@@ -26,6 +26,7 @@
 #include "../../../library/dev/device.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../library/pkg/package.h"
+#include "../../../utils/transform.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
@@ -96,6 +97,10 @@ BI_FootprintPad::~BI_FootprintPad() {
  *  Getters
  ******************************************************************************/
 
+bool BI_FootprintPad::getMirrored() const noexcept {
+  return mFootprint.getMirrored();
+}
+
 const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept {
   return mFootprintPad->getPackagePadUuid();
 }
@@ -110,14 +115,14 @@ QString BI_FootprintPad::getDisplayText() const noexcept {
 }
 
 QString BI_FootprintPad::getLayerName() const noexcept {
-  if (getIsMirrored())
+  if (getMirrored())
     return GraphicsLayer::getMirroredLayerName(mFootprintPad->getLayerName());
   else
     return mFootprintPad->getLayerName();
 }
 
 bool BI_FootprintPad::isOnLayer(const QString& layerName) const noexcept {
-  if (getIsMirrored()) {
+  if (getMirrored()) {
     return mFootprintPad->isOnLayer(
         GraphicsLayer::getMirroredLayerName(layerName));
   } else {
@@ -206,10 +211,11 @@ void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline) {
 }
 
 void BI_FootprintPad::updatePosition() noexcept {
-  mPosition = mFootprint.mapToScene(mFootprintPad->getPosition());
-  mRotation = mFootprint.getRotation() + mFootprintPad->getRotation();
+  Transform transform(mFootprint);
+  mPosition = transform.map(mFootprintPad->getPosition());
+  mRotation = transform.map(mFootprintPad->getRotation());
   mGraphicsItem->setPos(mPosition.toPxQPointF());
-  updateGraphicsItemTransform();
+  mGraphicsItem->setRotation(-mRotation.toDeg());
   mGraphicsItem->updateCacheAndRepaint();
   foreach (BI_NetLine* netline, mRegisteredNetLines) { netline->updateLine(); }
 }
@@ -217,10 +223,6 @@ void BI_FootprintPad::updatePosition() noexcept {
 /*******************************************************************************
  *  Inherited from BI_Base
  ******************************************************************************/
-
-bool BI_FootprintPad::getIsMirrored() const noexcept {
-  return mFootprint.getIsMirrored();
-}
 
 QPainterPath BI_FootprintPad::getGrabAreaScenePx() const noexcept {
   return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
@@ -240,8 +242,12 @@ Path BI_FootprintPad::getOutline(const Length& expansion) const noexcept {
 }
 
 Path BI_FootprintPad::getSceneOutline(const Length& expansion) const noexcept {
-  Angle rotation = getIsMirrored() ? -mRotation : mRotation;
-  return getOutline(expansion).rotated(rotation).translated(mPosition);
+  const Path path = getOutline(expansion)
+                        .rotated(mFootprintPad->getRotation())
+                        .translated(mFootprintPad->getPosition());
+  const Transform transform(mFootprint.getPosition(), mFootprint.getRotation(),
+                            mFootprint.getMirrored());
+  return transform.map(path);
 }
 
 TraceAnchor BI_FootprintPad::toTraceAnchor() const noexcept {
@@ -284,13 +290,6 @@ void BI_FootprintPad::componentSignalInstanceNetSignalChanged(NetSignal* from,
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void BI_FootprintPad::updateGraphicsItemTransform() noexcept {
-  QTransform t;
-  if (mFootprint.getIsMirrored()) t.scale(qreal(-1), qreal(1));
-  t.rotate(-mRotation.toDeg());
-  mGraphicsItem->setTransform(t);
-}
 
 QString BI_FootprintPad::getLibraryDeviceName() const noexcept {
   return *mFootprint.getDeviceInstance()

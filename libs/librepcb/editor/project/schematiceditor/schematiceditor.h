@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../dialogs/graphicsexportdialog.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "ui_schematiceditor.h"
 
@@ -92,11 +93,7 @@ private slots:
 
   // Actions
   void on_actionClose_Project_triggered();
-  void on_actionRenameSheet_triggered();
   void on_actionGrid_triggered();
-  void on_actionPrint_triggered();
-  void on_actionPDF_Export_triggered();
-  void on_actionExportAsSvg_triggered();
   void on_actionGenerateBom_triggered();
   void on_actionAddComp_Resistor_triggered();
   void on_actionAddComp_BipolarCapacitor_triggered();
@@ -121,6 +118,8 @@ private:
   QStringList getSearchToolBarCompleterList() noexcept;
   void goToSymbol(const QString& name, unsigned int index) noexcept;
   void updateComponentToolbarIcons() noexcept;
+  void execGraphicsExportDialog(GraphicsExportDialog::Output output,
+                                const QString& settingsKey) noexcept;
   bool useIeee315Symbols() const noexcept;
 
   // General Attributes

@@ -35,6 +35,9 @@ add_library(
   dialogs/dxfimportdialog.ui
   dialogs/filedialog.cpp
   dialogs/filedialog.h
+  dialogs/graphicsexportdialog.cpp
+  dialogs/graphicsexportdialog.h
+  dialogs/graphicsexportdialog.ui
   dialogs/gridsettingsdialog.cpp
   dialogs/gridsettingsdialog.h
   dialogs/gridsettingsdialog.ui
@@ -612,6 +615,8 @@ add_library(
   undocommandgroup.h
   undostack.cpp
   undostack.h
+  utils/editortoolbox.cpp
+  utils/editortoolbox.h
   utils/exclusiveactiongroup.cpp
   utils/exclusiveactiongroup.h
   utils/halignactiongroup.cpp
@@ -639,6 +644,8 @@ add_library(
   widgets/doublespinbox.h
   widgets/editabletablewidget.cpp
   widgets/editabletablewidget.h
+  widgets/graphicsexportpreviewwidget.cpp
+  widgets/graphicsexportpreviewwidget.h
   widgets/graphicslayercombobox.cpp
   widgets/graphicslayercombobox.h
   widgets/graphicsview.cpp
@@ -685,6 +692,8 @@ add_library(
   workspace/controlpanel/projecttreemodel.h
   workspace/controlpanel/recentprojectsmodel.cpp
   workspace/controlpanel/recentprojectsmodel.h
+  workspace/desktopservices.cpp
+  workspace/desktopservices.h
   workspace/firstrunwizard/firstrunwizard.cpp
   workspace/firstrunwizard/firstrunwizard.h
   workspace/firstrunwizard/firstrunwizard.ui

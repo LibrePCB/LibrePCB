@@ -32,7 +32,6 @@
 #include "../../types/uuid.h"
 #include "../erc/if_ercmsgprovider.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -234,23 +233,6 @@ public:
   void addToProject();
   void removeFromProject();
   void save();
-  /**
-   * @brief Print board to a QPrinter (printer or file)
-   *
-   * This is a helper function to print the board into w QPrinter. It does
-   * following:
-   *
-   * - Clear selection (#clearSelection())
-   * - Adjust layer colors to avoid too bright (almost invisible) elements
-   * - Render the board with scale 1:1 (#renderToQPainter())
-   * - Revert layer colors
-   *
-   * @param printer   The QPrinter where to print the board
-   *
-   * @throw Exception     On error
-   */
-  void print(QPrinter& printer);
-  void renderToQPainter(QPainter& painter, int dpi) const;
   void saveViewSceneRect(const QRectF& rect) noexcept { mViewRect = rect; }
   const QRectF& restoreViewSceneRect() const noexcept { return mViewRect; }
   void selectAll() noexcept;

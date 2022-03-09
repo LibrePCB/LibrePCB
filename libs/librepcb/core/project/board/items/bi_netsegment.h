@@ -121,11 +121,6 @@ public:
   Type_t getType() const noexcept override {
     return BI_Base::Type_t::NetSegment;
   }
-  const Point& getPosition() const noexcept override {
-    static Point p(0, 0);
-    return p;
-  }
-  bool getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   bool isSelectable() const noexcept override { return false; }
   bool isSelected() const noexcept override;

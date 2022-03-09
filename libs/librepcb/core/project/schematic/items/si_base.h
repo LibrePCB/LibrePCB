@@ -70,7 +70,6 @@ public:
   Circuit& getCircuit() const noexcept;
   Schematic& getSchematic() const noexcept { return mSchematic; }
   virtual Type_t getType() const noexcept = 0;
-  virtual const Point& getPosition() const noexcept = 0;
   virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
   virtual bool isAddedToSchematic() const noexcept {
     return mIsAddedToSchematic;

@@ -101,7 +101,7 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
   mUi->edtPosX->setValue(mDevice.getPosition().getX());
   mUi->edtPosY->setValue(mDevice.getPosition().getY());
   mUi->edtRotation->setValue(mDevice.getRotation());
-  mUi->cbxMirror->setChecked(mDevice.getIsMirrored());
+  mUi->cbxMirror->setChecked(mDevice.getMirrored());
 
   // set focus to component instance name
   mUi->edtCompInstName->selectAll();

@@ -96,6 +96,10 @@ add_library(
   export/gerberattributewriter.h
   export/gerbergenerator.cpp
   export/gerbergenerator.h
+  export/graphicsexport.cpp
+  export/graphicsexport.h
+  export/graphicsexportsettings.cpp
+  export/graphicsexportsettings.h
   export/pickplacecsvwriter.cpp
   export/pickplacecsvwriter.h
   export/pickplacedata.cpp
@@ -154,6 +158,8 @@ add_library(
   graphics/graphicslayername.h
   graphics/graphicslayerstackappearancesettings.cpp
   graphics/graphicslayerstackappearancesettings.h
+  graphics/graphicspainter.cpp
+  graphics/graphicspainter.h
   graphics/graphicsscene.cpp
   graphics/graphicsscene.h
   graphics/holegraphicsitem.cpp
@@ -242,6 +248,8 @@ add_library(
   library/pkg/footprintpad.h
   library/pkg/footprintpadgraphicsitem.cpp
   library/pkg/footprintpadgraphicsitem.h
+  library/pkg/footprintpainter.cpp
+  library/pkg/footprintpainter.h
   library/pkg/msg/msgduplicatepadname.cpp
   library/pkg/msg/msgduplicatepadname.h
   library/pkg/msg/msgmissingfootprint.cpp
@@ -280,6 +288,8 @@ add_library(
   library/sym/symbolcheck.h
   library/sym/symbolgraphicsitem.cpp
   library/sym/symbolgraphicsitem.h
+  library/sym/symbolpainter.cpp
+  library/sym/symbolpainter.h
   library/sym/symbolpin.cpp
   library/sym/symbolpin.h
   library/sym/symbolpingraphicsitem.cpp
@@ -309,6 +319,8 @@ add_library(
   project/board/boardgerberexport.h
   project/board/boardlayerstack.cpp
   project/board/boardlayerstack.h
+  project/board/boardpainter.cpp
+  project/board/boardpainter.h
   project/board/boardpickplacegenerator.cpp
   project/board/boardpickplacegenerator.h
   project/board/boardplanefragmentsbuilder.cpp
@@ -420,6 +432,8 @@ add_library(
   project/schematic/schematic.h
   project/schematic/schematiclayerprovider.cpp
   project/schematic/schematiclayerprovider.h
+  project/schematic/schematicpainter.cpp
+  project/schematic/schematicpainter.h
   project/schematic/schematicselectionquery.cpp
   project/schematic/schematicselectionquery.h
   serialization/serializablekeyvaluemap.h
@@ -464,6 +478,8 @@ add_library(
   utils/tangentpathjoiner.h
   utils/toolbox.cpp
   utils/toolbox.h
+  utils/transform.cpp
+  utils/transform.h
   workspace/workspace.cpp
   workspace/workspace.h
   workspace/workspacelibrarydb.cpp
@@ -506,6 +522,7 @@ target_link_libraries(
          Qt5::Network
          Qt5::PrintSupport
          Qt5::Sql
+         Qt5::Svg
          Qt5::Widgets
          # Link with -lproc on SunOS / Solaris / Illumos
          # This is required for proc_get_psinfo

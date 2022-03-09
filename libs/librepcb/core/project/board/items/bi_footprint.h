@@ -71,7 +71,9 @@ public:
   }
   const QMap<Uuid, BI_FootprintPad*>& getPads() const noexcept { return mPads; }
   const Footprint& getLibFootprint() const noexcept;
+  const Point& getPosition() const noexcept;
   const Angle& getRotation() const noexcept;
+  bool getMirrored() const noexcept;
   bool isSelectable() const noexcept override;
   bool isUsed() const noexcept;
   QRectF getBoundingRect() const noexcept;
@@ -92,9 +94,6 @@ public:
   /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
-  // Helper Methods
-  Point mapToScene(const Point& relativePos) const noexcept;
-
   // Inherited from AttributeProvider
   /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
   QVector<const AttributeProvider*> getAttributeProviderParents() const
@@ -104,8 +103,6 @@ public:
   Type_t getType() const noexcept override {
     return BI_Base::Type_t::Footprint;
   }
-  const Point& getPosition() const noexcept override;
-  bool getIsMirrored() const noexcept override;
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 

@@ -183,12 +183,13 @@ public:
   void setEnabled(bool enable) noexcept;
 
   // Operator Overloadings
-  GraphicsLayer& operator=(const GraphicsLayer& rhs) = delete;
+  GraphicsLayer& operator=(const GraphicsLayer& rhs) noexcept;
 
   // Static Methods
   static int getInnerLayerCount() noexcept {
     return 62;
   }  // some random number... ;)
+  static bool isBoardLayer(const QString& name) noexcept;
   static bool isTopLayer(const QString& name) noexcept;
   static bool isBottomLayer(const QString& name) noexcept;
   static bool isInnerLayer(const QString& name) noexcept;

@@ -101,7 +101,6 @@ public:
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::NetLine; }
-  const Point& getPosition() const noexcept override { return mPosition; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 
@@ -116,7 +115,6 @@ private:
   SI_NetSegment& mNetSegment;
   NetLine mNetLine;
   QScopedPointer<SGI_NetLine> mGraphicsItem;
-  Point mPosition;  ///< the center of startpoint and endpoint
   QMetaObject::Connection mHighlightChangedConnection;
 
   // References

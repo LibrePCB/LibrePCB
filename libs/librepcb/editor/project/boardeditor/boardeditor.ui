@@ -44,7 +44,6 @@
      <widget class="QLabel" name="lblUnplacedComponentsNote">
       <property name="font">
        <font>
-        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
@@ -70,26 +69,58 @@
      <x>0</x>
      <y>0</y>
      <width>886</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>&amp;Export</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/img/actions/export.png</normaloff>:/img/actions/export.png</iconset>
+     </property>
+     <addaction name="separator"/>
+     <addaction name="actionExportPdf"/>
+     <addaction name="actionExportImage"/>
+     <addaction name="actionExportLppz"/>
+    </widget>
+    <widget class="QMenu" name="menuGenerate_production_data">
+     <property name="title">
+      <string>Generate production data</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/img/actions/export_pick_place_file.png</normaloff>:/img/actions/export_pick_place_file.png</iconset>
+     </property>
+     <addaction name="actionGenerateFabricationData"/>
+     <addaction name="actionGeneratePickPlace"/>
+     <addaction name="actionGenerateBom"/>
+    </widget>
+    <widget class="QMenu" name="menuImport">
+     <property name="title">
+      <string>Import</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/img/actions/import.png</normaloff>:/img/actions/import.png</iconset>
+     </property>
+     <addaction name="actionImportDxf"/>
+    </widget>
     <addaction name="actionProjectSave"/>
     <addaction name="separator"/>
-    <addaction name="actionExportLppz"/>
-    <addaction name="actionExportAsPdf"/>
-    <addaction name="actionExportAsSvg"/>
-    <addaction name="actionGenerateBom"/>
-    <addaction name="actionGenerateFabricationData"/>
-    <addaction name="actionGeneratePickPlace"/>
     <addaction name="separator"/>
-    <addaction name="actionImportDxf"/>
+    <addaction name="separator"/>
+    <addaction name="separator"/>
+    <addaction name="menuImport"/>
+    <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionPrint"/>
-    <addaction name="separator"/>
+    <addaction name="menuGenerate_production_data"/>
     <addaction name="actionOrderPcb"/>
     <addaction name="separator"/>
     <addaction name="actionProjectClose"/>
@@ -200,7 +231,7 @@
    <addaction name="actionNewBoard"/>
    <addaction name="actionProjectSave"/>
    <addaction name="actionPrint"/>
-   <addaction name="actionExportAsPdf"/>
+   <addaction name="actionExportPdf"/>
    <addaction name="actionOrderPcb"/>
    <addaction name="separator"/>
    <addaction name="actionShowControlPanel"/>
@@ -329,7 +360,10 @@
      <normaloff>:/img/actions/print.png</normaloff>:/img/actions/print.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Print</string>
+    <string>&amp;Print board</string>
+   </property>
+   <property name="toolTip">
+    <string>Print board</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+P</string>
@@ -347,16 +381,19 @@
     <string notr="true">Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionExportAsPdf">
+  <action name="actionExportPdf">
    <property name="icon">
     <iconset>
      <normaloff>:/img/actions/pdf.png</normaloff>:/img/actions/pdf.png</iconset>
    </property>
    <property name="text">
-    <string>PDF &amp;Export</string>
+    <string>Export &amp;PDF</string>
    </property>
-   <property name="shortcut">
-    <string notr="true"/>
+   <property name="toolTip">
+    <string>Export board as PDF file</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
   <action name="actionShowControlPanel">
@@ -713,13 +750,10 @@
      <normaloff>:/img/actions/export_gerber.png</normaloff>:/img/actions/export_gerber.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Generate Fabrication Data</string>
+    <string>PCB &amp;Fabrication Data (Gerber)</string>
    </property>
    <property name="toolTip">
-    <string>Generate Fabrication Data</string>
-   </property>
-   <property name="shortcut">
-    <string notr="true"/>
+    <string>Generate PCB fabrication data</string>
    </property>
   </action>
   <action name="actionModifyDesignRules">
@@ -828,13 +862,10 @@
      <normaloff>:/img/actions/export_zip.png</normaloff>:/img/actions/export_zip.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Export project to *.lppz</string>
+    <string>Export project &amp;archive (*.lppz)</string>
    </property>
    <property name="toolTip">
-    <string>Export project to *.lppz</string>
-   </property>
-   <property name="shortcut">
-    <string notr="true"/>
+    <string>Export project to *.lppz archive</string>
    </property>
   </action>
   <action name="actionGenerateBom">
@@ -843,10 +874,10 @@
      <normaloff>:/img/actions/generate_bom.png</normaloff>:/img/actions/generate_bom.png</iconset>
    </property>
    <property name="text">
-    <string>Generate BOM</string>
+    <string>Bill of materials (BOM)</string>
    </property>
    <property name="toolTip">
-    <string>Generate BOM</string>
+    <string>Export bill of materials (BOM)</string>
    </property>
    <property name="shortcut">
     <string notr="true"/>
@@ -894,22 +925,10 @@
      <normaloff>:/img/actions/export_pick_place_file.png</normaloff>:/img/actions/export_pick_place_file.png</iconset>
    </property>
    <property name="text">
-    <string>Generate Pick&amp;&amp;Place Files</string>
+    <string>&amp;Pick&amp;&amp;Place Files</string>
    </property>
-   <property name="shortcut">
-    <string notr="true"/>
-   </property>
-  </action>
-  <action name="actionExportAsSvg">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/img/actions/export_svg.png</normaloff>:/img/actions/export_svg.png</iconset>
-   </property>
-   <property name="text">
-    <string>SVG Export</string>
-   </property>
-   <property name="shortcut">
-    <string notr="true"/>
+   <property name="toolTip">
+    <string>Generate pick&amp;place files</string>
    </property>
   </action>
   <action name="actionSelectAll">
@@ -927,7 +946,7 @@
   <action name="actionImportDxf">
    <property name="icon">
     <iconset>
-     <normaloff>:/img/actions/import.png</normaloff>:/img/actions/import.png</iconset>
+     <normaloff>:/img/actions/export_svg.png</normaloff>:/img/actions/export_svg.png</iconset>
    </property>
    <property name="text">
     <string>Import DXF</string>
@@ -945,6 +964,18 @@
     <string notr="true"/>
    </property>
   </action>
+  <action name="actionExportImage">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/export_pixmap.png</normaloff>:/img/actions/export_pixmap.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export &amp;image</string>
+   </property>
+   <property name="toolTip">
+    <string>Export board as image file</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -953,14 +984,14 @@
    <header location="global">librepcb/editor/widgets/statusbar.h</header>
   </customwidget>
   <customwidget>
-   <class>QTabBar</class>
-   <extends>QWidget</extends>
-   <header>qtabbar.h</header>
-  </customwidget>
-  <customwidget>
    <class>librepcb::editor::SearchToolBar</class>
    <extends>QToolBar</extends>
    <header location="global">librepcb/editor/widgets/searchtoolbar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QTabBar</class>
+   <extends>QWidget</extends>
+   <header>qtabbar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

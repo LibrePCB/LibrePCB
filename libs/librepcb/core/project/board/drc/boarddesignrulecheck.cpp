@@ -28,6 +28,7 @@
 #include "../../../library/pkg/footprintpad.h"
 #include "../../../utils/clipperhelpers.h"
 #include "../../../utils/toolbox.h"
+#include "../../../utils/transform.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/netsignal.h"
@@ -312,10 +313,8 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
                         .arg(layer->getNameTr(),
                              formatLength(*text->getText().getStrokeWidth()));
       QVector<Path> locations;
-      foreach (Path path, text->getText().getPaths()) {
-        path.rotate(text->getText().getRotation());
-        if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
-        path.translate(text->getText().getPosition());
+      Transform transform(text->getText());
+      foreach (Path path, transform.map(text->getText().getPaths())) {
         locations += path.toOutlineStrokes(PositiveLength(
             qMax(*text->getText().getStrokeWidth(), Length(50000))));
       }
@@ -358,10 +357,8 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
                           .arg(layer->getNameTr(),
                                formatLength(*text->getText().getStrokeWidth()));
         QVector<Path> locations;
-        foreach (Path path, text->getText().getPaths()) {
-          path.rotate(text->getText().getRotation());
-          if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
-          path.translate(text->getText().getPosition());
+        Transform transform(text->getText());
+        foreach (Path path, transform.map(text->getText().getPaths())) {
           locations += path.toOutlineStrokes(PositiveLength(
               qMax(*text->getText().getStrokeWidth(), Length(50000))));
         }
@@ -505,13 +502,13 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressStart,
 
   // package holes
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    Transform transform(*device);
     const BI_Footprint& footprint = device->getFootprint();
     for (const Hole& hole : footprint.getLibFootprint().getHoles()) {
       if (hole.getDiameter() < *mOptions.minNpthDrillDiameter) {
         QString msg = msgTr.arg(formatLength(*hole.getDiameter()));
-        Path location =
-            Path::circle(hole.getDiameter())
-                .translated(footprint.mapToScene(hole.getPosition()));
+        Path location = Path::circle(hole.getDiameter())
+                            .translated(transform.map(hole.getPosition()));
         emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }
@@ -533,33 +530,22 @@ const ClipperLib::Paths& BoardDesignRuleCheck::getCopperPaths(
 ClipperLib::Paths BoardDesignRuleCheck::getDeviceCourtyardPaths(
     const BI_Device& device, const GraphicsLayer* layer) {
   ClipperLib::Paths paths;
+  Transform transform(device);
   for (const Polygon& polygon : device.getLibFootprint().getPolygons()) {
-    QString polygonLayer = *polygon.getLayerName();
-    if (device.getIsMirrored()) {
-      polygonLayer = GraphicsLayer::getMirroredLayerName(polygonLayer);
-    }
+    GraphicsLayerName polygonLayer = transform.map(polygon.getLayerName());
     if (polygonLayer != layer->getName()) {
       continue;
     }
-    Path path = polygon.getPath();
-    path.rotate(device.getRotation());
-    if (device.getIsMirrored()) path.mirror(Qt::Horizontal);
-    path.translate(device.getPosition());
+    Path path = transform.map(polygon.getPath());
     ClipperHelpers::unite(paths,
                           ClipperHelpers::convert(path, maxArcTolerance()));
   }
   for (const Circle& circle : device.getLibFootprint().getCircles()) {
-    QString circleLayer = *circle.getLayerName();
-    if (device.getIsMirrored()) {
-      circleLayer = GraphicsLayer::getMirroredLayerName(circleLayer);
-    }
+    GraphicsLayerName circleLayer = transform.map(circle.getLayerName());
     if (circleLayer != layer->getName()) {
       continue;
     }
-    Point absolutePos = circle.getCenter();
-    absolutePos.rotate(device.getRotation());
-    if (device.getIsMirrored()) absolutePos.mirror(Qt::Horizontal);
-    absolutePos += device.getPosition();
+    Point absolutePos = transform.map(circle.getCenter());
     ClipperHelpers::unite(
         paths,
         ClipperHelpers::convert(Path::circle(circle.getDiameter()),

@@ -114,8 +114,6 @@ public:
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::NetLine; }
-  const Point& getPosition() const noexcept override { return mPosition; }
-  bool getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 
@@ -130,7 +128,6 @@ private:
   BI_NetSegment& mNetSegment;
   Trace mTrace;
   QScopedPointer<BGI_NetLine> mGraphicsItem;
-  Point mPosition;  ///< the center of startpoint and endpoint
   QMetaObject::Connection mHighlightChangedConnection;
 
   // References

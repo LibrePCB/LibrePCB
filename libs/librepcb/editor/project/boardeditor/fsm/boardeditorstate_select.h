@@ -133,7 +133,7 @@ private:  // Methods
       const QString& text = tr("Measure Selected Segments Length")) noexcept;
   void addActionProperties(QMenu& menu, Board& board, BI_Base& item,
                            const QString& text = tr("Properties")) noexcept;
-  void addActionSnap(QMenu& menu, const Point pos, Board& board, BI_Base& item,
+  void addActionSnap(QMenu& menu, const Point& pos, Board& board,
                      const QString& text = tr("Snap To Grid")) noexcept;
   void addActionSelectAll(
       QMenu& menu, BI_NetSegment& netsegment,

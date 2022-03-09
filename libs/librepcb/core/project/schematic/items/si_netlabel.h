@@ -82,9 +82,7 @@ public:
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::NetLabel; }
-  const Point& getPosition() const noexcept override {
-    return mNetLabel.getPosition();
-  }
+  const Point& getPosition() const noexcept { return mNetLabel.getPosition(); }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 

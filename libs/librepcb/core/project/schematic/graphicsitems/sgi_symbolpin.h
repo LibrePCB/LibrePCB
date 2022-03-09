@@ -79,7 +79,6 @@ private:
   GraphicsLayer* mJunctionLayer;
   QStaticText mStaticText;
   bool mRotate180;
-  bool mMirrored;
   QRectF mBoundingRect;
   QPointF mTextOrigin;
   QRectF mTextBoundingRect;

@@ -31,6 +31,7 @@
 #include "../../library/pkg/footprint.h"
 #include "../../library/pkg/footprintpad.h"
 #include "../../library/pkg/packagepad.h"
+#include "../../utils/transform.h"
 #include "../circuit/componentinstance.h"
 #include "../circuit/componentsignalinstance.h"
 #include "../circuit/netsignal.h"
@@ -325,9 +326,10 @@ int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const {
   // footprint holes
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     const BI_Footprint& footprint = device->getFootprint();
+    const Transform transform(*device);
     for (const Hole& hole : footprint.getLibFootprint().getHoles()) {
-      gen.drill(footprint.mapToScene(hole.getPosition()), hole.getDiameter(),
-                false, ExcellonGenerator::Function::MechanicalDrill);
+      gen.drill(transform.map(hole.getPosition()), hole.getDiameter(), false,
+                ExcellonGenerator::Function::MechanicalDrill);
       ++count;
     }
   }
@@ -449,10 +451,8 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
     if (layerName == text->getText().getLayerName()) {
       UnsignedLength lineWidth =
           calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
-      foreach (Path path, text->getText().getPaths()) {
-        path.rotate(text->getText().getRotation());
-        if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
-        path.translate(text->getText().getPosition());
+      const Transform transform(text->getText());
+      foreach (Path path, transform.map(text->getText().getPaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             QString());
       }
@@ -525,16 +525,12 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen,
   }
 
   // draw polygons
+  const Transform transform(footprint);
   for (const Polygon& polygon :
        footprint.getLibFootprint().getPolygons().sortedByUuid()) {
-    QString layer = footprint.getIsMirrored()
-        ? GraphicsLayer::getMirroredLayerName(layerName)
-        : layerName;
+    QString layer = transform.map(layerName);
     if (layer == polygon.getLayerName()) {
-      Path path = polygon.getPath();
-      path.rotate(footprint.getRotation());
-      if (footprint.getIsMirrored()) path.mirror(Qt::Horizontal);
-      path.translate(footprint.getPosition());
+      Path path = transform.map(polygon.getPath());
       gen.drawPathOutline(path, calcWidthOfLayer(polygon.getLineWidth(), layer),
                           graphicsFunction, graphicsNet, component);
       // Only fill closed paths (for consistency with the appearance in the
@@ -548,14 +544,9 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen,
   // draw circles
   for (const Circle& circle :
        footprint.getLibFootprint().getCircles().sortedByUuid()) {
-    QString layer = footprint.getIsMirrored()
-        ? GraphicsLayer::getMirroredLayerName(layerName)
-        : layerName;
+    QString layer = transform.map(layerName);
     if (layer == circle.getLayerName()) {
-      Point absolutePos = circle.getCenter();
-      absolutePos.rotate(footprint.getRotation());
-      if (footprint.getIsMirrored()) absolutePos.mirror(Qt::Horizontal);
-      absolutePos += footprint.getPosition();
+      Point absolutePos = transform.map(circle.getCenter());
       if (circle.isFilled()) {
         PositiveLength outerDia = circle.getDiameter() + circle.getLineWidth();
         gen.drawPathArea(Path::circle(outerDia).translated(absolutePos),
@@ -580,10 +571,8 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen,
     if (layerName == text->getText().getLayerName()) {
       UnsignedLength lineWidth =
           calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
-      foreach (Path path, text->getText().getPaths()) {
-        path.rotate(text->getText().getRotation());
-        if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
-        path.translate(text->getPosition());
+      Transform transform(text->getText());
+      foreach (Path path, transform.map(text->getText().getPaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             component);
       }
@@ -610,7 +599,6 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
     return;
   }
 
-  Angle rot = pad.getIsMirrored() ? -pad.getRotation() : pad.getRotation();
   const FootprintPad& libPad = pad.getLibPad();
   Length width = *libPad.getWidth();
   Length height = *libPad.getHeight();
@@ -661,18 +649,18 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
 
   switch (libPad.getShape()) {
     case FootprintPad::Shape::ROUND: {
-      gen.flashObround(pad.getPosition(), pWidth, pHeight, rot, function, net,
-                       component, pin, signal);
+      gen.flashObround(pad.getPosition(), pWidth, pHeight, pad.getRotation(),
+                       function, net, component, pin, signal);
       break;
     }
     case FootprintPad::Shape::RECT: {
-      gen.flashRect(pad.getPosition(), pWidth, pHeight, rot, function, net,
-                    component, pin, signal);
+      gen.flashRect(pad.getPosition(), pWidth, pHeight, pad.getRotation(),
+                    function, net, component, pin, signal);
       break;
     }
     case FootprintPad::Shape::OCTAGON: {
-      gen.flashOctagon(pad.getPosition(), pWidth, pHeight, rot, function, net,
-                       component, pin, signal);
+      gen.flashOctagon(pad.getPosition(), pWidth, pHeight, pad.getRotation(),
+                       function, net, component, pin, signal);
       break;
     }
     default: { throw LogicError(__FILE__, __LINE__); }

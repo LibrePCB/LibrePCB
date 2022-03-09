@@ -68,7 +68,7 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
     QString packageName = *device->getLibPackage().getNames().value(locale);
     Point position = device->getPosition();
     Angle rotation = device->getRotation();
-    PickPlaceDataItem::BoardSide boardSide = device->getIsMirrored()
+    PickPlaceDataItem::BoardSide boardSide = device->getMirrored()
         ? PickPlaceDataItem::BoardSide::BOTTOM
         : PickPlaceDataItem::BoardSide::TOP;
     data->addItem(PickPlaceDataItem(designator, value, deviceName, packageName,

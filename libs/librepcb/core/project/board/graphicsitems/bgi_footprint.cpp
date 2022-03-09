@@ -74,7 +74,7 @@ void BGI_Footprint::updateCacheAndRepaint() noexcept {
   mShape = QPainterPath();
 
   // set Z value
-  if (mFootprint.getIsMirrored())
+  if (mFootprint.getMirrored())
     setZValue(Board::ZValue_FootprintsBottom);
   else
     setZValue(Board::ZValue_FootprintsTop);
@@ -241,7 +241,7 @@ void BGI_Footprint::paint(QPainter* painter,
  ******************************************************************************/
 
 GraphicsLayer* BGI_Footprint::getLayer(QString name) const noexcept {
-  if (mFootprint.getIsMirrored())
+  if (mFootprint.getMirrored())
     name = GraphicsLayer::getMirroredLayerName(name);
   return mFootprint.getDeviceInstance().getBoard().getLayerStack().getLayer(
       name);

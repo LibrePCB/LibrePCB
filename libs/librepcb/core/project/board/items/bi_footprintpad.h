@@ -58,9 +58,30 @@ public:
   ~BI_FootprintPad();
 
   // Getters
+
+  /**
+   * @brief Get the absolute position of the pad (global scene coordinates)
+   *
+   * @return Global pad position
+   */
+  const Point& getPosition() const noexcept override { return mPosition; }
+
+  /**
+   * @brief Get the absolute rotation of the pad (global scene coordinates)
+   *
+   * @return Global pad rotation
+   */
+  const Angle& getRotation() const noexcept { return mRotation; }
+
+  /**
+   * @brief Get the absolute mirror state of the pad (global scene coordinates)
+   *
+   * @return Global pad mirror state
+   */
+  bool getMirrored() const noexcept;
+
   const Uuid& getLibPadUuid() const noexcept;
   QString getDisplayText() const noexcept;
-  const Angle& getRotation() const noexcept { return mRotation; }
   BI_Footprint& getFootprint() const noexcept { return mFootprint; }
   QString getLayerName() const noexcept;
   bool isOnLayer(const QString& layerName) const noexcept;
@@ -85,8 +106,6 @@ public:
   Type_t getType() const noexcept override {
     return BI_Base::Type_t::FootprintPad;
   }
-  const Point& getPosition() const noexcept override { return mPosition; }
-  bool getIsMirrored() const noexcept override;
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 
@@ -106,7 +125,6 @@ private slots:
   void componentSignalInstanceNetSignalChanged(NetSignal* from, NetSignal* to);
 
 private:
-  void updateGraphicsItemTransform() noexcept;
   QString getLibraryDeviceName() const noexcept;
   QString getComponentInstanceName() const noexcept;
   QString getPadNameOrUuid() const noexcept;

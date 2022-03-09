@@ -27,6 +27,7 @@
 #include "../../library/cmd/cmdlibraryelementedit.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../widgets/statusbar.h"
+#include "../../workspace/desktopservices.h"
 #include "../cmd/cmdfootprintedit.h"
 #include "fsm/packageeditorfsm.h"
 #include "ui_packageeditorwidget.h"
@@ -35,6 +36,7 @@
 #include <librepcb/core/library/msg/msgmissingauthor.h>
 #include <librepcb/core/library/msg/msgmissingcategories.h>
 #include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/pkg/footprintpainter.h>
 #include <librepcb/core/library/pkg/msg/msgmissingfootprint.h>
 #include <librepcb/core/library/pkg/msg/msgmissingfootprintname.h>
 #include <librepcb/core/library/pkg/msg/msgmissingfootprintvalue.h>
@@ -530,6 +532,46 @@ bool PackageEditorWidget::processCheckMessage(
   if (fixMsgHelper<MsgMissingFootprintValue>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgWrongFootprintTextLayer>(msg, applyFix)) return true;
   return false;
+}
+
+bool PackageEditorWidget::execGraphicsExportDialog(
+    GraphicsExportDialog::Output output, const QString& settingsKey) noexcept {
+  try {
+    // Get current footprint.
+    std::shared_ptr<const Footprint> footprint = mFsm->getCurrentFootprint();
+
+    // Determine default file path.
+    QString packageName =
+        FilePath::cleanFileName(*mPackage->getNames().getDefaultValue(),
+                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    if ((mPackage->getFootprints().count() > 1) && (footprint)) {
+      packageName += "_" % footprint->getNames().getDefaultValue();
+    }
+    FilePath defaultFilePath(QDir::homePath() % "/" % packageName %
+                             "_Footprint");
+
+    // Copy package items to allow processing them in worker threads.
+    QList<std::shared_ptr<GraphicsPagePainter>> pages;
+    if (footprint) {
+      pages.append(std::make_shared<FootprintPainter>(*footprint));
+    }
+
+    // Show dialog, which will do all the work.
+    GraphicsExportDialog dialog(
+        GraphicsExportDialog::Mode::Board, output, pages, 0,
+        *mPackage->getNames().getDefaultValue(), 0, defaultFilePath,
+        mContext.workspace.getSettings().defaultLengthUnit.get(),
+        "package_editor/" % settingsKey, this);
+    connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
+            [this](const FilePath& fp) {
+              DesktopServices services(mContext.workspace.getSettings(), true);
+              services.openFile(fp);
+            });
+    dialog.exec();
+  } catch (const Exception& e) {
+    QMessageBox::warning(this, tr("Error"), e.getMsg());
+  }
+  return true;
 }
 
 /*******************************************************************************

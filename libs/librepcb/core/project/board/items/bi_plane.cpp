@@ -114,7 +114,6 @@ BI_Plane::BI_Plane(Board& board, const Uuid& uuid,
 
 void BI_Plane::init() {
   mGraphicsItem.reset(new BGI_Plane(*this));
-  mGraphicsItem->setPos(getPosition().toPxQPointF());
   mGraphicsItem->setRotation(Angle::deg0().toDeg());
 
   // connect to the "attributes changed" signal of the board

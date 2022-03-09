@@ -39,21 +39,42 @@
      <x>0</x>
      <y>0</y>
      <width>920</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionNew_Schematic_Page"/>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>&amp;Export</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/img/actions/export.png</normaloff>:/img/actions/export.png</iconset>
+     </property>
+     <addaction name="separator"/>
+     <addaction name="actionExportPdf"/>
+     <addaction name="actionExportImage"/>
+     <addaction name="actionExportLppz"/>
+    </widget>
+    <widget class="QMenu" name="menuProductiondata">
+     <property name="title">
+      <string>Generate production data</string>
+     </property>
+     <property name="icon">
+      <iconset>
+       <normaloff>:/img/actions/export_pick_place_file.png</normaloff>:/img/actions/export_pick_place_file.png</iconset>
+     </property>
+     <addaction name="actionGenerateBom"/>
+    </widget>
     <addaction name="actionSave_Project"/>
-    <addaction name="actionExportLppz"/>
-    <addaction name="actionPDF_Export"/>
-    <addaction name="actionExportAsSvg"/>
-    <addaction name="actionGenerateBom"/>
-    <addaction name="actionPrint"/>
     <addaction name="separator"/>
+    <addaction name="menuExport"/>
+    <addaction name="separator"/>
+    <addaction name="actionPrint"/>
+    <addaction name="menuProductiondata"/>
     <addaction name="actionOrderPcb"/>
     <addaction name="separator"/>
     <addaction name="actionClose_Project"/>
@@ -122,6 +143,7 @@
     <property name="title">
      <string>Schematic</string>
     </property>
+    <addaction name="actionNewSheet"/>
     <addaction name="actionRenameSheet"/>
    </widget>
    <addaction name="menuFile"/>
@@ -148,10 +170,10 @@
    </attribute>
    <addaction name="actionClose_Project"/>
    <addaction name="separator"/>
-   <addaction name="actionNew_Schematic_Page"/>
+   <addaction name="actionNewSheet"/>
    <addaction name="actionSave_Project"/>
    <addaction name="actionPrint"/>
-   <addaction name="actionPDF_Export"/>
+   <addaction name="actionExportPdf"/>
    <addaction name="actionOrderPcb"/>
    <addaction name="separator"/>
    <addaction name="actionShow_Control_Panel"/>
@@ -331,22 +353,25 @@
      <normaloff>:/img/actions/print.png</normaloff>:/img/actions/print.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Print</string>
+    <string>&amp;Print schematics</string>
+   </property>
+   <property name="toolTip">
+    <string>Print schematics</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+P</string>
    </property>
   </action>
-  <action name="actionPDF_Export">
+  <action name="actionExportPdf">
    <property name="icon">
     <iconset>
      <normaloff>:/img/actions/pdf.png</normaloff>:/img/actions/pdf.png</iconset>
    </property>
    <property name="text">
-    <string>Export schematics to &amp;PDF</string>
+    <string>Export &amp;PDF</string>
    </property>
-   <property name="shortcut">
-    <string notr="true"/>
+   <property name="toolTip">
+    <string>Export schematics as PDF file</string>
    </property>
    <property name="visible">
     <bool>true</bool>
@@ -731,13 +756,13 @@
     <string notr="true"/>
    </property>
   </action>
-  <action name="actionNew_Schematic_Page">
+  <action name="actionNewSheet">
    <property name="icon">
     <iconset>
      <normaloff>:/img/actions/new_2.png</normaloff>:/img/actions/new_2.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;New Schematic Page</string>
+    <string>&amp;New Sheet</string>
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+N</string>
@@ -761,13 +786,10 @@
      <normaloff>:/img/actions/export_zip.png</normaloff>:/img/actions/export_zip.png</iconset>
    </property>
    <property name="text">
-    <string>&amp;Export project to *.lppz</string>
+    <string>Export project &amp;archive (*.lppz)</string>
    </property>
    <property name="toolTip">
-    <string>Export project to *.lppz</string>
-   </property>
-   <property name="shortcut">
-    <string notr="true"/>
+    <string>Export project to *.lppz archive</string>
    </property>
   </action>
   <action name="actionGenerateBom">
@@ -776,30 +798,15 @@
      <normaloff>:/img/actions/generate_bom.png</normaloff>:/img/actions/generate_bom.png</iconset>
    </property>
    <property name="text">
-    <string>Generate BOM</string>
+    <string>Bill of materials (BOM)</string>
    </property>
-   <property name="shortcut">
-    <string notr="true"/>
+   <property name="toolTip">
+    <string>Export bill of materials (BOM)</string>
    </property>
   </action>
   <action name="actionRenameSheet">
    <property name="text">
-    <string>Rename Sheet</string>
-   </property>
-   <property name="shortcut">
-    <string notr="true"/>
-   </property>
-  </action>
-  <action name="actionExportAsSvg">
-   <property name="icon">
-    <iconset>
-     <normaloff>:/img/actions/export_svg.png</normaloff>:/img/actions/export_svg.png</iconset>
-   </property>
-   <property name="text">
-    <string>Export sheet to SVG</string>
-   </property>
-   <property name="shortcut">
-    <string notr="true"/>
+    <string>&amp;Rename Sheet</string>
    </property>
   </action>
   <action name="actionSelectAll">
@@ -824,6 +831,18 @@
    </property>
    <property name="shortcut">
     <string notr="true"/>
+   </property>
+  </action>
+  <action name="actionExportImage">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/export_pixmap.png</normaloff>:/img/actions/export_pixmap.png</iconset>
+   </property>
+   <property name="text">
+    <string>Export &amp;image</string>
+   </property>
+   <property name="toolTip">
+    <string>Export schematics as image file</string>
    </property>
   </action>
  </widget>

@@ -26,6 +26,7 @@
 #include "../../../graphics/graphicslayer.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../utils/clipperhelpers.h"
+#include "../../../utils/transform.h"
 #include "../board.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprint.h"
@@ -74,14 +75,12 @@ void BoardClipperPathGenerator::addBoardOutline() {
 
   // footprint polygons
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    Transform transform(*device);
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
       if (polygon.getLayerName() != GraphicsLayer::sBoardOutlines) {
         continue;
       }
-      Path path = polygon.getPath();
-      path.rotate(device->getFootprint().getRotation());
-      if (device->getFootprint().getIsMirrored()) path.mirror(Qt::Horizontal);
-      path.translate(device->getFootprint().getPosition());
+      Path path = transform.map(polygon.getPath());
       ClipperHelpers::unite(mPaths,
                             ClipperHelpers::convert(path, mMaxArcTolerance));
     }
@@ -103,16 +102,14 @@ void BoardClipperPathGenerator::addHoles(const Length& offset) {
 
   // footprint holes
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    Transform transform(*device);
     for (const Hole& hole : device->getLibFootprint().getHoles()) {
       Length diameter = hole.getDiameter() + (offset * 2);
       if (diameter <= 0) {
         continue;
       }
-      Path path =
-          Path::circle(PositiveLength(diameter)).translated(hole.getPosition());
-      path.rotate(device->getFootprint().getRotation());
-      if (device->getFootprint().getIsMirrored()) path.mirror(Qt::Horizontal);
-      path.translate(device->getFootprint().getPosition());
+      Path path = transform.map(Path::circle(PositiveLength(diameter))
+                                    .translated(hole.getPosition()));
       ClipperHelpers::unite(mPaths,
                             ClipperHelpers::convert(path, mMaxArcTolerance));
     }
@@ -154,10 +151,8 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
       continue;
     }
     PositiveLength width(qMax(*text->getText().getStrokeWidth(), Length(1)));
-    foreach (Path path, text->getText().getPaths()) {
-      path.rotate(text->getText().getRotation());
-      if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
-      path.translate(text->getText().getPosition());
+    Transform transform(text->getText());
+    foreach (Path path, transform.map(text->getText().getPaths())) {
       QVector<Path> paths = path.toOutlineStrokes(width);
       foreach (const Path& p, paths) {
         ClipperHelpers::unite(mPaths,
@@ -181,20 +176,15 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
   // devices
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     const BI_Footprint& footprint = device->getFootprint();
+    Transform transform(*device);
 
     // polygons
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      QString polygonLayer = *polygon.getLayerName();
-      if (footprint.getIsMirrored()) {
-        polygonLayer = GraphicsLayer::getMirroredLayerName(polygonLayer);
-      }
+      GraphicsLayerName polygonLayer = transform.map(polygon.getLayerName());
       if ((polygonLayer != layerName) || (netsignal != nullptr)) {
         continue;
       }
-      Path path = polygon.getPath();
-      path.rotate(footprint.getRotation());
-      if (footprint.getIsMirrored()) path.mirror(Qt::Horizontal);
-      path.translate(footprint.getPosition());
+      Path path = transform.map(polygon.getPath());
       // outline
       if (polygon.getLineWidth() > 0) {
         QVector<Path> paths =
@@ -214,19 +204,12 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
 
     // circles
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
-      QString circleLayer = *circle.getLayerName();
-      if (footprint.getIsMirrored()) {
-        circleLayer = GraphicsLayer::getMirroredLayerName(circleLayer);
-      }
+      GraphicsLayerName circleLayer = transform.map(circle.getLayerName());
       if ((circleLayer != layerName) || (netsignal != nullptr)) {
         continue;
       }
-      Point absolutePos = circle.getCenter();
-      absolutePos.rotate(footprint.getRotation());
-      if (footprint.getIsMirrored()) absolutePos.mirror(Qt::Horizontal);
-      absolutePos += footprint.getPosition();
-      Path path = Path::circle(circle.getDiameter());
-      path.translate(absolutePos);
+      Path path = Path::circle(circle.getDiameter())
+                      .translated(transform.map(circle.getCenter()));
       // outline
       if (circle.getLineWidth() > 0) {
         QVector<Path> paths =
@@ -251,10 +234,8 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
         continue;
       }
       PositiveLength width(qMax(*text->getText().getStrokeWidth(), Length(1)));
-      foreach (Path path, text->getText().getPaths()) {
-        path.rotate(text->getText().getRotation());
-        if (text->getText().getMirrored()) path.mirror(Qt::Horizontal);
-        path.translate(text->getText().getPosition());
+      Transform transform(text->getText());
+      foreach (Path path, transform.map(text->getText().getPaths())) {
         foreach (const Path& p, path.toOutlineStrokes(width)) {
           ClipperHelpers::unite(mPaths,
                                 ClipperHelpers::convert(p, mMaxArcTolerance));
@@ -268,9 +249,11 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
           (pad->getCompSigInstNetSignal() != netsignal)) {
         continue;
       }
+      Transform transform(*pad);
       ClipperHelpers::unite(
           mPaths,
-          ClipperHelpers::convert(pad->getSceneOutline(), mMaxArcTolerance));
+          ClipperHelpers::convert(transform.map(pad->getOutline()),
+                                  mMaxArcTolerance));
     }
   }
 

@@ -433,7 +433,7 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept {
     BI_Footprint& footprint = device->getFootprint();
     if (footprint.isSelectable() &&
         footprint.getGrabAreaScenePx().contains(scenePosPx)) {
-      if (footprint.getIsMirrored()) {
+      if (footprint.getMirrored()) {
         list.append(&footprint);
       } else {
         list.prepend(&footprint);
@@ -442,7 +442,7 @@ QList<BI_Base*> Board::getItemsAtScenePos(const Point& pos) const noexcept {
     foreach (BI_FootprintPad* pad, footprint.getPads()) {
       if (pad->isSelectable() &&
           pad->getGrabAreaScenePx().contains(scenePosPx)) {
-        if (pad->getIsMirrored()) {
+        if (pad->getMirrored()) {
           list.append(pad);
         } else {
           list.insert(1, pad);
@@ -891,35 +891,6 @@ void Board::save() {
   } else {
     mDirectory->removeDirRecursively();  // can throw
   }
-}
-
-void Board::print(QPrinter& printer) {
-  clearSelection();
-
-  // Adjust layer colors
-  ScopeGuardList sgl;
-  foreach (GraphicsLayer* layer, mLayerStack->getAllLayers()) {
-    QColor color = layer->getColor();
-    sgl.add([layer, color]() { layer->setColor(color); });  // restore color
-    int h = color.hsvHue();
-    int s = color.hsvSaturation();
-    int v = color.value() / 2;  // avoid white colors
-    int a = (color.alpha() / 2) + 127;  // avoid transparent colors
-    layer->setColor(QColor::fromHsv(h, s, v, a));
-  }
-
-  QPainter painter(&printer);
-  renderToQPainter(painter, printer.resolution());  // can throw
-}
-
-void Board::renderToQPainter(QPainter& painter, int dpi) const {
-  QRectF sceneRect = mGraphicsScene->itemsBoundingRect();
-  QRectF printerRect(
-      qreal(0), qreal(0),
-      Length::fromPx(sceneRect.width()).toInch() * dpi,  // can throw
-      Length::fromPx(sceneRect.height()).toInch() * dpi);  // can throw
-  mGraphicsScene->render(&painter, printerRect, sceneRect,
-                         Qt::IgnoreAspectRatio);
 }
 
 void Board::selectAll() noexcept {

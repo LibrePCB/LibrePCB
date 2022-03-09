@@ -144,6 +144,18 @@ bool EditorWidgetBase::save() noexcept {
   return true;
 }
 
+bool EditorWidgetBase::exportImage() noexcept {
+  return execGraphicsExportDialog(GraphicsExportDialog::Output::Image,
+                                  "image_export");
+}
+bool EditorWidgetBase::exportPdf() noexcept {
+  return execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf,
+                                  "pdf_export");
+}
+bool EditorWidgetBase::print() noexcept {
+  return execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
+}
+
 /*******************************************************************************
  *  Protected Methods
  ******************************************************************************/

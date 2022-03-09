@@ -91,8 +91,26 @@ void GraphicsLayer::setEnabled(bool enable) noexcept {
 }
 
 /*******************************************************************************
+ *  Operator Overloadings
+ ******************************************************************************/
+
+GraphicsLayer& GraphicsLayer::operator=(const GraphicsLayer& rhs) noexcept {
+  mName = rhs.mName;
+  mNameTr = rhs.mNameTr;
+  mColor = rhs.mColor;
+  mColorHighlighted = rhs.mColorHighlighted;
+  mIsVisible = rhs.mIsVisible;
+  mIsEnabled = rhs.mIsEnabled;
+  return *this;
+}
+
+/*******************************************************************************
  *  Static Methods
  ******************************************************************************/
+
+bool GraphicsLayer::isBoardLayer(const QString& name) noexcept {
+  return name.startsWith("brd_") || isTopLayer(name) || isBottomLayer(name);
+}
 
 bool GraphicsLayer::isTopLayer(const QString& name) noexcept {
   return name.startsWith("top_");

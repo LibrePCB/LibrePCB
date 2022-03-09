@@ -85,7 +85,7 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
 
   // set Z value
   if ((mLibPad.getBoardSide() == FootprintPad::BoardSide::BOTTOM) !=
-      mPad.getIsMirrored()) {
+      mPad.getMirrored()) {
     setZValue(Board::ZValue_FootprintPadsBottom);
   } else {
     setZValue(Board::ZValue_FootprintPadsTop);
@@ -203,7 +203,7 @@ void BGI_FootprintPad::paint(QPainter* painter,
  ******************************************************************************/
 
 GraphicsLayer* BGI_FootprintPad::getLayer(QString name) const noexcept {
-  if (mPad.getIsMirrored()) name = GraphicsLayer::getMirroredLayerName(name);
+  if (mPad.getMirrored()) name = GraphicsLayer::getMirroredLayerName(name);
   return mPad.getFootprint()
       .getDeviceInstance()
       .getBoard()

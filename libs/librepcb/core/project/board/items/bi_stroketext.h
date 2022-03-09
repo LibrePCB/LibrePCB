@@ -67,6 +67,7 @@ public:
   const StrokeText& getText() const noexcept { return *mText; }
   const Uuid& getUuid() const
       noexcept;  // convenience function, e.g. for template usage
+  const Point& getPosition() const noexcept;
   bool isSelectable() const noexcept override;
 
   // General Methods
@@ -83,8 +84,6 @@ public:
   Type_t getType() const noexcept override {
     return BI_Base::Type_t::StrokeText;
   }
-  const Point& getPosition() const noexcept override;
-  bool getIsMirrored() const noexcept override { return false; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
   void setSelected(bool selected) noexcept override;
 

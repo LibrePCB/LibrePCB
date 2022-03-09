@@ -85,13 +85,15 @@ From Icons8:
 
 ```
 actions/clone.png: Color → Science → Natural Sciences → Clone
-actions/drc.png: Color →Programming → Testing→ Pass Fail
-actions/export_pick_place_file.png: Office L →Industry → Production Process→ Assembly Line
-actions/import.png: Color →Data→ Managing Data→ Import
+actions/drc.png: Color → Programming → Testing → Pass Fail
+actions/export.png: Color → Data → Export
+actions/export_pick_place_file.png: Office L → Industry → Production Process→ Assembly Line
+actions/export_pixmap: Color → Photo and Video → Photos → Image
+actions/import.png: Color → Data → Managing Data → Import
 actions/move_to.png: Pastel → Arrows → Move Out
 actions/order_pcb.png: Color → Ecommerce → Buy and Sell → Buy
-actions/ruler.png: Color →Editing → Image Editing→ Ruler
-actions/swap.png: Color →Arrows → Actions→ Swap
+actions/ruler.png: Color → Editing → Image Editing → Ruler
+actions/swap.png: Color → Arrows → Actions→ Swap
 ```
 
 From [publicdomainvectors.org](https://publicdomainvectors.org/):

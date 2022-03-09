@@ -98,6 +98,7 @@ libraryEditorWidget = {libraryEditor}::centralWidget
 libraryEditorActionNewElement = {libraryEditor}::actionNew
 libraryEditorActionRemove = {libraryEditor}::actionRemove
 libraryEditorActionImportEagleLibrary = {libraryEditor}::actionImportEagleLibrary
+libraryEditorActionExportImage = {libraryEditor}::actionExportImage
 
 # Tab widget
 libraryEditorTabWidget = {libraryEditorWidget}::tabWidget
@@ -254,6 +255,18 @@ libraryEditorEagleLibraryImportWizardSetOptionsComponentCategoryChooseButton = {
 libraryEditorEagleLibraryImportWizardSetOptionsChooseCategoryDialog = {libraryEditorEagleLibraryImportWizardSetOptionsPage}::librepcb__editor__CategoryChooserDialog
 libraryEditorEagleLibraryImportWizardSetOptionsChooseCategoryTree = {libraryEditorEagleLibraryImportWizardSetOptionsChooseCategoryDialog}::treeView
 
+# Graphics export dialog
+libraryEditorGraphicsExportDialog = librepcb__editor__GraphicsExportDialog
+libraryEditorGraphicsExportDialogButtonBox = {libraryEditorGraphicsExportDialog}::buttonBox
+libraryEditorGraphicsExportDialogButtonAccept = {libraryEditorGraphicsExportDialogButtonBox}::QPushButton
+libraryEditorGraphicsExportDialogButtonCancel = {libraryEditorGraphicsExportDialogButtonBox}::QPushButton-1
+libraryEditorGraphicsExportDialogOpenFileCheckbox = {libraryEditorGraphicsExportDialog}::cbxOpenExportedFiles
+
+# Graphics export save file dialog
+libraryEditorGraphicsExportSaveFileDialog = {libraryEditorGraphicsExportDialog}::{QT_FILE_DIALOG}
+libraryEditorGraphicsExportSaveFileDialogFileNameEdit = {libraryEditorGraphicsExportDialog}::{QT_FILE_DIALOG_LINE_EDIT}
+libraryEditorGraphicsExportSaveFileDialogOkButton = {libraryEditorGraphicsExportDialog}::{QT_FILE_DIALOG_BTN_OK}
+
 
 ################################################################################
 # Schematic Editor
@@ -270,6 +283,8 @@ schematicEditorDockErcMsg = {schematicEditor}::librepcb__editor__ErcMsgDock
 # Actions
 schematicEditorActionCloseProject = {schematicEditor}::actionClose_Project
 schematicEditorActionAddComponent = {schematicEditor}::actionToolAddComponent
+schematicEditorActionExportImage = {schematicEditor}::actionExportImage
+schematicEditorActionExportPdf = {schematicEditor}::actionExportPdf
 
 # Graphics view
 schematicEditorGraphicsView = {schematicEditor}::librepcb:_:GraphicsView
@@ -288,6 +303,26 @@ schematicEditorAddComponentDialogComponentNameLabel = {schematicEditorAddCompone
 schematicEditorAddComponentDialogComponentDescriptionLabel = {schematicEditorAddComponentDialog}::lblCompDescription
 schematicEditorAddComponentDialogDeviceNameLabel = {schematicEditorAddComponentDialog}::lblDeviceName
 
+# Graphics export dialog
+schematicEditorGraphicsExportDialog = {schematicEditor}::librepcb__editor__GraphicsExportDialog
+schematicEditorGraphicsExportDialogButtonBox = {schematicEditorGraphicsExportDialog}::buttonBox
+schematicEditorGraphicsExportDialogButtonBoxLeft = {schematicEditorGraphicsExportDialog}::buttonBoxLeft
+schematicEditorGraphicsExportDialogButtonRestoreDefaults = {schematicEditorGraphicsExportDialogButtonBoxLeft}::QPushButton
+schematicEditorGraphicsExportDialogButtonAccept = {schematicEditorGraphicsExportDialogButtonBox}::QPushButton
+schematicEditorGraphicsExportDialogButtonCancel = {schematicEditorGraphicsExportDialogButtonBox}::QPushButton-1
+schematicEditorGraphicsExportDialogButtonCopyToClipboard = {schematicEditorGraphicsExportDialogButtonBox}::btnCopyToClipboard
+schematicEditorGraphicsExportDialogOpenFileCheckbox = {schematicEditorGraphicsExportDialog}::cbxOpenExportedFiles
+schematicEditorGraphicsExportDialogTabWidget = {schematicEditorGraphicsExportDialog}::tabWidget
+schematicEditorGraphicsExportDialogTabBar = {schematicEditorGraphicsExportDialogTabWidget}::qt_tabwidget_tabbar
+schematicEditorGraphicsExportDialogStackedWidget = {schematicEditorGraphicsExportDialogTabWidget}::qt_tabwidget_stackedwidget
+schematicEditorGraphicsExportDialogTabGeneral = {schematicEditorGraphicsExportDialogStackedWidget}::tabGeneral
+schematicEditorGraphicsExportDialogPageSizeComboBox = {schematicEditorGraphicsExportDialogTabGeneral}::cbxPageSize
+
+# Graphics export save file dialog
+schematicEditorGraphicsExportSaveFileDialog = {schematicEditorGraphicsExportDialog}::{QT_FILE_DIALOG}
+schematicEditorGraphicsExportSaveFileDialogFileNameEdit = {schematicEditorGraphicsExportDialog}::{QT_FILE_DIALOG_LINE_EDIT}
+schematicEditorGraphicsExportSaveFileDialogOkButton = {schematicEditorGraphicsExportDialog}::{QT_FILE_DIALOG_BTN_OK}
+
 
 ################################################################################
 # Board Editor
@@ -303,3 +338,17 @@ boardEditorDockErcMsg = {boardEditor}::librepcb__editor__ErcMsgDock
 
 # Actions
 boardEditorActionCloseProject = {boardEditor}::actionClose_Project
+boardEditorActionExportImage = {boardEditor}::actionExportImage
+boardEditorActionExportPdf = {boardEditor}::actionExportPdf
+
+# Graphics export dialog
+boardEditorGraphicsExportDialog = {boardEditor}::librepcb__editor__GraphicsExportDialog
+boardEditorGraphicsExportDialogButtonBox = {boardEditorGraphicsExportDialog}::buttonBox
+boardEditorGraphicsExportDialogButtonAccept = {boardEditorGraphicsExportDialogButtonBox}::QPushButton
+boardEditorGraphicsExportDialogButtonCancel = {boardEditorGraphicsExportDialogButtonBox}::QPushButton-1
+boardEditorGraphicsExportDialogOpenFileCheckbox = {boardEditorGraphicsExportDialog}::cbxOpenExportedFiles
+
+# Graphics export save file dialog
+boardEditorGraphicsExportSaveFileDialog = {boardEditorGraphicsExportDialog}::{QT_FILE_DIALOG}
+boardEditorGraphicsExportSaveFileDialogFileNameEdit = {boardEditorGraphicsExportDialog}::{QT_FILE_DIALOG_LINE_EDIT}
+boardEditorGraphicsExportSaveFileDialogOkButton = {boardEditorGraphicsExportDialog}::{QT_FILE_DIALOG_BTN_OK}

@@ -542,7 +542,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           addActionFlip(menu);
           addActionDelete(menu, tr("Remove %1").arg(*cmpInst.getName()));
           menu.addSeparator();
-          addActionSnap(menu, devInst.getPosition(), *board, *selectedItem);
+          addActionSnap(menu, devInst.getPosition(), *board);
           QAction* aResetTexts = menu.addAction(QIcon(":/img/actions/undo.png"),
                                                 tr("Reset all texts"));
           connect(aResetTexts, &QAction::triggered, [this, footprint]() {
@@ -637,7 +637,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           menu.addSeparator();
           addActionSelectAll(menu, netpoint->getNetSegment());
           menu.addSeparator();
-          addActionSnap(menu, netpoint->getPosition(), *board, *selectedItem);
+          addActionSnap(menu, netpoint->getPosition(), *board);
           if (!netpoint->getNetLines().isEmpty()) {
             menu.addSeparator();
             addActionMeasure(menu, **netpoint->getNetLines().begin());
@@ -653,7 +653,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           addActionDeleteAll(menu, via->getNetSegment());
           menu.addSeparator();
           addActionSelectAll(menu, via->getNetSegment());
-          addActionSnap(menu, via->getPosition(), *board, *selectedItem);
+          addActionSnap(menu, via->getPosition(), *board);
           menu.addSeparator();
           addActionProperties(menu, *board, *selectedItem);
           break;
@@ -706,7 +706,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           addActionFlip(menu);
           addActionDelete(menu, tr("Remove Text"));
           menu.addSeparator();
-          addActionSnap(menu, text->getPosition(), *board, *selectedItem);
+          addActionSnap(menu, text->getPosition(), *board);
           menu.addSeparator();
           addActionProperties(menu, *board, *selectedItem);
           break;
@@ -718,7 +718,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
           addActionDelete(menu, tr("Remove Hole"));
           menu.addSeparator();
-          addActionSnap(menu, hole->getPosition(), *board, *selectedItem);
+          addActionSnap(menu, hole->getPosition(), *board);
           menu.addSeparator();
           addActionProperties(menu, *board, *selectedItem);
           break;
@@ -835,17 +835,16 @@ void BoardEditorState_Select::addActionProperties(
           [this, &board, &item]() { openPropertiesDialog(board, &item); });
 }
 
-void BoardEditorState_Select::addActionSnap(QMenu& menu, const Point pos,
-                                            Board& board, BI_Base& item,
+void BoardEditorState_Select::addActionSnap(QMenu& menu, const Point& pos,
+                                            Board& board,
                                             const QString& text) noexcept {
   if (!pos.isOnGrid(getGridInterval())) {
     QAction* action = menu.addAction(QIcon(":/img/actions/grid.png"), text);
-    connect(action, &QAction::triggered, [this, &board, &item]() {
+    connect(action, &QAction::triggered, [this, &board, pos]() {
       try {
         QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
-            new CmdDragSelectedBoardItems(board, item.getPosition()));
-        cmdMove->setCurrentPosition(
-            item.getPosition().mappedToGrid(getGridInterval()), false);
+            new CmdDragSelectedBoardItems(board, pos));
+        cmdMove->setCurrentPosition(pos.mappedToGrid(getGridInterval()), false);
         mContext.undoStack.execCmd(cmdMove.take());
       } catch (const Exception& e) {
         QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

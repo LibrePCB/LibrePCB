@@ -88,7 +88,6 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const BI_NetLine& other,
     mTrace(Uuid::createRandom(), other.mTrace.getLayer(),
            other.mTrace.getWidth(), startPoint.toTraceAnchor(),
            endPoint.toTraceAnchor()),
-    mPosition(other.mPosition),
     mStartPoint(&startPoint),
     mEndPoint(&endPoint) {
   // don't just copy the pointer "mLayer" because it may come from another
@@ -106,7 +105,6 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node,
   : BI_Base(segment.getBoard()),
     mNetSegment(segment),
     mTrace(node, fileFormat),
-    mPosition(),
     mStartPoint(getAnchor(mTrace.getStartPoint())),
     mEndPoint(getAnchor(mTrace.getEndPoint())) {
   if ((!mStartPoint) || (!mEndPoint)) {
@@ -130,7 +128,6 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, BI_NetLineAnchor& startPoint,
     mNetSegment(segment),
     mTrace(Uuid::createRandom(), GraphicsLayerName(layer.getName()), width,
            startPoint.toTraceAnchor(), endPoint.toTraceAnchor()),
-    mPosition(),
     mStartPoint(&startPoint),
     mEndPoint(&endPoint),
     mLayer(&layer) {
@@ -254,7 +251,6 @@ void BI_NetLine::removeFromBoard() {
 }
 
 void BI_NetLine::updateLine() noexcept {
-  mPosition = (mStartPoint->getPosition() + mEndPoint->getPosition()) / 2;
   mGraphicsItem->updateCacheAndRepaint();
 }
 

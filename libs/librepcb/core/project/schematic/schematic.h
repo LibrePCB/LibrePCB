@@ -160,7 +160,6 @@ public:
                         bool updateItems) noexcept;
   void clearSelection() const noexcept;
   void updateAllNetLabelAnchors() noexcept;
-  void renderToQPainter(QPainter& painter) const noexcept;
   std::unique_ptr<SchematicSelectionQuery> createSelectionQuery() const
       noexcept;
 
