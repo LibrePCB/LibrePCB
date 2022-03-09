@@ -103,8 +103,7 @@ TEST_F(AddComponentDialogTest, testAddMore) {
     AddComponentDialog dialog(*mWsDb, {}, {});
 
     // Check the default value.
-    QCheckBox& cbx =
-        TestHelpers::getChild<QCheckBox>(dialog, "buttonBox/cbxAddMore");
+    QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dialog, "cbxAddMore");
     EXPECT_EQ(defaultValue, cbx.isChecked());
     EXPECT_EQ(defaultValue, dialog.getAutoOpenAgain());
 
@@ -116,8 +115,7 @@ TEST_F(AddComponentDialogTest, testAddMore) {
   // Check if the setting is saved and restored automatically.
   {
     AddComponentDialog dialog(*mWsDb, {}, {});
-    QCheckBox& cbx =
-        TestHelpers::getChild<QCheckBox>(dialog, "buttonBox/cbxAddMore");
+    QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dialog, "cbxAddMore");
     EXPECT_EQ(newValue, cbx.isChecked());
     EXPECT_EQ(newValue, dialog.getAutoOpenAgain());
   }

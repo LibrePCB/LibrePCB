@@ -135,7 +135,6 @@ private:
   QStringList mLocaleOrder;
   QStringList mNormOrder;
   QScopedPointer<Ui::AddComponentDialog> mUi;
-  QPointer<QCheckBox> mAddMoreCheckbox;
   QScopedPointer<GraphicsScene> mComponentPreviewScene;
   QScopedPointer<GraphicsScene> mDevicePreviewScene;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
