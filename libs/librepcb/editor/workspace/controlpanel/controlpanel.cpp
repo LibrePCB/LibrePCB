@@ -326,7 +326,12 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept {
       connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this,
               &ControlPanel::openProjectLibraryUpdater);
       mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
-      mRecentProjectsModel->setLastRecentProject(filepath);
+
+      // Delay updating the last opened project to avoid an issue when
+      // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
+      QTimer::singleShot(500, this, [this, filepath]() {
+        mRecentProjectsModel->setLastRecentProject(filepath);
+      });
     }
     editor->showAllRequiredEditors();
     return editor;
