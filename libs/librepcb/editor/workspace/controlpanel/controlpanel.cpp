@@ -43,6 +43,7 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -311,6 +312,11 @@ ProjectEditor* ControlPanel::openProject(const FilePath& filepath) noexcept {
   try {
     ProjectEditor* editor = getOpenProject(filepath);
     if (!editor) {
+      // Opening the project can take some time, use wait cursor to provide
+      // immediate UI feedback.
+      setCursor(Qt::WaitCursor);
+      auto cursorScopeGuard = scopeGuard([this]() { unsetCursor(); });
+
       std::shared_ptr<TransactionalFileSystem> fs =
           TransactionalFileSystem::openRW(
               filepath.getParentDir(), &askForRestoringBackup,
