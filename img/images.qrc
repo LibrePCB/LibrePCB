@@ -24,6 +24,7 @@
         <file>actions/delete.png</file>
         <file>actions/down.png</file>
         <file>actions/download.png</file>
+        <file>actions/draw_arc.png</file>
         <file>actions/draw_circle.png</file>
         <file>actions/draw_line.png</file>
         <file>actions/draw_netlabel.png</file>
