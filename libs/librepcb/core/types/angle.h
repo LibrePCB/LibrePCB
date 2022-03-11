@@ -127,12 +127,9 @@ public:
    * setAngleMicroDeg() instead, because it is more accurate (no use of floating
    * point numbers). Or you can also use the static methods #deg0(), #deg45()
    * and so on.
-   *
-   * @todo fmod is only for double, so not good for processors with single
-   * precision FPU...
    */
   void setAngleDeg(qreal degrees) noexcept {
-    mMicrodegrees = fmod(degrees * 1e6, 360e6);
+    setAngleMicroDeg(qRound(std::fmod(degrees * 1e6, 360e6)));
   }
 
   /**
@@ -159,12 +156,9 @@ public:
    * setAngleMicroDeg() instead, because it is more accurate (no use of floating
    * point numbers). Or you can also use the static methods #deg0(), #deg45()
    * and so on.
-   *
-   * @todo fmod is only for double, so not good for processors with single
-   * precision FPU...
    */
   void setAngleRad(qreal radians) noexcept {
-    mMicrodegrees = fmod(radians * 180e6 / (qreal)M_PI, 360e6);
+    setAngleDeg(radians * (180.0 / M_PI));
   }
 
   // Conversions
@@ -181,7 +175,9 @@ public:
    *
    * @return The Angle in degrees
    */
-  qreal toDeg() const noexcept { return (qreal)mMicrodegrees / 1e6; }
+  qreal toDeg() const noexcept {
+    return static_cast<qreal>(mMicrodegrees) / 1e6;
+  }
 
   /**
    * @brief Get the angle in degrees as a QString
@@ -197,9 +193,7 @@ public:
    *
    * @return The angle in radians
    */
-  qreal toRad() const noexcept {
-    return (qreal)mMicrodegrees * (qreal)M_PI / 180e6;
-  }
+  qreal toRad() const noexcept { return toDeg() / (180.0 / M_PI); }
 
   // General Methods
 
