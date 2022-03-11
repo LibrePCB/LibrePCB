@@ -69,6 +69,8 @@
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/utils/tangentpathjoiner.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
@@ -138,16 +140,28 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
         return false;  // Aborted.
       }
 
+      // This operation can take some time, use wait cursor to provide
+      // immediate UI feedback.
+      parentWidget()->setCursor(Qt::WaitCursor);
+      auto cursorScopeGuard =
+          scopeGuard([this]() { parentWidget()->unsetCursor(); });
+
       // Read DXF file.
       DxfReader import;
       import.setScaleFactor(dialog.getScaleFactor());
       import.parse(fp);  // can throw
 
+      // If enabled, join tangent paths.
+      QVector<Path> paths = import.getPolygons().toVector();
+      if (dialog.getJoinTangentPolylines()) {
+        paths = TangentPathJoiner::join(paths, 2000);
+      }
+
       // Build board elements to import. ALthough this has nothing to do with
       // the clipboard, we use BoardClipboardData since it works very well :-)
       std::unique_ptr<BoardClipboardData> data(
           new BoardClipboardData(board->getUuid(), Point(0, 0)));
-      for (const auto& path : import.getPolygons()) {
+      foreach (const auto& path, paths) {
         data->getPolygons().append(std::make_shared<Polygon>(
             Uuid::createRandom(), dialog.getLayerName(), dialog.getLineWidth(),
             false, false, path));

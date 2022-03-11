@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>339</width>
-    <height>212</height>
+    <height>250</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,46 +30,55 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QCheckBox" name="cbxCirclesAsDrills">
-       <property name="toolTip">
-        <string>If checked, circles will be imported as drills.
-If unchecked (the default), circles will be imported as polygons.</string>
-       </property>
-       <property name="text">
-        <string>Import circles as drills</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
+     <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Line width:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="1" column="1">
       <widget class="librepcb::editor::UnsignedLengthEdit" name="edtLineWidth" native="true">
        <property name="toolTip">
         <string>The line width to set on the imported objects.</string>
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>Scale factor:</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="2" column="1">
+      <widget class="librepcb::editor::DoubleSpinBox" name="spbxScaleFactor">
+       <property name="toolTip">
+        <string>Additional scale factor, in case the DXF is not scaled properly.
+Note: If you have issues with scaling, make sure to configure the measuring unit of the DXF in your MCAD.</string>
+       </property>
+       <property name="buttonSymbols">
+        <enum>QAbstractSpinBox::NoButtons</enum>
+       </property>
+       <property name="decimals">
+        <number>6</number>
+       </property>
+       <property name="maximum">
+        <double>10000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>1.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Position:</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="3" column="1">
       <widget class="QCheckBox" name="cbxInteractivePlacement">
        <property name="toolTip">
         <string>If checked (the default), you can interactively place the imported objects by cursor.
@@ -80,7 +89,7 @@ If unchecked, you need to specify exact coordinates where the point (0,0) of the
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="4" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true">
@@ -98,23 +107,32 @@ If unchecked, you need to specify exact coordinates where the point (0,0) of the
        </item>
       </layout>
      </item>
-     <item row="3" column="1">
-      <widget class="librepcb::editor::DoubleSpinBox" name="spbxScaleFactor">
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Options:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QCheckBox" name="cbxJoinTangentPolylines">
        <property name="toolTip">
-        <string>Additional scale factor, in case the DXF is not scaled properly.
-Note: If you have issues with scaling, make sure to configure the measuring unit of the DXF in your MCAD.</string>
+        <string>If checked, tangent polylines of the DXF will be joined together.
+Helps for example to avoid invalid board outline polygons.</string>
        </property>
-       <property name="buttonSymbols">
-        <enum>QAbstractSpinBox::NoButtons</enum>
+       <property name="text">
+        <string>Join tangent polylines</string>
        </property>
-       <property name="decimals">
-        <number>6</number>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QCheckBox" name="cbxCirclesAsDrills">
+       <property name="toolTip">
+        <string>If checked, circles will be imported as drills.
+If unchecked (the default), circles will be imported as polygons.</string>
        </property>
-       <property name="maximum">
-        <double>10000.000000000000000</double>
-       </property>
-       <property name="value">
-        <double>1.000000000000000</double>
+       <property name="text">
+        <string>Import circles as drills</string>
        </property>
       </widget>
      </item>
@@ -172,13 +190,14 @@ Note: If you have issues with scaling, make sure to configure the measuring unit
  </customwidgets>
  <tabstops>
   <tabstop>cbxLayer</tabstop>
-  <tabstop>cbxCirclesAsDrills</tabstop>
   <tabstop>spbxScaleFactor</tabstop>
   <tabstop>edtLineWidth</tabstop>
   <tabstop>spbxScaleFactor</tabstop>
   <tabstop>cbxInteractivePlacement</tabstop>
   <tabstop>edtPosX</tabstop>
   <tabstop>edtPosY</tabstop>
+  <tabstop>cbxJoinTangentPolylines</tabstop>
+  <tabstop>cbxCirclesAsDrills</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>

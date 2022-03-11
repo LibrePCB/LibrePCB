@@ -44,6 +44,8 @@
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/library/sym/symbolgraphicsitem.h>
 #include <librepcb/core/library/sym/symbolpingraphicsitem.h>
+#include <librepcb/core/utils/scopeguard.h>
+#include <librepcb/core/utils/tangentpathjoiner.h>
 
 #include <QtCore>
 
@@ -365,16 +367,28 @@ bool SymbolEditorState_Select::processImportDxf() noexcept {
       return false;  // Aborted.
     }
 
+    // This operation can take some time, use wait cursor to provide
+    // immediate UI feedback.
+    mContext.editorWidget.setCursor(Qt::WaitCursor);
+    auto cursorScopeGuard =
+        scopeGuard([this]() { mContext.editorWidget.unsetCursor(); });
+
     // Read DXF file.
     DxfReader import;
     import.setScaleFactor(dialog.getScaleFactor());
     import.parse(fp);  // can throw
 
+    // If enabled, join tangent paths.
+    QVector<Path> paths = import.getPolygons().toVector();
+    if (dialog.getJoinTangentPolylines()) {
+      paths = TangentPathJoiner::join(paths, 2000);
+    }
+
     // Build elements to import. ALthough this has nothing to do with the
     // clipboard, we use SymbolClipboardData since it works very well :-)
     std::unique_ptr<SymbolClipboardData> data(
         new SymbolClipboardData(mContext.symbol.getUuid(), Point(0, 0)));
-    for (const auto& path : import.getPolygons()) {
+    foreach (const auto& path, paths) {
       data->getPolygons().append(
           std::make_shared<Polygon>(Uuid::createRandom(), dialog.getLayerName(),
                                     dialog.getLineWidth(), false, false, path));

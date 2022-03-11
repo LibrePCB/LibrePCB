@@ -141,6 +141,36 @@ TEST_F(DxfImportDialogTest, testCirclesAsDrills) {
   }
 }
 
+TEST_F(DxfImportDialogTest, testJoinTangentPolylines) {
+  const bool defaultValue = true;
+  const bool newValue = false;
+
+  {
+    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
+                           true, LengthUnit::millimeters(), "test");
+
+    // Check the default value.
+    QCheckBox& cbx =
+        TestHelpers::getChild<QCheckBox>(dialog, "cbxJoinTangentPolylines");
+    EXPECT_EQ(defaultValue, cbx.isChecked());
+    EXPECT_EQ(defaultValue, dialog.getJoinTangentPolylines());
+
+    // Check if the value can be changed.
+    cbx.setChecked(newValue);
+    EXPECT_EQ(newValue, dialog.getImportCirclesAsDrills());
+  }
+
+  // Check if the setting is saved and restored automatically.
+  {
+    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
+                           true, LengthUnit::millimeters(), "test");
+    QCheckBox& cbx =
+        TestHelpers::getChild<QCheckBox>(dialog, "cbxJoinTangentPolylines");
+    EXPECT_EQ(newValue, cbx.isChecked());
+    EXPECT_EQ(newValue, dialog.getJoinTangentPolylines());
+  }
+}
+
 TEST_F(DxfImportDialogTest, testLineWidth) {
   const UnsignedLength defaultValue(0);
   const UnsignedLength newValue(1230000);
