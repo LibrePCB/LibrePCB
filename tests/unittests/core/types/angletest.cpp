@@ -154,6 +154,69 @@ INSTANTIATE_TEST_SUITE_P(AngleTest, AngleTest, ::testing::Values(
 // clang-format on
 
 /*******************************************************************************
+ *  Parametrized setAngleDeg(float) and setAngleRad() Tests
+ ******************************************************************************/
+
+struct AngleSetAngleFloatTestData {
+  qreal inputDegrees;
+  qreal inputRadians;
+  qint32 output;  // Microdegrees
+  bool overflow;
+};
+
+class AngleSetAngleFloatTest
+  : public ::testing::TestWithParam<AngleSetAngleFloatTestData> {};
+
+TEST_P(AngleSetAngleFloatTest, testDeg) {
+  const AngleSetAngleFloatTestData& data = GetParam();
+
+  Angle a;
+  a.setAngleDeg(data.inputDegrees);
+  EXPECT_EQ(data.output, a.toMicroDeg());
+  EXPECT_EQ(data.output, Angle::fromDeg(data.inputDegrees).toMicroDeg());
+  if (!data.overflow) {
+    EXPECT_NEAR(data.inputDegrees, a.toDeg(), 1e-6);
+  }
+}
+
+TEST_P(AngleSetAngleFloatTest, testRad) {
+  const AngleSetAngleFloatTestData& data = GetParam();
+
+  Angle a;
+  a.setAngleRad(data.inputRadians);
+  EXPECT_EQ(data.output, a.toMicroDeg());
+  EXPECT_EQ(data.output, Angle::fromRad(data.inputRadians).toMicroDeg());
+  if (!data.overflow) {
+    EXPECT_NEAR(data.inputRadians, a.toRad(), 1e-7);
+  }
+}
+
+static AngleSetAngleFloatTestData sSetAngleFloatTestData[] = {
+    // {degrees, radians, microdegrees, overflow}
+    {0.0, 0.0, 0, false},
+    {-0.0, 0.0, 0, false},
+    {180.123456, 3.143747367, 180123456, false},
+    {-180.123456, -3.143747367, -180123456, false},
+    {359.999999, 6.28318529, 359999999, false},
+    {-359.999999, -6.28318529, -359999999, false},
+    {360.0, 6.2831853072, 0, true},  // overflow
+    {-360.0, -6.2831853072, 0, true},  // underflow
+    {360.1, 6.2849306364, 100000, true},  // overflow
+    {-360.1, -6.2849306364, -100000, true},  // underflow
+    {359.9999999, 6.2831853054, 0, true},  // round -> overflow
+    {-359.9999999, -6.2831853054, 0, true},  // round -> overflow
+    {360.0000006, 6.2831853177, 1, true},  // round -> overflow
+    {-360.0000006, -6.2831853177, -1, true},  // round -> underflow
+    {0.1000004, 0.0017453362, 100000, true},  // round
+    {-0.1000004, -0.0017453362, -100000, true},  // round
+    {0.1000006, 0.0017453397, 100001, true},  // round
+    {-0.1000006, -0.0017453397, -100001, true},  // round
+};
+
+INSTANTIATE_TEST_SUITE_P(AngleSetAngleFloatTest, AngleSetAngleFloatTest,
+                         ::testing::ValuesIn(sSetAngleFloatTestData));
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 
