@@ -176,6 +176,21 @@ bool BoardEditorState_AddVia::entry() noexcept {
       this, &BoardEditorState_AddVia::applySelectedNetSignal,
       Qt::QueuedConnection);
 
+  // Avoid creating vias with a drill diameter larger than its size!
+  // See https://github.com/LibrePCB/LibrePCB/issues/946.
+  connect(mSizeEdit.data(), &PositiveLengthEdit::valueChanged, this,
+          [this](const PositiveLength& value) {
+            if (value < mDrillEdit->getValue()) {
+              mDrillEdit->setValue(value);
+            }
+          });
+  connect(mDrillEdit.data(), &PositiveLengthEdit::valueChanged, this,
+          [this](const PositiveLength& value) {
+            if (value > mSizeEdit->getValue()) {
+              mSizeEdit->setValue(value);
+            }
+          });
+
   return true;
 }
 
