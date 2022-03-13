@@ -70,10 +70,11 @@ public:
 
   // Getters
   GraphicsLayerName getLayerName() const noexcept;
-  bool getImportCirclesAsDrills() const noexcept;
   UnsignedLength getLineWidth() const noexcept;
   qreal getScaleFactor() const noexcept;
   tl::optional<Point> getPlacementPosition() const noexcept;
+  bool getJoinTangentPolylines() const noexcept;
+  bool getImportCirclesAsDrills() const noexcept;
 
   // General Methods
   FilePath chooseFile() const noexcept;
