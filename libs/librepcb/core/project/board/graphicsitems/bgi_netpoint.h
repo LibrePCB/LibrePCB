@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../graphics/graphicslayer.h"
 #include "bgi_base.h"
 
 #include <QtCore>
@@ -34,7 +35,6 @@
 namespace librepcb {
 
 class BI_NetPoint;
-class GraphicsLayer;
 
 /*******************************************************************************
  *  Class BGI_NetPoint
@@ -65,15 +65,22 @@ public:
   // Operator Overloadings
   BGI_NetPoint& operator=(const BGI_NetPoint& rhs) = delete;
 
-private:
-  // Private Methods
+private:  // Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
+  void layerEdited(const GraphicsLayer& layer,
+                   GraphicsLayer::Event event) noexcept;
+  void updateVisibility() noexcept;
 
+private:  // Data
   // General Attributes
   BI_NetPoint& mNetPoint;
+  GraphicsLayer* mLayer;
 
   // Cached Attributes
   QRectF mBoundingRect;
+
+  // Slots
+  GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;
 };
 
 /*******************************************************************************

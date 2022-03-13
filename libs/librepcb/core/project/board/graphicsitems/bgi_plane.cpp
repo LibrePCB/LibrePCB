@@ -48,7 +48,8 @@ BGI_Plane::BGI_Plane(BI_Plane& plane) noexcept
     mPlane(plane),
     mLayer(nullptr),
     mLineWidthPx(0),
-    mVertexRadiusPx(0) {
+    mVertexRadiusPx(0),
+    mOnLayerEditedSlot(*this, &BGI_Plane::layerEdited) {
   updateCacheAndRepaint();
 }
 
@@ -107,7 +108,15 @@ void BGI_Plane::updateCacheAndRepaint() noexcept {
 
   setZValue(getZValueOfCopperLayer(*mPlane.getLayerName()));
 
+  // set layer
+  if (mLayer) {
+    mLayer->onEdited.detach(mOnLayerEditedSlot);
+  }
   mLayer = getLayer(*mPlane.getLayerName());
+  if (mLayer) {
+    mLayer->onEdited.attach(mOnLayerEditedSlot);
+  }
+  updateVisibility();
 
   // set shape and bounding rect
   mOutline = mPlane.getOutline().toClosedPath().toQPainterPathPx();
@@ -186,8 +195,32 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
  *  Private Methods
  ******************************************************************************/
 
-GraphicsLayer* BGI_Plane::getLayer(QString name) const noexcept {
+GraphicsLayer* BGI_Plane::getLayer(const QString& name) const noexcept {
   return mPlane.getBoard().getLayerStack().getLayer(name);
+}
+
+void BGI_Plane::layerEdited(const GraphicsLayer& layer,
+                            GraphicsLayer::Event event) noexcept {
+  Q_UNUSED(layer);
+
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::HighlightColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      updateVisibility();
+      break;
+    default:
+      break;
+  }
+}
+
+void BGI_Plane::updateVisibility() noexcept {
+  setVisible(mLayer && mLayer->isVisible());
 }
 
 /*******************************************************************************

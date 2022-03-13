@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../graphics/graphicslayer.h"
 #include "bgi_base.h"
 
 #include <QtCore>
@@ -34,7 +35,6 @@
 namespace librepcb {
 
 class BI_Via;
-class GraphicsLayer;
 
 /*******************************************************************************
  *  Class BGI_Via
@@ -66,10 +66,15 @@ public:
   // Operator Overloadings
   BGI_Via& operator=(const BGI_Via& rhs) = delete;
 
-private:
-  // Private Methods
+private:  // Methods
   GraphicsLayer* getLayer(const QString& name) const noexcept;
+  void connectLayerEditedSlots() noexcept;
+  void disconnectLayerEditedSlots() noexcept;
+  void layerEdited(const GraphicsLayer& layer,
+                   GraphicsLayer::Event event) noexcept;
+  void updateVisibility() noexcept;
 
+private:  // Data
   // General Attributes
   BI_Via& mVia;
   GraphicsLayer* mViaLayer;
@@ -84,6 +89,9 @@ private:
   QPainterPath mCreamMask;
   QRectF mBoundingRect;
   QFont mFont;
+
+  // Slots
+  GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;
 };
 
 /*******************************************************************************

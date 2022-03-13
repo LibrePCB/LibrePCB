@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../graphics/graphicslayer.h"
 #include "bgi_base.h"
 
 #include <QtCore>
@@ -34,7 +35,6 @@
 namespace librepcb {
 
 class BI_Plane;
-class GraphicsLayer;
 class Path;
 class Polygon;
 
@@ -83,10 +83,13 @@ public:
   // Operator Overloadings
   BGI_Plane& operator=(const BGI_Plane& rhs) = delete;
 
-private:
-  // Private Methods
-  GraphicsLayer* getLayer(QString name) const noexcept;
+private:  // Methods
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
+  void layerEdited(const GraphicsLayer& layer,
+                   GraphicsLayer::Event event) noexcept;
+  void updateVisibility() noexcept;
 
+private:  // Data
   // General Attributes
   BI_Plane& mPlane;
 
@@ -98,6 +101,9 @@ private:
   QVector<QPainterPath> mAreas;
   qreal mLineWidthPx;
   qreal mVertexRadiusPx;
+
+  // Slots
+  GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;
 };
 
 /*******************************************************************************

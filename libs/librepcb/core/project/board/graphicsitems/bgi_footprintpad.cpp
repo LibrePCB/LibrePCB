@@ -56,7 +56,8 @@ BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept
     mTopStopMaskLayer(nullptr),
     mBottomStopMaskLayer(nullptr),
     mTopCreamMaskLayer(nullptr),
-    mBottomCreamMaskLayer(nullptr) {
+    mBottomCreamMaskLayer(nullptr),
+    mOnLayerEditedSlot(*this, &BGI_FootprintPad::layerEdited) {
   mFont = qApp->getDefaultSansSerifFont();
   mFont.setPixelSize(1);
 
@@ -92,6 +93,7 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
   }
 
   // set layers
+  disconnectLayerEditedSlots();
   mPadLayer = getLayer(mLibPad.getLayerName());
   if (mLibPad.getBoardSide() == FootprintPad::BoardSide::THT) {
     mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
@@ -109,6 +111,8 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
     mTopCreamMaskLayer = getLayer(GraphicsLayer::sTopSolderPaste);
     mBottomCreamMaskLayer = nullptr;
   }
+  connectLayerEditedSlots();
+  updateVisibility();
 
   // determine stop/cream mask clearance
   PositiveLength size = qMin(mLibPad.getWidth(), mLibPad.getHeight());
@@ -136,9 +140,6 @@ void BGI_FootprintPad::paint(QPainter* painter,
                              QWidget* widget) {
   Q_UNUSED(option);
   Q_UNUSED(widget);
-  // const bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) !=
-  // 0); const qreal lod =
-  // option->levelOfDetailFromTransform(painter->worldTransform());
 
   const NetSignal* netsignal = mPad.getCompSigInstNetSignal();
   bool highlight =
@@ -209,6 +210,59 @@ GraphicsLayer* BGI_FootprintPad::getLayer(QString name) const noexcept {
       .getBoard()
       .getLayerStack()
       .getLayer(name);
+}
+
+void BGI_FootprintPad::connectLayerEditedSlots() noexcept {
+  for (GraphicsLayer* layer :
+       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer, mTopCreamMaskLayer,
+        mBottomCreamMaskLayer}) {
+    if (layer) {
+      layer->onEdited.attach(mOnLayerEditedSlot);
+    }
+  }
+}
+
+void BGI_FootprintPad::disconnectLayerEditedSlots() noexcept {
+  for (GraphicsLayer* layer :
+       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer, mTopCreamMaskLayer,
+        mBottomCreamMaskLayer}) {
+    if (layer) {
+      layer->onEdited.detach(mOnLayerEditedSlot);
+    }
+  }
+}
+
+void BGI_FootprintPad::layerEdited(const GraphicsLayer& layer,
+                                   GraphicsLayer::Event event) noexcept {
+  Q_UNUSED(layer);
+
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::HighlightColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      updateVisibility();
+      break;
+    default:
+      break;
+  }
+}
+
+void BGI_FootprintPad::updateVisibility() noexcept {
+  bool visible = false;
+  for (GraphicsLayer* layer :
+       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer, mTopCreamMaskLayer,
+        mBottomCreamMaskLayer}) {
+    if (layer && layer->isVisible()) {
+      visible = true;
+      break;
+    }
+  }
+  setVisible(visible);
 }
 
 /*******************************************************************************

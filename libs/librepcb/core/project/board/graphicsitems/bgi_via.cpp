@@ -49,7 +49,8 @@ BGI_Via::BGI_Via(BI_Via& via) noexcept
     mVia(via),
     mViaLayer(nullptr),
     mTopStopMaskLayer(nullptr),
-    mBottomStopMaskLayer(nullptr) {
+    mBottomStopMaskLayer(nullptr),
+    mOnLayerEditedSlot(*this, &BGI_Via::layerEdited) {
   setZValue(Board::ZValue_Vias);
 
   mFont = qApp->getDefaultSansSerifFont();
@@ -78,9 +79,13 @@ void BGI_Via::updateCacheAndRepaint() noexcept {
 
   setToolTip(mVia.getNetSegment().getNetNameToDisplay(true));
 
+  // set layers
+  disconnectLayerEditedSlots();
   mViaLayer = getLayer(GraphicsLayer::sBoardViasTht);
   mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
   mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
+  connectLayerEditedSlots();
+  updateVisibility();
 
   // determine stop mask clearance
   mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(
@@ -159,6 +164,56 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
 GraphicsLayer* BGI_Via::getLayer(const QString& name) const noexcept {
   return mVia.getBoard().getLayerStack().getLayer(name);
+}
+
+void BGI_Via::connectLayerEditedSlots() noexcept {
+  for (GraphicsLayer* layer :
+       {mViaLayer, mTopStopMaskLayer, mBottomStopMaskLayer}) {
+    if (layer) {
+      layer->onEdited.attach(mOnLayerEditedSlot);
+    }
+  }
+}
+
+void BGI_Via::disconnectLayerEditedSlots() noexcept {
+  for (GraphicsLayer* layer :
+       {mViaLayer, mTopStopMaskLayer, mBottomStopMaskLayer}) {
+    if (layer) {
+      layer->onEdited.detach(mOnLayerEditedSlot);
+    }
+  }
+}
+
+void BGI_Via::layerEdited(const GraphicsLayer& layer,
+                          GraphicsLayer::Event event) noexcept {
+  Q_UNUSED(layer);
+
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::HighlightColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      updateVisibility();
+      break;
+    default:
+      break;
+  }
+}
+
+void BGI_Via::updateVisibility() noexcept {
+  bool visible = false;
+  for (GraphicsLayer* layer :
+       {mViaLayer, mTopStopMaskLayer, mBottomStopMaskLayer}) {
+    if (layer && layer->isVisible()) {
+      visible = true;
+      break;
+    }
+  }
+  setVisible(visible);
 }
 
 /*******************************************************************************
