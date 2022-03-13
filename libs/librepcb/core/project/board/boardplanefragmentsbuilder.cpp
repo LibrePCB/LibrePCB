@@ -84,8 +84,8 @@ QVector<Path> BoardPlaneFragmentsBuilder::buildFragments() noexcept {
  ******************************************************************************/
 
 void BoardPlaneFragmentsBuilder::addPlaneOutline() {
-  mResult.push_back(
-      ClipperHelpers::convert(mPlane.getOutline(), maxArcTolerance()));
+  mResult.push_back(ClipperHelpers::convert(mPlane.getOutline().toClosedPath(),
+                                            maxArcTolerance()));
 }
 
 void BoardPlaneFragmentsBuilder::clipToBoardOutline() {
