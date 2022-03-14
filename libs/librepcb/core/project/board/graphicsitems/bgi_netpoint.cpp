@@ -42,7 +42,10 @@ namespace librepcb {
  ******************************************************************************/
 
 BGI_NetPoint::BGI_NetPoint(BI_NetPoint& netpoint) noexcept
-  : BGI_Base(), mNetPoint(netpoint) {
+  : BGI_Base(),
+    mNetPoint(netpoint),
+    mLayer(nullptr),
+    mOnLayerEditedSlot(*this, &BGI_NetPoint::layerEdited) {
   updateCacheAndRepaint();
 }
 
@@ -54,8 +57,7 @@ BGI_NetPoint::~BGI_NetPoint() noexcept {
  ******************************************************************************/
 
 bool BGI_NetPoint::isSelectable() const noexcept {
-  GraphicsLayer* layer = mNetPoint.getLayerOfLines();
-  return layer ? layer->isVisible() : false;
+  return mLayer && mLayer->isVisible();
 }
 
 /*******************************************************************************
@@ -70,6 +72,16 @@ void BGI_NetPoint::updateCacheAndRepaint() noexcept {
   // set Z value
   GraphicsLayer* layer = mNetPoint.getLayerOfLines();
   setZValue(layer ? getZValueOfCopperLayer(layer->getName()) : 0);
+
+  // set layer
+  if (mLayer) {
+    mLayer->onEdited.detach(mOnLayerEditedSlot);
+  }
+  mLayer = mNetPoint.getLayerOfLines();
+  if (mLayer) {
+    mLayer->onEdited.attach(mOnLayerEditedSlot);
+  }
+  updateVisibility();
 
   qreal radius = mNetPoint.getMaxLineWidth()->toPx() / 2;
   mBoundingRect = QRectF(-radius, -radius, 2 * radius, 2 * radius);
@@ -112,6 +124,30 @@ void BGI_NetPoint::paint(QPainter* painter,
 
 GraphicsLayer* BGI_NetPoint::getLayer(const QString& name) const noexcept {
   return mNetPoint.getBoard().getLayerStack().getLayer(name);
+}
+
+void BGI_NetPoint::layerEdited(const GraphicsLayer& layer,
+                               GraphicsLayer::Event event) noexcept {
+  Q_UNUSED(layer);
+
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::HighlightColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      updateVisibility();
+      break;
+    default:
+      break;
+  }
+}
+
+void BGI_NetPoint::updateVisibility() noexcept {
+  setVisible(mLayer && mLayer->isVisible());
 }
 
 /*******************************************************************************
