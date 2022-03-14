@@ -44,7 +44,10 @@ namespace librepcb {
  ******************************************************************************/
 
 BGI_NetLine::BGI_NetLine(BI_NetLine& netline) noexcept
-  : BGI_Base(), mNetLine(netline), mLayer(nullptr) {
+  : BGI_Base(),
+    mNetLine(netline),
+    mLayer(nullptr),
+    mOnLayerEditedSlot(*this, &BGI_NetLine::layerEdited) {
   updateCacheAndRepaint();
 }
 
@@ -71,8 +74,15 @@ void BGI_NetLine::updateCacheAndRepaint() noexcept {
   // set Z value
   setZValue(getZValueOfCopperLayer(mNetLine.getLayer().getName()));
 
+  // set layer
+  if (mLayer) {
+    mLayer->onEdited.detach(mOnLayerEditedSlot);
+  }
   mLayer = &mNetLine.getLayer();
-  Q_ASSERT(mLayer);
+  if (mLayer) {
+    mLayer->onEdited.attach(mOnLayerEditedSlot);
+  }
+  updateVisibility();
 
   mLineF.setP1(mNetLine.getStartPoint().getPosition().toPxQPointF());
   mLineF.setP2(mNetLine.getEndPoint().getPosition().toPxQPointF());
@@ -132,6 +142,30 @@ void BGI_NetLine::paint(QPainter* painter,
 
 GraphicsLayer* BGI_NetLine::getLayer(const QString& name) const noexcept {
   return mNetLine.getBoard().getLayerStack().getLayer(name);
+}
+
+void BGI_NetLine::layerEdited(const GraphicsLayer& layer,
+                              GraphicsLayer::Event event) noexcept {
+  Q_UNUSED(layer);
+
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::HighlightColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      updateVisibility();
+      break;
+    default:
+      break;
+  }
+}
+
+void BGI_NetLine::updateVisibility() noexcept {
+  setVisible(mLayer && mLayer->isVisible());
 }
 
 /*******************************************************************************

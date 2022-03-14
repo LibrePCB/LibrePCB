@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../graphics/graphicslayer.h"
 #include "bgi_base.h"
 
 #include <QtCore>
@@ -35,7 +36,6 @@ namespace librepcb {
 
 class BI_FootprintPad;
 class FootprintPad;
-class GraphicsLayer;
 class PackagePad;
 
 /*******************************************************************************
@@ -68,10 +68,15 @@ public:
   // Operator Overloadings
   BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
 
-private:
-  // Private Methods
+private:  // Methods
   GraphicsLayer* getLayer(QString name) const noexcept;
+  void connectLayerEditedSlots() noexcept;
+  void disconnectLayerEditedSlots() noexcept;
+  void layerEdited(const GraphicsLayer& layer,
+                   GraphicsLayer::Event event) noexcept;
+  void updateVisibility() noexcept;
 
+private:  // Data
   // General Attributes
   BI_FootprintPad& mPad;
   const FootprintPad& mLibPad;
@@ -88,6 +93,9 @@ private:
   QPainterPath mCreamMask;
   QRectF mBoundingRect;
   QFont mFont;
+
+  // Slots
+  GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;
 };
 
 /*******************************************************************************
