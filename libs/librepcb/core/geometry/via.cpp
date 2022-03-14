@@ -98,10 +98,12 @@ Path Via::getSceneOutline(const Length& expansion) const noexcept {
 }
 
 QPainterPath Via::toQPainterPathPx(const Length& expansion) const noexcept {
+  // Avoid creating inverted graphics if drill>size, since it looks correct.
+  PositiveLength drill = std::min(mDrillDiameter, mSize);
+
   QPainterPath p = getOutline(expansion).toQPainterPathPx();
-  p.setFillRule(Qt::OddEvenFill);  // important to subtract the hole!
-  p.addEllipse(QPointF(0, 0), mDrillDiameter->toPx() / 2,
-               mDrillDiameter->toPx() / 2);
+  p.setFillRule(Qt::OddEvenFill);  // Important to subtract the hole!
+  p.addEllipse(QPointF(0, 0), drill->toPx() / 2, drill->toPx() / 2);
   return p;
 }
 

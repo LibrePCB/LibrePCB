@@ -65,6 +65,21 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardViaPropertiesDialog::buttonBoxClicked);
 
+  // Avoid creating vias with a drill diameter larger than its size!
+  // See https://github.com/LibrePCB/LibrePCB/issues/946.
+  connect(mUi->edtSize, &PositiveLengthEdit::valueChanged, this,
+          [this](const PositiveLength& value) {
+            if (value < mUi->edtDrillDiameter->getValue()) {
+              mUi->edtDrillDiameter->setValue(value);
+            }
+          });
+  connect(mUi->edtDrillDiameter, &PositiveLengthEdit::valueChanged, this,
+          [this](const PositiveLength& value) {
+            if (value > mUi->edtSize->getValue()) {
+              mUi->edtSize->setValue(value);
+            }
+          });
+
   // shape combobox
   mUi->cbxShape->addItem(tr("Round"), static_cast<int>(Via::Shape::Round));
   mUi->cbxShape->addItem(tr("Square"), static_cast<int>(Via::Shape::Square));
