@@ -50,8 +50,7 @@ public:
   explicit WorkspaceSettingsItem_GenericValue(
       const QString& key, const T& defaultValue,
       QObject* parent = nullptr) noexcept
-    : WorkspaceSettingsItem(parent),
-      mKey(key),
+    : WorkspaceSettingsItem(key, parent),
       mDefaultValue(defaultValue),
       mCurrentValue(defaultValue) {}
   ~WorkspaceSettingsItem_GenericValue() noexcept {}
@@ -69,8 +68,10 @@ public:
    * @param value   The new value
    */
   void set(const T& value) noexcept {
-    mCurrentValue = value;
-    emit edited();
+    if (value != mCurrentValue) {
+      mCurrentValue = value;
+      valueModified();
+    }
   }
 
   /**
@@ -80,33 +81,31 @@ public:
    */
   const T& getDefault() const noexcept { return mDefaultValue; }
 
-  /**
-   * @copydoc ::librepcb::WorkspaceSettingsItem::restoreDefault()
-   */
-  virtual void restoreDefault() noexcept override { set(mDefaultValue); }
-
-  /**
-   * @copydoc ::librepcb::WorkspaceSettingsItem::load()
-   */
-  void load(const SExpression& root, const Version& fileFormat) override {
-    set(deserialize<T>(root.getChild(mKey % "/@0"), fileFormat));  // can throw
-  }
-
-  /**
-   * @copydoc ::librepcb::WorkspaceSettingsItem::serialize()
-   */
-  void serialize(SExpression& root) const override {
-    root.ensureLineBreak();
-    root.appendChild(mKey, mCurrentValue);
-    root.ensureLineBreak();
-  }
-
   // Operator Overloadings
   WorkspaceSettingsItem_GenericValue& operator=(
       const WorkspaceSettingsItem_GenericValue& rhs) = delete;
 
+private:  // Methods
+  /**
+   * @copydoc ::librepcb::WorkspaceSettingsItem::restoreDefaultImpl()
+   */
+  virtual void restoreDefaultImpl() noexcept override { set(mDefaultValue); }
+
+  /**
+   * @copydoc ::librepcb::WorkspaceSettingsItem::loadImpl()
+   */
+  void loadImpl(const SExpression& root, const Version& fileFormat) override {
+    set(deserialize<T>(root.getChild("@0"), fileFormat));  // can throw
+  }
+
+  /**
+   * @copydoc ::librepcb::WorkspaceSettingsItem::serializeImpl()
+   */
+  void serializeImpl(SExpression& root) const override {
+    root.appendChild(mCurrentValue);
+  }
+
 private:
-  QString mKey;  ///< Key used for serialization
   T mDefaultValue;  ///< Initial, default value
   T mCurrentValue;  ///< Current value
 };

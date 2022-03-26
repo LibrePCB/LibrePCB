@@ -33,11 +33,40 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WorkspaceSettingsItem::WorkspaceSettingsItem(QObject* parent) noexcept
-  : QObject(parent) {
+WorkspaceSettingsItem::WorkspaceSettingsItem(const QString& key,
+                                             QObject* parent) noexcept
+  : QObject(parent), mKey(key), mIsDefault(true), mEdited(false) {
 }
 
 WorkspaceSettingsItem::~WorkspaceSettingsItem() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void WorkspaceSettingsItem::valueModified() noexcept {
+  mIsDefault = false;
+  mEdited = true;
+  emit edited();
+}
+
+void WorkspaceSettingsItem::restoreDefault() noexcept {
+  restoreDefaultImpl();
+  mIsDefault = true;
+  mEdited = true;
+}
+
+void WorkspaceSettingsItem::load(const SExpression& root,
+                                 const Version& fileFormat) {
+  loadImpl(root, fileFormat);  // can throw
+  mIsDefault = false;
+  mEdited = false;
+}
+
+void WorkspaceSettingsItem::serialize(SExpression& root) const {
+  serializeImpl(root);  // can throw
+  mEdited = false;
 }
 
 /*******************************************************************************

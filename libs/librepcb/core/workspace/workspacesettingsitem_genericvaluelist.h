@@ -51,8 +51,7 @@ public:
   explicit WorkspaceSettingsItem_GenericValueList(
       const QString& listKey, const QString& itemKey, const T& defaultValue,
       QObject* parent = nullptr) noexcept
-    : WorkspaceSettingsItem(parent),
-      mListKey(listKey),
+    : WorkspaceSettingsItem(listKey, parent),
       mItemKey(itemKey),
       mDefaultValue(defaultValue),
       mCurrentValue(defaultValue) {}
@@ -71,8 +70,10 @@ public:
    * @param value   The new value
    */
   void set(const T& value) noexcept {
-    mCurrentValue = value;
-    emit edited();
+    if (value != mCurrentValue) {
+      mCurrentValue = value;
+      valueModified();
+    }
   }
 
   /**
@@ -82,18 +83,22 @@ public:
    */
   const T& getDefault() const noexcept { return mDefaultValue; }
 
+  // Operator Overloadings
+  WorkspaceSettingsItem_GenericValueList& operator=(
+      const WorkspaceSettingsItem_GenericValueList& rhs) = delete;
+
+private:  // Methods
   /**
-   * @copydoc ::librepcb::WorkspaceSettingsItem::restoreDefault()
+   * @copydoc ::librepcb::WorkspaceSettingsItem::restoreDefaultImpl()
    */
-  virtual void restoreDefault() noexcept override { set(mDefaultValue); }
+  virtual void restoreDefaultImpl() noexcept override { set(mDefaultValue); }
 
   /**
-   * @copydoc ::librepcb::WorkspaceSettingsItem::load()
+   * @copydoc ::librepcb::WorkspaceSettingsItem::loadImpl()
    */
-  void load(const SExpression& root, const Version& fileFormat) override {
+  void loadImpl(const SExpression& root, const Version& fileFormat) override {
     T values;  // temporary object to make this method atomic
-    foreach (const SExpression& child,
-             root.getChild(mListKey).getChildren(mItemKey)) {
+    foreach (const SExpression& child, root.getChildren(mItemKey)) {
       values.append(deserialize<typename T::value_type>(child.getChild("@0"),
                                                         fileFormat));
     }
@@ -101,25 +106,17 @@ public:
   }
 
   /**
-   * @copydoc ::librepcb::WorkspaceSettingsItem::serialize()
+   * @copydoc ::librepcb::WorkspaceSettingsItem::serializeImpl()
    */
-  void serialize(SExpression& root) const override {
-    root.ensureLineBreak();
-    SExpression& child = root.appendList(mListKey);
+  void serializeImpl(SExpression& root) const override {
     foreach (const auto& item, mCurrentValue) {
-      child.ensureLineBreak();
-      child.appendChild(mItemKey, item);
+      root.ensureLineBreak();
+      root.appendChild(mItemKey, item);
     }
-    child.ensureLineBreakIfMultiLine();
-    root.ensureLineBreak();
+    root.ensureLineBreakIfMultiLine();
   }
 
-  // Operator Overloadings
-  WorkspaceSettingsItem_GenericValueList& operator=(
-      const WorkspaceSettingsItem_GenericValueList& rhs) = delete;
-
 private:
-  QString mListKey;  ///< Outer key used for serialization
   QString mItemKey;  ///< Inner key used for serialization
   T mDefaultValue;  ///< Initial, default value
   T mCurrentValue;  ///< Current value
