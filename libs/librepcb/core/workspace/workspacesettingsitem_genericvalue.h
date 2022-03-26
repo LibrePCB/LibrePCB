@@ -96,7 +96,9 @@ public:
    * @copydoc ::librepcb::WorkspaceSettingsItem::serialize()
    */
   void serialize(SExpression& root) const override {
-    root.appendChild(mKey, mCurrentValue, true);
+    root.ensureLineBreak();
+    root.appendChild(mKey, mCurrentValue);
+    root.ensureLineBreak();
   }
 
   // Operator Overloadings

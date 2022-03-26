@@ -212,13 +212,21 @@ void LibraryBaseElement::cleanupAfterLoadingElementFromFile() noexcept {
 
 void LibraryBaseElement::serialize(SExpression& root) const {
   root.appendChild(mUuid);
+  root.ensureLineBreak();
   mNames.serialize(root);
+  root.ensureLineBreak();
   mDescriptions.serialize(root);
+  root.ensureLineBreak();
   mKeywords.serialize(root);
-  root.appendChild("author", mAuthor, true);
-  root.appendChild("version", mVersion, true);
-  root.appendChild("created", mCreated, true);
-  root.appendChild("deprecated", mIsDeprecated, true);
+  root.ensureLineBreak();
+  root.appendChild("author", mAuthor);
+  root.ensureLineBreak();
+  root.appendChild("version", mVersion);
+  root.ensureLineBreak();
+  root.appendChild("created", mCreated);
+  root.ensureLineBreak();
+  root.appendChild("deprecated", mIsDeprecated);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

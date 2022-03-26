@@ -167,10 +167,12 @@ bool Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
 
 void Via::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild(mPosition.serializeToDomElement("position"), true);
-  root.appendChild("size", mSize, false);
-  root.appendChild("drill", mDrillDiameter, false);
-  root.appendChild("shape", mShape, false);
+  root.ensureLineBreak();
+  root.appendChild(mPosition.serializeToDomElement("position"));
+  root.appendChild("size", mSize);
+  root.appendChild("drill", mDrillDiameter);
+  root.appendChild("shape", mShape);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

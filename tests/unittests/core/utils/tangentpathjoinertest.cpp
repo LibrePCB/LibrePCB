@@ -41,8 +41,10 @@ protected:
   std::string str(QVector<Path> paths, const QString& name = "paths") const {
     SExpression root = SExpression::createList(name);
     foreach (const Path& p, paths) {
-      root.appendChild(p.serializeToDomElement("path"), true);
+      root.ensureLineBreak();
+      root.appendChild(p.serializeToDomElement("path"));
     }
+    root.ensureLineBreakIfMultiLine();
     return root.toByteArray().toStdString();
   }
 

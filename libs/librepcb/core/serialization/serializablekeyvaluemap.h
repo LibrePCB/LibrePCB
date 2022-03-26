@@ -80,7 +80,7 @@ public:
     foreach (const SExpression& child, node.getChildren(T::tagname)) {
       QString key;
       SExpression value;
-      if (child.getChildren().count() > 1) {
+      if (child.getChild("@0").isList()) {
         key = child.getChild(QString(T::keyname) % "/@0").getValue();
         value = child.getChild("@1");
       } else {
@@ -158,12 +158,14 @@ public:
   /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override {
     for (auto i = mValues.constBegin(); i != mValues.constEnd(); ++i) {
-      SExpression& child = root.appendList(T::tagname, true);
+      root.ensureLineBreak();
+      SExpression& child = root.appendList(T::tagname);
       if (!i.key().isEmpty()) {
-        child.appendChild(T::keyname, i.key(), false);
+        child.appendChild(T::keyname, i.key());
       }
       child.appendChild(i.value());
     }
+    root.ensureLineBreakIfMultiLine();
   }
 
   // Operator Overloadings

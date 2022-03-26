@@ -93,13 +93,15 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
 
   mSilkscreenLayersTop.clear();
   foreach (const SExpression& child,
-           node.getChild("silkscreen_top/layers").getChildren()) {
+           node.getChild("silkscreen_top/layers")
+               .getChildren(SExpression::Type::Token)) {
     mSilkscreenLayersTop.append(child.getValue());
   }
 
   mSilkscreenLayersBot.clear();
   foreach (const SExpression& child,
-           node.getChild("silkscreen_bot/layers").getChildren()) {
+           node.getChild("silkscreen_bot/layers")
+               .getChildren(SExpression::Type::Token)) {
     mSilkscreenLayersBot.append(child.getValue());
   }
 }
@@ -112,47 +114,62 @@ BoardFabricationOutputSettings::~BoardFabricationOutputSettings() noexcept {
  ******************************************************************************/
 
 void BoardFabricationOutputSettings::serialize(SExpression& root) const {
-  root.appendChild("base_path", mOutputBasePath, true);
-  root.appendList("outlines", true)
-      .appendChild("suffix", mSuffixOutlines, false);
-  root.appendList("copper_top", true)
-      .appendChild("suffix", mSuffixCopperTop, false);
-  root.appendList("copper_inner", true)
-      .appendChild("suffix", mSuffixCopperInner, false);
-  root.appendList("copper_bot", true)
-      .appendChild("suffix", mSuffixCopperBot, false);
-  root.appendList("soldermask_top", true)
-      .appendChild("suffix", mSuffixSolderMaskTop, false);
-  root.appendList("soldermask_bot", true)
-      .appendChild("suffix", mSuffixSolderMaskBot, false);
+  root.ensureLineBreak();
+  root.appendChild("base_path", mOutputBasePath);
+  root.ensureLineBreak();
+  root.appendList("outlines").appendChild("suffix", mSuffixOutlines);
+  root.ensureLineBreak();
+  root.appendList("copper_top").appendChild("suffix", mSuffixCopperTop);
+  root.ensureLineBreak();
+  root.appendList("copper_inner").appendChild("suffix", mSuffixCopperInner);
+  root.ensureLineBreak();
+  root.appendList("copper_bot").appendChild("suffix", mSuffixCopperBot);
+  root.ensureLineBreak();
+  root.appendList("soldermask_top").appendChild("suffix", mSuffixSolderMaskTop);
+  root.ensureLineBreak();
+  root.appendList("soldermask_bot").appendChild("suffix", mSuffixSolderMaskBot);
+  root.ensureLineBreak();
 
-  SExpression& silkscreenTop = root.appendList("silkscreen_top", true);
-  silkscreenTop.appendChild("suffix", mSuffixSilkscreenTop, false);
-  SExpression& silkscreenTopLayers = silkscreenTop.appendList("layers", true);
+  SExpression& silkscreenTop = root.appendList("silkscreen_top");
+  silkscreenTop.appendChild("suffix", mSuffixSilkscreenTop);
+  silkscreenTop.ensureLineBreak();
+  SExpression& silkscreenTopLayers = silkscreenTop.appendList("layers");
   foreach (const QString& layer, mSilkscreenLayersTop) {
     silkscreenTopLayers.appendChild(SExpression::createToken(layer));
   }
+  silkscreenTop.ensureLineBreak();
+  root.ensureLineBreak();
 
-  SExpression& silkscreenBot = root.appendList("silkscreen_bot", true);
-  silkscreenBot.appendChild("suffix", mSuffixSilkscreenBot, false);
-  SExpression& silkscreenBotLayers = silkscreenBot.appendList("layers", true);
+  SExpression& silkscreenBot = root.appendList("silkscreen_bot");
+  silkscreenBot.appendChild("suffix", mSuffixSilkscreenBot);
+  silkscreenBot.ensureLineBreak();
+  SExpression& silkscreenBotLayers = silkscreenBot.appendList("layers");
   foreach (const QString& layer, mSilkscreenLayersBot) {
     silkscreenBotLayers.appendChild(SExpression::createToken(layer));
   }
+  silkscreenBot.ensureLineBreak();
+  root.ensureLineBreak();
 
-  SExpression& drills = root.appendList("drills", true);
-  drills.appendChild("merge", mMergeDrillFiles, false);
-  drills.appendChild("suffix_pth", mSuffixDrillsPth, true);
-  drills.appendChild("suffix_npth", mSuffixDrillsNpth, true);
-  drills.appendChild("suffix_merged", mSuffixDrills, true);
+  SExpression& drills = root.appendList("drills");
+  drills.appendChild("merge", mMergeDrillFiles);
+  drills.ensureLineBreak();
+  drills.appendChild("suffix_pth", mSuffixDrillsPth);
+  drills.ensureLineBreak();
+  drills.appendChild("suffix_npth", mSuffixDrillsNpth);
+  drills.ensureLineBreak();
+  drills.appendChild("suffix_merged", mSuffixDrills);
+  drills.ensureLineBreak();
+  root.ensureLineBreak();
 
-  SExpression& solderPasteTop = root.appendList("solderpaste_top", true);
-  solderPasteTop.appendChild("create", mEnableSolderPasteTop, false);
-  solderPasteTop.appendChild("suffix", mSuffixSolderPasteTop, false);
+  SExpression& solderPasteTop = root.appendList("solderpaste_top");
+  solderPasteTop.appendChild("create", mEnableSolderPasteTop);
+  solderPasteTop.appendChild("suffix", mSuffixSolderPasteTop);
+  root.ensureLineBreak();
 
-  SExpression& solderPasteBot = root.appendList("solderpaste_bot", true);
-  solderPasteBot.appendChild("create", mEnableSolderPasteBot, false);
-  solderPasteBot.appendChild("suffix", mSuffixSolderPasteBot, false);
+  SExpression& solderPasteBot = root.appendList("solderpaste_bot");
+  solderPasteBot.appendChild("create", mEnableSolderPasteBot);
+  solderPasteBot.appendChild("suffix", mSuffixSolderPasteBot);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

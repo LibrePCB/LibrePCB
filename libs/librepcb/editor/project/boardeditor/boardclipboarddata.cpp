@@ -136,23 +136,34 @@ std::unique_ptr<BoardClipboardData> BoardClipboardData::fromMimeData(
  ******************************************************************************/
 
 void BoardClipboardData::serialize(SExpression& root) const {
-  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"), true);
-  root.appendChild("board", mBoardUuid, true);
+  root.ensureLineBreak();
+  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"));
+  root.ensureLineBreak();
+  root.appendChild("board", mBoardUuid);
+  root.ensureLineBreak();
   mDevices.serialize(root);
+  root.ensureLineBreak();
   mNetSegments.serialize(root);
+  root.ensureLineBreak();
   mPlanes.serialize(root);
+  root.ensureLineBreak();
   mPolygons.serialize(root);
+  root.ensureLineBreak();
   mStrokeTexts.serialize(root);
+  root.ensureLineBreak();
   mHoles.serialize(root);
 
   for (auto it = mPadPositions.constBegin(); it != mPadPositions.constEnd();
        ++it) {
     SExpression child = SExpression::createList("pad_position");
-    child.appendChild("device", it.key().first, false);
-    child.appendChild("pad", it.key().second, false);
-    child.appendChild(it.value().serializeToDomElement("position"), false);
-    root.appendChild(child, true);
+    child.appendChild("device", it.key().first);
+    child.appendChild("pad", it.key().second);
+    child.appendChild(it.value().serializeToDomElement("position"));
+    root.ensureLineBreak();
+    root.appendChild(child);
   }
+
+  root.ensureLineBreak();
 }
 
 QString BoardClipboardData::getMimeType() noexcept {

@@ -87,18 +87,20 @@ public:
   static void serializeObjectContainer(SExpression& root, const T& container,
                                        const QString& itemName) {
     for (const auto& object : container) {
-      root.appendChild(object.serializeToDomElement(itemName),
-                       true);  // can throw
+      root.ensureLineBreak();
+      root.appendChild(object.serializeToDomElement(itemName));  // can throw
     }
+    root.ensureLineBreakIfMultiLine();
   }
 
   template <typename T>
   static void serializePointerContainer(SExpression& root, const T& container,
                                         const QString& itemName) {
     for (const auto& pointer : container) {
-      root.appendChild(pointer->serializeToDomElement(itemName),
-                       true);  // can throw
+      root.ensureLineBreak();
+      root.appendChild(pointer->serializeToDomElement(itemName));  // can throw
     }
+    root.ensureLineBreakIfMultiLine();
   }
 
   template <typename T>

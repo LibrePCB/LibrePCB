@@ -148,12 +148,14 @@ bool Circle::setDiameter(const PositiveLength& dia) noexcept {
 
 void Circle::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName, false);
-  root.appendChild("width", mLineWidth, true);
-  root.appendChild("fill", mIsFilled, false);
-  root.appendChild("grab_area", mIsGrabArea, false);
-  root.appendChild("diameter", mDiameter, false);
-  root.appendChild(mCenter.serializeToDomElement("position"), false);
+  root.appendChild("layer", mLayerName);
+  root.ensureLineBreak();
+  root.appendChild("width", mLineWidth);
+  root.appendChild("fill", mIsFilled);
+  root.appendChild("grab_area", mIsGrabArea);
+  root.appendChild("diameter", mDiameter);
+  root.appendChild(mCenter.serializeToDomElement("position"));
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

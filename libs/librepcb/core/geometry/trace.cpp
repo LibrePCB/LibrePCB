@@ -62,12 +62,12 @@ TraceAnchor::~TraceAnchor() noexcept {
 
 void TraceAnchor::serialize(SExpression& root) const {
   if (mJunction) {
-    root.appendChild("junction", *mJunction, false);
+    root.appendChild("junction", *mJunction);
   } else if (mVia) {
-    root.appendChild("via", *mVia, false);
+    root.appendChild("via", *mVia);
   } else if (mPad) {
-    root.appendChild("device", mPad->device, false);
-    root.appendChild("pad", mPad->pad, false);
+    root.appendChild("device", mPad->device);
+    root.appendChild("pad", mPad->pad);
   } else {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -198,10 +198,13 @@ bool Trace::setEndPoint(const TraceAnchor& end) noexcept {
 
 void Trace::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", SExpression::createToken(*mLayer), false);
-  root.appendChild("width", mWidth, false);
-  root.appendChild(mStart.serializeToDomElement("from"), true);
-  root.appendChild(mEnd.serializeToDomElement("to"), true);
+  root.appendChild("layer", SExpression::createToken(*mLayer));
+  root.appendChild("width", mWidth);
+  root.ensureLineBreak();
+  root.appendChild(mStart.serializeToDomElement("from"));
+  root.ensureLineBreak();
+  root.appendChild(mEnd.serializeToDomElement("to"));
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

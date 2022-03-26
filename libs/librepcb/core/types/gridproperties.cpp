@@ -62,9 +62,9 @@ GridProperties::~GridProperties() noexcept {
  ******************************************************************************/
 
 void GridProperties::serialize(SExpression& root) const {
-  root.appendChild("type", mType, false);
-  root.appendChild("interval", mInterval, false);
-  root.appendChild("unit", mUnit, false);
+  root.appendChild("type", mType);
+  root.appendChild("interval", mInterval);
+  root.appendChild("unit", mUnit);
 }
 
 /*******************************************************************************

@@ -48,8 +48,8 @@ Vertex::Vertex(const SExpression& node, const Version& fileFormat) {
  ******************************************************************************/
 
 void Vertex::serialize(SExpression& root) const {
-  root.appendChild(mPos.serializeToDomElement("position"), false);
-  root.appendChild("angle", mAngle, false);
+  root.appendChild(mPos.serializeToDomElement("position"));
+  root.appendChild("angle", mAngle);
 }
 
 /*******************************************************************************

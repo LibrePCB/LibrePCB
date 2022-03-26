@@ -195,10 +195,15 @@ void Symbol::textsEdited(const TextList& list, int index,
 
 void Symbol::serialize(SExpression& root) const {
   LibraryElement::serialize(root);
+  root.ensureLineBreak();
   mPins.serialize(root);
+  root.ensureLineBreak();
   mPolygons.serialize(root);
+  root.ensureLineBreak();
   mCircles.serialize(root);
+  root.ensureLineBreak();
   mTexts.serialize(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

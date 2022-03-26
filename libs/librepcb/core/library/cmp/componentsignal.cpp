@@ -144,12 +144,14 @@ bool ComponentSignal::setIsClock(bool clock) noexcept {
 
 void ComponentSignal::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("name", mName, false);
-  root.appendChild("role", mRole, false);
-  root.appendChild("required", mIsRequired, true);
-  root.appendChild("negated", mIsNegated, false);
-  root.appendChild("clock", mIsClock, false);
-  root.appendChild("forced_net", mForcedNetName, false);
+  root.appendChild("name", mName);
+  root.appendChild("role", mRole);
+  root.ensureLineBreak();
+  root.appendChild("required", mIsRequired);
+  root.appendChild("negated", mIsNegated);
+  root.appendChild("clock", mIsClock);
+  root.appendChild("forced_net", mForcedNetName);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

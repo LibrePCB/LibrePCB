@@ -101,9 +101,10 @@ void RecentProjectsModel::save() noexcept {
     // save the new list in the workspace
     SExpression root = SExpression::createList("librepcb_recent_projects");
     foreach (const FilePath& filepath, mAllProjects) {
-      root.appendChild("project", filepath.toRelative(mWorkspace.getPath()),
-                       true);
+      root.ensureLineBreak();
+      root.appendChild("project", filepath.toRelative(mWorkspace.getPath()));
     }
+    root.ensureLineBreakIfMultiLine();
     FileUtils::writeFile(mFilePath, root.toByteArray());  // can throw
   } catch (Exception& e) {
     qWarning() << "Could not save recent projects file:" << e.getMsg();

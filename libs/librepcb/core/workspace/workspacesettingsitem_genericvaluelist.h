@@ -104,10 +104,14 @@ public:
    * @copydoc ::librepcb::WorkspaceSettingsItem::serialize()
    */
   void serialize(SExpression& root) const override {
-    SExpression& child = root.appendList(mListKey, true);
+    root.ensureLineBreak();
+    SExpression& child = root.appendList(mListKey);
     foreach (const auto& item, mCurrentValue) {
-      child.appendChild(mItemKey, item, true);
+      child.ensureLineBreak();
+      child.appendChild(mItemKey, item);
     }
+    child.ensureLineBreakIfMultiLine();
+    root.ensureLineBreak();
   }
 
   // Operator Overloadings

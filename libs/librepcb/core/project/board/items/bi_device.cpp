@@ -253,13 +253,19 @@ void BI_Device::serialize(SExpression& root) const {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
   root.appendChild(mCompInstance->getUuid());
-  root.appendChild("lib_device", mLibDevice->getUuid(), true);
-  root.appendChild("lib_footprint", mLibFootprint->getUuid(), true);
-  root.appendChild(mPosition.serializeToDomElement("position"), true);
-  root.appendChild("rotation", mRotation, false);
-  root.appendChild("mirror", mMirrored, false);
+  root.ensureLineBreak();
+  root.appendChild("lib_device", mLibDevice->getUuid());
+  root.ensureLineBreak();
+  root.appendChild("lib_footprint", mLibFootprint->getUuid());
+  root.ensureLineBreak();
+  root.appendChild(mPosition.serializeToDomElement("position"));
+  root.appendChild("rotation", mRotation);
+  root.appendChild("mirror", mMirrored);
+  root.ensureLineBreak();
   mAttributes.serialize(root);
+  root.ensureLineBreak();
   mFootprint->serialize(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

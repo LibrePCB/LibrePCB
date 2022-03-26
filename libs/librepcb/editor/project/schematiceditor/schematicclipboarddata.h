@@ -101,12 +101,18 @@ public:
     /// @copydoc ::librepcb::SerializableObject::serialize()
     void serialize(SExpression& root) const override {
       root.appendChild(uuid);
-      root.appendChild("lib_component", libComponentUuid, true);
-      root.appendChild("lib_variant", libVariantUuid, true);
-      root.appendChild("lib_device", libDeviceUuid, true);
-      root.appendChild("name", name, true);
-      root.appendChild("value", value, false);
+      root.ensureLineBreak();
+      root.appendChild("lib_component", libComponentUuid);
+      root.ensureLineBreak();
+      root.appendChild("lib_variant", libVariantUuid);
+      root.ensureLineBreak();
+      root.appendChild("lib_device", libDeviceUuid);
+      root.ensureLineBreak();
+      root.appendChild("name", name);
+      root.appendChild("value", value);
+      root.ensureLineBreak();
       attributes.serialize(root);
+      root.ensureLineBreak();
     }
 
     bool operator!=(const ComponentInstance& rhs) noexcept {
@@ -154,11 +160,15 @@ public:
     /// @copydoc ::librepcb::SerializableObject::serialize()
     void serialize(SExpression& root) const override {
       root.appendChild(uuid);
-      root.appendChild("component", componentInstanceUuid, true);
-      root.appendChild("lib_gate", symbolVariantItemUuid, true);
-      root.appendChild(position.serializeToDomElement("position"), true);
-      root.appendChild("rotation", rotation, false);
-      root.appendChild("mirror", mirrored, false);
+      root.ensureLineBreak();
+      root.appendChild("component", componentInstanceUuid);
+      root.ensureLineBreak();
+      root.appendChild("lib_gate", symbolVariantItemUuid);
+      root.ensureLineBreak();
+      root.appendChild(position.serializeToDomElement("position"));
+      root.appendChild("rotation", rotation);
+      root.appendChild("mirror", mirrored);
+      root.ensureLineBreak();
     }
 
     bool operator!=(const SymbolInstance& rhs) noexcept {
@@ -192,10 +202,15 @@ public:
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
     void serialize(SExpression& root) const override {
-      root.appendChild("net", netName, true);
+      root.ensureLineBreak();
+      root.appendChild("net", netName);
+      root.ensureLineBreak();
       junctions.serialize(root);
+      root.ensureLineBreak();
       lines.serialize(root);
+      root.ensureLineBreak();
       labels.serialize(root);
+      root.ensureLineBreak();
     }
 
     bool operator!=(const NetSegment& rhs) noexcept {

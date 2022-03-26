@@ -21,6 +21,8 @@
  *  Includes
  ******************************************************************************/
 
+#include "sexpressionlegacymode.h"
+
 #include <gtest/gtest.h>
 #include <librepcb/core/serialization/sexpression.h>
 
@@ -153,6 +155,203 @@ TEST(SExpressionTest, testParsePartialExpression) {
 TEST(SExpressionTest, testSerializeStringWithEscaping) {
   SExpression s = SExpression::createString("Foo\n \r\n \" \\ Bar");
   EXPECT_EQ("\"Foo\\n \\r\\n \\\" \\\\ Bar\"\n", s.toByteArray());
+}
+
+TEST(SExpressionTest, testRoundtrip) {
+  // Create input with wrong indentation, this shall be fixed by toByteArray().
+  QByteArray input =
+      "(librepcb_board 71762d7e-e7f1-403c-8020-db9670c01e9b\n"
+      "(default_font \"newstroke.bene\")\n"
+      "(grid (type lines) (interval 0.15875) (unit millimeters))\n"
+      "(fabrication_output_settings\n"
+      "(base_path \"./output/{{VERSION}}/gerber/{{PROJECT}}\")\n"
+      "(outlines (suffix \"\"))\n"
+      "  (silkscreen_top (suffix \".gto\")\n"
+      "    (layers top_placement top_names)\n"
+      "  )\n"
+      ")\n"
+      " (emptylines foo\n"
+      " \n "
+      "     (child 1)\n"
+      " \n "
+      "\n"
+      "  )\n"
+      "(multiline foo\n"
+      ")\n"
+      "(emptyline\n"
+      ")\n"
+      "(empty)\n"
+      ")\n";
+  SExpression s = SExpression::parse(input, FilePath());
+  QByteArray actual = s.toByteArray();
+  QByteArray expected =
+      "(librepcb_board 71762d7e-e7f1-403c-8020-db9670c01e9b\n"
+      " (default_font \"newstroke.bene\")\n"
+      " (grid (type lines) (interval 0.15875) (unit millimeters))\n"
+      " (fabrication_output_settings\n"
+      "  (base_path \"./output/{{VERSION}}/gerber/{{PROJECT}}\")\n"
+      "  (outlines (suffix \"\"))\n"
+      "  (silkscreen_top (suffix \".gto\")\n"
+      "   (layers top_placement top_names)\n"
+      "  )\n"
+      " )\n"
+      " (emptylines foo\n"
+      "\n"
+      "  (child 1)\n"
+      "\n"
+      "\n"
+      " )\n"
+      " (multiline foo\n"
+      " )\n"
+      " (emptyline\n"
+      " )\n"
+      " (empty)\n"
+      ")\n";
+  EXPECT_EQ(expected.toStdString(), actual.toStdString());
+}
+
+TEST(SExpressionTest, testGetChildSkipsLineBreaks) {
+  SExpression s =
+      SExpression::parse("(root \n (child \n 0 \n 1 \n 2 \n ))", FilePath());
+  EXPECT_EQ("0", s.getChild("child/@0").getValue().toStdString());
+  EXPECT_EQ("1", s.getChild("child/@1").getValue().toStdString());
+  EXPECT_EQ("2", s.getChild("child/@2").getValue().toStdString());
+}
+
+TEST(SExpressionTest, testEnsureLineBreakIfMultiLine) {
+  SExpressionLegacyMode legacyMode(false);  // File format v0.2+
+  SExpression s = SExpression::createList("test");
+  s.ensureLineBreakIfMultiLine();
+  s.ensureLineBreakIfMultiLine();
+  EXPECT_EQ(
+      "(test\n"
+      ")\n",
+      s.toByteArray().toStdString());
+
+  s.appendChild("child", 1);
+  s.ensureLineBreakIfMultiLine();
+  s.ensureLineBreakIfMultiLine();
+  EXPECT_EQ(
+      "(test\n"
+      " (child 1)\n"
+      ")\n",
+      s.toByteArray().toStdString());
+
+  s.ensureLineBreak();
+  s.appendChild("child", 2);
+  s.ensureLineBreakIfMultiLine();
+  s.ensureLineBreakIfMultiLine();
+  EXPECT_EQ(
+      "(test\n"
+      " (child 1)\n"
+      " (child 2)\n"
+      ")\n",
+      s.toByteArray().toStdString());
+}
+
+TEST(SExpressionTest, testEnsureLineBreakIfMultiLineLegacy) {
+  SExpressionLegacyMode legacyMode(true);  // File format v0.1
+  SExpression s = SExpression::createList("test");
+  s.ensureLineBreakIfMultiLine();
+  s.ensureLineBreakIfMultiLine();
+  EXPECT_EQ("(test)\n", s.toByteArray().toStdString());
+
+  s.appendChild("child", 1);
+  s.ensureLineBreakIfMultiLine();
+  s.ensureLineBreakIfMultiLine();
+  EXPECT_EQ("(test (child 1))\n", s.toByteArray().toStdString());
+
+  s.ensureLineBreak();
+  s.appendChild("child", 2);
+  s.ensureLineBreakIfMultiLine();
+  s.ensureLineBreakIfMultiLine();
+  EXPECT_EQ(
+      "(test (child 1)\n"
+      " (child 2)\n"
+      ")\n",
+      s.toByteArray().toStdString());
+}
+
+TEST(SExpressionTest, testEnsureEmptyLine) {
+  SExpressionLegacyMode legacyMode(false);  // File format v0.2+
+  SExpression s = SExpression::createList("test");
+  s.appendChild("child", 1);
+  s.ensureEmptyLine();
+  s.ensureEmptyLine();
+  s.ensureEmptyLine();
+  s.appendChild("child", 2);
+  s.ensureEmptyLine();
+  s.ensureEmptyLine();
+  s.ensureEmptyLine();
+  EXPECT_EQ(
+      "(test (child 1)\n"
+      " (child 2)\n"
+      ")\n",
+      s.toByteArray().toStdString());
+}
+
+TEST(SExpressionTest, testEnsureEmptyLineLegacy) {
+  SExpressionLegacyMode legacyMode(true);  // File format v0.1
+  SExpression s = SExpression::createList("test");
+  s.appendChild("child", 1);
+  s.ensureEmptyLine();
+  s.ensureEmptyLine();
+  s.ensureEmptyLine();
+  s.appendChild("child", 2);
+  s.ensureEmptyLine();
+  s.ensureEmptyLine();
+  s.ensureEmptyLine();
+  EXPECT_EQ(
+      "(test (child 1)\n"
+      "\n"
+      " (child 2)\n"
+      "\n"
+      ")\n",
+      s.toByteArray().toStdString());
+}
+
+TEST(SExpressionTest, testToByteArrayEmptyList) {
+  SExpression s = SExpression::createList("test");
+  EXPECT_EQ("(test)\n", s.toByteArray().toStdString());
+}
+
+TEST(SExpressionTest, testToByteArrayEmptyListWithTrailingLineBreak) {
+  SExpression s = SExpression::createList("test");
+  s.ensureLineBreak();
+  EXPECT_EQ(
+      "(test\n"
+      ")\n",
+      s.toByteArray().toStdString());
+}
+
+TEST(SExpressionTest, testToByteArrayListWithLineBreaks) {
+  SExpression s = SExpression::createList("test");
+  s.appendChild("child", 1);
+  s.ensureLineBreak();
+  s.appendChild("child", 2);
+  s.ensureLineBreak();
+  EXPECT_EQ(
+      "(test (child 1)\n"
+      " (child 2)\n"
+      ")\n",
+      s.toByteArray().toStdString());
+}
+
+TEST(SExpressionTest, testToByteArrayListWithTooManyLineBreaks) {
+  SExpression s = SExpression::createList("test");
+  s.appendChild("child", 1);
+  s.ensureLineBreak();
+  s.ensureLineBreak();
+  s.ensureLineBreak();
+  s.appendChild("child", 2);
+  s.ensureLineBreak();
+  s.ensureLineBreak();
+  s.ensureLineBreak();
+  EXPECT_EQ(
+      "(test (child 1)\n"
+      " (child 2)\n"
+      ")\n",
+      s.toByteArray().toStdString());
 }
 
 /*******************************************************************************

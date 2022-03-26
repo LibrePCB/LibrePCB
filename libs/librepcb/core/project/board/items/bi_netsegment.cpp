@@ -554,11 +554,16 @@ void BI_NetSegment::serialize(SExpression& root) const {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
   root.appendChild(mUuid);
-  root.appendChild(
-      "net", mNetSignal ? mNetSignal->getUuid() : tl::optional<Uuid>(), true);
+  root.ensureLineBreak();
+  root.appendChild("net",
+                   mNetSignal ? mNetSignal->getUuid() : tl::optional<Uuid>());
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mVias, "via");
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mNetPoints, "junction");
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mNetLines, "trace");
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

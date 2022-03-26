@@ -17,12 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef UNITTESTS_CORE_SEXPRESSIONLEGACYMODE_H
+#define UNITTESTS_CORE_SEXPRESSIONLEGACYMODE_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "librarycategory.h"
 
-#include "../../serialization/sexpression.h"
+#include <librepcb/core/serialization/sexpression.h>
 
 #include <QtCore>
 
@@ -30,47 +32,29 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace tests {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class SExpressionLegacyMode
  ******************************************************************************/
 
-LibraryCategory::LibraryCategory(const QString& shortElementName,
-                                 const QString& longElementName,
-                                 const Uuid& uuid, const Version& version,
-                                 const QString& author,
-                                 const ElementName& name_en_US,
-                                 const QString& description_en_US,
-                                 const QString& keywords_en_US)
-  : LibraryBaseElement(true, shortElementName, longElementName, uuid, version,
-                       author, name_en_US, description_en_US, keywords_en_US) {
-}
+class SExpressionLegacyMode final {
+  bool mOldValue;
 
-LibraryCategory::LibraryCategory(
-    std::unique_ptr<TransactionalDirectory> directory,
-    const QString& shortElementName, const QString& longElementName)
-  : LibraryBaseElement(std::move(directory), true, shortElementName,
-                       longElementName),
-    mParentUuid(deserialize<tl::optional<Uuid>>(
-        mLoadingFileDocument.getChild("parent/@0"), mLoadingFileFormat)) {
-}
-
-LibraryCategory::~LibraryCategory() noexcept {
-}
-
-/*******************************************************************************
- *  Protected Methods
- ******************************************************************************/
-
-void LibraryCategory::serialize(SExpression& root) const {
-  LibraryBaseElement::serialize(root);
-  root.ensureLineBreak();
-  root.appendChild("parent", mParentUuid);
-  root.ensureLineBreak();
-}
+public:
+  SExpressionLegacyMode() = delete;
+  SExpressionLegacyMode(bool newValue) : mOldValue(SExpression::legacyMode()) {
+    SExpression::legacyMode() = newValue;
+  }
+  SExpressionLegacyMode(const SExpressionLegacyMode& other) = delete;
+  ~SExpressionLegacyMode() { SExpression::legacyMode() = mOldValue; }
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace tests
 }  // namespace librepcb
+
+#endif

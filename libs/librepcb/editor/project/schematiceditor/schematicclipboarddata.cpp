@@ -119,13 +119,21 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardData::fromMimeData(
  ******************************************************************************/
 
 void SchematicClipboardData::serialize(SExpression& root) const {
-  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"), true);
-  root.appendChild("schematic", mSchematicUuid, true);
+  root.ensureLineBreak();
+  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"));
+  root.ensureLineBreak();
+  root.appendChild("schematic", mSchematicUuid);
+  root.ensureLineBreak();
   mComponentInstances.serialize(root);
+  root.ensureLineBreak();
   mSymbolInstances.serialize(root);
+  root.ensureLineBreak();
   mNetSegments.serialize(root);
+  root.ensureLineBreak();
   mPolygons.serialize(root);
+  root.ensureLineBreak();
   mTexts.serialize(root);
+  root.ensureLineBreak();
 }
 
 QString SchematicClipboardData::getMimeType() noexcept {

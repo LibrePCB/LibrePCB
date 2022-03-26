@@ -119,7 +119,7 @@ void NetClass::unregisterNetSignal(NetSignal& signal) {
 
 void NetClass::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("name", mName, false);
+  root.appendChild("name", mName);
 }
 
 /*******************************************************************************

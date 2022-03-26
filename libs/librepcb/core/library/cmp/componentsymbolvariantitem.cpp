@@ -148,12 +148,16 @@ bool ComponentSymbolVariantItem::setSuffix(
 
 void ComponentSymbolVariantItem::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("symbol", mSymbolUuid, true);
-  root.appendChild(mSymbolPos.serializeToDomElement("position"), true);
-  root.appendChild("rotation", mSymbolRot, false);
-  root.appendChild("required", mIsRequired, false);
-  root.appendChild("suffix", mSuffix, false);
+  root.ensureLineBreak();
+  root.appendChild("symbol", mSymbolUuid);
+  root.ensureLineBreak();
+  root.appendChild(mSymbolPos.serializeToDomElement("position"));
+  root.appendChild("rotation", mSymbolRot);
+  root.appendChild("required", mIsRequired);
+  root.appendChild("suffix", mSuffix);
+  root.ensureLineBreak();
   mPinSignalMap.sortedByUuid().serialize(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

@@ -61,8 +61,8 @@ protected:
    */
   static std::string str(const DxfReader::Circle& circle) {
     SExpression s = SExpression::createList("object");
-    s.appendChild(circle.position.serializeToDomElement("position"), false);
-    s.appendChild("diameter", circle.diameter, false);
+    s.appendChild(circle.position.serializeToDomElement("position"));
+    s.appendChild("diameter", circle.diameter);
     return s.toByteArray().toStdString();
   }
 };

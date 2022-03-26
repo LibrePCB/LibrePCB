@@ -75,12 +75,14 @@ GraphicsLayerStackAppearanceSettings::
 void GraphicsLayerStackAppearanceSettings::serialize(SExpression& root) const {
   for (const GraphicsLayer* layer : mLayers.getAllLayers()) {
     Q_ASSERT(layer);
-    SExpression& child = root.appendList("layer", true);
+    root.ensureLineBreak();
+    SExpression& child = root.appendList("layer");
     child.appendChild(SExpression::createToken(layer->getName()));
-    child.appendChild("color", layer->getColor(false), false);
-    child.appendChild("color_hl", layer->getColor(true), false);
-    child.appendChild("visible", layer->getVisible(), false);
+    child.appendChild("color", layer->getColor(false));
+    child.appendChild("color_hl", layer->getColor(true));
+    child.appendChild("visible", layer->getVisible());
   }
+  root.ensureLineBreakIfMultiLine();
 }
 
 /*******************************************************************************

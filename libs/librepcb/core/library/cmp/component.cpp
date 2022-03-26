@@ -138,12 +138,19 @@ LibraryElementCheckMessageList Component::runChecks() const {
 
 void Component::serialize(SExpression& root) const {
   LibraryElement::serialize(root);
-  root.appendChild("schematic_only", mSchematicOnly, true);
-  root.appendChild("default_value", mDefaultValue, true);
+  root.ensureLineBreak();
+  root.appendChild("schematic_only", mSchematicOnly);
+  root.ensureLineBreak();
+  root.appendChild("default_value", mDefaultValue);
+  root.ensureLineBreak();
   mPrefixes.serialize(root);
+  root.ensureLineBreak();
   mAttributes.serialize(root);
+  root.ensureLineBreak();
   mSignals.serialize(root);
+  root.ensureLineBreak();
   mSymbolVariants.serialize(root);
+  root.ensureLineBreak();
 }
 
 QString Component::cleanNorm(QString norm) noexcept {
