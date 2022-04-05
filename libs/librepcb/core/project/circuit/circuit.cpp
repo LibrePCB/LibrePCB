@@ -383,13 +383,13 @@ void Circuit::save() {
  ******************************************************************************/
 
 void Circuit::serialize(SExpression& root) const {
-  root.appendLineBreak();
+  root.ensureEmptyLine();
   serializePointerContainer(root, mNetClasses, "netclass");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
   serializePointerContainer(root, mNetSignals, "net");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
   serializePointerContainer(root, mComponentInstances, "component");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
 }
 
 /*******************************************************************************

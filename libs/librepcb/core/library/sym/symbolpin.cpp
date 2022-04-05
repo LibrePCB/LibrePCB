@@ -136,10 +136,12 @@ void SymbolPin::unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept {
 
 void SymbolPin::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("name", mName, false);
-  root.appendChild(mPosition.serializeToDomElement("position"), true);
-  root.appendChild("rotation", mRotation, false);
-  root.appendChild("length", mLength, false);
+  root.appendChild("name", mName);
+  root.ensureLineBreak();
+  root.appendChild(mPosition.serializeToDomElement("position"));
+  root.appendChild("rotation", mRotation);
+  root.appendChild("length", mLength);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

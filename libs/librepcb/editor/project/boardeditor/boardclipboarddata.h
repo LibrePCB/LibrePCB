@@ -103,12 +103,17 @@ public:
     /// @copydoc ::librepcb::SerializableObject::serialize()
     void serialize(SExpression& root) const override {
       root.appendChild(componentUuid);
-      root.appendChild("lib_device", libDeviceUuid, true);
-      root.appendChild("lib_footprint", libFootprintUuid, true);
-      root.appendChild(position.serializeToDomElement("position"), true);
-      root.appendChild("rotation", rotation, false);
-      root.appendChild("mirror", mirrored, false);
+      root.ensureLineBreak();
+      root.appendChild("lib_device", libDeviceUuid);
+      root.ensureLineBreak();
+      root.appendChild("lib_footprint", libFootprintUuid);
+      root.ensureLineBreak();
+      root.appendChild(position.serializeToDomElement("position"));
+      root.appendChild("rotation", rotation);
+      root.appendChild("mirror", mirrored);
+      root.ensureLineBreak();
       strokeTexts.serialize(root);
+      root.ensureLineBreak();
     }
 
     bool operator!=(const Device& rhs) noexcept {
@@ -142,10 +147,15 @@ public:
 
     /// @copydoc ::librepcb::SerializableObject::serialize()
     void serialize(SExpression& root) const override {
-      root.appendChild("net", netName, true);
+      root.ensureLineBreak();
+      root.appendChild("net", netName);
+      root.ensureLineBreak();
       vias.serialize(root);
+      root.ensureLineBreak();
       junctions.serialize(root);
+      root.ensureLineBreak();
       traces.serialize(root);
+      root.ensureLineBreak();
     }
 
     bool operator!=(const NetSegment& rhs) noexcept {
@@ -204,14 +214,19 @@ public:
     /// @copydoc ::librepcb::SerializableObject::serialize()
     void serialize(SExpression& root) const override {
       root.appendChild(uuid);
-      root.appendChild("layer", layer, false);
-      root.appendChild("net", netSignalName, true);
-      root.appendChild("priority", priority, false);
-      root.appendChild("min_width", minWidth, true);
-      root.appendChild("min_clearance", minClearance, false);
-      root.appendChild("keep_orphans", keepOrphans, false);
-      root.appendChild("connect_style", connectStyle, true);
+      root.appendChild("layer", layer);
+      root.ensureLineBreak();
+      root.appendChild("net", netSignalName);
+      root.appendChild("priority", priority);
+      root.ensureLineBreak();
+      root.appendChild("min_width", minWidth);
+      root.appendChild("min_clearance", minClearance);
+      root.appendChild("keep_orphans", keepOrphans);
+      root.ensureLineBreak();
+      root.appendChild("connect_style", connectStyle);
+      root.ensureLineBreak();
       outline.serialize(root);
+      root.ensureLineBreak();
     }
 
     bool operator!=(const Plane& rhs) noexcept {

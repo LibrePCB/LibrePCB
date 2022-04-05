@@ -217,11 +217,15 @@ void SI_Symbol::serialize(SExpression& root) const {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
   root.appendChild(mUuid);
-  root.appendChild("component", mComponentInstance->getUuid(), true);
-  root.appendChild("lib_gate", mSymbVarItem->getUuid(), true);
-  root.appendChild(mPosition.serializeToDomElement("position"), true);
-  root.appendChild("rotation", mRotation, false);
-  root.appendChild("mirror", mMirrored, false);
+  root.ensureLineBreak();
+  root.appendChild("component", mComponentInstance->getUuid());
+  root.ensureLineBreak();
+  root.appendChild("lib_gate", mSymbVarItem->getUuid());
+  root.ensureLineBreak();
+  root.appendChild(mPosition.serializeToDomElement("position"));
+  root.appendChild("rotation", mRotation);
+  root.appendChild("mirror", mMirrored);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

@@ -479,18 +479,21 @@ void Project::save() {
   // Save schematics/schematics.lp
   SExpression schRoot = SExpression::createList("librepcb_schematics");
   foreach (Schematic* schematic, mSchematics) {
+    schRoot.ensureLineBreak();
     schRoot.appendChild("schematic",
-                        schematic->getFilePath().toRelative(getPath()), true);
+                        schematic->getFilePath().toRelative(getPath()));
   }
+  schRoot.ensureLineBreakIfMultiLine();
   mDirectory->write("schematics/schematics.lp",
                     schRoot.toByteArray());  // can throw
 
   // Save boards/boards.lp
   SExpression brdRoot = SExpression::createList("librepcb_boards");
   foreach (Board* board, mBoards) {
-    brdRoot.appendChild("board", board->getFilePath().toRelative(getPath()),
-                        true);
+    brdRoot.ensureLineBreak();
+    brdRoot.appendChild("board", board->getFilePath().toRelative(getPath()));
   }
+  brdRoot.ensureLineBreakIfMultiLine();
   mDirectory->write("boards/boards.lp", brdRoot.toByteArray());  // can throw
 
   // Save all removed schematics (*.lp files)

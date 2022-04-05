@@ -113,13 +113,13 @@ bool Attribute::setTypeValueUnit(const AttributeType& type,
 void Attribute::serialize(SExpression& root) const {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
   root.appendChild(mKey);
-  root.appendChild("type", *mType, false);
+  root.appendChild("type", *mType);
   if (mUnit) {
-    root.appendChild("unit", *mUnit, false);
+    root.appendChild("unit", *mUnit);
   } else {
-    root.appendChild("unit", SExpression::createToken("none"), false);
+    root.appendChild("unit", SExpression::createToken("none"));
   }
-  root.appendChild("value", mValue, false);
+  root.appendChild("value", mValue);
 }
 
 /*******************************************************************************

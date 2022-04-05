@@ -59,7 +59,9 @@ public:
   ~MinimalSerializableObjectMock() {}
 
   void serialize(SExpression& root) const override {
-    root.appendChild("value", mValue, true);
+    root.ensureLineBreak();
+    root.appendChild("value", mValue);
+    root.ensureLineBreak();
   }
 
   bool operator==(const MinimalSerializableObjectMock& rhs) = delete;
@@ -97,7 +99,9 @@ public:
 
   void serialize(SExpression& root) const override {
     root.appendChild(mUuid);
-    root.appendChild("name", mName, true);
+    root.ensureLineBreak();
+    root.appendChild("name", mName);
+    root.ensureLineBreak();
   }
 
   bool operator==(const SerializableObjectMock& rhs) const noexcept {

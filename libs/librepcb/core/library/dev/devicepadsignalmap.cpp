@@ -75,7 +75,7 @@ bool DevicePadSignalMapItem::setSignalUuid(
 
 void DevicePadSignalMapItem::serialize(SExpression& root) const {
   root.appendChild(mPadUuid);
-  root.appendChild("signal", mSignalUuid, false);
+  root.appendChild("signal", mSignalUuid);
 }
 
 /*******************************************************************************

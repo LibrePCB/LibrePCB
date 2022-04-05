@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
-#include "../serialization/serializableobject.h"
 #include "../types/lengthunit.h"
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
@@ -36,6 +35,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class SExpression;
 
 /*******************************************************************************
  *  Class WorkspaceSettings
@@ -54,7 +55,7 @@ namespace librepcb {
  *
  * @see ::librepcb::WorkspaceSettingsItem
  */
-class WorkspaceSettings final : public QObject, public SerializableObject {
+class WorkspaceSettings final : public QObject {
   Q_OBJECT
 
 public:
@@ -71,9 +72,14 @@ public:
   void restoreDefaults() noexcept;
 
   /**
+   * @brief Save all settings to a QByteArray
+   */
+  QByteArray saveToByteArray();
+
+  /**
    * @brief Save all settings to the file
    */
-  void saveToFile() const;
+  void saveToFile();
 
   // Operator Overloadings
   WorkspaceSettings& operator=(const WorkspaceSettings& rhs) = delete;
@@ -86,15 +92,40 @@ private:  // Methods
    */
   QList<WorkspaceSettingsItem*> getAllItems() const noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
 private:  // Data
-  FilePath mFilePath;  ///< path to the "settings.lp" file
+  /**
+   * @brief Path to the "settings.lp" file
+   */
+  FilePath mFilePath;
+
+  /**
+   * @brief Settings nodes contained in the file #mFilePath
+   *
+   * This map is filled with all settings S-Expression nodes when loading the
+   * settings from file. When modifying settings with the workspace settings
+   * dialog, the nodes in this map are updated accordingly. When saving the
+   * settings to file, these S-Expression nodes will be written to the file.
+   *
+   * - Key: Settings key, e.g. "use_opengl"
+   * - Value: The corresponding serialization, e.g. "(use_opengl true)"
+   *
+   * Important:
+   *
+   *   - Keeping unknown settings is important to not loose them when opening
+   *     a workspace after an application downgrade.
+   *   - When restoring default settings, the corresponding (or all) entries
+   *     are removed from this map (i.e. not written to file at all). This
+   *     ensures that users will automatically profit from improved default
+   *     values after an application upgrade unless they have manually changed
+   *     them.
+   *   - QMap is sorted by key, which will lead to sorted entries in the
+   *     S-Expression file for a clean file format.
+   */
+  QMap<QString, SExpression> mFileContent;
 
 public:
-  // All settings item objects below, in the same order as they are safed in
-  // the settings file.
+  // All settings item objects below. The order is not relevant for saving,
+  // it should be ordered logically.
   //
   // Note: Generally we don't make member variables public, but in this case
   //       it would create a lot of boilerplate to wrap all objects with

@@ -40,6 +40,7 @@ WorkspaceSettings::WorkspaceSettings(const FilePath& fp,
                                      const Version& fileFormat, QObject* parent)
   : QObject(parent),
     mFilePath(fp),
+    mFileContent(),
     // Initialize settings items. Their constructor will register them as
     // child objects of this object, this way we will access them later.
     userName("user", "", this),
@@ -56,9 +57,15 @@ WorkspaceSettings::WorkspaceSettings(const FilePath& fp,
     qDebug("Load workspace settings...");
     SExpression root =
         SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
+    foreach (const SExpression& child,
+             root.getChildren(SExpression::Type::List)) {
+      mFileContent.insert(child.getName(), child);
+    }
     foreach (WorkspaceSettingsItem* item, getAllItems()) {
       try {
-        item->load(root, fileFormat);  // can throw
+        if (mFileContent.contains(item->getKey())) {
+          item->load(mFileContent[item->getKey()], fileFormat);  // can throw
+        }
       } catch (const Exception& e) {
         qCritical() << "Could not load workspace settings item:" << e.getMsg();
       }
@@ -80,11 +87,33 @@ void WorkspaceSettings::restoreDefaults() noexcept {
   foreach (WorkspaceSettingsItem* item, getAllItems()) {
     item->restoreDefault();
   }
+  mFileContent.clear();  // Remove even unknown settings!
 }
 
-void WorkspaceSettings::saveToFile() const {
-  SExpression doc(serializeToDomElement("librepcb_workspace_settings"));
-  FileUtils::writeFile(mFilePath, doc.toByteArray());  // can throw
+QByteArray WorkspaceSettings::saveToByteArray() {
+  foreach (const WorkspaceSettingsItem* item, getAllItems()) {
+    if (item->isEdited()) {
+      if (item->isDefaultValue()) {
+        mFileContent.remove(item->getKey());
+      } else {
+        SExpression node = SExpression::createList(item->getKey());
+        item->serialize(node);  // can throw
+        mFileContent.insert(item->getKey(), node);
+      }
+    }
+  }
+
+  SExpression root = SExpression::createList("librepcb_workspace_settings");
+  foreach (const SExpression& child, mFileContent) {
+    root.ensureLineBreak();
+    root.appendChild(child);
+  }
+  root.ensureLineBreakIfMultiLine();
+  return root.toByteArray();
+}
+
+void WorkspaceSettings::saveToFile() {
+  FileUtils::writeFile(mFilePath, saveToByteArray());  // can throw
 }
 
 /*******************************************************************************
@@ -93,12 +122,6 @@ void WorkspaceSettings::saveToFile() const {
 
 QList<WorkspaceSettingsItem*> WorkspaceSettings::getAllItems() const noexcept {
   return findChildren<WorkspaceSettingsItem*>();
-}
-
-void WorkspaceSettings::serialize(SExpression& root) const {
-  foreach (const WorkspaceSettingsItem* item, getAllItems()) {
-    item->serialize(root);  // can throw
-  }
 }
 
 /*******************************************************************************

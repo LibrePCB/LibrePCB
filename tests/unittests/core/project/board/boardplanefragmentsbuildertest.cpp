@@ -87,10 +87,14 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
     child.appendChild(uuid);
     foreach (const Path& fragment,
              Toolbox::sortedQSet(actualPlaneFragments[uuid])) {
-      child.appendChild(fragment.serializeToDomElement("fragment"), true);
+      child.ensureLineBreak();
+      child.appendChild(fragment.serializeToDomElement("fragment"));
     }
-    actualSexpr.appendChild(child, true);
+    child.ensureLineBreakIfMultiLine();
+    actualSexpr.ensureLineBreak();
+    actualSexpr.appendChild(child);
   }
+  actualSexpr.ensureLineBreakIfMultiLine();
   QByteArray actual = actualSexpr.toByteArray();
   FileUtils::writeFile(testDataDir.getPathTo("actual.lp"), actual);
 

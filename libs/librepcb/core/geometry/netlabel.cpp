@@ -100,8 +100,10 @@ bool NetLabel::setRotation(const Angle& rotation) noexcept {
 
 void NetLabel::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild(mPosition.serializeToDomElement("position"), true);
-  root.appendChild("rotation", mRotation, false);
+  root.ensureLineBreak();
+  root.appendChild(mPosition.serializeToDomElement("position"));
+  root.appendChild("rotation", mRotation);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

@@ -357,13 +357,20 @@ void ComponentInstance::serialize(SExpression& root) const {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
   root.appendChild(mUuid);
-  root.appendChild("lib_component", mLibComponent->getUuid(), true);
-  root.appendChild("lib_variant", mCompSymbVar->getUuid(), true);
-  root.appendChild("lib_device", mDefaultDeviceUuid, true);
-  root.appendChild("name", mName, true);
-  root.appendChild("value", mValue, false);
+  root.ensureLineBreak();
+  root.appendChild("lib_component", mLibComponent->getUuid());
+  root.ensureLineBreak();
+  root.appendChild("lib_variant", mCompSymbVar->getUuid());
+  root.ensureLineBreak();
+  root.appendChild("lib_device", mDefaultDeviceUuid);
+  root.ensureLineBreak();
+  root.appendChild("name", mName);
+  root.appendChild("value", mValue);
+  root.ensureLineBreak();
   mAttributes->serialize(root);
+  root.ensureLineBreak();
   serializePointerContainer(root, mSignals, "signal");
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

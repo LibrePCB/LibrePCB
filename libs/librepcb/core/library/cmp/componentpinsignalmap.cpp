@@ -94,8 +94,8 @@ bool ComponentPinSignalMapItem::setDisplayType(
 
 void ComponentPinSignalMapItem::serialize(SExpression& root) const {
   root.appendChild(mPinUuid);
-  root.appendChild("signal", mSignalUuid, false);
-  root.appendChild("text", mDisplayType, false);
+  root.appendChild("signal", mSignalUuid);
+  root.appendChild("text", mDisplayType);
 }
 
 /*******************************************************************************

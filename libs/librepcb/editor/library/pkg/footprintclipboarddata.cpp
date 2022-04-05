@@ -99,15 +99,24 @@ std::unique_ptr<FootprintClipboardData> FootprintClipboardData::fromMimeData(
  ******************************************************************************/
 
 void FootprintClipboardData::serialize(SExpression& root) const {
-  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"), true);
-  root.appendChild("footprint", mFootprintUuid, true);
-  SExpression& packageRoot = root.appendList("package", true);
+  root.ensureLineBreak();
+  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"));
+  root.ensureLineBreak();
+  root.appendChild("footprint", mFootprintUuid);
+  root.ensureLineBreak();
+  SExpression& packageRoot = root.appendList("package");
   mPackagePads.serialize(packageRoot);
+  root.ensureLineBreak();
   mFootprintPads.serialize(root);
+  root.ensureLineBreak();
   mPolygons.serialize(root);
+  root.ensureLineBreak();
   mCircles.serialize(root);
+  root.ensureLineBreak();
   mStrokeTexts.serialize(root);
+  root.ensureLineBreak();
   mHoles.serialize(root);
+  root.ensureLineBreak();
 }
 
 QPixmap FootprintClipboardData::generatePixmap(

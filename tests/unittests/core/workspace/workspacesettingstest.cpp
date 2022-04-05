@@ -20,6 +20,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../serialization/sexpressionlegacymode.h"
+
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/fileutils.h>
@@ -143,9 +145,129 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   EXPECT_EQ(obj1.repositoryUrls.get(), obj2.repositoryUrls.get());
 
   // Check if serialization of loaded settings leads to same file content
-  SExpression sexpr1 = obj1.serializeToDomElement("settings");
-  SExpression sexpr2 = obj2.serializeToDomElement("settings");
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+  EXPECT_EQ(obj1.saveToByteArray().toStdString(),
+            obj2.saveToByteArray().toStdString());
+}
+
+// Verify that saving to file does only overwrite modified settings, but keeps
+// unknown file entries and does not add new entries for default settings.
+// This allows to switch between different application versions without
+// creating unnecessary modifications after an upgrade, or - even worse -
+// loosing settings after a downgrade. This allows us to improve/extend the
+// workspace settings even between minor versions (i.e. without introducing
+// a new file format) without any pain for users.
+//
+// In addition, it ensures that the built-in default values are used unless
+// the user explicitly changed the settings. This way, most users will profit
+// from improved default settings automatically. If we saved all settings every
+// time, users would keep the settings at the time writing the settings file
+// the first time forever.
+TEST_F(WorkspaceSettingsTest, testSaveOnlyModifiedSettings) {
+  SExpression sexpr = SExpression::parse(
+      "(librepcb_workspace_settings\n"
+      " (project_autosave_interval 1234)\n"
+      " (unknown_item \"Foo Bar\")\n"
+      " (unknown_list\n"
+      "  (unknown_list_item 42)\n"
+      " )\n"
+      ")\n",
+      FilePath());
+  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
+  FileUtils::writeFile(fp, sexpr.toByteArray());
+
+  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
+  EXPECT_EQ(1234U, obj.projectAutosaveIntervalSeconds.get());
+  obj.projectAutosaveIntervalSeconds.set(42);
+  obj.saveToFile();
+
+  QString actualContent = FileUtils::readFile(fp);
+  QString expectedContent =
+      "(librepcb_workspace_settings\n"
+      " (project_autosave_interval 42)\n"
+      " (unknown_item \"Foo Bar\")\n"
+      " (unknown_list\n"
+      "  (unknown_list_item 42)\n"
+      " )\n"
+      ")\n";
+  EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
+}
+
+// Addition for the previous test: Saving a default-constructed object to file
+// shall create a file without any entries.
+TEST_F(WorkspaceSettingsTest, testDefaultIsEmptyFile) {
+  SExpressionLegacyMode legacyMode(false);  // File format v0.2+
+  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
+
+  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
+  obj.saveToFile();
+
+  QString actualContent = FileUtils::readFile(fp);
+  QString expectedContent =
+      "(librepcb_workspace_settings\n"
+      ")\n";
+  EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
+}
+
+TEST_F(WorkspaceSettingsTest, testDefaultIsEmptyFileLegacy) {
+  SExpressionLegacyMode legacyMode(true);  // File format v0.1
+  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
+
+  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
+  obj.saveToFile();
+
+  QString actualContent = FileUtils::readFile(fp);
+  QString expectedContent = "(librepcb_workspace_settings)\n";
+  EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
+}
+
+// Test that restoring all default values also removes unknown entries from the
+// settings file, since an empty file is the real default.
+TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFile) {
+  SExpressionLegacyMode legacyMode(false);  // File format v0.2+
+  SExpression sexpr = SExpression::parse(
+      "(librepcb_workspace_settings\n"
+      " (project_autosave_interval 1234)\n"
+      " (unknown_value \"Foo Bar\")\n"
+      " (unknown_list\n"
+      "  (unknown_list_item 42)\n"
+      " )\n"
+      ")\n",
+      FilePath());
+  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
+  FileUtils::writeFile(fp, sexpr.toByteArray());
+
+  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
+  obj.restoreDefaults();
+  obj.saveToFile();
+
+  QString actualContent = FileUtils::readFile(fp);
+  QString expectedContent =
+      "(librepcb_workspace_settings\n"
+      ")\n";
+  EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
+}
+
+TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFileLegacy) {
+  SExpressionLegacyMode legacyMode(true);  // File format v0.1
+  SExpression sexpr = SExpression::parse(
+      "(librepcb_workspace_settings\n"
+      " (project_autosave_interval 1234)\n"
+      " (unknown_value \"Foo Bar\")\n"
+      " (unknown_list\n"
+      "  (unknown_list_item 42)\n"
+      " )\n"
+      ")\n",
+      FilePath());
+  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
+  FileUtils::writeFile(fp, sexpr.toByteArray());
+
+  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
+  obj.restoreDefaults();
+  obj.saveToFile();
+
+  QString actualContent = FileUtils::readFile(fp);
+  QString expectedContent = "(librepcb_workspace_settings)\n";
+  EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
 }
 
 /*******************************************************************************

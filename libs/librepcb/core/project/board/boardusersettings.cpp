@@ -69,6 +69,8 @@ BoardUserSettings::~BoardUserSettings() noexcept {
 
 void BoardUserSettings::serialize(SExpression& root) const {
   mLayerSettings->serialize(root);
+
+  root.ensureLineBreakIfMultiLine();
 }
 
 /*******************************************************************************

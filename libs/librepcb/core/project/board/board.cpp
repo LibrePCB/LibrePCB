@@ -1001,27 +1001,32 @@ void Board::updateIcon() noexcept {
 
 void Board::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("name", mName, true);
-  root.appendChild("default_font", mDefaultFontFileName, true);
-  root.appendChild(mGridProperties->serializeToDomElement("grid"), true);
-  root.appendChild(mLayerStack->serializeToDomElement("layers"), true);
-  root.appendChild(mDesignRules->serializeToDomElement("design_rules"), true);
+  root.ensureLineBreak();
+  root.appendChild("name", mName);
+  root.ensureLineBreak();
+  root.appendChild("default_font", mDefaultFontFileName);
+  root.ensureLineBreak();
+  root.appendChild(mGridProperties->serializeToDomElement("grid"));
+  root.ensureLineBreak();
+  root.appendChild(mLayerStack->serializeToDomElement("layers"));
+  root.ensureLineBreak();
+  root.appendChild(mDesignRules->serializeToDomElement("design_rules"));
+  root.ensureLineBreak();
   root.appendChild(mFabricationOutputSettings->serializeToDomElement(
-                       "fabrication_output_settings"),
-                   true);
-  root.appendLineBreak();
+      "fabrication_output_settings"));
+  root.ensureEmptyLine();
   serializePointerContainer(root, mDeviceInstances, "device");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
   serializePointerContainerUuidSorted(root, mNetSegments, "netsegment");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
   serializePointerContainerUuidSorted(root, mPlanes, "plane");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
   serializePointerContainerUuidSorted(root, mPolygons, "polygon");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
   serializePointerContainerUuidSorted(root, mStrokeTexts, "stroke_text");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
   serializePointerContainerUuidSorted(root, mHoles, "hole");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
 }
 
 void Board::updateErcMessages() noexcept {

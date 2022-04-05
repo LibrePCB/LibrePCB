@@ -79,8 +79,10 @@ LibraryElementCheckMessageList LibraryElement::runChecks() const {
 void LibraryElement::serialize(SExpression& root) const {
   LibraryBaseElement::serialize(root);
   foreach (const Uuid& uuid, Toolbox::sortedQSet(mCategories)) {
-    root.appendChild("category", uuid, true);
+    root.ensureLineBreak();
+    root.appendChild("category", uuid);
   }
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

@@ -436,13 +436,15 @@ void Schematic::updateIcon() noexcept {
 
 void Schematic::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("name", mName, true);
-  root.appendChild(mGridProperties->serializeToDomElement("grid"), true);
-  root.appendLineBreak();
+  root.ensureLineBreak();
+  root.appendChild("name", mName);
+  root.ensureLineBreak();
+  root.appendChild(mGridProperties->serializeToDomElement("grid"));
+  root.ensureEmptyLine();
   serializePointerContainerUuidSorted(root, mSymbols, "symbol");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
   serializePointerContainerUuidSorted(root, mNetSegments, "netsegment");
-  root.appendLineBreak();
+  root.ensureEmptyLine();
 }
 
 /*******************************************************************************
