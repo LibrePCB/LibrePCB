@@ -273,8 +273,7 @@ void ComponentSignalInstance::serialize(SExpression& root) const {
   root.appendChild(mComponentSignal->getUuid());
   root.appendChild(
       "net",
-      mNetSignal ? tl::make_optional(mNetSignal->getUuid()) : tl::nullopt,
-      false);
+      mNetSignal ? tl::make_optional(mNetSignal->getUuid()) : tl::nullopt);
 }
 
 /*******************************************************************************

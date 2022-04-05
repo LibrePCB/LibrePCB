@@ -64,7 +64,9 @@ LibraryCategory::~LibraryCategory() noexcept {
 
 void LibraryCategory::serialize(SExpression& root) const {
   LibraryBaseElement::serialize(root);
-  root.appendChild("parent", mParentUuid, true);
+  root.ensureLineBreak();
+  root.appendChild("parent", mParentUuid);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

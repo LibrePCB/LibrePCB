@@ -282,14 +282,16 @@ void FootprintPad::unregisterGraphicsItem(
 
 void FootprintPad::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("side", mBoardSide, false);
-  root.appendChild("shape", mShape, false);
-  root.appendChild(mPosition.serializeToDomElement("position"), true);
-  root.appendChild("rotation", mRotation, false);
-  root.appendChild(Point(*mWidth, *mHeight).serializeToDomElement("size"),
-                   false);
-  root.appendChild("drill", mDrillDiameter, false);
-  root.appendChild("package_pad", mPackagePadUuid, true);
+  root.appendChild("side", mBoardSide);
+  root.appendChild("shape", mShape);
+  root.ensureLineBreak();
+  root.appendChild(mPosition.serializeToDomElement("position"));
+  root.appendChild("rotation", mRotation);
+  root.appendChild(Point(*mWidth, *mHeight).serializeToDomElement("size"));
+  root.appendChild("drill", mDrillDiameter);
+  root.ensureLineBreak();
+  root.appendChild("package_pad", mPackagePadUuid);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

@@ -112,11 +112,17 @@ void ProjectMetadata::updateLastModified() noexcept {
 
 void ProjectMetadata::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("name", mName, true);
-  root.appendChild("author", mAuthor, true);
-  root.appendChild("version", mVersion, true);
-  root.appendChild("created", mCreated, true);
+  root.ensureLineBreak();
+  root.appendChild("name", mName);
+  root.ensureLineBreak();
+  root.appendChild("author", mAuthor);
+  root.ensureLineBreak();
+  root.appendChild("version", mVersion);
+  root.ensureLineBreak();
+  root.appendChild("created", mCreated);
+  root.ensureLineBreak();
   mAttributes.serialize(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

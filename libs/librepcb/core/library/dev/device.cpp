@@ -94,10 +94,15 @@ LibraryElementCheckMessageList Device::runChecks() const {
 
 void Device::serialize(SExpression& root) const {
   LibraryElement::serialize(root);
-  root.appendChild("component", mComponentUuid, true);
-  root.appendChild("package", mPackageUuid, true);
+  root.ensureLineBreak();
+  root.appendChild("component", mComponentUuid);
+  root.ensureLineBreak();
+  root.appendChild("package", mPackageUuid);
+  root.ensureLineBreak();
   mAttributes.serialize(root);
+  root.ensureLineBreak();
   mPadSignalMap.sortedByUuid().serialize(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

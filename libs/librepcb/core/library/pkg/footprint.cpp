@@ -148,13 +148,21 @@ void Footprint::unregisterGraphicsItem(FootprintGraphicsItem& item) noexcept {
 
 void Footprint::serialize(SExpression& root) const {
   root.appendChild(mUuid);
+  root.ensureLineBreak();
   mNames.serialize(root);
+  root.ensureLineBreak();
   mDescriptions.serialize(root);
+  root.ensureLineBreak();
   mPads.serialize(root);
+  root.ensureLineBreak();
   mPolygons.serialize(root);
+  root.ensureLineBreak();
   mCircles.serialize(root);
+  root.ensureLineBreak();
   mStrokeTexts.serialize(root);
+  root.ensureLineBreak();
   mHoles.serialize(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

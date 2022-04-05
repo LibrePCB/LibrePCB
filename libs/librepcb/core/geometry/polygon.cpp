@@ -137,11 +137,14 @@ bool Polygon::setPath(const Path& path) noexcept {
 
 void Polygon::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName, false);
-  root.appendChild("width", mLineWidth, true);
-  root.appendChild("fill", mIsFilled, false);
-  root.appendChild("grab_area", mIsGrabArea, false);
+  root.appendChild("layer", mLayerName);
+  root.ensureLineBreak();
+  root.appendChild("width", mLineWidth);
+  root.appendChild("fill", mIsFilled);
+  root.appendChild("grab_area", mIsGrabArea);
+  root.ensureLineBreak();
   mPath.serialize(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

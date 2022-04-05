@@ -51,36 +51,54 @@ class WorkspaceSettingsItem : public QObject {
 
 public:
   // Constructors / Destructor
-  explicit WorkspaceSettingsItem(QObject* parent = nullptr) noexcept;
+  WorkspaceSettingsItem() = delete;
+  explicit WorkspaceSettingsItem(const QString& key,
+                                 QObject* parent = nullptr) noexcept;
   WorkspaceSettingsItem(const WorkspaceSettingsItem& other) = delete;
-  ~WorkspaceSettingsItem() noexcept;
+  virtual ~WorkspaceSettingsItem() noexcept;
+
+  /**
+   * @brief Get the setting key used for serialization
+   *
+   * @return Serialization key.
+   */
+  const QString& getKey() const noexcept { return mKey; }
+
+  /**
+   * @brief Check whether this setting is at its default value (not modified)
+   *
+   * @retval true   Default is active, value is not stored in settings file.
+   * @retval false  Value has been modified and is stored in settings file.
+   */
+  bool isDefaultValue() const noexcept { return mIsDefault; }
+
+  /**
+   * @brief Check whether this setting was edited sinc the last load or save
+   *
+   * @retval true   Value has been modified.
+   * @retval false  Value not modified, settings file content is still valid.
+   */
+  bool isEdited() const noexcept { return mEdited; }
 
   /**
    * @brief Restore default value
-   *
-   * @note Implementation must emit the #edited() signal.
    */
-  virtual void restoreDefault() noexcept = 0;
+  void restoreDefault() noexcept;
 
   /**
-   * @brief Load value from S-Expression node
+   * @brief Load value from S-Expression file
    *
-   * @param root        Root node of the settings file.
+   * @param root        Loaded ::librepcb::SExpression node.
    * @param fileFormat  The file format of the settings file.
-   *
-   * @note Implementation must emit the #edited() signal.
-   *
-   * @note Implementation must be atomic, i.e. either the value must be loaded
-   *       completely from file, or left at the old value (in case of errors).
    */
-  virtual void load(const SExpression& root, const Version& fileFormat) = 0;
+  void load(const SExpression& root, const Version& fileFormat);
 
   /**
-   * @brief Serialize the value into S-Expression node
+   * @brief Serialize the value into S-Expression nodes
    *
-   * @param root  Root node of the settings file.
+   * @param root  S-Expression node to be updated.
    */
-  virtual void serialize(SExpression& root) const = 0;
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   WorkspaceSettingsItem& operator=(const WorkspaceSettingsItem& rhs) = delete;
@@ -90,6 +108,43 @@ signals:
    * @brief Signal to notify about changes of the settings value
    */
   void edited();
+
+protected:
+  void valueModified() noexcept;
+
+  /**
+   * @brief Restore default value
+   *
+   * @note Implementation must emit the #edited() signal if the value has
+   *       changed.
+   */
+  virtual void restoreDefaultImpl() noexcept = 0;
+
+  /**
+   * @brief Load value from S-Expression node
+   *
+   * @param root        S-Expression node of the settings element.
+   * @param fileFormat  The file format of the settings file.
+   *
+   * @note Implementation must emit the #edited() signal if the value has
+   *       changed.
+   *
+   * @note Implementation must be atomic, i.e. either the value must be loaded
+   *       completely from file, or left at the old value (in case of errors).
+   */
+  virtual void loadImpl(const SExpression& root, const Version& fileFormat) = 0;
+
+  /**
+   * @brief Serialize the value into S-Expression node
+   *
+   * @param root  S-Expression node to be updated.
+   */
+  virtual void serializeImpl(SExpression& root) const = 0;
+
+private:
+  QString mKey;  ///< Key used for serialization
+  bool mIsDefault;  ///< Setting is at default value
+  mutable bool mEdited;  ///< Edited since last load or save
 };
 
 /*******************************************************************************

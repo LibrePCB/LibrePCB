@@ -520,10 +520,15 @@ void SI_NetSegment::serialize(SExpression& root) const {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
   root.appendChild(mUuid);
-  root.appendChild("net", mNetSignal->getUuid(), true);
+  root.ensureLineBreak();
+  root.appendChild("net", mNetSignal->getUuid());
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mNetPoints, "junction");
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mNetLines, "line");
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mNetLabels, "label");
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

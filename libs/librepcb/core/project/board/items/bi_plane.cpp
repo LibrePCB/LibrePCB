@@ -232,16 +232,21 @@ void BI_Plane::rebuild() noexcept {
 
 void BI_Plane::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName, false);
-  root.appendChild("net", mNetSignal->getUuid(), true);
-  root.appendChild("priority", mPriority, false);
-  root.appendChild("min_width", mMinWidth, true);
-  root.appendChild("min_clearance", mMinClearance, false);
-  root.appendChild("keep_orphans", mKeepOrphans, false);
-  root.appendChild("connect_style", mConnectStyle, true);
+  root.appendChild("layer", mLayerName);
+  root.ensureLineBreak();
+  root.appendChild("net", mNetSignal->getUuid());
+  root.appendChild("priority", mPriority);
+  root.ensureLineBreak();
+  root.appendChild("min_width", mMinWidth);
+  root.appendChild("min_clearance", mMinClearance);
+  root.appendChild("keep_orphans", mKeepOrphans);
+  root.ensureLineBreak();
+  root.appendChild("connect_style", mConnectStyle);
   // root.appendChild("thermal_gap_width", mThermalGapWidth, false);
   // root.appendChild("thermal_spoke_width", mThermalSpokeWidth, false);
+  root.ensureLineBreak();
   mOutline.serialize(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

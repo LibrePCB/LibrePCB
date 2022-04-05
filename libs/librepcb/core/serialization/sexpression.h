@@ -93,10 +93,17 @@ public:
   bool isToken() const noexcept { return mType == Type::Token; }
   bool isString() const noexcept { return mType == Type::String; }
   bool isLineBreak() const noexcept { return mType == Type::LineBreak; }
-  bool isMultiLineList() const noexcept;
   const QString& getName() const;
   const QString& getValue() const;
+  /**
+   * @brief Get all children of this node
+   *
+   * @attention The returned list may even contain linebreak-elements!
+   *
+   * @return All children
+   */
   const QList<SExpression>& getChildren() const noexcept { return mChildren; }
+  QList<SExpression> getChildren(Type type) const noexcept;
   QList<SExpression> getChildren(const QString& name) const noexcept;
 
   /**
@@ -124,6 +131,10 @@ public:
    *            "position" child, an exception is raised even if the following
    *            "via" elements do have a "position" child.
    *
+   * @note  In contrast to #getChildren(), this method skips linebreak
+   *        elements. So if you acces an element by index (e.g. "@3"),
+   *        the n-th child which is *not* a linebreak will be returned.
+   *
    * @param path    The path to the child to get, separated by forward slashes
    *                '/'. To specify a child by index, use '@' followed by the
    *                index (e.g. '@1' to get the second child).
@@ -148,19 +159,20 @@ public:
   const SExpression* tryGetChild(const QString& path) const noexcept;
 
   // General Methods
-  SExpression& appendLineBreak();
-  SExpression& appendList(const QString& name, bool linebreak);
-  SExpression& appendChild(const SExpression& child, bool linebreak);
+  void ensureLineBreak();
+  void ensureLineBreakIfMultiLine();
+  void ensureEmptyLine();
+  SExpression& appendList(const QString& name);
+  SExpression& appendChild(const SExpression& child);
   template <typename T>
   SExpression& appendChild(const T& obj) {
-    appendChild(serialize(obj), false);
+    appendChild(serialize(obj));
     return *this;
   }
   template <typename T>
-  SExpression& appendChild(const QString& child, const T& obj, bool linebreak) {
-    return appendList(child, linebreak).appendChild(obj);
+  SExpression& appendChild(const QString& child, const T& obj) {
+    return appendList(child).appendChild(obj);
   }
-  void removeLineBreaks() noexcept;
   QByteArray toByteArray() const;
 
   // Operator Overloadings
@@ -172,10 +184,14 @@ public:
   static SExpression createString(const QString& string);
   static SExpression createLineBreak();
   static SExpression parse(const QByteArray& content, const FilePath& filePath);
+  static bool& legacyMode() noexcept;
 
 private:  // Methods
   SExpression(Type type, const QString& value);
 
+  bool isMultiLine() const noexcept;
+  static bool skipLineBreaks(const QList<SExpression>& children,
+                             int& index) noexcept;
   static SExpression parse(const QString& content, int& index,
                            const FilePath& filePath);
   static SExpression parseList(const QString& content, int& index,
@@ -184,7 +200,8 @@ private:  // Methods
                             const FilePath& filePath);
   static QString parseString(const QString& content, int& index,
                              const FilePath& filePath);
-  static void skipWhitespaceAndComments(const QString& content, int& index);
+  static void skipWhitespaceAndComments(const QString& content, int& index,
+                                        bool skipNewline = false);
   static QString escapeString(const QString& string) noexcept;
   static bool isValidToken(const QString& token) noexcept;
   static bool isValidTokenChar(const QChar& c) noexcept;

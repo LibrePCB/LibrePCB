@@ -147,12 +147,14 @@ bool Text::setAlign(const Alignment& align) noexcept {
 
 void Text::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName, false);
-  root.appendChild("value", mText, false);
-  root.appendChild(mAlign.serializeToDomElement("align"), true);
-  root.appendChild("height", mHeight, false);
-  root.appendChild(mPosition.serializeToDomElement("position"), false);
-  root.appendChild("rotation", mRotation, false);
+  root.appendChild("layer", mLayerName);
+  root.appendChild("value", mText);
+  root.ensureLineBreak();
+  root.appendChild(mAlign.serializeToDomElement("align"));
+  root.appendChild("height", mHeight);
+  root.appendChild(mPosition.serializeToDomElement("position"));
+  root.appendChild("rotation", mRotation);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

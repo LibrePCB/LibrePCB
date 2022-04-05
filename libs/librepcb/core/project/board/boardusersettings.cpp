@@ -84,11 +84,14 @@ void BoardUserSettings::serialize(SExpression& root) const {
 
   for (auto i = mPlanesVisibility.constBegin();
        i != mPlanesVisibility.constEnd(); i++) {
+    root.ensureLineBreak();
     SExpression node = SExpression::createList("plane");
     node.appendChild(i.key());
-    node.appendChild("visible", i.value(), false);
-    root.appendChild(node, true);
+    node.appendChild("visible", i.value());
+    root.appendChild(node);
   }
+
+  root.ensureLineBreakIfMultiLine();
 }
 
 /*******************************************************************************

@@ -446,19 +446,25 @@ void TransactionalFileSystem::saveDiff(const QString& type) const {
   }
 
   SExpression root = SExpression::createList("librepcb_" % type);
-  root.appendChild("created", dt, true);
-  root.appendChild("modified_files_directory", filesDir.getFilename(), true);
+  root.ensureLineBreak();
+  root.appendChild("created", dt);
+  root.ensureLineBreak();
+  root.appendChild("modified_files_directory", filesDir.getFilename());
   foreach (const QString& filepath, Toolbox::sorted(mModifiedFiles.keys())) {
-    root.appendChild("modified_file", filepath, true);
+    root.ensureLineBreak();
+    root.appendChild("modified_file", filepath);
     FileUtils::writeFile(filesDir.getPathTo(filepath),
                          mModifiedFiles.value(filepath));  // can throw
   }
   foreach (const QString& filepath, Toolbox::sorted(mRemovedFiles.values())) {
-    root.appendChild("removed_file", filepath, true);
+    root.ensureLineBreak();
+    root.appendChild("removed_file", filepath);
   }
   foreach (const QString& filepath, Toolbox::sorted(mRemovedDirs.values())) {
-    root.appendChild("removed_directory", filepath, true);
+    root.ensureLineBreak();
+    root.appendChild("removed_directory", filepath);
   }
+  root.ensureLineBreak();
 
   // Writing the main file must be the last operation to "mark" this diff as
   // complete!

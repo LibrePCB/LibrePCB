@@ -58,10 +58,10 @@ NetLineAnchor::~NetLineAnchor() noexcept {
 
 void NetLineAnchor::serialize(SExpression& root) const {
   if (mJunction) {
-    root.appendChild("junction", *mJunction, false);
+    root.appendChild("junction", *mJunction);
   } else if (mPin) {
-    root.appendChild("symbol", mPin->symbol, false);
-    root.appendChild("pin", mPin->pin, false);
+    root.appendChild("symbol", mPin->symbol);
+    root.appendChild("pin", mPin->pin);
   } else {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -168,9 +168,12 @@ bool NetLine::setEndPoint(const NetLineAnchor& end) noexcept {
 
 void NetLine::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("width", mWidth, false);
-  root.appendChild(mStart.serializeToDomElement("from"), true);
-  root.appendChild(mEnd.serializeToDomElement("to"), true);
+  root.appendChild("width", mWidth);
+  root.ensureLineBreak();
+  root.appendChild(mStart.serializeToDomElement("from"));
+  root.ensureLineBreak();
+  root.appendChild(mEnd.serializeToDomElement("to"));
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

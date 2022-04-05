@@ -71,7 +71,7 @@ bool PackagePad::setName(const CircuitIdentifier& name) noexcept {
 
 void PackagePad::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("name", mName, false);
+  root.appendChild("name", mName);
 }
 
 /*******************************************************************************

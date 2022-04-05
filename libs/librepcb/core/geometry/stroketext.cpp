@@ -329,17 +329,21 @@ void StrokeText::updatePaths() noexcept {
 
 void StrokeText::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName, false);
-  root.appendChild("height", mHeight, true);
-  root.appendChild("stroke_width", mStrokeWidth, false);
-  root.appendChild("letter_spacing", mLetterSpacing, false);
-  root.appendChild("line_spacing", mLineSpacing, false);
-  root.appendChild(mAlign.serializeToDomElement("align"), true);
-  root.appendChild(mPosition.serializeToDomElement("position"), false);
-  root.appendChild("rotation", mRotation, false);
-  root.appendChild("auto_rotate", mAutoRotate, true);
-  root.appendChild("mirror", mMirrored, false);
-  root.appendChild("value", mText, false);
+  root.appendChild("layer", mLayerName);
+  root.ensureLineBreak();
+  root.appendChild("height", mHeight);
+  root.appendChild("stroke_width", mStrokeWidth);
+  root.appendChild("letter_spacing", mLetterSpacing);
+  root.appendChild("line_spacing", mLineSpacing);
+  root.ensureLineBreak();
+  root.appendChild(mAlign.serializeToDomElement("align"));
+  root.appendChild(mPosition.serializeToDomElement("position"));
+  root.appendChild("rotation", mRotation);
+  root.ensureLineBreak();
+  root.appendChild("auto_rotate", mAutoRotate);
+  root.appendChild("mirror", mMirrored);
+  root.appendChild("value", mText);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

@@ -138,10 +138,14 @@ bool ComponentSymbolVariant::setDescriptions(
 
 void ComponentSymbolVariant::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("norm", mNorm, false);
+  root.appendChild("norm", mNorm);
+  root.ensureLineBreak();
   mNames.serialize(root);
+  root.ensureLineBreak();
   mDescriptions.serialize(root);
+  root.ensureLineBreak();
   mSymbolItems.serialize(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

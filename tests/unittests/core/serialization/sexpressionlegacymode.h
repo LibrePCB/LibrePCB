@@ -17,10 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef UNITTESTS_CORE_SEXPRESSIONLEGACYMODE_H
+#define UNITTESTS_CORE_SEXPRESSIONLEGACYMODE_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "workspacesettingsitem.h"
+
+#include <librepcb/core/serialization/sexpression.h>
 
 #include <QtCore>
 
@@ -28,49 +32,29 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace tests {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class SExpressionLegacyMode
  ******************************************************************************/
 
-WorkspaceSettingsItem::WorkspaceSettingsItem(const QString& key,
-                                             QObject* parent) noexcept
-  : QObject(parent), mKey(key), mIsDefault(true), mEdited(false) {
-}
+class SExpressionLegacyMode final {
+  bool mOldValue;
 
-WorkspaceSettingsItem::~WorkspaceSettingsItem() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void WorkspaceSettingsItem::valueModified() noexcept {
-  mIsDefault = false;
-  mEdited = true;
-  emit edited();
-}
-
-void WorkspaceSettingsItem::restoreDefault() noexcept {
-  restoreDefaultImpl();
-  mIsDefault = true;
-  mEdited = true;
-}
-
-void WorkspaceSettingsItem::load(const SExpression& root,
-                                 const Version& fileFormat) {
-  loadImpl(root, fileFormat);  // can throw
-  mIsDefault = false;
-  mEdited = false;
-}
-
-void WorkspaceSettingsItem::serialize(SExpression& root) const {
-  serializeImpl(root);  // can throw
-  mEdited = false;
-}
+public:
+  SExpressionLegacyMode() = delete;
+  SExpressionLegacyMode(bool newValue) : mOldValue(SExpression::legacyMode()) {
+    SExpression::legacyMode() = newValue;
+  }
+  SExpressionLegacyMode(const SExpressionLegacyMode& other) = delete;
+  ~SExpressionLegacyMode() { SExpression::legacyMode() = mOldValue; }
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace tests
 }  // namespace librepcb
+
+#endif

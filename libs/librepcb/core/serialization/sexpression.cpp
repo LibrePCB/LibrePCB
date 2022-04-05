@@ -56,30 +56,31 @@ SExpression::~SExpression() noexcept {
  *  Getters
  ******************************************************************************/
 
-bool SExpression::isMultiLineList() const noexcept {
-  foreach (const SExpression& child, mChildren) {
-    if (child.isLineBreak() || (child.isMultiLineList())) {
-      return true;
-    }
-  }
-  return false;
-}
-
 const QString& SExpression::getName() const {
   if (isList()) {
     return mValue;
   } else {
     throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
-                         tr("Node is not a list."));
+                         "Node is not a list.");
   }
 }
 
 const QString& SExpression::getValue() const {
   if (!isToken() && !isString()) {
     throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, mValue,
-                         tr("Node is not a token or string."));
+                         "Node is not a token or string.");
   }
   return mValue;
+}
+
+QList<SExpression> SExpression::getChildren(Type type) const noexcept {
+  QList<SExpression> children;
+  foreach (const SExpression& child, mChildren) {
+    if (child.getType() == type) {
+      children.append(child);
+    }
+  }
+  return children;
 }
 
 QList<SExpression> SExpression::getChildren(const QString& name) const
@@ -99,7 +100,7 @@ const SExpression& SExpression::getChild(const QString& path) const {
     return *child;
   } else {
     throw FileParseError(__FILE__, __LINE__, mFilePath, -1, -1, QString(),
-                         tr("Child not found: %1").arg(path));
+                         QString("Child not found: %1").arg(path));
   }
 }
 
@@ -110,7 +111,7 @@ const SExpression* SExpression::tryGetChild(const QString& path) const
     if (name.startsWith('@')) {
       bool valid = false;
       int index = name.mid(1).toInt(&valid);
-      if ((valid) && (index >= 0) && (index < child->mChildren.count())) {
+      if ((valid) && (index >= 0) && skipLineBreaks(child->mChildren, index)) {
         child = &child->mChildren.at(index);
       } else {
         return nullptr;
@@ -136,19 +137,38 @@ const SExpression* SExpression::tryGetChild(const QString& path) const
  *  General Methods
  ******************************************************************************/
 
-SExpression& SExpression::appendLineBreak() {
-  mChildren.append(createLineBreak());
-  return *this;
+void SExpression::ensureLineBreak() {
+  if (mChildren.isEmpty() || (!mChildren.last().isLineBreak())) {
+    mChildren.append(createLineBreak());
+  }
 }
 
-SExpression& SExpression::appendList(const QString& name, bool linebreak) {
-  return appendChild(createList(name), linebreak);
+void SExpression::ensureLineBreakIfMultiLine() {
+  // It's ugly to conditionally create line breaks, let's always create them
+  // for file format v0.2.
+  if ((!legacyMode()) || isMultiLine()) {
+    ensureLineBreak();
+  }
 }
 
-SExpression& SExpression::appendChild(const SExpression& child,
-                                      bool linebreak) {
+void SExpression::ensureEmptyLine() {
+  // Empty lines are cumbersome, let's stop creating them for file format v0.2.
+  if (legacyMode()) {
+    while ((mChildren.count() < 2) || (!mChildren.last().isLineBreak()) ||
+           (!mChildren.at(mChildren.count() - 2).isLineBreak())) {
+      mChildren.append(createLineBreak());
+    }
+  } else {
+    ensureLineBreak();
+  }
+}
+
+SExpression& SExpression::appendList(const QString& name) {
+  return appendChild(createList(name));
+}
+
+SExpression& SExpression::appendChild(const SExpression& child) {
   if (mType == Type::List) {
-    if (linebreak) appendLineBreak();
     mChildren.append(child);
     return mChildren.last();
   } else {
@@ -156,17 +176,11 @@ SExpression& SExpression::appendChild(const SExpression& child,
   }
 }
 
-void SExpression::removeLineBreaks() noexcept {
-  for (int i = mChildren.count() - 1; i >= 0; --i) {
-    if (mChildren.at(i).isLineBreak()) {
-      mChildren.removeAt(i);
-    }
-  }
-}
-
 QByteArray SExpression::toByteArray() const {
   QString str = toString(0);  // can throw
-  str += '\n';  // newline at end of file
+  if (!str.endsWith('\n')) {
+    str += '\n';  // newline at end of file
+  }
   return str.toUtf8();
 }
 
@@ -238,36 +252,33 @@ bool SExpression::isValidTokenChar(const QChar& c) noexcept {
 QString SExpression::toString(int indent) const {
   if (mType == Type::List) {
     if (!isValidToken(mValue)) {
-      throw LogicError(__FILE__, __LINE__,
-                       tr("Invalid S-Expression list name: %1").arg(mValue));
+      throw LogicError(
+          __FILE__, __LINE__,
+          QString("Invalid S-Expression list name: %1").arg(mValue));
     }
     QString str = '(' + mValue;
+    bool lastCharIsSpace = false;
+    const int lastIndex = mChildren.count() - 1;
     for (int i = 0; i < mChildren.count(); ++i) {
       const SExpression& child = mChildren.at(i);
-      if ((!str.at(str.length() - 1).isSpace()) && (!child.isLineBreak())) {
+      if ((!lastCharIsSpace) && (!child.isLineBreak())) {
         str += ' ';
       }
-      bool nextChildIsLineBreak = (i < mChildren.count() - 1)
-          ? mChildren.at(i + 1).isLineBreak()
-          : true;
-      if (child.isLineBreak() && nextChildIsLineBreak) {
-        if ((i > 0) && mChildren.at(i - 1).isLineBreak()) {
-          // too many line breaks ;)
-        } else {
-          str += '\n';
-        }
-      } else {
-        str += child.toString(indent + 1);
+      const bool nextChildIsLineBreak =
+          (i < lastIndex) && mChildren.at(i + 1).isLineBreak();
+      int currentIndent =
+          (child.isLineBreak() && nextChildIsLineBreak) ? 0 : (indent + 1);
+      lastCharIsSpace = child.isLineBreak() && (currentIndent > 0);
+      if (lastCharIsSpace && (i == lastIndex)) {
+        --currentIndent;
       }
-    }
-    if (isMultiLineList()) {
-      str += '\n' + QString(' ').repeated(indent);
+      str += child.toString(currentIndent);
     }
     return str + ')';
   } else if (mType == Type::Token) {
     if (!isValidToken(mValue)) {
       throw LogicError(__FILE__, __LINE__,
-                       tr("Invalid S-Expression token: %1").arg(mValue));
+                       QString("Invalid S-Expression token: %1").arg(mValue));
     }
     return mValue;
   } else if (mType == Type::String) {
@@ -303,12 +314,13 @@ SExpression SExpression::parse(const QByteArray& content,
                                const FilePath& filePath) {
   int index = 0;
   QString contentStr = QString::fromUtf8(content);
-  skipWhitespaceAndComments(contentStr, index);
+  skipWhitespaceAndComments(contentStr, index, true);  // Skip newlines as well.
   if (index >= contentStr.length()) {
     throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
                          "No S-Expression node found.");
   }
   SExpression root = parse(contentStr, index, filePath);
+  skipWhitespaceAndComments(contentStr, index, true);  // Skip newlines as well.
   if (index < contentStr.length()) {
     throw FileParseError(__FILE__, __LINE__, filePath, -1, -1, QString(),
                          "File contains more than one root node.");
@@ -316,15 +328,49 @@ SExpression SExpression::parse(const QByteArray& content,
   return root;
 }
 
+bool& SExpression::legacyMode() noexcept {
+  static bool v01 = (qApp->getFileFormatVersion() < Version::fromString("0.2"));
+  return v01;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+bool SExpression::isMultiLine() const noexcept {
+  if (isLineBreak()) {
+    return true;
+  } else if (isList()) {
+    foreach (const SExpression& child, mChildren) {
+      if (child.isMultiLine()) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool SExpression::skipLineBreaks(const QList<SExpression>& children,
+                                 int& index) noexcept {
+  for (int i = 0; i < children.count(); ++i) {
+    if (children.at(i).isLineBreak()) {
+      ++index;
+    } else if (i == index) {
+      return true;
+    }
+  }
+  return false;
+}
 
 SExpression SExpression::parse(const QString& content, int& index,
                                const FilePath& filePath) {
   Q_ASSERT(index < content.length());
 
-  if (content.at(index) == '(') {
+  if (content.at(index) == '\n') {
+    ++index;  // consume the '\n'
+    skipWhitespaceAndComments(content, index);  // consume following spaces
+    return createLineBreak();
+  } else if (content.at(index) == '(') {
     return parseList(content, index, filePath);
   } else if (content.at(index) == '"') {
     return createString(parseString(content, index, filePath));
@@ -429,9 +475,9 @@ QString SExpression::parseString(const QString& content, int& index,
   return string;
 }
 
-void SExpression::skipWhitespaceAndComments(const QString& content,
-                                            int& index) {
-  static QSet<QChar> spaces = {' ', '\f', '\n', '\r', '\t', '\v'};
+void SExpression::skipWhitespaceAndComments(const QString& content, int& index,
+                                            bool skipNewline) {
+  static QSet<QChar> spaces = {' ', '\f', '\r', '\t', '\v'};
 
   bool isComment = false;
   while (index < content.length()) {
@@ -441,7 +487,7 @@ void SExpression::skipWhitespaceAndComments(const QString& content,
     } else if (c == '\n') {
       isComment = false;
     }
-    if (isComment || spaces.contains(c)) {
+    if (isComment || ((skipNewline) && (c == '\n')) || spaces.contains(c)) {
       ++index;
     } else {
       break;

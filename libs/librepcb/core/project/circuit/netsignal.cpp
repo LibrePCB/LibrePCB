@@ -241,9 +241,11 @@ void NetSignal::serialize(SExpression& root) const {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
   root.appendChild(mUuid);
-  root.appendChild("auto", mHasAutoName, false);
-  root.appendChild("name", mName, false);
-  root.appendChild("netclass", mNetClass->getUuid(), true);
+  root.appendChild("auto", mHasAutoName);
+  root.appendChild("name", mName);
+  root.ensureLineBreak();
+  root.appendChild("netclass", mNetClass->getUuid());
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

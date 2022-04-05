@@ -57,13 +57,13 @@ ProjectSettings::ProjectSettings(Project& project, const Version& fileFormat,
 
     // locale order
     foreach (const SExpression& node,
-             root.getChild("library_locale_order").getChildren()) {
+             root.getChild("library_locale_order").getChildren("locale")) {
       mLocaleOrder.append(node.getChild("@0").getValue());
     }
 
     // norm order
     foreach (const SExpression& node,
-             root.getChild("library_norm_order").getChildren()) {
+             root.getChild("library_norm_order").getChildren("norm")) {
       mNormOrder.append(node.getChild("@0").getValue());
     }
   }
@@ -101,12 +101,21 @@ void ProjectSettings::save() {
  ******************************************************************************/
 
 void ProjectSettings::serialize(SExpression& root) const {
-  SExpression& locale_order = root.appendList("library_locale_order", true);
-  foreach (const QString& locale, mLocaleOrder)
-    locale_order.appendChild("locale", locale, true);
-  SExpression& norm_order = root.appendList("library_norm_order", true);
-  foreach (const QString& norm, mNormOrder)
-    norm_order.appendChild("norm", norm, true);
+  root.ensureLineBreak();
+  SExpression& locale_order = root.appendList("library_locale_order");
+  foreach (const QString& locale, mLocaleOrder) {
+    locale_order.ensureLineBreak();
+    locale_order.appendChild("locale", locale);
+  }
+  locale_order.ensureLineBreakIfMultiLine();
+  root.ensureLineBreak();
+  SExpression& norm_order = root.appendList("library_norm_order");
+  foreach (const QString& norm, mNormOrder) {
+    norm_order.ensureLineBreak();
+    norm_order.appendChild("norm", norm);
+  }
+  norm_order.ensureLineBreakIfMultiLine();
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

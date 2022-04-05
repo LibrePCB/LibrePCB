@@ -172,10 +172,13 @@ template QStringList Library::searchForElements<Device>() const noexcept;
 
 void Library::serialize(SExpression& root) const {
   LibraryBaseElement::serialize(root);
-  root.appendChild("url", mUrl, true);
+  root.ensureLineBreak();
+  root.appendChild("url", mUrl);
   foreach (const Uuid& uuid, Toolbox::sortedQSet(mDependencies)) {
-    root.appendChild("dependency", uuid, true);
+    root.ensureLineBreak();
+    root.appendChild("dependency", uuid);
   }
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

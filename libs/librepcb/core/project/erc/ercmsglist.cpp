@@ -112,13 +112,19 @@ void ErcMsgList::save() {
 void ErcMsgList::serialize(SExpression& root) const {
   foreach (ErcMsg* ercMsg, mItems) {
     if (ercMsg->isIgnored()) {
-      SExpression& itemNode = root.appendList("approved", true);
+      root.ensureLineBreak();
+      SExpression& itemNode = root.appendList("approved");
+      itemNode.ensureLineBreak();
       itemNode.appendChild<QString>(
-          "class", ercMsg->getOwner().getErcMsgOwnerClassName(), true);
-      itemNode.appendChild("instance", ercMsg->getOwnerKey(), true);
-      itemNode.appendChild("message", ercMsg->getMsgKey(), true);
+          "class", ercMsg->getOwner().getErcMsgOwnerClassName());
+      itemNode.ensureLineBreak();
+      itemNode.appendChild("instance", ercMsg->getOwnerKey());
+      itemNode.ensureLineBreak();
+      itemNode.appendChild("message", ercMsg->getMsgKey());
+      itemNode.ensureLineBreak();
     }
   }
+  root.ensureLineBreakIfMultiLine();
 }
 
 /*******************************************************************************
