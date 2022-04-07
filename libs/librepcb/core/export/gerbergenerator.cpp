@@ -253,7 +253,10 @@ void GerberGenerator::generate() {
 }
 
 void GerberGenerator::saveToFile(const FilePath& filepath) const {
-  FileUtils::writeFile(filepath, mOutput.toLatin1());  // can throw
+  // Note: Although we save it as UTF-8, usually it will still contain only
+  // ASCII characters for maximum compatibility with legacy crappy readers.
+  // Unicode is only required when exporting Gerber X3 assembly attributes.
+  FileUtils::writeFile(filepath, mOutput.toUtf8());  // can throw
 }
 
 /*******************************************************************************

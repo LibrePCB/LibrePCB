@@ -89,6 +89,7 @@ bool GerberAttribute::operator==(const GerberAttribute& rhs) const noexcept {
 
 QString GerberAttribute::toString() const noexcept {
   QString s = "T";
+  bool strictAscii = true;  // For maximum compatibility with crappy readers!
   switch (mType) {
     case Type::File: {
       s += "F";
@@ -100,6 +101,11 @@ QString GerberAttribute::toString() const noexcept {
     }
     case Type::Object: {
       s += "O";
+      // ASCII is not sufficient for component values like μ or Ω, thus we
+      // allow unicode for such attributes. Note that such attributes should
+      // appear in Gerber X3 assembly files anyway (not in PCB data files),
+      // so only modern 8X3) readers will need to handle unicode.
+      strictAscii = false;
       break;
     }
     case Type::Delete: {
@@ -109,7 +115,9 @@ QString GerberAttribute::toString() const noexcept {
     default: { return QString(); }
   }
   s += mKey;
-  foreach (const QString& value, mValues) { s += "," + escapeValue(value); }
+  foreach (const QString& value, mValues) {
+    s += "," + escapeValue(value, strictAscii);
+  }
   return s;
 }
 
@@ -362,17 +370,30 @@ GerberAttribute GerberAttribute::objectPin(const QString& component,
  *  Private Methods
  ******************************************************************************/
 
-QString GerberAttribute::escapeValue(const QString& value) noexcept {
-  // perform compatibility decomposition (NFKD)
-  QString ret = value.normalized(QString::NormalizationForm_KD);
+QString GerberAttribute::escapeValue(const QString& value,
+                                     bool strictAscii) noexcept {
+  QString ret = value;
+  // remove CRLF newlines
+  ret.remove('\r');
   // replace newlines by spaces
-  ret = ret.replace('\n', ' ');
-  // remove all invalid characters
-  // Note: Even if backslashes are allowed, we will remove them because we
-  // haven't implemented proper escaping. Escaping of unicode characters is also
-  // missing here.
-  QString validChars("-a-zA-Z0-9_+/!?<>\"'(){}.|&@# ;$:=");  // No ',' in attrs!
-  ret.remove(QRegularExpression(QString("[^%1]").arg(validChars)));
+  ret.replace('\n', ' ');
+  if (strictAscii) {
+    // perform compatibility decomposition (NFKD)
+    ret = ret.normalized(QString::NormalizationForm_KD);
+    // remove all invalid characters for maximum compatibility with readers
+    QString validChars("-a-zA-Z0-9_+/!?<>\"'(){}.|&@# ;$:=");
+    ret.remove(QRegularExpression(QString("[^%1]").arg(validChars)));
+  } else {
+    // escape backslash
+    ret.replace("\\", "\\u005C");
+    // escape '%'
+    ret.replace("%", "\\u0025");
+    // escape '*'
+    ret.replace("*", "\\u002A");
+    // escape ','
+    ret.replace(",", "\\u002C");
+  }
+
   // limit length to 65535 characters
   ret.truncate(65535);
   return ret;

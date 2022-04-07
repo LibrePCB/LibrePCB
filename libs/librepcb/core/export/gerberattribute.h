@@ -121,7 +121,7 @@ private:  // Methods
   GerberAttribute(Type type, const QString& key,
                   const QStringList& values) noexcept;
   QString toString() const noexcept;
-  static QString escapeValue(const QString& value) noexcept;
+  static QString escapeValue(const QString& value, bool strictAscii) noexcept;
 
 private:  // Data
   Type mType;
