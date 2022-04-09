@@ -29,6 +29,7 @@
 #include "../utils/undostackactiongroup.h"
 #include "../widgets/statusbar.h"
 
+#include <librepcb/core/library/librarybaseelement.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -57,8 +58,11 @@ EditorWidgetBase::EditorWidgetBase(const Context& context, const FilePath& fp,
     mUndoStackActionGroup(nullptr),
     mToolsActionGroup(nullptr),
     mStatusBar(nullptr),
+    mManualModificationsMade(false),
     mIsInterfaceBroken(false),
-    mStatusBarMessage() {
+    mStatusBarMessage(),
+    mSupportedApprovals(),
+    mDisappearedApprovals() {
   mUndoStack.reset(new UndoStack());
   connect(mUndoStack.data(), &UndoStack::cleanChanged, this,
           &EditorWidgetBase::undoStackCleanChanged);
@@ -116,6 +120,7 @@ void EditorWidgetBase::disconnectEditor() noexcept {
  ******************************************************************************/
 
 bool EditorWidgetBase::save() noexcept {
+  mManualModificationsMade = false;
   mIsInterfaceBroken = false;
   mUndoStack->setClean();
   emit dirtyChanged(false);
@@ -180,6 +185,23 @@ void EditorWidgetBase::setupErrorNotificationWidget(QWidget& widget) noexcept {
   layout->addWidget(label);
   connect(this, &EditorWidgetBase::errorsAvailableChanged, &widget,
           &QWidget::setVisible);
+}
+
+void EditorWidgetBase::setMessageApproved(
+    LibraryBaseElement& element,
+    std::shared_ptr<const LibraryElementCheckMessage> msg,
+    bool approve) noexcept {
+  if (msg) {
+    QSet<SExpression> approvals = element.getMessageApprovals();
+    if (approve) {
+      approvals.insert(msg->getApproval());
+    } else {
+      approvals.remove(msg->getApproval());
+    }
+    element.setMessageApprovals(approvals);
+    mManualModificationsMade = true;
+    emit dirtyChanged(true);
+  }
 }
 
 void EditorWidgetBase::undoStackStateModified() noexcept {
@@ -268,6 +290,11 @@ void EditorWidgetBase::updateCheckMessages() noexcept {
   try {
     LibraryElementCheckMessageList msgs;
     if (runChecks(msgs)) {  // can throw
+      QSet<SExpression> approvals;
+      foreach (const auto& msg, msgs) { approvals.insert(msg->getApproval()); }
+      mSupportedApprovals |= approvals;
+      mDisappearedApprovals = mSupportedApprovals - approvals;
+
       int errors = 0;
       foreach (const auto& msg, msgs) {
         if (msg->getSeverity() == LibraryElementCheckMessage::Severity::Error) {

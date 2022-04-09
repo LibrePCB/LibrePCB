@@ -41,6 +41,7 @@ LibraryElementCheckListWidget::LibraryElementCheckListWidget(
   : QWidget(parent),
     mListWidget(new QListWidget(this)),
     mHandler(nullptr),
+    mApprovals(),
     mProvideFixes(true) {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
@@ -109,17 +110,27 @@ void LibraryElementCheckListWidget::setMessages(
   }
 }
 
+void LibraryElementCheckListWidget::setApprovals(
+    const QSet<SExpression>& approvals) noexcept {
+  if (approvals != mApprovals) {
+    mApprovals = approvals;
+    updateList();
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 void LibraryElementCheckListWidget::updateList() noexcept {
+  mListWidget->setUpdatesEnabled(false);  // Avoid flicker.
   mListWidget->clear();
   foreach (const auto& msg, mMessages) {
     QListWidgetItem* item = new QListWidgetItem();
     mListWidget->addItem(item);
+    const bool approved = mApprovals.contains(msg->getApproval());
     LibraryElementCheckListItemWidget* widget =
-        new LibraryElementCheckListItemWidget(msg, *this);
+        new LibraryElementCheckListItemWidget(msg, *this, approved);
     mListWidget->setItemWidget(item, widget);
   }
   if (mListWidget->count() == 0) {
@@ -128,6 +139,7 @@ void LibraryElementCheckListWidget::updateList() noexcept {
   } else {
     mListWidget->setEnabled(true);
   }
+  mListWidget->setUpdatesEnabled(true);
 }
 
 void LibraryElementCheckListWidget::itemDoubleClicked(
@@ -163,6 +175,14 @@ void LibraryElementCheckListWidget::libraryElementCheckDescriptionRequested(
     std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
   if (mHandler) {
     mHandler->libraryElementCheckDescriptionRequested(msg);
+  }
+}
+
+void LibraryElementCheckListWidget::libraryElementCheckApproveRequested(
+    std::shared_ptr<const LibraryElementCheckMessage> msg,
+    bool approve) noexcept {
+  if (mHandler) {
+    mHandler->libraryElementCheckApproveRequested(msg, approve);
   }
 }
 
