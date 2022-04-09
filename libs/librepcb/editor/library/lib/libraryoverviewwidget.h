@@ -118,6 +118,9 @@ private:  // Methods
   bool processCheckMessage(
       std::shared_ptr<const LibraryElementCheckMessage> msg,
       bool applyFix) override;
+  void libraryElementCheckApproveRequested(
+      std::shared_ptr<const LibraryElementCheckMessage> msg,
+      bool approve) noexcept override;
   void updateElementLists() noexcept;
   template <typename ElementType>
   void updateElementList(QListWidget& listWidget, const QIcon& icon) noexcept;

@@ -58,7 +58,7 @@ public:
 
   // Getters
   Severity getSeverity() const noexcept { return mSeverity; }
-  const QPixmap& getSeverityPixmap() const noexcept { return mSeverityPixmap; }
+  const QIcon& getSeverityIcon() const noexcept { return mSeverityIcon; }
   const QString& getMessage() const noexcept { return mMessage; }
   const QString& getDescription() const noexcept { return mDescription; }
   const SExpression& getApproval() const noexcept { return mApproval; }
@@ -74,7 +74,7 @@ public:
   }
 
   // Static Methods
-  static QPixmap getSeverityPixmap(Severity severity) noexcept;
+  static QIcon getSeverityIcon(Severity severity) noexcept;
 
   // Operator Overloads
   bool operator==(const LibraryElementCheckMessage& rhs) const noexcept;
@@ -89,7 +89,7 @@ protected:  // Methods
 
 protected:  // Data
   Severity mSeverity;
-  QPixmap mSeverityPixmap;
+  QIcon mSeverityIcon;
   QString mMessage;
   QString mDescription;
   SExpression mApproval;
