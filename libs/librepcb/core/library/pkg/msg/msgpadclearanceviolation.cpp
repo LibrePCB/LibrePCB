@@ -47,10 +47,18 @@ MsgPadClearanceViolation::MsgPadClearanceViolation(
            "situations it might be needed to use smaller clearances but not "
            "all PCB manufacturers are able to reliably produce such small "
            "clearances, so usually this should be avoided.")
-            .arg(QString::number(clearance.toMm() * 1000) % "μm")),
+            .arg(QString::number(clearance.toMm() * 1000) % "μm"),
+        "SmallPadClearance"),
     mFootprint(footprint),
     mPad1(pad1),
     mPad2(pad2) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", std::min(pad1->getUuid(), pad2->getUuid()));
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", std::max(pad1->getUuid(), pad2->getUuid()));
+  mApproval.ensureLineBreak();
 }
 
 MsgPadClearanceViolation::~MsgPadClearanceViolation() noexcept {

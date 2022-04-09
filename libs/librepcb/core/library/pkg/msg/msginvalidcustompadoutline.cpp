@@ -42,9 +42,15 @@ MsgInvalidCustomPadOutline::MsgInvalidCustomPadOutline(
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
         tr("The pad has set a custom outline which does not represent a valid "
            "area. Either choose a different pad shape or specify a valid "
-           "custom outline.")),
+           "custom outline."),
+        "InvalidCustomPadOutline"),
     mFootprint(footprint),
     mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgInvalidCustomPadOutline::~MsgInvalidCustomPadOutline() noexcept {

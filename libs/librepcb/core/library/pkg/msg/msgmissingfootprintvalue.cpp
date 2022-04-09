@@ -43,7 +43,11 @@ MsgMissingFootprintValue::MsgMissingFootprintValue(
            "value, otherwise you won't see that value on the PCB (e.g. on "
            "silkscreen). There are only a few exceptions which don't need a "
            "value (e.g. if the footprint is only a drawing), for those you can "
-           "ignore this message.")) {
+           "ignore this message."),
+        "MissingValueText") {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgMissingFootprintValue::~MsgMissingFootprintValue() noexcept {

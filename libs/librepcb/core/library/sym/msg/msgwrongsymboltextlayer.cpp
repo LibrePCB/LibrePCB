@@ -43,9 +43,13 @@ MsgWrongSymbolTextLayer::MsgWrongSymbolTextLayer(
                  GraphicsLayer::getTranslation(expectedLayerName)),
         tr("The text element '%1' should normally be on layer '%2'.")
             .arg(text->getText(),
-                 GraphicsLayer::getTranslation(expectedLayerName))),
+                 GraphicsLayer::getTranslation(expectedLayerName)),
+        "TextLayer"),
     mText(text),
     mExpectedLayerName(expectedLayerName) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("text", text->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgWrongSymbolTextLayer::~MsgWrongSymbolTextLayer() noexcept {

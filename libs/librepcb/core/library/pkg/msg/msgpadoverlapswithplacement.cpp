@@ -44,9 +44,15 @@ MsgPadOverlapsWithPlacement::MsgPadOverlapsWithPlacement(
         tr("Pads should have at least %1 clearance to the outlines "
            "layer because outlines are drawn on silkscreen which will "
            "be cropped for Gerber export.")
-            .arg(QString::number(clearance.toMm() * 1000) % "μm")),
+            .arg(QString::number(clearance.toMm() * 1000) % "μm"),
+        "PadOverlapsPlacement"),
     mFootprint(footprint),
     mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgPadOverlapsWithPlacement::~MsgPadOverlapsWithPlacement() noexcept {

@@ -41,7 +41,8 @@ MsgNoPadsInDeviceConnected::MsgNoPadsInDeviceConnected() noexcept
            "them.\n\nTo fix this issue, connect the package pads to their "
            "corresponding component signals in the table widget.\n\nIf all "
            "pads have only a mechanical purpose and thus don't need to be "
-           "connected to component signals, this message can be ignored.")) {
+           "connected to component signals, this message can be ignored."),
+        "NoPadsConnected") {
 }
 
 MsgNoPadsInDeviceConnected::~MsgNoPadsInDeviceConnected() noexcept {

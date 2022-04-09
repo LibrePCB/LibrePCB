@@ -37,7 +37,8 @@ MsgMissingSymbolValue::MsgMissingSymbolValue() noexcept
         tr("Most symbols should have a text element for the component's value, "
            "otherwise you won't see that value in the schematics. There are "
            "only a few exceptions (e.g. a schematic frame) which don't need a "
-           "value, for those you can ignore this message.")) {
+           "value, for those you can ignore this message."),
+        "ValueTextMissing") {
 }
 
 MsgMissingSymbolValue::~MsgMissingSymbolValue() noexcept {

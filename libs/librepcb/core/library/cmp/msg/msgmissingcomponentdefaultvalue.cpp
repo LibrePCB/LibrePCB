@@ -43,8 +43,8 @@ MsgMissingComponentDefaultValue::MsgMissingComponentDefaultValue() noexcept
            "Specific parts (e.g. a microcontroller): %2\n"
            "Passive parts: Using an attribute, e.g. %3")
             .arg("'{{PARTNUMBER or DEVICE}}'",
-                 "'{{PARTNUMBER or DEVICE or COMPONENT}}'",
-                 "'{{RESISTANCE}}'")) {
+                 "'{{PARTNUMBER or DEVICE or COMPONENT}}'", "'{{RESISTANCE}}'"),
+        "EmptyDefaultValue") {
 }
 
 MsgMissingComponentDefaultValue::~MsgMissingComponentDefaultValue() noexcept {

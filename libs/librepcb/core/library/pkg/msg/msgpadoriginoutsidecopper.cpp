@@ -44,9 +44,15 @@ MsgPadOriginOutsideCopper::MsgPadOriginOutsideCopper(
            "otherwise traces won't be connected properly.\n\n"
            "For THT pads, the origin must be located within a drill "
            "hole since on some layers the pad might only have a small annular "
-           "ring instead of the full pad shape.")),
+           "ring instead of the full pad shape."),
+        "PadOriginOutsideCopper"),
     mFootprint(footprint),
     mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgPadOriginOutsideCopper::~MsgPadOriginOutsideCopper() noexcept {

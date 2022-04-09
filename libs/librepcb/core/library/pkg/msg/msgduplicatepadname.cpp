@@ -42,7 +42,9 @@ MsgDuplicatePadName::MsgDuplicatePadName(const PackagePad& pad) noexcept
            "assign all these pads to the same component signal later in the "
            "device editor.\n\nFor neutral packages (e.g. SOT23), pads should "
            "be named only by numbers anyway, not by functionality (e.g. name "
-           "them '1', '2', '3' instead of 'D', 'G', 'S').")) {
+           "them '1', '2', '3' instead of 'D', 'G', 'S')."),
+        "DuplicatePadName") {
+  mApproval.appendChild("name", *pad.getName());
 }
 
 MsgDuplicatePadName::~MsgDuplicatePadName() noexcept {
