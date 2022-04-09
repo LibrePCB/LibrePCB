@@ -40,7 +40,9 @@ MsgDuplicatePinName::MsgDuplicatePinName(const SymbolPin& pin) noexcept
            "distinguished later in the component editor. If your part has "
            "several pins with same functionality (e.g. multiple GND pins), you "
            "should add only one of these pins to the symbol. The assignment to "
-           "multiple leads should be done in the device editor instead.")) {
+           "multiple leads should be done in the device editor instead."),
+        "duplicate_pin_name") {
+  mApproval.appendChild("name", *pin.getName());
 }
 
 MsgDuplicatePinName::~MsgDuplicatePinName() noexcept {

@@ -41,9 +41,15 @@ MsgUnusedCustomPadOutline::MsgUnusedCustomPadOutline(
         tr("Unused custom outline of pad '%1' in '%2'")
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
         tr("The pad has set a custom outline but it isn't used as the shape. "
-           "So it has no effect and should be removed to avoid confusion.")),
+           "So it has no effect and should be removed to avoid confusion."),
+        "unused_custom_pad_outline"),
     mFootprint(footprint),
     mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgUnusedCustomPadOutline::~MsgUnusedCustomPadOutline() noexcept {

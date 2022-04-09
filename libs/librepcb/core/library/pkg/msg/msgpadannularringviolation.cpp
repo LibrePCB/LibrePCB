@@ -44,9 +44,15 @@ MsgPadAnnularRingViolation::MsgPadAnnularRingViolation(
         tr("Pads should have at least %1 annular ring (copper around each pad "
            "hole). Note that this value is just a general recommendation, the "
            "exact value depends on the capabilities of the PCB manufacturer.")
-            .arg(QString::number(annularRing.toMm() * 1000) % "μm")),
+            .arg(QString::number(annularRing.toMm() * 1000) % "μm"),
+        "small_pad_annular_ring"),
     mFootprint(footprint),
     mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgPadAnnularRingViolation::~MsgPadAnnularRingViolation() noexcept {

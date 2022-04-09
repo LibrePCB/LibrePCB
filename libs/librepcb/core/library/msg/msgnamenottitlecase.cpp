@@ -37,7 +37,8 @@ MsgNameNotTitleCase::MsgNameNotTitleCase(const ElementName& name) noexcept
         tr("Generally the library element name should be written in title case "
            "(for consistency). As the current name has words starting with a "
            "lowercase character, it seems that it is not title cases. If this "
-           "assumption is wrong, just ignore this message.")),
+           "assumption is wrong, just ignore this message."),
+        "name_not_title_case"),
     mName(name) {
 }
 

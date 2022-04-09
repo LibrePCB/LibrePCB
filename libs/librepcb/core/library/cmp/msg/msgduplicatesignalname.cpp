@@ -43,7 +43,9 @@ MsgDuplicateSignalName::MsgDuplicateSignalName(
            "has several pins which are electrically exactly equal (e.g. "
            "multiple GND pins), you should add only one of these pins as a "
            "component signal. The assignment to multiple pins should be done "
-           "in the device editor instead.")) {
+           "in the device editor instead."),
+        "duplicate_signal_name") {
+  mApproval.appendChild("name", *signal.getName());
 }
 
 MsgDuplicateSignalName::~MsgDuplicateSignalName() noexcept {

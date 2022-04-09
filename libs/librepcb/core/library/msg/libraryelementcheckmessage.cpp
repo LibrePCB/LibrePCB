@@ -36,15 +36,19 @@ LibraryElementCheckMessage::LibraryElementCheckMessage(
   : mSeverity(other.mSeverity),
     mSeverityPixmap(other.mSeverityPixmap),
     mMessage(other.mMessage),
-    mDescription(other.mDescription) {
+    mDescription(other.mDescription),
+    mApproval(other.mApproval) {
 }
 
 LibraryElementCheckMessage::LibraryElementCheckMessage(
-    Severity severity, const QString& msg, const QString& description) noexcept
+    Severity severity, const QString& msg, const QString& description,
+    const QString& approvalName) noexcept
   : mSeverity(severity),
     mSeverityPixmap(getSeverityPixmap(severity)),
     mMessage(msg),
-    mDescription(description) {
+    mDescription(description),
+    mApproval(SExpression::createList("approved")) {
+  mApproval.appendChild(SExpression::createToken(approvalName));  // snake_case
 }
 
 LibraryElementCheckMessage::~LibraryElementCheckMessage() noexcept {

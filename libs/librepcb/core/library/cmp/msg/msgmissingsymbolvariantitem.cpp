@@ -40,8 +40,12 @@ MsgMissingSymbolVariantItem::MsgMissingSymbolVariantItem(
         tr("Symbol variant '%1' has no items")
             .arg(*symbVar->getNames().getDefaultValue()),
         tr("Every symbol variant requires at least one symbol item, otherwise "
-           "it can't be added to schematics.")),
+           "it can't be added to schematics."),
+        "missing_gates"),
     mSymbVar(symbVar) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("variant", symbVar->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgMissingSymbolVariantItem::~MsgMissingSymbolVariantItem() noexcept {

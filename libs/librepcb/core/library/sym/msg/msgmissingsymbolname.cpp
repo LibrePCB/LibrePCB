@@ -37,7 +37,8 @@ MsgMissingSymbolName::MsgMissingSymbolName() noexcept
         tr("Most symbols should have a text element for the component's name, "
            "otherwise you won't see that name in the schematics. There are "
            "only a few exceptions (e.g. a schematic frame) which don't need a "
-           "name, for those you can ignore this message.")) {
+           "name, for those you can ignore this message."),
+        "missing_name_text") {
 }
 
 MsgMissingSymbolName::~MsgMissingSymbolName() noexcept {

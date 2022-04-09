@@ -45,7 +45,8 @@ MsgOverlappingPads::MsgOverlappingPads(
                  *footprint->getNames().getDefaultValue()),
         tr("The copper area of two pads overlap. This can lead to serious "
            "issues with the design rule check and probably leads to a short "
-           "circuit in the board so this really needs to be fixed.")),
+           "circuit in the board so this really needs to be fixed."),
+        "overlapping_pads"),
     mFootprint(footprint),
     mPad1(pad1),
     mPad2(pad2) {
