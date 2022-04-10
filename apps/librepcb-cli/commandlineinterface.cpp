@@ -185,6 +185,10 @@ int CommandLineInterface::execute() noexcept {
       "all",
       tr("Perform the selected action(s) on all elements contained in "
          "the opened library."));
+  QCommandLineOption libCheckOption(
+      "check",
+      tr("Run the library element check, print all non-approved messages and "
+         "report failure (exit code = 1) if there are non-approved messages."));
   QCommandLineOption libSaveOption(
       "save",
       tr("Save library (and contained elements if '--all' is given) "
@@ -241,6 +245,7 @@ int CommandLineInterface::execute() noexcept {
                                  tr("Path to library directory (*.lplib)."));
     positionalArgNames.append("library");
     parser.addOption(libAllOption);
+    parser.addOption(libCheckOption);
     parser.addOption(libSaveOption);
     parser.addOption(libStrictOption);
   } else if (!command.isEmpty()) {
@@ -328,6 +333,7 @@ int CommandLineInterface::execute() noexcept {
   } else if (command == "open-library") {
     cmdSuccess = openLibrary(positionalArgs.value(1),  // library directory
                              parser.isSet(libAllOption),  // all elements
+                             parser.isSet(libCheckOption),  // run check
                              parser.isSet(libSaveOption),  // save
                              parser.isSet(libStrictOption)  // strict mode
     );
@@ -730,7 +736,8 @@ bool CommandLineInterface::openProject(
 }
 
 bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
-                                       bool save, bool strict) const noexcept {
+                                       bool runCheck, bool save,
+                                       bool strict) const noexcept {
   try {
     bool success = true;
 
@@ -743,22 +750,23 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     std::unique_ptr<Library> lib =
         Library::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(libFs)));  // can throw
-    processLibraryElement(libDir, *libFs, *lib, save, strict,
+    processLibraryElement(libDir, *libFs, *lib, runCheck, save, strict,
                           success);  // can throw
 
     // Open all component categories
     if (all) {
       QStringList elements = lib->searchForElements<ComponentCategory>();
+      elements.sort();  // For deterministic console output.
       print(tr("Process %1 component categories...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
+        qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         std::unique_ptr<ComponentCategory> element =
             ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
                               success);  // can throw
       }
     }
@@ -766,16 +774,17 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all package categories
     if (all) {
       QStringList elements = lib->searchForElements<PackageCategory>();
+      elements.sort();  // For deterministic console output.
       print(tr("Process %1 package categories...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
+        qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         std::unique_ptr<PackageCategory> element =
             PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
                               success);  // can throw
       }
     }
@@ -783,16 +792,17 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all symbols
     if (all) {
       QStringList elements = lib->searchForElements<Symbol>();
+      elements.sort();  // For deterministic console output.
       print(tr("Process %1 symbols...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
+        qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         std::unique_ptr<Symbol> element =
             Symbol::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
                               success);  // can throw
       }
     }
@@ -800,16 +810,17 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all packages
     if (all) {
       QStringList elements = lib->searchForElements<Package>();
+      elements.sort();  // For deterministic console output.
       print(tr("Process %1 packages...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
+        qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         std::unique_ptr<Package> element =
             Package::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
                               success);  // can throw
       }
     }
@@ -817,16 +828,17 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all components
     if (all) {
       QStringList elements = lib->searchForElements<Component>();
+      elements.sort();  // For deterministic console output.
       print(tr("Process %1 components...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
+        qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         std::unique_ptr<Component> element =
             Component::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
                               success);  // can throw
       }
     }
@@ -834,16 +846,17 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     // Open all devices
     if (all) {
       QStringList elements = lib->searchForElements<Device>();
+      elements.sort();  // For deterministic console output.
       print(tr("Process %1 devices...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
-        qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
+        qInfo().noquote() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
         std::unique_ptr<Device> element =
             Device::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
                               success);  // can throw
       }
     }
@@ -858,8 +871,21 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
 void CommandLineInterface::processLibraryElement(const QString& libDir,
                                                  TransactionalFileSystem& fs,
                                                  LibraryBaseElement& element,
-                                                 bool save, bool strict,
+                                                 bool runCheck, bool save,
+                                                 bool strict,
                                                  bool& success) const {
+  // Helper function to print an error header to console only once, if
+  // there is at least one error.
+  bool errorHeaderPrinted = false;
+  auto printErrorHeaderOnce = [&errorHeaderPrinted, &element]() {
+    if (!errorHeaderPrinted) {
+      printErr(QString("  - %1 (%2):")
+                   .arg(*element.getNames().getDefaultValue(),
+                        element.getUuid().toStr()));
+      errorHeaderPrinted = true;
+    }
+  };
+
   // Save element to transactional file system, if needed
   if (strict || save) {
     element.save();  // can throw
@@ -867,24 +893,82 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
 
   // Check for non-canonical files (strict mode)
   if (strict) {
-    qInfo() << tr("Check '%1' for non-canonical files...")
-                   .arg(prettyPath(fs.getPath(), libDir));
+    qInfo().noquote() << tr("Check '%1' for non-canonical files...")
+                             .arg(prettyPath(fs.getPath(), libDir));
 
     QStringList paths = fs.checkForModifications();  // can throw
-    // sort file paths to increases readability of console output
-    std::sort(paths.begin(), paths.end());
-    foreach (const QString& path, paths) {
-      printErr(QString("    - Non-canonical file: '%1'")
-                   .arg(prettyPath(fs.getAbsPath(path), libDir)));
+    if (!paths.isEmpty()) {
+      // sort file paths to increases readability of console output
+      std::sort(paths.begin(), paths.end());
+      printErrorHeaderOnce();
+      foreach (const QString& path, paths) {
+        printErr(QString("    - Non-canonical file: '%1'")
+                     .arg(prettyPath(fs.getAbsPath(path), libDir)));
+      }
+      success = false;
     }
-    if (paths.count() > 0) {
+  }
+
+  // Run library element check, if needed.
+  if (runCheck) {
+    qInfo().noquote() << tr("Check '%1' for non-approved messages...")
+                             .arg(prettyPath(fs.getPath(), libDir));
+
+    const QSet<SExpression>& approvals = element.getMessageApprovals();
+    LibraryElementCheckMessageList messageList = element.runChecks();
+    // Sort messages to increases readability of console output.
+    Toolbox::sortNumeric(
+        messageList,
+        [](const QCollator& cmp,
+           const std::shared_ptr<const LibraryElementCheckMessage>& lhs,
+           const std::shared_ptr<const LibraryElementCheckMessage>& rhs) {
+          if (lhs->getSeverity() != rhs->getSeverity()) {
+            return lhs->getSeverity() > rhs->getSeverity();
+          } else {
+            return cmp(lhs->getMessage(), rhs->getMessage());
+          }
+        },
+        Qt::CaseInsensitive, false);
+    int approvedMsgCount = 0;
+    QStringList messages;
+    foreach (const auto& msg, messageList) {
+      if (approvals.contains(msg->getApproval())) {
+        ++approvedMsgCount;
+      } else {
+        QString severity = tr("ERROR");
+        switch (msg->getSeverity()) {
+          case LibraryElementCheckMessage::Severity::Hint:
+            severity = tr("HINT");
+            break;
+          case LibraryElementCheckMessage::Severity::Warning:
+            severity = tr("WARNING");
+            break;
+          case LibraryElementCheckMessage::Severity::Error:
+            break;
+          default:
+            qCritical() << "Unknown message severity:"
+                        << static_cast<int>(msg->getSeverity());
+            break;
+        }
+        messages.append(
+            QString("    - [%1] %2").arg(severity, msg->getMessage()));
+      }
+    }
+    qInfo().noquote() << "  " %
+            tr("Approved messages: %1").arg(approvedMsgCount);
+    qInfo().noquote() << "  " %
+            tr("Non-approved messages: %1").arg(messages.count());
+    if (!messages.isEmpty()) {
+      printErrorHeaderOnce();
+      foreach (const QString& msg, messages) { printErr(msg); }
       success = false;
     }
   }
 
   // Save element to file system, if needed
   if (save) {
-    qInfo() << tr("Save '%1'...").arg(prettyPath(fs.getPath(), libDir));
+    qInfo().noquote()
+        << tr("Save '%1'...").arg(prettyPath(fs.getPath(), libDir));
     if (failIfFileFormatUnstable()) {
       success = false;
     } else {

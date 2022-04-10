@@ -3,16 +3,17 @@
 
 import os
 import params
+import shutil
 
 """
-Test command "open-library --strict"
+Test command "open-library --check"
 """
 
 
-def test_valid_lp(cli):
-    library = params.POPULATED_LIBRARY
+def test_no_messages(cli):
+    library = params.EMPTY_LIBRARY
     cli.add_library(library.dir)
-    code, stdout, stderr = cli.run('open-library', '--all', '--strict',
+    code, stdout, stderr = cli.run('open-library', '--all', '--check',
                                    library.dir)
     assert stderr == ''
     assert stdout == \
@@ -27,33 +28,25 @@ def test_valid_lp(cli):
     assert code == 0
 
 
-def test_invalid_lp(cli):
+def test_messages(cli):
     library = params.POPULATED_LIBRARY
     cli.add_library(library.dir)
-    # append some zeros to the library file and a symbol file
-    paths = [
-        library.dir + '/library.lp',
-        library.dir + '/sym/9b75d0ce-ac4e-4a52-a88a-8777f66d3241/symbol.lp',
-    ]
-    for path in paths:
-        with open(cli.abspath(path), 'ab') as f:
-            f.write(b'\0\0')
-    # open library
-    code, stdout, stderr = cli.run('open-library', '--all', '--strict',
+    for subdir in ['sym', 'pkg', 'cmp']:
+        shutil.rmtree(cli.abspath(os.path.join(library.dir, subdir)))
+    code, stdout, stderr = cli.run('open-library', '--all', '--check',
                                    library.dir)
     assert stderr == \
-        "  - Populated Library (a7cb5051-9f37-4500-be38-33eade6e621e):\n" \
-        "    - Non-canonical file: '{paths[0]}'\n" \
-        "  - Diode (9b75d0ce-ac4e-4a52-a88a-8777f66d3241):\n" \
-        "    - Non-canonical file: '{paths[1]}'\n" \
-        .format(paths=paths).replace('/', os.sep)
+        "  - PSMN022-30PL (5738d8f9-4101-4409-bd46-d9c173b40d60):\n" \
+        "    - [ERROR] No categories set\n" \
+        "  - PSMN5R8 (f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e):\n" \
+        "    - [ERROR] No categories set\n"
     assert stdout == \
         "Open library 'Populated Library.lplib'...\n" \
         "Process {library.cmpcat} component categories...\n" \
         "Process {library.pkgcat} package categories...\n" \
-        "Process {library.sym} symbols...\n" \
-        "Process {library.pkg} packages...\n" \
-        "Process {library.cmp} components...\n" \
+        "Process 0 symbols...\n" \
+        "Process 0 packages...\n" \
+        "Process 0 components...\n" \
         "Process {library.dev} devices...\n" \
         "Finished with errors!\n".format(library=library)
     assert code == 1
