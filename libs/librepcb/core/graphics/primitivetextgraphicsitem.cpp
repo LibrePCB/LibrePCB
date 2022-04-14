@@ -134,19 +134,7 @@ void PrimitiveTextGraphicsItem::paint(QPainter* painter,
   } else {
     painter->setPen(mPen);
   }
-
-  if (mapToScene(0, 1).y() < mapToScene(0, 0).y()) {
-    // The text needs to be rotated 180°!
-    // TODO: Is there a better solution to determine the overall rotation of the
-    // item?
-    // painter->save();
-    painter->rotate(180);
-    painter->translate(-mBoundingRect.topLeft() - mBoundingRect.bottomRight());
-    painter->drawText(QRectF(), mTextFlags, mText);
-    // painter->restore();
-  } else {
-    painter->drawText(QRectF(), mTextFlags, mText);
-  }
+  painter->drawText(QRectF(), mTextFlags, mText);
 }
 
 /*******************************************************************************

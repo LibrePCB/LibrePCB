@@ -58,6 +58,10 @@ public:
   // Getters
   Text& getText() noexcept { return mText; }
 
+  // Setters
+  void setRotation(const Angle& rot) noexcept override;
+  void setAlignment(const Alignment& align) noexcept override;
+
   // General Methods
   void setAttributeProvider(const AttributeProvider* provider) noexcept;
   void updateText() noexcept;
@@ -67,6 +71,7 @@ public:
 
 private:  // Methods
   void textEdited(const Text& text, Text::Event event) noexcept;
+  void setRotationAndAlignment(Angle rotation, Alignment align) noexcept;
 
 private:  // Data
   Text& mText;

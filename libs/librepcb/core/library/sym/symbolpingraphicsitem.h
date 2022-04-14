@@ -78,7 +78,7 @@ public:
   SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs) = delete;
 
 private:  // Methods
-  void updateShape() noexcept;
+  void updateTextRotationAndAlignment() noexcept;
 
 private:  // Data
   SymbolPin& mPin;

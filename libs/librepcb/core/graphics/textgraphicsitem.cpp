@@ -24,6 +24,7 @@
 
 #include "../attribute/attributesubstitutor.h"
 #include "../graphics/graphicslayer.h"
+#include "../utils/toolbox.h"
 #include "origincrossgraphicsitem.h"
 
 #include <QtCore>
@@ -48,10 +49,9 @@ TextGraphicsItem::TextGraphicsItem(Text& text,
     mOnEditedSlot(*this, &TextGraphicsItem::textEdited) {
   setFont(TextGraphicsItem::Font::SansSerif);
   setPosition(mText.getPosition());
-  setRotation(mText.getRotation());
   setHeight(mText.getHeight());
-  setAlignment(mText.getAlign());
   setLayer(mLayerProvider.getLayer(*mText.getLayerName()));
+  setRotationAndAlignment(mText.getRotation(), mText.getAlign());
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(5);
   updateText();
@@ -67,6 +67,18 @@ TextGraphicsItem::TextGraphicsItem(Text& text,
 }
 
 TextGraphicsItem::~TextGraphicsItem() noexcept {
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void TextGraphicsItem::setRotation(const Angle& rot) noexcept {
+  setRotationAndAlignment(rot, mText.getAlign());
+}
+
+void TextGraphicsItem::setAlignment(const Alignment& align) noexcept {
+  setRotationAndAlignment(mText.getRotation(), align);
 }
 
 /*******************************************************************************
@@ -106,18 +118,28 @@ void TextGraphicsItem::textEdited(const Text& text,
       setPosition(text.getPosition());
       break;
     case Text::Event::RotationChanged:
-      setRotation(text.getRotation());
+      setRotationAndAlignment(text.getRotation(), text.getAlign());
       break;
     case Text::Event::HeightChanged:
       setHeight(text.getHeight());
       break;
     case Text::Event::AlignChanged:
-      setAlignment(text.getAlign());
+      setRotationAndAlignment(text.getRotation(), text.getAlign());
       break;
     default:
       qWarning() << "Unhandled switch-case in TextGraphicsItem::textEdited()";
       break;
   }
+}
+
+void TextGraphicsItem::setRotationAndAlignment(Angle rotation,
+                                               Alignment align) noexcept {
+  if (Toolbox::isTextUpsideDown(rotation, false)) {
+    rotation += Angle::deg180();
+    align.mirror();
+  }
+  PrimitiveTextGraphicsItem::setRotation(rotation);
+  PrimitiveTextGraphicsItem::setAlignment(align);
 }
 
 /*******************************************************************************
