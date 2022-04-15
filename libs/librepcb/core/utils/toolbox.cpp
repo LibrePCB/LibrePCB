@@ -33,6 +33,15 @@ namespace librepcb {
  *  Static Methods
  ******************************************************************************/
 
+bool Toolbox::isTextUpsideDown(const Angle& rotation, bool mirrored) noexcept {
+  const Angle mapped180 = rotation.mappedTo180deg();
+  if (mirrored) {
+    return ((mapped180 < -Angle::deg90()) || (mapped180 >= Angle::deg90()));
+  } else {
+    return ((mapped180 <= -Angle::deg90()) || (mapped180 > Angle::deg90()));
+  }
+}
+
 QPainterPath Toolbox::shapeFromPath(const QPainterPath& path, const QPen& pen,
                                     const QBrush& brush,
                                     const UnsignedLength& minWidth) noexcept {

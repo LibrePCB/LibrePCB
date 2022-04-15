@@ -25,6 +25,7 @@
 #include "../../../application.h"
 #include "../../../library/cmp/component.h"
 #include "../../../library/sym/symbolpin.h"
+#include "../../../utils/toolbox.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
@@ -80,8 +81,7 @@ void SGI_SymbolPin::updateCacheAndRepaint() noexcept {
   mBoundingRect = QRectF();
 
   // rotation
-  const Angle absAngle = mPin.getRotation().mappedTo180deg();
-  mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+  mRotate180 = Toolbox::isTextUpsideDown(mPin.getRotation(), false);
 
   // circle
   mShape.addEllipse(-mRadiusPx, -mRadiusPx, 2 * mRadiusPx, 2 * mRadiusPx);

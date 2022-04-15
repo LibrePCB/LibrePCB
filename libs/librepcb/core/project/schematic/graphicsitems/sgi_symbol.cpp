@@ -26,6 +26,7 @@
 #include "../../../attribute/attributesubstitutor.h"
 #include "../../../library/cmp/component.h"
 #include "../../../library/sym/symbol.h"
+#include "../../../utils/toolbox.h"
 #include "../../circuit/componentinstance.h"
 #include "../../project.h"
 #include "../items/si_symbol.h"
@@ -141,12 +142,7 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept {
     Angle absAngle = text.getRotation() + mSymbol.getRotation();
     absAngle.mapTo180deg();
     props.mirrored = mSymbol.getMirrored();
-    if (!props.mirrored)
-      props.rotate180 =
-          (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
-    else
-      props.rotate180 =
-          (absAngle < -Angle::deg90() || absAngle >= Angle::deg90());
+    props.rotate180 = Toolbox::isTextUpsideDown(absAngle, props.mirrored);
 
     // calculate text position
     scaledTextRect.translate(text.getPosition().toPxQPointF());

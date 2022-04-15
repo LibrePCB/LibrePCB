@@ -80,8 +80,7 @@ SGI_NetLabel::~SGI_NetLabel() noexcept {
 void SGI_NetLabel::updateCacheAndRepaint() noexcept {
   prepareGeometryChange();
 
-  mRotate180 = (mNetLabel.getRotation().mappedTo180deg() <= -Angle::deg90() ||
-                mNetLabel.getRotation().mappedTo180deg() > Angle::deg90());
+  mRotate180 = Toolbox::isTextUpsideDown(mNetLabel.getRotation(), false);
 
   mStaticText.setText(*mNetLabel.getNetSignalOfNetSegment().getName());
   mStaticText.prepare(QTransform(), mFont);

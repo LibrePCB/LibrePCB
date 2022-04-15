@@ -177,10 +177,9 @@ void BoardPainter::paint(QPainter& painter,
     // Draw invisible texts to make them selectable and searchable in PDF and
     // SVG output.
     foreach (const Text& text, content.texts) {
-      QFont font = qApp->getDefaultMonospaceFont();
-      font.setPixelSize(qCeil(text.getHeight()->toPx()));
       p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
-                 text.getAlign(), text.getText(), font, Qt::transparent,
+                 text.getAlign(), text.getText(),
+                 qApp->getDefaultMonospaceFont(), Qt::transparent,
                  settings.getMirror());
     }
   }

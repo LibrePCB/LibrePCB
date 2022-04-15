@@ -56,9 +56,13 @@ SchematicPainter::SchematicPainter(const Schematic& schematic) noexcept {
     Symbol sym;
     sym.transform = Transform(*symbol);
     foreach (const SI_SymbolPin* pin, symbol->getPins()) {
-      sym.pins.append(Pin{pin->getLibPin().getPosition(),
-                          pin->getLibPin().getRotation(),
-                          pin->getLibPin().getLength(), pin->getDisplayText()});
+      sym.pins.append(Pin{
+          pin->getLibPin().getPosition(),
+          pin->getLibPin().getRotation(),
+          pin->getLibPin().getLength(),
+          pin->getDisplayText(),
+          pin->getLibPin().getNamePosition(),
+      });
       if (pin->isVisibleJunction()) {
         mJunctions.append(pin->getPosition());
       }
@@ -142,23 +146,25 @@ void SchematicPainter::paint(QPainter& painter,
       if (symbol.transform.getMirrored()) {
         alignment.mirrorV();
       }
-      QFont font = qApp->getDefaultSansSerifFont();
-      font.setPixelSize(qCeil(text.getHeight()->toPx()));
       p.drawText(symbol.transform.map(text.getPosition()),
                  symbol.transform.map(text.getRotation()), *text.getHeight(),
-                 alignment, text.getText(), font,
+                 alignment, text.getText(), qApp->getDefaultSansSerifFont(),
                  settings.getColor(*text.getLayerName()), false);
     }
 
     // Draw Symbol Pins.
     foreach (const Pin& pin, symbol.pins) {
-      QFont font = qApp->getDefaultSansSerifFont();
-      font.setPixelSize(5);
       p.drawSymbolPin(symbol.transform.map(pin.position),
-                      symbol.transform.map(pin.rotation), *pin.length, pin.text,
-                      font, settings.getColor(GraphicsLayer::sSymbolOutlines),
-                      QColor(),
-                      settings.getColor(GraphicsLayer::sSymbolPinNames));
+                      symbol.transform.map(pin.rotation), *pin.length,
+                      settings.getColor(GraphicsLayer::sSymbolOutlines),
+                      QColor());
+      p.drawText(symbol.transform.map(pin.position +
+                                      pin.namePosition.rotated(pin.rotation)),
+                 symbol.transform.map(pin.rotation),
+                 *SymbolPin::getNameHeight(),
+                 Alignment(HAlign::left(), VAlign::center()), pin.name,
+                 qApp->getDefaultSansSerifFont(),
+                 settings.getColor(GraphicsLayer::sSymbolPinNames), false);
     }
   }
 
@@ -173,10 +179,8 @@ void SchematicPainter::paint(QPainter& painter,
 
   // Draw Texts.
   foreach (const Text& text, mTexts) {
-    QFont font = qApp->getDefaultSansSerifFont();
-    font.setPixelSize(qCeil(text.getHeight()->toPx()));
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
-               text.getAlign(), text.getText(), font,
+               text.getAlign(), text.getText(), qApp->getDefaultSansSerifFont(),
                settings.getColor(*text.getLayerName()), false);
   }
 
