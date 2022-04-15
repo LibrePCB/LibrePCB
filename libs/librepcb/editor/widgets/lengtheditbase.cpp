@@ -92,6 +92,10 @@ const LengthUnit& LengthEditBase::getDisplayedUnit() const noexcept {
  *  Setters
  ******************************************************************************/
 
+void LengthEditBase::setDefaultValueToolTip(const Length& value) noexcept {
+  setToolTip(tr("Default value:") % " " % value.toMmString() % " mm");
+}
+
 void LengthEditBase::setDefaultUnit(const LengthUnit& unit) noexcept {
   if (unit != mDefaultUnit) {
     mDefaultUnit = unit;

@@ -100,6 +100,7 @@ public:
   const LengthUnit& getDisplayedUnit() const noexcept;
 
   // Setters
+  void setDefaultValueToolTip(const Length& value) noexcept;
   void setDefaultUnit(const LengthUnit& unit) noexcept;
   void setChangeUnitActionVisible(bool visible) noexcept;
   void setStepBehavior(StepBehavior behavior) noexcept;
