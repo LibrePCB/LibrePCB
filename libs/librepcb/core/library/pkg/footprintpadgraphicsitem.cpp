@@ -94,6 +94,9 @@ void FootprintPadGraphicsItem::setPosition(const Point& pos) noexcept {
 
 void FootprintPadGraphicsItem::setRotation(const Angle& rot) noexcept {
   QGraphicsItem::setRotation(-rot.toDeg());
+
+  // Keep the text always at 0° for readability.
+  mTextGraphicsItem->setRotation(-rot);
 }
 
 void FootprintPadGraphicsItem::setShape(const QPainterPath& shape) noexcept {

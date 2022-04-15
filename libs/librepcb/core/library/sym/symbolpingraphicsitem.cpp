@@ -28,6 +28,7 @@
 #include "../../graphics/primitivetextgraphicsitem.h"
 #include "../../types/angle.h"
 #include "../../types/point.h"
+#include "../../utils/toolbox.h"
 #include "symbolpin.h"
 
 #include <QtCore>
@@ -66,10 +67,10 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolPin& pin,
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   // text
-  mTextGraphicsItem->setHeight(PositiveLength(Length::fromMm(qreal(2))));
-  mTextGraphicsItem->setAlignment(Alignment(HAlign::left(), VAlign::center()));
+  mTextGraphicsItem->setHeight(SymbolPin::getNameHeight());
   mTextGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinNames));
   mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  updateTextRotationAndAlignment();
 
   // pin properties
   setPosition(mPin.getPosition());
@@ -95,11 +96,12 @@ void SymbolPinGraphicsItem::setPosition(const Point& pos) noexcept {
 
 void SymbolPinGraphicsItem::setRotation(const Angle& rot) noexcept {
   QGraphicsItem::setRotation(-rot.toDeg());
+  updateTextRotationAndAlignment();  // Auto-rotation may need to be updated.
 }
 
 void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept {
   mLineGraphicsItem->setLine(Point(0, 0), Point(*length, 0));
-  mTextGraphicsItem->setPosition(Point(length + Length(800000), Length(0)));
+  mTextGraphicsItem->setPosition(mPin.getNamePosition());
 }
 
 void SymbolPinGraphicsItem::setName(const CircuitIdentifier& name) noexcept {
@@ -130,6 +132,21 @@ void SymbolPinGraphicsItem::paint(QPainter* painter,
   Q_UNUSED(painter);
   Q_UNUSED(option);
   Q_UNUSED(widget);
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void SymbolPinGraphicsItem::updateTextRotationAndAlignment() noexcept {
+  Angle rotation(0);
+  Alignment alignment(HAlign::left(), VAlign::center());
+  if (Toolbox::isTextUpsideDown(mPin.getRotation(), false)) {
+    rotation += Angle::deg180();
+    alignment.mirror();
+  }
+  mTextGraphicsItem->setRotation(rotation);
+  mTextGraphicsItem->setAlignment(alignment);
 }
 
 /*******************************************************************************

@@ -27,6 +27,7 @@
 #include "../types/angle.h"
 #include "../types/length.h"
 #include "../types/point.h"
+#include "../utils/toolbox.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -107,19 +108,20 @@ void GraphicsPainter::drawCircle(const Point& center, const Length& diameter,
 
 void GraphicsPainter::drawText(const Point& position, const Angle& rotation,
                                const Length& height, const Alignment& alignment,
-                               const QString& text, const QFont& font,
+                               const QString& text, QFont font,
                                const QColor& color,
                                bool mirrorInPlace) noexcept {
   if (text.trimmed().isEmpty() || (!color.isValid())) {
     return;  // Nothing to draw.
   }
 
-  const bool rotate180 = textIsUpsideDown(rotation);
+  const bool rotate180 = Toolbox::isTextUpsideDown(rotation, false);
   Alignment align = rotate180 ? alignment.mirrored() : alignment;
   if (mirrorInPlace) {
     align.mirrorH();
   }
   const int flags = align.toQtAlign();
+  font.setPixelSize(qCeil(height.toPx()));
   const QFontMetricsF metrics(font);
   const qreal scale = height.toPx() / metrics.height();
   const QRectF rect =
@@ -147,10 +149,8 @@ void GraphicsPainter::drawText(const Point& position, const Angle& rotation,
 
 void GraphicsPainter::drawSymbolPin(const Point& position,
                                     const Angle& rotation, const Length& length,
-                                    const QString& text, const QFont& font,
                                     const QColor& lineColor,
-                                    const QColor& circleColor,
-                                    const QColor& textColor) noexcept {
+                                    const QColor& circleColor) noexcept {
   // Draw Line.
   if (lineColor.isValid()) {
     const Point endPosition = position + Point(length, 0).rotated(rotation);
@@ -166,29 +166,6 @@ void GraphicsPainter::drawSymbolPin(const Point& position,
     mPainter.setPen(QPen(circleColor, mMinLineWidth->toPx()));
     mPainter.setBrush(Qt::NoBrush);
     mPainter.drawEllipse(position.toPxQPointF(), radius, radius);
-  }
-
-  // Draw Text.
-  if (textColor.isValid()) {
-    const bool rotate180 = textIsUpsideDown(rotation);
-    const int flags =
-        Qt::AlignVCenter | (rotate180 ? Qt::AlignRight : Qt::AlignLeft);
-    const Point anchor =
-        position + Point::fromPx(length.toPx() + 4, 0).rotated(rotation);
-    const QFontMetricsF metrics(font);
-    const QRectF rect =
-        metrics.boundingRect(QRectF(), flags | Qt::TextDontClip, text);
-
-    mPainter.save();
-    mPainter.setPen(QPen(textColor, 0));
-    mPainter.setBrush(Qt::NoBrush);
-    mPainter.setFont(font);
-    mPainter.translate(anchor.toPxQPointF().x(), anchor.toPxQPointF().y());
-    mPainter.rotate(-rotation.mappedTo180deg().toDeg() + (rotate180 ? 180 : 0));
-    mPainter.drawText(rect, flags, text);
-    mPainter.setPen(Qt::transparent);
-    mPainter.drawRect(rect);  // Required for correct bounding rect calculation!
-    mPainter.restore();
   }
 }
 
@@ -214,7 +191,7 @@ void GraphicsPainter::drawNetLabel(const Point& position, const Angle& rotation,
 
   const Alignment align(mirror ? HAlign::right() : HAlign::left(),
                         VAlign::bottom());
-  const bool rotate180 = textIsUpsideDown(rotation);
+  const bool rotate180 = Toolbox::isTextUpsideDown(rotation, false);
   const int flags =
       rotate180 ? align.mirrored().toQtAlign() : align.toQtAlign();
   const QFontMetricsF metrics(font);
@@ -239,11 +216,6 @@ void GraphicsPainter::drawNetLabel(const Point& position, const Angle& rotation,
 
 qreal GraphicsPainter::getPenWidthPx(const Length& width) const noexcept {
   return std::max(width, *mMinLineWidth).toPx();
-}
-
-bool GraphicsPainter::textIsUpsideDown(const Angle& rotation) noexcept {
-  const Angle rotation180 = rotation.mappedTo180deg();
-  return ((rotation180 <= -Angle::deg90()) || (rotation180 > Angle::deg90()));
 }
 
 /*******************************************************************************

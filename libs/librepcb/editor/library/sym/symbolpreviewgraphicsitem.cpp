@@ -30,6 +30,7 @@
 #include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -156,9 +157,7 @@ void SymbolPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
 
     // check rotation
     Angle absAngle = text.getRotation() + Angle::fromDeg(rotation());
-    absAngle.mapTo180deg();
-    props.rotate180 =
-        (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+    props.rotate180 = Toolbox::isTextUpsideDown(absAngle, false);
 
     // calculate text position
     qreal dx, dy;

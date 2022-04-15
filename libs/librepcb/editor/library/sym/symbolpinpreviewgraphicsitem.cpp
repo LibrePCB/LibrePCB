@@ -26,6 +26,7 @@
 #include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbolpin.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QPrinter>
 #include <QtCore>
@@ -89,8 +90,7 @@ void SymbolPinPreviewGraphicsItem::updateCacheAndRepaint() noexcept {
   // rotation
   Angle absAngle = mPin.getRotation() +
       Angle::fromDeg(parentItem() ? -parentItem()->rotation() : 0);
-  absAngle.mapTo180deg();
-  mRotate180 = (absAngle <= -Angle::deg90() || absAngle > Angle::deg90());
+  mRotate180 = Toolbox::isTextUpsideDown(absAngle, false);
 
   // circle
   mShape.addEllipse(-mRadiusPx, -mRadiusPx, 2 * mRadiusPx, 2 * mRadiusPx);

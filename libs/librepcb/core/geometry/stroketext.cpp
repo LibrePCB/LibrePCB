@@ -24,6 +24,7 @@
 
 #include "../attribute/attributesubstitutor.h"
 #include "../font/strokefont.h"
+#include "../utils/toolbox.h"
 
 #include <QtCore>
 
@@ -122,9 +123,7 @@ const QVector<Path>& StrokeText::getPaths() const noexcept {
 }
 
 bool StrokeText::needsAutoRotation() const noexcept {
-  Angle rot360 = (mMirrored ? -mRotation : mRotation).mappedTo0_360deg();
-  return mAutoRotate && (rot360 > Angle::deg90()) &&
-      (rot360 <= Angle::deg270());
+  return mAutoRotate && Toolbox::isTextUpsideDown(mRotation, mMirrored);
 }
 
 Length StrokeText::calcLetterSpacing() const noexcept {

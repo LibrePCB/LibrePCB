@@ -55,7 +55,8 @@ class SchematicPainter final : public GraphicsPagePainter {
     Point position;
     Angle rotation;
     UnsignedLength length;
-    QString text;
+    QString name;
+    Point namePosition;
   };
 
   struct Line {
