@@ -79,6 +79,9 @@ public:
   const Point& getPosition() const noexcept { return mPosition; }
   const UnsignedLength& getLength() const noexcept { return mLength; }
   const Angle& getRotation() const noexcept { return mRotation; }
+  Point getNamePosition() const noexcept {
+    return Point(mLength + Length(800000), 0);  // Without rotation!
+  }
 
   // Setters
   bool setPosition(const Point& pos) noexcept;
@@ -99,6 +102,11 @@ public:
     return !(*this == rhs);
   }
   SymbolPin& operator=(const SymbolPin& rhs) noexcept;
+
+  // Static Methods
+  static PositiveLength getNameHeight() noexcept {
+    return PositiveLength(2500000);
+  }
 
 private:  // Data
   Uuid mUuid;

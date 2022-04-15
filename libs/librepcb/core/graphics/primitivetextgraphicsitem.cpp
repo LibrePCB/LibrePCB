@@ -42,12 +42,12 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
     QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
     mLayer(nullptr),
+    mText(),
+    mHeight(1),
     mAlignment(HAlign::left(), VAlign::bottom()),
     mTextFlags(0),
     mOnLayerEditedSlot(*this, &PrimitiveTextGraphicsItem::layerEdited) {
   mFont = qApp->getDefaultSansSerifFont();
-  mFont.setPixelSize(1);
-
   updateBoundingRectAndShape();
   setVisible(false);
 }
@@ -76,7 +76,7 @@ void PrimitiveTextGraphicsItem::setText(const QString& text) noexcept {
 
 void PrimitiveTextGraphicsItem::setHeight(
     const PositiveLength& height) noexcept {
-  mFont.setPixelSize(height->toPx());
+  mHeight = height;
   updateBoundingRectAndShape();
 }
 
@@ -86,7 +86,6 @@ void PrimitiveTextGraphicsItem::setAlignment(const Alignment& align) noexcept {
 }
 
 void PrimitiveTextGraphicsItem::setFont(Font font) noexcept {
-  int size = mFont.pixelSize();  // memorize size
   switch (font) {
     case Font::SansSerif:
       mFont = qApp->getDefaultSansSerifFont();
@@ -100,7 +99,6 @@ void PrimitiveTextGraphicsItem::setFont(Font font) noexcept {
       break;
     }
   }
-  mFont.setPixelSize(size);
   updateBoundingRectAndShape();
 }
 
@@ -169,10 +167,12 @@ void PrimitiveTextGraphicsItem::layerEdited(
 void PrimitiveTextGraphicsItem::updateBoundingRectAndShape() noexcept {
   prepareGeometryChange();
   mTextFlags = Qt::TextDontClip | mAlignment.toQtAlign();
+  mFont.setPixelSize(qCeil(mHeight->toPx()));
   QFontMetricsF fm(mFont);
   mBoundingRect = fm.boundingRect(QRectF(), mTextFlags, mText);
   mShape = QPainterPath();
   mShape.addRect(mBoundingRect);
+  setScale(mHeight->toPx() / fm.height());
   update();
 }
 

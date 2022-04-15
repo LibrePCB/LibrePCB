@@ -67,7 +67,7 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolPin& pin,
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   // text
-  mTextGraphicsItem->setHeight(PositiveLength(Length::fromMm(qreal(2))));
+  mTextGraphicsItem->setHeight(SymbolPin::getNameHeight());
   mTextGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinNames));
   mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   updateTextRotationAndAlignment();
@@ -101,7 +101,7 @@ void SymbolPinGraphicsItem::setRotation(const Angle& rot) noexcept {
 
 void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept {
   mLineGraphicsItem->setLine(Point(0, 0), Point(*length, 0));
-  mTextGraphicsItem->setPosition(Point(length + Length(800000), Length(0)));
+  mTextGraphicsItem->setPosition(mPin.getNamePosition());
 }
 
 void SymbolPinGraphicsItem::setName(const CircuitIdentifier& name) noexcept {

@@ -70,13 +70,11 @@ public:
                   const QColor& fillColor) noexcept;
   void drawText(const Point& position, const Angle& rotation,
                 const Length& height, const Alignment& alignment,
-                const QString& text, const QFont& font, const QColor& color,
+                const QString& text, QFont font, const QColor& color,
                 bool mirrorInPlace) noexcept;
   void drawSymbolPin(const Point& position, const Angle& rotation,
-                     const Length& length, const QString& text,
-                     const QFont& font, const QColor& lineColor,
-                     const QColor& circleColor,
-                     const QColor& textColor) noexcept;
+                     const Length& length, const QColor& lineColor,
+                     const QColor& circleColor) noexcept;
   void drawNetJunction(const Point& position, const QColor& color) noexcept;
   void drawNetLabel(const Point& position, const Angle& rotation, bool mirror,
                     const QString& text, const QFont& font,

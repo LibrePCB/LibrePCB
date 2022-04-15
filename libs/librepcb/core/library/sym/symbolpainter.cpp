@@ -88,21 +88,22 @@ void SymbolPainter::paint(QPainter& painter,
 
   // Draw Texts.
   foreach (const Text& text, mTexts) {
-    QFont font = qApp->getDefaultSansSerifFont();
-    font.setPixelSize(qCeil(text.getHeight()->toPx()));
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
-               text.getAlign(), text.getText(), font,
+               text.getAlign(), text.getText(), qApp->getDefaultSansSerifFont(),
                settings.getColor(*text.getLayerName()), false);
   }
 
   // Draw Pins.
   foreach (const SymbolPin& pin, mPins) {
-    QFont font = qApp->getDefaultSansSerifFont();
-    font.setPixelSize(5);
     p.drawSymbolPin(pin.getPosition(), pin.getRotation(), *pin.getLength(),
-                    *pin.getName(), font,
-                    settings.getColor(GraphicsLayer::sSymbolOutlines), QColor(),
-                    settings.getColor(GraphicsLayer::sSymbolPinNames));
+                    settings.getColor(GraphicsLayer::sSymbolOutlines),
+                    QColor());
+    p.drawText(
+        pin.getPosition() + pin.getNamePosition().rotated(pin.getRotation()),
+        pin.getRotation(), *SymbolPin::getNameHeight(),
+        Alignment(HAlign::left(), VAlign::center()), *pin.getName(),
+        qApp->getDefaultSansSerifFont(),
+        settings.getColor(GraphicsLayer::sSymbolPinNames), false);
   }
 }
 

@@ -84,6 +84,7 @@ private:  // Methods
 private:  // Data
   const GraphicsLayer* mLayer;
   QString mText;
+  PositiveLength mHeight;
   Alignment mAlignment;
   QFont mFont;
   QPen mPen;
