@@ -96,6 +96,21 @@ public:
     return copy;
   }
 
+  /**
+   * @brief Check if a text with a given rotation is considered as upside down
+   *
+   * A text is considered as upside down if it is rotated counterclockwise by
+   * [-90..90°[, i.e. -90° is considered as upside down, but 90° is *not*
+   * considered as upside down. For mirrored texts (rotated clockwise), it
+   * is the other way around. Used to determine whether a text needs to be
+   * auto-rotated or not.
+   *
+   * @param rotation  The global (scene coordinates) rotation of the text.
+   * @param mirrored  If the text is mirrored (inverted rotation!).
+   * @return Whether the text is upside down or not.
+   */
+  static bool isTextUpsideDown(const Angle& rotation, bool mirrored) noexcept;
+
   static QRectF boundingRectFromRadius(qreal radius) noexcept {
     return QRectF(-radius, -radius, 2 * radius, 2 * radius);
   }

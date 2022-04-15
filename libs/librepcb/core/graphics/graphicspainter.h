@@ -87,7 +87,6 @@ public:
 
 private:  // Methods
   qreal getPenWidthPx(const Length& width) const noexcept;
-  static bool textIsUpsideDown(const Angle& rotation) noexcept;
 
 private:  // Data
   QPainter& mPainter;

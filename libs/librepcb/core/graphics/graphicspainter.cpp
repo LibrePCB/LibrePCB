@@ -27,6 +27,7 @@
 #include "../types/angle.h"
 #include "../types/length.h"
 #include "../types/point.h"
+#include "../utils/toolbox.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -114,7 +115,7 @@ void GraphicsPainter::drawText(const Point& position, const Angle& rotation,
     return;  // Nothing to draw.
   }
 
-  const bool rotate180 = textIsUpsideDown(rotation);
+  const bool rotate180 = Toolbox::isTextUpsideDown(rotation, false);
   Alignment align = rotate180 ? alignment.mirrored() : alignment;
   if (mirrorInPlace) {
     align.mirrorH();
@@ -170,7 +171,7 @@ void GraphicsPainter::drawSymbolPin(const Point& position,
 
   // Draw Text.
   if (textColor.isValid()) {
-    const bool rotate180 = textIsUpsideDown(rotation);
+    const bool rotate180 = Toolbox::isTextUpsideDown(rotation, false);
     const int flags =
         Qt::AlignVCenter | (rotate180 ? Qt::AlignRight : Qt::AlignLeft);
     const Point anchor =
@@ -214,7 +215,7 @@ void GraphicsPainter::drawNetLabel(const Point& position, const Angle& rotation,
 
   const Alignment align(mirror ? HAlign::right() : HAlign::left(),
                         VAlign::bottom());
-  const bool rotate180 = textIsUpsideDown(rotation);
+  const bool rotate180 = Toolbox::isTextUpsideDown(rotation, false);
   const int flags =
       rotate180 ? align.mirrored().toQtAlign() : align.toQtAlign();
   const QFontMetricsF metrics(font);
@@ -239,11 +240,6 @@ void GraphicsPainter::drawNetLabel(const Point& position, const Angle& rotation,
 
 qreal GraphicsPainter::getPenWidthPx(const Length& width) const noexcept {
   return std::max(width, *mMinLineWidth).toPx();
-}
-
-bool GraphicsPainter::textIsUpsideDown(const Angle& rotation) noexcept {
-  const Angle rotation180 = rotation.mappedTo180deg();
-  return ((rotation180 <= -Angle::deg90()) || (rotation180 > Angle::deg90()));
 }
 
 /*******************************************************************************
