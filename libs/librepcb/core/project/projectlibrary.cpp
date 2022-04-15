@@ -157,11 +157,9 @@ void ProjectLibrary::loadElements(const QString& dirname, const QString& type,
     QScopedPointer<ElementType> element(
         new ElementType(std::move(dir)));  // can throw
     if (elementList.contains(element->getUuid())) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString("There are multiple library elements with the same "
-                  "UUID in the directory \"%1\"")
-              .arg(dir->getAbsPath().toNative()));
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("There are multiple %1 with the UUID \"%2\"")
+                             .arg(type, element->getUuid().toStr()));
     }
 
     // everything is ok -> update members
