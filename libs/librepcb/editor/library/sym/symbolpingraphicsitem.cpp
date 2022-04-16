@@ -22,13 +22,13 @@
  ******************************************************************************/
 #include "symbolpingraphicsitem.h"
 
-#include "../../graphics/graphicslayer.h"
-#include "../../graphics/linegraphicsitem.h"
-#include "../../graphics/primitivecirclegraphicsitem.h"
-#include "../../graphics/primitivetextgraphicsitem.h"
-#include "../../types/angle.h"
-#include "../../types/point.h"
-#include "../../utils/toolbox.h"
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/linegraphicsitem.h>
+#include <librepcb/core/graphics/primitivecirclegraphicsitem.h>
+#include <librepcb/core/graphics/primitivetextgraphicsitem.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/point.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,6 +37,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -179,4 +180,5 @@ void SymbolPinGraphicsItem::updateTextRotationAndAlignment() noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

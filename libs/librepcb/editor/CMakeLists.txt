@@ -304,6 +304,10 @@ add_library(
   library/sym/symboleditorwidget.cpp
   library/sym/symboleditorwidget.h
   library/sym/symboleditorwidget.ui
+  library/sym/symbolgraphicsitem.cpp
+  library/sym/symbolgraphicsitem.h
+  library/sym/symbolpingraphicsitem.cpp
+  library/sym/symbolpingraphicsitem.h
   library/sym/symbolpinpreviewgraphicsitem.cpp
   library/sym/symbolpinpreviewgraphicsitem.h
   library/sym/symbolpinpropertiesdialog.cpp

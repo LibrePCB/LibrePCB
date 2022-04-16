@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_SYMBOLGRAPHICSITEM_H
-#define LIBREPCB_CORE_SYMBOLGRAPHICSITEM_H
+#ifndef LIBREPCB_EDITOR_SYMBOLGRAPHICSITEM_H
+#define LIBREPCB_EDITOR_SYMBOLGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "symbol.h"
+#include <librepcb/core/library/sym/symbol.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,8 +38,11 @@ namespace librepcb {
 class CircleGraphicsItem;
 class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem;
-class SymbolPinGraphicsItem;
 class TextGraphicsItem;
+
+namespace editor {
+
+class SymbolPinGraphicsItem;
 
 /*******************************************************************************
  *  Class SymbolGraphicsItem
@@ -127,6 +130,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

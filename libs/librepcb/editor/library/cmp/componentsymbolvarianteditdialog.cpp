@@ -23,6 +23,7 @@
 #include "componentsymbolvarianteditdialog.h"
 
 #include "../../library/libraryelementcache.h"
+#include "../sym/symbolgraphicsitem.h"
 #include "ui_componentsymbolvarianteditdialog.h"
 
 #include <librepcb/core/exceptions.h>
@@ -32,7 +33,6 @@
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentsymbolvariant.h>
 #include <librepcb/core/library/sym/symbol.h>
-#include <librepcb/core/library/sym/symbolgraphicsitem.h>
 #include <librepcb/core/norms.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>

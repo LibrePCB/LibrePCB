@@ -26,12 +26,12 @@
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdsymbolpinedit.h"
 #include "../symboleditorwidget.h"
+#include "../symbolgraphicsitem.h"
+#include "../symbolpingraphicsitem.h"
 
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/sym/symbol.h>
-#include <librepcb/core/library/sym/symbolgraphicsitem.h>
 #include <librepcb/core/library/sym/symbolpin.h>
-#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 
 #include <QtCore>
 

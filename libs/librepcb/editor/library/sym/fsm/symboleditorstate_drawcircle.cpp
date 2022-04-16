@@ -27,13 +27,13 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../symboleditorwidget.h"
+#include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/circle.h>
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/sym/symbol.h>
-#include <librepcb/core/library/sym/symbolgraphicsitem.h>
 
 #include <QtCore>
 

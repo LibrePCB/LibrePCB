@@ -34,6 +34,8 @@
 #include "../../cmd/cmdremoveselectedsymbolitems.h"
 #include "../symbolclipboarddata.h"
 #include "../symboleditorwidget.h"
+#include "../symbolgraphicsitem.h"
+#include "../symbolpingraphicsitem.h"
 #include "../symbolpinpropertiesdialog.h"
 
 #include <librepcb/core/graphics/circlegraphicsitem.h>
@@ -42,8 +44,6 @@
 #include <librepcb/core/graphics/textgraphicsitem.h>
 #include <librepcb/core/import/dxfreader.h>
 #include <librepcb/core/library/sym/symbol.h>
-#include <librepcb/core/library/sym/symbolgraphicsitem.h>
-#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
 

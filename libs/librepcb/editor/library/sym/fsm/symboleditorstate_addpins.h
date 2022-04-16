@@ -40,11 +40,11 @@ namespace librepcb {
 class Angle;
 class Point;
 class SymbolPin;
-class SymbolPinGraphicsItem;
 
 namespace editor {
 
 class CmdSymbolPinEdit;
+class SymbolPinGraphicsItem;
 
 /*******************************************************************************
  *  Class SymbolEditorState_AddPins

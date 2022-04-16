@@ -27,12 +27,12 @@
 #include "../../cmd/cmdtextedit.h"
 #include "../../widgets/graphicsview.h"
 #include "../cmd/cmdsymbolpinedit.h"
+#include "../sym/symbolgraphicsitem.h"
+#include "../sym/symbolpingraphicsitem.h"
 
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/textgraphicsitem.h>
-#include <librepcb/core/library/sym/symbolgraphicsitem.h>
-#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 #include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>

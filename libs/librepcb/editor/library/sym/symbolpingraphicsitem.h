@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_SYMBOLPINGRAPHICSITEM_H
-#define LIBREPCB_CORE_SYMBOLPINGRAPHICSITEM_H
+#ifndef LIBREPCB_EDITOR_SYMBOLPINGRAPHICSITEM_H
+#define LIBREPCB_EDITOR_SYMBOLPINGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "symbolpin.h"
+#include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,6 +37,8 @@ class IF_GraphicsLayerProvider;
 class LineGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class SymbolPinGraphicsItem
@@ -92,6 +94,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

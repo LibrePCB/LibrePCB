@@ -37,12 +37,12 @@ class Component;
 class DefaultGraphicsLayerProvider;
 class GraphicsScene;
 class Symbol;
-class SymbolGraphicsItem;
 class Workspace;
 
 namespace editor {
 
 class LibraryElementCache;
+class SymbolGraphicsItem;
 
 namespace Ui {
 class ComponentSymbolVariantEditDialog;

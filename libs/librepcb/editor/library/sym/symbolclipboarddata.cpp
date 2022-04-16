@@ -22,12 +22,13 @@
  ******************************************************************************/
 #include "symbolclipboarddata.h"
 
+#include "symbolpingraphicsitem.h"
+
 #include <librepcb/core/application.h>
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/textgraphicsitem.h>
-#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 
 #include <QtCore>
 #include <QtWidgets>
