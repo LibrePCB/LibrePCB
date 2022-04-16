@@ -195,6 +195,9 @@ public:
   // Getters
   bool isEmpty() const noexcept { return mObjects.empty(); }
   int count() const noexcept { return mObjects.count(); }
+  const QVector<std::shared_ptr<T>>& values() const noexcept {
+    return mObjects;
+  }
   std::vector<Uuid> getUuids() const noexcept {
     std::vector<Uuid> uuids;
     uuids.reserve(mObjects.count());
