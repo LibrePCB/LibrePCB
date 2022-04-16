@@ -65,8 +65,6 @@ SymbolEditorState_DrawPolygonBase::SymbolEditorState_DrawPolygonBase(
 SymbolEditorState_DrawPolygonBase::
     ~SymbolEditorState_DrawPolygonBase() noexcept {
   Q_ASSERT(mEditCmd.isNull());
-  Q_ASSERT(mCurrentPolygon == nullptr);
-  Q_ASSERT(mCurrentGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -209,13 +207,13 @@ bool SymbolEditorState_DrawPolygonBase::start(const Point& pos) noexcept {
         new CmdPolygonInsert(mContext.symbol.getPolygons(), mCurrentPolygon));
     mEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
     mCurrentGraphicsItem =
-        mContext.symbolGraphicsItem.getPolygonGraphicsItem(*mCurrentPolygon);
+        mContext.symbolGraphicsItem.getGraphicsItem(mCurrentPolygon);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    mCurrentGraphicsItem = nullptr;
+    mCurrentGraphicsItem.reset();
     mEditCmd.reset();
     mCurrentPolygon.reset();
     return false;
@@ -225,7 +223,7 @@ bool SymbolEditorState_DrawPolygonBase::start(const Point& pos) noexcept {
 bool SymbolEditorState_DrawPolygonBase::abort() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
+    mCurrentGraphicsItem.reset();
     mEditCmd.reset();
     mCurrentPolygon.reset();
     mContext.undoStack.abortCmdGroup();

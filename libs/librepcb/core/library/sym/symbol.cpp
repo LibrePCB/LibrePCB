@@ -24,7 +24,6 @@
 
 #include "../../serialization/sexpression.h"
 #include "symbolcheck.h"
-#include "symbolgraphicsitem.h"
 
 #include <QtCore>
 
@@ -47,7 +46,6 @@ Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
     mPolygons(),
     mCircles(),
     mTexts(),
-    mRegisteredGraphicsItem(nullptr),
     mPinsEditedSlot(*this, &Symbol::pinsEdited),
     mPolygonsEditedSlot(*this, &Symbol::polygonsEdited),
     mCirclesEditedSlot(*this, &Symbol::circlesEdited),
@@ -66,7 +64,6 @@ Symbol::Symbol(std::unique_ptr<TransactionalDirectory> directory)
     mPolygons(mLoadingFileDocument, mLoadingFileFormat),
     mCircles(mLoadingFileDocument, mLoadingFileFormat),
     mTexts(mLoadingFileDocument, mLoadingFileFormat),
-    mRegisteredGraphicsItem(nullptr),
     mPinsEditedSlot(*this, &Symbol::pinsEdited),
     mPolygonsEditedSlot(*this, &Symbol::polygonsEdited),
     mCirclesEditedSlot(*this, &Symbol::circlesEdited),
@@ -79,7 +76,6 @@ Symbol::Symbol(std::unique_ptr<TransactionalDirectory> directory)
 }
 
 Symbol::~Symbol() noexcept {
-  Q_ASSERT(mRegisteredGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -91,16 +87,6 @@ LibraryElementCheckMessageList Symbol::runChecks() const {
   return check.runChecks();  // can throw
 }
 
-void Symbol::registerGraphicsItem(SymbolGraphicsItem& item) noexcept {
-  Q_ASSERT(!mRegisteredGraphicsItem);
-  mRegisteredGraphicsItem = &item;
-}
-
-void Symbol::unregisterGraphicsItem(SymbolGraphicsItem& item) noexcept {
-  Q_ASSERT(mRegisteredGraphicsItem == &item);
-  mRegisteredGraphicsItem = nullptr;
-}
-
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -110,20 +96,8 @@ void Symbol::pinsEdited(const SymbolPinList& list, int index,
                         SymbolPinList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
-  switch (event) {
-    case SymbolPinList::Event::ElementAdded:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->addPin(const_cast<SymbolPin&>(*pin));
-      }
-      break;
-    case SymbolPinList::Event::ElementRemoved:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->removePin(const_cast<SymbolPin&>(*pin));
-      }
-      break;
-    default:
-      break;
-  }
+  Q_UNUSED(pin);
+  Q_UNUSED(event);
   onEdited.notify(Event::PinsEdited);
 }
 
@@ -132,20 +106,8 @@ void Symbol::polygonsEdited(const PolygonList& list, int index,
                             PolygonList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
-  switch (event) {
-    case PolygonList::Event::ElementAdded:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->addPolygon(const_cast<Polygon&>(*polygon));
-      }
-      break;
-    case PolygonList::Event::ElementRemoved:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->removePolygon(const_cast<Polygon&>(*polygon));
-      }
-      break;
-    default:
-      break;
-  }
+  Q_UNUSED(polygon);
+  Q_UNUSED(event);
   onEdited.notify(Event::PolygonsEdited);
 }
 
@@ -154,20 +116,8 @@ void Symbol::circlesEdited(const CircleList& list, int index,
                            CircleList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
-  switch (event) {
-    case CircleList::Event::ElementAdded:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->addCircle(const_cast<Circle&>(*circle));
-      }
-      break;
-    case CircleList::Event::ElementRemoved:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->removeCircle(const_cast<Circle&>(*circle));
-      }
-      break;
-    default:
-      break;
-  }
+  Q_UNUSED(circle);
+  Q_UNUSED(event);
   onEdited.notify(Event::CirclesEdited);
 }
 
@@ -176,20 +126,8 @@ void Symbol::textsEdited(const TextList& list, int index,
                          TextList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
-  switch (event) {
-    case TextList::Event::ElementAdded:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->addText(const_cast<Text&>(*text));
-      }
-      break;
-    case TextList::Event::ElementRemoved:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->removeText(const_cast<Text&>(*text));
-      }
-      break;
-    default:
-      break;
-  }
+  Q_UNUSED(text);
+  Q_UNUSED(event);
   onEdited.notify(Event::TextsEdited);
 }
 

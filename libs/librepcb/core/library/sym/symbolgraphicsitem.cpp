@@ -44,93 +44,64 @@ namespace librepcb {
 
 SymbolGraphicsItem::SymbolGraphicsItem(
     Symbol& symbol, const IF_GraphicsLayerProvider& lp) noexcept
-  : QGraphicsItem(nullptr), mSymbol(symbol), mLayerProvider(lp) {
-  for (SymbolPin& pin : mSymbol.getPins()) {
-    addPin(pin);
-  }
-  for (Polygon& polygon : mSymbol.getPolygons()) {
-    addPolygon(polygon);
-  }
-  for (Circle& circle : mSymbol.getCircles()) {
-    addCircle(circle);
-  }
-  for (Text& text : mSymbol.getTexts()) {
-    addText(text);
-  }
+  : QGraphicsItem(nullptr),
+    mSymbol(symbol),
+    mLayerProvider(lp),
+    mOnEditedSlot(*this, &SymbolGraphicsItem::symbolEdited) {
+  syncPins();
+  syncCircles();
+  syncPolygons();
+  syncTexts();
 
-  // register to the symbol to get attribute updates
-  mSymbol.registerGraphicsItem(*this);
+  // Register to the symbol to get notified about any modifications.
+  mSymbol.onEdited.attach(mOnEditedSlot);
 }
 
 SymbolGraphicsItem::~SymbolGraphicsItem() noexcept {
-  mSymbol.unregisterGraphicsItem(*this);
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
 
-SymbolPinGraphicsItem* SymbolGraphicsItem::getPinGraphicsItem(
-    const Uuid& pin) noexcept {
-  return mPinGraphicsItems.value(pin).data();
-}
-
-CircleGraphicsItem* SymbolGraphicsItem::getCircleGraphicsItem(
-    const Circle& circle) noexcept {
-  return mCircleGraphicsItems.value(&circle).data();
-}
-
-PolygonGraphicsItem* SymbolGraphicsItem::getPolygonGraphicsItem(
-    const Polygon& polygon) noexcept {
-  return mPolygonGraphicsItems.value(&polygon).data();
-}
-
-TextGraphicsItem* SymbolGraphicsItem::getTextGraphicsItem(
-    const Text& text) noexcept {
-  return mTextGraphicsItems.value(&text).data();
-}
-
 int SymbolGraphicsItem::getItemsAtPosition(
-    const Point& pos, QList<QSharedPointer<SymbolPinGraphicsItem>>* pins,
-    QList<QSharedPointer<CircleGraphicsItem>>* circles,
-    QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
-    QList<QSharedPointer<TextGraphicsItem>>* texts) noexcept {
+    const Point& pos, QList<std::shared_ptr<SymbolPinGraphicsItem>>* pins,
+    QList<std::shared_ptr<CircleGraphicsItem>>* circles,
+    QList<std::shared_ptr<PolygonGraphicsItem>>* polygons,
+    QList<std::shared_ptr<TextGraphicsItem>>* texts) noexcept {
   int count = 0;
   if (pins) {
-    foreach (const QSharedPointer<SymbolPinGraphicsItem>& item,
-             mPinGraphicsItems) {
-      QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
-      if (item->shape().contains(mappedPos)) {
-        pins->append(item);
+    foreach (const auto& ptr, mPinGraphicsItems) {
+      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
+      if (ptr->shape().contains(mappedPos)) {
+        pins->append(ptr);
         ++count;
       }
     }
   }
   if (circles) {
-    foreach (const QSharedPointer<CircleGraphicsItem>& item,
-             mCircleGraphicsItems) {
-      QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
-      if (item->shape().contains(mappedPos)) {
-        circles->append(item);
+    foreach (const auto& ptr, mCircleGraphicsItems) {
+      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
+      if (ptr->shape().contains(mappedPos)) {
+        circles->append(ptr);
         ++count;
       }
     }
   }
   if (polygons) {
-    foreach (const QSharedPointer<PolygonGraphicsItem>& item,
-             mPolygonGraphicsItems) {
-      QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
-      if (item->shape().contains(mappedPos)) {
-        polygons->append(item);
+    foreach (const auto& ptr, mPolygonGraphicsItems) {
+      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
+      if (ptr->shape().contains(mappedPos)) {
+        polygons->append(ptr);
         ++count;
       }
     }
   }
   if (texts) {
-    foreach (const QSharedPointer<TextGraphicsItem>& item, mTextGraphicsItems) {
-      QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
-      if (item->shape().contains(mappedPos)) {
-        texts->append(item);
+    foreach (const auto& ptr, mTextGraphicsItems) {
+      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
+      if (ptr->shape().contains(mappedPos)) {
+        texts->append(ptr);
         ++count;
       }
     }
@@ -138,48 +109,45 @@ int SymbolGraphicsItem::getItemsAtPosition(
   return count;
 }
 
-QList<QSharedPointer<SymbolPinGraphicsItem>>
+QList<std::shared_ptr<SymbolPinGraphicsItem>>
     SymbolGraphicsItem::getSelectedPins() noexcept {
-  QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
-  foreach (const QSharedPointer<SymbolPinGraphicsItem>& item,
-           mPinGraphicsItems) {
-    if (item->isSelected()) {
-      pins.append(item);
+  QList<std::shared_ptr<SymbolPinGraphicsItem>> pins;
+  foreach (const auto& ptr, mPinGraphicsItems) {
+    if (ptr->isSelected()) {
+      pins.append(ptr);
     }
   }
   return pins;
 }
 
-QList<QSharedPointer<CircleGraphicsItem>>
+QList<std::shared_ptr<CircleGraphicsItem>>
     SymbolGraphicsItem::getSelectedCircles() noexcept {
-  QList<QSharedPointer<CircleGraphicsItem>> circles;
-  foreach (const QSharedPointer<CircleGraphicsItem>& item,
-           mCircleGraphicsItems) {
-    if (item->isSelected()) {
-      circles.append(item);
+  QList<std::shared_ptr<CircleGraphicsItem>> circles;
+  foreach (const auto& ptr, mCircleGraphicsItems) {
+    if (ptr->isSelected()) {
+      circles.append(ptr);
     }
   }
   return circles;
 }
 
-QList<QSharedPointer<PolygonGraphicsItem>>
+QList<std::shared_ptr<PolygonGraphicsItem>>
     SymbolGraphicsItem::getSelectedPolygons() noexcept {
-  QList<QSharedPointer<PolygonGraphicsItem>> polygons;
-  foreach (const QSharedPointer<PolygonGraphicsItem>& item,
-           mPolygonGraphicsItems) {
-    if (item->isSelected()) {
-      polygons.append(item);
+  QList<std::shared_ptr<PolygonGraphicsItem>> polygons;
+  foreach (const auto& ptr, mPolygonGraphicsItems) {
+    if (ptr->isSelected()) {
+      polygons.append(ptr);
     }
   }
   return polygons;
 }
 
-QList<QSharedPointer<TextGraphicsItem>>
+QList<std::shared_ptr<TextGraphicsItem>>
     SymbolGraphicsItem::getSelectedTexts() noexcept {
-  QList<QSharedPointer<TextGraphicsItem>> texts;
-  foreach (const QSharedPointer<TextGraphicsItem>& item, mTextGraphicsItems) {
-    if (item->isSelected()) {
-      texts.append(item);
+  QList<std::shared_ptr<TextGraphicsItem>> texts;
+  foreach (const auto& ptr, mTextGraphicsItems) {
+    if (ptr->isSelected()) {
+      texts.append(ptr);
     }
   }
   return texts;
@@ -197,76 +165,24 @@ void SymbolGraphicsItem::setRotation(const Angle& rot) noexcept {
   QGraphicsItem::setRotation(-rot.toDeg());
 }
 
-void SymbolGraphicsItem::addPin(SymbolPin& pin) noexcept {
-  Q_ASSERT(!mPinGraphicsItems.contains(pin.getUuid()));
-  QSharedPointer<SymbolPinGraphicsItem> item(
-      new SymbolPinGraphicsItem(pin, mLayerProvider, this));
-  mPinGraphicsItems.insert(pin.getUuid(), item);
-}
-
-void SymbolGraphicsItem::removePin(SymbolPin& pin) noexcept {
-  Q_ASSERT(mPinGraphicsItems.contains(pin.getUuid()));
-  mPinGraphicsItems.remove(pin.getUuid());  // this deletes the graphics item
-}
-
-void SymbolGraphicsItem::addCircle(Circle& circle) noexcept {
-  Q_ASSERT(!mCircleGraphicsItems.contains(&circle));
-  QSharedPointer<CircleGraphicsItem> item(
-      new CircleGraphicsItem(circle, mLayerProvider, this));
-  mCircleGraphicsItems.insert(&circle, item);
-}
-
-void SymbolGraphicsItem::removeCircle(Circle& circle) noexcept {
-  Q_ASSERT(mCircleGraphicsItems.contains(&circle));
-  mCircleGraphicsItems.remove(&circle);  // this deletes the graphics item
-}
-
-void SymbolGraphicsItem::addPolygon(Polygon& polygon) noexcept {
-  Q_ASSERT(!mPolygonGraphicsItems.contains(&polygon));
-  QSharedPointer<PolygonGraphicsItem> item(
-      new PolygonGraphicsItem(polygon, mLayerProvider, this));
-  item->setEditable(true);
-  mPolygonGraphicsItems.insert(&polygon, item);
-}
-
-void SymbolGraphicsItem::removePolygon(Polygon& polygon) noexcept {
-  Q_ASSERT(mPolygonGraphicsItems.contains(&polygon));
-  mPolygonGraphicsItems.remove(&polygon);  // this deletes the graphics item
-}
-
-void SymbolGraphicsItem::addText(Text& text) noexcept {
-  Q_ASSERT(!mTextGraphicsItems.contains(&text));
-  QSharedPointer<TextGraphicsItem> item(
-      new TextGraphicsItem(text, mLayerProvider, this));
-  mTextGraphicsItems.insert(&text, item);
-}
-
-void SymbolGraphicsItem::removeText(Text& text) noexcept {
-  Q_ASSERT(mTextGraphicsItems.contains(&text));
-  mTextGraphicsItems.remove(&text);  // this deletes the graphics item
-}
-
 void SymbolGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
   QPainterPath path;
   path.addRect(rect);
-  foreach (const QSharedPointer<SymbolPinGraphicsItem>& item,
-           mPinGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(item.data(), path);
-    item->setSelected(item->shape().intersects(mappedPath));
+  foreach (const auto& ptr, mPinGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
-  foreach (const QSharedPointer<CircleGraphicsItem>& item,
-           mCircleGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(item.data(), path);
-    item->setSelected(item->shape().intersects(mappedPath));
+  foreach (const auto& ptr, mCircleGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
-  foreach (const QSharedPointer<PolygonGraphicsItem>& item,
-           mPolygonGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(item.data(), path);
-    item->setSelected(item->shape().intersects(mappedPath));
+  foreach (const auto& ptr, mPolygonGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
-  foreach (const QSharedPointer<TextGraphicsItem>& item, mTextGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(item.data(), path);
-    item->setSelected(item->shape().intersects(mappedPath));
+  foreach (const auto& ptr, mTextGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
 }
 
@@ -280,6 +196,124 @@ void SymbolGraphicsItem::paint(QPainter* painter,
   Q_UNUSED(painter);
   Q_UNUSED(option);
   Q_UNUSED(widget);
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void SymbolGraphicsItem::syncPins() noexcept {
+  // Remove obsolete items.
+  for (auto it = mPinGraphicsItems.begin(); it != mPinGraphicsItems.end();) {
+    if (!mSymbol.getPins().contains(it.key().get())) {
+      Q_ASSERT(it.value());
+      it.value()->setParentItem(nullptr);
+      it = mPinGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mSymbol.getPins().values()) {
+    if (!mPinGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i =
+          std::make_shared<SymbolPinGraphicsItem>(obj, mLayerProvider, this);
+      mPinGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
+void SymbolGraphicsItem::syncCircles() noexcept {
+  // Remove obsolete items.
+  for (auto it = mCircleGraphicsItems.begin();
+       it != mCircleGraphicsItems.end();) {
+    if (!mSymbol.getCircles().contains(it.key().get())) {
+      Q_ASSERT(it.value());
+      it.value()->setParentItem(nullptr);
+      it = mCircleGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mSymbol.getCircles().values()) {
+    if (!mCircleGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i = std::make_shared<CircleGraphicsItem>(*obj, mLayerProvider, this);
+      mCircleGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
+void SymbolGraphicsItem::syncPolygons() noexcept {
+  // Remove obsolete items.
+  for (auto it = mPolygonGraphicsItems.begin();
+       it != mPolygonGraphicsItems.end();) {
+    if (!mSymbol.getPolygons().contains(it.key().get())) {
+      Q_ASSERT(it.value());
+      it.value()->setParentItem(nullptr);
+      it = mPolygonGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mSymbol.getPolygons().values()) {
+    if (!mPolygonGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i =
+          std::make_shared<PolygonGraphicsItem>(*obj, mLayerProvider, this);
+      i->setEditable(true);
+      mPolygonGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
+void SymbolGraphicsItem::syncTexts() noexcept {
+  // Remove obsolete items.
+  for (auto it = mTextGraphicsItems.begin(); it != mTextGraphicsItems.end();) {
+    if (!mSymbol.getTexts().contains(it.key().get())) {
+      Q_ASSERT(it.key() && it.value());
+      it.value()->setParentItem(nullptr);
+      it = mTextGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mSymbol.getTexts().values()) {
+    if (!mTextGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i = std::make_shared<TextGraphicsItem>(*obj, mLayerProvider, this);
+      mTextGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
+void SymbolGraphicsItem::symbolEdited(const Symbol& symbol,
+                                      Symbol::Event event) noexcept {
+  Q_UNUSED(symbol);
+  switch (event) {
+    case Symbol::Event::PinsEdited:
+      syncPins();
+      break;
+    case Symbol::Event::CirclesEdited:
+      syncCircles();
+      break;
+    case Symbol::Event::PolygonsEdited:
+      syncPolygons();
+      break;
+    case Symbol::Event::TextsEdited:
+      syncTexts();
+      break;
+    default:
+      break;
+  }
 }
 
 /*******************************************************************************

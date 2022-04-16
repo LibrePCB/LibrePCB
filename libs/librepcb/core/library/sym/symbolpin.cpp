@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "symbolpin.h"
 
-#include "symbolpingraphicsitem.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -41,8 +39,7 @@ SymbolPin::SymbolPin(const SymbolPin& other) noexcept
     mName(other.mName),
     mPosition(other.mPosition),
     mLength(other.mLength),
-    mRotation(other.mRotation),
-    mRegisteredGraphicsItem(nullptr) {
+    mRotation(other.mRotation) {
 }
 
 SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
@@ -53,8 +50,7 @@ SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
     mName(name),
     mPosition(position),
     mLength(length),
-    mRotation(rotation),
-    mRegisteredGraphicsItem(nullptr) {
+    mRotation(rotation) {
 }
 
 SymbolPin::SymbolPin(const SExpression& node, const Version& fileFormat)
@@ -64,12 +60,10 @@ SymbolPin::SymbolPin(const SExpression& node, const Version& fileFormat)
     mPosition(node.getChild("position"), fileFormat),
     mLength(
         deserialize<UnsignedLength>(node.getChild("length/@0"), fileFormat)),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
-    mRegisteredGraphicsItem(nullptr) {
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)) {
 }
 
 SymbolPin::~SymbolPin() noexcept {
-  Q_ASSERT(mRegisteredGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -82,7 +76,6 @@ bool SymbolPin::setName(const CircuitIdentifier& name) noexcept {
   }
 
   mName = name;
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setName(mName);
   onEdited.notify(Event::NameChanged);
   return true;
 }
@@ -93,7 +86,6 @@ bool SymbolPin::setPosition(const Point& pos) noexcept {
   }
 
   mPosition = pos;
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setPosition(mPosition);
   onEdited.notify(Event::PositionChanged);
   return true;
 }
@@ -104,7 +96,6 @@ bool SymbolPin::setLength(const UnsignedLength& length) noexcept {
   }
 
   mLength = length;
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setLength(mLength);
   onEdited.notify(Event::LengthChanged);
   return true;
 }
@@ -115,7 +106,6 @@ bool SymbolPin::setRotation(const Angle& rotation) noexcept {
   }
 
   mRotation = rotation;
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setRotation(mRotation);
   onEdited.notify(Event::RotationChanged);
   return true;
 }
@@ -123,16 +113,6 @@ bool SymbolPin::setRotation(const Angle& rotation) noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void SymbolPin::registerGraphicsItem(SymbolPinGraphicsItem& item) noexcept {
-  Q_ASSERT(!mRegisteredGraphicsItem);
-  mRegisteredGraphicsItem = &item;
-}
-
-void SymbolPin::unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept {
-  Q_ASSERT(mRegisteredGraphicsItem == &item);
-  mRegisteredGraphicsItem = nullptr;
-}
 
 void SymbolPin::serialize(SExpression& root) const {
   root.appendChild(mUuid);

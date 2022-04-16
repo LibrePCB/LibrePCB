@@ -97,9 +97,11 @@ bool CmdPasteSymbolItems::performExecute() {
         std::make_shared<SymbolPin>(uuid, name, pin.getPosition() + mPosOffset,
                                     pin.getLength(), pin.getRotation());
     execNewChildCmd(new CmdSymbolPinInsert(mSymbol.getPins(), copy));
-    SymbolPinGraphicsItem* item = mGraphicsItem.getPinGraphicsItem(uuid);
-    Q_ASSERT(item);
-    item->setSelected(true);
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select pin graphics item!";
+    }
   }
 
   for (const Circle& circle : mData->getCircles().sortedByUuid()) {
@@ -113,9 +115,11 @@ bool CmdPasteSymbolItems::performExecute() {
         circle.isGrabArea(), circle.getCenter() + mPosOffset,
         circle.getDiameter());
     execNewChildCmd(new CmdCircleInsert(mSymbol.getCircles(), copy));
-    CircleGraphicsItem* item = mGraphicsItem.getCircleGraphicsItem(*copy);
-    Q_ASSERT(item);
-    item->setSelected(true);
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select circle graphics item!";
+    }
   }
 
   for (const Polygon& polygon : mData->getPolygons().sortedByUuid()) {
@@ -129,9 +133,11 @@ bool CmdPasteSymbolItems::performExecute() {
         polygon.isFilled(), polygon.isGrabArea(),
         polygon.getPath().translated(mPosOffset));
     execNewChildCmd(new CmdPolygonInsert(mSymbol.getPolygons(), copy));
-    PolygonGraphicsItem* item = mGraphicsItem.getPolygonGraphicsItem(*copy);
-    Q_ASSERT(item);
-    item->setSelected(true);
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select polygon graphics item!";
+    }
   }
 
   for (const Text& text : mData->getTexts().sortedByUuid()) {
@@ -145,9 +151,11 @@ bool CmdPasteSymbolItems::performExecute() {
         text.getPosition() + mPosOffset, text.getRotation(), text.getHeight(),
         text.getAlign());
     execNewChildCmd(new CmdTextInsert(mSymbol.getTexts(), copy));
-    TextGraphicsItem* item = mGraphicsItem.getTextGraphicsItem(*copy);
-    Q_ASSERT(item);
-    item->setSelected(true);
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select text graphics item!";
+    }
   }
 
   undoScopeGuard.dismiss();  // no undo required

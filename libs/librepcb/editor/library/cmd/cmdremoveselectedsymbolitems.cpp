@@ -62,7 +62,7 @@ bool CmdRemoveSelectedSymbolItems::performExecute() {
   // remove pins
   foreach (const auto& pin, mContext.symbolGraphicsItem.getSelectedPins()) {
     appendChild(
-        new CmdSymbolPinRemove(mContext.symbol.getPins(), &pin->getPin()));
+        new CmdSymbolPinRemove(mContext.symbol.getPins(), pin->getPin().get()));
   }
 
   // remove circles

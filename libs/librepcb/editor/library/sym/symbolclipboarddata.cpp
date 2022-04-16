@@ -111,8 +111,8 @@ QPixmap SymbolClipboardData::generatePixmap(
     const IF_GraphicsLayerProvider& lp) noexcept {
   GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
-  for (SymbolPin& pin : mPins) {
-    items.append(std::make_shared<SymbolPinGraphicsItem>(pin, lp));
+  for (auto ptr : mPins.values()) {
+    items.append(std::make_shared<SymbolPinGraphicsItem>(ptr, lp));
   }
   for (Polygon& polygon : mPolygons) {
     items.append(std::make_shared<PolygonGraphicsItem>(polygon, lp));

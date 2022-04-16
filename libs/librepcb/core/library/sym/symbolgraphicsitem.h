@@ -23,27 +23,22 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../types/uuid.h"
+#include "symbol.h"
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Angle;
-class Circle;
 class CircleGraphicsItem;
 class IF_GraphicsLayerProvider;
-class Point;
-class Polygon;
 class PolygonGraphicsItem;
-class Symbol;
-class SymbolPin;
 class SymbolPinGraphicsItem;
-class Text;
 class TextGraphicsItem;
 
 /*******************************************************************************
@@ -63,33 +58,37 @@ public:
   ~SymbolGraphicsItem() noexcept;
 
   // Getters
-  SymbolPinGraphicsItem* getPinGraphicsItem(const Uuid& pin) noexcept;
-  CircleGraphicsItem* getCircleGraphicsItem(const Circle& circle) noexcept;
-  PolygonGraphicsItem* getPolygonGraphicsItem(const Polygon& polygon) noexcept;
-  TextGraphicsItem* getTextGraphicsItem(const Text& text) noexcept;
+  std::shared_ptr<SymbolPinGraphicsItem> getGraphicsItem(
+      std::shared_ptr<SymbolPin> pin) noexcept {
+    return mPinGraphicsItems.value(pin);
+  }
+  std::shared_ptr<CircleGraphicsItem> getGraphicsItem(
+      std::shared_ptr<Circle> circle) noexcept {
+    return mCircleGraphicsItems.value(circle);
+  }
+  std::shared_ptr<PolygonGraphicsItem> getGraphicsItem(
+      std::shared_ptr<Polygon> polygon) noexcept {
+    return mPolygonGraphicsItems.value(polygon);
+  }
+  std::shared_ptr<TextGraphicsItem> getGraphicsItem(
+      std::shared_ptr<Text> text) noexcept {
+    return mTextGraphicsItems.value(text);
+  }
   int getItemsAtPosition(
-      const Point& pos, QList<QSharedPointer<SymbolPinGraphicsItem>>* pins,
-      QList<QSharedPointer<CircleGraphicsItem>>* circles,
-      QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
-      QList<QSharedPointer<TextGraphicsItem>>* texts) noexcept;
-  QList<QSharedPointer<SymbolPinGraphicsItem>> getSelectedPins() noexcept;
-  QList<QSharedPointer<CircleGraphicsItem>> getSelectedCircles() noexcept;
-  QList<QSharedPointer<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
-  QList<QSharedPointer<TextGraphicsItem>> getSelectedTexts() noexcept;
+      const Point& pos, QList<std::shared_ptr<SymbolPinGraphicsItem>>* pins,
+      QList<std::shared_ptr<CircleGraphicsItem>>* circles,
+      QList<std::shared_ptr<PolygonGraphicsItem>>* polygons,
+      QList<std::shared_ptr<TextGraphicsItem>>* texts) noexcept;
+  QList<std::shared_ptr<SymbolPinGraphicsItem>> getSelectedPins() noexcept;
+  QList<std::shared_ptr<CircleGraphicsItem>> getSelectedCircles() noexcept;
+  QList<std::shared_ptr<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
+  QList<std::shared_ptr<TextGraphicsItem>> getSelectedTexts() noexcept;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
 
   // General Methods
-  void addPin(SymbolPin& pin) noexcept;
-  void removePin(SymbolPin& pin) noexcept;
-  void addCircle(Circle& circle) noexcept;
-  void removeCircle(Circle& circle) noexcept;
-  void addPolygon(Polygon& polygon) noexcept;
-  void removePolygon(Polygon& polygon) noexcept;
-  void addText(Text& text) noexcept;
-  void removeText(Text& text) noexcept;
   void setSelectionRect(const QRectF rect) noexcept;
 
   // Inherited from QGraphicsItem
@@ -101,14 +100,27 @@ public:
   // Operator Overloadings
   SymbolGraphicsItem& operator=(const SymbolGraphicsItem& rhs) = delete;
 
+private:  // Methods
+  void syncPins() noexcept;
+  void syncCircles() noexcept;
+  void syncPolygons() noexcept;
+  void syncTexts() noexcept;
+  void symbolEdited(const Symbol& symbol, Symbol::Event event) noexcept;
+
 private:  // Data
   Symbol& mSymbol;
   const IF_GraphicsLayerProvider& mLayerProvider;
-  QHash<Uuid, QSharedPointer<SymbolPinGraphicsItem>> mPinGraphicsItems;
-  QHash<const Circle*, QSharedPointer<CircleGraphicsItem>> mCircleGraphicsItems;
-  QHash<const Polygon*, QSharedPointer<PolygonGraphicsItem>>
+  QMap<std::shared_ptr<SymbolPin>, std::shared_ptr<SymbolPinGraphicsItem>>
+      mPinGraphicsItems;
+  QMap<std::shared_ptr<Circle>, std::shared_ptr<CircleGraphicsItem>>
+      mCircleGraphicsItems;
+  QMap<std::shared_ptr<Polygon>, std::shared_ptr<PolygonGraphicsItem>>
       mPolygonGraphicsItems;
-  QHash<const Text*, QSharedPointer<TextGraphicsItem>> mTextGraphicsItems;
+  QMap<std::shared_ptr<Text>, std::shared_ptr<TextGraphicsItem>>
+      mTextGraphicsItems;
+
+  // Slots
+  Symbol::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

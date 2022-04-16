@@ -22,14 +22,13 @@
  ******************************************************************************/
 #include "symbolpingraphicsitem.h"
 
-#include "../../graphics/circlegraphicsitem.h"
 #include "../../graphics/graphicslayer.h"
 #include "../../graphics/linegraphicsitem.h"
+#include "../../graphics/primitivecirclegraphicsitem.h"
 #include "../../graphics/primitivetextgraphicsitem.h"
 #include "../../types/angle.h"
 #include "../../types/point.h"
 #include "../../utils/toolbox.h"
-#include "symbolpin.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -43,14 +42,17 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolPin& pin,
+SymbolPinGraphicsItem::SymbolPinGraphicsItem(std::shared_ptr<SymbolPin> pin,
                                              const IF_GraphicsLayerProvider& lp,
                                              QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
     mPin(pin),
     mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
     mLineGraphicsItem(new LineGraphicsItem(this)),
-    mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)) {
+    mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
+    mOnEditedSlot(*this, &SymbolPinGraphicsItem::pinEdited) {
+  Q_ASSERT(mPin);
+
   setFlag(QGraphicsItem::ItemHasNoContents, false);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(10);
@@ -67,23 +69,23 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(SymbolPin& pin,
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   // text
+  mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
   mTextGraphicsItem->setHeight(SymbolPin::getNameHeight());
   mTextGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinNames));
   mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   updateTextRotationAndAlignment();
 
   // pin properties
-  setPosition(mPin.getPosition());
-  setRotation(mPin.getRotation());
-  setLength(mPin.getLength());
-  setName(mPin.getName());
+  setPosition(mPin->getPosition());
+  setRotation(mPin->getRotation());
+  setLength(mPin->getLength());
+  setName(mPin->getName());
 
-  // register to the pin to get attribute updates
-  mPin.registerGraphicsItem(*this);
+  // Register to the pin to get notified about any modifications.
+  mPin->onEdited.attach(mOnEditedSlot);
 }
 
 SymbolPinGraphicsItem::~SymbolPinGraphicsItem() noexcept {
-  mPin.unregisterGraphicsItem(*this);
 }
 
 /*******************************************************************************
@@ -97,16 +99,6 @@ void SymbolPinGraphicsItem::setPosition(const Point& pos) noexcept {
 void SymbolPinGraphicsItem::setRotation(const Angle& rot) noexcept {
   QGraphicsItem::setRotation(-rot.toDeg());
   updateTextRotationAndAlignment();  // Auto-rotation may need to be updated.
-}
-
-void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept {
-  mLineGraphicsItem->setLine(Point(0, 0), Point(*length, 0));
-  mTextGraphicsItem->setPosition(mPin.getNamePosition());
-}
-
-void SymbolPinGraphicsItem::setName(const CircuitIdentifier& name) noexcept {
-  setToolTip(*name);
-  mTextGraphicsItem->setText(*name);
 }
 
 void SymbolPinGraphicsItem::setSelected(bool selected) noexcept {
@@ -138,10 +130,44 @@ void SymbolPinGraphicsItem::paint(QPainter* painter,
  *  Private Methods
  ******************************************************************************/
 
+void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
+                                      SymbolPin::Event event) noexcept {
+  switch (event) {
+    case SymbolPin::Event::UuidChanged:
+      break;
+    case SymbolPin::Event::NameChanged:
+      setName(pin.getName());
+      break;
+    case SymbolPin::Event::PositionChanged:
+      setPosition(pin.getPosition());
+      break;
+    case SymbolPin::Event::LengthChanged:
+      setLength(pin.getLength());
+      break;
+    case SymbolPin::Event::RotationChanged:
+      setRotation(pin.getRotation());
+      break;
+    default:
+      qWarning()
+          << "Unhandled switch-case in SymbolPinGraphicsItem::pinEdited()";
+      break;
+  }
+}
+
+void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept {
+  mLineGraphicsItem->setLine(Point(0, 0), Point(*length, 0));
+  mTextGraphicsItem->setPosition(mPin->getNamePosition());
+}
+
+void SymbolPinGraphicsItem::setName(const CircuitIdentifier& name) noexcept {
+  setToolTip(*name);
+  mTextGraphicsItem->setText(*name);
+}
+
 void SymbolPinGraphicsItem::updateTextRotationAndAlignment() noexcept {
   Angle rotation(0);
   Alignment alignment(HAlign::left(), VAlign::center());
-  if (Toolbox::isTextUpsideDown(mPin.getRotation(), false)) {
+  if (Toolbox::isTextUpsideDown(mPin->getRotation(), false)) {
     rotation += Angle::deg180();
     alignment.mirror();
   }

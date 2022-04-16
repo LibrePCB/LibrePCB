@@ -23,8 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../types/circuitidentifier.h"
-#include "../../types/length.h"
+#include "symbolpin.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,13 +33,10 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Angle;
 class IF_GraphicsLayerProvider;
 class LineGraphicsItem;
-class Point;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;
-class SymbolPin;
 
 /*******************************************************************************
  *  Class SymbolPinGraphicsItem
@@ -54,18 +50,17 @@ public:
   // Constructors / Destructor
   SymbolPinGraphicsItem() = delete;
   SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other) = delete;
-  SymbolPinGraphicsItem(SymbolPin& pin, const IF_GraphicsLayerProvider& lp,
+  SymbolPinGraphicsItem(std::shared_ptr<SymbolPin> pin,
+                        const IF_GraphicsLayerProvider& lp,
                         QGraphicsItem* parent = nullptr) noexcept;
   ~SymbolPinGraphicsItem() noexcept;
 
   // Getters
-  SymbolPin& getPin() noexcept { return mPin; }
+  const std::shared_ptr<SymbolPin>& getPin() noexcept { return mPin; }
 
   // Setters
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
-  void setLength(const UnsignedLength& length) noexcept;
-  void setName(const CircuitIdentifier& name) noexcept;
   void setSelected(bool selected) noexcept;
 
   // Inherited from QGraphicsItem
@@ -78,13 +73,19 @@ public:
   SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs) = delete;
 
 private:  // Methods
+  void pinEdited(const SymbolPin& pin, SymbolPin::Event event) noexcept;
+  void setLength(const UnsignedLength& length) noexcept;
+  void setName(const CircuitIdentifier& name) noexcept;
   void updateTextRotationAndAlignment() noexcept;
 
 private:  // Data
-  SymbolPin& mPin;
+  std::shared_ptr<SymbolPin> mPin;
   QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
+
+  // Slots
+  SymbolPin::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

@@ -123,7 +123,8 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       // update start position of selection or movement
       mStartPos = Point::fromPx(e.scenePos());
       // get items under cursor
-      QList<QGraphicsItem*> items = findItemsAtPosition(mStartPos);
+      QList<std::shared_ptr<QGraphicsItem>> items =
+          findItemsAtPosition(mStartPos);
       if (findPolygonVerticesAtPosition(mStartPos) && (!mContext.readOnly)) {
         mState = SubState::MOVING_POLYGON_VERTEX;
       } else if (items.isEmpty()) {
@@ -132,15 +133,15 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         mState = SubState::SELECTING;
       } else {
         // check if the top most item under the cursor is already selected
-        QGraphicsItem* topMostItem = items.first();
+        std::shared_ptr<QGraphicsItem> topMostItem = items.first();
 
         bool itemAlreadySelected = topMostItem->isSelected();
         if (e.modifiers().testFlag(Qt::ControlModifier)) {
           // Toggle selection when CTRL is pressed
-          if (dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)) {
+          if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(
+                  topMostItem)) {
             // workaround for selection of a SymbolPinGraphicsItem
-            dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)
-                ->setSelected(!itemAlreadySelected);
+            i->setSelected(!itemAlreadySelected);
           } else {
             topMostItem->setSelected(!itemAlreadySelected);
           }
@@ -149,10 +150,10 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           mCurrentSelectionIndex += 1;
           mCurrentSelectionIndex %= items.count();
           clearSelectionRect(true);
-          QGraphicsItem* item = items[mCurrentSelectionIndex];
-          if (dynamic_cast<SymbolPinGraphicsItem*>(item)) {
+          std::shared_ptr<QGraphicsItem> item = items[mCurrentSelectionIndex];
+          if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(item)) {
             // workaround for selection of a SymbolPinGraphicsItem
-            dynamic_cast<SymbolPinGraphicsItem*>(item)->setSelected(true);
+            i->setSelected(true);
           } else {
             item->setSelected(true);
           }
@@ -160,10 +161,10 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           // Only select the topmost item when clicking an unselected item
           // without CTRL
           clearSelectionRect(true);
-          if (dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)) {
+          if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(
+                  topMostItem)) {
             // workaround for selection of a SymbolPinGraphicsItem
-            dynamic_cast<SymbolPinGraphicsItem*>(topMostItem)
-                ->setSelected(true);
+            i->setSelected(true);
           } else {
             topMostItem->setSelected(true);
           }
@@ -469,10 +470,10 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
     aRemove->setEnabled((remainingVertices >= 2) && (!mContext.readOnly));
   } else {
     // handle item selection
-    QGraphicsItem* selectedItem = nullptr;
-    QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+    std::shared_ptr<QGraphicsItem> selectedItem;
+    QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPosition(pos);
     if (items.isEmpty()) return false;
-    foreach (QGraphicsItem* item, items) {
+    foreach (std::shared_ptr<QGraphicsItem> item, items) {
       if (item->isSelected()) {
         selectedItem = item;
       }
@@ -480,9 +481,10 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
     if (!selectedItem) {
       clearSelectionRect(true);
       selectedItem = items.first();
-      if (dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)) {
+      if (auto i =
+              std::dynamic_pointer_cast<SymbolPinGraphicsItem>(selectedItem)) {
         // workaround for selection of a SymbolPinGraphicsItem
-        dynamic_cast<SymbolPinGraphicsItem*>(selectedItem)->setSelected(true);
+        i->setSelected(true);
       } else {
         selectedItem->setSelected(true);
       }
@@ -491,16 +493,16 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
     Q_ASSERT(selectedItem->isSelected());
 
     // if a polygon line is under the cursor, add the "Add Vertex" menu item
-    if (PolygonGraphicsItem* i =
-            dynamic_cast<PolygonGraphicsItem*>(selectedItem)) {
-      Polygon* polygon = &i->getPolygon();
+    if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(selectedItem)) {
+      std::shared_ptr<Polygon> polygon =
+          mContext.symbol.getPolygons().find(&i->getPolygon());
       int index = i->getLineIndexAtPosition(pos);
-      if (index >= 0) {
+      if (polygon && (index >= 0)) {
         QAction* aAddVertex =
             menu.addAction(QIcon(":/img/actions/add.png"), tr("Add Vertex"));
         aAddVertex->setEnabled(!mContext.readOnly);
         connect(aAddVertex, &QAction::triggered,
-                [=]() { startAddingPolygonVertex(*polygon, index, pos); });
+                [=]() { startAddingPolygonVertex(polygon, index, pos); });
         menu.addSeparator();
       }
     }
@@ -542,43 +544,37 @@ bool SymbolEditorState_Select::openContextMenuAtPos(const Point& pos) noexcept {
 }
 
 bool SymbolEditorState_Select::openPropertiesDialogOfItem(
-    QGraphicsItem* item) noexcept {
+    std::shared_ptr<QGraphicsItem> item) noexcept {
   if (!item) return false;
 
-  if (SymbolPinGraphicsItem* pin = dynamic_cast<SymbolPinGraphicsItem*>(item)) {
-    Q_ASSERT(pin);
+  if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(item)) {
     SymbolPinPropertiesDialog dialog(
-        pin->getPin(), mContext.undoStack, getDefaultLengthUnit(),
+        *i->getPin(), mContext.undoStack, getDefaultLengthUnit(),
         "symbol_editor/pin_properties_dialog", &mContext.editorWidget);
     dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
-  } else if (TextGraphicsItem* text = dynamic_cast<TextGraphicsItem*>(item)) {
-    Q_ASSERT(text);
-    TextPropertiesDialog dialog(text->getText(), mContext.undoStack,
+  } else if (auto i = std::dynamic_pointer_cast<TextGraphicsItem>(item)) {
+    TextPropertiesDialog dialog(i->getText(), mContext.undoStack,
                                 getAllowedTextLayers(), getDefaultLengthUnit(),
                                 "symbol_editor/text_properties_dialog",
                                 &mContext.editorWidget);
     dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
-  } else if (PolygonGraphicsItem* polygon =
-                 dynamic_cast<PolygonGraphicsItem*>(item)) {
-    Q_ASSERT(polygon);
+  } else if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
     PolygonPropertiesDialog dialog(
-        polygon->getPolygon(), mContext.undoStack,
-        getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
-        "symbol_editor/polygon_properties_dialog", &mContext.editorWidget);
+        i->getPolygon(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
+        getDefaultLengthUnit(), "symbol_editor/polygon_properties_dialog",
+        &mContext.editorWidget);
     dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
-  } else if (CircleGraphicsItem* circle =
-                 dynamic_cast<CircleGraphicsItem*>(item)) {
-    Q_ASSERT(circle);
+  } else if (auto i = std::dynamic_pointer_cast<CircleGraphicsItem>(item)) {
     CirclePropertiesDialog dialog(
-        circle->getCircle(), mContext.undoStack,
-        getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
-        "symbol_editor/circle_properties_dialog", &mContext.editorWidget);
+        i->getCircle(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
+        getDefaultLengthUnit(), "symbol_editor/circle_properties_dialog",
+        &mContext.editorWidget);
     dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
@@ -588,7 +584,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
 
 bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
     const Point& pos) noexcept {
-  QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+  QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPosition(pos);
   if (items.isEmpty()) return false;
   return openPropertiesDialogOfItem(items.first());
 }
@@ -598,23 +594,23 @@ bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
     Point cursorPos = mContext.graphicsView.mapGlobalPosToScenePos(
         QCursor::pos(), true, false);
     SymbolClipboardData data(mContext.symbol.getUuid(), cursorPos);
-    foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin,
+    foreach (const std::shared_ptr<SymbolPinGraphicsItem>& pin,
              mContext.symbolGraphicsItem.getSelectedPins()) {
       Q_ASSERT(pin);
-      data.getPins().append(std::make_shared<SymbolPin>(pin->getPin()));
+      data.getPins().append(std::make_shared<SymbolPin>(*pin->getPin()));
     }
-    foreach (const QSharedPointer<CircleGraphicsItem>& circle,
+    foreach (const std::shared_ptr<CircleGraphicsItem>& circle,
              mContext.symbolGraphicsItem.getSelectedCircles()) {
       Q_ASSERT(circle);
       data.getCircles().append(std::make_shared<Circle>(circle->getCircle()));
     }
-    foreach (const QSharedPointer<PolygonGraphicsItem>& polygon,
+    foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon,
              mContext.symbolGraphicsItem.getSelectedPolygons()) {
       Q_ASSERT(polygon);
       data.getPolygons().append(
           std::make_shared<Polygon>(polygon->getPolygon()));
     }
-    foreach (const QSharedPointer<TextGraphicsItem>& text,
+    foreach (const std::shared_ptr<TextGraphicsItem>& text,
              mContext.symbolGraphicsItem.getSelectedTexts()) {
       Q_ASSERT(text);
       data.getTexts().append(std::make_shared<Text>(text->getText()));
@@ -753,17 +749,18 @@ void SymbolEditorState_Select::removeSelectedPolygonVertices() noexcept {
 }
 
 void SymbolEditorState_Select::startAddingPolygonVertex(
-    Polygon& polygon, int vertex, const Point& pos) noexcept {
+    std::shared_ptr<Polygon> polygon, int vertex, const Point& pos) noexcept {
   try {
+    Q_ASSERT(polygon);
     Q_ASSERT(vertex > 0);  // it must be the vertex *after* the clicked line
-    Path path = polygon.getPath();
+    Path path = polygon->getPath();
     Point newPos = pos.mappedToGrid(getGridInterval());
     Angle newAngle = path.getVertices()[vertex - 1].getAngle();
     path.getVertices().insert(vertex, Vertex(newPos, newAngle));
-    mCmdPolygonEdit.reset(new CmdPolygonEdit(polygon));
+    mCmdPolygonEdit.reset(new CmdPolygonEdit(*polygon));
     mCmdPolygonEdit->setPath(path, true);
 
-    mSelectedPolygon = &polygon;
+    mSelectedPolygon = polygon;
     mSelectedPolygonVertices = {vertex};
     mStartPos = pos;
     mState = SubState::MOVING_POLYGON_VERTEX;
@@ -787,26 +784,26 @@ void SymbolEditorState_Select::clearSelectionRect(
   }
 }
 
-QList<QGraphicsItem*> SymbolEditorState_Select::findItemsAtPosition(
-    const Point& pos) noexcept {
-  QList<QSharedPointer<SymbolPinGraphicsItem>> pins;
-  QList<QSharedPointer<CircleGraphicsItem>> circles;
-  QList<QSharedPointer<PolygonGraphicsItem>> polygons;
-  QList<QSharedPointer<TextGraphicsItem>> texts;
+QList<std::shared_ptr<QGraphicsItem>>
+    SymbolEditorState_Select::findItemsAtPosition(const Point& pos) noexcept {
+  QList<std::shared_ptr<SymbolPinGraphicsItem>> pins;
+  QList<std::shared_ptr<CircleGraphicsItem>> circles;
+  QList<std::shared_ptr<PolygonGraphicsItem>> polygons;
+  QList<std::shared_ptr<TextGraphicsItem>> texts;
   int count = mContext.symbolGraphicsItem.getItemsAtPosition(
       pos, &pins, &circles, &polygons, &texts);
-  QList<QGraphicsItem*> result = {};
-  foreach (QSharedPointer<SymbolPinGraphicsItem> pin, pins) {
-    result.append(pin.data());
+  QList<std::shared_ptr<QGraphicsItem>> result = {};
+  foreach (std::shared_ptr<SymbolPinGraphicsItem> pin, pins) {
+    result.append(pin);
   }
-  foreach (QSharedPointer<CircleGraphicsItem> cirlce, circles) {
-    result.append(cirlce.data());
+  foreach (std::shared_ptr<CircleGraphicsItem> cirlce, circles) {
+    result.append(cirlce);
   }
-  foreach (QSharedPointer<PolygonGraphicsItem> polygon, polygons) {
-    result.append(polygon.data());
+  foreach (std::shared_ptr<PolygonGraphicsItem> polygon, polygons) {
+    result.append(polygon);
   }
-  foreach (QSharedPointer<TextGraphicsItem> text, texts) {
-    result.append(text.data());
+  foreach (std::shared_ptr<TextGraphicsItem> text, texts) {
+    result.append(text);
   }
 
   Q_ASSERT(result.count() ==
@@ -817,19 +814,18 @@ QList<QGraphicsItem*> SymbolEditorState_Select::findItemsAtPosition(
 
 bool SymbolEditorState_Select::findPolygonVerticesAtPosition(
     const Point& pos) noexcept {
-  for (Polygon& p : mContext.symbol.getPolygons()) {
-    PolygonGraphicsItem* i =
-        mContext.symbolGraphicsItem.getPolygonGraphicsItem(p);
-    if (i && i->isSelected()) {
-      mSelectedPolygonVertices = i->getVertexIndicesAtPosition(pos);
+  for (auto ptr : mContext.symbol.getPolygons().values()) {
+    auto graphicsItem = mContext.symbolGraphicsItem.getGraphicsItem(ptr);
+    if (graphicsItem && graphicsItem->isSelected()) {
+      mSelectedPolygonVertices = graphicsItem->getVertexIndicesAtPosition(pos);
       if (!mSelectedPolygonVertices.isEmpty()) {
-        mSelectedPolygon = &p;
+        mSelectedPolygon = ptr;
         return true;
       }
     }
   }
 
-  mSelectedPolygon = nullptr;
+  mSelectedPolygon.reset();
   mSelectedPolygonVertices.clear();
   return false;
 }

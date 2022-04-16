@@ -61,8 +61,6 @@ SymbolEditorState_DrawCircle::SymbolEditorState_DrawCircle(
 
 SymbolEditorState_DrawCircle::~SymbolEditorState_DrawCircle() noexcept {
   Q_ASSERT(mEditCmd.isNull());
-  Q_ASSERT(mCurrentCircle == nullptr);
-  Q_ASSERT(mCurrentGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -161,21 +159,21 @@ bool SymbolEditorState_DrawCircle::processAbortCommand() noexcept {
 bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add symbol circle"));
-    mCurrentCircle =
-        new Circle(Uuid::createRandom(), mLastLayerName, mLastLineWidth,
-                   mLastFill, mLastGrabArea, pos, PositiveLength(1));
-    mContext.undoStack.appendToCmdGroup(new CmdCircleInsert(
-        mContext.symbol.getCircles(), std::shared_ptr<Circle>(mCurrentCircle)));
+    mCurrentCircle = std::make_shared<Circle>(
+        Uuid::createRandom(), mLastLayerName, mLastLineWidth, mLastFill,
+        mLastGrabArea, pos, PositiveLength(1));
+    mContext.undoStack.appendToCmdGroup(
+        new CmdCircleInsert(mContext.symbol.getCircles(), mCurrentCircle));
     mEditCmd.reset(new CmdCircleEdit(*mCurrentCircle));
     mCurrentGraphicsItem =
-        mContext.symbolGraphicsItem.getCircleGraphicsItem(*mCurrentCircle);
+        mContext.symbolGraphicsItem.getGraphicsItem(mCurrentCircle);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    mCurrentGraphicsItem = nullptr;
-    mCurrentCircle = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentCircle.reset();
     mEditCmd.reset();
     return false;
   }
@@ -200,8 +198,8 @@ bool SymbolEditorState_DrawCircle::finishAddCircle(const Point& pos) noexcept {
   try {
     updateCircleDiameter(pos);
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
-    mCurrentCircle = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentCircle.reset();
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
     return true;
@@ -214,8 +212,8 @@ bool SymbolEditorState_DrawCircle::finishAddCircle(const Point& pos) noexcept {
 bool SymbolEditorState_DrawCircle::abortAddCircle() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
-    mCurrentCircle = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentCircle.reset();
     mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
     return true;
