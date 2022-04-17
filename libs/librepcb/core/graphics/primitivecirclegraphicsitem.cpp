@@ -24,7 +24,6 @@
 
 #include "../utils/toolbox.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -112,21 +111,9 @@ void PrimitiveCircleGraphicsItem::paint(QPainter* painter,
   Q_UNUSED(widget);
 
   const bool isSelected = option->state.testFlag(QStyle::State_Selected);
-  const bool deviceIsPrinter =
-      (dynamic_cast<QPrinter*>(painter->device()) != nullptr);
 
-  QPen pen = isSelected ? mPenHighlighted : mPen;
-  QBrush brush = isSelected ? mBrushHighlighted : mBrush;
-
-  // When printing, enforce a minimum line width to make sure the line will be
-  // visible (too thin lines will not be visible).
-  qreal minPrintLineWidth = Length(100000).toPx();
-  if (deviceIsPrinter && (pen.widthF() < minPrintLineWidth)) {
-    pen.setWidthF(minPrintLineWidth);
-  }
-
-  painter->setPen(pen);
-  painter->setBrush(brush);
+  painter->setPen(isSelected ? mPenHighlighted : mPen);
+  painter->setBrush(isSelected ? mBrushHighlighted : mBrush);
   painter->drawEllipse(mCircleRect);
 }
 

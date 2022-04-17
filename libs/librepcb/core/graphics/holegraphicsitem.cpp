@@ -53,7 +53,6 @@ HoleGraphicsItem::HoleGraphicsItem(const Hole& hole,
 
   // add origin cross
   mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
-  mOriginCrossGraphicsItem->setVisibleInPrintOutput(true);
   mOriginCrossGraphicsItem->setRotation(Angle::deg45());
   mOriginCrossGraphicsItem->setSize(positiveToUnsigned(mHole.getDiameter()) +
                                     UnsignedLength(500000));

@@ -35,7 +35,6 @@
 #include "../items/bi_footprint.h"
 #include "../items/bi_footprintpad.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 

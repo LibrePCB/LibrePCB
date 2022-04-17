@@ -31,7 +31,6 @@
 #include "../items/bi_netsegment.h"
 #include "../items/bi_via.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 

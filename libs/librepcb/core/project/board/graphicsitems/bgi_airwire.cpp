@@ -27,7 +27,6 @@
 #include "../boardlayerstack.h"
 #include "../items/bi_airwire.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 

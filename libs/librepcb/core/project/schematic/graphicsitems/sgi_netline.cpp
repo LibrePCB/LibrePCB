@@ -30,7 +30,6 @@
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 

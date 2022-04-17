@@ -27,7 +27,6 @@
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -44,10 +43,7 @@ namespace editor {
 FootprintPadPreviewGraphicsItem::FootprintPadPreviewGraphicsItem(
     const IF_GraphicsLayerProvider& layerProvider, const FootprintPad& fptPad,
     const PackagePad* pkgPad) noexcept
-  : QGraphicsItem(),
-    mFootprintPad(fptPad),
-    mPackagePad(pkgPad),
-    mDrawBoundingRect(false) {
+  : QGraphicsItem(), mFootprintPad(fptPad), mPackagePad(pkgPad) {
   mFont = qApp->getDefaultSansSerifFont();
   mFont.setPixelSize(2);
 
@@ -82,8 +78,6 @@ void FootprintPadPreviewGraphicsItem::paint(
     QWidget* widget) noexcept {
   Q_UNUSED(widget);
   const bool selected = option->state.testFlag(QStyle::State_Selected);
-  const bool deviceIsPrinter =
-      (dynamic_cast<QPrinter*>(painter->device()) != 0);
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 
@@ -94,22 +88,13 @@ void FootprintPadPreviewGraphicsItem::paint(
   painter->drawPath(mShape);
 
   // draw text
-  if (mPackagePad && (!deviceIsPrinter) && (lod > 3)) {
+  if (mPackagePad && (lod > 3)) {
     QColor color = mLayer->getColor(selected).lighter(150);
     color.setAlpha(255);
     painter->setPen(color);
     painter->setFont(mFont);
     painter->drawText(mBoundingRect, Qt::AlignCenter, *mPackagePad->getName());
   }
-
-#ifdef QT_DEBUG
-  if (mDrawBoundingRect) {
-    // draw bounding rect
-    painter->setPen(QPen(Qt::red, 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(mBoundingRect);
-  }
-#endif
 }
 
 /*******************************************************************************

@@ -30,7 +30,6 @@
 #include "../items/bi_netpoint.h"
 #include "../items/bi_netsegment.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 

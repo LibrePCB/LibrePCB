@@ -31,7 +31,6 @@
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -121,7 +120,6 @@ void SGI_NetLabel::paint(QPainter* painter,
                          const QStyleOptionGraphicsItem* option,
                          QWidget* widget) {
   Q_UNUSED(widget);
-  bool deviceIsPrinter = (dynamic_cast<QPrinter*>(painter->device()) != 0);
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 
@@ -130,7 +128,7 @@ void SGI_NetLabel::paint(QPainter* painter,
 
   GraphicsLayer* layer = getLayer(GraphicsLayer::sSchematicReferences);
   Q_ASSERT(layer);
-  if ((layer->isVisible()) && (lod > 2) && (!deviceIsPrinter)) {
+  if ((layer->isVisible()) && (lod > 2)) {
     // draw origin cross
     painter->setPen(QPen(layer->getColor(highlight), 0));
     painter->drawLines(sOriginCrossLines);
@@ -138,7 +136,7 @@ void SGI_NetLabel::paint(QPainter* painter,
 
   layer = getLayer(GraphicsLayer::sSchematicNetLabels);
   Q_ASSERT(layer);
-  if ((layer->isVisible()) && ((deviceIsPrinter) || (lod > 1))) {
+  if ((layer->isVisible()) && (lod > 1)) {
     // draw text
     painter->setPen(QPen(layer->getColor(highlight), 0));
     painter->setFont(mFont);
