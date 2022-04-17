@@ -215,8 +215,8 @@ QString ComponentEditorWidget::commitMetadata() noexcept {
 }
 
 bool ComponentEditorWidget::openComponentSymbolVariantEditor(
-    ComponentSymbolVariant& variant) noexcept {
-  ComponentSymbolVariantEditDialog dialog(mContext.workspace, *mComponent,
+    std::shared_ptr<ComponentSymbolVariant> variant) noexcept {
+  ComponentSymbolVariantEditDialog dialog(mContext.workspace, mComponent,
                                           variant);
   dialog.setReadOnly(mContext.readOnly);
   return (dialog.exec() == QDialog::Accepted);

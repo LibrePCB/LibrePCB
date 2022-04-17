@@ -28,6 +28,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -63,9 +65,10 @@ public:
   ComponentSymbolVariantEditDialog() = delete;
   ComponentSymbolVariantEditDialog(
       const ComponentSymbolVariantEditDialog& other) = delete;
-  ComponentSymbolVariantEditDialog(const Workspace& ws, const Component& cmp,
-                                   ComponentSymbolVariant& symbVar,
-                                   QWidget* parent = nullptr) noexcept;
+  ComponentSymbolVariantEditDialog(
+      const Workspace& ws, std::shared_ptr<const Component> cmp,
+      std::shared_ptr<ComponentSymbolVariant> symbVar,
+      QWidget* parent = nullptr) noexcept;
   ~ComponentSymbolVariantEditDialog() noexcept;
 
   // Setters
@@ -77,18 +80,22 @@ public:
 
 private:  // Methods
   void accept() noexcept override;
-  void updateGraphicsItems() noexcept;
+  void schedulePreviewUpdate() noexcept;
+  void schedulePreviewTextsUpdate() noexcept;
+  void updatePreview() noexcept;
 
 private:  // Data
   const Workspace& mWorkspace;
-  const Component& mComponent;
-  ComponentSymbolVariant& mOriginalSymbVar;
+  std::shared_ptr<const Component> mComponent;
+  std::shared_ptr<ComponentSymbolVariant> mOriginalSymbVar;
   ComponentSymbolVariant mSymbVar;
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
   std::shared_ptr<LibraryElementCache> mLibraryElementCache;
   QScopedPointer<Ui::ComponentSymbolVariantEditDialog> mUi;
 
+  bool mPreviewUpdateScheduled;
+  bool mPreviewTextsUpdateScheduled;
   QList<std::shared_ptr<Symbol>> mSymbols;
   QList<std::shared_ptr<SymbolGraphicsItem>> mGraphicsItems;
 };

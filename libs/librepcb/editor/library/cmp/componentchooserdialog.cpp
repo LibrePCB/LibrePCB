@@ -23,7 +23,7 @@
 #include "componentchooserdialog.h"
 
 #include "../../workspace/categorytreemodel.h"
-#include "../sym/symbolpreviewgraphicsitem.h"
+#include "../sym/symbolgraphicsitem.h"
 #include "ui_componentchooserdialog.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -205,9 +205,9 @@ void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
 
   if (fp.isValid() && mLayerProvider) {
     try {
-      mComponent.reset(new Component(
+      mComponent = std::make_shared<Component>(
           std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-              TransactionalFileSystem::openRO(fp)))));  // can throw
+              TransactionalFileSystem::openRO(fp))));  // can throw
       if (mComponent && mComponent->getSymbolVariants().count() > 0) {
         const ComponentSymbolVariant& symbVar =
             *mComponent->getSymbolVariants().first();
@@ -221,12 +221,14 @@ void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
                     new TransactionalDirectory(
                         TransactionalFileSystem::openRO(fp))));  // can throw
             mSymbols.append(sym);
-            std::shared_ptr<SymbolPreviewGraphicsItem> graphicsItem =
-                std::make_shared<SymbolPreviewGraphicsItem>(
-                    *mLayerProvider, QStringList(), *sym, mComponent.data(),
-                    symbVar.getUuid(), item.getUuid());
-            graphicsItem->setPos(item.getSymbolPosition().toPxQPointF());
-            graphicsItem->setRotation(-item.getSymbolRotation().toDeg());
+
+            std::shared_ptr<SymbolGraphicsItem> graphicsItem =
+                std::make_shared<SymbolGraphicsItem>(
+                    *sym, *mLayerProvider, mComponent,
+                    symbVar.getSymbolItems().get(item.getUuid()),
+                    localeOrder());
+            graphicsItem->setPosition(item.getSymbolPosition());
+            graphicsItem->setRotation(item.getSymbolRotation());
             mGraphicsScene->addItem(*graphicsItem);
             mSymbolGraphicsItems.append(graphicsItem);
           } catch (const Exception& e) {

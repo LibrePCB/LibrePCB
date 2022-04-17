@@ -36,6 +36,7 @@
 #include <librepcb/core/norms.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -51,16 +52,21 @@ namespace editor {
  ******************************************************************************/
 
 ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
-    const Workspace& ws, const Component& cmp, ComponentSymbolVariant& symbVar,
-    QWidget* parent) noexcept
+    const Workspace& ws, std::shared_ptr<const Component> cmp,
+    std::shared_ptr<ComponentSymbolVariant> symbVar, QWidget* parent) noexcept
   : QDialog(parent),
     mWorkspace(ws),
     mComponent(cmp),
     mOriginalSymbVar(symbVar),
-    mSymbVar(symbVar),
+    mSymbVar(*symbVar),
     mGraphicsScene(new GraphicsScene()),
     mLibraryElementCache(new LibraryElementCache(ws.getLibraryDb())),
-    mUi(new Ui::ComponentSymbolVariantEditDialog) {
+    mUi(new Ui::ComponentSymbolVariantEditDialog),
+    mPreviewUpdateScheduled(false),
+    mPreviewTextsUpdateScheduled(false) {
+  Q_ASSERT(mComponent);
+  Q_ASSERT(mOriginalSymbVar);
+
   mUi->setupUi(this);
   mUi->cbxNorm->addItems(getAvailableNorms());
   mUi->graphicsView->setScene(mGraphicsScene.data());
@@ -79,11 +85,17 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
   connect(
       mUi->symbolListWidget,
       &ComponentSymbolVariantItemListEditorWidget::triggerGraphicsItemsUpdate,
-      this, &ComponentSymbolVariantEditDialog::updateGraphicsItems);
+      this, &ComponentSymbolVariantEditDialog::schedulePreviewUpdate,
+      Qt::QueuedConnection);
+  connect(mUi->symbolListWidget,
+          &ComponentSymbolVariantItemListEditorWidget::
+              triggerGraphicsItemsTextsUpdate,
+          this, &ComponentSymbolVariantEditDialog::schedulePreviewTextsUpdate,
+          Qt::QueuedConnection);
   mUi->pinSignalMapEditorWidget->setReferences(
-      &mSymbVar, mLibraryElementCache, &mComponent.getSignals(), nullptr);
+      &mSymbVar, mLibraryElementCache, &mComponent->getSignals(), nullptr);
 
-  updateGraphicsItems();
+  schedulePreviewUpdate();
 }
 
 ComponentSymbolVariantEditDialog::~ComponentSymbolVariantEditDialog() noexcept {
@@ -118,7 +130,7 @@ void ComponentSymbolVariantEditDialog::accept() noexcept {
     mSymbVar.setName("", name);
     mSymbVar.setDescription("", mUi->edtDescription->text().trimmed());
     mSymbVar.setNorm(mUi->cbxNorm->currentText().trimmed());
-    mOriginalSymbVar = mSymbVar;
+    *mOriginalSymbVar = mSymbVar;
     QDialog::accept();
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
@@ -126,28 +138,55 @@ void ComponentSymbolVariantEditDialog::accept() noexcept {
   }
 }
 
-void ComponentSymbolVariantEditDialog::updateGraphicsItems() noexcept {
-  mGraphicsItems.clear();
-  mSymbols.clear();
-  for (const ComponentSymbolVariantItem& item : mSymbVar.getSymbolItems()) {
-    try {
-      FilePath fp = mWorkspace.getLibraryDb().getLatest<Symbol>(
-          item.getSymbolUuid());  // can throw
-      std::shared_ptr<Symbol> sym = std::make_shared<Symbol>(
-          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-              TransactionalFileSystem::openRO(fp))));  // can throw
-      mSymbols.append(sym);
-      std::shared_ptr<SymbolGraphicsItem> graphicsItem =
-          std::make_shared<SymbolGraphicsItem>(*sym, *mGraphicsLayerProvider);
-      graphicsItem->setPosition(item.getSymbolPosition());
-      graphicsItem->setRotation(item.getSymbolRotation());
-      mGraphicsScene->addItem(*graphicsItem);
-      mGraphicsItems.append(graphicsItem);
-    } catch (const Exception& e) {
-      // what could we do here? ;)
+void ComponentSymbolVariantEditDialog::schedulePreviewUpdate() noexcept {
+  // The signal may be emitted many times for a single change, thus only
+  // scheduling the update to execute it only once.
+  mPreviewUpdateScheduled = true;
+  QTimer::singleShot(50, this,
+                     &ComponentSymbolVariantEditDialog::updatePreview);
+}
+
+void ComponentSymbolVariantEditDialog::schedulePreviewTextsUpdate() noexcept {
+  // The signal may be emitted many times for a single change, thus only
+  // scheduling the update to execute it only once.
+  mPreviewTextsUpdateScheduled = true;
+  QTimer::singleShot(50, this,
+                     &ComponentSymbolVariantEditDialog::updatePreview);
+}
+
+void ComponentSymbolVariantEditDialog::updatePreview() noexcept {
+  if (mPreviewUpdateScheduled) {
+    mPreviewUpdateScheduled = false;
+    mPreviewTextsUpdateScheduled = false;
+    mGraphicsItems.clear();
+    mSymbols.clear();
+    for (const ComponentSymbolVariantItem& item : mSymbVar.getSymbolItems()) {
+      try {
+        FilePath fp = mWorkspace.getLibraryDb().getLatest<Symbol>(
+            item.getSymbolUuid());  // can throw
+        std::shared_ptr<Symbol> sym = std::make_shared<Symbol>(
+            std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+                TransactionalFileSystem::openRO(fp))));  // can throw
+        mSymbols.append(sym);
+
+        std::shared_ptr<SymbolGraphicsItem> graphicsItem =
+            std::make_shared<SymbolGraphicsItem>(
+                *sym, *mGraphicsLayerProvider, mComponent,
+                mSymbVar.getSymbolItems().get(item.getUuid()),
+                mWorkspace.getSettings().libraryLocaleOrder.get());
+        graphicsItem->setPosition(item.getSymbolPosition());
+        graphicsItem->setRotation(item.getSymbolRotation());
+        mGraphicsScene->addItem(*graphicsItem);
+        mGraphicsItems.append(graphicsItem);
+      } catch (const Exception& e) {
+        // what could we do here? ;)
+      }
     }
+    mUi->graphicsView->zoomAll();
+  } else if (mPreviewTextsUpdateScheduled) {
+    mPreviewTextsUpdateScheduled = false;
+    foreach (auto item, mGraphicsItems) { item->updateAllTexts(); }
   }
-  mUi->graphicsView->zoomAll();
 }
 
 /*******************************************************************************

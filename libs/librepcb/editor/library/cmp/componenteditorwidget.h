@@ -32,6 +32,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -77,7 +79,7 @@ private:  // Methods
   void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
   bool openComponentSymbolVariantEditor(
-      ComponentSymbolVariant& variant) noexcept override;
+      std::shared_ptr<ComponentSymbolVariant> variant) noexcept override;
   void memorizeComponentInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;
   bool runChecks(LibraryElementCheckMessageList& msgs) const override;
@@ -93,7 +95,7 @@ private:  // Methods
 private:  // Data
   QScopedPointer<Ui::ComponentEditorWidget> mUi;
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
-  QSharedPointer<Component> mComponent;
+  std::shared_ptr<Component> mComponent;
 
   // broken interface detection
   bool mOriginalIsSchematicOnly;

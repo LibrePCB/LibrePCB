@@ -308,13 +308,9 @@ add_library(
   library/sym/symbolgraphicsitem.h
   library/sym/symbolpingraphicsitem.cpp
   library/sym/symbolpingraphicsitem.h
-  library/sym/symbolpinpreviewgraphicsitem.cpp
-  library/sym/symbolpinpreviewgraphicsitem.h
   library/sym/symbolpinpropertiesdialog.cpp
   library/sym/symbolpinpropertiesdialog.h
   library/sym/symbolpinpropertiesdialog.ui
-  library/sym/symbolpreviewgraphicsitem.cpp
-  library/sym/symbolpreviewgraphicsitem.h
   modelview/angledelegate.cpp
   modelview/angledelegate.h
   modelview/attributelistmodel.cpp

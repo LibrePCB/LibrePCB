@@ -133,14 +133,14 @@ void ComponentSymbolVariantListWidget::viewDoubleClicked(
 void ComponentSymbolVariantListWidget::editVariant(const Uuid& uuid) noexcept {
   try {
     auto variant = mSymbolVariantList->get(uuid);
-    ComponentSymbolVariant copy(*variant);
+    auto copy = std::make_shared<ComponentSymbolVariant>(*variant);
     if (mEditorProvider->openComponentSymbolVariantEditor(copy)) {
       QScopedPointer<CmdComponentSymbolVariantEdit> cmd(
           new CmdComponentSymbolVariantEdit(*variant));
-      cmd->setNorm(copy.getNorm());
-      cmd->setNames(copy.getNames());
-      cmd->setDescriptions(copy.getDescriptions());
-      cmd->setSymbolItems(copy.getSymbolItems());
+      cmd->setNorm(copy->getNorm());
+      cmd->setNames(copy->getNames());
+      cmd->setDescriptions(copy->getDescriptions());
+      cmd->setSymbolItems(copy->getSymbolItems());
       mUndoStack->execCmd(cmd.take());
     }
   } catch (const Exception& e) {
