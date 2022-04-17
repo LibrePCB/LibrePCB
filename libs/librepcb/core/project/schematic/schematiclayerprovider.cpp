@@ -53,14 +53,6 @@ SchematicLayerProvider::SchematicLayerProvider(Project& project)
   addLayer(GraphicsLayer::sSchematicDocumentation);
   addLayer(GraphicsLayer::sSchematicComments);
   addLayer(GraphicsLayer::sSchematicGuide);
-#ifdef QT_DEBUG
-  addLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  addLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
-  addLayer(GraphicsLayer::sDebugSymbolPinNetSignalNames);
-  addLayer(GraphicsLayer::sDebugNetLinesNetSignalNames);
-  addLayer(GraphicsLayer::sDebugInvisibleNetPoints);
-  addLayer(GraphicsLayer::sDebugComponentSymbolsCounts);
-#endif
 }
 
 SchematicLayerProvider::~SchematicLayerProvider() noexcept {

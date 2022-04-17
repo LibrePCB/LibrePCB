@@ -101,28 +101,6 @@ void SGI_NetLine::paint(QPainter* painter,
     painter->setPen(pen);
     painter->drawLine(mLineF);
   }
-
-#ifdef QT_DEBUG
-  GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugNetLinesNetSignalNames);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw net signal name
-    QFont font = qApp->getDefaultMonospaceFont();
-    font.setPixelSize(3);
-    painter->setFont(font);
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->drawText(mLineF.pointAt((qreal)0.5),
-                      *mNetLine.getNetSignalOfNetSegment().getName());
-  }
-  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(mBoundingRect);
-  }
-#endif
 }
 
 /*******************************************************************************

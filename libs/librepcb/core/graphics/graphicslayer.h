@@ -124,16 +124,6 @@ public:
   //static constexpr const char* sInnerCopper#            = "in#_cu";
   static constexpr const char* sBotCopper               = "bot_cu";
 
-#ifdef QT_DEBUG
-  // debug layers
-  static constexpr const char* sDebugGraphicsItemsBoundingRects       = "dbg_GraphicsItemsBoundingRects";
-  static constexpr const char* sDebugGraphicsItemsTextsBoundingRects  = "dbg_GraphicsItemsTextsBoundingRects";
-  static constexpr const char* sDebugSymbolPinNetSignalNames          = "dbg_SymbolPinNetSignalNames";
-  static constexpr const char* sDebugNetLinesNetSignalNames           = "dbg_NetLinesNetSignalNames";
-  static constexpr const char* sDebugInvisibleNetPoints               = "dbg_InvisibleNetPoints";
-  static constexpr const char* sDebugComponentSymbolsCounts           = "dbg_ComponentSymbolsCounts";
-#endif
-
   // clang-format on
 
   // Signals

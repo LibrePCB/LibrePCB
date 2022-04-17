@@ -155,25 +155,6 @@ void SGI_NetLabel::paint(QPainter* painter,
     painter->setBrush(QBrush(layer->getColor(highlight), Qt::Dense5Pattern));
     painter->drawRect(mBoundingRect);
   }
-
-#ifdef QT_DEBUG
-  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(mBoundingRect);
-  }
-  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw text bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(QRectF(mTextOrigin, mStaticText.size()));
-  }
-#endif
 }
 
 /*******************************************************************************

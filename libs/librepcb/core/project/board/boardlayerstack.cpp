@@ -169,12 +169,6 @@ void BoardLayerStack::addAllLayers() noexcept {
   addLayer(GraphicsLayer::sBoardDocumentation);
   addLayer(GraphicsLayer::sBoardComments);
   addLayer(GraphicsLayer::sBoardGuide);
-
-#ifdef QT_DEBUG
-  // debug layers
-  addLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  addLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
-#endif
 }
 
 void BoardLayerStack::addLayer(const QString& name, bool disable) noexcept {

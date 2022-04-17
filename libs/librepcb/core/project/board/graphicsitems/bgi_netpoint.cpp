@@ -97,27 +97,9 @@ void BGI_NetPoint::updateCacheAndRepaint() noexcept {
 void BGI_NetPoint::paint(QPainter* painter,
                          const QStyleOptionGraphicsItem* option,
                          QWidget* widget) {
+  Q_UNUSED(painter);
   Q_UNUSED(option);
   Q_UNUSED(widget);
-
-  const NetSignal* netsignal = mNetPoint.getNetSegment().getNetSignal();
-  bool highlight =
-      mNetPoint.isSelected() || (netsignal && netsignal->isHighlighted());
-
-#ifdef QT_DEBUG
-  GraphicsLayer* layer =
-      getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(boundingRect());
-  }
-#else
-  Q_UNUSED(highlight);
-  Q_UNUSED(painter);
-#endif
 }
 
 /*******************************************************************************

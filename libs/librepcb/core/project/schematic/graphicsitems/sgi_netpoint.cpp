@@ -103,25 +103,6 @@ void SGI_NetPoint::paint(QPainter* painter,
     painter->drawLine(sBoundingRect.topRight() / 2,
                       sBoundingRect.bottomLeft() / 2);
   }
-
-#ifdef QT_DEBUG
-  GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugInvisibleNetPoints);
-  Q_ASSERT(layer);
-  if ((layer->isVisible()) && (!mIsVisibleJunction)) {
-    // draw circle
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawEllipse(sBoundingRect);
-  }
-  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(sBoundingRect);
-  }
-#endif
 }
 
 /*******************************************************************************

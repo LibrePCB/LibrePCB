@@ -176,19 +176,6 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
       foreach (const QPainterPath& area, mAreas) { painter->drawPath(area); }
     }
   }
-
-#ifdef QT_DEBUG
-  // draw bounding rect
-  const GraphicsLayer* layer = mPlane.getBoard().getLayerStack().getLayer(
-      GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  if (layer) {
-    if (layer->isVisible()) {
-      painter->setPen(QPen(layer->getColor(selected), 0));
-      painter->setBrush(Qt::NoBrush);
-      painter->drawRect(mBoundingRect);
-    }
-  }
-#endif
 }
 
 /*******************************************************************************

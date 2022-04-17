@@ -222,18 +222,6 @@ void BGI_Footprint::paint(QPainter* painter,
       painter->drawLine(0, -width, 0, width);
     }
   }
-
-#ifdef QT_DEBUG
-  // draw bounding rect
-  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  if (layer) {
-    if (layer->isVisible()) {
-      painter->setPen(QPen(layer->getColor(selected), 0));
-      painter->setBrush(Qt::NoBrush);
-      painter->drawRect(mBoundingRect);
-    }
-  }
-#endif
 }
 
 /*******************************************************************************
