@@ -97,8 +97,7 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) {
   }
 
   mGraphicsItem.reset(new SGI_Symbol(*this));
-  mGraphicsItem->setPos(mPosition.toPxQPointF());
-  updateGraphicsItemTransform();
+  mGraphicsItem->setPosition(mPosition);
 
   for (const SymbolPin& libPin : mSymbol->getPins()) {
     SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin.getUuid());  // can throw
@@ -121,15 +120,15 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) {
   // connect to the "attributes changes" signal of schematic and component
   // instance
   connect(mComponentInstance, &ComponentInstance::attributesChanged, this,
-          &SI_Symbol::schematicOrComponentAttributesChanged);
+          [this]() { mGraphicsItem->updateAllTexts(); });
 
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 SI_Symbol::~SI_Symbol() noexcept {
+  mGraphicsItem.reset();
   qDeleteAll(mPins);
   mPins.clear();
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
@@ -155,8 +154,7 @@ QRectF SI_Symbol::getBoundingRect() const noexcept {
 void SI_Symbol::setPosition(const Point& newPos) noexcept {
   if (newPos != mPosition) {
     mPosition = newPos;
-    mGraphicsItem->setPos(newPos.toPxQPointF());
-    mGraphicsItem->updateCacheAndRepaint();
+    mGraphicsItem->setPosition(newPos);
     foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(); }
   }
 }
@@ -164,8 +162,7 @@ void SI_Symbol::setPosition(const Point& newPos) noexcept {
 void SI_Symbol::setRotation(const Angle& newRotation) noexcept {
   if (newRotation != mRotation) {
     mRotation = newRotation;
-    updateGraphicsItemTransform();
-    mGraphicsItem->updateCacheAndRepaint();
+    mGraphicsItem->updateRotationAndMirror();
     foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(); }
   }
 }
@@ -173,8 +170,7 @@ void SI_Symbol::setRotation(const Angle& newRotation) noexcept {
 void SI_Symbol::setMirrored(bool newMirrored) noexcept {
   if (newMirrored != mMirrored) {
     mMirrored = newMirrored;
-    updateGraphicsItemTransform();
-    mGraphicsItem->updateCacheAndRepaint();
+    mGraphicsItem->updateRotationAndMirror();
     foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(); }
   }
 }
@@ -255,28 +251,13 @@ QPainterPath SI_Symbol::getGrabAreaScenePx() const noexcept {
 
 void SI_Symbol::setSelected(bool selected) noexcept {
   SI_Base::setSelected(selected);
-  mGraphicsItem->update();
+  mGraphicsItem->setSelected(selected);
   foreach (SI_SymbolPin* pin, mPins) { pin->setSelected(selected); }
-}
-
-/*******************************************************************************
- *  Private Slots
- ******************************************************************************/
-
-void SI_Symbol::schematicOrComponentAttributesChanged() {
-  mGraphicsItem->updateCacheAndRepaint();
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void SI_Symbol::updateGraphicsItemTransform() noexcept {
-  QTransform t;
-  if (mMirrored) t.scale(qreal(-1), qreal(1));
-  t.rotate(-mRotation.toDeg());
-  mGraphicsItem->setTransform(t);
-}
 
 bool SI_Symbol::checkAttributesValidity() const noexcept {
   if (mSymbVarItem == nullptr) return false;
