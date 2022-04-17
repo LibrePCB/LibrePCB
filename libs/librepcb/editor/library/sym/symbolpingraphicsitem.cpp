@@ -26,6 +26,7 @@
 #include <librepcb/core/graphics/linegraphicsitem.h>
 #include <librepcb/core/graphics/primitivecirclegraphicsitem.h>
 #include <librepcb/core/graphics/primitivetextgraphicsitem.h>
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -43,11 +44,16 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SymbolPinGraphicsItem::SymbolPinGraphicsItem(std::shared_ptr<SymbolPin> pin,
-                                             const IF_GraphicsLayerProvider& lp,
-                                             QGraphicsItem* parent) noexcept
+SymbolPinGraphicsItem::SymbolPinGraphicsItem(
+    std::shared_ptr<SymbolPin> pin, const IF_GraphicsLayerProvider& lp,
+    std::shared_ptr<const Component> cmp,
+    std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
+    QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
     mPin(pin),
+    mLayerProvider(lp),
+    mComponent(cmp),
+    mItem(cmpItem),
     mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
     mLineGraphicsItem(new LineGraphicsItem(this)),
     mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
@@ -75,12 +81,12 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(std::shared_ptr<SymbolPin> pin,
   mTextGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinNames));
   mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   updateTextRotationAndAlignment();
+  updateText();
 
   // pin properties
   setPosition(mPin->getPosition());
   setRotation(mPin->getRotation());
   setLength(mPin->getLength());
-  setName(mPin->getName());
 
   // Register to the pin to get notified about any modifications.
   mPin->onEdited.attach(mOnEditedSlot);
@@ -107,6 +113,54 @@ void SymbolPinGraphicsItem::setSelected(bool selected) noexcept {
   mLineGraphicsItem->setSelected(selected);
   mTextGraphicsItem->setSelected(selected);
   QGraphicsItem::setSelected(selected);
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void SymbolPinGraphicsItem::updateText() noexcept {
+  QString text;
+  if (mItem) {
+    if (auto i = mItem->getPinSignalMap().find(mPin->getUuid())) {
+      auto signal = (mComponent && i->getSignalUuid())
+          ? mComponent->getSignals().find(*i->getSignalUuid())
+          : nullptr;
+      if (signal && signal->isRequired()) {
+        mCircleGraphicsItem->setLineLayer(
+            mLayerProvider.getLayer(GraphicsLayer::sSymbolPinCirclesReq));
+      } else if (signal && (!signal->isRequired())) {
+        mCircleGraphicsItem->setLineLayer(
+            mLayerProvider.getLayer(GraphicsLayer::sSymbolPinCirclesOpt));
+      } else {
+        mCircleGraphicsItem->setLineLayer(nullptr);
+      }
+      if (i->getDisplayType() == CmpSigPinDisplayType::none()) {
+        // Nothing to do, leave text empty.
+      } else if (i->getDisplayType() == CmpSigPinDisplayType::pinName()) {
+        text = *mPin->getName();
+      } else if (i->getDisplayType() ==
+                 CmpSigPinDisplayType::componentSignal()) {
+        if (signal) {
+          text = *signal->getName();
+        }
+      } else if (i->getDisplayType() == CmpSigPinDisplayType::netSignal()) {
+        if (signal && (!signal->getForcedNetName().isEmpty())) {
+          text = signal->getForcedNetName();
+        } else {
+          text = "(NET)";
+        }
+      } else {
+        qCritical() << "SymbolPinGraphicsItem: Unknown pin display type!";
+      }
+    } else {
+      qCritical() << "SymbolPinGraphicsItem: Pin not found in pin-signal map!";
+    }
+  } else {
+    text = *mPin->getName();
+  }
+  setToolTip(text);
+  mTextGraphicsItem->setText(text);
 }
 
 /*******************************************************************************
@@ -137,7 +191,7 @@ void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
     case SymbolPin::Event::UuidChanged:
       break;
     case SymbolPin::Event::NameChanged:
-      setName(pin.getName());
+      updateText();
       break;
     case SymbolPin::Event::PositionChanged:
       setPosition(pin.getPosition());
@@ -158,11 +212,6 @@ void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
 void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept {
   mLineGraphicsItem->setLine(Point(0, 0), Point(*length, 0));
   mTextGraphicsItem->setPosition(mPin->getNamePosition());
-}
-
-void SymbolPinGraphicsItem::setName(const CircuitIdentifier& name) noexcept {
-  setToolTip(*name);
-  mTextGraphicsItem->setText(*name);
 }
 
 void SymbolPinGraphicsItem::updateTextRotationAndAlignment() noexcept {

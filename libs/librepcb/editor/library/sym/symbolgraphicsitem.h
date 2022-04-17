@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/attribute/attributeprovider.h>
+#include <librepcb/core/library/cmp/componentsymbolvariantitem.h>
 #include <librepcb/core/library/sym/symbol.h>
 
 #include <QtCore>
@@ -36,6 +38,7 @@
 namespace librepcb {
 
 class CircleGraphicsItem;
+class Component;
 class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem;
 class TextGraphicsItem;
@@ -51,13 +54,17 @@ class SymbolPinGraphicsItem;
 /**
  * @brief The SymbolGraphicsItem class
  */
-class SymbolGraphicsItem final : public QGraphicsItem {
+class SymbolGraphicsItem final : public QGraphicsItem,
+                                 public AttributeProvider {
 public:
   // Constructors / Destructor
   SymbolGraphicsItem() = delete;
   SymbolGraphicsItem(const SymbolGraphicsItem& other) = delete;
-  SymbolGraphicsItem(Symbol& symbol,
-                     const IF_GraphicsLayerProvider& lp) noexcept;
+  SymbolGraphicsItem(
+      Symbol& symbol, const IF_GraphicsLayerProvider& lp,
+      std::shared_ptr<const Component> cmp = nullptr,
+      std::shared_ptr<const ComponentSymbolVariantItem> cmpItem = nullptr,
+      const QStringList& localeOrder = {}) noexcept;
   ~SymbolGraphicsItem() noexcept;
 
   // Getters
@@ -92,6 +99,7 @@ public:
   void setRotation(const Angle& rot) noexcept;
 
   // General Methods
+  void updateAllTexts() noexcept;
   void setSelectionRect(const QRectF rect) noexcept;
 
   // Inherited from QGraphicsItem
@@ -103,16 +111,23 @@ public:
   // Operator Overloadings
   SymbolGraphicsItem& operator=(const SymbolGraphicsItem& rhs) = delete;
 
+signals:
+  void attributesChanged() override {}
+
 private:  // Methods
   void syncPins() noexcept;
   void syncCircles() noexcept;
   void syncPolygons() noexcept;
   void syncTexts() noexcept;
   void symbolEdited(const Symbol& symbol, Symbol::Event event) noexcept;
+  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 private:  // Data
   Symbol& mSymbol;
   const IF_GraphicsLayerProvider& mLayerProvider;
+  std::shared_ptr<const Component> mComponent;  // Can be nullptr.
+  std::shared_ptr<const ComponentSymbolVariantItem> mItem;  // Can be nullptr.
+  QStringList mLocaleOrder;
   QMap<std::shared_ptr<SymbolPin>, std::shared_ptr<SymbolPinGraphicsItem>>
       mPinGraphicsItems;
   QMap<std::shared_ptr<Circle>, std::shared_ptr<CircleGraphicsItem>>

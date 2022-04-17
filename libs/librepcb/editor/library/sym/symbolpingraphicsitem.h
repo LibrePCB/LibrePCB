@@ -33,6 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Component;
+class ComponentSymbolVariantItem;
 class IF_GraphicsLayerProvider;
 class LineGraphicsItem;
 class PrimitiveCircleGraphicsItem;
@@ -52,9 +54,11 @@ public:
   // Constructors / Destructor
   SymbolPinGraphicsItem() = delete;
   SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other) = delete;
-  SymbolPinGraphicsItem(std::shared_ptr<SymbolPin> pin,
-                        const IF_GraphicsLayerProvider& lp,
-                        QGraphicsItem* parent = nullptr) noexcept;
+  SymbolPinGraphicsItem(
+      std::shared_ptr<SymbolPin> pin, const IF_GraphicsLayerProvider& lp,
+      std::shared_ptr<const Component> cmp = nullptr,
+      std::shared_ptr<const ComponentSymbolVariantItem> cmpItem = nullptr,
+      QGraphicsItem* parent = nullptr) noexcept;
   ~SymbolPinGraphicsItem() noexcept;
 
   // Getters
@@ -64,6 +68,9 @@ public:
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
   void setSelected(bool selected) noexcept;
+
+  // General Methods
+  void updateText() noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return QRectF(); }
@@ -77,11 +84,13 @@ public:
 private:  // Methods
   void pinEdited(const SymbolPin& pin, SymbolPin::Event event) noexcept;
   void setLength(const UnsignedLength& length) noexcept;
-  void setName(const CircuitIdentifier& name) noexcept;
   void updateTextRotationAndAlignment() noexcept;
 
 private:  // Data
   std::shared_ptr<SymbolPin> mPin;
+  const IF_GraphicsLayerProvider& mLayerProvider;
+  std::shared_ptr<const Component> mComponent;  // Can be nullptr.
+  std::shared_ptr<const ComponentSymbolVariantItem> mItem;  // Can be nullptr.
   QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;

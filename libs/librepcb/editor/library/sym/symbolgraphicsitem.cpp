@@ -27,6 +27,7 @@
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/textgraphicsitem.h>
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
@@ -45,10 +46,16 @@ namespace editor {
  ******************************************************************************/
 
 SymbolGraphicsItem::SymbolGraphicsItem(
-    Symbol& symbol, const IF_GraphicsLayerProvider& lp) noexcept
+    Symbol& symbol, const IF_GraphicsLayerProvider& lp,
+    std::shared_ptr<const Component> cmp,
+    std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
+    const QStringList& localeOrder) noexcept
   : QGraphicsItem(nullptr),
     mSymbol(symbol),
     mLayerProvider(lp),
+    mComponent(cmp),
+    mItem(cmpItem),
+    mLocaleOrder(localeOrder),
     mOnEditedSlot(*this, &SymbolGraphicsItem::symbolEdited) {
   syncPins();
   syncCircles();
@@ -167,6 +174,11 @@ void SymbolGraphicsItem::setRotation(const Angle& rot) noexcept {
   QGraphicsItem::setRotation(-rot.toDeg());
 }
 
+void SymbolGraphicsItem::updateAllTexts() noexcept {
+  foreach (const auto& ptr, mPinGraphicsItems) { ptr->updateText(); }
+  foreach (const auto& ptr, mTextGraphicsItems) { ptr->updateText(); }
+}
+
 void SymbolGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
   QPainterPath path;
   path.addRect(rect);
@@ -220,8 +232,8 @@ void SymbolGraphicsItem::syncPins() noexcept {
   for (auto& obj : mSymbol.getPins().values()) {
     if (!mPinGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i =
-          std::make_shared<SymbolPinGraphicsItem>(obj, mLayerProvider, this);
+      auto i = std::make_shared<SymbolPinGraphicsItem>(obj, mLayerProvider,
+                                                       mComponent, mItem, this);
       mPinGraphicsItems.insert(obj, i);
     }
   }
@@ -292,6 +304,9 @@ void SymbolGraphicsItem::syncTexts() noexcept {
     if (!mTextGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
       auto i = std::make_shared<TextGraphicsItem>(*obj, mLayerProvider, this);
+      if (mComponent) {
+        i->setAttributeProvider(this);
+      }
       mTextGraphicsItems.insert(obj, i);
     }
   }
@@ -315,6 +330,24 @@ void SymbolGraphicsItem::symbolEdited(const Symbol& symbol,
       break;
     default:
       break;
+  }
+}
+
+QString SymbolGraphicsItem::getBuiltInAttributeValue(const QString& key) const
+    noexcept {
+  if (mComponent && (key == "COMPONENT")) {
+    return *mComponent->getNames().value(mLocaleOrder);
+  } else if (mComponent && mItem && (key == "NAME")) {
+    return *mComponent->getPrefixes().value(mLocaleOrder) % "?" %
+        *mItem->getSuffix();
+  } else {
+    // If an attribute is not defined, return its key. This makes sure that
+    // e.g.  in a schematic frame the texts like "{{FIELD_SHEET}}" are visible
+    // as "FIELD_SHEET" instead of completely missing text. Same applies to the
+    // "{{VALUE}}" text - it's almost impossible to automatically substitute it
+    // by a reasonable value (e.g. the component's default value) so let's
+    // simply display "VALUE".
+    return key;
   }
 }
 
