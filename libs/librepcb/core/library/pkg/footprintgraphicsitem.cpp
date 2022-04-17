@@ -261,6 +261,7 @@ void FootprintGraphicsItem::addPolygon(Polygon& polygon) noexcept {
   Q_ASSERT(!mPolygonGraphicsItems.contains(&polygon));
   QSharedPointer<PolygonGraphicsItem> item(
       new PolygonGraphicsItem(polygon, mLayerProvider, this));
+  item->setEditable(true);
   mPolygonGraphicsItems.insert(&polygon, item);
 }
 

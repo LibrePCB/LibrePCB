@@ -70,6 +70,7 @@ BI_Polygon::BI_Polygon(Board& board, const Uuid& uuid,
 void BI_Polygon::init() {
   mGraphicsItem.reset(
       new PolygonGraphicsItem(*mPolygon, mBoard.getLayerStack()));
+  mGraphicsItem->setEditable(true);
   mGraphicsItem->setZValue(Board::ZValue_Default);
 
   // connect to the "attributes changed" signal of the board

@@ -42,6 +42,7 @@ PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
   : PrimitivePathGraphicsItem(parent),
     mPolygon(polygon),
     mLayerProvider(lp),
+    mEditable(false),
     mOnEditedSlot(*this, &PolygonGraphicsItem::polygonEdited) {
   setPath(mPolygon.getPath().toQPainterPathPx());
   setLineWidth(mPolygon.getLineWidth());
@@ -95,6 +96,11 @@ QVector<int> PolygonGraphicsItem::getVertexIndicesAtPosition(
     }
   }
   return indices;
+}
+
+void PolygonGraphicsItem::setEditable(bool editable) noexcept {
+  mEditable = editable;
+  updateVertexGraphicsItems();
 }
 
 QVariant PolygonGraphicsItem::itemChange(GraphicsItemChange change,
@@ -151,6 +157,11 @@ void PolygonGraphicsItem::updateFillLayer() noexcept {
 }
 
 void PolygonGraphicsItem::updateVertexGraphicsItems() noexcept {
+  if (!mEditable) {
+    mVertexGraphicsItems.clear();
+    return;
+  }
+
   const Path& path = mPolygon.getPath();
 
   while (mVertexGraphicsItems.count() < path.getVertices().count()) {
