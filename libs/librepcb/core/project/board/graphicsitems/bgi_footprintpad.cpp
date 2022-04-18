@@ -35,7 +35,6 @@
 #include "../items/bi_footprint.h"
 #include "../items/bi_footprintpad.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -184,19 +183,6 @@ void BGI_FootprintPad::paint(QPainter* painter,
     painter->setBrush(mTopCreamMaskLayer->getColor(highlight));
     painter->drawPath(mCreamMask);
   }
-
-#ifdef QT_DEBUG
-  GraphicsLayer* layer =
-      getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  if (layer) {
-    if (layer->isVisible()) {
-      // draw bounding rect
-      painter->setPen(QPen(layer->getColor(highlight), 0));
-      painter->setBrush(Qt::NoBrush);
-      painter->drawRect(mBoundingRect);
-    }
-  }
-#endif
 }
 
 /*******************************************************************************

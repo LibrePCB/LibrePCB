@@ -37,11 +37,11 @@
 namespace librepcb {
 
 class Symbol;
-class SymbolGraphicsItem;
 
 namespace editor {
 
 class SymbolClipboardData;
+class SymbolGraphicsItem;
 
 /*******************************************************************************
  *  Class CmdPasteSymbolItems

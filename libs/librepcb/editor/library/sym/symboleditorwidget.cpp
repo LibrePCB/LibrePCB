@@ -30,6 +30,7 @@
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdsymbolpinedit.h"
 #include "fsm/symboleditorfsm.h"
+#include "symbolgraphicsitem.h"
 #include "ui_symboleditorwidget.h"
 
 #include <librepcb/core/graphics/circlegraphicsitem.h>
@@ -44,7 +45,6 @@
 #include <librepcb/core/library/sym/msg/msgsymbolpinnotongrid.h>
 #include <librepcb/core/library/sym/msg/msgwrongsymboltextlayer.h>
 #include <librepcb/core/library/sym/symbol.h>
-#include <librepcb/core/library/sym/symbolgraphicsitem.h>
 #include <librepcb/core/library/sym/symbolpainter.h>
 #include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>

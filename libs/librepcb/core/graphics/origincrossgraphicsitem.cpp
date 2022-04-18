@@ -25,7 +25,6 @@
 #include "../types/angle.h"
 #include "../types/point.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -42,7 +41,6 @@ OriginCrossGraphicsItem::OriginCrossGraphicsItem(QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
     mLayer(nullptr),
     mSize(0),
-    mVisibleInPrintOutput(false),  // don't show origin crosses by default
     mOnLayerEditedSlot(*this, &OriginCrossGraphicsItem::layerEdited) {
   mPen.setWidth(0);
   mPenHighlighted.setWidth(0);
@@ -89,11 +87,6 @@ void OriginCrossGraphicsItem::setLayer(const GraphicsLayer* layer) noexcept {
   }
 }
 
-void OriginCrossGraphicsItem::setVisibleInPrintOutput(bool visible) noexcept {
-  mVisibleInPrintOutput = visible;
-  update();
-}
-
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
@@ -104,23 +97,8 @@ void OriginCrossGraphicsItem::paint(QPainter* painter,
   Q_UNUSED(widget);
 
   const bool isSelected = option->state.testFlag(QStyle::State_Selected);
-  const bool deviceIsPrinter =
-      (dynamic_cast<QPrinter*>(painter->device()) != nullptr);
 
-  if (deviceIsPrinter && (!mVisibleInPrintOutput)) {
-    return;
-  }
-
-  QPen pen = isSelected ? mPenHighlighted : mPen;
-
-  // When printing, enforce a minimum line width to make sure the line will be
-  // visible (too thin lines will not be visible).
-  qreal minPrintLineWidth = Length(100000).toPx();
-  if (deviceIsPrinter && (pen.widthF() < minPrintLineWidth)) {
-    pen.setWidthF(minPrintLineWidth);
-  }
-
-  painter->setPen(pen);
+  painter->setPen(isSelected ? mPenHighlighted : mPen);
   painter->drawLine(mLineH);
   painter->drawLine(mLineV);
 }

@@ -28,7 +28,6 @@
 #include "../schematic.h"
 #include "../schematiclayerprovider.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -86,8 +85,6 @@ void SGI_NetPoint::paint(QPainter* painter,
   Q_UNUSED(option);
   Q_UNUSED(widget);
 
-  const bool deviceIsPrinter =
-      (dynamic_cast<QPrinter*>(painter->device()) != 0);
   bool highlight = mNetPoint.isSelected() ||
       mNetPoint.getNetSignalOfNetSegment().isHighlighted();
 
@@ -95,7 +92,7 @@ void SGI_NetPoint::paint(QPainter* painter,
     painter->setPen(Qt::NoPen);
     painter->setBrush(QBrush(mLayer->getColor(highlight), Qt::SolidPattern));
     painter->drawEllipse(sBoundingRect);
-  } else if (mLayer->isVisible() && mIsOpenLineEnd && !deviceIsPrinter) {
+  } else if (mLayer->isVisible() && mIsOpenLineEnd) {
     painter->setPen(QPen(mLayer->getColor(highlight), 0));
     painter->setBrush(Qt::NoBrush);
     painter->drawLine(sBoundingRect.topLeft() / 2,
@@ -103,25 +100,6 @@ void SGI_NetPoint::paint(QPainter* painter,
     painter->drawLine(sBoundingRect.topRight() / 2,
                       sBoundingRect.bottomLeft() / 2);
   }
-
-#ifdef QT_DEBUG
-  GraphicsLayer* layer = getLayer(GraphicsLayer::sDebugInvisibleNetPoints);
-  Q_ASSERT(layer);
-  if ((layer->isVisible()) && (!mIsVisibleJunction)) {
-    // draw circle
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawEllipse(sBoundingRect);
-  }
-  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(sBoundingRect);
-  }
-#endif
 }
 
 /*******************************************************************************

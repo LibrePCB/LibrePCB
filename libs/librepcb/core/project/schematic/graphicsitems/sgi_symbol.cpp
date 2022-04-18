@@ -22,18 +22,19 @@
  ******************************************************************************/
 #include "sgi_symbol.h"
 
-#include "../../../application.h"
 #include "../../../attribute/attributesubstitutor.h"
-#include "../../../library/cmp/component.h"
 #include "../../../library/sym/symbol.h"
 #include "../../../utils/toolbox.h"
-#include "../../circuit/componentinstance.h"
+#include "../../../utils/transform.h"
 #include "../../project.h"
 #include "../items/si_symbol.h"
-#include "../schematic.h"
 #include "../schematiclayerprovider.h"
 
-#include <QPrinter>
+#include <librepcb/core/graphics/circlegraphicsitem.h>
+#include <librepcb/core/graphics/origincrossgraphicsitem.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/graphics/primitivetextgraphicsitem.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -47,12 +48,62 @@ namespace librepcb {
  ******************************************************************************/
 
 SGI_Symbol::SGI_Symbol(SI_Symbol& symbol) noexcept
-  : SGI_Base(), mSymbol(symbol), mLibSymbol(symbol.getLibSymbol()) {
+  : SGI_Base(), mSymbol(symbol) {
+  setFlag(QGraphicsItem::ItemHasNoContents, false);
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(Schematic::ZValue_Symbols);
 
-  mFont = qApp->getDefaultSansSerifFont();
+  mOriginCrossGraphicsItem = std::make_shared<OriginCrossGraphicsItem>(this);
+  mOriginCrossGraphicsItem->setSize(UnsignedLength(1400000));
+  mOriginCrossGraphicsItem->setLayer(mSymbol.getProject().getLayers().getLayer(
+      GraphicsLayer::sSchematicReferences));
+  mShape.addRect(mOriginCrossGraphicsItem->boundingRect());
 
-  updateCacheAndRepaint();
+  for (auto& obj : mSymbol.getLibSymbol().getCircles().values()) {
+    Q_ASSERT(obj);
+    auto i = std::make_shared<CircleGraphicsItem>(
+        *obj, mSymbol.getProject().getLayers(), this);
+    i->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    if (obj->isGrabArea()) {
+      const qreal r = (obj->getDiameter() + obj->getLineWidth())->toPx() / 2;
+      QPainterPath path;
+      path.addEllipse(obj->getCenter().toPxQPointF(), r, r);
+      mShape |= path;
+    }
+    mCircleGraphicsItems.append(i);
+  }
+
+  for (auto& obj : mSymbol.getLibSymbol().getPolygons().values()) {
+    Q_ASSERT(obj);
+    auto i = std::make_shared<PolygonGraphicsItem>(
+        *obj, mSymbol.getProject().getLayers(), this);
+    i->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    if (obj->isGrabArea()) {
+      mShape |= Toolbox::shapeFromPath(obj->getPath().toQPainterPathPx(),
+                                       Qt::SolidLine, Qt::SolidPattern,
+                                       obj->getLineWidth());
+    }
+    mPolygonGraphicsItems.append(i);
+  }
+
+  for (auto& obj : mSymbol.getLibSymbol().getTexts().values()) {
+    Q_ASSERT(obj);
+    auto i = std::make_shared<PrimitiveTextGraphicsItem>(this);
+    i->setPosition(obj->getPosition());
+    i->setHeight(obj->getHeight());
+    i->setLayer(
+        mSymbol.getProject().getLayers().getLayer(*obj->getLayerName()));
+    i->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
+    i->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    mTextGraphicsItems.append(i);
+  }
+
+  mBoundingRect = mShape.boundingRect();
+  updateRotationAndMirror();
+  updateAllTexts();
 }
 
 SGI_Symbol::~SGI_Symbol() noexcept {
@@ -62,112 +113,59 @@ SGI_Symbol::~SGI_Symbol() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void SGI_Symbol::updateCacheAndRepaint() noexcept {
-  prepareGeometryChange();
+void SGI_Symbol::setPosition(const Point& pos) noexcept {
+  QGraphicsItem::setPos(pos.toPxQPointF());
+}
 
-  mBoundingRect = QRectF();
+void SGI_Symbol::updateRotationAndMirror() noexcept {
+  QTransform t;
+  if (mSymbol.getMirrored()) t.scale(qreal(-1), qreal(1));
+  const QTransform revertMirrorTransform = t;
+  t.rotate(-mSymbol.getRotation().toDeg());
+  setTransform(t);
 
-  mShape = QPainterPath();
-  mShape.setFillRule(Qt::WindingFill);
-
-  // cross rect
-  QRectF crossRect(-4, -4, 8, 8);
-  mBoundingRect = mBoundingRect.united(crossRect);
-  mShape.addRect(crossRect);
-
-  // polygons
-  for (const Polygon& polygon : mLibSymbol.getPolygons()) {
-    // query polygon path and line width
-    QPainterPath polygonPath = polygon.getPath().toQPainterPathPx();
-    qreal w = polygon.getLineWidth()->toPx() / 2;
-
-    // update bounding rectangle
-    mBoundingRect =
-        mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
-
-    // update shape
-    if (polygon.isGrabArea()) {
-      QPainterPathStroker stroker;
-      stroker.setCapStyle(Qt::RoundCap);
-      stroker.setJoinStyle(Qt::RoundJoin);
-      stroker.setWidth(2 * w);
-      // add polygon area
-      mShape = mShape.united(polygonPath);
-      // add stroke area
-      mShape = mShape.united(stroker.createStroke(polygonPath));
+  for (int i = 0; i < std::min(mSymbol.getLibSymbol().getTexts().count(),
+                               mTextGraphicsItems.count());
+       ++i) {
+    const auto text = mSymbol.getLibSymbol().getTexts().at(i);
+    Q_ASSERT(text);
+    auto item = mTextGraphicsItems.at(i);
+    Q_ASSERT(item);
+    item->setTransform(revertMirrorTransform);
+    Transform transform(mSymbol);
+    Angle rotation = text->getRotation();
+    Alignment alignment = text->getAlign();
+    if (mSymbol.getMirrored()) {
+      rotation += Angle::deg180();
+      alignment.mirrorV();
     }
-  }
-
-  // circles
-  for (const Circle& circle : mLibSymbol.getCircles()) {
-    // get circle radius, including compensation for the stroke width
-    qreal w = circle.getLineWidth()->toPx() / 2;
-    qreal r = circle.getDiameter()->toPx() / 2 + w;
-
-    // get the bounding rectangle for the circle
-    QPointF center = circle.getCenter().toPxQPointF();
-    QRectF boundingRect =
-        QRectF(QPointF(center.x() - r, center.y() - r), QSizeF(r * 2, r * 2));
-
-    // update bounding rectangle
-    mBoundingRect = mBoundingRect.united(boundingRect);
-
-    // update shape
-    if (circle.isGrabArea()) {
-      mShape.addEllipse(circle.getCenter().toPxQPointF(), r, r);
+    if (Toolbox::isTextUpsideDown(transform.map(text->getRotation()), false)) {
+      rotation += Angle::deg180();
+      alignment.mirror();
     }
+    item->setRotation(rotation);
+    item->setAlignment(alignment);
   }
+}
 
-  // texts
-  mCachedTextProperties.clear();
-  for (const Text& text : mLibSymbol.getTexts()) {
-    // create static text properties
-    CachedTextProperties_t props;
+void SGI_Symbol::setSelected(bool selected) noexcept {
+  mOriginCrossGraphicsItem->setSelected(selected);
+  foreach (const auto& i, mCircleGraphicsItems) { i->setSelected(selected); }
+  foreach (const auto& i, mPolygonGraphicsItems) { i->setSelected(selected); }
+  foreach (const auto& i, mTextGraphicsItems) { i->setSelected(selected); }
+  QGraphicsItem::setSelected(selected);
+}
 
-    // get the text to display
-    props.text = AttributeSubstitutor::substitute(text.getText(), &mSymbol);
-
-    // calculate font metrics
-    props.fontPixelSize = qCeil(text.getHeight()->toPx());
-    mFont.setPixelSize(props.fontPixelSize);
-    QFontMetricsF metrics(mFont);
-    props.scaleFactor = text.getHeight()->toPx() / metrics.height();
-    props.textRect = metrics.boundingRect(
-        QRectF(), text.getAlign().toQtAlign() | Qt::TextDontClip, props.text);
-    QRectF scaledTextRect =
-        QRectF(props.textRect.topLeft() * props.scaleFactor,
-               props.textRect.bottomRight() * props.scaleFactor);
-
-    // check rotation
-    Angle absAngle = text.getRotation() + mSymbol.getRotation();
-    absAngle.mapTo180deg();
-    props.mirrored = mSymbol.getMirrored();
-    props.rotate180 = Toolbox::isTextUpsideDown(absAngle, props.mirrored);
-
-    // calculate text position
-    scaledTextRect.translate(text.getPosition().toPxQPointF());
-
-    // text alignment
-    if (props.rotate180)
-      props.flags = text.getAlign().mirrored().toQtAlign();
-    else
-      props.flags = text.getAlign().toQtAlign();
-
-    // calculate text bounding rect
-    mBoundingRect = mBoundingRect.united(scaledTextRect);
-    props.textRect = QRectF(scaledTextRect.topLeft() / props.scaleFactor,
-                            scaledTextRect.bottomRight() / props.scaleFactor);
-    if (props.rotate180) {
-      props.textRect = QRectF(-props.textRect.x(), -props.textRect.y(),
-                              -props.textRect.width(), -props.textRect.height())
-                           .normalized();
-    }
-
-    // save properties
-    mCachedTextProperties.insert(&text, props);
+void SGI_Symbol::updateAllTexts() noexcept {
+  for (int i = 0; i < std::min(mSymbol.getLibSymbol().getTexts().count(),
+                               mTextGraphicsItems.count());
+       ++i) {
+    const auto text = mSymbol.getLibSymbol().getTexts().at(i);
+    Q_ASSERT(text);
+    auto item = mTextGraphicsItems.at(i);
+    Q_ASSERT(item);
+    item->setText(AttributeSubstitutor::substitute(text->getText(), &mSymbol));
   }
-
-  update();
 }
 
 /*******************************************************************************
@@ -176,175 +174,10 @@ void SGI_Symbol::updateCacheAndRepaint() noexcept {
 
 void SGI_Symbol::paint(QPainter* painter,
                        const QStyleOptionGraphicsItem* option,
-                       QWidget* widget) {
+                       QWidget* widget) noexcept {
+  Q_UNUSED(painter);
+  Q_UNUSED(option);
   Q_UNUSED(widget);
-
-  const GraphicsLayer* layer = 0;
-  const bool selected = mSymbol.isSelected();
-  const bool deviceIsPrinter =
-      (dynamic_cast<QPrinter*>(painter->device()) != 0);
-  const qreal lod =
-      option->levelOfDetailFromTransform(painter->worldTransform());
-
-  // draw all polygons
-  for (const Polygon& polygon : mLibSymbol.getPolygons()) {
-    // set colors
-    layer = getLayer(*polygon.getLayerName());
-    if (layer) {
-      if (!layer->isVisible()) layer = nullptr;
-    }
-    if (layer)
-      painter->setPen(QPen(layer->getColor(selected),
-                           polygon.getLineWidth()->toPx(), Qt::SolidLine,
-                           Qt::RoundCap, Qt::RoundJoin));
-    else
-      painter->setPen(Qt::NoPen);
-    if (polygon.isFilled() && polygon.getPath().isClosed())
-      layer = getLayer(*polygon.getLayerName());
-    else if (polygon.isGrabArea())
-      layer = getLayer(GraphicsLayer::sSymbolGrabAreas);
-    else
-      layer = nullptr;
-    if (layer) {
-      if (!layer->isVisible()) layer = nullptr;
-    }
-    painter->setBrush(layer
-                          ? QBrush(layer->getColor(selected), Qt::SolidPattern)
-                          : Qt::NoBrush);
-
-    // draw polygon
-    painter->drawPath(polygon.getPath().toQPainterPathPx());
-  }
-
-  // draw all circles
-  for (const Circle& circle : mLibSymbol.getCircles()) {
-    // set colors
-    layer = getLayer(*circle.getLayerName());
-    if (layer) {
-      if (!layer->isVisible()) layer = nullptr;
-    }
-    if (layer)
-      painter->setPen(QPen(layer->getColor(selected),
-                           circle.getLineWidth()->toPx(), Qt::SolidLine,
-                           Qt::RoundCap, Qt::RoundJoin));
-    else
-      painter->setPen(Qt::NoPen);
-    if (circle.isFilled())
-      layer = getLayer(*circle.getLayerName());
-    else if (circle.isGrabArea())
-      layer = getLayer(GraphicsLayer::sSymbolGrabAreas);
-    else
-      layer = nullptr;
-    if (layer) {
-      if (!layer->isVisible()) layer = nullptr;
-    }
-    painter->setBrush(layer
-                          ? QBrush(layer->getColor(selected), Qt::SolidPattern)
-                          : Qt::NoBrush);
-
-    // draw circle
-    painter->drawEllipse(circle.getCenter().toPxQPointF(),
-                         circle.getDiameter()->toPx() / 2,
-                         circle.getDiameter()->toPx() / 2);
-    // TODO: rotation
-  }
-
-  // draw all texts
-  for (const Text& text : mLibSymbol.getTexts()) {
-    // get layer
-    layer = getLayer(*text.getLayerName());
-    if (!layer) continue;
-    if (!layer->isVisible()) continue;
-
-    // get cached text properties
-    const CachedTextProperties_t& props = mCachedTextProperties.value(&text);
-    mFont.setPixelSize(props.fontPixelSize);
-
-    // draw text or rect
-    painter->save();
-    painter->translate(text.getPosition().toPxQPointF());
-    if (props.mirrored) {
-      static const QTransform gMirror(-1.0, 0.0, 0.0, 1.0, 0.0, 0.0);
-      if (text.getAlign().getH() != HAlign::center()) {
-        painter->translate(props.textRect.width() * props.scaleFactor, 0);
-      }
-      painter->setTransform(gMirror, true);
-    }
-    painter->rotate(-text.getRotation().toDeg());
-    painter->translate(-text.getPosition().toPxQPointF());
-    painter->scale(props.scaleFactor, props.scaleFactor);
-    if (props.rotate180) painter->rotate(180);
-    if ((deviceIsPrinter) || (lod * text.getHeight()->toPx() > 8)) {
-      // draw text
-      painter->setPen(QPen(layer->getColor(selected), 0));
-      painter->setFont(mFont);
-      painter->drawText(props.textRect, props.flags, props.text);
-    } else {
-      // fill rect
-      painter->fillRect(props.textRect,
-                        QBrush(layer->getColor(selected), Qt::Dense5Pattern));
-    }
-#ifdef QT_DEBUG
-    layer = getLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
-    Q_ASSERT(layer);
-    if (layer->isVisible()) {
-      // draw text bounding rect
-      painter->setPen(QPen(layer->getColor(selected), 0));
-      painter->setBrush(Qt::NoBrush);
-      painter->drawRect(props.textRect);
-    }
-#endif
-    painter->restore();
-  }
-
-  // draw origin cross
-  if (!deviceIsPrinter) {
-    layer = getLayer(GraphicsLayer::sSchematicReferences);
-    Q_ASSERT(layer);
-    if (layer->isVisible()) {
-      qreal width = Length(700000).toPx();
-      painter->setPen(QPen(layer->getColor(selected), 0));
-      painter->drawLine(-2 * width, 0, 2 * width, 0);
-      painter->drawLine(0, -2 * width, 0, 2 * width);
-    }
-  }
-
-#ifdef QT_DEBUG
-  layer = getLayer(GraphicsLayer::sDebugComponentSymbolsCounts);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // show symbols count of the component
-    int count = mSymbol.getComponentInstance().getPlacedSymbolsCount();
-    int maxCount = mSymbol.getComponentInstance()
-                       .getSymbolVariant()
-                       .getSymbolItems()
-                       .count();
-    mFont.setPixelSize(Length(1000000).toPx());
-    painter->setFont(mFont);
-    painter->setPen(
-        QPen(layer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
-    painter->drawText(QRectF(),
-                      Qt::AlignHCenter | Qt::AlignVCenter | Qt::TextSingleLine |
-                          Qt::TextDontClip,
-                      QString("[%1/%2]").arg(count).arg(maxCount));
-  }
-  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw bounding rect
-    painter->setPen(QPen(layer->getColor(selected), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(mBoundingRect);
-  }
-#endif
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-GraphicsLayer* SGI_Symbol::getLayer(const QString& name) const noexcept {
-  return mSymbol.getProject().getLayers().getLayer(name);
 }
 
 /*******************************************************************************

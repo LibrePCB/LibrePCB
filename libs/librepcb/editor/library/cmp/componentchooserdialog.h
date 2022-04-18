@@ -44,7 +44,7 @@ class Workspace;
 
 namespace editor {
 
-class SymbolPreviewGraphicsItem;
+class SymbolGraphicsItem;
 
 namespace Ui {
 class ComponentChooserDialog;
@@ -100,10 +100,10 @@ private:  // Data
   tl::optional<Uuid> mSelectedComponentUuid;
 
   // preview
-  QScopedPointer<Component> mComponent;
+  std::shared_ptr<Component> mComponent;
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QList<std::shared_ptr<Symbol>> mSymbols;
-  QList<std::shared_ptr<SymbolPreviewGraphicsItem>> mSymbolGraphicsItems;
+  QList<std::shared_ptr<SymbolGraphicsItem>> mSymbolGraphicsItems;
 };
 
 /*******************************************************************************

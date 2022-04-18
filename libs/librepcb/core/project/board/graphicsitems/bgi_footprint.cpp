@@ -30,7 +30,6 @@
 #include "../items/bi_device.h"
 #include "../items/bi_footprint.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -126,8 +125,6 @@ void BGI_Footprint::paint(QPainter* painter,
 
   const GraphicsLayer* layer = 0;
   const bool selected = mFootprint.isSelected();
-  const bool deviceIsPrinter =
-      (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
   // draw all polygons
   for (const Polygon& polygon : mLibFootprint.getPolygons()) {
@@ -214,26 +211,12 @@ void BGI_Footprint::paint(QPainter* painter,
 
   // draw origin cross
   layer = getLayer(GraphicsLayer::sTopReferences);
-  if (layer) {
-    if ((!deviceIsPrinter) && layer->isVisible()) {
-      qreal width = Length(700000).toPx();
-      painter->setPen(QPen(layer->getColor(selected), 0));
-      painter->drawLine(-width, 0, width, 0);
-      painter->drawLine(0, -width, 0, width);
-    }
+  if (layer && layer->isVisible()) {
+    qreal width = Length(700000).toPx();
+    painter->setPen(QPen(layer->getColor(selected), 0));
+    painter->drawLine(-width, 0, width, 0);
+    painter->drawLine(0, -width, 0, width);
   }
-
-#ifdef QT_DEBUG
-  // draw bounding rect
-  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  if (layer) {
-    if (layer->isVisible()) {
-      painter->setPen(QPen(layer->getColor(selected), 0));
-      painter->setBrush(Qt::NoBrush);
-      painter->drawRect(mBoundingRect);
-    }
-  }
-#endif
 }
 
 /*******************************************************************************

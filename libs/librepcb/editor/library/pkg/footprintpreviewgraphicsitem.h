@@ -65,9 +65,6 @@ public:
       const AttributeProvider* attrProvider = nullptr) noexcept;
   ~FootprintPreviewGraphicsItem() noexcept;
 
-  // Setters
-  void setDrawBoundingRect(bool enable) noexcept;
-
   // General Methods
   void updateCacheAndRepaint() noexcept;
 
@@ -98,7 +95,6 @@ private:
   // const Device* mDevice;
   const Component* mComponent;
   const AttributeProvider* mAttributeProvider;
-  bool mDrawBoundingRect;
   QStringList mLocaleOrder;
   StrokeTextList mStrokeTexts;
 

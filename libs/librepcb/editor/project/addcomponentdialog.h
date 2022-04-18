@@ -44,12 +44,13 @@ class DefaultGraphicsLayerProvider;
 class Device;
 class GraphicsScene;
 class Package;
+class Symbol;
 class WorkspaceLibraryDb;
 
 namespace editor {
 
 class FootprintPreviewGraphicsItem;
-class SymbolPreviewGraphicsItem;
+class SymbolGraphicsItem;
 
 namespace Ui {
 class AddComponentDialog;
@@ -126,7 +127,8 @@ private:
   SearchResult searchComponentsAndDevices(const QString& input);
   void setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
   void setSelectedComponent(const Component* cmp);
-  void setSelectedSymbVar(const ComponentSymbolVariant* symbVar);
+  void setSelectedSymbVar(
+      std::shared_ptr<const ComponentSymbolVariant> symbVar);
   void setSelectedDevice(const Device* dev);
   void accept() noexcept;
 
@@ -142,11 +144,12 @@ private:
 
   // Attributes
   tl::optional<Uuid> mSelectedCategoryUuid;
-  QScopedPointer<const Component> mSelectedComponent;
-  const ComponentSymbolVariant* mSelectedSymbVar;
+  std::shared_ptr<const Component> mSelectedComponent;
+  std::shared_ptr<const ComponentSymbolVariant> mSelectedSymbVar;
   QScopedPointer<const Device> mSelectedDevice;
   QScopedPointer<const Package> mSelectedPackage;
-  QList<std::shared_ptr<SymbolPreviewGraphicsItem>> mPreviewSymbolGraphicsItems;
+  QList<std::shared_ptr<Symbol>> mPreviewSymbols;
+  QList<std::shared_ptr<SymbolGraphicsItem>> mPreviewSymbolGraphicsItems;
   QScopedPointer<FootprintPreviewGraphicsItem> mPreviewFootprintGraphicsItem;
 };
 

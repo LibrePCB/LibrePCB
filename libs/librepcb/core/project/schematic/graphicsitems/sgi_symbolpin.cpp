@@ -22,21 +22,18 @@
  ******************************************************************************/
 #include "sgi_symbolpin.h"
 
-#include "../../../application.h"
-#include "../../../library/cmp/component.h"
 #include "../../../library/sym/symbolpin.h"
 #include "../../../utils/toolbox.h"
-#include "../../circuit/componentinstance.h"
-#include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
-#include "../../projectsettings.h"
 #include "../items/si_symbol.h"
 #include "../items/si_symbolpin.h"
-#include "../schematic.h"
 #include "../schematiclayerprovider.h"
 
-#include <QPrinter>
+#include <librepcb/core/graphics/linegraphicsitem.h>
+#include <librepcb/core/graphics/primitivecirclegraphicsitem.h>
+#include <librepcb/core/graphics/primitivetextgraphicsitem.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -50,184 +47,125 @@ namespace librepcb {
  ******************************************************************************/
 
 SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept
-  : SGI_Base(), mPin(pin), mLibPin(pin.getLibPin()), mIsVisibleJunction(false) {
+  : SGI_Base(),
+    mPin(pin),
+    mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
+    mLineGraphicsItem(new LineGraphicsItem(this)),
+    mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)) {
+  setFlag(QGraphicsItem::ItemHasNoContents, false);
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(Schematic::ZValue_Symbols);
-  setToolTip(*mLibPin.getName());
+  setToolTip(*mPin.getLibPin().getName());
 
-  mJunctionLayer = getLayer(GraphicsLayer::sSchematicNetLines);
-  Q_ASSERT(mJunctionLayer);
+  // Setup circle.
+  mCircleGraphicsItem->setDiameter(UnsignedLength(1200000));
+  mCircleGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  mCircleGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
-  mStaticText.setTextFormat(Qt::PlainText);
-  mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+  // Setup line.
+  mLineGraphicsItem->setLine(Point(0, 0),
+                             Point(*mPin.getLibPin().getLength(), 0));
+  mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
+  mLineGraphicsItem->setLayer(getLayer(GraphicsLayer::sSymbolOutlines));
+  mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  mLineGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
-  mFont = qApp->getDefaultSansSerifFont();
-  mFont.setPixelSize(5);
+  // Setup text.
+  mTextGraphicsItem->setPosition(mPin.getLibPin().getNamePosition());
+  mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
+  mTextGraphicsItem->setHeight(SymbolPin::getNameHeight());
+  mTextGraphicsItem->setLayer(getLayer(GraphicsLayer::sSymbolPinNames));
+  mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  mTextGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+  updateTextRotationAndAlignment();
 
-  mRadiusPx = Length(600000).toPx();
-
-  updateCacheAndRepaint();
+  updateData();
 }
 
 SGI_SymbolPin::~SGI_SymbolPin() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void SGI_SymbolPin::setPosition(const Point& pos) noexcept {
+  QGraphicsItem::setPos(pos.toPxQPointF());
+}
+
+void SGI_SymbolPin::setRotation(const Angle& rot) noexcept {
+  QGraphicsItem::setRotation(-rot.toDeg());
+  updateTextRotationAndAlignment();  // Auto-rotation may need to be updated.
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void SGI_SymbolPin::updateCacheAndRepaint() noexcept {
-  mShape = QPainterPath();
-  mShape.setFillRule(Qt::WindingFill);
-  mBoundingRect = QRectF();
+void SGI_SymbolPin::updateData() noexcept {
+  mTextGraphicsItem->setText(mPin.getDisplayText());
 
-  // rotation
-  mRotate180 = Toolbox::isTextUpsideDown(mPin.getRotation(), false);
+  bool isConnected = mPin.getCompSigInstNetSignal();
+  const GraphicsLayer* lineLayer = nullptr;
+  const GraphicsLayer* fillLayer = nullptr;
+  if (mPin.isVisibleJunction()) {
+    fillLayer = getLayer(GraphicsLayer::sSchematicNetLines);
+  } else if ((!isConnected) && mPin.isRequired()) {
+    lineLayer = getLayer(GraphicsLayer::sSymbolPinCirclesReq);
+  } else if (!isConnected) {
+    lineLayer = getLayer(GraphicsLayer::sSymbolPinCirclesOpt);
+  }
+  mCircleGraphicsItem->setLineLayer(lineLayer);
+  mCircleGraphicsItem->setFillLayer(fillLayer);
+}
 
-  // circle
-  mShape.addEllipse(-mRadiusPx, -mRadiusPx, 2 * mRadiusPx, 2 * mRadiusPx);
-  mBoundingRect = mBoundingRect.united(mShape.boundingRect());
-
-  // line
-  QRectF lineRect =
-      QRectF(QPointF(0, 0), Point(*mLibPin.getLength(), 0).toPxQPointF())
-          .normalized();
-  lineRect.adjust(-Length(79375).toPx(), -Length(79375).toPx(),
-                  Length(79375).toPx(), Length(79375).toPx());
-  mBoundingRect = mBoundingRect.united(lineRect).normalized();
-
-  // text
-  qreal x = mLibPin.getLength()->toPx() + 4;
-  mStaticText.setText(mPin.getDisplayText());
-  mStaticText.prepare(QTransform(), mFont);
-  mTextOrigin.setX(mRotate180 ? -x - mStaticText.size().width() : x);
-  mTextOrigin.setY(-mStaticText.size().height() / 2);
-  mStaticText.prepare(QTransform()
-                          .rotate(mRotate180 ? 180 : 0)
-                          .translate(mTextOrigin.x(), mTextOrigin.y()),
-                      mFont);
-  if (mRotate180)
-    mTextBoundingRect =
-        QRectF(-mTextOrigin.x(), -mTextOrigin.y(), -mStaticText.size().width(),
-               -mStaticText.size().height())
-            .normalized();
-  else
-    mTextBoundingRect =
-        QRectF(mTextOrigin.x(), -mTextOrigin.y() - mStaticText.size().height(),
-               mStaticText.size().width(), mStaticText.size().height())
-            .normalized();
-  mBoundingRect = mBoundingRect.united(mTextBoundingRect).normalized();
-
-  mIsVisibleJunction = mPin.isVisibleJunction();
-
-  update();
+void SGI_SymbolPin::updateSelection() noexcept {
+  const bool selected = mPin.isSelected();
+  const bool highlighted = mPin.getCompSigInstNetSignal() &&
+      mPin.getCompSigInstNetSignal()->isHighlighted();
+  mCircleGraphicsItem->setSelected(selected || highlighted);
+  mLineGraphicsItem->setSelected(selected || highlighted);
+  mTextGraphicsItem->setSelected(selected || highlighted);
+  QGraphicsItem::setSelected(selected);  // Ignore highlighting here.
 }
 
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
+QRectF SGI_SymbolPin::boundingRect() const noexcept {
+  // It seems that the tooltip is not shown without this :-(
+  return mCircleGraphicsItem->boundingRect();
+}
+
+QPainterPath SGI_SymbolPin::shape() const noexcept {
+  QPainterPath p;
+  p.addEllipse(mCircleGraphicsItem->boundingRect());
+  return p;
+}
+
 void SGI_SymbolPin::paint(QPainter* painter,
                           const QStyleOptionGraphicsItem* option,
-                          QWidget* widget) {
+                          QWidget* widget) noexcept {
+  Q_UNUSED(painter);
+  Q_UNUSED(option);
   Q_UNUSED(widget);
-  const bool deviceIsPrinter =
-      (dynamic_cast<QPrinter*>(painter->device()) != 0);
-  const qreal lod =
-      option->levelOfDetailFromTransform(painter->worldTransform());
-
-  const NetSignal* netsignal = mPin.getCompSigInstNetSignal();
-  bool highlight =
-      mPin.isSelected() || (netsignal && netsignal->isHighlighted());
-
-  // draw line
-  GraphicsLayer* layer = getLayer(GraphicsLayer::sSymbolOutlines);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    painter->setPen(QPen(layer->getColor(highlight), Length(158750).toPx(),
-                         Qt::SolidLine, Qt::RoundCap));
-    painter->drawLine(QPointF(0, 0),
-                      Point(*mLibPin.getLength(), 0).toPxQPointF());
-  }
-
-  // draw circle
-  if (mPin.isRequired()) {
-    layer = getLayer(GraphicsLayer::sSymbolPinCirclesReq);
-  } else {
-    layer = getLayer(GraphicsLayer::sSymbolPinCirclesOpt);
-  }
-  Q_ASSERT(layer);
-  if ((layer->isVisible()) && (!deviceIsPrinter) && (!netsignal)) {
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawEllipse(QPointF(0, 0), mRadiusPx, mRadiusPx);
-  }
-
-  // fill circle
-  if (mIsVisibleJunction && mJunctionLayer && mJunctionLayer->isVisible()) {
-    painter->setPen(QPen(mJunctionLayer->getColor(highlight), 0));
-    painter->setBrush(mJunctionLayer->getColor(highlight));
-    painter->drawEllipse(QPointF(0, 0), mRadiusPx, mRadiusPx);
-  }
-
-  // draw text or filled rect
-  layer = getLayer(GraphicsLayer::sSymbolPinNames);
-  Q_ASSERT(layer);
-  if ((layer->isVisible()) && (!mStaticText.text().isEmpty())) {
-    if ((deviceIsPrinter) || (lod > 1)) {
-      // draw text
-      painter->save();
-      if (mRotate180) painter->rotate(180);
-      painter->setPen(QPen(layer->getColor(highlight), 0));
-      painter->setFont(mFont);
-      painter->drawStaticText(mTextOrigin, mStaticText);
-      painter->restore();
-    } else {
-      // draw filled rect
-      painter->setPen(Qt::NoPen);
-      painter->setBrush(QBrush(layer->getColor(highlight), Qt::Dense5Pattern));
-      painter->drawRect(mTextBoundingRect);
-    }
-  }
-
-#ifdef QT_DEBUG
-  layer = getLayer(GraphicsLayer::sDebugSymbolPinNetSignalNames);
-  Q_ASSERT(layer);
-  if ((layer->isVisible()) && (netsignal)) {
-    // draw net signal name
-    QFont font = qApp->getDefaultMonospaceFont();
-    font.setPixelSize(3);
-    painter->setFont(font);
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->save();
-    if (mRotate180) painter->rotate(180);
-    painter->drawText(QRectF(),
-                      Qt::AlignHCenter | Qt::AlignBottom | Qt::TextSingleLine |
-                          Qt::TextDontClip,
-                      *netsignal->getName());
-    painter->restore();
-  }
-  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(mBoundingRect);
-  }
-  layer = getLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw text bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(mTextBoundingRect);
-  }
-#endif
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void SGI_SymbolPin::updateTextRotationAndAlignment() noexcept {
+  Angle rotation(0);
+  Alignment alignment(HAlign::left(), VAlign::center());
+  if (Toolbox::isTextUpsideDown(mPin.getRotation(), false)) {
+    rotation += Angle::deg180();
+    alignment.mirror();
+  }
+  mTextGraphicsItem->setRotation(rotation);
+  mTextGraphicsItem->setAlignment(alignment);
+}
 
 GraphicsLayer* SGI_SymbolPin::getLayer(const QString& name) const noexcept {
   return mPin.getSymbol().getProject().getLayers().getLayer(name);

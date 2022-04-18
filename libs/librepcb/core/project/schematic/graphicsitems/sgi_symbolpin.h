@@ -34,8 +34,10 @@
 namespace librepcb {
 
 class GraphicsLayer;
+class LineGraphicsItem;
+class PrimitiveCircleGraphicsItem;
+class PrimitiveTextGraphicsItem;
 class SI_SymbolPin;
-class SymbolPin;
 
 /*******************************************************************************
  *  Class SGI_SymbolPin
@@ -52,37 +54,32 @@ public:
   explicit SGI_SymbolPin(SI_SymbolPin& pin) noexcept;
   ~SGI_SymbolPin() noexcept;
 
+  // Setters
+  void setPosition(const Point& pos) noexcept;
+  void setRotation(const Angle& rot) noexcept;
+
   // General Methods
-  void updateCacheAndRepaint() noexcept;
+  void updateData() noexcept;
+  void updateSelection() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept { return mBoundingRect; }
-  QPainterPath shape() const noexcept { return mShape; }
+  QRectF boundingRect() const noexcept override;
+  QPainterPath shape() const noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0);
+             QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
   SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
 
-private:
-  // Private Methods
+private:  // Methods
+  void updateTextRotationAndAlignment() noexcept;
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 
-  // General Attributes
+private:  // Data
   SI_SymbolPin& mPin;
-  const SymbolPin& mLibPin;
-  QFont mFont;
-  qreal mRadiusPx;
-
-  // Cached Attributes
-  bool mIsVisibleJunction;
-  GraphicsLayer* mJunctionLayer;
-  QStaticText mStaticText;
-  bool mRotate180;
-  QRectF mBoundingRect;
-  QPointF mTextOrigin;
-  QRectF mTextBoundingRect;
-  QPainterPath mShape;
+  QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
+  QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
+  QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
 };
 
 /*******************************************************************************

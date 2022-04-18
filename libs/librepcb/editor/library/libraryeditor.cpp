@@ -273,16 +273,6 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   addLayer(GraphicsLayer::sTopGlue, true);
   addLayer(GraphicsLayer::sBotGlue, true);
 
-  // add debug layers
-#ifdef QT_DEBUG
-  addLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  addLayer(GraphicsLayer::sDebugGraphicsItemsTextsBoundingRects);
-  addLayer(GraphicsLayer::sDebugSymbolPinNetSignalNames);
-  addLayer(GraphicsLayer::sDebugNetLinesNetSignalNames);
-  addLayer(GraphicsLayer::sDebugInvisibleNetPoints);
-  addLayer(GraphicsLayer::sDebugComponentSymbolsCounts);
-#endif
-
   // Edit element signals
   connect(overviewWidget, &LibraryOverviewWidget::newComponentCategoryTriggered,
           this, &LibraryEditor::newComponentCategoryTriggered);

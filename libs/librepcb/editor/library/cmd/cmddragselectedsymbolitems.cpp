@@ -27,12 +27,12 @@
 #include "../../cmd/cmdtextedit.h"
 #include "../../widgets/graphicsview.h"
 #include "../cmd/cmdsymbolpinedit.h"
+#include "../sym/symbolgraphicsitem.h"
+#include "../sym/symbolpingraphicsitem.h"
 
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/textgraphicsitem.h>
-#include <librepcb/core/library/sym/symbolgraphicsitem.h>
-#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 #include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
@@ -60,21 +60,21 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
   int count = 0;
   PositiveLength grid = mContext.graphicsView.getGridProperties().getInterval();
 
-  QList<QSharedPointer<SymbolPinGraphicsItem>> pins =
+  QList<std::shared_ptr<SymbolPinGraphicsItem>> pins =
       context.symbolGraphicsItem.getSelectedPins();
-  foreach (const QSharedPointer<SymbolPinGraphicsItem>& pin, pins) {
+  foreach (const std::shared_ptr<SymbolPinGraphicsItem>& pin, pins) {
     Q_ASSERT(pin);
-    mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPin()));
-    mCenterPos += pin->getPin().getPosition();
-    if (!pin->getPin().getPosition().isOnGrid(grid)) {
+    mPinEditCmds.append(new CmdSymbolPinEdit(*pin->getPin()));
+    mCenterPos += pin->getPin()->getPosition();
+    if (!pin->getPin()->getPosition().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
     ++count;
   }
 
-  QList<QSharedPointer<CircleGraphicsItem>> circles =
+  QList<std::shared_ptr<CircleGraphicsItem>> circles =
       context.symbolGraphicsItem.getSelectedCircles();
-  foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {
+  foreach (const std::shared_ptr<CircleGraphicsItem>& circle, circles) {
     Q_ASSERT(circle);
     mCircleEditCmds.append(new CmdCircleEdit(circle->getCircle()));
     mCenterPos += circle->getCircle().getCenter();
@@ -84,9 +84,9 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     ++count;
   }
 
-  QList<QSharedPointer<PolygonGraphicsItem>> polygons =
+  QList<std::shared_ptr<PolygonGraphicsItem>> polygons =
       context.symbolGraphicsItem.getSelectedPolygons();
-  foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {
+  foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon, polygons) {
     Q_ASSERT(polygon);
     mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getPolygon()));
     foreach (const Vertex& vertex,
@@ -99,9 +99,9 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     }
   }
 
-  QList<QSharedPointer<TextGraphicsItem>> texts =
+  QList<std::shared_ptr<TextGraphicsItem>> texts =
       context.symbolGraphicsItem.getSelectedTexts();
-  foreach (const QSharedPointer<TextGraphicsItem>& text, texts) {
+  foreach (const std::shared_ptr<TextGraphicsItem>& text, texts) {
     Q_ASSERT(text);
     mTextEditCmds.append(new CmdTextEdit(text->getText()));
     mCenterPos += text->getText().getPosition();

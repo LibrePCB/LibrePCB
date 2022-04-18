@@ -57,7 +57,6 @@ public:
   void setRotation(const Angle& rot) noexcept;
   void setSize(const UnsignedLength& size) noexcept;
   void setLayer(const GraphicsLayer* layer) noexcept;
-  void setVisibleInPrintOutput(bool visible) noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return mBoundingRect; }
@@ -83,7 +82,6 @@ private:  // Data
   QLineF mLineV;
   QRectF mBoundingRect;
   QPainterPath mShape;
-  bool mVisibleInPrintOutput;
 
   // Slots
   GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;

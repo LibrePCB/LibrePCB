@@ -54,6 +54,7 @@ void SI_Polygon::init() {
   // Create the graphics item.
   mGraphicsItem.reset(
       new PolygonGraphicsItem(*mPolygon, mSchematic.getProject().getLayers()));
+  mGraphicsItem->setEditable(true);
   mGraphicsItem->setZValue(Schematic::ZValue_Polygons);
 }
 

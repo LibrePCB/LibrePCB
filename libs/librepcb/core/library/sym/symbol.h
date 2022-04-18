@@ -36,8 +36,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class SymbolGraphicsItem;
-
 /*******************************************************************************
  *  Class Symbol
  ******************************************************************************/
@@ -87,8 +85,6 @@ public:
 
   // General Methods
   virtual LibraryElementCheckMessageList runChecks() const override;
-  void registerGraphicsItem(SymbolGraphicsItem& item) noexcept;
-  void unregisterGraphicsItem(SymbolGraphicsItem& item) noexcept;
 
   // Operator Overloadings
   Symbol& operator=(const Symbol& rhs) = delete;
@@ -122,8 +118,6 @@ private:  // Data
   PolygonList mPolygons;
   CircleList mCircles;
   TextList mTexts;
-
-  SymbolGraphicsItem* mRegisteredGraphicsItem;
 
   // Slots
   SymbolPinList::OnEditedSlot mPinsEditedSlot;

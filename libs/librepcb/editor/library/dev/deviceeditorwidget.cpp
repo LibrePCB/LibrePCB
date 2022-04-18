@@ -29,7 +29,7 @@
 #include "../cmp/componentchooserdialog.h"
 #include "../pkg/footprintpreviewgraphicsitem.h"
 #include "../pkg/packagechooserdialog.h"
-#include "../sym/symbolpreviewgraphicsitem.h"
+#include "../sym/symbolgraphicsitem.h"
 #include "ui_deviceeditorwidget.h"
 
 #include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
@@ -356,12 +356,14 @@ void DeviceEditorWidget::updateComponentPreview() noexcept {
             std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
                 TransactionalFileSystem::openRO(fp))));  // can throw
         mSymbols.append(sym);
-        std::shared_ptr<SymbolPreviewGraphicsItem> graphicsItem =
-            std::make_shared<SymbolPreviewGraphicsItem>(
-                *mGraphicsLayerProvider, QStringList(), *sym, mComponent.data(),
-                symbVar.getUuid(), item.getUuid());
-        graphicsItem->setPos(item.getSymbolPosition().toPxQPointF());
-        graphicsItem->setRotation(-item.getSymbolRotation().toDeg());
+
+        std::shared_ptr<SymbolGraphicsItem> graphicsItem =
+            std::make_shared<SymbolGraphicsItem>(
+                *sym, *mGraphicsLayerProvider, mComponent,
+                symbVar.getSymbolItems().get(item.getUuid()),
+                getLibLocaleOrder());
+        graphicsItem->setPosition(item.getSymbolPosition());
+        graphicsItem->setRotation(item.getSymbolRotation());
         mComponentGraphicsScene->addItem(*graphicsItem);
         mSymbolGraphicsItems.append(graphicsItem);
       } catch (const Exception& e) {
@@ -400,10 +402,9 @@ void DeviceEditorWidget::updateDevicePackageUuid(const Uuid& uuid) noexcept {
 
 void DeviceEditorWidget::updatePackagePreview() noexcept {
   if (mPackage && mPackage->getFootprints().count() > 0) {
-    mFootprintGraphicsItem.reset(
-        new FootprintPreviewGraphicsItem(*mGraphicsLayerProvider, QStringList(),
-                                         *mPackage->getFootprints().first(),
-                                         mPackage.data(), mComponent.data()));
+    mFootprintGraphicsItem.reset(new FootprintPreviewGraphicsItem(
+        *mGraphicsLayerProvider, QStringList(),
+        *mPackage->getFootprints().first(), mPackage.data(), mComponent.get()));
     mPackageGraphicsScene->addItem(*mFootprintGraphicsItem);
     mUi->viewPackage->zoomAll();
   }

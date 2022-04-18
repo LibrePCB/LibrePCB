@@ -22,12 +22,13 @@
  ******************************************************************************/
 #include "symbolclipboarddata.h"
 
+#include "symbolpingraphicsitem.h"
+
 #include <librepcb/core/application.h>
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/textgraphicsitem.h>
-#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -111,8 +112,8 @@ QPixmap SymbolClipboardData::generatePixmap(
     const IF_GraphicsLayerProvider& lp) noexcept {
   GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
-  for (SymbolPin& pin : mPins) {
-    items.append(std::make_shared<SymbolPinGraphicsItem>(pin, lp));
+  for (auto ptr : mPins.values()) {
+    items.append(std::make_shared<SymbolPinGraphicsItem>(ptr, lp));
   }
   for (Polygon& polygon : mPolygons) {
     items.append(std::make_shared<PolygonGraphicsItem>(polygon, lp));

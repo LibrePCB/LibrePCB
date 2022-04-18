@@ -30,7 +30,6 @@
 #include "../boardlayerstack.h"
 #include "../items/bi_plane.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -143,29 +142,24 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
   Q_UNUSED(widget);
 
   const bool selected = mPlane.isSelected();
-  const bool deviceIsPrinter =
-      (dynamic_cast<QPrinter*>(painter->device()) != nullptr);
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 
   if (mLayer && mLayer->isVisible()) {
-    // draw outline only on screen, not for print or PDF export
-    if (!deviceIsPrinter) {
-      mLineWidthPx = 3 / lod;
-      painter->setPen(QPen(mLayer->getColor(selected), mLineWidthPx,
-                           Qt::DashLine, Qt::RoundCap));
-      painter->setBrush(Qt::NoBrush);
-      painter->drawPath(mOutline);
+    mLineWidthPx = 3 / lod;
+    painter->setPen(QPen(mLayer->getColor(selected), mLineWidthPx, Qt::DashLine,
+                         Qt::RoundCap));
+    painter->setBrush(Qt::NoBrush);
+    painter->drawPath(mOutline);
 
-      // if the plane is selected, draw vertex handles
-      if (selected) {
-        mVertexRadiusPx = (mLineWidthPx / 2) + Length::fromMm(0.2).toPx();
-        painter->setPen(
-            QPen(mLayer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
-        foreach (const Vertex& vertex, mPlane.getOutline().getVertices()) {
-          painter->drawEllipse(vertex.getPos().toPxQPointF(), mVertexRadiusPx,
-                               mVertexRadiusPx);
-        }
+    // if the plane is selected, draw vertex handles
+    if (selected) {
+      mVertexRadiusPx = (mLineWidthPx / 2) + Length::fromMm(0.2).toPx();
+      painter->setPen(
+          QPen(mLayer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
+      foreach (const Vertex& vertex, mPlane.getOutline().getVertices()) {
+        painter->drawEllipse(vertex.getPos().toPxQPointF(), mVertexRadiusPx,
+                             mVertexRadiusPx);
       }
     }
 
@@ -176,19 +170,6 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
       foreach (const QPainterPath& area, mAreas) { painter->drawPath(area); }
     }
   }
-
-#ifdef QT_DEBUG
-  // draw bounding rect
-  const GraphicsLayer* layer = mPlane.getBoard().getLayerStack().getLayer(
-      GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  if (layer) {
-    if (layer->isVisible()) {
-      painter->setPen(QPen(layer->getColor(selected), 0));
-      painter->setBrush(Qt::NoBrush);
-      painter->drawRect(mBoundingRect);
-    }
-  }
-#endif
 }
 
 /*******************************************************************************

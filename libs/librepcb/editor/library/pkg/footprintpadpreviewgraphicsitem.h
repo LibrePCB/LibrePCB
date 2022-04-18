@@ -56,9 +56,6 @@ public:
       const PackagePad* pkgPad = nullptr) noexcept;
   ~FootprintPadPreviewGraphicsItem() noexcept;
 
-  // Setters
-  void setDrawBoundingRect(bool enable) noexcept { mDrawBoundingRect = enable; }
-
   // General Methods
   void updateCacheAndRepaint() noexcept;
 
@@ -77,7 +74,6 @@ private:
   const FootprintPad& mFootprintPad;
   const PackagePad* mPackagePad;
   GraphicsLayer* mLayer;
-  bool mDrawBoundingRect;
 
   // Cached Attributes
   QRectF mBoundingRect;

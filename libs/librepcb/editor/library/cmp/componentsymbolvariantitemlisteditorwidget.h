@@ -77,6 +77,7 @@ public:
 signals:
   void edited();
   void triggerGraphicsItemsUpdate();
+  void triggerGraphicsItemsTextsUpdate();
 
 private:  // Methods
   void itemListEdited(

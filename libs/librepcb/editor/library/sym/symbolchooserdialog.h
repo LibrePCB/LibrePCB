@@ -37,10 +37,11 @@ namespace librepcb {
 class GraphicsScene;
 class IF_GraphicsLayerProvider;
 class Symbol;
-class SymbolGraphicsItem;
 class Workspace;
 
 namespace editor {
+
+class SymbolGraphicsItem;
 
 namespace Ui {
 class SymbolChooserDialog;
