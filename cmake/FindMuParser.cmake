@@ -37,6 +37,11 @@ find_package(muparser 2.0 QUIET)
 if(muparser_FOUND)
   message(STATUS "Using system MuParser")
 
+  # Add uppercase alias if only the lowercase target is defined
+  if(NOT TARGET MuParser::MuParser)
+    add_library(MuParser::MuParser ALIAS muparser::muparser)
+  endif()
+
   # Stop here, we're done
   return()
 endif()
