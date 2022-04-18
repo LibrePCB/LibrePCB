@@ -70,6 +70,19 @@ public:
   /// @return       All indices of the vertices at the specified position.
   QVector<int> getVertexIndicesAtPosition(const Point& pos) const noexcept;
 
+  // Setters
+
+  /**
+   * Enable/disable editing mode when selected
+   *
+   * If the item is editable and selected, vertex handles will be shown to
+   * indicate that they can be moved. If not editable, handles will not be
+   * shown.
+   *
+   * @param editable  Whether the polygon is (visually) editable or not.
+   */
+  void setEditable(bool editable) noexcept;
+
   // Inherited Methods
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
@@ -85,6 +98,7 @@ private:  // Methods
 private:  // Data
   Polygon& mPolygon;
   const IF_GraphicsLayerProvider& mLayerProvider;
+  bool mEditable;
 
   /// The square graphics items to drag each vertex
   QList<std::shared_ptr<PrimitivePathGraphicsItem>> mVertexGraphicsItems;

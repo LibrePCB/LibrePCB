@@ -23,7 +23,7 @@
 #include "addcomponentdialog.h"
 
 #include "../library/pkg/footprintpreviewgraphicsitem.h"
-#include "../library/sym/symbolpreviewgraphicsitem.h"
+#include "../library/sym/symbolgraphicsitem.h"
 #include "../widgets/graphicsview.h"
 #include "../workspace/categorytreemodel.h"
 #include "ui_addcomponentdialog.h"
@@ -247,8 +247,7 @@ void AddComponentDialog::cbxSymbVar_currentIndexChanged(int index) noexcept {
     tl::optional<Uuid> uuid =
         Uuid::tryFromString(mUi->cbxSymbVar->itemData(index).toString());
     if (uuid) {
-      setSelectedSymbVar(
-          mSelectedComponent->getSymbolVariants().find(*uuid).get());
+      setSelectedSymbVar(mSelectedComponent->getSymbolVariants().find(*uuid));
     } else {
       setSelectedSymbVar(nullptr);
     }
@@ -405,7 +404,7 @@ void AddComponentDialog::setSelectedCategory(
 }
 
 void AddComponentDialog::setSelectedComponent(const Component* cmp) {
-  if (cmp && (cmp == mSelectedComponent.data())) return;
+  if (cmp && (cmp == mSelectedComponent.get())) return;
 
   mUi->lblCompName->setText(tr("No component selected"));
   mUi->lblCompDescription->clear();
@@ -439,23 +438,26 @@ void AddComponentDialog::setSelectedComponent(const Component* cmp) {
 }
 
 void AddComponentDialog::setSelectedSymbVar(
-    const ComponentSymbolVariant* symbVar) {
+    std::shared_ptr<const ComponentSymbolVariant> symbVar) {
   if (symbVar && (symbVar == mSelectedSymbVar)) return;
   mPreviewSymbolGraphicsItems.clear();
+  mPreviewSymbols.clear();
   mSelectedSymbVar = symbVar;
 
   if (mSelectedComponent && mSelectedSymbVar) {
     for (const ComponentSymbolVariantItem& item : symbVar->getSymbolItems()) {
       FilePath symbolFp = mDb.getLatest<Symbol>(item.getSymbolUuid());
       if (!symbolFp.isValid()) continue;  // TODO: show warning
-      const Symbol* symbol = new Symbol(std::unique_ptr<TransactionalDirectory>(
-          new TransactionalDirectory(TransactionalFileSystem::openRO(
-              symbolFp))));  // TODO: fix memory leak...
-      auto graphicsItem = std::make_shared<SymbolPreviewGraphicsItem>(
-          *mGraphicsLayerProvider, mLocaleOrder, *symbol,
-          mSelectedComponent.data(), symbVar->getUuid(), item.getUuid());
-      graphicsItem->setPos(item.getSymbolPosition().toPxQPointF());
-      graphicsItem->setRotation(-item.getSymbolRotation().toDeg());
+      auto symbol = std::make_shared<Symbol>(
+          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+              TransactionalFileSystem::openRO(symbolFp))));
+      mPreviewSymbols.append(symbol);
+
+      auto graphicsItem = std::make_shared<SymbolGraphicsItem>(
+          *symbol, *mGraphicsLayerProvider, mSelectedComponent,
+          mSelectedSymbVar->getSymbolItems().get(item.getUuid()), mLocaleOrder);
+      graphicsItem->setPosition(item.getSymbolPosition());
+      graphicsItem->setRotation(item.getSymbolRotation());
       mPreviewSymbolGraphicsItems.append(graphicsItem);
       mComponentPreviewScene->addItem(*graphicsItem);
       mUi->viewComponent->zoomAll();
@@ -489,7 +491,7 @@ void AddComponentDialog::setSelectedDevice(const Device* dev) {
         mPreviewFootprintGraphicsItem.reset(new FootprintPreviewGraphicsItem(
             *mGraphicsLayerProvider, mLocaleOrder,
             *mSelectedPackage->getFootprints().first(), mSelectedPackage.data(),
-            mSelectedComponent.data()));
+            mSelectedComponent.get()));
         mDevicePreviewScene->addItem(*mPreviewFootprintGraphicsItem);
         mUi->viewDevice->zoomAll();
       }

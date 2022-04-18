@@ -30,7 +30,6 @@
 #include "../boardlayerstack.h"
 #include "../items/bi_via.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -140,18 +139,6 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     painter->setBrush(mTopStopMaskLayer->getColor(highlight));
     painter->drawPath(mStopMask);
   }
-
-#ifdef QT_DEBUG
-  GraphicsLayer* layer =
-      getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(boundingRect());
-  }
-#endif
 }
 
 /*******************************************************************************

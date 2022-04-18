@@ -25,14 +25,14 @@
 #include "../../cmd/cmdcircleedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdtextedit.h"
+#include "../sym/symbolgraphicsitem.h"
+#include "../sym/symbolpingraphicsitem.h"
 #include "cmdsymbolpinedit.h"
 
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/textgraphicsitem.h>
 #include <librepcb/core/library/sym/symbol.h>
-#include <librepcb/core/library/sym/symbolgraphicsitem.h>
-#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 
 #include <QtCore>
 
@@ -62,7 +62,7 @@ bool CmdRemoveSelectedSymbolItems::performExecute() {
   // remove pins
   foreach (const auto& pin, mContext.symbolGraphicsItem.getSelectedPins()) {
     appendChild(
-        new CmdSymbolPinRemove(mContext.symbol.getPins(), &pin->getPin()));
+        new CmdSymbolPinRemove(mContext.symbol.getPins(), pin->getPin().get()));
   }
 
   // remove circles

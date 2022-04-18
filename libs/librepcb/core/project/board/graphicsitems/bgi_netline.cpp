@@ -29,7 +29,6 @@
 #include "../items/bi_netline.h"
 #include "../items/bi_netpoint.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -120,18 +119,6 @@ void BGI_NetLine::paint(QPainter* painter,
     painter->setPen(pen);
     painter->drawLine(mLineF);
   }
-
-#ifdef QT_DEBUG
-  GraphicsLayer* layer =
-      getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer->isVisible()) {
-    // draw bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(mBoundingRect);
-  }
-#endif
 }
 
 /*******************************************************************************

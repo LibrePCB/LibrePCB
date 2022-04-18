@@ -121,6 +121,7 @@ private slots:
   void updateErcMessages() noexcept;
 
 private:
+  void netSignalChanged(NetSignal* from, NetSignal* to) noexcept;
   QString getLibraryComponentName() const noexcept;
   QString getComponentSignalNameOrPinUuid() const noexcept;
   QString getNetSignalName() const noexcept;
@@ -130,6 +131,8 @@ private:
   const SymbolPin* mSymbolPin;
   const ComponentPinSignalMapItem* mPinSignalMapItem;
   ComponentSignalInstance* mComponentSignalInstance;
+  QMetaObject::Connection mNetSignalChangedConnection;
+  QMetaObject::Connection mNetSignalRenamedConnection;
   QMetaObject::Connection mHighlightChangedConnection;
 
   // Misc

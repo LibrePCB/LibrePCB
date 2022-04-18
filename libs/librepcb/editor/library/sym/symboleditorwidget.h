@@ -38,11 +38,11 @@ namespace librepcb {
 class GraphicsScene;
 class GridProperties;
 class Symbol;
-class SymbolGraphicsItem;
 
 namespace editor {
 
 class SymbolEditorFsm;
+class SymbolGraphicsItem;
 
 namespace Ui {
 class SymbolEditorWidget;

@@ -149,7 +149,6 @@ void ComponentSymbolVariantItemListEditorWidget::itemListEdited(
   switch (event) {
     case ComponentSymbolVariantItemList::Event::ElementAdded:
     case ComponentSymbolVariantItemList::Event::ElementRemoved:
-      emit edited();
       emit triggerGraphicsItemsUpdate();
       break;
     default:
@@ -170,6 +169,10 @@ void ComponentSymbolVariantItemListEditorWidget::itemEdited(
     case ComponentSymbolVariantItem::Event::SymbolRotationChanged:
     case ComponentSymbolVariantItem::Event::SymbolUuidChanged:
       emit triggerGraphicsItemsUpdate();
+      break;
+    case ComponentSymbolVariantItem::Event::SuffixChanged:
+    case ComponentSymbolVariantItem::Event::PinSignalMapEdited:
+      emit triggerGraphicsItemsTextsUpdate();
       break;
     default:
       break;

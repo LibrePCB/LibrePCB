@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -51,7 +53,7 @@ public:
 
   // General Methods
   virtual bool openComponentSymbolVariantEditor(
-      ComponentSymbolVariant& variant) noexcept = 0;
+      std::shared_ptr<ComponentSymbolVariant> variant) noexcept = 0;
 
   // Operator Overloadings
   IF_ComponentSymbolVariantEditorProvider& operator=(

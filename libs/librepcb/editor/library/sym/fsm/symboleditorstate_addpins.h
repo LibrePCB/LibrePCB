@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -38,11 +40,11 @@ namespace librepcb {
 class Angle;
 class Point;
 class SymbolPin;
-class SymbolPinGraphicsItem;
 
 namespace editor {
 
 class CmdSymbolPinEdit;
+class SymbolPinGraphicsItem;
 
 /*******************************************************************************
  *  Class SymbolEditorState_AddPins
@@ -88,8 +90,8 @@ private:  // Methods
 
 private:  // Types / Data
   QScopedPointer<CmdSymbolPinEdit> mEditCmd;
-  SymbolPin* mCurrentPin;
-  SymbolPinGraphicsItem* mCurrentGraphicsItem;
+  std::shared_ptr<SymbolPin> mCurrentPin;
+  std::shared_ptr<SymbolPinGraphicsItem> mCurrentGraphicsItem;
   QLineEdit* mNameLineEdit;
 
   // parameter memory

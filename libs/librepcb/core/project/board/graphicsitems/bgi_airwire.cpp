@@ -27,7 +27,6 @@
 #include "../boardlayerstack.h"
 #include "../items/bi_airwire.h"
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -111,18 +110,6 @@ void BGI_AirWire::paint(QPainter* painter,
       painter->drawEllipse(mBoundingRect);
     }
   }
-
-#ifdef QT_DEBUG
-  GraphicsLayer* layer =
-      getLayer(GraphicsLayer::sDebugGraphicsItemsBoundingRects);
-  Q_ASSERT(layer);
-  if (layer && layer->isVisible()) {
-    // draw bounding rect
-    painter->setPen(QPen(layer->getColor(highlight), 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(mBoundingRect);
-  }
-#endif
 }
 
 /*******************************************************************************

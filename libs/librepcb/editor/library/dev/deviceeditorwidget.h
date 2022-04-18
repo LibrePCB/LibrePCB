@@ -31,6 +31,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -46,7 +48,7 @@ class Symbol;
 namespace editor {
 
 class FootprintPreviewGraphicsItem;
-class SymbolPreviewGraphicsItem;
+class SymbolGraphicsItem;
 
 namespace Ui {
 class DeviceEditorWidget;
@@ -107,10 +109,10 @@ private:  // Data
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
 
   // component
-  QScopedPointer<Component> mComponent;
+  std::shared_ptr<Component> mComponent;
   QScopedPointer<GraphicsScene> mComponentGraphicsScene;
   QList<std::shared_ptr<Symbol>> mSymbols;
-  QList<std::shared_ptr<SymbolPreviewGraphicsItem>> mSymbolGraphicsItems;
+  QList<std::shared_ptr<SymbolGraphicsItem>> mSymbolGraphicsItems;
 
   // package
   QScopedPointer<Package> mPackage;

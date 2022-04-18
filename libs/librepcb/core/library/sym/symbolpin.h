@@ -36,8 +36,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class SymbolPinGraphicsItem;
-
 /*******************************************************************************
  *  Class SymbolPin
  ******************************************************************************/
@@ -89,10 +87,6 @@ public:
   bool setRotation(const Angle& rotation) noexcept;
   bool setName(const CircuitIdentifier& name) noexcept;
 
-  // General Methods
-  void registerGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
-  void unregisterGraphicsItem(SymbolPinGraphicsItem& item) noexcept;
-
   /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
 
@@ -114,8 +108,6 @@ private:  // Data
   Point mPosition;
   UnsignedLength mLength;
   Angle mRotation;
-
-  SymbolPinGraphicsItem* mRegisteredGraphicsItem;
 };
 
 /*******************************************************************************

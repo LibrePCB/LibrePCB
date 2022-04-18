@@ -33,7 +33,6 @@
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/library/pkg/package.h>
 
-#include <QPrinter>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -58,7 +57,6 @@ FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(
     mPackage(package),
     /*mDevice(device),*/ mComponent(component),
     mAttributeProvider(attrProvider),
-    mDrawBoundingRect(false),
     mLocaleOrder(localeOrder) {
   updateCacheAndRepaint();
 
@@ -93,19 +91,6 @@ FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(
 FootprintPreviewGraphicsItem::~FootprintPreviewGraphicsItem() noexcept {
   qDeleteAll(childItems());  // remove now because childs have references to
                              // mStrokeTexts
-}
-
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-void FootprintPreviewGraphicsItem::setDrawBoundingRect(bool enable) noexcept {
-  mDrawBoundingRect = enable;
-  foreach (QGraphicsItem* child, childItems()) {
-    FootprintPadPreviewGraphicsItem* pad =
-        dynamic_cast<FootprintPadPreviewGraphicsItem*>(child);
-    if (pad) pad->setDrawBoundingRect(enable);
-  }
 }
 
 /*******************************************************************************
@@ -148,8 +133,6 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter,
   QPen pen;
   const GraphicsLayer* layer = 0;
   const bool selected = option->state.testFlag(QStyle::State_Selected);
-  const bool deviceIsPrinter =
-      (dynamic_cast<QPrinter*>(painter->device()) != 0);
 
   // draw all polygons
   for (const Polygon& polygon : mFootprint.getPolygons()) {
@@ -201,25 +184,14 @@ void FootprintPreviewGraphicsItem::paint(QPainter* painter,
   }
 
   // draw origin cross
-  if (!deviceIsPrinter) {
-    layer = mLayerProvider.getLayer(GraphicsLayer::sTopReferences);
-    if (layer) {
-      qreal width = Length(700000).toPx();
-      pen = QPen(layer->getColor(selected), 0);
-      painter->setPen(pen);
-      painter->drawLine(-2 * width, 0, 2 * width, 0);
-      painter->drawLine(0, -2 * width, 0, 2 * width);
-    }
+  layer = mLayerProvider.getLayer(GraphicsLayer::sTopReferences);
+  if (layer) {
+    qreal width = Length(700000).toPx();
+    pen = QPen(layer->getColor(selected), 0);
+    painter->setPen(pen);
+    painter->drawLine(-2 * width, 0, 2 * width, 0);
+    painter->drawLine(0, -2 * width, 0, 2 * width);
   }
-
-#ifdef QT_DEBUG
-  if (mDrawBoundingRect) {
-    // draw bounding rect
-    painter->setPen(QPen(Qt::red, 0));
-    painter->setBrush(Qt::NoBrush);
-    painter->drawRect(mBoundingRect);
-  }
-#endif
 }
 
 /*******************************************************************************

@@ -38,13 +38,13 @@ class GraphicsScene;
 class GridProperties;
 class IF_GraphicsLayerProvider;
 class Symbol;
-class SymbolGraphicsItem;
 
 namespace editor {
 
 class GraphicsView;
 class SymbolEditorState;
 class SymbolEditorWidget;
+class SymbolGraphicsItem;
 class UndoStack;
 
 /*******************************************************************************

@@ -26,12 +26,12 @@
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdsymbolpinedit.h"
 #include "../symboleditorwidget.h"
+#include "../symbolgraphicsitem.h"
+#include "../symbolpingraphicsitem.h"
 
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/sym/symbol.h>
-#include <librepcb/core/library/sym/symbolgraphicsitem.h>
 #include <librepcb/core/library/sym/symbolpin.h>
-#include <librepcb/core/library/sym/symbolpingraphicsitem.h>
 
 #include <QtCore>
 
@@ -57,8 +57,6 @@ SymbolEditorState_AddPins::SymbolEditorState_AddPins(
 
 SymbolEditorState_AddPins::~SymbolEditorState_AddPins() noexcept {
   Q_ASSERT(mEditCmd.isNull());
-  Q_ASSERT(mCurrentPin == nullptr);
-  Q_ASSERT(mCurrentGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -97,8 +95,8 @@ bool SymbolEditorState_AddPins::entry() noexcept {
 bool SymbolEditorState_AddPins::exit() noexcept {
   // abort command
   try {
-    mCurrentGraphicsItem = nullptr;
-    mCurrentPin = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentPin.reset();
     mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
   } catch (const Exception& e) {
@@ -134,8 +132,8 @@ bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(
   Angle currentRot = mCurrentPin->getRotation();
   try {
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
-    mCurrentPin = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentPin.reset();
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
     return addNextPin(currentPos, currentRot);
@@ -170,22 +168,22 @@ bool SymbolEditorState_AddPins::addNextPin(const Point& pos,
   try {
     mNameLineEdit->setText(determineNextPinName());
     mContext.undoStack.beginCmdGroup(tr("Add symbol pin"));
-    mCurrentPin = new SymbolPin(Uuid::createRandom(),
-                                CircuitIdentifier(mNameLineEdit->text()), pos,
-                                mLastLength, rot);  // can throw
+    mCurrentPin = std::make_shared<SymbolPin>(
+        Uuid::createRandom(), CircuitIdentifier(mNameLineEdit->text()), pos,
+        mLastLength, rot);  // can throw
 
-    mContext.undoStack.appendToCmdGroup(new CmdSymbolPinInsert(
-        mContext.symbol.getPins(), std::shared_ptr<SymbolPin>(mCurrentPin)));
+    mContext.undoStack.appendToCmdGroup(
+        new CmdSymbolPinInsert(mContext.symbol.getPins(), mCurrentPin));
     mEditCmd.reset(new CmdSymbolPinEdit(*mCurrentPin));
     mCurrentGraphicsItem =
-        mContext.symbolGraphicsItem.getPinGraphicsItem(mCurrentPin->getUuid());
+        mContext.symbolGraphicsItem.getGraphicsItem(mCurrentPin);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    mCurrentGraphicsItem = nullptr;
-    mCurrentPin = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentPin.reset();
     mEditCmd.reset();
     return false;
   }

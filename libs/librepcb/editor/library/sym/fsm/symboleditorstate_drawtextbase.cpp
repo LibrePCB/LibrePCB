@@ -27,13 +27,13 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../symboleditorwidget.h"
+#include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/text.h>
 #include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/textgraphicsitem.h>
 #include <librepcb/core/library/sym/symbol.h>
-#include <librepcb/core/library/sym/symbolgraphicsitem.h>
 
 #include <QtCore>
 
@@ -60,8 +60,6 @@ SymbolEditorState_DrawTextBase::SymbolEditorState_DrawTextBase(
 
 SymbolEditorState_DrawTextBase::~SymbolEditorState_DrawTextBase() noexcept {
   Q_ASSERT(mEditCmd.isNull());
-  Q_ASSERT(mCurrentText == nullptr);
-  Q_ASSERT(mCurrentGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -190,20 +188,21 @@ bool SymbolEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
   try {
     mStartPos = pos;
     mContext.undoStack.beginCmdGroup(tr("Add symbol text"));
-    mCurrentText = new Text(Uuid::createRandom(), mLastLayerName, mLastText,
-                            pos, mLastRotation, mLastHeight, getAlignment());
-    mContext.undoStack.appendToCmdGroup(new CmdTextInsert(
-        mContext.symbol.getTexts(), std::shared_ptr<Text>(mCurrentText)));
+    mCurrentText =
+        std::make_shared<Text>(Uuid::createRandom(), mLastLayerName, mLastText,
+                               pos, mLastRotation, mLastHeight, getAlignment());
+    mContext.undoStack.appendToCmdGroup(
+        new CmdTextInsert(mContext.symbol.getTexts(), mCurrentText));
     mEditCmd.reset(new CmdTextEdit(*mCurrentText));
     mCurrentGraphicsItem =
-        mContext.symbolGraphicsItem.getTextGraphicsItem(*mCurrentText);
+        mContext.symbolGraphicsItem.getGraphicsItem(mCurrentText);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    mCurrentGraphicsItem = nullptr;
-    mCurrentText = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentText.reset();
     mEditCmd.reset();
     return false;
   }
@@ -217,8 +216,8 @@ bool SymbolEditorState_DrawTextBase::finishAddText(const Point& pos) noexcept {
   try {
     mEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
-    mCurrentText = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentText.reset();
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
     return true;
@@ -231,8 +230,8 @@ bool SymbolEditorState_DrawTextBase::finishAddText(const Point& pos) noexcept {
 bool SymbolEditorState_DrawTextBase::abortAddText() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
-    mCurrentText = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentText.reset();
     mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
     return true;

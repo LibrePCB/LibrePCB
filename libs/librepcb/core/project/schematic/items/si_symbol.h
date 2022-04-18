@@ -110,18 +110,12 @@ public:
   // Operator Overloadings
   SI_Symbol& operator=(const SI_Symbol& rhs) = delete;
 
-private slots:
-
-  void schematicOrComponentAttributesChanged();
-
 signals:
-
   /// @copydoc AttributeProvider::attributesChanged()
   void attributesChanged() override;
 
 private:
   void init(const Uuid& symbVarItemUuid);
-  void updateGraphicsItemTransform() noexcept;
   bool checkAttributesValidity() const noexcept;
 
   // General

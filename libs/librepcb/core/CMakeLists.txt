@@ -286,14 +286,10 @@ add_library(
   library/sym/symbol.h
   library/sym/symbolcheck.cpp
   library/sym/symbolcheck.h
-  library/sym/symbolgraphicsitem.cpp
-  library/sym/symbolgraphicsitem.h
   library/sym/symbolpainter.cpp
   library/sym/symbolpainter.h
   library/sym/symbolpin.cpp
   library/sym/symbolpin.h
-  library/sym/symbolpingraphicsitem.cpp
-  library/sym/symbolpingraphicsitem.h
   network/filedownload.cpp
   network/filedownload.h
   network/networkaccessmanager.cpp

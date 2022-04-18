@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_SYMBOLPREVIEWGRAPHICSITEM_H
-#define LIBREPCB_EDITOR_SYMBOLPREVIEWGRAPHICSITEM_H
+#ifndef LIBREPCB_EDITOR_SYMBOLPINGRAPHICSITEM_H
+#define LIBREPCB_EDITOR_SYMBOLPINGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/attribute/attributeprovider.h>
-#include <librepcb/core/types/uuid.h>
+#include <librepcb/core/library/sym/symbolpin.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,83 +35,68 @@ namespace librepcb {
 
 class Component;
 class ComponentSymbolVariantItem;
-class GraphicsLayer;
 class IF_GraphicsLayerProvider;
-class Symbol;
-class Text;
+class LineGraphicsItem;
+class PrimitiveCircleGraphicsItem;
+class PrimitiveTextGraphicsItem;
 
 namespace editor {
 
 /*******************************************************************************
- *  Class SymbolPreviewGraphicsItem
+ *  Class SymbolPinGraphicsItem
  ******************************************************************************/
 
 /**
- * @brief The SymbolPreviewGraphicsItem class
+ * @brief The SymbolPinGraphicsItem class
  */
-class SymbolPreviewGraphicsItem final : public QGraphicsItem,
-                                        public AttributeProvider {
+class SymbolPinGraphicsItem final : public QGraphicsItem {
 public:
   // Constructors / Destructor
-  SymbolPreviewGraphicsItem() = delete;
-  SymbolPreviewGraphicsItem(const SymbolPreviewGraphicsItem& other) = delete;
-  explicit SymbolPreviewGraphicsItem(
-      const IF_GraphicsLayerProvider& layerProvider,
-      const QStringList& localeOrder, const Symbol& symbol,
-      const Component* cmp = nullptr,
-      const tl::optional<Uuid>& symbVarUuid = tl::nullopt,
-      const tl::optional<Uuid>& symbVarItemUuid = tl::nullopt) noexcept;
-  ~SymbolPreviewGraphicsItem() noexcept;
+  SymbolPinGraphicsItem() = delete;
+  SymbolPinGraphicsItem(const SymbolPinGraphicsItem& other) = delete;
+  SymbolPinGraphicsItem(
+      std::shared_ptr<SymbolPin> pin, const IF_GraphicsLayerProvider& lp,
+      std::shared_ptr<const Component> cmp = nullptr,
+      std::shared_ptr<const ComponentSymbolVariantItem> cmpItem = nullptr,
+      QGraphicsItem* parent = nullptr) noexcept;
+  ~SymbolPinGraphicsItem() noexcept;
+
+  // Getters
+  const std::shared_ptr<SymbolPin>& getPin() noexcept { return mPin; }
 
   // Setters
-  void setDrawBoundingRect(bool enable) noexcept;
+  void setPosition(const Point& pos) noexcept;
+  void setRotation(const Angle& rot) noexcept;
+  void setSelected(bool selected) noexcept;
 
   // General Methods
-  void updateCacheAndRepaint() noexcept;
+  void updateText() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept override { return mBoundingRect; }
-  QPainterPath shape() const noexcept override { return mShape; }
+  QRectF boundingRect() const noexcept override { return QRectF(); }
+  QPainterPath shape() const noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
-  SymbolPreviewGraphicsItem& operator=(const SymbolPreviewGraphicsItem& rhs) =
-      delete;
+  SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs) = delete;
 
-signals:
+private:  // Methods
+  void pinEdited(const SymbolPin& pin, SymbolPin::Event event) noexcept;
+  void setLength(const UnsignedLength& length) noexcept;
+  void updateTextRotationAndAlignment() noexcept;
 
-  /// @copydoc AttributeProvider::attributesChanged()
-  void attributesChanged() override {}
-
-private:
-  // Inherited from AttributeProvider
-  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-
-  // Types
-
-  struct CachedTextProperties_t {
-    QString text;
-    qreal fontSize;
-    bool rotate180;
-    Qt::Alignment align;
-    QRectF textRect;
-  };
-
-  // General Attributes
+private:  // Data
+  std::shared_ptr<SymbolPin> mPin;
   const IF_GraphicsLayerProvider& mLayerProvider;
-  const Symbol& mSymbol;
-  const Component* mComponent;
-  const ComponentSymbolVariantItem* mSymbVarItem;
-  QFont mFont;
-  bool mDrawBoundingRect;
-  QStringList mLocaleOrder;
+  std::shared_ptr<const Component> mComponent;  // Can be nullptr.
+  std::shared_ptr<const ComponentSymbolVariantItem> mItem;  // Can be nullptr.
+  QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
+  QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
+  QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
 
-  // Cached Attributes
-  QRectF mBoundingRect;
-  QPainterPath mShape;
-  QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
+  // Slots
+  SymbolPin::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

@@ -57,9 +57,10 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid)
                           .get(pinUuid)
                           .get();  // can throw
   tl::optional<Uuid> cmpSignalUuid = mPinSignalMapItem->getSignalUuid();
-  if (cmpSignalUuid)
+  if (cmpSignalUuid) {
     mComponentSignalInstance =
         mSymbol.getComponentInstance().getSignalInstance(*cmpSignalUuid);
+  }
 
   mGraphicsItem.reset(new SGI_SymbolPin(*this));
   updatePosition();
@@ -152,15 +153,22 @@ void SI_SymbolPin::addToSchematic() {
   }
   if (mComponentSignalInstance) {
     mComponentSignalInstance->registerSymbolPin(*this);  // can throw
+    mNetSignalChangedConnection = connect(
+        mComponentSignalInstance, &ComponentSignalInstance::netSignalChanged,
+        this, &SI_SymbolPin::netSignalChanged);
   }
-  if (getCompSigInstNetSignal()) {
+  if (NetSignal* netsignal = getCompSigInstNetSignal()) {
+    mNetSignalRenamedConnection =
+        connect(netsignal, &NetSignal::nameChanged, this,
+                [this]() { mGraphicsItem->updateData(); });
     mHighlightChangedConnection =
-        connect(getCompSigInstNetSignal(), &NetSignal::highlightedChanged,
-                [this]() { mGraphicsItem->update(); });
+        connect(netsignal, &NetSignal::highlightedChanged, this,
+                [this]() { mGraphicsItem->updateSelection(); });
   }
   SI_Base::addToSchematic(mGraphicsItem.data());
   updateErcMessages();
-  mGraphicsItem->updateCacheAndRepaint();
+  mGraphicsItem->updateData();
+  mGraphicsItem->updateSelection();
 }
 
 void SI_SymbolPin::removeFromSchematic() {
@@ -169,8 +177,10 @@ void SI_SymbolPin::removeFromSchematic() {
   }
   if (mComponentSignalInstance) {
     mComponentSignalInstance->unregisterSymbolPin(*this);  // can throw
+    disconnect(mNetSignalChangedConnection);
   }
   if (getCompSigInstNetSignal()) {
+    disconnect(mNetSignalRenamedConnection);
     disconnect(mHighlightChangedConnection);
   }
   SI_Base::removeFromSchematic(mGraphicsItem.data());
@@ -207,8 +217,7 @@ void SI_SymbolPin::registerNetLine(SI_NetLine& netline) {
   mRegisteredNetLines.insert(&netline);
   netline.updateLine();
   updateErcMessages();
-  mGraphicsItem
-      ->updateCacheAndRepaint();  // re-check whether to fill the circle or not
+  mGraphicsItem->updateData();
 }
 
 void SI_SymbolPin::unregisterNetLine(SI_NetLine& netline) {
@@ -218,17 +227,15 @@ void SI_SymbolPin::unregisterNetLine(SI_NetLine& netline) {
   mRegisteredNetLines.remove(&netline);
   netline.updateLine();
   updateErcMessages();
-  mGraphicsItem
-      ->updateCacheAndRepaint();  // re-check whether to fill the circle or not
+  mGraphicsItem->updateData();
 }
 
 void SI_SymbolPin::updatePosition() noexcept {
   Transform transform(mSymbol);
   mPosition = transform.map(mSymbolPin->getPosition());
   mRotation = transform.map(mSymbolPin->getRotation());
-  mGraphicsItem->setPos(mPosition.toPxQPointF());
-  mGraphicsItem->setRotation(-mRotation.toDeg());
-  mGraphicsItem->updateCacheAndRepaint();
+  mGraphicsItem->setPosition(mPosition);
+  mGraphicsItem->setRotation(mRotation);
   foreach (SI_NetLine* netline, mRegisteredNetLines) { netline->updateLine(); }
 }
 
@@ -242,7 +249,7 @@ QPainterPath SI_SymbolPin::getGrabAreaScenePx() const noexcept {
 
 void SI_SymbolPin::setSelected(bool selected) noexcept {
   SI_Base::setSelected(selected);
-  mGraphicsItem->update();
+  mGraphicsItem->updateSelection();
 }
 
 /*******************************************************************************
@@ -262,6 +269,23 @@ void SI_SymbolPin::updateErcMessages() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void SI_SymbolPin::netSignalChanged(NetSignal* from, NetSignal* to) noexcept {
+  if (from) {
+    disconnect(mNetSignalRenamedConnection);
+    disconnect(mHighlightChangedConnection);
+  }
+  if (to) {
+    mNetSignalRenamedConnection =
+        connect(to, &NetSignal::nameChanged, this,
+                [this]() { mGraphicsItem->updateData(); });
+    mHighlightChangedConnection =
+        connect(to, &NetSignal::highlightedChanged, this,
+                [this]() { mGraphicsItem->updateSelection(); });
+  }
+  mGraphicsItem->updateData();
+  mGraphicsItem->updateSelection();
+}
 
 QString SI_SymbolPin::getLibraryComponentName() const noexcept {
   return *mSymbol.getComponentInstance()

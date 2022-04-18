@@ -98,7 +98,7 @@ public:
 
 private:  // Methods
   bool openContextMenuAtPos(const Point& pos) noexcept;
-  bool openPropertiesDialogOfItem(QGraphicsItem* item) noexcept;
+  bool openPropertiesDialogOfItem(std::shared_ptr<QGraphicsItem> item) noexcept;
   bool openPropertiesDialogOfItemAtPos(const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
   bool startPaste(std::unique_ptr<SymbolClipboardData> data,
@@ -108,11 +108,12 @@ private:  // Methods
   bool snapSelectedItemsToGrid() noexcept;
   bool removeSelectedItems() noexcept;
   void removeSelectedPolygonVertices() noexcept;
-  void startAddingPolygonVertex(Polygon& polygon, int vertex,
+  void startAddingPolygonVertex(std::shared_ptr<Polygon> polygon, int vertex,
                                 const Point& pos) noexcept;
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
   void clearSelectionRect(bool updateItemsSelectionState) noexcept;
-  QList<QGraphicsItem*> findItemsAtPosition(const Point& pos) noexcept;
+  QList<std::shared_ptr<QGraphicsItem> > findItemsAtPosition(
+      const Point& pos) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
 
 private:  // Types / Data
@@ -130,7 +131,7 @@ private:  // Types / Data
   int mCurrentSelectionIndex;
 
   /// The current polygon selected for editing (nullptr if none)
-  Polygon* mSelectedPolygon;
+  std::shared_ptr<Polygon> mSelectedPolygon;
   /// The polygon vertex indices selected for editing (empty if none)
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)

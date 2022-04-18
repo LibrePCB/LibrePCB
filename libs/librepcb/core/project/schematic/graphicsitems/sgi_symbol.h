@@ -33,10 +33,12 @@
  ******************************************************************************/
 namespace librepcb {
 
+class CircleGraphicsItem;
 class GraphicsLayer;
+class OriginCrossGraphicsItem;
+class PolygonGraphicsItem;
+class PrimitiveTextGraphicsItem;
 class SI_Symbol;
-class Symbol;
-class Text;
 
 /*******************************************************************************
  *  Class SGI_Symbol
@@ -54,42 +56,28 @@ public:
   ~SGI_Symbol() noexcept;
 
   // General Methods
-  void updateCacheAndRepaint() noexcept;
+  void setPosition(const Point& pos) noexcept;
+  void setSelected(bool selected) noexcept;
+  void updateRotationAndMirror() noexcept;
+  void updateAllTexts() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept { return mBoundingRect; }
-  QPainterPath shape() const noexcept { return mShape; }
+  QRectF boundingRect() const noexcept override { return mBoundingRect; }
+  QPainterPath shape() const noexcept override { return mShape; }
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0);
+             QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
   SGI_Symbol& operator=(const SGI_Symbol& rhs) = delete;
 
-private:
-  // Private Methods
-  GraphicsLayer* getLayer(const QString& name) const noexcept;
-
-  // Types
-
-  struct CachedTextProperties_t {
-    QString text;
-    int fontPixelSize;
-    qreal scaleFactor;
-    bool rotate180;
-    bool mirrored;
-    int flags;
-    QRectF textRect;  // not scaled
-  };
-
-  // General Attributes
+private:  // Data
   SI_Symbol& mSymbol;
-  const Symbol& mLibSymbol;
-  QFont mFont;
-
-  // Cached Attributes
+  std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+  QVector<std::shared_ptr<CircleGraphicsItem>> mCircleGraphicsItems;
+  QVector<std::shared_ptr<PolygonGraphicsItem>> mPolygonGraphicsItems;
+  QVector<std::shared_ptr<PrimitiveTextGraphicsItem>> mTextGraphicsItems;
   QRectF mBoundingRect;
   QPainterPath mShape;
-  QHash<const Text*, CachedTextProperties_t> mCachedTextProperties;
 };
 
 /*******************************************************************************
