@@ -59,10 +59,11 @@ public:
 
 signals:
   // Note: Full namespace librepcb::UnsignedLength is required for the MOC!
-  void valueChanged(const librepcb::UnsignedLength& value);
+  void valueChanged(const librepcb::UnsignedLength& value,
+                    const librepcb::Length& diff);
 
 private:
-  virtual void valueChangedImpl() noexcept override;
+  virtual void valueChangedImpl(const Length& diff) noexcept override;
 };
 
 /*******************************************************************************

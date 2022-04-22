@@ -65,8 +65,8 @@ void UnsignedLengthEdit::setValue(const UnsignedLength& value) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void UnsignedLengthEdit::valueChangedImpl() noexcept {
-  emit valueChanged(getValue());
+void UnsignedLengthEdit::valueChangedImpl(const Length& diff) noexcept {
+  emit valueChanged(getValue(), diff);
 }
 
 /*******************************************************************************
