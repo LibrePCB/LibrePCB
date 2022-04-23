@@ -62,6 +62,9 @@ SchematicPainter::SchematicPainter(const Schematic& schematic) noexcept {
           pin->getLibPin().getLength(),
           pin->getDisplayText(),
           pin->getLibPin().getNamePosition(),
+          pin->getLibPin().getNameRotation(),
+          pin->getLibPin().getNameHeight(),
+          pin->getLibPin().getNameAlignment(),
       });
       if (pin->isVisibleJunction()) {
         mJunctions.append(pin->getPosition());
@@ -158,11 +161,14 @@ void SchematicPainter::paint(QPainter& painter,
                       symbol.transform.map(pin.rotation), *pin.length,
                       settings.getColor(GraphicsLayer::sSymbolOutlines),
                       QColor());
+      Alignment nameAlignment = pin.nameAlignment;
+      if (symbol.transform.getMirrored()) {
+        nameAlignment.mirrorV();
+      }
       p.drawText(symbol.transform.map(pin.position +
                                       pin.namePosition.rotated(pin.rotation)),
-                 symbol.transform.map(pin.rotation),
-                 *SymbolPin::getNameHeight(),
-                 Alignment(HAlign::left(), VAlign::center()), pin.name,
+                 symbol.transform.map(pin.rotation + pin.nameRotation),
+                 *pin.nameHeight, nameAlignment, pin.name,
                  qApp->getDefaultSansSerifFont(),
                  settings.getColor(GraphicsLayer::sSymbolPinNames), false);
     }

@@ -77,16 +77,18 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
 
   // text
   mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
-  mTextGraphicsItem->setHeight(SymbolPin::getNameHeight());
   mTextGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinNames));
   mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
-  updateTextRotationAndAlignment();
   updateText();
 
   // pin properties
   setPosition(mPin->getPosition());
   setRotation(mPin->getRotation());
   setLength(mPin->getLength());
+  setNamePosition(mPin->getNamePosition());
+  setNameHeight(mPin->getNameHeight());
+  setNameRotationAndAlignment(mPin->getNameRotation(),
+                              mPin->getNameAlignment());
 
   // Register to the pin to get notified about any modifications.
   mPin->onEdited.attach(mOnEditedSlot);
@@ -105,7 +107,10 @@ void SymbolPinGraphicsItem::setPosition(const Point& pos) noexcept {
 
 void SymbolPinGraphicsItem::setRotation(const Angle& rot) noexcept {
   QGraphicsItem::setRotation(-rot.toDeg());
-  updateTextRotationAndAlignment();  // Auto-rotation may need to be updated.
+
+  // Auto-rotation may need to be updated.
+  setNameRotationAndAlignment(mPin->getNameRotation(),
+                              mPin->getNameAlignment());
 }
 
 void SymbolPinGraphicsItem::setSelected(bool selected) noexcept {
@@ -202,6 +207,17 @@ void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
     case SymbolPin::Event::RotationChanged:
       setRotation(pin.getRotation());
       break;
+    case SymbolPin::Event::NamePositionChanged:
+      setNamePosition(pin.getNamePosition());
+      break;
+    case SymbolPin::Event::NameHeightChanged:
+      setNameHeight(pin.getNameHeight());
+      break;
+    case SymbolPin::Event::NameRotationChanged:
+    case SymbolPin::Event::NameAlignmentChanged:
+      setNameRotationAndAlignment(pin.getNameRotation(),
+                                  pin.getNameAlignment());
+      break;
     default:
       qWarning()
           << "Unhandled switch-case in SymbolPinGraphicsItem::pinEdited()";
@@ -214,15 +230,25 @@ void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept {
   mTextGraphicsItem->setPosition(mPin->getNamePosition());
 }
 
-void SymbolPinGraphicsItem::updateTextRotationAndAlignment() noexcept {
-  Angle rotation(0);
-  Alignment alignment(HAlign::left(), VAlign::center());
-  if (Toolbox::isTextUpsideDown(mPin->getRotation(), false)) {
-    rotation += Angle::deg180();
-    alignment.mirror();
+void SymbolPinGraphicsItem::setNamePosition(const Point& position) noexcept {
+  mTextGraphicsItem->setPosition(position);
+}
+
+void SymbolPinGraphicsItem::setNameHeight(
+    const PositiveLength& height) noexcept {
+  mTextGraphicsItem->setHeight(height);
+}
+
+void SymbolPinGraphicsItem::setNameRotationAndAlignment(
+    const Angle& rotation, const Alignment& align) noexcept {
+  const Angle totalRotation = mPin->getRotation() + rotation;
+  if (Toolbox::isTextUpsideDown(totalRotation, false)) {
+    mTextGraphicsItem->setRotation(rotation + Angle::deg180());
+    mTextGraphicsItem->setAlignment(align.mirrored());
+  } else {
+    mTextGraphicsItem->setRotation(rotation);
+    mTextGraphicsItem->setAlignment(align);
   }
-  mTextGraphicsItem->setRotation(rotation);
-  mTextGraphicsItem->setAlignment(alignment);
 }
 
 /*******************************************************************************

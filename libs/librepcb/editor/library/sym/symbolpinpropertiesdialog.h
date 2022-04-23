@@ -23,8 +23,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/length.h>
+
 #include <QtCore>
 #include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -56,8 +60,8 @@ public:
   // Constructors / Destructor
   SymbolPinPropertiesDialog() = delete;
   SymbolPinPropertiesDialog(const SymbolPinPropertiesDialog& other) = delete;
-  SymbolPinPropertiesDialog(SymbolPin& pin, UndoStack& undoStack,
-                            const LengthUnit& lengthUnit,
+  SymbolPinPropertiesDialog(std::shared_ptr<SymbolPin> pin,
+                            UndoStack& undoStack, const LengthUnit& lengthUnit,
                             const QString& settingsPrefix,
                             QWidget* parent = nullptr) noexcept;
   ~SymbolPinPropertiesDialog() noexcept;
@@ -70,11 +74,12 @@ public:
       delete;
 
 private:  // Methods
+  void updateNamePositionTooltip(const UnsignedLength& length) noexcept;
   void on_buttonBox_clicked(QAbstractButton* button);
   bool applyChanges() noexcept;
 
 private:  // Data
-  SymbolPin& mSymbolPin;
+  std::shared_ptr<SymbolPin> mSymbolPin;
   UndoStack& mUndoStack;
   QScopedPointer<Ui::SymbolPinPropertiesDialog> mUi;
 };

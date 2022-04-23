@@ -100,9 +100,8 @@ void SymbolPainter::paint(QPainter& painter,
                     QColor());
     p.drawText(
         pin.getPosition() + pin.getNamePosition().rotated(pin.getRotation()),
-        pin.getRotation(), *SymbolPin::getNameHeight(),
-        Alignment(HAlign::left(), VAlign::center()), *pin.getName(),
-        qApp->getDefaultSansSerifFont(),
+        pin.getRotation() + pin.getNameRotation(), *pin.getNameHeight(),
+        pin.getNameAlignment(), *pin.getName(), qApp->getDefaultSansSerifFont(),
         settings.getColor(GraphicsLayer::sSymbolPinNames), false);
   }
 }

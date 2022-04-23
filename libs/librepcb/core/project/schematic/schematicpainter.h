@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../export/graphicsexport.h"
+#include "../../types/alignment.h"
 #include "../../types/length.h"
 #include "../../utils/transform.h"
 
@@ -57,6 +58,9 @@ class SchematicPainter final : public GraphicsPagePainter {
     UnsignedLength length;
     QString name;
     Point namePosition;
+    Angle nameRotation;
+    PositiveLength nameHeight;
+    Alignment nameAlignment;
   };
 
   struct Line {

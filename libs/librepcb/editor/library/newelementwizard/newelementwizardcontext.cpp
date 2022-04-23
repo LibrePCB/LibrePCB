@@ -167,7 +167,9 @@ void NewElementWizardContext::copyElement(ElementType type,
       for (const SymbolPin& pin : symbol->getPins()) {
         mSymbolPins.append(std::make_shared<SymbolPin>(
             Uuid::createRandom(), pin.getName(), pin.getPosition(),
-            pin.getLength(), pin.getRotation()));
+            pin.getLength(), pin.getRotation(), pin.getNamePosition(),
+            pin.getNameRotation(), pin.getNameHeight(),
+            pin.getNameAlignment()));
       }
       // copy polygons but generate new UUIDs
       mSymbolPolygons.clear();

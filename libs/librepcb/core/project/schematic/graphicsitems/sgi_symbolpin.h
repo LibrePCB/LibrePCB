@@ -54,11 +54,8 @@ public:
   explicit SGI_SymbolPin(SI_SymbolPin& pin) noexcept;
   ~SGI_SymbolPin() noexcept;
 
-  // Setters
-  void setPosition(const Point& pos) noexcept;
-  void setRotation(const Angle& rot) noexcept;
-
   // General Methods
+  void updateTransform() noexcept;
   void updateData() noexcept;
   void updateSelection() noexcept;
 
@@ -72,7 +69,6 @@ public:
   SGI_SymbolPin& operator=(const SGI_SymbolPin& rhs) = delete;
 
 private:  // Methods
-  void updateTextRotationAndAlignment() noexcept;
   GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 private:  // Data

@@ -56,7 +56,6 @@ SymbolEditorState_AddPins::SymbolEditorState_AddPins(
 }
 
 SymbolEditorState_AddPins::~SymbolEditorState_AddPins() noexcept {
-  Q_ASSERT(mEditCmd.isNull());
 }
 
 /*******************************************************************************
@@ -95,9 +94,9 @@ bool SymbolEditorState_AddPins::entry() noexcept {
 bool SymbolEditorState_AddPins::exit() noexcept {
   // abort command
   try {
+    mEditCmd.reset();
     mCurrentGraphicsItem.reset();
     mCurrentPin.reset();
-    mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -120,7 +119,9 @@ bool SymbolEditorState_AddPins::processGraphicsSceneMouseMoved(
     QGraphicsSceneMouseEvent& e) noexcept {
   Point currentPos =
       Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
-  mEditCmd->setPosition(currentPos, true);
+  if (mEditCmd) {
+    mEditCmd->setPosition(currentPos, true);
+  }
   return true;
 }
 
@@ -128,14 +129,16 @@ bool SymbolEditorState_AddPins::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
   Point currentPos =
       Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
-  mEditCmd->setPosition(currentPos, true);
   Angle currentRot = mCurrentPin->getRotation();
   try {
+    if (mEditCmd) {
+      mEditCmd->setPosition(currentPos, true);
+      mContext.undoStack.appendToCmdGroup(mEditCmd.take());
+    }
+    mContext.undoStack.commitCmdGroup();
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
     mCurrentPin.reset();
-    mContext.undoStack.appendToCmdGroup(mEditCmd.take());
-    mContext.undoStack.commitCmdGroup();
     return addNextPin(currentPos, currentRot);
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -150,12 +153,16 @@ bool SymbolEditorState_AddPins::processGraphicsSceneRightMouseButtonReleased(
 }
 
 bool SymbolEditorState_AddPins::processRotateCw() noexcept {
-  mEditCmd->rotate(-Angle::deg90(), mCurrentPin->getPosition(), true);
+  if (mEditCmd) {
+    mEditCmd->rotate(-Angle::deg90(), mCurrentPin->getPosition(), true);
+  }
   return true;
 }
 
 bool SymbolEditorState_AddPins::processRotateCcw() noexcept {
-  mEditCmd->rotate(Angle::deg90(), mCurrentPin->getPosition(), true);
+  if (mEditCmd) {
+    mEditCmd->rotate(Angle::deg90(), mCurrentPin->getPosition(), true);
+  }
   return true;
 }
 
@@ -170,21 +177,22 @@ bool SymbolEditorState_AddPins::addNextPin(const Point& pos,
     mContext.undoStack.beginCmdGroup(tr("Add symbol pin"));
     mCurrentPin = std::make_shared<SymbolPin>(
         Uuid::createRandom(), CircuitIdentifier(mNameLineEdit->text()), pos,
-        mLastLength, rot);  // can throw
-
+        mLastLength, rot, SymbolPin::getDefaultNamePosition(mLastLength),
+        Angle(0), SymbolPin::getDefaultNameHeight(),
+        SymbolPin::getDefaultNameAlignment());  // can throw
     mContext.undoStack.appendToCmdGroup(
         new CmdSymbolPinInsert(mContext.symbol.getPins(), mCurrentPin));
-    mEditCmd.reset(new CmdSymbolPinEdit(*mCurrentPin));
     mCurrentGraphicsItem =
         mContext.symbolGraphicsItem.getGraphicsItem(mCurrentPin);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
+    mEditCmd.reset(new CmdSymbolPinEdit(mCurrentPin));
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    mEditCmd.reset();
     mCurrentGraphicsItem.reset();
     mCurrentPin.reset();
-    mEditCmd.reset();
     return false;
   }
 }
@@ -205,6 +213,8 @@ void SymbolEditorState_AddPins::lengthEditValueChanged(
   mLastLength = value;
   if (mEditCmd) {
     mEditCmd->setLength(mLastLength, true);
+    mEditCmd->setNamePosition(SymbolPin::getDefaultNamePosition(mLastLength),
+                              true);
   }
 }
 

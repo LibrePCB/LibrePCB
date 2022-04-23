@@ -84,7 +84,10 @@ public:
 private:  // Methods
   void pinEdited(const SymbolPin& pin, SymbolPin::Event event) noexcept;
   void setLength(const UnsignedLength& length) noexcept;
-  void updateTextRotationAndAlignment() noexcept;
+  void setNamePosition(const Point& position) noexcept;
+  void setNameHeight(const PositiveLength& height) noexcept;
+  void setNameRotationAndAlignment(const Angle& rotation,
+                                   const Alignment& align) noexcept;
 
 private:  // Data
   std::shared_ptr<SymbolPin> mPin;

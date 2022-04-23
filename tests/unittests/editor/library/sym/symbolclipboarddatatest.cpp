@@ -73,11 +73,13 @@ TEST(SymbolClipboardDataTest, testToFromMimeDataPopulated) {
 
   std::shared_ptr<SymbolPin> pin1 = std::make_shared<SymbolPin>(
       Uuid::createRandom(), CircuitIdentifier("foo"), Point(12, 34),
-      UnsignedLength(0), Angle(56));
+      UnsignedLength(0), Angle(56), Point(78, 90), Angle(98),
+      PositiveLength(76), Alignment(HAlign::center(), VAlign::top()));
 
   std::shared_ptr<SymbolPin> pin2 = std::make_shared<SymbolPin>(
       Uuid::createRandom(), CircuitIdentifier("bar"), Point(120, 340),
-      UnsignedLength(123), Angle(789));
+      UnsignedLength(123), Angle(789), Point(987, 654), Angle(32),
+      PositiveLength(10), Alignment(HAlign::right(), VAlign::bottom()));
 
   std::shared_ptr<Polygon> polygon1 = std::make_shared<Polygon>(
       Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(1), false,

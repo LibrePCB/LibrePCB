@@ -97,7 +97,7 @@ public:
   // General Methods
   void addToSchematic() override;
   void removeFromSchematic() override;
-  void updatePosition() noexcept;
+  void updatePosition(bool mirroredOrRotated) noexcept;
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override {

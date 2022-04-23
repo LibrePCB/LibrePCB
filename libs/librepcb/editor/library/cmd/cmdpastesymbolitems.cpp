@@ -93,9 +93,10 @@ bool CmdPasteSymbolItems::performExecute() {
       name = CircuitIdentifier(
           Toolbox::incrementNumberInString(*name));  // can throw
     }
-    std::shared_ptr<SymbolPin> copy =
-        std::make_shared<SymbolPin>(uuid, name, pin.getPosition() + mPosOffset,
-                                    pin.getLength(), pin.getRotation());
+    std::shared_ptr<SymbolPin> copy = std::make_shared<SymbolPin>(
+        uuid, name, pin.getPosition() + mPosOffset, pin.getLength(),
+        pin.getRotation(), pin.getNamePosition(), pin.getNameRotation(),
+        pin.getNameHeight(), pin.getNameAlignment());
     execNewChildCmd(new CmdSymbolPinInsert(mSymbol.getPins(), copy));
     if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
       graphicsItem->setSelected(true);
