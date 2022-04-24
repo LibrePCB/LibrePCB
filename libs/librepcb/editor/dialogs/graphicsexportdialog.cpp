@@ -1410,6 +1410,7 @@ QPrinter::DuplexMode GraphicsExportDialog::getDuplex() const noexcept {
 
 void GraphicsExportDialog::setPageContent(
     const QList<ContentItem>& items) noexcept {
+  QSignalBlocker signalBlocker(mUi->treeContent);  // Avoid recursion.
   mUi->treeContent->clear();
   mPageContentItems = items;
   foreach (const ContentItem& item, items) {
@@ -1429,6 +1430,7 @@ void GraphicsExportDialog::setPageContent(
     }
   }
   mUi->treeContent->viewport()->update();  // Fix UI flicker.
+  applySettings();  // Because we disabled updates triggered by the UI.
 }
 
 const QList<GraphicsExportDialog::ContentItem>&
