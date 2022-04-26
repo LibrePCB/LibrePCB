@@ -552,7 +552,7 @@ bool PackageEditorState_Select::openContextMenuAtPos(
     connect(aMirrorH, &QAction::triggered,
             [this]() { mirrorSelectedItems(Qt::Horizontal, false); });
     QAction* aFlipH =
-        menu.addAction(QIcon(":/img/actions/swap.png"), tr("Flip"));
+        menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), tr("Flip"));
     aFlipH->setEnabled(!mContext.readOnly);
     connect(aFlipH, &QAction::triggered,
             [this]() { mirrorSelectedItems(Qt::Horizontal, true); });

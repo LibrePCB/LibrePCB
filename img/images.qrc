@@ -49,6 +49,8 @@
         <file>actions/info.png</file>
         <file>actions/layers.png</file>
         <file>actions/minus.png</file>
+        <file>actions/mirror_horizontal.png</file>
+        <file>actions/mirror_vertical.png</file>
         <file>actions/move.png</file>
         <file>actions/move_to.png</file>
         <file>actions/new.png</file>
@@ -81,7 +83,6 @@
         <file>actions/settings.png</file>
         <file>actions/show_planes.png</file>
         <file>actions/stop.png</file>
-        <file>actions/swap.png</file>
         <file>actions/undo.png</file>
         <file>actions/up.png</file>
         <file>actions/working.png</file>

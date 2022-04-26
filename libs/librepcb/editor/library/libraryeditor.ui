@@ -715,7 +715,7 @@
   <action name="actionMirror">
    <property name="icon">
     <iconset>
-     <normaloff>:/img/actions/flip_horizontal.png</normaloff>:/img/actions/flip_horizontal.png</iconset>
+     <normaloff>:/img/actions/mirror_horizontal.png</normaloff>:/img/actions/mirror_horizontal.png</iconset>
    </property>
    <property name="text">
     <string>Mirror</string>
@@ -727,7 +727,7 @@
   <action name="actionFlip">
    <property name="icon">
     <iconset>
-     <normaloff>:/img/actions/swap.png</normaloff>:/img/actions/swap.png</iconset>
+     <normaloff>:/img/actions/flip_horizontal.png</normaloff>:/img/actions/flip_horizontal.png</iconset>
    </property>
    <property name="text">
     <string>Flip</string>
