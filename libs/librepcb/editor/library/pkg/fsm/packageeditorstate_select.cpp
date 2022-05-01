@@ -34,6 +34,8 @@
 #include "../../cmd/cmdpastefootprintitems.h"
 #include "../../cmd/cmdremoveselectedfootprintitems.h"
 #include "../footprintclipboarddata.h"
+#include "../footprintgraphicsitem.h"
+#include "../footprintpadgraphicsitem.h"
 #include "../footprintpadpropertiesdialog.h"
 #include "../packageeditorwidget.h"
 
@@ -43,8 +45,6 @@
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/import/dxfreader.h>
-#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>

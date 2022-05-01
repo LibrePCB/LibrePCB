@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_FOOTPRINTPADGRAPHICSITEM_H
-#define LIBREPCB_CORE_FOOTPRINTPADGRAPHICSITEM_H
+#ifndef LIBREPCB_EDITOR_FOOTPRINTPADGRAPHICSITEM_H
+#define LIBREPCB_EDITOR_FOOTPRINTPADGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../pkg/packagepad.h"
-#include "footprintpad.h"
+#include <librepcb/core/library/pkg/footprintpad.h>
+#include <librepcb/core/library/pkg/packagepad.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,6 +39,8 @@ namespace librepcb {
 class IF_GraphicsLayerProvider;
 class PrimitivePathGraphicsItem;
 class PrimitiveTextGraphicsItem;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class FootprintPadGraphicsItem
@@ -102,6 +104,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

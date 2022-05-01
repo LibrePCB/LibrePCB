@@ -22,13 +22,14 @@
  ******************************************************************************/
 #include "footprintclipboarddata.h"
 
+#include "footprintpadgraphicsitem.h"
+
 #include <librepcb/core/application.h>
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/holegraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
-#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
 
 #include <QtCore>
 #include <QtWidgets>

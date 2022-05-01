@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_FOOTPRINTGRAPHICSITEM_H
-#define LIBREPCB_CORE_FOOTPRINTGRAPHICSITEM_H
+#ifndef LIBREPCB_EDITOR_FOOTPRINTGRAPHICSITEM_H
+#define LIBREPCB_EDITOR_FOOTPRINTGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../pkg/packagepad.h"
-#include "footprint.h"
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/packagepad.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,7 +40,6 @@ class Angle;
 class Circle;
 class CircleGraphicsItem;
 class FootprintPad;
-class FootprintPadGraphicsItem;
 class Hole;
 class HoleGraphicsItem;
 class IF_GraphicsLayerProvider;
@@ -49,6 +48,10 @@ class Polygon;
 class PolygonGraphicsItem;
 class StrokeText;
 class StrokeTextGraphicsItem;
+
+namespace editor {
+
+class FootprintPadGraphicsItem;
 
 /*******************************************************************************
  *  Class FootprintGraphicsItem
@@ -149,6 +152,7 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

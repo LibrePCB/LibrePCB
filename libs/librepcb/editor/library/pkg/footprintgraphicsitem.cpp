@@ -22,14 +22,14 @@
  ******************************************************************************/
 #include "footprintgraphicsitem.h"
 
-#include "../../graphics/circlegraphicsitem.h"
-#include "../../graphics/holegraphicsitem.h"
-#include "../../graphics/polygongraphicsitem.h"
-#include "../../graphics/stroketextgraphicsitem.h"
-#include "../../types/angle.h"
-#include "../../types/point.h"
-#include "footprint.h"
 #include "footprintpadgraphicsitem.h"
+
+#include <librepcb/core/graphics/circlegraphicsitem.h>
+#include <librepcb/core/graphics/holegraphicsitem.h>
+#include <librepcb/core/graphics/polygongraphicsitem.h>
+#include <librepcb/core/graphics/stroketextgraphicsitem.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,6 +38,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -378,4 +379,5 @@ void FootprintGraphicsItem::footprintEdited(const Footprint& footprint,
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

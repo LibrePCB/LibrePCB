@@ -37,12 +37,12 @@
 namespace librepcb {
 
 class Footprint;
-class FootprintGraphicsItem;
 class Package;
 
 namespace editor {
 
 class FootprintClipboardData;
+class FootprintGraphicsItem;
 
 /*******************************************************************************
  *  Class CmdPasteFootprintItems

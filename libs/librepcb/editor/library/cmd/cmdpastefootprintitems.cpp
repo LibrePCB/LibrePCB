@@ -27,6 +27,8 @@
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
 #include "../pkg/footprintclipboarddata.h"
+#include "../pkg/footprintgraphicsitem.h"
+#include "../pkg/footprintpadgraphicsitem.h"
 #include "cmdfootprintpadedit.h"
 
 #include <librepcb/core/graphics/circlegraphicsitem.h>
@@ -34,8 +36,6 @@
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/utils/scopeguard.h>
 

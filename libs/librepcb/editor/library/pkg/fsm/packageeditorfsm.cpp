@@ -23,6 +23,7 @@
 #include "packageeditorfsm.h"
 
 #include "../../../widgets/graphicsview.h"
+#include "../footprintgraphicsitem.h"
 #include "packageeditorstate_addholes.h"
 #include "packageeditorstate_addnames.h"
 #include "packageeditorstate_addpads.h"
@@ -38,7 +39,6 @@
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/primitivetextgraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
 #include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>

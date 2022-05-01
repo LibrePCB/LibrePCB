@@ -27,14 +27,14 @@
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdfootprintpadedit.h"
 #include "../boardsideselectorwidget.h"
+#include "../footprintgraphicsitem.h"
+#include "../footprintpadgraphicsitem.h"
 #include "../footprintpadshapeselectorwidget.h"
 #include "../packageeditorwidget.h"
 #include "../packagepadcombobox.h"
 
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>

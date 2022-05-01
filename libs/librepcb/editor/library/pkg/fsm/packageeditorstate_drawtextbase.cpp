@@ -29,6 +29,7 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../../widgets/unsignedlengthedit.h"
+#include "../footprintgraphicsitem.h"
 #include "../packageeditorwidget.h"
 
 #include <librepcb/core/geometry/stroketext.h>
@@ -36,7 +37,6 @@
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
 
 #include <QtCore>
 

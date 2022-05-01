@@ -22,13 +22,12 @@
  ******************************************************************************/
 #include "footprintpadgraphicsitem.h"
 
-#include "../../graphics/graphicslayer.h"
-#include "../../graphics/primitivepathgraphicsitem.h"
-#include "../../graphics/primitivetextgraphicsitem.h"
-#include "../../types/angle.h"
-#include "../../types/length.h"
-#include "../../types/point.h"
-#include "footprintpad.h"
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/primitivepathgraphicsitem.h>
+#include <librepcb/core/graphics/primitivetextgraphicsitem.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/length.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,6 +36,7 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -202,4 +202,5 @@ void FootprintPadGraphicsItem::updateTextHeight() noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

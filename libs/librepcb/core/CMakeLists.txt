@@ -242,12 +242,8 @@ add_library(
   library/msg/msgnamenottitlecase.h
   library/pkg/footprint.cpp
   library/pkg/footprint.h
-  library/pkg/footprintgraphicsitem.cpp
-  library/pkg/footprintgraphicsitem.h
   library/pkg/footprintpad.cpp
   library/pkg/footprintpad.h
-  library/pkg/footprintpadgraphicsitem.cpp
-  library/pkg/footprintpadgraphicsitem.h
   library/pkg/footprintpainter.cpp
   library/pkg/footprintpainter.h
   library/pkg/msg/msgduplicatepadname.cpp

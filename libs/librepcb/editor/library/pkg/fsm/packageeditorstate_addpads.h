@@ -37,12 +37,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-class FootprintPadGraphicsItem;
 class PackagePad;
 
 namespace editor {
 
 class CmdFootprintPadEdit;
+class FootprintPadGraphicsItem;
 class PackagePadComboBox;
 
 /*******************************************************************************
