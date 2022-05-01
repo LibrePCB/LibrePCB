@@ -99,9 +99,6 @@ public:
   HoleList& getHoles() noexcept { return mHoles; }
 
   // General Methods
-  void setStrokeFontForAllTexts(const StrokeFont* font) noexcept;
-
-  // General Methods
 
   /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -144,8 +141,6 @@ private:  // Data
   CircleList mCircles;
   StrokeTextList mStrokeTexts;
   HoleList mHoles;
-
-  const StrokeFont* mStrokeFont;
 
   // Slots
   LocalizedNameMap::OnEditedSlot mNamesEditedSlot;

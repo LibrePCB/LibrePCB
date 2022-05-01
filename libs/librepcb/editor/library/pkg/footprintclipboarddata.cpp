@@ -135,8 +135,8 @@ QPixmap FootprintClipboardData::generatePixmap(
     items.append(std::make_shared<CircleGraphicsItem>(circle, lp));
   }
   for (StrokeText& text : mStrokeTexts) {
-    text.setFont(&qApp->getDefaultStrokeFont());
-    items.append(std::make_shared<StrokeTextGraphicsItem>(text, lp));
+    items.append(std::make_shared<StrokeTextGraphicsItem>(
+        text, lp, qApp->getDefaultStrokeFont()));
   }
   for (Hole& hole : mHoles) {
     items.append(std::make_shared<HoleGraphicsItem>(hole, lp));

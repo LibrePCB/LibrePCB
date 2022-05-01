@@ -34,6 +34,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class AttributeProvider;
 class IF_GraphicsLayerProvider;
 class OriginCrossGraphicsItem;
 
@@ -51,11 +52,16 @@ public:
   StrokeTextGraphicsItem() = delete;
   StrokeTextGraphicsItem(const StrokeTextGraphicsItem& other) = delete;
   StrokeTextGraphicsItem(StrokeText& text, const IF_GraphicsLayerProvider& lp,
+                         const StrokeFont& font,
                          QGraphicsItem* parent = nullptr) noexcept;
   ~StrokeTextGraphicsItem() noexcept;
 
   // Getters
   StrokeText& getText() noexcept { return mText; }
+
+  // General Methods
+  void setAttributeProvider(const AttributeProvider* provider) noexcept;
+  void updateText() noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
@@ -67,6 +73,7 @@ private:  // Methods
   void strokeTextEdited(const StrokeText& text,
                         StrokeText::Event event) noexcept;
   void updateLayer(const GraphicsLayerName& layerName) noexcept;
+  void updatePaths() noexcept;
   void updateTransform() noexcept;
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
@@ -74,7 +81,12 @@ private:  // Methods
 private:  // Data
   StrokeText& mText;
   const IF_GraphicsLayerProvider& mLayerProvider;
+  const StrokeFont& mFont;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+
+  /// Object for substituting placeholders in text
+  const AttributeProvider* mAttributeProvider;
+  QString mSubstitutedText;
 
   // Slots
   StrokeText::OnEditedSlot mOnEditedSlot;

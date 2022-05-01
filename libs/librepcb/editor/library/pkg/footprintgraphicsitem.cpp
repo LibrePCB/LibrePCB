@@ -46,10 +46,11 @@ namespace editor {
 
 FootprintGraphicsItem::FootprintGraphicsItem(
     std::shared_ptr<Footprint> footprint, const IF_GraphicsLayerProvider& lp,
-    const PackagePadList* packagePadList) noexcept
+    const StrokeFont& font, const PackagePadList* packagePadList) noexcept
   : QGraphicsItem(nullptr),
     mFootprint(footprint),
     mLayerProvider(lp),
+    mFont(font),
     mPackagePadList(packagePadList),
     mOnEditedSlot(*this, &FootprintGraphicsItem::footprintEdited) {
   Q_ASSERT(mFootprint);
@@ -322,8 +323,8 @@ void FootprintGraphicsItem::syncStrokeTexts() noexcept {
   for (auto& obj : mFootprint->getStrokeTexts().values()) {
     if (!mStrokeTextGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i =
-          std::make_shared<StrokeTextGraphicsItem>(*obj, mLayerProvider, this);
+      auto i = std::make_shared<StrokeTextGraphicsItem>(*obj, mLayerProvider,
+                                                        mFont, this);
       mStrokeTextGraphicsItems.insert(obj, i);
     }
   }

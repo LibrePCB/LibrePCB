@@ -67,6 +67,7 @@ public:
   FootprintGraphicsItem(const FootprintGraphicsItem& other) = delete;
   FootprintGraphicsItem(std::shared_ptr<Footprint> footprint,
                         const IF_GraphicsLayerProvider& lp,
+                        const StrokeFont& font,
                         const PackagePadList* packagePadList) noexcept;
   ~FootprintGraphicsItem() noexcept;
 
@@ -132,6 +133,7 @@ private:  // Methods
 private:  // Data
   std::shared_ptr<Footprint> mFootprint;
   const IF_GraphicsLayerProvider& mLayerProvider;
+  const StrokeFont& mFont;
   const PackagePadList* mPackagePadList;
   QMap<std::shared_ptr<FootprintPad>, std::shared_ptr<FootprintPadGraphicsItem>>
       mPadGraphicsItems;

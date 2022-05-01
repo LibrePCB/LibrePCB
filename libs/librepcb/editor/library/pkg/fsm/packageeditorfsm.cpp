@@ -136,13 +136,10 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
 
   mContext.currentFootprint = fpt;
   if (mContext.currentFootprint) {
-    // set font to default application font
-    mContext.currentFootprint->setStrokeFontForAllTexts(
-        &qApp->getDefaultStrokeFont());
     // load graphics items recursively
     mContext.currentGraphicsItem.reset(new FootprintGraphicsItem(
         mContext.currentFootprint, mContext.layerProvider,
-        &mContext.package.getPads()));
+        qApp->getDefaultStrokeFont(), &mContext.package.getPads()));
     mContext.graphicsScene.addItem(*mContext.currentGraphicsItem);
     mSelectFootprintGraphicsItem.reset();
     mContext.graphicsView.setEnabled(true);

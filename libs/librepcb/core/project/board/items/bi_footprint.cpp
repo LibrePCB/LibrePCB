@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "bi_footprint.h"
 
-#include "../../../font/strokefontpool.h"
 #include "../../../graphics/graphicsscene.h"
 #include "../../../library/dev/device.h"
 #include "../../../library/pkg/footprint.h"
@@ -202,12 +201,7 @@ void BI_Footprint::addStrokeText(BI_StrokeText& text) {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  // set font and attribute substitutor for all text items
-  // TODO: move this to BI_StrokeText?!
   text.setFootprint(this);
-  text.getText().setAttributeProvider(this);
-  text.getText().setFont(&getProject().getStrokeFonts().getFont(
-      mBoard.getDefaultFontName()));  // can throw
 
   if (isAddedToBoard()) {
     text.addToBoard();  // can throw

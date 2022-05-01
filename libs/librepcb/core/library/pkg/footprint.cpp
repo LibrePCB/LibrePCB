@@ -45,7 +45,6 @@ Footprint::Footprint(const Footprint& other) noexcept
     mCircles(other.mCircles),
     mStrokeTexts(other.mStrokeTexts),
     mHoles(other.mHoles),
-    mStrokeFont(nullptr),
     mNamesEditedSlot(*this, &Footprint::namesEdited),
     mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
     mPadsEditedSlot(*this, &Footprint::padsEdited),
@@ -73,7 +72,6 @@ Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
     mCircles(),
     mStrokeTexts(),
     mHoles(),
-    mStrokeFont(nullptr),
     mNamesEditedSlot(*this, &Footprint::namesEdited),
     mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
     mPadsEditedSlot(*this, &Footprint::padsEdited),
@@ -100,7 +98,6 @@ Footprint::Footprint(const SExpression& node, const Version& fileFormat)
     mCircles(node, fileFormat),
     mStrokeTexts(node, fileFormat),
     mHoles(node, fileFormat),
-    mStrokeFont(nullptr),
     mNamesEditedSlot(*this, &Footprint::namesEdited),
     mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
     mPadsEditedSlot(*this, &Footprint::padsEdited),
@@ -123,13 +120,6 @@ Footprint::~Footprint() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void Footprint::setStrokeFontForAllTexts(const StrokeFont* font) noexcept {
-  mStrokeFont = font;
-  for (StrokeText& text : mStrokeTexts) {
-    text.setFont(mStrokeFont);
-  }
-}
 
 void Footprint::serialize(SExpression& root) const {
   root.appendChild(mUuid);
@@ -237,9 +227,8 @@ void Footprint::strokeTextsEdited(const StrokeTextList& list, int index,
                                   StrokeTextList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
-  if (event == StrokeTextList::Event::ElementAdded) {
-    const_cast<StrokeText&>(*text).setFont(mStrokeFont);
-  }
+  Q_UNUSED(text);
+  Q_UNUSED(event);
   onEdited.notify(Event::StrokeTextsEdited);
 }
 

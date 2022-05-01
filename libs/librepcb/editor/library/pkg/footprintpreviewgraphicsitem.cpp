@@ -76,10 +76,9 @@ FootprintPreviewGraphicsItem::FootprintPreviewGraphicsItem(
   mStrokeTexts =
       footprint.getStrokeTexts();  // copy texts because we modify them...
   for (StrokeText& text : mStrokeTexts) {
-    text.setFont(&qApp->getDefaultStrokeFont());
-    text.setAttributeProvider(this);
-    StrokeTextGraphicsItem* item =
-        new StrokeTextGraphicsItem(text, layerProvider);
+    StrokeTextGraphicsItem* item = new StrokeTextGraphicsItem(
+        text, layerProvider, qApp->getDefaultStrokeFont());
+    item->setAttributeProvider(this);
     item->setParentItem(this);
   }
 
