@@ -225,15 +225,11 @@ add_library(
   library/pkg/footprintlistmodel.h
   library/pkg/footprintpadgraphicsitem.cpp
   library/pkg/footprintpadgraphicsitem.h
-  library/pkg/footprintpadpreviewgraphicsitem.cpp
-  library/pkg/footprintpadpreviewgraphicsitem.h
   library/pkg/footprintpadpropertiesdialog.cpp
   library/pkg/footprintpadpropertiesdialog.h
   library/pkg/footprintpadpropertiesdialog.ui
   library/pkg/footprintpadshapeselectorwidget.cpp
   library/pkg/footprintpadshapeselectorwidget.h
-  library/pkg/footprintpreviewgraphicsitem.cpp
-  library/pkg/footprintpreviewgraphicsitem.h
   library/pkg/fsm/packageeditorfsm.cpp
   library/pkg/fsm/packageeditorfsm.h
   library/pkg/fsm/packageeditorstate.cpp

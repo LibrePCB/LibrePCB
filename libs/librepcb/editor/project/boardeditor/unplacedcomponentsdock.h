@@ -45,7 +45,7 @@ class Project;
 
 namespace editor {
 
-class FootprintPreviewGraphicsItem;
+class FootprintGraphicsItem;
 class ProjectEditor;
 
 namespace Ui {
@@ -109,7 +109,7 @@ private:  // Methods
   void currentFootprintIndexChanged(int index) noexcept;
   void setSelectedComponentInstance(ComponentInstance* cmp) noexcept;
   void setSelectedDeviceAndPackage(const tl::optional<Uuid>& deviceUuid,
-                                   const Package* package,
+                                   Package* package,
                                    bool packageOwned) noexcept;
   void setSelectedFootprintUuid(const tl::optional<Uuid>& uuid) noexcept;
   void setSelectedDeviceAsDefault() noexcept;
@@ -150,14 +150,14 @@ private:  // Data
   // Current selection
   ComponentInstance* mSelectedComponent;
   tl::optional<Uuid> mSelectedDeviceUuid;
-  const Package* mSelectedPackage;
+  Package* mSelectedPackage;
   bool mSelectedPackageOwned;
   tl::optional<Uuid> mSelectedFootprintUuid;
 
   // Preview graphics scene
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
   QScopedPointer<GraphicsScene> mPreviewGraphicsScene;
-  QScopedPointer<FootprintPreviewGraphicsItem> mPreviewGraphicsItem;
+  QScopedPointer<FootprintGraphicsItem> mPreviewGraphicsItem;
 };
 
 /*******************************************************************************

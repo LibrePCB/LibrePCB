@@ -22,12 +22,13 @@
  ******************************************************************************/
 #include "addcomponentdialog.h"
 
-#include "../library/pkg/footprintpreviewgraphicsitem.h"
+#include "../library/pkg/footprintgraphicsitem.h"
 #include "../library/sym/symbolgraphicsitem.h"
 #include "../widgets/graphicsview.h"
 #include "../workspace/categorytreemodel.h"
 #include "ui_addcomponentdialog.h"
 
+#include <librepcb/core/application.h>
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
@@ -488,10 +489,10 @@ void AddComponentDialog::setSelectedDevice(const Device* dev) {
         mUi->lblDeviceName->setText(QString("%1 [%2]").arg(devName, pkgName));
       }
       if (mSelectedPackage->getFootprints().count() > 0) {
-        mPreviewFootprintGraphicsItem.reset(new FootprintPreviewGraphicsItem(
-            *mGraphicsLayerProvider, mLocaleOrder,
-            *mSelectedPackage->getFootprints().first(), mSelectedPackage.data(),
-            mSelectedComponent.get()));
+        mPreviewFootprintGraphicsItem.reset(new FootprintGraphicsItem(
+            mSelectedPackage->getFootprints().first(), *mGraphicsLayerProvider,
+            qApp->getDefaultStrokeFont(), &mSelectedPackage->getPads(),
+            mSelectedComponent.get(), mLocaleOrder));
         mDevicePreviewScene->addItem(*mPreviewFootprintGraphicsItem);
         mUi->viewDevice->zoomAll();
       }

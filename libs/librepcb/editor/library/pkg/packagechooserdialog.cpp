@@ -23,9 +23,10 @@
 #include "packagechooserdialog.h"
 
 #include "../../workspace/categorytreemodel.h"
-#include "footprintpreviewgraphicsitem.h"
+#include "footprintgraphicsitem.h"
 #include "ui_packagechooserdialog.h"
 
+#include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/pkg/package.h>
@@ -208,9 +209,10 @@ void PackageChooserDialog::updatePreview(const FilePath& fp) noexcept {
           std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
               TransactionalFileSystem::openRO(fp)))));  // can throw
       if (mPackage->getFootprints().count() > 0) {
-        mGraphicsItem.reset(new FootprintPreviewGraphicsItem(
-            *mLayerProvider, QStringList(), *mPackage->getFootprints().first(),
-            mPackage.data()));
+        mGraphicsItem.reset(new FootprintGraphicsItem(
+            mPackage->getFootprints().first(), *mLayerProvider,
+            qApp->getDefaultStrokeFont(), &mPackage->getPads(), nullptr,
+            localeOrder()));
         mGraphicsScene->addItem(*mGraphicsItem);
         mUi->graphicsView->zoomAll();
       }
