@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/attribute/attributeprovider.h>
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 
@@ -39,6 +40,7 @@ namespace librepcb {
 class Angle;
 class Circle;
 class CircleGraphicsItem;
+class Component;
 class FootprintPad;
 class Hole;
 class HoleGraphicsItem;
@@ -60,7 +62,8 @@ class FootprintPadGraphicsItem;
 /**
  * @brief The FootprintGraphicsItem class
  */
-class FootprintGraphicsItem final : public QGraphicsItem {
+class FootprintGraphicsItem final : public QGraphicsItem,
+                                    public AttributeProvider {
 public:
   // Constructors / Destructor
   FootprintGraphicsItem() = delete;
@@ -68,7 +71,9 @@ public:
   FootprintGraphicsItem(std::shared_ptr<Footprint> footprint,
                         const IF_GraphicsLayerProvider& lp,
                         const StrokeFont& font,
-                        const PackagePadList* packagePadList) noexcept;
+                        const PackagePadList* packagePadList = nullptr,
+                        const Component* component = nullptr,
+                        const QStringList& localeOrder = {}) noexcept;
   ~FootprintGraphicsItem() noexcept;
 
   // Getters
@@ -110,6 +115,7 @@ public:
   void setRotation(const Angle& rot) noexcept;
 
   // General Methods
+  void updateAllTexts() noexcept;
   void setSelectionRect(const QRectF rect) noexcept;
 
   // Inherited from QGraphicsItem
@@ -121,6 +127,9 @@ public:
   // Operator Overloadings
   FootprintGraphicsItem& operator=(const FootprintGraphicsItem& rhs) = delete;
 
+signals:
+  void attributesChanged() override {}
+
 private:  // Methods
   void syncPads() noexcept;
   void syncCircles() noexcept;
@@ -129,12 +138,15 @@ private:  // Methods
   void syncHoles() noexcept;
   void footprintEdited(const Footprint& footprint,
                        Footprint::Event event) noexcept;
+  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 private:  // Data
   std::shared_ptr<Footprint> mFootprint;
   const IF_GraphicsLayerProvider& mLayerProvider;
   const StrokeFont& mFont;
-  const PackagePadList* mPackagePadList;
+  const PackagePadList* mPackagePadList;  // Can be nullptr.
+  QPointer<const Component> mComponent;  // Can be nullptr.
+  QStringList mLocaleOrder;
   QMap<std::shared_ptr<FootprintPad>, std::shared_ptr<FootprintPadGraphicsItem>>
       mPadGraphicsItems;
   QMap<std::shared_ptr<Circle>, std::shared_ptr<CircleGraphicsItem>>

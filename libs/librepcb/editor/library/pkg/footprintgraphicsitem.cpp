@@ -28,6 +28,7 @@
 #include <librepcb/core/graphics/holegraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
 
@@ -46,12 +47,15 @@ namespace editor {
 
 FootprintGraphicsItem::FootprintGraphicsItem(
     std::shared_ptr<Footprint> footprint, const IF_GraphicsLayerProvider& lp,
-    const StrokeFont& font, const PackagePadList* packagePadList) noexcept
+    const StrokeFont& font, const PackagePadList* packagePadList,
+    const Component* component, const QStringList& localeOrder) noexcept
   : QGraphicsItem(nullptr),
     mFootprint(footprint),
     mLayerProvider(lp),
     mFont(font),
     mPackagePadList(packagePadList),
+    mComponent(component),
+    mLocaleOrder(localeOrder),
     mOnEditedSlot(*this, &FootprintGraphicsItem::footprintEdited) {
   Q_ASSERT(mFootprint);
 
@@ -194,6 +198,11 @@ void FootprintGraphicsItem::setRotation(const Angle& rot) noexcept {
   QGraphicsItem::setRotation(-rot.toDeg());
 }
 
+void FootprintGraphicsItem::updateAllTexts() noexcept {
+  foreach (const auto& ptr, mPadGraphicsItems) { ptr->updateText(); }
+  foreach (const auto& ptr, mStrokeTextGraphicsItems) { ptr->updateText(); }
+}
+
 void FootprintGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
   QPainterPath path;
   path.addRect(rect);
@@ -325,6 +334,9 @@ void FootprintGraphicsItem::syncStrokeTexts() noexcept {
       Q_ASSERT(obj);
       auto i = std::make_shared<StrokeTextGraphicsItem>(*obj, mLayerProvider,
                                                         mFont, this);
+      if (mComponent) {
+        i->setAttributeProvider(this);
+      }
       mStrokeTextGraphicsItems.insert(obj, i);
     }
   }
@@ -373,6 +385,23 @@ void FootprintGraphicsItem::footprintEdited(const Footprint& footprint,
       break;
     default:
       break;
+  }
+}
+
+QString FootprintGraphicsItem::getBuiltInAttributeValue(
+    const QString& key) const noexcept {
+  if (mComponent && (key == "COMPONENT")) {
+    return *mComponent->getNames().value(mLocaleOrder);
+  } else if (mComponent && (key == "NAME")) {
+    return *mComponent->getPrefixes().value(mLocaleOrder) % "?";
+  } else {
+    // If an attribute is not defined, return its key. This makes sure that
+    // e.g. in a schematic frame the texts like "{{FIELD_SHEET}}" are visible
+    // as "FIELD_SHEET" instead of completely missing text. Same applies to the
+    // "{{VALUE}}" text - it's almost impossible to automatically substitute it
+    // by a reasonable value (e.g. the component's default value) so let's
+    // simply display "VALUE".
+    return key;
   }
 }
 

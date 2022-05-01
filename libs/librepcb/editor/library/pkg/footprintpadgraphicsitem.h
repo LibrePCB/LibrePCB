@@ -68,6 +68,9 @@ public:
   void setRotation(const Angle& rot) noexcept;
   void setSelected(bool selected) noexcept;
 
+  // General Methods
+  void updateText() noexcept;
+
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return QRectF(); }
   QPainterPath shape() const noexcept override;
@@ -85,7 +88,6 @@ private:  // Methods
                             PackagePadList::Event event) noexcept;
   void setShape(const QPainterPath& shape) noexcept;
   void setLayerName(const QString& name) noexcept;
-  void setPackagePadUuid(const tl::optional<Uuid>& uuid) noexcept;
   void updateTextHeight() noexcept;
 
 private:  // Data

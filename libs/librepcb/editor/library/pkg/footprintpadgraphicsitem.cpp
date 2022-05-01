@@ -73,7 +73,7 @@ FootprintPadGraphicsItem::FootprintPadGraphicsItem(
   setRotation(mPad->getRotation());
   setShape(mPad->toQPainterPathPx());
   setLayerName(mPad->getLayerName());
-  setPackagePadUuid(mPad->getPackagePadUuid());
+  updateText();
 
   // Register to the pad(s) to get notified about any modifications.
   mPad->onEdited.attach(mOnPadEditedSlot);
@@ -106,6 +106,19 @@ void FootprintPadGraphicsItem::setSelected(bool selected) noexcept {
   QGraphicsItem::setSelected(selected);
 }
 
+void FootprintPadGraphicsItem::updateText() noexcept {
+  QString text;
+  if (mPackagePadList && mPad->getPackagePadUuid()) {
+    if (std::shared_ptr<const PackagePad> pad =
+            mPackagePadList->find(*mPad->getPackagePadUuid())) {
+      text = *pad->getName();
+    }
+  }
+  setToolTip(text);
+  mTextGraphicsItem->setText(text);
+  updateTextHeight();
+}
+
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
@@ -132,7 +145,7 @@ void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
     case FootprintPad::Event::UuidChanged:
       break;
     case FootprintPad::Event::PackagePadUuidChanged:
-      setPackagePadUuid(pad.getPackagePadUuid());
+      updateText();
       break;
     case FootprintPad::Event::PositionChanged:
       setPosition(pad.getPosition());
@@ -164,7 +177,7 @@ void FootprintPadGraphicsItem::packagePadListEdited(
   Q_UNUSED(index);
   Q_UNUSED(pad);
   Q_UNUSED(event);
-  setPackagePadUuid(mPad->getPackagePadUuid());
+  updateText();
 }
 
 void FootprintPadGraphicsItem::setShape(const QPainterPath& shape) noexcept {
@@ -175,18 +188,6 @@ void FootprintPadGraphicsItem::setShape(const QPainterPath& shape) noexcept {
 void FootprintPadGraphicsItem::setLayerName(const QString& name) noexcept {
   mPathGraphicsItem->setFillLayer(mLayerProvider.getLayer(name));
   mTextGraphicsItem->setLayer(mLayerProvider.getLayer(name));
-}
-
-void FootprintPadGraphicsItem::setPackagePadUuid(
-    const tl::optional<Uuid>& uuid) noexcept {
-  QString name;
-  if (mPackagePadList && uuid) {
-    if (std::shared_ptr<const PackagePad> pad = mPackagePadList->find(*uuid)) {
-      name = *pad->getName();
-    }
-  }
-  mTextGraphicsItem->setText(name);
-  updateTextHeight();
 }
 
 void FootprintPadGraphicsItem::updateTextHeight() noexcept {
