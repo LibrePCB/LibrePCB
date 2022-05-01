@@ -38,8 +38,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class FootprintGraphicsItem;
-
 /*******************************************************************************
  *  Class Footprint
  ******************************************************************************/
@@ -102,8 +100,6 @@ public:
 
   // General Methods
   void setStrokeFontForAllTexts(const StrokeFont* font) noexcept;
-  void registerGraphicsItem(FootprintGraphicsItem& item) noexcept;
-  void unregisterGraphicsItem(FootprintGraphicsItem& item) noexcept;
 
   // General Methods
 
@@ -150,7 +146,6 @@ private:  // Data
   HoleList mHoles;
 
   const StrokeFont* mStrokeFont;
-  FootprintGraphicsItem* mRegisteredGraphicsItem;
 
   // Slots
   LocalizedNameMap::OnEditedSlot mNamesEditedSlot;

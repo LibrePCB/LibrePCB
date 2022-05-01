@@ -24,19 +24,19 @@
  *  Includes
  ******************************************************************************/
 #include "../pkg/packagepad.h"
+#include "footprintpad.h"
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Angle;
-class FootprintPad;
 class IF_GraphicsLayerProvider;
-class Point;
 class PrimitivePathGraphicsItem;
 class PrimitiveTextGraphicsItem;
 
@@ -52,21 +52,18 @@ public:
   // Constructors / Destructor
   FootprintPadGraphicsItem() = delete;
   FootprintPadGraphicsItem(const FootprintPadGraphicsItem& other) = delete;
-  FootprintPadGraphicsItem(FootprintPad& pad,
+  FootprintPadGraphicsItem(std::shared_ptr<FootprintPad> pad,
                            const IF_GraphicsLayerProvider& lp,
                            const PackagePadList* packagePadList,
                            QGraphicsItem* parent = nullptr) noexcept;
   ~FootprintPadGraphicsItem() noexcept;
 
   // Getters
-  FootprintPad& getPad() noexcept { return mPad; }
+  const std::shared_ptr<FootprintPad>& getPad() noexcept { return mPad; }
 
   // Setters
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
-  void setShape(const QPainterPath& shape) noexcept;
-  void setLayerName(const QString& name) noexcept;
-  void setPackagePadUuid(const tl::optional<Uuid>& uuid) noexcept;
   void setSelected(bool selected) noexcept;
 
   // Inherited from QGraphicsItem
@@ -80,20 +77,25 @@ public:
       delete;
 
 private:  // Methods
+  void padEdited(const FootprintPad& pad, FootprintPad::Event event) noexcept;
   void packagePadListEdited(const PackagePadList& list, int index,
                             const std::shared_ptr<const PackagePad>& pad,
                             PackagePadList::Event event) noexcept;
+  void setShape(const QPainterPath& shape) noexcept;
+  void setLayerName(const QString& name) noexcept;
+  void setPackagePadUuid(const tl::optional<Uuid>& uuid) noexcept;
   void updateTextHeight() noexcept;
 
 private:  // Data
-  FootprintPad& mPad;
+  std::shared_ptr<FootprintPad> mPad;
   const IF_GraphicsLayerProvider& mLayerProvider;
   const PackagePadList* mPackagePadList;
   QScopedPointer<PrimitivePathGraphicsItem> mPathGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
 
   // Slots
-  PackagePadList::OnEditedSlot mOnPadsEditedSlot;
+  FootprintPad::OnEditedSlot mOnPadEditedSlot;
+  PackagePadList::OnEditedSlot mOnPackagePadsEditedSlot;
 };
 
 /*******************************************************************************

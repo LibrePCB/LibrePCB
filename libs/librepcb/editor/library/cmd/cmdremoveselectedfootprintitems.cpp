@@ -65,7 +65,7 @@ bool CmdRemoveSelectedFootprintItems::performExecute() {
   // remove pins
   foreach (const auto& pad, mContext.currentGraphicsItem->getSelectedPads()) {
     appendChild(new CmdFootprintPadRemove(mContext.currentFootprint->getPads(),
-                                          &pad->getPad()));
+                                          pad->getPad().get()));
   }
 
   // remove circles

@@ -123,7 +123,7 @@ QPixmap FootprintClipboardData::generatePixmap(
     const IF_GraphicsLayerProvider& lp) noexcept {
   GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
-  for (FootprintPad& pad : mFootprintPads) {
+  for (auto pad : mFootprintPads.values()) {
     items.append(
         std::make_shared<FootprintPadGraphicsItem>(pad, lp, &mPackagePads));
   }

@@ -65,8 +65,6 @@ PackageEditorState_DrawPolygonBase::PackageEditorState_DrawPolygonBase(
 PackageEditorState_DrawPolygonBase::
     ~PackageEditorState_DrawPolygonBase() noexcept {
   Q_ASSERT(mEditCmd.isNull());
-  Q_ASSERT(mCurrentPolygon == nullptr);
-  Q_ASSERT(mCurrentGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -203,20 +201,20 @@ bool PackageEditorState_DrawPolygonBase::start(const Point& pos) noexcept {
     // add polygon
     mSegmentStartPos = pos;
     mContext.undoStack.beginCmdGroup(tr("Add footprint polygon"));
-    mCurrentPolygon.reset(new Polygon(Uuid::createRandom(), mLastLayerName,
-                                      mLastLineWidth, mLastFill, mLastGrabArea,
-                                      path));
+    mCurrentPolygon = std::make_shared<Polygon>(Uuid::createRandom(),
+                                                mLastLayerName, mLastLineWidth,
+                                                mLastFill, mLastGrabArea, path);
     mContext.undoStack.appendToCmdGroup(new CmdPolygonInsert(
         mContext.currentFootprint->getPolygons(), mCurrentPolygon));
     mEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
     mCurrentGraphicsItem =
-        mContext.currentGraphicsItem->getPolygonGraphicsItem(*mCurrentPolygon);
+        mContext.currentGraphicsItem->getGraphicsItem(mCurrentPolygon);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    mCurrentGraphicsItem = nullptr;
+    mCurrentGraphicsItem.reset();
     mEditCmd.reset();
     mCurrentPolygon.reset();
     return false;
@@ -226,7 +224,7 @@ bool PackageEditorState_DrawPolygonBase::start(const Point& pos) noexcept {
 bool PackageEditorState_DrawPolygonBase::abort() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
+    mCurrentGraphicsItem.reset();
     mEditCmd.reset();
     mCurrentPolygon.reset();
     mContext.undoStack.abortCmdGroup();

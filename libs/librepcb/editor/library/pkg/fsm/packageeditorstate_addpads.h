@@ -30,11 +30,14 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
+class FootprintPadGraphicsItem;
 class PackagePad;
 
 namespace editor {
@@ -97,7 +100,7 @@ private:  // Types / Data
   PadType mPadType;
   QScopedPointer<CmdFootprintPadEdit> mEditCmd;
   std::shared_ptr<FootprintPad> mCurrentPad;
-  FootprintPadGraphicsItem* mCurrentGraphicsItem;
+  std::shared_ptr<FootprintPadGraphicsItem> mCurrentGraphicsItem;
   PackagePadComboBox* mPackagePadComboBox;
 
   // parameter memory

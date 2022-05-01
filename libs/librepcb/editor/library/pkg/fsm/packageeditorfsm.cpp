@@ -141,7 +141,7 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
         &qApp->getDefaultStrokeFont());
     // load graphics items recursively
     mContext.currentGraphicsItem.reset(new FootprintGraphicsItem(
-        *mContext.currentFootprint, mContext.layerProvider,
+        mContext.currentFootprint, mContext.layerProvider,
         &mContext.package.getPads()));
     mContext.graphicsScene.addItem(*mContext.currentGraphicsItem);
     mSelectFootprintGraphicsItem.reset();

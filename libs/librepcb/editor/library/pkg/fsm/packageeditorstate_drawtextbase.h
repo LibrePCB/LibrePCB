@@ -34,6 +34,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -103,8 +105,8 @@ private:  // Types / Data
   Mode mMode;
   Point mStartPos;
   QScopedPointer<CmdStrokeTextEdit> mEditCmd;
-  StrokeText* mCurrentText;
-  StrokeTextGraphicsItem* mCurrentGraphicsItem;
+  std::shared_ptr<StrokeText> mCurrentText;
+  std::shared_ptr<StrokeTextGraphicsItem> mCurrentGraphicsItem;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;

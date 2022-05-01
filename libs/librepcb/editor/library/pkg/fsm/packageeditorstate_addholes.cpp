@@ -57,8 +57,6 @@ PackageEditorState_AddHoles::PackageEditorState_AddHoles(
 
 PackageEditorState_AddHoles::~PackageEditorState_AddHoles() noexcept {
   Q_ASSERT(mEditCmd.isNull());
-  Q_ASSERT(mCurrentHole == nullptr);
-  Q_ASSERT(mCurrentGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -131,20 +129,20 @@ bool PackageEditorState_AddHoles::processGraphicsSceneLeftMouseButtonPressed(
 bool PackageEditorState_AddHoles::startAddHole(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add hole"));
-    mCurrentHole = new Hole(Uuid::createRandom(), pos, mLastDiameter);
+    mCurrentHole =
+        std::make_shared<Hole>(Uuid::createRandom(), pos, mLastDiameter);
     mContext.undoStack.appendToCmdGroup(
-        new CmdHoleInsert(mContext.currentFootprint->getHoles(),
-                          std::shared_ptr<Hole>(mCurrentHole)));
+        new CmdHoleInsert(mContext.currentFootprint->getHoles(), mCurrentHole));
     mEditCmd.reset(new CmdHoleEdit(*mCurrentHole));
     mCurrentGraphicsItem =
-        mContext.currentGraphicsItem->getHoleGraphicsItem(*mCurrentHole);
+        mContext.currentGraphicsItem->getGraphicsItem(mCurrentHole);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    mCurrentGraphicsItem = nullptr;
-    mCurrentHole = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentHole.reset();
     mEditCmd.reset();
     return false;
   }
@@ -154,8 +152,8 @@ bool PackageEditorState_AddHoles::finishAddHole(const Point& pos) noexcept {
   try {
     mEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
-    mCurrentHole = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentHole.reset();
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
     return true;
@@ -168,8 +166,8 @@ bool PackageEditorState_AddHoles::finishAddHole(const Point& pos) noexcept {
 bool PackageEditorState_AddHoles::abortAddHole() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
-    mCurrentHole = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentHole.reset();
     mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
     return true;

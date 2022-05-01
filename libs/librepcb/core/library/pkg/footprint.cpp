@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "footprint.h"
 
-#include "footprintgraphicsitem.h"
 #include "package.h"
 
 #include <QtCore>
@@ -47,7 +46,6 @@ Footprint::Footprint(const Footprint& other) noexcept
     mStrokeTexts(other.mStrokeTexts),
     mHoles(other.mHoles),
     mStrokeFont(nullptr),
-    mRegisteredGraphicsItem(nullptr),
     mNamesEditedSlot(*this, &Footprint::namesEdited),
     mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
     mPadsEditedSlot(*this, &Footprint::padsEdited),
@@ -76,7 +74,6 @@ Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
     mStrokeTexts(),
     mHoles(),
     mStrokeFont(nullptr),
-    mRegisteredGraphicsItem(nullptr),
     mNamesEditedSlot(*this, &Footprint::namesEdited),
     mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
     mPadsEditedSlot(*this, &Footprint::padsEdited),
@@ -104,7 +101,6 @@ Footprint::Footprint(const SExpression& node, const Version& fileFormat)
     mStrokeTexts(node, fileFormat),
     mHoles(node, fileFormat),
     mStrokeFont(nullptr),
-    mRegisteredGraphicsItem(nullptr),
     mNamesEditedSlot(*this, &Footprint::namesEdited),
     mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
     mPadsEditedSlot(*this, &Footprint::padsEdited),
@@ -122,7 +118,6 @@ Footprint::Footprint(const SExpression& node, const Version& fileFormat)
 }
 
 Footprint::~Footprint() noexcept {
-  Q_ASSERT(mRegisteredGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -134,16 +129,6 @@ void Footprint::setStrokeFontForAllTexts(const StrokeFont* font) noexcept {
   for (StrokeText& text : mStrokeTexts) {
     text.setFont(mStrokeFont);
   }
-}
-
-void Footprint::registerGraphicsItem(FootprintGraphicsItem& item) noexcept {
-  Q_ASSERT(!mRegisteredGraphicsItem);
-  mRegisteredGraphicsItem = &item;
-}
-
-void Footprint::unregisterGraphicsItem(FootprintGraphicsItem& item) noexcept {
-  Q_ASSERT(mRegisteredGraphicsItem == &item);
-  mRegisteredGraphicsItem = nullptr;
 }
 
 void Footprint::serialize(SExpression& root) const {
@@ -222,20 +207,8 @@ void Footprint::padsEdited(const FootprintPadList& list, int index,
                            FootprintPadList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
-  switch (event) {
-    case FootprintPadList::Event::ElementAdded:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->addPad(const_cast<FootprintPad&>(*pad));
-      }
-      break;
-    case FootprintPadList::Event::ElementRemoved:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->removePad(const_cast<FootprintPad&>(*pad));
-      }
-      break;
-    default:
-      break;
-  }
+  Q_UNUSED(pad);
+  Q_UNUSED(event);
   onEdited.notify(Event::PadsEdited);
 }
 
@@ -244,20 +217,8 @@ void Footprint::polygonsEdited(const PolygonList& list, int index,
                                PolygonList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
-  switch (event) {
-    case PolygonList::Event::ElementAdded:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->addPolygon(const_cast<Polygon&>(*polygon));
-      }
-      break;
-    case PolygonList::Event::ElementRemoved:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->removePolygon(const_cast<Polygon&>(*polygon));
-      }
-      break;
-    default:
-      break;
-  }
+  Q_UNUSED(polygon);
+  Q_UNUSED(event);
   onEdited.notify(Event::PolygonsEdited);
 }
 
@@ -266,20 +227,8 @@ void Footprint::circlesEdited(const CircleList& list, int index,
                               CircleList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
-  switch (event) {
-    case CircleList::Event::ElementAdded:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->addCircle(const_cast<Circle&>(*circle));
-      }
-      break;
-    case CircleList::Event::ElementRemoved:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->removeCircle(const_cast<Circle&>(*circle));
-      }
-      break;
-    default:
-      break;
-  }
+  Q_UNUSED(circle);
+  Q_UNUSED(event);
   onEdited.notify(Event::CirclesEdited);
 }
 
@@ -288,21 +237,8 @@ void Footprint::strokeTextsEdited(const StrokeTextList& list, int index,
                                   StrokeTextList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
-  switch (event) {
-    case StrokeTextList::Event::ElementAdded:
-      const_cast<StrokeText&>(*text).setFont(mStrokeFont);
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->addStrokeText(const_cast<StrokeText&>(*text));
-      }
-      break;
-    case StrokeTextList::Event::ElementRemoved:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->removeStrokeText(
-            const_cast<StrokeText&>(*text));
-      }
-      break;
-    default:
-      break;
+  if (event == StrokeTextList::Event::ElementAdded) {
+    const_cast<StrokeText&>(*text).setFont(mStrokeFont);
   }
   onEdited.notify(Event::StrokeTextsEdited);
 }
@@ -312,20 +248,8 @@ void Footprint::holesEdited(const HoleList& list, int index,
                             HoleList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
-  switch (event) {
-    case HoleList::Event::ElementAdded:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->addHole(const_cast<Hole&>(*hole));
-      }
-      break;
-    case HoleList::Event::ElementRemoved:
-      if (mRegisteredGraphicsItem) {
-        mRegisteredGraphicsItem->removeHole(const_cast<Hole&>(*hole));
-      }
-      break;
-    default:
-      break;
-  }
+  Q_UNUSED(hole);
+  Q_UNUSED(event);
   onEdited.notify(Event::HolesEdited);
 }
 

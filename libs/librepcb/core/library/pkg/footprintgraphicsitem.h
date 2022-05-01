@@ -23,11 +23,13 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../types/uuid.h"
 #include "../pkg/packagepad.h"
+#include "footprint.h"
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -37,7 +39,6 @@ namespace librepcb {
 class Angle;
 class Circle;
 class CircleGraphicsItem;
-class Footprint;
 class FootprintPad;
 class FootprintPadGraphicsItem;
 class Hole;
@@ -61,46 +62,50 @@ public:
   // Constructors / Destructor
   FootprintGraphicsItem() = delete;
   FootprintGraphicsItem(const FootprintGraphicsItem& other) = delete;
-  FootprintGraphicsItem(Footprint& fpt, const IF_GraphicsLayerProvider& lp,
+  FootprintGraphicsItem(std::shared_ptr<Footprint> footprint,
+                        const IF_GraphicsLayerProvider& lp,
                         const PackagePadList* packagePadList) noexcept;
   ~FootprintGraphicsItem() noexcept;
 
   // Getters
-  Footprint& getFootprint() noexcept { return mFootprint; }
-  FootprintPadGraphicsItem* getPadGraphicsItem(
-      const FootprintPad& pin) noexcept;
-  CircleGraphicsItem* getCircleGraphicsItem(const Circle& circle) noexcept;
-  PolygonGraphicsItem* getPolygonGraphicsItem(const Polygon& polygon) noexcept;
-  StrokeTextGraphicsItem* getTextGraphicsItem(const StrokeText& text) noexcept;
-  HoleGraphicsItem* getHoleGraphicsItem(const Hole& hole) noexcept;
+  std::shared_ptr<FootprintPadGraphicsItem> getGraphicsItem(
+      std::shared_ptr<FootprintPad> pad) noexcept {
+    return mPadGraphicsItems.value(pad);
+  }
+  std::shared_ptr<CircleGraphicsItem> getGraphicsItem(
+      std::shared_ptr<Circle> circle) noexcept {
+    return mCircleGraphicsItems.value(circle);
+  }
+  std::shared_ptr<PolygonGraphicsItem> getGraphicsItem(
+      std::shared_ptr<Polygon> polygon) noexcept {
+    return mPolygonGraphicsItems.value(polygon);
+  }
+  std::shared_ptr<StrokeTextGraphicsItem> getGraphicsItem(
+      std::shared_ptr<StrokeText> text) noexcept {
+    return mStrokeTextGraphicsItems.value(text);
+  }
+  std::shared_ptr<HoleGraphicsItem> getGraphicsItem(
+      std::shared_ptr<Hole> hole) noexcept {
+    return mHoleGraphicsItems.value(hole);
+  }
   int getItemsAtPosition(
-      const Point& pos, QList<QSharedPointer<FootprintPadGraphicsItem>>* pads,
-      QList<QSharedPointer<CircleGraphicsItem>>* circles,
-      QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
-      QList<QSharedPointer<StrokeTextGraphicsItem>>* texts,
-      QList<QSharedPointer<HoleGraphicsItem>>* holes) noexcept;
-  QList<QSharedPointer<FootprintPadGraphicsItem>> getSelectedPads() noexcept;
-  QList<QSharedPointer<CircleGraphicsItem>> getSelectedCircles() noexcept;
-  QList<QSharedPointer<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
-  QList<QSharedPointer<StrokeTextGraphicsItem>>
+      const Point& pos, QList<std::shared_ptr<FootprintPadGraphicsItem>>* pads,
+      QList<std::shared_ptr<CircleGraphicsItem>>* circles,
+      QList<std::shared_ptr<PolygonGraphicsItem>>* polygons,
+      QList<std::shared_ptr<StrokeTextGraphicsItem>>* texts,
+      QList<std::shared_ptr<HoleGraphicsItem>>* holes) noexcept;
+  QList<std::shared_ptr<FootprintPadGraphicsItem>> getSelectedPads() noexcept;
+  QList<std::shared_ptr<CircleGraphicsItem>> getSelectedCircles() noexcept;
+  QList<std::shared_ptr<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
+  QList<std::shared_ptr<StrokeTextGraphicsItem>>
       getSelectedStrokeTexts() noexcept;
-  QList<QSharedPointer<HoleGraphicsItem>> getSelectedHoles() noexcept;
+  QList<std::shared_ptr<HoleGraphicsItem>> getSelectedHoles() noexcept;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
 
   // General Methods
-  void addPad(FootprintPad& pad) noexcept;
-  void removePad(FootprintPad& pad) noexcept;
-  void addCircle(Circle& circle) noexcept;
-  void removeCircle(Circle& circle) noexcept;
-  void addPolygon(Polygon& polygon) noexcept;
-  void removePolygon(Polygon& polygon) noexcept;
-  void addStrokeText(StrokeText& text) noexcept;
-  void removeStrokeText(StrokeText& text) noexcept;
-  void addHole(Hole& hole) noexcept;
-  void removeHole(Hole& hole) noexcept;
   void setSelectionRect(const QRectF rect) noexcept;
 
   // Inherited from QGraphicsItem
@@ -112,18 +117,32 @@ public:
   // Operator Overloadings
   FootprintGraphicsItem& operator=(const FootprintGraphicsItem& rhs) = delete;
 
+private:  // Methods
+  void syncPads() noexcept;
+  void syncCircles() noexcept;
+  void syncPolygons() noexcept;
+  void syncStrokeTexts() noexcept;
+  void syncHoles() noexcept;
+  void footprintEdited(const Footprint& footprint,
+                       Footprint::Event event) noexcept;
+
 private:  // Data
-  Footprint& mFootprint;
+  std::shared_ptr<Footprint> mFootprint;
   const IF_GraphicsLayerProvider& mLayerProvider;
   const PackagePadList* mPackagePadList;
-  QHash<const FootprintPad*, QSharedPointer<FootprintPadGraphicsItem>>
+  QMap<std::shared_ptr<FootprintPad>, std::shared_ptr<FootprintPadGraphicsItem>>
       mPadGraphicsItems;
-  QHash<const Circle*, QSharedPointer<CircleGraphicsItem>> mCircleGraphicsItems;
-  QHash<const Polygon*, QSharedPointer<PolygonGraphicsItem>>
+  QMap<std::shared_ptr<Circle>, std::shared_ptr<CircleGraphicsItem>>
+      mCircleGraphicsItems;
+  QMap<std::shared_ptr<Polygon>, std::shared_ptr<PolygonGraphicsItem>>
       mPolygonGraphicsItems;
-  QHash<const StrokeText*, QSharedPointer<StrokeTextGraphicsItem>>
+  QMap<std::shared_ptr<StrokeText>, std::shared_ptr<StrokeTextGraphicsItem>>
       mStrokeTextGraphicsItems;
-  QHash<const Hole*, QSharedPointer<HoleGraphicsItem>> mHoleGraphicsItems;
+  QMap<std::shared_ptr<Hole>, std::shared_ptr<HoleGraphicsItem>>
+      mHoleGraphicsItems;
+
+  // Slots
+  Footprint::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

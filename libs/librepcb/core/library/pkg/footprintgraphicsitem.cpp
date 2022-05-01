@@ -44,117 +44,80 @@ namespace librepcb {
  ******************************************************************************/
 
 FootprintGraphicsItem::FootprintGraphicsItem(
-    Footprint& fpt, const IF_GraphicsLayerProvider& lp,
+    std::shared_ptr<Footprint> footprint, const IF_GraphicsLayerProvider& lp,
     const PackagePadList* packagePadList) noexcept
   : QGraphicsItem(nullptr),
-    mFootprint(fpt),
+    mFootprint(footprint),
     mLayerProvider(lp),
-    mPackagePadList(packagePadList) {
-  for (FootprintPad& pad : mFootprint.getPads()) {
-    addPad(pad);
-  }
-  for (Polygon& polygon : mFootprint.getPolygons()) {
-    addPolygon(polygon);
-  }
-  for (Circle& circle : mFootprint.getCircles()) {
-    addCircle(circle);
-  }
-  for (StrokeText& text : mFootprint.getStrokeTexts()) {
-    addStrokeText(text);
-  }
-  for (Hole& hole : mFootprint.getHoles()) {
-    addHole(hole);
-  }
+    mPackagePadList(packagePadList),
+    mOnEditedSlot(*this, &FootprintGraphicsItem::footprintEdited) {
+  Q_ASSERT(mFootprint);
 
-  // register to the footprint to get attribute updates
-  mFootprint.registerGraphicsItem(*this);
+  syncPads();
+  syncCircles();
+  syncPolygons();
+  syncStrokeTexts();
+  syncHoles();
+
+  // Register to the footprint to get notified about any modifications.
+  mFootprint->onEdited.attach(mOnEditedSlot);
 }
 
 FootprintGraphicsItem::~FootprintGraphicsItem() noexcept {
-  mFootprint.unregisterGraphicsItem(*this);
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
 
-FootprintPadGraphicsItem* FootprintGraphicsItem::getPadGraphicsItem(
-    const FootprintPad& pin) noexcept {
-  return mPadGraphicsItems.value(&pin).data();
-}
-
-CircleGraphicsItem* FootprintGraphicsItem::getCircleGraphicsItem(
-    const Circle& circle) noexcept {
-  return mCircleGraphicsItems.value(&circle).data();
-}
-
-PolygonGraphicsItem* FootprintGraphicsItem::getPolygonGraphicsItem(
-    const Polygon& polygon) noexcept {
-  return mPolygonGraphicsItems.value(&polygon).data();
-}
-
-StrokeTextGraphicsItem* FootprintGraphicsItem::getTextGraphicsItem(
-    const StrokeText& text) noexcept {
-  return mStrokeTextGraphicsItems.value(&text).data();
-}
-
-HoleGraphicsItem* FootprintGraphicsItem::getHoleGraphicsItem(
-    const Hole& hole) noexcept {
-  return mHoleGraphicsItems.value(&hole).data();
-}
-
 int FootprintGraphicsItem::getItemsAtPosition(
-    const Point& pos, QList<QSharedPointer<FootprintPadGraphicsItem>>* pads,
-    QList<QSharedPointer<CircleGraphicsItem>>* circles,
-    QList<QSharedPointer<PolygonGraphicsItem>>* polygons,
-    QList<QSharedPointer<StrokeTextGraphicsItem>>* texts,
-    QList<QSharedPointer<HoleGraphicsItem>>* holes) noexcept {
+    const Point& pos, QList<std::shared_ptr<FootprintPadGraphicsItem>>* pads,
+    QList<std::shared_ptr<CircleGraphicsItem>>* circles,
+    QList<std::shared_ptr<PolygonGraphicsItem>>* polygons,
+    QList<std::shared_ptr<StrokeTextGraphicsItem>>* texts,
+    QList<std::shared_ptr<HoleGraphicsItem>>* holes) noexcept {
   int count = 0;
   if (pads) {
-    foreach (const QSharedPointer<FootprintPadGraphicsItem>& item,
-             mPadGraphicsItems) {
-      QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
-      if (item->shape().contains(mappedPos)) {
-        pads->append(item);
+    foreach (const auto& ptr, mPadGraphicsItems) {
+      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
+      if (ptr->shape().contains(mappedPos)) {
+        pads->append(ptr);
         ++count;
       }
     }
   }
   if (circles) {
-    foreach (const QSharedPointer<CircleGraphicsItem>& item,
-             mCircleGraphicsItems) {
-      QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
-      if (item->shape().contains(mappedPos)) {
-        circles->append(item);
+    foreach (const auto& ptr, mCircleGraphicsItems) {
+      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
+      if (ptr->shape().contains(mappedPos)) {
+        circles->append(ptr);
         ++count;
       }
     }
   }
   if (polygons) {
-    foreach (const QSharedPointer<PolygonGraphicsItem>& item,
-             mPolygonGraphicsItems) {
-      QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
-      if (item->shape().contains(mappedPos)) {
-        polygons->append(item);
+    foreach (const auto& ptr, mPolygonGraphicsItems) {
+      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
+      if (ptr->shape().contains(mappedPos)) {
+        polygons->append(ptr);
         ++count;
       }
     }
   }
   if (texts) {
-    foreach (const QSharedPointer<StrokeTextGraphicsItem>& item,
-             mStrokeTextGraphicsItems) {
-      QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
-      if (item->shape().contains(mappedPos)) {
-        texts->append(item);
+    foreach (const auto& ptr, mStrokeTextGraphicsItems) {
+      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
+      if (ptr->shape().contains(mappedPos)) {
+        texts->append(ptr);
         ++count;
       }
     }
   }
   if (holes) {
-    foreach (const QSharedPointer<HoleGraphicsItem>& item, mHoleGraphicsItems) {
-      QPointF mappedPos = mapToItem(item.data(), pos.toPxQPointF());
-      if (item->shape().contains(mappedPos)) {
-        holes->append(item);
+    foreach (const auto& ptr, mHoleGraphicsItems) {
+      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
+      if (ptr->shape().contains(mappedPos)) {
+        holes->append(ptr);
         ++count;
       }
     }
@@ -162,60 +125,56 @@ int FootprintGraphicsItem::getItemsAtPosition(
   return count;
 }
 
-QList<QSharedPointer<FootprintPadGraphicsItem>>
+QList<std::shared_ptr<FootprintPadGraphicsItem>>
     FootprintGraphicsItem::getSelectedPads() noexcept {
-  QList<QSharedPointer<FootprintPadGraphicsItem>> pins;
-  foreach (const QSharedPointer<FootprintPadGraphicsItem>& item,
-           mPadGraphicsItems) {
-    if (item->isSelected()) {
-      pins.append(item);
+  QList<std::shared_ptr<FootprintPadGraphicsItem>> pins;
+  foreach (const auto& ptr, mPadGraphicsItems) {
+    if (ptr->isSelected()) {
+      pins.append(ptr);
     }
   }
   return pins;
 }
 
-QList<QSharedPointer<CircleGraphicsItem>>
+QList<std::shared_ptr<CircleGraphicsItem>>
     FootprintGraphicsItem::getSelectedCircles() noexcept {
-  QList<QSharedPointer<CircleGraphicsItem>> circles;
-  foreach (const QSharedPointer<CircleGraphicsItem>& item,
-           mCircleGraphicsItems) {
-    if (item->isSelected()) {
-      circles.append(item);
+  QList<std::shared_ptr<CircleGraphicsItem>> circles;
+  foreach (const auto& ptr, mCircleGraphicsItems) {
+    if (ptr->isSelected()) {
+      circles.append(ptr);
     }
   }
   return circles;
 }
 
-QList<QSharedPointer<PolygonGraphicsItem>>
+QList<std::shared_ptr<PolygonGraphicsItem>>
     FootprintGraphicsItem::getSelectedPolygons() noexcept {
-  QList<QSharedPointer<PolygonGraphicsItem>> polygons;
-  foreach (const QSharedPointer<PolygonGraphicsItem>& item,
-           mPolygonGraphicsItems) {
-    if (item->isSelected()) {
-      polygons.append(item);
+  QList<std::shared_ptr<PolygonGraphicsItem>> polygons;
+  foreach (const auto& ptr, mPolygonGraphicsItems) {
+    if (ptr->isSelected()) {
+      polygons.append(ptr);
     }
   }
   return polygons;
 }
 
-QList<QSharedPointer<StrokeTextGraphicsItem>>
+QList<std::shared_ptr<StrokeTextGraphicsItem>>
     FootprintGraphicsItem::getSelectedStrokeTexts() noexcept {
-  QList<QSharedPointer<StrokeTextGraphicsItem>> texts;
-  foreach (const QSharedPointer<StrokeTextGraphicsItem>& item,
-           mStrokeTextGraphicsItems) {
-    if (item->isSelected()) {
-      texts.append(item);
+  QList<std::shared_ptr<StrokeTextGraphicsItem>> texts;
+  foreach (const auto& ptr, mStrokeTextGraphicsItems) {
+    if (ptr->isSelected()) {
+      texts.append(ptr);
     }
   }
   return texts;
 }
 
-QList<QSharedPointer<HoleGraphicsItem>>
+QList<std::shared_ptr<HoleGraphicsItem>>
     FootprintGraphicsItem::getSelectedHoles() noexcept {
-  QList<QSharedPointer<HoleGraphicsItem>> holes;
-  foreach (const QSharedPointer<HoleGraphicsItem>& item, mHoleGraphicsItems) {
-    if (item->isSelected()) {
-      holes.append(item);
+  QList<std::shared_ptr<HoleGraphicsItem>> holes;
+  foreach (const auto& ptr, mHoleGraphicsItems) {
+    if (ptr->isSelected()) {
+      holes.append(ptr);
     }
   }
   return holes;
@@ -233,92 +192,28 @@ void FootprintGraphicsItem::setRotation(const Angle& rot) noexcept {
   QGraphicsItem::setRotation(-rot.toDeg());
 }
 
-void FootprintGraphicsItem::addPad(FootprintPad& pad) noexcept {
-  Q_ASSERT(!mPadGraphicsItems.contains(&pad));
-  QSharedPointer<FootprintPadGraphicsItem> item(
-      new FootprintPadGraphicsItem(pad, mLayerProvider, mPackagePadList, this));
-  mPadGraphicsItems.insert(&pad, item);
-}
-
-void FootprintGraphicsItem::removePad(FootprintPad& pad) noexcept {
-  Q_ASSERT(mPadGraphicsItems.contains(&pad));
-  mPadGraphicsItems.remove(&pad);  // this deletes the graphics item
-}
-
-void FootprintGraphicsItem::addCircle(Circle& circle) noexcept {
-  Q_ASSERT(!mCircleGraphicsItems.contains(&circle));
-  QSharedPointer<CircleGraphicsItem> item(
-      new CircleGraphicsItem(circle, mLayerProvider, this));
-  mCircleGraphicsItems.insert(&circle, item);
-}
-
-void FootprintGraphicsItem::removeCircle(Circle& circle) noexcept {
-  Q_ASSERT(mCircleGraphicsItems.contains(&circle));
-  mCircleGraphicsItems.remove(&circle);  // this deletes the graphics item
-}
-
-void FootprintGraphicsItem::addPolygon(Polygon& polygon) noexcept {
-  Q_ASSERT(!mPolygonGraphicsItems.contains(&polygon));
-  QSharedPointer<PolygonGraphicsItem> item(
-      new PolygonGraphicsItem(polygon, mLayerProvider, this));
-  item->setEditable(true);
-  mPolygonGraphicsItems.insert(&polygon, item);
-}
-
-void FootprintGraphicsItem::removePolygon(Polygon& polygon) noexcept {
-  Q_ASSERT(mPolygonGraphicsItems.contains(&polygon));
-  mPolygonGraphicsItems.remove(&polygon);  // this deletes the graphics item
-}
-
-void FootprintGraphicsItem::addStrokeText(StrokeText& text) noexcept {
-  Q_ASSERT(!mStrokeTextGraphicsItems.contains(&text));
-  QSharedPointer<StrokeTextGraphicsItem> item(
-      new StrokeTextGraphicsItem(text, mLayerProvider, this));
-  mStrokeTextGraphicsItems.insert(&text, item);
-}
-
-void FootprintGraphicsItem::removeStrokeText(StrokeText& text) noexcept {
-  Q_ASSERT(mStrokeTextGraphicsItems.contains(&text));
-  mStrokeTextGraphicsItems.remove(&text);  // this deletes the graphics item
-}
-
-void FootprintGraphicsItem::addHole(Hole& hole) noexcept {
-  Q_ASSERT(!mHoleGraphicsItems.contains(&hole));
-  QSharedPointer<HoleGraphicsItem> item(
-      new HoleGraphicsItem(hole, mLayerProvider, this));
-  mHoleGraphicsItems.insert(&hole, item);
-}
-void FootprintGraphicsItem::removeHole(Hole& hole) noexcept {
-  Q_ASSERT(mHoleGraphicsItems.contains(&hole));
-  mHoleGraphicsItems.remove(&hole);  // this deletes the graphics item
-}
-
 void FootprintGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
   QPainterPath path;
   path.addRect(rect);
-  foreach (const QSharedPointer<FootprintPadGraphicsItem>& item,
-           mPadGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(item.data(), path);
-    item->setSelected(item->shape().intersects(mappedPath));
+  foreach (const auto& ptr, mPadGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
-  foreach (const QSharedPointer<CircleGraphicsItem>& item,
-           mCircleGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(item.data(), path);
-    item->setSelected(item->shape().intersects(mappedPath));
+  foreach (const auto& ptr, mCircleGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
-  foreach (const QSharedPointer<PolygonGraphicsItem>& item,
-           mPolygonGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(item.data(), path);
-    item->setSelected(item->shape().intersects(mappedPath));
+  foreach (const auto& ptr, mPolygonGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
-  foreach (const QSharedPointer<StrokeTextGraphicsItem>& item,
-           mStrokeTextGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(item.data(), path);
-    item->setSelected(item->shape().intersects(mappedPath));
+  foreach (const auto& ptr, mStrokeTextGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
-  foreach (const QSharedPointer<HoleGraphicsItem>& item, mHoleGraphicsItems) {
-    QPainterPath mappedPath = mapToItem(item.data(), path);
-    item->setSelected(item->shape().intersects(mappedPath));
+  foreach (const auto& ptr, mHoleGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
 }
 
@@ -332,6 +227,151 @@ void FootprintGraphicsItem::paint(QPainter* painter,
   Q_UNUSED(painter);
   Q_UNUSED(option);
   Q_UNUSED(widget);
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void FootprintGraphicsItem::syncPads() noexcept {
+  // Remove obsolete items.
+  for (auto it = mPadGraphicsItems.begin(); it != mPadGraphicsItems.end();) {
+    if (!mFootprint->getPads().contains(it.key().get())) {
+      Q_ASSERT(it.value());
+      it.value()->setParentItem(nullptr);
+      it = mPadGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mFootprint->getPads().values()) {
+    if (!mPadGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i = std::make_shared<FootprintPadGraphicsItem>(
+          obj, mLayerProvider, mPackagePadList, this);
+      mPadGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
+void FootprintGraphicsItem::syncCircles() noexcept {
+  // Remove obsolete items.
+  for (auto it = mCircleGraphicsItems.begin();
+       it != mCircleGraphicsItems.end();) {
+    if (!mFootprint->getCircles().contains(it.key().get())) {
+      Q_ASSERT(it.value());
+      it.value()->setParentItem(nullptr);
+      it = mCircleGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mFootprint->getCircles().values()) {
+    if (!mCircleGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i = std::make_shared<CircleGraphicsItem>(*obj, mLayerProvider, this);
+      mCircleGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
+void FootprintGraphicsItem::syncPolygons() noexcept {
+  // Remove obsolete items.
+  for (auto it = mPolygonGraphicsItems.begin();
+       it != mPolygonGraphicsItems.end();) {
+    if (!mFootprint->getPolygons().contains(it.key().get())) {
+      Q_ASSERT(it.value());
+      it.value()->setParentItem(nullptr);
+      it = mPolygonGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mFootprint->getPolygons().values()) {
+    if (!mPolygonGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i =
+          std::make_shared<PolygonGraphicsItem>(*obj, mLayerProvider, this);
+      i->setEditable(true);
+      mPolygonGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
+void FootprintGraphicsItem::syncStrokeTexts() noexcept {
+  // Remove obsolete items.
+  for (auto it = mStrokeTextGraphicsItems.begin();
+       it != mStrokeTextGraphicsItems.end();) {
+    if (!mFootprint->getStrokeTexts().contains(it.key().get())) {
+      Q_ASSERT(it.key() && it.value());
+      it.value()->setParentItem(nullptr);
+      it = mStrokeTextGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mFootprint->getStrokeTexts().values()) {
+    if (!mStrokeTextGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i =
+          std::make_shared<StrokeTextGraphicsItem>(*obj, mLayerProvider, this);
+      mStrokeTextGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
+void FootprintGraphicsItem::syncHoles() noexcept {
+  // Remove obsolete items.
+  for (auto it = mHoleGraphicsItems.begin(); it != mHoleGraphicsItems.end();) {
+    if (!mFootprint->getHoles().contains(it.key().get())) {
+      Q_ASSERT(it.value());
+      it.value()->setParentItem(nullptr);
+      it = mHoleGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mFootprint->getHoles().values()) {
+    if (!mHoleGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i = std::make_shared<HoleGraphicsItem>(*obj, mLayerProvider, this);
+      mHoleGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
+void FootprintGraphicsItem::footprintEdited(const Footprint& footprint,
+                                            Footprint::Event event) noexcept {
+  Q_UNUSED(footprint);
+  switch (event) {
+    case Footprint::Event::PadsEdited:
+      syncPads();
+      break;
+    case Footprint::Event::CirclesEdited:
+      syncCircles();
+      break;
+    case Footprint::Event::PolygonsEdited:
+      syncPolygons();
+      break;
+    case Footprint::Event::HolesEdited:
+      syncHoles();
+      break;
+    case Footprint::Event::StrokeTextsEdited:
+      syncStrokeTexts();
+      break;
+    default:
+      break;
+  }
 }
 
 /*******************************************************************************

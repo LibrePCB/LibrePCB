@@ -74,8 +74,6 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
 
 PackageEditorState_AddPads::~PackageEditorState_AddPads() noexcept {
   Q_ASSERT(mEditCmd.isNull());
-  Q_ASSERT(mCurrentPad == nullptr);
-  Q_ASSERT(mCurrentGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -232,19 +230,20 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add footprint pad"));
     mLastPad.setPosition(pos);
-    mCurrentPad.reset(new FootprintPad(Uuid::createRandom(), mLastPad));
+    mCurrentPad =
+        std::make_shared<FootprintPad>(Uuid::createRandom(), mLastPad);
     mContext.undoStack.appendToCmdGroup(new CmdFootprintPadInsert(
         mContext.currentFootprint->getPads(), mCurrentPad));
     mEditCmd.reset(new CmdFootprintPadEdit(*mCurrentPad));
     mCurrentGraphicsItem =
-        mContext.currentGraphicsItem->getPadGraphicsItem(*mCurrentPad);
+        mContext.currentGraphicsItem->getGraphicsItem(mCurrentPad);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    mCurrentGraphicsItem = nullptr;
-    mCurrentPad = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentPad.reset();
     mEditCmd.reset();
     return false;
   }
@@ -254,7 +253,7 @@ bool PackageEditorState_AddPads::finishAddPad(const Point& pos) noexcept {
   try {
     mEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
+    mCurrentGraphicsItem.reset();
     mLastPad = *mCurrentPad;
     mCurrentPad.reset();
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
@@ -270,7 +269,7 @@ bool PackageEditorState_AddPads::finishAddPad(const Point& pos) noexcept {
 bool PackageEditorState_AddPads::abortAddPad() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
+    mCurrentGraphicsItem.reset();
     mLastPad = *mCurrentPad;
     mCurrentPad.reset();
     mEditCmd.reset();

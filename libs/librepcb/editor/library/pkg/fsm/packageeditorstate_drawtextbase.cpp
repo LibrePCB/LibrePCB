@@ -66,8 +66,6 @@ PackageEditorState_DrawTextBase::PackageEditorState_DrawTextBase(
 
 PackageEditorState_DrawTextBase::~PackageEditorState_DrawTextBase() noexcept {
   Q_ASSERT(mEditCmd.isNull());
-  Q_ASSERT(mCurrentText == nullptr);
-  Q_ASSERT(mCurrentGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -228,23 +226,22 @@ bool PackageEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
   try {
     mStartPos = pos;
     mContext.undoStack.beginCmdGroup(tr("Add footprint text"));
-    mCurrentText = new StrokeText(
+    mCurrentText = std::make_shared<StrokeText>(
         Uuid::createRandom(), mLastLayerName, mLastText, pos, mLastRotation,
         mLastHeight, mLastStrokeWidth, StrokeTextSpacing(), StrokeTextSpacing(),
         mLastAlignment, false, true);
-    mContext.undoStack.appendToCmdGroup(
-        new CmdStrokeTextInsert(mContext.currentFootprint->getStrokeTexts(),
-                                std::shared_ptr<StrokeText>(mCurrentText)));
+    mContext.undoStack.appendToCmdGroup(new CmdStrokeTextInsert(
+        mContext.currentFootprint->getStrokeTexts(), mCurrentText));
     mEditCmd.reset(new CmdStrokeTextEdit(*mCurrentText));
     mCurrentGraphicsItem =
-        mContext.currentGraphicsItem->getTextGraphicsItem(*mCurrentText);
+        mContext.currentGraphicsItem->getGraphicsItem(mCurrentText);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    mCurrentGraphicsItem = nullptr;
-    mCurrentText = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentText.reset();
     mEditCmd.reset();
     return false;
   }
@@ -258,8 +255,8 @@ bool PackageEditorState_DrawTextBase::finishAddText(const Point& pos) noexcept {
   try {
     mEditCmd->setPosition(pos, true);
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
-    mCurrentText = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentText.reset();
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
     return true;
@@ -272,8 +269,8 @@ bool PackageEditorState_DrawTextBase::finishAddText(const Point& pos) noexcept {
 bool PackageEditorState_DrawTextBase::abortAddText() noexcept {
   try {
     mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem = nullptr;
-    mCurrentText = nullptr;
+    mCurrentGraphicsItem.reset();
+    mCurrentText.reset();
     mEditCmd.reset();
     mContext.undoStack.abortCmdGroup();
     return true;

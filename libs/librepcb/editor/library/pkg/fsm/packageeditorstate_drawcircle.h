@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -88,8 +90,8 @@ private:  // Methods
 
 private:  // Types / Data
   QScopedPointer<CmdCircleEdit> mEditCmd;
-  Circle* mCurrentCircle;
-  CircleGraphicsItem* mCurrentGraphicsItem;
+  std::shared_ptr<Circle> mCurrentCircle;
+  std::shared_ptr<CircleGraphicsItem> mCurrentGraphicsItem;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;
