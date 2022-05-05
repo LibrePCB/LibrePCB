@@ -133,11 +133,11 @@ void BI_Footprint::init() {
 }
 
 void BI_Footprint::deinit() noexcept {
+  mGraphicsItem.reset();
   qDeleteAll(mPads);
   mPads.clear();
   qDeleteAll(mStrokeTexts);
   mStrokeTexts.clear();
-  mGraphicsItem.reset();
 }
 
 BI_Footprint::~BI_Footprint() noexcept {
@@ -292,7 +292,7 @@ bool BI_Footprint::isSelectable() const noexcept {
 
 void BI_Footprint::setSelected(bool selected) noexcept {
   BI_Base::setSelected(selected);
-  mGraphicsItem->update();
+  mGraphicsItem->setSelected(selected);
   foreach (BI_FootprintPad* pad, mPads)
     pad->setSelected(selected);
   foreach (BI_StrokeText* text, mStrokeTexts)
@@ -304,13 +304,11 @@ void BI_Footprint::setSelected(bool selected) noexcept {
  ******************************************************************************/
 
 void BI_Footprint::deviceInstanceAttributesChanged() {
-  mGraphicsItem->updateCacheAndRepaint();
   emit attributesChanged();
 }
 
 void BI_Footprint::deviceInstanceMoved(const Point& pos) {
   mGraphicsItem->setPos(pos.toPxQPointF());
-  mGraphicsItem->updateCacheAndRepaint();
   foreach (BI_FootprintPad* pad, mPads) {
     pad->updatePosition();
     mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
@@ -321,7 +319,6 @@ void BI_Footprint::deviceInstanceMoved(const Point& pos) {
 void BI_Footprint::deviceInstanceRotated(const Angle& rot) {
   Q_UNUSED(rot);
   updateGraphicsItemTransform();
-  mGraphicsItem->updateCacheAndRepaint();
   foreach (BI_FootprintPad* pad, mPads) {
     pad->updatePosition();
     mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
@@ -331,7 +328,7 @@ void BI_Footprint::deviceInstanceRotated(const Angle& rot) {
 void BI_Footprint::deviceInstanceMirrored(bool mirrored) {
   Q_UNUSED(mirrored);
   updateGraphicsItemTransform();
-  mGraphicsItem->updateCacheAndRepaint();
+  mGraphicsItem->updateBoardSide();
   foreach (BI_FootprintPad* pad, mPads) {
     pad->updatePosition();
     mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
