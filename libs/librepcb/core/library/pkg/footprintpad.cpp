@@ -23,7 +23,6 @@
 #include "footprintpad.h"
 
 #include "../../graphics/graphicslayer.h"
-#include "footprintpadgraphicsitem.h"
 
 #include <QtCore>
 
@@ -45,8 +44,7 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
     mWidth(other.mWidth),
     mHeight(other.mHeight),
     mDrillDiameter(other.mDrillDiameter),
-    mBoardSide(other.mBoardSide),
-    mRegisteredGraphicsItem(nullptr) {
+    mBoardSide(other.mBoardSide) {
 }
 
 FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
@@ -63,8 +61,7 @@ FootprintPad::FootprintPad(const Uuid& padUuid, const Point& pos,
     mWidth(width),
     mHeight(height),
     mDrillDiameter(drillDiameter),
-    mBoardSide(side),
-    mRegisteredGraphicsItem(nullptr) {
+    mBoardSide(side) {
 }
 
 FootprintPad::FootprintPad(const SExpression& node, const Version& fileFormat)
@@ -77,12 +74,10 @@ FootprintPad::FootprintPad(const SExpression& node, const Version& fileFormat)
     mHeight(Point(node.getChild("size"), fileFormat).getY()),
     mDrillDiameter(
         deserialize<UnsignedLength>(node.getChild("drill/@0"), fileFormat)),
-    mBoardSide(deserialize<BoardSide>(node.getChild("side/@0"), fileFormat)),
-    mRegisteredGraphicsItem(nullptr) {
+    mBoardSide(deserialize<BoardSide>(node.getChild("side/@0"), fileFormat)) {
 }
 
 FootprintPad::~FootprintPad() noexcept {
-  Q_ASSERT(mRegisteredGraphicsItem == nullptr);
 }
 
 /*******************************************************************************
@@ -152,7 +147,6 @@ bool FootprintPad::setPosition(const Point& pos) noexcept {
   }
 
   mPosition = pos;
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setPosition(mPosition);
   onEdited.notify(Event::PositionChanged);
   return true;
 }
@@ -163,9 +157,6 @@ bool FootprintPad::setPackagePadUuid(const Uuid& pad) noexcept {
   }
 
   mPackagePadUuid = pad;
-  if (mRegisteredGraphicsItem) {
-    mRegisteredGraphicsItem->setPackagePadUuid(mPackagePadUuid);
-  }
   onEdited.notify(Event::PackagePadUuidChanged);
   return true;
 }
@@ -176,7 +167,6 @@ bool FootprintPad::setRotation(const Angle& rot) noexcept {
   }
 
   mRotation = rot;
-  if (mRegisteredGraphicsItem) mRegisteredGraphicsItem->setRotation(mRotation);
   onEdited.notify(Event::RotationChanged);
   return true;
 }
@@ -187,8 +177,6 @@ bool FootprintPad::setShape(Shape shape) noexcept {
   }
 
   mShape = shape;
-  if (mRegisteredGraphicsItem)
-    mRegisteredGraphicsItem->setShape(toQPainterPathPx());
   onEdited.notify(Event::ShapeChanged);
   return true;
 }
@@ -199,8 +187,6 @@ bool FootprintPad::setWidth(const PositiveLength& width) noexcept {
   }
 
   mWidth = width;
-  if (mRegisteredGraphicsItem)
-    mRegisteredGraphicsItem->setShape(toQPainterPathPx());
   onEdited.notify(Event::WidthChanged);
   return true;
 }
@@ -211,8 +197,6 @@ bool FootprintPad::setHeight(const PositiveLength& height) noexcept {
   }
 
   mHeight = height;
-  if (mRegisteredGraphicsItem)
-    mRegisteredGraphicsItem->setShape(toQPainterPathPx());
   onEdited.notify(Event::HeightChanged);
   return true;
 }
@@ -223,8 +207,6 @@ bool FootprintPad::setDrillDiameter(const UnsignedLength& diameter) noexcept {
   }
 
   mDrillDiameter = diameter;
-  if (mRegisteredGraphicsItem)
-    mRegisteredGraphicsItem->setShape(toQPainterPathPx());
   onEdited.notify(Event::DrillDiameterChanged);
   return true;
 }
@@ -235,10 +217,6 @@ bool FootprintPad::setBoardSide(BoardSide side) noexcept {
   }
 
   mBoardSide = side;
-  if (mRegisteredGraphicsItem)
-    mRegisteredGraphicsItem->setLayerName(getLayerName());
-  if (mRegisteredGraphicsItem)
-    mRegisteredGraphicsItem->setShape(toQPainterPathPx());
   onEdited.notify(Event::BoardSideChanged);
   return true;
 }
@@ -246,18 +224,6 @@ bool FootprintPad::setBoardSide(BoardSide side) noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void FootprintPad::registerGraphicsItem(
-    FootprintPadGraphicsItem& item) noexcept {
-  Q_ASSERT(!mRegisteredGraphicsItem);
-  mRegisteredGraphicsItem = &item;
-}
-
-void FootprintPad::unregisterGraphicsItem(
-    FootprintPadGraphicsItem& item) noexcept {
-  Q_ASSERT(mRegisteredGraphicsItem == &item);
-  mRegisteredGraphicsItem = nullptr;
-}
 
 void FootprintPad::serialize(SExpression& root) const {
   root.appendChild(mPackagePadUuid);

@@ -47,7 +47,7 @@ class Symbol;
 
 namespace editor {
 
-class FootprintPreviewGraphicsItem;
+class FootprintGraphicsItem;
 class SymbolGraphicsItem;
 
 namespace Ui {
@@ -117,7 +117,7 @@ private:  // Data
   // package
   QScopedPointer<Package> mPackage;
   QScopedPointer<GraphicsScene> mPackageGraphicsScene;
-  QScopedPointer<FootprintPreviewGraphicsItem> mFootprintGraphicsItem;
+  QScopedPointer<FootprintGraphicsItem> mFootprintGraphicsItem;
 
   // broken interface detection
   tl::optional<Uuid> mOriginalComponentUuid;

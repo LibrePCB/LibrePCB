@@ -27,14 +27,14 @@
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
 #include "../../widgets/graphicsview.h"
+#include "../pkg/footprintgraphicsitem.h"
+#include "../pkg/footprintpadgraphicsitem.h"
 #include "cmdfootprintpadedit.h"
 
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/holegraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
-#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
@@ -65,21 +65,21 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
   int count = 0;
   PositiveLength grid = mContext.graphicsView.getGridProperties().getInterval();
 
-  QList<QSharedPointer<FootprintPadGraphicsItem>> pads =
+  QList<std::shared_ptr<FootprintPadGraphicsItem>> pads =
       context.currentGraphicsItem->getSelectedPads();
-  foreach (const QSharedPointer<FootprintPadGraphicsItem>& pad, pads) {
+  foreach (const std::shared_ptr<FootprintPadGraphicsItem>& pad, pads) {
     Q_ASSERT(pad);
-    mPadEditCmds.append(new CmdFootprintPadEdit(pad->getPad()));
-    mCenterPos += pad->getPad().getPosition();
-    if (!pad->getPad().getPosition().isOnGrid(grid)) {
+    mPadEditCmds.append(new CmdFootprintPadEdit(*pad->getPad()));
+    mCenterPos += pad->getPad()->getPosition();
+    if (!pad->getPad()->getPosition().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
     ++count;
   }
 
-  QList<QSharedPointer<CircleGraphicsItem>> circles =
+  QList<std::shared_ptr<CircleGraphicsItem>> circles =
       context.currentGraphicsItem->getSelectedCircles();
-  foreach (const QSharedPointer<CircleGraphicsItem>& circle, circles) {
+  foreach (const std::shared_ptr<CircleGraphicsItem>& circle, circles) {
     Q_ASSERT(circle);
     mCircleEditCmds.append(new CmdCircleEdit(circle->getCircle()));
     mCenterPos += circle->getCircle().getCenter();
@@ -89,9 +89,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     ++count;
   }
 
-  QList<QSharedPointer<PolygonGraphicsItem>> polygons =
+  QList<std::shared_ptr<PolygonGraphicsItem>> polygons =
       context.currentGraphicsItem->getSelectedPolygons();
-  foreach (const QSharedPointer<PolygonGraphicsItem>& polygon, polygons) {
+  foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon, polygons) {
     Q_ASSERT(polygon);
     mPolygonEditCmds.append(new CmdPolygonEdit(polygon->getPolygon()));
     foreach (const Vertex& vertex,
@@ -104,9 +104,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     }
   }
 
-  QList<QSharedPointer<StrokeTextGraphicsItem>> texts =
+  QList<std::shared_ptr<StrokeTextGraphicsItem>> texts =
       context.currentGraphicsItem->getSelectedStrokeTexts();
-  foreach (const QSharedPointer<StrokeTextGraphicsItem>& text, texts) {
+  foreach (const std::shared_ptr<StrokeTextGraphicsItem>& text, texts) {
     Q_ASSERT(text);
     mTextEditCmds.append(new CmdStrokeTextEdit(text->getText()));
     mCenterPos += text->getText().getPosition();
@@ -116,9 +116,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     ++count;
   }
 
-  QList<QSharedPointer<HoleGraphicsItem>> holes =
+  QList<std::shared_ptr<HoleGraphicsItem>> holes =
       context.currentGraphicsItem->getSelectedHoles();
-  foreach (const QSharedPointer<HoleGraphicsItem>& hole, holes) {
+  foreach (const std::shared_ptr<HoleGraphicsItem>& hole, holes) {
     Q_ASSERT(hole);
     // Note: The const_cast<> is a bit ugly, but it was by far the easiest
     // way and is safe since here we know that we're allowed to modify the hole.

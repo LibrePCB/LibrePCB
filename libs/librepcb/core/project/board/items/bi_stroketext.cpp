@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "bi_stroketext.h"
 
+#include "../../../attribute/attributesubstitutor.h"
 #include "../../../font/strokefontpool.h"
 #include "../../../geometry/stroketext.h"
 #include "../../../graphics/graphicsscene.h"
@@ -70,12 +71,10 @@ BI_StrokeText::BI_StrokeText(Board& board, const StrokeText& text)
 
 void BI_StrokeText::init() {
   mText->onEdited.attach(mOnStrokeTextEditedSlot);
-  mText->setAttributeProvider(&mBoard);
-  mText->setFont(&getProject().getStrokeFonts().getFont(
-      mBoard.getDefaultFontName()));  // can throw
 
   mGraphicsItem.reset(
-      new StrokeTextGraphicsItem(*mText, mBoard.getLayerStack()));
+      new StrokeTextGraphicsItem(*mText, mBoard.getLayerStack(), getFont()));
+  mGraphicsItem->setAttributeProvider(getAttributeProvider());
   mAnchorGraphicsItem.reset(new LineGraphicsItem());
   updateGraphicsItems();
 
@@ -98,6 +97,7 @@ void BI_StrokeText::setFootprint(BI_Footprint* footprint) noexcept {
   }
 
   mFootprint = footprint;
+  mGraphicsItem->setAttributeProvider(getAttributeProvider());
   updateGraphicsItems();
 
   // Text might need to be updated if footprint attributes have changed.
@@ -105,6 +105,20 @@ void BI_StrokeText::setFootprint(BI_Footprint* footprint) noexcept {
     connect(mFootprint, &BI_Footprint::attributesChanged, this,
             &BI_StrokeText::boardOrFootprintAttributesChanged);
   }
+}
+
+const AttributeProvider* BI_StrokeText::getAttributeProvider() const noexcept {
+  if (mFootprint) {
+    return mFootprint;
+  } else {
+    return &mBoard;
+  }
+}
+
+QVector<Path> BI_StrokeText::generatePaths() const {
+  const QString text = AttributeSubstitutor::substitute(mText->getText(),
+                                                        getAttributeProvider());
+  return mText->generatePaths(getFont(), text);
 }
 
 void BI_StrokeText::updateGraphicsItems() noexcept {
@@ -157,6 +171,11 @@ const Point& BI_StrokeText::getPosition() const noexcept {
   return mText->getPosition();
 }
 
+const StrokeFont& BI_StrokeText::getFont() const {
+  return mBoard.getProject().getStrokeFonts().getFont(
+      mBoard.getDefaultFontName());  // can throw
+}
+
 QPainterPath BI_StrokeText::getGrabAreaScenePx() const noexcept {
   return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
 }
@@ -182,7 +201,7 @@ void BI_StrokeText::setSelected(bool selected) noexcept {
  ******************************************************************************/
 
 void BI_StrokeText::boardOrFootprintAttributesChanged() {
-  mText->updatePaths();
+  mGraphicsItem->updateText();
 }
 
 /*******************************************************************************

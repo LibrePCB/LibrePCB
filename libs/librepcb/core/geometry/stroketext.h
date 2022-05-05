@@ -39,7 +39,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class AttributeProvider;
 class StrokeFont;
 
 /*******************************************************************************
@@ -133,7 +132,6 @@ public:
     AlignChanged,
     MirroredChanged,
     AutoRotateChanged,
-    PathsChanged,
   };
   Signal<StrokeText, Event> onEdited;
   typedef Slot<StrokeText, Event> OnEditedSlot;
@@ -168,10 +166,12 @@ public:
   bool getMirrored() const noexcept { return mMirrored; }
   bool getAutoRotate() const noexcept { return mAutoRotate; }
   const QString& getText() const noexcept { return mText; }
-  const QVector<Path>& getPaths() const noexcept;
+  QVector<Path> generatePaths(const StrokeFont& font) const noexcept;
+  QVector<Path> generatePaths(const StrokeFont& font, const QString& text) const
+      noexcept;
   bool needsAutoRotation() const noexcept;
-  Length calcLetterSpacing() const noexcept;
-  Length calcLineSpacing() const noexcept;
+  Length calcLetterSpacing(const StrokeFont& font) const noexcept;
+  Length calcLineSpacing(const StrokeFont& font) const noexcept;
 
   // Setters
   bool setLayerName(const GraphicsLayerName& name) noexcept;
@@ -185,12 +185,6 @@ public:
   bool setAlign(const Alignment& align) noexcept;
   bool setMirrored(bool mirrored) noexcept;
   bool setAutoRotate(bool autoRotate) noexcept;
-
-  // General Methods
-  void setAttributeProvider(const AttributeProvider* provider) noexcept;
-  void setFont(const StrokeFont* font) noexcept;
-  const StrokeFont* getCurrentFont() const noexcept { return mFont; }
-  void updatePaths() noexcept;
 
   /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -215,14 +209,6 @@ private:  // Data
   Alignment mAlign;
   bool mMirrored;
   bool mAutoRotate;
-
-  // Misc
-  const AttributeProvider*
-      mAttributeProvider;  ///< for substituting placeholders in text
-  const StrokeFont* mFont;  ///< font used for calculating paths
-  QVector<Path> mPaths;  ///< stroke paths without transformations
-                         ///< (mirror/rotate/translate)
-  QVector<Path> mPathsRotated;  ///< same as #mPaths, but rotated by 180°
 };
 
 /*******************************************************************************

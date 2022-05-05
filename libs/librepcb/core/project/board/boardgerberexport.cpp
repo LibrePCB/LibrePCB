@@ -452,7 +452,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
       UnsignedLength lineWidth =
           calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
       const Transform transform(text->getText());
-      foreach (Path path, transform.map(text->getText().getPaths())) {
+      foreach (Path path, transform.map(text->generatePaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             QString());
       }
@@ -572,7 +572,7 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen,
       UnsignedLength lineWidth =
           calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
       Transform transform(text->getText());
-      foreach (Path path, transform.map(text->getText().getPaths())) {
+      foreach (Path path, transform.map(text->generatePaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             component);
       }

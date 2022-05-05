@@ -152,7 +152,7 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
     }
     PositiveLength width(qMax(*text->getText().getStrokeWidth(), Length(1)));
     Transform transform(text->getText());
-    foreach (Path path, transform.map(text->getText().getPaths())) {
+    foreach (Path path, transform.map(text->generatePaths())) {
       QVector<Path> paths = path.toOutlineStrokes(width);
       foreach (const Path& p, paths) {
         ClipperHelpers::unite(mPaths,
@@ -235,7 +235,7 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
       }
       PositiveLength width(qMax(*text->getText().getStrokeWidth(), Length(1)));
       Transform transform(text->getText());
-      foreach (Path path, transform.map(text->getText().getPaths())) {
+      foreach (Path path, transform.map(text->generatePaths())) {
         foreach (const Path& p, path.toOutlineStrokes(width)) {
           ClipperHelpers::unite(mPaths,
                                 ClipperHelpers::convert(p, mMaxArcTolerance));

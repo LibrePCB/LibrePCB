@@ -314,7 +314,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
                              formatLength(*text->getText().getStrokeWidth()));
       QVector<Path> locations;
       Transform transform(text->getText());
-      foreach (Path path, transform.map(text->getText().getPaths())) {
+      foreach (Path path, transform.map(text->generatePaths())) {
         locations += path.toOutlineStrokes(PositiveLength(
             qMax(*text->getText().getStrokeWidth(), Length(50000))));
       }
@@ -358,7 +358,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
                                formatLength(*text->getText().getStrokeWidth()));
         QVector<Path> locations;
         Transform transform(text->getText());
-        foreach (Path path, transform.map(text->getText().getPaths())) {
+        foreach (Path path, transform.map(text->generatePaths())) {
           locations += path.toOutlineStrokes(PositiveLength(
               qMax(*text->getText().getStrokeWidth(), Length(50000))));
         }

@@ -41,7 +41,7 @@ class Workspace;
 
 namespace editor {
 
-class FootprintPreviewGraphicsItem;
+class FootprintGraphicsItem;
 
 namespace Ui {
 class PackageChooserDialog;
@@ -99,7 +99,7 @@ private:  // Data
   // preview
   QScopedPointer<Package> mPackage;
   QScopedPointer<GraphicsScene> mGraphicsScene;
-  QScopedPointer<FootprintPreviewGraphicsItem> mGraphicsItem;
+  QScopedPointer<FootprintGraphicsItem> mGraphicsItem;
 };
 
 /*******************************************************************************

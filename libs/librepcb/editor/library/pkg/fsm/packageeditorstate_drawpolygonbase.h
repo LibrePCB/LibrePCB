@@ -102,7 +102,7 @@ private:  // Types / Data
   QScopedPointer<CmdPolygonEdit> mEditCmd;
   std::shared_ptr<Polygon> mCurrentPolygon;
   Point mSegmentStartPos;
-  PolygonGraphicsItem* mCurrentGraphicsItem;
+  std::shared_ptr<PolygonGraphicsItem> mCurrentGraphicsItem;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;

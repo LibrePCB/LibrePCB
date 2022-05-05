@@ -22,13 +22,14 @@
  ******************************************************************************/
 #include "bgi_footprint.h"
 
-#include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../../library/pkg/footprint.h"
-#include "../../project.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
-#include "../items/bi_device.h"
 #include "../items/bi_footprint.h"
+
+#include <librepcb/core/graphics/origincrossgraphicsitem.h>
+#include <librepcb/core/graphics/primitivecirclegraphicsitem.h>
+#include <librepcb/core/graphics/primitivepathgraphicsitem.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -45,15 +46,63 @@ namespace librepcb {
 BGI_Footprint::BGI_Footprint(BI_Footprint& footprint) noexcept
   : BGI_Base(),
     mFootprint(footprint),
-    mLibFootprint(footprint.getLibFootprint()) {
-  updateCacheAndRepaint();
+    mGrabAreaLayer(),
+    mOnLayerEditedSlot(*this, &BGI_Footprint::layerEdited) {
+  mOriginCrossGraphicsItem = std::make_shared<OriginCrossGraphicsItem>(this);
+  mOriginCrossGraphicsItem->setSize(UnsignedLength(1400000));
+  mShape |= mOriginCrossGraphicsItem->shape();
+
+  for (auto& obj : mFootprint.getLibFootprint().getCircles().values()) {
+    Q_ASSERT(obj);
+    auto i = std::make_shared<PrimitiveCircleGraphicsItem>(this);
+    i->setPosition(obj->getCenter());
+    i->setDiameter(positiveToUnsigned(obj->getDiameter()));
+    i->setLineWidth(obj->getLineWidth());
+    i->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    if (obj->isGrabArea()) {
+      const qreal r = (obj->getDiameter() + obj->getLineWidth())->toPx() / 2;
+      QPainterPath path;
+      path.addEllipse(obj->getCenter().toPxQPointF(), r, r);
+      mShape |= path;
+    }
+    mCircleGraphicsItems.append(i);
+  }
+
+  for (auto& obj : mFootprint.getLibFootprint().getPolygons().values()) {
+    Q_ASSERT(obj);
+    auto i = std::make_shared<PrimitivePathGraphicsItem>(this);
+    i->setPath(obj->getPath().toQPainterPathPx());
+    i->setLineWidth(obj->getLineWidth());
+    i->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    if (obj->isGrabArea()) {
+      mShape |= Toolbox::shapeFromPath(obj->getPath().toQPainterPathPx(),
+                                       QPen(Qt::SolidPattern, 0),
+                                       Qt::SolidPattern, obj->getLineWidth());
+    }
+    mPolygonGraphicsItems.append(i);
+  }
+
+  for (auto& obj : mFootprint.getLibFootprint().getHoles().values()) {
+    Q_ASSERT(obj);
+    auto i = std::make_shared<PrimitiveCircleGraphicsItem>(this);
+    i->setPosition(obj->getPosition());
+    i->setDiameter(positiveToUnsigned(obj->getDiameter()));
+    i->setLineLayer(getLayer(GraphicsLayer::sBoardDrillsNpth));
+    i->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    mHoleGraphicsItems.append(i);
+  }
+
+  updateBoardSide();
 }
 
 BGI_Footprint::~BGI_Footprint() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
+ *  General Methods
  ******************************************************************************/
 
 bool BGI_Footprint::isSelectable() const noexcept {
@@ -61,173 +110,112 @@ bool BGI_Footprint::isSelectable() const noexcept {
   return layer && layer->isVisible();
 }
 
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
+void BGI_Footprint::setSelected(bool selected) noexcept {
+  mOriginCrossGraphicsItem->setSelected(selected);
+  foreach (const auto& i, mCircleGraphicsItems) { i->setSelected(selected); }
+  foreach (const auto& i, mPolygonGraphicsItems) { i->setSelected(selected); }
+  QGraphicsItem::setSelected(selected);
+}
 
-void BGI_Footprint::updateCacheAndRepaint() noexcept {
-  GraphicsLayer* layer = nullptr;
-  prepareGeometryChange();
-
-  mBoundingRect = QRectF();
-  mShape = QPainterPath();
-
-  // set Z value
-  if (mFootprint.getMirrored())
+void BGI_Footprint::updateBoardSide() noexcept {
+  // Update Z value.
+  if (mFootprint.getMirrored()) {
     setZValue(Board::ZValue_FootprintsBottom);
-  else
+  } else {
     setZValue(Board::ZValue_FootprintsTop);
+  }
 
-  // cross rect
-  layer = getLayer(GraphicsLayer::sTopReferences);
-  if (layer) {
-    if (layer->isVisible()) {
-      qreal width = Length(700000).toPx();
-      QRectF crossRect(-width, -width, 2 * width, 2 * width);
-      mBoundingRect = mBoundingRect.united(crossRect);
-      mShape.addRect(crossRect);
+  // Update grab area layer.
+  GraphicsLayer* grabAreaLayer = getLayer(GraphicsLayer::sTopGrabAreas);
+  if (grabAreaLayer != mGrabAreaLayer) {
+    if (mGrabAreaLayer) {
+      mGrabAreaLayer->onEdited.detach(mOnLayerEditedSlot);
+    }
+    prepareGeometryChange();
+    mGrabAreaLayer = grabAreaLayer;
+    if (mGrabAreaLayer) {
+      mGrabAreaLayer->onEdited.attach(mOnLayerEditedSlot);
     }
   }
 
-  // polygons
-  for (const Polygon& polygon : mLibFootprint.getPolygons()) {
-    layer = getLayer(*polygon.getLayerName());
-    if (!layer) continue;
-    if (!layer->isVisible()) continue;
+  // Update origin cross layer.
+  mOriginCrossGraphicsItem->setLayer(getLayer(GraphicsLayer::sTopReferences));
 
-    QPainterPath polygonPath = polygon.getPath().toQPainterPathPx();
-    qreal w = polygon.getLineWidth()->toPx() / 2;
-    mBoundingRect =
-        mBoundingRect.united(polygonPath.boundingRect().adjusted(-w, -w, w, w));
-    if (!polygon.isGrabArea()) continue;
-    layer = getLayer(GraphicsLayer::sTopGrabAreas);
-    if (!layer) continue;
-    if (!layer->isVisible()) continue;
-    mShape = mShape.united(polygonPath);
+  // Update circle layers.
+  const CircleList& circles = mFootprint.getLibFootprint().getCircles();
+  for (int i = 0; i < std::min(circles.count(), mCircleGraphicsItems.count());
+       ++i) {
+    mCircleGraphicsItems.at(i)->setLineLayer(
+        getLayer(*circles.at(i)->getLayerName()));
+    if (circles.at(i)->isFilled()) {
+      mCircleGraphicsItems.at(i)->setFillLayer(
+          getLayer(*circles.at(i)->getLayerName()));
+    } else if (circles.at(i)->isGrabArea()) {
+      mCircleGraphicsItems.at(i)->setFillLayer(mGrabAreaLayer);
+    }
   }
 
-  if (!mShape.isEmpty()) mShape.setFillRule(Qt::WindingFill);
-
-  setVisible(!mBoundingRect.isEmpty());
-
-  update();
+  // Update polygon layers.
+  const PolygonList& polygons = mFootprint.getLibFootprint().getPolygons();
+  for (int i = 0; i < std::min(polygons.count(), mPolygonGraphicsItems.count());
+       ++i) {
+    mPolygonGraphicsItems.at(i)->setLineLayer(
+        getLayer(*polygons.at(i)->getLayerName()));
+    // Don't fill if path is not closed (for consistency with Gerber export)!
+    if (polygons.at(i)->isFilled() && polygons.at(i)->getPath().isClosed()) {
+      mPolygonGraphicsItems.at(i)->setFillLayer(
+          getLayer(*polygons.at(i)->getLayerName()));
+    } else if (polygons.at(i)->isGrabArea()) {
+      mPolygonGraphicsItems.at(i)->setFillLayer(mGrabAreaLayer);
+    }
+  }
 }
 
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
+QPainterPath BGI_Footprint::shape() const noexcept {
+  return (mGrabAreaLayer && mGrabAreaLayer->isVisible())
+      ? mShape
+      : mOriginCrossGraphicsItem->shape();
+}
+
 void BGI_Footprint::paint(QPainter* painter,
                           const QStyleOptionGraphicsItem* option,
                           QWidget* widget) {
+  Q_UNUSED(painter);
   Q_UNUSED(option);
   Q_UNUSED(widget);
-
-  const GraphicsLayer* layer = 0;
-  const bool selected = mFootprint.isSelected();
-
-  // draw all polygons
-  for (const Polygon& polygon : mLibFootprint.getPolygons()) {
-    // get layer
-    layer = getLayer(*polygon.getLayerName());
-    if (!layer) continue;
-    if (!layer->isVisible()) continue;
-
-    // set pen
-    painter->setPen(QPen(layer->getColor(selected),
-                         polygon.getLineWidth()->toPx(), Qt::SolidLine,
-                         Qt::RoundCap, Qt::RoundJoin));
-
-    // set brush
-    if ((!polygon.isFilled()) || (!polygon.getPath().isClosed())) {
-      if (polygon.isGrabArea())
-        layer = getLayer(GraphicsLayer::sTopGrabAreas);
-      else
-        layer = nullptr;
-    }
-    if (layer) {
-      if (layer->isVisible())
-        painter->setBrush(QBrush(layer->getColor(selected), Qt::SolidPattern));
-      else
-        painter->setBrush(Qt::NoBrush);
-    } else {
-      painter->setBrush(Qt::NoBrush);
-    }
-
-    // draw polygon
-    painter->drawPath(polygon.getPath().toQPainterPathPx());
-  }
-
-  // draw all circles
-  for (const Circle& circle : mLibFootprint.getCircles()) {
-    // get layer
-    layer = getLayer(*circle.getLayerName());
-    if (!layer) continue;
-    if (!layer->isVisible()) continue;
-
-    // set pen
-    painter->setPen(QPen(layer->getColor(selected),
-                         circle.getLineWidth()->toPx(), Qt::SolidLine,
-                         Qt::RoundCap, Qt::RoundJoin));
-
-    // set brush
-    if (!circle.isFilled()) {
-      if (circle.isGrabArea())
-        layer = getLayer(GraphicsLayer::sTopGrabAreas);
-      else
-        layer = nullptr;
-    }
-    if (layer) {
-      if (layer->isVisible())
-        painter->setBrush(QBrush(layer->getColor(selected), Qt::SolidPattern));
-      else
-        painter->setBrush(Qt::NoBrush);
-    } else {
-      painter->setBrush(Qt::NoBrush);
-    }
-
-    // draw circle
-    painter->drawEllipse(circle.getCenter().toPxQPointF(),
-                         circle.getDiameter()->toPx() / 2,
-                         circle.getDiameter()->toPx() / 2);
-    // TODO: rotation
-  }
-
-  // draw all holes
-  for (const Hole& hole : mLibFootprint.getHoles()) {
-    // get layer
-    layer = getLayer(GraphicsLayer::sBoardDrillsNpth);
-    if (!layer) continue;
-    if (!layer->isVisible()) continue;
-
-    // set pen/brush
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(QBrush(layer->getColor(selected), Qt::SolidPattern));
-
-    // draw hole
-    qreal radius = (hole.getDiameter() / 2).toPx();
-    painter->drawEllipse(hole.getPosition().toPxQPointF(), radius, radius);
-  }
-
-  // draw origin cross
-  layer = getLayer(GraphicsLayer::sTopReferences);
-  if (layer && layer->isVisible()) {
-    qreal width = Length(700000).toPx();
-    painter->setPen(QPen(layer->getColor(selected), 0));
-    painter->drawLine(-width, 0, width, 0);
-    painter->drawLine(0, -width, 0, width);
-  }
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
+void BGI_Footprint::layerEdited(const GraphicsLayer& layer,
+                                GraphicsLayer::Event event) noexcept {
+  Q_UNUSED(layer);
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+    case GraphicsLayer::Event::HighlightColorChanged:
+    case GraphicsLayer::Event::Destroyed:
+      break;
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      prepareGeometryChange();
+      break;
+    default:
+      qWarning() << "BGI_Footprint: Unhandled switch-case in layerEdited()";
+      break;
+  }
+}
+
 GraphicsLayer* BGI_Footprint::getLayer(QString name) const noexcept {
-  if (mFootprint.getMirrored())
+  if (mFootprint.getMirrored()) {
     name = GraphicsLayer::getMirroredLayerName(name);
-  return mFootprint.getDeviceInstance().getBoard().getLayerStack().getLayer(
-      name);
+  }
+  return mFootprint.getBoard().getLayerStack().getLayer(name);
 }
 
 /*******************************************************************************

@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "stroketext.h"
 
-#include "../attribute/attributesubstitutor.h"
 #include "../font/strokefont.h"
 #include "../utils/toolbox.h"
 
@@ -50,9 +49,7 @@ StrokeText::StrokeText(const StrokeText& other) noexcept
     mLineSpacing(other.mLineSpacing),
     mAlign(other.mAlign),
     mMirrored(other.mMirrored),
-    mAutoRotate(other.mAutoRotate),
-    mAttributeProvider(nullptr),
-    mFont(nullptr) {
+    mAutoRotate(other.mAutoRotate) {
 }
 
 StrokeText::StrokeText(const Uuid& uuid, const StrokeText& other) noexcept
@@ -80,9 +77,7 @@ StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName,
     mLineSpacing(lineSpacing),
     mAlign(align),
     mMirrored(mirrored),
-    mAutoRotate(autoRotate),
-    mAttributeProvider(nullptr),
-    mFont(nullptr) {
+    mAutoRotate(autoRotate) {
 }
 
 StrokeText::StrokeText(const SExpression& node, const Version& fileFormat)
@@ -103,9 +98,8 @@ StrokeText::StrokeText(const SExpression& node, const Version& fileFormat)
         node.getChild("line_spacing/@0"), fileFormat)),
     mAlign(node.getChild("align"), fileFormat),
     mMirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)),
-    mAutoRotate(deserialize<bool>(node.getChild("auto_rotate/@0"), fileFormat)),
-    mAttributeProvider(nullptr),
-    mFont(nullptr) {
+    mAutoRotate(
+        deserialize<bool>(node.getChild("auto_rotate/@0"), fileFormat)) {
 }
 
 StrokeText::~StrokeText() noexcept {
@@ -115,22 +109,34 @@ StrokeText::~StrokeText() noexcept {
  *  Getters
  ******************************************************************************/
 
-const QVector<Path>& StrokeText::getPaths() const noexcept {
-  if (!mFont) {
-    qWarning() << "Tried to obtain StrokeFont paths, but no font is set!";
+QVector<Path> StrokeText::generatePaths(const StrokeFont& font) const noexcept {
+  return generatePaths(font, mText);
+}
+
+QVector<Path> StrokeText::generatePaths(const StrokeFont& font,
+                                        const QString& text) const noexcept {
+  Point bottomLeft, topRight;
+  QVector<Path> paths =
+      font.stroke(text, mHeight, calcLetterSpacing(font), calcLineSpacing(font),
+                  mAlign, bottomLeft, topRight);
+  if (needsAutoRotation()) {
+    const Point center = (bottomLeft + topRight) / 2;
+    for (Path& p : paths) {
+      p.rotate(Angle::deg180(), center);
+    }
   }
-  return needsAutoRotation() ? mPathsRotated : mPaths;
+  return paths;
 }
 
 bool StrokeText::needsAutoRotation() const noexcept {
   return mAutoRotate && Toolbox::isTextUpsideDown(mRotation, mMirrored);
 }
 
-Length StrokeText::calcLetterSpacing() const noexcept {
-  if (mLetterSpacing.isAuto() && mFont) {
+Length StrokeText::calcLetterSpacing(const StrokeFont& font) const noexcept {
+  if (mLetterSpacing.isAuto()) {
     // Use recommended letter spacing of font, but add stroke width to avoid
     // overlapped glyphs caused by thick lines.
-    return Length(mHeight->toNm() * mFont->getLetterSpacing().toNormalized()) +
+    return Length(mHeight->toNm() * font.getLetterSpacing().toNormalized()) +
         mStrokeWidth;
   } else {
     // Use given letter spacing without additional factor or stroke width
@@ -139,11 +145,11 @@ Length StrokeText::calcLetterSpacing() const noexcept {
   }
 }
 
-Length StrokeText::calcLineSpacing() const noexcept {
-  if (mLineSpacing.isAuto() && mFont) {
+Length StrokeText::calcLineSpacing(const StrokeFont& font) const noexcept {
+  if (mLineSpacing.isAuto()) {
     // Use recommended line spacing of font, but add stroke width to avoid
     // overlapped glyphs caused by thick lines.
-    return Length(mHeight->toNm() * mFont->getLineSpacing().toNormalized()) +
+    return Length(mHeight->toNm() * font.getLineSpacing().toNormalized()) +
         mStrokeWidth;
   } else {
     // Use given line spacing without additional factor or stroke width offset.
@@ -172,7 +178,6 @@ bool StrokeText::setText(const QString& text) noexcept {
   }
 
   mText = text;
-  updatePaths();  // because text has changed
   onEdited.notify(Event::TextChanged);
   return true;
 }
@@ -192,12 +197,8 @@ bool StrokeText::setRotation(const Angle& rotation) noexcept {
     return false;
   }
 
-  bool needsRotation = needsAutoRotation();
   mRotation = rotation;
   onEdited.notify(Event::RotationChanged);
-  if (needsRotation != needsAutoRotation()) {
-    onEdited.notify(Event::PathsChanged);
-  }
   return true;
 }
 
@@ -207,7 +208,6 @@ bool StrokeText::setHeight(const PositiveLength& height) noexcept {
   }
 
   mHeight = height;
-  updatePaths();  // because height has changed
   onEdited.notify(Event::HeightChanged);
   return true;
 }
@@ -218,7 +218,6 @@ bool StrokeText::setStrokeWidth(const UnsignedLength& strokeWidth) noexcept {
   }
 
   mStrokeWidth = strokeWidth;
-  updatePaths();  // because stroke width has changed
   onEdited.notify(Event::StrokeWidthChanged);
   return true;
 }
@@ -229,7 +228,6 @@ bool StrokeText::setLetterSpacing(const StrokeTextSpacing& spacing) noexcept {
   }
 
   mLetterSpacing = spacing;
-  updatePaths();  // because letter spacing has changed
   onEdited.notify(Event::LetterSpacingChanged);
   return true;
 }
@@ -240,7 +238,6 @@ bool StrokeText::setLineSpacing(const StrokeTextSpacing& spacing) noexcept {
   }
 
   mLineSpacing = spacing;
-  updatePaths();  // because line spacing has changed
   onEdited.notify(Event::LineSpacingChanged);
   return true;
 }
@@ -251,7 +248,6 @@ bool StrokeText::setAlign(const Alignment& align) noexcept {
   }
 
   mAlign = align;
-  updatePaths();  // because alignment has changed
   onEdited.notify(Event::AlignChanged);
   return true;
 }
@@ -261,12 +257,8 @@ bool StrokeText::setMirrored(bool mirrored) noexcept {
     return false;
   }
 
-  bool needsRotation = needsAutoRotation();
   mMirrored = mirrored;
   onEdited.notify(Event::MirroredChanged);
-  if (needsRotation != needsAutoRotation()) {
-    onEdited.notify(Event::PathsChanged);
-  }
   return true;
 }
 
@@ -275,56 +267,14 @@ bool StrokeText::setAutoRotate(bool autoRotate) noexcept {
     return false;
   }
 
-  bool needsRotation = needsAutoRotation();
   mAutoRotate = autoRotate;
   onEdited.notify(Event::AutoRotateChanged);
-  if (needsRotation != needsAutoRotation()) {
-    onEdited.notify(Event::PathsChanged);
-  }
   return true;
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
-
-void StrokeText::setAttributeProvider(
-    const AttributeProvider* provider) noexcept {
-  if (provider == mAttributeProvider) return;
-  mAttributeProvider = provider;
-  updatePaths();
-}
-
-void StrokeText::setFont(const StrokeFont* font) noexcept {
-  if (font == mFont) return;
-  mFont = font;
-  updatePaths();
-}
-
-void StrokeText::updatePaths() noexcept {
-  QVector<Path> paths;
-  Point center;
-  if (mFont) {
-    QString str = mText;
-    if (mAttributeProvider) {
-      str = AttributeSubstitutor::substitute(str, mAttributeProvider);
-    }
-    Point bottomLeft, topRight;
-    paths = mFont->stroke(str, mHeight, calcLetterSpacing(), calcLineSpacing(),
-                          mAlign, bottomLeft, topRight);
-    center = (bottomLeft + topRight) / 2;
-  }
-  if (paths == mPaths) return;
-  mPaths = paths;
-
-  // rotate paths by 180° around their center
-  mPathsRotated = paths;
-  for (Path& p : mPathsRotated) {
-    p.rotate(Angle::deg180(), center);
-  }
-
-  onEdited.notify(Event::PathsChanged);
-}
 
 void StrokeText::serialize(SExpression& root) const {
   root.appendChild(mUuid);

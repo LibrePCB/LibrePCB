@@ -39,8 +39,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class FootprintPadGraphicsItem;
-
 /*******************************************************************************
  *  Class FootprintPad
  ******************************************************************************/
@@ -110,10 +108,6 @@ public:
   bool setDrillDiameter(const UnsignedLength& diameter) noexcept;
   bool setBoardSide(BoardSide side) noexcept;
 
-  // General Methods
-  void registerGraphicsItem(FootprintPadGraphicsItem& item) noexcept;
-  void unregisterGraphicsItem(FootprintPadGraphicsItem& item) noexcept;
-
   /// @copydoc ::librepcb::SerializableObject::serialize()
   virtual void serialize(SExpression& root) const override;
 
@@ -133,7 +127,6 @@ protected:  // Data
   PositiveLength mHeight;
   UnsignedLength mDrillDiameter;  // no effect if BoardSide != THT!
   BoardSide mBoardSide;
-  FootprintPadGraphicsItem* mRegisteredGraphicsItem;
 };
 
 /*******************************************************************************

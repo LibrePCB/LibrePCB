@@ -188,9 +188,8 @@ void FootprintPainter::initContentByLayer() const noexcept {
 
     // Texts.
     foreach (StrokeText text, mStrokeTexts) {
-      text.setFont(&mStrokeFont);
       Transform transform(text);
-      foreach (Path path, transform.map(text.getPaths())) {
+      foreach (Path path, transform.map(text.generatePaths(mStrokeFont))) {
         mContentByLayer[*text.getLayerName()].polygons.append(
             Polygon(text.getUuid(), text.getLayerName(), text.getStrokeWidth(),
                     false, false, path));

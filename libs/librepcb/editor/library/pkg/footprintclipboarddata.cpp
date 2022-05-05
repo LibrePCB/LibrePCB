@@ -22,13 +22,14 @@
  ******************************************************************************/
 #include "footprintclipboarddata.h"
 
+#include "footprintpadgraphicsitem.h"
+
 #include <librepcb/core/application.h>
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/holegraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
-#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -123,7 +124,7 @@ QPixmap FootprintClipboardData::generatePixmap(
     const IF_GraphicsLayerProvider& lp) noexcept {
   GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
-  for (FootprintPad& pad : mFootprintPads) {
+  for (auto pad : mFootprintPads.values()) {
     items.append(
         std::make_shared<FootprintPadGraphicsItem>(pad, lp, &mPackagePads));
   }
@@ -134,8 +135,8 @@ QPixmap FootprintClipboardData::generatePixmap(
     items.append(std::make_shared<CircleGraphicsItem>(circle, lp));
   }
   for (StrokeText& text : mStrokeTexts) {
-    text.setFont(&qApp->getDefaultStrokeFont());
-    items.append(std::make_shared<StrokeTextGraphicsItem>(text, lp));
+    items.append(std::make_shared<StrokeTextGraphicsItem>(
+        text, lp, qApp->getDefaultStrokeFont()));
   }
   for (Hole& hole : mHoles) {
     items.append(std::make_shared<HoleGraphicsItem>(hole, lp));

@@ -22,13 +22,12 @@
  ******************************************************************************/
 #include "footprintpadgraphicsitem.h"
 
-#include "../../graphics/graphicslayer.h"
-#include "../../graphics/primitivepathgraphicsitem.h"
-#include "../../graphics/primitivetextgraphicsitem.h"
-#include "../../types/angle.h"
-#include "../../types/length.h"
-#include "../../types/point.h"
-#include "footprintpad.h"
+#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/primitivepathgraphicsitem.h>
+#include <librepcb/core/graphics/primitivetextgraphicsitem.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/length.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,13 +36,14 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 FootprintPadGraphicsItem::FootprintPadGraphicsItem(
-    FootprintPad& pad, const IF_GraphicsLayerProvider& lp,
+    std::shared_ptr<FootprintPad> pad, const IF_GraphicsLayerProvider& lp,
     const PackagePadList* packagePadList, QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
     mPad(pad),
@@ -51,7 +51,11 @@ FootprintPadGraphicsItem::FootprintPadGraphicsItem(
     mPackagePadList(packagePadList),
     mPathGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
-    mOnPadsEditedSlot(*this, &FootprintPadGraphicsItem::packagePadListEdited) {
+    mOnPadEditedSlot(*this, &FootprintPadGraphicsItem::padEdited),
+    mOnPackagePadsEditedSlot(*this,
+                             &FootprintPadGraphicsItem::packagePadListEdited) {
+  Q_ASSERT(mPad);
+
   setFlag(QGraphicsItem::ItemHasNoContents, false);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(10);
@@ -65,23 +69,20 @@ FootprintPadGraphicsItem::FootprintPadGraphicsItem(
       Alignment(HAlign::center(), VAlign::center()));
 
   // pad properties
-  setPosition(mPad.getPosition());
-  setRotation(mPad.getRotation());
-  setShape(mPad.toQPainterPathPx());
-  setLayerName(mPad.getLayerName());
-  setPackagePadUuid(mPad.getPackagePadUuid());
+  setPosition(mPad->getPosition());
+  setRotation(mPad->getRotation());
+  setShape(mPad->toQPainterPathPx());
+  setLayerName(mPad->getLayerName());
+  updateText();
 
-  // register to the pad to get attribute updates
-  mPad.registerGraphicsItem(*this);
-
-  // register to the package pad list to get notified about updates
+  // Register to the pad(s) to get notified about any modifications.
+  mPad->onEdited.attach(mOnPadEditedSlot);
   if (mPackagePadList) {
-    mPackagePadList->onEdited.attach(mOnPadsEditedSlot);
+    mPackagePadList->onEdited.attach(mOnPackagePadsEditedSlot);
   }
 }
 
 FootprintPadGraphicsItem::~FootprintPadGraphicsItem() noexcept {
-  mPad.unregisterGraphicsItem(*this);
 }
 
 /*******************************************************************************
@@ -99,31 +100,23 @@ void FootprintPadGraphicsItem::setRotation(const Angle& rot) noexcept {
   mTextGraphicsItem->setRotation(-rot);
 }
 
-void FootprintPadGraphicsItem::setShape(const QPainterPath& shape) noexcept {
-  mPathGraphicsItem->setPath(shape);
-  updateTextHeight();
-}
-
-void FootprintPadGraphicsItem::setLayerName(const QString& name) noexcept {
-  mPathGraphicsItem->setFillLayer(mLayerProvider.getLayer(name));
-  mTextGraphicsItem->setLayer(mLayerProvider.getLayer(name));
-}
-
-void FootprintPadGraphicsItem::setPackagePadUuid(const Uuid& uuid) noexcept {
-  QString name;
-  if (mPackagePadList) {
-    if (std::shared_ptr<const PackagePad> pad = mPackagePadList->find(uuid)) {
-      name = *pad->getName();
-    }
-  }
-  mTextGraphicsItem->setText(name);
-  updateTextHeight();
-}
-
 void FootprintPadGraphicsItem::setSelected(bool selected) noexcept {
   mPathGraphicsItem->setSelected(selected);
   mTextGraphicsItem->setSelected(selected);
   QGraphicsItem::setSelected(selected);
+}
+
+void FootprintPadGraphicsItem::updateText() noexcept {
+  QString text;
+  if (mPackagePadList) {
+    if (std::shared_ptr<const PackagePad> pad =
+            mPackagePadList->find(mPad->getPackagePadUuid())) {
+      text = *pad->getName();
+    }
+  }
+  setToolTip(text);
+  mTextGraphicsItem->setText(text);
+  updateTextHeight();
 }
 
 /*******************************************************************************
@@ -146,6 +139,34 @@ void FootprintPadGraphicsItem::paint(QPainter* painter,
  *  Private Methods
  ******************************************************************************/
 
+void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
+                                         FootprintPad::Event event) noexcept {
+  switch (event) {
+    case FootprintPad::Event::PackagePadUuidChanged:
+      updateText();
+      break;
+    case FootprintPad::Event::PositionChanged:
+      setPosition(pad.getPosition());
+      break;
+    case FootprintPad::Event::RotationChanged:
+      setRotation(pad.getRotation());
+      break;
+    case FootprintPad::Event::ShapeChanged:
+    case FootprintPad::Event::WidthChanged:
+    case FootprintPad::Event::HeightChanged:
+    case FootprintPad::Event::DrillDiameterChanged:
+      setShape(pad.toQPainterPathPx());
+      break;
+    case FootprintPad::Event::BoardSideChanged:
+      setLayerName(pad.getLayerName());
+      break;
+    default:
+      qWarning()
+          << "Unhandled switch-case in FootprintPadGraphicsItem::padEdited()";
+      break;
+  }
+}
+
 void FootprintPadGraphicsItem::packagePadListEdited(
     const PackagePadList& list, int index,
     const std::shared_ptr<const PackagePad>& pad,
@@ -154,7 +175,17 @@ void FootprintPadGraphicsItem::packagePadListEdited(
   Q_UNUSED(index);
   Q_UNUSED(pad);
   Q_UNUSED(event);
-  setPackagePadUuid(mPad.getPackagePadUuid());
+  updateText();
+}
+
+void FootprintPadGraphicsItem::setShape(const QPainterPath& shape) noexcept {
+  mPathGraphicsItem->setPath(shape);
+  updateTextHeight();
+}
+
+void FootprintPadGraphicsItem::setLayerName(const QString& name) noexcept {
+  mPathGraphicsItem->setFillLayer(mLayerProvider.getLayer(name));
+  mTextGraphicsItem->setLayer(mLayerProvider.getLayer(name));
 }
 
 void FootprintPadGraphicsItem::updateTextHeight() noexcept {
@@ -170,4 +201,5 @@ void FootprintPadGraphicsItem::updateTextHeight() noexcept {
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

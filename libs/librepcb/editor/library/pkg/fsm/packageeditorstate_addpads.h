@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -40,6 +42,7 @@ class PackagePad;
 namespace editor {
 
 class CmdFootprintPadEdit;
+class FootprintPadGraphicsItem;
 class PackagePadComboBox;
 
 /*******************************************************************************
@@ -96,7 +99,7 @@ private:  // Types / Data
   PadType mPadType;
   QScopedPointer<CmdFootprintPadEdit> mEditCmd;
   std::shared_ptr<FootprintPad> mCurrentPad;
-  FootprintPadGraphicsItem* mCurrentGraphicsItem;
+  std::shared_ptr<FootprintPadGraphicsItem> mCurrentGraphicsItem;
   PackagePadComboBox* mPackagePadComboBox;
 
   // parameter memory
