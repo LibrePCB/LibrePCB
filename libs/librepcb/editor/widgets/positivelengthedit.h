@@ -59,10 +59,11 @@ public:
 
 signals:
   // Note: Full namespace librepcb::PositiveLength is required for the MOC!
-  void valueChanged(const librepcb::PositiveLength& value);
+  void valueChanged(const librepcb::PositiveLength& value,
+                    const librepcb::Length& diff);
 
 private:
-  virtual void valueChangedImpl() noexcept override;
+  virtual void valueChangedImpl(const Length& diff) noexcept override;
 };
 
 /*******************************************************************************

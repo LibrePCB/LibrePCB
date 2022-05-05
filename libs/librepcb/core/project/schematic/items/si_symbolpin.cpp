@@ -63,7 +63,7 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid)
   }
 
   mGraphicsItem.reset(new SGI_SymbolPin(*this));
-  updatePosition();
+  updatePosition(true);
 
   // create ERC messages
   mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(
@@ -230,12 +230,14 @@ void SI_SymbolPin::unregisterNetLine(SI_NetLine& netline) {
   mGraphicsItem->updateData();
 }
 
-void SI_SymbolPin::updatePosition() noexcept {
+void SI_SymbolPin::updatePosition(bool mirroredOrRotated) noexcept {
   Transform transform(mSymbol);
   mPosition = transform.map(mSymbolPin->getPosition());
   mRotation = transform.map(mSymbolPin->getRotation());
-  mGraphicsItem->setPosition(mPosition);
-  mGraphicsItem->setRotation(mRotation);
+  mGraphicsItem->setPos(mPosition.toPxQPointF());
+  if (mirroredOrRotated) {
+    mGraphicsItem->updateTransform();
+  }
   foreach (SI_NetLine* netline, mRegisteredNetLines) { netline->updateLine(); }
 }
 

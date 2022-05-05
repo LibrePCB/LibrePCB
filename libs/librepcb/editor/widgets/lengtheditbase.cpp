@@ -92,6 +92,10 @@ const LengthUnit& LengthEditBase::getDisplayedUnit() const noexcept {
  *  Setters
  ******************************************************************************/
 
+void LengthEditBase::setDefaultValueToolTip(const Length& value) noexcept {
+  setToolTip(tr("Default value:") % " " % value.toMmString() % " mm");
+}
+
 void LengthEditBase::setDefaultUnit(const LengthUnit& unit) noexcept {
   if (unit != mDefaultUnit) {
     mDefaultUnit = unit;
@@ -197,10 +201,11 @@ void LengthEditBase::setValueImpl(Length value) noexcept {
   // To avoid unnecessary clearing the QLineEdit selection, only update the
   // value (and therefore the text) if really needed.
   if (value != mValue) {
+    const Length diff = value - mValue;
     mValue = value;
     updateSingleStep();
     updateText();
-    valueChangedImpl();
+    valueChangedImpl(diff);
     update();  // step buttons might need to be repainted
   }
 }
@@ -213,12 +218,13 @@ void LengthEditBase::updateValueFromText(QString text) noexcept {
       Length value = unit.convertFromUnit(result.value);  // can throw
       // Only accept values in the allowed range.
       if ((value >= mMinimum) && (value <= mMaximum)) {
+        const Length diff = value - mValue;
         mValue = value;
         setSelectedUnit(unit);
         updateSingleStep();
         // In contrast to setValueImpl(), do NOT call updateText() to avoid
         // disturbing the user while writing the text!
-        valueChangedImpl();
+        valueChangedImpl(diff);
         update();  // step buttons might need to be repainted
       } else {
         qWarning() << "LengthEditBase: Entered text was a valid number, but "

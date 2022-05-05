@@ -360,12 +360,17 @@ std::shared_ptr<StrokeText> EagleTypeConverter::convertBoardText(
 
 std::shared_ptr<SymbolPin> EagleTypeConverter::convertSymbolPin(
     const parseagle::Pin& p) {
+  UnsignedLength length(convertLength(p.getLengthInMillimeters()));
   return std::make_shared<SymbolPin>(
       Uuid::createRandom(),  // UUID
       convertPinOrPadName(p.getName()),  // Name
       convertPoint(p.getPosition()),  // Position
-      UnsignedLength(convertLength(p.getLengthInMillimeters())),  // Length
-      convertAngle(p.getRotation().getAngle())  // Rotation
+      length,  // Length
+      convertAngle(p.getRotation().getAngle()),  // Rotation
+      SymbolPin::getDefaultNamePosition(length),  // Name position
+      Angle(0),  // Name rotation
+      SymbolPin::getDefaultNameHeight(),  // Name height
+      Alignment(HAlign::left(), VAlign::center())  // Name alignment
   );
 }
 

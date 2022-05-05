@@ -62,19 +62,29 @@ TEST_F(SymbolPinTest, testConstructFromSExpressionCurrentVersion) {
   SExpression sexpr = SExpression::parse(
       "(pin d48b8bd2-a46c-4495-87a5-662747034098 (name \"1\")\n"
       " (position 1.234 2.345) (rotation 45.0) (length 0.5)\n"
+      " (name_position 0.1 0.2) (name_rotation -90.0) (name_height 1.234)\n"
+      " (name_align center bottom)\n"
       ")",
       FilePath());
   SymbolPin obj(sexpr, qApp->getFileFormatVersion());
   EXPECT_EQ(Uuid::fromString("d48b8bd2-a46c-4495-87a5-662747034098"),
             obj.getUuid());
+  EXPECT_EQ("1", obj.getName()->toStdString());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(Angle::deg45(), obj.getRotation());
   EXPECT_EQ(UnsignedLength(500000), obj.getLength());
+  EXPECT_EQ(Point(100000, 200000), obj.getNamePosition());
+  EXPECT_EQ(-Angle::deg90(), obj.getNameRotation());
+  EXPECT_EQ(PositiveLength(1234000), obj.getNameHeight());
+  EXPECT_EQ(Alignment(HAlign::center(), VAlign::bottom()),
+            obj.getNameAlignment());
 }
 
 TEST_F(SymbolPinTest, testSerializeAndDeserialize) {
   SymbolPin obj1(Uuid::createRandom(), CircuitIdentifier("foo"),
-                 Point(123, 567), UnsignedLength(321), Angle(789));
+                 Point(123, 567), UnsignedLength(321), Angle(789),
+                 Point(100000, 200000), Angle(321), PositiveLength(123456),
+                 Alignment(HAlign::center(), VAlign::bottom()));
   SExpression sexpr1 = obj1.serializeToDomElement("pin");
 
   SymbolPin obj2(sexpr1, qApp->getFileFormatVersion());

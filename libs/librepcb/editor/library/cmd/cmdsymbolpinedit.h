@@ -50,12 +50,16 @@ public:
   // Constructors / Destructor
   CmdSymbolPinEdit() = delete;
   CmdSymbolPinEdit(const CmdSymbolPinEdit& other) = delete;
-  explicit CmdSymbolPinEdit(SymbolPin& pin) noexcept;
+  explicit CmdSymbolPinEdit(std::shared_ptr<SymbolPin> pin) noexcept;
   ~CmdSymbolPinEdit() noexcept;
 
   // Setters
   void setName(const CircuitIdentifier& name, bool immediate) noexcept;
   void setLength(const UnsignedLength& length, bool immediate) noexcept;
+  void setNamePosition(const Point& position, bool immediate) noexcept;
+  void setNameRotation(const Angle& rotation, bool immediate) noexcept;
+  void setNameHeight(const PositiveLength& height, bool immediate) noexcept;
+  void setNameAlignment(const Alignment& align, bool immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
@@ -82,7 +86,7 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  SymbolPin& mPin;
+  std::shared_ptr<SymbolPin> mPin;
 
   // General Attributes
   CircuitIdentifier mOldName;
@@ -93,6 +97,14 @@ private:
   Point mNewPos;
   Angle mOldRotation;
   Angle mNewRotation;
+  Point mOldNamePosition;
+  Point mNewNamePosition;
+  Angle mOldNameRotation;
+  Angle mNewNameRotation;
+  PositiveLength mOldNameHeight;
+  PositiveLength mNewNameHeight;
+  Alignment mOldNameAlignment;
+  Alignment mNewNameAlignment;
 };
 
 /*******************************************************************************

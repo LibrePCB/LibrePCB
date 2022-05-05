@@ -155,7 +155,7 @@ void SI_Symbol::setPosition(const Point& newPos) noexcept {
   if (newPos != mPosition) {
     mPosition = newPos;
     mGraphicsItem->setPosition(newPos);
-    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(); }
+    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(false); }
   }
 }
 
@@ -163,7 +163,7 @@ void SI_Symbol::setRotation(const Angle& newRotation) noexcept {
   if (newRotation != mRotation) {
     mRotation = newRotation;
     mGraphicsItem->updateRotationAndMirror();
-    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(); }
+    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(true); }
   }
 }
 
@@ -171,7 +171,7 @@ void SI_Symbol::setMirrored(bool newMirrored) noexcept {
   if (newMirrored != mMirrored) {
     mMirrored = newMirrored;
     mGraphicsItem->updateRotationAndMirror();
-    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(); }
+    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(true); }
   }
 }
 

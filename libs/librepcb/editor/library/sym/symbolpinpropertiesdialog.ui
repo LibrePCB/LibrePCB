@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>313</width>
-    <height>145</height>
+    <width>391</width>
+    <height>287</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="lblName">
        <property name="text">
         <string>Name:</string>
        </property>
@@ -31,14 +31,31 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_6">
+      <widget class="QLabel" name="lblLength">
        <property name="text">
         <string>Length:</string>
        </property>
       </widget>
      </item>
+     <item row="1" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtLength" native="true"/>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="cbxAutoMoveText">
+         <property name="toolTip">
+          <string>Move text automatically when changing the pin length.</string>
+         </property>
+         <property name="text">
+          <string>Move Text</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="lblPosition">
        <property name="text">
         <string>Position:</string>
        </property>
@@ -55,17 +72,71 @@
       </layout>
      </item>
      <item row="3" column="0">
-      <widget class="QLabel" name="label_5">
+      <widget class="QLabel" name="lblRotation">
        <property name="text">
         <string>Rotation:</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="librepcb::editor::UnsignedLengthEdit" name="edtLength" native="true"/>
-     </item>
      <item row="3" column="1">
       <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
+     </item>
+     <item row="4" column="0" colspan="2">
+      <widget class="Line" name="line">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="lblNamePosition">
+       <property name="text">
+        <string>Text Position:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="librepcb::editor::LengthEdit" name="edtNamePosX" native="true"/>
+       </item>
+       <item>
+        <widget class="librepcb::editor::LengthEdit" name="edtNamePosY" native="true"/>
+       </item>
+      </layout>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="lblNameRotation">
+       <property name="text">
+        <string>Text Rotation:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="librepcb::editor::AngleEdit" name="edtNameRotation" native="true"/>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="lblNameHeight">
+       <property name="text">
+        <string>Text Height:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="librepcb::editor::PositiveLengthEdit" name="edtNameHeight" native="true"/>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="lblNameAlignment">
+       <property name="text">
+        <string>Text Alignment:</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="librepcb::editor::AlignmentSelector" name="edtNameAlignment" native="true"/>
      </item>
     </layout>
    </item>
@@ -100,13 +171,28 @@
    <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>librepcb::editor::AlignmentSelector</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/alignmentselector.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::PositiveLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>edtName</tabstop>
-  <tabstop>edtLength</tabstop>
   <tabstop>edtPosX</tabstop>
   <tabstop>edtPosY</tabstop>
   <tabstop>edtRotation</tabstop>
+  <tabstop>edtNamePosX</tabstop>
+  <tabstop>edtNamePosY</tabstop>
+  <tabstop>edtNameRotation</tabstop>
+  <tabstop>edtNameAlignment</tabstop>
  </tabstops>
  <resources/>
  <connections/>

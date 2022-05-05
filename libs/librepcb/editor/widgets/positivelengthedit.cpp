@@ -65,8 +65,8 @@ void PositiveLengthEdit::setValue(const PositiveLength& value) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void PositiveLengthEdit::valueChangedImpl() noexcept {
-  emit valueChanged(getValue());
+void PositiveLengthEdit::valueChangedImpl(const Length& diff) noexcept {
+  emit valueChanged(getValue(), diff);
 }
 
 /*******************************************************************************

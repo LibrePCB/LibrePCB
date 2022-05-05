@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "symbolpin.h"
 
+#include "../../types/version.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -39,18 +41,29 @@ SymbolPin::SymbolPin(const SymbolPin& other) noexcept
     mName(other.mName),
     mPosition(other.mPosition),
     mLength(other.mLength),
-    mRotation(other.mRotation) {
+    mRotation(other.mRotation),
+    mNamePosition(other.mNamePosition),
+    mNameRotation(other.mNameRotation),
+    mNameHeight(other.mNameHeight),
+    mNameAlignment(other.mNameAlignment) {
 }
 
 SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
                      const Point& position, const UnsignedLength& length,
-                     const Angle& rotation) noexcept
+                     const Angle& rotation, const Point& namePosition,
+                     const Angle& nameRotation,
+                     const PositiveLength& nameHeight,
+                     const Alignment& nameAlign) noexcept
   : onEdited(*this),
     mUuid(uuid),
     mName(name),
     mPosition(position),
     mLength(length),
-    mRotation(rotation) {
+    mRotation(rotation),
+    mNamePosition(namePosition),
+    mNameRotation(nameRotation),
+    mNameHeight(nameHeight),
+    mNameAlignment(nameAlign) {
 }
 
 SymbolPin::SymbolPin(const SExpression& node, const Version& fileFormat)
@@ -60,7 +73,19 @@ SymbolPin::SymbolPin(const SExpression& node, const Version& fileFormat)
     mPosition(node.getChild("position"), fileFormat),
     mLength(
         deserialize<UnsignedLength>(node.getChild("length/@0"), fileFormat)),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)) {
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
+    mNamePosition(getDefaultNamePosition(mLength)),  // Since file format v0.2
+    mNameRotation(0),  // Since file format v0.2
+    mNameHeight(getDefaultNameHeight()),  // Since file format v0.2
+    mNameAlignment(getDefaultNameAlignment()) {  // Since file format v0.2
+  if (fileFormat >= Version::fromString("0.2")) {
+    mNamePosition = Point(node.getChild("name_position"), fileFormat);
+    mNameRotation =
+        deserialize<Angle>(node.getChild("name_rotation/@0"), fileFormat);
+    mNameHeight = deserialize<PositiveLength>(node.getChild("name_height/@0"),
+                                              fileFormat);
+    mNameAlignment = Alignment(node.getChild("name_align"), fileFormat);
+  }
 }
 
 SymbolPin::~SymbolPin() noexcept {
@@ -110,6 +135,46 @@ bool SymbolPin::setRotation(const Angle& rotation) noexcept {
   return true;
 }
 
+bool SymbolPin::setNamePosition(const Point& position) noexcept {
+  if (position == mNamePosition) {
+    return false;
+  }
+
+  mNamePosition = position;
+  onEdited.notify(Event::NamePositionChanged);
+  return true;
+}
+
+bool SymbolPin::setNameRotation(const Angle& rotation) noexcept {
+  if (rotation == mNameRotation) {
+    return false;
+  }
+
+  mNameRotation = rotation;
+  onEdited.notify(Event::NameRotationChanged);
+  return true;
+}
+
+bool SymbolPin::setNameHeight(const PositiveLength& height) noexcept {
+  if (height == mNameHeight) {
+    return false;
+  }
+
+  mNameHeight = height;
+  onEdited.notify(Event::NameHeightChanged);
+  return true;
+}
+
+bool SymbolPin::setNameAlignment(const Alignment& align) noexcept {
+  if (align == mNameAlignment) {
+    return false;
+  }
+
+  mNameAlignment = align;
+  onEdited.notify(Event::NameAlignmentChanged);
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -121,6 +186,12 @@ void SymbolPin::serialize(SExpression& root) const {
   root.appendChild(mPosition.serializeToDomElement("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("length", mLength);
+  root.ensureLineBreak();
+  root.appendChild(mNamePosition.serializeToDomElement("name_position"));
+  root.appendChild("name_rotation", mNameRotation);
+  root.appendChild("name_height", mNameHeight);
+  root.ensureLineBreak();
+  root.appendChild(mNameAlignment.serializeToDomElement("name_align"));
   root.ensureLineBreak();
 }
 
@@ -134,6 +205,10 @@ bool SymbolPin::operator==(const SymbolPin& rhs) const noexcept {
   if (mPosition != rhs.mPosition) return false;
   if (mLength != rhs.mLength) return false;
   if (mRotation != rhs.mRotation) return false;
+  if (mNamePosition != rhs.mNamePosition) return false;
+  if (mNameRotation != rhs.mNameRotation) return false;
+  if (mNameHeight != rhs.mNameHeight) return false;
+  if (mNameAlignment != rhs.mNameAlignment) return false;
   return true;
 }
 
@@ -146,6 +221,10 @@ SymbolPin& SymbolPin::operator=(const SymbolPin& rhs) noexcept {
   setPosition(rhs.mPosition);
   setLength(rhs.mLength);
   setRotation(rhs.mRotation);
+  setNamePosition(rhs.mNamePosition);
+  setNameRotation(rhs.mNameRotation);
+  setNameHeight(rhs.mNameHeight);
+  setNameAlignment(rhs.mNameAlignment);
   return *this;
 }
 

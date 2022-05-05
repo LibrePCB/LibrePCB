@@ -100,6 +100,7 @@ public:
   const LengthUnit& getDisplayedUnit() const noexcept;
 
   // Setters
+  void setDefaultValueToolTip(const Length& value) noexcept;
   void setDefaultUnit(const LengthUnit& unit) noexcept;
   void setChangeUnitActionVisible(bool visible) noexcept;
   void setStepBehavior(StepBehavior behavior) noexcept;
@@ -149,7 +150,7 @@ protected:  // Methods
   void setSelectedUnit(const LengthUnit& unit) noexcept;
   void saveSelectedUnit() noexcept;
   QString getValueStr(const LengthUnit& unit) const noexcept;
-  virtual void valueChangedImpl() noexcept = 0;
+  virtual void valueChangedImpl(const Length& diff) noexcept = 0;
 
 protected:  // Data
   QAction* mChangeUnitAction;

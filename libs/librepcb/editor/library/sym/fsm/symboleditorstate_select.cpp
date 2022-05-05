@@ -549,7 +549,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
 
   if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(item)) {
     SymbolPinPropertiesDialog dialog(
-        *i->getPin(), mContext.undoStack, getDefaultLengthUnit(),
+        i->getPin(), mContext.undoStack, getDefaultLengthUnit(),
         "symbol_editor/pin_properties_dialog", &mContext.editorWidget);
     dialog.setReadOnly(mContext.readOnly);
     dialog.exec();

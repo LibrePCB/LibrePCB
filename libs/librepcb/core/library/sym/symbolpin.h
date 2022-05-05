@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../serialization/serializableobjectlist.h"
+#include "../../types/alignment.h"
 #include "../../types/angle.h"
 #include "../../types/circuitidentifier.h"
 #include "../../types/length.h"
@@ -58,6 +59,10 @@ public:
     PositionChanged,
     LengthChanged,
     RotationChanged,
+    NamePositionChanged,
+    NameRotationChanged,
+    NameHeightChanged,
+    NameAlignmentChanged,
   };
   Signal<SymbolPin, Event> onEdited;
   typedef Slot<SymbolPin, Event> OnEditedSlot;
@@ -67,7 +72,9 @@ public:
   SymbolPin(const SymbolPin& other) noexcept;
   SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
             const Point& position, const UnsignedLength& length,
-            const Angle& rotation) noexcept;
+            const Angle& rotation, const Point& namePosition,
+            const Angle& nameRotation, const PositiveLength& nameHeight,
+            const Alignment& nameAlign) noexcept;
   SymbolPin(const SExpression& node, const Version& fileFormat);
   ~SymbolPin() noexcept;
 
@@ -77,15 +84,20 @@ public:
   const Point& getPosition() const noexcept { return mPosition; }
   const UnsignedLength& getLength() const noexcept { return mLength; }
   const Angle& getRotation() const noexcept { return mRotation; }
-  Point getNamePosition() const noexcept {
-    return Point(mLength + Length(800000), 0);  // Without rotation!
-  }
+  const Point& getNamePosition() const noexcept { return mNamePosition; }
+  const Angle& getNameRotation() const noexcept { return mNameRotation; }
+  const PositiveLength& getNameHeight() const noexcept { return mNameHeight; }
+  const Alignment& getNameAlignment() const noexcept { return mNameAlignment; }
 
   // Setters
   bool setPosition(const Point& pos) noexcept;
   bool setLength(const UnsignedLength& length) noexcept;
   bool setRotation(const Angle& rotation) noexcept;
   bool setName(const CircuitIdentifier& name) noexcept;
+  bool setNamePosition(const Point& position) noexcept;
+  bool setNameRotation(const Angle& rotation) noexcept;
+  bool setNameHeight(const PositiveLength& height) noexcept;
+  bool setNameAlignment(const Alignment& align) noexcept;
 
   /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -98,8 +110,14 @@ public:
   SymbolPin& operator=(const SymbolPin& rhs) noexcept;
 
   // Static Methods
-  static PositiveLength getNameHeight() noexcept {
+  static Point getDefaultNamePosition(const UnsignedLength& length) noexcept {
+    return Point(length + Length(1270000), 0);
+  }
+  static PositiveLength getDefaultNameHeight() noexcept {
     return PositiveLength(2500000);
+  }
+  static Alignment getDefaultNameAlignment() noexcept {
+    return Alignment(HAlign::left(), VAlign::center());
   }
 
 private:  // Data
@@ -108,6 +126,10 @@ private:  // Data
   Point mPosition;
   UnsignedLength mLength;
   Angle mRotation;
+  Point mNamePosition;
+  Angle mNameRotation;
+  PositiveLength mNameHeight;
+  Alignment mNameAlignment;
 };
 
 /*******************************************************************************

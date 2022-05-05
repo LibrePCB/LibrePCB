@@ -464,7 +464,7 @@ template <>
 void SymbolEditorWidget::fixMsg(const MsgSymbolPinNotOnGrid& msg) {
   std::shared_ptr<SymbolPin> pin = mSymbol->getPins().get(msg.getPin().get());
   Point newPos = pin->getPosition().mappedToGrid(msg.getGridInterval());
-  QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(*pin));
+  QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(pin));
   cmd->setPosition(newPos, false);
   mUndoStack->execCmd(cmd.take());
 }

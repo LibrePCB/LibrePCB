@@ -89,9 +89,9 @@ private:  // Methods
   bool hasPin(const QString& name) const noexcept;
 
 private:  // Types / Data
-  QScopedPointer<CmdSymbolPinEdit> mEditCmd;
   std::shared_ptr<SymbolPin> mCurrentPin;
   std::shared_ptr<SymbolPinGraphicsItem> mCurrentGraphicsItem;
+  QScopedPointer<CmdSymbolPinEdit> mEditCmd;
   QLineEdit* mNameLineEdit;
 
   // parameter memory
