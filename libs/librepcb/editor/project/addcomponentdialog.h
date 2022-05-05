@@ -49,7 +49,7 @@ class WorkspaceLibraryDb;
 
 namespace editor {
 
-class FootprintPreviewGraphicsItem;
+class FootprintGraphicsItem;
 class SymbolGraphicsItem;
 
 namespace Ui {
@@ -147,10 +147,10 @@ private:
   std::shared_ptr<const Component> mSelectedComponent;
   std::shared_ptr<const ComponentSymbolVariant> mSelectedSymbVar;
   QScopedPointer<const Device> mSelectedDevice;
-  QScopedPointer<const Package> mSelectedPackage;
+  QScopedPointer<Package> mSelectedPackage;
   QList<std::shared_ptr<Symbol>> mPreviewSymbols;
   QList<std::shared_ptr<SymbolGraphicsItem>> mPreviewSymbolGraphicsItems;
-  QScopedPointer<FootprintPreviewGraphicsItem> mPreviewFootprintGraphicsItem;
+  QScopedPointer<FootprintGraphicsItem> mPreviewFootprintGraphicsItem;
 };
 
 /*******************************************************************************

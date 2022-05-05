@@ -17,28 +17,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_FOOTPRINTPADGRAPHICSITEM_H
-#define LIBREPCB_CORE_FOOTPRINTPADGRAPHICSITEM_H
+#ifndef LIBREPCB_EDITOR_FOOTPRINTPADGRAPHICSITEM_H
+#define LIBREPCB_EDITOR_FOOTPRINTPADGRAPHICSITEM_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../pkg/packagepad.h"
+#include <librepcb/core/library/pkg/footprintpad.h>
+#include <librepcb/core/library/pkg/packagepad.h>
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Angle;
-class FootprintPad;
 class IF_GraphicsLayerProvider;
-class Point;
 class PrimitivePathGraphicsItem;
 class PrimitiveTextGraphicsItem;
+
+namespace editor {
 
 /*******************************************************************************
  *  Class FootprintPadGraphicsItem
@@ -52,22 +54,22 @@ public:
   // Constructors / Destructor
   FootprintPadGraphicsItem() = delete;
   FootprintPadGraphicsItem(const FootprintPadGraphicsItem& other) = delete;
-  FootprintPadGraphicsItem(FootprintPad& pad,
+  FootprintPadGraphicsItem(std::shared_ptr<FootprintPad> pad,
                            const IF_GraphicsLayerProvider& lp,
                            const PackagePadList* packagePadList,
                            QGraphicsItem* parent = nullptr) noexcept;
   ~FootprintPadGraphicsItem() noexcept;
 
   // Getters
-  FootprintPad& getPad() noexcept { return mPad; }
+  const std::shared_ptr<FootprintPad>& getPad() noexcept { return mPad; }
 
   // Setters
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
-  void setShape(const QPainterPath& shape) noexcept;
-  void setLayerName(const QString& name) noexcept;
-  void setPackagePadUuid(const tl::optional<Uuid>& uuid) noexcept;
   void setSelected(bool selected) noexcept;
+
+  // General Methods
+  void updateText() noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept override { return QRectF(); }
@@ -80,26 +82,31 @@ public:
       delete;
 
 private:  // Methods
+  void padEdited(const FootprintPad& pad, FootprintPad::Event event) noexcept;
   void packagePadListEdited(const PackagePadList& list, int index,
                             const std::shared_ptr<const PackagePad>& pad,
                             PackagePadList::Event event) noexcept;
+  void setShape(const QPainterPath& shape) noexcept;
+  void setLayerName(const QString& name) noexcept;
   void updateTextHeight() noexcept;
 
 private:  // Data
-  FootprintPad& mPad;
+  std::shared_ptr<FootprintPad> mPad;
   const IF_GraphicsLayerProvider& mLayerProvider;
   const PackagePadList* mPackagePadList;
   QScopedPointer<PrimitivePathGraphicsItem> mPathGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
 
   // Slots
-  PackagePadList::OnEditedSlot mOnPadsEditedSlot;
+  FootprintPad::OnEditedSlot mOnPadEditedSlot;
+  PackagePadList::OnEditedSlot mOnPackagePadsEditedSlot;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

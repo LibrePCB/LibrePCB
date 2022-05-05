@@ -36,6 +36,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class AttributeProvider;
 class BI_Footprint;
 class Board;
 class LineGraphicsItem;
@@ -68,11 +69,14 @@ public:
   const Uuid& getUuid() const
       noexcept;  // convenience function, e.g. for template usage
   const Point& getPosition() const noexcept;
+  const StrokeFont& getFont() const;
   bool isSelectable() const noexcept override;
 
   // General Methods
   BI_Footprint* getFootprint() const noexcept { return mFootprint; }
   void setFootprint(BI_Footprint* footprint) noexcept;
+  const AttributeProvider* getAttributeProvider() const noexcept;
+  QVector<Path> generatePaths() const;
   void updateGraphicsItems() noexcept;
   void addToBoard() override;
   void removeFromBoard() override;

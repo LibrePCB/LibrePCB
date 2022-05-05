@@ -34,6 +34,8 @@
 #include "../../cmd/cmdpastefootprintitems.h"
 #include "../../cmd/cmdremoveselectedfootprintitems.h"
 #include "../footprintclipboarddata.h"
+#include "../footprintgraphicsitem.h"
+#include "../footprintpadgraphicsitem.h"
 #include "../footprintpadpropertiesdialog.h"
 #include "../packageeditorwidget.h"
 
@@ -43,8 +45,6 @@
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/import/dxfreader.h>
-#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
@@ -125,7 +125,8 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       // update start position of selection or movement
       mStartPos = Point::fromPx(e.scenePos());
       // get items under cursor
-      QList<QGraphicsItem*> items = findItemsAtPosition(mStartPos);
+      QList<std::shared_ptr<QGraphicsItem>> items =
+          findItemsAtPosition(mStartPos);
       if (findPolygonVerticesAtPosition(mStartPos) && (!mContext.readOnly)) {
         mState = SubState::MOVING_POLYGON_VERTEX;
       } else if (items.isEmpty()) {
@@ -134,15 +135,15 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         mState = SubState::SELECTING;
       } else {
         // check if the top most item under the cursor is already selected
-        QGraphicsItem* topMostItem = items.first();
+        std::shared_ptr<QGraphicsItem> topMostItem = items.first();
         bool itemAlreadySelected = topMostItem->isSelected();
 
         if (e.modifiers().testFlag(Qt::ControlModifier)) {
           // Toggle selection when CTRL is pressed
-          if (dynamic_cast<FootprintPadGraphicsItem*>(topMostItem)) {
-            // workaround for selection of a SymbolPinGraphicsItem
-            dynamic_cast<FootprintPadGraphicsItem*>(topMostItem)
-                ->setSelected(!itemAlreadySelected);
+          if (auto i = std::dynamic_pointer_cast<FootprintPadGraphicsItem>(
+                  topMostItem)) {
+            // workaround for selection of a FootprintPadGraphicsItem
+            i->setSelected(!itemAlreadySelected);
           } else {
             topMostItem->setSelected(!itemAlreadySelected);
           }
@@ -151,10 +152,11 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           mCurrentSelectionIndex += 1;
           mCurrentSelectionIndex %= items.count();
           clearSelectionRect(true);
-          QGraphicsItem* item = items[mCurrentSelectionIndex];
-          if (dynamic_cast<FootprintPadGraphicsItem*>(item)) {
-            // workaround for selection of a SymbolPinGraphicsItem
-            dynamic_cast<FootprintPadGraphicsItem*>(item)->setSelected(true);
+          std::shared_ptr<QGraphicsItem> item = items[mCurrentSelectionIndex];
+          if (auto i =
+                  std::dynamic_pointer_cast<FootprintPadGraphicsItem>(item)) {
+            // workaround for selection of a FootprintPadGraphicsItem
+            i->setSelected(true);
           } else {
             item->setSelected(true);
           }
@@ -162,10 +164,10 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
           // Only select the topmost item when clicking an unselected item
           // without CTRL
           clearSelectionRect(true);
-          if (dynamic_cast<FootprintPadGraphicsItem*>(topMostItem)) {
-            // workaround for selection of a SymbolPinGraphicsItem
-            dynamic_cast<FootprintPadGraphicsItem*>(topMostItem)
-                ->setSelected(true);
+          if (auto i = std::dynamic_pointer_cast<FootprintPadGraphicsItem>(
+                  topMostItem)) {
+            // workaround for selection of a FootprintPadGraphicsItem
+            i->setSelected(true);
           } else {
             topMostItem->setSelected(true);
           }
@@ -499,10 +501,10 @@ bool PackageEditorState_Select::openContextMenuAtPos(
     aRemove->setEnabled((remainingVertices >= 2) && (!mContext.readOnly));
   } else {
     // handle item selection
-    QGraphicsItem* selectedItem = nullptr;
-    QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+    std::shared_ptr<QGraphicsItem> selectedItem;
+    QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPosition(pos);
     if (items.isEmpty()) return false;
-    foreach (QGraphicsItem* item, items) {
+    foreach (std::shared_ptr<QGraphicsItem> item, items) {
       if (item->isSelected()) {
         selectedItem = item;
       }
@@ -510,10 +512,10 @@ bool PackageEditorState_Select::openContextMenuAtPos(
     if (!selectedItem) {
       clearSelectionRect(true);
       selectedItem = items.first();
-      if (dynamic_cast<FootprintPadGraphicsItem*>(selectedItem)) {
-        // workaround for selection of a SymbolPinGraphicsItem
-        dynamic_cast<FootprintPadGraphicsItem*>(selectedItem)
-            ->setSelected(true);
+      if (auto i = std::dynamic_pointer_cast<FootprintPadGraphicsItem>(
+              selectedItem)) {
+        // workaround for selection of a FootprintPadGraphicsItem
+        i->setSelected(true);
       } else {
         selectedItem->setSelected(true);
       }
@@ -522,17 +524,19 @@ bool PackageEditorState_Select::openContextMenuAtPos(
     Q_ASSERT(selectedItem->isSelected());
 
     // if a polygon line is under the cursor, add the "Add Vertex" menu item
-    if (PolygonGraphicsItem* i =
-            dynamic_cast<PolygonGraphicsItem*>(selectedItem)) {
-      Polygon* polygon = &i->getPolygon();
-      int index = i->getLineIndexAtPosition(pos);
-      if (index >= 0) {
-        QAction* aAddVertex =
-            menu.addAction(QIcon(":/img/actions/add.png"), tr("Add Vertex"));
-        aAddVertex->setEnabled(!mContext.readOnly);
-        connect(aAddVertex, &QAction::triggered,
-                [=]() { startAddingPolygonVertex(*polygon, index, pos); });
-        menu.addSeparator();
+    if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(selectedItem)) {
+      if (mContext.currentFootprint) {
+        std::shared_ptr<Polygon> polygon =
+            mContext.currentFootprint->getPolygons().find(&i->getPolygon());
+        int index = i->getLineIndexAtPosition(pos);
+        if (index >= 0) {
+          QAction* aAddVertex =
+              menu.addAction(QIcon(":/img/actions/add.png"), tr("Add Vertex"));
+          aAddVertex->setEnabled(!mContext.readOnly);
+          connect(aAddVertex, &QAction::triggered,
+                  [=]() { startAddingPolygonVertex(polygon, index, pos); });
+          menu.addSeparator();
+        }
       }
     }
 
@@ -578,55 +582,46 @@ bool PackageEditorState_Select::openContextMenuAtPos(
 }
 
 bool PackageEditorState_Select::openPropertiesDialogOfItem(
-    QGraphicsItem* item) noexcept {
+    std::shared_ptr<QGraphicsItem> item) noexcept {
   if (!item) return false;
 
-  if (FootprintPadGraphicsItem* pad =
-          dynamic_cast<FootprintPadGraphicsItem*>(item)) {
-    Q_ASSERT(pad);
+  if (auto i = std::dynamic_pointer_cast<FootprintPadGraphicsItem>(item)) {
     FootprintPadPropertiesDialog dialog(
-        mContext.package, pad->getPad(), mContext.undoStack,
+        mContext.package, *i->getPad(), mContext.undoStack,
         getDefaultLengthUnit(),
         "package_editor/footprint_pad_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
-  } else if (StrokeTextGraphicsItem* text =
-                 dynamic_cast<StrokeTextGraphicsItem*>(item)) {
-    Q_ASSERT(text);
+  } else if (auto i = std::dynamic_pointer_cast<StrokeTextGraphicsItem>(item)) {
     StrokeTextPropertiesDialog dialog(
-        text->getText(), mContext.undoStack, getAllowedTextLayers(),
+        i->getText(), mContext.undoStack, getAllowedTextLayers(),
         getDefaultLengthUnit(), "package_editor/stroke_text_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
-  } else if (PolygonGraphicsItem* polygon =
-                 dynamic_cast<PolygonGraphicsItem*>(item)) {
-    Q_ASSERT(polygon);
+  } else if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
     PolygonPropertiesDialog dialog(
-        polygon->getPolygon(), mContext.undoStack,
-        getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
-        "package_editor/polygon_properties_dialog", &mContext.editorWidget);
+        i->getPolygon(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
+        getDefaultLengthUnit(), "package_editor/polygon_properties_dialog",
+        &mContext.editorWidget);
     dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
-  } else if (CircleGraphicsItem* circle =
-                 dynamic_cast<CircleGraphicsItem*>(item)) {
-    Q_ASSERT(circle);
+  } else if (auto i = std::dynamic_pointer_cast<CircleGraphicsItem>(item)) {
     CirclePropertiesDialog dialog(
-        circle->getCircle(), mContext.undoStack,
-        getAllowedCircleAndPolygonLayers(), getDefaultLengthUnit(),
-        "package_editor/circle_properties_dialog", &mContext.editorWidget);
+        i->getCircle(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
+        getDefaultLengthUnit(), "package_editor/circle_properties_dialog",
+        &mContext.editorWidget);
     dialog.setReadOnly(mContext.readOnly);
     dialog.exec();
     return true;
-  } else if (HoleGraphicsItem* hole = dynamic_cast<HoleGraphicsItem*>(item)) {
-    Q_ASSERT(hole);
+  } else if (auto i = std::dynamic_pointer_cast<HoleGraphicsItem>(item)) {
     // Note: The const_cast<> is a bit ugly, but it was by far the easiest
     // way and is safe since here we know that we're allowed to modify the hole.
-    HolePropertiesDialog dialog(const_cast<Hole&>(hole->getHole()),
+    HolePropertiesDialog dialog(const_cast<Hole&>(i->getHole()),
                                 mContext.undoStack, getDefaultLengthUnit(),
                                 "package_editor/hole_properties_dialog",
                                 &mContext.editorWidget);
@@ -639,7 +634,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
 
 bool PackageEditorState_Select::openPropertiesDialogOfItemAtPos(
     const Point& pos) noexcept {
-  QList<QGraphicsItem*> items = findItemsAtPosition(pos);
+  QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPosition(pos);
   if (items.isEmpty()) return false;
   return openPropertiesDialogOfItem(items.first());
 }
@@ -654,30 +649,30 @@ bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
         QCursor::pos(), true, false);
     FootprintClipboardData data(mContext.currentFootprint->getUuid(),
                                 mContext.package.getPads(), cursorPos);
-    foreach (const QSharedPointer<FootprintPadGraphicsItem>& pad,
+    foreach (const std::shared_ptr<FootprintPadGraphicsItem>& pad,
              mContext.currentGraphicsItem->getSelectedPads()) {
       Q_ASSERT(pad);
       data.getFootprintPads().append(
-          std::make_shared<FootprintPad>(pad->getPad()));
+          std::make_shared<FootprintPad>(*pad->getPad()));
     }
-    foreach (const QSharedPointer<CircleGraphicsItem>& circle,
+    foreach (const std::shared_ptr<CircleGraphicsItem>& circle,
              mContext.currentGraphicsItem->getSelectedCircles()) {
       Q_ASSERT(circle);
       data.getCircles().append(std::make_shared<Circle>(circle->getCircle()));
     }
-    foreach (const QSharedPointer<PolygonGraphicsItem>& polygon,
+    foreach (const std::shared_ptr<PolygonGraphicsItem>& polygon,
              mContext.currentGraphicsItem->getSelectedPolygons()) {
       Q_ASSERT(polygon);
       data.getPolygons().append(
           std::make_shared<Polygon>(polygon->getPolygon()));
     }
-    foreach (const QSharedPointer<StrokeTextGraphicsItem>& text,
+    foreach (const std::shared_ptr<StrokeTextGraphicsItem>& text,
              mContext.currentGraphicsItem->getSelectedStrokeTexts()) {
       Q_ASSERT(text);
       data.getStrokeTexts().append(
           std::make_shared<StrokeText>(text->getText()));
     }
-    foreach (const QSharedPointer<HoleGraphicsItem>& hole,
+    foreach (const std::shared_ptr<HoleGraphicsItem>& hole,
              mContext.currentGraphicsItem->getSelectedHoles()) {
       Q_ASSERT(hole);
       data.getHoles().append(std::make_shared<Hole>(hole->getHole()));
@@ -828,17 +823,18 @@ void PackageEditorState_Select::removeSelectedPolygonVertices() noexcept {
 }
 
 void PackageEditorState_Select::startAddingPolygonVertex(
-    Polygon& polygon, int vertex, const Point& pos) noexcept {
+    std::shared_ptr<Polygon> polygon, int vertex, const Point& pos) noexcept {
   try {
+    Q_ASSERT(polygon);
     Q_ASSERT(vertex > 0);  // it must be the vertex *after* the clicked line
-    Path path = polygon.getPath();
+    Path path = polygon->getPath();
     Point newPos = pos.mappedToGrid(getGridInterval());
     Angle newAngle = path.getVertices()[vertex - 1].getAngle();
     path.getVertices().insert(vertex, Vertex(newPos, newAngle));
-    mCmdPolygonEdit.reset(new CmdPolygonEdit(polygon));
+    mCmdPolygonEdit.reset(new CmdPolygonEdit(*polygon));
     mCmdPolygonEdit->setPath(path, true);
 
-    mSelectedPolygon = &polygon;
+    mSelectedPolygon = polygon;
     mSelectedPolygonVertices = {vertex};
     mStartPos = pos;
     mState = SubState::MOVING_POLYGON_VERTEX;
@@ -862,30 +858,30 @@ void PackageEditorState_Select::clearSelectionRect(
   }
 }
 
-QList<QGraphicsItem*> PackageEditorState_Select::findItemsAtPosition(
-    const Point& pos) noexcept {
-  QList<QSharedPointer<FootprintPadGraphicsItem>> pads;
-  QList<QSharedPointer<CircleGraphicsItem>> circles;
-  QList<QSharedPointer<PolygonGraphicsItem>> polygons;
-  QList<QSharedPointer<StrokeTextGraphicsItem>> texts;
-  QList<QSharedPointer<HoleGraphicsItem>> holes;
+QList<std::shared_ptr<QGraphicsItem>>
+    PackageEditorState_Select::findItemsAtPosition(const Point& pos) noexcept {
+  QList<std::shared_ptr<FootprintPadGraphicsItem>> pads;
+  QList<std::shared_ptr<CircleGraphicsItem>> circles;
+  QList<std::shared_ptr<PolygonGraphicsItem>> polygons;
+  QList<std::shared_ptr<StrokeTextGraphicsItem>> texts;
+  QList<std::shared_ptr<HoleGraphicsItem>> holes;
   int count = mContext.currentGraphicsItem->getItemsAtPosition(
       pos, &pads, &circles, &polygons, &texts, &holes);
-  QList<QGraphicsItem*> result = {};
-  foreach (QSharedPointer<FootprintPadGraphicsItem> pad, pads) {
-    result.append(pad.data());
+  QList<std::shared_ptr<QGraphicsItem>> result = {};
+  foreach (std::shared_ptr<FootprintPadGraphicsItem> pad, pads) {
+    result.append(pad);
   }
-  foreach (QSharedPointer<CircleGraphicsItem> cirlce, circles) {
-    result.append(cirlce.data());
+  foreach (std::shared_ptr<CircleGraphicsItem> cirlce, circles) {
+    result.append(cirlce);
   }
-  foreach (QSharedPointer<PolygonGraphicsItem> polygon, polygons) {
-    result.append(polygon.data());
+  foreach (std::shared_ptr<PolygonGraphicsItem> polygon, polygons) {
+    result.append(polygon);
   }
-  foreach (QSharedPointer<StrokeTextGraphicsItem> text, texts) {
-    result.append(text.data());
+  foreach (std::shared_ptr<StrokeTextGraphicsItem> text, texts) {
+    result.append(text);
   }
-  foreach (QSharedPointer<HoleGraphicsItem> hole, holes) {
-    result.append(hole.data());
+  foreach (std::shared_ptr<HoleGraphicsItem> hole, holes) {
+    result.append(hole);
   }
 
   Q_ASSERT(result.count() ==
@@ -898,20 +894,20 @@ QList<QGraphicsItem*> PackageEditorState_Select::findItemsAtPosition(
 bool PackageEditorState_Select::findPolygonVerticesAtPosition(
     const Point& pos) noexcept {
   if (mContext.currentFootprint) {
-    for (Polygon& p : mContext.currentFootprint->getPolygons()) {
-      PolygonGraphicsItem* i =
-          mContext.currentGraphicsItem->getPolygonGraphicsItem(p);
-      if (i && i->isSelected()) {
-        mSelectedPolygonVertices = i->getVertexIndicesAtPosition(pos);
+    for (auto ptr : mContext.currentFootprint->getPolygons().values()) {
+      auto graphicsItem = mContext.currentGraphicsItem->getGraphicsItem(ptr);
+      if (graphicsItem && graphicsItem->isSelected()) {
+        mSelectedPolygonVertices =
+            graphicsItem->getVertexIndicesAtPosition(pos);
         if (!mSelectedPolygonVertices.isEmpty()) {
-          mSelectedPolygon = &p;
+          mSelectedPolygon = ptr;
           return true;
         }
       }
     }
   }
 
-  mSelectedPolygon = nullptr;
+  mSelectedPolygon.reset();
   mSelectedPolygonVertices.clear();
   return false;
 }

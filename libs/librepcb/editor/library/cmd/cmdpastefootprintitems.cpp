@@ -27,6 +27,8 @@
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
 #include "../pkg/footprintclipboarddata.h"
+#include "../pkg/footprintgraphicsitem.h"
+#include "../pkg/footprintpadgraphicsitem.h"
 #include "cmdfootprintpadedit.h"
 
 #include <librepcb/core/graphics/circlegraphicsitem.h>
@@ -34,8 +36,6 @@
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/utils/scopeguard.h>
 
@@ -104,9 +104,11 @@ bool CmdPasteFootprintItems::performExecute() {
         pad.getShape(), pad.getWidth(), pad.getHeight(), pad.getDrillDiameter(),
         pad.getBoardSide());
     execNewChildCmd(new CmdFootprintPadInsert(mFootprint.getPads(), copy));
-    FootprintPadGraphicsItem* item = mGraphicsItem.getPadGraphicsItem(*copy);
-    Q_ASSERT(item);
-    item->setSelected(true);
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select pad graphics item!";
+    }
   }
 
   for (const Circle& circle : mData->getCircles().sortedByUuid()) {
@@ -120,9 +122,11 @@ bool CmdPasteFootprintItems::performExecute() {
         circle.isGrabArea(), circle.getCenter() + mPosOffset,
         circle.getDiameter());
     execNewChildCmd(new CmdCircleInsert(mFootprint.getCircles(), copy));
-    CircleGraphicsItem* item = mGraphicsItem.getCircleGraphicsItem(*copy);
-    Q_ASSERT(item);
-    item->setSelected(true);
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select circle graphics item!";
+    }
   }
 
   for (const Polygon& polygon : mData->getPolygons().sortedByUuid()) {
@@ -136,9 +140,11 @@ bool CmdPasteFootprintItems::performExecute() {
         polygon.isFilled(), polygon.isGrabArea(),
         polygon.getPath().translated(mPosOffset));
     execNewChildCmd(new CmdPolygonInsert(mFootprint.getPolygons(), copy));
-    PolygonGraphicsItem* item = mGraphicsItem.getPolygonGraphicsItem(*copy);
-    Q_ASSERT(item);
-    item->setSelected(true);
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select polygon graphics item!";
+    }
   }
 
   for (const StrokeText& text : mData->getStrokeTexts().sortedByUuid()) {
@@ -153,9 +159,11 @@ bool CmdPasteFootprintItems::performExecute() {
         text.getStrokeWidth(), text.getLetterSpacing(), text.getLineSpacing(),
         text.getAlign(), text.getMirrored(), text.getAutoRotate());
     execNewChildCmd(new CmdStrokeTextInsert(mFootprint.getStrokeTexts(), copy));
-    StrokeTextGraphicsItem* item = mGraphicsItem.getTextGraphicsItem(*copy);
-    Q_ASSERT(item);
-    item->setSelected(true);
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select stroke text graphics item!";
+    }
   }
 
   for (const Hole& hole : mData->getHoles().sortedByUuid()) {
@@ -167,9 +175,11 @@ bool CmdPasteFootprintItems::performExecute() {
     std::shared_ptr<Hole> copy = std::make_shared<Hole>(
         uuid, hole.getPosition() + mPosOffset, hole.getDiameter());
     execNewChildCmd(new CmdHoleInsert(mFootprint.getHoles(), copy));
-    HoleGraphicsItem* item = mGraphicsItem.getHoleGraphicsItem(*copy);
-    Q_ASSERT(item);
-    item->setSelected(true);
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select hole graphics item!";
+    }
   }
 
   undoScopeGuard.dismiss();  // no undo required

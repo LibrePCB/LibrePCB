@@ -28,6 +28,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -80,8 +82,8 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<CmdHoleEdit> mEditCmd;
-  Hole* mCurrentHole;
-  HoleGraphicsItem* mCurrentGraphicsItem;
+  std::shared_ptr<Hole> mCurrentHole;
+  std::shared_ptr<HoleGraphicsItem> mCurrentGraphicsItem;
 
   // parameter memory
   PositiveLength mLastDiameter;

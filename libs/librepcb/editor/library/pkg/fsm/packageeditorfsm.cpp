@@ -23,6 +23,7 @@
 #include "packageeditorfsm.h"
 
 #include "../../../widgets/graphicsview.h"
+#include "../footprintgraphicsitem.h"
 #include "packageeditorstate_addholes.h"
 #include "packageeditorstate_addnames.h"
 #include "packageeditorstate_addpads.h"
@@ -38,7 +39,6 @@
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/primitivetextgraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
 #include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>
@@ -136,13 +136,10 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
 
   mContext.currentFootprint = fpt;
   if (mContext.currentFootprint) {
-    // set font to default application font
-    mContext.currentFootprint->setStrokeFontForAllTexts(
-        &qApp->getDefaultStrokeFont());
     // load graphics items recursively
     mContext.currentGraphicsItem.reset(new FootprintGraphicsItem(
-        *mContext.currentFootprint, mContext.layerProvider,
-        &mContext.package.getPads()));
+        mContext.currentFootprint, mContext.layerProvider,
+        qApp->getDefaultStrokeFont(), &mContext.package.getPads()));
     mContext.graphicsScene.addItem(*mContext.currentGraphicsItem);
     mSelectFootprintGraphicsItem.reset();
     mContext.graphicsView.setEnabled(true);

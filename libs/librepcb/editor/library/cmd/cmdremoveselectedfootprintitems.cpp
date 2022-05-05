@@ -26,6 +26,8 @@
 #include "../../cmd/cmdholeedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
+#include "../pkg/footprintgraphicsitem.h"
+#include "../pkg/footprintpadgraphicsitem.h"
 #include "cmdfootprintpadedit.h"
 
 #include <librepcb/core/graphics/circlegraphicsitem.h>
@@ -33,8 +35,6 @@
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/library/pkg/footprintgraphicsitem.h>
-#include <librepcb/core/library/pkg/footprintpadgraphicsitem.h>
 
 #include <QtCore>
 
@@ -65,7 +65,7 @@ bool CmdRemoveSelectedFootprintItems::performExecute() {
   // remove pins
   foreach (const auto& pad, mContext.currentGraphicsItem->getSelectedPads()) {
     appendChild(new CmdFootprintPadRemove(mContext.currentFootprint->getPads(),
-                                          &pad->getPad()));
+                                          pad->getPad().get()));
   }
 
   // remove circles

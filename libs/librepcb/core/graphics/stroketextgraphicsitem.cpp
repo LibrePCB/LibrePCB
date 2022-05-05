@@ -22,10 +22,8 @@
  ******************************************************************************/
 #include "stroketextgraphicsitem.h"
 
-#include "../application.h"
-#include "../font/strokefontpool.h"
+#include "../attribute/attributesubstitutor.h"
 #include "../graphics/graphicslayer.h"
-#include "../utils/toolbox.h"
 #include "origincrossgraphicsitem.h"
 
 #include <QtCore>
@@ -42,10 +40,13 @@ namespace librepcb {
 
 StrokeTextGraphicsItem::StrokeTextGraphicsItem(
     StrokeText& text, const IF_GraphicsLayerProvider& lp,
-    QGraphicsItem* parent) noexcept
+    const StrokeFont& font, QGraphicsItem* parent) noexcept
   : PrimitivePathGraphicsItem(parent),
     mText(text),
     mLayerProvider(lp),
+    mFont(font),
+    mAttributeProvider(nullptr),
+    mSubstitutedText(),
     mOnEditedSlot(*this, &StrokeTextGraphicsItem::strokeTextEdited) {
   // add origin cross
   mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
@@ -54,10 +55,10 @@ StrokeTextGraphicsItem::StrokeTextGraphicsItem(
   // set text properties
   setPosition(mText.getPosition());
   setLineWidth(mText.getStrokeWidth());
-  setPath(Path::toQPainterPathPx(mText.getPaths(), false));
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(5);
   updateLayer(mText.getLayerName());
+  updateText();
   updateTransform();
 
   // register to the text to get attribute updates
@@ -65,6 +66,30 @@ StrokeTextGraphicsItem::StrokeTextGraphicsItem(
 }
 
 StrokeTextGraphicsItem::~StrokeTextGraphicsItem() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void StrokeTextGraphicsItem::setAttributeProvider(
+    const AttributeProvider* provider) noexcept {
+  if (provider != mAttributeProvider) {
+    mAttributeProvider = provider;
+    updateText();
+  }
+}
+
+void StrokeTextGraphicsItem::updateText() noexcept {
+  QString text = mText.getText();
+  if (mAttributeProvider) {
+    text =
+        AttributeSubstitutor::substitute(mText.getText(), mAttributeProvider);
+  }
+  if (text != mSubstitutedText) {
+    mSubstitutedText = text;
+    updatePaths();
+  }
 }
 
 /*******************************************************************************
@@ -86,28 +111,29 @@ void StrokeTextGraphicsItem::strokeTextEdited(
       updateLayer(text.getLayerName());
       break;
     case StrokeText::Event::TextChanged:
+      updateText();
+      break;
     case StrokeText::Event::HeightChanged:
     case StrokeText::Event::LetterSpacingChanged:
     case StrokeText::Event::LineSpacingChanged:
     case StrokeText::Event::AlignChanged:
     case StrokeText::Event::AutoRotateChanged:
-      // do nothing because PathsChanged will be emitted too
+      updatePaths();
       break;
     case StrokeText::Event::PositionChanged:
       setPosition(text.getPosition());
       break;
     case StrokeText::Event::RotationChanged:
+      updatePaths();  // Auto-rotation might have changed.
       updateTransform();
       break;
     case StrokeText::Event::StrokeWidthChanged:
-      // update only line width because PathsChanged will be emitted too
       setLineWidth(text.getStrokeWidth());
+      updatePaths();  // Spacing might need to be re-calculated.
       break;
     case StrokeText::Event::MirroredChanged:
+      updatePaths();
       updateTransform();
-      break;
-    case StrokeText::Event::PathsChanged:
-      setPath(Path::toQPainterPathPx(text.getPaths(), false));
       break;
     default:
       qWarning() << "Unhandled switch-case in "
@@ -121,6 +147,11 @@ void StrokeTextGraphicsItem::updateLayer(
   const GraphicsLayer* layer = mLayerProvider.getLayer(*layerName);
   setLineLayer(layer);
   mOriginCrossGraphicsItem->setLayer(layer);
+}
+
+void StrokeTextGraphicsItem::updatePaths() noexcept {
+  setPath(Path::toQPainterPathPx(mText.generatePaths(mFont, mSubstitutedText),
+                                 false));
 }
 
 void StrokeTextGraphicsItem::updateTransform() noexcept {

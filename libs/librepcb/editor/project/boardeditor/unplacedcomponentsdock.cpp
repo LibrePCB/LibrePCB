@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "unplacedcomponentsdock.h"
 
-#include "../../library/pkg/footprintpreviewgraphicsitem.h"
+#include "../../library/pkg/footprintgraphicsitem.h"
 #include "../../project/cmd/cmdcomponentinstanceedit.h"
 #include "../../undostack.h"
 #include "../../widgets/graphicsview.h"
@@ -30,6 +30,7 @@
 #include "../projecteditor.h"
 #include "ui_unplacedcomponentsdock.h"
 
+#include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/core/graphics/graphicsscene.h>
@@ -278,8 +279,7 @@ void UnplacedComponentsDock::currentDeviceIndexChanged(int index) noexcept {
     //  - Allow adding devices even if package not found in workspace library
     //  - Use correct package (version) for preview
     //  - Better performance than loading workspace library elements
-    const Package* package =
-        mProject.getLibrary().getPackage(device.packageUuid);
+    Package* package = mProject.getLibrary().getPackage(device.packageUuid);
     if (!package) {
       // If package does not exist in project library, use workspace library.
       FilePath pkgFp =
@@ -347,7 +347,7 @@ void UnplacedComponentsDock::setSelectedComponentInstance(
 }
 
 void UnplacedComponentsDock::setSelectedDeviceAndPackage(
-    const tl::optional<Uuid>& deviceUuid, const Package* package,
+    const tl::optional<Uuid>& deviceUuid, Package* package,
     bool packageOwned) noexcept {
   setSelectedFootprintUuid(tl::nullopt);
   mUi->lblNoDeviceFound->setVisible(deviceUuid && (!package));
@@ -406,13 +406,13 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(
 
   if (mBoard && mSelectedComponent && mSelectedDeviceUuid && mSelectedPackage &&
       mSelectedFootprintUuid) {
-    const Footprint* fpt =
-        mSelectedPackage->getFootprints().find(*mSelectedFootprintUuid).get();
-    if (fpt) {
-      mPreviewGraphicsItem.reset(new FootprintPreviewGraphicsItem(
-          *mGraphicsLayerProvider.data(),
-          mProject.getSettings().getLocaleOrder(), *fpt, mSelectedPackage,
-          &mSelectedComponent->getLibComponent(), mSelectedComponent));
+    if (std::shared_ptr<Footprint> footprint =
+            mSelectedPackage->getFootprints().find(*mSelectedFootprintUuid)) {
+      mPreviewGraphicsItem.reset(new FootprintGraphicsItem(
+          footprint, *mGraphicsLayerProvider.data(),
+          qApp->getDefaultStrokeFont(), &mSelectedPackage->getPads(),
+          &mSelectedComponent->getLibComponent(),
+          mProject.getSettings().getLocaleOrder()));
       mPreviewGraphicsScene->addItem(*mPreviewGraphicsItem);
       mUi->graphicsView->zoomAll();
       mUi->btnAdd->setEnabled(true);

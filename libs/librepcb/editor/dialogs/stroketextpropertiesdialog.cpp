@@ -26,6 +26,7 @@
 #include "../undostack.h"
 #include "ui_stroketextpropertiesdialog.h"
 
+#include <librepcb/core/application.h>
 #include <librepcb/core/font/strokefont.h>
 #include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/graphics/graphicslayer.h>
@@ -75,12 +76,11 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
   mUi->alignmentSelector->setAlignment(mText.getAlign());
   mUi->edtHeight->setValue(mText.getHeight());
   mUi->edtStrokeWidth->setValue(mText.getStrokeWidth());
+  const StrokeFont& font = qApp->getDefaultStrokeFont();
   if (mText.getLetterSpacing().isAuto()) {
     mUi->cbxLetterSpacingAuto->setChecked(true);
     mUi->edtLetterSpacingRatio->setEnabled(false);
-    const StrokeFont* font = text.getCurrentFont();
-    Ratio ratio = font ? font->getLetterSpacing() : Ratio::percent100();
-    mUi->edtLetterSpacingRatio->setValue(ratio);
+    mUi->edtLetterSpacingRatio->setValue(font.getLetterSpacing());
   } else {
     mUi->cbxLetterSpacingAuto->setChecked(false);
     mUi->edtLetterSpacingRatio->setEnabled(true);
@@ -89,9 +89,7 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
   if (mText.getLineSpacing().isAuto()) {
     mUi->cbxLineSpacingAuto->setChecked(true);
     mUi->edtLineSpacingRatio->setEnabled(false);
-    const StrokeFont* font = text.getCurrentFont();
-    Ratio ratio = font ? font->getLineSpacing() : Ratio::percent100();
-    mUi->edtLineSpacingRatio->setValue(ratio);
+    mUi->edtLineSpacingRatio->setValue(font.getLineSpacing());
   } else {
     mUi->cbxLineSpacingAuto->setChecked(false);
     mUi->edtLineSpacingRatio->setEnabled(true);

@@ -35,7 +35,6 @@
 namespace librepcb {
 
 class Footprint;
-class FootprintGraphicsItem;
 class GraphicsScene;
 class GridProperties;
 class IF_GraphicsLayerProvider;
@@ -44,6 +43,7 @@ class PrimitiveTextGraphicsItem;
 
 namespace editor {
 
+class FootprintGraphicsItem;
 class GraphicsView;
 class PackageEditorState;
 class PackageEditorWidget;

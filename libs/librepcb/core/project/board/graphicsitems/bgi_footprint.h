@@ -23,10 +23,13 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../graphics/graphicslayer.h"
 #include "bgi_base.h"
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -34,9 +37,10 @@
 namespace librepcb {
 
 class BI_Footprint;
-class Footprint;
 class GraphicsLayer;
-class StrokeText;
+class OriginCrossGraphicsItem;
+class PrimitiveCircleGraphicsItem;
+class PrimitivePathGraphicsItem;
 
 /*******************************************************************************
  *  Class BGI_Footprint
@@ -53,32 +57,36 @@ public:
   explicit BGI_Footprint(BI_Footprint& footprint) noexcept;
   ~BGI_Footprint() noexcept;
 
-  // Getters
-  bool isSelectable() const noexcept;
-
   // General Methods
-  void updateCacheAndRepaint() noexcept;
+  bool isSelectable() const noexcept;
+  void setSelected(bool selected) noexcept;
+  void updateBoardSide() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept { return mBoundingRect; }
-  QPainterPath shape() const noexcept { return mShape; }
+  QRectF boundingRect() const noexcept { return QRectF(); }
+  QPainterPath shape() const noexcept;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0);
 
   // Operator Overloadings
   BGI_Footprint& operator=(const BGI_Footprint& rhs) = delete;
 
-private:
-  // Private Methods
+private:  // Methods
+  void layerEdited(const GraphicsLayer& layer,
+                   GraphicsLayer::Event event) noexcept;
   GraphicsLayer* getLayer(QString name) const noexcept;
 
-  // General Attributes
+private:  // Data
   BI_Footprint& mFootprint;
-  const Footprint& mLibFootprint;
-
-  // Cached Attributes
-  QRectF mBoundingRect;
+  QPointer<GraphicsLayer> mGrabAreaLayer;
+  std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+  QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;
+  QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mPolygonGraphicsItems;
+  QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mHoleGraphicsItems;
   QPainterPath mShape;
+
+  // Slots
+  GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;
 };
 
 /*******************************************************************************

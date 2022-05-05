@@ -27,11 +27,12 @@
 #include "../cmd/cmddeviceedit.h"
 #include "../cmd/cmddevicepadsignalmapitemedit.h"
 #include "../cmp/componentchooserdialog.h"
-#include "../pkg/footprintpreviewgraphicsitem.h"
+#include "../pkg/footprintgraphicsitem.h"
 #include "../pkg/packagechooserdialog.h"
 #include "../sym/symbolgraphicsitem.h"
 #include "ui_deviceeditorwidget.h"
 
+#include <librepcb/core/application.h>
 #include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/component.h>
@@ -402,9 +403,10 @@ void DeviceEditorWidget::updateDevicePackageUuid(const Uuid& uuid) noexcept {
 
 void DeviceEditorWidget::updatePackagePreview() noexcept {
   if (mPackage && mPackage->getFootprints().count() > 0) {
-    mFootprintGraphicsItem.reset(new FootprintPreviewGraphicsItem(
-        *mGraphicsLayerProvider, QStringList(),
-        *mPackage->getFootprints().first(), mPackage.data(), mComponent.get()));
+    mFootprintGraphicsItem.reset(new FootprintGraphicsItem(
+        mPackage->getFootprints().first(), *mGraphicsLayerProvider,
+        qApp->getDefaultStrokeFont(), &mPackage->getPads(), mComponent.get(),
+        getLibLocaleOrder()));
     mPackageGraphicsScene->addItem(*mFootprintGraphicsItem);
     mUi->viewPackage->zoomAll();
   }
