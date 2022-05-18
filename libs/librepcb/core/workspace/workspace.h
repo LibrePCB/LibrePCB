@@ -114,14 +114,24 @@ public:
   /**
    * @brief Get the workspace settings
    */
-  WorkspaceSettings& getSettings() const { return *mWorkspaceSettings; }
+  WorkspaceSettings& getSettings() { return *mWorkspaceSettings; }
 
-  // Library Management
+  /**
+   * @brief Get the workspace settings
+   */
+  const WorkspaceSettings& getSettings() const { return *mWorkspaceSettings; }
 
   /**
    * @brief Get the workspace library database
    */
   WorkspaceLibraryDb& getLibraryDb() const { return *mLibraryDb; }
+
+  // General Methods
+
+  /**
+   * @brief Save all (modified) settings to disk
+   */
+  void saveSettings();
 
   // Operator Overloadings
   Workspace& operator=(const Workspace& rhs) = delete;

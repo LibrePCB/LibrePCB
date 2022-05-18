@@ -80,16 +80,36 @@ Workspace::Workspace(const FilePath& wsPath,
 
   // all OK, let's load the workspace stuff!
 
-  // load workspace settings
-  mWorkspaceSettings.reset(
-      new WorkspaceSettings(mMetadataPath.getPathTo("settings.lp"),
-                            qApp->getFileFormatVersion(), this));
+  // Load workspace settings.
+  mWorkspaceSettings.reset(new WorkspaceSettings(this));
+  const FilePath settingsFilePath = mMetadataPath.getPathTo("settings.lp");
+  if (settingsFilePath.isExistingFile()) {
+    qDebug("Load workspace settings...");
+    SExpression root = SExpression::parse(FileUtils::readFile(settingsFilePath),
+                                          settingsFilePath);
+    mWorkspaceSettings->load(root, qApp->getFileFormatVersion());
+    qDebug("Workspace settings loaded.");
+  } else {
+    qInfo("Workspace settings file not found, default settings will be used.");
+  }
 
   // load library database
   mLibraryDb.reset(new WorkspaceLibraryDb(getLibrariesPath()));  // can throw
 }
 
 Workspace::~Workspace() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void Workspace::saveSettings() {
+  qDebug() << "Save workspace settings...";
+  const FilePath settingsFilePath = mMetadataPath.getPathTo("settings.lp");
+  FileUtils::writeFile(
+      settingsFilePath,
+      mWorkspaceSettings->serialize().toByteArray());  // can throw
 }
 
 /*******************************************************************************

@@ -45,10 +45,11 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WorkspaceSettingsDialog::WorkspaceSettingsDialog(WorkspaceSettings& settings,
+WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
                                                  QWidget* parent)
   : QDialog(parent),
-    mSettings(settings),
+    mWorkspace(workspace),
+    mSettings(workspace.getSettings()),
     mLibLocaleOrderModel(new LibraryLocaleOrderModel()),
     mLibNormOrderModel(new LibraryNormOrderModel()),
     mRepositoryUrlsModel(new RepositoryUrlModel()),
@@ -330,7 +331,8 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
         static_cast<WorkspaceSettings::PdfOpenBehavior>(
             mUi->pdfOpenGroup->checkedId()));
 
-    mSettings.saveToFile();  // can throw
+    // Save settings to disk.
+    mWorkspace.saveSettings();  // can throw
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }

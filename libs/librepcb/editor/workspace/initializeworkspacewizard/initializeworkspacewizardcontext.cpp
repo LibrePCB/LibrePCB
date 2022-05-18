@@ -70,7 +70,7 @@ void InitializeWorkspaceWizardContext::initializeEmptyWorkspace() const {
   ws.getSettings().defaultLengthUnit.set(mLengthUnit);
   ws.getSettings().libraryNormOrder.set(mLibraryNormOrder);
   ws.getSettings().userName.set(mUserName);
-  ws.getSettings().saveToFile();  // can throw
+  ws.saveSettings();  // can throw
 }
 
 /*******************************************************************************

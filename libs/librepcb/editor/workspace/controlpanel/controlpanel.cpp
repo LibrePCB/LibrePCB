@@ -542,7 +542,7 @@ void ControlPanel::on_actionSwitch_Workspace_triggered() {
 }
 
 void ControlPanel::on_actionWorkspace_Settings_triggered() {
-  WorkspaceSettingsDialog dialog(mWorkspace.getSettings(), this);
+  WorkspaceSettingsDialog dialog(mWorkspace, this);
   dialog.exec();
 }
 

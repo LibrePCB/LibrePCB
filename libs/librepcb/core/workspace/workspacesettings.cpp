@@ -36,10 +36,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-WorkspaceSettings::WorkspaceSettings(const FilePath& fp,
-                                     const Version& fileFormat, QObject* parent)
+WorkspaceSettings::WorkspaceSettings(QObject* parent)
   : QObject(parent),
-    mFilePath(fp),
     mFileContent(),
     // Initialize settings items. Their constructor will register them as
     // child objects of this object, this way we will access them later.
@@ -55,28 +53,6 @@ WorkspaceSettings::WorkspaceSettings(const FilePath& fp,
     useCustomPdfReader("use_custom_pdf_reader", false, this),
     pdfReaderCommand("pdf_custom_reader_command", "", this),
     pdfOpenBehavior("pdf_open_behavior", PdfOpenBehavior::ALWAYS, this) {
-  // load settings if the settings file exists
-  if (mFilePath.isExistingFile()) {
-    qDebug("Load workspace settings...");
-    SExpression root =
-        SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
-    foreach (const SExpression& child,
-             root.getChildren(SExpression::Type::List)) {
-      mFileContent.insert(child.getName(), child);
-    }
-    foreach (WorkspaceSettingsItem* item, getAllItems()) {
-      try {
-        if (mFileContent.contains(item->getKey())) {
-          item->load(mFileContent[item->getKey()], fileFormat);  // can throw
-        }
-      } catch (const Exception& e) {
-        qCritical() << "Could not load workspace settings item:" << e.getMsg();
-      }
-    }
-    qDebug("Workspace settings loaded.");
-  } else {
-    qInfo("Workspace settings file not found, default settings will be used.");
-  }
 }
 
 WorkspaceSettings::~WorkspaceSettings() noexcept {
@@ -86,6 +62,23 @@ WorkspaceSettings::~WorkspaceSettings() noexcept {
  *  Public Methods
  ******************************************************************************/
 
+void WorkspaceSettings::load(const SExpression& node,
+                             const Version& fileFormat) {
+  foreach (const SExpression& child,
+           node.getChildren(SExpression::Type::List)) {
+    mFileContent.insert(child.getName(), child);
+  }
+  foreach (WorkspaceSettingsItem* item, getAllItems()) {
+    try {
+      if (mFileContent.contains(item->getKey())) {
+        item->load(mFileContent[item->getKey()], fileFormat);  // can throw
+      }
+    } catch (const Exception& e) {
+      qCritical() << "Could not load workspace settings item:" << e.getMsg();
+    }
+  }
+}
+
 void WorkspaceSettings::restoreDefaults() noexcept {
   foreach (WorkspaceSettingsItem* item, getAllItems()) {
     item->restoreDefault();
@@ -93,7 +86,7 @@ void WorkspaceSettings::restoreDefaults() noexcept {
   mFileContent.clear();  // Remove even unknown settings!
 }
 
-QByteArray WorkspaceSettings::saveToByteArray() {
+SExpression WorkspaceSettings::serialize() {
   foreach (const WorkspaceSettingsItem* item, getAllItems()) {
     if (item->isEdited()) {
       if (item->isDefaultValue()) {
@@ -105,18 +98,13 @@ QByteArray WorkspaceSettings::saveToByteArray() {
       }
     }
   }
-
   SExpression root = SExpression::createList("librepcb_workspace_settings");
   foreach (const SExpression& child, mFileContent) {
     root.ensureLineBreak();
     root.appendChild(child);
   }
   root.ensureLineBreakIfMultiLine();
-  return root.toByteArray();
-}
-
-void WorkspaceSettings::saveToFile() {
-  FileUtils::writeFile(mFilePath, saveToByteArray());  // can throw
+  return root;
 }
 
 /*******************************************************************************
