@@ -26,6 +26,7 @@
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
 #include "../fileio/fileutils.h"
+#include "../fileio/transactionalfilesystem.h"
 #include "../fileio/versionfile.h"
 #include "../library/library.h"
 #include "../project/project.h"
@@ -52,7 +53,9 @@ Workspace::Workspace(const FilePath& wsPath,
     mProjectsPath(mPath.getPathTo("projects")),
     mMetadataPath(mPath.getPathTo("v" % qApp->getFileFormatVersion().toStr())),
     mLibrariesPath(mMetadataPath.getPathTo("libraries")),
-    mLock(mMetadataPath) {
+    mFileSystem(),
+    mWorkspaceSettings(),
+    mLibraryDb() {
   // check if the workspace is valid
   if (!isValidWorkspacePath(mPath)) {
     throw RuntimeError(
@@ -75,18 +78,20 @@ Workspace::Workspace(const FilePath& wsPath,
   FileUtils::makePath(mMetadataPath);  // can throw
   FileUtils::makePath(mLibrariesPath);  // can throw
 
-  // the workspace can be opened by this application, so we will lock it
-  mLock.tryLock(lockCallback);  // can throw
-
-  // all OK, let's load the workspace stuff!
+  // Access the data directory with TransactionalFileSystem to ensure a
+  // failsafe file access and forbid concurrent access by a lock.
+  mFileSystem = TransactionalFileSystem::openRW(
+      mMetadataPath, TransactionalFileSystem::RestoreMode::yes,
+      lockCallback);  // can throw
 
   // Load workspace settings.
   mWorkspaceSettings.reset(new WorkspaceSettings(this));
-  const FilePath settingsFilePath = mMetadataPath.getPathTo("settings.lp");
-  if (settingsFilePath.isExistingFile()) {
+  const QString settingsFilePath = "settings.lp";
+  if (mFileSystem->fileExists(settingsFilePath)) {
     qDebug("Load workspace settings...");
-    SExpression root = SExpression::parse(FileUtils::readFile(settingsFilePath),
-                                          settingsFilePath);
+    SExpression root =
+        SExpression::parse(mFileSystem->read(settingsFilePath),
+                           mFileSystem->getAbsPath(settingsFilePath));
     mWorkspaceSettings->load(root, qApp->getFileFormatVersion());
     qDebug("Workspace settings loaded.");
   } else {
@@ -106,10 +111,8 @@ Workspace::~Workspace() noexcept {
 
 void Workspace::saveSettings() {
   qDebug() << "Save workspace settings...";
-  const FilePath settingsFilePath = mMetadataPath.getPathTo("settings.lp");
-  FileUtils::writeFile(
-      settingsFilePath,
-      mWorkspaceSettings->serialize().toByteArray());  // can throw
+  saveSettingsToTransactionalFileSystem();  // can throw
+  mFileSystem->save();  // can throw
 }
 
 /*******************************************************************************
@@ -166,6 +169,16 @@ void Workspace::setMostRecentlyUsedWorkspacePath(
     const FilePath& path) noexcept {
   QSettings clientSettings;
   clientSettings.setValue("workspaces/most_recently_used", path.toNative());
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void Workspace::saveSettingsToTransactionalFileSystem() {
+  mFileSystem->write(
+      "settings.lp",
+      mWorkspaceSettings->serialize().toByteArray());  // can throw
 }
 
 /*******************************************************************************

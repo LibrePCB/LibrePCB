@@ -28,6 +28,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -35,6 +37,7 @@ namespace librepcb {
 
 class Library;
 class Project;
+class TransactionalFileSystem;
 class WorkspaceLibraryDb;
 class WorkspaceSettings;
 
@@ -198,6 +201,12 @@ public:
     return Version::fromString("0.1");
   }
 
+private:  // Methods
+  /**
+   * @brief Save the workspace settings to the transactional file system
+   */
+  void saveSettingsToTransactionalFileSystem();
+
 private:  // Data
   /// a FilePath object which represents the workspace directory
   FilePath mPath;
@@ -212,7 +221,7 @@ private:  // Data
   FilePath mLibrariesPath;
 
   /// to lock the version directory (#mMetadataPath)
-  DirectoryLock mLock;
+  std::shared_ptr<TransactionalFileSystem> mFileSystem;
 
   /// the WorkspaceSettings object
   QScopedPointer<WorkspaceSettings> mWorkspaceSettings;
