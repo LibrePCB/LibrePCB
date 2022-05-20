@@ -39,15 +39,22 @@ namespace librepcb {
 AsyncCopyOperation::AsyncCopyOperation(const FilePath& source,
                                        const FilePath& destination,
                                        QObject* parent) noexcept
-  : QThread(parent), mSource(source), mDestination(destination) {
+  : QThread(parent), mSource(source), mDestination(destination), mAbort(false) {
 }
 
 AsyncCopyOperation::~AsyncCopyOperation() noexcept {
+  abort();
 }
 
 /*******************************************************************************
  *  Public Methods
  ******************************************************************************/
+
+void AsyncCopyOperation::abort() noexcept {
+  mAbort = true;
+  wait();
+  mAbort = false;
+}
 
 /*******************************************************************************
  *  Private Methods
@@ -82,6 +89,9 @@ void AsyncCopyOperation::run() noexcept {
 
     try {
       for (int i = 0; i < files.count(); ++i) {
+        if (mAbort) {
+          throw UserCanceled(__FILE__, __LINE__);
+        }
         FilePath src = files.at(i);
         QString srcRelative = src.toRelative(mSource);
         FilePath dst = tmpDst.getPathTo(srcRelative);
