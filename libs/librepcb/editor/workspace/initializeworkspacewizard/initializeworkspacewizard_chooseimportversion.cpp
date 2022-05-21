@@ -44,6 +44,7 @@ InitializeWorkspaceWizard_ChooseImportVersion::
     mContext(context),
     mUi(new Ui::InitializeWorkspaceWizard_ChooseImportVersion) {
   mUi->setupUi(this);
+  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 
   mUi->cbxVersions->addItem(tr("Do not import any data"));
   foreach (const Version& version,

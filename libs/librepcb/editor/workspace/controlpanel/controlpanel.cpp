@@ -29,7 +29,7 @@
 #include "../../project/newprojectwizard/newprojectwizard.h"
 #include "../../project/projecteditor.h"
 #include "../../workspace/librarymanager/librarymanager.h"
-#include "../firstrunwizard/firstrunwizard.h"
+#include "../initializeworkspacewizard/initializeworkspacewizard.h"
 #include "../projectlibraryupdater/projectlibraryupdater.h"
 #include "../workspacesettingsdialog.h"
 #include "favoriteprojectsmodel.h"
@@ -521,20 +521,10 @@ void ControlPanel::on_actionClose_all_open_projects_triggered() {
 }
 
 void ControlPanel::on_actionSwitch_Workspace_triggered() {
-  FirstRunWizard wizard;
-  wizard.skipWelcomePage();  // Welcome page not needed here
-  if (wizard.exec() == QDialog::Accepted) {
-    FilePath wsPath = wizard.getWorkspaceFilePath();
-    if (wizard.getCreateNewWorkspace()) {
-      try {
-        // create new workspace
-        Workspace::createNewWorkspace(wsPath);  // can throw
-      } catch (const Exception& e) {
-        QMessageBox::critical(this, tr("Error"), e.getMsg());
-        return;
-      }
-    }
-    Workspace::setMostRecentlyUsedWorkspacePath(wsPath);
+  InitializeWorkspaceWizard wizard(FilePath(), true);
+  if ((wizard.exec() == QDialog::Accepted) &&
+      (wizard.getWorkspacePath().isValid())) {
+    Workspace::setMostRecentlyUsedWorkspacePath(wizard.getWorkspacePath());
     QMessageBox::information(this, tr("Workspace changed"),
                              tr("The chosen workspace will be used after "
                                 "restarting the application."));

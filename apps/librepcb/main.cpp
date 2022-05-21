@@ -28,7 +28,6 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
-#include <librepcb/editor/workspace/firstrunwizard/firstrunwizard.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtCore>
@@ -233,16 +232,12 @@ static bool isFileFormatStableOrAcceptUnstable() noexcept {
 static int openWorkspace(FilePath& path) {
   // If no valid workspace path is available, ask the user to choose it.
   if (!path.isValid()) {
-    FirstRunWizard wizard;
-    if (wizard.exec() == QDialog::Accepted) {
-      path = wizard.getWorkspaceFilePath();
-      if (wizard.getCreateNewWorkspace()) {
-        Workspace::createNewWorkspace(path);  // can throw
-      }
-      Workspace::setMostRecentlyUsedWorkspacePath(path);
-    } else {
+    InitializeWorkspaceWizard wizard(path, false);
+    if (wizard.exec() != QDialog::Accepted) {
       throw UserCanceled(__FILE__, __LINE__);
     }
+    path = wizard.getWorkspacePath();
+    Workspace::setMostRecentlyUsedWorkspacePath(path);
   }
 
   // If the selected directory is not a valid workspace, we need to abort here
@@ -260,7 +255,7 @@ static int openWorkspace(FilePath& path) {
   // be default-initialized!
   QList<Version> versions = Workspace::getFileFormatVersionsOfWorkspace(path);
   if (!versions.contains(qApp->getFileFormatVersion())) {
-    InitializeWorkspaceWizard wizard(path);
+    InitializeWorkspaceWizard wizard(path, true);
     if (wizard.exec() != QDialog::Accepted) {
       throw UserCanceled(__FILE__, __LINE__);
     }

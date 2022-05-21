@@ -706,15 +706,6 @@ add_library(
   workspace/controlpanel/recentprojectsmodel.h
   workspace/desktopservices.cpp
   workspace/desktopservices.h
-  workspace/firstrunwizard/firstrunwizard.cpp
-  workspace/firstrunwizard/firstrunwizard.h
-  workspace/firstrunwizard/firstrunwizard.ui
-  workspace/firstrunwizard/firstrunwizardpage_welcome.cpp
-  workspace/firstrunwizard/firstrunwizardpage_welcome.h
-  workspace/firstrunwizard/firstrunwizardpage_welcome.ui
-  workspace/firstrunwizard/firstrunwizardpage_workspacepath.cpp
-  workspace/firstrunwizard/firstrunwizardpage_workspacepath.h
-  workspace/firstrunwizard/firstrunwizardpage_workspacepath.ui
   workspace/initializeworkspacewizard/initializeworkspacewizard.cpp
   workspace/initializeworkspacewizard/initializeworkspacewizard.h
   workspace/initializeworkspacewizard/initializeworkspacewizard.ui
@@ -724,9 +715,15 @@ add_library(
   workspace/initializeworkspacewizard/initializeworkspacewizard_choosesettings.cpp
   workspace/initializeworkspacewizard/initializeworkspacewizard_choosesettings.h
   workspace/initializeworkspacewizard/initializeworkspacewizard_choosesettings.ui
+  workspace/initializeworkspacewizard/initializeworkspacewizard_chooseworkspace.cpp
+  workspace/initializeworkspacewizard/initializeworkspacewizard_chooseworkspace.h
+  workspace/initializeworkspacewizard/initializeworkspacewizard_chooseworkspace.ui
   workspace/initializeworkspacewizard/initializeworkspacewizard_finalizeimport.cpp
   workspace/initializeworkspacewizard/initializeworkspacewizard_finalizeimport.h
   workspace/initializeworkspacewizard/initializeworkspacewizard_finalizeimport.ui
+  workspace/initializeworkspacewizard/initializeworkspacewizard_welcome.cpp
+  workspace/initializeworkspacewizard/initializeworkspacewizard_welcome.h
+  workspace/initializeworkspacewizard/initializeworkspacewizard_welcome.ui
   workspace/initializeworkspacewizard/initializeworkspacewizardcontext.cpp
   workspace/initializeworkspacewizard/initializeworkspacewizardcontext.h
   workspace/librarymanager/addlibrarywidget.cpp

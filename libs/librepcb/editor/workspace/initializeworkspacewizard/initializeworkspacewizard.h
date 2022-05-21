@@ -51,13 +51,14 @@ class InitializeWorkspaceWizard final : public QWizard {
 public:
   // Constructors / Destructor
   explicit InitializeWorkspaceWizard(const FilePath& workspacePath,
+                                     bool skipWelcomePage,
                                      QWidget* parent = nullptr) noexcept;
   InitializeWorkspaceWizard(const InitializeWorkspaceWizard& other) = delete;
   ~InitializeWorkspaceWizard() noexcept;
 
   // Getters
-  const InitializeWorkspaceWizardContext& getContext() const noexcept {
-    return mContext;
+  const FilePath& getWorkspacePath() const noexcept {
+    return mContext.getWorkspacePath();
   }
 
   // Operator Overloadings

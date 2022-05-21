@@ -56,6 +56,8 @@ public:
 
   enum PageId {
     ID_None = -1,  ///< last page
+    ID_Welcome,
+    ID_ChooseWorkspace,
     ID_ChooseImportVersion,
     ID_FinalizeImport,
     ID_ChooseSettings,
@@ -71,6 +73,10 @@ public:
 
   // Getters
   const FilePath& getWorkspacePath() const noexcept { return mWorkspacePath; }
+  bool getCreateWorkspace() const noexcept { return mCreateWorkspace; }
+  const QList<Version>& getFileFormatVersions() const noexcept {
+    return mFileFormatVersions;
+  }
   const tl::optional<Version>& getVersionToImport() const noexcept {
     return mVersionToImport;
   }
@@ -82,6 +88,8 @@ public:
   const QString& getUserName() const noexcept { return mUserName; }
 
   // Setters
+  void setWorkspacePath(const FilePath& fp) noexcept;
+  void setCreateWorkspace(bool create) noexcept { mCreateWorkspace = create; }
   void setVersionToImport(const tl::optional<Version>& version) noexcept {
     mVersionToImport = version;
   }
@@ -101,8 +109,13 @@ public:
   InitializeWorkspaceWizardContext& operator=(
       const InitializeWorkspaceWizardContext& rhs) = delete;
 
+signals:
+  void workspacePathChanged();
+
 private:  // Data
   FilePath mWorkspacePath;
+  bool mCreateWorkspace;
+  QList<Version> mFileFormatVersions;
   tl::optional<Version> mVersionToImport;
   QString mAppLocale;
   LengthUnit mLengthUnit;

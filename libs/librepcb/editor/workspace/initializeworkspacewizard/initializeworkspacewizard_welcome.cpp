@@ -17,47 +17,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_FIRSTRUNWIZARDPAGE_WELCOME_H
-#define LIBREPCB_EDITOR_FIRSTRUNWIZARDPAGE_WELCOME_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+#include "initializeworkspacewizard_welcome.h"
+
+#include "ui_initializeworkspacewizard_welcome.h"
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
 
-namespace Ui {
-class FirstRunWizardPage_Welcome;
-}
-
 /*******************************************************************************
- *  Class FirstRunWizardPage_Welcome
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The FirstRunWizardPage_Welcome class
- */
-class FirstRunWizardPage_Welcome final : public QWizardPage {
-  Q_OBJECT
+InitializeWorkspaceWizard_Welcome::InitializeWorkspaceWizard_Welcome(
+    InitializeWorkspaceWizardContext& context, QWidget* parent) noexcept
+  : QWizardPage(parent),
+    mContext(context),
+    mUi(new Ui::InitializeWorkspaceWizard_Welcome) {
+  mUi->setupUi(this);
+}
 
-public:
-  // Constructors / Destructor
-  explicit FirstRunWizardPage_Welcome(QWidget* parent = 0) noexcept;
-  ~FirstRunWizardPage_Welcome() noexcept;
-
-private:
-  // Private Methods
-  Q_DISABLE_COPY(FirstRunWizardPage_Welcome)
-
-  // Private Membervariables
-  QScopedPointer<Ui::FirstRunWizardPage_Welcome> mUi;
-};
+InitializeWorkspaceWizard_Welcome::
+    ~InitializeWorkspaceWizard_Welcome() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
@@ -65,5 +52,3 @@ private:
 
 }  // namespace editor
 }  // namespace librepcb
-
-#endif

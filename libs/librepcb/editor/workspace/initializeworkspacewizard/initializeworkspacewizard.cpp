@@ -24,7 +24,9 @@
 
 #include "initializeworkspacewizard_chooseimportversion.h"
 #include "initializeworkspacewizard_choosesettings.h"
+#include "initializeworkspacewizard_chooseworkspace.h"
 #include "initializeworkspacewizard_finalizeimport.h"
+#include "initializeworkspacewizard_welcome.h"
 #include "ui_initializeworkspacewizard.h"
 
 #include <librepcb/core/workspace/workspace.h>
@@ -40,27 +42,37 @@ namespace editor {
  ******************************************************************************/
 
 InitializeWorkspaceWizard::InitializeWorkspaceWizard(
-    const FilePath& workspacePath, QWidget* parent) noexcept
+    const FilePath& workspacePath, bool skipWelcomePage,
+    QWidget* parent) noexcept
   : QWizard(parent),
     mContext(workspacePath),
     mUi(new Ui::InitializeWorkspaceWizard) {
   mUi->setupUi(this);
+  setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
+  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 
-  // add pages
-  if (Workspace::getFileFormatVersionsOfWorkspace(mContext.getWorkspacePath())
-          .count() > 0) {
-    // Only provide import option if there are versions to import
-    setPage(InitializeWorkspaceWizardContext::ID_ChooseImportVersion,
-            new InitializeWorkspaceWizard_ChooseImportVersion(mContext));
-    setPage(InitializeWorkspaceWizardContext::ID_FinalizeImport,
-            new InitializeWorkspaceWizard_FinalizeImport(mContext));
-  }
+  // Add pages.
+  setPage(InitializeWorkspaceWizardContext::ID_Welcome,
+          new InitializeWorkspaceWizard_Welcome(mContext));
+  setPage(InitializeWorkspaceWizardContext::ID_ChooseWorkspace,
+          new InitializeWorkspaceWizard_ChooseWorkspace(mContext));
+  setPage(InitializeWorkspaceWizardContext::ID_ChooseImportVersion,
+          new InitializeWorkspaceWizard_ChooseImportVersion(mContext));
+  setPage(InitializeWorkspaceWizardContext::ID_FinalizeImport,
+          new InitializeWorkspaceWizard_FinalizeImport(mContext));
   setPage(InitializeWorkspaceWizardContext::ID_ChooseSettings,
           new InitializeWorkspaceWizard_ChooseSettings(mContext));
 
-  // set header logo
-  setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
-  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
+  // Determine start page.
+  if ((!workspacePath.isValid()) && (!skipWelcomePage)) {
+    setStartId(InitializeWorkspaceWizardContext::ID_Welcome);
+  } else if (!workspacePath.isValid()) {
+    setStartId(InitializeWorkspaceWizardContext::ID_ChooseWorkspace);
+  } else if (mContext.getFileFormatVersions().count() > 0) {
+    setStartId(InitializeWorkspaceWizardContext::ID_ChooseImportVersion);
+  } else {
+    setStartId(InitializeWorkspaceWizardContext::ID_ChooseSettings);
+  }
 }
 
 InitializeWorkspaceWizard::~InitializeWorkspaceWizard() noexcept {

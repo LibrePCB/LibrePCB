@@ -40,7 +40,11 @@ namespace editor {
 
 InitializeWorkspaceWizardContext::InitializeWorkspaceWizardContext(
     const FilePath& ws, QObject* parent) noexcept
-  : QObject(parent), mWorkspacePath(ws), mVersionToImport() {
+  : QObject(parent),
+    mWorkspacePath(),
+    mCreateWorkspace(false),
+    mVersionToImport() {
+  setWorkspacePath(ws);
 }
 
 InitializeWorkspaceWizardContext::~InitializeWorkspaceWizardContext() noexcept {
@@ -49,6 +53,15 @@ InitializeWorkspaceWizardContext::~InitializeWorkspaceWizardContext() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void InitializeWorkspaceWizardContext::setWorkspacePath(
+    const FilePath& fp) noexcept {
+  if (fp != mWorkspacePath) {
+    mWorkspacePath = fp;
+    mFileFormatVersions = Workspace::getFileFormatVersionsOfWorkspace(fp);
+    emit workspacePathChanged();
+  }
+}
 
 std::unique_ptr<AsyncCopyOperation>
     InitializeWorkspaceWizardContext::createImportCopyOperation() const
@@ -65,6 +78,9 @@ std::unique_ptr<AsyncCopyOperation>
 }
 
 void InitializeWorkspaceWizardContext::initializeEmptyWorkspace() const {
+  if (mCreateWorkspace) {
+    Workspace::createNewWorkspace(mWorkspacePath);  // can throw
+  }
   Workspace ws(mWorkspacePath);  // can throw
   ws.getSettings().applicationLocale.set(mAppLocale);
   ws.getSettings().defaultLengthUnit.set(mLengthUnit);

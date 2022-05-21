@@ -17,31 +17,53 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_WELCOME_H
+#define LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_WELCOME_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "firstrunwizardpage_welcome.h"
+#include "initializeworkspacewizardcontext.h"
 
-#include "ui_firstrunwizardpage_welcome.h"
+#include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
 
+namespace Ui {
+class InitializeWorkspaceWizard_Welcome;
+}
+
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class InitializeWorkspaceWizard_Welcome
  ******************************************************************************/
 
-FirstRunWizardPage_Welcome::FirstRunWizardPage_Welcome(QWidget* parent) noexcept
-  : QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_Welcome) {
-  mUi->setupUi(this);
-  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
-}
+/**
+ * @brief The InitializeWorkspaceWizard_Welcome class
+ */
+class InitializeWorkspaceWizard_Welcome final : public QWizardPage {
+  Q_OBJECT
 
-FirstRunWizardPage_Welcome::~FirstRunWizardPage_Welcome() noexcept {
-}
+public:
+  // Constructors / Destructor
+  explicit InitializeWorkspaceWizard_Welcome(
+      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+  InitializeWorkspaceWizard_Welcome(
+      const InitializeWorkspaceWizard_Welcome& other) = delete;
+  ~InitializeWorkspaceWizard_Welcome() noexcept;
+
+  // Operator Overloadings
+  InitializeWorkspaceWizard_Welcome& operator=(
+      const InitializeWorkspaceWizard_Welcome& rhs) = delete;
+
+private:
+  InitializeWorkspaceWizardContext& mContext;
+  QScopedPointer<Ui::InitializeWorkspaceWizard_Welcome> mUi;
+};
 
 /*******************************************************************************
  *  End of File
@@ -49,3 +71,5 @@ FirstRunWizardPage_Welcome::~FirstRunWizardPage_Welcome() noexcept {
 
 }  // namespace editor
 }  // namespace librepcb
+
+#endif
