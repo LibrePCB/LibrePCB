@@ -1,4 +1,23 @@
 ################################################################################
+# Initialize Workspace Wizard
+################################################################################
+
+initWorkspaceWizard = librepcb__editor__InitializeWorkspaceWizard
+initWorkspaceWizardWidget = {initWorkspaceWizard}::QWidget
+initWorkspaceWizardNextButton = {initWorkspaceWizardWidget}::__qt__passive_wizardbutton1
+initWorkspaceWizardFinishButton = {initWorkspaceWizardWidget}::qt_wizard_finish
+initWorkspaceWizardFrame = {initWorkspaceWizardWidget}::QFrame
+initWorkspaceWizardChooseWorkspacePage = {initWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_ChooseWorkspace
+initWorkspaceWizardChooseWorkspacePathEdit = {initWorkspaceWizardChooseWorkspacePage}::edtPath
+initWorkspaceWizardChooseWorkspaceStatusLabel = {initWorkspaceWizardChooseWorkspacePage}::lblStatus
+initWorkspaceWizardUpgradePage = {initWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_Upgrade
+initWorkspaceWizardUpgradeSourceLabel = {initWorkspaceWizardUpgradePage}::lblSource
+initWorkspaceWizardUpgradeDestinationLabel = {initWorkspaceWizardUpgradePage}::lblDestination
+initWorkspaceWizardChooseSettingsPage = {initWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_ChooseSettings
+initWorkspaceWizardChooseSettingsUserNameEdit = {initWorkspaceWizardChooseSettingsPage}::edtUserName
+
+
+################################################################################
 # Control Panel
 ################################################################################
 
@@ -8,6 +27,8 @@ controlPanelWidget = {controlPanel}::centralWidget
 
 # Actions
 controlPanelActionOpenLibraryManager = {controlPanel}::actionOpen_Library_Manager
+controlPanelActionSwitchWorkspace = {controlPanel}::actionSwitch_Workspace
+controlPanelActionOpenWorkspaceSettings = {controlPanel}::actionWorkspace_Settings
 
 # Labels at top
 controlPanelWarnForNoLibrariesLabel = {controlPanelWidget}::lblWarnForNoLibraries
@@ -37,6 +58,28 @@ controlPanelNewProjectWizardFrame = {controlPanelNewProjectWizardWidget}::QFrame
 controlPanelNewProjectWizardMetadataPage = {controlPanelNewProjectWizardFrame}::librepcb__editor__NewProjectWizardPage_Metadata
 controlPanelNewProjectWizardMetadataNameEdit = {controlPanelNewProjectWizardMetadataPage}::edtName
 controlPanelNewProjectWizardMetadataPathLabel = {controlPanelNewProjectWizardMetadataPage}::lblFullFilePath
+
+# Workspace settings dialog
+controlPanelWorkspaceSettingsDialog = librepcb__editor__WorkspaceSettingsDialog
+controlPanelWorkspaceSettingsDialogButtonBox = {controlPanelWorkspaceSettingsDialog}::buttonBox
+controlPanelWorkspaceSettingsDialogButtonAccept = {controlPanelWorkspaceSettingsDialogButtonBox}::QPushButton
+controlPanelWorkspaceSettingsDialogButtonCancel = {controlPanelWorkspaceSettingsDialogButtonBox}::QPushButton-1
+controlPanelWorkspaceSettingsDialogTabWidget = {controlPanelWorkspaceSettingsDialog}::tabWidget
+controlPanelWorkspaceSettingsDialogStackedWidget = {controlPanelWorkspaceSettingsDialogTabWidget}::qt_tabwidget_stackedwidget
+controlPanelWorkspaceSettingsDialogGeneralTab = {controlPanelWorkspaceSettingsDialogStackedWidget}::generalTab
+controlPanelWorkspaceSettingsDialogGeneralUserNameEdit = {controlPanelWorkspaceSettingsDialogGeneralTab}::edtUserName
+
+# Switch workspace dialog
+controlPanelInitWorkspaceWizard = {controlPanel}::librepcb__editor__InitializeWorkspaceWizard
+controlPanelInitWorkspaceWizardWidget = {controlPanelInitWorkspaceWizard}::QWidget
+controlPanelInitWorkspaceWizardNextButton = {controlPanelInitWorkspaceWizardWidget}::__qt__passive_wizardbutton1
+controlPanelInitWorkspaceWizardFinishButton = {controlPanelInitWorkspaceWizardWidget}::qt_wizard_finish
+controlPanelInitWorkspaceWizardFrame = {controlPanelInitWorkspaceWizardWidget}::QFrame
+controlPanelInitWorkspaceWizardChooseWorkspacePage = {controlPanelInitWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_ChooseWorkspace
+controlPanelInitWorkspaceWizardChooseWorkspacePathEdit = {controlPanelInitWorkspaceWizardChooseWorkspacePage}::edtPath
+controlPanelInitWorkspaceWizardChooseWorkspaceStatusLabel = {controlPanelInitWorkspaceWizardChooseWorkspacePage}::lblStatus
+controlPanelInitWorkspaceWizardChooseSettingsPage = {controlPanelInitWorkspaceWizardFrame}::librepcb__editor__InitializeWorkspaceWizard_ChooseSettings
+controlPanelInitWorkspaceWizardChooseSettingsUserNameEdit = {controlPanelInitWorkspaceWizardChooseSettingsPage}::edtUserName
 
 
 ################################################################################
