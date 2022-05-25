@@ -61,7 +61,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ControlPanel::ControlPanel(Workspace& workspace)
+ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
   : QMainWindow(nullptr),
     mWorkspace(workspace),
     mUi(new Ui::ControlPanel),
@@ -83,12 +83,9 @@ ControlPanel::ControlPanel(Workspace& workspace)
           mUi->statusBar, &StatusBar::setProgressBarPercent,
           Qt::QueuedConnection);
 
-  // decive if we have to show the warning about a newer workspace file format
-  // version
-  Version actualVersion = qApp->getFileFormatVersion();
-  tl::optional<Version> highestVersion =
-      Workspace::getHighestFileFormatVersionOfWorkspace(workspace.getPath());
-  mUi->lblWarnForNewerAppVersions->setVisible(highestVersion > actualVersion);
+  // Show warning if the workspace has already been opened with a higher
+  // file format version.
+  mUi->lblWarnForNewerAppVersions->setVisible(fileFormatIsOutdated);
 
   // hide warning about missing libraries, but update visibility each time the
   // workspace library was scanned
@@ -521,7 +518,12 @@ void ControlPanel::on_actionClose_all_open_projects_triggered() {
 }
 
 void ControlPanel::on_actionSwitch_Workspace_triggered() {
-  InitializeWorkspaceWizard wizard(FilePath(), true);
+  InitializeWorkspaceWizard wizard(true, this);
+  try {
+    wizard.setWorkspacePath(mWorkspace.getPath());
+  } catch (const Exception& e) {
+    qWarning() << "ControlPanel: Failed to set current workspace path.";
+  }
   if ((wizard.exec() == QDialog::Accepted) &&
       (wizard.getWorkspacePath().isValid())) {
     Workspace::setMostRecentlyUsedWorkspacePath(wizard.getWorkspacePath());

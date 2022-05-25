@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_FINALIZEIMPORT_H
-#define LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_FINALIZEIMPORT_H
+#ifndef LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_UPGRADE_H
+#define LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_UPGRADE_H
 
 /*******************************************************************************
  *  Includes
@@ -32,49 +32,46 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class AsyncCopyOperation;
+
 namespace editor {
 
 namespace Ui {
-class InitializeWorkspaceWizard_FinalizeImport;
+class InitializeWorkspaceWizard_Upgrade;
 }
 
 /*******************************************************************************
- *  Class InitializeWorkspaceWizard_FinalizeImport
+ *  Class InitializeWorkspaceWizard_Upgrade
  ******************************************************************************/
 
 /**
- * @brief The InitializeWorkspaceWizard_FinalizeImport class
+ * @brief The InitializeWorkspaceWizard_Upgrade class
  */
-class InitializeWorkspaceWizard_FinalizeImport final : public QWizardPage {
+class InitializeWorkspaceWizard_Upgrade final : public QWizardPage {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit InitializeWorkspaceWizard_FinalizeImport(
+  explicit InitializeWorkspaceWizard_Upgrade(
       InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
-  InitializeWorkspaceWizard_FinalizeImport(
-      const InitializeWorkspaceWizard_FinalizeImport& other) = delete;
-  ~InitializeWorkspaceWizard_FinalizeImport() noexcept;
+  InitializeWorkspaceWizard_Upgrade(
+      const InitializeWorkspaceWizard_Upgrade& other) = delete;
+  ~InitializeWorkspaceWizard_Upgrade() noexcept;
 
   // Inherited from QWizardPage
   void initializePage() noexcept override;
-  bool isComplete() const noexcept override;
+  bool validatePage() noexcept override;
   int nextId() const noexcept override;
 
   // Operator Overloadings
-  InitializeWorkspaceWizard_FinalizeImport& operator=(
-      const InitializeWorkspaceWizard_FinalizeImport& rhs) = delete;
-
-private:
-  void startImport() noexcept;
-  void importFailed(const QString& error) noexcept;
-  void importSucceeded() noexcept;
+  InitializeWorkspaceWizard_Upgrade& operator=(
+      const InitializeWorkspaceWizard_Upgrade& rhs) = delete;
 
 private:
   InitializeWorkspaceWizardContext& mContext;
-  QScopedPointer<Ui::InitializeWorkspaceWizard_FinalizeImport> mUi;
-  std::unique_ptr<AsyncCopyOperation> mCopyOperation;
-  bool mImportSucceeded;
+  QScopedPointer<Ui::InitializeWorkspaceWizard_Upgrade> mUi;
+  QScopedPointer<AsyncCopyOperation> mCopyOperation;
 };
 
 /*******************************************************************************

@@ -50,24 +50,36 @@ class InitializeWorkspaceWizard final : public QWizard {
 
 public:
   // Constructors / Destructor
-  explicit InitializeWorkspaceWizard(const FilePath& workspacePath,
-                                     bool skipWelcomePage,
+  explicit InitializeWorkspaceWizard(bool forceChoosePath,
                                      QWidget* parent = nullptr) noexcept;
   InitializeWorkspaceWizard(const InitializeWorkspaceWizard& other) = delete;
   ~InitializeWorkspaceWizard() noexcept;
 
   // Getters
+  bool getNeedsToBeShown() const noexcept { return mNeedsToBeShown; }
   const FilePath& getWorkspacePath() const noexcept {
     return mContext.getWorkspacePath();
   }
+  const QString& getDataDir() const noexcept { return mContext.getDataDir(); }
+  bool getWorkspaceContainsNewerFileFormats() const noexcept {
+    return mContext.getWorkspaceContainsNewerFileFormats();
+  }
+
+  // Setters
+  void setWorkspacePath(const FilePath& fp);
 
   // Operator Overloadings
   InitializeWorkspaceWizard& operator=(const InitializeWorkspaceWizard& rhs) =
       delete;
 
-private:
+private:  // Methods
+  void updateStartPage() noexcept;
+
+private:  // Data
   InitializeWorkspaceWizardContext mContext;
   QScopedPointer<Ui::InitializeWorkspaceWizard> mUi;
+  bool mForceChoosePath;
+  bool mNeedsToBeShown;
 };
 
 /*******************************************************************************

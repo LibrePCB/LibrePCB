@@ -47,6 +47,14 @@ InitializeWorkspaceWizard_Welcome::
 }
 
 /*******************************************************************************
+ *  Public Methods
+ ******************************************************************************/
+
+int InitializeWorkspaceWizard_Welcome::nextId() const noexcept {
+  return InitializeWorkspaceWizardContext::PageId::ID_ChooseWorkspace;
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

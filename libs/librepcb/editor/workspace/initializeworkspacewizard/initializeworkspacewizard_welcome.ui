@@ -7,11 +7,8 @@
     <x>0</x>
     <y>0</y>
     <width>373</width>
-    <height>147</height>
+    <height>156</height>
    </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Welcome to LibrePCB</string>
   </property>
   <property name="title">
    <string>Welcome to LibrePCB</string>
@@ -38,7 +35,29 @@
     </widget>
    </item>
    <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>10</width>
+       <height>6</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
     <widget class="QLabel" name="label_2">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Website: &lt;a href=&quot;https://librepcb.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://librepcb.org&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;GitHub Project: &lt;a href=&quot;https://github.com/LibrePCB&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/LibrePCB&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;LibrePCB is published under the &lt;a href=&quot;http://www.gnu.org/licenses/gpl-3.0.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GNU GPLv3&lt;/span&gt;&lt;/a&gt; License.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
@@ -52,19 +71,6 @@
       <set>Qt::TextBrowserInteraction</set>
      </property>
     </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

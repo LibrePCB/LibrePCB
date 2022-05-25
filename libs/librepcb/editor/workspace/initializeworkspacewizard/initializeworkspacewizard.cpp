@@ -22,14 +22,11 @@
  ******************************************************************************/
 #include "initializeworkspacewizard.h"
 
-#include "initializeworkspacewizard_chooseimportversion.h"
 #include "initializeworkspacewizard_choosesettings.h"
 #include "initializeworkspacewizard_chooseworkspace.h"
-#include "initializeworkspacewizard_finalizeimport.h"
+#include "initializeworkspacewizard_upgrade.h"
 #include "initializeworkspacewizard_welcome.h"
 #include "ui_initializeworkspacewizard.h"
-
-#include <librepcb/core/workspace/workspace.h>
 
 /*******************************************************************************
  *  Namespace
@@ -41,12 +38,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-InitializeWorkspaceWizard::InitializeWorkspaceWizard(
-    const FilePath& workspacePath, bool skipWelcomePage,
-    QWidget* parent) noexcept
+InitializeWorkspaceWizard::InitializeWorkspaceWizard(bool forceChoosePath,
+                                                     QWidget* parent) noexcept
   : QWizard(parent),
-    mContext(workspacePath),
-    mUi(new Ui::InitializeWorkspaceWizard) {
+    mContext(),
+    mUi(new Ui::InitializeWorkspaceWizard),
+    mForceChoosePath(forceChoosePath),
+    mNeedsToBeShown(true) {
   mUi->setupUi(this);
   setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
   setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
@@ -56,26 +54,62 @@ InitializeWorkspaceWizard::InitializeWorkspaceWizard(
           new InitializeWorkspaceWizard_Welcome(mContext));
   setPage(InitializeWorkspaceWizardContext::ID_ChooseWorkspace,
           new InitializeWorkspaceWizard_ChooseWorkspace(mContext));
-  setPage(InitializeWorkspaceWizardContext::ID_ChooseImportVersion,
-          new InitializeWorkspaceWizard_ChooseImportVersion(mContext));
-  setPage(InitializeWorkspaceWizardContext::ID_FinalizeImport,
-          new InitializeWorkspaceWizard_FinalizeImport(mContext));
+  setPage(InitializeWorkspaceWizardContext::ID_Upgrade,
+          new InitializeWorkspaceWizard_Upgrade(mContext));
   setPage(InitializeWorkspaceWizardContext::ID_ChooseSettings,
           new InitializeWorkspaceWizard_ChooseSettings(mContext));
-
-  // Determine start page.
-  if ((!workspacePath.isValid()) && (!skipWelcomePage)) {
-    setStartId(InitializeWorkspaceWizardContext::ID_Welcome);
-  } else if (!workspacePath.isValid()) {
-    setStartId(InitializeWorkspaceWizardContext::ID_ChooseWorkspace);
-  } else if (mContext.getFileFormatVersions().count() > 0) {
-    setStartId(InitializeWorkspaceWizardContext::ID_ChooseImportVersion);
-  } else {
-    setStartId(InitializeWorkspaceWizardContext::ID_ChooseSettings);
-  }
+  updateStartPage();
 }
 
 InitializeWorkspaceWizard::~InitializeWorkspaceWizard() noexcept {
+}
+
+/*******************************************************************************
+ *  Public Methods
+ ******************************************************************************/
+
+void InitializeWorkspaceWizard::setWorkspacePath(const FilePath& fp) {
+  mContext.setWorkspacePath(fp);  // can throw
+  updateStartPage();
+
+  if (mNeedsToBeShown && (!mForceChoosePath)) {
+    switch (startId()) {
+      case InitializeWorkspaceWizardContext::ID_Welcome:
+        qInfo() << "No workspace selected, asking for path.";
+        break;
+      case InitializeWorkspaceWizardContext::ID_ChooseWorkspace:
+        qInfo() << "Invalid workspace selected, asking for different path.";
+        break;
+      case InitializeWorkspaceWizardContext::ID_Upgrade:
+        qInfo() << "Workspace data is outdated, asking for upgrade.";
+        break;
+      case InitializeWorkspaceWizardContext::ID_ChooseSettings:
+        qInfo() << "Workspace data not initialized, asking for settings.";
+        break;
+      default:
+        break;
+    }
+  }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void InitializeWorkspaceWizard::updateStartPage() noexcept {
+  mNeedsToBeShown = true;
+  if ((!mContext.getWorkspacePath().isValid()) && (!mForceChoosePath)) {
+    setStartId(InitializeWorkspaceWizardContext::ID_Welcome);
+  } else if (mForceChoosePath || (!mContext.getWorkspaceExists())) {
+    setStartId(InitializeWorkspaceWizardContext::ID_ChooseWorkspace);
+  } else if (mContext.getNeedsUpgrade()) {
+    setStartId(InitializeWorkspaceWizardContext::ID_Upgrade);
+  } else if (mContext.getNeedsInitialization()) {
+    setStartId(InitializeWorkspaceWizardContext::ID_ChooseSettings);
+  } else {
+    setStartId(InitializeWorkspaceWizardContext::ID_None);
+    mNeedsToBeShown = false;
+  }
 }
 
 /*******************************************************************************

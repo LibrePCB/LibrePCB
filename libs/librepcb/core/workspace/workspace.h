@@ -62,7 +62,9 @@ public:
   /**
    * @brief Constructor to open an existing workspace
    *
-   * @param wsPath        The filepath to the workspace directory
+   * @param wsPath        The filepath to the workspace directory.
+   * @param dataDirName   Subdirectory name where data files are stored
+   *                      (e.g. "data" or "v0.1").
    * @param lockCallback  A callback which gets called if the workspace
    *                      directory is locked, to decide what to do in this
    *                      case.
@@ -70,7 +72,7 @@ public:
    * @throw Exception If the workspace could not be opened, this constructor
    * throws an exception.
    */
-  explicit Workspace(const FilePath& wsPath,
+  explicit Workspace(const FilePath& wsPath, const QString& dataDirName,
                      DirectoryLock::LockHandlerCallback lockCallback = nullptr);
 
   /**
@@ -91,24 +93,24 @@ public:
   const FilePath& getProjectsPath() const { return mProjectsPath; }
 
   /**
-   * @brief Get the filepath to the version directory (v#) in the workspace
+   * @brief Get the filepath to the data directory in the workspace
    */
-  const FilePath& getMetadataPath() const { return mMetadataPath; }
+  const FilePath& getDataPath() const { return mDataPath; }
 
   /**
-   * @brief Get the filepath to the "v#/libraries" directory in the workspace
+   * @brief Get the filepath to the "data/libraries" directory in the workspace
    */
   const FilePath& getLibrariesPath() const { return mLibrariesPath; }
 
   /**
-   * @brief Get the filepath to the "v#/libraries/local" directory
+   * @brief Get the filepath to the "data/libraries/local" directory
    */
   FilePath getLocalLibrariesPath() const {
     return mLibrariesPath.getPathTo("local");
   }
 
   /**
-   * @brief Get the filepath to the "v#/libraries/remote" directory
+   * @brief Get the filepath to the "data/libraries/remote" directory
    */
   FilePath getRemoteLibrariesPath() const {
     return mLibrariesPath.getPathTo("remote");
@@ -142,30 +144,46 @@ public:
   // Static Methods
 
   /**
-   * @brief Check whether a filepath points to a valid workspace directory or
-   * not
+   * @brief Check the existence & compatibility of a workspace directory
    *
-   * @param path  A path to a directory
+   * @param wsRoot    Workspace directory root path to check.
+   * @param errorMsg  If not nullptr, and the function returns `false`, an
+   *                  explanation error message will be written here.
    *
-   * @return True if the path is a valid workspace directory, false otherwise
+   * @return  True if the path is a compatible workspace directory, false
+   *          otherwise.
    */
-  static bool isValidWorkspacePath(const FilePath& path) noexcept;
+  static bool checkCompatibility(const FilePath& wsRoot,
+                                 QString* errorMsg = nullptr);
 
   /**
-   * @brief getFileFormatVersionsOfWorkspace
-   * @param path
-   * @return
+   * @brief Find all data directories of a workspace
+   *
+   * @param wsRoot            Workspace directory root path. Should be a valid
+   *                          path, checked with #checkCompatibility().
+   *
+   * @return  All data directory names and their contained (resp. intended)
+   *          file format version.
    */
-  static QList<Version> getFileFormatVersionsOfWorkspace(
-      const FilePath& path) noexcept;
+  static QMap<QString, Version> findDataDirectories(const FilePath& wsRoot);
 
   /**
-   * @brief getHighestFileFormatVersionOfWorkspace
-   * @param path
-   * @return
+   * @brief Decide which data directory to open, and how to do it
+   *
+   * @param dataDirs    All available data directories, as returned by
+   *                    #findDataDirectories().
+   * @param copyFromDir If the file format of the data directory needs to be
+   *                    upgraded, the source directory of the copy operation
+   *                    will be written out here.
+   * @param copyToDir   If the file format of the data directory needs to be
+   *                    upgraded, the destination directory of the copy
+   *                    operation will be written out here.
+   *
+   * @return Name of the data directory to open or create.
    */
-  static tl::optional<Version> getHighestFileFormatVersionOfWorkspace(
-      const FilePath& path) noexcept;
+  static QString determineDataDirectory(const QMap<QString, Version>& dataDirs,
+                                        QString& copyFromDir,
+                                        QString& copyToDir) noexcept;
 
   /**
    * @brief Create a new workspace
@@ -215,12 +233,12 @@ private:  // Data
   FilePath mProjectsPath;
 
   /// the subdirectory of the current file format version
-  FilePath mMetadataPath;
+  FilePath mDataPath;
 
-  /// the directory "v#/libraries"
+  /// the directory "data/libraries"
   FilePath mLibrariesPath;
 
-  /// to lock the version directory (#mMetadataPath)
+  /// to lock the version directory (#mDataPath)
   std::shared_ptr<TransactionalFileSystem> mFileSystem;
 
   /// the WorkspaceSettings object

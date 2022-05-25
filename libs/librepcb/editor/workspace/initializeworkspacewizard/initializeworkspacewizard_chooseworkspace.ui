@@ -10,9 +10,6 @@
     <height>252</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>WizardPage</string>
-  </property>
   <property name="title">
    <string>Select Workspace Path</string>
   </property>
@@ -29,7 +26,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>&lt;p&gt;LibrePCB stores settings, libraries and projects in a directory called &lt;i&gt;workspace&lt;/i&gt;.&lt;/p&gt;
+      <string>&lt;p&gt;LibrePCB stores settings, libraries and (optionally) projects in a directory called &lt;i&gt;workspace&lt;/i&gt;.&lt;/p&gt;
 &lt;p&gt;Workspaces are platform independent, so they can be used across different operating systems.&lt;/p&gt;</string>
      </property>
      <property name="wordWrap">
@@ -67,6 +64,12 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnBrowse">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string notr="true">...</string>
        </property>
@@ -76,11 +79,6 @@
    </item>
    <item>
     <widget class="QLabel" name="lblStatus">
-     <property name="font">
-      <font>
-       <italic>true</italic>
-      </font>
-     </property>
      <property name="text">
       <string notr="true"/>
      </property>

@@ -29,16 +29,10 @@
 
 #include <QtCore>
 
-#include <memory>
-#include <optional.hpp>
-
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class AsyncCopyOperation;
-
 namespace editor {
 
 /*******************************************************************************
@@ -53,46 +47,38 @@ class InitializeWorkspaceWizardContext final : public QObject {
 
 public:
   // Types
-
   enum PageId {
     ID_None = -1,  ///< last page
     ID_Welcome,
     ID_ChooseWorkspace,
-    ID_ChooseImportVersion,
-    ID_FinalizeImport,
+    ID_Upgrade,
     ID_ChooseSettings,
   };
 
   // Constructors / Destructor
-  InitializeWorkspaceWizardContext() = delete;
   InitializeWorkspaceWizardContext(
       const InitializeWorkspaceWizardContext& other) = delete;
-  InitializeWorkspaceWizardContext(const FilePath& ws,
-                                   QObject* parent = nullptr) noexcept;
+  explicit InitializeWorkspaceWizardContext(QObject* parent = nullptr) noexcept;
   ~InitializeWorkspaceWizardContext() noexcept;
 
   // Getters
   const FilePath& getWorkspacePath() const noexcept { return mWorkspacePath; }
-  bool getCreateWorkspace() const noexcept { return mCreateWorkspace; }
-  const QList<Version>& getFileFormatVersions() const noexcept {
-    return mFileFormatVersions;
+  bool isWorkspacePathValid() const noexcept { return mWorkspacePathValid; }
+  bool getWorkspaceExists() const noexcept { return mWorkspaceExists; }
+  const QString& getDataDir() const noexcept { return mDataDir; }
+  const std::pair<QString, QString>& getUpgradeCopyDirs() const noexcept {
+    return mUpgradeCopyDirs;
   }
-  const tl::optional<Version>& getVersionToImport() const noexcept {
-    return mVersionToImport;
+  bool getNeedsInitialization() const noexcept {
+    return !mDataDirs.contains(mDataDir);
   }
-  const QString& getAppLocale() const noexcept { return mAppLocale; }
-  const LengthUnit& getLengthUnit() const noexcept { return mLengthUnit; }
-  const QStringList& getLibraryNormOrder() const noexcept {
-    return mLibraryNormOrder;
+  bool getNeedsUpgrade() const noexcept {
+    return !mUpgradeCopyDirs.first.isEmpty();
   }
-  const QString& getUserName() const noexcept { return mUserName; }
+  bool getWorkspaceContainsNewerFileFormats() const noexcept;
 
   // Setters
-  void setWorkspacePath(const FilePath& fp) noexcept;
-  void setCreateWorkspace(bool create) noexcept { mCreateWorkspace = create; }
-  void setVersionToImport(const tl::optional<Version>& version) noexcept {
-    mVersionToImport = version;
-  }
+  void setWorkspacePath(const FilePath& fp);
   void setAppLocale(const QString& locale) noexcept { mAppLocale = locale; }
   void setLengthUnit(const LengthUnit& unit) noexcept { mLengthUnit = unit; }
   void setLibraryNormOrder(const QStringList& order) noexcept {
@@ -101,22 +87,21 @@ public:
   void setUserName(const QString& name) noexcept { mUserName = name; }
 
   // General Methods
-  std::unique_ptr<AsyncCopyOperation> createImportCopyOperation() const
-      noexcept;
   void initializeEmptyWorkspace() const;
 
   // Operator Overloadings
   InitializeWorkspaceWizardContext& operator=(
       const InitializeWorkspaceWizardContext& rhs) = delete;
 
-signals:
-  void workspacePathChanged();
-
 private:  // Data
   FilePath mWorkspacePath;
-  bool mCreateWorkspace;
-  QList<Version> mFileFormatVersions;
-  tl::optional<Version> mVersionToImport;
+  bool mWorkspacePathValid;
+  bool mWorkspaceExists;
+  QMap<QString, Version> mDataDirs;
+  QString mDataDir;
+  std::pair<QString, QString> mUpgradeCopyDirs;
+
+  // Settings.
   QString mAppLocale;
   LengthUnit mLengthUnit;
   QStringList mLibraryNormOrder;

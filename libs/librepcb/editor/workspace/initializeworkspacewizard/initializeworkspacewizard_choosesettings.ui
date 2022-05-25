@@ -10,11 +10,8 @@
     <height>186</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Choose settings</string>
-  </property>
   <property name="title">
-   <string>Choose workspace settings</string>
+   <string>Choose Settings</string>
   </property>
   <property name="subTitle">
    <string>Set the most important workspace settings.</string>
@@ -84,6 +81,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cbxAppLanguage</tabstop>
+  <tabstop>cbxLibraryNorm</tabstop>
+  <tabstop>cbxLengthUnit</tabstop>
+  <tabstop>edtUserName</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

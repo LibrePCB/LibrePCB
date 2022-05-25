@@ -25,9 +25,7 @@
 #include "../../dialogs/filedialog.h"
 #include "ui_initializeworkspacewizard_chooseworkspace.h"
 
-#include <librepcb/core/application.h>
 #include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/workspace/workspace.h>
 
 /*******************************************************************************
  *  Namespace
@@ -46,7 +44,8 @@ InitializeWorkspaceWizard_ChooseWorkspace::
     mContext(context),
     mUi(new Ui::InitializeWorkspaceWizard_ChooseWorkspace) {
   mUi->setupUi(this);
-  mUi->btnBrowse->setFixedSize(mUi->edtPath->height(), mUi->edtPath->height());
+  connect(mUi->edtPath, &QLineEdit::textChanged, this,
+          &InitializeWorkspaceWizard_ChooseWorkspace::updateWorkspacePath);
   connect(mUi->btnBrowse, &QPushButton::clicked, this, [this]() {
     QString filepath = FileDialog::getExistingDirectory(
         this, tr("Select Workspace Directory"));
@@ -54,13 +53,18 @@ InitializeWorkspaceWizard_ChooseWorkspace::
       mUi->edtPath->setText(filepath);
     }
   });
-  connect(mUi->edtPath, &QLineEdit::textChanged, this,
-          &InitializeWorkspaceWizard_ChooseWorkspace::completeChanged);
-  connect(&mContext, &InitializeWorkspaceWizardContext::workspacePathChanged,
-          this, [this]() {
-            setFinalPage(true);
-            setFinalPage(false);
-          });
+}
+
+InitializeWorkspaceWizard_ChooseWorkspace::
+    ~InitializeWorkspaceWizard_ChooseWorkspace() noexcept {
+}
+
+/*******************************************************************************
+ *  Inherited Methods
+ ******************************************************************************/
+
+void InitializeWorkspaceWizard_ChooseWorkspace::initializePage() noexcept {
+  mUi->btnBrowse->setFixedWidth(mUi->btnBrowse->height());
 
   // By default, the suggested workspace path is a subdirectory within the
   // user's home folder. However, depending on the deployment method, the
@@ -72,57 +76,66 @@ InitializeWorkspaceWizard_ChooseWorkspace::
   if (!defaultWsPath.isValid()) {
     defaultWsPath = FilePath(QDir::homePath()).getPathTo("LibrePCB-Workspace");
   }
-  if (!mContext.getWorkspacePath().isValid()) {
-    mUi->edtPath->setText(defaultWsPath.toNative());
+
+  FilePath fp = mContext.getWorkspacePath();
+  if (!fp.isValid()) {
+    fp = defaultWsPath;
   }
+  mUi->edtPath->setText(fp.toNative());
+  mUi->edtPath->selectAll();
+  mUi->edtPath->setFocus();
 }
-
-InitializeWorkspaceWizard_ChooseWorkspace::
-    ~InitializeWorkspaceWizard_ChooseWorkspace() noexcept {
-}
-
-/*******************************************************************************
- *  Inherited Methods
- ******************************************************************************/
 
 bool InitializeWorkspaceWizard_ChooseWorkspace::isComplete() const noexcept {
-  FilePath path(mUi->edtPath->text());
-  mContext.setWorkspacePath(path);
-
-  bool complete = false;
-  QString message;
-  if (!path.isValid()) {
-    message = tr("Please select a directory.");
-  } else if (Workspace::isValidWorkspacePath(path)) {
-    message = tr("Directory contains a valid workspace.");
-    mContext.setCreateWorkspace(false);
-    complete = true;
-  } else if (((!path.isExistingDir()) && (!path.isExistingFile())) ||
-             path.isEmptyDir()) {
-    message = tr("New, empty workspace will be created.");
-    mContext.setCreateWorkspace(true);
-    complete = true;
-  } else {
-    message = tr("Directory is not empty!");
-  }
-
-  if (complete) {
-    mUi->lblStatus->setText("<font color=\"green\">✔ " % message % "</font>");
-  } else {
-    mUi->lblStatus->setText("<font color=\"red\">✖ " % message % "</font>");
-  }
-
-  return complete;
+  return mContext.isWorkspacePathValid();
 }
 
 int InitializeWorkspaceWizard_ChooseWorkspace::nextId() const noexcept {
-  if (mContext.getFileFormatVersions().contains(qApp->getFileFormatVersion())) {
-    return InitializeWorkspaceWizardContext::ID_None;
-  } else if (mContext.getFileFormatVersions().count() > 0) {
-    return InitializeWorkspaceWizardContext::ID_ChooseImportVersion;
-  } else {
+  if (mContext.getNeedsUpgrade()) {
+    return InitializeWorkspaceWizardContext::ID_Upgrade;
+  } else if (mContext.getNeedsInitialization()) {
     return InitializeWorkspaceWizardContext::ID_ChooseSettings;
+  } else {
+    return InitializeWorkspaceWizardContext::ID_None;
   }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void InitializeWorkspaceWizard_ChooseWorkspace::updateWorkspacePath() noexcept {
+  QString message;
+
+  try {
+    FilePath path(mUi->edtPath->text());
+    mContext.setWorkspacePath(path);  // can throw
+    if (!path.isValid()) {
+      message = tr("Please select a directory.");
+    } else if (mContext.getWorkspaceExists()) {
+      message = tr("Directory contains a valid workspace.");
+    } else if (mContext.isWorkspacePathValid()) {
+      message = tr("New workspace will be created.");
+    } else {
+      message = tr("Directory is not empty!");
+    }
+  } catch (const Exception& e) {
+    message = e.getMsg();
+  }
+
+  if (mContext.getWorkspaceExists()) {
+    mUi->lblStatus->setText("<font color=\"green\">✔ " % message % "</font>");
+  } else if (mContext.isWorkspacePathValid()) {
+    mUi->lblStatus->setText("<font color=\"blue\">➤ " % message % "</font>");
+  } else {
+    mUi->lblStatus->setText("<font color=\"red\">⚠ " % message % "</font>");
+  }
+
+  // Workaround to force nextId() to be reloaded.
+  setFinalPage(true);
+  setFinalPage(false);
+
+  emit completeChanged();
 }
 
 /*******************************************************************************

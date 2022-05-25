@@ -57,12 +57,16 @@ public:
   ~InitializeWorkspaceWizard_ChooseWorkspace() noexcept;
 
   // Inherited Methods
+  void initializePage() noexcept override;
   bool isComplete() const noexcept override;
   int nextId() const noexcept override;
 
   // Operator Overloadings
   InitializeWorkspaceWizard_ChooseWorkspace& operator=(
       const InitializeWorkspaceWizard_ChooseWorkspace& rhs) = delete;
+
+private:  // Methods
+  void updateWorkspacePath() noexcept;
 
 private:  // Data
   InitializeWorkspaceWizardContext& mContext;

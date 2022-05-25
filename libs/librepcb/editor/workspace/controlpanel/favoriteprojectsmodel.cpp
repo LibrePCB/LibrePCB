@@ -42,7 +42,7 @@ FavoriteProjectsModel::FavoriteProjectsModel(
     const Workspace& workspace) noexcept
   : QAbstractListModel(nullptr), mWorkspace(workspace) {
   try {
-    mFilePath = mWorkspace.getMetadataPath().getPathTo("favorite_projects.lp");
+    mFilePath = mWorkspace.getDataPath().getPathTo("favorite_projects.lp");
     if (mFilePath.isExistingFile()) {
       SExpression root =
           SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);

@@ -71,7 +71,7 @@ public:
   // Constructors / Destructor
   ControlPanel() = delete;
   ControlPanel(const ControlPanel& other) = delete;
-  explicit ControlPanel(Workspace& workspace);
+  explicit ControlPanel(Workspace& workspace, bool fileFormatIsOutdated);
   ~ControlPanel();
 
   // Operator Overloadings

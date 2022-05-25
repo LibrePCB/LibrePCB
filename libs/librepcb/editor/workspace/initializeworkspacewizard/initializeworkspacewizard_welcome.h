@@ -56,6 +56,9 @@ public:
       const InitializeWorkspaceWizard_Welcome& other) = delete;
   ~InitializeWorkspaceWizard_Welcome() noexcept;
 
+  // Inherited from QWizardPage
+  int nextId() const noexcept override;
+
   // Operator Overloadings
   InitializeWorkspaceWizard_Welcome& operator=(
       const InitializeWorkspaceWizard_Welcome& rhs) = delete;
