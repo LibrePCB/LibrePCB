@@ -63,7 +63,7 @@ public:
   void updateBoardSide() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept { return QRectF(); }
+  QRectF boundingRect() const noexcept { return mBoundingRect; }
   QPainterPath shape() const noexcept;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0);
@@ -83,6 +83,7 @@ private:  // Data
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;
   QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mPolygonGraphicsItems;
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mHoleGraphicsItems;
+  QRectF mBoundingRect;
   QPainterPath mShape;
 
   // Slots
