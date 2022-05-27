@@ -101,9 +101,10 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol) noexcept
     mTextGraphicsItems.append(i);
   }
 
-  mBoundingRect = mShape.boundingRect();
   updateRotationAndMirror();
   updateAllTexts();
+
+  mBoundingRect = childrenBoundingRect();
 }
 
 SGI_Symbol::~SGI_Symbol() noexcept {
