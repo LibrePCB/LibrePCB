@@ -20,12 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "initializeworkspacewizard_chooseimportversion.h"
+#include "initializeworkspacewizard_welcome.h"
 
-#include "librepcb/core/workspace/workspace.h"
-#include "ui_initializeworkspacewizard_chooseimportversion.h"
-
-#include <librepcb/core/application.h>
+#include "ui_initializeworkspacewizard_welcome.h"
 
 /*******************************************************************************
  *  Namespace
@@ -37,46 +34,24 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-InitializeWorkspaceWizard_ChooseImportVersion::
-    InitializeWorkspaceWizard_ChooseImportVersion(
-        InitializeWorkspaceWizardContext& context, QWidget* parent) noexcept
+InitializeWorkspaceWizard_Welcome::InitializeWorkspaceWizard_Welcome(
+    InitializeWorkspaceWizardContext& context, QWidget* parent) noexcept
   : QWizardPage(parent),
     mContext(context),
-    mUi(new Ui::InitializeWorkspaceWizard_ChooseImportVersion) {
+    mUi(new Ui::InitializeWorkspaceWizard_Welcome) {
   mUi->setupUi(this);
-
-  mUi->cbxVersions->addItem(tr("Do not import any data"));
-  foreach (const Version& version,
-           Workspace::getFileFormatVersionsOfWorkspace(
-               mContext.getWorkspacePath())) {
-    if (version < qApp->getFileFormatVersion()) {
-      mUi->cbxVersions->addItem("LibrePCB " % version.toStr() % ".x",
-                                version.toStr());
-    }
-  }
-  mUi->cbxVersions->setCurrentIndex(mUi->cbxVersions->count() - 1);
 }
 
-InitializeWorkspaceWizard_ChooseImportVersion::
-    ~InitializeWorkspaceWizard_ChooseImportVersion() noexcept {
+InitializeWorkspaceWizard_Welcome::
+    ~InitializeWorkspaceWizard_Welcome() noexcept {
 }
 
 /*******************************************************************************
  *  Public Methods
  ******************************************************************************/
 
-bool InitializeWorkspaceWizard_ChooseImportVersion::validatePage() noexcept {
-  mContext.setVersionToImport(
-      Version::tryFromString(mUi->cbxVersions->currentData().toString()));
-  return true;
-}
-
-int InitializeWorkspaceWizard_ChooseImportVersion::nextId() const noexcept {
-  if (mContext.getVersionToImport()) {
-    return InitializeWorkspaceWizardContext::ID_FinalizeImport;
-  } else {
-    return InitializeWorkspaceWizardContext::ID_ChooseSettings;
-  }
+int InitializeWorkspaceWizard_Welcome::nextId() const noexcept {
+  return InitializeWorkspaceWizardContext::PageId::ID_ChooseWorkspace;
 }
 
 /*******************************************************************************

@@ -17,12 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_FIRSTRUNWIZARDPAGE_WELCOME_H
-#define LIBREPCB_EDITOR_FIRSTRUNWIZARDPAGE_WELCOME_H
+#ifndef LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_WELCOME_H
+#define LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_WELCOME_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "initializeworkspacewizardcontext.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -33,30 +35,37 @@ namespace librepcb {
 namespace editor {
 
 namespace Ui {
-class FirstRunWizardPage_Welcome;
+class InitializeWorkspaceWizard_Welcome;
 }
 
 /*******************************************************************************
- *  Class FirstRunWizardPage_Welcome
+ *  Class InitializeWorkspaceWizard_Welcome
  ******************************************************************************/
 
 /**
- * @brief The FirstRunWizardPage_Welcome class
+ * @brief The InitializeWorkspaceWizard_Welcome class
  */
-class FirstRunWizardPage_Welcome final : public QWizardPage {
+class InitializeWorkspaceWizard_Welcome final : public QWizardPage {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit FirstRunWizardPage_Welcome(QWidget* parent = 0) noexcept;
-  ~FirstRunWizardPage_Welcome() noexcept;
+  explicit InitializeWorkspaceWizard_Welcome(
+      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+  InitializeWorkspaceWizard_Welcome(
+      const InitializeWorkspaceWizard_Welcome& other) = delete;
+  ~InitializeWorkspaceWizard_Welcome() noexcept;
+
+  // Inherited from QWizardPage
+  int nextId() const noexcept override;
+
+  // Operator Overloadings
+  InitializeWorkspaceWizard_Welcome& operator=(
+      const InitializeWorkspaceWizard_Welcome& rhs) = delete;
 
 private:
-  // Private Methods
-  Q_DISABLE_COPY(FirstRunWizardPage_Welcome)
-
-  // Private Membervariables
-  QScopedPointer<Ui::FirstRunWizardPage_Welcome> mUi;
+  InitializeWorkspaceWizardContext& mContext;
+  QScopedPointer<Ui::InitializeWorkspaceWizard_Welcome> mUi;
 };
 
 /*******************************************************************************

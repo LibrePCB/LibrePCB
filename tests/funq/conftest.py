@@ -7,6 +7,7 @@ import platform
 import shutil
 import pytest
 import funq
+from copy import deepcopy
 from funq.client import ApplicationContext, ApplicationConfig
 from funq.errors import FunqError
 
@@ -60,6 +61,20 @@ class LibrePcbFixture(object):
         self.workspace_path = os.path.join(self.tmpdir, 'Empty Workspace')
         self.project_path = None
 
+        # Set environment variables
+        self.env = deepcopy(os.environ)
+        # Make GUI independent from the system's language
+        self.env['LC_ALL'] = 'C'
+        # Override configuration location to make tests independent of existing configs
+        self.env['LIBREPCB_CONFIG_DIR'] = os.path.join(self.tmpdir, 'config')
+        # Use a neutral username
+        self.env['USERNAME'] = 'testuser'
+        # Force LibrePCB to use Qt-style file dialogs because native dialogs don't work
+        self.env['LIBREPCB_DISABLE_NATIVE_DIALOGS'] = '1'
+        # Disable warning about unstable file format, since tests are run also
+        # on the (unstable) master branch
+        self.env['LIBREPCB_DISABLE_UNSTABLE_WARNING'] = '1'
+
     def abspath(self, relpath):
         return os.path.join(self.tmpdir, relpath)
 
@@ -86,7 +101,7 @@ class LibrePcbFixture(object):
         self.project_path = path
 
     def get_workspace_libraries_path(self, subdir=''):
-        return os.path.join(self.workspace_path, 'v0.2', 'libraries', subdir)
+        return os.path.join(self.workspace_path, 'data', 'libraries', subdir)
 
     def add_local_library_to_workspace(self, path):
         if not os.path.isabs(path):
@@ -97,7 +112,7 @@ class LibrePcbFixture(object):
 
     def open(self):
         self._create_application_config_file()
-        return Application(self.executable, env=self._env(), args=self._args())
+        return Application(self.executable, env=self.env, args=self._args())
 
     def _create_application_config_file(self):
         org_dir = 'LibrePCB.org' if platform.system() == 'Darwin' else 'LibrePCB'
@@ -118,21 +133,6 @@ class LibrePcbFixture(object):
         if self.project_path:
             args.append(self.project_path)
         return args
-
-    def _env(self):
-        env = os.environ
-        # Make GUI independent from the system's language
-        env['LC_ALL'] = 'C'
-        # Override configuration location to make tests independent of existing configs
-        env['LIBREPCB_CONFIG_DIR'] = os.path.join(self.tmpdir, 'config')
-        # Use a neutral username
-        env['USERNAME'] = 'testuser'
-        # Force LibrePCB to use Qt-style file dialogs because native dialogs don't work
-        env['LIBREPCB_DISABLE_NATIVE_DIALOGS'] = '1'
-        # Disable warning about unstable file format, since tests are run also
-        # on the (unstable) master branch
-        env['LIBREPCB_DISABLE_UNSTABLE_WARNING'] = '1'
-        return env
 
 
 class Helpers(object):

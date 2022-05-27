@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
-#include "../fileio/filepath.h"
 #include "../types/lengthunit.h"
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
@@ -71,11 +70,17 @@ public:
   };
 
   // Constructors / Destructor
-  WorkspaceSettings() = delete;
   WorkspaceSettings(const WorkspaceSettings& other) = delete;
-  explicit WorkspaceSettings(const FilePath& fp, const Version& fileFormat,
-                             QObject* parent = nullptr);
+  explicit WorkspaceSettings(QObject* parent = nullptr);
   ~WorkspaceSettings() noexcept;
+
+  /**
+   * @brief Load settings from file
+   *
+   * @param node        S-Expression node of settings file.
+   * @param fileFormat  File format of settings file.
+   */
+  void load(const SExpression& node, const Version& fileFormat);
 
   /**
    * @brief Reset all settings to their default value
@@ -83,14 +88,11 @@ public:
   void restoreDefaults() noexcept;
 
   /**
-   * @brief Save all settings to a QByteArray
+   * @brief Serialize settings to ::librepcb::SExpression
+   *
+   * @return ::librepcb::SExpression node containing all settings.
    */
-  QByteArray saveToByteArray();
-
-  /**
-   * @brief Save all settings to the file
-   */
-  void saveToFile();
+  SExpression serialize();
 
   // Operator Overloadings
   WorkspaceSettings& operator=(const WorkspaceSettings& rhs) = delete;
@@ -105,12 +107,7 @@ private:  // Methods
 
 private:  // Data
   /**
-   * @brief Path to the "settings.lp" file
-   */
-  FilePath mFilePath;
-
-  /**
-   * @brief Settings nodes contained in the file #mFilePath
+   * @brief Settings nodes loaded by #load()
    *
    * This map is filled with all settings S-Expression nodes when loading the
    * settings from file. When modifying settings with the workspace settings

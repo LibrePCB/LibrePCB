@@ -43,7 +43,7 @@ protected:
   FilePath mWsDir;
   FilePath mVersionFile;
   FilePath mProjectsPath;
-  FilePath mMetadataPath;
+  FilePath mDataPath;
   FilePath mLibrariesPath;
 
   WorkspaceTest() {
@@ -51,9 +51,8 @@ protected:
     mWsDir = FilePath::getRandomTempPath().getPathTo("test workspace dir");
     mVersionFile = mWsDir.getPathTo(".librepcb-workspace");
     mProjectsPath = mWsDir.getPathTo("projects");
-    mMetadataPath =
-        mWsDir.getPathTo("v" % qApp->getFileFormatVersion().toStr());
-    mLibrariesPath = mMetadataPath.getPathTo("libraries");
+    mDataPath = mWsDir.getPathTo("data");
+    mLibrariesPath = mDataPath.getPathTo("libraries");
   }
 
   virtual ~WorkspaceTest() {
@@ -75,19 +74,19 @@ TEST_F(WorkspaceTest, testCreateOpenClose) {
 
   // open/close workspace
   {
-    Workspace ws(mWsDir);
+    Workspace ws(mWsDir, "data");
     EXPECT_EQ(mWsDir, ws.getPath());
     EXPECT_EQ(mProjectsPath, ws.getProjectsPath());
-    EXPECT_EQ(mMetadataPath, ws.getMetadataPath());
+    EXPECT_EQ(mDataPath, ws.getDataPath());
     EXPECT_EQ(mLibrariesPath, ws.getLibrariesPath());
   }
 
   // open/close workspace again
-  { Workspace ws(mWsDir); }
+  { Workspace ws(mWsDir, "data"); }
 }
 
 TEST_F(WorkspaceTest, testOpenNonExistingWorkspace) {
-  EXPECT_THROW(Workspace ws(mWsDir), Exception);
+  EXPECT_THROW(Workspace ws(mWsDir, "data"), Exception);
 }
 
 TEST_F(WorkspaceTest, testOpenIncompatibleWorkspaceVersion) {
@@ -98,39 +97,193 @@ TEST_F(WorkspaceTest, testOpenIncompatibleWorkspaceVersion) {
   versionFile.setVersion(
       Version::fromString("0.0.1"));  // version 0.0.1 will never exist
   FileUtils::writeFile(mVersionFile, versionFile.toByteArray());
-  EXPECT_THROW(Workspace ws(mWsDir), Exception);
+  EXPECT_THROW(Workspace ws(mWsDir, "data"), Exception);
 }
 
 TEST_F(WorkspaceTest, testIfOpeningWorkspaceMultipleTimesFails) {
   Workspace::createNewWorkspace(mWsDir);
-  Workspace w1s(mWsDir);
-  EXPECT_THROW(Workspace ws2(mWsDir), Exception);
+  Workspace w1s(mWsDir, "data");
+  EXPECT_THROW(Workspace ws2(mWsDir, "data"), Exception);
 }
 
-TEST_F(WorkspaceTest, testIsValidWorkspacePath) {
-  EXPECT_FALSE(Workspace::isValidWorkspacePath(mWsDir));
+TEST_F(WorkspaceTest, testCheckCOmpatibility) {
+  {
+    QString errorMsg;
+    EXPECT_FALSE(Workspace::checkCompatibility(mWsDir));
+    EXPECT_FALSE(Workspace::checkCompatibility(mWsDir, &errorMsg));
+    EXPECT_FALSE(errorMsg.isEmpty());
+  }
   Workspace::createNewWorkspace(mWsDir);
-  EXPECT_TRUE(Workspace::isValidWorkspacePath(mWsDir));
+  {
+    QString errorMsg;
+    EXPECT_TRUE(Workspace::checkCompatibility(mWsDir));
+    EXPECT_TRUE(Workspace::checkCompatibility(mWsDir, &errorMsg));
+    EXPECT_TRUE(errorMsg.isEmpty());
+  }
 }
 
-TEST_F(WorkspaceTest, testGetFileFormatVersionsOfWorkspace) {
-  EXPECT_TRUE(Workspace::getFileFormatVersionsOfWorkspace(mWsDir).isEmpty());
+TEST_F(WorkspaceTest, testFindDataDirectories) {
+  EXPECT_TRUE(Workspace::findDataDirectories(mWsDir).isEmpty());
   Workspace::createNewWorkspace(mWsDir);
-  EXPECT_TRUE(Workspace::getFileFormatVersionsOfWorkspace(mWsDir).isEmpty());
-  Workspace ws(mWsDir);
-  EXPECT_EQ(QList<Version>{qApp->getFileFormatVersion()},
-            Workspace::getFileFormatVersionsOfWorkspace(mWsDir));
+  EXPECT_TRUE(Workspace::findDataDirectories(mWsDir).isEmpty());
+  { Workspace ws(mWsDir, "data"); }
+  EXPECT_EQ((QMap<QString, Version>{{"data", qApp->getFileFormatVersion()}}),
+            Workspace::findDataDirectories(mWsDir));
+  { Workspace ws(mWsDir, "v0.1"); }
+  EXPECT_EQ((QMap<QString, Version>{{"data", qApp->getFileFormatVersion()},
+                                    {"v0.1", Version::fromString("0.1")}}),
+            Workspace::findDataDirectories(mWsDir));
 }
 
-TEST_F(WorkspaceTest, testGetHighestFileFormatVersionOfWorkspace) {
-  EXPECT_FALSE(
-      Workspace::getHighestFileFormatVersionOfWorkspace(mWsDir).has_value());
-  Workspace::createNewWorkspace(mWsDir);
-  EXPECT_FALSE(
-      Workspace::getHighestFileFormatVersionOfWorkspace(mWsDir).has_value());
-  Workspace ws(mWsDir);
-  EXPECT_EQ(qApp->getFileFormatVersion(),
-            Workspace::getHighestFileFormatVersionOfWorkspace(mWsDir));
+TEST_F(WorkspaceTest, testDetermineDataDirectoryEmpty) {
+  QMap<QString, Version> dataDirs;
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ("data", dataDir.toStdString());
+  EXPECT_EQ("", copyFromDir.toStdString());
+  EXPECT_EQ("", copyToDir.toStdString());
+}
+
+TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyOlderVersion) {
+  QMap<QString, Version> dataDirs = {
+      {"v0.0.1", Version::fromString("0.0.1")},
+  };
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ("data", dataDir.toStdString());
+  EXPECT_EQ("v0.0.1", copyFromDir.toStdString());
+  EXPECT_EQ("data", copyToDir.toStdString());
+}
+
+TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyCurrentVersion) {
+  QString versionedDirName = "v" % qApp->getFileFormatVersion().toStr();
+  QMap<QString, Version> dataDirs = {
+      {versionedDirName, qApp->getFileFormatVersion()},
+  };
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ(versionedDirName.toStdString(), dataDir.toStdString());
+  EXPECT_EQ("", copyFromDir.toStdString());
+  EXPECT_EQ("", copyToDir.toStdString());
+}
+
+TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyNewerVersion) {
+  QMap<QString, Version> dataDirs = {
+      {"v999", Version::fromString("999")},
+  };
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ("data", dataDir.toStdString());
+  EXPECT_EQ("", copyFromDir.toStdString());
+  EXPECT_EQ("", copyToDir.toStdString());
+}
+
+TEST_F(WorkspaceTest, testDetermineDataDirectoryOlderAndNewerVersions) {
+  QMap<QString, Version> dataDirs = {
+      {"v0.0.1", Version::fromString("0.0.1")},
+      {"v0.0.2", Version::fromString("0.0.2")},
+      {"v999", Version::fromString("999")},
+  };
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ("data", dataDir.toStdString());
+  EXPECT_EQ("v0.0.2", copyFromDir.toStdString());
+  EXPECT_EQ("data", copyToDir.toStdString());
+}
+
+TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyOlderVersionInData) {
+  QMap<QString, Version> dataDirs = {
+      {"data", Version::fromString("0.0.1")},
+  };
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ("data", dataDir.toStdString());
+  EXPECT_EQ("data", copyFromDir.toStdString());
+  EXPECT_EQ("v0.0.1", copyToDir.toStdString());
+}
+
+TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyCurrentVersionInData) {
+  QMap<QString, Version> dataDirs = {
+      {"data", qApp->getFileFormatVersion()},
+  };
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ("data", dataDir.toStdString());
+  EXPECT_EQ("", copyFromDir.toStdString());
+  EXPECT_EQ("", copyToDir.toStdString());
+}
+
+TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyNewerVersionInData) {
+  QString versionedDirName = "v" % qApp->getFileFormatVersion().toStr();
+  QMap<QString, Version> dataDirs = {
+      {"data", Version::fromString("999")},
+  };
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ(versionedDirName.toStdString(), dataDir.toStdString());
+  EXPECT_EQ("", copyFromDir.toStdString());
+  EXPECT_EQ("", copyToDir.toStdString());
+}
+
+TEST_F(WorkspaceTest, testDetermineDataDirectoryOlderVersionInDataWithBackups) {
+  QMap<QString, Version> dataDirs = {
+      {"v0.0.1", Version::fromString("0.0.1")},
+      {"v0.0.2", Version::fromString("0.0.2")},
+      {"data", Version::fromString("0.0.3")},
+  };
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ("data", dataDir.toStdString());
+  EXPECT_EQ("data", copyFromDir.toStdString());
+  EXPECT_EQ("v0.0.3", copyToDir.toStdString());
+}
+
+TEST_F(WorkspaceTest,
+       testDetermineDataDirectoryCurrentVersionInDataWithBackups) {
+  QMap<QString, Version> dataDirs = {
+      {"v0.0.1", Version::fromString("0.0.1")},
+      {"v0.0.2", Version::fromString("0.0.2")},
+      {"data", qApp->getFileFormatVersion()},
+  };
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ("data", dataDir.toStdString());
+  EXPECT_EQ("", copyFromDir.toStdString());
+  EXPECT_EQ("", copyToDir.toStdString());
+}
+
+TEST_F(WorkspaceTest, testDetermineDataDirectoryOlderVersionInDataAndBackup) {
+  QMap<QString, Version> dataDirs = {
+      {"v0.0.1", Version::fromString("0.0.1")},
+      {"data", Version::fromString("0.0.1")},
+  };
+  QString copyFromDir = "foo";
+  QString copyToDir = "foo";
+  QString dataDir =
+      Workspace::determineDataDirectory(dataDirs, copyFromDir, copyToDir);
+  EXPECT_EQ("data", dataDir.toStdString());
+  EXPECT_EQ("", copyFromDir.toStdString());
+  EXPECT_EQ("", copyToDir.toStdString());
 }
 
 /*******************************************************************************

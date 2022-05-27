@@ -33,6 +33,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Workspace;
 class WorkspaceSettings;
 
 namespace editor {
@@ -60,7 +61,7 @@ public:
   // Constructors / Destructor
   WorkspaceSettingsDialog() = delete;
   WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other) = delete;
-  explicit WorkspaceSettingsDialog(WorkspaceSettings& settings,
+  explicit WorkspaceSettingsDialog(Workspace& workspace,
                                    QWidget* parent = nullptr);
   ~WorkspaceSettingsDialog();
 
@@ -74,6 +75,7 @@ private:
   void saveSettings() noexcept;
 
 private:
+  Workspace& mWorkspace;  /// Reference to the Workspace object
   WorkspaceSettings& mSettings;  ///< Reference to the WorkspaceSettings object
   QScopedPointer<LibraryLocaleOrderModel> mLibLocaleOrderModel;
   QScopedPointer<LibraryNormOrderModel> mLibNormOrderModel;

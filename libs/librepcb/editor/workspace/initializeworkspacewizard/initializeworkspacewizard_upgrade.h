@@ -17,31 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_UPGRADE_H
+#define LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_UPGRADE_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "firstrunwizardpage_welcome.h"
+#include "initializeworkspacewizardcontext.h"
 
-#include "ui_firstrunwizardpage_welcome.h"
+#include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class AsyncCopyOperation;
+
 namespace editor {
 
+namespace Ui {
+class InitializeWorkspaceWizard_Upgrade;
+}
+
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class InitializeWorkspaceWizard_Upgrade
  ******************************************************************************/
 
-FirstRunWizardPage_Welcome::FirstRunWizardPage_Welcome(QWidget* parent) noexcept
-  : QWizardPage(parent), mUi(new Ui::FirstRunWizardPage_Welcome) {
-  mUi->setupUi(this);
-  setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
-}
+/**
+ * @brief The InitializeWorkspaceWizard_Upgrade class
+ */
+class InitializeWorkspaceWizard_Upgrade final : public QWizardPage {
+  Q_OBJECT
 
-FirstRunWizardPage_Welcome::~FirstRunWizardPage_Welcome() noexcept {
-}
+public:
+  // Constructors / Destructor
+  explicit InitializeWorkspaceWizard_Upgrade(
+      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+  InitializeWorkspaceWizard_Upgrade(
+      const InitializeWorkspaceWizard_Upgrade& other) = delete;
+  ~InitializeWorkspaceWizard_Upgrade() noexcept;
+
+  // Inherited from QWizardPage
+  void initializePage() noexcept override;
+  bool validatePage() noexcept override;
+  int nextId() const noexcept override;
+
+  // Operator Overloadings
+  InitializeWorkspaceWizard_Upgrade& operator=(
+      const InitializeWorkspaceWizard_Upgrade& rhs) = delete;
+
+private:
+  InitializeWorkspaceWizardContext& mContext;
+  QScopedPointer<Ui::InitializeWorkspaceWizard_Upgrade> mUi;
+  QScopedPointer<AsyncCopyOperation> mCopyOperation;
+};
 
 /*******************************************************************************
  *  End of File
@@ -49,3 +80,5 @@ FirstRunWizardPage_Welcome::~FirstRunWizardPage_Welcome() noexcept {
 
 }  // namespace editor
 }  // namespace librepcb
+
+#endif

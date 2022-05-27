@@ -28,7 +28,6 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
-#include <librepcb/editor/workspace/firstrunwizard/firstrunwizard.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
 #include <QtCore>
@@ -231,44 +230,25 @@ static bool isFileFormatStableOrAcceptUnstable() noexcept {
  ******************************************************************************/
 
 static int openWorkspace(FilePath& path) {
-  // If no valid workspace path is available, ask the user to choose it.
-  if (!path.isValid()) {
-    FirstRunWizard wizard;
-    if (wizard.exec() == QDialog::Accepted) {
-      path = wizard.getWorkspaceFilePath();
-      if (wizard.getCreateNewWorkspace()) {
-        Workspace::createNewWorkspace(path);  // can throw
-      }
-      Workspace::setMostRecentlyUsedWorkspacePath(path);
-    } else {
-      throw UserCanceled(__FILE__, __LINE__);
-    }
-  }
-
-  // If the selected directory is not a valid workspace, we need to abort here
-  // to avoid the InitializeWorkspaceWizard to silently/unintentielly creating
-  // new files within the specified directory.
-  if (!Workspace::isValidWorkspacePath(path)) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        Application::translate(
-            "Workspace", "This directory is not a valid LibrePCB workspace."));
-  }
-
-  // Migrate workspace to new major version, if needed. Note that this needs
-  // to be done *before* opening the workspace, otherwise the workspace would
-  // be default-initialized!
-  QList<Version> versions = Workspace::getFileFormatVersionsOfWorkspace(path);
-  if (!versions.contains(qApp->getFileFormatVersion())) {
-    InitializeWorkspaceWizard wizard(path);
+  InitializeWorkspaceWizard wizard(false);
+  wizard.setWorkspacePath(path);  // can throw
+  while (wizard.getNeedsToBeShown()) {
     if (wizard.exec() != QDialog::Accepted) {
       throw UserCanceled(__FILE__, __LINE__);
     }
+    Workspace::setMostRecentlyUsedWorkspacePath(wizard.getWorkspacePath());
+
+    // Just to be on the safe side that the workspace is now *really* ready
+    // to open (created, upgraded, initialized, ...), check the status again
+    // before continue opening the workspace.
+    wizard.setWorkspacePath(wizard.getWorkspacePath());  // can throw
+    wizard.restart();
   }
 
   // Open the workspace (can throw). If it is locked, a dialog will show
   // an error and possibly provides an option to override the lock.
-  Workspace ws(path, DirectoryLockHandlerDialog::createDirectoryLockCallback());
+  Workspace ws(wizard.getWorkspacePath(), wizard.getDataDir(),
+               DirectoryLockHandlerDialog::createDirectoryLockCallback());
 
   // Now since workspace settings are loaded, switch to the locale defined
   // there (until now, the system locale was used).
@@ -278,7 +258,8 @@ static int openWorkspace(FilePath& path) {
     qApp->setTranslationLocale(locale);
   }
 
-  ControlPanel p(ws);
+  // Open the control panel.
+  ControlPanel p(ws, wizard.getWorkspaceContainsNewerFileFormats());
   p.show();
 
   return appExec();
