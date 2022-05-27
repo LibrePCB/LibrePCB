@@ -96,6 +96,8 @@ BGI_Footprint::BGI_Footprint(BI_Footprint& footprint) noexcept
   }
 
   updateBoardSide();
+
+  mBoundingRect = childrenBoundingRect();
 }
 
 BGI_Footprint::~BGI_Footprint() noexcept {
