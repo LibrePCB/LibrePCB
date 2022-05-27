@@ -55,6 +55,21 @@ public:
   const FilePath& getSource() const noexcept { return mSource; }
   const FilePath& getDestination() const noexcept { return mDestination; }
 
+  // General Methods
+
+  /**
+   * @brief Abort a running copy operation
+   *
+   * If the copy operation was not finished yet, it is completely reverted,
+   * i.e. the destination will be deleted to revert to the state as before
+   * starting the copy operation.
+   *
+   * @note  This calls QThread::wait() so the calling thread blocks until the
+   *        operation is completely aborted. If no copy operation is running,
+   *        this method has no effect.
+   */
+  void abort() noexcept;
+
   // Operator Overloadings
   AsyncCopyOperation& operator=(const AsyncCopyOperation& rhs) = delete;
 
@@ -72,6 +87,7 @@ private:  // Methods
 private:  // Data
   FilePath mSource;
   FilePath mDestination;
+  volatile bool mAbort;
 };
 
 /*******************************************************************************

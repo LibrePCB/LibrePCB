@@ -26,6 +26,7 @@
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
 #include "../fileio/fileutils.h"
+#include "../fileio/transactionalfilesystem.h"
 #include "../fileio/versionfile.h"
 #include "../library/library.h"
 #include "../project/project.h"
@@ -45,89 +46,209 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Workspace::Workspace(const FilePath& wsPath,
+Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
                      DirectoryLock::LockHandlerCallback lockCallback)
   : QObject(nullptr),
     mPath(wsPath),
     mProjectsPath(mPath.getPathTo("projects")),
-    mMetadataPath(mPath.getPathTo("v" % qApp->getFileFormatVersion().toStr())),
-    mLibrariesPath(mMetadataPath.getPathTo("libraries")),
-    mLock(mMetadataPath) {
-  // check if the workspace is valid
-  if (!isValidWorkspacePath(mPath)) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("Invalid workspace path: \"%1\"").arg(mPath.toNative()));
-  }
-  FilePath versionFp = mPath.getPathTo(".librepcb-workspace");
-  QByteArray versionRaw(FileUtils::readFile(versionFp));  // can throw
-  VersionFile wsVersionFile =
-      VersionFile::fromByteArray(versionRaw);  // can throw
-  if (wsVersionFile.getVersion() != FILE_FORMAT_VERSION()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("The workspace version %1 is not compatible "
-                          "with this application version.")
-                           .arg(wsVersionFile.getVersion().toStr()));
+    mDataPath(mPath.getPathTo(dataDirName)),
+    mLibrariesPath(mDataPath.getPathTo("libraries")),
+    mFileSystem(),
+    mWorkspaceSettings(),
+    mLibraryDb() {
+  qDebug() << "Opening workspace data directory:" << mDataPath.toNative();
+
+  // Fail if the path is not a valid workspace directory.
+  QString errorMsg;
+  if (!checkCompatibility(mPath)) {
+    throw RuntimeError(__FILE__, __LINE__, errorMsg);
   }
 
-  // create directories which do not exist already
+  // Ensure that the projects directory exists since several features depend
+  // on it.
   FileUtils::makePath(mProjectsPath);  // can throw
-  FileUtils::makePath(mMetadataPath);  // can throw
+
+  // Access the data directory with TransactionalFileSystem to ensure a
+  // failsafe file access and forbid concurrent access by a lock.
+  mFileSystem = TransactionalFileSystem::openRW(
+      mDataPath, TransactionalFileSystem::RestoreMode::yes,
+      lockCallback);  // can throw
+
+  // Check file format of data directory.
+  QString versionFilePath = ".librepcb-data";
+  Version loadedFileFormat = Version::fromString("0.1");
+  if (mFileSystem->fileExists(versionFilePath)) {
+    QByteArray raw(mFileSystem->read(versionFilePath));  // can throw
+    VersionFile file = VersionFile::fromByteArray(raw);  // can throw
+    loadedFileFormat = file.getVersion();
+    if (loadedFileFormat > qApp->getFileFormatVersion()) {
+      throw LogicError(__FILE__, __LINE__,
+                       QString("Workspace data directory requires LibrePCB %1 "
+                               "or later to open..")
+                           .arg(loadedFileFormat.toStr()));
+    }
+  }
+
+  // Load workspace settings.
+  mWorkspaceSettings.reset(new WorkspaceSettings(this));
+  const QString settingsFilePath = "settings.lp";
+  if (mFileSystem->fileExists(settingsFilePath)) {
+    qDebug("Load workspace settings...");
+    SExpression root =
+        SExpression::parse(mFileSystem->read(settingsFilePath),
+                           mFileSystem->getAbsPath(settingsFilePath));
+    mWorkspaceSettings->load(root, loadedFileFormat);
+    qDebug("Workspace settings loaded.");
+  } else {
+    qInfo("Workspace settings file not found, default settings will be used.");
+  }
+
+  // Write files to disk if an upgrade is performed.
+  if (loadedFileFormat != qApp->getFileFormatVersion()) {
+    qInfo().nospace().noquote()
+        << "Workspace data is outdated, will upgrade files from v"
+        << loadedFileFormat.toStr() << ".";
+    QFile(mLibrariesPath.getPathTo("library_cache.sqlite").toStr()).remove();
+    QFile(mLibrariesPath.getPathTo("cache.sqlite").toStr()).remove();
+    QFile(mLibrariesPath.getPathTo("cache_v1.sqlite").toStr()).remove();
+    QFile(mLibrariesPath.getPathTo("cache_v2.sqlite").toStr()).remove();
+    mFileSystem->write(
+        versionFilePath,
+        VersionFile(qApp->getFileFormatVersion()).toByteArray());  // can throw
+    saveSettingsToTransactionalFileSystem();  // can throw
+    mFileSystem->save();  // can throw
+  }
+
+  // Load library database.
   FileUtils::makePath(mLibrariesPath);  // can throw
+  mLibraryDb.reset(new WorkspaceLibraryDb(mLibrariesPath));  // can throw
 
-  // the workspace can be opened by this application, so we will lock it
-  mLock.tryLock(lockCallback);  // can throw
-
-  // all OK, let's load the workspace stuff!
-
-  // load workspace settings
-  mWorkspaceSettings.reset(
-      new WorkspaceSettings(mMetadataPath.getPathTo("settings.lp"),
-                            qApp->getFileFormatVersion(), this));
-
-  // load library database
-  mLibraryDb.reset(new WorkspaceLibraryDb(getLibrariesPath()));  // can throw
+  // Done!
+  qDebug("Workspace successfully opened.");
 }
 
 Workspace::~Workspace() noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void Workspace::saveSettings() {
+  qDebug() << "Save workspace settings...";
+  saveSettingsToTransactionalFileSystem();  // can throw
+  mFileSystem->save();  // can throw
+}
+
+/*******************************************************************************
  *  Static Methods
  ******************************************************************************/
 
-bool Workspace::isValidWorkspacePath(const FilePath& path) noexcept {
-  return path.getPathTo(".librepcb-workspace").isExistingFile();
+bool Workspace::checkCompatibility(const FilePath& wsRoot, QString* error) {
+  // Check existence of version file.
+  const FilePath versionFp = wsRoot.getPathTo(".librepcb-workspace");
+  if (!versionFp.isExistingFile()) {
+    if (error) {
+      *error = tr("The directory \"%1\" is not a valid LibrePCB workspace.")
+                   .arg(wsRoot.toNative());
+    }
+    return false;
+  }
+
+  // Check workspace file format.
+  const QByteArray versionRaw(FileUtils::readFile(versionFp));  // can throw
+  const VersionFile versionFile =
+      VersionFile::fromByteArray(versionRaw);  // can throw
+  if (versionFile.getVersion() != FILE_FORMAT_VERSION()) {
+    if (error) {
+      *error = tr("The workspace \"%1\" requires LibrePCB %2 or later.")
+                   .arg(versionFile.getVersion().toStr());
+    }
+    return false;
+  }
+
+  return true;
 }
 
-QList<Version> Workspace::getFileFormatVersionsOfWorkspace(
-    const FilePath& path) noexcept {
-  QList<Version> list;
-  if (isValidWorkspacePath(path)) {
-    QDir dir(path.toStr());
-    QStringList subdirs = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
-    foreach (const QString& subdir, subdirs) {
-      if (subdir.startsWith('v')) {
-        tl::optional<Version> version =
-            Version::tryFromString(subdir.mid(1, -1));
-        if (version) {
-          list.append(*version);
-        }
+QMap<QString, Version> Workspace::findDataDirectories(const FilePath& wsRoot) {
+  QMap<QString, Version> result;
+  const QDir dir(wsRoot.toStr());
+  const QStringList dirs = dir.entryList(QDir::AllDirs | QDir::NoDotAndDotDot);
+  foreach (const QString& subdir, dirs) {
+    if (subdir == "data") {
+      const FilePath path = wsRoot.getPathTo(subdir);
+      const QString versionFile = ".librepcb-data";
+      std::shared_ptr<TransactionalFileSystem> fs =
+          TransactionalFileSystem::openRO(
+              path, TransactionalFileSystem::RestoreMode::yes);
+      if (fs->fileExists(versionFile)) {
+        result.insert(
+            subdir,
+            VersionFile::fromByteArray(fs->read(versionFile)).getVersion());
+      } else {
+        // File format 0.1 didn't have a version file.
+        result.insert(subdir, Version::fromString("0.1"));
+      }
+    } else if (subdir.startsWith('v')) {
+      if (tl::optional<Version> v = Version::tryFromString(subdir.mid(1, -1))) {
+        // IMPORTANT: Return the version number contained in the directory
+        // name, *NOT* the version number of the file format contained within
+        // that directory! The file format might be older, but the directory
+        // is allowed/intended to be silently upgraded up to the file format
+        // of the directory name.
+        result.insert(subdir, *v);
       }
     }
-    std::sort(list.begin(), list.end());
   }
-  return list;
+  return result;
 }
 
-tl::optional<Version> Workspace::getHighestFileFormatVersionOfWorkspace(
-    const FilePath& path) noexcept {
-  QList<Version> versions = getFileFormatVersionsOfWorkspace(path);
-  if (versions.count() > 0) {
-    return versions.last();
-  } else {
-    return tl::nullopt;
+QString Workspace::determineDataDirectory(
+    const QMap<QString, Version>& dataDirs, QString& copyFromDir,
+    QString& copyToDir) noexcept {
+  const Version fileFormat = qApp->getFileFormatVersion();
+  const QString versionedDirName = "v" % fileFormat.toStr();
+  const QString defaultDirName = "data";
+  copyFromDir = QString();
+  copyToDir = QString();
+
+  // If there's a specific data directory for the current file format, use it.
+  const auto versionedIt = dataDirs.find(versionedDirName);
+  if (versionedIt != dataDirs.end()) {
+    return versionedDirName;
   }
+
+  // If the default data directory file format can be loaded, use it.
+  const auto defaultIt = dataDirs.find(defaultDirName);
+  if ((defaultIt != dataDirs.end()) && (defaultIt.value() <= fileFormat)) {
+    // If the file format needs to be upgraded, a backup should be created.
+    // But only if it doesn't exist yet, otherwise we can just do the upgrade.
+    const QString backupDir = "v" % defaultIt->toStr();
+    if ((defaultIt.value() < fileFormat) && (!dataDirs.contains(backupDir))) {
+      copyFromDir = defaultDirName;
+      copyToDir = backupDir;
+    }
+    return defaultDirName;
+  }
+
+  // There's no data directory to open, so we have to create a new one.
+  // Note: Changed for 0.1 backport.
+  const QString dataDir = versionedDirName;
+
+  // If there are older file formats available, the latest one should be
+  // imported.
+  tl::optional<Version> versionToImport;
+  for (auto it = dataDirs.begin(); it != dataDirs.end(); it++) {
+    if ((it.key() != defaultDirName) && (it.value() < fileFormat) &&
+        ((!versionToImport) || (it.value() > (*versionToImport)))) {
+      copyFromDir = it.key();
+      versionToImport = it.value();
+    }
+  }
+  if (versionToImport) {
+    copyToDir = dataDir;
+  }
+  return dataDir;
 }
 
 void Workspace::createNewWorkspace(const FilePath& path) {
@@ -146,6 +267,16 @@ void Workspace::setMostRecentlyUsedWorkspacePath(
     const FilePath& path) noexcept {
   QSettings clientSettings;
   clientSettings.setValue("workspaces/most_recently_used", path.toNative());
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void Workspace::saveSettingsToTransactionalFileSystem() {
+  mFileSystem->write(
+      "settings.lp",
+      mWorkspaceSettings->serialize().toByteArray());  // can throw
 }
 
 /*******************************************************************************

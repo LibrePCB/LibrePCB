@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Initialize Workspace</string>
+   <string>LibrePCB Workspace Setup</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>:/img/logo/64x64.png</normaloff>:/img/logo/64x64.png</iconset>
   </property>
   <property name="wizardStyle">
    <enum>QWizard::ModernStyle</enum>

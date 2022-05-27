@@ -41,7 +41,7 @@ namespace editor {
 RecentProjectsModel::RecentProjectsModel(const Workspace& workspace) noexcept
   : QAbstractListModel(nullptr), mWorkspace(workspace) {
   try {
-    mFilePath = mWorkspace.getMetadataPath().getPathTo("recent_projects.lp");
+    mFilePath = mWorkspace.getDataPath().getPathTo("recent_projects.lp");
     if (mFilePath.isExistingFile()) {
       SExpression root =
           SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);

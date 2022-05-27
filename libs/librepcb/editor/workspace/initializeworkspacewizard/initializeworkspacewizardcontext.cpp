@@ -23,8 +23,7 @@
 #include "initializeworkspacewizardcontext.h"
 
 #include <librepcb/core/application.h>
-#include <librepcb/core/fileio/asynccopyoperation.h>
-#include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -39,8 +38,20 @@ namespace editor {
  ******************************************************************************/
 
 InitializeWorkspaceWizardContext::InitializeWorkspaceWizardContext(
-    const FilePath& ws, QObject* parent) noexcept
-  : QObject(parent), mWorkspacePath(ws), mVersionToImport() {
+    QObject* parent) noexcept
+  : QObject(parent),
+    mWorkspacePath(),
+    mWorkspacePathValid(false),
+    mWorkspaceExists(false),
+    mDataDirs(),
+    mDataDir(),
+    mUpgradeCopyDirs(),
+    mAppLocale(),
+    mLengthUnit(),
+    mLibraryNormOrder(),
+    mUserName() {
+  mDataDir = Workspace::determineDataDirectory(
+      mDataDirs, mUpgradeCopyDirs.first, mUpgradeCopyDirs.second);
 }
 
 InitializeWorkspaceWizardContext::~InitializeWorkspaceWizardContext() noexcept {
@@ -50,27 +61,47 @@ InitializeWorkspaceWizardContext::~InitializeWorkspaceWizardContext() noexcept {
  *  General Methods
  ******************************************************************************/
 
-std::unique_ptr<AsyncCopyOperation>
-    InitializeWorkspaceWizardContext::createImportCopyOperation() const
-    noexcept {
-  if (mVersionToImport) {
-    FilePath src = mWorkspacePath.getPathTo("v" % mVersionToImport->toStr());
-    FilePath dst =
-        mWorkspacePath.getPathTo("v" % qApp->getFileFormatVersion().toStr());
-    return std::unique_ptr<AsyncCopyOperation>(
-        new AsyncCopyOperation(src, dst));
+bool InitializeWorkspaceWizardContext::getWorkspaceContainsNewerFileFormats()
+    const noexcept {
+  return (!mDataDirs.isEmpty()) &&
+      (qApp->getFileFormatVersion() <
+       Toolbox::sorted(mDataDirs.values()).last());
+}
+
+void InitializeWorkspaceWizardContext::setWorkspacePath(const FilePath& fp) {
+  if (!fp.isValid()) {
+    mWorkspacePathValid = false;
+    mWorkspaceExists = false;
+    mDataDirs.clear();
+  } else if (Workspace::checkCompatibility(fp)) {
+    mDataDirs = Workspace::findDataDirectories(fp);  // can throw
+    mWorkspacePathValid = true;
+    mWorkspaceExists = true;
+  } else if (((!fp.isExistingDir()) && (!fp.isExistingFile())) ||
+             fp.isEmptyDir()) {
+    mWorkspacePathValid = true;
+    mWorkspaceExists = false;
+    mDataDirs.clear();
   } else {
-    return std::unique_ptr<AsyncCopyOperation>(nullptr);
+    mWorkspacePathValid = false;
+    mWorkspaceExists = false;
+    mDataDirs.clear();
   }
+  mDataDir = Workspace::determineDataDirectory(
+      mDataDirs, mUpgradeCopyDirs.first, mUpgradeCopyDirs.second);
+  mWorkspacePath = fp;
 }
 
 void InitializeWorkspaceWizardContext::initializeEmptyWorkspace() const {
-  Workspace ws(mWorkspacePath);  // can throw
+  if (!mWorkspaceExists) {
+    Workspace::createNewWorkspace(mWorkspacePath);  // can throw
+  }
+  Workspace ws(mWorkspacePath, mDataDir);  // can throw
   ws.getSettings().applicationLocale.set(mAppLocale);
   ws.getSettings().defaultLengthUnit.set(mLengthUnit);
   ws.getSettings().libraryNormOrder.set(mLibraryNormOrder);
   ws.getSettings().userName.set(mUserName);
-  ws.getSettings().saveToFile();  // can throw
+  ws.saveSettings();  // can throw
 }
 
 /*******************************************************************************

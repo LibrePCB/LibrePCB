@@ -24,7 +24,6 @@
 
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
-#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -45,10 +44,10 @@ class WorkspaceSettingsTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(WorkspaceSettingsTest, testConstructFromSExpressionV01) {
+TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionV01) {
   // Attention: Do NOT modify this string! It represents the freezed(!) file
   // format V0.1 and even current versions of LibrePCB must be able to load it!
-  SExpression sexpr = SExpression::parse(
+  SExpression root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (user \"Foo Bar\")\n"
       " (application_locale \"de_CH\")\n"
@@ -66,10 +65,9 @@ TEST_F(WorkspaceSettingsTest, testConstructFromSExpressionV01) {
       " )\n"
       ")",
       FilePath());
-  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
-  FileUtils::writeFile(fp, sexpr.toByteArray());
 
-  WorkspaceSettings obj(fp, Version::fromString("0.1"));
+  WorkspaceSettings obj;
+  obj.load(root, Version::fromString("0.1"));
   EXPECT_EQ("Foo Bar", obj.userName.get());
   EXPECT_EQ("de_CH", obj.applicationLocale.get());
   EXPECT_EQ(LengthUnit::micrometers(), obj.defaultLengthUnit.get());
@@ -81,8 +79,8 @@ TEST_F(WorkspaceSettingsTest, testConstructFromSExpressionV01) {
             obj.repositoryUrls.get());
 }
 
-TEST_F(WorkspaceSettingsTest, testConstructFromSExpressionCurrentVersion) {
-  SExpression sexpr = SExpression::parse(
+TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
+  SExpression root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (user \"Foo Bar\")\n"
       " (application_locale \"de_CH\")\n"
@@ -100,10 +98,9 @@ TEST_F(WorkspaceSettingsTest, testConstructFromSExpressionCurrentVersion) {
       " )\n"
       ")",
       FilePath());
-  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
-  FileUtils::writeFile(fp, sexpr.toByteArray());
 
-  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
+  WorkspaceSettings obj;
+  obj.load(root, qApp->getFileFormatVersion());
   EXPECT_EQ("Foo Bar", obj.userName.get());
   EXPECT_EQ("de_CH", obj.applicationLocale.get());
   EXPECT_EQ(LengthUnit::micrometers(), obj.defaultLengthUnit.get());
@@ -116,10 +113,8 @@ TEST_F(WorkspaceSettingsTest, testConstructFromSExpressionCurrentVersion) {
 }
 
 TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
-  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
-
   // Store
-  WorkspaceSettings obj1(fp, qApp->getFileFormatVersion());
+  WorkspaceSettings obj1;
   obj1.userName.set("foo bar");
   obj1.applicationLocale.set("de_CH");
   obj1.defaultLengthUnit.set(LengthUnit::nanometers());
@@ -128,10 +123,11 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   obj1.libraryLocaleOrder.set({"de_CH", "en_US"});
   obj1.libraryNormOrder.set({"foo", "bar"});
   obj1.repositoryUrls.set({QUrl("https://foo"), QUrl("https://bar")});
-  obj1.saveToFile();
+  const SExpression root1 = obj1.serialize();
 
   // Load
-  WorkspaceSettings obj2(fp, qApp->getFileFormatVersion());
+  WorkspaceSettings obj2;
+  obj2.load(root1, qApp->getFileFormatVersion());
   EXPECT_EQ(obj1.userName.get().toStdString(),
             obj2.userName.get().toStdString());
   EXPECT_EQ(obj1.applicationLocale.get().toStdString(),
@@ -143,13 +139,14 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   EXPECT_EQ(obj1.libraryLocaleOrder.get(), obj2.libraryLocaleOrder.get());
   EXPECT_EQ(obj1.libraryNormOrder.get(), obj2.libraryNormOrder.get());
   EXPECT_EQ(obj1.repositoryUrls.get(), obj2.repositoryUrls.get());
+  const SExpression root2 = obj2.serialize();
 
   // Check if serialization of loaded settings leads to same file content
-  EXPECT_EQ(obj1.saveToByteArray().toStdString(),
-            obj2.saveToByteArray().toStdString());
+  EXPECT_EQ(root1.toByteArray().toStdString(),
+            root2.toByteArray().toStdString());
 }
 
-// Verify that saving to file does only overwrite modified settings, but keeps
+// Verify that serializing does only overwrite modified settings, but keeps
 // unknown file entries and does not add new entries for default settings.
 // This allows to switch between different application versions without
 // creating unnecessary modifications after an upgrade, or - even worse -
@@ -163,7 +160,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
 // time, users would keep the settings at the time writing the settings file
 // the first time forever.
 TEST_F(WorkspaceSettingsTest, testSaveOnlyModifiedSettings) {
-  SExpression sexpr = SExpression::parse(
+  SExpression root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (project_autosave_interval 1234)\n"
       " (unknown_item \"Foo Bar\")\n"
@@ -172,15 +169,14 @@ TEST_F(WorkspaceSettingsTest, testSaveOnlyModifiedSettings) {
       " )\n"
       ")\n",
       FilePath());
-  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
-  FileUtils::writeFile(fp, sexpr.toByteArray());
 
-  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
+  WorkspaceSettings obj;
+  obj.load(root, qApp->getFileFormatVersion());
   EXPECT_EQ(1234U, obj.projectAutosaveIntervalSeconds.get());
   obj.projectAutosaveIntervalSeconds.set(42);
-  obj.saveToFile();
+  const SExpression root2 = obj.serialize();
 
-  QString actualContent = FileUtils::readFile(fp);
+  QString actualContent = root2.toByteArray();
   QString expectedContent =
       "(librepcb_workspace_settings\n"
       " (project_autosave_interval 42)\n"
@@ -194,28 +190,26 @@ TEST_F(WorkspaceSettingsTest, testSaveOnlyModifiedSettings) {
 
 // Addition for the previous test: Saving a default-constructed object to file
 // shall create a file without any entries.
-TEST_F(WorkspaceSettingsTest, testDefaultIsEmptyFile) {
+TEST_F(WorkspaceSettingsTest, testDefaultSerializeEmpty) {
   SExpressionLegacyMode legacyMode(false);  // File format v0.2+
-  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
 
-  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
-  obj.saveToFile();
+  WorkspaceSettings obj;
+  const SExpression root = obj.serialize();
 
-  QString actualContent = FileUtils::readFile(fp);
+  QString actualContent = root.toByteArray();
   QString expectedContent =
       "(librepcb_workspace_settings\n"
       ")\n";
   EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
 }
 
-TEST_F(WorkspaceSettingsTest, testDefaultIsEmptyFileLegacy) {
+TEST_F(WorkspaceSettingsTest, testDefaultSerializeEmptyFileLegacy) {
   SExpressionLegacyMode legacyMode(true);  // File format v0.1
-  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
 
-  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
-  obj.saveToFile();
+  WorkspaceSettings obj;
+  const SExpression root = obj.serialize();
 
-  QString actualContent = FileUtils::readFile(fp);
+  QString actualContent = root.toByteArray();
   QString expectedContent = "(librepcb_workspace_settings)\n";
   EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
 }
@@ -224,7 +218,7 @@ TEST_F(WorkspaceSettingsTest, testDefaultIsEmptyFileLegacy) {
 // settings file, since an empty file is the real default.
 TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFile) {
   SExpressionLegacyMode legacyMode(false);  // File format v0.2+
-  SExpression sexpr = SExpression::parse(
+  SExpression root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (project_autosave_interval 1234)\n"
       " (unknown_value \"Foo Bar\")\n"
@@ -233,14 +227,13 @@ TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFile) {
       " )\n"
       ")\n",
       FilePath());
-  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
-  FileUtils::writeFile(fp, sexpr.toByteArray());
 
-  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
+  WorkspaceSettings obj;
+  obj.load(root, qApp->getFileFormatVersion());
   obj.restoreDefaults();
-  obj.saveToFile();
+  const SExpression root2 = obj.serialize();
 
-  QString actualContent = FileUtils::readFile(fp);
+  QString actualContent = root2.toByteArray();
   QString expectedContent =
       "(librepcb_workspace_settings\n"
       ")\n";
@@ -249,7 +242,7 @@ TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFile) {
 
 TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFileLegacy) {
   SExpressionLegacyMode legacyMode(true);  // File format v0.1
-  SExpression sexpr = SExpression::parse(
+  SExpression root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (project_autosave_interval 1234)\n"
       " (unknown_value \"Foo Bar\")\n"
@@ -258,14 +251,13 @@ TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFileLegacy) {
       " )\n"
       ")\n",
       FilePath());
-  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.lp");
-  FileUtils::writeFile(fp, sexpr.toByteArray());
 
-  WorkspaceSettings obj(fp, qApp->getFileFormatVersion());
+  WorkspaceSettings obj;
+  obj.load(root, qApp->getFileFormatVersion());
   obj.restoreDefaults();
-  obj.saveToFile();
+  const SExpression root2 = obj.serialize();
 
-  QString actualContent = FileUtils::readFile(fp);
+  QString actualContent = root2.toByteArray();
   QString expectedContent = "(librepcb_workspace_settings)\n";
   EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
 }

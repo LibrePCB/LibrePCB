@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_FIRSTRUNWIZARD_H
-#define LIBREPCB_EDITOR_FIRSTRUNWIZARD_H
+#ifndef LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_CHOOSEWORKSPACE_H
+#define LIBREPCB_EDITOR_INITIALIZEWORKSPACEWIZARD_CHOOSEWORKSPACE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
+#include "initializeworkspacewizardcontext.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,45 +35,42 @@ namespace librepcb {
 namespace editor {
 
 namespace Ui {
-class FirstRunWizard;
+class InitializeWorkspaceWizard_ChooseWorkspace;
 }
 
 /*******************************************************************************
- *  Class FirstRunWizard
+ *  Class InitializeWorkspaceWizard_ChooseWorkspace
  ******************************************************************************/
 
 /**
- * @brief The FirstRunWizard class
+ * @brief The InitializeWorkspaceWizard_ChooseWorkspace class
  */
-class FirstRunWizard final : public QWizard {
+class InitializeWorkspaceWizard_ChooseWorkspace final : public QWizardPage {
   Q_OBJECT
-
-  enum PageId {
-    Page_Welcome,
-    Page_WorkspacePath,
-  };
 
 public:
   // Constructors / Destructor
-  explicit FirstRunWizard(QWidget* parent = 0) noexcept;
-  ~FirstRunWizard() noexcept;
+  explicit InitializeWorkspaceWizard_ChooseWorkspace(
+      InitializeWorkspaceWizardContext& context, QWidget* parent = 0) noexcept;
+  InitializeWorkspaceWizard_ChooseWorkspace(
+      const InitializeWorkspaceWizard_ChooseWorkspace& other) = delete;
+  ~InitializeWorkspaceWizard_ChooseWorkspace() noexcept;
 
-  // Getters
-  bool getCreateNewWorkspace() const noexcept;
-  FilePath getWorkspaceFilePath() const noexcept;
+  // Inherited Methods
+  void initializePage() noexcept override;
+  bool isComplete() const noexcept override;
+  int nextId() const noexcept override;
 
-  // General Methods
-  void skipWelcomePage() noexcept;
+  // Operator Overloadings
+  InitializeWorkspaceWizard_ChooseWorkspace& operator=(
+      const InitializeWorkspaceWizard_ChooseWorkspace& rhs) = delete;
 
-  // Inherited from QWizard
-  int nextId() const override;
+private:  // Methods
+  void updateWorkspacePath() noexcept;
 
-private:
-  // Private Methods
-  Q_DISABLE_COPY(FirstRunWizard)
-
-  // Private Membervariables
-  QScopedPointer<Ui::FirstRunWizard> mUi;
+private:  // Data
+  InitializeWorkspaceWizardContext& mContext;
+  QScopedPointer<Ui::InitializeWorkspaceWizard_ChooseWorkspace> mUi;
 };
 
 /*******************************************************************************
