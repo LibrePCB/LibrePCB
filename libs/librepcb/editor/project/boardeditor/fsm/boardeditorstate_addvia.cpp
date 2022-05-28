@@ -124,7 +124,7 @@ bool BoardEditorState_AddVia::entry() noexcept {
   mSizeLabel->setIndent(10);
   mContext.editorUi.commandToolbar->addWidget(mSizeLabel.data());
 
-  // Add the size combobox to the toolbar
+  // Add the size edit to the toolbar
   mSizeEdit.reset(new PositiveLengthEdit());
   mSizeEdit->setValue(mLastViaProperties.getSize());
   mContext.editorUi.commandToolbar->addWidget(mSizeEdit.data());
@@ -136,7 +136,7 @@ bool BoardEditorState_AddVia::entry() noexcept {
   mDrillLabel->setIndent(10);
   mContext.editorUi.commandToolbar->addWidget(mDrillLabel.data());
 
-  // Add the drill combobox to the toolbar
+  // Add the drill edit to the toolbar
   mDrillEdit.reset(new PositiveLengthEdit());
   mDrillEdit->setValue(mLastViaProperties.getDrillDiameter());
   mContext.editorUi.commandToolbar->addWidget(mDrillEdit.data());
