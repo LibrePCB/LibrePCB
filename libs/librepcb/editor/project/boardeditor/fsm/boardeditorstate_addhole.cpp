@@ -87,9 +87,7 @@ bool BoardEditorState_AddHole::entry() noexcept {
           &BoardEditorState_AddHole::diameterEditValueChanged);
   mContext.editorUi.commandToolbar->addWidget(mDiameterEdit.data());
 
-  // Change the cursor
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
-
   return true;
 }
 
@@ -101,9 +99,7 @@ bool BoardEditorState_AddHole::exit() noexcept {
   mDiameterEdit.reset();
   mDiameterLabel.reset();
 
-  // Reset the cursor
-  mContext.editorGraphicsView.setCursor(Qt::ArrowCursor);
-
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 

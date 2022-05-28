@@ -62,6 +62,30 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &FootprintPadPropertiesDialog::on_buttonBox_clicked);
 
+  // Avoid creating pads with a drill diameter larger than its size!
+  // See https://github.com/LibrePCB/LibrePCB/issues/946.
+  connect(mUi->edtWidth, &PositiveLengthEdit::valueChanged, this,
+          [this](const PositiveLength& value) {
+            if (value < mUi->edtDrillDiameter->getValue()) {
+              mUi->edtDrillDiameter->setValue(positiveToUnsigned(value));
+            }
+          });
+  connect(mUi->edtHeight, &PositiveLengthEdit::valueChanged, this,
+          [this](const PositiveLength& value) {
+            if (value < mUi->edtDrillDiameter->getValue()) {
+              mUi->edtDrillDiameter->setValue(positiveToUnsigned(value));
+            }
+          });
+  connect(mUi->edtDrillDiameter, &UnsignedLengthEdit::valueChanged, this,
+          [this](const UnsignedLength& value) {
+            if (value > mUi->edtWidth->getValue()) {
+              mUi->edtWidth->setValue(PositiveLength(*value));
+            }
+            if (value > mUi->edtHeight->getValue()) {
+              mUi->edtHeight->setValue(PositiveLength(*value));
+            }
+          });
+
   // load pad attributes
   int currentPadIndex = -1;
   for (const PackagePad& p : pkg.getPads()) {

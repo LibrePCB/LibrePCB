@@ -82,7 +82,6 @@ PackageEditorState_AddPads::~PackageEditorState_AddPads() noexcept {
 
 bool PackageEditorState_AddPads::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
 
   // populate command toolbar
 
@@ -123,6 +122,7 @@ bool PackageEditorState_AddPads::entry() noexcept {
   // width
   mContext.commandToolBar.addLabel(tr("Width:"), 10);
   std::unique_ptr<PositiveLengthEdit> edtWidth(new PositiveLengthEdit());
+  QPointer<PositiveLengthEdit> edtWidthPtr = edtWidth.get();
   edtWidth->configure(getDefaultLengthUnit(), LengthEditBase::Steps::generic(),
                       "package_editor/add_pads/width");
   edtWidth->setValue(mLastPad.getWidth());
@@ -133,6 +133,7 @@ bool PackageEditorState_AddPads::entry() noexcept {
   // height
   mContext.commandToolBar.addLabel(tr("Height:"), 10);
   std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
+  QPointer<PositiveLengthEdit> edtHeightPtr = edtHeight.get();
   edtHeight->configure(getDefaultLengthUnit(), LengthEditBase::Steps::generic(),
                        "package_editor/add_pads/height");
   edtHeight->setValue(mLastPad.getHeight());
@@ -141,10 +142,12 @@ bool PackageEditorState_AddPads::entry() noexcept {
   mContext.commandToolBar.addWidget(std::move(edtHeight));
 
   // drill diameter
+  QPointer<UnsignedLengthEdit> edtDrillDiameterPtr;
   if (mPadType == PadType::THT) {
     mContext.commandToolBar.addLabel(tr("Drill Diameter:"), 10);
     std::unique_ptr<UnsignedLengthEdit> edtDrillDiameter(
         new UnsignedLengthEdit());
+    edtDrillDiameterPtr = edtDrillDiameter.get();
     edtDrillDiameter->configure(getDefaultLengthUnit(),
                                 LengthEditBase::Steps::drillDiameter(),
                                 "package_editor/add_pads/drill_diameter");
@@ -154,9 +157,41 @@ bool PackageEditorState_AddPads::entry() noexcept {
     mContext.commandToolBar.addWidget(std::move(edtDrillDiameter));
   }
 
+  // Avoid creating pads with a drill diameter larger than its size!
+  // See https://github.com/LibrePCB/LibrePCB/issues/946.
+  if (edtWidthPtr && edtHeightPtr && edtDrillDiameterPtr) {
+    connect(edtWidthPtr.data(), &PositiveLengthEdit::valueChanged, this,
+            [edtDrillDiameterPtr](const PositiveLength& value) {
+              if (edtDrillDiameterPtr &&
+                  (value < edtDrillDiameterPtr->getValue())) {
+                edtDrillDiameterPtr->setValue(positiveToUnsigned(value));
+              }
+            });
+    connect(edtHeightPtr.data(), &PositiveLengthEdit::valueChanged, this,
+            [edtDrillDiameterPtr](const PositiveLength& value) {
+              if (edtDrillDiameterPtr &&
+                  (value < edtDrillDiameterPtr->getValue())) {
+                edtDrillDiameterPtr->setValue(positiveToUnsigned(value));
+              }
+            });
+    connect(edtDrillDiameterPtr.data(), &UnsignedLengthEdit::valueChanged, this,
+            [edtWidthPtr, edtHeightPtr](const UnsignedLength& value) {
+              if (edtWidthPtr && (value > edtWidthPtr->getValue())) {
+                edtWidthPtr->setValue(PositiveLength(*value));
+              }
+              if (edtHeightPtr && (value > edtHeightPtr->getValue())) {
+                edtHeightPtr->setValue(PositiveLength(*value));
+              }
+            });
+  }
+
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
-  return startAddPad(pos);
+  if (!startAddPad(pos)) {
+    return false;
+  }
+  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  return true;
 }
 
 bool PackageEditorState_AddPads::exit() noexcept {
@@ -168,7 +203,7 @@ bool PackageEditorState_AddPads::exit() noexcept {
   mPackagePadComboBox = nullptr;
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.setCursor(Qt::ArrowCursor);
+  mContext.graphicsView.unsetCursor();
   return true;
 }
 

@@ -117,9 +117,7 @@ bool BoardEditorState_DrawPolygon::entry() noexcept {
   connect(mFillCheckBox.data(), &QCheckBox::toggled, this,
           &BoardEditorState_DrawPolygon::filledCheckBoxCheckedChanged);
 
-  // Change the cursor
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
-
   return true;
 }
 
@@ -137,9 +135,7 @@ bool BoardEditorState_DrawPolygon::exit() noexcept {
   qDeleteAll(mActionSeparators);
   mActionSeparators.clear();
 
-  // Reset the cursor
-  mContext.editorGraphicsView.setCursor(Qt::ArrowCursor);
-
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 
@@ -181,12 +177,6 @@ bool BoardEditorState_DrawPolygon::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
         QGraphicsSceneMouseEvent& e) noexcept {
   return processGraphicsSceneLeftMouseButtonPressed(e);
-}
-
-bool BoardEditorState_DrawPolygon::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Q_UNUSED(e);
-  return processAbortCommand();
 }
 
 bool BoardEditorState_DrawPolygon::processSwitchToBoard(int index) noexcept {
