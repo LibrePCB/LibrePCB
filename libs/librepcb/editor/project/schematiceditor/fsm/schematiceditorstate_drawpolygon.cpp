@@ -185,13 +185,6 @@ bool SchematicEditorState_DrawPolygon::
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
-bool SchematicEditorState_DrawPolygon::
-    processGraphicsSceneRightMouseButtonReleased(
-        QGraphicsSceneMouseEvent& e) noexcept {
-  Q_UNUSED(e);
-  return processAbortCommand();
-}
-
 bool SchematicEditorState_DrawPolygon::processSwitchToSchematicPage(
     int index) noexcept {
   // Allow switching to an existing schematic if no command is active.

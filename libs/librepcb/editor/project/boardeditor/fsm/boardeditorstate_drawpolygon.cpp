@@ -183,12 +183,6 @@ bool BoardEditorState_DrawPolygon::
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
-bool BoardEditorState_DrawPolygon::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Q_UNUSED(e);
-  return processAbortCommand();
-}
-
 bool BoardEditorState_DrawPolygon::processSwitchToBoard(int index) noexcept {
   // Allow switching to an existing board if no command is active.
   return (!mIsUndoCmdActive) && (index >= 0);

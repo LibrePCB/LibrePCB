@@ -74,8 +74,6 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonDoubleClicked(
       QGraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processGraphicsSceneRightMouseButtonReleased(
-      QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
 
   // Operator Overloadings

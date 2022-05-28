@@ -137,10 +137,12 @@ private:  // Methods
   bool setNextState(State state) noexcept;
   bool leaveCurrentState() noexcept;
   bool enterNextState(State state) noexcept;
+  bool switchToPreviousState() noexcept;
 
 private:  // Data
   QMap<State, SymbolEditorState*> mStates;
   State mCurrentState;
+  State mPreviousState;
 };
 
 /*******************************************************************************

@@ -188,12 +188,6 @@ bool BoardEditorState_DrawPlane::
   return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
-bool BoardEditorState_DrawPlane::processGraphicsSceneRightMouseButtonReleased(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  Q_UNUSED(e);
-  return processAbortCommand();
-}
-
 bool BoardEditorState_DrawPlane::processSwitchToBoard(int index) noexcept {
   // Allow switching to an existing board if no command is active.
   return (!mIsUndoCmdActive) && (index >= 0);

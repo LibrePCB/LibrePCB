@@ -289,11 +289,15 @@ bool BoardEditorFsm::processGraphicsSceneRightMouseButtonReleased(
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneRightMouseButtonReleased(e)) {
       return true;
+    } else if (mCurrentState != State::SELECT) {
+      // If right click is not handled, abort current command.
+      return processAbortCommand();
+    } else {
+      // In select state, switch back to last state.
+      return switchToPreviousState();
     }
   }
-
-  // Switch back to last state
-  return switchToPreviousState();
+  return false;
 }
 
 bool BoardEditorFsm::processSwitchToBoard(int index) noexcept {
