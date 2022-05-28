@@ -132,12 +132,10 @@ bool SchematicEditorState_AddText::entry() noexcept {
           &SchematicEditorState_AddText::heightEditValueChanged);
   mContext.editorUi.commandToolbar->addWidget(mHeightEdit.data());
 
-  // Change the cursor
-  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
-
   // Set focus to text combobox to allow typing the text immediately
   setFocusToTextEdit();
 
+  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -153,9 +151,7 @@ bool SchematicEditorState_AddText::exit() noexcept {
   mLayerComboBox.reset();
   mLayerLabel.reset();
 
-  // Reset the cursor
-  mContext.editorGraphicsView.setCursor(Qt::ArrowCursor);
-
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 

@@ -118,9 +118,7 @@ bool SchematicEditorState_DrawPolygon::entry() noexcept {
   connect(mFillCheckBox.data(), &QCheckBox::toggled, this,
           &SchematicEditorState_DrawPolygon::filledCheckBoxCheckedChanged);
 
-  // Change the cursor
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
-
   return true;
 }
 
@@ -138,9 +136,7 @@ bool SchematicEditorState_DrawPolygon::exit() noexcept {
   qDeleteAll(mActionSeparators);
   mActionSeparators.clear();
 
-  // Reset the cursor
-  mContext.editorGraphicsView.setCursor(Qt::ArrowCursor);
-
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 
@@ -183,13 +179,6 @@ bool SchematicEditorState_DrawPolygon::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
         QGraphicsSceneMouseEvent& e) noexcept {
   return processGraphicsSceneLeftMouseButtonPressed(e);
-}
-
-bool SchematicEditorState_DrawPolygon::
-    processGraphicsSceneRightMouseButtonReleased(
-        QGraphicsSceneMouseEvent& e) noexcept {
-  Q_UNUSED(e);
-  return processAbortCommand();
 }
 
 bool SchematicEditorState_DrawPolygon::processSwitchToSchematicPage(

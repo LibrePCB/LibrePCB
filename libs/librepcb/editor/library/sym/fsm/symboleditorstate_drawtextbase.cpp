@@ -68,7 +68,6 @@ SymbolEditorState_DrawTextBase::~SymbolEditorState_DrawTextBase() noexcept {
 
 bool SymbolEditorState_DrawTextBase::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
 
   // populate command toolbar
   if (mMode == Mode::TEXT) {
@@ -112,7 +111,11 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
 
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
-  return startAddText(pos);
+  if (!startAddText(pos)) {
+    return false;
+  }
+  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  return true;
 }
 
 bool SymbolEditorState_DrawTextBase::exit() noexcept {
@@ -123,7 +126,7 @@ bool SymbolEditorState_DrawTextBase::exit() noexcept {
   // cleanup command toolbar
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.setCursor(Qt::ArrowCursor);
+  mContext.graphicsView.unsetCursor();
   return true;
 }
 

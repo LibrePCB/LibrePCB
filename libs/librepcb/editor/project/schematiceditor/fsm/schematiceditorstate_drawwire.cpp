@@ -120,9 +120,7 @@ bool SchematicEditorState_DrawWire::entry() noexcept {
     });
   }
 
-  // change the cursor
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
-
   return true;
 }
 
@@ -138,9 +136,7 @@ bool SchematicEditorState_DrawWire::exit() noexcept {
   qDeleteAll(mActionSeparators);
   mActionSeparators.clear();
 
-  // change the cursor
-  mContext.editorGraphicsView.setCursor(Qt::ArrowCursor);
-
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 

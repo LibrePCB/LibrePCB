@@ -64,7 +64,6 @@ SymbolEditorState_AddPins::~SymbolEditorState_AddPins() noexcept {
 
 bool SymbolEditorState_AddPins::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
 
   // populate command toolbar
   mContext.commandToolBar.addLabel(tr("Name:"));
@@ -88,7 +87,11 @@ bool SymbolEditorState_AddPins::entry() noexcept {
 
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
-  return addNextPin(pos, Angle::deg0());
+  if (!addNextPin(pos, Angle::deg0())) {
+    return false;
+  }
+  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  return true;
 }
 
 bool SymbolEditorState_AddPins::exit() noexcept {
@@ -107,7 +110,7 @@ bool SymbolEditorState_AddPins::exit() noexcept {
   mNameLineEdit = nullptr;
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.setCursor(Qt::ArrowCursor);
+  mContext.graphicsView.unsetCursor();
   return true;
 }
 

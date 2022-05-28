@@ -45,7 +45,7 @@ namespace editor {
  ******************************************************************************/
 
 SymbolEditorFsm::SymbolEditorFsm(const Context& context) noexcept
-  : QObject(nullptr), mCurrentState(State::IDLE) {
+  : QObject(nullptr), mCurrentState(State::IDLE), mPreviousState(State::IDLE) {
   mStates.insert(State::SELECT, new SymbolEditorState_Select(context));
   mStates.insert(State::ADD_PINS, new SymbolEditorState_AddPins(context));
   mStates.insert(State::ADD_NAMES, new SymbolEditorState_AddNames(context));
@@ -140,8 +140,16 @@ bool SymbolEditorFsm::processGraphicsSceneLeftMouseButtonDoubleClicked(
 
 bool SymbolEditorFsm::processGraphicsSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
-  if (getCurrentState()) {
-    return getCurrentState()->processGraphicsSceneRightMouseButtonReleased(e);
+  if (SymbolEditorState* state = getCurrentState()) {
+    if (state->processGraphicsSceneRightMouseButtonReleased(e)) {
+      return true;
+    } else if (mCurrentState != State::SELECT) {
+      // If right click is not handled, abort current command.
+      return processAbortCommand();
+    } else {
+      // In select state, switch back to last state.
+      return switchToPreviousState();
+    }
   } else {
     return false;
   }
@@ -287,6 +295,10 @@ bool SymbolEditorFsm::leaveCurrentState() noexcept {
   if ((getCurrentState()) && (!getCurrentState()->exit())) {
     return false;
   }
+  if (mCurrentState != State::SELECT) {
+    // Only memorize states other than SELECT.
+    mPreviousState = mCurrentState;
+  }
   mCurrentState = State::IDLE;
   emit toolChanged(getCurrentTool());
   return true;
@@ -301,6 +313,14 @@ bool SymbolEditorFsm::enterNextState(State state) noexcept {
   mCurrentState = state;
   emit toolChanged(getCurrentTool());
   return true;
+}
+
+bool SymbolEditorFsm::switchToPreviousState() noexcept {
+  State nextState = mPreviousState;
+  if ((nextState == mCurrentState) || (nextState == State::IDLE)) {
+    nextState = State::SELECT;
+  }
+  return setNextState(nextState);
 }
 
 /*******************************************************************************

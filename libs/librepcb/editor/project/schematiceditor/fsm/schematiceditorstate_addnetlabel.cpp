@@ -66,9 +66,7 @@ bool SchematicEditorState_AddNetLabel::entry() noexcept {
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
-  // change the cursor
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
-
   return true;
 }
 
@@ -83,9 +81,7 @@ bool SchematicEditorState_AddNetLabel::exit() noexcept {
     }
   }
 
-  // change the cursor
-  mContext.editorGraphicsView.setCursor(Qt::ArrowCursor);
-
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 

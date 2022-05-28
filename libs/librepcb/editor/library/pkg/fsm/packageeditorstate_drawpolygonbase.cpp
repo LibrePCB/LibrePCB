@@ -73,7 +73,6 @@ PackageEditorState_DrawPolygonBase::
 
 bool PackageEditorState_DrawPolygonBase::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
 
   // populate command toolbar
   mContext.commandToolBar.addLabel(tr("Layer:"));
@@ -122,6 +121,7 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
     mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
   }
 
+  mContext.graphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -133,7 +133,7 @@ bool PackageEditorState_DrawPolygonBase::exit() noexcept {
   // cleanup command toolbar
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.setCursor(Qt::ArrowCursor);
+  mContext.graphicsView.unsetCursor();
   return true;
 }
 

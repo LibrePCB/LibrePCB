@@ -65,7 +65,6 @@ PackageEditorState_AddHoles::~PackageEditorState_AddHoles() noexcept {
 
 bool PackageEditorState_AddHoles::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
 
   // populate command toolbar
   mContext.commandToolBar.addLabel(tr("Diameter:"), 10);
@@ -81,7 +80,11 @@ bool PackageEditorState_AddHoles::entry() noexcept {
 
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
-  return startAddHole(pos);
+  if (!startAddHole(pos)) {
+    return false;
+  }
+  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  return true;
 }
 
 bool PackageEditorState_AddHoles::exit() noexcept {
@@ -92,7 +95,7 @@ bool PackageEditorState_AddHoles::exit() noexcept {
   // cleanup command toolbar
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.setCursor(Qt::ArrowCursor);
+  mContext.graphicsView.unsetCursor();
   return true;
 }
 

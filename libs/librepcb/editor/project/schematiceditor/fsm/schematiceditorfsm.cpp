@@ -265,11 +265,15 @@ bool SchematicEditorFsm::processGraphicsSceneRightMouseButtonReleased(
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processGraphicsSceneRightMouseButtonReleased(e)) {
       return true;
+    } else if (mCurrentState != State::SELECT) {
+      // If right click is not handled, abort current command.
+      return processAbortCommand();
+    } else {
+      // In select state, switch back to last state.
+      return switchToPreviousState();
     }
   }
-
-  // Switch back to last state
-  return switchToPreviousState();
+  return false;
 }
 
 bool SchematicEditorFsm::processSwitchToSchematicPage(int index) noexcept {
@@ -312,7 +316,6 @@ bool SchematicEditorFsm::leaveCurrentState() noexcept {
       // The "add component" state does not make much sense to restore with
       // rightclick, thus not memorizing it.
       break;
-
     default:
       mPreviousState = mCurrentState;
       break;

@@ -54,7 +54,10 @@ namespace editor {
  ******************************************************************************/
 
 PackageEditorFsm::PackageEditorFsm(const Context& context) noexcept
-  : QObject(nullptr), mContext(context), mCurrentState(State::IDLE) {
+  : QObject(nullptr),
+    mContext(context),
+    mCurrentState(State::IDLE),
+    mPreviousState(State::IDLE) {
   mStates.insert(State::SELECT, new PackageEditorState_Select(mContext));
   mStates.insert(State::ADD_THT_PADS,
                  new PackageEditorState_AddPadsTht(mContext));
@@ -206,9 +209,17 @@ bool PackageEditorFsm::processGraphicsSceneLeftMouseButtonDoubleClicked(
 
 bool PackageEditorFsm::processGraphicsSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
-  if (getCurrentState() && mContext.currentFootprint &&
-      mContext.currentGraphicsItem) {
-    return getCurrentState()->processGraphicsSceneRightMouseButtonReleased(e);
+  PackageEditorState* state = getCurrentState();
+  if (state && mContext.currentFootprint && mContext.currentGraphicsItem) {
+    if (state->processGraphicsSceneRightMouseButtonReleased(e)) {
+      return true;
+    } else if (mCurrentState != State::SELECT) {
+      // If right click is not handled, abort current command.
+      return processAbortCommand();
+    } else {
+      // In select state, switch back to last state.
+      return switchToPreviousState();
+    }
   } else {
     return false;
   }
@@ -379,6 +390,10 @@ bool PackageEditorFsm::leaveCurrentState() noexcept {
   if ((getCurrentState()) && (!getCurrentState()->exit())) {
     return false;
   }
+  if (mCurrentState != State::SELECT) {
+    // Only memorize states other than SELECT.
+    mPreviousState = mCurrentState;
+  }
   mCurrentState = State::IDLE;
   emit toolChanged(getCurrentTool());
   return true;
@@ -393,6 +408,14 @@ bool PackageEditorFsm::enterNextState(State state) noexcept {
   mCurrentState = state;
   emit toolChanged(getCurrentTool());
   return true;
+}
+
+bool PackageEditorFsm::switchToPreviousState() noexcept {
+  State nextState = mPreviousState;
+  if ((nextState == mCurrentState) || (nextState == State::IDLE)) {
+    nextState = State::SELECT;
+  }
+  return setNextState(nextState);
 }
 
 /*******************************************************************************

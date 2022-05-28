@@ -122,6 +122,7 @@ bool SchematicEditorState_AddComponent::entry() noexcept {
   connect(mAttributeUnitComboBox, &AttributeUnitComboBox::currentItemChanged,
           this, &SchematicEditorState_AddComponent::attributeChanged);
 
+  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -142,6 +143,7 @@ bool SchematicEditorState_AddComponent::exit() noexcept {
   delete mValueLabel;
   mValueLabel = nullptr;
 
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 

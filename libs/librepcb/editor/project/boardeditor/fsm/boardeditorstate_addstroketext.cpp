@@ -147,9 +147,7 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
           &BoardEditorState_AddStrokeText::mirrorCheckBoxToggled);
   mContext.editorUi.commandToolbar->addWidget(mMirrorCheckBox.data());
 
-  // Change the cursor
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
-
   return true;
 }
 
@@ -167,9 +165,7 @@ bool BoardEditorState_AddStrokeText::exit() noexcept {
   mLayerComboBox.reset();
   mLayerLabel.reset();
 
-  // Reset the cursor
-  mContext.editorGraphicsView.setCursor(Qt::ArrowCursor);
-
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 
