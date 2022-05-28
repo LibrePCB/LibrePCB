@@ -191,6 +191,7 @@ bool BoardEditorState_AddVia::entry() noexcept {
             }
           });
 
+  mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -210,6 +211,7 @@ bool BoardEditorState_AddVia::exit() noexcept {
   qDeleteAll(mActionSeparators);
   mActionSeparators.clear();
 
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 

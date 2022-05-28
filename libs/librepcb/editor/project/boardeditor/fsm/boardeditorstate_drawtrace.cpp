@@ -220,9 +220,7 @@ bool BoardEditorState_DrawTrace::entry() noexcept {
           &BoardEditorState_DrawTrace::drillDiameterEditValueChanged);
   mActionSeparators.append(mContext.editorUi.commandToolbar->addSeparator());
 
-  // Change the cursor
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
-
   return true;
 }
 
@@ -247,9 +245,7 @@ bool BoardEditorState_DrawTrace::exit() noexcept {
   qDeleteAll(mWireModeActions);
   mWireModeActions.clear();
 
-  // Reset the cursor
-  mContext.editorGraphicsView.setCursor(Qt::ArrowCursor);
-
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 

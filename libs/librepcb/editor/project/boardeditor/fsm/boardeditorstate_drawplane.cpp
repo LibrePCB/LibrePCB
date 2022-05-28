@@ -124,9 +124,7 @@ bool BoardEditorState_DrawPlane::entry() noexcept {
   connect(mLayerComboBox.data(), &GraphicsLayerComboBox::currentLayerChanged,
           this, &BoardEditorState_DrawPlane::layerComboBoxLayerChanged);
 
-  // Change the cursor
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
-
   return true;
 }
 
@@ -142,9 +140,7 @@ bool BoardEditorState_DrawPlane::exit() noexcept {
   qDeleteAll(mActionSeparators);
   mActionSeparators.clear();
 
-  // Reset the cursor
-  mContext.editorGraphicsView.setCursor(Qt::ArrowCursor);
-
+  mContext.editorGraphicsView.unsetCursor();
   return true;
 }
 

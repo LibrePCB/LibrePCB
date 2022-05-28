@@ -69,7 +69,6 @@ PackageEditorState_DrawCircle::~PackageEditorState_DrawCircle() noexcept {
 
 bool PackageEditorState_DrawCircle::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
 
   // populate command toolbar
   mContext.commandToolBar.addLabel(tr("Layer:"));
@@ -103,6 +102,7 @@ bool PackageEditorState_DrawCircle::entry() noexcept {
           &PackageEditorState_DrawCircle::grabAreaCheckBoxCheckedChanged);
   mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
 
+  mContext.graphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
 
@@ -114,7 +114,7 @@ bool PackageEditorState_DrawCircle::exit() noexcept {
   // cleanup command toolbar
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.setCursor(Qt::ArrowCursor);
+  mContext.graphicsView.unsetCursor();
   return true;
 }
 

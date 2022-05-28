@@ -82,7 +82,6 @@ PackageEditorState_AddPads::~PackageEditorState_AddPads() noexcept {
 
 bool PackageEditorState_AddPads::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-  mContext.graphicsView.setCursor(Qt::CrossCursor);
 
   // populate command toolbar
 
@@ -156,7 +155,11 @@ bool PackageEditorState_AddPads::entry() noexcept {
 
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
-  return startAddPad(pos);
+  if (!startAddPad(pos)) {
+    return false;
+  }
+  mContext.graphicsView.setCursor(Qt::CrossCursor);
+  return true;
 }
 
 bool PackageEditorState_AddPads::exit() noexcept {
@@ -168,7 +171,7 @@ bool PackageEditorState_AddPads::exit() noexcept {
   mPackagePadComboBox = nullptr;
   mContext.commandToolBar.clear();
 
-  mContext.graphicsView.setCursor(Qt::ArrowCursor);
+  mContext.graphicsView.unsetCursor();
   return true;
 }
 
