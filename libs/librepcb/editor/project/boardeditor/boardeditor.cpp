@@ -258,6 +258,12 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
           &BoardEditorFsm::processImportDxf);
   connect(mUi->actionOrderPcb, &QAction::triggered, this,
           [this]() { mProjectEditor.execOrderPcbDialog(nullptr, this); });
+  connect(mUi->actionFind, &QAction::triggered, mUi->searchToolbar,
+          &SearchToolBar::selectAllAndSetFocus);
+  connect(mUi->actionFindNext, &QAction::triggered, mUi->searchToolbar,
+          &SearchToolBar::findNext);
+  connect(mUi->actionFindPrevious, &QAction::triggered, mUi->searchToolbar,
+          &SearchToolBar::findPrevious);
 
   // connect the undo/redo actions with the UndoStack of the project
   mUndoStackActionGroup.reset(
