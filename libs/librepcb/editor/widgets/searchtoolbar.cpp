@@ -43,8 +43,8 @@ SearchToolBar::SearchToolBar(QWidget* parent) noexcept
   mLineEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   mLineEdit->setMaxLength(30);  // avoid too large widget in toolbar
   mLineEdit->setClearButtonEnabled(true);  // to quickly clear the search term
-  connect(mLineEdit.data(), &QLineEdit::textEdited, this,
-          &SearchToolBar::textEdited);
+  connect(mLineEdit.data(), &QLineEdit::textChanged, this,
+          &SearchToolBar::textChangedHandler);
   connect(mLineEdit.data(), &QLineEdit::returnPressed, this,
           &SearchToolBar::enterPressed);
   addWidget(mLineEdit.data());
@@ -58,6 +58,10 @@ SearchToolBar::~SearchToolBar() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void SearchToolBar::clear() noexcept {
+  mLineEdit->clear();
+}
 
 void SearchToolBar::selectAllAndSetFocus() noexcept {
   mLineEdit->selectAll();
@@ -86,10 +90,11 @@ void SearchToolBar::updateCompleter() noexcept {
   mLineEdit->setCompleter(completer);
 }
 
-void SearchToolBar::textEdited(const QString& text) noexcept {
+void SearchToolBar::textChangedHandler(const QString& text) noexcept {
   Q_UNUSED(text);
   updateCompleter();
   mIndex = 0;
+  emit textChanged(text);
 }
 
 void SearchToolBar::enterPressed() noexcept {

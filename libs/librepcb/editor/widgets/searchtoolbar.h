@@ -52,6 +52,9 @@ public:
   explicit SearchToolBar(QWidget* parent = nullptr) noexcept;
   ~SearchToolBar() noexcept;
 
+  // Getters
+  QString getText() const noexcept { return mLineEdit->text(); }
+
   // Setters
   void setPlaceholderText(const QString& text) noexcept {
     mLineEdit->setPlaceholderText(text);
@@ -61,17 +64,19 @@ public:
   }
 
   // General Methods
+  void clear() noexcept;
   void selectAllAndSetFocus() noexcept;
 
   // Operator Overloadings
   SearchToolBar& operator=(const SearchToolBar& rhs) = delete;
 
 signals:
+  void textChanged(const QString& text);
   void goToTriggered(const QString& name, unsigned int index = 0);
 
 private:
   void updateCompleter() noexcept;
-  void textEdited(const QString& text) noexcept;
+  void textChangedHandler(const QString& text) noexcept;
   void enterPressed() noexcept;
 
 private:
