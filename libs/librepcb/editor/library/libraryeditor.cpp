@@ -113,6 +113,8 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
           &LibraryEditor::flipTriggered);
   connect(mUi->actionRemove, &QAction::triggered, this,
           &LibraryEditor::removeTriggered);
+  connect(mUi->actionFind, &QAction::triggered, mUi->filterToolbar,
+          &SearchToolBar::selectAllAndSetFocus);
   connect(mUi->actionAbortCommand, &QAction::triggered, this,
           &LibraryEditor::abortCommandTriggered);
   connect(mUi->actionZoomIn, &QAction::triggered, this,
@@ -160,14 +162,9 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   setWindowIcon(mLibrary->getIconAsPixmap());
 
   // setup "filter" toolbar
-  QLineEdit* filterLineEdit = new QLineEdit();
-  filterLineEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  filterLineEdit->setMaxLength(30);  // avoid too large widget in toolbar
-  filterLineEdit->setClearButtonEnabled(true);  // to quickly reset the filter
-  filterLineEdit->setPlaceholderText(tr("Filter elements"));
-  connect(filterLineEdit, &QLineEdit::textEdited, overviewWidget,
+  mUi->filterToolbar->setPlaceholderText(tr("Filter elements"));
+  connect(mUi->filterToolbar, &SearchToolBar::textChanged, overviewWidget,
           &LibraryOverviewWidget::setFilter);
-  mUi->filterToolbar->addWidget(filterLineEdit);
 
   // setup status bar
   mUi->statusBar->setFields(StatusBar::ProgressBar);

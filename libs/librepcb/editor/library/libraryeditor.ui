@@ -137,6 +137,8 @@
     <addaction name="actionCut"/>
     <addaction name="actionPaste"/>
     <addaction name="actionRemove"/>
+    <addaction name="separator"/>
+    <addaction name="actionFind"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -236,7 +238,7 @@
    <addaction name="actionZoomAll"/>
    <addaction name="actionGridProperties"/>
   </widget>
-  <widget class="QToolBar" name="filterToolbar">
+  <widget class="librepcb::editor::SearchToolBar" name="filterToolbar">
    <property name="windowTitle">
     <string>Filter</string>
    </property>
@@ -804,6 +806,18 @@
     <string>Export as image file</string>
    </property>
   </action>
+  <action name="actionFind">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/search.png</normaloff>:/img/actions/search.png</iconset>
+   </property>
+   <property name="text">
+    <string notr="true">Find...</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Ctrl+F</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -811,6 +825,11 @@
    <class>librepcb::editor::StatusBar</class>
    <extends>QStatusBar</extends>
    <header location="global">librepcb/editor/widgets/statusbar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::SearchToolBar</class>
+   <extends>QToolBar</extends>
+   <header location="global">librepcb/editor/widgets/searchtoolbar.h</header>
   </customwidget>
   <customwidget>
    <class>librepcb::editor::TabWidget</class>
