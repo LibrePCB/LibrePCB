@@ -764,6 +764,19 @@ void LibraryEditor::updateTabTitles() noexcept {
   }
 }
 
+void LibraryEditor::keyPressEvent(QKeyEvent* event) noexcept {
+  // If the overview tab is opened and a filter is active, discard the filter
+  // with the escape key.
+  if ((event->key() == Qt::Key_Escape) &&
+      (!mUi->filterToolbar->getText().isEmpty())) {
+    if (dynamic_cast<LibraryOverviewWidget*>(mCurrentEditorWidget)) {
+      mUi->filterToolbar->clear();
+      return;
+    }
+  }
+  QMainWindow::keyPressEvent(event);
+}
+
 void LibraryEditor::closeEvent(QCloseEvent* event) noexcept {
   if (closeAndDestroy(true)) {
     QMainWindow::closeEvent(event);
