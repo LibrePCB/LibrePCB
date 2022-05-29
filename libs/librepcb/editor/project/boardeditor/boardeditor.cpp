@@ -838,7 +838,7 @@ QStringList BoardEditor::getSearchToolBarCompleterList() noexcept {
   return list;
 }
 
-void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
+void BoardEditor::goToDevice(const QString& name, int index) noexcept {
   QList<BI_Device*> deviceCandidates = {};
   foreach (BI_Device* device, getSearchCandidates()) {
     if (device->getComponentInstance().getName()->startsWith(
@@ -848,6 +848,9 @@ void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
   }
 
   if (deviceCandidates.count()) {
+    while (index < 0) {
+      index += deviceCandidates.count();
+    }
     index %= deviceCandidates.count();
     BI_Device* device = deviceCandidates[index];
     Board* board = getActiveBoard();

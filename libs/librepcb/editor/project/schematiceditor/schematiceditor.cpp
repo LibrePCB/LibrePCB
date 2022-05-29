@@ -615,8 +615,7 @@ QStringList SchematicEditor::getSearchToolBarCompleterList() noexcept {
   return list;
 }
 
-void SchematicEditor::goToSymbol(const QString& name,
-                                 unsigned int index) noexcept {
+void SchematicEditor::goToSymbol(const QString& name, int index) noexcept {
   QList<SI_Symbol*> symbolCandidates = {};
   foreach (SI_Symbol* symbol, getSearchCandidates()) {
     if (symbol->getName().startsWith(name, Qt::CaseInsensitive)) {
@@ -625,6 +624,9 @@ void SchematicEditor::goToSymbol(const QString& name,
   }
 
   if (symbolCandidates.count()) {
+    while (index < 0) {
+      index += symbolCandidates.count();
+    }
     index %= symbolCandidates.count();
     SI_Symbol* symbol = symbolCandidates[index];
     Schematic& schematic = symbol->getSchematic();

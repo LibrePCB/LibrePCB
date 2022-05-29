@@ -39,6 +39,7 @@ SearchToolBar::SearchToolBar(QWidget* parent) noexcept
   : QToolBar(parent),
     mCompleterListFunction(),
     mLineEdit(new QLineEdit()),
+    mForward(true),
     mIndex(0) {
   mLineEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   mLineEdit->setMaxLength(30);  // avoid too large widget in toolbar
@@ -46,7 +47,7 @@ SearchToolBar::SearchToolBar(QWidget* parent) noexcept
   connect(mLineEdit.data(), &QLineEdit::textChanged, this,
           &SearchToolBar::textChangedHandler);
   connect(mLineEdit.data(), &QLineEdit::returnPressed, this,
-          &SearchToolBar::enterPressed);
+          &SearchToolBar::findNext);
   addWidget(mLineEdit.data());
   setFocusPolicy(mLineEdit->focusPolicy());
   setFocusProxy(mLineEdit.data());
@@ -66,6 +67,24 @@ void SearchToolBar::clear() noexcept {
 void SearchToolBar::selectAllAndSetFocus() noexcept {
   mLineEdit->selectAll();
   mLineEdit->setFocus();
+}
+
+void SearchToolBar::findNext() noexcept {
+  if (!mForward) {
+    mForward = true;
+    mIndex += 2;
+  }
+  emit goToTriggered(mLineEdit->text().trimmed(), mIndex);
+  ++mIndex;
+}
+
+void SearchToolBar::findPrevious() noexcept {
+  if (mForward) {
+    mForward = false;
+    mIndex -= 2;
+  }
+  emit goToTriggered(mLineEdit->text().trimmed(), mIndex);
+  --mIndex;
 }
 
 /*******************************************************************************
@@ -91,14 +110,10 @@ void SearchToolBar::updateCompleter() noexcept {
 }
 
 void SearchToolBar::textChangedHandler(const QString& text) noexcept {
-  Q_UNUSED(text);
   updateCompleter();
   mIndex = 0;
+  mForward = true;
   emit textChanged(text);
-}
-
-void SearchToolBar::enterPressed() noexcept {
-  emit goToTriggered(mLineEdit->text().trimmed(), mIndex++);
 }
 
 /*******************************************************************************

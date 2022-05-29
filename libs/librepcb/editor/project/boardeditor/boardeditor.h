@@ -135,7 +135,7 @@ private:
   void clearDrcMarker() noexcept;
   QList<BI_Device*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;
-  void goToDevice(const QString& name, unsigned int index) noexcept;
+  void goToDevice(const QString& name, int index) noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
 
