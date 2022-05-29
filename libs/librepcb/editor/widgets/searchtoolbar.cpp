@@ -48,9 +48,20 @@ SearchToolBar::SearchToolBar(QWidget* parent) noexcept
   connect(mLineEdit.data(), &QLineEdit::returnPressed, this,
           &SearchToolBar::enterPressed);
   addWidget(mLineEdit.data());
+  setFocusPolicy(mLineEdit->focusPolicy());
+  setFocusProxy(mLineEdit.data());
 }
 
 SearchToolBar::~SearchToolBar() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void SearchToolBar::selectAllAndSetFocus() noexcept {
+  mLineEdit->selectAll();
+  mLineEdit->setFocus();
 }
 
 /*******************************************************************************

@@ -60,6 +60,9 @@ public:
     mCompleterListFunction = fun;
   }
 
+  // General Methods
+  void selectAllAndSetFocus() noexcept;
+
   // Operator Overloadings
   SearchToolBar& operator=(const SearchToolBar& rhs) = delete;
 
