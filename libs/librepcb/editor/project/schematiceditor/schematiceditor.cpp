@@ -596,14 +596,11 @@ void SchematicEditor::renameSchematic(int index) noexcept {
 }
 
 QList<SI_Symbol*> SchematicEditor::getSearchCandidates() noexcept {
-  QList<SI_Symbol*> candidates = {};
+  QList<SI_Symbol*> candidates;
   foreach (const Schematic* schematic, mProject.getSchematics()) {
     Q_ASSERT(schematic);
     candidates += schematic->getSymbols();
   }
-  std::sort(
-      candidates.begin(), candidates.end(),
-      [](SI_Symbol* a, SI_Symbol* b) { return a->getName() < b->getName(); });
   return candidates;
 }
 
@@ -616,12 +613,22 @@ QStringList SchematicEditor::getSearchToolBarCompleterList() noexcept {
 }
 
 void SchematicEditor::goToSymbol(const QString& name, int index) noexcept {
-  QList<SI_Symbol*> symbolCandidates = {};
+  QList<SI_Symbol*> symbolCandidates;
   foreach (SI_Symbol* symbol, getSearchCandidates()) {
     if (symbol->getName().startsWith(name, Qt::CaseInsensitive)) {
       symbolCandidates.append(symbol);
     }
   }
+
+  // Sort by name for a natural order of results.
+  QCollator collator;
+  collator.setCaseSensitivity(Qt::CaseInsensitive);
+  collator.setIgnorePunctuation(false);
+  collator.setNumericMode(true);
+  std::sort(symbolCandidates.begin(), symbolCandidates.end(),
+            [&collator](const SI_Symbol* a, const SI_Symbol* b) {
+              return collator(a->getName(), b->getName());
+            });
 
   if (symbolCandidates.count()) {
     while (index < 0) {

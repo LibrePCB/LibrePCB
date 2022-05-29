@@ -818,14 +818,9 @@ void BoardEditor::clearDrcMarker() noexcept {
 }
 
 QList<BI_Device*> BoardEditor::getSearchCandidates() noexcept {
-  QList<BI_Device*> candidates = {};
+  QList<BI_Device*> candidates;
   if (Board* board = getActiveBoard()) {
     candidates += board->getDeviceInstances().values();
-    std::sort(candidates.begin(), candidates.end(),
-              [](BI_Device* a, BI_Device* b) {
-                return a->getComponentInstance().getName() <
-                    b->getComponentInstance().getName();
-              });
   }
   return candidates;
 }
@@ -839,13 +834,24 @@ QStringList BoardEditor::getSearchToolBarCompleterList() noexcept {
 }
 
 void BoardEditor::goToDevice(const QString& name, int index) noexcept {
-  QList<BI_Device*> deviceCandidates = {};
+  QList<BI_Device*> deviceCandidates;
   foreach (BI_Device* device, getSearchCandidates()) {
     if (device->getComponentInstance().getName()->startsWith(
             name, Qt::CaseInsensitive)) {
       deviceCandidates.append(device);
     }
   }
+
+  // Sort by name for a natural order of results.
+  QCollator collator;
+  collator.setCaseSensitivity(Qt::CaseInsensitive);
+  collator.setIgnorePunctuation(false);
+  collator.setNumericMode(true);
+  std::sort(deviceCandidates.begin(), deviceCandidates.end(),
+            [&collator](const BI_Device* a, const BI_Device* b) {
+              return collator(*a->getComponentInstance().getName(),
+                              *b->getComponentInstance().getName());
+            });
 
   if (deviceCandidates.count()) {
     while (index < 0) {
