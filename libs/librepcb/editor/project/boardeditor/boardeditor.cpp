@@ -258,6 +258,12 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
           &BoardEditorFsm::processImportDxf);
   connect(mUi->actionOrderPcb, &QAction::triggered, this,
           [this]() { mProjectEditor.execOrderPcbDialog(nullptr, this); });
+  connect(mUi->actionFind, &QAction::triggered, mUi->searchToolbar,
+          &SearchToolBar::selectAllAndSetFocus);
+  connect(mUi->actionFindNext, &QAction::triggered, mUi->searchToolbar,
+          &SearchToolBar::findNext);
+  connect(mUi->actionFindPrevious, &QAction::triggered, mUi->searchToolbar,
+          &SearchToolBar::findPrevious);
 
   // connect the undo/redo actions with the UndoStack of the project
   mUndoStackActionGroup.reset(
@@ -818,14 +824,9 @@ void BoardEditor::clearDrcMarker() noexcept {
 }
 
 QList<BI_Device*> BoardEditor::getSearchCandidates() noexcept {
-  QList<BI_Device*> candidates = {};
+  QList<BI_Device*> candidates;
   if (Board* board = getActiveBoard()) {
     candidates += board->getDeviceInstances().values();
-    std::sort(candidates.begin(), candidates.end(),
-              [](BI_Device* a, BI_Device* b) {
-                return a->getComponentInstance().getName() <
-                    b->getComponentInstance().getName();
-              });
   }
   return candidates;
 }
@@ -838,8 +839,8 @@ QStringList BoardEditor::getSearchToolBarCompleterList() noexcept {
   return list;
 }
 
-void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
-  QList<BI_Device*> deviceCandidates = {};
+void BoardEditor::goToDevice(const QString& name, int index) noexcept {
+  QList<BI_Device*> deviceCandidates;
   foreach (BI_Device* device, getSearchCandidates()) {
     if (device->getComponentInstance().getName()->startsWith(
             name, Qt::CaseInsensitive)) {
@@ -847,7 +848,21 @@ void BoardEditor::goToDevice(const QString& name, unsigned int index) noexcept {
     }
   }
 
+  // Sort by name for a natural order of results.
+  QCollator collator;
+  collator.setCaseSensitivity(Qt::CaseInsensitive);
+  collator.setIgnorePunctuation(false);
+  collator.setNumericMode(true);
+  std::sort(deviceCandidates.begin(), deviceCandidates.end(),
+            [&collator](const BI_Device* a, const BI_Device* b) {
+              return collator(*a->getComponentInstance().getName(),
+                              *b->getComponentInstance().getName());
+            });
+
   if (deviceCandidates.count()) {
+    while (index < 0) {
+      index += deviceCandidates.count();
+    }
     index %= deviceCandidates.count();
     BI_Device* device = deviceCandidates[index];
     Board* board = getActiveBoard();

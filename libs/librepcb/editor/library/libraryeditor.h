@@ -170,6 +170,7 @@ private:  // Methods
   void editNewLibraryElement(NewElementWizardContext::ElementType type,
                              const FilePath& fp);
   void updateTabTitles() noexcept;
+  void keyPressEvent(QKeyEvent* event) noexcept override;
   void closeEvent(QCloseEvent* event) noexcept override;
   void addLayer(const QString& name, bool forceVisible = false) noexcept;
 

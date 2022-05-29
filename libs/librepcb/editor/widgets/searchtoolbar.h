@@ -52,6 +52,9 @@ public:
   explicit SearchToolBar(QWidget* parent = nullptr) noexcept;
   ~SearchToolBar() noexcept;
 
+  // Getters
+  QString getText() const noexcept { return mLineEdit->text(); }
+
   // Setters
   void setPlaceholderText(const QString& text) noexcept {
     mLineEdit->setPlaceholderText(text);
@@ -60,21 +63,28 @@ public:
     mCompleterListFunction = fun;
   }
 
+  // General Methods
+  void clear() noexcept;
+  void selectAllAndSetFocus() noexcept;
+  void findNext() noexcept;
+  void findPrevious() noexcept;
+
   // Operator Overloadings
   SearchToolBar& operator=(const SearchToolBar& rhs) = delete;
 
 signals:
-  void goToTriggered(const QString& name, unsigned int index = 0);
+  void textChanged(const QString& text);
+  void goToTriggered(const QString& name, int index = 0);
 
 private:
   void updateCompleter() noexcept;
-  void textEdited(const QString& text) noexcept;
-  void enterPressed() noexcept;
+  void textChangedHandler(const QString& text) noexcept;
 
 private:
   CompleterListFunction mCompleterListFunction;
   QScopedPointer<QLineEdit> mLineEdit;
-  unsigned int mIndex;  ///< Number of searches with the current search term
+  bool mForward;  ///< Current search direction (forward or backward)
+  int mIndex;  ///< Number of searches with the current search term
 };
 
 /*******************************************************************************
