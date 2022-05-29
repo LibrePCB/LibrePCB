@@ -116,7 +116,7 @@ private:
   void renameSchematic(int index) noexcept;
   QList<SI_Symbol*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;
-  void goToSymbol(const QString& name, unsigned int index) noexcept;
+  void goToSymbol(const QString& name, int index) noexcept;
   void updateComponentToolbarIcons() noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;

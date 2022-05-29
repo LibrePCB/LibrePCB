@@ -163,6 +163,12 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
           [this]() { mProjectEditor.execLppzExportDialog(this); });
   connect(mUi->actionOrderPcb, &QAction::triggered, this,
           [this]() { mProjectEditor.execOrderPcbDialog(nullptr, this); });
+  connect(mUi->actionFind, &QAction::triggered, mUi->searchToolbar,
+          &SearchToolBar::selectAllAndSetFocus);
+  connect(mUi->actionFindNext, &QAction::triggered, mUi->searchToolbar,
+          &SearchToolBar::findNext);
+  connect(mUi->actionFindPrevious, &QAction::triggered, mUi->searchToolbar,
+          &SearchToolBar::findPrevious);
 
   // connect the undo/redo actions with the UndoStack of the project
   mUndoStackActionGroup.reset(
@@ -596,14 +602,11 @@ void SchematicEditor::renameSchematic(int index) noexcept {
 }
 
 QList<SI_Symbol*> SchematicEditor::getSearchCandidates() noexcept {
-  QList<SI_Symbol*> candidates = {};
+  QList<SI_Symbol*> candidates;
   foreach (const Schematic* schematic, mProject.getSchematics()) {
     Q_ASSERT(schematic);
     candidates += schematic->getSymbols();
   }
-  std::sort(
-      candidates.begin(), candidates.end(),
-      [](SI_Symbol* a, SI_Symbol* b) { return a->getName() < b->getName(); });
   return candidates;
 }
 
@@ -615,16 +618,28 @@ QStringList SchematicEditor::getSearchToolBarCompleterList() noexcept {
   return list;
 }
 
-void SchematicEditor::goToSymbol(const QString& name,
-                                 unsigned int index) noexcept {
-  QList<SI_Symbol*> symbolCandidates = {};
+void SchematicEditor::goToSymbol(const QString& name, int index) noexcept {
+  QList<SI_Symbol*> symbolCandidates;
   foreach (SI_Symbol* symbol, getSearchCandidates()) {
     if (symbol->getName().startsWith(name, Qt::CaseInsensitive)) {
       symbolCandidates.append(symbol);
     }
   }
 
+  // Sort by name for a natural order of results.
+  QCollator collator;
+  collator.setCaseSensitivity(Qt::CaseInsensitive);
+  collator.setIgnorePunctuation(false);
+  collator.setNumericMode(true);
+  std::sort(symbolCandidates.begin(), symbolCandidates.end(),
+            [&collator](const SI_Symbol* a, const SI_Symbol* b) {
+              return collator(a->getName(), b->getName());
+            });
+
   if (symbolCandidates.count()) {
+    while (index < 0) {
+      index += symbolCandidates.count();
+    }
     index %= symbolCandidates.count();
     SI_Symbol* symbol = symbolCandidates[index];
     Schematic& schematic = symbol->getSchematic();

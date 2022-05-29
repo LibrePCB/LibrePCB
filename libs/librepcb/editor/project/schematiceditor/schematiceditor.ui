@@ -109,6 +109,10 @@
     <addaction name="actionPaste"/>
     <addaction name="actionRemove"/>
     <addaction name="separator"/>
+    <addaction name="actionFind"/>
+    <addaction name="actionFindNext"/>
+    <addaction name="actionFindPrevious"/>
+    <addaction name="separator"/>
     <addaction name="actionEditNetclasses"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -874,6 +878,34 @@
    </property>
    <property name="toolTip">
     <string>Export schematics as image file</string>
+   </property>
+  </action>
+  <action name="actionFind">
+   <property name="icon">
+    <iconset>
+     <normaloff>:/img/actions/search.png</normaloff>:/img/actions/search.png</iconset>
+   </property>
+   <property name="text">
+    <string notr="true">Find...</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionFindNext">
+   <property name="text">
+    <string notr="true">Find Next</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true">F3</string>
+   </property>
+  </action>
+  <action name="actionFindPrevious">
+   <property name="text">
+    <string notr="true">Find Previous</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Shift+F3</string>
    </property>
   </action>
  </widget>

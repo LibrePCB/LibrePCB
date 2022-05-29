@@ -39,18 +39,52 @@ SearchToolBar::SearchToolBar(QWidget* parent) noexcept
   : QToolBar(parent),
     mCompleterListFunction(),
     mLineEdit(new QLineEdit()),
+    mForward(true),
     mIndex(0) {
   mLineEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
   mLineEdit->setMaxLength(30);  // avoid too large widget in toolbar
   mLineEdit->setClearButtonEnabled(true);  // to quickly clear the search term
-  connect(mLineEdit.data(), &QLineEdit::textEdited, this,
-          &SearchToolBar::textEdited);
+  connect(mLineEdit.data(), &QLineEdit::textChanged, this,
+          &SearchToolBar::textChangedHandler);
   connect(mLineEdit.data(), &QLineEdit::returnPressed, this,
-          &SearchToolBar::enterPressed);
+          &SearchToolBar::findNext);
   addWidget(mLineEdit.data());
+  setFocusPolicy(mLineEdit->focusPolicy());
+  setFocusProxy(mLineEdit.data());
 }
 
 SearchToolBar::~SearchToolBar() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void SearchToolBar::clear() noexcept {
+  mLineEdit->clear();
+}
+
+void SearchToolBar::selectAllAndSetFocus() noexcept {
+  mLineEdit->selectAll();
+  mLineEdit->setFocus();
+}
+
+void SearchToolBar::findNext() noexcept {
+  if (!mForward) {
+    mForward = true;
+    mIndex += 2;
+  }
+  emit goToTriggered(mLineEdit->text().trimmed(), mIndex);
+  ++mIndex;
+}
+
+void SearchToolBar::findPrevious() noexcept {
+  if (mForward) {
+    mForward = false;
+    mIndex -= 2;
+  }
+  emit goToTriggered(mLineEdit->text().trimmed(), mIndex);
+  --mIndex;
 }
 
 /*******************************************************************************
@@ -75,14 +109,11 @@ void SearchToolBar::updateCompleter() noexcept {
   mLineEdit->setCompleter(completer);
 }
 
-void SearchToolBar::textEdited(const QString& text) noexcept {
-  Q_UNUSED(text);
+void SearchToolBar::textChangedHandler(const QString& text) noexcept {
   updateCompleter();
   mIndex = 0;
-}
-
-void SearchToolBar::enterPressed() noexcept {
-  emit goToTriggered(mLineEdit->text().trimmed(), mIndex++);
+  mForward = true;
+  emit textChanged(text);
 }
 
 /*******************************************************************************
