@@ -108,6 +108,7 @@ private:  // Methods
 
 private:  // Data
   bool mIsUndoCmdActive;
+  bool mUseAddComponentDialog;
   QScopedPointer<AddComponentDialog> mAddComponentDialog;
   Angle mLastAngle;
 

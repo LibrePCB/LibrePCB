@@ -57,6 +57,7 @@ SchematicEditorState_AddComponent::SchematicEditorState_AddComponent(
     const Context& context) noexcept
   : SchematicEditorState(context),
     mIsUndoCmdActive(false),
+    mUseAddComponentDialog(true),
     mAddComponentDialog(nullptr),
     mLastAngle(0),
     mCurrentComponent(nullptr),
@@ -156,6 +157,7 @@ bool SchematicEditorState_AddComponent::processAddComponent() noexcept {
     // start adding (another) component
     if (!abortCommand(true)) return false;
     mLastAngle.setAngleMicroDeg(0);  // reset the angle
+    mUseAddComponentDialog = true;
     startAddingComponent();
     return true;
   } catch (UserCanceled& exc) {
@@ -172,6 +174,7 @@ bool SchematicEditorState_AddComponent::processAddComponent(
     // start adding (another) component
     if (!abortCommand(true)) return false;
     mLastAngle.setAngleMicroDeg(0);  // reset the angle
+    mUseAddComponentDialog = false;
     startAddingComponent(cmp, symbVar);
     return true;
   } catch (UserCanceled& exc) {
@@ -199,7 +202,8 @@ bool SchematicEditorState_AddComponent::processAbortCommand() noexcept {
     if (!abortCommand(true)) {
       return false;
     }
-    if (mAddComponentDialog && mAddComponentDialog->getAutoOpenAgain()) {
+    if (mUseAddComponentDialog && mAddComponentDialog &&
+        mAddComponentDialog->getAutoOpenAgain()) {
       mLastAngle.setAngleMicroDeg(0);  // reset the angle
       startAddingComponent();
       return true;
