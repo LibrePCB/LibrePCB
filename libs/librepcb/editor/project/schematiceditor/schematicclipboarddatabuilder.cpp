@@ -84,6 +84,11 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
 
   // Add components
   foreach (SI_Symbol* symbol, query->getSymbols()) {
+    // Components with multiple symbols (gates) shall be added only once.
+    if (data->getComponentInstances().contains(
+            symbol->getComponentInstance().getUuid())) {
+      continue;
+    }
     std::unique_ptr<TransactionalDirectory> dir = data->getDirectory(
         "cmp/" %
         symbol->getComponentInstance().getLibComponent().getUuid().toStr());
