@@ -96,6 +96,9 @@ public:
         attributes(node, fileFormat),
         onEdited(*this) {}
 
+    /// Required for ::librepcb::SerializableObjectList::contains()
+    const Uuid& getUuid() const noexcept { return uuid; }
+
     /// @copydoc ::librepcb::SerializableObject::serialize()
     void serialize(SExpression& root) const override {
       root.appendChild(uuid);
