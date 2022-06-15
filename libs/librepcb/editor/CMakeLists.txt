@@ -53,6 +53,10 @@ add_library(
   dialogs/textpropertiesdialog.cpp
   dialogs/textpropertiesdialog.h
   dialogs/textpropertiesdialog.ui
+  editorcommand.cpp
+  editorcommand.h
+  editorcommandcategory.h
+  editorcommandset.h
   library/cat/categorychooserdialog.cpp
   library/cat/categorychooserdialog.h
   library/cat/categorychooserdialog.ui
