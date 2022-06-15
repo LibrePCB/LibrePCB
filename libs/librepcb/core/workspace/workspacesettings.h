@@ -27,6 +27,7 @@
 #include "../types/lengthunit.h"
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
+#include "workspacesettingsitem_keyboardshortcuts.h"
 
 #include <QtCore>
 
@@ -231,6 +232,18 @@ public:
    * Default: PdfOpenBehavior::ALWAYS
    */
   WorkspaceSettingsItem_GenericValue<PdfOpenBehavior> pdfOpenBehavior;
+
+  /**
+   * @brief Keyboard shortcuts
+   *
+   * @note Expected to contain only the shortcuts explicitly set (overridden)
+   *       by the user, not all available shortcuts. This way we are able to
+   *       improve the default shortcuts with each new release without users
+   *       staying at the old shortcuts.
+   *
+   * @see ::librepcb::WorkspaceSettingsItem_KeyboardShortcuts
+   */
+  WorkspaceSettingsItem_KeyboardShortcuts keyboardShortcuts;
 };
 
 /*******************************************************************************

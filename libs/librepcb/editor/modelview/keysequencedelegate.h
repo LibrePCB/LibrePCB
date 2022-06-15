@@ -17,14 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_WORKSPACESETTINGSDIALOG_H
-#define LIBREPCB_EDITOR_WORKSPACESETTINGSDIALOG_H
+#ifndef LIBREPCB_EDITOR_KEYSEQUENCEDELEGATE_H
+#define LIBREPCB_EDITOR_KEYSEQUENCEDELEGATE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../modelview/editablelistmodel.h"
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -32,60 +30,37 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Workspace;
-class WorkspaceSettings;
-
 namespace editor {
 
-class KeyboardShortcutsModel;
-
-namespace Ui {
-class WorkspaceSettingsDialog;
-}
+class KeySequencesEditorWidget;
 
 /*******************************************************************************
- *  Class WorkspaceSettingsDialog
+ *  Class KeySequenceDelegate
  ******************************************************************************/
 
 /**
- * @brief Dialog (GUI) to view and modify workspace settings
+ * @brief Subclass of QStyledItemDelegate to display/edit a QKeySequence
  */
-class WorkspaceSettingsDialog final : public QDialog {
+class KeySequenceDelegate final : public QStyledItemDelegate {
   Q_OBJECT
-
-  using LibraryLocaleOrderModel =
-      EditableListModel<QStringList, EditableListModelType::LOCALE>;
-  using LibraryNormOrderModel = EditableListModel<QStringList>;
-  using RepositoryUrlModel = EditableListModel<QList<QUrl>>;
 
 public:
   // Constructors / Destructor
-  WorkspaceSettingsDialog() = delete;
-  WorkspaceSettingsDialog(const WorkspaceSettingsDialog& other) = delete;
-  explicit WorkspaceSettingsDialog(Workspace& workspace,
-                                   QWidget* parent = nullptr);
-  ~WorkspaceSettingsDialog();
+  explicit KeySequenceDelegate(QObject* parent = nullptr) noexcept;
+  KeySequenceDelegate(const KeySequenceDelegate& other) = delete;
+  ~KeySequenceDelegate() noexcept;
+
+  // Inherited from QStyledItemDelegate
+  QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
+                        const QModelIndex& index) const override;
+  void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+  void setModelData(QWidget* editor, QAbstractItemModel* model,
+                    const QModelIndex& index) const override;
+  void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
+                            const QModelIndex& index) const override;
 
   // Operator Overloadings
-  WorkspaceSettingsDialog& operator=(const WorkspaceSettingsDialog& rhs) =
-      delete;
-
-private:
-  void buttonBoxClicked(QAbstractButton* button) noexcept;
-  void keyPressEvent(QKeyEvent* event) noexcept override;
-  void loadSettings() noexcept;
-  void saveSettings() noexcept;
-
-private:
-  Workspace& mWorkspace;  /// Reference to the Workspace object
-  WorkspaceSettings& mSettings;  ///< Reference to the WorkspaceSettings object
-  QScopedPointer<LibraryLocaleOrderModel> mLibLocaleOrderModel;
-  QScopedPointer<LibraryNormOrderModel> mLibNormOrderModel;
-  QScopedPointer<RepositoryUrlModel> mRepositoryUrlsModel;
-  QScopedPointer<KeyboardShortcutsModel> mKeyboardShortcutsModel;
-  QScopedPointer<QSortFilterProxyModel> mKeyboardShortcutsFilterModel;
-  QScopedPointer<Ui::WorkspaceSettingsDialog> mUi;
+  KeySequenceDelegate& operator=(const KeySequenceDelegate& rhs) = delete;
 };
 
 /*******************************************************************************
