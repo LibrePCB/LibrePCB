@@ -67,8 +67,8 @@ public:
   virtual bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processRotateCw() noexcept override;
-  virtual bool processRotateCcw() noexcept override;
+  virtual bool processRotate(const Angle& rotation) noexcept override;
+  virtual bool processMirror(Qt::Orientation orientation) noexcept override;
   virtual bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonPressed(
@@ -92,7 +92,6 @@ private:  // Methods
   void layerComboBoxLayerChanged(const GraphicsLayerName& layerName) noexcept;
   void textComboBoxValueChanged(const QString& value) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
-  void setFocusToTextEdit() noexcept;
 
 private:  // Data
   // State
@@ -103,14 +102,6 @@ private:  // Data
   // mIsUndoCmdActive == true.
   SI_Text* mCurrentTextToPlace;
   QScopedPointer<CmdTextEdit> mCurrentTextEditCmd;
-
-  // Widgets for the command toolbar
-  QScopedPointer<QLabel> mLayerLabel;
-  QScopedPointer<GraphicsLayerComboBox> mLayerComboBox;
-  QScopedPointer<QLabel> mTextLabel;
-  QScopedPointer<QComboBox> mTextComboBox;
-  QScopedPointer<QLabel> mHeightLabel;
-  QScopedPointer<PositiveLengthEdit> mHeightEdit;
 };
 
 /*******************************************************************************

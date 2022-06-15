@@ -47,6 +47,9 @@ class StrokeTextGraphicsItem;
 namespace editor {
 
 class CmdStrokeTextEdit;
+class GraphicsLayerComboBox;
+class HAlignActionGroup;
+class VAlignActionGroup;
 
 /*******************************************************************************
  *  Class PackageEditorState_DrawTextBase
@@ -73,6 +76,8 @@ public:
   // General Methods
   bool entry() noexcept override;
   bool exit() noexcept override;
+  QSet<EditorWidgetBase::Feature> getAvailableFeatures() const
+      noexcept override;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -81,8 +86,9 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
-  bool processRotateCw() noexcept override;
-  bool processRotateCcw() noexcept override;
+  bool processRotate(const Angle& rotation) noexcept override;
+  bool processMirror(Qt::Orientation orientation) noexcept override;
+  bool processFlip(Qt::Orientation orientation) noexcept override;
 
   // Operator Overloadings
   PackageEditorState_DrawTextBase& operator=(
@@ -93,7 +99,6 @@ private:  // Methods
   bool finishAddText(const Point& pos) noexcept;
   bool abortAddText() noexcept;
   void resetToDefaultParameters() noexcept;
-
   void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
   void strokeWidthEditValueChanged(const UnsignedLength& value) noexcept;
@@ -107,6 +112,9 @@ private:  // Types / Data
   QScopedPointer<CmdStrokeTextEdit> mEditCmd;
   std::shared_ptr<StrokeText> mCurrentText;
   std::shared_ptr<StrokeTextGraphicsItem> mCurrentGraphicsItem;
+  QPointer<GraphicsLayerComboBox> mLayerComboBox;
+  QPointer<HAlignActionGroup> mHAlignActionGroup;
+  QPointer<VAlignActionGroup> mVAlignActionGroup;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;
@@ -115,6 +123,7 @@ private:  // Types / Data
   UnsignedLength mLastStrokeWidth;
   Alignment mLastAlignment;
   QString mLastText;
+  bool mLastMirrored;
 };
 
 /*******************************************************************************

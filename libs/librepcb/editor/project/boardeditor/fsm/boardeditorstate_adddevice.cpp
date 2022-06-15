@@ -79,20 +79,13 @@ bool BoardEditorState_AddDevice::processAddDevice(
   return true;
 }
 
-bool BoardEditorState_AddDevice::processRotateCw() noexcept {
-  return rotateDevice(-Angle::deg90());
+bool BoardEditorState_AddDevice::processRotate(const Angle& rotation) noexcept {
+  return rotateDevice(rotation);
 }
 
-bool BoardEditorState_AddDevice::processRotateCcw() noexcept {
-  return rotateDevice(Angle::deg90());
-}
-
-bool BoardEditorState_AddDevice::processFlipHorizontal() noexcept {
-  return mirrorDevice(Qt::Horizontal);
-}
-
-bool BoardEditorState_AddDevice::processFlipVertical() noexcept {
-  return mirrorDevice(Qt::Vertical);
+bool BoardEditorState_AddDevice::processFlip(
+    Qt::Orientation orientation) noexcept {
+  return mirrorDevice(orientation);
 }
 
 bool BoardEditorState_AddDevice::processGraphicsSceneMouseMoved(

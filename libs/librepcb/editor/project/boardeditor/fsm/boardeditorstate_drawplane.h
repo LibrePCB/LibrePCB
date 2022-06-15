@@ -99,13 +99,6 @@ private:  // Data
   // mIsUndoCmdActive == true.
   BI_Plane* mCurrentPlane;
   QScopedPointer<CmdBoardPlaneEdit> mCurrentPlaneEditCmd;
-
-  // Widgets for the command toolbar
-  QList<QAction*> mActionSeparators;
-  QScopedPointer<QLabel> mNetSignalLabel;
-  QScopedPointer<QComboBox> mNetSignalComboBox;
-  QScopedPointer<QLabel> mLayerLabel;
-  QScopedPointer<GraphicsLayerComboBox> mLayerComboBox;
 };
 
 /*******************************************************************************

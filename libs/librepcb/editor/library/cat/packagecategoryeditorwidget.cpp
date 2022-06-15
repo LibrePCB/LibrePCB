@@ -95,6 +95,17 @@ PackageCategoryEditorWidget::~PackageCategoryEditorWidget() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+QSet<EditorWidgetBase::Feature>
+    PackageCategoryEditorWidget::getAvailableFeatures() const noexcept {
+  return {
+      EditorWidgetBase::Feature::Close,
+  };
+}
+
+/*******************************************************************************
  *  Public Slots
  ******************************************************************************/
 

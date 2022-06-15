@@ -78,13 +78,11 @@ private:  // Types
 
 public:  // Types
   struct Context {
-    Workspace& workspace;
+    EditorWidgetBase::Context& editorContext;
     PackageEditorWidget& editorWidget;
     UndoStack& undoStack;
-    bool readOnly;
     GraphicsScene& graphicsScene;
     GraphicsView& graphicsView;
-    const IF_GraphicsLayerProvider& layerProvider;
     Package& package;
     std::shared_ptr<Footprint> currentFootprint;
     std::shared_ptr<FootprintGraphicsItem> currentGraphicsItem;
@@ -101,6 +99,12 @@ public:
   // Getters
   EditorWidgetBase::Tool getCurrentTool() const noexcept;
   std::shared_ptr<Footprint> getCurrentFootprint() const noexcept;
+  const QSet<EditorWidgetBase::Feature>& getAvailableFeatures() const noexcept {
+    return mAvailableFeatures;
+  }
+
+  // General Methods
+  void updateAvailableFeatures() noexcept;
 
   // Event Handlers
   bool processChangeCurrentFootprint(
@@ -118,11 +122,13 @@ public:
   bool processCut() noexcept;
   bool processCopy() noexcept;
   bool processPaste() noexcept;
-  bool processRotateCw() noexcept;
-  bool processRotateCcw() noexcept;
-  bool processMirror() noexcept;
-  bool processFlip() noexcept;
+  bool processMove(Qt::ArrowType direction) noexcept;
+  bool processRotate(const Angle& rotation) noexcept;
+  bool processMirror(Qt::Orientation orientation) noexcept;
+  bool processFlip(Qt::Orientation orientation) noexcept;
+  bool processSnapToGrid() noexcept;
   bool processRemove() noexcept;
+  bool processEditProperties() noexcept;
   bool processAbortCommand() noexcept;
   bool processStartSelecting() noexcept;
   bool processStartAddingFootprintThtPads() noexcept;
@@ -142,6 +148,7 @@ public:
 
 signals:
   void toolChanged(EditorWidgetBase::Tool newTool);
+  void availableFeaturesChanged();
 
 private:  // Methods
   PackageEditorState* getCurrentState() const noexcept;
@@ -156,6 +163,7 @@ private:  // Data
   State mCurrentState;
   State mPreviousState;
   QScopedPointer<PrimitiveTextGraphicsItem> mSelectFootprintGraphicsItem;
+  QSet<EditorWidgetBase::Feature> mAvailableFeatures;
 };
 
 /*******************************************************************************

@@ -75,6 +75,11 @@ void CmdBoardViaEdit::translate(const Point& deltaPos,
   if (immediate) mVia.setPosition(mNewPos);
 }
 
+void CmdBoardViaEdit::snapToGrid(const PositiveLength& gridInterval,
+                                 bool immediate) noexcept {
+  setPosition(mNewPos.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdBoardViaEdit::rotate(const Angle& angle, const Point& center,
                              bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

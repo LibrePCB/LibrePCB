@@ -100,15 +100,6 @@ private:
   // mIsUndoCmdActive == true.
   BI_Polygon* mCurrentPolygon;
   QScopedPointer<CmdPolygonEdit> mCurrentPolygonEditCmd;
-
-  // Widgets for the command toolbar
-  QList<QAction*> mActionSeparators;
-  QScopedPointer<QLabel> mLayerLabel;
-  QScopedPointer<GraphicsLayerComboBox> mLayerComboBox;
-  QScopedPointer<QLabel> mWidthLabel;
-  QScopedPointer<UnsignedLengthEdit> mWidthEdit;
-  QScopedPointer<QLabel> mFillLabel;
-  QScopedPointer<QCheckBox> mFillCheckBox;
 };
 
 /*******************************************************************************

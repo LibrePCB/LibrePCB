@@ -26,6 +26,7 @@
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../library/cmd/cmdlibraryelementedit.h"
 #include "../../utils/exclusiveactiongroup.h"
+#include "../../utils/toolbarproxy.h"
 #include "../../widgets/statusbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdfootprintedit.h"
@@ -82,8 +83,6 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   mUi->graphicsView->setBackgroundBrush(Qt::black);
   mUi->graphicsView->setForegroundBrush(Qt::white);
   mUi->graphicsView->setEnabled(false);  // no footprint selected
-  connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged, this,
-          &PackageEditorWidget::cursorPositionChanged);
   setWindowIcon(QIcon(":/img/library/package.png"));
 
   // Apply grid properties unit from workspace settings
@@ -145,18 +144,14 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
           this, &PackageEditorWidget::commitMetadata);
 
   // Load finite state machine (FSM).
-  PackageEditorFsm::Context fsmContext{mContext.workspace,
-                                       *this,
-                                       *mUndoStack,
-                                       mContext.readOnly,
-                                       *mGraphicsScene,
-                                       *mUi->graphicsView,
-                                       mContext.layerProvider,
-                                       *mPackage,
-                                       nullptr,
-                                       nullptr,
-                                       *mCommandToolBarProxy};
+  PackageEditorFsm::Context fsmContext{
+      mContext,  *this,   *mUndoStack, *mGraphicsScene,      *mUi->graphicsView,
+      *mPackage, nullptr, nullptr,     *mCommandToolBarProxy};
   mFsm.reset(new PackageEditorFsm(fsmContext));
+  connect(mUndoStack.data(), &UndoStack::stateModified, mFsm.data(),
+          &PackageEditorFsm::updateAvailableFeatures);
+  connect(mFsm.data(), &PackageEditorFsm::availableFeaturesChanged, this,
+          [this]() { emit availableFeaturesChanged(getAvailableFeatures()); });
   currentFootprintChanged(0);  // small hack to select the first footprint...
 
   // Last but not least, connect the graphics scene events with the FSM.
@@ -170,43 +165,61 @@ PackageEditorWidget::~PackageEditorWidget() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+QSet<EditorWidgetBase::Feature> PackageEditorWidget::getAvailableFeatures()
+    const noexcept {
+  QSet<EditorWidgetBase::Feature> features = {
+      EditorWidgetBase::Feature::Close,
+      EditorWidgetBase::Feature::GraphicsView,
+      EditorWidgetBase::Feature::ExportGraphics,
+  };
+  return features + mFsm->getAvailableFeatures();
+}
+
+/*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void PackageEditorWidget::setToolsActionGroup(
-    ExclusiveActionGroup* group) noexcept {
-  if (mToolsActionGroup) {
-    disconnect(mFsm.data(), &PackageEditorFsm::toolChanged, mToolsActionGroup,
-               &ExclusiveActionGroup::setCurrentAction);
-  }
+void PackageEditorWidget::connectEditor(
+    UndoStackActionGroup& undoStackActionGroup,
+    ExclusiveActionGroup& toolsActionGroup, QToolBar& commandToolBar,
+    StatusBar& statusBar) noexcept {
+  EditorWidgetBase::connectEditor(undoStackActionGroup, toolsActionGroup,
+                                  commandToolBar, statusBar);
 
-  EditorWidgetBase::setToolsActionGroup(group);
+  bool enabled = !mContext.readOnly;
+  mToolsActionGroup->setActionEnabled(Tool::SELECT, true);
+  mToolsActionGroup->setActionEnabled(Tool::ADD_THT_PADS, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::ADD_SMT_PADS, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::ADD_NAMES, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::ADD_VALUES, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::DRAW_LINE, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::DRAW_RECT, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::DRAW_POLYGON, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::ADD_HOLES, enabled);
+  mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
+  connect(mFsm.data(), &PackageEditorFsm::toolChanged, mToolsActionGroup,
+          &ExclusiveActionGroup::setCurrentAction);
 
-  if (mToolsActionGroup) {
-    bool enabled = !mContext.readOnly;
-    mToolsActionGroup->setActionEnabled(Tool::SELECT, true);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_THT_PADS, enabled);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_SMT_PADS, enabled);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_NAMES, enabled);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_VALUES, enabled);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_LINE, enabled);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_RECT, enabled);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_POLYGON, enabled);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, enabled);
-    mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, enabled);
-    mToolsActionGroup->setActionEnabled(Tool::ADD_HOLES, enabled);
-    mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
-    connect(mFsm.data(), &PackageEditorFsm::toolChanged, mToolsActionGroup,
-            &ExclusiveActionGroup::setCurrentAction);
-  }
+  mStatusBar->setField(StatusBar::AbsolutePosition, true);
+  mStatusBar->setLengthUnit(mUi->graphicsView->getGridProperties().getUnit());
+  connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
+          mStatusBar, &StatusBar::setAbsoluteCursorPosition);
 }
 
-void PackageEditorWidget::setStatusBar(StatusBar* statusbar) noexcept {
-  EditorWidgetBase::setStatusBar(statusbar);
+void PackageEditorWidget::disconnectEditor() noexcept {
+  EditorWidgetBase::disconnectEditor();
 
-  if (mStatusBar) {
-    mStatusBar->setLengthUnit(mUi->graphicsView->getGridProperties().getUnit());
-  }
+  disconnect(mFsm.data(), &PackageEditorFsm::toolChanged, mToolsActionGroup,
+             &ExclusiveActionGroup::setCurrentAction);
+
+  mStatusBar->setField(StatusBar::AbsolutePosition, false);
+  disconnect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
+             mStatusBar, &StatusBar::setAbsoluteCursorPosition);
 }
 
 /*******************************************************************************
@@ -249,24 +262,32 @@ bool PackageEditorWidget::paste() noexcept {
   return mFsm->processPaste();
 }
 
-bool PackageEditorWidget::rotateCw() noexcept {
-  return mFsm->processRotateCw();
+bool PackageEditorWidget::move(Qt::ArrowType direction) noexcept {
+  return mFsm->processMove(direction);
 }
 
-bool PackageEditorWidget::rotateCcw() noexcept {
-  return mFsm->processRotateCcw();
+bool PackageEditorWidget::rotate(const Angle& rotation) noexcept {
+  return mFsm->processRotate(rotation);
 }
 
-bool PackageEditorWidget::mirror() noexcept {
-  return mFsm->processMirror();
+bool PackageEditorWidget::mirror(Qt::Orientation orientation) noexcept {
+  return mFsm->processMirror(orientation);
 }
 
-bool PackageEditorWidget::flip() noexcept {
-  return mFsm->processFlip();
+bool PackageEditorWidget::flip(Qt::Orientation orientation) noexcept {
+  return mFsm->processFlip(orientation);
+}
+
+bool PackageEditorWidget::snapToGrid() noexcept {
+  return mFsm->processSnapToGrid();
 }
 
 bool PackageEditorWidget::remove() noexcept {
   return mFsm->processRemove();
+}
+
+bool PackageEditorWidget::editProperties() noexcept {
+  return mFsm->processEditProperties();
 }
 
 bool PackageEditorWidget::zoomIn() noexcept {
@@ -294,14 +315,25 @@ bool PackageEditorWidget::importDxf() noexcept {
 
 bool PackageEditorWidget::editGridProperties() noexcept {
   GridSettingsDialog dialog(mUi->graphicsView->getGridProperties(), this);
-  connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
-          [this](const GridProperties& grid) {
-            mUi->graphicsView->setGridProperties(grid);
-            if (mStatusBar) {
-              mStatusBar->setLengthUnit(grid.getUnit());
-            }
-          });
+  connect(&dialog, &GridSettingsDialog::gridPropertiesChanged, this,
+          &PackageEditorWidget::setGridProperties);
   dialog.exec();
+  return true;
+}
+
+bool PackageEditorWidget::increaseGridInterval() noexcept {
+  GridProperties grid = mUi->graphicsView->getGridProperties();
+  grid.setInterval(PositiveLength(grid.getInterval() * 2));
+  setGridProperties(grid);
+  return true;
+}
+
+bool PackageEditorWidget::decreaseGridInterval() noexcept {
+  GridProperties grid = mUi->graphicsView->getGridProperties();
+  if ((*grid.getInterval()) % 2 == 0) {
+    grid.setInterval(PositiveLength(grid.getInterval() / 2));
+    setGridProperties(grid);
+  }
   return true;
 }
 
@@ -572,6 +604,17 @@ bool PackageEditorWidget::execGraphicsExportDialog(
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
   return true;
+}
+
+void PackageEditorWidget::setGridProperties(
+    const GridProperties& grid) noexcept {
+  mUi->graphicsView->setGridProperties(grid);
+  if (mStatusBar) {
+    mStatusBar->setLengthUnit(grid.getUnit());
+  }
+  if (mFsm) {
+    mFsm->updateAvailableFeatures();  // Re-calculate "snap to grid" feature!
+  }
 }
 
 /*******************************************************************************

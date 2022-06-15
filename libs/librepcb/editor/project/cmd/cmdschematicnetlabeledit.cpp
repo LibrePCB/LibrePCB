@@ -99,6 +99,28 @@ void CmdSchematicNetLabelEdit::mirror(bool immediate) noexcept {
   if (immediate) mNetLabel.setMirrored(mNewMirrored);
 }
 
+void CmdSchematicNetLabelEdit::mirror(Qt::Orientation orientation,
+                                      const Point& center,
+                                      bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewMirrored = !mNewMirrored;
+  mNewPos.mirror(orientation, center);
+  Angle rotation = mNewRotation;
+  if (orientation == Qt::Vertical) {
+    rotation += Angle::deg180();
+    rotate(Angle::deg180(), mNewPos, false);
+  }
+  rotation.mapTo0_360deg();
+  if ((rotation == Angle::deg90()) || (rotation == Angle::deg270())) {
+    rotate(Angle::deg180(), mNewPos, false);
+  }
+  if (immediate) {
+    mNetLabel.setPosition(mNewPos);
+    mNetLabel.setRotation(mNewRotation);
+    mNetLabel.setMirrored(mNewMirrored);
+  }
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/

@@ -23,7 +23,9 @@
 #include "boardeditorstate_addstroketext.h"
 
 #include "../../../cmd/cmdstroketextedit.h"
+#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
+#include "../../../utils/toolbarproxy.h"
 #include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
@@ -90,62 +92,60 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
                                                                  true, true);
   if (!addText(*board, pos)) return false;
 
-  // Add the "Layer:" label to the toolbar
-  mLayerLabel.reset(new QLabel(tr("Layer:")));
-  mLayerLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mLayerLabel.data());
+  EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the layers combobox to the toolbar
-  mLayerComboBox.reset(new GraphicsLayerComboBox());
+  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
+  mLayerComboBox = new GraphicsLayerComboBox();
   mLayerComboBox->setLayers(getAllowedGeometryLayers(*board));
   mLayerComboBox->setCurrentLayer(mLastStrokeTextProperties.getLayerName());
-  mContext.editorUi.commandToolbar->addWidget(mLayerComboBox.data());
-  connect(mLayerComboBox.data(), &GraphicsLayerComboBox::currentLayerChanged,
-          this, &BoardEditorState_AddStrokeText::layerComboBoxLayerChanged);
-
-  // Add the "Text:" label to the toolbar
-  mTextLabel.reset(new QLabel(tr("Text:")));
-  mTextLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mTextLabel.data());
+  mLayerComboBox->addAction(cmd.layerUp.createAction(
+      mLayerComboBox, mLayerComboBox.data(), &GraphicsLayerComboBox::stepDown));
+  mLayerComboBox->addAction(cmd.layerDown.createAction(
+      mLayerComboBox, mLayerComboBox.data(), &GraphicsLayerComboBox::stepUp));
+  connect(mLayerComboBox, &GraphicsLayerComboBox::currentLayerChanged, this,
+          &BoardEditorState_AddStrokeText::layerComboBoxLayerChanged);
+  mContext.commandToolBar.addWidget(
+      std::unique_ptr<GraphicsLayerComboBox>(mLayerComboBox));
 
   // Add the text combobox to the toolbar
-  mTextComboBox.reset(new QComboBox());
-  mTextComboBox->setEditable(true);
-  mTextComboBox->setMinimumContentsLength(20);
-  mTextComboBox->addItem("{{BOARD}}");
-  mTextComboBox->addItem("{{PROJECT}}");
-  mTextComboBox->addItem("{{AUTHOR}}");
-  mTextComboBox->addItem("{{VERSION}}");
-  mTextComboBox->setCurrentIndex(
-      mTextComboBox->findText(mLastStrokeTextProperties.getText()));
-  mTextComboBox->setCurrentText(mLastStrokeTextProperties.getText());
-  connect(mTextComboBox.data(), &QComboBox::currentTextChanged, this,
+  mContext.commandToolBar.addLabel(tr("Text:"), 10);
+  std::unique_ptr<QComboBox> textComboBox(new QComboBox());
+  textComboBox->setEditable(true);
+  textComboBox->setMinimumContentsLength(20);
+  textComboBox->addItem("{{BOARD}}");
+  textComboBox->addItem("{{PROJECT}}");
+  textComboBox->addItem("{{AUTHOR}}");
+  textComboBox->addItem("{{VERSION}}");
+  textComboBox->setCurrentIndex(
+      textComboBox->findText(mLastStrokeTextProperties.getText()));
+  textComboBox->setCurrentText(mLastStrokeTextProperties.getText());
+  connect(textComboBox.get(), &QComboBox::currentTextChanged, this,
           &BoardEditorState_AddStrokeText::textComboBoxValueChanged);
-  mContext.editorUi.commandToolbar->addWidget(mTextComboBox.data());
-
-  // Add the "Height:" label to the toolbar
-  mHeightLabel.reset(new QLabel(tr("Height:")));
-  mHeightLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mHeightLabel.data());
+  mContext.commandToolBar.addWidget(std::move(textComboBox));
 
   // Add the height spinbox to the toolbar
-  mHeightEdit.reset(new PositiveLengthEdit());
-  mHeightEdit->setValue(mLastStrokeTextProperties.getHeight());
-  connect(mHeightEdit.data(), &PositiveLengthEdit::valueChanged, this,
+  mContext.commandToolBar.addLabel(tr("Height:"), 10);
+  std::unique_ptr<PositiveLengthEdit> heightEdit(new PositiveLengthEdit());
+  heightEdit->setValue(mLastStrokeTextProperties.getHeight());
+  heightEdit->addAction(cmd.sizeIncrease.createAction(
+      heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepUp));
+  heightEdit->addAction(cmd.sizeDecrease.createAction(
+      heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(heightEdit.get(), &PositiveLengthEdit::valueChanged, this,
           &BoardEditorState_AddStrokeText::heightEditValueChanged);
-  mContext.editorUi.commandToolbar->addWidget(mHeightEdit.data());
-
-  // Add the "Mirror:" label to the toolbar
-  mMirrorLabel.reset(new QLabel(tr("Mirror:")));
-  mMirrorLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mMirrorLabel.data());
+  mContext.commandToolBar.addWidget(std::move(heightEdit));
 
   // Add the mirror checkbox to the toolbar
-  mMirrorCheckBox.reset(new QCheckBox());
+  mContext.commandToolBar.addLabel(tr("Mirror:"), 10);
+  mMirrorCheckBox = new QCheckBox();
   mMirrorCheckBox->setChecked(mLastStrokeTextProperties.getMirrored());
-  connect(mMirrorCheckBox.data(), &QCheckBox::toggled, this,
+  mMirrorCheckBox->addAction(cmd.mirrorHorizontal.createAction(
+      mMirrorCheckBox, mMirrorCheckBox.data(), &QCheckBox::toggle));
+  connect(mMirrorCheckBox, &QCheckBox::toggled, this,
           &BoardEditorState_AddStrokeText::mirrorCheckBoxToggled);
-  mContext.editorUi.commandToolbar->addWidget(mMirrorCheckBox.data());
+  mContext.commandToolBar.addWidget(
+      std::unique_ptr<QCheckBox>(mMirrorCheckBox));
 
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
@@ -156,14 +156,7 @@ bool BoardEditorState_AddStrokeText::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   // Remove actions / widgets from the "command" toolbar
-  mMirrorCheckBox.reset();
-  mMirrorLabel.reset();
-  mHeightEdit.reset();
-  mHeightLabel.reset();
-  mTextComboBox.reset();
-  mTextLabel.reset();
-  mLayerComboBox.reset();
-  mLayerLabel.reset();
+  mContext.commandToolBar.clear();
 
   mContext.editorGraphicsView.unsetCursor();
   return true;
@@ -173,20 +166,14 @@ bool BoardEditorState_AddStrokeText::exit() noexcept {
  *  Event Handlers
  ******************************************************************************/
 
-bool BoardEditorState_AddStrokeText::processRotateCw() noexcept {
-  return rotateText(-Angle::deg90());
+bool BoardEditorState_AddStrokeText::processRotate(
+    const Angle& rotation) noexcept {
+  return rotateText(rotation);
 }
 
-bool BoardEditorState_AddStrokeText::processRotateCcw() noexcept {
-  return rotateText(Angle::deg90());
-}
-
-bool BoardEditorState_AddStrokeText::processFlipHorizontal() noexcept {
-  return flipText(Qt::Horizontal);
-}
-
-bool BoardEditorState_AddStrokeText::processFlipVertical() noexcept {
-  return flipText(Qt::Vertical);
+bool BoardEditorState_AddStrokeText::processFlip(
+    Qt::Orientation orientation) noexcept {
+  return flipText(orientation);
 }
 
 bool BoardEditorState_AddStrokeText::processGraphicsSceneMouseMoved(

@@ -70,12 +70,14 @@ public:
   ~PackageEditorWidget() noexcept;
 
   // Getters
-  virtual bool hasGraphicalEditor() const noexcept override { return true; }
-  virtual bool supportsFlip() const noexcept override { return true; }
+  QSet<Feature> getAvailableFeatures() const noexcept override;
 
   // Setters
-  void setToolsActionGroup(ExclusiveActionGroup* group) noexcept override;
-  void setStatusBar(StatusBar* statusbar) noexcept override;
+  void connectEditor(UndoStackActionGroup& undoStackActionGroup,
+                     ExclusiveActionGroup& toolsActionGroup,
+                     QToolBar& commandToolBar,
+                     StatusBar& statusBar) noexcept override;
+  void disconnectEditor() noexcept override;
 
   // Operator Overloadings
   PackageEditorWidget& operator=(const PackageEditorWidget& rhs) = delete;
@@ -86,17 +88,21 @@ public slots:
   bool cut() noexcept override;
   bool copy() noexcept override;
   bool paste() noexcept override;
-  bool rotateCw() noexcept override;
-  bool rotateCcw() noexcept override;
-  bool mirror() noexcept override;
-  bool flip() noexcept override;
+  bool move(Qt::ArrowType direction) noexcept override;
+  bool rotate(const librepcb::Angle& rotation) noexcept override;
+  bool mirror(Qt::Orientation orientation) noexcept override;
+  bool flip(Qt::Orientation orientation) noexcept override;
+  bool snapToGrid() noexcept override;
   bool remove() noexcept override;
+  bool editProperties() noexcept override;
   bool zoomIn() noexcept override;
   bool zoomOut() noexcept override;
   bool zoomAll() noexcept override;
   bool abortCommand() noexcept override;
   bool importDxf() noexcept override;
   bool editGridProperties() noexcept override;
+  bool increaseGridInterval() noexcept override;
+  bool decreaseGridInterval() noexcept override;
 
 private:  // Methods
   void updateMetadata() noexcept;
@@ -118,6 +124,7 @@ private:  // Methods
       bool applyFix) override;
   bool execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept override;
+  void setGridProperties(const GridProperties& grid) noexcept;
 
 private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;

@@ -29,6 +29,7 @@
 #include "../../project/cmd/cmdboardplaneedit.h"
 #include "../../project/cmd/cmdboardviaedit.h"
 #include "../../project/cmd/cmddeviceinstanceedit.h"
+#include "cmdfootprintstroketextsreset.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardselectionquery.h>
@@ -61,7 +62,9 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     mStartPos(startPos),
     mDeltaPos(0, 0),
     mCenterPos(0, 0),
-    mDeltaAngle(0) {
+    mDeltaAngle(0),
+    mSnappedToGrid(false),
+    mTextsReset(false) {
   // get all selected items
   std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
   query->addDeviceInstancesOfSelectedFootprints();
@@ -83,6 +86,8 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     ++count;
     CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(*device);
     mDeviceEditCmds.append(cmd);
+    mDeviceStrokeTextsResetCmds.append(
+        new CmdFootprintStrokeTextsReset(device->getFootprint()));
   }
   foreach (BI_Via* via, query->getVias()) {
     Q_ASSERT(via);
@@ -148,6 +153,36 @@ CmdDragSelectedBoardItems::~CmdDragSelectedBoardItems() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void CmdDragSelectedBoardItems::snapToGrid() noexcept {
+  PositiveLength grid = mBoard.getGridProperties().getInterval();
+  foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdBoardViaEdit* cmd, mViaEditCmds) { cmd->snapToGrid(grid, true); }
+  foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdHoleEdit* cmd, mHoleEditCmds) { cmd->snapToGrid(grid, true); }
+  mSnappedToGrid = true;
+
+  // Force updating airwires immediately as they are important while moving
+  // items.
+  mBoard.triggerAirWiresRebuild();
+}
+
+void CmdDragSelectedBoardItems::resetAllTexts() noexcept {
+  mTextsReset = true;
+}
 
 void CmdDragSelectedBoardItems::setCurrentPosition(
     const Point& pos, const bool gridIncrement) noexcept {
@@ -225,10 +260,13 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
  ******************************************************************************/
 
 bool CmdDragSelectedBoardItems::performExecute() {
-  if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0())) {
+  if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0()) &&
+      (!mSnappedToGrid) && (!mTextsReset)) {
     // no movement required --> discard all commands
     qDeleteAll(mDeviceEditCmds);
     mDeviceEditCmds.clear();
+    qDeleteAll(mDeviceStrokeTextsResetCmds);
+    mDeviceStrokeTextsResetCmds.clear();
     qDeleteAll(mViaEditCmds);
     mViaEditCmds.clear();
     qDeleteAll(mNetPointEditCmds);
@@ -244,7 +282,15 @@ bool CmdDragSelectedBoardItems::performExecute() {
     return false;
   }
 
+  if (!mTextsReset) {
+    qDeleteAll(mDeviceStrokeTextsResetCmds);
+    mDeviceStrokeTextsResetCmds.clear();
+  }
+
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
+    appendChild(cmd);  // can throw
+  }
+  foreach (CmdFootprintStrokeTextsReset* cmd, mDeviceStrokeTextsResetCmds) {
     appendChild(cmd);  // can throw
   }
   foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {

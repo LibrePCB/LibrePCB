@@ -75,8 +75,8 @@ public:
   virtual bool processAddComponent() noexcept override;
   virtual bool processAddComponent(const Uuid& cmp,
                                    const Uuid& symbVar) noexcept override;
-  virtual bool processRotateCw() noexcept override;
-  virtual bool processRotateCcw() noexcept override;
+  virtual bool processRotate(const Angle& rotation) noexcept override;
+  virtual bool processMirror(Qt::Orientation orientation) noexcept override;
   virtual bool processAbortCommand() noexcept override;
   virtual bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept override;
@@ -111,6 +111,7 @@ private:  // Data
   bool mUseAddComponentDialog;
   QScopedPointer<AddComponentDialog> mAddComponentDialog;
   Angle mLastAngle;
+  bool mLastMirrored;
 
   // information about the current component/symbol to place
   ComponentInstance* mCurrentComponent;
@@ -119,12 +120,11 @@ private:  // Data
   CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
 
   // Widgets for the command toolbar
-  QLabel* mValueLabel;
-  QComboBox* mValueComboBox;
-  QLineEdit* mAttributeValueEdit;
-  QAction* mAttributeValueEditAction;
-  AttributeUnitComboBox* mAttributeUnitComboBox;
-  QAction* mAttributeUnitComboBoxAction;
+  QPointer<QComboBox> mValueComboBox;
+  QPointer<QLineEdit> mAttributeValueEdit;
+  QPointer<QAction> mAttributeValueEditAction;
+  QPointer<AttributeUnitComboBox> mAttributeUnitComboBox;
+  QPointer<QAction> mAttributeUnitComboBoxAction;
 };
 
 /*******************************************************************************

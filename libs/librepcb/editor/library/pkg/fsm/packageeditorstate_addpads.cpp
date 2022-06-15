@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packageeditorstate_addpads.h"
 
+#include "../../../editorcommandset.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../../widgets/unsignedlengthedit.h"
@@ -29,7 +30,6 @@
 #include "../boardsideselectorwidget.h"
 #include "../footprintgraphicsitem.h"
 #include "../footprintpadgraphicsitem.h"
-#include "../footprintpadshapeselectorwidget.h"
 #include "../packageeditorwidget.h"
 #include "../packagepadcombobox.h"
 
@@ -84,6 +84,7 @@ bool PackageEditorState_AddPads::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
 
   // populate command toolbar
+  EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // package pad
   mContext.commandToolBar.addLabel(tr("Package Pad:"));
@@ -102,6 +103,12 @@ bool PackageEditorState_AddPads::entry() noexcept {
     std::unique_ptr<BoardSideSelectorWidget> boardSideSelector(
         new BoardSideSelectorWidget());
     boardSideSelector->setCurrentBoardSide(mLastPad.getBoardSide());
+    boardSideSelector->addAction(cmd.layerUp.createAction(
+        boardSideSelector.get(), boardSideSelector.get(),
+        &BoardSideSelectorWidget::setBoardSideTop));
+    boardSideSelector->addAction(cmd.layerDown.createAction(
+        boardSideSelector.get(), boardSideSelector.get(),
+        &BoardSideSelectorWidget::setBoardSideBottom));
     connect(boardSideSelector.get(),
             &BoardSideSelectorWidget::currentBoardSideChanged, this,
             &PackageEditorState_AddPads::boardSideSelectorCurrentSideChanged);
@@ -109,14 +116,35 @@ bool PackageEditorState_AddPads::entry() noexcept {
     mContext.commandToolBar.addSeparator();
   }
 
-  // shape
-  std::unique_ptr<FootprintPadShapeSelectorWidget> shapeSelector(
-      new FootprintPadShapeSelectorWidget());
-  connect(shapeSelector.get(),
-          &FootprintPadShapeSelectorWidget::currentShapeChanged, this,
-          &PackageEditorState_AddPads::shapeSelectorCurrentShapeChanged);
-  shapeSelector->setCurrentShape(mLastPad.getShape());
-  mContext.commandToolBar.addWidget(std::move(shapeSelector));
+  // Shape.
+  std::unique_ptr<QActionGroup> shapeActionGroup(
+      new QActionGroup(&mContext.commandToolBar));
+  QAction* aShapeRound =
+      cmd.thtShapeRound.createAction(shapeActionGroup.get(), this, [this]() {
+        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::ROUND);
+      });
+  aShapeRound->setIcon(QIcon(":/img/command_toolbars/shape_round.png"));
+  aShapeRound->setCheckable(true);
+  aShapeRound->setChecked(mLastPad.getShape() == FootprintPad::Shape::ROUND);
+  aShapeRound->setActionGroup(shapeActionGroup.get());
+  QAction* aShapeRect = cmd.thtShapeRectangular.createAction(
+      shapeActionGroup.get(), this, [this]() {
+        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::RECT);
+      });
+  aShapeRect->setIcon(QIcon(":/img/command_toolbars/shape_rect.png"));
+  aShapeRect->setCheckable(true);
+  aShapeRect->setChecked(mLastPad.getShape() == FootprintPad::Shape::RECT);
+  aShapeRect->setActionGroup(shapeActionGroup.get());
+  QAction* aShapeOctagon = cmd.thtShapeOctagonal.createAction(
+      shapeActionGroup.get(), this, [this]() {
+        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::OCTAGON);
+      });
+  aShapeOctagon->setIcon(QIcon(":/img/command_toolbars/shape_octagon.png"));
+  aShapeOctagon->setCheckable(true);
+  aShapeOctagon->setChecked(mLastPad.getShape() ==
+                            FootprintPad::Shape::OCTAGON);
+  aShapeOctagon->setActionGroup(shapeActionGroup.get());
+  mContext.commandToolBar.addActionGroup(std::move(shapeActionGroup));
   mContext.commandToolBar.addSeparator();
 
   // width
@@ -126,6 +154,10 @@ bool PackageEditorState_AddPads::entry() noexcept {
   edtWidth->configure(getDefaultLengthUnit(), LengthEditBase::Steps::generic(),
                       "package_editor/add_pads/width");
   edtWidth->setValue(mLastPad.getWidth());
+  edtWidth->addAction(cmd.lineWidthIncrease.createAction(
+      edtWidth.get(), edtWidth.get(), &PositiveLengthEdit::stepUp));
+  edtWidth->addAction(cmd.lineWidthDecrease.createAction(
+      edtWidth.get(), edtWidth.get(), &PositiveLengthEdit::stepDown));
   connect(edtWidth.get(), &PositiveLengthEdit::valueChanged, this,
           &PackageEditorState_AddPads::widthEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtWidth));
@@ -137,6 +169,10 @@ bool PackageEditorState_AddPads::entry() noexcept {
   edtHeight->configure(getDefaultLengthUnit(), LengthEditBase::Steps::generic(),
                        "package_editor/add_pads/height");
   edtHeight->setValue(mLastPad.getHeight());
+  edtHeight->addAction(cmd.sizeIncrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepUp));
+  edtHeight->addAction(cmd.sizeDecrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepDown));
   connect(edtHeight.get(), &PositiveLengthEdit::valueChanged, this,
           &PackageEditorState_AddPads::heightEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtHeight));
@@ -152,6 +188,12 @@ bool PackageEditorState_AddPads::entry() noexcept {
                                 LengthEditBase::Steps::drillDiameter(),
                                 "package_editor/add_pads/drill_diameter");
     edtDrillDiameter->setValue(mLastPad.getDrillDiameter());
+    edtDrillDiameter->addAction(cmd.drillIncrease.createAction(
+        edtDrillDiameter.get(), edtDrillDiameter.get(),
+        &PositiveLengthEdit::stepUp));
+    edtDrillDiameter->addAction(cmd.drillDecrease.createAction(
+        edtDrillDiameter.get(), edtDrillDiameter.get(),
+        &PositiveLengthEdit::stepDown));
     connect(edtDrillDiameter.get(), &UnsignedLengthEdit::valueChanged, this,
             &PackageEditorState_AddPads::drillDiameterEditValueChanged);
     mContext.commandToolBar.addWidget(std::move(edtDrillDiameter));
@@ -207,6 +249,14 @@ bool PackageEditorState_AddPads::exit() noexcept {
   return true;
 }
 
+QSet<EditorWidgetBase::Feature>
+    PackageEditorState_AddPads::getAvailableFeatures() const noexcept {
+  return {
+      EditorWidgetBase::Feature::Abort,
+      EditorWidgetBase::Feature::Rotate,
+  };
+}
+
 /*******************************************************************************
  *  Event Handlers
  ******************************************************************************/
@@ -236,21 +286,12 @@ bool PackageEditorState_AddPads::processGraphicsSceneLeftMouseButtonPressed(
 bool PackageEditorState_AddPads::processGraphicsSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
-  return processRotateCcw();
+  return processRotate(Angle::deg90());
 }
 
-bool PackageEditorState_AddPads::processRotateCw() noexcept {
+bool PackageEditorState_AddPads::processRotate(const Angle& rotation) noexcept {
   if (mCurrentPad) {
-    mEditCmd->rotate(-Angle::deg90(), mCurrentPad->getPosition(), true);
-    return true;
-  } else {
-    return false;
-  }
-}
-
-bool PackageEditorState_AddPads::processRotateCcw() noexcept {
-  if (mCurrentPad) {
-    mEditCmd->rotate(Angle::deg90(), mCurrentPad->getPosition(), true);
+    mEditCmd->rotate(rotation, mCurrentPad->getPosition(), true);
     return true;
   } else {
     return false;

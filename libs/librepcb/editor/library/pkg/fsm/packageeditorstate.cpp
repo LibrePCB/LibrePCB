@@ -57,12 +57,12 @@ const PositiveLength& PackageEditorState::getGridInterval() const noexcept {
 }
 
 const LengthUnit& PackageEditorState::getDefaultLengthUnit() const noexcept {
-  return mContext.workspace.getSettings().defaultLengthUnit.get();
+  return mContext.editorContext.workspace.getSettings().defaultLengthUnit.get();
 }
 
 QList<GraphicsLayer*> PackageEditorState::getAllowedTextLayers() const
     noexcept {
-  return mContext.layerProvider.getLayers({
+  return mContext.editorContext.layerProvider.getLayers({
       GraphicsLayer::sBoardSheetFrames,
       GraphicsLayer::sBoardOutlines,
       GraphicsLayer::sBoardMillingPth,
@@ -96,7 +96,7 @@ QList<GraphicsLayer*> PackageEditorState::getAllowedTextLayers() const
 
 QList<GraphicsLayer*> PackageEditorState::getAllowedCircleAndPolygonLayers()
     const noexcept {
-  return mContext.layerProvider.getLayers({
+  return mContext.editorContext.layerProvider.getLayers({
       GraphicsLayer::sBoardSheetFrames, GraphicsLayer::sBoardOutlines,
       GraphicsLayer::sBoardMillingPth,  GraphicsLayer::sBoardMeasures,
       GraphicsLayer::sBoardAlignment,   GraphicsLayer::sBoardDocumentation,

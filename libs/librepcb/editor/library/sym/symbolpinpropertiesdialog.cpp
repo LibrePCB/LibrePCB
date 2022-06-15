@@ -110,6 +110,7 @@ void SymbolPinPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->edtPosY->setReadOnly(readOnly);
   mUi->edtRotation->setReadOnly(readOnly);
   mUi->edtLength->setReadOnly(readOnly);
+  mUi->cbxAutoMoveText->setEnabled(!readOnly);
   mUi->edtNameHeight->setReadOnly(readOnly);
   mUi->edtNamePosX->setReadOnly(readOnly);
   mUi->edtNamePosY->setReadOnly(readOnly);

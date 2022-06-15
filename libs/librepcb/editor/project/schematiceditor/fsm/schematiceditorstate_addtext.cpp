@@ -23,7 +23,9 @@
 #include "schematiceditorstate_addtext.h"
 
 #include "../../../cmd/cmdtextedit.h"
+#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
+#include "../../../utils/toolbarproxy.h"
 #include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
@@ -80,60 +82,58 @@ bool SchematicEditorState_AddText::entry() noexcept {
   // state
   schematic->clearSelection();
 
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
   // Add a new stroke text
   Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
                                                                  true, true);
   if (!addText(*schematic, pos)) return false;
 
-  // Add the "Layer:" label to the toolbar
-  mLayerLabel.reset(new QLabel(tr("Layer:")));
-  mLayerLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mLayerLabel.data());
-
   // Add the layers combobox to the toolbar
-  mLayerComboBox.reset(new GraphicsLayerComboBox());
-  mLayerComboBox->setLayers(getAllowedGeometryLayers());
-  mLayerComboBox->setCurrentLayer(mLastTextProperties.getLayerName());
-  mContext.editorUi.commandToolbar->addWidget(mLayerComboBox.data());
-  connect(mLayerComboBox.data(), &GraphicsLayerComboBox::currentLayerChanged,
+  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
+  std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
+      new GraphicsLayerComboBox());
+  layerComboBox->setLayers(getAllowedGeometryLayers());
+  layerComboBox->setCurrentLayer(mLastTextProperties.getLayerName());
+  layerComboBox->addAction(
+      cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
+                               &GraphicsLayerComboBox::stepDown));
+  layerComboBox->addAction(
+      cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
+                                 &GraphicsLayerComboBox::stepUp));
+  connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
           this, &SchematicEditorState_AddText::layerComboBoxLayerChanged);
-
-  // Add the "Text:" label to the toolbar
-  mTextLabel.reset(new QLabel(tr("Text:")));
-  mTextLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mTextLabel.data());
+  mContext.commandToolBar.addWidget(std::move(layerComboBox));
 
   // Add the text combobox to the toolbar
-  mTextComboBox.reset(new QComboBox());
-  mTextComboBox->setEditable(true);
-  mTextComboBox->setMinimumContentsLength(20);
-  mTextComboBox->addItem("{{SHEET}}");
-  mTextComboBox->addItem("{{PAGE_X_OF_Y}}");
-  mTextComboBox->addItem("{{PROJECT}}");
-  mTextComboBox->addItem("{{AUTHOR}}");
-  mTextComboBox->addItem("{{VERSION}}");
-  mTextComboBox->addItem("{{MODIFIED_DATE}}");
-  mTextComboBox->setCurrentIndex(
-      mTextComboBox->findText(mLastTextProperties.getText()));
-  mTextComboBox->setCurrentText(mLastTextProperties.getText());
-  connect(mTextComboBox.data(), &QComboBox::currentTextChanged, this,
+  mContext.commandToolBar.addLabel(tr("Text:"), 10);
+  std::unique_ptr<QComboBox> textComboBox(new QComboBox());
+  textComboBox->setEditable(true);
+  textComboBox->setMinimumContentsLength(20);
+  textComboBox->addItem("{{SHEET}}");
+  textComboBox->addItem("{{PAGE_X_OF_Y}}");
+  textComboBox->addItem("{{PROJECT}}");
+  textComboBox->addItem("{{AUTHOR}}");
+  textComboBox->addItem("{{VERSION}}");
+  textComboBox->addItem("{{MODIFIED_DATE}}");
+  textComboBox->setCurrentIndex(
+      textComboBox->findText(mLastTextProperties.getText()));
+  textComboBox->setCurrentText(mLastTextProperties.getText());
+  connect(textComboBox.get(), &QComboBox::currentTextChanged, this,
           &SchematicEditorState_AddText::textComboBoxValueChanged);
-  mContext.editorUi.commandToolbar->addWidget(mTextComboBox.data());
-
-  // Add the "Height:" label to the toolbar
-  mHeightLabel.reset(new QLabel(tr("Height:")));
-  mHeightLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mHeightLabel.data());
+  mContext.commandToolBar.addWidget(std::move(textComboBox));
 
   // Add the height spinbox to the toolbar
-  mHeightEdit.reset(new PositiveLengthEdit());
-  mHeightEdit->setValue(mLastTextProperties.getHeight());
-  connect(mHeightEdit.data(), &PositiveLengthEdit::valueChanged, this,
+  mContext.commandToolBar.addLabel(tr("Height:"), 10);
+  std::unique_ptr<PositiveLengthEdit> heightEdit(new PositiveLengthEdit());
+  heightEdit->setValue(mLastTextProperties.getHeight());
+  heightEdit->addAction(cmd.sizeIncrease.createAction(
+      heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepUp));
+  heightEdit->addAction(cmd.sizeDecrease.createAction(
+      heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(heightEdit.get(), &PositiveLengthEdit::valueChanged, this,
           &SchematicEditorState_AddText::heightEditValueChanged);
-  mContext.editorUi.commandToolbar->addWidget(mHeightEdit.data());
-
-  // Set focus to text combobox to allow typing the text immediately
-  setFocusToTextEdit();
+  mContext.commandToolBar.addWidget(std::move(heightEdit));
 
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
@@ -144,12 +144,7 @@ bool SchematicEditorState_AddText::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   // Remove actions / widgets from the "command" toolbar
-  mHeightEdit.reset();
-  mHeightLabel.reset();
-  mTextComboBox.reset();
-  mTextLabel.reset();
-  mLayerComboBox.reset();
-  mLayerLabel.reset();
+  mContext.commandToolBar.clear();
 
   mContext.editorGraphicsView.unsetCursor();
   return true;
@@ -159,12 +154,19 @@ bool SchematicEditorState_AddText::exit() noexcept {
  *  Event Handlers
  ******************************************************************************/
 
-bool SchematicEditorState_AddText::processRotateCw() noexcept {
-  return rotateText(-Angle::deg90());
+bool SchematicEditorState_AddText::processRotate(
+    const Angle& rotation) noexcept {
+  return rotateText(rotation);
 }
 
-bool SchematicEditorState_AddText::processRotateCcw() noexcept {
-  return rotateText(Angle::deg90());
+bool SchematicEditorState_AddText::processMirror(
+    Qt::Orientation orientation) noexcept {
+  if ((!mCurrentTextEditCmd) || (!mCurrentTextToPlace)) return false;
+
+  mCurrentTextEditCmd->mirror(orientation, mCurrentTextToPlace->getPosition(),
+                              true);
+  mLastTextProperties = mCurrentTextToPlace->getText();
+  return true;
 }
 
 bool SchematicEditorState_AddText::processGraphicsSceneMouseMoved(
@@ -226,10 +228,6 @@ bool SchematicEditorState_AddText::addText(Schematic& schematic,
         new CmdSchematicTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());
     mCurrentTextEditCmd.reset(new CmdTextEdit(mCurrentTextToPlace->getText()));
-
-    // Set focus to text combobox to allow typing the text immediately
-    setFocusToTextEdit();
-
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -318,13 +316,6 @@ void SchematicEditorState_AddText::heightEditValueChanged(
   mLastTextProperties.setHeight(value);
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setHeight(mLastTextProperties.getHeight(), true);
-  }
-}
-
-void SchematicEditorState_AddText::setFocusToTextEdit() noexcept {
-  if (mTextComboBox) {
-    mTextComboBox->lineEdit()->selectAll();
-    mTextComboBox->setFocus();
   }
 }
 

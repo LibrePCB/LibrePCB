@@ -22,16 +22,19 @@
  ******************************************************************************/
 #include "schematiceditor.h"
 
-#include "../../dialogs/aboutdialog.h"
 #include "../../dialogs/filedialog.h"
 #include "../../dialogs/gridsettingsdialog.h"
+#include "../../editorcommandset.h"
 #include "../../project/cmd/cmdschematicadd.h"
 #include "../../project/cmd/cmdschematicedit.h"
 #include "../../project/cmd/cmdschematicremove.h"
 #include "../../undostack.h"
 #include "../../utils/exclusiveactiongroup.h"
+#include "../../utils/menubuilder.h"
+#include "../../utils/standardeditorcommandhandler.h"
+#include "../../utils/toolbarproxy.h"
 #include "../../utils/undostackactiongroup.h"
-#include "../../widgets/graphicsview.h"
+#include "../../widgets/searchtoolbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
 #include "../erc/ercmsgdock.h"
@@ -74,214 +77,78 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
     mProjectEditor(projectEditor),
     mProject(project),
     mUi(new Ui::SchematicEditor),
-    mGraphicsView(nullptr),
+    mCommandToolBarProxy(new ToolBarProxy(this)),
+    mStandardCommandHandler(new StandardEditorCommandHandler(
+        mProjectEditor.getWorkspace().getSettings(), this)),
     mActiveSchematicIndex(-1),
-    mPagesDock(nullptr),
-    mErcMsgDock(nullptr),
-    mFsm(nullptr) {
+    mFsm() {
   mUi->setupUi(this);
-  mUi->actionSave_Project->setEnabled(mProject.getDirectory().isWritable());
 
-  // set window title
-  QString filenameStr = mProject.getFilepath().getFilename();
-  if (!mProject.getDirectory().isWritable()) {
-    filenameStr.append(QStringLiteral(" [Read-Only]"));
-  }
-  setWindowTitle(tr("%1 - LibrePCB Schematic Editor").arg(filenameStr));
-
-  // Add Dock Widgets
-  mPagesDock = new SchematicPagesDock(mProject, this);
-  connect(this, &SchematicEditor::activeSchematicChanged, mPagesDock,
-          &SchematicPagesDock::setSelectedSchematic);
-  connect(mPagesDock, &SchematicPagesDock::selectedSchematicChanged, this,
-          &SchematicEditor::setActiveSchematicIndex);
-  connect(mPagesDock, &SchematicPagesDock::addSchematicTriggered, this,
-          &SchematicEditor::addSchematic);
-  connect(mPagesDock, &SchematicPagesDock::removeSchematicTriggered, this,
-          &SchematicEditor::removeSchematic);
-  connect(mPagesDock, &SchematicPagesDock::renameSchematicTriggered, this,
-          &SchematicEditor::renameSchematic);
-  addDockWidget(Qt::LeftDockWidgetArea, mPagesDock, Qt::Vertical);
-  mErcMsgDock = new ErcMsgDock(mProject);
-  addDockWidget(Qt::RightDockWidgetArea, mErcMsgDock, Qt::Vertical);
-
-  // add graphics view as central widget
-  mGraphicsView = new GraphicsView(nullptr, this);
-  mGraphicsView->setUseOpenGl(
+  // Setup graphics view.
+  mUi->graphicsView->setUseOpenGl(
       mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
-  setCentralWidget(mGraphicsView);
+  mUi->graphicsView->setEventHandlerObject(this);
+  connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
+          mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
 
-  // Add actions to toggle visibility of dock widgets
-  mUi->menuView->addSeparator();
-  mUi->menuView->addAction(mPagesDock->toggleViewAction());
-  mUi->menuView->addAction(mErcMsgDock->toggleViewAction());
-
-  // connect some actions which are created with the Qt Designer
-  connect(mUi->actionSave_Project, &QAction::triggered, &mProjectEditor,
-          &ProjectEditor::saveProject);
-  connect(mUi->actionQuit, &QAction::triggered, this, &SchematicEditor::close);
-  connect(mUi->actionPrint, &QAction::triggered, this, [this]() {
-    execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
-  });
-  connect(mUi->actionExportPdf, &QAction::triggered, this, [this]() {
-    execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
-  });
-  connect(mUi->actionExportImage, &QAction::triggered, this, [this]() {
-    execGraphicsExportDialog(GraphicsExportDialog::Output::Image,
-                             "image_export");
-  });
-  connect(mUi->actionNewSheet, &QAction::triggered, this,
-          &SchematicEditor::addSchematic);
-  connect(mUi->actionRenameSheet, &QAction::triggered, this,
-          [this]() { renameSchematic(mActiveSchematicIndex); });
-  connect(mUi->actionOpenWebsite, &QAction::triggered,
-          []() { QDesktopServices::openUrl(QUrl("https://librepcb.org")); });
-  connect(mUi->actionOnlineDocumentation, &QAction::triggered, []() {
-    QDesktopServices::openUrl(QUrl("https://docs.librepcb.org"));
-  });
-  connect(mUi->actionAbout, &QAction::triggered, this, [this]() {
-    AboutDialog aboutDialog(this);
-    aboutDialog.exec();
-  });
-  connect(mUi->actionAbout_Qt, &QAction::triggered, qApp,
-          &QApplication::aboutQt);
-  connect(mUi->actionZoom_In, &QAction::triggered, mGraphicsView,
-          &GraphicsView::zoomIn);
-  connect(mUi->actionZoom_Out, &QAction::triggered, mGraphicsView,
-          &GraphicsView::zoomOut);
-  connect(mUi->actionZoom_All, &QAction::triggered, mGraphicsView,
-          &GraphicsView::zoomAll);
-  connect(mUi->actionShow_Control_Panel, &QAction::triggered, &mProjectEditor,
-          &ProjectEditor::showControlPanelClicked);
-  connect(mUi->actionShow_Board_Editor, &QAction::triggered, &mProjectEditor,
-          &ProjectEditor::showBoardEditor);
-  connect(mUi->actionEditNetclasses, &QAction::triggered,
-          [this]() { mProjectEditor.execNetClassesEditorDialog(this); });
-  connect(mUi->actionProjectSettings, &QAction::triggered,
-          [this]() { mProjectEditor.execProjectSettingsDialog(this); });
-  connect(mUi->actionExportLppz, &QAction::triggered,
-          [this]() { mProjectEditor.execLppzExportDialog(this); });
-  connect(mUi->actionOrderPcb, &QAction::triggered, this,
-          [this]() { mProjectEditor.execOrderPcbDialog(nullptr, this); });
-  connect(mUi->actionFind, &QAction::triggered, mUi->searchToolbar,
-          &SearchToolBar::selectAllAndSetFocus);
-  connect(mUi->actionFindNext, &QAction::triggered, mUi->searchToolbar,
-          &SearchToolBar::findNext);
-  connect(mUi->actionFindPrevious, &QAction::triggered, mUi->searchToolbar,
-          &SearchToolBar::findPrevious);
-
-  // connect the undo/redo actions with the UndoStack of the project
-  mUndoStackActionGroup.reset(
-      new UndoStackActionGroup(*mUi->actionUndo, *mUi->actionRedo, nullptr,
-                               &mProjectEditor.getUndoStack(), this));
-
-  // build the whole schematic editor finite state machine with all its substate
-  // objects
-  SchematicEditorFsm::Context fsmContext{
-      mProjectEditor.getWorkspace(), mProject, *this, *mUi, *mGraphicsView,
-      mProjectEditor.getUndoStack()};
-  mFsm = new SchematicEditorFsm(fsmContext);
-
-  // connect the "tools" toolbar with the state machine
-  mToolsActionGroup.reset(new ExclusiveActionGroup());
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::SELECT,
-                               mUi->actionToolSelect);
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::DRAW_WIRE,
-                               mUi->actionToolDrawWire);
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_NETLABEL,
-                               mUi->actionToolAddNetLabel);
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_COMPONENT,
-                               mUi->actionToolAddComponent);
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::DRAW_POLYGON,
-                               mUi->actionToolDrawPolygon);
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_TEXT,
-                               mUi->actionToolAddText);
-  mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
-  connect(mFsm, &SchematicEditorFsm::stateChanged, mToolsActionGroup.data(),
-          &ExclusiveActionGroup::setCurrentAction);
-  connect(mToolsActionGroup.data(),
-          &ExclusiveActionGroup::changeRequestTriggered, this,
-          &SchematicEditor::toolActionGroupChangeTriggered);
-
-  // connect the "command" toolbar with the state machine
-  connect(mUi->actionCommandAbort, &QAction::triggered, mFsm,
-          &SchematicEditorFsm::processAbortCommand);
-
-  // connect the "edit" toolbar with the state machine
-  connect(mUi->actionSelectAll, &QAction::triggered, mFsm,
-          &SchematicEditorFsm::processSelectAll);
-  connect(mUi->actionCopy, &QAction::triggered, mFsm,
-          &SchematicEditorFsm::processCopy);
-  connect(mUi->actionCut, &QAction::triggered, mFsm,
-          &SchematicEditorFsm::processCut);
-  connect(mUi->actionPaste, &QAction::triggered, mFsm,
-          &SchematicEditorFsm::processPaste);
-  connect(mUi->actionRotate_CW, &QAction::triggered, mFsm,
-          &SchematicEditorFsm::processRotateCw);
-  connect(mUi->actionRotate_CCW, &QAction::triggered, mFsm,
-          &SchematicEditorFsm::processRotateCcw);
-  connect(mUi->actionMirror, &QAction::triggered, mFsm,
-          &SchematicEditorFsm::processMirror);
-  connect(mUi->actionRemove, &QAction::triggered, mFsm,
-          &SchematicEditorFsm::processRemove);
-
-  // setup "search" toolbar
-  mUi->searchToolbar->setPlaceholderText(tr("Find symbol..."));
-  mUi->searchToolbar->setCompleterListFunction(
-      std::bind(&SchematicEditor::getSearchToolBarCompleterList, this));
-  connect(mUi->searchToolbar, &SearchToolBar::goToTriggered, this,
-          &SchematicEditor::goToSymbol);
-
-  // setup status bar
+  // Setup status bar.
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |
                             StatusBar::ProgressBar);
   mUi->statusbar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
           &WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
-  connect(mGraphicsView, &GraphicsView::cursorScenePositionChanged,
-          mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
 
-  // Make the icons in the components toolbar dependent from project settings
-  updateComponentToolbarIcons();
-  connect(&mProject.getSettings(), &ProjectSettings::settingsChanged, this,
-          &SchematicEditor::updateComponentToolbarIcons);
+  // Set window title.
+  QString filenameStr = mProject.getFilepath().getFilename();
+  if (!mProject.getDirectory().isWritable()) {
+    filenameStr.append(QStringLiteral(" [Read-Only]"));
+  }
+  setWindowTitle(tr("%1 - LibrePCB Schematic Editor").arg(filenameStr));
 
-  // Restore Window Geometry
+  // Build the whole schematic editor finite state machine.
+  SchematicEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
+                                         mProject,
+                                         *this,
+                                         *mUi->graphicsView,
+                                         *mCommandToolBarProxy,
+                                         mProjectEditor.getUndoStack()};
+  mFsm.reset(new SchematicEditorFsm(fsmContext));
+
+  // Create all actions, window menus, toolbars and dock widgets.
+  createActions();
+  createToolBars();
+  createDockWidgets();
+  createMenus();  // Depends on dock widgets!
+
+  // Restore window geometry.
   QSettings clientSettings;
   restoreGeometry(
       clientSettings.value("schematic_editor/window_geometry").toByteArray());
   restoreState(
-      clientSettings.value("schematic_editor/window_state").toByteArray());
+      clientSettings.value("schematic_editor/window_state_v2").toByteArray());
 
   // Load first schematic page
   if (mProject.getSchematics().count() > 0) setActiveSchematicIndex(0);
 
   // Set focus to graphics view (avoid having the focus in some arbitrary
   // widget).
-  mGraphicsView->setFocus();
+  mUi->graphicsView->setFocus();
 
   // mGraphicsView->zoomAll(); does not work properly here, should be executed
   // later in the event loop (ugly, but seems to work...)
-  QTimer::singleShot(200, mGraphicsView, &GraphicsView::zoomAll);
+  QTimer::singleShot(200, mUi->graphicsView, &GraphicsView::zoomAll);
 }
 
 SchematicEditor::~SchematicEditor() {
-  // Save Window Geometry
+  // Save window geometry.
   QSettings clientSettings;
   clientSettings.setValue("schematic_editor/window_geometry", saveGeometry());
-  clientSettings.setValue("schematic_editor/window_state", saveState());
+  clientSettings.setValue("schematic_editor/window_state_v2", saveState());
 
-  delete mFsm;
-  mFsm = nullptr;
-  delete mErcMsgDock;
-  mErcMsgDock = nullptr;
-  delete mPagesDock;
-  mPagesDock = nullptr;
-  delete mGraphicsView;
-  mGraphicsView = nullptr;
-  delete mUi;
-  mUi = nullptr;
+  // Important: Release command toolbar proxy since otherwise the actions will
+  // be deleted first.
+  mCommandToolBarProxy->setToolBar(nullptr);
 }
 
 /*******************************************************************************
@@ -310,21 +177,23 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
   Schematic* schematic = getActiveSchematic();
   if (schematic) {
     // save current view scene rect
-    schematic->saveViewSceneRect(mGraphicsView->getVisibleSceneRect());
+    schematic->saveViewSceneRect(mUi->graphicsView->getVisibleSceneRect());
   }
   schematic = mProject.getSchematicByIndex(index);
   if (schematic) {
     // show scene, restore view scene rect, set grid properties
-    mGraphicsView->setScene(&schematic->getGraphicsScene());
-    mGraphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
-    mGraphicsView->setGridProperties(schematic->getGridProperties());
+    mUi->graphicsView->setScene(&schematic->getGraphicsScene());
+    mUi->graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
+    mUi->graphicsView->setGridProperties(schematic->getGridProperties());
     mUi->statusbar->setLengthUnit(schematic->getGridProperties().getUnit());
   } else {
-    mGraphicsView->setScene(nullptr);
+    mUi->graphicsView->setScene(nullptr);
   }
 
   // update toolbars
-  mUi->actionGrid->setEnabled(schematic != nullptr);
+  mActionGridProperties->setEnabled(schematic != nullptr);
+  mActionGridIncrease->setEnabled(schematic != nullptr);
+  mActionGridDecrease->setEnabled(schematic != nullptr);
 
   // schematic page has changed!
   mActiveSchematicIndex = index;
@@ -355,94 +224,506 @@ void SchematicEditor::closeEvent(QCloseEvent* event) {
 }
 
 /*******************************************************************************
- *  Actions
- ******************************************************************************/
-
-void SchematicEditor::on_actionClose_Project_triggered() {
-  mProjectEditor.closeAndDestroy(true, this);
-}
-
-void SchematicEditor::on_actionGrid_triggered() {
-  if (const Schematic* activeSchematic = getActiveSchematic()) {
-    GridSettingsDialog dialog(activeSchematic->getGridProperties(), this);
-    connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
-            [this](const GridProperties& grid) {
-              mGraphicsView->setGridProperties(grid);
-              mUi->statusbar->setLengthUnit(grid.getUnit());
-            });
-    if (dialog.exec()) {
-      foreach (Schematic* schematic, mProject.getSchematics()) {
-        schematic->setGridProperties(dialog.getGrid());
-      }
-    }
-  }
-}
-
-void SchematicEditor::on_actionGenerateBom_triggered() {
-  const Board* board =
-      mProject.getBoards().count() == 1 ? mProject.getBoardByIndex(0) : nullptr;
-  BomGeneratorDialog dialog(mProject, board, this);
-  dialog.exec();
-}
-
-void SchematicEditor::on_actionAddComp_Resistor_triggered() {
-  Uuid componentUuid = Uuid::fromString("ef80cd5e-2689-47ee-8888-31d04fc99174");
-  Uuid symbVarUuid = Uuid::fromString(
-      useIeee315Symbols() ? "d16e1f44-16af-4773-a310-de370f744548"
-                          : "a5995314-f535-45d4-8bd8-2d0b8a0dc42a");
-  mFsm->processAddComponent(componentUuid, symbVarUuid);
-}
-
-void SchematicEditor::on_actionAddComp_BipolarCapacitor_triggered() {
-  Uuid componentUuid = Uuid::fromString("d167e0e3-6a92-4b76-b013-77b9c230e5f1");
-  Uuid symbVarUuid = Uuid::fromString(
-      useIeee315Symbols() ? "6e639ff1-4e81-423b-9d0e-b28b35693a61"
-                          : "8cd7b37f-e5fa-4af5-a8dd-d78830bba3af");
-  mFsm->processAddComponent(componentUuid, symbVarUuid);
-}
-
-void SchematicEditor::on_actionAddComp_UnipolarCapacitor_triggered() {
-  Uuid componentUuid = Uuid::fromString("c54375c5-7149-4ded-95c5-7462f7301ee7");
-  Uuid symbVarUuid = Uuid::fromString(
-      useIeee315Symbols() ? "20a01a81-506e-4fee-9dc0-8b50e6537cd4"
-                          : "5412add2-af9c-44b8-876d-a0fb7c201897");
-  mFsm->processAddComponent(componentUuid, symbVarUuid);
-}
-
-void SchematicEditor::on_actionAddComp_Inductor_triggered() {
-  Uuid componentUuid = Uuid::fromString("506bd124-6062-400e-9078-b38bd7e1aaee");
-  Uuid symbVarUuid = Uuid::fromString(
-      useIeee315Symbols() ? "4245d515-6f6d-48cb-9958-a4ea23d0187f"
-                          : "62a7598c-17fe-41cf-8fa1-4ed274c3adc2");
-  mFsm->processAddComponent(componentUuid, symbVarUuid);
-}
-
-void SchematicEditor::on_actionAddComp_gnd_triggered() {
-  Uuid componentUuid = Uuid::fromString("8076f6be-bfab-4fc1-9772-5d54465dd7e1");
-  Uuid symbVarUuid = Uuid::fromString("f09ad258-595b-4ee9-a1fc-910804a203ae");
-  mFsm->processAddComponent(componentUuid, symbVarUuid);
-}
-
-void SchematicEditor::on_actionAddComp_vcc_triggered() {
-  Uuid componentUuid = Uuid::fromString("58c3c6cd-11eb-4557-aa3f-d3e05874afde");
-  Uuid symbVarUuid = Uuid::fromString("afb86b45-68ec-47b6-8d96-153d73567228");
-  mFsm->processAddComponent(componentUuid, symbVarUuid);
-}
-
-void SchematicEditor::on_actionProjectProperties_triggered() {
-  ProjectPropertiesEditorDialog dialog(mProject.getMetadata(),
-                                       mProjectEditor.getUndoStack(), this);
-  dialog.exec();
-}
-
-void SchematicEditor::on_actionUpdateLibrary_triggered() {
-  // ugly hack until we have a *real* project library updater...
-  emit mProjectEditor.openProjectLibraryUpdaterClicked(mProject.getFilepath());
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void SchematicEditor::createActions() noexcept {
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  mActionAboutLibrePcb.reset(cmd.aboutLibrePcb.createAction(
+      this, mStandardCommandHandler.data(),
+      &StandardEditorCommandHandler::aboutLibrePcb));
+  mActionAboutQt.reset(
+      cmd.aboutQt.createAction(this, qApp, &QApplication::aboutQt));
+  mActionOnlineDocumentation.reset(cmd.documentationOnline.createAction(
+      this, mStandardCommandHandler.data(),
+      &StandardEditorCommandHandler::onlineDocumentation));
+  mActionWebsite.reset(
+      cmd.website.createAction(this, mStandardCommandHandler.data(),
+                               &StandardEditorCommandHandler::website));
+  mActionSaveProject.reset(cmd.projectSave.createAction(
+      this, &mProjectEditor, &ProjectEditor::saveProject));
+  mActionSaveProject->setEnabled(mProject.getDirectory().isWritable());
+  mActionCloseProject.reset(cmd.projectClose.createAction(
+      this, this, [this]() { mProjectEditor.closeAndDestroy(true, this); }));
+  mActionCloseWindow.reset(
+      cmd.windowClose.createAction(this, this, &SchematicEditor::close));
+  mActionQuit.reset(cmd.applicationQuit.createAction(
+      this, qApp, &Application::quitTriggered));
+  mActionFileManager.reset(cmd.fileManager.createAction(this, this, [this]() {
+    mStandardCommandHandler->fileManager(mProject.getPath());
+  }));
+  mActionBoardEditor.reset(cmd.boardEditor.createAction(
+      this, &mProjectEditor, &ProjectEditor::showBoardEditor));
+  mActionControlPanel.reset(cmd.controlPanel.createAction(
+      this, &mProjectEditor, &ProjectEditor::showControlPanelClicked));
+  mActionProjectProperties.reset(
+      cmd.projectProperties.createAction(this, this, [this]() {
+        ProjectPropertiesEditorDialog dialog(
+            mProject.getMetadata(), mProjectEditor.getUndoStack(), this);
+        dialog.exec();
+      }));
+  mActionProjectSettings.reset(cmd.projectSettings.createAction(
+      this, this,
+      [this]() { mProjectEditor.execProjectSettingsDialog(this); }));
+  mActionNetClasses.reset(cmd.netClasses.createAction(this, this, [this]() {
+    mProjectEditor.execNetClassesEditorDialog(this);
+  }));
+  mActionUpdateLibrary.reset(
+      cmd.projectLibraryUpdate.createAction(this, this, [this]() {
+        // Ugly hack until we have a *real* project library updater...
+        emit mProjectEditor.openProjectLibraryUpdaterClicked(
+            mProject.getFilepath());
+      }));
+  mActionExportLppz.reset(cmd.exportLppz.createAction(
+      this, this, [this]() { mProjectEditor.execLppzExportDialog(this); }));
+  mActionExportImage.reset(cmd.exportImage.createAction(this, this, [this]() {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Image,
+                             "image_export");
+  }));
+  mActionExportPdf.reset(cmd.exportPdf.createAction(this, this, [this]() {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
+  }));
+  mActionPrint.reset(cmd.print.createAction(this, this, [this]() {
+    execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
+  }));
+  mActionGenerateBom.reset(cmd.generateBom.createAction(this, this, [this]() {
+    const Board* board = mProject.getBoards().count() == 1
+        ? mProject.getBoardByIndex(0)
+        : nullptr;
+    BomGeneratorDialog dialog(mProject, board, this);
+    dialog.exec();
+  }));
+  mActionOrderPcb.reset(cmd.orderPcb.createAction(this, this, [this]() {
+    mProjectEditor.execOrderPcbDialog(nullptr, this);
+  }));
+  mActionNewSheet.reset(
+      cmd.sheetNew.createAction(this, this, &SchematicEditor::addSchematic));
+  mActionRenameSheet.reset(cmd.sheetRename.createAction(
+      this, this, [this]() { renameSchematic(mActiveSchematicIndex); }));
+  mActionRemoveSheet.reset(cmd.sheetRemove.createAction(
+      this, this, [this]() { removeSchematic(mActiveSchematicIndex); }));
+  mActionNextPage.reset(cmd.pageNext.createAction(this, this, [this]() {
+    const int newIndex = mActiveSchematicIndex + 1;
+    if (newIndex < mProject.getSchematics().count()) {
+      setActiveSchematicIndex(newIndex);
+    }
+  }));
+  addAction(mActionNextPage.data());
+  mActionPreviousPage.reset(cmd.pagePrevious.createAction(this, this, [this]() {
+    const int newIndex = mActiveSchematicIndex - 1;
+    if (newIndex >= 0) {
+      setActiveSchematicIndex(newIndex);
+    }
+  }));
+  addAction(mActionPreviousPage.data());
+  mActionFind.reset(cmd.find.createAction(this));
+  mActionFindNext.reset(cmd.findNext.createAction(this));
+  mActionFindPrevious.reset(cmd.findPrevious.createAction(this));
+  mActionSelectAll.reset(cmd.selectAll.createAction(
+      this, mFsm.data(), &SchematicEditorFsm::processSelectAll));
+  mActionGridProperties.reset(cmd.gridProperties.createAction(
+      this, this, &SchematicEditor::execGridPropertiesDialog));
+  mActionGridIncrease.reset(cmd.gridIncrease.createAction(this, this, [this]() {
+    if (const Schematic* schematic = getActiveSchematic()) {
+      GridProperties grid = schematic->getGridProperties();
+      grid.setInterval(PositiveLength(grid.getInterval() * 2));
+      setGridProperties(grid, true);
+    }
+  }));
+  mActionGridDecrease.reset(cmd.gridDecrease.createAction(this, this, [this]() {
+    if (const Schematic* schematic = getActiveSchematic()) {
+      GridProperties grid = schematic->getGridProperties();
+      if ((*grid.getInterval()) % 2 == 0) {
+        grid.setInterval(PositiveLength(grid.getInterval() / 2));
+        setGridProperties(grid, true);
+      }
+    }
+  }));
+  mActionZoomFit.reset(cmd.zoomFitContent.createAction(this, mUi->graphicsView,
+                                                       &GraphicsView::zoomAll));
+  mActionZoomIn.reset(
+      cmd.zoomIn.createAction(this, mUi->graphicsView, &GraphicsView::zoomIn));
+  mActionZoomOut.reset(cmd.zoomOut.createAction(this, mUi->graphicsView,
+                                                &GraphicsView::zoomOut));
+  mActionUndo.reset(cmd.undo.createAction(this));
+  mActionRedo.reset(cmd.redo.createAction(this));
+  mActionCut.reset(cmd.clipboardCut.createAction(
+      this, mFsm.data(), &SchematicEditorFsm::processCut));
+  mActionCopy.reset(cmd.clipboardCopy.createAction(
+      this, mFsm.data(), &SchematicEditorFsm::processCopy));
+  mActionPaste.reset(cmd.clipboardPaste.createAction(
+      this, mFsm.data(), &SchematicEditorFsm::processPaste));
+  mActionMoveLeft.reset(cmd.moveLeft.createAction(this, this, [this]() {
+    if (!mFsm->processMove(
+            Point(-mUi->graphicsView->getGridProperties().getInterval(), 0))) {
+      // Workaround for consumed keyboard shortcuts for scrolling.
+      mUi->graphicsView->horizontalScrollBar()->triggerAction(
+          QScrollBar::SliderSingleStepSub);
+    }
+  }));
+  addAction(mActionMoveLeft.data());
+  mActionMoveRight.reset(cmd.moveRight.createAction(this, this, [this]() {
+    if (!mFsm->processMove(
+            Point(*mUi->graphicsView->getGridProperties().getInterval(), 0))) {
+      // Workaround for consumed keyboard shortcuts for scrolling.
+      mUi->graphicsView->horizontalScrollBar()->triggerAction(
+          QScrollBar::SliderSingleStepAdd);
+    }
+  }));
+  addAction(mActionMoveRight.data());
+  mActionMoveUp.reset(cmd.moveUp.createAction(this, this, [this]() {
+    if (!mFsm->processMove(
+            Point(0, *mUi->graphicsView->getGridProperties().getInterval()))) {
+      // Workaround for consumed keyboard shortcuts for scrolling.
+      mUi->graphicsView->verticalScrollBar()->triggerAction(
+          QScrollBar::SliderSingleStepSub);
+    }
+  }));
+  addAction(mActionMoveUp.data());
+  mActionMoveDown.reset(cmd.moveDown.createAction(this, this, [this]() {
+    if (!mFsm->processMove(
+            Point(0, -mUi->graphicsView->getGridProperties().getInterval()))) {
+      // Workaround for consumed keyboard shortcuts for scrolling.
+      mUi->graphicsView->verticalScrollBar()->triggerAction(
+          QScrollBar::SliderSingleStepAdd);
+    }
+  }));
+  addAction(mActionMoveDown.data());
+  mActionRotateCcw.reset(cmd.rotateCcw.createAction(
+      this, this, [this]() { mFsm->processRotate(Angle::deg90()); }));
+  mActionRotateCw.reset(cmd.rotateCw.createAction(
+      this, this, [this]() { mFsm->processRotate(-Angle::deg90()); }));
+  mActionMirrorHorizontal.reset(cmd.mirrorHorizontal.createAction(
+      this, this, [this]() { mFsm->processMirror(Qt::Horizontal); }));
+  mActionMirrorVertical.reset(cmd.mirrorVertical.createAction(
+      this, this, [this]() { mFsm->processMirror(Qt::Vertical); }));
+  mActionProperties.reset(cmd.properties.createAction(
+      this, mFsm.data(), &SchematicEditorFsm::processEditProperties));
+  mActionRemove.reset(cmd.remove.createAction(
+      this, mFsm.data(), &SchematicEditorFsm::processRemove));
+  mActionAbort.reset(cmd.abort.createAction(
+      this, mFsm.data(), &SchematicEditorFsm::processAbortCommand));
+  mActionToolSelect.reset(cmd.toolSelect.createAction(this));
+  mActionToolWire.reset(cmd.toolWire.createAction(this));
+  mActionToolNetLabel.reset(cmd.toolNetLabel.createAction(this));
+  mActionToolPolygon.reset(cmd.toolPolygon.createAction(this));
+  mActionToolText.reset(cmd.toolText.createAction(this));
+  mActionToolComponent.reset(cmd.toolComponent.createAction(this));
+  mActionComponentResistor.reset(
+      cmd.componentResistor.createAction(this, this, [this]() {
+        Uuid componentUuid =
+            Uuid::fromString("ef80cd5e-2689-47ee-8888-31d04fc99174");
+        Uuid symbVarUuid = Uuid::fromString(
+            useIeee315Symbols() ? "d16e1f44-16af-4773-a310-de370f744548"
+                                : "a5995314-f535-45d4-8bd8-2d0b8a0dc42a");
+        mFsm->processAddComponent(componentUuid, symbVarUuid);
+      }));
+  mActionComponentInductor.reset(
+      cmd.componentInductor.createAction(this, this, [this]() {
+        Uuid componentUuid =
+            Uuid::fromString("506bd124-6062-400e-9078-b38bd7e1aaee");
+        Uuid symbVarUuid = Uuid::fromString(
+            useIeee315Symbols() ? "4245d515-6f6d-48cb-9958-a4ea23d0187f"
+                                : "62a7598c-17fe-41cf-8fa1-4ed274c3adc2");
+        mFsm->processAddComponent(componentUuid, symbVarUuid);
+      }));
+  mActionComponentCapacitorBipolar.reset(
+      cmd.componentCapacitorBipolar.createAction(this, this, [this]() {
+        Uuid componentUuid =
+            Uuid::fromString("d167e0e3-6a92-4b76-b013-77b9c230e5f1");
+        Uuid symbVarUuid = Uuid::fromString(
+            useIeee315Symbols() ? "6e639ff1-4e81-423b-9d0e-b28b35693a61"
+                                : "8cd7b37f-e5fa-4af5-a8dd-d78830bba3af");
+        mFsm->processAddComponent(componentUuid, symbVarUuid);
+      }));
+  mActionComponentCapacitorUnipolar.reset(
+      cmd.componentCapacitorUnipolar.createAction(this, this, [this]() {
+        Uuid componentUuid =
+            Uuid::fromString("c54375c5-7149-4ded-95c5-7462f7301ee7");
+        Uuid symbVarUuid = Uuid::fromString(
+            useIeee315Symbols() ? "20a01a81-506e-4fee-9dc0-8b50e6537cd4"
+                                : "5412add2-af9c-44b8-876d-a0fb7c201897");
+        mFsm->processAddComponent(componentUuid, symbVarUuid);
+      }));
+  mActionComponentGnd.reset(cmd.componentGnd.createAction(this, this, [this]() {
+    Uuid componentUuid =
+        Uuid::fromString("8076f6be-bfab-4fc1-9772-5d54465dd7e1");
+    Uuid symbVarUuid = Uuid::fromString("f09ad258-595b-4ee9-a1fc-910804a203ae");
+    mFsm->processAddComponent(componentUuid, symbVarUuid);
+  }));
+  mActionComponentVcc.reset(cmd.componentVcc.createAction(this, this, [this]() {
+    Uuid componentUuid =
+        Uuid::fromString("58c3c6cd-11eb-4557-aa3f-d3e05874afde");
+    Uuid symbVarUuid = Uuid::fromString("afb86b45-68ec-47b6-8d96-153d73567228");
+    mFsm->processAddComponent(componentUuid, symbVarUuid);
+  }));
+  mActionDockPages.reset(cmd.dockPages.createAction(this, this, [this]() {
+    mDockPages->show();
+    mDockPages->raise();
+    mDockPages->setFocus();
+  }));
+  mActionDockErc.reset(cmd.dockErc.createAction(this, this, [this]() {
+    mDockErc->show();
+    mDockErc->raise();
+    mDockErc->setFocus();
+  }));
+
+  // Undo stack action group.
+  mUndoStackActionGroup.reset(
+      new UndoStackActionGroup(*mActionUndo, *mActionRedo, nullptr,
+                               &mProjectEditor.getUndoStack(), this));
+
+  // Tools action group.
+  mToolsActionGroup.reset(new ExclusiveActionGroup());
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::SELECT,
+                               mActionToolSelect.data());
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::DRAW_WIRE,
+                               mActionToolWire.data());
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_NETLABEL,
+                               mActionToolNetLabel.data());
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::DRAW_POLYGON,
+                               mActionToolPolygon.data());
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_TEXT,
+                               mActionToolText.data());
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_COMPONENT,
+                               mActionToolComponent.data());
+  mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
+  connect(mFsm.data(), &SchematicEditorFsm::stateChanged,
+          mToolsActionGroup.data(), &ExclusiveActionGroup::setCurrentAction);
+  connect(mToolsActionGroup.data(),
+          &ExclusiveActionGroup::changeRequestTriggered, this,
+          &SchematicEditor::toolActionGroupChangeTriggered);
+}
+
+void SchematicEditor::createToolBars() noexcept {
+  // File.
+  mToolBarFile.reset(new QToolBar(tr("File"), this));
+  mToolBarFile->setObjectName("toolBarFile");
+  mToolBarFile->addAction(mActionCloseProject.data());
+  mToolBarFile->addSeparator();
+  mToolBarFile->addAction(mActionNewSheet.data());
+  mToolBarFile->addAction(mActionSaveProject.data());
+  mToolBarFile->addAction(mActionPrint.data());
+  mToolBarFile->addAction(mActionExportPdf.data());
+  mToolBarFile->addAction(mActionOrderPcb.data());
+  mToolBarFile->addSeparator();
+  mToolBarFile->addAction(mActionControlPanel.data());
+  mToolBarFile->addAction(mActionBoardEditor.data());
+  mToolBarFile->addSeparator();
+  mToolBarFile->addAction(mActionUndo.data());
+  mToolBarFile->addAction(mActionRedo.data());
+  addToolBar(Qt::TopToolBarArea, mToolBarFile.data());
+
+  // Edit.
+  mToolBarEdit.reset(new QToolBar(tr("Edit"), this));
+  mToolBarEdit->setObjectName("toolBarEdit");
+  mToolBarEdit->addAction(mActionCut.data());
+  mToolBarEdit->addAction(mActionCopy.data());
+  mToolBarEdit->addAction(mActionPaste.data());
+  mToolBarEdit->addAction(mActionRemove.data());
+  mToolBarEdit->addAction(mActionRotateCcw.data());
+  mToolBarEdit->addAction(mActionRotateCw.data());
+  mToolBarEdit->addAction(mActionMirrorHorizontal.data());
+  mToolBarEdit->addAction(mActionMirrorVertical.data());
+  addToolBar(Qt::TopToolBarArea, mToolBarEdit.data());
+
+  // View.
+  mToolBarView.reset(new QToolBar(tr("View"), this));
+  mToolBarView->setObjectName("toolBarView");
+  mToolBarView->addAction(mActionGridProperties.data());
+  mToolBarView->addAction(mActionZoomIn.data());
+  mToolBarView->addAction(mActionZoomOut.data());
+  mToolBarView->addAction(mActionZoomFit.data());
+  addToolBar(Qt::TopToolBarArea, mToolBarView.data());
+
+  // Search.
+  mToolBarSearch.reset(new SearchToolBar(this));
+  mToolBarSearch->setObjectName("toolBarSearch");
+  mToolBarSearch->setPlaceholderText(tr("Find symbol..."));
+  mToolBarSearch->setCompleterListFunction(
+      std::bind(&SchematicEditor::getSearchToolBarCompleterList, this));
+  connect(mActionFind.data(), &QAction::triggered, mToolBarSearch.data(),
+          &SearchToolBar::selectAllAndSetFocus);
+  connect(mActionFindNext.data(), &QAction::triggered, mToolBarSearch.data(),
+          &SearchToolBar::findNext);
+  connect(mActionFindPrevious.data(), &QAction::triggered,
+          mToolBarSearch.data(), &SearchToolBar::findPrevious);
+  addToolBar(Qt::TopToolBarArea, mToolBarSearch.data());
+  connect(mToolBarSearch.data(), &SearchToolBar::goToTriggered, this,
+          &SchematicEditor::goToSymbol);
+
+  // Command.
+  mToolBarCommand.reset(new QToolBar(tr("Command"), this));
+  mToolBarCommand->setObjectName("toolBarCommand");
+  mToolBarCommand->addAction(mActionAbort.data());
+  mToolBarCommand->addSeparator();
+  addToolBarBreak(Qt::TopToolBarArea);
+  addToolBar(Qt::TopToolBarArea, mToolBarCommand.data());
+  mCommandToolBarProxy->setToolBar(mToolBarCommand.data());
+
+  // Tools.
+  mToolBarTools.reset(new QToolBar(tr("Tools"), this));
+  mToolBarTools->setObjectName("toolBarTools");
+  mToolBarTools->addAction(mActionToolSelect.data());
+  mToolBarTools->addAction(mActionToolWire.data());
+  mToolBarTools->addAction(mActionToolNetLabel.data());
+  mToolBarTools->addAction(mActionToolPolygon.data());
+  mToolBarTools->addAction(mActionToolText.data());
+  mToolBarTools->addAction(mActionToolComponent.data());
+  addToolBar(Qt::LeftToolBarArea, mToolBarTools.data());
+
+  // Components.
+  mToolBarComponents.reset(new QToolBar(tr("Components"), this));
+  mToolBarComponents->setObjectName("toolBarComponents");
+  mToolBarComponents->addAction(mActionComponentResistor.data());
+  mToolBarComponents->addAction(mActionComponentInductor.data());
+  mToolBarComponents->addAction(mActionComponentCapacitorBipolar.data());
+  mToolBarComponents->addAction(mActionComponentCapacitorUnipolar.data());
+  mToolBarComponents->addAction(mActionComponentGnd.data());
+  mToolBarComponents->addAction(mActionComponentVcc.data());
+  addToolBarBreak(Qt::LeftToolBarArea);
+  addToolBar(Qt::LeftToolBarArea, mToolBarComponents.data());
+  updateComponentToolbarIcons();  // Load icons according workspace settings.
+  connect(&mProject.getSettings(), &ProjectSettings::settingsChanged, this,
+          &SchematicEditor::updateComponentToolbarIcons);
+}
+
+void SchematicEditor::createDockWidgets() noexcept {
+  // Pages.
+  mDockPages.reset(new SchematicPagesDock(mProject, this));
+  connect(this, &SchematicEditor::activeSchematicChanged, mDockPages.data(),
+          &SchematicPagesDock::setSelectedSchematic);
+  connect(mDockPages.data(), &SchematicPagesDock::selectedSchematicChanged,
+          this, &SchematicEditor::setActiveSchematicIndex);
+  connect(mDockPages.data(), &SchematicPagesDock::addSchematicTriggered, this,
+          &SchematicEditor::addSchematic);
+  connect(mDockPages.data(), &SchematicPagesDock::removeSchematicTriggered,
+          this, &SchematicEditor::removeSchematic);
+  connect(mDockPages.data(), &SchematicPagesDock::renameSchematicTriggered,
+          this, &SchematicEditor::renameSchematic);
+  addDockWidget(Qt::LeftDockWidgetArea, mDockPages.data(), Qt::Vertical);
+
+  // ERC Messages.
+  mDockErc.reset(new ErcMsgDock(mProject));
+  addDockWidget(Qt::RightDockWidgetArea, mDockErc.data(), Qt::Vertical);
+
+  // Set reasonable default dock size.
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+  resizeDocks(
+      {
+          mDockPages.data(),
+          mDockErc.data(),
+      },
+      {
+          120,
+          150,
+      },
+      Qt::Horizontal);
+#endif
+}
+
+void SchematicEditor::createMenus() noexcept {
+  MenuBuilder mb(mUi->menuBar);
+
+  // File.
+  mb.newMenu(&MenuBuilder::createFileMenu);
+  mb.addAction(mActionSaveProject);
+  mb.addAction(mActionFileManager);
+  mb.addSeparator();
+  {
+    MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createExportMenu));
+    smb.addAction(mActionExportPdf);
+    smb.addAction(mActionExportImage);
+    smb.addAction(mActionExportLppz);
+  }
+  {
+    MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createProductionDataMenu));
+    smb.addAction(mActionGenerateBom);
+  }
+  mb.addSeparator();
+  mb.addAction(mActionPrint);
+  mb.addAction(mActionOrderPcb);
+  mb.addSeparator();
+  mb.addAction(mActionCloseWindow);
+  mb.addAction(mActionCloseProject);
+  mb.addSeparator();
+  mb.addAction(mActionQuit);
+
+  // Edit.
+  mb.newMenu(&MenuBuilder::createEditMenu);
+  mb.addAction(mActionUndo);
+  mb.addAction(mActionRedo);
+  mb.addSeparator();
+  mb.addAction(mActionSelectAll);
+  mb.addSeparator();
+  mb.addAction(mActionCut);
+  mb.addAction(mActionCopy);
+  mb.addAction(mActionPaste);
+  mb.addAction(mActionRemove);
+  mb.addSeparator();
+  mb.addAction(mActionRotateCcw);
+  mb.addAction(mActionRotateCw);
+  mb.addAction(mActionMirrorHorizontal);
+  mb.addAction(mActionMirrorVertical);
+  mb.addSeparator();
+  mb.addAction(mActionFind);
+  mb.addAction(mActionFindNext);
+  mb.addAction(mActionFindPrevious);
+  mb.addSeparator();
+  mb.addAction(mActionProperties);
+
+  // View.
+  mb.newMenu(&MenuBuilder::createViewMenu);
+  mb.addAction(mActionGridProperties);
+  mb.addAction(mActionGridIncrease.data());
+  mb.addAction(mActionGridDecrease.data());
+  mb.addSeparator();
+  mb.addAction(mActionZoomIn);
+  mb.addAction(mActionZoomOut);
+  mb.addAction(mActionZoomFit);
+  mb.addSeparator();
+  {
+    MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createGoToDockMenu));
+    smb.addAction(mActionDockPages);
+    smb.addAction(mActionDockErc);
+  }
+  {
+    MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createDocksVisibilityMenu));
+    smb.addAction(mDockPages->toggleViewAction());
+    smb.addAction(mDockErc->toggleViewAction());
+  }
+
+  // Schematic.
+  mb.newMenu(&MenuBuilder::createSchematicMenu);
+  mb.addAction(mActionNewSheet);
+  mb.addAction(mActionRenameSheet);
+  mb.addAction(mActionRemoveSheet);
+
+  // Project.
+  mb.newMenu(&MenuBuilder::createProjectMenu);
+  mb.addAction(mActionNetClasses);
+  mb.addAction(mActionProjectProperties);
+  mb.addAction(mActionProjectSettings);
+  mb.addSeparator();
+  mb.addAction(mActionUpdateLibrary);
+
+  // Tools.
+  mb.newMenu(&MenuBuilder::createToolsMenu);
+  mb.addAction(mActionToolSelect);
+  mb.addAction(mActionToolWire);
+  mb.addAction(mActionToolNetLabel);
+  mb.addAction(mActionToolPolygon);
+  mb.addAction(mActionToolText);
+  mb.addAction(mActionToolComponent);
+
+  // Help.
+  mb.newMenu(&MenuBuilder::createHelpMenu);
+  mb.addAction(mActionOnlineDocumentation);
+  mb.addAction(mActionWebsite);
+  mb.addAction(mActionAboutLibrePcb);
+  mb.addAction(mActionAboutQt);
+}
 
 bool SchematicEditor::graphicsViewEventHandler(QEvent* event) {
   Q_ASSERT(event);
@@ -500,7 +781,19 @@ bool SchematicEditor::graphicsViewEventHandler(QEvent* event) {
     case QEvent::KeyPress: {
       auto* e = dynamic_cast<QKeyEvent*>(event);
       Q_ASSERT(e);
-      mFsm->processKeyPressed(*e);
+      if (mFsm->processKeyPressed(*e)) {
+        return true;
+      }
+      switch (e->key()) {
+        case Qt::Key_Left:
+        case Qt::Key_Right:
+        case Qt::Key_Up:
+        case Qt::Key_Down:
+          // Allow handling these keys by the graphics view for scrolling.
+          return false;
+        default:
+          break;
+      }
       break;
     }
 
@@ -651,21 +944,45 @@ void SchematicEditor::goToSymbol(const QString& name, int index) noexcept {
       // symbol is 1/4th of the screen.
       qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());
       rect.adjust(-margin, -margin, margin, margin);
-      mGraphicsView->zoomToRect(rect);
+      mUi->graphicsView->zoomToRect(rect);
     }
   }
 }
 
 void SchematicEditor::updateComponentToolbarIcons() noexcept {
   QString suffix = useIeee315Symbols() ? "us" : "eu";
-  mUi->actionAddComp_Resistor->setIcon(
+  mActionComponentResistor->setIcon(
       QIcon(":/img/library/resistor_" % suffix % ".png"));
-  mUi->actionAddComp_Inductor->setIcon(
+  mActionComponentInductor->setIcon(
       QIcon(":/img/library/inductor_" % suffix % ".png"));
-  mUi->actionAddComp_BipolarCapacitor->setIcon(
+  mActionComponentCapacitorBipolar->setIcon(
       QIcon(":/img/library/bipolar_capacitor_" % suffix % ".png"));
-  mUi->actionAddComp_UnipolarCapacitor->setIcon(
+  mActionComponentCapacitorUnipolar->setIcon(
       QIcon(":/img/library/unipolar_capacitor_" % suffix % ".png"));
+}
+
+void SchematicEditor::setGridProperties(const GridProperties& grid,
+                                        bool applyToSchematics) noexcept {
+  mUi->graphicsView->setGridProperties(grid);
+  mUi->statusbar->setLengthUnit(grid.getUnit());
+
+  if (applyToSchematics) {
+    foreach (Schematic* schematic, mProject.getSchematics()) {
+      schematic->setGridProperties(grid);
+    }
+  }
+}
+
+void SchematicEditor::execGridPropertiesDialog() noexcept {
+  if (const Schematic* activeSchematic = getActiveSchematic()) {
+    GridSettingsDialog dialog(activeSchematic->getGridProperties(), this);
+    connect(
+        &dialog, &GridSettingsDialog::gridPropertiesChanged,
+        [this](const GridProperties& grid) { setGridProperties(grid, false); });
+    if (dialog.exec()) {
+      setGridProperties(dialog.getGrid(), true);
+    }
+  }
 }
 
 void SchematicEditor::execGraphicsExportDialog(

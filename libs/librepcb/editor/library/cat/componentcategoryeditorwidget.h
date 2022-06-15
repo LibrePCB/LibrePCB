@@ -64,6 +64,9 @@ public:
                                 QWidget* parent = nullptr);
   ~ComponentCategoryEditorWidget() noexcept;
 
+  // Getters
+  QSet<Feature> getAvailableFeatures() const noexcept override;
+
   // Operator Overloadings
   ComponentCategoryEditorWidget& operator=(
       const ComponentCategoryEditorWidget& rhs) = delete;

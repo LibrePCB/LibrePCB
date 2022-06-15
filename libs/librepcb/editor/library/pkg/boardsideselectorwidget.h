@@ -55,6 +55,12 @@ public:
 
   // Setters
   void setCurrentBoardSide(FootprintPad::BoardSide side) noexcept;
+  void setBoardSideTop() noexcept {
+    setCurrentBoardSide(FootprintPad::BoardSide::TOP);
+  }
+  void setBoardSideBottom() noexcept {
+    setCurrentBoardSide(FootprintPad::BoardSide::BOTTOM);
+  }
 
   // Operator Overloadings
   BoardSideSelectorWidget& operator=(const BoardSideSelectorWidget& rhs) =

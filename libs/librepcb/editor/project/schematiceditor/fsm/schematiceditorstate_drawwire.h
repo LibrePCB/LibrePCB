@@ -60,17 +60,14 @@ class SchematicEditorState_DrawWire final : public SchematicEditorState {
   };
 
   /**
-   * @brief The WireMode enum contains all available wire modes
-   *
-   * @note The first item must have the value 0!
+   * @brief All available wire modes
    */
-  enum WireMode {
-    WireMode_HV = 0,  ///< horizontal - vertical [default]
-    WireMode_VH,  ///< vertical - horizontal
-    WireMode_9045,  ///< 90° - 45°
-    WireMode_4590,  ///< 45° - 90°
-    WireMode_Straight,  ///< straight
-    WireMode_COUNT  ///< count of wire modes
+  enum class WireMode {
+    HV,  ///< horizontal - vertical [default]
+    VH,  ///< vertical - horizontal
+    Deg9045,  ///< 90° - 45°
+    Deg4590,  ///< 45° - 90°
+    Straight,  ///< straight
   };
 
 public:
@@ -115,14 +112,14 @@ private:  //  Methods
   SI_NetLine* findNetLine(Schematic& schematic, const Point& pos,
                           SI_NetLine* except = nullptr) const noexcept;
   Point updateNetpointPositions(Schematic& schematic, bool snap) noexcept;
-  void updateWireModeActionsCheckedState() noexcept;
+  void wireModeChanged(WireMode mode) noexcept;
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
       noexcept;
 
 private:  // Data
   Circuit& mCircuit;
   SubState mSubState;  ///< the current substate
-  WireMode mWireMode;  ///< the current wire mode
+  WireMode mCurrentWireMode;  ///< the current wire mode
   Point mCursorPos;  ///< the current cursor position
   SI_NetLineAnchor*
       mFixedStartAnchor;  ///< the fixed anchor (start point of the line)
@@ -132,8 +129,7 @@ private:  // Data
   SI_NetPoint* mPositioningNetPoint2;  ///< the second netpoint to place
 
   // Widgets for the command toolbar
-  QHash<WireMode, QAction*> mWireModeActions;
-  QList<QAction*> mActionSeparators;
+  QPointer<QActionGroup> mWireModeActionGroup;
 };
 
 /*******************************************************************************

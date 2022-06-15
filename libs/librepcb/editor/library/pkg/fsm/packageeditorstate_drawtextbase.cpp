@@ -23,6 +23,7 @@
 #include "packageeditorstate_drawtextbase.h"
 
 #include "../../../cmd/cmdstroketextedit.h"
+#include "../../../editorcommandset.h"
 #include "../../../utils/halignactiongroup.h"
 #include "../../../utils/valignactiongroup.h"
 #include "../../../widgets/graphicslayercombobox.h"
@@ -60,7 +61,8 @@ PackageEditorState_DrawTextBase::PackageEditorState_DrawTextBase(
     mLastHeight(1),
     mLastStrokeWidth(0),
     mLastAlignment(HAlign::left(), VAlign::bottom()),
-    mLastText() {
+    mLastText(),
+    mLastMirrored(false) {
   resetToDefaultParameters();
 }
 
@@ -76,12 +78,20 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
 
   // populate command toolbar
+  EditorCommandSet& cmd = EditorCommandSet::instance();
   if (mMode == Mode::TEXT) {
     mContext.commandToolBar.addLabel(tr("Layer:"));
     std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
         new GraphicsLayerComboBox());
+    mLayerComboBox = layerComboBox.get();
     layerComboBox->setLayers(getAllowedTextLayers());
     layerComboBox->setCurrentLayer(mLastLayerName);
+    layerComboBox->addAction(
+        cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
+                                 &GraphicsLayerComboBox::stepDown));
+    layerComboBox->addAction(
+        cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
+                                   &GraphicsLayerComboBox::stepUp));
     connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
             this, &PackageEditorState_DrawTextBase::layerComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -109,12 +119,17 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
     resetToDefaultParameters();
   }
 
+  // Height.
   mContext.commandToolBar.addLabel(tr("Height:"), 10);
   std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
   edtHeight->configure(getDefaultLengthUnit(),
                        LengthEditBase::Steps::textHeight(),
                        "package_editor/draw_text/height");
   edtHeight->setValue(mLastHeight);
+  edtHeight->addAction(cmd.sizeIncrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepUp));
+  edtHeight->addAction(cmd.sizeDecrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepDown));
   connect(edtHeight.get(), &PositiveLengthEdit::valueChanged, this,
           &PackageEditorState_DrawTextBase::heightEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtHeight));
@@ -127,6 +142,12 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
                                 LengthEditBase::Steps::generic(),
                                 "package_editor/draw_text/stroke_width");
   strokeWidthSpinBox->setValue(mLastStrokeWidth);
+  strokeWidthSpinBox->addAction(cmd.lineWidthIncrease.createAction(
+      strokeWidthSpinBox.get(), strokeWidthSpinBox.get(),
+      &UnsignedLengthEdit::stepUp));
+  strokeWidthSpinBox->addAction(cmd.lineWidthDecrease.createAction(
+      strokeWidthSpinBox.get(), strokeWidthSpinBox.get(),
+      &UnsignedLengthEdit::stepDown));
   connect(strokeWidthSpinBox.get(), &UnsignedLengthEdit::valueChanged, this,
           &PackageEditorState_DrawTextBase::strokeWidthEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(strokeWidthSpinBox));
@@ -134,6 +155,7 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
   // Horizontal alignment
   mContext.commandToolBar.addSeparator();
   std::unique_ptr<HAlignActionGroup> hAlignActionGroup(new HAlignActionGroup());
+  mHAlignActionGroup = hAlignActionGroup.get();
   hAlignActionGroup->setValue(mLastAlignment.getH());
   connect(hAlignActionGroup.get(), &HAlignActionGroup::valueChanged, this,
           &PackageEditorState_DrawTextBase::hAlignActionGroupValueChanged);
@@ -142,6 +164,7 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
   // Vertical alignment
   mContext.commandToolBar.addSeparator();
   std::unique_ptr<VAlignActionGroup> vAlignActionGroup(new VAlignActionGroup());
+  mVAlignActionGroup = vAlignActionGroup.get();
   vAlignActionGroup->setValue(mLastAlignment.getV());
   connect(vAlignActionGroup.get(), &VAlignActionGroup::valueChanged, this,
           &PackageEditorState_DrawTextBase::vAlignActionGroupValueChanged);
@@ -166,6 +189,16 @@ bool PackageEditorState_DrawTextBase::exit() noexcept {
 
   mContext.graphicsView.unsetCursor();
   return true;
+}
+
+QSet<EditorWidgetBase::Feature>
+    PackageEditorState_DrawTextBase::getAvailableFeatures() const noexcept {
+  return {
+      EditorWidgetBase::Feature::Abort,
+      EditorWidgetBase::Feature::Rotate,
+      EditorWidgetBase::Feature::Mirror,
+      EditorWidgetBase::Feature::Flip,
+  };
 }
 
 /*******************************************************************************
@@ -199,11 +232,13 @@ bool PackageEditorState_DrawTextBase::
     processGraphicsSceneRightMouseButtonReleased(
         QGraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
-  return processRotateCcw();
+  return processRotate(Angle::deg90());
 }
-bool PackageEditorState_DrawTextBase::processRotateCw() noexcept {
+
+bool PackageEditorState_DrawTextBase::processRotate(
+    const Angle& rotation) noexcept {
   if (mCurrentText) {
-    mEditCmd->rotate(-Angle::deg90(), mCurrentText->getPosition(), true);
+    mEditCmd->rotate(rotation, mCurrentText->getPosition(), true);
     mLastRotation = mCurrentText->getRotation();
     return true;
   } else {
@@ -211,10 +246,42 @@ bool PackageEditorState_DrawTextBase::processRotateCw() noexcept {
   }
 }
 
-bool PackageEditorState_DrawTextBase::processRotateCcw() noexcept {
+bool PackageEditorState_DrawTextBase::processMirror(
+    Qt::Orientation orientation) noexcept {
   if (mCurrentText) {
-    mEditCmd->rotate(Angle::deg90(), mCurrentText->getPosition(), true);
+    mEditCmd->mirrorGeometry(orientation, mCurrentText->getPosition(), true);
     mLastRotation = mCurrentText->getRotation();
+    mLastAlignment = mCurrentText->getAlign();
+    if (mHAlignActionGroup) {
+      mHAlignActionGroup->setValue(mLastAlignment.getH());
+    }
+    if (mHAlignActionGroup) {
+      mVAlignActionGroup->setValue(mLastAlignment.getV());
+    }
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool PackageEditorState_DrawTextBase::processFlip(
+    Qt::Orientation orientation) noexcept {
+  if (mCurrentText) {
+    mEditCmd->mirrorGeometry(orientation, mCurrentText->getPosition(), true);
+    mEditCmd->mirrorLayer(true);
+    mLastLayerName = mCurrentText->getLayerName();
+    mLastRotation = mCurrentText->getRotation();
+    mLastAlignment = mCurrentText->getAlign();
+    mLastMirrored = mCurrentText->getMirrored();
+    if (mLayerComboBox) {
+      mLayerComboBox->setCurrentLayer(mCurrentText->getLayerName());
+    }
+    if (mHAlignActionGroup) {
+      mHAlignActionGroup->setValue(mLastAlignment.getH());
+    }
+    if (mHAlignActionGroup) {
+      mVAlignActionGroup->setValue(mLastAlignment.getV());
+    }
     return true;
   } else {
     return false;
@@ -232,7 +299,7 @@ bool PackageEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
     mCurrentText = std::make_shared<StrokeText>(
         Uuid::createRandom(), mLastLayerName, mLastText, pos, mLastRotation,
         mLastHeight, mLastStrokeWidth, StrokeTextSpacing(), StrokeTextSpacing(),
-        mLastAlignment, false, true);
+        mLastAlignment, mLastMirrored, true);
     mContext.undoStack.appendToCmdGroup(new CmdStrokeTextInsert(
         mContext.currentFootprint->getStrokeTexts(), mCurrentText));
     mEditCmd.reset(new CmdStrokeTextEdit(*mCurrentText));
@@ -284,6 +351,8 @@ bool PackageEditorState_DrawTextBase::abortAddText() noexcept {
 }
 
 void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
+  mLastRotation = Angle::deg0();
+  mLastMirrored = false;
   switch (mMode) {
     case Mode::NAME:
       // Set all properties according library conventions

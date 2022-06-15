@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "symboleditorstate.h"
 
+#include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/length.h>
 
 #include <QtCore>
@@ -37,7 +38,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Angle;
 class Point;
 class SymbolPin;
 
@@ -66,6 +66,8 @@ public:
   // General Methods
   bool entry() noexcept override;
   bool exit() noexcept override;
+  QSet<EditorWidgetBase::Feature> getAvailableFeatures() const
+      noexcept override;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -74,15 +76,15 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
-  bool processRotateCw() noexcept override;
-  bool processRotateCcw() noexcept override;
+  bool processRotate(const Angle& rotation) noexcept override;
+  bool processMirror(Qt::Orientation orientation) noexcept override;
 
   // Operator Overloadings
   SymbolEditorState_AddPins& operator=(const SymbolEditorState_AddPins& rhs) =
       delete;
 
 private:  // Methods
-  bool addNextPin(const Point& pos, const Angle& rot) noexcept;
+  bool addNextPin(const Point& pos) noexcept;
   void nameLineEditTextChanged(const QString& text) noexcept;
   void lengthEditValueChanged(const UnsignedLength& value) noexcept;
   QString determineNextPinName() const noexcept;
@@ -95,6 +97,7 @@ private:  // Types / Data
   QLineEdit* mNameLineEdit;
 
   // parameter memory
+  Angle mLastRotation;
   UnsignedLength mLastLength;
 };
 

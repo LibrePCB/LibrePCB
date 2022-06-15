@@ -51,6 +51,9 @@ class ErcMsgDock;
 class ExclusiveActionGroup;
 class GraphicsView;
 class ProjectEditor;
+class SearchToolBar;
+class StandardEditorCommandHandler;
+class ToolBarProxy;
 class UndoStackActionGroup;
 class UnplacedComponentsDock;
 
@@ -101,28 +104,16 @@ public slots:
 private slots:
 
   // Actions
-  void on_actionProjectClose_triggered();
-  void on_actionNewBoard_triggered();
-  void on_actionCopyBoard_triggered();
-  void on_actionRemoveBoard_triggered();
-  void on_actionGrid_triggered();
-  void on_actionGenerateFabricationData_triggered();
-  void on_actionGenerateBom_triggered();
-  void on_actionGeneratePickPlace_triggered();
-  void on_actionProjectProperties_triggered();
-  void on_actionUpdateLibrary_triggered();
-  void on_actionLayerStackSetup_triggered();
-  void on_actionModifyDesignRules_triggered();
-  void on_actionDesignRuleCheck_triggered();
-  void on_actionRebuildPlanes_triggered();
-  void on_actionShowAllPlanes_triggered();
-  void on_actionHideAllPlanes_triggered();
   void on_tabBar_currentChanged(int index);
   void on_lblUnplacedComponentsNote_linkActivated();
-  void boardListActionGroupTriggered(QAction* action);
 
 private:
   // Private Methods
+  void createActions() noexcept;
+  void createToolBars() noexcept;
+  void createDockWidgets() noexcept;
+  void createMenus() noexcept;
+  void updateBoardActionGroup() noexcept;
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void unplacedComponentsCountChanged(int count) noexcept;
@@ -136,16 +127,23 @@ private:
   QList<BI_Device*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;
   void goToDevice(const QString& name, int index) noexcept;
+  void newBoard() noexcept;
+  void copyBoard() noexcept;
+  void removeBoard() noexcept;
+  void setGridProperties(const GridProperties& grid,
+                         bool applyToBoard) noexcept;
+  void execGridPropertiesDialog() noexcept;
+  void execDesignRulesDialog() noexcept;
+  void execDesignRuleCheckDialog() noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
 
   // General Attributes
   ProjectEditor& mProjectEditor;
   Project& mProject;
-  Ui::BoardEditor* mUi;
-  GraphicsView* mGraphicsView;
-  QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
-  QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
+  QScopedPointer<Ui::BoardEditor> mUi;
+  QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
+  QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
 
   // DRC
   BoardDesignRuleCheck::Options mDrcOptions;
@@ -155,17 +153,105 @@ private:
 
   // Misc
   QPointer<Board> mActiveBoard;
-  QList<QAction*> mBoardListActions;
-  QActionGroup mBoardListActionGroup;
+  QScopedPointer<BoardEditorFsm> mFsm;
+
+  // Actions
+  QScopedPointer<QAction> mActionAboutLibrePcb;
+  QScopedPointer<QAction> mActionAboutQt;
+  QScopedPointer<QAction> mActionOnlineDocumentation;
+  QScopedPointer<QAction> mActionWebsite;
+  QScopedPointer<QAction> mActionSaveProject;
+  QScopedPointer<QAction> mActionCloseProject;
+  QScopedPointer<QAction> mActionCloseWindow;
+  QScopedPointer<QAction> mActionQuit;
+  QScopedPointer<QAction> mActionFileManager;
+  QScopedPointer<QAction> mActionSchematicEditor;
+  QScopedPointer<QAction> mActionControlPanel;
+  QScopedPointer<QAction> mActionProjectProperties;
+  QScopedPointer<QAction> mActionProjectSettings;
+  QScopedPointer<QAction> mActionNetClasses;
+  QScopedPointer<QAction> mActionUpdateLibrary;
+  QScopedPointer<QAction> mActionLayerStack;
+  QScopedPointer<QAction> mActionDesignRules;
+  QScopedPointer<QAction> mActionDesignRuleCheck;
+  QScopedPointer<QAction> mActionImportDxf;
+  QScopedPointer<QAction> mActionExportLppz;
+  QScopedPointer<QAction> mActionExportImage;
+  QScopedPointer<QAction> mActionExportPdf;
+  QScopedPointer<QAction> mActionPrint;
+  QScopedPointer<QAction> mActionGenerateBom;
+  QScopedPointer<QAction> mActionGenerateFabricationData;
+  QScopedPointer<QAction> mActionGeneratePickPlace;
+  QScopedPointer<QAction> mActionOrderPcb;
+  QScopedPointer<QAction> mActionNewBoard;
+  QScopedPointer<QAction> mActionCopyBoard;
+  QScopedPointer<QAction> mActionRemoveBoard;
+  QScopedPointer<QAction> mActionNextPage;
+  QScopedPointer<QAction> mActionPreviousPage;
+  QScopedPointer<QAction> mActionFind;
+  QScopedPointer<QAction> mActionFindNext;
+  QScopedPointer<QAction> mActionFindPrevious;
+  QScopedPointer<QAction> mActionSelectAll;
+  QScopedPointer<QAction> mActionGridProperties;
+  QScopedPointer<QAction> mActionGridIncrease;
+  QScopedPointer<QAction> mActionGridDecrease;
+  QScopedPointer<QAction> mActionZoomFit;
+  QScopedPointer<QAction> mActionZoomIn;
+  QScopedPointer<QAction> mActionZoomOut;
+  QScopedPointer<QAction> mActionUndo;
+  QScopedPointer<QAction> mActionRedo;
+  QScopedPointer<QAction> mActionCut;
+  QScopedPointer<QAction> mActionCopy;
+  QScopedPointer<QAction> mActionPaste;
+  QScopedPointer<QAction> mActionMoveLeft;
+  QScopedPointer<QAction> mActionMoveRight;
+  QScopedPointer<QAction> mActionMoveUp;
+  QScopedPointer<QAction> mActionMoveDown;
+  QScopedPointer<QAction> mActionRotateCcw;
+  QScopedPointer<QAction> mActionRotateCw;
+  QScopedPointer<QAction> mActionFlipHorizontal;
+  QScopedPointer<QAction> mActionFlipVertical;
+  QScopedPointer<QAction> mActionSnapToGrid;
+  QScopedPointer<QAction> mActionResetAllTexts;
+  QScopedPointer<QAction> mActionProperties;
+  QScopedPointer<QAction> mActionRemove;
+  QScopedPointer<QAction> mActionShowPlanes;
+  QScopedPointer<QAction> mActionHidePlanes;
+  QScopedPointer<QAction> mActionRebuildPlanes;
+  QScopedPointer<QAction> mActionAbort;
+  QScopedPointer<QAction> mActionToolSelect;
+  QScopedPointer<QAction> mActionToolTrace;
+  QScopedPointer<QAction> mActionToolVia;
+  QScopedPointer<QAction> mActionToolPolygon;
+  QScopedPointer<QAction> mActionToolText;
+  QScopedPointer<QAction> mActionToolPlane;
+  QScopedPointer<QAction> mActionToolHole;
+  QScopedPointer<QAction> mActionDockErc;
+  QScopedPointer<QAction> mActionDockDrc;
+  QScopedPointer<QAction> mActionDockLayers;
+  QScopedPointer<QAction> mActionDockPlaceDevices;
+
+  // Action groups
+  QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;
+  QScopedPointer<ExclusiveActionGroup> mToolsActionGroup;
+  QScopedPointer<QActionGroup> mBoardActionGroup;
+
+  // Toolbars
+  QScopedPointer<QToolBar> mToolBarFile;
+  QScopedPointer<QToolBar> mToolBarEdit;
+  QScopedPointer<QToolBar> mToolBarView;
+  QScopedPointer<SearchToolBar> mToolBarSearch;
+  QScopedPointer<QToolBar> mToolBarCommand;
+  QScopedPointer<QToolBar> mToolBarTools;
 
   // Docks
-  ErcMsgDock* mErcMsgDock;
-  UnplacedComponentsDock* mUnplacedComponentsDock;
-  BoardLayersDock* mBoardLayersDock;
-  QScopedPointer<BoardDesignRuleCheckMessagesDock> mDrcMessagesDock;
+  QScopedPointer<UnplacedComponentsDock> mDockUnplacedComponents;
+  QScopedPointer<BoardLayersDock> mDockLayers;
+  QScopedPointer<ErcMsgDock> mDockErc;
+  QScopedPointer<BoardDesignRuleCheckMessagesDock> mDockDrc;
 
-  // Finite State Machine
-  QScopedPointer<BoardEditorFsm> mFsm;
+  // Menus
+  QPointer<QMenu> mMenuBoard;
 };
 
 /*******************************************************************************

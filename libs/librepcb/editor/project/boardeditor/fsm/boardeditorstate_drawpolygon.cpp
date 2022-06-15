@@ -23,7 +23,9 @@
 #include "boardeditorstate_drawpolygon.h"
 
 #include "../../../cmd/cmdpolygonedit.h"
+#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
+#include "../../../utils/toolbarproxy.h"
 #include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/unsignedlengthedit.h"
@@ -80,42 +82,45 @@ bool BoardEditorState_DrawPolygon::entry() noexcept {
   // Clear board selection because selection does not make sense in this state
   board->clearSelection();
 
-  // Add the "Layer:" label to the toolbar
-  mLayerLabel.reset(new QLabel(tr("Layer:")));
-  mLayerLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mLayerLabel.data());
+  EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the layers combobox to the toolbar
-  mLayerComboBox.reset(new GraphicsLayerComboBox());
-  mLayerComboBox->setLayers(getAllowedGeometryLayers(*board));
-  mLayerComboBox->setCurrentLayer(mLastPolygonProperties.getLayerName());
-  mContext.editorUi.commandToolbar->addWidget(mLayerComboBox.data());
-  connect(mLayerComboBox.data(), &GraphicsLayerComboBox::currentLayerChanged,
+  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
+  std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
+      new GraphicsLayerComboBox());
+  layerComboBox->setLayers(getAllowedGeometryLayers(*board));
+  layerComboBox->setCurrentLayer(mLastPolygonProperties.getLayerName());
+  layerComboBox->addAction(
+      cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
+                               &GraphicsLayerComboBox::stepDown));
+  layerComboBox->addAction(
+      cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
+                                 &GraphicsLayerComboBox::stepUp));
+  connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
           this, &BoardEditorState_DrawPolygon::layerComboBoxLayerChanged);
+  mContext.commandToolBar.addWidget(std::move(layerComboBox));
 
-  // Add the "Width:" label to the toolbar
-  mWidthLabel.reset(new QLabel(tr("Width:")));
-  mWidthLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mWidthLabel.data());
-
-  // Add the widths combobox to the toolbar
-  mWidthEdit.reset(new UnsignedLengthEdit());
-  mWidthEdit->setValue(mLastPolygonProperties.getLineWidth());
-  mContext.editorUi.commandToolbar->addWidget(mWidthEdit.data());
-  connect(mWidthEdit.data(), &UnsignedLengthEdit::valueChanged, this,
+  // Add the width edit to the toolbar
+  mContext.commandToolBar.addLabel(tr("Width:"), 10);
+  std::unique_ptr<UnsignedLengthEdit> widthEdit(new UnsignedLengthEdit());
+  widthEdit->setValue(mLastPolygonProperties.getLineWidth());
+  widthEdit->addAction(cmd.lineWidthIncrease.createAction(
+      widthEdit.get(), widthEdit.get(), &UnsignedLengthEdit::stepUp));
+  widthEdit->addAction(cmd.lineWidthDecrease.createAction(
+      widthEdit.get(), widthEdit.get(), &UnsignedLengthEdit::stepDown));
+  connect(widthEdit.get(), &UnsignedLengthEdit::valueChanged, this,
           &BoardEditorState_DrawPolygon::widthEditValueChanged);
-
-  // Add the "Filled:" label to the toolbar
-  mFillLabel.reset(new QLabel(tr("Filled:")));
-  mFillLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mFillLabel.data());
+  mContext.commandToolBar.addWidget(std::move(widthEdit));
 
   // Add the filled checkbox to the toolbar
-  mFillCheckBox.reset(new QCheckBox());
-  mFillCheckBox->setChecked(mLastPolygonProperties.isFilled());
-  mContext.editorUi.commandToolbar->addWidget(mFillCheckBox.data());
-  connect(mFillCheckBox.data(), &QCheckBox::toggled, this,
+  mContext.commandToolBar.addLabel(tr("Filled:"), 10);
+  std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox());
+  fillCheckBox->setChecked(mLastPolygonProperties.isFilled());
+  fillCheckBox->addAction(cmd.fillToggle.createAction(
+      fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
+  connect(fillCheckBox.get(), &QCheckBox::toggled, this,
           &BoardEditorState_DrawPolygon::filledCheckBoxCheckedChanged);
+  mContext.commandToolBar.addWidget(std::move(fillCheckBox));
 
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
@@ -126,14 +131,7 @@ bool BoardEditorState_DrawPolygon::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   // Remove actions / widgets from the "command" toolbar
-  mFillCheckBox.reset();
-  mFillLabel.reset();
-  mWidthEdit.reset();
-  mWidthLabel.reset();
-  mLayerComboBox.reset();
-  mLayerLabel.reset();
-  qDeleteAll(mActionSeparators);
-  mActionSeparators.clear();
+  mContext.commandToolBar.clear();
 
   mContext.editorGraphicsView.unsetCursor();
   return true;

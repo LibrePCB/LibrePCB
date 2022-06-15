@@ -77,6 +77,11 @@ void CmdDeviceInstanceEdit::translate(const Point& deltaPos,
   if (immediate) mDevice.setPosition(mNewPos);
 }
 
+void CmdDeviceInstanceEdit::snapToGrid(const PositiveLength& gridInterval,
+                                       bool immediate) noexcept {
+  setPosition(mNewPos.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdDeviceInstanceEdit::setRotation(const Angle& angle,
                                         bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

@@ -124,6 +124,21 @@ std::shared_ptr<Footprint> PackageEditorFsm::getCurrentFootprint() const
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void PackageEditorFsm::updateAvailableFeatures() noexcept {
+  QSet<EditorWidgetBase::Feature> features;
+  if (PackageEditorState* state = getCurrentState()) {
+    features |= state->getAvailableFeatures();
+  }
+  if (features != mAvailableFeatures) {
+    mAvailableFeatures = features;
+    emit availableFeaturesChanged();
+  }
+}
+
+/*******************************************************************************
  *  Event Handlers
  ******************************************************************************/
 
@@ -141,7 +156,7 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
   if (mContext.currentFootprint) {
     // load graphics items recursively
     mContext.currentGraphicsItem.reset(new FootprintGraphicsItem(
-        mContext.currentFootprint, mContext.layerProvider,
+        mContext.currentFootprint, mContext.editorContext.layerProvider,
         qApp->getDefaultStrokeFont(), &mContext.package.getPads()));
     mContext.graphicsScene.addItem(*mContext.currentGraphicsItem);
     mSelectFootprintGraphicsItem.reset();
@@ -156,7 +171,8 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
     mSelectFootprintGraphicsItem->setHeight(PositiveLength(Length::fromMm(5)));
     mSelectFootprintGraphicsItem->setText(tr("Please select a footprint."));
     mSelectFootprintGraphicsItem->setLayer(
-        mContext.layerProvider.getLayer(GraphicsLayer::sBoardOutlines));
+        mContext.editorContext.layerProvider.getLayer(
+            GraphicsLayer::sBoardOutlines));
     mContext.graphicsScene.addItem(*mSelectFootprintGraphicsItem);
     mContext.graphicsView.setEnabled(false);
     mContext.graphicsView.zoomAll();
@@ -257,37 +273,45 @@ bool PackageEditorFsm::processPaste() noexcept {
   }
 }
 
-bool PackageEditorFsm::processRotateCw() noexcept {
+bool PackageEditorFsm::processMove(Qt::ArrowType direction) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
-    return getCurrentState()->processRotateCw();
+    return getCurrentState()->processMove(direction);
   } else {
     return false;
   }
 }
 
-bool PackageEditorFsm::processRotateCcw() noexcept {
+bool PackageEditorFsm::processRotate(const Angle& rotation) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
-    return getCurrentState()->processRotateCcw();
+    return getCurrentState()->processRotate(rotation);
   } else {
     return false;
   }
 }
 
-bool PackageEditorFsm::processMirror() noexcept {
+bool PackageEditorFsm::processMirror(Qt::Orientation orientation) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
-    return getCurrentState()->processMirror();
+    return getCurrentState()->processMirror(orientation);
   } else {
     return false;
   }
 }
 
-bool PackageEditorFsm::processFlip() noexcept {
+bool PackageEditorFsm::processFlip(Qt::Orientation orientation) noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
-    return getCurrentState()->processFlip();
+    return getCurrentState()->processFlip(orientation);
+  } else {
+    return false;
+  }
+}
+
+bool PackageEditorFsm::processSnapToGrid() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processSnapToGrid();
   } else {
     return false;
   }
@@ -297,6 +321,14 @@ bool PackageEditorFsm::processRemove() noexcept {
   if (getCurrentState() && mContext.currentFootprint &&
       mContext.currentGraphicsItem) {
     return getCurrentState()->processRemove();
+  } else {
+    return false;
+  }
+}
+
+bool PackageEditorFsm::processEditProperties() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processEditProperties();
   } else {
     return false;
   }
@@ -383,12 +415,18 @@ bool PackageEditorFsm::setNextState(State state) noexcept {
   if (!leaveCurrentState()) {
     return false;
   }
-  return enterNextState(state);
+  const bool success = enterNextState(state);
+  updateAvailableFeatures();
+  return success;
 }
 
 bool PackageEditorFsm::leaveCurrentState() noexcept {
-  if ((getCurrentState()) && (!getCurrentState()->exit())) {
-    return false;
+  if (PackageEditorState* state = getCurrentState()) {
+    if (!state->exit()) {
+      return false;
+    }
+    disconnect(state, &PackageEditorState::availableFeaturesChanged, this,
+               &PackageEditorFsm::updateAvailableFeatures);
   }
   if (mCurrentState != State::SELECT) {
     // Only memorize states other than SELECT.
@@ -401,9 +439,12 @@ bool PackageEditorFsm::leaveCurrentState() noexcept {
 
 bool PackageEditorFsm::enterNextState(State state) noexcept {
   Q_ASSERT(mCurrentState == State::IDLE);
-  PackageEditorState* nextState = mStates.value(state, nullptr);
-  if ((nextState) && (!nextState->entry())) {
-    return false;
+  if (PackageEditorState* nextState = mStates.value(state, nullptr)) {
+    if (!nextState->entry()) {
+      return false;
+    }
+    connect(nextState, &PackageEditorState::availableFeaturesChanged, this,
+            &PackageEditorFsm::updateAvailableFeatures);
   }
   mCurrentState = state;
   emit toolChanged(getCurrentTool());
