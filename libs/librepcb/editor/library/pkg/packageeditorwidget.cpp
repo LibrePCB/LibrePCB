@@ -24,6 +24,7 @@
 
 #include "../../cmd/cmdstroketextedit.h"
 #include "../../dialogs/gridsettingsdialog.h"
+#include "../../editorcommandset.h"
 #include "../../library/cmd/cmdlibraryelementedit.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/toolbarproxy.h"
@@ -83,6 +84,13 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   mUi->graphicsView->setBackgroundBrush(Qt::black);
   mUi->graphicsView->setForegroundBrush(Qt::white);
   mUi->graphicsView->setEnabled(false);  // no footprint selected
+  mUi->graphicsView->addAction(
+      EditorCommandSet::instance().commandToolBarFocus.createAction(
+          this, this,
+          [this]() {
+            mCommandToolBarProxy->startTabFocusCycle(*mUi->graphicsView);
+          },
+          EditorCommand::ActionFlag::WidgetShortcut));
   setWindowIcon(QIcon(":/img/library/package.png"));
 
   // Apply grid properties unit from workspace settings

@@ -376,9 +376,6 @@ void SchematicEditorState_AddComponent::startAddingComponent(
       updateAttributeToolbar();
     }
 
-    // set focus to toolbar so the value can be changed by typing
-    setFocusToToolbar();
-
     // create the first symbol instance and add it to the schematic
     mCurrentSymbVarItemIndex = 0;
     const ComponentSymbolVariantItem* currentSymbVarItem =
@@ -526,21 +523,6 @@ void SchematicEditorState_AddComponent::updateAttributeToolbar() noexcept {
   } else {
     mAttributeValueEditAction->setVisible(false);
     mAttributeUnitComboBoxAction->setVisible(false);
-  }
-}
-
-void SchematicEditorState_AddComponent::setFocusToToolbar() noexcept {
-  QLineEdit* widget = nullptr;
-  if (mAttributeValueEditAction && mAttributeValueEditAction->isVisible()) {
-    widget = mAttributeValueEdit;
-  } else if (mValueComboBox) {
-    widget = mValueComboBox->lineEdit();
-  }
-  if (widget) {
-    // Slightly delay it to make it working properly...
-    QTimer::singleShot(0, widget, &QLineEdit::selectAll);
-    QTimer::singleShot(
-        0, widget, static_cast<void (QLineEdit::*)()>(&QLineEdit::setFocus));
   }
 }
 

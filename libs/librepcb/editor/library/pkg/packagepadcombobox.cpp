@@ -42,6 +42,8 @@ PackagePadComboBox::PackagePadComboBox(QWidget* parent) noexcept
   layout->addWidget(mComboBox);
 
   mComboBox->setEditable(false);
+  setFocusPolicy(mComboBox->focusPolicy());
+  setFocusProxy(mComboBox);
 
   connect(
       mComboBox,

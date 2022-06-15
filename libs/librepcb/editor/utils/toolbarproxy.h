@@ -63,6 +63,7 @@ public:
   QAction* addWidget(std::unique_ptr<QWidget> widget, int indent = 0) noexcept;
   QAction* addSeparator() noexcept;
   void removeAction(QAction* action) noexcept;
+  bool startTabFocusCycle(QWidget& returnFocusWidget);
 
   // Operator Overloadings
   ToolBarProxy& operator=(const ToolBarProxy& rhs) = delete;

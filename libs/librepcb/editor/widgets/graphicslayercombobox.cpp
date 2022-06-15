@@ -44,7 +44,9 @@ GraphicsLayerComboBox::GraphicsLayerComboBox(QWidget* parent) noexcept
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mComboBox.data());
 
+  mComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   mComboBox->setEditable(false);
+  setFocusPolicy(mComboBox->focusPolicy());
   setFocusProxy(mComboBox.data());
 
   connect(

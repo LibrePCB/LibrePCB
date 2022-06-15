@@ -102,7 +102,6 @@ private:  // Methods
   void attributeChanged() noexcept;
   void updateValueToolbar() noexcept;
   void updateAttributeToolbar() noexcept;
-  void setFocusToToolbar() noexcept;
   static QString toSingleLine(const QString& text) noexcept;
   static QString toMultiLine(const QString& text) noexcept;
 

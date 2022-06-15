@@ -55,6 +55,28 @@ void EditorToolbox::removeFormLayoutRow(QLabel& label) noexcept {
       << label.objectName() << ".";
 }
 
+bool EditorToolbox::startToolBarTabFocusCycle(
+    QToolBar& toolBar, QWidget& returnFocusToWidget) noexcept {
+  QWidget* previousWidget = nullptr;
+  foreach (QAction* action, toolBar.actions()) {
+    QWidget* widget = toolBar.widgetForAction(action);
+    if (widget && (widget->focusPolicy() & Qt::TabFocus)) {
+      if (!previousWidget) {
+        widget->setFocus(Qt::TabFocusReason);
+      } else {
+        toolBar.setTabOrder(previousWidget, widget);
+      }
+      previousWidget = widget;
+    }
+  }
+  if (previousWidget) {
+    toolBar.setTabOrder(previousWidget, &returnFocusToWidget);
+    return true;
+  } else {
+    return false;
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

@@ -561,6 +561,14 @@ void BoardEditor::createActions() noexcept {
         mDockUnplacedComponents->setFocus();
       }));
 
+  // Widget shortcuts.
+  mUi->graphicsView->addAction(cmd.commandToolBarFocus.createAction(
+      this, this,
+      [this]() {
+        mCommandToolBarProxy->startTabFocusCycle(*mUi->graphicsView);
+      },
+      EditorCommand::ActionFlag::WidgetShortcut));
+
   // Undo stack action group.
   mUndoStackActionGroup.reset(
       new UndoStackActionGroup(*mActionUndo, *mActionRedo, nullptr,
