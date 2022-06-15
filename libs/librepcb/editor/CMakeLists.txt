@@ -639,6 +639,8 @@ add_library(
   utils/halignactiongroup.h
   utils/menubuilder.cpp
   utils/menubuilder.h
+  utils/standardeditorcommandhandler.cpp
+  utils/standardeditorcommandhandler.h
   utils/toolbarproxy.cpp
   utils/toolbarproxy.h
   utils/undostackactiongroup.cpp
