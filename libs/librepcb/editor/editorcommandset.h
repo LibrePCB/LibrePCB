@@ -1376,6 +1376,15 @@ public:
       {QKeySequence(Qt::Key_F1)},
       &categoryHelp,
   };
+  EditorCommand keyboardShortcutsReference{
+      "keyboard_shortcuts_reference",  // clang-format break
+      QT_TR_NOOP("Keyboard Shortcuts Reference"),
+      QT_TR_NOOP("Open a quick reference about the keyboard shortcuts"),
+      QIcon(),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL + Qt::Key_F1)},
+      &categoryHelp,
+  };
 
   EditorCommandCategory categoryContextMenu{
       "categoryContextMenu", QT_TR_NOOP("Context Menu"), false, &categoryRoot};

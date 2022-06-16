@@ -62,6 +62,7 @@ public:
   void onlineDocumentation() const noexcept;
   void website() const noexcept;
   void fileManager(const FilePath& fp) const noexcept;
+  void shortcutsReference() const noexcept;
 
   // Operator Overloadings
   StandardEditorCommandHandler& operator=(
