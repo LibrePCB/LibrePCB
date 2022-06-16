@@ -17,63 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
-#define LIBREPCB_EDITOR_FOOTPRINTPADSHAPESELECTORWIDGET_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/library/pkg/footprintpad.h>
+#include "standardeditorcommandhandler.h"
+
+#include "../dialogs/aboutdialog.h"
+#include "../workspace/desktopservices.h"
 
 #include <QtCore>
 #include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
- *  Class FootprintPadShapeSelectorWidget
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The FootprintPadShapeSelectorWidget class
- */
-class FootprintPadShapeSelectorWidget final : public QWidget {
-  Q_OBJECT
+StandardEditorCommandHandler::StandardEditorCommandHandler(
+    const WorkspaceSettings& settings, QWidget* parent) noexcept
+  : QObject(parent), mSettings(settings), mParent(parent) {
+}
 
-public:
-  // Constructors / Destructor
-  explicit FootprintPadShapeSelectorWidget(QWidget* parent = nullptr) noexcept;
-  FootprintPadShapeSelectorWidget(
-      const FootprintPadShapeSelectorWidget& other) = delete;
-  ~FootprintPadShapeSelectorWidget() noexcept;
+StandardEditorCommandHandler::~StandardEditorCommandHandler() noexcept {
+}
 
-  // Getters
-  FootprintPad::Shape getCurrentShape() const noexcept;
+/*******************************************************************************
+ *  Action Handlers
+ ******************************************************************************/
 
-  // Setters
-  void setCurrentShape(FootprintPad::Shape shape) noexcept;
+void StandardEditorCommandHandler::aboutLibrePcb() const noexcept {
+  AboutDialog aboutDialog(mParent);
+  aboutDialog.exec();
+}
 
-  // Operator Overloadings
-  FootprintPadShapeSelectorWidget& operator=(
-      const FootprintPadShapeSelectorWidget& rhs) = delete;
+void StandardEditorCommandHandler::onlineDocumentation() const noexcept {
+  QDesktopServices::openUrl(QUrl("https://docs.librepcb.org"));
+}
 
-signals:
-  void currentShapeChanged(FootprintPad::Shape shape);
+void StandardEditorCommandHandler::website() const noexcept {
+  QDesktopServices::openUrl(QUrl("https://librepcb.org"));
+}
 
-private:  // Methods
-  void btnRoundToggled(bool checked) noexcept;
-  void btnRectToggled(bool checked) noexcept;
-  void btnOctagonToggled(bool checked) noexcept;
-
-private:  // Data
-  QToolButton* mBtnRound;
-  QToolButton* mBtnRect;
-  QToolButton* mBtnOctagon;
-};
+void StandardEditorCommandHandler::fileManager(const FilePath& fp) const
+    noexcept {
+  DesktopServices ds(mSettings, false);
+  ds.openFile(fp);
+}
 
 /*******************************************************************************
  *  End of File
@@ -81,5 +75,3 @@ private:  // Data
 
 }  // namespace editor
 }  // namespace librepcb
-
-#endif

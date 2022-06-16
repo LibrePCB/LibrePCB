@@ -135,6 +135,17 @@ ComponentEditorWidget::~ComponentEditorWidget() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+QSet<EditorWidgetBase::Feature> ComponentEditorWidget::getAvailableFeatures()
+    const noexcept {
+  return {
+      EditorWidgetBase::Feature::Close,
+  };
+}
+
+/*******************************************************************************
  *  Public Slots
  ******************************************************************************/
 

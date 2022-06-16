@@ -31,7 +31,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
 class ComponentInstance;
+class Point;
 class Project;
 class Uuid;
 class Workspace;
@@ -41,11 +43,8 @@ namespace editor {
 class BoardEditor;
 class BoardEditorState;
 class GraphicsView;
+class ToolBarProxy;
 class UndoStack;
-
-namespace Ui {
-class BoardEditor;
-}
 
 /*******************************************************************************
  *  Class BoardEditorFsm
@@ -85,8 +84,8 @@ public:
     Workspace& workspace;
     Project& project;
     BoardEditor& editor;
-    Ui::BoardEditor& editorUi;
     GraphicsView& editorGraphicsView;
+    ToolBarProxy& commandToolBar;
     UndoStack& undoStack;
   };
 
@@ -116,11 +115,13 @@ public:
   bool processCut() noexcept;
   bool processCopy() noexcept;
   bool processPaste() noexcept;
-  bool processRotateCw() noexcept;
-  bool processRotateCcw() noexcept;
-  bool processFlipHorizontal() noexcept;
-  bool processFlipVertical() noexcept;
+  bool processMove(const Point& delta) noexcept;
+  bool processRotate(const Angle& rotation) noexcept;
+  bool processFlip(Qt::Orientation orientation) noexcept;
+  bool processSnapToGrid() noexcept;
+  bool processResetAllTexts() noexcept;
   bool processRemove() noexcept;
+  bool processEditProperties() noexcept;
   bool processKeyPressed(const QKeyEvent& e) noexcept;
   bool processKeyReleased(const QKeyEvent& e) noexcept;
   bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept;

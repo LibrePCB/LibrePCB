@@ -45,6 +45,9 @@ AttributeUnitComboBox::AttributeUnitComboBox(QWidget* parent) noexcept
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mComboBox);
 
+  setFocusPolicy(mComboBox->focusPolicy());
+  setFocusProxy(mComboBox);
+
   connect(
       mComboBox,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),

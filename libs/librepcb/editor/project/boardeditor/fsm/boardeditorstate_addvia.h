@@ -82,7 +82,7 @@ private:  // Methods
   void setNetSignal(NetSignal* netsignal) noexcept;
   bool fixPosition(Board& board, const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void updateShapeActionsCheckedState() noexcept;
+  void shapeChanged(Via::Shape shape) noexcept;
   void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void applySelectedNetSignal() noexcept;
@@ -119,14 +119,7 @@ private:  // Data
   QScopedPointer<CmdBoardViaEdit> mCurrentViaEditCmd;
 
   // Widgets for the command toolbar
-  QHash<int, QAction*> mShapeActions;
-  QList<QAction*> mActionSeparators;
-  QScopedPointer<QLabel> mSizeLabel;
-  QScopedPointer<PositiveLengthEdit> mSizeEdit;
-  QScopedPointer<QLabel> mDrillLabel;
-  QScopedPointer<PositiveLengthEdit> mDrillEdit;
-  QScopedPointer<QLabel> mNetSignalLabel;
-  QScopedPointer<QComboBox> mNetSignalComboBox;
+  QPointer<QComboBox> mNetSignalComboBox;
 };
 
 /*******************************************************************************

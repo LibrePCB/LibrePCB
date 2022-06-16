@@ -67,6 +67,21 @@ void CmdSchematicNetPointEdit::translate(const Point& deltaPos,
   if (immediate) mNetPoint.setPosition(mNewPos);
 }
 
+void CmdSchematicNetPointEdit::rotate(const Angle& angle, const Point& center,
+                                      bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPos.rotate(angle, center);
+  if (immediate) mNetPoint.setPosition(mNewPos);
+}
+
+void CmdSchematicNetPointEdit::mirror(Qt::Orientation orientation,
+                                      const Point& center,
+                                      bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPos.mirror(orientation, center);
+  if (immediate) mNetPoint.setPosition(mNewPos);
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/

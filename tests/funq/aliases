@@ -26,9 +26,9 @@ controlPanel = librepcb__editor__ControlPanel
 controlPanelWidget = {controlPanel}::centralWidget
 
 # Actions
-controlPanelActionOpenLibraryManager = {controlPanel}::actionOpen_Library_Manager
-controlPanelActionSwitchWorkspace = {controlPanel}::actionSwitch_Workspace
-controlPanelActionOpenWorkspaceSettings = {controlPanel}::actionWorkspace_Settings
+controlPanelActionOpenLibraryManager = {controlPanel}::actionLibraryManager
+controlPanelActionSwitchWorkspace = {controlPanel}::actionWorkspaceSwitch
+controlPanelActionOpenWorkspaceSettings = {controlPanel}::actionWorkspaceSettings
 
 # Labels at top
 controlPanelWarnForNoLibrariesLabel = {controlPanelWidget}::lblWarnForNoLibraries
@@ -138,8 +138,7 @@ libraryEditor = librepcb__editor__LibraryEditor
 libraryEditorWidget = {libraryEditor}::centralWidget
 
 # Actions
-libraryEditorActionNewElement = {libraryEditor}::actionNew
-libraryEditorActionRemove = {libraryEditor}::actionRemove
+libraryEditorActionNewElement = {libraryEditor}::actionLibraryElementNew
 libraryEditorActionImportEagleLibrary = {libraryEditor}::actionImportEagleLibrary
 libraryEditorActionExportImage = {libraryEditor}::actionExportImage
 
@@ -320,12 +319,12 @@ schematicEditor = librepcb__editor__SchematicEditor
 schematicEditorWidget = {schematicEditor}::centralWidget
 
 # Toolbars
-schematicEditorToolbarFile = {schematicEditor}::fileToolbar
+schematicEditorToolbarFile = {schematicEditor}::toolBarFile
 schematicEditorDockErcMsg = {schematicEditor}::librepcb__editor__ErcMsgDock
 
 # Actions
-schematicEditorActionCloseProject = {schematicEditor}::actionClose_Project
-schematicEditorActionAddComponent = {schematicEditor}::actionToolAddComponent
+schematicEditorActionCloseProject = {schematicEditor}::actionProjectClose
+schematicEditorActionAddComponent = {schematicEditor}::actionToolComponent
 schematicEditorActionExportImage = {schematicEditor}::actionExportImage
 schematicEditorActionExportPdf = {schematicEditor}::actionExportPdf
 
@@ -376,11 +375,11 @@ boardEditor = librepcb__editor__BoardEditor
 boardEditorWidget = {boardEditor}::centralWidget
 
 # Toolbars
-boardEditorToolbarFile = {boardEditor}::fileToolbar
+boardEditorToolbarFile = {boardEditor}::toolBarFile
 boardEditorDockErcMsg = {boardEditor}::librepcb__editor__ErcMsgDock
 
 # Actions
-boardEditorActionCloseProject = {boardEditor}::actionClose_Project
+boardEditorActionCloseProject = {boardEditor}::actionProjectClose
 boardEditorActionExportImage = {boardEditor}::actionExportImage
 boardEditorActionExportPdf = {boardEditor}::actionExportPdf
 

@@ -72,6 +72,9 @@ public:
                      QWidget* parent = nullptr);
   ~DeviceEditorWidget() noexcept;
 
+  // Getters
+  QSet<Feature> getAvailableFeatures() const noexcept override;
+
   // Operator Overloadings
   DeviceEditorWidget& operator=(const DeviceEditorWidget& rhs) = delete;
 

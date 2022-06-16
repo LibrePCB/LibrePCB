@@ -23,7 +23,9 @@
 #include "boardeditorstate_addhole.h"
 
 #include "../../../cmd/cmdholeedit.h"
+#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
+#include "../../../utils/toolbarproxy.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmdboardholeadd.h"
@@ -75,17 +77,19 @@ bool BoardEditorState_AddHole::entry() noexcept {
                                                                  true, true);
   if (!addHole(*board, pos)) return false;
 
-  // Add the "Diameter:" label to the toolbar
-  mDiameterLabel.reset(new QLabel(tr("Diameter:")));
-  mDiameterLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mDiameterLabel.data());
+  EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the diameter spinbox to the toolbar
-  mDiameterEdit.reset(new PositiveLengthEdit());
-  mDiameterEdit->setValue(mLastDiameter);
-  connect(mDiameterEdit.data(), &PositiveLengthEdit::valueChanged, this,
+  mContext.commandToolBar.addLabel(tr("Diameter:"), 10);
+  std::unique_ptr<PositiveLengthEdit> diameterEdit(new PositiveLengthEdit());
+  diameterEdit->setValue(mLastDiameter);
+  diameterEdit->addAction(cmd.drillIncrease.createAction(
+      diameterEdit.get(), diameterEdit.get(), &PositiveLengthEdit::stepUp));
+  diameterEdit->addAction(cmd.drillDecrease.createAction(
+      diameterEdit.get(), diameterEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(diameterEdit.get(), &PositiveLengthEdit::valueChanged, this,
           &BoardEditorState_AddHole::diameterEditValueChanged);
-  mContext.editorUi.commandToolbar->addWidget(mDiameterEdit.data());
+  mContext.commandToolBar.addWidget(std::move(diameterEdit));
 
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
@@ -96,8 +100,7 @@ bool BoardEditorState_AddHole::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   // Remove actions / widgets from the "command" toolbar
-  mDiameterEdit.reset();
-  mDiameterLabel.reset();
+  mContext.commandToolBar.clear();
 
   mContext.editorGraphicsView.unsetCursor();
   return true;

@@ -43,6 +43,7 @@ class CmdBoardNetPointEdit;
 class CmdBoardPlaneEdit;
 class CmdBoardViaEdit;
 class CmdDeviceInstanceEdit;
+class CmdFootprintStrokeTextsReset;
 class CmdHoleEdit;
 class CmdPolygonEdit;
 class CmdStrokeTextEdit;
@@ -62,6 +63,8 @@ public:
   ~CmdDragSelectedBoardItems() noexcept;
 
   // General Methods
+  void snapToGrid() noexcept;
+  void resetAllTexts() noexcept;
   void setCurrentPosition(const Point& pos,
                           const bool gridIncrement = true) noexcept;
   void rotate(const Angle& angle, bool aroundItemsCenter = false) noexcept;
@@ -78,9 +81,12 @@ private:
   Point mDeltaPos;
   Point mCenterPos;
   Angle mDeltaAngle;
+  bool mSnappedToGrid;
+  bool mTextsReset;
 
   // Move commands
   QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
+  QList<CmdFootprintStrokeTextsReset*> mDeviceStrokeTextsResetCmds;
   QList<CmdBoardViaEdit*> mViaEditCmds;
   QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
   QList<CmdBoardPlaneEdit*> mPlaneEditCmds;

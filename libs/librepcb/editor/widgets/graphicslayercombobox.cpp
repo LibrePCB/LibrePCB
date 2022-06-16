@@ -44,7 +44,9 @@ GraphicsLayerComboBox::GraphicsLayerComboBox(QWidget* parent) noexcept
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mComboBox.data());
 
+  mComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   mComboBox->setEditable(false);
+  setFocusPolicy(mComboBox->focusPolicy());
   setFocusProxy(mComboBox.data());
 
   connect(
@@ -99,7 +101,29 @@ void GraphicsLayerComboBox::setLayers(
 
 void GraphicsLayerComboBox::setCurrentLayer(
     const GraphicsLayerName& name) noexcept {
-  mComboBox->setCurrentIndex(mComboBox->findData(*name, Qt::UserRole));
+  setCurrentLayer(*name);
+}
+
+void GraphicsLayerComboBox::setCurrentLayer(const QString& name) noexcept {
+  mComboBox->setCurrentIndex(mComboBox->findData(name, Qt::UserRole));
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void GraphicsLayerComboBox::stepUp() noexcept {
+  const int newIndex = mComboBox->currentIndex() + 1;
+  if (newIndex < mComboBox->count()) {
+    mComboBox->setCurrentIndex(newIndex);
+  }
+}
+
+void GraphicsLayerComboBox::stepDown() noexcept {
+  const int newIndex = mComboBox->currentIndex() - 1;
+  if (newIndex >= 0) {
+    mComboBox->setCurrentIndex(newIndex);
+  }
 }
 
 /*******************************************************************************

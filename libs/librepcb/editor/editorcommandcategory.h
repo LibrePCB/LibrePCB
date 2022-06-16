@@ -17,52 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDMIRRORSELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_EDITOR_CMDMIRRORSELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_EDITOR_EDITORCOMMANDCATEGORY_H
+#define LIBREPCB_EDITOR_EDITORCOMMANDCATEGORY_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommandgroup.h"
-
-#include <librepcb/core/types/angle.h>
-
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Schematic;
-
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdMirrorSelectedSchematicItems
+ *  Class EditorCommandCategory
  ******************************************************************************/
 
 /**
- * @brief The CmdMirrorSelectedSchematicItems class
+ * @brief Category for ::librepcb::editor::EditorCommand
  */
-class CmdMirrorSelectedSchematicItems final : public UndoCommandGroup {
+class EditorCommandCategory final : public QObject {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  CmdMirrorSelectedSchematicItems(Schematic& schematic,
-                                  Qt::Orientation orientation) noexcept;
-  ~CmdMirrorSelectedSchematicItems() noexcept;
+  EditorCommandCategory() = delete;
+  EditorCommandCategory(const EditorCommandCategory& other) = delete;
+  EditorCommandCategory(const QString& objectName, const char* text,
+                        bool configurable, QObject* parent = nullptr) noexcept
+    : QObject(parent),
+      mTextNoTr(text),
+      mText(tr(text)),
+      mConfigurable(configurable) {
+    setObjectName(objectName);
+  }
+  ~EditorCommandCategory() noexcept {}
 
-private:
-  // Private Methods
+  // Getters
+  const char* getTextNoTr() const noexcept { return mTextNoTr; }
+  const QString& getText() const noexcept { return mText; }
+  bool isConfigurable() const noexcept { return mConfigurable; }
 
-  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  bool performExecute() override;
+  // Operator Overloadings
+  EditorCommandCategory& operator=(const EditorCommandCategory& rhs) = delete;
 
-  // Private Member Variables
-
-  // Attributes from the constructor
-  Schematic& mSchematic;
-  Qt::Orientation mOrientation;
+private:  // Data
+  const char* mTextNoTr;
+  QString mText;
+  bool mConfigurable;
 };
 
 /*******************************************************************************

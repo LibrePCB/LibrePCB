@@ -23,6 +23,7 @@
 #include "schematiceditorstate_addcomponent.h"
 
 #include "../../../undostack.h"
+#include "../../../utils/toolbarproxy.h"
 #include "../../../widgets/attributeunitcombobox.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../addcomponentdialog.h"
@@ -60,12 +61,12 @@ SchematicEditorState_AddComponent::SchematicEditorState_AddComponent(
     mUseAddComponentDialog(true),
     mAddComponentDialog(nullptr),
     mLastAngle(0),
+    mLastMirrored(false),
     mCurrentComponent(nullptr),
     mCurrentSymbVarItemIndex(-1),
     mCurrentSymbolToPlace(nullptr),
     mCurrentSymbolEditCommand(nullptr),
     // command toolbar actions / widgets:
-    mValueLabel(nullptr),
     mValueComboBox(nullptr),
     mAttributeValueEdit(nullptr),
     mAttributeValueEditAction(nullptr),
@@ -84,38 +85,34 @@ SchematicEditorState_AddComponent::
 bool SchematicEditorState_AddComponent::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
   mLastAngle.setAngleMicroDeg(0);
-
-  // add the "Value:" label to the toolbar
-  mValueLabel = new QLabel(tr("Value:"));
-  mValueLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mValueLabel);
+  mLastMirrored = false;
 
   // add the value text edit to the toolbar
+  mContext.commandToolBar.addLabel(tr("Value:"), 10);
   mValueComboBox = new QComboBox();
   mValueComboBox->setEditable(true);
   mValueComboBox->setFixedHeight(QLineEdit().sizeHint().height());
   mValueComboBox->setMinimumWidth(200);
   mValueComboBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-  mContext.editorUi.commandToolbar->addWidget(mValueComboBox);
+  mContext.commandToolBar.addWidget(std::unique_ptr<QWidget>(mValueComboBox));
 
   // add the attribute text edit to the toolbar
   mAttributeValueEdit = new QLineEdit();
   mAttributeValueEdit->setClearButtonEnabled(true);
   mAttributeValueEdit->setSizePolicy(QSizePolicy::Preferred,
                                      QSizePolicy::Fixed);
-  mAttributeValueEditAction =
-      mContext.editorUi.commandToolbar->addWidget(mAttributeValueEdit);
+  mAttributeValueEditAction = mContext.commandToolBar.addWidget(
+      std::unique_ptr<QWidget>(mAttributeValueEdit));
 
   // add the attribute unit combobox to the toolbar
   mAttributeUnitComboBox = new AttributeUnitComboBox();
   mAttributeUnitComboBox->setFixedHeight(QLineEdit().sizeHint().height());
-  mAttributeUnitComboBoxAction =
-      mContext.editorUi.commandToolbar->addWidget(mAttributeUnitComboBox);
+  mAttributeUnitComboBoxAction = mContext.commandToolBar.addWidget(
+      std::unique_ptr<QWidget>(mAttributeUnitComboBox));
 
   // Update attribute toolbar widgets and start watching for modifications
   updateValueToolbar();
   updateAttributeToolbar();
-  setFocusToToolbar();
   connect(mValueComboBox, &QComboBox::currentTextChanged, this,
           &SchematicEditorState_AddComponent::valueChanged);
   connect(mAttributeValueEdit, &QLineEdit::textChanged, this,
@@ -133,16 +130,7 @@ bool SchematicEditorState_AddComponent::exit() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
   // Remove actions / widgets from the "command" toolbar
-  mAttributeUnitComboBoxAction = nullptr;
-  mAttributeValueEditAction = nullptr;
-  delete mAttributeUnitComboBox;
-  mAttributeUnitComboBox = nullptr;
-  delete mAttributeValueEdit;
-  mAttributeValueEdit = nullptr;
-  delete mValueComboBox;
-  mValueComboBox = nullptr;
-  delete mValueLabel;
-  mValueLabel = nullptr;
+  mContext.commandToolBar.clear();
 
   mContext.editorGraphicsView.unsetCursor();
   return true;
@@ -157,6 +145,7 @@ bool SchematicEditorState_AddComponent::processAddComponent() noexcept {
     // start adding (another) component
     if (!abortCommand(true)) return false;
     mLastAngle.setAngleMicroDeg(0);  // reset the angle
+    mLastMirrored = false;
     mUseAddComponentDialog = true;
     startAddingComponent();
     return true;
@@ -174,6 +163,7 @@ bool SchematicEditorState_AddComponent::processAddComponent(
     // start adding (another) component
     if (!abortCommand(true)) return false;
     mLastAngle.setAngleMicroDeg(0);  // reset the angle
+    mLastMirrored = false;
     mUseAddComponentDialog = false;
     startAddingComponent(cmp, symbVar);
     return true;
@@ -185,15 +175,20 @@ bool SchematicEditorState_AddComponent::processAddComponent(
   return false;
 }
 
-bool SchematicEditorState_AddComponent::processRotateCw() noexcept {
-  mLastAngle -= Angle::deg90();
-  mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
+bool SchematicEditorState_AddComponent::processRotate(
+    const Angle& rotation) noexcept {
+  mCurrentSymbolEditCommand->rotate(rotation,
+                                    mCurrentSymbolToPlace->getPosition(), true);
+  mLastAngle = mCurrentSymbolToPlace->getRotation();
   return true;
 }
 
-bool SchematicEditorState_AddComponent::processRotateCcw() noexcept {
-  mLastAngle += Angle::deg90();
-  mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
+bool SchematicEditorState_AddComponent::processMirror(
+    Qt::Orientation orientation) noexcept {
+  mCurrentSymbolEditCommand->mirror(mCurrentSymbolToPlace->getPosition(),
+                                    orientation, true);
+  mLastAngle = mCurrentSymbolToPlace->getRotation();
+  mLastMirrored = mCurrentSymbolToPlace->getMirrored();
   return true;
 }
 
@@ -205,6 +200,7 @@ bool SchematicEditorState_AddComponent::processAbortCommand() noexcept {
     if (mUseAddComponentDialog && mAddComponentDialog &&
         mAddComponentDialog->getAutoOpenAgain()) {
       mLastAngle.setAngleMicroDeg(0);  // reset the angle
+      mLastMirrored = false;
       startAddingComponent();
       return true;
     }
@@ -271,6 +267,7 @@ bool SchematicEditorState_AddComponent::
       mCurrentSymbolEditCommand =
           new CmdSymbolInstanceEdit(*mCurrentSymbolToPlace);
       mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
+      mCurrentSymbolEditCommand->setMirrored(mLastMirrored, true);
     } else {
       // all symbols placed, start adding the next component
       Uuid componentUuid = mCurrentComponent->getLibComponent().getUuid();
@@ -305,8 +302,9 @@ bool SchematicEditorState_AddComponent::
   if (mIsUndoCmdActive && mCurrentSymbolEditCommand) {
     // Only rotate symbol if cursor was not moved during click
     if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
-      mLastAngle += Angle::deg90();
-      mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
+      mCurrentSymbolEditCommand->rotate(
+          Angle::deg90(), mCurrentSymbolToPlace->getPosition(), true);
+      mLastAngle = mCurrentSymbolToPlace->getRotation();
     }
 
     // Always accept the event if we are placing a symbol! When ignoring the
@@ -378,9 +376,6 @@ void SchematicEditorState_AddComponent::startAddingComponent(
       updateAttributeToolbar();
     }
 
-    // set focus to toolbar so the value can be changed by typing
-    setFocusToToolbar();
-
     // create the first symbol instance and add it to the schematic
     mCurrentSymbVarItemIndex = 0;
     const ComponentSymbolVariantItem* currentSymbVarItem =
@@ -408,6 +403,7 @@ void SchematicEditorState_AddComponent::startAddingComponent(
     mCurrentSymbolEditCommand =
         new CmdSymbolInstanceEdit(*mCurrentSymbolToPlace);
     mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
+    mCurrentSymbolEditCommand->setMirrored(mLastMirrored, true);
   } catch (Exception& e) {
     if (mIsUndoCmdActive) {
       try {
@@ -527,21 +523,6 @@ void SchematicEditorState_AddComponent::updateAttributeToolbar() noexcept {
   } else {
     mAttributeValueEditAction->setVisible(false);
     mAttributeUnitComboBoxAction->setVisible(false);
-  }
-}
-
-void SchematicEditorState_AddComponent::setFocusToToolbar() noexcept {
-  QLineEdit* widget = nullptr;
-  if (mAttributeValueEditAction && mAttributeValueEditAction->isVisible()) {
-    widget = mAttributeValueEdit;
-  } else if (mValueComboBox) {
-    widget = mValueComboBox->lineEdit();
-  }
-  if (widget) {
-    // Slightly delay it to make it working properly...
-    QTimer::singleShot(0, widget, &QLineEdit::selectAll);
-    QTimer::singleShot(
-        0, widget, static_cast<void (QLineEdit::*)()>(&QLineEdit::setFocus));
   }
 }
 

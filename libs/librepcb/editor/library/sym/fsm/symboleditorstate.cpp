@@ -23,6 +23,7 @@
 #include "symboleditorstate.h"
 
 #include "../../../widgets/graphicsview.h"
+#include "../../editorwidgetbase.h"
 
 #include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/types/gridproperties.h>
@@ -57,11 +58,11 @@ const PositiveLength& SymbolEditorState::getGridInterval() const noexcept {
 }
 
 const LengthUnit& SymbolEditorState::getDefaultLengthUnit() const noexcept {
-  return mContext.workspace.getSettings().defaultLengthUnit.get();
+  return mContext.editorContext.workspace.getSettings().defaultLengthUnit.get();
 }
 
 QList<GraphicsLayer*> SymbolEditorState::getAllowedTextLayers() const noexcept {
-  return mContext.layerProvider.getLayers({
+  return mContext.editorContext.layerProvider.getLayers({
       GraphicsLayer::sSymbolOutlines,
       // GraphicsLayer::sSymbolHiddenGrabAreas, -> makes no sense for texts
       GraphicsLayer::sSymbolNames,
@@ -75,7 +76,7 @@ QList<GraphicsLayer*> SymbolEditorState::getAllowedTextLayers() const noexcept {
 
 QList<GraphicsLayer*> SymbolEditorState::getAllowedCircleAndPolygonLayers()
     const noexcept {
-  return mContext.layerProvider.getLayers({
+  return mContext.editorContext.layerProvider.getLayers({
       GraphicsLayer::sSymbolOutlines,
       GraphicsLayer::sSymbolHiddenGrabAreas,
       GraphicsLayer::sSymbolNames,

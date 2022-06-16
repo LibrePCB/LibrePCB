@@ -45,6 +45,7 @@ NumberEditBase::NumberEditBase(QWidget* parent) noexcept
   // decimals.
   mSpinBox->setDecimals(10);
   setSingleStep(tl::nullopt);
+  setFocusPolicy(mSpinBox->focusPolicy());
   setFocusProxy(mSpinBox.data());
 
   connect(mSpinBox.data(),

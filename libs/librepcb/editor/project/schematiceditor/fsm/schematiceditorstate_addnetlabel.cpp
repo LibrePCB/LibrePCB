@@ -150,9 +150,20 @@ bool SchematicEditorState_AddNetLabel::processSwitchToSchematicPage(
   return !mUndoCmdActive;
 }
 
-bool SchematicEditorState_AddNetLabel::processMirror() noexcept {
+bool SchematicEditorState_AddNetLabel::processRotate(
+    const Angle& rotation) noexcept {
   if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
-    mEditCmd->mirror(true);
+    mEditCmd->rotate(rotation, mCurrentNetLabel->getPosition(), true);
+    return true;
+  }
+
+  return false;
+}
+
+bool SchematicEditorState_AddNetLabel::processMirror(
+    Qt::Orientation orientation) noexcept {
+  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
+    mEditCmd->mirror(orientation, mCurrentNetLabel->getPosition(), true);
     return true;
   }
 

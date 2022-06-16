@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "valignactiongroup.h"
 
+#include "../editorcommandset.h"
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -34,20 +36,17 @@ namespace editor {
 
 VAlignActionGroup::VAlignActionGroup(QWidget* parent) noexcept
   : QActionGroup(parent), mValue(VAlign::bottom()) {
-  QAction* bottom =
-      addAction(QIcon(":img/command_toolbars/align_vertical_bottom.png"),
-                tr("Align bottom"));
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  QAction* bottom = cmd.alignVerticalBottom.createAction(this);
   bottom->setCheckable(true);
   bottom->setData(QVariant::fromValue(VAlign::bottom()));
 
-  QAction* center =
-      addAction(QIcon(":img/command_toolbars/align_vertical_center.png"),
-                tr("Align center"));
+  QAction* center = cmd.alignVerticalCenter.createAction(this);
   center->setCheckable(true);
   center->setData(QVariant::fromValue(VAlign::center()));
 
-  QAction* top = addAction(
-      QIcon(":img/command_toolbars/align_vertical_top.png"), tr("Align top"));
+  QAction* top = cmd.alignVerticalTop.createAction(this);
   top->setCheckable(true);
   top->setData(QVariant::fromValue(VAlign::top()));
 

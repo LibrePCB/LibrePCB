@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "toolbarproxy.h"
 
+#include "editortoolbox.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -149,6 +151,11 @@ void ToolBarProxy::removeAction(QAction* action) noexcept {
 
   mActions.removeOne(action);
   delete action;
+}
+
+bool ToolBarProxy::startTabFocusCycle(QWidget& returnFocusWidget) {
+  return mToolBar &&
+      EditorToolbox::startToolBarTabFocusCycle(*mToolBar, returnFocusWidget);
 }
 
 /*******************************************************************************

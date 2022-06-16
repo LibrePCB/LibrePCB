@@ -304,6 +304,9 @@
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
           <widget class="QPlainTextEdit" name="txtDetails">
+           <property name="tabChangesFocus">
+            <bool>true</bool>
+           </property>
            <property name="documentTitle">
             <string notr="true"/>
            </property>

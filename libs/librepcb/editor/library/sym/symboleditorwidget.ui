@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -38,8 +38,8 @@
       </size>
      </property>
     </widget>
-  </item>
-  <item>
+   </item>
+   <item>
     <widget class="QWidget" name="errorNotificationWidget" native="true">
      <property name="minimumSize">
       <size>
@@ -113,7 +113,11 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="librepcb::editor::PlainTextEdit" name="edtDescription"/>
+        <widget class="librepcb::editor::PlainTextEdit" name="edtDescription">
+         <property name="tabChangesFocus">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_6">

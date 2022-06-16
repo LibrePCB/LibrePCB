@@ -66,10 +66,8 @@ public:
   virtual bool processAddDevice(ComponentInstance& component,
                                 const Uuid& device,
                                 const Uuid& footprint) noexcept override;
-  virtual bool processRotateCw() noexcept override;
-  virtual bool processRotateCcw() noexcept override;
-  virtual bool processFlipHorizontal() noexcept override;
-  virtual bool processFlipVertical() noexcept override;
+  virtual bool processRotate(const Angle& rotation) noexcept override;
+  virtual bool processFlip(Qt::Orientation orientation) noexcept override;
   virtual bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneLeftMouseButtonPressed(

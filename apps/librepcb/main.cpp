@@ -260,6 +260,7 @@ static int openWorkspace(FilePath& path) {
 
   // Open the control panel.
   ControlPanel p(ws, wizard.getWorkspaceContainsNewerFileFormats());
+  QObject::connect(qApp, &Application::quitTriggered, &p, &ControlPanel::close);
   p.show();
 
   return appExec();

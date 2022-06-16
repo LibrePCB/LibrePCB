@@ -91,11 +91,13 @@ public:
   virtual bool processCut() noexcept override;
   virtual bool processCopy() noexcept override;
   virtual bool processPaste() noexcept override;
-  virtual bool processRotateCw() noexcept override;
-  virtual bool processRotateCcw() noexcept override;
-  virtual bool processFlipHorizontal() noexcept override;
-  virtual bool processFlipVertical() noexcept override;
+  virtual bool processMove(const Point& delta) noexcept override;
+  virtual bool processRotate(const Angle& rotation) noexcept override;
+  virtual bool processFlip(Qt::Orientation orientation) noexcept override;
+  virtual bool processSnapToGrid() noexcept override;
+  virtual bool processResetAllTexts() noexcept override;
   virtual bool processRemove() noexcept override;
+  virtual bool processEditProperties() noexcept override;
   virtual bool processAbortCommand() noexcept override;
   virtual bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept override;
@@ -114,38 +116,17 @@ public:
       delete;
 
 private:  // Methods
-  // Menu Helpers
-  void addActionRotate(QMenu& menu,
-                       const QString& text = tr("Rotate")) noexcept;
-  void addActionFlip(QMenu& menu, const QString& text = tr("Flip")) noexcept;
-  void addActionDelete(QMenu& menu,
-                       const QString& text = tr("Remove")) noexcept;
-  void addActionDeleteAll(
-      QMenu& menu, BI_NetSegment& netsegment,
-      const QString& text = tr("Remove Whole Trace")) noexcept;
-  void addActionRemoveVertex(
-      QMenu& menu, BI_Base& item, const QVector<int>& verticesToRemove,
-      const QString& text = tr("Remove Vertex")) noexcept;
-  bool addActionAddVertex(QMenu& menu, BI_Base& item, const Point& pos,
-                          const QString& text = tr("Add Vertex")) noexcept;
-  void addActionMeasure(
-      QMenu& menu, BI_NetLine& netline,
-      const QString& text = tr("Measure Selected Segments Length")) noexcept;
-  void addActionProperties(QMenu& menu, Board& board, BI_Base& item,
-                           const QString& text = tr("Properties")) noexcept;
-  void addActionSnap(QMenu& menu, const Point& pos, Board& board,
-                     const QString& text = tr("Snap To Grid")) noexcept;
-  void addActionSelectAll(
-      QMenu& menu, BI_NetSegment& netsegment,
-      const QString& text = tr("Select Whole Trace")) noexcept;
-
-  // Actions
   bool startMovingSelectedItems(Board& board, const Point& startPos) noexcept;
+  bool moveSelectedItems(const Point& delta) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;
+  bool snapSelectedItemsToGrid() noexcept;
+  bool resetAllTextsOfSelectedItems() noexcept;
   bool removeSelectedItems() noexcept;
-  void removeSelectedPolygonVertices() noexcept;
-  void removeSelectedPlaneVertices() noexcept;
+  void removePolygonVertices(Polygon& polygon,
+                             const QVector<int> vertices) noexcept;
+  void removePlaneVertices(BI_Plane& plane,
+                           const QVector<int> vertices) noexcept;
   void startAddingPolygonVertex(BI_Polygon& polygon, int vertex,
                                 const Point& pos) noexcept;
   void startAddingPlaneVertex(BI_Plane& plane, int vertex,
@@ -185,7 +166,7 @@ private:  // Methods
                                 QSet<Uuid>& visitedNetLines,
                                 UnsignedLength& totalLength);
 
-  bool openPropertiesDialog(Board& board, BI_Base* item);
+  bool openPropertiesDialog(BI_Base* item);
   void openDevicePropertiesDialog(BI_Device& device) noexcept;
   void openViaPropertiesDialog(BI_Via& via) noexcept;
   void openPlanePropertiesDialog(BI_Plane& plane) noexcept;

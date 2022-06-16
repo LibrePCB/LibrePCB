@@ -22,7 +22,9 @@
  ******************************************************************************/
 #include "boardeditorstate_drawplane.h"
 
+#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
+#include "../../../utils/toolbarproxy.h"
 #include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdboardplaneadd.h"
@@ -82,47 +84,48 @@ bool BoardEditorState_DrawPlane::entry() noexcept {
   // Clear board selection because selection does not make sense in this state
   board->clearSelection();
 
-  // Add the "Signal:" label to the toolbar
-  mNetSignalLabel.reset(new QLabel(tr("Signal:")));
-  mNetSignalLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mNetSignalLabel.data());
+  EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the netsignals combobox to the toolbar
-  mNetSignalComboBox.reset(new QComboBox());
-  mNetSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
-  mNetSignalComboBox->setEditable(false);
+  mContext.commandToolBar.addLabel(tr("Signal:"), 10);
+  std::unique_ptr<QComboBox> netSignalComboBox(new QComboBox());
+  netSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+  netSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
+  netSignalComboBox->setEditable(false);
   foreach (NetSignal* netsignal, mContext.project.getCircuit().getNetSignals())
-    mNetSignalComboBox->addItem(*netsignal->getName(),
-                                netsignal->getUuid().toStr());
-  mNetSignalComboBox->model()->sort(0);
-  mNetSignalComboBox->setCurrentText(mLastNetSignal ? *mLastNetSignal->getName()
-                                                    : "");
-  mContext.editorUi.commandToolbar->addWidget(mNetSignalComboBox.data());
+    netSignalComboBox->addItem(*netsignal->getName(),
+                               netsignal->getUuid().toStr());
+  netSignalComboBox->model()->sort(0);
+  netSignalComboBox->setCurrentText(mLastNetSignal ? *mLastNetSignal->getName()
+                                                   : "");
   connect(
-      mNetSignalComboBox.data(), &QComboBox::currentTextChanged,
+      netSignalComboBox.get(), &QComboBox::currentTextChanged,
       [this](const QString& value) {
         setNetSignal(mContext.project.getCircuit().getNetSignalByName(value));
       });
-
-  // Add the "Layer:" label to the toolbar
-  mLayerLabel.reset(new QLabel(tr("Layer:")));
-  mLayerLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mLayerLabel.data());
+  mContext.commandToolBar.addWidget(std::move(netSignalComboBox));
 
   // Add the layers combobox to the toolbar
-  mLayerComboBox.reset(new GraphicsLayerComboBox());
+  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
+  std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
+      new GraphicsLayerComboBox());
   QList<GraphicsLayer*> layers;
   foreach (GraphicsLayer* layer, board->getLayerStack().getAllLayers()) {
     if (layer->isCopperLayer() && layer->isEnabled()) {
       layers.append(layer);
     }
   }
-  mLayerComboBox->setLayers(layers);
-  mLayerComboBox->setCurrentLayer(mLastLayerName);
-  mContext.editorUi.commandToolbar->addWidget(mLayerComboBox.data());
-  connect(mLayerComboBox.data(), &GraphicsLayerComboBox::currentLayerChanged,
+  layerComboBox->setLayers(layers);
+  layerComboBox->setCurrentLayer(mLastLayerName);
+  layerComboBox->addAction(
+      cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
+                               &GraphicsLayerComboBox::stepDown));
+  layerComboBox->addAction(
+      cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
+                                 &GraphicsLayerComboBox::stepUp));
+  connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
           this, &BoardEditorState_DrawPlane::layerComboBoxLayerChanged);
+  mContext.commandToolBar.addWidget(std::move(layerComboBox));
 
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
@@ -133,12 +136,7 @@ bool BoardEditorState_DrawPlane::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   // Remove actions / widgets from the "command" toolbar
-  mLayerComboBox.reset();
-  mLayerLabel.reset();
-  mNetSignalComboBox.reset();
-  mNetSignalLabel.reset();
-  qDeleteAll(mActionSeparators);
-  mActionSeparators.clear();
+  mContext.commandToolBar.clear();
 
   mContext.editorGraphicsView.unsetCursor();
   return true;

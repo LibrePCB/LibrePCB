@@ -47,6 +47,8 @@ class TextGraphicsItem;
 namespace editor {
 
 class CmdTextEdit;
+class HAlignActionGroup;
+class VAlignActionGroup;
 
 /*******************************************************************************
  *  Class SymbolEditorState_DrawTextBase
@@ -73,6 +75,8 @@ public:
   // General Methods
   bool entry() noexcept override;
   bool exit() noexcept override;
+  QSet<EditorWidgetBase::Feature> getAvailableFeatures() const
+      noexcept override;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -81,8 +85,8 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
   bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
-  bool processRotateCw() noexcept override;
-  bool processRotateCcw() noexcept override;
+  bool processRotate(const Angle& rotation) noexcept override;
+  bool processMirror(Qt::Orientation orientation) noexcept override;
 
   // Operator Overloadings
   SymbolEditorState_DrawTextBase& operator=(
@@ -93,11 +97,11 @@ private:  // Methods
   bool finishAddText(const Point& pos) noexcept;
   bool abortAddText() noexcept;
   void resetToDefaultParameters() noexcept;
-  Alignment getAlignment() const noexcept;
-
   void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
   void textComboBoxValueChanged(const QString& value) noexcept;
+  void hAlignActionGroupValueChanged(const HAlign& value) noexcept;
+  void vAlignActionGroupValueChanged(const VAlign& value) noexcept;
 
 private:  // Types / Data
   Mode mMode;
@@ -105,11 +109,14 @@ private:  // Types / Data
   QScopedPointer<CmdTextEdit> mEditCmd;
   std::shared_ptr<Text> mCurrentText;
   std::shared_ptr<TextGraphicsItem> mCurrentGraphicsItem;
+  QPointer<HAlignActionGroup> mHAlignActionGroup;
+  QPointer<VAlignActionGroup> mVAlignActionGroup;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;
   Angle mLastRotation;
   PositiveLength mLastHeight;
+  Alignment mLastAlignment;
   QString mLastText;
 };
 

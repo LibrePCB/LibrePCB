@@ -120,6 +120,15 @@ CmdDragSelectedSymbolItems::~CmdDragSelectedSymbolItems() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+int CmdDragSelectedSymbolItems::getSelectedItemsCount() const noexcept {
+  return mPinEditCmds.count() + mCircleEditCmds.count() +
+      mPolygonEditCmds.count() + mTextEditCmds.count();
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 

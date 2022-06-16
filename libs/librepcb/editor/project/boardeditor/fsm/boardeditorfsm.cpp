@@ -181,36 +181,45 @@ bool BoardEditorFsm::processPaste() noexcept {
   return false;
 }
 
-bool BoardEditorFsm::processRotateCw() noexcept {
+bool BoardEditorFsm::processMove(const Point& delta) noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
-    if (state->processRotateCw()) {
+    if (state->processMove(delta)) {
       return true;
     }
   }
   return false;
 }
 
-bool BoardEditorFsm::processRotateCcw() noexcept {
+bool BoardEditorFsm::processRotate(const Angle& rotation) noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
-    if (state->processRotateCcw()) {
+    if (state->processRotate(rotation)) {
       return true;
     }
   }
   return false;
 }
 
-bool BoardEditorFsm::processFlipHorizontal() noexcept {
+bool BoardEditorFsm::processFlip(Qt::Orientation orientation) noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
-    if (state->processFlipHorizontal()) {
+    if (state->processFlip(orientation)) {
       return true;
     }
   }
   return false;
 }
 
-bool BoardEditorFsm::processFlipVertical() noexcept {
+bool BoardEditorFsm::processSnapToGrid() noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
-    if (state->processFlipVertical()) {
+    if (state->processSnapToGrid()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool BoardEditorFsm::processResetAllTexts() noexcept {
+  if (BoardEditorState* state = getCurrentStateObj()) {
+    if (state->processResetAllTexts()) {
       return true;
     }
   }
@@ -220,6 +229,15 @@ bool BoardEditorFsm::processFlipVertical() noexcept {
 bool BoardEditorFsm::processRemove() noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processRemove()) {
+      return true;
+    }
+  }
+  return false;
+}
+
+bool BoardEditorFsm::processEditProperties() noexcept {
+  if (BoardEditorState* state = getCurrentStateObj()) {
+    if (state->processEditProperties()) {
       return true;
     }
   }
