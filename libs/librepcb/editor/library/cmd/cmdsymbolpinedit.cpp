@@ -34,17 +34,18 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdSymbolPinEdit::CmdSymbolPinEdit(SymbolPin& pin) noexcept
+CmdSymbolPinEdit::CmdSymbolPinEdit(std::shared_ptr<SymbolPin> pin) noexcept
   : UndoCommand(tr("Edit pin")),
     mPin(pin),
-    mOldName(pin.getName()),
+    mOldName(pin->getName()),
     mNewName(mOldName),
-    mOldLength(pin.getLength()),
+    mOldLength(pin->getLength()),
     mNewLength(mOldLength),
-    mOldPos(pin.getPosition()),
+    mOldPos(pin->getPosition()),
     mNewPos(mOldPos),
-    mOldRotation(pin.getRotation()),
+    mOldRotation(pin->getRotation()),
     mNewRotation(mOldRotation) {
+  Q_ASSERT(mPin);
 }
 
 CmdSymbolPinEdit::~CmdSymbolPinEdit() noexcept {
@@ -52,7 +53,7 @@ CmdSymbolPinEdit::~CmdSymbolPinEdit() noexcept {
     try {
       performUndo();
     } catch (...) {
-      qCritical() << "Undo failed!";
+      qCritical() << "Undo failed in CmdSymbolPinEdit destructor!";
     }
   }
 }
@@ -65,27 +66,27 @@ void CmdSymbolPinEdit::setName(const CircuitIdentifier& name,
                                bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewName = name;
-  if (immediate) mPin.setName(mNewName);
+  if (immediate) mPin->setName(mNewName);
 }
 
 void CmdSymbolPinEdit::setLength(const UnsignedLength& length,
                                  bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewLength = length;
-  if (immediate) mPin.setLength(mNewLength);
+  if (immediate) mPin->setLength(mNewLength);
 }
 
 void CmdSymbolPinEdit::setPosition(const Point& pos, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos = pos;
-  if (immediate) mPin.setPosition(mNewPos);
+  if (immediate) mPin->setPosition(mNewPos);
 }
 
 void CmdSymbolPinEdit::translate(const Point& deltaPos,
                                  bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewPos += deltaPos;
-  if (immediate) mPin.setPosition(mNewPos);
+  if (immediate) mPin->setPosition(mNewPos);
 }
 
 void CmdSymbolPinEdit::snapToGrid(const PositiveLength& gridInterval,
@@ -97,7 +98,7 @@ void CmdSymbolPinEdit::setRotation(const Angle& angle,
                                    bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewRotation = angle;
-  if (immediate) mPin.setRotation(mNewRotation);
+  if (immediate) mPin->setRotation(mNewRotation);
 }
 
 void CmdSymbolPinEdit::rotate(const Angle& angle, const Point& center,
@@ -106,8 +107,8 @@ void CmdSymbolPinEdit::rotate(const Angle& angle, const Point& center,
   mNewPos.rotate(angle, center);
   mNewRotation += angle;
   if (immediate) {
-    mPin.setPosition(mNewPos);
-    mPin.setRotation(mNewRotation);
+    mPin->setPosition(mNewPos);
+    mPin->setRotation(mNewRotation);
   }
 }
 
@@ -121,8 +122,8 @@ void CmdSymbolPinEdit::mirror(Qt::Orientation orientation, const Point& center,
     mNewRotation = -mNewRotation;
   }
   if (immediate) {
-    mPin.setPosition(mNewPos);
-    mPin.setRotation(mNewRotation);
+    mPin->setPosition(mNewPos);
+    mPin->setRotation(mNewRotation);
   }
 }
 
@@ -141,17 +142,17 @@ bool CmdSymbolPinEdit::performExecute() {
 }
 
 void CmdSymbolPinEdit::performUndo() {
-  mPin.setName(mOldName);
-  mPin.setLength(mOldLength);
-  mPin.setPosition(mOldPos);
-  mPin.setRotation(mOldRotation);
+  mPin->setName(mOldName);
+  mPin->setLength(mOldLength);
+  mPin->setPosition(mOldPos);
+  mPin->setRotation(mOldRotation);
 }
 
 void CmdSymbolPinEdit::performRedo() {
-  mPin.setName(mNewName);
-  mPin.setLength(mNewLength);
-  mPin.setPosition(mNewPos);
-  mPin.setRotation(mNewRotation);
+  mPin->setName(mNewName);
+  mPin->setLength(mNewLength);
+  mPin->setPosition(mNewPos);
+  mPin->setRotation(mNewRotation);
 }
 
 /*******************************************************************************

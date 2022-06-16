@@ -53,6 +53,9 @@ public:
   explicit CmdSchematicNetLabelEdit(SI_NetLabel& netlabel) noexcept;
   ~CmdSchematicNetLabelEdit() noexcept;
 
+  // Getters
+  SI_NetLabel& getNetLabel() noexcept { return mNetLabel; }
+
   // Setters
   void setPosition(const Point& position, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;

@@ -23,6 +23,7 @@
 #include "symboleditorstate_drawcircle.h"
 
 #include "../../../cmd/cmdcircleedit.h"
+#include "../../../editorcommandset.h"
 #include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/unsignedlengthedit.h"
@@ -71,11 +72,18 @@ bool SymbolEditorState_DrawCircle::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
 
   // populate command toolbar
+  EditorCommandSet& cmd = EditorCommandSet::instance();
   mContext.commandToolBar.addLabel(tr("Layer:"));
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
   layerComboBox->setLayers(getAllowedCircleAndPolygonLayers());
   layerComboBox->setCurrentLayer(mLastLayerName);
+  layerComboBox->addAction(
+      cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
+                               &GraphicsLayerComboBox::stepDown));
+  layerComboBox->addAction(
+      cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
+                                 &GraphicsLayerComboBox::stepUp));
   connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
           this, &SymbolEditorState_DrawCircle::layerComboBoxValueChanged);
   mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -86,18 +94,26 @@ bool SymbolEditorState_DrawCircle::entry() noexcept {
                           LengthEditBase::Steps::generic(),
                           "symbol_editor/draw_circle/line_width");
   edtLineWidth->setValue(mLastLineWidth);
+  edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
+  edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
   connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
           &SymbolEditorState_DrawCircle::lineWidthEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtLineWidth));
 
   std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
   fillCheckBox->setChecked(mLastFill);
+  fillCheckBox->addAction(cmd.fillToggle.createAction(
+      fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
   connect(fillCheckBox.get(), &QCheckBox::toggled, this,
           &SymbolEditorState_DrawCircle::fillCheckBoxCheckedChanged);
   mContext.commandToolBar.addWidget(std::move(fillCheckBox), 10);
 
   std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
   grabAreaCheckBox->setChecked(mLastGrabArea);
+  grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
+      grabAreaCheckBox.get(), grabAreaCheckBox.get(), &QCheckBox::toggle));
   connect(grabAreaCheckBox.get(), &QCheckBox::toggled, this,
           &SymbolEditorState_DrawCircle::grabAreaCheckBoxCheckedChanged);
   mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
@@ -116,6 +132,13 @@ bool SymbolEditorState_DrawCircle::exit() noexcept {
 
   mContext.graphicsView.unsetCursor();
   return true;
+}
+
+QSet<EditorWidgetBase::Feature>
+    SymbolEditorState_DrawCircle::getAvailableFeatures() const noexcept {
+  return {
+      EditorWidgetBase::Feature::Abort,
+  };
 }
 
 /*******************************************************************************

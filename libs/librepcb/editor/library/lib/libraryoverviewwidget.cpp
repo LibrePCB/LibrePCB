@@ -23,7 +23,9 @@
 #include "libraryoverviewwidget.h"
 
 #include "../../dialogs/filedialog.h"
+#include "../../editorcommandset.h"
 #include "../../library/cmd/cmdlibraryedit.h"
+#include "../../utils/menubuilder.h"
 #include "librarylisteditorwidget.h"
 #include "ui_libraryoverviewwidget.h"
 
@@ -148,9 +150,28 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
   connect(&mContext.workspace.getLibraryDb(),
           &WorkspaceLibraryDb::scanSucceeded, this,
           &LibraryOverviewWidget::updateElementLists);
+
+  // Create contextmenu actions for each list widget.
+  createListWidgetActions(mUi->lstCmpCat);
+  createListWidgetActions(mUi->lstPkgCat);
+  createListWidgetActions(mUi->lstSym);
+  createListWidgetActions(mUi->lstCmp);
+  createListWidgetActions(mUi->lstPkg);
+  createListWidgetActions(mUi->lstDev);
 }
 
 LibraryOverviewWidget::~LibraryOverviewWidget() noexcept {
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+QSet<EditorWidgetBase::Feature> LibraryOverviewWidget::getAvailableFeatures()
+    const noexcept {
+  return {
+      EditorWidgetBase::Feature::Filter,
+  };
 }
 
 /*******************************************************************************
@@ -206,6 +227,48 @@ bool LibraryOverviewWidget::remove() noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void LibraryOverviewWidget::createListWidgetActions(
+    QListWidget* listWidget) noexcept {
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+  listWidget->addAction(cmd.itemOpen.createAction(
+      listWidget, this,
+      [this, listWidget]() {
+        const QHash<QListWidgetItem*, FilePath> selectedItemPaths =
+            getElementListItemFilePaths(listWidget->selectedItems());
+        foreach (const FilePath& fp, selectedItemPaths) {
+          editItem(listWidget, fp);
+        }
+      },
+      EditorCommand::ActionFlag::WidgetShortcut));
+  if (!mContext.readOnly) {
+    listWidget->addAction(cmd.itemNew.createAction(
+        listWidget, this, [this, listWidget]() { newItem(listWidget); },
+        EditorCommand::ActionFlag::WidgetShortcut));
+    listWidget->addAction(cmd.libraryElementDuplicate.createAction(
+        listWidget, this,
+        [this, listWidget]() {
+          const QHash<QListWidgetItem*, FilePath> selectedItemPaths =
+              getElementListItemFilePaths(listWidget->selectedItems());
+          if (selectedItemPaths.count() == 1) {
+            duplicateItem(listWidget, selectedItemPaths.values().first());
+          }
+        },
+        EditorCommand::ActionFlag::WidgetShortcut));
+    listWidget->addAction(cmd.remove.createAction(
+        listWidget, this,
+        [this, listWidget]() {
+          const QHash<QListWidgetItem*, FilePath> selectedItemPaths =
+              getElementListItemFilePaths(listWidget->selectedItems());
+          if (!selectedItemPaths.isEmpty()) {
+            removeItems(selectedItemPaths);
+          }
+        },
+        EditorCommand::ActionFlag::QueuedConnection |
+            EditorCommand::ActionFlag::WidgetShortcut));  // Queued for funq
+                                                          // testing.
+  }
+}
 
 void LibraryOverviewWidget::updateMetadata() noexcept {
   setWindowTitle(*mLibrary->getNames().getDefaultValue());
@@ -403,22 +466,24 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
 
   // Build the context menu
   QMenu menu;
-  QAction* aEdit = menu.addAction(QIcon(":/img/actions/edit.png"),
-                                  mContext.readOnly ? tr("Open") : tr("Edit"));
+  MenuBuilder mb(&menu);
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+  QAction* aEdit = cmd.itemOpen.createAction(&menu);
   aEdit->setVisible(!selectedItemPaths.isEmpty());
-  QAction* aDuplicate =
-      menu.addAction(QIcon(":/img/actions/clone.png"), tr("Duplicate"));
+  mb.addAction(aEdit);
+  QAction* aDuplicate = cmd.libraryElementDuplicate.createAction(&menu);
   aDuplicate->setVisible(selectedItemPaths.count() == 1);
   aDuplicate->setEnabled(!mContext.readOnly);
-  QAction* aRemove =
-      menu.addAction(QIcon(":/img/actions/delete.png"), tr("Remove"));
+  mb.addAction(aDuplicate);
+  QAction* aRemove = cmd.remove.createAction(&menu);
   aRemove->setVisible(!selectedItemPaths.isEmpty());
   aRemove->setEnabled(!mContext.readOnly);
+  mb.addAction(aRemove);
   if (!selectedItemPaths.isEmpty()) {
-    QMenu* menuCopyToLib = menu.addMenu(QIcon(":/img/actions/copy.png"),
-                                        tr("Copy to other library"));
-    QMenu* menuMoveToLib = menu.addMenu(QIcon(":/img/actions/move_to.png"),
-                                        tr("Move to other library"));
+    QMenu* menuCopyToLib =
+        mb.addSubMenu(&MenuBuilder::createCopyToOtherLibraryMenu);
+    QMenu* menuMoveToLib =
+        mb.addSubMenu(&MenuBuilder::createMoveToOtherLibraryMenu);
     foreach (const LibraryMenuItem& item, getLocalLibraries()) {
       if (item.filepath != mLibrary->getDirectory().getAbsPath()) {
         QAction* actionCopy = menuCopyToLib->addAction(item.pixmap, item.name);
@@ -432,9 +497,13 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
     menuMoveToLib->setEnabled((!aMoveToLibChildren.isEmpty()) &&
                               (!mContext.readOnly));
   }
-  QAction* aNew = menu.addAction(QIcon(":/img/actions/new.png"), tr("New"));
+  if (!selectedItemPaths.isEmpty()) {
+    mb.addSeparator();
+  }
+  QAction* aNew = cmd.itemNew.createAction(&menu);
   aNew->setVisible(selectedItemPaths.count() <= 1);
   aNew->setEnabled(!mContext.readOnly);
+  mb.addAction(aNew);
 
   // Set default action
   if (selectedItemPaths.isEmpty() && aNew->isVisible() && aNew->isEnabled()) {

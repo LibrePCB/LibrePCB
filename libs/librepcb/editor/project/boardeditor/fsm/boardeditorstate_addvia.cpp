@@ -22,7 +22,9 @@
  ******************************************************************************/
 #include "boardeditorstate_addvia.h"
 
+#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
+#include "../../../utils/toolbarproxy.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmdboardnetsegmentadd.h"
@@ -95,62 +97,62 @@ bool BoardEditorState_AddVia::entry() noexcept {
   updateClosestNetSignal(*board, pos);
   if (!addVia(*board, pos)) return false;
 
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
   // Add shape actions to the "command" toolbar
-  mShapeActions.insert(static_cast<int>(Via::Shape::Round),
-                       mContext.editorUi.commandToolbar->addAction(
-                           QIcon(":/img/command_toolbars/via_round.png"), ""));
-  mShapeActions.insert(static_cast<int>(Via::Shape::Square),
-                       mContext.editorUi.commandToolbar->addAction(
-                           QIcon(":/img/command_toolbars/via_square.png"), ""));
-  mShapeActions.insert(
-      static_cast<int>(Via::Shape::Octagon),
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/via_octagon.png"), ""));
-  mActionSeparators.append(mContext.editorUi.commandToolbar->addSeparator());
-  updateShapeActionsCheckedState();
-
-  // Connect the shape actions with the slot updateShapeActionsCheckedState()
-  foreach (int shape, mShapeActions.keys()) {
-    connect(mShapeActions.value(shape), &QAction::triggered, [this, shape]() {
-      mLastViaProperties.setShape(static_cast<Via::Shape>(shape));
-      if (mCurrentViaEditCmd) {
-        mCurrentViaEditCmd->setShape(mLastViaProperties.getShape(), true);
-      }
-      updateShapeActionsCheckedState();
-    });
-  }
-
-  // Add the "Size:" label to the toolbar
-  mSizeLabel.reset(new QLabel(tr("Size:")));
-  mSizeLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mSizeLabel.data());
+  std::unique_ptr<QActionGroup> shapeActionGroup(
+      new QActionGroup(&mContext.commandToolBar));
+  QAction* aShapeRound = cmd.thtShapeRound.createAction(
+      shapeActionGroup.get(), this,
+      [this]() { shapeChanged(Via::Shape::Round); });
+  aShapeRound->setCheckable(true);
+  aShapeRound->setChecked(mLastViaProperties.getShape() == Via::Shape::Round);
+  aShapeRound->setActionGroup(shapeActionGroup.get());
+  QAction* aShapeRect = cmd.thtShapeRectangular.createAction(
+      shapeActionGroup.get(), this,
+      [this]() { shapeChanged(Via::Shape::Square); });
+  aShapeRect->setCheckable(true);
+  aShapeRect->setChecked(mLastViaProperties.getShape() == Via::Shape::Square);
+  aShapeRect->setActionGroup(shapeActionGroup.get());
+  QAction* aShapeOctagon = cmd.thtShapeOctagonal.createAction(
+      shapeActionGroup.get(), this,
+      [this]() { shapeChanged(Via::Shape::Octagon); });
+  aShapeOctagon->setCheckable(true);
+  aShapeOctagon->setChecked(mLastViaProperties.getShape() ==
+                            Via::Shape::Octagon);
+  aShapeOctagon->setActionGroup(shapeActionGroup.get());
+  mContext.commandToolBar.addActionGroup(std::move(shapeActionGroup));
+  mContext.commandToolBar.addSeparator();
 
   // Add the size edit to the toolbar
-  mSizeEdit.reset(new PositiveLengthEdit());
-  mSizeEdit->setValue(mLastViaProperties.getSize());
-  mContext.editorUi.commandToolbar->addWidget(mSizeEdit.data());
-  connect(mSizeEdit.data(), &PositiveLengthEdit::valueChanged, this,
+  mContext.commandToolBar.addLabel(tr("Size:"), 10);
+  std::unique_ptr<PositiveLengthEdit> sizeEdit(new PositiveLengthEdit());
+  QPointer<PositiveLengthEdit> sizeEditPtr = sizeEdit.get();
+  sizeEdit->setValue(mLastViaProperties.getSize());
+  sizeEdit->addAction(cmd.sizeIncrease.createAction(
+      sizeEdit.get(), sizeEdit.get(), &PositiveLengthEdit::stepUp));
+  sizeEdit->addAction(cmd.sizeDecrease.createAction(
+      sizeEdit.get(), sizeEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(sizeEdit.get(), &PositiveLengthEdit::valueChanged, this,
           &BoardEditorState_AddVia::sizeEditValueChanged);
-
-  // Add the "Drill:" label to the toolbar
-  mDrillLabel.reset(new QLabel(tr("Drill:")));
-  mDrillLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mDrillLabel.data());
+  mContext.commandToolBar.addWidget(std::move(sizeEdit));
 
   // Add the drill edit to the toolbar
-  mDrillEdit.reset(new PositiveLengthEdit());
-  mDrillEdit->setValue(mLastViaProperties.getDrillDiameter());
-  mContext.editorUi.commandToolbar->addWidget(mDrillEdit.data());
-  connect(mDrillEdit.data(), &PositiveLengthEdit::valueChanged, this,
+  mContext.commandToolBar.addLabel(tr("Drill:"), 10);
+  std::unique_ptr<PositiveLengthEdit> drillEdit(new PositiveLengthEdit());
+  QPointer<PositiveLengthEdit> drillEditPtr = drillEdit.get();
+  drillEdit->setValue(mLastViaProperties.getDrillDiameter());
+  drillEdit->addAction(cmd.drillIncrease.createAction(
+      drillEdit.get(), drillEdit.get(), &PositiveLengthEdit::stepUp));
+  drillEdit->addAction(cmd.drillDecrease.createAction(
+      drillEdit.get(), drillEdit.get(), &PositiveLengthEdit::stepDown));
+  connect(drillEdit.get(), &PositiveLengthEdit::valueChanged, this,
           &BoardEditorState_AddVia::drillDiameterEditValueChanged);
-
-  // Add the "Signal:" label to the toolbar
-  mNetSignalLabel.reset(new QLabel(tr("Signal:")));
-  mNetSignalLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mNetSignalLabel.data());
+  mContext.commandToolBar.addWidget(std::move(drillEdit));
 
   // Add the netsignals combobox to the toolbar
-  mNetSignalComboBox.reset(new QComboBox());
+  mContext.commandToolBar.addLabel(tr("Signal:"), 10);
+  mNetSignalComboBox = new QComboBox();
   mNetSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
   mNetSignalComboBox->setEditable(false);
@@ -169,25 +171,26 @@ bool BoardEditorState_AddVia::entry() noexcept {
   } else {
     mNetSignalComboBox->setCurrentIndex(-1);  // No net
   }
-  mContext.editorUi.commandToolbar->addWidget(mNetSignalComboBox.data());
   connect(
       mNetSignalComboBox.data(),
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, &BoardEditorState_AddVia::applySelectedNetSignal,
       Qt::QueuedConnection);
+  mContext.commandToolBar.addWidget(
+      std::unique_ptr<QComboBox>(mNetSignalComboBox));
 
   // Avoid creating vias with a drill diameter larger than its size!
   // See https://github.com/LibrePCB/LibrePCB/issues/946.
-  connect(mSizeEdit.data(), &PositiveLengthEdit::valueChanged, this,
-          [this](const PositiveLength& value) {
-            if (value < mDrillEdit->getValue()) {
-              mDrillEdit->setValue(value);
+  connect(sizeEditPtr, &PositiveLengthEdit::valueChanged, drillEditPtr,
+          [drillEditPtr](const PositiveLength& value) {
+            if ((drillEditPtr) && (value < drillEditPtr->getValue())) {
+              drillEditPtr->setValue(value);
             }
           });
-  connect(mDrillEdit.data(), &PositiveLengthEdit::valueChanged, this,
-          [this](const PositiveLength& value) {
-            if (value > mSizeEdit->getValue()) {
-              mSizeEdit->setValue(value);
+  connect(drillEditPtr, &PositiveLengthEdit::valueChanged, sizeEditPtr,
+          [sizeEditPtr](const PositiveLength& value) {
+            if ((sizeEditPtr) && (value > sizeEditPtr->getValue())) {
+              sizeEditPtr->setValue(value);
             }
           });
 
@@ -200,16 +203,7 @@ bool BoardEditorState_AddVia::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   // Remove actions / widgets from the "command" toolbar
-  mNetSignalComboBox.reset();
-  mNetSignalLabel.reset();
-  mDrillEdit.reset();
-  mDrillLabel.reset();
-  mSizeEdit.reset();
-  mSizeLabel.reset();
-  qDeleteAll(mShapeActions);
-  mShapeActions.clear();
-  qDeleteAll(mActionSeparators);
-  mActionSeparators.clear();
+  mContext.commandToolBar.clear();
 
   mContext.editorGraphicsView.unsetCursor();
   return true;
@@ -399,12 +393,10 @@ bool BoardEditorState_AddVia::abortCommand(bool showErrMsgBox) noexcept {
   }
 }
 
-void BoardEditorState_AddVia::updateShapeActionsCheckedState() noexcept {
-  foreach (int key, mShapeActions.keys()) {
-    mShapeActions.value(key)->setCheckable(
-        key == static_cast<int>(mLastViaProperties.getShape()));
-    mShapeActions.value(key)->setChecked(
-        key == static_cast<int>(mLastViaProperties.getShape()));
+void BoardEditorState_AddVia::shapeChanged(Via::Shape shape) noexcept {
+  mLastViaProperties.setShape(shape);
+  if (mCurrentViaEditCmd) {
+    mCurrentViaEditCmd->setShape(mLastViaProperties.getShape(), true);
   }
 }
 

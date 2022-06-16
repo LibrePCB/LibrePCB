@@ -22,7 +22,10 @@
  ******************************************************************************/
 #include "boardeditorstate_drawtrace.h"
 
+#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
+#include "../../../utils/toolbarproxy.h"
+#include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmdboardnetsegmentadd.h"
@@ -60,7 +63,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     const Context& context) noexcept
   : BoardEditorState(context),
     mSubState(SubState_Idle),
-    mCurrentWireMode(WireMode_HV),
+    mCurrentWireMode(WireMode::HV),
     mCurrentLayerName(GraphicsLayer::sTopCopper),
     mAddVia(false),
     mTempVia(nullptr),
@@ -100,125 +103,155 @@ bool BoardEditorState_DrawTrace::entry() noexcept {
   // Clear board selection because selection does not make sense in this state
   board->clearSelection();
 
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
   // Add wire mode actions to the "command" toolbar
-  mWireModeActions.insert(
-      WireMode_HV,
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/wire_h_v.png"), ""));
-  mWireModeActions.insert(
-      WireMode_VH,
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/wire_v_h.png"), ""));
-  mWireModeActions.insert(
-      WireMode_9045,
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/wire_90_45.png"), ""));
-  mWireModeActions.insert(
-      WireMode_4590,
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/wire_45_90.png"), ""));
-  mWireModeActions.insert(
-      WireMode_Straight,
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/wire_straight.png"), ""));
-  mActionSeparators.append(mContext.editorUi.commandToolbar->addSeparator());
-  updateWireModeActionsCheckedState();
-
-  // Connect the wire mode actions with the slot
-  // updateWireModeActionsCheckedState()
-  foreach (WireMode mode, mWireModeActions.keys()) {
-    connect(mWireModeActions.value(mode), &QAction::triggered, [this, mode]() {
-      mCurrentWireMode = mode;
-      updateWireModeActionsCheckedState();
-    });
-  }
-
-  // Add the "Width:" label to the toolbar
-  mWidthLabel.reset(new QLabel(tr("Width:")));
-  mWidthLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mWidthLabel.data());
+  mWireModeActionGroup = new QActionGroup(&mContext.commandToolBar);
+  QAction* aWireModeHV = cmd.wireModeHV.createAction(
+      mWireModeActionGroup, this, [this]() { wireModeChanged(WireMode::HV); });
+  aWireModeHV->setCheckable(true);
+  aWireModeHV->setChecked(mCurrentWireMode == WireMode::HV);
+  aWireModeHV->setActionGroup(mWireModeActionGroup);
+  QAction* aWireModeVH = cmd.wireModeVH.createAction(
+      mWireModeActionGroup, this, [this]() { wireModeChanged(WireMode::VH); });
+  aWireModeVH->setCheckable(true);
+  aWireModeVH->setChecked(mCurrentWireMode == WireMode::VH);
+  aWireModeVH->setActionGroup(mWireModeActionGroup);
+  QAction* aWireMode9045 = cmd.wireMode9045.createAction(
+      mWireModeActionGroup, this,
+      [this]() { wireModeChanged(WireMode::Deg9045); });
+  aWireMode9045->setCheckable(true);
+  aWireMode9045->setChecked(mCurrentWireMode == WireMode::Deg9045);
+  aWireMode9045->setActionGroup(mWireModeActionGroup);
+  QAction* aWireMode4590 = cmd.wireMode4590.createAction(
+      mWireModeActionGroup, this,
+      [this]() { wireModeChanged(WireMode::Deg4590); });
+  aWireMode4590->setCheckable(true);
+  aWireMode4590->setChecked(mCurrentWireMode == WireMode::Deg4590);
+  aWireMode4590->setActionGroup(mWireModeActionGroup);
+  QAction* aWireModeStraight = cmd.wireModeStraight.createAction(
+      mWireModeActionGroup, this,
+      [this]() { wireModeChanged(WireMode::Straight); });
+  aWireModeStraight->setCheckable(true);
+  aWireModeStraight->setChecked(mCurrentWireMode == WireMode::Straight);
+  aWireModeStraight->setActionGroup(mWireModeActionGroup);
+  mContext.commandToolBar.addActionGroup(
+      std::unique_ptr<QActionGroup>(mWireModeActionGroup));
+  mContext.commandToolBar.addSeparator();
 
   // Add the widths combobox to the toolbar
-  mWidthEdit.reset(new PositiveLengthEdit());
+  mContext.commandToolBar.addLabel(tr("Width:"), 10);
+  mWidthEdit = new PositiveLengthEdit();
   mWidthEdit->setValue(mCurrentWidth);
-  mContext.editorUi.commandToolbar->addWidget(mWidthEdit.data());
+  mWidthEdit->addAction(cmd.lineWidthIncrease.createAction(
+      mWidthEdit, mWidthEdit.data(), &PositiveLengthEdit::stepUp));
+  mWidthEdit->addAction(cmd.lineWidthDecrease.createAction(
+      mWidthEdit, mWidthEdit.data(), &PositiveLengthEdit::stepDown));
   connect(mWidthEdit.data(), &PositiveLengthEdit::valueChanged, this,
           &BoardEditorState_DrawTrace::wireWidthEditValueChanged);
+  mContext.commandToolBar.addWidget(
+      std::unique_ptr<PositiveLengthEdit>(mWidthEdit));
 
   // Add the auto width checkbox to the toolbar
-  mAutoWidthEdit.reset(new QCheckBox(tr("Auto")));
-  mAutoWidthEdit->setChecked(mCurrentAutoWidth);
-  mContext.editorUi.commandToolbar->addWidget(mAutoWidthEdit.data());
-  connect(mAutoWidthEdit.data(), &QCheckBox::toggled, this,
+  std::unique_ptr<QCheckBox> autoWidthCheckBox(new QCheckBox(tr("Auto")));
+  autoWidthCheckBox->setChecked(mCurrentAutoWidth);
+  autoWidthCheckBox->addAction(cmd.widthAutoToggle.createAction(
+      autoWidthCheckBox.get(), autoWidthCheckBox.get(), &QCheckBox::toggle));
+  connect(autoWidthCheckBox.get(), &QCheckBox::toggled, this,
           &BoardEditorState_DrawTrace::wireAutoWidthEditToggled);
-  mActionSeparators.append(mContext.editorUi.commandToolbar->addSeparator());
-
-  // Add the "Layer:" label to the toolbar
-  mLayerLabel.reset(new QLabel(tr("Layer:")));
-  mLayerLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mLayerLabel.data());
+  mContext.commandToolBar.addWidget(std::move(autoWidthCheckBox));
+  mContext.commandToolBar.addSeparator();
 
   // Add the layers combobox to the toolbar
-  mLayerComboBox.reset(new QComboBox());
-  mLayerComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-  mLayerComboBox->setInsertPolicy(QComboBox::NoInsert);
-  foreach (const auto& layer, board->getLayerStack().getAllLayers()) {
+  mContext.commandToolBar.addLabel(tr("Layer:"), 10);
+  mLayerComboBox = new GraphicsLayerComboBox();
+  QList<GraphicsLayer*> layers;
+  foreach (GraphicsLayer* layer, board->getLayerStack().getAllLayers()) {
     if (layer->isCopperLayer() && layer->isEnabled()) {
-      mLayerComboBox->addItem(layer->getNameTr(), layer->getName());
+      layers.append(layer);
     }
   }
-  mLayerComboBox->setCurrentIndex(mLayerComboBox->findData(mCurrentLayerName));
-  mContext.editorUi.commandToolbar->addWidget(mLayerComboBox.data());
-  connect(
-      mLayerComboBox.data(),
-      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-      this, &BoardEditorState_DrawTrace::layerComboBoxIndexChanged);
+  mLayerComboBox->setLayers(layers);
+  mLayerComboBox->setCurrentLayer(mCurrentLayerName);
+  mLayerComboBox->addAction(cmd.layerUp.createAction(
+      mLayerComboBox, mLayerComboBox.data(), &GraphicsLayerComboBox::stepDown));
+  mLayerComboBox->addAction(cmd.layerDown.createAction(
+      mLayerComboBox, mLayerComboBox.data(), &GraphicsLayerComboBox::stepUp));
+  connect(mLayerComboBox, &GraphicsLayerComboBox::currentLayerChanged, this,
+          &BoardEditorState_DrawTrace::layerChanged);
+  mContext.commandToolBar.addWidget(
+      std::unique_ptr<GraphicsLayerComboBox>(mLayerComboBox));
 
   // Add shape actions to the "command" toolbar
-  mShapeActions.insert(static_cast<int>(Via::Shape::Round),
-                       mContext.editorUi.commandToolbar->addAction(
-                           QIcon(":/img/command_toolbars/via_round.png"), ""));
-  mShapeActions.insert(static_cast<int>(Via::Shape::Square),
-                       mContext.editorUi.commandToolbar->addAction(
-                           QIcon(":/img/command_toolbars/via_square.png"), ""));
-  mShapeActions.insert(
-      static_cast<int>(Via::Shape::Octagon),
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/via_octagon.png"), ""));
-  updateShapeActionsCheckedState();
-
-  // Connect the shape actions with the slot updateShapeActionsCheckedState()
-  foreach (int shape, mShapeActions.keys()) {
-    connect(mShapeActions.value(shape), &QAction::triggered, [this, shape]() {
-      mCurrentViaProperties.setShape(static_cast<Via::Shape>(shape));
-      updateShapeActionsCheckedState();
-    });
-  }
-
-  // Add the "Size:" label to the toolbar
-  mSizeLabel.reset(new QLabel(tr("Size:")));
-  mSizeLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mSizeLabel.data());
+  std::unique_ptr<QActionGroup> shapeActionGroup(
+      new QActionGroup(&mContext.commandToolBar));
+  QAction* aShapeRound = cmd.thtShapeRound.createAction(
+      shapeActionGroup.get(), this,
+      [this]() { viaShapeChanged(Via::Shape::Round); });
+  aShapeRound->setCheckable(true);
+  aShapeRound->setChecked(mCurrentViaProperties.getShape() ==
+                          Via::Shape::Round);
+  aShapeRound->setActionGroup(shapeActionGroup.get());
+  QAction* aShapeRect = cmd.thtShapeRectangular.createAction(
+      shapeActionGroup.get(), this,
+      [this]() { viaShapeChanged(Via::Shape::Square); });
+  aShapeRect->setCheckable(true);
+  aShapeRect->setChecked(mCurrentViaProperties.getShape() ==
+                         Via::Shape::Square);
+  aShapeRect->setActionGroup(shapeActionGroup.get());
+  QAction* aShapeOctagon = cmd.thtShapeOctagonal.createAction(
+      shapeActionGroup.get(), this,
+      [this]() { viaShapeChanged(Via::Shape::Octagon); });
+  aShapeOctagon->setCheckable(true);
+  aShapeOctagon->setChecked(mCurrentViaProperties.getShape() ==
+                            Via::Shape::Octagon);
+  aShapeOctagon->setActionGroup(shapeActionGroup.get());
+  mContext.commandToolBar.addActionGroup(std::move(shapeActionGroup));
+  mContext.commandToolBar.addSeparator();
 
   // Add the size edit to the toolbar
-  mSizeEdit.reset(new PositiveLengthEdit());
+  mContext.commandToolBar.addLabel(tr("Size:"), 10);
+  mSizeEdit = new PositiveLengthEdit();
   mSizeEdit->setValue(mCurrentViaProperties.getSize());
-  mContext.editorUi.commandToolbar->addWidget(mSizeEdit.data());
+  mSizeEdit->addAction(cmd.sizeIncrease.createAction(
+      mSizeEdit, mSizeEdit.data(), &PositiveLengthEdit::stepUp));
+  mSizeEdit->addAction(cmd.sizeDecrease.createAction(
+      mSizeEdit, mSizeEdit.data(), &PositiveLengthEdit::stepDown));
   connect(mSizeEdit.data(), &PositiveLengthEdit::valueChanged, this,
           &BoardEditorState_DrawTrace::sizeEditValueChanged);
-
-  // Add the "Drill:" label to the toolbar
-  mDrillLabel.reset(new QLabel(tr("Drill:")));
-  mDrillLabel->setIndent(10);
-  mContext.editorUi.commandToolbar->addWidget(mDrillLabel.data());
+  mContext.commandToolBar.addWidget(
+      std::unique_ptr<PositiveLengthEdit>(mSizeEdit));
 
   // Add the drill edit to the toolbar
-  mDrillEdit.reset(new PositiveLengthEdit());
+  mContext.commandToolBar.addLabel(tr("Drill:"), 10);
+  mDrillEdit = new PositiveLengthEdit();
   mDrillEdit->setValue(mCurrentViaProperties.getDrillDiameter());
-  mContext.editorUi.commandToolbar->addWidget(mDrillEdit.data());
+  mDrillEdit->addAction(cmd.drillIncrease.createAction(
+      mDrillEdit, mDrillEdit.data(), &PositiveLengthEdit::stepUp));
+  mDrillEdit->addAction(cmd.drillDecrease.createAction(
+      mDrillEdit, mDrillEdit.data(), &PositiveLengthEdit::stepDown));
   connect(mDrillEdit.data(), &PositiveLengthEdit::valueChanged, this,
           &BoardEditorState_DrawTrace::drillDiameterEditValueChanged);
-  mActionSeparators.append(mContext.editorUi.commandToolbar->addSeparator());
+  mContext.commandToolBar.addWidget(
+      std::unique_ptr<PositiveLengthEdit>(mDrillEdit));
+  mContext.commandToolBar.addSeparator();
+
+  // Avoid creating vias with a drill diameter larger than its size!
+  // See https://github.com/LibrePCB/LibrePCB/issues/946.
+  QPointer<PositiveLengthEdit> sizeEditPtr = mSizeEdit;
+  QPointer<PositiveLengthEdit> drillEditPtr = mDrillEdit;
+  connect(sizeEditPtr, &PositiveLengthEdit::valueChanged, drillEditPtr,
+          [drillEditPtr](const PositiveLength& value) {
+            if ((drillEditPtr) && (value < drillEditPtr->getValue())) {
+              drillEditPtr->setValue(value);
+            }
+          });
+  connect(drillEditPtr, &PositiveLengthEdit::valueChanged, sizeEditPtr,
+          [sizeEditPtr](const PositiveLength& value) {
+            if ((sizeEditPtr) && (value > sizeEditPtr->getValue())) {
+              sizeEditPtr->setValue(value);
+            }
+          });
 
   // Avoid creating vias with a drill diameter larger than its size!
   // See https://github.com/LibrePCB/LibrePCB/issues/946.
@@ -244,21 +277,7 @@ bool BoardEditorState_DrawTrace::exit() noexcept {
   if (!abortPositioning(true)) return false;
 
   // Remove actions / widgets from the "command" toolbar
-  mAutoWidthEdit.reset();
-  mWidthEdit.reset();
-  mWidthLabel.reset();
-  mDrillEdit.reset();
-  mDrillLabel.reset();
-  mSizeEdit.reset();
-  mSizeLabel.reset();
-  qDeleteAll(mShapeActions);
-  mShapeActions.clear();
-  mLayerComboBox.reset();
-  mLayerLabel.reset();
-  qDeleteAll(mActionSeparators);
-  mActionSeparators.clear();
-  qDeleteAll(mWireModeActions);
-  mWireModeActions.clear();
+  mContext.commandToolBar.clear();
 
   mContext.editorGraphicsView.unsetCursor();
   return true;
@@ -289,45 +308,6 @@ bool BoardEditorState_DrawTrace::processKeyPressed(
         return true;
       }
       break;
-    case Qt::Key_Plus:
-      mWidthEdit->stepBy(1);
-      return true;
-    case Qt::Key_Minus:
-      mWidthEdit->stepBy(-1);
-      return true;
-    case Qt::Key_7:
-      mLayerComboBox->setCurrentIndex((mLayerComboBox->currentIndex() + 1) %
-                                      mLayerComboBox->count());
-      return true;
-    case Qt::Key_1:
-      mLayerComboBox->setCurrentIndex(
-          (mLayerComboBox->count() + mLayerComboBox->currentIndex() - 1) %
-          mLayerComboBox->count());
-      return true;
-    case Qt::Key_8:
-      mSizeEdit->stepBy(1);
-      return true;
-    case Qt::Key_2:
-      mSizeEdit->stepBy(-1);
-      return true;
-    case Qt::Key_9:
-      mDrillEdit->stepBy(1);
-      return true;
-    case Qt::Key_3:
-      mDrillEdit->stepBy(-1);
-      return true;
-    case Qt::Key_4:
-      mCurrentViaProperties.setShape(Via::Shape::Round);
-      updateShapeActionsCheckedState();
-      return true;
-    case Qt::Key_5:
-      mCurrentViaProperties.setShape(Via::Shape::Square);
-      updateShapeActionsCheckedState();
-      return true;
-    case Qt::Key_6:
-      mCurrentViaProperties.setShape(Via::Shape::Octagon);
-      updateShapeActionsCheckedState();
-      return true;
     default:
       break;
   }
@@ -392,14 +372,16 @@ bool BoardEditorState_DrawTrace::
 bool BoardEditorState_DrawTrace::processGraphicsSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
   if (mSubState == SubState_PositioningNetPoint) {
-    // Only switch to next wire mode if cursor was not moved during click
-    if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
-      mCurrentWireMode = static_cast<WireMode>(mCurrentWireMode + 1);
-      if (mCurrentWireMode == WireMode_COUNT)
-        mCurrentWireMode = static_cast<WireMode>(0);
-      updateWireModeActionsCheckedState();
+    // Only switch to next wire mode if cursor was not moved during click.
+    if ((mWireModeActionGroup) &&
+        (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton))) {
+      int index = mWireModeActionGroup->actions().indexOf(
+          mWireModeActionGroup->checkedAction());
+      index = (index + 1) % mWireModeActionGroup->actions().count();
+      QAction* newAction = mWireModeActionGroup->actions().value(index);
+      Q_ASSERT(newAction);
+      newAction->trigger();
       mCursorPos = Point::fromPx(e.scenePos());
-      updateNetpointPositions();
     }
 
     // Always accept the event if we are drawing a trace! When ignoring the
@@ -558,7 +540,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
     Q_ASSERT(layer);
     layer->setVisible(true);
     mCurrentLayerName = layer->getName();
-    mLayerComboBox->setCurrentIndex(mLayerComboBox->findData(layer->getName()));
+    mLayerComboBox->setCurrentLayer(mCurrentLayerName);
 
     // update line width
     if (mCurrentAutoWidth && mFixedStartAnchor->getMaxLineWidth() > 0) {
@@ -1002,15 +984,20 @@ BI_NetLineAnchor* BoardEditorState_DrawTrace::combineAnchors(
   return otherAnchor;
 }
 
-void BoardEditorState_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
+void BoardEditorState_DrawTrace::wireModeChanged(WireMode mode) noexcept {
+  mCurrentWireMode = mode;
+  updateNetpointPositions();
+}
+
+void BoardEditorState_DrawTrace::layerChanged(
+    const GraphicsLayerName& layer) noexcept {
   Board* board = getActiveBoard();
   if (!board) return;
-  QString newLayerName = mLayerComboBox->itemData(index).toString();
-  GraphicsLayer* layer = board->getLayerStack().getLayer(newLayerName);
-  if (!layer) return;
-  layer->setVisible(true);
+  GraphicsLayer* layerObj = board->getLayerStack().getLayer(*layer);
+  if (!layerObj) return;
+  layerObj->setVisible(true);
   if ((mSubState == SubState_PositioningNetPoint) &&
-      (newLayerName != mCurrentLayerName)) {
+      (layer != mCurrentLayerName)) {
     // If the start anchor is a via or THT pad, delete current trace segment
     // and start a new one on the selected layer. Otherwise, just add a via
     // at the current position, i.e. at the end of the current trace segment.
@@ -1023,28 +1010,23 @@ void BoardEditorState_DrawTrace::layerComboBoxIndexChanged(int index) noexcept {
     }
     if (via || pad) {
       abortPositioning(false);
-      mCurrentLayerName = newLayerName;
+      mCurrentLayerName = *layer;
       startPositioning(*board, startPos, nullptr, via, pad);
       updateNetpointPositions();
     } else {
       mAddVia = true;
       showVia(true);
-      mViaLayerName = newLayerName;
+      mViaLayerName = *layer;
     }
   } else {
     mAddVia = false;
     showVia(false);
-    mCurrentLayerName = newLayerName;
+    mCurrentLayerName = *layer;
   }
 }
 
-void BoardEditorState_DrawTrace::updateShapeActionsCheckedState() noexcept {
-  foreach (int key, mShapeActions.keys()) {
-    mShapeActions.value(key)->setCheckable(
-        key == static_cast<int>(mCurrentViaProperties.getShape()));
-    mShapeActions.value(key)->setChecked(
-        key == static_cast<int>(mCurrentViaProperties.getShape()));
-  }
+void BoardEditorState_DrawTrace::viaShapeChanged(Via::Shape shape) noexcept {
+  mCurrentViaProperties.setShape(shape);
   updateNetpointPositions();
 }
 
@@ -1072,14 +1054,6 @@ void BoardEditorState_DrawTrace::wireAutoWidthEditToggled(
   mCurrentAutoWidth = checked;
 }
 
-void BoardEditorState_DrawTrace::updateWireModeActionsCheckedState() noexcept {
-  foreach (WireMode key, mWireModeActions.keys()) {
-    mWireModeActions.value(key)->setCheckable(key == mCurrentWireMode);
-    mWireModeActions.value(key)->setChecked(key == mCurrentWireMode);
-  }
-  updateNetpointPositions();
-}
-
 Point BoardEditorState_DrawTrace::calcMiddlePointPos(const Point& p1,
                                                      const Point p2,
                                                      WireMode mode) const
@@ -1088,21 +1062,21 @@ Point BoardEditorState_DrawTrace::calcMiddlePointPos(const Point& p1,
   qreal xPositive = delta.getX() >= 0 ? 1 : -1;
   qreal yPositive = delta.getY() >= 0 ? 1 : -1;
   switch (mode) {
-    case WireMode_HV:
+    case WireMode::HV:
       return Point(p2.getX(), p1.getY());
-    case WireMode_VH:
+    case WireMode::VH:
       return Point(p1.getX(), p2.getY());
-    case WireMode_9045:
+    case WireMode::Deg9045:
       if (delta.getX().abs() >= delta.getY().abs())
         return Point(p2.getX() - delta.getY().abs() * xPositive, p1.getY());
       else
         return Point(p1.getX(), p2.getY() - delta.getX().abs() * yPositive);
-    case WireMode_4590:
+    case WireMode::Deg4590:
       if (delta.getX().abs() >= delta.getY().abs())
         return Point(p1.getX() + delta.getY().abs() * xPositive, p2.getY());
       else
         return Point(p2.getX(), p1.getY() + delta.getX().abs() * yPositive);
-    case WireMode_Straight:
+    case WireMode::Straight:
       return p1;
     default:
       Q_ASSERT(false);

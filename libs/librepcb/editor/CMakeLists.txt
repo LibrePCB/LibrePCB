@@ -53,6 +53,10 @@ add_library(
   dialogs/textpropertiesdialog.cpp
   dialogs/textpropertiesdialog.h
   dialogs/textpropertiesdialog.ui
+  editorcommand.cpp
+  editorcommand.h
+  editorcommandcategory.h
+  editorcommandset.h
   library/cat/categorychooserdialog.cpp
   library/cat/categorychooserdialog.h
   library/cat/categorychooserdialog.ui
@@ -228,8 +232,6 @@ add_library(
   library/pkg/footprintpadpropertiesdialog.cpp
   library/pkg/footprintpadpropertiesdialog.h
   library/pkg/footprintpadpropertiesdialog.ui
-  library/pkg/footprintpadshapeselectorwidget.cpp
-  library/pkg/footprintpadshapeselectorwidget.h
   library/pkg/fsm/packageeditorfsm.cpp
   library/pkg/fsm/packageeditorfsm.h
   library/pkg/fsm/packageeditorstate.cpp
@@ -471,6 +473,8 @@ add_library(
   project/cmd/cmddeviceinstanceremove.h
   project/cmd/cmddragselectedboarditems.cpp
   project/cmd/cmddragselectedboarditems.h
+  project/cmd/cmddragselectedschematicitems.cpp
+  project/cmd/cmddragselectedschematicitems.h
   project/cmd/cmdflipselectedboarditems.cpp
   project/cmd/cmdflipselectedboarditems.h
   project/cmd/cmdfootprintstroketextadd.cpp
@@ -479,10 +483,6 @@ add_library(
   project/cmd/cmdfootprintstroketextremove.h
   project/cmd/cmdfootprintstroketextsreset.cpp
   project/cmd/cmdfootprintstroketextsreset.h
-  project/cmd/cmdmirrorselectedschematicitems.cpp
-  project/cmd/cmdmirrorselectedschematicitems.h
-  project/cmd/cmdmoveselectedschematicitems.cpp
-  project/cmd/cmdmoveselectedschematicitems.h
   project/cmd/cmdnetclassadd.cpp
   project/cmd/cmdnetclassadd.h
   project/cmd/cmdnetclassedit.cpp
@@ -519,8 +519,6 @@ add_library(
   project/cmd/cmdremoveunusednetsignals.h
   project/cmd/cmdreplacedevice.cpp
   project/cmd/cmdreplacedevice.h
-  project/cmd/cmdrotateselectedschematicitems.cpp
-  project/cmd/cmdrotateselectedschematicitems.h
   project/cmd/cmdschematicadd.cpp
   project/cmd/cmdschematicadd.h
   project/cmd/cmdschematicedit.cpp
@@ -621,6 +619,10 @@ add_library(
   utils/exclusiveactiongroup.h
   utils/halignactiongroup.cpp
   utils/halignactiongroup.h
+  utils/menubuilder.cpp
+  utils/menubuilder.h
+  utils/standardeditorcommandhandler.cpp
+  utils/standardeditorcommandhandler.h
   utils/toolbarproxy.cpp
   utils/toolbarproxy.h
   utils/undostackactiongroup.cpp

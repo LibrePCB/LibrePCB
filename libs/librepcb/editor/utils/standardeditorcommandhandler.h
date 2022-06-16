@@ -17,59 +17,66 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDROTATESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_EDITOR_CMDROTATESELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_EDITOR_STANDARDEDITORCOMMANDHANDLER_H
+#define LIBREPCB_EDITOR_STANDARDEDITORCOMMANDHANDLER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommandgroup.h"
-
-#include <librepcb/core/types/angle.h>
-
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Schematic;
+class FilePath;
+class WorkspaceSettings;
 
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdRotateSelectedSchematicItems
+ *  Class StandardEditorCommandHandler
  ******************************************************************************/
 
 /**
- * @brief The CmdRotateSelectedSchematicItems class
+ * @brief Helper to handle some of the ::librepcb::editor::EditorCommand actions
+ *
+ * Indended to share code between the various editors.
  */
-class CmdRotateSelectedSchematicItems final : public UndoCommandGroup {
+class StandardEditorCommandHandler final : public QObject {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  CmdRotateSelectedSchematicItems(Schematic& schematic,
-                                  const Angle& angle) noexcept;
-  ~CmdRotateSelectedSchematicItems() noexcept;
+  StandardEditorCommandHandler() = delete;
+  StandardEditorCommandHandler(const StandardEditorCommandHandler& other) =
+      delete;
+  StandardEditorCommandHandler(const WorkspaceSettings& settings,
+                               QWidget* parent = nullptr) noexcept;
+  ~StandardEditorCommandHandler() noexcept;
 
-private:
-  // Private Methods
+  // Action Handlers
+  void aboutLibrePcb() const noexcept;
+  void onlineDocumentation() const noexcept;
+  void website() const noexcept;
+  void fileManager(const FilePath& fp) const noexcept;
 
-  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  bool performExecute() override;
+  // Operator Overloadings
+  StandardEditorCommandHandler& operator=(
+      const StandardEditorCommandHandler& rhs) = delete;
 
-  // Private Member Variables
-
-  // Attributes from the constructor
-  Schematic& mSchematic;
-  Angle mAngle;
+private:  // Data
+  const WorkspaceSettings& mSettings;
+  QPointer<QWidget> mParent;
 };
+
+}  // namespace editor
+}  // namespace librepcb
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
-
-}  // namespace editor
-}  // namespace librepcb
 
 #endif

@@ -26,6 +26,7 @@
 #include "boardeditorstate.h"
 
 #include <librepcb/core/geometry/via.h>
+#include <librepcb/core/graphics/graphicslayername.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -46,6 +47,7 @@ class NetSignal;
 
 namespace editor {
 
+class GraphicsLayerComboBox;
 class PositiveLengthEdit;
 
 /*******************************************************************************
@@ -97,16 +99,13 @@ private:
 
   /**
    * @brief All available wire modes
-   *
-   * @note The first item must have the value 0!
    */
-  enum WireMode {
-    WireMode_HV = 0,  ///< horizontal - vertical [default]
-    WireMode_VH,  ///< vertical - horizontal
-    WireMode_9045,  ///< 90° - 45°
-    WireMode_4590,  ///< 45° - 90°
-    WireMode_Straight,  ///< straight
-    WireMode_COUNT  ///< count of wire modes
+  enum class WireMode {
+    HV,  ///< horizontal - vertical [default]
+    VH,  ///< vertical - horizontal
+    Deg9045,  ///< 90° - 45°
+    Deg4590,  ///< 45° - 90°
+    Straight,  ///< straight
   };
 
   /**
@@ -242,13 +241,13 @@ private:
   BI_NetLineAnchor* combineAnchors(BI_NetLineAnchor& a, BI_NetLineAnchor& b);
 
   // Callback Functions for the Gui elements
-  void layerComboBoxIndexChanged(int index) noexcept;
-  void updateShapeActionsCheckedState() noexcept;
+  void wireModeChanged(WireMode mode) noexcept;
+  void layerChanged(const GraphicsLayerName& layer) noexcept;
+  void viaShapeChanged(Via::Shape shape) noexcept;
   void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void wireWidthEditValueChanged(const PositiveLength& value) noexcept;
   void wireAutoWidthEditToggled(const bool checked) noexcept;
-  void updateWireModeActionsCheckedState() noexcept;
 
   /**
    * @brief Calculate the 'middle point' of two point,
@@ -288,18 +287,11 @@ private:
   BI_NetPoint* mPositioningNetPoint2;  ///< the second netpoint to place
 
   // Widgets for the command toolbar
-  QHash<WireMode, QAction*> mWireModeActions;
-  QList<QAction*> mActionSeparators;
-  QScopedPointer<QLabel> mLayerLabel;
-  QScopedPointer<QComboBox> mLayerComboBox;
-  QHash<int, QAction*> mShapeActions;
-  QScopedPointer<QLabel> mSizeLabel;
-  QScopedPointer<PositiveLengthEdit> mSizeEdit;
-  QScopedPointer<QLabel> mDrillLabel;
-  QScopedPointer<PositiveLengthEdit> mDrillEdit;
-  QScopedPointer<QLabel> mWidthLabel;
-  QScopedPointer<PositiveLengthEdit> mWidthEdit;
-  QScopedPointer<QCheckBox> mAutoWidthEdit;
+  QPointer<GraphicsLayerComboBox> mLayerComboBox;
+  QPointer<PositiveLengthEdit> mSizeEdit;
+  QPointer<PositiveLengthEdit> mDrillEdit;
+  QPointer<PositiveLengthEdit> mWidthEdit;
+  QPointer<QActionGroup> mWireModeActionGroup;
 };
 
 /*******************************************************************************

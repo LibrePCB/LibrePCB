@@ -91,10 +91,6 @@ private:  // Data
   // mIsUndoCmdActive == true.
   BI_Hole* mCurrentHoleToPlace;
   QScopedPointer<CmdHoleEdit> mCurrentHoleEditCmd;
-
-  // Widgets for the command toolbar
-  QScopedPointer<QLabel> mDiameterLabel;
-  QScopedPointer<PositiveLengthEdit> mDiameterEdit;
 };
 
 /*******************************************************************************

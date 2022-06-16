@@ -77,58 +77,32 @@ EditorWidgetBase::~EditorWidgetBase() noexcept {
  *  Setters
  ******************************************************************************/
 
-void EditorWidgetBase::setUndoStackActionGroup(
-    UndoStackActionGroup* group) noexcept {
-  if (group == mUndoStackActionGroup) return;
-  if (mUndoStackActionGroup) mUndoStackActionGroup->setUndoStack(nullptr);
-  mUndoStackActionGroup = group;
-  if (mUndoStackActionGroup)
-    mUndoStackActionGroup->setUndoStack(mUndoStack.data());
+void EditorWidgetBase::connectEditor(UndoStackActionGroup& undoStackActionGroup,
+                                     ExclusiveActionGroup& toolsActionGroup,
+                                     QToolBar& commandToolBar,
+                                     StatusBar& statusBar) noexcept {
+  mUndoStackActionGroup = &undoStackActionGroup;
+  mUndoStackActionGroup->setUndoStack(mUndoStack.data());
+
+  mToolsActionGroup = &toolsActionGroup;
+  mToolsActionGroup->reset();
+  connect(mToolsActionGroup, &ExclusiveActionGroup::changeRequestTriggered,
+          this, &EditorWidgetBase::toolActionGroupChangeTriggered);
+
+  mCommandToolBarProxy->setToolBar(&commandToolBar);
+
+  mStatusBar = &statusBar;
 }
 
-void EditorWidgetBase::setToolsActionGroup(
-    ExclusiveActionGroup* group) noexcept {
-  if (group == mToolsActionGroup) {
-    return;
-  }
+void EditorWidgetBase::disconnectEditor() noexcept {
+  mUndoStackActionGroup->setUndoStack(nullptr);
+  mUndoStackActionGroup = nullptr;
 
-  if (mToolsActionGroup) {
-    disconnect(mToolsActionGroup, &ExclusiveActionGroup::changeRequestTriggered,
-               this, &EditorWidgetBase::toolActionGroupChangeTriggered);
-    mToolsActionGroup->reset();
-  }
+  disconnect(mToolsActionGroup, &ExclusiveActionGroup::changeRequestTriggered,
+             this, &EditorWidgetBase::toolActionGroupChangeTriggered);
+  mToolsActionGroup->reset();
 
-  mToolsActionGroup = group;
-
-  if (mToolsActionGroup) {
-    mToolsActionGroup->reset();
-    connect(mToolsActionGroup, &ExclusiveActionGroup::changeRequestTriggered,
-            this, &EditorWidgetBase::toolActionGroupChangeTriggered);
-  }
-}
-
-void EditorWidgetBase::setCommandToolBar(QToolBar* toolbar) noexcept {
-  mCommandToolBarProxy->setToolBar(toolbar);
-}
-
-void EditorWidgetBase::setStatusBar(StatusBar* statusbar) noexcept {
-  if (statusbar == mStatusBar) {
-    return;
-  }
-
-  if (mStatusBar) {
-    disconnect(this, &EditorWidgetBase::cursorPositionChanged, mStatusBar,
-               &StatusBar::setAbsoluteCursorPosition);
-    mStatusBar->setField(StatusBar::AbsolutePosition, false);
-  }
-
-  mStatusBar = statusbar;
-
-  if (mStatusBar) {
-    mStatusBar->setField(StatusBar::AbsolutePosition, hasGraphicalEditor());
-    connect(this, &EditorWidgetBase::cursorPositionChanged, mStatusBar,
-            &StatusBar::setAbsoluteCursorPosition);
-  }
+  mCommandToolBarProxy->setToolBar(nullptr);
 }
 
 /*******************************************************************************

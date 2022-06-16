@@ -150,6 +150,16 @@ bool SchematicEditorState_AddNetLabel::processSwitchToSchematicPage(
   return !mUndoCmdActive;
 }
 
+bool SchematicEditorState_AddNetLabel::processRotate(
+    const Angle& rotation) noexcept {
+  if (mUndoCmdActive && mCurrentNetLabel && mEditCmd) {
+    mEditCmd->rotate(rotation, mCurrentNetLabel->getPosition(), true);
+    return true;
+  }
+
+  return false;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

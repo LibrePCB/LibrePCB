@@ -67,11 +67,12 @@ public:
                         QWidget* parent = nullptr);
   ~LibraryOverviewWidget() noexcept;
 
-  // Setters
-  void setFilter(const QString& filter) noexcept;
-
   // Getters
   Library& getLibrary() const noexcept { return *mLibrary; }
+  QSet<Feature> getAvailableFeatures() const noexcept override;
+
+  // Setters
+  void setFilter(const QString& filter) noexcept;
 
   // Operator Overloadings
   LibraryOverviewWidget& operator=(const LibraryOverviewWidget& rhs) = delete;
@@ -102,6 +103,7 @@ signals:
   void removeElementTriggered(const FilePath& fp);
 
 private:  // Methods
+  void createListWidgetActions(QListWidget* listWidget) noexcept;
   void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
   bool isInterfaceBroken() const noexcept override { return false; }

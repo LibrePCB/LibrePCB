@@ -70,7 +70,6 @@ signals:
 
 protected:
   void resizeEvent(QResizeEvent* event) noexcept override;
-  bool eventFilter(QObject* obj, QEvent* event) noexcept override;
 
 private:  // Methods
   void removeSelectedSchematic() noexcept;

@@ -55,6 +55,7 @@ public:
   // Setters
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
+  void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void setShape(Via::Shape shape, bool immediate) noexcept;
   void setSize(const PositiveLength& size, bool immediate) noexcept;

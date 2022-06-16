@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "schematicpagesdock.h"
 
+#include "../../editorcommandset.h"
 #include "ui_schematicpagesdock.h"
 
 #include <librepcb/core/project/project.h>
@@ -66,8 +67,14 @@ SchematicPagesDock::SchematicPagesDock(Project& project, QWidget* parent)
   connect(&mProject, &Project::attributesChanged, this,
           &SchematicPagesDock::updateSchematicNames);
 
-  // install event filter on the list widget to implement keyboard shortcuts
-  mUi->listWidget->installEventFilter(this);
+  // Add keyboard shortcuts.
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+  mUi->listWidget->addAction(cmd.rename.createAction(
+      this, this, &SchematicPagesDock::renameSelectedSchematic,
+      EditorCommand::ActionFlag::WidgetShortcut));
+  mUi->listWidget->addAction(cmd.remove.createAction(
+      this, this, &SchematicPagesDock::removeSelectedSchematic,
+      EditorCommand::ActionFlag::WidgetShortcut));
 }
 
 SchematicPagesDock::~SchematicPagesDock() {
@@ -89,27 +96,6 @@ void SchematicPagesDock::resizeEvent(QResizeEvent* event) noexcept {
   int iconSize = event->size().width() - 10;  // this is not good...
   mUi->listWidget->setIconSize(QSize(iconSize, iconSize));
   QDockWidget::resizeEvent(event);
-}
-
-bool SchematicPagesDock::eventFilter(QObject* obj, QEvent* event) noexcept {
-  if (event->type() == QEvent::ShortcutOverride) {
-    QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-    switch (keyEvent->key()) {
-      case Qt::Key_Delete: {
-        removeSelectedSchematic();
-        event->accept();
-        return true;
-      }
-      case Qt::Key_F2: {
-        renameSelectedSchematic();
-        event->accept();
-        return true;
-      }
-      default:
-        break;
-    }
-  }
-  return QDockWidget::eventFilter(obj, event);
 }
 
 /*******************************************************************************

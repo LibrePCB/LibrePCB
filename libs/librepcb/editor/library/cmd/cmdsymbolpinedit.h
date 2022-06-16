@@ -50,7 +50,7 @@ public:
   // Constructors / Destructor
   CmdSymbolPinEdit() = delete;
   CmdSymbolPinEdit(const CmdSymbolPinEdit& other) = delete;
-  explicit CmdSymbolPinEdit(SymbolPin& pin) noexcept;
+  explicit CmdSymbolPinEdit(std::shared_ptr<SymbolPin> pin) noexcept;
   ~CmdSymbolPinEdit() noexcept;
 
   // Setters
@@ -82,7 +82,7 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  SymbolPin& mPin;
+  std::shared_ptr<SymbolPin> mPin;
 
   // General Attributes
   CircuitIdentifier mOldName;

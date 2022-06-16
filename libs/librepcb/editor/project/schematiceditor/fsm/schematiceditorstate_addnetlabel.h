@@ -73,6 +73,7 @@ public:
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processSwitchToSchematicPage(int index) noexcept override;
+  virtual bool processRotate(const Angle& rotation) noexcept override;
 
   // Operator Overloadings
   SchematicEditorState_AddNetLabel& operator=(

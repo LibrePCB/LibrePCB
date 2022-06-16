@@ -68,6 +68,8 @@ public:
   // General Methods
   virtual bool entry() noexcept override;
   virtual bool exit() noexcept override;
+  QSet<EditorWidgetBase::Feature> getAvailableFeatures() const
+      noexcept override;
 
   // Event Handlers
   virtual bool processGraphicsSceneMouseMoved(
@@ -76,8 +78,7 @@ public:
       QGraphicsSceneMouseEvent& e) noexcept override;
   virtual bool processGraphicsSceneRightMouseButtonReleased(
       QGraphicsSceneMouseEvent& e) noexcept override;
-  virtual bool processRotateCw() noexcept override;
-  virtual bool processRotateCcw() noexcept override;
+  virtual bool processRotate(const Angle& rotation) noexcept override;
 
   // Operator Overloadings
   PackageEditorState_AddPads& operator=(const PackageEditorState_AddPads& rhs) =

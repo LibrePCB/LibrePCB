@@ -171,11 +171,10 @@ void CmdStrokeTextEdit::mirrorGeometry(Qt::Orientation orientation,
   mNewPosition.mirror(orientation, center);
   if (orientation == Qt::Horizontal) {
     mNewRotation = Angle::deg180() - mNewRotation;
-    mNewAlign.mirrorV();
   } else {
     mNewRotation = -mNewRotation;
-    mNewAlign.mirrorH();
   }
+  mNewAlign.mirrorV();
   if (immediate) {
     mText.setPosition(mNewPosition);
     mText.setRotation(mNewRotation);

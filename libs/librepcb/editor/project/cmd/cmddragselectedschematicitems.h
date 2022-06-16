@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDMOVESELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_EDITOR_CMDMOVESELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDDRAGSELECTEDSCHEMATICITEMS_H
+#define LIBREPCB_EDITOR_CMDDRAGSELECTEDSCHEMATICITEMS_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "../../undocommandgroup.h"
 
+#include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
 
 #include <QtCore>
@@ -43,21 +44,24 @@ class CmdSchematicNetPointEdit;
 class CmdSymbolInstanceEdit;
 
 /*******************************************************************************
- *  Class CmdMoveSelectedSchematicItems
+ *  Class CmdDragSelectedSchematicItems
  ******************************************************************************/
 
 /**
- * @brief The CmdMoveSelectedSchematicItems class
+ * @brief The CmdDragSelectedSchematicItems class
  */
-class CmdMoveSelectedSchematicItems final : public UndoCommandGroup {
+class CmdDragSelectedSchematicItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdMoveSelectedSchematicItems(Schematic& schematic,
-                                const Point& startPos) noexcept;
-  ~CmdMoveSelectedSchematicItems() noexcept;
+  CmdDragSelectedSchematicItems(Schematic& schematic,
+                                const Point& startPos = Point()) noexcept;
+  ~CmdDragSelectedSchematicItems() noexcept;
 
   // General Methods
   void setCurrentPosition(const Point& pos) noexcept;
+  void rotate(const Angle& angle, bool aroundItemsCenter = false) noexcept;
+  void mirror(Qt::Orientation orientation,
+              bool aroundItemsCenter = false) noexcept;
 
 private:
   // Private Methods
@@ -69,6 +73,9 @@ private:
   Schematic& mSchematic;
   Point mStartPos;
   Point mDeltaPos;
+  Point mCenterPos;
+  Angle mDeltaAngle;
+  bool mMirrored;
 
   // Move commands
   QList<CmdSymbolInstanceEdit*> mSymbolEditCmds;

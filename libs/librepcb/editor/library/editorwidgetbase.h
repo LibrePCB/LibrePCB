@@ -37,8 +37,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Angle;
 class IF_GraphicsLayerProvider;
 class LibraryBaseElement;
+class Point;
 class Point;
 class Workspace;
 
@@ -86,6 +88,29 @@ public:
     ADD_HOLES,
   };
 
+  enum class Feature {
+    // Handled by editor widgets (constant).
+    Close,
+    Filter,
+    GraphicsView,
+    ExportGraphics,
+
+    // Handled by FSM states (dynamic).
+    SelectGraphics,
+    ImportGraphics,
+    Abort,
+    Cut,
+    Copy,
+    Paste,
+    Remove,
+    Move,
+    Rotate,
+    Mirror,
+    Flip,
+    SnapToGrid,
+    Properties,
+  };
+
   // Constructors / Destructor
   EditorWidgetBase() = delete;
   EditorWidgetBase(const EditorWidgetBase& other) = delete;
@@ -96,14 +121,14 @@ public:
   // Getters
   const FilePath& getFilePath() const noexcept { return mFilePath; }
   bool isDirty() const noexcept { return !mUndoStack->isClean(); }
-  virtual bool hasGraphicalEditor() const noexcept { return false; }
-  virtual bool supportsFlip() const noexcept { return false; }
+  virtual QSet<Feature> getAvailableFeatures() const noexcept = 0;
 
   // Setters
-  virtual void setUndoStackActionGroup(UndoStackActionGroup* group) noexcept;
-  virtual void setToolsActionGroup(ExclusiveActionGroup* group) noexcept;
-  virtual void setCommandToolBar(QToolBar* toolbar) noexcept;
-  virtual void setStatusBar(StatusBar* statusbar) noexcept;
+  virtual void connectEditor(UndoStackActionGroup& undoStackActionGroup,
+                             ExclusiveActionGroup& toolsActionGroup,
+                             QToolBar& commandToolBar,
+                             StatusBar& statusBar) noexcept;
+  virtual void disconnectEditor() noexcept;
 
   // Operator Overloadings
   EditorWidgetBase& operator=(const EditorWidgetBase& rhs) = delete;
@@ -114,11 +139,25 @@ public slots:
   virtual bool cut() noexcept { return false; }
   virtual bool copy() noexcept { return false; }
   virtual bool paste() noexcept { return false; }
-  virtual bool rotateCw() noexcept { return false; }
-  virtual bool rotateCcw() noexcept { return false; }
-  virtual bool mirror() noexcept { return false; }
-  virtual bool flip() noexcept { return false; }
+  virtual bool move(Qt::ArrowType direction) noexcept {
+    Q_UNUSED(direction);
+    return false;
+  }
+  virtual bool rotate(const librepcb::Angle& rotation) noexcept {
+    Q_UNUSED(rotation);
+    return false;
+  }
+  virtual bool mirror(Qt::Orientation orientation) noexcept {
+    Q_UNUSED(orientation);
+    return false;
+  }
+  virtual bool flip(Qt::Orientation orientation) noexcept {
+    Q_UNUSED(orientation);
+    return false;
+  }
+  virtual bool snapToGrid() noexcept { return false; }
   virtual bool remove() noexcept { return false; }
+  virtual bool editProperties() noexcept { return false; }
   virtual bool zoomIn() noexcept { return false; }
   virtual bool zoomOut() noexcept { return false; }
   virtual bool zoomAll() noexcept { return false; }
@@ -128,6 +167,8 @@ public slots:
   virtual bool exportPdf() noexcept;
   virtual bool print() noexcept;
   virtual bool editGridProperties() noexcept { return false; }
+  virtual bool increaseGridInterval() noexcept { return false; }
+  virtual bool decreaseGridInterval() noexcept { return false; }
 
 protected:  // Methods
   void setupInterfaceBrokenWarningWidget(QWidget& widget) noexcept;
@@ -177,10 +218,11 @@ private:  // Methods
 
 signals:
   void dirtyChanged(bool dirty);
-  void elementEdited(const FilePath& fp);
+  void elementEdited(const librepcb::FilePath& fp);
   void interfaceBrokenChanged(bool broken);
   void errorsAvailableChanged(bool hasErrors);
-  void cursorPositionChanged(const Point& pos);
+  void availableFeaturesChanged(
+      const QSet<librepcb::editor::EditorWidgetBase::Feature>& features);
 
 protected:  // Data
   Context mContext;
@@ -193,6 +235,11 @@ protected:  // Data
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
   bool mIsInterfaceBroken;
 };
+
+inline uint qHash(const EditorWidgetBase::Feature& feature,
+                  uint seed = 0) noexcept {
+  return ::qHash(static_cast<int>(feature), seed);
+}
 
 /*******************************************************************************
  *  End of File

@@ -57,6 +57,14 @@ class SymbolClipboardData;
 class SymbolEditorState_Select final : public SymbolEditorState {
   Q_OBJECT
 
+  enum class SubState {
+    IDLE,
+    SELECTING,
+    MOVING,
+    PASTING,
+    MOVING_POLYGON_VERTEX
+  };
+
 public:
   // Constructors / Destructor
   SymbolEditorState_Select() = delete;
@@ -65,10 +73,9 @@ public:
   ~SymbolEditorState_Select() noexcept;
 
   // General Methods
-  bool exit() noexcept override {
-    processAbortCommand();
-    return true;
-  }
+  bool exit() noexcept override;
+  QSet<EditorWidgetBase::Feature> getAvailableFeatures() const
+      noexcept override;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(
@@ -85,10 +92,12 @@ public:
   bool processCut() noexcept override;
   bool processCopy() noexcept override;
   bool processPaste() noexcept override;
-  bool processRotateCw() noexcept override;
-  bool processRotateCcw() noexcept override;
-  bool processMirror() noexcept override;
+  bool processMove(Qt::ArrowType direction) noexcept override;
+  bool processRotate(const Angle& rotation) noexcept override;
+  bool processMirror(Qt::Orientation orientation) noexcept override;
+  bool processSnapToGrid() noexcept override;
   bool processRemove() noexcept override;
+  bool processEditProperties() noexcept override;
   bool processImportDxf() noexcept override;
   bool processAbortCommand() noexcept override;
 
@@ -107,7 +116,8 @@ private:  // Methods
   bool mirrorSelectedItems(Qt::Orientation orientation) noexcept;
   bool snapSelectedItemsToGrid() noexcept;
   bool removeSelectedItems() noexcept;
-  void removeSelectedPolygonVertices() noexcept;
+  void removePolygonVertices(std::shared_ptr<Polygon> polygon,
+                             const QVector<int> vertices) noexcept;
   void startAddingPolygonVertex(std::shared_ptr<Polygon> polygon, int vertex,
                                 const Point& pos) noexcept;
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
@@ -115,16 +125,9 @@ private:  // Methods
   QList<std::shared_ptr<QGraphicsItem> > findItemsAtPosition(
       const Point& pos) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
+  void setState(SubState state) noexcept;
 
 private:  // Types / Data
-  enum class SubState {
-    IDLE,
-    SELECTING,
-    MOVING,
-    PASTING,
-    MOVING_POLYGON_VERTEX
-  };
-
   SubState mState;
   Point mStartPos;
   QScopedPointer<CmdDragSelectedSymbolItems> mCmdDragSelectedItems;

@@ -64,7 +64,7 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
       context.symbolGraphicsItem.getSelectedPins();
   foreach (const std::shared_ptr<SymbolPinGraphicsItem>& pin, pins) {
     Q_ASSERT(pin);
-    mPinEditCmds.append(new CmdSymbolPinEdit(*pin->getPin()));
+    mPinEditCmds.append(new CmdSymbolPinEdit(pin->getPin()));
     mCenterPos += pin->getPin()->getPosition();
     if (!pin->getPin()->getPosition().isOnGrid(grid)) {
       mHasOffTheGridElements = true;
@@ -117,6 +117,15 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
 
 CmdDragSelectedSymbolItems::~CmdDragSelectedSymbolItems() noexcept {
   deleteAllCommands();
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+int CmdDragSelectedSymbolItems::getSelectedItemsCount() const noexcept {
+  return mPinEditCmds.count() + mCircleEditCmds.count() +
+      mPolygonEditCmds.count() + mTextEditCmds.count();
 }
 
 /*******************************************************************************

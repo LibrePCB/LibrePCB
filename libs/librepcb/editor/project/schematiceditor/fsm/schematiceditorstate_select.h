@@ -43,7 +43,7 @@ class Schematic;
 
 namespace editor {
 
-class CmdMoveSelectedSchematicItems;
+class CmdDragSelectedSchematicItems;
 
 /*******************************************************************************
  *  Class SchematicEditorState_Select
@@ -72,10 +72,11 @@ public:
   virtual bool processCut() noexcept override;
   virtual bool processCopy() noexcept override;
   virtual bool processPaste() noexcept override;
-  virtual bool processRotateCw() noexcept override;
-  virtual bool processRotateCcw() noexcept override;
-  virtual bool processMirror() noexcept override;
+  virtual bool processMove(const Point& delta) noexcept override;
+  virtual bool processRotate(const Angle& rotation) noexcept override;
+  virtual bool processMirror(Qt::Orientation orientation) noexcept override;
   virtual bool processRemove() noexcept override;
+  virtual bool processEditProperties() noexcept override;
   virtual bool processAbortCommand() noexcept override;
   virtual bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept override;
@@ -96,28 +97,15 @@ public:
 private:  // Methods
   bool startMovingSelectedItems(Schematic& schematic,
                                 const Point& startPos) noexcept;
+  bool moveSelectedItems(const Point& delta) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
-  bool mirrorSelectedItems() noexcept;
+  bool mirrorSelectedItems(Qt::Orientation orientation) noexcept;
   bool removeSelectedItems() noexcept;
   bool copySelectedItemsToClipboard() noexcept;
   bool pasteFromClipboard() noexcept;
-  void openPropertiesDialog(SI_Base* item) noexcept;
+  bool openPropertiesDialog(SI_Base* item) noexcept;
   void openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept;
   void openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept;
-
-  // Right Click Menu
-  QAction* addActionCut(QMenu& menu, const QString& text = tr("Cut")) noexcept;
-  QAction* addActionCopy(QMenu& menu,
-                         const QString& text = tr("Copy")) noexcept;
-  QAction* addActionRemove(QMenu& menu,
-                           const QString& text = tr("Remove")) noexcept;
-  QAction* addActionMirror(QMenu& menu,
-                           const QString& text = tr("Mirror")) noexcept;
-  QAction* addActionRotate(QMenu& menu,
-                           const QString& text = tr("Rotate")) noexcept;
-  QAction* addActionOpenProperties(
-      QMenu& menu, SI_Base* item,
-      const QString& text = tr("Properties")) noexcept;
 
 private:  // Data
   /// enum for all possible substates
@@ -130,7 +118,7 @@ private:  // Data
 
   SubState mSubState;  ///< the current substate
   Point mStartPos;
-  QScopedPointer<CmdMoveSelectedSchematicItems> mSelectedItemsMoveCommand;
+  QScopedPointer<CmdDragSelectedSchematicItems> mSelectedItemsDragCommand;
   int mCurrentSelectionIndex;
 };
 

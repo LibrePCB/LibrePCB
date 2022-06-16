@@ -74,11 +74,9 @@ private:  // Types
 
 public:  // Types
   struct Context {
-    Workspace& workspace;
+    EditorWidgetBase::Context& editorContext;
     SymbolEditorWidget& editorWidget;
     UndoStack& undoStack;
-    bool readOnly;
-    const IF_GraphicsLayerProvider& layerProvider;
     GraphicsScene& graphicsScene;
     GraphicsView& graphicsView;
     Symbol& symbol;
@@ -95,6 +93,12 @@ public:
 
   // Getters
   EditorWidgetBase::Tool getCurrentTool() const noexcept;
+  const QSet<EditorWidgetBase::Feature>& getAvailableFeatures() const noexcept {
+    return mAvailableFeatures;
+  }
+
+  // General Methods
+  void updateAvailableFeatures() noexcept;
 
   // Event Handlers
   bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept;
@@ -110,10 +114,12 @@ public:
   bool processCut() noexcept;
   bool processCopy() noexcept;
   bool processPaste() noexcept;
-  bool processRotateCw() noexcept;
-  bool processRotateCcw() noexcept;
-  bool processMirror() noexcept;
+  bool processMove(Qt::ArrowType direction) noexcept;
+  bool processRotate(const Angle& rotation) noexcept;
+  bool processMirror(Qt::Orientation orientation) noexcept;
+  bool processSnapToGrid() noexcept;
   bool processRemove() noexcept;
+  bool processEditProperties() noexcept;
   bool processAbortCommand() noexcept;
   bool processStartSelecting() noexcept;
   bool processStartAddingSymbolPins() noexcept;
@@ -131,6 +137,7 @@ public:
 
 signals:
   void toolChanged(EditorWidgetBase::Tool newTool);
+  void availableFeaturesChanged();
 
 private:  // Methods
   SymbolEditorState* getCurrentState() const noexcept;
@@ -143,6 +150,7 @@ private:  // Data
   QMap<State, SymbolEditorState*> mStates;
   State mCurrentState;
   State mPreviousState;
+  QSet<EditorWidgetBase::Feature> mAvailableFeatures;
 };
 
 /*******************************************************************************

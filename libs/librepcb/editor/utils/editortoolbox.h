@@ -61,6 +61,27 @@ public:
    */
   static void removeFormLayoutRow(QLabel& label) noexcept;
 
+  /**
+   * @brief Set the focus to the first widget of a toolbar and iterate through
+   *
+   * - The tab order of all widgets of the passed toolbar will be configured
+   *   from left to right resp. top to bottom.
+   * - After the last widget, the tab order is followed by a custom widget.
+   * - The first widget of the passed toolbar will get the focus.
+   *
+   * Intended for the command toolbar to enter focus from the graphics view,
+   * navigate though all the toolbar widgets, and then return the focus
+   * back to the graphics view.
+   *
+   * @param toolBar               The toolbar to set the focus.
+   * @param returnFocusToWidget   Widget which shall have the focus after
+   *                              the last widget of the toolbar.
+   * @return  True if there was at least one widget and the focus has been
+   *          set. False if there was no widget and the focus was not set.
+   */
+  static bool startToolBarTabFocusCycle(QToolBar& toolBar,
+                                        QWidget& returnFocusToWidget) noexcept;
+
 private:
   /**
    * @brief Helper for #removeFormLayoutRow()

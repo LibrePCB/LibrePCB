@@ -23,6 +23,7 @@
 #include "packageeditorstate_drawpolygonbase.h"
 
 #include "../../../cmd/cmdpolygonedit.h"
+#include "../../../editorcommandset.h"
 #include "../../../widgets/angleedit.h"
 #include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
@@ -75,11 +76,18 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
 
   // populate command toolbar
+  EditorCommandSet& cmd = EditorCommandSet::instance();
   mContext.commandToolBar.addLabel(tr("Layer:"));
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
   layerComboBox->setLayers(getAllowedCircleAndPolygonLayers());
   layerComboBox->setCurrentLayer(mLastLayerName);
+  layerComboBox->addAction(
+      cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
+                               &GraphicsLayerComboBox::stepDown));
+  layerComboBox->addAction(
+      cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
+                                 &GraphicsLayerComboBox::stepUp));
   connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
           this, &PackageEditorState_DrawPolygonBase::layerComboBoxValueChanged);
   mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -90,6 +98,10 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
                           LengthEditBase::Steps::generic(),
                           "package_editor/draw_polygon/line_width");
   edtLineWidth->setValue(mLastLineWidth);
+  edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
+  edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
+      edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
   connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
           &PackageEditorState_DrawPolygonBase::lineWidthEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtLineWidth));
@@ -107,6 +119,8 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
   if (mMode != Mode::LINE) {
     std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
     fillCheckBox->setChecked(mLastFill);
+    fillCheckBox->addAction(cmd.fillToggle.createAction(
+        fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
     connect(fillCheckBox.get(), &QCheckBox::toggled, this,
             &PackageEditorState_DrawPolygonBase::fillCheckBoxCheckedChanged);
     mContext.commandToolBar.addWidget(std::move(fillCheckBox), 10);
@@ -115,6 +129,8 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
   if (mMode != Mode::LINE) {
     std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
     grabAreaCheckBox->setChecked(mLastGrabArea);
+    grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
+        grabAreaCheckBox.get(), grabAreaCheckBox.get(), &QCheckBox::toggle));
     connect(
         grabAreaCheckBox.get(), &QCheckBox::toggled, this,
         &PackageEditorState_DrawPolygonBase::grabAreaCheckBoxCheckedChanged);
@@ -135,6 +151,13 @@ bool PackageEditorState_DrawPolygonBase::exit() noexcept {
 
   mContext.graphicsView.unsetCursor();
   return true;
+}
+
+QSet<EditorWidgetBase::Feature>
+    PackageEditorState_DrawPolygonBase::getAvailableFeatures() const noexcept {
+  return {
+      EditorWidgetBase::Feature::Abort,
+  };
 }
 
 /*******************************************************************************

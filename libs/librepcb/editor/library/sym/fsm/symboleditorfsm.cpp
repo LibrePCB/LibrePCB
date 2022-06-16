@@ -98,6 +98,21 @@ EditorWidgetBase::Tool SymbolEditorFsm::getCurrentTool() const noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void SymbolEditorFsm::updateAvailableFeatures() noexcept {
+  QSet<EditorWidgetBase::Feature> features;
+  if (SymbolEditorState* state = getCurrentState()) {
+    features |= state->getAvailableFeatures();
+  }
+  if (features != mAvailableFeatures) {
+    mAvailableFeatures = features;
+    emit availableFeaturesChanged();
+  }
+}
+
+/*******************************************************************************
  *  Event Handlers
  ******************************************************************************/
 
@@ -187,25 +202,33 @@ bool SymbolEditorFsm::processPaste() noexcept {
   }
 }
 
-bool SymbolEditorFsm::processRotateCw() noexcept {
+bool SymbolEditorFsm::processMove(Qt::ArrowType direction) noexcept {
   if (getCurrentState()) {
-    return getCurrentState()->processRotateCw();
+    return getCurrentState()->processMove(direction);
   } else {
     return false;
   }
 }
 
-bool SymbolEditorFsm::processRotateCcw() noexcept {
+bool SymbolEditorFsm::processRotate(const Angle& rotation) noexcept {
   if (getCurrentState()) {
-    return getCurrentState()->processRotateCcw();
+    return getCurrentState()->processRotate(rotation);
   } else {
     return false;
   }
 }
 
-bool SymbolEditorFsm::processMirror() noexcept {
+bool SymbolEditorFsm::processMirror(Qt::Orientation orientation) noexcept {
   if (getCurrentState()) {
-    return getCurrentState()->processMirror();
+    return getCurrentState()->processMirror(orientation);
+  } else {
+    return false;
+  }
+}
+
+bool SymbolEditorFsm::processSnapToGrid() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processSnapToGrid();
   } else {
     return false;
   }
@@ -214,6 +237,14 @@ bool SymbolEditorFsm::processMirror() noexcept {
 bool SymbolEditorFsm::processRemove() noexcept {
   if (getCurrentState()) {
     return getCurrentState()->processRemove();
+  } else {
+    return false;
+  }
+}
+
+bool SymbolEditorFsm::processEditProperties() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processEditProperties();
   } else {
     return false;
   }
@@ -288,12 +319,18 @@ bool SymbolEditorFsm::setNextState(State state) noexcept {
   if (!leaveCurrentState()) {
     return false;
   }
-  return enterNextState(state);
+  const bool success = enterNextState(state);
+  updateAvailableFeatures();
+  return success;
 }
 
 bool SymbolEditorFsm::leaveCurrentState() noexcept {
-  if ((getCurrentState()) && (!getCurrentState()->exit())) {
-    return false;
+  if (SymbolEditorState* state = getCurrentState()) {
+    if (!getCurrentState()->exit()) {
+      return false;
+    }
+    disconnect(state, &SymbolEditorState::availableFeaturesChanged, this,
+               &SymbolEditorFsm::updateAvailableFeatures);
   }
   if (mCurrentState != State::SELECT) {
     // Only memorize states other than SELECT.
@@ -306,9 +343,12 @@ bool SymbolEditorFsm::leaveCurrentState() noexcept {
 
 bool SymbolEditorFsm::enterNextState(State state) noexcept {
   Q_ASSERT(mCurrentState == State::IDLE);
-  SymbolEditorState* nextState = mStates.value(state, nullptr);
-  if ((nextState) && (!nextState->entry())) {
-    return false;
+  if (SymbolEditorState* nextState = mStates.value(state, nullptr)) {
+    if (!nextState->entry()) {
+      return false;
+    }
+    connect(nextState, &SymbolEditorState::availableFeaturesChanged, this,
+            &SymbolEditorFsm::updateAvailableFeatures);
   }
   mCurrentState = state;
   emit toolChanged(getCurrentTool());

@@ -43,7 +43,10 @@
    </item>
    <item row="2" column="1">
     <widget class="QPlainTextEdit" name="edtDefaultValue">
-     <property name="placeholderText" stdset="0">
+     <property name="tabChangesFocus">
+      <bool>true</bool>
+     </property>
+     <property name="placeholderText">
       <string/>
      </property>
     </widget>

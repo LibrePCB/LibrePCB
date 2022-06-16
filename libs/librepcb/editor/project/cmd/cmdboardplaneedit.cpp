@@ -78,6 +78,11 @@ void CmdBoardPlaneEdit::translate(const Point& deltaPos,
   if (immediate) mPlane.setOutline(mNewOutline);
 }
 
+void CmdBoardPlaneEdit::snapToGrid(const PositiveLength& gridInterval,
+                                   bool immediate) noexcept {
+  setOutline(mNewOutline.mappedToGrid(gridInterval), immediate);
+}
+
 void CmdBoardPlaneEdit::rotate(const Angle& angle, const Point& center,
                                bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());

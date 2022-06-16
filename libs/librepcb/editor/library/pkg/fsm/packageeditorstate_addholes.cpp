@@ -23,6 +23,7 @@
 #include "packageeditorstate_addholes.h"
 
 #include "../../../cmd/cmdholeedit.h"
+#include "../../../editorcommandset.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../footprintgraphicsitem.h"
@@ -67,6 +68,7 @@ bool PackageEditorState_AddHoles::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
 
   // populate command toolbar
+  EditorCommandSet& cmd = EditorCommandSet::instance();
   mContext.commandToolBar.addLabel(tr("Diameter:"), 10);
 
   std::unique_ptr<PositiveLengthEdit> edtDiameter(new PositiveLengthEdit());
@@ -74,6 +76,10 @@ bool PackageEditorState_AddHoles::entry() noexcept {
                          LengthEditBase::Steps::drillDiameter(),
                          "package_editor/add_holes/diameter");
   edtDiameter->setValue(mLastDiameter);
+  edtDiameter->addAction(cmd.drillIncrease.createAction(
+      edtDiameter.get(), edtDiameter.get(), &PositiveLengthEdit::stepUp));
+  edtDiameter->addAction(cmd.drillDecrease.createAction(
+      edtDiameter.get(), edtDiameter.get(), &PositiveLengthEdit::stepDown));
   connect(edtDiameter.get(), &PositiveLengthEdit::valueChanged, this,
           &PackageEditorState_AddHoles::diameterEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtDiameter));
@@ -97,6 +103,13 @@ bool PackageEditorState_AddHoles::exit() noexcept {
 
   mContext.graphicsView.unsetCursor();
   return true;
+}
+
+QSet<EditorWidgetBase::Feature>
+    PackageEditorState_AddHoles::getAvailableFeatures() const noexcept {
+  return {
+      EditorWidgetBase::Feature::Abort,
+  };
 }
 
 /*******************************************************************************

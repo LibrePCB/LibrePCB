@@ -38,12 +38,14 @@ namespace librepcb {
 namespace editor {
 
 SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(
-    SymbolPin& pin, UndoStack& undoStack, const LengthUnit& lengthUnit,
-    const QString& settingsPrefix, QWidget* parent) noexcept
+    std::shared_ptr<SymbolPin> pin, UndoStack& undoStack,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
+    QWidget* parent) noexcept
   : QDialog(parent),
     mSymbolPin(pin),
     mUndoStack(undoStack),
     mUi(new Ui::SymbolPinPropertiesDialog) {
+  Q_ASSERT(mSymbolPin);
   mUi->setupUi(this);
   mUi->edtLength->configure(lengthUnit, LengthEditBase::Steps::pinLength(),
                             settingsPrefix % "/length");
@@ -56,11 +58,11 @@ SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(
           &SymbolPinPropertiesDialog::on_buttonBox_clicked);
 
   // load pin attributes
-  mUi->edtName->setText(*mSymbolPin.getName());
-  mUi->edtPosX->setValue(mSymbolPin.getPosition().getX());
-  mUi->edtPosY->setValue(mSymbolPin.getPosition().getY());
-  mUi->edtRotation->setValue(mSymbolPin.getRotation());
-  mUi->edtLength->setValue(mSymbolPin.getLength());
+  mUi->edtName->setText(*mSymbolPin->getName());
+  mUi->edtPosX->setValue(mSymbolPin->getPosition().getX());
+  mUi->edtPosY->setValue(mSymbolPin->getPosition().getY());
+  mUi->edtRotation->setValue(mSymbolPin->getRotation());
+  mUi->edtLength->setValue(mSymbolPin->getLength());
 
   // preselect name
   mUi->edtName->selectAll();

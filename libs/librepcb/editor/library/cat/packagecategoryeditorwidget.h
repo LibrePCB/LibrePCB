@@ -64,6 +64,9 @@ public:
                               QWidget* parent = nullptr);
   ~PackageCategoryEditorWidget() noexcept;
 
+  // Getters
+  QSet<Feature> getAvailableFeatures() const noexcept override;
+
   // Operator Overloadings
   PackageCategoryEditorWidget& operator=(
       const PackageCategoryEditorWidget& rhs) = delete;

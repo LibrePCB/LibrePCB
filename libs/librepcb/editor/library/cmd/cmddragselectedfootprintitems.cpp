@@ -139,6 +139,15 @@ CmdDragSelectedFootprintItems::~CmdDragSelectedFootprintItems() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+int CmdDragSelectedFootprintItems::getSelectedItemsCount() const noexcept {
+  return mPadEditCmds.count() + mCircleEditCmds.count() +
+      mPolygonEditCmds.count() + mTextEditCmds.count() + mHoleEditCmds.count();
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 

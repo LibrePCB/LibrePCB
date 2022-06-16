@@ -23,6 +23,9 @@
 #include "symboleditorstate_drawtextbase.h"
 
 #include "../../../cmd/cmdtextedit.h"
+#include "../../../editorcommandset.h"
+#include "../../../utils/halignactiongroup.h"
+#include "../../../utils/valignactiongroup.h"
 #include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
@@ -54,7 +57,9 @@ SymbolEditorState_DrawTextBase::SymbolEditorState_DrawTextBase(
     mCurrentText(nullptr),
     mCurrentGraphicsItem(nullptr),
     mLastLayerName(GraphicsLayer::sSymbolNames),
-    mLastHeight(1) {
+    mLastHeight(1),
+    mLastAlignment(HAlign::left(), VAlign::bottom()),
+    mLastText() {
   resetToDefaultParameters();
 }
 
@@ -69,6 +74,8 @@ SymbolEditorState_DrawTextBase::~SymbolEditorState_DrawTextBase() noexcept {
 bool SymbolEditorState_DrawTextBase::entry() noexcept {
   mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
 
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+
   // populate command toolbar
   if (mMode == Mode::TEXT) {
     mContext.commandToolBar.addLabel(tr("Layer:"));
@@ -76,6 +83,12 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
         new GraphicsLayerComboBox());
     layerComboBox->setLayers(getAllowedTextLayers());
     layerComboBox->setCurrentLayer(mLastLayerName);
+    layerComboBox->addAction(
+        cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
+                                 &GraphicsLayerComboBox::stepDown));
+    layerComboBox->addAction(
+        cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
+                                   &GraphicsLayerComboBox::stepUp));
     connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
             this, &SymbolEditorState_DrawTextBase::layerComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(layerComboBox));
@@ -91,7 +104,12 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
     textComboBox->addItem("{{AUTHOR}}");
     textComboBox->addItem("{{VERSION}}");
     textComboBox->addItem("{{PAGE_X_OF_Y}}");
-    textComboBox->setCurrentIndex(textComboBox->findText(mLastText));
+    int currentTextIndex = textComboBox->findText(mLastText);
+    if (currentTextIndex >= 0) {
+      textComboBox->setCurrentIndex(currentTextIndex);
+    } else {
+      textComboBox->setCurrentText(mLastText);
+    }
     connect(textComboBox.get(), &QComboBox::currentTextChanged, this,
             &SymbolEditorState_DrawTextBase::textComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(textComboBox));
@@ -99,15 +117,38 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
     resetToDefaultParameters();
   }
 
+  // Height spinbox.
   mContext.commandToolBar.addLabel(tr("Height:"), 10);
   std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
   edtHeight->configure(getDefaultLengthUnit(),
                        LengthEditBase::Steps::textHeight(),
                        "symbol_editor/draw_text/height");
   edtHeight->setValue(mLastHeight);
+  edtHeight->addAction(cmd.sizeIncrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepUp));
+  edtHeight->addAction(cmd.sizeDecrease.createAction(
+      edtHeight.get(), edtHeight.get(), &PositiveLengthEdit::stepDown));
   connect(edtHeight.get(), &PositiveLengthEdit::valueChanged, this,
           &SymbolEditorState_DrawTextBase::heightEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtHeight));
+
+  // Horizontal alignment
+  mContext.commandToolBar.addSeparator();
+  std::unique_ptr<HAlignActionGroup> hAlignActionGroup(new HAlignActionGroup());
+  mHAlignActionGroup = hAlignActionGroup.get();
+  hAlignActionGroup->setValue(mLastAlignment.getH());
+  connect(hAlignActionGroup.get(), &HAlignActionGroup::valueChanged, this,
+          &SymbolEditorState_DrawTextBase::hAlignActionGroupValueChanged);
+  mContext.commandToolBar.addActionGroup(std::move(hAlignActionGroup));
+
+  // Vertical alignment
+  mContext.commandToolBar.addSeparator();
+  std::unique_ptr<VAlignActionGroup> vAlignActionGroup(new VAlignActionGroup());
+  mVAlignActionGroup = vAlignActionGroup.get();
+  vAlignActionGroup->setValue(mLastAlignment.getV());
+  connect(vAlignActionGroup.get(), &VAlignActionGroup::valueChanged, this,
+          &SymbolEditorState_DrawTextBase::vAlignActionGroupValueChanged);
+  mContext.commandToolBar.addActionGroup(std::move(vAlignActionGroup));
 
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
@@ -128,6 +169,15 @@ bool SymbolEditorState_DrawTextBase::exit() noexcept {
 
   mContext.graphicsView.unsetCursor();
   return true;
+}
+
+QSet<EditorWidgetBase::Feature>
+    SymbolEditorState_DrawTextBase::getAvailableFeatures() const noexcept {
+  return {
+      EditorWidgetBase::Feature::Abort,
+      EditorWidgetBase::Feature::Rotate,
+      EditorWidgetBase::Feature::Mirror,
+  };
 }
 
 /*******************************************************************************
@@ -160,12 +210,13 @@ bool SymbolEditorState_DrawTextBase::
     processGraphicsSceneRightMouseButtonReleased(
         QGraphicsSceneMouseEvent& e) noexcept {
   Q_UNUSED(e);
-  return processRotateCcw();
+  return processRotate(Angle::deg90());
 }
 
-bool SymbolEditorState_DrawTextBase::processRotateCw() noexcept {
+bool SymbolEditorState_DrawTextBase::processRotate(
+    const Angle& rotation) noexcept {
   if (mCurrentText) {
-    mEditCmd->rotate(-Angle::deg90(), mCurrentText->getPosition(), true);
+    mEditCmd->rotate(rotation, mCurrentText->getPosition(), true);
     mLastRotation = mCurrentText->getRotation();
     return true;
   } else {
@@ -173,10 +224,18 @@ bool SymbolEditorState_DrawTextBase::processRotateCw() noexcept {
   }
 }
 
-bool SymbolEditorState_DrawTextBase::processRotateCcw() noexcept {
+bool SymbolEditorState_DrawTextBase::processMirror(
+    Qt::Orientation orientation) noexcept {
   if (mCurrentText) {
-    mEditCmd->rotate(Angle::deg90(), mCurrentText->getPosition(), true);
+    mEditCmd->mirror(orientation, mCurrentText->getPosition(), true);
     mLastRotation = mCurrentText->getRotation();
+    mLastAlignment = mCurrentText->getAlign();
+    if (mHAlignActionGroup) {
+      mHAlignActionGroup->setValue(mLastAlignment.getH());
+    }
+    if (mHAlignActionGroup) {
+      mVAlignActionGroup->setValue(mLastAlignment.getV());
+    }
     return true;
   } else {
     return false;
@@ -193,7 +252,7 @@ bool SymbolEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
     mContext.undoStack.beginCmdGroup(tr("Add symbol text"));
     mCurrentText =
         std::make_shared<Text>(Uuid::createRandom(), mLastLayerName, mLastText,
-                               pos, mLastRotation, mLastHeight, getAlignment());
+                               pos, mLastRotation, mLastHeight, mLastAlignment);
     mContext.undoStack.appendToCmdGroup(
         new CmdTextInsert(mContext.symbol.getTexts(), mCurrentText));
     mEditCmd.reset(new CmdTextEdit(*mCurrentText));
@@ -245,33 +304,29 @@ bool SymbolEditorState_DrawTextBase::abortAddText() noexcept {
 }
 
 void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
+  mLastRotation = Angle::deg0();
   switch (mMode) {
     case Mode::NAME:
       // Set all properties according library conventions
       mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolNames);
       mLastHeight = PositiveLength(2500000);
+      mLastAlignment = Alignment(HAlign::left(), VAlign::bottom());
       mLastText = "{{NAME}}";
       break;
     case Mode::VALUE:
       // Set all properties according library conventions
       mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolValues);
       mLastHeight = PositiveLength(2500000);
+      mLastAlignment = Alignment(HAlign::left(), VAlign::top());
       mLastText = "{{VALUE}}";
       break;
     default:
       // Set properties to something reasonable
       mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolOutlines);
       mLastHeight = PositiveLength(2500000);
+      mLastAlignment = Alignment(HAlign::left(), VAlign::bottom());
       mLastText = "Text";  // Non-empty to avoid invisible graphics item
       break;
-  }
-}
-
-Alignment SymbolEditorState_DrawTextBase::getAlignment() const noexcept {
-  if (mMode == Mode::VALUE) {
-    return Alignment(HAlign::left(), VAlign::top());
-  } else {
-    return Alignment(HAlign::left(), VAlign::bottom());
   }
 }
 
@@ -296,6 +351,22 @@ void SymbolEditorState_DrawTextBase::textComboBoxValueChanged(
   mLastText = value.trimmed();
   if (mEditCmd) {
     mEditCmd->setText(mLastText, true);
+  }
+}
+
+void SymbolEditorState_DrawTextBase::hAlignActionGroupValueChanged(
+    const HAlign& value) noexcept {
+  mLastAlignment.setH(value);
+  if (mEditCmd) {
+    mEditCmd->setAlignment(mLastAlignment, true);
+  }
+}
+
+void SymbolEditorState_DrawTextBase::vAlignActionGroupValueChanged(
+    const VAlign& value) noexcept {
+  mLastAlignment.setV(value);
+  if (mEditCmd) {
+    mEditCmd->setAlignment(mLastAlignment, true);
   }
 }
 

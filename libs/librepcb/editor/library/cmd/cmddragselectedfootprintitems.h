@@ -61,6 +61,7 @@ public:
   ~CmdDragSelectedFootprintItems() noexcept;
 
   // Getters
+  int getSelectedItemsCount() const noexcept;
   bool hasOffTheGridElements() const noexcept { return mHasOffTheGridElements; }
 
   // General Methods

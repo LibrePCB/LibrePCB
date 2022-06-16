@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "halignactiongroup.h"
 
+#include "../editorcommandset.h"
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -34,21 +36,17 @@ namespace editor {
 
 HAlignActionGroup::HAlignActionGroup(QWidget* parent) noexcept
   : QActionGroup(parent), mValue(HAlign::left()) {
-  QAction* left =
-      addAction(QIcon(":img/command_toolbars/align_horizontal_left.png"),
-                tr("Align left"));
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+
+  QAction* left = cmd.alignHorizontalLeft.createAction(this);
   left->setCheckable(true);
   left->setData(QVariant::fromValue(HAlign::left()));
 
-  QAction* center =
-      addAction(QIcon(":img/command_toolbars/align_horizontal_center.png"),
-                tr("Align center"));
+  QAction* center = cmd.alignHorizontalCenter.createAction(this);
   center->setCheckable(true);
   center->setData(QVariant::fromValue(HAlign::center()));
 
-  QAction* right =
-      addAction(QIcon(":img/command_toolbars/align_horizontal_right.png"),
-                tr("Align right"));
+  QAction* right = cmd.alignHorizontalRight.createAction(this);
   right->setCheckable(true);
   right->setData(QVariant::fromValue(HAlign::right()));
 

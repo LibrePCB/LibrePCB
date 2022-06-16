@@ -22,7 +22,9 @@
  ******************************************************************************/
 #include "schematiceditorstate_drawwire.h"
 
+#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
+#include "../../../utils/toolbarproxy.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdchangenetsignalofschematicnetsegment.h"
 #include "../../cmd/cmdcombineschematicnetsegments.h"
@@ -61,7 +63,7 @@ SchematicEditorState_DrawWire::SchematicEditorState_DrawWire(
   : SchematicEditorState(context),
     mCircuit(context.project.getCircuit()),
     mSubState(SubState::IDLE),
-    mWireMode(WireMode_HV),
+    mCurrentWireMode(WireMode::HV),
     mCursorPos(),
     mFixedStartAnchor(nullptr),
     mPositioningNetLine1(nullptr),
@@ -88,37 +90,39 @@ bool SchematicEditorState_DrawWire::entry() noexcept {
   }
 
   // Add wire mode actions to the "command" toolbar
-  mWireModeActions.insert(
-      WireMode_HV,
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/wire_h_v.png"), ""));
-  mWireModeActions.insert(
-      WireMode_VH,
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/wire_v_h.png"), ""));
-  mWireModeActions.insert(
-      WireMode_9045,
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/wire_90_45.png"), ""));
-  mWireModeActions.insert(
-      WireMode_4590,
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/wire_45_90.png"), ""));
-  mWireModeActions.insert(
-      WireMode_Straight,
-      mContext.editorUi.commandToolbar->addAction(
-          QIcon(":/img/command_toolbars/wire_straight.png"), ""));
-  mActionSeparators.append(mContext.editorUi.commandToolbar->addSeparator());
-  updateWireModeActionsCheckedState();
-
-  // connect the wire mode actions with the slot
-  // updateWireModeActionsCheckedState()
-  foreach (WireMode mode, mWireModeActions.keys()) {
-    connect(mWireModeActions.value(mode), &QAction::triggered, [this, mode]() {
-      mWireMode = mode;
-      updateWireModeActionsCheckedState();
-    });
-  }
+  EditorCommandSet& cmd = EditorCommandSet::instance();
+  mWireModeActionGroup = new QActionGroup(&mContext.commandToolBar);
+  QAction* aWireModeHV = cmd.wireModeHV.createAction(
+      mWireModeActionGroup, this, [this]() { wireModeChanged(WireMode::HV); });
+  aWireModeHV->setCheckable(true);
+  aWireModeHV->setChecked(mCurrentWireMode == WireMode::HV);
+  aWireModeHV->setActionGroup(mWireModeActionGroup);
+  QAction* aWireModeVH = cmd.wireModeVH.createAction(
+      mWireModeActionGroup, this, [this]() { wireModeChanged(WireMode::VH); });
+  aWireModeVH->setCheckable(true);
+  aWireModeVH->setChecked(mCurrentWireMode == WireMode::VH);
+  aWireModeVH->setActionGroup(mWireModeActionGroup);
+  QAction* aWireMode9045 = cmd.wireMode9045.createAction(
+      mWireModeActionGroup, this,
+      [this]() { wireModeChanged(WireMode::Deg9045); });
+  aWireMode9045->setCheckable(true);
+  aWireMode9045->setChecked(mCurrentWireMode == WireMode::Deg9045);
+  aWireMode9045->setActionGroup(mWireModeActionGroup);
+  QAction* aWireMode4590 = cmd.wireMode4590.createAction(
+      mWireModeActionGroup, this,
+      [this]() { wireModeChanged(WireMode::Deg4590); });
+  aWireMode4590->setCheckable(true);
+  aWireMode4590->setChecked(mCurrentWireMode == WireMode::Deg4590);
+  aWireMode4590->setActionGroup(mWireModeActionGroup);
+  QAction* aWireModeStraight = cmd.wireModeStraight.createAction(
+      mWireModeActionGroup, this,
+      [this]() { wireModeChanged(WireMode::Straight); });
+  aWireModeStraight->setCheckable(true);
+  aWireModeStraight->setChecked(mCurrentWireMode == WireMode::Straight);
+  aWireModeStraight->setActionGroup(mWireModeActionGroup);
+  mContext.commandToolBar.addActionGroup(
+      std::unique_ptr<QActionGroup>(mWireModeActionGroup));
+  mContext.commandToolBar.addSeparator();
 
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
@@ -131,10 +135,7 @@ bool SchematicEditorState_DrawWire::exit() noexcept {
   }
 
   // Remove actions / widgets from the "command" toolbar
-  qDeleteAll(mWireModeActions);
-  mWireModeActions.clear();
-  qDeleteAll(mActionSeparators);
-  mActionSeparators.clear();
+  mContext.commandToolBar.clear();
 
   mContext.editorGraphicsView.unsetCursor();
   return true;
@@ -253,13 +254,15 @@ bool SchematicEditorState_DrawWire::
   mCursorPos = Point::fromPx(e.scenePos());
 
   if (mSubState == SubState::POSITIONING_NETPOINT) {
-    // Only switch to next wire mode if cursor was not moved during click
-    if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
-      mWireMode = static_cast<WireMode>(mWireMode + 1);
-      if (mWireMode == WireMode_COUNT) mWireMode = static_cast<WireMode>(0);
-      updateWireModeActionsCheckedState();
-      bool snap = !e.modifiers().testFlag(Qt::ShiftModifier);
-      updateNetpointPositions(*schematic, snap);
+    // Only switch to next wire mode if cursor was not moved during click.
+    if ((mWireModeActionGroup) &&
+        (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton))) {
+      int index = mWireModeActionGroup->actions().indexOf(
+          mWireModeActionGroup->checkedAction());
+      index = (index + 1) % mWireModeActionGroup->actions().count();
+      QAction* newAction = mWireModeActionGroup->actions().value(index);
+      Q_ASSERT(newAction);
+      newAction->trigger();
     }
 
     // Always accept the event if we are drawing a wire! When ignoring the
@@ -672,17 +675,18 @@ Point SchematicEditorState_DrawWire::updateNetpointPositions(
     }
   }
 
-  mPositioningNetPoint1->setPosition(
-      calcMiddlePointPos(mFixedStartAnchor->getPosition(), pos, mWireMode));
+  mPositioningNetPoint1->setPosition(calcMiddlePointPos(
+      mFixedStartAnchor->getPosition(), pos, mCurrentWireMode));
   mPositioningNetPoint2->setPosition(pos);
   return pos;
 }
 
-void SchematicEditorState_DrawWire::
-    updateWireModeActionsCheckedState() noexcept {
-  foreach (WireMode key, mWireModeActions.keys()) {
-    mWireModeActions.value(key)->setCheckable(key == mWireMode);
-    mWireModeActions.value(key)->setChecked(key == mWireMode);
+void SchematicEditorState_DrawWire::wireModeChanged(WireMode mode) noexcept {
+  mCurrentWireMode = mode;
+  if (mSubState == SubState::POSITIONING_NETPOINT) {
+    if (Schematic* schematic = getActiveSchematic()) {
+      updateNetpointPositions(*schematic, true);
+    }
   }
 }
 
@@ -692,11 +696,11 @@ Point SchematicEditorState_DrawWire::calcMiddlePointPos(const Point& p1,
     noexcept {
   Point delta = p2 - p1;
   switch (mode) {
-    case WireMode_HV:
+    case WireMode::HV:
       return Point(p2.getX(), p1.getY());
-    case WireMode_VH:
+    case WireMode::VH:
       return Point(p1.getX(), p2.getY());
-    case WireMode_9045:
+    case WireMode::Deg9045:
       if (delta.getX().abs() >= delta.getY().abs())
         return Point(
             p2.getX() - delta.getY().abs() * (delta.getX() >= 0 ? 1 : -1),
@@ -705,7 +709,7 @@ Point SchematicEditorState_DrawWire::calcMiddlePointPos(const Point& p1,
         return Point(
             p1.getX(),
             p2.getY() - delta.getX().abs() * (delta.getY() >= 0 ? 1 : -1));
-    case WireMode_4590:
+    case WireMode::Deg4590:
       if (delta.getX().abs() >= delta.getY().abs())
         return Point(
             p1.getX() + delta.getY().abs() * (delta.getX() >= 0 ? 1 : -1),
@@ -714,7 +718,7 @@ Point SchematicEditorState_DrawWire::calcMiddlePointPos(const Point& p1,
         return Point(
             p2.getX(),
             p1.getY() + delta.getX().abs() * (delta.getY() >= 0 ? 1 : -1));
-    case WireMode_Straight:
+    case WireMode::Straight:
       return p1;
     default:
       Q_ASSERT(false);

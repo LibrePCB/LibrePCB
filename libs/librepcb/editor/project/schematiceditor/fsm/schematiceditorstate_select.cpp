@@ -25,13 +25,13 @@
 #include "../../../cmd/cmdpolygonedit.h"
 #include "../../../dialogs/polygonpropertiesdialog.h"
 #include "../../../dialogs/textpropertiesdialog.h"
+#include "../../../editorcommandset.h"
 #include "../../../undostack.h"
+#include "../../../utils/menubuilder.h"
 #include "../../../widgets/graphicsview.h"
-#include "../../cmd/cmdmirrorselectedschematicitems.h"
-#include "../../cmd/cmdmoveselectedschematicitems.h"
+#include "../../cmd/cmddragselectedschematicitems.h"
 #include "../../cmd/cmdpasteschematicitems.h"
 #include "../../cmd/cmdremoveselectedschematicitems.h"
-#include "../../cmd/cmdrotateselectedschematicitems.h"
 #include "../renamenetsegmentdialog.h"
 #include "../schematicclipboarddatabuilder.h"
 #include "../symbolinstancepropertiesdialog.h"
@@ -40,6 +40,7 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/schematicselectionquery.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -62,7 +63,7 @@ SchematicEditorState_Select::SchematicEditorState_Select(
 }
 
 SchematicEditorState_Select::~SchematicEditorState_Select() noexcept {
-  Q_ASSERT(mSelectedItemsMoveCommand.isNull());
+  Q_ASSERT(mSelectedItemsDragCommand.isNull());
 }
 
 /*******************************************************************************
@@ -83,7 +84,7 @@ bool SchematicEditorState_Select::exit() noexcept {
     }
   }
 
-  mSelectedItemsMoveCommand.reset();
+  mSelectedItemsDragCommand.reset();
   mSubState = SubState::IDLE;
   return true;
 }
@@ -123,28 +124,21 @@ bool SchematicEditorState_Select::processPaste() noexcept {
   return false;
 }
 
-bool SchematicEditorState_Select::processRotateCw() noexcept {
+bool SchematicEditorState_Select::processMove(const Point& delta) noexcept {
   if (mSubState == SubState::IDLE) {
-    rotateSelectedItems(-Angle::deg90());
-    return true;
+    return moveSelectedItems(delta);
   }
   return false;
 }
 
-bool SchematicEditorState_Select::processRotateCcw() noexcept {
-  if (mSubState == SubState::IDLE) {
-    rotateSelectedItems(Angle::deg90());
-    return true;
-  }
-  return false;
+bool SchematicEditorState_Select::processRotate(
+    const Angle& rotation) noexcept {
+  return rotateSelectedItems(rotation);
 }
 
-bool SchematicEditorState_Select::processMirror() noexcept {
-  if (mSubState == SubState::IDLE) {
-    mirrorSelectedItems();
-    return true;
-  }
-  return false;
+bool SchematicEditorState_Select::processMirror(
+    Qt::Orientation orientation) noexcept {
+  return mirrorSelectedItems(orientation);
 }
 
 bool SchematicEditorState_Select::processRemove() noexcept {
@@ -155,18 +149,37 @@ bool SchematicEditorState_Select::processRemove() noexcept {
   return false;
 }
 
+bool SchematicEditorState_Select::processEditProperties() noexcept {
+  Schematic* schematic = getActiveSchematic();
+  if ((!schematic) || (mSubState != SubState::IDLE)) {
+    return false;
+  }
+
+  std::unique_ptr<SchematicSelectionQuery> query =
+      schematic->createSelectionQuery();
+  query->addSelectedSymbols();
+  query->addSelectedNetLabels();
+  foreach (auto ptr, query->getSymbols()) { return openPropertiesDialog(ptr); }
+  foreach (auto ptr, query->getNetLabels()) {
+    return openPropertiesDialog(ptr);
+  }
+  return false;
+}
+
 bool SchematicEditorState_Select::processAbortCommand() noexcept {
-  if (mSubState == SubState::PASTING) {
-    // abort pasting items
-    Q_ASSERT(!mSelectedItemsMoveCommand.isNull());
-    try {
-      mContext.undoStack.abortCmdGroup();
-      mSelectedItemsMoveCommand.reset();
-      mSubState = SubState::IDLE;
-    } catch (Exception& e) {
-      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  try {
+    switch (mSubState) {
+      case SubState::PASTING: {
+        Q_ASSERT(!mSelectedItemsDragCommand.isNull());
+        mContext.undoStack.abortCmdGroup();
+        mSelectedItemsDragCommand.reset();
+        mSubState = SubState::IDLE;
+        return true;
+      }
+      default: { break; }
     }
-    return true;
+  } catch (Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return false;
 }
@@ -186,9 +199,9 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
 
     case SubState::MOVING:
     case SubState::PASTING: {
-      Q_ASSERT(!mSelectedItemsMoveCommand.isNull());
+      Q_ASSERT(!mSelectedItemsDragCommand.isNull());
       Point pos = Point::fromPx(e.scenePos());
-      mSelectedItemsMoveCommand->setCurrentPosition(pos);
+      mSelectedItemsDragCommand->setCurrentPosition(pos);
       return true;
     }
 
@@ -240,17 +253,17 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     }
   } else if (mSubState == SubState::PASTING) {
     // stop moving items (set position of all selected elements permanent)
-    Q_ASSERT(!mSelectedItemsMoveCommand.isNull());
+    Q_ASSERT(!mSelectedItemsDragCommand.isNull());
     Point pos = Point::fromPx(mouseEvent.scenePos());
-    mSelectedItemsMoveCommand->setCurrentPosition(pos);
+    mSelectedItemsDragCommand->setCurrentPosition(pos);
     try {
       mContext.undoStack.appendToCmdGroup(
-          mSelectedItemsMoveCommand.take());  // can throw
+          mSelectedItemsDragCommand.take());  // can throw
       mContext.undoStack.commitCmdGroup();
     } catch (Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
-    mSelectedItemsMoveCommand.reset();
+    mSelectedItemsDragCommand.reset();
     mSubState = SubState::IDLE;
   }
 
@@ -269,15 +282,15 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     return true;
   } else if (mSubState == SubState::MOVING) {
     // stop moving items (set position of all selected elements permanent)
-    Q_ASSERT(!mSelectedItemsMoveCommand.isNull());
+    Q_ASSERT(!mSelectedItemsDragCommand.isNull());
     Point pos = Point::fromPx(e.scenePos());
-    mSelectedItemsMoveCommand->setCurrentPosition(pos);
+    mSelectedItemsDragCommand->setCurrentPosition(pos);
     try {
-      execCmd(mSelectedItemsMoveCommand.take());  // can throw
+      execCmd(mSelectedItemsDragCommand.take());  // can throw
     } catch (Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
-    mSelectedItemsMoveCommand.reset();
+    mSelectedItemsDragCommand.reset();
     mSubState = SubState::IDLE;
   }
 
@@ -297,7 +310,9 @@ bool SchematicEditorState_Select::
     if (items.isEmpty()) return false;
 
     // open the properties editor dialog of the top most item
-    openPropertiesDialog(items.first());
+    if (openPropertiesDialog(items.first())) {
+      return true;
+    }
   }
 
   return false;
@@ -305,13 +320,17 @@ bool SchematicEditorState_Select::
 
 bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
+  if (mSelectedItemsDragCommand) {
+    return rotateSelectedItems(Angle::deg90());
+  }
+
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
   if (mSubState != SubState::IDLE) return false;
 
   // handle item selection
-  QList<SI_Base*> items =
-      schematic->getItemsAtScenePos(Point::fromPx(e.scenePos()));
+  Point pos = Point::fromPx(e.scenePos());
+  QList<SI_Base*> items = schematic->getItemsAtScenePos(pos);
   if (items.isEmpty()) return false;
   SI_Base* selectedItem = nullptr;
   foreach (SI_Base* item, items) {
@@ -329,19 +348,36 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
   // build the context menu
   QMenu menu;
+  MenuBuilder mb(&menu);
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
   switch (selectedItem->getType()) {
     case SI_Base::Type_t::Symbol: {
       SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(selectedItem);
       Q_ASSERT(symbol);
 
-      addActionCut(menu);
-      addActionCopy(menu);
-      addActionRemove(menu, tr("Remove Symbol"));
-      menu.addSeparator();
-      addActionRotate(menu);
-      addActionMirror(menu);
-      menu.addSeparator();
-      addActionOpenProperties(menu, selectedItem);
+      mb.addAction(
+          cmd.properties.createAction(
+              &menu, this,
+              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+          MenuBuilder::Flag::DefaultAction);
+      mb.addSeparator();
+      mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
+        copySelectedItemsToClipboard();
+        removeSelectedItems();
+      }));
+      mb.addAction(cmd.clipboardCopy.createAction(
+          &menu, this, [this]() { copySelectedItemsToClipboard(); }));
+      mb.addAction(cmd.remove.createAction(
+          &menu, this, [this]() { removeSelectedItems(); }));
+      mb.addSeparator();
+      mb.addAction(cmd.rotateCcw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+      mb.addAction(cmd.rotateCw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+      mb.addAction(cmd.mirrorHorizontal.createAction(
+          &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
+      mb.addAction(cmd.mirrorVertical.createAction(
+          &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
       break;
     }
 
@@ -349,16 +385,30 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(selectedItem);
       Q_ASSERT(netlabel);
 
-      addActionRotate(menu);
-      addActionRemove(menu, tr("Remove Net Label"));
-      menu.addSeparator();
-      addActionOpenProperties(menu, selectedItem, tr("Rename Net Segment"));
+      mb.addAction(
+          cmd.properties.createAction(
+              &menu, this,
+              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+          MenuBuilder::Flag::DefaultAction);
+      mb.addSeparator();
+      mb.addAction(cmd.remove.createAction(
+          &menu, this, [this]() { removeSelectedItems(); }));
+      mb.addSeparator();
+      mb.addAction(cmd.rotateCcw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+      mb.addAction(cmd.rotateCw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+      mb.addAction(cmd.mirrorHorizontal.createAction(
+          &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
+      mb.addAction(cmd.mirrorVertical.createAction(
+          &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
       break;
     }
 
     default:
       return false;
   }
+
   // execute the context menu
   menu.exec(e.screenPos());
   return true;
@@ -376,41 +426,66 @@ bool SchematicEditorState_Select::processSwitchToSchematicPage(
 
 bool SchematicEditorState_Select::startMovingSelectedItems(
     Schematic& schematic, const Point& startPos) noexcept {
-  Q_ASSERT(mSelectedItemsMoveCommand.isNull());
-  mSelectedItemsMoveCommand.reset(
-      new CmdMoveSelectedSchematicItems(schematic, startPos));
+  Q_ASSERT(mSelectedItemsDragCommand.isNull());
+  mSelectedItemsDragCommand.reset(
+      new CmdDragSelectedSchematicItems(schematic, startPos));
   mSubState = SubState::MOVING;
   return true;
 }
 
-bool SchematicEditorState_Select::rotateSelectedItems(
-    const Angle& angle) noexcept {
+bool SchematicEditorState_Select::moveSelectedItems(
+    const Point& delta) noexcept {
   Schematic* schematic = getActiveSchematic();
-  Q_ASSERT(schematic);
-  if (!schematic) return false;
+  if ((!schematic) || (mSelectedItemsDragCommand)) return false;
 
   try {
-    CmdRotateSelectedSchematicItems* cmd =
-        new CmdRotateSelectedSchematicItems(*schematic, angle);
-    execCmd(cmd);
-    return true;
-  } catch (Exception& e) {
+    QScopedPointer<CmdDragSelectedSchematicItems> cmd(
+        new CmdDragSelectedSchematicItems(*schematic, Point(0, 0)));
+    cmd->setCurrentPosition(delta);
+    return execCmd(cmd.take());
+  } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
 }
 
-bool SchematicEditorState_Select::mirrorSelectedItems() noexcept {
+bool SchematicEditorState_Select::rotateSelectedItems(
+    const Angle& angle) noexcept {
   Schematic* schematic = getActiveSchematic();
-  Q_ASSERT(schematic);
   if (!schematic) return false;
 
   try {
-    CmdMirrorSelectedSchematicItems* cmd =
-        new CmdMirrorSelectedSchematicItems(*schematic, Qt::Horizontal);
-    execCmd(cmd);
+    if (mSelectedItemsDragCommand) {
+      mSelectedItemsDragCommand->rotate(angle, true);
+    } else {
+      QScopedPointer<CmdDragSelectedSchematicItems> cmd(
+          new CmdDragSelectedSchematicItems(*schematic));
+      cmd->rotate(angle, true);
+      execCmd(cmd.take());
+    }
     return true;
-  } catch (Exception& e) {
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    return false;
+  }
+}
+
+bool SchematicEditorState_Select::mirrorSelectedItems(
+    Qt::Orientation orientation) noexcept {
+  Schematic* schematic = getActiveSchematic();
+  if (!schematic) return false;
+
+  try {
+    if (mSelectedItemsDragCommand) {
+      mSelectedItemsDragCommand->mirror(orientation, true);
+    } else {
+      QScopedPointer<CmdDragSelectedSchematicItems> cmd(
+          new CmdDragSelectedSchematicItems(*schematic));
+      cmd->mirror(orientation, true);
+      execCmd(cmd.take());
+    }
+    return true;
+  } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
@@ -418,7 +493,6 @@ bool SchematicEditorState_Select::mirrorSelectedItems() noexcept {
 
 bool SchematicEditorState_Select::removeSelectedItems() noexcept {
   Schematic* schematic = getActiveSchematic();
-  Q_ASSERT(schematic);
   if (!schematic) return false;
 
   try {
@@ -426,7 +500,7 @@ bool SchematicEditorState_Select::removeSelectedItems() noexcept {
         new CmdRemoveSelectedSchematicItems(*schematic);
     execCmd(cmd);
     return true;
-  } catch (Exception& e) {
+  } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     return false;
   }
@@ -442,7 +516,7 @@ bool SchematicEditorState_Select::copySelectedItemsToClipboard() noexcept {
     SchematicClipboardDataBuilder builder(*schematic);
     std::unique_ptr<SchematicClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
-  } catch (Exception& e) {
+  } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
   return true;
@@ -478,8 +552,8 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
 
     if (mContext.undoStack.appendToCmdGroup(cmd.take())) {  // can throw
       // start moving the selected items
-      mSelectedItemsMoveCommand.reset(
-          new CmdMoveSelectedSchematicItems(*schematic, mStartPos));
+      mSelectedItemsDragCommand.reset(
+          new CmdDragSelectedSchematicItems(*schematic, mStartPos));
       return true;
     } else {
       // no items pasted -> abort
@@ -488,7 +562,7 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
     }
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-    mSelectedItemsMoveCommand.reset();
+    mSelectedItemsDragCommand.reset();
     if (mSubState == SubState::PASTING) {
       try {
         mContext.undoStack.abortCmdGroup();
@@ -500,26 +574,28 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
   return false;
 }
 
-void SchematicEditorState_Select::openPropertiesDialog(SI_Base* item) noexcept {
-  if (!item) return;
+bool SchematicEditorState_Select::openPropertiesDialog(SI_Base* item) noexcept {
+  if (!item) {
+    return false;
+  }
+
   switch (item->getType()) {
     case SI_Base::Type_t::Symbol: {
       SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item);
       Q_ASSERT(symbol);
       openSymbolPropertiesDialog(*symbol);
-      break;
+      return true;
     }
-
     case SI_Base::Type_t::NetLabel: {
       SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item);
       Q_ASSERT(netlabel);
       openNetLabelPropertiesDialog(*netlabel);
-      break;
+      return true;
     }
-
     default:
       break;
   }
+  return false;
 }
 
 void SchematicEditorState_Select::openSymbolPropertiesDialog(
@@ -536,56 +612,6 @@ void SchematicEditorState_Select::openNetLabelPropertiesDialog(
   RenameNetSegmentDialog dialog(mContext.undoStack, netlabel.getNetSegment(),
                                 parentWidget());
   dialog.exec();  // performs the rename, if needed
-}
-
-QAction* SchematicEditorState_Select::addActionCut(
-    QMenu& menu, const QString& text) noexcept {
-  QAction* action = menu.addAction(QIcon(":/img/actions/cut.png"), text);
-  connect(action, &QAction::triggered, [this]() {
-    copySelectedItemsToClipboard();
-    removeSelectedItems();
-  });
-  return action;
-}
-
-QAction* SchematicEditorState_Select::addActionCopy(
-    QMenu& menu, const QString& text) noexcept {
-  QAction* action = menu.addAction(QIcon(":/img/actions/copy.png"), text);
-  connect(action, &QAction::triggered,
-          [this]() { copySelectedItemsToClipboard(); });
-  return action;
-}
-
-QAction* SchematicEditorState_Select::addActionRemove(
-    QMenu& menu, const QString& text) noexcept {
-  QAction* action = menu.addAction(QIcon(":/img/actions/delete.png"), text);
-  connect(action, &QAction::triggered, [this]() { removeSelectedItems(); });
-  return action;
-}
-
-QAction* SchematicEditorState_Select::addActionMirror(
-    QMenu& menu, const QString& text) noexcept {
-  QAction* action =
-      menu.addAction(QIcon(":/img/actions/flip_horizontal.png"), text);
-  connect(action, &QAction::triggered, [this]() { mirrorSelectedItems(); });
-  return action;
-}
-
-QAction* SchematicEditorState_Select::addActionRotate(
-    QMenu& menu, const QString& text) noexcept {
-  QAction* action =
-      menu.addAction(QIcon(":/img/actions/rotate_left.png"), text);
-  connect(action, &QAction::triggered,
-          [this]() { rotateSelectedItems(Angle::deg90()); });
-  return action;
-}
-
-QAction* SchematicEditorState_Select::addActionOpenProperties(
-    QMenu& menu, SI_Base* item, const QString& text) noexcept {
-  QAction* action = menu.addAction(QIcon(":/img/actions/settings.png"), text);
-  connect(action, &QAction::triggered,
-          [this, item]() { openPropertiesDialog(item); });
-  return action;
 }
 
 /*******************************************************************************

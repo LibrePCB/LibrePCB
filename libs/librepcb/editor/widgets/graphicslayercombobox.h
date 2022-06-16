@@ -61,6 +61,11 @@ public:
   // Setters
   void setLayers(const QList<GraphicsLayer*>& layers) noexcept;
   void setCurrentLayer(const GraphicsLayerName& name) noexcept;
+  void setCurrentLayer(const QString& name) noexcept;
+
+  // General Methods
+  void stepUp() noexcept;
+  void stepDown() noexcept;
 
   // Operator Overloadings
   GraphicsLayerComboBox& operator=(const GraphicsLayerComboBox& rhs) = delete;

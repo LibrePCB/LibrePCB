@@ -104,6 +104,9 @@ public:
   // Static Methods
   static Application* instance() noexcept;
 
+signals:
+  void quitTriggered();
+
 private:  // Methods
   void removeAllTranslators() noexcept;
 

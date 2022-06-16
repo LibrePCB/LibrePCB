@@ -37,6 +37,7 @@ namespace librepcb {
 
 class GraphicsLayer;
 class LengthUnit;
+class Point;
 class Schematic;
 
 namespace editor {
@@ -79,10 +80,20 @@ public:
   virtual bool processCut() noexcept { return false; }
   virtual bool processCopy() noexcept { return false; }
   virtual bool processPaste() noexcept { return false; }
-  virtual bool processRotateCw() noexcept { return false; }
-  virtual bool processRotateCcw() noexcept { return false; }
-  virtual bool processMirror() noexcept { return false; }
+  virtual bool processMove(const Point& delta) noexcept {
+    Q_UNUSED(delta);
+    return false;
+  }
+  virtual bool processRotate(const Angle& rotation) noexcept {
+    Q_UNUSED(rotation);
+    return false;
+  }
+  virtual bool processMirror(Qt::Orientation orientation) noexcept {
+    Q_UNUSED(orientation);
+    return false;
+  }
   virtual bool processRemove() noexcept { return false; }
+  virtual bool processEditProperties() noexcept { return false; }
   virtual bool processAbortCommand() noexcept { return false; }
   virtual bool processKeyPressed(const QKeyEvent& e) noexcept {
     Q_UNUSED(e);
