@@ -22,8 +22,11 @@
  ******************************************************************************/
 #include "workspacesettingsdialog.h"
 
+#include "../editorcommandset.h"
 #include "../modelview/comboboxdelegate.h"
 #include "../modelview/editablelistmodel.h"
+#include "../modelview/keyboardshortcutsmodel.h"
+#include "../modelview/keysequencedelegate.h"
 #include "ui_workspacesettingsdialog.h"
 
 #include <librepcb/core/application.h>
@@ -53,8 +56,12 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mLibLocaleOrderModel(new LibraryLocaleOrderModel()),
     mLibNormOrderModel(new LibraryNormOrderModel()),
     mRepositoryUrlsModel(new RepositoryUrlModel()),
+    mKeyboardShortcutsModel(new KeyboardShortcutsModel(this)),
+    mKeyboardShortcutsFilterModel(new QSortFilterProxyModel(this)),
     mUi(new Ui::WorkspaceSettingsDialog) {
   mUi->setupUi(this);
+
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Initialize application locale widgets
   {
@@ -141,6 +148,43 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
             mRepositoryUrlsModel.data(), &RepositoryUrlModel::moveItemDown);
   }
 
+  // Initialize keyboard shortcuts widgets
+  {
+    mKeyboardShortcutsFilterModel->setSourceModel(
+        mKeyboardShortcutsModel.data());
+    mKeyboardShortcutsFilterModel->setFilterCaseSensitivity(
+        Qt::CaseInsensitive);
+    mKeyboardShortcutsFilterModel->setFilterKeyColumn(-1);  // All columns.
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 10, 0))
+    mKeyboardShortcutsFilterModel->setRecursiveFilteringEnabled(true);
+#else
+    // Filtering would be more complicated with Qt < 5.10, not really worth
+    // the effort. Thus simply don't provide the filter feature.
+    mUi->line->hide();
+    mUi->edtCommandFilter->hide();
+#endif
+    connect(mUi->edtCommandFilter, &QLineEdit::textChanged,
+            mKeyboardShortcutsFilterModel.data(),
+            &QSortFilterProxyModel::setFilterFixedString);
+    connect(mUi->edtCommandFilter, &QLineEdit::textChanged,
+            mUi->treeKeyboardShortcuts, &QTreeView::expandAll);
+    mUi->treeKeyboardShortcuts->setModel(mKeyboardShortcutsFilterModel.data());
+    mUi->treeKeyboardShortcuts->header()->setMinimumSectionSize(
+        QKeySequenceEdit().sizeHint().width());
+    mUi->treeKeyboardShortcuts->header()->setSectionResizeMode(
+        0, QHeaderView::ResizeToContents);
+    mUi->treeKeyboardShortcuts->header()->setSectionResizeMode(
+        1, QHeaderView::Stretch);
+    mUi->treeKeyboardShortcuts->header()->setSectionResizeMode(
+        2, QHeaderView::ResizeToContents);
+    KeySequenceDelegate* delegate = new KeySequenceDelegate(this);
+    mUi->treeKeyboardShortcuts->setItemDelegateForColumn(2, delegate);
+    mUi->treeKeyboardShortcuts->addAction(cmd.find.createAction(
+        this, this,
+        [this]() { mUi->edtCommandFilter->setFocus(Qt::ShortcutFocusReason); },
+        EditorCommand::ActionFlag::WidgetShortcut));
+  }
+
   // Now load all current settings
   loadSettings();
 
@@ -208,6 +252,18 @@ void WorkspaceSettingsDialog::buttonBoxClicked(
   }
 }
 
+void WorkspaceSettingsDialog::keyPressEvent(QKeyEvent* event) noexcept {
+  // If the keyboard shortcuts tab is opened and a filter is active, discard
+  // the filter with the escape key.
+  if ((event->key() == Qt::Key_Escape) &&
+      (mUi->tabWidget->currentWidget() == mUi->keyboardShortcutsTab) &&
+      (!mUi->edtCommandFilter->text().isEmpty())) {
+    mUi->edtCommandFilter->clear();
+    return;
+  }
+  QDialog::keyPressEvent(event);
+}
+
 void WorkspaceSettingsDialog::loadSettings() noexcept {
   // User Name
   mUi->edtUserName->setText(mSettings.userName.get());
@@ -239,6 +295,10 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
 
   // Repository URLs
   mRepositoryUrlsModel->setValues(mSettings.repositoryUrls.get());
+
+  // Keyboard Shortcuts
+  mKeyboardShortcutsModel->setOverrides(mSettings.keyboardShortcuts.get());
+  mUi->treeKeyboardShortcuts->expandAll();
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -273,6 +333,9 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 
     // Repository URLs
     mSettings.repositoryUrls.set(mRepositoryUrlsModel->getValues());
+
+    // Keyboard shortcuts
+    mSettings.keyboardShortcuts.set(mKeyboardShortcutsModel->getOverrides());
 
     // Save settings to disk.
     mWorkspace.saveSettings();  // can throw

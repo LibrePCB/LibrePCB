@@ -27,6 +27,7 @@
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
+#include <librepcb/editor/editorcommandset.h>
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
@@ -257,6 +258,25 @@ static int openWorkspace(FilePath& path) {
     QLocale::setDefault(locale);
     qApp->setTranslationLocale(locale);
   }
+
+  // Apply keyboard shortcuts from workspace settings globally.
+  auto applyKeyboardShortcuts = [&ws]() {
+    const auto& overrides = ws.getSettings().keyboardShortcuts.get();
+    EditorCommandSet& set = EditorCommandSet::instance();
+    foreach (EditorCommandCategory* category, set.getCategories()) {
+      foreach (EditorCommand* command, set.getCommands(category)) {
+        QList<QKeySequence> sequences =
+            overrides.contains(command->getIdentifier())
+            ? overrides.value(command->getIdentifier())
+            : command->getDefaultKeySequences();
+        command->setKeySequences(sequences);
+      }
+    }
+  };
+  applyKeyboardShortcuts();
+  QObject::connect(&ws.getSettings().keyboardShortcuts,
+                   &WorkspaceSettingsItem::edited,
+                   &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
   // Open the control panel.
   ControlPanel p(ws, wizard.getWorkspaceContainsNewerFileFormats());

@@ -49,7 +49,8 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     libraryLocaleOrder("library_locale_order", "locale", QStringList(), this),
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),
     repositoryUrls("repositories", "repository",
-                   QList<QUrl>{QUrl("https://api.librepcb.org")}, this) {
+                   QList<QUrl>{QUrl("https://api.librepcb.org")}, this),
+    keyboardShortcuts(this) {
 }
 
 WorkspaceSettings::~WorkspaceSettings() noexcept {

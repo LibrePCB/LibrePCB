@@ -320,6 +320,10 @@ add_library(
   modelview/comboboxdelegate.cpp
   modelview/comboboxdelegate.h
   modelview/editablelistmodel.h
+  modelview/keyboardshortcutsmodel.cpp
+  modelview/keyboardshortcutsmodel.h
+  modelview/keysequencedelegate.cpp
+  modelview/keysequencedelegate.h
   modelview/lengthdelegate.cpp
   modelview/lengthdelegate.h
   modelview/pathmodel.cpp
@@ -653,6 +657,8 @@ add_library(
   widgets/graphicsview.cpp
   widgets/graphicsview.h
   widgets/if_graphicsvieweventhandler.h
+  widgets/keysequenceseditorwidget.cpp
+  widgets/keysequenceseditorwidget.h
   widgets/lengthedit.cpp
   widgets/lengthedit.h
   widgets/lengtheditbase.cpp
