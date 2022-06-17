@@ -62,6 +62,13 @@ public:
   static void removeFormLayoutRow(QLabel& label) noexcept;
 
   /**
+   * @brief Delete a QLayout item with all its children
+   *
+   * @param item    The item to delete. Must not be nullptr!
+   */
+  static void deleteLayoutItemRecursively(QLayoutItem* item) noexcept;
+
+  /**
    * @brief Set the focus to the first widget of a toolbar and iterate through
    *
    * - The tab order of all widgets of the passed toolbar will be configured

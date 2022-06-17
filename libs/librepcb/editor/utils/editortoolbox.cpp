@@ -55,6 +55,20 @@ void EditorToolbox::removeFormLayoutRow(QLabel& label) noexcept {
       << label.objectName() << ".";
 }
 
+void EditorToolbox::deleteLayoutItemRecursively(QLayoutItem* item) noexcept {
+  Q_ASSERT(item);
+  if (QWidget* widget = item->widget()) {
+    delete widget;
+  } else if (QLayout* layout = item->layout()) {
+    for (int i = 0; i < layout->count(); ++i) {
+      deleteLayoutItemRecursively(layout->takeAt(i));
+    }
+  } else if (QSpacerItem* spacer = item->spacerItem()) {
+    delete spacer;
+  }
+  delete item;
+}
+
 bool EditorToolbox::startToolBarTabFocusCycle(
     QToolBar& toolBar, QWidget& returnFocusToWidget) noexcept {
   QWidget* previousWidget = nullptr;
