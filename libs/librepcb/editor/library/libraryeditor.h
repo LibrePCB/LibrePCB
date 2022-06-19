@@ -180,6 +180,7 @@ private:  // Data
   QScopedPointer<QAction> mActionAboutLibrePcb;
   QScopedPointer<QAction> mActionAboutQt;
   QScopedPointer<QAction> mActionOnlineDocumentation;
+  QScopedPointer<QAction> mActionKeyboardShortcutsReference;
   QScopedPointer<QAction> mActionWebsite;
   QScopedPointer<QAction> mActionSave;
   QScopedPointer<QAction> mActionSaveAll;

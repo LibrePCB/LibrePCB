@@ -311,6 +311,10 @@ void BoardEditor::createActions() noexcept {
   mActionOnlineDocumentation.reset(cmd.documentationOnline.createAction(
       this, mStandardCommandHandler.data(),
       &StandardEditorCommandHandler::onlineDocumentation));
+  mActionKeyboardShortcutsReference.reset(
+      cmd.keyboardShortcutsReference.createAction(
+          this, mStandardCommandHandler.data(),
+          &StandardEditorCommandHandler::shortcutsReference));
   mActionWebsite.reset(
       cmd.website.createAction(this, mStandardCommandHandler.data(),
                                &StandardEditorCommandHandler::website));
@@ -839,7 +843,9 @@ void BoardEditor::createMenus() noexcept {
   // Help.
   mb.newMenu(&MenuBuilder::createHelpMenu);
   mb.addAction(mActionOnlineDocumentation);
+  mb.addAction(mActionKeyboardShortcutsReference);
   mb.addAction(mActionWebsite);
+  mb.addSeparator();
   mb.addAction(mActionAboutLibrePcb);
   mb.addAction(mActionAboutQt);
 }
