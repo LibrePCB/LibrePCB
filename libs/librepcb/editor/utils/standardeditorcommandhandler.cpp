@@ -23,7 +23,11 @@
 #include "standardeditorcommandhandler.h"
 
 #include "../dialogs/aboutdialog.h"
+#include "../editorcommandset.h"
 #include "../workspace/desktopservices.h"
+#include "shortcutsreferencegenerator.h"
+
+#include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -67,6 +71,26 @@ void StandardEditorCommandHandler::fileManager(const FilePath& fp) const
     noexcept {
   DesktopServices ds(mSettings, false);
   ds.openFile(fp);
+}
+
+void StandardEditorCommandHandler::shortcutsReference() const noexcept {
+  try {
+    // This can take some time, use wait cursor to provide UI feedback
+    // (keeping it a bit longer since opening the PDF reader takes some time).
+    mParent->setCursor(Qt::WaitCursor);
+    auto cursorScopeGuard = scopeGuard(
+        [this]() { QTimer::singleShot(1000, mParent, &QWidget::unsetCursor); });
+
+    FilePath fp = FilePath::getApplicationTempPath().getPathTo(
+        "librepcb-shortcuts-reference.pdf");
+    ShortcutsReferenceGenerator generator(EditorCommandSet::instance());
+    generator.generatePdf(fp);
+
+    DesktopServices ds(mSettings, true, mParent);
+    ds.openPdf(fp);
+  } catch (const Exception& e) {
+    QMessageBox::critical(mParent, tr("Error"), e.getMsg());
+  }
 }
 
 /*******************************************************************************

@@ -17,67 +17,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_STANDARDEDITORCOMMANDHANDLER_H
-#define LIBREPCB_EDITOR_STANDARDEDITORCOMMANDHANDLER_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+
+#include "../../testhelpers.h"
+
+#include <gtest/gtest.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/editor/editorcommandset.h>
+#include <librepcb/editor/utils/shortcutsreferencegenerator.h>
+
+#include <QtTest>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class FilePath;
-class WorkspaceSettings;
-
 namespace editor {
+namespace tests {
+
+using ::librepcb::tests::TestHelpers;
 
 /*******************************************************************************
- *  Class StandardEditorCommandHandler
+ *  Test Class
  ******************************************************************************/
 
-/**
- * @brief Helper to handle some of the ::librepcb::editor::EditorCommand actions
- *
- * Indended to share code between the various editors.
- */
-class StandardEditorCommandHandler final : public QObject {
-  Q_OBJECT
+class ShortcutsReferenceGeneratorTest : public ::testing::Test {};
 
-public:
-  // Constructors / Destructor
-  StandardEditorCommandHandler() = delete;
-  StandardEditorCommandHandler(const StandardEditorCommandHandler& other) =
-      delete;
-  StandardEditorCommandHandler(const WorkspaceSettings& settings,
-                               QWidget* parent = nullptr) noexcept;
-  ~StandardEditorCommandHandler() noexcept;
+/*******************************************************************************
+ *  Test Methods
+ ******************************************************************************/
 
-  // Action Handlers
-  void aboutLibrePcb() const noexcept;
-  void onlineDocumentation() const noexcept;
-  void website() const noexcept;
-  void fileManager(const FilePath& fp) const noexcept;
-  void shortcutsReference() const noexcept;
+TEST_F(ShortcutsReferenceGeneratorTest, testExportPdfMultipleTimes) {
+  FilePath fp = FilePath::getRandomTempPath().getPathTo("test.pdf");
+  ShortcutsReferenceGenerator gen(EditorCommandSet::instance());
+  gen.generatePdf(fp);
+  EXPECT_TRUE(fp.isExistingFile());
 
-  // Operator Overloadings
-  StandardEditorCommandHandler& operator=(
-      const StandardEditorCommandHandler& rhs) = delete;
-
-private:  // Data
-  const WorkspaceSettings& mSettings;
-  QPointer<QWidget> mParent;
-};
-
-}  // namespace editor
-}  // namespace librepcb
+  // Export again to see if it doesn't fail on already existing file.
+  gen.generatePdf(fp);
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-#endif
+}  // namespace tests
+}  // namespace editor
+}  // namespace librepcb
