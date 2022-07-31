@@ -96,7 +96,8 @@ Point Toolbox::arcCenter(const Point& p1, const Point& p2,
     qreal angleSgn = (angle >= 0) ? 1 : -1;
     qreal d = qSqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
     qreal r = d / (2 * qSin(angle / 2));
-    qreal h = qSqrt(r * r - d * d / 4);
+    // Note: std::max() fixes https://github.com/LibrePCB/LibrePCB/issues/974
+    qreal h = qSqrt(std::max(r * r - d * d / 4.0, qreal(0)));
     qreal u = (x1 - x0) / d;
     qreal v = (y1 - y0) / d;
     qreal a = ((x0 + x1) / 2) - h * v * angleSgn;

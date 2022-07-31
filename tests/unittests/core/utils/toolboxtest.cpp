@@ -132,7 +132,9 @@ TEST_P(ToolboxArcCenterTest, test) {
 // clang-format off
 static ToolboxArcCenterTestData sToolboxArcCenterTestData[] = {
 // p1,                         p2,                         angle,              center
-  {Point(47744137, 37820591),  Point(55364137, 24622364),  -Angle::deg90(),    Point(44955023, 27411478)}
+  {Point(47744137, 37820591),  Point(55364137, 24622364),  -Angle::deg90(),    Point(44955023, 27411478)},
+  // Test to reproduce https://github.com/LibrePCB/LibrePCB/issues/974
+  {Point(30875000, 32385000),  Point(26275000, 32385000),  -Angle::deg180(),   Point(28575000, 32385000)}
 };
 // clang-format on
 

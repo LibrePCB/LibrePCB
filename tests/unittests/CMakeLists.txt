@@ -74,6 +74,7 @@ add_executable(
   core/types/signalroletest.cpp
   core/types/uuidtest.cpp
   core/types/versiontest.cpp
+  core/utils/clipperhelperstest.cpp
   core/utils/mathparsertest.cpp
   core/utils/scopeguardtest.cpp
   core/utils/signalslottest.cpp
