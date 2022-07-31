@@ -157,6 +157,20 @@ TEST_F(PathTest, testCircle) {
   EXPECT_TRUE(path.isClosed());
 }
 
+// Test to reproduce https://github.com/LibrePCB/LibrePCB/issues/974
+TEST_F(PathTest, testFlatArc) {
+  Path expected = Path({
+      Vertex(Point(30875000, 32385000)),
+      Vertex(Point(29725000, 30393142)),
+      Vertex(Point(27425000, 30393142)),
+      Vertex(Point(26275000, 32385000)),
+  });
+  Path actual =
+      Path::flatArc(Point(30875000, 32385000), Point(26275000, 32385000),
+                    -Angle::deg180(), PositiveLength(1000000));
+  EXPECT_EQ(str(expected), str(actual));
+}
+
 /*******************************************************************************
  *  Parametrized obround(width, height) Tests
  ******************************************************************************/
