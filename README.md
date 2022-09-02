@@ -82,8 +82,10 @@ actually used for CI, but are also useful to build LibrePCB locally.
 
 #### Installation on Debian/Ubuntu/Mint
 
+*Note: For Ubuntu older than 22.04, replace `qtbase5-dev` by `qt5-default`.*
+
 ```bash
-sudo apt-get install git build-essential qt5-default qttools5-dev-tools qttools5-dev \
+sudo apt-get install git build-essential qtbase5-dev qttools5-dev-tools qttools5-dev \
      libglu1-mesa-dev openssl zlib1g zlib1g-dev libqt5opengl5-dev libqt5svg5-dev cmake
 sudo apt-get install qt5-doc qtcreator # optional
 ```
