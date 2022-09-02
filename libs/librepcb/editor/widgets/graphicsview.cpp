@@ -25,8 +25,13 @@
 #include "QtOpenGL"
 #include "if_graphicsvieweventhandler.h"
 
+#include <librepcb/core/application.h>
+#include <librepcb/core/graphics/graphicspainter.h>
 #include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/types/alignment.h>
+#include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/gridproperties.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -44,6 +49,7 @@ namespace editor {
 GraphicsView::GraphicsView(QWidget* parent,
                            IF_GraphicsViewEventHandler* eventHandler) noexcept
   : QGraphicsView(parent),
+    mOverlayLabel(new QLabel(this)),
     mEventHandlerObject(eventHandler),
     mScene(nullptr),
     mZoomAnimation(nullptr),
@@ -51,6 +57,14 @@ GraphicsView::GraphicsView(QWidget* parent,
     mSceneRectMarker(),
     mOriginCrossVisible(true),
     mUseOpenGl(false),
+    mGrayOut(false),
+    mSceneCursor(),
+    mRulerGauges({
+        {1, LengthUnit::millimeters(), " ", Length(100), Length(0)},
+        {-1, LengthUnit::inches(), "", Length(254), Length(0)},
+    }),
+    mRulerColor(Qt::black),
+    mRulerPositions(),
     mPanningActive(false) {
   setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
   setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
@@ -61,6 +75,12 @@ GraphicsView::GraphicsView(QWidget* parent,
   setSceneRect(-2000, -2000, 4000, 4000);
   setBackgroundBrush(Qt::white);
   setForegroundBrush(Qt::black);
+
+  mOverlayLabel->setFont(qApp->getDefaultMonospaceFont());
+  mOverlayLabel->setTextFormat(Qt::RichText);
+  mOverlayLabel->move(0, 0);
+  mOverlayLabel->hide();
+  setOverlayColor(Qt::black);
 
   mZoomAnimation = new QVariantAnimation();
   connect(mZoomAnimation, &QVariantAnimation::valueChanged, this,
@@ -109,6 +129,11 @@ void GraphicsView::setUseOpenGl(bool useOpenGl) noexcept {
   viewport()->grabGesture(Qt::PinchGesture);
 }
 
+void GraphicsView::setGrayOut(bool grayOut) noexcept {
+  mGrayOut = grayOut;
+  setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+}
+
 void GraphicsView::setGridProperties(
     const GridProperties& properties) noexcept {
   *mGridProperties = properties;
@@ -130,6 +155,43 @@ void GraphicsView::setVisibleSceneRect(const QRectF& rect) noexcept {
 void GraphicsView::setSceneRectMarker(const QRectF& rect) noexcept {
   mSceneRectMarker = rect;
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+}
+
+void GraphicsView::setSceneCursor(
+    const tl::optional<std::pair<Point, CursorOptions>>& cursor) noexcept {
+  mSceneCursor = cursor;
+  setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+}
+
+void GraphicsView::setRulerColor(const QColor& color) noexcept {
+  mRulerColor = color;
+  setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+}
+
+void GraphicsView::setRulerPositions(
+    const tl::optional<std::pair<Point, Point>>& pos) noexcept {
+  mRulerPositions = pos;
+  setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+}
+
+void GraphicsView::setOverlayColor(const QColor& color) noexcept {
+  QColor bgColor = backgroundBrush().color();
+  bgColor.setAlpha(130);
+  mOverlayLabel->setStyleSheet(QString("QLabel {"
+                                       "  background-color: %1;"
+                                       "  border: none;"
+                                       "  border-bottom-right-radius: 15px;"
+                                       "  padding: 5px;"
+                                       "  color: %2;"
+                                       "}")
+                                   .arg(bgColor.name(QColor::HexArgb))
+                                   .arg(color.name(QColor::HexArgb)));
+}
+
+void GraphicsView::setOverlayText(const QString& text) noexcept {
+  mOverlayLabel->setText(text);
+  mOverlayLabel->resize(mOverlayLabel->sizeHint());
+  mOverlayLabel->setVisible(!text.isEmpty());
 }
 
 void GraphicsView::setOriginCrossVisible(bool visible) noexcept {
@@ -370,8 +432,6 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect) {
 }
 
 void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
-  Q_UNUSED(rect);
-
   QPen originPen(foregroundBrush().color());
   originPen.setWidth(0);
   painter->setPen(originPen);
@@ -388,6 +448,138 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
     // draw scene rect marker
     painter->drawRect(mSceneRectMarker);
     painter->drawLine(mapToScene(0, 0), mSceneRectMarker.topLeft());
+  }
+
+  // If enabled, gray out the whole scene content to improve readability of
+  // overlays.
+  if (mGrayOut) {
+    QColor color = backgroundBrush().color();
+    color.setAlpha(120);
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(color);
+    painter->fillRect(rect, color);
+  }
+
+  // If enabled, draw a ruler overlay to make measurements on screen.
+  if (mRulerPositions) {
+    const qreal scaleFactor =
+        QStyleOptionGraphicsItem::levelOfDetailFromTransform(transform());
+    const Point diff = mRulerPositions->second - mRulerPositions->first;
+    const Length distance = *diff.getLength();
+    const Angle angle = (!diff.isOrigin())
+        ? Angle::fromRad(qAtan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()))
+        : -Angle::deg90();
+
+    // Transform painter to allow drawing from (0,0) to (0,distance).
+    painter->save();
+    painter->translate(mRulerPositions->first.toPxQPointF());
+    painter->rotate(90 - angle.toDeg());
+
+    // Determine text rotation.
+    Angle textRotation = Angle::deg0();
+    Alignment textAlign(HAlign::left(), VAlign::center());
+    qreal xScale = 1;
+    if (Toolbox::isTextUpsideDown(angle - Angle::deg90(), false)) {
+      textRotation = Angle::deg180();
+      textAlign.mirrorH();
+      xScale = -1;
+    }
+
+    // Use GraphicsPainter to get a simpler painting API.
+    GraphicsPainter p(*painter);
+
+    // Draw direct line from start to end point.
+    p.drawLine(Point(0, 0), Point(0, distance), Length::fromPx(3 / scaleFactor),
+               mRulerColor);
+
+    // Draw center since this might be useful for some use-cases.
+    const Length circleDiameter = Length::fromPx(15 / scaleFactor);
+    if (circleDiameter < (distance / 2)) {
+      p.drawCircle(Point(0, distance / 2), circleDiameter,
+                   Length::fromPx(1 / scaleFactor), mRulerColor, QColor());
+    }
+
+    // Draw ticks & texts.
+    const qreal maxTickCount = distance.toPx() * scaleFactor / 4.1;
+    const Length textHeight = Length::fromPx(25 / scaleFactor);
+    for (RulerGauge& gauge : mRulerGauges) {
+      Length tickInterval = gauge.minTickInterval;
+      qint64 tickCount = -1;
+      while ((tickCount < 0) || (tickCount > maxTickCount) ||
+             ((gauge.currentTickInterval > tickInterval) &&
+              (tickCount >= (maxTickCount / 2)))) {
+        tickInterval *= 10;
+        tickCount = distance.toNm() / tickInterval.toNm();
+      }
+      tickCount += 1;  // For the end value.
+      gauge.currentTickInterval = tickInterval;
+      const Length shortTickX =
+          Length::fromPx(10 / scaleFactor) * gauge.xScale * xScale;
+      const Length longTickX =
+          Length::fromPx(20 / scaleFactor) * gauge.xScale * xScale;
+      const Length textOffset =
+          Length::fromPx(25 / scaleFactor) * gauge.xScale * xScale;
+      for (int i = 0; i <= tickCount; ++i) {
+        const bool isEnd = (i == tickCount);
+        const Length tickPos = isEnd ? distance : (tickInterval * i);
+        const Point scenePos =
+            mRulerPositions->first + Point(tickPos, 0).rotated(angle);
+        if (!rect.contains(scenePos.toPxQPointF())) {
+          // To heavily improve performance, do not draw ticks outside the
+          // visible scene rect.
+          continue;
+        }
+        if ((isEnd) || (i % 5 == 0) || (textHeight <= tickInterval)) {
+          // Draw long tick.
+          p.drawLine(Point(0, tickPos), Point(longTickX, tickPos), Length(0),
+                     mRulerColor);
+          if ((isEnd) ||
+              (tickPos <=
+               (distance - std::min(textHeight, tickInterval * 5)))) {
+            // Draw text beside the long tick.
+            const float value = gauge.unit.convertToUnit(tickPos);
+            const QString text =
+                Toolbox::floatToString(
+                    value, gauge.unit.getReasonableNumberOfDecimals(),
+                    QLocale()) %
+                gauge.unitSeparator % gauge.unit.toShortStringTr();
+            p.drawText(
+                Point(textOffset, tickPos), textRotation, textHeight,
+                (gauge.xScale != xScale) ? textAlign.mirroredH() : textAlign,
+                text, qApp->getDefaultMonospaceFont(), mRulerColor, false,
+                false, 10);
+          }
+        } else {
+          // Draw short tick.
+          p.drawLine(Point(0, tickPos), Point(shortTickX, tickPos), Length(0),
+                     mRulerColor);
+        }
+      }
+    }
+
+    // Restore original transformation.
+    painter->restore();
+  }
+
+  // If enabled, draw a cursor at a specific position.
+  if (mSceneCursor) {
+    const qreal scaleFactor =
+        QStyleOptionGraphicsItem::levelOfDetailFromTransform(transform());
+    const qreal r = 20 / scaleFactor;
+    const QPointF pos = mSceneCursor->first.toPxQPointF();
+    const CursorOptions options = mSceneCursor->second;
+
+    if (options.testFlag(CursorOption::Cross)) {
+      painter->setPen(QPen(mRulerColor, 0));
+      painter->drawLine(pos + QPointF(0, -r), pos + QPointF(0, r));
+      painter->drawLine(pos + QPointF(-r, 0), pos + QPointF(r, 0));
+    }
+
+    if (options.testFlag(CursorOption::Circle)) {
+      painter->setPen(QPen(Qt::green, 2 / scaleFactor));
+      painter->setBrush(Qt::NoBrush);
+      painter->drawEllipse(pos, r / 2, r / 2);
+    }
   }
 }
 
