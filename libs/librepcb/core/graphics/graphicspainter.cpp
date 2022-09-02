@@ -109,19 +109,24 @@ void GraphicsPainter::drawCircle(const Point& center, const Length& diameter,
 void GraphicsPainter::drawText(const Point& position, const Angle& rotation,
                                const Length& height, const Alignment& alignment,
                                const QString& text, QFont font,
-                               const QColor& color,
-                               bool mirrorInPlace) noexcept {
+                               const QColor& color, bool autoRotate,
+                               bool mirrorInPlace, int fontPixelSize) noexcept {
   if (text.trimmed().isEmpty() || (!color.isValid())) {
     return;  // Nothing to draw.
   }
 
-  const bool rotate180 = Toolbox::isTextUpsideDown(rotation, false);
+  const bool rotate180 =
+      autoRotate && Toolbox::isTextUpsideDown(rotation, false);
   Alignment align = rotate180 ? alignment.mirrored() : alignment;
   if (mirrorInPlace) {
     align.mirrorH();
   }
   const int flags = align.toQtAlign();
-  font.setPixelSize(qCeil(height.toPx()));
+  if (fontPixelSize > 0) {
+    font.setPixelSize(fontPixelSize);
+  } else {
+    font.setPixelSize(qCeil(height.toPx()));
+  }
   const QFontMetricsF metrics(font);
   const qreal scale = height.toPx() / metrics.height();
   const QRectF rect =

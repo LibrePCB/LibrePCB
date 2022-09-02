@@ -90,7 +90,7 @@ void SymbolPainter::paint(QPainter& painter,
   foreach (const Text& text, mTexts) {
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
                text.getAlign(), text.getText(), qApp->getDefaultSansSerifFont(),
-               settings.getColor(*text.getLayerName()), false);
+               settings.getColor(*text.getLayerName()), true, false);
   }
 
   // Draw Pins.
@@ -102,7 +102,7 @@ void SymbolPainter::paint(QPainter& painter,
         pin.getPosition() + pin.getNamePosition().rotated(pin.getRotation()),
         pin.getRotation() + pin.getNameRotation(), *pin.getNameHeight(),
         pin.getNameAlignment(), *pin.getName(), qApp->getDefaultSansSerifFont(),
-        settings.getColor(GraphicsLayer::sSymbolPinNames), false);
+        settings.getColor(GraphicsLayer::sSymbolPinNames), true, false);
   }
 }
 
