@@ -27,6 +27,7 @@
 #include "schematiceditorstate_addtext.h"
 #include "schematiceditorstate_drawpolygon.h"
 #include "schematiceditorstate_drawwire.h"
+#include "schematiceditorstate_measure.h"
 #include "schematiceditorstate_select.h"
 
 #include <QtCore>
@@ -57,6 +58,13 @@ SchematicEditorFsm::SchematicEditorFsm(const Context& context,
   mStates.insert(State::DRAW_POLYGON,
                  new SchematicEditorState_DrawPolygon(context));
   mStates.insert(State::ADD_TEXT, new SchematicEditorState_AddText(context));
+  mStates.insert(State::MEASURE, new SchematicEditorState_Measure(context));
+
+  foreach (SchematicEditorState* state, mStates) {
+    connect(state, &SchematicEditorState::statusBarMessageChanged, this,
+            &SchematicEditorFsm::statusBarMessageChanged);
+  }
+
   enterNextState(State::SELECT);
 }
 
@@ -117,6 +125,10 @@ bool SchematicEditorFsm::processAddText() noexcept {
 
 bool SchematicEditorFsm::processDrawWire() noexcept {
   return setNextState(State::DRAW_WIRE);
+}
+
+bool SchematicEditorFsm::processMeasure() noexcept {
+  return setNextState(State::MEASURE);
 }
 
 bool SchematicEditorFsm::processAbortCommand() noexcept {

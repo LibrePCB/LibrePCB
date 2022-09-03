@@ -57,7 +57,8 @@ EditorWidgetBase::EditorWidgetBase(const Context& context, const FilePath& fp,
     mUndoStackActionGroup(nullptr),
     mToolsActionGroup(nullptr),
     mStatusBar(nullptr),
-    mIsInterfaceBroken(false) {
+    mIsInterfaceBroken(false),
+    mStatusBarMessage() {
   mUndoStack.reset(new UndoStack());
   connect(mUndoStack.data(), &UndoStack::cleanChanged, this,
           &EditorWidgetBase::undoStackCleanChanged);
@@ -92,6 +93,7 @@ void EditorWidgetBase::connectEditor(UndoStackActionGroup& undoStackActionGroup,
   mCommandToolBarProxy->setToolBar(&commandToolBar);
 
   mStatusBar = &statusBar;
+  mStatusBar->setPermanentMessage(mStatusBarMessage);
 }
 
 void EditorWidgetBase::disconnectEditor() noexcept {
@@ -103,6 +105,10 @@ void EditorWidgetBase::disconnectEditor() noexcept {
   mToolsActionGroup->reset();
 
   mCommandToolBarProxy->setToolBar(nullptr);
+
+  mStatusBar->clearMessage();
+  mStatusBar->clearPermanentMessage();
+  mStatusBar = nullptr;
 }
 
 /*******************************************************************************
@@ -185,6 +191,20 @@ void EditorWidgetBase::undoStackStateModified() noexcept {
     }
   }
   scheduleLibraryElementChecks();
+}
+
+void EditorWidgetBase::setStatusBarMessage(const QString& message,
+                                           int timeoutMs) noexcept {
+  if (mStatusBar) {
+    if (timeoutMs < 0) {
+      mStatusBar->setPermanentMessage(message);
+    } else {
+      mStatusBar->showMessage(message, timeoutMs);
+    }
+  }
+  if (timeoutMs < 0) {
+    mStatusBarMessage = message;
+  }
 }
 
 const QStringList& EditorWidgetBase::getLibLocaleOrder() const noexcept {

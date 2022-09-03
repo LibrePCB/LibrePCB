@@ -103,6 +103,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   // Setup graphics view.
   mUi->graphicsView->setBackgroundBrush(Qt::black);
   mUi->graphicsView->setForegroundBrush(Qt::white);
+  mUi->graphicsView->setOverlayColor(Qt::yellow);
+  mUi->graphicsView->setRulerColor(Qt::yellow);
   mUi->graphicsView->setUseOpenGl(
       mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
   mUi->graphicsView->setEventHandlerObject(this);
@@ -132,6 +134,14 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
                                      *mCommandToolBarProxy,
                                      mProjectEditor.getUndoStack()};
   mFsm.reset(new BoardEditorFsm(fsmContext));
+  connect(mFsm.data(), &BoardEditorFsm::statusBarMessageChanged, this,
+          [this](const QString& message, int timeoutMs) {
+            if (timeoutMs < 0) {
+              mUi->statusbar->setPermanentMessage(message);
+            } else {
+              mUi->statusbar->showMessage(message, timeoutMs);
+            }
+          });
 
   // Create all actions, window menus, toolbars and dock widgets.
   createActions();
@@ -543,6 +553,7 @@ void BoardEditor::createActions() noexcept {
   mActionToolText.reset(cmd.toolText.createAction(this));
   mActionToolPlane.reset(cmd.toolPlane.createAction(this));
   mActionToolHole.reset(cmd.toolHole.createAction(this));
+  mActionToolMeasure.reset(cmd.toolMeasure.createAction(this));
   mActionDockErc.reset(cmd.dockErc.createAction(this, this, [this]() {
     mDockErc->show();
     mDockErc->raise();
@@ -594,6 +605,8 @@ void BoardEditor::createActions() noexcept {
                                mActionToolText.data());
   mToolsActionGroup->addAction(BoardEditorFsm::State::ADD_HOLE,
                                mActionToolHole.data());
+  mToolsActionGroup->addAction(BoardEditorFsm::State::MEASURE,
+                               mActionToolMeasure.data());
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
   connect(mFsm.data(), &BoardEditorFsm::stateChanged, mToolsActionGroup.data(),
           &ExclusiveActionGroup::setCurrentAction);
@@ -678,6 +691,8 @@ void BoardEditor::createToolBars() noexcept {
   mToolBarTools->addAction(mActionToolText.data());
   mToolBarTools->addAction(mActionToolPlane.data());
   mToolBarTools->addAction(mActionToolHole.data());
+  mToolBarTools->addSeparator();
+  mToolBarTools->addAction(mActionToolMeasure.data());
   mToolBarTools->addAction(mActionRebuildPlanes.data());
   mToolBarTools->addAction(mActionDesignRuleCheck.data());
   addToolBar(Qt::LeftToolBarArea, mToolBarTools.data());
@@ -839,6 +854,8 @@ void BoardEditor::createMenus() noexcept {
   mb.addAction(mActionToolText);
   mb.addAction(mActionToolPlane);
   mb.addAction(mActionToolHole);
+  mb.addSeparator();
+  mb.addAction(mActionToolMeasure);
 
   // Help.
   mb.newMenu(&MenuBuilder::createHelpMenu);
@@ -983,6 +1000,9 @@ void BoardEditor::toolActionGroupChangeTriggered(
       break;
     case BoardEditorFsm::State::ADD_HOLE:
       mFsm->processAddHole();
+      break;
+    case BoardEditorFsm::State::MEASURE:
+      mFsm->processMeasure();
       break;
     default:
       Q_ASSERT(false);

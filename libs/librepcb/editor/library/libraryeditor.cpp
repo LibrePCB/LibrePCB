@@ -644,6 +644,7 @@ void LibraryEditor::createActions() noexcept {
   mActionToolSmtPad.reset(cmd.toolPadSmt.createAction(this));
   mActionToolThtPad.reset(cmd.toolPadTht.createAction(this));
   mActionToolHole.reset(cmd.toolHole.createAction(this));
+  mActionToolMeasure.reset(cmd.toolMeasure.createAction(this));
 
   // Undo stack action group.
   mUndoStackActionGroup.reset(new UndoStackActionGroup(
@@ -675,6 +676,8 @@ void LibraryEditor::createActions() noexcept {
                                mActionToolSmtPad.data());
   mToolsActionGroup->addAction(EditorWidgetBase::Tool::ADD_HOLES,
                                mActionToolHole.data());
+  mToolsActionGroup->addAction(EditorWidgetBase::Tool::MEASURE,
+                               mActionToolMeasure.data());
   mToolsActionGroup->setEnabled(false);
 }
 
@@ -755,6 +758,8 @@ void LibraryEditor::createToolBars() noexcept {
   mToolBarTools->addAction(mActionToolThtPad.data());
   mToolBarTools->addAction(mActionToolSmtPad.data());
   mToolBarTools->addAction(mActionToolHole.data());
+  mToolBarTools->addSeparator();
+  mToolBarTools->addAction(mActionToolMeasure.data());
   addToolBar(Qt::LeftToolBarArea, mToolBarTools.data());
 }
 
@@ -838,6 +843,8 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionToolThtPad);
   mb.addAction(mActionToolSmtPad);
   mb.addAction(mActionToolHole);
+  mb.addSeparator();
+  mb.addAction(mActionToolMeasure);
 
   // Help.
   mb.newMenu(&MenuBuilder::createHelpMenu);

@@ -72,6 +72,8 @@ public:
     DRAW_POLYGON,
     /// ::librepcb::editor::SchematicEditorState_AddText
     ADD_TEXT,
+    /// ::librepcb::editor::SchematicEditorState_Measure
+    MEASURE,
   };
 
   /// FSM Context
@@ -102,6 +104,7 @@ public:
   bool processDrawPolygon() noexcept;
   bool processAddText() noexcept;
   bool processDrawWire() noexcept;
+  bool processMeasure() noexcept;
   bool processAbortCommand() noexcept;
   bool processSelectAll() noexcept;
   bool processCut() noexcept;
@@ -147,6 +150,7 @@ public:
 
 signals:
   void stateChanged(State newState);
+  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 private:
   SchematicEditorState* getCurrentStateObj() const noexcept;

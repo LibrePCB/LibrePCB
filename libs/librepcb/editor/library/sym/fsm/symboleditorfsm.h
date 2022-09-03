@@ -69,7 +69,8 @@ private:  // Types
     DRAW_RECT,
     DRAW_POLYGON,
     DRAW_CIRCLE,
-    DRAW_TEXT
+    DRAW_TEXT,
+    MEASURE,
   };
 
 public:  // Types
@@ -101,6 +102,8 @@ public:
   void updateAvailableFeatures() noexcept;
 
   // Event Handlers
+  bool processKeyPressed(const QKeyEvent& e) noexcept;
+  bool processKeyReleased(const QKeyEvent& e) noexcept;
   bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneLeftMouseButtonPressed(
       QGraphicsSceneMouseEvent& e) noexcept;
@@ -131,6 +134,7 @@ public:
   bool processStartDrawCircles() noexcept;
   bool processStartDrawTexts() noexcept;
   bool processStartDxfImport() noexcept;
+  bool processStartMeasure() noexcept;
 
   // Operator Overloadings
   SymbolEditorState& operator=(const SymbolEditorState& rhs) = delete;
@@ -138,6 +142,7 @@ public:
 signals:
   void toolChanged(EditorWidgetBase::Tool newTool);
   void availableFeaturesChanged();
+  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 private:  // Methods
   SymbolEditorState* getCurrentState() const noexcept;

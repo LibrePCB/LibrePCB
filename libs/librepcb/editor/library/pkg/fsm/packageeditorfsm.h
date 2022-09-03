@@ -74,6 +74,7 @@ private:  // Types
     DRAW_CIRCLE,
     DRAW_TEXT,
     ADD_HOLES,
+    MEASURE,
   };
 
 public:  // Types
@@ -109,6 +110,8 @@ public:
   // Event Handlers
   bool processChangeCurrentFootprint(
       const std::shared_ptr<Footprint>& fpt) noexcept;
+  bool processKeyPressed(const QKeyEvent& e) noexcept;
+  bool processKeyReleased(const QKeyEvent& e) noexcept;
   bool processGraphicsSceneMouseMoved(QGraphicsSceneMouseEvent& e) noexcept;
   bool processGraphicsSceneLeftMouseButtonPressed(
       QGraphicsSceneMouseEvent& e) noexcept;
@@ -142,6 +145,7 @@ public:
   bool processStartDrawTexts() noexcept;
   bool processStartAddingHoles() noexcept;
   bool processStartDxfImport() noexcept;
+  bool processStartMeasure() noexcept;
 
   // Operator Overloadings
   PackageEditorFsm& operator=(const PackageEditorFsm& rhs) = delete;
@@ -149,6 +153,7 @@ public:
 signals:
   void toolChanged(EditorWidgetBase::Tool newTool);
   void availableFeaturesChanged();
+  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 private:  // Methods
   PackageEditorState* getCurrentState() const noexcept;

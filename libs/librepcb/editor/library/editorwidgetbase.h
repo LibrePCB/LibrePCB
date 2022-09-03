@@ -86,6 +86,7 @@ public:
     ADD_THT_PADS,
     ADD_SMT_PADS,
     ADD_HOLES,
+    MEASURE,
   };
 
   enum class Feature {
@@ -186,6 +187,7 @@ protected:  // Methods
     return false;
   }
   void undoStackStateModified() noexcept;
+  void setStatusBarMessage(const QString& message, int timeoutMs = -1) noexcept;
   const QStringList& getLibLocaleOrder() const noexcept;
   QString getWorkspaceSettingsUserName() noexcept;
 
@@ -234,6 +236,7 @@ protected:  // Data
   StatusBar* mStatusBar;
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
   bool mIsInterfaceBroken;
+  QString mStatusBarMessage;
 };
 
 inline uint qHash(const EditorWidgetBase::Feature& feature,

@@ -30,6 +30,7 @@
 #include "symboleditorstate_drawpolygon.h"
 #include "symboleditorstate_drawrect.h"
 #include "symboleditorstate_drawtext.h"
+#include "symboleditorstate_measure.h"
 #include "symboleditorstate_select.h"
 
 #include <QtCore>
@@ -56,6 +57,13 @@ SymbolEditorFsm::SymbolEditorFsm(const Context& context) noexcept
                  new SymbolEditorState_DrawPolygon(context));
   mStates.insert(State::DRAW_CIRCLE, new SymbolEditorState_DrawCircle(context));
   mStates.insert(State::DRAW_TEXT, new SymbolEditorState_DrawText(context));
+  mStates.insert(State::MEASURE, new SymbolEditorState_Measure(context));
+
+  foreach (SymbolEditorState* state, mStates) {
+    connect(state, &SymbolEditorState::statusBarMessageChanged, this,
+            &SymbolEditorFsm::statusBarMessageChanged);
+  }
+
   enterNextState(State::SELECT);
 }
 
@@ -91,6 +99,8 @@ EditorWidgetBase::Tool SymbolEditorFsm::getCurrentTool() const noexcept {
       return EditorWidgetBase::Tool::DRAW_CIRCLE;
     case State::DRAW_TEXT:
       return EditorWidgetBase::Tool::DRAW_TEXT;
+    case State::MEASURE:
+      return EditorWidgetBase::Tool::MEASURE;
     default:
       Q_ASSERT(false);
       return EditorWidgetBase::Tool::NONE;
@@ -115,6 +125,22 @@ void SymbolEditorFsm::updateAvailableFeatures() noexcept {
 /*******************************************************************************
  *  Event Handlers
  ******************************************************************************/
+
+bool SymbolEditorFsm::processKeyPressed(const QKeyEvent& e) noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processKeyPressed(e);
+  } else {
+    return false;
+  }
+}
+
+bool SymbolEditorFsm::processKeyReleased(const QKeyEvent& e) noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processKeyReleased(e);
+  } else {
+    return false;
+  }
+}
 
 bool SymbolEditorFsm::processGraphicsSceneMouseMoved(
     QGraphicsSceneMouseEvent& e) noexcept {
@@ -302,6 +328,10 @@ bool SymbolEditorFsm::processStartDxfImport() noexcept {
     }
   }
   return false;
+}
+
+bool SymbolEditorFsm::processStartMeasure() noexcept {
+  return setNextState(State::MEASURE);
 }
 
 /*******************************************************************************
