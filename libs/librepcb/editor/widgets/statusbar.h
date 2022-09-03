@@ -64,6 +64,8 @@ public:
   // Setters
   void setFields(Fields fields) noexcept;
   void setField(Field field, bool enable) noexcept;
+  void setPermanentMessage(const QString& message) noexcept;
+  void clearPermanentMessage() noexcept;
   void setLengthUnit(const LengthUnit& unit) noexcept;
   void setAbsoluteCursorPosition(const Point& pos) noexcept;
   void setProgressBarTextFormat(const QString& format) noexcept;
@@ -72,13 +74,19 @@ public:
   // Operator Overloadings
   StatusBar& operator=(const StatusBar& rhs) = delete;
 
+protected:
+  void resizeEvent(QResizeEvent* e) noexcept override;
+
 private:  // Methods
+  void updatePermanentMessage() noexcept;
   void updateAbsoluteCursorPosition() noexcept;
 
 private:  // Data
   Fields mFields;
+  QString mPermanentMessage;
   LengthUnit mLengthUnit;
   Point mAbsoluteCursorPosition;
+  QScopedPointer<QLabel> mMessageLabel;
   QScopedPointer<QLabel> mAbsPosXLabel;
   QScopedPointer<QLabel> mAbsPosYLabel;
   QScopedPointer<QProgressBar> mProgressBar;
