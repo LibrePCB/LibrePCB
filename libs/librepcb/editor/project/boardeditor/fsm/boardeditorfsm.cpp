@@ -29,6 +29,7 @@
 #include "boardeditorstate_drawplane.h"
 #include "boardeditorstate_drawpolygon.h"
 #include "boardeditorstate_drawtrace.h"
+#include "boardeditorstate_measure.h"
 #include "boardeditorstate_select.h"
 
 #include <QtCore>
@@ -59,6 +60,13 @@ BoardEditorFsm::BoardEditorFsm(const Context& context, QObject* parent) noexcept
                  new BoardEditorState_DrawPolygon(context));
   mStates.insert(State::DRAW_PLANE, new BoardEditorState_DrawPlane(context));
   mStates.insert(State::DRAW_TRACE, new BoardEditorState_DrawTrace(context));
+  mStates.insert(State::MEASURE, new BoardEditorState_Measure(context));
+
+  foreach (BoardEditorState* state, mStates) {
+    connect(state, &BoardEditorState::statusBarMessageChanged, this,
+            &BoardEditorFsm::statusBarMessageChanged);
+  }
+
   enterNextState(State::SELECT);
 
   // Connect the requestLeavingState() signal of all states to the
@@ -132,6 +140,10 @@ bool BoardEditorFsm::processImportDxf() noexcept {
     }
   }
   return false;
+}
+
+bool BoardEditorFsm::processMeasure() noexcept {
+  return setNextState(State::MEASURE);
 }
 
 bool BoardEditorFsm::processAbortCommand() noexcept {

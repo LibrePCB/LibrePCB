@@ -25,6 +25,7 @@
 #include "schematiceditorstate_addcomponent.h"
 #include "schematiceditorstate_addnetlabel.h"
 #include "schematiceditorstate_drawwire.h"
+#include "schematiceditorstate_measure.h"
 #include "schematiceditorstate_select.h"
 
 #include <QtCore>
@@ -52,6 +53,13 @@ SchematicEditorFsm::SchematicEditorFsm(const Context& context,
                  new SchematicEditorState_AddNetLabel(context));
   mStates.insert(State::ADD_COMPONENT,
                  new SchematicEditorState_AddComponent(context));
+  mStates.insert(State::MEASURE, new SchematicEditorState_Measure(context));
+
+  foreach (SchematicEditorState* state, mStates) {
+    connect(state, &SchematicEditorState::statusBarMessageChanged, this,
+            &SchematicEditorFsm::statusBarMessageChanged);
+  }
+
   enterNextState(State::SELECT);
 }
 
@@ -104,6 +112,10 @@ bool SchematicEditorFsm::processAddNetLabel() noexcept {
 
 bool SchematicEditorFsm::processDrawWire() noexcept {
   return setNextState(State::DRAW_WIRE);
+}
+
+bool SchematicEditorFsm::processMeasure() noexcept {
+  return setNextState(State::MEASURE);
 }
 
 bool SchematicEditorFsm::processAbortCommand() noexcept {

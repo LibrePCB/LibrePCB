@@ -138,7 +138,7 @@ void SchematicPainter::paint(QPainter& painter,
       p.drawText(symbol.transform.map(text.getPosition()),
                  symbol.transform.map(text.getRotation()), *text.getHeight(),
                  alignment, text.getText(), qApp->getDefaultSansSerifFont(),
-                 settings.getColor(*text.getLayerName()), false);
+                 settings.getColor(*text.getLayerName()), true, false);
     }
 
     // Draw Symbol Pins.
@@ -147,13 +147,13 @@ void SchematicPainter::paint(QPainter& painter,
                       symbol.transform.map(pin.rotation), *pin.length,
                       settings.getColor(GraphicsLayer::sSymbolOutlines),
                       QColor());
-      p.drawText(symbol.transform.map(pin.position +
-                                      pin.namePosition.rotated(pin.rotation)),
-                 symbol.transform.map(pin.rotation),
-                 *SymbolPin::getNameHeight(),
-                 Alignment(HAlign::left(), VAlign::center()), pin.name,
-                 qApp->getDefaultSansSerifFont(),
-                 settings.getColor(GraphicsLayer::sSymbolPinNames), false);
+      p.drawText(
+          symbol.transform.map(pin.position +
+                               pin.namePosition.rotated(pin.rotation)),
+          symbol.transform.map(pin.rotation), *SymbolPin::getNameHeight(),
+          Alignment(HAlign::left(), VAlign::center()), pin.name,
+          qApp->getDefaultSansSerifFont(),
+          settings.getColor(GraphicsLayer::sSymbolPinNames), true, false);
     }
   }
 

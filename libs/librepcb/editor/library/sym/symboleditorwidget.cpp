@@ -154,6 +154,8 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
           &SymbolEditorFsm::updateAvailableFeatures);
   connect(mFsm.data(), &SymbolEditorFsm::availableFeaturesChanged, this,
           [this]() { emit availableFeaturesChanged(getAvailableFeatures()); });
+  connect(mFsm.data(), &SymbolEditorFsm::statusBarMessageChanged, this,
+          &SymbolEditorWidget::setStatusBarMessage);
 
   // Last but not least, connect the graphics scene events with the FSM.
   mUi->graphicsView->setEventHandlerObject(this);
@@ -197,6 +199,7 @@ void SymbolEditorWidget::connectEditor(
   mToolsActionGroup->setActionEnabled(Tool::DRAW_POLYGON, enabled);
   mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, enabled);
   mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::MEASURE, true);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
   connect(mFsm.data(), &SymbolEditorFsm::toolChanged, mToolsActionGroup,
           &ExclusiveActionGroup::setCurrentAction);
@@ -208,14 +211,14 @@ void SymbolEditorWidget::connectEditor(
 }
 
 void SymbolEditorWidget::disconnectEditor() noexcept {
-  EditorWidgetBase::disconnectEditor();
-
   disconnect(mFsm.data(), &SymbolEditorFsm::toolChanged, mToolsActionGroup,
              &ExclusiveActionGroup::setCurrentAction);
 
   mStatusBar->setField(StatusBar::AbsolutePosition, false);
   disconnect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
              mStatusBar, &StatusBar::setAbsoluteCursorPosition);
+
+  EditorWidgetBase::disconnectEditor();
 }
 
 /*******************************************************************************
@@ -416,6 +419,16 @@ bool SymbolEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
           return false;
       }
     }
+    case QEvent::KeyPress: {
+      auto* e = dynamic_cast<QKeyEvent*>(event);
+      Q_ASSERT(e);
+      return mFsm->processKeyPressed(*e);
+    }
+    case QEvent::KeyRelease: {
+      auto* e = dynamic_cast<QKeyEvent*>(event);
+      Q_ASSERT(e);
+      return mFsm->processKeyReleased(*e);
+    }
     default: { return false; }
   }
 }
@@ -440,6 +453,8 @@ bool SymbolEditorWidget::toolChangeRequested(Tool newTool) noexcept {
       return mFsm->processStartDrawCircles();
     case Tool::DRAW_TEXT:
       return mFsm->processStartDrawTexts();
+    case Tool::MEASURE:
+      return mFsm->processStartMeasure();
     default:
       return false;
   }

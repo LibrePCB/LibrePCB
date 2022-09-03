@@ -184,6 +184,7 @@ private:
   QScopedPointer<QAction> mActionToolWire;
   QScopedPointer<QAction> mActionToolNetLabel;
   QScopedPointer<QAction> mActionToolComponent;
+  QScopedPointer<QAction> mActionToolMeasure;
   QScopedPointer<QAction> mActionComponentResistor;
   QScopedPointer<QAction> mActionComponentInductor;
   QScopedPointer<QAction> mActionComponentCapacitorBipolar;

@@ -71,7 +71,8 @@ public:
   void drawText(const Point& position, const Angle& rotation,
                 const Length& height, const Alignment& alignment,
                 const QString& text, QFont font, const QColor& color,
-                bool mirrorInPlace) noexcept;
+                bool autoRotate, bool mirrorInPlace,
+                int fontPixelSize = 0) noexcept;
   void drawSymbolPin(const Point& position, const Angle& rotation,
                      const Length& length, const QColor& lineColor,
                      const QColor& circleColor) noexcept;

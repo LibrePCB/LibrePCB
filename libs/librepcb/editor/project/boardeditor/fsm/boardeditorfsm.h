@@ -77,6 +77,8 @@ public:
     DRAW_PLANE,
     /// ::librepcb::editor::BoardEditorState_DrawTrace
     DRAW_TRACE,
+    /// ::librepcb::editor::BoardEditorState_Measure
+    MEASURE,
   };
 
   /// FSM Context
@@ -110,6 +112,7 @@ public:
   bool processDrawPlane() noexcept;
   bool processDrawTrace() noexcept;
   bool processImportDxf() noexcept;
+  bool processMeasure() noexcept;
   bool processAbortCommand() noexcept;
   bool processSelectAll() noexcept;
   bool processCut() noexcept;
@@ -156,6 +159,7 @@ public:
 
 signals:
   void stateChanged(State newState);
+  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 private:
   BoardEditorState* getCurrentStateObj() const noexcept;

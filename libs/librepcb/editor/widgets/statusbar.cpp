@@ -36,7 +36,16 @@ namespace editor {
  ******************************************************************************/
 
 StatusBar::StatusBar(QWidget* parent) noexcept
-  : QStatusBar(parent), mFields(0), mLengthUnit(), mAbsoluteCursorPosition() {
+  : QStatusBar(parent),
+    mFields(0),
+    mPermanentMessage(),
+    mLengthUnit(),
+    mAbsoluteCursorPosition() {
+  // permanent message
+  mMessageLabel.reset(new QLabel());
+  mMessageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+  addWidget(mMessageLabel.data(), 1);
+
   // absolute position x
   mAbsPosXLabel.reset(new QLabel());
   mAbsPosXLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -74,6 +83,15 @@ StatusBar::~StatusBar() noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void StatusBar::setPermanentMessage(const QString& message) noexcept {
+  mPermanentMessage = message;
+  updatePermanentMessage();
+}
+
+void StatusBar::clearPermanentMessage() noexcept {
+  mMessageLabel->clear();
+}
 
 void StatusBar::setFields(Fields fields) noexcept {
   mAbsPosXLabel->setVisible(fields & AbsolutePosition);
@@ -115,8 +133,26 @@ void StatusBar::setProgressBarPercent(int percent) noexcept {
 }
 
 /*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void StatusBar::resizeEvent(QResizeEvent* e) noexcept {
+  Q_UNUSED(e);
+  updatePermanentMessage();
+}
+
+/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void StatusBar::updatePermanentMessage() noexcept {
+  const QFontMetrics metrics(mMessageLabel->font());
+  const QString elidedText = metrics.elidedText(
+      mPermanentMessage, Qt::ElideRight, mMessageLabel->width());
+  mMessageLabel->setText(elidedText);
+  mMessageLabel->setToolTip(
+      (elidedText == mPermanentMessage) ? QString() : mPermanentMessage);
+}
 
 void StatusBar::updateAbsoluteCursorPosition() noexcept {
   mAbsPosXLabel->setText(

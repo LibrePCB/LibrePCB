@@ -67,7 +67,9 @@ public:
     /// ::librepcb::editor::SchematicEditorState_AddNetLabel
     ADD_NETLABEL,
     /// ::librepcb::editor::SchematicEditorState_AddComponent
-    ADD_COMPONENT
+    ADD_COMPONENT,
+    /// ::librepcb::editor::SchematicEditorState_Measure
+    MEASURE,
   };
 
   /// FSM Context
@@ -96,6 +98,7 @@ public:
   bool processAddComponent(const Uuid& cmp, const Uuid& symbVar) noexcept;
   bool processAddNetLabel() noexcept;
   bool processDrawWire() noexcept;
+  bool processMeasure() noexcept;
   bool processAbortCommand() noexcept;
   bool processSelectAll() noexcept;
   bool processCut() noexcept;
@@ -141,6 +144,7 @@ public:
 
 signals:
   void stateChanged(State newState);
+  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 private:
   SchematicEditorState* getCurrentStateObj() const noexcept;

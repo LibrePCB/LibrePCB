@@ -73,13 +73,10 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
   setWindowTitle(
       tr("Control Panel - LibrePCB %1").arg(qApp->applicationVersion()));
 
-  // show workspace path in status bar
-  QString wsPath = mWorkspace.getPath().toNative();
-  QLabel* statusBarLabel = new QLabel(tr("Workspace: %1").arg(wsPath));
-  mUi->statusBar->addWidget(statusBarLabel, 1);
-
   // initialize status bar
   mUi->statusBar->setFields(StatusBar::ProgressBar);
+  mUi->statusBar->setPermanentMessage(
+      tr("Workspace: %1").arg(mWorkspace.getPath().toNative()));
   mUi->statusBar->setProgressBarTextFormat(tr("Scanning libraries (%p%)"));
   connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanProgressUpdate,
           mUi->statusBar, &StatusBar::setProgressBarPercent,

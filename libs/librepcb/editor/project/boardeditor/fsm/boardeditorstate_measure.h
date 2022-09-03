@@ -17,14 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_STATUSBAR_H
-#define LIBREPCB_EDITOR_STATUSBAR_H
+#ifndef LIBREPCB_EDITOR_BOARDEDITORSTATE_MEASURE_H
+#define LIBREPCB_EDITOR_BOARDEDITORSTATE_MEASURE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/types/lengthunit.h>
-#include <librepcb/core/types/point.h>
+#include "boardeditorstate.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,62 +34,47 @@
 namespace librepcb {
 namespace editor {
 
+class MeasureTool;
+
 /*******************************************************************************
- *  Class StatusBar
+ *  Class BoardEditorState_Measure
  ******************************************************************************/
 
 /**
- * @brief The StatusBar class extends QStatusBar for some commonly used fields
+ * @brief The "measure" state/tool of the board editor
  */
-class StatusBar final : public QStatusBar {
+class BoardEditorState_Measure final : public BoardEditorState {
   Q_OBJECT
 
 public:
-  // Types
-  enum Field {
-    AbsolutePosition = 1 << 0,
-    ProgressBar = 1 << 1,
-  };
-  Q_DECLARE_FLAGS(Fields, Field);
-
   // Constructors / Destructor
-  explicit StatusBar(QWidget* parent = nullptr) noexcept;
-  StatusBar(const StatusBar& other) = delete;
-  ~StatusBar() noexcept;
+  BoardEditorState_Measure() = delete;
+  BoardEditorState_Measure(const BoardEditorState_Measure& other) = delete;
+  explicit BoardEditorState_Measure(const Context& context) noexcept;
+  virtual ~BoardEditorState_Measure() noexcept;
 
-  // Getters
-  Fields getFields() const noexcept { return mFields; }
+  // General Methods
+  virtual bool entry() noexcept override;
+  virtual bool exit() noexcept override;
 
-  // Setters
-  void setFields(Fields fields) noexcept;
-  void setField(Field field, bool enable) noexcept;
-  void setPermanentMessage(const QString& message) noexcept;
-  void clearPermanentMessage() noexcept;
-  void setLengthUnit(const LengthUnit& unit) noexcept;
-  void setAbsoluteCursorPosition(const Point& pos) noexcept;
-  void setProgressBarTextFormat(const QString& format) noexcept;
-  void setProgressBarPercent(int percent) noexcept;
+  // Event Handlers
+  virtual bool processCopy() noexcept override;
+  virtual bool processRemove() noexcept override;
+  virtual bool processAbortCommand() noexcept override;
+  virtual bool processKeyPressed(const QKeyEvent& e) noexcept override;
+  virtual bool processKeyReleased(const QKeyEvent& e) noexcept override;
+  virtual bool processGraphicsSceneMouseMoved(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processGraphicsSceneLeftMouseButtonPressed(
+      QGraphicsSceneMouseEvent& e) noexcept override;
+  virtual bool processSwitchToBoard(int index) noexcept override;
 
   // Operator Overloadings
-  StatusBar& operator=(const StatusBar& rhs) = delete;
-
-protected:
-  void resizeEvent(QResizeEvent* e) noexcept override;
-
-private:  // Methods
-  void updatePermanentMessage() noexcept;
-  void updateAbsoluteCursorPosition() noexcept;
+  BoardEditorState_Measure& operator=(const BoardEditorState_Measure& rhs) =
+      delete;
 
 private:  // Data
-  Fields mFields;
-  QString mPermanentMessage;
-  LengthUnit mLengthUnit;
-  Point mAbsoluteCursorPosition;
-  QScopedPointer<QLabel> mMessageLabel;
-  QScopedPointer<QLabel> mAbsPosXLabel;
-  QScopedPointer<QLabel> mAbsPosYLabel;
-  QScopedPointer<QProgressBar> mProgressBar;
-  QScopedPointer<QWidget> mProgressBarPlaceHolder;
+  QScopedPointer<MeasureTool> mTool;
 };
 
 /*******************************************************************************
@@ -99,7 +83,5 @@ private:  // Data
 
 }  // namespace editor
 }  // namespace librepcb
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::editor::StatusBar::Fields)
 
 #endif
