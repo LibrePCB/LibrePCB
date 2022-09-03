@@ -148,6 +148,7 @@ signals:
    * the current state and entering the select tool.
    */
   void requestLeavingState();
+  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 protected:  // Methods
   Board* getActiveBoard() noexcept;

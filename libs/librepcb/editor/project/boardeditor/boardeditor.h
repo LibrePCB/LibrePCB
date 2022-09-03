@@ -227,6 +227,7 @@ private:
   QScopedPointer<QAction> mActionToolText;
   QScopedPointer<QAction> mActionToolPlane;
   QScopedPointer<QAction> mActionToolHole;
+  QScopedPointer<QAction> mActionToolMeasure;
   QScopedPointer<QAction> mActionDockErc;
   QScopedPointer<QAction> mActionDockDrc;
   QScopedPointer<QAction> mActionDockLayers;

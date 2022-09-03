@@ -23,7 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/point.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -51,6 +53,13 @@ class GraphicsView final : public QGraphicsView {
   Q_OBJECT
 
 public:
+  // Types
+  enum class CursorOption {
+    Cross = (1 << 0),
+    Circle = (1 << 1),
+  };
+  Q_DECLARE_FLAGS(CursorOptions, CursorOption)
+
   // Constructors / Destructor
   GraphicsView(const GraphicsView& other) = delete;
   explicit GraphicsView(
@@ -68,6 +77,7 @@ public:
 
   // Setters
   void setUseOpenGl(bool useOpenGl) noexcept;
+  void setGrayOut(bool grayOut) noexcept;
   void setGridProperties(const GridProperties& properties) noexcept;
   void setScene(GraphicsScene* scene) noexcept;
   void setVisibleSceneRect(const QRectF& rect) noexcept;
@@ -82,6 +92,13 @@ public:
    * @param rect    The rect to mark. Pass an empty rect to clear the marker.
    */
   void setSceneRectMarker(const QRectF& rect) noexcept;
+  void setSceneCursor(
+      const tl::optional<std::pair<Point, CursorOptions>>& cursor) noexcept;
+  void setRulerColor(const QColor& color) noexcept;
+  void setRulerPositions(
+      const tl::optional<std::pair<Point, Point>>& pos) noexcept;
+  void setOverlayColor(const QColor& color) noexcept;
+  void setOverlayText(const QString& text) noexcept;
   void setOriginCrossVisible(bool visible) noexcept;
   void setEventHandlerObject(
       IF_GraphicsViewEventHandler* eventHandler) noexcept;
@@ -123,6 +140,7 @@ private:
   void drawForeground(QPainter* painter, const QRectF& rect);
 
   // General Attributes
+  QScopedPointer<QLabel> mOverlayLabel;
   IF_GraphicsViewEventHandler* mEventHandlerObject;
   GraphicsScene* mScene;
   QVariantAnimation* mZoomAnimation;
@@ -130,6 +148,24 @@ private:
   QRectF mSceneRectMarker;
   bool mOriginCrossVisible;
   bool mUseOpenGl;
+  bool mGrayOut;
+
+  /// If not nullopt, a cursor will be shown at the given position
+  tl::optional<std::pair<Point, CursorOptions>> mSceneCursor;
+
+  // Configuration for the ruler overlay
+  struct RulerGauge {
+    int xScale;
+    LengthUnit unit;
+    QString unitSeparator;
+    Length minTickInterval;
+    Length currentTickInterval;
+  };
+  QVector<RulerGauge> mRulerGauges;
+  QColor mRulerColor;
+  tl::optional<std::pair<Point, Point>> mRulerPositions;
+
+  // State
   volatile bool mPanningActive;
   QCursor mCursorBeforePanning;
 

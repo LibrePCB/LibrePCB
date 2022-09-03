@@ -258,6 +258,8 @@ add_library(
   library/pkg/fsm/packageeditorstate_drawtext.h
   library/pkg/fsm/packageeditorstate_drawtextbase.cpp
   library/pkg/fsm/packageeditorstate_drawtextbase.h
+  library/pkg/fsm/packageeditorstate_measure.cpp
+  library/pkg/fsm/packageeditorstate_measure.h
   library/pkg/fsm/packageeditorstate_select.cpp
   library/pkg/fsm/packageeditorstate_select.h
   library/pkg/packagechooserdialog.cpp
@@ -296,6 +298,8 @@ add_library(
   library/sym/fsm/symboleditorstate_drawtext.h
   library/sym/fsm/symboleditorstate_drawtextbase.cpp
   library/sym/fsm/symboleditorstate_drawtextbase.h
+  library/sym/fsm/symboleditorstate_measure.cpp
+  library/sym/fsm/symboleditorstate_measure.h
   library/sym/fsm/symboleditorstate_select.cpp
   library/sym/fsm/symboleditorstate_select.h
   library/sym/symbolchooserdialog.cpp
@@ -390,6 +394,8 @@ add_library(
   project/boardeditor/fsm/boardeditorstate_drawpolygon.h
   project/boardeditor/fsm/boardeditorstate_drawtrace.cpp
   project/boardeditor/fsm/boardeditorstate_drawtrace.h
+  project/boardeditor/fsm/boardeditorstate_measure.cpp
+  project/boardeditor/fsm/boardeditorstate_measure.h
   project/boardeditor/fsm/boardeditorstate_select.cpp
   project/boardeditor/fsm/boardeditorstate_select.h
   project/boardeditor/unplacedcomponentsdock.cpp
@@ -603,6 +609,8 @@ add_library(
   project/schematiceditor/fsm/schematiceditorstate_drawpolygon.h
   project/schematiceditor/fsm/schematiceditorstate_drawwire.cpp
   project/schematiceditor/fsm/schematiceditorstate_drawwire.h
+  project/schematiceditor/fsm/schematiceditorstate_measure.cpp
+  project/schematiceditor/fsm/schematiceditorstate_measure.h
   project/schematiceditor/fsm/schematiceditorstate_select.cpp
   project/schematiceditor/fsm/schematiceditorstate_select.h
   project/schematiceditor/renamenetsegmentdialog.cpp
@@ -635,6 +643,8 @@ add_library(
   utils/exclusiveactiongroup.h
   utils/halignactiongroup.cpp
   utils/halignactiongroup.h
+  utils/measuretool.cpp
+  utils/measuretool.h
   utils/menubuilder.cpp
   utils/menubuilder.h
   utils/shortcutsreferencegenerator.cpp

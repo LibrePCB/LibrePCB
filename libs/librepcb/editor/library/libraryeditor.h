@@ -237,6 +237,7 @@ private:  // Data
   QScopedPointer<QAction> mActionToolSmtPad;
   QScopedPointer<QAction> mActionToolThtPad;
   QScopedPointer<QAction> mActionToolHole;
+  QScopedPointer<QAction> mActionToolMeasure;
 
   // Action groups
   QScopedPointer<UndoStackActionGroup> mUndoStackActionGroup;

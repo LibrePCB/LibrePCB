@@ -68,6 +68,14 @@ public:
       noexcept = 0;
 
   // Event Handlers
+  virtual bool processKeyPressed(const QKeyEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
+  virtual bool processKeyReleased(const QKeyEvent& e) noexcept {
+    Q_UNUSED(e);
+    return false;
+  }
   virtual bool processGraphicsSceneMouseMoved(
       QGraphicsSceneMouseEvent& e) noexcept {
     Q_UNUSED(e);
@@ -120,6 +128,7 @@ public:
 
 signals:
   void availableFeaturesChanged();
+  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
 
 protected:  // Methods
   const PositiveLength& getGridInterval() const noexcept;

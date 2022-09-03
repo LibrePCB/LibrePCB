@@ -136,6 +136,9 @@ public:
   // Operator Overloadings
   SchematicEditorState& operator=(const SchematicEditorState& rhs) = delete;
 
+signals:
+  void statusBarMessageChanged(const QString& message, int timeoutMs = -1);
+
 protected:  // Methods
   Schematic* getActiveSchematic() noexcept;
   PositiveLength getGridInterval() const noexcept;

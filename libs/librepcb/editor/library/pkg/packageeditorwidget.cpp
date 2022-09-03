@@ -83,6 +83,8 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   mUi->graphicsView->setScene(mGraphicsScene.data());
   mUi->graphicsView->setBackgroundBrush(Qt::black);
   mUi->graphicsView->setForegroundBrush(Qt::white);
+  mUi->graphicsView->setOverlayColor(Qt::yellow);
+  mUi->graphicsView->setRulerColor(Qt::yellow);
   mUi->graphicsView->setEnabled(false);  // no footprint selected
   mUi->graphicsView->addAction(
       EditorCommandSet::instance().commandToolBarFocus.createAction(
@@ -160,6 +162,8 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
           &PackageEditorFsm::updateAvailableFeatures);
   connect(mFsm.data(), &PackageEditorFsm::availableFeaturesChanged, this,
           [this]() { emit availableFeaturesChanged(getAvailableFeatures()); });
+  connect(mFsm.data(), &PackageEditorFsm::statusBarMessageChanged, this,
+          &PackageEditorWidget::setStatusBarMessage);
   currentFootprintChanged(0);  // small hack to select the first footprint...
 
   // Last but not least, connect the graphics scene events with the FSM.
@@ -209,6 +213,7 @@ void PackageEditorWidget::connectEditor(
   mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, enabled);
   mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, enabled);
   mToolsActionGroup->setActionEnabled(Tool::ADD_HOLES, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::MEASURE, true);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
   connect(mFsm.data(), &PackageEditorFsm::toolChanged, mToolsActionGroup,
           &ExclusiveActionGroup::setCurrentAction);
@@ -220,14 +225,14 @@ void PackageEditorWidget::connectEditor(
 }
 
 void PackageEditorWidget::disconnectEditor() noexcept {
-  EditorWidgetBase::disconnectEditor();
-
   disconnect(mFsm.data(), &PackageEditorFsm::toolChanged, mToolsActionGroup,
              &ExclusiveActionGroup::setCurrentAction);
 
   mStatusBar->setField(StatusBar::AbsolutePosition, false);
   disconnect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
              mStatusBar, &StatusBar::setAbsoluteCursorPosition);
+
+  EditorWidgetBase::disconnectEditor();
 }
 
 /*******************************************************************************
@@ -432,6 +437,16 @@ bool PackageEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
           return false;
       }
     }
+    case QEvent::KeyPress: {
+      auto* e = dynamic_cast<QKeyEvent*>(event);
+      Q_ASSERT(e);
+      return mFsm->processKeyPressed(*e);
+    }
+    case QEvent::KeyRelease: {
+      auto* e = dynamic_cast<QKeyEvent*>(event);
+      Q_ASSERT(e);
+      return mFsm->processKeyReleased(*e);
+    }
     default: { return false; }
   }
 }
@@ -460,6 +475,8 @@ bool PackageEditorWidget::toolChangeRequested(Tool newTool) noexcept {
       return mFsm->processStartDrawTexts();
     case Tool::ADD_HOLES:
       return mFsm->processStartAddingHoles();
+    case Tool::MEASURE:
+      return mFsm->processStartMeasure();
     default:
       return false;
   }

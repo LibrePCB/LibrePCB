@@ -186,6 +186,7 @@ private:
   QScopedPointer<QAction> mActionToolPolygon;
   QScopedPointer<QAction> mActionToolText;
   QScopedPointer<QAction> mActionToolComponent;
+  QScopedPointer<QAction> mActionToolMeasure;
   QScopedPointer<QAction> mActionComponentResistor;
   QScopedPointer<QAction> mActionComponentInductor;
   QScopedPointer<QAction> mActionComponentCapacitorBipolar;

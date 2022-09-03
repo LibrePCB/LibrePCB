@@ -152,7 +152,7 @@ void SchematicPainter::paint(QPainter& painter,
       p.drawText(symbol.transform.map(text.getPosition()),
                  symbol.transform.map(text.getRotation()), *text.getHeight(),
                  alignment, text.getText(), qApp->getDefaultSansSerifFont(),
-                 settings.getColor(*text.getLayerName()), false);
+                 settings.getColor(*text.getLayerName()), true, false);
     }
 
     // Draw Symbol Pins.
@@ -170,7 +170,8 @@ void SchematicPainter::paint(QPainter& painter,
                  symbol.transform.map(pin.rotation + pin.nameRotation),
                  *pin.nameHeight, nameAlignment, pin.name,
                  qApp->getDefaultSansSerifFont(),
-                 settings.getColor(GraphicsLayer::sSymbolPinNames), false);
+                 settings.getColor(GraphicsLayer::sSymbolPinNames), true,
+                 false);
     }
   }
 
@@ -187,7 +188,7 @@ void SchematicPainter::paint(QPainter& painter,
   foreach (const Text& text, mTexts) {
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
                text.getAlign(), text.getText(), qApp->getDefaultSansSerifFont(),
-               settings.getColor(*text.getLayerName()), false);
+               settings.getColor(*text.getLayerName()), true, false);
   }
 
   // Draw Net Lines.

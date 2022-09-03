@@ -114,6 +114,14 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
                                          *mCommandToolBarProxy,
                                          mProjectEditor.getUndoStack()};
   mFsm.reset(new SchematicEditorFsm(fsmContext));
+  connect(mFsm.data(), &SchematicEditorFsm::statusBarMessageChanged, this,
+          [this](const QString& message, int timeoutMs) {
+            if (timeoutMs < 0) {
+              mUi->statusbar->setPermanentMessage(message);
+            } else {
+              mUi->statusbar->showMessage(message, timeoutMs);
+            }
+          });
 
   // Create all actions, window menus, toolbars and dock widgets.
   createActions();
@@ -414,6 +422,7 @@ void SchematicEditor::createActions() noexcept {
   mActionToolPolygon.reset(cmd.toolPolygon.createAction(this));
   mActionToolText.reset(cmd.toolText.createAction(this));
   mActionToolComponent.reset(cmd.toolComponent.createAction(this));
+  mActionToolMeasure.reset(cmd.toolMeasure.createAction(this));
   mActionComponentResistor.reset(
       cmd.componentResistor.createAction(this, this, [this]() {
         Uuid componentUuid =
@@ -500,6 +509,8 @@ void SchematicEditor::createActions() noexcept {
                                mActionToolText.data());
   mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_COMPONENT,
                                mActionToolComponent.data());
+  mToolsActionGroup->addAction(SchematicEditorFsm::State::MEASURE,
+                               mActionToolMeasure.data());
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
   connect(mFsm.data(), &SchematicEditorFsm::stateChanged,
           mToolsActionGroup.data(), &ExclusiveActionGroup::setCurrentAction);
@@ -583,6 +594,8 @@ void SchematicEditor::createToolBars() noexcept {
   mToolBarTools->addAction(mActionToolPolygon.data());
   mToolBarTools->addAction(mActionToolText.data());
   mToolBarTools->addAction(mActionToolComponent.data());
+  mToolBarTools->addSeparator();
+  mToolBarTools->addAction(mActionToolMeasure.data());
   addToolBar(Qt::LeftToolBarArea, mToolBarTools.data());
 
   // Components.
@@ -728,6 +741,8 @@ void SchematicEditor::createMenus() noexcept {
   mb.addAction(mActionToolPolygon);
   mb.addAction(mActionToolText);
   mb.addAction(mActionToolComponent);
+  mb.addSeparator();
+  mb.addAction(mActionToolMeasure);
 
   // Help.
   mb.newMenu(&MenuBuilder::createHelpMenu);
@@ -852,6 +867,9 @@ void SchematicEditor::toolActionGroupChangeTriggered(
       break;
     case SchematicEditorFsm::State::ADD_TEXT:
       mFsm->processAddText();
+      break;
+    case SchematicEditorFsm::State::MEASURE:
+      mFsm->processMeasure();
       break;
     default:
       Q_ASSERT(false);

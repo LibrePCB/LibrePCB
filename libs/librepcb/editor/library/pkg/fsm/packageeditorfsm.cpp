@@ -33,6 +33,7 @@
 #include "packageeditorstate_drawpolygon.h"
 #include "packageeditorstate_drawrect.h"
 #include "packageeditorstate_drawtext.h"
+#include "packageeditorstate_measure.h"
 #include "packageeditorstate_select.h"
 
 #include <librepcb/core/application.h>
@@ -73,6 +74,13 @@ PackageEditorFsm::PackageEditorFsm(const Context& context) noexcept
                  new PackageEditorState_DrawCircle(mContext));
   mStates.insert(State::DRAW_TEXT, new PackageEditorState_DrawText(mContext));
   mStates.insert(State::ADD_HOLES, new PackageEditorState_AddHoles(mContext));
+  mStates.insert(State::MEASURE, new PackageEditorState_Measure(mContext));
+
+  foreach (PackageEditorState* state, mStates) {
+    connect(state, &PackageEditorState::statusBarMessageChanged, this,
+            &PackageEditorFsm::statusBarMessageChanged);
+  }
+
   enterNextState(State::SELECT);
 }
 
@@ -112,6 +120,8 @@ EditorWidgetBase::Tool PackageEditorFsm::getCurrentTool() const noexcept {
       return EditorWidgetBase::Tool::DRAW_TEXT;
     case State::ADD_HOLES:
       return EditorWidgetBase::Tool::ADD_HOLES;
+    case State::MEASURE:
+      return EditorWidgetBase::Tool::MEASURE;
     default:
       Q_ASSERT(false);
       return EditorWidgetBase::Tool::NONE;
@@ -179,6 +189,24 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
 
     // go to selection tool because other tools may no longer work properly!
     return setNextState(State::SELECT);
+  }
+}
+
+bool PackageEditorFsm::processKeyPressed(const QKeyEvent& e) noexcept {
+  if (getCurrentState() && mContext.currentFootprint &&
+      mContext.currentGraphicsItem) {
+    return getCurrentState()->processKeyPressed(e);
+  } else {
+    return false;
+  }
+}
+
+bool PackageEditorFsm::processKeyReleased(const QKeyEvent& e) noexcept {
+  if (getCurrentState() && mContext.currentFootprint &&
+      mContext.currentGraphicsItem) {
+    return getCurrentState()->processKeyReleased(e);
+  } else {
+    return false;
   }
 }
 
@@ -394,6 +422,10 @@ bool PackageEditorFsm::processStartDxfImport() noexcept {
     }
   }
   return false;
+}
+
+bool PackageEditorFsm::processStartMeasure() noexcept {
+  return setNextState(State::MEASURE);
 }
 
 /*******************************************************************************
