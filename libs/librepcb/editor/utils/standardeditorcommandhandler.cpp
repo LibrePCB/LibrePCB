@@ -69,8 +69,8 @@ void StandardEditorCommandHandler::website() const noexcept {
 
 void StandardEditorCommandHandler::fileManager(const FilePath& fp) const
     noexcept {
-  DesktopServices ds(mSettings, false);
-  ds.openFile(fp);
+  DesktopServices ds(mSettings, mParent);
+  ds.openLocalPath(fp);
 }
 
 void StandardEditorCommandHandler::shortcutsReference() const noexcept {
@@ -86,8 +86,8 @@ void StandardEditorCommandHandler::shortcutsReference() const noexcept {
     ShortcutsReferenceGenerator generator(EditorCommandSet::instance());
     generator.generatePdf(fp);
 
-    DesktopServices ds(mSettings, true, mParent);
-    ds.openPdf(fp);
+    DesktopServices ds(mSettings, mParent);
+    ds.openLocalPath(fp);
   } catch (const Exception& e) {
     QMessageBox::critical(mParent, tr("Error"), e.getMsg());
   }

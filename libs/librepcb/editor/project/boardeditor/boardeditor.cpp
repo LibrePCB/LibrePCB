@@ -1289,8 +1289,8 @@ void BoardEditor::execGraphicsExportDialog(
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
               DesktopServices services(
-                  mProjectEditor.getWorkspace().getSettings(), true);
-              services.openFile(fp);
+                  mProjectEditor.getWorkspace().getSettings(), this);
+              services.openLocalPath(fp);
             });
     dialog.exec();
   } catch (const Exception& e) {

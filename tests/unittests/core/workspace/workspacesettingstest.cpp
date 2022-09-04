@@ -96,6 +96,9 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
       " (repositories\n"
       "  (repository \"https://api.librepcb.org\")\n"
       " )\n"
+      " (external_pdf_reader\n"
+      "  (command \"evince \\\"{{FILEPATH}}\\\"\")\n"
+      " )\n"
       ")",
       FilePath());
 
@@ -110,6 +113,8 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
   EXPECT_EQ(QStringList{"IEC 60617"}, obj.libraryNormOrder.get());
   EXPECT_EQ(QList<QUrl>{QUrl("https://api.librepcb.org")},
             obj.repositoryUrls.get());
+  EXPECT_EQ(QStringList{"evince \"{{FILEPATH}}\""},
+            obj.externalPdfReaderCommands.get());
 }
 
 TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
@@ -123,9 +128,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   obj1.libraryLocaleOrder.set({"de_CH", "en_US"});
   obj1.libraryNormOrder.set({"foo", "bar"});
   obj1.repositoryUrls.set({QUrl("https://foo"), QUrl("https://bar")});
-  obj1.useCustomPdfReader.set(obj1.useCustomPdfReader.get());
-  obj1.pdfReaderCommand.set("my reader");
-  obj1.pdfOpenBehavior.set(WorkspaceSettings::PdfOpenBehavior::NEVER);
+  obj1.externalPdfReaderCommands.set({"pdf", "reader"});
   const SExpression root1 = obj1.serialize();
 
   // Load
@@ -142,9 +145,8 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   EXPECT_EQ(obj1.libraryLocaleOrder.get(), obj2.libraryLocaleOrder.get());
   EXPECT_EQ(obj1.libraryNormOrder.get(), obj2.libraryNormOrder.get());
   EXPECT_EQ(obj1.repositoryUrls.get(), obj2.repositoryUrls.get());
-  EXPECT_EQ(obj1.useCustomPdfReader.get(), obj2.useCustomPdfReader.get());
-  EXPECT_EQ(obj1.pdfReaderCommand.get(), obj2.pdfReaderCommand.get());
-  EXPECT_EQ(obj1.pdfOpenBehavior.get(), obj2.pdfOpenBehavior.get());
+  EXPECT_EQ(obj1.externalPdfReaderCommands.get(),
+            obj2.externalPdfReaderCommands.get());
   const SExpression root2 = obj2.serialize();
 
   // Check if serialization of loaded settings leads to same file content

@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "../modelview/editablelistmodel.h"
 
+#include <librepcb/core/workspace/workspacesettingsitem_genericvaluelist.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -59,6 +61,14 @@ class WorkspaceSettingsDialog final : public QDialog {
   using LibraryNormOrderModel = EditableListModel<QStringList>;
   using RepositoryUrlModel = EditableListModel<QList<QUrl>>;
 
+  struct ExternalApplication {
+    QPointer<WorkspaceSettingsItem_GenericValueList<QStringList>> setting;
+    QString exampleExecutable;
+    QString defaultArgument;
+    QVector<std::pair<QString, QString>> placeholders;
+    QStringList currentValue;
+  };
+
 public:
   // Constructors / Destructor
   WorkspaceSettingsDialog() = delete;
@@ -74,6 +84,7 @@ public:
 private:
   void buttonBoxClicked(QAbstractButton* button) noexcept;
   void keyPressEvent(QKeyEvent* event) noexcept override;
+  void externalApplicationListIndexChanged(int index) noexcept;
   void loadSettings() noexcept;
   void saveSettings() noexcept;
 
@@ -86,6 +97,9 @@ private:
   QScopedPointer<KeyboardShortcutsModel> mKeyboardShortcutsModel;
   QScopedPointer<QSortFilterProxyModel> mKeyboardShortcutsFilterModel;
   QScopedPointer<Ui::WorkspaceSettingsDialog> mUi;
+
+  // Cached settings
+  QVector<ExternalApplication> mExternalApplications;
 };
 
 /*******************************************************************************
