@@ -59,6 +59,7 @@ public:
   ~DesktopServices() noexcept;
 
   // General Methods
+  bool openWebUrl(const QUrl& url) const noexcept;
   bool openLocalPath(const FilePath& filePath) const noexcept;
 
   // Operator Overloadings

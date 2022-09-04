@@ -234,7 +234,7 @@ void ProjectEditor::execOrderPcbDialog(const Board* board,
         filter);  // can throw
   };
 
-  OrderPcbDialog dialog(mWorkspace.getSettings().repositoryUrls.get(), callback,
+  OrderPcbDialog dialog(mWorkspace.getSettings(), callback,
                         board ? board->getRelativePath() : QString(), parent);
   dialog.exec();
 }

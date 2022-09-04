@@ -164,6 +164,18 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     connect(mUi->lstExternalApplications, &QListWidget::currentRowChanged, this,
             &WorkspaceSettingsDialog::externalApplicationListIndexChanged);
 
+    mUi->lstExternalApplications->addItem(new QListWidgetItem(
+        QIcon(":/img/actions/open_browser.png"), tr("Web Browser")));
+    mExternalApplications.append(ExternalApplication{
+        &mSettings.externalWebBrowserCommands,
+        "firefox",
+        "\"{{URL}}\"",
+        {std::make_pair(
+            QString("{{URL}}"),
+            tr("Website URL to open", "Decription for '{{URL}}' placeholder"))},
+        {},
+    });
+
     mUi->lstExternalApplications->addItem(
         new QListWidgetItem(QIcon(":/img/actions/pdf.png"), tr("PDF Reader")));
     mExternalApplications.append(ExternalApplication{

@@ -60,11 +60,13 @@ void StandardEditorCommandHandler::aboutLibrePcb() const noexcept {
 }
 
 void StandardEditorCommandHandler::onlineDocumentation() const noexcept {
-  QDesktopServices::openUrl(QUrl("https://docs.librepcb.org"));
+  DesktopServices ds(mSettings, mParent);
+  ds.openWebUrl(QUrl("https://docs.librepcb.org"));
 }
 
 void StandardEditorCommandHandler::website() const noexcept {
-  QDesktopServices::openUrl(QUrl("https://librepcb.org"));
+  DesktopServices ds(mSettings, mParent);
+  ds.openWebUrl(QUrl("https://librepcb.org"));
 }
 
 void StandardEditorCommandHandler::fileManager(const FilePath& fp) const

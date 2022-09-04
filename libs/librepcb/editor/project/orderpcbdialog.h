@@ -34,6 +34,7 @@
 namespace librepcb {
 
 class OrderPcbApiRequest;
+class WorkspaceSettings;
 
 namespace editor {
 
@@ -55,7 +56,7 @@ public:
   // Constructors / Destructor
   OrderPcbDialog() = delete;
   OrderPcbDialog(const OrderPcbDialog& other) = delete;
-  explicit OrderPcbDialog(const QList<QUrl>& repositories,
+  explicit OrderPcbDialog(const WorkspaceSettings& settings,
                           std::function<QByteArray()> createLppzCallback,
                           const QString& boardRelativePath = QString(),
                           QWidget* parent = nullptr) noexcept;
@@ -76,6 +77,7 @@ private:  // Methods
   void setError(const QString& msg) noexcept;
 
 private:  // Data
+  const WorkspaceSettings& mSettings;
   QScopedPointer<OrderPcbApiRequest> mRequest;
   std::function<QByteArray()> mCreateLppzCallback;
   QString mBoardRelativePath;

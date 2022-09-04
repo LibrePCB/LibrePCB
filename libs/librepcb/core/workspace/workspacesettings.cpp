@@ -50,6 +50,8 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),
     repositoryUrls("repositories", "repository",
                    QList<QUrl>{QUrl("https://api.librepcb.org")}, this),
+    externalWebBrowserCommands("external_web_browser", "command", QStringList(),
+                               this),
     externalPdfReaderCommands("external_pdf_reader", "command", QStringList(),
                               this),
     keyboardShortcuts(this) {

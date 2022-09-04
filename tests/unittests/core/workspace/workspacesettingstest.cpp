@@ -77,6 +77,7 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionV01) {
   EXPECT_EQ(QStringList{"IEC 60617"}, obj.libraryNormOrder.get());
   EXPECT_EQ(QList<QUrl>{QUrl("https://api.librepcb.org")},
             obj.repositoryUrls.get());
+  EXPECT_EQ(QStringList{}, obj.externalWebBrowserCommands.get());
 }
 
 TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
@@ -96,6 +97,9 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
       " (repositories\n"
       "  (repository \"https://api.librepcb.org\")\n"
       " )\n"
+      " (external_web_browser\n"
+      "  (command \"firefox \\\"{{URL}}\\\"\")\n"
+      " )\n"
       " (external_pdf_reader\n"
       "  (command \"evince \\\"{{FILEPATH}}\\\"\")\n"
       " )\n"
@@ -113,6 +117,8 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
   EXPECT_EQ(QStringList{"IEC 60617"}, obj.libraryNormOrder.get());
   EXPECT_EQ(QList<QUrl>{QUrl("https://api.librepcb.org")},
             obj.repositoryUrls.get());
+  EXPECT_EQ(QStringList{"firefox \"{{URL}}\""},
+            obj.externalWebBrowserCommands.get());
   EXPECT_EQ(QStringList{"evince \"{{FILEPATH}}\""},
             obj.externalPdfReaderCommands.get());
 }
@@ -128,6 +134,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   obj1.libraryLocaleOrder.set({"de_CH", "en_US"});
   obj1.libraryNormOrder.set({"foo", "bar"});
   obj1.repositoryUrls.set({QUrl("https://foo"), QUrl("https://bar")});
+  obj1.externalWebBrowserCommands.set({"foo", "bar"});
   obj1.externalPdfReaderCommands.set({"pdf", "reader"});
   const SExpression root1 = obj1.serialize();
 
@@ -145,6 +152,8 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   EXPECT_EQ(obj1.libraryLocaleOrder.get(), obj2.libraryLocaleOrder.get());
   EXPECT_EQ(obj1.libraryNormOrder.get(), obj2.libraryNormOrder.get());
   EXPECT_EQ(obj1.repositoryUrls.get(), obj2.repositoryUrls.get());
+  EXPECT_EQ(obj1.externalWebBrowserCommands.get(),
+            obj2.externalWebBrowserCommands.get());
   EXPECT_EQ(obj1.externalPdfReaderCommands.get(),
             obj2.externalPdfReaderCommands.get());
   const SExpression root2 = obj2.serialize();

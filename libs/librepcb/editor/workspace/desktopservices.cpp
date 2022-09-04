@@ -50,6 +50,19 @@ DesktopServices::~DesktopServices() noexcept {
  *  General Methods
  ******************************************************************************/
 
+bool DesktopServices::openWebUrl(const QUrl& url) const noexcept {
+  foreach (QString cmd, mSettings.externalWebBrowserCommands.get()) {
+    cmd.replace("{{URL}}", url.toString());
+    if (QProcess::startDetached(cmd)) {
+      qDebug() << "Successfully opened URL with command:" << cmd;
+      return true;
+    } else {
+      qWarning() << "Failed to open URL with command:" << cmd;
+    }
+  }
+  return openUrl(url);
+}
+
 bool DesktopServices::openLocalPath(const FilePath& filePath) const noexcept {
   const QString ext = filePath.getSuffix().toLower();
   if (ext == "pdf") {
