@@ -32,6 +32,7 @@
 #include "../../utils/standardeditorcommandhandler.h"
 #include "../../workspace/desktopservices.h"
 #include "../../workspace/librarymanager/librarymanager.h"
+#include "../desktopservices.h"
 #include "../initializeworkspacewizard/initializeworkspacewizard.h"
 #include "../projectlibraryupdater/projectlibraryupdater.h"
 #include "../workspacesettingsdialog.h"

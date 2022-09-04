@@ -392,13 +392,15 @@ void BoardEditor::createActions() noexcept {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
   }));
   mActionGenerateBom.reset(cmd.generateBom.createAction(this, this, [this]() {
-    BomGeneratorDialog dialog(mProject, getActiveBoard(), this);
+    BomGeneratorDialog dialog(mProjectEditor.getWorkspace().getSettings(),
+                              mProject, getActiveBoard(), this);
     dialog.exec();
   }));
   mActionGenerateFabricationData.reset(
       cmd.generateFabricationData.createAction(this, this, [this]() {
         if (Board* board = getActiveBoard()) {
-          FabricationOutputDialog dialog(*board, this);
+          FabricationOutputDialog dialog(
+              mProjectEditor.getWorkspace().getSettings(), *board, this);
           dialog.exec();
         }
       }));

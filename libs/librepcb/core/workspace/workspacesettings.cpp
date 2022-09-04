@@ -52,6 +52,8 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
                    QList<QUrl>{QUrl("https://api.librepcb.org")}, this),
     externalWebBrowserCommands("external_web_browser", "command", QStringList(),
                                this),
+    externalFileManagerCommands("external_file_manager", "command",
+                                QStringList(), this),
     externalPdfReaderCommands("external_pdf_reader", "command", QStringList(),
                               this),
     keyboardShortcuts(this) {

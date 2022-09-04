@@ -23,6 +23,7 @@
 #include "bomgeneratordialog.h"
 
 #include "../dialogs/filedialog.h"
+#include "../workspace/desktopservices.h"
 #include "ui_bomgeneratordialog.h"
 
 #include <librepcb/core/attribute/attributesubstitutor.h>
@@ -49,10 +50,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BomGeneratorDialog::BomGeneratorDialog(const Project& project,
+BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
+                                       const Project& project,
                                        const Board* board,
                                        QWidget* parent) noexcept
   : QDialog(parent),
+    mSettings(settings),
     mProject(project),
     mBom(new Bom(QStringList())),
     mUi(new Ui::BomGeneratorDialog) {
@@ -107,8 +110,8 @@ void BomGeneratorDialog::btnChooseOutputPathClicked() noexcept {
 }
 
 void BomGeneratorDialog::btnOpenOutputDirectoryClicked() noexcept {
-  QDesktopServices::openUrl(
-      QUrl::fromLocalFile(getOutputFilePath().getParentDir().toStr()));
+  DesktopServices ds(mSettings, this);
+  ds.openLocalPath(getOutputFilePath().getParentDir());
 }
 
 void BomGeneratorDialog::btnGenerateClicked() noexcept {

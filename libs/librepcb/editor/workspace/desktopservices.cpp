@@ -65,7 +65,9 @@ bool DesktopServices::openWebUrl(const QUrl& url) const noexcept {
 
 bool DesktopServices::openLocalPath(const FilePath& filePath) const noexcept {
   const QString ext = filePath.getSuffix().toLower();
-  if (ext == "pdf") {
+  if (filePath.isExistingDir()) {
+    return openDirectory(filePath);
+  } else if (ext == "pdf") {
     return openLocalPathWithCommand(filePath,
                                     mSettings.externalPdfReaderCommands.get());
   } else {
@@ -76,6 +78,11 @@ bool DesktopServices::openLocalPath(const FilePath& filePath) const noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+bool DesktopServices::openDirectory(const FilePath& filePath) const noexcept {
+  return openLocalPathWithCommand(filePath,
+                                  mSettings.externalFileManagerCommands.get());
+}
 
 bool DesktopServices::openLocalPathWithCommand(
     const FilePath& filePath, const QStringList& commands) const noexcept {

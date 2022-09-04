@@ -216,6 +216,20 @@ public:
       externalWebBrowserCommands;
 
   /**
+   * @brief Custom command(s) to be used for opening directories
+   *
+   * When opening a directory, the application will iterate through this list
+   * of commands until a command was successful. If none was successful, the
+   * system's default command will be used as fallback.
+   *
+   * Supported placeholders: `{{URL}}`, `{{FILEPATH}}`
+   *
+   * Default: []
+   */
+  WorkspaceSettingsItem_GenericValueList<QStringList>
+      externalFileManagerCommands;
+
+  /**
    * @brief Custom command(s) to be used for opening PDF files
    *
    * When opening a PDF file, the application will iterate through this list

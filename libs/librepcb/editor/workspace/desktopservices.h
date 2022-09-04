@@ -66,6 +66,7 @@ public:
   DesktopServices& operator=(const DesktopServices& rhs) = delete;
 
 private:  // Methods
+  bool openDirectory(const FilePath& filePath) const noexcept;
   bool openLocalPathWithCommand(const FilePath& filePath,
                                 const QStringList& commands) const noexcept;
   bool openUrl(const QUrl& url) const noexcept;

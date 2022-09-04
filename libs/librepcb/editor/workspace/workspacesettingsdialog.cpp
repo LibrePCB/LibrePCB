@@ -176,6 +176,16 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
         {},
     });
 
+    mUi->lstExternalApplications->addItem(new QListWidgetItem(
+        QIcon(":/img/actions/open.png"), tr("File Manager")));
+    mExternalApplications.append(ExternalApplication{
+        &mSettings.externalFileManagerCommands,
+        "explorer",
+        "\"{{FILEPATH}}\"",
+        {placeholderFilePath, placeholderUrl},
+        {},
+    });
+
     mUi->lstExternalApplications->addItem(
         new QListWidgetItem(QIcon(":/img/actions/pdf.png"), tr("PDF Reader")));
     mExternalApplications.append(ExternalApplication{
