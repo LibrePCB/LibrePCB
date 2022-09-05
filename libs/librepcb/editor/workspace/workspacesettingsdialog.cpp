@@ -22,11 +22,13 @@
  ******************************************************************************/
 #include "workspacesettingsdialog.h"
 
+#include "../dialogs/filedialog.h"
 #include "../editorcommandset.h"
 #include "../modelview/comboboxdelegate.h"
 #include "../modelview/editablelistmodel.h"
 #include "../modelview/keyboardshortcutsmodel.h"
 #include "../modelview/keysequencedelegate.h"
+#include "../utils/editortoolbox.h"
 #include "ui_workspacesettingsdialog.h"
 
 #include <librepcb/core/application.h>
@@ -150,39 +152,53 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
 
   // Initialize external applications widgets
   {
-    connect(mUi->pdfCustomRadioBtn, &QRadioButton::toggled,
-            mUi->pdfCustomCmdEdit, &QTextEdit::setEnabled);
-    connect(mUi->pdfCustomRadioBtn, &QRadioButton::toggled,
-            mUi->pdfCustomCmdPickBtn, &QToolButton::setEnabled);
+    auto placeholderFilePath =
+        std::make_pair(QString("{{FILEPATH}}"),
+                       tr("Absolute path to the file to open",
+                          "Decription for '{{FILEPATH}}' placeholder"));
+    auto placeholderUrl =
+        std::make_pair(QString("{{URL}}"),
+                       tr("URL to the file to open (file://)",
+                          "Decription for '{{URL}}' placeholder"));
 
-    // PDF Reader
-    // match IDs with enum values
-    mUi->pdfOpenGroup->setId(
-        mUi->pdfOpenAlwaysRadio,
-        static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ALWAYS));
+    connect(mUi->lstExternalApplications, &QListWidget::currentRowChanged, this,
+            &WorkspaceSettingsDialog::externalApplicationListIndexChanged);
 
-    mUi->pdfOpenGroup->setId(
-        mUi->pdfOpenNeverRadio,
-        static_cast<int>(WorkspaceSettings::PdfOpenBehavior::NEVER));
-
-    mUi->pdfOpenGroup->setId(
-        mUi->pdfOpenAskRadio,
-        static_cast<int>(WorkspaceSettings::PdfOpenBehavior::ASK));
-
-    // File picker
-    connect(mUi->pdfCustomCmdPickBtn, &QToolButton::clicked, [&]() {
-      QFileDialog fileDialog(this);
-
-      fileDialog.setWindowTitle(tr("Select an executable file"));
-      fileDialog.setFileMode(QFileDialog::ExistingFile);
-      fileDialog.setFilter(QDir::Executable);
-      fileDialog.setDirectory(QDir::home());
-
-      if (fileDialog.exec()) {
-        mUi->pdfCustomCmdEdit->setText(fileDialog.selectedFiles().first() +
-                                       " \"{{FILEPATH}}\"");
-      }
+    mUi->lstExternalApplications->addItem(new QListWidgetItem(
+        QIcon(":/img/actions/open_browser.png"), tr("Web Browser")));
+    mExternalApplications.append(ExternalApplication{
+        &mSettings.externalWebBrowserCommands,
+        "firefox",
+        "\"{{URL}}\"",
+        {std::make_pair(
+            QString("{{URL}}"),
+            tr("Website URL to open", "Decription for '{{URL}}' placeholder"))},
+        {},
     });
+
+    mUi->lstExternalApplications->addItem(new QListWidgetItem(
+        QIcon(":/img/actions/open.png"), tr("File Manager")));
+    mExternalApplications.append(ExternalApplication{
+        &mSettings.externalFileManagerCommands,
+        "explorer",
+        "\"{{FILEPATH}}\"",
+        {placeholderFilePath, placeholderUrl},
+        {},
+    });
+
+    mUi->lstExternalApplications->addItem(
+        new QListWidgetItem(QIcon(":/img/actions/pdf.png"), tr("PDF Reader")));
+    mExternalApplications.append(ExternalApplication{
+        &mSettings.externalPdfReaderCommands,
+        "evince",
+        "\"{{FILEPATH}}\"",
+        {placeholderFilePath, placeholderUrl},
+        {},
+    });
+
+    mUi->lstExternalApplications->setMinimumWidth(
+        mUi->lstExternalApplications->sizeHintForColumn(0) + 20);
+    mUi->lstExternalApplications->setCurrentRow(0);
   }
 
   // Initialize keyboard shortcuts widgets
@@ -301,6 +317,85 @@ void WorkspaceSettingsDialog::keyPressEvent(QKeyEvent* event) noexcept {
   QDialog::keyPressEvent(event);
 }
 
+void WorkspaceSettingsDialog::externalApplicationListIndexChanged(
+    int index) noexcept {
+  if ((index < 0) || (index >= mExternalApplications.count())) {
+    return;
+  }
+
+  while (mUi->layoutExternalApplicationCommands->count() > 0) {
+    QLayoutItem* item = mUi->layoutExternalApplicationCommands->takeAt(0);
+    Q_ASSERT(item);
+    EditorToolbox::deleteLayoutItemRecursively(item);
+  }
+
+  QStringList commands = mExternalApplications[index].currentValue;
+  for (int i = 0; i <= commands.count(); ++i) {
+    QHBoxLayout* hLayout = new QHBoxLayout();
+    hLayout->setContentsMargins(0, 0, 0, 0);
+    hLayout->setSpacing(0);
+
+    QLineEdit* edit = new QLineEdit(commands.value(i), this);
+    edit->setPlaceholderText(
+        tr("Example:") % " " % mExternalApplications[index].exampleExecutable %
+        " " % mExternalApplications[index].defaultArgument);
+    if (i < commands.count()) {
+      connect(edit, &QLineEdit::textChanged, edit, [this, index, edit, i]() {
+        mExternalApplications[index].currentValue.replace(i, edit->text());
+      });
+    } else {
+      connect(edit, &QLineEdit::editingFinished, edit, [this, index, edit]() {
+        if (!edit->text().isEmpty()) {
+          mExternalApplications[index].currentValue.append(edit->text());
+        }
+      });
+      connect(edit, &QLineEdit::editingFinished, edit,
+              [this]() {
+                externalApplicationListIndexChanged(
+                    mUi->lstExternalApplications->currentRow());
+              },
+              Qt::QueuedConnection);
+    }
+    hLayout->addWidget(edit);
+
+    QToolButton* btnBrowse = new QToolButton(this);
+    btnBrowse->setToolTip(tr("Select executable..."));
+    btnBrowse->setIcon(QIcon(":/img/actions/open.png"));
+    connect(btnBrowse, &QToolButton::clicked, this, [this, edit, index]() {
+      QString fp = FileDialog::getOpenFileName(this, tr("Select executable"),
+                                               QDir::rootPath());
+      if (!fp.isEmpty()) {
+        edit->setText(fp % " " % mExternalApplications[index].defaultArgument);
+        emit edit->editingFinished();
+      }
+    });
+    hLayout->addWidget(btnBrowse);
+
+    if (i < commands.count()) {
+      QToolButton* btnRemove = new QToolButton(this);
+      btnRemove->setToolTip(tr("Remove this command"));
+      btnRemove->setIcon(QIcon(":/img/actions/delete.png"));
+      connect(btnRemove, &QToolButton::clicked, this,
+              [this, index, i]() {
+                mExternalApplications[index].currentValue.removeAt(i);
+                externalApplicationListIndexChanged(index);
+              },
+              Qt::QueuedConnection);
+      hLayout->addWidget(btnRemove);
+    }
+
+    mUi->layoutExternalApplicationCommands->addLayout(hLayout);
+  }
+
+  QString placeholdersText =
+      "<p>" % tr("Available placeholders:") % "</p><p><ul>";
+  foreach (const auto& p, mExternalApplications[index].placeholders) {
+    placeholdersText += "<li><tt>" % p.first % "</tt>: " % p.second % "</li>";
+  }
+  placeholdersText += "</ul></p>";
+  mUi->lblExternalApplicationsPlaceholders->setText(placeholdersText);
+}
+
 void WorkspaceSettingsDialog::loadSettings() noexcept {
   // User Name
   mUi->edtUserName->setText(mSettings.userName.get());
@@ -333,16 +428,12 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   // Repository URLs
   mRepositoryUrlsModel->setValues(mSettings.repositoryUrls.get());
 
-  // External PDF Reader
-  mUi->pdfCustomCmdEdit->setEnabled(mSettings.useCustomPdfReader.get());
-  mUi->pdfCustomCmdPickBtn->setEnabled(mSettings.useCustomPdfReader.get());
-
-  mUi->pdfCustomCmdEdit->setText(mSettings.pdfReaderCommand.get());
-  mUi->pdfCustomRadioBtn->setChecked(mSettings.useCustomPdfReader.get());
-
-  // External PDF reader behaviour
-  mUi->pdfOpenGroup->button(static_cast<int>(mSettings.pdfOpenBehavior.get()))
-      ->setChecked(true);
+  // External Applications
+  for (auto& app : mExternalApplications) {
+    app.currentValue = app.setting->get();
+  }
+  externalApplicationListIndexChanged(
+      mUi->lstExternalApplications->currentRow());
 
   // Keyboard Shortcuts
   mKeyboardShortcutsModel->setOverrides(mSettings.keyboardShortcuts.get());
@@ -382,14 +473,16 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
     // Repository URLs
     mSettings.repositoryUrls.set(mRepositoryUrlsModel->getValues());
 
-    // External PDF Reader
-    mSettings.useCustomPdfReader.set(mUi->pdfCustomRadioBtn->isChecked());
-    mSettings.pdfReaderCommand.set(mUi->pdfCustomCmdEdit->text().trimmed());
-
-    // External PDF reader behaviour
-    mSettings.pdfOpenBehavior.set(
-        static_cast<WorkspaceSettings::PdfOpenBehavior>(
-            mUi->pdfOpenGroup->checkedId()));
+    // External Applications
+    for (auto& app : mExternalApplications) {
+      QStringList commands;
+      foreach (const QString& cmd, app.currentValue) {
+        if (!cmd.trimmed().isEmpty()) {
+          commands.append(cmd.trimmed());
+        }
+      }
+      app.setting->set(commands);
+    }
 
     // Keyboard shortcuts
     mSettings.keyboardShortcuts.set(mKeyboardShortcutsModel->getOverrides());

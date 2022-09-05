@@ -39,8 +39,8 @@ namespace editor {
  ******************************************************************************/
 
 DesktopServices::DesktopServices(const WorkspaceSettings& settings,
-                                 bool forceOpen, QWidget* parent) noexcept
-  : mSettings(settings), mForceOpen(forceOpen), mParent(parent) {
+                                 QWidget* parent) noexcept
+  : mSettings(settings), mParent(parent) {
 }
 
 DesktopServices::~DesktopServices() noexcept {
@@ -50,60 +50,59 @@ DesktopServices::~DesktopServices() noexcept {
  *  General Methods
  ******************************************************************************/
 
-bool DesktopServices::openFile(const FilePath& filePath) const noexcept {
-  const QString ext = filePath.getSuffix().toLower();
-  if (ext == "pdf") {
-    return openPdf(filePath);
-  } else {
-    return openUrl(QUrl::fromLocalFile(filePath.toNative()));
+bool DesktopServices::openWebUrl(const QUrl& url) const noexcept {
+  foreach (QString cmd, mSettings.externalWebBrowserCommands.get()) {
+    cmd.replace("{{URL}}", url.toString());
+    if (QProcess::startDetached(cmd)) {
+      qDebug() << "Successfully opened URL with command:" << cmd;
+      return true;
+    } else {
+      qWarning() << "Failed to open URL with command:" << cmd;
+    }
   }
+  return openUrl(url);
 }
 
-bool DesktopServices::openPdf(const FilePath& filePath) const noexcept {
-  if (!mForceOpen) {
-    switch (mSettings.pdfOpenBehavior.get()) {
-      case WorkspaceSettings::PdfOpenBehavior::NEVER: {
-        return false;  // Do not open file -> abort.
-      }
-      case WorkspaceSettings::PdfOpenBehavior::ALWAYS: {
-        break;  // Open file -> just continue.
-      }
-      case WorkspaceSettings::PdfOpenBehavior::ASK: {
-        int result = QMessageBox::information(
-            mParent, tr("PDF Export"), tr("PDF exported successfully."),
-            QMessageBox::Ok | QMessageBox::Open);
-        if (result != QMessageBox::Open) {
-          return false;  // Do not open file -> abort.
-        }
-        break;
-      }
-      default: {
-        qCritical() << "DesktopServices: Unhandled switch-case!";
-        return false;
-      }
-    }
-  }
-
-  // Open file now.
-  if (mSettings.useCustomPdfReader.get()) {
-    QString cmd = mSettings.pdfReaderCommand.get();
-    cmd.replace("{{FILEPATH}}", filePath.toNative());
-    if (!QProcess::startDetached(cmd)) {
-      qCritical() << "Failed to open PDF with custom command:" << cmd;
-      return false;
-    }
+bool DesktopServices::openLocalPath(const FilePath& filePath) const noexcept {
+  const QString ext = filePath.getSuffix().toLower();
+  if (filePath.isExistingDir()) {
+    return openDirectory(filePath);
+  } else if (ext == "pdf") {
+    return openLocalPathWithCommand(filePath,
+                                    mSettings.externalPdfReaderCommands.get());
   } else {
     return openUrl(QUrl::fromLocalFile(filePath.toNative()));
   }
-  return true;
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
+bool DesktopServices::openDirectory(const FilePath& filePath) const noexcept {
+  return openLocalPathWithCommand(filePath,
+                                  mSettings.externalFileManagerCommands.get());
+}
+
+bool DesktopServices::openLocalPathWithCommand(
+    const FilePath& filePath, const QStringList& commands) const noexcept {
+  const QUrl url = QUrl::fromLocalFile(filePath.toNative());
+  foreach (QString cmd, commands) {
+    cmd.replace("{{FILEPATH}}", filePath.toNative());
+    cmd.replace("{{URL}}", url.toString());
+    if (QProcess::startDetached(cmd)) {
+      qDebug() << "Successfully opened file or directory with command:" << cmd;
+      return true;
+    } else {
+      qWarning() << "Failed to open file or directory with command:" << cmd;
+    }
+  }
+  return openUrl(url);
+}
+
 bool DesktopServices::openUrl(const QUrl& url) const noexcept {
   if (QDesktopServices::openUrl(url)) {
+    qDebug() << "Successfully opened URL with QDesktopServices:" << url;
     return true;
   } else {
     qCritical() << "Failed to open URL with QDesktopServices:" << url;

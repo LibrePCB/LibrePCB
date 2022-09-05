@@ -32,6 +32,7 @@
 #include "../../utils/standardeditorcommandhandler.h"
 #include "../../workspace/desktopservices.h"
 #include "../../workspace/librarymanager/librarymanager.h"
+#include "../desktopservices.h"
 #include "../initializeworkspacewizard/initializeworkspacewizard.h"
 #include "../projectlibraryupdater/projectlibraryupdater.h"
 #include "../workspacesettingsdialog.h"
@@ -614,7 +615,8 @@ void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index) {
   } else if (fp.getSuffix() == "lpp") {
     openProject(fp);
   } else {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(fp.toStr()));
+    DesktopServices ds(mWorkspace.getSettings(), this);
+    ds.openLocalPath(fp);
   }
 }
 
@@ -659,14 +661,14 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
         &menu, this, [this, fp]() { openProjectLibraryUpdater(fp); },
         EditorCommand::ActionFlag::NoShortcuts));
   } else {
-    mb.addAction(
-        cmd.itemOpen.createAction(&menu, this,
-                                  [fp]() {
-                                    QDesktopServices::openUrl(
-                                        QUrl::fromLocalFile(fp.toStr()));
-                                  },
-                                  EditorCommand::ActionFlag::NoShortcuts),
-        MenuBuilder::Flag::DefaultAction);
+    mb.addAction(cmd.itemOpen.createAction(
+                     &menu, this,
+                     [this, fp]() {
+                       DesktopServices ds(mWorkspace.getSettings(), this);
+                       ds.openLocalPath(fp);
+                     },
+                     EditorCommand::ActionFlag::NoShortcuts),
+                 MenuBuilder::Flag::DefaultAction);
   }
   mb.addSeparator();
   if (fp.isExistingDir() && (!isProjectDir) && (!isInProjectDir)) {

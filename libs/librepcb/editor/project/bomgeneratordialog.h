@@ -39,6 +39,7 @@ namespace librepcb {
 class Board;
 class Bom;
 class Project;
+class WorkspaceSettings;
 
 namespace editor {
 
@@ -60,9 +61,9 @@ public:
   // Constructors / Destructor
   BomGeneratorDialog() = delete;
   BomGeneratorDialog(const BomGeneratorDialog& other) = delete;
-  explicit BomGeneratorDialog(const Project& project,
-                              const Board* board = nullptr,
-                              QWidget* parent = nullptr) noexcept;
+  BomGeneratorDialog(const WorkspaceSettings& settings, const Project& project,
+                     const Board* board = nullptr,
+                     QWidget* parent = nullptr) noexcept;
   ~BomGeneratorDialog() noexcept;
 
   // Operator Overloads
@@ -80,6 +81,7 @@ private:  // Methods
   FilePath getOutputFilePath() const noexcept;
 
 private:  // Data
+  const WorkspaceSettings& mSettings;
   const Project& mProject;
   std::shared_ptr<Bom> mBom;
   QScopedPointer<Ui::BomGeneratorDialog> mUi;

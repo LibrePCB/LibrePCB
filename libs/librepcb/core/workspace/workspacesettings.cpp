@@ -50,9 +50,12 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),
     repositoryUrls("repositories", "repository",
                    QList<QUrl>{QUrl("https://api.librepcb.org")}, this),
-    useCustomPdfReader("use_custom_pdf_reader", false, this),
-    pdfReaderCommand("pdf_custom_reader_command", "", this),
-    pdfOpenBehavior("pdf_open_behavior", PdfOpenBehavior::ALWAYS, this),
+    externalWebBrowserCommands("external_web_browser", "command", QStringList(),
+                               this),
+    externalFileManagerCommands("external_file_manager", "command",
+                                QStringList(), this),
+    externalPdfReaderCommands("external_pdf_reader", "command", QStringList(),
+                              this),
     keyboardShortcuts(this) {
 }
 

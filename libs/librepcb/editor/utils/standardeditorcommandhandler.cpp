@@ -60,17 +60,19 @@ void StandardEditorCommandHandler::aboutLibrePcb() const noexcept {
 }
 
 void StandardEditorCommandHandler::onlineDocumentation() const noexcept {
-  QDesktopServices::openUrl(QUrl("https://docs.librepcb.org"));
+  DesktopServices ds(mSettings, mParent);
+  ds.openWebUrl(QUrl("https://docs.librepcb.org"));
 }
 
 void StandardEditorCommandHandler::website() const noexcept {
-  QDesktopServices::openUrl(QUrl("https://librepcb.org"));
+  DesktopServices ds(mSettings, mParent);
+  ds.openWebUrl(QUrl("https://librepcb.org"));
 }
 
 void StandardEditorCommandHandler::fileManager(const FilePath& fp) const
     noexcept {
-  DesktopServices ds(mSettings, false);
-  ds.openFile(fp);
+  DesktopServices ds(mSettings, mParent);
+  ds.openLocalPath(fp);
 }
 
 void StandardEditorCommandHandler::shortcutsReference() const noexcept {
@@ -86,8 +88,8 @@ void StandardEditorCommandHandler::shortcutsReference() const noexcept {
     ShortcutsReferenceGenerator generator(EditorCommandSet::instance());
     generator.generatePdf(fp);
 
-    DesktopServices ds(mSettings, true, mParent);
-    ds.openPdf(fp);
+    DesktopServices ds(mSettings, mParent);
+    ds.openLocalPath(fp);
   } catch (const Exception& e) {
     QMessageBox::critical(mParent, tr("Error"), e.getMsg());
   }

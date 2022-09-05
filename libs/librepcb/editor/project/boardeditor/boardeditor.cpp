@@ -392,13 +392,15 @@ void BoardEditor::createActions() noexcept {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
   }));
   mActionGenerateBom.reset(cmd.generateBom.createAction(this, this, [this]() {
-    BomGeneratorDialog dialog(mProject, getActiveBoard(), this);
+    BomGeneratorDialog dialog(mProjectEditor.getWorkspace().getSettings(),
+                              mProject, getActiveBoard(), this);
     dialog.exec();
   }));
   mActionGenerateFabricationData.reset(
       cmd.generateFabricationData.createAction(this, this, [this]() {
         if (Board* board = getActiveBoard()) {
-          FabricationOutputDialog dialog(*board, this);
+          FabricationOutputDialog dialog(
+              mProjectEditor.getWorkspace().getSettings(), *board, this);
           dialog.exec();
         }
       }));
@@ -1289,8 +1291,8 @@ void BoardEditor::execGraphicsExportDialog(
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
               DesktopServices services(
-                  mProjectEditor.getWorkspace().getSettings(), true);
-              services.openFile(fp);
+                  mProjectEditor.getWorkspace().getSettings(), this);
+              services.openLocalPath(fp);
             });
     dialog.exec();
   } catch (const Exception& e) {
