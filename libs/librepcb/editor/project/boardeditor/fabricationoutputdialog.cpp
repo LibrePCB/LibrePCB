@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "fabricationoutputdialog.h"
 
+#include "../../workspace/desktopservices.h"
 #include "ui_fabricationoutputdialog.h"
 
 #include <librepcb/core/graphics/graphicslayer.h>
@@ -43,8 +44,10 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-FabricationOutputDialog::FabricationOutputDialog(Board& board, QWidget* parent)
+FabricationOutputDialog::FabricationOutputDialog(
+    const WorkspaceSettings& settings, Board& board, QWidget* parent)
   : QDialog(parent),
+    mSettings(settings),
     mProject(board.getProject()),
     mBoard(board),
     mUi(new Ui::FabricationOutputDialog) {
@@ -181,7 +184,8 @@ void FabricationOutputDialog::on_btnBrowseOutputDir_clicked() {
   BoardGerberExport grbExport(mBoard, mBoard.getFabricationOutputSettings());
   FilePath dir = grbExport.getOutputDirectory();
   if (dir.isExistingDir()) {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(dir.toStr()));
+    DesktopServices ds(mSettings, this);
+    ds.openLocalPath(dir);
   } else {
     QMessageBox::warning(this, tr("Warning"), tr("Directory does not exist."));
   }

@@ -54,23 +54,25 @@ public:
   // Constructors / Destructor
   DesktopServices() = delete;
   DesktopServices(const DesktopServices& other) = delete;
-  explicit DesktopServices(const WorkspaceSettings& settings, bool forceOpen,
-                           QWidget* parent = nullptr) noexcept;
+  explicit DesktopServices(const WorkspaceSettings& settings,
+                           QWidget* parent) noexcept;
   ~DesktopServices() noexcept;
 
   // General Methods
-  bool openFile(const FilePath& filePath) const noexcept;
-  bool openPdf(const FilePath& filePath) const noexcept;
+  bool openWebUrl(const QUrl& url) const noexcept;
+  bool openLocalPath(const FilePath& filePath) const noexcept;
 
   // Operator Overloadings
   DesktopServices& operator=(const DesktopServices& rhs) = delete;
 
 private:  // Methods
+  bool openDirectory(const FilePath& filePath) const noexcept;
+  bool openLocalPathWithCommand(const FilePath& filePath,
+                                const QStringList& commands) const noexcept;
   bool openUrl(const QUrl& url) const noexcept;
 
 private:  // Data
   const WorkspaceSettings& mSettings;
-  const bool mForceOpen;
   QPointer<QWidget> mParent;
 };
 

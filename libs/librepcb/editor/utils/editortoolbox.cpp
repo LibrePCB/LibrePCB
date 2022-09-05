@@ -60,7 +60,7 @@ void EditorToolbox::deleteLayoutItemRecursively(QLayoutItem* item) noexcept {
   if (QWidget* widget = item->widget()) {
     delete widget;
   } else if (QLayout* layout = item->layout()) {
-    for (int i = 0; i < layout->count(); ++i) {
+    for (int i = layout->count() - 1; i >= 0; --i) {
       deleteLayoutItemRecursively(layout->takeAt(i));
     }
   } else if (QSpacerItem* spacer = item->spacerItem()) {

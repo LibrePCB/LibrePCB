@@ -303,7 +303,8 @@ void SchematicEditor::createActions() noexcept {
     const Board* board = mProject.getBoards().count() == 1
         ? mProject.getBoardByIndex(0)
         : nullptr;
-    BomGeneratorDialog dialog(mProject, board, this);
+    BomGeneratorDialog dialog(mProjectEditor.getWorkspace().getSettings(),
+                              mProject, board, this);
     dialog.exec();
   }));
   mActionOrderPcb.reset(cmd.orderPcb.createAction(this, this, [this]() {
@@ -1041,8 +1042,8 @@ void SchematicEditor::execGraphicsExportDialog(
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
               DesktopServices services(
-                  mProjectEditor.getWorkspace().getSettings(), true);
-              services.openFile(fp);
+                  mProjectEditor.getWorkspace().getSettings(), this);
+              services.openLocalPath(fp);
             });
     dialog.exec();
   } catch (const Exception& e) {

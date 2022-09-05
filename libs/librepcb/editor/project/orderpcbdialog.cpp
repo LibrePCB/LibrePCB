@@ -22,10 +22,12 @@
  ******************************************************************************/
 #include "orderpcbdialog.h"
 
+#include "../workspace/desktopservices.h"
 #include "ui_orderpcbdialog.h"
 
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/network/orderpcbapirequest.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,11 +42,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-OrderPcbDialog::OrderPcbDialog(const QList<QUrl>& repositories,
+OrderPcbDialog::OrderPcbDialog(const WorkspaceSettings& settings,
                                std::function<QByteArray()> createLppzCallback,
                                const QString& boardRelativePath,
                                QWidget* parent) noexcept
   : QDialog(parent),
+    mSettings(settings),
     mRequest(),
     mCreateLppzCallback(createLppzCallback),
     mBoardRelativePath(boardRelativePath),
@@ -75,8 +78,9 @@ OrderPcbDialog::OrderPcbDialog(const QList<QUrl>& repositories,
           .toBool());
 
   // Request upload information.
-  if (repositories.count() > 0) {
-    mRequest.reset(new OrderPcbApiRequest(repositories.first()));
+  if (mSettings.repositoryUrls.get().count() > 0) {
+    mRequest.reset(
+        new OrderPcbApiRequest(mSettings.repositoryUrls.get().first()));
     connect(mRequest.data(), &OrderPcbApiRequest::infoRequestSucceeded, this,
             &OrderPcbDialog::infoRequestSucceeded);
     connect(mRequest.data(), &OrderPcbApiRequest::infoRequestFailed, this,
@@ -186,14 +190,15 @@ void OrderPcbDialog::uploadSucceeded(const QUrl& redirectUrl) noexcept {
                "Placeholder is an URL with hyperlink.")
                 .arg(hyperlink));
   if (mUi->cbxOpenBrowser->isChecked()) {
-    if (QDesktopServices::openUrl(redirectUrl)) {
+    DesktopServices ds(mSettings, this);
+    if (ds.openWebUrl(redirectUrl)) {
       // The web browser might need a few seconds to open. Let's keep the dialog
       // open during this time - if the dialog closes immediately but no browser
       // is visible yet, it looks like the feature does not work.
       QTimer::singleShot(5000, this, &OrderPcbDialog::accept);
       setStatus(tr("Success! Opening %1...").arg(hyperlink));
     } else {
-      qWarning() << "Failed to open the webbrowser with QDesktopServices.";
+      setError(tr("Failed to open %1").arg(hyperlink));
     }
   }
 }

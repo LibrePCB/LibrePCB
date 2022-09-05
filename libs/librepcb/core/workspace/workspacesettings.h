@@ -202,6 +202,47 @@ public:
   WorkspaceSettingsItem_GenericValueList<QList<QUrl>> repositoryUrls;
 
   /**
+   * @brief Custom command(s) to be used for opening web URLs
+   *
+   * When opening an URL, the application will iterate through this list of
+   * commands until a command was successful. If none was successful, the
+   * system's default command will be used as fallback.
+   *
+   * Supported placeholders: `{{URL}}`
+   *
+   * Default: []
+   */
+  WorkspaceSettingsItem_GenericValueList<QStringList>
+      externalWebBrowserCommands;
+
+  /**
+   * @brief Custom command(s) to be used for opening directories
+   *
+   * When opening a directory, the application will iterate through this list
+   * of commands until a command was successful. If none was successful, the
+   * system's default command will be used as fallback.
+   *
+   * Supported placeholders: `{{URL}}`, `{{FILEPATH}}`
+   *
+   * Default: []
+   */
+  WorkspaceSettingsItem_GenericValueList<QStringList>
+      externalFileManagerCommands;
+
+  /**
+   * @brief Custom command(s) to be used for opening PDF files
+   *
+   * When opening a PDF file, the application will iterate through this list
+   * of commands until a command was successful. If none was successful, the
+   * system's default command will be used as fallback.
+   *
+   * Supported placeholders: `{{URL}}`, `{{FILEPATH}}`
+   *
+   * Default: []
+   */
+  WorkspaceSettingsItem_GenericValueList<QStringList> externalPdfReaderCommands;
+
+  /**
    * @brief Keyboard shortcuts
    *
    * @note Expected to contain only the shortcuts explicitly set (overridden)

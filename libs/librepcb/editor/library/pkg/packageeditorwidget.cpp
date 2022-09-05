@@ -621,8 +621,8 @@ bool PackageEditorWidget::execGraphicsExportDialog(
         "package_editor/" % settingsKey, this);
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {
-              DesktopServices services(mContext.workspace.getSettings(), true);
-              services.openFile(fp);
+              DesktopServices services(mContext.workspace.getSettings(), this);
+              services.openLocalPath(fp);
             });
     dialog.exec();
   } catch (const Exception& e) {

@@ -24,6 +24,7 @@
 #include "../../testhelpers.h"
 
 #include <gtest/gtest.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/project/orderpcbdialog.h>
 
 #include <QtTest>
@@ -51,11 +52,13 @@ protected:
  ******************************************************************************/
 
 TEST_F(OrderPcbDialogTest, testAutoOpenBrowser) {
+  WorkspaceSettings settings;
+  settings.repositoryUrls.set(QList<QUrl>());  // Avoid API calls during test!
   const bool defaultValue = true;
   const bool newValue = false;
 
   {
-    OrderPcbDialog dialog(QList<QUrl>(), nullptr);
+    OrderPcbDialog dialog(settings, nullptr);
 
     // Check the default value.
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dialog, "cbxOpenBrowser");
@@ -67,14 +70,16 @@ TEST_F(OrderPcbDialogTest, testAutoOpenBrowser) {
 
   // Check if the setting is saved and restored automatically.
   {
-    OrderPcbDialog dialog(QList<QUrl>(), nullptr);
+    OrderPcbDialog dialog(settings, nullptr);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dialog, "cbxOpenBrowser");
     EXPECT_EQ(newValue, cbx.isChecked());
   }
 }
 
 TEST_F(OrderPcbDialogTest, testTabOrder) {
-  OrderPcbDialog dialog(QList<QUrl>(), nullptr);
+  WorkspaceSettings settings;
+  settings.repositoryUrls.set(QList<QUrl>());  // Avoid API calls during test!
+  OrderPcbDialog dialog(settings, nullptr);
   TestHelpers::testTabOrder(dialog);
 }
 
