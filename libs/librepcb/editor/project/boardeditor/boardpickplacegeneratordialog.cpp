@@ -22,12 +22,14 @@
  ******************************************************************************/
 #include "boardpickplacegeneratordialog.h"
 
+#include "../../workspace/desktopservices.h"
 #include "ui_boardpickplacegeneratordialog.h"
 
 #include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/export/pickplacecsvwriter.h>
 #include <librepcb/core/fileio/csvfile.h>
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/board/boardpickplacegenerator.h>
 #include <librepcb/core/project/project.h>
 
@@ -43,14 +45,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(Board& board,
-                                                             QWidget* parent)
+BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(
+    const WorkspaceSettings& settings, Board& board, QWidget* parent)
   : QDialog(parent),
     mBoard(board),
     mData(),
     mUi(new Ui::BoardPickPlaceGeneratorDialog) {
   mUi->setupUi(this);
-  mUi->lblSuccess->hide();
   mUi->lblBoardName->setText(*board.getName());
   mUi->tableWidget->setWordWrap(false);
   mUi->tableWidget->verticalHeader()->setMinimumSectionSize(10);
@@ -60,10 +61,33 @@ BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(Board& board,
       "./output/{{VERSION}}/assembly/{{PROJECT}}_PnP-TOP.csv");
   mUi->edtBottomFilePath->setText(
       "./output/{{VERSION}}/assembly/{{PROJECT}}_PnP-BOT.csv");
-  QPushButton* btnGenerate =
+  mBtnGenerate =
       mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::ActionRole);
-  connect(btnGenerate, &QPushButton::clicked, this,
+  connect(mBtnGenerate, &QPushButton::clicked, this,
           &BoardPickPlaceGeneratorDialog::btnGenerateClicked);
+  connect(mUi->btnBrowseOutputDir, &QPushButton::clicked, this,
+          [this, &settings]() {
+            DesktopServices ds(settings, this);
+            ds.openLocalPath(
+                getOutputFilePath(mUi->edtTopFilePath->text()).getParentDir());
+          });
+  connect(mUi->rbtnFormatCsvWithMetadata, &QRadioButton::toggled, this,
+          [this](bool checked) {
+            if (checked) setFileExtension("csv");
+          });
+  connect(mUi->rbtnFormatCsvWithoutMetadata, &QRadioButton::toggled, this,
+          [this](bool checked) {
+            if (checked) setFileExtension("csv");
+          });
+  connect(mUi->rbtnFormatGerberX3, &QRadioButton::toggled, this,
+          [this](bool checked) {
+            if (checked) setFileExtension("gbr");
+          });
+
+  // Load window geometry.
+  QSettings clientSettings;
+  restoreGeometry(
+      clientSettings.value("pnp_export_dialog/window_geometry").toByteArray());
 
   BoardPickPlaceGenerator gen(mBoard);
   mData = gen.generate();
@@ -71,29 +95,69 @@ BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(Board& board,
 }
 
 BoardPickPlaceGeneratorDialog::~BoardPickPlaceGeneratorDialog() {
+  // Save window geometry.
+  QSettings clientSettings;
+  clientSettings.setValue("pnp_export_dialog/window_geometry", saveGeometry());
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
+void BoardPickPlaceGeneratorDialog::setFileExtension(
+    const QString& extension) noexcept {
+  for (QLineEdit* edit : {mUi->edtTopFilePath, mUi->edtBottomFilePath}) {
+    QStringList splitPath = edit->text().split(".");
+    if ((splitPath.count() > 1) && (splitPath.last().toLower() != extension)) {
+      splitPath.last() = extension;
+    }
+    edit->setText(splitPath.join("."));
+  }
+}
+
 void BoardPickPlaceGeneratorDialog::btnGenerateClicked() noexcept {
   try {
-    PickPlaceCsvWriter writer(*mData);
-    writer.setIncludeMetadataComment(mUi->cbxIncludeComment->isChecked());
-    if (mUi->cbxTopDevices->isChecked()) {
-      writer.setBoardSide(PickPlaceCsvWriter::BoardSide::TOP);
-      writer.generateCsv()->saveToFile(
-          getOutputFilePath(mUi->edtTopFilePath->text()));  // can throw
+    if (mUi->rbtnFormatGerberX3->isChecked()) {
+      // Gerber X3
+      BoardGerberExport gen(mBoard);
+      if (mUi->cbxTopDevices->isChecked()) {
+        gen.exportComponentLayer(
+            BoardGerberExport::BoardSide::Top,
+            getOutputFilePath(mUi->edtTopFilePath->text()));  // can throw
+      }
+      if (mUi->cbxBottomDevices->isChecked()) {
+        gen.exportComponentLayer(
+            BoardGerberExport::BoardSide::Bottom,
+            getOutputFilePath(mUi->edtBottomFilePath->text()));  // can throw
+      }
+    } else {
+      // CSV
+      PickPlaceCsvWriter writer(*mData);
+      writer.setIncludeMetadataComment(
+          mUi->rbtnFormatCsvWithMetadata->isChecked());
+      if (mUi->cbxTopDevices->isChecked()) {
+        writer.setBoardSide(PickPlaceCsvWriter::BoardSide::TOP);
+        writer.generateCsv()->saveToFile(
+            getOutputFilePath(mUi->edtTopFilePath->text()));  // can throw
+      }
+      if (mUi->cbxBottomDevices->isChecked()) {
+        writer.setBoardSide(PickPlaceCsvWriter::BoardSide::BOTTOM);
+        writer.generateCsv()->saveToFile(
+            getOutputFilePath(mUi->edtBottomFilePath->text()));  // can throw
+      }
     }
-    if (mUi->cbxBottomDevices->isChecked()) {
-      writer.setBoardSide(PickPlaceCsvWriter::BoardSide::BOTTOM);
-      writer.generateCsv()->saveToFile(
-          getOutputFilePath(mUi->edtBottomFilePath->text()));  // can throw
+
+    QString btnSuccessText = tr("Success!");
+    QString btnGenerateText = mBtnGenerate->text();
+    if (btnGenerateText != btnSuccessText) {
+      mBtnGenerate->setText(btnSuccessText);
+      QTimer::singleShot(500, this, [this, btnGenerateText]() {
+        if (mBtnGenerate) {
+          mBtnGenerate->setText(btnGenerateText);
+        }
+      });
     }
-    mUi->lblSuccess->show();
   } catch (Exception& e) {
-    mUi->lblSuccess->hide();
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
 }
@@ -132,7 +196,9 @@ FilePath BoardPickPlaceGeneratorDialog::getOutputFilePath(
             str, FilePath::ReplaceSpaces | FilePath::KeepCase);
       });
 
-  if (QDir::isAbsolutePath(path)) {
+  if (path.isEmpty()) {
+    return FilePath();
+  } else if (QDir::isAbsolutePath(path)) {
     return FilePath(path);
   } else {
     return mBoard.getProject().getPath().getPathTo(path);
