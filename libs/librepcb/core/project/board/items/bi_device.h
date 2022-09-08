@@ -61,6 +61,9 @@ class BI_Device final : public BI_Base,
   DECLARE_ERC_MSG_CLASS_NAME(BI_Device)
 
 public:
+  // Types
+  enum class MountType { Tht, Smt, Fiducial, Other, None };
+
   // Constructors / Destructor
   BI_Device() = delete;
   BI_Device(const BI_Device& other) = delete;
@@ -85,6 +88,24 @@ public:
   bool getMirrored() const noexcept { return mMirrored; }
   bool isSelectable() const noexcept override;
   bool isUsed() const noexcept;
+
+  /**
+   * @brief Determine the mount (assembly) type of this device
+   *
+   * By default, this is automatically detected from the footprint pads (THT or
+   * SMT). If there are no pads, ::librepcb::BI_Device::MountType::None is
+   * returned since probably it is just a logo or so.
+   *
+   * However, the user can manually override this mechanism by adding a
+   * device property `MOUNT_TYPE` set to `THT`, `SMT`, `FIDUCIAL`, `OTHER` or
+   * `NONE`.
+   *
+   * Note that this mechanism should be refactored in v0.2, see
+   * https://github.com/LibrePCB/LibrePCB/issues/1001 for details.
+   *
+   * @return The determined device mount type.
+   */
+  MountType determineMountType() const noexcept;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
