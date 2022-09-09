@@ -23,6 +23,7 @@
 
 #include <gtest/gtest.h>
 #include <librepcb/core/export/gerberattribute.h>
+#include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
@@ -309,6 +310,66 @@ TEST_F(GerberAttributeTest, testObjectPin) {
                 .toStdString());
   EXPECT_EQ("G04 #@! TO.P,C7,42,VCC*\n",
             GerberAttribute::objectPin("C7", "42", "VCC")
+                .toGerberString()
+                .toStdString());
+}
+
+TEST_F(GerberAttributeTest, testComponentRotation) {
+  EXPECT_EQ("G04 #@! TO.CRot,-90.0*\n",
+            GerberAttribute::componentRotation(-Angle::deg90())
+                .toGerberString()
+                .toStdString());
+  EXPECT_EQ("G04 #@! TO.CRot,0.123456*\n",
+            GerberAttribute::componentRotation(Angle(123456))
+                .toGerberString()
+                .toStdString());
+}
+
+TEST_F(GerberAttributeTest, testComponentManufacturer) {
+  EXPECT_EQ("G04 #@! TO.CMfr,Foo \u00E4 \\u005C \\u0025 \\u002A \\u002C*\n",
+            GerberAttribute::componentManufacturer("Foo\n\u00E4\r\n\\ % * ,")
+                .toGerberString()
+                .toStdString());
+}
+
+TEST_F(GerberAttributeTest, testComponentMpn) {
+  EXPECT_EQ("G04 #@! TO.CMPN,Foo \u00E4 \\u005C \\u0025 \\u002A \\u002C*\n",
+            GerberAttribute::componentMpn("Foo\n\u00E4\r\n\\ % * ,")
+                .toGerberString()
+                .toStdString());
+}
+
+TEST_F(GerberAttributeTest, testComponentValue) {
+  EXPECT_EQ("G04 #@! TO.CVal,Foo \u00E4 \\u005C \\u0025 \\u002A \\u002C*\n",
+            GerberAttribute::componentValue("Foo\n\u00E4\r\n\\ % * ,")
+                .toGerberString()
+                .toStdString());
+}
+
+TEST_F(GerberAttributeTest, testComponentMountType) {
+  EXPECT_EQ("G04 #@! TO.CMnt,TH*\n",
+            GerberAttribute::componentMountType(GerberAttribute::MountType::Tht)
+                .toGerberString()
+                .toStdString());
+  EXPECT_EQ("G04 #@! TO.CMnt,SMD*\n",
+            GerberAttribute::componentMountType(GerberAttribute::MountType::Smt)
+                .toGerberString()
+                .toStdString());
+  EXPECT_EQ(
+      "G04 #@! TO.CMnt,Fiducial*\n",
+      GerberAttribute::componentMountType(GerberAttribute::MountType::Fiducial)
+          .toGerberString()
+          .toStdString());
+  EXPECT_EQ(
+      "G04 #@! TO.CMnt,Other*\n",
+      GerberAttribute::componentMountType(GerberAttribute::MountType::Other)
+          .toGerberString()
+          .toStdString());
+}
+
+TEST_F(GerberAttributeTest, testComponentFootprint) {
+  EXPECT_EQ("G04 #@! TO.CFtp,Foo \u00E4 \\u005C \\u0025 \\u002A \\u002C*\n",
+            GerberAttribute::componentFootprint("Foo\n\u00E4\r\n\\ % * ,")
                 .toGerberString()
                 .toStdString());
 }

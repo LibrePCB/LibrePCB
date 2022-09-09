@@ -58,21 +58,24 @@ class BoardGerberExport final : public QObject, public AttributeProvider {
   Q_OBJECT
 
 public:
+  enum class BoardSide { Top, Bottom };
+
   // Constructors / Destructor
   BoardGerberExport() = delete;
   BoardGerberExport(const BoardGerberExport& other) = delete;
-  BoardGerberExport(const Board& board,
-                    const BoardFabricationOutputSettings& settings) noexcept;
+  explicit BoardGerberExport(const Board& board) noexcept;
   ~BoardGerberExport() noexcept;
 
   // Getters
-  FilePath getOutputDirectory() const noexcept;
+  FilePath getOutputDirectory(
+      const BoardFabricationOutputSettings& settings) const noexcept;
   const QVector<FilePath>& getWrittenFiles() const noexcept {
     return mWrittenFiles;
   }
 
   // General Methods
-  void exportAllLayers() const;
+  void exportPcbLayers(const BoardFabricationOutputSettings& settings) const;
+  void exportComponentLayer(BoardSide side, const FilePath& filePath) const;
 
   // Inherited from AttributeProvider
   /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
@@ -89,19 +92,29 @@ signals:
 
 private:
   // Private Methods
-  void exportDrills() const;
-  void exportDrillsNpth() const;
-  void exportDrillsPth() const;
-  void exportLayerBoardOutlines() const;
-  void exportLayerTopCopper() const;
-  void exportLayerInnerCopper() const;
-  void exportLayerBottomCopper() const;
-  void exportLayerTopSolderMask() const;
-  void exportLayerBottomSolderMask() const;
-  void exportLayerTopSilkscreen() const;
-  void exportLayerBottomSilkscreen() const;
-  void exportLayerTopSolderPaste() const;
-  void exportLayerBottomSolderPaste() const;
+  void exportDrills(const BoardFabricationOutputSettings& settings) const;
+  void exportDrillsNpth(const BoardFabricationOutputSettings& settings) const;
+  void exportDrillsPth(const BoardFabricationOutputSettings& settings) const;
+  void exportLayerBoardOutlines(
+      const BoardFabricationOutputSettings& settings) const;
+  void exportLayerTopCopper(
+      const BoardFabricationOutputSettings& settings) const;
+  void exportLayerInnerCopper(
+      const BoardFabricationOutputSettings& settings) const;
+  void exportLayerBottomCopper(
+      const BoardFabricationOutputSettings& settings) const;
+  void exportLayerTopSolderMask(
+      const BoardFabricationOutputSettings& settings) const;
+  void exportLayerBottomSolderMask(
+      const BoardFabricationOutputSettings& settings) const;
+  void exportLayerTopSilkscreen(
+      const BoardFabricationOutputSettings& settings) const;
+  void exportLayerBottomSilkscreen(
+      const BoardFabricationOutputSettings& settings) const;
+  void exportLayerTopSolderPaste(
+      const BoardFabricationOutputSettings& settings) const;
+  void exportLayerBottomSolderPaste(
+      const BoardFabricationOutputSettings& settings) const;
 
   int drawNpthDrills(ExcellonGenerator& gen) const;
   int drawPthDrills(ExcellonGenerator& gen) const;
@@ -113,7 +126,7 @@ private:
   void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad,
                         const QString& layerName) const;
 
-  FilePath getOutputFilePath(const QString& suffix) const noexcept;
+  FilePath getOutputFilePath(QString path) const noexcept;
 
   // Static Methods
   static UnsignedLength calcWidthOfLayer(const UnsignedLength& width,
@@ -131,7 +144,6 @@ private:
   // Private Member Variables
   const Project& mProject;
   const Board& mBoard;
-  QScopedPointer<const BoardFabricationOutputSettings> mSettings;
   QDateTime mCreationDateTime;
   QString mProjectName;
   mutable int mCurrentInnerCopperLayer;

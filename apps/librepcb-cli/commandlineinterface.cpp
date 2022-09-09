@@ -505,11 +505,11 @@ bool CommandLineInterface::openProject(
       }
       foreach (const Board* board, boardList) {
         print("  " % tr("Board '%1':").arg(*board->getName()));
-        BoardGerberExport grbExport(
-            *board,
-            customSettings ? *customSettings
-                           : board->getFabricationOutputSettings());
-        grbExport.exportAllLayers();  // can throw
+        BoardGerberExport grbExport(*board);
+        grbExport.exportPcbLayers(
+            customSettings
+                ? *customSettings
+                : board->getFabricationOutputSettings());  // can throw
         foreach (const FilePath& fp, grbExport.getWrittenFiles()) {
           print(QString("    => '%1'").arg(prettyPath(fp, projectFile)));
           writtenFilesCounter[fp]++;

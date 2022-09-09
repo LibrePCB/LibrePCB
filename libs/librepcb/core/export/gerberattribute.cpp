@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "gerberattribute.h"
 
+#include "../types/angle.h"
 #include "../types/uuid.h"
 
 #include <QtCore>
@@ -89,6 +90,7 @@ bool GerberAttribute::operator==(const GerberAttribute& rhs) const noexcept {
 
 QString GerberAttribute::toString() const noexcept {
   QString s = "T";
+  bool strictAscii = true;  // For maximum compatibility with crappy readers!
   switch (mType) {
     case Type::File: {
       s += "F";
@@ -100,6 +102,11 @@ QString GerberAttribute::toString() const noexcept {
     }
     case Type::Object: {
       s += "O";
+      // ASCII is not sufficient for component values like μ or Ω, thus we
+      // allow unicode for such attributes. Note that such attributes should
+      // appear in Gerber X3 assembly files anyway (not in PCB data files),
+      // so only modern 8X3) readers will need to handle unicode.
+      strictAscii = false;
       break;
     }
     case Type::Delete: {
@@ -109,7 +116,9 @@ QString GerberAttribute::toString() const noexcept {
     default: { return QString(); }
   }
   s += mKey;
-  foreach (const QString& value, mValues) { s += "," + escapeValue(value); }
+  foreach (const QString& value, mValues) {
+    s += "," + escapeValue(value, strictAscii);
+  }
   return s;
 }
 
@@ -259,6 +268,25 @@ GerberAttribute GerberAttribute::fileFunctionMixedPlating(
       {"MixedPlating", QString::number(fromLayer), QString::number(toLayer)});
 }
 
+GerberAttribute GerberAttribute::fileFunctionComponent(
+    int layer, BoardSide side) noexcept {
+  QString layerStr = "L" % QString::number(layer);
+  switch (side) {
+    case BoardSide::Top: {
+      return GerberAttribute(Type::File, ".FileFunction",
+                             {"Component", layerStr, "Top"});
+    }
+    case BoardSide::Bottom: {
+      return GerberAttribute(Type::File, ".FileFunction",
+                             {"Component", layerStr, "Bot"});
+    }
+    default: {
+      qCritical() << "Unknown Gerber board side:" << static_cast<int>(side);
+      return GerberAttribute();
+    }
+  }
+}
+
 GerberAttribute GerberAttribute::filePolarity(Polarity polarity) noexcept {
   switch (polarity) {
     case Polarity::Positive: {
@@ -316,6 +344,21 @@ GerberAttribute GerberAttribute::apertureFunction(
     case ApertureFunction::ViaPad: {
       return GerberAttribute(Type::Aperture, ".AperFunction", {"ViaPad"});
     }
+    case ApertureFunction::ComponentMain: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"ComponentMain"});
+    }
+    case ApertureFunction::ComponentPin: {
+      return GerberAttribute(Type::Aperture, ".AperFunction", {"ComponentPin"});
+    }
+    case ApertureFunction::ComponentOutlineBody: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"ComponentOutline", "Body"});
+    }
+    case ApertureFunction::ComponentOutlineCourtyard: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"ComponentOutline", "Courtyard"});
+    }
     default: {
       qCritical() << "Unknown Gerber aperture function attribute:"
                   << static_cast<int>(function);
@@ -358,21 +401,79 @@ GerberAttribute GerberAttribute::objectPin(const QString& component,
   return GerberAttribute(Type::Object, ".P", values);
 }
 
+GerberAttribute GerberAttribute::componentRotation(
+    const Angle& rotation) noexcept {
+  return GerberAttribute(Type::Object, ".CRot", {rotation.toDegString()});
+}
+
+GerberAttribute GerberAttribute::componentManufacturer(
+    const QString& manufacturer) noexcept {
+  return GerberAttribute(Type::Object, ".CMfr", {manufacturer});
+}
+
+GerberAttribute GerberAttribute::componentMpn(const QString& mpn) noexcept {
+  return GerberAttribute(Type::Object, ".CMPN", {mpn});
+}
+
+GerberAttribute GerberAttribute::componentValue(const QString& value) noexcept {
+  return GerberAttribute(Type::Object, ".CVal", {value});
+}
+
+GerberAttribute GerberAttribute::componentMountType(MountType type) noexcept {
+  switch (type) {
+    case MountType::Tht: {
+      return GerberAttribute(Type::Object, ".CMnt", {"TH"});
+    }
+    case MountType::Smt: {
+      return GerberAttribute(Type::Object, ".CMnt", {"SMD"});
+    }
+    case MountType::Fiducial: {
+      return GerberAttribute(Type::Object, ".CMnt", {"Fiducial"});
+    }
+    case MountType::Other: {
+      return GerberAttribute(Type::Object, ".CMnt", {"Other"});
+    }
+    default: {
+      qCritical() << "Unknown Gerber component mount type attribute:"
+                  << static_cast<int>(type);
+      return GerberAttribute();
+    }
+  }
+}
+
+GerberAttribute GerberAttribute::componentFootprint(
+    const QString& footprint) noexcept {
+  return GerberAttribute(Type::Object, ".CFtp", {footprint});
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-QString GerberAttribute::escapeValue(const QString& value) noexcept {
-  // perform compatibility decomposition (NFKD)
-  QString ret = value.normalized(QString::NormalizationForm_KD);
+QString GerberAttribute::escapeValue(const QString& value,
+                                     bool strictAscii) noexcept {
+  QString ret = value;
+  // remove CRLF newlines
+  ret.remove('\r');
   // replace newlines by spaces
-  ret = ret.replace('\n', ' ');
-  // remove all invalid characters
-  // Note: Even if backslashes are allowed, we will remove them because we
-  // haven't implemented proper escaping. Escaping of unicode characters is also
-  // missing here.
-  QString validChars("-a-zA-Z0-9_+/!?<>\"'(){}.|&@# ;$:=");  // No ',' in attrs!
-  ret.remove(QRegularExpression(QString("[^%1]").arg(validChars)));
+  ret.replace('\n', ' ');
+  if (strictAscii) {
+    // perform compatibility decomposition (NFKD)
+    ret = ret.normalized(QString::NormalizationForm_KD);
+    // remove all invalid characters for maximum compatibility with readers
+    QString validChars("-a-zA-Z0-9_+/!?<>\"'(){}.|&@# ;$:=");
+    ret.remove(QRegularExpression(QString("[^%1]").arg(validChars)));
+  } else {
+    // escape backslash
+    ret.replace("\\", "\\u005C");
+    // escape '%'
+    ret.replace("%", "\\u0025");
+    // escape '*'
+    ret.replace("*", "\\u002A");
+    // escape ','
+    ret.replace(",", "\\u002C");
+  }
+
   // limit length to 65535 characters
   ret.truncate(65535);
   return ret;

@@ -140,6 +140,22 @@ public:
   int addOctagon(const PositiveLength& w, const PositiveLength& h,
                  const Angle& rot, Function function) noexcept;
 
+  /**
+   * @brief Add a component main aperture (for component layers only)
+   *
+   * @return Aperture number.
+   */
+  int addComponentMain() noexcept;
+
+  /**
+   * @brief Add a component pin aperture (for component layers only)
+   *
+   * @param isPin1    Whether the aperture is for pin 1 or another pin.
+   *
+   * @return Aperture number.
+   */
+  int addComponentPin(bool isPin1) noexcept;
+
   // Operator Overloadings
   GerberApertureList& operator=(const GerberApertureList& rhs) = delete;
 
