@@ -62,6 +62,15 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
       mBoard.getProject().getSettings().getLocaleOrder();
 
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    // Skip devices which are considered as no device to be mounted.
+    switch (device->determineMountType()) {
+      case BI_Device::MountType::None:
+      case BI_Device::MountType::Fiducial:
+        continue;
+      default:
+        break;
+    }
+
     QString designator = *device->getComponentInstance().getName();
     QString value = device->getComponentInstance().getValue(true).trimmed();
     QString deviceName = *device->getLibDevice().getNames().value(locale);
