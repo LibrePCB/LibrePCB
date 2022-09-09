@@ -30,6 +30,7 @@
 #include "../../library/cmp/componentsignal.h"
 #include "../../library/pkg/footprint.h"
 #include "../../library/pkg/footprintpad.h"
+#include "../../library/pkg/package.h"
 #include "../../library/pkg/packagepad.h"
 #include "../../utils/transform.h"
 #include "../circuit/componentinstance.h"
@@ -118,6 +119,126 @@ void BoardGerberExport::exportPcbLayers(
   if (settings.getEnableSolderPasteBot()) {
     exportLayerBottomSolderPaste(settings);
   }
+}
+
+void BoardGerberExport::exportComponentLayer(BoardSide side,
+                                             const FilePath& filePath) const {
+  GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
+                      mProject.getMetadata().getVersion());
+  if (side == BoardSide::Top) {
+    gen.setFileFunctionComponent(1, GerberGenerator::BoardSide::Top);
+  } else {
+    gen.setFileFunctionComponent(
+        mBoard.getLayerStack().getInnerLayerCount() + 2,
+        GerberGenerator::BoardSide::Bottom);
+  }
+
+  // Export board outline since this is useful for manual review.
+  foreach (const BI_Polygon* polygon, sortedByUuid(mBoard.getPolygons())) {
+    Q_ASSERT(polygon);
+    if (polygon->getPolygon().getLayerName() == GraphicsLayer::sBoardOutlines) {
+      UnsignedLength lineWidth =
+          calcWidthOfLayer(polygon->getPolygon().getLineWidth(),
+                           *polygon->getPolygon().getLayerName());
+      gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth,
+                          GerberAttribute::ApertureFunction::Profile,
+                          tl::nullopt, QString());
+    }
+  }
+
+  // Export all components on the selected board side.
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    if (device->getMirrored() == (side == BoardSide::Bottom)) {
+      // Skip devices which are considered as no device to be mounted.
+      GerberGenerator::MountType mountType = GerberGenerator::MountType::Other;
+      switch (device->determineMountType()) {
+        case BI_Device::MountType::Tht:
+          mountType = GerberGenerator::MountType::Tht;
+          break;
+        case BI_Device::MountType::Smt:
+          mountType = GerberGenerator::MountType::Smt;
+          break;
+        case BI_Device::MountType::Fiducial:
+          mountType = GerberGenerator::MountType::Fiducial;
+          break;
+        case BI_Device::MountType::None:
+          continue;
+        default:
+          break;
+      }
+
+      // Export component center and attributes.
+      const BI_Footprint& footprint = device->getFootprint();
+      Angle rotation = device->getMirrored() ? -device->getRotation()
+                                             : device->getRotation();
+      QString designator = *device->getComponentInstance().getName();
+      QString value = device->getComponentInstance().getValue(true).trimmed();
+      QString manufacturer =
+          AttributeSubstitutor::substitute("{{MANUFACTURER}}", device)
+              .trimmed();
+      QString mpn = AttributeSubstitutor::substitute(
+                        "{{MPN or PARTNUMBER or DEVICE}}", device)
+                        .trimmed();
+      // Note: Always use english locale to make PnP files portable.
+      QString footprintName =
+          *device->getLibPackage().getNames().getDefaultValue();
+      gen.flashComponent(device->getPosition(), rotation, designator, value,
+                         mountType, manufacturer, mpn, footprintName);
+
+      // Export component outline. But only closed ones, sunce Gerber specs say
+      // that component outlines must be closed.
+      QHash<QString, GerberAttribute::ApertureFunction> layerFunction;
+      if (side == BoardSide::Top) {
+        layerFunction[GraphicsLayer::sTopDocumentation] =
+            GerberAttribute::ApertureFunction::ComponentOutlineBody;
+        layerFunction[GraphicsLayer::sTopCourtyard] =
+            GerberAttribute::ApertureFunction::ComponentOutlineCourtyard;
+      } else {
+        layerFunction[GraphicsLayer::sBotDocumentation] =
+            GerberAttribute::ApertureFunction::ComponentOutlineBody;
+        layerFunction[GraphicsLayer::sBotCourtyard] =
+            GerberAttribute::ApertureFunction::ComponentOutlineCourtyard;
+      }
+      const Transform transform(footprint);
+      for (const Polygon& polygon :
+           footprint.getLibFootprint().getPolygons().sortedByUuid()) {
+        if (!polygon.getPath().isClosed()) {
+          continue;
+        }
+        if (polygon.isFilled()) {
+          continue;
+        }
+        QString layer = transform.map(*polygon.getLayerName());
+        if (!layerFunction.contains(layer)) {
+          continue;
+        }
+        Path path = transform.map(polygon.getPath());
+        gen.drawComponentOutline(path, rotation, designator, value, mountType,
+                                 manufacturer, mpn, footprintName,
+                                 layerFunction[layer]);
+      }
+
+      // Export component pins.
+      foreach (const BI_FootprintPad* pad, footprint.getPads()) {
+        QString pinName, pinSignal;
+        if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
+          pinName = *pkgPad->getName();
+        }
+        if (ComponentSignalInstance* cmpSig =
+                pad->getComponentSignalInstance()) {
+          pinSignal = *cmpSig->getCompSignal().getName();
+        }
+        bool isPin1 = (pinName == "1");  // Very sophisticated algorithm ;-)
+        gen.flashComponentPin(pad->getPosition(), rotation, designator, value,
+                              mountType, manufacturer, mpn, footprintName,
+                              pinName, pinSignal, isPin1);
+      }
+    }
+  }
+
+  gen.generate();
+  gen.saveToFile(filePath);
+  mWrittenFiles.append(filePath);
 }
 
 /*******************************************************************************

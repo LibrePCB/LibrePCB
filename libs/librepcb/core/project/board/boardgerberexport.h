@@ -58,6 +58,8 @@ class BoardGerberExport final : public QObject, public AttributeProvider {
   Q_OBJECT
 
 public:
+  enum class BoardSide { Top, Bottom };
+
   // Constructors / Destructor
   BoardGerberExport() = delete;
   BoardGerberExport(const BoardGerberExport& other) = delete;
@@ -73,6 +75,7 @@ public:
 
   // General Methods
   void exportPcbLayers(const BoardFabricationOutputSettings& settings) const;
+  void exportComponentLayer(BoardSide side, const FilePath& filePath) const;
 
   // Inherited from AttributeProvider
   /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()

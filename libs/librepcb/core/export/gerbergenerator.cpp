@@ -93,6 +93,11 @@ void GerberGenerator::setFileFunctionPaste(BoardSide side,
   mFileAttributes.append(GerberAttribute::filePolarity(polarity));
 }
 
+void GerberGenerator::setFileFunctionComponent(int layer,
+                                               BoardSide side) noexcept {
+  mFileAttributes.append(GerberAttribute::fileFunctionComponent(layer, side));
+}
+
 void GerberGenerator::setLayerPolarity(Polarity p) noexcept {
   switch (p) {
     case Polarity::Positive:
@@ -116,7 +121,13 @@ void GerberGenerator::drawLine(const Point& start, const Point& end,
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        QString(),  // Object: Pin number/name
-                       QString()  // Object: Pin signal
+                       QString(),  // Object: Pin signal
+                       QString(),  // Object: Component value
+                       tl::nullopt,  // Object: Component mount type
+                       QString(),  // Object: Component manufacturer
+                       QString(),  // Object: Component MPN
+                       QString(),  // Object: Component footprint name
+                       tl::nullopt  // Object: Component rotation
   );
   moveToPosition(start);
   linearInterpolateToPosition(end);
@@ -136,7 +147,13 @@ void GerberGenerator::drawPathOutline(const Path& path,
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        QString(),  // Object: Pin number/name
-                       QString()  // Object: Pin signal
+                       QString(),  // Object: Pin signal
+                       QString(),  // Object: Component value
+                       tl::nullopt,  // Object: Component mount type
+                       QString(),  // Object: Component manufacturer
+                       QString(),  // Object: Component MPN
+                       QString(),  // Object: Component footprint name
+                       tl::nullopt  // Object: Component rotation
   );
   moveToPosition(path.getVertices().first().getPos());
   for (int i = 1; i < path.getVertices().count(); ++i) {
@@ -164,7 +181,13 @@ void GerberGenerator::drawPathArea(const Path& path, Function function,
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        QString(),  // Object: Pin number/name
-                       QString()  // Object: Pin signal
+                       QString(),  // Object: Pin signal
+                       QString(),  // Object: Component value
+                       tl::nullopt,  // Object: Component mount type
+                       QString(),  // Object: Component manufacturer
+                       QString(),  // Object: Component MPN
+                       QString(),  // Object: Component footprint name
+                       tl::nullopt  // Object: Component rotation
   );
   setRegionModeOn();
   moveToPosition(path.getVertices().first().getPos());
@@ -174,6 +197,37 @@ void GerberGenerator::drawPathArea(const Path& path, Function function,
     interpolateBetween(v0, v);
   }
   setRegionModeOff();
+}
+
+void GerberGenerator::drawComponentOutline(
+    const Path& path, const Angle& rot, const QString& designator,
+    const QString& value, MountType mountType, const QString& manufacturer,
+    const QString& mpn, const QString& footprintName,
+    Function function) noexcept {
+  if (path.getVertices().count() < 2) {
+    qWarning() << "Invalid path was ignored in gerber output!";
+    return;
+  }
+  setCurrentAperture(
+      mApertureList->addCircle(UnsignedLength(100000), function));
+  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+                       tl::nullopt,  // Object: Net name
+                       designator,  // Object: Component designator
+                       QString(),  // Object: Pin number/name
+                       QString(),  // Object: Pin signal
+                       value,  // Object: Component value
+                       mountType,  // Object: Component mount type
+                       manufacturer,  // Object: Component manufacturer
+                       mpn,  // Object: Component MPN
+                       footprintName,  // Object: Component footprint name
+                       rot  // Object: Component rotation
+  );
+  moveToPosition(path.getVertices().first().getPos());
+  for (int i = 1; i < path.getVertices().count(); ++i) {
+    const Vertex& v = path.getVertices().at(i);
+    const Vertex& v0 = path.getVertices().at(i - 1);
+    interpolateBetween(v0, v);
+  }
 }
 
 void GerberGenerator::flashCircle(const Point& pos, const PositiveLength& dia,
@@ -187,7 +241,13 @@ void GerberGenerator::flashCircle(const Point& pos, const PositiveLength& dia,
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        pin,  // Object: Pin number/name
-                       signal  // Object: Pin signal
+                       signal,  // Object: Pin signal
+                       QString(),  // Object: Component value
+                       tl::nullopt,  // Object: Component mount type
+                       QString(),  // Object: Component manufacturer
+                       QString(),  // Object: Component MPN
+                       QString(),  // Object: Component footprint name
+                       tl::nullopt  // Object: Component rotation
   );
   flashAtPosition(pos);
 }
@@ -203,7 +263,13 @@ void GerberGenerator::flashRect(const Point& pos, const PositiveLength& w,
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        pin,  // Object: Pin number/name
-                       signal  // Object: Pin signal
+                       signal,  // Object: Pin signal
+                       QString(),  // Object: Component value
+                       tl::nullopt,  // Object: Component mount type
+                       QString(),  // Object: Component manufacturer
+                       QString(),  // Object: Component MPN
+                       QString(),  // Object: Component footprint name
+                       tl::nullopt  // Object: Component rotation
   );
   flashAtPosition(pos);
 }
@@ -219,7 +285,13 @@ void GerberGenerator::flashObround(const Point& pos, const PositiveLength& w,
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        pin,  // Object: Pin number/name
-                       signal  // Object: Pin signal
+                       signal,  // Object: Pin signal
+                       QString(),  // Object: Component value
+                       tl::nullopt,  // Object: Component mount type
+                       QString(),  // Object: Component manufacturer
+                       QString(),  // Object: Component MPN
+                       QString(),  // Object: Component footprint name
+                       tl::nullopt  // Object: Component rotation
   );
   flashAtPosition(pos);
 }
@@ -235,7 +307,56 @@ void GerberGenerator::flashOctagon(const Point& pos, const PositiveLength& w,
                        net,  // Object: Net name
                        component,  // Object: Component designator
                        pin,  // Object: Pin number/name
-                       signal  // Object: Pin signal
+                       signal,  // Object: Pin signal
+                       QString(),  // Object: Component value
+                       tl::nullopt,  // Object: Component mount type
+                       QString(),  // Object: Component manufacturer
+                       QString(),  // Object: Component MPN
+                       QString(),  // Object: Component footprint name
+                       tl::nullopt  // Object: Component rotation
+  );
+  flashAtPosition(pos);
+}
+
+void GerberGenerator::flashComponent(const Point& pos, const Angle& rot,
+                                     const QString& designator,
+                                     const QString& value, MountType mountType,
+                                     const QString& manufacturer,
+                                     const QString& mpn,
+                                     const QString& footprintName) noexcept {
+  setCurrentAperture(mApertureList->addComponentMain());
+  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+                       tl::nullopt,  // Object: Net name
+                       designator,  // Object: Component designator
+                       QString(),  // Object: Pin number/name
+                       QString(),  // Object: Pin signal
+                       value,  // Object: Component value
+                       mountType,  // Object: Component mount type
+                       manufacturer,  // Object: Component manufacturer
+                       mpn,  // Object: Component MPN
+                       footprintName,  // Object: Component footprint name
+                       rot  // Object: Component rotation
+  );
+  flashAtPosition(pos);
+}
+
+void GerberGenerator::flashComponentPin(
+    const Point& pos, const Angle& rot, const QString& designator,
+    const QString& value, MountType mountType, const QString& manufacturer,
+    const QString& mpn, const QString& footprintName, const QString& pin,
+    const QString& signal, bool isPin1) noexcept {
+  setCurrentAperture(mApertureList->addComponentPin(isPin1));
+  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+                       tl::nullopt,  // Object: Net name
+                       designator,  // Object: Component designator
+                       pin,  // Object: Pin number/name
+                       signal,  // Object: Pin signal
+                       value,  // Object: Component value
+                       mountType,  // Object: Component mount type
+                       manufacturer,  // Object: Component manufacturer
+                       mpn,  // Object: Component MPN
+                       footprintName,  // Object: Component footprint name
+                       rot  // Object: Component rotation
   );
   flashAtPosition(pos);
 }
@@ -263,11 +384,14 @@ void GerberGenerator::saveToFile(const FilePath& filepath) const {
  *  Private Methods
  ******************************************************************************/
 
-void GerberGenerator::setCurrentAttributes(Function apertureFunction,
-                                           const tl::optional<QString>& netName,
-                                           const QString& componentDesignator,
-                                           const QString& pinName,
-                                           const QString& pinSignal) noexcept {
+void GerberGenerator::setCurrentAttributes(
+    Function apertureFunction, const tl::optional<QString>& netName,
+    const QString& componentDesignator, const QString& pinName,
+    const QString& pinSignal, const QString& componentValue,
+    const tl::optional<MountType>& componentMountType,
+    const QString& componentManufacturer, const QString& componentMpn,
+    const QString& componentFootprint,
+    const tl::optional<Angle>& componentRotation) noexcept {
   QList<GerberAttribute> attributes;
   if (apertureFunction) {
     attributes.append(GerberAttribute::apertureFunction(*apertureFunction));
@@ -281,6 +405,25 @@ void GerberGenerator::setCurrentAttributes(Function apertureFunction,
   if (!componentDesignator.isEmpty() && !pinName.isEmpty()) {
     attributes.append(
         GerberAttribute::objectPin(componentDesignator, pinName, pinSignal));
+  }
+  if (!componentValue.isEmpty()) {
+    attributes.append(GerberAttribute::componentValue(componentValue));
+  }
+  if (componentMountType) {
+    attributes.append(GerberAttribute::componentMountType(*componentMountType));
+  }
+  if (!componentManufacturer.isEmpty()) {
+    attributes.append(
+        GerberAttribute::componentManufacturer(componentManufacturer));
+  }
+  if (!componentMpn.isEmpty()) {
+    attributes.append(GerberAttribute::componentMpn(componentMpn));
+  }
+  if (!componentFootprint.isEmpty()) {
+    attributes.append(GerberAttribute::componentFootprint(componentFootprint));
+  }
+  if (componentRotation) {
+    attributes.append(GerberAttribute::componentRotation(*componentRotation));
   }
   mContent.append(mAttributeWriter->setAttributes(attributes));
 }

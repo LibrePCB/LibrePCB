@@ -43,11 +43,13 @@ protected:
   /**
    * @brief Helper function to generate output containing all possible features
    *
+   * @param componentPins   If false, Gerber X3 component pins are not exported.
+   *
    * @return Gerber content
    */
-  static const QString& generateEverything() noexcept {
-    static QString s;
-    if (s.isEmpty()) {
+  static const QString& generateEverything(bool componentPins = true) noexcept {
+    static QHash<bool, QString> cache;
+    if (!cache.contains(componentPins)) {
       GerberGenerator gen(
           QDateTime(QDate(2000, 2, 1), QTime(1, 2, 3, 4), Qt::OffsetFromUTC,
                     3600),
@@ -128,6 +130,23 @@ protected:
                   gen.flashOctagon(Point(100, 200), PositiveLength(200000),
                                    PositiveLength(100000), rot, function, net,
                                    component, pin, signal);
+
+                  gen.flashComponent(Point(100, 200), rot, component, "",
+                                     GerberGenerator::MountType::Tht, "", "",
+                                     "");
+                  gen.flashComponent(Point(100, 200), rot, component, "value",
+                                     GerberGenerator::MountType::Smt,
+                                     "manufacturer", "mpn", "footprint");
+
+                  if (componentPins) {
+                    gen.flashComponentPin(Point(100, 200), rot, component, "",
+                                          GerberGenerator::MountType::Tht, "",
+                                          "", "", pin, signal, false);
+                    gen.flashComponentPin(
+                        Point(100, 200), rot, component, "value",
+                        GerberGenerator::MountType::Smt, "manufacturer", "mpn",
+                        "footprint", pin, signal, true);
+                  }
                 }
               }
             }
@@ -135,9 +154,9 @@ protected:
         }
       }
       gen.generate();
-      s = gen.toStr();
+      cache[componentPins] = gen.toStr();
     }
-    return s;
+    return cache[componentPins];
   }
 };
 
@@ -167,7 +186,7 @@ TEST_F(GerberGeneratorTest, testUsingOnlyMultiQuadrantMode) {
 // have a size of zero, we only need to check all circle apertures.
 TEST_F(GerberGeneratorTest, testDoesNotContainZeroSizeApertures) {
   int checkedCircles = 0;
-  QString s = generateEverything();
+  QString s = generateEverything(false);
   foreach (const QString line, s.split('\n')) {
     QRegularExpression re("^%ADD\\d+C,(.+)\\*%$");
     QRegularExpressionMatch match = re.match(line);
