@@ -68,9 +68,16 @@ std::shared_ptr<Bom> BomGenerator::generate(const Board* board) noexcept {
     QString devName;
     QString pkgName;
     if (board) {
-      const BI_Device* device =
-          board->getDeviceInstanceByComponentUuid(cmpInst->getUuid());
-      if (device) {
+      if (const BI_Device* device =
+              board->getDeviceInstanceByComponentUuid(cmpInst->getUuid())) {
+        // Skip devices which are considered as no device to be mounted.
+        switch (device->determineMountType()) {
+          case BI_Device::MountType::None:
+          case BI_Device::MountType::Fiducial:
+            continue;
+          default:
+            break;
+        }
         devName = *device->getLibDevice().getNames().getDefaultValue();
         pkgName = *device->getLibPackage().getNames().getDefaultValue();
       }
