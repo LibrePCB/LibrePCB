@@ -57,6 +57,7 @@ public:
   using BoardSide = GerberAttribute::BoardSide;
   using CopperSide = GerberAttribute::CopperSide;
   using Function = GerberApertureList::Function;
+  using MountType = GerberAttribute::MountType;
 
   // Constructors / Destructor
   GerberGenerator() = delete;
@@ -75,6 +76,7 @@ public:
   void setFileFunctionSolderMask(BoardSide side, Polarity polarity) noexcept;
   void setFileFunctionLegend(BoardSide side, Polarity polarity) noexcept;
   void setFileFunctionPaste(BoardSide side, Polarity polarity) noexcept;
+  void setFileFunctionComponent(int layer, BoardSide side) noexcept;
   void setLayerPolarity(Polarity p) noexcept;
   void drawLine(const Point& start, const Point& end,
                 const UnsignedLength& width, Function function,
@@ -86,6 +88,11 @@ public:
   void drawPathArea(const Path& path, Function function,
                     const tl::optional<QString>& net,
                     const QString& component) noexcept;
+  void drawComponentOutline(const Path& path, const Angle& rot,
+                            const QString& designator, const QString& value,
+                            MountType mountType, const QString& manufacturer,
+                            const QString& mpn, const QString& footprintName,
+                            Function function) noexcept;
   void flashCircle(const Point& pos, const PositiveLength& dia,
                    Function function, const tl::optional<QString>& net,
                    const QString& component, const QString& pin,
@@ -104,6 +111,17 @@ public:
                     Function function, const tl::optional<QString>& net,
                     const QString& component, const QString& pin,
                     const QString& signal) noexcept;
+  void flashComponent(const Point& pos, const Angle& rot,
+                      const QString& designator, const QString& value,
+                      MountType mountType, const QString& manufacturer,
+                      const QString& mpn,
+                      const QString& footprintName) noexcept;
+  void flashComponentPin(const Point& pos, const Angle& rot,
+                         const QString& designator, const QString& value,
+                         MountType mountType, const QString& manufacturer,
+                         const QString& mpn, const QString& footprintName,
+                         const QString& pin, const QString& signal,
+                         bool isPin1) noexcept;
 
   // General Methods
   void generate();
@@ -114,11 +132,14 @@ public:
 
 private:
   // Private Methods
-  void setCurrentAttributes(Function apertureFunction,
-                            const tl::optional<QString>& netName,
-                            const QString& componentDesignator,
-                            const QString& pinName,
-                            const QString& pinSignal) noexcept;
+  void setCurrentAttributes(
+      Function apertureFunction, const tl::optional<QString>& netName,
+      const QString& componentDesignator, const QString& pinName,
+      const QString& pinSignal, const QString& componentValue,
+      const tl::optional<MountType>& componentMountType,
+      const QString& componentManufacturer, const QString& componentMpn,
+      const QString& componentFootprint,
+      const tl::optional<Angle>& componentRotation) noexcept;
   void setCurrentAperture(int number) noexcept;
   void setRegionModeOn() noexcept;
   void setRegionModeOff() noexcept;

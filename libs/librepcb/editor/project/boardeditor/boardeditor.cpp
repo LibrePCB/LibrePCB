@@ -407,7 +407,8 @@ void BoardEditor::createActions() noexcept {
   mActionGeneratePickPlace.reset(
       cmd.generatePickPlace.createAction(this, this, [this]() {
         if (Board* board = getActiveBoard()) {
-          BoardPickPlaceGeneratorDialog dialog(*board);
+          BoardPickPlaceGeneratorDialog dialog(
+              mProjectEditor.getWorkspace().getSettings(), *board);
           dialog.exec();
         }
       }));

@@ -863,6 +863,34 @@ TEST_F(GerberApertureListTest, testWideOctagon100deg) {
   }
 }
 
+TEST_F(GerberApertureListTest, testComponentMain) {
+  GerberApertureList l;
+
+  // Note: The Gerber specs require exactly this aperture shape!!!
+  const char* expected =
+      "G04 #@! TA.AperFunction,ComponentMain*\n"
+      "%ADD10C,0.3*%\n"
+      "G04 #@! TD*\n";
+
+  EXPECT_EQ(10, l.addComponentMain());
+  EXPECT_EQ(expected, l.generateString().toStdString());
+}
+
+TEST_F(GerberApertureListTest, testComponentPin) {
+  GerberApertureList l;
+
+  // Note: The Gerber specs require exactly this aperture shape!!!
+  const char* expected =
+      "G04 #@! TA.AperFunction,ComponentPin*\n"
+      "%ADD10C,0*%\n"
+      "%ADD11P,0.36X4X0.0*%\n"
+      "G04 #@! TD*\n";
+
+  EXPECT_EQ(10, l.addComponentPin(false));
+  EXPECT_EQ(11, l.addComponentPin(true));
+  EXPECT_EQ(expected, l.generateString().toStdString());
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

@@ -188,6 +188,25 @@ int GerberApertureList::addOctagon(const PositiveLength& w,
   }
 }
 
+int GerberApertureList::addComponentMain() noexcept {
+  // Note: The aperture shape, size and function is defined in the Gerber
+  // specs, do not change them!
+  return addCircle(UnsignedLength(300000),
+                   GerberAttribute::ApertureFunction::ComponentMain);
+}
+
+int GerberApertureList::addComponentPin(bool isPin1) noexcept {
+  // Note: The aperture shape, size and function is defined in the Gerber
+  // specs, do not change them!
+  if (isPin1) {
+    return addAperture("%ADD{}P,0.36X4X0.0*%\n",
+                       GerberAttribute::ApertureFunction::ComponentPin);
+  } else {
+    return addAperture("%ADD{}C,0*%\n",
+                       GerberAttribute::ApertureFunction::ComponentPin);
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
