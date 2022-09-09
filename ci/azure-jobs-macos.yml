@@ -1,7 +1,7 @@
 jobs:
 - job: macOS
   pool:
-    vmImage: 'macOS-10.15'
+    vmImage: 'macOS-11'
   timeoutInMinutes: 180
   variables:
     OS: 'mac'
