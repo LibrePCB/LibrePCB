@@ -28,6 +28,7 @@
 #include <librepcb/core/export/bom.h>
 #include <librepcb/core/export/bomcsvwriter.h>
 #include <librepcb/core/export/graphicsexport.h>
+#include <librepcb/core/export/pickplacecsvwriter.h>
 #include <librepcb/core/fileio/csvfile.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -41,6 +42,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
+#include <librepcb/core/project/board/boardpickplacegenerator.h>
 #include <librepcb/core/project/bomgenerator.h>
 #include <librepcb/core/project/erc/ercmsg.h>
 #include <librepcb/core/project/erc/ercmsglist.h>
@@ -130,6 +132,19 @@ int CommandLineInterface::execute() noexcept {
          "containing custom settings. If not set, the settings from the boards "
          "will be used instead."),
       tr("file"));
+  QCommandLineOption exportPnpTopOption(
+      "export-pnp-top",
+      tr("Export pick&place file for automated assembly of the top board side. "
+         "Existing files will be overwritten. Supported file extensions: %1")
+          .arg("csv, gbr"),
+      tr("file"));
+  QCommandLineOption exportPnpBottomOption(
+      "export-pnp-bottom",
+      tr("Export pick&place file for automated assembly of the bottom board "
+         "side. Existing files will be overwritten. Supported file extensions: "
+         "%1")
+          .arg("csv, gbr"),
+      tr("file"));
   QCommandLineOption boardOption("board",
                                  tr("The name of the board(s) to export. Can "
                                     "be given multiple times. If not set, "
@@ -182,6 +197,8 @@ int CommandLineInterface::execute() noexcept {
     parser.addOption(bomAttributesOption);
     parser.addOption(exportPcbFabricationDataOption);
     parser.addOption(pcbFabricationSettingsOption);
+    parser.addOption(exportPnpTopOption);
+    parser.addOption(exportPnpBottomOption);
     parser.addOption(boardOption);
     parser.addOption(saveOption);
     parser.addOption(prjStrictOption);
@@ -251,6 +268,8 @@ int CommandLineInterface::execute() noexcept {
         parser.value(bomAttributesOption),  // BOM attributes
         parser.isSet(exportPcbFabricationDataOption),  // export PCB fab. data
         parser.value(pcbFabricationSettingsOption),  // PCB fab. settings
+        parser.values(exportPnpTopOption),  // export PnP top
+        parser.values(exportPnpBottomOption),  // export PnP bottom
         parser.values(boardOption),  // boards
         parser.isSet(saveOption),  // save project
         parser.isSet(prjStrictOption)  // strict mode
@@ -287,7 +306,9 @@ bool CommandLineInterface::openProject(
     const QStringList& exportSchematicsFiles, const QStringList& exportBomFiles,
     const QStringList& exportBoardBomFiles, const QString& bomAttributes,
     bool exportPcbFabricationData, const QString& pcbFabricationSettingsPath,
-    const QStringList& boards, bool save, bool strict) const noexcept {
+    const QStringList& exportPnpTopFiles,
+    const QStringList& exportPnpBottomFiles, const QStringList& boards,
+    bool save, bool strict) const noexcept {
   try {
     bool success = true;
     QMap<FilePath, int> writtenFilesCounter;
@@ -513,6 +534,58 @@ bool CommandLineInterface::openProject(
         foreach (const FilePath& fp, grbExport.getWrittenFiles()) {
           print(QString("    => '%1'").arg(prettyPath(fp, projectFile)));
           writtenFilesCounter[fp]++;
+        }
+      }
+    }
+
+    // Export pick&place files
+    if ((exportPnpTopFiles.count() + exportPnpBottomFiles.count()) > 0) {
+      struct Job {
+        QString boardSideStr;
+        PickPlaceCsvWriter::BoardSide boardSideCsv;
+        BoardGerberExport::BoardSide boardSideGbr;
+        QString destStr;
+      };
+      QVector<Job> jobs;
+      foreach (const QString& fp, exportPnpTopFiles) {
+        jobs.append(Job{tr("top"), PickPlaceCsvWriter::BoardSide::TOP,
+                        BoardGerberExport::BoardSide::Top, fp});
+      }
+      foreach (const QString& fp, exportPnpBottomFiles) {
+        jobs.append(Job{tr("bottom"), PickPlaceCsvWriter::BoardSide::BOTTOM,
+                        BoardGerberExport::BoardSide::Bottom, fp});
+      }
+      foreach (const auto& job, jobs) {
+        print(tr("Export %1 assembly data to '%2'...")
+                  .arg(job.boardSideStr)
+                  .arg(job.destStr));
+        foreach (const Board* board, boardList) {
+          const QString destPathStr = AttributeSubstitutor::substitute(
+              job.destStr, board, [&](const QString& str) {
+                return FilePath::cleanFileName(
+                    str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+              });
+          const FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
+          print(QString("  - '%1' => '%2'")
+                    .arg(*board->getName(), prettyPath(fp, destPathStr)));
+          const QString suffix = job.destStr.split('.').last().toLower();
+          if (suffix == "csv") {
+            BoardPickPlaceGenerator gen(*board);
+            std::shared_ptr<PickPlaceData> data = gen.generate();
+            PickPlaceCsvWriter writer(*data);
+            writer.setIncludeMetadataComment(true);
+            writer.setBoardSide(job.boardSideCsv);
+            std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
+            csv->saveToFile(fp);  // can throw
+            writtenFilesCounter[fp]++;
+          } else if (suffix == "gbr") {
+            BoardGerberExport gen(*board);
+            gen.exportComponentLayer(job.boardSideGbr, fp);  // can throw
+            writtenFilesCounter[fp]++;
+          } else {
+            printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
+            success = false;
+          }
         }
       }
     }
