@@ -155,6 +155,7 @@ bool PackageEditorState_DrawPolygonBase::exit() noexcept {
 
   mContext.graphicsView.unsetCursor();
   mContext.graphicsView.setSceneCursor(tl::nullopt);
+  mContext.graphicsView.setOverlayText(QString());
   return true;
 }
 
@@ -247,6 +248,7 @@ bool PackageEditorState_DrawPolygonBase::start() noexcept {
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentPolygon);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
+    updateOverlayText();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -267,6 +269,7 @@ bool PackageEditorState_DrawPolygonBase::abort(bool showErrMsgBox) noexcept {
       mContext.undoStack.abortCmdGroup();
       mIsUndoCmdActive = false;
     }
+    updateOverlayText();
     return true;
   } catch (const Exception& e) {
     if (showErrMsgBox) {
@@ -314,6 +317,7 @@ bool PackageEditorState_DrawPolygonBase::addNextSegment() noexcept {
     vertices.last().setAngle(mLastAngle);
     vertices.append(Vertex(mCursorPos, Angle::deg0()));
     mEditCmd->setPath(Path(vertices), true);
+    updateOverlayText();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -333,6 +337,8 @@ void PackageEditorState_DrawPolygonBase::updateCursorPosition(
   if (mCurrentPolygon && mEditCmd) {
     updatePolygonPath();
   }
+
+  updateOverlayText();
 }
 
 void PackageEditorState_DrawPolygonBase::updatePolygonPath() noexcept {
@@ -350,6 +356,69 @@ void PackageEditorState_DrawPolygonBase::updatePolygonPath() noexcept {
     vertices[count - 1].setPos(mCursorPos);
   }
   mEditCmd->setPath(Path(vertices), true);
+}
+
+void PackageEditorState_DrawPolygonBase::updateOverlayText() noexcept {
+  const LengthUnit& unit = getDefaultLengthUnit();
+  const int decimals = unit.getReasonableNumberOfDecimals();
+  auto formatLength = [&unit, decimals](const QString& name,
+                                        const Length& value) {
+    return QString("%1: %2 %3")
+        .arg(name)
+        .arg(unit.convertToUnit(value), 11 - name.length(), 'f', decimals)
+        .arg(unit.toShortStringTr());
+  };
+  auto formatAngle = [decimals](const QString& name, const Angle& value) {
+    return QString("%1: %2°").arg(name).arg(
+        value.toDeg(), 14 - decimals - name.length(), 'f', 3);
+  };
+
+  const QVector<Vertex> vertices = mCurrentPolygon
+      ? mCurrentPolygon->getPath().getVertices()
+      : QVector<Vertex>{};
+  const int count = vertices.count();
+
+  QString text;
+  switch (mMode) {
+    case Mode::LINE:
+    case Mode::POLYGON: {
+      const Point p0 = (count >= 2) ? vertices[count - 2].getPos() : mCursorPos;
+      const Point p1 = (count >= 2) ? vertices[count - 1].getPos() : mCursorPos;
+      const Point diff = p1 - p0;
+      const UnsignedLength length = (p1 - p0).getLength();
+      const Angle angle = Angle::fromRad(
+          qAtan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()));
+      text += formatLength("X0", p0.getX()) % "<br>";
+      text += formatLength("Y0", p0.getY()) % "<br>";
+      text += formatLength("X1", p1.getX()) % "<br>";
+      text += formatLength("Y0", p1.getY()) % "<br>";
+      text += "<br>";
+      text += "<b>" % formatLength("Δ", *length) % "</b><br>";
+      text += "<b>" % formatAngle("∠", angle) % "</b>";
+      break;
+    }
+    case Mode::RECT: {
+      const Point p0 = (count >= 3) ? vertices[0].getPos() : mCursorPos;
+      const Point p1 = (count >= 3) ? vertices[2].getPos() : mCursorPos;
+      const Length width = (p1.getX() - p0.getX()).abs();
+      const Length height = (p1.getY() - p0.getY()).abs();
+      text += formatLength("X0", p0.getX()) % "<br>";
+      text += formatLength("Y0", p0.getY()) % "<br>";
+      text += formatLength("X1", p1.getX()) % "<br>";
+      text += formatLength("Y0", p1.getY()) % "<br>";
+      text += "<br>";
+      text += "<b>" % formatLength("ΔX", width) % "</b><br>";
+      text += "<b>" % formatLength("ΔY", height) % "</b>";
+      break;
+    }
+    default: {
+      qWarning() << "PackageEditorState_DrawPolygonBase: Unknown mode.";
+      break;
+    }
+  }
+
+  text.replace(" ", "&nbsp;");
+  mContext.graphicsView.setOverlayText(text);
 }
 
 void PackageEditorState_DrawPolygonBase::layerComboBoxValueChanged(

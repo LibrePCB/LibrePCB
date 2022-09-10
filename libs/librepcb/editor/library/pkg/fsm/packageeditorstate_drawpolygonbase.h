@@ -95,6 +95,7 @@ private:  // Methods
   bool addNextSegment() noexcept;
   void updateCursorPosition(Qt::KeyboardModifiers modifiers) noexcept;
   void updatePolygonPath() noexcept;
+  void updateOverlayText() noexcept;
 
   void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
   void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
