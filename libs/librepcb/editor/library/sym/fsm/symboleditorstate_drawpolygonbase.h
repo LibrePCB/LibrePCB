@@ -69,6 +69,8 @@ public:
   virtual ~SymbolEditorState_DrawPolygonBase() noexcept;
 
   // General Methods
+  bool processKeyPressed(const QKeyEvent& e) noexcept override;
+  bool processKeyReleased(const QKeyEvent& e) noexcept override;
   bool entry() noexcept override;
   bool exit() noexcept override;
   QSet<EditorWidgetBase::Feature> getAvailableFeatures() const
@@ -88,10 +90,11 @@ public:
       const SymbolEditorState_DrawPolygonBase& rhs) = delete;
 
 private:  // Methods
-  bool start(const Point& pos) noexcept;
-  bool abort() noexcept;
-  bool addNextSegment(const Point& pos) noexcept;
-  bool updateCurrentPosition(const Point& pos) noexcept;
+  bool start() noexcept;
+  bool abort(bool showErrMsgBox = true) noexcept;
+  bool addNextSegment() noexcept;
+  void updateCursorPosition(Qt::KeyboardModifiers modifiers) noexcept;
+  void updatePolygonPath() noexcept;
 
   void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
   void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
@@ -101,10 +104,12 @@ private:  // Methods
 
 private:  // Types / Data
   Mode mMode;
+  bool mIsUndoCmdActive;
   QScopedPointer<CmdPolygonEdit> mEditCmd;
   std::shared_ptr<Polygon> mCurrentPolygon;
-  Point mSegmentStartPos;
   std::shared_ptr<PolygonGraphicsItem> mCurrentGraphicsItem;
+  Point mLastScenePos;
+  Point mCursorPos;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;
