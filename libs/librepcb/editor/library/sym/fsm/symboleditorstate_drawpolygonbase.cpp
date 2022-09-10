@@ -107,7 +107,7 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
   mContext.commandToolBar.addWidget(std::move(edtLineWidth));
 
   if (mMode != Mode::RECT) {
-    mContext.commandToolBar.addLabel(tr("Angle:"), 10);
+    mContext.commandToolBar.addLabel(tr("Arc Angle:"), 10);
     std::unique_ptr<AngleEdit> edtAngle(new AngleEdit());
     edtAngle->setSingleStep(90.0);  // [°]
     edtAngle->setValue(mLastAngle);
@@ -121,6 +121,14 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
     fillCheckBox->setChecked(mLastFill);
     fillCheckBox->addAction(cmd.fillToggle.createAction(
         fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
+    QString toolTip = tr("Fill polygon, if closed");
+    if (!cmd.fillToggle.getKeySequences().isEmpty()) {
+      toolTip += " (" %
+          cmd.fillToggle.getKeySequences().first().toString(
+              QKeySequence::NativeText) %
+          ")";
+    }
+    fillCheckBox->setToolTip(toolTip);
     connect(fillCheckBox.get(), &QCheckBox::toggled, this,
             &SymbolEditorState_DrawPolygonBase::fillCheckBoxCheckedChanged);
     mContext.commandToolBar.addWidget(std::move(fillCheckBox), 10);
@@ -131,6 +139,14 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
     grabAreaCheckBox->setChecked(mLastGrabArea);
     grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
         grabAreaCheckBox.get(), grabAreaCheckBox.get(), &QCheckBox::toggle));
+    QString toolTip = tr("Use polygon as grab area");
+    if (!cmd.grabAreaToggle.getKeySequences().isEmpty()) {
+      toolTip += " (" %
+          cmd.grabAreaToggle.getKeySequences().first().toString(
+              QKeySequence::NativeText) %
+          ")";
+    }
+    grabAreaCheckBox->setToolTip(toolTip);
     connect(grabAreaCheckBox.get(), &QCheckBox::toggled, this,
             &SymbolEditorState_DrawPolygonBase::grabAreaCheckBoxCheckedChanged);
     mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
@@ -139,6 +155,7 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
   mLastScenePos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
   updateCursorPosition(0);
+  updateStatusBarMessage();
 
   mContext.graphicsView.setCursor(Qt::CrossCursor);
   return true;
@@ -155,6 +172,7 @@ bool SymbolEditorState_DrawPolygonBase::exit() noexcept {
   mContext.graphicsView.unsetCursor();
   mContext.graphicsView.setSceneCursor(tl::nullopt);
   mContext.graphicsView.setOverlayText(QString());
+  emit statusBarMessageChanged(QString());
   return true;
 }
 
@@ -248,6 +266,7 @@ bool SymbolEditorState_DrawPolygonBase::start() noexcept {
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
     updateOverlayText();
+    updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -269,6 +288,7 @@ bool SymbolEditorState_DrawPolygonBase::abort(bool showErrMsgBox) noexcept {
       mIsUndoCmdActive = false;
     }
     updateOverlayText();
+    updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
     if (showErrMsgBox) {
@@ -317,6 +337,7 @@ bool SymbolEditorState_DrawPolygonBase::addNextSegment() noexcept {
     vertices.append(Vertex(mCursorPos, Angle::deg0()));
     mEditCmd->setPath(Path(vertices), true);
     updateOverlayText();
+    updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -418,6 +439,31 @@ void SymbolEditorState_DrawPolygonBase::updateOverlayText() noexcept {
 
   text.replace(" ", "&nbsp;");
   mContext.graphicsView.setOverlayText(text);
+}
+
+void SymbolEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
+  QString note = " " %
+      tr("(press %1 to disable snap, %2 to abort)")
+          .arg(QCoreApplication::translate("QShortcut", "Shift"))
+          .arg(tr("right click"));
+
+  if (mMode == Mode::RECT) {
+    if (!mIsUndoCmdActive) {
+      emit statusBarMessageChanged(tr("Click to specify the first edge") %
+                                   note);
+    } else {
+      emit statusBarMessageChanged(tr("Click to specify the second edge") %
+                                   note);
+    }
+  } else {
+    if (!mIsUndoCmdActive) {
+      emit statusBarMessageChanged(tr("Click to specify the first point") %
+                                   note);
+    } else {
+      emit statusBarMessageChanged(tr("Click to specify the next point") %
+                                   note);
+    }
+  }
 }
 
 void SymbolEditorState_DrawPolygonBase::layerComboBoxValueChanged(
