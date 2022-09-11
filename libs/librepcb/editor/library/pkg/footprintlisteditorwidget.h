@@ -56,7 +56,7 @@ public:
 
   // Setters
   void setReadOnly(bool readOnly) noexcept;
-  void setReferences(FootprintList& list, UndoStack& stack) noexcept;
+  void setReferences(FootprintList* list, UndoStack* stack) noexcept;
 
   // Operator Overloadings
   FootprintListEditorWidget& operator=(const FootprintListEditorWidget& rhs) =

@@ -78,10 +78,10 @@ void FootprintListEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);
 }
 
-void FootprintListEditorWidget::setReferences(FootprintList& list,
-                                              UndoStack& stack) noexcept {
-  mModel->setFootprintList(&list);
-  mModel->setUndoStack(&stack);
+void FootprintListEditorWidget::setReferences(FootprintList* list,
+                                              UndoStack* stack) noexcept {
+  mModel->setFootprintList(list);
+  mModel->setUndoStack(stack);
 }
 
 /*******************************************************************************
