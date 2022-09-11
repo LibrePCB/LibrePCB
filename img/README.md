@@ -21,6 +21,7 @@ actions/cut.png icons/png/48x48/actions/edit-cut-5.png LGPL-2.1
 actions/delete.png icons/png/48x48/actions/edit-delete-2.png GPLv2
 actions/down.png icons/png/48x48/actions/go-down-5.png PD
 actions/download.png icons/png/48x48/actions/download-3.png CC-BY-SA 3.0 or LGPL
+actions/draw_arc.png icons/png/48x48/actions/draw-halfcircle3.png CC-BY-SA 3.0 or LGPL
 actions/draw_circle.png icons/png/32x32/actions/draw-circle-2.png CC-BY-SA 3.0 or LGPL
 actions/draw_polygon.png icons/png/32x32/actions/draw-polyline-2.png CC-BY-SA 3.0 or LGPL
 actions/draw_rectangle.png icons/png/48x48/actions/draw-rectangle-2.png CC-BY-SA 3.0 or LGPL

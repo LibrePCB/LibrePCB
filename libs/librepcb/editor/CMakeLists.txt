@@ -244,6 +244,8 @@ add_library(
   library/pkg/fsm/packageeditorstate_addpads.h
   library/pkg/fsm/packageeditorstate_addvalues.cpp
   library/pkg/fsm/packageeditorstate_addvalues.h
+  library/pkg/fsm/packageeditorstate_drawarc.cpp
+  library/pkg/fsm/packageeditorstate_drawarc.h
   library/pkg/fsm/packageeditorstate_drawcircle.cpp
   library/pkg/fsm/packageeditorstate_drawcircle.h
   library/pkg/fsm/packageeditorstate_drawline.cpp
@@ -284,6 +286,8 @@ add_library(
   library/sym/fsm/symboleditorstate_addpins.h
   library/sym/fsm/symboleditorstate_addvalues.cpp
   library/sym/fsm/symboleditorstate_addvalues.h
+  library/sym/fsm/symboleditorstate_drawarc.cpp
+  library/sym/fsm/symboleditorstate_drawarc.h
   library/sym/fsm/symboleditorstate_drawcircle.cpp
   library/sym/fsm/symboleditorstate_drawcircle.h
   library/sym/fsm/symboleditorstate_drawline.cpp

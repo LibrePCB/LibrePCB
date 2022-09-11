@@ -56,12 +56,14 @@ SymbolEditorState_DrawPolygonBase::SymbolEditorState_DrawPolygonBase(
     mIsUndoCmdActive(false),
     mCurrentPolygon(nullptr),
     mCurrentGraphicsItem(nullptr),
+    mArcCenter(),
+    mArcInSecondState(false),
     mLastLayerName(GraphicsLayer::sSymbolOutlines),  // Most important layer
     mLastLineWidth(200000),  // Typical width according library conventions
     mLastAngle(0),
     mLastFill(false),  // Fill is needed very rarely
-    mLastGrabArea(mode != Mode::LINE)  // Most symbol outlines are grab areas
-{
+    // Most symbol outlines are grab areas
+    mLastGrabArea((mode != Mode::LINE) && (mode != Mode::ARC)) {
 }
 
 SymbolEditorState_DrawPolygonBase::
@@ -106,7 +108,7 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
           &SymbolEditorState_DrawPolygonBase::lineWidthEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtLineWidth));
 
-  if (mMode != Mode::RECT) {
+  if ((mMode == Mode::LINE) || (mMode == Mode::POLYGON)) {
     mContext.commandToolBar.addLabel(tr("Arc Angle:"), 10);
     std::unique_ptr<AngleEdit> edtAngle(new AngleEdit());
     edtAngle->setSingleStep(90.0);  // [°]
@@ -116,7 +118,7 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
     mContext.commandToolBar.addWidget(std::move(edtAngle));
   }
 
-  if (mMode != Mode::LINE) {
+  if ((mMode == Mode::RECT) || (mMode == Mode::POLYGON)) {
     std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox(tr("Fill")));
     fillCheckBox->setChecked(mLastFill);
     fillCheckBox->addAction(cmd.fillToggle.createAction(
@@ -134,7 +136,7 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
     mContext.commandToolBar.addWidget(std::move(fillCheckBox), 10);
   }
 
-  if (mMode != Mode::LINE) {
+  if ((mMode == Mode::RECT) || (mMode == Mode::POLYGON)) {
     std::unique_ptr<QCheckBox> grabAreaCheckBox(new QCheckBox(tr("Grab Area")));
     grabAreaCheckBox->setChecked(mLastGrabArea);
     grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
@@ -246,10 +248,23 @@ bool SymbolEditorState_DrawPolygonBase::processAbortCommand() noexcept {
 
 bool SymbolEditorState_DrawPolygonBase::start() noexcept {
   try {
-    // Create path.
+    // Reset members.
+    if (mMode == Mode::ARC) {
+      mLastAngle = Angle(0);
+      mArcCenter = mCursorPos;
+      mArcInSecondState = false;
+    }
+
+    // Create inital path.
     Path path;
-    for (int i = 0; i < ((mMode == Mode::RECT) ? 5 : 2); ++i) {
-      path.addVertex(mCursorPos, (i == 0) ? mLastAngle : Angle::deg0());
+    if (mMode == Mode::ARC) {
+      for (int i = 0; i < 3; ++i) {
+        path.addVertex(mCursorPos);
+      }
+    } else {
+      for (int i = 0; i < ((mMode == Mode::RECT) ? 5 : 2); ++i) {
+        path.addVertex(mCursorPos, (i == 0) ? mLastAngle : Angle::deg0());
+      }
     }
 
     // Add polygon.
@@ -308,6 +323,14 @@ bool SymbolEditorState_DrawPolygonBase::addNextSegment() noexcept {
       Point size =
           vertices[vertices.count() - 3].getPos() - vertices[0].getPos();
       isEmpty = (size.getX() == 0) || (size.getY() == 0);
+    } else if (mMode == Mode::ARC) {
+      // Take radius or arc angle into account, depending on state.
+      if (!mArcInSecondState) {
+        isEmpty = (vertices[vertices.count() - 1].getPos() == mArcCenter);
+      } else {
+        isEmpty =
+            (vertices[vertices.count() - 1].getPos() == vertices[0].getPos());
+      }
     } else {
       // Only take the last line segment into account.
       isEmpty = (vertices[vertices.count() - 1].getPos() ==
@@ -317,6 +340,15 @@ bool SymbolEditorState_DrawPolygonBase::addNextSegment() noexcept {
       return abort();
     }
 
+    // If the first part of an arc was drawn, start the second part now.
+    if ((mMode == Mode::ARC) && (!mArcInSecondState)) {
+      mArcInSecondState = true;
+      updatePolygonPath();
+      updateOverlayText();
+      updateStatusBarMessage();
+      return true;
+    }
+
     // Commit current polygon segment.
     mEditCmd->setPath(Path(vertices), true);
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
@@ -324,7 +356,7 @@ bool SymbolEditorState_DrawPolygonBase::addNextSegment() noexcept {
     mIsUndoCmdActive = false;
 
     // If the polygon is completed, abort now.
-    if ((mMode == Mode::RECT) ||
+    if ((mMode == Mode::RECT) || (mMode == Mode::ARC) ||
         (vertices.first().getPos() == vertices.last().getPos())) {
       return abort();
     }
@@ -371,6 +403,46 @@ void SymbolEditorState_DrawPolygonBase::updatePolygonPath() noexcept {
     vertices[count - 3].setPos(mCursorPos);
     vertices[count - 2].setPos(
         Point(vertices[count - 5].getPos().getX(), mCursorPos.getY()));
+  } else if (mMode == Mode::ARC) {
+    if (!mArcInSecondState) {
+      // Draw 2 arcs with 180° each to result in an accurate 360° circle.
+      // This circle helps the user to place the start point of the arc.
+      Q_ASSERT(count == 3);
+      vertices[2] = Vertex(mCursorPos);
+      vertices[1] = Vertex(mCursorPos.rotated(Angle::deg180(), mArcCenter),
+                           Angle::deg180());
+      vertices[0] = Vertex(mCursorPos, Angle::deg180());
+    } else {
+      // Now place the end point of the arc. The only degree of freedom is the
+      // angle. This angle is determined by the current cursor position and
+      // the position where the cursor was before to determine the arc's
+      // direction.
+      Point arcStart = vertices[0].getPos();
+      Angle angle =
+          Toolbox::arcAngle(arcStart, mCursorPos, mArcCenter).mappedTo180deg();
+      if (((mLastAngle > Angle::deg90()) && (angle < 0)) ||
+          ((mLastAngle < -Angle::deg90()) && (angle > 0))) {
+        angle.invert();
+      }
+      // Remove the old arc segments.
+      while (vertices.count() > 1) {
+        vertices.removeLast();
+      }
+      if (angle.abs() > Angle::deg270()) {
+        // The angle is > 270°, so let's create two separate arc segments to
+        // avoid mathematical inaccuracy due to too high angle.
+        Angle halfAngle = angle / 2;
+        vertices[0].setAngle(angle - halfAngle);
+        vertices.append(
+            Vertex(arcStart.rotated(halfAngle, mArcCenter), halfAngle));
+        vertices.append(Vertex(arcStart.rotated(angle, mArcCenter)));
+      } else {
+        // The angle is small enough to be implemented by a single arc segment.
+        vertices[0].setAngle(angle);
+        vertices.append(Vertex(arcStart.rotated(angle, mArcCenter)));
+      }
+      mLastAngle = angle;
+    }
   } else {
     Q_ASSERT(count >= 2);
     vertices[count - 1].setPos(mCursorPos);
@@ -431,6 +503,26 @@ void SymbolEditorState_DrawPolygonBase::updateOverlayText() noexcept {
       text += "<b>" % formatLength("ΔY", height) % "</b>";
       break;
     }
+    case Mode::ARC: {
+      const Point center = (count >= 2) ? mArcCenter : mCursorPos;
+      const Point p0 = (count >= 2) ? vertices.first().getPos() : mCursorPos;
+      const Point p1 = (count >= 2) ? vertices.last().getPos() : mCursorPos;
+      const UnsignedLength radius =
+          (count >= 2) ? (p0 - mArcCenter).getLength() : UnsignedLength(0);
+      Angle angle;
+      foreach (const Vertex& v, vertices) { angle += v.getAngle(); }
+      text += formatLength("X·", center.getX()) % "<br>";
+      text += formatLength("Y·", center.getY()) % "<br>";
+      text += formatLength("X0", p0.getX()) % "<br>";
+      text += formatLength("Y0", p0.getY()) % "<br>";
+      text += formatLength("X1", p1.getX()) % "<br>";
+      text += formatLength("Y1", p1.getY()) % "<br>";
+      text += "<br>";
+      text += "<b>" % formatLength("r", *radius) % "</b><br>";
+      text += "<b>" % formatLength("⌀", radius * 2) % "</b><br>";
+      text += "<b>" % formatAngle("∠", angle) % "</b>";
+      break;
+    }
     default: {
       qWarning() << "SymbolEditorState_DrawPolygonBase: Unknown mode.";
       break;
@@ -454,6 +546,16 @@ void SymbolEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
     } else {
       emit statusBarMessageChanged(tr("Click to specify the second edge") %
                                    note);
+    }
+  } else if (mMode == Mode::ARC) {
+    if (!mIsUndoCmdActive) {
+      emit statusBarMessageChanged(tr("Click to specify the arc center") %
+                                   note);
+    } else if (!mArcInSecondState) {
+      emit statusBarMessageChanged(tr("Click to specify the start point") %
+                                   note);
+    } else {
+      emit statusBarMessageChanged(tr("Click to specify the end point") % note);
     }
   } else {
     if (!mIsUndoCmdActive) {

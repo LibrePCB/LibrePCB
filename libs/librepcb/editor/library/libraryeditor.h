@@ -230,6 +230,7 @@ private:  // Data
   QScopedPointer<QAction> mActionToolRect;
   QScopedPointer<QAction> mActionToolPolygon;
   QScopedPointer<QAction> mActionToolCircle;
+  QScopedPointer<QAction> mActionToolArc;
   QScopedPointer<QAction> mActionToolText;
   QScopedPointer<QAction> mActionToolName;
   QScopedPointer<QAction> mActionToolValue;

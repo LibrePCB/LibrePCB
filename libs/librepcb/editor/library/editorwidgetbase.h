@@ -79,6 +79,7 @@ public:
     DRAW_RECT,
     DRAW_POLYGON,
     DRAW_CIRCLE,
+    DRAW_ARC,
     DRAW_TEXT,
     ADD_NAMES,
     ADD_VALUES,

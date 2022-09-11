@@ -59,7 +59,7 @@ class PackageEditorState_DrawPolygonBase : public PackageEditorState {
 
 public:
   // Types
-  enum class Mode { LINE, RECT, POLYGON };
+  enum class Mode { LINE, ARC, RECT, POLYGON };
 
   // Constructors / Destructor
   PackageEditorState_DrawPolygonBase() = delete;
@@ -112,6 +112,10 @@ private:  // Types / Data
   std::shared_ptr<PolygonGraphicsItem> mCurrentGraphicsItem;
   Point mLastScenePos;
   Point mCursorPos;
+
+  // Arc tool state
+  Point mArcCenter;
+  bool mArcInSecondState;
 
   // parameter memory
   GraphicsLayerName mLastLayerName;
