@@ -53,6 +53,7 @@ PackageEditorState_DrawPolygonBase::PackageEditorState_DrawPolygonBase(
     Context& context, Mode mode) noexcept
   : PackageEditorState(context),
     mMode(mode),
+    mIsUndoCmdActive(false),
     mCurrentPolygon(nullptr),
     mCurrentGraphicsItem(nullptr),
     mLastLayerName(GraphicsLayer::sTopPlacement),  // Most important layer
@@ -65,7 +66,6 @@ PackageEditorState_DrawPolygonBase::PackageEditorState_DrawPolygonBase(
 
 PackageEditorState_DrawPolygonBase::
     ~PackageEditorState_DrawPolygonBase() noexcept {
-  Q_ASSERT(mEditCmd.isNull());
 }
 
 /*******************************************************************************
@@ -107,7 +107,7 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
   mContext.commandToolBar.addWidget(std::move(edtLineWidth));
 
   if (mMode != Mode::RECT) {
-    mContext.commandToolBar.addLabel(tr("Angle:"), 10);
+    mContext.commandToolBar.addLabel(tr("Arc Angle:"), 10);
     std::unique_ptr<AngleEdit> edtAngle(new AngleEdit());
     edtAngle->setSingleStep(90.0);  // [°]
     edtAngle->setValue(mLastAngle);
@@ -121,6 +121,14 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
     fillCheckBox->setChecked(mLastFill);
     fillCheckBox->addAction(cmd.fillToggle.createAction(
         fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
+    QString toolTip = tr("Fill polygon, if closed");
+    if (!cmd.fillToggle.getKeySequences().isEmpty()) {
+      toolTip += " (" %
+          cmd.fillToggle.getKeySequences().first().toString(
+              QKeySequence::NativeText) %
+          ")";
+    }
+    fillCheckBox->setToolTip(toolTip);
     connect(fillCheckBox.get(), &QCheckBox::toggled, this,
             &PackageEditorState_DrawPolygonBase::fillCheckBoxCheckedChanged);
     mContext.commandToolBar.addWidget(std::move(fillCheckBox), 10);
@@ -131,18 +139,31 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
     grabAreaCheckBox->setChecked(mLastGrabArea);
     grabAreaCheckBox->addAction(cmd.grabAreaToggle.createAction(
         grabAreaCheckBox.get(), grabAreaCheckBox.get(), &QCheckBox::toggle));
+    QString toolTip = tr("Use polygon as grab area");
+    if (!cmd.grabAreaToggle.getKeySequences().isEmpty()) {
+      toolTip += " (" %
+          cmd.grabAreaToggle.getKeySequences().first().toString(
+              QKeySequence::NativeText) %
+          ")";
+    }
+    grabAreaCheckBox->setToolTip(toolTip);
     connect(
         grabAreaCheckBox.get(), &QCheckBox::toggled, this,
         &PackageEditorState_DrawPolygonBase::grabAreaCheckBoxCheckedChanged);
     mContext.commandToolBar.addWidget(std::move(grabAreaCheckBox));
   }
 
+  mLastScenePos =
+      mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
+  updateCursorPosition(0);
+  updateStatusBarMessage();
+
   mContext.graphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
 
 bool PackageEditorState_DrawPolygonBase::exit() noexcept {
-  if (mCurrentPolygon && (!abort())) {
+  if (!abort()) {
     return false;
   }
 
@@ -150,6 +171,9 @@ bool PackageEditorState_DrawPolygonBase::exit() noexcept {
   mContext.commandToolBar.clear();
 
   mContext.graphicsView.unsetCursor();
+  mContext.graphicsView.setSceneCursor(tl::nullopt);
+  mContext.graphicsView.setOverlayText(QString());
+  emit statusBarMessageChanged(QString());
   return true;
 }
 
@@ -164,45 +188,53 @@ QSet<EditorWidgetBase::Feature>
  *  Event Handlers
  ******************************************************************************/
 
-bool PackageEditorState_DrawPolygonBase::processGraphicsSceneMouseMoved(
-    QGraphicsSceneMouseEvent& e) noexcept {
-  if (mCurrentPolygon) {
-    Point currentPos =
-        Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
-    return updateCurrentPosition(currentPos);
-  } else {
+bool PackageEditorState_DrawPolygonBase::processKeyPressed(
+    const QKeyEvent& e) noexcept {
+  if (e.key() == Qt::Key_Shift) {
+    updateCursorPosition(e.modifiers());
     return true;
   }
+
+  return false;
+}
+
+bool PackageEditorState_DrawPolygonBase::processKeyReleased(
+    const QKeyEvent& e) noexcept {
+  if (e.key() == Qt::Key_Shift) {
+    updateCursorPosition(e.modifiers());
+    return true;
+  }
+
+  return false;
+}
+
+bool PackageEditorState_DrawPolygonBase::processGraphicsSceneMouseMoved(
+    QGraphicsSceneMouseEvent& e) noexcept {
+  mLastScenePos = Point::fromPx(e.scenePos());
+  updateCursorPosition(e.modifiers());
+  return true;
 }
 
 bool PackageEditorState_DrawPolygonBase::
     processGraphicsSceneLeftMouseButtonPressed(
         QGraphicsSceneMouseEvent& e) noexcept {
-  Point currentPos =
-      Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
-  if (mCurrentPolygon) {
-    Point startPos = mCurrentPolygon->getPath().getVertices().first().getPos();
-    if (currentPos == mSegmentStartPos) {
-      return abort();
-    } else if ((currentPos == startPos) || (mMode == Mode::RECT)) {
-      return addNextSegment(currentPos) && abort();
-    } else {
-      return addNextSegment(currentPos);
-    }
+  mLastScenePos = Point::fromPx(e.scenePos());
+  if (mIsUndoCmdActive) {
+    return addNextSegment();
   } else {
-    return start(currentPos);
+    return start();
   }
 }
 
 bool PackageEditorState_DrawPolygonBase::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
         QGraphicsSceneMouseEvent& e) noexcept {
-  return processGraphicsSceneLeftMouseButtonPressed(
-      e);  // handle like single click
+  // Handle like a single click.
+  return processGraphicsSceneLeftMouseButtonPressed(e);
 }
 
 bool PackageEditorState_DrawPolygonBase::processAbortCommand() noexcept {
-  if (mCurrentPolygon) {
+  if (mIsUndoCmdActive) {
     return abort();
   } else {
     return false;
@@ -213,17 +245,17 @@ bool PackageEditorState_DrawPolygonBase::processAbortCommand() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-bool PackageEditorState_DrawPolygonBase::start(const Point& pos) noexcept {
+bool PackageEditorState_DrawPolygonBase::start() noexcept {
   try {
-    // create path
+    // Create path.
     Path path;
     for (int i = 0; i < ((mMode == Mode::RECT) ? 5 : 2); ++i) {
-      path.addVertex(pos, (i == 0) ? mLastAngle : Angle::deg0());
+      path.addVertex(mCursorPos, (i == 0) ? mLastAngle : Angle::deg0());
     }
 
-    // add polygon
-    mSegmentStartPos = pos;
+    // Add polygon.
     mContext.undoStack.beginCmdGroup(tr("Add footprint polygon"));
+    mIsUndoCmdActive = true;
     mCurrentPolygon = std::make_shared<Polygon>(Uuid::createRandom(),
                                                 mLastLayerName, mLastLineWidth,
                                                 mLastFill, mLastGrabArea, path);
@@ -234,46 +266,79 @@ bool PackageEditorState_DrawPolygonBase::start(const Point& pos) noexcept {
         mContext.currentGraphicsItem->getGraphicsItem(mCurrentPolygon);
     Q_ASSERT(mCurrentGraphicsItem);
     mCurrentGraphicsItem->setSelected(true);
+    updateOverlayText();
+    updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
-    mCurrentGraphicsItem.reset();
-    mEditCmd.reset();
-    mCurrentPolygon.reset();
+    abort(false);
     return false;
   }
 }
 
-bool PackageEditorState_DrawPolygonBase::abort() noexcept {
+bool PackageEditorState_DrawPolygonBase::abort(bool showErrMsgBox) noexcept {
   try {
-    mCurrentGraphicsItem->setSelected(false);
-    mCurrentGraphicsItem.reset();
+    if (mCurrentGraphicsItem) {
+      mCurrentGraphicsItem->setSelected(false);
+      mCurrentGraphicsItem.reset();
+    }
     mEditCmd.reset();
     mCurrentPolygon.reset();
-    mContext.undoStack.abortCmdGroup();
+    if (mIsUndoCmdActive) {
+      mContext.undoStack.abortCmdGroup();
+      mIsUndoCmdActive = false;
+    }
+    updateOverlayText();
+    updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
-    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    if (showErrMsgBox) {
+      QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+    }
     return false;
   }
 }
 
-bool PackageEditorState_DrawPolygonBase::addNextSegment(
-    const Point& pos) noexcept {
+bool PackageEditorState_DrawPolygonBase::addNextSegment() noexcept {
   try {
-    // commit current
-    updateCurrentPosition(pos);
+    // If no line was drawn, abort now.
+    QVector<Vertex> vertices = mCurrentPolygon->getPath().getVertices();
+    bool isEmpty = false;
+    if (mMode == Mode::RECT) {
+      // Take rect size into account.
+      Point size =
+          vertices[vertices.count() - 3].getPos() - vertices[0].getPos();
+      isEmpty = (size.getX() == 0) || (size.getY() == 0);
+    } else {
+      // Only take the last line segment into account.
+      isEmpty = (vertices[vertices.count() - 1].getPos() ==
+                 vertices[vertices.count() - 2].getPos());
+    }
+    if (isEmpty) {
+      return abort();
+    }
+
+    // Commit current polygon segment.
+    mEditCmd->setPath(Path(vertices), true);
     mContext.undoStack.appendToCmdGroup(mEditCmd.take());
     mContext.undoStack.commitCmdGroup();
+    mIsUndoCmdActive = false;
 
-    // add next
-    mSegmentStartPos = pos;
+    // If the polygon is completed, abort now.
+    if ((mMode == Mode::RECT) ||
+        (vertices.first().getPos() == vertices.last().getPos())) {
+      return abort();
+    }
+
+    // Add next polygon segment.
     mContext.undoStack.beginCmdGroup(tr("Add footprint polygon"));
+    mIsUndoCmdActive = true;
     mEditCmd.reset(new CmdPolygonEdit(*mCurrentPolygon));
-    Path newPath = mCurrentPolygon->getPath();
-    newPath.getVertices().last().setAngle(mLastAngle);
-    newPath.addVertex(pos, Angle::deg0());
-    mEditCmd->setPath(newPath, true);
+    vertices.last().setAngle(mLastAngle);
+    vertices.append(Vertex(mCursorPos, Angle::deg0()));
+    mEditCmd->setPath(Path(vertices), true);
+    updateOverlayText();
+    updateStatusBarMessage();
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
@@ -281,24 +346,125 @@ bool PackageEditorState_DrawPolygonBase::addNextSegment(
   }
 }
 
-bool PackageEditorState_DrawPolygonBase::updateCurrentPosition(
-    const Point& pos) noexcept {
-  if ((!mCurrentPolygon) || (!mEditCmd)) return false;
+void PackageEditorState_DrawPolygonBase::updateCursorPosition(
+    Qt::KeyboardModifiers modifiers) noexcept {
+  mCursorPos = mLastScenePos;
+  if (!modifiers.testFlag(Qt::ShiftModifier)) {
+    mCursorPos.mapToGrid(getGridInterval());
+  }
+  mContext.graphicsView.setSceneCursor(
+      std::make_pair(mCursorPos, GraphicsView::CursorOption::Cross));
+
+  if (mCurrentPolygon && mEditCmd) {
+    updatePolygonPath();
+  }
+
+  updateOverlayText();
+}
+
+void PackageEditorState_DrawPolygonBase::updatePolygonPath() noexcept {
   QVector<Vertex> vertices = mCurrentPolygon->getPath().getVertices();
   int count = vertices.count();
   if (mMode == Mode::RECT) {
     Q_ASSERT(count >= 5);
     vertices[count - 4].setPos(
-        Point(pos.getX(), vertices[count - 5].getPos().getY()));
-    vertices[count - 3].setPos(pos);
+        Point(mCursorPos.getX(), vertices[count - 5].getPos().getY()));
+    vertices[count - 3].setPos(mCursorPos);
     vertices[count - 2].setPos(
-        Point(vertices[count - 5].getPos().getX(), pos.getY()));
+        Point(vertices[count - 5].getPos().getX(), mCursorPos.getY()));
   } else {
     Q_ASSERT(count >= 2);
-    vertices[count - 1].setPos(pos);
+    vertices[count - 1].setPos(mCursorPos);
   }
   mEditCmd->setPath(Path(vertices), true);
-  return true;
+}
+
+void PackageEditorState_DrawPolygonBase::updateOverlayText() noexcept {
+  const LengthUnit& unit = getDefaultLengthUnit();
+  const int decimals = unit.getReasonableNumberOfDecimals();
+  auto formatLength = [&unit, decimals](const QString& name,
+                                        const Length& value) {
+    return QString("%1: %2 %3")
+        .arg(name)
+        .arg(unit.convertToUnit(value), 11 - name.length(), 'f', decimals)
+        .arg(unit.toShortStringTr());
+  };
+  auto formatAngle = [decimals](const QString& name, const Angle& value) {
+    return QString("%1: %2°").arg(name).arg(
+        value.toDeg(), 14 - decimals - name.length(), 'f', 3);
+  };
+
+  const QVector<Vertex> vertices = mCurrentPolygon
+      ? mCurrentPolygon->getPath().getVertices()
+      : QVector<Vertex>{};
+  const int count = vertices.count();
+
+  QString text;
+  switch (mMode) {
+    case Mode::LINE:
+    case Mode::POLYGON: {
+      const Point p0 = (count >= 2) ? vertices[count - 2].getPos() : mCursorPos;
+      const Point p1 = (count >= 2) ? vertices[count - 1].getPos() : mCursorPos;
+      const Point diff = p1 - p0;
+      const UnsignedLength length = (p1 - p0).getLength();
+      const Angle angle = Angle::fromRad(
+          qAtan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()));
+      text += formatLength("X0", p0.getX()) % "<br>";
+      text += formatLength("Y0", p0.getY()) % "<br>";
+      text += formatLength("X1", p1.getX()) % "<br>";
+      text += formatLength("Y0", p1.getY()) % "<br>";
+      text += "<br>";
+      text += "<b>" % formatLength("Δ", *length) % "</b><br>";
+      text += "<b>" % formatAngle("∠", angle) % "</b>";
+      break;
+    }
+    case Mode::RECT: {
+      const Point p0 = (count >= 3) ? vertices[0].getPos() : mCursorPos;
+      const Point p1 = (count >= 3) ? vertices[2].getPos() : mCursorPos;
+      const Length width = (p1.getX() - p0.getX()).abs();
+      const Length height = (p1.getY() - p0.getY()).abs();
+      text += formatLength("X0", p0.getX()) % "<br>";
+      text += formatLength("Y0", p0.getY()) % "<br>";
+      text += formatLength("X1", p1.getX()) % "<br>";
+      text += formatLength("Y0", p1.getY()) % "<br>";
+      text += "<br>";
+      text += "<b>" % formatLength("ΔX", width) % "</b><br>";
+      text += "<b>" % formatLength("ΔY", height) % "</b>";
+      break;
+    }
+    default: {
+      qWarning() << "PackageEditorState_DrawPolygonBase: Unknown mode.";
+      break;
+    }
+  }
+
+  text.replace(" ", "&nbsp;");
+  mContext.graphicsView.setOverlayText(text);
+}
+
+void PackageEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
+  QString note = " " %
+      tr("(press %1 to disable snap, %2 to abort)")
+          .arg(QCoreApplication::translate("QShortcut", "Shift"))
+          .arg(tr("right click"));
+
+  if (mMode == Mode::RECT) {
+    if (!mIsUndoCmdActive) {
+      emit statusBarMessageChanged(tr("Click to specify the first edge") %
+                                   note);
+    } else {
+      emit statusBarMessageChanged(tr("Click to specify the second edge") %
+                                   note);
+    }
+  } else {
+    if (!mIsUndoCmdActive) {
+      emit statusBarMessageChanged(tr("Click to specify the first point") %
+                                   note);
+    } else {
+      emit statusBarMessageChanged(tr("Click to specify the next point") %
+                                   note);
+    }
+  }
 }
 
 void PackageEditorState_DrawPolygonBase::layerComboBoxValueChanged(
