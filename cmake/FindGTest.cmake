@@ -40,4 +40,17 @@ if(GTest_FOUND)
   return()
 endif()
 
+# Otherwise, try to find shared library on the system via pkg-config
+find_package(PkgConfig QUIET)
+if(PKGCONFIG_FOUND)
+  pkg_check_modules(GTest GLOBAL IMPORTED_TARGET gtest)
+  pkg_check_modules(GMock GLOBAL IMPORTED_TARGET gmock)
+endif()
+if(GTest_FOUND)
+  message(STATUS "Using system GTest / GMock (via pkg-config)")
+  add_library(GTest::GTest ALIAS PkgConfig::GTest)
+  add_library(GTest::GMock ALIAS PkgConfig::GMock)
+  return()
+endif()
+
 message(FATAL_ERROR "Did not find GoogleTest / GoogleMock system libraries")

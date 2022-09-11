@@ -133,7 +133,7 @@ Right now, the following libraries can be unbundled:
 |-|-|-|
 | [dxflib] | `UNBUNDLE_DXFLIB` | `pkg-config` |
 | [fontobene-qt5] | `UNBUNDLE_FONTOBENE_QT5` | `pkg-config`, `find_path` |
-| [googletest] | `UNBUNDLE_GTEST` | `cmake` |
+| [googletest] | `UNBUNDLE_GTEST` | `cmake`, `pkg-config` |
 | [hoedown] ¹ | `UNBUNDLE_HOEDOWN` | `pkg-config` |
 | [muparser] | `UNBUNDLE_MUPARSER` | `cmake` |
 | [polyclipping] | `UNBUNDLE_POLYCLIPPING` | `pkg-config` |
