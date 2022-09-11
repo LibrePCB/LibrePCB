@@ -5,6 +5,7 @@ LibrePCB Developers Documentation {#mainpage}
 
 # Documentation {#doc_main_pages}
 
+- @ref doc_building
 - @ref doc_developers
 - @ref doc_code_style_guide
 - @ref doc_release_workflow
