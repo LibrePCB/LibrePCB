@@ -19,9 +19,9 @@ jobs:
         CC: clang
         CXX: clang++
       Ubuntu_2004_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-6
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-7
       Ubuntu_2004_Unbundled:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-6
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-7
         UNBUNDLE_DXFLIB: true
         UNBUNDLE_MUPARSER: true
         #UNBUNDLE_QUAZIP: true  # Note: Does not ship quazip 1.x yet
