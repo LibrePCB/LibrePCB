@@ -25,6 +25,7 @@
 #include "symboleditorstate_addnames.h"
 #include "symboleditorstate_addpins.h"
 #include "symboleditorstate_addvalues.h"
+#include "symboleditorstate_drawarc.h"
 #include "symboleditorstate_drawcircle.h"
 #include "symboleditorstate_drawline.h"
 #include "symboleditorstate_drawpolygon.h"
@@ -56,6 +57,7 @@ SymbolEditorFsm::SymbolEditorFsm(const Context& context) noexcept
   mStates.insert(State::DRAW_POLYGON,
                  new SymbolEditorState_DrawPolygon(context));
   mStates.insert(State::DRAW_CIRCLE, new SymbolEditorState_DrawCircle(context));
+  mStates.insert(State::DRAW_ARC, new SymbolEditorState_DrawArc(context));
   mStates.insert(State::DRAW_TEXT, new SymbolEditorState_DrawText(context));
   mStates.insert(State::MEASURE, new SymbolEditorState_Measure(context));
 
@@ -91,6 +93,8 @@ EditorWidgetBase::Tool SymbolEditorFsm::getCurrentTool() const noexcept {
       return EditorWidgetBase::Tool::ADD_VALUES;
     case State::DRAW_LINE:
       return EditorWidgetBase::Tool::DRAW_LINE;
+    case State::DRAW_ARC:
+      return EditorWidgetBase::Tool::DRAW_ARC;
     case State::DRAW_RECT:
       return EditorWidgetBase::Tool::DRAW_RECT;
     case State::DRAW_POLYGON:
@@ -302,6 +306,10 @@ bool SymbolEditorFsm::processStartAddingValues() noexcept {
 
 bool SymbolEditorFsm::processStartDrawLines() noexcept {
   return setNextState(State::DRAW_LINE);
+}
+
+bool SymbolEditorFsm::processStartDrawArcs() noexcept {
+  return setNextState(State::DRAW_ARC);
 }
 
 bool SymbolEditorFsm::processStartDrawRects() noexcept {

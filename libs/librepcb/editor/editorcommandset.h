@@ -790,6 +790,15 @@ public:
       {QKeySequence(Qt::Key_C)},
       &categoryTools,
   };
+  EditorCommand toolArc{
+      "tool_arc",  // clang-format break
+      QT_TR_NOOP("Draw Arc"),
+      QT_TR_NOOP("Draw graphical arcs"),
+      QIcon(":/img/actions/draw_arc.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::SHIFT + Qt::Key_C)},
+      &categoryTools,
+  };
   EditorCommand toolText{
       "tool_text",  // clang-format break
       QT_TR_NOOP("Add Text"),

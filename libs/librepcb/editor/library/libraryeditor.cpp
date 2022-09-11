@@ -637,6 +637,7 @@ void LibraryEditor::createActions() noexcept {
   mActionToolRect.reset(cmd.toolRect.createAction(this));
   mActionToolPolygon.reset(cmd.toolPolygon.createAction(this));
   mActionToolCircle.reset(cmd.toolCircle.createAction(this));
+  mActionToolArc.reset(cmd.toolArc.createAction(this));
   mActionToolText.reset(cmd.toolText.createAction(this));
   mActionToolName.reset(cmd.toolName.createAction(this));
   mActionToolValue.reset(cmd.toolValue.createAction(this));
@@ -662,6 +663,8 @@ void LibraryEditor::createActions() noexcept {
                                mActionToolPolygon.data());
   mToolsActionGroup->addAction(EditorWidgetBase::Tool::DRAW_CIRCLE,
                                mActionToolCircle.data());
+  mToolsActionGroup->addAction(EditorWidgetBase::Tool::DRAW_ARC,
+                               mActionToolArc.data());
   mToolsActionGroup->addAction(EditorWidgetBase::Tool::ADD_NAMES,
                                mActionToolName.data());
   mToolsActionGroup->addAction(EditorWidgetBase::Tool::ADD_VALUES,
@@ -749,6 +752,7 @@ void LibraryEditor::createToolBars() noexcept {
   mToolBarTools->addAction(mActionToolRect.data());
   mToolBarTools->addAction(mActionToolPolygon.data());
   mToolBarTools->addAction(mActionToolCircle.data());
+  mToolBarTools->addAction(mActionToolArc.data());
   mToolBarTools->addAction(mActionToolName.data());
   mToolBarTools->addAction(mActionToolValue.data());
   mToolBarTools->addAction(mActionToolText.data());
@@ -834,6 +838,7 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionToolRect);
   mb.addAction(mActionToolPolygon);
   mb.addAction(mActionToolCircle);
+  mb.addAction(mActionToolArc);
   mb.addAction(mActionToolName);
   mb.addAction(mActionToolValue);
   mb.addAction(mActionToolText);

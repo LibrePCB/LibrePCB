@@ -134,6 +134,18 @@ public:
                          const Angle& a) noexcept;
 
   /**
+   * @brief Calculate the angle between two given points
+   *
+   * @param p1      First point.
+   * @param p2      Second point.
+   * @param center  Center of the arc. Defaults to (0, 0).
+   * @return Angle counter-clockwise from p1 to p2 (0..360°).
+   *         Zero if it could not be determined.
+   */
+  static Angle arcAngle(const Point& p1, const Point& p2,
+                        const Point& center = Point(0, 0)) noexcept;
+
+  /**
    * @brief Calculate the point on a given line which is nearest to a given
    * point
    *

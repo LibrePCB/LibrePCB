@@ -206,6 +206,7 @@ void SymbolEditorWidget::connectEditor(
   mToolsActionGroup->setActionEnabled(Tool::DRAW_RECT, enabled);
   mToolsActionGroup->setActionEnabled(Tool::DRAW_POLYGON, enabled);
   mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::DRAW_ARC, enabled);
   mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, enabled);
   mToolsActionGroup->setActionEnabled(Tool::MEASURE, true);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
@@ -459,6 +460,8 @@ bool SymbolEditorWidget::toolChangeRequested(Tool newTool) noexcept {
       return mFsm->processStartDrawPolygons();
     case Tool::DRAW_CIRCLE:
       return mFsm->processStartDrawCircles();
+    case Tool::DRAW_ARC:
+      return mFsm->processStartDrawArcs();
     case Tool::DRAW_TEXT:
       return mFsm->processStartDrawTexts();
     case Tool::MEASURE:

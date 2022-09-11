@@ -106,6 +106,18 @@ Point Toolbox::arcCenter(const Point& p1, const Point& p2,
   }
 }
 
+Angle Toolbox::arcAngle(const Point& p1, const Point& p2,
+                        const Point& center) noexcept {
+  Point delta1 = p1 - center;
+  Point delta2 = p2 - center;
+  if (delta1.isOrigin() || delta2.isOrigin()) {
+    return Angle::deg0();
+  }
+  qreal angle1 = qAtan2(delta1.getY().toMm(), delta1.getX().toMm());
+  qreal angle2 = qAtan2(delta2.getY().toMm(), delta2.getX().toMm());
+  return Angle::fromRad(angle2 - angle1).mapTo0_360deg();
+}
+
 Point Toolbox::nearestPointOnLine(const Point& p, const Point& l1,
                                   const Point& l2) noexcept {
   Point a = l2 - l1;
