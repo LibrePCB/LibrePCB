@@ -50,7 +50,7 @@ def test_export_project_with_one_board_implicit(cli, project):
     assert len(stdout) > 0
     assert stdout[-1] == 'SUCCESS'
     assert os.path.exists(dir)
-    assert len(os.listdir(dir)) == 8
+    assert len(os.listdir(dir)) == 9
 
 
 @pytest.mark.parametrize("project", [
@@ -70,7 +70,7 @@ def test_export_project_with_one_board_explicit(cli, project):
     assert len(stdout) > 0
     assert stdout[-1] == 'SUCCESS'
     assert os.path.exists(dir)
-    assert len(os.listdir(dir)) == 8
+    assert len(os.listdir(dir)) == 9
 
 
 @pytest.mark.parametrize("project", [
@@ -109,7 +109,7 @@ def test_export_project_with_two_boards_implicit(cli, project):
     assert len(stdout) > 0
     assert stdout[-1] == 'SUCCESS'
     assert os.path.exists(dir)
-    assert len(os.listdir(dir)) == 16
+    assert len(os.listdir(dir)) == 18
 
 
 @pytest.mark.parametrize("project", [
@@ -129,7 +129,7 @@ def test_export_project_with_two_boards_explicit_one(cli, project):
     assert len(stdout) > 0
     assert stdout[-1] == 'SUCCESS'
     assert os.path.exists(dir)
-    assert len(os.listdir(dir)) == 8
+    assert len(os.listdir(dir)) == 9
 
 
 @pytest.mark.parametrize("project", [
@@ -150,7 +150,7 @@ def test_export_project_with_two_boards_explicit_two(cli, project):
     assert len(stdout) > 0
     assert stdout[-1] == 'SUCCESS'
     assert os.path.exists(dir)
-    assert len(os.listdir(dir)) == 16
+    assert len(os.listdir(dir)) == 18
 
 
 @pytest.mark.parametrize("project", [
@@ -199,7 +199,7 @@ def test_export_project_with_two_conflicting_boards_succeeds_explicit(cli, proje
     assert len(stdout) > 0
     assert stdout[-1] == 'SUCCESS'
     assert os.path.exists(dir)
-    assert len(os.listdir(dir)) == 8
+    assert len(os.listdir(dir)) == 9
 
 
 @pytest.mark.parametrize("project", [

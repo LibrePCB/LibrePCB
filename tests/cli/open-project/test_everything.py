@@ -68,7 +68,7 @@ def test_everything(cli, project):
 
     # check "--export-pcb-fabrication-data"
     assert os.path.exists(gerber_dir)
-    assert len(os.listdir(gerber_dir)) == project.board_count * 8
+    assert len(os.listdir(gerber_dir)) == project.board_count * 9
 
     # check "--save"
     assert os.path.getsize(path) != original_filesize
