@@ -127,10 +127,12 @@ private:  // Data
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<Symbol> mSymbol;
   QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
-  QScopedPointer<SymbolEditorFsm> mFsm;
 
-  // broken interface detection
+  /// Broken interface detection
   QSet<Uuid> mOriginalSymbolPinUuids;
+
+  /// Editor state machine
+  QScopedPointer<SymbolEditorFsm> mFsm;
 };
 
 /*******************************************************************************

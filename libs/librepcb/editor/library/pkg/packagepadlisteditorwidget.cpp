@@ -73,9 +73,9 @@ void PackagePadListEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);
 }
 
-void PackagePadListEditorWidget::setReferences(PackagePadList& list,
+void PackagePadListEditorWidget::setReferences(PackagePadList* list,
                                                UndoStack* stack) noexcept {
-  mModel->setPadList(&list);
+  mModel->setPadList(list);
   mModel->setUndoStack(stack);
 }
 

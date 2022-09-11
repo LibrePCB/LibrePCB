@@ -67,7 +67,7 @@ int NewElementWizardPage_PackagePads::nextId() const noexcept {
 
 void NewElementWizardPage_PackagePads::initializePage() noexcept {
   QWizardPage::initializePage();
-  mUi->padListEditorWidget->setReferences(mContext.mPackagePads, nullptr);
+  mUi->padListEditorWidget->setReferences(&mContext.mPackagePads, nullptr);
 }
 
 void NewElementWizardPage_PackagePads::cleanupPage() noexcept {

@@ -119,14 +119,14 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   updateMetadata();
 
   // Setup footprint list editor widget.
-  mUi->footprintEditorWidget->setReferences(mPackage->getFootprints(),
-                                            *mUndoStack);
+  mUi->footprintEditorWidget->setReferences(&mPackage->getFootprints(),
+                                            mUndoStack.data());
   connect(mUi->footprintEditorWidget,
           &FootprintListEditorWidget::currentFootprintChanged, this,
           &PackageEditorWidget::currentFootprintChanged);
 
   // Setup pad list editor widget.
-  mUi->padListEditorWidget->setReferences(mPackage->getPads(),
+  mUi->padListEditorWidget->setReferences(&mPackage->getPads(),
                                           mUndoStack.data());
 
   // Show "interface broken" warning when related properties are modified.
@@ -171,9 +171,18 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
 }
 
 PackageEditorWidget::~PackageEditorWidget() noexcept {
+  // Clean up the state machine nicely to avoid unexpected behavior. Triggering
+  // abort (Esc) two times is usually sufficient to leave any active tool, so
+  // let's call it three times to be on the safe side. Unfortunately there's
+  // no clean way to forcible and guaranteed leaving a tool.
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
+  mFsm->processAbortCommand();
   mFsm.reset();
-  mPackage.take()
-      ->deleteLater();  // avoid dangling pointer! todo: make this less ugly ;)
+
+  // Disconnect UI from package to avoid dangling pointers.
+  mUi->footprintEditorWidget->setReferences(nullptr, nullptr);
+  mUi->padListEditorWidget->setReferences(nullptr, nullptr);
 }
 
 /*******************************************************************************

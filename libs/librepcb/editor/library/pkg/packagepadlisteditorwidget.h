@@ -57,7 +57,7 @@ public:
 
   // Setters
   void setReadOnly(bool readOnly) noexcept;
-  void setReferences(PackagePadList& list, UndoStack* stack) noexcept;
+  void setReferences(PackagePadList* list, UndoStack* stack) noexcept;
 
   // Operator Overloadings
   PackagePadListEditorWidget& operator=(const PackagePadListEditorWidget& rhs) =

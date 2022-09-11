@@ -131,11 +131,13 @@ private:  // Data
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<Package> mPackage;
-  QScopedPointer<PackageEditorFsm> mFsm;
 
   // broken interface detection
   QSet<Uuid> mOriginalPadUuids;
   FootprintList mOriginalFootprints;
+
+  /// Editor state machine
+  QScopedPointer<PackageEditorFsm> mFsm;
 };
 
 /*******************************************************************************
