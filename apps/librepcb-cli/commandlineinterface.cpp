@@ -797,11 +797,12 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
 QString CommandLineInterface::prettyPath(const FilePath& path,
                                          const QString& style) noexcept {
   if (QFileInfo(style).isAbsolute()) {
-    return path.toStr();  // absolute path
+    return path.toNative();  // absolute path
   } else if (path == FilePath(QDir::currentPath())) {
     return path.getFilename();  // name of current directory
   } else {
-    return path.toRelative(FilePath(QDir::currentPath()));  // relative path
+    return QDir::toNativeSeparators(
+        path.toRelative(FilePath(QDir::currentPath())));  // relative path
   }
 }
 
