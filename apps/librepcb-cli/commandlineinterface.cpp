@@ -352,7 +352,7 @@ bool CommandLineInterface::openProject(
         std::sort(paths.begin(), paths.end());
         foreach (const QString& path, paths) {
           printErr(
-              QString("    - Non-canonical file: %1")
+              QString("    - Non-canonical file: '%1'")
                   .arg(prettyPath(projectFs->getAbsPath(path), projectFile)));
         }
         if (paths.count() > 0) {
@@ -612,7 +612,7 @@ bool CommandLineInterface::openProject(
       writtenFilesIterator.next();
       if (writtenFilesIterator.value() > 1) {
         filesOverwritten = true;
-        printErr(tr("ERROR: The file %1 was written multiple times!")
+        printErr(tr("ERROR: The file '%1' was written multiple times!")
                      .arg(prettyPath(writtenFilesIterator.key(), projectFile)));
       }
     }
@@ -622,7 +622,7 @@ bool CommandLineInterface::openProject(
                   "functions. For board output files, you could either "
                   "add the placeholder '%1' to the path or specify the "
                   "boards to export with the '%2' argument.")
-                   .arg("'{{BOARD}}'", "--board"));
+                   .arg("{{BOARD}}", "--board"));
       success = false;
     }
 
@@ -771,7 +771,7 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
     // sort file paths to increases readability of console output
     std::sort(paths.begin(), paths.end());
     foreach (const QString& path, paths) {
-      printErr(QString("    - Non-canonical file: %1")
+      printErr(QString("    - Non-canonical file: '%1'")
                    .arg(prettyPath(fs.getAbsPath(path), libDir)));
     }
     if (paths.count() > 0) {
