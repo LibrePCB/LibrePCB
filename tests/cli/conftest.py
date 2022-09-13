@@ -36,7 +36,12 @@ class CliExecutor(object):
         pass
 
     def abspath(self, relpath):
-        return os.path.join(self.tmpdir, relpath)
+        return os.path.normpath(os.path.join(self.tmpdir, relpath))
+
+    def add_library(self, library):
+        src = os.path.join(DATA_DIR, 'libraries', library)
+        dst = os.path.join(self.tmpdir, library)
+        shutil.copytree(src, dst)
 
     def add_project(self, project, as_lppz=False):
         src = os.path.join(DATA_DIR, 'projects', project)
@@ -55,7 +60,7 @@ class CliExecutor(object):
         # output to stdout/stderr because it helps debugging failed tests
         sys.stdout.write(stdout)
         sys.stderr.write(stderr)
-        return p.returncode, stdout.splitlines(), stderr.splitlines()
+        return p.returncode, stdout, stderr
 
     def _env(self):
         env = os.environ

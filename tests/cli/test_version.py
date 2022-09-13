@@ -7,14 +7,15 @@ import re
 Test "--version"
 """
 
+PATTERN = "LibrePCB CLI Version \\d+\\.\\d+\\.\\d+(\\-\\w+)?\\n" \
+          "File Format [0-9]+(\\.[0-9]+)? \\((stable|unstable)\\)\\n" \
+          "Git Revision [0-9a-f]+\\n" \
+          "Qt Version [0-9\\.]+ \\(compiled against [0-9\\.]+\\)\\n" \
+          "Built at [0-9a-zA-Z\\.:/ ]+\\n"
+
 
 def test_valid_call(cli):
     code, stdout, stderr = cli.run('--version')
+    assert stderr == ''
+    assert re.fullmatch(PATTERN, stdout)
     assert code == 0
-    assert len(stderr) == 0
-    assert len(stdout) == 5
-    assert re.match('LibrePCB CLI Version \\d+\\.\\d+\\.\\d+(\\-\\w+)?$', stdout[0])
-    assert re.match('File Format .+', stdout[1])
-    assert re.match('Git Revision .+', stdout[2])
-    assert re.match('Qt Version .+', stdout[3])
-    assert re.match('Built at .+', stdout[4])
