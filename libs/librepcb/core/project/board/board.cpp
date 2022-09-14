@@ -987,6 +987,10 @@ std::unique_ptr<BoardSelectionQuery> Board::createSelectionQuery() const
 QString Board::getBuiltInAttributeValue(const QString& key) const noexcept {
   if (key == QLatin1String("BOARD")) {
     return *mName;
+  } else if (key == QLatin1String("BOARD_DIRNAME")) {
+    return mDirectory->getPath().split("/").last();
+  } else if (key == QLatin1String("BOARD_INDEX")) {
+    return QString::number(mProject.getBoardIndex(*this));
   } else {
     return QString();
   }
