@@ -286,16 +286,18 @@ void BoardGerberExport::exportDrillsNpth(
                         mProject.getMetadata().getVersion(),
                         ExcellonGenerator::Plating::No, 1,
                         mBoard.getLayerStack().getInnerLayerCount() + 2);
-  int count = drawNpthDrills(gen);
-  if (count > 0) {
-    // Some PCB manufacturers don't like to have separate drill files for PTH
-    // and NPTH. As many boards don't have non-plated holes anyway, we create
-    // this file only if it's really needed. Maybe this avoids unnecessary
-    // issues with manufacturers...
-    gen.generate();
-    gen.saveToFile(fp);
-    mWrittenFiles.append(fp);
-  }
+  drawNpthDrills(gen);
+
+  // Note that separate NPTH drill files could lead to issues with some PCB
+  // manufacturers, even if it's empty in many cases. However, we generate the
+  // NPTH file even if there are no NPTH drills since it could also lead to
+  // unexpected behavior if the file is generated only conditionally. See
+  // https://github.com/LibrePCB/LibrePCB/issues/998. If the PCB manufacturer
+  // doesn't support a separate NPTH file, the user shall enable the
+  // "merge PTH and NPTH drills"  option.
+  gen.generate();
+  gen.saveToFile(fp);
+  mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportDrillsPth(
