@@ -227,6 +227,8 @@ int CommandLineInterface::execute() noexcept {
   // --version
   if (parser.isSet(versionOption)) {
     print(tr("LibrePCB CLI Version %1").arg(mApp.applicationVersion()));
+    print(tr("File Format %1").arg(mApp.getFileFormatVersion().toStr()) % " " %
+          (mApp.isFileFormatStable() ? tr("(stable)") : tr("(unstable)")));
     print(tr("Git Revision %1").arg(mApp.getGitRevision()));
     print(tr("Qt Version %1 (compiled against %2)")
               .arg(qVersion(), QT_VERSION_STR));
