@@ -65,8 +65,7 @@ private:  // Methods
                    const QString& pcbFabricationSettingsPath,
                    const QStringList& exportPnpTopFiles,
                    const QStringList& exportPnpBottomFiles,
-                   const QStringList& boards, bool save, bool strict) const
-      noexcept;
+                   const QStringList& boards, bool save, bool strict) noexcept;
   bool openLibrary(const QString& libDir, bool all, bool save,
                    bool strict) const noexcept;
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
@@ -74,12 +73,14 @@ private:  // Methods
                              bool strict, bool& success) const;
   static QString prettyPath(const FilePath& path,
                             const QString& style) noexcept;
-  static bool failIfFileFormatUnstable() noexcept;
-  static void print(const QString& str) noexcept;
-  static void printErr(const QString& str) noexcept;
+  bool failIfFileFormatUnstable() const noexcept;
+  void print(const QString& str) const noexcept;
+  void printErr(const QString& str) const noexcept;
 
 private:  // Data
   const Application& mApp;
+  bool mUseJsonOutput;
+  QJsonObject mJsonOutput;
 };
 
 /*******************************************************************************

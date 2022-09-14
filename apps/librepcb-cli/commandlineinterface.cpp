@@ -49,6 +49,7 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectmetadata.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
+#include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
 
@@ -65,7 +66,7 @@ namespace cli {
  ******************************************************************************/
 
 CommandLineInterface::CommandLineInterface(const Application& app) noexcept
-  : mApp(app) {
+  : mApp(app), mUseJsonOutput(false), mJsonOutput() {
 }
 
 /*******************************************************************************
@@ -73,6 +74,9 @@ CommandLineInterface::CommandLineInterface(const Application& app) noexcept
  ******************************************************************************/
 
 int CommandLineInterface::execute() noexcept {
+  mUseJsonOutput = false;
+  mJsonOutput = QJsonObject();
+
   QStringList positionalArgNames;
   QMap<QString, QPair<QString, QString>> commands = {
       {"open-project",
@@ -93,6 +97,9 @@ int CommandLineInterface::execute() noexcept {
   const QCommandLineOption versionOption = parser.addVersionOption();
   QCommandLineOption verboseOption("verbose", tr("Verbose output."));
   parser.addOption(verboseOption);
+  const QCommandLineOption jsonOption(
+      "json", tr("Format stdout as JSON instead of plain text."));
+  parser.addOption(jsonOption);
   parser.addPositionalArgument("command",
                                tr("The command to execute (see list below)."));
   positionalArgNames.append("command");
@@ -260,8 +267,39 @@ int CommandLineInterface::execute() noexcept {
     return 0;
   }
 
+  // --json
+  if (parser.isSet(jsonOption)) {
+    mUseJsonOutput = true;
+  }
+  auto jsonScopeGuard = scopeGuard([this]() {
+    if (mUseJsonOutput) {
+      QTextStream s(stdout);
+      s << QJsonDocument(mJsonOutput).toJson();
+    }
+  });
+
   // --version
   if (parser.isSet(versionOption)) {
+    mJsonOutput["app"] = QJsonObject{
+        {"version", mApp.applicationVersion()},
+        {"revision",
+         mApp.getGitRevision().isEmpty() ? QJsonValue()
+                                         : mApp.getGitRevision()},
+    };
+    mJsonOutput["file_format"] = QJsonObject{
+        {"version", mApp.getFileFormatVersion().toStr()},
+        {"stable", mApp.isFileFormatStable()},
+    };
+    mJsonOutput["qt"] = QJsonObject{
+        {"compiled", QT_VERSION_STR},
+        {"linked", qVersion()},
+    };
+    mJsonOutput["build"] = QJsonObject{
+        {"date",
+         mApp.getBuildDate().isValid()
+             ? mApp.getBuildDate().toString(Qt::ISODate)
+             : QJsonValue()},
+    };
     print(tr("LibrePCB CLI Version %1").arg(mApp.applicationVersion()));
     print(tr("File Format %1").arg(mApp.getFileFormatVersion().toStr()) % " " %
           (mApp.isFileFormatStable() ? tr("(stable)") : tr("(unstable)")));
@@ -335,7 +373,7 @@ bool CommandLineInterface::openProject(
     bool exportPcbFabricationData, const QString& pcbFabricationSettingsPath,
     const QStringList& exportPnpTopFiles,
     const QStringList& exportPnpBottomFiles, const QStringList& boards,
-    bool save, bool strict) const noexcept {
+    bool save, bool strict) noexcept {
   try {
     bool success = true;
     QMap<FilePath, int> writtenFilesCounter;
@@ -343,6 +381,7 @@ bool CommandLineInterface::openProject(
     // Open project
     FilePath projectFp(QFileInfo(projectFile).absoluteFilePath());
     print(tr("Open project '%1'...").arg(prettyPath(projectFp, projectFile)));
+    mJsonOutput["path"] = projectFp.toNative();
     std::shared_ptr<TransactionalFileSystem> projectFs;
     QString projectFileName;
     if (projectFp.getSuffix() == "lppz") {
@@ -358,17 +397,21 @@ bool CommandLineInterface::openProject(
       projectFs = TransactionalFileSystem::open(projectFp.getParentDir(), save);
       projectFileName = projectFp.getFilename();
     }
+    mJsonOutput["filename"] = projectFileName.isEmpty() ? QJsonValue() : projectFileName;
     Project project(std::unique_ptr<TransactionalDirectory>(
                         new TransactionalDirectory(projectFs)),
                     projectFileName);  // can throw
 
     // Check for non-canonical files (strict mode)
     if (strict) {
+      QJsonObject jsonNode;
       print(tr("Check for non-canonical files..."));
       if (projectFp.getSuffix() == "lppz") {
-        printErr("  " %
-                 tr("ERROR: The option '--strict' is not available for "
-                    "*.lppz files!"));
+        const QString msg =                  tr("The option '--strict' is not available for "
+                                                "*.lppz files.");
+        jsonNode["error"] = msg;
+        printErr("  " % tr("ERROR:") % " " %
+                 msg);
         success = false;
       } else {
         project.save();  // can throw
@@ -380,12 +423,13 @@ bool CommandLineInterface::openProject(
         foreach (const QString& path, paths) {
           printErr(
               QString("    - Non-canonical file: '%1'")
-                  .arg(prettyPath(projectFs->getAbsPath(path), projectFile)));
+                  .arg(path));
         }
         if (paths.count() > 0) {
           success = false;
         }
       }
+      mJsonOutput["formatting"] = jsonNode;
     }
 
     // ERC
@@ -393,6 +437,7 @@ bool CommandLineInterface::openProject(
       print(tr("Run ERC..."));
       QStringList messages;
       int approvedMsgCount = 0;
+      QJsonArray messagesNode;
       foreach (const ErcMsg* msg, project.getErcMsgList().getItems()) {
         if (!msg->isVisible()) continue;
         if (msg->isIgnored()) {
@@ -409,12 +454,18 @@ bool CommandLineInterface::openProject(
               severity = tr("ERROR");
               break;
           }
+          messagesNode.append(QJsonObject{
+              {"approved", msg->isIgnored()},
+              {"severity", severity},
+              {"message", msg->getMsg()},
+          });
           messages.append(
               QString("    - [%1] %2").arg(severity, msg->getMsg()));
         }
       }
       print("  " % tr("Approved messages: %1").arg(approvedMsgCount));
       print("  " % tr("Non-approved messages: %1").arg(messages.count()));
+      mJsonOutput["erc"] = QJsonObject{{"messages", messagesNode}};
       // sort messages to increases readability of console output
       std::sort(messages.begin(), messages.end());
       foreach (const QString& msg, messages) { printErr(msg); }
@@ -436,7 +487,7 @@ bool CommandLineInterface::openProject(
       graphicsExport.setDocumentName(*project.getMetadata().getName());
       QObject::connect(
           &graphicsExport, &GraphicsExport::savingFile,
-          [&destPathStr, &writtenFilesCounter](const FilePath& fp) {
+          [this, &destPathStr, &writtenFilesCounter](const FilePath& fp) {
             print(QString("  => '%1'").arg(prettyPath(fp, destPathStr)));
             writtenFilesCounter[fp]++;
           });
@@ -833,7 +884,7 @@ QString CommandLineInterface::prettyPath(const FilePath& path,
   }
 }
 
-bool CommandLineInterface::failIfFileFormatUnstable() noexcept {
+bool CommandLineInterface::failIfFileFormatUnstable() const noexcept {
   if ((!qApp->isFileFormatStable()) &&
       (qgetenv("LIBREPCB_DISABLE_UNSTABLE_WARNING") != "1")) {
     printErr(
@@ -849,14 +900,25 @@ bool CommandLineInterface::failIfFileFormatUnstable() noexcept {
   }
 }
 
-void CommandLineInterface::print(const QString& str) noexcept {
-  QTextStream s(stdout);
-  s << str << endl;
+void CommandLineInterface::print(const QString& str) const noexcept {
+  if (mUseJsonOutput) {
+    // Redirect status messages to stderr log since stdout is JSON formatted.
+    qInfo().noquote() << str;
+  } else {
+    QTextStream s(stdout);
+    s << str << endl;
+  }
 }
 
-void CommandLineInterface::printErr(const QString& str) noexcept {
-  QTextStream s(stderr);
-  s << str << endl;
+void CommandLineInterface::printErr(const QString& str) const noexcept {
+  if (mUseJsonOutput) {
+    // If JSON output is uded, output error messages as log to make them hidden
+    // by default. Only if --verbose is passed, the messages will be visible
+    qInfo().noquote() << str;
+  } else {
+    QTextStream s(stderr);
+    s << str << endl;
+  }
 }
 
 /*******************************************************************************
