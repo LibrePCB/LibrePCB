@@ -156,6 +156,11 @@ int CommandLineInterface::execute() noexcept {
                                     "be given multiple times. If not set, "
                                     "all boards are exported."),
                                  tr("name"));
+  QCommandLineOption boardIndexOption("board-index",
+                                      tr("Same as '%1', but allows to specify "
+                                         "boards by index instead of by name.")
+                                          .arg("--board"),
+                                      tr("index"));
   QCommandLineOption saveOption(
       "save",
       tr("Save project before closing it (useful to upgrade file format)."));
@@ -215,6 +220,7 @@ int CommandLineInterface::execute() noexcept {
     parser.addOption(exportPnpTopOption);
     parser.addOption(exportPnpBottomOption);
     parser.addOption(boardOption);
+    parser.addOption(boardIndexOption);
     parser.addOption(saveOption);
     parser.addOption(prjStrictOption);
   } else if (command == "open-library") {
@@ -302,7 +308,8 @@ int CommandLineInterface::execute() noexcept {
         parser.value(pcbFabricationSettingsOption),  // PCB fab. settings
         parser.values(exportPnpTopOption),  // export PnP top
         parser.values(exportPnpBottomOption),  // export PnP bottom
-        parser.values(boardOption),  // boards
+        parser.values(boardOption),  // board names
+        parser.values(boardIndexOption),  // board indices
         parser.isSet(saveOption),  // save project
         parser.isSet(prjStrictOption)  // strict mode
     );
@@ -334,8 +341,8 @@ bool CommandLineInterface::openProject(
     const QStringList& exportBoardBomFiles, const QString& bomAttributes,
     bool exportPcbFabricationData, const QString& pcbFabricationSettingsPath,
     const QStringList& exportPnpTopFiles,
-    const QStringList& exportPnpBottomFiles, const QStringList& boards,
-    bool save, bool strict) const noexcept {
+    const QStringList& exportPnpBottomFiles, const QStringList& boardNames,
+    const QStringList& boardIndices, bool save, bool strict) const noexcept {
   try {
     bool success = true;
     QMap<FilePath, int> writtenFilesCounter;
@@ -361,6 +368,38 @@ bool CommandLineInterface::openProject(
     Project project(std::unique_ptr<TransactionalDirectory>(
                         new TransactionalDirectory(projectFs)),
                     projectFileName);  // can throw
+
+    // Parse list of boards.
+    QList<Board*> boards;
+    foreach (const QString& boardName, boardNames) {
+      if (Board* board = project.getBoardByName(boardName)) {
+        if (!boards.contains(board)) {
+          boards.append(board);
+        }
+      } else {
+        printErr(
+            tr("ERROR: No board with the name '%1' found.").arg(boardName));
+        success = false;
+      }
+    }
+    foreach (const QString& boardIndex, boardIndices) {
+      bool ok = false;
+      const int index = boardIndex.trimmed().toInt(&ok);
+      Board* board = project.getBoardByIndex(index);
+      if (ok && board) {
+        if (!boards.contains(board)) {
+          boards.append(board);
+        }
+      } else {
+        printErr(tr("ERROR: Board index '%1' is invalid.").arg(boardIndex));
+        success = false;
+      }
+    }
+
+    // If no boards are specified, export all boards.
+    if (boardNames.isEmpty() && boardIndices.isEmpty()) {
+      boards = project.getBoards();
+    }
 
     // Check for non-canonical files (strict mode)
     if (strict) {
@@ -455,25 +494,6 @@ bool CommandLineInterface::openProject(
       }
     }
 
-    // Parse list of boards
-    QList<Board*> boardList;
-    if (boards.isEmpty()) {
-      // export all boards
-      boardList = project.getBoards();
-    } else {
-      // export specified boards
-      foreach (const QString& boardName, boards) {
-        Board* board = project.getBoardByName(boardName);
-        if (board) {
-          boardList.append(board);
-        } else {
-          printErr(
-              tr("ERROR: No board with the name '%1' found.").arg(boardName));
-          success = false;
-        }
-      }
-    }
-
     // Export BOM
     if (exportBomFiles.count() + exportBoardBomFiles.count() > 0) {
       QList<QPair<QString, bool>> jobs;  // <OutputPath, BoardSpecific>
@@ -489,16 +509,17 @@ bool CommandLineInterface::openProject(
         attributes.append(str.trimmed());
       }
       foreach (const auto& job, jobs) {
+        QList<Board*> boardsToExport;
         const QString& destStr = job.first;
         bool boardSpecific = job.second;
         if (boardSpecific) {
           print(tr("Export board-specific BOM to '%1'...").arg(destStr));
+          boardsToExport = boards;
         } else {
           print(tr("Export generic BOM to '%1'...").arg(destStr));
+          boardsToExport = {nullptr};
         }
-        QList<Board*> boards =
-            boardSpecific ? boardList : QList<Board*>{nullptr};
-        foreach (const Board* board, boards) {
+        foreach (const Board* board, boardsToExport) {
           const AttributeProvider* attrProvider = board;
           if (!board) {
             attrProvider = &project;
@@ -536,6 +557,7 @@ bool CommandLineInterface::openProject(
     if (exportPcbFabricationData) {
       print(tr("Export PCB fabrication data..."));
       tl::optional<BoardFabricationOutputSettings> customSettings;
+      QList<Board*> boardsToExport = boards;
       if (!pcbFabricationSettingsPath.isEmpty()) {
         try {
           qDebug() << "Load custom fabrication output settings:"
@@ -548,10 +570,10 @@ bool CommandLineInterface::openProject(
           printErr(
               tr("ERROR: Failed to load custom settings: %1").arg(e.getMsg()));
           success = false;
-          boardList.clear();  // avoid exporting any boards
+          boardsToExport.clear();  // avoid exporting any boards
         }
       }
-      foreach (const Board* board, boardList) {
+      foreach (const Board* board, boardsToExport) {
         print("  " % tr("Board '%1':").arg(*board->getName()));
         BoardGerberExport grbExport(*board);
         grbExport.exportPcbLayers(
@@ -586,7 +608,7 @@ bool CommandLineInterface::openProject(
         print(tr("Export %1 assembly data to '%2'...")
                   .arg(job.boardSideStr)
                   .arg(job.destStr));
-        foreach (const Board* board, boardList) {
+        foreach (const Board* board, boards) {
           const QString destPathStr = AttributeSubstitutor::substitute(
               job.destStr, board, [&](const QString& str) {
                 return FilePath::cleanFileName(
