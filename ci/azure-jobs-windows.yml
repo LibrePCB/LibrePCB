@@ -41,9 +41,9 @@ jobs:
       condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
     - script: build\\tests\\unittests\\librepcb-unittests.exe
       displayName: Run LibrePCB Unittests
-    - script: pytest -v --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
+    - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
       displayName: Run LibrePCB-CLI Functional Tests
-    - script: pytest -v --librepcb-executable="build/install/opt/bin/librepcb.exe" --reruns 5 --reruns-delay 10 ./tests/funq
+    - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb.exe" --reruns 5 --reruns-delay 10 ./tests/funq
       displayName: Run LibrePCB Functional Tests
     - bash: ./ci/upload_artifacts.sh
       displayName: Upload Artifacts

@@ -19,11 +19,17 @@ def test_if_unknown_file_extension_fails(cli, project):
     code, stdout, stderr = cli.run('open-project',
                                    '--export-schematics=foo.bar',
                                    project.path)
+    assert stderr == \
+        "  ERROR: Failed to export image \"{path}\". Check file permissions " \
+        "and make sure to use a supported image file extension.\n".format(
+            path=cli.abspath('foo.bar'),
+        )
+    assert stdout == \
+        "Open project '{project.path}'...\n" \
+        "Export schematics to 'foo.bar'...\n" \
+        "  => 'foo.bar'\n" \
+        "Finished with errors!\n".format(project=project)
     assert code == 1
-    assert len(stderr) == 1
-    assert 'Failed to export image' in stderr[0]
-    assert len(stdout) > 0
-    assert stdout[-1] == 'Finished with errors!'
 
 
 @pytest.mark.parametrize("project", [
@@ -37,10 +43,13 @@ def test_exporting_pdf_with_relative_path(cli, project):
     code, stdout, stderr = cli.run('open-project',
                                    '--export-schematics=sch.pdf',
                                    project.path)
+    assert stderr == ''
+    assert stdout == \
+        "Open project '{project.path}'...\n" \
+        "Export schematics to 'sch.pdf'...\n" \
+        "  => 'sch.pdf'\n" \
+        "SUCCESS\n".format(project=project)
     assert code == 0
-    assert len(stderr) == 0
-    assert len(stdout) > 0
-    assert stdout[-1] == 'SUCCESS'
     assert os.path.exists(path)
 
 
@@ -49,16 +58,22 @@ def test_exporting_pdf_with_relative_path(cli, project):
     params.PROJECT_WITH_TWO_BOARDS_LPPZ_PARAM,
 ])
 def test_exporting_pdf_with_absolute_path(cli, project):
+    """
+    Note: Test with passing the argument as "--arg <value>".
+    """
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     path = cli.abspath('schematic with spaces.pdf')
     assert not os.path.exists(path)
     code, stdout, stderr = cli.run('open-project',
-                                   '--export-schematics={}'.format(path),
+                                   '--export-schematics', path,
                                    project.path)
+    assert stderr == ''
+    assert stdout == \
+        "Open project '{project.path}'...\n" \
+        "Export schematics to '{path}'...\n" \
+        "  => '{path}'\n" \
+        "SUCCESS\n".format(project=project, path=path)
     assert code == 0
-    assert len(stderr) == 0
-    assert len(stdout) > 0
-    assert stdout[-1] == 'SUCCESS'
     assert os.path.exists(path)
 
 
@@ -74,10 +89,13 @@ def test_exporting_images(cli, file_extension):
     code, stdout, stderr = cli.run('open-project',
                                    '--export-schematics={}'.format(path),
                                    project.path)
+    assert stderr == ''
+    assert stdout == \
+        "Open project '{project.path}'...\n" \
+        "Export schematics to '{path}'...\n" \
+        "  => '{path}'\n" \
+        "SUCCESS\n".format(project=project, path=path)
     assert code == 0
-    assert len(stderr) == 0
-    assert len(stdout) > 0
-    assert stdout[-1] == 'SUCCESS'
     assert os.path.exists(path)
 
 
@@ -93,9 +111,12 @@ def test_if_output_directories_are_created(cli, project):
     code, stdout, stderr = cli.run('open-project',
                                    '--export-schematics={}'.format(path),
                                    project.path)
+    assert stderr == ''
+    assert stdout == \
+        "Open project '{project.path}'...\n" \
+        "Export schematics to '{path}'...\n" \
+        "  => '{path}'\n" \
+        "SUCCESS\n".format(project=project, path=path)
     assert code == 0
-    assert len(stderr) == 0
-    assert len(stdout) > 0
-    assert stdout[-1] == 'SUCCESS'
     assert os.path.exists(dir)
     assert os.path.exists(path)

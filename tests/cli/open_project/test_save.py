@@ -23,8 +23,10 @@ def test_save(cli, project):
     original_filesize = os.path.getsize(path)
     # save project (must remove the appended zeros)
     code, stdout, stderr = cli.run('open-project', '--save', path)
+    assert stderr == ''
+    assert stdout == \
+        "Open project '{path}'...\n" \
+        "Save project...\n" \
+        "SUCCESS\n".format(path=path)
     assert code == 0
-    assert len(stderr) == 0
-    assert len(stdout) > 0
-    assert stdout[-1] == 'SUCCESS'
     assert os.path.getsize(path) != original_filesize

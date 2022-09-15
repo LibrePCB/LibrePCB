@@ -5,12 +5,33 @@ import os
 import pytest
 
 
+class Library:
+    def __init__(self, dir, cmpcat, pkgcat, sym, pkg, cmp, dev):
+        self.dir = dir
+        self.cmpcat = cmpcat
+        self.pkgcat = pkgcat
+        self.sym = sym
+        self.pkg = pkg
+        self.cmp = cmp
+        self.dev = dev
+
+
+EMPTY_LIBRARY = Library('Empty Library.lplib', 0, 0, 0, 0, 0, 0)
+EMPTY_LIBRARY_PARAM = pytest.param(EMPTY_LIBRARY,
+                                   id='EmptyLibrary')
+
+POPULATED_LIBRARY = Library('Populated Library.lplib', 10, 4, 19, 8, 15, 8)
+POPULATED_LIBRARY_PARAM = pytest.param(POPULATED_LIBRARY,
+                                       id='PopulatedLibrary')
+
+
 class Project:
     def __init__(self, dir, path, output_dir, board_count):
         self.dir = dir
-        self.path = path
+        self.path = os.path.normpath(path)
         self.parent_dir = os.path.dirname(path)
         self.output_dir = output_dir
+        self.output_dir_native = os.path.normpath(output_dir)
         self.is_lppz = path.endswith('.lppz')
         self.board_count = board_count
 
