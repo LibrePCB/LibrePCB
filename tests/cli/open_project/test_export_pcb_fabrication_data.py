@@ -340,12 +340,14 @@ def test_export_project_with_two_conflicting_boards_succeeds_explicit(cli, proje
 ])
 def test_export_with_custom_settings(cli, project):
     """
-    Note: Test with passing the argument as "--arg <value>".
+    Notes:
+      - Test with passing the argument as "--arg <value>".
+      - Test attributes '{{BOARD_INDEX}}' and '{{BOARD_DIRNAME}}' in path.
     """
     cli.add_project(project.dir, as_lppz=project.is_lppz)
     settings = """
       (fabrication_output_settings
-        (base_path "./custom_output/")
+        (base_path "./out/{{BOARD_INDEX}}_{{BOARD_DIRNAME}}/")
         (outlines (suffix "OUTLINES.gbr"))
         (copper_top (suffix "COPPER-TOP.gbr"))
         (copper_inner (suffix "COPPER-IN{{CU_LAYER}}.gbr"))
@@ -369,7 +371,7 @@ def test_export_with_custom_settings(cli, project):
     """
     with open(cli.abspath('settings.lp'), mode='w') as f:
         f.write(settings)
-    dir = os.path.dirname(cli.abspath(project.path)) + '/custom_output'
+    dir = os.path.dirname(cli.abspath(project.path)) + '/out/0_default'
     assert not os.path.exists(dir)
     code, stdout, stderr = cli.run('open-project',
                                    '--export-pcb-fabrication-data',
@@ -380,16 +382,16 @@ def test_export_with_custom_settings(cli, project):
         "Open project '{project.path}'...\n" \
         "Export PCB fabrication data...\n" \
         "  Board 'default':\n" \
-        "    => '{output_prefix}custom_output//DRILLS.drl'\n" \
-        "    => '{output_prefix}custom_output//OUTLINES.gbr'\n" \
-        "    => '{output_prefix}custom_output//COPPER-TOP.gbr'\n" \
-        "    => '{output_prefix}custom_output//COPPER-BOTTOM.gbr'\n" \
-        "    => '{output_prefix}custom_output//SOLDERMASK-TOP.gbr'\n" \
-        "    => '{output_prefix}custom_output//SOLDERMASK-BOTTOM.gbr'\n" \
-        "    => '{output_prefix}custom_output//SILKSCREEN-TOP.gbr'\n" \
-        "    => '{output_prefix}custom_output//SILKSCREEN-BOTTOM.gbr'\n" \
-        "    => '{output_prefix}custom_output//SOLDERPASTE-TOP.gbr'\n" \
-        "    => '{output_prefix}custom_output//SOLDERPASTE-BOTTOM.gbr'\n" \
+        "    => '{output_prefix}out//0_default//DRILLS.drl'\n" \
+        "    => '{output_prefix}out//0_default//OUTLINES.gbr'\n" \
+        "    => '{output_prefix}out//0_default//COPPER-TOP.gbr'\n" \
+        "    => '{output_prefix}out//0_default//COPPER-BOTTOM.gbr'\n" \
+        "    => '{output_prefix}out//0_default//SOLDERMASK-TOP.gbr'\n" \
+        "    => '{output_prefix}out//0_default//SOLDERMASK-BOTTOM.gbr'\n" \
+        "    => '{output_prefix}out//0_default//SILKSCREEN-TOP.gbr'\n" \
+        "    => '{output_prefix}out//0_default//SILKSCREEN-BOTTOM.gbr'\n" \
+        "    => '{output_prefix}out//0_default//SOLDERPASTE-TOP.gbr'\n" \
+        "    => '{output_prefix}out//0_default//SOLDERPASTE-BOTTOM.gbr'\n" \
         "SUCCESS\n".format(
             project=project,
             output_prefix=('' if project.is_lppz else (project.dir + os.sep)),
