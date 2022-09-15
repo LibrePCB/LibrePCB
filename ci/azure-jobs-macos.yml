@@ -28,9 +28,9 @@ jobs:
     displayName: Build Installer
   - bash: ./build/tests/unittests/librepcb-unittests
     displayName: Run LibrePCB Unittests
-  - bash: pytest -v --librepcb-executable="build/install/opt/librepcb-cli.app/Contents/MacOS/librepcb-cli" ./tests/cli
+  - bash: pytest -vvv --librepcb-executable="build/install/opt/librepcb-cli.app/Contents/MacOS/librepcb-cli" ./tests/cli
     displayName: Run LibrePCB-CLI Functional Tests
-  - bash: pytest -v --librepcb-executable="build/install/opt/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
+  - bash: pytest -vvv --librepcb-executable="build/install/opt/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
     displayName: Run LibrePCB Functional Tests
   - bash: ./ci/upload_artifacts.sh
     displayName: Upload Artifacts

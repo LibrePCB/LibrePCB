@@ -73,6 +73,7 @@ CommandLineInterface::CommandLineInterface(const Application& app) noexcept
  ******************************************************************************/
 
 int CommandLineInterface::execute() noexcept {
+  QStringList positionalArgNames;
   QMap<QString, QPair<QString, QString>> commands = {
       {"open-project",
        {tr("Open a project to execute project-related tasks."),
@@ -85,11 +86,16 @@ int CommandLineInterface::execute() noexcept {
   // Add global options
   QCommandLineParser parser;
   parser.setApplicationDescription(tr("LibrePCB Command Line Interface"));
-  const QCommandLineOption helpOption = parser.addHelpOption();
+  // Don't use the built-in addHelpOption() since it also adds the "--help-all"
+  // option which we don't need, and the OS-dependent option "-?".
+  const QCommandLineOption helpOption({"h", "help"}, tr("Print this message."));
+  parser.addOption(helpOption);
   const QCommandLineOption versionOption = parser.addVersionOption();
   QCommandLineOption verboseOption("verbose", tr("Verbose output."));
   parser.addOption(verboseOption);
-  parser.addPositionalArgument("command", tr("The command to execute."));
+  parser.addPositionalArgument("command",
+                               tr("The command to execute (see list below)."));
+  positionalArgNames.append("command");
 
   // Define options for "open-project"
   QCommandLineOption ercOption(
@@ -173,23 +179,32 @@ int CommandLineInterface::execute() noexcept {
       tr("Fail if the opened files are not strictly canonical, i.e. "
          "there would be changes when saving the library elements."));
 
+  // Build help text.
+  const QStringList args = mApp.arguments();
+  const QString executable = args.value(0);
+  QString helpText = parser.helpText() % "\n" % tr("Commands:") % "\n";
+  for (auto it = commands.constBegin(); it != commands.constEnd(); ++it) {
+    helpText += "  " % it.key().leftJustified(15) % it.value().first % "\n";
+  }
+  helpText += "\n" % tr("List command-specific options:") % "\n  " %
+      executable % " <command> --help";
+  QString usageHelpText = helpText.split("\n").value(0);
+  const QString helpCommandTextPrefix = tr("Help:") % " ";
+  QString helpCommandText = helpCommandTextPrefix % executable % " --help";
+
   // First parse to get the supplied command (ignoring errors because the parser
   // does not yet know the command-dependent options).
-  parser.parse(mApp.arguments());
+  parser.parse(args);
 
   // Add command-dependent options
-  QStringList positionalArgs = parser.positionalArguments();
-  QString command =
-      positionalArgs.isEmpty() ? QString() : positionalArgs.first();
-  if (positionalArgs.count() > 0) {
-    positionalArgs.removeFirst();  // command is now stored in separate variable
-  }
+  const QString command = parser.positionalArguments().value(0);
+  parser.clearPositionalArguments();
   if (command == "open-project") {
-    parser.clearPositionalArguments();
     parser.addPositionalArgument(command, commands[command].first,
                                  commands[command].second);
     parser.addPositionalArgument("project",
                                  tr("Path to project file (*.lpp[z])."));
+    positionalArgNames.append("project");
     parser.addOption(ercOption);
     parser.addOption(exportSchematicsOption);
     parser.addOption(exportBomOption);
@@ -203,47 +218,35 @@ int CommandLineInterface::execute() noexcept {
     parser.addOption(saveOption);
     parser.addOption(prjStrictOption);
   } else if (command == "open-library") {
-    parser.clearPositionalArguments();
     parser.addPositionalArgument(command, commands[command].first,
                                  commands[command].second);
     parser.addPositionalArgument("library",
                                  tr("Path to library directory (*.lplib)."));
+    positionalArgNames.append("library");
     parser.addOption(libAllOption);
     parser.addOption(libSaveOption);
     parser.addOption(libStrictOption);
   } else if (!command.isEmpty()) {
-    printErr(tr("Unknown command '%1'.").arg(command), 2);
-    print(parser.helpText(), 0);
+    printErr(tr("Unknown command '%1'.").arg(command));
+    printErr(usageHelpText);
+    printErr(helpCommandText);
     return 1;
+  }
+
+  // If a command is given, make the help texts command-specific now.
+  if (!command.isEmpty()) {
+    helpText = parser.helpText().trimmed();  // Remove the list of commands.
+    usageHelpText = helpText.split("\n").value(0);
+    helpCommandText =
+        helpCommandTextPrefix % executable % " " % command % " --help";
   }
 
   // Parse the actual command line arguments given by the user
-  if (!parser.parse(mApp.arguments())) {
-    printErr(parser.errorText(), 2);
-    print(parser.helpText(), 0);
+  if (!parser.parse(args)) {
+    printErr(parser.errorText());
+    printErr(usageHelpText);
+    printErr(helpCommandText);
     return 1;
-  }
-
-  // --version
-  if (parser.isSet(versionOption)) {
-    print(tr("LibrePCB CLI Version %1").arg(mApp.applicationVersion()));
-    print(tr("Git Revision %1").arg(mApp.getGitRevision()));
-    print(tr("Qt Version %1 (compiled against %2)")
-              .arg(qVersion(), QT_VERSION_STR));
-    print(tr("Built at %1").arg(mApp.getBuildDate().toString(Qt::LocalDate)));
-    return 0;
-  }
-
-  // --help (also shown if no command supplied)
-  if (parser.isSet(helpOption) || command.isEmpty()) {
-    print(parser.helpText(), 0);
-    if (command.isEmpty()) {
-      print("\n" % tr("Commands:"));
-      for (auto it = commands.constBegin(); it != commands.constEnd(); ++it) {
-        print("  " % it.key().leftJustified(15) % it.value().first);
-      }
-    }
-    return 0;
   }
 
   // --verbose
@@ -251,16 +254,45 @@ int CommandLineInterface::execute() noexcept {
     Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::All);
   }
 
+  // --help (also shown if no arguments supplied)
+  if (parser.isSet(helpOption) || (args.count() <= 1)) {
+    print(helpText);
+    return 0;
+  }
+
+  // --version
+  if (parser.isSet(versionOption)) {
+    print(tr("LibrePCB CLI Version %1").arg(mApp.applicationVersion()));
+    print(tr("File Format %1").arg(mApp.getFileFormatVersion().toStr()) % " " %
+          (mApp.isFileFormatStable() ? tr("(stable)") : tr("(unstable)")));
+    print(tr("Git Revision %1").arg(mApp.getGitRevision()));
+    print(tr("Qt Version %1 (compiled against %2)")
+              .arg(qVersion(), QT_VERSION_STR));
+    print(tr("Built at %1").arg(mApp.getBuildDate().toString(Qt::LocalDate)));
+    return 0;
+  }
+
+  // Check number of passed positional command arguments.
+  const QStringList positionalArgs = parser.positionalArguments();
+  if (positionalArgs.count() < positionalArgNames.count()) {
+    const QStringList names = positionalArgNames.mid(positionalArgs.count());
+    printErr(tr("Missing arguments:") % " " % names.join(" "));
+    printErr(usageHelpText);
+    printErr(helpCommandText);
+    return 1;
+  } else if (positionalArgs.count() > positionalArgNames.count()) {
+    const QStringList args = positionalArgs.mid(positionalArgNames.count());
+    printErr(tr("Unknown arguments:") % " " % args.join(" "));
+    printErr(usageHelpText);
+    printErr(helpCommandText);
+    return 1;
+  }
+
   // Execute command
   bool cmdSuccess = false;
   if (command == "open-project") {
-    if (positionalArgs.count() != 1) {
-      printErr(tr("Wrong argument count."), 2);
-      print(parser.helpText(), 0);
-      return 1;
-    }
     cmdSuccess = openProject(
-        positionalArgs.value(0),  // project filepath
+        positionalArgs.value(1),  // project filepath
         parser.isSet(ercOption),  // run ERC
         parser.values(exportSchematicsOption),  // export schematics
         parser.values(exportBomOption),  // export generic BOM
@@ -275,18 +307,13 @@ int CommandLineInterface::execute() noexcept {
         parser.isSet(prjStrictOption)  // strict mode
     );
   } else if (command == "open-library") {
-    if (positionalArgs.count() != 1) {
-      printErr(tr("Wrong argument count."), 2);
-      print(parser.helpText(), 0);
-      return 1;
-    }
-    cmdSuccess = openLibrary(positionalArgs.value(0),  // library directory
+    cmdSuccess = openLibrary(positionalArgs.value(1),  // library directory
                              parser.isSet(libAllOption),  // all elements
                              parser.isSet(libSaveOption),  // save
                              parser.isSet(libStrictOption)  // strict mode
     );
   } else {
-    printErr(tr("Internal failure."));
+    printErr("Internal failure.");  // No tr() because this cannot occur.
   }
   if (cmdSuccess) {
     print(tr("SUCCESS"));
@@ -352,7 +379,7 @@ bool CommandLineInterface::openProject(
         std::sort(paths.begin(), paths.end());
         foreach (const QString& path, paths) {
           printErr(
-              QString("    - Non-canonical file: %1")
+              QString("    - Non-canonical file: '%1'")
                   .arg(prettyPath(projectFs->getAbsPath(path), projectFile)));
         }
         if (paths.count() > 0) {
@@ -612,7 +639,7 @@ bool CommandLineInterface::openProject(
       writtenFilesIterator.next();
       if (writtenFilesIterator.value() > 1) {
         filesOverwritten = true;
-        printErr(tr("ERROR: The file %1 was written multiple times!")
+        printErr(tr("ERROR: The file '%1' was written multiple times!")
                      .arg(prettyPath(writtenFilesIterator.key(), projectFile)));
       }
     }
@@ -622,7 +649,7 @@ bool CommandLineInterface::openProject(
                   "functions. For board output files, you could either "
                   "add the placeholder '%1' to the path or specify the "
                   "boards to export with the '%2' argument.")
-                   .arg("'{{BOARD}}'", "--board"));
+                   .arg("{{BOARD}}", "--board"));
       success = false;
     }
 
@@ -771,7 +798,7 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
     // sort file paths to increases readability of console output
     std::sort(paths.begin(), paths.end());
     foreach (const QString& path, paths) {
-      printErr(QString("    - Non-canonical file: %1")
+      printErr(QString("    - Non-canonical file: '%1'")
                    .arg(prettyPath(fs.getAbsPath(path), libDir)));
     }
     if (paths.count() > 0) {
@@ -797,11 +824,12 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
 QString CommandLineInterface::prettyPath(const FilePath& path,
                                          const QString& style) noexcept {
   if (QFileInfo(style).isAbsolute()) {
-    return path.toStr();  // absolute path
+    return path.toNative();  // absolute path
   } else if (path == FilePath(QDir::currentPath())) {
     return path.getFilename();  // name of current directory
   } else {
-    return path.toRelative(FilePath(QDir::currentPath()));  // relative path
+    return QDir::toNativeSeparators(
+        path.toRelative(FilePath(QDir::currentPath())));  // relative path
   }
 }
 
@@ -821,20 +849,14 @@ bool CommandLineInterface::failIfFileFormatUnstable() noexcept {
   }
 }
 
-void CommandLineInterface::print(const QString& str, int newlines) noexcept {
+void CommandLineInterface::print(const QString& str) noexcept {
   QTextStream s(stdout);
-  s << str;
-  for (int i = 0; i < newlines; ++i) {
-    s << endl;
-  }
+  s << str << endl;
 }
 
-void CommandLineInterface::printErr(const QString& str, int newlines) noexcept {
+void CommandLineInterface::printErr(const QString& str) noexcept {
   QTextStream s(stderr);
-  s << str;
-  for (int i = 0; i < newlines; ++i) {
-    s << endl;
-  }
+  s << str << endl;
 }
 
 /*******************************************************************************
