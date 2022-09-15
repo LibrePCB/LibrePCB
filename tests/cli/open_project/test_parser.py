@@ -52,6 +52,12 @@ Options:
                                      boards are exported.
   --board-index <index>              Same as '--board', but allows to specify
                                      boards by index instead of by name.
+  --remove-other-boards              Remove all boards not specified with
+                                     '--board[-index]' from the project before
+                                     executing all the other actions. If
+                                     '--board[-index]' is not passed, all boards
+                                     will be removed. Pass '--save' to save the
+                                     modified project to disk.
   --save                             Save project before closing it (useful to
                                      upgrade file format).
   --strict                           Fail if the project files are not strictly

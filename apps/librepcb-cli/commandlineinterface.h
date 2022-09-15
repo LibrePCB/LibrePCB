@@ -66,8 +66,8 @@ private:  // Methods
                    const QStringList& exportPnpTopFiles,
                    const QStringList& exportPnpBottomFiles,
                    const QStringList& boardNames,
-                   const QStringList& boardIndices, bool save,
-                   bool strict) const noexcept;
+                   const QStringList& boardIndices, bool removeOtherBoards,
+                   bool save, bool strict) const noexcept;
   bool openLibrary(const QString& libDir, bool all, bool save,
                    bool strict) const noexcept;
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
