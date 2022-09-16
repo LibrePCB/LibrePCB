@@ -65,8 +65,9 @@ private:  // Methods
                    const QString& pcbFabricationSettingsPath,
                    const QStringList& exportPnpTopFiles,
                    const QStringList& exportPnpBottomFiles,
-                   const QStringList& boards, bool save, bool strict) const
-      noexcept;
+                   const QStringList& boardNames,
+                   const QStringList& boardIndices, bool save,
+                   bool strict) const noexcept;
   bool openLibrary(const QString& libDir, bool all, bool save,
                    bool strict) const noexcept;
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,

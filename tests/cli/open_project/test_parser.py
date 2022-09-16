@@ -50,6 +50,8 @@ Options:
   --board <name>                     The name of the board(s) to export. Can be
                                      given multiple times. If not set, all
                                      boards are exported.
+  --board-index <index>              Same as '--board', but allows to specify
+                                     boards by index instead of by name.
   --save                             Save project before closing it (useful to
                                      upgrade file format).
   --strict                           Fail if the project files are not strictly
