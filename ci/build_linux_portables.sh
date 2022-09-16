@@ -3,6 +3,17 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
+# Helper to extract and rebuild AppImages with appimagetool to get the static
+# runtime which doesn't need libfuse2 and thus also runs on Ubuntu 22.04, see
+# https://github.com/LibrePCB/LibrePCB/issues/980.
+patch_appimage () {
+  ./LibrePCB-*-x86_64.AppImage --appimage-extract
+  chmod -R 755 ./squashfs-root
+  rm ./LibrePCB-*-x86_64.AppImage
+  appimagetool ./squashfs-root
+  rm -rf ./squashfs-root
+}
+
 # Copy OpenSSL libraries manually since these runtime dependencies cannot
 # be detected by linuxdeployqt.
 mkdir -p "./build/install/opt/lib"
@@ -21,6 +32,7 @@ cp "./build/appimage-cli/opt/share/icons/hicolor/scalable/apps/org.librepcb.Libr
   "./build/appimage-cli/org.librepcb.LibrePCB.svg"
 linuxdeployqt "./build/appimage-cli/opt/share/applications/org.librepcb.LibrePCB.desktop" \
   $LINUXDEPLOYQT_FLAGS -appimage
+patch_appimage
 mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-cli-nightly-linux-x86_64.AppImage
 
 # Build LibrePCB AppImage.
@@ -29,7 +41,8 @@ cp "./build/appimage/opt/share/icons/hicolor/scalable/apps/org.librepcb.LibrePCB
   "./build/appimage/org.librepcb.LibrePCB.svg"
 linuxdeployqt "./build/appimage/opt/share/applications/org.librepcb.LibrePCB.desktop" \
   $LINUXDEPLOYQT_FLAGS -appimage
-cp ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-x86_64.AppImage
+patch_appimage
+mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-x86_64.AppImage
 
 # Run linuxdeployqt to bundle all libraries into the portable packages.
 linuxdeployqt "./build/install/opt/bin/librepcb-cli" $LINUXDEPLOYQT_FLAGS -always-overwrite
