@@ -161,6 +161,13 @@ int CommandLineInterface::execute() noexcept {
                                          "boards by index instead of by name.")
                                           .arg("--board"),
                                       tr("index"));
+  QCommandLineOption removeOtherBoardsOption(
+      "remove-other-boards",
+      tr("Remove all boards not specified with '%1' from the project before "
+         "executing all the other actions. If '%1' is not passed, all boards "
+         "will be removed. Pass '%2' to save the modified project to disk.")
+          .arg("--board[-index]")
+          .arg("--save"));
   QCommandLineOption saveOption(
       "save",
       tr("Save project before closing it (useful to upgrade file format)."));
@@ -221,6 +228,7 @@ int CommandLineInterface::execute() noexcept {
     parser.addOption(exportPnpBottomOption);
     parser.addOption(boardOption);
     parser.addOption(boardIndexOption);
+    parser.addOption(removeOtherBoardsOption);
     parser.addOption(saveOption);
     parser.addOption(prjStrictOption);
   } else if (command == "open-library") {
@@ -310,6 +318,7 @@ int CommandLineInterface::execute() noexcept {
         parser.values(exportPnpBottomOption),  // export PnP bottom
         parser.values(boardOption),  // board names
         parser.values(boardIndexOption),  // board indices
+        parser.isSet(removeOtherBoardsOption),  // remove other boards
         parser.isSet(saveOption),  // save project
         parser.isSet(prjStrictOption)  // strict mode
     );
@@ -342,7 +351,8 @@ bool CommandLineInterface::openProject(
     bool exportPcbFabricationData, const QString& pcbFabricationSettingsPath,
     const QStringList& exportPnpTopFiles,
     const QStringList& exportPnpBottomFiles, const QStringList& boardNames,
-    const QStringList& boardIndices, bool save, bool strict) const noexcept {
+    const QStringList& boardIndices, bool removeOtherBoards, bool save,
+    bool strict) const noexcept {
   try {
     bool success = true;
     QMap<FilePath, int> writtenFilesCounter;
@@ -393,6 +403,18 @@ bool CommandLineInterface::openProject(
       } else {
         printErr(tr("ERROR: Board index '%1' is invalid.").arg(boardIndex));
         success = false;
+      }
+    }
+
+    // Remove other boards (note: do this at the very beginning to make all
+    // the other commands, e.g. the ERC, working without the removed boards).
+    if (removeOtherBoards) {
+      print(tr("Remove other boards..."));
+      foreach (Board* board, project.getBoards()) {
+        if (!boards.contains(board)) {
+          print(QString("  - '%1'").arg(*board->getName()));
+          project.removeBoard(*board);
+        }
       }
     }
 
