@@ -59,8 +59,7 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(
   mUuid = Uuid::tryFromString(mJsonObject.value("uuid").toString());
   mVersion = Version::tryFromString(mJsonObject.value("version").toString());
   mIsRecommended = mJsonObject.value("recommended").toBool();
-  QString name =
-      mJsonObject.value("name").toObject().value("default").toString();
+  mName = mJsonObject.value("name").toObject().value("default").toString();
   QString desc =
       mJsonObject.value("description").toObject().value("default").toString();
   QString author = mJsonObject.value("author").toString();
@@ -76,7 +75,7 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(
   }
 
   mUi->lblName->setText(
-      QString("%1 v%2").arg(name, mVersion ? mVersion->toStr() : QString()));
+      QString("%1 v%2").arg(mName, mVersion ? mVersion->toStr() : QString()));
   mUi->lblDescription->setText(desc);
   mUi->lblAuthor->setText(QString("Author: %1").arg(author));
 
