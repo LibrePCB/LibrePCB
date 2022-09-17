@@ -62,6 +62,14 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
   connect(mUi->btnRepoLibsDownload, &QPushButton::clicked, this,
           &AddLibraryWidget::downloadLibrariesFromRepositoryButtonClicked);
 
+  // Hide text in library list since text is displayed with custom item
+  // widgets, but list item texts are still set for keyboard navigation.
+  mUi->lstRepoLibs->setStyleSheet(
+      "QListWidget::item{"
+      "  color: transparent;"
+      "  selection-color: transparent;"
+      "}");
+
   // tab "create local library": set placeholder texts
   mUi->edtLocalName->setPlaceholderText("My Library");
   mUi->edtLocalAuthor->setPlaceholderText(
@@ -360,6 +368,10 @@ void AddLibraryWidget::repositoryLibraryListReceived(
     connect(widget, &RepositoryLibraryListWidgetItem::checkedChanged, this,
             &AddLibraryWidget::repoLibraryDownloadCheckedChanged);
     QListWidgetItem* item = new QListWidgetItem(mUi->lstRepoLibs);
+    // Set item text to make searching by keyboard working (type to find
+    // library). However, the text would mess up the look, thus it is made
+    // hidden with a stylesheet set in the constructor (see above).
+    item->setText(widget->getName());
     item->setSizeHint(widget->sizeHint());
     mUi->lstRepoLibs->setItemWidget(item, widget);
   }
