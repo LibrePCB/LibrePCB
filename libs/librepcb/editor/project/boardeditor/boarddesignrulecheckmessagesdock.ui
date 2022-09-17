@@ -53,6 +53,9 @@
       </item>
       <item>
        <widget class="QProgressBar" name="prgProgress">
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
         <property name="format">
          <string/>
         </property>
