@@ -58,6 +58,14 @@ LibraryManager::LibraryManager(Workspace& ws, QWidget* parent) noexcept
   connect(mUi->lstLibraries, &QListWidget::currentItemChanged, this,
           &LibraryManager::currentListItemChanged);
 
+  // Hide text in library list since text is displayed with custom item
+  // widgets, but list item texts are still set for keyboard navigation.
+  mUi->lstLibraries->setStyleSheet(
+      "QListWidget::item{"
+      "  color: transparent;"
+      "  selection-color: transparent;"
+      "}");
+
   mAddLibraryWidget.reset(new AddLibraryWidget(mWorkspace));
   mUi->verticalLayout->insertWidget(0, mAddLibraryWidget.data());
   connect(mAddLibraryWidget.data(), &AddLibraryWidget::libraryAdded, this,
@@ -156,6 +164,10 @@ void LibraryManager::updateLibraryList() noexcept {
     LibraryListWidgetItem* widget = widgets.at(i);
     Q_ASSERT(widget);
     QListWidgetItem* item = new QListWidgetItem(mUi->lstLibraries);
+    // Set item text to make searching by keyboard working (type to find
+    // library). However, the text would mess up the look, thus it is made
+    // hidden with a stylesheet set in the constructor (see above).
+    item->setText(widget->getName());
     item->setSizeHint(widget->sizeHint());
     mUi->lstLibraries->setItemWidget(item, widget);
     if (widget->getLibraryFilePath() == selectedLibrary) {
