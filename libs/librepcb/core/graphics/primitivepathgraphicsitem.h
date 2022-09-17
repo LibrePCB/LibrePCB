@@ -72,7 +72,11 @@ public:
   void setShapeMode(ShapeMode mode) noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept override { return mBoundingRect; }
+  QRectF boundingRect() const noexcept override {
+    return mBoundingRect +
+        QMarginsF(mBoundingRectMarginPx, mBoundingRectMarginPx,
+                  mBoundingRectMarginPx, mBoundingRectMarginPx);
+  }
   QPainterPath shape() const noexcept override { return mShape; }
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0) noexcept override;
@@ -98,6 +102,7 @@ protected:  // Data
   QBrush mBrushHighlighted;
   QPainterPath mPainterPath;
   QRectF mBoundingRect;
+  qreal mBoundingRectMarginPx;
   QPainterPath mShape;
 
   // Slots

@@ -46,9 +46,12 @@ BGI_Plane::BGI_Plane(BI_Plane& plane) noexcept
   : BGI_Base(),
     mPlane(plane),
     mLayer(nullptr),
+    mBoundingRectMarginPx(0),
     mLineWidthPx(0),
-    mVertexRadiusPx(0),
+    mVertexHandleRadiusPx(0),
+    mVertexHandles(),
     mOnLayerEditedSlot(*this, &BGI_Plane::layerEdited) {
+  setFlag(QGraphicsItem::ItemIsSelectable, true);
   updateCacheAndRepaint();
 }
 
@@ -68,6 +71,8 @@ int BGI_Plane::getLineIndexAtPosition(const Point& pos) const noexcept {
   // the plane and check if the specified position is located within the shape
   // of one of these graphics items. This is quite ugly, but was easy to
   // implement and seems to work nicely... ;-)
+  const UnsignedLength width(std::max(
+      Length::fromPx(mLineWidthPx), Length::fromPx(mVertexHandleRadiusPx * 2)));
   for (int i = 1; i < mPlane.getOutline().getVertices().count(); ++i) {
     Path path;
     path.addVertex(mPlane.getOutline().getVertices()[i - 1]);
@@ -75,7 +80,7 @@ int BGI_Plane::getLineIndexAtPosition(const Point& pos) const noexcept {
 
     PrimitivePathGraphicsItem item(const_cast<BGI_Plane*>(this));
     item.setPath(path.toQPainterPathPx());
-    item.setLineWidth(UnsignedLength(Length::fromPx(mLineWidthPx)));
+    item.setLineWidth(width);
     item.setLineLayer(mLayer);
 
     if (item.shape().contains(item.mapFromScene(pos.toPxQPointF()))) {
@@ -88,14 +93,15 @@ int BGI_Plane::getLineIndexAtPosition(const Point& pos) const noexcept {
 
 QVector<int> BGI_Plane::getVertexIndicesAtPosition(const Point& pos) const
     noexcept {
-  QVector<int> indices;
+  QMultiMap<Length, int> indices;
   for (int i = 0; i < mPlane.getOutline().getVertices().count(); ++i) {
-    Point diff = (mPlane.getOutline().getVertices()[i].getPos() - pos);
-    if (diff.getLength()->toPx() < mVertexRadiusPx) {
-      indices.append(i);
+    const Length distance =
+        *(mPlane.getOutline().getVertices().at(i).getPos() - pos).getLength();
+    if (distance.toPx() <= mVertexHandleRadiusPx) {
+      indices.insert(distance, i);
     }
   }
-  return indices;
+  return indices.values(indices.uniqueKeys().value(0)).toVector();
 }
 
 /*******************************************************************************
@@ -117,6 +123,23 @@ void BGI_Plane::updateCacheAndRepaint() noexcept {
   }
   updateVisibility();
 
+  // calculate vertex handle sizes
+  mVertexHandles.clear();
+  const int count = mPlane.getOutline().getVertices().count();
+  for (int i = 0; i < count; ++i) {
+    const Point p = mPlane.getOutline().getVertices().at(i).getPos();
+    Length maxRadius(10000000);
+    for (int k = 0; k < count; ++k) {
+      Length radius =
+          (p - mPlane.getOutline().getVertices().at(k).getPos()).getLength() /
+          2;
+      if ((radius > 0) && (radius < maxRadius)) {
+        maxRadius = radius;
+      }
+    }
+    mVertexHandles.append(VertexHandle{p, maxRadius.toPx()});
+  }
+
   // set shape and bounding rect
   mOutline = mPlane.getOutline().toClosedPath().toQPainterPathPx();
   mShape = mShape = Toolbox::shapeFromPath(
@@ -130,40 +153,68 @@ void BGI_Plane::updateCacheAndRepaint() noexcept {
     mBoundingRect = mBoundingRect.united(mAreas.last().boundingRect());
   }
 
-  update();
+  updateBoundingRectMargin();
 }
 
 /*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
+QVariant BGI_Plane::itemChange(GraphicsItemChange change,
+                               const QVariant& value) noexcept {
+  if (change == ItemSelectedHasChanged) {
+    updateBoundingRectMargin();
+  }
+  return BGI_Base::itemChange(change, value);
+}
+
+QPainterPath BGI_Plane::shape() const noexcept {
+  const Length vertexHandleSize = Length::fromPx(mVertexHandleRadiusPx * 2);
+  if ((vertexHandleSize > 0) && (isSelected())) {
+    // Extend shape by vertex handles.
+    return Toolbox::shapeFromPath(mOutline, QPen(Length::fromMm(0.3).toPx()),
+                                  QBrush(), UnsignedLength(vertexHandleSize));
+  } else {
+    return mShape;
+  }
+}
+
 void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-                      QWidget* widget) {
+                      QWidget* widget) noexcept {
   Q_UNUSED(widget);
 
-  const bool selected = mPlane.isSelected();
+  const bool selected = option->state.testFlag(QStyle::State_Selected);
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 
   if (mLayer && mLayer->isVisible()) {
+    // Draw outline.
     mLineWidthPx = 3 / lod;
     painter->setPen(QPen(mLayer->getColor(selected), mLineWidthPx, Qt::DashLine,
                          Qt::RoundCap));
     painter->setBrush(Qt::NoBrush);
     painter->drawPath(mOutline);
 
-    // if the plane is selected, draw vertex handles
+    // If the plane is selected, draw vertex handles.
     if (selected) {
-      mVertexRadiusPx = (mLineWidthPx / 2) + Length::fromMm(0.2).toPx();
-      painter->setPen(
-          QPen(mLayer->getColor(selected), 0, Qt::SolidLine, Qt::RoundCap));
-      foreach (const Vertex& vertex, mPlane.getOutline().getVertices()) {
-        painter->drawEllipse(vertex.getPos().toPxQPointF(), mVertexRadiusPx,
-                             mVertexRadiusPx);
+      const qreal radius = 20 / lod;
+      mVertexHandleRadiusPx = std::min(radius, mBoundingRectMarginPx);
+      QColor color = mLayer->getColor(selected);
+      color.setAlpha(color.alpha() / 2);
+      for (int i = 0; i < mVertexHandles.count(); ++i) {
+        const QPointF p = mVertexHandles.at(i).pos.toPxQPointF();
+        const qreal glowRadius =
+            std::min(radius, mVertexHandles.at(i).maxGlowRadiusPx * 1.5);
+        QRadialGradient gradient(p, glowRadius);
+        gradient.setColorAt(0, color);
+        gradient.setColorAt(0.5, color);
+        gradient.setColorAt(1, Qt::transparent);
+        painter->setPen(QPen(QBrush(gradient), glowRadius * 2));
+        painter->drawPoint(p);
       }
     }
 
-    // draw plane only if plane should be visible
+    // Draw plane only if plane should be visible.
     if (mPlane.isVisible()) {
       painter->setPen(Qt::NoPen);
       painter->setBrush(mLayer->getColor(selected));
@@ -202,6 +253,23 @@ void BGI_Plane::layerEdited(const GraphicsLayer& layer,
 
 void BGI_Plane::updateVisibility() noexcept {
   setVisible(mLayer && mLayer->isVisible());
+  setSelected(isVisible() && mPlane.isSelected());
+}
+
+void BGI_Plane::updateBoundingRectMargin() noexcept {
+  // Increase bounding rect by the maximum allowed vertex handle size if
+  // the polygon is selected and editable, to include the vertex handles.
+  // Otherwise remove the margin to avoid too much margin around the whole
+  // graphics scene (e.g. leading to wrong zoom-all or graphics export scaling).
+  prepareGeometryChange();
+  mBoundingRectMarginPx = 0;
+  if (isSelected()) {
+    foreach (const VertexHandle& handle, mVertexHandles) {
+      mBoundingRectMarginPx =
+          std::max(handle.maxGlowRadiusPx, mBoundingRectMarginPx);
+    }
+  }
+  update();
 }
 
 /*******************************************************************************
