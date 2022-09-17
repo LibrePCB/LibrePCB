@@ -23,6 +23,7 @@
 #include "polygongraphicsitem.h"
 
 #include "../graphics/graphicslayer.h"
+#include "../utils/toolbox.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -43,11 +44,12 @@ PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
     mPolygon(polygon),
     mLayerProvider(lp),
     mEditable(false),
+    mVertexHandleRadiusPx(0),
+    mVertexHandles(),
     mOnEditedSlot(*this, &PolygonGraphicsItem::polygonEdited) {
-  setPath(mPolygon.getPath().toQPainterPathPx());
   setLineWidth(mPolygon.getLineWidth());
   setLineLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
-  updateVertexGraphicsItems();
+  updatePath();
   updateFillLayer();
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
@@ -68,6 +70,8 @@ int PolygonGraphicsItem::getLineIndexAtPosition(const Point& pos) const
   // the polygon and check if the specified position is located within the shape
   // of one of these graphics items. This is quite ugly, but was easy to
   // implement and seems to work nicely... ;-)
+  const UnsignedLength width(std::max(
+      *mPolygon.getLineWidth(), Length::fromPx(mVertexHandleRadiusPx * 2)));
   for (int i = 1; i < mPolygon.getPath().getVertices().count(); ++i) {
     Path path;
     path.addVertex(mPolygon.getPath().getVertices()[i - 1]);
@@ -75,7 +79,7 @@ int PolygonGraphicsItem::getLineIndexAtPosition(const Point& pos) const
 
     PrimitivePathGraphicsItem item(const_cast<PolygonGraphicsItem*>(this));
     item.setPath(path.toQPainterPathPx());
-    item.setLineWidth(mPolygon.getLineWidth());
+    item.setLineWidth(width);
     item.setLineLayer(mLineLayer);
 
     if (item.shape().contains(item.mapFromScene(pos.toPxQPointF()))) {
@@ -88,29 +92,78 @@ int PolygonGraphicsItem::getLineIndexAtPosition(const Point& pos) const
 
 QVector<int> PolygonGraphicsItem::getVertexIndicesAtPosition(
     const Point& pos) const noexcept {
-  QVector<int> indices;
-  for (int i = 0; i < mVertexGraphicsItems.count(); ++i) {
-    if (mVertexGraphicsItems[i]->shape().contains(
-            mVertexGraphicsItems[i]->mapFromScene(pos.toPxQPointF()))) {
-      indices.append(i);
+  QMultiMap<Length, int> indices;
+  for (int i = 0; i < mPolygon.getPath().getVertices().count(); ++i) {
+    const Length distance =
+        *(mPolygon.getPath().getVertices().at(i).getPos() - pos).getLength();
+    if (distance.toPx() <= mVertexHandleRadiusPx) {
+      indices.insert(distance, i);
     }
   }
-  return indices;
+  return indices.values(indices.uniqueKeys().value(0)).toVector();
 }
 
 void PolygonGraphicsItem::setEditable(bool editable) noexcept {
   mEditable = editable;
-  updateVertexGraphicsItems();
+  updateBoundingRectMargin();
 }
 
 QVariant PolygonGraphicsItem::itemChange(GraphicsItemChange change,
                                          const QVariant& value) noexcept {
-  if (change == ItemSelectedChange) {
-    for (int i = 0; i < mVertexGraphicsItems.count(); ++i) {
-      mVertexGraphicsItems[i]->setVisible(value.toBool());
+  if (change == ItemSelectedHasChanged) {
+    updateBoundingRectMargin();
+  }
+  return PrimitivePathGraphicsItem::itemChange(change, value);
+}
+
+QPainterPath PolygonGraphicsItem::shape() const noexcept {
+  const Length vertexHandleSize = Length::fromPx(mVertexHandleRadiusPx * 2);
+  if ((vertexHandleSize > 0) && (isSelected())) {
+    // Extend shape by vertex handles.
+    return Toolbox::shapeFromPath(mPainterPath, mPen, mBrush,
+                                  UnsignedLength(vertexHandleSize));
+  } else {
+    return PrimitivePathGraphicsItem::shape();
+  }
+}
+
+void PolygonGraphicsItem::paint(QPainter* painter,
+                                const QStyleOptionGraphicsItem* option,
+                                QWidget* widget) noexcept {
+  PrimitivePathGraphicsItem::paint(painter, option, widget);
+
+  const bool isSelected = option->state.testFlag(QStyle::State_Selected);
+  const qreal lod =
+      option->levelOfDetailFromTransform(painter->worldTransform());
+
+  // Draw vertex handles, if editable and selected.
+  if (mEditable && isSelected && mLineLayer) {
+    const qreal radius = 20 / lod;
+    mVertexHandleRadiusPx =
+        std::min(std::max(radius, mPolygon.getLineWidth()->toPx() / 2),
+                 mBoundingRectMarginPx);
+    QColor color = mLineLayer->getColor(isSelected);
+    color.setAlpha(color.alpha() / 3);
+    painter->setBrush(Qt::NoBrush);
+    for (int i = 0; i < mVertexHandles.count(); ++i) {
+      const QPointF p = mVertexHandles.at(i).pos.toPxQPointF();
+      const qreal glowRadius =
+          std::max(std::min(radius, mVertexHandles.at(i).maxGlowRadiusPx * 1.5),
+                   mPolygon.getLineWidth()->toPx() * 2);
+      QRadialGradient gradient(p, glowRadius);
+      gradient.setColorAt(0, color);
+      gradient.setColorAt(0.5, color);
+      gradient.setColorAt(1, Qt::transparent);
+      painter->setPen(QPen(QBrush(gradient), glowRadius * 2));
+      painter->drawPoint(p);
+      if (mPolygon.getLineWidth() > 0) {
+        const qreal lineRadius = mPolygon.getLineWidth()->toPx() / 2;
+        QColor color(0, 0, 0, 80);
+        painter->setPen(QPen(color, 0));
+        painter->drawEllipse(p, lineRadius, lineRadius);
+      }
     }
   }
-  return QGraphicsItem::itemChange(change, value);
 }
 
 /*******************************************************************************
@@ -123,20 +176,17 @@ void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
     case Polygon::Event::LayerNameChanged:
       setLineLayer(mLayerProvider.getLayer(*polygon.getLayerName()));
       updateFillLayer();  // required if the area is filled with the line layer
-      updateVertexGraphicsItems();
       break;
     case Polygon::Event::LineWidthChanged:
       setLineWidth(polygon.getLineWidth());
-      updateVertexGraphicsItems();
       break;
     case Polygon::Event::IsFilledChanged:
     case Polygon::Event::IsGrabAreaChanged:
       updateFillLayer();
       break;
     case Polygon::Event::PathChanged:
-      setPath(polygon.getPath().toQPainterPathPx());
+      updatePath();
       updateFillLayer();  // path "closed" might have changed
-      updateVertexGraphicsItems();
       break;
     default:
       qWarning() << "Unhandled switch-case in "
@@ -156,43 +206,37 @@ void PolygonGraphicsItem::updateFillLayer() noexcept {
   }
 }
 
-void PolygonGraphicsItem::updateVertexGraphicsItems() noexcept {
-  if (!mEditable) {
-    mVertexGraphicsItems.clear();
-    return;
-  }
-
-  const Path& path = mPolygon.getPath();
-
-  while (mVertexGraphicsItems.count() < path.getVertices().count()) {
-    std::shared_ptr<PrimitivePathGraphicsItem> item =
-        std::make_shared<PrimitivePathGraphicsItem>(this);
-    item->setShapeMode(PrimitivePathGraphicsItem::ShapeMode::FILLED_OUTLINE);
-    item->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    mVertexGraphicsItems.append(item);
-  }
-
-  while (mVertexGraphicsItems.count() > path.getVertices().count()) {
-    mVertexGraphicsItems.takeLast();
-  }
-
-  for (int i = 0; i < mVertexGraphicsItems.count(); ++i) {
-    Length size = (mPolygon.getLineWidth() / 2) + Length::fromMm(0.2);
-    if (i == 0) {
-      // first vertex is rectangular to make visible where the path starts
-      mVertexGraphicsItems[i]->setPath(
-          Path::rect(Point(-size, -size), Point(size, size))
-              .toQPainterPathPx());
-    } else {
-      // other vertices are round
-      mVertexGraphicsItems[i]->setPath(
-          Path::circle(PositiveLength(size * 2)).toQPainterPathPx());
+void PolygonGraphicsItem::updatePath() noexcept {
+  mVertexHandles.clear();
+  const int count = mPolygon.getPath().getVertices().count();
+  for (int i = 0; i < count; ++i) {
+    const Point p = mPolygon.getPath().getVertices().at(i).getPos();
+    Length maxRadius(10000000);
+    for (int k = 0; k < count; ++k) {
+      Length radius =
+          (p - mPolygon.getPath().getVertices().at(k).getPos()).getLength() / 2;
+      if ((radius > 0) && (radius < maxRadius)) {
+        maxRadius = radius;
+      }
     }
-    mVertexGraphicsItems[i]->setLineLayer(mLineLayer);
-    mVertexGraphicsItems[i]->setPos(
-        path.getVertices()[i].getPos().toPxQPointF());
-    mVertexGraphicsItems[i]->setZValue(zValue() + 0.1);
-    mVertexGraphicsItems[i]->setVisible(isSelected());
+    mVertexHandles.append(VertexHandle{p, maxRadius.toPx()});
+  }
+  setPath(mPolygon.getPath().toQPainterPathPx());
+  updateBoundingRectMargin();
+}
+
+void PolygonGraphicsItem::updateBoundingRectMargin() noexcept {
+  // Increase bounding rect by the maximum allowed vertex handle size if
+  // the polygon is selected and editable, to include the vertex handles.
+  // Otherwise remove the margin to avoid too much margin around the whole
+  // graphics scene (e.g. leading to wrong zoom-all or graphics export scaling).
+  prepareGeometryChange();
+  mBoundingRectMarginPx = 0;
+  if (mEditable && isSelected()) {
+    foreach (const VertexHandle& handle, mVertexHandles) {
+      mBoundingRectMarginPx =
+          std::max(handle.maxGlowRadiusPx, mBoundingRectMarginPx);
+    }
   }
 }
 

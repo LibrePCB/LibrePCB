@@ -263,7 +263,7 @@ bool BI_Plane::isSelectable() const noexcept {
 
 void BI_Plane::setSelected(bool selected) noexcept {
   BI_Base::setSelected(selected);
-  mGraphicsItem->update();
+  mGraphicsItem->setSelected(selected);
 }
 
 /*******************************************************************************
