@@ -64,6 +64,7 @@ StatusBar::StatusBar(QWidget* parent) noexcept
   mProgressBar->setFixedWidth(200);
   mProgressBar->setMinimum(0);
   mProgressBar->setMaximum(100);
+  mProgressBar->setAlignment(Qt::AlignCenter);
   addPermanentWidget(mProgressBar.data());
 
   // progress bar placeholder to reserve space
