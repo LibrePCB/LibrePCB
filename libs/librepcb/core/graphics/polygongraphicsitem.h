@@ -86,6 +86,9 @@ public:
   // Inherited Methods
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
+  QPainterPath shape() const noexcept override;
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
   PolygonGraphicsItem& operator=(const PolygonGraphicsItem& rhs) = delete;
@@ -93,15 +96,21 @@ public:
 private:  // Methods
   void polygonEdited(const Polygon& polygon, Polygon::Event event) noexcept;
   void updateFillLayer() noexcept;
-  void updateVertexGraphicsItems() noexcept;
+  void updatePath() noexcept;
+  void updateBoundingRectMargin() noexcept;
 
 private:  // Data
   Polygon& mPolygon;
   const IF_GraphicsLayerProvider& mLayerProvider;
   bool mEditable;
 
-  /// The square graphics items to drag each vertex
-  QList<std::shared_ptr<PrimitivePathGraphicsItem>> mVertexGraphicsItems;
+  // Cached attributes
+  qreal mVertexHandleRadiusPx;
+  struct VertexHandle {
+    Point pos;
+    qreal maxGlowRadiusPx;
+  };
+  QVector<VertexHandle> mVertexHandles;
 
   // Slots
   Polygon::OnEditedSlot mOnEditedSlot;

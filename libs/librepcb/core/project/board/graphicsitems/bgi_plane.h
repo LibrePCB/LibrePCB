@@ -75,10 +75,16 @@ public:
   void updateCacheAndRepaint() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept { return mBoundingRect; }
-  QPainterPath shape() const noexcept { return mShape; }
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
+  QRectF boundingRect() const noexcept override {
+    return mBoundingRect +
+        QMarginsF(mBoundingRectMarginPx, mBoundingRectMarginPx,
+                  mBoundingRectMarginPx, mBoundingRectMarginPx);
+  }
+  QPainterPath shape() const noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0);
+             QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
   BGI_Plane& operator=(const BGI_Plane& rhs) = delete;
@@ -88,6 +94,7 @@ private:  // Methods
   void layerEdited(const GraphicsLayer& layer,
                    GraphicsLayer::Event event) noexcept;
   void updateVisibility() noexcept;
+  void updateBoundingRectMargin() noexcept;
 
 private:  // Data
   // General Attributes
@@ -96,11 +103,17 @@ private:  // Data
   // Cached Attributes
   GraphicsLayer* mLayer;
   QRectF mBoundingRect;
+  qreal mBoundingRectMarginPx;
   QPainterPath mShape;
   QPainterPath mOutline;
   QVector<QPainterPath> mAreas;
   qreal mLineWidthPx;
-  qreal mVertexRadiusPx;
+  qreal mVertexHandleRadiusPx;
+  struct VertexHandle {
+    Point pos;
+    qreal maxGlowRadiusPx;
+  };
+  QVector<VertexHandle> mVertexHandles;
 
   // Slots
   GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;

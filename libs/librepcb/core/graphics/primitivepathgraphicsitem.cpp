@@ -42,6 +42,7 @@ PrimitivePathGraphicsItem::PrimitivePathGraphicsItem(
     mLineLayer(nullptr),
     mFillLayer(nullptr),
     mShapeMode(ShapeMode::STROKE_AND_AREA_BY_LAYER),
+    mBoundingRectMarginPx(0),
     mOnLayerEditedSlot(*this, &PrimitivePathGraphicsItem::layerEdited) {
   mPen.setCapStyle(Qt::RoundCap);
   mPenHighlighted.setCapStyle(Qt::RoundCap);
