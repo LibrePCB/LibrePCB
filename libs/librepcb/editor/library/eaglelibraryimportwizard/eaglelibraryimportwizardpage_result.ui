@@ -144,6 +144,9 @@
      <property name="value">
       <number>0</number>
      </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
      <property name="format">
       <string notr="true"/>
      </property>
