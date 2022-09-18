@@ -118,13 +118,14 @@ void Debug::print(DebugLevel_t level, const QString& msg, const char* file,
                   int line) {
   QMutexLocker locker(&mMutex);
 
+  // If there is nothing to print, return immediately from this function.
   if ((mDebugLevelStderr < level) &&
-      ((mDebugLevelLogFile < level) || (!mLogFile)))
-    return;  // if there is nothing to print, we will return immediately from
-             // this function
+      ((mDebugLevelLogFile < level) || (!mLogFile))) {
+    return;
+  }
 
-  const char* levelStr =
-      "---------";  // the debug level string has always 9 characters
+  // The debug level string has always 9 characters.
+  const char* levelStr = "---------";
   switch (level) {
     case DebugLevel_t::DebugMsg:
       levelStr = "DEBUG-MSG";
@@ -148,9 +149,11 @@ void Debug::print(DebugLevel_t level, const QString& msg, const char* file,
       break;
   }
 
-  QString logMsg = QString("[%1] %2 (%3:%4)")
-                       .arg(levelStr, msg.toLocal8Bit().constData(), file)
-                       .arg(line);
+  QString logMsg = QString("[%1] %2").arg(levelStr).arg(msg);
+  if (file || line) {
+    // Avoid printing useless "(:0)" in release builds.
+    logMsg += QString(" (%1:%2)").arg(file).arg(line);
+  }
 
   if (mDebugLevelStderr >= level) {
     // write to stderr
