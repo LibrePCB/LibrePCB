@@ -73,10 +73,11 @@ int BGI_Plane::getLineIndexAtPosition(const Point& pos) const noexcept {
   // implement and seems to work nicely... ;-)
   const UnsignedLength width(std::max(
       Length::fromPx(mLineWidthPx), Length::fromPx(mVertexHandleRadiusPx * 2)));
-  for (int i = 1; i < mPlane.getOutline().getVertices().count(); ++i) {
+  const Path outline = mPlane.getOutline().toClosedPath();  // Add last segment.
+  for (int i = 1; i < outline.getVertices().count(); ++i) {
     Path path;
-    path.addVertex(mPlane.getOutline().getVertices()[i - 1]);
-    path.addVertex(mPlane.getOutline().getVertices()[i]);
+    path.addVertex(outline.getVertices()[i - 1]);
+    path.addVertex(outline.getVertices()[i]);
 
     PrimitivePathGraphicsItem item(const_cast<BGI_Plane*>(this));
     item.setPath(path.toQPainterPathPx());
