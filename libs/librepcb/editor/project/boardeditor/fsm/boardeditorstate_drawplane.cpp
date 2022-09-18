@@ -75,11 +75,16 @@ bool BoardEditorState_DrawPlane::entry() noexcept {
   if (!board) return false;
 
   // Get most used net signal
-  if (!mLastNetSignal) {
+  if ((!mLastNetSignal) || (!mLastNetSignal->isAddedToCircuit())) {
     mLastNetSignal =
         mContext.project.getCircuit().getNetSignalWithMostElements();
   }
-  if (!mLastNetSignal) return false;
+  if (!mLastNetSignal) {
+    QMessageBox::warning(&mContext.editor, tr("No net available"),
+                         tr("Your circuit doesn't contain any net, please add "
+                            "one in the schematic editor first."));
+    return false;
+  }
 
   // Clear board selection because selection does not make sense in this state
   board->clearSelection();
