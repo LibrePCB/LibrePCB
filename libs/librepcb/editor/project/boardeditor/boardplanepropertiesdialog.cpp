@@ -146,7 +146,7 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
     if (netsignal) {
       cmd->setNetSignal(*netsignal);
     } else {
-      qWarning() << "No valid netsignal selected!";
+      qWarning() << "No valid netsignal selected in plane properties dialog!";
     }
 
     // layer

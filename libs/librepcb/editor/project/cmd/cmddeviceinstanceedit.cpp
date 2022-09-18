@@ -54,7 +54,7 @@ CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept {
       mDevice.setRotation(mOldRotation);
       mDevice.setMirrored(mOldMirrored);  // can throw
     } catch (Exception& e) {
-      qCritical() << "Could not revert all changes:" << e.getMsg();
+      qCritical() << "Failed to revert device instance changes:" << e.getMsg();
     }
   }
 }
@@ -130,7 +130,8 @@ void CmdDeviceInstanceEdit::mirror(const Point& center,
       break;
     }
     default: {
-      qCritical() << "Invalid orientation:" << orientation;
+      qCritical() << "Unhandled switch-case in CmdDeviceInstanceEdit::mirror():"
+                  << orientation;
       break;
     }
   }

@@ -94,8 +94,9 @@ void PrimitiveTextGraphicsItem::setFont(Font font) noexcept {
       mFont = qApp->getDefaultMonospaceFont();
       break;
     default: {
-      Q_ASSERT(false);
-      qCritical() << "Unknown font:" << static_cast<int>(font);
+      qCritical()
+          << "Unhandled switch-case in PrimitiveTextGraphicsItem::setFont():"
+          << static_cast<int>(font);
       break;
     }
   }
@@ -159,7 +160,8 @@ void PrimitiveTextGraphicsItem::layerEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "PrimitiveTextGraphicsItem::layerEdited()";
+                    "PrimitiveTextGraphicsItem::layerEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

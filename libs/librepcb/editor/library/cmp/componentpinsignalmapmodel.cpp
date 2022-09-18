@@ -343,7 +343,8 @@ void ComponentPinSignalMapModel::symbolItemsEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "ComponentPinSignalMapModel::symbolItemsEdited()";
+                    "ComponentPinSignalMapModel::symbolItemsEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }
@@ -365,7 +366,8 @@ void ComponentPinSignalMapModel::signalListEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "ComponentPinSignalMapModel::signalListEdited()";
+                    "ComponentPinSignalMapModel::signalListEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

@@ -452,7 +452,7 @@ void AddLibraryWidget::downloadLibrariesFromRepositoryButtonClicked() noexcept {
     if (widget) {
       widget->startDownloadIfSelected();
     } else {
-      qWarning() << "Invalid item widget detected.";
+      qWarning() << "Invalid item widget detected in library manager.";
     }
   }
 }

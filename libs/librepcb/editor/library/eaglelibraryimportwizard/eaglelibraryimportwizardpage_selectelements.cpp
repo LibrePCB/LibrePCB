@@ -185,7 +185,10 @@ void EagleLibraryImportWizardPage_SelectElements::treeItemChanged(
         mContext->getImport().setPackageChecked(name, checked);
         break;
       default:
-        qCritical() << "Unknown tree item type.";
+        qCritical()
+            << "Unhandled switch-case in "
+               "EagleLibraryImportWizardPage_SelectElements::treeItemChanged():"
+            << elementType;
         break;
     }
   } else {
@@ -257,7 +260,10 @@ void EagleLibraryImportWizardPage_SelectElements::updateRootNodes() noexcept {
         elementTypeStr = tr("Packages");
         break;
       default:
-        qCritical() << "Unknown root node element type:" << elementTypeInt;
+        qCritical()
+            << "Unhandled switch-case in "
+               "EagleLibraryImportWizardPage_SelectElements::updateRootNodes():"
+            << elementTypeInt;
         break;
     }
     root->setText(0,

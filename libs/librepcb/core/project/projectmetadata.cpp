@@ -51,7 +51,7 @@ ProjectMetadata::ProjectMetadata(const Uuid& uuid, const ElementName& name,
 ProjectMetadata::ProjectMetadata(const SExpression& node,
                                  const Version& fileFormat)
   : QObject(nullptr), mUuid(Uuid::createRandom()), mName("Project") {
-  qDebug() << "load project metadata...";
+  qDebug() << "Load project metadata...";
 
   mUuid = deserialize<Uuid>(node.getChild("@0"), fileFormat);
   mName = deserialize<ElementName>(node.getChild("name/@0"), fileFormat);
@@ -62,7 +62,7 @@ ProjectMetadata::ProjectMetadata(const SExpression& node,
 
   mLastModified = QDateTime::currentDateTime();
 
-  qDebug() << "metadata successfully loaded!";
+  qDebug() << "Successfully loaded project metadata.";
 }
 
 ProjectMetadata::~ProjectMetadata() noexcept {

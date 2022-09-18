@@ -75,16 +75,16 @@ void InitializeWorkspaceWizard::setWorkspacePath(const FilePath& fp) {
   if (mNeedsToBeShown && (!mForceChoosePath)) {
     switch (startId()) {
       case InitializeWorkspaceWizardContext::ID_Welcome:
-        qInfo() << "No workspace selected, asking for path.";
+        qInfo() << "No workspace selected, asking for path...";
         break;
       case InitializeWorkspaceWizardContext::ID_ChooseWorkspace:
-        qInfo() << "Invalid workspace selected, asking for different path.";
+        qInfo() << "Invalid workspace selected, asking for different path...";
         break;
       case InitializeWorkspaceWizardContext::ID_Upgrade:
-        qInfo() << "Workspace data is outdated, asking for upgrade.";
+        qInfo() << "Workspace data is outdated, asking for upgrade...";
         break;
       case InitializeWorkspaceWizardContext::ID_ChooseSettings:
-        qInfo() << "Workspace data not initialized, asking for settings.";
+        qInfo() << "Workspace data not initialized, asking for settings...";
         break;
       default:
         break;

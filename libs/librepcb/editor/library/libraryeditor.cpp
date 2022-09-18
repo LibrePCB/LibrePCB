@@ -412,7 +412,7 @@ bool LibraryEditor::closeTab(int index) noexcept {
       dynamic_cast<EditorWidgetBase*>(mUi->tabWidget->widget(index));
   if (widget == nullptr) {
     qCritical()
-        << "Cannot close tab, widget is not an EditorWidgetBase subclass";
+        << "Cannot close tab, widget is not an EditorWidgetBase subclass.";
     return false;
   }
 
@@ -732,7 +732,7 @@ void LibraryEditor::createToolBars() noexcept {
                     mUi->tabWidget->widget(0))) {
               w->setFilter(text);
             } else {
-              qCritical() << "LibraryEditor: Could not get overview widget.";
+              qCritical() << "Could not get overview widget in library editor.";
             }
           });
 

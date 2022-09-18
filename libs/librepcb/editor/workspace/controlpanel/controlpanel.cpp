@@ -316,7 +316,7 @@ void ControlPanel::updateNoLibrariesWarningVisibility() noexcept {
   try {
     showWarning = mWorkspace.getLibraryDb().getAll<Library>().isEmpty();
   } catch (const Exception& e) {
-    qCritical() << "Could not get library list:" << e.getMsg();
+    qCritical() << "Failed to get workspace library list:" << e.getMsg();
   }
   mUi->lblWarnForNoLibraries->setVisible(showWarning);
 }
@@ -333,7 +333,7 @@ void ControlPanel::switchWorkspace() noexcept {
   try {
     wizard.setWorkspacePath(mWorkspace.getPath());
   } catch (const Exception& e) {
-    qWarning() << "ControlPanel: Failed to set current workspace path.";
+    qWarning() << "Failed to prepare workspace switching:" << e.getMsg();
   }
   if ((wizard.exec() == QDialog::Accepted) &&
       (wizard.getWorkspacePath().isValid())) {

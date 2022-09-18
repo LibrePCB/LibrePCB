@@ -51,7 +51,7 @@ UndoStackTransaction::~UndoStackTransaction() noexcept {
     if (mCmdActive)
       mStack.abortCmdGroup();  // can throw, but should really not!
   } catch (...) {
-    qFatal("UndoStack::abortCmdGroup() has thrown an exception!");
+    qFatal("Aborting the undo stack command group threw an exception!");
   }
 }
 
@@ -276,7 +276,7 @@ void UndoStack::abortCmdGroup() {
     delete mCommands.takeLast();  // delete and remove the aborted command group
                                   // from the stack
   } catch (Exception& e) {
-    qCritical() << "UndoCommand::undo() has thrown an exception:" << e.getMsg();
+    qCritical() << "Exception thrown in UndoCommand::undo():" << e.getMsg();
     throw;
   }
 
@@ -299,7 +299,7 @@ void UndoStack::undo() {
     mCommands[mCurrentIndex - 1]->undo();  // can throw (but should usually not)
     mCurrentIndex--;
   } catch (Exception& e) {
-    qCritical() << "UndoCommand::undo() has thrown an exception:" << e.getMsg();
+    qCritical() << "Exception thrown in UndoCommand::undo():" << e.getMsg();
     throw;
   }
 
@@ -321,7 +321,7 @@ void UndoStack::redo() {
     mCommands[mCurrentIndex]->redo();  // can throw (but should usually not)
     mCurrentIndex++;
   } catch (Exception& e) {
-    qCritical() << "UndoCommand::redo() has thrown an exception:" << e.getMsg();
+    qCritical() << "Exception thrown in UndoCommand::redo():" << e.getMsg();
     throw;
   }
 
@@ -343,7 +343,7 @@ void UndoStack::clear() noexcept {
     try {
       abortCmdGroup();
     } catch (...) {
-      qCritical() << "Could not abort the currently active command group!";
+      qCritical() << "Failed to abort the currently active command group!";
     }
   }
 

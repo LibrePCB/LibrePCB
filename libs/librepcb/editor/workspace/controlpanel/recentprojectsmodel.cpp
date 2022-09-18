@@ -54,7 +54,7 @@ RecentProjectsModel::RecentProjectsModel(const Workspace& workspace) noexcept
       updateVisibleProjects();
     }
   } catch (Exception& e) {
-    qWarning() << "Could not read recent projects file:" << e.getMsg();
+    qWarning() << "Failed to read recent projects file:" << e.getMsg();
   }
 }
 
@@ -107,7 +107,7 @@ void RecentProjectsModel::save() noexcept {
     root.ensureLineBreakIfMultiLine();
     FileUtils::writeFile(mFilePath, root.toByteArray());  // can throw
   } catch (Exception& e) {
-    qWarning() << "Could not save recent projects file:" << e.getMsg();
+    qWarning() << "Failed to save recent projects file:" << e.getMsg();
   }
 }
 

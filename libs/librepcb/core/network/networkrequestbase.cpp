@@ -253,8 +253,8 @@ void NetworkRequestBase::replyFinishedSlot() noexcept {
       return;
     } else {
       // follow redirection
-      qDebug() << "Redirect from" << mUrl.toString() << "to"
-               << redirectUrl.toString();
+      qDebug().nospace() << "Redirect from " << mUrl.toString() << " to "
+                         << redirectUrl.toString() << ".";
       emit progressState(tr("Redirect to %1...").arg(redirectUrl.toString()));
       mReply.take()->deleteLater();
       mRedirectedUrls.append(mUrl);
@@ -297,8 +297,8 @@ void NetworkRequestBase::finalize(const QString& errorMsg) noexcept {
     emit aborted();
     emit finished(false);
   } else {
-    qDebug() << "Request failed:" << mUrl.toString();
-    qDebug() << "Network error:" << errorMsg;
+    qCritical() << "Request failed:" << mUrl.toString();
+    qCritical() << "Network error:" << errorMsg;
     emit progressState(tr("Request failed: %1").arg(errorMsg));
     emit errored(errorMsg);
     emit finished(false);

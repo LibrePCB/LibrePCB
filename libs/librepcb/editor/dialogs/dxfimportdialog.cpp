@@ -90,7 +90,7 @@ DxfImportDialog::DxfImportDialog(QList<GraphicsLayer*> layers,
     restoreGeometry(clientSettings.value(settingsPrefix % "/window_geometry")
                         .toByteArray());
   } catch (const Exception& e) {
-    qCritical() << "Error while initializing DXF import dialog:" << e.getMsg();
+    qCritical() << "Failed to initialize DXF import dialog:" << e.getMsg();
   }
 }
 

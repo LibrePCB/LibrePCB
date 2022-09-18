@@ -148,8 +148,10 @@ void NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked() noexcept {
       break;
     }
     default: {
-      qCritical() << "Unknown enum value:"
-                  << static_cast<int>(mContext.mElementType);
+      qCritical()
+          << "Unhandled switch-case in "
+             "NewElementWizardPage_EnterMetadata::btnChooseCategoryClicked():"
+          << static_cast<int>(mContext.mElementType);
       return;
     }
   }

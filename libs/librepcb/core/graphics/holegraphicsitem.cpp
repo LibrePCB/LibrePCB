@@ -91,7 +91,8 @@ void HoleGraphicsItem::holeEdited(const Hole& hole,
                                         UnsignedLength(500000));
       break;
     default:
-      qWarning() << "Unhandled switch-case in HoleGraphicsItem::holeEdited()";
+      qWarning() << "Unhandled switch-case in HoleGraphicsItem::holeEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

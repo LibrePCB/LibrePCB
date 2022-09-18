@@ -130,7 +130,7 @@ void Library::save() {
 void Library::moveTo(TransactionalDirectory& dest) {
   // check directory suffix
   if (dest.getAbsPath().getSuffix() != "lplib") {
-    qDebug() << dest.getAbsPath().toNative();
+    qDebug() << "Invalid library:" << dest.getAbsPath().toNative();
     throw RuntimeError(
         __FILE__, __LINE__,
         tr("A library directory name must have the suffix '.lplib'."));
@@ -149,7 +149,7 @@ QStringList Library::searchForElements() const noexcept {
     if (isValidElementDirectory<ElementType>(*mDirectory, dirPath)) {
       list.append(dirPath);
     } else {
-      qWarning() << "Directory is not a valid library element:"
+      qWarning() << "Directory is not a valid library element, ignoring it:"
                  << mDirectory->getAbsPath(dirPath).toNative();
     }
   }

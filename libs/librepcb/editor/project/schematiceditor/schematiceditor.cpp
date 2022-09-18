@@ -873,8 +873,9 @@ void SchematicEditor::toolActionGroupChangeTriggered(
       mFsm->processMeasure();
       break;
     default:
-      Q_ASSERT(false);
-      qCritical() << "Unknown tool triggered!";
+      qCritical() << "Unhandled switch-case in "
+                     "SchematicEditor::toolActionGroupChangeTriggered():"
+                  << newTool;
       break;
   }
 }

@@ -1008,8 +1008,9 @@ void BoardEditor::toolActionGroupChangeTriggered(
       mFsm->processMeasure();
       break;
     default:
-      Q_ASSERT(false);
-      qCritical() << "Unknown tool triggered!";
+      qCritical() << "Unhandled switch-case in "
+                     "BoardEditor::toolActionGroupChangeTriggered():"
+                  << newTool;
       break;
   }
 }

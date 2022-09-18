@@ -60,7 +60,7 @@ CmdFootprintPadEdit::~CmdFootprintPadEdit() noexcept {
     try {
       performUndo();
     } catch (...) {
-      qCritical() << "Undo failed!";
+      qCritical() << "Undo failed in CmdFootprintPadEdit destructor!";
     }
   }
 }

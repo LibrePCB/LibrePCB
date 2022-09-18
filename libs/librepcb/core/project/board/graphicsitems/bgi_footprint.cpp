@@ -208,7 +208,8 @@ void BGI_Footprint::layerEdited(const GraphicsLayer& layer,
       prepareGeometryChange();
       break;
     default:
-      qWarning() << "BGI_Footprint: Unhandled switch-case in layerEdited()";
+      qWarning() << "Unhandled switch-case in BGI_Footprint::layerEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

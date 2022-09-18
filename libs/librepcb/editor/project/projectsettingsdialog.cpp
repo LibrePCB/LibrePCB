@@ -109,7 +109,8 @@ void ProjectSettingsDialog::on_buttonBox_clicked(QAbstractButton* button) {
     }
 
     default:
-      qCritical() << "invalid button role:"
+      qCritical() << "Unhandled switch-case in "
+                     "ProjectSettingsDialog::on_buttonBox_clicked():"
                   << mUi->buttonBox->buttonRole(button);
       break;
   }

@@ -127,7 +127,7 @@ QString GraphicsExport::run(RunArgs args) noexcept {
 
   QElapsedTimer timer;
   timer.start();
-  qDebug() << "GraphicsExport: Job started.";
+  qDebug() << "Start graphics export in worker thread...";
   emit progress(10, 0, args.pages.count());
 
   try {
@@ -215,7 +215,9 @@ QString GraphicsExport::run(RunArgs args) noexcept {
                       QPageSize::Millimeter, "Custom", QPageSize::ExactMatch);
       }
       if (pagedPaintDevice && (!pagedPaintDevice->setPageSize(pageSize))) {
-        qCritical() << "GraphicsExport: Failed to set page size!";
+        qCritical().nospace()
+            << "Failed to set page size for graphics export to "
+            << pageSize.name() << ".";
       }
 
       // Determine output page orientation.
@@ -235,7 +237,7 @@ QString GraphicsExport::run(RunArgs args) noexcept {
           }
         }
         if (!pagedPaintDevice->setPageOrientation(orientation)) {
-          qCritical() << "GraphicsExport: Failed to set page orientation!";
+          qCritical() << "Failed to set page orientation for graphics export!";
         }
       }
 
@@ -288,17 +290,16 @@ QString GraphicsExport::run(RunArgs args) noexcept {
       QScopedPointer<QImage> image;
       std::shared_ptr<QPicture> picture;
       if (pagedPaintDevice) {
-        qDebug().nospace() << "GraphicsExport: Writing page " << (index + 1)
-                           << " to " << args.printerName % args.filePath.toStr()
-                           << ".";
+        qDebug().nospace() << "Export page " << (index + 1) << " to "
+                           << args.printerName % args.filePath.toStr() << "...";
         if (index == 0) {
           beginSuccess = painter.begin(pagedPaintDevice);
         } else {
           beginSuccess = pagedPaintDevice->newPage();
         }
       } else if (fileExt == "svg") {
-        qDebug().nospace() << "GraphicsExport: Writing page " << (index + 1)
-                           << " as SVG to " << outputFilePath.toStr() << ".";
+        qDebug().nospace() << "Export page " << (index + 1) << " as SVG to "
+                           << outputFilePath.toStr() << "...";
         svgGenerator.reset(new QSvgGenerator());
         svgGenerator->setTitle(mDocumentName);
         svgGenerator->setFileName(outputFilePath.toStr());
@@ -310,8 +311,8 @@ QString GraphicsExport::run(RunArgs args) noexcept {
       } else if (!args.preview) {
         QString target =
             outputFilePath.isValid() ? outputFilePath.toStr() : "clipboard";
-        qDebug().nospace() << "GraphicsExport: Writing page " << (index + 1)
-                           << " as pixmap to " << target << ".";
+        qDebug().nospace() << "Export page " << (index + 1) << " as pixmap to "
+                           << target << "...";
         image.reset(
             new QImage(pageRectPx.size(), QImage::Format_ARGB32_Premultiplied));
         image->fill(Qt::transparent);
@@ -319,8 +320,7 @@ QString GraphicsExport::run(RunArgs args) noexcept {
         painter.setRenderHints(QPainter::Antialiasing |
                                QPainter::SmoothPixmapTransform);
       } else {
-        qDebug().nospace() << "GraphicsExport: Creating preview of page "
-                           << index + 1 << ".";
+        qDebug().nospace() << "Generate preview of page " << index + 1 << "...";
         picture = std::make_shared<QPicture>();
         beginSuccess = painter.begin(picture.get());
         painter.setRenderHints(QPainter::Antialiasing |
@@ -390,19 +390,19 @@ QString GraphicsExport::run(RunArgs args) noexcept {
     // removal fails (no critical error).
     if (mAbort && pdfWriter) {
       if (!QFile::remove(args.filePath.toStr())) {
-        qWarning() << "GraphicsExport: Failed to remove partial PDF file.";
+        qWarning() << "Failed to remove partially exported PDF file.";
       }
     }
 
-    qDebug().nospace() << "GraphicsExport: Job succeeded after "
+    qDebug().nospace() << "Successfully exported graphics in "
                        << timer.elapsed() << "ms.";
     emit progress(100, args.pages.count(), args.pages.count());
     emit succeeded();
     return QString();
   } catch (const Exception& e) {
     QString msg = e.getMsg().isEmpty() ? "Unknown error" : e.getMsg();
-    qCritical().nospace() << "GraphicsExport: Job failed after "
-                          << timer.elapsed() << "ms: " << msg;
+    qCritical().nospace() << "Graphics export failed after " << timer.elapsed()
+                          << "ms: " << msg;
     emit failed(msg);
     return msg;
   }

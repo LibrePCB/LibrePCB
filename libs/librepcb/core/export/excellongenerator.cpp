@@ -67,7 +67,9 @@ ExcellonGenerator::ExcellonGenerator(const QDateTime& creationDate,
       break;
     }
     default: {
-      qCritical() << "ExcellonGenerator: Invalid plating enum value.";
+      qCritical()
+          << "Unhandled switch-case in ExcellonGenerator::ExcellonGenerator():"
+          << static_cast<int>(plating);
       break;
     }
   }

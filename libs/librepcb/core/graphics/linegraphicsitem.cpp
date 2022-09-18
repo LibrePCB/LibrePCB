@@ -128,7 +128,8 @@ void LineGraphicsItem::layerEdited(const GraphicsLayer& layer,
       setLayer(nullptr);
       break;
     default:
-      qWarning() << "Unhandled switch-case in LineGraphicsItem::layerEdited()";
+      qWarning() << "Unhandled switch-case in LineGraphicsItem::layerEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

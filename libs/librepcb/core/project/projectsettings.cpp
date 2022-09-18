@@ -41,7 +41,7 @@ ProjectSettings::ProjectSettings(Project& project, const Version& fileFormat,
   : QObject(nullptr), mProject(project) {
   Q_UNUSED(fileFormat);
 
-  qDebug() << "load settings...";
+  qDebug() << "Load project settings...";
 
   // restore all default values
   restoreDefaults();
@@ -70,7 +70,7 @@ ProjectSettings::ProjectSettings(Project& project, const Version& fileFormat,
 
   triggerSettingsChanged();
 
-  qDebug() << "settings successfully loaded!";
+  qDebug() << "Successfully loaded project settings.";
 }
 
 ProjectSettings::~ProjectSettings() noexcept {

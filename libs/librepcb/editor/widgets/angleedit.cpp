@@ -70,7 +70,7 @@ void AngleEdit::spinBoxValueChanged(double value) noexcept {
     emit valueChanged(mValue);
   } catch (const Exception& e) {
     // This should actually never happen, thus no user visible message here.
-    qWarning() << "Invalid angle entered:" << e.getMsg();
+    qWarning() << "Invalid angle entered:" << value;
   }
 }
 

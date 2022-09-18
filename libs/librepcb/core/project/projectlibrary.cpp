@@ -46,7 +46,7 @@ namespace librepcb {
 ProjectLibrary::ProjectLibrary(
     std::unique_ptr<TransactionalDirectory> directory)
   : mDirectory(std::move(directory)) {
-  qDebug() << "load project library...";
+  qDebug() << "Load project library...";
 
   try {
     // Load all library elements
@@ -60,7 +60,7 @@ ProjectLibrary::ProjectLibrary(
     throw;
   }
 
-  qDebug() << "project library successfully loaded!";
+  qDebug() << "Successfully loaded project library.";
 }
 
 ProjectLibrary::~ProjectLibrary() noexcept {
@@ -148,7 +148,7 @@ void ProjectLibrary::loadElements(const QString& dirname, const QString& type,
 
     // check if directory is a valid library element
     if (!LibraryBaseElement::isValidElementDirectory<ElementType>(*dir, "")) {
-      qWarning() << "Found an invalid directory in the library:"
+      qWarning() << "Invalid directory in project library, ignoring it:"
                  << dir->getAbsPath().toNative();
       continue;
     }
@@ -168,7 +168,8 @@ void ProjectLibrary::loadElements(const QString& dirname, const QString& type,
     mAllElements.insert(element.take());  // Take object from smart pointer!
   }
 
-  qDebug() << "successfully loaded" << elementList.count() << qPrintable(type);
+  qDebug().nospace() << "Successfully loaded " << elementList.count() << " "
+                     << qPrintable(type) << ".";
 }
 
 template <typename ElementType>

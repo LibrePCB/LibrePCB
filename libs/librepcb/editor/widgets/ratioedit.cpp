@@ -81,7 +81,7 @@ void RatioEdit::spinBoxValueChanged(double value) noexcept {
     emit valueChanged(mValue);
   } catch (const Exception& e) {
     // This should actually never happen, thus no user visible message here.
-    qWarning() << "Invalid ratio entered:" << e.getMsg();
+    qWarning() << "Invalid ratio entered:" << value;
   }
 }
 

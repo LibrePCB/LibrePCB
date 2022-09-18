@@ -107,14 +107,13 @@ bool InitializeWorkspaceWizard_Upgrade::validatePage() noexcept {
   if (QAbstractButton* btn = wizard()->button(QWizard::BackButton)) {
     btn->setEnabled(false);
   } else {
-    qWarning() << "InitializeWorkspaceWizard_Upgrade: Could not disable back "
-                  "button.";
+    qWarning() << "Could not disable back button in workspace upgrade wizard.";
   }
   if (QAbstractButton* btn = wizard()->button(QWizard::FinishButton)) {
     btn->setEnabled(false);
   } else {
-    qWarning() << "InitializeWorkspaceWizard_Upgrade: Could not disable finish "
-                  "button.";
+    qWarning()
+        << "Could not disable finish button in workspace upgrade wizard.";
   }
   mUi->progressBar->show();
   mCopyOperation->start();

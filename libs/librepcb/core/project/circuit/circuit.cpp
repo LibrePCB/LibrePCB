@@ -46,7 +46,7 @@ Circuit::Circuit(Project& project, const Version& fileFormat, bool create)
   : QObject(&project),
     mProject(project),
     mDirectory(new TransactionalDirectory(project.getDirectory(), "circuit")) {
-  qDebug() << "load circuit...";
+  qDebug() << "Load circuit...";
 
   try {
     if (create) {
@@ -101,7 +101,7 @@ Circuit::Circuit(Project& project, const Version& fileFormat, bool create)
     throw;
   }
 
-  qDebug() << "circuit successfully loaded!";
+  qDebug() << "Successfully loaded circuit.";
 }
 
 Circuit::~Circuit() noexcept {

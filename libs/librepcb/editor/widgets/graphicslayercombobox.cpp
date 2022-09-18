@@ -64,14 +64,14 @@ GraphicsLayerComboBox::~GraphicsLayerComboBox() noexcept {
 
 tl::optional<GraphicsLayerName> GraphicsLayerComboBox::getCurrentLayerName()
     const noexcept {
+  QString name = mComboBox->currentData(Qt::UserRole).toString();
   try {
-    QString name = mComboBox->currentData(Qt::UserRole).toString();
     if (GraphicsLayerNameConstraint()(name)) {
       return GraphicsLayerName(name);  // can throw
     }
   } catch (const Exception& e) {
     // This should actually never happen, thus no user visible message here.
-    qWarning() << "Invalid graphics layer selected:" << e.getMsg();
+    qWarning() << "Invalid graphics layer selected:" << name;
   }
   return tl::nullopt;
 }

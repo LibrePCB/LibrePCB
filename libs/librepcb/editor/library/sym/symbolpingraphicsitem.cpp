@@ -156,10 +156,10 @@ void SymbolPinGraphicsItem::updateText() noexcept {
           text = "(NET)";
         }
       } else {
-        qCritical() << "SymbolPinGraphicsItem: Unknown pin display type!";
+        qCritical() << "Unknown pin display type for pin graphics item!";
       }
     } else {
-      qCritical() << "SymbolPinGraphicsItem: Pin not found in pin-signal map!";
+      qCritical() << "Pin not found in pin-signal map for pin graphics item!";
     }
   } else {
     text = *mPin->getName();
@@ -220,7 +220,8 @@ void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
       break;
     default:
       qWarning()
-          << "Unhandled switch-case in SymbolPinGraphicsItem::pinEdited()";
+          << "Unhandled switch-case in SymbolPinGraphicsItem::pinEdited():"
+          << static_cast<int>(event);
       break;
   }
 }

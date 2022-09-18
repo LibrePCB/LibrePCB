@@ -326,7 +326,8 @@ void FootprintListModel::footprintListEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "FootprintListModel::footprintListEdited()";
+                    "FootprintListModel::footprintListEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }
