@@ -73,7 +73,8 @@ ElementName MsgNameNotTitleCase::getFixedName(
   try {
     return ElementName(newName);  // Could throw, but should really not!
   } catch (const Exception& e) {
-    qCritical() << "Could not fixup invalid name:" << e.getMsg();
+    qCritical().nospace() << "Could not fixup invalid name " << (*name) << ": "
+                          << e.getMsg();
     return name;
   }
 }

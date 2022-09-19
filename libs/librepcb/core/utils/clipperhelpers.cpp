@@ -226,7 +226,7 @@ ClipperLib::Paths ClipperHelpers::prepareHoles(
       preparedHoles.push_back(rotateCutInHole(hole));
     } else {
       qWarning() << "Detected invalid hole in path flattening algorithm, "
-                    "ignoring it...";
+                    "ignoring it.";
     }
   }
   // important: sort holes by the y coordinate of their connection point

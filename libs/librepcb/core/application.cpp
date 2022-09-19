@@ -124,7 +124,7 @@ Application::Application(int& argc, char** argv) noexcept
     QString fp = info.absoluteFilePath();
     int id = QFontDatabase::addApplicationFont(fp);
     if (id < 0) {
-      qCritical() << "Failed to load font" << fp;
+      qCritical().nospace() << "Failed to register font " << fp << ".";
     }
   }
 
@@ -179,8 +179,8 @@ const StrokeFont& Application::getDefaultStrokeFont() const noexcept {
   try {
     return mStrokeFontPool->getFont(getDefaultStrokeFontName());
   } catch (const Exception& e) {
-    qFatal("Default stroke font could not be loaded!");  // aborts the
-                                                         // application!!!
+    // Abort the application!!!
+    qFatal("Default stroke font could not be loaded, terminating application!");
   }
 }
 

@@ -62,7 +62,7 @@ void FileUtils::writeFile(const FilePath& filepath, const QByteArray& content) {
   }
   qint64 written = file.write(content);
   if (written != content.size()) {
-    qDebug() << "only" << written << "of" << content.size() << "bytes written";
+    qDebug() << "Only" << written << "of" << content.size() << "bytes written.";
     throw RuntimeError(__FILE__, __LINE__,
                        tr("Could not write to file \"%1\": %2")
                            .arg(filepath.toNative(), file.errorString()));

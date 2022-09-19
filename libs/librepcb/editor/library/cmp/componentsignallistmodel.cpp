@@ -341,7 +341,8 @@ void ComponentSignalListModel::signalListEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "ComponentSignalListModel::signalListEdited()";
+                    "ComponentSignalListModel::signalListEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

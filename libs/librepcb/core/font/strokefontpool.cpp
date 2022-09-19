@@ -40,14 +40,14 @@ StrokeFontPool::StrokeFontPool(const FileSystem& directory) noexcept {
     FilePath fp = directory.getAbsPath(filename);
     if (fp.getSuffix() != "bene") continue;
     try {
-      qDebug() << "Load stroke font:" << filename;
+      qDebug() << "Found stroke font:" << filename;
       mFonts.insert(
           filename,
           std::make_shared<StrokeFont>(fp,
                                        directory.read(filename)));  // can throw
     } catch (const Exception& e) {
-      qCritical() << "Failed to load stroke font" << fp.toNative() << ":"
-                  << e.getMsg();
+      qCritical().nospace() << "Failed to load stroke font " << fp.toNative()
+                            << ": " << e.getMsg();
     }
   }
 }

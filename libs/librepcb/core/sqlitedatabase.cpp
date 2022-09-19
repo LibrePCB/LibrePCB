@@ -51,7 +51,7 @@ SQLiteDatabase::TransactionScopeGuard::~TransactionScopeGuard() noexcept {
     try {
       mDb.rollbackTransaction();  // can throw
     } catch (Exception& e) {
-      qCritical() << "Could not rollback database transaction:" << e.getMsg();
+      qCritical() << "Failed to roll back database transaction:" << e.getMsg();
     }
   }
 }

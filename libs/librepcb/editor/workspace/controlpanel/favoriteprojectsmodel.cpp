@@ -55,7 +55,7 @@ FavoriteProjectsModel::FavoriteProjectsModel(
       updateVisibleProjects();
     }
   } catch (Exception& e) {
-    qWarning() << "Could not read favorite projects file:" << e.getMsg();
+    qWarning() << "Failed to read favorite projects file:" << e.getMsg();
   }
 }
 
@@ -115,7 +115,7 @@ void FavoriteProjectsModel::save() noexcept {
     root.ensureLineBreakIfMultiLine();
     FileUtils::writeFile(mFilePath, root.toByteArray());  // can throw
   } catch (Exception& e) {
-    qWarning() << "Could not save favorite projects file:" << e.getMsg();
+    qWarning() << "Failed to save favorite projects file:" << e.getMsg();
   }
 }
 

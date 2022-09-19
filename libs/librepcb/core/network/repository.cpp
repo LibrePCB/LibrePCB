@@ -77,7 +77,8 @@ void Repository::requestedDataReceived(const QByteArray& data) noexcept {
   if (nextResultsLink.isString()) {
     QUrl url = QUrl(nextResultsLink.toString());
     if (url.isValid()) {
-      qDebug() << "Request more results from repository:" << url.toString();
+      qDebug().nospace() << "Request more results from repository "
+                         << url.toString() << "...";
       requestLibraryList(url);
     } else {
       qWarning() << "Invalid URL in received JSON object:"

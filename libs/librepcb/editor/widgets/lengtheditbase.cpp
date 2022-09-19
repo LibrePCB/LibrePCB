@@ -143,7 +143,7 @@ void LengthEditBase::configureClientSettings(
       mSelectedUnit = tl::nullopt;
     }
   } catch (const Exception& e) {
-    qWarning() << "LengthEditBase: Could not restore unit from user settings:"
+    qWarning() << "Failed to restore length edit unit from user settings:"
                << e.getMsg();
   }
 }
@@ -227,12 +227,13 @@ void LengthEditBase::updateValueFromText(QString text) noexcept {
         valueChangedImpl(diff);
         update();  // step buttons might need to be repainted
       } else {
-        qWarning() << "LengthEditBase: Entered text was a valid number, but "
-                      "outside the allowed range.";
+        qWarning() << "Entered length text was a valid number, but "
+                      "outside the allowed range:"
+                   << text;
       }
     }
   } catch (const Exception&) {
-    qWarning() << "LengthEditBase: Entered text was a valid expression, but "
+    qWarning() << "Entered length text was a valid expression, but "
                   "evaluated to an invalid number:"
                << text;
   }
@@ -249,8 +250,9 @@ void LengthEditBase::updateSingleStep() noexcept {
       break;
     }
     default:
-      Q_ASSERT(false);
-      qCritical() << "Unknown step behavior in LengthEditBase!";
+      qCritical()
+          << "Unhandled switch-case in LengthEditBase::updateSingleStep():"
+          << static_cast<int>(mStepBehavior);
       break;
   }
 }

@@ -83,7 +83,8 @@ void CircleGraphicsItem::circleEdited(const Circle& circle,
       break;
     default:
       qWarning()
-          << "Unhandled switch-case in CircleGraphicsItem::circleEdited()";
+          << "Unhandled switch-case in CircleGraphicsItem::circleEdited():"
+          << static_cast<int>(event);
       break;
   }
 }

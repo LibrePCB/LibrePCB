@@ -70,7 +70,7 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(
     if (uuid) {
       mDependencies.insert(*uuid);
     } else {
-      qWarning() << "Invalid dependency UUID:" << value.toString();
+      qWarning() << "Invalid library dependency UUID:" << value.toString();
     }
   }
 
@@ -200,7 +200,8 @@ void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
         installedVersion = v;
       }
     } catch (const Exception& e) {
-      qCritical() << "Could not determine if library is installed.";
+      qCritical() << "Failed to determine if library is installed: "
+                  << e.getMsg();
     }
     if (installedVersion) {
       if (installedVersion < mVersion) {

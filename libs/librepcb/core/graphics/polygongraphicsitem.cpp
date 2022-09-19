@@ -189,8 +189,9 @@ void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
       updateFillLayer();  // path "closed" might have changed
       break;
     default:
-      qWarning() << "Unhandled switch-case in "
-                    "PolygonGraphicsItem::polygonEdited()";
+      qWarning()
+          << "Unhandled switch-case in PolygonGraphicsItem::polygonEdited():"
+          << static_cast<int>(event);
       break;
   }
 }

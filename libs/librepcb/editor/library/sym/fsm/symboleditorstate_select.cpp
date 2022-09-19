@@ -387,7 +387,8 @@ bool SymbolEditorState_Select::processMove(Qt::ArrowType direction) noexcept {
             break;
           }
           default: {
-            qWarning() << "SymbolEditorState_Select: Unknown move direction:"
+            qWarning() << "Unhandled switch-case in "
+                          "SymbolEditorState_Select::processMove():"
                        << direction;
             break;
           }

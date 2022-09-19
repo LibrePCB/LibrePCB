@@ -87,13 +87,6 @@ problem! LibrePCB maintainers can help you in several ways:
   license. This applies to all kinds of resources (images, symbols, text, sound, source code, ...).
 
 
-# Exceptions {#doc_developers_exceptions}
-
-- Use always our own exception types (librepcb::Exception and derivated classes), see [exceptions.h].
-- Never use other exception types (like `std::exception`).
-- Exceptions from 3rd-party libraries must be translated into our own exceptions in a wrapper class.
-
-
 # Deployment {#doc_developers_deployment}
 
 - Where to put our files on UNIX/Linux?: http://unix.stackexchange.com/questions/114407/deploying-my-application

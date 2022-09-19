@@ -73,8 +73,8 @@ QVector<Path> BoardPlaneFragmentsBuilder::buildFragments() noexcept {
     }
     return ClipperHelpers::convert(mResult);
   } catch (const Exception& e) {
-    qCritical() << "Failed to build plane fragments! Leave plane empty...";
-    qCritical() << "Inner error message:" << e.getMsg();
+    qCritical() << "Failed to build plane fragments, leaving plane empty:"
+                << e.getMsg();
     return QVector<Path>();
   }
 }

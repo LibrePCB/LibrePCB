@@ -137,7 +137,8 @@ void StrokeTextGraphicsItem::strokeTextEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "StrokeTextGraphicsItem::strokeTextEdited()";
+                    "StrokeTextGraphicsItem::strokeTextEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

@@ -160,7 +160,9 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
         device ? mUi->cbxPreselectedDevice->findData(device->toStr()) : 0);
   } catch (const Exception& e) {
     // If something went wrong, disable the combobox to avoid breaking something
-    qCritical() << "Could not list devices:" << e.getMsg();
+    qCritical()
+        << "Failed to list devices in symbol instance properties dialog:"
+        << e.getMsg();
     mUi->cbxPreselectedDevice->setEnabled(false);
   }
 

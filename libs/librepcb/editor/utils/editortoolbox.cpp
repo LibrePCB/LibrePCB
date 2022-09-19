@@ -50,9 +50,8 @@ void EditorToolbox::removeFormLayoutRow(QLabel& label) noexcept {
       }
     }
   }
-  qWarning().nospace()
-      << "EditorToolbox::removeFormLayoutRow() failed to remove row "
-      << label.objectName() << ".";
+  qWarning().nospace() << "Failed to remove form layout row "
+                       << label.objectName() << ".";
 }
 
 void EditorToolbox::deleteLayoutItemRecursively(QLayoutItem* item) noexcept {

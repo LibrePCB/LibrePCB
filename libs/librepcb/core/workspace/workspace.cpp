@@ -56,7 +56,8 @@ Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
     mFileSystem(),
     mWorkspaceSettings(),
     mLibraryDb() {
-  qDebug() << "Opening workspace data directory:" << mDataPath.toNative();
+  qDebug().nospace() << "Open workspace data directory " << mDataPath.toNative()
+                     << "...";
 
   // Fail if the path is not a valid workspace directory.
   QString errorMsg;
@@ -98,7 +99,7 @@ Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
         SExpression::parse(mFileSystem->read(settingsFilePath),
                            mFileSystem->getAbsPath(settingsFilePath));
     mWorkspaceSettings->load(root, loadedFileFormat);
-    qDebug("Workspace settings loaded.");
+    qDebug("Successfully loaded workspace settings.");
   } else {
     qInfo("Workspace settings file not found, default settings will be used.");
   }
@@ -107,7 +108,7 @@ Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
   if (loadedFileFormat != qApp->getFileFormatVersion()) {
     qInfo().nospace().noquote()
         << "Workspace data is outdated, will upgrade files from v"
-        << loadedFileFormat.toStr() << ".";
+        << loadedFileFormat.toStr() << "...";
     QFile(mLibrariesPath.getPathTo("library_cache.sqlite").toStr()).remove();
     QFile(mLibrariesPath.getPathTo("cache.sqlite").toStr()).remove();
     QFile(mLibrariesPath.getPathTo("cache_v1.sqlite").toStr()).remove();
@@ -124,7 +125,7 @@ Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
   mLibraryDb.reset(new WorkspaceLibraryDb(mLibrariesPath));  // can throw
 
   // Done!
-  qDebug("Workspace successfully opened.");
+  qDebug("Successfully opened workspace.");
 }
 
 Workspace::~Workspace() noexcept {

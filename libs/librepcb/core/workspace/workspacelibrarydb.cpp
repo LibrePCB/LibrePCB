@@ -64,7 +64,7 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(const FilePath& librariesPath)
   int dbVersion = getDbVersion();
   if (dbVersion != sCurrentDbVersion) {
     qWarning() << "Library database version" << dbVersion
-               << "not supported, will be reinitialized.";
+               << "is outdated or not supported, reinitializing...";
     mDb.reset();
     QFile(mFilePath.toStr()).remove();
     mDb.reset(new SQLiteDatabase(mFilePath));  // can throw
@@ -89,7 +89,7 @@ WorkspaceLibraryDb::WorkspaceLibraryDb(const FilePath& librariesPath)
   connect(mLibraryScanner.data(), &WorkspaceLibraryScanner::scanFinished, this,
           &WorkspaceLibraryDb::scanFinished, Qt::QueuedConnection);
 
-  qDebug("Workspace library database successfully loaded!");
+  qDebug("Successfully loaded workspace library database.");
 }
 
 WorkspaceLibraryDb::~WorkspaceLibraryDb() noexcept {

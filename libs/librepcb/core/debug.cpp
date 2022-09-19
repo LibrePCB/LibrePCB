@@ -86,8 +86,9 @@ void Debug::setDebugLevelLogFile(DebugLevel_t level) {
       mDebugLevelLogFile = level;  // activate logging to file immediately!
       qDebug() << "Enabled logging to file:" << mLogFilepath.toNative();
     } else {
-      qWarning() << "Cannot enable logging to file" << mLogFilepath.toNative();
-      qWarning() << "Error message:" << mLogFile->errorString();
+      qWarning().nospace() << "Failed to enable logging to file "
+                           << mLogFilepath.toNative() << ": "
+                           << mLogFile->errorString();
       delete mLogFile;
       mLogFile = 0;
     }
@@ -118,13 +119,14 @@ void Debug::print(DebugLevel_t level, const QString& msg, const char* file,
                   int line) {
   QMutexLocker locker(&mMutex);
 
+  // If there is nothing to print, return immediately from this function.
   if ((mDebugLevelStderr < level) &&
-      ((mDebugLevelLogFile < level) || (!mLogFile)))
-    return;  // if there is nothing to print, we will return immediately from
-             // this function
+      ((mDebugLevelLogFile < level) || (!mLogFile))) {
+    return;
+  }
 
-  const char* levelStr =
-      "---------";  // the debug level string has always 9 characters
+  // The debug level string has always 9 characters.
+  const char* levelStr = "---------";
   switch (level) {
     case DebugLevel_t::DebugMsg:
       levelStr = "DEBUG-MSG";
@@ -148,9 +150,11 @@ void Debug::print(DebugLevel_t level, const QString& msg, const char* file,
       break;
   }
 
-  QString logMsg = QString("[%1] %2 (%3:%4)")
-                       .arg(levelStr, msg.toLocal8Bit().constData(), file)
-                       .arg(line);
+  QString logMsg = QString("[%1] %2").arg(levelStr).arg(msg);
+  if (file || line) {
+    // Avoid printing useless "(:0)" in release builds.
+    logMsg += QString(" (%1:%2)").arg(file).arg(line);
+  }
 
   if (mDebugLevelStderr >= level) {
     // write to stderr

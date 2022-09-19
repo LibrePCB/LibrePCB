@@ -281,7 +281,7 @@ void EditorWidgetBase::updateCheckMessages() noexcept {
       scheduleLibraryElementChecks();
     }
   } catch (const Exception& e) {
-    qCritical() << "Failed to run checks:" << e.getMsg();
+    qCritical() << "Failed to run library element checks:" << e.getMsg();
   }
 }
 

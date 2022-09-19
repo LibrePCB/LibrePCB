@@ -184,7 +184,7 @@ void BoardPickPlaceGeneratorDialog::updateTable() noexcept {
     }
     mUi->tableWidget->resizeRowsToContents();
   } catch (Exception& e) {
-    qCritical() << e.getMsg();
+    qCritical() << "Failed to update pick&place table widget:" << e.getMsg();
   }
 }
 

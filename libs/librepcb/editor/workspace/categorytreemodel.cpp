@@ -132,7 +132,7 @@ QVariant CategoryTreeModel::data(const QModelIndex& index, int role) const
  ******************************************************************************/
 
 void CategoryTreeModel::update() noexcept {
-  qDebug() << "CategoryTreeModel update started.";
+  qDebug() << "Update category tree model...";
   QElapsedTimer t;
   t.start();
 
@@ -150,13 +150,13 @@ void CategoryTreeModel::update() noexcept {
                    {}}));
     }
   } catch (const Exception& e) {
-    qCritical() << "CategoryTreeModel failed to update items:" << e.getMsg();
+    qCritical() << "Failed to update category tree model:" << e.getMsg();
   }
 
   // Update tree with new items in a way which keeps the selection in views.
   updateModelItem(mRootItem, items);
 
-  qDebug() << "CategoryTreeModel update finished in" << t.elapsed() << "ms.";
+  qDebug() << "Finished category tree model update in" << t.elapsed() << "ms.";
 }
 
 QVector<std::shared_ptr<CategoryTreeModel::Item>> CategoryTreeModel::getChilds(
@@ -188,7 +188,7 @@ QVector<std::shared_ptr<CategoryTreeModel::Item>> CategoryTreeModel::getChilds(
       }
     }
   } catch (const Exception& e) {
-    qCritical() << "CategoryTreeModel failed to update items:" << e.getMsg();
+    qCritical() << "Failed to update category tree model items:" << e.getMsg();
   }
 
   // Sort items by text.

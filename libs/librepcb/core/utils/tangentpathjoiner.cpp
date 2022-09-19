@@ -170,7 +170,7 @@ void TangentPathJoiner::findAllPaths(QVector<Result>& result,
                                      const Result& prefix) noexcept {
   for (int i = 0; i < paths.count(); ++i) {
     if ((timeoutMs >= 0) && (timer.elapsed() > timeoutMs)) {
-      qWarning() << "TangentPathJoiner aborted due to timeout.";
+      qWarning() << "Tangent path joining algorithm aborted due to timeout.";
       break;
     }
     if (!prefix.indices.contains(i)) {

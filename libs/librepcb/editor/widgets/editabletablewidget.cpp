@@ -208,7 +208,7 @@ void EditableTableWidget::buttonClickedHandler(
     (this->*clickedSignal)(data);
   } else {
     qCritical() << "Invalid index received in "
-                   "EditableTableWidget::buttonClickedHandler()";
+                   "EditableTableWidget::buttonClickedHandler().";
   }
 }
 

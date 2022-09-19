@@ -437,7 +437,7 @@ QHash<QListWidgetItem*, FilePath>
     if (fp.isValid()) {
       itemPaths.insert(item, fp);
     } else {
-      qWarning() << "File path for item is not valid";
+      qWarning() << "Invalid file path of library list widget item ignored.";
     }
   }
   return itemPaths;
@@ -550,7 +550,7 @@ void LibraryOverviewWidget::newItem(QListWidget* list) noexcept {
   } else if (list == mUi->lstDev) {
     emit newDeviceTriggered();
   } else if (list) {
-    qCritical() << "Unknown list widget!";
+    qCritical() << "Unknown list widget in LibraryOverviewWidget::newItem()!";
   }
 }
 
@@ -569,7 +569,8 @@ void LibraryOverviewWidget::duplicateItem(QListWidget* list,
   } else if (list == mUi->lstDev) {
     emit duplicateDeviceTriggered(fp);
   } else if (list) {
-    qCritical() << "Unknown list widget!";
+    qCritical()
+        << "Unknown list widget in LibraryOverviewWidget::duplicateItem()!";
   }
 }
 
@@ -588,7 +589,7 @@ void LibraryOverviewWidget::editItem(QListWidget* list,
   } else if (list == mUi->lstDev) {
     emit editDeviceTriggered(fp);
   } else if (list) {
-    qCritical() << "Unknown list widget!";
+    qCritical() << "Unknown list widget in LibraryOverviewWidget::editItem()!";
   }
 }
 
@@ -665,16 +666,18 @@ void LibraryOverviewWidget::copyElementsToOtherLibrary(
       FilePath destination = libFp.getPathTo(relativePath);
       try {
         if (removeFromSource) {
-          qInfo() << "Move library element from" << itemPath.toNative() << "to"
-                  << destination.toNative();
+          qInfo().nospace()
+              << "Move library element from " << itemPath.toNative() << " to "
+              << destination.toNative() << "...";
           // Emit signal so that the library editor can close any tabs that have
           // opened this item
           emit removeElementTriggered(itemPath);
           FileUtils::move(itemPath, destination);
           delete item;  // Remove from list
         } else {
-          qInfo() << "Copy library element from" << itemPath.toNative() << "to"
-                  << destination.toNative();
+          qInfo().nospace()
+              << "Copy library element from " << itemPath.toNative() << " to "
+              << destination.toNative() << "...";
           FileUtils::copyDirRecursively(itemPath, destination);
         }
       } catch (const Exception& e) {
@@ -705,7 +708,7 @@ QList<LibraryOverviewWidget::LibraryMenuItem>
       }
     }
   } catch (const Exception& e) {
-    qCritical() << "Could not list local libraries:" << e.getMsg();
+    qCritical() << "Failed to list local libraries:" << e.getMsg();
   }
   // sort by name
   std::sort(libs.begin(), libs.end(),

@@ -85,7 +85,8 @@ public:
       mReader.mCircles.append(
           DxfReader::Circle{point(data.cx, data.cy), PositiveLength(diameter)});
     } else {
-      qWarning() << "Circle in DXF file ignored due to invalid diameter.";
+      qWarning() << "Circle in DXF file ignored due to invalid radius:"
+                 << data.radius;
     }
   }
 

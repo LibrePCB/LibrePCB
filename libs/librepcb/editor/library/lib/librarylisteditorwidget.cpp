@@ -91,7 +91,8 @@ LibraryListEditorWidget::LibraryListEditorWidget(const Workspace& ws,
     }
     mModel->setChoices(uuids);
   } catch (const Exception& e) {
-    qCritical() << "Could not load library list.";
+    qCritical() << "Could not load library list in editor widget:"
+                << e.getMsg();
   }
 }
 

@@ -179,8 +179,8 @@ Point SchematicNetSegmentSplitter::getAnchorPosition(
       return mJunctions.get(*junctionUuid)->getPosition();
     }
   }
-  qWarning()
-      << "SchematicNetSegmentSplitter: Could not determine position of anchor!";
+  qWarning() << "Failed to determine position of net label anchor while "
+                "splitting segments!";
   return Point();
 }
 

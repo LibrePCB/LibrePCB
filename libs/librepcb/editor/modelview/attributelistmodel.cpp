@@ -416,7 +416,8 @@ void AttributeListModel::attributeListEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "AttributeListModel::attributeListEdited()";
+                    "AttributeListModel::attributeListEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

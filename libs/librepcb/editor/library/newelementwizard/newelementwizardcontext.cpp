@@ -139,7 +139,9 @@ void NewElementWizardContext::copyElement(ElementType type,
       break;
     }
     default: {
-      qCritical() << "Unknown enum value:" << static_cast<int>(mElementType);
+      qCritical()
+          << "Unhandled switch-case in NewElementWizardContext::copyElement():"
+          << static_cast<int>(mElementType);
       break;
     }
   }

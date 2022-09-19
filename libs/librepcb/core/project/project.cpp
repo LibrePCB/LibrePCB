@@ -55,8 +55,8 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
     AttributeProvider(),
     mDirectory(std::move(directory)),
     mFilename(filename) {
-  qDebug() << (create ? "create project:" : "open project:")
-           << getFilepath().toNative();
+  qDebug().nospace() << (create ? "Create project " : "Open project ")
+                     << getFilepath().toNative() << "...";
 
   // Check if the file extension is correct
   if (!mFilename.endsWith(".lpp")) {
@@ -168,7 +168,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
         Schematic* schematic = new Schematic(*this, std::move(dir), fileFormat);
         addSchematic(*schematic);
       }
-      qDebug() << mSchematics.count() << "schematics successfully loaded!";
+      qDebug() << "Successfully loaded" << mSchematics.count() << "schematics.";
     }
 
     // Load all boards
@@ -184,7 +184,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
         Board* board = new Board(*this, std::move(dir), fileFormat);
         addBoard(*board);
       }
-      qDebug() << mBoards.count() << "boards successfully loaded!";
+      qDebug() << "Successfully loaded" << mBoards.count() << "boards.";
     }
 
     // at this point, the whole circuit with all schematics and boards is
@@ -212,7 +212,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
   }
 
   // project successfully opened! :-)
-  qDebug() << "project successfully loaded!";
+  qDebug() << "Successfully loaded project.";
 }
 
 Project::~Project() noexcept {
@@ -236,7 +236,7 @@ Project::~Project() noexcept {
   qDeleteAll(mRemovedSchematics);
   mRemovedSchematics.clear();
 
-  qDebug() << "closed project:" << getFilepath().toNative();
+  qDebug().nospace() << "Closed project " << getFilepath().toNative() << ".";
 }
 
 /*******************************************************************************

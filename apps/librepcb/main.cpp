@@ -91,7 +91,7 @@ int main(int argc, char* argv[]) {
   // Stop network access manager thread
   networkAccessManager.reset();
 
-  qDebug() << "Exit application with code" << retval;
+  qDebug().nospace() << "Exit application with code " << retval << ".";
   return retval;
 }
 
@@ -135,20 +135,20 @@ static void configureApplicationSettings() noexcept {
 
 static void writeLogHeader() noexcept {
   // write application name and version to log
-  qInfo() << QString("LibrePCB %1 (%2)")
-                 .arg(qApp->applicationVersion(), qApp->getGitRevision());
+  qInfo().noquote() << QString("LibrePCB %1 (%2)")
+                           .arg(qApp->applicationVersion(),
+                                qApp->getGitRevision());
 
   // write Qt version to log
-  qInfo() << QString("Qt version: %1 (compiled against %2)")
-                 .arg(qVersion(), QT_VERSION_STR);
+  qInfo().noquote() << QString("Qt version: %1 (compiled against %2)")
+                           .arg(qVersion(), QT_VERSION_STR);
 
   // write resources directory path to log
-  qInfo() << QString("Resources directory: %1")
-                 .arg(qApp->getResourcesDir().toNative());
+  qInfo() << "Resources directory:" << qApp->getResourcesDir().toNative();
 
   // write application settings directory to log (nice to know for users)
-  qInfo() << QString("Application settings: %1")
-                 .arg(FilePath(QSettings().fileName()).toNative());
+  qInfo() << "Application settings:"
+          << FilePath(QSettings().fileName()).toNative();
 }
 
 /*******************************************************************************

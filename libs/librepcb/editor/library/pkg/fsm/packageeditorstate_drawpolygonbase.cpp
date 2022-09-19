@@ -525,7 +525,9 @@ void PackageEditorState_DrawPolygonBase::updateOverlayText() noexcept {
       break;
     }
     default: {
-      qWarning() << "PackageEditorState_DrawPolygonBase: Unknown mode.";
+      qWarning() << "Unhandled switch-case in "
+                    "PackageEditorState_DrawPolygonBase::updateOverlayText():"
+                 << static_cast<int>(mMode);
       break;
     }
   }

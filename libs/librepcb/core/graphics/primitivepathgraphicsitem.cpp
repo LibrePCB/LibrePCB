@@ -156,7 +156,8 @@ void PrimitivePathGraphicsItem::layerEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "PrimitivePathGraphicsItem::layerEdited()";
+                    "PrimitivePathGraphicsItem::layerEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

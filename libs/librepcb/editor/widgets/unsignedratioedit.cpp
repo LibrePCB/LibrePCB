@@ -81,7 +81,7 @@ void UnsignedRatioEdit::spinBoxValueChanged(double value) noexcept {
     emit valueChanged(mValue);
   } catch (const Exception& e) {
     // This should actually never happen, thus no user visible message here.
-    qWarning() << "Invalid unsigned ratio entered:" << e.getMsg();
+    qWarning() << "Invalid unsigned ratio entered:" << value;
   }
 }
 

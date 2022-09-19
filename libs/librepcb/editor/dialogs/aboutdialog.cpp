@@ -128,8 +128,9 @@ void AboutDialog::formatLabelText(QLabel* label, bool selectable,
   label->setOpenExternalLinks(containsLinks);
   if (selectable) {
     label->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    // If text is selectable, external links won't work anymore!
     if (containsLinks) {
-      qWarning() << "If text is selectable, external links won't work anymore!";
+      qWarning() << "Invalid label configuration in about dialog!";
     }
   }
 }

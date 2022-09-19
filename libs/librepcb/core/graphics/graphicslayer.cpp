@@ -267,7 +267,8 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
           hlColor = QColor("#C09739BF");
           break;
         default:
-          qWarning() << "Invalid remainder!";
+          qWarning()
+              << "Unhandled switch-case in GraphicsLayer::getDefaultValues().";
           color = QColor("#FFFF00FF");
           hlColor = QColor("#FFFF00FF");
       }

@@ -120,7 +120,8 @@ void CmdSymbolInstanceEdit::mirror(const Point& center,
       break;
     }
     default: {
-      qCritical() << "Invalid orientation:" << orientation;
+      qCritical() << "Unhandled switch-case in CmdSymbolInstanceEdit::mirror():"
+                  << orientation;
       break;
     }
   }

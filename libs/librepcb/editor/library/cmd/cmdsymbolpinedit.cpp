@@ -61,7 +61,7 @@ CmdSymbolPinEdit::~CmdSymbolPinEdit() noexcept {
     try {
       performUndo();
     } catch (...) {
-      qCritical() << "Undo failed!";
+      qCritical() << "Undo failed in CmdSymbolPinEdit destructor!";
     }
   }
 }

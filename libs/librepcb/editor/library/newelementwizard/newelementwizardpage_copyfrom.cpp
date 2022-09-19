@@ -287,7 +287,8 @@ void NewElementWizardPage_CopyFrom::initializePage() noexcept {
       break;
     }
     default: {
-      qCritical() << "Unknown enum value:"
+      qCritical() << "Unhandled switch-case in "
+                     "NewElementWizardPage_CopyFrom::initializePage():"
                   << static_cast<int>(mContext.mElementType);
       setCategoryTreeModel(nullptr);
       break;

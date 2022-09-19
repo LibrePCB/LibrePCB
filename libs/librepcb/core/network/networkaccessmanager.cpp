@@ -106,13 +106,13 @@ NetworkAccessManager* NetworkAccessManager::instance() noexcept {
 
 void NetworkAccessManager::run() noexcept {
   Q_ASSERT(QThread::currentThread() == this);
-  qDebug() << "Started network access manager thread.";
+  qDebug() << "Network access manager thread started.";
   mManager = new QNetworkAccessManager();
   mThreadStartSemaphore.release();
   try {
     exec();  // event loop (blocking)
   } catch (...) {
-    qCritical() << "Exception thrown in network access manager event loop!!!";
+    qCritical() << "Network access manager event loop aborted by exception!";
     // do NOT exit the thread to avoid further problems due to deleted
     // QNetworkAccessManager
     while (true) {
@@ -121,17 +121,18 @@ void NetworkAccessManager::run() noexcept {
   }
   delete mManager;
   mManager = nullptr;
-  qDebug() << "Stopped network access manager thread.";
+  qDebug() << "Network access manager thread stopped.";
 }
 
 void NetworkAccessManager::stop() noexcept {
   Q_ASSERT(QThread::currentThread() != this);
   quit();
   if (!wait(5000)) {
-    qWarning() << "Could not quit the network access manager thread!";
+    qWarning() << "Failed to quit the network access manager thread, trying to "
+                  "terminate it...";
     terminate();
     if (!wait(1000)) {
-      qCritical() << "Could not terminate the network access manager thread!";
+      qCritical() << "Failed to terminate the network access manager thread!";
     }
   }
 }
