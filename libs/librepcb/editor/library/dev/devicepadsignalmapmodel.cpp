@@ -249,7 +249,8 @@ void DevicePadSignalMapModel::padSignalMapEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "DevicePadSignalMapModel::padSignalMapEdited()";
+                    "DevicePadSignalMapModel::padSignalMapEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

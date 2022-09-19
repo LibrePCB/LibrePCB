@@ -107,7 +107,9 @@ void GerberGenerator::setLayerPolarity(Polarity p) noexcept {
       mContent.append("%LPC*%\n");
       break;
     default:
-      qCritical() << "Invalid Layer Polarity:" << static_cast<int>(p);
+      qCritical()
+          << "Unhandled siwtch-case in GerberGenerator::setLayerPolarity():"
+          << static_cast<int>(p);
       break;
   }
 }

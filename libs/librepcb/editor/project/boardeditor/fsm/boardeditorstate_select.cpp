@@ -1504,7 +1504,7 @@ QList<BoardEditorState_Select::DeviceMenuItem>
           return collator(lhs.name, rhs.name);
         });
   } catch (const Exception& e) {
-    qCritical() << "Could not list devices:" << e.getMsg();
+    qCritical() << "Failed to list devices in context menu:" << e.getMsg();
   }
   return items;
 }

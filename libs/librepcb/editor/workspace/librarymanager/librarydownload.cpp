@@ -72,7 +72,8 @@ void LibraryDownload::setExpectedZipFileSize(qint64 bytes) noexcept {
   if (mFileDownload) {
     mFileDownload->setExpectedReplyContentSize(bytes);
   } else {
-    qCritical() << "Calling this method after start() is not allowed!";
+    qCritical() << "Calling LibraryDownload::setExpectedZipFileSize() after "
+                   "start() is not allowed!";
   }
 }
 
@@ -82,7 +83,8 @@ void LibraryDownload::setExpectedChecksum(
   if (mFileDownload) {
     mFileDownload->setExpectedChecksum(algorithm, checksum);
   } else {
-    qCritical() << "Calling this method after start() is not allowed!";
+    qCritical() << "Calling LibraryDownload::setExpectedChecksum() after "
+                   "start() is not allowed!";
   }
 }
 
@@ -92,7 +94,8 @@ void LibraryDownload::setExpectedChecksum(
 
 void LibraryDownload::start() noexcept {
   if (!mFileDownload) {
-    qCritical() << "Calling this method multiple times is not allowed!";
+    qCritical()
+        << "Calling LibraryDownload::start() multiple times is not allowed!";
     return;
   }
 

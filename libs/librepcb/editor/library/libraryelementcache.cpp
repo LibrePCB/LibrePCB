@@ -101,7 +101,7 @@ std::shared_ptr<const T> LibraryElementCache::getElement(
           new TransactionalDirectory(TransactionalFileSystem::openRO(fp))));
       container.insert(uuid, element);
     } catch (const Exception& e) {
-      qWarning() << "Could not open library element:" << e.getMsg();
+      qWarning() << "Failed to open library element:" << e.getMsg();
     }
   }
   return element;

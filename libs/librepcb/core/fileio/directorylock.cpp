@@ -51,7 +51,8 @@ DirectoryLock::~DirectoryLock() noexcept {
   try {
     unlockIfLocked();  // can throw
   } catch (const Exception& e) {
-    qCritical() << "Could not remove lock file:" << e.getMsg();
+    qCritical().nospace() << "Failed to remove lock file "
+                          << mLockFilePath.toNative() << ": " << e.getMsg();
   }
 }
 
@@ -152,14 +153,16 @@ void DirectoryLock::tryLock(LockHandlerCallback lockHandler) {
   LockStatus status = getStatus(&user);  // can throw
   switch (status) {
     case LockStatus::StaleLock:
-      qWarning() << "Overriding stale lock on directory:" << mDirToLock;
+      qWarning().nospace() << "Override stale lock on directory "
+                           << mDirToLock.toNative() << "...";
       // fallthrough
     case LockStatus::Unlocked:
       lock();  // can throw
       break;
     default:  // Locked!
       if (lockHandler && lockHandler(mDirToLock, status, user)) {
-        qInfo() << "Overriding lock on directory:" << mDirToLock;
+        qInfo().nospace() << "Override lock on directory "
+                          << mDirToLock.toNative() << "...";
         lock();  // can throw
         break;
       }

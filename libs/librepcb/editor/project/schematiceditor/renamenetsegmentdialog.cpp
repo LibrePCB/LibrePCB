@@ -194,7 +194,8 @@ void RenameNetSegmentDialog::updateAction() noexcept {
     } else {
       mAction = Action::INVALID_NAME;  // Not correct, but sufficient
       desc = "UNKNOWN ERROR";
-      qCritical() << "Unhandled case in RenameNetSegmentDialog!";
+      qCritical()
+          << "Unhandled case in RenameNetSegmentDialog::updateAction()!";
     }
     mUi->lblDescription->setText(desc);
     mUi->lblDescription->setStyleSheet("");

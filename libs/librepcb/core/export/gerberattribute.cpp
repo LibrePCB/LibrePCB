@@ -187,7 +187,9 @@ GerberAttribute GerberAttribute::fileFunctionCopper(int layer,
       break;
     }
     default: {
-      qCritical() << "Unknown Gerber copper side:" << static_cast<int>(side);
+      qCritical()
+          << "Unhandled switch-case in GerberAttribute::fileFunctionCopper():"
+          << static_cast<int>(side);
       return GerberAttribute();
     }
   }
@@ -206,7 +208,9 @@ GerberAttribute GerberAttribute::fileFunctionSolderMask(
                              {"Soldermask", "Bot"});
     }
     default: {
-      qCritical() << "Unknown Gerber board side:" << static_cast<int>(side);
+      qCritical() << "Unhandled switch-case in "
+                     "GerberAttribute::fileFunctionSolderMask():"
+                  << static_cast<int>(side);
       return GerberAttribute();
     }
   }
@@ -221,7 +225,9 @@ GerberAttribute GerberAttribute::fileFunctionLegend(BoardSide side) noexcept {
       return GerberAttribute(Type::File, ".FileFunction", {"Legend", "Bot"});
     }
     default: {
-      qCritical() << "Unknown Gerber board side:" << static_cast<int>(side);
+      qCritical()
+          << "Unhandled switch-case in GerberAttribute::fileFunctionLegend():"
+          << static_cast<int>(side);
       return GerberAttribute();
     }
   }
@@ -236,7 +242,9 @@ GerberAttribute GerberAttribute::fileFunctionPaste(BoardSide side) noexcept {
       return GerberAttribute(Type::File, ".FileFunction", {"Paste", "Bot"});
     }
     default: {
-      qCritical() << "Unknown Gerber board side:" << static_cast<int>(side);
+      qCritical()
+          << "Unhandled switch-case in GerberAttribute::fileFunctionPaste():"
+          << static_cast<int>(side);
       return GerberAttribute();
     }
   }
@@ -281,7 +289,9 @@ GerberAttribute GerberAttribute::fileFunctionComponent(
                              {"Component", layerStr, "Bot"});
     }
     default: {
-      qCritical() << "Unknown Gerber board side:" << static_cast<int>(side);
+      qCritical() << "Unhandled switch-case in "
+                     "GerberAttribute::fileFunctionComponent():"
+                  << static_cast<int>(side);
       return GerberAttribute();
     }
   }
@@ -296,7 +306,7 @@ GerberAttribute GerberAttribute::filePolarity(Polarity polarity) noexcept {
       return GerberAttribute(Type::File, ".FilePolarity", {"Negative"});
     }
     default: {
-      qCritical() << "Unknown Gerber file polarity:"
+      qCritical() << "Unhandled switch-case in GerberAttribute::filePolarity():"
                   << static_cast<int>(polarity);
       return GerberAttribute();
     }
@@ -360,8 +370,9 @@ GerberAttribute GerberAttribute::apertureFunction(
                              {"ComponentOutline", "Courtyard"});
     }
     default: {
-      qCritical() << "Unknown Gerber aperture function attribute:"
-                  << static_cast<int>(function);
+      qCritical()
+          << "Unhandled switch-case in GerberAttribute::apertureFunction():"
+          << static_cast<int>(function);
       return GerberAttribute();
     }
   }
@@ -434,8 +445,9 @@ GerberAttribute GerberAttribute::componentMountType(MountType type) noexcept {
       return GerberAttribute(Type::Object, ".CMnt", {"Other"});
     }
     default: {
-      qCritical() << "Unknown Gerber component mount type attribute:"
-                  << static_cast<int>(type);
+      qCritical()
+          << "Unhandled switch-case in GerberAttribute::componentMountType():"
+          << static_cast<int>(type);
       return GerberAttribute();
     }
   }

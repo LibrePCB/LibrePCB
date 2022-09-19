@@ -92,7 +92,8 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node,
     mSignals.insert(signal->getCompSignal().getUuid(), signal);
   }
   if (mSignals.count() != mLibComponent->getSignals().count()) {
-    qDebug() << mSignals.count() << "!=" << mLibComponent->getSignals().count();
+    qCritical() << "Signal count mismatch:" << mSignals.count()
+                << "!=" << mLibComponent->getSignals().count();
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("The signal count of the component instance \"%1\" does "

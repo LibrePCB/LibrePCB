@@ -142,7 +142,8 @@ void PrimitiveCircleGraphicsItem::layerEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "PrimitiveCircleGraphicsItem::layerEdited()";
+                    "PrimitiveCircleGraphicsItem::layerEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

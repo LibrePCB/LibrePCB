@@ -70,7 +70,7 @@ void PathModel::copyItem(const QVariant& editData) noexcept {
     mPath.insertVertex(index, mPath.getVertices().value(index));
     endInsertRows();
   } else {
-    qWarning() << "Invalid index in PathModel::copyItem()";
+    qWarning() << "Invalid index in PathModel::copyItem():" << index;
   }
 }
 
@@ -81,7 +81,7 @@ void PathModel::removeItem(const QVariant& editData) noexcept {
     mPath.getVertices().remove(index);
     endRemoveRows();
   } else {
-    qWarning() << "Invalid index in PathModel::removeItem()";
+    qWarning() << "Invalid index in PathModel::removeItem():" << index;
   }
 }
 

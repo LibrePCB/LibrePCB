@@ -766,7 +766,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
   }
 
   if ((width <= 0) || (height <= 0)) {
-    qWarning() << "Pad with zero size ignored in gerber export:"
+    qWarning() << "Pad with zero size ignored in Gerber export:"
                << pad.getLibPadUuid();
     return;
   }

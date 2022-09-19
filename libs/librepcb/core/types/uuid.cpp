@@ -99,7 +99,8 @@ Uuid Uuid::createRandom() noexcept {
   if (isValid(str)) {
     return Uuid(str);
   } else {
-    qFatal("Not able to generate valid random UUID!");  // calls abort()!
+    // Calls abort()!
+    qFatal("Not able to generate valid random UUID, terminating application!");
   }
 }
 

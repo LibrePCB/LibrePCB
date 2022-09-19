@@ -294,7 +294,7 @@ void UnplacedComponentsDock::currentDeviceIndexChanged(int index) noexcept {
     }
     setSelectedDeviceAndPackage(device.deviceUuid, package, packageOwned);
   } catch (const Exception& e) {
-    qCritical() << e.getMsg();
+    qCritical() << "Failed to load device & package preview:" << e.getMsg();
   }
 }
 
@@ -569,7 +569,7 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
           DeviceMetadata{deviceUuid, devName, pkgUuid, QString(), false});
     }
   } catch (const Exception& e) {
-    qCritical() << "Error while listing devices in unplaced components dock:"
+    qCritical() << "Failed to list devices in unplaced components dock:"
                 << e.getMsg();
   }
 
@@ -589,9 +589,8 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
             pkgFp, localeOrder,
             &device.packageName);  // can throw
       } catch (const Exception& e) {
-        qCritical()
-            << "Error while querying packages in unplaced components dock:"
-            << e.getMsg();
+        qCritical() << "Failed to query packages in unplaced components dock:"
+                    << e.getMsg();
       }
     }
     device.selectedInSchematic =
@@ -616,7 +615,7 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
       }
     }
     qWarning() << "Selected device" << *dev
-               << "not found in library, will use another device.";
+               << "not found in library, will use another device...";
   }
 
   // Prio 2: Use the device already used for the same component before.

@@ -287,7 +287,8 @@ void PackagePadListModel::padListEdited(
       dataChanged(this->index(index, 0), this->index(index, _COLUMN_COUNT - 1));
       break;
     default:
-      qWarning() << "Unhandled switch-case in PackagePadList::padListEdited()";
+      qWarning() << "Unhandled switch-case in PackagePadList::padListEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

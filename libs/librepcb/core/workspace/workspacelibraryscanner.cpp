@@ -59,10 +59,11 @@ WorkspaceLibraryScanner::~WorkspaceLibraryScanner() noexcept {
   mAbort = true;
   mSemaphore.release();
   if (!wait(2000)) {
-    qWarning() << "Could not abort the library scanner worker thread!";
+    qWarning() << "Failed to abort the library scanner worker thread, trying "
+                  "to terminate it...";
     terminate();
     if (!wait(2000)) {
-      qCritical() << "Could not terminate the library scanner worker thread!";
+      qCritical() << "Failed to terminate the library scanner worker thread!";
     }
   }
 }
@@ -100,7 +101,7 @@ void WorkspaceLibraryScanner::scan() noexcept {
     timer.start();
     emit scanStarted();
     emit scanProgressUpdate(0);
-    qDebug() << "Workspace library scan started.";
+    qDebug() << "Start workspace library scan in worker thread...";
 
     // open SQLite database
     SQLiteDatabase db(mDbFilePath);  // can throw
@@ -117,7 +118,7 @@ void WorkspaceLibraryScanner::scan() noexcept {
     emit scanLibraryListUpdated(libIds.count());
     emit scanProgressUpdate(1);
     qDebug() << "Workspace libraries indexed:" << libIds.count()
-             << "libraries in" << timer.elapsed() << "ms";
+             << "libraries in" << timer.elapsed() << "ms.";
 
     // begin database transaction
     SQLiteDatabase::TransactionScopeGuard transactionGuard(db);  // can throw
@@ -167,7 +168,7 @@ void WorkspaceLibraryScanner::scan() noexcept {
     if ((!mAbort) && (mSemaphore.available() == 0)) {
       transactionGuard.commit();  // can throw
       qDebug() << "Workspace library scan succeeded:" << count << "elements in"
-               << timer.elapsed() << "ms";
+               << timer.elapsed() << "ms.";
       emit scanSucceeded(count);
     } else {
       qDebug() << "Workspace library scan aborted after" << timer.elapsed()
@@ -197,7 +198,7 @@ void WorkspaceLibraryScanner::getLibrariesOfDirectory(
         qCritical() << "Error:" << e.getMsg();
       }
     } else {
-      qWarning() << "Directory is not a valid library:"
+      qWarning() << "Directory is not a valid library, ignoring it:"
                  << fs->getAbsPath(dirpath).toNative();
     }
   }
@@ -276,7 +277,8 @@ int WorkspaceLibraryScanner::addElementsToDb(
       addTranslationsToDb(writer, id, element);
       count++;
     } catch (const Exception& e) {
-      qWarning() << "Failed to open library element:" << absPath.toStr();
+      qWarning() << "Failed to open library element during scan:"
+                 << absPath.toNative();
     }
   }
   return count;

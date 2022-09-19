@@ -127,7 +127,8 @@ void TextGraphicsItem::textEdited(const Text& text,
       setRotationAndAlignment(text.getRotation(), text.getAlign());
       break;
     default:
-      qWarning() << "Unhandled switch-case in TextGraphicsItem::textEdited()";
+      qWarning() << "Unhandled switch-case in TextGraphicsItem::textEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

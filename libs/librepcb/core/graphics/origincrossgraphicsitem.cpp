@@ -127,7 +127,8 @@ void OriginCrossGraphicsItem::layerEdited(const GraphicsLayer& layer,
       break;
     default:
       qWarning()
-          << "Unhandled switch-case in OriginCrossGraphicsItem::layerEdited()";
+          << "Unhandled switch-case in OriginCrossGraphicsItem::layerEdited():"
+          << static_cast<int>(event);
       break;
   }
 }

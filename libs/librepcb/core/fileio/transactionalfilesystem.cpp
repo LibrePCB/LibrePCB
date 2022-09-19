@@ -50,7 +50,7 @@ TransactionalFileSystem::TransactionalFileSystem(
   // Load the backup if there is one (i.e. last save operation has failed).
   FilePath backupFile = mFilePath.getPathTo(".backup/backup.lp");
   if (backupFile.isExistingFile()) {
-    qDebug() << "Restoring file system from backup:" << backupFile.toNative();
+    qDebug() << "Restore file system from backup:" << backupFile.toNative();
     loadDiff(backupFile);  // can throw
   }
 
@@ -64,7 +64,7 @@ TransactionalFileSystem::TransactionalFileSystem(
   FilePath autosaveFile = mFilePath.getPathTo(".autosave/autosave.lp");
   if (autosaveFile.isExistingFile()) {
     if (restoreCallback && restoreCallback(mFilePath)) {  // can throw
-      qDebug() << "Restoring file system from autosave backup:"
+      qDebug() << "Restore file system from autosave backup:"
                << autosaveFile.toNative();
       loadDiff(autosaveFile);  // can throw
       mRestoredFromAutosave = true;
@@ -82,7 +82,7 @@ TransactionalFileSystem::~TransactionalFileSystem() noexcept {
     try {
       removeDiff("autosave");  // can throw
     } catch (const Exception& e) {
-      qWarning() << "Could not remove autosave directory:" << e.getMsg();
+      qWarning() << "Failed to remove autosave directory:" << e.getMsg();
     }
   }
 }

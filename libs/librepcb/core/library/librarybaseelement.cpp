@@ -136,7 +136,7 @@ LibraryBaseElement::LibraryBaseElement(
 
   // check if the UUID equals to the directory basename
   if (mDirectoryNameMustBeUuid && (mUuid.toStr() != dirUuidStr)) {
-    qDebug() << mUuid.toStr() << "!=" << dirUuidStr;
+    qDebug() << "UUID mismatch:" << mUuid.toStr() << "!=" << dirUuidStr;
     throw RuntimeError(
         __FILE__, __LINE__,
         QString(

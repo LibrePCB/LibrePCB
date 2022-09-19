@@ -129,7 +129,7 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
   // get device from library
   mLibDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
   if (!mLibDevice) {
-    qDebug() << mCompInstance->getUuid();
+    qCritical() << "No device for component:" << mCompInstance->getUuid();
     throw RuntimeError(__FILE__, __LINE__,
                        tr("No device with the UUID \"%1\" found in the "
                           "project's library.")
@@ -149,7 +149,7 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
   Uuid packageUuid = mLibDevice->getPackageUuid();
   mLibPackage = mBoard.getProject().getLibrary().getPackage(packageUuid);
   if (!mLibPackage) {
-    qDebug() << mCompInstance->getUuid();
+    qCritical() << "No package for component:" << mCompInstance->getUuid();
     throw RuntimeError(__FILE__, __LINE__,
                        tr("No package with the UUID \"%1\" found in "
                           "the project's library.")

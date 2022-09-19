@@ -496,7 +496,8 @@ void ComponentSymbolVariantItemListModel::itemListEdited(
       break;
     default:
       qWarning() << "Unhandled switch-case in "
-                    "ComponentSymbolVariantItemListModel::itemListEdited()";
+                    "ComponentSymbolVariantItemListModel::itemListEdited():"
+                 << static_cast<int>(event);
       break;
   }
 }

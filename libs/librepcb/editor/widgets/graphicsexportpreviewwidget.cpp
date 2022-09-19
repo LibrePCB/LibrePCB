@@ -198,7 +198,7 @@ void GraphicsExportWidget::setPageContent(
     updateItemPositions();
     updateScale();
   } else {
-    qWarning() << "GraphicsExportWidget: Page index out of bounds.";
+    qWarning() << "Graphics export preview page index out of bounds:" << index;
   }
 }
 

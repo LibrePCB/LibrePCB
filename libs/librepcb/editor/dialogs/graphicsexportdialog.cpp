@@ -877,8 +877,8 @@ void GraphicsExportDialog::syncClientSettings(
       }
     }
   } catch (const Exception& e) {
-    qCritical() << "GraphicsExportDialog: Failed to sync client settings.";
-    qCritical() << "GraphicsExportDialog:" << e.getMsg();
+    qCritical() << "Failed to sync graphics export dialog client settings:"
+                << e.getMsg();
   }
 }
 

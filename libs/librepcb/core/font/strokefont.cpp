@@ -43,7 +43,8 @@ StrokeFont::StrokeFont(const FilePath& fontFilePath,
                        const QByteArray& content) noexcept
   : QObject(nullptr), mFilePath(fontFilePath) {
   // load the font in another thread because it takes some time to load it
-  qDebug() << "Start loading font" << mFilePath.toNative();
+  qDebug() << "Start loading stroke font " << mFilePath.toNative()
+           << "in worker thread...";
   mFuture = QtConcurrent::run([content]() {
     QTextStream s(content);
     return fb::Font(s);
@@ -187,7 +188,7 @@ QVector<Path> StrokeFont::strokeGlyph(const QChar& glyph,
     spacing = convertLength(height, glyphSpacing);
     return polylines2paths(polylines, height);
   } catch (const fb::Exception& e) {
-    qWarning() << "Failed to load stroke font glyph" << glyph;
+    qWarning().nospace() << "Failed to load stroke font glyph " << glyph << ".";
     spacing = 0;
     return QVector<Path>();
   }
@@ -205,12 +206,12 @@ const fb::GlyphListAccessor& StrokeFont::accessor() const noexcept {
   if (!mFont) {
     try {
       mFont.reset(new fb::Font(mFuture.result()));  // can throw
-      qDebug() << "Successfully loaded font" << mFilePath.toNative() << "with"
-               << mFont->glyphs.count() << "glyphs";
+      qDebug() << "Successfully loaded stroke font" << mFilePath.toNative()
+               << "with" << mFont->glyphs.count() << "glyphs.";
     } catch (const fb::Exception& e) {
       mFont.reset(new fb::Font());
-      qCritical() << "Failed to load font" << mFilePath.toNative();
-      qCritical() << "Error:" << e.msg();
+      qCritical().nospace() << "Failed to load stroke font "
+                            << mFilePath.toNative() << ": " << e.msg();
     }
 
     mGlyphListCache.reset(new fb::GlyphListCache(mFont->glyphs));

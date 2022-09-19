@@ -162,7 +162,8 @@ void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
       break;
     default:
       qWarning()
-          << "Unhandled switch-case in FootprintPadGraphicsItem::padEdited()";
+          << "Unhandled switch-case in FootprintPadGraphicsItem::padEdited():"
+          << static_cast<int>(event);
       break;
   }
 }

@@ -213,7 +213,7 @@ void BomGeneratorDialog::updateTable() noexcept {
     mUi->tableWidget->resizeRowsToContents();
     mUi->lblSuccess->hide();
   } catch (Exception& e) {
-    qCritical() << e.getMsg();
+    qCritical() << "Failed to update BOM table widget:" << e.getMsg();
   }
 }
 

@@ -51,7 +51,8 @@ QString LengthUnit::toStr() const noexcept {
     case LengthUnit_t::Mils:
       return QString("mils");
     default:
-      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      qCritical() << "Unhandled switch-case in LengthUnit::toStr():"
+                  << static_cast<int>(mUnit);
       Q_ASSERT(false);
       return QString();
   }
@@ -70,7 +71,8 @@ QString LengthUnit::toStringTr() const noexcept {
     case LengthUnit_t::Mils:
       return tr("Mils");
     default:
-      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      qCritical() << "Unhandled switch-case in LengthUnit::toStringTr():"
+                  << static_cast<int>(mUnit);
       Q_ASSERT(false);
       return QString();
   }
@@ -89,7 +91,8 @@ QString LengthUnit::toShortStringTr() const noexcept {
     case LengthUnit_t::Mils:
       return "mils";
     default:
-      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      qCritical() << "Unhandled switch-case in LengthUnit::toShortStringTr():"
+                  << static_cast<int>(mUnit);
       Q_ASSERT(false);
       return QString();
   }
@@ -108,7 +111,9 @@ int LengthUnit::getReasonableNumberOfDecimals() const noexcept {
     case LengthUnit_t::Mils:
       return 2;
     default:
-      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      qCritical() << "Unhandled switch-case in "
+                     "LengthUnit::getReasonableNumberOfDecimals():"
+                  << static_cast<int>(mUnit);
       Q_ASSERT(false);
       return 3;
   }
@@ -127,7 +132,9 @@ QStringList LengthUnit::getUserInputSuffixes() const noexcept {
     case LengthUnit_t::Mils:
       return QStringList{"mils"};
     default:
-      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      qCritical()
+          << "Unhandled switch-case in LengthUnit::getUserInputSuffixes():"
+          << static_cast<int>(mUnit);
       Q_ASSERT(false);
       return QStringList();
   }
@@ -146,7 +153,8 @@ qreal LengthUnit::convertToUnit(const Length& length) const noexcept {
     case LengthUnit_t::Mils:
       return length.toMil();
     default:
-      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      qCritical() << "Unhandled switch-case in LengthUnit::convertToUnit():"
+                  << static_cast<int>(mUnit);
       Q_ASSERT(false);
       return 0;
   }
@@ -165,7 +173,8 @@ QPointF LengthUnit::convertToUnit(const Point& point) const noexcept {
     case LengthUnit_t::Mils:
       return point.toMilQPointF();
     default:
-      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      qCritical() << "Unhandled switch-case in LengthUnit::convertToUnit():"
+                  << static_cast<int>(mUnit);
       Q_ASSERT(false);
       return QPointF();
   }
@@ -184,7 +193,8 @@ Length LengthUnit::convertFromUnit(qreal length) const {
     case LengthUnit_t::Mils:
       return Length::fromMil(length);
     default:
-      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      qCritical() << "Unhandled switch-case in LengthUnit::convertFromUnit():"
+                  << static_cast<int>(mUnit);
       Q_ASSERT(false);
       return Length(0);
   }
@@ -203,7 +213,8 @@ Point LengthUnit::convertFromUnit(const QPointF& point) const {
     case LengthUnit_t::Mils:
       return Point::fromMil(point);
     default:
-      qCritical() << "invalid length unit:" << static_cast<int>(mUnit);
+      qCritical() << "Unhandled switch-case in LengthUnit::convertFromUnit():"
+                  << static_cast<int>(mUnit);
       Q_ASSERT(false);
       return Point(Length(0), Length(0));
   }

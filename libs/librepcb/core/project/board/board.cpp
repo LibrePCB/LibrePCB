@@ -270,7 +270,7 @@ Board::Board(Project& project,
         // an older, now incompatible revision). To avoid frustration, we just
         // ignore these errors and load the default settings instead...
         qCritical() << "Could not open board user settings, defaults will be "
-                       "used instead!";
+                       "used instead.";
         mUserSettings.reset(new BoardUserSettings(*this));
       }
 

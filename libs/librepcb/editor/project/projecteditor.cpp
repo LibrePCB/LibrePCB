@@ -188,7 +188,7 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
     if (filename.isEmpty()) return;
     if (!filename.endsWith(".lppz")) filename.append(".lppz");
     FilePath fp(filename);
-    qDebug() << "Export project to *.lppz:" << fp.toNative();
+    qDebug().nospace() << "Export project to " << fp.toNative() << "...";
 
     // Usually we save the project to the transactional file system (but not to
     // the disk!) before exporting the *.lppz since the user probably expects
@@ -212,7 +212,7 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
     };
     mProject.getDirectory().getFileSystem()->exportToZip(fp,
                                                          filter);  // can throw
-    qDebug() << "Project successfully exported.";
+    qDebug() << "Successfully exported project to *.lppz.";
   } catch (const Exception& e) {
     QMessageBox::critical(parent, tr("Error"), e.getMsg());
   }
@@ -248,7 +248,7 @@ bool ProjectEditor::saveProject() noexcept {
 
     // saving was successful --> clean the undo stack
     mUndoStack->setClean();
-    qDebug() << "Project successfully saved";
+    qDebug() << "Successfully saved project.";
     return true;
   } catch (Exception& exc) {
     QMessageBox::critical(0, tr("Error while saving the project"),
@@ -279,7 +279,7 @@ bool ProjectEditor::autosaveProject() noexcept {
     mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->autosave();  // can throw
     mLastAutosaveStateId = mUndoStack->getUniqueStateId();
-    qDebug() << "Project successfully autosaved";
+    qDebug() << "Successfully autosaved project.";
     return true;
   } catch (Exception& exc) {
     return false;

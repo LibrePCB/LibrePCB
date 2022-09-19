@@ -452,8 +452,7 @@ protected:  // Methods
       onElementEdited.notify(index, at(index), args...);
       onEdited.notify(index, at(index), Event::ElementEdited);
     } else {
-      qCritical() << "SerializableObjectList: Received notification from "
-                     "unknown element!";
+      qCritical() << "Received notification from unknown list element!";
     }
   }
   void throwKeyNotFoundException(const Uuid& key) const {

@@ -126,7 +126,8 @@ void FileDownload::finalizeRequest() {
     QString result = hash.result().toHex();
     QString expected = mExpectedChecksum.toHex();
     if (result != expected) {
-      qDebug() << "expected" << expected << "but got" << result;
+      qDebug().nospace() << "Expected checksum " << expected << " but got "
+                         << result << ".";
       throw RuntimeError(
           __FILE__, __LINE__,
           tr("Checksum verification of downloaded file failed!"));
