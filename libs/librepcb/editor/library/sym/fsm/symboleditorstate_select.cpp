@@ -82,6 +82,10 @@ SymbolEditorState_Select::~SymbolEditorState_Select() noexcept {
 
 bool SymbolEditorState_Select::exit() noexcept {
   processAbortCommand();
+
+  // Avoid propagating the selection to other, non-selectable tools.
+  clearSelectionRect(true);
+
   return true;
 }
 

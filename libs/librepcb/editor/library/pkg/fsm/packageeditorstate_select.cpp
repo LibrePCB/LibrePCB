@@ -83,6 +83,10 @@ PackageEditorState_Select::~PackageEditorState_Select() noexcept {
 
 bool PackageEditorState_Select::exit() noexcept {
   processAbortCommand();
+
+  // Avoid propagating the selection to other, non-selectable tools.
+  clearSelectionRect(true);
+
   return true;
 }
 

@@ -35,7 +35,6 @@
 
 #include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
 
@@ -75,8 +74,6 @@ PackageEditorState_DrawTextBase::~PackageEditorState_DrawTextBase() noexcept {
  ******************************************************************************/
 
 bool PackageEditorState_DrawTextBase::entry() noexcept {
-  mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-
   // populate command toolbar
   EditorCommandSet& cmd = EditorCommandSet::instance();
   if (mMode == Mode::TEXT) {

@@ -100,9 +100,6 @@ bool BoardEditorState_DrawTrace::entry() noexcept {
   Board* board = getActiveBoard();
   if (!board) return false;
 
-  // Clear board selection because selection does not make sense in this state
-  board->clearSelection();
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add wire mode actions to the "command" toolbar

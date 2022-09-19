@@ -92,6 +92,13 @@ bool SchematicEditorState_Select::exit() noexcept {
   mSelectedItemsDragCommand.reset();
   mCmdPolygonEdit.reset();
   mSubState = SubState::IDLE;
+
+  // Avoid propagating the selection to other, non-selectable tools, thus
+  // clearing the selection on *all* schematics.
+  foreach (Schematic* schematic, mContext.project.getSchematics()) {
+    schematic->clearSelection();
+  }
+
   return true;
 }
 
