@@ -90,6 +90,19 @@ public:
   // General Methods
 
   /**
+   * @brief Abort any active (blocking) tools in other editors
+   *
+   * If an undo command group is already active while starting a new tool, try
+   * to abort any active tool in other editors since it is annoying to block
+   * one editor by another editor (an error message would appear). However, do
+   * NOT abort tools in the own editor since this could lead to
+   * unexpected/wrong behavior (e.g. recursion)!
+   *
+   * @param editor  The calling editor, which will not be aborted.
+   */
+  void abortBlockingToolsInOtherEditors(QWidget* editor) noexcept;
+
+  /**
    * @brief Inform the editor that a project related window is about to close
    *
    * The project must be closed and destroyed automatically after the last

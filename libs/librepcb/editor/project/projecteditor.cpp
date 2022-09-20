@@ -124,6 +124,21 @@ const LengthUnit& ProjectEditor::getDefaultLengthUnit() const noexcept {
  *  General Methods
  ******************************************************************************/
 
+void ProjectEditor::abortBlockingToolsInOtherEditors(QWidget* editor) noexcept {
+  if (mUndoStack->isCommandGroupActive()) {
+    if (mSchematicEditor && (editor != mSchematicEditor)) {
+      mSchematicEditor->abortAllCommands();
+    }
+    if (mBoardEditor && (editor != mBoardEditor)) {
+      mBoardEditor->abortAllCommands();
+    }
+    if (mUndoStack->isCommandGroupActive()) {
+      qWarning() << "Requested to abort tools in other editors, but there is "
+                    "still an active undo command group.";
+    }
+  }
+}
+
 bool ProjectEditor::windowIsAboutToClose(QMainWindow& window) noexcept {
   if (getCountOfVisibleEditorWindows() > 1) {
     // this is not the last open window, so no problem to close it...

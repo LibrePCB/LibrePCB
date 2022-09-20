@@ -133,6 +133,9 @@ bool BoardEditorState_Select::exit() noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_Select::processImportDxf() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Board* board = getActiveBoard();
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
       (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (board)) {
@@ -232,6 +235,9 @@ bool BoardEditorState_Select::processSelectAll() noexcept {
 }
 
 bool BoardEditorState_Select::processCut() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
       (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     if (copySelectedItemsToClipboard()) {
@@ -244,6 +250,9 @@ bool BoardEditorState_Select::processCut() noexcept {
 }
 
 bool BoardEditorState_Select::processCopy() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
       (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     return copySelectedItemsToClipboard();
@@ -253,6 +262,9 @@ bool BoardEditorState_Select::processCopy() noexcept {
 }
 
 bool BoardEditorState_Select::processPaste() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Board* board = getActiveBoard();
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
       (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (board)) {
@@ -291,6 +303,9 @@ bool BoardEditorState_Select::processPaste() noexcept {
 }
 
 bool BoardEditorState_Select::processMove(const Point& delta) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
       (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     return moveSelectedItems(delta);
@@ -299,6 +314,9 @@ bool BoardEditorState_Select::processMove(const Point& delta) noexcept {
 }
 
 bool BoardEditorState_Select::processRotate(const Angle& rotation) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     return rotateSelectedItems(rotation);
   }
@@ -308,6 +326,9 @@ bool BoardEditorState_Select::processRotate(const Angle& rotation) noexcept {
 
 bool BoardEditorState_Select::processFlip(
     Qt::Orientation orientation) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
       mCmdPlaneEdit) {
     return false;
@@ -316,6 +337,9 @@ bool BoardEditorState_Select::processFlip(
 }
 
 bool BoardEditorState_Select::processSnapToGrid() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
       mCmdPlaneEdit) {
     return false;
@@ -324,6 +348,9 @@ bool BoardEditorState_Select::processSnapToGrid() noexcept {
 }
 
 bool BoardEditorState_Select::processResetAllTexts() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
       mCmdPlaneEdit) {
     return false;
@@ -332,6 +359,9 @@ bool BoardEditorState_Select::processResetAllTexts() noexcept {
 }
 
 bool BoardEditorState_Select::processRemove() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
       mCmdPlaneEdit) {
     return false;
@@ -340,6 +370,9 @@ bool BoardEditorState_Select::processRemove() noexcept {
 }
 
 bool BoardEditorState_Select::processEditProperties() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Board* board = getActiveBoard();
   if ((!board) || mIsUndoCmdActive || mSelectedItemsDragCommand ||
       mCmdPolygonEdit || mCmdPlaneEdit) {
@@ -421,6 +454,9 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Board* board = getActiveBoard();
   if (!board) return false;
 
@@ -534,6 +570,9 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
     QGraphicsSceneMouseEvent& e) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Board* board = getActiveBoard();
   if (!board) return false;
 
@@ -552,6 +591,9 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
 
 bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Board* board = getActiveBoard();
   if (!board) return false;
 

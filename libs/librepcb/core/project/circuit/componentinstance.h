@@ -98,6 +98,7 @@ public:
   int getUnplacedOptionalSymbolsCount() const noexcept;
   int getRegisteredElementsCount() const noexcept;
   bool isUsed() const noexcept;
+  bool isAddedToCircuit() const noexcept { return mIsAddedToCircuit; }
 
   // Setters
 

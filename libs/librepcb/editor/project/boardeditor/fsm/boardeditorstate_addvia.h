@@ -77,7 +77,7 @@ public:
       delete;
 
 private:  // Methods
-  bool addVia(Board& board, const Point& pos) noexcept;
+  bool addVia(const Point& pos) noexcept;
   bool updatePosition(Board& board, const Point& pos) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;
   bool fixPosition(Board& board, const Point& pos) noexcept;

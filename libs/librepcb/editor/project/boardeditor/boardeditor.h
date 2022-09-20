@@ -89,6 +89,7 @@ public:
 
   // General Methods
   void abortAllCommands() noexcept;
+  void abortBlockingToolsInOtherEditors() noexcept;
 
   // Operator Overloadings
   BoardEditor& operator=(const BoardEditor& rhs) = delete;

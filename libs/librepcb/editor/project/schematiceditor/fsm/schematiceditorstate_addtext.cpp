@@ -75,15 +75,12 @@ SchematicEditorState_AddText::~SchematicEditorState_AddText() noexcept {
 bool SchematicEditorState_AddText::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add a new stroke text
   Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
                                                                  true, true);
-  if (!addText(*schematic, pos)) return false;
+  if (!addText(pos)) return false;
 
   // Add the layers combobox to the toolbar
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
@@ -173,12 +170,9 @@ bool SchematicEditorState_AddText::processGraphicsSceneMouseMoved(
 
 bool SchematicEditorState_AddText::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
   fixPosition(pos);
-  addText(*schematic, pos);
+  addText(pos);
   return true;
 }
 
@@ -210,16 +204,20 @@ bool SchematicEditorState_AddText::processSwitchToSchematicPage(
  *  Private Methods
  ******************************************************************************/
 
-bool SchematicEditorState_AddText::addText(Schematic& schematic,
-                                           const Point& pos) noexcept {
+bool SchematicEditorState_AddText::addText(const Point& pos) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Q_ASSERT(mIsUndoCmdActive == false);
+  Schematic* schematic = getActiveSchematic();
+  if (!schematic) return false;
 
   try {
     mContext.undoStack.beginCmdGroup(tr("Add text to schematic"));
     mIsUndoCmdActive = true;
     mLastTextProperties.setPosition(pos);
-    mCurrentTextToPlace =
-        new SI_Text(schematic, Text(Uuid::createRandom(), mLastTextProperties));
+    mCurrentTextToPlace = new SI_Text(
+        *schematic, Text(Uuid::createRandom(), mLastTextProperties));
     QScopedPointer<CmdSchematicTextAdd> cmdAdd(
         new CmdSchematicTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());

@@ -424,6 +424,8 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(
 void UnplacedComponentsDock::setSelectedDeviceAsDefault() noexcept {
   if (mBoard && mSelectedComponent && mSelectedDeviceUuid) {
     try {
+      // Release undo stack.
+      mProjectEditor.abortBlockingToolsInOtherEditors(this);
       QScopedPointer<CmdComponentInstanceEdit> cmd(new CmdComponentInstanceEdit(
           mProject.getCircuit(), *mSelectedComponent));
       if (mSelectedComponent->getDefaultDeviceUuid() == mSelectedDeviceUuid) {
@@ -486,6 +488,7 @@ void UnplacedComponentsDock::autoAddDevicesToBoard(
     bool onlyWithPreSelectedDevice,
     const tl::optional<Uuid>& libCmpUuidFilter) noexcept {
   Q_ASSERT(mBoard);
+  mProjectEditor.abortBlockingToolsInOtherEditors(this);  // Release undo stack.
   QScopedPointer<UndoCommandGroup> cmd(
       new UndoCommandGroup(tr("Add devices to board")));
 

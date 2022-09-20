@@ -260,6 +260,10 @@ void BoardEditor::abortAllCommands() noexcept {
   mFsm->processAbortCommand();
 }
 
+void BoardEditor::abortBlockingToolsInOtherEditors() noexcept {
+  mProjectEditor.abortBlockingToolsInOtherEditors(this);
+}
+
 /*******************************************************************************
  *  Inherited Methods
  ******************************************************************************/
@@ -346,6 +350,7 @@ void BoardEditor::createActions() noexcept {
       this, &mProjectEditor, &ProjectEditor::showControlPanelClicked));
   mActionProjectProperties.reset(
       cmd.projectProperties.createAction(this, this, [this]() {
+        abortBlockingToolsInOtherEditors();  // Release undo stack.
         ProjectPropertiesEditorDialog dialog(
             mProject.getMetadata(), mProjectEditor.getUndoStack(), this);
         dialog.exec();
@@ -365,6 +370,7 @@ void BoardEditor::createActions() noexcept {
   mActionLayerStack.reset(cmd.layerStack.createAction(this, this, [this]() {
     try {
       if (Board* board = getActiveBoard()) {
+        abortBlockingToolsInOtherEditors();  // Release undo stack.
         BoardLayerStackSetupDialog dialog(board->getLayerStack(),
                                           mProjectEditor.getUndoStack(), this);
         dialog.exec();
@@ -1139,6 +1145,7 @@ void BoardEditor::newBoard() noexcept {
   if (!ok) return;
 
   try {
+    abortBlockingToolsInOtherEditors();  // Release undo stack.
     CmdBoardAdd* cmd =
         new CmdBoardAdd(mProject, ElementName(name));  // can throw
     mProjectEditor.getUndoStack().execCmd(cmd);
@@ -1159,6 +1166,7 @@ void BoardEditor::copyBoard() noexcept {
   if (!ok) return;
 
   try {
+    abortBlockingToolsInOtherEditors();  // Release undo stack.
     CmdBoardAdd* cmd =
         new CmdBoardAdd(mProject, *board, ElementName(name));  // can throw
     mProjectEditor.getUndoStack().execCmd(cmd);
@@ -1179,6 +1187,7 @@ void BoardEditor::removeBoard() noexcept {
   if (btn != QMessageBox::Yes) return;
 
   try {
+    abortBlockingToolsInOtherEditors();  // Release undo stack.
     mProjectEditor.getUndoStack().execCmd(new CmdBoardRemove(*board));
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
@@ -1215,6 +1224,7 @@ void BoardEditor::execDesignRulesDialog() noexcept {
   if (!board) return;
 
   try {
+    abortBlockingToolsInOtherEditors();  // Release undo stack.
     BoardDesignRules originalRules = board->getDesignRules();
     BoardDesignRulesDialog dialog(board->getDesignRules(),
                                   mProjectEditor.getDefaultLengthUnit(),

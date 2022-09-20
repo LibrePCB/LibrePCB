@@ -85,13 +85,10 @@ BoardEditorState_AddVia::~BoardEditorState_AddVia() noexcept {
 bool BoardEditorState_AddVia::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   // Add a new via
   Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
                                                                  true, true);
-  if (!addVia(*board, pos)) return false;
+  if (!addVia(pos)) return false;
 
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
@@ -226,7 +223,7 @@ bool BoardEditorState_AddVia::processGraphicsSceneLeftMouseButtonPressed(
 
   Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
   fixPosition(*board, pos);
-  addVia(*board, pos);
+  addVia(pos);
   return true;
 }
 
@@ -239,14 +236,19 @@ bool BoardEditorState_AddVia::processGraphicsSceneLeftMouseButtonDoubleClicked(
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_AddVia::addVia(Board& board, const Point& pos) noexcept {
+bool BoardEditorState_AddVia::addVia(const Point& pos) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Q_ASSERT(mIsUndoCmdActive == false);
+  Board* board = getActiveBoard();
+  if (!board) return false;
 
   try {
     mContext.undoStack.beginCmdGroup(tr("Add via to board"));
     mIsUndoCmdActive = true;
     CmdBoardNetSegmentAdd* cmdAddSeg =
-        new CmdBoardNetSegmentAdd(board, getCurrentNetSignal());
+        new CmdBoardNetSegmentAdd(*board, getCurrentNetSignal());
     mContext.undoStack.appendToCmdGroup(cmdAddSeg);
     BI_NetSegment* netsegment = cmdAddSeg->getNetSegment();
     Q_ASSERT(netsegment);
