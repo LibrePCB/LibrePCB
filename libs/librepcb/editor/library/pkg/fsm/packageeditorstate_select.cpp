@@ -83,23 +83,24 @@ PackageEditorState_Select::~PackageEditorState_Select() noexcept {
 
 bool PackageEditorState_Select::exit() noexcept {
   processAbortCommand();
+
+  // Avoid propagating the selection to other, non-selectable tools.
+  clearSelectionRect(true);
+
   return true;
 }
 
 QSet<EditorWidgetBase::Feature>
     PackageEditorState_Select::getAvailableFeatures() const noexcept {
   QSet<EditorWidgetBase::Feature> features;
+  // The abort command is always enabled to clear the selection.
+  features |= EditorWidgetBase::Feature::Abort;
   if (mState != SubState::PASTING) {
     features |= EditorWidgetBase::Feature::SelectGraphics;
     if (!mContext.editorContext.readOnly) {
       features |= EditorWidgetBase::Feature::ImportGraphics;
       features |= EditorWidgetBase::Feature::Paste;
     }
-  }
-  if (((mState == SubState::MOVING) && (mCmdDragSelectedItems)) ||
-      (mState == SubState::PASTING) ||
-      ((mState == SubState::MOVING_POLYGON_VERTEX) && (mCmdPolygonEdit))) {
-    features |= EditorWidgetBase::Feature::Abort;
   }
   if (mContext.currentGraphicsItem) {
     CmdDragSelectedFootprintItems cmd(mContext);
@@ -609,7 +610,10 @@ bool PackageEditorState_Select::processAbortCommand() noexcept {
         return false;
       }
     }
-    default: { return false; }
+    default: {
+      clearSelectionRect(true);  // Clear selection, if any.
+      return true;
+    }
   }
 }
 

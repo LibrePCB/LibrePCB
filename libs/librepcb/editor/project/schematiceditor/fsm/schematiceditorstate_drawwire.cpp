@@ -83,12 +83,6 @@ SchematicEditorState_DrawWire::~SchematicEditorState_DrawWire() noexcept {
 bool SchematicEditorState_DrawWire::entry() noexcept {
   Q_ASSERT(mSubState == SubState::IDLE);
 
-  // clear schematic selection because selection does not make sense in this
-  // state
-  if (Schematic* schematic = getActiveSchematic()) {
-    schematic->clearSelection();
-  }
-
   // Add wire mode actions to the "command" toolbar
   EditorCommandSet& cmd = EditorCommandSet::instance();
   mWireModeActionGroup = new QActionGroup(&mContext.commandToolBar);

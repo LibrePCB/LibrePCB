@@ -30,7 +30,6 @@
 #include "../symbolgraphicsitem.h"
 #include "../symbolpingraphicsitem.h"
 
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/library/sym/symbolpin.h>
 
@@ -65,8 +64,6 @@ SymbolEditorState_AddPins::~SymbolEditorState_AddPins() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_AddPins::entry() noexcept {
-  mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // populate command toolbar

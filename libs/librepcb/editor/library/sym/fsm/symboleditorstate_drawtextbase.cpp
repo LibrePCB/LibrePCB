@@ -34,7 +34,6 @@
 
 #include <librepcb/core/geometry/text.h>
 #include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/textgraphicsitem.h>
 #include <librepcb/core/library/sym/symbol.h>
 
@@ -72,8 +71,6 @@ SymbolEditorState_DrawTextBase::~SymbolEditorState_DrawTextBase() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_DrawTextBase::entry() noexcept {
-  mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // populate command toolbar

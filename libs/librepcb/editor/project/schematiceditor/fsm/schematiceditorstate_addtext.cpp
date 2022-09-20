@@ -78,10 +78,6 @@ bool SchematicEditorState_AddText::entry() noexcept {
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
-  // Clear schematic selection because selection does not make sense in this
-  // state
-  schematic->clearSelection();
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add a new stroke text

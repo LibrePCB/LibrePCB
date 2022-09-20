@@ -86,9 +86,6 @@ bool BoardEditorState_DrawPlane::entry() noexcept {
     return false;
   }
 
-  // Clear board selection because selection does not make sense in this state
-  board->clearSelection();
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the netsignals combobox to the toolbar

@@ -79,9 +79,6 @@ bool BoardEditorState_DrawPolygon::entry() noexcept {
   Board* board = getActiveBoard();
   if (!board) return false;
 
-  // Clear board selection because selection does not make sense in this state
-  board->clearSelection();
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the layers combobox to the toolbar

@@ -119,6 +119,12 @@ bool BoardEditorState_Select::exit() noexcept {
   // Abort the currently active command
   if (!abortCommand(true)) return false;
 
+  // Avoid propagating the selection to other, non-selectable tools, thus
+  // clearing the selection on *all* boards.
+  foreach (Board* board, mContext.project.getBoards()) {
+    board->clearSelection();
+  }
+
   return true;
 }
 
@@ -362,7 +368,11 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
 }
 
 bool BoardEditorState_Select::processAbortCommand() noexcept {
-  return abortCommand(true);
+  abortCommand(true);
+  if (Board* board = getActiveBoard()) {
+    board->clearSelection();
+  }
+  return true;
 }
 
 bool BoardEditorState_Select::processGraphicsSceneMouseMoved(

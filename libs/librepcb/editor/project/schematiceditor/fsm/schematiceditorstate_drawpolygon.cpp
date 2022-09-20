@@ -79,10 +79,6 @@ bool SchematicEditorState_DrawPolygon::entry() noexcept {
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
-  // Clear schematic selection because selection does not make sense in this
-  // state
-  schematic->clearSelection();
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the layers combobox to the toolbar
