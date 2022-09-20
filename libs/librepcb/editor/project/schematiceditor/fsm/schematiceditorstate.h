@@ -144,6 +144,7 @@ protected:  // Methods
   PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getDefaultLengthUnit() const noexcept;
   QList<GraphicsLayer*> getAllowedGeometryLayers() const noexcept;
+  void abortBlockingToolsInOtherEditors() noexcept;
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;
 

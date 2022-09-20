@@ -156,6 +156,7 @@ protected:  // Methods
   const LengthUnit& getDefaultLengthUnit() const noexcept;
   QList<GraphicsLayer*> getAllowedGeometryLayers(const Board& board) const
       noexcept;
+  void abortBlockingToolsInOtherEditors() noexcept;
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;
 

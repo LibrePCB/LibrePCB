@@ -80,7 +80,7 @@ public:
       delete;
 
 private:  // Methods
-  bool startAddPlane(Board& board, const Point& pos) noexcept;
+  bool startAddPlane(const Point& pos) noexcept;
   bool addSegment(const Point& pos) noexcept;
   bool updateLastVertexPosition(const Point& pos) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;

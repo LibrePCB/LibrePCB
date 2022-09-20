@@ -83,6 +83,10 @@ QList<GraphicsLayer*> SchematicEditorState::getAllowedGeometryLayers() const
   });
 }
 
+void SchematicEditorState::abortBlockingToolsInOtherEditors() noexcept {
+  mContext.editor.abortBlockingToolsInOtherEditors();
+}
+
 bool SchematicEditorState::execCmd(UndoCommand* cmd) {
   return mContext.undoStack.execCmd(cmd);
 }

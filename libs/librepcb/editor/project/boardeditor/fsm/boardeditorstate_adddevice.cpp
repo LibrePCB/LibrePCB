@@ -30,6 +30,7 @@
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
 
 #include <QtCore>
 
@@ -151,8 +152,15 @@ bool BoardEditorState_AddDevice::processGraphicsSceneRightMouseButtonReleased(
 bool BoardEditorState_AddDevice::addDevice(ComponentInstance& cmp,
                                            const Uuid& dev,
                                            const Uuid& fpt) noexcept {
+  QPointer<ComponentInstance> cmpPtr = &cmp;
+
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
+  // Discarding temporary changes could have deleted the component, so let's
+  // check it again.
   Board* board = getActiveBoard();
-  if (!board) return false;
+  if ((!board) || (!cmpPtr) || (!cmp.isAddedToCircuit())) return false;
 
   try {
     // start a new command

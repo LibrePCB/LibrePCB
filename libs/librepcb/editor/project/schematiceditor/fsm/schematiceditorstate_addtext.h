@@ -84,7 +84,7 @@ public:
       const SchematicEditorState_AddText& rhs) = delete;
 
 private:  // Methods
-  bool addText(Schematic& schematic, const Point& pos) noexcept;
+  bool addText(const Point& pos) noexcept;
   bool rotateText(const Angle& angle) noexcept;
   bool updatePosition(const Point& pos) noexcept;
   bool fixPosition(const Point& pos) noexcept;

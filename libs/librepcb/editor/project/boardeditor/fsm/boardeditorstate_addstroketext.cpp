@@ -80,22 +80,21 @@ BoardEditorState_AddStrokeText::~BoardEditorState_AddStrokeText() noexcept {
 bool BoardEditorState_AddStrokeText::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   makeLayerVisible();
 
   // Add a new stroke text
   Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
                                                                  true, true);
-  if (!addText(*board, pos)) return false;
+  if (!addText(pos)) return false;
 
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the layers combobox to the toolbar
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
   mLayerComboBox = new GraphicsLayerComboBox();
-  mLayerComboBox->setLayers(getAllowedGeometryLayers(*board));
+  if (Board* board = getActiveBoard()) {
+    mLayerComboBox->setLayers(getAllowedGeometryLayers(*board));
+  }
   mLayerComboBox->setCurrentLayer(mLastStrokeTextProperties.getLayerName());
   mLayerComboBox->addAction(cmd.layerUp.createAction(
       mLayerComboBox, mLayerComboBox.data(), &GraphicsLayerComboBox::stepDown));
@@ -182,12 +181,9 @@ bool BoardEditorState_AddStrokeText::processGraphicsSceneMouseMoved(
 
 bool BoardEditorState_AddStrokeText::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
   fixPosition(pos);
-  addText(*board, pos);
+  addText(pos);
   return true;
 }
 
@@ -214,16 +210,20 @@ bool BoardEditorState_AddStrokeText::
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_AddStrokeText::addText(Board& board,
-                                             const Point& pos) noexcept {
+bool BoardEditorState_AddStrokeText::addText(const Point& pos) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Q_ASSERT(mIsUndoCmdActive == false);
+  Board* board = getActiveBoard();
+  if (!board) return false;
 
   try {
     mContext.undoStack.beginCmdGroup(tr("Add text to board"));
     mIsUndoCmdActive = true;
     mLastStrokeTextProperties.setPosition(pos);
     mCurrentTextToPlace = new BI_StrokeText(
-        board, StrokeText(Uuid::createRandom(), mLastStrokeTextProperties));
+        *board, StrokeText(Uuid::createRandom(), mLastStrokeTextProperties));
     QScopedPointer<CmdBoardStrokeTextAdd> cmdAdd(
         new CmdBoardStrokeTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());

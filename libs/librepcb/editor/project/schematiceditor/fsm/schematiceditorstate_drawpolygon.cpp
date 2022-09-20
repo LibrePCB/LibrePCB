@@ -76,9 +76,6 @@ SchematicEditorState_DrawPolygon::~SchematicEditorState_DrawPolygon() noexcept {
 bool SchematicEditorState_DrawPolygon::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the layers combobox to the toolbar
@@ -157,14 +154,11 @@ bool SchematicEditorState_DrawPolygon::processGraphicsSceneMouseMoved(
 bool SchematicEditorState_DrawPolygon::
     processGraphicsSceneLeftMouseButtonPressed(
         QGraphicsSceneMouseEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
   if (mIsUndoCmdActive) {
     addSegment(pos);
   } else {
-    startAddPolygon(*schematic, pos);
+    startAddPolygon(pos);
   }
   return true;
 }
@@ -186,8 +180,13 @@ bool SchematicEditorState_DrawPolygon::processSwitchToSchematicPage(
  ******************************************************************************/
 
 bool SchematicEditorState_DrawPolygon::startAddPolygon(
-    Schematic& schematic, const Point& pos) noexcept {
+    const Point& pos) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Q_ASSERT(mIsUndoCmdActive == false);
+  Schematic* schematic = getActiveSchematic();
+  if (!schematic) return false;
 
   try {
     // Start a new undo command
@@ -197,7 +196,7 @@ bool SchematicEditorState_DrawPolygon::startAddPolygon(
     // Add polygon with two vertices
     mLastPolygonProperties.setPath(Path({Vertex(pos), Vertex(pos)}));
     mCurrentPolygon = new SI_Polygon(
-        schematic, Polygon(Uuid::createRandom(), mLastPolygonProperties));
+        *schematic, Polygon(Uuid::createRandom(), mLastPolygonProperties));
     mContext.undoStack.appendToCmdGroup(
         new CmdSchematicPolygonAdd(*mCurrentPolygon));
 

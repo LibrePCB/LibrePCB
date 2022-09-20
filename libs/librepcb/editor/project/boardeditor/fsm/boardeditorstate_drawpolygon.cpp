@@ -76,16 +76,15 @@ BoardEditorState_DrawPolygon::~BoardEditorState_DrawPolygon() noexcept {
 bool BoardEditorState_DrawPolygon::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the layers combobox to the toolbar
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
-  layerComboBox->setLayers(getAllowedGeometryLayers(*board));
+  if (Board* board = getActiveBoard()) {
+    layerComboBox->setLayers(getAllowedGeometryLayers(*board));
+  }
   layerComboBox->setCurrentLayer(mLastPolygonProperties.getLayerName());
   layerComboBox->addAction(
       cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
@@ -156,14 +155,11 @@ bool BoardEditorState_DrawPolygon::processGraphicsSceneMouseMoved(
 
 bool BoardEditorState_DrawPolygon::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
   if (mIsUndoCmdActive) {
     addSegment(pos);
   } else {
-    startAddPolygon(*board, pos);
+    startAddPolygon(pos);
   }
   return true;
 }
@@ -183,9 +179,13 @@ bool BoardEditorState_DrawPolygon::processSwitchToBoard(int index) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_DrawPolygon::startAddPolygon(Board& board,
-                                                   const Point& pos) noexcept {
+bool BoardEditorState_DrawPolygon::startAddPolygon(const Point& pos) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Q_ASSERT(mIsUndoCmdActive == false);
+  Board* board = getActiveBoard();
+  if (!board) return false;
 
   try {
     // Start a new undo command
@@ -195,7 +195,7 @@ bool BoardEditorState_DrawPolygon::startAddPolygon(Board& board,
     // Add polygon with two vertices
     mLastPolygonProperties.setPath(Path({Vertex(pos), Vertex(pos)}));
     mCurrentPolygon = new BI_Polygon(
-        board, Polygon(Uuid::createRandom(), mLastPolygonProperties));
+        *board, Polygon(Uuid::createRandom(), mLastPolygonProperties));
     mContext.undoStack.appendToCmdGroup(
         new CmdBoardPolygonAdd(*mCurrentPolygon));
 
