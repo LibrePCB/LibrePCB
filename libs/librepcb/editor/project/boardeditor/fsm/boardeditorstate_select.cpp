@@ -368,7 +368,11 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
 }
 
 bool BoardEditorState_Select::processAbortCommand() noexcept {
-  return abortCommand(true);
+  abortCommand(true);
+  if (Board* board = getActiveBoard()) {
+    board->clearSelection();
+  }
+  return true;
 }
 
 bool BoardEditorState_Select::processGraphicsSceneMouseMoved(

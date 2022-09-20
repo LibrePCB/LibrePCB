@@ -192,6 +192,12 @@ bool SchematicEditorState_Select::processEditProperties() noexcept {
 bool SchematicEditorState_Select::processAbortCommand() noexcept {
   try {
     switch (mSubState) {
+      case SubState::IDLE: {
+        if (Schematic* schematic = getActiveSchematic()) {
+          schematic->clearSelection();
+        }
+        return true;
+      }
       case SubState::PASTING: {
         Q_ASSERT(!mSelectedItemsDragCommand.isNull());
         mContext.undoStack.abortCmdGroup();
