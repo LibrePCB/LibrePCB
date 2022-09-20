@@ -97,9 +97,6 @@ BoardEditorState_DrawTrace::~BoardEditorState_DrawTrace() noexcept {
 bool BoardEditorState_DrawTrace::entry() noexcept {
   Q_ASSERT(mSubState == SubState_Idle);
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add wire mode actions to the "command" toolbar
@@ -163,9 +160,11 @@ bool BoardEditorState_DrawTrace::entry() noexcept {
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
   mLayerComboBox = new GraphicsLayerComboBox();
   QList<GraphicsLayer*> layers;
-  foreach (GraphicsLayer* layer, board->getLayerStack().getAllLayers()) {
-    if (layer->isCopperLayer() && layer->isEnabled()) {
-      layers.append(layer);
+  if (Board* board = getActiveBoard()) {
+    foreach (GraphicsLayer* layer, board->getLayerStack().getAllLayers()) {
+      if (layer->isCopperLayer() && layer->isEnabled()) {
+        layers.append(layer);
+      }
     }
   }
   mLayerComboBox->setLayers(layers);
@@ -401,6 +400,9 @@ bool BoardEditorState_DrawTrace::processSwitchToBoard(int index) noexcept {
 bool BoardEditorState_DrawTrace::startPositioning(
     Board& board, const Point& pos, BI_NetPoint* fixedPoint, BI_Via* fixedVia,
     BI_FootprintPad* fixedPad) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Point posOnGrid = pos.mappedToGrid(getGridInterval());
   mTargetPos = mCursorPos.mappedToGrid(getGridInterval());
 

@@ -63,9 +63,6 @@ SchematicEditorState_AddNetLabel::~SchematicEditorState_AddNetLabel() noexcept {
 bool SchematicEditorState_AddNetLabel::entry() noexcept {
   Q_ASSERT(mUndoCmdActive == false);
 
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);
   return true;
 }
@@ -100,30 +97,24 @@ bool SchematicEditorState_AddNetLabel::processGraphicsSceneMouseMoved(
 bool SchematicEditorState_AddNetLabel::
     processGraphicsSceneLeftMouseButtonPressed(
         QGraphicsSceneMouseEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   Point pos = Point::fromPx(e.scenePos());
 
   if (mUndoCmdActive) {
     return fixLabel(pos);
   } else {
-    return addLabel(*schematic, pos);
+    return addLabel(pos);
   }
 }
 
 bool SchematicEditorState_AddNetLabel::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
         QGraphicsSceneMouseEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   Point pos = Point::fromPx(e.scenePos());
 
   if (mUndoCmdActive) {
     return fixLabel(pos);
   } else {
-    return addLabel(*schematic, pos);
+    return addLabel(pos);
   }
 }
 
@@ -164,13 +155,17 @@ bool SchematicEditorState_AddNetLabel::processRotate(
  *  Private Methods
  ******************************************************************************/
 
-bool SchematicEditorState_AddNetLabel::addLabel(Schematic& schematic,
-                                                const Point& pos) noexcept {
+bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Q_ASSERT(mUndoCmdActive == false);
+  Schematic* schematic = getActiveSchematic();
+  if (!schematic) return false;
 
   try {
     QList<SI_NetLine*> netlinesUnderCursor =
-        schematic.getNetLinesAtScenePos(pos);
+        schematic->getNetLinesAtScenePos(pos);
     if (netlinesUnderCursor.isEmpty()) return false;
     SI_NetSegment& netsegment = netlinesUnderCursor.first()->getNetSegment();
 

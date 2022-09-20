@@ -80,7 +80,7 @@ public:
       const SchematicEditorState_AddNetLabel& rhs) = delete;
 
 private:  // Methods
-  bool addLabel(Schematic& schematic, const Point& pos) noexcept;
+  bool addLabel(const Point& pos) noexcept;
   bool updateLabel(const Point& pos) noexcept;
   bool fixLabel(const Point& pos) noexcept;
 

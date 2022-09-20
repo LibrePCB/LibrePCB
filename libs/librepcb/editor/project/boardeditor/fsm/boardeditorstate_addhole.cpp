@@ -65,15 +65,12 @@ BoardEditorState_AddHole::~BoardEditorState_AddHole() noexcept {
 bool BoardEditorState_AddHole::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   makeLayerVisible();
 
   // Add a new hole
   Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
                                                                  true, true);
-  if (!addHole(*board, pos)) return false;
+  if (!addHole(pos)) return false;
 
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
@@ -116,12 +113,9 @@ bool BoardEditorState_AddHole::processGraphicsSceneMouseMoved(
 
 bool BoardEditorState_AddHole::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
   fixPosition(pos);
-  addHole(*board, pos);
+  addHole(pos);
   return true;
 }
 
@@ -134,15 +128,19 @@ bool BoardEditorState_AddHole::processGraphicsSceneLeftMouseButtonDoubleClicked(
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_AddHole::addHole(Board& board,
-                                       const Point& pos) noexcept {
+bool BoardEditorState_AddHole::addHole(const Point& pos) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Q_ASSERT(mIsUndoCmdActive == false);
+  Board* board = getActiveBoard();
+  if (!board) return false;
 
   try {
     mContext.undoStack.beginCmdGroup(tr("Add hole to board"));
     mIsUndoCmdActive = true;
     mCurrentHoleToPlace =
-        new BI_Hole(board, Hole(Uuid::createRandom(), pos, mLastDiameter));
+        new BI_Hole(*board, Hole(Uuid::createRandom(), pos, mLastDiameter));
     QScopedPointer<CmdBoardHoleAdd> cmdAdd(
         new CmdBoardHoleAdd(*mCurrentHoleToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());

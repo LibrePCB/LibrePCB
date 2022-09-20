@@ -111,6 +111,9 @@ bool SchematicEditorState_Select::processSelectAll() noexcept {
 }
 
 bool SchematicEditorState_Select::processCut() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if (mSubState == SubState::IDLE) {
     return copySelectedItemsToClipboard() && removeSelectedItems();
   }
@@ -118,6 +121,9 @@ bool SchematicEditorState_Select::processCut() noexcept {
 }
 
 bool SchematicEditorState_Select::processCopy() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if (mSubState == SubState::IDLE) {
     return copySelectedItemsToClipboard();
   }
@@ -125,6 +131,9 @@ bool SchematicEditorState_Select::processCopy() noexcept {
 }
 
 bool SchematicEditorState_Select::processPaste() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if (mSubState == SubState::IDLE) {
     return pasteFromClipboard();
   }
@@ -132,6 +141,9 @@ bool SchematicEditorState_Select::processPaste() noexcept {
 }
 
 bool SchematicEditorState_Select::processMove(const Point& delta) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if (mSubState == SubState::IDLE) {
     return moveSelectedItems(delta);
   }
@@ -140,15 +152,24 @@ bool SchematicEditorState_Select::processMove(const Point& delta) noexcept {
 
 bool SchematicEditorState_Select::processRotate(
     const Angle& rotation) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   return rotateSelectedItems(rotation);
 }
 
 bool SchematicEditorState_Select::processMirror(
     Qt::Orientation orientation) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   return mirrorSelectedItems(orientation);
 }
 
 bool SchematicEditorState_Select::processRemove() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if (mSubState == SubState::IDLE) {
     removeSelectedItems();
     return true;
@@ -157,6 +178,9 @@ bool SchematicEditorState_Select::processRemove() noexcept {
 }
 
 bool SchematicEditorState_Select::processEditProperties() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Schematic* schematic = getActiveSchematic();
   if ((!schematic) || (mSubState != SubState::IDLE)) {
     return false;
@@ -227,6 +251,9 @@ bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
 
 bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& mouseEvent) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
@@ -285,6 +312,9 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 
 bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
@@ -313,6 +343,9 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 bool SchematicEditorState_Select::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
         QGraphicsSceneMouseEvent& e) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
@@ -333,6 +366,9 @@ bool SchematicEditorState_Select::
 
 bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   if (mSelectedItemsDragCommand) {
     return rotateSelectedItems(Angle::deg90());
   }

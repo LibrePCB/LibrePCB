@@ -102,6 +102,10 @@ QList<GraphicsLayer*> BoardEditorState::getAllowedGeometryLayers(
   });
 }
 
+void BoardEditorState::abortBlockingToolsInOtherEditors() noexcept {
+  mContext.editor.abortBlockingToolsInOtherEditors();
+}
+
 bool BoardEditorState::execCmd(UndoCommand* cmd) {
   return mContext.undoStack.execCmd(cmd);
 }

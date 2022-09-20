@@ -85,14 +85,10 @@ BoardEditorState_AddVia::~BoardEditorState_AddVia() noexcept {
 bool BoardEditorState_AddVia::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   // Add a new via
   Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
                                                                  true, true);
-  updateClosestNetSignal(*board, pos);
-  if (!addVia(*board, pos)) return false;
+  if (!addVia(pos)) return false;
 
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
@@ -226,7 +222,7 @@ bool BoardEditorState_AddVia::processGraphicsSceneLeftMouseButtonPressed(
 
   Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
   fixPosition(*board, pos);
-  addVia(*board, pos);
+  addVia(pos);
   return true;
 }
 
@@ -239,18 +235,27 @@ bool BoardEditorState_AddVia::processGraphicsSceneLeftMouseButtonDoubleClicked(
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_AddVia::addVia(Board& board, const Point& pos) noexcept {
+bool BoardEditorState_AddVia::addVia(const Point& pos) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Q_ASSERT(mIsUndoCmdActive == false);
+  Board* board = getActiveBoard();
+  if (!board) return false;
 
   try {
     mContext.undoStack.beginCmdGroup(tr("Add via to board"));
     mIsUndoCmdActive = true;
     NetSignal* netsignal = getCurrentNetSignal();
     if (!netsignal) {
+      updateClosestNetSignal(*board, pos);
+      netsignal = getCurrentNetSignal();
+    }
+    if (!netsignal) {
       throw RuntimeError(__FILE__, __LINE__, tr("No net signal selected."));
     }
     CmdBoardNetSegmentAdd* cmdAddSeg =
-        new CmdBoardNetSegmentAdd(board, *netsignal);
+        new CmdBoardNetSegmentAdd(*board, *netsignal);
     mContext.undoStack.appendToCmdGroup(cmdAddSeg);
     BI_NetSegment* netsegment = cmdAddSeg->getNetSegment();
     Q_ASSERT(netsegment);

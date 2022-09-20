@@ -71,9 +71,6 @@ BoardEditorState_DrawPlane::~BoardEditorState_DrawPlane() noexcept {
 bool BoardEditorState_DrawPlane::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   // Get most used net signal
   if ((!mLastNetSignal) || (!mLastNetSignal->isAddedToCircuit())) {
     mLastNetSignal =
@@ -112,9 +109,11 @@ bool BoardEditorState_DrawPlane::entry() noexcept {
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
   QList<GraphicsLayer*> layers;
-  foreach (GraphicsLayer* layer, board->getLayerStack().getAllLayers()) {
-    if (layer->isCopperLayer() && layer->isEnabled()) {
-      layers.append(layer);
+  if (Board* board = getActiveBoard()) {
+    foreach (GraphicsLayer* layer, board->getLayerStack().getAllLayers()) {
+      if (layer->isCopperLayer() && layer->isEnabled()) {
+        layers.append(layer);
+      }
     }
   }
   layerComboBox->setLayers(layers);
@@ -166,14 +165,11 @@ bool BoardEditorState_DrawPlane::processGraphicsSceneMouseMoved(
 
 bool BoardEditorState_DrawPlane::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
   if (mIsUndoCmdActive) {
     addSegment(pos);
   } else {
-    startAddPlane(*board, pos);
+    startAddPlane(pos);
   }
   return true;
 }
@@ -193,9 +189,13 @@ bool BoardEditorState_DrawPlane::processSwitchToBoard(int index) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-bool BoardEditorState_DrawPlane::startAddPlane(Board& board,
-                                               const Point& pos) noexcept {
+bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Q_ASSERT(mIsUndoCmdActive == false);
+  Board* board = getActiveBoard();
+  if (!board) return false;
 
   try {
     // Start a new undo command
@@ -204,7 +204,7 @@ bool BoardEditorState_DrawPlane::startAddPlane(Board& board,
 
     // Add plane with two vertices
     Path path({Vertex(pos), Vertex(pos)});
-    mCurrentPlane = new BI_Plane(board, Uuid::createRandom(), mLastLayerName,
+    mCurrentPlane = new BI_Plane(*board, Uuid::createRandom(), mLastLayerName,
                                  *mLastNetSignal, path);
     mContext.undoStack.appendToCmdGroup(new CmdBoardPlaneAdd(*mCurrentPlane));
 

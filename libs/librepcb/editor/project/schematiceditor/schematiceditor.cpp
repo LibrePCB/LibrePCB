@@ -220,6 +220,10 @@ void SchematicEditor::abortAllCommands() noexcept {
   mFsm->processAbortCommand();
 }
 
+void SchematicEditor::abortBlockingToolsInOtherEditors() noexcept {
+  mProjectEditor.abortBlockingToolsInOtherEditors(this);
+}
+
 /*******************************************************************************
  *  Inherited Methods
  ******************************************************************************/
@@ -271,6 +275,7 @@ void SchematicEditor::createActions() noexcept {
       this, &mProjectEditor, &ProjectEditor::showControlPanelClicked));
   mActionProjectProperties.reset(
       cmd.projectProperties.createAction(this, this, [this]() {
+        abortBlockingToolsInOtherEditors();  // Release undo stack.
         ProjectPropertiesEditorDialog dialog(
             mProject.getMetadata(), mProjectEditor.getUndoStack(), this);
         dialog.exec();
@@ -872,6 +877,7 @@ void SchematicEditor::addSchematic() noexcept {
   if (!ok) return;
 
   try {
+    abortBlockingToolsInOtherEditors();  // Release undo stack.
     CmdSchematicAdd* cmd =
         new CmdSchematicAdd(mProject, ElementName(name));  // can throw
     mProjectEditor.getUndoStack().execCmd(cmd);
@@ -886,6 +892,7 @@ void SchematicEditor::removeSchematic(int index) noexcept {
   if (!schematic) return;
 
   try {
+    abortBlockingToolsInOtherEditors();  // Release undo stack.
     CmdSchematicRemove* cmd = new CmdSchematicRemove(mProject, *schematic);
     mProjectEditor.getUndoStack().execCmd(cmd);
   } catch (Exception& e) {
@@ -904,6 +911,7 @@ void SchematicEditor::renameSchematic(int index) noexcept {
   if (!ok) return;
 
   try {
+    abortBlockingToolsInOtherEditors();  // Release undo stack.
     QScopedPointer<CmdSchematicEdit> cmd(new CmdSchematicEdit(*schematic));
     cmd->setName(ElementName(cleanElementName(name)));  // can throw
     mProjectEditor.getUndoStack().execCmd(cmd.take());

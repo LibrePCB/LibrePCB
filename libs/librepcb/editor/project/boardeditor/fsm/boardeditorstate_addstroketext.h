@@ -81,7 +81,7 @@ public:
       const BoardEditorState_AddStrokeText& rhs) = delete;
 
 private:  // Methods
-  bool addText(Board& board, const Point& pos) noexcept;
+  bool addText(const Point& pos) noexcept;
   bool rotateText(const Angle& angle) noexcept;
   bool flipText(Qt::Orientation orientation) noexcept;
   bool updatePosition(const Point& pos) noexcept;

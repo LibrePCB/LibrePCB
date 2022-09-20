@@ -85,6 +85,7 @@ public:
 
   // General Methods
   void abortAllCommands() noexcept;
+  void abortBlockingToolsInOtherEditors() noexcept;
 
   // Operator Overloadings
   SchematicEditor& operator=(const SchematicEditor& rhs) = delete;

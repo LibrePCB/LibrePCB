@@ -322,8 +322,11 @@ bool SchematicEditorState_AddComponent::
 void SchematicEditorState_AddComponent::startAddingComponent(
     const tl::optional<Uuid>& cmp, const tl::optional<Uuid>& symbVar,
     const tl::optional<Uuid>& dev, bool keepValue) {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Schematic* schematic = getActiveSchematic();
-  if (!schematic) throw LogicError(__FILE__, __LINE__);
+  if (!schematic) return;
 
   try {
     // start a new command

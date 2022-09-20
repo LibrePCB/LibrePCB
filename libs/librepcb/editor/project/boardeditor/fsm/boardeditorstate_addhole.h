@@ -75,7 +75,7 @@ public:
       delete;
 
 private:  // Methods
-  bool addHole(Board& board, const Point& pos) noexcept;
+  bool addHole(const Point& pos) noexcept;
   bool updatePosition(const Point& pos) noexcept;
   bool fixPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;

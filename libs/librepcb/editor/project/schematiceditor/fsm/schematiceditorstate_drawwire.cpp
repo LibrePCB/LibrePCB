@@ -205,6 +205,9 @@ bool SchematicEditorState_DrawWire::processGraphicsSceneMouseMoved(
 
 bool SchematicEditorState_DrawWire::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
 
