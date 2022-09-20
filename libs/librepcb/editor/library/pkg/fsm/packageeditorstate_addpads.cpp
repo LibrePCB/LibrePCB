@@ -33,7 +33,6 @@
 #include "../packageeditorwidget.h"
 #include "../packagepadcombobox.h"
 
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/library/pkg/package.h>
 
@@ -81,8 +80,6 @@ PackageEditorState_AddPads::~PackageEditorState_AddPads() noexcept {
  ******************************************************************************/
 
 bool PackageEditorState_AddPads::entry() noexcept {
-  mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-
   // populate command toolbar
   EditorCommandSet& cmd = EditorCommandSet::instance();
 

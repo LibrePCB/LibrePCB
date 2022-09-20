@@ -33,7 +33,6 @@
 #include <librepcb/core/geometry/circle.h>
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/sym/symbol.h>
 
 #include <QtCore>
@@ -69,8 +68,6 @@ SymbolEditorState_DrawCircle::~SymbolEditorState_DrawCircle() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorState_DrawCircle::entry() noexcept {
-  mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-
   // populate command toolbar
   EditorCommandSet& cmd = EditorCommandSet::instance();
   mContext.commandToolBar.addLabel(tr("Layer:"));

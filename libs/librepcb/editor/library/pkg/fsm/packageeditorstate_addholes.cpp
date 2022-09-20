@@ -31,7 +31,6 @@
 
 #include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/holegraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
 
@@ -65,8 +64,6 @@ PackageEditorState_AddHoles::~PackageEditorState_AddHoles() noexcept {
  ******************************************************************************/
 
 bool PackageEditorState_AddHoles::entry() noexcept {
-  mContext.graphicsScene.setSelectionArea(QPainterPath());  // clear selection
-
   // populate command toolbar
   EditorCommandSet& cmd = EditorCommandSet::instance();
   mContext.commandToolBar.addLabel(tr("Diameter:"), 10);

@@ -83,8 +83,6 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
   Board* board = getActiveBoard();
   if (!board) return false;
 
-  // Clear board selection because selection does not make sense in this state
-  board->clearSelection();
   makeLayerVisible();
 
   // Add a new stroke text

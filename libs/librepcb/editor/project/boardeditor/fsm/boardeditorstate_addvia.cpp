@@ -88,9 +88,6 @@ bool BoardEditorState_AddVia::entry() noexcept {
   Board* board = getActiveBoard();
   if (!board) return false;
 
-  // Clear board selection because selection does not make sense in this state
-  board->clearSelection();
-
   // Add a new via
   Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
                                                                  true, true);
