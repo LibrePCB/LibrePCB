@@ -131,7 +131,6 @@ private:  // Data
   SubState mSubState;  ///< the current substate
   Point mStartPos;
   QScopedPointer<CmdDragSelectedSchematicItems> mSelectedItemsDragCommand;
-  int mCurrentSelectionIndex;
 
   /// The current polygon selected for editing (nullptr if none)
   SI_Polygon* mSelectedPolygon;

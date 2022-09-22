@@ -91,7 +91,6 @@ BoardEditorState_Select::BoardEditorState_Select(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mCurrentSelectionIndex(0),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
     mCmdPolygonEdit(),
@@ -493,24 +492,37 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
         board->clearSelection();
-        mCurrentSelectionIndex = 0;
         return true;
       }
 
-      bool itemAlreadySelected = items.first()->isSelected();
-
+      // Check if there's already an item selected.
+      BI_Base* selectedItem = nullptr;
+      foreach (auto item, items) {
+        if (item->isSelected()) {
+          selectedItem = item;
+          break;
+        }
+      }
       if ((e.modifiers() & Qt::ControlModifier)) {
-        // Toggle selection when CTRL is pressed
-        items.first()->setSelected(!itemAlreadySelected);
+        // Toggle selection when CTRL is pressed.
+        auto item = selectedItem ? selectedItem : items.first();
+        item->setSelected(!item->isSelected());
       } else if ((e.modifiers() & Qt::ShiftModifier)) {
-        // Cycle Selection, when holding shift
-        mCurrentSelectionIndex += 1;
-        mCurrentSelectionIndex %= items.count();
+        // Cycle Selection, when holding shift.
+        int nextSelectionIndex = 0;
+        for (int i = 0; i < items.count(); ++i) {
+          if (items.at(i)->isSelected()) {
+            nextSelectionIndex = (i + 1) % items.count();
+            break;
+          }
+        }
+        Q_ASSERT((nextSelectionIndex >= 0) &&
+                 (nextSelectionIndex < items.count()));
         board->clearSelection();
-        items[mCurrentSelectionIndex]->setSelected(true);
-      } else if (!itemAlreadySelected) {
+        items[nextSelectionIndex]->setSelected(true);
+      } else if (!selectedItem) {
         // Only select the topmost item when clicking an unselected item
-        // without CTRL
+        // without CTRL.
         board->clearSelection();
         items.first()->setSelected(true);
       }
@@ -583,12 +595,13 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
   if (!board) return false;
 
   if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
-    // Check if there is an element under the mouse
+    // Open the properties editor dialog of the selected item, if any.
     QList<BI_Base*> items =
         board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
-    if (items.isEmpty()) return false;
-    if (openPropertiesDialog(items.first())) {
-      return true;
+    foreach (auto item, items) {
+      if (item->isSelected() && openPropertiesDialog(item)) {
+        return true;
+      }
     }
   }
 

@@ -182,7 +182,6 @@ private:  // Data
 
   /// When dragging items, this undo command will be active
   QScopedPointer<CmdDragSelectedBoardItems> mSelectedItemsDragCommand;
-  int mCurrentSelectionIndex;
 
   /// The current polygon selected for editing (nullptr if none)
   BI_Polygon* mSelectedPolygon;

@@ -61,7 +61,6 @@ SchematicEditorState_Select::SchematicEditorState_Select(
     const Context& context) noexcept
   : SchematicEditorState(context),
     mSubState(SubState::IDLE),
-    mCurrentSelectionIndex(0),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
     mCmdPolygonEdit() {
@@ -312,20 +311,34 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         return true;
       }
 
-      bool itemAlreadySelected = items.first()->isSelected();
-
+      // Check if there's already an item selected.
+      SI_Base* selectedItem = nullptr;
+      foreach (auto item, items) {
+        if (item->isSelected()) {
+          selectedItem = item;
+          break;
+        }
+      }
       if (mouseEvent.modifiers() & Qt::ControlModifier) {
-        // Toggle selection when CTRL is pressed
-        items.first()->setSelected(!itemAlreadySelected);
+        // Toggle selection when CTRL is pressed.
+        auto item = selectedItem ? selectedItem : items.first();
+        item->setSelected(!item->isSelected());
       } else if (mouseEvent.modifiers() & Qt::ShiftModifier) {
-        // Cycle Selection, when holding shift
-        mCurrentSelectionIndex += 1;
-        mCurrentSelectionIndex %= items.count();
+        // Cycle Selection, when holding shift.
+        int nextSelectionIndex = 0;
+        for (int i = 0; i < items.count(); ++i) {
+          if (items.at(i)->isSelected()) {
+            nextSelectionIndex = (i + 1) % items.count();
+            break;
+          }
+        }
+        Q_ASSERT((nextSelectionIndex >= 0) &&
+                 (nextSelectionIndex < items.count()));
         schematic->clearSelection();
-        items[mCurrentSelectionIndex]->setSelected(true);
-      } else if (!itemAlreadySelected) {
+        items[nextSelectionIndex]->setSelected(true);
+      } else if (!selectedItem) {
         // Only select the topmost item when clicking an unselected item
-        // without CTRL
+        // without CTRL.
         schematic->clearSelection();
         items.first()->setSelected(true);
       }
@@ -410,14 +423,13 @@ bool SchematicEditorState_Select::
   if (!schematic) return false;
 
   if (mSubState == SubState::IDLE) {
-    // check if there is an element under the mouse
+    // Open the properties editor dialog of the selected item, if any.
     QList<SI_Base*> items =
         schematic->getItemsAtScenePos(Point::fromPx(e.scenePos()));
-    if (items.isEmpty()) return false;
-
-    // open the properties editor dialog of the top most item
-    if (openPropertiesDialog(items.first())) {
-      return true;
+    foreach (auto item, items) {
+      if (item->isSelected() && openPropertiesDialog(item)) {
+        return true;
+      }
     }
   }
 
