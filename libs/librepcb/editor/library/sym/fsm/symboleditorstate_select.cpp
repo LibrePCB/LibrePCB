@@ -283,7 +283,12 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 
 bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Q_UNUSED(e);
+  // If SHIFT or CTRL is pressed, the user is modifying items selection, not
+  // double-clicking.
+  if (e.modifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+    return processGraphicsSceneLeftMouseButtonPressed(e);
+  }
+
   if (mState == SubState::IDLE) {
     return openPropertiesDialogOfItemAtPos(Point::fromPx(e.scenePos()));
   } else {

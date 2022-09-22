@@ -570,6 +570,12 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
     QGraphicsSceneMouseEvent& e) noexcept {
+  // If SHIFT or CTRL is pressed, the user is modifying items selection, not
+  // double-clicking.
+  if (e.modifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+    return processGraphicsSceneLeftMouseButtonPressed(e);
+  }
+
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
