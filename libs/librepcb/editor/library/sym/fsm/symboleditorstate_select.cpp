@@ -950,30 +950,11 @@ void SymbolEditorState_Select::clearSelectionRect(
 
 QList<std::shared_ptr<QGraphicsItem>>
     SymbolEditorState_Select::findItemsAtPosition(const Point& pos) noexcept {
-  QList<std::shared_ptr<SymbolPinGraphicsItem>> pins;
-  QList<std::shared_ptr<CircleGraphicsItem>> circles;
-  QList<std::shared_ptr<PolygonGraphicsItem>> polygons;
-  QList<std::shared_ptr<TextGraphicsItem>> texts;
-  int count = mContext.symbolGraphicsItem.getItemsAtPosition(
-      pos, &pins, &circles, &polygons, &texts);
-  QList<std::shared_ptr<QGraphicsItem>> result;
-  foreach (std::shared_ptr<SymbolPinGraphicsItem> pin, pins) {
-    result.append(pin);
-  }
-  foreach (std::shared_ptr<CircleGraphicsItem> cirlce, circles) {
-    result.append(cirlce);
-  }
-  foreach (std::shared_ptr<PolygonGraphicsItem> polygon, polygons) {
-    result.append(polygon);
-  }
-  foreach (std::shared_ptr<TextGraphicsItem> text, texts) {
-    result.append(text);
-  }
-
-  Q_ASSERT(result.count() ==
-           (pins.count() + texts.count() + polygons.count() + circles.count()));
-  Q_ASSERT(result.count() == count);
-  return result;
+  return mContext.symbolGraphicsItem.findItemsAtPos(
+      mContext.graphicsView.calcPosWithTolerance(pos),
+      mContext.graphicsView.calcPosWithTolerance(pos, 2),
+      SymbolGraphicsItem::FindFlag::All |
+          SymbolGraphicsItem::FindFlag::AcceptNearMatch);
 }
 
 bool SymbolEditorState_Select::findPolygonVerticesAtPosition(

@@ -68,6 +68,7 @@ public:
   }
   const QVector<Vertex>& getVertices() const noexcept { return mVertices; }
   UnsignedLength getTotalStraightLength() const noexcept;
+  Point calcNearestPointBetweenVertices(const Point& p) const noexcept;
   Path toClosedPath() const noexcept;
   QVector<Path> toOutlineStrokes(const PositiveLength& width) const noexcept;
   const QPainterPath& toQPainterPathPx() const noexcept;

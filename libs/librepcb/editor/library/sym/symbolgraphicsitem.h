@@ -57,6 +57,19 @@ class SymbolPinGraphicsItem;
 class SymbolGraphicsItem final : public QGraphicsItem,
                                  public AttributeProvider {
 public:
+  enum class FindFlag {
+    // Item types
+    Pins = (1 << 0),
+    Circles = (1 << 1),
+    Polygons = (1 << 2),
+    Texts = (1 << 3),
+    All = Pins | Circles | Polygons | Texts,
+
+    // Match behavior
+    AcceptNearMatch = (1 << 10),
+  };
+  Q_DECLARE_FLAGS(FindFlags, FindFlag)
+
   // Constructors / Destructor
   SymbolGraphicsItem() = delete;
   SymbolGraphicsItem(const SymbolGraphicsItem& other) = delete;
@@ -84,15 +97,13 @@ public:
       std::shared_ptr<Text> text) noexcept {
     return mTextGraphicsItems.value(text);
   }
-  int getItemsAtPosition(
-      const Point& pos, QList<std::shared_ptr<SymbolPinGraphicsItem>>* pins,
-      QList<std::shared_ptr<CircleGraphicsItem>>* circles,
-      QList<std::shared_ptr<PolygonGraphicsItem>>* polygons,
-      QList<std::shared_ptr<TextGraphicsItem>>* texts) noexcept;
   QList<std::shared_ptr<SymbolPinGraphicsItem>> getSelectedPins() noexcept;
   QList<std::shared_ptr<CircleGraphicsItem>> getSelectedCircles() noexcept;
   QList<std::shared_ptr<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
   QList<std::shared_ptr<TextGraphicsItem>> getSelectedTexts() noexcept;
+  QList<std::shared_ptr<QGraphicsItem>> findItemsAtPos(
+      const QPainterPath& posAreaSmall, const QPainterPath& posAreaLarge,
+      FindFlags flags) noexcept;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
@@ -141,11 +152,13 @@ private:  // Data
   Symbol::OnEditedSlot mOnEditedSlot;
 };
 
+}  // namespace editor
+}  // namespace librepcb
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::editor::SymbolGraphicsItem::FindFlags)
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
-
-}  // namespace editor
-}  // namespace librepcb
 
 #endif

@@ -302,7 +302,8 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     } else {
       // handle items selection
       Point pos = Point::fromPx(mouseEvent.scenePos());
-      QList<SI_Base*> items = schematic->getItemsAtScenePos(pos);
+      const QList<SI_Base*> items =
+          findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
         schematic->clearSelection();
@@ -419,13 +420,10 @@ bool SchematicEditorState_Select::
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   if (mSubState == SubState::IDLE) {
     // Open the properties editor dialog of the selected item, if any.
-    QList<SI_Base*> items =
-        schematic->getItemsAtScenePos(Point::fromPx(e.scenePos()));
+    const QList<SI_Base*> items = findItemsAtPos(
+        Point::fromPx(e.scenePos()), FindFlag::All | FindFlag::AcceptNearMatch);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
         return true;
@@ -451,7 +449,8 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
   // handle item selection
   Point pos = Point::fromPx(e.scenePos());
-  QList<SI_Base*> items = schematic->getItemsAtScenePos(pos);
+  QList<SI_Base*> items =
+      findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
   if (items.isEmpty()) return false;
   SI_Base* selectedItem = nullptr;
   foreach (SI_Base* item, items) {

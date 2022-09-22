@@ -174,10 +174,10 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
   if (!schematic) return false;
 
   try {
-    QList<SI_NetLine*> netlinesUnderCursor =
-        schematic->getNetLinesAtScenePos(pos);
-    if (netlinesUnderCursor.isEmpty()) return false;
-    SI_NetSegment& netsegment = netlinesUnderCursor.first()->getNetSegment();
+    SI_NetLine* netlineUnderCursor = findItemAtPos<SI_NetLine>(
+        pos, FindFlag::NetLines | FindFlag::AcceptNearestWithinGrid);
+    if (!netlineUnderCursor) return false;
+    SI_NetSegment& netsegment = netlineUnderCursor->getNetSegment();
 
     mContext.undoStack.beginCmdGroup(tr("Add net label to schematic"));
     mUndoCmdActive = true;

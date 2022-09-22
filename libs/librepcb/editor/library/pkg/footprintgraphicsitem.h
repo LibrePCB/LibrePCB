@@ -65,6 +65,20 @@ class FootprintPadGraphicsItem;
 class FootprintGraphicsItem final : public QGraphicsItem,
                                     public AttributeProvider {
 public:
+  enum class FindFlag {
+    // Item types
+    Pads = (1 << 0),
+    Circles = (1 << 1),
+    Polygons = (1 << 2),
+    StrokeTexts = (1 << 3),
+    Holes = (1 << 4),
+    All = Pads | Circles | Polygons | StrokeTexts | Holes,
+
+    // Match behavior
+    AcceptNearMatch = (1 << 10),
+  };
+  Q_DECLARE_FLAGS(FindFlags, FindFlag)
+
   // Constructors / Destructor
   FootprintGraphicsItem() = delete;
   FootprintGraphicsItem(const FootprintGraphicsItem& other) = delete;
@@ -97,18 +111,15 @@ public:
       std::shared_ptr<Hole> hole) noexcept {
     return mHoleGraphicsItems.value(hole);
   }
-  int getItemsAtPosition(
-      const Point& pos, QList<std::shared_ptr<FootprintPadGraphicsItem>>* pads,
-      QList<std::shared_ptr<CircleGraphicsItem>>* circles,
-      QList<std::shared_ptr<PolygonGraphicsItem>>* polygons,
-      QList<std::shared_ptr<StrokeTextGraphicsItem>>* texts,
-      QList<std::shared_ptr<HoleGraphicsItem>>* holes) noexcept;
   QList<std::shared_ptr<FootprintPadGraphicsItem>> getSelectedPads() noexcept;
   QList<std::shared_ptr<CircleGraphicsItem>> getSelectedCircles() noexcept;
   QList<std::shared_ptr<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
   QList<std::shared_ptr<StrokeTextGraphicsItem>>
       getSelectedStrokeTexts() noexcept;
   QList<std::shared_ptr<HoleGraphicsItem>> getSelectedHoles() noexcept;
+  QList<std::shared_ptr<QGraphicsItem>> findItemsAtPos(
+      const QPainterPath& posAreaSmall, const QPainterPath& posAreaLarge,
+      FindFlags flags) noexcept;
 
   // Setters
   void setPosition(const Point& pos) noexcept;
@@ -162,11 +173,14 @@ private:  // Data
   Footprint::OnEditedSlot mOnEditedSlot;
 };
 
+}  // namespace editor
+}  // namespace librepcb
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(
+    librepcb::editor::FootprintGraphicsItem::FindFlags)
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
-
-}  // namespace editor
-}  // namespace librepcb
 
 #endif

@@ -86,18 +86,8 @@ private:  // Methods
   void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void applySelectedNetSignal() noexcept;
-  void updateClosestNetSignal(Board& board, const Point& pos) noexcept;
+  void updateClosestNetSignal(const Point& pos) noexcept;
   NetSignal* getCurrentNetSignal() const noexcept;
-  BI_Via* findVia(Board& board, const Point pos,
-                  const QSet<const NetSignal*>& netsignals = {},
-                  const QSet<BI_Via*>& except = {}) const noexcept;
-  BI_FootprintPad* findPad(Board& board, const Point pos,
-                           const QSet<const NetSignal*>& netsignals = {},
-                           const QSet<BI_FootprintPad*>& except = {}) const
-      noexcept;
-  BI_NetLine* findNetLine(Board& board, const Point pos,
-                          const QSet<const NetSignal*>& netsignals = {}) const
-      noexcept;
 
 private:  // Data
   // State

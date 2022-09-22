@@ -106,6 +106,8 @@ public:
   // General Methods
   Point mapGlobalPosToScenePos(const QPoint& globalPosPx, bool boundToView,
                                bool mapToGrid) const noexcept;
+  QPainterPath calcPosWithTolerance(const Point& pos,
+                                    qreal multiplier = 1) const noexcept;
   void handleMouseWheelEvent(QGraphicsSceneWheelEvent* event) noexcept;
 
   // Operator Overloadings

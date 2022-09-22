@@ -125,12 +125,6 @@ public:
   }
   GraphicsScene& getGraphicsScene() const noexcept { return *mGraphicsScene; }
   bool isEmpty() const noexcept;
-  QList<SI_Base*> getItemsAtScenePos(const Point& pos) const noexcept;
-  QList<SI_NetPoint*> getNetPointsAtScenePos(const Point& pos) const noexcept;
-  QList<SI_NetLine*> getNetLinesAtScenePos(const Point& pos) const noexcept;
-  QList<SI_NetLabel*> getNetLabelsAtScenePos(const Point& pos) const noexcept;
-  QList<SI_SymbolPin*> getPinsAtScenePos(const Point& pos) const noexcept;
-  QList<SI_Text*> getTextsAtScenePos(const Point& pos) const noexcept;
 
   // Setters: General
   void setGridProperties(const GridProperties& grid) noexcept;

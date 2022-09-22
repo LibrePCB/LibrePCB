@@ -488,7 +488,8 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     } else {
       // handle items selection
       QList<BI_Base*> items =
-          board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
+          findItemsAtPos(Point::fromPx(e.scenePos()),
+                         FindFlag::All | FindFlag::AcceptNearMatch);
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
         board->clearSelection();
@@ -591,13 +592,10 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     // Open the properties editor dialog of the selected item, if any.
-    QList<BI_Base*> items =
-        board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
+    const QList<BI_Base*> items = findItemsAtPos(
+        Point::fromPx(e.scenePos()), FindFlag::All | FindFlag::AcceptNearMatch);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
         return true;
@@ -621,10 +619,10 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       return rotateSelectedItems(Angle::deg90());
     }
   } else if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
-    Point pos = Point::fromPx(e.scenePos());
-
     // handle item selection
-    QList<BI_Base*> items = board->getItemsAtScenePos(pos);
+    Point pos = Point::fromPx(e.scenePos());
+    QList<BI_Base*> items =
+        findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
     if (items.isEmpty()) return false;
 
     // If the right-clicked element is part of an active selection, keep it

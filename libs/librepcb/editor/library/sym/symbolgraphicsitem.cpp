@@ -73,51 +73,6 @@ SymbolGraphicsItem::~SymbolGraphicsItem() noexcept {
  *  Getters
  ******************************************************************************/
 
-int SymbolGraphicsItem::getItemsAtPosition(
-    const Point& pos, QList<std::shared_ptr<SymbolPinGraphicsItem>>* pins,
-    QList<std::shared_ptr<CircleGraphicsItem>>* circles,
-    QList<std::shared_ptr<PolygonGraphicsItem>>* polygons,
-    QList<std::shared_ptr<TextGraphicsItem>>* texts) noexcept {
-  int count = 0;
-  if (pins) {
-    foreach (const auto& ptr, mPinGraphicsItems) {
-      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
-      if (ptr->shape().contains(mappedPos)) {
-        pins->append(ptr);
-        ++count;
-      }
-    }
-  }
-  if (circles) {
-    foreach (const auto& ptr, mCircleGraphicsItems) {
-      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
-      if (ptr->shape().contains(mappedPos)) {
-        circles->append(ptr);
-        ++count;
-      }
-    }
-  }
-  if (polygons) {
-    foreach (const auto& ptr, mPolygonGraphicsItems) {
-      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
-      if (ptr->shape().contains(mappedPos)) {
-        polygons->append(ptr);
-        ++count;
-      }
-    }
-  }
-  if (texts) {
-    foreach (const auto& ptr, mTextGraphicsItems) {
-      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
-      if (ptr->shape().contains(mappedPos)) {
-        texts->append(ptr);
-        ++count;
-      }
-    }
-  }
-  return count;
-}
-
 QList<std::shared_ptr<SymbolPinGraphicsItem>>
     SymbolGraphicsItem::getSelectedPins() noexcept {
   QList<std::shared_ptr<SymbolPinGraphicsItem>> pins;
@@ -160,6 +115,67 @@ QList<std::shared_ptr<TextGraphicsItem>>
     }
   }
   return texts;
+}
+
+QList<std::shared_ptr<QGraphicsItem>> SymbolGraphicsItem::findItemsAtPos(
+    const QPainterPath& posAreaSmall, const QPainterPath& posAreaLarge,
+    FindFlags flags) noexcept {
+  const QPointF pos = posAreaSmall.boundingRect().center();
+
+  // Note: The order of adding the items is very important (the top most item
+  // must appear as the first item in the list)! For that, we work with
+  // priorities (0 = highest priority):
+  //
+  //    0: pins
+  //   10: texts
+  //   20: circles/polygons
+  //
+  // And for items not directly under the cursor, but very close to the cursor,
+  // add +1000.
+  QMultiMap<std::pair<int, qreal>, std::shared_ptr<QGraphicsItem>> items;
+  auto processItem = [this, &items, &pos, &posAreaSmall, &posAreaLarge, flags](
+                         const std::shared_ptr<QGraphicsItem>& item,
+                         int priority, bool large = false) {
+    Q_ASSERT(item);
+    const QPainterPath grabArea = mapFromItem(item.get(), item->shape());
+    const QPointF center = grabArea.controlPointRect().center();
+    const QPointF diff = center - pos;
+    qreal distance = (diff.x() * diff.x()) + (diff.y() * diff.y());
+    if (grabArea.contains(pos)) {
+      items.insert(std::make_pair(priority, distance), item);
+    } else if ((flags & FindFlag::AcceptNearMatch) &&
+               grabArea.intersects(large ? posAreaLarge : posAreaSmall)) {
+      items.insert(std::make_pair(priority + 1000, distance), item);
+    }
+  };
+
+  if (flags.testFlag(FindFlag::Pins)) {
+    foreach (auto ptr, mPinGraphicsItems) {
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 0);
+    }
+  }
+
+  if (flags.testFlag(FindFlag::Texts)) {
+    foreach (auto ptr, mTextGraphicsItems) {
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 10);
+    }
+  }
+
+  if (flags.testFlag(FindFlag::Circles)) {
+    foreach (auto ptr, mCircleGraphicsItems) {
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 20,
+                  true);  // Probably large grab area makes sense?
+    }
+  }
+
+  if (flags.testFlag(FindFlag::Polygons)) {
+    foreach (auto ptr, mPolygonGraphicsItems) {
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 20,
+                  true);  // Probably large grab area makes sense?
+    }
+  }
+
+  return items.values();
 }
 
 /*******************************************************************************

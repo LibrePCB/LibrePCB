@@ -1044,35 +1044,14 @@ void PackageEditorState_Select::clearSelectionRect(
 
 QList<std::shared_ptr<QGraphicsItem>>
     PackageEditorState_Select::findItemsAtPosition(const Point& pos) noexcept {
-  QList<std::shared_ptr<FootprintPadGraphicsItem>> pads;
-  QList<std::shared_ptr<CircleGraphicsItem>> circles;
-  QList<std::shared_ptr<PolygonGraphicsItem>> polygons;
-  QList<std::shared_ptr<StrokeTextGraphicsItem>> texts;
-  QList<std::shared_ptr<HoleGraphicsItem>> holes;
-  int count = mContext.currentGraphicsItem->getItemsAtPosition(
-      pos, &pads, &circles, &polygons, &texts, &holes);
-  QList<std::shared_ptr<QGraphicsItem>> result;
-  foreach (std::shared_ptr<FootprintPadGraphicsItem> pad, pads) {
-    result.append(pad);
+  if (!mContext.currentGraphicsItem) {
+    return QList<std::shared_ptr<QGraphicsItem>>();
   }
-  foreach (std::shared_ptr<CircleGraphicsItem> cirlce, circles) {
-    result.append(cirlce);
-  }
-  foreach (std::shared_ptr<PolygonGraphicsItem> polygon, polygons) {
-    result.append(polygon);
-  }
-  foreach (std::shared_ptr<StrokeTextGraphicsItem> text, texts) {
-    result.append(text);
-  }
-  foreach (std::shared_ptr<HoleGraphicsItem> hole, holes) {
-    result.append(hole);
-  }
-
-  Q_ASSERT(result.count() ==
-           (pads.count() + texts.count() + polygons.count() + circles.count() +
-            holes.count()));
-  Q_ASSERT(result.count() == count);
-  return result;
+  return mContext.currentGraphicsItem->findItemsAtPos(
+      mContext.graphicsView.calcPosWithTolerance(pos),
+      mContext.graphicsView.calcPosWithTolerance(pos, 2),
+      FootprintGraphicsItem::FindFlag::All |
+          FootprintGraphicsItem::FindFlag::AcceptNearMatch);
 }
 
 bool PackageEditorState_Select::findPolygonVerticesAtPosition(

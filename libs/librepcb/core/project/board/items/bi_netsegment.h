@@ -96,13 +96,6 @@ public:
   int getNetLinesAtScenePos(const Point& pos, const GraphicsLayer* layer,
                             QList<BI_NetLine*>& lines) const noexcept;
 
-  BI_NetPoint* getNetPointNextToScenePos(const Point& pos,
-                                         const GraphicsLayer* layer,
-                                         UnsignedLength& maxDistance) const
-      noexcept;
-  BI_Via* getViaNextToScenePos(const Point& pos,
-                               UnsignedLength& maxDistance) const noexcept;
-
   // Setters
   void setNetSignal(NetSignal* netsignal);
 
