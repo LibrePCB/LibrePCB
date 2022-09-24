@@ -19,10 +19,11 @@ jobs:
         CC: clang
         CXX: clang++
       Ubuntu_2004_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-6
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-7
       Ubuntu_2004_Unbundled:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-6
+        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-7
         UNBUNDLE_DXFLIB: true
+        UNBUNDLE_GTEST: true
         UNBUNDLE_MUPARSER: true
         #UNBUNDLE_QUAZIP: true  # Note: Does not ship quazip 1.x yet
         UNBUNDLE_POLYCLIPPING: true
@@ -44,6 +45,9 @@ jobs:
   - bash: rm -rf libs/dxflib
     displayName: Remove bundled dxflib lib
     condition: and(succeeded(), eq(variables['UNBUNDLE_DXFLIB'], 'true'))
+  - bash: rm -rf libs/googletest
+    displayName: Remove bundled googletest lib
+    condition: and(succeeded(), eq(variables['UNBUNDLE_GTEST'], 'true'))
   - bash: rm -rf libs/muparser
     displayName: Remove bundled muparser lib
     condition: and(succeeded(), eq(variables['UNBUNDLE_MUPARSER'], 'true'))
