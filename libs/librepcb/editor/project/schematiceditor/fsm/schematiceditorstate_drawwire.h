@@ -105,13 +105,9 @@ private:  //  Methods
                         SI_NetPoint* fixedPoint = nullptr) noexcept;
   bool addNextNetPoint(Schematic& schematic, bool snap) noexcept;
   bool abortPositioning(bool showErrMsgBox) noexcept;
-  SI_SymbolPin* findSymbolPin(Schematic& schematic, const Point& pos) const
-      noexcept;
-  SI_NetPoint* findNetPoint(Schematic& schematic, const Point& pos,
-                            SI_NetPoint* except = nullptr) const noexcept;
-  SI_NetLine* findNetLine(Schematic& schematic, const Point& pos,
-                          SI_NetLine* except = nullptr) const noexcept;
-  Point updateNetpointPositions(Schematic& schematic, bool snap) noexcept;
+  SI_Base* findItem(const Point& pos,
+                    const QSet<SI_Base*>& except = {}) noexcept;
+  Point updateNetpointPositions(bool snap) noexcept;
   void wireModeChanged(WireMode mode) noexcept;
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
       noexcept;

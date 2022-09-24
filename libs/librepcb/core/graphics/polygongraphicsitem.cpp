@@ -116,17 +116,6 @@ QVariant PolygonGraphicsItem::itemChange(GraphicsItemChange change,
   return PrimitivePathGraphicsItem::itemChange(change, value);
 }
 
-QPainterPath PolygonGraphicsItem::shape() const noexcept {
-  const Length vertexHandleSize = Length::fromPx(mVertexHandleRadiusPx * 2);
-  if ((vertexHandleSize > 0) && (isSelected())) {
-    // Extend shape by vertex handles.
-    return Toolbox::shapeFromPath(mPainterPath, mPen, mBrush,
-                                  UnsignedLength(vertexHandleSize));
-  } else {
-    return PrimitivePathGraphicsItem::shape();
-  }
-}
-
 void PolygonGraphicsItem::paint(QPainter* painter,
                                 const QStyleOptionGraphicsItem* option,
                                 QWidget* widget) noexcept {

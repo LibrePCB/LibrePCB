@@ -66,7 +66,6 @@ SymbolEditorState_Select::SymbolEditorState_Select(
   : SymbolEditorState(context),
     mState(SubState::IDLE),
     mStartPos(),
-    mCurrentSelectionIndex(0),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
     mCmdPolygonEdit() {
@@ -181,41 +180,52 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         clearSelectionRect(true);
         setState(SubState::SELECTING);
       } else {
-        // check if the top most item under the cursor is already selected
-        std::shared_ptr<QGraphicsItem> topMostItem = items.first();
-
-        bool itemAlreadySelected = topMostItem->isSelected();
+        // Check if there's already an item selected.
+        std::shared_ptr<QGraphicsItem> selectedItem;
+        foreach (std::shared_ptr<QGraphicsItem> item, items) {
+          if (item->isSelected()) {
+            selectedItem = item;
+            break;
+          }
+        }
         if (e.modifiers().testFlag(Qt::ControlModifier)) {
-          // Toggle selection when CTRL is pressed
-          if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(
-                  topMostItem)) {
+          // Toggle selection when CTRL is pressed.
+          auto item = selectedItem ? selectedItem : items.first();
+          if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(item)) {
             // workaround for selection of a SymbolPinGraphicsItem
-            i->setSelected(!itemAlreadySelected);
+            i->setSelected(!item->isSelected());
           } else {
-            topMostItem->setSelected(!itemAlreadySelected);
+            item->setSelected(!item->isSelected());
           }
         } else if (e.modifiers().testFlag(Qt::ShiftModifier)) {
-          // Cycle Selection, when holding shift
-          mCurrentSelectionIndex += 1;
-          mCurrentSelectionIndex %= items.count();
+          // Cycle Selection, when holding shift.
+          int nextSelectionIndex = 0;
+          for (int i = 0; i < items.count(); ++i) {
+            if (items.at(i)->isSelected()) {
+              nextSelectionIndex = (i + 1) % items.count();
+              break;
+            }
+          }
+          Q_ASSERT((nextSelectionIndex >= 0) &&
+                   (nextSelectionIndex < items.count()));
           clearSelectionRect(true);
-          std::shared_ptr<QGraphicsItem> item = items[mCurrentSelectionIndex];
+          std::shared_ptr<QGraphicsItem> item = items[nextSelectionIndex];
           if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(item)) {
             // workaround for selection of a SymbolPinGraphicsItem
             i->setSelected(true);
           } else {
             item->setSelected(true);
           }
-        } else if (!itemAlreadySelected) {
+        } else if (!selectedItem) {
           // Only select the topmost item when clicking an unselected item
-          // without CTRL
+          // without CTRL.
           clearSelectionRect(true);
           if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(
-                  topMostItem)) {
+                  items.first())) {
             // workaround for selection of a SymbolPinGraphicsItem
             i->setSelected(true);
           } else {
-            topMostItem->setSelected(true);
+            items.first()->setSelected(true);
           }
         }
         emit availableFeaturesChanged();  // Selection might have changed.
@@ -283,7 +293,12 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 
 bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Q_UNUSED(e);
+  // If SHIFT or CTRL is pressed, the user is modifying items selection, not
+  // double-clicking.
+  if (e.modifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+    return processGraphicsSceneLeftMouseButtonPressed(e);
+  }
+
   if (mState == SubState::IDLE) {
     return openPropertiesDialogOfItemAtPos(Point::fromPx(e.scenePos()));
   } else {
@@ -735,8 +750,12 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
 bool SymbolEditorState_Select::openPropertiesDialogOfItemAtPos(
     const Point& pos) noexcept {
   QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPosition(pos);
-  if (items.isEmpty()) return false;
-  return openPropertiesDialogOfItem(items.first());
+  foreach (std::shared_ptr<QGraphicsItem> item, items) {
+    if (item->isSelected()) {
+      return openPropertiesDialogOfItem(item);
+    }
+  }
+  return false;
 }
 
 bool SymbolEditorState_Select::copySelectedItemsToClipboard() noexcept {
@@ -931,30 +950,11 @@ void SymbolEditorState_Select::clearSelectionRect(
 
 QList<std::shared_ptr<QGraphicsItem>>
     SymbolEditorState_Select::findItemsAtPosition(const Point& pos) noexcept {
-  QList<std::shared_ptr<SymbolPinGraphicsItem>> pins;
-  QList<std::shared_ptr<CircleGraphicsItem>> circles;
-  QList<std::shared_ptr<PolygonGraphicsItem>> polygons;
-  QList<std::shared_ptr<TextGraphicsItem>> texts;
-  int count = mContext.symbolGraphicsItem.getItemsAtPosition(
-      pos, &pins, &circles, &polygons, &texts);
-  QList<std::shared_ptr<QGraphicsItem>> result;
-  foreach (std::shared_ptr<SymbolPinGraphicsItem> pin, pins) {
-    result.append(pin);
-  }
-  foreach (std::shared_ptr<CircleGraphicsItem> cirlce, circles) {
-    result.append(cirlce);
-  }
-  foreach (std::shared_ptr<PolygonGraphicsItem> polygon, polygons) {
-    result.append(polygon);
-  }
-  foreach (std::shared_ptr<TextGraphicsItem> text, texts) {
-    result.append(text);
-  }
-
-  Q_ASSERT(result.count() ==
-           (pins.count() + texts.count() + polygons.count() + circles.count()));
-  Q_ASSERT(result.count() == count);
-  return result;
+  return mContext.symbolGraphicsItem.findItemsAtPos(
+      mContext.graphicsView.calcPosWithTolerance(pos),
+      mContext.graphicsView.calcPosWithTolerance(pos, 2),
+      SymbolGraphicsItem::FindFlag::All |
+          SymbolGraphicsItem::FindFlag::AcceptNearMatch);
 }
 
 bool SymbolEditorState_Select::findPolygonVerticesAtPosition(

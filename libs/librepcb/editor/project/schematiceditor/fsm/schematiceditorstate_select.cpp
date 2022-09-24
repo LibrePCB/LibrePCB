@@ -57,9 +57,7 @@ namespace editor {
 
 SchematicEditorState_Select::SchematicEditorState_Select(
     const Context& context) noexcept
-  : SchematicEditorState(context),
-    mSubState(SubState::IDLE),
-    mCurrentSelectionIndex(0) {
+  : SchematicEditorState(context), mSubState(SubState::IDLE) {
 }
 
 SchematicEditorState_Select::~SchematicEditorState_Select() noexcept {
@@ -260,7 +258,8 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
   if (mSubState == SubState::IDLE) {
     // handle items selection
     Point pos = Point::fromPx(mouseEvent.scenePos());
-    QList<SI_Base*> items = schematic->getItemsAtScenePos(pos);
+    const QList<SI_Base*> items =
+        findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
     if (items.isEmpty()) {
       // no items under mouse --> start drawing a selection rectangle
       schematic->clearSelection();
@@ -269,20 +268,34 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       return true;
     }
 
-    bool itemAlreadySelected = items.first()->isSelected();
-
+    // Check if there's already an item selected.
+    SI_Base* selectedItem = nullptr;
+    foreach (auto item, items) {
+      if (item->isSelected()) {
+        selectedItem = item;
+        break;
+      }
+    }
     if (mouseEvent.modifiers() & Qt::ControlModifier) {
-      // Toggle selection when CTRL is pressed
-      items.first()->setSelected(!itemAlreadySelected);
+      // Toggle selection when CTRL is pressed.
+      auto item = selectedItem ? selectedItem : items.first();
+      item->setSelected(!item->isSelected());
     } else if (mouseEvent.modifiers() & Qt::ShiftModifier) {
-      // Cycle Selection, when holding shift
-      mCurrentSelectionIndex += 1;
-      mCurrentSelectionIndex %= items.count();
+      // Cycle Selection, when holding shift.
+      int nextSelectionIndex = 0;
+      for (int i = 0; i < items.count(); ++i) {
+        if (items.at(i)->isSelected()) {
+          nextSelectionIndex = (i + 1) % items.count();
+          break;
+        }
+      }
+      Q_ASSERT((nextSelectionIndex >= 0) &&
+               (nextSelectionIndex < items.count()));
       schematic->clearSelection();
-      items[mCurrentSelectionIndex]->setSelected(true);
-    } else if (!itemAlreadySelected) {
+      items[nextSelectionIndex]->setSelected(true);
+    } else if (!selectedItem) {
       // Only select the topmost item when clicking an unselected item
-      // without CTRL
+      // without CTRL.
       schematic->clearSelection();
       items.first()->setSelected(true);
     }
@@ -343,21 +356,23 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 bool SchematicEditorState_Select::
     processGraphicsSceneLeftMouseButtonDoubleClicked(
         QGraphicsSceneMouseEvent& e) noexcept {
+  // If SHIFT or CTRL is pressed, the user is modifying items selection, not
+  // double-clicking.
+  if (e.modifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+    return processGraphicsSceneLeftMouseButtonPressed(e);
+  }
+
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   if (mSubState == SubState::IDLE) {
-    // check if there is an element under the mouse
-    QList<SI_Base*> items =
-        schematic->getItemsAtScenePos(Point::fromPx(e.scenePos()));
-    if (items.isEmpty()) return false;
-
-    // open the properties editor dialog of the top most item
-    if (openPropertiesDialog(items.first())) {
-      return true;
+    // Open the properties editor dialog of the selected item, if any.
+    const QList<SI_Base*> items = findItemsAtPos(
+        Point::fromPx(e.scenePos()), FindFlag::All | FindFlag::AcceptNearMatch);
+    foreach (auto item, items) {
+      if (item->isSelected() && openPropertiesDialog(item)) {
+        return true;
+      }
     }
   }
 
@@ -379,7 +394,8 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
   // handle item selection
   Point pos = Point::fromPx(e.scenePos());
-  QList<SI_Base*> items = schematic->getItemsAtScenePos(pos);
+  QList<SI_Base*> items =
+      findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
   if (items.isEmpty()) return false;
   SI_Base* selectedItem = nullptr;
   foreach (SI_Base* item, items) {

@@ -76,61 +76,6 @@ FootprintGraphicsItem::~FootprintGraphicsItem() noexcept {
  *  Getters
  ******************************************************************************/
 
-int FootprintGraphicsItem::getItemsAtPosition(
-    const Point& pos, QList<std::shared_ptr<FootprintPadGraphicsItem>>* pads,
-    QList<std::shared_ptr<CircleGraphicsItem>>* circles,
-    QList<std::shared_ptr<PolygonGraphicsItem>>* polygons,
-    QList<std::shared_ptr<StrokeTextGraphicsItem>>* texts,
-    QList<std::shared_ptr<HoleGraphicsItem>>* holes) noexcept {
-  int count = 0;
-  if (pads) {
-    foreach (const auto& ptr, mPadGraphicsItems) {
-      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
-      if (ptr->shape().contains(mappedPos)) {
-        pads->append(ptr);
-        ++count;
-      }
-    }
-  }
-  if (circles) {
-    foreach (const auto& ptr, mCircleGraphicsItems) {
-      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
-      if (ptr->shape().contains(mappedPos)) {
-        circles->append(ptr);
-        ++count;
-      }
-    }
-  }
-  if (polygons) {
-    foreach (const auto& ptr, mPolygonGraphicsItems) {
-      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
-      if (ptr->shape().contains(mappedPos)) {
-        polygons->append(ptr);
-        ++count;
-      }
-    }
-  }
-  if (texts) {
-    foreach (const auto& ptr, mStrokeTextGraphicsItems) {
-      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
-      if (ptr->shape().contains(mappedPos)) {
-        texts->append(ptr);
-        ++count;
-      }
-    }
-  }
-  if (holes) {
-    foreach (const auto& ptr, mHoleGraphicsItems) {
-      QPointF mappedPos = mapToItem(ptr.get(), pos.toPxQPointF());
-      if (ptr->shape().contains(mappedPos)) {
-        holes->append(ptr);
-        ++count;
-      }
-    }
-  }
-  return count;
-}
-
 QList<std::shared_ptr<FootprintPadGraphicsItem>>
     FootprintGraphicsItem::getSelectedPads() noexcept {
   QList<std::shared_ptr<FootprintPadGraphicsItem>> pins;
@@ -184,6 +129,106 @@ QList<std::shared_ptr<HoleGraphicsItem>>
     }
   }
   return holes;
+}
+
+QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
+    const QPainterPath& posAreaSmall, const QPainterPath& posAreaLarge,
+    FindFlags flags) noexcept {
+  const QPointF pos = posAreaSmall.boundingRect().center();
+
+  // Note: The order of adding the items is very important (the top most item
+  // must appear as the first item in the list)! For that, we work with
+  // priorities (0 = highest priority):
+  //
+  //     0: holes
+  //    10: pads tht
+  //    20: texts board layer
+  //    30: polygons/circles board layer
+  //   110: pads top
+  //   120: texts top
+  //   130: polygons/circles top
+  //   220: texts inner
+  //   230: polygons/circles inner
+  //   310: pads bottom
+  //   320: texts bottom
+  //   330: polygons/circles bottom
+  //
+  // So the system is:
+  //      0 for holes
+  //     10 for pads
+  //     20 for texts
+  //     30 for polygons/circles
+  //   +100 for top layer items
+  //   +200 for inner layer items
+  //   +300 for bottom layer items
+  //
+  // And for items not directly under the cursor, but very close to the cursor,
+  // add +1000.
+  QMultiMap<std::pair<int, qreal>, std::shared_ptr<QGraphicsItem>> items;
+  auto priorityFromLayer = [](const QString& layerName) {
+    if (GraphicsLayer::isTopLayer(layerName)) {
+      return 100;
+    } else if (GraphicsLayer::isInnerLayer(layerName)) {
+      return 200;
+    } else if (GraphicsLayer::isBottomLayer(layerName)) {
+      return 300;
+    } else {
+      return 0;
+    }
+  };
+  auto processItem = [this, &items, &pos, &posAreaSmall, &posAreaLarge, flags](
+                         const std::shared_ptr<QGraphicsItem>& item,
+                         int priority, bool large = false) {
+    Q_ASSERT(item);
+    const QPainterPath grabArea = mapFromItem(item.get(), item->shape());
+    const QPointF center = grabArea.controlPointRect().center();
+    const QPointF diff = center - pos;
+    qreal distance = (diff.x() * diff.x()) + (diff.y() * diff.y());
+    if (grabArea.contains(pos)) {
+      items.insert(std::make_pair(priority, distance), item);
+    } else if ((flags & FindFlag::AcceptNearMatch) &&
+               grabArea.intersects(large ? posAreaLarge : posAreaSmall)) {
+      items.insert(std::make_pair(priority + 1000, distance), item);
+    }
+  };
+
+  if (flags.testFlag(FindFlag::Holes)) {
+    foreach (auto ptr, mHoleGraphicsItems) {
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 0);
+    }
+  }
+
+  if (flags.testFlag(FindFlag::Pads)) {
+    foreach (auto ptr, mPadGraphicsItems) {
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
+                  10 + priorityFromLayer(ptr->getPad()->getLayerName()));
+    }
+  }
+
+  if (flags.testFlag(FindFlag::StrokeTexts)) {
+    foreach (auto ptr, mStrokeTextGraphicsItems) {
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
+                  20 + priorityFromLayer(*ptr->getText().getLayerName()));
+    }
+  }
+
+  if (flags.testFlag(FindFlag::Circles)) {
+    foreach (auto ptr, mCircleGraphicsItems) {
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
+                  30 + priorityFromLayer(*ptr->getCircle().getLayerName()),
+                  true);  // Probably large grab area makes sense?
+    }
+  }
+
+  if (flags.testFlag(FindFlag::Polygons)) {
+    foreach (auto ptr, mPolygonGraphicsItems) {
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
+                  30 + priorityFromLayer(*ptr->getPolygon().getLayerName()),
+                  true);  // Probably large grab area makes sense?
+    }
+  }
+
+  return items.values();
 }
 
 /*******************************************************************************

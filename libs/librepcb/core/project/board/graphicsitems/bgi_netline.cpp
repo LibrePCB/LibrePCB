@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "bgi_netline.h"
 
+#include "../../../utils/toolbox.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../board.h"
@@ -91,11 +92,8 @@ void BGI_NetLine::updateCacheAndRepaint() noexcept {
   mShape = QPainterPath();
   mShape.moveTo(mNetLine.getStartPoint().getPosition().toPxQPointF());
   mShape.lineTo(mNetLine.getEndPoint().getPosition().toPxQPointF());
-  QPainterPathStroker ps;
-  ps.setCapStyle(Qt::RoundCap);
-  PositiveLength width = qMax(mNetLine.getWidth(), PositiveLength(100000));
-  ps.setWidth(width->toPx());
-  mShape = ps.createStroke(mShape);
+  mShape = Toolbox::shapeFromPath(mShape, QPen(Qt::SolidPattern, 0), QBrush(),
+                                  positiveToUnsigned(mNetLine.getWidth()));
   update();
 }
 

@@ -137,6 +137,7 @@ void BI_Via::addToBoard() {
               [this]() { mGraphicsItem->update(); });
   BI_Base::addToBoard(mGraphicsItem.data());
   mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
+  mGraphicsItem->updateCacheAndRepaint();  // Force updating tooltip.
 }
 
 void BI_Via::removeFromBoard() {

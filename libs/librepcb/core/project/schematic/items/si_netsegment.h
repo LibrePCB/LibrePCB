@@ -67,12 +67,6 @@ public:
   const Uuid& getUuid() const noexcept { return mUuid; }
   NetSignal& getNetSignal() const noexcept { return *mNetSignal; }
   bool isUsed() const noexcept;
-  int getNetPointsAtScenePos(const Point& pos,
-                             QList<SI_NetPoint*>& points) const noexcept;
-  int getNetLinesAtScenePos(const Point& pos, QList<SI_NetLine*>& lines) const
-      noexcept;
-  int getNetLabelsAtScenePos(const Point& pos,
-                             QList<SI_NetLabel*>& labels) const noexcept;
   QSet<QString> getForcedNetNames() const noexcept;
   QString getForcedNetName() const noexcept;
   Point calcNearestPoint(const Point& p) const noexcept;

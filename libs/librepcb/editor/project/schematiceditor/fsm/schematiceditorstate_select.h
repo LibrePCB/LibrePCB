@@ -119,7 +119,6 @@ private:  // Data
   SubState mSubState;  ///< the current substate
   Point mStartPos;
   QScopedPointer<CmdDragSelectedSchematicItems> mSelectedItemsDragCommand;
-  int mCurrentSelectionIndex;
 };
 
 /*******************************************************************************
