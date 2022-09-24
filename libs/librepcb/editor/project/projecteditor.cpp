@@ -132,10 +132,6 @@ void ProjectEditor::abortBlockingToolsInOtherEditors(QWidget* editor) noexcept {
     if (mBoardEditor && (editor != mBoardEditor)) {
       mBoardEditor->abortAllCommands();
     }
-    if (mUndoStack->isCommandGroupActive()) {
-      qWarning() << "Requested to abort tools in other editors, but there is "
-                    "still an active undo command group.";
-    }
   }
 }
 

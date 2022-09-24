@@ -91,7 +91,6 @@ BoardEditorState_Select::BoardEditorState_Select(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mCurrentSelectionIndex(0),
     mSelectedPolygon(nullptr),
     mSelectedPolygonVertices(),
     mCmdPolygonEdit(),
@@ -489,28 +488,42 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     } else {
       // handle items selection
       QList<BI_Base*> items =
-          board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
+          findItemsAtPos(Point::fromPx(e.scenePos()),
+                         FindFlag::All | FindFlag::AcceptNearMatch);
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
         board->clearSelection();
-        mCurrentSelectionIndex = 0;
         return true;
       }
 
-      bool itemAlreadySelected = items.first()->isSelected();
-
+      // Check if there's already an item selected.
+      BI_Base* selectedItem = nullptr;
+      foreach (auto item, items) {
+        if (item->isSelected()) {
+          selectedItem = item;
+          break;
+        }
+      }
       if ((e.modifiers() & Qt::ControlModifier)) {
-        // Toggle selection when CTRL is pressed
-        items.first()->setSelected(!itemAlreadySelected);
+        // Toggle selection when CTRL is pressed.
+        auto item = selectedItem ? selectedItem : items.first();
+        item->setSelected(!item->isSelected());
       } else if ((e.modifiers() & Qt::ShiftModifier)) {
-        // Cycle Selection, when holding shift
-        mCurrentSelectionIndex += 1;
-        mCurrentSelectionIndex %= items.count();
+        // Cycle Selection, when holding shift.
+        int nextSelectionIndex = 0;
+        for (int i = 0; i < items.count(); ++i) {
+          if (items.at(i)->isSelected()) {
+            nextSelectionIndex = (i + 1) % items.count();
+            break;
+          }
+        }
+        Q_ASSERT((nextSelectionIndex >= 0) &&
+                 (nextSelectionIndex < items.count()));
         board->clearSelection();
-        items[mCurrentSelectionIndex]->setSelected(true);
-      } else if (!itemAlreadySelected) {
+        items[nextSelectionIndex]->setSelected(true);
+      } else if (!selectedItem) {
         // Only select the topmost item when clicking an unselected item
-        // without CTRL
+        // without CTRL.
         board->clearSelection();
         items.first()->setSelected(true);
       }
@@ -570,19 +583,23 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
     QGraphicsSceneMouseEvent& e) noexcept {
+  // If SHIFT or CTRL is pressed, the user is modifying items selection, not
+  // double-clicking.
+  if (e.modifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
+    return processGraphicsSceneLeftMouseButtonPressed(e);
+  }
+
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
   if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
-    // Check if there is an element under the mouse
-    QList<BI_Base*> items =
-        board->getItemsAtScenePos(Point::fromPx(e.scenePos()));
-    if (items.isEmpty()) return false;
-    if (openPropertiesDialog(items.first())) {
-      return true;
+    // Open the properties editor dialog of the selected item, if any.
+    const QList<BI_Base*> items = findItemsAtPos(
+        Point::fromPx(e.scenePos()), FindFlag::All | FindFlag::AcceptNearMatch);
+    foreach (auto item, items) {
+      if (item->isSelected() && openPropertiesDialog(item)) {
+        return true;
+      }
     }
   }
 
@@ -602,10 +619,10 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       return rotateSelectedItems(Angle::deg90());
     }
   } else if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
-    Point pos = Point::fromPx(e.scenePos());
-
     // handle item selection
-    QList<BI_Base*> items = board->getItemsAtScenePos(pos);
+    Point pos = Point::fromPx(e.scenePos());
+    QList<BI_Base*> items =
+        findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
     if (items.isEmpty()) return false;
 
     // If the right-clicked element is part of an active selection, keep it

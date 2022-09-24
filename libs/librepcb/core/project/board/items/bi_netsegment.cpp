@@ -233,41 +233,6 @@ int BI_NetSegment::getNetLinesAtScenePos(const Point& pos,
   return count;
 }
 
-BI_NetPoint* BI_NetSegment::getNetPointNextToScenePos(
-    const Point& pos, const GraphicsLayer* layer,
-    UnsignedLength& maxDistance) const noexcept {
-  BI_NetPoint* result = nullptr;
-  foreach (BI_NetPoint* netpoint, mNetPoints) {
-    if (netpoint->isSelectable() &&
-        ((!layer) || (netpoint->getLayerOfLines() == layer))) {
-      UnsignedLength distance = (netpoint->getPosition() - pos).getLength();
-      if (distance < maxDistance) {
-        maxDistance = distance;
-        result = netpoint;
-      }
-    }
-  }
-  return result;
-}
-
-BI_Via* BI_NetSegment::getViaNextToScenePos(const Point& pos,
-                                            UnsignedLength& maxDistance) const
-    noexcept {
-  BI_Via* result = nullptr;
-  foreach (BI_Via* via, mVias) {
-    if (via->isSelectable()) {
-      // NOTE(5n8ke): maxDistance is depending on the center of the via and
-      // not the actual distance between the position and the edge of the via
-      UnsignedLength distance = (via->getPosition() - pos).getLength();
-      if (distance < maxDistance) {
-        maxDistance = distance;
-        result = via;
-      }
-    }
-  }
-  return result;
-}
-
 /*******************************************************************************
  *  Setters
  ******************************************************************************/

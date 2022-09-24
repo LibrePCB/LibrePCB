@@ -149,13 +149,10 @@ bool SchematicEditorState_DrawWire::processAbortCommand() noexcept {
 
 bool SchematicEditorState_DrawWire::processKeyPressed(
     const QKeyEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   switch (e.key()) {
     case Qt::Key_Shift: {
       if (mSubState == SubState::POSITIONING_NETPOINT) {
-        updateNetpointPositions(*schematic, false);
+        updateNetpointPositions(false);
         return true;
       }
       break;
@@ -169,13 +166,10 @@ bool SchematicEditorState_DrawWire::processKeyPressed(
 
 bool SchematicEditorState_DrawWire::processKeyReleased(
     const QKeyEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   switch (e.key()) {
     case Qt::Key_Shift: {
       if (mSubState == SubState::POSITIONING_NETPOINT) {
-        updateNetpointPositions(*schematic, true);
+        updateNetpointPositions(true);
         return true;
       }
       break;
@@ -189,14 +183,11 @@ bool SchematicEditorState_DrawWire::processKeyReleased(
 
 bool SchematicEditorState_DrawWire::processGraphicsSceneMouseMoved(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
-
   mCursorPos = Point::fromPx(e.scenePos());
 
   if (mSubState == SubState::POSITIONING_NETPOINT) {
     bool snap = !e.modifiers().testFlag(Qt::ShiftModifier);
-    updateNetpointPositions(*schematic, snap);
+    updateNetpointPositions(snap);
     return true;
   }
 
@@ -294,15 +285,16 @@ bool SchematicEditorState_DrawWire::startPositioning(
     tl::optional<CircuitIdentifier> forcedNetName;
     Point pos = mCursorPos.mappedToGrid(getGridInterval());
     if (snap || fixedPoint) {
+      SI_Base* item = findItem(mCursorPos);
       if (fixedPoint) {
         mFixedStartAnchor = fixedPoint;
         netsegment = &fixedPoint->getNetSegment();
         pos = fixedPoint->getPosition();
-      } else if (SI_NetPoint* netpoint = findNetPoint(schematic, mCursorPos)) {
+      } else if (SI_NetPoint* netpoint = qobject_cast<SI_NetPoint*>(item)) {
         mFixedStartAnchor = netpoint;
         netsegment = &netpoint->getNetSegment();
         pos = netpoint->getPosition();
-      } else if (SI_SymbolPin* pin = findSymbolPin(schematic, mCursorPos)) {
+      } else if (SI_SymbolPin* pin = qobject_cast<SI_SymbolPin*>(item)) {
         mFixedStartAnchor = pin;
         netsegment = pin->getNetSegmentOfLines();
         netsignal = pin->getCompSigInstNetSignal();
@@ -321,12 +313,14 @@ bool SchematicEditorState_DrawWire::startPositioning(
                     .arg(name));
           }
         }
-      } else if (SI_NetLine* netline = findNetLine(schematic, mCursorPos)) {
+      } else if (SI_NetLine* netline = qobject_cast<SI_NetLine*>(item)) {
         // split netline
         netsegment = &netline->getNetSegment();
         QScopedPointer<CmdSchematicNetSegmentAddElements> cmdAdd(
             new CmdSchematicNetSegmentAddElements(*netsegment));
-        mFixedStartAnchor = cmdAdd->addNetPoint(pos);
+        mFixedStartAnchor = cmdAdd->addNetPoint(Toolbox::nearestPointOnLine(
+            pos, netline->getStartPoint().getPosition(),
+            netline->getEndPoint().getPosition()));
         cmdAdd->addNetLine(*mFixedStartAnchor, netline->getStartPoint());
         cmdAdd->addNetLine(*mFixedStartAnchor, netline->getEndPoint());
         mContext.undoStack.appendToCmdGroup(cmdAdd.take());  // can throw
@@ -404,7 +398,7 @@ bool SchematicEditorState_DrawWire::startPositioning(
     mPositioningNetLine2 = l2;
 
     // properly place the new netpoints/netlines according the current wire mode
-    updateNetpointPositions(schematic, snap);
+    updateNetpointPositions(snap);
 
     // highlight all elements of the current netsignal
     mCircuit.setHighlightedNetSignal(&netsegment->getNetSignal());
@@ -424,7 +418,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(Schematic& schematic,
   Q_ASSERT(mSubState == SubState::POSITIONING_NETPOINT);
 
   // Snap to the item under the cursor and make sure the lines are up to date.
-  Point pos = updateNetpointPositions(schematic, snap);
+  Point pos = updateNetpointPositions(snap);
 
   // abort if p2 == p0 (no line drawn)
   if (pos == mFixedStartAnchor->getPosition()) {
@@ -463,11 +457,12 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(Schematic& schematic,
       SI_NetSegment* otherNetSegment = nullptr;
       QString otherForcedNetName;
       if (snap) {
-        if (SI_NetPoint* netpoint =
-                findNetPoint(schematic, pos, mPositioningNetPoint2)) {
+        SI_Base* item =
+            findItem(pos, {mPositioningNetPoint2, mPositioningNetLine2});
+        if (SI_NetPoint* netpoint = qobject_cast<SI_NetPoint*>(item)) {
           otherAnchor = netpoint;
           otherNetSegment = &netpoint->getNetSegment();
-        } else if (SI_SymbolPin* pin = findSymbolPin(schematic, pos)) {
+        } else if (SI_SymbolPin* pin = qobject_cast<SI_SymbolPin*>(item)) {
           otherAnchor = pin;
           otherNetSegment = pin->getNetSegmentOfLines();
           // connect pin if needed
@@ -479,8 +474,7 @@ bool SchematicEditorState_DrawWire::addNextNetPoint(Schematic& schematic,
             otherForcedNetName =
                 pin->getComponentSignalInstance()->getForcedNetSignalName();
           }
-        } else if (SI_NetLine* netline =
-                       findNetLine(schematic, pos, mPositioningNetLine2)) {
+        } else if (SI_NetLine* netline = qobject_cast<SI_NetLine*>(item)) {
           // split netline
           otherNetSegment = &netline->getNetSegment();
           QScopedPointer<CmdSchematicNetSegmentAddElements> cmdAdd(
@@ -631,44 +625,32 @@ bool SchematicEditorState_DrawWire::abortPositioning(
   }
 }
 
-SI_SymbolPin* SchematicEditorState_DrawWire::findSymbolPin(
-    Schematic& schematic, const Point& pos) const noexcept {
-  QList<SI_SymbolPin*> items = schematic.getPinsAtScenePos(pos);
-  for (int i = items.count() - 1; i >= 0; --i) {
-    // only choose pins which are connected to a component signal!
-    if (!items.at(i)->getComponentSignalInstance()) {
-      items.removeAt(i);
-    }
-  }
-  return (items.count() > 0) ? items.first() : nullptr;
-}
-
-SI_NetPoint* SchematicEditorState_DrawWire::findNetPoint(
-    Schematic& schematic, const Point& pos, SI_NetPoint* except) const
-    noexcept {
-  QList<SI_NetPoint*> items = schematic.getNetPointsAtScenePos(pos);
-  items.removeAll(except);
-  return (items.count() > 0) ? items.first() : nullptr;
-}
-
-SI_NetLine* SchematicEditorState_DrawWire::findNetLine(Schematic& schematic,
-                                                       const Point& pos,
-                                                       SI_NetLine* except) const
-    noexcept {
-  QList<SI_NetLine*> items = schematic.getNetLinesAtScenePos(pos);
-  items.removeAll(except);
-  return (items.count() > 0) ? items.first() : nullptr;
+SI_Base* SchematicEditorState_DrawWire::findItem(
+    const Point& pos, const QSet<SI_Base*>& except) noexcept {
+  // Only find pins which are connected to a component signal!
+  return findItemAtPos<SI_Base>(pos,
+                                FindFlag::NetPoints | FindFlag::NetLines |
+                                    FindFlag::SymbolPinsWithComponentSignal |
+                                    FindFlag::AcceptNearestWithinGrid,
+                                except);
 }
 
 Point SchematicEditorState_DrawWire::updateNetpointPositions(
-    Schematic& schematic, bool snap) noexcept {
+    bool snap) noexcept {
   // Find anchor under cursor.
   Point pos = mCursorPos.mappedToGrid(getGridInterval());
   if (snap) {
-    if (SI_NetPoint* np = findNetPoint(schematic, mCursorPos)) {
-      pos = np->getPosition();
-    } else if (SI_SymbolPin* pin = findSymbolPin(schematic, mCursorPos)) {
-      pos = pin->getPosition();
+    SI_Base* item = findItem(mCursorPos,
+                             {mPositioningNetPoint1, mPositioningNetPoint2,
+                              mPositioningNetLine1, mPositioningNetLine2});
+    if (SI_NetLineAnchor* anchor = dynamic_cast<SI_NetLineAnchor*>(item)) {
+      pos = anchor->getPosition();
+    } else if (SI_NetLine* netline = qobject_cast<SI_NetLine*>(item)) {
+      pos = Toolbox::nearestPointOnLine(pos,
+                                        netline->getStartPoint().getPosition(),
+                                        netline->getEndPoint().getPosition());
+    } else if (item) {
+      qCritical() << "Found item below cursor, but it has an unexpected type!";
     }
   }
 
@@ -681,9 +663,7 @@ Point SchematicEditorState_DrawWire::updateNetpointPositions(
 void SchematicEditorState_DrawWire::wireModeChanged(WireMode mode) noexcept {
   mCurrentWireMode = mode;
   if (mSubState == SubState::POSITIONING_NETPOINT) {
-    if (Schematic* schematic = getActiveSchematic()) {
-      updateNetpointPositions(*schematic, true);
-    }
+    updateNetpointPositions(true);
   }
 }
 

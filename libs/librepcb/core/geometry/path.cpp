@@ -72,6 +72,23 @@ UnsignedLength Path::getTotalStraightLength() const noexcept {
   return length;
 }
 
+Point Path::calcNearestPointBetweenVertices(const Point& p) const noexcept {
+  if (!mVertices.isEmpty()) {
+    // Note: Does not take arcs into account yet.
+    Point nearest = mVertices.first().getPos();
+    for (int i = 1; i < mVertices.count(); ++i) {
+      Point tmp = Toolbox::nearestPointOnLine(p, mVertices.at(i - 1).getPos(),
+                                              mVertices.at(i).getPos());
+      if ((tmp - p).getLength() < (nearest - p).getLength()) {
+        nearest = tmp;
+      }
+    }
+    return nearest;
+  } else {
+    return Point();
+  }
+}
+
 Path Path::toClosedPath() const noexcept {
   Path p(*this);
   p.close();

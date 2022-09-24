@@ -131,7 +131,6 @@ private:  // Types / Data
   SubState mState;
   Point mStartPos;
   QScopedPointer<CmdDragSelectedSymbolItems> mCmdDragSelectedItems;
-  int mCurrentSelectionIndex;
 
   /// The current polygon selected for editing (nullptr if none)
   std::shared_ptr<Polygon> mSelectedPolygon;

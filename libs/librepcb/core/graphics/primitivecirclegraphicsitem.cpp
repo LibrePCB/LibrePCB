@@ -176,7 +176,7 @@ void PrimitiveCircleGraphicsItem::updateBoundingRectAndShape() noexcept {
   mBoundingRect = Toolbox::adjustedBoundingRect(mCircleRect, mPen.widthF() / 2);
   QPainterPath p;
   p.addEllipse(mCircleRect);
-  mShape = Toolbox::shapeFromPath(p, mPen, mBrush, UnsignedLength(200000));
+  mShape = Toolbox::shapeFromPath(p, mPen, mBrush);
   update();
 }
 

@@ -190,8 +190,7 @@ void PrimitivePathGraphicsItem::updateBoundingRectAndShape() noexcept {
   if (mShapeMode == ShapeMode::FILLED_OUTLINE) {
     mShape = mPainterPath;
   } else {
-    mShape = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush,
-                                    UnsignedLength(200000));
+    mShape = Toolbox::shapeFromPath(mPainterPath, mPen, mBrush);
   }
   mBoundingRect = mShape.controlPointRect();
   update();

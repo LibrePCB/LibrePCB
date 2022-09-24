@@ -86,7 +86,6 @@ public:
   // Inherited Methods
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
-  QPainterPath shape() const noexcept override;
   void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
              QWidget* widget = 0) noexcept override;
 

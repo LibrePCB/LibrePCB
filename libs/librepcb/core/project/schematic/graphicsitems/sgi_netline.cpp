@@ -23,6 +23,7 @@
 #include "sgi_netline.h"
 
 #include "../../../application.h"
+#include "../../../utils/toolbox.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../items/si_netline.h"
@@ -72,11 +73,8 @@ void SGI_NetLine::updateCacheAndRepaint() noexcept {
   mShape = QPainterPath();
   mShape.moveTo(mNetLine.getStartPoint().getPosition().toPxQPointF());
   mShape.lineTo(mNetLine.getEndPoint().getPosition().toPxQPointF());
-  QPainterPathStroker ps;
-  ps.setCapStyle(Qt::RoundCap);
-  UnsignedLength width = qMax(mNetLine.getWidth(), UnsignedLength(1270000));
-  ps.setWidth(width->toPx());
-  mShape = ps.createStroke(mShape);
+  mShape = Toolbox::shapeFromPath(mShape, QPen(Qt::SolidPattern, 0), QBrush(),
+                                  mNetLine.getWidth());
   update();
 }
 

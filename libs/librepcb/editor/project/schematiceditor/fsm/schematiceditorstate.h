@@ -38,6 +38,7 @@ namespace librepcb {
 class GraphicsLayer;
 class LengthUnit;
 class Point;
+class SI_Base;
 class Schematic;
 
 namespace editor {
@@ -56,6 +57,28 @@ class SchematicEditorState : public QObject {
 
 public:
   using Context = SchematicEditorFsm::Context;
+
+  enum class FindFlag {
+    // Item types
+    NetPoints = (1 << 0),
+    NetLines = (1 << 1),
+    NetLabels = (1 << 2),
+    Symbols = (1 << 3),
+    SymbolPins = (1 << 4),
+    SymbolPinsWithComponentSignal = (1 << 5),  // Subset of SymbolPins.
+    Polygons = (1 << 6),
+    Texts = (1 << 7),
+    All = NetPoints | NetLines | NetLabels | Symbols | SymbolPins | Polygons |
+        Texts,
+
+    // Match behavior
+    AcceptNearMatch = (1 << 10),
+    AcceptNearestWithinGrid = (1 << 11),
+
+    // Performance options
+    SkipLowerPriorityMatches = (1 << 15),
+  };
+  Q_DECLARE_FLAGS(FindFlags, FindFlag)
 
   // Constructors / Destructor
   SchematicEditorState() = delete;
@@ -147,16 +170,32 @@ protected:  // Methods
   void abortBlockingToolsInOtherEditors() noexcept;
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;
+  QList<SI_Base*> findItemsAtPos(const Point& pos, FindFlags flags,
+                                 const QSet<SI_Base*>& except = {}) noexcept;
+  template <typename T = SI_Base>
+  T* findItemAtPos(const Point& pos, FindFlags flags,
+                   const QSet<SI_Base*>& except = {}) noexcept {
+    const QList<SI_Base*> items =
+        findItemsAtPos(pos, flags | FindFlag::SkipLowerPriorityMatches, except);
+    T* castedItem = qobject_cast<T*>(items.value(0, nullptr));
+    if ((!items.isEmpty()) && (!castedItem)) {
+      // Probably wrong flags are passed?!?!
+      qCritical() << "Found a schematic item, but it has the wrong type!";
+    }
+    return castedItem;
+  }
 
 protected:  // Data
   Context mContext;
 };
 
+}  // namespace editor
+}  // namespace librepcb
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::editor::SchematicEditorState::FindFlags)
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
-
-}  // namespace editor
-}  // namespace librepcb
 
 #endif

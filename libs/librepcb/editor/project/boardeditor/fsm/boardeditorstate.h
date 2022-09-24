@@ -35,9 +35,11 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BI_Base;
 class Board;
 class GraphicsLayer;
 class LengthUnit;
+class NetSignal;
 class Point;
 
 namespace editor {
@@ -56,6 +58,29 @@ class BoardEditorState : public QObject {
 
 public:
   using Context = BoardEditorFsm::Context;
+
+  enum class FindFlag {
+    // Item types
+    Vias = (1 << 0),
+    NetPoints = (1 << 1),
+    NetLines = (1 << 2),
+    Footprints = (1 << 3),
+    FootprintPads = (1 << 4),
+    Planes = (1 << 5),
+    Polygons = (1 << 6),
+    StrokeTexts = (1 << 7),
+    Holes = (1 << 8),
+    All = Vias | NetPoints | NetLines | Footprints | FootprintPads | Planes |
+        Polygons | StrokeTexts | Holes,
+
+    // Match behavior
+    AcceptNearMatch = (1 << 10),
+    AcceptNextGridMatch = (1 << 11),
+
+    // Performance options
+    SkipLowerPriorityMatches = (1 << 15),
+  };
+  Q_DECLARE_FLAGS(FindFlags, FindFlag)
 
   // Constructors / Destructor
   BoardEditorState() = delete;
@@ -159,16 +184,37 @@ protected:  // Methods
   void abortBlockingToolsInOtherEditors() noexcept;
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;
+  QList<BI_Base*> findItemsAtPos(const Point& pos, FindFlags flags,
+                                 const GraphicsLayer* cuLayer = nullptr,
+                                 const QSet<const NetSignal*>& netsignals = {},
+                                 const QSet<BI_Base*>& except = {}) noexcept;
+  template <typename T = BI_Base>
+  T* findItemAtPos(const Point& pos, FindFlags flags,
+                   const GraphicsLayer* cuLayer = nullptr,
+                   const QSet<const NetSignal*>& netsignals = {},
+                   const QSet<BI_Base*>& except = {}) noexcept {
+    const QList<BI_Base*> items =
+        findItemsAtPos(pos, flags | FindFlag::SkipLowerPriorityMatches, cuLayer,
+                       netsignals, except);
+    T* castedItem = qobject_cast<T*>(items.value(0, nullptr));
+    if ((!items.isEmpty()) && (!castedItem)) {
+      // Probably wrong flags are passed?!?!
+      qCritical() << "Found a board item, but it has the wrong type!";
+    }
+    return castedItem;
+  }
 
 protected:  // Data
   Context mContext;
 };
 
+}  // namespace editor
+}  // namespace librepcb
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::editor::BoardEditorState::FindFlags)
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
-
-}  // namespace editor
-}  // namespace librepcb
 
 #endif

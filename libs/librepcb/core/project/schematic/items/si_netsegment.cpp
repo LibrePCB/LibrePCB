@@ -142,45 +142,6 @@ bool SI_NetSegment::isUsed() const noexcept {
           (!mNetLabels.isEmpty()));
 }
 
-int SI_NetSegment::getNetPointsAtScenePos(const Point& pos,
-                                          QList<SI_NetPoint*>& points) const
-    noexcept {
-  int count = 0;
-  foreach (SI_NetPoint* netpoint, mNetPoints) {
-    if (netpoint->getGrabAreaScenePx().contains(pos.toPxQPointF())) {
-      points.append(netpoint);
-      ++count;
-    }
-  }
-  return count;
-}
-
-int SI_NetSegment::getNetLinesAtScenePos(const Point& pos,
-                                         QList<SI_NetLine*>& lines) const
-    noexcept {
-  int count = 0;
-  foreach (SI_NetLine* netline, mNetLines) {
-    if (netline->getGrabAreaScenePx().contains(pos.toPxQPointF())) {
-      lines.append(netline);
-      ++count;
-    }
-  }
-  return count;
-}
-
-int SI_NetSegment::getNetLabelsAtScenePos(const Point& pos,
-                                          QList<SI_NetLabel*>& labels) const
-    noexcept {
-  int count = 0;
-  foreach (SI_NetLabel* netlabel, mNetLabels) {
-    if (netlabel->getGrabAreaScenePx().contains(pos.toPxQPointF())) {
-      labels.append(netlabel);
-      ++count;
-    }
-  }
-  return count;
-}
-
 QSet<QString> SI_NetSegment::getForcedNetNames() const noexcept {
   QSet<QString> names;
   foreach (SI_NetLine* netline, mNetLines) {

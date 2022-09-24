@@ -273,7 +273,7 @@ bool BoardEditorState_AddVia::updatePosition(Board& board,
   if (mCurrentViaEditCmd) {
     mCurrentViaEditCmd->setPosition(pos, true);
     if (mUseAutoNetSignal) {
-      updateClosestNetSignal(board, pos);
+      updateClosestNetSignal(pos);
       applySelectedNetSignal();
     }
     board.triggerAirWiresRebuild();
@@ -439,17 +439,22 @@ void BoardEditorState_AddVia::applySelectedNetSignal() noexcept {
 }
 
 void BoardEditorState_AddVia::updateClosestNetSignal(
-    Board& board, const Point& pos) noexcept {
+    const Point& pos) noexcept {
   // TODO(5n8ke): Get the closest candidate, instead of the most used
   // for now a _closest_ NetSignal is only found, when it is at pos.
   // Otherwise the last candidate is returned.
   if (!mClosestNetSignalIsUpToDate) {
     const NetSignal* netsignal = getCurrentNetSignal();
-    if (BI_NetLine* netline = findNetLine(board, pos)) {
+    BI_Base* item =
+        findItemAtPos(pos,
+                      FindFlag::Vias | FindFlag::FootprintPads |
+                          FindFlag::NetLines | FindFlag::AcceptNextGridMatch,
+                      nullptr, {}, {mCurrentViaToPlace});
+    if (BI_NetLine* netline = qobject_cast<BI_NetLine*>(item)) {
       netsignal = netline->getNetSegment().getNetSignal();
-    } else if (BI_FootprintPad* pad = findPad(board, pos)) {
+    } else if (BI_FootprintPad* pad = qobject_cast<BI_FootprintPad*>(item)) {
       netsignal = pad->getCompSigInstNetSignal();
-    } else if (BI_Via* via = findVia(board, pos, {}, {mCurrentViaToPlace})) {
+    } else if (BI_Via* via = qobject_cast<BI_Via*>(item)) {
       netsignal = via->getNetSegment().getNetSignal();
     } else if (!netsignal) {
       // If there was and still is no "closest" net signal available, fall back
@@ -473,32 +478,6 @@ NetSignal* BoardEditorState_AddVia::getCurrentNetSignal() const noexcept {
   return mCurrentNetSignal
       ? mContext.project.getCircuit().getNetSignalByUuid(*mCurrentNetSignal)
       : nullptr;
-}
-
-BI_Via* BoardEditorState_AddVia::findVia(
-    Board& board, const Point pos, const QSet<const NetSignal*>& netsignals,
-    const QSet<BI_Via*>& except) const noexcept {
-  QSet<BI_Via*> items =
-      Toolbox::toSet(board.getViasAtScenePos(pos, netsignals));
-  items -= except;
-  return items.count() > 0 ? *items.constBegin() : nullptr;
-}
-
-BI_FootprintPad* BoardEditorState_AddVia::findPad(
-    Board& board, const Point pos, const QSet<const NetSignal*>& netsignals,
-    const QSet<BI_FootprintPad*>& except) const noexcept {
-  QSet<BI_FootprintPad*> items =
-      Toolbox::toSet(board.getPadsAtScenePos(pos, nullptr, netsignals));
-  items -= except;
-  return items.count() > 0 ? *items.constBegin() : nullptr;
-}
-
-BI_NetLine* BoardEditorState_AddVia::findNetLine(
-    Board& board, const Point pos,
-    const QSet<const NetSignal*>& netsignals) const noexcept {
-  QSet<BI_NetLine*> items =
-      Toolbox::toSet(board.getNetLinesAtScenePos(pos, nullptr, netsignals));
-  return items.count() > 0 ? *items.constBegin() : nullptr;
 }
 
 /*******************************************************************************
