@@ -53,7 +53,7 @@ namespace editor {
 ProjectLibraryUpdater::ProjectLibraryUpdater(Workspace& ws,
                                              const FilePath& project,
                                              ControlPanel& cp) noexcept
-  : QMainWindow(nullptr),
+  : QDialog(nullptr),
     mWorkspace(ws),
     mProjectFilePath(project),
     mControlPanel(cp),
@@ -133,8 +133,8 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
       mControlPanel.openProject(mProjectFilePath);
       // bring this window to front again (with some delay to make it working
       // properly)
-      QTimer::singleShot(500, this, &QMainWindow::raise);
-      QTimer::singleShot(500, this, &QMainWindow::activateWindow);
+      QTimer::singleShot(500, this, &QDialog::raise);
+      QTimer::singleShot(500, this, &QDialog::activateWindow);
     }
   }
 
