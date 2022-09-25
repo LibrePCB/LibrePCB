@@ -409,8 +409,8 @@ QListView::item
               <property name="frameShape">
                <enum>QFrame::NoFrame</enum>
               </property>
-              <property name="openExternalLinks">
-               <bool>true</bool>
+              <property name="openLinks">
+               <bool>false</bool>
               </property>
              </widget>
             </item>

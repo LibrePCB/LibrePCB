@@ -203,7 +203,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_9">
+          <widget class="QLabel" name="lblLicenseLink">
            <property name="minimumSize">
             <size>
              <width>25</width>
@@ -220,12 +220,9 @@
             <string>https://en.wikipedia.org/wiki/Creative_Commons_license</string>
            </property>
            <property name="text">
-            <string>&lt;a href=&quot;https://en.wikipedia.org/wiki/Creative_Commons_license&quot;&gt;&lt;img src=&quot;:/img/status/info.png&quot; width=&quot;25&quot; height=&quot;25&quot;/&gt;&lt;/a&gt;</string>
+            <string notr="true">&lt;a href=&quot;https://en.wikipedia.org/wiki/Creative_Commons_license&quot;&gt;&lt;img src=&quot;:/img/status/info.png&quot; width=&quot;25&quot; height=&quot;25&quot;/&gt;&lt;/a&gt;</string>
            </property>
            <property name="scaledContents">
-            <bool>true</bool>
-           </property>
-           <property name="openExternalLinks">
             <bool>true</bool>
            </property>
           </widget>

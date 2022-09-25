@@ -62,6 +62,11 @@ FabricationOutputDialog::FabricationOutputDialog(
           mUi->edtSuffixSolderPasteTop, &QLineEdit::setEnabled);
   connect(mUi->cbxSolderPasteBot, &QCheckBox::toggled,
           mUi->edtSuffixSolderPasteBot, &QLineEdit::setEnabled);
+  connect(mUi->lblNotes, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mSettings, this);
+            ds.openWebUrl(QUrl(url));
+          });
 
   BoardFabricationOutputSettings s = mBoard.getFabricationOutputSettings();
   mUi->edtBasePath->setText(s.getOutputBasePath());

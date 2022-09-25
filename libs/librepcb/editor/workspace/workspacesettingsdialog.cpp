@@ -29,6 +29,7 @@
 #include "../modelview/keyboardshortcutsmodel.h"
 #include "../modelview/keysequencedelegate.h"
 #include "../utils/editortoolbox.h"
+#include "desktopservices.h"
 #include "ui_workspacesettingsdialog.h"
 
 #include <librepcb/core/application.h>
@@ -148,6 +149,11 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
             mRepositoryUrlsModel.data(), &RepositoryUrlModel::moveItemUp);
     connect(mUi->tblRepositoryUrls, &EditableTableWidget::btnMoveDownClicked,
             mRepositoryUrlsModel.data(), &RepositoryUrlModel::moveItemDown);
+    connect(mUi->lblRepositoriesInfo, &QLabel::linkActivated, this,
+            [this](const QString& url) {
+              DesktopServices ds(mWorkspace.getSettings(), this);
+              ds.openWebUrl(QUrl(url));
+            });
   }
 
   // Initialize external applications widgets

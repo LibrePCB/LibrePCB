@@ -163,9 +163,6 @@
           <property name="textFormat">
            <enum>Qt::RichText</enum>
           </property>
-          <property name="openExternalLinks">
-           <bool>true</bool>
-          </property>
           <property name="textInteractionFlags">
            <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
           </property>
@@ -197,9 +194,6 @@
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>
-          </property>
-          <property name="openExternalLinks">
-           <bool>true</bool>
           </property>
           <property name="textInteractionFlags">
            <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>

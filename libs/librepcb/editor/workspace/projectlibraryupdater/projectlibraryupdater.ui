@@ -52,9 +52,6 @@ p, li { white-space: pre-wrap; }
      <property name="margin">
       <number>3</number>
      </property>
-     <property name="openExternalLinks">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item>

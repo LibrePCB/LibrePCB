@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "addlibrarywidget.h"
 
+#include "../desktopservices.h"
 #include "librarydownload.h"
 #include "repositorylibrarylistwidgetitem.h"
 #include "ui_addlibrarywidget.h"
@@ -61,6 +62,11 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
           &AddLibraryWidget::downloadZipUrlLineEditTextChanged);
   connect(mUi->btnRepoLibsDownload, &QPushButton::clicked, this,
           &AddLibraryWidget::downloadLibrariesFromRepositoryButtonClicked);
+  connect(mUi->lblLicenseLink, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mWorkspace.getSettings(), this);
+            ds.openWebUrl(QUrl(url));
+          });
 
   // Hide text in library list since text is displayed with custom item
   // widgets, but list item texts are still set for keyboard navigation.
