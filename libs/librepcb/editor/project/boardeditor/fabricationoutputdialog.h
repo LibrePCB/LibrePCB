@@ -59,20 +59,22 @@ public:
                                    Board& board, QWidget* parent = 0);
   ~FabricationOutputDialog();
 
-private slots:
-  void on_btnDefaultSuffixes_clicked();
-  void on_btnProtelSuffixes_clicked();
-  void on_btnGenerate_clicked();
-  void on_btnBrowseOutputDir_clicked();
+signals:
+  void orderPcbDialogTriggered();
 
 private:
+  void btnDefaultSuffixesClicked();
+  void btnProtelSuffixesClicked();
+  void btnGenerateClicked();
+  void btnBrowseOutputDirClicked();
   QStringList getTopSilkscreenLayers() const noexcept;
   QStringList getBotSilkscreenLayers() const noexcept;
 
   const WorkspaceSettings& mSettings;
   Project& mProject;
   Board& mBoard;
-  Ui::FabricationOutputDialog* mUi;
+  QScopedPointer<Ui::FabricationOutputDialog> mUi;
+  QPointer<QPushButton> mBtnGenerate;
 };
 
 /*******************************************************************************
