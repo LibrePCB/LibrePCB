@@ -107,6 +107,10 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
       " (external_pdf_reader\n"
       "  (command \"evince \\\"{{FILEPATH}}\\\"\")\n"
       " )\n"
+      " (dismissed_messages\n"
+      "  (message \"SOME_MESSAGE: foo\")\n"
+      "  (message \"SOME_MESSAGE: bar\")\n"
+      " )\n"
       ")",
       FilePath());
 
@@ -127,6 +131,8 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
             obj.externalFileManagerCommands.get());
   EXPECT_EQ(QStringList{"evince \"{{FILEPATH}}\""},
             obj.externalPdfReaderCommands.get());
+  EXPECT_EQ((QSet<QString>{"SOME_MESSAGE: foo", "SOME_MESSAGE: bar"}),
+            obj.dismissedMessages.get());
 }
 
 TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
@@ -143,6 +149,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   obj1.externalWebBrowserCommands.set({"foo", "bar"});
   obj1.externalFileManagerCommands.set({"file", "manager"});
   obj1.externalPdfReaderCommands.set({"pdf", "reader"});
+  obj1.dismissedMessages.set({"foo", "bar"});
   const SExpression root1 = obj1.serialize();
 
   // Load
@@ -165,6 +172,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
             obj2.externalFileManagerCommands.get());
   EXPECT_EQ(obj1.externalPdfReaderCommands.get(),
             obj2.externalPdfReaderCommands.get());
+  EXPECT_EQ(obj1.dismissedMessages.get(), obj2.dismissedMessages.get());
   const SExpression root2 = obj2.serialize();
 
   // Check if serialization of loaded settings leads to same file content

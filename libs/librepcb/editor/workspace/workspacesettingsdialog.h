@@ -85,6 +85,7 @@ private:
   void buttonBoxClicked(QAbstractButton* button) noexcept;
   void keyPressEvent(QKeyEvent* event) noexcept override;
   void externalApplicationListIndexChanged(int index) noexcept;
+  void updateDismissedMessagesCount() noexcept;
   void loadSettings() noexcept;
   void saveSettings() noexcept;
 
