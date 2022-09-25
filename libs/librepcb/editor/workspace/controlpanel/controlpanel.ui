@@ -35,63 +35,10 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QLabel" name="lblWarnForNewerAppVersions">
-      <property name="font">
-       <font>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QLabel {
-	background-color: rgb(255, 255, 127);
-
-	color: rgb(170, 0, 0);
-};</string>
-      </property>
-      <property name="text">
-       <string>This workspace was already used with a newer version of LibrePCB. All changes in libraries and workspace settings will not be available in newer versions of LibrePCB.</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-      <property name="margin">
-       <number>10</number>
-      </property>
-     </widget>
+     <widget class="librepcb::editor::MessageWidget" name="msgWarnForNewerAppVersions" native="true"/>
     </item>
     <item>
-     <widget class="QLabel" name="lblWarnForNoLibraries">
-      <property name="font">
-       <font>
-        <pointsize>13</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QLabel {
-	background-color: rgb(255, 255, 127);
-
-	color: rgb(170, 0, 0);
-};</string>
-      </property>
-      <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This workspace does not contain any libraries, which are essential to create and modify projects. You should open the library manager to add some libraries. &lt;a href=&quot;LibraryManager&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Click here to open the library manager&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-      <property name="margin">
-       <number>10</number>
-      </property>
-     </widget>
+     <widget class="librepcb::editor::MessageWidget" name="msgWarnForNoLibraries" native="true"/>
     </item>
     <item>
      <widget class="QSplitter" name="splitter_h">
@@ -116,6 +63,9 @@
           </property>
           <property name="contextMenuPolicy">
            <enum>Qt::CustomContextMenu</enum>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
           </property>
           <property name="editTriggers">
            <set>QAbstractItemView::NoEditTriggers</set>
@@ -442,6 +392,12 @@ QListView::item
    <class>librepcb::editor::StatusBar</class>
    <extends>QStatusBar</extends>
    <header location="global">librepcb/editor/widgets/statusbar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::MessageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/messagewidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
