@@ -31,6 +31,7 @@
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectmetadata.h>
+#include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
 
@@ -52,6 +53,16 @@ FabricationOutputDialog::FabricationOutputDialog(
     mBoard(board),
     mUi(new Ui::FabricationOutputDialog) {
   mUi->setupUi(this);
+  mBtnGenerate =
+      mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::ActionRole);
+  connect(mBtnGenerate, &QPushButton::clicked, this,
+          &FabricationOutputDialog::btnGenerateClicked);
+  connect(mUi->btnDefaultSuffixes, &QPushButton::clicked, this,
+          &FabricationOutputDialog::btnDefaultSuffixesClicked);
+  connect(mUi->btnProtelSuffixes, &QPushButton::clicked, this,
+          &FabricationOutputDialog::btnProtelSuffixesClicked);
+  connect(mUi->btnBrowseOutputDir, &QPushButton::clicked, this,
+          &FabricationOutputDialog::btnBrowseOutputDirClicked);
   connect(mUi->cbxDrillsMerge, &QCheckBox::toggled, mUi->edtSuffixDrills,
           &QLineEdit::setEnabled);
   connect(mUi->cbxDrillsMerge, &QCheckBox::toggled, mUi->edtSuffixDrillsNpth,
@@ -62,10 +73,36 @@ FabricationOutputDialog::FabricationOutputDialog(
           mUi->edtSuffixSolderPasteTop, &QLineEdit::setEnabled);
   connect(mUi->cbxSolderPasteBot, &QCheckBox::toggled,
           mUi->edtSuffixSolderPasteBot, &QLineEdit::setEnabled);
+
+  QString notes;
+  notes += "<p>" %
+      tr("This dialog allows to generate Gerber X2 (RS-274X) / Excellon files "
+         "for PCB fabrication.") %
+      "</p>";
+  notes += "<p><b>" %
+      tr("Note that it's highly recommended to review the generated files "
+         "before ordering PCBs.") %
+      "</b><br>";
+  notes += tr("This could be done with the free application <a "
+              "href=\"%1\">gerbv</a> or the <a href=\"%2\">official reference "
+              "viewer from Ucamco</a>.")
+               .arg("http://gerbv.geda-project.org/")
+               .arg("https://gerber.ucamco.com/") %
+      "</p>";
+  notes += "<p>" %
+      tr("As a simpler and faster alternative, you could use the "
+         "<a href=\"%1\">Order PCB</a> feature instead.")
+          .arg("order-pcb") %
+      "</p>";
+  mUi->lblNotes->setText(notes);
   connect(mUi->lblNotes, &QLabel::linkActivated, this,
-          [this](const QString& url) {
-            DesktopServices ds(mSettings, this);
-            ds.openWebUrl(QUrl(url));
+          [this](const QString& link) {
+            if (link == "order-pcb") {
+              emit orderPcbDialogTriggered();
+            } else {
+              DesktopServices ds(mSettings, this);
+              ds.openWebUrl(QUrl(link));
+            }
           });
 
   BoardFabricationOutputSettings s = mBoard.getFabricationOutputSettings();
@@ -102,18 +139,26 @@ FabricationOutputDialog::FabricationOutputDialog(
       botSilkscreen.contains(GraphicsLayer::sBotNames));
   mUi->cbxSilkBotValues->setChecked(
       botSilkscreen.contains(GraphicsLayer::sBotValues));
+
+  // Load window geometry.
+  QSettings clientSettings;
+  restoreGeometry(
+      clientSettings.value("fabrication_export_dialog/window_geometry")
+          .toByteArray());
 }
 
 FabricationOutputDialog::~FabricationOutputDialog() {
-  delete mUi;
-  mUi = nullptr;
+  // Save window geometry.
+  QSettings clientSettings;
+  clientSettings.setValue("fabrication_export_dialog/window_geometry",
+                          saveGeometry());
 }
 
 /*******************************************************************************
  *  Private Slots
  ******************************************************************************/
 
-void FabricationOutputDialog::on_btnDefaultSuffixes_clicked() {
+void FabricationOutputDialog::btnDefaultSuffixesClicked() {
   mUi->edtSuffixOutlines->setText("_OUTLINES.gbr");
   mUi->edtSuffixCopperTop->setText("_COPPER-TOP.gbr");
   mUi->edtSuffixCopperInner->setText("_COPPER-IN{{CU_LAYER}}.gbr");
@@ -130,7 +175,7 @@ void FabricationOutputDialog::on_btnDefaultSuffixes_clicked() {
   mUi->cbxDrillsMerge->setChecked(false);
 }
 
-void FabricationOutputDialog::on_btnProtelSuffixes_clicked() {
+void FabricationOutputDialog::btnProtelSuffixesClicked() {
   mUi->edtSuffixOutlines->setText(".gm1");
   mUi->edtSuffixCopperTop->setText(".gtl");
   mUi->edtSuffixCopperInner->setText(".g{{CU_LAYER}}");
@@ -147,8 +192,12 @@ void FabricationOutputDialog::on_btnProtelSuffixes_clicked() {
   mUi->cbxDrillsMerge->setChecked(true);
 }
 
-void FabricationOutputDialog::on_btnGenerate_clicked() {
+void FabricationOutputDialog::btnGenerateClicked() {
   try {
+    // Visual feedback with cursor.
+    setCursor(Qt::WaitCursor);
+    auto cursorScopeGuard = scopeGuard([this]() { unsetCursor(); });
+
     // rebuild planes because they may be outdated!
     mBoard.rebuildAllPlanes();
 
@@ -180,12 +229,24 @@ void FabricationOutputDialog::on_btnGenerate_clicked() {
     // generate files
     BoardGerberExport grbExport(mBoard);
     grbExport.exportPcbLayers(mBoard.getFabricationOutputSettings());
-  } catch (Exception& e) {
+
+    // Show success message.
+    QString btnSuccessText = tr("Success!");
+    QString btnGenerateText = mBtnGenerate->text();
+    if (btnGenerateText != btnSuccessText) {
+      mBtnGenerate->setText(btnSuccessText);
+      QTimer::singleShot(500, this, [this, btnGenerateText]() {
+        if (mBtnGenerate) {
+          mBtnGenerate->setText(btnGenerateText);
+        }
+      });
+    }
+  } catch (const Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
 }
 
-void FabricationOutputDialog::on_btnBrowseOutputDir_clicked() {
+void FabricationOutputDialog::btnBrowseOutputDirClicked() {
   BoardGerberExport grbExport(mBoard);
   FilePath dir =
       grbExport.getOutputDirectory(mBoard.getFabricationOutputSettings());

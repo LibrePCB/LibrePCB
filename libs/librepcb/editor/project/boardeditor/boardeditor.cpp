@@ -407,6 +407,10 @@ void BoardEditor::createActions() noexcept {
         if (Board* board = getActiveBoard()) {
           FabricationOutputDialog dialog(
               mProjectEditor.getWorkspace().getSettings(), *board, this);
+          connect(&dialog, &FabricationOutputDialog::orderPcbDialogTriggered,
+                  this, [this, &dialog]() {
+                    mProjectEditor.execOrderPcbDialog(nullptr, &dialog);
+                  });
           dialog.exec();
         }
       }));
@@ -765,9 +769,9 @@ void BoardEditor::createMenus() noexcept {
   }
   {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createProductionDataMenu));
+    smb.addAction(mActionGenerateBom);
     smb.addAction(mActionGenerateFabricationData);
     smb.addAction(mActionGeneratePickPlace);
-    smb.addAction(mActionGenerateBom);
   }
   mb.addSeparator();
   mb.addAction(mActionPrint);
