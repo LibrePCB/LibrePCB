@@ -23,6 +23,7 @@
 #include "newprojectwizardpage_metadata.h"
 
 #include "../../dialogs/filedialog.h"
+#include "../../workspace/desktopservices.h"
 #include "ui_newprojectwizardpage_metadata.h"
 
 #include <librepcb/core/application.h>
@@ -44,7 +45,9 @@ namespace editor {
 
 NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
     const Workspace& ws, QWidget* parent) noexcept
-  : QWizardPage(parent), mUi(new Ui::NewProjectWizardPage_Metadata) {
+  : QWizardPage(parent),
+    mWorkspace(ws),
+    mUi(new Ui::NewProjectWizardPage_Metadata) {
   mUi->setupUi(this);
   setPixmap(QWizard::LogoPixmap, QPixmap(":/img/actions/plus_2.png"));
   setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
@@ -56,6 +59,11 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
           &NewProjectWizardPage_Metadata::locationChanged);
   connect(mUi->btnLocation, &QPushButton::clicked, this,
           &NewProjectWizardPage_Metadata::chooseLocationClicked);
+  connect(mUi->lblLicenseLink, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mWorkspace.getSettings(), this);
+            ds.openWebUrl(QUrl(url));
+          });
 
   // insert values
   mUi->edtAuthor->setText(ws.getSettings().userName.get());

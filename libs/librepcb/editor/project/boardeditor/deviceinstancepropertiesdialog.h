@@ -36,6 +36,7 @@ namespace librepcb {
 class BI_Device;
 class LengthUnit;
 class Project;
+class WorkspaceSettings;
 
 namespace editor {
 
@@ -61,7 +62,8 @@ public:
   DeviceInstancePropertiesDialog() = delete;
   DeviceInstancePropertiesDialog(const DeviceInstancePropertiesDialog& other) =
       delete;
-  DeviceInstancePropertiesDialog(Project& project, BI_Device& device,
+  DeviceInstancePropertiesDialog(const WorkspaceSettings& settings,
+                                 Project& project, BI_Device& device,
                                  UndoStack& undoStack,
                                  const LengthUnit& lengthUnit,
                                  const QString& settingsPrefix,
@@ -79,6 +81,7 @@ private:  // Methods
   bool applyChanges() noexcept;
 
 private:  // Data
+  const WorkspaceSettings& mSettings;
   Project& mProject;
   BI_Device& mDevice;
   UndoStack& mUndoStack;
