@@ -59,7 +59,7 @@ class ProjectLibraryUpdater;
  * The whole project library update concept needs to be refactored some time to
  * provide an updater with much more functionality and higher reliability.
  */
-class ProjectLibraryUpdater : public QMainWindow {
+class ProjectLibraryUpdater : public QDialog {
   Q_OBJECT
 
 public:
