@@ -109,6 +109,15 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
           mActionLibraryManager.data(), &QAction::trigger);
   connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
           this, &ControlPanel::openLibraryEditor);
+  connect(mUi->textBrowser, &QTextBrowser::anchorClicked, this,
+          [this](QUrl url) {
+            const QStringList searchPaths = mUi->textBrowser->searchPaths();
+            if (url.isRelative() && (!searchPaths.isEmpty())) {
+              url.setPath(searchPaths.first() % "/" % url.path());
+            }
+            DesktopServices ds(mWorkspace.getSettings(), this);
+            ds.openWebUrl(url);
+          });
 
   // load project models
   mRecentProjectsModel.reset(new RecentProjectsModel(mWorkspace));

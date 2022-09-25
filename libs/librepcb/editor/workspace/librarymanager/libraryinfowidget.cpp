@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "libraryinfowidget.h"
 
+#include "../desktopservices.h"
 #include "ui_libraryinfowidget.h"
 
 #include <librepcb/core/fileio/fileutils.h>
@@ -79,6 +80,11 @@ LibraryInfoWidget::LibraryInfoWidget(Workspace& ws, const FilePath& libDir)
   mUi->lblUrl->setText(
       QString("<a href='%1'>%2</a>")
           .arg(lib.getUrl().toEncoded(), lib.getUrl().toDisplayString()));
+  connect(mUi->lblUrl, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mWorkspace.getSettings(), this);
+            ds.openWebUrl(QUrl(url));
+          });
   mUi->lblCreated->setText(lib.getCreated().toString(Qt::TextDate));
   mUi->lblDeprecated->setText(
       lib.isDeprecated() ? tr("Yes - Consider switching to another library.")
@@ -103,9 +109,13 @@ LibraryInfoWidget::LibraryInfoWidget(Workspace& ws, const FilePath& libDir)
   mUi->lblDependencies->setText(dependencies);
   mUi->lblDirectory->setText(
       QString("<a href='%1'>%2</a>")
-          .arg(mLibDir.toQUrl().toLocalFile(),
-               mLibDir.toRelative(ws.getLibrariesPath())));
+          .arg(mLibDir.toStr(), mLibDir.toRelative(ws.getLibrariesPath())));
   mUi->lblDirectory->setToolTip(mLibDir.toNative());
+  connect(mUi->lblDirectory, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mWorkspace.getSettings(), this);
+            ds.openLocalPath(FilePath(url));
+          });
 }
 
 LibraryInfoWidget::~LibraryInfoWidget() noexcept {

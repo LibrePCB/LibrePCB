@@ -59,11 +59,26 @@ OrderPcbDialog::OrderPcbDialog(const WorkspaceSettings& settings,
   mUi->imgError->hide();
   connect(mUi->btnUpload, &QPushButton::clicked, this,
           &OrderPcbDialog::uploadButtonClicked);
+  connect(mUi->lblMoreInformation, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mSettings, this);
+            ds.openWebUrl(QUrl(url));
+          });
+  connect(mUi->lblStatus, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mSettings, this);
+            ds.openWebUrl(QUrl(url));
+          });
 
   // Replace placeholder in the note label.
   QString forumLink = "<a href=\"https://librepcb.discourse.group/\">" %
       tr("discussion forum") % "</a>";
   mUi->lblNote->setText(mUi->lblNote->text().arg(forumLink));
+  connect(mUi->lblNote, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mSettings, this);
+            ds.openWebUrl(QUrl(url));
+          });
 
   // Load the window geometry and settings.
   // Note: Do not use restoreGeometry(), only store the window size (but not

@@ -26,6 +26,7 @@
 #include "../../project/cmd/cmdsymbolinstanceedit.h"
 #include "../../undocommand.h"
 #include "../../undostack.h"
+#include "../../workspace/desktopservices.h"
 #include "ui_symbolinstancepropertiesdialog.h"
 
 #include <librepcb/core/attribute/attributetype.h>
@@ -91,8 +92,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
           mComponentInstance.getLibComponent()
               .getDirectory()
               .getAbsPath()
-              .toQUrl()
-              .toString(),
+              .toStr(),
           *mComponentInstance.getLibComponent().getNames().value(localeOrder)) +
       " (" +
       tr("symbol variant \"%1\"")
@@ -107,6 +107,11 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
           .getDirectory()
           .getAbsPath()
           .toNative());
+  connect(mUi->lblCompLibName, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mWorkspace.getSettings(), this);
+            ds.openLocalPath(FilePath(url));
+          });
 
   // Symbol Instance Attributes
   mUi->lblSymbInstName->setText(mSymbol.getName());
@@ -116,12 +121,17 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
   mUi->cbxMirror->setChecked(mSymbol.getMirrored());
 
   // Symbol Library Element Attributes
-  mUi->lblSymbLibName->setText(htmlLink.arg(
-      mSymbol.getLibSymbol().getDirectory().getAbsPath().toQUrl().toString(),
-      *mSymbol.getLibSymbol().getNames().value(localeOrder)));
+  mUi->lblSymbLibName->setText(
+      htmlLink.arg(mSymbol.getLibSymbol().getDirectory().getAbsPath().toStr(),
+                   *mSymbol.getLibSymbol().getNames().value(localeOrder)));
   mUi->lblSymbLibName->setToolTip(
       mSymbol.getLibSymbol().getDescriptions().value(localeOrder) + "<p>" +
       mSymbol.getLibSymbol().getDirectory().getAbsPath().toNative());
+  connect(mUi->lblSymbLibName, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mWorkspace.getSettings(), this);
+            ds.openLocalPath(FilePath(url));
+          });
 
   // List Devices
   try {

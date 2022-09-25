@@ -25,6 +25,7 @@
 #include "../../project/cmd/cmdcomponentinstanceedit.h"
 #include "../../project/cmd/cmddeviceinstanceeditall.h"
 #include "../../undostack.h"
+#include "../../workspace/desktopservices.h"
 #include "ui_deviceinstancepropertiesdialog.h"
 
 #include <librepcb/core/library/dev/device.h>
@@ -48,10 +49,11 @@ namespace editor {
  ******************************************************************************/
 
 DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
-    Project& project, BI_Device& device, UndoStack& undoStack,
-    const LengthUnit& lengthUnit, const QString& settingsPrefix,
-    QWidget* parent) noexcept
+    const WorkspaceSettings& settings, Project& project, BI_Device& device,
+    UndoStack& undoStack, const LengthUnit& lengthUnit,
+    const QString& settingsPrefix, QWidget* parent) noexcept
   : QDialog(parent),
+    mSettings(settings),
     mProject(project),
     mDevice(device),
     mUndoStack(undoStack),
@@ -78,19 +80,29 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
 
   // Library Element Information
   QString htmlLink("<a href=\"%1\">%2<a>");
-  mUi->lblLibDeviceName->setText(htmlLink.arg(
-      mDevice.getLibDevice().getDirectory().getAbsPath().toQUrl().toString(),
-      *mDevice.getLibDevice().getNames().value(localeOrder)));
+  mUi->lblLibDeviceName->setText(
+      htmlLink.arg(mDevice.getLibDevice().getDirectory().getAbsPath().toStr(),
+                   *mDevice.getLibDevice().getNames().value(localeOrder)));
   mUi->lblLibDeviceName->setToolTip(
       mDevice.getLibDevice().getDescriptions().value(localeOrder) + "<p>" +
       mDevice.getLibDevice().getDirectory().getAbsPath().toNative());
+  connect(mUi->lblLibDeviceName, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mSettings, this);
+            ds.openLocalPath(FilePath(url));
+          });
 
-  mUi->lblLibPackageName->setText(htmlLink.arg(
-      mDevice.getLibPackage().getDirectory().getAbsPath().toQUrl().toString(),
-      *mDevice.getLibPackage().getNames().value(localeOrder)));
+  mUi->lblLibPackageName->setText(
+      htmlLink.arg(mDevice.getLibPackage().getDirectory().getAbsPath().toStr(),
+                   *mDevice.getLibPackage().getNames().value(localeOrder)));
   mUi->lblLibPackageName->setToolTip(
       mDevice.getLibPackage().getDescriptions().value(localeOrder) + "<p>" +
       mDevice.getLibPackage().getDirectory().getAbsPath().toNative());
+  connect(mUi->lblLibPackageName, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mSettings, this);
+            ds.openLocalPath(FilePath(url));
+          });
 
   mUi->lblLibFootprintName->setText(
       *mDevice.getLibFootprint().getNames().value(localeOrder));

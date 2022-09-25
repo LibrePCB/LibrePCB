@@ -84,6 +84,7 @@ private:  // Methods
   bool validatePage() noexcept override;
 
 private:  // Data
+  const Workspace& mWorkspace;
   QScopedPointer<Ui::NewProjectWizardPage_Metadata> mUi;
   FilePath mFullFilePath;
 };

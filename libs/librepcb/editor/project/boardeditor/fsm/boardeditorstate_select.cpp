@@ -1481,7 +1481,8 @@ bool BoardEditorState_Select::openPropertiesDialog(BI_Base* item) {
 void BoardEditorState_Select::openDevicePropertiesDialog(
     BI_Device& device) noexcept {
   DeviceInstancePropertiesDialog dialog(
-      mContext.project, device, mContext.undoStack, getDefaultLengthUnit(),
+      mContext.workspace.getSettings(), mContext.project, device,
+      mContext.undoStack, getDefaultLengthUnit(),
       "board_editor/device_properties_dialog", parentWidget());
   dialog.exec();
 }
