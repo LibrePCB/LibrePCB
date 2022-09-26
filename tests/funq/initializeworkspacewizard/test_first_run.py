@@ -99,7 +99,6 @@ def test_open_compatible_workspace(librepcb):
         app.widget('controlPanel').properties()['visible'] is True
 
 
-
 def test_open_workspace_downgrade(librepcb, helpers):
     """
     Choose a workspace to open, which needs to be initialized with an
@@ -108,7 +107,6 @@ def test_open_workspace_downgrade(librepcb, helpers):
     test_workspace_path = librepcb.workspace_path
     librepcb.workspace_path = None  # Do not set workspace in LibrePCB.ini
     v01_path = os.path.join(test_workspace_path, 'v0.1')
-    v02_path = os.path.join(test_workspace_path, 'v0.2')
     data_path = os.path.join(test_workspace_path, 'data')
     shutil.move(v01_path, data_path)
     with open(os.path.join(data_path, '.librepcb-data'), 'wb') as f:
