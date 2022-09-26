@@ -15,7 +15,7 @@ endif()
 #    "1.0.0-unstable"
 #  - Release candidates (on release branches): Suffix "-rc#", e.g. "1.0.0-rc3"
 #  - Releases (on release branches): No suffix, e.g. "1.0.0"
-set(LIBREPCB_APP_VERSION "0.1.6")
+set(LIBREPCB_APP_VERSION "0.1.7")
 
 # File format version:
 #  - Must be equal to the major version of APP_VERSION!
