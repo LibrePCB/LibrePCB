@@ -80,6 +80,19 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     }
   }
 
+  // Initialize "reset dismissed messages" button
+  updateDismissedMessagesCount();
+  connect(mUi->btnResetDismissedMessages, &QPushButton::clicked, this,
+          [this]() {
+            try {
+              mSettings.dismissedMessages.restoreDefault();
+              mWorkspace.saveSettings();  // can throw
+            } catch (const Exception& e) {
+              QMessageBox::critical(this, tr("Error"), e.getMsg());
+            }
+            updateDismissedMessagesCount();
+          });
+
   // Initialize library locale order widgets
   {
     QList<QLocale> locales = QLocale::matchingLocales(
@@ -400,6 +413,18 @@ void WorkspaceSettingsDialog::externalApplicationListIndexChanged(
   }
   placeholdersText += "</ul></p>";
   mUi->lblExternalApplicationsPlaceholders->setText(placeholdersText);
+}
+
+void WorkspaceSettingsDialog::updateDismissedMessagesCount() noexcept {
+  const int count = mSettings.dismissedMessages.get().count();
+  mUi->btnResetDismissedMessages->setText(tr("Reset") % " (" %
+                                          QString::number(count) % ")");
+  mUi->btnResetDismissedMessages->setToolTip(
+      tr("Reset all permanently dismissed messages (something like \"do not "
+         "show again\") to make them appear again.") %
+      "\n\n" %
+      tr("Currently there are %1 dismissed message(s).", nullptr, count)
+          .arg(count));
 }
 
 void WorkspaceSettingsDialog::loadSettings() noexcept {

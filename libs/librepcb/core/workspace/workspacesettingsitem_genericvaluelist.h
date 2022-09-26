@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "workspacesettingsitem.h"
 
+#include <librepcb/core/utils/toolbox.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -65,6 +67,17 @@ public:
   const T& get() const noexcept { return mCurrentValue; }
 
   /**
+   * @brief Check if the current value contains a praticular item
+   *
+   * @param item    Item to check.
+   *
+   * @return Whether the item is contained in the current value or not.
+   */
+  bool contains(const typename T::value_type& item) const noexcept {
+    return mCurrentValue.contains(item);
+  }
+
+  /**
    * @brief Set the value
    *
    * @param value   The new value
@@ -74,6 +87,17 @@ public:
       mCurrentValue = value;
       valueModified();
     }
+  }
+
+  /**
+   * @brief Add a single item to the value list
+   *
+   * @param item    The item to append (list) or insert (unordered set)
+   */
+  void add(const typename T::value_type& item) noexcept {
+    auto newValue = mCurrentValue;
+    newValue << item;
+    set(newValue);
   }
 
   /**
@@ -99,17 +123,40 @@ private:  // Methods
   void loadImpl(const SExpression& root, const Version& fileFormat) override {
     T values;  // temporary object to make this method atomic
     foreach (const SExpression& child, root.getChildren(mItemKey)) {
-      values.append(deserialize<typename T::value_type>(child.getChild("@0"),
-                                                        fileFormat));
+      values << deserialize<typename T::value_type>(child.getChild("@0"),
+                                                    fileFormat);
     }
     set(values);
+  }
+
+  /**
+   * @brief Helper for serialization of QList
+   *
+   * @param value   QList to serialize.
+   *
+   * @return Unmodified value.
+   */
+  T makeCanonical(const QList<typename T::value_type>& value) const noexcept {
+    return value;  // Do not sort QList since the order is relevant!
+  }
+
+  /**
+   * @brief Helper for serialization of QSet
+   *
+   * @param value   QSet to serialize.
+   *
+   * @return QSet as a sorted QList.
+   */
+  QList<typename T::value_type> makeCanonical(
+      const QSet<typename T::value_type>& value) const noexcept {
+    return Toolbox::sortedQSet(value);  // Make file format canonical.
   }
 
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::serializeImpl()
    */
   void serializeImpl(SExpression& root) const override {
-    foreach (const auto& item, mCurrentValue) {
+    foreach (const auto& item, makeCanonical(mCurrentValue)) {
       root.ensureLineBreak();
       root.appendChild(mItemKey, item);
     }

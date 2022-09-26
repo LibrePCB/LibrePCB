@@ -679,6 +679,8 @@ add_library(
   widgets/lengthedit.h
   widgets/lengtheditbase.cpp
   widgets/lengtheditbase.h
+  widgets/messagewidget.cpp
+  widgets/messagewidget.h
   widgets/numbereditbase.cpp
   widgets/numbereditbase.h
   widgets/patheditorwidget.cpp
