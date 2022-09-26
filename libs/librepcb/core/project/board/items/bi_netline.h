@@ -128,7 +128,7 @@ private:
   BI_NetSegment& mNetSegment;
   Trace mTrace;
   QScopedPointer<BGI_NetLine> mGraphicsItem;
-  QMetaObject::Connection mHighlightChangedConnection;
+  QVector<QMetaObject::Connection> mConnections;
 
   // References
   BI_NetLineAnchor* mStartPoint;

@@ -96,6 +96,7 @@ public:
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
     ZValue_Symbols,  ///< Z value for ::librepcb::SI_Symbol items
+    ZValue_SymbolPins,  ///< Z value for ::librepcb::SI_SymbolPin items
     ZValue_NetLabels,  ///< Z value for ::librepcb::SI_NetLabel items
     ZValue_NetLines,  ///< Z value for ::librepcb::SI_NetLine items
     ZValue_HiddenNetPoints,  ///< Z value for hidden

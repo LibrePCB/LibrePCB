@@ -154,12 +154,15 @@ void CmdDragSelectedSchematicItems::mirror(Qt::Orientation orientation,
         cmd->getNetLabel().getPosition().mirrored(orientation, center);
 
     // Compensate offset only for horizontal positioning
+    // Since there is no right alignment (yet), coordinates need to be
+    // re-adjusted to accommodate left shift.
+    // New position = mirrored old position - label width
     Angle labelRotation = cmd->getNetLabel().getRotation().mappedTo0_360deg();
-    if (labelRotation == Angle::deg0() || labelRotation == Angle::deg180()) {
-      // Since there is no right alignment (yet), coordinates need to be
-      // re-adjusted to accommodate left shift.
-      // New position = mirrored old position - label width
+    if (labelRotation == Angle::deg0()) {
       newpos.setX(newpos.getX() - cmd->getNetLabel().getApproximateWidth());
+      newpos.mapToGrid(mSchematic.getGridProperties().getInterval());
+    } else if (labelRotation == Angle::deg180()) {
+      newpos.setX(newpos.getX() + cmd->getNetLabel().getApproximateWidth());
       newpos.mapToGrid(mSchematic.getGridProperties().getInterval());
     }
 

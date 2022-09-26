@@ -35,7 +35,6 @@ class Circuit;
 class GraphicsScene;
 class Point;
 class Project;
-class SGI_Base;
 class Schematic;
 
 /*******************************************************************************
@@ -88,8 +87,8 @@ public:
 
 protected:
   // General Methods
-  void addToSchematic(SGI_Base* item) noexcept;
-  void removeFromSchematic(SGI_Base* item) noexcept;
+  void addToSchematic(QGraphicsItem* item) noexcept;
+  void removeFromSchematic(QGraphicsItem* item) noexcept;
 
 protected:
   Schematic& mSchematic;

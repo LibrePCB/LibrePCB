@@ -65,11 +65,6 @@ void BI_Via::init() {
   // connect to the "attributes changed" signal of the board
   connect(&mBoard, &Board::attributesChanged, this,
           &BI_Via::boardOrNetAttributesChanged);
-
-  // Connect to the "name changed" signal of the net signal to enforce updating
-  // the displayed net signal name in the board.
-  connect(&getNetSignalOfNetSegment(), &NetSignal::nameChanged, this,
-          &BI_Via::boardOrNetAttributesChanged);
 }
 
 BI_Via::~BI_Via() noexcept {
@@ -132,9 +127,12 @@ void BI_Via::addToBoard() {
   if (isAddedToBoard() || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  mHighlightChangedConnection =
-      connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
-              [this]() { mGraphicsItem->update(); });
+  mConnections.append(connect(&getNetSignalOfNetSegment(),
+                              &NetSignal::nameChanged, this,
+                              &BI_Via::boardOrNetAttributesChanged));
+  mConnections.append(connect(&getNetSignalOfNetSegment(),
+                              &NetSignal::highlightedChanged,
+                              [this]() { mGraphicsItem->update(); }));
   BI_Base::addToBoard(mGraphicsItem.data());
   mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
   mGraphicsItem->updateCacheAndRepaint();  // Force updating tooltip.
@@ -144,7 +142,9 @@ void BI_Via::removeFromBoard() {
   if ((!isAddedToBoard()) || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  disconnect(mHighlightChangedConnection);
+  while (!mConnections.isEmpty()) {
+    disconnect(mConnections.takeLast());
+  }
   BI_Base::removeFromBoard(mGraphicsItem.data());
   mBoard.scheduleAirWiresRebuild(&getNetSignalOfNetSegment());
 }

@@ -151,11 +151,6 @@ void BI_NetLine::init() {
 
   mGraphicsItem.reset(new BGI_NetLine(*this));
   updateLine();
-
-  // Connect to the "name changed" signal of the net signal to enforce updating
-  // the displayed net signal name in the board.
-  connect(&getNetSignalOfNetSegment(), &NetSignal::nameChanged, this,
-          &BI_NetLine::updateLine);
 }
 
 BI_NetLine::~BI_NetLine() noexcept {
@@ -229,9 +224,13 @@ void BI_NetLine::addToBoard() {
   auto sg = scopeGuard([&]() { mStartPoint->unregisterNetLine(*this); });
   mEndPoint->registerNetLine(*this);  // can throw
 
-  mHighlightChangedConnection =
-      connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
-              [this]() { mGraphicsItem->update(); });
+  mConnections.append(connect(&getNetSignalOfNetSegment(),
+                              &NetSignal::nameChanged, this,
+                              &BI_NetLine::updateLine));
+  mConnections.append(connect(&getNetSignalOfNetSegment(),
+                              &NetSignal::highlightedChanged,
+                              [this]() { mGraphicsItem->update(); }));
+
   BI_Base::addToBoard(mGraphicsItem.data());
   sg.dismiss();
 }
@@ -245,7 +244,10 @@ void BI_NetLine::removeFromBoard() {
   auto sg = scopeGuard([&]() { mEndPoint->registerNetLine(*this); });
   mEndPoint->unregisterNetLine(*this);  // can throw
 
-  disconnect(mHighlightChangedConnection);
+  while (!mConnections.isEmpty()) {
+    disconnect(mConnections.takeLast());
+  }
+
   BI_Base::removeFromBoard(mGraphicsItem.data());
   sg.dismiss();
 }

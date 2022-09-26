@@ -24,6 +24,7 @@
 
 #include "../../../library/sym/symbolpin.h"
 #include "../../../utils/toolbox.h"
+#include "../../../utils/transform.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../items/si_symbol.h"
@@ -54,7 +55,7 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept
     mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)) {
   setFlag(QGraphicsItem::ItemHasNoContents, false);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
-  setZValue(Schematic::ZValue_Symbols);
+  setZValue(Schematic::ZValue_SymbolPins);
   setToolTip(*mPin.getLibPin().getName());
 
   // Setup circle.
@@ -71,13 +72,11 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
   // Setup text.
-  mTextGraphicsItem->setPosition(mPin.getLibPin().getNamePosition());
   mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
-  mTextGraphicsItem->setHeight(SymbolPin::getNameHeight());
+  mTextGraphicsItem->setHeight(mPin.getLibPin().getNameHeight());
   mTextGraphicsItem->setLayer(getLayer(GraphicsLayer::sSymbolPinNames));
   mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mTextGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
-  updateTextRotationAndAlignment();
 
   updateData();
 }
@@ -86,21 +85,30 @@ SGI_SymbolPin::~SGI_SymbolPin() noexcept {
 }
 
 /*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-void SGI_SymbolPin::setPosition(const Point& pos) noexcept {
-  QGraphicsItem::setPos(pos.toPxQPointF());
-}
-
-void SGI_SymbolPin::setRotation(const Angle& rot) noexcept {
-  QGraphicsItem::setRotation(-rot.toDeg());
-  updateTextRotationAndAlignment();  // Auto-rotation may need to be updated.
-}
-
-/*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void SGI_SymbolPin::updateTransform() noexcept {
+  mLineGraphicsItem->setRotation(mPin.getRotation());
+
+  const Transform transform(mPin.getSymbol());
+  const Point namePosition =
+      transform.map(mPin.getLibPin().getNamePosition().rotated(
+          mPin.getLibPin().getRotation())) -
+      transform.getPosition();
+  Angle nameRotation = transform.map(mPin.getLibPin().getRotation());
+  Alignment nameAlignment(HAlign::left(), VAlign::center());
+  if (transform.getMirrored()) {
+    nameAlignment.mirrorV();
+  }
+  if (Toolbox::isTextUpsideDown(nameRotation, false)) {
+    nameRotation += Angle::deg180();
+    nameAlignment.mirror();
+  }
+  mTextGraphicsItem->setPosition(namePosition);
+  mTextGraphicsItem->setRotation(nameRotation);
+  mTextGraphicsItem->setAlignment(nameAlignment);
+}
 
 void SGI_SymbolPin::updateData() noexcept {
   mTextGraphicsItem->setText(mPin.getDisplayText());
@@ -155,17 +163,6 @@ void SGI_SymbolPin::paint(QPainter* painter,
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void SGI_SymbolPin::updateTextRotationAndAlignment() noexcept {
-  Angle rotation(0);
-  Alignment alignment(HAlign::left(), VAlign::center());
-  if (Toolbox::isTextUpsideDown(mPin.getRotation(), false)) {
-    rotation += Angle::deg180();
-    alignment.mirror();
-  }
-  mTextGraphicsItem->setRotation(rotation);
-  mTextGraphicsItem->setAlignment(alignment);
-}
 
 GraphicsLayer* SGI_SymbolPin::getLayer(const QString& name) const noexcept {
   return mPin.getSymbol().getProject().getLayers().getLayer(name);
