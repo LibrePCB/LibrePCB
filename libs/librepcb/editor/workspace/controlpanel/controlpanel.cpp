@@ -89,16 +89,39 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
 
   // Show warning if the workspace has already been opened with a higher
   // file format version.
-  mUi->lblWarnForNewerAppVersions->setVisible(fileFormatIsOutdated);
+  mUi->msgWarnForNewerAppVersions->init(
+      mWorkspace,
+      QString("WORKSPACE_V%1_OPENED_WITH_NEWER_VERSION")
+          .arg(qApp->getFileFormatVersion().toStr()),
+      tr("This workspace was already used with a newer version of LibrePCB. "
+         "All changes in libraries and workspace settings will not be "
+         "available in newer versions of LibrePCB."),
+      fileFormatIsOutdated);
 
-  // hide warning about missing libraries, but update visibility each time the
-  // workspace library was scanned
-  mUi->lblWarnForNoLibraries->setVisible(false);
-  connect(mUi->lblWarnForNoLibraries, &QLabel::linkActivated, this,
+  // Setup warning about missing libraries, and update visibility each time the
+  // workspace library was scanned.
+  mUi->msgWarnForNoLibraries->init(
+      mWorkspace,
+      QString("WORKSPACE_V%1_HAS_NO_LIBRARIES")
+          .arg(qApp->getFileFormatVersion().toStr()),
+      tr("This workspace does not contain any libraries, which are essential "
+         "to create and modify projects. You should <a href=\"%1\">open the "
+         "library manager</a> to add some libraries.")
+          .arg("library-manager"),
+      false);
+  connect(mUi->msgWarnForNoLibraries, &MessageWidget::linkActivated, this,
           &ControlPanel::openLibraryManager);
-  connect(&mWorkspace.getLibraryDb(),
-          &WorkspaceLibraryDb::scanLibraryListUpdated, this,
-          &ControlPanel::updateNoLibrariesWarningVisibility);
+  connect(
+      &mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanLibraryListUpdated,
+      this, [this]() {
+        bool showWarning = false;
+        try {
+          showWarning = mWorkspace.getLibraryDb().getAll<Library>().isEmpty();
+        } catch (const Exception& e) {
+          qCritical() << "Failed to get workspace library list:" << e.getMsg();
+        }
+        mUi->msgWarnForNoLibraries->setActive(showWarning);
+      });
 
   // connect some actions which are created with the Qt Designer
   connect(mUi->openProjectButton, &QPushButton::clicked,
@@ -318,16 +341,6 @@ void ControlPanel::loadSettings() {
   }
 
   clientSettings.endGroup();
-}
-
-void ControlPanel::updateNoLibrariesWarningVisibility() noexcept {
-  bool showWarning = false;
-  try {
-    showWarning = mWorkspace.getLibraryDb().getAll<Library>().isEmpty();
-  } catch (const Exception& e) {
-    qCritical() << "Failed to get workspace library list:" << e.getMsg();
-  }
-  mUi->lblWarnForNoLibraries->setVisible(showWarning);
 }
 
 void ControlPanel::openLibraryManager() noexcept {

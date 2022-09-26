@@ -253,6 +253,18 @@ public:
    * @see ::librepcb::WorkspaceSettingsItem_KeyboardShortcuts
    */
   WorkspaceSettingsItem_KeyboardShortcuts keyboardShortcuts;
+
+  /**
+   * @brief Dismissed messages
+   *
+   * List of messages which the user dismissed with "do not show again". It's
+   * just a generic list of strings, where each message is identified by some
+   * locale-independent string. It's recommended to use UPPER_SNAKE_CASE
+   * strings, For example: "WORKSPACE_V0.1_HAS_NO_LIBRARIES".
+   *
+   * Default: []
+   */
+  WorkspaceSettingsItem_GenericValueList<QSet<QString>> dismissedMessages;
 };
 
 /*******************************************************************************

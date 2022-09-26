@@ -113,7 +113,6 @@ private:
   void createMenus() noexcept;
   void saveSettings();
   void loadSettings();
-  void updateNoLibrariesWarningVisibility() noexcept;
   void openLibraryManager() noexcept;
   void switchWorkspace() noexcept;
   void showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept;

@@ -56,7 +56,8 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
                                 QStringList(), this),
     externalPdfReaderCommands("external_pdf_reader", "command", QStringList(),
                               this),
-    keyboardShortcuts(this) {
+    keyboardShortcuts(this),
+    dismissedMessages("dismissed_messages", "message", QSet<QString>(), this) {
 }
 
 WorkspaceSettings::~WorkspaceSettings() noexcept {
