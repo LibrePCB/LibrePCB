@@ -67,10 +67,9 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
 
   // insert values
   mUi->edtAuthor->setText(ws.getSettings().userName.get());
-  mUi->cbxLicense->addItem(QString("No License (not recommended)"), QString());
-  mUi->cbxLicense->addItem(
-      tr("CC0-1.0 (no restrictions, recommended for open hardware projects)"),
-      QString("licenses/cc0-1.0.txt"));
+  mUi->cbxLicense->addItem(tr("None"), QString());
+  mUi->cbxLicense->addItem(tr("CC0-1.0 (no restrictions)"),
+                           QString("licenses/cc0-1.0.txt"));
   mUi->cbxLicense->addItem(tr("CC-BY-4.0 (requires attribution)"),
                            QString("licenses/cc-by-4.0.txt"));
   mUi->cbxLicense->addItem(
