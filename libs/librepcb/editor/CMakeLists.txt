@@ -715,6 +715,8 @@ add_library(
   widgets/unsignedlengthedit.h
   widgets/unsignedratioedit.cpp
   widgets/unsignedratioedit.h
+  widgets/waitingspinnerwidget.cpp
+  widgets/waitingspinnerwidget.h
   workspace/categorytreemodel.cpp
   workspace/categorytreemodel.h
   workspace/controlpanel/controlpanel.cpp
