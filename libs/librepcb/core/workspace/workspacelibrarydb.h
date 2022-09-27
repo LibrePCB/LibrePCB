@@ -81,6 +81,22 @@ public:
   const FilePath& getFilePath() const noexcept { return mFilePath; }
 
   /**
+   * @brief Check if there is currently a library scan in progress
+   *
+   * @return Whether a scan is in progress or not.
+   */
+  bool isScanInProgress() const noexcept {
+    return getScanProgressPercent() < 100;
+  }
+
+  /**
+   * @brief Get the current progress of the library rescan
+   *
+   * @return Progress in percent (100 = finished).
+   */
+  int getScanProgressPercent() const noexcept;
+
+  /**
    * @brief Get elements, optionally matching some criteria
    *
    * @tparam ElementType  Type of the library element.

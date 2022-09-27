@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "componentchooserdialog.h"
 
+#include "../../widgets/waitingspinnerwidget.h"
 #include "../../workspace/categorytreemodel.h"
 #include "../sym/symbolgraphicsitem.h"
 #include "ui_componentchooserdialog.h"
@@ -71,6 +72,18 @@ ComponentChooserDialog::ComponentChooserDialog(
           &ComponentChooserDialog::listComponents_itemDoubleClicked);
   connect(mUi->edtSearch, &QLineEdit::textChanged, this,
           &ComponentChooserDialog::searchEditTextChanged);
+
+  // Add waiting spinner during workspace library scan.
+  auto addSpinner = [&ws](QWidget* widget) {
+    WaitingSpinnerWidget* spinner = new WaitingSpinnerWidget(widget);
+    connect(&ws.getLibraryDb(), &WorkspaceLibraryDb::scanStarted, spinner,
+            &WaitingSpinnerWidget::show);
+    connect(&ws.getLibraryDb(), &WorkspaceLibraryDb::scanFinished, spinner,
+            &WaitingSpinnerWidget::hide);
+    spinner->setVisible(ws.getLibraryDb().isScanInProgress());
+  };
+  addSpinner(mUi->treeCategories);
+  addSpinner(mUi->listComponents);
 
   setSelectedComponent(tl::nullopt);
 }

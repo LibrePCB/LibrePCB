@@ -98,6 +98,8 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   connect(&mProjectEditor.getWorkspace().getLibraryDb(),
           &WorkspaceLibraryDb::scanProgressUpdate, mUi->statusbar,
           &StatusBar::setProgressBarPercent, Qt::QueuedConnection);
+  mUi->statusbar->setProgressBarPercent(
+      mProjectEditor.getWorkspace().getLibraryDb().getScanProgressPercent());
 
   // Set window title.
   QString filenameStr = mProject.getFilepath().getFilename();

@@ -60,6 +60,9 @@ public:
   WorkspaceLibraryScanner(const WorkspaceLibraryScanner& other) = delete;
   ~WorkspaceLibraryScanner() noexcept;
 
+  // Getters
+  int getProgressPercent() const noexcept { return mLastProgressPercent; }
+
   // General Methods
   void startScan() noexcept;
 
@@ -104,6 +107,7 @@ private:  // Data
   const FilePath mDbFilePath;  ///< Path to the SQLite database file.
   QSemaphore mSemaphore;
   volatile bool mAbort;
+  int mLastProgressPercent;
 };
 
 /*******************************************************************************
