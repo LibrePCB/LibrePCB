@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "addcomponentdialog.h"
 
+#include "../editorcommandset.h"
 #include "../library/pkg/footprintgraphicsitem.h"
 #include "../library/sym/symbolgraphicsitem.h"
 #include "../widgets/graphicsview.h"
@@ -91,6 +92,12 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
       mUi->cbxSymbVar,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, &AddComponentDialog::cbxSymbVar_currentIndexChanged);
+
+  // Add actions.
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+  addAction(cmd.find.createAction(this, this, [this]() {
+    mUi->edtSearch->setFocus(Qt::ShortcutFocusReason);
+  }));
 
   mUi->viewComponent->setScene(mComponentPreviewScene.data());
   mUi->viewComponent->setOriginCrossVisible(false);
