@@ -88,6 +88,8 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanProgressUpdate,
           mUi->statusBar, &StatusBar::setProgressBarPercent,
           Qt::QueuedConnection);
+  mUi->statusBar->setProgressBarPercent(
+      mWorkspace.getLibraryDb().getScanProgressPercent());
 
   // Add all required schematic layers.
   addLayer(GraphicsLayer::sSchematicReferences);
