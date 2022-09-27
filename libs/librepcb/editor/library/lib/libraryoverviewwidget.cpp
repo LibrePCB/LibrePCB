@@ -26,6 +26,7 @@
 #include "../../editorcommandset.h"
 #include "../../library/cmd/cmdlibraryedit.h"
 #include "../../utils/menubuilder.h"
+#include "../../widgets/waitingspinnerwidget.h"
 #include "librarylisteditorwidget.h"
 #include "ui_libraryoverviewwidget.h"
 
@@ -151,13 +152,13 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
           &WorkspaceLibraryDb::scanSucceeded, this,
           &LibraryOverviewWidget::updateElementLists);
 
-  // Create contextmenu actions for each list widget.
-  createListWidgetActions(mUi->lstCmpCat);
-  createListWidgetActions(mUi->lstPkgCat);
-  createListWidgetActions(mUi->lstSym);
-  createListWidgetActions(mUi->lstCmp);
-  createListWidgetActions(mUi->lstPkg);
-  createListWidgetActions(mUi->lstDev);
+  // Setup each list widget.
+  setupListWidget(mUi->lstCmpCat);
+  setupListWidget(mUi->lstPkgCat);
+  setupListWidget(mUi->lstSym);
+  setupListWidget(mUi->lstCmp);
+  setupListWidget(mUi->lstPkg);
+  setupListWidget(mUi->lstDev);
 }
 
 LibraryOverviewWidget::~LibraryOverviewWidget() noexcept {
@@ -228,8 +229,8 @@ bool LibraryOverviewWidget::remove() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void LibraryOverviewWidget::createListWidgetActions(
-    QListWidget* listWidget) noexcept {
+void LibraryOverviewWidget::setupListWidget(QListWidget* listWidget) noexcept {
+  // Create contextmenu actions.
   const EditorCommandSet& cmd = EditorCommandSet::instance();
   listWidget->addAction(cmd.itemOpen.createAction(
       listWidget, this,
@@ -268,6 +269,14 @@ void LibraryOverviewWidget::createListWidgetActions(
             EditorCommand::ActionFlag::WidgetShortcut));  // Queued for funq
                                                           // testing.
   }
+
+  // Add waiting spinner during workspace library scan.
+  WaitingSpinnerWidget* spinner = new WaitingSpinnerWidget(listWidget);
+  connect(&mContext.workspace.getLibraryDb(), &WorkspaceLibraryDb::scanStarted,
+          spinner, &WaitingSpinnerWidget::show);
+  connect(&mContext.workspace.getLibraryDb(), &WorkspaceLibraryDb::scanFinished,
+          spinner, &WaitingSpinnerWidget::hide);
+  spinner->setVisible(mContext.workspace.getLibraryDb().isScanInProgress());
 }
 
 void LibraryOverviewWidget::updateMetadata() noexcept {

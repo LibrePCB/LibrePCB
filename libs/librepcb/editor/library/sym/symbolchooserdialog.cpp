@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "symbolchooserdialog.h"
 
+#include "../../widgets/waitingspinnerwidget.h"
 #include "../../workspace/categorytreemodel.h"
 #include "symbolgraphicsitem.h"
 #include "ui_symbolchooserdialog.h"
@@ -71,6 +72,18 @@ SymbolChooserDialog::SymbolChooserDialog(
           &SymbolChooserDialog::listSymbols_itemDoubleClicked);
   connect(mUi->edtSearch, &QLineEdit::textChanged, this,
           &SymbolChooserDialog::searchEditTextChanged);
+
+  // Add waiting spinner during workspace library scan.
+  auto addSpinner = [&ws](QWidget* widget) {
+    WaitingSpinnerWidget* spinner = new WaitingSpinnerWidget(widget);
+    connect(&ws.getLibraryDb(), &WorkspaceLibraryDb::scanStarted, spinner,
+            &WaitingSpinnerWidget::show);
+    connect(&ws.getLibraryDb(), &WorkspaceLibraryDb::scanFinished, spinner,
+            &WaitingSpinnerWidget::hide);
+    spinner->setVisible(ws.getLibraryDb().isScanInProgress());
+  };
+  addSpinner(mUi->treeCategories);
+  addSpinner(mUi->listSymbols);
 
   setSelectedSymbol(FilePath());
 }

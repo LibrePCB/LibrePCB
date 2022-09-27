@@ -103,7 +103,7 @@ signals:
   void removeElementTriggered(const FilePath& fp);
 
 private:  // Methods
-  void createListWidgetActions(QListWidget* listWidget) noexcept;
+  void setupListWidget(QListWidget* listWidget) noexcept;
   void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
   bool isInterfaceBroken() const noexcept override { return false; }

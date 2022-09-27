@@ -22,9 +22,11 @@
  ******************************************************************************/
 #include "categorychooserdialog.h"
 
+#include "../../widgets/waitingspinnerwidget.h"
 #include "ui_categorychooserdialog.h"
 
 #include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -52,6 +54,14 @@ CategoryChooserDialog::CategoryChooserDialog(const Workspace& ws,
       ws.getLibraryDb(), ws.getSettings().libraryLocaleOrder.get(), filters));
   mUi->treeView->setModel(mModel.data());
   mUi->treeView->setRootIndex(QModelIndex());
+
+  // Add waiting spinner during workspace library scan.
+  WaitingSpinnerWidget* spinner = new WaitingSpinnerWidget(mUi->treeView);
+  connect(&ws.getLibraryDb(), &WorkspaceLibraryDb::scanStarted, spinner,
+          &WaitingSpinnerWidget::show);
+  connect(&ws.getLibraryDb(), &WorkspaceLibraryDb::scanFinished, spinner,
+          &WaitingSpinnerWidget::hide);
+  spinner->setVisible(ws.getLibraryDb().isScanInProgress());
 }
 
 CategoryChooserDialog::~CategoryChooserDialog() noexcept {
