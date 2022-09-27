@@ -51,7 +51,11 @@ WorkspaceLibraryScanner::WorkspaceLibraryScanner(
     mLibrariesPath(librariesPath),
     mDbFilePath(dbFilePath),
     mSemaphore(0),
-    mAbort(false) {
+    mAbort(false),
+    mLastProgressPercent(100) {
+  connect(this, &WorkspaceLibraryScanner::scanProgressUpdate, this,
+          [this](int percent) { mLastProgressPercent = percent; },
+          Qt::QueuedConnection);
   start();
 }
 

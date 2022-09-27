@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packagechooserdialog.h"
 
+#include "../../widgets/waitingspinnerwidget.h"
 #include "../../workspace/categorytreemodel.h"
 #include "footprintgraphicsitem.h"
 #include "ui_packagechooserdialog.h"
@@ -73,6 +74,18 @@ PackageChooserDialog::PackageChooserDialog(
           &PackageChooserDialog::listPackages_itemDoubleClicked);
   connect(mUi->edtSearch, &QLineEdit::textChanged, this,
           &PackageChooserDialog::searchEditTextChanged);
+
+  // Add waiting spinner during workspace library scan.
+  auto addSpinner = [&ws](QWidget* widget) {
+    WaitingSpinnerWidget* spinner = new WaitingSpinnerWidget(widget);
+    connect(&ws.getLibraryDb(), &WorkspaceLibraryDb::scanStarted, spinner,
+            &WaitingSpinnerWidget::show);
+    connect(&ws.getLibraryDb(), &WorkspaceLibraryDb::scanFinished, spinner,
+            &WaitingSpinnerWidget::hide);
+    spinner->setVisible(ws.getLibraryDb().isScanInProgress());
+  };
+  addSpinner(mUi->treeCategories);
+  addSpinner(mUi->listPackages);
 
   setSelectedPackage(tl::nullopt);
 }

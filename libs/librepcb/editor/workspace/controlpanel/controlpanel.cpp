@@ -82,6 +82,8 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
   connect(&mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanProgressUpdate,
           mUi->statusBar, &StatusBar::setProgressBarPercent,
           Qt::QueuedConnection);
+  mUi->statusBar->setProgressBarPercent(
+      mWorkspace.getLibraryDb().getScanProgressPercent());
 
   // Setup actions and menus.
   createActions();

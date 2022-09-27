@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "addlibrarywidget.h"
 
+#include "../../widgets/waitingspinnerwidget.h"
 #include "../desktopservices.h"
 #include "librarydownload.h"
 #include "repositorylibrarylistwidgetitem.h"
@@ -114,6 +115,15 @@ void AddLibraryWidget::updateRepositoryLibraryList() noexcept {
             &AddLibraryWidget::repositoryLibraryListReceived);
     connect(repo.get(), &Repository::errorWhileFetchingLibraryList, this,
             &AddLibraryWidget::errorWhileFetchingLibraryList);
+
+    // Add waiting spinner during library list download.
+    WaitingSpinnerWidget* spinner = new WaitingSpinnerWidget(mUi->lstRepoLibs);
+    connect(repo.get(), &Repository::libraryListReceived, spinner,
+            &WaitingSpinnerWidget::deleteLater);
+    connect(repo.get(), &Repository::errorWhileFetchingLibraryList, spinner,
+            &WaitingSpinnerWidget::deleteLater);
+    spinner->show();
+
     repo->requestLibraryList();
     mRepositories.append(repo);
   }

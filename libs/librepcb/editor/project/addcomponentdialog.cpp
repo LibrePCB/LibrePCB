@@ -26,6 +26,7 @@
 #include "../library/pkg/footprintgraphicsitem.h"
 #include "../library/sym/symbolgraphicsitem.h"
 #include "../widgets/graphicsview.h"
+#include "../widgets/waitingspinnerwidget.h"
 #include "../workspace/categorytreemodel.h"
 #include "ui_addcomponentdialog.h"
 
@@ -110,6 +111,18 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,
           &AddComponentDialog::treeCategories_currentItemChanged);
+
+  // Add waiting spinner during workspace library scan.
+  auto addSpinner = [&db](QWidget* widget) {
+    WaitingSpinnerWidget* spinner = new WaitingSpinnerWidget(widget);
+    connect(&db, &WorkspaceLibraryDb::scanStarted, spinner,
+            &WaitingSpinnerWidget::show);
+    connect(&db, &WorkspaceLibraryDb::scanFinished, spinner,
+            &WaitingSpinnerWidget::hide);
+    spinner->setVisible(db.isScanInProgress());
+  };
+  addSpinner(mUi->treeCategories);
+  addSpinner(mUi->treeComponents);
 
   // Reset GUI to state of nothing selected.
   setSelectedComponent(nullptr);

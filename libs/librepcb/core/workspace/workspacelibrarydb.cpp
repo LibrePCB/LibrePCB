@@ -99,6 +99,10 @@ WorkspaceLibraryDb::~WorkspaceLibraryDb() noexcept {
  *  Getters
  ******************************************************************************/
 
+int WorkspaceLibraryDb::getScanProgressPercent() const noexcept {
+  return mLibraryScanner->getProgressPercent();
+}
+
 bool WorkspaceLibraryDb::getLibraryMetadata(const FilePath libDir,
                                             QPixmap* icon) const {
   QSqlQuery query = mDb->prepareQuery(
