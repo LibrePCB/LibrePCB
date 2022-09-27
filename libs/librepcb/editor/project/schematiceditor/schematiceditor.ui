@@ -18,7 +18,7 @@
     <normaloff>:/img/actions/schematic.png</normaloff>:/img/actions/schematic.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -31,6 +31,9 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
+    <item>
+     <widget class="librepcb::editor::MessageWidget" name="msgEmptySchematic" native="true"/>
+    </item>
     <item>
      <widget class="librepcb::editor::GraphicsView" name="graphicsView">
       <property name="frameShape">
@@ -62,6 +65,12 @@
    <class>librepcb::editor::GraphicsView</class>
    <extends>QGraphicsView</extends>
    <header location="global">librepcb/editor/widgets/graphicsview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::MessageWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/messagewidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -111,6 +111,9 @@ public:
   void setLocaleOrder(const QStringList& order) noexcept;
   void setNormOrder(const QStringList& order) noexcept { mNormOrder = order; }
 
+  // General Methods
+  void selectComponentByKeyword(const QString keyword) noexcept;
+
 private slots:
   void searchEditTextChanged(const QString& text) noexcept;
   void treeCategories_currentItemChanged(const QModelIndex& current,
@@ -123,7 +126,7 @@ private slots:
 
 private:
   // Private Methods
-  void searchComponents(const QString& input);
+  void searchComponents(const QString& input, bool selectFirstResult = false);
   SearchResult searchComponentsAndDevices(const QString& input);
   void setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
   void setSelectedComponent(const Component* cmp);
@@ -141,6 +144,7 @@ private:
   QScopedPointer<GraphicsScene> mDevicePreviewScene;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
   QScopedPointer<CategoryTreeModel> mCategoryTreeModel;
+  QString mCurrentSearchTerm;
 
   // Attributes
   tl::optional<Uuid> mSelectedCategoryUuid;

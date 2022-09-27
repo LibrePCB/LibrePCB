@@ -98,7 +98,7 @@ public:
 
   // Event Handlers
   bool processSelect() noexcept;
-  bool processAddComponent() noexcept;
+  bool processAddComponent(const QString& searchTerm = QString()) noexcept;
   bool processAddComponent(const Uuid& cmp, const Uuid& symbVar) noexcept;
   bool processAddNetLabel() noexcept;
   bool processDrawPolygon() noexcept;

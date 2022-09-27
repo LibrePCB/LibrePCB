@@ -69,6 +69,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
     mGraphicsLayerProvider(new DefaultGraphicsLayerProvider()),
     mCategoryTreeModel(new CategoryTreeModel(
         mDb, mLocaleOrder, CategoryTreeModel::Filter::CmpCatWithComponents)),
+    mCurrentSearchTerm(),
     mSelectedComponent(nullptr),
     mSelectedSymbVar(nullptr),
     mSelectedDevice(nullptr),
@@ -93,6 +94,14 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
       mUi->cbxSymbVar,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, &AddComponentDialog::cbxSymbVar_currentIndexChanged);
+  connect(&mDb, &WorkspaceLibraryDb::scanSucceeded, this, [this]() {
+    // Update component tree view since there might be new DB entries. But for
+    // now very fundamental since keeping the selection is not implemented yet.
+    if ((!mCurrentSearchTerm.isEmpty()) &&
+        (!mUi->treeComponents->currentItem())) {
+      selectComponentByKeyword(mCurrentSearchTerm);
+    }
+  });
 
   // Add actions.
   const EditorCommandSet& cmd = EditorCommandSet::instance();
@@ -190,6 +199,20 @@ bool AddComponentDialog::getAutoOpenAgain() const noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void AddComponentDialog::selectComponentByKeyword(
+    const QString keyword) noexcept {
+  try {
+    searchComponents(keyword, true);
+  } catch (const Exception& e) {
+    qCritical().noquote() << "Failed to pre-select component by keyword:"
+                          << e.getMsg();
+  }
+}
+
+/*******************************************************************************
  *  Private Slots
  ******************************************************************************/
 
@@ -281,7 +304,9 @@ void AddComponentDialog::cbxSymbVar_currentIndexChanged(int index) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void AddComponentDialog::searchComponents(const QString& input) {
+void AddComponentDialog::searchComponents(const QString& input,
+                                          bool selectFirstResult) {
+  mCurrentSearchTerm = input;
   setSelectedComponent(nullptr);
   mUi->treeComponents->clear();
 
@@ -310,6 +335,17 @@ void AddComponentDialog::searchComponents(const QString& input) {
   }
 
   mUi->treeComponents->sortByColumn(0, Qt::AscendingOrder);
+
+  if (selectFirstResult) {
+    if (QTreeWidgetItem* cmpItem = mUi->treeComponents->topLevelItem(0)) {
+      cmpItem->setExpanded(true);
+      if (QTreeWidgetItem* devItem = cmpItem->child(0)) {
+        mUi->treeComponents->setCurrentItem(devItem);
+      } else {
+        mUi->treeComponents->setCurrentItem(cmpItem);
+      }
+    }
+  }
 }
 
 AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
@@ -377,6 +413,7 @@ AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
 
 void AddComponentDialog::setSelectedCategory(
     const tl::optional<Uuid>& categoryUuid) {
+  mCurrentSearchTerm.clear();
   setSelectedComponent(nullptr);
   mUi->treeComponents->clear();
 
