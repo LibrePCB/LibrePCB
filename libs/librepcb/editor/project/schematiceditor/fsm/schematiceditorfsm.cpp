@@ -77,13 +77,14 @@ bool SchematicEditorFsm::processSelect() noexcept {
   return setNextState(State::SELECT);
 }
 
-bool SchematicEditorFsm::processAddComponent() noexcept {
+bool SchematicEditorFsm::processAddComponent(
+    const QString& searchTerm) noexcept {
   State oldState = mCurrentState;
   if (!setNextState(State::ADD_COMPONENT)) {
     return false;
   }
   if (SchematicEditorState* state = getCurrentStateObj()) {
-    if (state->processAddComponent()) {
+    if (state->processAddComponent(searchTerm)) {
       return true;
     }
   }

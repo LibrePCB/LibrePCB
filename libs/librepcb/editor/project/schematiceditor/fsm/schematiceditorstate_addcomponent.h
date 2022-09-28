@@ -72,7 +72,8 @@ public:
   virtual bool exit() noexcept override;
 
   // Event Handlers
-  virtual bool processAddComponent() noexcept override;
+  virtual bool processAddComponent(
+      const QString& searchTerm = QString()) noexcept override;
   virtual bool processAddComponent(const Uuid& cmp,
                                    const Uuid& symbVar) noexcept override;
   virtual bool processRotate(const Angle& rotation) noexcept override;
@@ -95,6 +96,7 @@ private:  // Methods
   void startAddingComponent(const tl::optional<Uuid>& cmp = tl::nullopt,
                             const tl::optional<Uuid>& symbVar = tl::nullopt,
                             const tl::optional<Uuid>& dev = tl::nullopt,
+                            const QString& searchTerm = QString(),
                             bool keepValue = false);
   bool abortCommand(bool showErrMsgBox) noexcept;
   std::shared_ptr<const Attribute> getToolbarAttribute() const noexcept;

@@ -140,14 +140,15 @@ bool SchematicEditorState_AddComponent::exit() noexcept {
  *  Event Handlers
  ******************************************************************************/
 
-bool SchematicEditorState_AddComponent::processAddComponent() noexcept {
+bool SchematicEditorState_AddComponent::processAddComponent(
+    const QString& searchTerm) noexcept {
   try {
     // start adding (another) component
     if (!abortCommand(true)) return false;
     mLastAngle.setAngleMicroDeg(0);  // reset the angle
     mLastMirrored = false;
     mUseAddComponentDialog = true;
-    startAddingComponent();
+    startAddingComponent(tl::nullopt, tl::nullopt, tl::nullopt, searchTerm);
     return true;
   } catch (UserCanceled& exc) {
   } catch (Exception& exc) {
@@ -277,7 +278,8 @@ bool SchematicEditorState_AddComponent::
       mContext.undoStack.commitCmdGroup();
       mIsUndoCmdActive = false;
       abortCommand(false);  // reset attributes
-      startAddingComponent(componentUuid, symbVarUuid, defaultDeviceUuid, true);
+      startAddingComponent(componentUuid, symbVarUuid, defaultDeviceUuid,
+                           QString(), true);
     }
     return true;
   } catch (Exception& e) {
@@ -321,7 +323,7 @@ bool SchematicEditorState_AddComponent::
 
 void SchematicEditorState_AddComponent::startAddingComponent(
     const tl::optional<Uuid>& cmp, const tl::optional<Uuid>& symbVar,
-    const tl::optional<Uuid>& dev, bool keepValue) {
+    const tl::optional<Uuid>& dev, const QString& searchTerm, bool keepValue) {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -352,6 +354,9 @@ void SchematicEditorState_AddComponent::startAddingComponent(
             mContext.workspace.getLibraryDb(),
             mContext.project.getSettings().getLocaleOrder(),
             mContext.project.getSettings().getNormOrder(), parentWidget()));
+      }
+      if (!searchTerm.isEmpty()) {
+        mAddComponentDialog->selectComponentByKeyword(searchTerm);
       }
       if (mAddComponentDialog->exec() != QDialog::Accepted)
         throw UserCanceled(__FILE__, __LINE__);  // abort

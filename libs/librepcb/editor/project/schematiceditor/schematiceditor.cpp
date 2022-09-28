@@ -131,6 +131,26 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   createDockWidgets();
   createMenus();  // Depends on dock widgets!
 
+  // Setup "empty schematic" message.
+  mUi->msgEmptySchematic->init(
+      mProjectEditor.getWorkspace(), "SCHEMATIC_HAS_NO_SYMBOLS",
+      tr("This schematic doesn't contain any components yet. Use the "
+         "<a href='%1'>Add Component</a> dialog to populate it. A good idea "
+         "is to <a href='%2'>add a schematic frame</a> first.")
+          .arg("dialog")
+          .arg("frame"),
+      false);
+  connect(mUi->msgEmptySchematic, &MessageWidget::linkActivated, this,
+          [this](const QString& link) {
+            if (mFsm) {
+              if (link == "frame") {
+                mFsm->processAddComponent("schematic frame");
+              } else {
+                mFsm->processAddComponent();
+              }
+            }
+          });
+
   // Restore window geometry.
   QSettings clientSettings;
   restoreGeometry(
@@ -189,6 +209,9 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
     // save current view scene rect
     schematic->saveViewSceneRect(mUi->graphicsView->getVisibleSceneRect());
   }
+  while (!mSchematicConnections.isEmpty()) {
+    disconnect(mSchematicConnections.takeLast());
+  }
   schematic = mProject.getSchematicByIndex(index);
   if (schematic) {
     // show scene, restore view scene rect, set grid properties
@@ -196,6 +219,12 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
     mUi->graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
     mUi->graphicsView->setGridProperties(schematic->getGridProperties());
     mUi->statusbar->setLengthUnit(schematic->getGridProperties().getUnit());
+    mSchematicConnections.append(
+        connect(schematic, &Schematic::symbolAdded, this,
+                &SchematicEditor::updateEmptySchematicMessage));
+    mSchematicConnections.append(
+        connect(schematic, &Schematic::symbolRemoved, this,
+                &SchematicEditor::updateEmptySchematicMessage));
   } else {
     mUi->graphicsView->setScene(nullptr);
   }
@@ -208,6 +237,7 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
   // schematic page has changed!
   mActiveSchematicIndex = index;
   emit activeSchematicChanged(mActiveSchematicIndex);
+  updateEmptySchematicMessage();
   return true;
 }
 
@@ -975,6 +1005,12 @@ void SchematicEditor::goToSymbol(const QString& name, int index) noexcept {
       mUi->graphicsView->zoomToRect(rect);
     }
   }
+}
+
+void SchematicEditor::updateEmptySchematicMessage() noexcept {
+  Schematic* schematic = getActiveSchematic();
+  mUi->msgEmptySchematic->setActive(schematic &&
+                                    schematic->getSymbols().isEmpty());
 }
 
 void SchematicEditor::updateComponentToolbarIcons() noexcept {

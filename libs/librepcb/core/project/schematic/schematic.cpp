@@ -188,6 +188,7 @@ void Schematic::addSymbol(SI_Symbol& symbol) {
   // add to schematic
   symbol.addToSchematic();  // can throw
   mSymbols.append(&symbol);
+  emit symbolAdded(symbol);
 }
 
 void Schematic::removeSymbol(SI_Symbol& symbol) {
@@ -197,6 +198,7 @@ void Schematic::removeSymbol(SI_Symbol& symbol) {
   // remove from schematic
   symbol.removeFromSchematic();  // can throw
   mSymbols.removeOne(&symbol);
+  emit symbolRemoved(symbol);
 }
 
 /*******************************************************************************
