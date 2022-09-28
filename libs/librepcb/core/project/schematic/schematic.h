@@ -193,6 +193,8 @@ public:
                            const ElementName& name);
 
 signals:
+  void symbolAdded(SI_Symbol& symbol);
+  void symbolRemoved(SI_Symbol& symbol);
 
   /// @copydoc AttributeProvider::attributesChanged()
   void attributesChanged() override;

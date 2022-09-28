@@ -92,7 +92,11 @@ public:
   virtual bool exit() noexcept { return true; }
 
   // Event Handlers
-  virtual bool processAddComponent() noexcept { return false; }
+  virtual bool processAddComponent(
+      const QString& searchTerm = QString()) noexcept {
+    Q_UNUSED(searchTerm);
+    return false;
+  }
   virtual bool processAddComponent(const Uuid& cmp,
                                    const Uuid& symbVar) noexcept {
     Q_UNUSED(cmp);

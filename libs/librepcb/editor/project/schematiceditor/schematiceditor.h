@@ -110,6 +110,7 @@ private:
   QList<SI_Symbol*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;
   void goToSymbol(const QString& name, int index) noexcept;
+  void updateEmptySchematicMessage() noexcept;
   void updateComponentToolbarIcons() noexcept;
   void setGridProperties(const GridProperties& grid,
                          bool applyToSchematics) noexcept;
@@ -213,6 +214,9 @@ private:
   // Docks
   QScopedPointer<SchematicPagesDock> mDockPages;
   QScopedPointer<ErcMsgDock> mDockErc;
+
+  // Connections
+  QVector<QMetaObject::Connection> mSchematicConnections;
 };
 
 /*******************************************************************************
