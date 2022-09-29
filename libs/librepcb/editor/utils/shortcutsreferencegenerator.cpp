@@ -151,7 +151,7 @@ void ShortcutsReferenceGenerator::drawCommandCategory(
     QPdfWriter& writer, QPainter& painter, qreal x, qreal y,
     EditorCommandCategory& cat) const noexcept {
   drawText(writer, painter, x, y, sCategoryTextSize, sColumnWidth,
-           cat.getText(), Flag::Bold);
+           cat.getTextNoTr(), Flag::Bold);
 
   y += 0.5 + sCategoryTextSize / 2;
   painter.setPen(QPen(Qt::black, 1));

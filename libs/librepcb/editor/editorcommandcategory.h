@@ -50,7 +50,8 @@ public:
                         bool configurable, QObject* parent = nullptr) noexcept
     : QObject(parent),
       mTextNoTr(text),
-      mText(tr(text)),
+      // Note: Translations are done within the EditorCommandSet context.
+      mText(QCoreApplication::translate("EditorCommandSet", text)),
       mConfigurable(configurable) {
     setObjectName(objectName);
   }
