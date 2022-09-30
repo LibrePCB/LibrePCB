@@ -63,6 +63,7 @@ BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(
       "./output/{{VERSION}}/assembly/{{PROJECT}}_PnP-BOT.csv");
   mBtnGenerate =
       mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::ActionRole);
+  mBtnGenerate->setDefault(true);
   connect(mBtnGenerate, &QPushButton::clicked, this,
           &BoardPickPlaceGeneratorDialog::btnGenerateClicked);
   connect(mUi->btnBrowseOutputDir, &QPushButton::clicked, this,

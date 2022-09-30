@@ -69,6 +69,7 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
   mUi->edtOutputPath->setText("./output/{{VERSION}}/{{PROJECT}}_BOM.csv");
   QPushButton* btnGenerate =
       mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::ActionRole);
+  btnGenerate->setDefault(true);
 
   mUi->cbxBoard->addItem(tr("None"));
   foreach (const Board* brd, mProject.getBoards()) {
