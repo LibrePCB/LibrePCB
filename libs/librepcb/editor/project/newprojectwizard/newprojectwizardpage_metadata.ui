@@ -74,43 +74,14 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLineEdit" name="edtLocation"/>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnLocation">
-       <property name="minimumSize">
-        <size>
-         <width>25</width>
-         <height>25</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>25</width>
-         <height>25</height>
-        </size>
-       </property>
-       <property name="text">
-        <string notr="true">...</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="4" column="0">
+   <item row="5" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string>Full Path:</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="5" column="1">
     <widget class="QLabel" name="lblFullFilePath">
      <property name="font">
       <font>
@@ -128,14 +99,14 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
+   <item row="7" column="0" colspan="2">
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
+   <item row="8" column="0">
     <widget class="QLabel" name="label_5">
      <property name="minimumSize">
       <size>
@@ -160,7 +131,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
+   <item row="8" column="1">
     <widget class="QLabel" name="label_9">
      <property name="text">
       <string>A LibrePCB project consists of a whole directory, not only of a single file. Just select the new project's parent directory, and the subdirectory and filename will be set automatically.</string>
@@ -208,6 +179,9 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="edtLocation"/>
    </item>
   </layout>
  </widget>

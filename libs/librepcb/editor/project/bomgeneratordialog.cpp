@@ -23,6 +23,7 @@
 #include "bomgeneratordialog.h"
 
 #include "../dialogs/filedialog.h"
+#include "../editorcommandset.h"
 #include "../workspace/desktopservices.h"
 #include "ui_bomgeneratordialog.h"
 
@@ -60,7 +61,6 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
     mBom(new Bom(QStringList())),
     mUi(new Ui::BomGeneratorDialog) {
   mUi->setupUi(this);
-  mUi->btnBrowse->setFixedWidth(mUi->btnBrowse->sizeHint().height());
   mUi->tableWidget->setWordWrap(false);
   mUi->tableWidget->verticalHeader()->setMinimumSectionSize(10);
   mUi->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -69,6 +69,15 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
   mBtnGenerate =
       mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::AcceptRole);
   mBtnGenerate->setDefault(true);
+
+  // Add browse action.
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+  mUi->edtOutputPath->addAction(
+      cmd.inputBrowse.createAction(
+          mUi->edtOutputPath, this,
+          &BomGeneratorDialog::btnChooseOutputPathClicked,
+          EditorCommand::ActionFlag::WidgetShortcut),
+      QLineEdit::TrailingPosition);
 
   mUi->cbxBoard->addItem(tr("None"));
   foreach (const Board* brd, mProject.getBoards()) {
@@ -85,8 +94,6 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
       this, &BomGeneratorDialog::updateBom);
   connect(mUi->edtAttributes, &QLineEdit::textEdited, this,
           &BomGeneratorDialog::updateBom);
-  connect(mUi->btnBrowse, &QToolButton::clicked, this,
-          &BomGeneratorDialog::btnChooseOutputPathClicked);
   connect(mUi->btnBrowseOutputDir, &QPushButton::clicked, this,
           &BomGeneratorDialog::btnOpenOutputDirectoryClicked);
   connect(mBtnGenerate, &QPushButton::clicked, this,

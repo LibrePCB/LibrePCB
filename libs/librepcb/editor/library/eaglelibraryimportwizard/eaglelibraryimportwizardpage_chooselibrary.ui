@@ -31,32 +31,14 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <property name="spacing">
-      <number>0</number>
+    <widget class="QLineEdit" name="edtFilePath">
+     <property name="maxLength">
+      <number>500</number>
      </property>
-     <item>
-      <widget class="QLineEdit" name="edtFilePath">
-       <property name="maxLength">
-        <number>500</number>
-       </property>
-       <property name="placeholderText">
-        <string>Select file with the button to the right</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnChooseFilePath">
-       <property name="text">
-        <string notr="true"/>
-       </property>
-       <property name="icon">
-        <iconset>
-         <normaloff>:/img/actions/search.png</normaloff>:/img/actions/search.png</iconset>
-       </property>
-      </widget>
-     </item>
-    </layout>
+     <property name="placeholderText">
+      <string>Select file to import</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QScrollArea" name="sclMessages">
@@ -126,7 +108,6 @@
  </widget>
  <tabstops>
   <tabstop>edtFilePath</tabstop>
-  <tabstop>btnChooseFilePath</tabstop>
   <tabstop>sclMessages</tabstop>
  </tabstops>
  <resources/>
