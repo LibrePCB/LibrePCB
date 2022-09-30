@@ -31,6 +31,9 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <layout class="QFormLayout" name="formLayout">
+          <property name="fieldGrowthPolicy">
+           <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+          </property>
           <property name="verticalSpacing">
            <number>3</number>
           </property>
@@ -173,7 +176,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>GraphicsView</class>
+   <class>librepcb::editor::GraphicsView</class>
    <extends>QGraphicsView</extends>
    <header location="global">librepcb/editor/widgets/graphicsview.h</header>
   </customwidget>

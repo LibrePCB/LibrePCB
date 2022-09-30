@@ -54,8 +54,10 @@ FabricationOutputDialog::FabricationOutputDialog(
     mUi(new Ui::FabricationOutputDialog) {
   mUi->setupUi(this);
   mBtnGenerate =
-      mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::ActionRole);
+      mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::AcceptRole);
   mBtnGenerate->setDefault(true);
+  connect(mUi->buttonBox, &QDialogButtonBox::rejected, this,
+          &FabricationOutputDialog::reject);
   connect(mBtnGenerate, &QPushButton::clicked, this,
           &FabricationOutputDialog::btnGenerateClicked);
   connect(mUi->btnDefaultSuffixes, &QPushButton::clicked, this,

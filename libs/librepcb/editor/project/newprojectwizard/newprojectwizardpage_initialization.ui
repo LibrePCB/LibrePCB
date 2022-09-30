@@ -49,6 +49,12 @@
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="lblSchematicFileName">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string notr="true">-</string>
         </property>
@@ -89,6 +95,12 @@
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="lblBoardFileName">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string notr="true">-</string>
         </property>

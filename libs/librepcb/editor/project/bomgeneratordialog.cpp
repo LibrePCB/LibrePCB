@@ -60,16 +60,15 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
     mBom(new Bom(QStringList())),
     mUi(new Ui::BomGeneratorDialog) {
   mUi->setupUi(this);
-  mUi->lblSuccess->hide();
   mUi->btnBrowse->setFixedWidth(mUi->btnBrowse->sizeHint().height());
   mUi->tableWidget->setWordWrap(false);
   mUi->tableWidget->verticalHeader()->setMinimumSectionSize(10);
   mUi->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
   mUi->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
   mUi->edtOutputPath->setText("./output/{{VERSION}}/{{PROJECT}}_BOM.csv");
-  QPushButton* btnGenerate =
-      mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::ActionRole);
-  btnGenerate->setDefault(true);
+  mBtnGenerate =
+      mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::AcceptRole);
+  mBtnGenerate->setDefault(true);
 
   mUi->cbxBoard->addItem(tr("None"));
   foreach (const Board* brd, mProject.getBoards()) {
@@ -88,10 +87,12 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
           &BomGeneratorDialog::updateBom);
   connect(mUi->btnBrowse, &QToolButton::clicked, this,
           &BomGeneratorDialog::btnChooseOutputPathClicked);
-  connect(mUi->btnOpenDirectory, &QToolButton::clicked, this,
+  connect(mUi->btnBrowseOutputDir, &QPushButton::clicked, this,
           &BomGeneratorDialog::btnOpenOutputDirectoryClicked);
-  connect(btnGenerate, &QPushButton::clicked, this,
+  connect(mBtnGenerate, &QPushButton::clicked, this,
           &BomGeneratorDialog::btnGenerateClicked);
+  connect(mUi->buttonBox, &QDialogButtonBox::rejected, this,
+          &BomGeneratorDialog::reject);
 }
 
 BomGeneratorDialog::~BomGeneratorDialog() noexcept {
@@ -106,7 +107,6 @@ void BomGeneratorDialog::btnChooseOutputPathClicked() noexcept {
       this, tr("Save to"), getOutputFilePath().getParentDir().toStr(), "*.csv");
   if (!fp.isEmpty()) {
     mUi->edtOutputPath->setText(fp);
-    mUi->lblSuccess->hide();
   }
 }
 
@@ -120,9 +120,18 @@ void BomGeneratorDialog::btnGenerateClicked() noexcept {
     BomCsvWriter writer(*mBom);
     std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
     csv->saveToFile(getOutputFilePath());  // can throw
-    mUi->lblSuccess->show();
+
+    QString btnSuccessText = tr("Success!");
+    QString btnGenerateText = mBtnGenerate->text();
+    if (btnGenerateText != btnSuccessText) {
+      mBtnGenerate->setText(btnSuccessText);
+      QTimer::singleShot(500, this, [this, btnGenerateText]() {
+        if (mBtnGenerate) {
+          mBtnGenerate->setText(btnGenerateText);
+        }
+      });
+    }
   } catch (const Exception& e) {
-    mUi->lblSuccess->hide();
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
 }
@@ -212,7 +221,6 @@ void BomGeneratorDialog::updateTable() noexcept {
       }
     }
     mUi->tableWidget->resizeRowsToContents();
-    mUi->lblSuccess->hide();
   } catch (Exception& e) {
     qCritical() << "Failed to update BOM table widget:" << e.getMsg();
   }

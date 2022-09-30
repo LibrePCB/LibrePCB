@@ -74,6 +74,9 @@
        <string>Create local library</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <item row="0" column="0" colspan="2">
         <widget class="QLabel" name="label_8">
          <property name="text">
@@ -181,7 +184,10 @@
        <item row="7" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0">
          <property name="spacing">
-          <number>0</number>
+          <number>7</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinimumSize</enum>
          </property>
          <item>
           <widget class="QCheckBox" name="cbxLocalCc0License"/>
@@ -250,6 +256,9 @@
        <string>Download manually</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout_2">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <item row="0" column="0" colspan="2">
         <widget class="QLabel" name="label_10">
          <property name="text">

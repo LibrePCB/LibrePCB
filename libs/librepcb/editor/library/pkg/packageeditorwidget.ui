@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1">
+  <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -38,8 +38,8 @@
       </size>
      </property>
     </widget>
-  </item>
-  <item>
+   </item>
+   <item>
     <widget class="QWidget" name="errorNotificationWidget" native="true">
      <property name="minimumSize">
       <size>
@@ -140,6 +140,9 @@
      </item>
      <item>
       <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <property name="horizontalSpacing">
         <number>3</number>
        </property>
