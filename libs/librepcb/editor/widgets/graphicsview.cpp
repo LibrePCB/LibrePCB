@@ -76,6 +76,7 @@ GraphicsView::GraphicsView(QWidget* parent,
   setBackgroundBrush(Qt::white);
   setForegroundBrush(Qt::black);
 
+  mOverlayLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
   mOverlayLabel->setFont(qApp->getDefaultMonospaceFont());
   mOverlayLabel->setTextFormat(Qt::RichText);
   mOverlayLabel->move(0, 0);
