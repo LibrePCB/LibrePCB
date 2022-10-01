@@ -43,13 +43,14 @@ EditorCommand::EditorCommand(const QString& identifier, const char* text,
   : QObject(parent),
     mIdentifier(identifier),
     mTextNoTr(text),
-    // Note: Translations are done within the EditorCommandSet context.
-    mText(QCoreApplication::translate("EditorCommandSet", text)),
-    mDescription(QCoreApplication::translate("EditorCommandSet", description)),
+    mText(text),
+    mDescriptionNoTr(description),
+    mDescription(description),
     mIcon(icon),
     mFlags(flags),
     mDefaultKeySequences(defaultKeySequences),
     mKeySequences(defaultKeySequences) {
+  updateTranslations();
 }
 
 EditorCommand::~EditorCommand() noexcept {
@@ -70,6 +71,13 @@ void EditorCommand::setKeySequences(
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void EditorCommand::updateTranslations() noexcept {
+  // Note: Translations are done within the EditorCommandSet context.
+  mText = QCoreApplication::translate("EditorCommandSet", mTextNoTr);
+  mDescription =
+      QCoreApplication::translate("EditorCommandSet", mDescriptionNoTr);
+}
 
 QAction* EditorCommand::createAction(QObject* parent, ActionFlags flags) const
     noexcept {
