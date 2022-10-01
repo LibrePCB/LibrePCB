@@ -50,10 +50,10 @@ public:
                         bool configurable, QObject* parent = nullptr) noexcept
     : QObject(parent),
       mTextNoTr(text),
-      // Note: Translations are done within the EditorCommandSet context.
-      mText(QCoreApplication::translate("EditorCommandSet", text)),
+      mText(text),
       mConfigurable(configurable) {
     setObjectName(objectName);
+    updateTranslations();
   }
   ~EditorCommandCategory() noexcept {}
 
@@ -61,6 +61,12 @@ public:
   const char* getTextNoTr() const noexcept { return mTextNoTr; }
   const QString& getText() const noexcept { return mText; }
   bool isConfigurable() const noexcept { return mConfigurable; }
+
+  // General Methods
+  void updateTranslations() noexcept {
+    // Note: Translations are done within the EditorCommandSet context.
+    mText = QCoreApplication::translate("EditorCommandSet", mTextNoTr);
+  }
 
   // Operator Overloadings
   EditorCommandCategory& operator=(const EditorCommandCategory& rhs) = delete;
