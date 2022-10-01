@@ -153,7 +153,7 @@ protected:  // Methods
   virtual void valueChangedImpl(const Length& diff) noexcept = 0;
 
 protected:  // Data
-  QAction* mChangeUnitAction;
+  QPointer<QAction> mChangeUnitAction;
   LengthUnit mDefaultUnit;
   tl::optional<LengthUnit> mSelectedUnit;
   Length mMinimum;

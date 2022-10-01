@@ -23,6 +23,7 @@
 #include "newprojectwizardpage_metadata.h"
 
 #include "../../dialogs/filedialog.h"
+#include "../../editorcommandset.h"
 #include "../../workspace/desktopservices.h"
 #include "ui_newprojectwizardpage_metadata.h"
 
@@ -52,13 +53,20 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
   setPixmap(QWizard::LogoPixmap, QPixmap(":/img/actions/plus_2.png"));
   setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 
+  // Add browse action.
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+  mUi->edtLocation->addAction(
+      cmd.inputBrowse.createAction(
+          mUi->edtLocation, this,
+          &NewProjectWizardPage_Metadata::chooseLocationClicked,
+          EditorCommand::ActionFlag::WidgetShortcut),
+      QLineEdit::TrailingPosition);
+
   // signal/slot connections
   connect(mUi->edtName, &QLineEdit::textChanged, this,
           &NewProjectWizardPage_Metadata::nameChanged);
   connect(mUi->edtLocation, &QLineEdit::textChanged, this,
           &NewProjectWizardPage_Metadata::locationChanged);
-  connect(mUi->btnLocation, &QPushButton::clicked, this,
-          &NewProjectWizardPage_Metadata::chooseLocationClicked);
   connect(mUi->lblLicenseLink, &QLabel::linkActivated, this,
           [this](const QString& url) {
             DesktopServices ds(mWorkspace.getSettings(), this);

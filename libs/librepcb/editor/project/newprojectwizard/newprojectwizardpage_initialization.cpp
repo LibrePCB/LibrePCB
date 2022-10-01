@@ -79,11 +79,6 @@ QString NewProjectWizardPage_Initialization::getSchematicName() const noexcept {
   return mUi->edtSchematicName->text();
 }
 
-QString NewProjectWizardPage_Initialization::getSchematicFileName() const
-    noexcept {
-  return mUi->lblSchematicFileName->text();
-}
-
 bool NewProjectWizardPage_Initialization::getCreateBoard() const noexcept {
   return mUi->cbxAddBoard->isChecked();
 }
@@ -92,29 +87,29 @@ QString NewProjectWizardPage_Initialization::getBoardName() const noexcept {
   return mUi->edtBoardName->text();
 }
 
-QString NewProjectWizardPage_Initialization::getBoardFileName() const noexcept {
-  return mUi->lblBoardFileName->text();
-}
-
 /*******************************************************************************
  *  GUI Action Handlers
  ******************************************************************************/
 
 void NewProjectWizardPage_Initialization::schematicNameChanged(
     const QString& name) noexcept {
-  QString filename = FilePath::cleanFileName(
+  QString dir = FilePath::cleanFileName(
       name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-  if (!filename.isEmpty()) filename.append(".lp");
-  mUi->lblSchematicFileName->setText(filename);
+  if (!dir.isEmpty()) {
+    dir = "schematics/" % dir % "/";
+  }
+  mUi->lblSchematicDirectory->setText(dir);
   emit completeChanged();
 }
 
 void NewProjectWizardPage_Initialization::boardNameChanged(
     const QString& name) noexcept {
-  QString filename = FilePath::cleanFileName(
+  QString dir = FilePath::cleanFileName(
       name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-  if (!filename.isEmpty()) filename.append(".lp");
-  mUi->lblBoardFileName->setText(filename);
+  if (!dir.isEmpty()) {
+    dir = "boards/" % dir % "/";
+  }
+  mUi->lblBoardDirectory->setText(dir);
   emit completeChanged();
 }
 
@@ -128,13 +123,13 @@ bool NewProjectWizardPage_Initialization::isComplete() const noexcept {
 
   // check schematic filename
   if (mUi->cbxAddSchematic->isChecked() &&
-      mUi->lblSchematicFileName->text().isEmpty()) {
+      mUi->lblSchematicDirectory->text().isEmpty()) {
     return false;
   }
 
   // check board filename
   if (mUi->cbxAddBoard->isChecked() &&
-      mUi->lblBoardFileName->text().isEmpty()) {
+      mUi->lblBoardDirectory->text().isEmpty()) {
     return false;
   }
 

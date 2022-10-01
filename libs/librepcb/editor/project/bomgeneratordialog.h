@@ -85,6 +85,7 @@ private:  // Data
   const Project& mProject;
   std::shared_ptr<Bom> mBom;
   QScopedPointer<Ui::BomGeneratorDialog> mUi;
+  QPointer<QPushButton> mBtnGenerate;
 };
 
 /*******************************************************************************

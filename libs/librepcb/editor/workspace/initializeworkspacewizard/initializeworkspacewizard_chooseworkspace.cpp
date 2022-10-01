@@ -23,6 +23,7 @@
 #include "initializeworkspacewizard_chooseworkspace.h"
 
 #include "../../dialogs/filedialog.h"
+#include "../../editorcommandset.h"
 #include "ui_initializeworkspacewizard_chooseworkspace.h"
 
 #include <librepcb/core/fileio/filepath.h>
@@ -46,13 +47,20 @@ InitializeWorkspaceWizard_ChooseWorkspace::
   mUi->setupUi(this);
   connect(mUi->edtPath, &QLineEdit::textChanged, this,
           &InitializeWorkspaceWizard_ChooseWorkspace::updateWorkspacePath);
-  connect(mUi->btnBrowse, &QPushButton::clicked, this, [this]() {
-    QString filepath = FileDialog::getExistingDirectory(
-        this, tr("Select Workspace Directory"));
-    if (!filepath.isEmpty()) {
-      mUi->edtPath->setText(filepath);
-    }
-  });
+
+  // Add browse action.
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+  QAction* aBrowse = cmd.inputBrowse.createAction(
+      mUi->edtPath, this,
+      [this]() {
+        QString filepath = FileDialog::getExistingDirectory(
+            this, tr("Select Workspace Directory"));
+        if (!filepath.isEmpty()) {
+          mUi->edtPath->setText(filepath);
+        }
+      },
+      EditorCommand::ActionFlag::WidgetShortcut);
+  mUi->edtPath->addAction(aBrowse, QLineEdit::TrailingPosition);
 }
 
 InitializeWorkspaceWizard_ChooseWorkspace::
@@ -64,8 +72,6 @@ InitializeWorkspaceWizard_ChooseWorkspace::
  ******************************************************************************/
 
 void InitializeWorkspaceWizard_ChooseWorkspace::initializePage() noexcept {
-  mUi->btnBrowse->setFixedWidth(mUi->btnBrowse->height());
-
   // By default, the suggested workspace path is a subdirectory within the
   // user's home folder. However, depending on the deployment method, the
   // home folder might be some kind of sandboxed and/or even deleted when

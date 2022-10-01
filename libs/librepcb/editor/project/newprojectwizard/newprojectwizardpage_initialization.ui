@@ -43,12 +43,18 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Filename:</string>
+         <string>Directory:</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="lblSchematicFileName">
+       <widget class="QLabel" name="lblSchematicDirectory">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string notr="true">-</string>
         </property>
@@ -83,12 +89,18 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_8">
         <property name="text">
-         <string>Filename:</string>
+         <string>Directory:</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="lblBoardFileName">
+       <widget class="QLabel" name="lblBoardDirectory">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string notr="true">-</string>
         </property>

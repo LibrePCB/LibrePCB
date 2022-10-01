@@ -58,10 +58,8 @@ public:
   // Getters
   bool getCreateSchematic() const noexcept;
   QString getSchematicName() const noexcept;
-  QString getSchematicFileName() const noexcept;
   bool getCreateBoard() const noexcept;
   QString getBoardName() const noexcept;
-  QString getBoardFileName() const noexcept;
 
   // Operator Overloadings
   NewProjectWizardPage_Initialization& operator=(

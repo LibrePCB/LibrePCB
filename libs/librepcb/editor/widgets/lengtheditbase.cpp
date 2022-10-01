@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "lengtheditbase.h"
 
+#include "../editorcommandset.h"
+
 #include <librepcb/core/utils/mathparser.h>
 #include <librepcb/core/utils/toolbox.h>
 
@@ -38,8 +40,7 @@ namespace editor {
 LengthEditBase::LengthEditBase(const Length& min, const Length& max,
                                const Length& value, QWidget* parent) noexcept
   : QAbstractSpinBox(parent),
-    mChangeUnitAction(lineEdit()->addAction(QIcon(":/img/actions/ruler.png"),
-                                            QLineEdit::TrailingPosition)),
+    mChangeUnitAction(nullptr),
     mDefaultUnit(LengthUnit::millimeters()),
     mSelectedUnit(tl::nullopt),
     mMinimum(min),
@@ -54,6 +55,14 @@ LengthEditBase::LengthEditBase(const Length& min, const Length& max,
     mAdditionalSize(30, 0),
     mSettingsKey() {
   Q_ASSERT((mValue >= mMinimum) && (mValue <= mMaximum));
+
+  // Add action to change unit.
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+  mChangeUnitAction = cmd.inputUnitChange.createAction(
+      this, this, &LengthEditBase::changeUnitActionTriggered,
+      EditorCommand::ActionFlag::WidgetShortcut);
+  lineEdit()->addAction(mChangeUnitAction, QLineEdit::TrailingPosition);
+  addAction(mChangeUnitAction);  // Required to get keyboard shortcut working.
 
   // Ugly hack to make sizeHint() and minimumSizeHint() working properly.
   // QAbstractSpinBox uses (among others) the special value text to calculate
@@ -73,8 +82,6 @@ LengthEditBase::LengthEditBase(const Length& min, const Length& max,
           &LengthEditBase::updateText);
   connect(lineEdit(), &QLineEdit::textEdited, this,
           &LengthEditBase::updateValueFromText);
-  connect(mChangeUnitAction, &QAction::triggered, this,
-          &LengthEditBase::changeUnitActionTriggered);
 }
 
 LengthEditBase::~LengthEditBase() noexcept {
@@ -333,7 +340,10 @@ void LengthEditBase::changeUnitActionTriggered() noexcept {
       updateText();
     });
   }
-  menu.exec(QCursor::pos());
+
+  // Note: Don't use QCursor::pos() since it would be completely wrong when the
+  // menu is triggered by the keyboard shortcut.
+  menu.exec(mapToGlobal(QPoint(0, height())));
 }
 
 void LengthEditBase::setSelectedUnit(const LengthUnit& unit) noexcept {

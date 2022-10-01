@@ -348,12 +348,9 @@ void WorkspaceSettingsDialog::externalApplicationListIndexChanged(
     EditorToolbox::deleteLayoutItemRecursively(item);
   }
 
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
   QStringList commands = mExternalApplications[index].currentValue;
   for (int i = 0; i <= commands.count(); ++i) {
-    QHBoxLayout* hLayout = new QHBoxLayout();
-    hLayout->setContentsMargins(0, 0, 0, 0);
-    hLayout->setSpacing(0);
-
     QLineEdit* edit = new QLineEdit(commands.value(i), this);
     edit->setPlaceholderText(
         tr("Example:") % " " % mExternalApplications[index].exampleExecutable %
@@ -375,35 +372,35 @@ void WorkspaceSettingsDialog::externalApplicationListIndexChanged(
               },
               Qt::QueuedConnection);
     }
-    hLayout->addWidget(edit);
+    mUi->layoutExternalApplicationCommands->addWidget(edit);
 
-    QToolButton* btnBrowse = new QToolButton(this);
-    btnBrowse->setToolTip(tr("Select executable..."));
-    btnBrowse->setIcon(QIcon(":/img/actions/open.png"));
-    connect(btnBrowse, &QToolButton::clicked, this, [this, edit, index]() {
-      QString fp = FileDialog::getOpenFileName(this, tr("Select executable"),
-                                               QDir::rootPath());
-      if (!fp.isEmpty()) {
-        edit->setText(fp % " " % mExternalApplications[index].defaultArgument);
-        emit edit->editingFinished();
-      }
-    });
-    hLayout->addWidget(btnBrowse);
+    // Add 'browse' action.
+    QAction* aBrowse = cmd.inputBrowse.createAction(
+        edit, this,
+        [this, edit, index]() {
+          QString fp = FileDialog::getOpenFileName(
+              this, tr("Select executable"), QDir::rootPath());
+          if (!fp.isEmpty()) {
+            edit->setText(fp % " " %
+                          mExternalApplications[index].defaultArgument);
+            emit edit->editingFinished();
+          }
+        },
+        EditorCommand::ActionFlag::WidgetShortcut);
+    edit->addAction(aBrowse, QLineEdit::TrailingPosition);
 
+    // Add 'remove' action.
     if (i < commands.count()) {
-      QToolButton* btnRemove = new QToolButton(this);
-      btnRemove->setToolTip(tr("Remove this command"));
-      btnRemove->setIcon(QIcon(":/img/actions/delete.png"));
-      connect(btnRemove, &QToolButton::clicked, this,
-              [this, index, i]() {
-                mExternalApplications[index].currentValue.removeAt(i);
-                externalApplicationListIndexChanged(index);
-              },
-              Qt::QueuedConnection);
-      hLayout->addWidget(btnRemove);
+      QAction* aRemove = cmd.inputRemove.createAction(
+          edit, this,
+          [this, index, i]() {
+            mExternalApplications[index].currentValue.removeAt(i);
+            externalApplicationListIndexChanged(index);
+          },
+          EditorCommand::ActionFlag::WidgetShortcut |
+              EditorCommand::ActionFlag::QueuedConnection);
+      edit->addAction(aRemove, QLineEdit::TrailingPosition);
     }
-
-    mUi->layoutExternalApplicationCommands->addLayout(hLayout);
   }
 
   QString placeholdersText =

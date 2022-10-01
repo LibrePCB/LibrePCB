@@ -23,6 +23,7 @@
 #include "eaglelibraryimportwizardpage_chooselibrary.h"
 
 #include "../../dialogs/filedialog.h"
+#include "../../editorcommandset.h"
 #include "eaglelibraryimportwizardcontext.h"
 #include "ui_eaglelibraryimportwizardpage_chooselibrary.h"
 
@@ -50,19 +51,27 @@ EagleLibraryImportWizardPage_ChooseLibrary::
     mContext(context) {
   mUi->setupUi(this);
   mUi->edtFilePath->setText("-");  // Workaround to force initial library load.
-  connect(mUi->btnChooseFilePath, &QToolButton::clicked, this, [this]() {
-    QString p = mUi->edtFilePath->text();
-    if (p.trimmed().isEmpty()) {
-      p = QDir::homePath();
-    }
-    p = FileDialog::getOpenFileName(this, tr("Choose file"), p, "*.lbr;;*");
-    if (!p.isEmpty()) {
-      mUi->edtFilePath->setText(p);
-    }
-  });
   connect(mUi->edtFilePath, &QLineEdit::textChanged, mContext.get(),
           &EagleLibraryImportWizardContext::setLbrFilePath,
           Qt::QueuedConnection);
+
+  // Add browse action.
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+  QAction* aBrowse = cmd.inputBrowse.createAction(
+      mUi->edtFilePath, this,
+      [this]() {
+        QString p = mUi->edtFilePath->text();
+        if (p.trimmed().isEmpty()) {
+          p = QDir::homePath();
+        }
+        p = FileDialog::getOpenFileName(this, tr("Choose file"), p, "*.lbr;;*");
+        if (!p.isEmpty()) {
+          mUi->edtFilePath->setText(p);
+        }
+      },
+      EditorCommand::ActionFlag::WidgetShortcut);
+  mUi->edtFilePath->addAction(aBrowse, QLineEdit::TrailingPosition);
+
   connect(mContext.get(), &EagleLibraryImportWizardContext::parseCompleted,
           mUi->lblMessages, &QLabel::setText);
   connect(mContext.get(), &EagleLibraryImportWizardContext::parseCompleted,
