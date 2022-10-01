@@ -54,7 +54,8 @@ ComponentChooserDialog::ComponentChooserDialog(
   : QDialog(parent),
     mWorkspace(ws),
     mLayerProvider(layerProvider),
-    mUi(new Ui::ComponentChooserDialog) {
+    mUi(new Ui::ComponentChooserDialog),
+    mCategorySelected(false) {
   mUi->setupUi(this);
   mGraphicsScene.reset(new GraphicsScene());
   mUi->graphicsView->setScene(mGraphicsScene.data());
@@ -139,7 +140,9 @@ void ComponentChooserDialog::listComponents_itemDoubleClicked(
 }
 
 void ComponentChooserDialog::searchComponents(const QString& input) {
-  setSelectedCategory(tl::nullopt);
+  setSelectedComponent(tl::nullopt);
+  mUi->listComponents->clear();
+  mCategorySelected = false;
 
   // min. 2 chars to avoid freeze on entering first character due to huge result
   if (input.length() > 1) {
@@ -159,25 +162,26 @@ void ComponentChooserDialog::searchComponents(const QString& input) {
 
 void ComponentChooserDialog::setSelectedCategory(
     const tl::optional<Uuid>& uuid) noexcept {
-  if (uuid && (uuid == mSelectedCategoryUuid)) return;
+  if ((mCategorySelected) && (uuid == mSelectedCategoryUuid)) return;
 
   setSelectedComponent(tl::nullopt);
   mUi->listComponents->clear();
-
   mSelectedCategoryUuid = uuid;
+  mCategorySelected = true;
+
   try {
     QSet<Uuid> components =
         mWorkspace.getLibraryDb().getByCategory<Component>(uuid);  // can throw
-    foreach (const Uuid& uuid, components) {
+    foreach (const Uuid& cmpUuid, components) {
       try {
-        FilePath fp =
-            mWorkspace.getLibraryDb().getLatest<Component>(uuid);  // can throw
+        FilePath fp = mWorkspace.getLibraryDb().getLatest<Component>(
+            cmpUuid);  // can throw
         QString name;
         mWorkspace.getLibraryDb().getTranslations<Component>(
             fp, localeOrder(),
             &name);  // can throw
         QListWidgetItem* item = new QListWidgetItem(name);
-        item->setData(Qt::UserRole, uuid.toStr());
+        item->setData(Qt::UserRole, cmpUuid.toStr());
         mUi->listComponents->addItem(item);
       } catch (const Exception& e) {
         continue;  // should we do something here?

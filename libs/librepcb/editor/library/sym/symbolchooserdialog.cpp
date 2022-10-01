@@ -54,7 +54,8 @@ SymbolChooserDialog::SymbolChooserDialog(
     mWorkspace(ws),
     mLayerProvider(layerProvider),
     mUi(new Ui::SymbolChooserDialog),
-    mPreviewScene(new GraphicsScene()) {
+    mPreviewScene(new GraphicsScene()),
+    mCategorySelected(false) {
   mUi->setupUi(this);
   mUi->graphicsView->setScene(mPreviewScene.data());
   mUi->graphicsView->setOriginCrossVisible(false);
@@ -156,7 +157,9 @@ void SymbolChooserDialog::listSymbols_itemDoubleClicked(
 }
 
 void SymbolChooserDialog::searchSymbols(const QString& input) {
-  setSelectedCategory(tl::nullopt);
+  setSelectedSymbol(FilePath());
+  mUi->listSymbols->clear();
+  mCategorySelected = false;
 
   // min. 2 chars to avoid freeze on entering first character due to huge result
   if (input.length() > 1) {
@@ -176,12 +179,12 @@ void SymbolChooserDialog::searchSymbols(const QString& input) {
 
 void SymbolChooserDialog::setSelectedCategory(
     const tl::optional<Uuid>& uuid) noexcept {
-  if (uuid && (uuid == mSelectedCategoryUuid)) return;
+  if ((mCategorySelected) && (uuid == mSelectedCategoryUuid)) return;
 
   setSelectedSymbol(FilePath());
   mUi->listSymbols->clear();
-
   mSelectedCategoryUuid = uuid;
+  mCategorySelected = true;
 
   try {
     QSet<Uuid> symbols =
