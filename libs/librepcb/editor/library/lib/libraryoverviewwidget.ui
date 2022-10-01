@@ -283,6 +283,9 @@
      </widget>
      <widget class="QWidget" name="layoutWidget">
       <layout class="QFormLayout" name="formLayout">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <property name="horizontalSpacing">
         <number>3</number>
        </property>

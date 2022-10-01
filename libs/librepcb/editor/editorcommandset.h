@@ -416,6 +416,36 @@ public:
       &categoryEditor,
   };
 
+  EditorCommandCategory categoryTextInput{
+      "categoryTextInput", QT_TR_NOOP("Text Input"), true, &categoryRoot};
+  EditorCommand inputBrowse{
+      "input_browse",  // clang-format break
+      QT_TR_NOOP("Browse"),
+      QT_TR_NOOP("Open file or directory browser"),
+      QIcon(":/img/actions/open.png"),
+      EditorCommand::Flag::OpensPopup,
+      {QKeySequence(Qt::CTRL + Qt::Key_B)},
+      &categoryTextInput,
+  };
+  EditorCommand inputUnitChange{
+      "input_unit_change",  // clang-format break
+      QT_TR_NOOP("Change Unit"),
+      QT_TR_NOOP("Change the measurement unit of the text input"),
+      QIcon(":/img/actions/ruler.png"),
+      EditorCommand::Flag::OpensPopup,
+      {QKeySequence(Qt::CTRL + Qt::Key_M)},
+      &categoryTextInput,
+  };
+  EditorCommand inputRemove{
+      "input_remove",  // clang-format break
+      QT_TR_NOOP("Remove"),
+      QT_TR_NOOP("Remove this item"),
+      QIcon(":/img/actions/delete.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL + Qt::Key_Delete)},
+      &categoryTextInput,
+  };
+
   EditorCommandCategory categoryImportExport{
       "categoryImportExport", QT_TR_NOOP("Import/Export"), true, &categoryRoot};
   EditorCommand importDxf{

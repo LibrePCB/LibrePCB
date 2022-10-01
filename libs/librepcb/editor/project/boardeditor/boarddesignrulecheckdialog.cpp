@@ -71,10 +71,12 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
                                      LengthEditBase::Steps::generic(),
                                      settingsPrefix % "/courtyard_offset");
   QPushButton* btnRun =
-      mUi->buttonBox->addButton(tr("Run DRC"), QDialogButtonBox::ActionRole);
+      mUi->buttonBox->addButton(tr("Run DRC"), QDialogButtonBox::AcceptRole);
   btnRun->setDefault(true);  // Allow just pressing the return key to run DRC.
   connect(btnRun, &QPushButton::clicked, this,
           &BoardDesignRuleCheckDialog::btnRunDrcClicked);
+  connect(mUi->buttonBox, &QDialogButtonBox::rejected, this,
+          &BoardDesignRuleCheckDialog::reject);
   connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxRebuildPlanes,
           &QCheckBox::setChecked);
   connect(mUi->btnSelectAll, &QPushButton::clicked,
