@@ -257,6 +257,7 @@ static int openWorkspace(FilePath& path) {
     QLocale locale(ws.getSettings().applicationLocale.get());
     QLocale::setDefault(locale);
     qApp->setTranslationLocale(locale);
+    EditorCommandSet::instance().updateTranslations();
   }
 
   // Apply keyboard shortcuts from workspace settings globally.

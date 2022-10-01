@@ -61,6 +61,15 @@ public:
     static EditorCommandSet obj;
     return obj;
   }
+  void updateTranslations() noexcept {
+    // Required to be called when the application's locale has changed.
+    foreach (EditorCommandCategory* cat, getCategories()) {
+      cat->updateTranslations();
+      foreach (EditorCommand* cmd, getCommands(cat)) {
+        cmd->updateTranslations();
+      }
+    }
+  }
   QList<EditorCommandCategory*> getCategories() noexcept {
     return categoryRoot.findChildren<EditorCommandCategory*>();
   }

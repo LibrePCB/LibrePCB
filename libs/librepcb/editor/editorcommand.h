@@ -91,6 +91,7 @@ public:
   void setKeySequences(const QList<QKeySequence>& sequences) noexcept;
 
   // General Methods
+  void updateTranslations() noexcept;
   QAction* createAction(QObject* parent,
                         ActionFlags flags = ActionFlags()) const noexcept;
   template <typename TContext, typename TSlot>
@@ -119,6 +120,7 @@ private:  // Data
   QString mIdentifier;
   const char* mTextNoTr;
   QString mText;
+  const char* mDescriptionNoTr;
   QString mDescription;
   QIcon mIcon;
   Flags mFlags;
