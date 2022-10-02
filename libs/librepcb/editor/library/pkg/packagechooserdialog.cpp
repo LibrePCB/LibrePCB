@@ -54,7 +54,8 @@ PackageChooserDialog::PackageChooserDialog(
   : QDialog(parent),
     mWorkspace(ws),
     mLayerProvider(layerProvider),
-    mUi(new Ui::PackageChooserDialog) {
+    mUi(new Ui::PackageChooserDialog),
+    mCategorySelected(false) {
   mUi->setupUi(this);
 
   mGraphicsScene.reset(new GraphicsScene());
@@ -140,7 +141,9 @@ void PackageChooserDialog::listPackages_itemDoubleClicked(
 }
 
 void PackageChooserDialog::searchPackages(const QString& input) {
-  setSelectedCategory(tl::nullopt);
+  setSelectedPackage(tl::nullopt);
+  mUi->listPackages->clear();
+  mCategorySelected = false;
 
   // min. 2 chars to avoid freeze on entering first character due to huge result
   if (input.length() > 1) {
@@ -160,12 +163,12 @@ void PackageChooserDialog::searchPackages(const QString& input) {
 
 void PackageChooserDialog::setSelectedCategory(
     const tl::optional<Uuid>& uuid) noexcept {
-  if (uuid && (uuid == mSelectedCategoryUuid)) return;
+  if ((mCategorySelected) && (uuid == mSelectedCategoryUuid)) return;
 
   setSelectedPackage(tl::nullopt);
   mUi->listPackages->clear();
-
   mSelectedCategoryUuid = uuid;
+  mCategorySelected = true;
 
   try {
     QSet<Uuid> packages =

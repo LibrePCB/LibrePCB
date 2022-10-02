@@ -93,6 +93,7 @@ private:  // Data
   QScopedPointer<Ui::SymbolChooserDialog> mUi;
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
   QScopedPointer<GraphicsScene> mPreviewScene;
+  bool mCategorySelected;
   tl::optional<Uuid> mSelectedCategoryUuid;
   QScopedPointer<Symbol> mSelectedSymbol;
   QScopedPointer<SymbolGraphicsItem> mGraphicsItem;

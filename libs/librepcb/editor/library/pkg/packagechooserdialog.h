@@ -93,6 +93,7 @@ private:  // Data
   const IF_GraphicsLayerProvider* mLayerProvider;
   QScopedPointer<Ui::PackageChooserDialog> mUi;
   QScopedPointer<QAbstractItemModel> mCategoryTreeModel;
+  bool mCategorySelected;
   tl::optional<Uuid> mSelectedCategoryUuid;
   tl::optional<Uuid> mSelectedPackageUuid;
 
