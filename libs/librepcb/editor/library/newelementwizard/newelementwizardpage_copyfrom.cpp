@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "newelementwizardpage_copyfrom.h"
 
+#include "../../widgets/waitingspinnerwidget.h"
 #include "../../workspace/categorytreemodel.h"
 #include "ui_newelementwizardpage_copyfrom.h"
 
@@ -55,6 +56,21 @@ NewElementWizardPage_CopyFrom::NewElementWizardPage_CopyFrom(
           &NewElementWizardPage_CopyFrom::listWidget_currentItemChanged);
   connect(mUi->listWidget, &QListWidget::itemDoubleClicked, this,
           &NewElementWizardPage_CopyFrom::listWidget_itemDoubleClicked);
+
+  // Add waiting spinner during workspace library scan.
+  auto addSpinner = [&context](QWidget* widget) {
+    WaitingSpinnerWidget* spinner = new WaitingSpinnerWidget(widget);
+    connect(&context.getWorkspace().getLibraryDb(),
+            &WorkspaceLibraryDb::scanStarted, spinner,
+            &WaitingSpinnerWidget::show);
+    connect(&context.getWorkspace().getLibraryDb(),
+            &WorkspaceLibraryDb::scanFinished, spinner,
+            &WaitingSpinnerWidget::hide);
+    spinner->setVisible(
+        context.getWorkspace().getLibraryDb().isScanInProgress());
+  };
+  addSpinner(mUi->treeView);
+  addSpinner(mUi->listWidget);
 }
 
 NewElementWizardPage_CopyFrom::~NewElementWizardPage_CopyFrom() noexcept {
