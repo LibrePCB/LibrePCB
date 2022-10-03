@@ -56,6 +56,21 @@
   </provides>
 
   <releases>
+    <release version="0.1.7" date="2022-10-03" type="stable">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>Measure tool in all editors</li>
+          <li>EAGLE library import</li>
+          <li>Powerful print/PDF/image export</li>
+          <li>Gerber X3 pick&amp;place export</li>
+          <li>Improved, configurable keyboard shortcuts</li>
+          <li>Many usability improvements</li>
+          <li>Various bugfixes</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2022-10-03_release_0.1.7/</url>
+    </release>
     <release version="0.1.6" date="2021-11-02" type="stable">
       <description>
         <p>Highlights:</p>
