@@ -17,15 +17,17 @@ Y3=400
 
 # capture screenshots
 wmctrl -a "Control Panel" && wmctrl -r "Control Panel" -e 0,$X1,$Y1,$WIDTH,$HEIGHT
-shutter -w="Control Panel" -o control_panel_small.png -d 3 -c -e
-wmctrl -a "Board Editor" && wmctrl -r "Board Editor" -e 0,$X2,$Y2,$WIDTH,$HEIGHT
-shutter -w="Board Editor" -o board_editor_small.png -d 3 -c -e
+shutter -w="Control Panel" -o `pwd`/control_panel_small.png -d 3 -c -e -n
+sleep 5
 wmctrl -a "Schematic Editor" && wmctrl -r "Schematic Editor" -e 0,$X3,$Y3,$WIDTH,$HEIGHT
-shutter -w="Schematic Editor" -o schematic_editor_small.png -d 3 -c -e
+shutter -w="Schematic Editor" -o `pwd`/schematic_editor_small.png -d 3 -c -e -n
+sleep 5
+wmctrl -a "Board Editor" && wmctrl -r "Board Editor" -e 0,$X2,$Y2,$WIDTH,$HEIGHT
+shutter -w="Board Editor" -o `pwd`/board_editor_small.png -d 3 -c -e -n
+sleep 5
 
 # merge screenshots together
 convert -page +$X1+$Y1 control_panel_small.png \
-        -page +$X2+$Y2 board_editor_small.png \
-        -page +$X3+$Y3 schematic_editor_small.png \
+        -page +$X2+$Y2 schematic_editor_small.png \
+        -page +$X3+$Y3 board_editor_small.png \
         -background transparent -layers merge +repage overview_small.png
-
