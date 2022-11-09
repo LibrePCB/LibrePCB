@@ -29,7 +29,6 @@
 #include "../../../utils/transform.h"
 #include "../board.h"
 #include "../items/bi_device.h"
-#include "../items/bi_footprint.h"
 #include "../items/bi_footprintpad.h"
 #include "../items/bi_hole.h"
 #include "../items/bi_netline.h"
@@ -175,7 +174,6 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
 
   // devices
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    const BI_Footprint& footprint = device->getFootprint();
     Transform transform(*device);
 
     // polygons
@@ -227,7 +225,7 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
     }
 
     // stroke texts
-    foreach (const BI_StrokeText* text, footprint.getStrokeTexts()) {
+    foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
       if ((*text->getText().getLayerName() != layerName) ||
           (netsignal != nullptr)) {
@@ -244,7 +242,7 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
     }
 
     // pads
-    foreach (const BI_FootprintPad* pad, footprint.getPads()) {
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
       if ((!pad->isOnLayer(layerName)) ||
           (pad->getCompSigInstNetSignal() != netsignal)) {
         continue;

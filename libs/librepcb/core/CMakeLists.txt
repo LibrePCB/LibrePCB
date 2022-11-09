@@ -327,8 +327,8 @@ add_library(
   project/board/graphicsitems/bgi_airwire.h
   project/board/graphicsitems/bgi_base.cpp
   project/board/graphicsitems/bgi_base.h
-  project/board/graphicsitems/bgi_footprint.cpp
-  project/board/graphicsitems/bgi_footprint.h
+  project/board/graphicsitems/bgi_device.cpp
+  project/board/graphicsitems/bgi_device.h
   project/board/graphicsitems/bgi_footprintpad.cpp
   project/board/graphicsitems/bgi_footprintpad.h
   project/board/graphicsitems/bgi_netline.cpp
@@ -345,8 +345,6 @@ add_library(
   project/board/items/bi_base.h
   project/board/items/bi_device.cpp
   project/board/items/bi_device.h
-  project/board/items/bi_footprint.cpp
-  project/board/items/bi_footprint.h
   project/board/items/bi_footprintpad.cpp
   project/board/items/bi_footprintpad.h
   project/board/items/bi_hole.cpp

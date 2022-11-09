@@ -17,55 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_EDITOR_CMDDEVICESTROKETEXTADD_H
+#define LIBREPCB_EDITOR_CMDDEVICESTROKETEXTADD_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdfootprintstroketextsreset.h"
-
-#include "cmdfootprintstroketextadd.h"
-#include "cmdfootprintstroketextremove.h"
-
-#include <librepcb/core/project/board/items/bi_footprint.h>
+#include "../../undocommand.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class BI_Device;
+class BI_StrokeText;
+
 namespace editor {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class CmdDeviceStrokeTextAdd
  ******************************************************************************/
 
-CmdFootprintStrokeTextsReset::CmdFootprintStrokeTextsReset(
-    BI_Footprint& footprint) noexcept
-  : UndoCommandGroup(tr("Reset footprint texts")), mFootprint(footprint) {
-}
+/**
+ * @brief The CmdDeviceStrokeTextAdd class
+ */
+class CmdDeviceStrokeTextAdd final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdDeviceStrokeTextAdd(BI_Device& device, BI_StrokeText& text) noexcept;
+  ~CmdDeviceStrokeTextAdd() noexcept;
 
-CmdFootprintStrokeTextsReset::~CmdFootprintStrokeTextsReset() noexcept {
-}
+private:
+  // Private Methods
 
-/*******************************************************************************
- *  Inherited from UndoCommand
- ******************************************************************************/
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
 
-bool CmdFootprintStrokeTextsReset::performExecute() {
-  // Remove all texts
-  foreach (BI_StrokeText* text, mFootprint.getStrokeTexts()) {
-    appendChild(new CmdFootprintStrokeTextRemove(mFootprint, *text));
-  }
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
 
-  // Create new texts
-  for (const StrokeText& text : mFootprint.getDefaultStrokeTexts()) {
-    appendChild(new CmdFootprintStrokeTextAdd(
-        mFootprint, *new BI_StrokeText(mFootprint.getBoard(), text)));
-  }
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
 
-  // execute all child commands
-  return UndoCommandGroup::performExecute();  // can throw
-}
+  // Private Member Variables
+
+  // Attributes from the constructor
+  BI_Device& mDevice;
+  BI_StrokeText& mText;
+};
 
 /*******************************************************************************
  *  End of File
@@ -73,3 +75,5 @@ bool CmdFootprintStrokeTextsReset::performExecute() {
 
 }  // namespace editor
 }  // namespace librepcb
+
+#endif

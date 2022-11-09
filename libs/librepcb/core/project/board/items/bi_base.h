@@ -56,7 +56,6 @@ public:
     NetLine,  ///< ::librepcb::BI_NetLine
     Via,  ///< ::librepcb::BI_Via
     Device,  ///< ::librepcb::BI_Device
-    Footprint,  ///< ::librepcb::BI_Footprint
     FootprintPad,  ///< ::librepcb::BI_FootprintPad
     Polygon,  ///< ::librepcb::BI_Polygon
     StrokeText,  ///< ::librepcb::BI_StrokeText

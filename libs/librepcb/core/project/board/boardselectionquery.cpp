@@ -24,7 +24,6 @@
 
 #include "board.h"
 #include "items/bi_device.h"
-#include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
@@ -96,7 +95,7 @@ int BoardSelectionQuery::getResultCount() const noexcept {
 
 void BoardSelectionQuery::addDeviceInstancesOfSelectedFootprints() noexcept {
   foreach (BI_Device* device, mDevices) {
-    if (device->getFootprint().isSelected()) {
+    if (device->isSelected()) {
       mResultDeviceInstances.insert(device);
     }
   }
@@ -158,7 +157,7 @@ void BoardSelectionQuery::addSelectedBoardStrokeTexts() noexcept {
 
 void BoardSelectionQuery::addSelectedFootprintStrokeTexts() noexcept {
   foreach (BI_Device* device, mDevices) {
-    foreach (BI_StrokeText* text, device->getFootprint().getStrokeTexts()) {
+    foreach (BI_StrokeText* text, device->getStrokeTexts()) {
       if (text->isSelected()) {
         mResultStrokeTexts.insert(text);
       }

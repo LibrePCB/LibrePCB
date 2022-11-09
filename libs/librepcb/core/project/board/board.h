@@ -95,16 +95,14 @@ public:
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
     ZValue_TextsBottom,  ///< Z value for librepcb::BI_StrokeText items
-    ZValue_FootprintsBottom,  ///< Z value for librepcb::BI_Footprint
-                              ///< items
+    ZValue_DevicesBottom,  ///< Z value for librepcb::BI_Device items
     ZValue_FootprintPadsBottom,  ///< Z value for
                                  ///< librepcb::BI_FootprintPad items
     ZValue_CopperBottom,
     ZValue_CopperTop,
     ZValue_FootprintPadsTop,  ///< Z value for
                               ///< librepcb::BI_FootprintPad items
-    ZValue_FootprintsTop,  ///< Z value for librepcb::BI_Footprint
-                           ///< items
+    ZValue_DevicesTop,  ///< Z value for librepcb::BI_Device items
     ZValue_TextsTop,  ///< Z value for librepcb::BI_StrokeText items
     ZValue_Vias,  ///< Z value for librepcb::BI_Via items
     ZValue_Texts,  ///< Z value for librepcb::BI_StrokeText items

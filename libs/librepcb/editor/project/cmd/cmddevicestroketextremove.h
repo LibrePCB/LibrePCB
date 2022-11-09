@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDFOOTPRINTSTROKETEXTADD_H
-#define LIBREPCB_EDITOR_CMDFOOTPRINTSTROKETEXTADD_H
+#ifndef LIBREPCB_EDITOR_CMDDEVICESTROKETEXTREMOVE_H
+#define LIBREPCB_EDITOR_CMDDEVICESTROKETEXTREMOVE_H
 
 /*******************************************************************************
  *  Includes
@@ -32,24 +32,23 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_Footprint;
+class BI_Device;
 class BI_StrokeText;
 
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdFootprintStrokeTextAdd
+ *  Class CmdDeviceStrokeTextRemove
  ******************************************************************************/
 
 /**
- * @brief The CmdFootprintStrokeTextAdd class
+ * @brief The CmdDeviceStrokeTextRemove class
  */
-class CmdFootprintStrokeTextAdd final : public UndoCommand {
+class CmdDeviceStrokeTextRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdFootprintStrokeTextAdd(BI_Footprint& footprint,
-                            BI_StrokeText& text) noexcept;
-  ~CmdFootprintStrokeTextAdd() noexcept;
+  CmdDeviceStrokeTextRemove(BI_Device& device, BI_StrokeText& text) noexcept;
+  ~CmdDeviceStrokeTextRemove() noexcept;
 
 private:
   // Private Methods
@@ -66,7 +65,7 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  BI_Footprint& mFootprint;
+  BI_Device& mDevice;
   BI_StrokeText& mText;
 };
 

@@ -17,47 +17,50 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDFOOTPRINTSTROKETEXTSRESET_H
-#define LIBREPCB_EDITOR_CMDFOOTPRINTSTROKETEXTSRESET_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommandgroup.h"
+#include "cmddevicestroketextremove.h"
+
+#include <librepcb/core/project/board/items/bi_device.h>
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class BI_Footprint;
-
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdFootprintStrokeTextsReset
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The CmdFootprintStrokeTextsReset class
- */
-class CmdFootprintStrokeTextsReset final : public UndoCommandGroup {
-public:
-  // Constructors / Destructor
-  CmdFootprintStrokeTextsReset(BI_Footprint& footprint) noexcept;
-  ~CmdFootprintStrokeTextsReset() noexcept;
+CmdDeviceStrokeTextRemove::CmdDeviceStrokeTextRemove(
+    BI_Device& device, BI_StrokeText& text) noexcept
+  : UndoCommand(tr("Remove footprint text")), mDevice(device), mText(text) {
+}
 
-private:
-  // Private Methods
+CmdDeviceStrokeTextRemove::~CmdDeviceStrokeTextRemove() noexcept {
+}
 
-  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  bool performExecute() override;
+/*******************************************************************************
+ *  Inherited from UndoCommand
+ ******************************************************************************/
 
-  // Private Member Variables
-  BI_Footprint& mFootprint;
-};
+bool CmdDeviceStrokeTextRemove::performExecute() {
+  performRedo();  // can throw
+
+  return true;
+}
+
+void CmdDeviceStrokeTextRemove::performUndo() {
+  mDevice.addStrokeText(mText);  // can throw
+}
+
+void CmdDeviceStrokeTextRemove::performRedo() {
+  mDevice.removeStrokeText(mText);  // can throw
+}
 
 /*******************************************************************************
  *  End of File
@@ -65,5 +68,3 @@ private:
 
 }  // namespace editor
 }  // namespace librepcb
-
-#endif

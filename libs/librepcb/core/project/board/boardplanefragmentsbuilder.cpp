@@ -28,7 +28,6 @@
 #include "../../utils/clipperhelpers.h"
 #include "../../utils/transform.h"
 #include "items/bi_device.h"
-#include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
@@ -148,15 +147,14 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
   // subtract holes and pads from devices
   foreach (const BI_Device* device, mPlane.getBoard().getDeviceInstances()) {
     Transform transform(*device);
-    for (const Hole& hole :
-         device->getFootprint().getLibFootprint().getHoles()) {
+    for (const Hole& hole : device->getLibFootprint().getHoles()) {
       Point pos = transform.map(hole.getPosition());
       PositiveLength dia(hole.getDiameter() + mPlane.getMinClearance() * 2);
       Path path = Path::circle(dia).translated(pos);
       c.AddPath(ClipperHelpers::convert(path, maxArcTolerance()),
                 ClipperLib::ptClip, true);
     }
-    foreach (const BI_FootprintPad* pad, device->getFootprint().getPads()) {
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
       if (!pad->isOnLayer(*mPlane.getLayerName())) continue;
       if (pad->getCompSigInstNetSignal() == &mPlane.getNetSignal()) {
         ClipperLib::Path path =

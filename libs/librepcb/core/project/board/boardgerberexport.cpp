@@ -42,7 +42,6 @@
 #include "boardfabricationoutputsettings.h"
 #include "boardlayerstack.h"
 #include "items/bi_device.h"
-#include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
@@ -167,7 +166,6 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
       }
 
       // Export component center and attributes.
-      const BI_Footprint& footprint = device->getFootprint();
       Angle rotation = device->getMirrored() ? -device->getRotation()
                                              : device->getRotation();
       QString designator = *device->getComponentInstance().getName();
@@ -198,9 +196,9 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
         layerFunction[GraphicsLayer::sBotCourtyard] =
             GerberAttribute::ApertureFunction::ComponentOutlineCourtyard;
       }
-      const Transform transform(footprint);
+      const Transform transform(*device);
       for (const Polygon& polygon :
-           footprint.getLibFootprint().getPolygons().sortedByUuid()) {
+           device->getLibFootprint().getPolygons().sortedByUuid()) {
         if (!polygon.getPath().isClosed()) {
           continue;
         }
@@ -218,7 +216,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
       }
 
       // Export component pins.
-      foreach (const BI_FootprintPad* pad, footprint.getPads()) {
+      foreach (const BI_FootprintPad* pad, device->getPads()) {
         QString pinName, pinSignal;
         if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
           pinName = *pkgPad->getName();
@@ -472,9 +470,8 @@ int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const {
 
   // footprint holes
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    const BI_Footprint& footprint = device->getFootprint();
     const Transform transform(*device);
-    for (const Hole& hole : footprint.getLibFootprint().getHoles()) {
+    for (const Hole& hole : device->getLibFootprint().getHoles()) {
       gen.drill(transform.map(hole.getPosition()), hole.getDiameter(), false,
                 ExcellonGenerator::Function::MechanicalDrill);
       ++count;
@@ -496,8 +493,7 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
 
   // footprint pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    const BI_Footprint& footprint = device->getFootprint();
-    foreach (const BI_FootprintPad* pad, footprint.getPads()) {
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
       const FootprintPad& libPad = pad->getLibPad();
       if (libPad.getBoardSide() == FootprintPad::BoardSide::THT) {
         gen.drill(pad->getPosition(),
@@ -526,7 +522,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   // draw footprints incl. pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     Q_ASSERT(device);
-    drawFootprint(gen, device->getFootprint(), layerName);
+    drawDevice(gen, *device, layerName);
   }
 
   // draw vias and traces (grouped by net)
@@ -654,9 +650,9 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
   }
 }
 
-void BoardGerberExport::drawFootprint(GerberGenerator& gen,
-                                      const BI_Footprint& footprint,
-                                      const QString& layerName) const {
+void BoardGerberExport::drawDevice(GerberGenerator& gen,
+                                   const BI_Device& device,
+                                   const QString& layerName) const {
   GerberGenerator::Function graphicsFunction = tl::nullopt;
   tl::optional<QString> graphicsNet = tl::nullopt;
   if (layerName == GraphicsLayer::sBoardOutlines) {
@@ -665,18 +661,17 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen,
     graphicsFunction = GerberAttribute::ApertureFunction::Conductor;
     graphicsNet = "";  // Not connected to any net.
   }
-  QString component =
-      *footprint.getDeviceInstance().getComponentInstance().getName();
+  QString component = *device.getComponentInstance().getName();
 
   // draw pads
-  foreach (const BI_FootprintPad* pad, footprint.getPads()) {
+  foreach (const BI_FootprintPad* pad, device.getPads()) {
     drawFootprintPad(gen, *pad, layerName);
   }
 
   // draw polygons
-  const Transform transform(footprint);
+  const Transform transform(device);
   for (const Polygon& polygon :
-       footprint.getLibFootprint().getPolygons().sortedByUuid()) {
+       device.getLibFootprint().getPolygons().sortedByUuid()) {
     QString layer = transform.map(layerName);
     if (layer == polygon.getLayerName()) {
       Path path = transform.map(polygon.getPath());
@@ -692,7 +687,7 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen,
 
   // draw circles
   for (const Circle& circle :
-       footprint.getLibFootprint().getCircles().sortedByUuid()) {
+       device.getLibFootprint().getCircles().sortedByUuid()) {
     QString layer = transform.map(layerName);
     if (layer == circle.getLayerName()) {
       Point absolutePos = transform.map(circle.getCenter());
@@ -715,8 +710,7 @@ void BoardGerberExport::drawFootprint(GerberGenerator& gen,
   if (GraphicsLayer::isCopperLayer(layerName)) {
     textFunction = GerberAttribute::ApertureFunction::NonConductor;
   }
-  foreach (const BI_StrokeText* text,
-           sortedByUuid(footprint.getStrokeTexts())) {
+  foreach (const BI_StrokeText* text, sortedByUuid(device.getStrokeTexts())) {
     if (layerName == text->getText().getLayerName()) {
       UnsignedLength lineWidth =
           calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
@@ -776,8 +770,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
   // Pad attributes (most of them only on copper layers).
   GerberGenerator::Function function = tl::nullopt;
   tl::optional<QString> net = tl::nullopt;
-  QString component =
-      *pad.getFootprint().getDeviceInstance().getComponentInstance().getName();
+  QString component = *pad.getDevice().getComponentInstance().getName();
   QString pin, signal;
   if (isOnCopperLayer) {
     if (!isSmt) {

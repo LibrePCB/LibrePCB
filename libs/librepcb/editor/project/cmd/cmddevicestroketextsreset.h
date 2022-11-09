@@ -17,50 +17,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_EDITOR_CMDDEVICESTROKETEXTSRESET_H
+#define LIBREPCB_EDITOR_CMDDEVICESTROKETEXTSRESET_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdfootprintstroketextadd.h"
-
-#include <librepcb/core/project/board/items/bi_footprint.h>
+#include "../../undocommandgroup.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class BI_Device;
+
 namespace editor {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class CmdDeviceStrokeTextsReset
  ******************************************************************************/
 
-CmdFootprintStrokeTextAdd::CmdFootprintStrokeTextAdd(
-    BI_Footprint& footprint, BI_StrokeText& text) noexcept
-  : UndoCommand(tr("Add footprint text")), mFootprint(footprint), mText(text) {
-}
+/**
+ * @brief The CmdDeviceStrokeTextsReset class
+ */
+class CmdDeviceStrokeTextsReset final : public UndoCommandGroup {
+public:
+  // Constructors / Destructor
+  CmdDeviceStrokeTextsReset(BI_Device& device) noexcept;
+  ~CmdDeviceStrokeTextsReset() noexcept;
 
-CmdFootprintStrokeTextAdd::~CmdFootprintStrokeTextAdd() noexcept {
-}
+private:
+  // Private Methods
 
-/*******************************************************************************
- *  Inherited from UndoCommand
- ******************************************************************************/
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
 
-bool CmdFootprintStrokeTextAdd::performExecute() {
-  performRedo();  // can throw
-
-  return true;
-}
-
-void CmdFootprintStrokeTextAdd::performUndo() {
-  mFootprint.removeStrokeText(mText);  // can throw
-}
-
-void CmdFootprintStrokeTextAdd::performRedo() {
-  mFootprint.addStrokeText(mText);  // can throw
-}
+  // Private Member Variables
+  BI_Device& mDevice;
+};
 
 /*******************************************************************************
  *  End of File
@@ -68,3 +65,5 @@ void CmdFootprintStrokeTextAdd::performRedo() {
 
 }  // namespace editor
 }  // namespace librepcb
+
+#endif

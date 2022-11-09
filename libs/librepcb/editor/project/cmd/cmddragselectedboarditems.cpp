@@ -29,12 +29,11 @@
 #include "../../project/cmd/cmdboardplaneedit.h"
 #include "../../project/cmd/cmdboardviaedit.h"
 #include "../../project/cmd/cmddeviceinstanceedit.h"
-#include "cmdfootprintstroketextsreset.h"
+#include "cmddevicestroketextsreset.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardselectionquery.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprint.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
@@ -86,8 +85,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     ++count;
     CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(*device);
     mDeviceEditCmds.append(cmd);
-    mDeviceStrokeTextsResetCmds.append(
-        new CmdFootprintStrokeTextsReset(device->getFootprint()));
+    mDeviceStrokeTextsResetCmds.append(new CmdDeviceStrokeTextsReset(*device));
   }
   foreach (BI_Via* via, query->getVias()) {
     Q_ASSERT(via);
@@ -123,10 +121,9 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   }
   foreach (BI_StrokeText* text, query->getStrokeTexts()) {
     Q_ASSERT(text);
-    // do not count texts of footprints if the footprint is selected too
-    if ((!text->getFootprint()) ||
-        (!query->getDeviceInstances().contains(
-            &text->getFootprint()->getDeviceInstance()))) {
+    // do not count texts of devices if the device is selected too
+    if ((!text->getDevice()) ||
+        (!query->getDeviceInstances().contains(text->getDevice()))) {
       mCenterPos += text->getPosition();
       ++count;
     }
@@ -290,7 +287,7 @@ bool CmdDragSelectedBoardItems::performExecute() {
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
     appendChild(cmd);  // can throw
   }
-  foreach (CmdFootprintStrokeTextsReset* cmd, mDeviceStrokeTextsResetCmds) {
+  foreach (CmdDeviceStrokeTextsReset* cmd, mDeviceStrokeTextsResetCmds) {
     appendChild(cmd);  // can throw
   }
   foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {

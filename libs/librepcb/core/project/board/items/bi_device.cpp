@@ -26,7 +26,8 @@
 #include "../../../library/dev/device.h"
 #include "../../../library/pkg/package.h"
 #include "../../../library/sym/symbol.h"
-#include "../../../utils/scopeguard.h"
+#include "../../../utils/scopeguardlist.h"
+#include "../../../utils/transform.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
 #include "../../erc/ercmsg.h"
@@ -34,7 +35,6 @@
 #include "../../projectlibrary.h"
 #include "../../projectsettings.h"
 #include "../board.h"
-#include "bi_footprint.h"
 #include "bi_footprintpad.h"
 
 #include <QtCore>
@@ -58,7 +58,9 @@ BI_Device::BI_Device(Board& board, const BI_Device& other)
     mRotation(other.mRotation),
     mMirrored(other.mMirrored),
     mAttributes(other.mAttributes) {
-  mFootprint.reset(new BI_Footprint(*this, *other.mFootprint));
+  foreach (const BI_StrokeText* text, other.mStrokeTexts) {
+    addStrokeText(*new BI_StrokeText(mBoard, *text));
+  }
 
   init();
 }
@@ -96,8 +98,10 @@ BI_Device::BI_Device(Board& board, const SExpression& node,
   // load attributes
   mAttributes.loadFromSExpression(node, fileFormat);  // can throw
 
-  // load footprint
-  mFootprint.reset(new BI_Footprint(*this, node, fileFormat));
+  // Load stroke texts.
+  foreach (const SExpression& node, node.getChildren("stroke_text")) {
+    addStrokeText(*new BI_StrokeText(mBoard, node, fileFormat));  // can throw
+  }
 
   init();
 }
@@ -118,8 +122,10 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
   // add attributes
   mAttributes = mLibDevice->getAttributes();
 
-  // create footprint
-  mFootprint.reset(new BI_Footprint(*this));
+  // Add initial stroke texts.
+  for (const StrokeText& text : getDefaultStrokeTexts()) {
+    addStrokeText(*new BI_StrokeText(mBoard, text));
+  }
 
   init();
 }
@@ -172,6 +178,39 @@ void BI_Device::init() {
     }
   }
 
+  // Load pads.
+  for (const FootprintPad& libPad : getLibFootprint().getPads()) {
+    if (mPads.contains(libPad.getUuid())) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString("The footprint pad UUID \"%1\" is defined multiple times.")
+              .arg(libPad.getUuid().toStr()));
+    }
+    if (libPad.getPackagePadUuid() &&
+        (!mLibPackage->getPads().contains(*libPad.getPackagePadUuid()))) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("Pad \"%1\" not found in package \"%2\".")
+                             .arg(libPad.getPackagePadUuid()->toStr(),
+                                  mLibPackage->getUuid().toStr()));
+    }
+    if (libPad.getPackagePadUuid() &&
+        (!mLibDevice->getPadSignalMap().contains(
+            *libPad.getPackagePadUuid()))) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("Package pad \"%1\" not found in "
+                                 "pad-signal-map of device \"%2\".")
+                             .arg(libPad.getPackagePadUuid()->toStr(),
+                                  mLibDevice->getUuid().toStr()));
+    }
+    BI_FootprintPad* pad = new BI_FootprintPad(*this, libPad.getUuid());
+    mPads.insert(libPad.getUuid(), pad);
+  }
+
+  // Create graphics item.
+  mGraphicsItem.reset(new BGI_Device(*this));
+  mGraphicsItem->setPos(mPosition.toPxQPointF());
+  updateGraphicsItemTransform();
+
   // Emit the "attributesChanged" signal when the board or component instance
   // has emitted it.
   connect(&mBoard, &Board::attributesChanged, this,
@@ -183,7 +222,11 @@ void BI_Device::init() {
 }
 
 BI_Device::~BI_Device() noexcept {
-  mFootprint.reset();
+  mGraphicsItem.reset();
+  qDeleteAll(mPads);
+  mPads.clear();
+  qDeleteAll(mStrokeTexts);
+  mStrokeTexts.clear();
 }
 
 /*******************************************************************************
@@ -195,7 +238,14 @@ const Uuid& BI_Device::getComponentInstanceUuid() const noexcept {
 }
 
 bool BI_Device::isUsed() const noexcept {
-  return mFootprint->isUsed();
+  foreach (const BI_FootprintPad* pad, mPads) {
+    if (pad->isUsed()) return true;
+  }
+  return false;
+}
+
+QRectF BI_Device::getBoundingRect() const noexcept {
+  return mGraphicsItem->sceneTransform().mapRect(mGraphicsItem->boundingRect());
 }
 
 BI_Device::MountType BI_Device::determineMountType() const noexcept {
@@ -204,7 +254,7 @@ BI_Device::MountType BI_Device::determineMountType() const noexcept {
     // Auto-detection depending on footprint pads.
     bool hasThtPads = false;
     bool hasSmtPads = false;
-    foreach (const BI_FootprintPad* pad, mFootprint->getPads()) {
+    foreach (const BI_FootprintPad* pad, mPads) {
       if (pad->getLibPad().getDrillDiameter() > 0) {
         hasThtPads = true;
       } else {
@@ -232,20 +282,77 @@ BI_Device::MountType BI_Device::determineMountType() const noexcept {
 }
 
 /*******************************************************************************
+ *  StrokeText Methods
+ ******************************************************************************/
+
+StrokeTextList BI_Device::getDefaultStrokeTexts() const noexcept {
+  // Copy all footprint texts and transform them to the global coordinate system
+  // (not relative to the footprint). The original UUIDs are kept for future
+  // identification.
+  StrokeTextList texts = mLibFootprint->getStrokeTexts();
+  Transform transform(*this);
+  for (StrokeText& text : texts) {
+    text.setPosition(transform.map(text.getPosition()));
+    if (getMirrored()) {
+      text.setRotation(text.getRotation() +
+                       (text.getMirrored() ? -getRotation() : getRotation()));
+    } else {
+      text.setRotation(text.getRotation() +
+                       (text.getMirrored() ? -getRotation() : getRotation()));
+    }
+    text.setMirrored(transform.map(text.getMirrored()));
+    text.setLayerName(transform.map(text.getLayerName()));
+  }
+  return texts;
+}
+
+void BI_Device::addStrokeText(BI_StrokeText& text) {
+  if ((mStrokeTexts.contains(&text)) || (&text.getBoard() != &mBoard)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+
+  text.setDevice(this);
+
+  if (isAddedToBoard()) {
+    text.addToBoard();  // can throw
+  }
+  mStrokeTexts.append(&text);
+}
+
+void BI_Device::removeStrokeText(BI_StrokeText& text) {
+  if (!mStrokeTexts.contains(&text)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (isAddedToBoard()) {
+    text.removeFromBoard();  // can throw
+  }
+  mStrokeTexts.removeOne(&text);
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
 void BI_Device::setPosition(const Point& pos) noexcept {
   if (pos != mPosition) {
     mPosition = pos;
-    emit moved(mPosition);
+    mGraphicsItem->setPos(pos.toPxQPointF());
+    foreach (BI_FootprintPad* pad, mPads) {
+      pad->updatePosition();
+      mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
+    }
+    foreach (BI_StrokeText* text, mStrokeTexts) { text->updateGraphicsItems(); }
   }
 }
 
 void BI_Device::setRotation(const Angle& rot) noexcept {
   if (rot != mRotation) {
     mRotation = rot;
-    emit rotated(mRotation);
+    updateGraphicsItemTransform();
+    foreach (BI_FootprintPad* pad, mPads) {
+      pad->updatePosition();
+      mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
+    }
   }
 }
 
@@ -255,7 +362,12 @@ void BI_Device::setMirrored(bool mirror) {
       throw LogicError(__FILE__, __LINE__);
     }
     mMirrored = mirror;
-    emit mirrored(mMirrored);
+    updateGraphicsItemTransform();
+    mGraphicsItem->updateBoardSide();
+    foreach (BI_FootprintPad* pad, mPads) {
+      pad->updatePosition();
+      mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
+    }
   }
 }
 
@@ -263,24 +375,38 @@ void BI_Device::addToBoard() {
   if (isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
+  ScopeGuardList sgl(mPads.count() + mStrokeTexts.count() + 1);
   mCompInstance->registerDevice(*this);  // can throw
-  auto sg = scopeGuard([&]() { mCompInstance->unregisterDevice(*this); });
-  mFootprint->addToBoard();  // can throw
-  sg.dismiss();
-  BI_Base::addToBoard(nullptr);
-  updateErcMessages();
+  sgl.add([&]() { mCompInstance->unregisterDevice(*this); });
+  foreach (BI_FootprintPad* pad, mPads) {
+    pad->addToBoard();  // can throw
+    sgl.add([pad]() { pad->removeFromBoard(); });
+  }
+  foreach (BI_StrokeText* text, mStrokeTexts) {
+    text->addToBoard();  // can throw
+    sgl.add([text]() { text->removeFromBoard(); });
+  }
+  BI_Base::addToBoard(mGraphicsItem.data());
+  sgl.dismiss();
 }
 
 void BI_Device::removeFromBoard() {
   if (!isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  mFootprint->removeFromBoard();  // can throw
-  auto sg = scopeGuard([&]() { mFootprint->addToBoard(); });
+  ScopeGuardList sgl(mPads.count() + mStrokeTexts.count() + 1);
+  foreach (BI_FootprintPad* pad, mPads) {
+    pad->removeFromBoard();  // can throw
+    sgl.add([pad]() { pad->addToBoard(); });
+  }
+  foreach (BI_StrokeText* text, mStrokeTexts) {
+    text->removeFromBoard();  // can throw
+    sgl.add([text]() { text->addToBoard(); });
+  }
   mCompInstance->unregisterDevice(*this);  // can throw
-  sg.dismiss();
-  BI_Base::removeFromBoard(nullptr);
-  updateErcMessages();
+  sgl.add([&]() { mCompInstance->registerDevice(*this); });
+  BI_Base::removeFromBoard(mGraphicsItem.data());
+  sgl.dismiss();
 }
 
 void BI_Device::serialize(SExpression& root) const {
@@ -298,7 +424,7 @@ void BI_Device::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mAttributes.serialize(root);
   root.ensureLineBreak();
-  mFootprint->serialize(root);
+  serializePointerContainerUuidSorted(root, mStrokeTexts, "stroke_text");
   root.ensureLineBreak();
 }
 
@@ -337,16 +463,20 @@ QVector<const AttributeProvider*> BI_Device::getAttributeProviderParents() const
  ******************************************************************************/
 
 QPainterPath BI_Device::getGrabAreaScenePx() const noexcept {
-  return mFootprint->getGrabAreaScenePx();
+  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
 }
 
 bool BI_Device::isSelectable() const noexcept {
-  return mFootprint->isSelectable();
+  return mGraphicsItem->isSelectable();
 }
 
 void BI_Device::setSelected(bool selected) noexcept {
   BI_Base::setSelected(selected);
-  mFootprint->setSelected(selected);
+  mGraphicsItem->setSelected(selected);
+  foreach (BI_FootprintPad* pad, mPads)
+    pad->setSelected(selected);
+  foreach (BI_StrokeText* text, mStrokeTexts)
+    text->setSelected(selected);
 }
 
 /*******************************************************************************
@@ -360,7 +490,11 @@ bool BI_Device::checkAttributesValidity() const noexcept {
   return true;
 }
 
-void BI_Device::updateErcMessages() noexcept {
+void BI_Device::updateGraphicsItemTransform() noexcept {
+  QTransform t;
+  if (mMirrored) t.scale(qreal(-1), qreal(1));
+  t.rotate(-mRotation.toDeg());
+  mGraphicsItem->setTransform(t);
 }
 
 const QStringList& BI_Device::getLocaleOrder() const noexcept {

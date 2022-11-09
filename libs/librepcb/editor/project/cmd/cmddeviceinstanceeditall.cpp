@@ -26,7 +26,6 @@
 #include "cmddeviceinstanceedit.h"
 
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprint.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 
 #include <QtCore>
@@ -46,7 +45,7 @@ CmdDeviceInstanceEditAll::CmdDeviceInstanceEditAll(BI_Device& dev) noexcept
   mDevEditCmd = new CmdDeviceInstanceEdit(dev);
   appendChild(mDevEditCmd);
 
-  foreach (BI_StrokeText* text, dev.getFootprint().getStrokeTexts()) {
+  foreach (BI_StrokeText* text, dev.getStrokeTexts()) {
     CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getText());
     mTextEditCmds.append(cmd);
     appendChild(cmd);

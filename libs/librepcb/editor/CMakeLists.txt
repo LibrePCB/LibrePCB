@@ -485,18 +485,18 @@ add_library(
   project/cmd/cmddeviceinstanceeditall.h
   project/cmd/cmddeviceinstanceremove.cpp
   project/cmd/cmddeviceinstanceremove.h
+  project/cmd/cmddevicestroketextadd.cpp
+  project/cmd/cmddevicestroketextadd.h
+  project/cmd/cmddevicestroketextremove.cpp
+  project/cmd/cmddevicestroketextremove.h
+  project/cmd/cmddevicestroketextsreset.cpp
+  project/cmd/cmddevicestroketextsreset.h
   project/cmd/cmddragselectedboarditems.cpp
   project/cmd/cmddragselectedboarditems.h
   project/cmd/cmddragselectedschematicitems.cpp
   project/cmd/cmddragselectedschematicitems.h
   project/cmd/cmdflipselectedboarditems.cpp
   project/cmd/cmdflipselectedboarditems.h
-  project/cmd/cmdfootprintstroketextadd.cpp
-  project/cmd/cmdfootprintstroketextadd.h
-  project/cmd/cmdfootprintstroketextremove.cpp
-  project/cmd/cmdfootprintstroketextremove.h
-  project/cmd/cmdfootprintstroketextsreset.cpp
-  project/cmd/cmdfootprintstroketextsreset.h
   project/cmd/cmdnetclassadd.cpp
   project/cmd/cmdnetclassadd.h
   project/cmd/cmdnetclassedit.cpp

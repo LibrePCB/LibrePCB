@@ -57,7 +57,6 @@
 #include <librepcb/core/project/board/boardselectionquery.h>
 #include <librepcb/core/project/board/graphicsitems/bgi_plane.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprint.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
@@ -647,12 +646,11 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     MenuBuilder mb(&menu);
     const EditorCommandSet& cmd = EditorCommandSet::instance();
     switch (selectedItem->getType()) {
-      case BI_Base::Type_t::Footprint: {
-        BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(selectedItem);
-        Q_ASSERT(footprint);
-        BI_Device& devInst = footprint->getDeviceInstance();
-        ComponentInstance& cmpInst = devInst.getComponentInstance();
-        const Point pos = devInst.getPosition();
+      case BI_Base::Type_t::Device: {
+        BI_Device* device = dynamic_cast<BI_Device*>(selectedItem);
+        Q_ASSERT(device);
+        ComponentInstance& cmpInst = device->getComponentInstance();
+        const Point pos = device->getPosition();
 
         // build the context menu
         mb.addAction(
@@ -685,15 +683,15 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         foreach (const DeviceMenuItem& item, getDeviceMenuItems(cmpInst)) {
           QAction* a = devMenu->addAction(item.icon, item.name);
           a->setData(item.uuid.toStr());
-          if (item.uuid == devInst.getLibDevice().getUuid()) {
+          if (item.uuid == device->getLibDevice().getUuid()) {
             a->setCheckable(true);
             a->setChecked(true);
             a->setEnabled(false);
           } else {
-            connect(a, &QAction::triggered, [this, board, &devInst, item]() {
+            connect(a, &QAction::triggered, [this, board, device, item]() {
               try {
                 CmdReplaceDevice* cmd =
-                    new CmdReplaceDevice(mContext.workspace, *board, devInst,
+                    new CmdReplaceDevice(mContext.workspace, *board, *device,
                                          item.uuid, tl::optional<Uuid>());
                 mContext.undoStack.execCmd(cmd);
               } catch (const Exception& e) {
@@ -706,23 +704,22 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
         QMenu* fptMenu = mb.addSubMenu(&MenuBuilder::createChangeFootprintMenu);
         for (const Footprint& footprint :
-             devInst.getLibPackage().getFootprints()) {
+             device->getLibPackage().getFootprints()) {
           QAction* a = fptMenu->addAction(
               fptMenu->icon(),
               *footprint.getNames().value(
                   mContext.project.getSettings().getLocaleOrder()));
-          if (footprint.getUuid() ==
-              devInst.getFootprint().getLibFootprint().getUuid()) {
+          if (footprint.getUuid() == device->getLibFootprint().getUuid()) {
             a->setCheckable(true);
             a->setChecked(true);
             a->setEnabled(false);
           } else {
             connect(a, &QAction::triggered,
-                    [this, board, &devInst, &footprint]() {
+                    [this, board, device, &footprint]() {
                       try {
-                        Uuid deviceUuid = devInst.getLibDevice().getUuid();
+                        Uuid deviceUuid = device->getLibDevice().getUuid();
                         CmdReplaceDevice* cmd = new CmdReplaceDevice(
-                            mContext.workspace, *board, devInst, deviceUuid,
+                            mContext.workspace, *board, *device, deviceUuid,
                             footprint.getUuid());
                         mContext.undoStack.execCmd(cmd);
                       } catch (const Exception& e) {
@@ -1434,12 +1431,6 @@ bool BoardEditorState_Select::openPropertiesDialog(BI_Base* item) {
       BI_Device* device = dynamic_cast<BI_Device*>(item);
       Q_ASSERT(device);
       openDevicePropertiesDialog(*device);
-      return true;
-    }
-    case BI_Base::Type_t::Footprint: {
-      BI_Footprint* footprint = dynamic_cast<BI_Footprint*>(item);
-      Q_ASSERT(footprint);
-      openDevicePropertiesDialog(footprint->getDeviceInstance());
       return true;
     }
     case BI_Base::Type_t::Via: {

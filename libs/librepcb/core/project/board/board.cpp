@@ -45,7 +45,6 @@
 #include "boardselectionquery.h"
 #include "items/bi_airwire.h"
 #include "items/bi_device.h"
-#include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
@@ -786,20 +785,19 @@ void Board::setSelectionRect(const Point& p1, const Point& p2,
   mGraphicsScene->setSelectionRect(p1, p2);
   if (updateItems) {
     QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-    foreach (BI_Device* component, mDeviceInstances) {
-      BI_Footprint& footprint = component->getFootprint();
-      bool selectFootprint = footprint.isSelectable() &&
-          footprint.getGrabAreaScenePx().intersects(rectPx);
-      footprint.setSelected(selectFootprint);
-      foreach (BI_FootprintPad* pad, footprint.getPads()) {
+    foreach (BI_Device* device, mDeviceInstances) {
+      bool selectDevice = device->isSelectable() &&
+          device->getGrabAreaScenePx().intersects(rectPx);
+      device->setSelected(selectDevice);
+      foreach (BI_FootprintPad* pad, device->getPads()) {
         bool selectPad =
             pad->isSelectable() && pad->getGrabAreaScenePx().intersects(rectPx);
-        pad->setSelected(selectFootprint || selectPad);
+        pad->setSelected(selectDevice || selectPad);
       }
-      foreach (BI_StrokeText* text, footprint.getStrokeTexts()) {
+      foreach (BI_StrokeText* text, device->getStrokeTexts()) {
         bool selectText = text->isSelectable() &&
             text->getGrabAreaScenePx().intersects(rectPx);
-        text->setSelected(selectFootprint || selectText);
+        text->setSelected(selectDevice || selectText);
       }
     }
     foreach (BI_NetSegment* segment, mNetSegments) {
@@ -830,7 +828,7 @@ void Board::setSelectionRect(const Point& p1, const Point& p2,
 
 void Board::clearSelection() const noexcept {
   foreach (BI_Device* device, mDeviceInstances)
-    device->getFootprint().setSelected(false);
+    device->setSelected(false);
   foreach (BI_NetSegment* segment, mNetSegments) { segment->clearSelection(); }
   foreach (BI_Plane* plane, mPlanes) { plane->setSelected(false); }
   foreach (BI_Polygon* polygon, mPolygons) { polygon->setSelected(false); }

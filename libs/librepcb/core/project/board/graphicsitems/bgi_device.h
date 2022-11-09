@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_BGI_FOOTPRINT_H
-#define LIBREPCB_CORE_BGI_FOOTPRINT_H
+#ifndef LIBREPCB_CORE_BGI_DEVICE_H
+#define LIBREPCB_CORE_BGI_DEVICE_H
 
 /*******************************************************************************
  *  Includes
@@ -36,26 +36,26 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_Footprint;
+class BI_Device;
 class GraphicsLayer;
 class OriginCrossGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitivePathGraphicsItem;
 
 /*******************************************************************************
- *  Class BGI_Footprint
+ *  Class BGI_Device
  ******************************************************************************/
 
 /**
- * @brief The BGI_Footprint class
+ * @brief The BGI_Device class
  */
-class BGI_Footprint final : public BGI_Base {
+class BGI_Device final : public BGI_Base {
 public:
   // Constructors / Destructor
-  BGI_Footprint() = delete;
-  BGI_Footprint(const BGI_Footprint& other) = delete;
-  explicit BGI_Footprint(BI_Footprint& footprint) noexcept;
-  ~BGI_Footprint() noexcept;
+  BGI_Device() = delete;
+  BGI_Device(const BGI_Device& other) = delete;
+  explicit BGI_Device(BI_Device& device) noexcept;
+  ~BGI_Device() noexcept;
 
   // General Methods
   bool isSelectable() const noexcept;
@@ -69,7 +69,7 @@ public:
              QWidget* widget = 0);
 
   // Operator Overloadings
-  BGI_Footprint& operator=(const BGI_Footprint& rhs) = delete;
+  BGI_Device& operator=(const BGI_Device& rhs) = delete;
 
 private:  // Methods
   void layerEdited(const GraphicsLayer& layer,
@@ -77,7 +77,7 @@ private:  // Methods
   GraphicsLayer* getLayer(QString name) const noexcept;
 
 private:  // Data
-  BI_Footprint& mFootprint;
+  BI_Device& mDevice;
   QPointer<GraphicsLayer> mGrabAreaLayer;
   std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;

@@ -33,7 +33,6 @@
 #include "../project.h"
 #include "board.h"
 #include "items/bi_device.h"
-#include "items/bi_footprint.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
 #include "items/bi_netline.h"
@@ -60,25 +59,23 @@ BoardPainter::BoardPainter(const Board& board)
         board.getDefaultFontName()))  // can throw
 {
   foreach (const BI_Device* device, board.getDeviceInstances()) {
-    const BI_Footprint& footprint = device->getFootprint();
     Footprint fpt;
     fpt.transform = Transform(*device);
-    foreach (const BI_FootprintPad* pad, footprint.getPads()) {
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
       fpt.pads.append(pad->getLibPad());
     }
-    for (const Polygon& polygon : footprint.getLibFootprint().getPolygons()) {
+    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
       fpt.polygons.append(polygon);
     }
-    for (const Circle& circle : footprint.getLibFootprint().getCircles()) {
+    for (const Circle& circle : device->getLibFootprint().getCircles()) {
       fpt.circles.append(circle);
     }
-    for (const Hole& hole : footprint.getLibFootprint().getHoles()) {
+    for (const Hole& hole : device->getLibFootprint().getHoles()) {
       fpt.holes.append(hole);
     }
-    foreach (const BI_StrokeText* text, footprint.getStrokeTexts()) {
+    foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
       StrokeText copy(text->getText());
-      copy.setText(
-          AttributeSubstitutor::substitute(copy.getText(), &footprint));
+      copy.setText(AttributeSubstitutor::substitute(copy.getText(), device));
       mStrokeTexts.append(copy);
     }
     mFootprints.append(fpt);

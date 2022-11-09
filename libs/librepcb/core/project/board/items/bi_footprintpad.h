@@ -35,7 +35,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_Footprint;
+class BI_Device;
 class ComponentSignal;
 class ComponentSignalInstance;
 class FootprintPad;
@@ -54,7 +54,7 @@ public:
   // Constructors / Destructor
   BI_FootprintPad() = delete;
   BI_FootprintPad(const BI_FootprintPad& other) = delete;
-  BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid);
+  BI_FootprintPad(BI_Device& device, const Uuid& padUuid);
   ~BI_FootprintPad();
 
   // Getters
@@ -82,7 +82,7 @@ public:
 
   const Uuid& getLibPadUuid() const noexcept;
   QString getDisplayText() const noexcept;
-  BI_Footprint& getFootprint() const noexcept { return mFootprint; }
+  BI_Device& getDevice() const noexcept { return mDevice; }
   QString getLayerName() const noexcept;
   bool isOnLayer(const QString& layerName) const noexcept;
   const FootprintPad& getLibPad() const noexcept { return *mFootprintPad; }
@@ -120,7 +120,7 @@ public:
   BI_FootprintPad& operator=(const BI_FootprintPad& rhs) = delete;
 
 private:  // Methods
-  void footprintAttributesChanged();
+  void deviceAttributesChanged();
   void componentSignalInstanceNetSignalChanged(NetSignal* from, NetSignal* to);
   QString getLibraryDeviceName() const noexcept;
   QString getComponentInstanceName() const noexcept;
@@ -128,7 +128,7 @@ private:  // Methods
   QString getNetSignalName() const noexcept;
 
 private:  // Data
-  BI_Footprint& mFootprint;
+  BI_Device& mDevice;
   const FootprintPad* mFootprintPad;
 
   /// The package pad where this footprint pad is connected to

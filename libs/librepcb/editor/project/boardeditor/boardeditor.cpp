@@ -59,7 +59,6 @@
 #include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/boardpainter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprint.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
@@ -1133,7 +1132,7 @@ void BoardEditor::goToDevice(const QString& name, int index) noexcept {
     Q_ASSERT(board);
     board->clearSelection();
     device->setSelected(true);
-    QRectF rect = device->getFootprint().getBoundingRect();
+    QRectF rect = device->getBoundingRect();
     // Zoom to a rectangle relative to the maximum device dimension. The
     // device is 1/4th of the screen.
     qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());

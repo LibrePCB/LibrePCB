@@ -29,7 +29,6 @@
 #include "../../project.h"
 #include "../board.h"
 #include "bi_device.h"
-#include "bi_footprint.h"
 #include "bi_footprintpad.h"
 #include "bi_netline.h"
 #include "bi_netpoint.h"
@@ -54,10 +53,10 @@ BI_NetSegment::BI_NetSegment(Board& board, const BI_NetSegment& other,
   // determine new pad anchors
   QHash<const BI_NetLineAnchor*, BI_NetLineAnchor*> anchorsMap;
   for (auto it = devMap.begin(); it != devMap.end(); ++it) {
-    BI_Footprint& oldFp = it.key()->getFootprint();
-    BI_Footprint& newFp = it.value()->getFootprint();
-    foreach (const BI_FootprintPad* pad, oldFp.getPads()) {
-      anchorsMap.insert(pad, newFp.getPad(pad->getLibPadUuid()));
+    const BI_Device& oldDev = *it.key();
+    BI_Device& newDev = *it.value();
+    foreach (const BI_FootprintPad* pad, oldDev.getPads()) {
+      anchorsMap.insert(pad, newDev.getPad(pad->getLibPadUuid()));
     }
   }
 
