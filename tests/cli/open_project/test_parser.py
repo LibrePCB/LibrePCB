@@ -13,8 +13,8 @@ LibrePCB Command Line Interface
 
 Options:
   -h, --help                         Print this message.
-  -v, --version                      Displays version information.
-  --verbose                          Verbose output.
+  -V, --version                      Displays version information.
+  -v, --verbose                      Verbose output.
   --erc                              Run the electrical rule check, print all
                                      non-approved warnings/errors and report
                                      failure (exit code = 1) if there are
