@@ -15,8 +15,8 @@ LibrePCB Command Line Interface
 
 Options:
   -h, --help     Print this message.
-  -v, --version  Displays version information.
-  --verbose      Verbose output.
+  -V, --version  Displays version information.
+  -v, --verbose  Verbose output.
 
 Arguments:
   command        The command to execute (see list below).
