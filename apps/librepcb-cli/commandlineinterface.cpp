@@ -90,7 +90,7 @@ int CommandLineInterface::execute() noexcept {
   // option which we don't need, and the OS-dependent option "-?".
   const QCommandLineOption helpOption({"h", "help"}, tr("Print this message."));
   parser.addOption(helpOption);
-  const QCommandLineOption versionOption({"V","version"},tr("Show version."));
+  const QCommandLineOption versionOption({"V","version"},tr("Displays version information."));
   parser.addOption(versionOption);
   QCommandLineOption verboseOption({"v","verbose"}, tr("Verbose output."));
   parser.addOption(verboseOption);
