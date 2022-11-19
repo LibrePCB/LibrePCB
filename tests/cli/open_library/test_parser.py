@@ -11,8 +11,8 @@ LibrePCB Command Line Interface
 
 Options:
   -h, --help     Print this message.
-  -v, --version  Displays version information.
-  --verbose      Verbose output.
+  -V, --version  Displays version information.
+  -v, --verbose  Verbose output.
   --all          Perform the selected action(s) on all elements contained in
                  the opened library.
   --save         Save library (and contained elements if '--all' is given)
