@@ -104,7 +104,7 @@ void RecentProjectsModel::save() noexcept {
       root.ensureLineBreak();
       root.appendChild("project", filepath.toRelative(mWorkspace.getPath()));
     }
-    root.ensureLineBreakIfMultiLine();
+    root.ensureLineBreak();
     FileUtils::writeFile(mFilePath, root.toByteArray());  // can throw
   } catch (Exception& e) {
     qWarning() << "Failed to save recent projects file:" << e.getMsg();

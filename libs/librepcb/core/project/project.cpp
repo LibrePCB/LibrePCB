@@ -553,7 +553,7 @@ void Project::save() {
     schRoot.appendChild("schematic",
                         schematic->getFilePath().toRelative(getPath()));
   }
-  schRoot.ensureLineBreakIfMultiLine();
+  schRoot.ensureLineBreak();
   mDirectory->write("schematics/schematics.lp",
                     schRoot.toByteArray());  // can throw
 
@@ -563,7 +563,7 @@ void Project::save() {
     brdRoot.ensureLineBreak();
     brdRoot.appendChild("board", board->getFilePath().toRelative(getPath()));
   }
-  brdRoot.ensureLineBreakIfMultiLine();
+  brdRoot.ensureLineBreak();
   mDirectory->write("boards/boards.lp", brdRoot.toByteArray());  // can throw
 
   // Save all removed schematics (*.lp files)

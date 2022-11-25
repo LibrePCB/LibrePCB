@@ -20,9 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include "serializableobjectmock.h"
-#include "sexpressionlegacymode.h"
 
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
@@ -338,7 +336,6 @@ TEST_F(SerializableObjectListTest, testSerialize) {
 }
 
 TEST_F(SerializableObjectListTest, testSerializeEmpty) {
-  SExpressionLegacyMode legacyMode(false);  // File format v0.2+
   SExpression e = SExpression::createList("list");
   List l;
   l.serialize(e);
@@ -346,15 +343,6 @@ TEST_F(SerializableObjectListTest, testSerializeEmpty) {
   // )
   EXPECT_EQ(1, e.getChildren().count());
   EXPECT_EQ(SExpression::Type::LineBreak, e.getChildren().at(0).getType());
-}
-
-TEST_F(SerializableObjectListTest, testSerializeEmptyLegacy) {
-  SExpressionLegacyMode legacyMode(true);  // File format v0.1
-  SExpression e = SExpression::createList("list");
-  List l;
-  l.serialize(e);
-  // (list)
-  EXPECT_EQ(0, e.getChildren().count());
 }
 
 TEST_F(SerializableObjectListTest, testOperatorEqual) {

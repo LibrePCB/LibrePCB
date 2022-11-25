@@ -160,8 +160,6 @@ public:
 
   // General Methods
   void ensureLineBreak();
-  void ensureLineBreakIfMultiLine();
-  void ensureEmptyLine();
   SExpression& appendList(const QString& name);
   SExpression& appendChild(const SExpression& child);
   template <typename T>
@@ -184,7 +182,6 @@ public:
   static SExpression createString(const QString& string);
   static SExpression createLineBreak();
   static SExpression parse(const QByteArray& content, const FilePath& filePath);
-  static bool& legacyMode() noexcept;
 
 private:  // Methods
   SExpression(Type type, const QString& value);

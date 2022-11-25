@@ -165,7 +165,7 @@ public:
       }
       child.appendChild(i.value());
     }
-    root.ensureLineBreakIfMultiLine();
+    root.ensureLineBreak();
   }
 
   // Operator Overloadings

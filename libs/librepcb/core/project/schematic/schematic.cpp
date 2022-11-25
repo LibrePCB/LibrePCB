@@ -510,15 +510,15 @@ void Schematic::serialize(SExpression& root) const {
   root.appendChild("name", mName);
   root.ensureLineBreak();
   root.appendChild(mGridProperties->serializeToDomElement("grid"));
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mSymbols, "symbol");
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mNetSegments, "netsegment");
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mPolygons, "polygon");
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mTexts, "text");
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

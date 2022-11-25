@@ -90,11 +90,11 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
       child.ensureLineBreak();
       child.appendChild(fragment.serializeToDomElement("fragment"));
     }
-    child.ensureLineBreakIfMultiLine();
+    child.ensureLineBreak();
     actualSexpr.ensureLineBreak();
     actualSexpr.appendChild(child);
   }
-  actualSexpr.ensureLineBreakIfMultiLine();
+  actualSexpr.ensureLineBreak();
   QByteArray actual = actualSexpr.toByteArray();
   FileUtils::writeFile(testDataDir.getPathTo("actual.lp"), actual);
 

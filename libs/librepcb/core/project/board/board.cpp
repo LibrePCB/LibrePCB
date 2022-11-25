@@ -747,7 +747,7 @@ void Board::save() {
         child.appendChild("color_hl", layer->getColor(true));
         child.appendChild("visible", layer->getVisible());
       }
-      root.ensureLineBreakIfMultiLine();
+      root.ensureLineBreak();
       foreach (BI_Plane* plane, mPlanes) {
         root.ensureLineBreak();
         SExpression node = SExpression::createList("plane");
@@ -755,7 +755,7 @@ void Board::save() {
         node.appendChild("visible", plane->isVisible());
         root.appendChild(node);
       }
-      root.ensureLineBreakIfMultiLine();
+      root.ensureLineBreak();
       mDirectory->write("settings.user.lp", root.toByteArray());  // can throw
     }
   } else {
@@ -887,19 +887,19 @@ void Board::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild(mFabricationOutputSettings->serializeToDomElement(
       "fabrication_output_settings"));
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
   serializePointerContainer(root, mDeviceInstances, "device");
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mNetSegments, "netsegment");
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mPlanes, "plane");
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mPolygons, "polygon");
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mStrokeTexts, "stroke_text");
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
   serializePointerContainerUuidSorted(root, mHoles, "hole");
-  root.ensureEmptyLine();
+  root.ensureLineBreak();
 }
 
 void Board::updateErcMessages() noexcept {

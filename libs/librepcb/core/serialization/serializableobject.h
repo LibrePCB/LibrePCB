@@ -90,7 +90,7 @@ public:
       root.ensureLineBreak();
       root.appendChild(object.serializeToDomElement(itemName));  // can throw
     }
-    root.ensureLineBreakIfMultiLine();
+    root.ensureLineBreak();
   }
 
   template <typename T>
@@ -100,7 +100,7 @@ public:
       root.ensureLineBreak();
       root.appendChild(pointer->serializeToDomElement(itemName));  // can throw
     }
-    root.ensureLineBreakIfMultiLine();
+    root.ensureLineBreak();
   }
 
   template <typename T>

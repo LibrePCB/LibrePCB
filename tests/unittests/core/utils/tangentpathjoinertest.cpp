@@ -44,7 +44,7 @@ protected:
       root.ensureLineBreak();
       root.appendChild(p.serializeToDomElement("path"));
     }
-    root.ensureLineBreakIfMultiLine();
+    root.ensureLineBreak();
     return root.toByteArray().toStdString();
   }
 

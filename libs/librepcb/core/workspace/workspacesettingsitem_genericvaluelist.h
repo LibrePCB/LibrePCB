@@ -160,7 +160,7 @@ private:  // Methods
       root.ensureLineBreak();
       root.appendChild(mItemKey, item);
     }
-    root.ensureLineBreakIfMultiLine();
+    root.ensureLineBreak();
   }
 
 private:

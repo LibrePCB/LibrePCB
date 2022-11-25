@@ -20,8 +20,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../serialization/sexpressionlegacymode.h"
-
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -225,8 +223,6 @@ TEST_F(WorkspaceSettingsTest, testSaveOnlyModifiedSettings) {
 // Addition for the previous test: Saving a default-constructed object to file
 // shall create a file without any entries.
 TEST_F(WorkspaceSettingsTest, testDefaultSerializeEmpty) {
-  SExpressionLegacyMode legacyMode(false);  // File format v0.2+
-
   WorkspaceSettings obj;
   const SExpression root = obj.serialize();
 
@@ -234,24 +230,12 @@ TEST_F(WorkspaceSettingsTest, testDefaultSerializeEmpty) {
   QString expectedContent =
       "(librepcb_workspace_settings\n"
       ")\n";
-  EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
-}
-
-TEST_F(WorkspaceSettingsTest, testDefaultSerializeEmptyFileLegacy) {
-  SExpressionLegacyMode legacyMode(true);  // File format v0.1
-
-  WorkspaceSettings obj;
-  const SExpression root = obj.serialize();
-
-  QString actualContent = root.toByteArray();
-  QString expectedContent = "(librepcb_workspace_settings)\n";
   EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
 }
 
 // Test that restoring all default values also removes unknown entries from the
 // settings file, since an empty file is the real default.
 TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFile) {
-  SExpressionLegacyMode legacyMode(false);  // File format v0.2+
   SExpression root = SExpression::parse(
       "(librepcb_workspace_settings\n"
       " (project_autosave_interval 1234)\n"
@@ -271,28 +255,6 @@ TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFile) {
   QString expectedContent =
       "(librepcb_workspace_settings\n"
       ")\n";
-  EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
-}
-
-TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFileLegacy) {
-  SExpressionLegacyMode legacyMode(true);  // File format v0.1
-  SExpression root = SExpression::parse(
-      "(librepcb_workspace_settings\n"
-      " (project_autosave_interval 1234)\n"
-      " (unknown_value \"Foo Bar\")\n"
-      " (unknown_list\n"
-      "  (unknown_list_item 42)\n"
-      " )\n"
-      ")\n",
-      FilePath());
-
-  WorkspaceSettings obj;
-  obj.load(root, qApp->getFileFormatVersion());
-  obj.restoreDefaults();
-  const SExpression root2 = obj.serialize();
-
-  QString actualContent = root2.toByteArray();
-  QString expectedContent = "(librepcb_workspace_settings)\n";
   EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
 }
 

@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "sexpression.h"
 
-#include "../application.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -143,26 +141,6 @@ void SExpression::ensureLineBreak() {
   }
 }
 
-void SExpression::ensureLineBreakIfMultiLine() {
-  // It's ugly to conditionally create line breaks, let's always create them
-  // for file format v0.2.
-  if ((!legacyMode()) || isMultiLine()) {
-    ensureLineBreak();
-  }
-}
-
-void SExpression::ensureEmptyLine() {
-  // Empty lines are cumbersome, let's stop creating them for file format v0.2.
-  if (legacyMode()) {
-    while ((mChildren.count() < 2) || (!mChildren.last().isLineBreak()) ||
-           (!mChildren.at(mChildren.count() - 2).isLineBreak())) {
-      mChildren.append(createLineBreak());
-    }
-  } else {
-    ensureLineBreak();
-  }
-}
-
 SExpression& SExpression::appendList(const QString& name) {
   return appendChild(createList(name));
 }
@@ -213,16 +191,6 @@ QString SExpression::escapeString(const QString& string) noexcept {
         {'\t', "\\t"},  // Escape horizontal tab to increase readability
         {'\v', "\\v"},  // Escape vertical tab to increase readability
     };
-    if (qApp->getFileFormatVersion() < Version::fromString("0.2")) {
-      // Until LibrePCB 0.1.5 we used sexpresso::escape() to escape strings.
-      // This function escaped more characters than actually needed. To avoid
-      // modifying the file format in LibrePCB 0.1.6, we emulate the same
-      // escaping behavior. In LibrePCB 0.2.x we are allowed to modify the file
-      // format, so let's get rid of these legacy escaping behavior.
-      replacements.insert('\'', "\\\'");  // Single quote
-      replacements.insert('\?', "\\?");  // Question mark
-      replacements.insert('\a', "\\a");  // Audible bell
-    }
   }
 
   QString escaped;
@@ -326,11 +294,6 @@ SExpression SExpression::parse(const QByteArray& content,
                          "File contains more than one root node.");
   }
   return root;
-}
-
-bool& SExpression::legacyMode() noexcept {
-  static bool v01 = (qApp->getFileFormatVersion() < Version::fromString("0.2"));
-  return v01;
 }
 
 /*******************************************************************************

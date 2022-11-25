@@ -107,14 +107,14 @@ void ProjectSettings::serialize(SExpression& root) const {
     locale_order.ensureLineBreak();
     locale_order.appendChild("locale", locale);
   }
-  locale_order.ensureLineBreakIfMultiLine();
+  locale_order.ensureLineBreak();
   root.ensureLineBreak();
   SExpression& norm_order = root.appendList("library_norm_order");
   foreach (const QString& norm, mNormOrder) {
     norm_order.ensureLineBreak();
     norm_order.appendChild("norm", norm);
   }
-  norm_order.ensureLineBreakIfMultiLine();
+  norm_order.ensureLineBreak();
   root.ensureLineBreak();
 }
 
