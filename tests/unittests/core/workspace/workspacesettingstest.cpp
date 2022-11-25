@@ -296,6 +296,57 @@ TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFileLegacy) {
   EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
 }
 
+// Verify that unknown (obsolete) settings are removed from the file when
+// upgrading the file format. Otherwise we have no clue what file format
+// an entry has if it was removed in some LibrePCB version, and then re-added
+// some day later.
+TEST_F(WorkspaceSettingsTest, testUpgradeFileFormat) {
+  SExpression root = SExpression::parse(
+      "(librepcb_workspace_settings\n"
+      " (dismissed_messages\n"
+      "  (message \"SOME_MESSAGE: foo\")\n"
+      "  (message \"SOME_MESSAGE: bar\")\n"
+      " )\n"
+      " (external_pdf_reader\n"
+      "  (command \"evince \\\"{{FILEPATH}}\\\"\")\n"
+      " )\n"
+      " (keyboard_shortcuts\n"
+      "  (shortcut file_manager \"F1\")\n"
+      "  (shortcut foo_bar \"F2\")\n"
+      " )\n"
+      " (project_autosave_interval 1234)\n"
+      " (unknown_item \"Foo Bar\")\n"
+      " (unknown_list\n"
+      "  (unknown_list_item 42)\n"
+      " )\n"
+      ")\n",
+      FilePath());
+
+  WorkspaceSettings obj;
+  obj.load(root, Version::fromString("0.1"));
+  EXPECT_EQ(1234U, obj.projectAutosaveIntervalSeconds.get());
+  obj.projectAutosaveIntervalSeconds.set(42);
+  const SExpression root2 = obj.serialize();
+
+  QString actualContent = root2.toByteArray();
+  QString expectedContent =
+      "(librepcb_workspace_settings\n"
+      " (dismissed_messages\n"
+      "  (message \"SOME_MESSAGE: bar\")\n"
+      "  (message \"SOME_MESSAGE: foo\")\n"
+      " )\n"
+      " (external_pdf_reader\n"
+      "  (command \"evince \\\"{{FILEPATH}}\\\"\")\n"
+      " )\n"
+      " (keyboard_shortcuts\n"
+      "  (shortcut file_manager \"F1\")\n"
+      "  (shortcut foo_bar \"F2\")\n"
+      " )\n"
+      " (project_autosave_interval 42)\n"
+      ")\n";
+  EXPECT_EQ(expectedContent.toStdString(), actualContent.toStdString());
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
