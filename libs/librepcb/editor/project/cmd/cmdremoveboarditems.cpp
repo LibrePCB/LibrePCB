@@ -30,13 +30,12 @@
 #include "../../project/cmd/cmdboardpolygonremove.h"
 #include "../../project/cmd/cmdboardstroketextremove.h"
 #include "../../project/cmd/cmddeviceinstanceremove.h"
-#include "../../project/cmd/cmdfootprintstroketextremove.h"
+#include "../../project/cmd/cmddevicestroketextremove.h"
 #include "../boardeditor/boardnetsegmentsplitter.h"
 #include "cmdremoveunusedlibraryelements.h"
 
 #include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprint.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
@@ -78,7 +77,7 @@ bool CmdRemoveBoardItems::performExecute() {
   NetSegmentItemList netSegmentItemsToRemove;
   foreach (BI_Device* device, mDeviceInstances) {
     Q_ASSERT(device->isAddedToBoard());
-    foreach (BI_FootprintPad* pad, device->getFootprint().getPads()) {
+    foreach (BI_FootprintPad* pad, device->getPads()) {
       if (BI_NetSegment* segment = pad->getNetSegmentOfLines()) {
         netSegmentItemsToRemove[segment].pads.insert(pad);
       }
@@ -127,11 +126,11 @@ bool CmdRemoveBoardItems::performExecute() {
 
   // remove stroke texts
   foreach (BI_StrokeText* text, mStrokeTexts) {
-    if (BI_Footprint* footprint = text->getFootprint()) {
-      if (!mDeviceInstances.contains(&footprint->getDeviceInstance())) {
+    if (BI_Device* device = text->getDevice()) {
+      if (!mDeviceInstances.contains(device)) {
         Q_ASSERT(text->isAddedToBoard());
         execNewChildCmd(
-            new CmdFootprintStrokeTextRemove(*footprint, *text));  // can throw
+            new CmdDeviceStrokeTextRemove(*device, *text));  // can throw
       }
     } else {
       Q_ASSERT(text->isAddedToBoard());
@@ -222,7 +221,7 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
                      trace.getStartPoint().tryGetPad()) {
         BI_Device* device =
             mBoard.getDeviceInstanceByComponentUuid(anchor->device);
-        start = device ? device->getFootprint().getPad(anchor->pad) : nullptr;
+        start = device ? device->getPad(anchor->pad) : nullptr;
       }
       BI_NetLineAnchor* end = nullptr;
       if (tl::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
@@ -233,7 +232,7 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
                      trace.getEndPoint().tryGetPad()) {
         BI_Device* device =
             mBoard.getDeviceInstanceByComponentUuid(anchor->device);
-        end = device ? device->getFootprint().getPad(anchor->pad) : nullptr;
+        end = device ? device->getPad(anchor->pad) : nullptr;
       }
       GraphicsLayer* layer = mBoard.getLayerStack().getLayer(*trace.getLayer());
       if ((!start) || (!end) || (!layer)) {

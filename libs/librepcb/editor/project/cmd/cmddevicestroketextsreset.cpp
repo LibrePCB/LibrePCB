@@ -20,9 +20,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdfootprintstroketextremove.h"
+#include "cmddevicestroketextsreset.h"
 
-#include <librepcb/core/project/board/items/bi_footprint.h>
+#include "cmddevicestroketextadd.h"
+#include "cmddevicestroketextremove.h"
+
+#include <librepcb/core/project/board/items/bi_device.h>
 
 #include <QtCore>
 
@@ -36,32 +39,31 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdFootprintStrokeTextRemove::CmdFootprintStrokeTextRemove(
-    BI_Footprint& footprint, BI_StrokeText& text) noexcept
-  : UndoCommand(tr("Remove footprint text")),
-    mFootprint(footprint),
-    mText(text) {
+CmdDeviceStrokeTextsReset::CmdDeviceStrokeTextsReset(BI_Device& device) noexcept
+  : UndoCommandGroup(tr("Reset footprint texts")), mDevice(device) {
 }
 
-CmdFootprintStrokeTextRemove::~CmdFootprintStrokeTextRemove() noexcept {
+CmdDeviceStrokeTextsReset::~CmdDeviceStrokeTextsReset() noexcept {
 }
 
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdFootprintStrokeTextRemove::performExecute() {
-  performRedo();  // can throw
+bool CmdDeviceStrokeTextsReset::performExecute() {
+  // Remove all texts
+  foreach (BI_StrokeText* text, mDevice.getStrokeTexts()) {
+    appendChild(new CmdDeviceStrokeTextRemove(mDevice, *text));
+  }
 
-  return true;
-}
+  // Create new texts
+  for (const StrokeText& text : mDevice.getDefaultStrokeTexts()) {
+    appendChild(new CmdDeviceStrokeTextAdd(
+        mDevice, *new BI_StrokeText(mDevice.getBoard(), text)));
+  }
 
-void CmdFootprintStrokeTextRemove::performUndo() {
-  mFootprint.addStrokeText(mText);  // can throw
-}
-
-void CmdFootprintStrokeTextRemove::performRedo() {
-  mFootprint.removeStrokeText(mText);  // can throw
+  // execute all child commands
+  return UndoCommandGroup::performExecute();  // can throw
 }
 
 /*******************************************************************************

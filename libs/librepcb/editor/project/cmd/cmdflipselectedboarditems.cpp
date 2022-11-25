@@ -39,7 +39,6 @@
 #include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/boardselectionquery.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprint.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
@@ -130,10 +129,9 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     }
   }
   foreach (BI_StrokeText* text, query->getStrokeTexts()) {
-    // do not count texts of footprints if the footprint is selected too
-    if ((!text->getFootprint()) ||
-        (!query->getDeviceInstances().contains(
-            &text->getFootprint()->getDeviceInstance()))) {
+    // do not count texts of devices if the device is selected too
+    if ((!text->getDevice()) ||
+        (!query->getDeviceInstances().contains(text->getDevice()))) {
       center += text->getPosition();
       ++count;
     }
@@ -161,7 +159,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     netsegments.insert(&via->getNetSegment());
   }
   foreach (BI_Device* device, query->getDeviceInstances()) {
-    foreach (BI_FootprintPad* pad, device->getFootprint().getPads()) {
+    foreach (BI_FootprintPad* pad, device->getPads()) {
       if (pad->getNetSegmentOfLines()) {
         netsegments.insert(pad->getNetSegmentOfLines());
       }

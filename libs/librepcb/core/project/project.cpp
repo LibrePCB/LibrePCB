@@ -33,7 +33,6 @@
 #include "circuit/circuit.h"
 #include "erc/ercmsglist.h"
 #include "projectlibrary.h"
-#include "projectmetadata.h"
 #include "projectsettings.h"
 #include "schematic/schematic.h"
 #include "schematic/schematiclayerprovider.h"
@@ -54,7 +53,13 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
   : QObject(nullptr),
     AttributeProvider(),
     mDirectory(std::move(directory)),
-    mFilename(filename) {
+    mFilename(filename),
+    mUuid(Uuid::createRandom()),
+    mName("Unnamed"),
+    mAuthor("Unknown"),
+    mVersion("v1"),
+    mCreated(QDateTime::currentDateTime()),
+    mLastModified(QDateTime::currentDateTime()) {
   qDebug().nospace() << (create ? "Create project " : "Open project ")
                      << getFilepath().toNative() << "...";
 
@@ -129,22 +134,23 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
     // Create or load metadata
     if (create) {
       QString name = cleanElementName(getFilepath().getCompleteBasename());
-      if (!ElementNameConstraint()(name)) {
-        name = "New Project";  // fallback if the filename is not a valid name
+      if (ElementNameConstraint()(name)) {
+        mName = ElementName(name);
       }
-      mProjectMetadata.reset(new ProjectMetadata(
-          Uuid::createRandom(), ElementName(name), tr("Unknown"), "v1",
-          QDateTime::currentDateTime(), QDateTime::currentDateTime()));
     } else {
       QString fp = "project/metadata.lp";
       SExpression root =
           SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
-      mProjectMetadata.reset(new ProjectMetadata(root, fileFormat));
+      mUuid = deserialize<Uuid>(root.getChild("@0"), fileFormat);
+      mName = deserialize<ElementName>(root.getChild("name/@0"), fileFormat);
+      mAuthor = root.getChild("author/@0").getValue();
+      mVersion = root.getChild("version/@0").getValue();
+      mCreated =
+          deserialize<QDateTime>(root.getChild("created/@0"), fileFormat);
+      mAttributes.loadFromSExpression(root, fileFormat);  // can throw
     }
 
     // Create all needed objects
-    connect(mProjectMetadata.data(), &ProjectMetadata::attributesChanged, this,
-            &Project::attributesChanged);
     mProjectSettings.reset(new ProjectSettings(*this, fileFormat, create));
     mProjectLibrary.reset(
         new ProjectLibrary(std::unique_ptr<TransactionalDirectory>(
@@ -237,6 +243,57 @@ Project::~Project() noexcept {
   mRemovedSchematics.clear();
 
   qDebug().nospace() << "Closed project " << getFilepath().toNative() << ".";
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void Project::setUuid(const Uuid& newUuid) noexcept {
+  if (newUuid != mUuid) {
+    mUuid = newUuid;
+    emit attributesChanged();
+  }
+}
+
+void Project::setName(const ElementName& newName) noexcept {
+  if (newName != mName) {
+    mName = newName;
+    emit attributesChanged();
+  }
+}
+
+void Project::setAuthor(const QString& newAuthor) noexcept {
+  if (newAuthor != mAuthor) {
+    mAuthor = newAuthor;
+    emit attributesChanged();
+  }
+}
+
+void Project::setVersion(const QString& newVersion) noexcept {
+  if (newVersion != mVersion) {
+    mVersion = newVersion;
+    emit attributesChanged();
+  }
+}
+
+void Project::setCreated(const QDateTime& newCreated) noexcept {
+  if (newCreated != mCreated) {
+    mCreated = newCreated;
+    emit attributesChanged();
+  }
+}
+
+void Project::updateLastModified() noexcept {
+  mLastModified = QDateTime::currentDateTime();
+  emit attributesChanged();
+}
+
+void Project::setAttributes(const AttributeList& newAttributes) noexcept {
+  if (newAttributes != mAttributes) {
+    mAttributes = newAttributes;
+    emit attributesChanged();
+  }
 }
 
 /*******************************************************************************
@@ -459,10 +516,23 @@ void Project::save() {
   mDirectory->write(mFilename, "LIBREPCB-PROJECT");  // can throw
 
   // Save project/metadata.lp
-  mDirectory->write(
-      "project/metadata.lp",
-      mProjectMetadata->serializeToDomElement("librepcb_project_metadata")
-          .toByteArray());  // can throw
+  {
+    SExpression root = SExpression::createList("librepcb_project_metadata");
+    root.appendChild(mUuid);
+    root.ensureLineBreak();
+    root.appendChild("name", mName);
+    root.ensureLineBreak();
+    root.appendChild("author", mAuthor);
+    root.ensureLineBreak();
+    root.appendChild("version", mVersion);
+    root.ensureLineBreak();
+    root.appendChild("created", mCreated);
+    root.ensureLineBreak();
+    mAttributes.serialize(root);
+    root.ensureLineBreak();
+    mDirectory->write("project/metadata.lp",
+                      root.toByteArray());  // can throw
+  }
 
   // Save settings
   mProjectSettings->save();  // can throw
@@ -515,7 +585,7 @@ void Project::save() {
   }
 
   // update the "last modified datetime" attribute of the project
-  mProjectMetadata->updateLastModified();
+  updateLastModified();
 }
 
 /*******************************************************************************
@@ -524,7 +594,7 @@ void Project::save() {
 
 QString Project::getUserDefinedAttributeValue(const QString& key) const
     noexcept {
-  if (const auto& attr = mProjectMetadata->getAttributes().find(key)) {
+  if (const auto& attr = mAttributes.find(key)) {
     return attr->getValueTr(true);
   } else {
     return QString();
@@ -533,7 +603,7 @@ QString Project::getUserDefinedAttributeValue(const QString& key) const
 
 QString Project::getBuiltInAttributeValue(const QString& key) const noexcept {
   if (key == QLatin1String("PROJECT")) {
-    return *mProjectMetadata->getName();
+    return *mName;
   } else if (key == QLatin1String("PROJECT_DIRPATH")) {
     return getPath().toNative();
   } else if (key == QLatin1String("PROJECT_BASENAME")) {
@@ -543,17 +613,17 @@ QString Project::getBuiltInAttributeValue(const QString& key) const noexcept {
   } else if (key == QLatin1String("PROJECT_FILEPATH")) {
     return getFilepath().toNative();
   } else if (key == QLatin1String("CREATED_DATE")) {
-    return mProjectMetadata->getCreated().date().toString(Qt::ISODate);
+    return mCreated.date().toString(Qt::ISODate);
   } else if (key == QLatin1String("CREATED_TIME")) {
-    return mProjectMetadata->getCreated().time().toString(Qt::ISODate);
+    return mCreated.time().toString(Qt::ISODate);
   } else if (key == QLatin1String("MODIFIED_DATE")) {
-    return mProjectMetadata->getLastModified().date().toString(Qt::ISODate);
+    return mLastModified.date().toString(Qt::ISODate);
   } else if (key == QLatin1String("MODIFIED_TIME")) {
-    return mProjectMetadata->getLastModified().time().toString(Qt::ISODate);
+    return mLastModified.time().toString(Qt::ISODate);
   } else if (key == QLatin1String("AUTHOR")) {
-    return mProjectMetadata->getAuthor();
+    return mAuthor;
   } else if (key == QLatin1String("VERSION")) {
-    return mProjectMetadata->getVersion();
+    return mVersion;
   } else if (key == QLatin1String("PAGES")) {
     return QString::number(mSchematics.count());
   } else if (key == QLatin1String("PAGE_X_OF_Y")) {

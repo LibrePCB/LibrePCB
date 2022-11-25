@@ -20,7 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdprojectmetadataedit.h"
+#include "cmdprojectedit.h"
+
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 
@@ -34,44 +36,42 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdProjectMetadataEdit::CmdProjectMetadataEdit(
-    ProjectMetadata& metadata) noexcept
+CmdProjectEdit::CmdProjectEdit(Project& project) noexcept
   : UndoCommand(tr("Edit Project Metadata")),
-    mMetadata(metadata),
-    mOldName(mMetadata.getName()),
-    mNewName(mMetadata.getName()),
-    mOldAuthor(mMetadata.getAuthor()),
-    mNewAuthor(mMetadata.getAuthor()),
-    mOldVersion(mMetadata.getVersion()),
-    mNewVersion(mMetadata.getVersion()),
-    mOldAttributes(mMetadata.getAttributes()),
+    mProject(project),
+    mOldName(mProject.getName()),
+    mNewName(mProject.getName()),
+    mOldAuthor(mProject.getAuthor()),
+    mNewAuthor(mProject.getAuthor()),
+    mOldVersion(mProject.getVersion()),
+    mNewVersion(mProject.getVersion()),
+    mOldAttributes(mProject.getAttributes()),
     mNewAttributes(mOldAttributes) {
 }
 
-CmdProjectMetadataEdit::~CmdProjectMetadataEdit() noexcept {
+CmdProjectEdit::~CmdProjectEdit() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void CmdProjectMetadataEdit::setName(const ElementName& newName) noexcept {
+void CmdProjectEdit::setName(const ElementName& newName) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewName = newName;
 }
 
-void CmdProjectMetadataEdit::setAuthor(const QString& newAuthor) noexcept {
+void CmdProjectEdit::setAuthor(const QString& newAuthor) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewAuthor = newAuthor;
 }
 
-void CmdProjectMetadataEdit::setVersion(const QString& newVersion) noexcept {
+void CmdProjectEdit::setVersion(const QString& newVersion) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewVersion = newVersion;
 }
 
-void CmdProjectMetadataEdit::setAttributes(
-    const AttributeList& attributes) noexcept {
+void CmdProjectEdit::setAttributes(const AttributeList& attributes) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewAttributes = attributes;
 }
@@ -80,7 +80,7 @@ void CmdProjectMetadataEdit::setAttributes(
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdProjectMetadataEdit::performExecute() {
+bool CmdProjectEdit::performExecute() {
   performRedo();  // can throw
 
   if (mNewName != mOldName) return true;
@@ -90,18 +90,18 @@ bool CmdProjectMetadataEdit::performExecute() {
   return false;
 }
 
-void CmdProjectMetadataEdit::performUndo() {
-  mMetadata.setName(mOldName);
-  mMetadata.setAuthor(mOldAuthor);
-  mMetadata.setVersion(mOldVersion);
-  mMetadata.setAttributes(mOldAttributes);
+void CmdProjectEdit::performUndo() {
+  mProject.setName(mOldName);
+  mProject.setAuthor(mOldAuthor);
+  mProject.setVersion(mOldVersion);
+  mProject.setAttributes(mOldAttributes);
 }
 
-void CmdProjectMetadataEdit::performRedo() {
-  mMetadata.setName(mNewName);
-  mMetadata.setAuthor(mNewAuthor);
-  mMetadata.setVersion(mNewVersion);
-  mMetadata.setAttributes(mNewAttributes);
+void CmdProjectEdit::performRedo() {
+  mProject.setName(mNewName);
+  mProject.setAuthor(mNewAuthor);
+  mProject.setVersion(mNewVersion);
+  mProject.setAttributes(mNewAttributes);
 }
 
 /*******************************************************************************

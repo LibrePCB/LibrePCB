@@ -53,7 +53,7 @@ BI_Plane::BI_Plane(Board& board, const BI_Plane& other)
     mConnectStyle(other.mConnectStyle),
     // mThermalGapWidth(other.mThermalGapWidth),
     // mThermalSpokeWidth(other.mThermalSpokeWidth),
-    mIsVisible(true),
+    mIsVisible(other.mIsVisible),
     mFragments(other.mFragments)  // also copy fragments to avoid the need for
                                   // a rebuild
 {

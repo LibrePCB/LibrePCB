@@ -31,7 +31,6 @@
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
 #include "bi_device.h"
-#include "bi_footprint.h"
 #include "bi_netsegment.h"
 
 #include <QtCore>
@@ -45,31 +44,28 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid)
-  : BI_Base(footprint.getBoard()),
-    mFootprint(footprint),
+BI_FootprintPad::BI_FootprintPad(BI_Device& device, const Uuid& padUuid)
+  : BI_Base(device.getBoard()),
+    mDevice(device),
     mFootprintPad(nullptr),
     mPackagePad(nullptr),
     mComponentSignalInstance(nullptr) {
   mFootprintPad =
-      mFootprint.getLibFootprint().getPads().get(padUuid).get();  // can throw
+      mDevice.getLibFootprint().getPads().get(padUuid).get();  // can throw
   if (mFootprintPad->getPackagePadUuid()) {
-    mPackagePad = mFootprint.getDeviceInstance()
-                      .getLibPackage()
+    mPackagePad = mDevice.getLibPackage()
                       .getPads()
                       .get(*mFootprintPad->getPackagePadUuid())
                       .get();  // can throw
 
     tl::optional<Uuid> cmpSignalUuid =
-        mFootprint.getDeviceInstance()
-            .getLibDevice()
+        mDevice.getLibDevice()
             .getPadSignalMap()
             .get(*mFootprintPad->getPackagePadUuid())
             ->getSignalUuid();  // can throw
     if (cmpSignalUuid) {
-      mComponentSignalInstance = mFootprint.getDeviceInstance()
-                                     .getComponentInstance()
-                                     .getSignalInstance(*cmpSignalUuid);
+      mComponentSignalInstance =
+          mDevice.getComponentInstance().getSignalInstance(*cmpSignalUuid);
       connect(mComponentSignalInstance,
               &ComponentSignalInstance::netSignalChanged, this,
               &BI_FootprintPad::componentSignalInstanceNetSignalChanged);
@@ -89,8 +85,8 @@ BI_FootprintPad::BI_FootprintPad(BI_Footprint& footprint, const Uuid& padUuid)
   updatePosition();
 
   // connect to the "attributes changed" signal of the footprint
-  connect(&mFootprint, &BI_Footprint::attributesChanged, this,
-          &BI_FootprintPad::footprintAttributesChanged);
+  connect(&mDevice, &BI_Device::attributesChanged, this,
+          &BI_FootprintPad::deviceAttributesChanged);
 }
 
 BI_FootprintPad::~BI_FootprintPad() {
@@ -103,7 +99,7 @@ BI_FootprintPad::~BI_FootprintPad() {
  ******************************************************************************/
 
 bool BI_FootprintPad::getMirrored() const noexcept {
-  return mFootprint.getMirrored();
+  return mDevice.getMirrored();
 }
 
 const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept {
@@ -218,7 +214,7 @@ void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline) {
 }
 
 void BI_FootprintPad::updatePosition() noexcept {
-  Transform transform(mFootprint);
+  Transform transform(mDevice);
   mPosition = transform.map(mFootprintPad->getPosition());
   mRotation = transform.map(mFootprintPad->getRotation());
   mGraphicsItem->setPos(mPosition.toPxQPointF());
@@ -252,22 +248,21 @@ Path BI_FootprintPad::getSceneOutline(const Length& expansion) const noexcept {
   const Path path = getOutline(expansion)
                         .rotated(mFootprintPad->getRotation())
                         .translated(mFootprintPad->getPosition());
-  const Transform transform(mFootprint.getPosition(), mFootprint.getRotation(),
-                            mFootprint.getMirrored());
+  const Transform transform(mDevice.getPosition(), mDevice.getRotation(),
+                            mDevice.getMirrored());
   return transform.map(path);
 }
 
 TraceAnchor BI_FootprintPad::toTraceAnchor() const noexcept {
-  return TraceAnchor::pad(
-      mFootprint.getDeviceInstance().getComponentInstanceUuid(),
-      mFootprintPad->getUuid());
+  return TraceAnchor::pad(mDevice.getComponentInstanceUuid(),
+                          mFootprintPad->getUuid());
 }
 
 /*******************************************************************************
  *  Private Slots
  ******************************************************************************/
 
-void BI_FootprintPad::footprintAttributesChanged() {
+void BI_FootprintPad::deviceAttributesChanged() {
   mGraphicsItem->updateCacheAndRepaint();
 }
 
@@ -299,14 +294,11 @@ void BI_FootprintPad::componentSignalInstanceNetSignalChanged(NetSignal* from,
  ******************************************************************************/
 
 QString BI_FootprintPad::getLibraryDeviceName() const noexcept {
-  return *mFootprint.getDeviceInstance()
-              .getLibDevice()
-              .getNames()
-              .getDefaultValue();
+  return *mDevice.getLibDevice().getNames().getDefaultValue();
 }
 
 QString BI_FootprintPad::getComponentInstanceName() const noexcept {
-  return *mFootprint.getDeviceInstance().getComponentInstance().getName();
+  return *mDevice.getComponentInstance().getName();
 }
 
 QString BI_FootprintPad::getPadNameOrUuid() const noexcept {

@@ -42,7 +42,6 @@ class Board;
 class Circuit;
 class ErcMsgList;
 class ProjectLibrary;
-class ProjectMetadata;
 class ProjectSettings;
 class Schematic;
 class SchematicLayerProvider;
@@ -129,11 +128,56 @@ public:
   StrokeFontPool& getStrokeFonts() const noexcept { return *mStrokeFontPool; }
 
   /**
-   * @brief Get the ProjectMetadata object which contains all project metadata
+   * @brief Get the UUID of the project
    *
-   * @return A reference to the ProjectMetadata object
+   * @return The project UUID
    */
-  ProjectMetadata& getMetadata() const noexcept { return *mProjectMetadata; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
+
+  /**
+   * @brief Get the name of the project
+   *
+   * @return The name of the project
+   */
+  const ElementName& getName() const noexcept { return mName; }
+
+  /**
+   * @brief Get the author of the project
+   *
+   * @return The author of the project
+   */
+  const QString& getAuthor() const noexcept { return mAuthor; }
+
+  /**
+   * @brief Get the version of the project
+   *
+   * @return The version of the project (arbitrary string)
+   */
+  const QString& getVersion() const noexcept { return mVersion; }
+
+  /**
+   * @brief Get the date and time when the project was created
+   *
+   * @return The local date and time of creation
+   */
+  const QDateTime& getCreated() const noexcept { return mCreated; }
+
+  /**
+   * @brief Get the date and time when the project was last modified
+   *
+   * @return The local date and time of last modification
+   *
+   * @todo    Dynamically determine the datetime of the last modification from
+   *          version control system, file attributes or something like that.
+   */
+  const QDateTime& getLastModified() const noexcept { return mLastModified; }
+
+  /**
+   * @brief Get the list of attributes
+   *
+   * @return All attributes in a specific order
+   */
+  const AttributeList& getAttributes() const noexcept { return mAttributes; }
 
   /**
    * @brief Get the ProjectSettings object which contains all project settings
@@ -163,6 +207,58 @@ public:
    * @return A reference to the Circuit object
    */
   Circuit& getCircuit() const noexcept { return *mCircuit; }
+
+  // Setters
+
+  /**
+   * @brief Set the project's UUID
+   *
+   * @warning Only call this right after instantiating a new Project object,
+   *          not some time later! Not intended to be accessible by the UI.
+   *
+   * @param newUuid           The new UUID.
+   */
+  void setUuid(const Uuid& newUuid) noexcept;
+
+  /**
+   * @brief Set the name of the project
+   *
+   * @param newName           The new name
+   */
+  void setName(const ElementName& newName) noexcept;
+
+  /**
+   * @brief Set the author of the project
+   *
+   * @param newAuthor         The new author
+   */
+  void setAuthor(const QString& newAuthor) noexcept;
+
+  /**
+   * @brief Set the version of the project
+   *
+   * @param newVersion        The new version (can be an arbitrary string)
+   */
+  void setVersion(const QString& newVersion) noexcept;
+
+  /**
+   * @brief Set the creation date/time
+   *
+   * @param newCreated        The new date/time of creation.
+   */
+  void setCreated(const QDateTime& newCreated) noexcept;
+
+  /**
+   * @brief Update the last modified date/time
+   */
+  void updateLastModified() noexcept;
+
+  /**
+   * @brief Set all project attributes
+   *
+   * @param newAttributes     The new list of attributes
+   */
+  void setAttributes(const AttributeList& newAttributes) noexcept;
 
   // Schematic Methods
 
@@ -427,19 +523,42 @@ private:
   explicit Project(std::unique_ptr<TransactionalDirectory> directory,
                    const QString& filename, bool create);
 
+  /// Project root directory.
   std::unique_ptr<TransactionalDirectory> mDirectory;
-  QString mFilename;  ///< the name of the *.lpp project file
 
-  // General
-  QScopedPointer<StrokeFontPool>
-      mStrokeFontPool;  ///< all fonts from ./resources/fontobene/
-  QScopedPointer<ProjectMetadata>
-      mProjectMetadata;  ///< e.g. project name, author, ...
-  QScopedPointer<ProjectSettings>
-      mProjectSettings;  ///< all project specific settings
-  QScopedPointer<ProjectLibrary>
-      mProjectLibrary;  ///< the library which contains all elements needed in
-                        ///< this project
+  /// Name of the *.lpp project file.
+  QString mFilename;
+
+  /// All fonts from ./resources/fontobene/.
+  QScopedPointer<StrokeFontPool> mStrokeFontPool;
+
+  /// The project's UUID.
+  Uuid mUuid;
+
+  /// The project name.
+  ElementName mName;
+
+  /// Author (optional).
+  QString mAuthor;
+
+  /// Version (arbitrary string, optional).
+  QString mVersion;
+
+  /// Date/time of project creation.
+  QDateTime mCreated;
+
+  /// Date/time of last modification.
+  QDateTime mLastModified;
+
+  /// User-defined attributes in the specified order.
+  AttributeList mAttributes;
+
+  /// All project specific settings.
+  QScopedPointer<ProjectSettings> mProjectSettings;
+
+  /// Ehe library which contains all elements needed in this project.
+  QScopedPointer<ProjectLibrary> mProjectLibrary;
+
   QScopedPointer<ErcMsgList>
       mErcMsgList;  ///< A list which contains all electrical rule check (ERC)
                     ///< messages
@@ -453,8 +572,6 @@ private:
       mSchematicLayerProvider;  ///< All schematic layers of this project
   QList<Board*> mBoards;  ///< All boards of this project
   QList<Board*> mRemovedBoards;  ///< All removed boards of this project
-  QScopedPointer<AttributeList>
-      mAttributes;  ///< all attributes in a specific order
 };
 
 /*******************************************************************************

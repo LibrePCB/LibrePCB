@@ -26,7 +26,6 @@
 #include "../../circuit/netsignal.h"
 #include "../boardlayerstack.h"
 #include "bi_device.h"
-#include "bi_footprint.h"
 #include "bi_footprintpad.h"
 #include "bi_netpoint.h"
 #include "bi_netsegment.h"
@@ -264,7 +263,7 @@ BI_NetLineAnchor* BI_NetLine::getAnchor(const TraceAnchor& anchor) {
   } else if (const tl::optional<TraceAnchor::PadAnchor>& pad =
                  anchor.tryGetPad()) {
     BI_Device* device = mBoard.getDeviceInstanceByComponentUuid(pad->device);
-    return device ? device->getFootprint().getPad(pad->pad) : nullptr;
+    return device ? device->getPad(pad->pad) : nullptr;
   } else {
     return nullptr;
   }

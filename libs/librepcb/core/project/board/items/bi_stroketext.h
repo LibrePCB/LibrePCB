@@ -37,7 +37,7 @@
 namespace librepcb {
 
 class AttributeProvider;
-class BI_Footprint;
+class BI_Device;
 class Board;
 class LineGraphicsItem;
 class Project;
@@ -73,8 +73,8 @@ public:
   bool isSelectable() const noexcept override;
 
   // General Methods
-  BI_Footprint* getFootprint() const noexcept { return mFootprint; }
-  void setFootprint(BI_Footprint* footprint) noexcept;
+  BI_Device* getDevice() const noexcept { return mDevice; }
+  void setDevice(BI_Device* device) noexcept;
   const AttributeProvider* getAttributeProvider() const noexcept;
   QVector<Path> generatePaths() const;
   void updateGraphicsItems() noexcept;
@@ -95,7 +95,7 @@ public:
   BI_StrokeText& operator=(const BI_StrokeText& rhs) = delete;
 
 private slots:
-  void boardOrFootprintAttributesChanged();
+  void boardOrDeviceAttributesChanged();
 
 private:  // Methods
   void init();
@@ -104,7 +104,7 @@ private:  // Methods
                         StrokeText::Event event) noexcept;
 
 private:  // Data
-  BI_Footprint* mFootprint;
+  BI_Device* mDevice;
   QScopedPointer<StrokeText> mText;
   QScopedPointer<StrokeTextGraphicsItem> mGraphicsItem;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;

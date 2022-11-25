@@ -485,18 +485,18 @@ add_library(
   project/cmd/cmddeviceinstanceeditall.h
   project/cmd/cmddeviceinstanceremove.cpp
   project/cmd/cmddeviceinstanceremove.h
+  project/cmd/cmddevicestroketextadd.cpp
+  project/cmd/cmddevicestroketextadd.h
+  project/cmd/cmddevicestroketextremove.cpp
+  project/cmd/cmddevicestroketextremove.h
+  project/cmd/cmddevicestroketextsreset.cpp
+  project/cmd/cmddevicestroketextsreset.h
   project/cmd/cmddragselectedboarditems.cpp
   project/cmd/cmddragselectedboarditems.h
   project/cmd/cmddragselectedschematicitems.cpp
   project/cmd/cmddragselectedschematicitems.h
   project/cmd/cmdflipselectedboarditems.cpp
   project/cmd/cmdflipselectedboarditems.h
-  project/cmd/cmdfootprintstroketextadd.cpp
-  project/cmd/cmdfootprintstroketextadd.h
-  project/cmd/cmdfootprintstroketextremove.cpp
-  project/cmd/cmdfootprintstroketextremove.h
-  project/cmd/cmdfootprintstroketextsreset.cpp
-  project/cmd/cmdfootprintstroketextsreset.h
   project/cmd/cmdnetclassadd.cpp
   project/cmd/cmdnetclassadd.h
   project/cmd/cmdnetclassedit.cpp
@@ -513,12 +513,12 @@ add_library(
   project/cmd/cmdpasteboarditems.h
   project/cmd/cmdpasteschematicitems.cpp
   project/cmd/cmdpasteschematicitems.h
+  project/cmd/cmdprojectedit.cpp
+  project/cmd/cmdprojectedit.h
   project/cmd/cmdprojectlibraryaddelement.cpp
   project/cmd/cmdprojectlibraryaddelement.h
   project/cmd/cmdprojectlibraryremoveelement.cpp
   project/cmd/cmdprojectlibraryremoveelement.h
-  project/cmd/cmdprojectmetadataedit.cpp
-  project/cmd/cmdprojectmetadataedit.h
   project/cmd/cmdprojectsettingschange.cpp
   project/cmd/cmdprojectsettingschange.h
   project/cmd/cmdremoveboarditems.cpp

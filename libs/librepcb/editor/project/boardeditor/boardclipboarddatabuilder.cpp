@@ -30,7 +30,6 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardselectionquery.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprint.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
@@ -98,7 +97,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
     }
     // Create list of stroke texts
     StrokeTextList strokeTexts;
-    foreach (const BI_StrokeText* t, device->getFootprint().getStrokeTexts()) {
+    foreach (const BI_StrokeText* t, device->getStrokeTexts()) {
       strokeTexts.append(std::make_shared<StrokeText>(t->getText()));
     }
     // Add device
@@ -107,7 +106,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
         device->getLibFootprint().getUuid(), device->getPosition(),
         device->getRotation(), device->getMirrored(), strokeTexts));
     // Add pad positions
-    foreach (const BI_FootprintPad* pad, device->getFootprint().getPads()) {
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
       data->getPadPositions().insert(
           std::make_pair(device->getComponentInstanceUuid(),
                          pad->getLibPadUuid()),
@@ -122,7 +121,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
        ++it) {
     BoardNetSegmentSplitter splitter;
     foreach (BI_Device* device, mBoard.getDeviceInstances()) {
-      foreach (BI_FootprintPad* pad, device->getFootprint().getPads()) {
+      foreach (BI_FootprintPad* pad, device->getPads()) {
         if (pad->getNetSegmentOfLines() == it.key()) {
           if (!query->getDeviceInstances().contains(device)) {
             // Pad is currently connected to this net segment, but will not be

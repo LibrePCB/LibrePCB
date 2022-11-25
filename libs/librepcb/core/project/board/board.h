@@ -58,7 +58,6 @@ class BoardDesignRules;
 class BoardFabricationOutputSettings;
 class BoardLayerStack;
 class BoardSelectionQuery;
-class BoardUserSettings;
 class GraphicsLayer;
 class GraphicsScene;
 class GridProperties;
@@ -96,16 +95,14 @@ public:
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
     ZValue_TextsBottom,  ///< Z value for librepcb::BI_StrokeText items
-    ZValue_FootprintsBottom,  ///< Z value for librepcb::BI_Footprint
-                              ///< items
+    ZValue_DevicesBottom,  ///< Z value for librepcb::BI_Device items
     ZValue_FootprintPadsBottom,  ///< Z value for
                                  ///< librepcb::BI_FootprintPad items
     ZValue_CopperBottom,
     ZValue_CopperTop,
     ZValue_FootprintPadsTop,  ///< Z value for
                               ///< librepcb::BI_FootprintPad items
-    ZValue_FootprintsTop,  ///< Z value for librepcb::BI_Footprint
-                           ///< items
+    ZValue_DevicesTop,  ///< Z value for librepcb::BI_Device items
     ZValue_TextsTop,  ///< Z value for librepcb::BI_StrokeText items
     ZValue_Vias,  ///< Z value for librepcb::BI_Via items
     ZValue_Texts,  ///< Z value for librepcb::BI_StrokeText items
@@ -181,6 +178,7 @@ public:
 
   // Plane Methods
   const QList<BI_Plane*>& getPlanes() const noexcept { return mPlanes; }
+  BI_Plane* getPlaneByUuid(const Uuid& uuid) const noexcept;
   void addPlane(BI_Plane& plane);
   void removePlane(BI_Plane& plane);
   void rebuildAllPlanes() noexcept;
@@ -266,7 +264,6 @@ private:
   QScopedPointer<GridProperties> mGridProperties;
   QScopedPointer<BoardDesignRules> mDesignRules;
   QScopedPointer<BoardFabricationOutputSettings> mFabricationOutputSettings;
-  QScopedPointer<BoardUserSettings> mUserSettings;
   QRectF mViewRect;
   QSet<NetSignal*> mScheduledNetSignalsForAirWireRebuild;
 

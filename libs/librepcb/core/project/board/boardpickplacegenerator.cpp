@@ -27,7 +27,6 @@
 #include "../../library/pkg/package.h"
 #include "../circuit/componentinstance.h"
 #include "../project.h"
-#include "../projectmetadata.h"
 #include "../projectsettings.h"
 #include "board.h"
 #include "items/bi_device.h"
@@ -56,8 +55,8 @@ BoardPickPlaceGenerator::~BoardPickPlaceGenerator() noexcept {
 
 std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
   std::shared_ptr<PickPlaceData> data = std::make_shared<PickPlaceData>(
-      *mBoard.getProject().getMetadata().getName(),
-      mBoard.getProject().getMetadata().getVersion(), *mBoard.getName());
+      *mBoard.getProject().getName(), mBoard.getProject().getVersion(),
+      *mBoard.getName());
   const QStringList& locale =
       mBoard.getProject().getSettings().getLocaleOrder();
 

@@ -156,8 +156,6 @@ add_library(
   graphics/graphicslayer.cpp
   graphics/graphicslayer.h
   graphics/graphicslayername.h
-  graphics/graphicslayerstackappearancesettings.cpp
-  graphics/graphicslayerstackappearancesettings.h
   graphics/graphicspainter.cpp
   graphics/graphicspainter.h
   graphics/graphicsscene.cpp
@@ -319,8 +317,6 @@ add_library(
   project/board/boardplanefragmentsbuilder.h
   project/board/boardselectionquery.cpp
   project/board/boardselectionquery.h
-  project/board/boardusersettings.cpp
-  project/board/boardusersettings.h
   project/board/drc/boardclipperpathgenerator.cpp
   project/board/drc/boardclipperpathgenerator.h
   project/board/drc/boarddesignrulecheck.cpp
@@ -331,8 +327,8 @@ add_library(
   project/board/graphicsitems/bgi_airwire.h
   project/board/graphicsitems/bgi_base.cpp
   project/board/graphicsitems/bgi_base.h
-  project/board/graphicsitems/bgi_footprint.cpp
-  project/board/graphicsitems/bgi_footprint.h
+  project/board/graphicsitems/bgi_device.cpp
+  project/board/graphicsitems/bgi_device.h
   project/board/graphicsitems/bgi_footprintpad.cpp
   project/board/graphicsitems/bgi_footprintpad.h
   project/board/graphicsitems/bgi_netline.cpp
@@ -349,8 +345,6 @@ add_library(
   project/board/items/bi_base.h
   project/board/items/bi_device.cpp
   project/board/items/bi_device.h
-  project/board/items/bi_footprint.cpp
-  project/board/items/bi_footprint.h
   project/board/items/bi_footprintpad.cpp
   project/board/items/bi_footprintpad.h
   project/board/items/bi_hole.cpp
@@ -390,8 +384,6 @@ add_library(
   project/project.h
   project/projectlibrary.cpp
   project/projectlibrary.h
-  project/projectmetadata.cpp
-  project/projectmetadata.h
   project/projectsettings.cpp
   project/projectsettings.h
   project/schematic/graphicsitems/sgi_base.cpp

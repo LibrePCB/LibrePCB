@@ -20,12 +20,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "bgi_footprint.h"
+#include "bgi_device.h"
 
 #include "../../../library/pkg/footprint.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
-#include "../items/bi_footprint.h"
+#include "../items/bi_device.h"
 
 #include <librepcb/core/graphics/origincrossgraphicsitem.h>
 #include <librepcb/core/graphics/primitivecirclegraphicsitem.h>
@@ -43,16 +43,16 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Footprint::BGI_Footprint(BI_Footprint& footprint) noexcept
+BGI_Device::BGI_Device(BI_Device& device) noexcept
   : BGI_Base(),
-    mFootprint(footprint),
+    mDevice(device),
     mGrabAreaLayer(),
-    mOnLayerEditedSlot(*this, &BGI_Footprint::layerEdited) {
+    mOnLayerEditedSlot(*this, &BGI_Device::layerEdited) {
   mOriginCrossGraphicsItem = std::make_shared<OriginCrossGraphicsItem>(this);
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1400000));
   mShape |= mOriginCrossGraphicsItem->shape();
 
-  for (auto& obj : mFootprint.getLibFootprint().getCircles().values()) {
+  for (auto& obj : mDevice.getLibFootprint().getCircles().values()) {
     Q_ASSERT(obj);
     auto i = std::make_shared<PrimitiveCircleGraphicsItem>(this);
     i->setPosition(obj->getCenter());
@@ -69,7 +69,7 @@ BGI_Footprint::BGI_Footprint(BI_Footprint& footprint) noexcept
     mCircleGraphicsItems.append(i);
   }
 
-  for (auto& obj : mFootprint.getLibFootprint().getPolygons().values()) {
+  for (auto& obj : mDevice.getLibFootprint().getPolygons().values()) {
     Q_ASSERT(obj);
     auto i = std::make_shared<PrimitivePathGraphicsItem>(this);
     i->setPath(obj->getPath().toQPainterPathPx());
@@ -84,7 +84,7 @@ BGI_Footprint::BGI_Footprint(BI_Footprint& footprint) noexcept
     mPolygonGraphicsItems.append(i);
   }
 
-  for (auto& obj : mFootprint.getLibFootprint().getHoles().values()) {
+  for (auto& obj : mDevice.getLibFootprint().getHoles().values()) {
     Q_ASSERT(obj);
     auto i = std::make_shared<PrimitiveCircleGraphicsItem>(this);
     i->setPosition(obj->getPosition());
@@ -100,31 +100,31 @@ BGI_Footprint::BGI_Footprint(BI_Footprint& footprint) noexcept
   mBoundingRect = childrenBoundingRect();
 }
 
-BGI_Footprint::~BGI_Footprint() noexcept {
+BGI_Device::~BGI_Device() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-bool BGI_Footprint::isSelectable() const noexcept {
+bool BGI_Device::isSelectable() const noexcept {
   GraphicsLayer* layer = getLayer(GraphicsLayer::sTopReferences);
   return layer && layer->isVisible();
 }
 
-void BGI_Footprint::setSelected(bool selected) noexcept {
+void BGI_Device::setSelected(bool selected) noexcept {
   mOriginCrossGraphicsItem->setSelected(selected);
   foreach (const auto& i, mCircleGraphicsItems) { i->setSelected(selected); }
   foreach (const auto& i, mPolygonGraphicsItems) { i->setSelected(selected); }
   QGraphicsItem::setSelected(selected);
 }
 
-void BGI_Footprint::updateBoardSide() noexcept {
+void BGI_Device::updateBoardSide() noexcept {
   // Update Z value.
-  if (mFootprint.getMirrored()) {
-    setZValue(Board::ZValue_FootprintsBottom);
+  if (mDevice.getMirrored()) {
+    setZValue(Board::ZValue_DevicesBottom);
   } else {
-    setZValue(Board::ZValue_FootprintsTop);
+    setZValue(Board::ZValue_DevicesTop);
   }
 
   // Update grab area layer.
@@ -144,7 +144,7 @@ void BGI_Footprint::updateBoardSide() noexcept {
   mOriginCrossGraphicsItem->setLayer(getLayer(GraphicsLayer::sTopReferences));
 
   // Update circle layers.
-  const CircleList& circles = mFootprint.getLibFootprint().getCircles();
+  const CircleList& circles = mDevice.getLibFootprint().getCircles();
   for (int i = 0; i < std::min(circles.count(), mCircleGraphicsItems.count());
        ++i) {
     mCircleGraphicsItems.at(i)->setLineLayer(
@@ -158,7 +158,7 @@ void BGI_Footprint::updateBoardSide() noexcept {
   }
 
   // Update polygon layers.
-  const PolygonList& polygons = mFootprint.getLibFootprint().getPolygons();
+  const PolygonList& polygons = mDevice.getLibFootprint().getPolygons();
   for (int i = 0; i < std::min(polygons.count(), mPolygonGraphicsItems.count());
        ++i) {
     mPolygonGraphicsItems.at(i)->setLineLayer(
@@ -177,15 +177,15 @@ void BGI_Footprint::updateBoardSide() noexcept {
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
-QPainterPath BGI_Footprint::shape() const noexcept {
+QPainterPath BGI_Device::shape() const noexcept {
   return (mGrabAreaLayer && mGrabAreaLayer->isVisible())
       ? mShape
       : mOriginCrossGraphicsItem->shape();
 }
 
-void BGI_Footprint::paint(QPainter* painter,
-                          const QStyleOptionGraphicsItem* option,
-                          QWidget* widget) {
+void BGI_Device::paint(QPainter* painter,
+                       const QStyleOptionGraphicsItem* option,
+                       QWidget* widget) {
   Q_UNUSED(painter);
   Q_UNUSED(option);
   Q_UNUSED(widget);
@@ -195,8 +195,8 @@ void BGI_Footprint::paint(QPainter* painter,
  *  Private Methods
  ******************************************************************************/
 
-void BGI_Footprint::layerEdited(const GraphicsLayer& layer,
-                                GraphicsLayer::Event event) noexcept {
+void BGI_Device::layerEdited(const GraphicsLayer& layer,
+                             GraphicsLayer::Event event) noexcept {
   Q_UNUSED(layer);
   switch (event) {
     case GraphicsLayer::Event::ColorChanged:
@@ -208,17 +208,17 @@ void BGI_Footprint::layerEdited(const GraphicsLayer& layer,
       prepareGeometryChange();
       break;
     default:
-      qWarning() << "Unhandled switch-case in BGI_Footprint::layerEdited():"
+      qWarning() << "Unhandled switch-case in BGI_Device::layerEdited():"
                  << static_cast<int>(event);
       break;
   }
 }
 
-GraphicsLayer* BGI_Footprint::getLayer(QString name) const noexcept {
-  if (mFootprint.getMirrored()) {
+GraphicsLayer* BGI_Device::getLayer(QString name) const noexcept {
+  if (mDevice.getMirrored()) {
     name = GraphicsLayer::getMirroredLayerName(name);
   }
-  return mFootprint.getBoard().getLayerStack().getLayer(name);
+  return mDevice.getBoard().getLayerStack().getLayer(name);
 }
 
 /*******************************************************************************

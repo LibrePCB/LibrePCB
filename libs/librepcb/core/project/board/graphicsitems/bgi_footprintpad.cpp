@@ -32,7 +32,6 @@
 #include "../boarddesignrules.h"
 #include "../boardlayerstack.h"
 #include "../items/bi_device.h"
-#include "../items/bi_footprint.h"
 #include "../items/bi_footprintpad.h"
 
 #include <QtCore>
@@ -191,11 +190,7 @@ void BGI_FootprintPad::paint(QPainter* painter,
 
 GraphicsLayer* BGI_FootprintPad::getLayer(QString name) const noexcept {
   if (mPad.getMirrored()) name = GraphicsLayer::getMirroredLayerName(name);
-  return mPad.getFootprint()
-      .getDeviceInstance()
-      .getBoard()
-      .getLayerStack()
-      .getLayer(name);
+  return mPad.getDevice().getBoard().getLayerStack().getLayer(name);
 }
 
 void BGI_FootprintPad::connectLayerEditedSlots() noexcept {

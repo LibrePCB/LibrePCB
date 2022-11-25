@@ -28,8 +28,9 @@
 #include "../../../serialization/serializableobject.h"
 #include "../../../types/uuid.h"
 #include "../../erc/if_ercmsgprovider.h"
-#include "../graphicsitems/bgi_footprint.h"
+#include "../graphicsitems/bgi_device.h"
 #include "bi_base.h"
+#include "bi_stroketext.h"
 
 #include <QtCore>
 
@@ -38,7 +39,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_Footprint;
 class Board;
 class ComponentInstance;
 class Device;
@@ -82,12 +82,17 @@ public:
   const Device& getLibDevice() const noexcept { return *mLibDevice; }
   const Package& getLibPackage() const noexcept { return *mLibPackage; }
   const Footprint& getLibFootprint() const noexcept { return *mLibFootprint; }
-  BI_Footprint& getFootprint() const noexcept { return *mFootprint; }
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
   bool getMirrored() const noexcept { return mMirrored; }
+  BI_FootprintPad* getPad(const Uuid& padUuid) const noexcept {
+    return mPads.value(padUuid);
+  }
+  const QMap<Uuid, BI_FootprintPad*>& getPads() const noexcept { return mPads; }
   bool isSelectable() const noexcept override;
   bool isUsed() const noexcept;
+  QRectF getBoundingRect() const noexcept;
+  BGI_Device& getGraphicsItem() noexcept { return *mGraphicsItem; }
 
   /**
    * @brief Determine the mount (assembly) type of this device
@@ -111,6 +116,14 @@ public:
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
   void setMirrored(bool mirror);
+
+  // StrokeText Methods
+  StrokeTextList getDefaultStrokeTexts() const noexcept;
+  const QList<BI_StrokeText*>& getStrokeTexts() const noexcept {
+    return mStrokeTexts;
+  }
+  void addStrokeText(BI_StrokeText& text);
+  void removeStrokeText(BI_StrokeText& text);
 
   // General Methods
   void addToBoard() override;
@@ -138,20 +151,15 @@ public:
   BI_Device& operator=(const BI_Device& rhs) = delete;
 
 signals:
-
   /// @copydoc AttributeProvider::attributesChanged()
   void attributesChanged() override;
-
-  void moved(const Point& newPos);
-  void rotated(const Angle& newRotation);
-  void mirrored(bool newIsMirrored);
 
 private:
   void initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
                                         const Uuid& footprintUuid);
   void init();
   bool checkAttributesValidity() const noexcept;
-  void updateErcMessages() noexcept;
+  void updateGraphicsItemTransform() noexcept;
   const QStringList& getLocaleOrder() const noexcept;
 
   // General
@@ -159,7 +167,6 @@ private:
   const Device* mLibDevice;
   const Package* mLibPackage;
   const Footprint* mLibFootprint;
-  QScopedPointer<BI_Footprint> mFootprint;
 
   // Attributes
   Point mPosition;
@@ -167,6 +174,11 @@ private:
   bool mMirrored;
   AttributeList
       mAttributes;  ///< not yet used, but already specified in file format
+
+  QMap<Uuid, BI_FootprintPad*> mPads;  ///< key: footprint pad UUID
+  QList<BI_StrokeText*> mStrokeTexts;
+
+  QScopedPointer<BGI_Device> mGraphicsItem;
 };
 
 /*******************************************************************************

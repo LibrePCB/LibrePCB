@@ -33,7 +33,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class ProjectMetadata;
+class Project;
 
 namespace editor {
 
@@ -58,7 +58,7 @@ public:
   ProjectPropertiesEditorDialog() = delete;
   ProjectPropertiesEditorDialog(const ProjectPropertiesEditorDialog& other) =
       delete;
-  ProjectPropertiesEditorDialog(ProjectMetadata& metadata, UndoStack& undoStack,
+  ProjectPropertiesEditorDialog(Project& project, UndoStack& undoStack,
                                 QWidget* parent) noexcept;
   ~ProjectPropertiesEditorDialog() noexcept;
 
@@ -72,7 +72,7 @@ private:  // Methods
   bool applyChanges() noexcept;
 
 private:  // Data
-  ProjectMetadata& mMetadata;
+  Project& mProject;
   UndoStack& mUndoStack;
   AttributeList mAttributes;
   QScopedPointer<Ui::ProjectPropertiesEditorDialog> mUi;

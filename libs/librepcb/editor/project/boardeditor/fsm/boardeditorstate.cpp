@@ -31,7 +31,6 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprint.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
@@ -312,13 +311,12 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
       (FindFlag::Footprints | FindFlag::FootprintPads |
        FindFlag::StrokeTexts)) {
     foreach (BI_Device* device, board->getDeviceInstances()) {
-      BI_Footprint& footprint = device->getFootprint();
       if (flags.testFlag(FindFlag::Footprints)) {
-        processItem(&footprint, footprint.getPosition(),
-                    40 + (footprint.getMirrored() ? 300 : 100));
+        processItem(device, device->getPosition(),
+                    40 + (device->getMirrored() ? 300 : 100));
       }
       if (flags.testFlag(FindFlag::FootprintPads)) {
-        foreach (BI_FootprintPad* pad, footprint.getPads()) {
+        foreach (BI_FootprintPad* pad, device->getPads()) {
           if ((!netsignals.isEmpty()) &&
               (!netsignals.contains(pad->getCompSigInstNetSignal()))) {
             continue;
@@ -331,7 +329,7 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
         }
       }
       if (flags.testFlag(FindFlag::StrokeTexts)) {
-        foreach (BI_StrokeText* text, device->getFootprint().getStrokeTexts()) {
+        foreach (BI_StrokeText* text, device->getStrokeTexts()) {
           processItem(text, text->getPosition(),
                       60 + priorityFromLayer(*text->getText().getLayerName()));
         }

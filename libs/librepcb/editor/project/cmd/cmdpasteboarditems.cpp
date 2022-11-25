@@ -40,7 +40,6 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/board/items/bi_footprint.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
@@ -141,15 +140,15 @@ bool CmdPasteBoardItems::performExecute() {
     QScopedPointer<BI_Device> device(
         new BI_Device(mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
                       dev.position + mPosOffset, dev.rotation, dev.mirrored));
-    foreach (BI_StrokeText* text, device->getFootprint().getStrokeTexts()) {
-      device->getFootprint().removeStrokeText(*text);
+    foreach (BI_StrokeText* text, device->getStrokeTexts()) {
+      device->removeStrokeText(*text);
     }
     for (const StrokeText& text : dev.strokeTexts) {
       StrokeText copy(Uuid::createRandom(), text);  // assign new UUID
       copy.setPosition(copy.getPosition() + mPosOffset);  // move
       BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
       item->setSelected(true);
-      device->getFootprint().addStrokeText(*item);
+      device->addStrokeText(*item);
     }
     device->setSelected(true);
     execNewChildCmd(new CmdDeviceInstanceAdd(*device.take()));
@@ -219,7 +218,7 @@ bool CmdPasteBoardItems::performExecute() {
           Q_ASSERT(pastedDevices.contains(anchor->device));
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
-          start = device ? device->getFootprint().getPad(anchor->pad) : nullptr;
+          start = device ? device->getPad(anchor->pad) : nullptr;
         }
         BI_NetLineAnchor* end = nullptr;
         if (tl::optional<Uuid> anchor = trace.getEndPoint().tryGetJunction()) {
@@ -232,7 +231,7 @@ bool CmdPasteBoardItems::performExecute() {
           Q_ASSERT(pastedDevices.contains(anchor->device));
           BI_Device* device =
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
-          end = device ? device->getFootprint().getPad(anchor->pad) : nullptr;
+          end = device ? device->getPad(anchor->pad) : nullptr;
         }
         GraphicsLayer* layer =
             mBoard.getLayerStack().getLayer(*trace.getLayer());

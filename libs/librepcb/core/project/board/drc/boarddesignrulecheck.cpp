@@ -37,7 +37,6 @@
 #include "../boardlayerstack.h"
 #include "../items/bi_airwire.h"
 #include "../items/bi_device.h"
-#include "../items/bi_footprint.h"
 #include "../items/bi_footprintpad.h"
 #include "../items/bi_hole.h"
 #include "../items/bi_netline.h"
@@ -343,8 +342,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
 
   // devices
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    const BI_Footprint& footprint = device->getFootprint();
-    foreach (const BI_StrokeText* text, footprint.getStrokeTexts()) {
+    foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
       const GraphicsLayer* layer =
           mBoard.getLayerStack().getLayer(*text->getText().getLayerName());
@@ -414,8 +412,7 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
 
   // pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    const BI_Footprint& footprint = device->getFootprint();
-    foreach (const BI_FootprintPad* pad, footprint.getPads()) {
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
       if (pad->getLibPad().getBoardSide() != FootprintPad::BoardSide::THT) {
         continue;  // skip SMT pads
       }
@@ -461,8 +458,7 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
 
   // pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    const BI_Footprint& footprint = device->getFootprint();
-    foreach (const BI_FootprintPad* pad, footprint.getPads()) {
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
       if (pad->getLibPad().getBoardSide() != FootprintPad::BoardSide::THT) {
         continue;  // skip SMT pads
       }
@@ -503,8 +499,7 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressStart,
   // package holes
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     Transform transform(*device);
-    const BI_Footprint& footprint = device->getFootprint();
-    for (const Hole& hole : footprint.getLibFootprint().getHoles()) {
+    for (const Hole& hole : device->getLibFootprint().getHoles()) {
       if (hole.getDiameter() < *mOptions.minNpthDrillDiameter) {
         QString msg = msgTr.arg(formatLength(*hole.getDiameter()));
         Path location = Path::circle(hole.getDiameter())

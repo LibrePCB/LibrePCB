@@ -43,7 +43,7 @@ class CmdBoardNetPointEdit;
 class CmdBoardPlaneEdit;
 class CmdBoardViaEdit;
 class CmdDeviceInstanceEdit;
-class CmdFootprintStrokeTextsReset;
+class CmdDeviceStrokeTextsReset;
 class CmdHoleEdit;
 class CmdPolygonEdit;
 class CmdStrokeTextEdit;
@@ -86,7 +86,7 @@ private:
 
   // Move commands
   QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
-  QList<CmdFootprintStrokeTextsReset*> mDeviceStrokeTextsResetCmds;
+  QList<CmdDeviceStrokeTextsReset*> mDeviceStrokeTextsResetCmds;
   QList<CmdBoardViaEdit*> mViaEditCmds;
   QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
   QList<CmdBoardPlaneEdit*> mPlaneEditCmds;

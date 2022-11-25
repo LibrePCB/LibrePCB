@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
-#define LIBREPCB_CORE_GRAPHICSLAYERSTACKAPPEARANCESETTINGS_H
+#ifndef LIBREPCB_EDITOR_CMDDEVICESTROKETEXTADD_H
+#define LIBREPCB_EDITOR_CMDDEVICESTROKETEXTADD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../serialization/serializableobject.h"
+#include "../../undocommand.h"
 
 #include <QtCore>
 
@@ -32,48 +32,48 @@
  ******************************************************************************/
 namespace librepcb {
 
-class IF_GraphicsLayerProvider;
+class BI_Device;
+class BI_StrokeText;
+
+namespace editor {
 
 /*******************************************************************************
- *  Class GraphicsLayerStackAppearanceSettings
+ *  Class CmdDeviceStrokeTextAdd
  ******************************************************************************/
 
 /**
- * @brief The GraphicsLayerStackAppearanceSettings class
+ * @brief The CmdDeviceStrokeTextAdd class
  */
-class GraphicsLayerStackAppearanceSettings final : public SerializableObject {
-  Q_DECLARE_TR_FUNCTIONS(GraphicsLayerStackAppearanceSettings)
-
+class CmdDeviceStrokeTextAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  GraphicsLayerStackAppearanceSettings() noexcept = delete;
-  GraphicsLayerStackAppearanceSettings(
-      const GraphicsLayerStackAppearanceSettings& other) = delete;
-  explicit GraphicsLayerStackAppearanceSettings(
-      IF_GraphicsLayerProvider& layers) noexcept;
-  GraphicsLayerStackAppearanceSettings(
-      IF_GraphicsLayerProvider& layers,
-      const GraphicsLayerStackAppearanceSettings& other) noexcept;
-  GraphicsLayerStackAppearanceSettings(IF_GraphicsLayerProvider& layers,
-                                       const SExpression& node,
-                                       const Version& fileFormat);
-  ~GraphicsLayerStackAppearanceSettings() noexcept;
+  CmdDeviceStrokeTextAdd(BI_Device& device, BI_StrokeText& text) noexcept;
+  ~CmdDeviceStrokeTextAdd() noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+private:
+  // Private Methods
 
-  // Operator Overloadings
-  GraphicsLayerStackAppearanceSettings& operator=(
-      const GraphicsLayerStackAppearanceSettings& rhs) noexcept;
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
 
-private:  // Data
-  IF_GraphicsLayerProvider& mLayers;
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
+
+  // Private Member Variables
+
+  // Attributes from the constructor
+  BI_Device& mDevice;
+  BI_StrokeText& mText;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

@@ -36,7 +36,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_Footprint;
+class BI_Device;
 class BI_FootprintPad;
 class BI_Via;
 class Board;
@@ -121,8 +121,8 @@ private:
   void drawLayer(GerberGenerator& gen, const QString& layerName) const;
   void drawVia(GerberGenerator& gen, const BI_Via& via,
                const QString& layerName, const QString& netName) const;
-  void drawFootprint(GerberGenerator& gen, const BI_Footprint& footprint,
-                     const QString& layerName) const;
+  void drawDevice(GerberGenerator& gen, const BI_Device& device,
+                  const QString& layerName) const;
   void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad,
                         const QString& layerName) const;
 

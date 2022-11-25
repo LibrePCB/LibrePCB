@@ -31,7 +31,7 @@
 #include "../../project.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
-#include "./bi_footprint.h"
+#include "bi_device.h"
 
 #include <QtCore>
 
@@ -46,7 +46,7 @@ namespace librepcb {
 
 BI_StrokeText::BI_StrokeText(Board& board, const BI_StrokeText& other)
   : BI_Base(board),
-    mFootprint(nullptr),
+    mDevice(nullptr),
     mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
   mText.reset(new StrokeText(Uuid::createRandom(), *other.mText));
   init();
@@ -55,7 +55,7 @@ BI_StrokeText::BI_StrokeText(Board& board, const BI_StrokeText& other)
 BI_StrokeText::BI_StrokeText(Board& board, const SExpression& node,
                              const Version& fileFormat)
   : BI_Base(board),
-    mFootprint(nullptr),
+    mDevice(nullptr),
     mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
   mText.reset(new StrokeText(node, fileFormat));
   init();
@@ -63,7 +63,7 @@ BI_StrokeText::BI_StrokeText(Board& board, const SExpression& node,
 
 BI_StrokeText::BI_StrokeText(Board& board, const StrokeText& text)
   : BI_Base(board),
-    mFootprint(nullptr),
+    mDevice(nullptr),
     mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
   mText.reset(new StrokeText(text));
   init();
@@ -80,7 +80,7 @@ void BI_StrokeText::init() {
 
   // connect to the "attributes changed" signal of the board
   connect(&mBoard, &Board::attributesChanged, this,
-          &BI_StrokeText::boardOrFootprintAttributesChanged);
+          &BI_StrokeText::boardOrDeviceAttributesChanged);
 }
 
 BI_StrokeText::~BI_StrokeText() noexcept {
@@ -90,26 +90,26 @@ BI_StrokeText::~BI_StrokeText() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void BI_StrokeText::setFootprint(BI_Footprint* footprint) noexcept {
-  if (mFootprint) {
-    disconnect(mFootprint, &BI_Footprint::attributesChanged, this,
-               &BI_StrokeText::boardOrFootprintAttributesChanged);
+void BI_StrokeText::setDevice(BI_Device* device) noexcept {
+  if (mDevice) {
+    disconnect(mDevice, &BI_Device::attributesChanged, this,
+               &BI_StrokeText::boardOrDeviceAttributesChanged);
   }
 
-  mFootprint = footprint;
+  mDevice = device;
   mGraphicsItem->setAttributeProvider(getAttributeProvider());
   updateGraphicsItems();
 
-  // Text might need to be updated if footprint attributes have changed.
-  if (mFootprint) {
-    connect(mFootprint, &BI_Footprint::attributesChanged, this,
-            &BI_StrokeText::boardOrFootprintAttributesChanged);
+  // Text might need to be updated if device attributes have changed.
+  if (mDevice) {
+    connect(mDevice, &BI_Device::attributesChanged, this,
+            &BI_StrokeText::boardOrDeviceAttributesChanged);
   }
 }
 
 const AttributeProvider* BI_StrokeText::getAttributeProvider() const noexcept {
-  if (mFootprint) {
-    return mFootprint;
+  if (mDevice) {
+    return mDevice;
   } else {
     return &mBoard;
   }
@@ -133,9 +133,8 @@ void BI_StrokeText::updateGraphicsItems() noexcept {
   mAnchorGraphicsItem->setZValue(static_cast<qreal>(zValue));
 
   // show anchor line only if there is a footprint and the text is selected
-  if (mFootprint && isSelected()) {
-    mAnchorGraphicsItem->setLine(mText->getPosition(),
-                                 mFootprint->getPosition());
+  if (mDevice && isSelected()) {
+    mAnchorGraphicsItem->setLine(mText->getPosition(), mDevice->getPosition());
     mAnchorGraphicsItem->setLayer(
         mBoard.getLayerStack().getLayer(*mText->getLayerName()));
   } else {
@@ -200,7 +199,7 @@ void BI_StrokeText::setSelected(bool selected) noexcept {
  *  Private Slots
  ******************************************************************************/
 
-void BI_StrokeText::boardOrFootprintAttributesChanged() {
+void BI_StrokeText::boardOrDeviceAttributesChanged() {
   mGraphicsItem->updateText();
 }
 
