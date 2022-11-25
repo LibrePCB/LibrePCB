@@ -125,7 +125,7 @@ void WorkspaceSettingsItem_KeyboardShortcuts::serializeImpl(
     root.ensureLineBreak();
     root.appendChild(node);
   }
-  root.ensureLineBreakIfMultiLine();
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

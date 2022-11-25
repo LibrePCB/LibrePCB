@@ -61,7 +61,6 @@ add_executable(
   core/project/projecttest.cpp
   core/serialization/serializableobjectlisttest.cpp
   core/serialization/serializableobjectmock.h
-  core/serialization/sexpressionlegacymode.h
   core/serialization/sexpressiontest.cpp
   core/sqlitedatabasetest.cpp
   core/systeminfotest.cpp

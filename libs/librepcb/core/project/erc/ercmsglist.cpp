@@ -124,7 +124,7 @@ void ErcMsgList::serialize(SExpression& root) const {
       itemNode.ensureLineBreak();
     }
   }
-  root.ensureLineBreakIfMultiLine();
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

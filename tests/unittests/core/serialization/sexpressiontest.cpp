@@ -20,9 +20,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
-#include "sexpressionlegacymode.h"
-
 #include <gtest/gtest.h>
 #include <librepcb/core/serialization/sexpression.h>
 
@@ -216,98 +213,6 @@ TEST(SExpressionTest, testGetChildSkipsLineBreaks) {
   EXPECT_EQ("0", s.getChild("child/@0").getValue().toStdString());
   EXPECT_EQ("1", s.getChild("child/@1").getValue().toStdString());
   EXPECT_EQ("2", s.getChild("child/@2").getValue().toStdString());
-}
-
-TEST(SExpressionTest, testEnsureLineBreakIfMultiLine) {
-  SExpressionLegacyMode legacyMode(false);  // File format v0.2+
-  SExpression s = SExpression::createList("test");
-  s.ensureLineBreakIfMultiLine();
-  s.ensureLineBreakIfMultiLine();
-  EXPECT_EQ(
-      "(test\n"
-      ")\n",
-      s.toByteArray().toStdString());
-
-  s.appendChild("child", 1);
-  s.ensureLineBreakIfMultiLine();
-  s.ensureLineBreakIfMultiLine();
-  EXPECT_EQ(
-      "(test\n"
-      " (child 1)\n"
-      ")\n",
-      s.toByteArray().toStdString());
-
-  s.ensureLineBreak();
-  s.appendChild("child", 2);
-  s.ensureLineBreakIfMultiLine();
-  s.ensureLineBreakIfMultiLine();
-  EXPECT_EQ(
-      "(test\n"
-      " (child 1)\n"
-      " (child 2)\n"
-      ")\n",
-      s.toByteArray().toStdString());
-}
-
-TEST(SExpressionTest, testEnsureLineBreakIfMultiLineLegacy) {
-  SExpressionLegacyMode legacyMode(true);  // File format v0.1
-  SExpression s = SExpression::createList("test");
-  s.ensureLineBreakIfMultiLine();
-  s.ensureLineBreakIfMultiLine();
-  EXPECT_EQ("(test)\n", s.toByteArray().toStdString());
-
-  s.appendChild("child", 1);
-  s.ensureLineBreakIfMultiLine();
-  s.ensureLineBreakIfMultiLine();
-  EXPECT_EQ("(test (child 1))\n", s.toByteArray().toStdString());
-
-  s.ensureLineBreak();
-  s.appendChild("child", 2);
-  s.ensureLineBreakIfMultiLine();
-  s.ensureLineBreakIfMultiLine();
-  EXPECT_EQ(
-      "(test (child 1)\n"
-      " (child 2)\n"
-      ")\n",
-      s.toByteArray().toStdString());
-}
-
-TEST(SExpressionTest, testEnsureEmptyLine) {
-  SExpressionLegacyMode legacyMode(false);  // File format v0.2+
-  SExpression s = SExpression::createList("test");
-  s.appendChild("child", 1);
-  s.ensureEmptyLine();
-  s.ensureEmptyLine();
-  s.ensureEmptyLine();
-  s.appendChild("child", 2);
-  s.ensureEmptyLine();
-  s.ensureEmptyLine();
-  s.ensureEmptyLine();
-  EXPECT_EQ(
-      "(test (child 1)\n"
-      " (child 2)\n"
-      ")\n",
-      s.toByteArray().toStdString());
-}
-
-TEST(SExpressionTest, testEnsureEmptyLineLegacy) {
-  SExpressionLegacyMode legacyMode(true);  // File format v0.1
-  SExpression s = SExpression::createList("test");
-  s.appendChild("child", 1);
-  s.ensureEmptyLine();
-  s.ensureEmptyLine();
-  s.ensureEmptyLine();
-  s.appendChild("child", 2);
-  s.ensureEmptyLine();
-  s.ensureEmptyLine();
-  s.ensureEmptyLine();
-  EXPECT_EQ(
-      "(test (child 1)\n"
-      "\n"
-      " (child 2)\n"
-      "\n"
-      ")\n",
-      s.toByteArray().toStdString());
 }
 
 TEST(SExpressionTest, testToByteArrayEmptyList) {

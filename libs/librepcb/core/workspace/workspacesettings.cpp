@@ -114,7 +114,7 @@ SExpression WorkspaceSettings::serialize() {
     root.ensureLineBreak();
     root.appendChild(child);
   }
-  root.ensureLineBreakIfMultiLine();
+  root.ensureLineBreak();
   return root;
 }
 
