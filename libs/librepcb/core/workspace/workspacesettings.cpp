@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "workspacesettings.h"
 
+#include "../application.h"
 #include "../fileio/fileutils.h"
 #include "../serialization/sexpression.h"
 
@@ -39,6 +40,7 @@ namespace librepcb {
 WorkspaceSettings::WorkspaceSettings(QObject* parent)
   : QObject(parent),
     mFileContent(),
+    mUpgradeRequired(false),
     // Initialize settings items. Their constructor will register them as
     // child objects of this object, this way we will access them later.
     userName("user", "", this),
@@ -82,6 +84,10 @@ void WorkspaceSettings::load(const SExpression& node,
       qCritical() << "Could not load workspace settings item:" << e.getMsg();
     }
   }
+  if (fileFormat < qApp->getFileFormatVersion()) {
+    mFileContent.clear();
+    mUpgradeRequired = true;
+  }
 }
 
 void WorkspaceSettings::restoreDefaults() noexcept {
@@ -93,7 +99,7 @@ void WorkspaceSettings::restoreDefaults() noexcept {
 
 SExpression WorkspaceSettings::serialize() {
   foreach (const WorkspaceSettingsItem* item, getAllItems()) {
-    if (item->isEdited()) {
+    if (item->isEdited() || mUpgradeRequired) {
       if (item->isDefaultValue()) {
         mFileContent.remove(item->getKey());
       } else {

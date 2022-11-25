@@ -121,6 +121,11 @@ private:  // Data
    */
   QMap<QString, SExpression> mFileContent;
 
+  /**
+   * @brief Whether #mFileContent needs to be upgraded or not
+   */
+  bool mUpgradeRequired;
+
 public:
   // All settings item objects below. The order is not relevant for saving,
   // it should be ordered logically.
