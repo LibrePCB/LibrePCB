@@ -58,7 +58,6 @@ class BoardDesignRules;
 class BoardFabricationOutputSettings;
 class BoardLayerStack;
 class BoardSelectionQuery;
-class BoardUserSettings;
 class GraphicsLayer;
 class GraphicsScene;
 class GridProperties;
@@ -181,6 +180,7 @@ public:
 
   // Plane Methods
   const QList<BI_Plane*>& getPlanes() const noexcept { return mPlanes; }
+  BI_Plane* getPlaneByUuid(const Uuid& uuid) const noexcept;
   void addPlane(BI_Plane& plane);
   void removePlane(BI_Plane& plane);
   void rebuildAllPlanes() noexcept;
@@ -266,7 +266,6 @@ private:
   QScopedPointer<GridProperties> mGridProperties;
   QScopedPointer<BoardDesignRules> mDesignRules;
   QScopedPointer<BoardFabricationOutputSettings> mFabricationOutputSettings;
-  QScopedPointer<BoardUserSettings> mUserSettings;
   QRectF mViewRect;
   QSet<NetSignal*> mScheduledNetSignalsForAirWireRebuild;
 

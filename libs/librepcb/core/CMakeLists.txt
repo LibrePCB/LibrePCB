@@ -156,8 +156,6 @@ add_library(
   graphics/graphicslayer.cpp
   graphics/graphicslayer.h
   graphics/graphicslayername.h
-  graphics/graphicslayerstackappearancesettings.cpp
-  graphics/graphicslayerstackappearancesettings.h
   graphics/graphicspainter.cpp
   graphics/graphicspainter.h
   graphics/graphicsscene.cpp
@@ -319,8 +317,6 @@ add_library(
   project/board/boardplanefragmentsbuilder.h
   project/board/boardselectionquery.cpp
   project/board/boardselectionquery.h
-  project/board/boardusersettings.cpp
-  project/board/boardusersettings.h
   project/board/drc/boardclipperpathgenerator.cpp
   project/board/drc/boardclipperpathgenerator.h
   project/board/drc/boarddesignrulecheck.cpp

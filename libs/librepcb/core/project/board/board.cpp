@@ -43,7 +43,6 @@
 #include "boardfabricationoutputsettings.h"
 #include "boardlayerstack.h"
 #include "boardselectionquery.h"
-#include "boardusersettings.h"
 #include "items/bi_airwire.h"
 #include "items/bi_device.h"
 #include "items/bi_footprint.h"
@@ -96,9 +95,6 @@ Board::Board(const Board& other,
     // copy fabrication output settings
     mFabricationOutputSettings.reset(
         new BoardFabricationOutputSettings(*other.mFabricationOutputSettings));
-
-    // copy user settings
-    mUserSettings.reset(new BoardUserSettings(*this, *other.mUserSettings));
 
     // copy device instances
     QHash<const BI_Device*, BI_Device*> copiedDeviceInstances;
@@ -173,7 +169,6 @@ Board::Board(const Board& other,
     mNetSegments.clear();
     qDeleteAll(mDeviceInstances);
     mDeviceInstances.clear();
-    mUserSettings.reset();
     mFabricationOutputSettings.reset();
     mDesignRules.reset();
     mGridProperties.reset();
@@ -216,9 +211,6 @@ Board::Board(Project& project,
       // load default fabrication output settings
       mFabricationOutputSettings.reset(new BoardFabricationOutputSettings());
 
-      // load default user settings
-      mUserSettings.reset(new BoardUserSettings(*this));
-
       // add 100x80mm board outline (1/2 Eurocard size)
       Polygon polygon(Uuid::createRandom(),
                       GraphicsLayerName(GraphicsLayer::sBoardOutlines),
@@ -256,24 +248,6 @@ Board::Board(Project& project,
       mFabricationOutputSettings.reset(new BoardFabricationOutputSettings(
           root.getChild("fabrication_output_settings"), fileFormat));
 
-      // load user settings
-      try {
-        QString userSettingsFp = "settings.user.lp";
-        SExpression userSettingsRoot =
-            SExpression::parse(mDirectory->read(userSettingsFp),
-                               mDirectory->getAbsPath(userSettingsFp));
-        mUserSettings.reset(
-            new BoardUserSettings(*this, userSettingsRoot, fileFormat));
-      } catch (const Exception&) {
-        // Project user settings are normally not put under version control and
-        // thus the likelyhood of parse errors is higher (e.g. when switching to
-        // an older, now incompatible revision). To avoid frustration, we just
-        // ignore these errors and load the default settings instead...
-        qCritical() << "Could not open board user settings, defaults will be "
-                       "used instead.";
-        mUserSettings.reset(new BoardUserSettings(*this));
-      }
-
       // Load all device instances
       foreach (const SExpression& node, root.getChildren("device")) {
         BI_Device* device = new BI_Device(*this, node, fileFormat);
@@ -303,8 +277,6 @@ Board::Board(Project& project,
       // Load all planes
       foreach (const SExpression& node, root.getChildren("plane")) {
         BI_Plane* plane = new BI_Plane(*this, node, fileFormat);
-        // load visibility from user settings
-        plane->setVisible(mUserSettings->getPlaneVisibility(plane->getUuid()));
         mPlanes.append(plane);
       }
 
@@ -324,6 +296,38 @@ Board::Board(Project& project,
       foreach (const SExpression& node, root.getChildren("hole")) {
         BI_Hole* hole = new BI_Hole(*this, node, fileFormat);
         mHoles.append(hole);
+      }
+
+      // load user settings
+      try {
+        const QString fp = "settings.user.lp";
+        const SExpression root = SExpression::parse(mDirectory->read(fp),
+                                                    mDirectory->getAbsPath(fp));
+        for (const SExpression& child : root.getChildren("layer")) {
+          const QString name = child.getChild("@0").getValue();
+          if (GraphicsLayer* layer = mLayerStack->getLayer(name)) {
+            layer->setColor(
+                deserialize<QColor>(child.getChild("color/@0"), fileFormat));
+            layer->setColorHighlighted(
+                deserialize<QColor>(child.getChild("color_hl/@0"), fileFormat));
+            layer->setVisible(
+                deserialize<bool>(child.getChild("visible/@0"), fileFormat));
+          }
+        }
+        foreach (const SExpression& node, root.getChildren("plane")) {
+          const Uuid uuid = deserialize<Uuid>(node.getChild("@0"), fileFormat);
+          if (BI_Plane* plane = getPlaneByUuid(uuid)) {
+            plane->setVisible(
+                deserialize<bool>(node.getChild("visible/@0"), fileFormat));
+          }
+        }
+      } catch (const Exception&) {
+        // Project user settings are normally not put under version control and
+        // thus the likelyhood of parse errors is higher (e.g. when switching to
+        // an older, now incompatible revision). To avoid frustration, we just
+        // ignore these errors and load the default settings instead...
+        qCritical() << "Could not open board user settings, defaults will be "
+                       "used instead.";
       }
     }
 
@@ -357,7 +361,6 @@ Board::Board(Project& project,
     mNetSegments.clear();
     qDeleteAll(mDeviceInstances);
     mDeviceInstances.clear();
-    mUserSettings.reset();
     mFabricationOutputSettings.reset();
     mDesignRules.reset();
     mGridProperties.reset();
@@ -389,7 +392,6 @@ Board::~Board() noexcept {
   qDeleteAll(mDeviceInstances);
   mDeviceInstances.clear();
 
-  mUserSettings.reset();
   mFabricationOutputSettings.reset();
   mDesignRules.reset();
   mGridProperties.reset();
@@ -546,6 +548,13 @@ void Board::removeNetSegment(BI_NetSegment& netsegment) {
 /*******************************************************************************
  *  Plane Methods
  ******************************************************************************/
+
+BI_Plane* Board::getPlaneByUuid(const Uuid& uuid) const noexcept {
+  foreach (BI_Plane* plane, mPlanes) {
+    if (plane->getUuid() == uuid) return plane;
+  }
+  return nullptr;
+}
 
 void Board::addPlane(BI_Plane& plane) {
   if ((!mIsAddedToProject) || (mPlanes.contains(&plane)) ||
@@ -721,18 +730,35 @@ void Board::removeFromProject() {
 void Board::save() {
   if (mIsAddedToProject) {
     // save board file
-    SExpression brdDoc(serializeToDomElement("librepcb_board"));  // can throw
-    mDirectory->write(getFilePath().getFilename(),
-                      brdDoc.toByteArray());  // can throw
+    {
+      SExpression root(serializeToDomElement("librepcb_board"));  // can throw
+      mDirectory->write(getFilePath().getFilename(),
+                        root.toByteArray());  // can throw
+    }
 
     // save user settings
-    mUserSettings->resetPlanesVisibility();
-    foreach (BI_Plane* plane, mPlanes) {
-      mUserSettings->setPlaneVisibility(plane->getUuid(), plane->isVisible());
+    {
+      SExpression root =
+          SExpression::createList("librepcb_board_user_settings");
+      for (const GraphicsLayer* layer : mLayerStack->getAllLayers()) {
+        root.ensureLineBreak();
+        SExpression& child = root.appendList("layer");
+        child.appendChild(SExpression::createToken(layer->getName()));
+        child.appendChild("color", layer->getColor(false));
+        child.appendChild("color_hl", layer->getColor(true));
+        child.appendChild("visible", layer->getVisible());
+      }
+      root.ensureLineBreakIfMultiLine();
+      foreach (BI_Plane* plane, mPlanes) {
+        root.ensureLineBreak();
+        SExpression node = SExpression::createList("plane");
+        node.appendChild(plane->getUuid());
+        node.appendChild("visible", plane->isVisible());
+        root.appendChild(node);
+      }
+      root.ensureLineBreakIfMultiLine();
+      mDirectory->write("settings.user.lp", root.toByteArray());  // can throw
     }
-    SExpression usrDoc(mUserSettings->serializeToDomElement(
-        "librepcb_board_user_settings"));  // can throw
-    mDirectory->write("settings.user.lp", usrDoc.toByteArray());  // can throw
   } else {
     mDirectory->removeDirRecursively();  // can throw
   }
