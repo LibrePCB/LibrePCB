@@ -30,7 +30,6 @@
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectmetadata.h>
 #include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>

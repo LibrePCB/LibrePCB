@@ -37,7 +37,6 @@
 #include "../circuit/componentsignalinstance.h"
 #include "../circuit/netsignal.h"
 #include "../project.h"
-#include "../projectmetadata.h"
 #include "board.h"
 #include "boarddesignrules.h"
 #include "boardfabricationoutputsettings.h"
@@ -69,7 +68,7 @@ BoardGerberExport::BoardGerberExport(const Board& board) noexcept
   : mProject(board.getProject()),
     mBoard(board),
     mCreationDateTime(QDateTime::currentDateTime()),
-    mProjectName(*mProject.getMetadata().getName()),
+    mProjectName(*mProject.getName()),
     mCurrentInnerCopperLayer(0) {
   // If the project contains multiple boards, add the board name to the
   // Gerber file metadata as well to distinguish between the different boards.
@@ -124,7 +123,7 @@ void BoardGerberExport::exportPcbLayers(
 void BoardGerberExport::exportComponentLayer(BoardSide side,
                                              const FilePath& filePath) const {
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getMetadata().getVersion());
+                      mProject.getVersion());
   if (side == BoardSide::Top) {
     gen.setFileFunctionComponent(1, GerberGenerator::BoardSide::Top);
   } else {
@@ -268,7 +267,7 @@ void BoardGerberExport::exportDrills(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixDrills());
   ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getMetadata().getVersion(),
+                        mProject.getVersion(),
                         ExcellonGenerator::Plating::Mixed, 1,
                         mBoard.getLayerStack().getInnerLayerCount() + 2);
   drawPthDrills(gen);
@@ -283,9 +282,8 @@ void BoardGerberExport::exportDrillsNpth(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixDrillsNpth());
   ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getMetadata().getVersion(),
-                        ExcellonGenerator::Plating::No, 1,
-                        mBoard.getLayerStack().getInnerLayerCount() + 2);
+                        mProject.getVersion(), ExcellonGenerator::Plating::No,
+                        1, mBoard.getLayerStack().getInnerLayerCount() + 2);
   drawNpthDrills(gen);
 
   // Note that separate NPTH drill files could lead to issues with some PCB
@@ -305,9 +303,8 @@ void BoardGerberExport::exportDrillsPth(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixDrillsPth());
   ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getMetadata().getVersion(),
-                        ExcellonGenerator::Plating::Yes, 1,
-                        mBoard.getLayerStack().getInnerLayerCount() + 2);
+                        mProject.getVersion(), ExcellonGenerator::Plating::Yes,
+                        1, mBoard.getLayerStack().getInnerLayerCount() + 2);
   drawPthDrills(gen);
   gen.generate();
   gen.saveToFile(fp);
@@ -319,7 +316,7 @@ void BoardGerberExport::exportLayerBoardOutlines(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixOutlines());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getMetadata().getVersion());
+                      mProject.getVersion());
   gen.setFileFunctionOutlines(false);
   drawLayer(gen, GraphicsLayer::sBoardOutlines);
   gen.generate();
@@ -332,7 +329,7 @@ void BoardGerberExport::exportLayerTopCopper(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixCopperTop());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getMetadata().getVersion());
+                      mProject.getVersion());
   gen.setFileFunctionCopper(1, GerberGenerator::CopperSide::Top,
                             GerberGenerator::Polarity::Positive);
   drawLayer(gen, GraphicsLayer::sTopCopper);
@@ -346,7 +343,7 @@ void BoardGerberExport::exportLayerBottomCopper(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixCopperBot());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getMetadata().getVersion());
+                      mProject.getVersion());
   gen.setFileFunctionCopper(mBoard.getLayerStack().getInnerLayerCount() + 2,
                             GerberGenerator::CopperSide::Bottom,
                             GerberGenerator::Polarity::Positive);
@@ -363,7 +360,7 @@ void BoardGerberExport::exportLayerInnerCopper(
     FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                     settings.getSuffixCopperInner());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getMetadata().getVersion());
+                        mProject.getVersion());
     gen.setFileFunctionCopper(i + 1, GerberGenerator::CopperSide::Inner,
                               GerberGenerator::Polarity::Positive);
     drawLayer(gen, GraphicsLayer::getInnerLayerName(i));
@@ -379,7 +376,7 @@ void BoardGerberExport::exportLayerTopSolderMask(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixSolderMaskTop());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getMetadata().getVersion());
+                      mProject.getVersion());
   gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Top,
                                 GerberGenerator::Polarity::Negative);
   drawLayer(gen, GraphicsLayer::sTopStopMask);
@@ -393,7 +390,7 @@ void BoardGerberExport::exportLayerBottomSolderMask(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixSolderMaskBot());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getMetadata().getVersion());
+                      mProject.getVersion());
   gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Bottom,
                                 GerberGenerator::Polarity::Negative);
   drawLayer(gen, GraphicsLayer::sBotStopMask);
@@ -410,7 +407,7 @@ void BoardGerberExport::exportLayerTopSilkscreen(
     FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                     settings.getSuffixSilkscreenTop());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getMetadata().getVersion());
+                        mProject.getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Top,
                               GerberGenerator::Polarity::Positive);
     foreach (const QString& layer, layers) { drawLayer(gen, layer); }
@@ -430,7 +427,7 @@ void BoardGerberExport::exportLayerBottomSilkscreen(
     FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                     settings.getSuffixSilkscreenBot());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getMetadata().getVersion());
+                        mProject.getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Bottom,
                               GerberGenerator::Polarity::Positive);
     foreach (const QString& layer, layers) { drawLayer(gen, layer); }
@@ -447,7 +444,7 @@ void BoardGerberExport::exportLayerTopSolderPaste(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixSolderPasteTop());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getMetadata().getVersion());
+                      mProject.getVersion());
   gen.setFileFunctionPaste(GerberGenerator::BoardSide::Top,
                            GerberGenerator::Polarity::Positive);
   drawLayer(gen, GraphicsLayer::sTopSolderPaste);
@@ -461,7 +458,7 @@ void BoardGerberExport::exportLayerBottomSolderPaste(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixSolderPasteBot());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getMetadata().getVersion());
+                      mProject.getVersion());
   gen.setFileFunctionPaste(GerberGenerator::BoardSide::Bottom,
                            GerberGenerator::Polarity::Positive);
   drawLayer(gen, GraphicsLayer::sBotSolderPaste);

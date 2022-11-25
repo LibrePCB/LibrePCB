@@ -390,8 +390,6 @@ add_library(
   project/project.h
   project/projectlibrary.cpp
   project/projectlibrary.h
-  project/projectmetadata.cpp
-  project/projectmetadata.h
   project/projectsettings.cpp
   project/projectsettings.h
   project/schematic/graphicsitems/sgi_base.cpp

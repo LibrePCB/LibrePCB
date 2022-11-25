@@ -31,7 +31,6 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectmetadata.h>
 #include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -86,9 +85,9 @@ Project* NewProjectWizard::createProject() const {
   QScopedPointer<Project> project(Project::create(
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
       mPageMetadata->getFullFilePath().getFilename()));
-  project->getMetadata().setName(
+  project->setName(
       ElementName(mPageMetadata->getProjectName().trimmed()));  // can throw
-  project->getMetadata().setAuthor(mPageMetadata->getProjectAuthor());
+  project->setAuthor(mPageMetadata->getProjectAuthor());
 
   // set project settings (copy from workspace settings)
   ProjectSettings& settings = project->getSettings();

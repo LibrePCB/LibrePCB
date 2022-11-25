@@ -64,7 +64,6 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectmetadata.h>
 #include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -354,7 +353,7 @@ void BoardEditor::createActions() noexcept {
       cmd.projectProperties.createAction(this, this, [this]() {
         abortBlockingToolsInOtherEditors();  // Release undo stack.
         ProjectPropertiesEditorDialog dialog(
-            mProject.getMetadata(), mProjectEditor.getUndoStack(), this);
+            mProject, mProjectEditor.getUndoStack(), this);
         dialog.exec();
       }));
   mActionProjectSettings.reset(cmd.projectSettings.createAction(
@@ -1274,12 +1273,10 @@ void BoardEditor::execGraphicsExportDialog(
     GraphicsExportDialog::Output output, const QString& settingsKey) noexcept {
   try {
     // Determine default file path.
-    QString projectName =
-        FilePath::cleanFileName(*mProject.getMetadata().getName(),
-                                FilePath::ReplaceSpaces | FilePath::KeepCase);
-    QString projectVersion =
-        FilePath::cleanFileName(mProject.getMetadata().getVersion(),
-                                FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString projectName = FilePath::cleanFileName(
+        *mProject.getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+    QString projectVersion = FilePath::cleanFileName(
+        mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
     QString relativePath =
         QString("output/%1/%2_Board").arg(projectVersion, projectName);
     FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
@@ -1301,7 +1298,7 @@ void BoardEditor::execGraphicsExportDialog(
     // Show dialog, which will do all the work.
     GraphicsExportDialog dialog(
         GraphicsExportDialog::Mode::Board, output, pages, 0,
-        *mProject.getMetadata().getName(),
+        *mProject.getName(),
         mActiveBoard ? mActiveBoard->getLayerStack().getInnerLayerCount() : 0,
         defaultFilePath,
         mProjectEditor.getWorkspace().getSettings().defaultLengthUnit.get(),

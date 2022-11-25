@@ -17,15 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDPROJECTMETADATAEDIT_H
-#define LIBREPCB_EDITOR_CMDPROJECTMETADATAEDIT_H
+#ifndef LIBREPCB_EDITOR_CMDPROJECTEDIT_H
+#define LIBREPCB_EDITOR_CMDPROJECTEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "../../undocommand.h"
 
-#include <librepcb/core/project/projectmetadata.h>
+#include <librepcb/core/attribute/attribute.h>
+#include <librepcb/core/types/elementname.h>
 
 #include <QtCore>
 
@@ -33,20 +34,23 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Project;
+
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdProjectMetadataEdit
+ *  Class CmdProjectEdit
  ******************************************************************************/
 
 /**
- * @brief The CmdProjectMetadataEdit class
+ * @brief The CmdProjectEdit class
  */
-class CmdProjectMetadataEdit final : public UndoCommand {
+class CmdProjectEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  explicit CmdProjectMetadataEdit(ProjectMetadata& metadata) noexcept;
-  ~CmdProjectMetadataEdit() noexcept;
+  explicit CmdProjectEdit(Project& project) noexcept;
+  ~CmdProjectEdit() noexcept;
 
   // Setters
   void setName(const ElementName& newName) noexcept;
@@ -69,7 +73,7 @@ private:
   // Private Member Variables
 
   // General
-  ProjectMetadata& mMetadata;
+  Project& mProject;
 
   // Misc
   ElementName mOldName;

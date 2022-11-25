@@ -23,10 +23,10 @@
 #include "projectpropertieseditordialog.h"
 
 #include "../undostack.h"
-#include "cmd/cmdprojectmetadataedit.h"
+#include "cmd/cmdprojectedit.h"
 #include "ui_projectpropertieseditordialog.h"
 
-#include <librepcb/core/project/projectmetadata.h>
+#include <librepcb/core/project/project.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -42,21 +42,21 @@ namespace editor {
  ******************************************************************************/
 
 ProjectPropertiesEditorDialog::ProjectPropertiesEditorDialog(
-    ProjectMetadata& metadata, UndoStack& undoStack, QWidget* parent) noexcept
+    Project& project, UndoStack& undoStack, QWidget* parent) noexcept
   : QDialog(parent),
-    mMetadata(metadata),
+    mProject(project),
     mUndoStack(undoStack),
-    mAttributes(mMetadata.getAttributes()),
+    mAttributes(mProject.getAttributes()),
     mUi(new Ui::ProjectPropertiesEditorDialog) {
   mUi->setupUi(this);
 
-  mUi->edtName->setText(*mMetadata.getName());
-  mUi->edtAuthor->setText(mMetadata.getAuthor());
-  mUi->edtVersion->setText(mMetadata.getVersion());
+  mUi->edtName->setText(*mProject.getName());
+  mUi->edtAuthor->setText(mProject.getAuthor());
+  mUi->edtVersion->setText(mProject.getVersion());
   mUi->lblCreatedDateTime->setText(
-      mMetadata.getCreated().toString(Qt::DefaultLocaleLongDate));
+      mProject.getCreated().toString(Qt::DefaultLocaleLongDate));
   mUi->lblLastModifiedDateTime->setText(
-      mMetadata.getLastModified().toString(Qt::DefaultLocaleLongDate));
+      mProject.getLastModified().toString(Qt::DefaultLocaleLongDate));
   mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
 
   // set focus to name so the user can immediately start typing to change it
@@ -93,7 +93,7 @@ void ProjectPropertiesEditorDialog::accept() {
 
 bool ProjectPropertiesEditorDialog::applyChanges() noexcept {
   try {
-    CmdProjectMetadataEdit* cmd = new CmdProjectMetadataEdit(mMetadata);
+    CmdProjectEdit* cmd = new CmdProjectEdit(mProject);
     cmd->setName(ElementName(mUi->edtName->text().trimmed()));  // can throw
     cmd->setAuthor(mUi->edtAuthor->text().trimmed());
     cmd->setVersion(mUi->edtVersion->text().trimmed());

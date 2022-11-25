@@ -47,7 +47,6 @@
 #include <librepcb/core/project/erc/ercmsg.h>
 #include <librepcb/core/project/erc/ercmsglist.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectmetadata.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
 
 #include <QtCore>
@@ -496,7 +495,7 @@ bool CommandLineInterface::openProject(
           });
       FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
       GraphicsExport graphicsExport;
-      graphicsExport.setDocumentName(*project.getMetadata().getName());
+      graphicsExport.setDocumentName(*project.getName());
       QObject::connect(
           &graphicsExport, &GraphicsExport::savingFile,
           [&destPathStr, &writtenFilesCounter](const FilePath& fp) {

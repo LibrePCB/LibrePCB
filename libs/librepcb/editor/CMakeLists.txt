@@ -513,12 +513,12 @@ add_library(
   project/cmd/cmdpasteboarditems.h
   project/cmd/cmdpasteschematicitems.cpp
   project/cmd/cmdpasteschematicitems.h
+  project/cmd/cmdprojectedit.cpp
+  project/cmd/cmdprojectedit.h
   project/cmd/cmdprojectlibraryaddelement.cpp
   project/cmd/cmdprojectlibraryaddelement.h
   project/cmd/cmdprojectlibraryremoveelement.cpp
   project/cmd/cmdprojectlibraryremoveelement.h
-  project/cmd/cmdprojectmetadataedit.cpp
-  project/cmd/cmdprojectmetadataedit.h
   project/cmd/cmdprojectsettingschange.cpp
   project/cmd/cmdprojectsettingschange.h
   project/cmd/cmdremoveboarditems.cpp
