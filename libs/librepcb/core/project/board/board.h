@@ -113,14 +113,15 @@ public:
   Board() = delete;
   Board(const Board& other) = delete;
   Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-        const Version& fileFormat)
-    : Board(project, std::move(directory), fileFormat, false, QString()) {}
+        const QString& directoryName, const Version& fileFormat)
+    : Board(project, std::move(directory), directoryName, fileFormat, false,
+            QString()) {}
   ~Board() noexcept;
 
   // Getters: General
   Project& getProject() const noexcept { return mProject; }
-  FilePath getFilePath() const noexcept;
-  QString getRelativePath() const noexcept;
+  const QString& getDirectoryName() const noexcept { return mDirectoryName; }
+  TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
   const GridProperties& getGridProperties() const noexcept {
     return *mGridProperties;
   }
@@ -235,7 +236,7 @@ public:
   // Static Methods
   static Board* create(Project& project,
                        std::unique_ptr<TransactionalDirectory> directory,
-                       const ElementName& name);
+                       const QString& directoryName, const ElementName& name);
 
 signals:
 
@@ -247,7 +248,8 @@ signals:
 
 private:
   Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-        const Version& fileFormat, bool create, const QString& newName);
+        const QString& directoryName, const Version& fileFormat, bool create,
+        const QString& newName);
   void updateIcon() noexcept;
   void updateErcMessages() noexcept;
 
@@ -256,6 +258,7 @@ private:
 
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
+  const QString mDirectoryName;
   std::unique_ptr<TransactionalDirectory> mDirectory;
   bool mIsAddedToProject;
 

@@ -409,7 +409,7 @@ void BoardEditor::createActions() noexcept {
               mProjectEditor.getWorkspace().getSettings(), *board, this);
           connect(&dialog, &FabricationOutputDialog::orderPcbDialogTriggered,
                   this, [this, &dialog]() {
-                    mProjectEditor.execOrderPcbDialog(nullptr, &dialog);
+                    mProjectEditor.execOrderPcbDialog(&dialog);
                   });
           dialog.exec();
         }
@@ -422,9 +422,8 @@ void BoardEditor::createActions() noexcept {
           dialog.exec();
         }
       }));
-  mActionOrderPcb.reset(cmd.orderPcb.createAction(this, this, [this]() {
-    mProjectEditor.execOrderPcbDialog(nullptr, this);
-  }));
+  mActionOrderPcb.reset(cmd.orderPcb.createAction(
+      this, this, [this]() { mProjectEditor.execOrderPcbDialog(this); }));
   mActionNewBoard.reset(
       cmd.boardNew.createAction(this, this, &BoardEditor::newBoard));
   mActionCopyBoard.reset(
@@ -1149,9 +1148,16 @@ void BoardEditor::newBoard() noexcept {
   if (!ok) return;
 
   try {
+    const QString dirName = FilePath::cleanFileName(
+        name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    if (dirName.isEmpty()) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         tr("Invalid name: '%1'").arg(name));
+    }
+
     abortBlockingToolsInOtherEditors();  // Release undo stack.
     CmdBoardAdd* cmd =
-        new CmdBoardAdd(mProject, ElementName(name));  // can throw
+        new CmdBoardAdd(mProject, dirName, ElementName(name));  // can throw
     mProjectEditor.getUndoStack().execCmd(cmd);
     setActiveBoardIndex(mProject.getBoardIndex(*cmd->getBoard()));
   } catch (Exception& e) {
@@ -1170,9 +1176,16 @@ void BoardEditor::copyBoard() noexcept {
   if (!ok) return;
 
   try {
+    const QString dirName = FilePath::cleanFileName(
+        name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    if (dirName.isEmpty()) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         tr("Invalid name: '%1'").arg(name));
+    }
+
     abortBlockingToolsInOtherEditors();  // Release undo stack.
-    CmdBoardAdd* cmd =
-        new CmdBoardAdd(mProject, *board, ElementName(name));  // can throw
+    CmdBoardAdd* cmd = new CmdBoardAdd(mProject, dirName, ElementName(name),
+                                       board);  // can throw
     mProjectEditor.getUndoStack().execCmd(cmd);
     setActiveBoardIndex(mProject.getBoardIndex(*cmd->getBoard()));
   } catch (Exception& e) {

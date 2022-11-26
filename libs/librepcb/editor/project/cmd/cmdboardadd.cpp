@@ -37,21 +37,14 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdBoardAdd::CmdBoardAdd(Project& project, const ElementName& name) noexcept
+CmdBoardAdd::CmdBoardAdd(Project& project, const QString& dirName,
+                         const ElementName& name,
+                         const Board* boardToCopy) noexcept
   : UndoCommand(tr("Add board")),
     mProject(project),
-    mBoardToCopy(nullptr),
+    mDirName(dirName),
     mName(name),
-    mBoard(nullptr),
-    mPageIndex(-1) {
-}
-
-CmdBoardAdd::CmdBoardAdd(Project& project, const Board& boardToCopy,
-                         const ElementName& name) noexcept
-  : UndoCommand(tr("Copy board")),
-    mProject(project),
-    mBoardToCopy(&boardToCopy),
-    mName(name),
+    mBoardToCopy(boardToCopy),
     mBoard(nullptr),
     mPageIndex(-1) {
 }
@@ -64,7 +57,10 @@ CmdBoardAdd::~CmdBoardAdd() noexcept {
  ******************************************************************************/
 
 bool CmdBoardAdd::performExecute() {
-  mBoard = mProject.createBoard(mName);  // can throw
+  mBoard = Board::create(
+      mProject,
+      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
+      mDirName, mName);  // can throw
   if (mBoardToCopy) {
     mBoard->copyFrom(*mBoardToCopy);  // can throw
   } else {

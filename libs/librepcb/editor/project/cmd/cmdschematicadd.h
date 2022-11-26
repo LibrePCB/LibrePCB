@@ -49,7 +49,8 @@ namespace editor {
 class CmdSchematicAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdSchematicAdd(Project& project, const ElementName& name) noexcept;
+  CmdSchematicAdd(Project& project, const QString& dirName,
+                  const ElementName& name) noexcept;
   ~CmdSchematicAdd() noexcept;
 
   // Getters
@@ -70,6 +71,7 @@ private:
   // Private Member Variables
 
   Project& mProject;
+  QString mDirName;
   ElementName mName;
   Schematic* mSchematic;
   int mPageIndex;

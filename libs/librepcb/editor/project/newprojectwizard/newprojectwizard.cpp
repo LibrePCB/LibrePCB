@@ -33,12 +33,12 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
-//#include "newprojectwizardpage_versioncontrol.h"
 
 /*******************************************************************************
  *  Namespace
@@ -57,8 +57,6 @@ NewProjectWizard::NewProjectWizard(const Workspace& ws,
 
   addPage(mPageMetadata = new NewProjectWizardPage_Metadata(mWorkspace, this));
   addPage(mPageInitialization = new NewProjectWizardPage_Initialization(this));
-  // addPage(mPageVersionControl = new
-  // NewProjectWizardPage_VersionControl(this));
 }
 
 NewProjectWizard::~NewProjectWizard() noexcept {
@@ -97,14 +95,20 @@ Project* NewProjectWizard::createProject() const {
 
   // add schematic
   if (mPageInitialization->getCreateSchematic()) {
-    Schematic* schematic = project->createSchematic(
+    Schematic* schematic = Schematic::create(
+        *project,
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
+        mPageInitialization->getSchematicDirName(),
         ElementName(mPageInitialization->getSchematicName()));  // can throw
     project->addSchematic(*schematic);
   }
 
   // add board
   if (mPageInitialization->getCreateBoard()) {
-    Board* board = project->createBoard(
+    Board* board = Board::create(
+        *project,
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
+        mPageInitialization->getBoardDirName(),
         ElementName(mPageInitialization->getBoardName()));  // can throw
     board->addDefaultContent();
     project->addBoard(*board);

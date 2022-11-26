@@ -171,7 +171,8 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
             FilePath::fromRelative(getPath(), node.getChild("@0").getValue());
         std::unique_ptr<TransactionalDirectory> dir(new TransactionalDirectory(
             *mDirectory, fp.getParentDir().toRelative(getPath())));
-        Schematic* schematic = new Schematic(*this, std::move(dir), fileFormat);
+        Schematic* schematic = new Schematic(
+            *this, std::move(dir), fp.getParentDir().getFilename(), fileFormat);
         addSchematic(*schematic);
       }
       qDebug() << "Successfully loaded" << mSchematics.count() << "schematics.";
@@ -187,7 +188,8 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
             FilePath::fromRelative(getPath(), node.getChild("@0").getValue());
         std::unique_ptr<TransactionalDirectory> dir(new TransactionalDirectory(
             *mDirectory, fp.getParentDir().toRelative(getPath())));
-        Board* board = new Board(*this, std::move(dir), fileFormat);
+        Board* board = new Board(*this, std::move(dir),
+                                 fp.getParentDir().getFilename(), fileFormat);
         addBoard(*board);
       }
       qDebug() << "Successfully loaded" << mBoards.count() << "boards.";
@@ -318,23 +320,6 @@ Schematic* Project::getSchematicByName(const QString& name) const noexcept {
   return nullptr;
 }
 
-Schematic* Project::createSchematic(const ElementName& name) {
-  QString dirname = FilePath::cleanFileName(
-      *name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-  if (dirname.isEmpty()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Invalid schematic name: \"%1\"").arg(*name));
-  }
-  std::unique_ptr<TransactionalDirectory> dir(
-      new TransactionalDirectory(*mDirectory, "schematics/" % dirname));
-  if (dir->fileExists("schematic.lp")) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("The schematic exists already: \"%1\"")
-                           .arg(dir->getAbsPath().toNative()));
-  }
-  return Schematic::create(*this, std::move(dir), name);
-}
-
 void Project::addSchematic(Schematic& schematic, int newIndex) {
   if ((mSchematics.contains(&schematic)) || (&schematic.getProject() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -349,6 +334,14 @@ void Project::addSchematic(Schematic& schematic, int newIndex) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("There is already a schematic with the name \"%1\"!")
                            .arg(*schematic.getName()));
+  }
+  foreach (const Schematic* s, mSchematics) {
+    if (s->getDirectoryName() == schematic.getDirectoryName()) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          tr("There is already a schematic with the directory name \"%1\"!")
+              .arg(schematic.getDirectoryName()));
+    }
   }
 
   if ((newIndex < 0) || (newIndex > mSchematics.count())) {
@@ -415,23 +408,6 @@ Board* Project::getBoardByName(const QString& name) const noexcept {
   return nullptr;
 }
 
-Board* Project::createBoard(const ElementName& name) {
-  QString dirname = FilePath::cleanFileName(
-      *name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-  if (dirname.isEmpty()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Invalid board name: \"%1\"").arg(*name));
-  }
-  std::unique_ptr<TransactionalDirectory> dir(
-      new TransactionalDirectory(*mDirectory, "boards/" % dirname));
-  if (dir->fileExists("board.lp")) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("The board exists already: \"%1\"")
-                           .arg(dir->getAbsPath().toNative()));
-  }
-  return Board::create(*this, std::move(dir), name);
-}
-
 void Project::addBoard(Board& board, int newIndex) {
   if ((mBoards.contains(&board)) || (&board.getProject() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -445,6 +421,14 @@ void Project::addBoard(Board& board, int newIndex) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("There is already a board with the name \"%1\"!")
                            .arg(*board.getName()));
+  }
+  foreach (const Board* b, mBoards) {
+    if (b->getDirectoryName() == board.getDirectoryName()) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          tr("There is already a board with the directory name \"%1\"!")
+              .arg(board.getDirectoryName()));
+    }
   }
 
   if ((newIndex < 0) || (newIndex > mBoards.count())) {
@@ -533,8 +517,9 @@ void Project::save() {
   SExpression schRoot = SExpression::createList("librepcb_schematics");
   foreach (Schematic* schematic, mSchematics) {
     schRoot.ensureLineBreak();
-    schRoot.appendChild("schematic",
-                        schematic->getFilePath().toRelative(getPath()));
+    schRoot.appendChild(
+        "schematic",
+        "schematics/" + schematic->getDirectoryName() + "/schematic.lp");
   }
   schRoot.ensureLineBreak();
   mDirectory->write("schematics/schematics.lp",
@@ -544,25 +529,18 @@ void Project::save() {
   SExpression brdRoot = SExpression::createList("librepcb_boards");
   foreach (Board* board, mBoards) {
     brdRoot.ensureLineBreak();
-    brdRoot.appendChild("board", board->getFilePath().toRelative(getPath()));
+    brdRoot.appendChild("board",
+                        "boards/" + board->getDirectoryName() + "/board.lp");
   }
   brdRoot.ensureLineBreak();
   mDirectory->write("boards/boards.lp", brdRoot.toByteArray());  // can throw
 
-  // Save all removed schematics (*.lp files)
-  foreach (Schematic* schematic, mRemovedSchematics) {
-    schematic->save();  // can throw
-  }
-  // Save all added schematics (*.lp files)
+  // Save all schematics (*.lp files)
   foreach (Schematic* schematic, mSchematics) {
     schematic->save();  // can throw
   }
 
-  // Save all removed boards (*.lp files)
-  foreach (Board* board, mRemovedBoards) {
-    board->save();  // can throw
-  }
-  // Save all added boards (*.lp files)
+  // Save all boards (*.lp files)
   foreach (Board* board, mBoards) {
     board->save();  // can throw
   }

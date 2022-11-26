@@ -53,15 +53,20 @@ namespace librepcb {
 
 Schematic::Schematic(Project& project,
                      std::unique_ptr<TransactionalDirectory> directory,
-                     const Version& fileFormat, bool create,
-                     const QString& newName)
+                     const QString& directoryName, const Version& fileFormat,
+                     bool create, const QString& newName)
   : QObject(&project),
     AttributeProvider(),
     mProject(project),
+    mDirectoryName(directoryName),
     mDirectory(std::move(directory)),
     mIsAddedToProject(false),
     mUuid(Uuid::createRandom()),
     mName("New Page") {
+  if (mDirectoryName.isEmpty()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+
   try {
     mGraphicsScene.reset(new GraphicsScene());
 
@@ -73,8 +78,9 @@ Schematic::Schematic(Project& project,
       // load default grid properties
       mGridProperties.reset(new GridProperties());
     } else {
-      SExpression root = SExpression::parse(
-          mDirectory->read(getFilePath().getFilename()), getFilePath());
+      const QString fp = "schematic.lp";
+      const SExpression root =
+          SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
 
       // the schematic seems to be ready to open, so we will create all needed
       // objects
@@ -180,10 +186,6 @@ Schematic::~Schematic() noexcept {
 /*******************************************************************************
  *  Getters: General
  ******************************************************************************/
-
-FilePath Schematic::getFilePath() const noexcept {
-  return mDirectory->getAbsPath("schematic.lp");
-}
 
 bool Schematic::isEmpty() const noexcept {
   return (mSymbols.isEmpty() && mNetSegments.isEmpty() && mPolygons.isEmpty() &&
@@ -380,6 +382,13 @@ void Schematic::addToProject() {
     sgl.add([text]() { text->removeFromSchematic(); });
   }
 
+  // Move directory atomically (last step which could throw an exception).
+  if (mDirectory->getFileSystem() != mProject.getDirectory().getFileSystem()) {
+    TransactionalDirectory dst(mProject.getDirectory(),
+                               "schematics/" % mDirectoryName);
+    mDirectory->moveTo(dst);  // can throw
+  }
+
   mIsAddedToProject = true;
   updateIcon();
   sgl.dismiss();
@@ -409,19 +418,18 @@ void Schematic::removeFromProject() {
     sgl.add([symbol]() { symbol->addToSchematic(); });
   }
 
+  // Move directory atomically (last step which could throw an exception).
+  TransactionalDirectory tmp;
+  mDirectory->moveTo(tmp);  // can throw
+
   mIsAddedToProject = false;
   sgl.dismiss();
 }
 
 void Schematic::save() {
-  if (mIsAddedToProject) {
-    // save schematic file
-    SExpression doc(serializeToDomElement("librepcb_schematic"));  // can throw
-    mDirectory->write(getFilePath().getFilename(),
-                      doc.toByteArray());  // can throw
-  } else {
-    mDirectory->removeDirRecursively();  // can throw
-  }
+  SExpression root(serializeToDomElement("librepcb_schematic"));  // can throw
+  mDirectory->write("schematic.lp",
+                    root.toByteArray());  // can throw
 }
 
 void Schematic::selectAll() noexcept {
@@ -527,8 +535,9 @@ void Schematic::serialize(SExpression& root) const {
 
 Schematic* Schematic::create(Project& project,
                              std::unique_ptr<TransactionalDirectory> directory,
+                             const QString& directoryName,
                              const ElementName& name) {
-  return new Schematic(project, std::move(directory),
+  return new Schematic(project, std::move(directory), directoryName,
                        qApp->getFileFormatVersion(), true, *name);
 }
 

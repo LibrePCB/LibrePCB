@@ -93,23 +93,26 @@ QString NewProjectWizardPage_Initialization::getBoardName() const noexcept {
 
 void NewProjectWizardPage_Initialization::schematicNameChanged(
     const QString& name) noexcept {
-  QString dir = FilePath::cleanFileName(
+  mSchematicDirName = FilePath::cleanFileName(
       name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-  if (!dir.isEmpty()) {
-    dir = "schematics/" % dir % "/";
+  if (mSchematicDirName.isEmpty()) {
+    mUi->lblSchematicDirectory->setText(tr("Invalid name!"));
+  } else {
+    mUi->lblSchematicDirectory->setText("schematics/" % mSchematicDirName %
+                                        "/");
   }
-  mUi->lblSchematicDirectory->setText(dir);
   emit completeChanged();
 }
 
 void NewProjectWizardPage_Initialization::boardNameChanged(
     const QString& name) noexcept {
-  QString dir = FilePath::cleanFileName(
+  mBoardDirName = FilePath::cleanFileName(
       name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-  if (!dir.isEmpty()) {
-    dir = "boards/" % dir % "/";
+  if (mBoardDirName.isEmpty()) {
+    mUi->lblBoardDirectory->setText(tr("Invalid name!"));
+  } else {
+    mUi->lblBoardDirectory->setText("boards/" % mBoardDirName % "/");
   }
-  mUi->lblBoardDirectory->setText(dir);
   emit completeChanged();
 }
 
@@ -122,14 +125,12 @@ bool NewProjectWizardPage_Initialization::isComplete() const noexcept {
   if (!QWizardPage::isComplete()) return false;
 
   // check schematic filename
-  if (mUi->cbxAddSchematic->isChecked() &&
-      mUi->lblSchematicDirectory->text().isEmpty()) {
+  if (mUi->cbxAddSchematic->isChecked() && mSchematicDirName.isEmpty()) {
     return false;
   }
 
   // check board filename
-  if (mUi->cbxAddBoard->isChecked() &&
-      mUi->lblBoardDirectory->text().isEmpty()) {
+  if (mUi->cbxAddBoard->isChecked() && mBoardDirName.isEmpty()) {
     return false;
   }
 

@@ -113,13 +113,15 @@ public:
   Schematic() = delete;
   Schematic(const Schematic& other) = delete;
   Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-            const Version& fileFormat)
-    : Schematic(project, std::move(directory), fileFormat, false, QString()) {}
+            const QString& directoryName, const Version& fileFormat)
+    : Schematic(project, std::move(directory), directoryName, fileFormat, false,
+                QString()) {}
   ~Schematic() noexcept;
 
   // Getters: General
   Project& getProject() const noexcept { return mProject; }
-  FilePath getFilePath() const noexcept;
+  const QString& getDirectoryName() const noexcept { return mDirectoryName; }
+  TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
   const GridProperties& getGridProperties() const noexcept {
     return *mGridProperties;
   }
@@ -190,6 +192,7 @@ public:
   // Static Methods
   static Schematic* create(Project& project,
                            std::unique_ptr<TransactionalDirectory> directory,
+                           const QString& directoryName,
                            const ElementName& name);
 
 signals:
@@ -201,7 +204,8 @@ signals:
 
 private:
   Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-            const Version& fileFormat, bool create, const QString& newName);
+            const QString& directoryName, const Version& fileFormat,
+            bool create, const QString& newName);
   void updateIcon() noexcept;
 
   /// @copydoc ::librepcb::SerializableObject::serialize()
@@ -209,6 +213,7 @@ private:
 
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
+  const QString mDirectoryName;
   std::unique_ptr<TransactionalDirectory> mDirectory;
   bool mIsAddedToProject;
 

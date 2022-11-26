@@ -73,13 +73,19 @@ namespace librepcb {
 
 Board::Board(Project& project,
              std::unique_ptr<TransactionalDirectory> directory,
-             const Version& fileFormat, bool create, const QString& newName)
+             const QString& directoryName, const Version& fileFormat,
+             bool create, const QString& newName)
   : QObject(&project),
     mProject(project),
+    mDirectoryName(directoryName),
     mDirectory(std::move(directory)),
     mIsAddedToProject(false),
     mUuid(Uuid::createRandom()),
     mName("New Board") {
+  if (mDirectoryName.isEmpty()) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+
   try {
     mGraphicsScene.reset(new GraphicsScene());
 
@@ -104,8 +110,9 @@ Board::Board(Project& project,
       // load default fabrication output settings
       mFabricationOutputSettings.reset(new BoardFabricationOutputSettings());
     } else {
-      SExpression root = SExpression::parse(
-          mDirectory->read(getFilePath().getFilename()), getFilePath());
+      const QString fp = "board.lp";
+      const SExpression root =
+          SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
 
       // the board seems to be ready to open, so we will create all needed
       // objects
@@ -288,14 +295,6 @@ Board::~Board() noexcept {
 /*******************************************************************************
  *  Getters: General
  ******************************************************************************/
-
-FilePath Board::getFilePath() const noexcept {
-  return mDirectory->getAbsPath("board.lp");
-}
-
-QString Board::getRelativePath() const noexcept {
-  return getFilePath().toRelative(mProject.getPath());
-}
 
 bool Board::isEmpty() const noexcept {
   return (mDeviceInstances.isEmpty() && mNetSegments.isEmpty() &&
@@ -724,6 +723,7 @@ void Board::addToProject() {
   if (mIsAddedToProject) {
     throw LogicError(__FILE__, __LINE__);
   }
+
   QList<BI_Base*> items = getAllItems();
   ScopeGuardList sgl(items.count());
   for (int i = 0; i < items.count(); ++i) {
@@ -731,6 +731,14 @@ void Board::addToProject() {
     item->addToBoard();  // can throw
     sgl.add([item]() { item->removeFromBoard(); });
   }
+
+  // Move directory atomically (last step which could throw an exception).
+  if (mDirectory->getFileSystem() != mProject.getDirectory().getFileSystem()) {
+    TransactionalDirectory dst(mProject.getDirectory(),
+                               "boards/" % mDirectoryName);
+    mDirectory->moveTo(dst);  // can throw
+  }
+
   mIsAddedToProject = true;
   forceAirWiresRebuild();
   updateErcMessages();
@@ -741,6 +749,7 @@ void Board::removeFromProject() {
   if (!mIsAddedToProject) {
     throw LogicError(__FILE__, __LINE__);
   }
+
   QList<BI_Base*> items = getAllItems();
   ScopeGuardList sgl(items.count());
   for (int i = items.count() - 1; i >= 0; --i) {
@@ -748,45 +757,45 @@ void Board::removeFromProject() {
     item->removeFromBoard();  // can throw
     sgl.add([item]() { item->addToBoard(); });
   }
+
+  // Move directory atomically (last step which could throw an exception).
+  TransactionalDirectory tmp;
+  mDirectory->moveTo(tmp);  // can throw
+
   mIsAddedToProject = false;
   updateErcMessages();
   sgl.dismiss();
 }
 
 void Board::save() {
-  if (mIsAddedToProject) {
-    // save board file
-    {
-      SExpression root(serializeToDomElement("librepcb_board"));  // can throw
-      mDirectory->write(getFilePath().getFilename(),
-                        root.toByteArray());  // can throw
-    }
+  // save board file
+  {
+    SExpression root(serializeToDomElement("librepcb_board"));  // can throw
+    mDirectory->write("board.lp",
+                      root.toByteArray());  // can throw
+  }
 
-    // save user settings
-    {
-      SExpression root =
-          SExpression::createList("librepcb_board_user_settings");
-      for (const GraphicsLayer* layer : mLayerStack->getAllLayers()) {
-        root.ensureLineBreak();
-        SExpression& child = root.appendList("layer");
-        child.appendChild(SExpression::createToken(layer->getName()));
-        child.appendChild("color", layer->getColor(false));
-        child.appendChild("color_hl", layer->getColor(true));
-        child.appendChild("visible", layer->getVisible());
-      }
+  // save user settings
+  {
+    SExpression root = SExpression::createList("librepcb_board_user_settings");
+    for (const GraphicsLayer* layer : mLayerStack->getAllLayers()) {
       root.ensureLineBreak();
-      foreach (BI_Plane* plane, mPlanes) {
-        root.ensureLineBreak();
-        SExpression node = SExpression::createList("plane");
-        node.appendChild(plane->getUuid());
-        node.appendChild("visible", plane->isVisible());
-        root.appendChild(node);
-      }
-      root.ensureLineBreak();
-      mDirectory->write("settings.user.lp", root.toByteArray());  // can throw
+      SExpression& child = root.appendList("layer");
+      child.appendChild(SExpression::createToken(layer->getName()));
+      child.appendChild("color", layer->getColor(false));
+      child.appendChild("color_hl", layer->getColor(true));
+      child.appendChild("visible", layer->getVisible());
     }
-  } else {
-    mDirectory->removeDirRecursively();  // can throw
+    root.ensureLineBreak();
+    foreach (BI_Plane* plane, mPlanes) {
+      root.ensureLineBreak();
+      SExpression node = SExpression::createList("plane");
+      node.appendChild(plane->getUuid());
+      node.appendChild("visible", plane->isVisible());
+      root.appendChild(node);
+    }
+    root.ensureLineBreak();
+    mDirectory->write("settings.user.lp", root.toByteArray());  // can throw
   }
 }
 
@@ -969,9 +978,9 @@ void Board::updateErcMessages() noexcept {
 
 Board* Board::create(Project& project,
                      std::unique_ptr<TransactionalDirectory> directory,
-                     const ElementName& name) {
-  return new Board(project, std::move(directory), qApp->getFileFormatVersion(),
-                   true, *name);
+                     const QString& directoryName, const ElementName& name) {
+  return new Board(project, std::move(directory), directoryName,
+                   qApp->getFileFormatVersion(), true, *name);
 }
 
 /*******************************************************************************

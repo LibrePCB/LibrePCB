@@ -316,17 +316,6 @@ public:
   Schematic* getSchematicByName(const QString& name) const noexcept;
 
   /**
-   * @brief Create a new schematic (page)
-   *
-   * @param name  The schematic page name
-   *
-   * @return A pointer to the new schematic
-   *
-   * @throw Exception This method throws an exception on error.
-   */
-  Schematic* createSchematic(const ElementName& name);
-
-  /**
    * @brief Add an existing schematic to this project
    *
    * @param schematic     The schematic to add
@@ -392,17 +381,6 @@ public:
    * @return A pointer to the specified board, or nullptr if name is invalid
    */
   Board* getBoardByName(const QString& name) const noexcept;
-
-  /**
-   * @brief Create a new board
-   *
-   * @param name  The board name
-   *
-   * @return A pointer to the new board
-   *
-   * @throw Exception This method throws an exception on error.
-   */
-  Board* createBoard(const ElementName& name);
 
   /**
    * @brief Add an existing board to this project

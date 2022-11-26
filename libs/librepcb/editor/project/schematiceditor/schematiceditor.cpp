@@ -343,9 +343,8 @@ void SchematicEditor::createActions() noexcept {
                               mProject, board, this);
     dialog.exec();
   }));
-  mActionOrderPcb.reset(cmd.orderPcb.createAction(this, this, [this]() {
-    mProjectEditor.execOrderPcbDialog(nullptr, this);
-  }));
+  mActionOrderPcb.reset(cmd.orderPcb.createAction(
+      this, this, [this]() { mProjectEditor.execOrderPcbDialog(this); }));
   mActionNewSheet.reset(
       cmd.sheetNew.createAction(this, this, &SchematicEditor::addSchematic));
   mActionRenameSheet.reset(cmd.sheetRename.createAction(
@@ -924,9 +923,16 @@ void SchematicEditor::addSchematic() noexcept {
   if (!ok) return;
 
   try {
+    const QString dirName = FilePath::cleanFileName(
+        name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
+    if (dirName.isEmpty()) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         tr("Invalid name: '%1'").arg(name));
+    }
+
     abortBlockingToolsInOtherEditors();  // Release undo stack.
     CmdSchematicAdd* cmd =
-        new CmdSchematicAdd(mProject, ElementName(name));  // can throw
+        new CmdSchematicAdd(mProject, dirName, ElementName(name));  // can throw
     mProjectEditor.getUndoStack().execCmd(cmd);
     setActiveSchematicIndex(mProject.getSchematics().count() - 1);
   } catch (Exception& e) {
