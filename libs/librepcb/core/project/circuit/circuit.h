@@ -80,7 +80,6 @@ public:
   const QMap<Uuid, NetClass*>& getNetClasses() const noexcept {
     return mNetClasses;
   }
-  NetClass* getNetClassByUuid(const Uuid& uuid) const noexcept;
   NetClass* getNetClassByName(const ElementName& name) const noexcept;
   void addNetClass(NetClass& netclass);
   void removeNetClass(NetClass& netclass);
@@ -91,7 +90,6 @@ public:
   const QMap<Uuid, NetSignal*>& getNetSignals() const noexcept {
     return mNetSignals;
   }
-  NetSignal* getNetSignalByUuid(const Uuid& uuid) const noexcept;
   NetSignal* getNetSignalByName(const QString& name) const noexcept;
   NetSignal* getNetSignalWithMostElements() const noexcept;
   void addNetSignal(NetSignal& netsignal);

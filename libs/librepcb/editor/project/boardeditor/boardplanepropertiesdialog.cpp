@@ -142,7 +142,7 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
     Uuid netSignalUuid = Uuid::fromString(
         mUi->cbxNetSignal->currentData().toString());  // can throw
     NetSignal* netsignal =
-        mPlane.getCircuit().getNetSignalByUuid(netSignalUuid);
+        mPlane.getCircuit().getNetSignals().value(netSignalUuid);
     if (netsignal) {
       cmd->setNetSignal(*netsignal);
     } else {

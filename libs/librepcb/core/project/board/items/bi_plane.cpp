@@ -62,7 +62,7 @@ BI_Plane::BI_Plane(Board& board, const SExpression& node,
     mIsVisible(true) {
   Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"), fileFormat);
   mNetSignal =
-      mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
+      mBoard.getProject().getCircuit().getNetSignals().value(netSignalUuid);
   if (!mNetSignal) {
     throw RuntimeError(
         __FILE__, __LINE__,

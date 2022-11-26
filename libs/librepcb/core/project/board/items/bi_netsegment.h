@@ -97,19 +97,14 @@ public:
   // Setters
   void setNetSignal(NetSignal* netsignal);
 
-  // Via Methods
-  const QList<BI_Via*>& getVias() const noexcept { return mVias; }
-  BI_Via* getViaByUuid(const Uuid& uuid) const noexcept;
-
-  // NetPoint Methods
-  const QList<BI_NetPoint*>& getNetPoints() const noexcept {
+  // Element Getters
+  const QMap<Uuid, BI_Via*>& getVias() const noexcept { return mVias; }
+  const QMap<Uuid, BI_NetPoint*>& getNetPoints() const noexcept {
     return mNetPoints;
   }
-  BI_NetPoint* getNetPointByUuid(const Uuid& uuid) const noexcept;
-
-  // NetLine Methods
-  const QList<BI_NetLine*>& getNetLines() const noexcept { return mNetLines; }
-  BI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, BI_NetLine*>& getNetLines() const noexcept {
+    return mNetLines;
+  }
 
   // NetPoint+NetLine Methods
   void addElements(const QList<BI_Via*>& vias,
@@ -161,9 +156,9 @@ private:
   NetSignal* mNetSignal;
 
   // Items
-  QList<BI_Via*> mVias;
-  QList<BI_NetPoint*> mNetPoints;
-  QList<BI_NetLine*> mNetLines;
+  QMap<Uuid, BI_Via*> mVias;
+  QMap<Uuid, BI_NetPoint*> mNetPoints;
+  QMap<Uuid, BI_NetLine*> mNetLines;
 };
 
 /*******************************************************************************

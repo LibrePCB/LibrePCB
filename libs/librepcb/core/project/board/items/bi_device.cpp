@@ -293,26 +293,31 @@ StrokeTextList BI_Device::getDefaultStrokeTexts() const noexcept {
 }
 
 void BI_Device::addStrokeText(BI_StrokeText& text) {
-  if ((mStrokeTexts.contains(&text)) || (&text.getBoard() != &mBoard)) {
+  if ((mStrokeTexts.values().contains(&text)) ||
+      (&text.getBoard() != &mBoard)) {
     throw LogicError(__FILE__, __LINE__);
   }
-
+  if (mStrokeTexts.contains(text.getUuid())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("There is already a stroke text with the UUID \"%1\"!")
+            .arg(text.getUuid().toStr()));
+  }
   text.setDevice(this);
-
   if (isAddedToBoard()) {
     text.addToBoard();  // can throw
   }
-  mStrokeTexts.append(&text);
+  mStrokeTexts.insert(text.getUuid(), &text);
 }
 
 void BI_Device::removeStrokeText(BI_StrokeText& text) {
-  if (!mStrokeTexts.contains(&text)) {
+  if (mStrokeTexts.value(text.getUuid()) != &text) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (isAddedToBoard()) {
     text.removeFromBoard();  // can throw
   }
-  mStrokeTexts.removeOne(&text);
+  mStrokeTexts.remove(text.getUuid());
 }
 
 /*******************************************************************************
@@ -421,7 +426,7 @@ void BI_Device::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mAttributes.serialize(root);
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mStrokeTexts, "stroke_text");
+  serializePointerContainer(root, mStrokeTexts, "stroke_text");
   root.ensureLineBreak();
 }
 

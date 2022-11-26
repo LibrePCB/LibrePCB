@@ -168,34 +168,34 @@ public:
   void removeDeviceInstance(BI_Device& instance);
 
   // NetSegment Methods
-  const QList<BI_NetSegment*>& getNetSegments() const noexcept {
+  const QMap<Uuid, BI_NetSegment*>& getNetSegments() const noexcept {
     return mNetSegments;
   }
-  BI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
   void addNetSegment(BI_NetSegment& netsegment);
   void removeNetSegment(BI_NetSegment& netsegment);
 
   // Plane Methods
-  const QList<BI_Plane*>& getPlanes() const noexcept { return mPlanes; }
-  BI_Plane* getPlaneByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, BI_Plane*>& getPlanes() const noexcept { return mPlanes; }
   void addPlane(BI_Plane& plane);
   void removePlane(BI_Plane& plane);
   void rebuildAllPlanes() noexcept;
 
   // Polygon Methods
-  const QList<BI_Polygon*>& getPolygons() const noexcept { return mPolygons; }
+  const QMap<Uuid, BI_Polygon*>& getPolygons() const noexcept {
+    return mPolygons;
+  }
   void addPolygon(BI_Polygon& polygon);
   void removePolygon(BI_Polygon& polygon);
 
   // StrokeText Methods
-  const QList<BI_StrokeText*>& getStrokeTexts() const noexcept {
+  const QMap<Uuid, BI_StrokeText*>& getStrokeTexts() const noexcept {
     return mStrokeTexts;
   }
   void addStrokeText(BI_StrokeText& text);
   void removeStrokeText(BI_StrokeText& text);
 
   // Hole Methods
-  const QList<BI_Hole*>& getHoles() const noexcept { return mHoles; }
+  const QMap<Uuid, BI_Hole*>& getHoles() const noexcept { return mHoles; }
   void addHole(BI_Hole& hole);
   void removeHole(BI_Hole& hole);
 
@@ -278,11 +278,11 @@ private:
 
   // items
   QMap<Uuid, BI_Device*> mDeviceInstances;
-  QList<BI_NetSegment*> mNetSegments;
-  QList<BI_Plane*> mPlanes;
-  QList<BI_Polygon*> mPolygons;
-  QList<BI_StrokeText*> mStrokeTexts;
-  QList<BI_Hole*> mHoles;
+  QMap<Uuid, BI_NetSegment*> mNetSegments;
+  QMap<Uuid, BI_Plane*> mPlanes;
+  QMap<Uuid, BI_Polygon*> mPolygons;
+  QMap<Uuid, BI_StrokeText*> mStrokeTexts;
+  QMap<Uuid, BI_Hole*> mHoles;
   QMultiHash<NetSignal*, BI_AirWire*> mAirWires;
 
   // ERC messages

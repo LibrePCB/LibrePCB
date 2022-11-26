@@ -121,7 +121,7 @@ public:
 
   // StrokeText Methods
   StrokeTextList getDefaultStrokeTexts() const noexcept;
-  const QList<BI_StrokeText*>& getStrokeTexts() const noexcept {
+  const QMap<Uuid, BI_StrokeText*>& getStrokeTexts() const noexcept {
     return mStrokeTexts;
   }
   void addStrokeText(BI_StrokeText& text);
@@ -178,7 +178,7 @@ private:
       mAttributes;  ///< not yet used, but already specified in file format
 
   QMap<Uuid, BI_FootprintPad*> mPads;  ///< key: footprint pad UUID
-  QList<BI_StrokeText*> mStrokeTexts;
+  QMap<Uuid, BI_StrokeText*> mStrokeTexts;
 
   QScopedPointer<BGI_Device> mGraphicsItem;
 };

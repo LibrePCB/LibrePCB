@@ -238,9 +238,9 @@ void BI_NetLine::serialize(SExpression& root) const {
 
 BI_NetLineAnchor* BI_NetLine::getAnchor(const TraceAnchor& anchor) {
   if (const tl::optional<Uuid>& uuid = anchor.tryGetJunction()) {
-    return mNetSegment.getNetPointByUuid(*uuid);
+    return mNetSegment.getNetPoints().value(*uuid);
   } else if (const tl::optional<Uuid>& uuid = anchor.tryGetVia()) {
-    return mNetSegment.getViaByUuid(*uuid);
+    return mNetSegment.getVias().value(*uuid);
   } else if (const tl::optional<TraceAnchor::PadAnchor>& pad =
                  anchor.tryGetPad()) {
     BI_Device* device = mBoard.getDeviceInstanceByComponentUuid(pad->device);

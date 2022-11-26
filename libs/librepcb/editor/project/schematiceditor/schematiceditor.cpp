@@ -977,7 +977,7 @@ QList<SI_Symbol*> SchematicEditor::getSearchCandidates() noexcept {
   QList<SI_Symbol*> candidates;
   foreach (const Schematic* schematic, mProject.getSchematics()) {
     Q_ASSERT(schematic);
-    candidates += schematic->getSymbols();
+    candidates += schematic->getSymbols().values();
   }
   return candidates;
 }

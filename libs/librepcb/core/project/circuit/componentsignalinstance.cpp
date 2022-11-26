@@ -65,7 +65,7 @@ ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit,
   tl::optional<Uuid> netsignalUuid =
       deserialize<tl::optional<Uuid>>(node.getChild("net/@0"), fileFormat);
   if (netsignalUuid) {
-    mNetSignal = mCircuit.getNetSignalByUuid(*netsignalUuid);
+    mNetSignal = mCircuit.getNetSignals().value(*netsignalUuid);
     if (!mNetSignal) {
       throw RuntimeError(__FILE__, __LINE__,
                          QString("Invalid netsignal UUID: \"%1\"")

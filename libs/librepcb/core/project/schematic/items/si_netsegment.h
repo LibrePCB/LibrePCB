@@ -75,15 +75,13 @@ public:
   // Setters
   void setNetSignal(NetSignal& netsignal);
 
-  // NetPoint Methods
-  const QList<SI_NetPoint*>& getNetPoints() const noexcept {
+  // Element Getters
+  const QMap<Uuid, SI_NetPoint*>& getNetPoints() const noexcept {
     return mNetPoints;
   }
-  SI_NetPoint* getNetPointByUuid(const Uuid& uuid) const noexcept;
-
-  // NetLine Methods
-  const QList<SI_NetLine*>& getNetLines() const noexcept { return mNetLines; }
-  SI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, SI_NetLine*>& getNetLines() const noexcept {
+    return mNetLines;
+  }
 
   // NetPoint+NetLine Methods
   void addNetPointsAndNetLines(const QList<SI_NetPoint*>& netpoints,
@@ -92,10 +90,9 @@ public:
                                   const QList<SI_NetLine*>& netlines);
 
   // NetLabel Methods
-  const QList<SI_NetLabel*>& getNetLabels() const noexcept {
+  const QMap<Uuid, SI_NetLabel*>& getNetLabels() const noexcept {
     return mNetLabels;
   }
-  SI_NetLabel* getNetLabelByUuid(const Uuid& uuid) const noexcept;
   void addNetLabel(SI_NetLabel& netlabel);
   void removeNetLabel(SI_NetLabel& netlabel);
   void updateAllNetLabelAnchors() noexcept;
@@ -136,9 +133,9 @@ private:
   NetSignal* mNetSignal;
 
   // Items
-  QList<SI_NetPoint*> mNetPoints;
-  QList<SI_NetLine*> mNetLines;
-  QList<SI_NetLabel*> mNetLabels;
+  QMap<Uuid, SI_NetPoint*> mNetPoints;
+  QMap<Uuid, SI_NetLine*> mNetLines;
+  QMap<Uuid, SI_NetLabel*> mNetLabels;
 };
 
 /*******************************************************************************

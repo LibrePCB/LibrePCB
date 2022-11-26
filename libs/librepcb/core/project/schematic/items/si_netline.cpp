@@ -156,10 +156,10 @@ void SI_NetLine::serialize(SExpression& root) const {
 
 SI_NetLineAnchor* SI_NetLine::getAnchor(const NetLineAnchor& anchor) {
   if (const tl::optional<Uuid>& uuid = anchor.tryGetJunction()) {
-    return mNetSegment.getNetPointByUuid(*uuid);
+    return mNetSegment.getNetPoints().value(*uuid);
   } else if (const tl::optional<NetLineAnchor::PinAnchor>& pin =
                  anchor.tryGetPin()) {
-    SI_Symbol* symbol = mSchematic.getSymbolByUuid(pin->symbol);
+    SI_Symbol* symbol = mSchematic.getSymbols().value(pin->symbol);
     return symbol ? symbol->getPin(pin->pin) : nullptr;
   } else {
     return nullptr;

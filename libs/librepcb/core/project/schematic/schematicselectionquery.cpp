@@ -44,8 +44,9 @@ namespace librepcb {
  ******************************************************************************/
 
 SchematicSelectionQuery::SchematicSelectionQuery(
-    const QList<SI_Symbol*>& symbols, const QList<SI_NetSegment*>& netsegments,
-    const QList<SI_Polygon*>& polygons, const QList<SI_Text*>& texts,
+    const QMap<Uuid, SI_Symbol*>& symbols,
+    const QMap<Uuid, SI_NetSegment*>& netsegments,
+    const QMap<Uuid, SI_Polygon*>& polygons, const QMap<Uuid, SI_Text*>& texts,
     QObject* parent)
   : QObject(parent),
     mSymbols(symbols),

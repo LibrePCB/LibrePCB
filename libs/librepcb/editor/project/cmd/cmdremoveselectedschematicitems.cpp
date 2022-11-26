@@ -221,7 +221,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
         start = junctionMap[*anchor];
       } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
                      netline.getStartPoint().tryGetPin()) {
-        SI_Symbol* symbol = mSchematic.getSymbolByUuid(anchor->symbol);
+        SI_Symbol* symbol = mSchematic.getSymbols().value(anchor->symbol);
         start = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
       SI_NetLineAnchor* end = nullptr;
@@ -229,7 +229,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
         end = junctionMap[*anchor];
       } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
                      netline.getEndPoint().tryGetPin()) {
-        SI_Symbol* symbol = mSchematic.getSymbolByUuid(anchor->symbol);
+        SI_Symbol* symbol = mSchematic.getSymbols().value(anchor->symbol);
         end = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
       if ((!start) || (!end)) {

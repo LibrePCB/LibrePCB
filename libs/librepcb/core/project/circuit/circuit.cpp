@@ -134,10 +134,6 @@ Circuit::~Circuit() noexcept {
  *  NetClass Methods
  ******************************************************************************/
 
-NetClass* Circuit::getNetClassByUuid(const Uuid& uuid) const noexcept {
-  return mNetClasses.value(uuid, nullptr);
-}
-
 NetClass* Circuit::getNetClassByName(const ElementName& name) const noexcept {
   foreach (NetClass* netclass, mNetClasses) {
     if (netclass->getName() == name) {
@@ -148,34 +144,30 @@ NetClass* Circuit::getNetClassByName(const ElementName& name) const noexcept {
 }
 
 void Circuit::addNetClass(NetClass& netclass) {
-  if (&netclass.getCircuit() != this) {
+  if ((mNetClasses.values().contains(&netclass)) ||
+      (&netclass.getCircuit() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no netclass with the same uuid in the list
-  if (getNetClassByUuid(netclass.getUuid())) {
+  if (mNetClasses.contains(netclass.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a net class with the UUID \"%1\"!")
             .arg(netclass.getUuid().toStr()));
   }
-  // check if there is no netclass with the same name in the list
   if (getNetClassByName(netclass.getName())) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("There is already a net class with the name \"%1\"!")
                            .arg(*netclass.getName()));
   }
-  // add netclass to circuit
   netclass.addToCircuit();  // can throw
   mNetClasses.insert(netclass.getUuid(), &netclass);
   emit netClassAdded(netclass);
 }
 
 void Circuit::removeNetClass(NetClass& netclass) {
-  // check if the netclass was added to the circuit
   if (mNetClasses.value(netclass.getUuid()) != &netclass) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // remove netclass from project
   netclass.removeFromCircuit();  // can throw
   mNetClasses.remove(netclass.getUuid());
   emit netClassRemoved(netclass);
@@ -209,10 +201,6 @@ QString Circuit::generateAutoNetSignalName() const noexcept {
   return name;
 }
 
-NetSignal* Circuit::getNetSignalByUuid(const Uuid& uuid) const noexcept {
-  return mNetSignals.value(uuid, nullptr);
-}
-
 NetSignal* Circuit::getNetSignalByName(const QString& name) const noexcept {
   foreach (NetSignal* netsignal, mNetSignals) {
     if (netsignal->getName() == name) {
@@ -235,34 +223,30 @@ NetSignal* Circuit::getNetSignalWithMostElements() const noexcept {
 }
 
 void Circuit::addNetSignal(NetSignal& netsignal) {
-  if (&netsignal.getCircuit() != this) {
+  if ((mNetSignals.values().contains(&netsignal)) ||
+      (&netsignal.getCircuit() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no netsignal with the same uuid in the list
-  if (getNetSignalByUuid(netsignal.getUuid())) {
+  if (mNetSignals.contains(netsignal.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a net signal with the UUID \"%1\"!")
             .arg(netsignal.getUuid().toStr()));
   }
-  // check if there is no netsignal with the same name in the list
   if (getNetSignalByName(*netsignal.getName())) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("There is already a net signal with the name \"%1\"!")
                            .arg(*netsignal.getName()));
   }
-  // add netsignal to circuit
   netsignal.addToCircuit();  // can throw
   mNetSignals.insert(netsignal.getUuid(), &netsignal);
   emit netSignalAdded(netsignal);
 }
 
 void Circuit::removeNetSignal(NetSignal& netsignal) {
-  // check if the netsignal was added to the circuit
   if (mNetSignals.value(netsignal.getUuid()) != &netsignal) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // remove netsignal from circuit
   netsignal.removeFromCircuit();  // can throw
   mNetSignals.remove(netsignal.getUuid());
   emit netSignalRemoved(netsignal);

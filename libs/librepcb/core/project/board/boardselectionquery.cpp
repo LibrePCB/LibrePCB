@@ -47,10 +47,11 @@ namespace librepcb {
 
 BoardSelectionQuery::BoardSelectionQuery(
     const QMap<Uuid, BI_Device*>& deviceInstances,
-    const QList<BI_NetSegment*>& netsegments, const QList<BI_Plane*>& planes,
-    const QList<BI_Polygon*>& polygons,
-    const QList<BI_StrokeText*>& strokeTexts, const QList<BI_Hole*>& holes,
-    QObject* parent)
+    const QMap<Uuid, BI_NetSegment*>& netsegments,
+    const QMap<Uuid, BI_Plane*>& planes,
+    const QMap<Uuid, BI_Polygon*>& polygons,
+    const QMap<Uuid, BI_StrokeText*>& strokeTexts,
+    const QMap<Uuid, BI_Hole*>& holes, QObject* parent)
   : QObject(parent),
     mDevices(deviceInstances),
     mNetSegments(netsegments),

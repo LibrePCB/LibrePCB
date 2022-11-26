@@ -208,7 +208,7 @@ bool CmdPasteSchematicItems::performExecute() {
         Q_ASSERT(start);
       } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
                      nl.getStartPoint().tryGetPin()) {
-        SI_Symbol* symbol = mSchematic.getSymbolByUuid(
+        SI_Symbol* symbol = mSchematic.getSymbols().value(
             symbolMap.value(anchor->symbol, Uuid::createRandom()));
         Q_ASSERT(symbol);
         SI_SymbolPin* pin = symbol->getPin(anchor->pin);
@@ -230,7 +230,7 @@ bool CmdPasteSchematicItems::performExecute() {
         Q_ASSERT(end);
       } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
                      nl.getEndPoint().tryGetPin()) {
-        SI_Symbol* symbol = mSchematic.getSymbolByUuid(
+        SI_Symbol* symbol = mSchematic.getSymbols().value(
             symbolMap.value(anchor->symbol, Uuid::createRandom()));
         Q_ASSERT(symbol);
         SI_SymbolPin* pin = symbol->getPin(anchor->pin);

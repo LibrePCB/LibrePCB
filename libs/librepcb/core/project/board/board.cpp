@@ -158,37 +158,37 @@ Board::Board(Project& project,
       // Load all netsegments
       foreach (const SExpression& node, root.getChildren("netsegment")) {
         BI_NetSegment* netsegment = new BI_NetSegment(*this, node, fileFormat);
-        if (getNetSegmentByUuid(netsegment->getUuid())) {
+        if (mNetSegments.contains(netsegment->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
               QString("There is already a netsegment with the UUID \"%1\"!")
                   .arg(netsegment->getUuid().toStr()));
         }
-        mNetSegments.append(netsegment);
+        mNetSegments.insert(netsegment->getUuid(), netsegment);
       }
 
       // Load all planes
       foreach (const SExpression& node, root.getChildren("plane")) {
         BI_Plane* plane = new BI_Plane(*this, node, fileFormat);
-        mPlanes.append(plane);
+        mPlanes.insert(plane->getUuid(), plane);
       }
 
       // Load all polygons
       foreach (const SExpression& node, root.getChildren("polygon")) {
         BI_Polygon* polygon = new BI_Polygon(*this, node, fileFormat);
-        mPolygons.append(polygon);
+        mPolygons.insert(polygon->getUuid(), polygon);
       }
 
       // Load all stroke texts
       foreach (const SExpression& node, root.getChildren("stroke_text")) {
         BI_StrokeText* text = new BI_StrokeText(*this, node, fileFormat);
-        mStrokeTexts.append(text);
+        mStrokeTexts.insert(text->getUuid(), text);
       }
 
       // Load all holes
       foreach (const SExpression& node, root.getChildren("hole")) {
         BI_Hole* hole = new BI_Hole(*this, node, fileFormat);
-        mHoles.append(hole);
+        mHoles.insert(hole->getUuid(), hole);
       }
 
       // load user settings
@@ -209,7 +209,7 @@ Board::Board(Project& project,
         }
         foreach (const SExpression& node, root.getChildren("plane")) {
           const Uuid uuid = deserialize<Uuid>(node.getChild("@0"), fileFormat);
-          if (BI_Plane* plane = getPlaneByUuid(uuid)) {
+          if (BI_Plane* plane = mPlanes.value(uuid)) {
             plane->setVisible(
                 deserialize<bool>(node.getChild("visible/@0"), fileFormat));
           }
@@ -363,16 +363,15 @@ BI_Device* Board::getDeviceInstanceByComponentUuid(const Uuid& uuid) const
 }
 
 void Board::addDeviceInstance(BI_Device& instance) {
-  if (&instance.getBoard() != this) {
+  if ((mDeviceInstances.values().contains(&instance)) ||
+      (&instance.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no device with the same component instance in the list
-  if (getDeviceInstanceByComponentUuid(
-          instance.getComponentInstance().getUuid())) {
+  if (mDeviceInstances.value(instance.getComponentInstanceUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a device with the component instance \"%1\"!")
-            .arg(instance.getComponentInstance().getUuid().toStr()));
+            .arg(instance.getComponentInstanceUuid().toStr()));
   }
   if (mIsAddedToProject) {
     instance.addToBoard();  // can throw
@@ -383,7 +382,8 @@ void Board::addDeviceInstance(BI_Device& instance) {
 }
 
 void Board::removeDeviceInstance(BI_Device& instance) {
-  if (!mDeviceInstances.contains(instance.getComponentInstanceUuid())) {
+  if (mDeviceInstances.value(instance.getComponentInstanceUuid()) !=
+      &instance) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
@@ -398,20 +398,12 @@ void Board::removeDeviceInstance(BI_Device& instance) {
  *  NetSegment Methods
  ******************************************************************************/
 
-BI_NetSegment* Board::getNetSegmentByUuid(const Uuid& uuid) const noexcept {
-  foreach (BI_NetSegment* netsegment, mNetSegments) {
-    if (netsegment->getUuid() == uuid) return netsegment;
-  }
-  return nullptr;
-}
-
 void Board::addNetSegment(BI_NetSegment& netsegment) {
-  if ((mNetSegments.contains(&netsegment)) ||
+  if ((mNetSegments.values().contains(&netsegment)) ||
       (&netsegment.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no netsegment with the same uuid in the list
-  if (getNetSegmentByUuid(netsegment.getUuid())) {
+  if (mNetSegments.contains(netsegment.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a netsegment with the UUID \"%1\"!")
@@ -420,52 +412,50 @@ void Board::addNetSegment(BI_NetSegment& netsegment) {
   if (mIsAddedToProject) {
     netsegment.addToBoard();  // can throw
   }
-  mNetSegments.append(&netsegment);
+  mNetSegments.insert(netsegment.getUuid(), &netsegment);
 }
 
 void Board::removeNetSegment(BI_NetSegment& netsegment) {
-  if (!mNetSegments.contains(&netsegment)) {
+  if (mNetSegments.value(netsegment.getUuid()) != &netsegment) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
     netsegment.removeFromBoard();  // can throw
   }
-  mNetSegments.removeOne(&netsegment);
+  mNetSegments.remove(netsegment.getUuid());
 }
 
 /*******************************************************************************
  *  Plane Methods
  ******************************************************************************/
 
-BI_Plane* Board::getPlaneByUuid(const Uuid& uuid) const noexcept {
-  foreach (BI_Plane* plane, mPlanes) {
-    if (plane->getUuid() == uuid) return plane;
-  }
-  return nullptr;
-}
-
 void Board::addPlane(BI_Plane& plane) {
-  if ((mPlanes.contains(&plane)) || (&plane.getBoard() != this)) {
+  if ((mPlanes.values().contains(&plane)) || (&plane.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
+  }
+  if (mPlanes.contains(plane.getUuid())) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("There is already a plane with the UUID \"%1\"!")
+                           .arg(plane.getUuid().toStr()));
   }
   if (mIsAddedToProject) {
     plane.addToBoard();  // can throw
   }
-  mPlanes.append(&plane);
+  mPlanes.insert(plane.getUuid(), &plane);
 }
 
 void Board::removePlane(BI_Plane& plane) {
-  if (!mPlanes.contains(&plane)) {
+  if (mPlanes.value(plane.getUuid()) != &plane) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
     plane.removeFromBoard();  // can throw
   }
-  mPlanes.removeOne(&plane);
+  mPlanes.remove(plane.getUuid());
 }
 
 void Board::rebuildAllPlanes() noexcept {
-  QList<BI_Plane*> planes = mPlanes;
+  QList<BI_Plane*> planes = mPlanes.values();
   std::sort(planes.begin(), planes.end(),
             [](const BI_Plane* p1, const BI_Plane* p2) {
               return !(*p1 < *p2);
@@ -481,23 +471,30 @@ void Board::rebuildAllPlanes() noexcept {
  ******************************************************************************/
 
 void Board::addPolygon(BI_Polygon& polygon) {
-  if ((mPolygons.contains(&polygon)) || (&polygon.getBoard() != this)) {
+  if ((mPolygons.values().contains(&polygon)) ||
+      (&polygon.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
+  }
+  if (mPolygons.contains(polygon.getUuid())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("There is already a polygon with the UUID \"%1\"!")
+            .arg(polygon.getUuid().toStr()));
   }
   if (mIsAddedToProject) {
     polygon.addToBoard();  // can throw
   }
-  mPolygons.append(&polygon);
+  mPolygons.insert(polygon.getUuid(), &polygon);
 }
 
 void Board::removePolygon(BI_Polygon& polygon) {
-  if (!mPolygons.contains(&polygon)) {
+  if (mPolygons.value(polygon.getUuid()) != &polygon) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
     polygon.removeFromBoard();  // can throw
   }
-  mPolygons.removeOne(&polygon);
+  mPolygons.remove(polygon.getUuid());
 }
 
 /*******************************************************************************
@@ -505,23 +502,29 @@ void Board::removePolygon(BI_Polygon& polygon) {
  ******************************************************************************/
 
 void Board::addStrokeText(BI_StrokeText& text) {
-  if ((mStrokeTexts.contains(&text)) || (&text.getBoard() != this)) {
+  if ((mStrokeTexts.values().contains(&text)) || (&text.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
+  }
+  if (mStrokeTexts.contains(text.getUuid())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("There is already a stroke text with the UUID \"%1\"!")
+            .arg(text.getUuid().toStr()));
   }
   if (mIsAddedToProject) {
     text.addToBoard();  // can throw
   }
-  mStrokeTexts.append(&text);
+  mStrokeTexts.insert(text.getUuid(), &text);
 }
 
 void Board::removeStrokeText(BI_StrokeText& text) {
-  if (!mStrokeTexts.contains(&text)) {
+  if (mStrokeTexts.value(text.getUuid()) != &text) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
     text.removeFromBoard();  // can throw
   }
-  mStrokeTexts.removeOne(&text);
+  mStrokeTexts.remove(text.getUuid());
 }
 
 /*******************************************************************************
@@ -529,23 +532,28 @@ void Board::removeStrokeText(BI_StrokeText& text) {
  ******************************************************************************/
 
 void Board::addHole(BI_Hole& hole) {
-  if ((mHoles.contains(&hole)) || (&hole.getBoard() != this)) {
+  if ((mHoles.values().contains(&hole)) || (&hole.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
+  }
+  if (mHoles.contains(hole.getUuid())) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("There is already a hole with the UUID \"%1\"!")
+                           .arg(hole.getUuid().toStr()));
   }
   if (mIsAddedToProject) {
     hole.addToBoard();  // can throw
   }
-  mHoles.append(&hole);
+  mHoles.insert(hole.getUuid(), &hole);
 }
 
 void Board::removeHole(BI_Hole& hole) {
-  if (!mHoles.contains(&hole)) {
+  if (mHoles.value(hole.getUuid()) != &hole) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
     hole.removeFromBoard();  // can throw
   }
-  mHoles.removeOne(&hole);
+  mHoles.remove(hole.getUuid());
 }
 
 /*******************************************************************************
@@ -926,15 +934,15 @@ void Board::serialize(SExpression& root) const {
   root.ensureLineBreak();
   serializePointerContainer(root, mDeviceInstances, "device");
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mNetSegments, "netsegment");
+  serializePointerContainer(root, mNetSegments, "netsegment");
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mPlanes, "plane");
+  serializePointerContainer(root, mPlanes, "plane");
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mPolygons, "polygon");
+  serializePointerContainer(root, mPolygons, "polygon");
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mStrokeTexts, "stroke_text");
+  serializePointerContainer(root, mStrokeTexts, "stroke_text");
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mHoles, "hole");
+  serializePointerContainer(root, mHoles, "hole");
   root.ensureLineBreak();
 }
 

@@ -140,26 +140,26 @@ public:
   void setName(const ElementName& name) noexcept;
 
   // Symbol Methods
-  QList<SI_Symbol*> getSymbols() const noexcept { return mSymbols; }
-  SI_Symbol* getSymbolByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, SI_Symbol*>& getSymbols() const noexcept { return mSymbols; }
   void addSymbol(SI_Symbol& symbol);
   void removeSymbol(SI_Symbol& symbol);
 
   // NetSegment Methods
-  QList<SI_NetSegment*> getNetSegments() const noexcept { return mNetSegments; }
-  SI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, SI_NetSegment*>& getNetSegments() const noexcept {
+    return mNetSegments;
+  }
   void addNetSegment(SI_NetSegment& netsegment);
   void removeNetSegment(SI_NetSegment& netsegment);
 
   // Polygon Methods
-  const QList<SI_Polygon*>& getPolygons() const noexcept { return mPolygons; }
-  SI_Polygon* getPolygonByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, SI_Polygon*>& getPolygons() const noexcept {
+    return mPolygons;
+  }
   void addPolygon(SI_Polygon& polygon);
   void removePolygon(SI_Polygon& polygon);
 
   // Text Methods
-  QList<SI_Text*> getTexts() const noexcept { return mTexts; }
-  SI_Text* getTextByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, SI_Text*>& getTexts() const noexcept { return mTexts; }
   void addText(SI_Text& text);
   void removeText(SI_Text& text);
 
@@ -226,10 +226,10 @@ private:
   ElementName mName;
   QIcon mIcon;
 
-  QList<SI_Symbol*> mSymbols;
-  QList<SI_NetSegment*> mNetSegments;
-  QList<SI_Polygon*> mPolygons;
-  QList<SI_Text*> mTexts;
+  QMap<Uuid, SI_Symbol*> mSymbols;
+  QMap<Uuid, SI_NetSegment*> mNetSegments;
+  QMap<Uuid, SI_Polygon*> mPolygons;
+  QMap<Uuid, SI_Text*> mTexts;
 };
 
 /*******************************************************************************

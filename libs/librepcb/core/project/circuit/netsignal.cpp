@@ -56,7 +56,7 @@ NetSignal::NetSignal(Circuit& circuit, const SExpression& node,
     mNetClass(nullptr) {
   Uuid netclassUuid =
       deserialize<Uuid>(node.getChild("netclass/@0"), fileFormat);
-  mNetClass = circuit.getNetClassByUuid(netclassUuid);
+  mNetClass = circuit.getNetClasses().value(netclassUuid);
   if (!mNetClass) {
     throw RuntimeError(
         __FILE__, __LINE__,

@@ -95,25 +95,25 @@ Schematic::Schematic(Project& project,
       // Load all symbols
       foreach (const SExpression& node, root.getChildren("symbol")) {
         SI_Symbol* symbol = new SI_Symbol(*this, node, fileFormat);
-        if (getSymbolByUuid(symbol->getUuid())) {
+        if (mSymbols.contains(symbol->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
               QString("There is already a symbol with the UUID \"%1\"!")
                   .arg(symbol->getUuid().toStr()));
         }
-        mSymbols.append(symbol);
+        mSymbols.insert(symbol->getUuid(), symbol);
       }
 
       // Load all netsegments
       foreach (const SExpression& node, root.getChildren("netsegment")) {
         SI_NetSegment* netsegment = new SI_NetSegment(*this, node, fileFormat);
-        if (getNetSegmentByUuid(netsegment->getUuid())) {
+        if (mNetSegments.contains(netsegment->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
               QString("There is already a netsegment with the UUID \"%1\"!")
                   .arg(netsegment->getUuid().toStr()));
         }
-        mNetSegments.append(netsegment);
+        mNetSegments.insert(netsegment->getUuid(), netsegment);
       }
 
       // Load all polygons
@@ -122,13 +122,13 @@ Schematic::Schematic(Project& project,
       // contain polygons.
       foreach (const SExpression& node, root.getChildren("polygon")) {
         SI_Polygon* polygon = new SI_Polygon(*this, node, fileFormat);
-        if (getPolygonByUuid(polygon->getUuid())) {
+        if (mPolygons.contains(polygon->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
               QString("There is already a polygon with the UUID \"%1\"!")
                   .arg(polygon->getUuid().toStr()));
         }
-        mPolygons.append(polygon);
+        mPolygons.insert(polygon->getUuid(), polygon);
       }
 
       // Load all texts
@@ -137,13 +137,13 @@ Schematic::Schematic(Project& project,
       // texts.
       foreach (const SExpression& node, root.getChildren("text")) {
         SI_Text* text = new SI_Text(*this, node, fileFormat);
-        if (getTextByUuid(text->getUuid())) {
+        if (mTexts.contains(text->getUuid())) {
           throw RuntimeError(
               __FILE__, __LINE__,
               QString("There is already a text with the UUID \"%1\"!")
                   .arg(text->getUuid().toStr()));
         }
-        mTexts.append(text);
+        mTexts.insert(text->getUuid(), text);
       }
     }
 
@@ -209,38 +209,28 @@ void Schematic::setName(const ElementName& name) noexcept {
  *  Symbol Methods
  ******************************************************************************/
 
-SI_Symbol* Schematic::getSymbolByUuid(const Uuid& uuid) const noexcept {
-  foreach (SI_Symbol* symbol, mSymbols) {
-    if (symbol->getUuid() == uuid) return symbol;
-  }
-  return nullptr;
-}
-
 void Schematic::addSymbol(SI_Symbol& symbol) {
-  if ((!mIsAddedToProject) || (mSymbols.contains(&symbol)) ||
+  if ((!mIsAddedToProject) || (mSymbols.values().contains(&symbol)) ||
       (&symbol.getSchematic() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no symbol with the same uuid in the list
-  if (getSymbolByUuid(symbol.getUuid())) {
+  if (mSymbols.contains(symbol.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a symbol with the UUID \"%1\"!")
             .arg(symbol.getUuid().toStr()));
   }
-  // add to schematic
   symbol.addToSchematic();  // can throw
-  mSymbols.append(&symbol);
+  mSymbols.insert(symbol.getUuid(), &symbol);
   emit symbolAdded(symbol);
 }
 
 void Schematic::removeSymbol(SI_Symbol& symbol) {
-  if ((!mIsAddedToProject) || (!mSymbols.contains(&symbol))) {
+  if ((!mIsAddedToProject) || (mSymbols.value(symbol.getUuid()) != &symbol)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // remove from schematic
   symbol.removeFromSchematic();  // can throw
-  mSymbols.removeOne(&symbol);
+  mSymbols.remove(symbol.getUuid());
   emit symbolRemoved(symbol);
 }
 
@@ -248,110 +238,82 @@ void Schematic::removeSymbol(SI_Symbol& symbol) {
  *  NetSegment Methods
  ******************************************************************************/
 
-SI_NetSegment* Schematic::getNetSegmentByUuid(const Uuid& uuid) const noexcept {
-  foreach (SI_NetSegment* netsegment, mNetSegments) {
-    if (netsegment->getUuid() == uuid) return netsegment;
-  }
-  return nullptr;
-}
-
 void Schematic::addNetSegment(SI_NetSegment& netsegment) {
-  if ((!mIsAddedToProject) || (mNetSegments.contains(&netsegment)) ||
+  if ((!mIsAddedToProject) || (mNetSegments.values().contains(&netsegment)) ||
       (&netsegment.getSchematic() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no netsegment with the same uuid in the list
-  if (getNetSegmentByUuid(netsegment.getUuid())) {
+  if (mNetSegments.contains(netsegment.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a netsegment with the UUID \"%1\"!")
             .arg(netsegment.getUuid().toStr()));
   }
-  // add to schematic
   netsegment.addToSchematic();  // can throw
-  mNetSegments.append(&netsegment);
+  mNetSegments.insert(netsegment.getUuid(), &netsegment);
 }
 
 void Schematic::removeNetSegment(SI_NetSegment& netsegment) {
-  if ((!mIsAddedToProject) || (!mNetSegments.contains(&netsegment))) {
+  if ((!mIsAddedToProject) ||
+      (mNetSegments.value(netsegment.getUuid()) != &netsegment)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // remove from schematic
   netsegment.removeFromSchematic();  // can throw
-  mNetSegments.removeOne(&netsegment);
+  mNetSegments.remove(netsegment.getUuid());
 }
 
 /*******************************************************************************
  *  Polygon Methods
  ******************************************************************************/
 
-SI_Polygon* Schematic::getPolygonByUuid(const Uuid& uuid) const noexcept {
-  foreach (SI_Polygon* polygon, mPolygons) {
-    if (polygon->getUuid() == uuid) return polygon;
-  }
-  return nullptr;
-}
-
 void Schematic::addPolygon(SI_Polygon& polygon) {
-  if ((!mIsAddedToProject) || (mPolygons.contains(&polygon)) ||
+  if ((!mIsAddedToProject) || (mPolygons.values().contains(&polygon)) ||
       (&polygon.getSchematic() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no text with the same uuid in the list
-  if (getPolygonByUuid(polygon.getUuid())) {
+  if (mPolygons.contains(polygon.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a polygon with the UUID \"%1\"!")
             .arg(polygon.getUuid().toStr()));
   }
-  // add to schematic
   polygon.addToSchematic();  // can throw
-  mPolygons.append(&polygon);
+  mPolygons.insert(polygon.getUuid(), &polygon);
 }
 
 void Schematic::removePolygon(SI_Polygon& polygon) {
-  if ((!mIsAddedToProject) || (!mPolygons.contains(&polygon))) {
+  if ((!mIsAddedToProject) ||
+      (mPolygons.value(polygon.getUuid()) != &polygon)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // remove from schematic
   polygon.removeFromSchematic();  // can throw
-  mPolygons.removeOne(&polygon);
+  mPolygons.remove(polygon.getUuid());
 }
 
 /*******************************************************************************
  *  Text Methods
  ******************************************************************************/
 
-SI_Text* Schematic::getTextByUuid(const Uuid& uuid) const noexcept {
-  foreach (SI_Text* text, mTexts) {
-    if (text->getUuid() == uuid) return text;
-  }
-  return nullptr;
-}
-
 void Schematic::addText(SI_Text& text) {
-  if ((!mIsAddedToProject) || (mTexts.contains(&text)) ||
+  if ((!mIsAddedToProject) || (mTexts.values().contains(&text)) ||
       (&text.getSchematic() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no text with the same uuid in the list
-  if (getTextByUuid(text.getUuid())) {
+  if (mTexts.contains(text.getUuid())) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("There is already a text with the UUID \"%1\"!")
                            .arg(text.getUuid().toStr()));
   }
-  // add to schematic
   text.addToSchematic();  // can throw
-  mTexts.append(&text);
+  mTexts.insert(text.getUuid(), &text);
 }
 
 void Schematic::removeText(SI_Text& text) {
-  if ((!mIsAddedToProject) || (!mTexts.contains(&text))) {
+  if ((!mIsAddedToProject) || (mTexts.value(text.getUuid()) != &text)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // remove from schematic
   text.removeFromSchematic();  // can throw
-  mTexts.removeOne(&text);
+  mTexts.remove(text.getUuid());
 }
 
 /*******************************************************************************
@@ -519,13 +481,13 @@ void Schematic::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild(mGridProperties->serializeToDomElement("grid"));
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mSymbols, "symbol");
+  serializePointerContainer(root, mSymbols, "symbol");
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mNetSegments, "netsegment");
+  serializePointerContainer(root, mNetSegments, "netsegment");
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mPolygons, "polygon");
+  serializePointerContainer(root, mPolygons, "polygon");
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mTexts, "text");
+  serializePointerContainer(root, mTexts, "text");
   root.ensureLineBreak();
 }
 
