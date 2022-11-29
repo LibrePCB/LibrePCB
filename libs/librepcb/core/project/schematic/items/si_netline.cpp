@@ -150,10 +150,6 @@ void SI_NetLine::updateLine() noexcept {
   mGraphicsItem->updateCacheAndRepaint();
 }
 
-void SI_NetLine::serialize(SExpression& root) const {
-  mNetLine.serialize(root);
-}
-
 SI_NetLineAnchor* SI_NetLine::getAnchor(const NetLineAnchor& anchor) {
   if (const tl::optional<Uuid>& uuid = anchor.tryGetJunction()) {
     return mNetSegment.getNetPoints().value(*uuid);

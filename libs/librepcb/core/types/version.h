@@ -223,11 +223,6 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serialize(const Version& obj) {
-  return SExpression::createString(obj.toStr());
-}
-
-template <>
 inline Version deserialize(const SExpression& sexpr,
                            const Version& fileFormat) {
   Q_UNUSED(fileFormat);

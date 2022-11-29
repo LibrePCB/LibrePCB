@@ -89,10 +89,6 @@ void SI_Polygon::removeFromSchematic() {
   SI_Base::removeFromSchematic(mGraphicsItem.data());
 }
 
-void SI_Polygon::serialize(SExpression& root) const {
-  mPolygon->serialize(root);
-}
-
 /*******************************************************************************
  *  Inherited from SI_Base
  ******************************************************************************/

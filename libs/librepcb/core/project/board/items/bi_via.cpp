@@ -161,10 +161,6 @@ void BI_Via::unregisterNetLine(BI_NetLine& netline) {
   mGraphicsItem->updateCacheAndRepaint();
 }
 
-void BI_Via::serialize(SExpression& root) const {
-  mVia.serialize(root);
-}
-
 /*******************************************************************************
  *  Inherited from BI_Base
  ******************************************************************************/

@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../serialization/serializableobject.h"
 #include "../../types/circuitidentifier.h"
 #include "../../types/uuid.h"
 #include "../erc/if_ercmsgprovider.h"
@@ -50,9 +49,7 @@ class SI_NetSegment;
 /**
  * @brief The NetSignal class
  */
-class NetSignal final : public QObject,
-                        public IF_ErcMsgProvider,
-                        public SerializableObject {
+class NetSignal final : public QObject, public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(NetSignal)
 
@@ -108,8 +105,12 @@ public:
   void registerBoardPlane(BI_Plane& plane);
   void unregisterBoardPlane(BI_Plane& plane);
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   NetSignal& operator=(const NetSignal& rhs) = delete;

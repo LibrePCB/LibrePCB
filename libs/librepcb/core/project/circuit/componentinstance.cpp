@@ -370,7 +370,10 @@ void ComponentInstance::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mAttributes->serialize(root);
   root.ensureLineBreak();
-  serializePointerContainer(root, mSignals, "signal");
+  for (const ComponentSignalInstance* obj : mSignals) {
+    obj->serialize(root.appendList("signal"));
+    root.ensureLineBreak();
+  }
   root.ensureLineBreak();
 }
 

@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/attribute/attributeprovider.h>
-#include <librepcb/core/serialization/serializableobject.h>
 
 #include <QtCore>
 
@@ -39,6 +38,7 @@ class QMainWindow;
 namespace librepcb {
 
 class Board;
+class FilePath;
 class LengthUnit;
 class Project;
 class Workspace;

@@ -222,8 +222,6 @@ void BI_Plane::serialize(SExpression& root) const {
   root.appendChild("keep_orphans", mKeepOrphans);
   root.ensureLineBreak();
   root.appendChild("connect_style", mConnectStyle);
-  // root.appendChild("thermal_gap_width", mThermalGapWidth, false);
-  // root.appendChild("thermal_spoke_width", mThermalSpokeWidth, false);
   root.ensureLineBreak();
   mOutline.serialize(root);
   root.ensureLineBreak();
@@ -268,6 +266,22 @@ bool BI_Plane::operator<(const BI_Plane& rhs) const noexcept {
 
 void BI_Plane::boardAttributesChanged() {
   mGraphicsItem->updateCacheAndRepaint();
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const BI_Plane::ConnectStyle& obj) {
+  switch (obj) {
+    case BI_Plane::ConnectStyle::None:
+      return SExpression::createToken("none");
+    case BI_Plane::ConnectStyle::Solid:
+      return SExpression::createToken("solid");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
 /*******************************************************************************

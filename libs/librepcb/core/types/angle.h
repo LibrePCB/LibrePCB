@@ -437,11 +437,6 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serialize(const Angle& obj) {
-  return SExpression::createToken(obj.toDegString());
-}
-
-template <>
 inline Angle deserialize(const SExpression& sexpr, const Version& fileFormat) {
   Q_UNUSED(fileFormat);
   return Angle::fromDeg(sexpr.getValue());  // can throw

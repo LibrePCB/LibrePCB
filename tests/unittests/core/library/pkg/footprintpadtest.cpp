@@ -137,10 +137,12 @@ TEST_F(FootprintPadTest, testSerializeAndDeserialize) {
                     Angle(789), FootprintPad::Shape::OCTAGON,
                     PositiveLength(123), PositiveLength(456),
                     UnsignedLength(100000), FootprintPad::BoardSide::THT);
-  SExpression sexpr1 = obj1.serializeToDomElement("pad");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
   FootprintPad obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("pad");
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

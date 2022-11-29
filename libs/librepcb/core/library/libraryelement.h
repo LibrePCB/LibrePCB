@@ -72,9 +72,6 @@ public:
   LibraryElement& operator=(const LibraryElement& rhs) = delete;
 
 protected:
-  // Protected Methods
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
   virtual void serialize(SExpression& root) const override;
 
   // General Library Element Attributes

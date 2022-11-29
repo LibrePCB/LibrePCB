@@ -188,6 +188,25 @@ LengthBase_t Length::mmStringToNm(const QString& millimeters) {
 }
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const Length& obj) {
+  return SExpression::createToken(obj.toMmString());
+}
+
+template <>
+SExpression serialize(const UnsignedLength& obj) {
+  return serialize(*obj);
+}
+
+template <>
+SExpression serialize(const PositiveLength& obj) {
+  return serialize(*obj);
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

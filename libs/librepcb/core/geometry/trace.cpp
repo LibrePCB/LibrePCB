@@ -198,12 +198,12 @@ bool Trace::setEndPoint(const TraceAnchor& end) noexcept {
 
 void Trace::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", SExpression::createToken(*mLayer));
+  root.appendChild("layer", mLayer);
   root.appendChild("width", mWidth);
   root.ensureLineBreak();
-  root.appendChild(mStart.serializeToDomElement("from"));
+  mStart.serialize(root.appendList("from"));
   root.ensureLineBreak();
-  root.appendChild(mEnd.serializeToDomElement("to"));
+  mEnd.serialize(root.appendList("to"));
   root.ensureLineBreak();
 }
 

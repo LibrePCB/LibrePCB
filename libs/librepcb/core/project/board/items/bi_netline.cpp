@@ -232,10 +232,6 @@ void BI_NetLine::updateLine() noexcept {
   mGraphicsItem->updateCacheAndRepaint();
 }
 
-void BI_NetLine::serialize(SExpression& root) const {
-  mTrace.serialize(root);
-}
-
 BI_NetLineAnchor* BI_NetLine::getAnchor(const TraceAnchor& anchor) {
   if (const tl::optional<Uuid>& uuid = anchor.tryGetJunction()) {
     return mNetSegment.getNetPoints().value(*uuid);

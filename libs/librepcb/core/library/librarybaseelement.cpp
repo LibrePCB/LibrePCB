@@ -172,12 +172,12 @@ LibraryElementCheckMessageList LibraryBaseElement::runChecks() const {
 }
 
 void LibraryBaseElement::save() {
-  // save S-Expressions file
-  mDirectory->write(
-      mLongElementName % ".lp",
-      serializeToDomElement("librepcb_" % mLongElementName).toByteArray());
+  // Content.
+  SExpression root = SExpression::createList("librepcb_" % mLongElementName);
+  serialize(root);
+  mDirectory->write(mLongElementName % ".lp", root.toByteArray());
 
-  // save version number file
+  // Version file.
   mDirectory->write(".librepcb-" % mShortElementName,
                     VersionFile(qApp->getFileFormatVersion()).toByteArray());
 }

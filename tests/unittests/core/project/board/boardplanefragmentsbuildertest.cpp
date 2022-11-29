@@ -88,7 +88,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
     foreach (const Path& fragment,
              Toolbox::sortedQSet(actualPlaneFragments[uuid])) {
       child.ensureLineBreak();
-      child.appendChild(fragment.serializeToDomElement("fragment"));
+      fragment.serialize(child.appendList("fragment"));
     }
     child.ensureLineBreak();
     actualSexpr.ensureLineBreak();

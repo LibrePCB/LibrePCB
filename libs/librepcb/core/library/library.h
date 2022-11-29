@@ -86,8 +86,7 @@ public:
     return QStringLiteral("library");
   }
 
-private:  // Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
+protected:
   virtual void serialize(SExpression& root) const override;
 
 private:  // Data

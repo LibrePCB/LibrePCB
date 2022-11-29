@@ -61,10 +61,12 @@ TEST_F(VertexTest, testConstructFromSExpressionCurrentVersion) {
 
 TEST_F(VertexTest, testSerializeAndDeserialize) {
   Vertex obj1(Point(123, 567), Angle(789));
-  SExpression sexpr1 = obj1.serializeToDomElement("vertex");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
   Vertex obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("vertex");
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

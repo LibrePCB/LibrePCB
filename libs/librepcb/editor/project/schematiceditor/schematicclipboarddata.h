@@ -23,14 +23,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <librepcb/core/geometry/junction.h>
 #include <librepcb/core/geometry/netlabel.h>
 #include <librepcb/core/geometry/netline.h>
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/text.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
-#include <librepcb/core/serialization/serializableobject.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -54,10 +52,10 @@ namespace editor {
 /**
  * @brief The SchematicClipboardData class
  */
-class SchematicClipboardData final : public SerializableObject {
+class SchematicClipboardData final {
 public:
   // Types
-  struct ComponentInstance : public SerializableObject {
+  struct ComponentInstance {
     static constexpr const char* tagname = "component";
 
     Uuid uuid;
@@ -101,8 +99,7 @@ public:
     /// Required for ::librepcb::SerializableObjectList::contains()
     const Uuid& getUuid() const noexcept { return uuid; }
 
-    /// @copydoc ::librepcb::SerializableObject::serialize()
-    void serialize(SExpression& root) const override {
+    void serialize(SExpression& root) const {
       root.appendChild(uuid);
       root.ensureLineBreak();
       root.appendChild("lib_component", libComponentUuid);
@@ -126,7 +123,7 @@ public:
     }
   };
 
-  struct SymbolInstance : public SerializableObject {
+  struct SymbolInstance {
     static constexpr const char* tagname = "symbol";
 
     Uuid uuid;
@@ -160,15 +157,14 @@ public:
         mirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)),
         onEdited(*this) {}
 
-    /// @copydoc ::librepcb::SerializableObject::serialize()
-    void serialize(SExpression& root) const override {
+    void serialize(SExpression& root) const {
       root.appendChild(uuid);
       root.ensureLineBreak();
       root.appendChild("component", componentInstanceUuid);
       root.ensureLineBreak();
       root.appendChild("lib_gate", symbolVariantItemUuid);
       root.ensureLineBreak();
-      root.appendChild(position.serializeToDomElement("position"));
+      position.serialize(root.appendList("position"));
       root.appendChild("rotation", rotation);
       root.appendChild("mirror", mirrored);
       root.ensureLineBreak();
@@ -183,7 +179,7 @@ public:
     }
   };
 
-  struct NetSegment : public SerializableObject {
+  struct NetSegment {
     static constexpr const char* tagname = "netsegment";
 
     CircuitIdentifier netName;
@@ -203,8 +199,7 @@ public:
         labels(node, fileFormat),
         onEdited(*this) {}
 
-    /// @copydoc ::librepcb::SerializableObject::serialize()
-    void serialize(SExpression& root) const override {
+    void serialize(SExpression& root) const {
       root.ensureLineBreak();
       root.appendChild("net", netName);
       root.ensureLineBreak();
@@ -258,9 +253,6 @@ public:
   SchematicClipboardData& operator=(const SchematicClipboardData& rhs) = delete;
 
 private:  // Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   static QString getMimeType() noexcept;
 
 private:  // Data

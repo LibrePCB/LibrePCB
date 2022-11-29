@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../serialization/serializableobject.h"
 #include "../../types/circuitidentifier.h"
 #include "../erc/if_ercmsgprovider.h"
 
@@ -49,9 +48,7 @@ class SI_SymbolPin;
 /**
  * @brief The ComponentSignalInstance class
  */
-class ComponentSignalInstance final : public QObject,
-                                      public IF_ErcMsgProvider,
-                                      public SerializableObject {
+class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(ComponentSignalInstance)
 
@@ -111,8 +108,12 @@ public:
   void registerFootprintPad(BI_FootprintPad& pad);
   void unregisterFootprintPad(BI_FootprintPad& pad);
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) =

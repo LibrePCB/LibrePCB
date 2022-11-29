@@ -43,7 +43,7 @@ namespace librepcb {
 /**
  * @brief The Polygon class
  */
-class Polygon final : public SerializableObject {
+class Polygon final {
   Q_DECLARE_TR_FUNCTIONS(Polygon)
 
 public:
@@ -84,8 +84,14 @@ public:
   bool setIsGrabArea(bool isGrabArea) noexcept;
   bool setPath(const Path& path) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const Polygon& rhs) const noexcept;

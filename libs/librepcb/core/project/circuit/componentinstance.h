@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../attribute/attribute.h"
 #include "../../attribute/attributeprovider.h"
-#include "../../serialization/serializableobject.h"
 #include "../../types/circuitidentifier.h"
 #include "../../types/uuid.h"
 #include "../erc/if_ercmsgprovider.h"
@@ -54,8 +53,7 @@ class SI_Symbol;
  */
 class ComponentInstance : public QObject,
                           public AttributeProvider,
-                          public IF_ErcMsgProvider,
-                          public SerializableObject {
+                          public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(ComponentInstance)
 
@@ -138,8 +136,12 @@ public:
   void registerDevice(BI_Device& device);
   void unregisterDevice(BI_Device& device);
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Inherited from AttributeProvider
   /// @copydoc ::librepcb::AttributeProvider::getUserDefinedAttributeValue()

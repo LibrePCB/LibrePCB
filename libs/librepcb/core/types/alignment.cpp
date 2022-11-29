@@ -50,6 +50,20 @@ HAlign& HAlign::mirror() noexcept {
   return *this;
 }
 
+template <>
+SExpression serialize(const VAlign& obj) {
+  switch (obj.toQtAlignFlag()) {
+    case Qt::AlignTop:
+      return SExpression::createToken("top");
+    case Qt::AlignVCenter:
+      return SExpression::createToken("center");
+    case Qt::AlignBottom:
+      return SExpression::createToken("bottom");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
 /*******************************************************************************
  *  Class VAlign
  ******************************************************************************/
@@ -71,8 +85,22 @@ VAlign& VAlign::mirror() noexcept {
   return *this;
 }
 
+template <>
+SExpression serialize(const HAlign& obj) {
+  switch (obj.toQtAlignFlag()) {
+    case Qt::AlignLeft:
+      return SExpression::createToken("left");
+    case Qt::AlignHCenter:
+      return SExpression::createToken("center");
+    case Qt::AlignRight:
+      return SExpression::createToken("right");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
 /*******************************************************************************
- *  Class VAlign
+ *  Class Alignment
  ******************************************************************************/
 
 Alignment::Alignment(const SExpression& node, const Version& fileFormat) {

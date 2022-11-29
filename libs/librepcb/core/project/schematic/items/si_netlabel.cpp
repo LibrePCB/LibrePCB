@@ -138,10 +138,6 @@ void SI_NetLabel::removeFromSchematic() {
   SI_Base::removeFromSchematic(mGraphicsItem.data());
 }
 
-void SI_NetLabel::serialize(SExpression& root) const {
-  mNetLabel.serialize(root);
-}
-
 /*******************************************************************************
  *  Inherited from SI_Base
  ******************************************************************************/

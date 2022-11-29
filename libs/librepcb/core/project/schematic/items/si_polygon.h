@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../serialization/serializableobject.h"
 #include "../../../types/point.h"
 #include "../../../types/uuid.h"
 #include "si_base.h"
@@ -46,7 +45,7 @@ class Schematic;
 /**
  * @brief The SI_Polygon class represents a polygon in a schematic
  */
-class SI_Polygon final : public SI_Base, public SerializableObject {
+class SI_Polygon final : public SI_Base {
   Q_OBJECT
 
 public:
@@ -67,9 +66,6 @@ public:
   // General Methods
   void addToSchematic() override;
   void removeFromSchematic() override;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::Polygon; }

@@ -89,10 +89,12 @@ TEST_F(TraceTest, testSerializeAndDeserialize) {
   Trace obj1(Uuid::createRandom(), GraphicsLayerName("foo"),
              PositiveLength(123), TraceAnchor::junction(Uuid::createRandom()),
              TraceAnchor::pad(Uuid::createRandom(), Uuid::createRandom()));
-  SExpression sexpr1 = obj1.serializeToDomElement("trace");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
   Trace obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("trace");
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

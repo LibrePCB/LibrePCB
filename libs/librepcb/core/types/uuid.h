@@ -165,23 +165,9 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serialize(const Uuid& obj) {
-  return SExpression::createToken(obj.toStr());
-}
-
-template <>
 inline Uuid deserialize(const SExpression& sexpr, const Version& fileFormat) {
   Q_UNUSED(fileFormat);
   return Uuid::fromString(sexpr.getValue());  // can throw
-}
-
-template <>
-inline SExpression serialize(const tl::optional<Uuid>& obj) {
-  if (obj) {
-    return serialize(*obj);
-  } else {
-    return SExpression::createToken("none");
-  }
 }
 
 template <>

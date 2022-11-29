@@ -103,11 +103,6 @@ protected:
  ******************************************************************************/
 
 template <>
-inline SExpression serialize(const AttributeType& obj) {
-  return SExpression::createToken(obj.getName());
-}
-
-template <>
 inline const AttributeType& deserialize(const SExpression& sexpr,
                                         const Version& fileFormat) {
   Q_UNUSED(fileFormat);

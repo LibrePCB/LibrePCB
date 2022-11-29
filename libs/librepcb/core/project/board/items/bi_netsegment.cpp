@@ -458,11 +458,20 @@ void BI_NetSegment::serialize(SExpression& root) const {
   root.appendChild("net",
                    mNetSignal ? mNetSignal->getUuid() : tl::optional<Uuid>());
   root.ensureLineBreak();
-  serializePointerContainer(root, mVias, "via");
+  for (const BI_Via* obj : mVias) {
+    root.ensureLineBreak();
+    obj->getVia().serialize(root.appendList("via"));
+  }
   root.ensureLineBreak();
-  serializePointerContainer(root, mNetPoints, "junction");
+  for (const BI_NetPoint* obj : mNetPoints) {
+    root.ensureLineBreak();
+    obj->getJunction().serialize(root.appendList("junction"));
+  }
   root.ensureLineBreak();
-  serializePointerContainer(root, mNetLines, "trace");
+  for (const BI_NetLine* obj : mNetLines) {
+    root.ensureLineBreak();
+    obj->getTrace().serialize(root.appendList("trace"));
+  }
   root.ensureLineBreak();
 }
 

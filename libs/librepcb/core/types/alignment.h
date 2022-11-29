@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
-#include "../serialization/serializableobject.h"
+#include "../serialization/sexpression.h"
 
 #include <QtCore>
 
@@ -72,20 +72,6 @@ private:
 /*******************************************************************************
  *  HAlign Non-Member Functions
  ******************************************************************************/
-
-template <>
-inline SExpression serialize(const HAlign& obj) {
-  switch (obj.toQtAlignFlag()) {
-    case Qt::AlignLeft:
-      return SExpression::createToken("left");
-    case Qt::AlignHCenter:
-      return SExpression::createToken("center");
-    case Qt::AlignRight:
-      return SExpression::createToken("right");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
 
 template <>
 inline HAlign deserialize(const SExpression& sexpr, const Version& fileFormat) {
@@ -145,20 +131,6 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serialize(const VAlign& obj) {
-  switch (obj.toQtAlignFlag()) {
-    case Qt::AlignTop:
-      return SExpression::createToken("top");
-    case Qt::AlignVCenter:
-      return SExpression::createToken("center");
-    case Qt::AlignBottom:
-      return SExpression::createToken("bottom");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
-
-template <>
 inline VAlign deserialize(const SExpression& sexpr, const Version& fileFormat) {
   Q_UNUSED(fileFormat);
   QString str = sexpr.getValue();
@@ -182,7 +154,7 @@ inline VAlign deserialize(const SExpression& sexpr, const Version& fileFormat) {
 /**
  * @brief The Alignment class
  */
-class Alignment final : public SerializableObject {
+class Alignment final {
   Q_DECLARE_TR_FUNCTIONS(Alignment)
 
 public:
@@ -205,8 +177,12 @@ public:
   Alignment mirroredH() const noexcept { return Alignment(*this).mirrorH(); }
   Alignment mirroredV() const noexcept { return Alignment(*this).mirrorV(); }
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   Alignment& operator=(const Alignment& rhs) noexcept {
     mH = rhs.mH;

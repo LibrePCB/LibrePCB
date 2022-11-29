@@ -48,7 +48,7 @@ namespace librepcb {
  * therefore never be changed:
  *  - UUID
  */
-class SymbolPin final : public SerializableObject {
+class SymbolPin final {
   Q_DECLARE_TR_FUNCTIONS(SymbolPin)
 
 public:
@@ -99,8 +99,14 @@ public:
   bool setNameHeight(const PositiveLength& height) noexcept;
   bool setNameAlignment(const Alignment& align) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const SymbolPin& rhs) const noexcept;

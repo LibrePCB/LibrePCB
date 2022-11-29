@@ -420,13 +420,16 @@ void BI_Device::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("lib_footprint", mLibFootprint->getUuid());
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("mirror", mMirrored);
   root.ensureLineBreak();
   mAttributes.serialize(root);
   root.ensureLineBreak();
-  serializePointerContainer(root, mStrokeTexts, "stroke_text");
+  for (const BI_StrokeText* obj : mStrokeTexts) {
+    root.ensureLineBreak();
+    obj->getText().serialize(root.appendList("stroke_text"));
+  }
   root.ensureLineBreak();
 }
 

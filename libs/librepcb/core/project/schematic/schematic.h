@@ -26,7 +26,6 @@
 #include "../../attribute/attributeprovider.h"
 #include "../../fileio/filepath.h"
 #include "../../fileio/transactionaldirectory.h"
-#include "../../serialization/serializableobject.h"
 #include "../../types/elementname.h"
 #include "../../types/uuid.h"
 
@@ -77,9 +76,7 @@ class SchematicSelectionQuery;
  *  - circle:           TODO
  *  - text:             ::librepcb::SI_Text
  */
-class Schematic final : public QObject,
-                        public AttributeProvider,
-                        public SerializableObject {
+class Schematic final : public QObject, public AttributeProvider {
   Q_OBJECT
 
 public:
@@ -207,9 +204,6 @@ private:
             const QString& directoryName, const Version& fileFormat,
             bool create, const QString& newName);
   void updateIcon() noexcept;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)

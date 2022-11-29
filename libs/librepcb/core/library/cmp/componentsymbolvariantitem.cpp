@@ -151,7 +151,7 @@ void ComponentSymbolVariantItem::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("symbol", mSymbolUuid);
   root.ensureLineBreak();
-  root.appendChild(mSymbolPos.serializeToDomElement("position"));
+  mSymbolPos.serialize(root.appendList("position"));
   root.appendChild("rotation", mSymbolRot);
   root.appendChild("required", mIsRequired);
   root.appendChild("suffix", mSuffix);

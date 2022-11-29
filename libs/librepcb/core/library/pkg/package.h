@@ -85,9 +85,8 @@ public:
     return QStringLiteral("package");
   }
 
-private:  // Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+protected:  // Methods
+  virtual void serialize(SExpression& root) const override;
 
 private:  // Data
   PackagePadList mPads;  ///< empty list if the package has no pads

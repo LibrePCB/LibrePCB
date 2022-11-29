@@ -74,12 +74,31 @@ FootprintClipboardData::~FootprintClipboardData() noexcept {
 
 std::unique_ptr<QMimeData> FootprintClipboardData::toMimeData(
     const IF_GraphicsLayerProvider& lp) {
-  SExpression sexpr =
-      serializeToDomElement("librepcb_clipboard_footprint");  // can throw
+  SExpression root = SExpression::createList("librepcb_clipboard_footprint");
+  root.ensureLineBreak();
+  mCursorPos.serialize(root.appendList("cursor_position"));
+  root.ensureLineBreak();
+  root.appendChild("footprint", mFootprintUuid);
+  root.ensureLineBreak();
+  {
+    SExpression& node = root.appendList("package");
+    mPackagePads.serialize(node);
+  }
+  root.ensureLineBreak();
+  mFootprintPads.serialize(root);
+  root.ensureLineBreak();
+  mPolygons.serialize(root);
+  root.ensureLineBreak();
+  mCircles.serialize(root);
+  root.ensureLineBreak();
+  mStrokeTexts.serialize(root);
+  root.ensureLineBreak();
+  mHoles.serialize(root);
+  root.ensureLineBreak();
 
   std::unique_ptr<QMimeData> data(new QMimeData());
   data->setImageData(generatePixmap(lp));
-  data->setData(getMimeType(), sexpr.toByteArray());
+  data->setData(getMimeType(), root.toByteArray());
   return data;
 }
 
@@ -98,27 +117,6 @@ std::unique_ptr<FootprintClipboardData> FootprintClipboardData::fromMimeData(
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void FootprintClipboardData::serialize(SExpression& root) const {
-  root.ensureLineBreak();
-  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"));
-  root.ensureLineBreak();
-  root.appendChild("footprint", mFootprintUuid);
-  root.ensureLineBreak();
-  SExpression& packageRoot = root.appendList("package");
-  mPackagePads.serialize(packageRoot);
-  root.ensureLineBreak();
-  mFootprintPads.serialize(root);
-  root.ensureLineBreak();
-  mPolygons.serialize(root);
-  root.ensureLineBreak();
-  mCircles.serialize(root);
-  root.ensureLineBreak();
-  mStrokeTexts.serialize(root);
-  root.ensureLineBreak();
-  mHoles.serialize(root);
-  root.ensureLineBreak();
-}
 
 QPixmap FootprintClipboardData::generatePixmap(
     const IF_GraphicsLayerProvider& lp) noexcept {

@@ -91,9 +91,23 @@ std::unique_ptr<TransactionalDirectory> SchematicClipboardData::getDirectory(
  ******************************************************************************/
 
 std::unique_ptr<QMimeData> SchematicClipboardData::toMimeData() const {
-  SExpression sexpr =
-      serializeToDomElement("librepcb_clipboard_schematic");  // can throw
-  mFileSystem->write("schematic.lp", sexpr.toByteArray());
+  SExpression root = SExpression::createList("librepcb_clipboard_schematic");
+  root.ensureLineBreak();
+  mCursorPos.serialize(root.appendList("cursor_position"));
+  root.ensureLineBreak();
+  root.appendChild("schematic", mSchematicUuid);
+  root.ensureLineBreak();
+  mComponentInstances.serialize(root);
+  root.ensureLineBreak();
+  mSymbolInstances.serialize(root);
+  root.ensureLineBreak();
+  mNetSegments.serialize(root);
+  root.ensureLineBreak();
+  mPolygons.serialize(root);
+  root.ensureLineBreak();
+  mTexts.serialize(root);
+  root.ensureLineBreak();
+  mFileSystem->write("schematic.lp", root.toByteArray());
 
   QByteArray zip = mFileSystem->exportToZip();
 
@@ -117,24 +131,6 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardData::fromMimeData(
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void SchematicClipboardData::serialize(SExpression& root) const {
-  root.ensureLineBreak();
-  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"));
-  root.ensureLineBreak();
-  root.appendChild("schematic", mSchematicUuid);
-  root.ensureLineBreak();
-  mComponentInstances.serialize(root);
-  root.ensureLineBreak();
-  mSymbolInstances.serialize(root);
-  root.ensureLineBreak();
-  mNetSegments.serialize(root);
-  root.ensureLineBreak();
-  mPolygons.serialize(root);
-  root.ensureLineBreak();
-  mTexts.serialize(root);
-  root.ensureLineBreak();
-}
 
 QString SchematicClipboardData::getMimeType() noexcept {
   return QString("application/x-librepcb-clipboard.schematic; version=%1")

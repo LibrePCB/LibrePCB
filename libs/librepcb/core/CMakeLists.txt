@@ -425,7 +425,6 @@ add_library(
   project/schematic/schematicselectionquery.cpp
   project/schematic/schematicselectionquery.h
   serialization/serializablekeyvaluemap.h
-  serialization/serializableobject.h
   serialization/serializableobjectlist.h
   serialization/sexpression.cpp
   serialization/sexpression.h

@@ -23,14 +23,15 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../serialization/serializableobject.h"
-
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class SExpression;
+class Version;
 
 /*******************************************************************************
  *  Class BoardFabricationOutputSettings
@@ -39,7 +40,7 @@ namespace librepcb {
 /**
  * @brief The BoardFabricationOutputSettings class
  */
-class BoardFabricationOutputSettings final : public SerializableObject {
+class BoardFabricationOutputSettings final {
 public:
   // Constructors / Destructor
   BoardFabricationOutputSettings() noexcept;
@@ -139,8 +140,14 @@ public:
   void setEnableSolderPasteTop(bool e) noexcept { mEnableSolderPasteTop = e; }
   void setEnableSolderPasteBot(bool e) noexcept { mEnableSolderPasteBot = e; }
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   BoardFabricationOutputSettings& operator=(

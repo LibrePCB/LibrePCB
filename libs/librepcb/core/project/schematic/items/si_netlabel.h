@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/netlabel.h"
-#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "si_base.h"
 
@@ -47,7 +46,7 @@ class Schematic;
 /**
  * @brief The SI_NetLabel class
  */
-class SI_NetLabel final : public SI_Base, public SerializableObject {
+class SI_NetLabel final : public SI_Base {
   Q_OBJECT
 
 public:
@@ -78,9 +77,6 @@ public:
   void updateAnchor() noexcept;
   void addToSchematic() override;
   void removeFromSchematic() override;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::NetLabel; }

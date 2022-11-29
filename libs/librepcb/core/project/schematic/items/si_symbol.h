@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../attribute/attributeprovider.h"
-#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/sgi_symbol.h"
 #include "si_base.h"
 
@@ -48,9 +47,7 @@ class Symbol;
 /**
  * @brief The SI_Symbol class
  */
-class SI_Symbol final : public SI_Base,
-                        public SerializableObject,
-                        public AttributeProvider {
+class SI_Symbol final : public SI_Base, public AttributeProvider {
   Q_OBJECT
 
 public:
@@ -92,8 +89,12 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Inherited from AttributeProvider
   /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()

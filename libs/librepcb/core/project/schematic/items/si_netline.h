@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/netline.h"
-#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/sgi_netline.h"
 #include "si_base.h"
 
@@ -62,7 +61,7 @@ public:
 /**
  * @brief The SI_NetLine class
  */
-class SI_NetLine final : public SI_Base, public SerializableObject {
+class SI_NetLine final : public SI_Base {
   Q_OBJECT
 
 public:
@@ -95,9 +94,6 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
   void updateLine() noexcept;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::NetLine; }

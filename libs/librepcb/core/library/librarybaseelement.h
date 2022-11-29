@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../fileio/transactionaldirectory.h"
 #include "../serialization/serializablekeyvaluemap.h"
-#include "../serialization/serializableobject.h"
 #include "../serialization/sexpression.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
@@ -47,7 +46,7 @@ namespace librepcb {
 /**
  * @brief The LibraryBaseElement class
  */
-class LibraryBaseElement : public QObject, public SerializableObject {
+class LibraryBaseElement : public QObject {
   Q_OBJECT
 
 public:
@@ -126,13 +125,17 @@ public:
                           ElementType::getShortElementName());
   }
 
-protected:
-  // Protected Methods
+protected:  // Methods
   virtual void cleanupAfterLoadingElementFromFile() noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  virtual void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  virtual void serialize(SExpression& root) const;
 
+protected:  // Data
   // General Attributes
   std::unique_ptr<TransactionalDirectory> mDirectory;
   bool mDirectoryNameMustBeUuid;

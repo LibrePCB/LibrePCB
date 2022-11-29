@@ -618,11 +618,6 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serialize(const Length& obj) {
-  return SExpression::createToken(obj.toMmString());
-}
-
-template <>
 inline Length deserialize(const SExpression& sexpr, const Version& fileFormat) {
   Q_UNUSED(fileFormat);
   return Length::fromMm(sexpr.getValue());
@@ -734,11 +729,6 @@ inline bool operator!=(const UnsignedLength& lhs, const Length& rhs) noexcept {
 }
 inline bool operator!=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
   return (*lhs) != rhs;
-}
-
-template <>
-inline SExpression serialize(const UnsignedLength& obj) {
-  return SExpression::createToken(obj->toMmString());
 }
 
 template <>
@@ -931,11 +921,6 @@ inline bool operator!=(const PositiveLength& lhs, const Length& rhs) noexcept {
 }
 inline bool operator!=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
   return (*lhs) != rhs;
-}
-
-template <>
-inline SExpression serialize(const PositiveLength& obj) {
-  return SExpression::createToken(obj->toMmString());
 }
 
 template <>

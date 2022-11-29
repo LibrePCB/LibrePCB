@@ -50,7 +50,7 @@ namespace librepcb {
  *    - Symbol UUID
  *    - Pin-signal-mapping
  */
-class ComponentSymbolVariant final : public SerializableObject {
+class ComponentSymbolVariant final {
 public:
   // Signals
   enum class Event {
@@ -104,8 +104,12 @@ public:
 
   // General Methods
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const ComponentSymbolVariant& rhs) const noexcept;

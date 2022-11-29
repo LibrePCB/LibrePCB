@@ -94,9 +94,8 @@ signals:
   void componentUuidChanged(const Uuid& uuid);
   void packageUuidChanged(const Uuid& uuid);
 
-private:  // Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+protected:  // Methods
+  virtual void serialize(SExpression& root) const override;
 
 private:  // Data
   Uuid mComponentUuid;

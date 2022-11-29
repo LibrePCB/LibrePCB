@@ -26,7 +26,6 @@
 #include "../../attribute/attributeprovider.h"
 #include "../../fileio/filepath.h"
 #include "../../fileio/transactionaldirectory.h"
-#include "../../serialization/serializableobject.h"
 #include "../../types/elementname.h"
 #include "../../types/length.h"
 #include "../../types/uuid.h"
@@ -74,8 +73,7 @@ class Project;
  */
 class Board final : public QObject,
                     public AttributeProvider,
-                    public IF_ErcMsgProvider,
-                    public SerializableObject {
+                    public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(Board)
 
@@ -252,9 +250,6 @@ private:
         const QString& newName);
   void updateIcon() noexcept;
   void updateErcMessages() noexcept;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)

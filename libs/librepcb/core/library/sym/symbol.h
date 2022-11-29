@@ -97,6 +97,9 @@ public:
     return QStringLiteral("symbol");
   }
 
+protected:  // Methods
+  virtual void serialize(SExpression& root) const override;
+
 private:  // Methods
   void pinsEdited(const SymbolPinList& list, int index,
                   const std::shared_ptr<const SymbolPin>& pin,
@@ -110,8 +113,6 @@ private:  // Methods
   void textsEdited(const TextList& list, int index,
                    const std::shared_ptr<const Text>& text,
                    TextList::Event event) noexcept;
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
 private:  // Data
   SymbolPinList mPins;

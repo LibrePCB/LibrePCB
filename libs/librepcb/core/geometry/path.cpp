@@ -246,7 +246,11 @@ bool Path::close() noexcept {
 }
 
 void Path::serialize(SExpression& root) const {
-  serializeObjectContainer(root, mVertices, "vertex");
+  for (const Vertex& vertex : mVertices) {
+    root.ensureLineBreak();
+    vertex.serialize(root.appendList("vertex"));
+  }
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

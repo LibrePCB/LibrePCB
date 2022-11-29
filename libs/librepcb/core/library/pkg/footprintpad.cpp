@@ -251,9 +251,9 @@ void FootprintPad::serialize(SExpression& root) const {
   root.appendChild("side", mBoardSide);
   root.appendChild("shape", mShape);
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
-  root.appendChild(Point(*mWidth, *mHeight).serializeToDomElement("size"));
+  Point(*mWidth, *mHeight).serialize(root.appendList("size"));
   root.appendChild("drill", mDrillDiameter);
   root.ensureLineBreak();
   root.appendChild("package_pad", mPackagePadUuid);
@@ -291,6 +291,38 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
   setDrillDiameter(rhs.mDrillDiameter);
   setBoardSide(rhs.mBoardSide);
   return *this;
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const FootprintPad::Shape& obj) {
+  switch (obj) {
+    case FootprintPad::Shape::ROUND:
+      return SExpression::createToken("round");
+    case FootprintPad::Shape::RECT:
+      return SExpression::createToken("rect");
+    case FootprintPad::Shape::OCTAGON:
+      return SExpression::createToken("octagon");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+SExpression serialize(const FootprintPad::BoardSide& obj) {
+  switch (obj) {
+    case FootprintPad::BoardSide::TOP:
+      return SExpression::createToken("top");
+    case FootprintPad::BoardSide::BOTTOM:
+      return SExpression::createToken("bottom");
+    case FootprintPad::BoardSide::THT:
+      return SExpression::createToken("tht");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
 /*******************************************************************************

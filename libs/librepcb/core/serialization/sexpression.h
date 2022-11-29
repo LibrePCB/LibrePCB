@@ -38,7 +38,7 @@ class SExpression;
 class Version;
 
 /**
- * Serialize an object to a ::librepcb::SExpression
+ * Serialize an object to an ::librepcb::SExpression
  *
  * @tparam T    Type of object to serialize.
  * @param obj   Object to serialize.
@@ -210,52 +210,6 @@ private:  // Data
   QList<SExpression> mChildren;
   FilePath mFilePath;
 };
-
-/*******************************************************************************
- *  Serialization Methods
- ******************************************************************************/
-
-template <>
-inline SExpression serialize(const QString& obj) {
-  return SExpression::createString(obj);
-}
-
-template <>
-inline SExpression serialize(const bool& obj) {
-  return SExpression::createToken(obj ? "true" : "false");
-}
-
-template <>
-inline SExpression serialize(const int& obj) {
-  return SExpression::createToken(QString::number(obj));
-}
-
-template <>
-inline SExpression serialize(const uint& obj) {
-  return SExpression::createToken(QString::number(obj));
-}
-
-template <>
-inline SExpression serialize(const QColor& obj) {
-  return SExpression::createString(obj.isValid() ? obj.name(QColor::HexArgb)
-                                                 : "");
-}
-
-template <>
-inline SExpression serialize(const QUrl& obj) {
-  return SExpression::createString(
-      obj.isValid() ? obj.toString(QUrl::PrettyDecoded) : "");
-}
-
-template <>
-inline SExpression serialize(const QDateTime& obj) {
-  return SExpression::createToken(obj.toUTC().toString(Qt::ISODate));
-}
-
-template <>
-inline SExpression serialize(const SExpression& obj) {
-  return obj;
-}
 
 /*******************************************************************************
  *  Deserialization Methods

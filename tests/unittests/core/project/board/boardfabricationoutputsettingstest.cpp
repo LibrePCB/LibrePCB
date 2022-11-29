@@ -43,30 +43,32 @@ class BoardFabricationOutputSettingsTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(BoardFabricationOutputSettingsTest, testSerializeAndDeserialize) {
-  BoardFabricationOutputSettings obj;
-  obj.setOutputBasePath("a");
-  obj.setSuffixDrills("b");
-  obj.setSuffixDrillsNpth("c");
-  obj.setSuffixDrillsPth("d");
-  obj.setSuffixOutlines("e");
-  obj.setSuffixCopperTop("f");
-  obj.setSuffixCopperInner("g");
-  obj.setSuffixCopperBot("h");
-  obj.setSuffixSolderMaskTop("i");
-  obj.setSuffixSolderMaskBot("j");
-  obj.setSuffixSilkscreenTop("k");
-  obj.setSuffixSilkscreenBot("l");
-  obj.setSuffixSolderPasteTop("m");
-  obj.setSuffixSolderPasteBot("n");
-  obj.setSilkscreenLayersTop({"o", "p"});
-  obj.setSilkscreenLayersBot({"q", "r"});
-  obj.setMergeDrillFiles(!obj.getMergeDrillFiles());
-  obj.setEnableSolderPasteTop(!obj.getEnableSolderPasteTop());
-  obj.setEnableSolderPasteBot(!obj.getEnableSolderPasteBot());
-  SExpression sexpr1 = obj.serializeToDomElement("settings");
+  BoardFabricationOutputSettings obj1;
+  obj1.setOutputBasePath("a");
+  obj1.setSuffixDrills("b");
+  obj1.setSuffixDrillsNpth("c");
+  obj1.setSuffixDrillsPth("d");
+  obj1.setSuffixOutlines("e");
+  obj1.setSuffixCopperTop("f");
+  obj1.setSuffixCopperInner("g");
+  obj1.setSuffixCopperBot("h");
+  obj1.setSuffixSolderMaskTop("i");
+  obj1.setSuffixSolderMaskBot("j");
+  obj1.setSuffixSilkscreenTop("k");
+  obj1.setSuffixSilkscreenBot("l");
+  obj1.setSuffixSolderPasteTop("m");
+  obj1.setSuffixSolderPasteBot("n");
+  obj1.setSilkscreenLayersTop({"o", "p"});
+  obj1.setSilkscreenLayersBot({"q", "r"});
+  obj1.setMergeDrillFiles(!obj1.getMergeDrillFiles());
+  obj1.setEnableSolderPasteTop(!obj1.getEnableSolderPasteTop());
+  obj1.setEnableSolderPasteBot(!obj1.getEnableSolderPasteBot());
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
   BoardFabricationOutputSettings obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("settings");
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

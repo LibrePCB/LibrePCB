@@ -183,15 +183,15 @@ void SymbolPin::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("name", mName);
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("length", mLength);
   root.ensureLineBreak();
-  root.appendChild(mNamePosition.serializeToDomElement("name_position"));
+  mNamePosition.serialize(root.appendList("name_position"));
   root.appendChild("name_rotation", mNameRotation);
   root.appendChild("name_height", mNameHeight);
   root.ensureLineBreak();
-  root.appendChild(mNameAlignment.serializeToDomElement("name_align"));
+  mNameAlignment.serialize(root.appendList("name_align"));
   root.ensureLineBreak();
 }
 

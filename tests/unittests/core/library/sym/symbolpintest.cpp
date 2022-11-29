@@ -85,10 +85,12 @@ TEST_F(SymbolPinTest, testSerializeAndDeserialize) {
                  Point(123, 567), UnsignedLength(321), Angle(789),
                  Point(100000, 200000), Angle(321), PositiveLength(123456),
                  Alignment(HAlign::center(), VAlign::bottom()));
-  SExpression sexpr1 = obj1.serializeToDomElement("pin");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
   SymbolPin obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("pin");
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

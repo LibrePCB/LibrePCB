@@ -275,11 +275,6 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serialize(const Ratio& obj) {
-  return SExpression::createToken(obj.toNormalizedString());
-}
-
-template <>
 inline Ratio deserialize(const SExpression& sexpr, const Version& fileFormat) {
   Q_UNUSED(fileFormat);
   return Ratio::fromNormalized(sexpr.getValue());
@@ -328,11 +323,6 @@ struct UnsignedRatioConstraint {
 using UnsignedRatio =
     type_safe::constrained_type<Ratio, UnsignedRatioConstraint,
                                 UnsignedRatioVerifier>;
-
-template <>
-inline SExpression serialize(const UnsignedRatio& obj) {
-  return SExpression::createToken(obj->toNormalizedString());
-}
 
 template <>
 inline UnsignedRatio deserialize(const SExpression& sexpr,

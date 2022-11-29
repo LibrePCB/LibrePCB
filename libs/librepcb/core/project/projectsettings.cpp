@@ -89,32 +89,27 @@ void ProjectSettings::triggerSettingsChanged() noexcept {
   emit settingsChanged();
 }
 
-void ProjectSettings::save() {
-  SExpression doc(
-      serializeToDomElement("librepcb_project_settings"));  // can throw
-  mProject.getDirectory().write("project/settings.lp",
-                                doc.toByteArray());  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
 void ProjectSettings::serialize(SExpression& root) const {
   root.ensureLineBreak();
-  SExpression& locale_order = root.appendList("library_locale_order");
-  foreach (const QString& locale, mLocaleOrder) {
-    locale_order.ensureLineBreak();
-    locale_order.appendChild("locale", locale);
+  {
+    SExpression& node = root.appendList("library_locale_order");
+    foreach (const QString& locale, mLocaleOrder) {
+      node.ensureLineBreak();
+      node.appendChild("locale", locale);
+    }
+    node.ensureLineBreak();
   }
-  locale_order.ensureLineBreak();
+
   root.ensureLineBreak();
-  SExpression& norm_order = root.appendList("library_norm_order");
-  foreach (const QString& norm, mNormOrder) {
-    norm_order.ensureLineBreak();
-    norm_order.appendChild("norm", norm);
+  {
+    SExpression& node = root.appendList("library_norm_order");
+    foreach (const QString& norm, mNormOrder) {
+      node.ensureLineBreak();
+      node.appendChild("norm", norm);
+    }
+    node.ensureLineBreak();
   }
-  norm_order.ensureLineBreak();
+
   root.ensureLineBreak();
 }
 

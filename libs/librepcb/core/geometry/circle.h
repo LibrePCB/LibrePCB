@@ -42,7 +42,7 @@ namespace librepcb {
 /**
  * @brief The Circle class
  */
-class Circle : public SerializableObject {
+class Circle final {
   Q_DECLARE_TR_FUNCTIONS(Circle)
 
 public:
@@ -67,7 +67,7 @@ public:
          const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
          const Point& center, const PositiveLength& diameter) noexcept;
   Circle(const SExpression& node, const Version& fileFormat);
-  virtual ~Circle() noexcept;
+  ~Circle() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
@@ -86,8 +86,14 @@ public:
   bool setCenter(const Point& center) noexcept;
   bool setDiameter(const PositiveLength& dia) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const Circle& rhs) const noexcept;

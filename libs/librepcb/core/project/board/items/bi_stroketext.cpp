@@ -150,10 +150,6 @@ void BI_StrokeText::removeFromBoard() {
   mBoard.getGraphicsScene().removeItem(*mAnchorGraphicsItem);
 }
 
-void BI_StrokeText::serialize(SExpression& root) const {
-  mText->serialize(root);
-}
-
 /*******************************************************************************
  *  Inherited from BI_Base
  ******************************************************************************/

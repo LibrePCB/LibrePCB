@@ -65,6 +65,18 @@ qint32 Ratio::normalizedStringToPpm(const QString& normalized) {
   return Toolbox::decimalFixedPointFromString<qint32>(normalized, 6);
 }
 
+// Non-Member Functions
+
+template <>
+SExpression serialize(const Ratio& obj) {
+  return SExpression::createToken(obj.toNormalizedString());
+}
+
+template <>
+SExpression serialize(const UnsignedRatio& obj) {
+  return serialize(*obj);
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

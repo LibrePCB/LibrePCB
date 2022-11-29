@@ -23,9 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gmock/gmock.h>
-#include <librepcb/core/serialization/serializableobject.h>
+#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/types/uuid.h>
 #include <librepcb/core/utils/signalslot.h>
 
@@ -41,7 +40,7 @@ namespace tests {
  *  Class MinimalSerializableObjectMock
  ******************************************************************************/
 
-class MinimalSerializableObjectMock final : public SerializableObject {
+class MinimalSerializableObjectMock final {
 public:
   QString mValue;
   Signal<MinimalSerializableObjectMock> onEdited;
@@ -58,7 +57,7 @@ public:
       delete;
   ~MinimalSerializableObjectMock() {}
 
-  void serialize(SExpression& root) const override {
+  void serialize(SExpression& root) const {
     root.ensureLineBreak();
     root.appendChild("value", mValue);
     root.ensureLineBreak();
@@ -74,7 +73,7 @@ public:
  *  Class SerializableObjectMock
  ******************************************************************************/
 
-class SerializableObjectMock final : public SerializableObject {
+class SerializableObjectMock final {
 public:
   Uuid mUuid;
   QString mName;
@@ -97,7 +96,7 @@ public:
   const Uuid& getUuid() const noexcept { return mUuid; }
   const QString& getName() const noexcept { return mName; }
 
-  void serialize(SExpression& root) const override {
+  void serialize(SExpression& root) const {
     root.appendChild(mUuid);
     root.ensureLineBreak();
     root.appendChild("name", mName);

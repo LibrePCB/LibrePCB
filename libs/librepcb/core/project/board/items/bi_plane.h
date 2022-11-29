@@ -26,7 +26,6 @@
 #include "../../../exceptions.h"
 #include "../../../geometry/path.h"
 #include "../../../graphics/graphicslayername.h"
-#include "../../../serialization/serializableobject.h"
 #include "../../../types/uuid.h"
 #include "bi_base.h"
 
@@ -49,7 +48,7 @@ class Project;
 /**
  * @brief The BI_Plane class
  */
-class BI_Plane final : public BI_Base, public SerializableObject {
+class BI_Plane final : public BI_Base {
   Q_OBJECT
 
 public:
@@ -105,8 +104,12 @@ public:
   void removeFromBoard() override;
   void clear() noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::Plane; }
@@ -145,20 +148,6 @@ private:  // Data
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
-
-template <>
-inline SExpression serialize(const BI_Plane::ConnectStyle& obj) {
-  switch (obj) {
-    case BI_Plane::ConnectStyle::None:
-      return SExpression::createToken("none");
-    // case BI_Plane::ConnectStyle::Thermal:  return
-    // SExpression::createToken("thermal");
-    case BI_Plane::ConnectStyle::Solid:
-      return SExpression::createToken("solid");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
 
 template <>
 inline BI_Plane::ConnectStyle deserialize(const SExpression& sexpr,

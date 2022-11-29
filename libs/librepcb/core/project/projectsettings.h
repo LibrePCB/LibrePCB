@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../fileio/filepath.h"
-#include "../serialization/serializableobject.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -34,6 +31,8 @@
 namespace librepcb {
 
 class Project;
+class SExpression;
+class Version;
 
 /*******************************************************************************
  *  Class ProjectSettings
@@ -42,7 +41,7 @@ class Project;
 /**
  * @brief The ProjectSettings class
  */
-class ProjectSettings final : public QObject, public SerializableObject {
+class ProjectSettings final : public QObject {
   Q_OBJECT
 
 public:
@@ -52,9 +51,6 @@ public:
   explicit ProjectSettings(Project& project, const Version& fileFormat,
                            bool create);
   ~ProjectSettings() noexcept;
-
-  // Getters: General
-  Project& getProject() const noexcept { return mProject; }
 
   // Getters: Settings
   const QStringList& getLocaleOrder() const noexcept { return mLocaleOrder; }
@@ -69,21 +65,21 @@ public:
   // General Methods
   void restoreDefaults() noexcept;
   void triggerSettingsChanged() noexcept;
-  void save();
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   ProjectSettings& operator=(const ProjectSettings& rhs) = delete;
 
 signals:
-
   void settingsChanged();
 
 private:
-  // Private Methods
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // General
   Project& mProject;  ///< a reference to the Project object (from the ctor)
 

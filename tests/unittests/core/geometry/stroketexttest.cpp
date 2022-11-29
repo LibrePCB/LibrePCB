@@ -95,10 +95,12 @@ TEST_F(StrokeTextTest, testSerializeAndDeserialize) {
                   UnsignedLength(456), StrokeTextSpacing(),
                   StrokeTextSpacing(Ratio(1234)),
                   Alignment(HAlign::right(), VAlign::center()), true, false);
-  SExpression sexpr1 = obj1.serializeToDomElement("text");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
   StrokeText obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("text");
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

@@ -79,6 +79,24 @@ GridProperties& GridProperties::operator=(const GridProperties& rhs) noexcept {
 }
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const GridProperties::Type_t& obj) {
+  switch (obj) {
+    case GridProperties::Type_t::Off:
+      return SExpression::createToken("off");
+    case GridProperties::Type_t::Lines:
+      return SExpression::createToken("lines");
+    case GridProperties::Type_t::Dots:
+      return SExpression::createToken("dots");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

@@ -357,22 +357,20 @@ void Circuit::setComponentInstanceName(ComponentInstance& cmp,
  *  General Methods
  ******************************************************************************/
 
-void Circuit::save() {
-  SExpression doc(serializeToDomElement("librepcb_circuit"));  // can throw
-  mDirectory->write("circuit.lp", doc.toByteArray());  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
 void Circuit::serialize(SExpression& root) const {
   root.ensureLineBreak();
-  serializePointerContainer(root, mNetClasses, "netclass");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mNetSignals, "net");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mComponentInstances, "component");
+  for (const NetClass* obj : mNetClasses) {
+    root.ensureLineBreak();
+    obj->serialize(root.appendList("netclass"));
+  }
+  for (const NetSignal* obj : mNetSignals) {
+    root.ensureLineBreak();
+    obj->serialize(root.appendList("net"));
+  }
+  for (const ComponentInstance* obj : mComponentInstances) {
+    root.ensureLineBreak();
+    obj->serialize(root.appendList("component"));
+  }
   root.ensureLineBreak();
 }
 

@@ -154,7 +154,7 @@ void Circle::serialize(SExpression& root) const {
   root.appendChild("fill", mIsFilled);
   root.appendChild("grab_area", mIsGrabArea);
   root.appendChild("diameter", mDiameter);
-  root.appendChild(mCenter.serializeToDomElement("position"));
+  mCenter.serialize(root.appendList("position"));
   root.ensureLineBreak();
 }
 

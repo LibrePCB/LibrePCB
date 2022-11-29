@@ -66,7 +66,7 @@ LibraryElementCheckMessageList Package::runChecks() const {
 }
 
 /*******************************************************************************
- *  Private Methods
+ *  Protected Methods
  ******************************************************************************/
 
 void Package::serialize(SExpression& root) const {

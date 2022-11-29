@@ -129,11 +129,6 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serialize(const CmpSigPinDisplayType& obj) {
-  return SExpression::createToken(obj.toString());
-}
-
-template <>
 inline const CmpSigPinDisplayType& deserialize(const SExpression& sexpr,
                                                const Version& fileFormat) {
   Q_UNUSED(fileFormat);

@@ -42,7 +42,9 @@ protected:
   std::string str(const QString& s) const { return s.toStdString(); }
 
   std::string str(const Point& p) const {
-    return p.serializeToDomElement("pos").toByteArray().toStdString();
+    SExpression sexpr = SExpression::createList("pos");
+    p.serialize(sexpr);
+    return sexpr.toByteArray().toStdString();
   }
 
   std::string str(const Angle& a) const {
@@ -50,7 +52,9 @@ protected:
   }
 
   std::string str(const Path& p) const {
-    return p.serializeToDomElement("path").toByteArray().toStdString();
+    SExpression sexpr = SExpression::createList("path");
+    p.serialize(sexpr);
+    return sexpr.toByteArray().toStdString();
   }
 };
 

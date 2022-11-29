@@ -23,9 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../fileio/filepath.h"
-#include "../../serialization/serializableobject.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -35,6 +32,7 @@ namespace librepcb {
 
 class ErcMsg;
 class Project;
+class SExpression;
 
 /*******************************************************************************
  *  Class ErcMsgList
@@ -44,7 +42,7 @@ class Project;
  * @brief The ErcMsgList class contains a list of ERC messages which are visible
  * for the user
  */
-class ErcMsgList final : public QObject, public SerializableObject {
+class ErcMsgList final : public QObject {
   Q_OBJECT
 
 public:
@@ -62,21 +60,23 @@ public:
   void remove(ErcMsg* ercMsg) noexcept;
   void update(ErcMsg* ercMsg) noexcept;
   void restoreIgnoreState();
-  void save();
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   ErcMsgList& operator=(const ErcMsgList& rhs) = delete;
 
 signals:
-
   void ercMsgAdded(ErcMsg* ercMsg);
   void ercMsgRemoved(ErcMsg* ercMsg);
   void ercMsgChanged(ErcMsg* ercMsg);
 
-private:  // Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
+private:
   // General
   Project& mProject;
 

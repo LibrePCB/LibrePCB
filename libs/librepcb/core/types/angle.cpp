@@ -136,6 +136,13 @@ qint32 Angle::degStringToMicrodeg(const QString& degrees) {
   return Toolbox::decimalFixedPointFromString<qint32>(degrees, 6);
 }
 
+// Non-Member Functions
+
+template <>
+SExpression serialize(const Angle& obj) {
+  return SExpression::createToken(obj.toDegString());
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

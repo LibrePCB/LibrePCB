@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../graphics/graphicslayer.h"
-#include "../../serialization/serializableobject.h"
 
 #include <QtCore>
 
@@ -43,9 +42,7 @@ class Board;
  * @brief The BoardLayerStack class provides and manages all available layers of
  * a board
  */
-class BoardLayerStack final : public QObject,
-                              public SerializableObject,
-                              public IF_GraphicsLayerProvider {
+class BoardLayerStack final : public QObject, public IF_GraphicsLayerProvider {
   Q_OBJECT
 
 public:
@@ -78,11 +75,6 @@ public:
 
   // Setters
   void setInnerLayerCount(int count) noexcept;
-
-  // General Methods
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // Operator Overloadings
   BoardLayerStack& operator=(const BoardLayerStack& rhs) noexcept;

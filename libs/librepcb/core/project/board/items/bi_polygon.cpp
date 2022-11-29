@@ -96,10 +96,6 @@ void BI_Polygon::removeFromBoard() {
   BI_Base::removeFromBoard(mGraphicsItem.data());
 }
 
-void BI_Polygon::serialize(SExpression& root) const {
-  mPolygon->serialize(root);
-}
-
 /*******************************************************************************
  *  Inherited from BI_Base
  ******************************************************************************/

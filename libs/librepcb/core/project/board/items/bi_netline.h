@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../../geometry/path.h"
 #include "../../../geometry/trace.h"
-#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/bgi_netline.h"
 #include "bi_base.h"
 
@@ -69,7 +68,7 @@ public:
 /**
  * @brief The BI_NetLine class
  */
-class BI_NetLine final : public BI_Base, public SerializableObject {
+class BI_NetLine final : public BI_Base {
   Q_OBJECT
 
 public:
@@ -105,9 +104,6 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
   void updateLine() noexcept;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::NetLine; }

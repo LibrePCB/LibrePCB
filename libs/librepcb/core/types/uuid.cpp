@@ -122,6 +122,24 @@ tl::optional<Uuid> Uuid::tryFromString(const QString& str) noexcept {
 }
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const Uuid& obj) {
+  return SExpression::createToken(obj.toStr());
+}
+
+template <>
+SExpression serialize(const tl::optional<Uuid>& obj) {
+  if (obj) {
+    return serialize(*obj);
+  } else {
+    return SExpression::createToken("none");
+  }
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

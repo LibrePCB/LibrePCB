@@ -132,11 +132,6 @@ private:  // Data
  ******************************************************************************/
 
 template <>
-inline SExpression serialize(const SignalRole& obj) {
-  return SExpression::createToken(obj.toStr());
-}
-
-template <>
 inline SignalRole deserialize(const SExpression& sexpr,
                               const Version& fileFormat) {
   Q_UNUSED(fileFormat);

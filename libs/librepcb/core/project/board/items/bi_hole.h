@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/hole.h"
-#include "../../../serialization/serializableobject.h"
 #include "bi_base.h"
 
 #include <QtCore>
@@ -45,7 +44,7 @@ class Project;
 /**
  * @brief The BI_Hole class
  */
-class BI_Hole final : public BI_Base, public SerializableObject {
+class BI_Hole final : public BI_Base {
   Q_OBJECT
 
 public:
@@ -67,9 +66,6 @@ public:
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::Hole; }

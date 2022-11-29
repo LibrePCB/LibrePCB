@@ -330,11 +330,6 @@ private:
  ******************************************************************************/
 
 template <>
-inline SExpression serialize(const LengthUnit& obj) {
-  return SExpression::createToken(obj.toStr());
-}
-
-template <>
 inline LengthUnit deserialize(const SExpression& sexpr,
                               const Version& fileFormat) {
   Q_UNUSED(fileFormat);

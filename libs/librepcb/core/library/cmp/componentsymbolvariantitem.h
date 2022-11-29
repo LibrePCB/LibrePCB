@@ -51,7 +51,7 @@ namespace librepcb {
  *  - Symbol UUID
  *  - Pin-signal-mapping
  */
-class ComponentSymbolVariantItem final : public SerializableObject {
+class ComponentSymbolVariantItem final {
   Q_DECLARE_TR_FUNCTIONS(ComponentSymbolVariantItem)
 
 public:
@@ -102,8 +102,14 @@ public:
     return mPinSignalMap;
   }
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const ComponentSymbolVariantItem& rhs) const noexcept;

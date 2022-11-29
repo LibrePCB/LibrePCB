@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../serialization/serializableobject.h"
 #include "../../../types/point.h"
 #include "../../../types/uuid.h"
 #include "bi_base.h"
@@ -51,7 +50,7 @@ class NetSignal;
 /**
  * @brief The BI_NetSegment class
  */
-class BI_NetSegment final : public BI_Base, public SerializableObject {
+class BI_NetSegment final : public BI_Base {
   Q_OBJECT
 
 public:
@@ -121,8 +120,12 @@ public:
   void setSelectionRect(const QRectF rectPx) noexcept;
   void clearSelection() const noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Inherited from BI_Base
   Type_t getType() const noexcept override {

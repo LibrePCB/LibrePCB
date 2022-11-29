@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../../attribute/attribute.h"
 #include "../../../attribute/attributeprovider.h"
-#include "../../../serialization/serializableobject.h"
 #include "../../../types/uuid.h"
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/bgi_device.h"
@@ -55,8 +54,7 @@ class Project;
  */
 class BI_Device final : public BI_Base,
                         public AttributeProvider,
-                        public IF_ErcMsgProvider,
-                        public SerializableObject {
+                        public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(BI_Device)
 
@@ -131,8 +129,12 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Inherited from AttributeProvider
   /// @copydoc ::librepcb::AttributeProvider::getUserDefinedAttributeValue()

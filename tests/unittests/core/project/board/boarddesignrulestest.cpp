@@ -132,10 +132,12 @@ TEST_F(BoardDesignRulesTest, testSerializeAndDeserialize) {
   obj1.setRestringPadBounds(UnsignedLength(99), UnsignedLength(111));
   obj1.setRestringViaRatio(UnsignedRatio(Ratio(222)));
   obj1.setRestringViaBounds(UnsignedLength(333), UnsignedLength(444));
-  SExpression sexpr1 = obj1.serializeToDomElement("rules");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
   BoardDesignRules obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("rules");
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

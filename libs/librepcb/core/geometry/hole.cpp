@@ -91,7 +91,7 @@ bool Hole::setDiameter(const PositiveLength& diameter) noexcept {
 void Hole::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("diameter", mDiameter);
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
 }
 
 /*******************************************************************************

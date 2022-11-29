@@ -167,7 +167,7 @@ template QStringList Library::searchForElements<Component>() const noexcept;
 template QStringList Library::searchForElements<Device>() const noexcept;
 
 /*******************************************************************************
- *  Private Methods
+ *  Protected Methods
  ******************************************************************************/
 
 void Library::serialize(SExpression& root) const {

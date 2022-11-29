@@ -474,15 +474,14 @@ void Project::removeBoard(Board& board, bool deleteBoard) {
 void Project::save() {
   qDebug() << "Save project files to transactional file system...";
 
-  // Save version file
-  mDirectory->write(
-      ".librepcb-project",
-      VersionFile(qApp->getFileFormatVersion()).toByteArray());  // can throw
+  // Version file.
+  mDirectory->write(".librepcb-project",
+                    VersionFile(qApp->getFileFormatVersion()).toByteArray());
 
-  // Save *.lpp project file
-  mDirectory->write(mFilename, "LIBREPCB-PROJECT");  // can throw
+  // Project file.
+  mDirectory->write(mFilename, "LIBREPCB-PROJECT");
 
-  // Save project/metadata.lp
+  // Metadata.
   {
     SExpression root = SExpression::createList("librepcb_project_metadata");
     root.appendChild(mUuid);
@@ -497,52 +496,58 @@ void Project::save() {
     root.ensureLineBreak();
     mAttributes.serialize(root);
     root.ensureLineBreak();
-    mDirectory->write("project/metadata.lp",
-                      root.toByteArray());  // can throw
+    mDirectory->write("project/metadata.lp", root.toByteArray());
   }
 
-  // Save settings
-  mProjectSettings->save();  // can throw
-
-  // Save circuit
-  mCircuit->save();  // can throw
-
-  // Save ERC messages list
-  mErcMsgList->save();  // can throw
-
-  // Save schematics/schematics.lp
-  SExpression schRoot = SExpression::createList("librepcb_schematics");
-  foreach (Schematic* schematic, mSchematics) {
-    schRoot.ensureLineBreak();
-    schRoot.appendChild(
-        "schematic",
-        "schematics/" + schematic->getDirectoryName() + "/schematic.lp");
-  }
-  schRoot.ensureLineBreak();
-  mDirectory->write("schematics/schematics.lp",
-                    schRoot.toByteArray());  // can throw
-
-  // Save boards/boards.lp
-  SExpression brdRoot = SExpression::createList("librepcb_boards");
-  foreach (Board* board, mBoards) {
-    brdRoot.ensureLineBreak();
-    brdRoot.appendChild("board",
-                        "boards/" + board->getDirectoryName() + "/board.lp");
-  }
-  brdRoot.ensureLineBreak();
-  mDirectory->write("boards/boards.lp", brdRoot.toByteArray());  // can throw
-
-  // Save all schematics (*.lp files)
-  foreach (Schematic* schematic, mSchematics) {
-    schematic->save();  // can throw
+  // Settings.
+  {
+    SExpression root = SExpression::createList("librepcb_project_settings");
+    mProjectSettings->serialize(root);
+    mDirectory->write("project/settings.lp", root.toByteArray());
   }
 
-  // Save all boards (*.lp files)
-  foreach (Board* board, mBoards) {
-    board->save();  // can throw
+  // Circuit.
+  {
+    SExpression root = SExpression::createList("librepcb_circuit");
+    mCircuit->serialize(root);
+    mDirectory->write("circuit/circuit.lp", root.toByteArray());
   }
 
-  // update the "last modified datetime" attribute of the project
+  // ERC.
+  {
+    SExpression root = SExpression::createList("librepcb_erc");
+    mErcMsgList->serialize(root);
+    mDirectory->write("circuit/erc.lp", root.toByteArray());
+  }
+
+  // Schematics.
+  {
+    SExpression root = SExpression::createList("librepcb_schematics");
+    foreach (Schematic* schematic, mSchematics) {
+      root.ensureLineBreak();
+      root.appendChild(
+          "schematic",
+          "schematics/" + schematic->getDirectoryName() + "/schematic.lp");
+      schematic->save();
+    }
+    root.ensureLineBreak();
+    mDirectory->write("schematics/schematics.lp", root.toByteArray());
+  }
+
+  // Boards.
+  {
+    SExpression root = SExpression::createList("librepcb_boards");
+    foreach (Board* board, mBoards) {
+      root.ensureLineBreak();
+      root.appendChild("board",
+                       "boards/" + board->getDirectoryName() + "/board.lp");
+      board->save();
+    }
+    root.ensureLineBreak();
+    mDirectory->write("boards/boards.lp", root.toByteArray());
+  }
+
+  // Update the "last modified datetime" attribute of the project.
   updateLastModified();
 }
 

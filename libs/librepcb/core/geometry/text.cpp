@@ -150,9 +150,9 @@ void Text::serialize(SExpression& root) const {
   root.appendChild("layer", mLayerName);
   root.appendChild("value", mText);
   root.ensureLineBreak();
-  root.appendChild(mAlign.serializeToDomElement("align"));
+  mAlign.serialize(root.appendList("align"));
   root.appendChild("height", mHeight);
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.ensureLineBreak();
 }

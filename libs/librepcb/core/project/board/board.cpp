@@ -776,14 +776,61 @@ void Board::removeFromProject() {
 }
 
 void Board::save() {
-  // save board file
+  // Content.
   {
-    SExpression root(serializeToDomElement("librepcb_board"));  // can throw
-    mDirectory->write("board.lp",
-                      root.toByteArray());  // can throw
+    SExpression root = SExpression::createList("librepcb_board");
+    root.appendChild(mUuid);
+    root.ensureLineBreak();
+    root.appendChild("name", mName);
+    root.ensureLineBreak();
+    root.appendChild("default_font", mDefaultFontFileName);
+    root.ensureLineBreak();
+    mGridProperties->serialize(root.appendList("grid"));
+    root.ensureLineBreak();
+    {
+      SExpression& node = root.appendList("layers");
+      node.appendChild("inner", mLayerStack->getInnerLayerCount());
+    }
+    root.ensureLineBreak();
+    mDesignRules->serialize(root.appendList("design_rules"));
+    root.ensureLineBreak();
+    mFabricationOutputSettings->serialize(
+        root.appendList("fabrication_output_settings"));
+    root.ensureLineBreak();
+    for (const BI_Device* obj : mDeviceInstances) {
+      root.ensureLineBreak();
+      obj->serialize(root.appendList("device"));
+    }
+    root.ensureLineBreak();
+    for (const BI_NetSegment* obj : mNetSegments) {
+      root.ensureLineBreak();
+      obj->serialize(root.appendList("netsegment"));
+    }
+    root.ensureLineBreak();
+    for (const BI_Plane* obj : mPlanes) {
+      root.ensureLineBreak();
+      obj->serialize(root.appendList("plane"));
+    }
+    root.ensureLineBreak();
+    for (const BI_Polygon* obj : mPolygons) {
+      root.ensureLineBreak();
+      obj->getPolygon().serialize(root.appendList("polygon"));
+    }
+    root.ensureLineBreak();
+    for (const BI_StrokeText* obj : mStrokeTexts) {
+      root.ensureLineBreak();
+      obj->getText().serialize(root.appendList("stroke_text"));
+    }
+    root.ensureLineBreak();
+    for (const BI_Hole* obj : mHoles) {
+      root.ensureLineBreak();
+      obj->getHole().serialize(root.appendList("hole"));
+    }
+    root.ensureLineBreak();
+    mDirectory->write("board.lp", root.toByteArray());
   }
 
-  // save user settings
+  // User settings.
   {
     SExpression root = SExpression::createList("librepcb_board_user_settings");
     for (const GraphicsLayer* layer : mLayerStack->getAllLayers()) {
@@ -795,7 +842,7 @@ void Board::save() {
       child.appendChild("visible", layer->getVisible());
     }
     root.ensureLineBreak();
-    foreach (BI_Plane* plane, mPlanes) {
+    for (const BI_Plane* plane : mPlanes) {
       root.ensureLineBreak();
       SExpression node = SExpression::createList("plane");
       node.appendChild(plane->getUuid());
@@ -803,7 +850,7 @@ void Board::save() {
       root.appendChild(node);
     }
     root.ensureLineBreak();
-    mDirectory->write("settings.user.lp", root.toByteArray());  // can throw
+    mDirectory->write("settings.user.lp", root.toByteArray());
   }
 }
 
@@ -914,36 +961,6 @@ QVector<const AttributeProvider*> Board::getAttributeProviderParents() const
 
 void Board::updateIcon() noexcept {
   mIcon = QIcon(mGraphicsScene->toPixmap(QSize(297, 210), Qt::white));
-}
-
-void Board::serialize(SExpression& root) const {
-  root.appendChild(mUuid);
-  root.ensureLineBreak();
-  root.appendChild("name", mName);
-  root.ensureLineBreak();
-  root.appendChild("default_font", mDefaultFontFileName);
-  root.ensureLineBreak();
-  root.appendChild(mGridProperties->serializeToDomElement("grid"));
-  root.ensureLineBreak();
-  root.appendChild(mLayerStack->serializeToDomElement("layers"));
-  root.ensureLineBreak();
-  root.appendChild(mDesignRules->serializeToDomElement("design_rules"));
-  root.ensureLineBreak();
-  root.appendChild(mFabricationOutputSettings->serializeToDomElement(
-      "fabrication_output_settings"));
-  root.ensureLineBreak();
-  serializePointerContainer(root, mDeviceInstances, "device");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mNetSegments, "netsegment");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mPlanes, "plane");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mPolygons, "polygon");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mStrokeTexts, "stroke_text");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mHoles, "hole");
-  root.ensureLineBreak();
 }
 
 void Board::updateErcMessages() noexcept {

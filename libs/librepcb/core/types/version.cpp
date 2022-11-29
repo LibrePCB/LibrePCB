@@ -121,6 +121,15 @@ tl::optional<Version> Version::tryFromString(const QString& str) noexcept {
 }
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const Version& obj) {
+  return SExpression::createString(obj.toStr());
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

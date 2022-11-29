@@ -24,6 +24,7 @@
 
 #include "../../application.h"
 #include "../../exceptions.h"
+#include "../../geometry/polygon.h"
 #include "../../graphics/graphicsscene.h"
 #include "../../library/sym/symbolpin.h"
 #include "../../serialization/sexpression.h"
@@ -389,9 +390,34 @@ void Schematic::removeFromProject() {
 }
 
 void Schematic::save() {
-  SExpression root(serializeToDomElement("librepcb_schematic"));  // can throw
-  mDirectory->write("schematic.lp",
-                    root.toByteArray());  // can throw
+  SExpression root = SExpression::createList("librepcb_schematic");
+  root.appendChild(mUuid);
+  root.ensureLineBreak();
+  root.appendChild("name", mName);
+  root.ensureLineBreak();
+  mGridProperties->serialize(root.appendList("grid"));
+  root.ensureLineBreak();
+  for (const SI_Symbol* obj : mSymbols) {
+    root.ensureLineBreak();
+    obj->serialize(root.appendList("symbol"));
+  }
+  root.ensureLineBreak();
+  for (const SI_NetSegment* obj : mNetSegments) {
+    root.ensureLineBreak();
+    obj->serialize(root.appendList("netsegment"));
+  }
+  root.ensureLineBreak();
+  for (const SI_Polygon* obj : mPolygons) {
+    root.ensureLineBreak();
+    obj->getPolygon().serialize(root.appendList("polygon"));
+  }
+  root.ensureLineBreak();
+  for (const SI_Text* obj : mTexts) {
+    root.ensureLineBreak();
+    obj->getText().serialize(root.appendList("text"));
+  }
+  root.ensureLineBreak();
+  mDirectory->write("schematic.lp", root.toByteArray());
 }
 
 void Schematic::selectAll() noexcept {
@@ -472,23 +498,6 @@ QVector<const AttributeProvider*> Schematic::getAttributeProviderParents() const
 
 void Schematic::updateIcon() noexcept {
   mIcon = QIcon(mGraphicsScene->toPixmap(QSize(297, 210), Qt::white));
-}
-
-void Schematic::serialize(SExpression& root) const {
-  root.appendChild(mUuid);
-  root.ensureLineBreak();
-  root.appendChild("name", mName);
-  root.ensureLineBreak();
-  root.appendChild(mGridProperties->serializeToDomElement("grid"));
-  root.ensureLineBreak();
-  serializePointerContainer(root, mSymbols, "symbol");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mNetSegments, "netsegment");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mPolygons, "polygon");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mTexts, "text");
-  root.ensureLineBreak();
 }
 
 /*******************************************************************************

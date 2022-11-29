@@ -41,7 +41,7 @@ namespace librepcb {
 /**
  * @brief The Hole class
  */
-class Hole final : public SerializableObject {
+class Hole final {
   Q_DECLARE_TR_FUNCTIONS(Hole)
 
 public:
@@ -72,8 +72,14 @@ public:
   bool setPosition(const Point& position) noexcept;
   bool setDiameter(const PositiveLength& diameter) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const Hole& rhs) const noexcept;

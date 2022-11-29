@@ -285,8 +285,8 @@ void StrokeText::serialize(SExpression& root) const {
   root.appendChild("letter_spacing", mLetterSpacing);
   root.appendChild("line_spacing", mLineSpacing);
   root.ensureLineBreak();
-  root.appendChild(mAlign.serializeToDomElement("align"));
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mAlign.serialize(root.appendList("align"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.ensureLineBreak();
   root.appendChild("auto_rotate", mAutoRotate);
@@ -332,6 +332,19 @@ StrokeText& StrokeText::operator=(const StrokeText& rhs) noexcept {
   setMirrored(rhs.mMirrored);
   setAutoRotate(rhs.mAutoRotate);
   return *this;
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const StrokeTextSpacing& obj) {
+  if (obj.isAuto()) {
+    return SExpression::createToken("auto");
+  } else {
+    return serialize(obj.getRatio());
+  }
 }
 
 /*******************************************************************************

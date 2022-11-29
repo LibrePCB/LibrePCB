@@ -95,7 +95,8 @@ TEST_P(AttributeTest, testSerialize) {
                       type.getUnitFromString(data.unit));
 
   if (data.validSExpression) {
-    SExpression sexpr = attribute.serializeToDomElement("attribute");
+    SExpression sexpr = SExpression::createList("attribute");
+    attribute.serialize(sexpr);
     EXPECT_EQ(data.serialized, sexpr.toByteArray());
   }
 }

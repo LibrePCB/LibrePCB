@@ -78,10 +78,6 @@ void BI_Hole::removeFromBoard() {
   BI_Base::removeFromBoard(mGraphicsItem.data());
 }
 
-void BI_Hole::serialize(SExpression& root) const {
-  mHole->serialize(root);
-}
-
 /*******************************************************************************
  *  Inherited from BI_Base
  ******************************************************************************/

@@ -39,7 +39,7 @@ namespace librepcb {
 /**
  * @brief The DevicePadSignalMapItem class
  */
-class DevicePadSignalMapItem final : public SerializableObject {
+class DevicePadSignalMapItem final {
 public:
   // Signals
   enum class Event {
@@ -69,8 +69,14 @@ public:
   // Setters
   bool setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const DevicePadSignalMapItem& rhs) const noexcept;

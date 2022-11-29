@@ -67,12 +67,24 @@ SymbolClipboardData::~SymbolClipboardData() noexcept {
 
 std::unique_ptr<QMimeData> SymbolClipboardData::toMimeData(
     const IF_GraphicsLayerProvider& lp) {
-  SExpression sexpr =
-      serializeToDomElement("librepcb_clipboard_symbol");  // can throw
+  SExpression root = SExpression::createList("librepcb_clipboard_symbol");
+  root.ensureLineBreak();
+  mCursorPos.serialize(root.appendList("cursor_position"));
+  root.ensureLineBreak();
+  root.appendChild("symbol", mSymbolUuid);
+  root.ensureLineBreak();
+  mPins.serialize(root);
+  root.ensureLineBreak();
+  mPolygons.serialize(root);
+  root.ensureLineBreak();
+  mCircles.serialize(root);
+  root.ensureLineBreak();
+  mTexts.serialize(root);
+  root.ensureLineBreak();
 
   std::unique_ptr<QMimeData> data(new QMimeData());
   data->setImageData(generatePixmap(lp));
-  data->setData(getMimeType(), sexpr.toByteArray());
+  data->setData(getMimeType(), root.toByteArray());
   return data;
 }
 
@@ -91,22 +103,6 @@ std::unique_ptr<SymbolClipboardData> SymbolClipboardData::fromMimeData(
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void SymbolClipboardData::serialize(SExpression& root) const {
-  root.ensureLineBreak();
-  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"));
-  root.ensureLineBreak();
-  root.appendChild("symbol", mSymbolUuid);
-  root.ensureLineBreak();
-  mPins.serialize(root);
-  root.ensureLineBreak();
-  mPolygons.serialize(root);
-  root.ensureLineBreak();
-  mCircles.serialize(root);
-  root.ensureLineBreak();
-  mTexts.serialize(root);
-  root.ensureLineBreak();
-}
 
 QPixmap SymbolClipboardData::generatePixmap(
     const IF_GraphicsLayerProvider& lp) noexcept {

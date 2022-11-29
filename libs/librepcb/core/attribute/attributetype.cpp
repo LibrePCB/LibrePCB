@@ -123,6 +123,15 @@ const AttributeType& AttributeType::fromString(const QString& type) {
 }
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const AttributeType& obj) {
+  return SExpression::createToken(obj.getName());
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

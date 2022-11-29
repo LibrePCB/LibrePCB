@@ -90,10 +90,12 @@ TEST_F(PolygonTest, testSerializeAndDeserialize) {
       Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(456), true,
       false,
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
-  SExpression sexpr1 = obj1.serializeToDomElement("polygon");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
   Polygon obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("polygon");
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

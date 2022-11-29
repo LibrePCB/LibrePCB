@@ -84,10 +84,6 @@ void SI_Text::removeFromSchematic() {
   SI_Base::removeFromSchematic(mGraphicsItem.data());
 }
 
-void SI_Text::serialize(SExpression& root) const {
-  mText.serialize(root);
-}
-
 /*******************************************************************************
  *  Inherited from SI_Base
  ******************************************************************************/

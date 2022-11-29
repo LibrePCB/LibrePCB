@@ -81,10 +81,12 @@ TEST_F(TextTest, testSerializeAndDeserialize) {
   Text obj1(Uuid::createRandom(), GraphicsLayerName("foo"), "foo bar",
             Point(12, 34), Angle(56), PositiveLength(78),
             Alignment(HAlign::right(), VAlign::center()));
-  SExpression sexpr1 = obj1.serializeToDomElement("text");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
   Text obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("text");
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

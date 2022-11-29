@@ -146,10 +146,6 @@ void SI_NetPoint::unregisterNetLine(SI_NetLine& netline) {
   mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
 }
 
-void SI_NetPoint::serialize(SExpression& root) const {
-  mJunction.serialize(root);
-}
-
 /*******************************************************************************
  *  Inherited from SI_Base
  ******************************************************************************/

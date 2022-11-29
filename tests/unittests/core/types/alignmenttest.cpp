@@ -87,7 +87,8 @@ TEST_P(AlignmentTest, testSerialize) {
 
   if (data.validSExpression) {
     Alignment alignment(data.hAlign, data.vAlign);
-    SExpression sexpr = alignment.serializeToDomElement("align");
+    SExpression sexpr = SExpression::createList("align");
+    alignment.serialize(sexpr);
     EXPECT_EQ(data.serialized, sexpr.toByteArray());
   }
 }

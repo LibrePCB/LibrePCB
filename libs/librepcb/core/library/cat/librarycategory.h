@@ -72,9 +72,6 @@ public:
   LibraryCategory& operator=(const LibraryCategory& rhs) = delete;
 
 protected:
-  // Protected Methods
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
   virtual void serialize(SExpression& root) const override;
 
   // General Library Category Attributes

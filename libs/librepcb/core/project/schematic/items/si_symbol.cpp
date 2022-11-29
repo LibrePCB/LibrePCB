@@ -218,7 +218,7 @@ void SI_Symbol::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("lib_gate", mSymbVarItem->getUuid());
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("mirror", mMirrored);
   root.ensureLineBreak();

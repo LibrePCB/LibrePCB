@@ -26,7 +26,7 @@
 #include "../exceptions.h"
 #include "../types/elementname.h"
 #include "../utils/signalslot.h"
-#include "serializableobject.h"
+#include "sexpression.h"
 
 #include <QtCore>
 
@@ -53,7 +53,7 @@ namespace librepcb {
  *          `clear()` method or similar!
  */
 template <typename T>
-class SerializableKeyValueMap final : public SerializableObject {
+class SerializableKeyValueMap final {
   Q_DECLARE_TR_FUNCTIONS(SerializableKeyValueMap)
 
 public:
@@ -155,8 +155,12 @@ public:
     }
   }
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override {
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const {
     for (auto i = mValues.constBegin(); i != mValues.constEnd(); ++i) {
       root.ensureLineBreak();
       SExpression& child = root.appendList(T::tagname);

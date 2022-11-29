@@ -168,7 +168,7 @@ bool Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
 void Via::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("size", mSize);
   root.appendChild("drill", mDrillDiameter);
   root.appendChild("shape", mShape);
@@ -195,6 +195,24 @@ Via& Via::operator=(const Via& rhs) noexcept {
   setSize(rhs.mSize);
   setDrillDiameter(rhs.mDrillDiameter);
   return *this;
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const Via::Shape& obj) {
+  switch (obj) {
+    case Via::Shape::Round:
+      return SExpression::createToken("round");
+    case Via::Shape::Square:
+      return SExpression::createToken("square");
+    case Via::Shape::Octagon:
+      return SExpression::createToken("octagon");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
 }
 
 /*******************************************************************************

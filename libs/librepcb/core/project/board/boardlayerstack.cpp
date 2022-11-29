@@ -83,14 +83,6 @@ void BoardLayerStack::setInnerLayerCount(int count) noexcept {
 }
 
 /*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void BoardLayerStack::serialize(SExpression& root) const {
-  root.appendChild("inner", mInnerLayerCount);
-}
-
-/*******************************************************************************
  *  Operator Overloadings
  ******************************************************************************/
 

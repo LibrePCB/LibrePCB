@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
-#include "../serialization/serializableobject.h"
 #include "length.h"
 #include "lengthunit.h"
 
@@ -42,7 +41,7 @@ namespace librepcb {
 /**
  * @brief The GridProperties class
  */
-class GridProperties final : public SerializableObject {
+class GridProperties final {
   Q_DECLARE_TR_FUNCTIONS(GridProperties)
 
 public:
@@ -71,8 +70,12 @@ public:
 
   // General Methods
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operators
   GridProperties& operator=(const GridProperties& rhs) noexcept;
@@ -86,20 +89,6 @@ private:  // Data
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
-
-template <>
-inline SExpression serialize(const GridProperties::Type_t& obj) {
-  switch (obj) {
-    case GridProperties::Type_t::Off:
-      return SExpression::createToken("off");
-    case GridProperties::Type_t::Lines:
-      return SExpression::createToken("lines");
-    case GridProperties::Type_t::Dots:
-      return SExpression::createToken("dots");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
 
 template <>
 inline GridProperties::Type_t deserialize(const SExpression& sexpr,

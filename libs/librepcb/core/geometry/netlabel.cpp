@@ -122,7 +122,7 @@ bool NetLabel::setMirrored(const bool mirrored) noexcept {
 void NetLabel::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("mirror", mMirrored);
   root.ensureLineBreak();

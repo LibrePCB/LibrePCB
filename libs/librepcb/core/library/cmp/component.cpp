@@ -133,7 +133,7 @@ LibraryElementCheckMessageList Component::runChecks() const {
 }
 
 /*******************************************************************************
- *  Private Methods
+ *  Protected Methods
  ******************************************************************************/
 
 void Component::serialize(SExpression& root) const {
@@ -152,6 +152,10 @@ void Component::serialize(SExpression& root) const {
   mSymbolVariants.serialize(root);
   root.ensureLineBreak();
 }
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
 
 QString Component::cleanNorm(QString norm) noexcept {
   return QString(norm.toUpper().remove(QRegularExpression("[^0-9A-Z]")));

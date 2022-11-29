@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../fileio/filepath.h"
 #include "../../library/cmp/componentprefix.h"
-#include "../../serialization/serializableobject.h"
 #include "../../types/circuitidentifier.h"
 #include "../../types/elementname.h"
 #include "../../types/uuid.h"
@@ -63,7 +62,7 @@ class TransactionalDirectory;
  *  - All net signals (::librepcb::NetSignal objects)
  *  - All component instances (::librepcb::ComponentInstance objects)
  */
-class Circuit final : public QObject, public SerializableObject {
+class Circuit final : public QObject {
   Q_OBJECT
 
 public:
@@ -114,7 +113,13 @@ public:
                                 const CircuitIdentifier& newName);
 
   // General Methods
-  void save();
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   Circuit& operator=(const Circuit& rhs) = delete;
@@ -131,9 +136,6 @@ signals:
   void componentRemoved(ComponentInstance& cmp);
 
 private:
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
   QScopedPointer<TransactionalDirectory> mDirectory;

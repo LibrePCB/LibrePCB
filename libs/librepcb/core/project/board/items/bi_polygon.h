@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../graphics/graphicslayername.h"
-#include "../../../serialization/serializableobject.h"
 #include "../../../types/length.h"
 #include "../../../types/point.h"
 #include "../../../types/uuid.h"
@@ -51,7 +50,7 @@ class Project;
 /**
  * @brief The BI_Polygon class
  */
-class BI_Polygon final : public BI_Base, public SerializableObject {
+class BI_Polygon final : public BI_Base {
   Q_OBJECT
 
 public:
@@ -77,9 +76,6 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::Polygon; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
@@ -89,7 +85,6 @@ public:
   BI_Polygon& operator=(const BI_Polygon& rhs) = delete;
 
 private slots:
-
   void boardAttributesChanged();
 
 private:

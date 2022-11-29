@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../serialization/serializableobject.h"
 #include "../../../types/point.h"
 #include "../../../types/uuid.h"
 #include "si_base.h"
@@ -51,7 +50,7 @@ class SI_SymbolPin;
  *
  * @todo Do not allow to create empty netsegments!
  */
-class SI_NetSegment final : public SI_Base, public SerializableObject {
+class SI_NetSegment final : public SI_Base {
   Q_OBJECT
 
 public:
@@ -104,8 +103,12 @@ public:
   void setSelectionRect(const QRectF rectPx) noexcept;
   void clearSelection() const noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override {

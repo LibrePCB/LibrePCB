@@ -46,7 +46,7 @@ namespace librepcb {
  * The main purpose of this class is to serialize and deserialize vias
  * contained in boards.
  */
-class Via final : public SerializableObject {
+class Via final {
   Q_DECLARE_TR_FUNCTIONS(Via)
 
 public:
@@ -93,8 +93,14 @@ public:
   bool setSize(const PositiveLength& size) noexcept;
   bool setDrillDiameter(const PositiveLength& diameter) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const Via& rhs) const noexcept;
@@ -121,20 +127,6 @@ using ViaList = SerializableObjectList<Via, ViaListNameProvider, Via::Event>;
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
-
-template <>
-inline SExpression serialize(const Via::Shape& obj) {
-  switch (obj) {
-    case Via::Shape::Round:
-      return SExpression::createToken("round");
-    case Via::Shape::Square:
-      return SExpression::createToken("square");
-    case Via::Shape::Octagon:
-      return SExpression::createToken("octagon");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
 
 template <>
 inline Via::Shape deserialize(const SExpression& sexpr,

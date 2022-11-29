@@ -448,11 +448,20 @@ void SI_NetSegment::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("net", mNetSignal->getUuid());
   root.ensureLineBreak();
-  serializePointerContainer(root, mNetPoints, "junction");
+  for (const SI_NetPoint* obj : mNetPoints) {
+    root.ensureLineBreak();
+    obj->getJunction().serialize(root.appendList("junction"));
+  }
   root.ensureLineBreak();
-  serializePointerContainer(root, mNetLines, "line");
+  for (const SI_NetLine* obj : mNetLines) {
+    root.ensureLineBreak();
+    obj->getNetLine().serialize(root.appendList("line"));
+  }
   root.ensureLineBreak();
-  serializePointerContainer(root, mNetLabels, "label");
+  for (const SI_NetLabel* obj : mNetLabels) {
+    root.ensureLineBreak();
+    obj->getNetLabel().serialize(root.appendList("label"));
+  }
   root.ensureLineBreak();
 }
 

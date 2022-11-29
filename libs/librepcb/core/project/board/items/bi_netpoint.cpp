@@ -167,10 +167,6 @@ void BI_NetPoint::unregisterNetLine(BI_NetLine& netline) {
   mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
 }
 
-void BI_NetPoint::serialize(SExpression& root) const {
-  mJunction.serialize(root);
-}
-
 /*******************************************************************************
  *  Inherited from BI_Base
  ******************************************************************************/

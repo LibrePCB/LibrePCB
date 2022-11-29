@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/text.h"
-#include "../../../serialization/serializableobject.h"
 #include "si_base.h"
 
 #include <QtCore>
@@ -44,7 +43,7 @@ class TextGraphicsItem;
 /**
  * @brief The SI_Text class represents a text label in a schematic
  */
-class SI_Text final : public SI_Base, public SerializableObject {
+class SI_Text final : public SI_Base {
   Q_OBJECT
 
 public:
@@ -66,9 +65,6 @@ public:
   // General Methods
   void addToSchematic() override;
   void removeFromSchematic() override;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::Text; }

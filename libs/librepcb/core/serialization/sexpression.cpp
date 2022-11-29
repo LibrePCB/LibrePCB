@@ -459,6 +459,47 @@ void SExpression::skipWhitespaceAndComments(const QString& content, int& index,
 }
 
 /*******************************************************************************
+ *  serialize() Specializations for C++/Qt Types
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const QColor& obj) {
+  return SExpression::createString(obj.isValid() ? obj.name(QColor::HexArgb)
+                                                 : "");
+}
+
+template <>
+SExpression serialize(const QUrl& obj) {
+  return SExpression::createString(
+      obj.isValid() ? obj.toString(QUrl::PrettyDecoded) : "");
+}
+
+template <>
+SExpression serialize(const QDateTime& obj) {
+  return SExpression::createToken(obj.toUTC().toString(Qt::ISODate));
+}
+
+template <>
+SExpression serialize(const QString& obj) {
+  return SExpression::createString(obj);
+}
+
+template <>
+SExpression serialize(const uint& obj) {
+  return SExpression::createToken(QString::number(obj));
+}
+
+template <>
+SExpression serialize(const int& obj) {
+  return SExpression::createToken(QString::number(obj));
+}
+
+template <>
+SExpression serialize(const bool& obj) {
+  return SExpression::createToken(obj ? "true" : "false");
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

@@ -85,7 +85,7 @@ bool Junction::setPosition(const Point& position) noexcept {
 
 void Junction::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
 }
 
 /*******************************************************************************

@@ -74,10 +74,12 @@ TEST_F(ViaTest, testConstructFromSExpressionCurrentVersion) {
 TEST_F(ViaTest, testSerializeAndDeserialize) {
   Via obj1(Uuid::createRandom(), Point(123, 456), Via::Shape::Octagon,
            PositiveLength(789), PositiveLength(321));
-  SExpression sexpr1 = obj1.serializeToDomElement("via");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
   Via obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("via");
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

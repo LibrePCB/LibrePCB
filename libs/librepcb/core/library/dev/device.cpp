@@ -89,7 +89,7 @@ LibraryElementCheckMessageList Device::runChecks() const {
 }
 
 /*******************************************************************************
- *  Private Methods
+ *  Protected Methods
  ******************************************************************************/
 
 void Device::serialize(SExpression& root) const {

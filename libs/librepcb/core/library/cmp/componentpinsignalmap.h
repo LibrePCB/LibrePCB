@@ -47,7 +47,7 @@ namespace librepcb {
  *  - Pin UUID
  *  - Signal UUID
  */
-class ComponentPinSignalMapItem final : public SerializableObject {
+class ComponentPinSignalMapItem final {
   Q_DECLARE_TR_FUNCTIONS(ComponentPinSignalMapItem)
 
 public:
@@ -84,8 +84,14 @@ public:
   bool setSignalUuid(const tl::optional<Uuid>& uuid) noexcept;
   bool setDisplayType(const CmpSigPinDisplayType& type) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const ComponentPinSignalMapItem& rhs) const noexcept;
