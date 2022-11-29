@@ -95,9 +95,6 @@ public:
   void removeComponent(Component& c);
   void removeDevice(Device& d);
 
-  // General Methods
-  void save();
-
   // Operator Overloadings
   ProjectLibrary& operator=(const ProjectLibrary& rhs) = delete;
 
@@ -122,7 +119,6 @@ private:
   QHash<Uuid, Device*> mDevices;
 
   QSet<LibraryBaseElement*> mAllElements;
-  QSet<LibraryBaseElement*> mElementsToUpgrade;
 };
 
 /*******************************************************************************

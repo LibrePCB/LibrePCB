@@ -67,7 +67,6 @@ ProjectLibrary::~ProjectLibrary() noexcept {
   // Delete all library elements.
   qDeleteAll(mAllElements);
   mAllElements.clear();
-  mElementsToUpgrade.clear();
 }
 
 /*******************************************************************************
@@ -122,19 +121,6 @@ void ProjectLibrary::removeDevice(Device& d) {
 }
 
 /*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void ProjectLibrary::save() {
-  // Save library elements to enforce a file format upgrade, but only once for
-  // optimal performance.
-  foreach (LibraryBaseElement* element, mElementsToUpgrade) {
-    element->save();  // can throw
-    mElementsToUpgrade.remove(element);
-  }
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
@@ -162,9 +148,11 @@ void ProjectLibrary::loadElements(const QString& dirname, const QString& type,
                              .arg(type, element->getUuid().toStr()));
     }
 
+    // Upgrade file format, if needed.
+    element->save();  // can throw
+
     // everything is ok -> update members
     elementList.insert(element->getUuid(), element.data());
-    mElementsToUpgrade.insert(element.data());
     mAllElements.insert(element.take());  // Take object from smart pointer!
   }
 
@@ -181,8 +169,16 @@ void ProjectLibrary::addElement(ElementType& element,
                              "UUID in the project's library: %1")
                          .arg(element.getUuid().toStr()));
   }
-  TransactionalDirectory dir(*mDirectory, element.getShortElementName());
-  element.saveIntoParentDirectory(dir);  // can throw
+
+  // Copy files, if necessary. In any case, the file format will be upgraded
+  // as well.
+  if (element.getDirectory().getFileSystem() != mDirectory->getFileSystem()) {
+    TransactionalDirectory dir(*mDirectory, element.getShortElementName());
+    element.saveIntoParentDirectory(dir);  // can throw
+  } else {
+    element.save();  // can throw
+  }
+
   elementList.insert(element.getUuid(), &element);
   mAllElements.insert(&element);
 }
@@ -192,9 +188,8 @@ void ProjectLibrary::removeElement(ElementType& element,
                                    QHash<Uuid, ElementType*>& elementList) {
   Q_ASSERT(elementList.value(element.getUuid()) == &element);
   Q_ASSERT(mAllElements.contains(&element));
-  TransactionalDirectory dir(
-      TransactionalFileSystem::openRW(FilePath::getRandomTempPath()));
-  element.moveIntoParentDirectory(dir);  // can throw
+  TransactionalDirectory tmpDir;
+  element.moveIntoParentDirectory(tmpDir);  // can throw
   elementList.remove(element.getUuid());
 }
 

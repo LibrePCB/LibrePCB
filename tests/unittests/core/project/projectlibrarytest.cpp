@@ -91,8 +91,7 @@ protected:
     return lib.getSymbols().values().first();
   }
 
-  void save(ProjectLibrary& lib) {
-    lib.save();
+  void saveToDisk() {
     mLibFs->save();
     mTempFs->save();
   }
@@ -142,7 +141,7 @@ TEST_F(ProjectLibraryTest, testAddSymbol_Save) {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
     lib.addSymbol(*mNewSymbol.take());
-    save(lib);
+    saveToDisk();
     EXPECT_EQ(2, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_TRUE(mNewSymbolFile.exists());
@@ -177,7 +176,7 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol_Save) {
         new TransactionalDirectory(mLibFs)));
     lib.addSymbol(*mNewSymbol);
     lib.removeSymbol(*mNewSymbol.take());
-    save(lib);
+    saveToDisk();
     EXPECT_EQ(1, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.exists());
@@ -208,7 +207,7 @@ TEST_F(ProjectLibraryTest, testRemoveSymbol_Save) {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
     lib.removeSymbol(*getFirstSymbol(lib));
-    save(lib);
+    saveToDisk();
     EXPECT_EQ(0, lib.getSymbols().count());
     EXPECT_FALSE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mExistingSymbolFile.dir().exists());
@@ -239,7 +238,7 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol_Save) {
     Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);
     lib.addSymbol(*sym);
-    save(lib);
+    saveToDisk();
     EXPECT_EQ(1, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
   }
@@ -258,7 +257,7 @@ TEST_F(ProjectLibraryTest, testSavingToExistingEmptyDirectory) {
   EXPECT_TRUE(mNewSymbolFile.dir().exists());
 
   lib.addSymbol(*mNewSymbol.take());
-  save(lib);
+  saveToDisk();
   EXPECT_TRUE(mNewSymbolFile.exists());
 }
 
@@ -267,13 +266,13 @@ TEST_F(ProjectLibraryTest, testIfExistingSymbolIsUpgradedOnlyOnce) {
       new TransactionalDirectory(mLibFs)));
   EXPECT_EQ(mExistingSymbolCreationSize,
             mExistingSymbolFile.size());  // not upgraded
-  save(lib);
+  saveToDisk();
   EXPECT_NE(mExistingSymbolCreationSize,
             mExistingSymbolFile.size());  // upgraded!
   modifyExistingSymbol();
   EXPECT_EQ(mExistingSymbolCreationSize,
             mExistingSymbolFile.size());  // not upgraded
-  save(lib);
+  saveToDisk();
   EXPECT_EQ(mExistingSymbolCreationSize,
             mExistingSymbolFile.size());  // not upgraded
 }

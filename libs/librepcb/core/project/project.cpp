@@ -504,9 +504,6 @@ void Project::save() {
   // Save settings
   mProjectSettings->save();  // can throw
 
-  // Save library
-  mProjectLibrary->save();  // can throw
-
   // Save circuit
   mCircuit->save();  // can throw
 
