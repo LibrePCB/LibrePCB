@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
-#include "../serialization/sexpression.h"
 
 #include <QtCore>
 
@@ -126,24 +125,6 @@ private:  // Data
   QString mRole;  ///< used for serialization (DO NOT MODIFY VALUES!)
   QString mName;  ///< human readable (translated)
 };
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline SignalRole deserialize(const SExpression& sexpr,
-                              const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  foreach (const SignalRole& role, SignalRole::getAllRoles()) {
-    if (role.toStr() == str) {
-      return role;
-    }
-  }
-  throw RuntimeError(__FILE__, __LINE__,
-                     SignalRole::tr("Invalid signal role: \"%1\"").arg(str));
-}
 
 /*******************************************************************************
  *  End of File

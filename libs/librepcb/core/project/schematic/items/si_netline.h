@@ -68,10 +68,9 @@ public:
   // Constructors / Destructor
   SI_NetLine() = delete;
   SI_NetLine(const SI_NetLine& other) = delete;
-  SI_NetLine(SI_NetSegment& segment, const SExpression& node,
-             const Version& fileFormat);
-  SI_NetLine(SI_NetSegment& segment, SI_NetLineAnchor& startPoint,
-             SI_NetLineAnchor& endPoint, const UnsignedLength& width);
+  SI_NetLine(SI_NetSegment& segment, const Uuid& uuid,
+             SI_NetLineAnchor& startPoint, SI_NetLineAnchor& endPoint,
+             const UnsignedLength& width);
   ~SI_NetLine() noexcept;
 
   // Getters
@@ -104,9 +103,6 @@ public:
   SI_NetLine& operator=(const SI_NetLine& rhs) = delete;
 
 private:
-  void init();
-  SI_NetLineAnchor* getAnchor(const NetLineAnchor& anchor);
-
   // General
   SI_NetSegment& mNetSegment;
   NetLine mNetLine;

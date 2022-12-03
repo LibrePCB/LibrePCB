@@ -89,9 +89,8 @@ public:
    * @brief Load value from S-Expression file
    *
    * @param root        Loaded ::librepcb::SExpression node.
-   * @param fileFormat  The file format of the settings file.
    */
-  void load(const SExpression& root, const Version& fileFormat);
+  void load(const SExpression& root);
 
   /**
    * @brief Serialize the value into S-Expression nodes
@@ -124,7 +123,6 @@ protected:
    * @brief Load value from S-Expression node
    *
    * @param root        S-Expression node of the settings element.
-   * @param fileFormat  The file format of the settings file.
    *
    * @note Implementation must emit the #edited() signal if the value has
    *       changed.
@@ -132,7 +130,7 @@ protected:
    * @note Implementation must be atomic, i.e. either the value must be loaded
    *       completely from file, or left at the old value (in case of errors).
    */
-  virtual void loadImpl(const SExpression& root, const Version& fileFormat) = 0;
+  virtual void loadImpl(const SExpression& root) = 0;
 
   /**
    * @brief Serialize the value into S-Expression node

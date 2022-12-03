@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../serialization/sexpression.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -435,12 +433,6 @@ private:
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
-
-template <>
-inline Angle deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return Angle::fromDeg(sexpr.getValue());  // can throw
-}
 
 inline QDataStream& operator<<(QDataStream& stream, const Angle& angle) {
   stream << angle.toDeg();

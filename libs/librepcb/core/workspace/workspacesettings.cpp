@@ -71,14 +71,14 @@ WorkspaceSettings::~WorkspaceSettings() noexcept {
 
 void WorkspaceSettings::load(const SExpression& node,
                              const Version& fileFormat) {
-  foreach (const SExpression& child,
+  foreach (const SExpression* child,
            node.getChildren(SExpression::Type::List)) {
-    mFileContent.insert(child.getName(), child);
+    mFileContent.insert(child->getName(), *child);
   }
   foreach (WorkspaceSettingsItem* item, getAllItems()) {
     try {
       if (mFileContent.contains(item->getKey())) {
-        item->load(mFileContent[item->getKey()], fileFormat);  // can throw
+        item->load(mFileContent[item->getKey()]);  // can throw
       }
     } catch (const Exception& e) {
       qCritical() << "Could not load workspace settings item:" << e.getMsg();

@@ -24,7 +24,6 @@
 
 #include "symbolpingraphicsitem.h"
 
-#include <librepcb/core/application.h>
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
@@ -48,14 +47,13 @@ SymbolClipboardData::SymbolClipboardData(const Uuid& symbolUuid,
   : mSymbolUuid(symbolUuid), mCursorPos(cursorPos) {
 }
 
-SymbolClipboardData::SymbolClipboardData(const SExpression& node,
-                                         const Version& fileFormat)
-  : mSymbolUuid(deserialize<Uuid>(node.getChild("symbol/@0"), fileFormat)),
-    mCursorPos(node.getChild("cursor_position"), fileFormat),
-    mPins(node, fileFormat),
-    mPolygons(node, fileFormat),
-    mCircles(node, fileFormat),
-    mTexts(node, fileFormat) {
+SymbolClipboardData::SymbolClipboardData(const SExpression& node)
+  : mSymbolUuid(deserialize<Uuid>(node.getChild("symbol/@0"))),
+    mCursorPos(node.getChild("cursor_position")),
+    mPins(node),
+    mPolygons(node),
+    mCircles(node),
+    mTexts(node) {
 }
 
 SymbolClipboardData::~SymbolClipboardData() noexcept {
@@ -93,8 +91,8 @@ std::unique_ptr<SymbolClipboardData> SymbolClipboardData::fromMimeData(
   QByteArray content = mime ? mime->data(getMimeType()) : QByteArray();
   if (!content.isNull()) {
     SExpression root = SExpression::parse(content, FilePath());
-    return std::unique_ptr<SymbolClipboardData>(new SymbolClipboardData(
-        root, qApp->getFileFormatVersion()));  // can throw
+    return std::unique_ptr<SymbolClipboardData>(
+        new SymbolClipboardData(root));  // can throw
   } else {
     return nullptr;
   }

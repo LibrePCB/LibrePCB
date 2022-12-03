@@ -32,6 +32,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -130,7 +132,7 @@ private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<GraphicsScene> mGraphicsScene;
-  QScopedPointer<Package> mPackage;
+  std::unique_ptr<Package> mPackage;
 
   // broken interface detection
   QSet<Uuid> mOriginalPadUuids;

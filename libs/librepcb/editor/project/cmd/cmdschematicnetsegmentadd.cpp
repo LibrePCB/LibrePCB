@@ -63,7 +63,8 @@ CmdSchematicNetSegmentAdd::~CmdSchematicNetSegmentAdd() noexcept {
 bool CmdSchematicNetSegmentAdd::performExecute() {
   if (!mNetSegment) {
     // create new net segment
-    mNetSegment = new SI_NetSegment(mSchematic, mNetSignal);  // can throw
+    mNetSegment = new SI_NetSegment(mSchematic, Uuid::createRandom(),
+                                    mNetSignal);  // can throw
   }
 
   performRedo();  // can throw

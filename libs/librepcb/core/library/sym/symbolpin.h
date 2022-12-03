@@ -75,7 +75,7 @@ public:
             const Angle& rotation, const Point& namePosition,
             const Angle& nameRotation, const PositiveLength& nameHeight,
             const Alignment& nameAlign) noexcept;
-  SymbolPin(const SExpression& node, const Version& fileFormat);
+  explicit SymbolPin(const SExpression& node);
   ~SymbolPin() noexcept;
 
   // Getters

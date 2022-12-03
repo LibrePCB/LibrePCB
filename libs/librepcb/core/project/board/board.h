@@ -111,9 +111,8 @@ public:
   Board() = delete;
   Board(const Board& other) = delete;
   Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-        const QString& directoryName, const Version& fileFormat)
-    : Board(project, std::move(directory), directoryName, fileFormat, false,
-            QString()) {}
+        const QString& directoryName, const Uuid& uuid,
+        const ElementName& name);
   ~Board() noexcept;
 
   // Getters: General
@@ -155,6 +154,12 @@ public:
   const QIcon& getIcon() const noexcept { return mIcon; }
   const QString& getDefaultFontName() const noexcept {
     return mDefaultFontFileName;
+  }
+
+  // Setters
+  void setName(const ElementName& name) noexcept { mName = name; }
+  void setDefaultFontName(const QString& name) noexcept {
+    mDefaultFontFileName = name;
   }
 
   // DeviceInstance Methods
@@ -231,11 +236,6 @@ public:
   bool operator==(const Board& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const Board& rhs) noexcept { return (this != &rhs); }
 
-  // Static Methods
-  static Board* create(Project& project,
-                       std::unique_ptr<TransactionalDirectory> directory,
-                       const QString& directoryName, const ElementName& name);
-
 signals:
 
   /// @copydoc AttributeProvider::attributesChanged()
@@ -245,9 +245,6 @@ signals:
   void deviceRemoved(BI_Device& comp);
 
 private:
-  Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-        const QString& directoryName, const Version& fileFormat, bool create,
-        const QString& newName);
   void updateIcon() noexcept;
   void updateErcMessages() noexcept;
 

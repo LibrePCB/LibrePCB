@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "lengthunit.h"
 
+#include "../serialization/sexpression.h"
 #include "length.h"
 #include "point.h"
 
@@ -254,6 +255,11 @@ QList<LengthUnit> LengthUnit::getAllUnits() noexcept {
 template <>
 SExpression serialize(const LengthUnit& obj) {
   return SExpression::createToken(obj.toStr());
+}
+
+template <>
+LengthUnit deserialize(const SExpression& node) {
+  return LengthUnit::fromString(node.getValue());  // can throw
 }
 
 /*******************************************************************************

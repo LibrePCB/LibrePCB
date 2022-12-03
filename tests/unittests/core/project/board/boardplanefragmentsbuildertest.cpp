@@ -27,6 +27,8 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectloader.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 #include <QtCore>
 
@@ -63,10 +65,11 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
   FilePath projectFp(TEST_DATA_DIR "/projects/Nested Planes/project.lpp");
   std::shared_ptr<TransactionalFileSystem> projectFs =
       TransactionalFileSystem::openRO(projectFp.getParentDir());
-  QScopedPointer<Project> project(
-      new Project(std::unique_ptr<TransactionalDirectory>(
+  ProjectLoader loader;
+  std::unique_ptr<Project> project =
+      loader.open(std::unique_ptr<TransactionalDirectory>(
                       new TransactionalDirectory(projectFs)),
-                  projectFp.getFilename()));
+                  projectFp.getFilename());  // can throw
 
   // force planes rebuild
   Board* board = project->getBoards().first();

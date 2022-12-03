@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "package.h"
 
-#include "../../serialization/sexpression.h"
+#include "../../serialization/fileformatmigration.h"
 #include "packagecheck.h"
 
 #include <QtCore>
@@ -44,13 +44,12 @@ Package::Package(const Uuid& uuid, const Version& version,
                    author, name_en_US, description_en_US, keywords_en_US) {
 }
 
-Package::Package(std::unique_ptr<TransactionalDirectory> directory)
-  : LibraryElement(std::move(directory), getShortElementName(),
-                   getLongElementName()) {
-  mPads.loadFromSExpression(mLoadingFileDocument, mLoadingFileFormat);
-  mFootprints.loadFromSExpression(mLoadingFileDocument, mLoadingFileFormat);
-
-  cleanupAfterLoadingElementFromFile();
+Package::Package(std::unique_ptr<TransactionalDirectory> directory,
+                 const SExpression& root)
+  : LibraryElement(getShortElementName(), getLongElementName(), true,
+                   std::move(directory), root),
+    mPads(root),
+    mFootprints(root) {
 }
 
 Package::~Package() noexcept {
@@ -63,6 +62,24 @@ Package::~Package() noexcept {
 LibraryElementCheckMessageList Package::runChecks() const {
   PackageCheck check(*this);
   return check.runChecks();  // can throw
+}
+
+std::unique_ptr<Package> Package::open(
+    std::unique_ptr<TransactionalDirectory> directory) {
+  Q_ASSERT(directory);
+
+  // Upgrade file format, if needed.
+  const Version fileFormat =
+      readFileFormat(*directory, ".librepcb-" % getShortElementName());
+  for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
+    migration->upgradePackage(*directory);
+  }
+
+  // Load element.
+  const QString fileName = getLongElementName() % ".lp";
+  const SExpression root = SExpression::parse(directory->read(fileName),
+                                              directory->getAbsPath(fileName));
+  return std::unique_ptr<Package>(new Package(std::move(directory), root));
 }
 
 /*******************************************************************************

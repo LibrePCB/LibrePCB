@@ -44,30 +44,17 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_StrokeText::BI_StrokeText(Board& board, const SExpression& node,
-                             const Version& fileFormat)
-  : BI_Base(board),
-    mDevice(nullptr),
-    mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
-  mText.reset(new StrokeText(node, fileFormat));
-  init();
-}
-
 BI_StrokeText::BI_StrokeText(Board& board, const StrokeText& text)
   : BI_Base(board),
     mDevice(nullptr),
+    mText(new StrokeText(text)),
+    mGraphicsItem(
+        new StrokeTextGraphicsItem(*mText, mBoard.getLayerStack(), getFont())),
+    mAnchorGraphicsItem(new LineGraphicsItem()),
     mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
-  mText.reset(new StrokeText(text));
-  init();
-}
-
-void BI_StrokeText::init() {
   mText->onEdited.attach(mOnStrokeTextEditedSlot);
 
-  mGraphicsItem.reset(
-      new StrokeTextGraphicsItem(*mText, mBoard.getLayerStack(), getFont()));
   mGraphicsItem->setAttributeProvider(getAttributeProvider());
-  mAnchorGraphicsItem.reset(new LineGraphicsItem());
   updateGraphicsItems();
 
   // connect to the "attributes changed" signal of the board

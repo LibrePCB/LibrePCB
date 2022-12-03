@@ -127,10 +127,8 @@ inline SExpression serialize(const CircuitIdentifier& obj) {
 }
 
 template <>
-inline CircuitIdentifier deserialize(const SExpression& sexpr,
-                                     const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return CircuitIdentifier(sexpr.getValue());  // can throw
+inline CircuitIdentifier deserialize(const SExpression& node) {
+  return CircuitIdentifier(node.getValue());  // can throw
 }
 
 template <>
@@ -143,12 +141,11 @@ inline SExpression serialize(const tl::optional<CircuitIdentifier>& obj) {
 }
 
 template <>
-inline tl::optional<CircuitIdentifier> deserialize(const SExpression& sexpr,
-                                                   const Version& fileFormat) {
-  if (sexpr.getValue().isEmpty()) {
+inline tl::optional<CircuitIdentifier> deserialize(const SExpression& node) {
+  if (node.getValue().isEmpty()) {
     return tl::nullopt;
   } else {
-    return deserialize<CircuitIdentifier>(sexpr, fileFormat);  // can throw
+    return deserialize<CircuitIdentifier>(node);  // can throw
   }
 }
 

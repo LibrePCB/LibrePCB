@@ -124,15 +124,15 @@ void NewElementWizardPage_DeviceProperties::setPackage(
     try {
       FilePath fp = mContext.getWorkspace().getLibraryDb().getLatest<Package>(
           *uuid);  // can throw
-      Package package(
+      std::unique_ptr<Package> package = Package::open(
           std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
               TransactionalFileSystem::openRO(fp))));  // can throw
       DevicePadSignalMapHelpers::setPads(mContext.mDevicePadSignalMap,
-                                         package.getPads().getUuidSet());
+                                         package->getPads().getUuidSet());
       mUi->lblPackageName->setText(
-          *package.getNames().value(mContext.getLibLocaleOrder()));
+          *package->getNames().value(mContext.getLibLocaleOrder()));
       mUi->lblPackageDescription->setText(
-          package.getDescriptions().value(mContext.getLibLocaleOrder()));
+          package->getDescriptions().value(mContext.getLibLocaleOrder()));
     } catch (const Exception& e) {
       mUi->lblPackageName->setText(tr("ERROR:"));
       mUi->lblPackageDescription->setText(e.getMsg());

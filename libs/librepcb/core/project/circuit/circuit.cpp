@@ -42,66 +42,10 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Circuit::Circuit(Project& project, const Version& fileFormat, bool create)
+Circuit::Circuit(Project& project)
   : QObject(&project),
     mProject(project),
     mDirectory(new TransactionalDirectory(project.getDirectory(), "circuit")) {
-  qDebug() << "Load circuit...";
-
-  try {
-    if (create) {
-      NetClass* netclass = new NetClass(*this, ElementName("default"));
-      addNetClass(*netclass);  // add a netclass with name "default"
-    } else {
-      SExpression root = SExpression::parse(
-          mDirectory->read("circuit.lp"), mDirectory->getAbsPath("circuit.lp"));
-
-      // OK - file is open --> now load the whole circuit stuff
-
-      // Load all netclasses
-      foreach (const SExpression& node, root.getChildren("netclass")) {
-        NetClass* netclass = new NetClass(*this, node, fileFormat);
-        addNetClass(*netclass);
-      }
-
-      // Load all netsignals
-      foreach (const SExpression& node, root.getChildren("net")) {
-        NetSignal* netsignal = new NetSignal(*this, node, fileFormat);
-        addNetSignal(*netsignal);
-      }
-
-      // Load all component instances
-      foreach (const SExpression& node, root.getChildren("component")) {
-        ComponentInstance* component =
-            new ComponentInstance(*this, node, fileFormat);
-        addComponentInstance(*component);
-      }
-    }
-  } catch (...) {
-    // free allocated memory (see comments in the destructor) and rethrow the
-    // exception
-    foreach (ComponentInstance* compInstance, mComponentInstances)
-      try {
-        removeComponentInstance(*compInstance);
-        delete compInstance;
-      } catch (...) {
-      }
-    foreach (NetSignal* netsignal, mNetSignals)
-      try {
-        removeNetSignal(*netsignal);
-        delete netsignal;
-      } catch (...) {
-      }
-    foreach (NetClass* netclass, mNetClasses)
-      try {
-        removeNetClass(*netclass);
-        delete netclass;
-      } catch (...) {
-      }
-    throw;
-  }
-
-  qDebug() << "Successfully loaded circuit.";
 }
 
 Circuit::~Circuit() noexcept {

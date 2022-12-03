@@ -20,10 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
 #include <librepcb/core/geometry/vertex.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 /*******************************************************************************
  *  Namespace
@@ -41,20 +40,10 @@ class VertexTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(VertexTest, testConstructFromSExpressionV01) {
-  // Attention: Do NOT modify this string! It represents the freezed(!) file
-  // format V0.1 and even current versions of LibrePCB must be able to load it!
+TEST_F(VertexTest, testConstructFromSExpression) {
   SExpression sexpr = SExpression::parse(
       "(vertex (position 1.2 3.4) (angle 45.0))", FilePath());
-  Vertex obj(sexpr, Version::fromString("0.1"));
-  EXPECT_EQ(Point(1200000, 3400000), obj.getPos());
-  EXPECT_EQ(Angle::deg45(), obj.getAngle());
-}
-
-TEST_F(VertexTest, testConstructFromSExpressionCurrentVersion) {
-  SExpression sexpr = SExpression::parse(
-      "(vertex (position 1.2 3.4) (angle 45.0))", FilePath());
-  Vertex obj(sexpr, qApp->getFileFormatVersion());
+  Vertex obj(sexpr);
   EXPECT_EQ(Point(1200000, 3400000), obj.getPos());
   EXPECT_EQ(Angle::deg45(), obj.getAngle());
 }
@@ -64,7 +53,7 @@ TEST_F(VertexTest, testSerializeAndDeserialize) {
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);
 
-  Vertex obj2(sexpr1, qApp->getFileFormatVersion());
+  Vertex obj2(sexpr1);
   SExpression sexpr2 = SExpression::createList("obj");
   obj2.serialize(sexpr2);
 

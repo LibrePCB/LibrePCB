@@ -181,10 +181,13 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
 
     mContext.undoStack.beginCmdGroup(tr("Add net label to schematic"));
     mUndoCmdActive = true;
-    CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(
-        netsegment, pos.mappedToGrid(getGridInterval()), Angle::deg0(), false);
+    SI_NetLabel* netLabel = new SI_NetLabel(
+        netsegment,
+        NetLabel(Uuid::createRandom(), pos.mappedToGrid(getGridInterval()),
+                 Angle::deg0(), false));
+    CmdSchematicNetLabelAdd* cmdAdd = new CmdSchematicNetLabelAdd(*netLabel);
     mContext.undoStack.appendToCmdGroup(cmdAdd);
-    mCurrentNetLabel = cmdAdd->getNetLabel();
+    mCurrentNetLabel = netLabel;
     mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
     return true;
   } catch (Exception& e) {

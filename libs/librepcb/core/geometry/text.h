@@ -68,7 +68,7 @@ public:
   Text(const Uuid& uuid, const GraphicsLayerName& layerName,
        const QString& text, const Point& pos, const Angle& rotation,
        const PositiveLength& height, const Alignment& align) noexcept;
-  Text(const SExpression& node, const Version& fileFormat);
+  explicit Text(const SExpression& node);
   ~Text() noexcept;
 
   // Getters

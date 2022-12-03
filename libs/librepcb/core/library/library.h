@@ -29,6 +29,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -51,7 +53,6 @@ public:
   Library(const Uuid& uuid, const Version& version, const QString& author,
           const ElementName& name_en_US, const QString& description_en_US,
           const QString& keywords_en_US);
-  explicit Library(std::unique_ptr<TransactionalDirectory> directory);
   ~Library() noexcept;
 
   // Getters
@@ -79,6 +80,8 @@ public:
   Library& operator=(const Library& rhs) = delete;
 
   // Static Methods
+  static std::unique_ptr<Library> open(
+      std::unique_ptr<TransactionalDirectory> directory);
   static QString getShortElementName() noexcept {
     return QStringLiteral("lib");
   }
@@ -88,6 +91,10 @@ public:
 
 protected:
   virtual void serialize(SExpression& root) const override;
+
+private:  // Methods
+  Library(std::unique_ptr<TransactionalDirectory> directory,
+          const SExpression& root);
 
 private:  // Data
   QUrl mUrl;

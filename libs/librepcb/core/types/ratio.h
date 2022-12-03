@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
-#include "../serialization/sexpression.h"
 
 #include <type_safe/constrained_type.hpp>
 
@@ -274,12 +273,6 @@ private:
  *  Non-Member Functions
  ******************************************************************************/
 
-template <>
-inline Ratio deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return Ratio::fromNormalized(sexpr.getValue());
-}
-
 inline QDataStream& operator<<(QDataStream& stream, const Ratio& ratio) {
   stream << ratio.toNormalizedString();
   return stream;
@@ -323,12 +316,6 @@ struct UnsignedRatioConstraint {
 using UnsignedRatio =
     type_safe::constrained_type<Ratio, UnsignedRatioConstraint,
                                 UnsignedRatioVerifier>;
-
-template <>
-inline UnsignedRatio deserialize(const SExpression& sexpr,
-                                 const Version& fileFormat) {
-  return UnsignedRatio(deserialize<Ratio>(sexpr, fileFormat));  // can throw
-}
 
 inline QDataStream& operator<<(QDataStream& stream,
                                const UnsignedRatio& ratio) {

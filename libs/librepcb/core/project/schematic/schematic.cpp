@@ -54,117 +54,25 @@ namespace librepcb {
 
 Schematic::Schematic(Project& project,
                      std::unique_ptr<TransactionalDirectory> directory,
-                     const QString& directoryName, const Version& fileFormat,
-                     bool create, const QString& newName)
+                     const QString& directoryName, const Uuid& uuid,
+                     const ElementName& name)
   : QObject(&project),
     AttributeProvider(),
     mProject(project),
     mDirectoryName(directoryName),
     mDirectory(std::move(directory)),
     mIsAddedToProject(false),
-    mUuid(Uuid::createRandom()),
-    mName("New Page") {
+    mGraphicsScene(new GraphicsScene()),
+    mGridProperties(new GridProperties()),
+    mUuid(uuid),
+    mName(name) {
   if (mDirectoryName.isEmpty()) {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  try {
-    mGraphicsScene.reset(new GraphicsScene());
-
-    // try to open/create the schematic file
-    if (create) {
-      // set attributes
-      mName = ElementName(newName);  // can throw
-
-      // load default grid properties
-      mGridProperties.reset(new GridProperties());
-    } else {
-      const QString fp = "schematic.lp";
-      const SExpression root =
-          SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
-
-      // the schematic seems to be ready to open, so we will create all needed
-      // objects
-
-      mUuid = deserialize<Uuid>(root.getChild("@0"), fileFormat);
-      mName = deserialize<ElementName>(root.getChild("name/@0"), fileFormat);
-
-      // Load grid properties
-      mGridProperties.reset(
-          new GridProperties(root.getChild("grid"), fileFormat));
-
-      // Load all symbols
-      foreach (const SExpression& node, root.getChildren("symbol")) {
-        SI_Symbol* symbol = new SI_Symbol(*this, node, fileFormat);
-        if (mSymbols.contains(symbol->getUuid())) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString("There is already a symbol with the UUID \"%1\"!")
-                  .arg(symbol->getUuid().toStr()));
-        }
-        mSymbols.insert(symbol->getUuid(), symbol);
-      }
-
-      // Load all netsegments
-      foreach (const SExpression& node, root.getChildren("netsegment")) {
-        SI_NetSegment* netsegment = new SI_NetSegment(*this, node, fileFormat);
-        if (mNetSegments.contains(netsegment->getUuid())) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString("There is already a netsegment with the UUID \"%1\"!")
-                  .arg(netsegment->getUuid().toStr()));
-        }
-        mNetSegments.insert(netsegment->getUuid(), netsegment);
-      }
-
-      // Load all polygons
-      // Note: Support for polygons was added in file format v0.2. However,
-      // there is no need to check the file format here - v0.1 simply doesn't
-      // contain polygons.
-      foreach (const SExpression& node, root.getChildren("polygon")) {
-        SI_Polygon* polygon = new SI_Polygon(*this, node, fileFormat);
-        if (mPolygons.contains(polygon->getUuid())) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString("There is already a polygon with the UUID \"%1\"!")
-                  .arg(polygon->getUuid().toStr()));
-        }
-        mPolygons.insert(polygon->getUuid(), polygon);
-      }
-
-      // Load all texts
-      // Note: Support for texts was added in file format v0.2. However, there
-      // is no need to check the file format here - v0.1 simply doesn't contain
-      // texts.
-      foreach (const SExpression& node, root.getChildren("text")) {
-        SI_Text* text = new SI_Text(*this, node, fileFormat);
-        if (mTexts.contains(text->getUuid())) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString("There is already a text with the UUID \"%1\"!")
-                  .arg(text->getUuid().toStr()));
-        }
-        mTexts.insert(text->getUuid(), text);
-      }
-    }
-
-    // emit the "attributesChanged" signal when the project has emitted it
-    connect(&mProject, &Project::attributesChanged, this,
-            &Schematic::attributesChanged);
-  } catch (...) {
-    // free the allocated memory in the reverse order of their allocation...
-    qDeleteAll(mTexts);
-    mTexts.clear();
-    qDeleteAll(mPolygons);
-    mPolygons.clear();
-    qDeleteAll(mNetSegments);
-    mNetSegments.clear();
-    qDeleteAll(mSymbols);
-    mSymbols.clear();
-    mGridProperties.reset();
-    mGraphicsScene.reset();
-    throw;  // ...and rethrow the exception
-  }
+  // Emit the "attributesChanged" signal when the project has emitted it.
+  connect(&mProject, &Project::attributesChanged, this,
+          &Schematic::attributesChanged);
 }
 
 Schematic::~Schematic() noexcept {
@@ -498,18 +406,6 @@ QVector<const AttributeProvider*> Schematic::getAttributeProviderParents() const
 
 void Schematic::updateIcon() noexcept {
   mIcon = QIcon(mGraphicsScene->toPixmap(QSize(297, 210), Qt::white));
-}
-
-/*******************************************************************************
- *  Static Methods
- ******************************************************************************/
-
-Schematic* Schematic::create(Project& project,
-                             std::unique_ptr<TransactionalDirectory> directory,
-                             const QString& directoryName,
-                             const ElementName& name) {
-  return new Schematic(project, std::move(directory), directoryName,
-                       qApp->getFileFormatVersion(), true, *name);
 }
 
 /*******************************************************************************

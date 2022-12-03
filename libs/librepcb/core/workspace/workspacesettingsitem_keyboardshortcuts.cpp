@@ -94,19 +94,17 @@ void WorkspaceSettingsItem_KeyboardShortcuts::restoreDefaultImpl() noexcept {
 }
 
 void WorkspaceSettingsItem_KeyboardShortcuts::loadImpl(
-    const SExpression& root, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-
+    const SExpression& root) {
   // Temporary objects to make this method atomic.
   QMap<QString, SExpression> nodes;
   QMap<QString, QList<QKeySequence>> overrides;
-  foreach (const SExpression& child, root.getChildren("shortcut")) {
-    QString identifier = child.getChild("@0").getValue();
-    nodes.insert(identifier, child);
+  foreach (const SExpression* child, root.getChildren("shortcut")) {
+    QString identifier = child->getChild("@0").getValue();
+    nodes.insert(identifier, *child);
     QList<QKeySequence> sequences;
-    foreach (const SExpression& node,
-             child.getChildren(SExpression::Type::String)) {
-      sequences.append(QKeySequence::fromString(node.getValue(),
+    foreach (const SExpression* node,
+             child->getChildren(SExpression::Type::String)) {
+      sequences.append(QKeySequence::fromString(node->getValue(),
                                                 QKeySequence::PortableText));
     }
     overrides.insert(identifier, sequences);

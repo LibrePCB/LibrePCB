@@ -219,9 +219,9 @@ void SymbolChooserDialog::setSelectedSymbol(const FilePath& fp) noexcept {
 
   if (fp.isValid()) {
     try {
-      mSelectedSymbol.reset(new Symbol(
+      mSelectedSymbol = Symbol::open(
           std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-              TransactionalFileSystem::openRO(fp)))));  // can throw
+              TransactionalFileSystem::openRO(fp))));  // can throw
       mUi->lblSymbolName->setText(
           *mSelectedSymbol->getNames().value(localeOrder()));
       mUi->lblSymbolDescription->setText(

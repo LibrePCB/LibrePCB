@@ -49,8 +49,6 @@ public:
   // Constructors / Destructor
   BoardLayerStack() = delete;
   BoardLayerStack(const BoardLayerStack& other) = delete;
-  BoardLayerStack(Board& board, const SExpression& node,
-                  const Version& fileFormat);
   explicit BoardLayerStack(Board& board);
   ~BoardLayerStack() noexcept;
 

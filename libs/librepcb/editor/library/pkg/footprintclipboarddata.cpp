@@ -52,17 +52,15 @@ FootprintClipboardData::FootprintClipboardData(
     mCursorPos(cursorPos) {
 }
 
-FootprintClipboardData::FootprintClipboardData(const SExpression& node,
-                                               const Version& fileFormat)
-  : mFootprintUuid(
-        deserialize<Uuid>(node.getChild("footprint/@0"), fileFormat)),
-    mPackagePads(node.getChild("package"), fileFormat),
-    mCursorPos(node.getChild("cursor_position"), fileFormat),
-    mFootprintPads(node, fileFormat),
-    mPolygons(node, fileFormat),
-    mCircles(node, fileFormat),
-    mStrokeTexts(node, fileFormat),
-    mHoles(node, fileFormat) {
+FootprintClipboardData::FootprintClipboardData(const SExpression& node)
+  : mFootprintUuid(deserialize<Uuid>(node.getChild("footprint/@0"))),
+    mPackagePads(node.getChild("package")),
+    mCursorPos(node.getChild("cursor_position")),
+    mFootprintPads(node),
+    mPolygons(node),
+    mCircles(node),
+    mStrokeTexts(node),
+    mHoles(node) {
 }
 
 FootprintClipboardData::~FootprintClipboardData() noexcept {
@@ -107,8 +105,8 @@ std::unique_ptr<FootprintClipboardData> FootprintClipboardData::fromMimeData(
   QByteArray content = mime ? mime->data(getMimeType()) : QByteArray();
   if (!content.isNull()) {
     SExpression root = SExpression::parse(content, FilePath());
-    return std::unique_ptr<FootprintClipboardData>(new FootprintClipboardData(
-        root, qApp->getFileFormatVersion()));  // can throw
+    return std::unique_ptr<FootprintClipboardData>(
+        new FootprintClipboardData(root));  // can throw
   } else {
     return nullptr;
   }

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "angle.h"
 
+#include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
 #include <QtCore>
@@ -141,6 +142,11 @@ qint32 Angle::degStringToMicrodeg(const QString& degrees) {
 template <>
 SExpression serialize(const Angle& obj) {
   return SExpression::createToken(obj.toDegString());
+}
+
+template <>
+Angle deserialize(const SExpression& node) {
+  return Angle::fromDeg(node.getValue());  // can throw
 }
 
 /*******************************************************************************

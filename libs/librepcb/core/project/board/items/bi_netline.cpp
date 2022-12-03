@@ -80,41 +80,16 @@ BI_NetSegment* BI_NetLineAnchor::getNetSegmentOfLines() const noexcept {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node,
-                       const Version& fileFormat)
+BI_NetLine::BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
+                       BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
+                       GraphicsLayer& layer, const PositiveLength& width)
   : BI_Base(segment.getBoard()),
     mNetSegment(segment),
-    mTrace(node, fileFormat),
-    mStartPoint(getAnchor(mTrace.getStartPoint())),
-    mEndPoint(getAnchor(mTrace.getEndPoint())) {
-  if ((!mStartPoint) || (!mEndPoint)) {
-    throw RuntimeError(__FILE__, __LINE__, "Invalid trace anchor!");
-  }
-
-  mLayer = mBoard.getLayerStack().getLayer(*mTrace.getLayer());
-  if (!mLayer) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString("Invalid board layer: \"%1\"").arg(*mTrace.getLayer()));
-  }
-
-  init();
-}
-
-BI_NetLine::BI_NetLine(BI_NetSegment& segment, BI_NetLineAnchor& startPoint,
-                       BI_NetLineAnchor& endPoint, GraphicsLayer& layer,
-                       const PositiveLength& width)
-  : BI_Base(segment.getBoard()),
-    mNetSegment(segment),
-    mTrace(Uuid::createRandom(), GraphicsLayerName(layer.getName()), width,
+    mTrace(uuid, GraphicsLayerName(layer.getName()), width,
            startPoint.toTraceAnchor(), endPoint.toTraceAnchor()),
     mStartPoint(&startPoint),
     mEndPoint(&endPoint),
     mLayer(&layer) {
-  init();
-}
-
-void BI_NetLine::init() {
   // check layer
   if (!mLayer->isCopperLayer()) {
     throw RuntimeError(__FILE__, __LINE__,

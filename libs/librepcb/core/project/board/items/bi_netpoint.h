@@ -53,9 +53,7 @@ public:
   // Constructors / Destructor
   BI_NetPoint() = delete;
   BI_NetPoint(const BI_NetPoint& other) = delete;
-  BI_NetPoint(BI_NetSegment& segment, const SExpression& node,
-              const Version& fileFormat);
-  BI_NetPoint(BI_NetSegment& segment, const Point& position);
+  BI_NetPoint(BI_NetSegment& segment, const Uuid& uuid, const Point& position);
   ~BI_NetPoint() noexcept;
 
   // Getters
@@ -95,8 +93,6 @@ public:
   bool operator!=(const BI_NetPoint& rhs) noexcept { return (this != &rhs); }
 
 private:
-  void init();
-
   // General
   QScopedPointer<BGI_NetPoint> mGraphicsItem;
   QMetaObject::Connection mHighlightChangedConnection;

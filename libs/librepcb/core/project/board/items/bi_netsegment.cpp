@@ -45,83 +45,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node,
-                             const Version& fileFormat)
-  : BI_Base(board),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mNetSignal(nullptr) {
-  try {
-    // Note: Connection to a netsignal is optional since file format V0.2.
-    if (tl::optional<Uuid> netSignalUuid = deserialize<tl::optional<Uuid>>(
-            node.getChild("net/@0"), fileFormat)) {
-      mNetSignal = mBoard.getProject().getCircuit().getNetSignals().value(
-          *netSignalUuid);
-      if (!mNetSignal) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           QString("Invalid net signal UUID: \"%1\"")
-                               .arg(netSignalUuid->toStr()));
-      }
-    }
-
-    // Load all vias
-    foreach (const SExpression& node, node.getChildren("via")) {
-      BI_Via* via = new BI_Via(*this, node, fileFormat);
-      if (mVias.contains(via->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a via with the UUID \"%1\"!")
-                .arg(via->getUuid().toStr()));
-      }
-      mVias.insert(via->getUuid(), via);
-    }
-
-    // Load all netpoints
-    foreach (const SExpression& child, node.getChildren("junction")) {
-      BI_NetPoint* netpoint = new BI_NetPoint(*this, child, fileFormat);
-      if (mNetPoints.contains(netpoint->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a netpoint with the UUID \"%1\"!")
-                .arg(netpoint->getUuid().toStr()));
-      }
-      mNetPoints.insert(netpoint->getUuid(), netpoint);
-    }
-
-    // Load all netlines
-    foreach (const SExpression& node,
-             node.getChildren("netline") + node.getChildren("trace")) {
-      BI_NetLine* netline = new BI_NetLine(*this, node, fileFormat);
-      if (mNetLines.contains(netline->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a netline with the UUID \"%1\"!")
-                .arg(netline->getUuid().toStr()));
-      }
-      mNetLines.insert(netline->getUuid(), netline);
-    }
-
-    if (!areAllNetPointsConnectedTogether()) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString("The netsegment with the UUID \"%1\" is not cohesive!")
-              .arg(mUuid.toStr()));
-    }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-  } catch (...) {
-    // free the allocated memory in the reverse order of their allocation...
-    qDeleteAll(mNetLines);
-    mNetLines.clear();
-    qDeleteAll(mNetPoints);
-    mNetPoints.clear();
-    qDeleteAll(mVias);
-    mVias.clear();
-    throw;  // ...and rethrow the exception
-  }
-}
-
-BI_NetSegment::BI_NetSegment(Board& board, NetSignal* signal)
-  : BI_Base(board), mUuid(Uuid::createRandom()), mNetSignal(signal) {
+BI_NetSegment::BI_NetSegment(Board& board, const Uuid& uuid, NetSignal* signal)
+  : BI_Base(board), mUuid(uuid), mNetSignal(signal) {
 }
 
 BI_NetSegment::~BI_NetSegment() noexcept {

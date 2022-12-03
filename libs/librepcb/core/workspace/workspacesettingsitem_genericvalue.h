@@ -94,8 +94,8 @@ private:  // Methods
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::loadImpl()
    */
-  void loadImpl(const SExpression& root, const Version& fileFormat) override {
-    set(deserialize<T>(root.getChild("@0"), fileFormat));  // can throw
+  void loadImpl(const SExpression& root) override {
+    set(deserialize<T>(root.getChild("@0")));  // can throw
   }
 
   /**

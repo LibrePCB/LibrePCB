@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "ratio.h"
 
+#include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
 #include <QtCore>
@@ -75,6 +76,16 @@ SExpression serialize(const Ratio& obj) {
 template <>
 SExpression serialize(const UnsignedRatio& obj) {
   return serialize(*obj);
+}
+
+template <>
+Ratio deserialize(const SExpression& node) {
+  return Ratio::fromNormalized(node.getValue());
+}
+
+template <>
+UnsignedRatio deserialize(const SExpression& node) {
+  return UnsignedRatio(deserialize<Ratio>(node));  // can throw
 }
 
 /*******************************************************************************

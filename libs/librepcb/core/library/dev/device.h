@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -60,7 +62,6 @@ public:
          const ElementName& name_en_US, const QString& description_en_US,
          const QString& keywords_en_US, const Uuid& component,
          const Uuid& package);
-  explicit Device(std::unique_ptr<TransactionalDirectory> directory);
   ~Device() noexcept;
 
   // Getters
@@ -83,6 +84,8 @@ public:
   Device& operator=(const Device& rhs) = delete;
 
   // Static Methods
+  static std::unique_ptr<Device> open(
+      std::unique_ptr<TransactionalDirectory> directory);
   static QString getShortElementName() noexcept {
     return QStringLiteral("dev");
   }
@@ -96,6 +99,10 @@ signals:
 
 protected:  // Methods
   virtual void serialize(SExpression& root) const override;
+
+private:  // Methods
+  Device(std::unique_ptr<TransactionalDirectory> directory,
+         const SExpression& root);
 
 private:  // Data
   Uuid mComponentUuid;

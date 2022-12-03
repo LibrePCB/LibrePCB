@@ -48,8 +48,7 @@ public:
   // Constructors / Destructor
   ProjectSettings() = delete;
   ProjectSettings(const ProjectSettings& other) = delete;
-  explicit ProjectSettings(Project& project, const Version& fileFormat,
-                           bool create);
+  explicit ProjectSettings(Project& project);
   ~ProjectSettings() noexcept;
 
   // Getters: Settings

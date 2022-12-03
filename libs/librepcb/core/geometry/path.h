@@ -26,6 +26,7 @@
 #include "vertex.h"
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -57,7 +58,7 @@ public:
   Path(const Path& other) noexcept;
   explicit Path(const QVector<Vertex>& vertices) noexcept
     : mVertices(vertices) {}
-  Path(const SExpression& node, const Version& fileFormat);
+  explicit Path(const SExpression& node);
   ~Path() noexcept {}
 
   // Getters

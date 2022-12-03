@@ -30,6 +30,39 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const Via::Shape& obj) {
+  switch (obj) {
+    case Via::Shape::Round:
+      return SExpression::createToken("round");
+    case Via::Shape::Square:
+      return SExpression::createToken("square");
+    case Via::Shape::Octagon:
+      return SExpression::createToken("octagon");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+Via::Shape deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == "round") {
+    return Via::Shape::Round;
+  } else if (str == "square") {
+    return Via::Shape::Square;
+  } else if (str == "octagon") {
+    return Via::Shape::Octagon;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Unknown via shape: '%1'").arg(str));
+  }
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
@@ -57,14 +90,13 @@ Via::Via(const Uuid& uuid, const Point& position, Shape shape,
     mDrillDiameter(drillDiameter) {
 }
 
-Via::Via(const SExpression& node, const Version& fileFormat)
+Via::Via(const SExpression& node)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mPosition(node.getChild("position"), fileFormat),
-    mShape(deserialize<Shape>(node.getChild("shape/@0"), fileFormat)),
-    mSize(deserialize<PositiveLength>(node.getChild("size/@0"), fileFormat)),
-    mDrillDiameter(
-        deserialize<PositiveLength>(node.getChild("drill/@0"), fileFormat)) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mPosition(node.getChild("position")),
+    mShape(deserialize<Shape>(node.getChild("shape/@0"))),
+    mSize(deserialize<PositiveLength>(node.getChild("size/@0"))),
+    mDrillDiameter(deserialize<PositiveLength>(node.getChild("drill/@0"))) {
 }
 
 Via::~Via() noexcept {
@@ -195,24 +227,6 @@ Via& Via::operator=(const Via& rhs) noexcept {
   setSize(rhs.mSize);
   setDrillDiameter(rhs.mDrillDiameter);
   return *this;
-}
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-SExpression serialize(const Via::Shape& obj) {
-  switch (obj) {
-    case Via::Shape::Round:
-      return SExpression::createToken("round");
-    case Via::Shape::Square:
-      return SExpression::createToken("square");
-    case Via::Shape::Octagon:
-      return SExpression::createToken("octagon");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
 }
 
 /*******************************************************************************

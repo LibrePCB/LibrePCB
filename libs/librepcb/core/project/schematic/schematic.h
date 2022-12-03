@@ -110,9 +110,8 @@ public:
   Schematic() = delete;
   Schematic(const Schematic& other) = delete;
   Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-            const QString& directoryName, const Version& fileFormat)
-    : Schematic(project, std::move(directory), directoryName, fileFormat, false,
-                QString()) {}
+            const QString& directoryName, const Uuid& uuid,
+            const ElementName& name);
   ~Schematic() noexcept;
 
   // Getters: General
@@ -186,12 +185,6 @@ public:
   bool operator==(const Schematic& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const Schematic& rhs) noexcept { return (this != &rhs); }
 
-  // Static Methods
-  static Schematic* create(Project& project,
-                           std::unique_ptr<TransactionalDirectory> directory,
-                           const QString& directoryName,
-                           const ElementName& name);
-
 signals:
   void symbolAdded(SI_Symbol& symbol);
   void symbolRemoved(SI_Symbol& symbol);
@@ -200,9 +193,6 @@ signals:
   void attributesChanged() override;
 
 private:
-  Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-            const QString& directoryName, const Version& fileFormat,
-            bool create, const QString& newName);
   void updateIcon() noexcept;
 
   // General

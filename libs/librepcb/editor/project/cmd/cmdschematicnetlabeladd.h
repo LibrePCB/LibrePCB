@@ -25,9 +25,6 @@
  ******************************************************************************/
 #include "../../undocommand.h"
 
-#include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/point.h>
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -52,12 +49,8 @@ namespace editor {
 class CmdSchematicNetLabelAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdSchematicNetLabelAdd(SI_NetSegment& segment, const Point& position,
-                          const Angle& rotation, const bool mirrored) noexcept;
+  explicit CmdSchematicNetLabelAdd(SI_NetLabel& netLabel) noexcept;
   ~CmdSchematicNetLabelAdd() noexcept;
-
-  // Getters
-  SI_NetLabel* getNetLabel() const noexcept { return mNetLabel; }
 
 private:
   // Private Methods
@@ -73,11 +66,7 @@ private:
 
   // Private Member Variables
 
-  SI_NetSegment& mNetSegment;
-  Point mPosition;
-  Angle mRotation;
-  bool mMirrored;
-  SI_NetLabel* mNetLabel;
+  SI_NetLabel& mNetLabel;
 };
 
 /*******************************************************************************

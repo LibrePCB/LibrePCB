@@ -77,7 +77,7 @@ public:
                const Point& pos, const Angle& rot, Shape shape,
                const PositiveLength& width, const PositiveLength& height,
                const UnsignedLength& drillDiameter, BoardSide side) noexcept;
-  FootprintPad(const SExpression& node, const Version& fileFormat);
+  explicit FootprintPad(const SExpression& node);
   ~FootprintPad() noexcept;
 
   // Getters
@@ -154,40 +154,6 @@ struct FootprintPadListNameProvider {
 using FootprintPadList =
     SerializableObjectList<FootprintPad, FootprintPadListNameProvider,
                            FootprintPad::Event>;
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline FootprintPad::BoardSide deserialize(const SExpression& sexpr,
-                                           const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  if (str == QLatin1String("top"))
-    return FootprintPad::BoardSide::TOP;
-  else if (str == QLatin1String("bottom"))
-    return FootprintPad::BoardSide::BOTTOM;
-  else if (str == QLatin1String("tht"))
-    return FootprintPad::BoardSide::THT;
-  else
-    throw RuntimeError(__FILE__, __LINE__, str);
-}
-
-template <>
-inline FootprintPad::Shape deserialize(const SExpression& sexpr,
-                                       const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  if (str == QLatin1String("round"))
-    return FootprintPad::Shape::ROUND;
-  else if (str == QLatin1String("rect"))
-    return FootprintPad::Shape::RECT;
-  else if (str == QLatin1String("octagon"))
-    return FootprintPad::Shape::OCTAGON;
-  else
-    throw RuntimeError(__FILE__, __LINE__, str);
-}
 
 /*******************************************************************************
  *  End of File

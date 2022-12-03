@@ -70,7 +70,7 @@ public:
   Via(const Uuid& uuid, const Via& other) noexcept;
   Via(const Uuid& uuid, const Point& position, Shape shape,
       const PositiveLength& size, const PositiveLength& drillDiameter) noexcept;
-  Via(const SExpression& node, const Version& fileFormat);
+  explicit Via(const SExpression& node);
   ~Via() noexcept;
 
   // Getters
@@ -123,26 +123,6 @@ struct ViaListNameProvider {
   static constexpr const char* tagname = "via";
 };
 using ViaList = SerializableObjectList<Via, ViaListNameProvider, Via::Event>;
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline Via::Shape deserialize(const SExpression& sexpr,
-                              const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  if (str == "round")
-    return Via::Shape::Round;
-  else if (str == "square")
-    return Via::Shape::Square;
-  else if (str == "octagon")
-    return Via::Shape::Octagon;
-  else
-    throw RuntimeError(__FILE__, __LINE__,
-                       Via::tr("Unknown via shape: \"%1\"").arg(str));
-}
 
 /*******************************************************************************
  *  End of File

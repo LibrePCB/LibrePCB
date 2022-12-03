@@ -22,12 +22,47 @@
  ******************************************************************************/
 #include "gridproperties.h"
 
+#include "../serialization/sexpression.h"
+
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const GridProperties::Type_t& obj) {
+  switch (obj) {
+    case GridProperties::Type_t::Off:
+      return SExpression::createToken("off");
+    case GridProperties::Type_t::Lines:
+      return SExpression::createToken("lines");
+    case GridProperties::Type_t::Dots:
+      return SExpression::createToken("dots");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+inline GridProperties::Type_t deserialize(const SExpression& sexpr) {
+  const QString str = sexpr.getValue();
+  if (str == "off") {
+    return GridProperties::Type_t::Off;
+  } else if (str == "lines") {
+    return GridProperties::Type_t::Lines;
+  } else if (str == "dots") {
+    return GridProperties::Type_t::Dots;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Unknown grid type: '%1'").arg(str));
+  }
+}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -37,12 +72,10 @@ GridProperties::GridProperties() noexcept
   : mType(Type_t::Lines), mInterval(2540000), mUnit(LengthUnit::millimeters()) {
 }
 
-GridProperties::GridProperties(const SExpression& node,
-                               const Version& fileFormat)
-  : mType(deserialize<Type_t>(node.getChild("type/@0"), fileFormat)),
-    mInterval(
-        deserialize<PositiveLength>(node.getChild("interval/@0"), fileFormat)),
-    mUnit(deserialize<LengthUnit>(node.getChild("unit/@0"), fileFormat)) {
+GridProperties::GridProperties(const SExpression& node)
+  : mType(deserialize<Type_t>(node.getChild("type/@0"))),
+    mInterval(deserialize<PositiveLength>(node.getChild("interval/@0"))),
+    mUnit(deserialize<LengthUnit>(node.getChild("unit/@0"))) {
 }
 
 GridProperties::GridProperties(Type_t type, const PositiveLength& interval,
@@ -76,24 +109,6 @@ GridProperties& GridProperties::operator=(const GridProperties& rhs) noexcept {
   mInterval = rhs.mInterval;
   mUnit = rhs.mUnit;
   return *this;
-}
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-SExpression serialize(const GridProperties::Type_t& obj) {
-  switch (obj) {
-    case GridProperties::Type_t::Off:
-      return SExpression::createToken("off");
-    case GridProperties::Type_t::Lines:
-      return SExpression::createToken("lines");
-    case GridProperties::Type_t::Dots:
-      return SExpression::createToken("dots");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
 }
 
 /*******************************************************************************

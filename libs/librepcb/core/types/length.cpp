@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "length.h"
 
+#include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
 #include <type_traits>
@@ -204,6 +205,21 @@ SExpression serialize(const UnsignedLength& obj) {
 template <>
 SExpression serialize(const PositiveLength& obj) {
   return serialize(*obj);
+}
+
+template <>
+Length deserialize(const SExpression& node) {
+  return Length::fromMm(node.getValue());
+}
+
+template <>
+UnsignedLength deserialize(const SExpression& node) {
+  return UnsignedLength(deserialize<Length>(node));  // can throw
+}
+
+template <>
+PositiveLength deserialize(const SExpression& node) {
+  return PositiveLength(deserialize<Length>(node));  // can throw
 }
 
 /*******************************************************************************

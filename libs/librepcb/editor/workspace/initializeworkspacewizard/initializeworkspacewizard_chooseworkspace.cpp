@@ -26,6 +26,7 @@
 #include "../../editorcommandset.h"
 #include "ui_initializeworkspacewizard_chooseworkspace.h"
 
+#include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/filepath.h>
 
 /*******************************************************************************

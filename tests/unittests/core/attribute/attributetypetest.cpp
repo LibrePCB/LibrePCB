@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/core/attribute/attrtypevoltage.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 /*******************************************************************************
  *  Namespace

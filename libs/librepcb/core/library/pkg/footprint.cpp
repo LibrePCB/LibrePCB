@@ -88,16 +88,16 @@ Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
-Footprint::Footprint(const SExpression& node, const Version& fileFormat)
+Footprint::Footprint(const SExpression& node)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mNames(node, fileFormat),
-    mDescriptions(node, fileFormat),
-    mPads(node, fileFormat),
-    mPolygons(node, fileFormat),
-    mCircles(node, fileFormat),
-    mStrokeTexts(node, fileFormat),
-    mHoles(node, fileFormat),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mNames(node),
+    mDescriptions(node),
+    mPads(node),
+    mPolygons(node),
+    mCircles(node),
+    mStrokeTexts(node),
+    mHoles(node),
     mNamesEditedSlot(*this, &Footprint::namesEdited),
     mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
     mPadsEditedSlot(*this, &Footprint::padsEdited),

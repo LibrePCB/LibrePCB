@@ -62,7 +62,6 @@ public:
   // Constructors / Destructor
   BI_Plane() = delete;
   BI_Plane(const BI_Plane& other) = delete;
-  BI_Plane(Board& board, const SExpression& node, const Version& fileFormat);
   BI_Plane(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
            NetSignal& netsignal, const Path& outline);
   ~BI_Plane() noexcept;
@@ -123,9 +122,6 @@ public:
 private slots:
   void boardAttributesChanged();
 
-private:  // Methods
-  void init();
-
 private:  // Data
   Uuid mUuid;
   GraphicsLayerName mLayerName;
@@ -144,26 +140,6 @@ private:  // Data
 
   QVector<Path> mFragments;
 };
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline BI_Plane::ConnectStyle deserialize(const SExpression& sexpr,
-                                          const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  if (str == "none") return BI_Plane::ConnectStyle::None;
-  // else if (str == "thermal")  return
-  // BI_Plane::ConnectStyle::Thermal;
-  else if (str == "solid")
-    return BI_Plane::ConnectStyle::Solid;
-  else
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        BI_Plane::tr("Unknown plane connect style: \"%1\"").arg(str));
-}
 
 /*******************************************************************************
  *  End of File

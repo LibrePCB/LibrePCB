@@ -57,15 +57,15 @@ LibraryInfoWidget::LibraryInfoWidget(Workspace& ws, const FilePath& libDir)
           &LibraryInfoWidget::btnRemoveLibraryClicked);
 
   // try to load the library
-  Library lib(
+  std::unique_ptr<Library> lib = Library::open(
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
           TransactionalFileSystem::openRO(mLibDir))));  // can throw
 
   const QStringList& localeOrder = ws.getSettings().libraryLocaleOrder.get();
 
   // image
-  if (!lib.getIconAsPixmap().isNull()) {
-    mUi->lblIcon->setPixmap(lib.getIconAsPixmap().scaled(
+  if (!lib->getIconAsPixmap().isNull()) {
+    mUi->lblIcon->setPixmap(lib->getIconAsPixmap().scaled(
         mUi->lblIcon->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
   } else {
     mUi->lblIcon->setVisible(false);
@@ -73,27 +73,27 @@ LibraryInfoWidget::LibraryInfoWidget(Workspace& ws, const FilePath& libDir)
   }
 
   // general attributes
-  mUi->lblName->setText(*lib.getNames().value(localeOrder));
-  mUi->lblDescription->setText(lib.getDescriptions().value(localeOrder));
-  mUi->lblVersion->setText(lib.getVersion().toStr());
-  mUi->lblAuthor->setText(lib.getAuthor());
+  mUi->lblName->setText(*lib->getNames().value(localeOrder));
+  mUi->lblDescription->setText(lib->getDescriptions().value(localeOrder));
+  mUi->lblVersion->setText(lib->getVersion().toStr());
+  mUi->lblAuthor->setText(lib->getAuthor());
   mUi->lblUrl->setText(
       QString("<a href='%1'>%2</a>")
-          .arg(lib.getUrl().toEncoded(), lib.getUrl().toDisplayString()));
+          .arg(lib->getUrl().toEncoded(), lib->getUrl().toDisplayString()));
   connect(mUi->lblUrl, &QLabel::linkActivated, this,
           [this](const QString& url) {
             DesktopServices ds(mWorkspace.getSettings(), this);
             ds.openWebUrl(QUrl(url));
           });
-  mUi->lblCreated->setText(lib.getCreated().toString(Qt::TextDate));
+  mUi->lblCreated->setText(lib->getCreated().toString(Qt::TextDate));
   mUi->lblDeprecated->setText(
-      lib.isDeprecated() ? tr("Yes - Consider switching to another library.")
-                         : tr("No"));
+      lib->isDeprecated() ? tr("Yes - Consider switching to another library.")
+                          : tr("No"));
 
   // extended attributes
   mUi->lblLibType->setText(isRemoteLibrary() ? tr("Remote") : tr("Local"));
   QString dependencies;
-  foreach (const Uuid& uuid, lib.getDependencies()) {
+  foreach (const Uuid& uuid, lib->getDependencies()) {
     QString line = dependencies.isEmpty() ? "" : "<br>";
     FilePath fp = ws.getLibraryDb().getLatest<Library>(uuid);  // can throw
     if (fp.isValid()) {

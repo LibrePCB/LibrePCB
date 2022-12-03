@@ -46,81 +46,9 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node,
-                             const Version& fileFormat)
-  : SI_Base(schematic),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mNetSignal(nullptr) {
-  try {
-    Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"), fileFormat);
-    mNetSignal = mSchematic.getProject().getCircuit().getNetSignals().value(
-        netSignalUuid);
-    if (!mNetSignal) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         QString("Invalid net signal UUID: \"%1\"")
-                             .arg(netSignalUuid.toStr()));
-    }
-
-    // Load all netpoints
-    foreach (const SExpression& child, node.getChildren("junction")) {
-      SI_NetPoint* netpoint = new SI_NetPoint(*this, child, fileFormat);
-      if (mNetPoints.contains(netpoint->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a netpoint with the UUID \"%1\"!")
-                .arg(netpoint->getUuid().toStr()));
-      }
-      mNetPoints.insert(netpoint->getUuid(), netpoint);
-    }
-
-    // Load all netlines
-    foreach (const SExpression& child,
-             node.getChildren("netline") + node.getChildren("line")) {
-      SI_NetLine* netline = new SI_NetLine(*this, child, fileFormat);
-      if (mNetLines.contains(netline->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a netline with the UUID \"%1\"!")
-                .arg(netline->getUuid().toStr()));
-      }
-      mNetLines.insert(netline->getUuid(), netline);
-    }
-
-    // Load all netlabels
-    foreach (const SExpression& child,
-             node.getChildren("netlabel") + node.getChildren("label")) {
-      SI_NetLabel* netlabel = new SI_NetLabel(*this, child, fileFormat);
-      if (mNetLabels.contains(netlabel->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a netlabel with the UUID \"%1\"!")
-                .arg(netlabel->getUuid().toStr()));
-      }
-      mNetLabels.insert(netlabel->getUuid(), netlabel);
-    }
-
-    if (!areAllNetPointsConnectedTogether()) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString("The netsegment with the UUID \"%1\" is not cohesive!")
-              .arg(mUuid.toStr()));
-    }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-  } catch (...) {
-    // free the allocated memory in the reverse order of their allocation...
-    qDeleteAll(mNetLabels);
-    mNetLabels.clear();
-    qDeleteAll(mNetLines);
-    mNetLines.clear();
-    qDeleteAll(mNetPoints);
-    mNetPoints.clear();
-    throw;  // ...and rethrow the exception
-  }
-}
-
-SI_NetSegment::SI_NetSegment(Schematic& schematic, NetSignal& signal)
-  : SI_Base(schematic), mUuid(Uuid::createRandom()), mNetSignal(&signal) {
+SI_NetSegment::SI_NetSegment(Schematic& schematic, const Uuid& uuid,
+                             NetSignal& signal)
+  : SI_Base(schematic), mUuid(uuid), mNetSignal(&signal) {
 }
 
 SI_NetSegment::~SI_NetSegment() noexcept {
@@ -273,7 +201,7 @@ void SI_NetSegment::addNetPointsAndNetLines(
   }
 
   if (!areAllNetPointsConnectedTogether()) {
-    throw LogicError(
+    throw RuntimeError(
         __FILE__, __LINE__,
         QString("The netsegment with the UUID \"%1\" is not cohesive!")
             .arg(mUuid.toStr()));

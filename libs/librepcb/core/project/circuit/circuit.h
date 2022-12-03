@@ -69,7 +69,7 @@ public:
   // Constructors / Destructor
   Circuit() = delete;
   Circuit(const Circuit& other) = delete;
-  Circuit(Project& project, const Version& fileFormat, bool create);
+  explicit Circuit(Project& project);
   ~Circuit() noexcept;
 
   // Getters

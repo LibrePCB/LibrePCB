@@ -46,84 +46,21 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentInstance::ComponentInstance(Circuit& circuit, const SExpression& node,
-                                     const Version& fileFormat)
-  : QObject(&circuit),
-    mCircuit(circuit),
-    mIsAddedToCircuit(false),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"), fileFormat)),
-    mValue(node.getChild("value/@0").getValue()),
-    mDefaultDeviceUuid(deserialize<tl::optional<Uuid>>(
-        node.getChild("lib_device/@0"), fileFormat)),
-    mLibComponent(nullptr),
-    mCompSymbVar(nullptr),
-    mAttributes() {
-  // read general attributes
-  Uuid cmpUuid =
-      deserialize<Uuid>(node.getChild("lib_component/@0"), fileFormat);
-  mLibComponent = mCircuit.getProject().getLibrary().getComponent(cmpUuid);
-  if (!mLibComponent) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("The component with the UUID \"%1\" does not exist in the "
-           "project's library!")
-            .arg(cmpUuid.toStr()));
-  }
-  Uuid symbVarUuid =
-      deserialize<Uuid>(node.getChild("lib_variant/@0"), fileFormat);
-  mCompSymbVar =
-      mLibComponent->getSymbolVariants().get(symbVarUuid).get();  // can throw
-
-  // load all component attributes
-  mAttributes.reset(new AttributeList(node, fileFormat));  // can throw
-
-  // load all signal instances
-  foreach (const SExpression& node,
-           node.getChildren("sig") + node.getChildren("signal")) {
-    ComponentSignalInstance* signal =
-        new ComponentSignalInstance(mCircuit, *this, node, fileFormat);
-    if (mSignals.contains(signal->getCompSignal().getUuid())) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString("The signal with the UUID \"%1\" is defined multiple times.")
-              .arg(signal->getCompSignal().getUuid().toStr()));
-    }
-    mSignals.insert(signal->getCompSignal().getUuid(), signal);
-  }
-  if (mSignals.count() != mLibComponent->getSignals().count()) {
-    qCritical() << "Signal count mismatch:" << mSignals.count()
-                << "!=" << mLibComponent->getSignals().count();
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString("The signal count of the component instance \"%1\" does "
-                "not match with the signal count of the component \"%2\".")
-            .arg(mUuid.toStr())
-            .arg(mLibComponent->getUuid().toStr()));
-  }
-
-  init();
-}
-
-ComponentInstance::ComponentInstance(Circuit& circuit, const Component& cmp,
-                                     const Uuid& symbVar,
+ComponentInstance::ComponentInstance(Circuit& circuit, const Uuid& uuid,
+                                     const Component& cmp, const Uuid& symbVar,
                                      const CircuitIdentifier& name,
                                      const tl::optional<Uuid>& defaultDevice)
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
-    mUuid(Uuid::createRandom()),
+    mUuid(uuid),
     mName(name),
+    mValue(cmp.getDefaultValue()),
     mDefaultDeviceUuid(defaultDevice),
-    mLibComponent(&cmp),
-    mCompSymbVar(nullptr),
-    mAttributes() {
-  mValue = cmp.getDefaultValue();
-  mCompSymbVar =
-      mLibComponent->getSymbolVariants().get(symbVar).get();  // can throw
-
-  // add attributes
-  mAttributes.reset(new AttributeList(cmp.getAttributes()));
+    mLibComponent(cmp),
+    mCompSymbVar(cmp.getSymbolVariants().get(symbVar).get()),  // can throw
+    mAttributes(new AttributeList(cmp.getAttributes())) {
+  Q_ASSERT(mCompSymbVar);
 
   // add signal map
   for (const ComponentSignal& signal : cmp.getSignals()) {
@@ -132,10 +69,6 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const Component& cmp,
     mSignals.insert(signalInstance->getCompSignal().getUuid(), signalInstance);
   }
 
-  init();
-}
-
-void ComponentInstance::init() {
   // create ERC messages
   mErcMsgUnplacedRequiredSymbols.reset(new ErcMsg(
       mCircuit.getProject(), *this, mUuid.toStr(), "UnplacedRequiredSymbols",
@@ -148,8 +81,6 @@ void ComponentInstance::init() {
   // emit the "attributesChanged" signal when the project has emitted it
   connect(&mCircuit.getProject(), &Project::attributesChanged, this,
           &ComponentInstance::attributesChanged);
-
-  if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ComponentInstance::~ComponentInstance() noexcept {
@@ -337,7 +268,7 @@ void ComponentInstance::unregisterSymbol(SI_Symbol& symbol) {
 void ComponentInstance::registerDevice(BI_Device& device) {
   if ((!mIsAddedToCircuit) || (device.getCircuit() != mCircuit) ||
       (mRegisteredDevices.contains(&device)) ||
-      (mLibComponent->isSchematicOnly())) {
+      (mLibComponent.isSchematicOnly())) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredDevices.append(&device);
@@ -359,7 +290,7 @@ void ComponentInstance::serialize(SExpression& root) const {
 
   root.appendChild(mUuid);
   root.ensureLineBreak();
-  root.appendChild("lib_component", mLibComponent->getUuid());
+  root.appendChild("lib_component", mLibComponent.getUuid());
   root.ensureLineBreak();
   root.appendChild("lib_variant", mCompSymbVar->getUuid());
   root.ensureLineBreak();
@@ -397,7 +328,7 @@ QString ComponentInstance::getBuiltInAttributeValue(const QString& key) const
   } else if (key == QLatin1String("VALUE")) {
     return mValue;
   } else if (key == QLatin1String("COMPONENT")) {
-    return *mLibComponent->getNames().value(getLocaleOrder());
+    return *mLibComponent.getNames().value(getLocaleOrder());
   } else {
     return QString();
   }
@@ -416,7 +347,6 @@ QVector<const AttributeProvider*>
  ******************************************************************************/
 
 bool ComponentInstance::checkAttributesValidity() const noexcept {
-  if (mLibComponent == nullptr) return false;
   if (mCompSymbVar == nullptr) return false;
   return true;
 }

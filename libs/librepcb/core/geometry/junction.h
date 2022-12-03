@@ -61,7 +61,7 @@ public:
   Junction(const Junction& other) noexcept;
   Junction(const Uuid& uuid, const Junction& other) noexcept;
   Junction(const Uuid& uuid, const Point& position) noexcept;
-  Junction(const SExpression& node, const Version& fileFormat);
+  explicit Junction(const SExpression& node);
   ~Junction() noexcept;
 
   // Getters

@@ -22,6 +22,9 @@
  ******************************************************************************/
 #include "uuid.h"
 
+#include "../exceptions.h"
+#include "../serialization/sexpression.h"
+
 #include <QRegularExpressionValidator>
 #include <QtCore>
 
@@ -136,6 +139,20 @@ SExpression serialize(const tl::optional<Uuid>& obj) {
     return serialize(*obj);
   } else {
     return SExpression::createToken("none");
+  }
+}
+
+template <>
+Uuid deserialize(const SExpression& node) {
+  return Uuid::fromString(node.getValue());  // can throw
+}
+
+template <>
+tl::optional<Uuid> deserialize(const SExpression& node) {
+  if (node.getValue() == "none") {
+    return tl::nullopt;
+  } else {
+    return deserialize<Uuid>(node);  // can throw
   }
 }
 

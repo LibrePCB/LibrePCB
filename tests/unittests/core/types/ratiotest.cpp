@@ -20,9 +20,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
+#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/types/ratio.h>
 
 #include <QtCore>
@@ -191,31 +190,21 @@ TEST_P(RatioTest, testSerialize) {
   EXPECT_EQ(data.string % "\n", serialize(data.ratio).toByteArray());
 }
 
-TEST_P(RatioTest, testDeserializeV01) {
+TEST_P(RatioTest, testDeserialize) {
   const RatioTestData_t& data = GetParam();
 
   SExpression sexpr = SExpression::createString(data.string);
-  EXPECT_EQ(data.ratio, deserialize<Ratio>(sexpr, Version::fromString("0.1")));
-}
-
-TEST_P(RatioTest, testDeserializeCurrentVersion) {
-  const RatioTestData_t& data = GetParam();
-
-  SExpression sexpr = SExpression::createString(data.string);
-  EXPECT_EQ(data.ratio,
-            deserialize<Ratio>(sexpr, qApp->getFileFormatVersion()));
+  EXPECT_EQ(data.ratio, deserialize<Ratio>(sexpr));
 }
 
 TEST(RatioTest, testDeserializeEmpty) {
   SExpression sexpr = SExpression::createString("");
-  EXPECT_THROW(deserialize<Ratio>(sexpr, qApp->getFileFormatVersion()),
-               RuntimeError);
+  EXPECT_THROW(deserialize<Ratio>(sexpr), RuntimeError);
 }
 
 TEST(RatioTest, testDeserializeInvalid) {
   SExpression sexpr = SExpression::createString("foo");
-  EXPECT_THROW(deserialize<Ratio>(sexpr, qApp->getFileFormatVersion()),
-               RuntimeError);
+  EXPECT_THROW(deserialize<Ratio>(sexpr), RuntimeError);
 }
 
 /*******************************************************************************

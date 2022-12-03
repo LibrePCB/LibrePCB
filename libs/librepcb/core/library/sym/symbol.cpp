@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "symbol.h"
 
-#include "../../serialization/sexpression.h"
+#include "../../serialization/fileformatmigration.h"
 #include "symbolcheck.h"
 
 #include <QtCore>
@@ -56,14 +56,15 @@ Symbol::Symbol(const Uuid& uuid, const Version& version, const QString& author,
   mTexts.onEdited.attach(mTextsEditedSlot);
 }
 
-Symbol::Symbol(std::unique_ptr<TransactionalDirectory> directory)
-  : LibraryElement(std::move(directory), getShortElementName(),
-                   getLongElementName()),
+Symbol::Symbol(std::unique_ptr<TransactionalDirectory> directory,
+               const SExpression& root)
+  : LibraryElement(getShortElementName(), getLongElementName(), true,
+                   std::move(directory), root),
     onEdited(*this),
-    mPins(mLoadingFileDocument, mLoadingFileFormat),
-    mPolygons(mLoadingFileDocument, mLoadingFileFormat),
-    mCircles(mLoadingFileDocument, mLoadingFileFormat),
-    mTexts(mLoadingFileDocument, mLoadingFileFormat),
+    mPins(root),
+    mPolygons(root),
+    mCircles(root),
+    mTexts(root),
     mPinsEditedSlot(*this, &Symbol::pinsEdited),
     mPolygonsEditedSlot(*this, &Symbol::polygonsEdited),
     mCirclesEditedSlot(*this, &Symbol::circlesEdited),
@@ -72,7 +73,6 @@ Symbol::Symbol(std::unique_ptr<TransactionalDirectory> directory)
   mPolygons.onEdited.attach(mPolygonsEditedSlot);
   mCircles.onEdited.attach(mCirclesEditedSlot);
   mTexts.onEdited.attach(mTextsEditedSlot);
-  cleanupAfterLoadingElementFromFile();
 }
 
 Symbol::~Symbol() noexcept {
@@ -85,6 +85,24 @@ Symbol::~Symbol() noexcept {
 LibraryElementCheckMessageList Symbol::runChecks() const {
   SymbolCheck check(*this);
   return check.runChecks();  // can throw
+}
+
+std::unique_ptr<Symbol> Symbol::open(
+    std::unique_ptr<TransactionalDirectory> directory) {
+  Q_ASSERT(directory);
+
+  // Upgrade file format, if needed.
+  const Version fileFormat =
+      readFileFormat(*directory, ".librepcb-" % getShortElementName());
+  for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
+    migration->upgradeSymbol(*directory);
+  }
+
+  // Load element.
+  const QString fileName = getLongElementName() % ".lp";
+  const SExpression root = SExpression::parse(directory->read(fileName),
+                                              directory->getAbsPath(fileName));
+  return std::unique_ptr<Symbol>(new Symbol(std::move(directory), root));
 }
 
 /*******************************************************************************

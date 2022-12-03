@@ -33,6 +33,7 @@
 namespace librepcb {
 
 class Angle;
+class SExpression;
 
 /*******************************************************************************
  *  Class Point
@@ -100,7 +101,7 @@ public:
    */
   explicit Point(const Length& x, const Length& y) noexcept : mX(x), mY(y) {}
 
-  Point(const SExpression& node, const Version& fileFormat);
+  explicit Point(const SExpression& node);
 
   /**
    * @brief Destructor

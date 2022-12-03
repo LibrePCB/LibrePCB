@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "attributetype.h"
 
+#include "../exceptions.h"
+#include "../serialization/sexpression.h"
 #include "attributeunit.h"
 #include "attrtypecapacitance.h"
 #include "attrtypecurrent.h"
@@ -129,6 +131,11 @@ const AttributeType& AttributeType::fromString(const QString& type) {
 template <>
 SExpression serialize(const AttributeType& obj) {
   return SExpression::createToken(obj.getName());
+}
+
+template <>
+const AttributeType& deserialize(const SExpression& node) {
+  return AttributeType::fromString(node.getValue());  // can throw
 }
 
 /*******************************************************************************

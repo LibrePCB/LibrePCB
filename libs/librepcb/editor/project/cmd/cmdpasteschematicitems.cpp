@@ -101,11 +101,11 @@ bool CmdPasteSchematicItems::performExecute() {
   std::unique_ptr<TransactionalDirectory> cmpDir = mData->getDirectory("cmp");
   foreach (const QString& dirname, cmpDir->getDirs()) {
     if (!mProject.getLibrary().getComponent(Uuid::fromString(dirname))) {
-      QScopedPointer<Component> cmp(
-          new Component(std::unique_ptr<TransactionalDirectory>(
-              new TransactionalDirectory(*cmpDir, dirname))));
+      std::unique_ptr<Component> cmp =
+          Component::open(std::unique_ptr<TransactionalDirectory>(
+              new TransactionalDirectory(*cmpDir, dirname)));
       execNewChildCmd(new CmdProjectLibraryAddElement<Component>(
-          mProject.getLibrary(), *cmp.take()));
+          mProject.getLibrary(), *cmp.release()));
     }
   }
 
@@ -113,11 +113,11 @@ bool CmdPasteSchematicItems::performExecute() {
   std::unique_ptr<TransactionalDirectory> symDir = mData->getDirectory("sym");
   foreach (const QString& dirname, symDir->getDirs()) {
     if (!mProject.getLibrary().getSymbol(Uuid::fromString(dirname))) {
-      QScopedPointer<Symbol> cmp(
-          new Symbol(std::unique_ptr<TransactionalDirectory>(
-              new TransactionalDirectory(*symDir, dirname))));
+      std::unique_ptr<Symbol> sym =
+          Symbol::open(std::unique_ptr<TransactionalDirectory>(
+              new TransactionalDirectory(*symDir, dirname)));
       execNewChildCmd(new CmdProjectLibraryAddElement<Symbol>(
-          mProject.getLibrary(), *cmp.take()));
+          mProject.getLibrary(), *sym.release()));
     }
   }
 
@@ -136,9 +136,9 @@ bool CmdPasteSchematicItems::performExecute() {
               libCmp->getPrefixes().value(
                   mProject.getSettings().getLocaleOrder())));
     }
-    QScopedPointer<ComponentInstance> copy(
-        new ComponentInstance(mProject.getCircuit(), *libCmp,
-                              cmp.libVariantUuid, name, cmp.libDeviceUuid));
+    QScopedPointer<ComponentInstance> copy(new ComponentInstance(
+        mProject.getCircuit(), Uuid::createRandom(), *libCmp,
+        cmp.libVariantUuid, name, cmp.libDeviceUuid));
     copy->setValue(cmp.value);
     copy->setAttributes(cmp.attributes);
     componentInstanceMap.insert(cmp.uuid, copy->getUuid());
@@ -156,9 +156,9 @@ bool CmdPasteSchematicItems::performExecute() {
                                        Uuid::createRandom()));
     if (!cmpInst) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<SI_Symbol> copy(
-        new SI_Symbol(mSchematic, *cmpInst, sym.symbolVariantItemUuid,
-                      sym.position + mPosOffset, sym.rotation, sym.mirrored));
+    QScopedPointer<SI_Symbol> copy(new SI_Symbol(
+        mSchematic, Uuid::createRandom(), *cmpInst, sym.symbolVariantItemUuid,
+        sym.position + mPosOffset, sym.rotation, sym.mirrored));
     copy->setSelected(true);
     symbolMap.insert(sym.uuid, copy->getUuid());
     execNewChildCmd(new CmdSymbolInstanceAdd(*copy.take()));
@@ -187,7 +187,8 @@ bool CmdPasteSchematicItems::performExecute() {
     tl::optional<CircuitIdentifier> forcedNetName;
 
     // Add new segment
-    SI_NetSegment* copy = new SI_NetSegment(mSchematic, *netSignal);
+    SI_NetSegment* copy =
+        new SI_NetSegment(mSchematic, Uuid::createRandom(), *netSignal);
     copy->setSelected(true);
     execNewChildCmd(new CmdSchematicNetSegmentAdd(*copy));
 
@@ -253,11 +254,13 @@ bool CmdPasteSchematicItems::performExecute() {
 
     // Add netlabels
     for (const NetLabel& nl : seg.labels) {
-      CmdSchematicNetLabelAdd* cmd =
-          new CmdSchematicNetLabelAdd(*copy, nl.getPosition() + mPosOffset,
-                                      nl.getRotation(), nl.getMirrored());
+      SI_NetLabel* netLabel = new SI_NetLabel(
+          *copy,
+          NetLabel(Uuid::createRandom(), nl.getPosition() + mPosOffset,
+                   nl.getRotation(), nl.getMirrored()));
+      CmdSchematicNetLabelAdd* cmd = new CmdSchematicNetLabelAdd(*netLabel);
       execNewChildCmd(cmd);
-      cmd->getNetLabel()->setSelected(true);
+      netLabel->setSelected(true);
       if (!forcedNetName) {
         // If the net segment has at least one net label, copy the original
         // net name.

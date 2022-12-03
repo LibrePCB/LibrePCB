@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "dxfreader.h"
 
+#include "../fileio/filepath.h"
+
 #include <dl_creationadapter.h>
 #include <dl_dxf.h>
 

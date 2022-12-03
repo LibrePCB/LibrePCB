@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
 #include "../fileio/filepath.h"
 
 #include <QtCore>
@@ -35,7 +34,6 @@
 namespace librepcb {
 
 class SExpression;
-class Version;
 
 /**
  * Serialize an object to an ::librepcb::SExpression
@@ -49,18 +47,15 @@ template <typename T>
 SExpression serialize(const T& obj);
 
 /**
- * Deserialize an ::librepcb::SExpression to an object
+ * Deserialize an ::librepcb::SExpression node to an object
  *
  * @tparam T          Type of object to deserialize.
- * @param sexpr       S-Expression to deserialize.
- * @param fileFormat  The file format version of the passed S-Expression.
- *                    If this is older than the latest file format version,
- *                    a migration might need to be performed.
+ * @param node        S-Expression to deserialize.
  * @return            Deserialized object.
  * @throws            ::librepcb::Exception in case of an error.
  */
 template <typename T>
-T deserialize(const SExpression& sexpr, const Version& fileFormat);
+T deserialize(const SExpression& node);
 
 /*******************************************************************************
  *  Class SExpression
@@ -103,8 +98,10 @@ public:
    * @return All children
    */
   const QList<SExpression>& getChildren() const noexcept { return mChildren; }
-  QList<SExpression> getChildren(Type type) const noexcept;
-  QList<SExpression> getChildren(const QString& name) const noexcept;
+  QList<SExpression*> getChildren(Type type) noexcept;
+  QList<const SExpression*> getChildren(Type type) const noexcept;
+  QList<SExpression*> getChildren(const QString& name) noexcept;
+  QList<const SExpression*> getChildren(const QString& name) const noexcept;
 
   /**
    * @brief Get a child by path
@@ -143,6 +140,7 @@ public:
    *
    * @throws ::librepcb::Exception if the specified child does not exist.
    */
+  SExpression& getChild(const QString& path);
   const SExpression& getChild(const QString& path) const;
 
   /**
@@ -156,6 +154,7 @@ public:
    * @return  A pointer to the child of the specified path, if found. If no
    *          such child exists, `nullptr` is returned.
    */
+  SExpression* tryGetChild(const QString& path) noexcept;
   const SExpression* tryGetChild(const QString& path) const noexcept;
 
   // General Methods
@@ -210,87 +209,6 @@ private:  // Data
   QList<SExpression> mChildren;
   FilePath mFilePath;
 };
-
-/*******************************************************************************
- *  Deserialization Methods
- ******************************************************************************/
-
-template <>
-inline QString deserialize(const SExpression& sexpr,
-                           const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return sexpr.getValue();  // can throw
-}
-
-template <>
-inline bool deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  if (sexpr.getValue() == "true") {
-    return true;
-  } else if (sexpr.getValue() == "false") {
-    return false;
-  } else
-    throw RuntimeError(__FILE__, __LINE__,
-                       SExpression::tr("Not a valid boolean."));
-}
-
-template <>
-inline int deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  bool ok = false;
-  int value = sexpr.getValue().toInt(&ok);
-  if (ok) {
-    return value;
-  } else
-    throw RuntimeError(__FILE__, __LINE__,
-                       SExpression::tr("Not a valid integer."));
-}
-
-template <>
-inline uint deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  bool ok = false;
-  uint value = sexpr.getValue().toUInt(&ok);
-  if (ok) {
-    return value;
-  } else
-    throw RuntimeError(__FILE__, __LINE__,
-                       SExpression::tr("Not a valid unsigned integer."));
-}
-
-template <>
-inline QDateTime deserialize(const SExpression& sexpr,
-                             const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QDateTime obj =
-      QDateTime::fromString(sexpr.getValue(), Qt::ISODate).toLocalTime();
-  if (obj.isValid())
-    return obj;
-  else
-    throw RuntimeError(__FILE__, __LINE__,
-                       SExpression::tr("Not a valid datetime."));
-}
-
-template <>
-inline QColor deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QColor obj(sexpr.getValue());
-  if (obj.isValid()) {
-    return obj;
-  } else
-    throw RuntimeError(__FILE__, __LINE__,
-                       SExpression::tr("Not a valid color."));
-}
-
-template <>
-inline QUrl deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QUrl obj(sexpr.getValue(), QUrl::StrictMode);
-  if (obj.isValid()) {
-    return obj;
-  } else
-    throw RuntimeError(__FILE__, __LINE__, SExpression::tr("Not a valid URL."));
-}
 
 /*******************************************************************************
  *  End of File

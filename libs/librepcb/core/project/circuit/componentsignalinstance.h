@@ -56,8 +56,6 @@ public:
   // Constructors / Destructor
   ComponentSignalInstance() = delete;
   ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
-  ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                          const SExpression& node, const Version& fileFormat);
   explicit ComponentSignalInstance(Circuit& circuit,
                                    ComponentInstance& cmpInstance,
                                    const ComponentSignal& cmpSignal,
@@ -67,7 +65,7 @@ public:
   // Getters
   Circuit& getCircuit() const noexcept { return mCircuit; }
   const ComponentSignal& getCompSignal() const noexcept {
-    return *mComponentSignal;
+    return mComponentSignal;
   }
   NetSignal* getNetSignal() const noexcept { return mNetSignal; }
   ComponentInstance& getComponentInstance() const noexcept {
@@ -128,13 +126,10 @@ private slots:
   void updateErcMessages() noexcept;
 
 private:
-  void init();
-  bool checkAttributesValidity() const noexcept;
-
   // General
   Circuit& mCircuit;
   ComponentInstance& mComponentInstance;
-  const ComponentSignal* mComponentSignal;
+  const ComponentSignal& mComponentSignal;
   bool mIsAddedToCircuit;
 
   // Attributes

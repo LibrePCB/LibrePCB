@@ -84,21 +84,6 @@ private:  // Data
 };
 
 /*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline StrokeTextSpacing deserialize(const SExpression& sexpr,
-                                     const Version& fileFormat) {
-  if (sexpr.getValue() == "auto") {
-    return StrokeTextSpacing();
-  } else {
-    return StrokeTextSpacing(
-        deserialize<Ratio>(sexpr, fileFormat));  // can throw
-  }
-}
-
-/*******************************************************************************
  *  Class StrokeText
  ******************************************************************************/
 
@@ -137,7 +122,7 @@ public:
              const StrokeTextSpacing& letterSpacing,
              const StrokeTextSpacing& lineSpacing, const Alignment& align,
              bool mirrored, bool autoRotate) noexcept;
-  StrokeText(const SExpression& node, const Version& fileFormat);
+  explicit StrokeText(const SExpression& node);
   ~StrokeText() noexcept;
 
   // Getters

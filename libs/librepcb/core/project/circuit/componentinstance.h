@@ -61,11 +61,9 @@ public:
   // Constructors / Destructor
   ComponentInstance() = delete;
   ComponentInstance(const ComponentInstance& other) = delete;
-  ComponentInstance(Circuit& circuit, const SExpression& node,
-                    const Version& fileFormat);
   explicit ComponentInstance(
-      Circuit& circuit, const Component& cmp, const Uuid& symbVar,
-      const CircuitIdentifier& name,
+      Circuit& circuit, const Uuid& uuid, const Component& cmp,
+      const Uuid& symbVar, const CircuitIdentifier& name,
       const tl::optional<Uuid>& defaultDevice = tl::nullopt);
   ~ComponentInstance() noexcept;
 
@@ -76,9 +74,12 @@ public:
   const tl::optional<Uuid>& getDefaultDeviceUuid() const noexcept {
     return mDefaultDeviceUuid;
   }
-  const Component& getLibComponent() const noexcept { return *mLibComponent; }
+  const Component& getLibComponent() const noexcept { return mLibComponent; }
   const ComponentSymbolVariant& getSymbolVariant() const noexcept {
     return *mCompSymbVar;
+  }
+  const QMap<Uuid, ComponentSignalInstance*>& getSignals() const noexcept {
+    return mSignals;
   }
   ComponentSignalInstance* getSignalInstance(const Uuid& signalUuid) const
       noexcept {
@@ -162,7 +163,6 @@ signals:
   void attributesChanged() override;
 
 private:
-  void init();
   bool checkAttributesValidity() const noexcept;
   void updateErcMessages() noexcept;
   const QStringList& getLocaleOrder() const noexcept;
@@ -187,8 +187,8 @@ private:
   /// @brief THe default device when adding the component to a board
   tl::optional<Uuid> mDefaultDeviceUuid;
 
-  /// @brief Pointer to the component in the project's library
-  const Component* mLibComponent;
+  /// @brief Reference to the component in the project's library
+  const Component& mLibComponent;
 
   /// @brief Pointer to the used symbol variant of #mLibComponent
   const ComponentSymbolVariant* mCompSymbVar;

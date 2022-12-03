@@ -118,10 +118,8 @@ inline SExpression serialize(const ComponentSymbolVariantItemSuffix& obj) {
 }
 
 template <>
-inline ComponentSymbolVariantItemSuffix deserialize(const SExpression& sexpr,
-                                                    const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return ComponentSymbolVariantItemSuffix(sexpr.getValue());  // can throw
+inline ComponentSymbolVariantItemSuffix deserialize(const SExpression& node) {
+  return ComponentSymbolVariantItemSuffix(node.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

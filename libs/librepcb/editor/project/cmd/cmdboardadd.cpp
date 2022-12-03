@@ -57,10 +57,10 @@ CmdBoardAdd::~CmdBoardAdd() noexcept {
  ******************************************************************************/
 
 bool CmdBoardAdd::performExecute() {
-  mBoard = Board::create(
+  mBoard = new Board(
       mProject,
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-      mDirName, mName);  // can throw
+      mDirName, Uuid::createRandom(), mName);  // can throw
   if (mBoardToCopy) {
     mBoard->copyFrom(*mBoardToCopy);  // can throw
   } else {

@@ -22,7 +22,9 @@
  ******************************************************************************/
 #include "favoriteprojectsmodel.h"
 
+#include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
@@ -44,11 +46,10 @@ FavoriteProjectsModel::FavoriteProjectsModel(
   try {
     mFilePath = mWorkspace.getDataPath().getPathTo("favorite_projects.lp");
     if (mFilePath.isExistingFile()) {
-      SExpression root =
+      const SExpression root =
           SExpression::parse(FileUtils::readFile(mFilePath), mFilePath);
-      const QList<SExpression>& childs = root.getChildren("project");
-      foreach (const SExpression& child, childs) {
-        QString path = child.getChild("@0").getValue();
+      foreach (const SExpression* child, root.getChildren("project")) {
+        QString path = child->getChild("@0").getValue();
         FilePath absPath = FilePath::fromRelative(mWorkspace.getPath(), path);
         mAllProjects.append(absPath);
       }
@@ -114,7 +115,7 @@ void FavoriteProjectsModel::save() noexcept {
     }
     root.ensureLineBreak();
     FileUtils::writeFile(mFilePath, root.toByteArray());  // can throw
-  } catch (Exception& e) {
+  } catch (const Exception& e) {
     qWarning() << "Failed to save favorite projects file:" << e.getMsg();
   }
 }

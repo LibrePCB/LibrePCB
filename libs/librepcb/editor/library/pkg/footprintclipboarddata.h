@@ -60,7 +60,7 @@ public:
   FootprintClipboardData(const Uuid& footprintUuid,
                          const PackagePadList& packagePads,
                          const Point& cursorPos) noexcept;
-  FootprintClipboardData(const SExpression& node, const Version& fileFormat);
+  explicit FootprintClipboardData(const SExpression& node);
   ~FootprintClipboardData() noexcept;
 
   // Getters

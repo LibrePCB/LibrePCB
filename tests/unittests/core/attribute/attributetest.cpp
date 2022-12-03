@@ -20,11 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
 #include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/attribute/attrtypevoltage.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 /*******************************************************************************
  *  Namespace
@@ -55,7 +54,7 @@ class AttributeTest : public ::testing::TestWithParam<AttributeTestData> {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_P(AttributeTest, testConstructFromSExpressionV01) {
+TEST_P(AttributeTest, testConstructFromSExpression) {
   const AttributeTestData& data = GetParam();
 
   const AttributeType& type = AttributeType::fromString(data.type);
@@ -64,26 +63,9 @@ TEST_P(AttributeTest, testConstructFromSExpressionV01) {
   SExpression sexpr = SExpression::parse(data.serialized, FilePath());
 
   if (data.validSExpression) {
-    EXPECT_EQ(attribute, Attribute(sexpr, Version::fromString("0.1")));
+    EXPECT_EQ(attribute, Attribute(sexpr));
   } else {
-    EXPECT_THROW({ Attribute a(sexpr, Version::fromString("0.1")); },
-                 Exception);
-  }
-}
-
-TEST_P(AttributeTest, testConstructFromSExpressionCurrentVersion) {
-  const AttributeTestData& data = GetParam();
-
-  const AttributeType& type = AttributeType::fromString(data.type);
-  Attribute attribute(AttributeKey(data.key), type, data.value,
-                      type.getUnitFromString(data.unit));
-  SExpression sexpr = SExpression::parse(data.serialized, FilePath());
-
-  if (data.validSExpression) {
-    EXPECT_EQ(attribute, Attribute(sexpr, qApp->getFileFormatVersion()));
-  } else {
-    EXPECT_THROW({ Attribute a(sexpr, qApp->getFileFormatVersion()); },
-                 Exception);
+    EXPECT_THROW({ Attribute a(sexpr); }, Exception);
   }
 }
 

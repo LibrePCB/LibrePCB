@@ -21,8 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 #include <QtCore>
 
@@ -66,7 +66,7 @@ TEST_F(BoardFabricationOutputSettingsTest, testSerializeAndDeserialize) {
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);
 
-  BoardFabricationOutputSettings obj2(sexpr1, qApp->getFileFormatVersion());
+  BoardFabricationOutputSettings obj2(sexpr1);
   SExpression sexpr2 = SExpression::createList("obj");
   obj2.serialize(sexpr2);
 

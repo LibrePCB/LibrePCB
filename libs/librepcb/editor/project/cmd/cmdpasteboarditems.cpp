@@ -120,20 +120,20 @@ bool CmdPasteBoardItems::performExecute() {
             mProject.getLibrary().getDevice(dev.libDeviceUuid)) {
       pgkUuid = libDev->getPackageUuid();
     } else {
-      QScopedPointer<Device> newLibDev(
-          new Device(mData->getDirectory("dev/" % dev.libDeviceUuid.toStr())));
+      std::unique_ptr<Device> newLibDev =
+          Device::open(mData->getDirectory("dev/" % dev.libDeviceUuid.toStr()));
       pgkUuid = newLibDev->getPackageUuid();
       execNewChildCmd(new CmdProjectLibraryAddElement<Device>(
-          mProject.getLibrary(), *newLibDev.take()));
+          mProject.getLibrary(), *newLibDev.release()));
     }
     Q_ASSERT(pgkUuid);
 
     // Copy new package to project library, if not existing already
     if (!mProject.getLibrary().getPackage(*pgkUuid)) {
-      QScopedPointer<Package> newLibPgk(
-          new Package(mData->getDirectory("pkg/" % pgkUuid->toStr())));
+      std::unique_ptr<Package> newLibPgk =
+          Package::open(mData->getDirectory("pkg/" % pgkUuid->toStr()));
       execNewChildCmd(new CmdProjectLibraryAddElement<Package>(
-          mProject.getLibrary(), *newLibPgk.take()));
+          mProject.getLibrary(), *newLibPgk.release()));
     }
 
     // Add device instance to board
@@ -180,7 +180,8 @@ bool CmdPasteBoardItems::performExecute() {
       // Add new segment
       NetSignal* netsignal =
           seg.netName ? getOrCreateNetSignal(**seg.netName) : nullptr;
-      BI_NetSegment* copy = new BI_NetSegment(mBoard, netsignal);
+      BI_NetSegment* copy =
+          new BI_NetSegment(mBoard, Uuid::createRandom(), netsignal);
       copy->setSelected(true);
       execNewChildCmd(new CmdBoardNetSegmentAdd(*copy));
 

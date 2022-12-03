@@ -66,7 +66,7 @@ public:
   Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
           const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
           const Path& path) noexcept;
-  Polygon(const SExpression& node, const Version& fileFormat);
+  explicit Polygon(const SExpression& node);
   ~Polygon() noexcept;
 
   // Getters

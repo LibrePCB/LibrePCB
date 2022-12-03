@@ -57,9 +57,8 @@ void WorkspaceSettingsItem::restoreDefault() noexcept {
   mEdited = true;
 }
 
-void WorkspaceSettingsItem::load(const SExpression& root,
-                                 const Version& fileFormat) {
-  loadImpl(root, fileFormat);  // can throw
+void WorkspaceSettingsItem::load(const SExpression& root) {
+  loadImpl(root);  // can throw
   mIsDefault = false;
   mEdited = false;
 }

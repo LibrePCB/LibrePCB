@@ -111,31 +111,31 @@ void NewElementWizardContext::copyElement(ElementType type,
   std::unique_ptr<TransactionalDirectory> dir(
       new TransactionalDirectory(TransactionalFileSystem::openRO(fp)));
 
-  QScopedPointer<LibraryBaseElement> element;
+  std::unique_ptr<LibraryBaseElement> element;
 
   switch (mElementType) {
     case NewElementWizardContext::ElementType::ComponentCategory: {
-      element.reset(new ComponentCategory(std::move(dir)));
+      element = ComponentCategory::open(std::move(dir));
       break;
     }
     case NewElementWizardContext::ElementType::PackageCategory: {
-      element.reset(new PackageCategory(std::move(dir)));
+      element = PackageCategory::open(std::move(dir));
       break;
     }
     case NewElementWizardContext::ElementType::Symbol: {
-      element.reset(new Symbol(std::move(dir)));
+      element = Symbol::open(std::move(dir));
       break;
     }
     case NewElementWizardContext::ElementType::Component: {
-      element.reset(new Component(std::move(dir)));
+      element = Component::open(std::move(dir));
       break;
     }
     case NewElementWizardContext::ElementType::Device: {
-      element.reset(new Device(std::move(dir)));
+      element = Device::open(std::move(dir));
       break;
     }
     case NewElementWizardContext::ElementType::Package: {
-      element.reset(new Package(std::move(dir)));
+      element = Package::open(std::move(dir));
       break;
     }
     default: {
@@ -150,19 +150,19 @@ void NewElementWizardContext::copyElement(ElementType type,
   mElementDescription = element->getDescriptions().getDefaultValue();
   mElementKeywords = element->getKeywords().getDefaultValue();
   if (const LibraryCategory* category =
-          dynamic_cast<const LibraryCategory*>(element.data())) {
+          dynamic_cast<const LibraryCategory*>(element.get())) {
     if (category->getParentUuid().has_value()) {
       mElementCategoryUuids.insert(*category->getParentUuid());
     }
   }
   if (const LibraryElement* libElement =
-          dynamic_cast<const LibraryElement*>(element.data())) {
+          dynamic_cast<const LibraryElement*>(element.get())) {
     mElementCategoryUuids = libElement->getCategories();
   }
 
   switch (mElementType) {
     case NewElementWizardContext::ElementType::Symbol: {
-      const Symbol* symbol = dynamic_cast<Symbol*>(element.data());
+      const Symbol* symbol = dynamic_cast<Symbol*>(element.get());
       Q_ASSERT(symbol);
       // copy pins but generate new UUIDs
       mSymbolPins.clear();
@@ -201,7 +201,7 @@ void NewElementWizardContext::copyElement(ElementType type,
     }
 
     case ElementType::Package: {
-      const Package* package = dynamic_cast<Package*>(element.data());
+      const Package* package = dynamic_cast<Package*>(element.get());
       Q_ASSERT(package);
       // copy pads but generate new UUIDs
       QHash<Uuid, tl::optional<Uuid>> padUuidMap;
@@ -264,7 +264,7 @@ void NewElementWizardContext::copyElement(ElementType type,
     }
 
     case ElementType::Component: {
-      const Component* component = dynamic_cast<Component*>(element.data());
+      const Component* component = dynamic_cast<Component*>(element.get());
       Q_ASSERT(component);
       mComponentSchematicOnly = component->isSchematicOnly();
       mComponentAttributes = component->getAttributes();
@@ -314,7 +314,7 @@ void NewElementWizardContext::copyElement(ElementType type,
     }
 
     case ElementType::Device: {
-      const Device* device = dynamic_cast<Device*>(element.data());
+      const Device* device = dynamic_cast<Device*>(element.get());
       Q_ASSERT(device);
       mDeviceComponentUuid = device->getComponentUuid();
       mDevicePackageUuid = device->getPackageUuid();

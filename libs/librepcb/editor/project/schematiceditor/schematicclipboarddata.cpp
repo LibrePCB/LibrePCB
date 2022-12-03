@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "schematicclipboarddata.h"
 
-#include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/librarybaseelement.h>
@@ -58,14 +57,13 @@ SchematicClipboardData::SchematicClipboardData(const QByteArray& mimeData)
 
   SExpression root =
       SExpression::parse(mFileSystem->read("schematic.lp"), FilePath());
-  Version fileFormat = qApp->getFileFormatVersion();
-  mSchematicUuid = deserialize<Uuid>(root.getChild("schematic/@0"), fileFormat);
-  mCursorPos = Point(root.getChild("cursor_position"), fileFormat);
-  mComponentInstances.loadFromSExpression(root, fileFormat);
-  mSymbolInstances.loadFromSExpression(root, fileFormat);
-  mNetSegments.loadFromSExpression(root, fileFormat);
-  mPolygons.loadFromSExpression(root, fileFormat);
-  mTexts.loadFromSExpression(root, fileFormat);
+  mSchematicUuid = deserialize<Uuid>(root.getChild("schematic/@0"));
+  mCursorPos = Point(root.getChild("cursor_position"));
+  mComponentInstances.loadFromSExpression(root);
+  mSymbolInstances.loadFromSExpression(root);
+  mNetSegments.loadFromSExpression(root);
+  mPolygons.loadFromSExpression(root);
+  mTexts.loadFromSExpression(root);
 }
 
 SchematicClipboardData::~SchematicClipboardData() noexcept {

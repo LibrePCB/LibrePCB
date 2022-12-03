@@ -51,8 +51,6 @@ public:
   BI_Via() = delete;
   BI_Via(const BI_Via& other) = delete;
   BI_Via(BI_NetSegment& netsegment, const Via& via);
-  BI_Via(BI_NetSegment& netsegment, const SExpression& node,
-         const Version& fileFormat);
   ~BI_Via() noexcept;
 
   // Getters
@@ -100,7 +98,6 @@ public:
   bool operator!=(const BI_Via& rhs) noexcept { return (this != &rhs); }
 
 private:
-  void init();
   void boardOrNetAttributesChanged();
 
   // General

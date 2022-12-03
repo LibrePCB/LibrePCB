@@ -68,8 +68,8 @@ PackageCategoryEditorWidget::PackageCategoryEditorWidget(const Context& context,
           &PackageCategoryEditorWidget::btnResetParentCategoryClicked);
 
   // Load element.
-  mCategory.reset(new PackageCategory(std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mFileSystem))));  // can throw
+  mCategory = PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem)));  // can throw
   updateMetadata();
 
   // Reload metadata on undo stack state changes.

@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "component.h"
 
-#include "../../serialization/sexpression.h"
+#include "../../serialization/fileformatmigration.h"
 #include "componentcheck.h"
 
 #include <QtCore>
@@ -47,23 +47,16 @@ Component::Component(const Uuid& uuid, const Version& version,
     mPrefixes(ComponentPrefix("")) {
 }
 
-Component::Component(std::unique_ptr<TransactionalDirectory> directory)
-  : LibraryElement(std::move(directory), getShortElementName(),
-                   getLongElementName()),
-    mSchematicOnly(false),
-    mDefaultValue(),
-    mPrefixes(ComponentPrefix("")) {
-  // Load all properties
-  mSchematicOnly = deserialize<bool>(
-      mLoadingFileDocument.getChild("schematic_only/@0"), mLoadingFileFormat);
-  mAttributes.loadFromSExpression(mLoadingFileDocument,
-                                  mLoadingFileFormat);  // can throw
-  mDefaultValue = mLoadingFileDocument.getChild("default_value/@0").getValue();
-  mPrefixes = NormDependentPrefixMap(mLoadingFileDocument, mLoadingFileFormat);
-  mSignals.loadFromSExpression(mLoadingFileDocument, mLoadingFileFormat);
-  mSymbolVariants.loadFromSExpression(mLoadingFileDocument, mLoadingFileFormat);
-
-  cleanupAfterLoadingElementFromFile();
+Component::Component(std::unique_ptr<TransactionalDirectory> directory,
+                     const SExpression& root)
+  : LibraryElement(getShortElementName(), getLongElementName(), true,
+                   std::move(directory), root),
+    mSchematicOnly(deserialize<bool>(root.getChild("schematic_only/@0"))),
+    mDefaultValue(root.getChild("default_value/@0").getValue()),
+    mPrefixes(root),
+    mAttributes(root),
+    mSignals(root),
+    mSymbolVariants(root) {
 }
 
 Component::~Component() noexcept {
@@ -130,6 +123,24 @@ std::shared_ptr<const ComponentSymbolVariantItem> Component::getSymbVarItem(
 LibraryElementCheckMessageList Component::runChecks() const {
   ComponentCheck check(*this);
   return check.runChecks();  // can throw
+}
+
+std::unique_ptr<Component> Component::open(
+    std::unique_ptr<TransactionalDirectory> directory) {
+  Q_ASSERT(directory);
+
+  // Upgrade file format, if needed.
+  const Version fileFormat =
+      readFileFormat(*directory, ".librepcb-" % getShortElementName());
+  for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
+    migration->upgradeComponent(*directory);
+  }
+
+  // Load element.
+  const QString fileName = getLongElementName() % ".lp";
+  const SExpression root = SExpression::parse(directory->read(fileName),
+                                              directory->getAbsPath(fileName));
+  return std::unique_ptr<Component>(new Component(std::move(directory), root));
 }
 
 /*******************************************************************************

@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "packagecategory.h"
 
-#include "../../serialization/sexpression.h"
+#include "../../serialization/fileformatmigration.h"
 
 #include <QtCore>
 
@@ -45,13 +45,35 @@ PackageCategory::PackageCategory(const Uuid& uuid, const Version& version,
 }
 
 PackageCategory::PackageCategory(
-    std::unique_ptr<TransactionalDirectory> directory)
-  : LibraryCategory(std::move(directory), getShortElementName(),
-                    getLongElementName()) {
-  cleanupAfterLoadingElementFromFile();
+    std::unique_ptr<TransactionalDirectory> directory, const SExpression& root)
+  : LibraryCategory(getShortElementName(), getLongElementName(),
+                    std::move(directory), root) {
 }
 
 PackageCategory::~PackageCategory() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+std::unique_ptr<PackageCategory> PackageCategory::open(
+    std::unique_ptr<TransactionalDirectory> directory) {
+  Q_ASSERT(directory);
+
+  // Upgrade file format, if needed.
+  const Version fileFormat =
+      readFileFormat(*directory, ".librepcb-" % getShortElementName());
+  for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
+    migration->upgradePackageCategory(*directory);
+  }
+
+  // Load element.
+  const QString fileName = getLongElementName() % ".lp";
+  const SExpression root = SExpression::parse(directory->read(fileName),
+                                              directory->getAbsPath(fileName));
+  return std::unique_ptr<PackageCategory>(
+      new PackageCategory(std::move(directory), root));
 }
 
 /*******************************************************************************

@@ -20,9 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/types/version.h>
 
 #include <QtCore>
@@ -245,28 +245,19 @@ TEST(VersionTest, testSerialize) {
   EXPECT_EQ(QByteArray("\"0.1\"\n"), serialize(obj).toByteArray());
 }
 
-TEST(VersionTest, testDeserializeV01) {
+TEST(VersionTest, testDeserialize) {
   SExpression sexpr = SExpression::createString("0.1");
-  EXPECT_EQ(Version::fromString("0.1"),
-            deserialize<Version>(sexpr, Version::fromString("0.1")));
-}
-
-TEST(VersionTest, testDeserializeCurrentVersion) {
-  SExpression sexpr = SExpression::createString("0.1");
-  EXPECT_EQ(Version::fromString("0.1"),
-            deserialize<Version>(sexpr, qApp->getFileFormatVersion()));
+  EXPECT_EQ(Version::fromString("0.1"), deserialize<Version>(sexpr));
 }
 
 TEST(VersionTest, testDeserializeEmpty) {
   SExpression sexpr = SExpression::createString("");
-  EXPECT_THROW(deserialize<Version>(sexpr, qApp->getFileFormatVersion()),
-               RuntimeError);
+  EXPECT_THROW(deserialize<Version>(sexpr), RuntimeError);
 }
 
 TEST(VersionTest, testDeserializeInvalid) {
   SExpression sexpr = SExpression::createString("foo");
-  EXPECT_THROW(deserialize<Version>(sexpr, qApp->getFileFormatVersion()),
-               RuntimeError);
+  EXPECT_THROW(deserialize<Version>(sexpr), RuntimeError);
 }
 
 /*******************************************************************************

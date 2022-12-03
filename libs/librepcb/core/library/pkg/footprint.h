@@ -74,7 +74,7 @@ public:
   Footprint(const Footprint& other) noexcept;
   Footprint(const Uuid& uuid, const ElementName& name_en_US,
             const QString& description_en_US);
-  Footprint(const SExpression& node, const Version& fileFormat);
+  explicit Footprint(const SExpression& node);
   ~Footprint() noexcept;
 
   // Getters: General

@@ -98,8 +98,8 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
                              mDependenciesEditorWidget.data());
 
   // Load library.
-  mLibrary.reset(new Library(std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mFileSystem))));
+  mLibrary = Library::open(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem)));  // can throw
   updateMetadata();
 
   // Reload metadata on undo stack state changes.

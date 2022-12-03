@@ -28,6 +28,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -141,7 +143,7 @@ private:  // Methods
 private:  // Data
   QScopedPointer<Ui::LibraryOverviewWidget> mUi;
   QScopedPointer<LibraryListEditorWidget> mDependenciesEditorWidget;
-  QSharedPointer<Library> mLibrary;
+  std::unique_ptr<Library> mLibrary;
   QByteArray mIcon;
   QString mCurrentFilter;
 };

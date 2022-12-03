@@ -64,6 +64,21 @@ SExpression serialize(const VAlign& obj) {
   }
 }
 
+template <>
+HAlign deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == "left") {
+    return HAlign::left();
+  } else if (str == "center") {
+    return HAlign::center();
+  } else if (str == "right") {
+    return HAlign::right();
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid horizontal alignment: '%1'").arg(str));
+  }
+}
+
 /*******************************************************************************
  *  Class VAlign
  ******************************************************************************/
@@ -99,18 +114,28 @@ SExpression serialize(const HAlign& obj) {
   }
 }
 
+template <>
+VAlign deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == "top") {
+    return VAlign::top();
+  } else if (str == "center") {
+    return VAlign::center();
+  } else if (str == "bottom") {
+    return VAlign::bottom();
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid vertical alignment: '%1'").arg(str));
+  }
+}
+
 /*******************************************************************************
  *  Class Alignment
  ******************************************************************************/
 
-Alignment::Alignment(const SExpression& node, const Version& fileFormat) {
-  try {
-    mH = deserialize<HAlign>(node.getChild("@0"), fileFormat);
-    mV = deserialize<VAlign>(node.getChild("@1"), fileFormat);
-  } catch (const Exception& e) {
-    throw FileParseError(__FILE__, __LINE__, node.getFilePath(), -1, -1,
-                         QString(), e.getMsg());
-  }
+Alignment::Alignment(const SExpression& node)
+  : mH(deserialize<HAlign>(node.getChild("@0"))),
+    mV(deserialize<VAlign>(node.getChild("@1"))) {
 }
 
 Alignment& Alignment::mirror() noexcept {

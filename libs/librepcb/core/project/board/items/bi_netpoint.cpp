@@ -37,22 +37,11 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const SExpression& node,
-                         const Version& fileFormat)
+BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const Uuid& uuid,
+                         const Point& position)
   : BI_Base(segment.getBoard()),
     mNetSegment(segment),
-    mJunction(node, fileFormat) {
-  init();
-}
-
-BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const Point& position)
-  : BI_Base(segment.getBoard()),
-    mNetSegment(segment),
-    mJunction(Uuid::createRandom(), position) {
-  init();
-}
-
-void BI_NetPoint::init() {
+    mJunction(uuid, position) {
   // create the graphics item
   mGraphicsItem.reset(new BGI_NetPoint(*this));
   mGraphicsItem->setPos(mJunction.getPosition().toPxQPointF());

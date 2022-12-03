@@ -75,11 +75,9 @@ public:
   // Constructors / Destructor
   BI_NetLine() = delete;
   BI_NetLine(const BI_NetLine& other) = delete;
-  BI_NetLine(BI_NetSegment& segment, const SExpression& node,
-             const Version& fileFormat);
-  BI_NetLine(BI_NetSegment& segment, BI_NetLineAnchor& startPoint,
-             BI_NetLineAnchor& endPoint, GraphicsLayer& layer,
-             const PositiveLength& width);
+  BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
+             BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
+             GraphicsLayer& layer, const PositiveLength& width);
   ~BI_NetLine() noexcept;
 
   // Getters
@@ -114,7 +112,6 @@ public:
   BI_NetLine& operator=(const BI_NetLine& rhs) = delete;
 
 private:
-  void init();
   BI_NetLineAnchor* getAnchor(const TraceAnchor& anchor);
 
   // General

@@ -20,10 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/import/dxfreader.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 /*******************************************************************************
  *  Namespace

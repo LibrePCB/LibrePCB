@@ -114,8 +114,8 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
                              mCategoriesEditorWidget.data());
 
   // Load element.
-  mPackage.reset(new Package(std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mFileSystem))));  // can throw
+  mPackage = Package::open(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem)));  // can throw
   updateMetadata();
 
   // Setup footprint list editor widget.

@@ -46,6 +46,7 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -393,8 +394,8 @@ ProjectEditor* ControlPanel::newProject(FilePath parentDir) noexcept {
   wizard.setLocation(parentDir);
   if (wizard.exec() == QWizard::Accepted) {
     try {
-      QScopedPointer<Project> project(wizard.createProject());  // can throw
-      return openProject(*project.take());
+      std::unique_ptr<Project> project = wizard.createProject();  // can throw
+      return openProject(*project.release());
     } catch (Exception& e) {
       QMessageBox::critical(this, tr("Could not create project"), e.getMsg());
     }
@@ -456,10 +457,12 @@ ProjectEditor* ControlPanel::openProject(FilePath filepath) noexcept {
           TransactionalFileSystem::openRW(
               filepath.getParentDir(), &askForRestoringBackup,
               DirectoryLockHandlerDialog::createDirectoryLockCallback());
-      Project* project = new Project(std::unique_ptr<TransactionalDirectory>(
-                                         new TransactionalDirectory(fs)),
-                                     filepath.getFilename());
-      editor = new ProjectEditor(mWorkspace, *project);
+      ProjectLoader loader;
+      std::unique_ptr<Project> project =
+          loader.open(std::unique_ptr<TransactionalDirectory>(
+                          new TransactionalDirectory(fs)),
+                      filepath.getFilename());  // can throw
+      editor = new ProjectEditor(mWorkspace, *project.release());
       connect(editor, &ProjectEditor::projectEditorClosed, this,
               &ControlPanel::projectEditorClosed);
       connect(editor, &ProjectEditor::showControlPanelClicked, this,

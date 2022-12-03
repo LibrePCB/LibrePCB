@@ -44,10 +44,11 @@ protected:
   FilePath mLibDir;
   std::shared_ptr<TransactionalFileSystem> mTempFs;
   std::shared_ptr<TransactionalFileSystem> mLibFs;
+  QScopedPointer<Symbol> mExistingSymbol;
   QFileInfo mExistingSymbolFile;
-  qint64 mExistingSymbolCreationSize;
   QScopedPointer<Symbol> mNewSymbol;
   QFileInfo mNewSymbolFile;
+  qint64 mNewSymbolCreationSize;
 
   ProjectLibraryTest() {
     mTempDir = FilePath::getRandomTempPath();
@@ -56,16 +57,17 @@ protected:
     mLibFs = TransactionalFileSystem::openRW(mLibDir);
 
     // create symbol inside project library
-    Symbol sym(Uuid::createRandom(), Version::fromString("1"), "",
-               ElementName("Existing Symbol"), "", "");
+    mExistingSymbol.reset(new Symbol(Uuid::createRandom(),
+                                     Version::fromString("1"), "",
+                                     ElementName("Existing Symbol"), "", ""));
     TransactionalDirectory libSymDir(mLibFs, "sym");
-    sym.saveIntoParentDirectory(libSymDir);
+    mExistingSymbol->saveIntoParentDirectory(libSymDir);
     mLibFs->save();
-    mExistingSymbolFile = QFileInfo(
+    mExistingSymbolFile =
         mLibDir
-            .getPathTo(QString("sym/%1/symbol.lp").arg(sym.getUuid().toStr()))
-            .toStr());
-    modifyExistingSymbol();  // modify file to detect when it gets overwritten
+            .getPathTo(QString("sym/%1/symbol.lp")
+                           .arg(mExistingSymbol->getUuid().toStr()))
+            .toStr();
 
     // create symbol outside the project library (emulating workspace library)
     mNewSymbol.reset(new Symbol(Uuid::createRandom(), Version::fromString("1"),
@@ -78,6 +80,12 @@ protected:
             .getPathTo(
                 QString("sym/%1/symbol.lp").arg(mNewSymbol->getUuid().toStr()))
             .toStr();
+
+    // modify new symbol to detect the file format upgrade
+    QByteArray newContent = mNewSymbol->getDirectory().read("symbol.lp") + " ";
+    mNewSymbolCreationSize = newContent.size();
+    mNewSymbol->getDirectory().write("symbol.lp", newContent);
+    mTempFs->save();
 
     // disable caching to get correct results
     mExistingSymbolFile.setCaching(false);
@@ -95,12 +103,6 @@ protected:
     mLibFs->save();
     mTempFs->save();
   }
-
-  void modifyExistingSymbol() {
-    FilePath fp(mExistingSymbolFile.absoluteFilePath());
-    FileUtils::writeFile(fp, FileUtils::readFile(fp).append(" "));
-    mExistingSymbolCreationSize = mExistingSymbolFile.size();
-  }
 };
 
 /*******************************************************************************
@@ -111,12 +113,11 @@ TEST_F(ProjectLibraryTest, testLoadSymbol) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
+    lib.addSymbol(*mExistingSymbol.take());
     EXPECT_EQ(1, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
   }
   EXPECT_TRUE(mExistingSymbolFile.exists());
-  EXPECT_EQ(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // not upgraded
 }
 
 TEST_F(ProjectLibraryTest, testAddSymbol) {
@@ -124,7 +125,7 @@ TEST_F(ProjectLibraryTest, testAddSymbol) {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
     lib.addSymbol(*mNewSymbol.take());
-    EXPECT_EQ(2, lib.getSymbols().count());
+    EXPECT_EQ(1, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.dir().exists());
@@ -132,8 +133,6 @@ TEST_F(ProjectLibraryTest, testAddSymbol) {
   EXPECT_TRUE(mExistingSymbolFile.exists());
   EXPECT_FALSE(mNewSymbolFile.exists());
   EXPECT_FALSE(mNewSymbolFile.dir().exists());
-  EXPECT_EQ(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // not upgraded
 }
 
 TEST_F(ProjectLibraryTest, testAddSymbol_Save) {
@@ -142,14 +141,14 @@ TEST_F(ProjectLibraryTest, testAddSymbol_Save) {
         new TransactionalDirectory(mLibFs)));
     lib.addSymbol(*mNewSymbol.take());
     saveToDisk();
-    EXPECT_EQ(2, lib.getSymbols().count());
+    EXPECT_EQ(1, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_TRUE(mNewSymbolFile.exists());
   }
   EXPECT_TRUE(mExistingSymbolFile.exists());
   EXPECT_TRUE(mNewSymbolFile.exists());
-  EXPECT_NE(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // upgraded!
+  EXPECT_NE(mNewSymbolCreationSize,
+            mNewSymbolFile.size());  // upgraded!
 }
 
 TEST_F(ProjectLibraryTest, testAddRemoveSymbol) {
@@ -158,7 +157,7 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol) {
         new TransactionalDirectory(mLibFs)));
     lib.addSymbol(*mNewSymbol);
     lib.removeSymbol(*mNewSymbol.take());
-    EXPECT_EQ(1, lib.getSymbols().count());
+    EXPECT_EQ(0, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.dir().exists());
@@ -166,8 +165,6 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol) {
   EXPECT_TRUE(mExistingSymbolFile.exists());
   EXPECT_FALSE(mNewSymbolFile.exists());
   EXPECT_FALSE(mNewSymbolFile.dir().exists());
-  EXPECT_EQ(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // not upgraded
 }
 
 TEST_F(ProjectLibraryTest, testAddRemoveSymbol_Save) {
@@ -177,7 +174,7 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol_Save) {
     lib.addSymbol(*mNewSymbol);
     lib.removeSymbol(*mNewSymbol.take());
     saveToDisk();
-    EXPECT_EQ(1, lib.getSymbols().count());
+    EXPECT_EQ(0, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.exists());
     EXPECT_FALSE(mNewSymbolFile.dir().exists());
@@ -185,27 +182,25 @@ TEST_F(ProjectLibraryTest, testAddRemoveSymbol_Save) {
   EXPECT_TRUE(mExistingSymbolFile.exists());
   EXPECT_FALSE(mNewSymbolFile.exists());
   EXPECT_FALSE(mNewSymbolFile.dir().exists());
-  EXPECT_NE(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // upgraded!
 }
 
 TEST_F(ProjectLibraryTest, testRemoveSymbol) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
+    lib.addSymbol(*mExistingSymbol.take());
     lib.removeSymbol(*getFirstSymbol(lib));
     EXPECT_EQ(0, lib.getSymbols().count());
     EXPECT_TRUE(mExistingSymbolFile.exists());
   }
   EXPECT_TRUE(mExistingSymbolFile.exists());
-  EXPECT_EQ(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // not upgraded
 }
 
 TEST_F(ProjectLibraryTest, testRemoveSymbol_Save) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
+    lib.addSymbol(*mExistingSymbol.take());
     lib.removeSymbol(*getFirstSymbol(lib));
     saveToDisk();
     EXPECT_EQ(0, lib.getSymbols().count());
@@ -220,6 +215,7 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
+    lib.addSymbol(*mExistingSymbol.take());
     Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);
     lib.addSymbol(*sym);
@@ -227,14 +223,13 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol) {
     EXPECT_TRUE(mExistingSymbolFile.exists());
   }
   EXPECT_TRUE(mExistingSymbolFile.exists());
-  EXPECT_EQ(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // not upgraded
 }
 
 TEST_F(ProjectLibraryTest, testRemoveAddSymbol_Save) {
   {
     ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
         new TransactionalDirectory(mLibFs)));
+    lib.addSymbol(*mExistingSymbol.take());
     Symbol* sym = getFirstSymbol(lib);
     lib.removeSymbol(*sym);
     lib.addSymbol(*sym);
@@ -243,8 +238,6 @@ TEST_F(ProjectLibraryTest, testRemoveAddSymbol_Save) {
     EXPECT_TRUE(mExistingSymbolFile.exists());
   }
   EXPECT_TRUE(mExistingSymbolFile.exists());
-  EXPECT_NE(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // upgraded!
 }
 
 TEST_F(ProjectLibraryTest, testSavingToExistingEmptyDirectory) {
@@ -259,22 +252,6 @@ TEST_F(ProjectLibraryTest, testSavingToExistingEmptyDirectory) {
   lib.addSymbol(*mNewSymbol.take());
   saveToDisk();
   EXPECT_TRUE(mNewSymbolFile.exists());
-}
-
-TEST_F(ProjectLibraryTest, testIfExistingSymbolIsUpgradedOnlyOnce) {
-  ProjectLibrary lib(std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mLibFs)));
-  EXPECT_EQ(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // not upgraded
-  saveToDisk();
-  EXPECT_NE(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // upgraded!
-  modifyExistingSymbol();
-  EXPECT_EQ(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // not upgraded
-  saveToDisk();
-  EXPECT_EQ(mExistingSymbolCreationSize,
-            mExistingSymbolFile.size());  // not upgraded
 }
 
 /*******************************************************************************

@@ -65,7 +65,6 @@ public:
   // Constructors / Destructor
   BI_Device() = delete;
   BI_Device(const BI_Device& other) = delete;
-  BI_Device(Board& board, const SExpression& node, const Version& fileFormat);
   BI_Device(Board& board, ComponentInstance& compInstance,
             const Uuid& deviceUuid, const Uuid& footprintUuid,
             const Point& position, const Angle& rotation, bool mirror,
@@ -75,7 +74,7 @@ public:
   // Getters
   const Uuid& getComponentInstanceUuid() const noexcept;
   ComponentInstance& getComponentInstance() const noexcept {
-    return *mCompInstance;
+    return mCompInstance;
   }
   const Device& getLibDevice() const noexcept { return *mLibDevice; }
   const Package& getLibPackage() const noexcept { return *mLibPackage; }
@@ -159,15 +158,12 @@ signals:
   void attributesChanged() override;
 
 private:
-  void initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
-                                        const Uuid& footprintUuid);
-  void init();
   bool checkAttributesValidity() const noexcept;
   void updateGraphicsItemTransform() noexcept;
   const QStringList& getLocaleOrder() const noexcept;
 
   // General
-  ComponentInstance* mCompInstance;
+  ComponentInstance& mCompInstance;
   const Device* mLibDevice;
   const Package* mLibPackage;
   const Footprint* mLibFootprint;

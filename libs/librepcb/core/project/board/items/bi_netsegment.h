@@ -57,9 +57,7 @@ public:
   // Constructors / Destructor
   BI_NetSegment() = delete;
   BI_NetSegment(const BI_NetSegment& other) = delete;
-  BI_NetSegment(Board& board, const SExpression& node,
-                const Version& fileFormat);
-  BI_NetSegment(Board& board, NetSignal* signal);
+  BI_NetSegment(Board& board, const Uuid& uuid, NetSignal* signal);
   ~BI_NetSegment() noexcept;
 
   // Getters

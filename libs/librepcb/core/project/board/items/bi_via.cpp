@@ -38,21 +38,10 @@ namespace librepcb {
  ******************************************************************************/
 
 BI_Via::BI_Via(BI_NetSegment& netsegment, const Via& via)
-  : BI_Base(netsegment.getBoard()), mVia(via), mNetSegment(netsegment) {
-  init();
-}
-
-BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node,
-               const Version& fileFormat)
   : BI_Base(netsegment.getBoard()),
-    mVia(node, fileFormat),
-    mNetSegment(netsegment) {
-  init();
-}
-
-void BI_Via::init() {
-  // create the graphics item
-  mGraphicsItem.reset(new BGI_Via(*this));
+    mVia(via),
+    mNetSegment(netsegment),
+    mGraphicsItem(new BGI_Via(*this)) {
   mGraphicsItem->setPos(mVia.getPosition().toPxQPointF());
 
   // connect to the "attributes changed" signal of the board

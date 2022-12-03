@@ -50,8 +50,6 @@ public:
   // Constructors / Destructor
   SI_Text() = delete;
   SI_Text(const SI_Text& other) = delete;
-  SI_Text(Schematic& schematic, const SExpression& node,
-          const Version& fileFormat);
   SI_Text(Schematic& schematic, const Text& text);
   ~SI_Text() noexcept;
 
@@ -75,7 +73,6 @@ public:
   SI_Text& operator=(const SI_Text& rhs) = delete;
 
 private:  // Methods
-  void init();
   void schematicAttributesChanged() noexcept;
 
 private:  // Attributes

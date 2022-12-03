@@ -52,8 +52,6 @@ public:
   // Constructors / Destructor
   SI_Polygon() = delete;
   SI_Polygon(const SI_Polygon& other) = delete;
-  SI_Polygon(Schematic& schematic, const SExpression& node,
-             const Version& fileFormat);
   SI_Polygon(Schematic& schematic, const Polygon& polygon);
   ~SI_Polygon() noexcept;
 
@@ -74,9 +72,6 @@ public:
 
   // Operator Overloadings
   SI_Polygon& operator=(const SI_Polygon& rhs) = delete;
-
-private:  // Methods
-  void init();
 
 private:  // Attributes
   QScopedPointer<Polygon> mPolygon;

@@ -195,7 +195,8 @@ void WorkspaceLibraryScanner::getLibrariesOfDirectory(
         new TransactionalDirectory(fs, dirpath));
     if (Library::isValidElementDirectory<Library>(*dir, "")) {
       try {
-        libs.append(std::make_shared<Library>(std::move(dir)));
+        libs.append(std::shared_ptr<Library>(
+            Library::open(std::move(dir)).release()));  // can throw
       } catch (Exception& e) {
         qCritical() << "Could not open workspace library!";
         qCritical() << "Library:" << fs->getAbsPath(dirpath).toNative();
@@ -276,9 +277,10 @@ int WorkspaceLibraryScanner::addElementsToDb(
     try {
       std::unique_ptr<TransactionalDirectory> dir(
           new TransactionalDirectory(fs, relPath));  // can throw
-      ElementType element(std::move(dir));  // can throw
-      int id = addElementToDb(writer, libId, element);
-      addTranslationsToDb(writer, id, element);
+      std::unique_ptr<ElementType> element =
+          ElementType::open(std::move(dir));  // can throw
+      int id = addElementToDb(writer, libId, *element);
+      addTranslationsToDb(writer, id, *element);
       count++;
     } catch (const Exception& e) {
       qWarning() << "Failed to open library element during scan:"

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "bi_plane.h"
 
+#include "../../../serialization/sexpression.h"
 #include "../../../utils/scopeguard.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
@@ -39,39 +40,6 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Plane::BI_Plane(Board& board, const SExpression& node,
-                   const Version& fileFormat)
-  : BI_Base(board),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mLayerName(
-        deserialize<GraphicsLayerName>(node.getChild("layer/@0"), fileFormat)),
-    mNetSignal(nullptr),
-    mOutline(),
-    mMinWidth(
-        deserialize<UnsignedLength>(node.getChild("min_width/@0"), fileFormat)),
-    mMinClearance(deserialize<UnsignedLength>(node.getChild("min_clearance/@0"),
-                                              fileFormat)),
-    mKeepOrphans(
-        deserialize<bool>(node.getChild("keep_orphans/@0"), fileFormat)),
-    mPriority(deserialize<int>(node.getChild("priority/@0"), fileFormat)),
-    mConnectStyle(deserialize<ConnectStyle>(node.getChild("connect_style/@0"),
-                                            fileFormat)),
-    // mThermalGapWidth(node.getValueByPath<Length>("thermal_gap_width", true)),
-    // mThermalSpokeWidth(node.getValueByPath<Length>("thermal_spoke_width",
-    // true))
-    mIsVisible(true) {
-  Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"), fileFormat);
-  mNetSignal =
-      mBoard.getProject().getCircuit().getNetSignals().value(netSignalUuid);
-  if (!mNetSignal) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("Invalid net signal UUID: \"%1\"").arg(netSignalUuid.toStr()));
-  }
-  mOutline = Path(node, fileFormat);
-  init();
-}
-
 BI_Plane::BI_Plane(Board& board, const Uuid& uuid,
                    const GraphicsLayerName& layerName, NetSignal& netsignal,
                    const Path& outline)
@@ -86,12 +54,9 @@ BI_Plane::BI_Plane(Board& board, const Uuid& uuid,
     mPriority(0),
     mConnectStyle(ConnectStyle::Solid),
     // mThermalGapWidth(100000), mThermalSpokeWidth(100000),
+    mGraphicsItem(nullptr),
     mIsVisible(true),
     mFragments() {
-  init();
-}
-
-void BI_Plane::init() {
   mGraphicsItem.reset(new BGI_Plane(*this));
   mGraphicsItem->setRotation(Angle::deg0().toDeg());
 
@@ -281,6 +246,19 @@ SExpression serialize(const BI_Plane::ConnectStyle& obj) {
       return SExpression::createToken("solid");
     default:
       throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+BI_Plane::ConnectStyle deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == "none") {
+    return BI_Plane::ConnectStyle::None;
+  } else if (str == "solid") {
+    return BI_Plane::ConnectStyle::Solid;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Unknown plane connect style: '%1'").arg(str));
   }
 }
 

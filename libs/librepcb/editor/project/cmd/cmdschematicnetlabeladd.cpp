@@ -24,7 +24,6 @@
 
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
-#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -38,16 +37,8 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(SI_NetSegment& segment,
-                                                 const Point& position,
-                                                 const Angle& rotation,
-                                                 const bool mirrored) noexcept
-  : UndoCommand(tr("Add netlabel")),
-    mNetSegment(segment),
-    mPosition(position),
-    mRotation(rotation),
-    mMirrored(mirrored),
-    mNetLabel(nullptr) {
+CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(SI_NetLabel& netLabel) noexcept
+  : UndoCommand(tr("Add netlabel")), mNetLabel(netLabel) {
 }
 
 CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept {
@@ -58,20 +49,17 @@ CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept {
  ******************************************************************************/
 
 bool CmdSchematicNetLabelAdd::performExecute() {
-  mNetLabel = new SI_NetLabel(mNetSegment, mPosition, mRotation,
-                              mMirrored);  // can throw
-
   performRedo();  // can throw
 
   return true;
 }
 
 void CmdSchematicNetLabelAdd::performUndo() {
-  mNetSegment.removeNetLabel(*mNetLabel);  // can throw
+  mNetLabel.getNetSegment().removeNetLabel(mNetLabel);  // can throw
 }
 
 void CmdSchematicNetLabelAdd::performRedo() {
-  mNetSegment.addNetLabel(*mNetLabel);  // can throw
+  mNetLabel.getNetSegment().addNetLabel(mNetLabel);  // can throw
 }
 
 /*******************************************************************************

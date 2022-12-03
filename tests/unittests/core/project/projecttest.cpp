@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectloader.h>
 
 #include <QtCore>
 
@@ -66,13 +67,13 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
   QDateTime datetime = QDateTime::currentDateTime();
 
   // create new project
-  QScopedPointer<Project> project(
-      Project::create(createDir(), mProjectFile.getFilename()));
+  std::unique_ptr<Project> project =
+      Project::create(createDir(), mProjectFile.getFilename());
   EXPECT_EQ(mProjectFile, project->getFilepath());
   EXPECT_EQ(mProjectDir, project->getPath());
-  EXPECT_EQ(mProjectFile.getCompleteBasename(), project->getName());
-  EXPECT_EQ("Unknown", project->getAuthor());
-  EXPECT_EQ(QString("v1"), project->getVersion());
+  EXPECT_EQ("Unnamed", project->getName());
+  EXPECT_EQ("", project->getAuthor());
+  EXPECT_EQ("", project->getVersion());
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
               project->getCreated().toMSecsSinceEpoch(), 5000);
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
@@ -81,6 +82,7 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
   EXPECT_EQ(0, project->getBoards().count());
 
   // save and close project
+  project->save();
   project->getDirectory().getFileSystem()->save();
   project.reset();
 
@@ -95,12 +97,13 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
   EXPECT_TRUE(mProjectDir.getPathTo("circuit/erc.lp").isExistingFile());
 
   // open project again
-  project.reset(new Project(createDir(), mProjectFile.getFilename()));
+  ProjectLoader loader;
+  project = loader.open(createDir(), mProjectFile.getFilename());
   EXPECT_EQ(mProjectFile, project->getFilepath());
   EXPECT_EQ(mProjectDir, project->getPath());
-  EXPECT_EQ(mProjectFile.getCompleteBasename(), project->getName());
-  EXPECT_EQ("Unknown", project->getAuthor());
-  EXPECT_EQ(QString("v1"), project->getVersion());
+  EXPECT_EQ("Unnamed", project->getName());
+  EXPECT_EQ("", project->getAuthor());
+  EXPECT_EQ("", project->getVersion());
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
               project->getCreated().toMSecsSinceEpoch(), 5000);
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
@@ -111,30 +114,36 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
 
 TEST_F(ProjectTest, testSave) {
   // create new project
-  QScopedPointer<Project> project(
-      Project::create(createDir(), mProjectFile.getFilename()));
+  std::unique_ptr<Project> project =
+      Project::create(createDir(), mProjectFile.getFilename());
 
   // save project
   project->save();
   project->getDirectory().getFileSystem()->save();
 
   // close and re-open project
-  project.reset();
-  project.reset(new Project(createDir(), mProjectFile.getFilename()));
+  {
+    project.reset();
+    ProjectLoader loader;
+    project = loader.open(createDir(), mProjectFile.getFilename());
+  }
 
   // save project
   project->save();
   project->getDirectory().getFileSystem()->save();
 
   // close and re-open project
-  project.reset();
-  project.reset(new Project(createDir(), mProjectFile.getFilename()));
+  {
+    project.reset();
+    ProjectLoader loader;
+    project = loader.open(createDir(), mProjectFile.getFilename());
+  }
 }
 
 TEST_F(ProjectTest, testIfLastModifiedDateTimeIsUpdatedOnSave) {
   // create new project
-  QScopedPointer<Project> project(
-      Project::create(createDir(), mProjectFile.getFilename()));
+  std::unique_ptr<Project> project =
+      Project::create(createDir(), mProjectFile.getFilename());
   qint64 datetimeAfterCreating = project->getLastModified().toMSecsSinceEpoch();
 
   // check if datetime has not changed
@@ -153,8 +162,8 @@ TEST_F(ProjectTest, testIfLastModifiedDateTimeIsUpdatedOnSave) {
 
 TEST_F(ProjectTest, testSettersGetters) {
   // create new project
-  QScopedPointer<Project> project(
-      Project::create(createDir(), mProjectFile.getFilename()));
+  std::unique_ptr<Project> project =
+      Project::create(createDir(), mProjectFile.getFilename());
 
   // set properties
   ElementName name("test name 1234");
@@ -175,7 +184,8 @@ TEST_F(ProjectTest, testSettersGetters) {
 
   // close and re-open project (read-only)
   project.reset();
-  project.reset(new Project(createDir(false), mProjectFile.getFilename()));
+  ProjectLoader loader;
+  project = loader.open(createDir(false), mProjectFile.getFilename());
 
   // get properties
   EXPECT_EQ(name, project->getName());

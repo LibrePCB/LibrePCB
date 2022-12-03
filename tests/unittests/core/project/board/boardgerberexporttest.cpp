@@ -27,6 +27,7 @@
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectloader.h>
 
 #include <QtCore>
 
@@ -68,10 +69,11 @@ TEST(BoardGerberExportTest, test) {
   FilePath projectFp(TEST_DATA_DIR "/projects/Gerber Test/project.lpp");
   std::shared_ptr<TransactionalFileSystem> projectFs =
       TransactionalFileSystem::openRO(projectFp.getParentDir());
-  QScopedPointer<Project> project(
-      new Project(std::unique_ptr<TransactionalDirectory>(
+  ProjectLoader loader;
+  std::unique_ptr<Project> project =
+      loader.open(std::unique_ptr<TransactionalDirectory>(
                       new TransactionalDirectory(projectFs)),
-                  projectFp.getFilename()));
+                  projectFp.getFilename());
 
   // force planes rebuild
   Board* board = project->getBoards().first();

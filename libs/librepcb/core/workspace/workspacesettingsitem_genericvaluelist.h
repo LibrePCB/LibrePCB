@@ -120,11 +120,10 @@ private:  // Methods
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::loadImpl()
    */
-  void loadImpl(const SExpression& root, const Version& fileFormat) override {
+  void loadImpl(const SExpression& root) override {
     T values;  // temporary object to make this method atomic
-    foreach (const SExpression& child, root.getChildren(mItemKey)) {
-      values << deserialize<typename T::value_type>(child.getChild("@0"),
-                                                    fileFormat);
+    foreach (const SExpression* child, root.getChildren(mItemKey)) {
+      values << deserialize<typename T::value_type>(child->getChild("@0"));
     }
     set(values);
   }

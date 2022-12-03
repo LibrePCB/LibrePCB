@@ -53,10 +53,7 @@ public:
   // Constructors / Destructor
   SI_NetPoint() = delete;
   SI_NetPoint(const SI_NetPoint& other) = delete;
-  SI_NetPoint(SI_NetSegment& segment, const SExpression& node,
-              const Version& fileFormat);
-  SI_NetPoint(SI_NetSegment& segment, const Point& position);
-  SI_NetPoint(SI_NetSegment& segment, SI_SymbolPin& pin);
+  SI_NetPoint(SI_NetSegment& segment, const Uuid& uuid, const Point& position);
   ~SI_NetPoint() noexcept;
 
   // Getters
@@ -97,8 +94,6 @@ public:
   bool operator!=(const SI_NetPoint& rhs) noexcept { return (this != &rhs); }
 
 private:
-  void init();
-
   // General
   QScopedPointer<SGI_NetPoint> mGraphicsItem;
   QMetaObject::Connection mHighlightChangedConnection;

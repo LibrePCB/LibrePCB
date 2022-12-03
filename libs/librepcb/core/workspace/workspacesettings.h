@@ -37,6 +37,7 @@
 namespace librepcb {
 
 class SExpression;
+class Version;
 
 /*******************************************************************************
  *  Class WorkspaceSettings

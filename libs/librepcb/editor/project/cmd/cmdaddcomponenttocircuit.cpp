@@ -86,8 +86,11 @@ bool CmdAddComponentToCircuit::performExecute() {
              "workspace library!")
               .arg(mComponentUuid.toStr()));
     }
-    Component* cmp = new Component(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(TransactionalFileSystem::openRO(cmpFp))));
+    Component* cmp =
+        Component::open(
+            std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
+                TransactionalFileSystem::openRO(cmpFp))))
+            .release();  // can throw
     CmdProjectLibraryAddElement<Component>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<Component>(mProject.getLibrary(), *cmp);
     appendChild(cmdAddToLibrary);  // can throw

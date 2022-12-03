@@ -61,8 +61,8 @@ bool CmdNetSignalAdd::performExecute() {
         CircuitIdentifier(mCircuit.generateAutoNetSignalName());  // can throw
   }
   Q_ASSERT(mName.has_value());
-  mNetSignal =
-      new NetSignal(mCircuit, mNetClass, *mName, autoName);  // can throw
+  mNetSignal = new NetSignal(mCircuit, Uuid::createRandom(), mNetClass, *mName,
+                             autoName);  // can throw
 
   performRedo();  // can throw
 

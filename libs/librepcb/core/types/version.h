@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../serialization/sexpression.h"
-
 #include <QtCore>
 
 #include <optional.hpp>
@@ -217,17 +215,6 @@ private:  // Data
    */
   QVector<uint> mNumbers;
 };
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline Version deserialize(const SExpression& sexpr,
-                           const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return Version::fromString(sexpr.getValue());  // can throw
-}
 
 /*******************************************************************************
  *  End of File

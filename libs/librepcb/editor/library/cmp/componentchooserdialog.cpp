@@ -222,9 +222,11 @@ void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
 
   if (fp.isValid() && mLayerProvider) {
     try {
-      mComponent = std::make_shared<Component>(
-          std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-              TransactionalFileSystem::openRO(fp))));  // can throw
+      mComponent.reset(
+          Component::open(std::unique_ptr<TransactionalDirectory>(
+                              new TransactionalDirectory(
+                                  TransactionalFileSystem::openRO(fp))))
+              .release());  // can throw
       if (mComponent && mComponent->getSymbolVariants().count() > 0) {
         const ComponentSymbolVariant& symbVar =
             *mComponent->getSymbolVariants().first();
@@ -233,10 +235,11 @@ void ComponentChooserDialog::updatePreview(const FilePath& fp) noexcept {
           try {
             FilePath fp = mWorkspace.getLibraryDb().getLatest<Symbol>(
                 item.getSymbolUuid());  // can throw
-            std::shared_ptr<Symbol> sym = std::make_shared<Symbol>(
-                std::unique_ptr<TransactionalDirectory>(
-                    new TransactionalDirectory(
-                        TransactionalFileSystem::openRO(fp))));  // can throw
+            std::shared_ptr<Symbol> sym(
+                Symbol::open(std::unique_ptr<TransactionalDirectory>(
+                                 new TransactionalDirectory(
+                                     TransactionalFileSystem::openRO(fp))))
+                    .release());  // can throw
             mSymbols.append(sym);
 
             std::shared_ptr<SymbolGraphicsItem> graphicsItem =

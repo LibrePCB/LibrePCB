@@ -73,194 +73,37 @@ namespace librepcb {
 
 Board::Board(Project& project,
              std::unique_ptr<TransactionalDirectory> directory,
-             const QString& directoryName, const Version& fileFormat,
-             bool create, const QString& newName)
+             const QString& directoryName, const Uuid& uuid,
+             const ElementName& name)
   : QObject(&project),
     mProject(project),
     mDirectoryName(directoryName),
     mDirectory(std::move(directory)),
     mIsAddedToProject(false),
-    mUuid(Uuid::createRandom()),
-    mName("New Board") {
+    mGraphicsScene(new GraphicsScene()),
+    mLayerStack(new BoardLayerStack(*this)),
+    // Use smaller grid than in schematics to avoid grid snap issues.
+    mGridProperties(new GridProperties(GridProperties::Type_t::Lines,
+                                       PositiveLength(635000),
+                                       LengthUnit::millimeters())),
+    mDesignRules(new BoardDesignRules()),
+    mFabricationOutputSettings(new BoardFabricationOutputSettings()),
+    mUuid(uuid),
+    mName(name),
+    mDefaultFontFileName(qApp->getDefaultStrokeFontName()) {
   if (mDirectoryName.isEmpty()) {
     throw LogicError(__FILE__, __LINE__);
   }
 
-  try {
-    mGraphicsScene.reset(new GraphicsScene());
+  // Emit the "attributesChanged" signal when the project has emitted it.
+  connect(&mProject, &Project::attributesChanged, this,
+          &Board::attributesChanged);
 
-    // try to open/create the board file
-    if (create) {
-      // set attributes
-      mName = ElementName(newName);  // can throw
-      mDefaultFontFileName = qApp->getDefaultStrokeFontName();
-
-      // load default layer stack
-      mLayerStack.reset(new BoardLayerStack(*this));
-
-      // load default grid properties (smaller grid than in schematics to avoid
-      // grid snap issues)
-      mGridProperties.reset(new GridProperties(GridProperties::Type_t::Lines,
-                                               PositiveLength(635000),
-                                               LengthUnit::millimeters()));
-
-      // load default design rules
-      mDesignRules.reset(new BoardDesignRules());
-
-      // load default fabrication output settings
-      mFabricationOutputSettings.reset(new BoardFabricationOutputSettings());
-    } else {
-      const QString fp = "board.lp";
-      const SExpression root =
-          SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
-
-      // the board seems to be ready to open, so we will create all needed
-      // objects
-
-      mUuid = deserialize<Uuid>(root.getChild("@0"), fileFormat);
-      mName = deserialize<ElementName>(root.getChild("name/@0"), fileFormat);
-      if (const SExpression* child = root.tryGetChild("default_font")) {
-        mDefaultFontFileName = child->getChild("@0").getValue();
-      } else {
-        mDefaultFontFileName = qApp->getDefaultStrokeFontName();
-      }
-
-      // Load grid properties
-      mGridProperties.reset(
-          new GridProperties(root.getChild("grid"), fileFormat));
-
-      // Load layer stack
-      mLayerStack.reset(
-          new BoardLayerStack(*this, root.getChild("layers"), fileFormat));
-
-      // load design rules
-      mDesignRules.reset(
-          new BoardDesignRules(root.getChild("design_rules"), fileFormat));
-
-      // load fabrication output settings
-      mFabricationOutputSettings.reset(new BoardFabricationOutputSettings(
-          root.getChild("fabrication_output_settings"), fileFormat));
-
-      // Load all device instances
-      foreach (const SExpression& node, root.getChildren("device")) {
-        BI_Device* device = new BI_Device(*this, node, fileFormat);
-        if (getDeviceInstanceByComponentUuid(
-                device->getComponentInstanceUuid())) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString("There is already a device of the component instance "
-                      "\"%1\"!")
-                  .arg(device->getComponentInstanceUuid().toStr()));
-        }
-        mDeviceInstances.insert(device->getComponentInstanceUuid(), device);
-      }
-
-      // Load all netsegments
-      foreach (const SExpression& node, root.getChildren("netsegment")) {
-        BI_NetSegment* netsegment = new BI_NetSegment(*this, node, fileFormat);
-        if (mNetSegments.contains(netsegment->getUuid())) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString("There is already a netsegment with the UUID \"%1\"!")
-                  .arg(netsegment->getUuid().toStr()));
-        }
-        mNetSegments.insert(netsegment->getUuid(), netsegment);
-      }
-
-      // Load all planes
-      foreach (const SExpression& node, root.getChildren("plane")) {
-        BI_Plane* plane = new BI_Plane(*this, node, fileFormat);
-        mPlanes.insert(plane->getUuid(), plane);
-      }
-
-      // Load all polygons
-      foreach (const SExpression& node, root.getChildren("polygon")) {
-        BI_Polygon* polygon = new BI_Polygon(*this, node, fileFormat);
-        mPolygons.insert(polygon->getUuid(), polygon);
-      }
-
-      // Load all stroke texts
-      foreach (const SExpression& node, root.getChildren("stroke_text")) {
-        BI_StrokeText* text = new BI_StrokeText(*this, node, fileFormat);
-        mStrokeTexts.insert(text->getUuid(), text);
-      }
-
-      // Load all holes
-      foreach (const SExpression& node, root.getChildren("hole")) {
-        BI_Hole* hole = new BI_Hole(*this, node, fileFormat);
-        mHoles.insert(hole->getUuid(), hole);
-      }
-
-      // load user settings
-      try {
-        const QString fp = "settings.user.lp";
-        const SExpression root = SExpression::parse(mDirectory->read(fp),
-                                                    mDirectory->getAbsPath(fp));
-        for (const SExpression& child : root.getChildren("layer")) {
-          const QString name = child.getChild("@0").getValue();
-          if (GraphicsLayer* layer = mLayerStack->getLayer(name)) {
-            layer->setColor(
-                deserialize<QColor>(child.getChild("color/@0"), fileFormat));
-            layer->setColorHighlighted(
-                deserialize<QColor>(child.getChild("color_hl/@0"), fileFormat));
-            layer->setVisible(
-                deserialize<bool>(child.getChild("visible/@0"), fileFormat));
-          }
-        }
-        foreach (const SExpression& node, root.getChildren("plane")) {
-          const Uuid uuid = deserialize<Uuid>(node.getChild("@0"), fileFormat);
-          if (BI_Plane* plane = mPlanes.value(uuid)) {
-            plane->setVisible(
-                deserialize<bool>(node.getChild("visible/@0"), fileFormat));
-          }
-        }
-      } catch (const Exception&) {
-        // Project user settings are normally not put under version control and
-        // thus the likelyhood of parse errors is higher (e.g. when switching to
-        // an older, now incompatible revision). To avoid frustration, we just
-        // ignore these errors and load the default settings instead...
-        qCritical() << "Could not open board user settings, defaults will be "
-                       "used instead.";
-      }
-    }
-
-    rebuildAllPlanes();
-    updateErcMessages();
-    updateIcon();
-
-    // emit the "attributesChanged" signal when the project has emitted it
-    connect(&mProject, &Project::attributesChanged, this,
-            &Board::attributesChanged);
-
-    connect(&mProject.getCircuit(), &Circuit::componentAdded, this,
-            &Board::updateErcMessages);
-    connect(&mProject.getCircuit(), &Circuit::componentRemoved, this,
-            &Board::updateErcMessages);
-  } catch (...) {
-    // free the allocated memory in the reverse order of their allocation...
-    qDeleteAll(mErcMsgListUnplacedComponentInstances);
-    mErcMsgListUnplacedComponentInstances.clear();
-    qDeleteAll(mAirWires);
-    mAirWires.clear();
-    qDeleteAll(mHoles);
-    mHoles.clear();
-    qDeleteAll(mStrokeTexts);
-    mStrokeTexts.clear();
-    qDeleteAll(mPolygons);
-    mPolygons.clear();
-    qDeleteAll(mPlanes);
-    mPlanes.clear();
-    qDeleteAll(mNetSegments);
-    mNetSegments.clear();
-    qDeleteAll(mDeviceInstances);
-    mDeviceInstances.clear();
-    mFabricationOutputSettings.reset();
-    mDesignRules.reset();
-    mGridProperties.reset();
-    mLayerStack.reset();
-    mGraphicsScene.reset();
-    throw;  // ...and rethrow the exception
-  }
+  // Update ERC messages if devices were added/removed.
+  connect(&mProject.getCircuit(), &Circuit::componentAdded, this,
+          &Board::updateErcMessages);
+  connect(&mProject.getCircuit(), &Circuit::componentRemoved, this,
+          &Board::updateErcMessages);
 }
 
 Board::~Board() noexcept {
@@ -639,7 +482,8 @@ void Board::copyFrom(const Board& other) {
 
   // Copy netsegments.
   foreach (const BI_NetSegment* netSegment, other.getNetSegments()) {
-    BI_NetSegment* copy = new BI_NetSegment(*this, netSegment->getNetSignal());
+    BI_NetSegment* copy = new BI_NetSegment(*this, Uuid::createRandom(),
+                                            netSegment->getNetSignal());
 
     // Determine new pad anchors.
     QHash<const BI_NetLineAnchor*, BI_NetLineAnchor*> anchorsMap;
@@ -664,7 +508,7 @@ void Board::copyFrom(const Board& other) {
     QList<BI_NetPoint*> netPoints;
     foreach (const BI_NetPoint* netPoint, netSegment->getNetPoints()) {
       BI_NetPoint* netPointCopy =
-          new BI_NetPoint(*copy, netPoint->getPosition());
+          new BI_NetPoint(*copy, Uuid::createRandom(), netPoint->getPosition());
       netPoints.append(netPointCopy);
       anchorsMap.insert(netPoint, netPointCopy);
     }
@@ -682,7 +526,8 @@ void Board::copyFrom(const Board& other) {
         throw LogicError(__FILE__, __LINE__);
       }
       BI_NetLine* netLineCopy =
-          new BI_NetLine(*copy, *start, *end, *layer, netLine->getWidth());
+          new BI_NetLine(*copy, Uuid::createRandom(), *start, *end, *layer,
+                         netLine->getWidth());
       netLines.append(netLineCopy);
     }
 
@@ -995,17 +840,6 @@ void Board::updateErcMessages() noexcept {
     qDeleteAll(mErcMsgListUnplacedComponentInstances);
     mErcMsgListUnplacedComponentInstances.clear();
   }
-}
-
-/*******************************************************************************
- *  Static Methods
- ******************************************************************************/
-
-Board* Board::create(Project& project,
-                     std::unique_ptr<TransactionalDirectory> directory,
-                     const QString& directoryName, const ElementName& name) {
-  return new Board(project, std::move(directory), directoryName,
-                   qApp->getFileFormatVersion(), true, *name);
 }
 
 /*******************************************************************************

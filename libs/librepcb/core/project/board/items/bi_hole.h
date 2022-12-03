@@ -51,7 +51,6 @@ public:
   // Constructors / Destructor
   BI_Hole() = delete;
   BI_Hole(const BI_Hole& other) = delete;
-  BI_Hole(Board& board, const SExpression& node, const Version& fileFormat);
   BI_Hole(Board& board, const Hole& hole);
   ~BI_Hole() noexcept;
 
@@ -74,9 +73,6 @@ public:
 
   // Operator Overloadings
   BI_Hole& operator=(const BI_Hole& rhs) = delete;
-
-private:  // Methods
-  void init();
 
 private:  // Data
   QScopedPointer<Hole> mHole;

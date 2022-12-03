@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
+#include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/versionfile.h>
 #include <librepcb/core/workspace/workspace.h>

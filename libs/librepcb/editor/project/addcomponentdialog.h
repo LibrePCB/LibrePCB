@@ -151,7 +151,7 @@ private:
   std::shared_ptr<const Component> mSelectedComponent;
   std::shared_ptr<const ComponentSymbolVariant> mSelectedSymbVar;
   QScopedPointer<const Device> mSelectedDevice;
-  QScopedPointer<Package> mSelectedPackage;
+  std::unique_ptr<Package> mSelectedPackage;
   QList<std::shared_ptr<Symbol>> mPreviewSymbols;
   QList<std::shared_ptr<SymbolGraphicsItem>> mPreviewSymbolGraphicsItems;
   QScopedPointer<FootprintGraphicsItem> mPreviewFootprintGraphicsItem;

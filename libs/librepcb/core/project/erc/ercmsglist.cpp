@@ -73,36 +73,6 @@ void ErcMsgList::update(ErcMsg* ercMsg) noexcept {
   emit ercMsgChanged(ercMsg);
 }
 
-void ErcMsgList::restoreIgnoreState() {
-  QString fp = "circuit/erc.lp";
-  if (mProject.getDirectory().fileExists(fp)) {
-    SExpression root =
-        SExpression::parse(mProject.getDirectory().read(fp),
-                           mProject.getDirectory().getAbsPath(fp));
-
-    // reset all ignore attributes
-    foreach (ErcMsg* ercMsg, mItems)
-      ercMsg->setIgnored(false);
-
-    // scan approved items and set ignore attributes
-    foreach (const SExpression& node, root.getChildren("approved")) {
-      foreach (ErcMsg* ercMsg, mItems) {
-        if ((ercMsg->getOwner().getErcMsgOwnerClassName() ==
-             node.getChild("class/@0").getValue()) &&
-            (ercMsg->getOwnerKey() ==
-             node.getChild("instance/@0").getValue()) &&
-            (ercMsg->getMsgKey() == node.getChild("message/@0").getValue())) {
-          ercMsg->setIgnored(true);
-        }
-      }
-    }
-  }
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
 void ErcMsgList::serialize(SExpression& root) const {
   foreach (const ErcMsg* msg, mItems) {
     if (msg->isIgnored()) {

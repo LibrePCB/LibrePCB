@@ -57,9 +57,7 @@ public:
   // Constructors / Destructor
   SI_NetSegment() = delete;
   SI_NetSegment(const SI_NetSegment& other) = delete;
-  SI_NetSegment(Schematic& schematic, const SExpression& node,
-                const Version& fileFormat);
-  SI_NetSegment(Schematic& schematic, NetSignal& signal);
+  SI_NetSegment(Schematic& schematic, const Uuid& uuid, NetSignal& signal);
   ~SI_NetSegment() noexcept;
 
   // Getters

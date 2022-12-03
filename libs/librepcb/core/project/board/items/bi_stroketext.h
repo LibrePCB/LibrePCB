@@ -56,8 +56,6 @@ public:
   // Constructors / Destructor
   BI_StrokeText() = delete;
   BI_StrokeText(const BI_StrokeText& other) = delete;
-  BI_StrokeText(Board& board, const SExpression& node,
-                const Version& fileFormat);
   BI_StrokeText(Board& board, const StrokeText& text);
   ~BI_StrokeText() noexcept;
 
@@ -93,7 +91,6 @@ private slots:
   void boardOrDeviceAttributesChanged();
 
 private:  // Methods
-  void init();
   void updatePaths() noexcept;
   void strokeTextEdited(const StrokeText& text,
                         StrokeText::Event event) noexcept;

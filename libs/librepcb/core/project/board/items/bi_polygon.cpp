@@ -40,31 +40,10 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Polygon::BI_Polygon(Board& board, const SExpression& node,
-                       const Version& fileFormat)
-  : BI_Base(board) {
-  mPolygon.reset(new Polygon(node, fileFormat));
-  init();
-}
-
-BI_Polygon::BI_Polygon(Board& board, const Polygon& polygon) : BI_Base(board) {
-  mPolygon.reset(new Polygon(polygon));
-  init();
-}
-
-BI_Polygon::BI_Polygon(Board& board, const Uuid& uuid,
-                       const GraphicsLayerName& layerName,
-                       const UnsignedLength& lineWidth, bool fill,
-                       bool isGrabArea, const Path& path)
-  : BI_Base(board) {
-  mPolygon.reset(
-      new Polygon(uuid, layerName, lineWidth, fill, isGrabArea, path));
-  init();
-}
-
-void BI_Polygon::init() {
-  mGraphicsItem.reset(
-      new PolygonGraphicsItem(*mPolygon, mBoard.getLayerStack()));
+BI_Polygon::BI_Polygon(Board& board, const Polygon& polygon)
+  : BI_Base(board),
+    mPolygon(new Polygon(polygon)),
+    mGraphicsItem(new PolygonGraphicsItem(*mPolygon, mBoard.getLayerStack())) {
   mGraphicsItem->setEditable(true);
   mGraphicsItem->setZValue(Board::ZValue_Default);
 

@@ -27,6 +27,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -50,19 +52,24 @@ public:
                     const QString& author, const ElementName& name_en_US,
                     const QString& description_en_US,
                     const QString& keywords_en_US);
-  explicit ComponentCategory(std::unique_ptr<TransactionalDirectory> directory);
   ~ComponentCategory() noexcept;
 
   // Operator Overloadings
   ComponentCategory& operator=(const ComponentCategory& rhs) = delete;
 
   // Static Methods
+  static std::unique_ptr<ComponentCategory> open(
+      std::unique_ptr<TransactionalDirectory> directory);
   static QString getShortElementName() noexcept {
     return QStringLiteral("cmpcat");
   }
   static QString getLongElementName() noexcept {
     return QStringLiteral("component_category");
   }
+
+private:  // Methods
+  ComponentCategory(std::unique_ptr<TransactionalDirectory> directory,
+                    const SExpression& root);
 };
 
 /*******************************************************************************

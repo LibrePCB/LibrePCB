@@ -70,27 +70,6 @@ private:
 };
 
 /*******************************************************************************
- *  HAlign Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline HAlign deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  if (str == "left")
-    return HAlign::left();
-  else if (str == "center")
-    return HAlign::center();
-  else if (str == "right")
-    return HAlign::right();
-  else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        HAlign::tr("Invalid horizontal alignment: \"%1\"").arg(str));
-  }
-}
-
-/*******************************************************************************
  *  Class VAlign
  ******************************************************************************/
 
@@ -127,27 +106,6 @@ private:
 };
 
 /*******************************************************************************
- *  VAlign Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline VAlign deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  if (str == "top")
-    return VAlign::top();
-  else if (str == "center")
-    return VAlign::center();
-  else if (str == "bottom")
-    return VAlign::bottom();
-  else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        VAlign::tr("Invalid vertical alignment: \"%1\"").arg(str));
-  }
-}
-
-/*******************************************************************************
  *  Class Alignment
  ******************************************************************************/
 
@@ -162,7 +120,7 @@ public:
   Alignment(const Alignment& other) noexcept : mH(other.mH), mV(other.mV) {}
   explicit Alignment(const HAlign& h, const VAlign& v) noexcept
     : mH(h), mV(v) {}
-  Alignment(const SExpression& node, const Version& fileFormat);
+  explicit Alignment(const SExpression& node);
   const HAlign getH() const noexcept { return mH; }
   const VAlign getV() const noexcept { return mV; }
   void setH(const HAlign& h) noexcept { mH = h; }

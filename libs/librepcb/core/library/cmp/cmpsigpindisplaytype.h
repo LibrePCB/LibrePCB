@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../serialization/sexpression.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -123,17 +121,6 @@ private:  // Data
   QString mDisplayType;  ///< used for serialization (DO NOT MODIFY VALUES!)
   QString mName;  ///< human readable (translated)
 };
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline const CmpSigPinDisplayType& deserialize(const SExpression& sexpr,
-                                               const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return CmpSigPinDisplayType::fromString(sexpr.getValue());  // can throw
-}
 
 /*******************************************************************************
  *  End of File

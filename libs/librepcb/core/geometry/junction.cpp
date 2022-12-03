@@ -46,10 +46,10 @@ Junction::Junction(const Uuid& uuid, const Point& position) noexcept
   : onEdited(*this), mUuid(uuid), mPosition(position) {
 }
 
-Junction::Junction(const SExpression& node, const Version& fileFormat)
+Junction::Junction(const SExpression& node)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mPosition(node.getChild("position"), fileFormat) {
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mPosition(node.getChild("position")) {
 }
 
 Junction::~Junction() noexcept {

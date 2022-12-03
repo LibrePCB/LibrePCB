@@ -41,7 +41,8 @@ namespace editor {
 CmdBoardSplitNetLine::CmdBoardSplitNetLine(BI_NetLine& netline,
                                            const Point& pos) noexcept
   : UndoCommandGroup(tr("Split trace")), mOldNetLine(netline) {
-  mSplitPoint = new BI_NetPoint(mOldNetLine.getNetSegment(), pos);
+  mSplitPoint =
+      new BI_NetPoint(mOldNetLine.getNetSegment(), Uuid::createRandom(), pos);
 }
 
 CmdBoardSplitNetLine::~CmdBoardSplitNetLine() noexcept {

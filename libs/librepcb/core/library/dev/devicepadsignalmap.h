@@ -54,7 +54,7 @@ public:
   DevicePadSignalMapItem(const DevicePadSignalMapItem& other) noexcept;
   DevicePadSignalMapItem(const Uuid& pad,
                          const tl::optional<Uuid>& signal) noexcept;
-  DevicePadSignalMapItem(const SExpression& node, const Version& fileFormat);
+  explicit DevicePadSignalMapItem(const SExpression& node);
   ~DevicePadSignalMapItem() noexcept;
 
   // Getters

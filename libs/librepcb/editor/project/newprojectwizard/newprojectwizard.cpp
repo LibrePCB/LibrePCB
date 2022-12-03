@@ -74,16 +74,16 @@ void NewProjectWizard::setLocation(const FilePath& dir) noexcept {
  *  General Methods
  ******************************************************************************/
 
-Project* NewProjectWizard::createProject() const {
+std::unique_ptr<Project> NewProjectWizard::createProject() const {
   // create file system
   std::shared_ptr<TransactionalFileSystem> fs = TransactionalFileSystem::openRW(
       mPageMetadata->getFullFilePath().getParentDir());
   TransactionalDirectory dir(fs);
 
   // create project and set some metadata
-  QScopedPointer<Project> project(Project::create(
+  std::unique_ptr<Project> project = Project::create(
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
-      mPageMetadata->getFullFilePath().getFilename()));
+      mPageMetadata->getFullFilePath().getFilename());
   project->setName(
       ElementName(mPageMetadata->getProjectName().trimmed()));  // can throw
   project->setAuthor(mPageMetadata->getProjectAuthor());
@@ -95,20 +95,20 @@ Project* NewProjectWizard::createProject() const {
 
   // add schematic
   if (mPageInitialization->getCreateSchematic()) {
-    Schematic* schematic = Schematic::create(
+    Schematic* schematic = new Schematic(
         *project,
         std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-        mPageInitialization->getSchematicDirName(),
+        mPageInitialization->getSchematicDirName(), Uuid::createRandom(),
         ElementName(mPageInitialization->getSchematicName()));  // can throw
     project->addSchematic(*schematic);
   }
 
   // add board
   if (mPageInitialization->getCreateBoard()) {
-    Board* board = Board::create(
+    Board* board = new Board(
         *project,
         std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-        mPageInitialization->getBoardDirName(),
+        mPageInitialization->getBoardDirName(), Uuid::createRandom(),
         ElementName(mPageInitialization->getBoardName()));  // can throw
     board->addDefaultContent();
     project->addBoard(*board);
@@ -163,7 +163,7 @@ Project* NewProjectWizard::createProject() const {
   fs->save();  // can throw
 
   // all done, return the new project
-  return project.take();
+  return project;
 }
 
 /*******************************************************************************

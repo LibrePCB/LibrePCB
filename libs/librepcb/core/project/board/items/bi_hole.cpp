@@ -39,20 +39,10 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Hole::BI_Hole(Board& board, const SExpression& node,
-                 const Version& fileFormat)
-  : BI_Base(board) {
-  mHole.reset(new Hole(node, fileFormat));
-  init();
-}
-
-BI_Hole::BI_Hole(Board& board, const Hole& hole) : BI_Base(board) {
-  mHole.reset(new Hole(hole));
-  init();
-}
-
-void BI_Hole::init() {
-  mGraphicsItem.reset(new HoleGraphicsItem(*mHole, mBoard.getLayerStack()));
+BI_Hole::BI_Hole(Board& board, const Hole& hole)
+  : BI_Base(board),
+    mHole(new Hole(hole)),
+    mGraphicsItem(new HoleGraphicsItem(*mHole, mBoard.getLayerStack())) {
 }
 
 BI_Hole::~BI_Hole() noexcept {

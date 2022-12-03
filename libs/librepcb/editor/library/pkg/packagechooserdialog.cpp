@@ -221,9 +221,9 @@ void PackageChooserDialog::updatePreview(const FilePath& fp) noexcept {
 
   if (fp.isValid() && mLayerProvider) {
     try {
-      mPackage.reset(new Package(
+      mPackage = Package::open(
           std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-              TransactionalFileSystem::openRO(fp)))));  // can throw
+              TransactionalFileSystem::openRO(fp))));  // can throw
       if (mPackage->getFootprints().count() > 0) {
         mGraphicsItem.reset(new FootprintGraphicsItem(
             mPackage->getFootprints().first(), *mLayerProvider,

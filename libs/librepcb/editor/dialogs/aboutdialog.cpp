@@ -26,7 +26,9 @@
 
 #include <librepcb/core/application.h>
 
+#include <QtCore>
 #include <QtNetwork>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace

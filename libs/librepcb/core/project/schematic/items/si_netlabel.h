@@ -53,10 +53,7 @@ public:
   // Constructors / Destructor
   SI_NetLabel() = delete;
   SI_NetLabel(const SI_NetLabel& other) = delete;
-  SI_NetLabel(SI_NetSegment& segment, const SExpression& node,
-              const Version& fileFormat);
-  explicit SI_NetLabel(SI_NetSegment& segment, const Point& position,
-                       const Angle& rotation, const bool mirrored);
+  explicit SI_NetLabel(SI_NetSegment& segment, const NetLabel& label);
   ~SI_NetLabel() noexcept;
 
   // Getters
@@ -88,8 +85,6 @@ public:
   SI_NetLabel& operator=(const SI_NetLabel& rhs) = delete;
 
 private:
-  void init();
-
   // General
   QScopedPointer<SGI_NetLabel> mGraphicsItem;
   QMetaObject::Connection mNameChangedConnection;

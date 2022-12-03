@@ -112,8 +112,8 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
                              mCategoriesEditorWidget.data());
 
   // Load element.
-  mSymbol.reset(new Symbol(std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mFileSystem))));  // can throw
+  mSymbol = Symbol::open(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem)));  // can throw
   updateMetadata();
 
   // Show "interface broken" warning when related properties are modified.

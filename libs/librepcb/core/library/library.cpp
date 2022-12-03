@@ -23,6 +23,7 @@
 #include "library.h"
 
 #include "../fileio/transactionalfilesystem.h"
+#include "../serialization/fileformatmigration.h"
 #include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 #include "cat/componentcategory.h"
@@ -48,40 +49,39 @@ Library::Library(const Uuid& uuid, const Version& version,
                  const QString& author, const ElementName& name_en_US,
                  const QString& description_en_US,
                  const QString& keywords_en_US)
-  : LibraryBaseElement(false, getShortElementName(), getLongElementName(), uuid,
+  : LibraryBaseElement(getShortElementName(), getLongElementName(), uuid,
                        version, author, name_en_US, description_en_US,
                        keywords_en_US) {
 }
 
-Library::Library(std::unique_ptr<TransactionalDirectory> directory)
-  : LibraryBaseElement(std::move(directory), false, "lib", "library") {
-  // check directory suffix
-  if (mDirectory->getAbsPath().getSuffix() != "lplib") {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("The library directory does not have the "
-                          "suffix '.lplib':\n\n%1")
-                           .arg(mDirectory->getAbsPath().toNative()));
+Library::Library(std::unique_ptr<TransactionalDirectory> directory,
+                 const SExpression& root)
+  : LibraryBaseElement(getShortElementName(), getLongElementName(), false,
+                       std::move(directory), root),
+    // Note: Don't use SExpression::getValueByPath<QUrl>() because it would
+    // throw an exception if the URL is empty, which is actually legal in this
+    // case.
+    mUrl(root.getChild("url/@0").getValue(), QUrl::StrictMode),
+    mDependencies(),  // Initialized below.
+    mIcon()  // Initialized below.
+{
+  // Read dependency UUIDs.
+  foreach (const SExpression* node, root.getChildren("dependency")) {
+    mDependencies.insert(deserialize<Uuid>(node->getChild("@0")));
   }
 
-  // read properties
-  // Note: Don't use SExpression::getValueByPath<QUrl>() because it would throw
-  // an exception if the URL is empty, which is actually legal in this case.
-  mUrl = QUrl(mLoadingFileDocument.getChild("url/@0").getValue(),
-              QUrl::StrictMode);
-
-  // read dependency UUIDs
-  foreach (const SExpression& node,
-           mLoadingFileDocument.getChildren("dependency")) {
-    mDependencies.insert(
-        deserialize<Uuid>(node.getChild("@0"), mLoadingFileFormat));
-  }
-
-  // load image if available
+  // Load image if available.
   if (mDirectory->fileExists("library.png")) {
     mIcon = mDirectory->read("library.png");  // can throw
   }
 
-  cleanupAfterLoadingElementFromFile();
+  // Check directory suffix.
+  if (mDirectory->getAbsPath().getSuffix() != "lplib") {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("The library directory does not have the "
+                               "suffix '.lplib':\n\n%1")
+                           .arg(mDirectory->getAbsPath().toNative()));
+  }
 }
 
 Library::~Library() noexcept {
@@ -165,6 +165,24 @@ template QStringList Library::searchForElements<Symbol>() const noexcept;
 template QStringList Library::searchForElements<Package>() const noexcept;
 template QStringList Library::searchForElements<Component>() const noexcept;
 template QStringList Library::searchForElements<Device>() const noexcept;
+
+std::unique_ptr<Library> Library::open(
+    std::unique_ptr<TransactionalDirectory> directory) {
+  Q_ASSERT(directory);
+
+  // Upgrade file format, if needed.
+  const Version fileFormat =
+      readFileFormat(*directory, ".librepcb-" % getShortElementName());
+  for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
+    migration->upgradeLibrary(*directory);
+  }
+
+  // Load element.
+  const QString fileName = getLongElementName() % ".lp";
+  const SExpression root = SExpression::parse(directory->read(fileName),
+                                              directory->getAbsPath(fileName));
+  return std::unique_ptr<Library>(new Library(std::move(directory), root));
+}
 
 /*******************************************************************************
  *  Protected Methods

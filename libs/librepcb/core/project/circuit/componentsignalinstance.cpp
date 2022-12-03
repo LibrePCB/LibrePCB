@@ -46,62 +46,28 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ComponentSignalInstance::ComponentSignalInstance(Circuit& circuit,
-                                                 ComponentInstance& cmpInstance,
-                                                 const SExpression& node,
-                                                 const Version& fileFormat)
-  : QObject(&cmpInstance),
-    mCircuit(circuit),
-    mComponentInstance(cmpInstance),
-    mComponentSignal(nullptr),
-    mIsAddedToCircuit(false),
-    mNetSignal(nullptr) {
-  // read attributes
-  Uuid compSignalUuid = deserialize<Uuid>(node.getChild("@0"), fileFormat);
-  mComponentSignal = mComponentInstance.getLibComponent()
-                         .getSignals()
-                         .get(compSignalUuid)
-                         .get();  // can throw
-  tl::optional<Uuid> netsignalUuid =
-      deserialize<tl::optional<Uuid>>(node.getChild("net/@0"), fileFormat);
-  if (netsignalUuid) {
-    mNetSignal = mCircuit.getNetSignals().value(*netsignalUuid);
-    if (!mNetSignal) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         QString("Invalid netsignal UUID: \"%1\"")
-                             .arg(netsignalUuid->toStr()));
-    }
-  }
-
-  init();
-}
-
 ComponentSignalInstance::ComponentSignalInstance(
     Circuit& circuit, ComponentInstance& cmpInstance,
     const ComponentSignal& cmpSignal, NetSignal* netsignal)
   : QObject(&cmpInstance),
     mCircuit(circuit),
     mComponentInstance(cmpInstance),
-    mComponentSignal(&cmpSignal),
+    mComponentSignal(cmpSignal),
     mIsAddedToCircuit(false),
     mNetSignal(netsignal) {
-  init();
-}
-
-void ComponentSignalInstance::init() {
   // create ERC messages
   mErcMsgUnconnectedRequiredSignal.reset(
       new ErcMsg(mCircuit.getProject(), *this,
                  QString("%1/%2")
                      .arg(mComponentInstance.getUuid().toStr())
-                     .arg(mComponentSignal->getUuid().toStr()),
+                     .arg(mComponentSignal.getUuid().toStr()),
                  "UnconnectedRequiredSignal",
                  ErcMsg::ErcMsgType_t::CircuitError, QString()));
   mErcMsgForcedNetSignalNameConflict.reset(
       new ErcMsg(mCircuit.getProject(), *this,
                  QString("%1/%2")
                      .arg(mComponentInstance.getUuid().toStr())
-                     .arg(mComponentSignal->getUuid().toStr()),
+                     .arg(mComponentSignal.getUuid().toStr()),
                  "ForcedNetSignalNameConflict",
                  ErcMsg::ErcMsgType_t::SchematicError, QString()));
   updateErcMessages();
@@ -115,8 +81,6 @@ void ComponentSignalInstance::init() {
     connect(mNetSignal, &NetSignal::nameChanged, this,
             &ComponentSignalInstance::netSignalNameChanged);
   }
-
-  if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 ComponentSignalInstance::~ComponentSignalInstance() noexcept {
@@ -130,11 +94,11 @@ ComponentSignalInstance::~ComponentSignalInstance() noexcept {
  ******************************************************************************/
 
 bool ComponentSignalInstance::isNetSignalNameForced() const noexcept {
-  return mComponentSignal->isNetSignalNameForced();
+  return mComponentSignal.isNetSignalNameForced();
 }
 
 QString ComponentSignalInstance::getForcedNetSignalName() const noexcept {
-  return AttributeSubstitutor::substitute(mComponentSignal->getForcedNetName(),
+  return AttributeSubstitutor::substitute(mComponentSignal.getForcedNetName(),
                                           &mComponentInstance);
 }
 
@@ -175,7 +139,7 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) {
         __FILE__, __LINE__,
         tr("The net signal of the component signal \"%1:%2\" cannot be "
            "changed because it is still in use!")
-            .arg(*mComponentInstance.getName(), *mComponentSignal->getName()));
+            .arg(*mComponentInstance.getName(), *mComponentSignal.getName()));
   }
   ScopeGuardList sgl;
   if (mNetSignal) {
@@ -268,21 +232,10 @@ void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad) {
 }
 
 void ComponentSignalInstance::serialize(SExpression& root) const {
-  if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
-  root.appendChild(mComponentSignal->getUuid());
+  root.appendChild(mComponentSignal.getUuid());
   root.appendChild(
       "net",
       mNetSignal ? tl::make_optional(mNetSignal->getUuid()) : tl::nullopt);
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-bool ComponentSignalInstance::checkAttributesValidity() const noexcept {
-  if (mComponentSignal == nullptr) return false;
-  return true;
 }
 
 /*******************************************************************************
@@ -298,16 +251,16 @@ void ComponentSignalInstance::netSignalNameChanged(
 void ComponentSignalInstance::updateErcMessages() noexcept {
   mErcMsgUnconnectedRequiredSignal->setMsg(
       tr("Unconnected component signal: \"%1\" from \"%2\"")
-          .arg(*mComponentSignal->getName())
+          .arg(*mComponentSignal.getName())
           .arg(*mComponentInstance.getName()));
   mErcMsgForcedNetSignalNameConflict->setMsg(
       tr("Signal name conflict: \"%1\" != \"%2\" (\"%3\" from \"%4\")")
           .arg((mNetSignal ? *mNetSignal->getName() : QString()),
-               getForcedNetSignalName(), *mComponentSignal->getName(),
+               getForcedNetSignalName(), *mComponentSignal.getName(),
                *mComponentInstance.getName()));
 
   mErcMsgUnconnectedRequiredSignal->setVisible(
-      (mIsAddedToCircuit) && (!mNetSignal) && (mComponentSignal->isRequired()));
+      (mIsAddedToCircuit) && (!mNetSignal) && (mComponentSignal.isRequired()));
   mErcMsgForcedNetSignalNameConflict->setVisible(
       (mIsAddedToCircuit) && (isNetSignalNameForced()) &&
       (mNetSignal ? (getForcedNetSignalName() != mNetSignal->getName())

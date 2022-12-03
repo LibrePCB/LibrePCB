@@ -30,6 +30,7 @@
 #include "../fileio/versionfile.h"
 #include "../library/library.h"
 #include "../project/project.h"
+#include "../serialization/fileformatmigration.h"
 #include "workspacelibrarydb.h"
 #include "workspacesettings.h"
 
@@ -61,7 +62,7 @@ Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
 
   // Fail if the path is not a valid workspace directory.
   QString errorMsg;
-  if (!checkCompatibility(mPath)) {
+  if (!checkCompatibility(mPath, &errorMsg)) {
     throw RuntimeError(__FILE__, __LINE__, errorMsg);
   }
 
@@ -90,6 +91,16 @@ Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
     }
   }
 
+  // Upgrade file format, if needed.
+  TransactionalDirectory dataDir(mFileSystem);
+  for (auto migration : FileFormatMigration::getMigrations(loadedFileFormat)) {
+    qInfo().nospace().noquote()
+        << "Workspace data file format is outdated, upgrading from v"
+        << migration->getFromVersion().toStr() << " to v"
+        << migration->getToVersion().toStr() << "...";
+    migration->upgradeWorkspaceData(dataDir);
+  }
+
   // Load workspace settings.
   mWorkspaceSettings.reset(new WorkspaceSettings(this));
   const QString settingsFilePath = "settings.lp";
@@ -104,18 +115,8 @@ Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
     qInfo("Workspace settings file not found, default settings will be used.");
   }
 
-  // Write files to disk if an upgrade is performed.
+  // Write files to disk if an upgrade was performed.
   if (loadedFileFormat != qApp->getFileFormatVersion()) {
-    qInfo().nospace().noquote()
-        << "Workspace data is outdated, will upgrade files from v"
-        << loadedFileFormat.toStr() << "...";
-    QFile(mLibrariesPath.getPathTo("library_cache.sqlite").toStr()).remove();
-    QFile(mLibrariesPath.getPathTo("cache.sqlite").toStr()).remove();
-    QFile(mLibrariesPath.getPathTo("cache_v1.sqlite").toStr()).remove();
-    QFile(mLibrariesPath.getPathTo("cache_v2.sqlite").toStr()).remove();
-    mFileSystem->write(
-        versionFilePath,
-        VersionFile(qApp->getFileFormatVersion()).toByteArray());  // can throw
     saveSettingsToTransactionalFileSystem();  // can throw
     mFileSystem->save();  // can throw
   }

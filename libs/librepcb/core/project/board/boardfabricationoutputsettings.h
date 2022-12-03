@@ -31,7 +31,6 @@
 namespace librepcb {
 
 class SExpression;
-class Version;
 
 /*******************************************************************************
  *  Class BoardFabricationOutputSettings
@@ -46,8 +45,7 @@ public:
   BoardFabricationOutputSettings() noexcept;
   BoardFabricationOutputSettings(
       const BoardFabricationOutputSettings& other) noexcept;
-  BoardFabricationOutputSettings(const SExpression& node,
-                                 const Version& fileFormat);
+  explicit BoardFabricationOutputSettings(const SExpression& node);
   ~BoardFabricationOutputSettings() noexcept;
 
   // Getters

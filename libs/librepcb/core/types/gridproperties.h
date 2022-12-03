@@ -34,6 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class SExpression;
+
 /*******************************************************************************
  *  Class GridProperties
  ******************************************************************************/
@@ -50,7 +52,7 @@ public:
 
   // Constructors / Destructor
   GridProperties() noexcept;
-  GridProperties(const SExpression& node, const Version& fileFormat);
+  explicit GridProperties(const SExpression& node);
   GridProperties(Type_t type, const PositiveLength& interval,
                  const LengthUnit& unit) noexcept;
   GridProperties(const GridProperties& other) noexcept;
@@ -85,27 +87,6 @@ private:  // Data
   PositiveLength mInterval;
   LengthUnit mUnit;
 };
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline GridProperties::Type_t deserialize(const SExpression& sexpr,
-                                          const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  if (str == "off")
-    return GridProperties::Type_t::Off;
-  else if (str == "lines")
-    return GridProperties::Type_t::Lines;
-  else if (str == "dots")
-    return GridProperties::Type_t::Dots;
-  else
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        GridProperties::tr("Unknown grid type: \"%1\"").arg(str));
-}
 
 /*******************************************************************************
  *  End of File

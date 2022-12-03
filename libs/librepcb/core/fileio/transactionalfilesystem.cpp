@@ -480,17 +480,17 @@ void TransactionalFileSystem::loadDiff(const FilePath& fp) {
   QString modifiedFilesDirName =
       root.getChild("modified_files_directory/@0").getValue();
   FilePath modifiedFilesDir = fp.getParentDir().getPathTo(modifiedFilesDirName);
-  foreach (const SExpression& node, root.getChildren("modified_file")) {
-    QString relPath = node.getChild("@0").getValue();
+  foreach (const SExpression* node, root.getChildren("modified_file")) {
+    QString relPath = node->getChild("@0").getValue();
     FilePath absPath = modifiedFilesDir.getPathTo(relPath);
     mModifiedFiles.insert(relPath, FileUtils::readFile(absPath));  // can throw
   }
-  foreach (const SExpression& node, root.getChildren("removed_file")) {
-    QString relPath = node.getChild("@0").getValue();
+  foreach (const SExpression* node, root.getChildren("removed_file")) {
+    QString relPath = node->getChild("@0").getValue();
     mRemovedFiles.insert(relPath);
   }
-  foreach (const SExpression& node, root.getChildren("removed_directory")) {
-    QString relPath = node.getChild("@0").getValue();
+  foreach (const SExpression* node, root.getChildren("removed_directory")) {
+    QString relPath = node->getChild("@0").getValue();
     mRemovedDirs.insert(relPath);
   }
 }

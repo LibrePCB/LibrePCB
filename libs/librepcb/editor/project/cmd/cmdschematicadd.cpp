@@ -55,10 +55,10 @@ CmdSchematicAdd::~CmdSchematicAdd() noexcept {
  ******************************************************************************/
 
 bool CmdSchematicAdd::performExecute() {
-  mSchematic = Schematic::create(
+  mSchematic = new Schematic(
       mProject,
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
-      mDirName, mName);
+      mDirName, Uuid::createRandom(), mName);
 
   performRedo();  // can throw
 

@@ -48,7 +48,7 @@ public:
     : mPos(other.mPos), mAngle(other.mAngle) {}
   explicit Vertex(const Point& pos, const Angle& angle = Angle::deg0()) noexcept
     : mPos(pos), mAngle(angle) {}
-  Vertex(const SExpression& node, const Version& fileFormat);
+  explicit Vertex(const SExpression& node);
   ~Vertex() noexcept {}
 
   // Getters

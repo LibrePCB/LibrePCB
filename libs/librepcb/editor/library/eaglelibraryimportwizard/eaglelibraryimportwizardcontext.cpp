@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "eaglelibraryimportwizardcontext.h"
 
+#include <librepcb/core/exceptions.h>
 #include <librepcb/eagleimport/eaglelibraryimport.h>
 
 #include <QtCore>

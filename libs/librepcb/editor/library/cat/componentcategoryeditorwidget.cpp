@@ -68,8 +68,8 @@ ComponentCategoryEditorWidget::ComponentCategoryEditorWidget(
           &ComponentCategoryEditorWidget::btnResetParentCategoryClicked);
 
   // Load element.
-  mCategory.reset(new ComponentCategory(std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mFileSystem))));  // can throw
+  mCategory = ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
+      new TransactionalDirectory(mFileSystem)));  // can throw
   updateMetadata();
 
   // Reload metadata on undo stack state changes.
