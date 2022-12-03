@@ -39,11 +39,6 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Hole::BI_Hole(Board& board, const BI_Hole& other) : BI_Base(board) {
-  mHole.reset(new Hole(Uuid::createRandom(), *other.mHole));
-  init();
-}
-
 BI_Hole::BI_Hole(Board& board, const SExpression& node,
                  const Version& fileFormat)
   : BI_Base(board) {

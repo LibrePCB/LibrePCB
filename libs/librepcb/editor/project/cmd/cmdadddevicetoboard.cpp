@@ -133,7 +133,7 @@ bool CmdAddDeviceToBoard::performExecute() {
   // create new device (ownership by board)
   mDeviceInstance =
       new BI_Device(mBoard, mComponentInstance, mDeviceUuid, *mFootprintUuid,
-                    mPosition, mRotation, mMirror);  // can throw
+                    mPosition, mRotation, mMirror, true);  // can throw
 
   // add a new device instance to the board
   execNewChildCmd(new CmdDeviceInstanceAdd(*mDeviceInstance));  // can throw

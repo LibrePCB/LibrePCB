@@ -76,8 +76,6 @@ public:
   // Constructors / Destructor
   BI_NetLine() = delete;
   BI_NetLine(const BI_NetLine& other) = delete;
-  BI_NetLine(BI_NetSegment& segment, const BI_NetLine& other,
-             BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint);
   BI_NetLine(BI_NetSegment& segment, const SExpression& node,
              const Version& fileFormat);
   BI_NetLine(BI_NetSegment& segment, BI_NetLineAnchor& startPoint,

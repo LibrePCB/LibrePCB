@@ -53,7 +53,6 @@ public:
   // Constructors / Destructor
   BI_Via() = delete;
   BI_Via(const BI_Via& other) = delete;
-  BI_Via(BI_NetSegment& netsegment, const BI_Via& other);
   BI_Via(BI_NetSegment& netsegment, const Via& via);
   BI_Via(BI_NetSegment& netsegment, const SExpression& node,
          const Version& fileFormat);

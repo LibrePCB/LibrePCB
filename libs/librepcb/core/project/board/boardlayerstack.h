@@ -52,7 +52,6 @@ public:
   // Constructors / Destructor
   BoardLayerStack() = delete;
   BoardLayerStack(const BoardLayerStack& other) = delete;
-  BoardLayerStack(Board& board, const BoardLayerStack& other);
   BoardLayerStack(Board& board, const SExpression& node,
                   const Version& fileFormat);
   explicit BoardLayerStack(Board& board);
@@ -86,7 +85,7 @@ public:
   void serialize(SExpression& root) const override;
 
   // Operator Overloadings
-  BoardLayerStack& operator=(const BoardLayerStack& rhs) = delete;
+  BoardLayerStack& operator=(const BoardLayerStack& rhs) noexcept;
 
 private slots:
   void layerAttributesChanged() noexcept;

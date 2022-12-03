@@ -67,11 +67,11 @@ public:
   // Constructors / Destructor
   BI_Device() = delete;
   BI_Device(const BI_Device& other) = delete;
-  BI_Device(Board& board, const BI_Device& other);
   BI_Device(Board& board, const SExpression& node, const Version& fileFormat);
   BI_Device(Board& board, ComponentInstance& compInstance,
             const Uuid& deviceUuid, const Uuid& footprintUuid,
-            const Point& position, const Angle& rotation, bool mirror);
+            const Point& position, const Angle& rotation, bool mirror,
+            bool loadInitialStrokeTexts);
   ~BI_Device() noexcept;
 
   // Getters
@@ -85,6 +85,7 @@ public:
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
   bool getMirrored() const noexcept { return mMirrored; }
+  const AttributeList& getAttributes() const noexcept { return mAttributes; }
   BI_FootprintPad* getPad(const Uuid& padUuid) const noexcept {
     return mPads.value(padUuid);
   }
@@ -116,6 +117,7 @@ public:
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
   void setMirrored(bool mirror);
+  void setAttributes(const AttributeList& attributes) noexcept;
 
   // StrokeText Methods
   StrokeTextList getDefaultStrokeTexts() const noexcept;

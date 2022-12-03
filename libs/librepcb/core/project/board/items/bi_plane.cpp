@@ -26,7 +26,6 @@
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
-#include "../boardplanefragmentsbuilder.h"
 #include "../graphicsitems/bgi_plane.h"
 
 #include <QtCore>
@@ -39,26 +38,6 @@ namespace librepcb {
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
-
-BI_Plane::BI_Plane(Board& board, const BI_Plane& other)
-  : BI_Base(board),
-    mUuid(Uuid::createRandom()),
-    mLayerName(other.mLayerName),
-    mNetSignal(other.mNetSignal),
-    mOutline(other.mOutline),
-    mMinWidth(other.mMinWidth),
-    mMinClearance(other.mMinClearance),
-    mKeepOrphans(other.mKeepOrphans),
-    mPriority(other.mPriority),
-    mConnectStyle(other.mConnectStyle),
-    // mThermalGapWidth(other.mThermalGapWidth),
-    // mThermalSpokeWidth(other.mThermalSpokeWidth),
-    mIsVisible(other.mIsVisible),
-    mFragments(other.mFragments)  // also copy fragments to avoid the need for
-                                  // a rebuild
-{
-  init();
-}
 
 BI_Plane::BI_Plane(Board& board, const SExpression& node,
                    const Version& fileFormat)
@@ -195,6 +174,14 @@ void BI_Plane::setVisible(bool visible) noexcept {
   }
 }
 
+void BI_Plane::setCalculatedFragments(const QVector<Path>& fragments) noexcept {
+  if (fragments != mFragments) {
+    mFragments = fragments;
+    mGraphicsItem->updateCacheAndRepaint();
+    mBoard.scheduleAirWiresRebuild(mNetSignal);
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -221,13 +208,6 @@ void BI_Plane::removeFromBoard() {
 void BI_Plane::clear() noexcept {
   mFragments.clear();
   mGraphicsItem->updateCacheAndRepaint();
-}
-
-void BI_Plane::rebuild() noexcept {
-  BoardPlaneFragmentsBuilder builder(*this);
-  mFragments = builder.buildFragments();
-  mGraphicsItem->updateCacheAndRepaint();
-  mBoard.scheduleAirWiresRebuild(mNetSignal);
 }
 
 void BI_Plane::serialize(SExpression& root) const {

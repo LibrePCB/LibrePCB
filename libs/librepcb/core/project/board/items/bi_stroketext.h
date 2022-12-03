@@ -57,7 +57,6 @@ public:
   // Constructors / Destructor
   BI_StrokeText() = delete;
   BI_StrokeText(const BI_StrokeText& other) = delete;
-  BI_StrokeText(Board& board, const BI_StrokeText& other);
   BI_StrokeText(Board& board, const SExpression& node,
                 const Version& fileFormat);
   BI_StrokeText(Board& board, const StrokeText& text);

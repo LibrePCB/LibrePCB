@@ -432,23 +432,6 @@ Board* Project::createBoard(const ElementName& name) {
   return Board::create(*this, std::move(dir), name);
 }
 
-Board* Project::createBoard(const Board& other, const ElementName& name) {
-  QString dirname = FilePath::cleanFileName(
-      *name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-  if (dirname.isEmpty()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Invalid board name: \"%1\"").arg(*name));
-  }
-  std::unique_ptr<TransactionalDirectory> dir(
-      new TransactionalDirectory(*mDirectory, "boards/" % dirname));
-  if (dir->fileExists("board.lp")) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("The board exists already: \"%1\"")
-                           .arg(dir->getAbsPath().toNative()));
-  }
-  return new Board(other, std::move(dir), name);
-}
-
 void Project::addBoard(Board& board, int newIndex) {
   if ((mBoards.contains(&board)) || (&board.getProject() != this)) {
     throw LogicError(__FILE__, __LINE__);

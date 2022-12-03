@@ -40,11 +40,6 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Polygon::BI_Polygon(Board& board, const BI_Polygon& other) : BI_Base(board) {
-  mPolygon.reset(new Polygon(Uuid::createRandom(), *other.mPolygon));
-  init();
-}
-
 BI_Polygon::BI_Polygon(Board& board, const SExpression& node,
                        const Version& fileFormat)
   : BI_Base(board) {

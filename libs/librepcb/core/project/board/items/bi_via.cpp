@@ -37,13 +37,6 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Via::BI_Via(BI_NetSegment& netsegment, const BI_Via& other)
-  : BI_Base(netsegment.getBoard()),
-    mVia(Uuid::createRandom(), other.mVia),
-    mNetSegment(netsegment) {
-  init();
-}
-
 BI_Via::BI_Via(BI_NetSegment& netsegment, const Via& via)
   : BI_Base(netsegment.getBoard()), mVia(via), mNetSegment(netsegment) {
   init();

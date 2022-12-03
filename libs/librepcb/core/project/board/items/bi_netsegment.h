@@ -58,8 +58,6 @@ public:
   // Constructors / Destructor
   BI_NetSegment() = delete;
   BI_NetSegment(const BI_NetSegment& other) = delete;
-  BI_NetSegment(Board& board, const BI_NetSegment& other,
-                const QHash<const BI_Device*, BI_Device*>& devMap);
   BI_NetSegment(Board& board, const SExpression& node,
                 const Version& fileFormat);
   BI_NetSegment(Board& board, NetSignal* signal);

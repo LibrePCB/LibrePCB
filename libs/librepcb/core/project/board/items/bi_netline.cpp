@@ -80,25 +80,6 @@ BI_NetSegment* BI_NetLineAnchor::getNetSegmentOfLines() const noexcept {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_NetLine::BI_NetLine(BI_NetSegment& segment, const BI_NetLine& other,
-                       BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint)
-  : BI_Base(segment.getBoard()),
-    mNetSegment(segment),
-    mTrace(Uuid::createRandom(), other.mTrace.getLayer(),
-           other.mTrace.getWidth(), startPoint.toTraceAnchor(),
-           endPoint.toTraceAnchor()),
-    mStartPoint(&startPoint),
-    mEndPoint(&endPoint) {
-  // don't just copy the pointer "mLayer" because it may come from another
-  // board!
-  mLayer = mBoard.getLayerStack().getLayer(*mTrace.getLayer());
-  if (!mLayer) {
-    throw LogicError(__FILE__, __LINE__);
-  }
-
-  init();
-}
-
 BI_NetLine::BI_NetLine(BI_NetSegment& segment, const SExpression& node,
                        const Version& fileFormat)
   : BI_Base(segment.getBoard()),

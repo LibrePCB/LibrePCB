@@ -64,10 +64,11 @@ CmdBoardAdd::~CmdBoardAdd() noexcept {
  ******************************************************************************/
 
 bool CmdBoardAdd::performExecute() {
+  mBoard = mProject.createBoard(mName);  // can throw
   if (mBoardToCopy) {
-    mBoard = mProject.createBoard(*mBoardToCopy, mName);  // can throw
+    mBoard->copyFrom(*mBoardToCopy);  // can throw
   } else {
-    mBoard = mProject.createBoard(mName);  // can throw
+    mBoard->addDefaultContent();  // can throw
   }
 
   performRedo();  // can throw

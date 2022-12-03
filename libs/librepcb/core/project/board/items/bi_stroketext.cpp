@@ -44,14 +44,6 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_StrokeText::BI_StrokeText(Board& board, const BI_StrokeText& other)
-  : BI_Base(board),
-    mDevice(nullptr),
-    mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
-  mText.reset(new StrokeText(Uuid::createRandom(), *other.mText));
-  init();
-}
-
 BI_StrokeText::BI_StrokeText(Board& board, const SExpression& node,
                              const Version& fileFormat)
   : BI_Base(board),

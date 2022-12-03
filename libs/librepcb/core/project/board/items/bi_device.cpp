@@ -48,23 +48,6 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Device::BI_Device(Board& board, const BI_Device& other)
-  : BI_Base(board),
-    mCompInstance(other.mCompInstance),
-    mLibDevice(other.mLibDevice),
-    mLibPackage(other.mLibPackage),
-    mLibFootprint(other.mLibFootprint),
-    mPosition(other.mPosition),
-    mRotation(other.mRotation),
-    mMirrored(other.mMirrored),
-    mAttributes(other.mAttributes) {
-  foreach (const BI_StrokeText* text, other.mStrokeTexts) {
-    addStrokeText(*new BI_StrokeText(mBoard, *text));
-  }
-
-  init();
-}
-
 BI_Device::BI_Device(Board& board, const SExpression& node,
                      const Version& fileFormat)
   : BI_Base(board),
@@ -108,7 +91,8 @@ BI_Device::BI_Device(Board& board, const SExpression& node,
 
 BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
                      const Uuid& deviceUuid, const Uuid& footprintUuid,
-                     const Point& position, const Angle& rotation, bool mirror)
+                     const Point& position, const Angle& rotation, bool mirror,
+                     bool loadInitialStrokeTexts)
   : BI_Base(board),
     mCompInstance(&compInstance),
     mLibDevice(nullptr),
@@ -119,12 +103,14 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
     mMirrored(mirror) {
   initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
 
-  // add attributes
+  // Add initial attributes.
   mAttributes = mLibDevice->getAttributes();
 
   // Add initial stroke texts.
-  for (const StrokeText& text : getDefaultStrokeTexts()) {
-    addStrokeText(*new BI_StrokeText(mBoard, text));
+  if (loadInitialStrokeTexts) {
+    for (const StrokeText& text : getDefaultStrokeTexts()) {
+      addStrokeText(*new BI_StrokeText(mBoard, text));
+    }
   }
 
   init();
@@ -330,7 +316,7 @@ void BI_Device::removeStrokeText(BI_StrokeText& text) {
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Setters
  ******************************************************************************/
 
 void BI_Device::setPosition(const Point& pos) noexcept {
@@ -370,6 +356,17 @@ void BI_Device::setMirrored(bool mirror) {
     }
   }
 }
+
+void BI_Device::setAttributes(const AttributeList& attributes) noexcept {
+  if (attributes != mAttributes) {
+    mAttributes = attributes;
+    emit attributesChanged();
+  }
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
 
 void BI_Device::addToBoard() {
   if (isAddedToBoard()) {

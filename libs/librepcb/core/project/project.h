@@ -405,18 +405,6 @@ public:
   Board* createBoard(const ElementName& name);
 
   /**
-   * @brief Create a new board as a copy of an existing board
-   *
-   * @param other The board to copy
-   * @param name  The board name
-   *
-   * @return A pointer to the new board
-   *
-   * @throw Exception This method throws an exception on error.
-   */
-  Board* createBoard(const Board& other, const ElementName& name);
-
-  /**
    * @brief Add an existing board to this project
    *
    * @param board         The board to add

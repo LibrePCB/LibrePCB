@@ -63,7 +63,6 @@ public:
   // Constructors / Destructor
   BI_Plane() = delete;
   BI_Plane(const BI_Plane& other) = delete;
-  BI_Plane(Board& board, const BI_Plane& other);
   BI_Plane(Board& board, const SExpression& node, const Version& fileFormat);
   BI_Plane(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
            NetSignal& netsignal, const Path& outline);
@@ -99,12 +98,12 @@ public:
   void setPriority(int priority) noexcept;
   void setKeepOrphans(bool keepOrphans) noexcept;
   void setVisible(bool visible) noexcept;
+  void setCalculatedFragments(const QVector<Path>& fragments) noexcept;
 
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
   void clear() noexcept;
-  void rebuild() noexcept;
 
   /// @copydoc ::librepcb::SerializableObject::serialize()
   void serialize(SExpression& root) const override;
@@ -119,7 +118,6 @@ public:
   bool operator<(const BI_Plane& rhs) const noexcept;
 
 private slots:
-
   void boardAttributesChanged();
 
 private:  // Methods

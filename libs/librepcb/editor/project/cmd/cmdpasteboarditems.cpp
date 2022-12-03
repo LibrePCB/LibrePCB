@@ -137,12 +137,9 @@ bool CmdPasteBoardItems::performExecute() {
     }
 
     // Add device instance to board
-    QScopedPointer<BI_Device> device(
-        new BI_Device(mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
-                      dev.position + mPosOffset, dev.rotation, dev.mirrored));
-    foreach (BI_StrokeText* text, device->getStrokeTexts()) {
-      device->removeStrokeText(*text);
-    }
+    QScopedPointer<BI_Device> device(new BI_Device(
+        mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
+        dev.position + mPosOffset, dev.rotation, dev.mirrored, false));
     for (const StrokeText& text : dev.strokeTexts) {
       StrokeText copy(Uuid::createRandom(), text);  // assign new UUID
       copy.setPosition(copy.getPosition() + mPosOffset);  // move

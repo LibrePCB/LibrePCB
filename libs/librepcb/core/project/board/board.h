@@ -112,8 +112,6 @@ public:
   // Constructors / Destructor
   Board() = delete;
   Board(const Board& other) = delete;
-  Board(const Board& other, std::unique_ptr<TransactionalDirectory> directory,
-        const ElementName& name);
   Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
         const Version& fileFormat)
     : Board(project, std::move(directory), fileFormat, false, QString()) {}
@@ -209,6 +207,8 @@ public:
   void forceAirWiresRebuild() noexcept;
 
   // General Methods
+  void addDefaultContent();
+  void copyFrom(const Board& other);
   void addToProject();
   void removeFromProject();
   void save();

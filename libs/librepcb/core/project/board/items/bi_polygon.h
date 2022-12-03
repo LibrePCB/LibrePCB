@@ -58,7 +58,6 @@ public:
   // Constructors / Destructor
   BI_Polygon() = delete;
   BI_Polygon(const BI_Polygon& other) = delete;
-  BI_Polygon(Board& board, const BI_Polygon& other);
   BI_Polygon(Board& board, const SExpression& node, const Version& fileFormat);
   BI_Polygon(Board& board, const Polygon& polygon);
   BI_Polygon(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,

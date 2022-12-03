@@ -30,6 +30,7 @@
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -105,6 +106,7 @@ Project* NewProjectWizard::createProject() const {
   if (mPageInitialization->getCreateBoard()) {
     Board* board = project->createBoard(
         ElementName(mPageInitialization->getBoardName()));  // can throw
+    board->addDefaultContent();
     project->addBoard(*board);
   }
 
