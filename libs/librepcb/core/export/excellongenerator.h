@@ -24,8 +24,8 @@
  *  Includes
  ******************************************************************************/
 #include "../fileio/filepath.h"
+#include "../geometry/path.h"
 #include "../types/length.h"
-#include "../types/point.h"
 #include "gerberattribute.h"
 
 #include <QtCore>
@@ -35,8 +35,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Point;
+
 /*******************************************************************************
- *  Class GerberGenerator
+ *  Class ExcellonGenerator
  ******************************************************************************/
 
 /**
@@ -58,11 +60,16 @@ public:
                     Plating plating, int fromLayer, int toLayer) noexcept;
   ~ExcellonGenerator() noexcept;
 
+  // Setters
+  void setUseG85Slots(bool use) noexcept { mUseG85Slots = use; }
+
   // Getters
   const QString& toStr() const noexcept { return mOutput; }
 
   // General Methods
   void drill(const Point& pos, const PositiveLength& dia, bool plated,
+             Function function) noexcept;
+  void drill(const NonEmptyPath& path, const PositiveLength& dia, bool plated,
              Function function) noexcept;
   void generate();
   void saveToFile(const FilePath& filepath) const;
@@ -73,16 +80,30 @@ public:
 private:
   void printHeader() noexcept;
   void printToolList() noexcept;
-  void printDrills() noexcept;
+  void printDrills();
+  void printPath(const NonEmptyPath& path);
+  void printDrill(const Point& pos) noexcept;
+  void printSlot(const NonEmptyPath& path);
+  void printRout(const NonEmptyPath& path) noexcept;
+  void printMoveTo(const Point& pos) noexcept;
+  void printLinearInterpolation(const Point& pos) noexcept;
+  void printCircularInterpolation(const Point& from, const Point& to,
+                                  const Angle& angle) noexcept;
   void printFooter() noexcept;
+
+  // Types
+  typedef std::tuple<Length, bool, Function> Tool;
 
   // Metadata
   Plating mPlating;
   QVector<GerberAttribute> mFileAttributes;
 
+  // Configuration
+  bool mUseG85Slots;
+
   // Excellon Data
   QString mOutput;
-  QMultiMap<std::tuple<Length, bool, Function>, Point> mDrillList;
+  QMultiMap<Tool, NonEmptyPath> mDrillList;
 };
 
 /*******************************************************************************

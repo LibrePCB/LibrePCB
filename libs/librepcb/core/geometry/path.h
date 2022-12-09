@@ -23,7 +23,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../exceptions.h"
 #include "vertex.h"
+
+#include <type_safe/constrained_type.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -52,6 +55,8 @@ namespace librepcb {
  * vertices are useless and thus considered as invalid.
  */
 class Path final {
+  Q_DECLARE_TR_FUNCTIONS(Path)
+
 public:
   // Constructors / Destructor
   Path() noexcept : mVertices(), mPainterPathPx() {}
@@ -170,6 +175,46 @@ private:  // Data
 
 inline uint qHash(const Path& key, uint seed = 0) noexcept {
   return qHashRange(key.getVertices().begin(), key.getVertices().end(), seed);
+}
+
+/*******************************************************************************
+ *  Class NonEmptyPath
+ ******************************************************************************/
+
+struct NonEmptyPathVerifier {
+  template <typename Value, typename Predicate>
+  static constexpr auto verify(Value&& val, const Predicate& p) ->
+      typename std::decay<Value>::type {
+    return p(val)
+        ? std::forward<Value>(val)
+        : (throw RuntimeError(__FILE__, __LINE__,
+                              Path::tr("Path doesn't contain vertices!")),
+           std::forward<Value>(val));
+  }
+};
+
+struct NonEmptyPathConstraint {
+  bool operator()(const Path& p) const noexcept {
+    return p.getVertices().count() > 0;
+  }
+};
+
+/**
+ * NonEmptyPath is a wrapper around a librepcb::Path object which is
+ * guaranteed to always contain at least one vertex.
+ *
+ * The constructor throws an exception if constructed from a librepcb::Path
+ * without vertices.
+ */
+using NonEmptyPath = type_safe::constrained_type<Path, NonEmptyPathConstraint,
+                                                 NonEmptyPathVerifier>;
+
+inline uint qHash(const NonEmptyPath& key, uint seed = 0) noexcept {
+  return ::qHash(*key, seed);
+}
+
+inline NonEmptyPath makeNonEmptyPath(const Point& pos) noexcept {
+  return NonEmptyPath(Path({Vertex(pos)}));
 }
 
 /*******************************************************************************
