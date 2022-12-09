@@ -221,7 +221,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
         start = junctionMap[*anchor];
       } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
                      netline.getStartPoint().tryGetPin()) {
-        SI_Symbol* symbol = mSchematic.getSymbolByUuid(anchor->symbol);
+        SI_Symbol* symbol = mSchematic.getSymbols().value(anchor->symbol);
         start = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
       SI_NetLineAnchor* end = nullptr;
@@ -229,7 +229,7 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
         end = junctionMap[*anchor];
       } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
                      netline.getEndPoint().tryGetPin()) {
-        SI_Symbol* symbol = mSchematic.getSymbolByUuid(anchor->symbol);
+        SI_Symbol* symbol = mSchematic.getSymbols().value(anchor->symbol);
         end = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
       if ((!start) || (!end)) {
@@ -242,9 +242,11 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
 
     // Add new netlabels
     for (const NetLabel& netlabel : segment.netlabels) {
-      execNewChildCmd(new CmdSchematicNetLabelAdd(
-          *newNetSegment, netlabel.getPosition(), netlabel.getRotation(),
-          netlabel.getMirrored()));
+      SI_NetLabel* newNetLabel = new SI_NetLabel(
+          *newNetSegment,
+          NetLabel(Uuid::createRandom(), netlabel.getPosition(),
+                   netlabel.getRotation(), netlabel.getMirrored()));
+      execNewChildCmd(new CmdSchematicNetLabelAdd(*newNetLabel));
     }
   }
 

@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -125,7 +127,7 @@ private:  // Data
   QScopedPointer<Ui::SymbolEditorWidget> mUi;
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<GraphicsScene> mGraphicsScene;
-  QScopedPointer<Symbol> mSymbol;
+  std::unique_ptr<Symbol> mSymbol;
   QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
 
   /// Broken interface detection

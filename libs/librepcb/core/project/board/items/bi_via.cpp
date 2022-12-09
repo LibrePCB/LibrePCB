@@ -37,29 +37,11 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Via::BI_Via(BI_NetSegment& netsegment, const BI_Via& other)
-  : BI_Base(netsegment.getBoard()),
-    mVia(Uuid::createRandom(), other.mVia),
-    mNetSegment(netsegment) {
-  init();
-}
-
 BI_Via::BI_Via(BI_NetSegment& netsegment, const Via& via)
-  : BI_Base(netsegment.getBoard()), mVia(via), mNetSegment(netsegment) {
-  init();
-}
-
-BI_Via::BI_Via(BI_NetSegment& netsegment, const SExpression& node,
-               const Version& fileFormat)
   : BI_Base(netsegment.getBoard()),
-    mVia(node, fileFormat),
-    mNetSegment(netsegment) {
-  init();
-}
-
-void BI_Via::init() {
-  // create the graphics item
-  mGraphicsItem.reset(new BGI_Via(*this));
+    mVia(via),
+    mNetSegment(netsegment),
+    mGraphicsItem(new BGI_Via(*this)) {
   mGraphicsItem->setPos(mVia.getPosition().toPxQPointF());
 
   // connect to the "attributes changed" signal of the board
@@ -166,10 +148,6 @@ void BI_Via::unregisterNetLine(BI_NetLine& netline) {
   mRegisteredNetLines.remove(&netline);
   netline.updateLine();
   mGraphicsItem->updateCacheAndRepaint();
-}
-
-void BI_Via::serialize(SExpression& root) const {
-  mVia.serialize(root);
 }
 
 /*******************************************************************************

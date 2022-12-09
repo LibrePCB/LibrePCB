@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/junction.h"
-#include "../../../serialization/serializableobject.h"
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/bgi_netpoint.h"
 #include "./bi_netline.h"
@@ -46,7 +45,6 @@ namespace librepcb {
  */
 class BI_NetPoint final : public BI_Base,
                           public BI_NetLineAnchor,
-                          public SerializableObject,
                           public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(BI_NetPoint)
@@ -55,9 +53,7 @@ public:
   // Constructors / Destructor
   BI_NetPoint() = delete;
   BI_NetPoint(const BI_NetPoint& other) = delete;
-  BI_NetPoint(BI_NetSegment& segment, const SExpression& node,
-              const Version& fileFormat);
-  BI_NetPoint(BI_NetSegment& segment, const Point& position);
+  BI_NetPoint(BI_NetSegment& segment, const Uuid& uuid, const Point& position);
   ~BI_NetPoint() noexcept;
 
   // Getters
@@ -75,9 +71,6 @@ public:
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::NetPoint; }
@@ -100,8 +93,6 @@ public:
   bool operator!=(const BI_NetPoint& rhs) noexcept { return (this != &rhs); }
 
 private:
-  void init();
-
   // General
   QScopedPointer<BGI_NetPoint> mGraphicsItem;
   QMetaObject::Connection mHighlightChangedConnection;

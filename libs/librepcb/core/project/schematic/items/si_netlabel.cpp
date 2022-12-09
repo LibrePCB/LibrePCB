@@ -41,23 +41,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const SExpression& node,
-                         const Version& fileFormat)
-  : SI_Base(segment.getSchematic()),
-    mNetSegment(segment),
-    mNetLabel(node, fileFormat) {
-  init();
-}
-
-SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const Point& position,
-                         const Angle& rotation, const bool mirrored)
-  : SI_Base(segment.getSchematic()),
-    mNetSegment(segment),
-    mNetLabel(Uuid::createRandom(), position, rotation, mirrored) {
-  init();
-}
-
-void SI_NetLabel::init() {
+SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const NetLabel& label)
+  : SI_Base(segment.getSchematic()), mNetSegment(segment), mNetLabel(label) {
   // create the graphics item
   mGraphicsItem.reset(new SGI_NetLabel(*this));
   mGraphicsItem->setPos(mNetLabel.getPosition().toPxQPointF());
@@ -136,10 +121,6 @@ void SI_NetLabel::removeFromSchematic() {
   disconnect(mNameChangedConnection);
   disconnect(mHighlightChangedConnection);
   SI_Base::removeFromSchematic(mGraphicsItem.data());
-}
-
-void SI_NetLabel::serialize(SExpression& root) const {
-  mNetLabel.serialize(root);
 }
 
 /*******************************************************************************

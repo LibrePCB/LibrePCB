@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/netline.h"
-#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/sgi_netline.h"
 #include "si_base.h"
 
@@ -62,17 +61,16 @@ public:
 /**
  * @brief The SI_NetLine class
  */
-class SI_NetLine final : public SI_Base, public SerializableObject {
+class SI_NetLine final : public SI_Base {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   SI_NetLine() = delete;
   SI_NetLine(const SI_NetLine& other) = delete;
-  SI_NetLine(SI_NetSegment& segment, const SExpression& node,
-             const Version& fileFormat);
-  SI_NetLine(SI_NetSegment& segment, SI_NetLineAnchor& startPoint,
-             SI_NetLineAnchor& endPoint, const UnsignedLength& width);
+  SI_NetLine(SI_NetSegment& segment, const Uuid& uuid,
+             SI_NetLineAnchor& startPoint, SI_NetLineAnchor& endPoint,
+             const UnsignedLength& width);
   ~SI_NetLine() noexcept;
 
   // Getters
@@ -96,9 +94,6 @@ public:
   void removeFromSchematic() override;
   void updateLine() noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::NetLine; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
@@ -108,9 +103,6 @@ public:
   SI_NetLine& operator=(const SI_NetLine& rhs) = delete;
 
 private:
-  void init();
-  SI_NetLineAnchor* getAnchor(const NetLineAnchor& anchor);
-
   // General
   SI_NetSegment& mNetSegment;
   NetLine mNetLine;

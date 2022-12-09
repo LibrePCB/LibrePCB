@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "netlabel.h"
 
-#include "../types/version.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -57,15 +55,12 @@ NetLabel::NetLabel(const Uuid& uuid, const Point& position,
     mMirrored(mirrored) {
 }
 
-NetLabel::NetLabel(const SExpression& node, const Version& fileFormat)
+NetLabel::NetLabel(const SExpression& node)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mPosition(node.getChild("position"), fileFormat),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
-    mMirrored(false) {
-  if (fileFormat >= Version::fromString("0.2")) {
-    mMirrored = deserialize<bool>(node.getChild("mirror/@0"), fileFormat);
-  }
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mPosition(node.getChild("position")),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
+    mMirrored(deserialize<bool>(node.getChild("mirror/@0"))) {
 }
 
 NetLabel::~NetLabel() noexcept {
@@ -122,7 +117,7 @@ bool NetLabel::setMirrored(const bool mirrored) noexcept {
 void NetLabel::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("mirror", mMirrored);
   root.ensureLineBreak();

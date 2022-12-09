@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../serialization/serializableobject.h"
 #include "../../types/elementname.h"
 #include "../../types/length.h"
 #include "../../types/ratio.h"
@@ -42,14 +41,14 @@ namespace librepcb {
 /**
  * @brief The BoardDesignRules class
  */
-class BoardDesignRules final : public SerializableObject {
+class BoardDesignRules final {
   Q_DECLARE_TR_FUNCTIONS(BoardDesignRules)
 
 public:
   // Constructors / Destructor
   BoardDesignRules() noexcept;
   BoardDesignRules(const BoardDesignRules& other);
-  BoardDesignRules(const SExpression& node, const Version& fileFormat);
+  explicit BoardDesignRules(const SExpression& node);
   ~BoardDesignRules() noexcept;
 
   // Getters : General Attributes
@@ -137,8 +136,12 @@ public:
   // General Methods
   void restoreDefaults() noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Helper Methods
   bool doesViaRequireStopMask(const Length& drillDia) const noexcept;

@@ -30,7 +30,6 @@
 #include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/library/pkg/packagepad.h>
-#include <librepcb/core/serialization/serializableobject.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -53,7 +52,7 @@ namespace editor {
 /**
  * @brief The FootprintClipboardData class
  */
-class FootprintClipboardData final : public SerializableObject {
+class FootprintClipboardData final {
 public:
   // Constructors / Destructor
   FootprintClipboardData() = delete;
@@ -61,7 +60,7 @@ public:
   FootprintClipboardData(const Uuid& footprintUuid,
                          const PackagePadList& packagePads,
                          const Point& cursorPos) noexcept;
-  FootprintClipboardData(const SExpression& node, const Version& fileFormat);
+  explicit FootprintClipboardData(const SExpression& node);
   ~FootprintClipboardData() noexcept;
 
   // Getters
@@ -95,9 +94,6 @@ public:
   FootprintClipboardData& operator=(const FootprintClipboardData& rhs) = delete;
 
 private:  // Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   QPixmap generatePixmap(const IF_GraphicsLayerProvider& lp) noexcept;
   static QString getMimeType() noexcept;
 

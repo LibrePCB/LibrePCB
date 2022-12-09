@@ -83,8 +83,9 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
                              mCategoriesEditorWidget.data());
 
   // Load element.
-  mComponent.reset(new Component(std::unique_ptr<TransactionalDirectory>(
-      new TransactionalDirectory(mFileSystem))));  // can throw
+  mComponent.reset(Component::open(std::unique_ptr<TransactionalDirectory>(
+                                       new TransactionalDirectory(mFileSystem)))
+                       .release());  // can throw
   mUi->signalEditorWidget->setReferences(mUndoStack.data(),
                                          &mComponent->getSignals());
   mUi->symbolVariantsEditorWidget->setReferences(

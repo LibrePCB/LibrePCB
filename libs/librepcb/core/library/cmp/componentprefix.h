@@ -108,10 +108,8 @@ inline SExpression serialize(const ComponentPrefix& obj) {
 }
 
 template <>
-inline ComponentPrefix deserialize(const SExpression& sexpr,
-                                   const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return ComponentPrefix(sexpr.getValue());  // can throw
+inline ComponentPrefix deserialize(const SExpression& node) {
+  return ComponentPrefix(node.getValue());  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

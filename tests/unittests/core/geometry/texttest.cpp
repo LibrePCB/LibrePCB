@@ -20,10 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
 #include <librepcb/core/geometry/text.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 /*******************************************************************************
  *  Namespace
@@ -41,32 +40,13 @@ class TextTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(TextTest, testConstructFromSExpressionV01) {
-  // Attention: Do NOT modify this string! It represents the freezed(!) file
-  // format V0.1 and even current versions of LibrePCB must be able to load it!
+TEST_F(TextTest, testConstructFromSExpression) {
   SExpression sexpr = SExpression::parse(
       "(text eabf43fb-496b-4dc8-8ff7-ffac67991390 (layer sym_names) "
       "(value \"{{NAME}}\") (align center bottom) (height 2.54) "
       "(position 1.234 2.345) (rotation 45.0))",
       FilePath());
-  Text obj(sexpr, Version::fromString("0.1"));
-  EXPECT_EQ(Uuid::fromString("eabf43fb-496b-4dc8-8ff7-ffac67991390"),
-            obj.getUuid());
-  EXPECT_EQ(GraphicsLayerName("sym_names"), obj.getLayerName());
-  EXPECT_EQ("{{NAME}}", obj.getText());
-  EXPECT_EQ(Alignment(HAlign::center(), VAlign::bottom()), obj.getAlign());
-  EXPECT_EQ(PositiveLength(2540000), obj.getHeight());
-  EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
-  EXPECT_EQ(Angle::deg45(), obj.getRotation());
-}
-
-TEST_F(TextTest, testConstructFromSExpressionCurrentVersion) {
-  SExpression sexpr = SExpression::parse(
-      "(text eabf43fb-496b-4dc8-8ff7-ffac67991390 (layer sym_names) "
-      "(value \"{{NAME}}\") (align center bottom) (height 2.54) "
-      "(position 1.234 2.345) (rotation 45.0))",
-      FilePath());
-  Text obj(sexpr, qApp->getFileFormatVersion());
+  Text obj(sexpr);
   EXPECT_EQ(Uuid::fromString("eabf43fb-496b-4dc8-8ff7-ffac67991390"),
             obj.getUuid());
   EXPECT_EQ(GraphicsLayerName("sym_names"), obj.getLayerName());
@@ -81,10 +61,12 @@ TEST_F(TextTest, testSerializeAndDeserialize) {
   Text obj1(Uuid::createRandom(), GraphicsLayerName("foo"), "foo bar",
             Point(12, 34), Angle(56), PositiveLength(78),
             Alignment(HAlign::right(), VAlign::center()));
-  SExpression sexpr1 = obj1.serializeToDomElement("text");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
-  Text obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("text");
+  Text obj2(sexpr1);
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

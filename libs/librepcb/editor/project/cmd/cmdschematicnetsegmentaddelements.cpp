@@ -59,7 +59,8 @@ SI_NetPoint* CmdSchematicNetSegmentAddElements::addNetPoint(
 
 SI_NetPoint* CmdSchematicNetSegmentAddElements::addNetPoint(
     const Point& position) {
-  SI_NetPoint* netpoint = new SI_NetPoint(mNetSegment, position);  // can throw
+  SI_NetPoint* netpoint = new SI_NetPoint(mNetSegment, Uuid::createRandom(),
+                                          position);  // can throw
   return addNetPoint(*netpoint);
 }
 
@@ -70,8 +71,9 @@ SI_NetLine* CmdSchematicNetSegmentAddElements::addNetLine(SI_NetLine& netline) {
 
 SI_NetLine* CmdSchematicNetSegmentAddElements::addNetLine(
     SI_NetLineAnchor& startPoint, SI_NetLineAnchor& endPoint) {
-  SI_NetLine* netline = new SI_NetLine(mNetSegment, startPoint, endPoint,
-                                       UnsignedLength(158750));  // can throw
+  SI_NetLine* netline =
+      new SI_NetLine(mNetSegment, Uuid::createRandom(), startPoint, endPoint,
+                     UnsignedLength(158750));  // can throw
   return addNetLine(*netline);
 }
 

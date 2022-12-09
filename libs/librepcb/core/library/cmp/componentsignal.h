@@ -42,7 +42,7 @@ namespace librepcb {
 /**
  * @brief The ComponentSignal class represents one signal of a component
  */
-class ComponentSignal final : public SerializableObject {
+class ComponentSignal final {
 public:
   // Signals
   enum class Event {
@@ -63,7 +63,7 @@ public:
   ComponentSignal(const Uuid& uuid, const CircuitIdentifier& name,
                   const SignalRole& role, const QString& forcedNetName,
                   bool isRequired, bool isNegated, bool isClock) noexcept;
-  ComponentSignal(const SExpression& node, const Version& fileFormat);
+  explicit ComponentSignal(const SExpression& node);
   ~ComponentSignal() noexcept;
 
   // Getters
@@ -88,8 +88,12 @@ public:
 
   // General Methods
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const ComponentSignal& rhs) const noexcept;

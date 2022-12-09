@@ -84,9 +84,10 @@ bool CmdComponentInstanceAdd::performExecute() {
         mCircuit.getProject().getSettings().getNormOrder();
     QString name = mCircuit.generateAutoComponentInstanceName(
         cmp->getPrefixes().value(normOrder));
-    mComponentInstance = new ComponentInstance(
-        mCircuit, *cmp, mSymbVarUuid, CircuitIdentifier(name),
-        mDefaultDeviceUuid);  // can throw
+    mComponentInstance =
+        new ComponentInstance(mCircuit, Uuid::createRandom(), *cmp,
+                              mSymbVarUuid, CircuitIdentifier(name),
+                              mDefaultDeviceUuid);  // can throw
   }
 
   performRedo();  // can throw

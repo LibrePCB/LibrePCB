@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../../geometry/path.h"
 #include "../../../geometry/via.h"
-#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/bgi_via.h"
 #include "./bi_netline.h"
 #include "bi_base.h"
@@ -44,19 +43,14 @@ namespace librepcb {
 /**
  * @brief The BI_Via class
  */
-class BI_Via final : public BI_Base,
-                     public BI_NetLineAnchor,
-                     public SerializableObject {
+class BI_Via final : public BI_Base, public BI_NetLineAnchor {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   BI_Via() = delete;
   BI_Via(const BI_Via& other) = delete;
-  BI_Via(BI_NetSegment& netsegment, const BI_Via& other);
   BI_Via(BI_NetSegment& netsegment, const Via& via);
-  BI_Via(BI_NetSegment& netsegment, const SExpression& node,
-         const Version& fileFormat);
   ~BI_Via() noexcept;
 
   // Getters
@@ -83,9 +77,6 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::Via; }
   const Point& getPosition() const noexcept override {
@@ -107,7 +98,6 @@ public:
   bool operator!=(const BI_Via& rhs) noexcept { return (this != &rhs); }
 
 private:
-  void init();
   void boardOrNetAttributesChanged();
 
   // General

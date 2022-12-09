@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "device.h"
 
-#include "../../serialization/sexpression.h"
+#include "../../serialization/fileformatmigration.h"
 #include "devicecheck.h"
 
 #include <QtCore>
@@ -48,16 +48,14 @@ Device::Device(const Uuid& uuid, const Version& version, const QString& author,
     mPadSignalMap() {
 }
 
-Device::Device(std::unique_ptr<TransactionalDirectory> directory)
-  : LibraryElement(std::move(directory), getShortElementName(),
-                   getLongElementName()),
-    mComponentUuid(deserialize<Uuid>(
-        mLoadingFileDocument.getChild("component/@0"), mLoadingFileFormat)),
-    mPackageUuid(deserialize<Uuid>(mLoadingFileDocument.getChild("package/@0"),
-                                   mLoadingFileFormat)),
-    mAttributes(mLoadingFileDocument, mLoadingFileFormat),
-    mPadSignalMap(mLoadingFileDocument, mLoadingFileFormat) {
-  cleanupAfterLoadingElementFromFile();
+Device::Device(std::unique_ptr<TransactionalDirectory> directory,
+               const SExpression& root)
+  : LibraryElement(getShortElementName(), getLongElementName(), true,
+                   std::move(directory), root),
+    mComponentUuid(deserialize<Uuid>(root.getChild("component/@0"))),
+    mPackageUuid(deserialize<Uuid>(root.getChild("package/@0"))),
+    mAttributes(root),
+    mPadSignalMap(root) {
 }
 
 Device::~Device() noexcept {
@@ -88,8 +86,26 @@ LibraryElementCheckMessageList Device::runChecks() const {
   return check.runChecks();  // can throw
 }
 
+std::unique_ptr<Device> Device::open(
+    std::unique_ptr<TransactionalDirectory> directory) {
+  Q_ASSERT(directory);
+
+  // Upgrade file format, if needed.
+  const Version fileFormat =
+      readFileFormat(*directory, ".librepcb-" % getShortElementName());
+  for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
+    migration->upgradeDevice(*directory);
+  }
+
+  // Load element.
+  const QString fileName = getLongElementName() % ".lp";
+  const SExpression root = SExpression::parse(directory->read(fileName),
+                                              directory->getAbsPath(fileName));
+  return std::unique_ptr<Device>(new Device(std::move(directory), root));
+}
+
 /*******************************************************************************
- *  Private Methods
+ *  Protected Methods
  ******************************************************************************/
 
 void Device::serialize(SExpression& root) const {

@@ -44,51 +44,23 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_Symbol::SI_Symbol(Schematic& schematic, const SExpression& node,
-                     const Version& fileFormat)
+SI_Symbol::SI_Symbol(Schematic& schematic, const Uuid& uuid,
+                     ComponentInstance& cmpInstance, const Uuid& symbolItem,
+                     const Point& position, const Angle& rotation,
+                     bool mirrored)
   : SI_Base(schematic),
-    mComponentInstance(nullptr),
-    mSymbVarItem(nullptr),
-    mSymbol(nullptr),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mPosition(node.getChild("position"), fileFormat),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
-    mMirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)) {
-  Uuid gcUuid = deserialize<Uuid>(node.getChild("component/@0"), fileFormat);
-  mComponentInstance =
-      schematic.getProject().getCircuit().getComponentInstanceByUuid(gcUuid);
-  if (!mComponentInstance) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString("No component with the UUID \"%1\" found in the circuit!")
-            .arg(gcUuid.toStr()));
-  }
-  Uuid symbVarItemUuid =
-      deserialize<Uuid>(node.getChild("lib_gate/@0"), fileFormat);
-  init(symbVarItemUuid);
-}
-
-SI_Symbol::SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
-                     const Uuid& symbolItem, const Point& position,
-                     const Angle& rotation, bool mirrored)
-  : SI_Base(schematic),
-    mComponentInstance(&cmpInstance),
-    mSymbVarItem(nullptr),
-    mSymbol(nullptr),
-    mUuid(Uuid::createRandom()),
+    mComponentInstance(cmpInstance),
+    mSymbVarItem(mComponentInstance.getSymbolVariant()
+                     .getSymbolItems()
+                     .get(symbolItem)
+                     .get()),  // can throw
+    mSymbol(mSchematic.getProject().getLibrary().getSymbol(
+        mSymbVarItem->getSymbolUuid())),
+    mUuid(uuid),
     mPosition(position),
     mRotation(rotation),
     mMirrored(mirrored) {
-  init(symbolItem);
-}
-
-void SI_Symbol::init(const Uuid& symbVarItemUuid) {
-  mSymbVarItem = mComponentInstance->getSymbolVariant()
-                     .getSymbolItems()
-                     .get(symbVarItemUuid)
-                     .get();  // can throw
-  mSymbol = mSchematic.getProject().getLibrary().getSymbol(
-      mSymbVarItem->getSymbolUuid());
+  Q_ASSERT(mSymbVarItem);
   if (!mSymbol) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("No symbol with the UUID \"%1\" found in the "
@@ -119,10 +91,8 @@ void SI_Symbol::init(const Uuid& symbVarItemUuid) {
 
   // connect to the "attributes changes" signal of schematic and component
   // instance
-  connect(mComponentInstance, &ComponentInstance::attributesChanged, this,
+  connect(&mComponentInstance, &ComponentInstance::attributesChanged, this,
           [this]() { mGraphicsItem->updateAllTexts(); });
-
-  if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 SI_Symbol::~SI_Symbol() noexcept {
@@ -137,9 +107,9 @@ SI_Symbol::~SI_Symbol() noexcept {
 
 QString SI_Symbol::getName() const noexcept {
   if (mSymbVarItem->getSuffix()->isEmpty()) {
-    return *mComponentInstance->getName();
+    return *mComponentInstance.getName();
   } else {
-    return mComponentInstance->getName() % "-" % mSymbVarItem->getSuffix();
+    return mComponentInstance.getName() % "-" % mSymbVarItem->getSuffix();
   }
 }
 
@@ -184,8 +154,8 @@ void SI_Symbol::addToSchematic() {
     throw LogicError(__FILE__, __LINE__);
   }
   ScopeGuardList sgl(mPins.count() + 1);
-  mComponentInstance->registerSymbol(*this);  // can throw
-  sgl.add([&]() { mComponentInstance->unregisterSymbol(*this); });
+  mComponentInstance.registerSymbol(*this);  // can throw
+  sgl.add([&]() { mComponentInstance.unregisterSymbol(*this); });
   foreach (SI_SymbolPin* pin, mPins) {
     pin->addToSchematic();  // can throw
     sgl.add([pin]() { pin->removeFromSchematic(); });
@@ -203,8 +173,8 @@ void SI_Symbol::removeFromSchematic() {
     pin->removeFromSchematic();  // can throw
     sgl.add([pin]() { pin->addToSchematic(); });
   }
-  mComponentInstance->unregisterSymbol(*this);  // can throw
-  sgl.add([&]() { mComponentInstance->registerSymbol(*this); });
+  mComponentInstance.unregisterSymbol(*this);  // can throw
+  sgl.add([&]() { mComponentInstance.registerSymbol(*this); });
   SI_Base::removeFromSchematic(mGraphicsItem.data());
   sgl.dismiss();
 }
@@ -214,11 +184,11 @@ void SI_Symbol::serialize(SExpression& root) const {
 
   root.appendChild(mUuid);
   root.ensureLineBreak();
-  root.appendChild("component", mComponentInstance->getUuid());
+  root.appendChild("component", mComponentInstance.getUuid());
   root.ensureLineBreak();
   root.appendChild("lib_gate", mSymbVarItem->getUuid());
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("mirror", mMirrored);
   root.ensureLineBreak();
@@ -238,7 +208,7 @@ QString SI_Symbol::getBuiltInAttributeValue(const QString& key) const noexcept {
 
 QVector<const AttributeProvider*> SI_Symbol::getAttributeProviderParents() const
     noexcept {
-  return QVector<const AttributeProvider*>{&mSchematic, mComponentInstance};
+  return QVector<const AttributeProvider*>{&mSchematic, &mComponentInstance};
 }
 
 /*******************************************************************************
@@ -262,7 +232,6 @@ void SI_Symbol::setSelected(bool selected) noexcept {
 bool SI_Symbol::checkAttributesValidity() const noexcept {
   if (mSymbVarItem == nullptr) return false;
   if (mSymbol == nullptr) return false;
-  if (mComponentInstance == nullptr) return false;
   return true;
 }
 

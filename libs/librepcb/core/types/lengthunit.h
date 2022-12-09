@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../serialization/sexpression.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -328,18 +326,6 @@ private:
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
-
-template <>
-inline SExpression serialize(const LengthUnit& obj) {
-  return SExpression::createToken(obj.toStr());
-}
-
-template <>
-inline LengthUnit deserialize(const SExpression& sexpr,
-                              const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return LengthUnit::fromString(sexpr.getValue());  // can throw
-}
 
 inline QDataStream& operator<<(QDataStream& stream, const LengthUnit& unit) {
   stream << unit.toStr();

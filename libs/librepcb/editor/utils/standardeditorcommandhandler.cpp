@@ -27,6 +27,8 @@
 #include "../workspace/desktopservices.h"
 #include "shortcutsreferencegenerator.h"
 
+#include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>

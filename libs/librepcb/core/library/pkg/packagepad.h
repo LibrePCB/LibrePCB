@@ -44,7 +44,7 @@ namespace librepcb {
  * therefore never be changed:
  *  - UUID
  */
-class PackagePad final : public SerializableObject {
+class PackagePad final {
   Q_DECLARE_TR_FUNCTIONS(PackagePad)
 
 public:
@@ -60,7 +60,7 @@ public:
   PackagePad() = delete;
   PackagePad(const PackagePad& other) noexcept;
   PackagePad(const Uuid& uuid, const CircuitIdentifier& name) noexcept;
-  PackagePad(const SExpression& node, const Version& fileFormat);
+  explicit PackagePad(const SExpression& node);
   ~PackagePad() noexcept;
 
   // Getters
@@ -72,8 +72,12 @@ public:
 
   // General Methods
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const PackagePad& rhs) const noexcept;

@@ -29,6 +29,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -62,7 +64,6 @@ public:
   Package(const Uuid& uuid, const Version& version, const QString& author,
           const ElementName& name_en_US, const QString& description_en_US,
           const QString& keywords_en_US);
-  explicit Package(std::unique_ptr<TransactionalDirectory> directory);
   ~Package() noexcept;
 
   // Getters
@@ -78,6 +79,8 @@ public:
   Package& operator=(const Package& rhs) = delete;
 
   // Static Methods
+  static std::unique_ptr<Package> open(
+      std::unique_ptr<TransactionalDirectory> directory);
   static QString getShortElementName() noexcept {
     return QStringLiteral("pkg");
   }
@@ -85,9 +88,12 @@ public:
     return QStringLiteral("package");
   }
 
+protected:  // Methods
+  virtual void serialize(SExpression& root) const override;
+
 private:  // Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  Package(std::unique_ptr<TransactionalDirectory> directory,
+          const SExpression& root);
 
 private:  // Data
   PackagePadList mPads;  ///< empty list if the package has no pads

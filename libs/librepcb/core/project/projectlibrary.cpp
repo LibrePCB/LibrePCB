@@ -22,15 +22,11 @@
  ******************************************************************************/
 #include "projectlibrary.h"
 
-#include "../application.h"
-#include "../exceptions.h"
-#include "../fileio/filepath.h"
 #include "../fileio/transactionalfilesystem.h"
 #include "../library/cmp/component.h"
 #include "../library/dev/device.h"
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
-#include "project.h"
 
 #include <QtCore>
 
@@ -46,28 +42,11 @@ namespace librepcb {
 ProjectLibrary::ProjectLibrary(
     std::unique_ptr<TransactionalDirectory> directory)
   : mDirectory(std::move(directory)) {
-  qDebug() << "Load project library...";
-
-  try {
-    // Load all library elements
-    loadElements<Symbol>("sym", "symbols", mSymbols);
-    loadElements<Package>("pkg", "packages", mPackages);
-    loadElements<Component>("cmp", "components", mComponents);
-    loadElements<Device>("dev", "devices", mDevices);
-  } catch (const Exception&) {
-    qDeleteAll(mAllElements);
-    mAllElements.clear();
-    throw;
-  }
-
-  qDebug() << "Successfully loaded project library.";
 }
 
 ProjectLibrary::~ProjectLibrary() noexcept {
-  // Delete all library elements.
   qDeleteAll(mAllElements);
   mAllElements.clear();
-  mElementsToUpgrade.clear();
 }
 
 /*******************************************************************************
@@ -122,55 +101,8 @@ void ProjectLibrary::removeDevice(Device& d) {
 }
 
 /*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void ProjectLibrary::save() {
-  // Save library elements to enforce a file format upgrade, but only once for
-  // optimal performance.
-  foreach (LibraryBaseElement* element, mElementsToUpgrade) {
-    element->save();  // can throw
-    mElementsToUpgrade.remove(element);
-  }
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-template <typename ElementType>
-void ProjectLibrary::loadElements(const QString& dirname, const QString& type,
-                                  QHash<Uuid, ElementType*>& elementList) {
-  // search all subdirectories which have a valid UUID as directory name
-  foreach (const QString& sub, mDirectory->getDirs(dirname)) {
-    std::unique_ptr<TransactionalDirectory> dir(
-        new TransactionalDirectory(*mDirectory, dirname % "/" % sub));
-
-    // check if directory is a valid library element
-    if (!LibraryBaseElement::isValidElementDirectory<ElementType>(*dir, "")) {
-      qWarning() << "Invalid directory in project library, ignoring it:"
-                 << dir->getAbsPath().toNative();
-      continue;
-    }
-
-    // load the library element
-    QScopedPointer<ElementType> element(
-        new ElementType(std::move(dir)));  // can throw
-    if (elementList.contains(element->getUuid())) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         QString("There are multiple %1 with the UUID \"%2\"")
-                             .arg(type, element->getUuid().toStr()));
-    }
-
-    // everything is ok -> update members
-    elementList.insert(element->getUuid(), element.data());
-    mElementsToUpgrade.insert(element.data());
-    mAllElements.insert(element.take());  // Take object from smart pointer!
-  }
-
-  qDebug().nospace() << "Successfully loaded " << elementList.count() << " "
-                     << qPrintable(type) << ".";
-}
 
 template <typename ElementType>
 void ProjectLibrary::addElement(ElementType& element,
@@ -181,8 +113,16 @@ void ProjectLibrary::addElement(ElementType& element,
                              "UUID in the project's library: %1")
                          .arg(element.getUuid().toStr()));
   }
-  TransactionalDirectory dir(*mDirectory, element.getShortElementName());
-  element.saveIntoParentDirectory(dir);  // can throw
+
+  // Copy files, if necessary. In any case, the file format will be upgraded
+  // as well.
+  if (element.getDirectory().getFileSystem() != mDirectory->getFileSystem()) {
+    TransactionalDirectory dir(*mDirectory, element.getShortElementName());
+    element.saveIntoParentDirectory(dir);  // can throw
+  } else {
+    element.save();  // can throw
+  }
+
   elementList.insert(element.getUuid(), &element);
   mAllElements.insert(&element);
 }
@@ -192,9 +132,8 @@ void ProjectLibrary::removeElement(ElementType& element,
                                    QHash<Uuid, ElementType*>& elementList) {
   Q_ASSERT(elementList.value(element.getUuid()) == &element);
   Q_ASSERT(mAllElements.contains(&element));
-  TransactionalDirectory dir(
-      TransactionalFileSystem::openRW(FilePath::getRandomTempPath()));
-  element.moveIntoParentDirectory(dir);  // can throw
+  TransactionalDirectory tmpDir;
+  element.moveIntoParentDirectory(tmpDir);  // can throw
   elementList.remove(element.getUuid());
 }
 

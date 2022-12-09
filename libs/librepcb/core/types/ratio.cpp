@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "ratio.h"
 
+#include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
 #include <QtCore>
@@ -63,6 +64,28 @@ Ratio Ratio::fromNormalized(const QString& normalized) {
 
 qint32 Ratio::normalizedStringToPpm(const QString& normalized) {
   return Toolbox::decimalFixedPointFromString<qint32>(normalized, 6);
+}
+
+// Non-Member Functions
+
+template <>
+SExpression serialize(const Ratio& obj) {
+  return SExpression::createToken(obj.toNormalizedString());
+}
+
+template <>
+SExpression serialize(const UnsignedRatio& obj) {
+  return serialize(*obj);
+}
+
+template <>
+Ratio deserialize(const SExpression& node) {
+  return Ratio::fromNormalized(node.getValue());
+}
+
+template <>
+UnsignedRatio deserialize(const SExpression& node) {
+  return UnsignedRatio(deserialize<Ratio>(node));  // can throw
 }
 
 /*******************************************************************************

@@ -39,18 +39,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_Text::SI_Text(Schematic& schematic, const SExpression& node,
-                 const Version& fileFormat)
-  : SI_Base(schematic), mText(node, fileFormat) {
-  init();
-}
-
 SI_Text::SI_Text(Schematic& schematic, const Text& text)
   : SI_Base(schematic), mText(text) {
-  init();
-}
-
-void SI_Text::init() {
   // Create the graphics item.
   mGraphicsItem.reset(
       new TextGraphicsItem(mText, mSchematic.getProject().getLayers()));
@@ -82,10 +72,6 @@ void SI_Text::removeFromSchematic() {
     throw LogicError(__FILE__, __LINE__);
   }
   SI_Base::removeFromSchematic(mGraphicsItem.data());
-}
-
-void SI_Text::serialize(SExpression& root) const {
-  mText.serialize(root);
 }
 
 /*******************************************************************************

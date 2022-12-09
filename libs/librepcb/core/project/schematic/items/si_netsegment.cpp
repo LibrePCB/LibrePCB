@@ -46,81 +46,9 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_NetSegment::SI_NetSegment(Schematic& schematic, const SExpression& node,
-                             const Version& fileFormat)
-  : SI_Base(schematic),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mNetSignal(nullptr) {
-  try {
-    Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"), fileFormat);
-    mNetSignal =
-        mSchematic.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
-    if (!mNetSignal) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         QString("Invalid net signal UUID: \"%1\"")
-                             .arg(netSignalUuid.toStr()));
-    }
-
-    // Load all netpoints
-    foreach (const SExpression& child, node.getChildren("junction")) {
-      SI_NetPoint* netpoint = new SI_NetPoint(*this, child, fileFormat);
-      if (getNetPointByUuid(netpoint->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a netpoint with the UUID \"%1\"!")
-                .arg(netpoint->getUuid().toStr()));
-      }
-      mNetPoints.append(netpoint);
-    }
-
-    // Load all netlines
-    foreach (const SExpression& child,
-             node.getChildren("netline") + node.getChildren("line")) {
-      SI_NetLine* netline = new SI_NetLine(*this, child, fileFormat);
-      if (getNetLineByUuid(netline->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a netline with the UUID \"%1\"!")
-                .arg(netline->getUuid().toStr()));
-      }
-      mNetLines.append(netline);
-    }
-
-    // Load all netlabels
-    foreach (const SExpression& child,
-             node.getChildren("netlabel") + node.getChildren("label")) {
-      SI_NetLabel* netlabel = new SI_NetLabel(*this, child, fileFormat);
-      if (getNetLabelByUuid(netlabel->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a netlabel with the UUID \"%1\"!")
-                .arg(netlabel->getUuid().toStr()));
-      }
-      mNetLabels.append(netlabel);
-    }
-
-    if (!areAllNetPointsConnectedTogether()) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString("The netsegment with the UUID \"%1\" is not cohesive!")
-              .arg(mUuid.toStr()));
-    }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-  } catch (...) {
-    // free the allocated memory in the reverse order of their allocation...
-    qDeleteAll(mNetLabels);
-    mNetLabels.clear();
-    qDeleteAll(mNetLines);
-    mNetLines.clear();
-    qDeleteAll(mNetPoints);
-    mNetPoints.clear();
-    throw;  // ...and rethrow the exception
-  }
-}
-
-SI_NetSegment::SI_NetSegment(Schematic& schematic, NetSignal& signal)
-  : SI_Base(schematic), mUuid(Uuid::createRandom()), mNetSignal(&signal) {
+SI_NetSegment::SI_NetSegment(Schematic& schematic, const Uuid& uuid,
+                             NetSignal& signal)
+  : SI_Base(schematic), mUuid(uuid), mNetSignal(&signal) {
 }
 
 SI_NetSegment::~SI_NetSegment() noexcept {
@@ -171,12 +99,12 @@ QString SI_NetSegment::getForcedNetName() const noexcept {
 Point SI_NetSegment::calcNearestPoint(const Point& p) const noexcept {
   Point pos = p;
   Length dist;
-  for (int i = 0; i < mNetLines.count(); ++i) {
+  for (auto it = mNetLines.begin(); it != mNetLines.end(); it++) {
     Point lp;
     UnsignedLength ld = Toolbox::shortestDistanceBetweenPointAndLine(
-        p, mNetLines.at(i)->getStartPoint().getPosition(),
-        mNetLines.at(i)->getEndPoint().getPosition(), &lp);
-    if ((i == 0) || (ld < dist)) {
+        p, it.value()->getStartPoint().getPosition(),
+        it.value()->getEndPoint().getPosition(), &lp);
+    if ((it == mNetLines.begin()) || (ld < dist)) {
       dist = *ld;
       pos = lp;
     }
@@ -225,28 +153,6 @@ void SI_NetSegment::setNetSignal(NetSignal& netsignal) {
 }
 
 /*******************************************************************************
- *  NetPoint Methods
- ******************************************************************************/
-
-SI_NetPoint* SI_NetSegment::getNetPointByUuid(const Uuid& uuid) const noexcept {
-  foreach (SI_NetPoint* netpoint, mNetPoints) {
-    if (netpoint->getUuid() == uuid) return netpoint;
-  }
-  return nullptr;
-}
-
-/*******************************************************************************
- *  NetLine Methods
- ******************************************************************************/
-
-SI_NetLine* SI_NetSegment::getNetLineByUuid(const Uuid& uuid) const noexcept {
-  foreach (SI_NetLine* netline, mNetLines) {
-    if (netline->getUuid() == uuid) return netline;
-  }
-  return nullptr;
-}
-
-/*******************************************************************************
  *  NetPoint+NetLine Methods
  ******************************************************************************/
 
@@ -258,47 +164,44 @@ void SI_NetSegment::addNetPointsAndNetLines(
 
   ScopeGuardList sgl(netpoints.count() + netlines.count());
   foreach (SI_NetPoint* netpoint, netpoints) {
-    if ((mNetPoints.contains(netpoint)) ||
+    if ((mNetPoints.values().contains(netpoint)) ||
         (&netpoint->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
     }
-    // check if there is no netpoint with the same uuid in the list
-    if (getNetPointByUuid(netpoint->getUuid())) {
+    if (mNetPoints.contains(netpoint->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString("There is already a netpoint with the UUID \"%1\"!")
               .arg(netpoint->getUuid().toStr()));
     }
-    // add to schematic
     netpoint->addToSchematic();  // can throw
-    mNetPoints.append(netpoint);
+    mNetPoints.insert(netpoint->getUuid(), netpoint);
     sgl.add([this, netpoint]() {
       netpoint->removeFromSchematic();
-      mNetPoints.removeOne(netpoint);
+      mNetPoints.remove(netpoint->getUuid());
     });
   }
   foreach (SI_NetLine* netline, netlines) {
-    if ((mNetLines.contains(netline)) || (&netline->getNetSegment() != this)) {
+    if ((mNetLines.values().contains(netline)) ||
+        (&netline->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
     }
-    // check if there is no netline with the same uuid in the list
-    if (getNetLineByUuid(netline->getUuid())) {
+    if (mNetLines.contains(netline->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString("There is already a netline with the UUID \"%1\"!")
               .arg(netline->getUuid().toStr()));
     }
-    // add to schematic
     netline->addToSchematic();  // can throw
-    mNetLines.append(netline);
+    mNetLines.insert(netline->getUuid(), netline);
     sgl.add([this, netline]() {
       netline->removeFromSchematic();
-      mNetLines.removeOne(netline);
+      mNetLines.remove(netline->getUuid());
     });
   }
 
   if (!areAllNetPointsConnectedTogether()) {
-    throw LogicError(
+    throw RuntimeError(
         __FILE__, __LINE__,
         QString("The netsegment with the UUID \"%1\" is not cohesive!")
             .arg(mUuid.toStr()));
@@ -317,27 +220,25 @@ void SI_NetSegment::removeNetPointsAndNetLines(
 
   ScopeGuardList sgl(netpoints.count() + netlines.count());
   foreach (SI_NetLine* netline, netlines) {
-    if (!mNetLines.contains(netline)) {
+    if (mNetLines.value(netline->getUuid()) != netline) {
       throw LogicError(__FILE__, __LINE__);
     }
-    // remove from schematic
     netline->removeFromSchematic();  // can throw
-    mNetLines.removeOne(netline);
+    mNetLines.remove(netline->getUuid());
     sgl.add([this, netline]() {
       netline->addToSchematic();
-      mNetLines.append(netline);
+      mNetLines.insert(netline->getUuid(), netline);
     });
   }
   foreach (SI_NetPoint* netpoint, netpoints) {
-    if (!mNetPoints.contains(netpoint)) {
+    if (mNetPoints.value(netpoint->getUuid()) != netpoint) {
       throw LogicError(__FILE__, __LINE__);
     }
-    // remove from schematic
     netpoint->removeFromSchematic();  // can throw
-    mNetPoints.removeOne(netpoint);
+    mNetPoints.remove(netpoint->getUuid());
     sgl.add([this, netpoint]() {
       netpoint->addToSchematic();
-      mNetPoints.append(netpoint);
+      mNetPoints.insert(netpoint->getUuid(), netpoint);
     });
   }
 
@@ -357,37 +258,28 @@ void SI_NetSegment::removeNetPointsAndNetLines(
  *  NetLabel Methods
  ******************************************************************************/
 
-SI_NetLabel* SI_NetSegment::getNetLabelByUuid(const Uuid& uuid) const noexcept {
-  foreach (SI_NetLabel* netlabel, mNetLabels) {
-    if (netlabel->getUuid() == uuid) return netlabel;
-  }
-  return nullptr;
-}
-
 void SI_NetSegment::addNetLabel(SI_NetLabel& netlabel) {
-  if ((!isAddedToSchematic()) || (mNetLabels.contains(&netlabel)) ||
+  if ((!isAddedToSchematic()) || (mNetLabels.values().contains(&netlabel)) ||
       (&netlabel.getNetSegment() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no netlabel with the same uuid in the list
-  if (getNetLabelByUuid(netlabel.getUuid())) {
+  if (mNetLabels.contains(netlabel.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a netlabel with the UUID \"%1\"!")
             .arg(netlabel.getUuid().toStr()));
   }
-  // add to schematic
   netlabel.addToSchematic();  // can throw
-  mNetLabels.append(&netlabel);
+  mNetLabels.insert(netlabel.getUuid(), &netlabel);
 }
 
 void SI_NetSegment::removeNetLabel(SI_NetLabel& netlabel) {
-  if ((!isAddedToSchematic()) || (!mNetLabels.contains(&netlabel))) {
+  if ((!isAddedToSchematic()) ||
+      (mNetLabels.value(netlabel.getUuid()) != &netlabel)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // remove from schematic
   netlabel.removeFromSchematic();  // can throw
-  mNetLabels.removeOne(&netlabel);
+  mNetLabels.remove(netlabel.getUuid());
 }
 
 void SI_NetSegment::updateAllNetLabelAnchors() noexcept {
@@ -484,11 +376,20 @@ void SI_NetSegment::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("net", mNetSignal->getUuid());
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mNetPoints, "junction");
+  for (const SI_NetPoint* obj : mNetPoints) {
+    root.ensureLineBreak();
+    obj->getJunction().serialize(root.appendList("junction"));
+  }
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mNetLines, "line");
+  for (const SI_NetLine* obj : mNetLines) {
+    root.ensureLineBreak();
+    obj->getNetLine().serialize(root.appendList("line"));
+  }
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mNetLabels, "label");
+  for (const SI_NetLabel* obj : mNetLabels) {
+    root.ensureLineBreak();
+    obj->getNetLabel().serialize(root.appendList("label"));
+  }
   root.ensureLineBreak();
 }
 

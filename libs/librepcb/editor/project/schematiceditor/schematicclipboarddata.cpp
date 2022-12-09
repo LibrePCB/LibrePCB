@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "schematicclipboarddata.h"
 
-#include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/librarybaseelement.h>
@@ -58,14 +57,13 @@ SchematicClipboardData::SchematicClipboardData(const QByteArray& mimeData)
 
   SExpression root =
       SExpression::parse(mFileSystem->read("schematic.lp"), FilePath());
-  Version fileFormat = qApp->getFileFormatVersion();
-  mSchematicUuid = deserialize<Uuid>(root.getChild("schematic/@0"), fileFormat);
-  mCursorPos = Point(root.getChild("cursor_position"), fileFormat);
-  mComponentInstances.loadFromSExpression(root, fileFormat);
-  mSymbolInstances.loadFromSExpression(root, fileFormat);
-  mNetSegments.loadFromSExpression(root, fileFormat);
-  mPolygons.loadFromSExpression(root, fileFormat);
-  mTexts.loadFromSExpression(root, fileFormat);
+  mSchematicUuid = deserialize<Uuid>(root.getChild("schematic/@0"));
+  mCursorPos = Point(root.getChild("cursor_position"));
+  mComponentInstances.loadFromSExpression(root);
+  mSymbolInstances.loadFromSExpression(root);
+  mNetSegments.loadFromSExpression(root);
+  mPolygons.loadFromSExpression(root);
+  mTexts.loadFromSExpression(root);
 }
 
 SchematicClipboardData::~SchematicClipboardData() noexcept {
@@ -91,9 +89,23 @@ std::unique_ptr<TransactionalDirectory> SchematicClipboardData::getDirectory(
  ******************************************************************************/
 
 std::unique_ptr<QMimeData> SchematicClipboardData::toMimeData() const {
-  SExpression sexpr =
-      serializeToDomElement("librepcb_clipboard_schematic");  // can throw
-  mFileSystem->write("schematic.lp", sexpr.toByteArray());
+  SExpression root = SExpression::createList("librepcb_clipboard_schematic");
+  root.ensureLineBreak();
+  mCursorPos.serialize(root.appendList("cursor_position"));
+  root.ensureLineBreak();
+  root.appendChild("schematic", mSchematicUuid);
+  root.ensureLineBreak();
+  mComponentInstances.serialize(root);
+  root.ensureLineBreak();
+  mSymbolInstances.serialize(root);
+  root.ensureLineBreak();
+  mNetSegments.serialize(root);
+  root.ensureLineBreak();
+  mPolygons.serialize(root);
+  root.ensureLineBreak();
+  mTexts.serialize(root);
+  root.ensureLineBreak();
+  mFileSystem->write("schematic.lp", root.toByteArray());
 
   QByteArray zip = mFileSystem->exportToZip();
 
@@ -117,24 +129,6 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardData::fromMimeData(
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void SchematicClipboardData::serialize(SExpression& root) const {
-  root.ensureLineBreak();
-  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"));
-  root.ensureLineBreak();
-  root.appendChild("schematic", mSchematicUuid);
-  root.ensureLineBreak();
-  mComponentInstances.serialize(root);
-  root.ensureLineBreak();
-  mSymbolInstances.serialize(root);
-  root.ensureLineBreak();
-  mNetSegments.serialize(root);
-  root.ensureLineBreak();
-  mPolygons.serialize(root);
-  root.ensureLineBreak();
-  mTexts.serialize(root);
-  root.ensureLineBreak();
-}
 
 QString SchematicClipboardData::getMimeType() noexcept {
   return QString("application/x-librepcb-clipboard.schematic; version=%1")

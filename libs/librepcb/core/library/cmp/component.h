@@ -32,6 +32,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -78,7 +80,6 @@ public:
   Component(const Uuid& uuid, const Version& version, const QString& author,
             const ElementName& name_en_US, const QString& description_en_US,
             const QString& keywords_en_US);
-  explicit Component(std::unique_ptr<TransactionalDirectory> directory);
   ~Component() noexcept;
 
   // General
@@ -135,6 +136,8 @@ public:
   Component& operator=(const Component& rhs) = delete;
 
   // Static Methods
+  static std::unique_ptr<Component> open(
+      std::unique_ptr<TransactionalDirectory> directory);
   static QString getShortElementName() noexcept {
     return QStringLiteral("cmp");
   }
@@ -142,10 +145,12 @@ public:
     return QStringLiteral("component");
   }
 
-private:  // Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+protected:  // Methods
+  virtual void serialize(SExpression& root) const override;
 
+private:  // Methods
+  Component(std::unique_ptr<TransactionalDirectory> directory,
+            const SExpression& root);
   static QString cleanNorm(QString norm) noexcept;
 
 private:  // Data

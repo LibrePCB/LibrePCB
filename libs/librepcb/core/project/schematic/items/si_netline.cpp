@@ -43,32 +43,15 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_NetLine::SI_NetLine(SI_NetSegment& segment, const SExpression& node,
-                       const Version& fileFormat)
+SI_NetLine::SI_NetLine(SI_NetSegment& segment, const Uuid& uuid,
+                       SI_NetLineAnchor& startPoint, SI_NetLineAnchor& endPoint,
+                       const UnsignedLength& width)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
-    mNetLine(node, fileFormat),
-    mStartPoint(getAnchor(mNetLine.getStartPoint())),
-    mEndPoint(getAnchor(mNetLine.getEndPoint())) {
-  if ((!mStartPoint) || (!mEndPoint)) {
-    throw RuntimeError(__FILE__, __LINE__, "Invalid trace anchor!");
-  }
-
-  init();
-}
-
-SI_NetLine::SI_NetLine(SI_NetSegment& segment, SI_NetLineAnchor& startPoint,
-                       SI_NetLineAnchor& endPoint, const UnsignedLength& width)
-  : SI_Base(segment.getSchematic()),
-    mNetSegment(segment),
-    mNetLine(Uuid::createRandom(), width, startPoint.toNetLineAnchor(),
+    mNetLine(uuid, width, startPoint.toNetLineAnchor(),
              endPoint.toNetLineAnchor()),
     mStartPoint(&startPoint),
     mEndPoint(&endPoint) {
-  init();
-}
-
-void SI_NetLine::init() {
   // check if both netpoints are different
   if (mStartPoint == mEndPoint) {
     throw LogicError(__FILE__, __LINE__,
@@ -148,22 +131,6 @@ void SI_NetLine::removeFromSchematic() {
 
 void SI_NetLine::updateLine() noexcept {
   mGraphicsItem->updateCacheAndRepaint();
-}
-
-void SI_NetLine::serialize(SExpression& root) const {
-  mNetLine.serialize(root);
-}
-
-SI_NetLineAnchor* SI_NetLine::getAnchor(const NetLineAnchor& anchor) {
-  if (const tl::optional<Uuid>& uuid = anchor.tryGetJunction()) {
-    return mNetSegment.getNetPointByUuid(*uuid);
-  } else if (const tl::optional<NetLineAnchor::PinAnchor>& pin =
-                 anchor.tryGetPin()) {
-    SI_Symbol* symbol = mSchematic.getSymbolByUuid(pin->symbol);
-    return symbol ? symbol->getPin(pin->pin) : nullptr;
-  } else {
-    return nullptr;
-  }
 }
 
 /*******************************************************************************

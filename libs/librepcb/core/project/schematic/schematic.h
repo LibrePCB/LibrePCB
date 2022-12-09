@@ -26,7 +26,6 @@
 #include "../../attribute/attributeprovider.h"
 #include "../../fileio/filepath.h"
 #include "../../fileio/transactionaldirectory.h"
-#include "../../serialization/serializableobject.h"
 #include "../../types/elementname.h"
 #include "../../types/uuid.h"
 
@@ -77,9 +76,7 @@ class SchematicSelectionQuery;
  *  - circle:           TODO
  *  - text:             ::librepcb::SI_Text
  */
-class Schematic final : public QObject,
-                        public AttributeProvider,
-                        public SerializableObject {
+class Schematic final : public QObject, public AttributeProvider {
   Q_OBJECT
 
 public:
@@ -113,13 +110,14 @@ public:
   Schematic() = delete;
   Schematic(const Schematic& other) = delete;
   Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-            const Version& fileFormat)
-    : Schematic(project, std::move(directory), fileFormat, false, QString()) {}
+            const QString& directoryName, const Uuid& uuid,
+            const ElementName& name);
   ~Schematic() noexcept;
 
   // Getters: General
   Project& getProject() const noexcept { return mProject; }
-  FilePath getFilePath() const noexcept;
+  const QString& getDirectoryName() const noexcept { return mDirectoryName; }
+  TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
   const GridProperties& getGridProperties() const noexcept {
     return *mGridProperties;
   }
@@ -138,26 +136,26 @@ public:
   void setName(const ElementName& name) noexcept;
 
   // Symbol Methods
-  QList<SI_Symbol*> getSymbols() const noexcept { return mSymbols; }
-  SI_Symbol* getSymbolByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, SI_Symbol*>& getSymbols() const noexcept { return mSymbols; }
   void addSymbol(SI_Symbol& symbol);
   void removeSymbol(SI_Symbol& symbol);
 
   // NetSegment Methods
-  QList<SI_NetSegment*> getNetSegments() const noexcept { return mNetSegments; }
-  SI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, SI_NetSegment*>& getNetSegments() const noexcept {
+    return mNetSegments;
+  }
   void addNetSegment(SI_NetSegment& netsegment);
   void removeNetSegment(SI_NetSegment& netsegment);
 
   // Polygon Methods
-  const QList<SI_Polygon*>& getPolygons() const noexcept { return mPolygons; }
-  SI_Polygon* getPolygonByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, SI_Polygon*>& getPolygons() const noexcept {
+    return mPolygons;
+  }
   void addPolygon(SI_Polygon& polygon);
   void removePolygon(SI_Polygon& polygon);
 
   // Text Methods
-  QList<SI_Text*> getTexts() const noexcept { return mTexts; }
-  SI_Text* getTextByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, SI_Text*>& getTexts() const noexcept { return mTexts; }
   void addText(SI_Text& text);
   void removeText(SI_Text& text);
 
@@ -187,11 +185,6 @@ public:
   bool operator==(const Schematic& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const Schematic& rhs) noexcept { return (this != &rhs); }
 
-  // Static Methods
-  static Schematic* create(Project& project,
-                           std::unique_ptr<TransactionalDirectory> directory,
-                           const ElementName& name);
-
 signals:
   void symbolAdded(SI_Symbol& symbol);
   void symbolRemoved(SI_Symbol& symbol);
@@ -200,15 +193,11 @@ signals:
   void attributesChanged() override;
 
 private:
-  Schematic(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-            const Version& fileFormat, bool create, const QString& newName);
   void updateIcon() noexcept;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
+  const QString mDirectoryName;
   std::unique_ptr<TransactionalDirectory> mDirectory;
   bool mIsAddedToProject;
 
@@ -221,10 +210,10 @@ private:
   ElementName mName;
   QIcon mIcon;
 
-  QList<SI_Symbol*> mSymbols;
-  QList<SI_NetSegment*> mNetSegments;
-  QList<SI_Polygon*> mPolygons;
-  QList<SI_Text*> mTexts;
+  QMap<Uuid, SI_Symbol*> mSymbols;
+  QMap<Uuid, SI_NetSegment*> mNetSegments;
+  QMap<Uuid, SI_Polygon*> mPolygons;
+  QMap<Uuid, SI_Text*> mTexts;
 };
 
 /*******************************************************************************

@@ -51,7 +51,7 @@ namespace librepcb {
  *  - Footprint pads (neither adding nor removing pads is allowed)
  *    - UUID
  */
-class Footprint final : public SerializableObject {
+class Footprint final {
   Q_DECLARE_TR_FUNCTIONS(Footprint)
 
 public:
@@ -74,7 +74,7 @@ public:
   Footprint(const Footprint& other) noexcept;
   Footprint(const Uuid& uuid, const ElementName& name_en_US,
             const QString& description_en_US);
-  Footprint(const SExpression& node, const Version& fileFormat);
+  explicit Footprint(const SExpression& node);
   ~Footprint() noexcept;
 
   // Getters: General
@@ -100,8 +100,12 @@ public:
 
   // General Methods
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const Footprint& rhs) const noexcept;

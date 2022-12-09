@@ -229,8 +229,7 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
   }
 }
 
-void ProjectEditor::execOrderPcbDialog(const Board* board,
-                                       QWidget* parent) noexcept {
+void ProjectEditor::execOrderPcbDialog(QWidget* parent) noexcept {
   auto callback = [this]() {
     if (qApp->isFileFormatStable()) {
       // See explanation in execLppzExportDialog().
@@ -245,8 +244,7 @@ void ProjectEditor::execOrderPcbDialog(const Board* board,
         filter);  // can throw
   };
 
-  OrderPcbDialog dialog(mWorkspace.getSettings(), callback,
-                        board ? board->getRelativePath() : QString(), parent);
+  OrderPcbDialog dialog(mWorkspace.getSettings(), callback, parent);
   dialog.exec();
 }
 

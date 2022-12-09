@@ -23,14 +23,12 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <librepcb/core/geometry/junction.h>
 #include <librepcb/core/geometry/netlabel.h>
 #include <librepcb/core/geometry/netline.h>
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/text.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
-#include <librepcb/core/serialization/serializableobject.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -54,10 +52,10 @@ namespace editor {
 /**
  * @brief The SchematicClipboardData class
  */
-class SchematicClipboardData final : public SerializableObject {
+class SchematicClipboardData final {
 public:
   // Types
-  struct ComponentInstance : public SerializableObject {
+  struct ComponentInstance {
     static constexpr const char* tagname = "component";
 
     Uuid uuid;
@@ -84,25 +82,21 @@ public:
         attributes(attributes),
         onEdited(*this) {}
 
-    ComponentInstance(const SExpression& node, const Version& fileFormat)
-      : uuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-        libComponentUuid(
-            deserialize<Uuid>(node.getChild("lib_component/@0"), fileFormat)),
-        libVariantUuid(
-            deserialize<Uuid>(node.getChild("lib_variant/@0"), fileFormat)),
-        libDeviceUuid(deserialize<tl::optional<Uuid>>(
-            node.getChild("lib_device/@0"), fileFormat)),
-        name(deserialize<CircuitIdentifier>(node.getChild("name/@0"),
-                                            fileFormat)),
+    explicit ComponentInstance(const SExpression& node)
+      : uuid(deserialize<Uuid>(node.getChild("@0"))),
+        libComponentUuid(deserialize<Uuid>(node.getChild("lib_component/@0"))),
+        libVariantUuid(deserialize<Uuid>(node.getChild("lib_variant/@0"))),
+        libDeviceUuid(
+            deserialize<tl::optional<Uuid>>(node.getChild("lib_device/@0"))),
+        name(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
         value(node.getChild("value/@0").getValue()),
-        attributes(node, fileFormat),
+        attributes(node),
         onEdited(*this) {}
 
     /// Required for ::librepcb::SerializableObjectList::contains()
     const Uuid& getUuid() const noexcept { return uuid; }
 
-    /// @copydoc ::librepcb::SerializableObject::serialize()
-    void serialize(SExpression& root) const override {
+    void serialize(SExpression& root) const {
       root.appendChild(uuid);
       root.ensureLineBreak();
       root.appendChild("lib_component", libComponentUuid);
@@ -126,7 +120,7 @@ public:
     }
   };
 
-  struct SymbolInstance : public SerializableObject {
+  struct SymbolInstance {
     static constexpr const char* tagname = "symbol";
 
     Uuid uuid;
@@ -149,26 +143,23 @@ public:
         mirrored(mirrored),
         onEdited(*this) {}
 
-    SymbolInstance(const SExpression& node, const Version& fileFormat)
-      : uuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-        componentInstanceUuid(
-            deserialize<Uuid>(node.getChild("component/@0"), fileFormat)),
-        symbolVariantItemUuid(
-            deserialize<Uuid>(node.getChild("lib_gate/@0"), fileFormat)),
-        position(node.getChild("position"), fileFormat),
-        rotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
-        mirrored(deserialize<bool>(node.getChild("mirror/@0"), fileFormat)),
+    explicit SymbolInstance(const SExpression& node)
+      : uuid(deserialize<Uuid>(node.getChild("@0"))),
+        componentInstanceUuid(deserialize<Uuid>(node.getChild("component/@0"))),
+        symbolVariantItemUuid(deserialize<Uuid>(node.getChild("lib_gate/@0"))),
+        position(node.getChild("position")),
+        rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
+        mirrored(deserialize<bool>(node.getChild("mirror/@0"))),
         onEdited(*this) {}
 
-    /// @copydoc ::librepcb::SerializableObject::serialize()
-    void serialize(SExpression& root) const override {
+    void serialize(SExpression& root) const {
       root.appendChild(uuid);
       root.ensureLineBreak();
       root.appendChild("component", componentInstanceUuid);
       root.ensureLineBreak();
       root.appendChild("lib_gate", symbolVariantItemUuid);
       root.ensureLineBreak();
-      root.appendChild(position.serializeToDomElement("position"));
+      position.serialize(root.appendList("position"));
       root.appendChild("rotation", rotation);
       root.appendChild("mirror", mirrored);
       root.ensureLineBreak();
@@ -183,7 +174,7 @@ public:
     }
   };
 
-  struct NetSegment : public SerializableObject {
+  struct NetSegment {
     static constexpr const char* tagname = "netsegment";
 
     CircuitIdentifier netName;
@@ -195,16 +186,14 @@ public:
     explicit NetSegment(const CircuitIdentifier& netName)
       : netName(netName), junctions(), lines(), labels(), onEdited(*this) {}
 
-    NetSegment(const SExpression& node, const Version& fileFormat)
-      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"),
-                                               fileFormat)),
-        junctions(node, fileFormat),
-        lines(node, fileFormat),
-        labels(node, fileFormat),
+    explicit NetSegment(const SExpression& node)
+      : netName(deserialize<CircuitIdentifier>(node.getChild("net/@0"))),
+        junctions(node),
+        lines(node),
+        labels(node),
         onEdited(*this) {}
 
-    /// @copydoc ::librepcb::SerializableObject::serialize()
-    void serialize(SExpression& root) const override {
+    void serialize(SExpression& root) const {
       root.ensureLineBreak();
       root.appendChild("net", netName);
       root.ensureLineBreak();
@@ -258,9 +247,6 @@ public:
   SchematicClipboardData& operator=(const SchematicClipboardData& rhs) = delete;
 
 private:  // Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   static QString getMimeType() noexcept;
 
 private:  // Data

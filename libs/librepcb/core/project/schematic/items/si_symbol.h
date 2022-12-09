@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../attribute/attributeprovider.h"
-#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/sgi_symbol.h"
 #include "si_base.h"
 
@@ -48,19 +47,16 @@ class Symbol;
 /**
  * @brief The SI_Symbol class
  */
-class SI_Symbol final : public SI_Base,
-                        public SerializableObject,
-                        public AttributeProvider {
+class SI_Symbol final : public SI_Base, public AttributeProvider {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   SI_Symbol() = delete;
   SI_Symbol(const SI_Symbol& other) = delete;
-  SI_Symbol(Schematic& schematic, const SExpression& node,
-            const Version& fileFormat);
-  explicit SI_Symbol(Schematic& schematic, ComponentInstance& cmpInstance,
-                     const Uuid& symbolItem, const Point& position = Point(),
+  explicit SI_Symbol(Schematic& schematic, const Uuid& uuid,
+                     ComponentInstance& cmpInstance, const Uuid& symbolItem,
+                     const Point& position = Point(),
                      const Angle& rotation = Angle(), bool mirrored = false);
   ~SI_Symbol() noexcept;
 
@@ -75,7 +71,7 @@ public:
   }
   const QHash<Uuid, SI_SymbolPin*>& getPins() const noexcept { return mPins; }
   ComponentInstance& getComponentInstance() const noexcept {
-    return *mComponentInstance;
+    return mComponentInstance;
   }
   const Symbol& getLibSymbol() const noexcept { return *mSymbol; }
   const ComponentSymbolVariantItem& getCompSymbVarItem() const noexcept {
@@ -92,8 +88,12 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Inherited from AttributeProvider
   /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
@@ -115,11 +115,10 @@ signals:
   void attributesChanged() override;
 
 private:
-  void init(const Uuid& symbVarItemUuid);
   bool checkAttributesValidity() const noexcept;
 
   // General
-  ComponentInstance* mComponentInstance;
+  ComponentInstance& mComponentInstance;
   const ComponentSymbolVariantItem* mSymbVarItem;
   const Symbol* mSymbol;
   QHash<Uuid, SI_SymbolPin*> mPins;  ///< key: symbol pin UUID

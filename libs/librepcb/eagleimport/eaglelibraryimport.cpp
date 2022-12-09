@@ -441,8 +441,8 @@ void EagleLibraryImport::run() noexcept {
           EagleTypeConverter::convertElementDescription(pkg.description),
           mKeywords);
       package->setCategories(mPackageCategories);
-      auto footprint = std::make_shared<Footprint>(
-          Uuid::createRandom(), ElementName("default"), mKeywords);
+      auto footprint = std::make_shared<Footprint>(Uuid::createRandom(),
+                                                   ElementName("default"), "");
       package->getFootprints().append(footprint);
       foreach (const auto& obj,
                convertWires(pkg.displayName, pkg.package->getWires())) {

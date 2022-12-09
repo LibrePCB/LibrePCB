@@ -476,7 +476,7 @@ void BoardEditorState_AddVia::updateClosestNetSignal(
 
 NetSignal* BoardEditorState_AddVia::getCurrentNetSignal() const noexcept {
   return mCurrentNetSignal
-      ? mContext.project.getCircuit().getNetSignalByUuid(*mCurrentNetSignal)
+      ? mContext.project.getCircuit().getNetSignals().value(*mCurrentNetSignal)
       : nullptr;
 }
 

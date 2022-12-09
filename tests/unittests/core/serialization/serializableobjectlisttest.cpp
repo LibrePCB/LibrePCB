@@ -23,7 +23,6 @@
 #include "serializableobjectmock.h"
 
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
 #include <librepcb/core/serialization/serializableobjectlist.h>
 
 #include <QtCore>
@@ -77,8 +76,7 @@ private:
 TEST_F(SerializableObjectListTest, testInstantiationWithMinimalElementClass) {
   MinimalList l1;  // default ctor
   MinimalList l2(std::move(l1));  // move ctor
-  MinimalList l3(SExpression::createList("list"),
-                 qApp->getFileFormatVersion());  // SExpression ctor
+  MinimalList l3(SExpression::createList("list"));  // SExpression ctor
   l3.append(std::make_shared<MinimalMock>("foo"));
   EXPECT_TRUE(l1.isEmpty());
   EXPECT_EQ(0, l2.count());
@@ -122,7 +120,7 @@ TEST_F(SerializableObjectListTest, testValueInitializerListConstructor) {
   EXPECT_EQ("bar", l[1]->mName);
 }
 
-TEST_F(SerializableObjectListTest, testSExpressionConstructorV01) {
+TEST_F(SerializableObjectListTest, testSExpressionConstructor) {
   SExpression e = SExpression::createList("list");
   e.ensureLineBreak();
   e.appendChild("test", mMocks[0]->mUuid).appendChild<QString>("name", "foo");
@@ -131,24 +129,7 @@ TEST_F(SerializableObjectListTest, testSExpressionConstructorV01) {
   e.ensureLineBreak();
   e.appendChild("none", mMocks[2]->mUuid).appendChild<QString>("name", "bar");
   e.ensureLineBreak();
-  List l(e, Version::fromString("0.1"));
-  EXPECT_EQ(2, l.count());
-  EXPECT_EQ(mMocks[0]->mUuid, l[0]->mUuid);
-  EXPECT_EQ(mMocks[1]->mUuid, l[1]->mUuid);
-  EXPECT_EQ("foo", l[0]->mName);
-  EXPECT_EQ("bar", l[1]->mName);
-}
-
-TEST_F(SerializableObjectListTest, testSExpressionConstructorCurrentVersion) {
-  SExpression e = SExpression::createList("list");
-  e.ensureLineBreak();
-  e.appendChild("test", mMocks[0]->mUuid).appendChild<QString>("name", "foo");
-  e.ensureLineBreak();
-  e.appendChild("test", mMocks[1]->mUuid).appendChild<QString>("name", "bar");
-  e.ensureLineBreak();
-  e.appendChild("none", mMocks[2]->mUuid).appendChild<QString>("name", "bar");
-  e.ensureLineBreak();
-  List l(e, qApp->getFileFormatVersion());
+  List l(e);
   EXPECT_EQ(2, l.count());
   EXPECT_EQ(mMocks[0]->mUuid, l[0]->mUuid);
   EXPECT_EQ(mMocks[1]->mUuid, l[1]->mUuid);

@@ -44,39 +44,16 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-NetSignal::NetSignal(Circuit& circuit, const SExpression& node,
-                     const Version& fileFormat)
-  : QObject(&circuit),
-    mCircuit(circuit),
-    mIsAddedToCircuit(false),
-    mIsHighlighted(false),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"), fileFormat)),
-    mHasAutoName(deserialize<bool>(node.getChild("auto/@0"), fileFormat)),
-    mNetClass(nullptr) {
-  Uuid netclassUuid =
-      deserialize<Uuid>(node.getChild("netclass/@0"), fileFormat);
-  mNetClass = circuit.getNetClassByUuid(netclassUuid);
-  if (!mNetClass) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString("Invalid netclass UUID: \"%1\"").arg(netclassUuid.toStr()));
-  }
-
-  if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-}
-
-NetSignal::NetSignal(Circuit& circuit, NetClass& netclass,
+NetSignal::NetSignal(Circuit& circuit, const Uuid& uuid, NetClass& netclass,
                      const CircuitIdentifier& name, bool autoName)
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
     mIsHighlighted(false),
-    mUuid(Uuid::createRandom()),
+    mUuid(uuid),
     mName(name),
     mHasAutoName(autoName),
-    mNetClass(&netclass) {
-  if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
+    mNetClass(netclass) {
 }
 
 NetSignal::~NetSignal() noexcept {
@@ -140,7 +117,7 @@ void NetSignal::addToCircuit() {
   if (mIsAddedToCircuit || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  mNetClass->registerNetSignal(*this);  // can throw
+  mNetClass.registerNetSignal(*this);  // can throw
   mIsAddedToCircuit = true;
   updateErcMessages();
 }
@@ -155,7 +132,7 @@ void NetSignal::removeFromCircuit() {
                           "because it is still in use!")
                            .arg(*mName));
   }
-  mNetClass->unregisterNetSignal(*this);  // can throw
+  mNetClass.unregisterNetSignal(*this);  // can throw
   mIsAddedToCircuit = false;
   updateErcMessages();
 }
@@ -238,24 +215,17 @@ void NetSignal::unregisterBoardPlane(BI_Plane& plane) {
 }
 
 void NetSignal::serialize(SExpression& root) const {
-  if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-
   root.appendChild(mUuid);
   root.appendChild("auto", mHasAutoName);
   root.appendChild("name", mName);
   root.ensureLineBreak();
-  root.appendChild("netclass", mNetClass->getUuid());
+  root.appendChild("netclass", mNetClass.getUuid());
   root.ensureLineBreak();
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-bool NetSignal::checkAttributesValidity() const noexcept {
-  if (mNetClass == nullptr) return false;
-  return true;
-}
 
 void NetSignal::updateErcMessages() noexcept {
   if (mIsAddedToCircuit && (!isUsed())) {

@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../serialization/serializableobject.h"
 #include "../../../types/point.h"
 #include "../../../types/uuid.h"
 #include "bi_base.h"
@@ -51,18 +50,14 @@ class NetSignal;
 /**
  * @brief The BI_NetSegment class
  */
-class BI_NetSegment final : public BI_Base, public SerializableObject {
+class BI_NetSegment final : public BI_Base {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   BI_NetSegment() = delete;
   BI_NetSegment(const BI_NetSegment& other) = delete;
-  BI_NetSegment(Board& board, const BI_NetSegment& other,
-                const QHash<const BI_Device*, BI_Device*>& devMap);
-  BI_NetSegment(Board& board, const SExpression& node,
-                const Version& fileFormat);
-  BI_NetSegment(Board& board, NetSignal* signal);
+  BI_NetSegment(Board& board, const Uuid& uuid, NetSignal* signal);
   ~BI_NetSegment() noexcept;
 
   // Getters
@@ -99,19 +94,14 @@ public:
   // Setters
   void setNetSignal(NetSignal* netsignal);
 
-  // Via Methods
-  const QList<BI_Via*>& getVias() const noexcept { return mVias; }
-  BI_Via* getViaByUuid(const Uuid& uuid) const noexcept;
-
-  // NetPoint Methods
-  const QList<BI_NetPoint*>& getNetPoints() const noexcept {
+  // Element Getters
+  const QMap<Uuid, BI_Via*>& getVias() const noexcept { return mVias; }
+  const QMap<Uuid, BI_NetPoint*>& getNetPoints() const noexcept {
     return mNetPoints;
   }
-  BI_NetPoint* getNetPointByUuid(const Uuid& uuid) const noexcept;
-
-  // NetLine Methods
-  const QList<BI_NetLine*>& getNetLines() const noexcept { return mNetLines; }
-  BI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, BI_NetLine*>& getNetLines() const noexcept {
+    return mNetLines;
+  }
 
   // NetPoint+NetLine Methods
   void addElements(const QList<BI_Via*>& vias,
@@ -128,8 +118,12 @@ public:
   void setSelectionRect(const QRectF rectPx) noexcept;
   void clearSelection() const noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Inherited from BI_Base
   Type_t getType() const noexcept override {
@@ -163,9 +157,9 @@ private:
   NetSignal* mNetSignal;
 
   // Items
-  QList<BI_Via*> mVias;
-  QList<BI_NetPoint*> mNetPoints;
-  QList<BI_NetLine*> mNetLines;
+  QMap<Uuid, BI_Via*> mVias;
+  QMap<Uuid, BI_NetPoint*> mNetPoints;
+  QMap<Uuid, BI_NetLine*> mNetLines;
 };
 
 /*******************************************************************************

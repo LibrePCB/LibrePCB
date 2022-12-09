@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "path.h"
 
+#include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
 #include <QtCore>
@@ -41,9 +42,9 @@ Path::Path(const Path& other) noexcept
   : mVertices(other.mVertices), mPainterPathPx(other.mPainterPathPx) {
 }
 
-Path::Path(const SExpression& node, const Version& fileFormat) {
-  foreach (const SExpression& child, node.getChildren("vertex")) {
-    mVertices.append(Vertex(child, fileFormat));
+Path::Path(const SExpression& node) {
+  foreach (const SExpression* child, node.getChildren("vertex")) {
+    mVertices.append(Vertex(*child));
   }
 }
 
@@ -246,7 +247,11 @@ bool Path::close() noexcept {
 }
 
 void Path::serialize(SExpression& root) const {
-  serializeObjectContainer(root, mVertices, "vertex");
+  for (const Vertex& vertex : mVertices) {
+    root.ensureLineBreak();
+    vertex.serialize(root.appendList("vertex"));
+  }
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

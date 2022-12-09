@@ -20,9 +20,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
+#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/types/alignment.h>
 
 /*******************************************************************************
@@ -54,31 +53,15 @@ class AlignmentTest : public ::testing::TestWithParam<AlignmentTestData> {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_P(AlignmentTest, testConstructFromSExpressionV01) {
+TEST_P(AlignmentTest, testConstructFromSExpression) {
   const AlignmentTestData& data = GetParam();
 
   SExpression sexpr = SExpression::parse(data.serialized, FilePath());
 
   if (data.validSExpression) {
-    EXPECT_EQ(Alignment(data.hAlign, data.vAlign),
-              Alignment(sexpr, Version::fromString("0.1")));
+    EXPECT_EQ(Alignment(data.hAlign, data.vAlign), Alignment(sexpr));
   } else {
-    EXPECT_THROW({ Alignment a(sexpr, Version::fromString("0.1")); },
-                 RuntimeError);
-  }
-}
-
-TEST_P(AlignmentTest, testConstructFromSExpressionCurrentVersion) {
-  const AlignmentTestData& data = GetParam();
-
-  SExpression sexpr = SExpression::parse(data.serialized, FilePath());
-
-  if (data.validSExpression) {
-    EXPECT_EQ(Alignment(data.hAlign, data.vAlign),
-              Alignment(sexpr, qApp->getFileFormatVersion()));
-  } else {
-    EXPECT_THROW({ Alignment a(sexpr, qApp->getFileFormatVersion()); },
-                 RuntimeError);
+    EXPECT_THROW({ Alignment a(sexpr); }, RuntimeError);
   }
 }
 
@@ -87,7 +70,8 @@ TEST_P(AlignmentTest, testSerialize) {
 
   if (data.validSExpression) {
     Alignment alignment(data.hAlign, data.vAlign);
-    SExpression sexpr = alignment.serializeToDomElement("align");
+    SExpression sexpr = SExpression::createList("align");
+    alignment.serialize(sexpr);
     EXPECT_EQ(data.serialized, sexpr.toByteArray());
   }
 }

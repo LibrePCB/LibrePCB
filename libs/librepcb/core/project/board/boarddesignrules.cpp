@@ -61,70 +61,39 @@ BoardDesignRules::BoardDesignRules(const BoardDesignRules& other)
   *this = other;
 }
 
-BoardDesignRules::BoardDesignRules(const SExpression& node,
-                                   const Version& fileFormat)
-  : BoardDesignRules()  // this loads all default values!
-{
-  // general attributes
-  mName = deserialize<ElementName>(node.getChild("name/@0"), fileFormat);
-  mDescription = node.getChild("description/@0").getValue();
-  // stop mask
-  if (const SExpression* e = node.tryGetChild("stopmask_clearance_ratio")) {
-    mStopMaskClearanceRatio =
-        deserialize<UnsignedRatio>(e->getChild("@0"), fileFormat);
-  }
-  if (const SExpression* e = node.tryGetChild("stopmask_clearance_min")) {
-    mStopMaskClearanceMin =
-        deserialize<UnsignedLength>(e->getChild("@0"), fileFormat);
-  }
-  if (const SExpression* e = node.tryGetChild("stopmask_clearance_max")) {
-    mStopMaskClearanceMax =
-        deserialize<UnsignedLength>(e->getChild("@0"), fileFormat);
-  }
-  if (const SExpression* e =
-          node.tryGetChild("stopmask_max_via_drill_diameter")) {
-    mStopMaskMaxViaDrillDiameter =
-        deserialize<UnsignedLength>(e->getChild("@0"), fileFormat);
-  }
-  // cream mask
-  if (const SExpression* e = node.tryGetChild("creammask_clearance_ratio")) {
-    mCreamMaskClearanceRatio =
-        deserialize<UnsignedRatio>(e->getChild("@0"), fileFormat);
-  }
-  if (const SExpression* e = node.tryGetChild("creammask_clearance_min")) {
-    mCreamMaskClearanceMin =
-        deserialize<UnsignedLength>(e->getChild("@0"), fileFormat);
-  }
-  if (const SExpression* e = node.tryGetChild("creammask_clearance_max")) {
-    mCreamMaskClearanceMax =
-        deserialize<UnsignedLength>(e->getChild("@0"), fileFormat);
-  }
-  // restring
-  if (const SExpression* e = node.tryGetChild("restring_pad_ratio")) {
-    mRestringPadRatio =
-        deserialize<UnsignedRatio>(e->getChild("@0"), fileFormat);
-  }
-  if (const SExpression* e = node.tryGetChild("restring_pad_min")) {
-    mRestringPadMin =
-        deserialize<UnsignedLength>(e->getChild("@0"), fileFormat);
-  }
-  if (const SExpression* e = node.tryGetChild("restring_pad_max")) {
-    mRestringPadMax =
-        deserialize<UnsignedLength>(e->getChild("@0"), fileFormat);
-  }
-  if (const SExpression* e = node.tryGetChild("restring_via_ratio")) {
-    mRestringViaRatio =
-        deserialize<UnsignedRatio>(e->getChild("@0"), fileFormat);
-  }
-  if (const SExpression* e = node.tryGetChild("restring_via_min")) {
-    mRestringViaMin =
-        deserialize<UnsignedLength>(e->getChild("@0"), fileFormat);
-  }
-  if (const SExpression* e = node.tryGetChild("restring_via_max")) {
-    mRestringViaMax =
-        deserialize<UnsignedLength>(e->getChild("@0"), fileFormat);
-  }
-
+BoardDesignRules::BoardDesignRules(const SExpression& node)
+  :  // general attributes
+    mName(deserialize<ElementName>(node.getChild("name/@0"))),
+    mDescription(node.getChild("description/@0").getValue()),
+    // stop mask
+    mStopMaskClearanceRatio(deserialize<UnsignedRatio>(
+        node.getChild("stopmask_clearance_ratio/@0"))),
+    mStopMaskClearanceMin(deserialize<UnsignedLength>(
+        node.getChild("stopmask_clearance_min/@0"))),
+    mStopMaskClearanceMax(deserialize<UnsignedLength>(
+        node.getChild("stopmask_clearance_max/@0"))),
+    mStopMaskMaxViaDrillDiameter(deserialize<UnsignedLength>(
+        node.getChild("stopmask_max_via_drill_diameter/@0"))),
+    // cream mask
+    mCreamMaskClearanceRatio(deserialize<UnsignedRatio>(
+        node.getChild("creammask_clearance_ratio/@0"))),
+    mCreamMaskClearanceMin(deserialize<UnsignedLength>(
+        node.getChild("creammask_clearance_min/@0"))),
+    mCreamMaskClearanceMax(deserialize<UnsignedLength>(
+        node.getChild("creammask_clearance_max/@0"))),
+    // restring
+    mRestringPadRatio(
+        deserialize<UnsignedRatio>(node.getChild("restring_pad_ratio/@0"))),
+    mRestringPadMin(
+        deserialize<UnsignedLength>(node.getChild("restring_pad_min/@0"))),
+    mRestringPadMax(
+        deserialize<UnsignedLength>(node.getChild("restring_pad_max/@0"))),
+    mRestringViaRatio(
+        deserialize<UnsignedRatio>(node.getChild("restring_via_ratio/@0"))),
+    mRestringViaMin(
+        deserialize<UnsignedLength>(node.getChild("restring_via_min/@0"))),
+    mRestringViaMax(
+        deserialize<UnsignedLength>(node.getChild("restring_via_max/@0"))) {
   // force validating properties, throw exception on error
   try {
     setStopMaskClearanceBounds(mStopMaskClearanceMin, mStopMaskClearanceMax);

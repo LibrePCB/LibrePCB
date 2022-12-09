@@ -23,9 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gmock/gmock.h>
-#include <librepcb/core/serialization/serializableobject.h>
+#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/types/uuid.h>
 #include <librepcb/core/utils/signalslot.h>
 
@@ -41,24 +40,21 @@ namespace tests {
  *  Class MinimalSerializableObjectMock
  ******************************************************************************/
 
-class MinimalSerializableObjectMock final : public SerializableObject {
+class MinimalSerializableObjectMock final {
 public:
   QString mValue;
   Signal<MinimalSerializableObjectMock> onEdited;
   MinimalSerializableObjectMock() = delete;
   MinimalSerializableObjectMock(const QString& value)
     : mValue(value), onEdited(*this) {}
-  MinimalSerializableObjectMock(const SExpression& root,
-                                const Version& fileFormat)
-    : mValue(root.getChild("@0").getValue()), onEdited(*this) {
-    Q_UNUSED(fileFormat);
-  }
+  explicit MinimalSerializableObjectMock(const SExpression& root)
+    : mValue(root.getChild("@0").getValue()), onEdited(*this) {}
   MinimalSerializableObjectMock(MinimalSerializableObjectMock&& other) = delete;
   MinimalSerializableObjectMock(const MinimalSerializableObjectMock& other) =
       delete;
   ~MinimalSerializableObjectMock() {}
 
-  void serialize(SExpression& root) const override {
+  void serialize(SExpression& root) const {
     root.ensureLineBreak();
     root.appendChild("value", mValue);
     root.ensureLineBreak();
@@ -74,7 +70,7 @@ public:
  *  Class SerializableObjectMock
  ******************************************************************************/
 
-class SerializableObjectMock final : public SerializableObject {
+class SerializableObjectMock final {
 public:
   Uuid mUuid;
   QString mName;
@@ -88,8 +84,8 @@ public:
       onEdited(*this) {}
   SerializableObjectMock(const Uuid& uuid, const QString& name)
     : mUuid(uuid), mName(name), onEdited(*this) {}
-  SerializableObjectMock(const SExpression& root, const Version& fileFormat)
-    : mUuid(deserialize<Uuid>(root.getChild("@0"), fileFormat)),
+  explicit SerializableObjectMock(const SExpression& root)
+    : mUuid(deserialize<Uuid>(root.getChild("@0"))),
       mName(root.getChild("name/@0").getValue()),
       onEdited(*this) {}
   ~SerializableObjectMock() {}
@@ -97,7 +93,7 @@ public:
   const Uuid& getUuid() const noexcept { return mUuid; }
   const QString& getName() const noexcept { return mName; }
 
-  void serialize(SExpression& root) const override {
+  void serialize(SExpression& root) const {
     root.appendChild(mUuid);
     root.ensureLineBreak();
     root.appendChild("name", mName);

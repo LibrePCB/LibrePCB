@@ -132,7 +132,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   }
 
   // Export board outline since this is useful for manual review.
-  foreach (const BI_Polygon* polygon, sortedByUuid(mBoard.getPolygons())) {
+  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     Q_ASSERT(polygon);
     if (polygon->getPolygon().getLayerName() == GraphicsLayer::sBoardOutlines) {
       UnsignedLength lineWidth =
@@ -505,9 +505,8 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
   }
 
   // vias
-  foreach (const BI_NetSegment* netsegment,
-           sortedByUuid(mBoard.getNetSegments())) {
-    foreach (const BI_Via* via, sortedByUuid(netsegment->getVias())) {
+  foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
+    foreach (const BI_Via* via, netsegment->getVias()) {
       gen.drill(via->getPosition(), via->getDrillDiameter(), true,
                 ExcellonGenerator::Function::ViaDrill);
       ++count;
@@ -526,18 +525,16 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   }
 
   // draw vias and traces (grouped by net)
-  foreach (const BI_NetSegment* netsegment,
-           sortedByUuid(mBoard.getNetSegments())) {
+  foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
     Q_ASSERT(netsegment);
     QString net = netsegment->getNetSignal()
         ? *netsegment->getNetSignal()->getName()  // Named net.
         : "N/C";  // Anonymous net (reserved name by Gerber specs).
-    foreach (const BI_Via* via, sortedByUuid(netsegment->getVias())) {
+    foreach (const BI_Via* via, netsegment->getVias()) {
       Q_ASSERT(via);
       drawVia(gen, *via, layerName, net);
     }
-    foreach (const BI_NetLine* netline,
-             sortedByUuid(netsegment->getNetLines())) {
+    foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
       Q_ASSERT(netline);
       if (netline->getLayer().getName() == layerName) {
         gen.drawLine(netline->getStartPoint().getPosition(),
@@ -550,7 +547,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   }
 
   // draw planes
-  foreach (const BI_Plane* plane, sortedByUuid(mBoard.getPlanes())) {
+  foreach (const BI_Plane* plane, mBoard.getPlanes()) {
     Q_ASSERT(plane);
     if (plane->getLayerName() == layerName) {
       foreach (const Path& fragment, plane->getFragments()) {
@@ -569,7 +566,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
     graphicsFunction = GerberAttribute::ApertureFunction::Conductor;
     graphicsNet = "";  // Not connected to any net.
   }
-  foreach (const BI_Polygon* polygon, sortedByUuid(mBoard.getPolygons())) {
+  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     Q_ASSERT(polygon);
     if (layerName == polygon->getPolygon().getLayerName()) {
       UnsignedLength lineWidth =
@@ -591,7 +588,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   if (GraphicsLayer::isCopperLayer(layerName)) {
     textFunction = GerberAttribute::ApertureFunction::NonConductor;
   }
-  foreach (const BI_StrokeText* text, sortedByUuid(mBoard.getStrokeTexts())) {
+  foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
     Q_ASSERT(text);
     if (layerName == text->getText().getLayerName()) {
       UnsignedLength lineWidth =
@@ -710,7 +707,7 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
   if (GraphicsLayer::isCopperLayer(layerName)) {
     textFunction = GerberAttribute::ApertureFunction::NonConductor;
   }
-  foreach (const BI_StrokeText* text, sortedByUuid(device.getStrokeTexts())) {
+  foreach (const BI_StrokeText* text, device.getStrokeTexts()) {
     if (layerName == text->getText().getLayerName()) {
       UnsignedLength lineWidth =
           calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);

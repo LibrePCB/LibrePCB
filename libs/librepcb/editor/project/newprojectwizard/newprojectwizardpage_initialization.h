@@ -58,8 +58,10 @@ public:
   // Getters
   bool getCreateSchematic() const noexcept;
   QString getSchematicName() const noexcept;
+  QString getSchematicDirName() const noexcept { return mSchematicDirName; }
   bool getCreateBoard() const noexcept;
   QString getBoardName() const noexcept;
+  QString getBoardDirName() const noexcept { return mBoardDirName; }
 
   // Operator Overloadings
   NewProjectWizardPage_Initialization& operator=(
@@ -74,6 +76,8 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::NewProjectWizardPage_Initialization> mUi;
+  QString mSchematicDirName;
+  QString mBoardDirName;
 };
 
 /*******************************************************************************

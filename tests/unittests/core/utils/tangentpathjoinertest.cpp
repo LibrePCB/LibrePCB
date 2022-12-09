@@ -42,7 +42,7 @@ protected:
     SExpression root = SExpression::createList(name);
     foreach (const Path& p, paths) {
       root.ensureLineBreak();
-      root.appendChild(p.serializeToDomElement("path"));
+      p.serialize(root.appendList("path"));
     }
     root.ensureLineBreak();
     return root.toByteArray().toStdString();

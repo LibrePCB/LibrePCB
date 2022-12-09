@@ -26,6 +26,7 @@
 #include "vertex.h"
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -50,14 +51,14 @@ namespace librepcb {
  * For a valid path, minimum two vertices are required. Paths with less than two
  * vertices are useless and thus considered as invalid.
  */
-class Path final : public SerializableObject {
+class Path final {
 public:
   // Constructors / Destructor
   Path() noexcept : mVertices(), mPainterPathPx() {}
   Path(const Path& other) noexcept;
   explicit Path(const QVector<Vertex>& vertices) noexcept
     : mVertices(vertices) {}
-  Path(const SExpression& node, const Version& fileFormat);
+  explicit Path(const SExpression& node);
   ~Path() noexcept {}
 
   // Getters
@@ -96,8 +97,12 @@ public:
                     const Angle& angle = Angle::deg0()) noexcept;
   bool close() noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   Path& operator=(const Path& rhs) noexcept;

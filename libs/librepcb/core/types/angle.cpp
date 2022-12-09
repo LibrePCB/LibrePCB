@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "angle.h"
 
+#include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
 #include <QtCore>
@@ -134,6 +135,18 @@ Angle Angle::fromRad(qreal radians) noexcept {
 
 qint32 Angle::degStringToMicrodeg(const QString& degrees) {
   return Toolbox::decimalFixedPointFromString<qint32>(degrees, 6);
+}
+
+// Non-Member Functions
+
+template <>
+SExpression serialize(const Angle& obj) {
+  return SExpression::createToken(obj.toDegString());
+}
+
+template <>
+Angle deserialize(const SExpression& node) {
+  return Angle::fromDeg(node.getValue());  // can throw
 }
 
 /*******************************************************************************

@@ -61,17 +61,15 @@ Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName,
     mAlign(align) {
 }
 
-Text::Text(const SExpression& node, const Version& fileFormat)
+Text::Text(const SExpression& node)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mLayerName(
-        deserialize<GraphicsLayerName>(node.getChild("layer/@0"), fileFormat)),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
     mText(node.getChild("value/@0").getValue()),
-    mPosition(node.getChild("position"), fileFormat),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
-    mHeight(
-        deserialize<PositiveLength>(node.getChild("height/@0"), fileFormat)),
-    mAlign(node.getChild("align"), fileFormat) {
+    mPosition(node.getChild("position")),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
+    mHeight(deserialize<PositiveLength>(node.getChild("height/@0"))),
+    mAlign(node.getChild("align")) {
 }
 
 Text::~Text() noexcept {
@@ -150,9 +148,9 @@ void Text::serialize(SExpression& root) const {
   root.appendChild("layer", mLayerName);
   root.appendChild("value", mText);
   root.ensureLineBreak();
-  root.appendChild(mAlign.serializeToDomElement("align"));
+  mAlign.serialize(root.appendList("align"));
   root.appendChild("height", mHeight);
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.ensureLineBreak();
 }

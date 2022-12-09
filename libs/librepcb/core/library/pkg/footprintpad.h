@@ -46,7 +46,7 @@ namespace librepcb {
 /**
  * @brief The FootprintPad class represents a pad of a footprint
  */
-class FootprintPad final : public SerializableObject {
+class FootprintPad final {
   Q_DECLARE_TR_FUNCTIONS(FootprintPad)
 
 public:
@@ -77,7 +77,7 @@ public:
                const Point& pos, const Angle& rot, Shape shape,
                const PositiveLength& width, const PositiveLength& height,
                const UnsignedLength& drillDiameter, BoardSide side) noexcept;
-  FootprintPad(const SExpression& node, const Version& fileFormat);
+  explicit FootprintPad(const SExpression& node);
   ~FootprintPad() noexcept;
 
   // Getters
@@ -110,8 +110,14 @@ public:
   bool setDrillDiameter(const UnsignedLength& diameter) noexcept;
   bool setBoardSide(BoardSide side) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  virtual void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const FootprintPad& rhs) const noexcept;
@@ -148,68 +154,6 @@ struct FootprintPadListNameProvider {
 using FootprintPadList =
     SerializableObjectList<FootprintPad, FootprintPadListNameProvider,
                            FootprintPad::Event>;
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline SExpression serialize(const FootprintPad::BoardSide& obj) {
-  switch (obj) {
-    case FootprintPad::BoardSide::TOP:
-      return SExpression::createToken("top");
-    case FootprintPad::BoardSide::BOTTOM:
-      return SExpression::createToken("bottom");
-    case FootprintPad::BoardSide::THT:
-      return SExpression::createToken("tht");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
-
-template <>
-inline FootprintPad::BoardSide deserialize(const SExpression& sexpr,
-                                           const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  if (str == QLatin1String("top"))
-    return FootprintPad::BoardSide::TOP;
-  else if (str == QLatin1String("bottom"))
-    return FootprintPad::BoardSide::BOTTOM;
-  else if (str == QLatin1String("tht"))
-    return FootprintPad::BoardSide::THT;
-  else
-    throw RuntimeError(__FILE__, __LINE__, str);
-}
-
-template <>
-inline SExpression serialize(const FootprintPad::Shape& obj) {
-  switch (obj) {
-    case FootprintPad::Shape::ROUND:
-      return SExpression::createToken("round");
-    case FootprintPad::Shape::RECT:
-      return SExpression::createToken("rect");
-    case FootprintPad::Shape::OCTAGON:
-      return SExpression::createToken("octagon");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
-
-template <>
-inline FootprintPad::Shape deserialize(const SExpression& sexpr,
-                                       const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  if (str == QLatin1String("round"))
-    return FootprintPad::Shape::ROUND;
-  else if (str == QLatin1String("rect"))
-    return FootprintPad::Shape::RECT;
-  else if (str == QLatin1String("octagon"))
-    return FootprintPad::Shape::OCTAGON;
-  else
-    throw RuntimeError(__FILE__, __LINE__, str);
-}
 
 /*******************************************************************************
  *  End of File

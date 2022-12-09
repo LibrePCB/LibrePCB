@@ -39,19 +39,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_Polygon::SI_Polygon(Schematic& schematic, const SExpression& node,
-                       const Version& fileFormat)
-  : SI_Base(schematic), mPolygon(new Polygon(node, fileFormat)) {
-  init();
-}
-
 SI_Polygon::SI_Polygon(Schematic& schematic, const Polygon& polygon)
   : SI_Base(schematic), mPolygon(new Polygon(polygon)) {
-  init();
-}
-
-void SI_Polygon::init() {
-  // Create the graphics item.
   mGraphicsItem.reset(
       new PolygonGraphicsItem(*mPolygon, mSchematic.getProject().getLayers()));
   mGraphicsItem->setEditable(true);
@@ -87,10 +76,6 @@ void SI_Polygon::removeFromSchematic() {
     throw LogicError(__FILE__, __LINE__);
   }
   SI_Base::removeFromSchematic(mGraphicsItem.data());
-}
-
-void SI_Polygon::serialize(SExpression& root) const {
-  mPolygon->serialize(root);
 }
 
 /*******************************************************************************

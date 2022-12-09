@@ -34,6 +34,7 @@
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
@@ -109,11 +110,13 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
       // check whether project can still be opened of if we broke something
       try {
         log(tr("Open project %1...").arg(prettyPath(mProjectFilePath)));
-        Project project(std::unique_ptr<TransactionalDirectory>(
+        ProjectLoader loader;
+        std::unique_ptr<Project> project =
+            loader.open(std::unique_ptr<TransactionalDirectory>(
                             new TransactionalDirectory(fs)),
-                        mProjectFilePath.getFilename());
+                        mProjectFilePath.getFilename());  // can throw
         log(tr("Save project %1...").arg(prettyPath(mProjectFilePath)));
-        project.save();  // force updating library elements file format
+        project->save();  // force upgrading file format
         fs->save();  // can throw
       } catch (const Exception& e) {
         // something is broken -> discard modifications in file system

@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "libraryelement.h"
 
-#include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 #include "libraryelementcheck.h"
 
@@ -43,20 +42,19 @@ LibraryElement::LibraryElement(const QString& shortElementName,
                                const ElementName& name_en_US,
                                const QString& description_en_US,
                                const QString& keywords_en_US)
-  : LibraryBaseElement(true, shortElementName, longElementName, uuid, version,
-                       author, name_en_US, description_en_US, keywords_en_US) {
+  : LibraryBaseElement(shortElementName, longElementName, uuid, version, author,
+                       name_en_US, description_en_US, keywords_en_US) {
 }
 
 LibraryElement::LibraryElement(
-    std::unique_ptr<TransactionalDirectory> directory,
-    const QString& shortElementName, const QString& longElementName)
-  : LibraryBaseElement(std::move(directory), true, shortElementName,
-                       longElementName) {
+    const QString& shortElementName, const QString& longElementName,
+    bool dirnameMustBeUuid, std::unique_ptr<TransactionalDirectory> directory,
+    const SExpression& root)
+  : LibraryBaseElement(shortElementName, longElementName, dirnameMustBeUuid,
+                       std::move(directory), root) {
   // read category UUIDs
-  foreach (const SExpression& node,
-           mLoadingFileDocument.getChildren("category")) {
-    mCategories.insert(
-        deserialize<Uuid>(node.getChild("@0"), mLoadingFileFormat));
+  foreach (const SExpression* node, root.getChildren("category")) {
+    mCategories.insert(deserialize<Uuid>(node->getChild("@0")));
   }
 }
 

@@ -39,25 +39,10 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Hole::BI_Hole(Board& board, const BI_Hole& other) : BI_Base(board) {
-  mHole.reset(new Hole(Uuid::createRandom(), *other.mHole));
-  init();
-}
-
-BI_Hole::BI_Hole(Board& board, const SExpression& node,
-                 const Version& fileFormat)
-  : BI_Base(board) {
-  mHole.reset(new Hole(node, fileFormat));
-  init();
-}
-
-BI_Hole::BI_Hole(Board& board, const Hole& hole) : BI_Base(board) {
-  mHole.reset(new Hole(hole));
-  init();
-}
-
-void BI_Hole::init() {
-  mGraphicsItem.reset(new HoleGraphicsItem(*mHole, mBoard.getLayerStack()));
+BI_Hole::BI_Hole(Board& board, const Hole& hole)
+  : BI_Base(board),
+    mHole(new Hole(hole)),
+    mGraphicsItem(new HoleGraphicsItem(*mHole, mBoard.getLayerStack())) {
 }
 
 BI_Hole::~BI_Hole() noexcept {
@@ -81,10 +66,6 @@ void BI_Hole::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   BI_Base::removeFromBoard(mGraphicsItem.data());
-}
-
-void BI_Hole::serialize(SExpression& root) const {
-  mHole->serialize(root);
 }
 
 /*******************************************************************************

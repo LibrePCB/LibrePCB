@@ -22,6 +22,9 @@
  ******************************************************************************/
 #include "version.h"
 
+#include "../exceptions.h"
+#include "../serialization/sexpression.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -118,6 +121,20 @@ tl::optional<Version> Version::tryFromString(const QString& str) noexcept {
     return tl::nullopt;
   }
   return Version(numbers);
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const Version& obj) {
+  return SExpression::createString(obj.toStr());
+}
+
+template <>
+Version deserialize(const SExpression& node) {
+  return Version::fromString(node.getValue());  // can throw
 }
 
 /*******************************************************************************

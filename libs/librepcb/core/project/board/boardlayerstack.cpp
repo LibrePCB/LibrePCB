@@ -35,33 +35,6 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardLayerStack::BoardLayerStack(Board& board, const BoardLayerStack& other)
-  : QObject(&board),
-    mBoard(board),
-    mLayersChanged(false),
-    mInnerLayerCount(other.mInnerLayerCount) {
-  foreach (const GraphicsLayer* layer, other.mLayers) {
-    addLayer(new GraphicsLayer(*layer));
-  }
-
-  connect(&mBoard, &Board::attributesChanged, this,
-          &BoardLayerStack::boardAttributesChanged, Qt::QueuedConnection);
-}
-
-BoardLayerStack::BoardLayerStack(Board& board, const SExpression& node,
-                                 const Version& fileFormat)
-  : QObject(&board),
-    mBoard(board),
-    mLayersChanged(false),
-    mInnerLayerCount(-1) {
-  addAllLayers();
-
-  setInnerLayerCount(deserialize<uint>(node.getChild("inner/@0"), fileFormat));
-
-  connect(&mBoard, &Board::attributesChanged, this,
-          &BoardLayerStack::boardAttributesChanged, Qt::QueuedConnection);
-}
-
 BoardLayerStack::BoardLayerStack(Board& board)
   : QObject(&board),
     mBoard(board),
@@ -96,11 +69,18 @@ void BoardLayerStack::setInnerLayerCount(int count) noexcept {
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Operator Overloadings
  ******************************************************************************/
 
-void BoardLayerStack::serialize(SExpression& root) const {
-  root.appendChild("inner", mInnerLayerCount);
+BoardLayerStack& BoardLayerStack::operator=(
+    const BoardLayerStack& rhs) noexcept {
+  mInnerLayerCount = rhs.mInnerLayerCount;
+  Q_ASSERT(mLayers.count() == rhs.mLayers.count());
+  for (int i = 0; i < qMin(mLayers.count(), rhs.mLayers.count()); ++i) {
+    Q_ASSERT(mLayers.at(i)->getName() == rhs.mLayers.at(i)->getName());
+    *mLayers.at(i) = *rhs.mLayers.at(i);
+  }
+  return *this;
 }
 
 /*******************************************************************************

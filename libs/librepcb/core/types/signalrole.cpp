@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "signalrole.h"
 
+#include "../serialization/sexpression.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -66,6 +68,27 @@ const QList<SignalRole>& SignalRole::getAllRoles() noexcept {
       passive(), power(), input(), output(), inout(), opendrain(),
   };
   return list;
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const SignalRole& obj) {
+  return SExpression::createToken(obj.toStr());
+}
+
+template <>
+SignalRole deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  foreach (const SignalRole& role, SignalRole::getAllRoles()) {
+    if (role.toStr() == str) {
+      return role;
+    }
+  }
+  throw RuntimeError(__FILE__, __LINE__,
+                     QString("Unknown signal role: '%1'").arg(str));
 }
 
 /*******************************************************************************

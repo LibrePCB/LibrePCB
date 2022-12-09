@@ -26,7 +26,6 @@
 #include "../../attribute/attributeprovider.h"
 #include "../../fileio/filepath.h"
 #include "../../fileio/transactionaldirectory.h"
-#include "../../serialization/serializableobject.h"
 #include "../../types/elementname.h"
 #include "../../types/length.h"
 #include "../../types/uuid.h"
@@ -74,8 +73,7 @@ class Project;
  */
 class Board final : public QObject,
                     public AttributeProvider,
-                    public IF_ErcMsgProvider,
-                    public SerializableObject {
+                    public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(Board)
 
@@ -112,17 +110,15 @@ public:
   // Constructors / Destructor
   Board() = delete;
   Board(const Board& other) = delete;
-  Board(const Board& other, std::unique_ptr<TransactionalDirectory> directory,
-        const ElementName& name);
   Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-        const Version& fileFormat)
-    : Board(project, std::move(directory), fileFormat, false, QString()) {}
+        const QString& directoryName, const Uuid& uuid,
+        const ElementName& name);
   ~Board() noexcept;
 
   // Getters: General
   Project& getProject() const noexcept { return mProject; }
-  FilePath getFilePath() const noexcept;
-  QString getRelativePath() const noexcept;
+  const QString& getDirectoryName() const noexcept { return mDirectoryName; }
+  TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
   const GridProperties& getGridProperties() const noexcept {
     return *mGridProperties;
   }
@@ -160,6 +156,12 @@ public:
     return mDefaultFontFileName;
   }
 
+  // Setters
+  void setName(const ElementName& name) noexcept { mName = name; }
+  void setDefaultFontName(const QString& name) noexcept {
+    mDefaultFontFileName = name;
+  }
+
   // DeviceInstance Methods
   const QMap<Uuid, BI_Device*>& getDeviceInstances() const noexcept {
     return mDeviceInstances;
@@ -169,34 +171,34 @@ public:
   void removeDeviceInstance(BI_Device& instance);
 
   // NetSegment Methods
-  const QList<BI_NetSegment*>& getNetSegments() const noexcept {
+  const QMap<Uuid, BI_NetSegment*>& getNetSegments() const noexcept {
     return mNetSegments;
   }
-  BI_NetSegment* getNetSegmentByUuid(const Uuid& uuid) const noexcept;
   void addNetSegment(BI_NetSegment& netsegment);
   void removeNetSegment(BI_NetSegment& netsegment);
 
   // Plane Methods
-  const QList<BI_Plane*>& getPlanes() const noexcept { return mPlanes; }
-  BI_Plane* getPlaneByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, BI_Plane*>& getPlanes() const noexcept { return mPlanes; }
   void addPlane(BI_Plane& plane);
   void removePlane(BI_Plane& plane);
   void rebuildAllPlanes() noexcept;
 
   // Polygon Methods
-  const QList<BI_Polygon*>& getPolygons() const noexcept { return mPolygons; }
+  const QMap<Uuid, BI_Polygon*>& getPolygons() const noexcept {
+    return mPolygons;
+  }
   void addPolygon(BI_Polygon& polygon);
   void removePolygon(BI_Polygon& polygon);
 
   // StrokeText Methods
-  const QList<BI_StrokeText*>& getStrokeTexts() const noexcept {
+  const QMap<Uuid, BI_StrokeText*>& getStrokeTexts() const noexcept {
     return mStrokeTexts;
   }
   void addStrokeText(BI_StrokeText& text);
   void removeStrokeText(BI_StrokeText& text);
 
   // Hole Methods
-  const QList<BI_Hole*>& getHoles() const noexcept { return mHoles; }
+  const QMap<Uuid, BI_Hole*>& getHoles() const noexcept { return mHoles; }
   void addHole(BI_Hole& hole);
   void removeHole(BI_Hole& hole);
 
@@ -209,6 +211,8 @@ public:
   void forceAirWiresRebuild() noexcept;
 
   // General Methods
+  void addDefaultContent();
+  void copyFrom(const Board& other);
   void addToProject();
   void removeFromProject();
   void save();
@@ -232,11 +236,6 @@ public:
   bool operator==(const Board& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const Board& rhs) noexcept { return (this != &rhs); }
 
-  // Static Methods
-  static Board* create(Project& project,
-                       std::unique_ptr<TransactionalDirectory> directory,
-                       const ElementName& name);
-
 signals:
 
   /// @copydoc AttributeProvider::attributesChanged()
@@ -246,16 +245,12 @@ signals:
   void deviceRemoved(BI_Device& comp);
 
 private:
-  Board(Project& project, std::unique_ptr<TransactionalDirectory> directory,
-        const Version& fileFormat, bool create, const QString& newName);
   void updateIcon() noexcept;
   void updateErcMessages() noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
+  const QString mDirectoryName;
   std::unique_ptr<TransactionalDirectory> mDirectory;
   bool mIsAddedToProject;
 
@@ -275,11 +270,11 @@ private:
 
   // items
   QMap<Uuid, BI_Device*> mDeviceInstances;
-  QList<BI_NetSegment*> mNetSegments;
-  QList<BI_Plane*> mPlanes;
-  QList<BI_Polygon*> mPolygons;
-  QList<BI_StrokeText*> mStrokeTexts;
-  QList<BI_Hole*> mHoles;
+  QMap<Uuid, BI_NetSegment*> mNetSegments;
+  QMap<Uuid, BI_Plane*> mPlanes;
+  QMap<Uuid, BI_Polygon*> mPolygons;
+  QMap<Uuid, BI_StrokeText*> mStrokeTexts;
+  QMap<Uuid, BI_Hole*> mHoles;
   QMultiHash<NetSignal*, BI_AirWire*> mAirWires;
 
   // ERC messages

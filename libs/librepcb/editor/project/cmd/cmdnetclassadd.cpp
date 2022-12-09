@@ -53,7 +53,7 @@ CmdNetClassAdd::~CmdNetClassAdd() noexcept {
  ******************************************************************************/
 
 bool CmdNetClassAdd::performExecute() {
-  mNetClass = new NetClass(mCircuit, mName);  // can throw
+  mNetClass = new NetClass(mCircuit, Uuid::createRandom(), mName);  // can throw
 
   performRedo();  // can throw
 

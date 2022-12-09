@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../../geometry/path.h"
 #include "../../../geometry/trace.h"
-#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/bgi_netline.h"
 #include "bi_base.h"
 
@@ -69,20 +68,16 @@ public:
 /**
  * @brief The BI_NetLine class
  */
-class BI_NetLine final : public BI_Base, public SerializableObject {
+class BI_NetLine final : public BI_Base {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   BI_NetLine() = delete;
   BI_NetLine(const BI_NetLine& other) = delete;
-  BI_NetLine(BI_NetSegment& segment, const BI_NetLine& other,
-             BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint);
-  BI_NetLine(BI_NetSegment& segment, const SExpression& node,
-             const Version& fileFormat);
-  BI_NetLine(BI_NetSegment& segment, BI_NetLineAnchor& startPoint,
-             BI_NetLineAnchor& endPoint, GraphicsLayer& layer,
-             const PositiveLength& width);
+  BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
+             BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
+             GraphicsLayer& layer, const PositiveLength& width);
   ~BI_NetLine() noexcept;
 
   // Getters
@@ -108,9 +103,6 @@ public:
   void removeFromBoard() override;
   void updateLine() noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::NetLine; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
@@ -120,7 +112,6 @@ public:
   BI_NetLine& operator=(const BI_NetLine& rhs) = delete;
 
 private:
-  void init();
   BI_NetLineAnchor* getAnchor(const TraceAnchor& anchor);
 
   // General

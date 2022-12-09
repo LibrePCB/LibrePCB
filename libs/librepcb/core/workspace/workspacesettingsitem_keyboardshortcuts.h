@@ -72,7 +72,7 @@ private:  // Methods
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::loadImpl()
    */
-  void loadImpl(const SExpression& root, const Version& fileFormat) override;
+  void loadImpl(const SExpression& root) override;
 
   /**
    * @copydoc ::librepcb::WorkspaceSettingsItem::serializeImpl()

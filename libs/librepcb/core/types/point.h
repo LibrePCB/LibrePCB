@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../serialization/serializableobject.h"
 #include "length.h"
 
 #include <QtCore>
@@ -34,6 +33,7 @@
 namespace librepcb {
 
 class Angle;
+class SExpression;
 
 /*******************************************************************************
  *  Class Point
@@ -75,7 +75,7 @@ class Angle;
  *
  * @see class Length
  */
-class Point final : public SerializableObject {
+class Point final {
 public:
   // Constructors / Destructor
 
@@ -101,7 +101,7 @@ public:
    */
   explicit Point(const Length& x, const Length& y) noexcept : mX(x), mY(y) {}
 
-  Point(const SExpression& node, const Version& fileFormat);
+  explicit Point(const SExpression& node);
 
   /**
    * @brief Destructor
@@ -395,8 +395,12 @@ public:
   Point& mirror(Qt::Orientation orientation,
                 const Point& center = Point(0, 0)) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Static Functions
 

@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/core/exceptions.h>
 #include <librepcb/core/serialization/sexpression.h>
 
 #include <QtCore>
@@ -231,9 +232,9 @@ TEST(SExpressionTest, testToByteArrayEmptyListWithTrailingLineBreak) {
 
 TEST(SExpressionTest, testToByteArrayListWithLineBreaks) {
   SExpression s = SExpression::createList("test");
-  s.appendChild("child", 1);
+  s.appendChild("child", SExpression::createToken("1"));
   s.ensureLineBreak();
-  s.appendChild("child", 2);
+  s.appendChild("child", SExpression::createToken("2"));
   s.ensureLineBreak();
   EXPECT_EQ(
       "(test (child 1)\n"
@@ -244,11 +245,11 @@ TEST(SExpressionTest, testToByteArrayListWithLineBreaks) {
 
 TEST(SExpressionTest, testToByteArrayListWithTooManyLineBreaks) {
   SExpression s = SExpression::createList("test");
-  s.appendChild("child", 1);
+  s.appendChild("child", SExpression::createToken("1"));
   s.ensureLineBreak();
   s.ensureLineBreak();
   s.ensureLineBreak();
-  s.appendChild("child", 2);
+  s.appendChild("child", SExpression::createToken("2"));
   s.ensureLineBreak();
   s.ensureLineBreak();
   s.ensureLineBreak();

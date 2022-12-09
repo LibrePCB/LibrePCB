@@ -20,10 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/import/dxfreader.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 /*******************************************************************************
  *  Namespace
@@ -52,8 +52,11 @@ protected:
   /**
    * @brief Helper to easily compare objects as strings for easier debugging
    */
-  static std::string str(const SerializableObject& obj) {
-    return obj.serializeToDomElement("object").toByteArray().toStdString();
+  template <typename T>
+  static std::string str(const T& obj) {
+    SExpression node = SExpression::createList("object");
+    obj.serialize(node);
+    return node.toByteArray().toStdString();
   }
 
   /**
@@ -61,7 +64,7 @@ protected:
    */
   static std::string str(const DxfReader::Circle& circle) {
     SExpression s = SExpression::createList("object");
-    s.appendChild(circle.position.serializeToDomElement("position"));
+    circle.position.serialize(s.appendList("position"));
     s.appendChild("diameter", circle.diameter);
     return s.toByteArray().toStdString();
   }

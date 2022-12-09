@@ -33,6 +33,69 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const FootprintPad::Shape& obj) {
+  switch (obj) {
+    case FootprintPad::Shape::ROUND:
+      return SExpression::createToken("round");
+    case FootprintPad::Shape::RECT:
+      return SExpression::createToken("rect");
+    case FootprintPad::Shape::OCTAGON:
+      return SExpression::createToken("octagon");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+SExpression serialize(const FootprintPad::BoardSide& obj) {
+  switch (obj) {
+    case FootprintPad::BoardSide::TOP:
+      return SExpression::createToken("top");
+    case FootprintPad::BoardSide::BOTTOM:
+      return SExpression::createToken("bottom");
+    case FootprintPad::BoardSide::THT:
+      return SExpression::createToken("tht");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+inline FootprintPad::BoardSide deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == QLatin1String("top")) {
+    return FootprintPad::BoardSide::TOP;
+  } else if (str == QLatin1String("bottom")) {
+    return FootprintPad::BoardSide::BOTTOM;
+  } else if (str == QLatin1String("tht")) {
+    return FootprintPad::BoardSide::THT;
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Unknown footprint pad board side: '%1'").arg(str));
+  }
+}
+
+template <>
+inline FootprintPad::Shape deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == QLatin1String("round")) {
+    return FootprintPad::Shape::ROUND;
+  } else if (str == QLatin1String("rect")) {
+    return FootprintPad::Shape::RECT;
+  } else if (str == QLatin1String("octagon")) {
+    return FootprintPad::Shape::OCTAGON;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Unknown footprint pad shape: '%1'").arg(str));
+  }
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
@@ -73,29 +136,18 @@ FootprintPad::FootprintPad(const Uuid& uuid,
     mBoardSide(side) {
 }
 
-FootprintPad::FootprintPad(const SExpression& node, const Version& fileFormat)
+FootprintPad::FootprintPad(const SExpression& node)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mPackagePadUuid(mUuid),  // See initialization below!
-    mPosition(node.getChild("position"), fileFormat),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
-    mShape(deserialize<Shape>(node.getChild("shape/@0"), fileFormat)),
-    mWidth(Point(node.getChild("size"), fileFormat).getX()),
-    mHeight(Point(node.getChild("size"), fileFormat).getY()),
-    mDrillDiameter(
-        deserialize<UnsignedLength>(node.getChild("drill/@0"), fileFormat)),
-    mBoardSide(deserialize<BoardSide>(node.getChild("side/@0"), fileFormat)) {
-  // In the file format 0.1, footprint pads did not have their own UUID, but
-  // only the UUID of the package pad they were connected to. To get a
-  // deterministic UUID when upgrading a v0.1 footprint pad to v0.2, we simply
-  // use the package pad UUID as the footprint pad UUID too (see initialization
-  // above). But when loading a 0.2 file format, we need to load the package
-  // pad from the new s-expression node.
-  // See https://github.com/LibrePCB/LibrePCB/issues/445
-  if (fileFormat >= Version::fromString("0.2")) {
-    mPackagePadUuid = deserialize<tl::optional<Uuid>>(
-        node.getChild("package_pad/@0"), fileFormat);
-  }
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mPackagePadUuid(
+        deserialize<tl::optional<Uuid>>(node.getChild("package_pad/@0"))),
+    mPosition(node.getChild("position")),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
+    mShape(deserialize<Shape>(node.getChild("shape/@0"))),
+    mWidth(deserialize<PositiveLength>(node.getChild("size/@0"))),
+    mHeight(deserialize<PositiveLength>(node.getChild("size/@1"))),
+    mDrillDiameter(deserialize<UnsignedLength>(node.getChild("drill/@0"))),
+    mBoardSide(deserialize<BoardSide>(node.getChild("side/@0"))) {
 }
 
 FootprintPad::~FootprintPad() noexcept {
@@ -251,9 +303,9 @@ void FootprintPad::serialize(SExpression& root) const {
   root.appendChild("side", mBoardSide);
   root.appendChild("shape", mShape);
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
-  root.appendChild(Point(*mWidth, *mHeight).serializeToDomElement("size"));
+  Point(*mWidth, *mHeight).serialize(root.appendList("size"));
   root.appendChild("drill", mDrillDiameter);
   root.ensureLineBreak();
   root.appendChild("package_pad", mPackagePadUuid);

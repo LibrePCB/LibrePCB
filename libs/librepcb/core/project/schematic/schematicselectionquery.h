@@ -38,6 +38,7 @@ class SI_Polygon;
 class SI_Symbol;
 class SI_SymbolPin;
 class SI_Text;
+class Uuid;
 
 /*******************************************************************************
  *  Class SchematicSelectionQuery
@@ -60,10 +61,10 @@ public:
   // Constructors / Destructor
   SchematicSelectionQuery() = delete;
   SchematicSelectionQuery(const SchematicSelectionQuery& other) = delete;
-  SchematicSelectionQuery(const QList<SI_Symbol*>& symbols,
-                          const QList<SI_NetSegment*>& netsegments,
-                          const QList<SI_Polygon*>& polygons,
-                          const QList<SI_Text*>& texts,
+  SchematicSelectionQuery(const QMap<Uuid, SI_Symbol*>& symbols,
+                          const QMap<Uuid, SI_NetSegment*>& netsegments,
+                          const QMap<Uuid, SI_Polygon*>& polygons,
+                          const QMap<Uuid, SI_Text*>& texts,
                           QObject* parent = nullptr);
   ~SchematicSelectionQuery() noexcept;
 
@@ -121,10 +122,10 @@ public:
 
 private:
   // references to the Schematic object
-  const QList<SI_Symbol*>& mSymbols;
-  const QList<SI_NetSegment*>& mNetSegments;
-  const QList<SI_Polygon*>& mPolygons;
-  const QList<SI_Text*>& mTexts;
+  const QMap<Uuid, SI_Symbol*>& mSymbols;
+  const QMap<Uuid, SI_NetSegment*>& mNetSegments;
+  const QMap<Uuid, SI_Polygon*>& mPolygons;
+  const QMap<Uuid, SI_Text*>& mTexts;
 
   // query result
   QSet<SI_Symbol*> mResultSymbols;

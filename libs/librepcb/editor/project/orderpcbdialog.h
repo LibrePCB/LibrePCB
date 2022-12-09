@@ -58,7 +58,6 @@ public:
   OrderPcbDialog(const OrderPcbDialog& other) = delete;
   explicit OrderPcbDialog(const WorkspaceSettings& settings,
                           std::function<QByteArray()> createLppzCallback,
-                          const QString& boardRelativePath = QString(),
                           QWidget* parent = nullptr) noexcept;
   ~OrderPcbDialog() noexcept;
 
@@ -80,7 +79,6 @@ private:  // Data
   const WorkspaceSettings& mSettings;
   QScopedPointer<OrderPcbApiRequest> mRequest;
   std::function<QByteArray()> mCreateLppzCallback;
-  QString mBoardRelativePath;
   QScopedPointer<Ui::OrderPcbDialog> mUi;
 };
 

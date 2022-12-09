@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
+#include <librepcb/core/serialization/sexpression.h>
 #include <librepcb/core/types/circuitidentifier.h>
 
 /*******************************************************************************
@@ -82,53 +82,19 @@ TEST_P(CircuitIdentifierTest, testSerialize) {
   }
 }
 
-TEST_P(CircuitIdentifierTest, testDeserializeV02) {
+TEST_P(CircuitIdentifierTest, testDeserialize) {
   const CircuitIdentifierTestData& data = GetParam();
   SExpression sexpr = SExpression::createToken(data.input);
   if (data.valid) {
-    EXPECT_EQ(
-        data.input,
-        *deserialize<CircuitIdentifier>(sexpr, Version::fromString("0.2")));
-    EXPECT_EQ(data.input,
-              *deserialize<tl::optional<CircuitIdentifier>>(
-                  sexpr, Version::fromString("0.2")));
+    EXPECT_EQ(data.input, *deserialize<CircuitIdentifier>(sexpr));
+    EXPECT_EQ(data.input, *deserialize<tl::optional<CircuitIdentifier>>(sexpr));
   } else {
-    EXPECT_THROW(
-        deserialize<CircuitIdentifier>(sexpr, Version::fromString("0.2")),
-        Exception);
+    EXPECT_THROW(deserialize<CircuitIdentifier>(sexpr), Exception);
     if (data.input.isEmpty()) {
       EXPECT_EQ(tl::nullopt,
-                deserialize<tl::optional<CircuitIdentifier>>(
-                    sexpr, Version::fromString("0.2")));
+                deserialize<tl::optional<CircuitIdentifier>>(sexpr));
     } else {
-      EXPECT_THROW(deserialize<tl::optional<CircuitIdentifier>>(
-                       sexpr, Version::fromString("0.2")),
-                   Exception);
-    }
-  }
-}
-
-TEST_P(CircuitIdentifierTest, testDeserializeCurrentVersion) {
-  const CircuitIdentifierTestData& data = GetParam();
-  SExpression sexpr = SExpression::createToken(data.input);
-  if (data.valid) {
-    EXPECT_EQ(
-        data.input,
-        *deserialize<CircuitIdentifier>(sexpr, qApp->getFileFormatVersion()));
-    EXPECT_EQ(data.input,
-              *deserialize<tl::optional<CircuitIdentifier>>(
-                  sexpr, qApp->getFileFormatVersion()));
-  } else {
-    EXPECT_THROW(
-        deserialize<CircuitIdentifier>(sexpr, qApp->getFileFormatVersion()),
-        Exception);
-    if (data.input.isEmpty()) {
-      EXPECT_EQ(tl::nullopt,
-                deserialize<tl::optional<CircuitIdentifier>>(
-                    sexpr, qApp->getFileFormatVersion()));
-    } else {
-      EXPECT_THROW(deserialize<tl::optional<CircuitIdentifier>>(
-                       sexpr, qApp->getFileFormatVersion()),
+      EXPECT_THROW(deserialize<tl::optional<CircuitIdentifier>>(sexpr),
                    Exception);
     }
   }
@@ -139,18 +105,9 @@ TEST(CircuitIdentifierTest, testSerializeOptional) {
   EXPECT_EQ("", serialize(identifier).getValue());
 }
 
-TEST(CircuitIdentifierTest, testDeserializeOptionalV02) {
+TEST(CircuitIdentifierTest, testDeserializeOptional) {
   SExpression sexpr = SExpression::createToken("");
-  EXPECT_EQ(tl::nullopt,
-            deserialize<tl::optional<CircuitIdentifier>>(
-                sexpr, Version::fromString("0.2")));
-}
-
-TEST(CircuitIdentifierTest, testDeserializeOptionalCurrentVersion) {
-  SExpression sexpr = SExpression::createToken("");
-  EXPECT_EQ(tl::nullopt,
-            deserialize<tl::optional<CircuitIdentifier>>(
-                sexpr, qApp->getFileFormatVersion()));
+  EXPECT_EQ(tl::nullopt, deserialize<tl::optional<CircuitIdentifier>>(sexpr));
 }
 
 /*******************************************************************************

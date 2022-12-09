@@ -22,6 +22,9 @@
  ******************************************************************************/
 #include "cmpsigpindisplaytype.h"
 
+#include "../../exceptions.h"
+#include "../../serialization/sexpression.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -79,7 +82,7 @@ const CmpSigPinDisplayType& CmpSigPinDisplayType::fromString(
   }
   throw RuntimeError(
       __FILE__, __LINE__,
-      QString("Invalid component signal pin display type: \"%1\"").arg(str));
+      QString("Invalid component signal pin display type: '%1'").arg(str));
 }
 
 const QList<CmpSigPinDisplayType>&
@@ -91,6 +94,20 @@ const QList<CmpSigPinDisplayType>&
       netSignal(),
   };
   return list;
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const CmpSigPinDisplayType& obj) {
+  return SExpression::createToken(obj.toString());
+}
+
+template <>
+const CmpSigPinDisplayType& deserialize(const SExpression& node) {
+  return CmpSigPinDisplayType::fromString(node.getValue());  // can throw
 }
 
 /*******************************************************************************

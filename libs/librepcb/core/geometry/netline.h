@@ -40,7 +40,7 @@ namespace librepcb {
 /**
  * @brief The NetLineAnchor class
  */
-class NetLineAnchor final : public SerializableObject {
+class NetLineAnchor final {
   Q_DECLARE_TR_FUNCTIONS(NetLineAnchor)
 
 public:
@@ -57,7 +57,7 @@ public:
   // Constructors / Destructor
   NetLineAnchor() = delete;
   NetLineAnchor(const NetLineAnchor& other) noexcept;
-  NetLineAnchor(const SExpression& node, const Version& fileFormat);
+  explicit NetLineAnchor(const SExpression& node);
   ~NetLineAnchor() noexcept;
 
   // Getters
@@ -66,8 +66,14 @@ public:
   }
   const tl::optional<PinAnchor>& tryGetPin() const noexcept { return mPin; }
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const NetLineAnchor& rhs) const noexcept;
@@ -99,7 +105,7 @@ private:  // Data
  * The main purpose of this class is to serialize and deserialize schematic
  * net lines.
  */
-class NetLine final : public SerializableObject {
+class NetLine final {
   Q_DECLARE_TR_FUNCTIONS(NetLine)
 
 public:
@@ -119,7 +125,7 @@ public:
   NetLine(const Uuid& uuid, const NetLine& other) noexcept;
   NetLine(const Uuid& uuid, const UnsignedLength& width,
           const NetLineAnchor& start, const NetLineAnchor& end) noexcept;
-  NetLine(const SExpression& node, const Version& fileFormat);
+  explicit NetLine(const SExpression& node);
   ~NetLine() noexcept;
 
   // Getters
@@ -134,8 +140,14 @@ public:
   bool setStartPoint(const NetLineAnchor& start) noexcept;
   bool setEndPoint(const NetLineAnchor& end) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const NetLine& rhs) const noexcept;

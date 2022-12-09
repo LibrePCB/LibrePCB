@@ -44,7 +44,7 @@ namespace librepcb {
 /**
  * @brief The Text class
  */
-class Text final : public SerializableObject {
+class Text final {
   Q_DECLARE_TR_FUNCTIONS(Text)
 
 public:
@@ -68,7 +68,7 @@ public:
   Text(const Uuid& uuid, const GraphicsLayerName& layerName,
        const QString& text, const Point& pos, const Angle& rotation,
        const PositiveLength& height, const Alignment& align) noexcept;
-  Text(const SExpression& node, const Version& fileFormat);
+  explicit Text(const SExpression& node);
   ~Text() noexcept;
 
   // Getters
@@ -88,8 +88,14 @@ public:
   bool setHeight(const PositiveLength& height) noexcept;
   bool setAlign(const Alignment& align) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const Text& rhs) const noexcept;

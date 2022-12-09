@@ -30,6 +30,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
 #include <optional.hpp>
 
 /*******************************************************************************
@@ -93,7 +94,7 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::ComponentCategoryEditorWidget> mUi;
-  QScopedPointer<ComponentCategory> mCategory;
+  std::unique_ptr<ComponentCategory> mCategory;
   tl::optional<Uuid> mParentUuid;
 };
 

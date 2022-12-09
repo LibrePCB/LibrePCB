@@ -20,10 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
 #include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 /*******************************************************************************
  *  Namespace
@@ -41,39 +40,14 @@ class StrokeTextTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(StrokeTextTest, testConstructFromSExpressionV01) {
-  // Attention: Do NOT modify this string! It represents the freezed(!) file
-  // format V0.1 and even current versions of LibrePCB must be able to load it!
+TEST_F(StrokeTextTest, testConstructFromSExpression) {
   SExpression sexpr = SExpression::parse(
       "(stroke_text 0a8d7180-68e1-4749-bf8c-538b0d88f08c (layer bot_placement) "
       "(height 1.0) (stroke_width 0.2) (letter_spacing auto) "
       "(line_spacing auto) (align left bottom) (position 1.234 2.345) "
       "(rotation 45.0) (auto_rotate true) (mirror true) (value \"Foo Bar\"))",
       FilePath());
-  StrokeText obj(sexpr, Version::fromString("0.1"));
-  EXPECT_EQ(Uuid::fromString("0a8d7180-68e1-4749-bf8c-538b0d88f08c"),
-            obj.getUuid());
-  EXPECT_EQ(GraphicsLayerName("bot_placement"), obj.getLayerName());
-  EXPECT_EQ(PositiveLength(1000000), obj.getHeight());
-  EXPECT_EQ(UnsignedLength(200000), obj.getStrokeWidth());
-  EXPECT_EQ(true, obj.getLetterSpacing().isAuto());
-  EXPECT_EQ(true, obj.getLineSpacing().isAuto());
-  EXPECT_EQ(Alignment(HAlign::left(), VAlign::bottom()), obj.getAlign());
-  EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
-  EXPECT_EQ(Angle::deg45(), obj.getRotation());
-  EXPECT_EQ(true, obj.getAutoRotate());
-  EXPECT_EQ(true, obj.getMirrored());
-  EXPECT_EQ("Foo Bar", obj.getText());
-}
-
-TEST_F(StrokeTextTest, testConstructFromSExpressionCurrentVersion) {
-  SExpression sexpr = SExpression::parse(
-      "(stroke_text 0a8d7180-68e1-4749-bf8c-538b0d88f08c (layer bot_placement) "
-      "(height 1.0) (stroke_width 0.2) (letter_spacing auto) "
-      "(line_spacing auto) (align left bottom) (position 1.234 2.345) "
-      "(rotation 45.0) (auto_rotate true) (mirror true) (value \"Foo Bar\"))",
-      FilePath());
-  StrokeText obj(sexpr, qApp->getFileFormatVersion());
+  StrokeText obj(sexpr);
   EXPECT_EQ(Uuid::fromString("0a8d7180-68e1-4749-bf8c-538b0d88f08c"),
             obj.getUuid());
   EXPECT_EQ(GraphicsLayerName("bot_placement"), obj.getLayerName());
@@ -95,10 +69,12 @@ TEST_F(StrokeTextTest, testSerializeAndDeserialize) {
                   UnsignedLength(456), StrokeTextSpacing(),
                   StrokeTextSpacing(Ratio(1234)),
                   Alignment(HAlign::right(), VAlign::center()), true, false);
-  SExpression sexpr1 = obj1.serializeToDomElement("text");
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
-  StrokeText obj2(sexpr1, qApp->getFileFormatVersion());
-  SExpression sexpr2 = obj2.serializeToDomElement("text");
+  StrokeText obj2(sexpr1);
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
   EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }

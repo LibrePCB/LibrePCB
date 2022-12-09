@@ -67,42 +67,39 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
 }
 
 BoardFabricationOutputSettings::BoardFabricationOutputSettings(
-    const SExpression& node, const Version& fileFormat)
-  : BoardFabricationOutputSettings()  // init and load defaults
-{
-  mOutputBasePath = node.getChild("base_path/@0").getValue();
-  mSuffixOutlines = node.getChild("outlines/suffix/@0").getValue();
-  mSuffixCopperTop = node.getChild("copper_top/suffix/@0").getValue();
-  mSuffixCopperInner = node.getChild("copper_inner/suffix/@0").getValue();
-  mSuffixCopperBot = node.getChild("copper_bot/suffix/@0").getValue();
-  mSuffixSolderMaskTop = node.getChild("soldermask_top/suffix/@0").getValue();
-  mSuffixSolderMaskBot = node.getChild("soldermask_bot/suffix/@0").getValue();
-  mSuffixSilkscreenTop = node.getChild("silkscreen_top/suffix/@0").getValue();
-  mSuffixSilkscreenBot = node.getChild("silkscreen_bot/suffix/@0").getValue();
-  mSuffixSolderPasteTop = node.getChild("solderpaste_top/suffix/@0").getValue();
-  mSuffixSolderPasteBot = node.getChild("solderpaste_bot/suffix/@0").getValue();
-  mSuffixDrillsPth = node.getChild("drills/suffix_pth/@0").getValue();
-  mSuffixDrillsNpth = node.getChild("drills/suffix_npth/@0").getValue();
-  mSuffixDrills = node.getChild("drills/suffix_merged/@0").getValue();
-  mMergeDrillFiles =
-      deserialize<bool>(node.getChild("drills/merge/@0"), fileFormat);
-  mEnableSolderPasteTop =
-      deserialize<bool>(node.getChild("solderpaste_top/create/@0"), fileFormat);
-  mEnableSolderPasteBot =
-      deserialize<bool>(node.getChild("solderpaste_bot/create/@0"), fileFormat);
-
-  mSilkscreenLayersTop.clear();
-  foreach (const SExpression& child,
+    const SExpression& node)
+  : mOutputBasePath(node.getChild("base_path/@0").getValue()),
+    mSuffixDrills(node.getChild("drills/suffix_merged/@0").getValue()),
+    mSuffixDrillsNpth(node.getChild("drills/suffix_npth/@0").getValue()),
+    mSuffixDrillsPth(node.getChild("drills/suffix_pth/@0").getValue()),
+    mSuffixOutlines(node.getChild("outlines/suffix/@0").getValue()),
+    mSuffixCopperTop(node.getChild("copper_top/suffix/@0").getValue()),
+    mSuffixCopperInner(node.getChild("copper_inner/suffix/@0").getValue()),
+    mSuffixCopperBot(node.getChild("copper_bot/suffix/@0").getValue()),
+    mSuffixSolderMaskTop(node.getChild("soldermask_top/suffix/@0").getValue()),
+    mSuffixSolderMaskBot(node.getChild("soldermask_bot/suffix/@0").getValue()),
+    mSuffixSilkscreenTop(node.getChild("silkscreen_top/suffix/@0").getValue()),
+    mSuffixSilkscreenBot(node.getChild("silkscreen_bot/suffix/@0").getValue()),
+    mSuffixSolderPasteTop(
+        node.getChild("solderpaste_top/suffix/@0").getValue()),
+    mSuffixSolderPasteBot(
+        node.getChild("solderpaste_bot/suffix/@0").getValue()),
+    mSilkscreenLayersTop(),  // Initialized below.
+    mSilkscreenLayersBot(),  // Initialized below.
+    mMergeDrillFiles(deserialize<bool>(node.getChild("drills/merge/@0"))),
+    mEnableSolderPasteTop(
+        deserialize<bool>(node.getChild("solderpaste_top/create/@0"))),
+    mEnableSolderPasteBot(
+        deserialize<bool>(node.getChild("solderpaste_bot/create/@0"))) {
+  foreach (const SExpression* child,
            node.getChild("silkscreen_top/layers")
                .getChildren(SExpression::Type::Token)) {
-    mSilkscreenLayersTop.append(child.getValue());
+    mSilkscreenLayersTop.append(child->getValue());
   }
-
-  mSilkscreenLayersBot.clear();
-  foreach (const SExpression& child,
+  foreach (const SExpression* child,
            node.getChild("silkscreen_bot/layers")
                .getChildren(SExpression::Type::Token)) {
-    mSilkscreenLayersBot.append(child.getValue());
+    mSilkscreenLayersBot.append(child->getValue());
   }
 }
 

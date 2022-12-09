@@ -37,22 +37,11 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const SExpression& node,
-                         const Version& fileFormat)
+SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const Uuid& uuid,
+                         const Point& position)
   : SI_Base(segment.getSchematic()),
     mNetSegment(segment),
-    mJunction(node, fileFormat) {
-  init();
-}
-
-SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const Point& position)
-  : SI_Base(segment.getSchematic()),
-    mNetSegment(segment),
-    mJunction(Uuid::createRandom(), position) {
-  init();
-}
-
-void SI_NetPoint::init() {
+    mJunction(uuid, position) {
   // create the graphics item
   mGraphicsItem.reset(new SGI_NetPoint(*this));
   mGraphicsItem->setPos(mJunction.getPosition().toPxQPointF());
@@ -144,10 +133,6 @@ void SI_NetPoint::unregisterNetLine(SI_NetLine& netline) {
   netline.updateLine();
   mGraphicsItem->updateCacheAndRepaint();
   mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
-}
-
-void SI_NetPoint::serialize(SExpression& root) const {
-  mJunction.serialize(root);
 }
 
 /*******************************************************************************

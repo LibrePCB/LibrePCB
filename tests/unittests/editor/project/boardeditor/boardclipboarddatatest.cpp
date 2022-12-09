@@ -21,6 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/core/attribute/attrtypestring.h>
+#include <librepcb/core/attribute/attrtypevoltage.h>
 #include <librepcb/editor/project/boardeditor/boardclipboarddata.h>
 
 #include <QtCore>
@@ -72,6 +74,13 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   Uuid uuid = Uuid::createRandom();
   Point pos(12345, 54321);
 
+  std::shared_ptr<Attribute> attribute1 = std::make_shared<Attribute>(
+      AttributeKey("A1"), AttrTypeString::instance(), "foo bar", nullptr);
+
+  std::shared_ptr<Attribute> attribute2 = std::make_shared<Attribute>(
+      AttributeKey("A2"), AttrTypeVoltage::instance(), "4.2",
+      AttrTypeVoltage::instance().getUnitFromString("millivolt"));
+
   std::shared_ptr<StrokeText> strokeText1 = std::make_shared<StrokeText>(
       Uuid::createRandom(), GraphicsLayerName("foo"), "text 1", Point(1, 2),
       Angle(3), PositiveLength(4), UnsignedLength(5), StrokeTextSpacing(),
@@ -88,12 +97,14 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       std::make_shared<BoardClipboardData::Device>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
           Point::fromMm(1, 2), Angle::fromDeg(45), false,
+          AttributeList{attribute1, attribute2},
           StrokeTextList{strokeText1, strokeText2});
 
   std::shared_ptr<BoardClipboardData::Device> device2 =
       std::make_shared<BoardClipboardData::Device>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
           Point::fromMm(10, 20), Angle::fromDeg(-45), true,
+          AttributeList{attribute2, attribute1},
           StrokeTextList{strokeText2, strokeText1});
 
   std::shared_ptr<BoardClipboardData::NetSegment> netSegment1 =

@@ -41,7 +41,7 @@ namespace librepcb {
 /**
  * @brief The TraceAnchor class
  */
-class TraceAnchor final : public SerializableObject {
+class TraceAnchor final {
   Q_DECLARE_TR_FUNCTIONS(TraceAnchor)
 
 public:
@@ -58,7 +58,7 @@ public:
   // Constructors / Destructor
   TraceAnchor() = delete;
   TraceAnchor(const TraceAnchor& other) noexcept;
-  TraceAnchor(const SExpression& node, const Version& fileFormat);
+  explicit TraceAnchor(const SExpression& node);
   ~TraceAnchor() noexcept;
 
   // Getters
@@ -68,8 +68,14 @@ public:
   const tl::optional<Uuid>& tryGetVia() const noexcept { return mVia; }
   const tl::optional<PadAnchor>& tryGetPad() const noexcept { return mPad; }
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const TraceAnchor& rhs) const noexcept;
@@ -102,7 +108,7 @@ private:  // Data
  *
  * The main purpose of this class is to serialize and deserialize traces.
  */
-class Trace final : public SerializableObject {
+class Trace final {
   Q_DECLARE_TR_FUNCTIONS(Trace)
 
 public:
@@ -124,7 +130,7 @@ public:
   Trace(const Uuid& uuid, const GraphicsLayerName& layer,
         const PositiveLength& width, const TraceAnchor& start,
         const TraceAnchor& end) noexcept;
-  Trace(const SExpression& node, const Version& fileFormat);
+  explicit Trace(const SExpression& node);
   ~Trace() noexcept;
 
   // Getters
@@ -141,8 +147,14 @@ public:
   bool setStartPoint(const TraceAnchor& start) noexcept;
   bool setEndPoint(const TraceAnchor& end) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const Trace& rhs) const noexcept;

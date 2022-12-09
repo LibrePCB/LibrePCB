@@ -37,10 +37,11 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdSchematicAdd::CmdSchematicAdd(Project& project,
+CmdSchematicAdd::CmdSchematicAdd(Project& project, const QString& dirName,
                                  const ElementName& name) noexcept
   : UndoCommand(tr("Add schematic")),
     mProject(project),
+    mDirName(dirName),
     mName(name),
     mSchematic(nullptr),
     mPageIndex(-1) {
@@ -54,7 +55,10 @@ CmdSchematicAdd::~CmdSchematicAdd() noexcept {
  ******************************************************************************/
 
 bool CmdSchematicAdd::performExecute() {
-  mSchematic = mProject.createSchematic(mName);  // can throw
+  mSchematic = new Schematic(
+      mProject,
+      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
+      mDirName, Uuid::createRandom(), mName);
 
   performRedo();  // can throw
 

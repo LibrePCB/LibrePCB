@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../../geometry/path.h"
 #include "../../../geometry/stroketext.h"
-#include "../../../serialization/serializableobject.h"
 #include "../../../types/uuid.h"
 #include "bi_base.h"
 
@@ -50,16 +49,13 @@ class StrokeTextGraphicsItem;
 /**
  * @brief The BI_StrokeText class
  */
-class BI_StrokeText final : public BI_Base, public SerializableObject {
+class BI_StrokeText final : public BI_Base {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   BI_StrokeText() = delete;
   BI_StrokeText(const BI_StrokeText& other) = delete;
-  BI_StrokeText(Board& board, const BI_StrokeText& other);
-  BI_StrokeText(Board& board, const SExpression& node,
-                const Version& fileFormat);
   BI_StrokeText(Board& board, const StrokeText& text);
   ~BI_StrokeText() noexcept;
 
@@ -81,9 +77,6 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // Inherited from BI_Base
   Type_t getType() const noexcept override {
     return BI_Base::Type_t::StrokeText;
@@ -98,7 +91,6 @@ private slots:
   void boardOrDeviceAttributesChanged();
 
 private:  // Methods
-  void init();
   void updatePaths() noexcept;
   void strokeTextEdited(const StrokeText& text,
                         StrokeText::Event event) noexcept;

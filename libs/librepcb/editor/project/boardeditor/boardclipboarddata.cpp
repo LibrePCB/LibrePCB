@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "boardclipboarddata.h"
 
-#include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/circuit/netsignal.h>
@@ -60,22 +59,20 @@ BoardClipboardData::BoardClipboardData(const QByteArray& mimeData)
 
   SExpression root =
       SExpression::parse(mFileSystem->read("board.lp"), FilePath());
-  Version fileFormat = qApp->getFileFormatVersion();
-  mBoardUuid = deserialize<Uuid>(root.getChild("board/@0"), fileFormat);
-  mCursorPos = Point(root.getChild("cursor_position"), fileFormat);
-  mDevices.loadFromSExpression(root, fileFormat);
-  mNetSegments.loadFromSExpression(root, fileFormat);
-  mPlanes.loadFromSExpression(root, fileFormat);
-  mPolygons.loadFromSExpression(root, fileFormat);
-  mStrokeTexts.loadFromSExpression(root, fileFormat);
-  mHoles.loadFromSExpression(root, fileFormat);
+  mBoardUuid = deserialize<Uuid>(root.getChild("board/@0"));
+  mCursorPos = Point(root.getChild("cursor_position"));
+  mDevices.loadFromSExpression(root);
+  mNetSegments.loadFromSExpression(root);
+  mPlanes.loadFromSExpression(root);
+  mPolygons.loadFromSExpression(root);
+  mStrokeTexts.loadFromSExpression(root);
+  mHoles.loadFromSExpression(root);
 
-  foreach (const SExpression& child, root.getChildren("pad_position")) {
+  foreach (const SExpression* child, root.getChildren("pad_position")) {
     mPadPositions.insert(
-        std::make_pair(
-            deserialize<Uuid>(child.getChild("device/@0"), fileFormat),
-            deserialize<Uuid>(child.getChild("pad/@0"), fileFormat)),
-        Point(child.getChild("position"), fileFormat));
+        std::make_pair(deserialize<Uuid>(child->getChild("device/@0")),
+                       deserialize<Uuid>(child->getChild("pad/@0"))),
+        Point(child->getChild("position")));
   }
 }
 
@@ -107,16 +104,40 @@ std::unique_ptr<TransactionalDirectory> BoardClipboardData::getDirectory(
  ******************************************************************************/
 
 std::unique_ptr<QMimeData> BoardClipboardData::toMimeData() const {
-  SExpression sexpr =
-      serializeToDomElement("librepcb_clipboard_board");  // can throw
-  mFileSystem->write("board.lp", sexpr.toByteArray());
+  SExpression root = SExpression::createList("librepcb_clipboard_board");
+  root.ensureLineBreak();
+  mCursorPos.serialize(root.appendList("cursor_position"));
+  root.ensureLineBreak();
+  root.appendChild("board", mBoardUuid);
+  root.ensureLineBreak();
+  mDevices.serialize(root);
+  root.ensureLineBreak();
+  mNetSegments.serialize(root);
+  root.ensureLineBreak();
+  mPlanes.serialize(root);
+  root.ensureLineBreak();
+  mPolygons.serialize(root);
+  root.ensureLineBreak();
+  mStrokeTexts.serialize(root);
+  root.ensureLineBreak();
+  mHoles.serialize(root);
+  for (auto it = mPadPositions.begin(); it != mPadPositions.end(); ++it) {
+    SExpression child = SExpression::createList("pad_position");
+    child.appendChild("device", it.key().first);
+    child.appendChild("pad", it.key().second);
+    it.value().serialize(child.appendList("position"));
+    root.ensureLineBreak();
+    root.appendChild(child);
+  }
+  root.ensureLineBreak();
+  mFileSystem->write("board.lp", root.toByteArray());
 
   QByteArray zip = mFileSystem->exportToZip();
 
   std::unique_ptr<QMimeData> data(new QMimeData());
   data->setData(getMimeType(), zip);
   data->setData("application/zip", zip);
-  data->setText(sexpr.toByteArray());  // TODO: Remove this
+  data->setText(root.toByteArray());  // TODO: Remove this
   return data;
 }
 
@@ -134,37 +155,6 @@ std::unique_ptr<BoardClipboardData> BoardClipboardData::fromMimeData(
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void BoardClipboardData::serialize(SExpression& root) const {
-  root.ensureLineBreak();
-  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"));
-  root.ensureLineBreak();
-  root.appendChild("board", mBoardUuid);
-  root.ensureLineBreak();
-  mDevices.serialize(root);
-  root.ensureLineBreak();
-  mNetSegments.serialize(root);
-  root.ensureLineBreak();
-  mPlanes.serialize(root);
-  root.ensureLineBreak();
-  mPolygons.serialize(root);
-  root.ensureLineBreak();
-  mStrokeTexts.serialize(root);
-  root.ensureLineBreak();
-  mHoles.serialize(root);
-
-  for (auto it = mPadPositions.constBegin(); it != mPadPositions.constEnd();
-       ++it) {
-    SExpression child = SExpression::createList("pad_position");
-    child.appendChild("device", it.key().first);
-    child.appendChild("pad", it.key().second);
-    child.appendChild(it.value().serializeToDomElement("position"));
-    root.ensureLineBreak();
-    root.appendChild(child);
-  }
-
-  root.ensureLineBreak();
-}
 
 QString BoardClipboardData::getMimeType() noexcept {
   return QString("application/x-librepcb-clipboard.board; version=%1")

@@ -42,66 +42,10 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Circuit::Circuit(Project& project, const Version& fileFormat, bool create)
+Circuit::Circuit(Project& project)
   : QObject(&project),
     mProject(project),
     mDirectory(new TransactionalDirectory(project.getDirectory(), "circuit")) {
-  qDebug() << "Load circuit...";
-
-  try {
-    if (create) {
-      NetClass* netclass = new NetClass(*this, ElementName("default"));
-      addNetClass(*netclass);  // add a netclass with name "default"
-    } else {
-      SExpression root = SExpression::parse(
-          mDirectory->read("circuit.lp"), mDirectory->getAbsPath("circuit.lp"));
-
-      // OK - file is open --> now load the whole circuit stuff
-
-      // Load all netclasses
-      foreach (const SExpression& node, root.getChildren("netclass")) {
-        NetClass* netclass = new NetClass(*this, node, fileFormat);
-        addNetClass(*netclass);
-      }
-
-      // Load all netsignals
-      foreach (const SExpression& node, root.getChildren("net")) {
-        NetSignal* netsignal = new NetSignal(*this, node, fileFormat);
-        addNetSignal(*netsignal);
-      }
-
-      // Load all component instances
-      foreach (const SExpression& node, root.getChildren("component")) {
-        ComponentInstance* component =
-            new ComponentInstance(*this, node, fileFormat);
-        addComponentInstance(*component);
-      }
-    }
-  } catch (...) {
-    // free allocated memory (see comments in the destructor) and rethrow the
-    // exception
-    foreach (ComponentInstance* compInstance, mComponentInstances)
-      try {
-        removeComponentInstance(*compInstance);
-        delete compInstance;
-      } catch (...) {
-      }
-    foreach (NetSignal* netsignal, mNetSignals)
-      try {
-        removeNetSignal(*netsignal);
-        delete netsignal;
-      } catch (...) {
-      }
-    foreach (NetClass* netclass, mNetClasses)
-      try {
-        removeNetClass(*netclass);
-        delete netclass;
-      } catch (...) {
-      }
-    throw;
-  }
-
-  qDebug() << "Successfully loaded circuit.";
 }
 
 Circuit::~Circuit() noexcept {
@@ -134,10 +78,6 @@ Circuit::~Circuit() noexcept {
  *  NetClass Methods
  ******************************************************************************/
 
-NetClass* Circuit::getNetClassByUuid(const Uuid& uuid) const noexcept {
-  return mNetClasses.value(uuid, nullptr);
-}
-
 NetClass* Circuit::getNetClassByName(const ElementName& name) const noexcept {
   foreach (NetClass* netclass, mNetClasses) {
     if (netclass->getName() == name) {
@@ -148,34 +88,30 @@ NetClass* Circuit::getNetClassByName(const ElementName& name) const noexcept {
 }
 
 void Circuit::addNetClass(NetClass& netclass) {
-  if (&netclass.getCircuit() != this) {
+  if ((mNetClasses.values().contains(&netclass)) ||
+      (&netclass.getCircuit() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no netclass with the same uuid in the list
-  if (getNetClassByUuid(netclass.getUuid())) {
+  if (mNetClasses.contains(netclass.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a net class with the UUID \"%1\"!")
             .arg(netclass.getUuid().toStr()));
   }
-  // check if there is no netclass with the same name in the list
   if (getNetClassByName(netclass.getName())) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("There is already a net class with the name \"%1\"!")
                            .arg(*netclass.getName()));
   }
-  // add netclass to circuit
   netclass.addToCircuit();  // can throw
   mNetClasses.insert(netclass.getUuid(), &netclass);
   emit netClassAdded(netclass);
 }
 
 void Circuit::removeNetClass(NetClass& netclass) {
-  // check if the netclass was added to the circuit
   if (mNetClasses.value(netclass.getUuid()) != &netclass) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // remove netclass from project
   netclass.removeFromCircuit();  // can throw
   mNetClasses.remove(netclass.getUuid());
   emit netClassRemoved(netclass);
@@ -209,10 +145,6 @@ QString Circuit::generateAutoNetSignalName() const noexcept {
   return name;
 }
 
-NetSignal* Circuit::getNetSignalByUuid(const Uuid& uuid) const noexcept {
-  return mNetSignals.value(uuid, nullptr);
-}
-
 NetSignal* Circuit::getNetSignalByName(const QString& name) const noexcept {
   foreach (NetSignal* netsignal, mNetSignals) {
     if (netsignal->getName() == name) {
@@ -235,34 +167,30 @@ NetSignal* Circuit::getNetSignalWithMostElements() const noexcept {
 }
 
 void Circuit::addNetSignal(NetSignal& netsignal) {
-  if (&netsignal.getCircuit() != this) {
+  if ((mNetSignals.values().contains(&netsignal)) ||
+      (&netsignal.getCircuit() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // check if there is no netsignal with the same uuid in the list
-  if (getNetSignalByUuid(netsignal.getUuid())) {
+  if (mNetSignals.contains(netsignal.getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a net signal with the UUID \"%1\"!")
             .arg(netsignal.getUuid().toStr()));
   }
-  // check if there is no netsignal with the same name in the list
   if (getNetSignalByName(*netsignal.getName())) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("There is already a net signal with the name \"%1\"!")
                            .arg(*netsignal.getName()));
   }
-  // add netsignal to circuit
   netsignal.addToCircuit();  // can throw
   mNetSignals.insert(netsignal.getUuid(), &netsignal);
   emit netSignalAdded(netsignal);
 }
 
 void Circuit::removeNetSignal(NetSignal& netsignal) {
-  // check if the netsignal was added to the circuit
   if (mNetSignals.value(netsignal.getUuid()) != &netsignal) {
     throw LogicError(__FILE__, __LINE__);
   }
-  // remove netsignal from circuit
   netsignal.removeFromCircuit();  // can throw
   mNetSignals.remove(netsignal.getUuid());
   emit netSignalRemoved(netsignal);
@@ -373,22 +301,20 @@ void Circuit::setComponentInstanceName(ComponentInstance& cmp,
  *  General Methods
  ******************************************************************************/
 
-void Circuit::save() {
-  SExpression doc(serializeToDomElement("librepcb_circuit"));  // can throw
-  mDirectory->write("circuit.lp", doc.toByteArray());  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
 void Circuit::serialize(SExpression& root) const {
   root.ensureLineBreak();
-  serializePointerContainer(root, mNetClasses, "netclass");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mNetSignals, "net");
-  root.ensureLineBreak();
-  serializePointerContainer(root, mComponentInstances, "component");
+  for (const NetClass* obj : mNetClasses) {
+    root.ensureLineBreak();
+    obj->serialize(root.appendList("netclass"));
+  }
+  for (const NetSignal* obj : mNetSignals) {
+    root.ensureLineBreak();
+    obj->serialize(root.appendList("net"));
+  }
+  for (const ComponentInstance* obj : mComponentInstances) {
+    root.ensureLineBreak();
+    obj->serialize(root.appendList("component"));
+  }
   root.ensureLineBreak();
 }
 

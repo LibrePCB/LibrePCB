@@ -44,13 +44,11 @@ namespace editor {
 
 OrderPcbDialog::OrderPcbDialog(const WorkspaceSettings& settings,
                                std::function<QByteArray()> createLppzCallback,
-                               const QString& boardRelativePath,
                                QWidget* parent) noexcept
   : QDialog(parent),
     mSettings(settings),
     mRequest(),
     mCreateLppzCallback(createLppzCallback),
-    mBoardRelativePath(boardRelativePath),
     mUi(new Ui::OrderPcbDialog) {
   mUi->setupUi(this);
   mUi->lblMoreInformation->hide();
@@ -183,7 +181,7 @@ void OrderPcbDialog::startUpload() noexcept {
             &OrderPcbDialog::uploadSucceeded);
     connect(mRequest.data(), &OrderPcbApiRequest::uploadFailed, this,
             &OrderPcbDialog::uploadFailed);
-    mRequest->startUpload(lppz, mBoardRelativePath);
+    mRequest->startUpload(lppz, QString());
   } catch (const Exception& e) {
     uploadFailed(e.getMsg());
   }

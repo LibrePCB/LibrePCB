@@ -52,17 +52,15 @@ FootprintClipboardData::FootprintClipboardData(
     mCursorPos(cursorPos) {
 }
 
-FootprintClipboardData::FootprintClipboardData(const SExpression& node,
-                                               const Version& fileFormat)
-  : mFootprintUuid(
-        deserialize<Uuid>(node.getChild("footprint/@0"), fileFormat)),
-    mPackagePads(node.getChild("package"), fileFormat),
-    mCursorPos(node.getChild("cursor_position"), fileFormat),
-    mFootprintPads(node, fileFormat),
-    mPolygons(node, fileFormat),
-    mCircles(node, fileFormat),
-    mStrokeTexts(node, fileFormat),
-    mHoles(node, fileFormat) {
+FootprintClipboardData::FootprintClipboardData(const SExpression& node)
+  : mFootprintUuid(deserialize<Uuid>(node.getChild("footprint/@0"))),
+    mPackagePads(node.getChild("package")),
+    mCursorPos(node.getChild("cursor_position")),
+    mFootprintPads(node),
+    mPolygons(node),
+    mCircles(node),
+    mStrokeTexts(node),
+    mHoles(node) {
 }
 
 FootprintClipboardData::~FootprintClipboardData() noexcept {
@@ -74,39 +72,16 @@ FootprintClipboardData::~FootprintClipboardData() noexcept {
 
 std::unique_ptr<QMimeData> FootprintClipboardData::toMimeData(
     const IF_GraphicsLayerProvider& lp) {
-  SExpression sexpr =
-      serializeToDomElement("librepcb_clipboard_footprint");  // can throw
-
-  std::unique_ptr<QMimeData> data(new QMimeData());
-  data->setImageData(generatePixmap(lp));
-  data->setData(getMimeType(), sexpr.toByteArray());
-  return data;
-}
-
-std::unique_ptr<FootprintClipboardData> FootprintClipboardData::fromMimeData(
-    const QMimeData* mime) {
-  QByteArray content = mime ? mime->data(getMimeType()) : QByteArray();
-  if (!content.isNull()) {
-    SExpression root = SExpression::parse(content, FilePath());
-    return std::unique_ptr<FootprintClipboardData>(new FootprintClipboardData(
-        root, qApp->getFileFormatVersion()));  // can throw
-  } else {
-    return nullptr;
-  }
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void FootprintClipboardData::serialize(SExpression& root) const {
+  SExpression root = SExpression::createList("librepcb_clipboard_footprint");
   root.ensureLineBreak();
-  root.appendChild(mCursorPos.serializeToDomElement("cursor_position"));
+  mCursorPos.serialize(root.appendList("cursor_position"));
   root.ensureLineBreak();
   root.appendChild("footprint", mFootprintUuid);
   root.ensureLineBreak();
-  SExpression& packageRoot = root.appendList("package");
-  mPackagePads.serialize(packageRoot);
+  {
+    SExpression& node = root.appendList("package");
+    mPackagePads.serialize(node);
+  }
   root.ensureLineBreak();
   mFootprintPads.serialize(root);
   root.ensureLineBreak();
@@ -118,7 +93,28 @@ void FootprintClipboardData::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mHoles.serialize(root);
   root.ensureLineBreak();
+
+  std::unique_ptr<QMimeData> data(new QMimeData());
+  data->setImageData(generatePixmap(lp));
+  data->setData(getMimeType(), root.toByteArray());
+  return data;
 }
+
+std::unique_ptr<FootprintClipboardData> FootprintClipboardData::fromMimeData(
+    const QMimeData* mime) {
+  QByteArray content = mime ? mime->data(getMimeType()) : QByteArray();
+  if (!content.isNull()) {
+    SExpression root = SExpression::parse(content, FilePath());
+    return std::unique_ptr<FootprintClipboardData>(
+        new FootprintClipboardData(root));  // can throw
+  } else {
+    return nullptr;
+  }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
 
 QPixmap FootprintClipboardData::generatePixmap(
     const IF_GraphicsLayerProvider& lp) noexcept {

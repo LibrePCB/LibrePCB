@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
-#include "../serialization/serializableobject.h"
 #include "length.h"
 #include "lengthunit.h"
 
@@ -35,6 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class SExpression;
+
 /*******************************************************************************
  *  Class GridProperties
  ******************************************************************************/
@@ -42,7 +43,7 @@ namespace librepcb {
 /**
  * @brief The GridProperties class
  */
-class GridProperties final : public SerializableObject {
+class GridProperties final {
   Q_DECLARE_TR_FUNCTIONS(GridProperties)
 
 public:
@@ -51,7 +52,7 @@ public:
 
   // Constructors / Destructor
   GridProperties() noexcept;
-  GridProperties(const SExpression& node, const Version& fileFormat);
+  explicit GridProperties(const SExpression& node);
   GridProperties(Type_t type, const PositiveLength& interval,
                  const LengthUnit& unit) noexcept;
   GridProperties(const GridProperties& other) noexcept;
@@ -71,8 +72,12 @@ public:
 
   // General Methods
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operators
   GridProperties& operator=(const GridProperties& rhs) noexcept;
@@ -82,41 +87,6 @@ private:  // Data
   PositiveLength mInterval;
   LengthUnit mUnit;
 };
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline SExpression serialize(const GridProperties::Type_t& obj) {
-  switch (obj) {
-    case GridProperties::Type_t::Off:
-      return SExpression::createToken("off");
-    case GridProperties::Type_t::Lines:
-      return SExpression::createToken("lines");
-    case GridProperties::Type_t::Dots:
-      return SExpression::createToken("dots");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
-
-template <>
-inline GridProperties::Type_t deserialize(const SExpression& sexpr,
-                                          const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  QString str = sexpr.getValue();
-  if (str == "off")
-    return GridProperties::Type_t::Off;
-  else if (str == "lines")
-    return GridProperties::Type_t::Lines;
-  else if (str == "dots")
-    return GridProperties::Type_t::Dots;
-  else
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        GridProperties::tr("Unknown grid type: \"%1\"").arg(str));
-}
 
 /*******************************************************************************
  *  End of File

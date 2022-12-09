@@ -286,9 +286,11 @@ void UnplacedComponentsDock::currentDeviceIndexChanged(int index) noexcept {
           mProjectEditor.getWorkspace().getLibraryDb().getLatest<Package>(
               device.packageUuid);
       if (pkgFp.isValid()) {
-        package = new Package(
-            std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-                TransactionalFileSystem::openRO(pkgFp))));
+        package =
+            Package::open(std::unique_ptr<TransactionalDirectory>(
+                              new TransactionalDirectory(
+                                  TransactionalFileSystem::openRO(pkgFp))))
+                .release();
         packageOwned = true;
       }
     }

@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../serialization/serializableobject.h"
 #include "../../types/circuitidentifier.h"
 #include "../../types/uuid.h"
 #include "../erc/if_ercmsgprovider.h"
@@ -50,9 +49,7 @@ class SI_NetSegment;
 /**
  * @brief The NetSignal class
  */
-class NetSignal final : public QObject,
-                        public IF_ErcMsgProvider,
-                        public SerializableObject {
+class NetSignal final : public QObject, public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(NetSignal)
 
@@ -60,9 +57,7 @@ public:
   // Constructors / Destructor
   NetSignal() = delete;
   NetSignal(const NetSignal& other) = delete;
-  NetSignal(Circuit& circuit, const SExpression& node,
-            const Version& fileFormat);
-  explicit NetSignal(Circuit& circuit, NetClass& netclass,
+  explicit NetSignal(Circuit& circuit, const Uuid& uuid, NetClass& netclass,
                      const CircuitIdentifier& name, bool autoName);
   ~NetSignal() noexcept;
 
@@ -70,7 +65,7 @@ public:
   const Uuid& getUuid() const noexcept { return mUuid; }
   const CircuitIdentifier& getName() const noexcept { return mName; }
   bool hasAutoName() const noexcept { return mHasAutoName; }
-  NetClass& getNetClass() const noexcept { return *mNetClass; }
+  NetClass& getNetClass() const noexcept { return mNetClass; }
   bool isHighlighted() const noexcept { return mIsHighlighted; }
 
   // Getters: General
@@ -108,8 +103,12 @@ public:
   void registerBoardPlane(BI_Plane& plane);
   void unregisterBoardPlane(BI_Plane& plane);
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   NetSignal& operator=(const NetSignal& rhs) = delete;
@@ -122,7 +121,6 @@ signals:
   void highlightedChanged(bool isHighlighted);
 
 private:
-  bool checkAttributesValidity() const noexcept;
   void updateErcMessages() noexcept;
 
   // General
@@ -134,7 +132,7 @@ private:
   Uuid mUuid;
   CircuitIdentifier mName;
   bool mHasAutoName;
-  NetClass* mNetClass;
+  NetClass& mNetClass;
 
   // Registered Elements of this NetSignal
   QList<ComponentSignalInstance*> mRegisteredComponentSignals;

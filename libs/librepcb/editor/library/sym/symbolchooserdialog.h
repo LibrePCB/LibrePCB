@@ -29,6 +29,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -95,7 +97,7 @@ private:  // Data
   QScopedPointer<GraphicsScene> mPreviewScene;
   bool mCategorySelected;
   tl::optional<Uuid> mSelectedCategoryUuid;
-  QScopedPointer<Symbol> mSelectedSymbol;
+  std::unique_ptr<Symbol> mSelectedSymbol;
   QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
 };
 

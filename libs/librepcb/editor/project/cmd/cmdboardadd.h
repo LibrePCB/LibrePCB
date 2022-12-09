@@ -49,9 +49,8 @@ namespace editor {
 class CmdBoardAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdBoardAdd(Project& project, const ElementName& name) noexcept;
-  CmdBoardAdd(Project& project, const Board& boardToCopy,
-              const ElementName& name) noexcept;
+  CmdBoardAdd(Project& project, const QString& dirName, const ElementName& name,
+              const Board* boardToCopy = nullptr) noexcept;
   ~CmdBoardAdd() noexcept;
 
   // Getters
@@ -72,8 +71,10 @@ private:
   // Private Member Variables
 
   Project& mProject;
-  const Board* mBoardToCopy;
+  QString mDirName;
   ElementName mName;
+  const Board* mBoardToCopy;
+
   Board* mBoard;
   int mPageIndex;
 };

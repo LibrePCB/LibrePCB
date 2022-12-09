@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "librarycategory.h"
 
-#include "../../serialization/sexpression.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -42,17 +40,16 @@ LibraryCategory::LibraryCategory(const QString& shortElementName,
                                  const ElementName& name_en_US,
                                  const QString& description_en_US,
                                  const QString& keywords_en_US)
-  : LibraryBaseElement(true, shortElementName, longElementName, uuid, version,
-                       author, name_en_US, description_en_US, keywords_en_US) {
+  : LibraryBaseElement(shortElementName, longElementName, uuid, version, author,
+                       name_en_US, description_en_US, keywords_en_US) {
 }
 
 LibraryCategory::LibraryCategory(
-    std::unique_ptr<TransactionalDirectory> directory,
-    const QString& shortElementName, const QString& longElementName)
-  : LibraryBaseElement(std::move(directory), true, shortElementName,
-                       longElementName),
-    mParentUuid(deserialize<tl::optional<Uuid>>(
-        mLoadingFileDocument.getChild("parent/@0"), mLoadingFileFormat)) {
+    const QString& shortElementName, const QString& longElementName,
+    std::unique_ptr<TransactionalDirectory> directory, const SExpression& root)
+  : LibraryBaseElement(shortElementName, longElementName, true,
+                       std::move(directory), root),
+    mParentUuid(deserialize<tl::optional<Uuid>>(root.getChild("parent/@0"))) {
 }
 
 LibraryCategory::~LibraryCategory() noexcept {

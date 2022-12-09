@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/text.h"
-#include "../../../serialization/serializableobject.h"
 #include "si_base.h"
 
 #include <QtCore>
@@ -44,15 +43,13 @@ class TextGraphicsItem;
 /**
  * @brief The SI_Text class represents a text label in a schematic
  */
-class SI_Text final : public SI_Base, public SerializableObject {
+class SI_Text final : public SI_Base {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   SI_Text() = delete;
   SI_Text(const SI_Text& other) = delete;
-  SI_Text(Schematic& schematic, const SExpression& node,
-          const Version& fileFormat);
   SI_Text(Schematic& schematic, const Text& text);
   ~SI_Text() noexcept;
 
@@ -67,9 +64,6 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::Text; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
@@ -79,7 +73,6 @@ public:
   SI_Text& operator=(const SI_Text& rhs) = delete;
 
 private:  // Methods
-  void init();
   void schematicAttributesChanged() noexcept;
 
 private:  // Attributes

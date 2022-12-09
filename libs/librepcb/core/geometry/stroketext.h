@@ -84,37 +84,13 @@ private:  // Data
 };
 
 /*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline SExpression serialize(const StrokeTextSpacing& obj) {
-  if (obj.isAuto()) {
-    return SExpression::createToken("auto");
-  } else {
-    return serialize(obj.getRatio());
-  }
-}
-
-template <>
-inline StrokeTextSpacing deserialize(const SExpression& sexpr,
-                                     const Version& fileFormat) {
-  if (sexpr.getValue() == "auto") {
-    return StrokeTextSpacing();
-  } else {
-    return StrokeTextSpacing(
-        deserialize<Ratio>(sexpr, fileFormat));  // can throw
-  }
-}
-
-/*******************************************************************************
  *  Class StrokeText
  ******************************************************************************/
 
 /**
  * @brief The StrokeText class
  */
-class StrokeText final : public SerializableObject {
+class StrokeText final {
   Q_DECLARE_TR_FUNCTIONS(StrokeText)
 
 public:
@@ -146,7 +122,7 @@ public:
              const StrokeTextSpacing& letterSpacing,
              const StrokeTextSpacing& lineSpacing, const Alignment& align,
              bool mirrored, bool autoRotate) noexcept;
-  StrokeText(const SExpression& node, const Version& fileFormat);
+  explicit StrokeText(const SExpression& node);
   ~StrokeText() noexcept;
 
   // Getters
@@ -186,8 +162,14 @@ public:
   bool setMirrored(bool mirrored) noexcept;
   bool setAutoRotate(bool autoRotate) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const StrokeText& rhs) const noexcept;

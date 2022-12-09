@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "sexpression.h"
 
+#include "../exceptions.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -71,29 +73,49 @@ const QString& SExpression::getValue() const {
   return mValue;
 }
 
-QList<SExpression> SExpression::getChildren(Type type) const noexcept {
-  QList<SExpression> children;
-  foreach (const SExpression& child, mChildren) {
+QList<SExpression*> SExpression::getChildren(Type type) noexcept {
+  QList<SExpression*> children;
+  for (SExpression& child : mChildren) {
     if (child.getType() == type) {
-      children.append(child);
+      children.append(&child);
     }
   }
   return children;
 }
 
-QList<SExpression> SExpression::getChildren(const QString& name) const
-    noexcept {
-  QList<SExpression> children;
-  foreach (const SExpression& child, mChildren) {
+QList<const SExpression*> SExpression::getChildren(Type type) const noexcept {
+  QList<const SExpression*> children;
+  for (const SExpression& child : mChildren) {
+    if (child.getType() == type) {
+      children.append(&child);
+    }
+  }
+  return children;
+}
+
+QList<SExpression*> SExpression::getChildren(const QString& name) noexcept {
+  QList<SExpression*> children;
+  for (SExpression& child : mChildren) {
     if (child.isList() && (child.mValue == name)) {
-      children.append(child);
+      children.append(&child);
     }
   }
   return children;
 }
 
-const SExpression& SExpression::getChild(const QString& path) const {
-  const SExpression* child = tryGetChild(path);
+QList<const SExpression*> SExpression::getChildren(const QString& name) const
+    noexcept {
+  QList<const SExpression*> children;
+  for (const SExpression& child : mChildren) {
+    if (child.isList() && (child.mValue == name)) {
+      children.append(&child);
+    }
+  }
+  return children;
+}
+
+SExpression& SExpression::getChild(const QString& path) {
+  SExpression* child = tryGetChild(path);
   if (child) {
     return *child;
   } else {
@@ -102,21 +124,24 @@ const SExpression& SExpression::getChild(const QString& path) const {
   }
 }
 
-const SExpression* SExpression::tryGetChild(const QString& path) const
-    noexcept {
-  const SExpression* child = this;
+const SExpression& SExpression::getChild(const QString& path) const {
+  return const_cast<SExpression*>(this)->getChild(path);
+}
+
+SExpression* SExpression::tryGetChild(const QString& path) noexcept {
+  SExpression* child = this;
   foreach (const QString& name, path.split('/')) {
     if (name.startsWith('@')) {
       bool valid = false;
       int index = name.mid(1).toInt(&valid);
       if ((valid) && (index >= 0) && skipLineBreaks(child->mChildren, index)) {
-        child = &child->mChildren.at(index);
+        child = &child->mChildren[index];
       } else {
         return nullptr;
       }
     } else {
       bool found = false;
-      foreach (const SExpression& childchild, child->mChildren) {
+      for (SExpression& childchild : child->mChildren) {
         if (childchild.isList() && (childchild.mValue == name)) {
           child = &childchild;
           found = true;
@@ -129,6 +154,11 @@ const SExpression* SExpression::tryGetChild(const QString& path) const
     }
   }
   return child;
+}
+
+const SExpression* SExpression::tryGetChild(const QString& path) const
+    noexcept {
+  return const_cast<SExpression*>(this)->tryGetChild(path);
 }
 
 /*******************************************************************************
@@ -455,6 +485,127 @@ void SExpression::skipWhitespaceAndComments(const QString& content, int& index,
     } else {
       break;
     }
+  }
+}
+
+/*******************************************************************************
+ *  serialize() Specializations for C++/Qt Types
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const QColor& obj) {
+  return SExpression::createString(obj.isValid() ? obj.name(QColor::HexArgb)
+                                                 : "");
+}
+
+template <>
+SExpression serialize(const QUrl& obj) {
+  return SExpression::createString(
+      obj.isValid() ? obj.toString(QUrl::PrettyDecoded) : "");
+}
+
+template <>
+SExpression serialize(const QDateTime& obj) {
+  return SExpression::createToken(obj.toUTC().toString(Qt::ISODate));
+}
+
+template <>
+SExpression serialize(const QString& obj) {
+  return SExpression::createString(obj);
+}
+
+template <>
+SExpression serialize(const uint& obj) {
+  return SExpression::createToken(QString::number(obj));
+}
+
+template <>
+SExpression serialize(const int& obj) {
+  return SExpression::createToken(QString::number(obj));
+}
+
+template <>
+SExpression serialize(const bool& obj) {
+  return SExpression::createToken(obj ? "true" : "false");
+}
+
+/*******************************************************************************
+ *  deserialize() Specializations for C++/Qt Types
+ ******************************************************************************/
+
+template <>
+QColor deserialize(const SExpression& node) {
+  const QColor obj(node.getValue());
+  if (obj.isValid()) {
+    return obj;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid color: '%1'").arg(node.getValue()));
+  }
+}
+
+template <>
+QUrl deserialize(const SExpression& node) {
+  const QUrl obj(node.getValue(), QUrl::StrictMode);
+  if (obj.isValid()) {
+    return obj;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid URL: '%1'").arg(node.getValue()));
+  }
+}
+
+template <>
+QDateTime deserialize(const SExpression& node) {
+  const QDateTime obj =
+      QDateTime::fromString(node.getValue(), Qt::ISODate).toLocalTime();
+  if (obj.isValid()) {
+    return obj;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid datetime: '%1'").arg(node.getValue()));
+  }
+}
+
+template <>
+QString deserialize(const SExpression& node) {
+  return node.getValue();  // can throw
+}
+
+template <>
+uint deserialize(const SExpression& node) {
+  bool ok = false;
+  const uint value = node.getValue().toUInt(&ok);
+  if (ok) {
+    return value;
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Invalid unsigned integer: '%1'").arg(node.getValue()));
+  }
+}
+
+template <>
+int deserialize(const SExpression& node) {
+  bool ok = false;
+  const int value = node.getValue().toInt(&ok);
+  if (ok) {
+    return value;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid integer: '%1'").arg(node.getValue()));
+  }
+}
+
+template <>
+bool deserialize(const SExpression& node) {
+  if (node.getValue() == "true") {
+    return true;
+  } else if (node.getValue() == "false") {
+    return false;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid boolean: '%1'").arg(node.getValue()));
   }
 }
 

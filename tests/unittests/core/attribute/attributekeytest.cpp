@@ -21,8 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/core/application.h>
 #include <librepcb/core/attribute/attributekey.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 /*******************************************************************************
  *  Namespace
@@ -82,32 +82,15 @@ TEST_P(AttributeKeyTest, testSerialize) {
   }
 }
 
-TEST_P(AttributeKeyTest, testDeserializeV01) {
+TEST_P(AttributeKeyTest, testDeserialize) {
   const AttributeKeyTestData& data = GetParam();
 
   if (data.valid) {
     EXPECT_EQ(AttributeKey(data.input),
-              deserialize<AttributeKey>(SExpression::createString(data.input),
-                                        Version::fromString("0.1")));
+              deserialize<AttributeKey>(SExpression::createString(data.input)));
   } else {
     EXPECT_THROW(
-        deserialize<AttributeKey>(SExpression::createString(data.input),
-                                  Version::fromString("0.1")),
-        RuntimeError);
-  }
-}
-
-TEST_P(AttributeKeyTest, testDeserializeCurrentVersion) {
-  const AttributeKeyTestData& data = GetParam();
-
-  if (data.valid) {
-    EXPECT_EQ(AttributeKey(data.input),
-              deserialize<AttributeKey>(SExpression::createString(data.input),
-                                        qApp->getFileFormatVersion()));
-  } else {
-    EXPECT_THROW(
-        deserialize<AttributeKey>(SExpression::createString(data.input),
-                                  qApp->getFileFormatVersion()),
+        deserialize<AttributeKey>(SExpression::createString(data.input)),
         RuntimeError);
   }
 }

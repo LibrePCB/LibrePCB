@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../fileio/filepath.h"
 #include "../../library/cmp/componentprefix.h"
-#include "../../serialization/serializableobject.h"
 #include "../../types/circuitidentifier.h"
 #include "../../types/elementname.h"
 #include "../../types/uuid.h"
@@ -63,14 +62,14 @@ class TransactionalDirectory;
  *  - All net signals (::librepcb::NetSignal objects)
  *  - All component instances (::librepcb::ComponentInstance objects)
  */
-class Circuit final : public QObject, public SerializableObject {
+class Circuit final : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   Circuit() = delete;
   Circuit(const Circuit& other) = delete;
-  Circuit(Project& project, const Version& fileFormat, bool create);
+  explicit Circuit(Project& project);
   ~Circuit() noexcept;
 
   // Getters
@@ -80,7 +79,6 @@ public:
   const QMap<Uuid, NetClass*>& getNetClasses() const noexcept {
     return mNetClasses;
   }
-  NetClass* getNetClassByUuid(const Uuid& uuid) const noexcept;
   NetClass* getNetClassByName(const ElementName& name) const noexcept;
   void addNetClass(NetClass& netclass);
   void removeNetClass(NetClass& netclass);
@@ -91,7 +89,6 @@ public:
   const QMap<Uuid, NetSignal*>& getNetSignals() const noexcept {
     return mNetSignals;
   }
-  NetSignal* getNetSignalByUuid(const Uuid& uuid) const noexcept;
   NetSignal* getNetSignalByName(const QString& name) const noexcept;
   NetSignal* getNetSignalWithMostElements() const noexcept;
   void addNetSignal(NetSignal& netsignal);
@@ -116,7 +113,13 @@ public:
                                 const CircuitIdentifier& newName);
 
   // General Methods
-  void save();
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   Circuit& operator=(const Circuit& rhs) = delete;
@@ -133,9 +136,6 @@ signals:
   void componentRemoved(ComponentInstance& cmp);
 
 private:
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
   QScopedPointer<TransactionalDirectory> mDirectory;

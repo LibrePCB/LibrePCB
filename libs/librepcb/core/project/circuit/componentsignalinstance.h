@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../serialization/serializableobject.h"
 #include "../../types/circuitidentifier.h"
 #include "../erc/if_ercmsgprovider.h"
 
@@ -49,9 +48,7 @@ class SI_SymbolPin;
 /**
  * @brief The ComponentSignalInstance class
  */
-class ComponentSignalInstance final : public QObject,
-                                      public IF_ErcMsgProvider,
-                                      public SerializableObject {
+class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(ComponentSignalInstance)
 
@@ -59,8 +56,6 @@ public:
   // Constructors / Destructor
   ComponentSignalInstance() = delete;
   ComponentSignalInstance(const ComponentSignalInstance& other) = delete;
-  ComponentSignalInstance(Circuit& circuit, ComponentInstance& cmpInstance,
-                          const SExpression& node, const Version& fileFormat);
   explicit ComponentSignalInstance(Circuit& circuit,
                                    ComponentInstance& cmpInstance,
                                    const ComponentSignal& cmpSignal,
@@ -70,7 +65,7 @@ public:
   // Getters
   Circuit& getCircuit() const noexcept { return mCircuit; }
   const ComponentSignal& getCompSignal() const noexcept {
-    return *mComponentSignal;
+    return mComponentSignal;
   }
   NetSignal* getNetSignal() const noexcept { return mNetSignal; }
   ComponentInstance& getComponentInstance() const noexcept {
@@ -111,8 +106,12 @@ public:
   void registerFootprintPad(BI_FootprintPad& pad);
   void unregisterFootprintPad(BI_FootprintPad& pad);
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   ComponentSignalInstance& operator=(const ComponentSignalInstance& rhs) =
@@ -127,13 +126,10 @@ private slots:
   void updateErcMessages() noexcept;
 
 private:
-  void init();
-  bool checkAttributesValidity() const noexcept;
-
   // General
   Circuit& mCircuit;
   ComponentInstance& mComponentInstance;
-  const ComponentSignal* mComponentSignal;
+  const ComponentSignal& mComponentSignal;
   bool mIsAddedToCircuit;
 
   // Attributes

@@ -30,6 +30,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
 #include <optional.hpp>
 
 /*******************************************************************************
@@ -93,7 +94,7 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::PackageCategoryEditorWidget> mUi;
-  QSharedPointer<PackageCategory> mCategory;
+  std::unique_ptr<PackageCategory> mCategory;
   tl::optional<Uuid> mParentUuid;
 };
 

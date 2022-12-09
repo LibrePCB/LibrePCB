@@ -45,122 +45,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_NetSegment::BI_NetSegment(Board& board, const BI_NetSegment& other,
-                             const QHash<const BI_Device*, BI_Device*>& devMap)
-  : BI_Base(board),
-    mUuid(Uuid::createRandom()),
-    mNetSignal(other.getNetSignal()) {
-  // determine new pad anchors
-  QHash<const BI_NetLineAnchor*, BI_NetLineAnchor*> anchorsMap;
-  for (auto it = devMap.begin(); it != devMap.end(); ++it) {
-    const BI_Device& oldDev = *it.key();
-    BI_Device& newDev = *it.value();
-    foreach (const BI_FootprintPad* pad, oldDev.getPads()) {
-      anchorsMap.insert(pad, newDev.getPad(pad->getLibPadUuid()));
-    }
-  }
-
-  // copy vias
-  foreach (const BI_Via* via, other.mVias) {
-    BI_Via* copy = new BI_Via(*this, *via);
-    Q_ASSERT(!getViaByUuid(copy->getUuid()));
-    mVias.append(copy);
-    anchorsMap.insert(via, copy);
-  }
-  // copy netpoints
-  foreach (const BI_NetPoint* netpoint, other.mNetPoints) {
-    BI_NetPoint* copy = new BI_NetPoint(*this, netpoint->getPosition());
-    mNetPoints.append(copy);
-    anchorsMap.insert(netpoint, copy);
-  }
-  // copy netlines
-  foreach (const BI_NetLine* netline, other.mNetLines) {
-    BI_NetLineAnchor* start = anchorsMap.value(&netline->getStartPoint());
-    Q_ASSERT(start);
-    BI_NetLineAnchor* end = anchorsMap.value(&netline->getEndPoint());
-    Q_ASSERT(end);
-    BI_NetLine* copy = new BI_NetLine(*this, *netline, *start, *end);
-    mNetLines.append(copy);
-  }
-}
-
-BI_NetSegment::BI_NetSegment(Board& board, const SExpression& node,
-                             const Version& fileFormat)
-  : BI_Base(board),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mNetSignal(nullptr) {
-  try {
-    // Note: Connection to a netsignal is optional since file format V0.2.
-    if (tl::optional<Uuid> netSignalUuid = deserialize<tl::optional<Uuid>>(
-            node.getChild("net/@0"), fileFormat)) {
-      mNetSignal =
-          mBoard.getProject().getCircuit().getNetSignalByUuid(*netSignalUuid);
-      if (!mNetSignal) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           QString("Invalid net signal UUID: \"%1\"")
-                               .arg(netSignalUuid->toStr()));
-      }
-    }
-
-    // Load all vias
-    foreach (const SExpression& node, node.getChildren("via")) {
-      BI_Via* via = new BI_Via(*this, node, fileFormat);
-      if (getViaByUuid(via->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a via with the UUID \"%1\"!")
-                .arg(via->getUuid().toStr()));
-      }
-      mVias.append(via);
-    }
-
-    // Load all netpoints
-    foreach (const SExpression& child, node.getChildren("junction")) {
-      BI_NetPoint* netpoint = new BI_NetPoint(*this, child, fileFormat);
-      if (getNetPointByUuid(netpoint->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a netpoint with the UUID \"%1\"!")
-                .arg(netpoint->getUuid().toStr()));
-      }
-      mNetPoints.append(netpoint);
-    }
-
-    // Load all netlines
-    foreach (const SExpression& node,
-             node.getChildren("netline") + node.getChildren("trace")) {
-      BI_NetLine* netline = new BI_NetLine(*this, node, fileFormat);
-      if (getNetLineByUuid(netline->getUuid())) {
-        throw RuntimeError(
-            __FILE__, __LINE__,
-            QString("There is already a netline with the UUID \"%1\"!")
-                .arg(netline->getUuid().toStr()));
-      }
-      mNetLines.append(netline);
-    }
-
-    if (!areAllNetPointsConnectedTogether()) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString("The netsegment with the UUID \"%1\" is not cohesive!")
-              .arg(mUuid.toStr()));
-    }
-
-    if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
-  } catch (...) {
-    // free the allocated memory in the reverse order of their allocation...
-    qDeleteAll(mNetLines);
-    mNetLines.clear();
-    qDeleteAll(mNetPoints);
-    mNetPoints.clear();
-    qDeleteAll(mVias);
-    mVias.clear();
-    throw;  // ...and rethrow the exception
-  }
-}
-
-BI_NetSegment::BI_NetSegment(Board& board, NetSignal* signal)
-  : BI_Base(board), mUuid(Uuid::createRandom()), mNetSignal(signal) {
+BI_NetSegment::BI_NetSegment(Board& board, const Uuid& uuid, NetSignal* signal)
+  : BI_Base(board), mUuid(uuid), mNetSignal(signal) {
 }
 
 BI_NetSegment::~BI_NetSegment() noexcept {
@@ -259,105 +145,75 @@ void BI_NetSegment::setNetSignal(NetSignal* netsignal) {
 }
 
 /*******************************************************************************
- *  Via Methods
- ******************************************************************************/
-
-BI_Via* BI_NetSegment::getViaByUuid(const Uuid& uuid) const noexcept {
-  foreach (BI_Via* via, mVias) {
-    if (via->getUuid() == uuid) return via;
-  }
-  return nullptr;
-}
-
-/*******************************************************************************
- *  NetPoint Methods
- ******************************************************************************/
-
-BI_NetPoint* BI_NetSegment::getNetPointByUuid(const Uuid& uuid) const noexcept {
-  foreach (BI_NetPoint* netpoint, mNetPoints) {
-    if (netpoint->getUuid() == uuid) return netpoint;
-  }
-  return nullptr;
-}
-
-/*******************************************************************************
- *  NetLine Methods
- ******************************************************************************/
-
-BI_NetLine* BI_NetSegment::getNetLineByUuid(const Uuid& uuid) const noexcept {
-  foreach (BI_NetLine* netline, mNetLines) {
-    if (netline->getUuid() == uuid) return netline;
-  }
-  return nullptr;
-}
-
-/*******************************************************************************
  *  NetPoint+NetLine Methods
  ******************************************************************************/
 
 void BI_NetSegment::addElements(const QList<BI_Via*>& vias,
                                 const QList<BI_NetPoint*>& netpoints,
                                 const QList<BI_NetLine*>& netlines) {
-  if (!isAddedToBoard()) {
-    throw LogicError(__FILE__, __LINE__);
-  }
-
   ScopeGuardList sgl(netpoints.count() + netlines.count());
   foreach (BI_Via* via, vias) {
-    if ((mVias.contains(via)) || (&via->getNetSegment() != this)) {
+    if ((mVias.values().contains(via)) || (&via->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
     }
-    // check if there is no via with the same uuid in the list
-    if (getViaByUuid(via->getUuid())) {
+    if (mVias.contains(via->getUuid())) {
       throw RuntimeError(__FILE__, __LINE__,
                          QString("There is already a via with the UUID \"%1\"!")
                              .arg(via->getUuid().toStr()));
     }
-    // add to board
-    via->addToBoard();  // can throw
-    mVias.append(via);
+    if (isAddedToBoard()) {
+      via->addToBoard();  // can throw
+    }
+    mVias.insert(via->getUuid(), via);
     sgl.add([this, via]() {
-      via->removeFromBoard();
-      mVias.removeOne(via);
+      if (isAddedToBoard()) {
+        via->removeFromBoard();
+      }
+      mVias.remove(via->getUuid());
     });
   }
   foreach (BI_NetPoint* netpoint, netpoints) {
-    if ((mNetPoints.contains(netpoint)) ||
+    if ((mNetPoints.values().contains(netpoint)) ||
         (&netpoint->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
     }
-    // check if there is no netpoint with the same uuid in the list
-    if (getNetPointByUuid(netpoint->getUuid())) {
+    if (mNetPoints.contains(netpoint->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString("There is already a netpoint with the UUID \"%1\"!")
               .arg(netpoint->getUuid().toStr()));
     }
-    // add to board
-    netpoint->addToBoard();  // can throw
-    mNetPoints.append(netpoint);
+    if (isAddedToBoard()) {
+      netpoint->addToBoard();  // can throw
+    }
+    mNetPoints.insert(netpoint->getUuid(), netpoint);
     sgl.add([this, netpoint]() {
-      netpoint->removeFromBoard();
-      mNetPoints.removeOne(netpoint);
+      if (isAddedToBoard()) {
+        netpoint->removeFromBoard();
+      }
+      mNetPoints.remove(netpoint->getUuid());
     });
   }
   foreach (BI_NetLine* netline, netlines) {
-    if ((mNetLines.contains(netline)) || (&netline->getNetSegment() != this)) {
+    if ((mNetLines.values().contains(netline)) ||
+        (&netline->getNetSegment() != this)) {
       throw LogicError(__FILE__, __LINE__);
     }
-    // check if there is no netline with the same uuid in the list
-    if (getNetLineByUuid(netline->getUuid())) {
+    if (mNetLines.contains(netline->getUuid())) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString("There is already a netline with the UUID \"%1\"!")
               .arg(netline->getUuid().toStr()));
     }
-    // add to board
-    netline->addToBoard();  // can throw
-    mNetLines.append(netline);
+    if (isAddedToBoard()) {
+      netline->addToBoard();  // can throw
+    }
+    mNetLines.insert(netline->getUuid(), netline);
     sgl.add([this, netline]() {
-      netline->removeFromBoard();
-      mNetLines.removeOne(netline);
+      if (isAddedToBoard()) {
+        netline->removeFromBoard();
+      }
+      mNetLines.remove(netline->getUuid());
     });
   }
 
@@ -374,45 +230,50 @@ void BI_NetSegment::addElements(const QList<BI_Via*>& vias,
 void BI_NetSegment::removeElements(const QList<BI_Via*>& vias,
                                    const QList<BI_NetPoint*>& netpoints,
                                    const QList<BI_NetLine*>& netlines) {
-  if (!isAddedToBoard()) {
-    throw LogicError(__FILE__, __LINE__);
-  }
-
   ScopeGuardList sgl(netpoints.count() + netlines.count());
   foreach (BI_NetLine* netline, netlines) {
-    if (!mNetLines.contains(netline)) {
+    if (mNetLines.value(netline->getUuid()) != netline) {
       throw LogicError(__FILE__, __LINE__);
     }
-    // remove from board
-    netline->removeFromBoard();  // can throw
-    mNetLines.removeOne(netline);
+    if (isAddedToBoard()) {
+      netline->removeFromBoard();  // can throw
+    }
+    mNetLines.remove(netline->getUuid());
     sgl.add([this, netline]() {
-      netline->addToBoard();
-      mNetLines.append(netline);
+      if (isAddedToBoard()) {
+        netline->addToBoard();
+      }
+      mNetLines.insert(netline->getUuid(), netline);
     });
   }
   foreach (BI_NetPoint* netpoint, netpoints) {
-    if (!mNetPoints.contains(netpoint)) {
+    if (mNetPoints.value(netpoint->getUuid()) != netpoint) {
       throw LogicError(__FILE__, __LINE__);
     }
-    // remove from board
-    netpoint->removeFromBoard();  // can throw
-    mNetPoints.removeOne(netpoint);
+    if (isAddedToBoard()) {
+      netpoint->removeFromBoard();  // can throw
+    }
+    mNetPoints.remove(netpoint->getUuid());
     sgl.add([this, netpoint]() {
-      netpoint->addToBoard();
-      mNetPoints.append(netpoint);
+      if (isAddedToBoard()) {
+        netpoint->addToBoard();
+      }
+      mNetPoints.insert(netpoint->getUuid(), netpoint);
     });
   }
   foreach (BI_Via* via, vias) {
-    if (!mVias.contains(via)) {
+    if (mVias.value(via->getUuid()) != via) {
       throw LogicError(__FILE__, __LINE__);
     }
-    // remove from board
-    via->removeFromBoard();  // can throw
-    mVias.removeOne(via);
+    if (isAddedToBoard()) {
+      via->removeFromBoard();  // can throw
+    }
+    mVias.remove(via->getUuid());
     sgl.add([this, via]() {
-      via->addToBoard();
-      mVias.append(via);
+      if (isAddedToBoard()) {
+        via->addToBoard();
+      }
+      mVias.insert(via->getUuid(), via);
     });
   }
 
@@ -522,11 +383,20 @@ void BI_NetSegment::serialize(SExpression& root) const {
   root.appendChild("net",
                    mNetSignal ? mNetSignal->getUuid() : tl::optional<Uuid>());
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mVias, "via");
+  for (const BI_Via* obj : mVias) {
+    root.ensureLineBreak();
+    obj->getVia().serialize(root.appendList("via"));
+  }
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mNetPoints, "junction");
+  for (const BI_NetPoint* obj : mNetPoints) {
+    root.ensureLineBreak();
+    obj->getJunction().serialize(root.appendList("junction"));
+  }
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mNetLines, "trace");
+  for (const BI_NetLine* obj : mNetLines) {
+    root.ensureLineBreak();
+    obj->getTrace().serialize(root.appendList("trace"));
+  }
   root.ensureLineBreak();
 }
 

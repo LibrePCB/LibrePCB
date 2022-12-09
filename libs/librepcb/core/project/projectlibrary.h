@@ -59,6 +59,9 @@ public:
   ProjectLibrary(std::unique_ptr<TransactionalDirectory> directory);
   ~ProjectLibrary() noexcept;
 
+  // Getters: General
+  TransactionalDirectory& getDirectory() const { return *mDirectory; }
+
   // Getters: Library Elements
   const QHash<Uuid, Symbol*>& getSymbols() const noexcept { return mSymbols; }
   const QHash<Uuid, Package*>& getPackages() const noexcept {
@@ -95,17 +98,11 @@ public:
   void removeComponent(Component& c);
   void removeDevice(Device& d);
 
-  // General Methods
-  void save();
-
   // Operator Overloadings
   ProjectLibrary& operator=(const ProjectLibrary& rhs) = delete;
 
 private:
   // Private Methods
-  template <typename ElementType>
-  void loadElements(const QString& dirname, const QString& type,
-                    QHash<Uuid, ElementType*>& elementList);
   template <typename ElementType>
   void addElement(ElementType& element, QHash<Uuid, ElementType*>& elementList);
   template <typename ElementType>
@@ -122,7 +119,6 @@ private:
   QHash<Uuid, Device*> mDevices;
 
   QSet<LibraryBaseElement*> mAllElements;
-  QSet<LibraryBaseElement*> mElementsToUpgrade;
 };
 
 /*******************************************************************************

@@ -79,16 +79,15 @@ public:
   Project(const Project& other) = delete;
 
   /**
-   * @brief The constructor to open an existing project with all its content
+   * @brief Create a new, default initialized project
    *
-   * @param directory     The directory which contains the project.
+   * @param directory     The project directory to use.
    * @param filename      The filename of the *.lpp project file.
    *
    * @throw Exception     If the project could not be opened successfully
    */
   Project(std::unique_ptr<TransactionalDirectory> directory,
-          const QString& filename)
-    : Project(std::move(directory), filename, false) {}
+          const QString& filename);
 
   /**
    * @brief The destructor will close the whole project (without saving!)
@@ -316,17 +315,6 @@ public:
   Schematic* getSchematicByName(const QString& name) const noexcept;
 
   /**
-   * @brief Create a new schematic (page)
-   *
-   * @param name  The schematic page name
-   *
-   * @return A pointer to the new schematic
-   *
-   * @throw Exception This method throws an exception on error.
-   */
-  Schematic* createSchematic(const ElementName& name);
-
-  /**
    * @brief Add an existing schematic to this project
    *
    * @param schematic     The schematic to add
@@ -394,29 +382,6 @@ public:
   Board* getBoardByName(const QString& name) const noexcept;
 
   /**
-   * @brief Create a new board
-   *
-   * @param name  The board name
-   *
-   * @return A pointer to the new board
-   *
-   * @throw Exception This method throws an exception on error.
-   */
-  Board* createBoard(const ElementName& name);
-
-  /**
-   * @brief Create a new board as a copy of an existing board
-   *
-   * @param other The board to copy
-   * @param name  The board name
-   *
-   * @return A pointer to the new board
-   *
-   * @throw Exception This method throws an exception on error.
-   */
-  Board* createBoard(const Board& other, const ElementName& name);
-
-  /**
    * @brief Add an existing board to this project
    *
    * @param board         The board to add
@@ -460,11 +425,9 @@ public:
 
   // Static Methods
 
-  static Project* create(std::unique_ptr<TransactionalDirectory> directory,
-                         const QString& filename) {
-    return new Project(std::move(directory), filename, true);
-  }
-
+  static std::unique_ptr<Project> create(
+      std::unique_ptr<TransactionalDirectory> directory,
+      const QString& filename);
   static bool isFilePathInsideProjectDirectory(const FilePath& fp) noexcept;
   static bool isProjectFile(const FilePath& file) noexcept;
   static bool isProjectDirectory(const FilePath& dir) noexcept;
@@ -505,24 +468,6 @@ signals:
   void boardRemoved(int oldIndex);
 
 private:
-  // Private Methods
-
-  /**
-   * @brief The constructor to create or open a project with all its content
-   *
-   * @param directory     The directory which contains the project.
-   * @param filename      The filename of the *.lpp project file.
-   * @param create        True if the specified project does not exist already
-   *                      and must be created.
-   *
-   * @throw Exception     If the project could not be created/opened
-   * successfully
-   *
-   * @todo Remove interactive message boxes, should be done at a higher layer!
-   */
-  explicit Project(std::unique_ptr<TransactionalDirectory> directory,
-                   const QString& filename, bool create);
-
   /// Project root directory.
   std::unique_ptr<TransactionalDirectory> mDirectory;
 

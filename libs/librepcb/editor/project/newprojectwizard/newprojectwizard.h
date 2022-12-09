@@ -28,6 +28,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -71,7 +73,7 @@ public:
   void setLocation(const FilePath& dir) noexcept;
 
   // General Methods
-  Project* createProject() const;
+  std::unique_ptr<Project> createProject() const;
 
   // Operator Overloadings
   NewProjectWizard& operator=(const NewProjectWizard& rhs) = delete;

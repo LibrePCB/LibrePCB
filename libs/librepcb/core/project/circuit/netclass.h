@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../serialization/serializableobject.h"
 #include "../../types/elementname.h"
 #include "../../types/uuid.h"
 #include "../erc/if_ercmsgprovider.h"
@@ -46,9 +45,7 @@ class NetSignal;
 /**
  * @brief The NetClass class
  */
-class NetClass final : public QObject,
-                       public IF_ErcMsgProvider,
-                       public SerializableObject {
+class NetClass final : public QObject, public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(NetClass)
 
@@ -56,9 +53,8 @@ public:
   // Constructors / Destructor
   NetClass() = delete;
   NetClass(const NetClass& other) = delete;
-  NetClass(Circuit& circuit, const SExpression& node,
-           const Version& fileFormat);
-  explicit NetClass(Circuit& circuit, const ElementName& name);
+  explicit NetClass(Circuit& circuit, const Uuid& uuid,
+                    const ElementName& name);
   ~NetClass() noexcept;
 
   // Getters
@@ -79,8 +75,12 @@ public:
   void registerNetSignal(NetSignal& signal);
   void unregisterNetSignal(NetSignal& signal);
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   NetClass& operator=(const NetClass& rhs) = delete;

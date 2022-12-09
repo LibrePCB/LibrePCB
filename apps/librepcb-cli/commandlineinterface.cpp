@@ -47,6 +47,7 @@
 #include <librepcb/core/project/erc/ercmsg.h>
 #include <librepcb/core/project/erc/ercmsglist.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
 
 #include <QtCore>
@@ -376,14 +377,16 @@ bool CommandLineInterface::openProject(
       projectFs = TransactionalFileSystem::open(projectFp.getParentDir(), save);
       projectFileName = projectFp.getFilename();
     }
-    Project project(std::unique_ptr<TransactionalDirectory>(
+    ProjectLoader loader;
+    std::unique_ptr<Project> project =
+        loader.open(std::unique_ptr<TransactionalDirectory>(
                         new TransactionalDirectory(projectFs)),
                     projectFileName);  // can throw
 
     // Parse list of boards.
     QList<Board*> boards;
     foreach (const QString& boardName, boardNames) {
-      if (Board* board = project.getBoardByName(boardName)) {
+      if (Board* board = project->getBoardByName(boardName)) {
         if (!boards.contains(board)) {
           boards.append(board);
         }
@@ -396,7 +399,7 @@ bool CommandLineInterface::openProject(
     foreach (const QString& boardIndex, boardIndices) {
       bool ok = false;
       const int index = boardIndex.trimmed().toInt(&ok);
-      Board* board = project.getBoardByIndex(index);
+      Board* board = project->getBoardByIndex(index);
       if (ok && board) {
         if (!boards.contains(board)) {
           boards.append(board);
@@ -411,17 +414,17 @@ bool CommandLineInterface::openProject(
     // the other commands, e.g. the ERC, working without the removed boards).
     if (removeOtherBoards) {
       print(tr("Remove other boards..."));
-      foreach (Board* board, project.getBoards()) {
+      foreach (Board* board, project->getBoards()) {
         if (!boards.contains(board)) {
           print(QString("  - '%1'").arg(*board->getName()));
-          project.removeBoard(*board);
+          project->removeBoard(*board);
         }
       }
     }
 
     // If no boards are specified, export all boards.
     if (boardNames.isEmpty() && boardIndices.isEmpty()) {
-      boards = project.getBoards();
+      boards = project->getBoards();
     }
 
     // Check for non-canonical files (strict mode)
@@ -433,7 +436,7 @@ bool CommandLineInterface::openProject(
                     "*.lppz files!"));
         success = false;
       } else {
-        project.save();  // can throw
+        project->save();  // can throw
         QStringList paths = projectFs->checkForModifications();  // can throw
         // ignore user config files
         paths = paths.filter(QRegularExpression("^((?!\\.user\\.lp).)*$"));
@@ -455,7 +458,7 @@ bool CommandLineInterface::openProject(
       print(tr("Run ERC..."));
       QStringList messages;
       int approvedMsgCount = 0;
-      foreach (const ErcMsg* msg, project.getErcMsgList().getItems()) {
+      foreach (const ErcMsg* msg, project->getErcMsgList().getItems()) {
         if (!msg->isVisible()) continue;
         if (msg->isIgnored()) {
           ++approvedMsgCount;
@@ -489,13 +492,13 @@ bool CommandLineInterface::openProject(
     foreach (const QString& destStr, exportSchematicsFiles) {
       print(tr("Export schematics to '%1'...").arg(destStr));
       QString destPathStr = AttributeSubstitutor::substitute(
-          destStr, &project, [&](const QString& str) {
+          destStr, project.get(), [&](const QString& str) {
             return FilePath::cleanFileName(
                 str, FilePath::ReplaceSpaces | FilePath::KeepCase);
           });
       FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
       GraphicsExport graphicsExport;
-      graphicsExport.setDocumentName(*project.getName());
+      graphicsExport.setDocumentName(*project->getName());
       QObject::connect(
           &graphicsExport, &GraphicsExport::savingFile,
           [&destPathStr, &writtenFilesCounter](const FilePath& fp) {
@@ -505,7 +508,7 @@ bool CommandLineInterface::openProject(
       std::shared_ptr<GraphicsExportSettings> settings =
           std::make_shared<GraphicsExportSettings>();
       GraphicsExport::Pages pages;
-      foreach (const Schematic* schematic, project.getSchematics()) {
+      foreach (const Schematic* schematic, project->getSchematics()) {
         pages.append(std::make_pair(
             std::make_shared<SchematicPainter>(*schematic), settings));
       }
@@ -545,7 +548,7 @@ bool CommandLineInterface::openProject(
         foreach (const Board* board, boardsToExport) {
           const AttributeProvider* attrProvider = board;
           if (!board) {
-            attrProvider = &project;
+            attrProvider = project.get();
           }
           QString destPathStr = AttributeSubstitutor::substitute(
               destStr, attrProvider, [&](const QString& str) {
@@ -553,7 +556,7 @@ bool CommandLineInterface::openProject(
                     str, FilePath::ReplaceSpaces | FilePath::KeepCase);
               });
           FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
-          BomGenerator gen(project);
+          BomGenerator gen(*project);
           gen.setAdditionalAttributes(attributes);
           std::shared_ptr<Bom> bom = gen.generate(board);
           if (board) {
@@ -585,10 +588,11 @@ bool CommandLineInterface::openProject(
         try {
           qDebug() << "Load custom fabrication output settings:"
                    << pcbFabricationSettingsPath;
-          FilePath fp(QFileInfo(pcbFabricationSettingsPath).absoluteFilePath());
-          customSettings = BoardFabricationOutputSettings(
-              SExpression::parse(FileUtils::readFile(fp), fp),
-              qApp->getFileFormatVersion());  // can throw
+          const FilePath fp(
+              QFileInfo(pcbFabricationSettingsPath).absoluteFilePath());
+          const SExpression root =
+              SExpression::parse(FileUtils::readFile(fp), fp);
+          customSettings = BoardFabricationOutputSettings(root);  // can throw
         } catch (const Exception& e) {
           printErr(
               tr("ERROR: Failed to load custom settings: %1").arg(e.getMsg()));
@@ -668,7 +672,7 @@ bool CommandLineInterface::openProject(
       if (failIfFileFormatUnstable()) {
         success = false;
       } else {
-        project.save();  // can throw
+        project->save();  // can throw
         if (projectFp.getSuffix() == "lppz") {
           projectFs->exportToZip(projectFp);  // can throw
         } else {
@@ -716,103 +720,110 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
 
     std::shared_ptr<TransactionalFileSystem> libFs =
         TransactionalFileSystem::open(libFp, save);  // can throw
-    Library lib(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(libFs)));  // can throw
-    processLibraryElement(libDir, *libFs, lib, save, strict,
+    std::unique_ptr<Library> lib =
+        Library::open(std::unique_ptr<TransactionalDirectory>(
+            new TransactionalDirectory(libFs)));  // can throw
+    processLibraryElement(libDir, *libFs, *lib, save, strict,
                           success);  // can throw
 
     // Open all component categories
     if (all) {
-      QStringList elements = lib.searchForElements<ComponentCategory>();
+      QStringList elements = lib->searchForElements<ComponentCategory>();
       print(tr("Process %1 component categories...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
         qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        ComponentCategory element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, element, save, strict,
+        std::unique_ptr<ComponentCategory> element =
+            ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
+                new TransactionalDirectory(fs)));  // can throw
+        processLibraryElement(libDir, *fs, *element, save, strict,
                               success);  // can throw
       }
     }
 
     // Open all package categories
     if (all) {
-      QStringList elements = lib.searchForElements<PackageCategory>();
+      QStringList elements = lib->searchForElements<PackageCategory>();
       print(tr("Process %1 package categories...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
         qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        PackageCategory element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, element, save, strict,
+        std::unique_ptr<PackageCategory> element =
+            PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
+                new TransactionalDirectory(fs)));  // can throw
+        processLibraryElement(libDir, *fs, *element, save, strict,
                               success);  // can throw
       }
     }
 
     // Open all symbols
     if (all) {
-      QStringList elements = lib.searchForElements<Symbol>();
+      QStringList elements = lib->searchForElements<Symbol>();
       print(tr("Process %1 symbols...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
         qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        Symbol element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, element, save, strict,
+        std::unique_ptr<Symbol> element =
+            Symbol::open(std::unique_ptr<TransactionalDirectory>(
+                new TransactionalDirectory(fs)));  // can throw
+        processLibraryElement(libDir, *fs, *element, save, strict,
                               success);  // can throw
       }
     }
 
     // Open all packages
     if (all) {
-      QStringList elements = lib.searchForElements<Package>();
+      QStringList elements = lib->searchForElements<Package>();
       print(tr("Process %1 packages...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
         qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        Package element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, element, save, strict,
+        std::unique_ptr<Package> element =
+            Package::open(std::unique_ptr<TransactionalDirectory>(
+                new TransactionalDirectory(fs)));  // can throw
+        processLibraryElement(libDir, *fs, *element, save, strict,
                               success);  // can throw
       }
     }
 
     // Open all components
     if (all) {
-      QStringList elements = lib.searchForElements<Component>();
+      QStringList elements = lib->searchForElements<Component>();
       print(tr("Process %1 components...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
         qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        Component element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, element, save, strict,
+        std::unique_ptr<Component> element =
+            Component::open(std::unique_ptr<TransactionalDirectory>(
+                new TransactionalDirectory(fs)));  // can throw
+        processLibraryElement(libDir, *fs, *element, save, strict,
                               success);  // can throw
       }
     }
 
     // Open all devices
     if (all) {
-      QStringList elements = lib.searchForElements<Device>();
+      QStringList elements = lib->searchForElements<Device>();
       print(tr("Process %1 devices...").arg(elements.count()));
       foreach (const QString& dir, elements) {
         FilePath fp = libFp.getPathTo(dir);
         qInfo() << tr("Open '%1'...").arg(prettyPath(fp, libDir));
         std::shared_ptr<TransactionalFileSystem> fs =
             TransactionalFileSystem::open(fp, save);  // can throw
-        Device element(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, element, save, strict,
+        std::unique_ptr<Device> element =
+            Device::open(std::unique_ptr<TransactionalDirectory>(
+                new TransactionalDirectory(fs)));  // can throw
+        processLibraryElement(libDir, *fs, *element, save, strict,
                               success);  // can throw
       }
     }

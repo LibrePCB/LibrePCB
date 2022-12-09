@@ -26,7 +26,7 @@
 #include "../exceptions.h"
 #include "../types/uuid.h"
 #include "../utils/signalslot.h"
-#include "serializableobject.h"
+#include "sexpression.h"
 
 #include <QtCore>
 
@@ -43,8 +43,8 @@ namespace librepcb {
  ******************************************************************************/
 
 /**
- * @brief The SerializableObjectList class implements a list of
- *        librepcb::SerializableObject
+ * @brief The SerializableObjectList class implements a list of serializable
+ *        objects
  *
  * This template class lets you hold a list of serializable objects and provides
  * some useful features:
@@ -70,8 +70,7 @@ namespace librepcb {
  *                copyable)
  *              - Optional: A constructor with one parameter of type `const
  *                SExpression&`
- *              - Optional: A method `serialize()` according to
- *                librepcb::SerializableObject
+ *              - Optional: A method `void serialize(SExpression&) const`
  *              - Optional: Comparison operator overloadings
  *              - Optional: A method `Uuid getUuid() const noexcept`
  *              - Optional: A method `QString getName() const noexcept`
@@ -93,7 +92,7 @@ namespace librepcb {
  * should use range based for loops (since C++11) instead.
  */
 template <typename T, typename P, typename... OnEditedArgs>
-class SerializableObjectList : public SerializableObject {
+class SerializableObjectList {
   Q_DECLARE_TR_FUNCTIONS(SerializableObjectList)
 
 public:
@@ -180,15 +179,14 @@ public:
                                   OnEditedArgs...>::elementEditedHandler) {
     foreach (const std::shared_ptr<T>& obj, elements) { append(obj); }
   }
-  explicit SerializableObjectList(const SExpression& node,
-                                  const Version& fileFormat)
+  explicit SerializableObjectList(const SExpression& node)
     : onEdited(*this),
       onElementEdited(*this),
       mOnEditedSlot(
           *this,
           &SerializableObjectList<T, P,
                                   OnEditedArgs...>::elementEditedHandler) {
-    loadFromSExpression(node, fileFormat);  // can throw
+    loadFromSExpression(node);  // can throw
   }
   virtual ~SerializableObjectList() noexcept {}
 
@@ -311,10 +309,10 @@ public:
   iterator end() noexcept { return mObjects.end(); }
 
   // General Methods
-  int loadFromSExpression(const SExpression& node, const Version& fileFormat) {
+  int loadFromSExpression(const SExpression& node) {
     clear();
-    foreach (const SExpression& node, node.getChildren(P::tagname)) {
-      append(std::make_shared<T>(node, fileFormat));  // can throw
+    foreach (const SExpression* child, node.getChildren(P::tagname)) {
+      append(std::make_shared<T>(*child));  // can throw
     }
     return count();
   }
@@ -366,9 +364,18 @@ public:
     }
     Q_ASSERT(isEmpty() && mObjects.isEmpty());
   }
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override {
-    serializePointerContainer(root, mObjects, P::tagname);  // can throw
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const {
+    foreach (const std::shared_ptr<T>& ptr, mObjects) {
+      root.ensureLineBreak();
+      ptr->serialize(root.appendList(P::tagname));  // can throw
+    }
+    root.ensureLineBreak();
   }
 
   // Convenience Methods

@@ -30,14 +30,15 @@
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
-//#include "newprojectwizardpage_versioncontrol.h"
 
 /*******************************************************************************
  *  Namespace
@@ -56,8 +57,6 @@ NewProjectWizard::NewProjectWizard(const Workspace& ws,
 
   addPage(mPageMetadata = new NewProjectWizardPage_Metadata(mWorkspace, this));
   addPage(mPageInitialization = new NewProjectWizardPage_Initialization(this));
-  // addPage(mPageVersionControl = new
-  // NewProjectWizardPage_VersionControl(this));
 }
 
 NewProjectWizard::~NewProjectWizard() noexcept {
@@ -75,16 +74,16 @@ void NewProjectWizard::setLocation(const FilePath& dir) noexcept {
  *  General Methods
  ******************************************************************************/
 
-Project* NewProjectWizard::createProject() const {
+std::unique_ptr<Project> NewProjectWizard::createProject() const {
   // create file system
   std::shared_ptr<TransactionalFileSystem> fs = TransactionalFileSystem::openRW(
       mPageMetadata->getFullFilePath().getParentDir());
   TransactionalDirectory dir(fs);
 
   // create project and set some metadata
-  QScopedPointer<Project> project(Project::create(
+  std::unique_ptr<Project> project = Project::create(
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
-      mPageMetadata->getFullFilePath().getFilename()));
+      mPageMetadata->getFullFilePath().getFilename());
   project->setName(
       ElementName(mPageMetadata->getProjectName().trimmed()));  // can throw
   project->setAuthor(mPageMetadata->getProjectAuthor());
@@ -96,15 +95,22 @@ Project* NewProjectWizard::createProject() const {
 
   // add schematic
   if (mPageInitialization->getCreateSchematic()) {
-    Schematic* schematic = project->createSchematic(
+    Schematic* schematic = new Schematic(
+        *project,
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
+        mPageInitialization->getSchematicDirName(), Uuid::createRandom(),
         ElementName(mPageInitialization->getSchematicName()));  // can throw
     project->addSchematic(*schematic);
   }
 
   // add board
   if (mPageInitialization->getCreateBoard()) {
-    Board* board = project->createBoard(
+    Board* board = new Board(
+        *project,
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
+        mPageInitialization->getBoardDirName(), Uuid::createRandom(),
         ElementName(mPageInitialization->getBoardName()));  // can throw
+    board->addDefaultContent();
     project->addBoard(*board);
   }
 
@@ -157,7 +163,7 @@ Project* NewProjectWizard::createProject() const {
   fs->save();  // can throw
 
   // all done, return the new project
-  return project.take();
+  return project;
 }
 
 /*******************************************************************************

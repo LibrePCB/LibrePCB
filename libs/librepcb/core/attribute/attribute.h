@@ -43,7 +43,7 @@ class AttributeUnit;
 /**
  * @brief The Attribute class
  */
-class Attribute final : public SerializableObject {
+class Attribute final {
   Q_DECLARE_TR_FUNCTIONS(Attribute)
 
 public:
@@ -58,7 +58,7 @@ public:
   // Constructors / Destructor
   Attribute() = delete;
   Attribute(const Attribute& other) noexcept;
-  Attribute(const SExpression& node, const Version& fileFormat);
+  explicit Attribute(const SExpression& node);
   Attribute(const AttributeKey& key, const AttributeType& type,
             const QString& value, const AttributeUnit* unit);
   ~Attribute() noexcept;
@@ -80,8 +80,12 @@ public:
 
   // General Methods
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const Attribute& rhs) const noexcept;

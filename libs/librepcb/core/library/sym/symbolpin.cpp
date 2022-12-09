@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "symbolpin.h"
 
-#include "../../types/version.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -66,26 +64,17 @@ SymbolPin::SymbolPin(const Uuid& uuid, const CircuitIdentifier& name,
     mNameAlignment(nameAlign) {
 }
 
-SymbolPin::SymbolPin(const SExpression& node, const Version& fileFormat)
+SymbolPin::SymbolPin(const SExpression& node)
   : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"), fileFormat)),
-    mPosition(node.getChild("position"), fileFormat),
-    mLength(
-        deserialize<UnsignedLength>(node.getChild("length/@0"), fileFormat)),
-    mRotation(deserialize<Angle>(node.getChild("rotation/@0"), fileFormat)),
-    mNamePosition(getDefaultNamePosition(mLength)),  // Since file format v0.2
-    mNameRotation(0),  // Since file format v0.2
-    mNameHeight(getDefaultNameHeight()),  // Since file format v0.2
-    mNameAlignment(getDefaultNameAlignment()) {  // Since file format v0.2
-  if (fileFormat >= Version::fromString("0.2")) {
-    mNamePosition = Point(node.getChild("name_position"), fileFormat);
-    mNameRotation =
-        deserialize<Angle>(node.getChild("name_rotation/@0"), fileFormat);
-    mNameHeight = deserialize<PositiveLength>(node.getChild("name_height/@0"),
-                                              fileFormat);
-    mNameAlignment = Alignment(node.getChild("name_align"), fileFormat);
-  }
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mName(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
+    mPosition(node.getChild("position")),
+    mLength(deserialize<UnsignedLength>(node.getChild("length/@0"))),
+    mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
+    mNamePosition(node.getChild("name_position")),
+    mNameRotation(deserialize<Angle>(node.getChild("name_rotation/@0"))),
+    mNameHeight(deserialize<PositiveLength>(node.getChild("name_height/@0"))),
+    mNameAlignment(node.getChild("name_align")) {
 }
 
 SymbolPin::~SymbolPin() noexcept {
@@ -183,15 +172,15 @@ void SymbolPin::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("name", mName);
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("length", mLength);
   root.ensureLineBreak();
-  root.appendChild(mNamePosition.serializeToDomElement("name_position"));
+  mNamePosition.serialize(root.appendList("name_position"));
   root.appendChild("name_rotation", mNameRotation);
   root.appendChild("name_height", mNameHeight);
   root.ensureLineBreak();
-  root.appendChild(mNameAlignment.serializeToDomElement("name_align"));
+  mNameAlignment.serialize(root.appendList("name_align"));
   root.ensureLineBreak();
 }
 

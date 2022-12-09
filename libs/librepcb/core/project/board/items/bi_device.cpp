@@ -48,94 +48,22 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Device::BI_Device(Board& board, const BI_Device& other)
-  : BI_Base(board),
-    mCompInstance(other.mCompInstance),
-    mLibDevice(other.mLibDevice),
-    mLibPackage(other.mLibPackage),
-    mLibFootprint(other.mLibFootprint),
-    mPosition(other.mPosition),
-    mRotation(other.mRotation),
-    mMirrored(other.mMirrored),
-    mAttributes(other.mAttributes) {
-  foreach (const BI_StrokeText* text, other.mStrokeTexts) {
-    addStrokeText(*new BI_StrokeText(mBoard, *text));
-  }
-
-  init();
-}
-
-BI_Device::BI_Device(Board& board, const SExpression& node,
-                     const Version& fileFormat)
-  : BI_Base(board),
-    mCompInstance(nullptr),
-    mLibDevice(nullptr),
-    mLibPackage(nullptr),
-    mLibFootprint(nullptr),
-    mAttributes() {
-  // get component instance
-  Uuid compInstUuid = deserialize<Uuid>(node.getChild("@0"), fileFormat);
-  mCompInstance =
-      mBoard.getProject().getCircuit().getComponentInstanceByUuid(compInstUuid);
-  if (!mCompInstance) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString("Could not find the component instance with UUID \"%1\"!")
-            .arg(compInstUuid.toStr()));
-  }
-  // get device and footprint uuid
-  Uuid deviceUuid =
-      deserialize<Uuid>(node.getChild("lib_device/@0"), fileFormat);
-  Uuid footprintUuid =
-      deserialize<Uuid>(node.getChild("lib_footprint/@0"), fileFormat);
-  initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
-
-  // get position, rotation and mirrored
-  mPosition = Point(node.getChild("position"), fileFormat);
-  mRotation = deserialize<Angle>(node.getChild("rotation/@0"), fileFormat);
-  mMirrored = deserialize<bool>(node.getChild("mirror/@0"), fileFormat);
-
-  // load attributes
-  mAttributes.loadFromSExpression(node, fileFormat);  // can throw
-
-  // Load stroke texts.
-  foreach (const SExpression& node, node.getChildren("stroke_text")) {
-    addStrokeText(*new BI_StrokeText(mBoard, node, fileFormat));  // can throw
-  }
-
-  init();
-}
-
 BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
                      const Uuid& deviceUuid, const Uuid& footprintUuid,
-                     const Point& position, const Angle& rotation, bool mirror)
+                     const Point& position, const Angle& rotation, bool mirror,
+                     bool loadInitialStrokeTexts)
   : BI_Base(board),
-    mCompInstance(&compInstance),
+    mCompInstance(compInstance),
     mLibDevice(nullptr),
     mLibPackage(nullptr),
     mLibFootprint(nullptr),
     mPosition(position),
     mRotation(rotation),
     mMirrored(mirror) {
-  initDeviceAndPackageAndFootprint(deviceUuid, footprintUuid);
-
-  // add attributes
-  mAttributes = mLibDevice->getAttributes();
-
-  // Add initial stroke texts.
-  for (const StrokeText& text : getDefaultStrokeTexts()) {
-    addStrokeText(*new BI_StrokeText(mBoard, text));
-  }
-
-  init();
-}
-
-void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
-                                                 const Uuid& footprintUuid) {
   // get device from library
   mLibDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
   if (!mLibDevice) {
-    qCritical() << "No device for component:" << mCompInstance->getUuid();
+    qCritical() << "No device for component:" << mCompInstance.getUuid();
     throw RuntimeError(__FILE__, __LINE__,
                        tr("No device with the UUID \"%1\" found in the "
                           "project's library.")
@@ -143,19 +71,19 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
   }
   // check if the device matches with the component
   if (mLibDevice->getComponentUuid() !=
-      mCompInstance->getLibComponent().getUuid()) {
+      mCompInstance.getLibComponent().getUuid()) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("The device \"%1\" does not match with the component"
                 "instance \"%2\".")
             .arg(mLibDevice->getUuid().toStr(),
-                 mCompInstance->getUuid().toStr()));
+                 mCompInstance.getUuid().toStr()));
   }
   // get package from library
   Uuid packageUuid = mLibDevice->getPackageUuid();
   mLibPackage = mBoard.getProject().getLibrary().getPackage(packageUuid);
   if (!mLibPackage) {
-    qCritical() << "No package for component:" << mCompInstance->getUuid();
+    qCritical() << "No package for component:" << mCompInstance.getUuid();
     throw RuntimeError(__FILE__, __LINE__,
                        tr("No package with the UUID \"%1\" found in "
                           "the project's library.")
@@ -164,13 +92,21 @@ void BI_Device::initDeviceAndPackageAndFootprint(const Uuid& deviceUuid,
   // get footprint from package
   mLibFootprint =
       mLibPackage->getFootprints().get(footprintUuid).get();  // can throw
-}
 
-void BI_Device::init() {
-  // check pad-signal-map
+  // Add initial attributes.
+  mAttributes = mLibDevice->getAttributes();
+
+  // Add initial stroke texts.
+  if (loadInitialStrokeTexts) {
+    for (const StrokeText& text : getDefaultStrokeTexts()) {
+      addStrokeText(*new BI_StrokeText(mBoard, text));
+    }
+  }
+
+  // Check pad-signal-map.
   for (const DevicePadSignalMapItem& item : mLibDevice->getPadSignalMap()) {
     tl::optional<Uuid> signalUuid = item.getSignalUuid();
-    if ((signalUuid) && (!mCompInstance->getSignalInstance(*signalUuid))) {
+    if ((signalUuid) && (!mCompInstance.getSignalInstance(*signalUuid))) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString("Unknown signal \"%1\" found in device \"%2\"")
@@ -215,10 +151,8 @@ void BI_Device::init() {
   // has emitted it.
   connect(&mBoard, &Board::attributesChanged, this,
           &BI_Device::attributesChanged);
-  connect(mCompInstance, &ComponentInstance::attributesChanged, this,
+  connect(&mCompInstance, &ComponentInstance::attributesChanged, this,
           &BI_Device::attributesChanged);
-
-  if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 }
 
 BI_Device::~BI_Device() noexcept {
@@ -234,7 +168,7 @@ BI_Device::~BI_Device() noexcept {
  ******************************************************************************/
 
 const Uuid& BI_Device::getComponentInstanceUuid() const noexcept {
-  return mCompInstance->getUuid();
+  return mCompInstance.getUuid();
 }
 
 bool BI_Device::isUsed() const noexcept {
@@ -307,26 +241,31 @@ StrokeTextList BI_Device::getDefaultStrokeTexts() const noexcept {
 }
 
 void BI_Device::addStrokeText(BI_StrokeText& text) {
-  if ((mStrokeTexts.contains(&text)) || (&text.getBoard() != &mBoard)) {
+  if ((mStrokeTexts.values().contains(&text)) ||
+      (&text.getBoard() != &mBoard)) {
     throw LogicError(__FILE__, __LINE__);
   }
-
+  if (mStrokeTexts.contains(text.getUuid())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("There is already a stroke text with the UUID \"%1\"!")
+            .arg(text.getUuid().toStr()));
+  }
   text.setDevice(this);
-
   if (isAddedToBoard()) {
     text.addToBoard();  // can throw
   }
-  mStrokeTexts.append(&text);
+  mStrokeTexts.insert(text.getUuid(), &text);
 }
 
 void BI_Device::removeStrokeText(BI_StrokeText& text) {
-  if (!mStrokeTexts.contains(&text)) {
+  if (mStrokeTexts.value(text.getUuid()) != &text) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (isAddedToBoard()) {
     text.removeFromBoard();  // can throw
   }
-  mStrokeTexts.removeOne(&text);
+  mStrokeTexts.remove(text.getUuid());
 }
 
 /*******************************************************************************
@@ -371,13 +310,20 @@ void BI_Device::setMirrored(bool mirror) {
   }
 }
 
+void BI_Device::setAttributes(const AttributeList& attributes) noexcept {
+  if (attributes != mAttributes) {
+    mAttributes = attributes;
+    emit attributesChanged();
+  }
+}
+
 void BI_Device::addToBoard() {
   if (isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
   ScopeGuardList sgl(mPads.count() + mStrokeTexts.count() + 1);
-  mCompInstance->registerDevice(*this);  // can throw
-  sgl.add([&]() { mCompInstance->unregisterDevice(*this); });
+  mCompInstance.registerDevice(*this);  // can throw
+  sgl.add([&]() { mCompInstance.unregisterDevice(*this); });
   foreach (BI_FootprintPad* pad, mPads) {
     pad->addToBoard();  // can throw
     sgl.add([pad]() { pad->removeFromBoard(); });
@@ -403,8 +349,8 @@ void BI_Device::removeFromBoard() {
     text->removeFromBoard();  // can throw
     sgl.add([text]() { text->addToBoard(); });
   }
-  mCompInstance->unregisterDevice(*this);  // can throw
-  sgl.add([&]() { mCompInstance->registerDevice(*this); });
+  mCompInstance.unregisterDevice(*this);  // can throw
+  sgl.add([&]() { mCompInstance.registerDevice(*this); });
   BI_Base::removeFromBoard(mGraphicsItem.data());
   sgl.dismiss();
 }
@@ -412,19 +358,22 @@ void BI_Device::removeFromBoard() {
 void BI_Device::serialize(SExpression& root) const {
   if (!checkAttributesValidity()) throw LogicError(__FILE__, __LINE__);
 
-  root.appendChild(mCompInstance->getUuid());
+  root.appendChild(mCompInstance.getUuid());
   root.ensureLineBreak();
   root.appendChild("lib_device", mLibDevice->getUuid());
   root.ensureLineBreak();
   root.appendChild("lib_footprint", mLibFootprint->getUuid());
   root.ensureLineBreak();
-  root.appendChild(mPosition.serializeToDomElement("position"));
+  mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("mirror", mMirrored);
   root.ensureLineBreak();
   mAttributes.serialize(root);
   root.ensureLineBreak();
-  serializePointerContainerUuidSorted(root, mStrokeTexts, "stroke_text");
+  for (const BI_StrokeText* obj : mStrokeTexts) {
+    root.ensureLineBreak();
+    obj->getText().serialize(root.appendList("stroke_text"));
+  }
   root.ensureLineBreak();
 }
 
@@ -455,7 +404,7 @@ QString BI_Device::getBuiltInAttributeValue(const QString& key) const noexcept {
 
 QVector<const AttributeProvider*> BI_Device::getAttributeProviderParents() const
     noexcept {
-  return QVector<const AttributeProvider*>{&mBoard, mCompInstance};
+  return QVector<const AttributeProvider*>{&mBoard, &mCompInstance};
 }
 
 /*******************************************************************************
@@ -484,7 +433,6 @@ void BI_Device::setSelected(bool selected) noexcept {
  ******************************************************************************/
 
 bool BI_Device::checkAttributesValidity() const noexcept {
-  if (mCompInstance == nullptr) return false;
   if (mLibDevice == nullptr) return false;
   if (mLibPackage == nullptr) return false;
   return true;

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "length.h"
 
+#include "../serialization/sexpression.h"
 #include "../utils/toolbox.h"
 
 #include <type_traits>
@@ -185,6 +186,40 @@ LengthBase_t Length::mapNmToGrid(LengthBase_t nanometers,
 
 LengthBase_t Length::mmStringToNm(const QString& millimeters) {
   return Toolbox::decimalFixedPointFromString<LengthBase_t>(millimeters, 6);
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const Length& obj) {
+  return SExpression::createToken(obj.toMmString());
+}
+
+template <>
+SExpression serialize(const UnsignedLength& obj) {
+  return serialize(*obj);
+}
+
+template <>
+SExpression serialize(const PositiveLength& obj) {
+  return serialize(*obj);
+}
+
+template <>
+Length deserialize(const SExpression& node) {
+  return Length::fromMm(node.getValue());
+}
+
+template <>
+UnsignedLength deserialize(const SExpression& node) {
+  return UnsignedLength(deserialize<Length>(node));  // can throw
+}
+
+template <>
+PositiveLength deserialize(const SExpression& node) {
+  return PositiveLength(deserialize<Length>(node));  // can throw
 }
 
 /*******************************************************************************

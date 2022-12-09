@@ -44,7 +44,7 @@ namespace librepcb {
  * The main purpose of this class is to serialize and deserialize junctions
  * contained in schematics or boards.
  */
-class Junction final : public SerializableObject {
+class Junction final {
   Q_DECLARE_TR_FUNCTIONS(Junction)
 
 public:
@@ -61,7 +61,7 @@ public:
   Junction(const Junction& other) noexcept;
   Junction(const Uuid& uuid, const Junction& other) noexcept;
   Junction(const Uuid& uuid, const Point& position) noexcept;
-  Junction(const SExpression& node, const Version& fileFormat);
+  explicit Junction(const SExpression& node);
   ~Junction() noexcept;
 
   // Getters
@@ -72,8 +72,14 @@ public:
   bool setUuid(const Uuid& uuid) noexcept;
   bool setPosition(const Point& position) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const Junction& rhs) const noexcept;

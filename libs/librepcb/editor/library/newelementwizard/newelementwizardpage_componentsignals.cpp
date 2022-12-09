@@ -79,10 +79,10 @@ QHash<Uuid, CircuitIdentifier>
   try {
     FilePath fp = mContext.getWorkspace().getLibraryDb().getLatest<Symbol>(
         symbol);  // can throw
-    Symbol sym(
+    std::unique_ptr<Symbol> symbol = Symbol::open(
         std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
             TransactionalFileSystem::openRO(fp))));  // can throw
-    for (const SymbolPin& pin : sym.getPins()) {
+    for (const SymbolPin& pin : symbol->getPins()) {
       names.insert(pin.getUuid(),
                    CircuitIdentifier(suffix % pin.getName()));  // can throw
     }

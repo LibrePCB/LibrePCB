@@ -108,7 +108,7 @@ private:  // Methods
 private:  // Data
   QScopedPointer<Ui::DeviceEditorWidget> mUi;
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
-  QScopedPointer<Device> mDevice;
+  std::unique_ptr<Device> mDevice;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
 
   // component

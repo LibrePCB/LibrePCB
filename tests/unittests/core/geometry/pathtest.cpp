@@ -20,9 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
 #include <librepcb/core/geometry/path.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 /*******************************************************************************
  *  Namespace
@@ -37,7 +37,9 @@ namespace tests {
 class PathTest : public ::testing::Test {
 protected:
   std::string str(const Path& path) const {
-    return path.serializeToDomElement("path").toByteArray().toStdString();
+    SExpression sexpr = SExpression::createList("path");
+    path.serialize(sexpr);
+    return sexpr.toByteArray().toStdString();
   }
 };
 

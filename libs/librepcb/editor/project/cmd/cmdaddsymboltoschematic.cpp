@@ -90,8 +90,10 @@ bool CmdAddSymbolToSchematic::performExecute() {
              "workspace library!")
               .arg(symbolUuid.toStr()));
     }
-    Symbol* sym = new Symbol(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(TransactionalFileSystem::openRO(symFp))));
+    Symbol* sym = Symbol::open(std::unique_ptr<TransactionalDirectory>(
+                                   new TransactionalDirectory(
+                                       TransactionalFileSystem::openRO(symFp))))
+                      .release();  // can throw
     CmdProjectLibraryAddElement<Symbol>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<Symbol>(
             mSchematic.getProject().getLibrary(), *sym);
@@ -100,7 +102,8 @@ bool CmdAddSymbolToSchematic::performExecute() {
 
   // create the new symbol (schematic takes ownership)
   mSymbolInstance =
-      new SI_Symbol(mSchematic, mComponentInstance, mSymbolItemUuid, mPosition,
+      new SI_Symbol(mSchematic, Uuid::createRandom(), mComponentInstance,
+                    mSymbolItemUuid, mPosition,
                     mAngle);  // can throw
 
   // add a new symbol instance to the schematic

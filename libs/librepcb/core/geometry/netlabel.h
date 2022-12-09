@@ -44,7 +44,7 @@ namespace librepcb {
  * The main purpose of this class is to serialize and deserialize net labels
  * contained in schematics.
  */
-class NetLabel final : public SerializableObject {
+class NetLabel final {
   Q_DECLARE_TR_FUNCTIONS(NetLabel)
 
 public:
@@ -64,7 +64,7 @@ public:
   NetLabel(const Uuid& uuid, const NetLabel& other) noexcept;
   NetLabel(const Uuid& uuid, const Point& position, const Angle& rotation,
            bool mirrored) noexcept;
-  NetLabel(const SExpression& node, const Version& fileFormat);
+  explicit NetLabel(const SExpression& node);
   ~NetLabel() noexcept;
 
   // Getters
@@ -79,8 +79,14 @@ public:
   bool setRotation(const Angle& rotation) noexcept;
   bool setMirrored(const bool mirrored) noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  // General Methods
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   bool operator==(const NetLabel& rhs) const noexcept;

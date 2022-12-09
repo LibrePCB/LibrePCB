@@ -89,8 +89,10 @@ bool CmdAddDeviceToBoard::performExecute() {
              "workspace library!")
               .arg(mDeviceUuid.toStr()));
     }
-    dev = new Device(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(TransactionalFileSystem::openRO(devFp))));
+    dev = Device::open(std::unique_ptr<TransactionalDirectory>(
+                           new TransactionalDirectory(
+                               TransactionalFileSystem::openRO(devFp))))
+              .release();  // can throw
     CmdProjectLibraryAddElement<Device>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<Device>(
             mBoard.getProject().getLibrary(), *dev);
@@ -111,8 +113,10 @@ bool CmdAddDeviceToBoard::performExecute() {
              "workspace library!")
               .arg(pkgUuid.toStr()));
     }
-    pkg = new Package(std::unique_ptr<TransactionalDirectory>(
-        new TransactionalDirectory(TransactionalFileSystem::openRO(pkgFp))));
+    pkg = Package::open(std::unique_ptr<TransactionalDirectory>(
+                            new TransactionalDirectory(
+                                TransactionalFileSystem::openRO(pkgFp))))
+              .release();  // can throw
     CmdProjectLibraryAddElement<Package>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<Package>(
             mBoard.getProject().getLibrary(), *pkg);
@@ -133,7 +137,7 @@ bool CmdAddDeviceToBoard::performExecute() {
   // create new device (ownership by board)
   mDeviceInstance =
       new BI_Device(mBoard, mComponentInstance, mDeviceUuid, *mFootprintUuid,
-                    mPosition, mRotation, mMirror);  // can throw
+                    mPosition, mRotation, mMirror, true);  // can throw
 
   // add a new device instance to the board
   execNewChildCmd(new CmdDeviceInstanceAdd(*mDeviceInstance));  // can throw

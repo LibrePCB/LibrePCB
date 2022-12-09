@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/netlabel.h"
-#include "../../../serialization/serializableobject.h"
 #include "../graphicsitems/sgi_netlabel.h"
 #include "si_base.h"
 
@@ -47,17 +46,14 @@ class Schematic;
 /**
  * @brief The SI_NetLabel class
  */
-class SI_NetLabel final : public SI_Base, public SerializableObject {
+class SI_NetLabel final : public SI_Base {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   SI_NetLabel() = delete;
   SI_NetLabel(const SI_NetLabel& other) = delete;
-  SI_NetLabel(SI_NetSegment& segment, const SExpression& node,
-              const Version& fileFormat);
-  explicit SI_NetLabel(SI_NetSegment& segment, const Point& position,
-                       const Angle& rotation, const bool mirrored);
+  explicit SI_NetLabel(SI_NetSegment& segment, const NetLabel& label);
   ~SI_NetLabel() noexcept;
 
   // Getters
@@ -79,9 +75,6 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::NetLabel; }
   const Point& getPosition() const noexcept { return mNetLabel.getPosition(); }
@@ -92,8 +85,6 @@ public:
   SI_NetLabel& operator=(const SI_NetLabel& rhs) = delete;
 
 private:
-  void init();
-
   // General
   QScopedPointer<SGI_NetLabel> mGraphicsItem;
   QMetaObject::Connection mNameChangedConnection;

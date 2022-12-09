@@ -38,20 +38,11 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-NetClass::NetClass(Circuit& circuit, const SExpression& node,
-                   const Version& fileFormat)
+NetClass::NetClass(Circuit& circuit, const Uuid& uuid, const ElementName& name)
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mName(deserialize<ElementName>(node.getChild("name/@0"), fileFormat)) {
-}
-
-NetClass::NetClass(Circuit& circuit, const ElementName& name)
-  : QObject(&circuit),
-    mCircuit(circuit),
-    mIsAddedToCircuit(false),
-    mUuid(Uuid::createRandom()),
+    mUuid(uuid),
     mName(name) {
 }
 

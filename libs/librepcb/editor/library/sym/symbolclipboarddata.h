@@ -28,7 +28,6 @@
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/text.h>
 #include <librepcb/core/library/sym/symbolpin.h>
-#include <librepcb/core/serialization/serializableobject.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -51,13 +50,13 @@ namespace editor {
 /**
  * @brief The SymbolClipboardData class
  */
-class SymbolClipboardData final : public SerializableObject {
+class SymbolClipboardData final {
 public:
   // Constructors / Destructor
   SymbolClipboardData() = delete;
   SymbolClipboardData(const SymbolClipboardData& other) = delete;
   SymbolClipboardData(const Uuid& symbolUuid, const Point& cursorPos) noexcept;
-  SymbolClipboardData(const SExpression& node, const Version& fileFormat);
+  explicit SymbolClipboardData(const SExpression& node);
   ~SymbolClipboardData() noexcept;
 
   // Getters
@@ -85,9 +84,6 @@ public:
   SymbolClipboardData& operator=(const SymbolClipboardData& rhs) = delete;
 
 private:  // Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   QPixmap generatePixmap(const IF_GraphicsLayerProvider& lp) noexcept;
   static QString getMimeType() noexcept;
 

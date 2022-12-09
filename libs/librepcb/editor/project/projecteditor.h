@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/attribute/attributeprovider.h>
-#include <librepcb/core/serialization/serializableobject.h>
 
 #include <QtCore>
 
@@ -39,6 +38,7 @@ class QMainWindow;
 namespace librepcb {
 
 class Board;
+class FilePath;
 class LengthUnit;
 class Project;
 class Workspace;
@@ -171,11 +171,9 @@ public slots:
   /**
    * @brief Execute the PCB order dialog (blocking!)
    *
-   * @param board     The board to order. Pass nullptr if unknown.
    * @param parent    Parent widget of the dialog (optional)
    */
-  void execOrderPcbDialog(const Board* board,
-                          QWidget* parent = nullptr) noexcept;
+  void execOrderPcbDialog(QWidget* parent = nullptr) noexcept;
 
   /**
    * @brief Save the whole project to the harddisc

@@ -22,11 +22,11 @@
  ******************************************************************************/
 #include "bi_plane.h"
 
+#include "../../../serialization/sexpression.h"
 #include "../../../utils/scopeguard.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
-#include "../boardplanefragmentsbuilder.h"
 #include "../graphicsitems/bgi_plane.h"
 
 #include <QtCore>
@@ -39,59 +39,6 @@ namespace librepcb {
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
-
-BI_Plane::BI_Plane(Board& board, const BI_Plane& other)
-  : BI_Base(board),
-    mUuid(Uuid::createRandom()),
-    mLayerName(other.mLayerName),
-    mNetSignal(other.mNetSignal),
-    mOutline(other.mOutline),
-    mMinWidth(other.mMinWidth),
-    mMinClearance(other.mMinClearance),
-    mKeepOrphans(other.mKeepOrphans),
-    mPriority(other.mPriority),
-    mConnectStyle(other.mConnectStyle),
-    // mThermalGapWidth(other.mThermalGapWidth),
-    // mThermalSpokeWidth(other.mThermalSpokeWidth),
-    mIsVisible(other.mIsVisible),
-    mFragments(other.mFragments)  // also copy fragments to avoid the need for
-                                  // a rebuild
-{
-  init();
-}
-
-BI_Plane::BI_Plane(Board& board, const SExpression& node,
-                   const Version& fileFormat)
-  : BI_Base(board),
-    mUuid(deserialize<Uuid>(node.getChild("@0"), fileFormat)),
-    mLayerName(
-        deserialize<GraphicsLayerName>(node.getChild("layer/@0"), fileFormat)),
-    mNetSignal(nullptr),
-    mOutline(),
-    mMinWidth(
-        deserialize<UnsignedLength>(node.getChild("min_width/@0"), fileFormat)),
-    mMinClearance(deserialize<UnsignedLength>(node.getChild("min_clearance/@0"),
-                                              fileFormat)),
-    mKeepOrphans(
-        deserialize<bool>(node.getChild("keep_orphans/@0"), fileFormat)),
-    mPriority(deserialize<int>(node.getChild("priority/@0"), fileFormat)),
-    mConnectStyle(deserialize<ConnectStyle>(node.getChild("connect_style/@0"),
-                                            fileFormat)),
-    // mThermalGapWidth(node.getValueByPath<Length>("thermal_gap_width", true)),
-    // mThermalSpokeWidth(node.getValueByPath<Length>("thermal_spoke_width",
-    // true))
-    mIsVisible(true) {
-  Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"), fileFormat);
-  mNetSignal =
-      mBoard.getProject().getCircuit().getNetSignalByUuid(netSignalUuid);
-  if (!mNetSignal) {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        tr("Invalid net signal UUID: \"%1\"").arg(netSignalUuid.toStr()));
-  }
-  mOutline = Path(node, fileFormat);
-  init();
-}
 
 BI_Plane::BI_Plane(Board& board, const Uuid& uuid,
                    const GraphicsLayerName& layerName, NetSignal& netsignal,
@@ -107,12 +54,9 @@ BI_Plane::BI_Plane(Board& board, const Uuid& uuid,
     mPriority(0),
     mConnectStyle(ConnectStyle::Solid),
     // mThermalGapWidth(100000), mThermalSpokeWidth(100000),
+    mGraphicsItem(nullptr),
     mIsVisible(true),
     mFragments() {
-  init();
-}
-
-void BI_Plane::init() {
   mGraphicsItem.reset(new BGI_Plane(*this));
   mGraphicsItem->setRotation(Angle::deg0().toDeg());
 
@@ -195,6 +139,14 @@ void BI_Plane::setVisible(bool visible) noexcept {
   }
 }
 
+void BI_Plane::setCalculatedFragments(const QVector<Path>& fragments) noexcept {
+  if (fragments != mFragments) {
+    mFragments = fragments;
+    mGraphicsItem->updateCacheAndRepaint();
+    mBoard.scheduleAirWiresRebuild(mNetSignal);
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -223,13 +175,6 @@ void BI_Plane::clear() noexcept {
   mGraphicsItem->updateCacheAndRepaint();
 }
 
-void BI_Plane::rebuild() noexcept {
-  BoardPlaneFragmentsBuilder builder(*this);
-  mFragments = builder.buildFragments();
-  mGraphicsItem->updateCacheAndRepaint();
-  mBoard.scheduleAirWiresRebuild(mNetSignal);
-}
-
 void BI_Plane::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("layer", mLayerName);
@@ -242,8 +187,6 @@ void BI_Plane::serialize(SExpression& root) const {
   root.appendChild("keep_orphans", mKeepOrphans);
   root.ensureLineBreak();
   root.appendChild("connect_style", mConnectStyle);
-  // root.appendChild("thermal_gap_width", mThermalGapWidth, false);
-  // root.appendChild("thermal_spoke_width", mThermalSpokeWidth, false);
   root.ensureLineBreak();
   mOutline.serialize(root);
   root.ensureLineBreak();
@@ -288,6 +231,35 @@ bool BI_Plane::operator<(const BI_Plane& rhs) const noexcept {
 
 void BI_Plane::boardAttributesChanged() {
   mGraphicsItem->updateCacheAndRepaint();
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const BI_Plane::ConnectStyle& obj) {
+  switch (obj) {
+    case BI_Plane::ConnectStyle::None:
+      return SExpression::createToken("none");
+    case BI_Plane::ConnectStyle::Solid:
+      return SExpression::createToken("solid");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+BI_Plane::ConnectStyle deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == "none") {
+    return BI_Plane::ConnectStyle::None;
+  } else if (str == "solid") {
+    return BI_Plane::ConnectStyle::Solid;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Unknown plane connect style: '%1'").arg(str));
+  }
 }
 
 /*******************************************************************************

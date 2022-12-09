@@ -46,7 +46,7 @@ protected:
     mTempDir = FilePath::getRandomTempPath();
 
     mNewElement.reset(new LibraryBaseElement(
-        true, "sym", "symbol", Uuid::createRandom(), Version::fromString("1.0"),
+        "sym", "symbol", Uuid::createRandom(), Version::fromString("1.0"),
         "test", ElementName("Test"), "", ""));
   }
 

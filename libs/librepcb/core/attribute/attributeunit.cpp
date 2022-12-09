@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "attributeunit.h"
 
+#include "../serialization/sexpression.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -39,6 +41,15 @@ AttributeUnit::AttributeUnit(const QString& name, const QString& symbolTr,
 }
 
 AttributeUnit::~AttributeUnit() noexcept {
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const AttributeUnit& obj) {
+  return SExpression::createToken(obj.getName());
 }
 
 /*******************************************************************************

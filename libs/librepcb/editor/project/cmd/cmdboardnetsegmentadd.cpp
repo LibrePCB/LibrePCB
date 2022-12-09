@@ -62,7 +62,8 @@ CmdBoardNetSegmentAdd::~CmdBoardNetSegmentAdd() noexcept {
 bool CmdBoardNetSegmentAdd::performExecute() {
   if (!mNetSegment) {
     // create new net segment
-    mNetSegment = new BI_NetSegment(mBoard, mNetSignal);  // can throw
+    mNetSegment = new BI_NetSegment(mBoard, Uuid::createRandom(),
+                                    mNetSignal);  // can throw
   }
 
   performRedo();  // can throw

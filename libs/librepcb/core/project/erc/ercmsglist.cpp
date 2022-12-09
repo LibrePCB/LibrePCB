@@ -73,55 +73,19 @@ void ErcMsgList::update(ErcMsg* ercMsg) noexcept {
   emit ercMsgChanged(ercMsg);
 }
 
-void ErcMsgList::restoreIgnoreState() {
-  QString fp = "circuit/erc.lp";
-  if (mProject.getDirectory().fileExists(fp)) {
-    SExpression root =
-        SExpression::parse(mProject.getDirectory().read(fp),
-                           mProject.getDirectory().getAbsPath(fp));
-
-    // reset all ignore attributes
-    foreach (ErcMsg* ercMsg, mItems)
-      ercMsg->setIgnored(false);
-
-    // scan approved items and set ignore attributes
-    foreach (const SExpression& node, root.getChildren("approved")) {
-      foreach (ErcMsg* ercMsg, mItems) {
-        if ((ercMsg->getOwner().getErcMsgOwnerClassName() ==
-             node.getChild("class/@0").getValue()) &&
-            (ercMsg->getOwnerKey() ==
-             node.getChild("instance/@0").getValue()) &&
-            (ercMsg->getMsgKey() == node.getChild("message/@0").getValue())) {
-          ercMsg->setIgnored(true);
-        }
-      }
-    }
-  }
-}
-
-void ErcMsgList::save() {
-  SExpression doc(serializeToDomElement("librepcb_erc"));  // can throw
-  mProject.getDirectory().write("circuit/erc.lp",
-                                doc.toByteArray());  // can throw
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
 void ErcMsgList::serialize(SExpression& root) const {
-  foreach (ErcMsg* ercMsg, mItems) {
-    if (ercMsg->isIgnored()) {
+  foreach (const ErcMsg* msg, mItems) {
+    if (msg->isIgnored()) {
       root.ensureLineBreak();
-      SExpression& itemNode = root.appendList("approved");
-      itemNode.ensureLineBreak();
-      itemNode.appendChild<QString>(
-          "class", ercMsg->getOwner().getErcMsgOwnerClassName());
-      itemNode.ensureLineBreak();
-      itemNode.appendChild("instance", ercMsg->getOwnerKey());
-      itemNode.ensureLineBreak();
-      itemNode.appendChild("message", ercMsg->getMsgKey());
-      itemNode.ensureLineBreak();
+      SExpression& node = root.appendList("approved");
+      node.ensureLineBreak();
+      node.appendChild("class",
+                       QString(msg->getOwner().getErcMsgOwnerClassName()));
+      node.ensureLineBreak();
+      node.appendChild("instance", msg->getOwnerKey());
+      node.ensureLineBreak();
+      node.appendChild("message", msg->getMsgKey());
+      node.ensureLineBreak();
     }
   }
   root.ensureLineBreak();

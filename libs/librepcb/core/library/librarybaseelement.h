@@ -25,8 +25,6 @@
  ******************************************************************************/
 #include "../fileio/transactionaldirectory.h"
 #include "../serialization/serializablekeyvaluemap.h"
-#include "../serialization/serializableobject.h"
-#include "../serialization/sexpression.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
 #include "./msg/libraryelementcheckmessage.h"
@@ -47,22 +45,23 @@ namespace librepcb {
 /**
  * @brief The LibraryBaseElement class
  */
-class LibraryBaseElement : public QObject, public SerializableObject {
+class LibraryBaseElement : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   LibraryBaseElement() = delete;
   LibraryBaseElement(const LibraryBaseElement& other) = delete;
-  LibraryBaseElement(bool dirnameMustBeUuid, const QString& shortElementName,
+  LibraryBaseElement(const QString& shortElementName,
                      const QString& longElementName, const Uuid& uuid,
                      const Version& version, const QString& author,
                      const ElementName& name_en_US,
                      const QString& description_en_US,
                      const QString& keywords_en_US);
-  LibraryBaseElement(std::unique_ptr<TransactionalDirectory> directory,
-                     bool dirnameMustBeUuid, const QString& shortElementName,
-                     const QString& longElementName);
+  LibraryBaseElement(const QString& shortElementName,
+                     const QString& longElementName, bool dirnameMustBeUuid,
+                     std::unique_ptr<TransactionalDirectory> directory,
+                     const SExpression& root);
   virtual ~LibraryBaseElement() noexcept;
 
   // Getters: General
@@ -70,12 +69,6 @@ public:
     return *mDirectory;
   }
   TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
-  const QString& getShortElementName() const noexcept {
-    return mShortElementName;
-  }
-  const QString& getLongElementName() const noexcept {
-    return mLongElementName;
-  }
 
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }
@@ -126,22 +119,22 @@ public:
                           ElementType::getShortElementName());
   }
 
-protected:
-  // Protected Methods
-  virtual void cleanupAfterLoadingElementFromFile() noexcept;
+protected:  // Methods
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  virtual void serialize(SExpression& root) const;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  virtual void serialize(SExpression& root) const override;
+  static Version readFileFormat(const TransactionalDirectory& directory,
+                                const QString& fileName);
 
+protected:  // Data
   // General Attributes
+  const QString mShortElementName;  ///< e.g. "lib", "cmpcat"
+  const QString mLongElementName;  ///< e.g. "library", "component_category"
   std::unique_ptr<TransactionalDirectory> mDirectory;
-  bool mDirectoryNameMustBeUuid;
-  QString mShortElementName;  ///< e.g. "lib", "cmpcat", "sym"
-  QString mLongElementName;  ///< e.g. "library", "component_category", "symbol"
-
-  // Members required for loading elements from file
-  SExpression mLoadingFileDocument;
-  Version mLoadingFileFormat;
 
   // General Library Element Attributes
   Uuid mUuid;

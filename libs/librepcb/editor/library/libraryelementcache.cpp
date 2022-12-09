@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "libraryelementcache.h"
 
+#include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
@@ -97,8 +98,10 @@ std::shared_ptr<const T> LibraryElementCache::getElement(
   if ((!element) && mDb) {
     try {
       FilePath fp = mDb->getLatest<T>(uuid);
-      element = std::make_shared<T>(std::unique_ptr<TransactionalDirectory>(
-          new TransactionalDirectory(TransactionalFileSystem::openRO(fp))));
+      element.reset(T::open(std::unique_ptr<TransactionalDirectory>(
+                                new TransactionalDirectory(
+                                    TransactionalFileSystem::openRO(fp))))
+                        .release());
       container.insert(uuid, element);
     } catch (const Exception& e) {
       qWarning() << "Failed to open library element:" << e.getMsg();

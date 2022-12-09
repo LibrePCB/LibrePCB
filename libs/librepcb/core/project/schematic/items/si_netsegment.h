@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../serialization/serializableobject.h"
 #include "../../../types/point.h"
 #include "../../../types/uuid.h"
 #include "si_base.h"
@@ -51,16 +50,14 @@ class SI_SymbolPin;
  *
  * @todo Do not allow to create empty netsegments!
  */
-class SI_NetSegment final : public SI_Base, public SerializableObject {
+class SI_NetSegment final : public SI_Base {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   SI_NetSegment() = delete;
   SI_NetSegment(const SI_NetSegment& other) = delete;
-  SI_NetSegment(Schematic& schematic, const SExpression& node,
-                const Version& fileFormat);
-  SI_NetSegment(Schematic& schematic, NetSignal& signal);
+  SI_NetSegment(Schematic& schematic, const Uuid& uuid, NetSignal& signal);
   ~SI_NetSegment() noexcept;
 
   // Getters
@@ -75,15 +72,13 @@ public:
   // Setters
   void setNetSignal(NetSignal& netsignal);
 
-  // NetPoint Methods
-  const QList<SI_NetPoint*>& getNetPoints() const noexcept {
+  // Element Getters
+  const QMap<Uuid, SI_NetPoint*>& getNetPoints() const noexcept {
     return mNetPoints;
   }
-  SI_NetPoint* getNetPointByUuid(const Uuid& uuid) const noexcept;
-
-  // NetLine Methods
-  const QList<SI_NetLine*>& getNetLines() const noexcept { return mNetLines; }
-  SI_NetLine* getNetLineByUuid(const Uuid& uuid) const noexcept;
+  const QMap<Uuid, SI_NetLine*>& getNetLines() const noexcept {
+    return mNetLines;
+  }
 
   // NetPoint+NetLine Methods
   void addNetPointsAndNetLines(const QList<SI_NetPoint*>& netpoints,
@@ -92,10 +87,9 @@ public:
                                   const QList<SI_NetLine*>& netlines);
 
   // NetLabel Methods
-  const QList<SI_NetLabel*>& getNetLabels() const noexcept {
+  const QMap<Uuid, SI_NetLabel*>& getNetLabels() const noexcept {
     return mNetLabels;
   }
-  SI_NetLabel* getNetLabelByUuid(const Uuid& uuid) const noexcept;
   void addNetLabel(SI_NetLabel& netlabel);
   void removeNetLabel(SI_NetLabel& netlabel);
   void updateAllNetLabelAnchors() noexcept;
@@ -107,8 +101,12 @@ public:
   void setSelectionRect(const QRectF rectPx) noexcept;
   void clearSelection() const noexcept;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override {
@@ -136,9 +134,9 @@ private:
   NetSignal* mNetSignal;
 
   // Items
-  QList<SI_NetPoint*> mNetPoints;
-  QList<SI_NetLine*> mNetLines;
-  QList<SI_NetLabel*> mNetLabels;
+  QMap<Uuid, SI_NetPoint*> mNetPoints;
+  QMap<Uuid, SI_NetLine*> mNetLines;
+  QMap<Uuid, SI_NetLabel*> mNetLabels;
 };
 
 /*******************************************************************************

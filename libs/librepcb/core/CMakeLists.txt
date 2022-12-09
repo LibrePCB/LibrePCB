@@ -384,6 +384,8 @@ add_library(
   project/project.h
   project/projectlibrary.cpp
   project/projectlibrary.h
+  project/projectloader.cpp
+  project/projectloader.h
   project/projectsettings.cpp
   project/projectsettings.h
   project/schematic/graphicsitems/sgi_base.cpp
@@ -424,8 +426,11 @@ add_library(
   project/schematic/schematicpainter.h
   project/schematic/schematicselectionquery.cpp
   project/schematic/schematicselectionquery.h
+  serialization/fileformatmigration.cpp
+  serialization/fileformatmigration.h
+  serialization/fileformatmigrationv01.cpp
+  serialization/fileformatmigrationv01.h
   serialization/serializablekeyvaluemap.h
-  serialization/serializableobject.h
   serialization/serializableobjectlist.h
   serialization/sexpression.cpp
   serialization/sexpression.h

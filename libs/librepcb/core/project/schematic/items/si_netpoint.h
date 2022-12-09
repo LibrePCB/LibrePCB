@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/junction.h"
-#include "../../../serialization/serializableobject.h"
 #include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/sgi_netpoint.h"
 #include "./si_netline.h"
@@ -46,7 +45,6 @@ namespace librepcb {
  */
 class SI_NetPoint final : public SI_Base,
                           public SI_NetLineAnchor,
-                          public SerializableObject,
                           public IF_ErcMsgProvider {
   Q_OBJECT
   DECLARE_ERC_MSG_CLASS_NAME(SI_NetPoint)
@@ -55,10 +53,7 @@ public:
   // Constructors / Destructor
   SI_NetPoint() = delete;
   SI_NetPoint(const SI_NetPoint& other) = delete;
-  SI_NetPoint(SI_NetSegment& segment, const SExpression& node,
-              const Version& fileFormat);
-  SI_NetPoint(SI_NetSegment& segment, const Point& position);
-  SI_NetPoint(SI_NetSegment& segment, SI_SymbolPin& pin);
+  SI_NetPoint(SI_NetSegment& segment, const Uuid& uuid, const Point& position);
   ~SI_NetPoint() noexcept;
 
   // Getters
@@ -77,9 +72,6 @@ public:
   // General Methods
   void addToSchematic() override;
   void removeFromSchematic() override;
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
   // Inherited from SI_Base
   Type_t getType() const noexcept override { return SI_Base::Type_t::NetPoint; }
@@ -102,8 +94,6 @@ public:
   bool operator!=(const SI_NetPoint& rhs) noexcept { return (this != &rhs); }
 
 private:
-  void init();
-
   // General
   QScopedPointer<SGI_NetPoint> mGraphicsItem;
   QMetaObject::Connection mHighlightChangedConnection;

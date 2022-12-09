@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../serialization/sexpression.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -64,15 +62,6 @@ private:
   QString mSymbolTr;  ///< e.g. "mV"
   QStringList mUserInputSuffixes;  ///< user input suffixes, e.g. "k" or "meg"
 };
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-inline SExpression serialize(const AttributeUnit& obj) {
-  return SExpression::createToken(obj.getName());
-}
 
 /*******************************************************************************
  *  End of File

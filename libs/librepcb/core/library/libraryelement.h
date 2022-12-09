@@ -54,9 +54,10 @@ public:
                  const ElementName& name_en_US,
                  const QString& description_en_US,
                  const QString& keywords_en_US);
-  LibraryElement(std::unique_ptr<TransactionalDirectory> directory,
-                 const QString& shortElementName,
-                 const QString& longElementName);
+  LibraryElement(const QString& shortElementName,
+                 const QString& longElementName, bool dirnameMustBeUuid,
+                 std::unique_ptr<TransactionalDirectory> directory,
+                 const SExpression& root);
   virtual ~LibraryElement() noexcept;
 
   // Getters: Attributes
@@ -72,12 +73,8 @@ public:
   LibraryElement& operator=(const LibraryElement& rhs) = delete;
 
 protected:
-  // Protected Methods
-
-  /// @copydoc ::librepcb::SerializableObject::serialize()
   virtual void serialize(SExpression& root) const override;
 
-  // General Library Element Attributes
   QSet<Uuid> mCategories;
 };
 

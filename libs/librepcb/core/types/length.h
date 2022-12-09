@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
-#include "../serialization/sexpression.h"
 
 #include <type_safe/constrained_type.hpp>
 
@@ -617,17 +616,6 @@ private:
  *  Non-Member Functions
  ******************************************************************************/
 
-template <>
-inline SExpression serialize(const Length& obj) {
-  return SExpression::createToken(obj.toMmString());
-}
-
-template <>
-inline Length deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return Length::fromMm(sexpr.getValue());
-}
-
 inline QDataStream& operator<<(QDataStream& stream, const Length& length) {
   stream << length.toMm();
   return stream;
@@ -734,17 +722,6 @@ inline bool operator!=(const UnsignedLength& lhs, const Length& rhs) noexcept {
 }
 inline bool operator!=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
   return (*lhs) != rhs;
-}
-
-template <>
-inline SExpression serialize(const UnsignedLength& obj) {
-  return SExpression::createToken(obj->toMmString());
-}
-
-template <>
-inline UnsignedLength deserialize(const SExpression& sexpr,
-                                  const Version& fileFormat) {
-  return UnsignedLength(deserialize<Length>(sexpr, fileFormat));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,
@@ -931,17 +908,6 @@ inline bool operator!=(const PositiveLength& lhs, const Length& rhs) noexcept {
 }
 inline bool operator!=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
   return (*lhs) != rhs;
-}
-
-template <>
-inline SExpression serialize(const PositiveLength& obj) {
-  return SExpression::createToken(obj->toMmString());
-}
-
-template <>
-inline PositiveLength deserialize(const SExpression& sexpr,
-                                  const Version& fileFormat) {
-  return PositiveLength(deserialize<Length>(sexpr, fileFormat));  // can throw
 }
 
 inline QDataStream& operator<<(QDataStream& stream,

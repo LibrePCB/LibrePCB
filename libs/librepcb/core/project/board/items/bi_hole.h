@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/hole.h"
-#include "../../../serialization/serializableobject.h"
 #include "bi_base.h"
 
 #include <QtCore>
@@ -45,15 +44,13 @@ class Project;
 /**
  * @brief The BI_Hole class
  */
-class BI_Hole final : public BI_Base, public SerializableObject {
+class BI_Hole final : public BI_Base {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   BI_Hole() = delete;
   BI_Hole(const BI_Hole& other) = delete;
-  BI_Hole(Board& board, const BI_Hole& other);
-  BI_Hole(Board& board, const SExpression& node, const Version& fileFormat);
   BI_Hole(Board& board, const Hole& hole);
   ~BI_Hole() noexcept;
 
@@ -69,9 +66,6 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
-
   // Inherited from BI_Base
   Type_t getType() const noexcept override { return BI_Base::Type_t::Hole; }
   QPainterPath getGrabAreaScenePx() const noexcept override;
@@ -79,9 +73,6 @@ public:
 
   // Operator Overloadings
   BI_Hole& operator=(const BI_Hole& rhs) = delete;
-
-private:  // Methods
-  void init();
 
 private:  // Data
   QScopedPointer<Hole> mHole;

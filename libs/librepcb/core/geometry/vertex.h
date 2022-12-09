@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../serialization/serializableobject.h"
 #include "../types/angle.h"
 #include "../types/point.h"
 
@@ -41,7 +40,7 @@ namespace librepcb {
 /**
  * @brief The Vertex class
  */
-class Vertex final : public SerializableObject {
+class Vertex final {
 public:
   // Constructors / Destructor
   Vertex() noexcept : mPos(), mAngle() {}
@@ -49,7 +48,7 @@ public:
     : mPos(other.mPos), mAngle(other.mAngle) {}
   explicit Vertex(const Point& pos, const Angle& angle = Angle::deg0()) noexcept
     : mPos(pos), mAngle(angle) {}
-  Vertex(const SExpression& node, const Version& fileFormat);
+  explicit Vertex(const SExpression& node);
   ~Vertex() noexcept {}
 
   // Getters
@@ -61,8 +60,13 @@ public:
   void setAngle(const Angle& angle) noexcept { mAngle = angle; }
 
   // General Methods
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
   Vertex& operator=(const Vertex& rhs) noexcept;

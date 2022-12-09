@@ -31,6 +31,8 @@
 
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -70,7 +72,6 @@ public:
   Symbol(const Uuid& uuid, const Version& version, const QString& author,
          const ElementName& name_en_US, const QString& description_en_US,
          const QString& keywords_en_US);
-  explicit Symbol(std::unique_ptr<TransactionalDirectory> directory);
   ~Symbol() noexcept;
 
   // Getters: Geometry
@@ -90,6 +91,8 @@ public:
   Symbol& operator=(const Symbol& rhs) = delete;
 
   // Static Methods
+  static std::unique_ptr<Symbol> open(
+      std::unique_ptr<TransactionalDirectory> directory);
   static QString getShortElementName() noexcept {
     return QStringLiteral("sym");
   }
@@ -97,7 +100,12 @@ public:
     return QStringLiteral("symbol");
   }
 
+protected:  // Methods
+  virtual void serialize(SExpression& root) const override;
+
 private:  // Methods
+  Symbol(std::unique_ptr<TransactionalDirectory> directory,
+         const SExpression& root);
   void pinsEdited(const SymbolPinList& list, int index,
                   const std::shared_ptr<const SymbolPin>& pin,
                   SymbolPinList::Event event) noexcept;
@@ -110,8 +118,6 @@ private:  // Methods
   void textsEdited(const TextList& list, int index,
                    const std::shared_ptr<const Text>& text,
                    TextList::Event event) noexcept;
-  /// @copydoc ::librepcb::SerializableObject::serialize()
-  void serialize(SExpression& root) const override;
 
 private:  // Data
   SymbolPinList mPins;

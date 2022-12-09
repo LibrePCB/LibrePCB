@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../serialization/sexpression.h"
-
 #include <QtCore>
 
 #include <optional.hpp>
@@ -163,36 +161,6 @@ private:  // Data
 /*******************************************************************************
  *  Non-Member Functions
  ******************************************************************************/
-
-template <>
-inline SExpression serialize(const Uuid& obj) {
-  return SExpression::createToken(obj.toStr());
-}
-
-template <>
-inline Uuid deserialize(const SExpression& sexpr, const Version& fileFormat) {
-  Q_UNUSED(fileFormat);
-  return Uuid::fromString(sexpr.getValue());  // can throw
-}
-
-template <>
-inline SExpression serialize(const tl::optional<Uuid>& obj) {
-  if (obj) {
-    return serialize(*obj);
-  } else {
-    return SExpression::createToken("none");
-  }
-}
-
-template <>
-inline tl::optional<Uuid> deserialize(const SExpression& sexpr,
-                                      const Version& fileFormat) {
-  if (sexpr.getValue() == "none") {
-    return tl::nullopt;
-  } else {
-    return deserialize<Uuid>(sexpr, fileFormat);  // can throw
-  }
-}
 
 inline QDataStream& operator<<(QDataStream& stream, const Uuid& uuid) noexcept {
   stream << uuid.toStr();

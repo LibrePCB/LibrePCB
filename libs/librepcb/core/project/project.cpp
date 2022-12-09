@@ -30,7 +30,9 @@
 #include "../font/strokefontpool.h"
 #include "../serialization/sexpression.h"
 #include "board/board.h"
+#include "board/items/bi_polygon.h"
 #include "circuit/circuit.h"
+#include "circuit/netclass.h"
 #include "erc/ercmsglist.h"
 #include "projectlibrary.h"
 #include "projectsettings.h"
@@ -49,176 +51,43 @@ namespace librepcb {
  ******************************************************************************/
 
 Project::Project(std::unique_ptr<TransactionalDirectory> directory,
-                 const QString& filename, bool create)
+                 const QString& filename)
   : QObject(nullptr),
     AttributeProvider(),
     mDirectory(std::move(directory)),
     mFilename(filename),
     mUuid(Uuid::createRandom()),
     mName("Unnamed"),
-    mAuthor("Unknown"),
-    mVersion("v1"),
+    mAuthor(),
+    mVersion(),
     mCreated(QDateTime::currentDateTime()),
     mLastModified(QDateTime::currentDateTime()) {
-  qDebug().nospace() << (create ? "Create project " : "Open project ")
-                     << getFilepath().toNative() << "...";
-
   // Check if the file extension is correct
   if (!mFilename.endsWith(".lpp")) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("The suffix of the project file must be \"lpp\"!"));
   }
 
-  Version fileFormat = qApp->getFileFormatVersion();
-  if (create) {
-    // Check if there isn't already a project in the selected directory
-    if (mDirectory->fileExists(".librepcb-project") ||
-        mDirectory->fileExists(mFilename)) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(
-              tr("The directory \"%1\" already contains a LibrePCB project."))
-              .arg(getPath().toNative()));
-    }
-  } else {
-    // check if the project does exist
-    if (!mDirectory->fileExists(".librepcb-project")) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(
-              tr("The directory \"%1\" does not contain a LibrePCB project."))
-              .arg(getPath().toNative()));
-    }
-    if (!mDirectory->fileExists(mFilename)) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          tr("The file \"%1\" does not exist.").arg(getFilepath().toNative()));
-    }
-    // check the project's file format version
-    fileFormat =
-        VersionFile::fromByteArray(mDirectory->read(".librepcb-project"))
-            .getVersion();
-    if (fileFormat > qApp->getFileFormatVersion()) {
-      throw RuntimeError(
-          __FILE__, __LINE__,
-          QString(
-              tr("This project was created with a newer application version.\n"
-                 "You need at least LibrePCB %1 to open it.\n\n%2"))
-              .arg(fileFormat.toPrettyStr(3))
-              .arg(getFilepath().toNative()));
-    }
-  }
+  // Load stroke fonts.
+  mStrokeFontPool.reset(new StrokeFontPool(
+      TransactionalDirectory(*mDirectory, "resources/fontobene")));
 
-  // OK - the project is locked (or read-only) and can be opened!
-  // Until this line, there was no memory allocated on the heap. But in the rest
-  // of the constructor, a lot of object will be created on the heap. If an
-  // exception is thrown somewhere, we must ensure that all the allocated memory
-  // gets freed. This is done by a try/catch block. In the catch-block, all
-  // allocated memory will be freed. Then the exception is rethrown to leave the
-  // constructor.
+  // Initialize settings.
+  mProjectSettings.reset(new ProjectSettings(*this));
 
-  try {
-    // copy and/or load stroke fonts
-    TransactionalDirectory fontobeneDir(*mDirectory, "resources/fontobene");
-    if (create) {
-      FilePath src = qApp->getResourcesFilePath("fontobene");
-      foreach (const FilePath& fp,
-               FileUtils::getFilesInDirectory(src, {"*.bene"})) {
-        if (fp.getSuffix() == "bene") {
-          fontobeneDir.write(fp.getFilename(), FileUtils::readFile(fp));
-        }
-      }
-    }
-    mStrokeFontPool.reset(new StrokeFontPool(fontobeneDir));
+  // Load project library.
+  mProjectLibrary.reset(
+      new ProjectLibrary(std::unique_ptr<TransactionalDirectory>(
+          new TransactionalDirectory(*mDirectory, "library"))));
 
-    // Create or load metadata
-    if (create) {
-      QString name = cleanElementName(getFilepath().getCompleteBasename());
-      if (ElementNameConstraint()(name)) {
-        mName = ElementName(name);
-      }
-    } else {
-      QString fp = "project/metadata.lp";
-      SExpression root =
-          SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
-      mUuid = deserialize<Uuid>(root.getChild("@0"), fileFormat);
-      mName = deserialize<ElementName>(root.getChild("name/@0"), fileFormat);
-      mAuthor = root.getChild("author/@0").getValue();
-      mVersion = root.getChild("version/@0").getValue();
-      mCreated =
-          deserialize<QDateTime>(root.getChild("created/@0"), fileFormat);
-      mAttributes.loadFromSExpression(root, fileFormat);  // can throw
-    }
+  // Initialize ERC.
+  mErcMsgList.reset(new ErcMsgList(*this));
 
-    // Create all needed objects
-    mProjectSettings.reset(new ProjectSettings(*this, fileFormat, create));
-    mProjectLibrary.reset(
-        new ProjectLibrary(std::unique_ptr<TransactionalDirectory>(
-            new TransactionalDirectory(*mDirectory, "library"))));
-    mErcMsgList.reset(new ErcMsgList(*this));
-    mCircuit.reset(new Circuit(*this, fileFormat, create));
+  // Initialize circuit.
+  mCircuit.reset(new Circuit(*this));
 
-    // Load all schematic layers
-    mSchematicLayerProvider.reset(new SchematicLayerProvider(*this));
-
-    // Load all schematics
-    if (!create) {
-      QString fp = "schematics/schematics.lp";
-      SExpression schRoot =
-          SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
-      foreach (const SExpression& node, schRoot.getChildren("schematic")) {
-        FilePath fp =
-            FilePath::fromRelative(getPath(), node.getChild("@0").getValue());
-        std::unique_ptr<TransactionalDirectory> dir(new TransactionalDirectory(
-            *mDirectory, fp.getParentDir().toRelative(getPath())));
-        Schematic* schematic = new Schematic(*this, std::move(dir), fileFormat);
-        addSchematic(*schematic);
-      }
-      qDebug() << "Successfully loaded" << mSchematics.count() << "schematics.";
-    }
-
-    // Load all boards
-    if (!create) {
-      QString fp = "boards/boards.lp";
-      SExpression brdRoot =
-          SExpression::parse(mDirectory->read(fp), mDirectory->getAbsPath(fp));
-      foreach (const SExpression& node, brdRoot.getChildren("board")) {
-        FilePath fp =
-            FilePath::fromRelative(getPath(), node.getChild("@0").getValue());
-        std::unique_ptr<TransactionalDirectory> dir(new TransactionalDirectory(
-            *mDirectory, fp.getParentDir().toRelative(getPath())));
-        Board* board = new Board(*this, std::move(dir), fileFormat);
-        addBoard(*board);
-      }
-      qDebug() << "Successfully loaded" << mBoards.count() << "boards.";
-    }
-
-    // at this point, the whole circuit with all schematics and boards is
-    // successfully loaded, so the ERC list now contains all the correct ERC
-    // messages. So we can now restore the ignore state of each ERC message from
-    // the file.
-    mErcMsgList->restoreIgnoreState();  // can throw
-
-    if (create) save();  // write all files to file system
-  } catch (...) {
-    // free the allocated memory in the reverse order of their allocation...
-    foreach (Board* board, mBoards) {
-      try {
-        removeBoard(*board, true);
-      } catch (...) {
-      }
-    }
-    foreach (Schematic* schematic, mSchematics) {
-      try {
-        removeSchematic(*schematic, true);
-      } catch (...) {
-      }
-    }
-    throw;  // ...and rethrow the exception
-  }
-
-  // project successfully opened! :-)
-  qDebug() << "Successfully loaded project.";
+  // Load all schematic layers.
+  mSchematicLayerProvider.reset(new SchematicLayerProvider(*this));
 }
 
 Project::~Project() noexcept {
@@ -318,23 +187,6 @@ Schematic* Project::getSchematicByName(const QString& name) const noexcept {
   return nullptr;
 }
 
-Schematic* Project::createSchematic(const ElementName& name) {
-  QString dirname = FilePath::cleanFileName(
-      *name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-  if (dirname.isEmpty()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Invalid schematic name: \"%1\"").arg(*name));
-  }
-  std::unique_ptr<TransactionalDirectory> dir(
-      new TransactionalDirectory(*mDirectory, "schematics/" % dirname));
-  if (dir->fileExists("schematic.lp")) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("The schematic exists already: \"%1\"")
-                           .arg(dir->getAbsPath().toNative()));
-  }
-  return Schematic::create(*this, std::move(dir), name);
-}
-
 void Project::addSchematic(Schematic& schematic, int newIndex) {
   if ((mSchematics.contains(&schematic)) || (&schematic.getProject() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -349,6 +201,14 @@ void Project::addSchematic(Schematic& schematic, int newIndex) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("There is already a schematic with the name \"%1\"!")
                            .arg(*schematic.getName()));
+  }
+  foreach (const Schematic* s, mSchematics) {
+    if (s->getDirectoryName() == schematic.getDirectoryName()) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          tr("There is already a schematic with the directory name \"%1\"!")
+              .arg(schematic.getDirectoryName()));
+    }
   }
 
   if ((newIndex < 0) || (newIndex > mSchematics.count())) {
@@ -415,40 +275,6 @@ Board* Project::getBoardByName(const QString& name) const noexcept {
   return nullptr;
 }
 
-Board* Project::createBoard(const ElementName& name) {
-  QString dirname = FilePath::cleanFileName(
-      *name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-  if (dirname.isEmpty()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Invalid board name: \"%1\"").arg(*name));
-  }
-  std::unique_ptr<TransactionalDirectory> dir(
-      new TransactionalDirectory(*mDirectory, "boards/" % dirname));
-  if (dir->fileExists("board.lp")) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("The board exists already: \"%1\"")
-                           .arg(dir->getAbsPath().toNative()));
-  }
-  return Board::create(*this, std::move(dir), name);
-}
-
-Board* Project::createBoard(const Board& other, const ElementName& name) {
-  QString dirname = FilePath::cleanFileName(
-      *name, FilePath::ReplaceSpaces | FilePath::ToLowerCase);
-  if (dirname.isEmpty()) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("Invalid board name: \"%1\"").arg(*name));
-  }
-  std::unique_ptr<TransactionalDirectory> dir(
-      new TransactionalDirectory(*mDirectory, "boards/" % dirname));
-  if (dir->fileExists("board.lp")) {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("The board exists already: \"%1\"")
-                           .arg(dir->getAbsPath().toNative()));
-  }
-  return new Board(other, std::move(dir), name);
-}
-
 void Project::addBoard(Board& board, int newIndex) {
   if ((mBoards.contains(&board)) || (&board.getProject() != this)) {
     throw LogicError(__FILE__, __LINE__);
@@ -462,6 +288,14 @@ void Project::addBoard(Board& board, int newIndex) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("There is already a board with the name \"%1\"!")
                            .arg(*board.getName()));
+  }
+  foreach (const Board* b, mBoards) {
+    if (b->getDirectoryName() == board.getDirectoryName()) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          tr("There is already a board with the directory name \"%1\"!")
+              .arg(board.getDirectoryName()));
+    }
   }
 
   if ((newIndex < 0) || (newIndex > mBoards.count())) {
@@ -507,15 +341,14 @@ void Project::removeBoard(Board& board, bool deleteBoard) {
 void Project::save() {
   qDebug() << "Save project files to transactional file system...";
 
-  // Save version file
-  mDirectory->write(
-      ".librepcb-project",
-      VersionFile(qApp->getFileFormatVersion()).toByteArray());  // can throw
+  // Version file.
+  mDirectory->write(".librepcb-project",
+                    VersionFile(qApp->getFileFormatVersion()).toByteArray());
 
-  // Save *.lpp project file
-  mDirectory->write(mFilename, "LIBREPCB-PROJECT");  // can throw
+  // Project file.
+  mDirectory->write(mFilename, "LIBREPCB-PROJECT");
 
-  // Save project/metadata.lp
+  // Metadata.
   {
     SExpression root = SExpression::createList("librepcb_project_metadata");
     root.appendChild(mUuid);
@@ -530,61 +363,58 @@ void Project::save() {
     root.ensureLineBreak();
     mAttributes.serialize(root);
     root.ensureLineBreak();
-    mDirectory->write("project/metadata.lp",
-                      root.toByteArray());  // can throw
+    mDirectory->write("project/metadata.lp", root.toByteArray());
   }
 
-  // Save settings
-  mProjectSettings->save();  // can throw
-
-  // Save library
-  mProjectLibrary->save();  // can throw
-
-  // Save circuit
-  mCircuit->save();  // can throw
-
-  // Save ERC messages list
-  mErcMsgList->save();  // can throw
-
-  // Save schematics/schematics.lp
-  SExpression schRoot = SExpression::createList("librepcb_schematics");
-  foreach (Schematic* schematic, mSchematics) {
-    schRoot.ensureLineBreak();
-    schRoot.appendChild("schematic",
-                        schematic->getFilePath().toRelative(getPath()));
-  }
-  schRoot.ensureLineBreak();
-  mDirectory->write("schematics/schematics.lp",
-                    schRoot.toByteArray());  // can throw
-
-  // Save boards/boards.lp
-  SExpression brdRoot = SExpression::createList("librepcb_boards");
-  foreach (Board* board, mBoards) {
-    brdRoot.ensureLineBreak();
-    brdRoot.appendChild("board", board->getFilePath().toRelative(getPath()));
-  }
-  brdRoot.ensureLineBreak();
-  mDirectory->write("boards/boards.lp", brdRoot.toByteArray());  // can throw
-
-  // Save all removed schematics (*.lp files)
-  foreach (Schematic* schematic, mRemovedSchematics) {
-    schematic->save();  // can throw
-  }
-  // Save all added schematics (*.lp files)
-  foreach (Schematic* schematic, mSchematics) {
-    schematic->save();  // can throw
+  // Settings.
+  {
+    SExpression root = SExpression::createList("librepcb_project_settings");
+    mProjectSettings->serialize(root);
+    mDirectory->write("project/settings.lp", root.toByteArray());
   }
 
-  // Save all removed boards (*.lp files)
-  foreach (Board* board, mRemovedBoards) {
-    board->save();  // can throw
-  }
-  // Save all added boards (*.lp files)
-  foreach (Board* board, mBoards) {
-    board->save();  // can throw
+  // Circuit.
+  {
+    SExpression root = SExpression::createList("librepcb_circuit");
+    mCircuit->serialize(root);
+    mDirectory->write("circuit/circuit.lp", root.toByteArray());
   }
 
-  // update the "last modified datetime" attribute of the project
+  // ERC.
+  {
+    SExpression root = SExpression::createList("librepcb_erc");
+    mErcMsgList->serialize(root);
+    mDirectory->write("circuit/erc.lp", root.toByteArray());
+  }
+
+  // Schematics.
+  {
+    SExpression root = SExpression::createList("librepcb_schematics");
+    foreach (Schematic* schematic, mSchematics) {
+      root.ensureLineBreak();
+      root.appendChild(
+          "schematic",
+          "schematics/" + schematic->getDirectoryName() + "/schematic.lp");
+      schematic->save();
+    }
+    root.ensureLineBreak();
+    mDirectory->write("schematics/schematics.lp", root.toByteArray());
+  }
+
+  // Boards.
+  {
+    SExpression root = SExpression::createList("librepcb_boards");
+    foreach (Board* board, mBoards) {
+      root.ensureLineBreak();
+      root.appendChild("board",
+                       "boards/" + board->getDirectoryName() + "/board.lp");
+      board->save();
+    }
+    root.ensureLineBreak();
+    mDirectory->write("boards/boards.lp", root.toByteArray());
+  }
+
+  // Update the "last modified datetime" attribute of the project.
   updateLastModified();
 }
 
@@ -637,6 +467,46 @@ QString Project::getBuiltInAttributeValue(const QString& key) const noexcept {
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
+
+std::unique_ptr<Project> Project::create(
+    std::unique_ptr<TransactionalDirectory> directory,
+    const QString& filename) {
+  Q_ASSERT(directory);
+  qDebug().nospace() << "Create project "
+                     << directory->getAbsPath(filename).toNative() << "...";
+
+  // Check if there isn't already a project in the selected directory.
+  if (directory->fileExists(".librepcb-project") ||
+      directory->fileExists(filename)) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString(tr("The directory \"%1\" already contains a LibrePCB project."))
+            .arg(directory->getAbsPath().toNative()));
+  }
+
+  // Populate with stroke fonts.
+  TransactionalDirectory fontobeneDir(*directory, "resources/fontobene");
+  FilePath src = qApp->getResourcesFilePath("fontobene");
+  foreach (const FilePath& fp,
+           FileUtils::getFilesInDirectory(src, {"*.bene"})) {
+    if (fp.getSuffix() == "bene") {
+      fontobeneDir.write(fp.getFilename(), FileUtils::readFile(fp));
+    }
+  }
+
+  // Create empty project.
+  std::unique_ptr<Project> p(new Project(std::move(directory), filename));
+
+  // Add default netclass with name "default".
+  {
+    NetClass* netclass = new NetClass(p->getCircuit(), Uuid::createRandom(),
+                                      ElementName("default"));
+    p->getCircuit().addNetClass(*netclass);
+  }
+
+  // Done!
+  return p;
+}
 
 bool Project::isFilePathInsideProjectDirectory(const FilePath& fp) noexcept {
   FilePath parent = fp.getParentDir();
