@@ -61,6 +61,7 @@ TEST_F(BoardFabricationOutputSettingsTest, testSerializeAndDeserialize) {
   obj1.setSilkscreenLayersTop({"o", "p"});
   obj1.setSilkscreenLayersBot({"q", "r"});
   obj1.setMergeDrillFiles(!obj1.getMergeDrillFiles());
+  obj1.setUseG85SlotCommand(!obj1.getUseG85SlotCommand());
   obj1.setEnableSolderPasteTop(!obj1.getEnableSolderPasteTop());
   obj1.setEnableSolderPasteBot(!obj1.getEnableSolderPasteBot());
   SExpression sexpr1 = SExpression::createList("obj");

@@ -123,6 +123,7 @@ FabricationOutputDialog::FabricationOutputDialog(
   mUi->edtSuffixSolderPasteTop->setText(s.getSuffixSolderPasteTop());
   mUi->edtSuffixSolderPasteBot->setText(s.getSuffixSolderPasteBot());
   mUi->cbxDrillsMerge->setChecked(s.getMergeDrillFiles());
+  mUi->cbxUseG85Slots->setChecked(s.getUseG85SlotCommand());
   mUi->cbxSolderPasteTop->setChecked(s.getEnableSolderPasteTop());
   mUi->cbxSolderPasteBot->setChecked(s.getEnableSolderPasteBot());
 
@@ -222,6 +223,7 @@ void FabricationOutputDialog::btnGenerateClicked() {
     s.setSilkscreenLayersTop(getTopSilkscreenLayers());
     s.setSilkscreenLayersBot(getBotSilkscreenLayers());
     s.setMergeDrillFiles(mUi->cbxDrillsMerge->isChecked());
+    s.setUseG85SlotCommand(mUi->cbxUseG85Slots->isChecked());
     s.setEnableSolderPasteTop(mUi->cbxSolderPasteTop->isChecked());
     s.setEnableSolderPasteBot(mUi->cbxSolderPasteBot->isChecked());
     if (s != mBoard.getFabricationOutputSettings()) {

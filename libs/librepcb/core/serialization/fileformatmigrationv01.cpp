@@ -186,6 +186,23 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
       dir.write(fp, root.toByteArray());
     }
   }
+
+  // Boards.
+  foreach (const QString& dirName, dir.getDirs("boards")) {
+    const QString fp = "boards/" % dirName % "/board.lp";
+    if (dir.fileExists(fp)) {
+      SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+      // Fabrication output settings.
+      {
+        SExpression& node = root.getChild("fabrication_output_settings");
+        SExpression& drillNode = node.getChild("drills");
+        drillNode.appendChild("g85_slots", false);
+      }
+
+      dir.write(fp, root.toByteArray());
+    }
+  }
 }
 
 void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {

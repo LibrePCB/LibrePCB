@@ -55,6 +55,7 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings() noexcept
     mSilkscreenLayersBot(
         {GraphicsLayer::sBotPlacement, GraphicsLayer::sBotNames}),
     mMergeDrillFiles(false),
+    mUseG85SlotCommand(false),
     mEnableSolderPasteTop(false),
     mEnableSolderPasteBot(false) {
 }
@@ -87,6 +88,7 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
     mSilkscreenLayersTop(),  // Initialized below.
     mSilkscreenLayersBot(),  // Initialized below.
     mMergeDrillFiles(deserialize<bool>(node.getChild("drills/merge/@0"))),
+    mUseG85SlotCommand(deserialize<bool>(node.getChild("drills/g85_slots/@0"))),
     mEnableSolderPasteTop(
         deserialize<bool>(node.getChild("solderpaste_top/create/@0"))),
     mEnableSolderPasteBot(
@@ -156,6 +158,8 @@ void BoardFabricationOutputSettings::serialize(SExpression& root) const {
   drills.ensureLineBreak();
   drills.appendChild("suffix_merged", mSuffixDrills);
   drills.ensureLineBreak();
+  drills.appendChild("g85_slots", mUseG85SlotCommand);
+  drills.ensureLineBreak();
   root.ensureLineBreak();
 
   SExpression& solderPasteTop = root.appendList("solderpaste_top");
@@ -192,6 +196,7 @@ BoardFabricationOutputSettings& BoardFabricationOutputSettings::operator=(
   mSilkscreenLayersTop = rhs.mSilkscreenLayersTop;
   mSilkscreenLayersBot = rhs.mSilkscreenLayersBot;
   mMergeDrillFiles = rhs.mMergeDrillFiles;
+  mUseG85SlotCommand = rhs.mUseG85SlotCommand;
   mEnableSolderPasteTop = rhs.mEnableSolderPasteTop;
   mEnableSolderPasteBot = rhs.mEnableSolderPasteBot;
   return *this;
@@ -216,6 +221,7 @@ bool BoardFabricationOutputSettings::operator==(
   if (mSilkscreenLayersTop != rhs.mSilkscreenLayersTop) return false;
   if (mSilkscreenLayersBot != rhs.mSilkscreenLayersBot) return false;
   if (mMergeDrillFiles != rhs.mMergeDrillFiles) return false;
+  if (mUseG85SlotCommand != rhs.mUseG85SlotCommand) return false;
   if (mEnableSolderPasteTop != rhs.mEnableSolderPasteTop) return false;
   if (mEnableSolderPasteBot != rhs.mEnableSolderPasteBot) return false;
   return true;
