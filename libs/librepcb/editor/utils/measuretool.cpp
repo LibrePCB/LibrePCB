@@ -158,8 +158,10 @@ void MeasureTool::setBoard(const Board* board) noexcept {
       mSnapCandidates.insert(text->getPosition());
     }
     foreach (const BI_Hole* hole, board->getHoles()) {
-      mSnapCandidates |= snapCandidatesFromCircle(
-          hole->getPosition(), *hole->getHole().getDiameter());
+      foreach (const Vertex& vertex, hole->getHole().getPath()->getVertices()) {
+        mSnapCandidates |= snapCandidatesFromCircle(
+            vertex.getPos(), *hole->getHole().getDiameter());
+      }
     }
   }
 }
@@ -332,8 +334,10 @@ QSet<Point> MeasureTool::snapCandidatesFromFootprint(
     candidates.insert(transform.map(s.getPosition()));
   }
   for (const Hole& h : footprint.getHoles()) {
-    candidates |= snapCandidatesFromCircle(transform.map(h.getPosition()),
-                                           *h.getDiameter());
+    foreach (const Vertex& vertex, h.getPath()->getVertices()) {
+      candidates |= snapCandidatesFromCircle(transform.map(vertex.getPos()),
+                                             *h.getDiameter());
+    }
   }
   return candidates;
 }

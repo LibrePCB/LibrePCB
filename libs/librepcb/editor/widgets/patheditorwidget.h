@@ -58,6 +58,7 @@ public:
   ~PathEditorWidget() noexcept;
 
   // General Methods
+  void setFrameShape(QFrame::Shape shape) noexcept;
   void setReadOnly(bool readOnly) noexcept;
   void setPath(const Path& path) noexcept;
   const Path& getPath() const noexcept;
@@ -65,6 +66,9 @@ public:
 
   // Operator Overloadings
   PathEditorWidget& operator=(const PathEditorWidget& rhs) = delete;
+
+signals:
+  void pathChanged(const Path& path);
 
 private:  // Data
   QScopedPointer<PathModel> mModel;

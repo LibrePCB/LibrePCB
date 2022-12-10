@@ -490,8 +490,9 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressStart,
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
     if (hole->getHole().getDiameter() < mOptions.minNpthDrillDiameter) {
       QString msg = msgTr.arg(formatLength(*hole->getHole().getDiameter()));
-      Path location = Path::circle(hole->getHole().getDiameter())
-                          .translated(hole->getPosition());
+      const QVector<Path> location =
+          hole->getHole().getPath()->toOutlineStrokes(
+              hole->getHole().getDiameter());
       emitMessage(BoardDesignRuleCheckMessage(msg, location));
     }
   }
@@ -502,8 +503,8 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressStart,
     for (const Hole& hole : device->getLibFootprint().getHoles()) {
       if (hole.getDiameter() < *mOptions.minNpthDrillDiameter) {
         QString msg = msgTr.arg(formatLength(*hole.getDiameter()));
-        Path location = Path::circle(hole.getDiameter())
-                            .translated(transform.map(hole.getPosition()));
+        const QVector<Path> location =
+            transform.map(hole.getPath())->toOutlineStrokes(hole.getDiameter());
         emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }

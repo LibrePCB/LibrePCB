@@ -137,7 +137,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     }
   }
   foreach (BI_Hole* hole, query->getHoles()) {
-    center += hole->getPosition();
+    center += hole->getHole().getPath()->getVertices().first().getPos();
     ++count;
   }
   if (count > 0) {
@@ -235,10 +235,10 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     execNewChildCmd(cmd.take());  // can throw
   }
 
-  // move all holes
+  // mirror all holes
   foreach (BI_Hole* hole, query->getHoles()) {
     QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(hole->getHole()));
-    cmd->setPosition(hole->getPosition().mirrored(mOrientation, center), false);
+    cmd->mirror(mOrientation, center, false);
     execNewChildCmd(cmd.take());  // can throw
   }
 

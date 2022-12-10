@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../geometry/hole.h"
-#include "primitivecirclegraphicsitem.h"
+#include "primitivepathgraphicsitem.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -45,7 +45,7 @@ class OriginCrossGraphicsItem;
  * @brief The HoleGraphicsItem class is the graphical representation of a
  *        librepcb::Hole
  */
-class HoleGraphicsItem final : public PrimitiveCircleGraphicsItem {
+class HoleGraphicsItem final : public PrimitivePathGraphicsItem {
 public:
   // Constructors / Destructor
   HoleGraphicsItem() = delete;
@@ -57,21 +57,21 @@ public:
   // Getters
   const Hole& getHole() noexcept { return mHole; }
 
-  // Inherited from QGraphicsItem
-  QPainterPath shape() const noexcept override;
-
   // Operator Overloadings
   HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
 
 private:  // Methods
   void holeEdited(const Hole& hole, Hole::Event event) noexcept;
+  void setShape(const PositiveLength& diameter,
+                const NonEmptyPath& path) noexcept;
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
 
 private:  // Data
   const Hole& mHole;
   const IF_GraphicsLayerProvider& mLayerProvider;
-  QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
+  QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItemStart;
+  QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItemEnd;
 
   // Slots
   Hole::OnEditedSlot mOnEditedSlot;

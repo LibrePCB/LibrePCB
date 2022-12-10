@@ -72,10 +72,6 @@ void BI_Hole::removeFromBoard() {
  *  Inherited from BI_Base
  ******************************************************************************/
 
-const Point& BI_Hole::getPosition() const noexcept {
-  return mHole->getPosition();
-}
-
 QPainterPath BI_Hole::getGrabAreaScenePx() const noexcept {
   return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
 }

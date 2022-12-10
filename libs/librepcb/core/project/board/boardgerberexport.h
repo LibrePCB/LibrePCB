@@ -24,10 +24,13 @@
  *  Includes
  ******************************************************************************/
 #include "../../attribute/attributeprovider.h"
+#include "../../export/excellongenerator.h"
 #include "../../fileio/filepath.h"
 #include "../../types/length.h"
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -40,7 +43,6 @@ class BI_Via;
 class Board;
 class BoardFabricationOutputSettings;
 class Circle;
-class ExcellonGenerator;
 class GerberGenerator;
 class Polygon;
 class Project;
@@ -124,6 +126,9 @@ private:
   void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad,
                         const QString& layerName) const;
 
+  std::unique_ptr<ExcellonGenerator> createExcellonGenerator(
+      const BoardFabricationOutputSettings& settings,
+      ExcellonGenerator::Plating plating) const;
   FilePath getOutputFilePath(QString path) const noexcept;
 
   // Static Methods

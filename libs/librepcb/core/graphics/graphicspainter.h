@@ -68,6 +68,9 @@ public:
   void drawCircle(const Point& center, const Length& diameter,
                   const Length& lineWidth, const QColor& lineColor,
                   const QColor& fillColor) noexcept;
+  void drawSlot(const Path& path, const PositiveLength& diameter,
+                const Length& lineWidth, const QColor& lineColor,
+                const QColor& fillColor) noexcept;
   void drawText(const Point& position, const Angle& rotation,
                 const Length& height, const Alignment& alignment,
                 const QString& text, QFont font, const QColor& color,

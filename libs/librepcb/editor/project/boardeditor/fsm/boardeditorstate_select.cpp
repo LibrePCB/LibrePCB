@@ -176,8 +176,9 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       }
       for (const auto& circle : import.getCircles()) {
         if (dialog.getImportCirclesAsDrills()) {
-          data->getHoles().append(std::make_shared<Hole>(
-              Uuid::createRandom(), circle.position, circle.diameter));
+          data->getHoles().append(
+              std::make_shared<Hole>(Uuid::createRandom(), circle.diameter,
+                                     makeNonEmptyPath(circle.position)));
         } else {
           data->getPolygons().append(std::make_shared<Polygon>(
               Uuid::createRandom(), dialog.getLayerName(),
@@ -976,7 +977,8 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       case BI_Base::Type_t::Hole: {
         BI_Hole* hole = dynamic_cast<BI_Hole*>(selectedItem);
         Q_ASSERT(hole);
-        const Point pos = hole->getPosition();
+        const Point pos =
+            hole->getHole().getPath()->getVertices().first().getPos();
 
         mb.addAction(
             cmd.properties.createAction(

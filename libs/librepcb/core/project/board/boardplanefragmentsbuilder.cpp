@@ -148,11 +148,14 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
   foreach (const BI_Device* device, mPlane.getBoard().getDeviceInstances()) {
     Transform transform(*device);
     for (const Hole& hole : device->getLibFootprint().getHoles()) {
-      Point pos = transform.map(hole.getPosition());
-      PositiveLength dia(hole.getDiameter() + mPlane.getMinClearance() * 2);
-      Path path = Path::circle(dia).translated(pos);
-      c.AddPath(ClipperHelpers::convert(path, maxArcTolerance()),
-                ClipperLib::ptClip, true);
+      const PositiveLength diameter(hole.getDiameter() +
+                                    mPlane.getMinClearance() * 2);
+      const NonEmptyPath path = transform.map(hole.getPath());
+      const QVector<Path> areas = path->toOutlineStrokes(diameter);
+      foreach (const Path& area, areas) {
+        c.AddPath(ClipperHelpers::convert(area, maxArcTolerance()),
+                  ClipperLib::ptClip, true);
+      }
     }
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       if (!pad->isOnLayer(*mPlane.getLayerName())) continue;
@@ -167,11 +170,14 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
 
   // subtract board holes
   for (const BI_Hole* hole : mPlane.getBoard().getHoles()) {
-    PositiveLength dia(hole->getHole().getDiameter() +
-                       mPlane.getMinClearance() * 2);
-    Path path = Path::circle(dia).translated(hole->getHole().getPosition());
-    c.AddPath(ClipperHelpers::convert(path, maxArcTolerance()),
-              ClipperLib::ptClip, true);
+    const PositiveLength diameter(hole->getHole().getDiameter() +
+                                  mPlane.getMinClearance() * 2);
+    const NonEmptyPath path = hole->getHole().getPath();
+    const QVector<Path> areas = path->toOutlineStrokes(diameter);
+    foreach (const Path& area, areas) {
+      c.AddPath(ClipperHelpers::convert(area, maxArcTolerance()),
+                ClipperLib::ptClip, true);
+    }
   }
 
   // subtract net segment items

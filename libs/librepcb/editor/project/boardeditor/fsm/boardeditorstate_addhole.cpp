@@ -139,8 +139,9 @@ bool BoardEditorState_AddHole::addHole(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add hole to board"));
     mIsUndoCmdActive = true;
-    mCurrentHoleToPlace =
-        new BI_Hole(*board, Hole(Uuid::createRandom(), pos, mLastDiameter));
+    mCurrentHoleToPlace = new BI_Hole(
+        *board,
+        Hole(Uuid::createRandom(), mLastDiameter, makeNonEmptyPath(pos)));
     QScopedPointer<CmdBoardHoleAdd> cmdAdd(
         new CmdBoardHoleAdd(*mCurrentHoleToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());
@@ -155,7 +156,7 @@ bool BoardEditorState_AddHole::addHole(const Point& pos) noexcept {
 
 bool BoardEditorState_AddHole::updatePosition(const Point& pos) noexcept {
   if (mCurrentHoleEditCmd) {
-    mCurrentHoleEditCmd->setPosition(pos, true);
+    mCurrentHoleEditCmd->setPath(makeNonEmptyPath(pos), true);
     return true;  // Event handled
   } else {
     return false;
@@ -167,7 +168,7 @@ bool BoardEditorState_AddHole::fixPosition(const Point& pos) noexcept {
 
   try {
     if (mCurrentHoleEditCmd) {
-      mCurrentHoleEditCmd->setPosition(pos, false);
+      mCurrentHoleEditCmd->setPath(makeNonEmptyPath(pos), false);
       mContext.undoStack.appendToCmdGroup(mCurrentHoleEditCmd.take());
     }
     mContext.undoStack.commitCmdGroup();

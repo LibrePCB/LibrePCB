@@ -23,9 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../geometry/path.h"
 #include "../serialization/serializableobjectlist.h"
 #include "../types/length.h"
-#include "../types/point.h"
 
 #include <QtCore>
 
@@ -48,8 +48,8 @@ public:
   // Signals
   enum class Event {
     UuidChanged,
-    PositionChanged,
     DiameterChanged,
+    PathChanged,
   };
   Signal<Hole, Event> onEdited;
   typedef Slot<Hole, Event> OnEditedSlot;
@@ -58,19 +58,22 @@ public:
   Hole() = delete;
   Hole(const Hole& other) noexcept;
   Hole(const Uuid& uuid, const Hole& other) noexcept;
-  Hole(const Uuid& uuid, const Point& position,
-       const PositiveLength& diameter) noexcept;
+  Hole(const Uuid& uuid, const PositiveLength& diameter,
+       const NonEmptyPath& path) noexcept;
   explicit Hole(const SExpression& node);
   ~Hole() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
-  const Point& getPosition() const noexcept { return mPosition; }
   const PositiveLength& getDiameter() const noexcept { return mDiameter; }
+  const NonEmptyPath& getPath() const noexcept { return mPath; }
+  bool isSlot() const noexcept;
+  bool isMultiSegmentSlot() const noexcept;
+  bool isCurvedSlot() const noexcept;
 
   // Setters
-  bool setPosition(const Point& position) noexcept;
   bool setDiameter(const PositiveLength& diameter) noexcept;
+  bool setPath(const NonEmptyPath& path) noexcept;
 
   // General Methods
 
@@ -88,8 +91,8 @@ public:
 
 private:  // Data
   Uuid mUuid;
-  Point mPosition;
   PositiveLength mDiameter;
+  NonEmptyPath mPath;
 };
 
 /*******************************************************************************

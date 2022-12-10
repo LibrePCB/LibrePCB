@@ -20,68 +20,59 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "transform.h"
-
-#include "../graphics/graphicslayer.h"
+#include <gtest/gtest.h>
+#include <librepcb/core/geometry/hole.h>
+#include <librepcb/core/serialization/sexpression.h>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace tests {
 
 /*******************************************************************************
- *  General Methods
+ *  Test Class
  ******************************************************************************/
 
-bool Transform::map(bool mirror) const noexcept {
-  return mMirrored ? !mirror : mirror;
+class HoleTest : public ::testing::Test {};
+
+/*******************************************************************************
+ *  Test Methods
+ ******************************************************************************/
+
+TEST_F(HoleTest, testConstructFromSExpression) {
+  SExpression sexpr = SExpression::parse(
+      "(hole b9445237-8982-4a9f-af06-bfc6c507e010 (diameter 0.5)"
+      " (vertex (position 1.234 2.345) (angle 45.0))"
+      ")",
+      FilePath());
+  Hole obj(sexpr);
+  EXPECT_EQ(Uuid::fromString("b9445237-8982-4a9f-af06-bfc6c507e010"),
+            obj.getUuid());
+  EXPECT_EQ(PositiveLength(500000), obj.getDiameter());
+  EXPECT_EQ(1, obj.getPath()->getVertices().count());
+  EXPECT_EQ(Point(1234000, 2345000),
+            obj.getPath()->getVertices().first().getPos());
+  EXPECT_EQ(Angle(45000000), obj.getPath()->getVertices().first().getAngle());
 }
 
-Angle Transform::map(const Angle& angle) const noexcept {
-  Angle a = mRotation + angle;
-  return mMirrored ? (Angle::deg180() - a) : a;
-}
+TEST_F(HoleTest, testSerializeAndDeserialize) {
+  Hole obj1(Uuid::createRandom(), PositiveLength(123),
+            NonEmptyPath(Path({Vertex(Point(123, 456), Angle::deg45()),
+                               Vertex(Point(789, 321), Angle::deg0())})));
+  SExpression sexpr1 = SExpression::createList("obj");
+  obj1.serialize(sexpr1);
 
-Point Transform::map(const Point& point) const noexcept {
-  Point p = point;
-  if (mRotation) {
-    p.rotate(mRotation);
-  }
-  if (mMirrored) {
-    p.mirror(Qt::Horizontal);
-  }
-  return p + mPosition;
-}
+  Hole obj2(sexpr1);
+  SExpression sexpr2 = SExpression::createList("obj");
+  obj2.serialize(sexpr2);
 
-Path Transform::map(const Path& path) const noexcept {
-  Path p = path;
-  if (mRotation) {
-    p.rotate(mRotation);
-  }
-  if (mMirrored) {
-    p.mirror(Qt::Horizontal);
-  }
-  if (!mPosition.isOrigin()) {
-    p.translate(mPosition);
-  }
-  return p;
-}
-
-NonEmptyPath Transform::map(const NonEmptyPath& path) const noexcept {
-  return NonEmptyPath(map(*path));
-}
-
-QString Transform::map(const QString& layerName) const noexcept {
-  return mMirrored ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
-}
-
-GraphicsLayerName Transform::map(const GraphicsLayerName& layerName) const
-    noexcept {
-  return GraphicsLayerName(map(*layerName));
+  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace tests
 }  // namespace librepcb

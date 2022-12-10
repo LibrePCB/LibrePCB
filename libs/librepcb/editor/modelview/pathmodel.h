@@ -83,6 +83,9 @@ public:
   // Operator Overloadings
   PathModel& operator=(const PathModel& rhs) noexcept;
 
+signals:
+  void pathChanged(const Path& path);
+
 private:  // Data
   Path mPath;
   Vertex mNewVertex;

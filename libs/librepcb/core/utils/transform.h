@@ -150,6 +150,16 @@ public:
   Path map(const Path& path) const noexcept;
 
   /**
+   * @brief Map a given path to the transformed coordinate system
+   *
+   * @param path  The path to map.
+   * @return The passed path, rotated by the transformations rotation,
+   *         mirrored horizontally if the transformation is mirroring, and
+   *         translated by the transformation offset.
+   */
+  NonEmptyPath map(const NonEmptyPath& path) const noexcept;
+
+  /**
    * @brief Map a given layer name to the transformed coordinate system
    *
    * @param layerName The layer to map.

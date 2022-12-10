@@ -106,6 +106,14 @@ void GraphicsPainter::drawCircle(const Point& center, const Length& diameter,
   mPainter.drawEllipse(center.toPxQPointF(), radius, radius);
 }
 
+void GraphicsPainter::drawSlot(const Path& path, const PositiveLength& diameter,
+                               const Length& lineWidth, const QColor& lineColor,
+                               const QColor& fillColor) noexcept {
+  for (const Path& segment : path.toOutlineStrokes(diameter)) {
+    drawPath(segment.toQPainterPathPx(), lineWidth, lineColor, fillColor);
+  }
+}
+
 void GraphicsPainter::drawText(const Point& position, const Angle& rotation,
                                const Length& height, const Alignment& alignment,
                                const QString& text, QFont font,

@@ -46,9 +46,12 @@ PathModel::~PathModel() noexcept {
  ******************************************************************************/
 
 void PathModel::setPath(const Path& path) noexcept {
-  emit beginResetModel();
-  mPath = path;
-  emit endResetModel();
+  if (path != mPath) {
+    emit beginResetModel();
+    mPath = path;
+    emit endResetModel();
+    emit pathChanged(mPath);
+  }
 }
 
 /*******************************************************************************
@@ -61,6 +64,7 @@ void PathModel::addItem(const QVariant& editData) noexcept {
                   mPath.getVertices().count());
   mPath.addVertex(mNewVertex);
   endInsertRows();
+  emit pathChanged(mPath);
 }
 
 void PathModel::copyItem(const QVariant& editData) noexcept {
@@ -69,6 +73,7 @@ void PathModel::copyItem(const QVariant& editData) noexcept {
     beginInsertRows(QModelIndex(), index, index);
     mPath.insertVertex(index, mPath.getVertices().value(index));
     endInsertRows();
+    emit pathChanged(mPath);
   } else {
     qWarning() << "Invalid index in PathModel::copyItem():" << index;
   }
@@ -80,6 +85,7 @@ void PathModel::removeItem(const QVariant& editData) noexcept {
     beginRemoveRows(QModelIndex(), index, index);
     mPath.getVertices().remove(index);
     endRemoveRows();
+    emit pathChanged(mPath);
   } else {
     qWarning() << "Invalid index in PathModel::removeItem():" << index;
   }
@@ -91,6 +97,7 @@ void PathModel::moveItemUp(const QVariant& editData) noexcept {
     beginMoveRows(QModelIndex(), index, index, QModelIndex(), index - 1);
     mPath.getVertices().insert(index - 1, mPath.getVertices().takeAt(index));
     endMoveRows();
+    emit pathChanged(mPath);
   }
 }
 
@@ -102,6 +109,7 @@ void PathModel::moveItemDown(const QVariant& editData) noexcept {
     beginMoveRows(QModelIndex(), index, index, QModelIndex(), index + 2);
     mPath.getVertices().insert(index + 1, mPath.getVertices().takeAt(index));
     endMoveRows();
+    emit pathChanged(mPath);
   }
 }
 
@@ -267,6 +275,9 @@ bool PathModel::setData(const QModelIndex& index, const QVariant& value,
       return false;
     }
     emit dataChanged(index, index);
+    if (vertex) {
+      emit pathChanged(mPath);
+    }
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());

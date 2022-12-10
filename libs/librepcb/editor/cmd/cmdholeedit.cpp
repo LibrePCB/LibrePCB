@@ -37,8 +37,8 @@ namespace editor {
 CmdHoleEdit::CmdHoleEdit(Hole& hole) noexcept
   : UndoCommand(tr("Edit hole")),
     mHole(hole),
-    mOldPosition(hole.getPosition()),
-    mNewPosition(mOldPosition),
+    mOldPath(hole.getPath()),
+    mNewPath(mOldPath),
     mOldDiameter(hole.getDiameter()),
     mNewDiameter(mOldDiameter) {
 }
@@ -53,35 +53,34 @@ CmdHoleEdit::~CmdHoleEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdHoleEdit::setPosition(const Point& pos, bool immediate) noexcept {
+void CmdHoleEdit::setPath(const NonEmptyPath& path, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPosition = pos;
-  if (immediate) mHole.setPosition(mNewPosition);
+  mNewPath = path;
+  if (immediate) mHole.setPath(mNewPath);
 }
 
 void CmdHoleEdit::translate(const Point& deltaPos, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPosition += deltaPos;
-  if (immediate) mHole.setPosition(mNewPosition);
+  setPath(NonEmptyPath(mNewPath->translated(deltaPos)), immediate);
 }
 
 void CmdHoleEdit::snapToGrid(const PositiveLength& gridInterval,
                              bool immediate) noexcept {
-  setPosition(mNewPosition.mappedToGrid(gridInterval), immediate);
+  const Point p0 = mNewPath->getVertices().first().getPos();
+  const Point p1 = p0.mappedToGrid(gridInterval);
+  setPath(NonEmptyPath(mNewPath->translated(p1 - p0)), immediate);
 }
 
 void CmdHoleEdit::rotate(const Angle& angle, const Point& center,
                          bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPosition.rotate(angle, center);
-  if (immediate) mHole.setPosition(mNewPosition);
+  setPath(NonEmptyPath(mNewPath->rotated(angle, center)), immediate);
 }
 
 void CmdHoleEdit::mirror(Qt::Orientation orientation, const Point& center,
                          bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewPosition.mirror(orientation, center);
-  if (immediate) mHole.setPosition(mNewPosition);
+  setPath(NonEmptyPath(mNewPath->mirrored(orientation, center)), immediate);
 }
 
 void CmdHoleEdit::setDiameter(const PositiveLength& diameter,
@@ -98,18 +97,18 @@ void CmdHoleEdit::setDiameter(const PositiveLength& diameter,
 bool CmdHoleEdit::performExecute() {
   performRedo();  // can throw
 
-  if (mNewPosition != mOldPosition) return true;
+  if (mNewPath != mOldPath) return true;
   if (mNewDiameter != mOldDiameter) return true;
   return false;
 }
 
 void CmdHoleEdit::performUndo() {
-  mHole.setPosition(mOldPosition);
+  mHole.setPath(mOldPath);
   mHole.setDiameter(mOldDiameter);
 }
 
 void CmdHoleEdit::performRedo() {
-  mHole.setPosition(mNewPosition);
+  mHole.setPath(mNewPath);
   mHole.setDiameter(mNewDiameter);
 }
 

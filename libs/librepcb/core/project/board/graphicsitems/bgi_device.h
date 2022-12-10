@@ -82,7 +82,7 @@ private:  // Data
   std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;
   QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mPolygonGraphicsItems;
-  QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mHoleGraphicsItems;
+  QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mHoleGraphicsItems;
   QRectF mBoundingRect;
   QPainterPath mShape;
 

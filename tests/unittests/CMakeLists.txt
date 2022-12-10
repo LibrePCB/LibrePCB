@@ -35,6 +35,7 @@ add_executable(
   core/fileio/filepathtest.cpp
   core/fileio/transactionaldirectorytest.cpp
   core/fileio/transactionalfilesystemtest.cpp
+  core/geometry/holetest.cpp
   core/geometry/pathtest.cpp
   core/geometry/polygontest.cpp
   core/geometry/stroketexttest.cpp

@@ -282,7 +282,7 @@ bool CmdPasteBoardItems::performExecute() {
   // Paste holes
   for (const Hole& hole : mData->getHoles()) {
     Hole copy(Uuid::createRandom(), hole);  // assign new UUID
-    copy.setPosition(copy.getPosition() + mPosOffset);  // move
+    copy.setPath(NonEmptyPath(copy.getPath()->translated(mPosOffset)));  // move
     BI_Hole* item = new BI_Hole(mBoard, copy);
     item->setSelected(true);
     execNewChildCmd(new CmdBoardHoleAdd(*item));

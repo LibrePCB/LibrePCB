@@ -118,7 +118,7 @@ bool PackageEditorState_AddHoles::processGraphicsSceneMouseMoved(
   if (mCurrentHole) {
     Point currentPos =
         Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
-    mEditCmd->setPosition(currentPos, true);
+    mEditCmd->setPath(makeNonEmptyPath(currentPos), true);
     return true;
   } else {
     return false;
@@ -142,8 +142,8 @@ bool PackageEditorState_AddHoles::processGraphicsSceneLeftMouseButtonPressed(
 bool PackageEditorState_AddHoles::startAddHole(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add hole"));
-    mCurrentHole =
-        std::make_shared<Hole>(Uuid::createRandom(), pos, mLastDiameter);
+    mCurrentHole = std::make_shared<Hole>(Uuid::createRandom(), mLastDiameter,
+                                          makeNonEmptyPath(pos));
     mContext.undoStack.appendToCmdGroup(
         new CmdHoleInsert(mContext.currentFootprint->getHoles(), mCurrentHole));
     mEditCmd.reset(new CmdHoleEdit(*mCurrentHole));
@@ -163,7 +163,7 @@ bool PackageEditorState_AddHoles::startAddHole(const Point& pos) noexcept {
 
 bool PackageEditorState_AddHoles::finishAddHole(const Point& pos) noexcept {
   try {
-    mEditCmd->setPosition(pos, true);
+    mEditCmd->setPath(makeNonEmptyPath(pos), true);
     mCurrentGraphicsItem->setSelected(false);
     mCurrentGraphicsItem.reset();
     mCurrentHole.reset();

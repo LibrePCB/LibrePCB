@@ -108,15 +108,15 @@ void FootprintPainter::paint(QPainter& painter,
 
     // Draw holes.
     foreach (const Hole& hole, content.holes) {
-      p.drawCircle(hole.getPosition(), *hole.getDiameter(), Length(0),
-                   settings.getColor(layer), QColor());
+      p.drawSlot(*hole.getPath(), hole.getDiameter(), Length(0),
+                 settings.getColor(layer), QColor());
     }
 
     // Draw pad holes.
     if (drawPadHoles) {
       foreach (const Hole& hole, content.padHoles) {
-        p.drawCircle(hole.getPosition(), *hole.getDiameter(), Length(0),
-                     settings.getColor(layer), QColor());
+        p.drawSlot(*hole.getPath(), hole.getDiameter(), Length(0),
+                   settings.getColor(layer), QColor());
       }
     }
 
@@ -180,8 +180,8 @@ void FootprintPainter::initContentByLayer() const noexcept {
       // Also add the hole for THT pads.
       if ((pad.getBoardSide() == FootprintPad::BoardSide::THT) &&
           (pad.getDrillDiameter() > 0)) {
-        Hole hole(pad.getUuid(), pad.getPosition(),
-                  PositiveLength(*pad.getDrillDiameter()));
+        Hole hole(pad.getUuid(), PositiveLength(*pad.getDrillDiameter()),
+                  makeNonEmptyPath(pad.getPosition()));
         mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(hole);
       }
     }
