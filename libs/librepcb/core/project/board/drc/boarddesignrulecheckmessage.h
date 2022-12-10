@@ -43,19 +43,22 @@ namespace librepcb {
 class BoardDesignRuleCheckMessage final {
 public:
   // Constructors / Destructor
+  BoardDesignRuleCheckMessage(const QString& message, const Path& location,
+                              const QString& description = QString()) noexcept;
   BoardDesignRuleCheckMessage(const QString& message,
-                              const Path& location) noexcept;
-  BoardDesignRuleCheckMessage(const QString& message,
-                              const QVector<Path>& locations) noexcept;
+                              const QVector<Path>& locations,
+                              const QString& description = QString()) noexcept;
   ~BoardDesignRuleCheckMessage() noexcept;
 
   // Getters
   const QString& getMessage() const noexcept { return mMessage; }
   const QVector<Path>& getLocations() const noexcept { return mLocations; }
+  const QString& getDescription() const noexcept { return mDescription; }
 
 private:  // Data
   QString mMessage;
   QVector<Path> mLocations;
+  QString mDescription;
 };
 
 /*******************************************************************************
