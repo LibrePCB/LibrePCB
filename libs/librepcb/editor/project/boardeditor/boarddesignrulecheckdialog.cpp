@@ -61,15 +61,29 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
   mUi->edtMinPthRestring->configure(lengthUnit,
                                     LengthEditBase::Steps::generic(),
                                     settingsPrefix % "/min_pth_restring");
-  mUi->edtMinPthDrillDiameter->configure(
-      lengthUnit, LengthEditBase::Steps::drillDiameter(),
-      settingsPrefix % "/min_pth_drill_diameter");
   mUi->edtMinNpthDrillDiameter->configure(
       lengthUnit, LengthEditBase::Steps::drillDiameter(),
       settingsPrefix % "/min_npth_drill_diameter");
+  mUi->edtMinNpthSlotWidth->configure(lengthUnit,
+                                      LengthEditBase::Steps::drillDiameter(),
+                                      settingsPrefix % "/min_npth_slot_width");
+  mUi->edtMinPthDrillDiameter->configure(
+      lengthUnit, LengthEditBase::Steps::drillDiameter(),
+      settingsPrefix % "/min_pth_drill_diameter");
   mUi->edtCourtyardOffset->configure(lengthUnit,
                                      LengthEditBase::Steps::generic(),
                                      settingsPrefix % "/courtyard_offset");
+  for (QComboBox* cbx : {mUi->cbxWarnNpthSlotsConfig}) {
+    cbx->addItem(
+        tr("Only Curved"),
+        QVariant::fromValue(BoardDesignRuleCheck::SlotsWarningLevel::Curved));
+    cbx->addItem(tr("Multi-Segment or Curved"),
+                 QVariant::fromValue(
+                     BoardDesignRuleCheck::SlotsWarningLevel::MultiSegment));
+    cbx->addItem(
+        tr("All"),
+        QVariant::fromValue(BoardDesignRuleCheck::SlotsWarningLevel::All));
+  }
   QPushButton* btnRun =
       mUi->buttonBox->addButton(tr("Run DRC"), QDialogButtonBox::AcceptRole);
   btnRun->setDefault(true);  // Allow just pressing the return key to run DRC.
@@ -77,26 +91,20 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
           &BoardDesignRuleCheckDialog::btnRunDrcClicked);
   connect(mUi->buttonBox, &QDialogButtonBox::rejected, this,
           &BoardDesignRuleCheckDialog::reject);
-  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxRebuildPlanes,
-          &QCheckBox::setChecked);
-  connect(mUi->btnSelectAll, &QPushButton::clicked,
-          mUi->cbxClearanceCopperCopper, &QCheckBox::setChecked);
-  connect(mUi->btnSelectAll, &QPushButton::clicked,
-          mUi->cbxClearanceCopperBoard, &QCheckBox::setChecked);
-  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxClearanceCopperNpth,
-          &QCheckBox::setChecked);
-  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxMinCopperWidth,
-          &QCheckBox::setChecked);
-  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxMinPthRestring,
-          &QCheckBox::setChecked);
-  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxMinPthDrillDiameter,
-          &QCheckBox::setChecked);
-  connect(mUi->btnSelectAll, &QPushButton::clicked,
-          mUi->cbxMinNpthDrillDiameter, &QCheckBox::setChecked);
-  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxCourtyardOffset,
-          &QCheckBox::setChecked);
-  connect(mUi->btnSelectAll, &QPushButton::clicked, mUi->cbxMissingConnections,
-          &QCheckBox::setChecked);
+  connect(mUi->btnSelectAll, &QPushButton::clicked, this, [this](bool checked) {
+    mUi->cbxRebuildPlanes->setChecked(checked);
+    mUi->cbxClearanceCopperCopper->setChecked(checked);
+    mUi->cbxClearanceCopperBoard->setChecked(checked);
+    mUi->cbxClearanceCopperNpth->setChecked(checked);
+    mUi->cbxMinCopperWidth->setChecked(checked);
+    mUi->cbxMinPthRestring->setChecked(checked);
+    mUi->cbxMinNpthDrillDiameter->setChecked(checked);
+    mUi->cbxMinNpthSlotWidth->setChecked(checked);
+    mUi->cbxMinPthDrillDiameter->setChecked(checked);
+    mUi->cbxWarnNpthSlots->setChecked(checked);
+    mUi->cbxCourtyardOffset->setChecked(checked);
+    mUi->cbxMissingConnections->setChecked(checked);
+  });
 
   // set options
   mUi->cbxRebuildPlanes->setChecked(options.rebuildPlanes);
@@ -110,10 +118,16 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
   mUi->edtMinCopperWidth->setValue(options.minCopperWidth);
   mUi->cbxMinPthRestring->setChecked(options.checkPthRestring);
   mUi->edtMinPthRestring->setValue(options.minPthRestring);
-  mUi->cbxMinPthDrillDiameter->setChecked(options.checkPthDrillDiameter);
-  mUi->edtMinPthDrillDiameter->setValue(options.minPthDrillDiameter);
   mUi->cbxMinNpthDrillDiameter->setChecked(options.checkNpthDrillDiameter);
   mUi->edtMinNpthDrillDiameter->setValue(options.minNpthDrillDiameter);
+  mUi->cbxMinNpthSlotWidth->setChecked(options.checkNpthSlotWidth);
+  mUi->edtMinNpthSlotWidth->setValue(options.minNpthSlotWidth);
+  mUi->cbxMinPthDrillDiameter->setChecked(options.checkPthDrillDiameter);
+  mUi->edtMinPthDrillDiameter->setValue(options.minPthDrillDiameter);
+  mUi->cbxWarnNpthSlots->setChecked(options.checkNpthSlotsWarning);
+  mUi->cbxWarnNpthSlotsConfig->setCurrentIndex(
+      mUi->cbxWarnNpthSlotsConfig->findData(
+          QVariant::fromValue(options.npthSlotsWarning)));
   mUi->cbxCourtyardOffset->setChecked(options.checkCourtyardClearance);
   mUi->edtCourtyardOffset->setValue(options.courtyardOffset);
   mUi->cbxMissingConnections->setChecked(options.checkMissingConnections);
@@ -149,10 +163,16 @@ BoardDesignRuleCheck::Options BoardDesignRuleCheckDialog::getOptions() const
   options.minCopperWidth = mUi->edtMinCopperWidth->getValue();
   options.checkPthRestring = mUi->cbxMinPthRestring->isChecked();
   options.minPthRestring = mUi->edtMinPthRestring->getValue();
-  options.checkPthDrillDiameter = mUi->cbxMinPthDrillDiameter->isChecked();
-  options.minPthDrillDiameter = mUi->edtMinPthDrillDiameter->getValue();
   options.checkNpthDrillDiameter = mUi->cbxMinNpthDrillDiameter->isChecked();
   options.minNpthDrillDiameter = mUi->edtMinNpthDrillDiameter->getValue();
+  options.checkNpthSlotWidth = mUi->cbxMinNpthSlotWidth->isChecked();
+  options.minNpthSlotWidth = mUi->edtMinNpthSlotWidth->getValue();
+  options.checkPthDrillDiameter = mUi->cbxMinPthDrillDiameter->isChecked();
+  options.minPthDrillDiameter = mUi->edtMinPthDrillDiameter->getValue();
+  options.checkNpthSlotsWarning = mUi->cbxWarnNpthSlots->isChecked();
+  options.npthSlotsWarning =
+      mUi->cbxWarnNpthSlotsConfig->currentData()
+          .value<BoardDesignRuleCheck::SlotsWarningLevel>();
   options.checkCourtyardClearance = mUi->cbxCourtyardOffset->isChecked();
   options.courtyardOffset = mUi->edtCourtyardOffset->getValue();
   options.checkMissingConnections = mUi->cbxMissingConnections->isChecked();
