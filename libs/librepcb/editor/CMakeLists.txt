@@ -684,6 +684,9 @@ add_library(
   widgets/graphicslayercombobox.h
   widgets/graphicsview.cpp
   widgets/graphicsview.h
+  widgets/holeeditorwidget.cpp
+  widgets/holeeditorwidget.h
+  widgets/holeeditorwidget.ui
   widgets/if_graphicsvieweventhandler.h
   widgets/keysequenceseditorwidget.cpp
   widgets/keysequenceseditorwidget.h

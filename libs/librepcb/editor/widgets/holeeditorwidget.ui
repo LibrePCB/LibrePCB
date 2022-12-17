@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::editor::HoleEditorWidget</class>
+ <widget class="QWidget" name="librepcb::editor::HoleEditorWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>366</width>
+    <height>206</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string notr="true"/>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Diameter:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="librepcb::editor::PositiveLengthEdit" name="edtDiameter" native="true"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabCircular">
+      <attribute name="title">
+       <string>Circular Drill</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Position:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true"/>
+         </item>
+         <item>
+          <widget class="librepcb::editor::LengthEdit" name="edtPosY" native="true"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabLinear">
+      <attribute name="title">
+       <string>Linear Slot</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout_3">
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="librepcb::editor::LengthEdit" name="edtCenterX" native="true"/>
+         </item>
+         <item>
+          <widget class="librepcb::editor::LengthEdit" name="edtCenterY" native="true"/>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Rotation:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Center:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
+       </item>
+       <item row="3" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,1">
+         <item>
+          <widget class="librepcb::editor::UnsignedLengthEdit" name="edtLength" native="true"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblOuterSize">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true"/>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Length:</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabArbitrary">
+      <attribute name="title">
+       <string>Arbitrary Slot</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="librepcb::editor::PathEditorWidget" name="pathEditorWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::editor::LengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/lengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::AngleEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/angleedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::PositiveLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::PathEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/patheditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::UnsignedLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>edtDiameter</tabstop>
+  <tabstop>edtPosX</tabstop>
+  <tabstop>edtPosY</tabstop>
+  <tabstop>edtCenterX</tabstop>
+  <tabstop>edtCenterY</tabstop>
+  <tabstop>edtLength</tabstop>
+  <tabstop>edtRotation</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
