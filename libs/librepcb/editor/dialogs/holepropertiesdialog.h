@@ -33,7 +33,6 @@ namespace librepcb {
 
 class Hole;
 class LengthUnit;
-class Path;
 
 namespace editor {
 
@@ -70,11 +69,6 @@ public:
   HolePropertiesDialog& operator=(const HolePropertiesDialog& rhs) = delete;
 
 private:  // Methods
-  void updatePathFromCircularTab() noexcept;
-  void updatePathFromLinearTab() noexcept;
-  void updateCircularTabFromPath(const Path& path) noexcept;
-  void updateLinearTabFromPath(const Path& path) noexcept;
-  void updateLinearOuterSize(const Path& path) noexcept;
   void on_buttonBox_clicked(QAbstractButton* button);
   bool applyChanges() noexcept;
 
