@@ -51,11 +51,13 @@ public:
   virtual ~EditableTableWidget() noexcept;
 
   // Setters
+  virtual void setModel(QAbstractItemModel* model) noexcept override;
   void setReadOnly(bool readOnly) noexcept;
   void setShowCopyButton(bool show) noexcept { mShowCopyButton = show; }
   void setShowEditButton(bool show) noexcept { mShowEditButton = show; }
   void setShowMoveButtons(bool show) noexcept { mShowMoveButtons = show; }
   void setBrowseButtonColumn(int col) noexcept { mBrowseButtonColumn = col; }
+  void setMinimumRowCount(int count) noexcept;
 
   // Inherited
   using QAbstractItemView::edit;  // Required to override edit() overload below.
@@ -74,6 +76,7 @@ protected:
 
 signals:
   void readOnlyChanged(bool readOnly);
+  void canRemoveChanged(bool canRemove);
   void currentRowChanged(int row);
   void btnAddClicked(const QVariant& data);
   void btnRemoveClicked(const QVariant& data);
@@ -84,12 +87,13 @@ signals:
   void btnBrowseClicked(const QVariant& data);
 
 private:
+  void updateCanRemove() noexcept;
   void installButtons(int row) noexcept;
   QToolButton* createButton(const QString& objectName, const QIcon& icon,
                             const QString& text, const QString& toolTip,
                             int width, int height, Signal clickedSignal,
-                            const QPersistentModelIndex& index,
-                            bool doesModify) noexcept;
+                            const QPersistentModelIndex& index, bool doesModify,
+                            bool doesRemove) noexcept;
   void buttonClickedHandler(Signal clickedSignal,
                             const QPersistentModelIndex& index) noexcept;
 
@@ -97,7 +101,11 @@ private:
   bool mShowEditButton;
   bool mShowMoveButtons;
   int mBrowseButtonColumn;
+  int mMinimumRowCount;
+  bool mCanRemove;
   bool mReadOnly;
+
+  QMetaObject::Connection mRowsRemovedConnection;
 };
 
 /*******************************************************************************
