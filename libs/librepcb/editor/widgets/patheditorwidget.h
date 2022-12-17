@@ -60,6 +60,7 @@ public:
   // General Methods
   void setFrameShape(QFrame::Shape shape) noexcept;
   void setReadOnly(bool readOnly) noexcept;
+  void setMinimumVertexCount(int count) noexcept;
   void setPath(const Path& path) noexcept;
   const Path& getPath() const noexcept;
   void setLengthUnit(const LengthUnit& unit) noexcept;
