@@ -63,6 +63,9 @@ public:
 
   // Operator Overloadings
   FileFormatMigrationV01& operator=(const FileFormatMigrationV01& rhs) = delete;
+
+private:  // Methods
+  void upgradeHoles(SExpression& node);
 };
 
 /*******************************************************************************

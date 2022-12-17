@@ -314,8 +314,8 @@ std::shared_ptr<Hole> EagleTypeConverter::convertHole(
     const parseagle::Hole& h) {
   return std::make_shared<Hole>(
       Uuid::createRandom(),  // UUID
-      convertPoint(h.getPosition()),  // Position
-      PositiveLength(convertLength(h.getDiameter()))  // Diameter
+      PositiveLength(convertLength(h.getDiameter())),  // Diameter
+      makeNonEmptyPath(convertPoint(h.getPosition()))  // Path
   );
 }
 

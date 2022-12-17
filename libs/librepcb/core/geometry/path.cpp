@@ -60,6 +60,16 @@ bool Path::isClosed() const noexcept {
   }
 }
 
+bool Path::isCurved() const noexcept {
+  // Angle of last vertex is not relevant!
+  for (int i = 0; i < (mVertices.count() - 1); ++i) {
+    if (mVertices.at(i).getAngle() != Angle::deg0()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 UnsignedLength Path::getTotalStraightLength() const noexcept {
   UnsignedLength length(0);
   if (mVertices.count() >= 2) {
@@ -100,13 +110,17 @@ QVector<Path> Path::toOutlineStrokes(const PositiveLength& width) const
     noexcept {
   QVector<Path> paths;
   paths.reserve(mVertices.count());
-  for (int i = 1; i < mVertices.count(); ++i) {  // skip first vertex!
-    const Vertex& v = mVertices.at(i);
-    const Vertex& v0 = mVertices.at(i - 1);
-    if (v0.getAngle() == 0) {
-      paths.append(obround(v0.getPos(), v.getPos(), width));
-    } else {
-      paths.append(arcObround(v0.getPos(), v.getPos(), v0.getAngle(), width));
+  if (mVertices.count() == 1) {
+    paths.append(circle(width).translated(mVertices.first().getPos()));
+  } else {
+    for (int i = 1; i < mVertices.count(); ++i) {  // skip first vertex!
+      const Vertex& v = mVertices.at(i);
+      const Vertex& v0 = mVertices.at(i - 1);
+      if (v0.getAngle() == 0) {
+        paths.append(obround(v0.getPos(), v.getPos(), width));
+      } else {
+        paths.append(arcObround(v0.getPos(), v.getPos(), v0.getAngle(), width));
+      }
     }
   }
   return paths;

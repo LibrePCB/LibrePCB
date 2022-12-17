@@ -264,14 +264,13 @@ void BoardGerberExport::exportDrills(
     const BoardFabricationOutputSettings& settings) const {
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixDrills());
-  ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getVersion(),
-                        ExcellonGenerator::Plating::Mixed, 1,
-                        mBoard.getLayerStack().getInnerLayerCount() + 2);
-  drawPthDrills(gen);
-  drawNpthDrills(gen);
-  gen.generate();
-  gen.saveToFile(fp);
+  std::unique_ptr<ExcellonGenerator> gen =
+      BoardGerberExport::createExcellonGenerator(
+          settings, ExcellonGenerator::Plating::Mixed);
+  drawPthDrills(*gen);
+  drawNpthDrills(*gen);
+  gen->generate();
+  gen->saveToFile(fp);
   mWrittenFiles.append(fp);
 }
 
@@ -279,10 +278,10 @@ void BoardGerberExport::exportDrillsNpth(
     const BoardFabricationOutputSettings& settings) const {
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixDrillsNpth());
-  ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getVersion(), ExcellonGenerator::Plating::No,
-                        1, mBoard.getLayerStack().getInnerLayerCount() + 2);
-  drawNpthDrills(gen);
+  std::unique_ptr<ExcellonGenerator> gen =
+      BoardGerberExport::createExcellonGenerator(
+          settings, ExcellonGenerator::Plating::No);
+  drawNpthDrills(*gen);
 
   // Note that separate NPTH drill files could lead to issues with some PCB
   // manufacturers, even if it's empty in many cases. However, we generate the
@@ -291,8 +290,8 @@ void BoardGerberExport::exportDrillsNpth(
   // https://github.com/LibrePCB/LibrePCB/issues/998. If the PCB manufacturer
   // doesn't support a separate NPTH file, the user shall enable the
   // "merge PTH and NPTH drills"  option.
-  gen.generate();
-  gen.saveToFile(fp);
+  gen->generate();
+  gen->saveToFile(fp);
   mWrittenFiles.append(fp);
 }
 
@@ -300,12 +299,12 @@ void BoardGerberExport::exportDrillsPth(
     const BoardFabricationOutputSettings& settings) const {
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixDrillsPth());
-  ExcellonGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getVersion(), ExcellonGenerator::Plating::Yes,
-                        1, mBoard.getLayerStack().getInnerLayerCount() + 2);
-  drawPthDrills(gen);
-  gen.generate();
-  gen.saveToFile(fp);
+  std::unique_ptr<ExcellonGenerator> gen =
+      BoardGerberExport::createExcellonGenerator(
+          settings, ExcellonGenerator::Plating::Yes);
+  drawPthDrills(*gen);
+  gen->generate();
+  gen->saveToFile(fp);
   mWrittenFiles.append(fp);
 }
 
@@ -472,7 +471,7 @@ int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const {
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     const Transform transform(*device);
     for (const Hole& hole : device->getLibFootprint().getHoles()) {
-      gen.drill(transform.map(hole.getPosition()), hole.getDiameter(), false,
+      gen.drill(transform.map(hole.getPath()), hole.getDiameter(), false,
                 ExcellonGenerator::Function::MechanicalDrill);
       ++count;
     }
@@ -480,8 +479,8 @@ int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const {
 
   // board holes
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    gen.drill(hole->getHole().getPosition(), hole->getHole().getDiameter(),
-              false, ExcellonGenerator::Function::MechanicalDrill);
+    gen.drill(hole->getHole().getPath(), hole->getHole().getDiameter(), false,
+              ExcellonGenerator::Function::MechanicalDrill);
     ++count;
   }
 
@@ -804,6 +803,16 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
     }
     default: { throw LogicError(__FILE__, __LINE__); }
   }
+}
+
+std::unique_ptr<ExcellonGenerator> BoardGerberExport::createExcellonGenerator(
+    const BoardFabricationOutputSettings& settings,
+    ExcellonGenerator::Plating plating) const {
+  std::unique_ptr<ExcellonGenerator> gen(new ExcellonGenerator(
+      mCreationDateTime, mProjectName, mBoard.getUuid(), mProject.getVersion(),
+      plating, 1, mBoard.getLayerStack().getInnerLayerCount() + 2));
+  gen->setUseG85Slots(settings.getUseG85SlotCommand());
+  return gen;
 }
 
 FilePath BoardGerberExport::getOutputFilePath(QString path) const noexcept {

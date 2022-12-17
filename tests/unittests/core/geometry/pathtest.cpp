@@ -52,6 +52,40 @@ TEST_F(PathTest, testDefaultConstructorCreatesEmptyPath) {
   EXPECT_EQ(0, path.getVertices().count());
 }
 
+TEST_F(PathTest, testIsCurvedFalse) {
+  EXPECT_FALSE(Path().isCurved());
+  EXPECT_FALSE(Path({
+                        Vertex(Point(0, 0)),
+                    })
+                   .isCurved());
+  EXPECT_FALSE(Path({
+                        Vertex(Point(0, 0)),
+                        Vertex(Point(1, 1)),
+                    })
+                   .isCurved());
+}
+
+// Ensure that the angle of the last vertex is not relevant.
+TEST_F(PathTest, testIsCurvedLastVertexFalse) {
+  EXPECT_FALSE(Path({
+                        Vertex(Point(1, 1), Angle::deg90()),
+                    })
+                   .isCurved());
+  EXPECT_FALSE(Path({
+                        Vertex(Point(0, 0)),
+                        Vertex(Point(1, 1), Angle::deg90()),
+                    })
+                   .isCurved());
+}
+
+TEST_F(PathTest, testIsCurvedTrue) {
+  EXPECT_TRUE(Path({
+                       Vertex(Point(0, 0), Angle::deg90()),
+                       Vertex(Point(1, 1)),
+                   })
+                  .isCurved());
+}
+
 TEST_F(PathTest, testGetTotalStraightLength) {
   QVector<Vertex> vertices;
   EXPECT_EQ(UnsignedLength(0), Path(vertices).getTotalStraightLength());

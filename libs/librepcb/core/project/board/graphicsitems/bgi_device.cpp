@@ -86,9 +86,9 @@ BGI_Device::BGI_Device(BI_Device& device) noexcept
 
   for (auto& obj : mDevice.getLibFootprint().getHoles().values()) {
     Q_ASSERT(obj);
-    auto i = std::make_shared<PrimitiveCircleGraphicsItem>(this);
-    i->setPosition(obj->getPosition());
-    i->setDiameter(positiveToUnsigned(obj->getDiameter()));
+    auto i = std::make_shared<PrimitivePathGraphicsItem>(this);
+    i->setPath(Path::toQPainterPathPx(
+        obj->getPath()->toOutlineStrokes(obj->getDiameter()), false));
     i->setLineLayer(getLayer(GraphicsLayer::sBoardDrillsNpth));
     i->setFlag(QGraphicsItem::ItemIsSelectable, true);
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);

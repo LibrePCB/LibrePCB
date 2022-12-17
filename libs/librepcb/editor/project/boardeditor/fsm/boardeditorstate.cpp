@@ -249,7 +249,8 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
 
   if (flags.testFlag(FindFlag::Holes)) {
     foreach (BI_Hole* hole, board->getHoles()) {
-      processItem(hole, hole->getPosition(), 5);
+      processItem(hole,
+                  hole->getHole().getPath()->getVertices().first().getPos(), 5);
     }
   }
 

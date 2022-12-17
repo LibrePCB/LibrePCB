@@ -364,6 +364,7 @@ def test_export_with_custom_settings(cli, project):
           (suffix_pth "DRILLS-PTH.drl")
           (suffix_npth "DRILLS-NPTH.drl")
           (suffix_merged "DRILLS.drl")
+          (g85_slots false)
         )
         (solderpaste_top (create true) (suffix "SOLDERPASTE-TOP.gbr"))
         (solderpaste_bot (create true) (suffix "SOLDERPASTE-BOTTOM.gbr"))

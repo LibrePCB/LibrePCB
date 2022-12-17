@@ -241,8 +241,10 @@ TEST_F(EagleTypeConverterTest, testConvertCircleFilled) {
 TEST_F(EagleTypeConverterTest, testConvertHole) {
   QString xml = "<hole x=\"1\" y=\"2\" drill=\"3.5\"/>";
   auto out = C::convertHole(parseagle::Hole(dom(xml)));
-  EXPECT_EQ(Point(1000000, 2000000), out->getPosition());
   EXPECT_EQ(PositiveLength(3500000), out->getDiameter());
+  EXPECT_EQ(1, out->getPath()->getVertices().count());
+  EXPECT_EQ(Point(1000000, 2000000),
+            out->getPath()->getVertices().first().getPos());
 }
 
 TEST_F(EagleTypeConverterTest, testConvertTextValue) {

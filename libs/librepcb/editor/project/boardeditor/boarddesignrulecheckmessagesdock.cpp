@@ -103,7 +103,9 @@ void BoardDesignRuleCheckMessagesDock::setMessages(
   bool signalsBlocked = mUi->lstMessages->blockSignals(true);
   mUi->lstMessages->clear();
   foreach (const BoardDesignRuleCheckMessage& message, mMessages) {
-    mUi->lstMessages->addItem(message.getMessage());
+    QListWidgetItem* item = new QListWidgetItem(message.getMessage());
+    item->setToolTip(message.getDescription());
+    mUi->lstMessages->addItem(item);
   }
   mUi->lstMessages->blockSignals(signalsBlocked);
 

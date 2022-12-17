@@ -21,10 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/core/project/board/boardfabricationoutputsettings.h>
+#include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/serialization/sexpression.h>
-
-#include <QtCore>
 
 /*******************************************************************************
  *  Namespace
@@ -36,38 +34,36 @@ namespace tests {
  *  Test Class
  ******************************************************************************/
 
-class BoardFabricationOutputSettingsTest : public ::testing::Test {};
+class HoleTest : public ::testing::Test {};
 
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
 
-TEST_F(BoardFabricationOutputSettingsTest, testSerializeAndDeserialize) {
-  BoardFabricationOutputSettings obj1;
-  obj1.setOutputBasePath("a");
-  obj1.setSuffixDrills("b");
-  obj1.setSuffixDrillsNpth("c");
-  obj1.setSuffixDrillsPth("d");
-  obj1.setSuffixOutlines("e");
-  obj1.setSuffixCopperTop("f");
-  obj1.setSuffixCopperInner("g");
-  obj1.setSuffixCopperBot("h");
-  obj1.setSuffixSolderMaskTop("i");
-  obj1.setSuffixSolderMaskBot("j");
-  obj1.setSuffixSilkscreenTop("k");
-  obj1.setSuffixSilkscreenBot("l");
-  obj1.setSuffixSolderPasteTop("m");
-  obj1.setSuffixSolderPasteBot("n");
-  obj1.setSilkscreenLayersTop({"o", "p"});
-  obj1.setSilkscreenLayersBot({"q", "r"});
-  obj1.setMergeDrillFiles(!obj1.getMergeDrillFiles());
-  obj1.setUseG85SlotCommand(!obj1.getUseG85SlotCommand());
-  obj1.setEnableSolderPasteTop(!obj1.getEnableSolderPasteTop());
-  obj1.setEnableSolderPasteBot(!obj1.getEnableSolderPasteBot());
+TEST_F(HoleTest, testConstructFromSExpression) {
+  SExpression sexpr = SExpression::parse(
+      "(hole b9445237-8982-4a9f-af06-bfc6c507e010 (diameter 0.5)"
+      " (vertex (position 1.234 2.345) (angle 45.0))"
+      ")",
+      FilePath());
+  Hole obj(sexpr);
+  EXPECT_EQ(Uuid::fromString("b9445237-8982-4a9f-af06-bfc6c507e010"),
+            obj.getUuid());
+  EXPECT_EQ(PositiveLength(500000), obj.getDiameter());
+  EXPECT_EQ(1, obj.getPath()->getVertices().count());
+  EXPECT_EQ(Point(1234000, 2345000),
+            obj.getPath()->getVertices().first().getPos());
+  EXPECT_EQ(Angle(45000000), obj.getPath()->getVertices().first().getAngle());
+}
+
+TEST_F(HoleTest, testSerializeAndDeserialize) {
+  Hole obj1(Uuid::createRandom(), PositiveLength(123),
+            NonEmptyPath(Path({Vertex(Point(123, 456), Angle::deg45()),
+                               Vertex(Point(789, 321), Angle::deg0())})));
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);
 
-  BoardFabricationOutputSettings obj2(sexpr1);
+  Hole obj2(sexpr1);
   SExpression sexpr2 = SExpression::createList("obj");
   obj2.serialize(sexpr2);
 

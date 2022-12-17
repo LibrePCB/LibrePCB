@@ -21,6 +21,7 @@ add_executable(
   core/attribute/attributetest.cpp
   core/attribute/attributetypetest.cpp
   core/attribute/attributeunittest.cpp
+  core/export/excellongeneratortest.cpp
   core/export/gerberaperturelisttest.cpp
   core/export/gerberattributetest.cpp
   core/export/gerberattributewritertest.cpp
@@ -34,6 +35,7 @@ add_executable(
   core/fileio/filepathtest.cpp
   core/fileio/transactionaldirectorytest.cpp
   core/fileio/transactionalfilesystemtest.cpp
+  core/geometry/holetest.cpp
   core/geometry/pathtest.cpp
   core/geometry/polygontest.cpp
   core/geometry/stroketexttest.cpp

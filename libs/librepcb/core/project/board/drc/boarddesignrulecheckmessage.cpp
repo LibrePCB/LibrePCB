@@ -34,13 +34,15 @@ namespace librepcb {
  ******************************************************************************/
 
 BoardDesignRuleCheckMessage::BoardDesignRuleCheckMessage(
-    const QString& message, const Path& location) noexcept
-  : BoardDesignRuleCheckMessage(message, QVector<Path>{location}) {
+    const QString& message, const Path& location,
+    const QString& description) noexcept
+  : BoardDesignRuleCheckMessage(message, QVector<Path>{location}, description) {
 }
 
 BoardDesignRuleCheckMessage::BoardDesignRuleCheckMessage(
-    const QString& message, const QVector<Path>& locations) noexcept
-  : mMessage(message), mLocations(locations) {
+    const QString& message, const QVector<Path>& locations,
+    const QString& description) noexcept
+  : mMessage(message), mLocations(locations), mDescription(description) {
 }
 
 BoardDesignRuleCheckMessage::~BoardDesignRuleCheckMessage() noexcept {

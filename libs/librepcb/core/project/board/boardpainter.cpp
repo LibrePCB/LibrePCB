@@ -159,15 +159,15 @@ void BoardPainter::paint(QPainter& painter,
 
     // Draw holes.
     foreach (const Hole& hole, content.holes) {
-      p.drawCircle(hole.getPosition(), *hole.getDiameter(), Length(0),
-                   settings.getColor(layer), QColor());
+      p.drawSlot(*hole.getPath(), hole.getDiameter(), Length(0),
+                 settings.getColor(layer), QColor());
     }
 
     // Draw pad holes.
     if (drawPadHoles) {
       foreach (const Hole& hole, content.padHoles) {
-        p.drawCircle(hole.getPosition(), *hole.getDiameter(), Length(0),
-                     settings.getColor(layer), QColor());
+        p.drawSlot(*hole.getPath(), hole.getDiameter(), Length(0),
+                   settings.getColor(layer), QColor());
       }
     }
 
@@ -207,7 +207,7 @@ void BoardPainter::initContentByLayer() const noexcept {
 
       // Footprint holes.
       foreach (Hole hole, footprint.holes) {
-        hole.setPosition(footprint.transform.map(hole.getPosition()));
+        hole.setPath(NonEmptyPath(footprint.transform.map(hole.getPath())));
         mContentByLayer[GraphicsLayer::sBoardDrillsNpth].holes.append(hole);
       }
 
@@ -241,8 +241,9 @@ void BoardPainter::initContentByLayer() const noexcept {
         // Also add the hole for THT pads.
         if ((pad.getBoardSide() == FootprintPad::BoardSide::THT) &&
             (pad.getDrillDiameter() > 0)) {
-          Hole hole(pad.getUuid(), footprint.transform.map(pad.getPosition()),
-                    PositiveLength(*pad.getDrillDiameter()));
+          Hole hole(
+              pad.getUuid(), PositiveLength(*pad.getDrillDiameter()),
+              makeNonEmptyPath(footprint.transform.map(pad.getPosition())));
           mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(
               hole);
         }

@@ -67,6 +67,10 @@ Path Transform::map(const Path& path) const noexcept {
   return p;
 }
 
+NonEmptyPath Transform::map(const NonEmptyPath& path) const noexcept {
+  return NonEmptyPath(map(*path));
+}
+
 QString Transform::map(const QString& layerName) const noexcept {
   return mMirrored ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
 }

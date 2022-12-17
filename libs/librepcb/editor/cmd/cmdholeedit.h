@@ -59,7 +59,7 @@ public:
   ~CmdHoleEdit() noexcept;
 
   // Setters
-  void setPosition(const Point& pos, bool immediate) noexcept;
+  void setPath(const NonEmptyPath& path, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
@@ -88,8 +88,8 @@ private:
   Hole& mHole;
 
   // General Attributes
-  Point mOldPosition;
-  Point mNewPosition;
+  NonEmptyPath mOldPath;
+  NonEmptyPath mNewPath;
   PositiveLength mOldDiameter;
   PositiveLength mNewDiameter;
 };

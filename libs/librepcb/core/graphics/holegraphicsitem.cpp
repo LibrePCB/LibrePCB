@@ -41,23 +41,25 @@ namespace librepcb {
 HoleGraphicsItem::HoleGraphicsItem(const Hole& hole,
                                    const IF_GraphicsLayerProvider& lp,
                                    QGraphicsItem* parent) noexcept
-  : PrimitiveCircleGraphicsItem(parent),
+  : PrimitivePathGraphicsItem(parent),
     mHole(hole),
     mLayerProvider(lp),
+    mOriginCrossGraphicsItemStart(new OriginCrossGraphicsItem(this)),
+    mOriginCrossGraphicsItemEnd(new OriginCrossGraphicsItem(this)),
     mOnEditedSlot(*this, &HoleGraphicsItem::holeEdited) {
-  setPosition(mHole.getPosition());
-  setDiameter(positiveToUnsigned(mHole.getDiameter()));
+  // setup origin crosses
+  for (auto item :
+       {&mOriginCrossGraphicsItemStart, &mOriginCrossGraphicsItemEnd}) {
+    (*item)->setRotation(Angle::deg45());
+    (*item)->setLayer(mLayerProvider.getLayer(GraphicsLayer::sTopReferences));
+  }
+
+  // update attributes
+  setShape(mHole.getDiameter(), mHole.getPath());
   setLineLayer(mLayerProvider.getLayer(GraphicsLayer::sBoardDrillsNpth));
+  setShapeMode(ShapeMode::FILLED_OUTLINE);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(5);
-
-  // add origin cross
-  mOriginCrossGraphicsItem.reset(new OriginCrossGraphicsItem(this));
-  mOriginCrossGraphicsItem->setRotation(Angle::deg45());
-  mOriginCrossGraphicsItem->setSize(positiveToUnsigned(mHole.getDiameter()) +
-                                    UnsignedLength(500000));
-  mOriginCrossGraphicsItem->setLayer(
-      mLayerProvider.getLayer(GraphicsLayer::sTopReferences));
 
   // register to the text to get attribute updates
   mHole.onEdited.attach(mOnEditedSlot);
@@ -67,28 +69,15 @@ HoleGraphicsItem::~HoleGraphicsItem() noexcept {
 }
 
 /*******************************************************************************
- *  Inherited from QGraphicsItem
- ******************************************************************************/
-
-QPainterPath HoleGraphicsItem::shape() const noexcept {
-  return PrimitiveCircleGraphicsItem::shape() +
-      mOriginCrossGraphicsItem->shape();
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
 void HoleGraphicsItem::holeEdited(const Hole& hole,
                                   Hole::Event event) noexcept {
   switch (event) {
-    case Hole::Event::PositionChanged:
-      setPosition(hole.getPosition());
-      break;
     case Hole::Event::DiameterChanged:
-      setDiameter(positiveToUnsigned(hole.getDiameter()));
-      mOriginCrossGraphicsItem->setSize(positiveToUnsigned(hole.getDiameter()) +
-                                        UnsignedLength(500000));
+    case Hole::Event::PathChanged:
+      setShape(hole.getDiameter(), hole.getPath());
       break;
     default:
       qWarning() << "Unhandled switch-case in HoleGraphicsItem::holeEdited():"
@@ -97,10 +86,28 @@ void HoleGraphicsItem::holeEdited(const Hole& hole,
   }
 }
 
+void HoleGraphicsItem::setShape(const PositiveLength& diameter,
+                                const NonEmptyPath& path) noexcept {
+  setPath(Path::toQPainterPathPx(path->toOutlineStrokes(diameter), false));
+
+  const UnsignedLength size =
+      positiveToUnsigned(diameter) + UnsignedLength(500000);
+  mOriginCrossGraphicsItemStart->setSize(size);
+  mOriginCrossGraphicsItemEnd->setSize(size);
+
+  mOriginCrossGraphicsItemStart->setPosition(
+      path->getVertices().first().getPos());
+  mOriginCrossGraphicsItemEnd->setPosition(path->getVertices().last().getPos());
+
+  mOriginCrossGraphicsItemEnd->setVisible(path->getVertices().count() > 1);
+}
+
 QVariant HoleGraphicsItem::itemChange(GraphicsItemChange change,
                                       const QVariant& value) noexcept {
-  if (change == ItemSelectedChange && mOriginCrossGraphicsItem) {
-    mOriginCrossGraphicsItem->setSelected(value.toBool());
+  if ((change == ItemSelectedChange) && mOriginCrossGraphicsItemStart &&
+      mOriginCrossGraphicsItemEnd) {
+    mOriginCrossGraphicsItemStart->setSelected(value.toBool());
+    mOriginCrossGraphicsItemEnd->setSelected(value.toBool());
   }
   return QGraphicsItem::itemChange(change, value);
 }

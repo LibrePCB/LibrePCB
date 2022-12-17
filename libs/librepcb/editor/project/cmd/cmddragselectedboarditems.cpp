@@ -132,7 +132,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   }
   foreach (BI_Hole* hole, query->getHoles()) {
     Q_ASSERT(hole);
-    mCenterPos += hole->getPosition();
+    mCenterPos += hole->getHole().getPath()->getVertices().first().getPos();
     ++count;
     CmdHoleEdit* cmd = new CmdHoleEdit(hole->getHole());
     mHoleEditCmds.append(cmd);

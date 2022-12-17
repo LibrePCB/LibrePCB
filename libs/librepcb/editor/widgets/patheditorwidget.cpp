@@ -75,6 +75,9 @@ PathEditorWidget::PathEditorWidget(QWidget* parent) noexcept
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mView.data());
+
+  connect(mModel.data(), &PathModel::pathChanged, this,
+          &PathEditorWidget::pathChanged);
 }
 
 PathEditorWidget::~PathEditorWidget() noexcept {
@@ -83,6 +86,10 @@ PathEditorWidget::~PathEditorWidget() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void PathEditorWidget::setFrameShape(QFrame::Shape shape) noexcept {
+  mView->setFrameShape(shape);
+}
 
 void PathEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);

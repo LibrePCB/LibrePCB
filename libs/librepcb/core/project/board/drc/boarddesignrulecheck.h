@@ -37,7 +37,9 @@ namespace librepcb {
 class BI_Device;
 class Board;
 class GraphicsLayer;
+class Hole;
 class NetSignal;
+class Transform;
 
 /*******************************************************************************
  *  Class BoardDesignRuleCheck
@@ -51,6 +53,13 @@ class BoardDesignRuleCheck final : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  enum class SlotsWarningLevel : int {
+    Curved = 0,  ///< Only warn about slots with curves.
+    MultiSegment = 1,  ///< Warn about slots with multiple segments or curves.
+    All = 2,  ///< Warn about all slots.
+  };
+
   struct Options {
     bool rebuildPlanes;
 
@@ -72,8 +81,14 @@ public:
     bool checkNpthDrillDiameter;
     UnsignedLength minNpthDrillDiameter;
 
+    bool checkNpthSlotWidth;
+    UnsignedLength minNpthSlotWidth;
+
     bool checkPthDrillDiameter;
     UnsignedLength minPthDrillDiameter;
+
+    bool checkNpthSlotsWarning;
+    SlotsWarningLevel npthSlotsWarning;
 
     bool checkCourtyardClearance;
     Length courtyardOffset;
@@ -94,8 +109,12 @@ public:
         minPthRestring(150000),  // 150um
         checkNpthDrillDiameter(true),
         minNpthDrillDiameter(250000),  // 250um
+        checkNpthSlotWidth(true),
+        minNpthSlotWidth(1000000),  // 1mm
         checkPthDrillDiameter(true),
         minPthDrillDiameter(250000),  // 250um
+        checkNpthSlotsWarning(true),
+        npthSlotsWarning(SlotsWarningLevel::MultiSegment),
         checkCourtyardClearance(true),
         courtyardOffset(0),  // 0um
         checkMissingConnections(true) {}
@@ -132,12 +151,16 @@ private:  // Methods
   void checkCourtyardClearances(int progressStart, int progressEnd);
   void checkMinimumCopperWidth(int progressStart, int progressEnd);
   void checkMinimumPthRestring(int progressStart, int progressEnd);
-  void checkMinimumPthDrillDiameter(int progressStart, int progressEnd);
   void checkMinimumNpthDrillDiameter(int progressStart, int progressEnd);
+  void checkMinimumNpthSlotWidth(int progressStart, int progressEnd);
+  void checkMinimumPthDrillDiameter(int progressStart, int progressEnd);
+  void checkWarnNpthSlots(int progressStart, int progressEnd);
   const ClipperLib::Paths& getCopperPaths(const GraphicsLayer* layer,
                                           const NetSignal* netsignal);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
                                             const GraphicsLayer* layer);
+  QVector<Path> getHoleLocation(const Hole& hole,
+                                const Transform& transform) const noexcept;
   void emitStatus(const QString& status) noexcept;
   void emitMessage(const BoardDesignRuleCheckMessage& msg) noexcept;
   QString formatLength(const Length& length) const noexcept;
@@ -163,5 +186,7 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace librepcb
+
+Q_DECLARE_METATYPE(librepcb::BoardDesignRuleCheck::SlotsWarningLevel)
 
 #endif

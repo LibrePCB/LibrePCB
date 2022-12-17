@@ -92,6 +92,7 @@ public:
     return mSilkscreenLayersBot;
   }
   bool getMergeDrillFiles() const noexcept { return mMergeDrillFiles; }
+  bool getUseG85SlotCommand() const noexcept { return mUseG85SlotCommand; }
   bool getEnableSolderPasteTop() const noexcept {
     return mEnableSolderPasteTop;
   }
@@ -135,6 +136,7 @@ public:
     mSilkscreenLayersBot = l;
   }
   void setMergeDrillFiles(bool m) noexcept { mMergeDrillFiles = m; }
+  void setUseG85SlotCommand(bool u) noexcept { mUseG85SlotCommand = u; }
   void setEnableSolderPasteTop(bool e) noexcept { mEnableSolderPasteTop = e; }
   void setEnableSolderPasteBot(bool e) noexcept { mEnableSolderPasteBot = e; }
 
@@ -173,6 +175,7 @@ private:  // Data
   QStringList mSilkscreenLayersTop;
   QStringList mSilkscreenLayersBot;
   bool mMergeDrillFiles;
+  bool mUseG85SlotCommand;
   bool mEnableSolderPasteTop;
   bool mEnableSolderPasteBot;
 };

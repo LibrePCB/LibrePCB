@@ -123,8 +123,9 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     // Note: The const_cast<> is a bit ugly, but it was by far the easiest
     // way and is safe since here we know that we're allowed to modify the hole.
     mHoleEditCmds.append(new CmdHoleEdit(const_cast<Hole&>(hole->getHole())));
-    mCenterPos += hole->getHole().getPosition();
-    if (!hole->getHole().getPosition().isOnGrid(grid)) {
+    const Point pos = hole->getHole().getPath()->getVertices().first().getPos();
+    mCenterPos += pos;
+    if (!pos.isOnGrid(grid)) {
       mHasOffTheGridElements = true;
     }
     ++count;

@@ -59,7 +59,6 @@ public:
   const Hole& getHole() const noexcept { return *mHole; }
   const Uuid& getUuid() const
       noexcept;  // convenience function, e.g. for template usage
-  const Point& getPosition() const noexcept;
   bool isSelectable() const noexcept override;
 
   // General Methods

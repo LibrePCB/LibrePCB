@@ -93,10 +93,12 @@ void BoardClipperPathGenerator::addHoles(const Length& offset) {
     if (diameter <= 0) {
       continue;
     }
-    Path path =
-        Path::circle(PositiveLength(diameter)).translated(hole->getPosition());
-    ClipperHelpers::unite(mPaths,
-                          ClipperHelpers::convert(path, mMaxArcTolerance));
+    const QVector<Path> areas =
+        hole->getHole().getPath()->toOutlineStrokes(PositiveLength(diameter));
+    foreach (const Path& area, areas) {
+      ClipperHelpers::unite(mPaths,
+                            ClipperHelpers::convert(area, mMaxArcTolerance));
+    }
   }
 
   // footprint holes
@@ -107,10 +109,13 @@ void BoardClipperPathGenerator::addHoles(const Length& offset) {
       if (diameter <= 0) {
         continue;
       }
-      Path path = transform.map(Path::circle(PositiveLength(diameter))
-                                    .translated(hole.getPosition()));
-      ClipperHelpers::unite(mPaths,
-                            ClipperHelpers::convert(path, mMaxArcTolerance));
+      const QVector<Path> areas =
+          transform.map(hole.getPath())
+              ->toOutlineStrokes(PositiveLength(diameter));
+      foreach (const Path& area, areas) {
+        ClipperHelpers::unite(mPaths,
+                              ClipperHelpers::convert(area, mMaxArcTolerance));
+      }
     }
   }
 }

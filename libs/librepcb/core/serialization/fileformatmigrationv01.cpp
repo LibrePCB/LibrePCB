@@ -112,6 +112,9 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
         const Uuid uuid = deserialize<Uuid>(padNode->getChild("@0"));
         padNode->appendChild("package_pad", uuid);
       }
+
+      // Holes.
+      upgradeHoles(*fptNode);
     }
 
     dir.write(fp, root.toByteArray());
@@ -186,6 +189,26 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
       dir.write(fp, root.toByteArray());
     }
   }
+
+  // Boards.
+  foreach (const QString& dirName, dir.getDirs("boards")) {
+    const QString fp = "boards/" % dirName % "/board.lp";
+    if (dir.fileExists(fp)) {
+      SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+      // Fabrication output settings.
+      {
+        SExpression& node = root.getChild("fabrication_output_settings");
+        SExpression& drillNode = node.getChild("drills");
+        drillNode.appendChild("g85_slots", false);
+      }
+
+      // Holes.
+      upgradeHoles(root);
+
+      dir.write(fp, root.toByteArray());
+    }
+  }
 }
 
 void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
@@ -206,6 +229,19 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
               << librariesDir.getAbsPath(fileName).toNative();
       librariesDir.removeFile(fileName);
     }
+  }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void FileFormatMigrationV01::upgradeHoles(SExpression& node) {
+  for (SExpression* holeNode : node.getChildren("hole")) {
+    const Point pos(holeNode->getChild("position"));
+    SExpression& vertexNode = holeNode->appendList("vertex");
+    pos.serialize(vertexNode.appendList("position"));
+    vertexNode.appendChild("angle", Angle::deg0());
   }
 }
 
