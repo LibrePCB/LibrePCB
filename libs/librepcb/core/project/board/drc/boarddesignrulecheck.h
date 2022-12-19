@@ -155,8 +155,8 @@ private:  // Methods
   void checkMinimumNpthSlotWidth(int progressStart, int progressEnd);
   void checkMinimumPthDrillDiameter(int progressStart, int progressEnd);
   void checkWarnNpthSlots(int progressStart, int progressEnd);
-  const ClipperLib::Paths& getCopperPaths(const GraphicsLayer* layer,
-                                          const NetSignal* netsignal);
+  const ClipperLib::Paths& getCopperPaths(
+      const GraphicsLayer& layer, const QVector<const NetSignal*>& netsignals);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
                                             const GraphicsLayer* layer);
   QVector<Path> getHoleLocation(const Hole& hole,
@@ -177,7 +177,8 @@ private:  // Data
   Options mOptions;
   QStringList mProgressStatus;
   QList<BoardDesignRuleCheckMessage> mMessages;
-  QHash<const GraphicsLayer*, QHash<const NetSignal*, ClipperLib::Paths>>
+  QHash<const GraphicsLayer*,
+        QHash<QVector<const NetSignal*>, ClipperLib::Paths>>
       mCachedPaths;
 };
 

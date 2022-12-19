@@ -59,7 +59,8 @@ public:
   // General Methods
   void addBoardOutline();
   void addHoles(const Length& offset);
-  void addCopper(const QString& layerName, const NetSignal* netsignal);
+  void addCopper(const QString& layerName,
+                 const QVector<const NetSignal*>& netsignals);
 
 private:  // Data
   Board& mBoard;
