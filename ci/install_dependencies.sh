@@ -9,6 +9,12 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # Docker container with all tools preinstalled.
 if [ "$OS" = "mac" ]
 then
+  # Fix crappy MacOS shit (https://github.com/actions/setup-python/issues/577).
+  rm /usr/local/bin/2to3* || true
+  rm /usr/local/bin/idle3* || true
+  rm /usr/local/bin/pydoc3* || true
+  rm /usr/local/bin/python3* || true
+
   # Update homebrow to avoid issues due to outdated package database. But
   # because even the update sometimes fails, let's ignore any errors with
   # "|| true" (Apple-style error handling). Maybe this way we get succussful
