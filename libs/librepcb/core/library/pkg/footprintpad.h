@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../exceptions.h"
+#include "../../geometry/hole.h"
 #include "../../geometry/path.h"
 #include "../../serialization/serializableobjectlist.h"
 #include "../../types/angle.h"
@@ -52,7 +53,7 @@ class FootprintPad final {
 public:
   // Types
   enum class Shape { ROUND, RECT, OCTAGON };
-  enum class BoardSide { TOP, BOTTOM, THT };
+  enum class ComponentSide { Top, Bottom };
 
   // Signals
   enum class Event {
@@ -63,8 +64,8 @@ public:
     ShapeChanged,
     WidthChanged,
     HeightChanged,
-    DrillDiameterChanged,
-    BoardSideChanged,
+    ComponentSideChanged,
+    HolesEdited,
   };
   Signal<FootprintPad, Event> onEdited;
   typedef Slot<FootprintPad, Event> OnEditedSlot;
@@ -72,11 +73,10 @@ public:
   // Constructors / Destructor
   FootprintPad() = delete;
   FootprintPad(const FootprintPad& other) noexcept;
-  FootprintPad(const Uuid& uuid, const FootprintPad& other) noexcept;
   FootprintPad(const Uuid& uuid, const tl::optional<Uuid>& pkgPadUuid,
                const Point& pos, const Angle& rot, Shape shape,
                const PositiveLength& width, const PositiveLength& height,
-               const UnsignedLength& drillDiameter, BoardSide side) noexcept;
+               ComponentSide side, const HoleList& holes) noexcept;
   explicit FootprintPad(const SExpression& node);
   ~FootprintPad() noexcept;
 
@@ -90,11 +90,11 @@ public:
   Shape getShape() const noexcept { return mShape; }
   const PositiveLength& getWidth() const noexcept { return mWidth; }
   const PositiveLength& getHeight() const noexcept { return mHeight; }
-  const UnsignedLength& getDrillDiameter() const noexcept {
-    return mDrillDiameter;
-  }
-  BoardSide getBoardSide() const noexcept { return mBoardSide; }
+  ComponentSide getComponentSide() const noexcept { return mComponentSide; }
+  const HoleList& getHoles() const noexcept { return mHoles; }
+  HoleList& getHoles() noexcept { return mHoles; }
   QString getLayerName() const noexcept;
+  bool isTht() const noexcept;
   bool isOnLayer(const QString& name) const noexcept;
   Path getOutline(const Length& expansion = Length(0)) const noexcept;
   QPainterPath toQPainterPathPx(const Length& expansion = Length(0)) const
@@ -107,8 +107,7 @@ public:
   bool setShape(Shape shape) noexcept;
   bool setWidth(const PositiveLength& width) noexcept;
   bool setHeight(const PositiveLength& height) noexcept;
-  bool setDrillDiameter(const UnsignedLength& diameter) noexcept;
-  bool setBoardSide(BoardSide side) noexcept;
+  bool setComponentSide(ComponentSide side) noexcept;
 
   // General Methods
 
@@ -126,7 +125,12 @@ public:
   }
   FootprintPad& operator=(const FootprintPad& rhs) noexcept;
 
-protected:  // Data
+private:  // Methods
+  void holesEdited(const HoleList& list, int index,
+                   const std::shared_ptr<const Hole>& hole,
+                   HoleList::Event event) noexcept;
+
+private:  // Data
   Uuid mUuid;
 
   /// The connected package pad
@@ -140,8 +144,11 @@ protected:  // Data
   Shape mShape;
   PositiveLength mWidth;
   PositiveLength mHeight;
-  UnsignedLength mDrillDiameter;  // no effect if BoardSide != THT!
-  BoardSide mBoardSide;
+  ComponentSide mComponentSide;
+  HoleList mHoles;  ///< If not empty, it's a THT pad.
+
+  // Slots
+  HoleList::OnEditedSlot mHolesEditedSlot;
 };
 
 /*******************************************************************************

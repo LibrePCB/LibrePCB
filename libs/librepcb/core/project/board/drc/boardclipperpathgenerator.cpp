@@ -121,7 +121,7 @@ void BoardClipperPathGenerator::addHoles(const Length& offset) {
 }
 
 void BoardClipperPathGenerator::addCopper(
-    const QString& layerName, const QVector<const NetSignal*>& netsignals) {
+    const QString& layerName, const QSet<const NetSignal*>& netsignals) {
   // polygons
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     if (polygon->getPolygon().getLayerName() != layerName) {

@@ -217,8 +217,17 @@ void BI_FootprintPad::updatePosition() noexcept {
   Transform transform(mDevice);
   mPosition = transform.map(mFootprintPad->getPosition());
   mRotation = transform.map(mFootprintPad->getRotation());
+
+  Angle rot = mRotation;
+  if (mDevice.getMirrored()) {
+    rot = Angle::deg180() - rot;
+  }
+
+  QTransform t;
+  if (mDevice.getMirrored()) t.scale(qreal(-1), qreal(1));
+  t.rotate(-rot.toDeg());
+  mGraphicsItem->setTransform(t);
   mGraphicsItem->setPos(mPosition.toPxQPointF());
-  mGraphicsItem->setRotation(-mRotation.toDeg());
   mGraphicsItem->updateCacheAndRepaint();
   foreach (BI_NetLine* netline, mRegisteredNetLines) { netline->updateLine(); }
 }

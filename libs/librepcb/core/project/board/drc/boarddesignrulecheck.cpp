@@ -443,32 +443,35 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
   // Check pad restrings.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     foreach (const BI_FootprintPad* pad, device->getPads()) {
+      // Determine hole areas including minimum restring.
       const Transform transform(*pad);
-      if (pad->getLibPad().getDrillDiameter() > 0) {
-        // Determine hole area including minimum restring.
-        const Length diameter = pad->getLibPad().getDrillDiameter() +
-            (*mOptions.minPthRestring * 2) - 1;
+      ClipperLib::Paths areas;
+      for (const Hole& hole : pad->getLibPad().getHoles()) {
+        const Length diameter =
+            hole.getDiameter() + (*mOptions.minPthRestring * 2) - 1;
         if (diameter <= 0) {
           continue;
         }
-        const ClipperLib::Paths areas{ClipperHelpers::convert(
-            transform.map(Path::circle(PositiveLength(diameter))),
-            maxArcTolerance())};
-
-        // Check if there's not a 100% overlap.
-        const std::unique_ptr<ClipperLib::PolyTree> remainingAreasTree =
-            ClipperHelpers::subtractToTree(areas, thtCopperAreaPaths);
-        const ClipperLib::Paths remainingAreas =
-            ClipperHelpers::flattenTree(*remainingAreasTree);
-        if (!remainingAreas.empty()) {
-          QString msg = tr("Restring of pad '%1' < %2",
-                           "Placeholders are pad name + restring width")
-                            .arg(pad->getDisplayText().simplified(),
-                                 formatLength(*mOptions.minPthRestring));
-          const QVector<Path> location =
-              ClipperHelpers::convert(remainingAreas);
-          emitMessage(BoardDesignRuleCheckMessage(msg, location));
+        foreach (const Path& area,
+                 hole.getPath()->toOutlineStrokes(PositiveLength(diameter))) {
+          ClipperHelpers::unite(
+              areas,
+              ClipperHelpers::convert(transform.map(area), maxArcTolerance()));
         }
+      }
+
+      // Check if there's not a 100% overlap.
+      const std::unique_ptr<ClipperLib::PolyTree> remainingAreasTree =
+          ClipperHelpers::subtractToTree(areas, thtCopperAreaPaths);
+      const ClipperLib::Paths remainingAreas =
+          ClipperHelpers::flattenTree(*remainingAreasTree);
+      if (!remainingAreas.empty()) {
+        QString msg = tr("Restring of pad '%1' < %2",
+                         "Placeholders are pad name + restring width")
+                          .arg(pad->getDisplayText().simplified(),
+                               formatLength(*mOptions.minPthRestring));
+        const QVector<Path> location = ClipperHelpers::convert(remainingAreas);
+        emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }
   }
@@ -571,19 +574,16 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
   // pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      if (pad->getLibPad().getBoardSide() != FootprintPad::BoardSide::THT) {
-        continue;  // skip SMT pads
-      }
-      if (pad->getLibPad().getDrillDiameter() < *mOptions.minPthDrillDiameter) {
-        QString msg =
-            tr("Min. pad drill diameter ('%1'): %2",
-               "Placeholders are pad name + drill diameter")
-                .arg(pad->getDisplayText().simplified(),
-                     formatLength(*pad->getLibPad().getDrillDiameter()));
-        PositiveLength diameter(
-            qMax(*pad->getLibPad().getDrillDiameter(), Length(50000)));
-        Path location = Path::circle(diameter).translated(pad->getPosition());
-        emitMessage(BoardDesignRuleCheckMessage(msg, location));
+      for (const Hole& hole : pad->getLibPad().getHoles()) {
+        if (hole.getDiameter() < *mOptions.minPthDrillDiameter) {
+          QString msg = tr("Min. pad drill diameter ('%1'): %2",
+                           "Placeholders are pad name + drill diameter")
+                            .arg(pad->getDisplayText().simplified(),
+                                 formatLength(*hole.getDiameter()));
+          PositiveLength diameter(qMax(*hole.getDiameter(), Length(50000)));
+          Path location = Path::circle(diameter).translated(pad->getPosition());
+          emitMessage(BoardDesignRuleCheckMessage(msg, location));
+        }
       }
     }
   }
@@ -646,13 +646,14 @@ void BoardDesignRuleCheck::checkWarnNpthSlots(int progressStart,
 }
 
 const ClipperLib::Paths& BoardDesignRuleCheck::getCopperPaths(
-    const GraphicsLayer& layer, const QVector<const NetSignal*>& netsignals) {
-  if (!mCachedPaths[&layer].contains(netsignals)) {
+    const GraphicsLayer& layer, const QSet<const NetSignal*>& netsignals) {
+  const auto key = qMakePair(&layer, netsignals);
+  if (!mCachedPaths.contains(key)) {
     BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
     gen.addCopper(layer.getName(), netsignals);
-    mCachedPaths[&layer][netsignals] = gen.getPaths();
+    mCachedPaths[key] = gen.getPaths();
   }
-  return mCachedPaths[&layer][netsignals];
+  return mCachedPaths[key];
 }
 
 ClipperLib::Paths BoardDesignRuleCheck::getDeviceCourtyardPaths(

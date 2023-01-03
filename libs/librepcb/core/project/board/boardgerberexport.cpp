@@ -492,11 +492,13 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
 
   // footprint pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    const Transform deviceTransform(*device);
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       const FootprintPad& libPad = pad->getLibPad();
-      if (libPad.getBoardSide() == FootprintPad::BoardSide::THT) {
-        gen.drill(pad->getPosition(),
-                  PositiveLength(*libPad.getDrillDiameter()), true,
+      const Transform padTransform(libPad.getPosition(), libPad.getRotation());
+      for (const Hole& hole : libPad.getHoles()) {
+        gen.drill(deviceTransform.map(padTransform.map(hole.getPath())),
+                  hole.getDiameter(), true,
                   ExcellonGenerator::Function::ComponentDrill);  // can throw
         ++count;
       }
@@ -722,7 +724,7 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
 void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
                                          const BI_FootprintPad& pad,
                                          const QString& layerName) const {
-  bool isSmt = pad.getLibPad().getBoardSide() != FootprintPad::BoardSide::THT;
+  bool isSmt = !pad.getLibPad().isTht();
   bool isOnCopperLayer = pad.isOnLayer(layerName);
   bool isOnSolderMaskTop = pad.isOnLayer(GraphicsLayer::sTopCopper) &&
       (layerName == GraphicsLayer::sTopStopMask);

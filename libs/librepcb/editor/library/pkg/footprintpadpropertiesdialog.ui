@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>330</width>
-    <height>226</height>
+    <width>510</width>
+    <height>325</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,167 +15,299 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QFormLayout" name="formLayout">
-     <property name="fieldGrowthPolicy">
-      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
      </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Package Pad:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="cbxPackagePad"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>Board Side:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QWidget" name="boardSideWidget" native="true">
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QRadioButton" name="rbtnBoardSideTht">
-          <property name="text">
-           <string>THT</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="rbtnBoardSideTop">
-          <property name="text">
-           <string>Top</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="rbtnBoardSideBottom">
-          <property name="text">
-           <string>Bottom</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Shape:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QWidget" name="shapeWidget" native="true">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QRadioButton" name="rbtnShapeRound">
-          <property name="text">
-           <string>Round</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="rbtnShapeRect">
-          <property name="text">
-           <string>Rect</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="rbtnShapeOctagon">
-          <property name="text">
-           <string>Octagon</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>Drill Diameter:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>Size:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="librepcb::editor::PositiveLengthEdit" name="edtWidth" native="true"/>
+     <widget class="QWidget" name="tabGeneral">
+      <attribute name="title">
+       <string>General</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Package Pad:</string>
+         </property>
+        </widget>
        </item>
-       <item>
-        <widget class="librepcb::editor::PositiveLengthEdit" name="edtHeight" native="true"/>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="cbxPackagePad"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Component Side:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QWidget" name="boardSideWidget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="rbtnComponentSideTop">
+            <property name="text">
+             <string>Top</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rbtnComponentSideBottom">
+            <property name="text">
+             <string>Bottom</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Shape:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QWidget" name="shapeWidget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QRadioButton" name="rbtnShapeRound">
+            <property name="text">
+             <string>Round</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rbtnShapeRect">
+            <property name="text">
+             <string>Rect</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="rbtnShapeOctagon">
+            <property name="text">
+             <string>Octagon</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Hole Diameter:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="librepcb::editor::PositiveLengthEdit" name="edtHoleDiameter" native="true"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblHoleDetails">
+           <property name="text">
+            <string>Multiple holes, see &lt;a href=&quot;tab&quot;&gt;here&lt;/a&gt;.</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnConvertToSmt">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Convert to SMT</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnConvertToTht">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string notr="true">Convert to THT</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Size:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="librepcb::editor::PositiveLengthEdit" name="edtWidth" native="true"/>
+         </item>
+         <item>
+          <widget class="librepcb::editor::PositiveLengthEdit" name="edtHeight" native="true"/>
+         </item>
+        </layout>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Position:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true"/>
+         </item>
+         <item>
+          <widget class="librepcb::editor::LengthEdit" name="edtPosY" native="true"/>
+         </item>
+        </layout>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Rotation:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
        </item>
       </layout>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>Position:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <layout class="QHBoxLayout" name="horizontalLayout">
+     </widget>
+     <widget class="QWidget" name="tabHoles">
+      <attribute name="title">
+       <string>Plated Holes</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,0">
        <item>
-        <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true"/>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lblSelectedHole">
+           <property name="text">
+            <string notr="true"/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnPreviousHole">
+           <property name="toolTip">
+            <string>Select previous hole</string>
+           </property>
+           <property name="text">
+            <string notr="true"/>
+           </property>
+           <property name="arrowType">
+            <enum>Qt::LeftArrow</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnNextHole">
+           <property name="toolTip">
+            <string>Select next hole</string>
+           </property>
+           <property name="text">
+            <string notr="true"/>
+           </property>
+           <property name="arrowType">
+            <enum>Qt::RightArrow</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnRemoveHole">
+           <property name="toolTip">
+            <string>Remove current hole</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/actions/minus.png</normaloff>:/img/actions/minus.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnAddHole">
+           <property name="toolTip">
+            <string>Add new hole</string>
+           </property>
+           <property name="text">
+            <string notr="true"/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/actions/add.png</normaloff>:/img/actions/add.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="librepcb::editor::LengthEdit" name="edtPosY" native="true"/>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="librepcb::editor::HoleEditorWidget" name="holeEditorWidget" native="true"/>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
-     </item>
-     <item row="6" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Rotation:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrillDiameter" native="true"/>
-     </item>
-     <item row="6" column="1">
-      <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
-     </item>
-    </layout>
+     </widget>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -203,15 +335,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::editor::UnsignedLengthEdit</class>
-   <extends>QWidget</extends>
-   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>librepcb::editor::PositiveLengthEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::HoleEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/holeeditorwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -219,7 +351,6 @@
   <tabstop>cbxPackagePad</tabstop>
   <tabstop>boardSideWidget</tabstop>
   <tabstop>shapeWidget</tabstop>
-  <tabstop>edtDrillDiameter</tabstop>
   <tabstop>edtWidth</tabstop>
   <tabstop>edtHeight</tabstop>
   <tabstop>edtPosX</tabstop>

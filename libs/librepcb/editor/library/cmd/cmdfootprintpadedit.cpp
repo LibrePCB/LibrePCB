@@ -39,8 +39,8 @@ CmdFootprintPadEdit::CmdFootprintPadEdit(FootprintPad& pad) noexcept
     mPad(pad),
     mOldPackagePadUuid(pad.getPackagePadUuid()),
     mNewPackagePadUuid(mOldPackagePadUuid),
-    mOldBoardSide(pad.getBoardSide()),
-    mNewBoardSide(mOldBoardSide),
+    mOldComponentSide(pad.getComponentSide()),
+    mNewComponentSide(mOldComponentSide),
     mOldShape(pad.getShape()),
     mNewShape(mOldShape),
     mOldWidth(pad.getWidth()),
@@ -51,8 +51,8 @@ CmdFootprintPadEdit::CmdFootprintPadEdit(FootprintPad& pad) noexcept
     mNewPos(mOldPos),
     mOldRotation(pad.getRotation()),
     mNewRotation(mOldRotation),
-    mOldDrillDiameter(pad.getDrillDiameter()),
-    mNewDrillDiameter(mOldDrillDiameter) {
+    mOldHoles(pad.getHoles()),
+    mNewHoles(mOldHoles) {
 }
 
 CmdFootprintPadEdit::~CmdFootprintPadEdit() noexcept {
@@ -76,11 +76,11 @@ void CmdFootprintPadEdit::setPackagePadUuid(const tl::optional<Uuid>& pad,
   if (immediate) mPad.setPackagePadUuid(mNewPackagePadUuid);
 }
 
-void CmdFootprintPadEdit::setBoardSide(FootprintPad::BoardSide side,
-                                       bool immediate) noexcept {
+void CmdFootprintPadEdit::setComponentSide(FootprintPad::ComponentSide side,
+                                           bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewBoardSide = side;
-  if (immediate) mPad.setBoardSide(mNewBoardSide);
+  mNewComponentSide = side;
+  if (immediate) mPad.setComponentSide(mNewComponentSide);
 }
 
 void CmdFootprintPadEdit::setShape(FootprintPad::Shape shape,
@@ -102,13 +102,6 @@ void CmdFootprintPadEdit::setHeight(const PositiveLength& height,
   Q_ASSERT(!wasEverExecuted());
   mNewHeight = height;
   if (immediate) mPad.setHeight(mNewHeight);
-}
-
-void CmdFootprintPadEdit::setDrillDiameter(const UnsignedLength& dia,
-                                           bool immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewDrillDiameter = dia;
-  if (immediate) mPad.setDrillDiameter(mNewDrillDiameter);
 }
 
 void CmdFootprintPadEdit::setPosition(const Point& pos,
@@ -165,18 +158,22 @@ void CmdFootprintPadEdit::mirrorGeometry(Qt::Orientation orientation,
 }
 
 void CmdFootprintPadEdit::mirrorLayer(bool immediate) noexcept {
-  switch (mNewBoardSide) {
-    case FootprintPad::BoardSide::BOTTOM:
-      mNewBoardSide = FootprintPad::BoardSide::TOP;
-      break;
-    case FootprintPad::BoardSide::TOP:
-      mNewBoardSide = FootprintPad::BoardSide::BOTTOM;
-      break;
-    default:
-      break;
+  if (mNewComponentSide == FootprintPad::ComponentSide::Top) {
+    mNewComponentSide = FootprintPad::ComponentSide::Bottom;
+  } else {
+    mNewComponentSide = FootprintPad::ComponentSide::Top;
   }
   if (immediate) {
-    mPad.setBoardSide(mNewBoardSide);
+    mPad.setComponentSide(mNewComponentSide);
+  }
+}
+
+void CmdFootprintPadEdit::setHoles(const HoleList& holes,
+                                   bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewHoles = holes;
+  if (immediate) {
+    mPad.getHoles() = holes;
   }
 }
 
@@ -188,36 +185,36 @@ bool CmdFootprintPadEdit::performExecute() {
   performRedo();  // can throw
 
   if (mNewPackagePadUuid != mOldPackagePadUuid) return true;
-  if (mNewBoardSide != mOldBoardSide) return true;
+  if (mNewComponentSide != mOldComponentSide) return true;
   if (mNewShape != mOldShape) return true;
   if (mNewWidth != mOldWidth) return true;
   if (mNewHeight != mOldHeight) return true;
   if (mNewPos != mOldPos) return true;
   if (mNewRotation != mOldRotation) return true;
-  if (mNewDrillDiameter != mOldDrillDiameter) return true;
+  if (mNewHoles != mOldHoles) return true;
   return false;
 }
 
 void CmdFootprintPadEdit::performUndo() {
   mPad.setPackagePadUuid(mOldPackagePadUuid);
-  mPad.setBoardSide(mOldBoardSide);
+  mPad.setComponentSide(mOldComponentSide);
   mPad.setShape(mOldShape);
   mPad.setWidth(mOldWidth);
   mPad.setHeight(mOldHeight);
   mPad.setPosition(mOldPos);
   mPad.setRotation(mOldRotation);
-  mPad.setDrillDiameter(mOldDrillDiameter);
+  mPad.getHoles() = mOldHoles;
 }
 
 void CmdFootprintPadEdit::performRedo() {
   mPad.setPackagePadUuid(mNewPackagePadUuid);
-  mPad.setBoardSide(mNewBoardSide);
+  mPad.setComponentSide(mNewComponentSide);
   mPad.setShape(mNewShape);
   mPad.setWidth(mNewWidth);
   mPad.setHeight(mNewHeight);
   mPad.setPosition(mNewPos);
   mPad.setRotation(mNewRotation);
-  mPad.setDrillDiameter(mNewDrillDiameter);
+  mPad.getHoles() = mNewHoles;
 }
 
 /*******************************************************************************

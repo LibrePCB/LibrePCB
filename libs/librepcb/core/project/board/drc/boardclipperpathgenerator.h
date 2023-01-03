@@ -60,7 +60,7 @@ public:
   void addBoardOutline();
   void addHoles(const Length& offset);
   void addCopper(const QString& layerName,
-                 const QVector<const NetSignal*>& netsignals);
+                 const QSet<const NetSignal*>& netsignals);
 
 private:  // Data
   Board& mBoard;

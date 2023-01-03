@@ -51,36 +51,6 @@ SExpression serialize(const FootprintPad::Shape& obj) {
 }
 
 template <>
-SExpression serialize(const FootprintPad::BoardSide& obj) {
-  switch (obj) {
-    case FootprintPad::BoardSide::TOP:
-      return SExpression::createToken("top");
-    case FootprintPad::BoardSide::BOTTOM:
-      return SExpression::createToken("bottom");
-    case FootprintPad::BoardSide::THT:
-      return SExpression::createToken("tht");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
-
-template <>
-inline FootprintPad::BoardSide deserialize(const SExpression& node) {
-  const QString str = node.getValue();
-  if (str == QLatin1String("top")) {
-    return FootprintPad::BoardSide::TOP;
-  } else if (str == QLatin1String("bottom")) {
-    return FootprintPad::BoardSide::BOTTOM;
-  } else if (str == QLatin1String("tht")) {
-    return FootprintPad::BoardSide::THT;
-  } else {
-    throw RuntimeError(
-        __FILE__, __LINE__,
-        QString("Unknown footprint pad board side: '%1'").arg(str));
-  }
-}
-
-template <>
 inline FootprintPad::Shape deserialize(const SExpression& node) {
   const QString str = node.getValue();
   if (str == QLatin1String("round")) {
@@ -92,6 +62,32 @@ inline FootprintPad::Shape deserialize(const SExpression& node) {
   } else {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Unknown footprint pad shape: '%1'").arg(str));
+  }
+}
+
+template <>
+SExpression serialize(const FootprintPad::ComponentSide& obj) {
+  switch (obj) {
+    case FootprintPad::ComponentSide::Top:
+      return SExpression::createToken("top");
+    case FootprintPad::ComponentSide::Bottom:
+      return SExpression::createToken("bottom");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+inline FootprintPad::ComponentSide deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == QLatin1String("top")) {
+    return FootprintPad::ComponentSide::Top;
+  } else if (str == QLatin1String("bottom")) {
+    return FootprintPad::ComponentSide::Bottom;
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Unknown footprint pad component side: '%1'").arg(str));
   }
 }
 
@@ -108,22 +104,18 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
     mShape(other.mShape),
     mWidth(other.mWidth),
     mHeight(other.mHeight),
-    mDrillDiameter(other.mDrillDiameter),
-    mBoardSide(other.mBoardSide) {
-}
-
-FootprintPad::FootprintPad(const Uuid& uuid, const FootprintPad& other) noexcept
-  : FootprintPad(other) {
-  mUuid = uuid;
+    mComponentSide(other.mComponentSide),
+    mHoles(other.mHoles),
+    mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
+  mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
 FootprintPad::FootprintPad(const Uuid& uuid,
                            const tl::optional<Uuid>& pkgPadUuid,
                            const Point& pos, const Angle& rot, Shape shape,
                            const PositiveLength& width,
-                           const PositiveLength& height,
-                           const UnsignedLength& drillDiameter,
-                           BoardSide side) noexcept
+                           const PositiveLength& height, ComponentSide side,
+                           const HoleList& holes) noexcept
   : onEdited(*this),
     mUuid(uuid),
     mPackagePadUuid(pkgPadUuid),
@@ -132,8 +124,10 @@ FootprintPad::FootprintPad(const Uuid& uuid,
     mShape(shape),
     mWidth(width),
     mHeight(height),
-    mDrillDiameter(drillDiameter),
-    mBoardSide(side) {
+    mComponentSide(side),
+    mHoles(holes),
+    mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
+  mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
 FootprintPad::FootprintPad(const SExpression& node)
@@ -146,8 +140,10 @@ FootprintPad::FootprintPad(const SExpression& node)
     mShape(deserialize<Shape>(node.getChild("shape/@0"))),
     mWidth(deserialize<PositiveLength>(node.getChild("size/@0"))),
     mHeight(deserialize<PositiveLength>(node.getChild("size/@1"))),
-    mDrillDiameter(deserialize<UnsignedLength>(node.getChild("drill/@0"))),
-    mBoardSide(deserialize<BoardSide>(node.getChild("side/@0"))) {
+    mComponentSide(deserialize<ComponentSide>(node.getChild("side/@0"))),
+    mHoles(node),
+    mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
+  mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
 FootprintPad::~FootprintPad() noexcept {
@@ -158,21 +154,22 @@ FootprintPad::~FootprintPad() noexcept {
  ******************************************************************************/
 
 QString FootprintPad::getLayerName() const noexcept {
-  switch (mBoardSide) {
-    case BoardSide::TOP:
-      return GraphicsLayer::sTopCopper;
-    case BoardSide::BOTTOM:
-      return GraphicsLayer::sBotCopper;
-    case BoardSide::THT:
-      return GraphicsLayer::sBoardPadsTht;
-    default:
-      Q_ASSERT(false);
-      return "";
+  if (isTht()) {
+    return GraphicsLayer::sBoardPadsTht;
+  } else if (mComponentSide == ComponentSide::Bottom) {
+    return GraphicsLayer::sBotCopper;
+  } else {
+    Q_ASSERT(mComponentSide == ComponentSide::Top);
+    return GraphicsLayer::sTopCopper;
   }
 }
 
+bool FootprintPad::isTht() const noexcept {
+  return !mHoles.isEmpty();
+}
+
 bool FootprintPad::isOnLayer(const QString& name) const noexcept {
-  if (mBoardSide == BoardSide::THT) {
+  if (isTht()) {
     return GraphicsLayer::isCopperLayer(name);
   } else {
     return (name == getLayerName());
@@ -202,12 +199,16 @@ Path FootprintPad::getOutline(const Length& expansion) const noexcept {
 
 QPainterPath FootprintPad::toQPainterPathPx(const Length& expansion) const
     noexcept {
-  QPainterPath p = getOutline(expansion).toQPainterPathPx();
-  if (mBoardSide == BoardSide::THT) {
-    p.setFillRule(Qt::OddEvenFill);  // important to subtract the hole!
-    p.addEllipse(QPointF(0, 0), mDrillDiameter->toPx() / 2,
-                 mDrillDiameter->toPx() / 2);
+  QPainterPath holesArea;
+  for (const Hole& h : mHoles) {
+    for (const Path& p : h.getPath()->toOutlineStrokes(h.getDiameter())) {
+      holesArea.addPath(p.toQPainterPathPx());
+    }
   }
+
+  QPainterPath p = getOutline(expansion).toQPainterPathPx();
+  p.setFillRule(Qt::OddEvenFill);  // Important to subtract the holes!
+  p.addPath(holesArea);
   return p;
 }
 
@@ -274,23 +275,13 @@ bool FootprintPad::setHeight(const PositiveLength& height) noexcept {
   return true;
 }
 
-bool FootprintPad::setDrillDiameter(const UnsignedLength& diameter) noexcept {
-  if (diameter == mDrillDiameter) {
+bool FootprintPad::setComponentSide(ComponentSide side) noexcept {
+  if (side == mComponentSide) {
     return false;
   }
 
-  mDrillDiameter = diameter;
-  onEdited.notify(Event::DrillDiameterChanged);
-  return true;
-}
-
-bool FootprintPad::setBoardSide(BoardSide side) noexcept {
-  if (side == mBoardSide) {
-    return false;
-  }
-
-  mBoardSide = side;
-  onEdited.notify(Event::BoardSideChanged);
+  mComponentSide = side;
+  onEdited.notify(Event::ComponentSideChanged);
   return true;
 }
 
@@ -300,15 +291,16 @@ bool FootprintPad::setBoardSide(BoardSide side) noexcept {
 
 void FootprintPad::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("side", mBoardSide);
+  root.appendChild("side", mComponentSide);
   root.appendChild("shape", mShape);
   root.ensureLineBreak();
   mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   Point(*mWidth, *mHeight).serialize(root.appendList("size"));
-  root.appendChild("drill", mDrillDiameter);
   root.ensureLineBreak();
   root.appendChild("package_pad", mPackagePadUuid);
+  root.ensureLineBreak();
+  mHoles.serialize(root);
   root.ensureLineBreak();
 }
 
@@ -324,8 +316,8 @@ bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
   if (mShape != rhs.mShape) return false;
   if (mWidth != rhs.mWidth) return false;
   if (mHeight != rhs.mHeight) return false;
-  if (mDrillDiameter != rhs.mDrillDiameter) return false;
-  if (mBoardSide != rhs.mBoardSide) return false;
+  if (mComponentSide != rhs.mComponentSide) return false;
+  if (mHoles != rhs.mHoles) return false;
   return true;
 }
 
@@ -340,9 +332,23 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
   setShape(rhs.mShape);
   setWidth(rhs.mWidth);
   setHeight(rhs.mHeight);
-  setDrillDiameter(rhs.mDrillDiameter);
-  setBoardSide(rhs.mBoardSide);
+  setComponentSide(rhs.mComponentSide);
+  mHoles = rhs.mHoles;
   return *this;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void FootprintPad::holesEdited(const HoleList& list, int index,
+                               const std::shared_ptr<const Hole>& hole,
+                               HoleList::Event event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(hole);
+  Q_UNUSED(event);
+  onEdited.notify(Event::HolesEdited);
 }
 
 /*******************************************************************************

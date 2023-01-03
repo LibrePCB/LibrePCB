@@ -155,34 +155,15 @@ void FootprintPainter::initContentByLayer() const noexcept {
 
     // Footprint pads.
     foreach (FootprintPad pad, mPads) {
-      QPainterPath path = pad.getOutline()
-                              .rotated(pad.getRotation())
-                              .translated(pad.getPosition())
-                              .toQPainterPathPx();
-      path.setFillRule(Qt::OddEvenFill);  // To subtract the hole!
-      path.addEllipse(pad.getPosition().toPxQPointF(),
-                      pad.getDrillDiameter()->toPx() / 2,
-                      pad.getDrillDiameter()->toPx() / 2);
-      QString layer;
-      switch (pad.getBoardSide()) {
-        case FootprintPad::BoardSide::TOP:
-          layer = GraphicsLayer::sTopCopper;
-          break;
-        case FootprintPad::BoardSide::BOTTOM:
-          layer = GraphicsLayer::sBotCopper;
-          break;
-        default:
-          layer = GraphicsLayer::sBoardPadsTht;
-          break;
-      }
+      const Transform transform(pad.getPosition(), pad.getRotation());
+      const QPainterPath path = transform.mapPx(pad.toQPainterPathPx());
+      const QString layer = pad.getLayerName();
       mContentByLayer[layer].areas.append(path);
 
-      // Also add the hole for THT pads.
-      if ((pad.getBoardSide() == FootprintPad::BoardSide::THT) &&
-          (pad.getDrillDiameter() > 0)) {
-        Hole hole(pad.getUuid(), PositiveLength(*pad.getDrillDiameter()),
-                  makeNonEmptyPath(pad.getPosition()));
-        mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(hole);
+      // Also add the holes for THT pads.
+      for (const Hole& hole : pad.getHoles()) {
+        mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(Hole(
+            hole.getUuid(), hole.getDiameter(), transform.map(hole.getPath())));
       }
     }
 

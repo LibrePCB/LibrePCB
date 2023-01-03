@@ -156,9 +156,8 @@ void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
         const QPainterPath pad2PathPx = pad2Path.toQPainterPathPx();
 
         // Only warn if both pads have copper on the same board side.
-        if ((pad1->getBoardSide() == pad2->getBoardSide()) ||
-            (pad1->getBoardSide() == FootprintPad::BoardSide::THT) ||
-            (pad2->getBoardSide() == FootprintPad::BoardSide::THT)) {
+        if ((pad1->getComponentSide() == pad2->getComponentSide()) ||
+            (pad1->isTht()) || (pad2->isTht())) {
           // Only warn if both pads have different net signal, or one of them
           // is unconnected (an unconnected pad is considered as a different
           // net signal).

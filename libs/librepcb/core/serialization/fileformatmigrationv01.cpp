@@ -111,6 +111,29 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
         // See https://github.com/LibrePCB/LibrePCB/issues/445
         const Uuid uuid = deserialize<Uuid>(padNode->getChild("@0"));
         padNode->appendChild("package_pad", uuid);
+
+        // Convert holes.
+        // Note: In the Gerber export, drills on SMT pads were ignored thus
+        // we delete such drills now to keep the same behavior.
+        // To get a deterministic UUID, the pad's UUID is reused for the hole.
+        SExpression& boardSideNode = padNode->getChild("side/@0");
+        const UnsignedLength drill =
+            deserialize<UnsignedLength>(padNode->getChild("drill/@0"));
+        if ((boardSideNode.getValue() == "tht") && (drill > 0)) {
+          SExpression& holeNode = padNode->appendList("hole");
+          holeNode.appendChild(uuid);
+          holeNode.appendChild("diameter", drill);
+          SExpression& vertexNode = holeNode.appendList("vertex");
+          SExpression& positionNode = vertexNode.appendList("position");
+          positionNode.appendChild(Length(0));  // X
+          positionNode.appendChild(Length(0));  // Y
+          vertexNode.appendChild("angle", Angle::deg0());
+        }
+        if (boardSideNode.getValue() == "tht") {
+          // THT is no longer a valid value. Since footprints are always drawn
+          // from the top view, it should be safe to set it to "top" now.
+          boardSideNode = SExpression::createToken("top");
+        }
       }
 
       // Holes.

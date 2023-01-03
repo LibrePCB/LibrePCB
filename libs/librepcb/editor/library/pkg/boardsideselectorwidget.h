@@ -51,15 +51,15 @@ public:
   ~BoardSideSelectorWidget() noexcept;
 
   // Getters
-  FootprintPad::BoardSide getCurrentBoardSide() const noexcept;
+  FootprintPad::ComponentSide getCurrentBoardSide() const noexcept;
 
   // Setters
-  void setCurrentBoardSide(FootprintPad::BoardSide side) noexcept;
+  void setCurrentBoardSide(FootprintPad::ComponentSide side) noexcept;
   void setBoardSideTop() noexcept {
-    setCurrentBoardSide(FootprintPad::BoardSide::TOP);
+    setCurrentBoardSide(FootprintPad::ComponentSide::Top);
   }
   void setBoardSideBottom() noexcept {
-    setCurrentBoardSide(FootprintPad::BoardSide::BOTTOM);
+    setCurrentBoardSide(FootprintPad::ComponentSide::Bottom);
   }
 
   // Operator Overloadings
@@ -67,7 +67,7 @@ public:
       delete;
 
 signals:
-  void currentBoardSideChanged(FootprintPad::BoardSide side);
+  void currentBoardSideChanged(FootprintPad::ComponentSide side);
 
 private:  // Methods
   void btnTopToggled(bool checked) noexcept;

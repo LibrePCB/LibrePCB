@@ -91,11 +91,11 @@ private:  // Methods
   void selectNextFreePadInComboBox() noexcept;
   void packagePadComboBoxCurrentPadChanged(tl::optional<Uuid> pad) noexcept;
   void boardSideSelectorCurrentSideChanged(
-      FootprintPad::BoardSide side) noexcept;
+      FootprintPad::ComponentSide side) noexcept;
   void shapeSelectorCurrentShapeChanged(FootprintPad::Shape shape) noexcept;
   void widthEditValueChanged(const PositiveLength& value) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
-  void drillDiameterEditValueChanged(const UnsignedLength& value) noexcept;
+  void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
 
 private:  // Types / Data
   PadType mPadType;
