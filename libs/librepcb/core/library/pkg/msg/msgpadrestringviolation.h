@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_PACKAGECHECK_H
-#define LIBREPCB_CORE_PACKAGECHECK_H
+#ifndef LIBREPCB_CORE_MSGPADRESTRINGVIOLATION_H
+#define LIBREPCB_CORE_MSGPADRESTRINGVIOLATION_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../libraryelementcheck.h"
+#include "../../../types/length.h"
+#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -32,40 +33,42 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Package;
+class Footprint;
+class FootprintPad;
+class Hole;
 
 /*******************************************************************************
- *  Class PackageCheck
+ *  Class MsgPadRestringViolation
  ******************************************************************************/
 
 /**
- * @brief The PackageCheck class
+ * @brief The MsgPadRestringViolation class
  */
-class PackageCheck : public LibraryElementCheck {
+class MsgPadRestringViolation final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgPadRestringViolation)
+
 public:
   // Constructors / Destructor
-  PackageCheck() = delete;
-  PackageCheck(const PackageCheck& other) = delete;
-  explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+  MsgPadRestringViolation() = delete;
+  MsgPadRestringViolation(std::shared_ptr<const Footprint> footprint,
+                          std::shared_ptr<const FootprintPad> pad,
+                          const QString& pkgPadName,
+                          const Length& restring) noexcept;
+  MsgPadRestringViolation(const MsgPadRestringViolation& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mPad(other.mPad) {}
+  virtual ~MsgPadRestringViolation() noexcept;
 
-  // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad1() const noexcept { return mPad; }
 
-  // Operator Overloadings
-  PackageCheck& operator=(const PackageCheck& rhs) = delete;
-
-protected:  // Methods
-  void checkDuplicatePadNames(MsgList& msgs) const;
-  void checkMissingFootprint(MsgList& msgs) const;
-  void checkMissingTexts(MsgList& msgs) const;
-  void checkWrongTextLayers(MsgList& msgs) const;
-  void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
-  void checkPadsRestring(MsgList& msgs) const;
-
-private:  // Data
-  const Package& mPackage;
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
 };
 
 /*******************************************************************************

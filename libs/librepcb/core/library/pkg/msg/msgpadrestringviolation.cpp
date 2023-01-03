@@ -17,61 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_PACKAGECHECK_H
-#define LIBREPCB_CORE_PACKAGECHECK_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../libraryelementcheck.h"
+#include "msgpadrestringviolation.h"
 
-#include <QtCore>
+#include "../footprint.h"
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 
-class Package;
-
 /*******************************************************************************
- *  Class PackageCheck
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The PackageCheck class
- */
-class PackageCheck : public LibraryElementCheck {
-public:
-  // Constructors / Destructor
-  PackageCheck() = delete;
-  PackageCheck(const PackageCheck& other) = delete;
-  explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+MsgPadRestringViolation::MsgPadRestringViolation(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName,
+    const Length& restring) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Warning,
+        tr("Restring of pad '%1' in '%3'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("Pads should have at least %1 restring (copper around each pad "
+           "hole). Note that this value is just a general recommendation, the "
+           "exact value depends on the capabilities of the PCB manufacturer.")
+            .arg(QString::number(restring.toMm() * 1000) % "μm")),
+    mFootprint(footprint),
+    mPad(pad) {
+}
 
-  // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
-
-  // Operator Overloadings
-  PackageCheck& operator=(const PackageCheck& rhs) = delete;
-
-protected:  // Methods
-  void checkDuplicatePadNames(MsgList& msgs) const;
-  void checkMissingFootprint(MsgList& msgs) const;
-  void checkMissingTexts(MsgList& msgs) const;
-  void checkWrongTextLayers(MsgList& msgs) const;
-  void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
-  void checkPadsRestring(MsgList& msgs) const;
-
-private:  // Data
-  const Package& mPackage;
-};
+MsgPadRestringViolation::~MsgPadRestringViolation() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace librepcb
-
-#endif
