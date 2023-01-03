@@ -104,11 +104,17 @@ void BoardDesignRuleCheck::execute() {
   if (mOptions.checkPthDrillDiameter) {
     checkMinimumPthDrillDiameter(78, 80);
   }
+  if (mOptions.checkPthSlotWidth) {
+    checkMinimumPthSlotWidth(80, 82);
+  }
   if (mOptions.checkNpthSlotsWarning) {
-    checkWarnNpthSlots(80, 82);
+    checkWarnNpthSlots(82, 83);
+  }
+  if (mOptions.checkPthSlotsWarning) {
+    checkWarnPthSlots(83, 84);
   }
   if (mOptions.checkCourtyardClearance) {
-    checkCourtyardClearances(82, 88);
+    checkCourtyardClearances(84, 88);
   }
   if (mOptions.checkMissingConnections) {
     checkForMissingConnections(88, 90);
@@ -494,7 +500,7 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressStart,
       emitMessage(BoardDesignRuleCheckMessage(
           msgTr.arg(formatLength(*hole->getHole().getDiameter()),
                     formatLength(*mOptions.minNpthDrillDiameter)),
-          getHoleLocation(hole->getHole(), Transform())));
+          getHoleLocation(hole->getHole())));
     }
   }
 
@@ -530,7 +536,7 @@ void BoardDesignRuleCheck::checkMinimumNpthSlotWidth(int progressStart,
       emitMessage(BoardDesignRuleCheckMessage(
           msgTr.arg(formatLength(*hole->getHole().getDiameter()),
                     formatLength(*mOptions.minNpthSlotWidth)),
-          getHoleLocation(hole->getHole(), Transform())));
+          getHoleLocation(hole->getHole())));
     }
   }
 
@@ -556,7 +562,7 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
   Q_UNUSED(progressStart);
   emitStatus(tr("Check minimum PTH drill diameters..."));
 
-  // vias
+  // Vias.
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
     foreach (const BI_Via* via, netsegment->getVias()) {
       if (via->getDrillDiameter() < mOptions.minPthDrillDiameter) {
@@ -571,7 +577,7 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
     }
   }
 
-  // pads
+  // Pads.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       for (const Hole& hole : pad->getLibPad().getHoles()) {
@@ -591,58 +597,111 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
   emit progressPercent(progressEnd);
 }
 
+void BoardDesignRuleCheck::checkMinimumPthSlotWidth(int progressStart,
+                                                    int progressEnd) {
+  Q_UNUSED(progressStart);
+  emitStatus(tr("Check minimum PTH slot width..."));
+
+  const QString msgTr =
+      tr("Min. PTH slot width: %1 < %2", "The '<' means 'smaller than'.");
+
+  // Pads.
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    Transform devTransform(*device);
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
+      Transform padTransform(pad->getLibPad().getPosition(),
+                             pad->getLibPad().getRotation());
+      for (const Hole& hole : pad->getLibPad().getHoles()) {
+        if ((hole.isSlot()) &&
+            (hole.getDiameter() < *mOptions.minPthSlotWidth)) {
+          emitMessage(BoardDesignRuleCheckMessage(
+              msgTr.arg(formatLength(*hole.getDiameter()),
+                        formatLength(*mOptions.minPthSlotWidth)),
+              getHoleLocation(hole, padTransform, devTransform)));
+        }
+      }
+    }
+  }
+
+  emit progressPercent(progressEnd);
+}
+
 void BoardDesignRuleCheck::checkWarnNpthSlots(int progressStart,
                                               int progressEnd) {
   Q_UNUSED(progressStart);
   emitStatus(tr("Check NPTH slots..."));
 
-  auto checkHole = [this](const Hole& hole, const Transform& transform) {
-    const QString suggestion = "\n" %
-        tr("Either avoid them or check if your PCB manufacturer supports "
-           "them.");
-    const QString checkSlotMode = "\n" %
-        tr("Choose the desired Excellon slot mode when generating the "
-           "production data (G85 vs. G00..G03).");
-    const QString g85NotAvailable = "\n" %
-        tr("The drilled slot mode (G85) will not be available when generating "
-           "production data.");
-    if ((mOptions.npthSlotsWarning >= SlotsWarningLevel::Curved) &&
-        hole.isCurvedSlot()) {
-      emitMessage(BoardDesignRuleCheckMessage(
-          tr("Hole is a slot with curves"), getHoleLocation(hole, transform),
-          tr("Curved slots are a very unusual thing and may cause troubles "
-             "with many PCB manufacturers.") %
-              suggestion % g85NotAvailable));
-    } else if ((mOptions.npthSlotsWarning >= SlotsWarningLevel::MultiSegment) &&
-               hole.isMultiSegmentSlot()) {
-      emitMessage(BoardDesignRuleCheckMessage(
-          tr("Hole is a multi-segment slot"), getHoleLocation(hole, transform),
-          tr("Multi-segment slots are a rather unusual thing and may cause "
-             "troubles with some PCB manufacturers.") %
-              suggestion % checkSlotMode));
-    } else if ((mOptions.npthSlotsWarning >= SlotsWarningLevel::All) &&
-               hole.isSlot()) {
-      emitMessage(BoardDesignRuleCheckMessage(
-          tr("Hole is a slot"), getHoleLocation(hole, transform),
-          tr("Slots may cause troubles with some PCB manufacturers.") %
-              suggestion % checkSlotMode));
-    }
-  };
-
   // Board holes.
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    checkHole(hole->getHole(), Transform());
+    processHoleSlotWarning(hole->getHole(), mOptions.npthSlotsWarning);
   }
 
   // Package holes.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     Transform transform(*device);
     for (const Hole& hole : device->getLibFootprint().getHoles()) {
-      checkHole(hole, transform);
+      processHoleSlotWarning(hole, mOptions.npthSlotsWarning, transform);
     }
   }
 
   emit progressPercent(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkWarnPthSlots(int progressStart,
+                                             int progressEnd) {
+  Q_UNUSED(progressStart);
+  emitStatus(tr("Check PTH slots..."));
+
+  // Pads.
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    Transform devTransform(*device);
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
+      Transform padTransform(pad->getLibPad().getPosition(),
+                             pad->getLibPad().getRotation());
+      for (const Hole& hole : pad->getLibPad().getHoles()) {
+        processHoleSlotWarning(hole, mOptions.pthSlotsWarning, padTransform,
+                               devTransform);
+      }
+    }
+  }
+
+  emit progressPercent(progressEnd);
+}
+
+void BoardDesignRuleCheck::processHoleSlotWarning(const Hole& hole,
+                                                  SlotsWarningLevel level,
+                                                  const Transform& transform1,
+                                                  const Transform& transform2) {
+  const QString suggestion = "\n" %
+      tr("Either avoid them or check if your PCB manufacturer supports "
+         "them.");
+  const QString checkSlotMode = "\n" %
+      tr("Choose the desired Excellon slot mode when generating the "
+         "production data (G85 vs. G00..G03).");
+  const QString g85NotAvailable = "\n" %
+      tr("The drilled slot mode (G85) will not be available when generating "
+         "production data.");
+  if ((level >= SlotsWarningLevel::Curved) && hole.isCurvedSlot()) {
+    emitMessage(BoardDesignRuleCheckMessage(
+        tr("Hole is a slot with curves"),
+        getHoleLocation(hole, transform1, transform2),
+        tr("Curved slots are a very unusual thing and may cause troubles "
+           "with many PCB manufacturers.") %
+            suggestion % g85NotAvailable));
+  } else if ((level >= SlotsWarningLevel::MultiSegment) &&
+             hole.isMultiSegmentSlot()) {
+    emitMessage(BoardDesignRuleCheckMessage(
+        tr("Hole is a multi-segment slot"),
+        getHoleLocation(hole, transform1, transform2),
+        tr("Multi-segment slots are a rather unusual thing and may cause "
+           "troubles with some PCB manufacturers.") %
+            suggestion % checkSlotMode));
+  } else if ((level >= SlotsWarningLevel::All) && hole.isSlot()) {
+    emitMessage(BoardDesignRuleCheckMessage(
+        tr("Hole is a slot"), getHoleLocation(hole, transform1, transform2),
+        tr("Slots may cause troubles with some PCB manufacturers.") %
+            suggestion % checkSlotMode));
+  }
 }
 
 const ClipperLib::Paths& BoardDesignRuleCheck::getCopperPaths(
@@ -684,8 +743,10 @@ ClipperLib::Paths BoardDesignRuleCheck::getDeviceCourtyardPaths(
 }
 
 QVector<Path> BoardDesignRuleCheck::getHoleLocation(
-    const Hole& hole, const Transform& transform) const noexcept {
-  return transform.map(hole.getPath())->toOutlineStrokes(hole.getDiameter());
+    const Hole& hole, const Transform& transform1,
+    const Transform& transform2) const noexcept {
+  return transform2.map(
+      transform1.map(hole.getPath())->toOutlineStrokes(hole.getDiameter()));
 }
 
 void BoardDesignRuleCheck::emitStatus(const QString& status) noexcept {

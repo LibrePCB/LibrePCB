@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../utils/transform.h"
 #include "boarddesignrulecheckmessage.h"
 
 #include <polyclipping/clipper.hpp>
@@ -39,7 +40,6 @@ class Board;
 class GraphicsLayer;
 class Hole;
 class NetSignal;
-class Transform;
 
 /*******************************************************************************
  *  Class BoardDesignRuleCheck
@@ -87,8 +87,14 @@ public:
     bool checkPthDrillDiameter;
     UnsignedLength minPthDrillDiameter;
 
+    bool checkPthSlotWidth;
+    UnsignedLength minPthSlotWidth;
+
     bool checkNpthSlotsWarning;
     SlotsWarningLevel npthSlotsWarning;
+
+    bool checkPthSlotsWarning;
+    SlotsWarningLevel pthSlotsWarning;
 
     bool checkCourtyardClearance;
     Length courtyardOffset;
@@ -113,8 +119,12 @@ public:
         minNpthSlotWidth(1000000),  // 1mm
         checkPthDrillDiameter(true),
         minPthDrillDiameter(250000),  // 250um
+        checkPthSlotWidth(true),
+        minPthSlotWidth(700000),  // 0.7mm
         checkNpthSlotsWarning(true),
         npthSlotsWarning(SlotsWarningLevel::MultiSegment),
+        checkPthSlotsWarning(true),
+        pthSlotsWarning(SlotsWarningLevel::MultiSegment),
         checkCourtyardClearance(true),
         courtyardOffset(0),  // 0um
         checkMissingConnections(true) {}
@@ -154,13 +164,20 @@ private:  // Methods
   void checkMinimumNpthDrillDiameter(int progressStart, int progressEnd);
   void checkMinimumNpthSlotWidth(int progressStart, int progressEnd);
   void checkMinimumPthDrillDiameter(int progressStart, int progressEnd);
+  void checkMinimumPthSlotWidth(int progressStart, int progressEnd);
   void checkWarnNpthSlots(int progressStart, int progressEnd);
+  void checkWarnPthSlots(int progressStart, int progressEnd);
+  void processHoleSlotWarning(const Hole& hole, SlotsWarningLevel level,
+                              const Transform& transform1 = Transform(),
+                              const Transform& transform2 = Transform());
   const ClipperLib::Paths& getCopperPaths(
       const GraphicsLayer& layer, const QSet<const NetSignal*>& netsignals);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
                                             const GraphicsLayer* layer);
   QVector<Path> getHoleLocation(const Hole& hole,
-                                const Transform& transform) const noexcept;
+                                const Transform& transform1 = Transform(),
+                                const Transform& transform2 = Transform()) const
+      noexcept;
   void emitStatus(const QString& status) noexcept;
   void emitMessage(const BoardDesignRuleCheckMessage& msg) noexcept;
   QString formatLength(const Length& length) const noexcept;

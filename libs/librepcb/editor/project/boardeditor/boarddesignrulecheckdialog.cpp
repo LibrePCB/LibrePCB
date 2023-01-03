@@ -70,10 +70,14 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
   mUi->edtMinPthDrillDiameter->configure(
       lengthUnit, LengthEditBase::Steps::drillDiameter(),
       settingsPrefix % "/min_pth_drill_diameter");
+  mUi->edtMinPthSlotWidth->configure(lengthUnit,
+                                     LengthEditBase::Steps::drillDiameter(),
+                                     settingsPrefix % "/min_pth_slot_width");
   mUi->edtCourtyardOffset->configure(lengthUnit,
                                      LengthEditBase::Steps::generic(),
                                      settingsPrefix % "/courtyard_offset");
-  for (QComboBox* cbx : {mUi->cbxWarnNpthSlotsConfig}) {
+  for (QComboBox* cbx :
+       {mUi->cbxWarnNpthSlotsConfig, mUi->cbxWarnPthSlotsConfig}) {
     cbx->addItem(
         tr("Only Curved"),
         QVariant::fromValue(BoardDesignRuleCheck::SlotsWarningLevel::Curved));
@@ -101,7 +105,9 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
     mUi->cbxMinNpthDrillDiameter->setChecked(checked);
     mUi->cbxMinNpthSlotWidth->setChecked(checked);
     mUi->cbxMinPthDrillDiameter->setChecked(checked);
+    mUi->cbxMinPthSlotWidth->setChecked(checked);
     mUi->cbxWarnNpthSlots->setChecked(checked);
+    mUi->cbxWarnPthSlots->setChecked(checked);
     mUi->cbxCourtyardOffset->setChecked(checked);
     mUi->cbxMissingConnections->setChecked(checked);
   });
@@ -124,10 +130,16 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
   mUi->edtMinNpthSlotWidth->setValue(options.minNpthSlotWidth);
   mUi->cbxMinPthDrillDiameter->setChecked(options.checkPthDrillDiameter);
   mUi->edtMinPthDrillDiameter->setValue(options.minPthDrillDiameter);
+  mUi->cbxMinPthSlotWidth->setChecked(options.checkPthSlotWidth);
+  mUi->edtMinPthSlotWidth->setValue(options.minPthSlotWidth);
   mUi->cbxWarnNpthSlots->setChecked(options.checkNpthSlotsWarning);
   mUi->cbxWarnNpthSlotsConfig->setCurrentIndex(
       mUi->cbxWarnNpthSlotsConfig->findData(
           QVariant::fromValue(options.npthSlotsWarning)));
+  mUi->cbxWarnPthSlots->setChecked(options.checkPthSlotsWarning);
+  mUi->cbxWarnPthSlotsConfig->setCurrentIndex(
+      mUi->cbxWarnPthSlotsConfig->findData(
+          QVariant::fromValue(options.pthSlotsWarning)));
   mUi->cbxCourtyardOffset->setChecked(options.checkCourtyardClearance);
   mUi->edtCourtyardOffset->setValue(options.courtyardOffset);
   mUi->cbxMissingConnections->setChecked(options.checkMissingConnections);
@@ -169,9 +181,15 @@ BoardDesignRuleCheck::Options BoardDesignRuleCheckDialog::getOptions() const
   options.minNpthSlotWidth = mUi->edtMinNpthSlotWidth->getValue();
   options.checkPthDrillDiameter = mUi->cbxMinPthDrillDiameter->isChecked();
   options.minPthDrillDiameter = mUi->edtMinPthDrillDiameter->getValue();
+  options.checkPthSlotWidth = mUi->cbxMinPthSlotWidth->isChecked();
+  options.minPthSlotWidth = mUi->edtMinPthSlotWidth->getValue();
   options.checkNpthSlotsWarning = mUi->cbxWarnNpthSlots->isChecked();
   options.npthSlotsWarning =
       mUi->cbxWarnNpthSlotsConfig->currentData()
+          .value<BoardDesignRuleCheck::SlotsWarningLevel>();
+  options.checkPthSlotsWarning = mUi->cbxWarnPthSlots->isChecked();
+  options.pthSlotsWarning =
+      mUi->cbxWarnPthSlotsConfig->currentData()
           .value<BoardDesignRuleCheck::SlotsWarningLevel>();
   options.checkCourtyardClearance = mUi->cbxCourtyardOffset->isChecked();
   options.courtyardOffset = mUi->edtCourtyardOffset->getValue();
