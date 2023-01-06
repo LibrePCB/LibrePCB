@@ -95,6 +95,10 @@ void PathEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);
 }
 
+void PathEditorWidget::setMinimumVertexCount(int count) noexcept {
+  mView->setMinimumRowCount(count);
+}
+
 void PathEditorWidget::setPath(const Path& path) noexcept {
   mModel->setPath(path);
 }

@@ -41,6 +41,8 @@ EditableTableWidget::EditableTableWidget(QWidget* parent) noexcept
     mShowEditButton(false),
     mShowMoveButtons(false),
     mBrowseButtonColumn(-1),
+    mMinimumRowCount(0),
+    mCanRemove(true),
     mReadOnly(false) {
   // set reasonable default values - they can still be changed afterwards
   setAlternatingRowColors(true);  // increase readability
@@ -61,10 +63,32 @@ EditableTableWidget::~EditableTableWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void EditableTableWidget::setModel(QAbstractItemModel* model) noexcept {
+  if (mRowsRemovedConnection) {
+    disconnect(mRowsRemovedConnection);
+  }
+
+  QTableView::setModel(model);
+  updateCanRemove();
+
+  if (model) {
+    connect(model, &QAbstractItemModel::rowsRemoved, this,
+            &EditableTableWidget::updateCanRemove);
+  }
+}
+
 void EditableTableWidget::setReadOnly(bool readOnly) noexcept {
   if (readOnly != mReadOnly) {
     mReadOnly = readOnly;
     emit readOnlyChanged(readOnly);
+    updateCanRemove();
+  }
+}
+
+void EditableTableWidget::setMinimumRowCount(int count) noexcept {
+  if (count != mMinimumRowCount) {
+    mMinimumRowCount = count;
+    updateCanRemove();
   }
 }
 
@@ -79,6 +103,7 @@ void EditableTableWidget::reset() {
       installButtons(i);
     }
   }
+  updateCanRemove();
 }
 
 bool EditableTableWidget::edit(const QModelIndex& index, EditTrigger trigger,
@@ -105,11 +130,21 @@ void EditableTableWidget::rowsInserted(const QModelIndex& parent, int start,
   for (int i = start; i <= end; ++i) {
     installButtons(i);
   }
+  updateCanRemove();
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void EditableTableWidget::updateCanRemove() noexcept {
+  const bool canRemove =
+      model() && (model()->rowCount() > (mMinimumRowCount + 1)) && (!mReadOnly);
+  if (canRemove != mCanRemove) {
+    mCanRemove = canRemove;
+    emit canRemoveChanged(mCanRemove);
+  }
+}
 
 void EditableTableWidget::installButtons(int row) noexcept {
   if (!model()) {
@@ -127,9 +162,9 @@ void EditableTableWidget::installButtons(int row) noexcept {
       layout->setSpacing(0);
       layout->addStretch(1);
       int size = rowHeight(row);
-      layout->addWidget(
-          createButton("btnBrowse", QIcon(), "...", tr("Browse"), size, size,
-                       &EditableTableWidget::btnBrowseClicked, index, true));
+      layout->addWidget(createButton(
+          "btnBrowse", QIcon(), "...", tr("Browse"), size, size,
+          &EditableTableWidget::btnBrowseClicked, index, true, false));
       setIndexWidget(index, widget);
     }
   }
@@ -147,24 +182,25 @@ void EditableTableWidget::installButtons(int row) noexcept {
       if (mShowEditButton) {
         layout->addWidget(createButton(
             "btnEdit", QIcon(":/img/actions/edit.png"), "", tr("Edit"), size,
-            size, &EditableTableWidget::btnEditClicked, index, false));
+            size, &EditableTableWidget::btnEditClicked, index, false, false));
       }
       if (mShowCopyButton) {
         layout->addWidget(createButton(
             "btnCopy", QIcon(":/img/actions/copy.png"), "", tr("Copy"), size,
-            size, &EditableTableWidget::btnCopyClicked, index, true));
+            size, &EditableTableWidget::btnCopyClicked, index, true, false));
       }
       if (mShowMoveButtons) {
         layout->addWidget(createButton(
             "btnMoveUp", QIcon(":/img/actions/up.png"), "", tr("Move up"), size,
-            size, &EditableTableWidget::btnMoveUpClicked, index, true));
+            size, &EditableTableWidget::btnMoveUpClicked, index, true, false));
         layout->addWidget(createButton(
             "btnMoveDown", QIcon(":/img/actions/down.png"), "", tr("Move down"),
-            size, size, &EditableTableWidget::btnMoveDownClicked, index, true));
+            size, size, &EditableTableWidget::btnMoveDownClicked, index, true,
+            false));
       }
       layout->addWidget(createButton(
           "btnRemove", QIcon(":/img/actions/minus.png"), "", tr("Remove"), size,
-          size, &EditableTableWidget::btnRemoveClicked, index, true));
+          size, &EditableTableWidget::btnRemoveClicked, index, true, true));
     } else {
       int width = size;
       if (mShowEditButton) width += size;
@@ -172,7 +208,7 @@ void EditableTableWidget::installButtons(int row) noexcept {
       if (mShowMoveButtons) width += 2 * size;
       layout->addWidget(createButton(
           "btnAdd", QIcon(":/img/actions/add.png"), "", tr("Add"), width, size,
-          &EditableTableWidget::btnAddClicked, index, true));
+          &EditableTableWidget::btnAddClicked, index, true, false));
     }
     setIndexWidget(index, widget);
   }
@@ -181,7 +217,8 @@ void EditableTableWidget::installButtons(int row) noexcept {
 QToolButton* EditableTableWidget::createButton(
     const QString& objectName, const QIcon& icon, const QString& text,
     const QString& toolTip, int width, int height, Signal clickedSignal,
-    const QPersistentModelIndex& index, bool doesModify) noexcept {
+    const QPersistentModelIndex& index, bool doesModify,
+    bool doesRemove) noexcept {
   QToolButton* btn = new QToolButton();
   btn->setObjectName(objectName);
   btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -190,11 +227,16 @@ QToolButton* EditableTableWidget::createButton(
   btn->setIcon(icon);
   btn->setIconSize(QSize(height - 4, height - 4));
   btn->setToolTip(toolTip);
-  if (doesModify) {
+  if (doesRemove) {
+    btn->setEnabled(mCanRemove);
+    connect(this, &EditableTableWidget::canRemoveChanged, btn,
+            &QPushButton::setEnabled);
+  } else if (doesModify) {
     btn->setDisabled(mReadOnly);
     connect(this, &EditableTableWidget::readOnlyChanged, btn,
             &QPushButton::setDisabled);
   }
+
   connect(btn, &QToolButton::clicked, this, [this, index, clickedSignal]() {
     buttonClickedHandler(clickedSignal, index);
   });

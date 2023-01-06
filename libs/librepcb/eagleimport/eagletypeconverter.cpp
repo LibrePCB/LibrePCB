@@ -416,9 +416,11 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           shape,  // Shape
           width,  // Width
           height,  // Height
-          UnsignedLength(
-              convertLength(p.getDrillDiameter())),  // Drill diameter
-          FootprintPad::BoardSide::THT  // Side
+          FootprintPad::ComponentSide::Top,  // Side
+          HoleList{std::make_shared<Hole>(
+              Uuid::createRandom(),
+              PositiveLength(convertLength(p.getDrillDiameter())),
+              makeNonEmptyPath(Point(0, 0)))}  // Holes
           ));
 }
 
@@ -426,11 +428,11 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
     EagleTypeConverter::convertSmtPad(const parseagle::SmtPad& p) {
   Uuid uuid = Uuid::createRandom();
   GraphicsLayerName layer = convertLayer(p.getLayer());
-  FootprintPad::BoardSide side;
+  FootprintPad::ComponentSide side;
   if (layer == GraphicsLayer::sTopCopper) {
-    side = FootprintPad::BoardSide::TOP;
+    side = FootprintPad::ComponentSide::Top;
   } else if (layer == GraphicsLayer::sBotCopper) {
-    side = FootprintPad::BoardSide::BOTTOM;
+    side = FootprintPad::ComponentSide::Bottom;
   } else {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Invalid pad layer: %1").arg(*layer));
@@ -447,8 +449,8 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           FootprintPad::Shape::RECT,  // Shape
           PositiveLength(convertLength(p.getWidth())),  // Width
           PositiveLength(convertLength(p.getHeight())),  // Height
-          UnsignedLength(0),  // Drill diameter
-          side  // Side
+          side,  // Side
+          HoleList{}  // Holes
           ));
 }
 

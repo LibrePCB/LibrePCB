@@ -57,10 +57,15 @@ public:
   static void unite(ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
   static std::unique_ptr<ClipperLib::PolyTree> intersect(
       const ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
+  static std::unique_ptr<ClipperLib::PolyTree> intersect(
+      const QList<ClipperLib::Paths>& paths);
   static void subtract(ClipperLib::Paths& subject,
                        const ClipperLib::Paths& clip);
+  static std::unique_ptr<ClipperLib::PolyTree> subtractToTree(
+      const ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
   static void offset(ClipperLib::Paths& paths, const Length& offset,
                      const PositiveLength& maxArcTolerance);
+  static ClipperLib::Paths treeToPaths(const ClipperLib::PolyTree& tree);
   static ClipperLib::Paths flattenTree(const ClipperLib::PolyNode& node);
 
   // Type Conversions

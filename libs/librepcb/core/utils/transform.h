@@ -195,6 +195,26 @@ public:
     return copy;
   }
 
+  /**
+   * @brief Map a given Qt object in pixels to the transformed coordinate system
+   *
+   * @param obj The Qt object (in pixel coordinates) to map, e.g. QPoint,
+   *            QPainterPath, ...).
+   * @return The passed object, rotated by the transformations rotation,
+   *         mirrored horizontally if the transformation is mirroring, and
+   *         translated by the transformation offset.
+   */
+  template <typename T>
+  T mapPx(const T& obj) const noexcept {
+    QTransform t;
+    t.translate(mPosition.toPxQPointF().x(), mPosition.toPxQPointF().y());
+    if (mMirrored) {
+      t.scale(-1, 1);
+    }
+    t.rotate(-mRotation.toDeg());
+    return t.map(obj);
+  }
+
   // Operator Overloadings
   bool operator==(const Transform& rhs) const noexcept {
     return (mPosition == rhs.mPosition) && (mRotation == rhs.mRotation) &&

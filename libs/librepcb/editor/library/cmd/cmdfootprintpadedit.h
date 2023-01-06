@@ -56,11 +56,11 @@ public:
   // Setters
   void setPackagePadUuid(const tl::optional<Uuid>& pad,
                          bool immediate) noexcept;
-  void setBoardSide(FootprintPad::BoardSide side, bool immediate) noexcept;
+  void setComponentSide(FootprintPad::ComponentSide side,
+                        bool immediate) noexcept;
   void setShape(FootprintPad::Shape shape, bool immediate) noexcept;
   void setWidth(const PositiveLength& width, bool immediate) noexcept;
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
-  void setDrillDiameter(const UnsignedLength& dia, bool immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
@@ -69,6 +69,7 @@ public:
   void mirrorGeometry(Qt::Orientation orientation, const Point& center,
                       bool immediate) noexcept;
   void mirrorLayer(bool immediate) noexcept;
+  void setHoles(const HoleList& holes, bool immediate) noexcept;
 
   // Operator Overloadings
   CmdFootprintPadEdit& operator=(const CmdFootprintPadEdit& rhs) = delete;
@@ -93,8 +94,8 @@ private:
   // General Attributes
   tl::optional<Uuid> mOldPackagePadUuid;
   tl::optional<Uuid> mNewPackagePadUuid;
-  FootprintPad::BoardSide mOldBoardSide;
-  FootprintPad::BoardSide mNewBoardSide;
+  FootprintPad::ComponentSide mOldComponentSide;
+  FootprintPad::ComponentSide mNewComponentSide;
   FootprintPad::Shape mOldShape;
   FootprintPad::Shape mNewShape;
   PositiveLength mOldWidth;
@@ -105,8 +106,8 @@ private:
   Point mNewPos;
   Angle mOldRotation;
   Angle mNewRotation;
-  UnsignedLength mOldDrillDiameter;
-  UnsignedLength mNewDrillDiameter;
+  HoleList mOldHoles;
+  HoleList mNewHoles;
 };
 
 /*******************************************************************************

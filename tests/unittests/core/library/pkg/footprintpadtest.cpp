@@ -45,7 +45,7 @@ class FootprintPadTest : public ::testing::Test {};
 TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
   SExpression sexpr = SExpression::parse(
       "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side top) (shape rect)\n"
-      " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2) (drill 0.0)\n"
+      " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2)\n"
       " (package_pad d48b8bd2-a46c-4495-87a5-662747034098)\n"
       ")",
       FilePath());
@@ -59,15 +59,21 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
   EXPECT_EQ(FootprintPad::Shape::RECT, obj.getShape());
   EXPECT_EQ(PositiveLength(1100000), obj.getWidth());
   EXPECT_EQ(UnsignedLength(2200000), obj.getHeight());
-  EXPECT_EQ(UnsignedLength(0), obj.getDrillDiameter());
-  EXPECT_EQ(FootprintPad::BoardSide::TOP, obj.getBoardSide());
+  EXPECT_EQ(FootprintPad::ComponentSide::Top, obj.getComponentSide());
+  EXPECT_EQ(0, obj.getHoles().count());
 }
 
 TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   SExpression sexpr = SExpression::parse(
-      "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side top) (shape rect)\n"
-      " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2) (drill 1.0)\n"
+      "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side bottom) (shape rect)\n"
+      " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2)\n"
       " (package_pad none)\n"
+      " (hole 7040952d-7016-49cd-8c3e-6078ecca98b9 (diameter 1.0)\n"
+      "  (vertex (position 1.1 2.2) (angle 45.0))\n"
+      " )\n"
+      " (hole d48b8bd2-a46c-4495-87a5-662747034098 (diameter 2.0)\n"
+      "  (vertex (position 3.3 4.4) (angle 0.0))\n"
+      " )\n"
       ")",
       FilePath());
   FootprintPad obj(sexpr);
@@ -79,15 +85,21 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   EXPECT_EQ(FootprintPad::Shape::RECT, obj.getShape());
   EXPECT_EQ(PositiveLength(1100000), obj.getWidth());
   EXPECT_EQ(UnsignedLength(2200000), obj.getHeight());
-  EXPECT_EQ(UnsignedLength(1000000), obj.getDrillDiameter());
-  EXPECT_EQ(FootprintPad::BoardSide::TOP, obj.getBoardSide());
+  EXPECT_EQ(FootprintPad::ComponentSide::Bottom, obj.getComponentSide());
+  EXPECT_EQ(2, obj.getHoles().count());
 }
 
 TEST_F(FootprintPadTest, testSerializeAndDeserialize) {
-  FootprintPad obj1(Uuid::createRandom(), Uuid::createRandom(), Point(123, 567),
-                    Angle(789), FootprintPad::Shape::OCTAGON,
-                    PositiveLength(123), PositiveLength(456),
-                    UnsignedLength(100000), FootprintPad::BoardSide::THT);
+  FootprintPad obj1(
+      Uuid::createRandom(), Uuid::createRandom(), Point(123, 567), Angle(789),
+      FootprintPad::Shape::OCTAGON, PositiveLength(123), PositiveLength(456),
+      FootprintPad::ComponentSide::Top,
+      HoleList{
+          std::make_shared<Hole>(Uuid::createRandom(), PositiveLength(100000),
+                                 makeNonEmptyPath(Point(100, 200))),
+          std::make_shared<Hole>(Uuid::createRandom(), PositiveLength(200000),
+                                 makeNonEmptyPath(Point(300, 400))),
+      });
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);
 

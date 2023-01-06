@@ -17,72 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_HOLEPROPERTIESDIALOG_H
-#define LIBREPCB_EDITOR_HOLEPROPERTIESDIALOG_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <QtCore>
-#include <QtWidgets>
+#include "msgpadrestringviolation.h"
+
+#include "../footprint.h"
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 
-class Hole;
-class LengthUnit;
-
-namespace editor {
-
-class UndoStack;
-
-namespace Ui {
-class HolePropertiesDialog;
-}
-
 /*******************************************************************************
- *  Class HolePropertiesDialog
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The HolePropertiesDialog class
- */
-class HolePropertiesDialog final : public QDialog {
-  Q_OBJECT
+MsgPadRestringViolation::MsgPadRestringViolation(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName,
+    const Length& restring) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Warning,
+        tr("Restring of pad '%1' in '%3'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("Pads should have at least %1 restring (copper around each pad "
+           "hole). Note that this value is just a general recommendation, the "
+           "exact value depends on the capabilities of the PCB manufacturer.")
+            .arg(QString::number(restring.toMm() * 1000) % "μm")),
+    mFootprint(footprint),
+    mPad(pad) {
+}
 
-public:
-  // Constructors / Destructor
-  HolePropertiesDialog() = delete;
-  HolePropertiesDialog(const HolePropertiesDialog& other) = delete;
-  HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
-                       const LengthUnit& lengthUnit,
-                       const QString& settingsPrefix,
-                       QWidget* parent = nullptr) noexcept;
-  ~HolePropertiesDialog() noexcept;
-
-  // Setters
-  void setReadOnly(bool readOnly) noexcept;
-
-  // Operator Overloadings
-  HolePropertiesDialog& operator=(const HolePropertiesDialog& rhs) = delete;
-
-private:  // Methods
-  void on_buttonBox_clicked(QAbstractButton* button);
-  bool applyChanges() noexcept;
-
-private:  // Data
-  Hole& mHole;
-  UndoStack& mUndoStack;
-  QScopedPointer<Ui::HolePropertiesDialog> mUi;
-};
+MsgPadRestringViolation::~MsgPadRestringViolation() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
-
-#endif

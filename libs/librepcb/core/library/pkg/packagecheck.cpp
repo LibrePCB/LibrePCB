@@ -30,6 +30,7 @@
 #include "msg/msgmissingfootprintvalue.h"
 #include "msg/msgpadclearanceviolation.h"
 #include "msg/msgpadoverlapswithplacement.h"
+#include "msg/msgpadrestringviolation.h"
 #include "msg/msgwrongfootprinttextlayer.h"
 #include "package.h"
 
@@ -63,6 +64,7 @@ LibraryElementCheckMessageList PackageCheck::runChecks() const {
   checkWrongTextLayers(msgs);
   checkPadsClearanceToPads(msgs);
   checkPadsClearanceToPlacement(msgs);
+  checkPadsRestring(msgs);
   return msgs;
 }
 
@@ -156,9 +158,8 @@ void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
         const QPainterPath pad2PathPx = pad2Path.toQPainterPathPx();
 
         // Only warn if both pads have copper on the same board side.
-        if ((pad1->getBoardSide() == pad2->getBoardSide()) ||
-            (pad1->getBoardSide() == FootprintPad::BoardSide::THT) ||
-            (pad2->getBoardSide() == FootprintPad::BoardSide::THT)) {
+        if ((pad1->getComponentSide() == pad2->getComponentSide()) ||
+            (pad1->isTht()) || (pad2->isTht())) {
           // Only warn if both pads have different net signal, or one of them
           // is unconnected (an unconnected pad is considered as a different
           // net signal).
@@ -224,6 +225,65 @@ void PackageCheck::checkPadsClearanceToPlacement(MsgList& msgs) const {
         msgs.append(std::make_shared<MsgPadOverlapsWithPlacement>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString(),
             clearance));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkPadsRestring(MsgList& msgs) const {
+  const Length restring(150000);  // 150 µm
+  const Length tolerance(10);  // 0.01 µm, to avoid rounding issues
+
+  // Check all footprints.
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+
+    // Check all pads.
+    for (auto itPad = (*itFtp).getPads().begin();
+         itPad != (*itFtp).getPads().end(); ++itPad) {
+      std::shared_ptr<const FootprintPad> pad = itPad.ptr();
+      std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
+          ? mPackage.getPads().find(*pad->getPackagePadUuid())
+          : nullptr;
+      const QPainterPath padPathPx = pad->getOutline().toQPainterPathPx();
+
+      // Check all holes.
+      bool emitWarning = false;
+      for (auto itHole1 = (*itPad).getHoles().begin();
+           itHole1 != (*itPad).getHoles().end(); ++itHole1) {
+        std::shared_ptr<const Hole> hole1 = itHole1.ptr();
+        const QVector<Path> hole1Paths = hole1->getPath()->toOutlineStrokes(
+            hole1->getDiameter() + PositiveLength((restring * 2) - tolerance));
+        const QPainterPath hole1PathPx =
+            Path::toQPainterPathPx(hole1Paths, true);
+
+        // Check restrings.
+        if (!padPathPx.contains(hole1PathPx)) {
+          emitWarning = true;
+        } else {
+          // Compare with all holes *after* hole1 to avoid redundant checks.
+          // So, don't initialize the iterator with begin() but with hole1 + 1.
+          auto itHole2 = itHole1;
+          for (++itHole2; itHole2 != (*itPad).getHoles().end(); ++itHole2) {
+            std::shared_ptr<const Hole> hole2 = itHole2.ptr();
+            const QVector<Path> hole2Paths =
+                hole2->getPath()->toOutlineStrokes(hole2->getDiameter());
+            const QPainterPath hole2PathPx =
+                Path::toQPainterPathPx(hole2Paths, true);
+
+            // Now check if the restring is really too small.
+            if (hole1PathPx.intersects(hole2PathPx)) {
+              emitWarning = true;
+            }
+          }
+        }
+      }
+
+      // Only show one warning even if there are multiple violations.
+      if (emitWarning) {
+        msgs.append(std::make_shared<MsgPadRestringViolation>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString(), restring));
       }
     }
   }

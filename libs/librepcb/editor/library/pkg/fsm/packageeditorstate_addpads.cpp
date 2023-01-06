@@ -60,14 +60,17 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
         FootprintPad::Shape::ROUND,  // Commonly used pad shape
         PositiveLength(2500000),  // There is no default/recommended pad size
         PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
-        UnsignedLength(800000),  // Commonly used drill diameter
-        FootprintPad::BoardSide::THT) {
+        FootprintPad::ComponentSide::Top,  // Default side
+        HoleList{}) {
   if (mPadType == PadType::SMT) {
-    mLastPad.setBoardSide(FootprintPad::BoardSide::TOP);  // Default side
     mLastPad.setShape(FootprintPad::Shape::RECT);  // Commonly used SMT shape
-    mLastPad.setDrillDiameter(UnsignedLength(0));  // Disable drill
     mLastPad.setWidth(PositiveLength(1500000));  // Same as for THT pads ->
     mLastPad.setHeight(PositiveLength(700000));  // reasonable multiple of 0.1mm
+  } else {
+    mLastPad.getHoles().append(std::make_shared<Hole>(
+        Uuid::createRandom(),
+        PositiveLength(800000),  // Commonly used drill diameter
+        makeNonEmptyPath(Point())));
   }
 }
 
@@ -99,7 +102,7 @@ bool PackageEditorState_AddPads::entry() noexcept {
   if (mPadType == PadType::SMT) {
     std::unique_ptr<BoardSideSelectorWidget> boardSideSelector(
         new BoardSideSelectorWidget());
-    boardSideSelector->setCurrentBoardSide(mLastPad.getBoardSide());
+    boardSideSelector->setCurrentBoardSide(mLastPad.getComponentSide());
     boardSideSelector->addAction(cmd.layerUp.createAction(
         boardSideSelector.get(), boardSideSelector.get(),
         &BoardSideSelectorWidget::setBoardSideTop));
@@ -175,23 +178,23 @@ bool PackageEditorState_AddPads::entry() noexcept {
   mContext.commandToolBar.addWidget(std::move(edtHeight));
 
   // drill diameter
-  QPointer<UnsignedLengthEdit> edtDrillDiameterPtr;
-  if (mPadType == PadType::THT) {
+  QPointer<PositiveLengthEdit> edtDrillDiameterPtr;
+  if ((mPadType == PadType::THT) && (!mLastPad.getHoles().isEmpty())) {
     mContext.commandToolBar.addLabel(tr("Drill Diameter:"), 10);
-    std::unique_ptr<UnsignedLengthEdit> edtDrillDiameter(
-        new UnsignedLengthEdit());
+    std::unique_ptr<PositiveLengthEdit> edtDrillDiameter(
+        new PositiveLengthEdit());
     edtDrillDiameterPtr = edtDrillDiameter.get();
     edtDrillDiameter->configure(getDefaultLengthUnit(),
                                 LengthEditBase::Steps::drillDiameter(),
                                 "package_editor/add_pads/drill_diameter");
-    edtDrillDiameter->setValue(mLastPad.getDrillDiameter());
+    edtDrillDiameter->setValue(mLastPad.getHoles().first()->getDiameter());
     edtDrillDiameter->addAction(cmd.drillIncrease.createAction(
         edtDrillDiameter.get(), edtDrillDiameter.get(),
         &PositiveLengthEdit::stepUp));
     edtDrillDiameter->addAction(cmd.drillDecrease.createAction(
         edtDrillDiameter.get(), edtDrillDiameter.get(),
         &PositiveLengthEdit::stepDown));
-    connect(edtDrillDiameter.get(), &UnsignedLengthEdit::valueChanged, this,
+    connect(edtDrillDiameter.get(), &PositiveLengthEdit::valueChanged, this,
             &PackageEditorState_AddPads::drillDiameterEditValueChanged);
     mContext.commandToolBar.addWidget(std::move(edtDrillDiameter));
   }
@@ -203,23 +206,23 @@ bool PackageEditorState_AddPads::entry() noexcept {
             [edtDrillDiameterPtr](const PositiveLength& value) {
               if (edtDrillDiameterPtr &&
                   (value < edtDrillDiameterPtr->getValue())) {
-                edtDrillDiameterPtr->setValue(positiveToUnsigned(value));
+                edtDrillDiameterPtr->setValue(value);
               }
             });
     connect(edtHeightPtr.data(), &PositiveLengthEdit::valueChanged, this,
             [edtDrillDiameterPtr](const PositiveLength& value) {
               if (edtDrillDiameterPtr &&
                   (value < edtDrillDiameterPtr->getValue())) {
-                edtDrillDiameterPtr->setValue(positiveToUnsigned(value));
+                edtDrillDiameterPtr->setValue(value);
               }
             });
-    connect(edtDrillDiameterPtr.data(), &UnsignedLengthEdit::valueChanged, this,
-            [edtWidthPtr, edtHeightPtr](const UnsignedLength& value) {
+    connect(edtDrillDiameterPtr.data(), &PositiveLengthEdit::valueChanged, this,
+            [edtWidthPtr, edtHeightPtr](const PositiveLength& value) {
               if (edtWidthPtr && (value > edtWidthPtr->getValue())) {
-                edtWidthPtr->setValue(PositiveLength(*value));
+                edtWidthPtr->setValue(value);
               }
               if (edtHeightPtr && (value > edtHeightPtr->getValue())) {
-                edtHeightPtr->setValue(PositiveLength(*value));
+                edtHeightPtr->setValue(value);
               }
             });
   }
@@ -303,8 +306,15 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add footprint pad"));
     mLastPad.setPosition(pos);
-    mCurrentPad =
-        std::make_shared<FootprintPad>(Uuid::createRandom(), mLastPad);
+    mCurrentPad = std::make_shared<FootprintPad>(
+        Uuid::createRandom(), mLastPad.getPackagePadUuid(),
+        mLastPad.getPosition(), mLastPad.getRotation(), mLastPad.getShape(),
+        mLastPad.getWidth(), mLastPad.getHeight(), mLastPad.getComponentSide(),
+        HoleList{});
+    for (const Hole& hole : mLastPad.getHoles()) {
+      mCurrentPad->getHoles().append(std::make_shared<Hole>(
+          Uuid::createRandom(), hole.getDiameter(), hole.getPath()));
+    }
     mContext.undoStack.appendToCmdGroup(new CmdFootprintPadInsert(
         mContext.currentFootprint->getPads(), mCurrentPad));
     mEditCmd.reset(new CmdFootprintPadEdit(*mCurrentPad));
@@ -382,10 +392,10 @@ void PackageEditorState_AddPads::packagePadComboBoxCurrentPadChanged(
 }
 
 void PackageEditorState_AddPads::boardSideSelectorCurrentSideChanged(
-    FootprintPad::BoardSide side) noexcept {
-  mLastPad.setBoardSide(side);
+    FootprintPad::ComponentSide side) noexcept {
+  mLastPad.setComponentSide(side);
   if (mEditCmd) {
-    mEditCmd->setBoardSide(side, true);
+    mEditCmd->setComponentSide(side, true);
   }
 }
 
@@ -414,10 +424,12 @@ void PackageEditorState_AddPads::heightEditValueChanged(
 }
 
 void PackageEditorState_AddPads::drillDiameterEditValueChanged(
-    const UnsignedLength& value) noexcept {
-  mLastPad.setDrillDiameter(value);
-  if (mEditCmd) {
-    mEditCmd->setDrillDiameter(mLastPad.getDrillDiameter(), true);
+    const PositiveLength& value) noexcept {
+  if (std::shared_ptr<Hole> hole = mLastPad.getHoles().value(0)) {
+    hole->setDiameter(value);
+    if (mEditCmd) {
+      mEditCmd->setHoles(mLastPad.getHoles(), true);
+    }
   }
 }
 

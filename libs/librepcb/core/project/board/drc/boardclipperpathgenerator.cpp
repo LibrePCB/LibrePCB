@@ -120,12 +120,14 @@ void BoardClipperPathGenerator::addHoles(const Length& offset) {
   }
 }
 
-void BoardClipperPathGenerator::addCopper(const QString& layerName,
-                                          const NetSignal* netsignal) {
+void BoardClipperPathGenerator::addCopper(
+    const QString& layerName, const QSet<const NetSignal*>& netsignals) {
   // polygons
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if ((polygon->getPolygon().getLayerName() != layerName) ||
-        (netsignal != nullptr)) {
+    if (polygon->getPolygon().getLayerName() != layerName) {
+      continue;
+    }
+    if ((!netsignals.isEmpty()) && (!netsignals.contains(nullptr))) {
       continue;
     }
     // outline
@@ -150,8 +152,10 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
 
   // stroke texts
   foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
-    if ((text->getText().getLayerName() != layerName) ||
-        (netsignal != nullptr)) {
+    if (text->getText().getLayerName() != layerName) {
+      continue;
+    }
+    if ((!netsignals.isEmpty()) && (!netsignals.contains(nullptr))) {
       continue;
     }
     PositiveLength width(qMax(*text->getText().getStrokeWidth(), Length(1)));
@@ -167,8 +171,11 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
 
   // planes
   foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-    if ((plane->getLayerName() != layerName) ||
-        (&plane->getNetSignal() != netsignal)) {
+    if (plane->getLayerName() != layerName) {
+      continue;
+    }
+    if ((!netsignals.isEmpty()) &&
+        (!netsignals.contains(&plane->getNetSignal()))) {
       continue;
     }
     foreach (const Path& p, plane->getFragments()) {
@@ -184,7 +191,10 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
     // polygons
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
       GraphicsLayerName polygonLayer = transform.map(polygon.getLayerName());
-      if ((polygonLayer != layerName) || (netsignal != nullptr)) {
+      if (polygonLayer != layerName) {
+        continue;
+      }
+      if ((!netsignals.isEmpty()) && (!netsignals.contains(nullptr))) {
         continue;
       }
       Path path = transform.map(polygon.getPath());
@@ -208,7 +218,10 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
     // circles
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
       GraphicsLayerName circleLayer = transform.map(circle.getLayerName());
-      if ((circleLayer != layerName) || (netsignal != nullptr)) {
+      if (circleLayer != layerName) {
+        continue;
+      }
+      if ((!netsignals.isEmpty()) && (!netsignals.contains(nullptr))) {
         continue;
       }
       Path path = Path::circle(circle.getDiameter())
@@ -232,8 +245,10 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
     // stroke texts
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
-      if ((*text->getText().getLayerName() != layerName) ||
-          (netsignal != nullptr)) {
+      if (*text->getText().getLayerName() != layerName) {
+        continue;
+      }
+      if ((!netsignals.isEmpty()) && (!netsignals.contains(nullptr))) {
         continue;
       }
       PositiveLength width(qMax(*text->getText().getStrokeWidth(), Length(1)));
@@ -248,8 +263,11 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
 
     // pads
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      if ((!pad->isOnLayer(layerName)) ||
-          (pad->getCompSigInstNetSignal() != netsignal)) {
+      if (!pad->isOnLayer(layerName)) {
+        continue;
+      }
+      if ((!netsignals.isEmpty()) &&
+          (!netsignals.contains(pad->getCompSigInstNetSignal()))) {
         continue;
       }
       Transform transform(*pad);
@@ -262,7 +280,8 @@ void BoardClipperPathGenerator::addCopper(const QString& layerName,
 
   // net segment items
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
-    if (netsegment->getNetSignal() != netsignal) {
+    if ((!netsignals.isEmpty()) &&
+        (!netsignals.contains(netsegment->getNetSignal()))) {
       continue;
     }
 

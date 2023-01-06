@@ -17,72 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_HOLEPROPERTIESDIALOG_H
-#define LIBREPCB_EDITOR_HOLEPROPERTIESDIALOG_H
+#ifndef LIBREPCB_CORE_MSGPADRESTRINGVIOLATION_H
+#define LIBREPCB_CORE_MSGPADRESTRINGVIOLATION_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../types/length.h"
+#include "../../msg/libraryelementcheckmessage.h"
+
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
+class Footprint;
+class FootprintPad;
 class Hole;
-class LengthUnit;
-
-namespace editor {
-
-class UndoStack;
-
-namespace Ui {
-class HolePropertiesDialog;
-}
 
 /*******************************************************************************
- *  Class HolePropertiesDialog
+ *  Class MsgPadRestringViolation
  ******************************************************************************/
 
 /**
- * @brief The HolePropertiesDialog class
+ * @brief The MsgPadRestringViolation class
  */
-class HolePropertiesDialog final : public QDialog {
-  Q_OBJECT
+class MsgPadRestringViolation final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgPadRestringViolation)
 
 public:
   // Constructors / Destructor
-  HolePropertiesDialog() = delete;
-  HolePropertiesDialog(const HolePropertiesDialog& other) = delete;
-  HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
-                       const LengthUnit& lengthUnit,
-                       const QString& settingsPrefix,
-                       QWidget* parent = nullptr) noexcept;
-  ~HolePropertiesDialog() noexcept;
+  MsgPadRestringViolation() = delete;
+  MsgPadRestringViolation(std::shared_ptr<const Footprint> footprint,
+                          std::shared_ptr<const FootprintPad> pad,
+                          const QString& pkgPadName,
+                          const Length& restring) noexcept;
+  MsgPadRestringViolation(const MsgPadRestringViolation& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mPad(other.mPad) {}
+  virtual ~MsgPadRestringViolation() noexcept;
 
-  // Setters
-  void setReadOnly(bool readOnly) noexcept;
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad1() const noexcept { return mPad; }
 
-  // Operator Overloadings
-  HolePropertiesDialog& operator=(const HolePropertiesDialog& rhs) = delete;
-
-private:  // Methods
-  void on_buttonBox_clicked(QAbstractButton* button);
-  bool applyChanges() noexcept;
-
-private:  // Data
-  Hole& mHole;
-  UndoStack& mUndoStack;
-  QScopedPointer<Ui::HolePropertiesDialog> mUi;
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
 
 #endif

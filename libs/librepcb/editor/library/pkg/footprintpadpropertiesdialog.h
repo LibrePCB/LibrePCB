@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/geometry/hole.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -74,12 +76,19 @@ public:
       const FootprintPadPropertiesDialog& rhs) = delete;
 
 private:  // Methods
+  void addHole() noexcept;
+  void removeSelectedHole() noexcept;
+  void removeAllHoles() noexcept;
+  void updateGeneralTabHoleWidgets() noexcept;
+  void setSelectedHole(int index) noexcept;
   void on_buttonBox_clicked(QAbstractButton* button);
   bool applyChanges() noexcept;
 
 private:  // Data
   FootprintPad& mPad;
   UndoStack& mUndoStack;
+  HoleList mHoles;
+  int mSelectedHoleIndex;
   QScopedPointer<Ui::FootprintPadPropertiesDialog> mUi;
 };
 

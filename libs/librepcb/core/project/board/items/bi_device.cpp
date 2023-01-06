@@ -189,7 +189,7 @@ BI_Device::MountType BI_Device::determineMountType() const noexcept {
     bool hasThtPads = false;
     bool hasSmtPads = false;
     foreach (const BI_FootprintPad* pad, mPads) {
-      if (pad->getLibPad().getDrillDiameter() > 0) {
+      if (pad->getLibPad().isTht()) {
         hasThtPads = true;
       } else {
         hasSmtPads = true;

@@ -69,11 +69,11 @@ BoardSideSelectorWidget::~BoardSideSelectorWidget() noexcept {
  *  Getters
  ******************************************************************************/
 
-FootprintPad::BoardSide BoardSideSelectorWidget::getCurrentBoardSide() const
+FootprintPad::ComponentSide BoardSideSelectorWidget::getCurrentBoardSide() const
     noexcept {
-  if (mBtnTop->isChecked()) return FootprintPad::BoardSide::TOP;
-  if (mBtnBottom->isChecked()) return FootprintPad::BoardSide::BOTTOM;
-  return FootprintPad::BoardSide::TOP;
+  if (mBtnTop->isChecked()) return FootprintPad::ComponentSide::Top;
+  if (mBtnBottom->isChecked()) return FootprintPad::ComponentSide::Bottom;
+  return FootprintPad::ComponentSide::Top;
 }
 
 /*******************************************************************************
@@ -81,9 +81,9 @@ FootprintPad::BoardSide BoardSideSelectorWidget::getCurrentBoardSide() const
  ******************************************************************************/
 
 void BoardSideSelectorWidget::setCurrentBoardSide(
-    FootprintPad::BoardSide side) noexcept {
-  mBtnTop->setChecked(side == FootprintPad::BoardSide::TOP);
-  mBtnBottom->setChecked(side == FootprintPad::BoardSide::BOTTOM);
+    FootprintPad::ComponentSide side) noexcept {
+  mBtnTop->setChecked(side == FootprintPad::ComponentSide::Top);
+  mBtnBottom->setChecked(side == FootprintPad::ComponentSide::Bottom);
 }
 
 /*******************************************************************************

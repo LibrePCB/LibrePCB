@@ -83,7 +83,7 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
   setToolTip(mPad.getDisplayText());
 
   // set Z value
-  if ((mLibPad.getBoardSide() == FootprintPad::BoardSide::BOTTOM) !=
+  if ((mLibPad.getComponentSide() == FootprintPad::ComponentSide::Bottom) !=
       mPad.getMirrored()) {
     setZValue(Board::ZValue_FootprintPadsBottom);
   } else {
@@ -93,12 +93,13 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
   // set layers
   disconnectLayerEditedSlots();
   mPadLayer = getLayer(mLibPad.getLayerName());
-  if (mLibPad.getBoardSide() == FootprintPad::BoardSide::THT) {
+  if (mLibPad.isTht()) {
     mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
     mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
     mTopCreamMaskLayer = nullptr;
     mBottomCreamMaskLayer = nullptr;
-  } else if (mLibPad.getBoardSide() == FootprintPad::BoardSide::BOTTOM) {
+  } else if (mLibPad.getComponentSide() ==
+             FootprintPad::ComponentSide::Bottom) {
     mTopStopMaskLayer = nullptr;
     mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
     mTopCreamMaskLayer = nullptr;

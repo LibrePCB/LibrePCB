@@ -481,7 +481,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
         // to pads of no net.
         throwPadNotConnectedException();
       }
-      if (pad->getLibPad().getBoardSide() != FootprintPad::BoardSide::THT) {
+      if (!pad->getLibPad().isTht()) {
         layer = board.getLayerStack().getLayer(pad->getLayerName());
       }
     } else if (BI_NetLine* netline = qobject_cast<BI_NetLine*>(item)) {
@@ -599,8 +599,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(Board& board) noexcept {
               {netsignal})) {
         if (mCurrentSnapActive || mTargetPos == pad->getPosition()) {
           otherAnchors.append(pad);
-          if (mAddVia &&
-              pad->getLibPad().getBoardSide() == FootprintPad::BoardSide::THT) {
+          if (mAddVia && pad->getLibPad().isTht()) {
             mCurrentLayerName = mViaLayerName;
           }
         }
@@ -793,8 +792,7 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
       isOnVia = true;
     } else if (BI_FootprintPad* pad = qobject_cast<BI_FootprintPad*>(item)) {
       mTargetPos = pad->getPosition();
-      isOnVia =
-          (pad->getLibPad().getBoardSide() == FootprintPad::BoardSide::THT);
+      isOnVia = (pad->getLibPad().isTht());
     } else if (BI_NetPoint* netpoint = qobject_cast<BI_NetPoint*>(item)) {
       mTargetPos = netpoint->getPosition();
     } else if (BI_NetLine* netline = qobject_cast<BI_NetLine*>(item)) {
@@ -922,8 +920,7 @@ void BoardEditorState_DrawTrace::layerChanged(
     Point startPos = mFixedStartAnchor->getPosition();
     BI_Via* via = dynamic_cast<BI_Via*>(mFixedStartAnchor);
     BI_FootprintPad* pad = dynamic_cast<BI_FootprintPad*>(mFixedStartAnchor);
-    if (pad &&
-        (pad->getLibPad().getBoardSide() != FootprintPad::BoardSide::THT)) {
+    if (pad && (!pad->getLibPad().isTht())) {
       pad = nullptr;
     }
     if (via || pad) {

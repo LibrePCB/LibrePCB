@@ -156,11 +156,14 @@ void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
     case FootprintPad::Event::ShapeChanged:
     case FootprintPad::Event::WidthChanged:
     case FootprintPad::Event::HeightChanged:
-    case FootprintPad::Event::DrillDiameterChanged:
       setShape(pad.toQPainterPathPx());
       break;
-    case FootprintPad::Event::BoardSideChanged:
+    case FootprintPad::Event::ComponentSideChanged:
       setLayerName(pad.getLayerName());
+      break;
+    case FootprintPad::Event::HolesEdited:
+      setLayerName(pad.getLayerName());
+      setShape(pad.toQPainterPathPx());
       break;
     default:
       qWarning()

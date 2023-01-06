@@ -318,9 +318,13 @@ QSet<Point> MeasureTool::snapCandidatesFromFootprint(
     path.addVertex(Point(0, -p.getHeight() / 2));
     candidates |= snapCandidatesFromPath(transform.map(
         path.rotated(p.getRotation()).translated(p.getPosition())));
-    if (p.getDrillDiameter() > 0) {
-      candidates |= snapCandidatesFromCircle(transform.map(p.getPosition()),
-                                             *p.getDrillDiameter());
+    const Transform padTransform(p.getPosition(), p.getRotation());
+    for (const Hole& h : p.getHoles()) {
+      foreach (const Vertex& vertex,
+               padTransform.map(h.getPath())->getVertices()) {
+        candidates |= snapCandidatesFromCircle(transform.map(vertex.getPos()),
+                                               *h.getDiameter());
+      }
     }
   }
   for (const Polygon& p : footprint.getPolygons()) {

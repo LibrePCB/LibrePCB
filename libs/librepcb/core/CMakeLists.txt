@@ -256,6 +256,8 @@ add_library(
   library/pkg/msg/msgpadclearanceviolation.h
   library/pkg/msg/msgpadoverlapswithplacement.cpp
   library/pkg/msg/msgpadoverlapswithplacement.h
+  library/pkg/msg/msgpadrestringviolation.cpp
+  library/pkg/msg/msgpadrestringviolation.h
   library/pkg/msg/msgwrongfootprinttextlayer.cpp
   library/pkg/msg/msgwrongfootprinttextlayer.h
   library/pkg/package.cpp

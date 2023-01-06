@@ -17,12 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_HOLEPROPERTIESDIALOG_H
-#define LIBREPCB_EDITOR_HOLEPROPERTIESDIALOG_H
+#ifndef LIBREPCB_EDITOR_HOLEEDITORWIDGET_H
+#define LIBREPCB_EDITOR_HOLEEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/geometry/hole.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -31,51 +33,60 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Hole;
 class LengthUnit;
+class Path;
 
 namespace editor {
 
-class UndoStack;
-
 namespace Ui {
-class HolePropertiesDialog;
+class HoleEditorWidget;
 }
 
 /*******************************************************************************
- *  Class HolePropertiesDialog
+ *  Class HoleEditorWidget
  ******************************************************************************/
 
 /**
- * @brief The HolePropertiesDialog class
+ * @brief The HoleEditorWidget class
  */
-class HolePropertiesDialog final : public QDialog {
+class HoleEditorWidget : public QWidget {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  HolePropertiesDialog() = delete;
-  HolePropertiesDialog(const HolePropertiesDialog& other) = delete;
-  HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
-                       const LengthUnit& lengthUnit,
-                       const QString& settingsPrefix,
-                       QWidget* parent = nullptr) noexcept;
-  ~HolePropertiesDialog() noexcept;
+  HoleEditorWidget() = delete;
+  explicit HoleEditorWidget(QWidget* parent = nullptr) noexcept;
+  HoleEditorWidget(const HoleEditorWidget& other) = delete;
+  virtual ~HoleEditorWidget() noexcept;
+
+  // Getters
+  const Hole& getHole() const noexcept { return mHole; }
 
   // Setters
   void setReadOnly(bool readOnly) noexcept;
+  void setHole(const Hole& hole) noexcept;
+
+  // General Methods
+  void setFocusToDiameterEdit() noexcept;
+  void configureClientSettings(const LengthUnit& lengthUnit,
+                               const QString& settingsPrefix) noexcept;
 
   // Operator Overloadings
-  HolePropertiesDialog& operator=(const HolePropertiesDialog& rhs) = delete;
+  HoleEditorWidget& operator=(const HoleEditorWidget& rhs) = delete;
+
+signals:
+  void holeChanged(const Hole& hole);
 
 private:  // Methods
-  void on_buttonBox_clicked(QAbstractButton* button);
-  bool applyChanges() noexcept;
+  void updatePathFromCircularTab() noexcept;
+  void updatePathFromLinearTab() noexcept;
+  void updateCircularTabFromPath(const Path& path) noexcept;
+  void updateLinearTabFromPath(const Path& path) noexcept;
+  void updateLinearOuterSize(const Path& path) noexcept;
 
 private:  // Data
-  Hole& mHole;
-  UndoStack& mUndoStack;
-  QScopedPointer<Ui::HolePropertiesDialog> mUi;
+  QScopedPointer<Ui::HoleEditorWidget> mUi;
+  Hole mHole;
 };
 
 /*******************************************************************************

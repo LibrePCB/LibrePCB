@@ -62,6 +62,7 @@ protected:  // Methods
   void checkWrongTextLayers(MsgList& msgs) const;
   void checkPadsClearanceToPads(MsgList& msgs) const;
   void checkPadsClearanceToPlacement(MsgList& msgs) const;
+  void checkPadsRestring(MsgList& msgs) const;
 
 private:  // Data
   const Package& mPackage;

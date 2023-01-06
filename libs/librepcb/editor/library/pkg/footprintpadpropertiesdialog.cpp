@@ -45,20 +45,46 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   : QDialog(parent),
     mPad(pad),
     mUndoStack(undoStack),
+    mHoles(mPad.getHoles()),
+    mSelectedHoleIndex(-1),
     mUi(new Ui::FootprintPadPropertiesDialog) {
   mUi->setupUi(this);
   mUi->edtWidth->configure(lengthUnit, LengthEditBase::Steps::generic(),
                            settingsPrefix % "/width");
   mUi->edtHeight->configure(lengthUnit, LengthEditBase::Steps::generic(),
                             settingsPrefix % "/height");
-  mUi->edtDrillDiameter->configure(lengthUnit,
-                                   LengthEditBase::Steps::drillDiameter(),
-                                   settingsPrefix % "/drill_diameter");
+  mUi->edtHoleDiameter->configure(lengthUnit,
+                                  LengthEditBase::Steps::drillDiameter(),
+                                  settingsPrefix % "/hole_diameter");
   mUi->edtPosX->configure(lengthUnit, LengthEditBase::Steps::generic(),
                           settingsPrefix % "/pos_x");
   mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
                           settingsPrefix % "/pos_y");
   mUi->edtRotation->setSingleStep(90.0);  // [°]
+  mUi->holeEditorWidget->configureClientSettings(
+      lengthUnit, settingsPrefix % "/hole_editor");
+  connect(mUi->lblHoleDetails, &QLabel::linkActivated, this,
+          [this]() { mUi->tabWidget->setCurrentWidget(mUi->tabHoles); });
+  connect(mUi->btnConvertToSmt, &QToolButton::clicked, this,
+          &FootprintPadPropertiesDialog::removeAllHoles);
+  connect(mUi->btnConvertToTht, &QToolButton::clicked, this,
+          &FootprintPadPropertiesDialog::addHole);
+  connect(mUi->holeEditorWidget, &HoleEditorWidget::holeChanged, this,
+          [this](const Hole& hole) {
+            const int index = qBound(0, mSelectedHoleIndex, mHoles.count() - 1);
+            if (const std::shared_ptr<Hole> holePtr = mHoles.value(index)) {
+              *holePtr = hole;
+              updateGeneralTabHoleWidgets();
+            }
+          });
+  connect(mUi->btnPreviousHole, &QToolButton::clicked, this,
+          [this]() { setSelectedHole(mSelectedHoleIndex - 1); });
+  connect(mUi->btnNextHole, &QToolButton::clicked, this,
+          [this]() { setSelectedHole(mSelectedHoleIndex + 1); });
+  connect(mUi->btnRemoveHole, &QToolButton::clicked, this,
+          &FootprintPadPropertiesDialog::removeSelectedHole);
+  connect(mUi->btnAddHole, &QToolButton::clicked, this,
+          &FootprintPadPropertiesDialog::addHole);
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &FootprintPadPropertiesDialog::on_buttonBox_clicked);
 
@@ -66,23 +92,27 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   // See https://github.com/LibrePCB/LibrePCB/issues/946.
   connect(mUi->edtWidth, &PositiveLengthEdit::valueChanged, this,
           [this](const PositiveLength& value) {
-            if (value < mUi->edtDrillDiameter->getValue()) {
-              mUi->edtDrillDiameter->setValue(positiveToUnsigned(value));
+            if (value < mUi->edtHoleDiameter->getValue()) {
+              mUi->edtHoleDiameter->setValue(value);
             }
           });
   connect(mUi->edtHeight, &PositiveLengthEdit::valueChanged, this,
           [this](const PositiveLength& value) {
-            if (value < mUi->edtDrillDiameter->getValue()) {
-              mUi->edtDrillDiameter->setValue(positiveToUnsigned(value));
+            if (value < mUi->edtHoleDiameter->getValue()) {
+              mUi->edtHoleDiameter->setValue(value);
             }
           });
-  connect(mUi->edtDrillDiameter, &UnsignedLengthEdit::valueChanged, this,
-          [this](const UnsignedLength& value) {
+  connect(mUi->edtHoleDiameter, &PositiveLengthEdit::valueChanged, this,
+          [this](const PositiveLength& value) {
             if (value > mUi->edtWidth->getValue()) {
-              mUi->edtWidth->setValue(PositiveLength(*value));
+              mUi->edtWidth->setValue(value);
             }
             if (value > mUi->edtHeight->getValue()) {
-              mUi->edtHeight->setValue(PositiveLength(*value));
+              mUi->edtHeight->setValue(value);
+            }
+            if (const std::shared_ptr<Hole> holePtr = mHoles.value(0)) {
+              holePtr->setDiameter(value);
+              mUi->holeEditorWidget->setHole(*holePtr);
             }
           });
 
@@ -96,19 +126,10 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
     }
   }
   mUi->cbxPackagePad->setCurrentIndex(currentPadIndex);
-  switch (mPad.getBoardSide()) {
-    case FootprintPad::BoardSide::TOP:
-      mUi->rbtnBoardSideTop->setChecked(true);
-      break;
-    case FootprintPad::BoardSide::BOTTOM:
-      mUi->rbtnBoardSideBottom->setChecked(true);
-      break;
-    case FootprintPad::BoardSide::THT:
-      mUi->rbtnBoardSideTht->setChecked(true);
-      break;
-    default:
-      Q_ASSERT(false);
-      break;
+  if (mPad.getComponentSide() == FootprintPad::ComponentSide::Bottom) {
+    mUi->rbtnComponentSideBottom->setChecked(true);
+  } else {
+    mUi->rbtnComponentSideTop->setChecked(true);
   }
   switch (mPad.getShape()) {
     case FootprintPad::Shape::ROUND:
@@ -126,15 +147,14 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   }
   mUi->edtWidth->setValue(mPad.getWidth());
   mUi->edtHeight->setValue(mPad.getHeight());
-  mUi->edtDrillDiameter->setValue(mPad.getDrillDiameter());
   mUi->edtPosX->setValue(mPad.getPosition().getX());
   mUi->edtPosY->setValue(mPad.getPosition().getY());
   mUi->edtRotation->setValue(mPad.getRotation());
+  updateGeneralTabHoleWidgets();
+  setSelectedHole(0);
 
-  // disable drill diameter for SMT pads
-  mUi->edtDrillDiameter->setEnabled(mUi->rbtnBoardSideTht->isChecked());
-  connect(mUi->rbtnBoardSideTht, &QRadioButton::toggled, mUi->edtDrillDiameter,
-          &LengthEdit::setEnabled);
+  // Always select first tab.
+  mUi->tabWidget->setCurrentIndex(0);
 }
 
 FootprintPadPropertiesDialog::~FootprintPadPropertiesDialog() noexcept {
@@ -146,18 +166,22 @@ FootprintPadPropertiesDialog::~FootprintPadPropertiesDialog() noexcept {
 
 void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->cbxPackagePad->setDisabled(readOnly);
-  mUi->rbtnBoardSideTht->setDisabled(readOnly);
-  mUi->rbtnBoardSideTop->setDisabled(readOnly);
-  mUi->rbtnBoardSideBottom->setDisabled(readOnly);
+  mUi->rbtnComponentSideTop->setDisabled(readOnly);
+  mUi->rbtnComponentSideBottom->setDisabled(readOnly);
   mUi->rbtnShapeRound->setDisabled(readOnly);
   mUi->rbtnShapeRect->setDisabled(readOnly);
   mUi->rbtnShapeOctagon->setDisabled(readOnly);
-  mUi->edtDrillDiameter->setReadOnly(readOnly);
+  mUi->edtHoleDiameter->setReadOnly(readOnly);
+  mUi->btnConvertToSmt->setEnabled(!readOnly);
+  mUi->btnConvertToTht->setEnabled(!readOnly);
   mUi->edtWidth->setReadOnly(readOnly);
   mUi->edtHeight->setReadOnly(readOnly);
   mUi->edtPosX->setReadOnly(readOnly);
   mUi->edtPosY->setReadOnly(readOnly);
   mUi->edtRotation->setReadOnly(readOnly);
+  mUi->btnRemoveHole->setVisible(!readOnly);
+  mUi->btnAddHole->setVisible(!readOnly);
+  mUi->holeEditorWidget->setReadOnly(readOnly);
   if (readOnly) {
     mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
   } else {
@@ -171,6 +195,61 @@ void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void FootprintPadPropertiesDialog::addHole() noexcept {
+  mHoles.append(std::make_shared<Hole>(
+      Uuid::createRandom(), PositiveLength(800000), makeNonEmptyPath(Point())));
+  setSelectedHole(mHoles.count() - 1);
+  updateGeneralTabHoleWidgets();
+}
+
+void FootprintPadPropertiesDialog::removeSelectedHole() noexcept {
+  mHoles.remove(mSelectedHoleIndex);
+  setSelectedHole(mSelectedHoleIndex);
+  updateGeneralTabHoleWidgets();
+}
+
+void FootprintPadPropertiesDialog::removeAllHoles() noexcept {
+  mHoles.clear();
+  setSelectedHole(0);
+  updateGeneralTabHoleWidgets();
+}
+
+void FootprintPadPropertiesDialog::updateGeneralTabHoleWidgets() noexcept {
+  if (mHoles.isEmpty()) {
+    mUi->lblHoleDetails->setVisible(false);
+    mUi->edtHoleDiameter->setVisible(false);
+    mUi->btnConvertToSmt->setVisible(false);
+    mUi->btnConvertToTht->setVisible(true);
+  } else {
+    mUi->btnConvertToTht->setVisible(false);
+    if (mHoles.count() == 1) {
+      mUi->lblHoleDetails->setVisible(false);
+      mUi->edtHoleDiameter->setVisible(true);
+      mUi->edtHoleDiameter->setValue(mHoles.first()->getDiameter());
+    } else {
+      mUi->edtHoleDiameter->setVisible(false);
+      mUi->lblHoleDetails->setVisible(true);
+    }
+    mUi->btnConvertToSmt->setVisible(true);
+  }
+}
+
+void FootprintPadPropertiesDialog::setSelectedHole(int index) noexcept {
+  mSelectedHoleIndex = qBound(0, index, mHoles.count() - 1);
+  const std::shared_ptr<Hole> hole = mHoles.value(mSelectedHoleIndex);
+  if (hole) {
+    mUi->lblSelectedHole->setText(
+        tr("Hole %1 of %2").arg(mSelectedHoleIndex + 1).arg(mHoles.count()));
+    mUi->holeEditorWidget->setHole(*hole);
+  } else {
+    mUi->lblSelectedHole->setText(tr("Pad has no holes"));
+  }
+  mUi->btnPreviousHole->setEnabled(mSelectedHoleIndex > 0);
+  mUi->btnNextHole->setEnabled(mSelectedHoleIndex < (mHoles.count() - 1));
+  mUi->btnRemoveHole->setEnabled(!mHoles.isEmpty());
+  mUi->holeEditorWidget->setVisible(hole ? true : false);
+}
 
 void FootprintPadPropertiesDialog::on_buttonBox_clicked(
     QAbstractButton* button) {
@@ -198,12 +277,10 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     tl::optional<Uuid> pkgPad =
         Uuid::tryFromString(mUi->cbxPackagePad->currentData().toString());
     cmd->setPackagePadUuid(pkgPad, false);
-    if (mUi->rbtnBoardSideTop->isChecked()) {
-      cmd->setBoardSide(FootprintPad::BoardSide::TOP, false);
-    } else if (mUi->rbtnBoardSideBottom->isChecked()) {
-      cmd->setBoardSide(FootprintPad::BoardSide::BOTTOM, false);
-    } else if (mUi->rbtnBoardSideTht->isChecked()) {
-      cmd->setBoardSide(FootprintPad::BoardSide::THT, false);
+    if (mUi->rbtnComponentSideTop->isChecked()) {
+      cmd->setComponentSide(FootprintPad::ComponentSide::Top, false);
+    } else if (mUi->rbtnComponentSideBottom->isChecked()) {
+      cmd->setComponentSide(FootprintPad::ComponentSide::Bottom, false);
     } else {
       Q_ASSERT(false);
     }
@@ -218,7 +295,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     }
     cmd->setWidth(mUi->edtWidth->getValue(), false);
     cmd->setHeight(mUi->edtHeight->getValue(), false);
-    cmd->setDrillDiameter(mUi->edtDrillDiameter->getValue(), false);
+    cmd->setHoles(mHoles, false);
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
     cmd->setRotation(mUi->edtRotation->getValue(), false);

@@ -72,11 +72,10 @@ QVector<QPair<Point, Point>> BoardAirWiresBuilder::buildAirWires() const {
       if (&pad->getBoard() != &mBoard) continue;
       const Point& pos = pad->getPosition();
       int id = builder.addPoint(pos);
-      pointLayerMap[id] = std::make_pair(
-          pos,
-          (pad->getLibPad().getBoardSide() == FootprintPad::BoardSide::THT)
-              ? QString()  // on all layers
-              : pad->getLayerName());
+      pointLayerMap[id] = std::make_pair(pos,
+                                         (pad->getLibPad().isTht())
+                                             ? QString()  // on all layers
+                                             : pad->getLayerName());
       anchorMap[pad] = id;
     }
   }
