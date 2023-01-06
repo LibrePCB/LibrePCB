@@ -279,6 +279,8 @@ add_library(
   project/board/board.h
   project/board/boardairwiresbuilder.cpp
   project/board/boardairwiresbuilder.h
+  project/board/boardd356netlistexport.cpp
+  project/board/boardd356netlistexport.h
   project/board/boarddesignrules.cpp
   project/board/boarddesignrules.h
   project/board/boardfabricationoutputsettings.cpp
