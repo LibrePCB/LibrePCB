@@ -48,10 +48,12 @@
 #include "unplacedcomponentsdock.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/graphics/primitivepathgraphicsitem.h>
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardd356netlistexport.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/boardpainter.h>
 #include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
@@ -417,6 +419,8 @@ void BoardEditor::createActions() noexcept {
           dialog.exec();
         }
       }));
+  mActionGenerateD356Netlist.reset(cmd.generateD356Netlist.createAction(
+      this, this, &BoardEditor::execD356NetlistExportDialog));
   mActionOrderPcb.reset(cmd.orderPcb.createAction(
       this, this, [this]() { mProjectEditor.execOrderPcbDialog(this); }));
   mActionNewBoard.reset(
@@ -778,6 +782,7 @@ void BoardEditor::createMenus() noexcept {
     smb.addAction(mActionGenerateBom);
     smb.addAction(mActionGenerateFabricationData);
     smb.addAction(mActionGeneratePickPlace);
+    smb.addAction(mActionGenerateD356Netlist);
   }
   mb.addSeparator();
   mb.addAction(mActionPrint);
@@ -1332,6 +1337,34 @@ void BoardEditor::execGraphicsExportDialog(
     dialog.exec();
   } catch (const Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
+  }
+}
+
+void BoardEditor::execD356NetlistExportDialog() noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return;
+
+  try {
+    QString path = "output/{{VERSION}}/{{PROJECT}}_Netlist.d356";
+    path =
+        AttributeSubstitutor::substitute(path, board, [&](const QString& str) {
+          return FilePath::cleanFileName(
+              str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+        });
+    path = FileDialog::getSaveFileName(
+        this, tr("Export project to *.lppz"),
+        mProject.getPath().getPathTo(path).toStr(), "*.d356");
+    if (path.isEmpty()) return;
+    if (!path.contains(".")) path.append(".d356");
+
+    FilePath fp(path);
+    qDebug().nospace() << "Export IPC D-356A netlist to " << fp.toNative()
+                       << "...";
+    BoardD356NetlistExport exp(*board);
+    FileUtils::writeFile(fp, exp.generate());  // can throw
+    qDebug() << "Successfully exported netlist.";
+  } catch (const Exception& e) {
+    QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
 }
 

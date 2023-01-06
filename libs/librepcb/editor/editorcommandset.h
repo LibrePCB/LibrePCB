@@ -529,6 +529,15 @@ public:
       {QKeySequence(Qt::Key_F11)},
       &categoryImportExport,
   };
+  EditorCommand generateD356Netlist{
+      "generate_d356_netlist",  // clang-format break
+      QT_TR_NOOP("Generate IPC-D-356A Netlist"),
+      QT_TR_NOOP("Generate netlist file for automated PCB testing"),
+      QIcon(":/img/actions/generate_bom.png"),  // No netlist icon yet.
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryImportExport,
+  };
   EditorCommand orderPcb{
       "order_pcb",  // clang-format break
       QT_TR_NOOP("Order PCB"),
