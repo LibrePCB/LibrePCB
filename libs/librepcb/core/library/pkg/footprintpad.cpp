@@ -177,18 +177,19 @@ bool FootprintPad::isOnLayer(const QString& name) const noexcept {
 }
 
 Path FootprintPad::getOutline(const Length& expansion) const noexcept {
-  Length width = mWidth + (expansion * 2);
-  Length height = mHeight + (expansion * 2);
+  const Length width = mWidth + (expansion * 2);
+  const Length height = mHeight + (expansion * 2);
   if (width > 0 && height > 0) {
-    PositiveLength pWidth(width);
-    PositiveLength pHeight(height);
+    const PositiveLength pWidth(width);
+    const PositiveLength pHeight(height);
+    const UnsignedLength cornerRadius(std::max(expansion, Length(0)));
     switch (mShape) {
       case Shape::ROUND:
         return Path::obround(pWidth, pHeight);
       case Shape::RECT:
-        return Path::centeredRect(pWidth, pHeight);
+        return Path::centeredRect(pWidth, pHeight, cornerRadius);
       case Shape::OCTAGON:
-        return Path::octagon(pWidth, pHeight);
+        return Path::octagon(pWidth, pHeight, cornerRadius);
       default:
         Q_ASSERT(false);
         break;

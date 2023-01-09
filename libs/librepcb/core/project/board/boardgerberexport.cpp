@@ -612,9 +612,10 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
       mBoard.getDesignRules().doesViaRequireStopMask(*via.getDrillDiameter());
   if (drawCopper || drawStopMask) {
     PositiveLength outerDiameter = via.getSize();
+    UnsignedLength radius(0);
     if (drawStopMask) {
-      outerDiameter += UnsignedLength(
-          mBoard.getDesignRules().calcStopMaskClearance(*via.getSize()) * 2);
+      radius = mBoard.getDesignRules().calcStopMaskClearance(*via.getSize());
+      outerDiameter += UnsignedLength(radius * 2);
     }
 
     // Via attributes (only on copper layers).
@@ -632,15 +633,15 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
         break;
       }
       case Via::Shape::Square: {
-        gen.flashRect(via.getPosition(), outerDiameter, outerDiameter,
-                      UnsignedLength(0), Angle::deg0(), function, net,
-                      QString(), QString(), QString());
+        gen.flashRect(via.getPosition(), outerDiameter, outerDiameter, radius,
+                      Angle::deg0(), function, net, QString(), QString(),
+                      QString());
         break;
       }
       case Via::Shape::Octagon: {
         gen.flashOctagon(via.getPosition(), outerDiameter, outerDiameter,
-                         UnsignedLength(0), Angle::deg0(), function, net,
-                         QString(), QString(), QString());
+                         radius, Angle::deg0(), function, net, QString(),
+                         QString(), QString());
         break;
       }
       default: { throw LogicError(__FILE__, __LINE__); }
@@ -743,17 +744,20 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
   const FootprintPad& libPad = pad.getLibPad();
   Length width = *libPad.getWidth();
   Length height = *libPad.getHeight();
+  UnsignedLength radius(0);
   if (isOnSolderMaskTop || isOnSolderMaskBottom) {
     Length size = qMin(width, height);
-    UnsignedLength clearance =
-        mBoard.getDesignRules().calcStopMaskClearance(size);
-    width += clearance * 2;
-    height += clearance * 2;
+    radius = mBoard.getDesignRules().calcStopMaskClearance(size);
+    width += radius * 2;
+    height += radius * 2;
   } else if (isOnSolderPasteTop || isOnSolderPasteBottom) {
     Length size = qMin(width, height);
     Length clearance = -mBoard.getDesignRules().calcCreamMaskClearance(size);
     width += clearance * 2;
     height += clearance * 2;
+    if (clearance > 0) {
+      radius = UnsignedLength(clearance);
+    }
   }
 
   if ((width <= 0) || (height <= 0)) {
@@ -794,12 +798,12 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
       break;
     }
     case FootprintPad::Shape::RECT: {
-      gen.flashRect(pad.getPosition(), pWidth, pHeight, UnsignedLength(0),
+      gen.flashRect(pad.getPosition(), pWidth, pHeight, radius,
                     pad.getRotation(), function, net, component, pin, signal);
       break;
     }
     case FootprintPad::Shape::OCTAGON: {
-      gen.flashOctagon(pad.getPosition(), pWidth, pHeight, UnsignedLength(0),
+      gen.flashOctagon(pad.getPosition(), pWidth, pHeight, radius,
                        pad.getRotation(), function, net, component, pin,
                        signal);
       break;
