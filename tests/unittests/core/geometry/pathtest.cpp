@@ -193,6 +193,37 @@ TEST_F(PathTest, testCircle) {
   EXPECT_TRUE(path.isClosed());
 }
 
+TEST_F(PathTest, testCenteredRectRoundedCorners) {
+  Path expected = Path({
+      Vertex(Point(-30000, 75000), Angle::deg0()),
+      Vertex(Point(30000, 75000), -Angle::deg90()),
+      Vertex(Point(50000, 55000), Angle::deg0()),
+      Vertex(Point(50000, -55000), -Angle::deg90()),
+      Vertex(Point(30000, -75000), Angle::deg0()),
+      Vertex(Point(-30000, -75000), -Angle::deg90()),
+      Vertex(Point(-50000, -55000), Angle::deg0()),
+      Vertex(Point(-50000, 55000), -Angle::deg90()),
+      Vertex(Point(-30000, 75000), Angle::deg0()),
+  });
+  Path actual = Path::centeredRect(
+      PositiveLength(100000), PositiveLength(150000), UnsignedLength(20000));
+  EXPECT_EQ(str(expected), str(actual));
+}
+
+TEST_F(PathTest, testCenteredRectRoundedCornersSaturation) {
+  Path expected = Path::obround(PositiveLength(100000), PositiveLength(150000));
+  Path actual = Path::centeredRect(
+      PositiveLength(100000), PositiveLength(150000), UnsignedLength(60000));
+  EXPECT_EQ(str(expected), str(actual));
+}
+
+TEST_F(PathTest, testOctagonRoundedCornersSaturation) {
+  Path expected = Path::obround(PositiveLength(100000), PositiveLength(150000));
+  Path actual = Path::octagon(PositiveLength(100000), PositiveLength(150000),
+                              UnsignedLength(60000));
+  EXPECT_EQ(str(expected), str(actual));
+}
+
 // Test to reproduce https://github.com/LibrePCB/LibrePCB/issues/974
 TEST_F(PathTest, testFlatArc) {
   Path expected = Path({
