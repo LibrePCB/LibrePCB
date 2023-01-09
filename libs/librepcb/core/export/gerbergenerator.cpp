@@ -255,12 +255,13 @@ void GerberGenerator::flashCircle(const Point& pos, const PositiveLength& dia,
 }
 
 void GerberGenerator::flashRect(const Point& pos, const PositiveLength& w,
-                                const PositiveLength& h, const Angle& rot,
+                                const PositiveLength& h,
+                                const UnsignedLength& radius, const Angle& rot,
                                 Function function,
                                 const tl::optional<QString>& net,
                                 const QString& component, const QString& pin,
                                 const QString& signal) noexcept {
-  setCurrentAperture(mApertureList->addRect(w, h, rot, function));
+  setCurrentAperture(mApertureList->addRect(w, h, radius, rot, function));
   setCurrentAttributes(tl::nullopt,  // Aperture: Function
                        net,  // Object: Net name
                        component,  // Object: Component designator
@@ -299,12 +300,13 @@ void GerberGenerator::flashObround(const Point& pos, const PositiveLength& w,
 }
 
 void GerberGenerator::flashOctagon(const Point& pos, const PositiveLength& w,
-                                   const PositiveLength& h, const Angle& rot,
-                                   Function function,
+                                   const PositiveLength& h,
+                                   const UnsignedLength& radius,
+                                   const Angle& rot, Function function,
                                    const tl::optional<QString>& net,
                                    const QString& component, const QString& pin,
                                    const QString& signal) noexcept {
-  setCurrentAperture(mApertureList->addOctagon(w, h, rot, function));
+  setCurrentAperture(mApertureList->addOctagon(w, h, radius, rot, function));
   setCurrentAttributes(tl::nullopt,  // Aperture: Function
                        net,  // Object: Net name
                        component,  // Object: Component designator

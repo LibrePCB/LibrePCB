@@ -119,26 +119,30 @@ public:
    *
    * @param w         Width.
    * @param h         Height.
+   * @param r         Corner radius.
    * @param rot       Rotation.
    * @param function  Function attribute.
    *
    * @return Aperture number.
    */
   int addRect(const PositiveLength& w, const PositiveLength& h,
-              const Angle& rot, Function function) noexcept;
+              const UnsignedLength& r, const Angle& rot,
+              Function function) noexcept;
 
   /**
    * @brief Add an octagon aperture
    *
    * @param w         Width.
    * @param h         Height.
+   * @param r         Corner radius.
    * @param rot       Rotation.
    * @param function  Function attribute.
    *
    * @return Aperture number.
    */
   int addOctagon(const PositiveLength& w, const PositiveLength& h,
-                 const Angle& rot, Function function) noexcept;
+                 const UnsignedLength& r, const Angle& rot,
+                 Function function) noexcept;
 
   /**
    * @brief Add a component main aperture (for component layers only)
@@ -177,8 +181,20 @@ private:  // Methods
    *
    * @return Aperture number.
    */
-  int addOutline(const QString& name, Path path, const Angle& rot,
+  int addOutline(const QString& name, const Path& path, const Angle& rot,
                  Function function) noexcept;
+
+  /**
+   * @brief Internal helper for #addOutline()
+   *
+   * @param path      The vertices. ATTENTION: After closing the path, it must
+   *                  contain at least 4 vertices and it must not contain any
+   *                  arc segment (i.e. all angles must be zero)!!!
+   * @param rot       Rotation.
+   *
+   * @return Aperture macro content.
+   */
+  QString buildOutlineMacro(Path path, const Angle& rot) const noexcept;
 
   /**
    * @brief Helper method to actually add a new or get an existing aperture

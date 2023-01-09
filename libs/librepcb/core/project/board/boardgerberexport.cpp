@@ -633,14 +633,14 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
       }
       case Via::Shape::Square: {
         gen.flashRect(via.getPosition(), outerDiameter, outerDiameter,
-                      Angle::deg0(), function, net, QString(), QString(),
-                      QString());
+                      UnsignedLength(0), Angle::deg0(), function, net,
+                      QString(), QString(), QString());
         break;
       }
       case Via::Shape::Octagon: {
         gen.flashOctagon(via.getPosition(), outerDiameter, outerDiameter,
-                         Angle::deg0(), function, net, QString(), QString(),
-                         QString());
+                         UnsignedLength(0), Angle::deg0(), function, net,
+                         QString(), QString(), QString());
         break;
       }
       default: { throw LogicError(__FILE__, __LINE__); }
@@ -794,13 +794,14 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
       break;
     }
     case FootprintPad::Shape::RECT: {
-      gen.flashRect(pad.getPosition(), pWidth, pHeight, pad.getRotation(),
-                    function, net, component, pin, signal);
+      gen.flashRect(pad.getPosition(), pWidth, pHeight, UnsignedLength(0),
+                    pad.getRotation(), function, net, component, pin, signal);
       break;
     }
     case FootprintPad::Shape::OCTAGON: {
-      gen.flashOctagon(pad.getPosition(), pWidth, pHeight, pad.getRotation(),
-                       function, net, component, pin, signal);
+      gen.flashOctagon(pad.getPosition(), pWidth, pHeight, UnsignedLength(0),
+                       pad.getRotation(), function, net, component, pin,
+                       signal);
       break;
     }
     default: { throw LogicError(__FILE__, __LINE__); }

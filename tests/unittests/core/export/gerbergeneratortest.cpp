@@ -101,15 +101,27 @@ protected:
                 for (int i = -355; i <= 355; i += 5) {
                   Angle rot = Angle(i * 1000000);  // -355..+355° in 5° steps
 
+                  // Rounded corners.
                   gen.flashRect(Point(100, 200), PositiveLength(100000),
-                                PositiveLength(100000), rot, function, net,
-                                component, pin, signal);
+                                PositiveLength(100000), UnsignedLength(0), rot,
+                                function, net, component, pin, signal);
                   gen.flashRect(Point(100, 200), PositiveLength(100000),
-                                PositiveLength(200000), rot, function, net,
-                                component, pin, signal);
+                                PositiveLength(200000), UnsignedLength(0), rot,
+                                function, net, component, pin, signal);
                   gen.flashRect(Point(100, 200), PositiveLength(200000),
-                                PositiveLength(100000), rot, function, net,
-                                component, pin, signal);
+                                PositiveLength(100000), UnsignedLength(0), rot,
+                                function, net, component, pin, signal);
+
+                  // Rounded corners.
+                  gen.flashRect(Point(100, 200), PositiveLength(100000),
+                                PositiveLength(100000), UnsignedLength(20000),
+                                rot, function, net, component, pin, signal);
+                  gen.flashRect(Point(100, 200), PositiveLength(100000),
+                                PositiveLength(200000), UnsignedLength(20000),
+                                rot, function, net, component, pin, signal);
+                  gen.flashRect(Point(100, 200), PositiveLength(200000),
+                                PositiveLength(100000), UnsignedLength(20000),
+                                rot, function, net, component, pin, signal);
 
                   gen.flashObround(Point(100, 200), PositiveLength(100000),
                                    PositiveLength(100000), rot, function, net,
@@ -121,14 +133,29 @@ protected:
                                    PositiveLength(100000), rot, function, net,
                                    component, pin, signal);
 
+                  // No rounded corners.
                   gen.flashOctagon(Point(100, 200), PositiveLength(100000),
-                                   PositiveLength(100000), rot, function, net,
+                                   PositiveLength(100000), UnsignedLength(0),
+                                   rot, function, net, component, pin, signal);
+                  gen.flashOctagon(Point(100, 200), PositiveLength(100000),
+                                   PositiveLength(200000), UnsignedLength(0),
+                                   rot, function, net, component, pin, signal);
+                  gen.flashOctagon(Point(100, 200), PositiveLength(200000),
+                                   PositiveLength(100000), UnsignedLength(0),
+                                   rot, function, net, component, pin, signal);
+
+                  // Rounded corners.
+                  gen.flashOctagon(Point(100, 200), PositiveLength(100000),
+                                   PositiveLength(100000),
+                                   UnsignedLength(20000), rot, function, net,
                                    component, pin, signal);
                   gen.flashOctagon(Point(100, 200), PositiveLength(100000),
-                                   PositiveLength(200000), rot, function, net,
+                                   PositiveLength(200000),
+                                   UnsignedLength(20000), rot, function, net,
                                    component, pin, signal);
                   gen.flashOctagon(Point(100, 200), PositiveLength(200000),
-                                   PositiveLength(100000), rot, function, net,
+                                   PositiveLength(100000),
+                                   UnsignedLength(20000), rot, function, net,
                                    component, pin, signal);
 
                   gen.flashComponent(Point(100, 200), rot, component, "",

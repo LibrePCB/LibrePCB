@@ -98,7 +98,8 @@ public:
                    const QString& component, const QString& pin,
                    const QString& signal) noexcept;
   void flashRect(const Point& pos, const PositiveLength& w,
-                 const PositiveLength& h, const Angle& rot, Function function,
+                 const PositiveLength& h, const UnsignedLength& radius,
+                 const Angle& rot, Function function,
                  const tl::optional<QString>& net, const QString& component,
                  const QString& pin, const QString& signal) noexcept;
   void flashObround(const Point& pos, const PositiveLength& w,
@@ -107,10 +108,10 @@ public:
                     const QString& component, const QString& pin,
                     const QString& signal) noexcept;
   void flashOctagon(const Point& pos, const PositiveLength& w,
-                    const PositiveLength& h, const Angle& rot,
-                    Function function, const tl::optional<QString>& net,
-                    const QString& component, const QString& pin,
-                    const QString& signal) noexcept;
+                    const PositiveLength& h, const UnsignedLength& radius,
+                    const Angle& rot, Function function,
+                    const tl::optional<QString>& net, const QString& component,
+                    const QString& pin, const QString& signal) noexcept;
   void flashComponent(const Point& pos, const Angle& rot,
                       const QString& designator, const QString& value,
                       MountType mountType, const QString& manufacturer,
