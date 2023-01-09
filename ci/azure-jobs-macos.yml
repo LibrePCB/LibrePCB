@@ -7,6 +7,7 @@ jobs:
     OS: 'mac'
     ARCH: 'x86_64'
     COPYFILE_DISABLE: 1 # Stop creating shit files (https://superuser.com/questions/259703/get-mac-tar-to-stop-putting-filenames-in-tar-archives)
+    HOMEBREW_NO_INSTALL_CLEANUP: 1 # Might speed up homebrew commands(?)
   steps:
   - checkout: self
     clean: true

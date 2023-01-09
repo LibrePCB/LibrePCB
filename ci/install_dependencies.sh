@@ -19,16 +19,26 @@ then
   # because even the update sometimes fails, let's ignore any errors with
   # "|| true" (Apple-style error handling). Maybe this way we get succussful
   # builds even if homebrow failed, which saves a lot of time and nerves.
+  echo "Updating package database..."
   brew update || true
+
+  # Actually we don't want to waste time with upgrading packages, but sometimes
+  # this needs to be done to get it working (maybe it depends on the phase of
+  # the moon whether this is required or not).
+  echo "Upgrading packages..."
+  brew upgrade || true
 
   # Make python3/pip3 the default
   export PATH="/usr/local/opt/python/libexec/bin:$PATH"
 
   # Install Qt
-  brew install qt5
-  brew link --force qt5
+  echo "Installing qt5..."
+  brew install --overwrite qt5
+  echo "Linking qt5..."
+  brew link --force --overwrite qt5
 
   # Install Qt Installer Framework
+  echo "Installing QtIFW..."
   QTIFW_VERSION="3.2.2"
   QTIFW_URL_BASE="https://download.qt.io/official_releases/qt-installer-framework/$QTIFW_VERSION"
   wget -cq "$QTIFW_URL_BASE/QtInstallerFramework-mac-x64.dmg"
