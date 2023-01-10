@@ -105,8 +105,11 @@ protected:
                      [this]() { ++mSignalFinished; }, Qt::QueuedConnection);
 
     copy.start();
-    bool success = copy.wait(timeout);
-    qApp->processEvents();  // Required to process the emitted signals.
+    const bool success = copy.wait(timeout);
+    // Enforce processing the emitted signals. Needs to be called twice, see
+    // https://github.com/LibrePCB/LibrePCB/issues/1061.
+    qApp->processEvents();
+    qApp->processEvents();
     return success;
   }
 };
