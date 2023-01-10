@@ -21,6 +21,7 @@ add_executable(
   core/attribute/attributetest.cpp
   core/attribute/attributetypetest.cpp
   core/attribute/attributeunittest.cpp
+  core/export/d356netlistgeneratortest.cpp
   core/export/excellongeneratortest.cpp
   core/export/gerberaperturelisttest.cpp
   core/export/gerberattributetest.cpp

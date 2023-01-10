@@ -92,6 +92,8 @@ add_library(
   export/bom.h
   export/bomcsvwriter.cpp
   export/bomcsvwriter.h
+  export/d356netlistgenerator.cpp
+  export/d356netlistgenerator.h
   export/excellongenerator.cpp
   export/excellongenerator.h
   export/gerberaperturelist.cpp
