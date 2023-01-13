@@ -58,6 +58,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     Board& board, const Point& startPos) noexcept
   : UndoCommandGroup(tr("Drag Board Elements")),
     mBoard(board),
+    mItemCount(0),
     mStartPos(startPos),
     mDeltaPos(0, 0),
     mCenterPos(0, 0),
@@ -78,11 +79,10 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   query->addSelectedHoles();
 
   // find the center of all elements and create undo commands
-  int count = 0;
   foreach (BI_Device* device, query->getDeviceInstances()) {
     Q_ASSERT(device);
     mCenterPos += device->getPosition();
-    ++count;
+    ++mItemCount;
     CmdDeviceInstanceEdit* cmd = new CmdDeviceInstanceEdit(*device);
     mDeviceEditCmds.append(cmd);
     mDeviceStrokeTextsResetCmds.append(new CmdDeviceStrokeTextsReset(*device));
@@ -90,14 +90,14 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   foreach (BI_Via* via, query->getVias()) {
     Q_ASSERT(via);
     mCenterPos += via->getPosition();
-    ++count;
+    ++mItemCount;
     CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
     mViaEditCmds.append(cmd);
   }
   foreach (BI_NetPoint* netpoint, query->getNetPoints()) {
     Q_ASSERT(netpoint);
     mCenterPos += netpoint->getPosition();
-    ++count;
+    ++mItemCount;
     CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
     mNetPointEditCmds.append(cmd);
   }
@@ -105,7 +105,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     Q_ASSERT(plane);
     for (const Vertex& vertex : plane->getOutline().getVertices()) {
       mCenterPos += vertex.getPos();
-      ++count;
+      ++mItemCount;
     }
     CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane, false);
     mPlaneEditCmds.append(cmd);
@@ -114,7 +114,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     Q_ASSERT(polygon);
     for (const Vertex& vertex : polygon->getPolygon().getPath().getVertices()) {
       mCenterPos += vertex.getPos();
-      ++count;
+      ++mItemCount;
     }
     CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
     mPolygonEditCmds.append(cmd);
@@ -125,7 +125,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     if ((!text->getDevice()) ||
         (!query->getDeviceInstances().contains(text->getDevice()))) {
       mCenterPos += text->getPosition();
-      ++count;
+      ++mItemCount;
     }
     CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getText());
     mStrokeTextEditCmds.append(cmd);
@@ -133,13 +133,14 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   foreach (BI_Hole* hole, query->getHoles()) {
     Q_ASSERT(hole);
     mCenterPos += hole->getHole().getPath()->getVertices().first().getPos();
-    ++count;
+    ++mItemCount;
     CmdHoleEdit* cmd = new CmdHoleEdit(hole->getHole());
     mHoleEditCmds.append(cmd);
   }
 
-  if (count > 0) {
-    mCenterPos /= count;
+  // Note: If only 1 item is selected, use its exact position as center.
+  if (mItemCount > 1) {
+    mCenterPos /= mItemCount;
     mCenterPos.mapToGrid(mBoard.getGridProperties().getInterval());
   }
 }
@@ -220,8 +221,11 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
 }
 
 void CmdDragSelectedBoardItems::rotate(const Angle& angle,
-                                       bool aroundItemsCenter) noexcept {
-  Point center = (aroundItemsCenter ? mCenterPos : mStartPos) + mDeltaPos;
+                                       bool aroundCurrentPosition) noexcept {
+  const Point center = (aroundCurrentPosition && (mItemCount > 1))
+      ? (mStartPos + mDeltaPos)
+            .mappedToGrid(mBoard.getGridProperties().getInterval())
+      : (mCenterPos + mDeltaPos);
 
   // rotate selected elements
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {

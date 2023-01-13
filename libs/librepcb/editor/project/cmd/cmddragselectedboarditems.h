@@ -67,7 +67,7 @@ public:
   void resetAllTexts() noexcept;
   void setCurrentPosition(const Point& pos,
                           const bool gridIncrement = true) noexcept;
-  void rotate(const Angle& angle, bool aroundItemsCenter = false) noexcept;
+  void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
 
 private:
   // Private Methods
@@ -77,6 +77,7 @@ private:
 
   // Private Member Variables
   Board& mBoard;
+  int mItemCount;
   Point mStartPos;
   Point mDeltaPos;
   Point mCenterPos;

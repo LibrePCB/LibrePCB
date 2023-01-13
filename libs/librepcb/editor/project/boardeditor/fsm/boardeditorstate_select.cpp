@@ -1052,11 +1052,11 @@ bool BoardEditorState_Select::rotateSelectedItems(const Angle& angle) noexcept {
 
   try {
     if (mSelectedItemsDragCommand) {
-      mSelectedItemsDragCommand->rotate(angle);
+      mSelectedItemsDragCommand->rotate(angle, true);
     } else {
       QScopedPointer<CmdDragSelectedBoardItems> cmd(
           new CmdDragSelectedBoardItems(*board));
-      cmd->rotate(angle, true);
+      cmd->rotate(angle, false);
       mContext.undoStack.execCmd(cmd.take());
     }
     return true;

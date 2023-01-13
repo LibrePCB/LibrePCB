@@ -663,7 +663,7 @@ bool SchematicEditorState_Select::rotateSelectedItems(
     } else {
       QScopedPointer<CmdDragSelectedSchematicItems> cmd(
           new CmdDragSelectedSchematicItems(*schematic));
-      cmd->rotate(angle, true);
+      cmd->rotate(angle, false);
       execCmd(cmd.take());
     }
     return true;
@@ -684,7 +684,7 @@ bool SchematicEditorState_Select::mirrorSelectedItems(
     } else {
       QScopedPointer<CmdDragSelectedSchematicItems> cmd(
           new CmdDragSelectedSchematicItems(*schematic));
-      cmd->mirror(orientation, true);
+      cmd->mirror(orientation, false);
       execCmd(cmd.take());
     }
     return true;

@@ -57,6 +57,7 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     Schematic& schematic, const Point& startPos) noexcept
   : UndoCommandGroup(tr("Drag Schematic Elements")),
     mSchematic(schematic),
+    mItemCount(0),
     mStartPos(startPos),
     mDeltaPos(0, 0),
     mCenterPos(0, 0),
@@ -74,42 +75,42 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
   query->addNetPointsOfNetLines();
 
   // Find the center of all elements and create undo commands.
-  int count = 0;
   foreach (SI_Symbol* symbol, query->getSymbols()) {
     mCenterPos += symbol->getPosition();
-    ++count;
+    ++mItemCount;
     CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
     mSymbolEditCmds.append(cmd);
   }
   foreach (SI_NetPoint* netpoint, query->getNetPoints()) {
     mCenterPos += netpoint->getPosition();
-    ++count;
+    ++mItemCount;
     CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
     mNetPointEditCmds.append(cmd);
   }
   foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
     mCenterPos += netlabel->getPosition();
-    ++count;
+    ++mItemCount;
     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
     mNetLabelEditCmds.append(cmd);
   }
   foreach (SI_Polygon* polygon, query->getPolygons()) {
     for (const Vertex& vertex : polygon->getPolygon().getPath().getVertices()) {
       mCenterPos += vertex.getPos();
-      ++count;
+      ++mItemCount;
     }
     CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
     mPolygonEditCmds.append(cmd);
   }
   foreach (SI_Text* text, query->getTexts()) {
     mCenterPos += text->getPosition();
-    ++count;
+    ++mItemCount;
     CmdTextEdit* cmd = new CmdTextEdit(text->getText());
     mTextEditCmds.append(cmd);
   }
 
-  if (count > 0) {
-    mCenterPos /= count;
+  // Note: If only 1 item is selected, use its exact position as center.
+  if (mItemCount > 1) {
+    mCenterPos /= mItemCount;
     mCenterPos.mapToGrid(mSchematic.getGridProperties().getInterval());
   }
 }
@@ -147,9 +148,12 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
   }
 }
 
-void CmdDragSelectedSchematicItems::rotate(const Angle& angle,
-                                           bool aroundItemsCenter) noexcept {
-  Point center = (aroundItemsCenter ? mCenterPos : mStartPos) + mDeltaPos;
+void CmdDragSelectedSchematicItems::rotate(
+    const Angle& angle, bool aroundCurrentPosition) noexcept {
+  const Point center = (aroundCurrentPosition && (mItemCount > 1))
+      ? (mStartPos + mDeltaPos)
+            .mappedToGrid(mSchematic.getGridProperties().getInterval())
+      : (mCenterPos + mDeltaPos);
 
   // rotate selected elements
   foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
@@ -170,9 +174,12 @@ void CmdDragSelectedSchematicItems::rotate(const Angle& angle,
   mDeltaAngle += angle;
 }
 
-void CmdDragSelectedSchematicItems::mirror(Qt::Orientation orientation,
-                                           bool aroundItemsCenter) noexcept {
-  Point center = (aroundItemsCenter ? mCenterPos : mStartPos) + mDeltaPos;
+void CmdDragSelectedSchematicItems::mirror(
+    Qt::Orientation orientation, bool aroundCurrentPosition) noexcept {
+  const Point center = (aroundCurrentPosition && (mItemCount > 1))
+      ? (mStartPos + mDeltaPos)
+            .mappedToGrid(mSchematic.getGridProperties().getInterval())
+      : (mCenterPos + mDeltaPos);
 
   // rotate selected elements
   foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {

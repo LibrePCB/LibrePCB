@@ -61,9 +61,8 @@ public:
 
   // General Methods
   void setCurrentPosition(const Point& pos) noexcept;
-  void rotate(const Angle& angle, bool aroundItemsCenter = false) noexcept;
-  void mirror(Qt::Orientation orientation,
-              bool aroundItemsCenter = false) noexcept;
+  void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
+  void mirror(Qt::Orientation orientation, bool aroundCurrentPosition) noexcept;
 
 private:
   // Private Methods
@@ -73,6 +72,7 @@ private:
 
   // Private Member Variables
   Schematic& mSchematic;
+  int mItemCount;
   Point mStartPos;
   Point mDeltaPos;
   Point mCenterPos;

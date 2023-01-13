@@ -111,8 +111,11 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     ++count;
   }
 
-  mCenterPos /= qMax(count, 1);
-  mCenterPos.mapToGrid(grid);
+  // Note: If only 1 item is selected, use its exact position as center.
+  if (count > 1) {
+    mCenterPos /= count;
+    mCenterPos.mapToGrid(grid);
+  }
 }
 
 CmdDragSelectedSymbolItems::~CmdDragSelectedSymbolItems() noexcept {
