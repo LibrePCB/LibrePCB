@@ -28,6 +28,7 @@
 #include "../../project/cmd/cmdschematicnetlabeledit.h"
 #include "../../project/cmd/cmdschematicnetpointedit.h"
 #include "../../project/cmd/cmdsymbolinstanceedit.h"
+#include "../../project/cmd/cmdsymbolinstancetextsreset.h"
 
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
@@ -62,7 +63,8 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     mDeltaPos(0, 0),
     mCenterPos(0, 0),
     mDeltaAngle(0),
-    mMirrored(false) {
+    mMirrored(false),
+    mTextsReset(false) {
   // get all selected items
   std::unique_ptr<SchematicSelectionQuery> query(
       mSchematic.createSelectionQuery());
@@ -81,6 +83,7 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     ++mItemCount;
     CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
     mSymbolEditCmds.append(cmd);
+    mSymbolTextsResetCmds.append(new CmdSymbolInstanceTextsReset(*symbol));
   }
   foreach (SI_NetPoint* netpoint, query->getNetPoints()) {
     mCenterPos += netpoint->getPosition();
@@ -126,6 +129,10 @@ CmdDragSelectedSchematicItems::~CmdDragSelectedSchematicItems() noexcept {
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
+
+void CmdDragSelectedSchematicItems::resetAllTexts() noexcept {
+  mTextsReset = true;
+}
 
 void CmdDragSelectedSchematicItems::setCurrentPosition(
     const Point& pos) noexcept {
@@ -210,10 +217,13 @@ void CmdDragSelectedSchematicItems::mirror(
  ******************************************************************************/
 
 bool CmdDragSelectedSchematicItems::performExecute() {
-  if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0()) && (!mMirrored)) {
+  if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0()) && (!mMirrored) &&
+      (!mTextsReset)) {
     // no movement required --> discard all move commands
     qDeleteAll(mSymbolEditCmds);
     mSymbolEditCmds.clear();
+    qDeleteAll(mSymbolTextsResetCmds);
+    mSymbolTextsResetCmds.clear();
     qDeleteAll(mNetPointEditCmds);
     mNetPointEditCmds.clear();
     qDeleteAll(mNetLabelEditCmds);
@@ -225,7 +235,15 @@ bool CmdDragSelectedSchematicItems::performExecute() {
     return false;
   }
 
+  if (!mTextsReset) {
+    qDeleteAll(mSymbolTextsResetCmds);
+    mSymbolTextsResetCmds.clear();
+  }
+
   foreach (CmdSymbolInstanceEdit* cmd, mSymbolEditCmds) {
+    appendChild(cmd);  // can throw
+  }
+  foreach (CmdSymbolInstanceTextsReset* cmd, mSymbolTextsResetCmds) {
     appendChild(cmd);  // can throw
   }
   foreach (CmdSchematicNetPointEdit* cmd, mNetPointEditCmds) {

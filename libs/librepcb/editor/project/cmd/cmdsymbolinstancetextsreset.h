@@ -17,16 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDDRAGSELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_EDITOR_CMDDRAGSELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDSYMBOLINSTANCETEXTSRESET_H
+#define LIBREPCB_EDITOR_CMDSYMBOLINSTANCETEXTSRESET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "../../undocommandgroup.h"
-
-#include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 
@@ -35,36 +32,22 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Schematic;
+class SI_Symbol;
 
 namespace editor {
 
-class CmdPolygonEdit;
-class CmdSchematicNetLabelEdit;
-class CmdSchematicNetPointEdit;
-class CmdSymbolInstanceEdit;
-class CmdSymbolInstanceTextsReset;
-class CmdTextEdit;
-
 /*******************************************************************************
- *  Class CmdDragSelectedSchematicItems
+ *  Class CmdSymbolInstanceTextsReset
  ******************************************************************************/
 
 /**
- * @brief The CmdDragSelectedSchematicItems class
+ * @brief The CmdSymbolInstanceTextsReset class
  */
-class CmdDragSelectedSchematicItems final : public UndoCommandGroup {
+class CmdSymbolInstanceTextsReset final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdDragSelectedSchematicItems(Schematic& schematic,
-                                const Point& startPos = Point()) noexcept;
-  ~CmdDragSelectedSchematicItems() noexcept;
-
-  // General Methods
-  void resetAllTexts() noexcept;
-  void setCurrentPosition(const Point& pos) noexcept;
-  void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
-  void mirror(Qt::Orientation orientation, bool aroundCurrentPosition) noexcept;
+  CmdSymbolInstanceTextsReset(SI_Symbol& symbol) noexcept;
+  ~CmdSymbolInstanceTextsReset() noexcept;
 
 private:
   // Private Methods
@@ -73,22 +56,7 @@ private:
   bool performExecute() override;
 
   // Private Member Variables
-  Schematic& mSchematic;
-  int mItemCount;
-  Point mStartPos;
-  Point mDeltaPos;
-  Point mCenterPos;
-  Angle mDeltaAngle;
-  bool mMirrored;
-  bool mTextsReset;
-
-  // Move commands
-  QList<CmdSymbolInstanceEdit*> mSymbolEditCmds;
-  QList<CmdSymbolInstanceTextsReset*> mSymbolTextsResetCmds;
-  QList<CmdSchematicNetPointEdit*> mNetPointEditCmds;
-  QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
-  QList<CmdPolygonEdit*> mPolygonEditCmds;
-  QList<CmdTextEdit*> mTextEditCmds;
+  SI_Symbol& mSymbol;
 };
 
 /*******************************************************************************

@@ -17,16 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDDRAGSELECTEDSCHEMATICITEMS_H
-#define LIBREPCB_EDITOR_CMDDRAGSELECTEDSCHEMATICITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDSYMBOLINSTANCETEXTADD_H
+#define LIBREPCB_EDITOR_CMDSYMBOLINSTANCETEXTADD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommandgroup.h"
-
-#include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/point.h>
+#include "../../undocommand.h"
 
 #include <QtCore>
 
@@ -35,36 +32,23 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Schematic;
+class SI_Symbol;
+class SI_Text;
 
 namespace editor {
 
-class CmdPolygonEdit;
-class CmdSchematicNetLabelEdit;
-class CmdSchematicNetPointEdit;
-class CmdSymbolInstanceEdit;
-class CmdSymbolInstanceTextsReset;
-class CmdTextEdit;
-
 /*******************************************************************************
- *  Class CmdDragSelectedSchematicItems
+ *  Class CmdSymbolInstanceTextAdd
  ******************************************************************************/
 
 /**
- * @brief The CmdDragSelectedSchematicItems class
+ * @brief The CmdSymbolInstanceTextAdd class
  */
-class CmdDragSelectedSchematicItems final : public UndoCommandGroup {
+class CmdSymbolInstanceTextAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdDragSelectedSchematicItems(Schematic& schematic,
-                                const Point& startPos = Point()) noexcept;
-  ~CmdDragSelectedSchematicItems() noexcept;
-
-  // General Methods
-  void resetAllTexts() noexcept;
-  void setCurrentPosition(const Point& pos) noexcept;
-  void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
-  void mirror(Qt::Orientation orientation, bool aroundCurrentPosition) noexcept;
+  CmdSymbolInstanceTextAdd(SI_Symbol& symbol, SI_Text& text) noexcept;
+  ~CmdSymbolInstanceTextAdd() noexcept;
 
 private:
   // Private Methods
@@ -72,23 +56,17 @@ private:
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  // Private Member Variables
-  Schematic& mSchematic;
-  int mItemCount;
-  Point mStartPos;
-  Point mDeltaPos;
-  Point mCenterPos;
-  Angle mDeltaAngle;
-  bool mMirrored;
-  bool mTextsReset;
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
 
-  // Move commands
-  QList<CmdSymbolInstanceEdit*> mSymbolEditCmds;
-  QList<CmdSymbolInstanceTextsReset*> mSymbolTextsResetCmds;
-  QList<CmdSchematicNetPointEdit*> mNetPointEditCmds;
-  QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
-  QList<CmdPolygonEdit*> mPolygonEditCmds;
-  QList<CmdTextEdit*> mTextEditCmds;
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
+
+  // Private Member Variables
+
+  // Attributes from the constructor
+  SI_Symbol& mSymbol;
+  SI_Text& mText;
 };
 
 /*******************************************************************************

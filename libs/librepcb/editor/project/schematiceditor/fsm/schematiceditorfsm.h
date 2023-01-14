@@ -113,6 +113,7 @@ public:
   bool processMove(const Point& delta) noexcept;
   bool processRotate(const Angle& rotation) noexcept;
   bool processMirror(Qt::Orientation orientation) noexcept;
+  bool processResetAllTexts() noexcept;
   bool processRemove() noexcept;
   bool processEditProperties() noexcept;
   bool processKeyPressed(const QKeyEvent& e) noexcept;

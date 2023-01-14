@@ -206,6 +206,15 @@ bool SchematicEditorFsm::processMirror(Qt::Orientation orientation) noexcept {
   return false;
 }
 
+bool SchematicEditorFsm::processResetAllTexts() noexcept {
+  if (SchematicEditorState* state = getCurrentStateObj()) {
+    if (state->processResetAllTexts()) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool SchematicEditorFsm::processRemove() noexcept {
   if (SchematicEditorState* state = getCurrentStateObj()) {
     if (state->processRemove()) {

@@ -177,6 +177,16 @@ bool SchematicEditorState_Select::processMirror(
   return false;
 }
 
+bool SchematicEditorState_Select::processResetAllTexts() noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
+  if (mSubState == SubState::IDLE) {
+    return resetAllTextsOfSelectedItems();
+  }
+  return false;
+}
+
 bool SchematicEditorState_Select::processRemove() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
@@ -499,6 +509,10 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
       mb.addAction(cmd.mirrorVertical.createAction(
           &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
+      mb.addSeparator();
+      mb.addAction(cmd.deviceResetTextAll.createAction(
+          &menu, this,
+          &SchematicEditorState_Select::resetAllTextsOfSelectedItems));
       break;
     }
 
@@ -688,6 +702,22 @@ bool SchematicEditorState_Select::mirrorSelectedItems(
       cmd->mirror(orientation, false);
       execCmd(cmd.take());
     }
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    return false;
+  }
+}
+
+bool SchematicEditorState_Select::resetAllTextsOfSelectedItems() noexcept {
+  Schematic* schematic = getActiveSchematic();
+  if (!schematic) return false;
+
+  try {
+    QScopedPointer<CmdDragSelectedSchematicItems> cmd(
+        new CmdDragSelectedSchematicItems(*schematic));
+    cmd->resetAllTexts();
+    mContext.undoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
