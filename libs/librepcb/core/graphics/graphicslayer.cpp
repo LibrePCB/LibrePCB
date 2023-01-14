@@ -187,7 +187,7 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
     h.insert(sSchematicGuide,           {tr("Guide"),                 Qt::darkYellow,             Qt::yellow,                 true});
     // symbol
     h.insert(sSymbolOutlines,           {tr("Outlines"),              Qt::darkRed,                Qt::red,                    true});
-    h.insert(sSymbolGrabAreas,          {tr("Grab Areas"),            QColor(255, 255, 0, 30),    QColor(255, 255, 0, 50),    true});
+    h.insert(sSymbolGrabAreas,          {tr("Grab Areas"),            QColor(255, 255, 225, 255), QColor(255, 255, 205, 255), true});
     h.insert(sSymbolHiddenGrabAreas,    {tr("Hidden Grab Areas"),     QColor(0, 0, 255, 30),      QColor(0, 0, 255, 50),      false});
     h.insert(sSymbolNames,              {tr("Names"),                 QColor(32, 32, 32, 255),    Qt::darkGray,               true});
     h.insert(sSymbolValues,             {tr("Values"),                QColor(80, 80, 80, 255),    Qt::gray,                   true});
