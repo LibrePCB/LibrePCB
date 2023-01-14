@@ -71,7 +71,8 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
   query->addSelectedNetLines();
   query->addSelectedNetLabels();
   query->addSelectedPolygons();
-  query->addSelectedTexts();
+  query->addSelectedSchematicTexts();
+  query->addSelectedSymbolTexts();
   query->addNetPointsOfNetLines();
 
   // Find the center of all elements and create undo commands.
@@ -102,8 +103,12 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     mPolygonEditCmds.append(cmd);
   }
   foreach (SI_Text* text, query->getTexts()) {
-    mCenterPos += text->getPosition();
-    ++mItemCount;
+    // do not count texts of symbols if the symbol is selected too
+    if ((!text->getSymbol()) ||
+        (!query->getSymbols().contains(text->getSymbol()))) {
+      mCenterPos += text->getPosition();
+      ++mItemCount;
+    }
     CmdTextEdit* cmd = new CmdTextEdit(text->getText());
     mTextEditCmds.append(cmd);
   }

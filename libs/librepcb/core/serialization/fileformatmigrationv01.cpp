@@ -160,6 +160,8 @@ void FileFormatMigrationV01::upgradeLibrary(TransactionalDirectory& dir) {
 }
 
 void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
+  LoadedData data;
+
   // Version File.
   upgradeVersionFile(dir, ".librepcb-project");
 
@@ -167,6 +169,27 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
   foreach (const QString& dirName, dir.getDirs("library/sym")) {
     TransactionalDirectory subDir(dir, "library/sym/" % dirName);
     if (subDir.fileExists(".librepcb-sym")) {
+      const QString fp = "symbol.lp";
+      SExpression root =
+          SExpression::parse(subDir.read(fp), subDir.getAbsPath(fp));
+      const Uuid uuid = deserialize<Uuid>(root.getChild("@0"));
+      Symbol sym;
+
+      // Texts.
+      for (SExpression* textNode : root.getChildren("text")) {
+        sym.texts.append(Text{
+            deserialize<Uuid>(textNode->getChild("@0")),
+            deserialize<GraphicsLayerName>(textNode->getChild("layer/@0")),
+            textNode->getChild("value/@0").getValue(),
+            Point(textNode->getChild("position")),
+            deserialize<Angle>(textNode->getChild("rotation/@0")),
+            deserialize<PositiveLength>(textNode->getChild("height/@0")),
+            Alignment(textNode->getChild("align")),
+        });
+      }
+
+      data.symbols.insert(uuid, sym);
+
       upgradeSymbol(subDir);
     }
   }
@@ -183,6 +206,32 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
   foreach (const QString& dirName, dir.getDirs("library/cmp")) {
     TransactionalDirectory subDir(dir, "library/cmp/" % dirName);
     if (subDir.fileExists(".librepcb-cmp")) {
+      const QString fp = "component.lp";
+      SExpression root =
+          SExpression::parse(subDir.read(fp), subDir.getAbsPath(fp));
+      const Uuid uuid = deserialize<Uuid>(root.getChild("@0"));
+      Component cmp;
+
+      // Symbol variants.
+      for (SExpression* varNode : root.getChildren("variant")) {
+        ComponentSymbolVariant symbVar{
+            deserialize<Uuid>(varNode->getChild("@0")),
+            {},
+        };
+
+        // Gates.
+        for (SExpression* gateNode : varNode->getChildren("gate")) {
+          symbVar.gates.append(Gate{
+              deserialize<Uuid>(gateNode->getChild("@0")),
+              deserialize<Uuid>(gateNode->getChild("symbol/@0")),
+          });
+        }
+
+        cmp.symbolVariants.append(symbVar);
+      }
+
+      data.components.insert(uuid, cmp);
+
       upgradeComponent(subDir);
     }
   }
@@ -195,11 +244,106 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
     }
   }
 
+  // Circuit.
+  {
+    const QString fp = "circuit/circuit.lp";
+    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+    // Component instances.
+    for (SExpression* cmpNode : root.getChildren("component")) {
+      const Uuid uuid = deserialize<Uuid>(cmpNode->getChild("@0"));
+      ComponentInstance cmpInst{
+          deserialize<Uuid>(cmpNode->getChild("lib_component/@0")),
+          deserialize<Uuid>(cmpNode->getChild("lib_variant/@0")),
+      };
+      data.componentInstances.insert(uuid, cmpInst);
+    }
+  }
+
   // Schematics.
   foreach (const QString& dirName, dir.getDirs("schematics")) {
     const QString fp = "schematics/" % dirName % "/schematic.lp";
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+      // Symbols.
+      for (SExpression* symNode : root.getChildren("symbol")) {
+        const Uuid cmpUuid =
+            deserialize<Uuid>(symNode->getChild("component/@0"));
+        const Uuid gateUuid =
+            deserialize<Uuid>(symNode->getChild("lib_gate/@0"));
+        auto cmpInstIt = data.componentInstances.find(cmpUuid);
+        if (cmpInstIt == data.componentInstances.end()) {
+          throw RuntimeError(__FILE__, __LINE__,
+                             QString("Failed to find component instance '%1'.")
+                                 .arg(cmpUuid.toStr()));
+        }
+        auto libCmpIt = data.components.find(cmpInstIt->libCmpUuid);
+        if (libCmpIt == data.components.end()) {
+          throw RuntimeError(__FILE__, __LINE__,
+                             QString("Failed to find component '%1'.")
+                                 .arg(cmpInstIt->libCmpUuid.toStr()));
+        }
+        const ComponentSymbolVariant* cmpSymbVar = nullptr;
+        foreach (const auto& var, libCmpIt->symbolVariants) {
+          if (var.uuid == cmpInstIt->libSymbVarUuid) {
+            cmpSymbVar = &var;
+            break;
+          }
+        }
+        if (!cmpSymbVar) {
+          throw RuntimeError(
+              __FILE__, __LINE__,
+              QString("Failed to find component symbol variant '%1'.")
+                  .arg(cmpInstIt->libSymbVarUuid.toStr()));
+        }
+        const Gate* gate = nullptr;
+        foreach (const auto& g, cmpSymbVar->gates) {
+          if (g.uuid == gateUuid) {
+            gate = &g;
+            break;
+          }
+        }
+        if (!gate) {
+          throw RuntimeError(
+              __FILE__, __LINE__,
+              QString("Failed to find gate '%1'.").arg(gateUuid.toStr()));
+        }
+        auto symIt = data.symbols.find(gate->symbolUuid);
+        if (symIt == data.symbols.end()) {
+          throw RuntimeError(__FILE__, __LINE__,
+                             QString("Failed to find symbol '%1'.")
+                                 .arg(gate->symbolUuid.toStr()));
+        }
+        const Point symPos(symNode->getChild("position"));
+        const Angle symRot =
+            deserialize<Angle>(symNode->getChild("rotation/@0"));
+        const bool symMirror =
+            deserialize<bool>(symNode->getChild("mirror/@0"));
+        foreach (const Text& text, symIt->texts) {
+          Point position = text.position.rotated(symRot);
+          if (symMirror) {
+            position.mirror(Qt::Horizontal);
+          }
+          position += symPos;
+          Angle rotation = symMirror
+              ? (Angle::deg180() - symRot - text.rotation)
+              : (symRot + text.rotation);
+          Alignment align = text.align;
+          if (symMirror) {
+            align.mirrorV();
+          }
+
+          SExpression& textNode = symNode->appendList("text");
+          textNode.appendChild(text.uuid);
+          textNode.appendChild("layer", text.layerName);
+          textNode.appendChild("value", text.text);
+          align.serialize(textNode.appendList("align"));
+          textNode.appendChild("height", text.height);
+          position.serialize(textNode.appendList("position"));
+          textNode.appendChild("rotation", rotation);
+        }
+      }
 
       // Net segments.
       for (SExpression* segNode : root.getChildren("netsegment")) {

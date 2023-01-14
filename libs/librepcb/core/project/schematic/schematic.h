@@ -94,6 +94,7 @@ public:
    */
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
+    ZValue_TextAnchors,  ///< Z value for ::librepcb::SI_Text anchor lines
     ZValue_Symbols,  ///< Z value for ::librepcb::SI_Symbol items
     ZValue_SymbolPins,  ///< Z value for ::librepcb::SI_SymbolPin items
     ZValue_Polygons,  ///< Z value for ::librepcb::SI_Polygon items

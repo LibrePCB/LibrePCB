@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../../geometry/text.h"
 #include "si_base.h"
+#include "si_symbol.h"
 
 #include <QtCore>
 
@@ -33,6 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class AttributeProvider;
+class LineGraphicsItem;
 class Schematic;
 class TextGraphicsItem;
 
@@ -61,6 +64,10 @@ public:
   const Text& getText() const noexcept { return mText; }
 
   // General Methods
+  SI_Symbol* getSymbol() const noexcept { return mSymbol; }
+  void setSymbol(SI_Symbol* symbol) noexcept;
+  const AttributeProvider* getAttributeProvider() const noexcept;
+  void updateAnchor() noexcept;
   void addToSchematic() override;
   void removeFromSchematic() override;
 
@@ -73,11 +80,17 @@ public:
   SI_Text& operator=(const SI_Text& rhs) = delete;
 
 private:  // Methods
-  void schematicAttributesChanged() noexcept;
+  void schematicOrSymbolAttributesChanged() noexcept;
+  void textEdited(const Text& text, Text::Event event) noexcept;
 
 private:  // Attributes
+  QPointer<SI_Symbol> mSymbol;
   Text mText;
   QScopedPointer<TextGraphicsItem> mGraphicsItem;
+  QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
+
+  // Slots
+  Text::OnEditedSlot mOnTextEditedSlot;
 };
 
 /*******************************************************************************

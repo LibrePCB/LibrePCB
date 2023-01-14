@@ -37,7 +37,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdSymbolInstanceEdit::CmdSymbolInstanceEdit(SI_Symbol& symbol) noexcept
-  : UndoCommand(tr("Edit symbol instance")),
+  : UndoCommand(tr("Edit Symbol")),
     mSymbol(symbol),
     mOldPos(symbol.getPosition()),
     mNewPos(mOldPos),

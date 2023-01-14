@@ -79,7 +79,7 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
   query->addSelectedNetLines();
   query->addSelectedNetLabels();
   query->addSelectedPolygons();
-  query->addSelectedTexts();
+  query->addSelectedSchematicTexts();
   query->addNetPointsOfNetLines();
 
   // Add components
@@ -114,11 +114,15 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
     if (dir->getFiles().isEmpty()) {
       symbol->getLibSymbol().getDirectory().copyTo(*dir);
     }
+    TextList texts;
+    foreach (const SI_Text* t, symbol->getTexts()) {
+      texts.append(std::make_shared<Text>(t->getText()));
+    }
     data->getSymbolInstances().append(
         std::make_shared<SchematicClipboardData::SymbolInstance>(
             symbol->getUuid(), symbol->getComponentInstance().getUuid(),
             symbol->getCompSymbVarItem().getUuid(), symbol->getPosition(),
-            symbol->getRotation(), symbol->getMirrored()));
+            symbol->getRotation(), symbol->getMirrored(), texts));
   }
 
   // Add (splitted) net segments including netpoints, netlines and netlabels

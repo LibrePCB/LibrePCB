@@ -29,7 +29,7 @@
 #include "../../addcomponentdialog.h"
 #include "../../cmd/cmdaddcomponenttocircuit.h"
 #include "../../cmd/cmdaddsymboltoschematic.h"
-#include "../../cmd/cmdsymbolinstanceedit.h"
+#include "../../cmd/cmdsymbolinstanceeditall.h"
 #include "../schematiceditor.h"
 
 #include <librepcb/core/attribute/attributetype.h>
@@ -266,7 +266,7 @@ bool SchematicEditorState_AddComponent::
       // add command to move the current symbol
       Q_ASSERT(mCurrentSymbolEditCommand == nullptr);
       mCurrentSymbolEditCommand =
-          new CmdSymbolInstanceEdit(*mCurrentSymbolToPlace);
+          new CmdSymbolInstanceEditAll(*mCurrentSymbolToPlace);
       mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
       mCurrentSymbolEditCommand->setMirrored(mLastMirrored, true);
     } else {
@@ -409,7 +409,7 @@ void SchematicEditorState_AddComponent::startAddingComponent(
     // add command to move the current symbol
     Q_ASSERT(mCurrentSymbolEditCommand == nullptr);
     mCurrentSymbolEditCommand =
-        new CmdSymbolInstanceEdit(*mCurrentSymbolToPlace);
+        new CmdSymbolInstanceEditAll(*mCurrentSymbolToPlace);
     mCurrentSymbolEditCommand->setRotation(mLastAngle, true);
     mCurrentSymbolEditCommand->setMirrored(mLastMirrored, true);
   } catch (Exception& e) {

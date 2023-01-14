@@ -37,7 +37,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(BI_Device& dev) noexcept
-  : UndoCommand(tr("Edit device instance")),
+  : UndoCommand(tr("Edit Device")),
     mDevice(dev),
     mOldPos(mDevice.getPosition()),
     mNewPos(mOldPos),

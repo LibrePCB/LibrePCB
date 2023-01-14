@@ -119,6 +119,7 @@ public:
     Q_UNUSED(orientation);
     return false;
   }
+  virtual bool processResetAllTexts() noexcept { return false; }
   virtual bool processRemove() noexcept { return false; }
   virtual bool processEditProperties() noexcept { return false; }
   virtual bool processAbortCommand() noexcept { return false; }

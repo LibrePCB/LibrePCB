@@ -380,7 +380,10 @@ void ProjectLoader::loadSchematicSymbol(Schematic& s, const SExpression& node) {
                     deserialize<Uuid>(node.getChild("lib_gate/@0")),
                     Point(node.getChild("position")),
                     deserialize<Angle>(node.getChild("rotation/@0")),
-                    deserialize<bool>(node.getChild("mirror/@0")));
+                    deserialize<bool>(node.getChild("mirror/@0")), false);
+  foreach (const SExpression* child, node.getChildren("text")) {
+    symbol->addText(*new SI_Text(s, Text(*child)));
+  }
   s.addSymbol(*symbol);
 }
 

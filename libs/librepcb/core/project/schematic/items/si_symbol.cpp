@@ -26,6 +26,7 @@
 #include "../../../library/cmp/component.h"
 #include "../../../library/sym/symbol.h"
 #include "../../../utils/scopeguardlist.h"
+#include "../../../utils/transform.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
 #include "../../project.h"
@@ -47,7 +48,7 @@ namespace librepcb {
 SI_Symbol::SI_Symbol(Schematic& schematic, const Uuid& uuid,
                      ComponentInstance& cmpInstance, const Uuid& symbolItem,
                      const Point& position, const Angle& rotation,
-                     bool mirrored)
+                     bool mirrored, bool loadInitialTexts)
   : SI_Base(schematic),
     mComponentInstance(cmpInstance),
     mSymbVarItem(mComponentInstance.getSymbolVariant()
@@ -71,6 +72,13 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const Uuid& uuid,
   mGraphicsItem.reset(new SGI_Symbol(*this));
   mGraphicsItem->setPosition(mPosition);
 
+  // Add initial texts.
+  if (loadInitialTexts) {
+    for (const Text& text : getDefaultTexts()) {
+      addText(*new SI_Text(mSchematic, text));
+    }
+  }
+
   for (const SymbolPin& libPin : mSymbol->getPins()) {
     SI_SymbolPin* pin = new SI_SymbolPin(*this, libPin.getUuid());  // can throw
     if (mPins.contains(libPin.getUuid())) {
@@ -89,14 +97,18 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const Uuid& uuid,
                            .arg(mUuid.toStr()));
   }
 
-  // connect to the "attributes changes" signal of schematic and component
-  // instance
+  // Emit the "attributesChanged" signal when the schematic or component
+  // instance has emitted it.
+  connect(&mSchematic, &Schematic::attributesChanged, this,
+          &SI_Symbol::attributesChanged);
   connect(&mComponentInstance, &ComponentInstance::attributesChanged, this,
-          [this]() { mGraphicsItem->updateAllTexts(); });
+          &SI_Symbol::attributesChanged);
 }
 
 SI_Symbol::~SI_Symbol() noexcept {
   mGraphicsItem.reset();
+  qDeleteAll(mTexts);
+  mTexts.clear();
   qDeleteAll(mPins);
   mPins.clear();
 }
@@ -126,6 +138,7 @@ void SI_Symbol::setPosition(const Point& newPos) noexcept {
     mPosition = newPos;
     mGraphicsItem->setPosition(newPos);
     foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(false); }
+    foreach (SI_Text* text, mTexts) { text->updateAnchor(); }
   }
 }
 
@@ -146,6 +159,56 @@ void SI_Symbol::setMirrored(bool newMirrored) noexcept {
 }
 
 /*******************************************************************************
+ *  Text Methods
+ ******************************************************************************/
+
+TextList SI_Symbol::getDefaultTexts() const noexcept {
+  // Copy all symbol texts and transform them to the global coordinate system
+  // (not relative to the symbol). The original UUIDs are kept for future
+  // identification.
+  TextList texts = mSymbol->getTexts();
+  Transform transform(*this);
+  for (Text& text : texts) {
+    text.setPosition(transform.map(text.getPosition()));
+    if (transform.getMirrored()) {
+      text.setRotation(Angle::deg180() - text.getRotation() - getRotation());
+      text.setAlign(text.getAlign().mirroredV());
+    } else {
+      text.setRotation(text.getRotation() + getRotation());
+    }
+  }
+  return texts;
+}
+
+void SI_Symbol::addText(SI_Text& text) {
+  if ((mTexts.values().contains(&text)) ||
+      (&text.getSchematic() != &mSchematic)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (mTexts.contains(text.getUuid())) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("There is already a text with the UUID \"%1\"!")
+                           .arg(text.getUuid().toStr()));
+  }
+  text.setSymbol(this);
+  if (isAddedToSchematic()) {
+    text.addToSchematic();  // can throw
+  }
+  mTexts.insert(text.getUuid(), &text);
+  text.setSelected(isSelected());
+}
+
+void SI_Symbol::removeText(SI_Text& text) {
+  if (mTexts.value(text.getUuid()) != &text) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (isAddedToSchematic()) {
+    text.removeFromSchematic();  // can throw
+  }
+  mTexts.remove(text.getUuid());
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
@@ -153,12 +216,16 @@ void SI_Symbol::addToSchematic() {
   if (isAddedToSchematic()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  ScopeGuardList sgl(mPins.count() + 1);
+  ScopeGuardList sgl(mPins.count() + mTexts.count() + 1);
   mComponentInstance.registerSymbol(*this);  // can throw
   sgl.add([&]() { mComponentInstance.unregisterSymbol(*this); });
   foreach (SI_SymbolPin* pin, mPins) {
     pin->addToSchematic();  // can throw
     sgl.add([pin]() { pin->removeFromSchematic(); });
+  }
+  foreach (SI_Text* text, mTexts) {
+    text->addToSchematic();  // can throw
+    sgl.add([text]() { text->removeFromSchematic(); });
   }
   SI_Base::addToSchematic(mGraphicsItem.data());
   sgl.dismiss();
@@ -168,10 +235,14 @@ void SI_Symbol::removeFromSchematic() {
   if (!isAddedToSchematic()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  ScopeGuardList sgl(mPins.count() + 1);
+  ScopeGuardList sgl(mPins.count() + mTexts.count() + 1);
   foreach (SI_SymbolPin* pin, mPins) {
     pin->removeFromSchematic();  // can throw
     sgl.add([pin]() { pin->addToSchematic(); });
+  }
+  foreach (SI_Text* text, mTexts) {
+    text->removeFromSchematic();  // can throw
+    sgl.add([text]() { text->addToSchematic(); });
   }
   mComponentInstance.unregisterSymbol(*this);  // can throw
   sgl.add([&]() { mComponentInstance.registerSymbol(*this); });
@@ -191,6 +262,11 @@ void SI_Symbol::serialize(SExpression& root) const {
   mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("mirror", mMirrored);
+  root.ensureLineBreak();
+  for (const SI_Text* obj : mTexts) {
+    root.ensureLineBreak();
+    obj->getText().serialize(root.appendList("text"));
+  }
   root.ensureLineBreak();
 }
 
@@ -223,6 +299,7 @@ void SI_Symbol::setSelected(bool selected) noexcept {
   SI_Base::setSelected(selected);
   mGraphicsItem->setSelected(selected);
   foreach (SI_SymbolPin* pin, mPins) { pin->setSelected(selected); }
+  foreach (SI_Text* text, mTexts) { text->setSelected(selected); }
 }
 
 /*******************************************************************************

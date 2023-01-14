@@ -23,7 +23,7 @@
 #include "symbolinstancepropertiesdialog.h"
 
 #include "../../project/cmd/cmdcomponentinstanceedit.h"
-#include "../../project/cmd/cmdsymbolinstanceedit.h"
+#include "../../project/cmd/cmdsymbolinstanceeditall.h"
 #include "../../undocommand.h"
 #include "../../undostack.h"
 #include "../../workspace/desktopservices.h"
@@ -236,8 +236,8 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
 
     // Symbol Instance
     bool mirrored = mUi->cbxMirror->isChecked();
-    QScopedPointer<CmdSymbolInstanceEdit> cmdSym(
-        new CmdSymbolInstanceEdit(mSymbol));
+    QScopedPointer<CmdSymbolInstanceEditAll> cmdSym(
+        new CmdSymbolInstanceEditAll(mSymbol));
     cmdSym->setPosition(Point(mUi->edtSymbInstPosX->getValue(),
                               mUi->edtSymbInstPosY->getValue()),
                         false);

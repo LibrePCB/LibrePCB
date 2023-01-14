@@ -85,6 +85,8 @@ private:
   Angle mNewRotation;
   bool mOldMirrored;
   bool mNewMirrored;
+
+  friend class CmdSymbolInstanceEditAll;
 };
 
 /*******************************************************************************

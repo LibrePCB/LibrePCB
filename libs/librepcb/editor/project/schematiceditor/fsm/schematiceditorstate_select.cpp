@@ -202,7 +202,8 @@ bool SchematicEditorState_Select::processEditProperties() noexcept {
   query->addSelectedSymbols();
   query->addSelectedNetLabels();
   query->addSelectedPolygons();
-  query->addSelectedTexts();
+  query->addSelectedSchematicTexts();
+  query->addSelectedSymbolTexts();
   foreach (auto ptr, query->getSymbols()) { return openPropertiesDialog(ptr); }
   foreach (auto ptr, query->getNetLabels()) {
     return openPropertiesDialog(ptr);

@@ -101,10 +101,9 @@ bool CmdAddSymbolToSchematic::performExecute() {
   }
 
   // create the new symbol (schematic takes ownership)
-  mSymbolInstance =
-      new SI_Symbol(mSchematic, Uuid::createRandom(), mComponentInstance,
-                    mSymbolItemUuid, mPosition,
-                    mAngle);  // can throw
+  mSymbolInstance = new SI_Symbol(mSchematic, Uuid::createRandom(),
+                                  mComponentInstance, mSymbolItemUuid,
+                                  mPosition, mAngle, false, true);  // can throw
 
   // add a new symbol instance to the schematic
   execNewChildCmd(new CmdSymbolInstanceAdd(*mSymbolInstance));  // can throw

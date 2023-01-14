@@ -79,6 +79,15 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       AttributeKey("A2"), AttrTypeVoltage::instance(), "4.2",
       AttrTypeVoltage::instance().getUnitFromString("millivolt"));
 
+  std::shared_ptr<Text> text1 = std::make_shared<Text>(
+      Uuid::createRandom(), GraphicsLayerName("foo"), "text 1", Point(1, 2),
+      Angle(3), PositiveLength(4), Alignment(HAlign::left(), VAlign::top()));
+
+  std::shared_ptr<Text> text2 = std::make_shared<Text>(
+      Uuid::createRandom(), GraphicsLayerName("bar"), "text 2", Point(10, 20),
+      Angle(30), PositiveLength(40),
+      Alignment(HAlign::center(), VAlign::bottom()));
+
   std::shared_ptr<SchematicClipboardData::ComponentInstance> component1 =
       std::make_shared<SchematicClipboardData::ComponentInstance>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
@@ -94,12 +103,12 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   std::shared_ptr<SchematicClipboardData::SymbolInstance> symbol1 =
       std::make_shared<SchematicClipboardData::SymbolInstance>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          Point(123, 456), Angle(789), false);
+          Point(123, 456), Angle(789), false, TextList{text2, text1});
 
   std::shared_ptr<SchematicClipboardData::SymbolInstance> symbol2 =
       std::make_shared<SchematicClipboardData::SymbolInstance>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          Point(321, 987), Angle(555), true);
+          Point(321, 987), Angle(555), true, TextList{text1, text2});
 
   std::shared_ptr<SchematicClipboardData::NetSegment> netSegment1 =
       std::make_shared<SchematicClipboardData::NetSegment>(
@@ -151,15 +160,6 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
                                 UnsignedLength(10), true, false,
                                 Path({Vertex(Point(10, 20), Angle(30)),
                                       Vertex(Point(40, 50), Angle(60))}));
-
-  std::shared_ptr<Text> text1 = std::make_shared<Text>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), "text 1", Point(1, 2),
-      Angle(3), PositiveLength(4), Alignment(HAlign::left(), VAlign::top()));
-
-  std::shared_ptr<Text> text2 = std::make_shared<Text>(
-      Uuid::createRandom(), GraphicsLayerName("bar"), "text 2", Point(10, 20),
-      Angle(30), PositiveLength(40),
-      Alignment(HAlign::center(), VAlign::bottom()));
 
   // Create object
   SchematicClipboardData obj1(uuid, pos);
