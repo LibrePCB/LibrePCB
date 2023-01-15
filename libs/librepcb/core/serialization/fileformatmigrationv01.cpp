@@ -472,6 +472,12 @@ void FileFormatMigrationV01::upgradeBoardDesignRules(SExpression& root) {
   SExpression& node = root.getChild("design_rules");
   node.removeChild(node.getChild("name"));
   node.removeChild(node.getChild("description"));
+  for (SExpression* child : node.getChildren(SExpression::Type::List)) {
+    QString name = child->getName();
+    name.replace("restring_pad_", "pad_annular_ring_");
+    name.replace("restring_via_", "via_annular_ring_");
+    child->setName(name);
+  }
 }
 
 void FileFormatMigrationV01::upgradeGrid(SExpression& node) {

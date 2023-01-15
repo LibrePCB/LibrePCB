@@ -45,13 +45,14 @@ BoardDesignRules::BoardDesignRules() noexcept
     mCreamMaskClearanceRatio(Ratio::percent100() / 10),  // 10%
     mCreamMaskClearanceMin(0),  // 0.0mm
     mCreamMaskClearanceMax(1000000),  // 1.0mm
-    // restring
-    mRestringPadRatio(Ratio::percent100() / 4),  // 25%
-    mRestringPadMin(250000),  // 0.25mm
-    mRestringPadMax(2000000),  // 2.0mm
-    mRestringViaRatio(Ratio::percent100() / 4),  // 25%
-    mRestringViaMin(200000),  // 0.2mm
-    mRestringViaMax(2000000)  // 2.0mm
+    // pad annular ring
+    mPadAnnularRingRatio(Ratio::percent100() / 4),  // 25%
+    mPadAnnularRingMin(250000),  // 0.25mm
+    mPadAnnularRingMax(2000000),  // 2.0mm
+    // via annular ring
+    mViaAnnularRingRatio(Ratio::percent100() / 4),  // 25%
+    mViaAnnularRingMin(200000),  // 0.2mm
+    mViaAnnularRingMax(2000000)  // 2.0mm
 {
 }
 
@@ -77,25 +78,26 @@ BoardDesignRules::BoardDesignRules(const SExpression& node)
         node.getChild("creammask_clearance_min/@0"))),
     mCreamMaskClearanceMax(deserialize<UnsignedLength>(
         node.getChild("creammask_clearance_max/@0"))),
-    // restring
-    mRestringPadRatio(
-        deserialize<UnsignedRatio>(node.getChild("restring_pad_ratio/@0"))),
-    mRestringPadMin(
-        deserialize<UnsignedLength>(node.getChild("restring_pad_min/@0"))),
-    mRestringPadMax(
-        deserialize<UnsignedLength>(node.getChild("restring_pad_max/@0"))),
-    mRestringViaRatio(
-        deserialize<UnsignedRatio>(node.getChild("restring_via_ratio/@0"))),
-    mRestringViaMin(
-        deserialize<UnsignedLength>(node.getChild("restring_via_min/@0"))),
-    mRestringViaMax(
-        deserialize<UnsignedLength>(node.getChild("restring_via_max/@0"))) {
+    // pad annular ring
+    mPadAnnularRingRatio(
+        deserialize<UnsignedRatio>(node.getChild("pad_annular_ring_ratio/@0"))),
+    mPadAnnularRingMin(
+        deserialize<UnsignedLength>(node.getChild("pad_annular_ring_min/@0"))),
+    mPadAnnularRingMax(
+        deserialize<UnsignedLength>(node.getChild("pad_annular_ring_max/@0"))),
+    // via annular ring
+    mViaAnnularRingRatio(
+        deserialize<UnsignedRatio>(node.getChild("via_annular_ring_ratio/@0"))),
+    mViaAnnularRingMin(
+        deserialize<UnsignedLength>(node.getChild("via_annular_ring_min/@0"))),
+    mViaAnnularRingMax(
+        deserialize<UnsignedLength>(node.getChild("via_annular_ring_max/@0"))) {
   // force validating properties, throw exception on error
   try {
     setStopMaskClearanceBounds(mStopMaskClearanceMin, mStopMaskClearanceMax);
     setCreamMaskClearanceBounds(mCreamMaskClearanceMin, mCreamMaskClearanceMax);
-    setRestringPadBounds(mRestringPadMin, mRestringPadMax);
-    setRestringViaBounds(mRestringViaMin, mRestringViaMax);
+    setPadAnnularRingBounds(mPadAnnularRingMin, mPadAnnularRingMax);
+    setViaAnnularRingBounds(mViaAnnularRingMin, mViaAnnularRingMax);
   } catch (const Exception& e) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("Invalid design rules: %1").arg(e.getMsg()));
@@ -131,25 +133,25 @@ void BoardDesignRules::setCreamMaskClearanceBounds(const UnsignedLength& min,
   }
 }
 
-void BoardDesignRules::setRestringPadBounds(const UnsignedLength& min,
-                                            const UnsignedLength& max) {
+void BoardDesignRules::setPadAnnularRingBounds(const UnsignedLength& min,
+                                               const UnsignedLength& max) {
   if (max >= min) {
-    mRestringPadMin = min;
-    mRestringPadMax = max;
+    mPadAnnularRingMin = min;
+    mPadAnnularRingMax = max;
   } else {
     throw RuntimeError(__FILE__, __LINE__,
-                       tr("Restring pads: MAX must be >= MIN"));
+                       tr("Pads annular ring: MAX must be >= MIN"));
   }
 }
 
-void BoardDesignRules::setRestringViaBounds(const UnsignedLength& min,
-                                            const UnsignedLength& max) {
+void BoardDesignRules::setViaAnnularRingBounds(const UnsignedLength& min,
+                                               const UnsignedLength& max) {
   if (max >= min) {
-    mRestringViaMin = min;
-    mRestringViaMax = max;
+    mViaAnnularRingMin = min;
+    mViaAnnularRingMax = max;
   } else {
     throw RuntimeError(__FILE__, __LINE__,
-                       tr("Restring vias: MAX must be >= MIN"));
+                       tr("Vias annular ring: MAX must be >= MIN"));
   }
 }
 
@@ -179,19 +181,20 @@ void BoardDesignRules::serialize(SExpression& root) const {
   root.appendChild("creammask_clearance_min", mCreamMaskClearanceMin);
   root.ensureLineBreak();
   root.appendChild("creammask_clearance_max", mCreamMaskClearanceMax);
-  // restring
+  // pad annular ring
   root.ensureLineBreak();
-  root.appendChild("restring_pad_ratio", mRestringPadRatio);
+  root.appendChild("pad_annular_ring_ratio", mPadAnnularRingRatio);
   root.ensureLineBreak();
-  root.appendChild("restring_pad_min", mRestringPadMin);
+  root.appendChild("pad_annular_ring_min", mPadAnnularRingMin);
   root.ensureLineBreak();
-  root.appendChild("restring_pad_max", mRestringPadMax);
+  root.appendChild("pad_annular_ring_max", mPadAnnularRingMax);
+  // via annular ring
   root.ensureLineBreak();
-  root.appendChild("restring_via_ratio", mRestringViaRatio);
+  root.appendChild("via_annular_ring_ratio", mViaAnnularRingRatio);
   root.ensureLineBreak();
-  root.appendChild("restring_via_min", mRestringViaMin);
+  root.appendChild("via_annular_ring_min", mViaAnnularRingMin);
   root.ensureLineBreak();
-  root.appendChild("restring_via_max", mRestringViaMax);
+  root.appendChild("via_annular_ring_max", mViaAnnularRingMax);
   root.ensureLineBreak();
 }
 
@@ -220,18 +223,20 @@ UnsignedLength BoardDesignRules::calcCreamMaskClearance(
              *mCreamMaskClearanceMax));
 }
 
-UnsignedLength BoardDesignRules::calcPadRestring(const Length& drillDia) const
-    noexcept {
-  return UnsignedLength(qBound(
-      *mRestringPadMin, drillDia.scaled(mRestringPadRatio->toNormalized()),
-      *mRestringPadMax));
+UnsignedLength BoardDesignRules::calcPadAnnularRing(
+    const Length& drillDia) const noexcept {
+  return UnsignedLength(
+      qBound(*mPadAnnularRingMin,
+             drillDia.scaled(mPadAnnularRingRatio->toNormalized()),
+             *mPadAnnularRingMax));
 }
 
-UnsignedLength BoardDesignRules::calcViaRestring(const Length& drillDia) const
-    noexcept {
-  return UnsignedLength(qBound(
-      *mRestringViaMin, drillDia.scaled(mRestringViaRatio->toNormalized()),
-      *mRestringViaMax));
+UnsignedLength BoardDesignRules::calcViaAnnularRing(
+    const Length& drillDia) const noexcept {
+  return UnsignedLength(
+      qBound(*mViaAnnularRingMin,
+             drillDia.scaled(mViaAnnularRingRatio->toNormalized()),
+             *mViaAnnularRingMax));
 }
 
 /*******************************************************************************
@@ -249,13 +254,14 @@ BoardDesignRules& BoardDesignRules::operator=(
   mCreamMaskClearanceRatio = rhs.mCreamMaskClearanceRatio;
   mCreamMaskClearanceMin = rhs.mCreamMaskClearanceMin;
   mCreamMaskClearanceMax = rhs.mCreamMaskClearanceMax;
-  // restring
-  mRestringPadRatio = rhs.mRestringPadRatio;
-  mRestringPadMin = rhs.mRestringPadMin;
-  mRestringPadMax = rhs.mRestringPadMax;
-  mRestringViaRatio = rhs.mRestringViaRatio;
-  mRestringViaMin = rhs.mRestringViaMin;
-  mRestringViaMax = rhs.mRestringViaMax;
+  // pad annular ring
+  mPadAnnularRingRatio = rhs.mPadAnnularRingRatio;
+  mPadAnnularRingMin = rhs.mPadAnnularRingMin;
+  mPadAnnularRingMax = rhs.mPadAnnularRingMax;
+  // via annular ring
+  mViaAnnularRingRatio = rhs.mViaAnnularRingRatio;
+  mViaAnnularRingMin = rhs.mViaAnnularRingMin;
+  mViaAnnularRingMax = rhs.mViaAnnularRingMax;
   return *this;
 }
 

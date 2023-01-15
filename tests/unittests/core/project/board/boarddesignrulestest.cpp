@@ -50,12 +50,12 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
       " (creammask_clearance_ratio 0.3)\n"
       " (creammask_clearance_min 1.3)\n"
       " (creammask_clearance_max 2.3)\n"
-      " (restring_pad_ratio 0.4)\n"
-      " (restring_pad_min 1.4)\n"
-      " (restring_pad_max 2.4)\n"
-      " (restring_via_ratio 0.5)\n"
-      " (restring_via_min 1.5)\n"
-      " (restring_via_max 2.5)\n"
+      " (pad_annular_ring_ratio 0.4)\n"
+      " (pad_annular_ring_min 1.4)\n"
+      " (pad_annular_ring_max 2.4)\n"
+      " (via_annular_ring_ratio 0.5)\n"
+      " (via_annular_ring_min 1.5)\n"
+      " (via_annular_ring_max 2.5)\n"
       ")",
       FilePath());
   BoardDesignRules obj(sexpr);
@@ -66,12 +66,12 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
   EXPECT_EQ(UnsignedRatio(Ratio(300000)), obj.getCreamMaskClearanceRatio());
   EXPECT_EQ(UnsignedLength(1300000), obj.getCreamMaskClearanceMin());
   EXPECT_EQ(UnsignedLength(2300000), obj.getCreamMaskClearanceMax());
-  EXPECT_EQ(UnsignedRatio(Ratio(400000)), obj.getRestringPadRatio());
-  EXPECT_EQ(UnsignedLength(1400000), obj.getRestringPadMin());
-  EXPECT_EQ(UnsignedLength(2400000), obj.getRestringPadMax());
-  EXPECT_EQ(UnsignedRatio(Ratio(500000)), obj.getRestringViaRatio());
-  EXPECT_EQ(UnsignedLength(1500000), obj.getRestringViaMin());
-  EXPECT_EQ(UnsignedLength(2500000), obj.getRestringViaMax());
+  EXPECT_EQ(UnsignedRatio(Ratio(400000)), obj.getPadAnnularRingRatio());
+  EXPECT_EQ(UnsignedLength(1400000), obj.getPadAnnularRingMin());
+  EXPECT_EQ(UnsignedLength(2400000), obj.getPadAnnularRingMax());
+  EXPECT_EQ(UnsignedRatio(Ratio(500000)), obj.getViaAnnularRingRatio());
+  EXPECT_EQ(UnsignedLength(1500000), obj.getViaAnnularRingMin());
+  EXPECT_EQ(UnsignedLength(2500000), obj.getViaAnnularRingMax());
 }
 
 TEST_F(BoardDesignRulesTest, testSerializeAndDeserialize) {
@@ -81,10 +81,10 @@ TEST_F(BoardDesignRulesTest, testSerializeAndDeserialize) {
   obj1.setStopMaskMaxViaDiameter(UnsignedLength(44));
   obj1.setCreamMaskClearanceRatio(UnsignedRatio(Ratio(55)));
   obj1.setCreamMaskClearanceBounds(UnsignedLength(66), UnsignedLength(77));
-  obj1.setRestringPadRatio(UnsignedRatio(Ratio(88)));
-  obj1.setRestringPadBounds(UnsignedLength(99), UnsignedLength(111));
-  obj1.setRestringViaRatio(UnsignedRatio(Ratio(222)));
-  obj1.setRestringViaBounds(UnsignedLength(333), UnsignedLength(444));
+  obj1.setPadAnnularRingRatio(UnsignedRatio(Ratio(88)));
+  obj1.setPadAnnularRingBounds(UnsignedLength(99), UnsignedLength(111));
+  obj1.setViaAnnularRingRatio(UnsignedRatio(Ratio(222)));
+  obj1.setViaAnnularRingBounds(UnsignedLength(333), UnsignedLength(444));
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);
 

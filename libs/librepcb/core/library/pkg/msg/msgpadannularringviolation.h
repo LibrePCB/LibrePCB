@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_MSGPADRESTRINGVIOLATION_H
-#define LIBREPCB_CORE_MSGPADRESTRINGVIOLATION_H
+#ifndef LIBREPCB_CORE_MSGPADANNULARRINGVIOLATION_H
+#define LIBREPCB_CORE_MSGPADANNULARRINGVIOLATION_H
 
 /*******************************************************************************
  *  Includes
@@ -38,27 +38,27 @@ class FootprintPad;
 class Hole;
 
 /*******************************************************************************
- *  Class MsgPadRestringViolation
+ *  Class MsgPadAnnularRingViolation
  ******************************************************************************/
 
 /**
- * @brief The MsgPadRestringViolation class
+ * @brief The MsgPadAnnularRingViolation class
  */
-class MsgPadRestringViolation final : public LibraryElementCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(MsgPadRestringViolation)
+class MsgPadAnnularRingViolation final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgPadAnnularRingViolation)
 
 public:
   // Constructors / Destructor
-  MsgPadRestringViolation() = delete;
-  MsgPadRestringViolation(std::shared_ptr<const Footprint> footprint,
-                          std::shared_ptr<const FootprintPad> pad,
-                          const QString& pkgPadName,
-                          const Length& restring) noexcept;
-  MsgPadRestringViolation(const MsgPadRestringViolation& other) noexcept
+  MsgPadAnnularRingViolation() = delete;
+  MsgPadAnnularRingViolation(std::shared_ptr<const Footprint> footprint,
+                             std::shared_ptr<const FootprintPad> pad,
+                             const QString& pkgPadName,
+                             const Length& annularRing) noexcept;
+  MsgPadAnnularRingViolation(const MsgPadAnnularRingViolation& other) noexcept
     : LibraryElementCheckMessage(other),
       mFootprint(other.mFootprint),
       mPad(other.mPad) {}
-  virtual ~MsgPadRestringViolation() noexcept;
+  virtual ~MsgPadAnnularRingViolation() noexcept;
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {

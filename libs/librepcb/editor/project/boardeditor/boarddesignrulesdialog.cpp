@@ -59,20 +59,20 @@ BoardDesignRulesDialog::BoardDesignRulesDialog(const BoardDesignRules& rules,
   mUi->edtCreamMaskClrMax->configure(
       lengthUnit, LengthEditBase::Steps::generic(),
       settingsPrefix % "/creammask_clearance_max");
-  mUi->edtRestringPadsRatio->setSingleStep(5.0);  // [%]
-  mUi->edtRestringPadsMin->configure(lengthUnit,
-                                     LengthEditBase::Steps::generic(),
-                                     settingsPrefix % "/restring_pads_min");
-  mUi->edtRestringPadsMax->configure(lengthUnit,
-                                     LengthEditBase::Steps::generic(),
-                                     settingsPrefix % "/restring_pads_max");
-  mUi->edtRestringViasRatio->setSingleStep(5.0);  // [%]
-  mUi->edtRestringViasMin->configure(lengthUnit,
-                                     LengthEditBase::Steps::generic(),
-                                     settingsPrefix % "/restring_vias_min");
-  mUi->edtRestringViasMax->configure(lengthUnit,
-                                     LengthEditBase::Steps::generic(),
-                                     settingsPrefix % "/restring_vias_max");
+  mUi->edtPadAnnularRingRatio->setSingleStep(5.0);  // [%]
+  mUi->edtPadAnnularRingMin->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/pad_annular_ring_min");
+  mUi->edtPadAnnularRingMax->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/pad_annular_ring_max");
+  mUi->edtViaAnnularRingRatio->setSingleStep(5.0);  // [%]
+  mUi->edtViaAnnularRingMin->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/via_annular_ring_min");
+  mUi->edtViaAnnularRingMax->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/via_annular_ring_max");
 
   updateWidgets();
 }
@@ -120,13 +120,14 @@ void BoardDesignRulesDialog::updateWidgets() noexcept {
       mDesignRules.getCreamMaskClearanceRatio());
   mUi->edtCreamMaskClrMin->setValue(mDesignRules.getCreamMaskClearanceMin());
   mUi->edtCreamMaskClrMax->setValue(mDesignRules.getCreamMaskClearanceMax());
-  // restring
-  mUi->edtRestringPadsRatio->setValue(mDesignRules.getRestringPadRatio());
-  mUi->edtRestringPadsMin->setValue(mDesignRules.getRestringPadMin());
-  mUi->edtRestringPadsMax->setValue(mDesignRules.getRestringPadMax());
-  mUi->edtRestringViasRatio->setValue(mDesignRules.getRestringViaRatio());
-  mUi->edtRestringViasMin->setValue(mDesignRules.getRestringViaMin());
-  mUi->edtRestringViasMax->setValue(mDesignRules.getRestringViaMax());
+  // pad annular ring
+  mUi->edtPadAnnularRingRatio->setValue(mDesignRules.getPadAnnularRingRatio());
+  mUi->edtPadAnnularRingMin->setValue(mDesignRules.getPadAnnularRingMin());
+  mUi->edtPadAnnularRingMax->setValue(mDesignRules.getPadAnnularRingMax());
+  // via annular ring
+  mUi->edtViaAnnularRingRatio->setValue(mDesignRules.getViaAnnularRingRatio());
+  mUi->edtViaAnnularRingMin->setValue(mDesignRules.getViaAnnularRingMin());
+  mUi->edtViaAnnularRingMax->setValue(mDesignRules.getViaAnnularRingMax());
 }
 
 void BoardDesignRulesDialog::applyRules() noexcept {
@@ -145,15 +146,18 @@ void BoardDesignRulesDialog::applyRules() noexcept {
     mDesignRules.setCreamMaskClearanceBounds(
         mUi->edtCreamMaskClrMin->getValue(),
         mUi->edtCreamMaskClrMax->getValue());  // can throw
-    // restring
-    mDesignRules.setRestringPadRatio(mUi->edtRestringPadsRatio->getValue());
-    mDesignRules.setRestringPadBounds(
-        mUi->edtRestringPadsMin->getValue(),
-        mUi->edtRestringPadsMax->getValue());  // can throw
-    mDesignRules.setRestringViaRatio(mUi->edtRestringViasRatio->getValue());
-    mDesignRules.setRestringViaBounds(
-        mUi->edtRestringViasMin->getValue(),
-        mUi->edtRestringViasMax->getValue());  // can throw
+    // pad annular ring
+    mDesignRules.setPadAnnularRingRatio(
+        mUi->edtPadAnnularRingRatio->getValue());
+    mDesignRules.setPadAnnularRingBounds(
+        mUi->edtPadAnnularRingMin->getValue(),
+        mUi->edtPadAnnularRingMax->getValue());  // can throw
+    // via annular ring
+    mDesignRules.setViaAnnularRingRatio(
+        mUi->edtViaAnnularRingRatio->getValue());
+    mDesignRules.setViaAnnularRingBounds(
+        mUi->edtViaAnnularRingMin->getValue(),
+        mUi->edtViaAnnularRingMax->getValue());  // can throw
   } catch (const Exception& e) {
     QMessageBox::warning(this, tr("Could not apply settings"), e.getMsg());
   }

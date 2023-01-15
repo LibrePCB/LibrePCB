@@ -77,24 +77,26 @@ public:
     return mCreamMaskClearanceMax;
   }
 
-  // Getters: Restring
-  const UnsignedRatio& getRestringPadRatio() const noexcept {
-    return mRestringPadRatio;
+  // Getters: Pad Annular Ring
+  const UnsignedRatio& getPadAnnularRingRatio() const noexcept {
+    return mPadAnnularRingRatio;
   }
-  const UnsignedLength& getRestringPadMin() const noexcept {
-    return mRestringPadMin;
+  const UnsignedLength& getPadAnnularRingMin() const noexcept {
+    return mPadAnnularRingMin;
   }
-  const UnsignedLength& getRestringPadMax() const noexcept {
-    return mRestringPadMax;
+  const UnsignedLength& getPadAnnularRingMax() const noexcept {
+    return mPadAnnularRingMax;
   }
-  const UnsignedRatio& getRestringViaRatio() const noexcept {
-    return mRestringViaRatio;
+
+  // Getters: Via Annular Ring
+  const UnsignedRatio& getViaAnnularRingRatio() const noexcept {
+    return mViaAnnularRingRatio;
   }
-  const UnsignedLength& getRestringViaMin() const noexcept {
-    return mRestringViaMin;
+  const UnsignedLength& getViaAnnularRingMin() const noexcept {
+    return mViaAnnularRingMin;
   }
-  const UnsignedLength& getRestringViaMax() const noexcept {
-    return mRestringViaMax;
+  const UnsignedLength& getViaAnnularRingMax() const noexcept {
+    return mViaAnnularRingMax;
   }
 
   // Setters: Stop Mask
@@ -114,17 +116,19 @@ public:
   void setCreamMaskClearanceBounds(const UnsignedLength& min,
                                    const UnsignedLength& max);
 
-  // Setters: Restring
-  void setRestringPadRatio(const UnsignedRatio& ratio) noexcept {
-    mRestringPadRatio = ratio;
+  // Setters: Pad Annular Ring
+  void setPadAnnularRingRatio(const UnsignedRatio& ratio) noexcept {
+    mPadAnnularRingRatio = ratio;
   }
-  void setRestringPadBounds(const UnsignedLength& min,
-                            const UnsignedLength& max);
-  void setRestringViaRatio(const UnsignedRatio& ratio) noexcept {
-    mRestringViaRatio = ratio;
+  void setPadAnnularRingBounds(const UnsignedLength& min,
+                               const UnsignedLength& max);
+
+  // Setters: Via Annular Ring
+  void setViaAnnularRingRatio(const UnsignedRatio& ratio) noexcept {
+    mViaAnnularRingRatio = ratio;
   }
-  void setRestringViaBounds(const UnsignedLength& min,
-                            const UnsignedLength& max);
+  void setViaAnnularRingBounds(const UnsignedLength& min,
+                               const UnsignedLength& max);
 
   // General Methods
   void restoreDefaults() noexcept;
@@ -140,8 +144,8 @@ public:
   bool doesViaRequireStopMask(const Length& drillDia) const noexcept;
   UnsignedLength calcStopMaskClearance(const Length& padSize) const noexcept;
   UnsignedLength calcCreamMaskClearance(const Length& padSize) const noexcept;
-  UnsignedLength calcPadRestring(const Length& drillDia) const noexcept;
-  UnsignedLength calcViaRestring(const Length& drillDia) const noexcept;
+  UnsignedLength calcPadAnnularRing(const Length& drillDia) const noexcept;
+  UnsignedLength calcViaAnnularRing(const Length& drillDia) const noexcept;
 
   // Operator Overloadings
   BoardDesignRules& operator=(const BoardDesignRules& rhs) noexcept;
@@ -158,13 +162,15 @@ private:
   UnsignedLength mCreamMaskClearanceMin;
   UnsignedLength mCreamMaskClearanceMax;
 
-  // Restring
-  UnsignedRatio mRestringPadRatio;
-  UnsignedLength mRestringPadMin;
-  UnsignedLength mRestringPadMax;
-  UnsignedRatio mRestringViaRatio;
-  UnsignedLength mRestringViaMin;
-  UnsignedLength mRestringViaMax;
+  // Pad Annular Ring
+  UnsignedRatio mPadAnnularRingRatio;  /// Percentage of the drill diameter
+  UnsignedLength mPadAnnularRingMin;
+  UnsignedLength mPadAnnularRingMax;
+
+  // Via Annular Ring
+  UnsignedRatio mViaAnnularRingRatio;  /// Percentage of the drill diameter
+  UnsignedLength mViaAnnularRingMin;
+  UnsignedLength mViaAnnularRingMax;
 };
 
 /*******************************************************************************

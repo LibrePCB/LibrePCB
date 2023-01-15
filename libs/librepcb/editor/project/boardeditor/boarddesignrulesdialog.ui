@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="4" column="3">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringPadsMax" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtPadAnnularRingMax" native="true"/>
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label_3">
@@ -49,15 +49,15 @@
     <widget class="librepcb::editor::UnsignedRatioEdit" name="edtStopMaskClrRatio" native="true"/>
    </item>
    <item row="5" column="2">
-    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRestringViasRatio" native="true"/>
+    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtViaAnnularRingRatio" native="true"/>
    </item>
    <item row="5" column="1">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringViasMin" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtViaAnnularRingMin" native="true"/>
    </item>
    <item row="4" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
-      <string>Restring THT Pads:</string>
+      <string>Pads Annular Ring:</string>
      </property>
     </widget>
    </item>
@@ -90,12 +90,12 @@
    <item row="5" column="0">
     <widget class="QLabel" name="label_10">
      <property name="text">
-      <string>Restring Vias:</string>
+      <string>Vias Annular Ring:</string>
      </property>
     </widget>
    </item>
    <item row="5" column="3">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringViasMax" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtViaAnnularRingMax" native="true"/>
    </item>
    <item row="0" column="1">
     <widget class="QLabel" name="label_4">
@@ -105,7 +105,7 @@
     </widget>
    </item>
    <item row="4" column="1">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringPadsMin" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtPadAnnularRingMin" native="true"/>
    </item>
    <item row="3" column="1">
     <widget class="librepcb::editor::UnsignedLengthEdit" name="edtCreamMaskClrMin" native="true"/>
@@ -117,7 +117,7 @@
     <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskClrMin" native="true"/>
    </item>
    <item row="4" column="2">
-    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRestringPadsRatio" native="true"/>
+    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtPadAnnularRingRatio" native="true"/>
    </item>
   </layout>
  </widget>
@@ -143,12 +143,12 @@
   <tabstop>edtCreamMaskClrMin</tabstop>
   <tabstop>edtCreamMaskClrRatio</tabstop>
   <tabstop>edtCreamMaskClrMax</tabstop>
-  <tabstop>edtRestringPadsMin</tabstop>
-  <tabstop>edtRestringPadsRatio</tabstop>
-  <tabstop>edtRestringPadsMax</tabstop>
-  <tabstop>edtRestringViasMin</tabstop>
-  <tabstop>edtRestringViasRatio</tabstop>
-  <tabstop>edtRestringViasMax</tabstop>
+  <tabstop>edtPadAnnularRingMin</tabstop>
+  <tabstop>edtPadAnnularRingRatio</tabstop>
+  <tabstop>edtPadAnnularRingMax</tabstop>
+  <tabstop>edtViaAnnularRingMin</tabstop>
+  <tabstop>edtViaAnnularRingRatio</tabstop>
+  <tabstop>edtViaAnnularRingMax</tabstop>
  </tabstops>
  <resources/>
  <connections>

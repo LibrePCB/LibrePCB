@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "msgpadrestringviolation.h"
+#include "msgpadannularringviolation.h"
 
 #include "../footprint.h"
 
@@ -33,23 +33,23 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-MsgPadRestringViolation::MsgPadRestringViolation(
+MsgPadAnnularRingViolation::MsgPadAnnularRingViolation(
     std::shared_ptr<const Footprint> footprint,
     std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName,
-    const Length& restring) noexcept
+    const Length& annularRing) noexcept
   : LibraryElementCheckMessage(
         Severity::Warning,
-        tr("Restring of pad '%1' in '%3'")
+        tr("Annular ring of pad '%1' in '%3'")
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
-        tr("Pads should have at least %1 restring (copper around each pad "
+        tr("Pads should have at least %1 annular ring (copper around each pad "
            "hole). Note that this value is just a general recommendation, the "
            "exact value depends on the capabilities of the PCB manufacturer.")
-            .arg(QString::number(restring.toMm() * 1000) % "μm")),
+            .arg(QString::number(annularRing.toMm() * 1000) % "μm")),
     mFootprint(footprint),
     mPad(pad) {
 }
 
-MsgPadRestringViolation::~MsgPadRestringViolation() noexcept {
+MsgPadAnnularRingViolation::~MsgPadAnnularRingViolation() noexcept {
 }
 
 /*******************************************************************************
