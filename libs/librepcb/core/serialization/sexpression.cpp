@@ -162,6 +162,18 @@ const SExpression* SExpression::tryGetChild(const QString& path) const
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void SExpression::setName(const QString& name) {
+  if (mType == Type::List) {
+    mValue = name;
+  } else {
+    throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 

@@ -157,6 +157,9 @@ public:
   SExpression* tryGetChild(const QString& path) noexcept;
   const SExpression* tryGetChild(const QString& path) const noexcept;
 
+  // Setters
+  void setName(const QString& name);
+
   // General Methods
   void ensureLineBreak();
   SExpression& appendList(const QString& name);
