@@ -913,7 +913,7 @@ void SchematicEditorState_Select::openSymbolPropertiesDialog(
     SI_Symbol& symbol) noexcept {
   SymbolInstancePropertiesDialog dialog(
       mContext.workspace, mContext.project, symbol.getComponentInstance(),
-      symbol, mContext.undoStack, getDefaultLengthUnit(),
+      symbol, mContext.undoStack, getLengthUnit(),
       "schematic_editor/symbol_properties_dialog", parentWidget());
   dialog.exec();
 }
@@ -927,19 +927,19 @@ void SchematicEditorState_Select::openNetLabelPropertiesDialog(
 
 void SchematicEditorState_Select::openPolygonPropertiesDialog(
     SI_Polygon& polygon) noexcept {
-  PolygonPropertiesDialog dialog(
-      polygon.getPolygon(), mContext.undoStack, getAllowedGeometryLayers(),
-      getDefaultLengthUnit(), "schematic_editor/polygon_properties_dialog",
-      parentWidget());
+  PolygonPropertiesDialog dialog(polygon.getPolygon(), mContext.undoStack,
+                                 getAllowedGeometryLayers(), getLengthUnit(),
+                                 "schematic_editor/polygon_properties_dialog",
+                                 parentWidget());
   dialog.exec();
 }
 
 void SchematicEditorState_Select::openTextPropertiesDialog(
     SI_Text& text) noexcept {
-  TextPropertiesDialog dialog(
-      text.getText(), mContext.undoStack, getAllowedGeometryLayers(),
-      getDefaultLengthUnit(), "schematic_editor/text_properties_dialog",
-      parentWidget());
+  TextPropertiesDialog dialog(text.getText(), mContext.undoStack,
+                              getAllowedGeometryLayers(), getLengthUnit(),
+                              "schematic_editor/text_properties_dialog",
+                              parentWidget());
   dialog.exec();  // performs the modifications
 }
 

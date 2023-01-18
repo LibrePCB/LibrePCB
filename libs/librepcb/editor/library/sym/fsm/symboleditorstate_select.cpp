@@ -495,7 +495,7 @@ bool SymbolEditorState_Select::processImportDxf() noexcept {
     // Ask for file path and import options.
     DxfImportDialog dialog(getAllowedCircleAndPolygonLayers(),
                            GraphicsLayerName(GraphicsLayer::sSymbolOutlines),
-                           false, getDefaultLengthUnit(),
+                           false, getLengthUnit(),
                            "symbol_editor/dxf_import_dialog",
                            &mContext.editorWidget);
     FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
@@ -714,14 +714,14 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
 
   if (auto i = std::dynamic_pointer_cast<SymbolPinGraphicsItem>(item)) {
     SymbolPinPropertiesDialog dialog(
-        i->getPin(), mContext.undoStack, getDefaultLengthUnit(),
+        i->getPin(), mContext.undoStack, getLengthUnit(),
         "symbol_editor/pin_properties_dialog", &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();
     return true;
   } else if (auto i = std::dynamic_pointer_cast<TextGraphicsItem>(item)) {
     TextPropertiesDialog dialog(i->getText(), mContext.undoStack,
-                                getAllowedTextLayers(), getDefaultLengthUnit(),
+                                getAllowedTextLayers(), getLengthUnit(),
                                 "symbol_editor/text_properties_dialog",
                                 &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
@@ -730,7 +730,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
   } else if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
     PolygonPropertiesDialog dialog(
         i->getPolygon(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
-        getDefaultLengthUnit(), "symbol_editor/polygon_properties_dialog",
+        getLengthUnit(), "symbol_editor/polygon_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();
@@ -738,7 +738,7 @@ bool SymbolEditorState_Select::openPropertiesDialogOfItem(
   } else if (auto i = std::dynamic_pointer_cast<CircleGraphicsItem>(item)) {
     CirclePropertiesDialog dialog(
         i->getCircle(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
-        getDefaultLengthUnit(), "symbol_editor/circle_properties_dialog",
+        getLengthUnit(), "symbol_editor/circle_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();

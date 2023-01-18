@@ -75,8 +75,13 @@ PositiveLength SchematicEditorState::getGridInterval() const noexcept {
   return mContext.editorGraphicsView.getGridProperties().getInterval();
 }
 
-const LengthUnit& SchematicEditorState::getDefaultLengthUnit() const noexcept {
-  return mContext.workspace.getSettings().defaultLengthUnit.get();
+const LengthUnit& SchematicEditorState::getLengthUnit() const noexcept {
+  if (const Schematic* schematic =
+          const_cast<SchematicEditorState*>(this)->getActiveSchematic()) {
+    return schematic->getGridProperties().getUnit();
+  } else {
+    return mContext.workspace.getSettings().defaultLengthUnit.get();
+  }
 }
 
 QList<GraphicsLayer*> SchematicEditorState::getAllowedGeometryLayers() const

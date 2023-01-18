@@ -27,8 +27,6 @@
 
 #include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/types/gridproperties.h>
-#include <librepcb/core/workspace/workspace.h>
-#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -57,8 +55,8 @@ const PositiveLength& SymbolEditorState::getGridInterval() const noexcept {
   return mContext.graphicsView.getGridProperties().getInterval();
 }
 
-const LengthUnit& SymbolEditorState::getDefaultLengthUnit() const noexcept {
-  return mContext.editorContext.workspace.getSettings().defaultLengthUnit.get();
+const LengthUnit& SymbolEditorState::getLengthUnit() const noexcept {
+  return mContext.graphicsView.getGridProperties().getUnit();
 }
 
 QList<GraphicsLayer*> SymbolEditorState::getAllowedTextLayers() const noexcept {

@@ -136,7 +136,7 @@ signals:
 
 protected:  // Methods
   const PositiveLength& getGridInterval() const noexcept;
-  const LengthUnit& getDefaultLengthUnit() const noexcept;
+  const LengthUnit& getLengthUnit() const noexcept;
   QList<GraphicsLayer*> getAllowedTextLayers() const noexcept;
   QList<GraphicsLayer*> getAllowedCircleAndPolygonLayers() const noexcept;
 

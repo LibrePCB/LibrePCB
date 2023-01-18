@@ -76,8 +76,13 @@ PositiveLength BoardEditorState::getGridInterval() const noexcept {
   return mContext.editorGraphicsView.getGridProperties().getInterval();
 }
 
-const LengthUnit& BoardEditorState::getDefaultLengthUnit() const noexcept {
-  return mContext.workspace.getSettings().defaultLengthUnit.get();
+const LengthUnit& BoardEditorState::getLengthUnit() const noexcept {
+  if (const Board* board =
+          const_cast<BoardEditorState*>(this)->getActiveBoard()) {
+    return board->getGridProperties().getUnit();
+  } else {
+    return mContext.workspace.getSettings().defaultLengthUnit.get();
+  }
 }
 
 QList<GraphicsLayer*> BoardEditorState::getAllowedGeometryLayers(

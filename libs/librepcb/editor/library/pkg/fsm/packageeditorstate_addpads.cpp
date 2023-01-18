@@ -151,7 +151,7 @@ bool PackageEditorState_AddPads::entry() noexcept {
   mContext.commandToolBar.addLabel(tr("Width:"), 10);
   std::unique_ptr<PositiveLengthEdit> edtWidth(new PositiveLengthEdit());
   QPointer<PositiveLengthEdit> edtWidthPtr = edtWidth.get();
-  edtWidth->configure(getDefaultLengthUnit(), LengthEditBase::Steps::generic(),
+  edtWidth->configure(getLengthUnit(), LengthEditBase::Steps::generic(),
                       "package_editor/add_pads/width");
   edtWidth->setValue(mLastPad.getWidth());
   edtWidth->addAction(cmd.lineWidthIncrease.createAction(
@@ -166,7 +166,7 @@ bool PackageEditorState_AddPads::entry() noexcept {
   mContext.commandToolBar.addLabel(tr("Height:"), 10);
   std::unique_ptr<PositiveLengthEdit> edtHeight(new PositiveLengthEdit());
   QPointer<PositiveLengthEdit> edtHeightPtr = edtHeight.get();
-  edtHeight->configure(getDefaultLengthUnit(), LengthEditBase::Steps::generic(),
+  edtHeight->configure(getLengthUnit(), LengthEditBase::Steps::generic(),
                        "package_editor/add_pads/height");
   edtHeight->setValue(mLastPad.getHeight());
   edtHeight->addAction(cmd.sizeIncrease.createAction(
@@ -184,7 +184,7 @@ bool PackageEditorState_AddPads::entry() noexcept {
     std::unique_ptr<PositiveLengthEdit> edtDrillDiameter(
         new PositiveLengthEdit());
     edtDrillDiameterPtr = edtDrillDiameter.get();
-    edtDrillDiameter->configure(getDefaultLengthUnit(),
+    edtDrillDiameter->configure(getLengthUnit(),
                                 LengthEditBase::Steps::drillDiameter(),
                                 "package_editor/add_pads/drill_diameter");
     edtDrillDiameter->setValue(mLastPad.getHoles().first()->getDiameter());

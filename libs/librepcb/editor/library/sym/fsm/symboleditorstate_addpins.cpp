@@ -78,8 +78,7 @@ bool SymbolEditorState_AddPins::entry() noexcept {
 
   mContext.commandToolBar.addLabel(tr("Length:"), 10);
   std::unique_ptr<UnsignedLengthEdit> edtLength(new UnsignedLengthEdit());
-  edtLength->configure(getDefaultLengthUnit(),
-                       LengthEditBase::Steps::pinLength(),
+  edtLength->configure(getLengthUnit(), LengthEditBase::Steps::pinLength(),
                        "symbol_editor/add_pins/length");
   edtLength->setValue(mLastLength);
   edtLength->addAction(cmd.sizeIncrease.createAction(
