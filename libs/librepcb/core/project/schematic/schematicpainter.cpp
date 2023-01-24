@@ -125,22 +125,28 @@ void SchematicPainter::paint(QPainter& painter,
 
   // Draw Symbols.
   foreach (const Symbol& symbol, mSymbols) {
-    // Draw Symbol Polygons.
-    foreach (const Polygon& polygon, symbol.polygons) {
-      p.drawPolygon(
-          symbol.transform.map(polygon.getPath()), *polygon.getLineWidth(),
-          settings.getColor(*polygon.getLayerName()),
-          settings.getFillColor(*polygon.getLayerName(), polygon.isFilled(),
-                                polygon.isGrabArea()));
-    }
+    // Draw grab areas first to make them appearing behind every other graphics
+    // item. Otherwise they might completely cover (hide) other items.
+    for (bool grabArea : {true, false}) {
+      // Draw Symbol Polygons.
+      foreach (const Polygon& polygon, symbol.polygons) {
+        if (polygon.isGrabArea() != grabArea) continue;
+        p.drawPolygon(
+            symbol.transform.map(polygon.getPath()), *polygon.getLineWidth(),
+            settings.getColor(*polygon.getLayerName()),
+            settings.getFillColor(*polygon.getLayerName(), polygon.isFilled(),
+                                  polygon.isGrabArea()));
+      }
 
-    // Draw Symbol Circles.
-    foreach (const Circle& circle, symbol.circles) {
-      p.drawCircle(
-          symbol.transform.map(circle.getCenter()), *circle.getDiameter(),
-          *circle.getLineWidth(), settings.getColor(*circle.getLayerName()),
-          settings.getFillColor(*circle.getLayerName(), circle.isFilled(),
-                                circle.isGrabArea()));
+      // Draw Symbol Circles.
+      foreach (const Circle& circle, symbol.circles) {
+        if (circle.isGrabArea() != grabArea) continue;
+        p.drawCircle(
+            symbol.transform.map(circle.getCenter()), *circle.getDiameter(),
+            *circle.getLineWidth(), settings.getColor(*circle.getLayerName()),
+            settings.getFillColor(*circle.getLayerName(), circle.isFilled(),
+                                  circle.isGrabArea()));
+      }
     }
 
     // Draw Symbol Texts.

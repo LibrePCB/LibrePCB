@@ -68,22 +68,28 @@ void SymbolPainter::paint(QPainter& painter,
   GraphicsPainter p(painter);
   p.setMinLineWidth(settings.getMinLineWidth());
 
-  // Draw Polygons.
-  foreach (const Polygon& polygon, mPolygons) {
-    p.drawPolygon(
-        polygon.getPath(), *polygon.getLineWidth(),
-        settings.getColor(*polygon.getLayerName()),
-        settings.getFillColor(*polygon.getLayerName(), polygon.isFilled(),
-                              polygon.isGrabArea()));
-  }
+  // Draw grab areas first to make them appearing behind every other graphics
+  // item. Otherwise they might completely cover (hide) other items.
+  for (bool grabArea : {true, false}) {
+    // Draw Polygons.
+    foreach (const Polygon& polygon, mPolygons) {
+      if (polygon.isGrabArea() != grabArea) continue;
+      p.drawPolygon(
+          polygon.getPath(), *polygon.getLineWidth(),
+          settings.getColor(*polygon.getLayerName()),
+          settings.getFillColor(*polygon.getLayerName(), polygon.isFilled(),
+                                polygon.isGrabArea()));
+    }
 
-  // Draw Circles.
-  foreach (const Circle& circle, mCircles) {
-    p.drawCircle(circle.getCenter(), *circle.getDiameter(),
-                 *circle.getLineWidth(),
-                 settings.getColor(*circle.getLayerName()),
-                 settings.getFillColor(*circle.getLayerName(),
-                                       circle.isFilled(), circle.isGrabArea()));
+    // Draw Circles.
+    foreach (const Circle& circle, mCircles) {
+      if (circle.isGrabArea() != grabArea) continue;
+      p.drawCircle(
+          circle.getCenter(), *circle.getDiameter(), *circle.getLineWidth(),
+          settings.getColor(*circle.getLayerName()),
+          settings.getFillColor(*circle.getLayerName(), circle.isFilled(),
+                                circle.isGrabArea()));
+    }
   }
 
   // Draw Texts.
