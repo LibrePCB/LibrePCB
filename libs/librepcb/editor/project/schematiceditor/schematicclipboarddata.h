@@ -129,18 +129,20 @@ public:
     Point position;
     Angle rotation;
     bool mirrored;
+    TextList texts;
 
     Signal<SymbolInstance> onEdited;  ///< Dummy event, not used
 
     SymbolInstance(const Uuid& uuid, const Uuid& componentInstanceUuid,
                    const Uuid& symbolVariantItemUuid, const Point& position,
-                   const Angle& rotation, bool mirrored)
+                   const Angle& rotation, bool mirrored, const TextList& texts)
       : uuid(uuid),
         componentInstanceUuid(componentInstanceUuid),
         symbolVariantItemUuid(symbolVariantItemUuid),
         position(position),
         rotation(rotation),
         mirrored(mirrored),
+        texts(texts),
         onEdited(*this) {}
 
     explicit SymbolInstance(const SExpression& node)
@@ -150,6 +152,7 @@ public:
         position(node.getChild("position")),
         rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
         mirrored(deserialize<bool>(node.getChild("mirror/@0"))),
+        texts(node),
         onEdited(*this) {}
 
     void serialize(SExpression& root) const {
@@ -163,6 +166,8 @@ public:
       root.appendChild("rotation", rotation);
       root.appendChild("mirror", mirrored);
       root.ensureLineBreak();
+      texts.serialize(root);
+      root.ensureLineBreak();
     }
 
     bool operator!=(const SymbolInstance& rhs) noexcept {
@@ -170,7 +175,7 @@ public:
           (componentInstanceUuid != rhs.componentInstanceUuid) ||
           (symbolVariantItemUuid != rhs.symbolVariantItemUuid) ||
           (position != rhs.position) || (rotation != rhs.rotation) ||
-          (mirrored != rhs.mirrored);
+          (mirrored != rhs.mirrored) || (texts != rhs.texts);
     }
   };
 

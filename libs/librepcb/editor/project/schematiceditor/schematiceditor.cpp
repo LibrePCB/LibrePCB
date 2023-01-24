@@ -446,6 +446,8 @@ void SchematicEditor::createActions() noexcept {
       this, this, [this]() { mFsm->processMirror(Qt::Horizontal); }));
   mActionMirrorVertical.reset(cmd.mirrorVertical.createAction(
       this, this, [this]() { mFsm->processMirror(Qt::Vertical); }));
+  mActionResetAllTexts.reset(cmd.deviceResetTextAll.createAction(
+      this, mFsm.data(), &SchematicEditorFsm::processResetAllTexts));
   mActionProperties.reset(cmd.properties.createAction(
       this, mFsm.data(), &SchematicEditorFsm::processEditProperties));
   mActionRemove.reset(cmd.remove.createAction(
@@ -727,6 +729,7 @@ void SchematicEditor::createMenus() noexcept {
   mb.addAction(mActionRotateCw);
   mb.addAction(mActionMirrorHorizontal);
   mb.addAction(mActionMirrorVertical);
+  mb.addAction(mActionResetAllTexts);
   mb.addSeparator();
   mb.addAction(mActionFind);
   mb.addAction(mActionFindNext);

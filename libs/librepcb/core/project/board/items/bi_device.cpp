@@ -256,6 +256,7 @@ void BI_Device::addStrokeText(BI_StrokeText& text) {
     text.addToBoard();  // can throw
   }
   mStrokeTexts.insert(text.getUuid(), &text);
+  text.setSelected(isSelected());
 }
 
 void BI_Device::removeStrokeText(BI_StrokeText& text) {

@@ -17,70 +17,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_SGI_SYMBOL_H
-#define LIBREPCB_CORE_SGI_SYMBOL_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "sgi_base.h"
+#include "cmdsymbolinstancetextsreset.h"
+
+#include "cmdsymbolinstancetextadd.h"
+#include "cmdsymbolinstancetextremove.h"
+
+#include <librepcb/core/project/schematic/items/si_symbol.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class CircleGraphicsItem;
-class GraphicsLayer;
-class OriginCrossGraphicsItem;
-class PolygonGraphicsItem;
-class SI_Symbol;
+namespace editor {
 
 /*******************************************************************************
- *  Class SGI_Symbol
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The SGI_Symbol class
- */
-class SGI_Symbol final : public SGI_Base {
-public:
-  // Constructors / Destructor
-  SGI_Symbol() = delete;
-  SGI_Symbol(const SGI_Symbol& other) = delete;
-  explicit SGI_Symbol(SI_Symbol& symbol) noexcept;
-  ~SGI_Symbol() noexcept;
+CmdSymbolInstanceTextsReset::CmdSymbolInstanceTextsReset(
+    SI_Symbol& symbol) noexcept
+  : UndoCommandGroup(tr("Reset symbol texts")), mSymbol(symbol) {
+}
 
-  // General Methods
-  void setPosition(const Point& pos) noexcept;
-  void setSelected(bool selected) noexcept;
-  void updateRotationAndMirror() noexcept;
+CmdSymbolInstanceTextsReset::~CmdSymbolInstanceTextsReset() noexcept {
+}
 
-  // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept override { return mBoundingRect; }
-  QPainterPath shape() const noexcept override { return mShape; }
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
+/*******************************************************************************
+ *  Inherited from UndoCommand
+ ******************************************************************************/
 
-  // Operator Overloadings
-  SGI_Symbol& operator=(const SGI_Symbol& rhs) = delete;
+bool CmdSymbolInstanceTextsReset::performExecute() {
+  // Remove all texts
+  foreach (SI_Text* text, mSymbol.getTexts()) {
+    appendChild(new CmdSymbolInstanceTextRemove(mSymbol, *text));
+  }
 
-private:  // Data
-  SI_Symbol& mSymbol;
-  std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
-  QVector<std::shared_ptr<CircleGraphicsItem>> mCircleGraphicsItems;
-  QVector<std::shared_ptr<PolygonGraphicsItem>> mPolygonGraphicsItems;
-  QRectF mBoundingRect;
-  QPainterPath mShape;
-};
+  // Create new texts
+  for (const Text& text : mSymbol.getDefaultTexts()) {
+    appendChild(new CmdSymbolInstanceTextAdd(
+        mSymbol, *new SI_Text(mSymbol.getSchematic(), text)));
+  }
+
+  // execute all child commands
+  return UndoCommandGroup::performExecute();  // can throw
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
-
-#endif

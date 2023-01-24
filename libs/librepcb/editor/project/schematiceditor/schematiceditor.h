@@ -179,6 +179,7 @@ private:
   QScopedPointer<QAction> mActionRotateCw;
   QScopedPointer<QAction> mActionMirrorHorizontal;
   QScopedPointer<QAction> mActionMirrorVertical;
+  QScopedPointer<QAction> mActionResetAllTexts;
   QScopedPointer<QAction> mActionProperties;
   QScopedPointer<QAction> mActionRemove;
   QScopedPointer<QAction> mActionAbort;

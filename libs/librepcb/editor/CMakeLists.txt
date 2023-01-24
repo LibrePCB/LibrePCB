@@ -571,8 +571,16 @@ add_library(
   project/cmd/cmdsymbolinstanceadd.h
   project/cmd/cmdsymbolinstanceedit.cpp
   project/cmd/cmdsymbolinstanceedit.h
+  project/cmd/cmdsymbolinstanceeditall.cpp
+  project/cmd/cmdsymbolinstanceeditall.h
   project/cmd/cmdsymbolinstanceremove.cpp
   project/cmd/cmdsymbolinstanceremove.h
+  project/cmd/cmdsymbolinstancetextadd.cpp
+  project/cmd/cmdsymbolinstancetextadd.h
+  project/cmd/cmdsymbolinstancetextremove.cpp
+  project/cmd/cmdsymbolinstancetextremove.h
+  project/cmd/cmdsymbolinstancetextsreset.cpp
+  project/cmd/cmdsymbolinstancetextsreset.h
   project/erc/ercmsgdock.cpp
   project/erc/ercmsgdock.h
   project/erc/ercmsgdock.ui

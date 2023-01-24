@@ -103,7 +103,8 @@ public:
   void addSelectedNetLines() noexcept;
   void addSelectedNetLabels() noexcept;
   void addSelectedPolygons() noexcept;
-  void addSelectedTexts() noexcept;
+  void addSelectedSchematicTexts() noexcept;
+  void addSelectedSymbolTexts() noexcept;
   /**
    * @brief Add net points of the selected net lines
    *

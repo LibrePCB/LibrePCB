@@ -23,6 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../graphics/graphicslayername.h"
+#include "../types/alignment.h"
+#include "../types/angle.h"
+#include "../types/point.h"
+#include "../types/uuid.h"
 #include "fileformatmigration.h"
 
 #include <QtCore>
@@ -43,6 +48,46 @@ class SExpression;
  */
 class FileFormatMigrationV01 final : public FileFormatMigration {
   Q_OBJECT
+
+  struct Text {
+    Uuid uuid;
+    GraphicsLayerName layerName;
+    QString text;
+    Point position;
+    Angle rotation;
+    PositiveLength height;
+    Alignment align;
+  };
+
+  struct Symbol {
+    QList<Text> texts;
+  };
+
+  struct Gate {
+    Uuid uuid;
+    Uuid symbolUuid;
+  };
+
+  struct ComponentSymbolVariant {
+    Uuid uuid;
+    QList<Gate> gates;
+  };
+
+  struct Component {
+    QList<ComponentSymbolVariant> symbolVariants;
+    ;
+  };
+
+  struct ComponentInstance {
+    Uuid libCmpUuid;
+    Uuid libSymbVarUuid;
+  };
+
+  struct LoadedData {
+    QHash<Uuid, Symbol> symbols;
+    QHash<Uuid, Component> components;
+    QMap<Uuid, ComponentInstance> componentInstances;
+  };
 
 public:
   // Constructors / Destructor

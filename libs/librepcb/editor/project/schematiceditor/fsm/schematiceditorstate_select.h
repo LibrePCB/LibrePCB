@@ -79,6 +79,7 @@ public:
   virtual bool processMove(const Point& delta) noexcept override;
   virtual bool processRotate(const Angle& rotation) noexcept override;
   virtual bool processMirror(Qt::Orientation orientation) noexcept override;
+  virtual bool processResetAllTexts() noexcept override;
   virtual bool processRemove() noexcept override;
   virtual bool processEditProperties() noexcept override;
   virtual bool processAbortCommand() noexcept override;
@@ -104,6 +105,7 @@ private:  // Methods
   bool moveSelectedItems(const Point& delta) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool mirrorSelectedItems(Qt::Orientation orientation) noexcept;
+  bool resetAllTextsOfSelectedItems() noexcept;
   bool removeSelectedItems() noexcept;
   void removePolygonVertices(Polygon& polygon,
                              const QVector<int> vertices) noexcept;

@@ -17,99 +17,63 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_SCHEMATICPAINTER_H
-#define LIBREPCB_CORE_SCHEMATICPAINTER_H
+#ifndef LIBREPCB_EDITOR_CMDSYMBOLINSTANCETEXTADD_H
+#define LIBREPCB_EDITOR_CMDSYMBOLINSTANCETEXTADD_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../export/graphicsexport.h"
-#include "../../types/alignment.h"
-#include "../../types/length.h"
-#include "../../utils/transform.h"
+#include "../../undocommand.h"
 
 #include <QtCore>
-#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class Circle;
-class Path;
-class Polygon;
-class Schematic;
-class Text;
+class SI_Symbol;
+class SI_Text;
+
+namespace editor {
 
 /*******************************************************************************
- *  Class SchematicPainter
+ *  Class CmdSymbolInstanceTextAdd
  ******************************************************************************/
 
 /**
- * @brief Paints a ::librepcb::Schematic to a QPainter
- *
- * Used for ::librepcb::GraphicsExport.
+ * @brief The CmdSymbolInstanceTextAdd class
  */
-class SchematicPainter final : public GraphicsPagePainter {
-  struct Pin {
-    Point position;
-    Angle rotation;
-    UnsignedLength length;
-    QString name;
-    Point namePosition;
-    Angle nameRotation;
-    PositiveLength nameHeight;
-    Alignment nameAlignment;
-  };
-
-  struct Line {
-    Point startPosition;
-    Point endPosition;
-    UnsignedLength width;
-  };
-
-  struct Label {
-    Point position;
-    Angle rotation;
-    bool mirrored;
-    QString text;
-  };
-
-  struct Symbol {
-    Transform transform;
-    QList<Pin> pins;
-    QList<Polygon> polygons;
-    QList<Circle> circles;
-  };
-
+class CmdSymbolInstanceTextAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  SchematicPainter() = delete;
-  explicit SchematicPainter(const Schematic& schematic) noexcept;
-  SchematicPainter(const SchematicPainter& other) = delete;
-  ~SchematicPainter() noexcept;
+  CmdSymbolInstanceTextAdd(SI_Symbol& symbol, SI_Text& text) noexcept;
+  ~CmdSymbolInstanceTextAdd() noexcept;
 
-  // General Methods
-  void paint(QPainter& painter, const GraphicsExportSettings& settings) const
-      noexcept override;
+private:
+  // Private Methods
 
-  // Operator Overloadings
-  SchematicPainter& operator=(const SchematicPainter& rhs) = delete;
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
 
-private:  // Data
-  QList<Symbol> mSymbols;
-  QList<Point> mJunctions;
-  QList<Line> mNetLines;
-  QList<Label> mNetLabels;
-  QList<Polygon> mPolygons;
-  QList<Text> mTexts;
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
+
+  // Private Member Variables
+
+  // Attributes from the constructor
+  SI_Symbol& mSymbol;
+  SI_Text& mText;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

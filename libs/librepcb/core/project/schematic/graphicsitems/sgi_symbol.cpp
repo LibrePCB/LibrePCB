@@ -22,10 +22,8 @@
  ******************************************************************************/
 #include "sgi_symbol.h"
 
-#include "../../../attribute/attributesubstitutor.h"
 #include "../../../library/sym/symbol.h"
 #include "../../../utils/toolbox.h"
-#include "../../../utils/transform.h"
 #include "../../project.h"
 #include "../items/si_symbol.h"
 #include "../schematiclayerprovider.h"
@@ -33,7 +31,6 @@
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/origincrossgraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
-#include <librepcb/core/graphics/primitivetextgraphicsitem.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -94,21 +91,7 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol) noexcept
     }
   }
 
-  for (auto& obj : mSymbol.getLibSymbol().getTexts().values()) {
-    Q_ASSERT(obj);
-    auto i = std::make_shared<PrimitiveTextGraphicsItem>(this);
-    i->setPosition(obj->getPosition());
-    i->setHeight(obj->getHeight());
-    i->setLayer(
-        mSymbol.getProject().getLayers().getLayer(*obj->getLayerName()));
-    i->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
-    i->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
-    mTextGraphicsItems.append(i);
-  }
-
   updateRotationAndMirror();
-  updateAllTexts();
 
   mBoundingRect = childrenBoundingRect();
 }
@@ -127,52 +110,15 @@ void SGI_Symbol::setPosition(const Point& pos) noexcept {
 void SGI_Symbol::updateRotationAndMirror() noexcept {
   QTransform t;
   if (mSymbol.getMirrored()) t.scale(qreal(-1), qreal(1));
-  const QTransform revertMirrorTransform = t;
   t.rotate(-mSymbol.getRotation().toDeg());
   setTransform(t);
-
-  for (int i = 0; i < std::min(mSymbol.getLibSymbol().getTexts().count(),
-                               mTextGraphicsItems.count());
-       ++i) {
-    const auto text = mSymbol.getLibSymbol().getTexts().at(i);
-    Q_ASSERT(text);
-    auto item = mTextGraphicsItems.at(i);
-    Q_ASSERT(item);
-    item->setTransform(revertMirrorTransform);
-    Transform transform(mSymbol);
-    Angle rotation = text->getRotation();
-    Alignment alignment = text->getAlign();
-    if (mSymbol.getMirrored()) {
-      rotation += Angle::deg180();
-      alignment.mirrorV();
-    }
-    if (Toolbox::isTextUpsideDown(transform.map(text->getRotation()), false)) {
-      rotation += Angle::deg180();
-      alignment.mirror();
-    }
-    item->setRotation(rotation);
-    item->setAlignment(alignment);
-  }
 }
 
 void SGI_Symbol::setSelected(bool selected) noexcept {
   mOriginCrossGraphicsItem->setSelected(selected);
   foreach (const auto& i, mCircleGraphicsItems) { i->setSelected(selected); }
   foreach (const auto& i, mPolygonGraphicsItems) { i->setSelected(selected); }
-  foreach (const auto& i, mTextGraphicsItems) { i->setSelected(selected); }
   QGraphicsItem::setSelected(selected);
-}
-
-void SGI_Symbol::updateAllTexts() noexcept {
-  for (int i = 0; i < std::min(mSymbol.getLibSymbol().getTexts().count(),
-                               mTextGraphicsItems.count());
-       ++i) {
-    const auto text = mSymbol.getLibSymbol().getTexts().at(i);
-    Q_ASSERT(text);
-    auto item = mTextGraphicsItems.at(i);
-    Q_ASSERT(item);
-    item->setText(AttributeSubstitutor::substitute(text->getText(), &mSymbol));
-  }
 }
 
 /*******************************************************************************

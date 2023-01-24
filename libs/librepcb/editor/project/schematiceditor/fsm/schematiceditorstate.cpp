@@ -226,7 +226,7 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
 
   if (flags &
       (FindFlag::Symbols | FindFlag::SymbolPins |
-       FindFlag::SymbolPinsWithComponentSignal)) {
+       FindFlag::SymbolPinsWithComponentSignal | FindFlag::Texts)) {
     foreach (SI_Symbol* symbol, schematic->getSymbols()) {
       if (flags.testFlag(FindFlag::Symbols)) {
         processItem(symbol, symbol->getPosition(), 40);
@@ -238,6 +238,11 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
               (pin->getComponentSignalInstance())) {
             processItem(pin, pin->getPosition(), 50);
           }
+        }
+      }
+      if (flags.testFlag(FindFlag::Texts)) {
+        foreach (SI_Text* text, symbol->getTexts()) {
+          processItem(text, text->getPosition(), 70);
         }
       }
     }

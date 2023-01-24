@@ -32,6 +32,7 @@
 #include "../../project/cmd/cmdschematicpolygonremove.h"
 #include "../../project/cmd/cmdschematictextremove.h"
 #include "../../project/cmd/cmdsymbolinstanceremove.h"
+#include "../../project/cmd/cmdsymbolinstancetextremove.h"
 #include "../schematiceditor/schematicnetsegmentsplitter.h"
 #include "cmdchangenetsignalofschematicnetsegment.h"
 #include "cmdremoveboarditems.h"
@@ -95,7 +96,8 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   query->addSelectedNetLines();
   query->addSelectedNetLabels();
   query->addSelectedPolygons();
-  query->addSelectedTexts();
+  query->addSelectedSchematicTexts();
+  query->addSelectedSymbolTexts();
   query->addNetPointsOfNetLines(true);
   query->addNetLinesOfSymbolPins();
 
@@ -111,6 +113,16 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
                           it.value().netlabels);
   }
 
+  // remove texts
+  foreach (SI_Text* text, query->getTexts()) {
+    if (SI_Symbol* symbol = text->getSymbol()) {
+      execNewChildCmd(
+          new CmdSymbolInstanceTextRemove(*symbol, *text));  // can throw
+    } else {
+      execNewChildCmd(new CmdSchematicTextRemove(*text));  // can throw
+    }
+  }
+
   // remove all symbols, devices and component instances
   foreach (SI_Symbol* symbol, query->getSymbols()) {
     Q_ASSERT(symbol->isAddedToSchematic());
@@ -120,11 +132,6 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   // remove polygons
   foreach (SI_Polygon* polygon, query->getPolygons()) {
     execNewChildCmd(new CmdSchematicPolygonRemove(*polygon));  // can throw
-  }
-
-  // remove texts
-  foreach (SI_Text* text, query->getTexts()) {
-    execNewChildCmd(new CmdSchematicTextRemove(*text));  // can throw
   }
 
   // remove netsignals which are no longer required

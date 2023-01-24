@@ -47,7 +47,7 @@ namespace editor {
 
 class AddComponentDialog;
 class AttributeUnitComboBox;
-class CmdSymbolInstanceEdit;
+class CmdSymbolInstanceEditAll;
 
 /*******************************************************************************
  *  Class SchematicEditorState_AddComponent
@@ -118,7 +118,7 @@ private:  // Data
   ComponentInstance* mCurrentComponent;
   int mCurrentSymbVarItemIndex;
   SI_Symbol* mCurrentSymbolToPlace;
-  CmdSymbolInstanceEdit* mCurrentSymbolEditCommand;
+  CmdSymbolInstanceEditAll* mCurrentSymbolEditCommand;
 
   // Widgets for the command toolbar
   QPointer<QComboBox> mValueComboBox;

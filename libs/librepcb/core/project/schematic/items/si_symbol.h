@@ -26,6 +26,7 @@
 #include "../../../attribute/attributeprovider.h"
 #include "../graphicsitems/sgi_symbol.h"
 #include "si_base.h"
+#include "si_text.h"
 
 #include <QtCore>
 
@@ -54,10 +55,10 @@ public:
   // Constructors / Destructor
   SI_Symbol() = delete;
   SI_Symbol(const SI_Symbol& other) = delete;
-  explicit SI_Symbol(Schematic& schematic, const Uuid& uuid,
-                     ComponentInstance& cmpInstance, const Uuid& symbolItem,
-                     const Point& position = Point(),
-                     const Angle& rotation = Angle(), bool mirrored = false);
+  SI_Symbol(Schematic& schematic, const Uuid& uuid,
+            ComponentInstance& cmpInstance, const Uuid& symbolItem,
+            const Point& position, const Angle& rotation, bool mirrored,
+            bool loadInitialTexts);
   ~SI_Symbol() noexcept;
 
   // Getters
@@ -83,6 +84,12 @@ public:
   void setPosition(const Point& newPos) noexcept;
   void setRotation(const Angle& newRotation) noexcept;
   void setMirrored(bool newMirrored) noexcept;
+
+  // Text Methods
+  TextList getDefaultTexts() const noexcept;
+  const QMap<Uuid, SI_Text*>& getTexts() const noexcept { return mTexts; }
+  void addText(SI_Text& text);
+  void removeText(SI_Text& text);
 
   // General Methods
   void addToSchematic() override;
@@ -122,6 +129,7 @@ private:
   const ComponentSymbolVariantItem* mSymbVarItem;
   const Symbol* mSymbol;
   QHash<Uuid, SI_SymbolPin*> mPins;  ///< key: symbol pin UUID
+  QMap<Uuid, SI_Text*> mTexts;  ///< key: text UUID
   QScopedPointer<SGI_Symbol> mGraphicsItem;
 
   // Attributes

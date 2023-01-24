@@ -156,12 +156,21 @@ bool CmdPasteSchematicItems::performExecute() {
                                        Uuid::createRandom()));
     if (!cmpInst) throw LogicError(__FILE__, __LINE__);
 
-    QScopedPointer<SI_Symbol> copy(new SI_Symbol(
+    QScopedPointer<SI_Symbol> symbol(new SI_Symbol(
         mSchematic, Uuid::createRandom(), *cmpInst, sym.symbolVariantItemUuid,
-        sym.position + mPosOffset, sym.rotation, sym.mirrored));
-    copy->setSelected(true);
-    symbolMap.insert(sym.uuid, copy->getUuid());
-    execNewChildCmd(new CmdSymbolInstanceAdd(*copy.take()));
+        sym.position + mPosOffset, sym.rotation, sym.mirrored, false));
+    for (const Text& text : sym.texts) {
+      // Note: Keep the UUID since it acts as a reference to the original
+      // library symbol text.
+      Text copy(text);
+      copy.setPosition(copy.getPosition() + mPosOffset);  // move
+      SI_Text* item = new SI_Text(mSchematic, copy);
+      item->setSelected(true);
+      symbol->addText(*item);
+    }
+    symbol->setSelected(true);
+    symbolMap.insert(sym.uuid, symbol->getUuid());
+    execNewChildCmd(new CmdSymbolInstanceAdd(*symbol.take()));
   }
 
   // Paste net segments

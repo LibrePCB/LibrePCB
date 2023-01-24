@@ -141,7 +141,9 @@ bool CmdPasteBoardItems::performExecute() {
         mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
         dev.position + mPosOffset, dev.rotation, dev.mirrored, false));
     for (const StrokeText& text : dev.strokeTexts) {
-      StrokeText copy(Uuid::createRandom(), text);  // assign new UUID
+      // Note: Keep the UUID since it acts as a reference to the original
+      // library footprint text.
+      StrokeText copy(text);
       copy.setPosition(copy.getPosition() + mPosOffset);  // move
       BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
       item->setSelected(true);

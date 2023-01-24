@@ -133,10 +133,20 @@ void SchematicSelectionQuery::addSelectedPolygons() noexcept {
   }
 }
 
-void SchematicSelectionQuery::addSelectedTexts() noexcept {
+void SchematicSelectionQuery::addSelectedSchematicTexts() noexcept {
   foreach (SI_Text* text, mTexts) {
     if (text->isSelected()) {
       mResultTexts.insert(text);
+    }
+  }
+}
+
+void SchematicSelectionQuery::addSelectedSymbolTexts() noexcept {
+  foreach (SI_Symbol* symbol, mSymbols) {
+    foreach (SI_Text* text, symbol->getTexts()) {
+      if (text->isSelected()) {
+        mResultTexts.insert(text);
+      }
     }
   }
 }

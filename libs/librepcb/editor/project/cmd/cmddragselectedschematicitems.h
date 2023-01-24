@@ -43,6 +43,7 @@ class CmdPolygonEdit;
 class CmdSchematicNetLabelEdit;
 class CmdSchematicNetPointEdit;
 class CmdSymbolInstanceEdit;
+class CmdSymbolInstanceTextsReset;
 class CmdTextEdit;
 
 /*******************************************************************************
@@ -60,6 +61,7 @@ public:
   ~CmdDragSelectedSchematicItems() noexcept;
 
   // General Methods
+  void resetAllTexts() noexcept;
   void setCurrentPosition(const Point& pos) noexcept;
   void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
   void mirror(Qt::Orientation orientation, bool aroundCurrentPosition) noexcept;
@@ -78,9 +80,11 @@ private:
   Point mCenterPos;
   Angle mDeltaAngle;
   bool mMirrored;
+  bool mTextsReset;
 
   // Move commands
   QList<CmdSymbolInstanceEdit*> mSymbolEditCmds;
+  QList<CmdSymbolInstanceTextsReset*> mSymbolTextsResetCmds;
   QList<CmdSchematicNetPointEdit*> mNetPointEditCmds;
   QList<CmdSchematicNetLabelEdit*> mNetLabelEditCmds;
   QList<CmdPolygonEdit*> mPolygonEditCmds;

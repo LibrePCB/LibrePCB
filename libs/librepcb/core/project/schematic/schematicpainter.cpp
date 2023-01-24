@@ -76,10 +76,10 @@ SchematicPainter::SchematicPainter(const Schematic& schematic) noexcept {
     for (const Circle& circle : symbol->getLibSymbol().getCircles()) {
       sym.circles.append(circle);
     }
-    for (const Text& text : symbol->getLibSymbol().getTexts()) {
-      Text copy(text);
+    for (const SI_Text* text : symbol->getTexts()) {
+      Text copy(text->getText());
       copy.setText(AttributeSubstitutor::substitute(copy.getText(), symbol));
-      sym.texts.append(copy);
+      mTexts.append(copy);
     }
     mSymbols.append(sym);
   }
@@ -147,18 +147,6 @@ void SchematicPainter::paint(QPainter& painter,
             settings.getFillColor(*circle.getLayerName(), circle.isFilled(),
                                   circle.isGrabArea()));
       }
-    }
-
-    // Draw Symbol Texts.
-    foreach (const Text& text, symbol.texts) {
-      Alignment alignment = text.getAlign();
-      if (symbol.transform.getMirrored()) {
-        alignment.mirrorV();
-      }
-      p.drawText(symbol.transform.map(text.getPosition()),
-                 symbol.transform.map(text.getRotation()), *text.getHeight(),
-                 alignment, text.getText(), qApp->getDefaultSansSerifFont(),
-                 settings.getColor(*text.getLayerName()), true, false);
     }
 
     // Draw Symbol Pins.
