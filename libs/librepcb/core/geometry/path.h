@@ -140,10 +140,12 @@ public:
   static Path arcObround(const Point& p1, const Point& p2, const Angle& angle,
                          const PositiveLength& width) noexcept;
   static Path rect(const Point& p1, const Point& p2) noexcept;
-  static Path centeredRect(const PositiveLength& width,
-                           const PositiveLength& height) noexcept;
-  static Path octagon(const PositiveLength& width,
-                      const PositiveLength& height) noexcept;
+  static Path centeredRect(
+      const PositiveLength& width, const PositiveLength& height,
+      const UnsignedLength& cornerRadius = UnsignedLength(0)) noexcept;
+  static Path octagon(
+      const PositiveLength& width, const PositiveLength& height,
+      const UnsignedLength& cornerRadius = UnsignedLength(0)) noexcept;
   static Path flatArc(const Point& p1, const Point& p2, const Angle& angle,
                       const PositiveLength& maxTolerance) noexcept;
 

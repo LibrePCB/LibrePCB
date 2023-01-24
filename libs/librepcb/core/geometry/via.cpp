@@ -109,14 +109,15 @@ Via::~Via() noexcept {
 Path Via::getOutline(const Length& expansion) const noexcept {
   Length size = mSize + (expansion * 2);
   if (size > 0) {
-    PositiveLength pSize(size);
+    const PositiveLength pSize(size);
+    const UnsignedLength cornerRadius(std::max(expansion, Length(0)));
     switch (mShape) {
       case Shape::Round:
         return Path::circle(pSize);
       case Shape::Square:
-        return Path::centeredRect(pSize, pSize);
+        return Path::centeredRect(pSize, pSize, cornerRadius);
       case Shape::Octagon:
-        return Path::octagon(pSize, pSize);
+        return Path::octagon(pSize, pSize, cornerRadius);
       default:
         Q_ASSERT(false);
         break;

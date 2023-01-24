@@ -377,33 +377,83 @@ Path Path::rect(const Point& p1, const Point& p2) noexcept {
 }
 
 Path Path::centeredRect(const PositiveLength& width,
-                        const PositiveLength& height) noexcept {
+                        const PositiveLength& height,
+                        const UnsignedLength& cornerRadius) noexcept {
   Path p;
-  Length rx = width / 2;
-  Length ry = height / 2;
-  p.addVertex(Point(-rx, ry));
-  p.addVertex(Point(rx, ry));
-  p.addVertex(Point(rx, -ry));
-  p.addVertex(Point(-rx, -ry));
-  p.addVertex(Point(-rx, ry));
+  const Length rx = width / 2;
+  const Length ry = height / 2;
+  if (cornerRadius == 0) {
+    // Regular rectangle without rounded corners.
+    p.addVertex(Point(-rx, ry));
+    p.addVertex(Point(rx, ry));
+    p.addVertex(Point(rx, -ry));
+    p.addVertex(Point(-rx, -ry));
+  } else if (cornerRadius >= std::min(rx, ry)) {
+    // Corner radius is too large for the given size, it's actually an obround.
+    return obround(width, height);
+  } else {
+    // Rectangle with rounded corners.
+    p.addVertex(Point(-rx + cornerRadius, ry));
+    p.addVertex(Point(rx - cornerRadius, ry), -Angle::deg90());
+    p.addVertex(Point(rx, ry - cornerRadius));
+    p.addVertex(Point(rx, -ry + cornerRadius), -Angle::deg90());
+    p.addVertex(Point(rx - cornerRadius, -ry));
+    p.addVertex(Point(-rx + cornerRadius, -ry), -Angle::deg90());
+    p.addVertex(Point(-rx, -ry + cornerRadius));
+    p.addVertex(Point(-rx, ry - cornerRadius), -Angle::deg90());
+  }
+  p.close();
   return p;
 }
 
-Path Path::octagon(const PositiveLength& width,
-                   const PositiveLength& height) noexcept {
+Path Path::octagon(const PositiveLength& width, const PositiveLength& height,
+                   const UnsignedLength& cornerRadius) noexcept {
   Path p;
-  Length rx = width / 2;
-  Length ry = height / 2;
-  Length a = Length::fromMm(qMin(rx, ry).toMm() * (2 - qSqrt(2)));
-  p.addVertex(Point(rx, ry - a));
-  p.addVertex(Point(rx - a, ry));
-  p.addVertex(Point(a - rx, ry));
-  p.addVertex(Point(-rx, ry - a));
-  p.addVertex(Point(-rx, a - ry));
-  p.addVertex(Point(a - rx, -ry));
-  p.addVertex(Point(rx - a, -ry));
-  p.addVertex(Point(rx, a - ry));
-  p.addVertex(Point(rx, ry - a));
+  const Length rx = width / 2;
+  const Length ry = height / 2;
+  const Length innerChamfer =
+      Length::fromMm(std::min(rx - cornerRadius, ry - cornerRadius).toMm() *
+                     (2 - qSqrt(2))) +
+      cornerRadius;
+  if (cornerRadius == 0) {
+    // Regular polygon without rounded corners.
+    p.addVertex(Point(rx, ry - innerChamfer));
+    p.addVertex(Point(rx - innerChamfer, ry));
+    p.addVertex(Point(innerChamfer - rx, ry));
+    p.addVertex(Point(-rx, ry - innerChamfer));
+    p.addVertex(Point(-rx, innerChamfer - ry));
+    p.addVertex(Point(innerChamfer - rx, -ry));
+    p.addVertex(Point(rx - innerChamfer, -ry));
+    p.addVertex(Point(rx, innerChamfer - ry));
+  } else if (innerChamfer >= std::min(rx, ry)) {
+    // Corner radius is too large for the given size, it's actually an obround.
+    return obround(width, height);
+  } else {
+    // Octagon with rounded corners.
+    const Length chamferOffset =
+        Length::fromMm(cornerRadius->toMm() * (1 - (1 / qSqrt(2))));
+    const Length outerChamfer = innerChamfer - cornerRadius + chamferOffset;
+    Q_ASSERT(chamferOffset >= 0);
+    Q_ASSERT(chamferOffset <= outerChamfer);
+    Q_ASSERT(outerChamfer <= innerChamfer);
+    p.addVertex(Point(rx, ry - innerChamfer), Angle::deg45());
+    p.addVertex(Point(rx - chamferOffset, ry - outerChamfer));
+    p.addVertex(Point(rx - outerChamfer, ry - chamferOffset), Angle::deg45());
+    p.addVertex(Point(rx - innerChamfer, ry));
+    p.addVertex(Point(innerChamfer - rx, ry), Angle::deg45());
+    p.addVertex(Point(outerChamfer - rx, ry - chamferOffset));
+    p.addVertex(Point(chamferOffset - rx, ry - outerChamfer), Angle::deg45());
+    p.addVertex(Point(-rx, ry - innerChamfer));
+    p.addVertex(Point(-rx, innerChamfer - ry), Angle::deg45());
+    p.addVertex(Point(chamferOffset - rx, outerChamfer - ry));
+    p.addVertex(Point(outerChamfer - rx, chamferOffset - ry), Angle::deg45());
+    p.addVertex(Point(innerChamfer - rx, -ry));
+    p.addVertex(Point(rx - innerChamfer, -ry), Angle::deg45());
+    p.addVertex(Point(rx - outerChamfer, chamferOffset - ry));
+    p.addVertex(Point(rx - chamferOffset, outerChamfer - ry), Angle::deg45());
+    p.addVertex(Point(rx, innerChamfer - ry));
+  }
+  p.close();
   return p;
 }
 

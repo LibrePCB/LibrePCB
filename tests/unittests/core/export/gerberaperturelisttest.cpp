@@ -68,19 +68,37 @@ protected:
           l.addObround(PositiveLength(200000), PositiveLength(100000), rot,
                        function);
 
-          l.addRect(PositiveLength(100000), PositiveLength(100000), rot,
-                    function);
-          l.addRect(PositiveLength(100000), PositiveLength(200000), rot,
-                    function);
-          l.addRect(PositiveLength(200000), PositiveLength(100000), rot,
-                    function);
+          // No rounded corners.
+          l.addRect(PositiveLength(100000), PositiveLength(100000),
+                    UnsignedLength(0), rot, function);
+          l.addRect(PositiveLength(100000), PositiveLength(200000),
+                    UnsignedLength(0), rot, function);
+          l.addRect(PositiveLength(200000), PositiveLength(100000),
+                    UnsignedLength(0), rot, function);
 
-          l.addOctagon(PositiveLength(100000), PositiveLength(100000), rot,
-                       function);
-          l.addOctagon(PositiveLength(100000), PositiveLength(200000), rot,
-                       function);
-          l.addOctagon(PositiveLength(200000), PositiveLength(100000), rot,
-                       function);
+          // Rounded corners.
+          l.addRect(PositiveLength(100000), PositiveLength(100000),
+                    UnsignedLength(20000), rot, function);
+          l.addRect(PositiveLength(100000), PositiveLength(200000),
+                    UnsignedLength(20000), rot, function);
+          l.addRect(PositiveLength(200000), PositiveLength(100000),
+                    UnsignedLength(20000), rot, function);
+
+          // No rounded corners.
+          l.addOctagon(PositiveLength(100000), PositiveLength(100000),
+                       UnsignedLength(0), rot, function);
+          l.addOctagon(PositiveLength(100000), PositiveLength(200000),
+                       UnsignedLength(0), rot, function);
+          l.addOctagon(PositiveLength(200000), PositiveLength(100000),
+                       UnsignedLength(0), rot, function);
+
+          // Rounded corners.
+          l.addOctagon(PositiveLength(100000), PositiveLength(100000),
+                       UnsignedLength(20000), rot, function);
+          l.addOctagon(PositiveLength(100000), PositiveLength(200000),
+                       UnsignedLength(20000), rot, function);
+          l.addOctagon(PositiveLength(200000), PositiveLength(100000),
+                       UnsignedLength(20000), rot, function);
         }
       }
       s = l.generateString();
@@ -389,7 +407,7 @@ TEST_F(GerberApertureListTest, testHighObround0deg) {
   GerberApertureList l;
   PositiveLength w(100000);
   PositiveLength h(200000);
-  QVector<Angle> rot = {
+  QVector<Angle> rotations = {
       -Angle::deg180(),
       Angle::deg0(),
       Angle::deg180(),
@@ -397,8 +415,8 @@ TEST_F(GerberApertureListTest, testHighObround0deg) {
 
   const char* expected = "%ADD10O,0.1X0.2*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addObround(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -409,7 +427,7 @@ TEST_F(GerberApertureListTest, testWideObround0deg) {
   GerberApertureList l;
   PositiveLength w(200000);
   PositiveLength h(100000);
-  QVector<Angle> rot = {
+  QVector<Angle> rotations = {
       -Angle::deg180(),
       Angle::deg0(),
       Angle::deg180(),
@@ -417,8 +435,8 @@ TEST_F(GerberApertureListTest, testWideObround0deg) {
 
   const char* expected = "%ADD10O,0.2X0.1*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addObround(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -429,7 +447,7 @@ TEST_F(GerberApertureListTest, testHighObround90deg) {
   GerberApertureList l;
   PositiveLength w(100000);
   PositiveLength h(200000);
-  QVector<Angle> rot = {
+  QVector<Angle> rotations = {
       -Angle::deg270(),
       -Angle::deg90(),
       Angle::deg90(),
@@ -438,8 +456,8 @@ TEST_F(GerberApertureListTest, testHighObround90deg) {
 
   const char* expected = "%ADD10O,0.2X0.1*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addObround(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -450,7 +468,7 @@ TEST_F(GerberApertureListTest, testWideObround90deg) {
   GerberApertureList l;
   PositiveLength w(200000);
   PositiveLength h(100000);
-  QVector<Angle> rot = {
+  QVector<Angle> rotations = {
       -Angle::deg270(),
       -Angle::deg90(),
       Angle::deg90(),
@@ -459,8 +477,8 @@ TEST_F(GerberApertureListTest, testWideObround90deg) {
 
   const char* expected = "%ADD10O,0.1X0.2*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addObround(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -471,7 +489,7 @@ TEST_F(GerberApertureListTest, testHighObround10deg) {
   GerberApertureList l;
   PositiveLength w(100000);
   PositiveLength h(150000);
-  QVector<Angle> rot = {
+  QVector<Angle> rotations = {
       Angle(-350000000),
       Angle(-170000000),
       Angle(10000000),
@@ -487,8 +505,8 @@ TEST_F(GerberApertureListTest, testHighObround10deg) {
       "20,1,0.1,0.004341,-0.02462,-0.004341,0.02462,0*%\n"
       "%ADD10ROTATEDOBROUND10*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addObround(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -499,7 +517,7 @@ TEST_F(GerberApertureListTest, testWideObround10deg) {
   GerberApertureList l;
   PositiveLength w(150000);
   PositiveLength h(100000);
-  QVector<Angle> rot = {
+  QVector<Angle> rotations = {
       Angle(-350000000),
       Angle(-170000000),
       Angle(10000000),
@@ -515,8 +533,8 @@ TEST_F(GerberApertureListTest, testWideObround10deg) {
       "20,1,0.1,-0.02462,-0.004341,0.02462,0.004341,0*%\n"
       "%ADD10ROTATEDOBROUND10*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addObround(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -527,7 +545,8 @@ TEST_F(GerberApertureListTest, testHighRect0deg) {
   GerberApertureList l;
   PositiveLength w(100000);
   PositiveLength h(150000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       -Angle::deg180(),
       Angle::deg0(),
       Angle::deg180(),
@@ -535,8 +554,8 @@ TEST_F(GerberApertureListTest, testHighRect0deg) {
 
   const char* expected = "%ADD10R,0.1X0.15*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addRect(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -547,7 +566,8 @@ TEST_F(GerberApertureListTest, testWideRect0deg) {
   GerberApertureList l;
   PositiveLength w(150000);
   PositiveLength h(100000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       -Angle::deg180(),
       Angle::deg0(),
       Angle::deg180(),
@@ -555,8 +575,8 @@ TEST_F(GerberApertureListTest, testWideRect0deg) {
 
   const char* expected = "%ADD10R,0.15X0.1*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addRect(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -567,7 +587,8 @@ TEST_F(GerberApertureListTest, testHighRect90deg) {
   GerberApertureList l;
   PositiveLength w(100000);
   PositiveLength h(150000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       -Angle::deg270(),
       -Angle::deg90(),
       Angle::deg90(),
@@ -576,8 +597,8 @@ TEST_F(GerberApertureListTest, testHighRect90deg) {
 
   const char* expected = "%ADD10R,0.15X0.1*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addRect(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -588,7 +609,8 @@ TEST_F(GerberApertureListTest, testWideRect90deg) {
   GerberApertureList l;
   PositiveLength w(150000);
   PositiveLength h(100000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       -Angle::deg270(),
       -Angle::deg90(),
       Angle::deg90(),
@@ -597,8 +619,8 @@ TEST_F(GerberApertureListTest, testWideRect90deg) {
 
   const char* expected = "%ADD10R,0.1X0.15*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addRect(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -609,7 +631,8 @@ TEST_F(GerberApertureListTest, testHighRect10deg) {
   GerberApertureList l;
   PositiveLength w(100000);
   PositiveLength h(150000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       Angle(-350000000),
       Angle(-170000000),
       Angle(10000000),
@@ -623,8 +646,8 @@ TEST_F(GerberApertureListTest, testHighRect10deg) {
       "20,1,0.1,-0.075,0.0,0.075,0.0,100.0*%\n"
       "%ADD10ROTATEDRECT10*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addRect(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -635,7 +658,8 @@ TEST_F(GerberApertureListTest, testWideRect10deg) {
   GerberApertureList l;
   PositiveLength w(150000);
   PositiveLength h(100000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       Angle(-350000000),
       Angle(-170000000),
       Angle(10000000),
@@ -649,8 +673,121 @@ TEST_F(GerberApertureListTest, testWideRect10deg) {
       "20,1,0.1,-0.075,0.0,0.075,0.0,10.0*%\n"
       "%ADD10ROTATEDRECT10*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addRect(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(expected, l.generateString().toStdString());
+  }
+}
+
+// Test if a rounded rect with height>width and rotation=10°;190°;-170°;-350°
+// is exported as a macro.
+TEST_F(GerberApertureListTest, testHighRoundedRect10deg) {
+  GerberApertureList l;
+  PositiveLength w(100000);
+  PositiveLength h(150000);
+  UnsignedLength r(20000);
+  QVector<Angle> rotations = {
+      Angle(-350000000),
+      Angle(-170000000),
+      Angle(10000000),
+      Angle(190000000),
+  };
+
+  // ATTENTION: DO NOT USE THE CENTER LINE (Code 21)!!! It is buggy in some
+  // CAM software!!!
+  const char* expected =
+      "%AMROUNDEDRECT10*"
+      "20,1,0.1,-0.055,0.0,0.055,0.0,100.0*"
+      "20,1,0.06,-0.075,0.0,0.075,0.0,100.0*"
+      "1,1,0.04,-0.019994,-0.059374*"
+      "1,1,0.04,-0.039095,0.048955*"
+      "1,1,0.04,0.019994,0.059374*"
+      "1,1,0.04,0.039095,-0.048955*%\n"
+      "%ADD10ROUNDEDRECT10*%\n";
+
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(expected, l.generateString().toStdString());
+  }
+}
+
+// Test if a rounded rect with height<width and rotation=10°;190°;-170°;-350°
+// is exported as a macro.
+TEST_F(GerberApertureListTest, testWideRoundedRect10deg) {
+  GerberApertureList l;
+  PositiveLength w(150000);
+  PositiveLength h(100000);
+  UnsignedLength r(20000);
+  QVector<Angle> rotations = {
+      Angle(-350000000),
+      Angle(-170000000),
+      Angle(10000000),
+      Angle(190000000),
+  };
+
+  // ATTENTION: DO NOT USE THE CENTER LINE (Code 21)!!! It is buggy in some
+  // CAM software!!!
+  const char* expected =
+      "%AMROUNDEDRECT10*"
+      "20,1,0.1,-0.055,0.0,0.055,0.0,10.0*"
+      "20,1,0.06,-0.075,0.0,0.075,0.0,10.0*"
+      "1,1,0.04,-0.059374,0.019994*"
+      "1,1,0.04,0.048955,0.039095*"
+      "1,1,0.04,0.059374,-0.019994*"
+      "1,1,0.04,-0.048955,-0.039095*%\n"
+      "%ADD10ROUNDEDRECT10*%\n";
+
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(expected, l.generateString().toStdString());
+  }
+}
+
+// Test if a rounded rect with rotations of a multiple of 180° and with a too
+// large radius is converted into an obround.
+TEST_F(GerberApertureListTest, testObroundRoundedRect0deg) {
+  GerberApertureList l;
+  PositiveLength w(150000);
+  PositiveLength h(100000);
+  UnsignedLength r(50000);
+  QVector<Angle> rotations = {
+      -Angle::deg180(),
+      Angle::deg0(),
+      Angle::deg180(),
+  };
+
+  const char* expected = "%ADD10O,0.15X0.1*%\n";
+
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
+    EXPECT_EQ(expected, l.generateString().toStdString());
+  }
+}
+
+// Test if a rounded rect with a too large radius is converted into an obround.
+TEST_F(GerberApertureListTest, testObroundRoundedRect10deg) {
+  GerberApertureList l;
+  PositiveLength w(150000);
+  PositiveLength h(100000);
+  UnsignedLength r(60000);
+  QVector<Angle> rotations = {
+      Angle(-350000000),
+      Angle(-170000000),
+      Angle(10000000),
+      Angle(190000000),
+  };
+
+  const char* expected =
+      "%AMROTATEDOBROUND10*"
+      "1,1,0.1,-0.02462,-0.004341*"
+      "1,1,0.1,0.02462,0.004341*"
+      "20,1,0.1,-0.02462,-0.004341,0.02462,0.004341,0*%\n"
+      "%ADD10ROTATEDOBROUND10*%\n";
+
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addRect(w, h, r, rot, tl::nullopt));
+    EXPECT_EQ(10, l.addObround(w, h, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -661,7 +798,8 @@ TEST_F(GerberApertureListTest, testRegularOctagon0deg) {
   GerberApertureList l;
   PositiveLength w(500000);
   PositiveLength h(500000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       -Angle::deg315(), -Angle::deg270(), -Angle::deg225(), -Angle::deg180(),
       -Angle::deg135(), -Angle::deg90(),  -Angle::deg45(),  Angle::deg0(),
       Angle::deg45(),   Angle::deg90(),   Angle::deg135(),  Angle::deg180(),
@@ -685,8 +823,8 @@ TEST_F(GerberApertureListTest, testRegularOctagon0deg) {
       "0.0*%\n"
       "%ADD10ROTATEDOCTAGON10*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -697,7 +835,8 @@ TEST_F(GerberApertureListTest, testRegularOctagon10deg) {
   GerberApertureList l;
   PositiveLength w(500000);
   PositiveLength h(500000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       Angle(-350000000), Angle(-305000000), Angle(-260000000),
       Angle(-215000000), Angle(-170000000), Angle(-125000000),
       Angle(-80000000),  Angle(-35000000),  Angle(10000000),
@@ -723,8 +862,8 @@ TEST_F(GerberApertureListTest, testRegularOctagon10deg) {
       "10.0*%\n"
       "%ADD10ROTATEDOCTAGON10*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -735,7 +874,8 @@ TEST_F(GerberApertureListTest, testHighOctagon0deg) {
   GerberApertureList l;
   PositiveLength w(500000);
   PositiveLength h(900000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       -Angle::deg180(),
       Angle::deg0(),
       Angle::deg180(),
@@ -756,8 +896,8 @@ TEST_F(GerberApertureListTest, testHighOctagon0deg) {
       "90.0*%\n"
       "%ADD10ROTATEDOCTAGON10*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -768,7 +908,8 @@ TEST_F(GerberApertureListTest, testWideOctagon0deg) {
   GerberApertureList l;
   PositiveLength w(900000);
   PositiveLength h(500000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       -Angle::deg180(),
       Angle::deg0(),
       Angle::deg180(),
@@ -789,8 +930,8 @@ TEST_F(GerberApertureListTest, testWideOctagon0deg) {
       "0.0*%\n"
       "%ADD10ROTATEDOCTAGON10*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -801,7 +942,8 @@ TEST_F(GerberApertureListTest, testHighOctagon100deg) {
   GerberApertureList l;
   PositiveLength w(500000);
   PositiveLength h(900000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       Angle(-260000000),
       Angle(-80000000),
       Angle(100000000),
@@ -823,8 +965,8 @@ TEST_F(GerberApertureListTest, testHighOctagon100deg) {
       "10.0*%\n"
       "%ADD10ROTATEDOCTAGON10*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
@@ -835,7 +977,8 @@ TEST_F(GerberApertureListTest, testWideOctagon100deg) {
   GerberApertureList l;
   PositiveLength w(900000);
   PositiveLength h(500000);
-  QVector<Angle> rot = {
+  UnsignedLength r(0);
+  QVector<Angle> rotations = {
       Angle(-260000000),
       Angle(-80000000),
       Angle(100000000),
@@ -857,8 +1000,8 @@ TEST_F(GerberApertureListTest, testWideOctagon100deg) {
       "100.0*%\n"
       "%ADD10ROTATEDOCTAGON10*%\n";
 
-  for (const Angle& r : rot) {
-    EXPECT_EQ(10, l.addOctagon(w, h, r, tl::nullopt));
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addOctagon(w, h, r, rot, tl::nullopt));
     EXPECT_EQ(expected, l.generateString().toStdString());
   }
 }
