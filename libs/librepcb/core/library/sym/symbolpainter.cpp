@@ -102,7 +102,7 @@ void SymbolPainter::paint(QPainter& painter,
   // Draw Pins.
   foreach (const SymbolPin& pin, mPins) {
     p.drawSymbolPin(pin.getPosition(), pin.getRotation(), *pin.getLength(),
-                    settings.getColor(GraphicsLayer::sSymbolOutlines),
+                    settings.getColor(GraphicsLayer::sSymbolPinLines),
                     QColor());
     p.drawText(
         pin.getPosition() + pin.getNamePosition().rotated(pin.getRotation()),

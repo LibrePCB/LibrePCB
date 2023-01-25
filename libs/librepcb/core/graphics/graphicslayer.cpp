@@ -193,6 +193,7 @@ void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
     h.insert(sSymbolValues,             {tr("Values"),                QColor(80, 80, 80, 255),    Qt::gray,                   true});
     h.insert(sSymbolPinCirclesOpt,      {tr("Optional Pins"),         QColor(0, 255, 0, 255),     QColor(0, 255, 0, 127),     true});
     h.insert(sSymbolPinCirclesReq,      {tr("Required Pins"),         QColor(255, 0, 0, 255),     QColor(255, 0, 0, 127),     true});
+    h.insert(sSymbolPinLines,           {tr("Pin Lines"),             Qt::darkRed,                Qt::red,                    true});
     h.insert(sSymbolPinNames,           {tr("Pin Names"),             QColor(64, 64, 64, 255),    Qt::gray,                   true});
     h.insert(sSymbolPinNumbers,         {tr("Pin Numbers"),           QColor(64, 64, 64, 255),    Qt::gray,                   true});
     // board asymmetric

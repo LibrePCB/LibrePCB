@@ -842,6 +842,7 @@ TEST_F(GraphicsExportDialogTest, testLayerColors) {
       GraphicsLayer::sSchematicSheetFrames,
       GraphicsLayer::sSymbolOutlines,
       GraphicsLayer::sSymbolGrabAreas,
+      GraphicsLayer::sSymbolPinLines,
       GraphicsLayer::sSymbolPinNames,
       GraphicsLayer::sSymbolPinNumbers,
       GraphicsLayer::sSymbolNames,

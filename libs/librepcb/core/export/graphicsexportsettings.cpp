@@ -55,6 +55,7 @@ GraphicsExportSettings::GraphicsExportSettings() noexcept
   addLayer(GraphicsLayer::sSchematicSheetFrames);
   addLayer(GraphicsLayer::sSymbolOutlines);
   addLayer(GraphicsLayer::sSymbolGrabAreas);
+  addLayer(GraphicsLayer::sSymbolPinLines);
   addLayer(GraphicsLayer::sSymbolPinNames);
   addLayer(GraphicsLayer::sSymbolPinNumbers);
   addLayer(GraphicsLayer::sSymbolNames);

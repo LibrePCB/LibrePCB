@@ -153,7 +153,7 @@ void SchematicPainter::paint(QPainter& painter,
     foreach (const Pin& pin, symbol.pins) {
       p.drawSymbolPin(symbol.transform.map(pin.position),
                       symbol.transform.map(pin.rotation), *pin.length,
-                      settings.getColor(GraphicsLayer::sSymbolOutlines),
+                      settings.getColor(GraphicsLayer::sSymbolPinLines),
                       QColor());
       Alignment nameAlignment = pin.nameAlignment;
       if (symbol.transform.getMirrored()) {

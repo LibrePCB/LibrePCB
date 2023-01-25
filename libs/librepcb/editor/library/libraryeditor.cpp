@@ -99,6 +99,7 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   addLayer(GraphicsLayer::sSymbolHiddenGrabAreas, true);
   addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
   addLayer(GraphicsLayer::sSymbolPinCirclesReq);
+  addLayer(GraphicsLayer::sSymbolPinLines);
   addLayer(GraphicsLayer::sSymbolPinNames);
   addLayer(GraphicsLayer::sSymbolPinNumbers);
   addLayer(GraphicsLayer::sSymbolNames);

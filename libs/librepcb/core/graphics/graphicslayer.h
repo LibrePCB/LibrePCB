@@ -73,6 +73,7 @@ public:
   static constexpr const char* sSymbolValues            = "sym_values";             ///< text {{VALUE}}
   static constexpr const char* sSymbolPinCirclesOpt     = "sym_pin_circles_opt";    ///< green circle of unconnected pins
   static constexpr const char* sSymbolPinCirclesReq     = "sym_pin_circles_req";    ///< red circle of unconnected pins
+  static constexpr const char* sSymbolPinLines          = "sym_pin_lines";          ///< line of symbol pins
   static constexpr const char* sSymbolPinNames          = "sym_pin_names";          ///< name of the connected component signal
   static constexpr const char* sSymbolPinNumbers        = "sym_pin_numbers";        ///< number of the connected footprint pad
 

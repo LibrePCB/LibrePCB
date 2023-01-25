@@ -72,7 +72,7 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
 
   // line
   mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
-  mLineGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolOutlines));
+  mLineGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinLines));
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   // text
