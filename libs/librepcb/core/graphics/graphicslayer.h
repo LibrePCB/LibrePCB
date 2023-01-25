@@ -36,6 +36,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Theme;
+
 /*******************************************************************************
  *  Class GraphicsLayer
  ******************************************************************************/
@@ -54,8 +56,6 @@ public:
   // clang-format off
 
   // schematic layers
-  //static constexpr const char* sSchematicBackground     = "sch_background";         ///< Primary: background | Secondary: grid
-  //static constexpr const char* sSchematicSelection      = "sch_selection";          ///< Primary: outline    | Secondary: area
   static constexpr const char* sSchematicReferences     = "sch_references";         ///< origin crosses of symbols, texts, ...
   static constexpr const char* sSchematicSheetFrames    = "sch_scheet_frames";      ///< e.g. A4 sheet frame + text boxes
   static constexpr const char* sSchematicNetLines       = "sch_net_lines";          ///< librepcb::SI_NetLine
@@ -78,8 +78,6 @@ public:
   static constexpr const char* sSymbolPinNumbers        = "sym_pin_numbers";        ///< number of the connected footprint pad
 
   // asymmetric board layers
-  //static constexpr const char* sBoardBackground         = "brd_background";         ///< Primary: background | Secondary: grid
-  //static constexpr const char* sBoardSelection          = "brd_selection";          ///< Primary: outline    | Secondary: area
   //static constexpr const char* sBoardReferences         = "brd_references";         ///< origin crosses of footprints, holes, ...
   static constexpr const char* sBoardSheetFrames        = "brd_sheet_frames";       ///< e.g. A4 sheet frame + text boxes
   static constexpr const char* sBoardOutlines           = "brd_outlines";           ///< incl. non-plated through hole milling
@@ -141,7 +139,9 @@ public:
   // Constructors / Destructor
   GraphicsLayer() = delete;
   GraphicsLayer(const GraphicsLayer& other) noexcept;
-  explicit GraphicsLayer(const QString& name) noexcept;
+  explicit GraphicsLayer(const QString& name, const QColor& color = Qt::black,
+                         const QColor& colorHighlighted = Qt::black,
+                         bool visible = true, bool enabled = true) noexcept;
   virtual ~GraphicsLayer() noexcept;
 
   // Getters
@@ -189,9 +189,7 @@ public:
   static int getInnerLayerNumber(const QString& name) noexcept;
   static QString getMirroredLayerName(const QString& name) noexcept;
   static QString getGrabAreaLayerName(const QString& outlineLayerName) noexcept;
-  static void getDefaultValues(const QString& name, QString& nameTr,
-                               QColor& color, QColor& colorHl,
-                               bool& visible) noexcept;
+  static QString getTranslation(const QString& name) noexcept;
 
 signals:
   void attributesChanged();
@@ -217,6 +215,8 @@ protected:  // Data
 class IF_GraphicsLayerProvider {
 public:
   virtual ~IF_GraphicsLayerProvider() {}
+
+  void applyTheme(const Theme& theme) noexcept;
 
   virtual GraphicsLayer* getLayer(const QString& name) const noexcept = 0;
   virtual QList<GraphicsLayer*> getAllLayers() const noexcept = 0;

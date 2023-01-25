@@ -25,6 +25,7 @@
 #include "../../editorcommandset.h"
 #include "ui_schematicpagesdock.h"
 
+#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
 
@@ -41,8 +42,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SchematicPagesDock::SchematicPagesDock(Project& project, QWidget* parent)
-  : QDockWidget(parent), mProject(project), mUi(new Ui::SchematicPagesDock) {
+SchematicPagesDock::SchematicPagesDock(Project& project,
+                                       const QColor& background,
+                                       QWidget* parent)
+  : QDockWidget(parent),
+    mProject(project),
+    mUi(new Ui::SchematicPagesDock),
+    mBackgroundColor(background) {
   mUi->setupUi(this);
 
   // disable wrapping to avoid "disappearing" schematic pages, see
@@ -117,7 +123,8 @@ void SchematicPagesDock::schematicAdded(int newIndex) noexcept {
 
   QListWidgetItem* item = new QListWidgetItem();
   item->setText(QString("%1: %2").arg(newIndex + 1).arg(*schematic->getName()));
-  item->setIcon(schematic->getIcon());
+  item->setIcon(QIcon(schematic->getGraphicsScene().toPixmap(
+      QSize(297, 210), mBackgroundColor)));
   mUi->listWidget->insertItem(newIndex, item);
 }
 

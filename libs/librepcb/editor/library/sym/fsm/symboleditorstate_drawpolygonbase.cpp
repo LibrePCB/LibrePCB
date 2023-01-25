@@ -169,7 +169,7 @@ bool SymbolEditorState_DrawPolygonBase::exit() noexcept {
 
   mContext.graphicsView.unsetCursor();
   mContext.graphicsView.setSceneCursor(tl::nullopt);
-  mContext.graphicsView.setOverlayText(QString());
+  mContext.graphicsView.setInfoBoxText(QString());
   emit statusBarMessageChanged(QString());
   return true;
 }
@@ -528,7 +528,7 @@ void SymbolEditorState_DrawPolygonBase::updateOverlayText() noexcept {
   }
 
   text.replace(" ", "&nbsp;");
-  mContext.graphicsView.setOverlayText(text);
+  mContext.graphicsView.setInfoBoxText(text);
 }
 
 void SymbolEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {

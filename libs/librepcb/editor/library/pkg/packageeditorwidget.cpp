@@ -78,13 +78,22 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   mUi->footprintEditorWidget->setReadOnly(mContext.readOnly);
   mUi->padListEditorWidget->setReadOnly(mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
+  const Theme& theme = mContext.workspace.getSettings().themes.getActive();
+  mUi->graphicsView->setBackgroundColors(
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+  mUi->graphicsView->setOverlayColors(
+      theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
+  mUi->graphicsView->setInfoBoxColors(
+      theme.getColor(Theme::Color::sBoardInfoBox).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardInfoBox).getSecondaryColor());
+  mGraphicsScene->setSelectionRectColors(
+      theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
   mUi->graphicsView->setUseOpenGl(
       mContext.workspace.getSettings().useOpenGl.get());
   mUi->graphicsView->setScene(mGraphicsScene.data());
-  mUi->graphicsView->setBackgroundBrush(Qt::black);
-  mUi->graphicsView->setForegroundBrush(Qt::white);
-  mUi->graphicsView->setOverlayColor(Qt::yellow);
-  mUi->graphicsView->setRulerColor(Qt::yellow);
   mUi->graphicsView->setEnabled(false);  // no footprint selected
   mUi->graphicsView->addAction(
       EditorCommandSet::instance().commandToolBarFocus.createAction(

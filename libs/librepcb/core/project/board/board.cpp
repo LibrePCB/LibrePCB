@@ -682,8 +682,6 @@ void Board::save() {
       root.ensureLineBreak();
       SExpression& child = root.appendList("layer");
       child.appendChild(SExpression::createToken(layer->getName()));
-      child.appendChild("color", layer->getColor(false));
-      child.appendChild("color_hl", layer->getColor(true));
       child.appendChild("visible", layer->getVisible());
     }
     root.ensureLineBreak();
@@ -803,10 +801,6 @@ QVector<const AttributeProvider*> Board::getAttributeProviderParents() const
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
-
-void Board::updateIcon() noexcept {
-  mIcon = QIcon(mGraphicsScene->toPixmap(QSize(297, 210), Qt::white));
-}
 
 void Board::updateErcMessages() noexcept {
   // type: UnplacedComponent (ComponentInstances without DeviceInstance)

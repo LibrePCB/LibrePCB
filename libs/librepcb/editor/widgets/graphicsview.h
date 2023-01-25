@@ -76,6 +76,9 @@ public:
   }
 
   // Setters
+  void setBackgroundColors(const QColor& fill, const QColor& grid) noexcept;
+  void setOverlayColors(const QColor& fill, const QColor& content) noexcept;
+  void setInfoBoxColors(const QColor& fill, const QColor& text) noexcept;
   void setUseOpenGl(bool useOpenGl) noexcept;
   void setGrayOut(bool grayOut) noexcept;
   void setGridProperties(const GridProperties& properties) noexcept;
@@ -94,11 +97,9 @@ public:
   void setSceneRectMarker(const QRectF& rect) noexcept;
   void setSceneCursor(
       const tl::optional<std::pair<Point, CursorOptions>>& cursor) noexcept;
-  void setRulerColor(const QColor& color) noexcept;
   void setRulerPositions(
       const tl::optional<std::pair<Point, Point>>& pos) noexcept;
-  void setOverlayColor(const QColor& color) noexcept;
-  void setOverlayText(const QString& text) noexcept;
+  void setInfoBoxText(const QString& text) noexcept;
   void setOriginCrossVisible(bool visible) noexcept;
   void setEventHandlerObject(
       IF_GraphicsViewEventHandler* eventHandler) noexcept;
@@ -142,11 +143,15 @@ private:
   void drawForeground(QPainter* painter, const QRectF& rect);
 
   // General Attributes
-  QScopedPointer<QLabel> mOverlayLabel;
+  QScopedPointer<QLabel> mInfoBoxLabel;
   IF_GraphicsViewEventHandler* mEventHandlerObject;
   GraphicsScene* mScene;
   QVariantAnimation* mZoomAnimation;
   GridProperties* mGridProperties;
+  QColor mBackgroundColor;
+  QColor mGridColor;
+  QColor mOverlayFillColor;
+  QColor mOverlayContentColor;
   QRectF mSceneRectMarker;
   bool mOriginCrossVisible;
   bool mUseOpenGl;
@@ -164,7 +169,6 @@ private:
     Length currentTickInterval;
   };
   QVector<RulerGauge> mRulerGauges;
-  QColor mRulerColor;
   tl::optional<std::pair<Point, Point>> mRulerPositions;
 
   // State

@@ -684,9 +684,6 @@ void ProjectLoader::loadBoardUserSettings(Board& b) {
     for (const SExpression* node : root.getChildren("layer")) {
       const QString name = node->getChild("@0").getValue();
       if (GraphicsLayer* layer = b.getLayerStack().getLayer(name)) {
-        layer->setColor(deserialize<QColor>(node->getChild("color/@0")));
-        layer->setColorHighlighted(
-            deserialize<QColor>(node->getChild("color_hl/@0")));
         layer->setVisible(deserialize<bool>(node->getChild("visible/@0")));
       } else {
         qWarning()

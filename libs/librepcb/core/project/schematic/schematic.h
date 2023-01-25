@@ -131,7 +131,6 @@ public:
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }
   const ElementName& getName() const noexcept { return mName; }
-  const QIcon& getIcon() const noexcept { return mIcon; }
 
   // Setters: Attributes
   void setName(const ElementName& name) noexcept;
@@ -194,8 +193,6 @@ signals:
   void attributesChanged() override;
 
 private:
-  void updateIcon() noexcept;
-
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
   const QString mDirectoryName;
@@ -209,7 +206,6 @@ private:
   // Attributes
   Uuid mUuid;
   ElementName mName;
-  QIcon mIcon;
 
   QMap<Uuid, SI_Symbol*> mSymbols;
   QMap<Uuid, SI_NetSegment*> mNetSegments;

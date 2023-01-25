@@ -187,7 +187,7 @@ void MeasureTool::leave() noexcept {
 
   if (mView) {
     mView->unsetCursor();
-    mView->setOverlayText(QString());
+    mView->setInfoBoxText(QString());
     mView->setSceneCursor(tl::nullopt);
     mView->setRulerPositions(tl::nullopt);
     mView->setGrayOut(false);
@@ -452,7 +452,7 @@ void MeasureTool::updateRulerPositions() noexcept {
               .arg(unit.toShortStringTr());
   text += QString("<b>∠: %1°</b>").arg(angle.toDeg(), 14 - decimals, 'f', 3);
   text.replace(" ", "&nbsp;");
-  mView->setOverlayText(text);
+  mView->setInfoBoxText(text);
 }
 
 void MeasureTool::updateStatusBarMessage() noexcept {

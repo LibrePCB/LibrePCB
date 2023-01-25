@@ -43,10 +43,10 @@ MsgWrongFootprintTextLayer::MsgWrongFootprintTextLayer(
         Severity::Warning,
         tr("Layer of '%1' in '%2' is not '%3'")
             .arg(text->getText(), *footprint->getNames().getDefaultValue(),
-                 GraphicsLayer(expectedLayerName).getNameTr()),
+                 GraphicsLayer::getTranslation(expectedLayerName)),
         tr("The text element '%1' should normally be on layer '%2'.")
             .arg(text->getText(),
-                 GraphicsLayer(expectedLayerName).getNameTr())),
+                 GraphicsLayer::getTranslation(expectedLayerName))),
     mFootprint(footprint),
     mText(text),
     mExpectedLayerName(expectedLayerName) {

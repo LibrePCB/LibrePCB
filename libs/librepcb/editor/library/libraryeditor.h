@@ -165,7 +165,7 @@ private:  // Methods
   void keyPressEvent(QKeyEvent* event) noexcept override;
   void closeEvent(QCloseEvent* event) noexcept override;
   bool closeAllTabs(bool withNonClosable, bool askForSave) noexcept;
-  void addLayer(const QString& name, bool forceVisible = false) noexcept;
+  void addLayer(const QString& name) noexcept;
 
 private:  // Data
   Workspace& mWorkspace;

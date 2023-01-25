@@ -170,7 +170,7 @@ bool PackageEditorState_DrawPolygonBase::exit() noexcept {
 
   mContext.graphicsView.unsetCursor();
   mContext.graphicsView.setSceneCursor(tl::nullopt);
-  mContext.graphicsView.setOverlayText(QString());
+  mContext.graphicsView.setInfoBoxText(QString());
   emit statusBarMessageChanged(QString());
   return true;
 }
@@ -529,7 +529,7 @@ void PackageEditorState_DrawPolygonBase::updateOverlayText() noexcept {
   }
 
   text.replace(" ", "&nbsp;");
-  mContext.graphicsView.setOverlayText(text);
+  mContext.graphicsView.setInfoBoxText(text);
 }
 
 void PackageEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {

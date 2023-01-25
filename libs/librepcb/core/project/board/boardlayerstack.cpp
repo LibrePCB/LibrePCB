@@ -122,10 +122,10 @@ void BoardLayerStack::addAllLayers() noexcept {
   // symmetric board layers
   addLayer(GraphicsLayer::sTopReferences);
   addLayer(GraphicsLayer::sBotReferences);
-  addLayer(GraphicsLayer::sTopGrabAreas);
-  addLayer(GraphicsLayer::sBotGrabAreas);
-  addLayer(GraphicsLayer::sTopHiddenGrabAreas, true);
-  addLayer(GraphicsLayer::sBotHiddenGrabAreas, true);
+  addLayer(GraphicsLayer::sTopGrabAreas, false);
+  addLayer(GraphicsLayer::sBotGrabAreas, false);
+  // addLayer(GraphicsLayer::sTopHiddenGrabAreas); Not needed!
+  // addLayer(GraphicsLayer::sBotHiddenGrabAreas); Not needed!
   addLayer(GraphicsLayer::sTopPlacement);
   addLayer(GraphicsLayer::sBotPlacement);
   addLayer(GraphicsLayer::sTopDocumentation);
@@ -134,14 +134,14 @@ void BoardLayerStack::addAllLayers() noexcept {
   addLayer(GraphicsLayer::sBotNames);
   addLayer(GraphicsLayer::sTopValues);
   addLayer(GraphicsLayer::sBotValues);
-  addLayer(GraphicsLayer::sTopCourtyard);
-  addLayer(GraphicsLayer::sBotCourtyard);
+  addLayer(GraphicsLayer::sTopCourtyard, false);
+  addLayer(GraphicsLayer::sBotCourtyard, false);
   addLayer(GraphicsLayer::sTopStopMask);
   addLayer(GraphicsLayer::sBotStopMask);
-  addLayer(GraphicsLayer::sTopSolderPaste);
-  addLayer(GraphicsLayer::sBotSolderPaste);
-  addLayer(GraphicsLayer::sTopGlue);
-  addLayer(GraphicsLayer::sBotGlue);
+  addLayer(GraphicsLayer::sTopSolderPaste, false);
+  addLayer(GraphicsLayer::sBotSolderPaste, false);
+  addLayer(GraphicsLayer::sTopGlue, false);
+  addLayer(GraphicsLayer::sBotGlue, false);
 
   // other asymmetric board layers
   addLayer(GraphicsLayer::sBoardMeasures);
@@ -151,10 +151,10 @@ void BoardLayerStack::addAllLayers() noexcept {
   addLayer(GraphicsLayer::sBoardGuide);
 }
 
-void BoardLayerStack::addLayer(const QString& name, bool disable) noexcept {
+void BoardLayerStack::addLayer(const QString& name, bool visible) noexcept {
   if (!getLayer(name)) {
     QScopedPointer<GraphicsLayer> layer(new GraphicsLayer(name));
-    if (disable) layer->setEnabled(false);
+    layer->setVisible(visible);
     addLayer(layer.take());
   }
 }

@@ -51,6 +51,7 @@ public:
   // General Methods
   void addItem(QGraphicsItem& item) noexcept;
   void removeItem(QGraphicsItem& item) noexcept;
+  void setSelectionRectColors(const QColor& line, const QColor& fill) noexcept;
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
   QPixmap toPixmap(int dpi,
                    const QColor& background = Qt::transparent) noexcept;

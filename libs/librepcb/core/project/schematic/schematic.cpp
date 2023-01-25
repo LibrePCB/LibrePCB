@@ -261,7 +261,6 @@ void Schematic::addToProject() {
   }
 
   mIsAddedToProject = true;
-  updateIcon();
   sgl.dismiss();
 }
 
@@ -398,14 +397,6 @@ QString Schematic::getBuiltInAttributeValue(const QString& key) const noexcept {
 QVector<const AttributeProvider*> Schematic::getAttributeProviderParents() const
     noexcept {
   return QVector<const AttributeProvider*>{&mProject};
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Schematic::updateIcon() noexcept {
-  mIcon = QIcon(mGraphicsScene->toPixmap(QSize(297, 210), Qt::white));
 }
 
 /*******************************************************************************

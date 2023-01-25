@@ -99,10 +99,17 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   mUi->lblUnplacedComponentsNote->hide();
 
   // Setup graphics view.
-  mUi->graphicsView->setBackgroundBrush(Qt::black);
-  mUi->graphicsView->setForegroundBrush(Qt::white);
-  mUi->graphicsView->setOverlayColor(Qt::yellow);
-  mUi->graphicsView->setRulerColor(Qt::yellow);
+  const Theme& theme =
+      mProjectEditor.getWorkspace().getSettings().themes.getActive();
+  mUi->graphicsView->setBackgroundColors(
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+  mUi->graphicsView->setOverlayColors(
+      theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
+  mUi->graphicsView->setInfoBoxColors(
+      theme.getColor(Theme::Color::sBoardInfoBox).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardInfoBox).getSecondaryColor());
   mUi->graphicsView->setUseOpenGl(
       mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
   mUi->graphicsView->setEventHandlerObject(this);
@@ -213,6 +220,12 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
     mActiveBoard = newBoard;
     if (mActiveBoard) {
       // show scene, restore view scene rect, set grid properties
+      const Theme& theme =
+          mProjectEditor.getWorkspace().getSettings().themes.getActive();
+      mActiveBoard->getLayerStack().applyTheme(theme);
+      mActiveBoard->getGraphicsScene().setSelectionRectColors(
+          theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
+          theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
       mUi->graphicsView->setScene(&mActiveBoard->getGraphicsScene());
       mUi->graphicsView->setVisibleSceneRect(
           mActiveBoard->restoreViewSceneRect());
@@ -1062,11 +1075,14 @@ void BoardEditor::updateBoardDrcMessages(
 void BoardEditor::highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
                                       bool zoomTo) noexcept {
   if (QGraphicsScene* scene = mUi->graphicsView->scene()) {
+    const ThemeColor& color =
+        mProjectEditor.getWorkspace().getSettings().themes.getActive().getColor(
+            Theme::Color::sBoardOverlays);
     QPainterPath path = Path::toQPainterPathPx(msg.getLocations(), true);
     mDrcLocationGraphicsItem.reset(new QGraphicsPathItem());
     mDrcLocationGraphicsItem->setZValue(Board::ZValue_AirWires);
-    mDrcLocationGraphicsItem->setPen(Qt::NoPen);
-    mDrcLocationGraphicsItem->setBrush(QColor::fromRgb(255, 127, 0));
+    mDrcLocationGraphicsItem->setPen(QPen(color.getPrimaryColor(), 0));
+    mDrcLocationGraphicsItem->setBrush(color.getSecondaryColor());
     mDrcLocationGraphicsItem->setPath(path);
     scene->addItem(mDrcLocationGraphicsItem.data());
 

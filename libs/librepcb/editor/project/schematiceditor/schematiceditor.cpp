@@ -44,12 +44,14 @@
 #include "schematicpagesdock.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/project/schematic/schematiclayerprovider.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
 #include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -84,6 +86,18 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   mUi->setupUi(this);
 
   // Setup graphics view.
+  const Theme& theme =
+      mProjectEditor.getWorkspace().getSettings().themes.getActive();
+  mProject.getLayers().applyTheme(theme);
+  mUi->graphicsView->setBackgroundColors(
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mUi->graphicsView->setOverlayColors(
+      theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
+  mUi->graphicsView->setInfoBoxColors(
+      theme.getColor(Theme::Color::sSchematicInfoBox).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicInfoBox).getSecondaryColor());
   mUi->graphicsView->setUseOpenGl(
       mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
   mUi->graphicsView->setEventHandlerObject(this);
@@ -214,6 +228,11 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
   schematic = mProject.getSchematicByIndex(index);
   if (schematic) {
     // show scene, restore view scene rect, set grid properties
+    const Theme& theme =
+        mProjectEditor.getWorkspace().getSettings().themes.getActive();
+    schematic->getGraphicsScene().setSelectionRectColors(
+        theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
+        theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
     mUi->graphicsView->setScene(&schematic->getGraphicsScene());
     mUi->graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
     mUi->graphicsView->setGridProperties(schematic->getGridProperties());
@@ -654,7 +673,14 @@ void SchematicEditor::createToolBars() noexcept {
 
 void SchematicEditor::createDockWidgets() noexcept {
   // Pages.
-  mDockPages.reset(new SchematicPagesDock(mProject, this));
+  mDockPages.reset(
+      new SchematicPagesDock(mProject,
+                             mProjectEditor.getWorkspace()
+                                 .getSettings()
+                                 .themes.getActive()
+                                 .getColor(Theme::Color::sSchematicBackground)
+                                 .getPrimaryColor(),
+                             this));
   connect(this, &SchematicEditor::activeSchematicChanged, mDockPages.data(),
           &SchematicPagesDock::setSelectedSchematic);
   connect(mDockPages.data(), &SchematicPagesDock::selectedSchematicChanged,

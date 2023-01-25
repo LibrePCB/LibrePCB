@@ -83,7 +83,7 @@ private slots:
 
 private:
   void addAllLayers() noexcept;
-  void addLayer(const QString& name, bool disable = false) noexcept;
+  void addLayer(const QString& name, bool visible = true) noexcept;
   void addLayer(GraphicsLayer* layer) noexcept;
 
   // General

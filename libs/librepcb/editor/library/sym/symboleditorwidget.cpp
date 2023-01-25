@@ -80,6 +80,19 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   mUi->edtVersion->setReadOnly(mContext.readOnly);
   mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
+  const Theme& theme = mContext.workspace.getSettings().themes.getActive();
+  mUi->graphicsView->setBackgroundColors(
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mUi->graphicsView->setOverlayColors(
+      theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
+  mUi->graphicsView->setInfoBoxColors(
+      theme.getColor(Theme::Color::sSchematicInfoBox).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicInfoBox).getSecondaryColor());
+  mGraphicsScene->setSelectionRectColors(
+      theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
   mUi->graphicsView->setUseOpenGl(
       mContext.workspace.getSettings().useOpenGl.get());
   mUi->graphicsView->setScene(mGraphicsScene.data());

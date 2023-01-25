@@ -359,7 +359,8 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
 
   // Boards.
   foreach (const QString& dirName, dir.getDirs("boards")) {
-    const QString fp = "boards/" % dirName % "/board.lp";
+    // Board content.
+    QString fp = "boards/" % dirName % "/board.lp";
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
 
@@ -372,6 +373,23 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
 
       // Holes.
       upgradeHoles(root);
+
+      dir.write(fp, root.toByteArray());
+    }
+
+    // User settings.
+    fp = "boards/" % dirName % "/settings.user.lp";
+    if (dir.fileExists(fp)) {
+      SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+      // Layers.
+      foreach (SExpression* node, root.getChildren("layer")) {
+        for (const auto tagName : {"color", "color_hl"}) {
+          if (SExpression* child = node->tryGetChild(tagName)) {
+            node->removeChild(*child);
+          }
+        }
+      }
 
       dir.write(fp, root.toByteArray());
     }

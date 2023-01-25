@@ -151,7 +151,6 @@ public:
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }
   const ElementName& getName() const noexcept { return mName; }
-  const QIcon& getIcon() const noexcept { return mIcon; }
   const QString& getDefaultFontName() const noexcept {
     return mDefaultFontFileName;
   }
@@ -245,7 +244,6 @@ signals:
   void deviceRemoved(BI_Device& comp);
 
 private:
-  void updateIcon() noexcept;
   void updateErcMessages() noexcept;
 
   // General
@@ -265,7 +263,6 @@ private:
   // Attributes
   Uuid mUuid;
   ElementName mName;
-  QIcon mIcon;
   QString mDefaultFontFileName;
 
   // items

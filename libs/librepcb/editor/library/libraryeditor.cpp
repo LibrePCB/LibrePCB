@@ -96,7 +96,7 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   addLayer(GraphicsLayer::sSchematicSheetFrames);
   addLayer(GraphicsLayer::sSymbolOutlines);
   addLayer(GraphicsLayer::sSymbolGrabAreas);
-  addLayer(GraphicsLayer::sSymbolHiddenGrabAreas, true);
+  addLayer(GraphicsLayer::sSymbolHiddenGrabAreas);
   addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
   addLayer(GraphicsLayer::sSymbolPinCirclesReq);
   addLayer(GraphicsLayer::sSymbolPinLines);
@@ -133,8 +133,8 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   addLayer(GraphicsLayer::sBotReferences);
   addLayer(GraphicsLayer::sTopGrabAreas);
   addLayer(GraphicsLayer::sBotGrabAreas);
-  addLayer(GraphicsLayer::sTopHiddenGrabAreas, true);
-  addLayer(GraphicsLayer::sBotHiddenGrabAreas, true);
+  addLayer(GraphicsLayer::sTopHiddenGrabAreas);
+  addLayer(GraphicsLayer::sBotHiddenGrabAreas);
   addLayer(GraphicsLayer::sTopPlacement);
   addLayer(GraphicsLayer::sBotPlacement);
   addLayer(GraphicsLayer::sTopDocumentation);
@@ -143,14 +143,18 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   addLayer(GraphicsLayer::sBotNames);
   addLayer(GraphicsLayer::sTopValues);
   addLayer(GraphicsLayer::sBotValues);
-  addLayer(GraphicsLayer::sTopCourtyard, true);
-  addLayer(GraphicsLayer::sBotCourtyard, true);
-  addLayer(GraphicsLayer::sTopStopMask, true);
-  addLayer(GraphicsLayer::sBotStopMask, true);
-  addLayer(GraphicsLayer::sTopSolderPaste, true);
-  addLayer(GraphicsLayer::sBotSolderPaste, true);
-  addLayer(GraphicsLayer::sTopGlue, true);
-  addLayer(GraphicsLayer::sBotGlue, true);
+  addLayer(GraphicsLayer::sTopCourtyard);
+  addLayer(GraphicsLayer::sBotCourtyard);
+  addLayer(GraphicsLayer::sTopStopMask);
+  addLayer(GraphicsLayer::sBotStopMask);
+  addLayer(GraphicsLayer::sTopSolderPaste);
+  addLayer(GraphicsLayer::sBotSolderPaste);
+  addLayer(GraphicsLayer::sTopGlue);
+  addLayer(GraphicsLayer::sBotGlue);
+
+  // Load layer colors.
+  const Theme& theme = mWorkspace.getSettings().themes.getActive();
+  applyTheme(theme);
 
   // Add overview tab.
   LibraryOverviewWidget* overviewWidget =
@@ -1054,10 +1058,8 @@ bool LibraryEditor::closeAllTabs(bool withNonClosable,
   return true;
 }
 
-void LibraryEditor::addLayer(const QString& name, bool forceVisible) noexcept {
-  QScopedPointer<GraphicsLayer> layer(new GraphicsLayer(name));
-  if (forceVisible) layer->setVisible(true);
-  mLayers.append(layer.take());
+void LibraryEditor::addLayer(const QString& name) noexcept {
+  mLayers.append(new GraphicsLayer(name));
 }
 
 /*******************************************************************************

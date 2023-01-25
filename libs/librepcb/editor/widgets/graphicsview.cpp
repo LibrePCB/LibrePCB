@@ -49,11 +49,15 @@ namespace editor {
 GraphicsView::GraphicsView(QWidget* parent,
                            IF_GraphicsViewEventHandler* eventHandler) noexcept
   : QGraphicsView(parent),
-    mOverlayLabel(new QLabel(this)),
+    mInfoBoxLabel(new QLabel(this)),
     mEventHandlerObject(eventHandler),
     mScene(nullptr),
     mZoomAnimation(nullptr),
     mGridProperties(new GridProperties()),
+    mBackgroundColor(Qt::white),
+    mGridColor(Qt::gray),
+    mOverlayFillColor(255, 255, 255, 120),
+    mOverlayContentColor(Qt::black),
     mSceneRectMarker(),
     mOriginCrossVisible(true),
     mUseOpenGl(false),
@@ -63,7 +67,6 @@ GraphicsView::GraphicsView(QWidget* parent,
         {1, LengthUnit::millimeters(), " ", Length(100), Length(0)},
         {-1, LengthUnit::inches(), "", Length(254), Length(0)},
     }),
-    mRulerColor(Qt::black),
     mRulerPositions(),
     mPanningActive(false) {
   setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -73,15 +76,13 @@ GraphicsView::GraphicsView(QWidget* parent,
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
   setSceneRect(-2000, -2000, 4000, 4000);
-  setBackgroundBrush(Qt::white);
-  setForegroundBrush(Qt::black);
 
-  mOverlayLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-  mOverlayLabel->setFont(qApp->getDefaultMonospaceFont());
-  mOverlayLabel->setTextFormat(Qt::RichText);
-  mOverlayLabel->move(0, 0);
-  mOverlayLabel->hide();
-  setOverlayColor(Qt::black);
+  mInfoBoxLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+  mInfoBoxLabel->setFont(qApp->getDefaultMonospaceFont());
+  mInfoBoxLabel->setTextFormat(Qt::RichText);
+  mInfoBoxLabel->move(0, 0);
+  mInfoBoxLabel->hide();
+  setInfoBoxColors(Qt::white, Qt::black);
 
   mZoomAnimation = new QVariantAnimation();
   connect(mZoomAnimation, &QVariantAnimation::valueChanged, this,
@@ -108,6 +109,33 @@ QRectF GraphicsView::getVisibleSceneRect() const noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void GraphicsView::setBackgroundColors(const QColor& fill,
+                                       const QColor& grid) noexcept {
+  mBackgroundColor = fill;
+  mGridColor = grid;
+  setBackgroundBrush(backgroundBrush());  // this will repaint the background
+}
+
+void GraphicsView::setOverlayColors(const QColor& fill,
+                                    const QColor& content) noexcept {
+  mOverlayFillColor = fill;
+  mOverlayContentColor = content;
+  setForegroundBrush(foregroundBrush());  // this will repaint the foreground
+}
+
+void GraphicsView::setInfoBoxColors(const QColor& fill,
+                                    const QColor& text) noexcept {
+  mInfoBoxLabel->setStyleSheet(QString("QLabel {"
+                                       "  background-color: %1;"
+                                       "  border: none;"
+                                       "  border-bottom-right-radius: 15px;"
+                                       "  padding: 5px;"
+                                       "  color: %2;"
+                                       "}")
+                                   .arg(fill.name(QColor::HexArgb))
+                                   .arg(text.name(QColor::HexArgb)));
+}
 
 void GraphicsView::setUseOpenGl(bool useOpenGl) noexcept {
   if (useOpenGl != mUseOpenGl) {
@@ -164,35 +192,16 @@ void GraphicsView::setSceneCursor(
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
 }
 
-void GraphicsView::setRulerColor(const QColor& color) noexcept {
-  mRulerColor = color;
-  setForegroundBrush(foregroundBrush());  // this will repaint the foreground
-}
-
 void GraphicsView::setRulerPositions(
     const tl::optional<std::pair<Point, Point>>& pos) noexcept {
   mRulerPositions = pos;
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
 }
 
-void GraphicsView::setOverlayColor(const QColor& color) noexcept {
-  QColor bgColor = backgroundBrush().color();
-  bgColor.setAlpha(130);
-  mOverlayLabel->setStyleSheet(QString("QLabel {"
-                                       "  background-color: %1;"
-                                       "  border: none;"
-                                       "  border-bottom-right-radius: 15px;"
-                                       "  padding: 5px;"
-                                       "  color: %2;"
-                                       "}")
-                                   .arg(bgColor.name(QColor::HexArgb))
-                                   .arg(color.name(QColor::HexArgb)));
-}
-
-void GraphicsView::setOverlayText(const QString& text) noexcept {
-  mOverlayLabel->setText(text);
-  mOverlayLabel->resize(mOverlayLabel->sizeHint());
-  mOverlayLabel->setVisible(!text.isEmpty());
+void GraphicsView::setInfoBoxText(const QString& text) noexcept {
+  mInfoBoxLabel->setText(text);
+  mInfoBoxLabel->resize(mInfoBoxLabel->sizeHint());
+  mInfoBoxLabel->setVisible(!text.isEmpty());
 }
 
 void GraphicsView::setOriginCrossVisible(bool visible) noexcept {
@@ -397,13 +406,13 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
 }
 
 void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect) {
-  QPen gridPen(Qt::gray);
+  QPen gridPen(mGridColor);
   gridPen.setCosmetic(true);
 
   // draw background color
   painter->setPen(Qt::NoPen);
-  painter->setBrush(backgroundBrush());
-  painter->fillRect(rect, backgroundBrush());
+  painter->setBrush(mBackgroundColor);
+  painter->fillRect(rect, mBackgroundColor);
 
   // draw background grid lines
   gridPen.setWidth(
@@ -446,20 +455,22 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect) {
 }
 
 void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
-  QPen originPen(foregroundBrush().color());
+  QPen originPen(mGridColor);
   originPen.setWidth(0);
   painter->setPen(originPen);
   painter->setBrush(Qt::NoBrush);
 
   if (mOriginCrossVisible) {
     // draw origin cross
-    qreal len = Length::fromMm(2.54).toPx();
+    const qreal len = mGridProperties->getInterval()->toPx() * 3;
     painter->drawLine(QLineF(-len, 0.0, len, 0.0));
     painter->drawLine(QLineF(0.0, -len, 0.0, len));
+    painter->drawRect(QRectF(-len / 6, -len / 6, len / 3, len / 3));
   }
 
   if ((!mSceneRectMarker.isEmpty()) && (mScene)) {
     // draw scene rect marker
+    painter->setPen(QPen(mOverlayContentColor, 0));
     painter->drawRect(mSceneRectMarker);
     painter->drawLine(mapToScene(0, 0), mSceneRectMarker.topLeft());
   }
@@ -467,11 +478,9 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
   // If enabled, gray out the whole scene content to improve readability of
   // overlays.
   if (mGrayOut) {
-    QColor color = backgroundBrush().color();
-    color.setAlpha(120);
     painter->setPen(Qt::NoPen);
-    painter->setBrush(color);
-    painter->fillRect(rect, color);
+    painter->setBrush(mOverlayFillColor);
+    painter->fillRect(rect, mOverlayFillColor);
   }
 
   // If enabled, draw a ruler overlay to make measurements on screen.
@@ -504,13 +513,14 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
 
     // Draw direct line from start to end point.
     p.drawLine(Point(0, 0), Point(0, distance), Length::fromPx(3 / scaleFactor),
-               mRulerColor);
+               mOverlayContentColor);
 
     // Draw center since this might be useful for some use-cases.
     const Length circleDiameter = Length::fromPx(15 / scaleFactor);
     if (circleDiameter < (distance / 2)) {
       p.drawCircle(Point(0, distance / 2), circleDiameter,
-                   Length::fromPx(1 / scaleFactor), mRulerColor, QColor());
+                   Length::fromPx(1 / scaleFactor), mOverlayContentColor,
+                   QColor());
     }
 
     // Draw ticks & texts.
@@ -546,7 +556,7 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
         if ((isEnd) || (i % 5 == 0) || (textHeight <= tickInterval)) {
           // Draw long tick.
           p.drawLine(Point(0, tickPos), Point(longTickX, tickPos), Length(0),
-                     mRulerColor);
+                     mOverlayContentColor);
           if ((isEnd) ||
               (tickPos <=
                (distance - std::min(textHeight, tickInterval * 5)))) {
@@ -560,13 +570,13 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
             p.drawText(
                 Point(textOffset, tickPos), textRotation, textHeight,
                 (gauge.xScale != xScale) ? textAlign.mirroredH() : textAlign,
-                text, qApp->getDefaultMonospaceFont(), mRulerColor, false,
-                false, 10);
+                text, qApp->getDefaultMonospaceFont(), mOverlayContentColor,
+                false, false, 10);
           }
         } else {
           // Draw short tick.
           p.drawLine(Point(0, tickPos), Point(shortTickX, tickPos), Length(0),
-                     mRulerColor);
+                     mOverlayContentColor);
         }
       }
     }
@@ -584,7 +594,7 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
     const CursorOptions options = mSceneCursor->second;
 
     if (options.testFlag(CursorOption::Cross)) {
-      painter->setPen(QPen(mRulerColor, 0));
+      painter->setPen(QPen(foregroundBrush(), 0));
       painter->drawLine(pos + QPointF(0, -r), pos + QPointF(0, r));
       painter->drawLine(pos + QPointF(-r, 0), pos + QPointF(r, 0));
     }

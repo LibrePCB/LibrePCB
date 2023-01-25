@@ -45,6 +45,7 @@ class Device;
 class GraphicsScene;
 class Package;
 class Symbol;
+class Theme;
 class WorkspaceLibraryDb;
 
 namespace editor {
@@ -86,7 +87,7 @@ public:
   // Constructors / Destructor
   explicit AddComponentDialog(const WorkspaceLibraryDb& db,
                               const QStringList& localeOrder,
-                              const QStringList& normOrder,
+                              const QStringList& normOrder, const Theme& theme,
                               QWidget* parent = nullptr);
   ~AddComponentDialog() noexcept;
 

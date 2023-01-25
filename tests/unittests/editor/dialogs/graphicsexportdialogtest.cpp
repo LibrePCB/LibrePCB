@@ -31,6 +31,7 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/workspace/theme.h>
 #include <librepcb/editor/dialogs/graphicsexportdialog.h>
 #include <librepcb/editor/widgets/unsignedlengthedit.h>
 
@@ -855,8 +856,11 @@ TEST_F(GraphicsExportDialogTest, testLayerColors) {
   };
   QList<std::pair<QString, QColor>> defaultValue;
   QList<std::pair<QString, QColor>> newValue;
+  const Theme theme;
   for (int i = 0; i < layers.count(); ++i) {
-    GraphicsLayer layer(layers.at(i));
+    const ThemeColor& color = theme.getColorForLayer(layers.at(i));
+    GraphicsLayer layer(layers.at(i), color.getPrimaryColor(),
+                        color.getSecondaryColor());
     defaultValue.append(std::make_pair(layer.getName(), layer.getColor()));
     newValue.append(
         std::make_pair(layer.getName(), QColor::colorNames().value(i)));
