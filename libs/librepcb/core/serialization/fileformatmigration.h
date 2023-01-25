@@ -47,6 +47,18 @@ class FileFormatMigration : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  struct Message {
+    enum class Severity : int { Note = 0, Warning = 1, Critical = 2 };
+    Version fromVersion;
+    Version toVersion;
+    Severity severity;
+    int affectedItems;
+    QString message;
+
+    QString getSeverityStrTr() const noexcept;
+  };
+
   // Constructors / Destructor
   FileFormatMigration() = delete;
   explicit FileFormatMigration(const Version& fromVersion,
@@ -67,7 +79,8 @@ public:
   virtual void upgradeComponent(TransactionalDirectory& dir) = 0;
   virtual void upgradeDevice(TransactionalDirectory& dir) = 0;
   virtual void upgradeLibrary(TransactionalDirectory& dir) = 0;
-  virtual void upgradeProject(TransactionalDirectory& dir) = 0;
+  virtual void upgradeProject(TransactionalDirectory& dir,
+                              QList<Message>& messages) = 0;
   virtual void upgradeWorkspaceData(TransactionalDirectory& dir) = 0;
 
   // Static Methods
@@ -78,6 +91,8 @@ public:
   FileFormatMigration& operator=(const FileFormatMigration& rhs) = delete;
 
 protected:  // Methods
+  Message buildMessage(Message::Severity severity, const QString& message,
+                       int affectedItems = -1) const noexcept;
   void upgradeVersionFile(TransactionalDirectory& dir, const QString& fileName);
 
 protected:  // Data

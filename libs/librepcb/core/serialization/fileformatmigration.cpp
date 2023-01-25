@@ -36,6 +36,23 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  Class FileFormatMigration::Message
+ ******************************************************************************/
+
+QString FileFormatMigration::Message::getSeverityStrTr() const noexcept {
+  switch (severity) {
+    case Severity::Note:
+      return tr("NOTE");
+    case Severity::Warning:
+      return tr("WARNING");
+    case Severity::Critical:
+      return tr("CRITICAL");
+    default:
+      return "UNKNOWN";
+  }
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
@@ -64,6 +81,17 @@ QList<std::shared_ptr<FileFormatMigration>> FileFormatMigration::getMigrations(
 /*******************************************************************************
  *  Protected Methods
  ******************************************************************************/
+
+FileFormatMigration::Message FileFormatMigration::buildMessage(
+    Message::Severity severity, const QString& message, int affectedItems) const
+    noexcept {
+  const Message msg{mFromVersion, mToVersion, severity, affectedItems, message};
+  const QString multiplier =
+      affectedItems > 0 ? QString(" (%1x)").arg(affectedItems) : "";
+  qInfo().nospace().noquote()
+      << "UPGRADE " << msg.getSeverityStrTr() << multiplier << ": " << message;
+  return msg;
+}
 
 void FileFormatMigration::upgradeVersionFile(TransactionalDirectory& dir,
                                              const QString& fileName) {

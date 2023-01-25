@@ -103,7 +103,8 @@ public:
   virtual void upgradeComponent(TransactionalDirectory& dir) override;
   virtual void upgradeDevice(TransactionalDirectory& dir) override;
   virtual void upgradeLibrary(TransactionalDirectory& dir) override;
-  virtual void upgradeProject(TransactionalDirectory& dir) override;
+  virtual void upgradeProject(TransactionalDirectory& dir,
+                              QList<Message>& messages) override;
   virtual void upgradeWorkspaceData(TransactionalDirectory& dir) override;
 
   // Operator Overloadings
