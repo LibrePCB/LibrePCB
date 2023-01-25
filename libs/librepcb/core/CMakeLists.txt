@@ -475,6 +475,10 @@ add_library(
   utils/toolbox.h
   utils/transform.cpp
   utils/transform.h
+  workspace/theme.cpp
+  workspace/theme.h
+  workspace/themecolor.cpp
+  workspace/themecolor.h
   workspace/workspace.cpp
   workspace/workspace.h
   workspace/workspacelibrarydb.cpp
@@ -491,6 +495,8 @@ add_library(
   workspace/workspacesettingsitem_genericvaluelist.h
   workspace/workspacesettingsitem_keyboardshortcuts.cpp
   workspace/workspacesettingsitem_keyboardshortcuts.h
+  workspace/workspacesettingsitem_themes.cpp
+  workspace/workspacesettingsitem_themes.h
 )
 target_include_directories(
   librepcb_core

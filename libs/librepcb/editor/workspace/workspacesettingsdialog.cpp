@@ -257,6 +257,115 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
         EditorCommand::ActionFlag::WidgetShortcut));
   }
 
+  // Initialize themes widgets.
+  {
+    for (QComboBox* cbx :
+         {mUi->cbxSchematicGridStyle, mUi->cbxBoardGridStyle}) {
+      cbx->addItem(tr("None", "Grid style"),
+                   QVariant::fromValue(Theme::GridStyle::None));
+      cbx->addItem(tr("Dots", "Grid style"),
+                   QVariant::fromValue(Theme::GridStyle::Dots));
+      cbx->addItem(tr("Lines", "Grid style"),
+                   QVariant::fromValue(Theme::GridStyle::Lines));
+    }
+    auto askName = [this](const QString& title, const QString& defaultName) {
+      return QInputDialog::getText(this, title, tr("Name:"), QLineEdit::Normal,
+                                   defaultName);
+    };
+    connect(
+        mUi->cbxThemes,
+        static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        this, &WorkspaceSettingsDialog::themeIndexChanged);
+    connect(mUi->btnRemoveTheme, &QToolButton::clicked, this, [this]() {
+      if (Theme* theme = getCurrentTheme()) {
+        mThemes.remove(theme->getUuid());
+        updateThemesList(mSettings.themes.getActiveUuid());
+      }
+    });
+    connect(mUi->btnRenameTheme, &QToolButton::clicked, this,
+            [this, askName]() {
+              if (Theme* theme = getCurrentTheme()) {
+                const QString name =
+                    askName(mUi->btnRenameTheme->text(), theme->getName());
+                if (!name.isEmpty()) {
+                  theme->setName(name);
+                  updateThemesList(theme->getUuid());
+                }
+              }
+            });
+    connect(mUi->btnResetTheme, &QToolButton::clicked, this, [this]() {
+      if (Theme* theme = getCurrentTheme()) {
+        theme->restoreDefaults();
+        updateThemesList(theme->getUuid());
+      }
+    });
+    connect(mUi->btnDuplicateTheme, &QToolButton::clicked, this,
+            [this, askName]() {
+              if (Theme* theme = getCurrentTheme()) {
+                const QString name =
+                    askName(mUi->btnDuplicateTheme->text(),
+                            tr("Copy of %1").arg(theme->getName()));
+                if (!name.isEmpty()) {
+                  const Theme copy(Uuid::createRandom(), name, *theme);
+                  mThemes.insert(copy.getUuid(), copy);
+                  updateThemesList(copy.getUuid());
+                }
+              }
+            });
+    connect(mUi->btnNewTheme, &QToolButton::clicked, this, [this, askName]() {
+      const QString name = askName(mUi->btnNewTheme->text(), tr("New Theme"));
+      if (!name.isEmpty()) {
+        const Theme theme(Uuid::createRandom(), name);
+        mThemes.insert(theme.getUuid(), theme);
+        updateThemesList(theme.getUuid());
+      }
+    });
+    mUi->treeThemeColors->header()->setSectionsMovable(false);
+    mUi->treeThemeColors->header()->setSectionResizeMode(0, QHeaderView::Fixed);
+    mUi->treeThemeColors->header()->setSectionResizeMode(1, QHeaderView::Fixed);
+    mUi->treeThemeColors->header()->setSectionResizeMode(2,
+                                                         QHeaderView::Stretch);
+    mUi->treeThemeColors->header()->resizeSection(0, 20);
+    mUi->treeThemeColors->header()->resizeSection(1, 20);
+    connect(mUi->treeThemeColors, &QTreeWidget::itemDoubleClicked, this,
+            [this](QTreeWidgetItem* item, int column) {
+              Theme* theme = getCurrentTheme();
+              if ((!item) || (column < 0) || (column > 1) || (!theme)) return;
+              QList<ThemeColor> colors = theme->getColors();
+              const int index = mUi->treeThemeColors->indexOfTopLevelItem(item);
+              if ((index < 0) || (index >= colors.count())) return;
+              QColor value = (column == 1) ? colors[index].getSecondaryColor()
+                                           : colors[index].getPrimaryColor();
+              if (!value.isValid()) return;
+              value = QColorDialog::getColor(value, this, QString(),
+                                             QColorDialog::ShowAlphaChannel);
+              if (!value.isValid()) return;
+              if (column == 1) {
+                colors[index].setSecondaryColor(value);
+              } else {
+                colors[index].setPrimaryColor(value);
+              }
+              theme->setColors(colors);
+              initColorTreeWidgetItem(*item, colors[index]);
+            });
+    for (auto cfg : {
+             std::make_pair(mUi->cbxSchematicGridStyle,
+                            &Theme::setSchematicGridStyle),
+             std::make_pair(mUi->cbxBoardGridStyle, &Theme::setBoardGridStyle),
+         }) {
+      connect(cfg.first,
+              static_cast<void (QComboBox::*)(int)>(
+                  &QComboBox::currentIndexChanged),
+              this, [this, cfg](int index) {
+                if (Theme* theme = getCurrentTheme()) {
+                  const Theme::GridStyle style =
+                      cfg.first->itemData(index).value<Theme::GridStyle>();
+                  (theme->*cfg.second)(style);
+                }
+              });
+    }
+  }
+
   // Now load all current settings
   loadSettings();
 
@@ -412,6 +521,70 @@ void WorkspaceSettingsDialog::externalApplicationListIndexChanged(
   mUi->lblExternalApplicationsPlaceholders->setText(placeholdersText);
 }
 
+void WorkspaceSettingsDialog::updateThemesList(
+    const Uuid& selectedTheme) noexcept {
+  mUi->cbxThemes->clear();
+  foreach (const Theme& theme, mThemes) {
+    mUi->cbxThemes->addItem(theme.getName(), theme.getUuid().toStr());
+  }
+  const int index =
+      std::max(0, mUi->cbxThemes->findData(selectedTheme.toStr()));
+  mUi->cbxThemes->setCurrentIndex(index);
+}
+
+void WorkspaceSettingsDialog::themeIndexChanged(int index) noexcept {
+  const bool valid = (index >= 0) && (index < mThemes.count());
+  const Theme theme = mThemes.values().value(index);
+
+  mUi->btnRemoveTheme->setEnabled(valid);
+  mUi->btnRenameTheme->setEnabled(valid);
+  mUi->btnResetTheme->setEnabled(valid);
+  mUi->btnDuplicateTheme->setEnabled(valid);
+
+  // Colors.
+  mUi->treeThemeColors->clear();
+  for (int i = 0; i < theme.getColors().count(); ++i) {
+    QTreeWidgetItem* item = new QTreeWidgetItem(mUi->treeThemeColors);
+    initColorTreeWidgetItem(*item, theme.getColors().at(i));
+  }
+  mUi->treeThemeColors->setEnabled(valid);
+
+  // Grid style.
+  for (const auto& cfg : {
+           std::make_pair(mUi->cbxSchematicGridStyle,
+                          theme.getSchematicGridStyle()),
+           std::make_pair(mUi->cbxBoardGridStyle, theme.getBoardGridStyle()),
+       }) {
+    const int index = cfg.first->findData(QVariant::fromValue(cfg.second));
+    cfg.first->setCurrentIndex(index);
+    cfg.first->setEnabled(valid);
+  }
+}
+
+void WorkspaceSettingsDialog::initColorTreeWidgetItem(
+    QTreeWidgetItem& item, const ThemeColor& color) noexcept {
+  auto init = [&item](int column, const QString& toolTip, const QColor& value) {
+    item.setBackground(column, value.isValid() ? value : Qt::transparent);
+    item.setToolTip(
+        column,
+        toolTip.arg(value.isValid() ? value.name(QColor::HexArgb).toUpper()
+                                    : tr("N/A")));
+    item.setText(column, value.isValid() ? "" : "✖");
+    item.setTextAlignment(column, Qt::AlignCenter);
+  };
+  init(0, tr("Primary color: %1"), color.getPrimaryColor());
+  init(1, tr("Secondary color: %1"), color.getSecondaryColor());
+
+  item.setText(2, color.getNameTr());
+}
+
+Theme* WorkspaceSettingsDialog::getCurrentTheme() noexcept {
+  const int index = mUi->cbxThemes->currentIndex();
+  const tl::optional<Uuid> uuid =
+      Uuid::tryFromString(mUi->cbxThemes->itemData(index).toString());
+  return (uuid && mThemes.contains(*uuid)) ? &mThemes[*uuid] : nullptr;
+}
+
 void WorkspaceSettingsDialog::updateDismissedMessagesCount() noexcept {
   const int count = mSettings.dismissedMessages.get().count();
   mUi->btnResetDismissedMessages->setText(tr("Reset") % " (" %
@@ -466,6 +639,10 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   // Keyboard Shortcuts
   mKeyboardShortcutsModel->setOverrides(mSettings.keyboardShortcuts.get());
   mUi->treeKeyboardShortcuts->expandAll();
+
+  // Themes
+  mThemes = mSettings.themes.getAll();
+  updateThemesList(mSettings.themes.getActiveUuid());
 }
 
 void WorkspaceSettingsDialog::saveSettings() noexcept {
@@ -514,6 +691,12 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
 
     // Keyboard shortcuts
     mSettings.keyboardShortcuts.set(mKeyboardShortcutsModel->getOverrides());
+
+    // Themes
+    mSettings.themes.setAll(mThemes);
+    if (const Theme* theme = getCurrentTheme()) {
+      mSettings.themes.setActiveUuid(theme->getUuid());
+    }
 
     // Save settings to disk.
     mWorkspace.saveSettings();  // can throw

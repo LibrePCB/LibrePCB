@@ -35,6 +35,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Theme;
+class ThemeColor;
 class Workspace;
 class WorkspaceSettings;
 
@@ -85,6 +87,11 @@ private:
   void buttonBoxClicked(QAbstractButton* button) noexcept;
   void keyPressEvent(QKeyEvent* event) noexcept override;
   void externalApplicationListIndexChanged(int index) noexcept;
+  void updateThemesList(const Uuid& selectedTheme) noexcept;
+  void themeIndexChanged(int index) noexcept;
+  void initColorTreeWidgetItem(QTreeWidgetItem& item,
+                               const ThemeColor& color) noexcept;
+  Theme* getCurrentTheme() noexcept;
   void updateDismissedMessagesCount() noexcept;
   void loadSettings() noexcept;
   void saveSettings() noexcept;
@@ -101,6 +108,7 @@ private:
 
   // Cached settings
   QVector<ExternalApplication> mExternalApplications;
+  QMap<Uuid, Theme> mThemes;
 };
 
 /*******************************************************************************
