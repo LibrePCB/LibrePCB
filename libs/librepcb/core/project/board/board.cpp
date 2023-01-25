@@ -30,7 +30,6 @@
 #include "../../library/dev/device.h"
 #include "../../library/pkg/footprint.h"
 #include "../../serialization/sexpression.h"
-#include "../../types/gridproperties.h"
 #include "../../types/lengthunit.h"
 #include "../../utils/scopeguardlist.h"
 #include "../../utils/toolbox.h"
@@ -82,15 +81,13 @@ Board::Board(Project& project,
     mIsAddedToProject(false),
     mGraphicsScene(new GraphicsScene()),
     mLayerStack(new BoardLayerStack(*this)),
-    // Use smaller grid than in schematics to avoid grid snap issues.
-    mGridProperties(new GridProperties(GridProperties::Type_t::Lines,
-                                       PositiveLength(635000),
-                                       LengthUnit::millimeters())),
     mDesignRules(new BoardDesignRules()),
     mFabricationOutputSettings(new BoardFabricationOutputSettings()),
     mUuid(uuid),
     mName(name),
-    mDefaultFontFileName(qApp->getDefaultStrokeFontName()) {
+    mDefaultFontFileName(qApp->getDefaultStrokeFontName()),
+    mGridInterval(635000),
+    mGridUnit(LengthUnit::millimeters()) {
   if (mDirectoryName.isEmpty()) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -130,7 +127,6 @@ Board::~Board() noexcept {
 
   mFabricationOutputSettings.reset();
   mDesignRules.reset();
-  mGridProperties.reset();
   mLayerStack.reset();
   mGraphicsScene.reset();
 }
@@ -186,14 +182,6 @@ QList<BI_Base*> Board::getAllItems() const noexcept {
   foreach (BI_AirWire* airWire, mAirWires)
     items.append(airWire);
   return items;
-}
-
-/*******************************************************************************
- *  Setters: General
- ******************************************************************************/
-
-void Board::setGridProperties(const GridProperties& grid) noexcept {
-  *mGridProperties = grid;
 }
 
 /*******************************************************************************
@@ -460,8 +448,9 @@ void Board::addDefaultContent() {
 
 void Board::copyFrom(const Board& other) {
   mDefaultFontFileName = other.getDefaultFontName();
+  mGridInterval = other.getGridInterval();
+  mGridUnit = other.getGridUnit();
   *mLayerStack = other.getLayerStack();
-  *mGridProperties = other.getGridProperties();
   *mDesignRules = other.getDesignRules();
   *mFabricationOutputSettings = other.getFabricationOutputSettings();
 
@@ -630,7 +619,9 @@ void Board::save() {
     root.ensureLineBreak();
     root.appendChild("default_font", mDefaultFontFileName);
     root.ensureLineBreak();
-    mGridProperties->serialize(root.appendList("grid"));
+    SExpression& gridNode = root.appendList("grid");
+    gridNode.appendChild("interval", mGridInterval);
+    gridNode.appendChild("unit", mGridUnit);
     root.ensureLineBreak();
     {
       SExpression& node = root.appendList("layers");

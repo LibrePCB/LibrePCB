@@ -36,7 +36,6 @@ namespace librepcb {
 
 class Footprint;
 class GraphicsScene;
-class GridProperties;
 class IF_GraphicsLayerProvider;
 class Package;
 class PrimitiveTextGraphicsItem;
@@ -85,6 +84,7 @@ public:  // Types
     UndoStack& undoStack;
     GraphicsScene& graphicsScene;
     GraphicsView& graphicsView;
+    LengthUnit& lengthUnit;
     Package& package;
     std::shared_ptr<Footprint> currentFootprint;
     std::shared_ptr<FootprintGraphicsItem> currentGraphicsItem;

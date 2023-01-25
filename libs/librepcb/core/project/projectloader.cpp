@@ -29,7 +29,6 @@
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
 #include "../serialization/fileformatmigration.h"
-#include "../types/gridproperties.h"
 #include "board/board.h"
 #include "board/boarddesignrules.h"
 #include "board/boardfabricationoutputsettings.h"
@@ -346,7 +345,10 @@ void ProjectLoader::loadSchematic(Project& p, const QString& relativeFilePath) {
       new Schematic(p, std::move(dir), fp.getParentDir().getFilename(),
                     deserialize<Uuid>(root.getChild("@0")),
                     deserialize<ElementName>(root.getChild("name/@0")));
-  schematic->setGridProperties(GridProperties(root.getChild("grid")));
+  schematic->setGridInterval(
+      deserialize<PositiveLength>(root.getChild("grid/interval/@0")));
+  schematic->setGridUnit(
+      deserialize<LengthUnit>(root.getChild("grid/unit/@0")));
   p.addSchematic(*schematic);
 
   foreach (const SExpression* node, root.getChildren("symbol")) {
@@ -487,7 +489,9 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   Board* board = new Board(p, std::move(dir), fp.getParentDir().getFilename(),
                            deserialize<Uuid>(root.getChild("@0")),
                            deserialize<ElementName>(root.getChild("name/@0")));
-  board->setGridProperties(GridProperties(root.getChild("grid")));
+  board->setGridInterval(
+      deserialize<PositiveLength>(root.getChild("grid/interval/@0")));
+  board->setGridUnit(deserialize<LengthUnit>(root.getChild("grid/unit/@0")));
   board->setDefaultFontName(root.getChild("default_font/@0").getValue());
   board->getLayerStack().setInnerLayerCount(
       deserialize<uint>(root.getChild("layers/inner/@0")));

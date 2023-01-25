@@ -37,28 +37,30 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-GridSettingsDialog::GridSettingsDialog(const GridProperties& grid,
+GridSettingsDialog::GridSettingsDialog(const PositiveLength& interval,
+                                       const LengthUnit& unit,
+                                       Theme::GridStyle style,
                                        QWidget* parent) noexcept
   : QDialog(parent),
     mUi(new Ui::GridSettingsDialog),
-    mOriginalGrid(grid),
-    mCurrentGrid(grid) {
+    mOriginalGrid{interval, unit, style},
+    mCurrentGrid{interval, unit, style} {
   mUi->setupUi(this);
-  mUi->edtInterval->setDefaultUnit(mCurrentGrid.getUnit());
+  mUi->edtInterval->setDefaultUnit(mCurrentGrid.unit);
   mUi->edtInterval->setStepBehavior(
       LengthEditBase::StepBehavior::HalfAndDouble);
-  mUi->edtInterval->setValue(mCurrentGrid.getInterval());
+  mUi->edtInterval->setValue(mCurrentGrid.interval);
 
   // set radiobutton id's
   mUi->rbtnGroup->setId(mUi->rbtnNoGrid,
-                        static_cast<int>(GridProperties::Type_t::Off));
+                        static_cast<int>(Theme::GridStyle::None));
   mUi->rbtnGroup->setId(mUi->rbtnDots,
-                        static_cast<int>(GridProperties::Type_t::Dots));
+                        static_cast<int>(Theme::GridStyle::Dots));
   mUi->rbtnGroup->setId(mUi->rbtnLines,
-                        static_cast<int>(GridProperties::Type_t::Lines));
+                        static_cast<int>(Theme::GridStyle::Lines));
 
   // select the grid type
-  mUi->rbtnGroup->button(static_cast<int>(mCurrentGrid.getType()))
+  mUi->rbtnGroup->button(static_cast<int>(mCurrentGrid.style))
       ->setChecked(true);
 
   // connect UI signal with slots
@@ -87,20 +89,23 @@ GridSettingsDialog::~GridSettingsDialog() noexcept {
 
 void GridSettingsDialog::rbtnGroupClicked(int id) noexcept {
   if (id < 0) return;
-  mCurrentGrid.setType(static_cast<GridProperties::Type_t>(id));
-  emit gridPropertiesChanged(mCurrentGrid);
+  mCurrentGrid.style = static_cast<Theme::GridStyle>(id);
+  emit gridPropertiesChanged(mCurrentGrid.interval, mCurrentGrid.unit,
+                             mCurrentGrid.style);
 }
 
 void GridSettingsDialog::edtIntervalValueChanged(
     const PositiveLength& value) noexcept {
-  mCurrentGrid.setInterval(value);
-  emit gridPropertiesChanged(mCurrentGrid);
+  mCurrentGrid.interval = value;
+  emit gridPropertiesChanged(mCurrentGrid.interval, mCurrentGrid.unit,
+                             mCurrentGrid.style);
 }
 
 void GridSettingsDialog::edtIntervalUnitChanged(
     const LengthUnit& unit) noexcept {
-  mCurrentGrid.setUnit(unit);
-  emit gridPropertiesChanged(mCurrentGrid);
+  mCurrentGrid.unit = unit;
+  emit gridPropertiesChanged(mCurrentGrid.interval, mCurrentGrid.unit,
+                             mCurrentGrid.style);
 }
 
 void GridSettingsDialog::buttonBoxClicked(QAbstractButton* button) noexcept {
@@ -113,23 +118,26 @@ void GridSettingsDialog::buttonBoxClicked(QAbstractButton* button) noexcept {
     case QDialogButtonBox::RejectRole: {
       // restore initial settings
       mCurrentGrid = mOriginalGrid;
-      emit gridPropertiesChanged(mCurrentGrid);
+      emit gridPropertiesChanged(mCurrentGrid.interval, mCurrentGrid.unit,
+                                 mCurrentGrid.style);
       reject();
       break;
     }
 
     case QDialogButtonBox::ResetRole: {
-      mCurrentGrid = GridProperties();
-      emit gridPropertiesChanged(mCurrentGrid);
+      mCurrentGrid = Grid{PositiveLength(2540000), LengthUnit::millimeters(),
+                          Theme::GridStyle::Lines};
+      emit gridPropertiesChanged(mCurrentGrid.interval, mCurrentGrid.unit,
+                                 mCurrentGrid.style);
 
       // update widgets
       mUi->rbtnGroup->blockSignals(true);
       mUi->edtInterval->blockSignals(true);
-      mUi->rbtnGroup->button(static_cast<int>(mCurrentGrid.getType()))
+      mUi->rbtnGroup->button(static_cast<int>(mCurrentGrid.style))
           ->setChecked(true);
       mUi->edtInterval->resetUnit();
-      mUi->edtInterval->setDefaultUnit(mCurrentGrid.getUnit());
-      mUi->edtInterval->setValue(mCurrentGrid.getInterval());
+      mUi->edtInterval->setDefaultUnit(mCurrentGrid.unit);
+      mUi->edtInterval->setValue(mCurrentGrid.interval);
       mUi->rbtnGroup->blockSignals(false);
       mUi->edtInterval->blockSignals(false);
       break;

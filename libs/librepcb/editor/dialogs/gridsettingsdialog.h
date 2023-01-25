@@ -23,7 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/types/gridproperties.h>
+#include <librepcb/core/types/length.h>
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -53,18 +55,24 @@ public:
   // Constructors / Destructor
   GridSettingsDialog() = delete;
   GridSettingsDialog(const GridSettingsDialog& other) = delete;
-  explicit GridSettingsDialog(const GridProperties& grid,
+  explicit GridSettingsDialog(const PositiveLength& interval,
+                              const LengthUnit& unit, Theme::GridStyle style,
                               QWidget* parent = nullptr) noexcept;
   ~GridSettingsDialog() noexcept;
 
   // Getters
-  const GridProperties& getGrid() const noexcept { return mCurrentGrid; }
+  const PositiveLength& getInterval() const noexcept {
+    return mCurrentGrid.interval;
+  }
+  const LengthUnit& getUnit() const noexcept { return mCurrentGrid.unit; }
+  Theme::GridStyle getStyle() const noexcept { return mCurrentGrid.style; }
 
   // Operator Overloadings
   GridSettingsDialog& operator=(const GridSettingsDialog& rhs) = delete;
 
 signals:
-  void gridPropertiesChanged(const GridProperties& grid);
+  void gridPropertiesChanged(const PositiveLength& interval,
+                             const LengthUnit& unit, Theme::GridStyle style);
 
 private:  // Methods
   void rbtnGroupClicked(int id) noexcept;
@@ -73,9 +81,15 @@ private:  // Methods
   void buttonBoxClicked(QAbstractButton* button) noexcept;
 
 private:  // Data
+  struct Grid {
+    PositiveLength interval;
+    LengthUnit unit;
+    Theme::GridStyle style;
+  };
+
   QScopedPointer<Ui::GridSettingsDialog> mUi;
-  GridProperties mOriginalGrid;
-  GridProperties mCurrentGrid;
+  Grid mOriginalGrid;
+  Grid mCurrentGrid;
 };
 
 /*******************************************************************************

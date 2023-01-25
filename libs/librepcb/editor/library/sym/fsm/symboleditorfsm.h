@@ -35,7 +35,6 @@
 namespace librepcb {
 
 class GraphicsScene;
-class GridProperties;
 class IF_GraphicsLayerProvider;
 class Symbol;
 
@@ -81,6 +80,7 @@ public:  // Types
     UndoStack& undoStack;
     GraphicsScene& graphicsScene;
     GraphicsView& graphicsView;
+    LengthUnit& lengthUnit;
     Symbol& symbol;
     SymbolGraphicsItem& symbolGraphicsItem;
     ToolBarProxy& commandToolBar;

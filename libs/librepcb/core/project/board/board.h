@@ -28,6 +28,7 @@
 #include "../../fileio/transactionaldirectory.h"
 #include "../../types/elementname.h"
 #include "../../types/length.h"
+#include "../../types/lengthunit.h"
 #include "../../types/uuid.h"
 #include "../erc/if_ercmsgprovider.h"
 
@@ -59,7 +60,6 @@ class BoardLayerStack;
 class BoardSelectionQuery;
 class GraphicsLayer;
 class GraphicsScene;
-class GridProperties;
 class NetSignal;
 class Project;
 
@@ -119,9 +119,6 @@ public:
   Project& getProject() const noexcept { return mProject; }
   const QString& getDirectoryName() const noexcept { return mDirectoryName; }
   TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
-  const GridProperties& getGridProperties() const noexcept {
-    return *mGridProperties;
-  }
   GraphicsScene& getGraphicsScene() const noexcept { return *mGraphicsScene; }
   BoardLayerStack& getLayerStack() noexcept { return *mLayerStack; }
   const BoardLayerStack& getLayerStack() const noexcept { return *mLayerStack; }
@@ -145,21 +142,26 @@ public:
       const QSet<const NetSignal*>& netsignals = {}) const noexcept;
   QList<BI_Base*> getAllItems() const noexcept;
 
-  // Setters: General
-  void setGridProperties(const GridProperties& grid) noexcept;
-
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }
   const ElementName& getName() const noexcept { return mName; }
   const QString& getDefaultFontName() const noexcept {
     return mDefaultFontFileName;
   }
+  const PositiveLength& getGridInterval() const noexcept {
+    return mGridInterval;
+  }
+  const LengthUnit& getGridUnit() const noexcept { return mGridUnit; }
 
   // Setters
   void setName(const ElementName& name) noexcept { mName = name; }
   void setDefaultFontName(const QString& name) noexcept {
     mDefaultFontFileName = name;
   }
+  void setGridInterval(const PositiveLength& interval) noexcept {
+    mGridInterval = interval;
+  }
+  void setGridUnit(const LengthUnit& unit) noexcept { mGridUnit = unit; }
 
   // DeviceInstance Methods
   const QMap<Uuid, BI_Device*>& getDeviceInstances() const noexcept {
@@ -254,7 +256,6 @@ private:
 
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<BoardLayerStack> mLayerStack;
-  QScopedPointer<GridProperties> mGridProperties;
   QScopedPointer<BoardDesignRules> mDesignRules;
   QScopedPointer<BoardFabricationOutputSettings> mFabricationOutputSettings;
   QRectF mViewRect;
@@ -264,6 +265,8 @@ private:
   Uuid mUuid;
   ElementName mName;
   QString mDefaultFontFileName;
+  PositiveLength mGridInterval;
+  LengthUnit mGridUnit;
 
   // items
   QMap<Uuid, BI_Device*> mDeviceInstances;

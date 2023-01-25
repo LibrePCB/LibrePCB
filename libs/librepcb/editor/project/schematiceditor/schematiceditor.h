@@ -112,7 +112,8 @@ private:
   void goToSymbol(const QString& name, int index) noexcept;
   void updateEmptySchematicMessage() noexcept;
   void updateComponentToolbarIcons() noexcept;
-  void setGridProperties(const GridProperties& grid,
+  void setGridProperties(const PositiveLength& interval, const LengthUnit& unit,
+                         Theme::GridStyle style,
                          bool applyToSchematics) noexcept;
   void execGridPropertiesDialog() noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,

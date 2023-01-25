@@ -446,8 +446,6 @@ add_library(
   types/angle.h
   types/circuitidentifier.h
   types/elementname.h
-  types/gridproperties.cpp
-  types/gridproperties.h
   types/length.cpp
   types/length.h
   types/lengthunit.cpp

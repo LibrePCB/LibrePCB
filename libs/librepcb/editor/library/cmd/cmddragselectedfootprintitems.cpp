@@ -35,7 +35,6 @@
 #include <librepcb/core/graphics/holegraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/stroketextgraphicsitem.h>
-#include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
 
@@ -63,7 +62,7 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
   Q_ASSERT(context.currentFootprint && context.currentGraphicsItem);
 
   int count = 0;
-  PositiveLength grid = mContext.graphicsView.getGridProperties().getInterval();
+  PositiveLength grid = mContext.graphicsView.getGridInterval();
 
   QList<std::shared_ptr<FootprintPadGraphicsItem>> pads =
       context.currentGraphicsItem->getSelectedPads();
@@ -156,7 +155,7 @@ int CmdDragSelectedFootprintItems::getSelectedItemsCount() const noexcept {
  ******************************************************************************/
 
 void CmdDragSelectedFootprintItems::snapToGrid() noexcept {
-  PositiveLength grid = mContext.graphicsView.getGridProperties().getInterval();
+  PositiveLength grid = mContext.graphicsView.getGridInterval();
   foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
     cmd->snapToGrid(grid, true);
   }

@@ -53,7 +53,6 @@
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/project/schematic/schematiclayerprovider.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
-#include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -98,6 +97,7 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   mUi->graphicsView->setInfoBoxColors(
       theme.getColor(Theme::Color::sSchematicInfoBox).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicInfoBox).getSecondaryColor());
+  mUi->graphicsView->setGridStyle(theme.getSchematicGridStyle());
   mUi->graphicsView->setUseOpenGl(
       mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
   mUi->graphicsView->setEventHandlerObject(this);
@@ -235,8 +235,8 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
         theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
     mUi->graphicsView->setScene(&schematic->getGraphicsScene());
     mUi->graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
-    mUi->graphicsView->setGridProperties(schematic->getGridProperties());
-    mUi->statusbar->setLengthUnit(schematic->getGridProperties().getUnit());
+    mUi->graphicsView->setGridInterval(schematic->getGridInterval());
+    mUi->statusbar->setLengthUnit(schematic->getGridUnit());
     mSchematicConnections.append(
         connect(schematic, &Schematic::symbolAdded, this,
                 &SchematicEditor::updateEmptySchematicMessage));
@@ -393,17 +393,18 @@ void SchematicEditor::createActions() noexcept {
       this, this, &SchematicEditor::execGridPropertiesDialog));
   mActionGridIncrease.reset(cmd.gridIncrease.createAction(this, this, [this]() {
     if (const Schematic* schematic = getActiveSchematic()) {
-      GridProperties grid = schematic->getGridProperties();
-      grid.setInterval(PositiveLength(grid.getInterval() * 2));
-      setGridProperties(grid, true);
+      const Length interval = schematic->getGridInterval() * 2;
+      setGridProperties(PositiveLength(interval), schematic->getGridUnit(),
+                        mUi->graphicsView->getGridStyle(), true);
     }
   }));
   mActionGridDecrease.reset(cmd.gridDecrease.createAction(this, this, [this]() {
     if (const Schematic* schematic = getActiveSchematic()) {
-      GridProperties grid = schematic->getGridProperties();
-      if ((*grid.getInterval()) % 2 == 0) {
-        grid.setInterval(PositiveLength(grid.getInterval() / 2));
-        setGridProperties(grid, true);
+      const Length interval = *schematic->getGridInterval();
+      if ((interval % 2) == 0) {
+        setGridProperties(PositiveLength(interval / 2),
+                          schematic->getGridUnit(),
+                          mUi->graphicsView->getGridStyle(), true);
       }
     }
   }));
@@ -422,8 +423,7 @@ void SchematicEditor::createActions() noexcept {
   mActionPaste.reset(cmd.clipboardPaste.createAction(
       this, mFsm.data(), &SchematicEditorFsm::processPaste));
   mActionMoveLeft.reset(cmd.moveLeft.createAction(this, this, [this]() {
-    if (!mFsm->processMove(
-            Point(-mUi->graphicsView->getGridProperties().getInterval(), 0))) {
+    if (!mFsm->processMove(Point(-mUi->graphicsView->getGridInterval(), 0))) {
       // Workaround for consumed keyboard shortcuts for scrolling.
       mUi->graphicsView->horizontalScrollBar()->triggerAction(
           QScrollBar::SliderSingleStepSub);
@@ -431,8 +431,7 @@ void SchematicEditor::createActions() noexcept {
   }));
   addAction(mActionMoveLeft.data());
   mActionMoveRight.reset(cmd.moveRight.createAction(this, this, [this]() {
-    if (!mFsm->processMove(
-            Point(*mUi->graphicsView->getGridProperties().getInterval(), 0))) {
+    if (!mFsm->processMove(Point(*mUi->graphicsView->getGridInterval(), 0))) {
       // Workaround for consumed keyboard shortcuts for scrolling.
       mUi->graphicsView->horizontalScrollBar()->triggerAction(
           QScrollBar::SliderSingleStepAdd);
@@ -440,8 +439,7 @@ void SchematicEditor::createActions() noexcept {
   }));
   addAction(mActionMoveRight.data());
   mActionMoveUp.reset(cmd.moveUp.createAction(this, this, [this]() {
-    if (!mFsm->processMove(
-            Point(0, *mUi->graphicsView->getGridProperties().getInterval()))) {
+    if (!mFsm->processMove(Point(0, *mUi->graphicsView->getGridInterval()))) {
       // Workaround for consumed keyboard shortcuts for scrolling.
       mUi->graphicsView->verticalScrollBar()->triggerAction(
           QScrollBar::SliderSingleStepSub);
@@ -449,8 +447,7 @@ void SchematicEditor::createActions() noexcept {
   }));
   addAction(mActionMoveUp.data());
   mActionMoveDown.reset(cmd.moveDown.createAction(this, this, [this]() {
-    if (!mFsm->processMove(
-            Point(0, -mUi->graphicsView->getGridProperties().getInterval()))) {
+    if (!mFsm->processMove(Point(0, -mUi->graphicsView->getGridInterval()))) {
       // Workaround for consumed keyboard shortcuts for scrolling.
       mUi->graphicsView->verticalScrollBar()->triggerAction(
           QScrollBar::SliderSingleStepAdd);
@@ -1075,26 +1072,35 @@ void SchematicEditor::updateComponentToolbarIcons() noexcept {
       QIcon(":/img/library/unipolar_capacitor_" % suffix % ".png"));
 }
 
-void SchematicEditor::setGridProperties(const GridProperties& grid,
+void SchematicEditor::setGridProperties(const PositiveLength& interval,
+                                        const LengthUnit& unit,
+                                        Theme::GridStyle style,
                                         bool applyToSchematics) noexcept {
-  mUi->graphicsView->setGridProperties(grid);
-  mUi->statusbar->setLengthUnit(grid.getUnit());
+  mUi->graphicsView->setGridInterval(interval);
+  mUi->graphicsView->setGridStyle(style);
+  mUi->statusbar->setLengthUnit(unit);
 
   if (applyToSchematics) {
     foreach (Schematic* schematic, mProject.getSchematics()) {
-      schematic->setGridProperties(grid);
+      schematic->setGridInterval(interval);
+      schematic->setGridUnit(unit);
     }
   }
 }
 
 void SchematicEditor::execGridPropertiesDialog() noexcept {
-  if (const Schematic* activeSchematic = getActiveSchematic()) {
-    GridSettingsDialog dialog(activeSchematic->getGridProperties(), this);
-    connect(
-        &dialog, &GridSettingsDialog::gridPropertiesChanged,
-        [this](const GridProperties& grid) { setGridProperties(grid, false); });
+  if (const Schematic* schematic = getActiveSchematic()) {
+    GridSettingsDialog dialog(schematic->getGridInterval(),
+                              schematic->getGridUnit(),
+                              mUi->graphicsView->getGridStyle(), this);
+    connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
+            [this](const PositiveLength& interval, const LengthUnit& unit,
+                   Theme::GridStyle style) {
+              setGridProperties(interval, unit, style, false);
+            });
     if (dialog.exec()) {
-      setGridProperties(dialog.getGrid(), true);
+      setGridProperties(dialog.getInterval(), dialog.getUnit(),
+                        dialog.getStyle(), true);
     }
   }
 }

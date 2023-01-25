@@ -25,7 +25,6 @@
 #include "../../../widgets/graphicsview.h"
 
 #include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
 
@@ -51,11 +50,11 @@ PackageEditorState::~PackageEditorState() noexcept {
  ******************************************************************************/
 
 const PositiveLength& PackageEditorState::getGridInterval() const noexcept {
-  return mContext.graphicsView.getGridProperties().getInterval();
+  return mContext.graphicsView.getGridInterval();
 }
 
 const LengthUnit& PackageEditorState::getLengthUnit() const noexcept {
-  return mContext.graphicsView.getGridProperties().getUnit();
+  return mContext.lengthUnit;
 }
 
 QList<GraphicsLayer*> PackageEditorState::getAllowedTextLayers() const

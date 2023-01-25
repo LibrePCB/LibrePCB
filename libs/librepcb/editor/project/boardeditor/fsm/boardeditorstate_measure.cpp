@@ -42,7 +42,7 @@ namespace editor {
 BoardEditorState_Measure::BoardEditorState_Measure(
     const Context& context) noexcept
   : BoardEditorState(context),
-    mTool(new MeasureTool(mContext.editorGraphicsView)) {
+    mTool(new MeasureTool(mContext.editorGraphicsView, getLengthUnit())) {
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &BoardEditorState_Measure::statusBarMessageChanged);
 }

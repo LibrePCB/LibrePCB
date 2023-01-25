@@ -131,8 +131,8 @@ private:
   void newBoard() noexcept;
   void copyBoard() noexcept;
   void removeBoard() noexcept;
-  void setGridProperties(const GridProperties& grid,
-                         bool applyToBoard) noexcept;
+  void setGridProperties(const PositiveLength& interval, const LengthUnit& unit,
+                         Theme::GridStyle style, bool applyToBoard) noexcept;
   void execGridPropertiesDialog() noexcept;
   void execDesignRulesDialog() noexcept;
   void execDesignRuleCheckDialog() noexcept;

@@ -30,7 +30,6 @@
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -53,7 +52,8 @@ GraphicsView::GraphicsView(QWidget* parent,
     mEventHandlerObject(eventHandler),
     mScene(nullptr),
     mZoomAnimation(nullptr),
-    mGridProperties(new GridProperties()),
+    mGridStyle(Theme::GridStyle::None),
+    mGridInterval(2540000),
     mBackgroundColor(Qt::white),
     mGridColor(Qt::gray),
     mOverlayFillColor(255, 255, 255, 120),
@@ -94,8 +94,6 @@ GraphicsView::GraphicsView(QWidget* parent,
 GraphicsView::~GraphicsView() noexcept {
   delete mZoomAnimation;
   mZoomAnimation = nullptr;
-  delete mGridProperties;
-  mGridProperties = nullptr;
 }
 
 /*******************************************************************************
@@ -163,9 +161,13 @@ void GraphicsView::setGrayOut(bool grayOut) noexcept {
   setForegroundBrush(foregroundBrush());  // this will repaint the foreground
 }
 
-void GraphicsView::setGridProperties(
-    const GridProperties& properties) noexcept {
-  *mGridProperties = properties;
+void GraphicsView::setGridStyle(Theme::GridStyle style) noexcept {
+  mGridStyle = style;
+  setBackgroundBrush(backgroundBrush());  // this will repaint the background
+}
+
+void GraphicsView::setGridInterval(const PositiveLength& interval) noexcept {
+  mGridInterval = interval;
   setBackgroundBrush(backgroundBrush());  // this will repaint the background
 }
 
@@ -228,7 +230,7 @@ Point GraphicsView::mapGlobalPosToScenePos(const QPoint& globalPosPx,
   }
   Point scenePos = Point::fromPx(mapToScene(localPosPx));
   if (mapToGrid) {
-    scenePos.mapToGrid(mGridProperties->getInterval());
+    scenePos.mapToGrid(mGridInterval);
   }
   return scenePos;
 }
@@ -415,11 +417,10 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect) {
   painter->fillRect(rect, mBackgroundColor);
 
   // draw background grid lines
-  gridPen.setWidth(
-      (mGridProperties->getType() == GridProperties::Type_t::Dots) ? 2 : 1);
+  gridPen.setWidth((mGridStyle == Theme::GridStyle::Dots) ? 2 : 1);
   painter->setPen(gridPen);
   painter->setBrush(Qt::NoBrush);
-  qreal gridIntervalPixels = mGridProperties->getInterval()->toPx();
+  qreal gridIntervalPixels = mGridInterval->toPx();
   qreal scaleFactor = width() / rect.width();
   if (gridIntervalPixels * scaleFactor >= (qreal)5) {
     qreal left, right, top, bottom;
@@ -427,8 +428,8 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect) {
     right = rect.right();
     top = rect.top();
     bottom = qFloor(rect.bottom() / gridIntervalPixels) * gridIntervalPixels;
-    switch (mGridProperties->getType()) {
-      case GridProperties::Type_t::Lines: {
+    switch (mGridStyle) {
+      case Theme::GridStyle::Lines: {
         QVarLengthArray<QLineF, 500> lines;
         for (qreal x = left; x < right; x += gridIntervalPixels)
           lines.append(QLineF(x, rect.top(), x, rect.bottom()));
@@ -439,7 +440,7 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect) {
         break;
       }
 
-      case GridProperties::Type_t::Dots: {
+      case Theme::GridStyle::Dots: {
         QVarLengthArray<QPointF, 2000> dots;
         for (qreal x = left; x < right; x += gridIntervalPixels)
           for (qreal y = bottom; y > top; y -= gridIntervalPixels)
@@ -462,7 +463,7 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
 
   if (mOriginCrossVisible) {
     // draw origin cross
-    const qreal len = mGridProperties->getInterval()->toPx() * 3;
+    const qreal len = mGridInterval->toPx() * 3;
     painter->drawLine(QLineF(-len, 0.0, len, 0.0));
     painter->drawLine(QLineF(0.0, -len, 0.0, len));
     painter->drawRect(QRectF(-len / 6, -len / 6, len / 3, len / 3));

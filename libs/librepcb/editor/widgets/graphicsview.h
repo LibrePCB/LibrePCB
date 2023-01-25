@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/point.h>
+#include <librepcb/core/workspace/theme.h>
 #include <optional/tl/optional.hpp>
 
 #include <QtCore>
@@ -36,7 +37,6 @@
 namespace librepcb {
 
 class GraphicsScene;
-class GridProperties;
 
 namespace editor {
 
@@ -71,9 +71,10 @@ public:
   GraphicsScene* getScene() const noexcept { return mScene; }
   QRectF getVisibleSceneRect() const noexcept;
   bool getUseOpenGl() const noexcept { return mUseOpenGl; }
-  const GridProperties& getGridProperties() const noexcept {
-    return *mGridProperties;
+  const PositiveLength& getGridInterval() const noexcept {
+    return mGridInterval;
   }
+  Theme::GridStyle getGridStyle() const noexcept { return mGridStyle; }
 
   // Setters
   void setBackgroundColors(const QColor& fill, const QColor& grid) noexcept;
@@ -81,7 +82,8 @@ public:
   void setInfoBoxColors(const QColor& fill, const QColor& text) noexcept;
   void setUseOpenGl(bool useOpenGl) noexcept;
   void setGrayOut(bool grayOut) noexcept;
-  void setGridProperties(const GridProperties& properties) noexcept;
+  void setGridStyle(Theme::GridStyle style) noexcept;
+  void setGridInterval(const PositiveLength& interval) noexcept;
   void setScene(GraphicsScene* scene) noexcept;
   void setVisibleSceneRect(const QRectF& rect) noexcept;
 
@@ -147,7 +149,8 @@ private:
   IF_GraphicsViewEventHandler* mEventHandlerObject;
   GraphicsScene* mScene;
   QVariantAnimation* mZoomAnimation;
-  GridProperties* mGridProperties;
+  Theme::GridStyle mGridStyle;
+  PositiveLength mGridInterval;
   QColor mBackgroundColor;
   QColor mGridColor;
   QColor mOverlayFillColor;

@@ -266,6 +266,8 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
 
+      upgradeGrid(root);
+
       // Symbols.
       for (SExpression* symNode : root.getChildren("symbol")) {
         const Uuid cmpUuid =
@@ -364,6 +366,8 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
 
+      upgradeGrid(root);
+
       // Fabrication output settings.
       {
         SExpression& node = root.getChild("fabrication_output_settings");
@@ -420,6 +424,11 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void FileFormatMigrationV01::upgradeGrid(SExpression& node) {
+  SExpression& gridNode = node.getChild("grid");
+  gridNode.removeChild(gridNode.getChild("type"));
+}
 
 void FileFormatMigrationV01::upgradeHoles(SExpression& node) {
   for (SExpression* holeNode : node.getChildren("hole")) {

@@ -27,6 +27,9 @@
 #include "../cat/categorylisteditorwidget.h"
 #include "../editorwidgetbase.h"
 
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/workspace/theme.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -38,7 +41,6 @@
 namespace librepcb {
 
 class GraphicsScene;
-class GridProperties;
 class Symbol;
 
 namespace editor {
@@ -121,12 +123,14 @@ private:  // Methods
       bool applyFix) override;
   bool execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept override;
-  void setGridProperties(const GridProperties& grid) noexcept;
+  void setGridProperties(const PositiveLength& interval, const LengthUnit& unit,
+                         Theme::GridStyle style) noexcept;
 
 private:  // Data
   QScopedPointer<Ui::SymbolEditorWidget> mUi;
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<GraphicsScene> mGraphicsScene;
+  LengthUnit mLengthUnit;
   std::unique_ptr<Symbol> mSymbol;
   QScopedPointer<SymbolGraphicsItem> mGraphicsItem;
 

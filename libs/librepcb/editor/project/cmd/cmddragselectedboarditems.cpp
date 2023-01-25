@@ -40,7 +40,6 @@
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
 
@@ -141,7 +140,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   // Note: If only 1 item is selected, use its exact position as center.
   if (mItemCount > 1) {
     mCenterPos /= mItemCount;
-    mCenterPos.mapToGrid(mBoard.getGridProperties().getInterval());
+    mCenterPos.mapToGrid(mBoard.getGridInterval());
   }
 }
 
@@ -153,7 +152,7 @@ CmdDragSelectedBoardItems::~CmdDragSelectedBoardItems() noexcept {
  ******************************************************************************/
 
 void CmdDragSelectedBoardItems::snapToGrid() noexcept {
-  PositiveLength grid = mBoard.getGridProperties().getInterval();
+  PositiveLength grid = mBoard.getGridInterval();
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
     cmd->snapToGrid(grid, true);
   }
@@ -186,7 +185,7 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
     const Point& pos, const bool gridIncrement) noexcept {
   Point delta = pos - mStartPos;
   if (gridIncrement) {
-    delta.mapToGrid(mBoard.getGridProperties().getInterval());
+    delta.mapToGrid(mBoard.getGridInterval());
   }
 
   if (delta != mDeltaPos) {
@@ -223,8 +222,7 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
 void CmdDragSelectedBoardItems::rotate(const Angle& angle,
                                        bool aroundCurrentPosition) noexcept {
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
-      ? (mStartPos + mDeltaPos)
-            .mappedToGrid(mBoard.getGridProperties().getInterval())
+      ? (mStartPos + mDeltaPos).mappedToGrid(mBoard.getGridInterval())
       : (mCenterPos + mDeltaPos);
 
   // rotate selected elements
