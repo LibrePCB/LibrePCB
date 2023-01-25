@@ -30,39 +30,6 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-SExpression serialize(const Via::Shape& obj) {
-  switch (obj) {
-    case Via::Shape::Round:
-      return SExpression::createToken("round");
-    case Via::Shape::Square:
-      return SExpression::createToken("square");
-    case Via::Shape::Octagon:
-      return SExpression::createToken("octagon");
-    default:
-      throw LogicError(__FILE__, __LINE__);
-  }
-}
-
-template <>
-Via::Shape deserialize(const SExpression& node) {
-  const QString str = node.getValue();
-  if (str == "round") {
-    return Via::Shape::Round;
-  } else if (str == "square") {
-    return Via::Shape::Square;
-  } else if (str == "octagon") {
-    return Via::Shape::Octagon;
-  } else {
-    throw RuntimeError(__FILE__, __LINE__,
-                       QString("Unknown via shape: '%1'").arg(str));
-  }
-}
-
-/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
@@ -70,7 +37,6 @@ Via::Via(const Via& other) noexcept
   : onEdited(*this),
     mUuid(other.mUuid),
     mPosition(other.mPosition),
-    mShape(other.mShape),
     mSize(other.mSize),
     mDrillDiameter(other.mDrillDiameter) {
 }
@@ -79,13 +45,11 @@ Via::Via(const Uuid& uuid, const Via& other) noexcept : Via(other) {
   mUuid = uuid;
 }
 
-Via::Via(const Uuid& uuid, const Point& position, Shape shape,
-         const PositiveLength& size,
+Via::Via(const Uuid& uuid, const Point& position, const PositiveLength& size,
          const PositiveLength& drillDiameter) noexcept
   : onEdited(*this),
     mUuid(uuid),
     mPosition(position),
-    mShape(shape),
     mSize(size),
     mDrillDiameter(drillDiameter) {
 }
@@ -94,7 +58,6 @@ Via::Via(const SExpression& node)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mPosition(node.getChild("position")),
-    mShape(deserialize<Shape>(node.getChild("shape/@0"))),
     mSize(deserialize<PositiveLength>(node.getChild("size/@0"))),
     mDrillDiameter(deserialize<PositiveLength>(node.getChild("drill/@0"))) {
 }
@@ -109,19 +72,7 @@ Via::~Via() noexcept {
 Path Via::getOutline(const Length& expansion) const noexcept {
   Length size = mSize + (expansion * 2);
   if (size > 0) {
-    const PositiveLength pSize(size);
-    const UnsignedLength cornerRadius(std::max(expansion, Length(0)));
-    switch (mShape) {
-      case Shape::Round:
-        return Path::circle(pSize);
-      case Shape::Square:
-        return Path::centeredRect(pSize, pSize, cornerRadius);
-      case Shape::Octagon:
-        return Path::octagon(pSize, pSize, cornerRadius);
-      default:
-        Q_ASSERT(false);
-        break;
-    }
+    return Path::circle(PositiveLength(size));
   }
   return Path();
 }
@@ -164,16 +115,6 @@ bool Via::setPosition(const Point& position) noexcept {
   return true;
 }
 
-bool Via::setShape(Shape shape) noexcept {
-  if (shape == mShape) {
-    return false;
-  }
-
-  mShape = shape;
-  onEdited.notify(Event::ShapeChanged);
-  return true;
-}
-
 bool Via::setSize(const PositiveLength& size) noexcept {
   if (size == mSize) {
     return false;
@@ -204,7 +145,6 @@ void Via::serialize(SExpression& root) const {
   mPosition.serialize(root.appendList("position"));
   root.appendChild("size", mSize);
   root.appendChild("drill", mDrillDiameter);
-  root.appendChild("shape", mShape);
   root.ensureLineBreak();
 }
 
@@ -215,7 +155,6 @@ void Via::serialize(SExpression& root) const {
 bool Via::operator==(const Via& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mPosition != rhs.mPosition) return false;
-  if (mShape != rhs.mShape) return false;
   if (mSize != rhs.mSize) return false;
   if (mDrillDiameter != rhs.mDrillDiameter) return false;
   return true;
@@ -224,7 +163,6 @@ bool Via::operator==(const Via& rhs) const noexcept {
 Via& Via::operator=(const Via& rhs) noexcept {
   setUuid(rhs.mUuid);
   setPosition(rhs.mPosition);
-  setShape(rhs.mShape);
   setSize(rhs.mSize);
   setDrillDiameter(rhs.mDrillDiameter);
   return *this;

@@ -174,7 +174,6 @@ private:
   // Callback Functions for the Gui elements
   void wireModeChanged(WireMode mode) noexcept;
   void layerChanged(const GraphicsLayerName& layer) noexcept;
-  void viaShapeChanged(Via::Shape shape) noexcept;
   void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void wireWidthEditValueChanged(const PositiveLength& value) noexcept;

@@ -54,29 +54,24 @@ public:
   enum class Event {
     UuidChanged,
     PositionChanged,
-    ShapeChanged,
     SizeChanged,
     DrillDiameterChanged,
   };
   Signal<Via, Event> onEdited;
   typedef Slot<Via, Event> OnEditedSlot;
 
-  // Public Types
-  enum class Shape { Round, Square, Octagon };
-
   // Constructors / Destructor
   Via() = delete;
   Via(const Via& other) noexcept;
   Via(const Uuid& uuid, const Via& other) noexcept;
-  Via(const Uuid& uuid, const Point& position, Shape shape,
-      const PositiveLength& size, const PositiveLength& drillDiameter) noexcept;
+  Via(const Uuid& uuid, const Point& position, const PositiveLength& size,
+      const PositiveLength& drillDiameter) noexcept;
   explicit Via(const SExpression& node);
   ~Via() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
   const Point& getPosition() const noexcept { return mPosition; }
-  Shape getShape() const noexcept { return mShape; }
   const PositiveLength& getSize() const noexcept { return mSize; }
   const PositiveLength& getDrillDiameter() const noexcept {
     return mDrillDiameter;
@@ -89,7 +84,6 @@ public:
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;
   bool setPosition(const Point& position) noexcept;
-  bool setShape(Shape shape) noexcept;
   bool setSize(const PositiveLength& size) noexcept;
   bool setDrillDiameter(const PositiveLength& diameter) noexcept;
 
@@ -110,7 +104,6 @@ public:
 private:  // Data
   Uuid mUuid;
   Point mPosition;
-  Shape mShape;
   PositiveLength mSize;
   PositiveLength mDrillDiameter;
 };

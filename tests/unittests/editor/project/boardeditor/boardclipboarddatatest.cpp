@@ -110,12 +110,12 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   std::shared_ptr<BoardClipboardData::NetSegment> netSegment1 =
       std::make_shared<BoardClipboardData::NetSegment>(
           CircuitIdentifier("net1"));
-  netSegment1->vias.append(std::make_shared<Via>(
-      Uuid::createRandom(), Point(1, 2), Via::Shape::Round, PositiveLength(10),
-      PositiveLength(3)));
-  netSegment1->vias.append(std::make_shared<Via>(
-      Uuid::createRandom(), Point(10, 20), Via::Shape::Square,
-      PositiveLength(100), PositiveLength(30)));
+  netSegment1->vias.append(
+      std::make_shared<Via>(Uuid::createRandom(), Point(1, 2),
+                            PositiveLength(10), PositiveLength(3)));
+  netSegment1->vias.append(
+      std::make_shared<Via>(Uuid::createRandom(), Point(10, 20),
+                            PositiveLength(100), PositiveLength(30)));
   netSegment1->junctions.append(
       std::make_shared<Junction>(Uuid::createRandom(), Point(1, 2)));
   netSegment1->junctions.append(
@@ -132,12 +132,12 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   std::shared_ptr<BoardClipboardData::NetSegment> netSegment2 =
       std::make_shared<BoardClipboardData::NetSegment>(
           CircuitIdentifier("net2"));
-  netSegment2->vias.append(std::make_shared<Via>(
-      Uuid::createRandom(), Point(1, 2), Via::Shape::Round, PositiveLength(10),
-      PositiveLength(3)));
-  netSegment2->vias.append(std::make_shared<Via>(
-      Uuid::createRandom(), Point(10, 20), Via::Shape::Square,
-      PositiveLength(100), PositiveLength(30)));
+  netSegment2->vias.append(
+      std::make_shared<Via>(Uuid::createRandom(), Point(1, 2),
+                            PositiveLength(10), PositiveLength(3)));
+  netSegment2->vias.append(
+      std::make_shared<Via>(Uuid::createRandom(), Point(10, 20),
+                            PositiveLength(100), PositiveLength(30)));
   netSegment2->junctions.append(
       std::make_shared<Junction>(Uuid::createRandom(), Point(1, 2)));
   netSegment2->junctions.append(

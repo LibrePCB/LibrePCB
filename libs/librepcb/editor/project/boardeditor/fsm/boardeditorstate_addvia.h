@@ -82,7 +82,6 @@ private:  // Methods
   void setNetSignal(NetSignal* netsignal) noexcept;
   bool fixPosition(Board& board, const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void shapeChanged(Via::Shape shape) noexcept;
   void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void applySelectedNetSignal() noexcept;

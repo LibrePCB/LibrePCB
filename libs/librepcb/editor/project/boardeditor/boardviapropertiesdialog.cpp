@@ -80,13 +80,6 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
             }
           });
 
-  // shape combobox
-  mUi->cbxShape->addItem(tr("Round"), static_cast<int>(Via::Shape::Round));
-  mUi->cbxShape->addItem(tr("Square"), static_cast<int>(Via::Shape::Square));
-  mUi->cbxShape->addItem(tr("Octagon"), static_cast<int>(Via::Shape::Octagon));
-  mUi->cbxShape->setCurrentIndex(
-      mUi->cbxShape->findData(static_cast<int>(mVia.getShape())));
-
   // Position spinboxes
   mUi->edtPosX->setValue(mVia.getPosition().getX());
   mUi->edtPosY->setValue(mVia.getPosition().getY());
@@ -138,8 +131,6 @@ void BoardViaPropertiesDialog::accept() {
 bool BoardViaPropertiesDialog::applyChanges() noexcept {
   try {
     QScopedPointer<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(mVia));
-    cmd->setShape(static_cast<Via::Shape>(mUi->cbxShape->currentData().toInt()),
-                  false);
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
     cmd->setSize(mUi->edtSize->getValue(), false);
