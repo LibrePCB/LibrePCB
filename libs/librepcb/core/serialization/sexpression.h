@@ -173,6 +173,10 @@ public:
   QByteArray toByteArray() const;
 
   // Operator Overloadings
+  bool operator==(const SExpression& rhs) const noexcept;
+  bool operator!=(const SExpression& rhs) const noexcept {
+    return !(*this == rhs);
+  }
   SExpression& operator=(const SExpression& rhs) noexcept;
 
   // Static Methods
