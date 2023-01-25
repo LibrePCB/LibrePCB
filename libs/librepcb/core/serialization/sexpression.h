@@ -170,6 +170,7 @@ public:
   SExpression& appendChild(const QString& child, const T& obj) {
     return appendList(child).appendChild(obj);
   }
+  void removeChild(const SExpression& child);
   QByteArray toByteArray() const;
 
   // Operator Overloadings

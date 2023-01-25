@@ -216,6 +216,34 @@ TEST(SExpressionTest, testGetChildSkipsLineBreaks) {
   EXPECT_EQ("2", s.getChild("child/@2").getValue().toStdString());
 }
 
+TEST(SExpressionTest, testRemoveChild) {
+  const QByteArray input =
+      "(test value\n"
+      " (child1 a b c)\n"
+      " (child2 a b c)\n"
+      ")\n";
+  SExpression s = SExpression::parse(input, FilePath());
+  SExpression& child = s.getChild("child1");
+  s.removeChild(child);
+  const QByteArray actual = s.toByteArray();
+  const QByteArray expected =
+      "(test value\n\n"
+      " (child2 a b c)\n"
+      ")\n";
+  EXPECT_EQ(expected.toStdString(), actual.toStdString());
+}
+
+TEST(SExpressionTest, testRemoveInvalidChild) {
+  const QByteArray input =
+      "(test value\n"
+      " (child1 a b c)\n"
+      " (child2 a b c)\n"
+      ")\n";
+  SExpression s = SExpression::parse(input, FilePath());
+  SExpression& child = s.getChild("child1/@0");
+  EXPECT_THROW(s.removeChild(child), LogicError);
+}
+
 TEST(SExpressionTest, testToByteArrayEmptyList) {
   SExpression s = SExpression::createList("test");
   EXPECT_EQ("(test)\n", s.toByteArray().toStdString());

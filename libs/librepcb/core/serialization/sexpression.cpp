@@ -184,6 +184,16 @@ SExpression& SExpression::appendChild(const SExpression& child) {
   }
 }
 
+void SExpression::removeChild(const SExpression& child) {
+  for (int i = 0; i < mChildren.count(); ++i) {
+    if (&mChildren.at(i) == &child) {
+      mChildren.removeAt(i);
+      return;
+    }
+  }
+  throw LogicError(__FILE__, __LINE__);
+}
+
 QByteArray SExpression::toByteArray() const {
   QString str = toString(0);  // can throw
   if (!str.endsWith('\n')) {
