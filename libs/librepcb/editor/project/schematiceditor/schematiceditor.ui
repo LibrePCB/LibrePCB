@@ -32,6 +32,9 @@
      <number>0</number>
     </property>
     <item>
+     <widget class="librepcb::editor::MessageWidget" name="msgProjectUpgraded" native="true"/>
+    </item>
+    <item>
      <widget class="librepcb::editor::MessageWidget" name="msgEmptySchematic" native="true"/>
     </item>
     <item>

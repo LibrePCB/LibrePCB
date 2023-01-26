@@ -395,38 +395,14 @@ ProjectEditor* ControlPanel::newProject(FilePath parentDir) noexcept {
   if (wizard.exec() == QWizard::Accepted) {
     try {
       std::unique_ptr<Project> project = wizard.createProject();  // can throw
-      return openProject(*project.release());
-    } catch (Exception& e) {
+      const FilePath fp = project->getFilepath();
+      project.reset();  // Release lock.
+      return openProject(fp);
+    } catch (const Exception& e) {
       QMessageBox::critical(this, tr("Could not create project"), e.getMsg());
     }
   }
   return nullptr;
-}
-
-ProjectEditor* ControlPanel::openProject(Project& project) noexcept {
-  try {
-    ProjectEditor* editor = getOpenProject(project.getFilepath());
-    if (!editor) {
-      editor = new ProjectEditor(mWorkspace, project);
-      connect(editor, &ProjectEditor::projectEditorClosed, this,
-              &ControlPanel::projectEditorClosed);
-      connect(editor, &ProjectEditor::showControlPanelClicked, this,
-              &ControlPanel::showControlPanel);
-      connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this,
-              &ControlPanel::openProjectLibraryUpdater);
-      mOpenProjectEditors.insert(project.getFilepath().toUnique().toStr(),
-                                 editor);
-      mRecentProjectsModel->setLastRecentProject(project.getFilepath());
-    }
-    editor->showAllRequiredEditors();
-    return editor;
-  } catch (UserCanceled& e) {
-    // do nothing
-    return nullptr;
-  } catch (Exception& e) {
-    QMessageBox::critical(this, tr("Could not open project"), e.getMsg());
-    return nullptr;
-  }
 }
 
 ProjectEditor* ControlPanel::openProject(FilePath filepath) noexcept {
@@ -462,7 +438,8 @@ ProjectEditor* ControlPanel::openProject(FilePath filepath) noexcept {
           loader.open(std::unique_ptr<TransactionalDirectory>(
                           new TransactionalDirectory(fs)),
                       filepath.getFilename());  // can throw
-      editor = new ProjectEditor(mWorkspace, *project.release());
+      editor = new ProjectEditor(mWorkspace, *project.release(),
+                                 loader.getUpgradeMessages());
       connect(editor, &ProjectEditor::projectEditorClosed, this,
               &ControlPanel::projectEditorClosed);
       connect(editor, &ProjectEditor::showControlPanelClicked, this,

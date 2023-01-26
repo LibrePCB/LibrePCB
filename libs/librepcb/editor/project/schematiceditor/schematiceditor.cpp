@@ -72,7 +72,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
+SchematicEditor::SchematicEditor(
+    ProjectEditor& projectEditor, Project& project,
+    const tl::optional<QList<FileFormatMigration::Message>>& upgradeMessages)
   : QMainWindow(0),
     mProjectEditor(projectEditor),
     mProject(project),
@@ -143,6 +145,29 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   createToolBars();
   createDockWidgets();
   createMenus();  // Depends on dock widgets!
+
+  // Setup "project upgraded" message.
+  {
+    QString msg =
+        tr("ATTENTION: This project has been upgraded to a new file format. "
+           "After saving, it will not be possible anymore to open it with an "
+           "older LibrePCB version!");
+    if (upgradeMessages && (!upgradeMessages->isEmpty())) {
+      msg += " ";
+      msg += tr("The upgrade produced <a href='%1'>%2 message(s)</a>, please "
+                "review before proceeding.",
+                nullptr, upgradeMessages->count())
+                 .arg("messages")
+                 .arg(upgradeMessages->count());
+      connect(mUi->msgProjectUpgraded, &MessageWidget::linkActivated, this,
+              [this, upgradeMessages](const QString&) {
+                showUpgradeMessages(*upgradeMessages);
+              });
+    }
+    mUi->msgProjectUpgraded->init(msg, upgradeMessages.has_value());
+    connect(&mProjectEditor, &ProjectEditor::projectSavedToDisk, this,
+            [this]() { mUi->msgProjectUpgraded->setActive(false); });
+  }
 
   // Setup "empty schematic" message.
   mUi->msgEmptySchematic->init(
@@ -1160,6 +1185,66 @@ bool SchematicEditor::useIeee315Symbols() const noexcept {
     }
   }
   return false;
+}
+
+void SchematicEditor::showUpgradeMessages(
+    QList<FileFormatMigration::Message> messages) noexcept {
+  std::sort(messages.begin(), messages.end(),
+            [](const FileFormatMigration::Message& a,
+               const FileFormatMigration::Message& b) {
+              if (a.severity > b.severity) return true;
+              if (a.toVersion < b.toVersion) return true;
+              if (a.message < b.message) return true;
+              return false;
+            });
+
+  QDialog dialog(this);
+  dialog.setWindowTitle(tr("File Format Upgrade Messages"));
+  dialog.resize(800, 400);
+  QVBoxLayout* layout = new QVBoxLayout(&dialog);
+  QTableWidget* table = new QTableWidget(messages.count(), 4, &dialog);
+  table->setHorizontalHeaderLabels(
+      {tr("Severity"), tr("Version"), tr("Occurrences"), tr("Message")});
+  table->horizontalHeader()->setSectionResizeMode(
+      0, QHeaderView::ResizeToContents);
+  table->horizontalHeader()->setSectionResizeMode(
+      1, QHeaderView::ResizeToContents);
+  table->horizontalHeader()->setSectionResizeMode(
+      2, QHeaderView::ResizeToContents);
+  table->horizontalHeader()->setStretchLastSection(true);
+  table->horizontalHeaderItem(3)->setTextAlignment(Qt::AlignLeft);
+  table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  table->setSelectionBehavior(QAbstractItemView::SelectRows);
+  table->setWordWrap(true);
+  for (int i = 0; i < messages.count(); ++i) {
+    const FileFormatMigration::Message m = messages.at(i);
+    QTableWidgetItem* item = new QTableWidgetItem(m.getSeverityStrTr());
+    item->setTextAlignment(Qt::AlignCenter);
+    table->setItem(i, 0, item);
+
+    item = new QTableWidgetItem(m.fromVersion.toStr() % " → " %
+                                m.toVersion.toStr());
+    item->setTextAlignment(Qt::AlignCenter);
+    table->setItem(i, 1, item);
+
+    item = new QTableWidgetItem(
+        (m.affectedItems > 0) ? QString::number(m.affectedItems) : QString());
+    item->setTextAlignment(Qt::AlignCenter);
+    table->setItem(i, 2, item);
+
+    item = new QTableWidgetItem(m.message);
+    item->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    table->setItem(i, 3, item);
+  }
+  layout->addWidget(table);
+  QTimer::singleShot(10, table, &QTableWidget::resizeRowsToContents);
+  connect(table->horizontalHeader(), &QHeaderView::sectionResized, table,
+          &QTableWidget::resizeRowsToContents);
+  QDialogButtonBox* buttonBox =
+      new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
+  connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::close);
+  layout->addWidget(buttonBox);
+  dialog.exec();
 }
 
 /*******************************************************************************

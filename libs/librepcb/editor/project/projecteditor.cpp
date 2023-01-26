@@ -48,7 +48,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ProjectEditor::ProjectEditor(Workspace& workspace, Project& project)
+ProjectEditor::ProjectEditor(
+    Workspace& workspace, Project& project,
+    const tl::optional<QList<FileFormatMigration::Message> >& upgradeMessages)
   : QObject(nullptr),
     mWorkspace(workspace),
     mProject(project),
@@ -61,7 +63,7 @@ ProjectEditor::ProjectEditor(Workspace& workspace, Project& project)
     mLastAutosaveStateId = mUndoStack->getUniqueStateId();
 
     // create the whole schematic/board editor GUI inclusive FSM and so on
-    mSchematicEditor = new SchematicEditor(*this, mProject);
+    mSchematicEditor = new SchematicEditor(*this, mProject, upgradeMessages);
     mBoardEditor = new BoardEditor(*this, mProject);
   } catch (...) {
     // free the allocated memory in the reverse order of their allocation...
@@ -257,6 +259,7 @@ bool ProjectEditor::saveProject() noexcept {
 
     // saving was successful --> clean the undo stack
     mUndoStack->setClean();
+    emit projectSavedToDisk();
     qDebug() << "Successfully saved project.";
     return true;
   } catch (Exception& exc) {
