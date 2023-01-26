@@ -159,7 +159,8 @@ void FileFormatMigrationV01::upgradeLibrary(TransactionalDirectory& dir) {
   upgradeVersionFile(dir, ".librepcb-lib");
 }
 
-void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
+void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
+                                            QList<Message>& messages) {
   LoadedData data;
 
   // Version File.
@@ -377,6 +378,20 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
 
       // Holes.
       upgradeHoles(root);
+
+      // Planes.
+      int planeCount = 0;
+      for (SExpression* planeNode : root.getChildren("plane")) {
+        Q_UNUSED(planeNode);
+        ++planeCount;
+      }
+      if (planeCount > 0) {
+        messages.append(buildMessage(
+            Message::Severity::Note,
+            tr("Plane area calculations have been adjusted, manual review and "
+               "running the DRC is recommended."),
+            planeCount));
+      }
 
       dir.write(fp, root.toByteArray());
     }

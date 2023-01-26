@@ -88,6 +88,7 @@ std::unique_ptr<Project> ProjectLoader::open(
     std::unique_ptr<TransactionalDirectory> directory,
     const QString& filename) {
   Q_ASSERT(directory);
+  mUpgradeMessages = tl::nullopt;
 
   QElapsedTimer timer;
   timer.start();
@@ -123,11 +124,14 @@ std::unique_ptr<Project> ProjectLoader::open(
 
   // Upgrate file format, if needed.
   for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
+    if (!mUpgradeMessages) {
+      mUpgradeMessages = QList<FileFormatMigration::Message>();
+    }
     qInfo().nospace().noquote()
         << "Project file format is outdated, upgrading from v"
         << migration->getFromVersion().toStr() << " to v"
         << migration->getToVersion().toStr() << "...";
-    migration->upgradeProject(*directory);
+    migration->upgradeProject(*directory, *mUpgradeMessages);
   }
 
   // Load project.

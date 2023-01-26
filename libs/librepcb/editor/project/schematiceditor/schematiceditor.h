@@ -27,6 +27,8 @@
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "ui_schematiceditor.h"
 
+#include <librepcb/core/serialization/fileformatmigration.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -71,7 +73,9 @@ public:
   // Constructors / Destructor
   SchematicEditor() = delete;
   SchematicEditor(const SchematicEditor& other) = delete;
-  explicit SchematicEditor(ProjectEditor& projectEditor, Project& project);
+  explicit SchematicEditor(
+      ProjectEditor& projectEditor, Project& project,
+      const tl::optional<QList<FileFormatMigration::Message>>& upgradeMessages);
   ~SchematicEditor();
 
   // Getters
@@ -119,6 +123,8 @@ private:
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
   bool useIeee315Symbols() const noexcept;
+  void showUpgradeMessages(
+      QList<FileFormatMigration::Message> messages) noexcept;
 
   // General Attributes
   ProjectEditor& mProjectEditor;

@@ -125,16 +125,6 @@ private:
    * @brief Open a project with the editor (or bring an already opened editor to
    * front)
    *
-   * @param project       An already opened project (but without the editor)
-   *
-   * @return The pointer to the opened project editor (nullptr on error)
-   */
-  ProjectEditor* openProject(Project& project) noexcept;
-
-  /**
-   * @brief Open a project with the editor (or bring an already opened editor to
-   * front)
-   *
    * @param filepath  The filepath to the *.lpp project file to open. If invalid
    *                  (the default), a file dialog will be shown to select it.
    *

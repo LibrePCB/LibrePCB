@@ -382,6 +382,25 @@ bool CommandLineInterface::openProject(
         loader.open(std::unique_ptr<TransactionalDirectory>(
                         new TransactionalDirectory(projectFs)),
                     projectFileName);  // can throw
+    if (auto messages = loader.getUpgradeMessages()) {
+      print(tr("Attention: Project has been upgraded to a newer file format!"));
+      std::sort(messages->begin(), messages->end(),
+                [](const FileFormatMigration::Message& a,
+                   const FileFormatMigration::Message& b) {
+                  if (a.severity > b.severity) return true;
+                  if (a.message < b.message) return true;
+                  return false;
+                });
+      foreach (const auto& msg, *messages) {
+        const QString multiplier = msg.affectedItems > 0
+            ? QString(" (%1x)").arg(msg.affectedItems)
+            : "";
+        print(QString(" - %1%2: %3")
+                  .arg(msg.getSeverityStrTr())
+                  .arg(multiplier)
+                  .arg(msg.message));
+      }
+    }
 
     // Parse list of boards.
     QList<Board*> boards;

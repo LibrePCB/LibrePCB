@@ -23,6 +23,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../serialization/fileformatmigration.h"
+
+#include <optional/tl/optional.hpp>
+
 #include <QtCore>
 
 #include <memory>
@@ -59,6 +63,10 @@ public:
   std::unique_ptr<Project> open(
       std::unique_ptr<TransactionalDirectory> directory,
       const QString& filename);
+  const tl::optional<QList<FileFormatMigration::Message>>& getUpgradeMessages()
+      const noexcept {
+    return mUpgradeMessages;
+  }
 
   // Operator Overloadings
   ProjectLoader& operator=(const ProjectLoader& rhs) = delete;
@@ -83,6 +91,9 @@ private:  // Methods
   void loadBoardPlane(Board& b, const SExpression& node);
   void loadBoardUserSettings(Board& b);
   void restoreApprovedErcMessages(Project& p);
+
+private:  // Data
+  tl::optional<QList<FileFormatMigration::Message>> mUpgradeMessages;
 };
 
 /*******************************************************************************

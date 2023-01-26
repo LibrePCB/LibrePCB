@@ -24,6 +24,8 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/attribute/attributeprovider.h>
+#include <librepcb/core/serialization/fileformatmigration.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
@@ -67,7 +69,9 @@ public:
   /**
    * @brief The constructor
    */
-  ProjectEditor(Workspace& workspace, Project& project);
+  ProjectEditor(Workspace& workspace, Project& project,
+                const tl::optional<QList<FileFormatMigration::Message> >&
+                    upgradeMessages);
 
   /**
    * @brief The destructor
@@ -222,7 +226,7 @@ public slots:
   bool closeAndDestroy(bool askForSave, QWidget* msgBoxParent = 0) noexcept;
 
 signals:
-
+  void projectSavedToDisk();
   void showControlPanelClicked();
   void openProjectLibraryUpdaterClicked(const FilePath& fp);
   void projectEditorClosed();
