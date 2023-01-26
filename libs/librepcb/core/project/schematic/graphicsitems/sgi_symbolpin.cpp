@@ -67,7 +67,7 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin) noexcept
   mLineGraphicsItem->setLine(Point(0, 0),
                              Point(*mPin.getLibPin().getLength(), 0));
   mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
-  mLineGraphicsItem->setLayer(getLayer(GraphicsLayer::sSymbolOutlines));
+  mLineGraphicsItem->setLayer(getLayer(GraphicsLayer::sSymbolPinLines));
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 

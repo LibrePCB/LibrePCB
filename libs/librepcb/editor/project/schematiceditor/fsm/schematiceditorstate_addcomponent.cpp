@@ -40,6 +40,7 @@
 #include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -353,7 +354,9 @@ void SchematicEditorState_AddComponent::startAddingComponent(
         mAddComponentDialog.reset(new AddComponentDialog(
             mContext.workspace.getLibraryDb(),
             mContext.project.getSettings().getLocaleOrder(),
-            mContext.project.getSettings().getNormOrder(), parentWidget()));
+            mContext.project.getSettings().getNormOrder(),
+            mContext.workspace.getSettings().themes.getActive(),
+            parentWidget()));
       }
       if (!searchTerm.isEmpty()) {
         mAddComponentDialog->selectComponentByKeyword(searchTerm);

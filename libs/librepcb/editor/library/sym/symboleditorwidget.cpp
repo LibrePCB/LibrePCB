@@ -48,7 +48,6 @@
 #include <librepcb/core/library/sym/msg/msgwrongsymboltextlayer.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/library/sym/symbolpainter.h>
-#include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -80,6 +79,20 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   mUi->edtVersion->setReadOnly(mContext.readOnly);
   mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
+  const Theme& theme = mContext.workspace.getSettings().themes.getActive();
+  mUi->graphicsView->setBackgroundColors(
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mUi->graphicsView->setOverlayColors(
+      theme.getColor(Theme::Color::sSchematicOverlays).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicOverlays).getSecondaryColor());
+  mUi->graphicsView->setInfoBoxColors(
+      theme.getColor(Theme::Color::sSchematicInfoBox).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicInfoBox).getSecondaryColor());
+  mGraphicsScene->setSelectionRectColors(
+      theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
+  mUi->graphicsView->setGridStyle(theme.getBoardGridStyle());
   mUi->graphicsView->setUseOpenGl(
       mContext.workspace.getSettings().useOpenGl.get());
   mUi->graphicsView->setScene(mGraphicsScene.data());
@@ -93,11 +106,9 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   setWindowIcon(QIcon(":/img/library/symbol.png"));
 
   // Apply grid properties unit from workspace settings
-  {
-    GridProperties p = mUi->graphicsView->getGridProperties();
-    p.setUnit(mContext.workspace.getSettings().defaultLengthUnit.get());
-    mUi->graphicsView->setGridProperties(p);
-  }
+  setGridProperties(PositiveLength(2540000),
+                    mContext.workspace.getSettings().defaultLengthUnit.get(),
+                    theme.getBoardGridStyle());
 
   // Insert category list editor widget.
   mCategoriesEditorWidget.reset(new CategoryListEditorWidget(
@@ -146,9 +157,15 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
   mUi->graphicsView->zoomAll();
 
   // Load finite state machine (FSM).
-  SymbolEditorFsm::Context fsmContext{
-      mContext,           *this,    *mUndoStack,    *mGraphicsScene,
-      *mUi->graphicsView, *mSymbol, *mGraphicsItem, *mCommandToolBarProxy};
+  SymbolEditorFsm::Context fsmContext{mContext,
+                                      *this,
+                                      *mUndoStack,
+                                      *mGraphicsScene,
+                                      *mUi->graphicsView,
+                                      mLengthUnit,
+                                      *mSymbol,
+                                      *mGraphicsItem,
+                                      *mCommandToolBarProxy};
   mFsm.reset(new SymbolEditorFsm(fsmContext));
   connect(mUndoStack.data(), &UndoStack::stateModified, mFsm.data(),
           &SymbolEditorFsm::updateAvailableFeatures);
@@ -214,7 +231,7 @@ void SymbolEditorWidget::connectEditor(
           &ExclusiveActionGroup::setCurrentAction);
 
   mStatusBar->setField(StatusBar::AbsolutePosition, true);
-  mStatusBar->setLengthUnit(mUi->graphicsView->getGridProperties().getUnit());
+  mStatusBar->setLengthUnit(mLengthUnit);
   connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
           mStatusBar, &StatusBar::setAbsoluteCursorPosition);
 }
@@ -318,7 +335,8 @@ bool SymbolEditorWidget::importDxf() noexcept {
 }
 
 bool SymbolEditorWidget::editGridProperties() noexcept {
-  GridSettingsDialog dialog(mUi->graphicsView->getGridProperties(), this);
+  GridSettingsDialog dialog(mUi->graphicsView->getGridInterval(), mLengthUnit,
+                            mUi->graphicsView->getGridStyle(), this);
   connect(&dialog, &GridSettingsDialog::gridPropertiesChanged, this,
           &SymbolEditorWidget::setGridProperties);
   dialog.exec();
@@ -326,17 +344,17 @@ bool SymbolEditorWidget::editGridProperties() noexcept {
 }
 
 bool SymbolEditorWidget::increaseGridInterval() noexcept {
-  GridProperties grid = mUi->graphicsView->getGridProperties();
-  grid.setInterval(PositiveLength(grid.getInterval() * 2));
-  setGridProperties(grid);
+  const Length interval = mUi->graphicsView->getGridInterval() * 2;
+  setGridProperties(PositiveLength(interval), mLengthUnit,
+                    mUi->graphicsView->getGridStyle());
   return true;
 }
 
 bool SymbolEditorWidget::decreaseGridInterval() noexcept {
-  GridProperties grid = mUi->graphicsView->getGridProperties();
-  if ((*grid.getInterval()) % 2 == 0) {
-    grid.setInterval(PositiveLength(grid.getInterval() / 2));
-    setGridProperties(grid);
+  const Length interval = *mUi->graphicsView->getGridInterval();
+  if ((interval % 2) == 0) {
+    setGridProperties(PositiveLength(interval / 2), mLengthUnit,
+                      mUi->graphicsView->getGridStyle());
   }
   return true;
 }
@@ -592,11 +610,14 @@ bool SymbolEditorWidget::execGraphicsExportDialog(
   return true;
 }
 
-void SymbolEditorWidget::setGridProperties(
-    const GridProperties& grid) noexcept {
-  mUi->graphicsView->setGridProperties(grid);
+void SymbolEditorWidget::setGridProperties(const PositiveLength& interval,
+                                           const LengthUnit& unit,
+                                           Theme::GridStyle style) noexcept {
+  mUi->graphicsView->setGridInterval(interval);
+  mUi->graphicsView->setGridStyle(style);
+  mLengthUnit = unit;
   if (mStatusBar) {
-    mStatusBar->setLengthUnit(grid.getUnit());
+    mStatusBar->setLengthUnit(unit);
   }
   if (mFsm) {
     mFsm->updateAvailableFeatures();  // Re-calculate "snap to grid" feature!

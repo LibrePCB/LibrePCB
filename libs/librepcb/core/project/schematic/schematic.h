@@ -27,6 +27,7 @@
 #include "../../fileio/filepath.h"
 #include "../../fileio/transactionaldirectory.h"
 #include "../../types/elementname.h"
+#include "../../types/lengthunit.h"
 #include "../../types/uuid.h"
 
 #include <QtCore>
@@ -41,7 +42,6 @@ namespace librepcb {
 
 class ComponentInstance;
 class GraphicsScene;
-class GridProperties;
 class NetSignal;
 class Point;
 class Project;
@@ -119,22 +119,23 @@ public:
   Project& getProject() const noexcept { return mProject; }
   const QString& getDirectoryName() const noexcept { return mDirectoryName; }
   TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
-  const GridProperties& getGridProperties() const noexcept {
-    return *mGridProperties;
-  }
   GraphicsScene& getGraphicsScene() const noexcept { return *mGraphicsScene; }
   bool isEmpty() const noexcept;
-
-  // Setters: General
-  void setGridProperties(const GridProperties& grid) noexcept;
 
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }
   const ElementName& getName() const noexcept { return mName; }
-  const QIcon& getIcon() const noexcept { return mIcon; }
+  const PositiveLength& getGridInterval() const noexcept {
+    return mGridInterval;
+  }
+  const LengthUnit& getGridUnit() const noexcept { return mGridUnit; }
 
   // Setters: Attributes
   void setName(const ElementName& name) noexcept;
+  void setGridInterval(const PositiveLength& interval) noexcept {
+    mGridInterval = interval;
+  }
+  void setGridUnit(const LengthUnit& unit) noexcept { mGridUnit = unit; }
 
   // Symbol Methods
   const QMap<Uuid, SI_Symbol*>& getSymbols() const noexcept { return mSymbols; }
@@ -194,8 +195,6 @@ signals:
   void attributesChanged() override;
 
 private:
-  void updateIcon() noexcept;
-
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
   const QString mDirectoryName;
@@ -203,13 +202,13 @@ private:
   bool mIsAddedToProject;
 
   QScopedPointer<GraphicsScene> mGraphicsScene;
-  QScopedPointer<GridProperties> mGridProperties;
   QRectF mViewRect;
 
   // Attributes
   Uuid mUuid;
   ElementName mName;
-  QIcon mIcon;
+  PositiveLength mGridInterval;
+  LengthUnit mGridUnit;
 
   QMap<Uuid, SI_Symbol*> mSymbols;
   QMap<Uuid, SI_NetSegment*> mNetSegments;

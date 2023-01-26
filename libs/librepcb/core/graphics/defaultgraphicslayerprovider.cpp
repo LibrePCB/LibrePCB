@@ -39,9 +39,10 @@ DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider() noexcept {
   addLayer(GraphicsLayer::sSchematicSheetFrames);
   addLayer(GraphicsLayer::sSymbolOutlines);
   addLayer(GraphicsLayer::sSymbolGrabAreas);
-  addLayer(GraphicsLayer::sSymbolHiddenGrabAreas);
+  // addLayer(GraphicsLayer::sSymbolHiddenGrabAreas); Not needed!
   addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
   addLayer(GraphicsLayer::sSymbolPinCirclesReq);
+  addLayer(GraphicsLayer::sSymbolPinLines);
   addLayer(GraphicsLayer::sSymbolPinNames);
   addLayer(GraphicsLayer::sSymbolPinNumbers);
   addLayer(GraphicsLayer::sSymbolNames);
@@ -74,8 +75,8 @@ DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider() noexcept {
   addLayer(GraphicsLayer::sBotReferences);
   addLayer(GraphicsLayer::sTopGrabAreas);
   addLayer(GraphicsLayer::sBotGrabAreas);
-  addLayer(GraphicsLayer::sTopHiddenGrabAreas);
-  addLayer(GraphicsLayer::sBotHiddenGrabAreas);
+  // addLayer(GraphicsLayer::sTopHiddenGrabAreas); Not needed!
+  // addLayer(GraphicsLayer::sBotHiddenGrabAreas); Not needed!
   addLayer(GraphicsLayer::sTopPlacement);
   addLayer(GraphicsLayer::sBotPlacement);
   addLayer(GraphicsLayer::sTopDocumentation);

@@ -38,7 +38,8 @@ namespace editor {
 
 SymbolEditorState_Measure::SymbolEditorState_Measure(
     const Context& context) noexcept
-  : SymbolEditorState(context), mTool(new MeasureTool(mContext.graphicsView)) {
+  : SymbolEditorState(context),
+    mTool(new MeasureTool(mContext.graphicsView, getLengthUnit())) {
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &SymbolEditorState_Measure::statusBarMessageChanged);
 }

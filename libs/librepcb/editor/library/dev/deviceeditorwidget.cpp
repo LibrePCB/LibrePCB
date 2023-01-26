@@ -44,6 +44,7 @@
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -76,13 +77,20 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   setWindowIcon(QIcon(":/img/library/device.png"));
 
-  // Show graphics scenes.
+  // Setup graphics view.
+  const Theme& theme = mContext.workspace.getSettings().themes.getActive();
+  mUi->viewComponent->setBackgroundColors(
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mUi->viewPackage->setBackgroundColors(
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mComponentGraphicsScene.reset(new GraphicsScene());
   mPackageGraphicsScene.reset(new GraphicsScene());
   mUi->viewComponent->setScene(mComponentGraphicsScene.data());
   mUi->viewPackage->setScene(mPackageGraphicsScene.data());
-  mUi->viewPackage->setBackgroundBrush(Qt::black);
   mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
+  mGraphicsLayerProvider->applyTheme(theme);
 
   // Insert category list editor widget.
   mCategoriesEditorWidget.reset(new CategoryListEditorWidget(

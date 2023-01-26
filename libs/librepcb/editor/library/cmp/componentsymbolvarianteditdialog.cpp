@@ -69,9 +69,16 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
 
   mUi->setupUi(this);
   mUi->cbxNorm->addItems(getAvailableNorms());
+
+  // Setup graphics view.
+  const Theme& theme = mWorkspace.getSettings().themes.getActive();
+  mUi->graphicsView->setBackgroundColors(
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mGraphicsScene.data());
   mUi->graphicsView->setOriginCrossVisible(false);
   mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
+  mGraphicsLayerProvider->applyTheme(theme);
 
   // load metadata
   mUi->edtName->setText(*mSymbVar.getNames().getDefaultValue());

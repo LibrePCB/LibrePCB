@@ -40,7 +40,6 @@
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/project/schematic/schematicselectionquery.h>
-#include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
 
@@ -119,7 +118,7 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
   // Note: If only 1 item is selected, use its exact position as center.
   if (mItemCount > 1) {
     mCenterPos /= mItemCount;
-    mCenterPos.mapToGrid(mSchematic.getGridProperties().getInterval());
+    mCenterPos.mapToGrid(mSchematic.getGridInterval());
   }
 }
 
@@ -137,7 +136,7 @@ void CmdDragSelectedSchematicItems::resetAllTexts() noexcept {
 void CmdDragSelectedSchematicItems::setCurrentPosition(
     const Point& pos) noexcept {
   Point delta = pos - mStartPos;
-  delta.mapToGrid(mSchematic.getGridProperties().getInterval());
+  delta.mapToGrid(mSchematic.getGridInterval());
 
   if (delta != mDeltaPos) {
     // move selected elements
@@ -163,8 +162,7 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
 void CmdDragSelectedSchematicItems::rotate(
     const Angle& angle, bool aroundCurrentPosition) noexcept {
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
-      ? (mStartPos + mDeltaPos)
-            .mappedToGrid(mSchematic.getGridProperties().getInterval())
+      ? (mStartPos + mDeltaPos).mappedToGrid(mSchematic.getGridInterval())
       : (mCenterPos + mDeltaPos);
 
   // rotate selected elements
@@ -189,8 +187,7 @@ void CmdDragSelectedSchematicItems::rotate(
 void CmdDragSelectedSchematicItems::mirror(
     Qt::Orientation orientation, bool aroundCurrentPosition) noexcept {
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
-      ? (mStartPos + mDeltaPos)
-            .mappedToGrid(mSchematic.getGridProperties().getInterval())
+      ? (mStartPos + mDeltaPos).mappedToGrid(mSchematic.getGridInterval())
       : (mCenterPos + mDeltaPos);
 
   // rotate selected elements

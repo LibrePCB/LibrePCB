@@ -184,6 +184,16 @@ SExpression& SExpression::appendChild(const SExpression& child) {
   }
 }
 
+void SExpression::removeChild(const SExpression& child) {
+  for (int i = 0; i < mChildren.count(); ++i) {
+    if (&mChildren.at(i) == &child) {
+      mChildren.removeAt(i);
+      return;
+    }
+  }
+  throw LogicError(__FILE__, __LINE__);
+}
+
 QByteArray SExpression::toByteArray() const {
   QString str = toString(0);  // can throw
   if (!str.endsWith('\n')) {
@@ -195,6 +205,12 @@ QByteArray SExpression::toByteArray() const {
 /*******************************************************************************
  *  Operator Overloadings
  ******************************************************************************/
+
+bool SExpression::operator==(const SExpression& rhs) const noexcept {
+  // Note: Ignore the filepath since it's not part of the actual node.
+  return (mType == rhs.mType) && (mValue == rhs.mValue) &&
+      (mChildren == rhs.mChildren);
+}
 
 SExpression& SExpression::operator=(const SExpression& rhs) noexcept {
   mType = rhs.mType;

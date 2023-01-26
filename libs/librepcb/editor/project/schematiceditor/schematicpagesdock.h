@@ -53,10 +53,12 @@ public:
   // Constructors / Destructor
   SchematicPagesDock() = delete;
   SchematicPagesDock(const SchematicPagesDock& other) = delete;
-  SchematicPagesDock(Project& project, QWidget* parent = nullptr);
+  SchematicPagesDock(Project& project, const QColor& background,
+                     QWidget* parent = nullptr);
   ~SchematicPagesDock();
 
   // General Methods
+  void setBackgroundColor(const QColor& c) noexcept { mBackgroundColor = c; }
   void setSelectedSchematic(int index) noexcept;
 
   // Operator Overloadings
@@ -81,6 +83,7 @@ private:  // Methods
 private:  // Data
   Project& mProject;
   QScopedPointer<Ui::SchematicPagesDock> mUi;
+  QColor mBackgroundColor;
 };
 
 /*******************************************************************************

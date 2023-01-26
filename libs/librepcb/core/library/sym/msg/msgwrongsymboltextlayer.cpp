@@ -39,10 +39,11 @@ MsgWrongSymbolTextLayer::MsgWrongSymbolTextLayer(
   : LibraryElementCheckMessage(
         Severity::Warning,
         tr("Layer of '%1' is not '%2'")
-            .arg(text->getText(), GraphicsLayer(expectedLayerName).getNameTr()),
+            .arg(text->getText(),
+                 GraphicsLayer::getTranslation(expectedLayerName)),
         tr("The text element '%1' should normally be on layer '%2'.")
             .arg(text->getText(),
-                 GraphicsLayer(expectedLayerName).getNameTr())),
+                 GraphicsLayer::getTranslation(expectedLayerName))),
     mText(text),
     mExpectedLayerName(expectedLayerName) {
 }

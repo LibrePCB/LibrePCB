@@ -104,6 +104,7 @@ GraphicsExportDialog::GraphicsExportDialog(
     mLayers.append(GraphicsLayer(GraphicsLayer::sSchematicSheetFrames));
     mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolOutlines));
     mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolGrabAreas));
+    mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolPinLines));
     mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolPinNames));
     mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolPinNumbers));
     mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolNames));

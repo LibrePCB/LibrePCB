@@ -93,8 +93,7 @@ bool SymbolEditorState_DrawPolygonBase::entry() noexcept {
 
   mContext.commandToolBar.addLabel(tr("Line Width:"), 10);
   std::unique_ptr<UnsignedLengthEdit> edtLineWidth(new UnsignedLengthEdit());
-  edtLineWidth->configure(getDefaultLengthUnit(),
-                          LengthEditBase::Steps::generic(),
+  edtLineWidth->configure(getLengthUnit(), LengthEditBase::Steps::generic(),
                           "symbol_editor/draw_polygon/line_width");
   edtLineWidth->setValue(mLastLineWidth);
   edtLineWidth->addAction(cmd.lineWidthIncrease.createAction(
@@ -170,7 +169,7 @@ bool SymbolEditorState_DrawPolygonBase::exit() noexcept {
 
   mContext.graphicsView.unsetCursor();
   mContext.graphicsView.setSceneCursor(tl::nullopt);
-  mContext.graphicsView.setOverlayText(QString());
+  mContext.graphicsView.setInfoBoxText(QString());
   emit statusBarMessageChanged(QString());
   return true;
 }
@@ -448,7 +447,7 @@ void SymbolEditorState_DrawPolygonBase::updatePolygonPath() noexcept {
 }
 
 void SymbolEditorState_DrawPolygonBase::updateOverlayText() noexcept {
-  const LengthUnit& unit = getDefaultLengthUnit();
+  const LengthUnit& unit = getLengthUnit();
   const int decimals = unit.getReasonableNumberOfDecimals();
   auto formatLength = [&unit, decimals](const QString& name,
                                         const Length& value) {
@@ -529,7 +528,7 @@ void SymbolEditorState_DrawPolygonBase::updateOverlayText() noexcept {
   }
 
   text.replace(" ", "&nbsp;");
-  mContext.graphicsView.setOverlayText(text);
+  mContext.graphicsView.setInfoBoxText(text);
 }
 
 void SymbolEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {

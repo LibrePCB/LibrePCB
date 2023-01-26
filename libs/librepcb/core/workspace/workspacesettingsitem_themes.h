@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_GRIDPROPERTIES_H
-#define LIBREPCB_CORE_GRIDPROPERTIES_H
+#ifndef LIBREPCB_CORE_WORKSPACESETTINGSITEM_THEMES_H
+#define LIBREPCB_CORE_WORKSPACESETTINGSITEM_THEMES_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../exceptions.h"
-#include "length.h"
-#include "lengthunit.h"
+#include "theme.h"
+#include "workspacesettingsitem.h"
 
 #include <QtCore>
 
@@ -34,58 +33,61 @@
  ******************************************************************************/
 namespace librepcb {
 
-class SExpression;
-
 /*******************************************************************************
- *  Class GridProperties
+ *  Class WorkspaceSettingsItem_Themes
  ******************************************************************************/
 
 /**
- * @brief The GridProperties class
+ * @brief Implementation of ::librepcb::WorkspaceSettingsItem to store
+ *        theme configurations
  */
-class GridProperties final {
-  Q_DECLARE_TR_FUNCTIONS(GridProperties)
+class WorkspaceSettingsItem_Themes final : public WorkspaceSettingsItem {
+  Q_OBJECT
 
 public:
-  // Types
-  enum class Type_t { Off, Lines, Dots };
-
   // Constructors / Destructor
-  GridProperties() noexcept;
-  explicit GridProperties(const SExpression& node);
-  GridProperties(Type_t type, const PositiveLength& interval,
-                 const LengthUnit& unit) noexcept;
-  GridProperties(const GridProperties& other) noexcept;
-  ~GridProperties() noexcept;
+  WorkspaceSettingsItem_Themes() = delete;
+  WorkspaceSettingsItem_Themes(const WorkspaceSettingsItem_Themes& other) =
+      delete;
+  explicit WorkspaceSettingsItem_Themes(QObject* parent = nullptr) noexcept;
+  ~WorkspaceSettingsItem_Themes() noexcept;
 
   // Getters
-  Type_t getType() const noexcept { return mType; }
-  const PositiveLength& getInterval() const noexcept { return mInterval; }
-  const LengthUnit& getUnit() const noexcept { return mUnit; }
+  const QMap<Uuid, Theme>& getAll() const noexcept { return mThemes; }
+  const Uuid& getActiveUuid() const noexcept { return mActiveUuid; }
+  const Theme& getActive() const noexcept { return mActiveTheme; }
 
   // Setters
-  void setType(Type_t type) noexcept { mType = type; }
-  void setInterval(const PositiveLength& interval) noexcept {
-    mInterval = interval;
-  }
-  void setUnit(const LengthUnit& unit) noexcept { mUnit = unit; }
+  void setAll(const QMap<Uuid, Theme>& themes) noexcept;
+  void setActiveUuid(const Uuid& uuid) noexcept;
 
-  // General Methods
+  // Operator Overloadings
+  WorkspaceSettingsItem_Themes& operator=(
+      const WorkspaceSettingsItem_Themes& rhs) = delete;
+
+private:  // Methods
+  /**
+   * @copydoc ::librepcb::WorkspaceSettingsItem::restoreDefaultImpl()
+   */
+  virtual void restoreDefaultImpl() noexcept override;
 
   /**
-   * @brief Serialize into ::librepcb::SExpression node
-   *
-   * @param root    Root node to serialize into.
+   * @copydoc ::librepcb::WorkspaceSettingsItem::loadImpl()
    */
-  void serialize(SExpression& root) const;
+  void loadImpl(const SExpression& root) override;
 
-  // Operators
-  GridProperties& operator=(const GridProperties& rhs) noexcept;
+  /**
+   * @copydoc ::librepcb::WorkspaceSettingsItem::serializeImpl()
+   */
+  void serializeImpl(SExpression& root) const override;
 
-private:  // Data
-  Type_t mType;
-  PositiveLength mInterval;
-  LengthUnit mUnit;
+  void addTheme(const Theme& theme) noexcept;
+  void updateActiveTheme() noexcept;
+
+private:
+  QMap<Uuid, Theme> mThemes;
+  Uuid mActiveUuid;
+  Theme mActiveTheme;
 };
 
 /*******************************************************************************

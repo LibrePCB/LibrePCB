@@ -59,7 +59,10 @@ PackageChooserDialog::PackageChooserDialog(
   mUi->setupUi(this);
 
   mGraphicsScene.reset(new GraphicsScene());
-  mUi->graphicsView->setBackgroundBrush(Qt::black);
+  const Theme& theme = mWorkspace.getSettings().themes.getActive();
+  mUi->graphicsView->setBackgroundColors(
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
   mCategoryTreeModel.reset(

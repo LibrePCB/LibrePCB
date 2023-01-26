@@ -26,9 +26,6 @@
 #include "../../editorwidgetbase.h"
 
 #include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/types/gridproperties.h>
-#include <librepcb/core/workspace/workspace.h>
-#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -54,11 +51,11 @@ SymbolEditorState::~SymbolEditorState() noexcept {
  ******************************************************************************/
 
 const PositiveLength& SymbolEditorState::getGridInterval() const noexcept {
-  return mContext.graphicsView.getGridProperties().getInterval();
+  return mContext.graphicsView.getGridInterval();
 }
 
-const LengthUnit& SymbolEditorState::getDefaultLengthUnit() const noexcept {
-  return mContext.editorContext.workspace.getSettings().defaultLengthUnit.get();
+const LengthUnit& SymbolEditorState::getLengthUnit() const noexcept {
+  return mContext.lengthUnit;
 }
 
 QList<GraphicsLayer*> SymbolEditorState::getAllowedTextLayers() const noexcept {

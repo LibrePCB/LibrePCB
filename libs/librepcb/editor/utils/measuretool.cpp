@@ -45,7 +45,6 @@
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/utils/transform.h>
 
 #include <QtCore>
@@ -61,9 +60,11 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-MeasureTool::MeasureTool(GraphicsView& view, QObject* parent) noexcept
+MeasureTool::MeasureTool(GraphicsView& view, const LengthUnit& unit,
+                         QObject* parent) noexcept
   : QObject(parent),
     mView(&view),
+    mUnit(unit),
     mSnapCandidates(),
     mLastScenePos(),
     mCursorPos(),
@@ -79,17 +80,17 @@ MeasureTool::~MeasureTool() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void MeasureTool::setFootprint(const Footprint* footprint) noexcept {
-  mSnapCandidates.clear();
-  if (footprint) {
-    mSnapCandidates |= snapCandidatesFromFootprint(*footprint, Transform());
-  }
-}
-
 void MeasureTool::setSymbol(const Symbol* symbol) noexcept {
   mSnapCandidates.clear();
   if (symbol) {
     mSnapCandidates |= snapCandidatesFromSymbol(*symbol, Transform());
+  }
+}
+
+void MeasureTool::setFootprint(const Footprint* footprint) noexcept {
+  mSnapCandidates.clear();
+  if (footprint) {
+    mSnapCandidates |= snapCandidatesFromFootprint(*footprint, Transform());
   }
 }
 
@@ -187,7 +188,7 @@ void MeasureTool::leave() noexcept {
 
   if (mView) {
     mView->unsetCursor();
-    mView->setOverlayText(QString());
+    mView->setInfoBoxText(QString());
     mView->setSceneCursor(tl::nullopt);
     mView->setRulerPositions(tl::nullopt);
     mView->setGrayOut(false);
@@ -246,9 +247,8 @@ bool MeasureTool::processGraphicsSceneLeftMouseButtonPressed(
 
 bool MeasureTool::processCopy() noexcept {
   if (mView && mStartPos && mEndPos) {
-    const LengthUnit& unit = mView->getGridProperties().getUnit();
     const Point diff = (*mEndPos) - (*mStartPos);
-    const qreal value = unit.convertToUnit(*diff.getLength());
+    const qreal value = mUnit.convertToUnit(*diff.getLength());
     const QString str = Toolbox::floatToString(value, 12, QLocale());
     qApp->clipboard()->setText(str);
     emit statusBarMessageChanged(tr("Copied to clipboard: %1").arg(str), 3000);
@@ -384,8 +384,7 @@ void MeasureTool::updateCursorPosition(
       }
     }
 
-    const Point posOnGrid =
-        mCursorPos.mappedToGrid(mView->getGridProperties().getInterval());
+    const Point posOnGrid = mCursorPos.mappedToGrid(mView->getGridInterval());
     const Length gridDistance = *(mCursorPos - posOnGrid).getLength();
     if ((nearestDistance >= 0) && (nearestDistance <= gridDistance)) {
       mCursorPos = nearestCandidate;
@@ -423,36 +422,35 @@ void MeasureTool::updateRulerPositions() noexcept {
   const UnsignedLength length = diff.getLength();
   const Angle angle =
       Angle::fromRad(qAtan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()));
-  const LengthUnit& unit = mView->getGridProperties().getUnit();
-  int decimals = unit.getReasonableNumberOfDecimals() + 1;
+  int decimals = mUnit.getReasonableNumberOfDecimals() + 1;
 
   QString text;
   text += QString("X0: %1 %2<br>")
-              .arg(unit.convertToUnit(startPos.getX()), 10, 'f', decimals)
-              .arg(unit.toShortStringTr());
+              .arg(mUnit.convertToUnit(startPos.getX()), 10, 'f', decimals)
+              .arg(mUnit.toShortStringTr());
   text += QString("Y0: %1 %2<br>")
-              .arg(unit.convertToUnit(startPos.getY()), 10, 'f', decimals)
-              .arg(unit.toShortStringTr());
+              .arg(mUnit.convertToUnit(startPos.getY()), 10, 'f', decimals)
+              .arg(mUnit.toShortStringTr());
   text += QString("X1: %1 %2<br>")
-              .arg(unit.convertToUnit(endPos.getX()), 10, 'f', decimals)
-              .arg(unit.toShortStringTr());
+              .arg(mUnit.convertToUnit(endPos.getX()), 10, 'f', decimals)
+              .arg(mUnit.toShortStringTr());
   text += QString("Y1: %1 %2<br>")
-              .arg(unit.convertToUnit(endPos.getY()), 10, 'f', decimals)
-              .arg(unit.toShortStringTr());
+              .arg(mUnit.convertToUnit(endPos.getY()), 10, 'f', decimals)
+              .arg(mUnit.toShortStringTr());
   text += QString("<br>");
   text += QString("ΔX: %1 %2<br>")
-              .arg(unit.convertToUnit(diff.getX()), 10, 'f', decimals)
-              .arg(unit.toShortStringTr());
+              .arg(mUnit.convertToUnit(diff.getX()), 10, 'f', decimals)
+              .arg(mUnit.toShortStringTr());
   text += QString("ΔY: %1 %2<br>")
-              .arg(unit.convertToUnit(diff.getY()), 10, 'f', decimals)
-              .arg(unit.toShortStringTr());
+              .arg(mUnit.convertToUnit(diff.getY()), 10, 'f', decimals)
+              .arg(mUnit.toShortStringTr());
   text += QString("<br>");
   text += QString("<b>Δ: %1 %2</b><br>")
-              .arg(unit.convertToUnit(*length), 11, 'f', decimals)
-              .arg(unit.toShortStringTr());
+              .arg(mUnit.convertToUnit(*length), 11, 'f', decimals)
+              .arg(mUnit.toShortStringTr());
   text += QString("<b>∠: %1°</b>").arg(angle.toDeg(), 14 - decimals, 'f', 3);
   text.replace(" ", "&nbsp;");
-  mView->setOverlayText(text);
+  mView->setInfoBoxText(text);
 }
 
 void MeasureTool::updateStatusBarMessage() noexcept {

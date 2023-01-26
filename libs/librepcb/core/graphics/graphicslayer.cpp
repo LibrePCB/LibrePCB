@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "graphicslayer.h"
 
+#include "../workspace/theme.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -45,9 +47,17 @@ GraphicsLayer::GraphicsLayer(const GraphicsLayer& other) noexcept
     mIsEnabled(other.mIsEnabled) {
 }
 
-GraphicsLayer::GraphicsLayer(const QString& name) noexcept
-  : QObject(nullptr), onEdited(*this), mName(name), mIsEnabled(true) {
-  getDefaultValues(mName, mNameTr, mColor, mColorHighlighted, mIsVisible);
+GraphicsLayer::GraphicsLayer(const QString& name, const QColor& color,
+                             const QColor& colorHighlighted, bool visible,
+                             bool enabled) noexcept
+  : QObject(nullptr),
+    onEdited(*this),
+    mName(name),
+    mNameTr(getTranslation(mName)),
+    mColor(color),
+    mColorHighlighted(colorHighlighted),
+    mIsVisible(visible),
+    mIsEnabled(enabled) {
 }
 
 GraphicsLayer::~GraphicsLayer() noexcept {
@@ -164,123 +174,82 @@ QString GraphicsLayer::getGrabAreaLayerName(
   }
 }
 
-void GraphicsLayer::getDefaultValues(const QString& name, QString& nameTr,
-                                     QColor& color, QColor& colorHl,
-                                     bool& visible) noexcept {
-  typedef struct {
-    QString nameTr;
-    QColor color;
-    QColor colorHl;
-    bool visible;
-  } Item;
-  static QHash<QString, Item> h;
-  if (h.isEmpty()) {
-    // clang-format off
-    // schematic
-    h.insert(sSchematicReferences,      {tr("References"),            QColor(0, 0, 0, 50),        QColor(0, 0, 0, 80),        true});
-    h.insert(sSchematicSheetFrames,     {tr("Sheet Frames"),          Qt::black,                  Qt::darkGray,               true});
-    h.insert(sSchematicNetLines,        {tr("Netlines"),              Qt::darkGreen,              Qt::green,                  true});
-    h.insert(sSchematicNetLabels,       {tr("Netlabels"),             Qt::darkGreen,              Qt::green,                  true});
-    h.insert(sSchematicNetLabelAnchors, {tr("Netlabel Anchors"),      Qt::darkGray,               Qt::gray,                   true});
-    h.insert(sSchematicDocumentation,   {tr("Documentation"),         Qt::darkGray,               Qt::gray,                   true});
-    h.insert(sSchematicComments,        {tr("Comments"),              Qt::darkBlue,               Qt::blue,                   true});
-    h.insert(sSchematicGuide,           {tr("Guide"),                 Qt::darkYellow,             Qt::yellow,                 true});
-    // symbol
-    h.insert(sSymbolOutlines,           {tr("Outlines"),              Qt::darkRed,                Qt::red,                    true});
-    h.insert(sSymbolGrabAreas,          {tr("Grab Areas"),            QColor(255, 255, 225, 255), QColor(255, 255, 205, 255), true});
-    h.insert(sSymbolHiddenGrabAreas,    {tr("Hidden Grab Areas"),     QColor(0, 0, 255, 30),      QColor(0, 0, 255, 50),      false});
-    h.insert(sSymbolNames,              {tr("Names"),                 QColor(32, 32, 32, 255),    Qt::darkGray,               true});
-    h.insert(sSymbolValues,             {tr("Values"),                QColor(80, 80, 80, 255),    Qt::gray,                   true});
-    h.insert(sSymbolPinCirclesOpt,      {tr("Optional Pins"),         QColor(0, 255, 0, 255),     QColor(0, 255, 0, 127),     true});
-    h.insert(sSymbolPinCirclesReq,      {tr("Required Pins"),         QColor(255, 0, 0, 255),     QColor(255, 0, 0, 127),     true});
-    h.insert(sSymbolPinNames,           {tr("Pin Names"),             QColor(64, 64, 64, 255),    Qt::gray,                   true});
-    h.insert(sSymbolPinNumbers,         {tr("Pin Numbers"),           QColor(64, 64, 64, 255),    Qt::gray,                   true});
-    // board asymmetric
-    h.insert(sBoardSheetFrames,         {tr("Sheet Frames"),          QColor("#96E0E0E0"),        QColor("#FFFFFFFF"),        true});
-    h.insert(sBoardOutlines,            {tr("Board Outlines"),        QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"),        true});
-    h.insert(sBoardMillingPth,          {tr("Milling (PTH)"),         QColor("#C800DDFF"),        QColor("#FF00FFFF"),        true});
-    h.insert(sBoardDrillsNpth,          {tr("Drills (NPTH)"),         QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"),        true});
-    h.insert(sBoardPadsTht,             {tr("Pads"),                  QColor("#966DB515"),        QColor("#B44EFC14"),        true});
-    h.insert(sBoardViasTht,             {tr("Vias"),                  QColor("#966DB515"),        QColor("#B44EFC14"),        true});
-    h.insert(sBoardAirWires,            {tr("Air Wires"),             Qt::yellow,                 Qt::yellow,                 true});
-    h.insert(sBoardMeasures,            {tr("Measures"),              QColor("#FF808000"),        QColor("#FFA3B200"),        true});
-    h.insert(sBoardAlignment,           {tr("Alignment"),             QColor("#B4E59500"),        QColor("#DCFFBF00"),        true});
-    h.insert(sBoardDocumentation,       {tr("Documentation"),         QColor("#96E0E0E0"),        QColor("#DCE0E0E0"),        true});
-    h.insert(sBoardComments,            {tr("Comments"),              QColor("#B4E59500"),        QColor("#DCFFBF00"),        true});
-    h.insert(sBoardGuide,               {tr("Guide"),                 QColor("#FF808000"),        QColor("#FFA3B200"),        true});
-    // board symmetric
-    h.insert(sTopPlacement,             {tr("Top Placement"),         QColor("#BBFFFFFF"),        QColor("#FFFFFFFF"),        true});
-    h.insert(sBotPlacement,             {tr("Bot Placement"),         QColor("#BBFFFFFF"),        QColor("#FFFFFFFF"),        true});
-    h.insert(sTopDocumentation,         {tr("Top Documentation"),     QColor("#96E0E0E0"),        QColor("#DCE0E0E0"),        true});
-    h.insert(sBotDocumentation,         {tr("Bot Documentation"),     QColor("#96E0E0E0"),        QColor("#DCE0E0E0"),        true});
-    h.insert(sTopGrabAreas,             {tr("Top Grab Areas"),        QColor("#14FFFFFF"),        QColor("#32FFFFFF"),        false});
-    h.insert(sBotGrabAreas,             {tr("Bot Grab Areas"),        QColor("#14FFFFFF"),        QColor("#32FFFFFF"),        false});
-    h.insert(sTopHiddenGrabAreas,       {tr("Top Hidden Grab Areas"), QColor("#28FFFFFF"),        QColor("#46FFFFFF"),        false});
-    h.insert(sBotHiddenGrabAreas,       {tr("Bot Hidden Grab Areas"), QColor("#28FFFFFF"),        QColor("#46FFFFFF"),        false});
-    h.insert(sTopReferences,            {tr("Top References"),        QColor("#64FFFFFF"),        QColor("#B4FFFFFF"),        true});
-    h.insert(sBotReferences,            {tr("Bot References"),        QColor("#64FFFFFF"),        QColor("#B4FFFFFF"),        true});
-    h.insert(sTopNames,                 {tr("Top Names"),             QColor("#96EDFFD8"),        QColor("#DCE0E0E0"),        true});
-    h.insert(sBotNames,                 {tr("Bot Names"),             QColor("#96EDFFD8"),        QColor("#DCE0E0E0"),        true});
-    h.insert(sTopValues,                {tr("Top Values"),            QColor("#96D8F2FF"),        QColor("#DCE0E0E0"),        true});
-    h.insert(sBotValues,                {tr("Bot Values"),            QColor("#96D8F2FF"),        QColor("#DCE0E0E0"),        true});
-    h.insert(sTopCourtyard,             {tr("Top Courtyard"),         QColor("#4600FFFF"),        QColor("#5A00FFFF"),        false});
-    h.insert(sBotCourtyard,             {tr("Bot Courtyard"),         QColor("#4600FFFF"),        QColor("#5A00FFFF"),        false});
-    h.insert(sTopStopMask,              {tr("Top Stop Mask"),         QColor("#30FFFFFF"),        QColor("#60FFFFFF"),        false});
-    h.insert(sBotStopMask,              {tr("Bot Stop Mask"),         QColor("#30FFFFFF"),        QColor("#60FFFFFF"),        false});
-    h.insert(sTopSolderPaste,           {tr("Top Solder Paste"),      QColor("#20E0E0E0"),        QColor("#40E0E0E0"),        false});
-    h.insert(sBotSolderPaste,           {tr("Bot Solder Paste"),      QColor("#20E0E0E0"),        QColor("#40E0E0E0"),        false});
-    h.insert(sTopFinish,                {tr("Top Finish"),            QColor(255, 0, 0, 130),     QColor(255, 0, 0, 130),     true});
-    h.insert(sBotFinish,                {tr("Bot Finish"),            QColor(255, 0, 0, 130),     QColor(255, 0, 0, 130),     true});
-    h.insert(sTopGlue,                  {tr("Top Glue"),              QColor("#64E0E0E0"),        QColor("#78E0E0E0"),        false});
-    h.insert(sBotGlue,                  {tr("Bot Glue"),              QColor("#64E0E0E0"),        QColor("#78E0E0E0"),        false});
-    // board copper
-    h.insert(sTopCopper,                {tr("Top Copper"),            QColor("#96CC0802"),        QColor("#C0FF0800"),        true});
-    h.insert(sBotCopper,                {tr("Bot Copper"),            QColor("#964578CC"),        QColor("#C00A66FC"),        true});
-    // clang-format on
+QString GraphicsLayer::getTranslation(const QString& name) noexcept {
+  static QHash<QString, QString> map;
+  if (map.isEmpty()) {
+    map.insert(sSchematicReferences, tr("References"));
+    map.insert(sSchematicSheetFrames, tr("Sheet Frames"));
+    map.insert(sSchematicNetLines, tr("Netlines"));
+    map.insert(sSchematicNetLabels, tr("Netlabels"));
+    map.insert(sSchematicNetLabelAnchors, tr("Netlabel Anchors"));
+    map.insert(sSchematicDocumentation, tr("Documentation"));
+    map.insert(sSchematicComments, tr("Comments"));
+    map.insert(sSchematicGuide, tr("Guide"));
+    map.insert(sSymbolOutlines, tr("Outlines"));
+    map.insert(sSymbolGrabAreas, tr("Grab Areas"));
+    map.insert(sSymbolHiddenGrabAreas, tr("Hidden Grab Areas"));
+    map.insert(sSymbolNames, tr("Names"));
+    map.insert(sSymbolValues, tr("Values"));
+    map.insert(sSymbolPinCirclesOpt, tr("Optional Pins"));
+    map.insert(sSymbolPinCirclesReq, tr("Required Pins"));
+    map.insert(sSymbolPinLines, tr("Pin Lines"));
+    map.insert(sSymbolPinNames, tr("Pin Names"));
+    map.insert(sSymbolPinNumbers, tr("Pin Numbers"));
+    map.insert(sBoardSheetFrames, tr("Sheet Frames"));
+    map.insert(sBoardOutlines, tr("Board Outlines"));
+    map.insert(sBoardMillingPth, tr("Milling (PTH"));
+    map.insert(sBoardDrillsNpth, tr("Drills (NPTH"));
+    map.insert(sBoardPadsTht, tr("Pads"));
+    map.insert(sBoardViasTht, tr("Vias"));
+    map.insert(sBoardAirWires, tr("Air Wires"));
+    map.insert(sBoardMeasures, tr("Measures"));
+    map.insert(sBoardAlignment, tr("Alignment"));
+    map.insert(sBoardDocumentation, tr("Documentation"));
+    map.insert(sBoardComments, tr("Comments"));
+    map.insert(sBoardGuide, tr("Guide"));
+    map.insert(sTopPlacement, tr("Top Placement"));
+    map.insert(sBotPlacement, tr("Bot Placement"));
+    map.insert(sTopDocumentation, tr("Top Documentation"));
+    map.insert(sBotDocumentation, tr("Bot Documentation"));
+    map.insert(sTopGrabAreas, tr("Top Grab Areas"));
+    map.insert(sBotGrabAreas, tr("Bot Grab Areas"));
+    map.insert(sTopHiddenGrabAreas, tr("Top Hidden Grab Areas"));
+    map.insert(sBotHiddenGrabAreas, tr("Bot Hidden Grab Areas"));
+    map.insert(sTopReferences, tr("Top References"));
+    map.insert(sBotReferences, tr("Bot References"));
+    map.insert(sTopNames, tr("Top Names"));
+    map.insert(sBotNames, tr("Bot Names"));
+    map.insert(sTopValues, tr("Top Values"));
+    map.insert(sBotValues, tr("Bot Values"));
+    map.insert(sTopCourtyard, tr("Top Courtyard"));
+    map.insert(sBotCourtyard, tr("Bot Courtyard"));
+    map.insert(sTopStopMask, tr("Top Stop Mask"));
+    map.insert(sBotStopMask, tr("Bot Stop Mask"));
+    map.insert(sTopSolderPaste, tr("Top Solder Paste"));
+    map.insert(sBotSolderPaste, tr("Bot Solder Paste"));
+    map.insert(sTopFinish, tr("Top Finish"));
+    map.insert(sBotFinish, tr("Bot Finish"));
+    map.insert(sTopGlue, tr("Top Glue"));
+    map.insert(sBotGlue, tr("Bot Glue"));
+    map.insert(sTopCopper, tr("Top Copper"));
+    map.insert(sBotCopper, tr("Bot Copper"));
     for (int i = 1; i <= getInnerLayerCount(); ++i) {
-      QString nameTr = tr("Inner Copper %1").arg(i);
-      QColor color;
-      QColor hlColor;
-      switch ((i - 1) % 6) {
-        case 0:
-          color = QColor("#96CC57FF");
-          hlColor = QColor("#C0DA84FF");
-          break;
-        case 1:
-          color = QColor("#96E2A1FF");
-          hlColor = QColor("#C0E9BAFF");
-          break;
-        case 2:
-          color = QColor("#96EE5C9B");
-          hlColor = QColor("#C0FF4C99");
-          break;
-        case 3:
-          color = QColor("#96E50063");
-          hlColor = QColor("#C0E50063");
-          break;
-        case 4:
-          color = QColor("#96A70049");
-          hlColor = QColor("#C0CC0058");
-          break;
-        case 5:
-          color = QColor("#967B20A3");
-          hlColor = QColor("#C09739BF");
-          break;
-        default:
-          qWarning()
-              << "Unhandled switch-case in GraphicsLayer::getDefaultValues().";
-          color = QColor("#FFFF00FF");
-          hlColor = QColor("#FFFF00FF");
-      }
-      h.insert(getInnerLayerName(i), {nameTr, color, hlColor, true});
+      map.insert(getInnerLayerName(i), tr("Inner Copper %1").arg(i));
     }
   }
+  return map.value(name, "Unknown");
+}
 
-  Item item = h.value(name, {name, Qt::darkRed, Qt::red, false});
-  nameTr = item.nameTr;
-  color = item.color;
-  colorHl = item.colorHl;
-  visible = item.visible;
+/*******************************************************************************
+ *  Class IF_GraphicsLayerProvider
+ ******************************************************************************/
+
+void IF_GraphicsLayerProvider::applyTheme(const Theme& theme) noexcept {
+  foreach (GraphicsLayer* layer, getAllLayers()) {
+    const ThemeColor& color = theme.getColorForLayer(layer->getName());
+    layer->setColor(color.getPrimaryColor());
+    layer->setColorHighlighted(color.getSecondaryColor());
+  }
 }
 
 /*******************************************************************************

@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/point.h>
 #include <optional/tl/optional.hpp>
 
@@ -59,7 +60,8 @@ public:
   // Constructors / Destructor
   MeasureTool() = delete;
   MeasureTool(const MeasureTool& other) = delete;
-  explicit MeasureTool(GraphicsView& view, QObject* parent = nullptr) noexcept;
+  explicit MeasureTool(GraphicsView& view, const LengthUnit& unit,
+                       QObject* parent = nullptr) noexcept;
   ~MeasureTool() noexcept;
 
   // General Methods
@@ -100,6 +102,7 @@ private:  // Methods
 
 private:  // Data
   QPointer<GraphicsView> mView;
+  LengthUnit mUnit;
   QSet<Point> mSnapCandidates;
   Point mLastScenePos;
   Point mCursorPos;

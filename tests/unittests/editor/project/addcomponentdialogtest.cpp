@@ -31,6 +31,7 @@
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/sqlitedatabase.h>
+#include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacelibrarydbwriter.h>
 #include <librepcb/editor/project/addcomponentdialog.h>
@@ -100,7 +101,7 @@ TEST_F(AddComponentDialogTest, testAddMore) {
   const bool newValue = false;
 
   {
-    AddComponentDialog dialog(*mWsDb, {}, {});
+    AddComponentDialog dialog(*mWsDb, {}, {}, Theme());
 
     // Check the default value.
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dialog, "cbxAddMore");
@@ -114,7 +115,7 @@ TEST_F(AddComponentDialogTest, testAddMore) {
 
   // Check if the setting is saved and restored automatically.
   {
-    AddComponentDialog dialog(*mWsDb, {}, {});
+    AddComponentDialog dialog(*mWsDb, {}, {}, Theme());
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dialog, "cbxAddMore");
     EXPECT_EQ(newValue, cbx.isChecked());
     EXPECT_EQ(newValue, dialog.getAutoOpenAgain());
@@ -180,7 +181,7 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
   mFs->save();
 
   // Create dialog
-  AddComponentDialog dialog(*mWsDb, {}, {});
+  AddComponentDialog dialog(*mWsDb, {}, {}, Theme());
   QTreeView& catView =
       TestHelpers::getChild<QTreeView>(dialog, "treeCategories");
   QTreeWidget& cmpView =
@@ -255,7 +256,7 @@ TEST_F(AddComponentDialogTest, testSetNormOrder) {
   mFs->save();
 
   // Create dialog
-  AddComponentDialog dialog(*mWsDb, {}, {"NORM"});
+  AddComponentDialog dialog(*mWsDb, {}, {"NORM"}, Theme());
   QTreeView& catView =
       TestHelpers::getChild<QTreeView>(dialog, "treeCategories");
   QTreeWidget& cmpView =
@@ -289,7 +290,7 @@ TEST_F(AddComponentDialogTest, testSearch) {
                                      tl::nullopt, tl::nullopt);
 
   // Create dialog
-  AddComponentDialog dialog(*mWsDb, {}, {});
+  AddComponentDialog dialog(*mWsDb, {}, {}, Theme());
   QLineEdit& edtSearch = TestHelpers::getChild<QLineEdit>(dialog, "edtSearch");
   QTreeWidget& cmpView =
       TestHelpers::getChild<QTreeWidget>(dialog, "treeComponents");

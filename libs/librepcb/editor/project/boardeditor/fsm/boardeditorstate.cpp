@@ -40,7 +40,6 @@
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
-#include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -73,11 +72,16 @@ Board* BoardEditorState::getActiveBoard() noexcept {
 }
 
 PositiveLength BoardEditorState::getGridInterval() const noexcept {
-  return mContext.editorGraphicsView.getGridProperties().getInterval();
+  return mContext.editorGraphicsView.getGridInterval();
 }
 
-const LengthUnit& BoardEditorState::getDefaultLengthUnit() const noexcept {
-  return mContext.workspace.getSettings().defaultLengthUnit.get();
+const LengthUnit& BoardEditorState::getLengthUnit() const noexcept {
+  if (const Board* board =
+          const_cast<BoardEditorState*>(this)->getActiveBoard()) {
+    return board->getGridUnit();
+  } else {
+    return mContext.workspace.getSettings().defaultLengthUnit.get();
+  }
 }
 
 QList<GraphicsLayer*> BoardEditorState::getAllowedGeometryLayers(

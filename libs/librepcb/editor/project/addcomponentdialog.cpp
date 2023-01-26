@@ -40,6 +40,7 @@
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
@@ -58,7 +59,7 @@ namespace editor {
 AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
                                        const QStringList& localeOrder,
                                        const QStringList& normOrder,
-                                       QWidget* parent)
+                                       const Theme& theme, QWidget* parent)
   : QDialog(parent),
     mDb(db),
     mLocaleOrder(localeOrder),
@@ -109,13 +110,21 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
     mUi->edtSearch->setFocus(Qt::ShortcutFocusReason);
   }));
 
-  mUi->viewComponent->setScene(mComponentPreviewScene.data());
+  // Setup symbol graphics view.
+  mUi->viewComponent->setBackgroundColors(
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->viewComponent->setOriginCrossVisible(false);
+  mUi->viewComponent->setScene(mComponentPreviewScene.data());
 
-  mUi->viewDevice->setScene(mDevicePreviewScene.data());
+  // Setup package graphics view.
+  mUi->viewDevice->setBackgroundColors(
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mUi->viewDevice->setOriginCrossVisible(false);
-  mUi->viewDevice->setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
+  mUi->viewDevice->setScene(mDevicePreviewScene.data());
 
+  mGraphicsLayerProvider->applyTheme(theme);
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,

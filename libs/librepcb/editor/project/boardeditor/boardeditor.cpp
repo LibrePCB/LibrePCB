@@ -64,7 +64,6 @@
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectsettings.h>
-#include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -99,10 +98,18 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   mUi->lblUnplacedComponentsNote->hide();
 
   // Setup graphics view.
-  mUi->graphicsView->setBackgroundBrush(Qt::black);
-  mUi->graphicsView->setForegroundBrush(Qt::white);
-  mUi->graphicsView->setOverlayColor(Qt::yellow);
-  mUi->graphicsView->setRulerColor(Qt::yellow);
+  const Theme& theme =
+      mProjectEditor.getWorkspace().getSettings().themes.getActive();
+  mUi->graphicsView->setBackgroundColors(
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+  mUi->graphicsView->setOverlayColors(
+      theme.getColor(Theme::Color::sBoardOverlays).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardOverlays).getSecondaryColor());
+  mUi->graphicsView->setInfoBoxColors(
+      theme.getColor(Theme::Color::sBoardInfoBox).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardInfoBox).getSecondaryColor());
+  mUi->graphicsView->setGridStyle(theme.getBoardGridStyle());
   mUi->graphicsView->setUseOpenGl(
       mProjectEditor.getWorkspace().getSettings().useOpenGl.get());
   mUi->graphicsView->setEventHandlerObject(this);
@@ -213,12 +220,17 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
     mActiveBoard = newBoard;
     if (mActiveBoard) {
       // show scene, restore view scene rect, set grid properties
+      const Theme& theme =
+          mProjectEditor.getWorkspace().getSettings().themes.getActive();
+      mActiveBoard->getLayerStack().applyTheme(theme);
+      mActiveBoard->getGraphicsScene().setSelectionRectColors(
+          theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
+          theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
       mUi->graphicsView->setScene(&mActiveBoard->getGraphicsScene());
       mUi->graphicsView->setVisibleSceneRect(
           mActiveBoard->restoreViewSceneRect());
-      mUi->graphicsView->setGridProperties(mActiveBoard->getGridProperties());
-      mUi->statusbar->setLengthUnit(
-          mActiveBoard->getGridProperties().getUnit());
+      mUi->graphicsView->setGridInterval(mActiveBoard->getGridInterval());
+      mUi->statusbar->setLengthUnit(mActiveBoard->getGridUnit());
       // force airwire rebuild immediately and on every project modification
       mActiveBoard->triggerAirWiresRebuild();
       connect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified,
@@ -453,17 +465,17 @@ void BoardEditor::createActions() noexcept {
       this, this, &BoardEditor::execGridPropertiesDialog));
   mActionGridIncrease.reset(cmd.gridIncrease.createAction(this, this, [this]() {
     if (const Board* board = getActiveBoard()) {
-      GridProperties grid = board->getGridProperties();
-      grid.setInterval(PositiveLength(grid.getInterval() * 2));
-      setGridProperties(grid, true);
+      const Length interval = board->getGridInterval() * 2;
+      setGridProperties(PositiveLength(interval), board->getGridUnit(),
+                        mUi->graphicsView->getGridStyle(), true);
     }
   }));
   mActionGridDecrease.reset(cmd.gridDecrease.createAction(this, this, [this]() {
     if (const Board* board = getActiveBoard()) {
-      GridProperties grid = board->getGridProperties();
-      if ((*grid.getInterval()) % 2 == 0) {
-        grid.setInterval(PositiveLength(grid.getInterval() / 2));
-        setGridProperties(grid, true);
+      const Length interval = *board->getGridInterval();
+      if ((interval % 2) == 0) {
+        setGridProperties(PositiveLength(interval / 2), board->getGridUnit(),
+                          mUi->graphicsView->getGridStyle(), true);
       }
     }
   }));
@@ -482,8 +494,7 @@ void BoardEditor::createActions() noexcept {
   mActionPaste.reset(cmd.clipboardPaste.createAction(
       this, mFsm.data(), &BoardEditorFsm::processPaste));
   mActionMoveLeft.reset(cmd.moveLeft.createAction(this, this, [this]() {
-    if (!mFsm->processMove(
-            Point(-mUi->graphicsView->getGridProperties().getInterval(), 0))) {
+    if (!mFsm->processMove(Point(-mUi->graphicsView->getGridInterval(), 0))) {
       // Workaround for consumed keyboard shortcuts for scrolling.
       mUi->graphicsView->horizontalScrollBar()->triggerAction(
           QScrollBar::SliderSingleStepSub);
@@ -491,8 +502,7 @@ void BoardEditor::createActions() noexcept {
   }));
   addAction(mActionMoveLeft.data());
   mActionMoveRight.reset(cmd.moveRight.createAction(this, this, [this]() {
-    if (!mFsm->processMove(
-            Point(*mUi->graphicsView->getGridProperties().getInterval(), 0))) {
+    if (!mFsm->processMove(Point(*mUi->graphicsView->getGridInterval(), 0))) {
       // Workaround for consumed keyboard shortcuts for scrolling.
       mUi->graphicsView->horizontalScrollBar()->triggerAction(
           QScrollBar::SliderSingleStepAdd);
@@ -500,8 +510,7 @@ void BoardEditor::createActions() noexcept {
   }));
   addAction(mActionMoveRight.data());
   mActionMoveUp.reset(cmd.moveUp.createAction(this, this, [this]() {
-    if (!mFsm->processMove(
-            Point(0, *mUi->graphicsView->getGridProperties().getInterval()))) {
+    if (!mFsm->processMove(Point(0, *mUi->graphicsView->getGridInterval()))) {
       // Workaround for consumed keyboard shortcuts for scrolling.
       mUi->graphicsView->verticalScrollBar()->triggerAction(
           QScrollBar::SliderSingleStepSub);
@@ -509,8 +518,7 @@ void BoardEditor::createActions() noexcept {
   }));
   addAction(mActionMoveUp.data());
   mActionMoveDown.reset(cmd.moveDown.createAction(this, this, [this]() {
-    if (!mFsm->processMove(
-            Point(0, -mUi->graphicsView->getGridProperties().getInterval()))) {
+    if (!mFsm->processMove(Point(0, -mUi->graphicsView->getGridInterval()))) {
       // Workaround for consumed keyboard shortcuts for scrolling.
       mUi->graphicsView->verticalScrollBar()->triggerAction(
           QScrollBar::SliderSingleStepAdd);
@@ -1062,11 +1070,14 @@ void BoardEditor::updateBoardDrcMessages(
 void BoardEditor::highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
                                       bool zoomTo) noexcept {
   if (QGraphicsScene* scene = mUi->graphicsView->scene()) {
+    const ThemeColor& color =
+        mProjectEditor.getWorkspace().getSettings().themes.getActive().getColor(
+            Theme::Color::sBoardOverlays);
     QPainterPath path = Path::toQPainterPathPx(msg.getLocations(), true);
     mDrcLocationGraphicsItem.reset(new QGraphicsPathItem());
     mDrcLocationGraphicsItem->setZValue(Board::ZValue_AirWires);
-    mDrcLocationGraphicsItem->setPen(Qt::NoPen);
-    mDrcLocationGraphicsItem->setBrush(QColor::fromRgb(255, 127, 0));
+    mDrcLocationGraphicsItem->setPen(QPen(color.getPrimaryColor(), 0));
+    mDrcLocationGraphicsItem->setBrush(color.getSecondaryColor());
     mDrcLocationGraphicsItem->setPath(path);
     scene->addItem(mDrcLocationGraphicsItem.data());
 
@@ -1211,27 +1222,35 @@ void BoardEditor::removeBoard() noexcept {
   }
 }
 
-void BoardEditor::setGridProperties(const GridProperties& grid,
+void BoardEditor::setGridProperties(const PositiveLength& interval,
+                                    const LengthUnit& unit,
+                                    Theme::GridStyle style,
                                     bool applyToBoard) noexcept {
-  mUi->graphicsView->setGridProperties(grid);
-  mUi->statusbar->setLengthUnit(grid.getUnit());
+  mUi->graphicsView->setGridInterval(interval);
+  mUi->graphicsView->setGridStyle(style);
+  mUi->statusbar->setLengthUnit(unit);
 
+  // In contrast to schematics, apply the grid only on the currently active
+  // board instead of all, so we can use different grids for each board.
   Board* activeBoard = getActiveBoard();
   if (activeBoard && applyToBoard) {
-    // In contrast to schematics, apply the grid only on the currently active
-    // board instead of all, so we can use different grids for each board.
-    activeBoard->setGridProperties(grid);
+    activeBoard->setGridInterval(interval);
+    activeBoard->setGridUnit(unit);
   }
 }
 
 void BoardEditor::execGridPropertiesDialog() noexcept {
-  if (Board* activeBoard = getActiveBoard()) {
-    GridSettingsDialog dialog(activeBoard->getGridProperties(), this);
-    connect(
-        &dialog, &GridSettingsDialog::gridPropertiesChanged,
-        [this](const GridProperties& grid) { setGridProperties(grid, false); });
+  if (Board* board = getActiveBoard()) {
+    GridSettingsDialog dialog(board->getGridInterval(), board->getGridUnit(),
+                              mUi->graphicsView->getGridStyle(), this);
+    connect(&dialog, &GridSettingsDialog::gridPropertiesChanged,
+            [this](const PositiveLength& interval, const LengthUnit& unit,
+                   Theme::GridStyle style) {
+              setGridProperties(interval, unit, style, false);
+            });
     if (dialog.exec()) {
-      setGridProperties(dialog.getGrid(), true);
+      setGridProperties(dialog.getInterval(), dialog.getUnit(),
+                        dialog.getStyle(), true);
     }
   }
 }

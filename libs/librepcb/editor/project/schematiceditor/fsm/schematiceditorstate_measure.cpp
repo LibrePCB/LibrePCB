@@ -42,7 +42,7 @@ namespace editor {
 SchematicEditorState_Measure::SchematicEditorState_Measure(
     const Context& context) noexcept
   : SchematicEditorState(context),
-    mTool(new MeasureTool(mContext.editorGraphicsView)) {
+    mTool(new MeasureTool(mContext.editorGraphicsView, getLengthUnit())) {
   connect(mTool.data(), &MeasureTool::statusBarMessageChanged, this,
           &SchematicEditorState_Measure::statusBarMessageChanged);
 }

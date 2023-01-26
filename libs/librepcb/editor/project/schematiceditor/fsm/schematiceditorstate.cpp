@@ -39,7 +39,6 @@
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/project/schematic/schematiclayerprovider.h>
-#include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -72,11 +71,16 @@ Schematic* SchematicEditorState::getActiveSchematic() noexcept {
 }
 
 PositiveLength SchematicEditorState::getGridInterval() const noexcept {
-  return mContext.editorGraphicsView.getGridProperties().getInterval();
+  return mContext.editorGraphicsView.getGridInterval();
 }
 
-const LengthUnit& SchematicEditorState::getDefaultLengthUnit() const noexcept {
-  return mContext.workspace.getSettings().defaultLengthUnit.get();
+const LengthUnit& SchematicEditorState::getLengthUnit() const noexcept {
+  if (const Schematic* schematic =
+          const_cast<SchematicEditorState*>(this)->getActiveSchematic()) {
+    return schematic->getGridUnit();
+  } else {
+    return mContext.workspace.getSettings().defaultLengthUnit.get();
+  }
 }
 
 QList<GraphicsLayer*> SchematicEditorState::getAllowedGeometryLayers() const

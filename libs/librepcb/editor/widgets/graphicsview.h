@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/types/point.h>
+#include <librepcb/core/workspace/theme.h>
 #include <optional/tl/optional.hpp>
 
 #include <QtCore>
@@ -36,7 +37,6 @@
 namespace librepcb {
 
 class GraphicsScene;
-class GridProperties;
 
 namespace editor {
 
@@ -71,14 +71,19 @@ public:
   GraphicsScene* getScene() const noexcept { return mScene; }
   QRectF getVisibleSceneRect() const noexcept;
   bool getUseOpenGl() const noexcept { return mUseOpenGl; }
-  const GridProperties& getGridProperties() const noexcept {
-    return *mGridProperties;
+  const PositiveLength& getGridInterval() const noexcept {
+    return mGridInterval;
   }
+  Theme::GridStyle getGridStyle() const noexcept { return mGridStyle; }
 
   // Setters
+  void setBackgroundColors(const QColor& fill, const QColor& grid) noexcept;
+  void setOverlayColors(const QColor& fill, const QColor& content) noexcept;
+  void setInfoBoxColors(const QColor& fill, const QColor& text) noexcept;
   void setUseOpenGl(bool useOpenGl) noexcept;
   void setGrayOut(bool grayOut) noexcept;
-  void setGridProperties(const GridProperties& properties) noexcept;
+  void setGridStyle(Theme::GridStyle style) noexcept;
+  void setGridInterval(const PositiveLength& interval) noexcept;
   void setScene(GraphicsScene* scene) noexcept;
   void setVisibleSceneRect(const QRectF& rect) noexcept;
 
@@ -94,11 +99,9 @@ public:
   void setSceneRectMarker(const QRectF& rect) noexcept;
   void setSceneCursor(
       const tl::optional<std::pair<Point, CursorOptions>>& cursor) noexcept;
-  void setRulerColor(const QColor& color) noexcept;
   void setRulerPositions(
       const tl::optional<std::pair<Point, Point>>& pos) noexcept;
-  void setOverlayColor(const QColor& color) noexcept;
-  void setOverlayText(const QString& text) noexcept;
+  void setInfoBoxText(const QString& text) noexcept;
   void setOriginCrossVisible(bool visible) noexcept;
   void setEventHandlerObject(
       IF_GraphicsViewEventHandler* eventHandler) noexcept;
@@ -142,11 +145,16 @@ private:
   void drawForeground(QPainter* painter, const QRectF& rect);
 
   // General Attributes
-  QScopedPointer<QLabel> mOverlayLabel;
+  QScopedPointer<QLabel> mInfoBoxLabel;
   IF_GraphicsViewEventHandler* mEventHandlerObject;
   GraphicsScene* mScene;
   QVariantAnimation* mZoomAnimation;
-  GridProperties* mGridProperties;
+  Theme::GridStyle mGridStyle;
+  PositiveLength mGridInterval;
+  QColor mBackgroundColor;
+  QColor mGridColor;
+  QColor mOverlayFillColor;
+  QColor mOverlayContentColor;
   QRectF mSceneRectMarker;
   bool mOriginCrossVisible;
   bool mUseOpenGl;
@@ -164,7 +172,6 @@ private:
     Length currentTickInterval;
   };
   QVector<RulerGauge> mRulerGauges;
-  QColor mRulerColor;
   tl::optional<std::pair<Point, Point>> mRulerPositions;
 
   // State

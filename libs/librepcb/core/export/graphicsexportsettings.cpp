@@ -23,6 +23,7 @@
 #include "graphicsexportsettings.h"
 
 #include "../graphics/graphicslayer.h"
+#include "../workspace/theme.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -55,6 +56,7 @@ GraphicsExportSettings::GraphicsExportSettings() noexcept
   addLayer(GraphicsLayer::sSchematicSheetFrames);
   addLayer(GraphicsLayer::sSymbolOutlines);
   addLayer(GraphicsLayer::sSymbolGrabAreas);
+  addLayer(GraphicsLayer::sSymbolPinLines);
   addLayer(GraphicsLayer::sSymbolPinNames);
   addLayer(GraphicsLayer::sSymbolPinNumbers);
   addLayer(GraphicsLayer::sSymbolNames);
@@ -206,7 +208,8 @@ bool GraphicsExportSettings::operator!=(const GraphicsExportSettings& rhs) const
  ******************************************************************************/
 
 void GraphicsExportSettings::addLayer(const QString& name) noexcept {
-  QColor color = GraphicsLayer(name).getColor();
+  static Theme defaultTheme;
+  QColor color = defaultTheme.getColorForLayer(name).getPrimaryColor();
   if (GraphicsLayer::isBoardLayer(name)) {
     // Make board layer looking better on white background since usually the
     // graphics export uses white background.

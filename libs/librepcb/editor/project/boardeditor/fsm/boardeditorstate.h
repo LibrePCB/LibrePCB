@@ -178,7 +178,7 @@ signals:
 protected:  // Methods
   Board* getActiveBoard() noexcept;
   PositiveLength getGridInterval() const noexcept;
-  const LengthUnit& getDefaultLengthUnit() const noexcept;
+  const LengthUnit& getLengthUnit() const noexcept;
   QList<GraphicsLayer*> getAllowedGeometryLayers(const Board& board) const
       noexcept;
   void abortBlockingToolsInOtherEditors() noexcept;

@@ -46,9 +46,9 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
 #include <librepcb/core/project/projectsettings.h>
-#include <librepcb/core/types/gridproperties.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -84,7 +84,14 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
     mPreviewGraphicsScene(new GraphicsScene()),
     mPreviewGraphicsItem(nullptr) {
   mUi->setupUi(this);
-  mUi->graphicsView->setBackgroundBrush(QBrush(Qt::black, Qt::SolidPattern));
+
+  // Setup graphics view.
+  const Theme& theme =
+      mProjectEditor.getWorkspace().getSettings().themes.getActive();
+  mGraphicsLayerProvider->applyTheme(theme);
+  mUi->graphicsView->setBackgroundColors(
+      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->graphicsView->setOriginCrossVisible(false);
   mUi->graphicsView->setScene(mPreviewGraphicsScene.data());
 
@@ -163,8 +170,8 @@ void UnplacedComponentsDock::setBoard(Board* board) {
             &UnplacedComponentsDock::updateComponentsList);
     connect(mBoard, &Board::deviceRemoved, this,
             &UnplacedComponentsDock::updateComponentsList);
-    mNextPosition = Point::fromMm(0, -20).mappedToGrid(
-        mBoard->getGridProperties().getInterval());
+    mNextPosition =
+        Point::fromMm(0, -20).mappedToGrid(mBoard->getGridInterval());
     updateComponentsList();
   }
 }
@@ -519,7 +526,7 @@ void UnplacedComponentsDock::autoAddDevicesToBoard(
         } else {
           mNextPosition += Point::fromMm(10, 0);
         }
-        mNextPosition.mapToGrid(mBoard->getGridProperties().getInterval());
+        mNextPosition.mapToGrid(mBoard->getGridInterval());
       }
     }
   }

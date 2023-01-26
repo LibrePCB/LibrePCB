@@ -530,7 +530,7 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
     // Ask for file path and import options.
     DxfImportDialog dialog(getAllowedCircleAndPolygonLayers(),
                            GraphicsLayerName(GraphicsLayer::sTopDocumentation),
-                           true, getDefaultLengthUnit(),
+                           true, getLengthUnit(),
                            "package_editor/dxf_import_dialog",
                            &mContext.editorWidget);
     FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
@@ -773,8 +773,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
 
   if (auto i = std::dynamic_pointer_cast<FootprintPadGraphicsItem>(item)) {
     FootprintPadPropertiesDialog dialog(
-        mContext.package, *i->getPad(), mContext.undoStack,
-        getDefaultLengthUnit(),
+        mContext.package, *i->getPad(), mContext.undoStack, getLengthUnit(),
         "package_editor/footprint_pad_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
@@ -783,7 +782,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
   } else if (auto i = std::dynamic_pointer_cast<StrokeTextGraphicsItem>(item)) {
     StrokeTextPropertiesDialog dialog(
         i->getText(), mContext.undoStack, getAllowedTextLayers(),
-        getDefaultLengthUnit(), "package_editor/stroke_text_properties_dialog",
+        getLengthUnit(), "package_editor/stroke_text_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();
@@ -791,7 +790,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
   } else if (auto i = std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
     PolygonPropertiesDialog dialog(
         i->getPolygon(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
-        getDefaultLengthUnit(), "package_editor/polygon_properties_dialog",
+        getLengthUnit(), "package_editor/polygon_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();
@@ -799,7 +798,7 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
   } else if (auto i = std::dynamic_pointer_cast<CircleGraphicsItem>(item)) {
     CirclePropertiesDialog dialog(
         i->getCircle(), mContext.undoStack, getAllowedCircleAndPolygonLayers(),
-        getDefaultLengthUnit(), "package_editor/circle_properties_dialog",
+        getLengthUnit(), "package_editor/circle_properties_dialog",
         &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();
@@ -807,10 +806,9 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
   } else if (auto i = std::dynamic_pointer_cast<HoleGraphicsItem>(item)) {
     // Note: The const_cast<> is a bit ugly, but it was by far the easiest
     // way and is safe since here we know that we're allowed to modify the hole.
-    HolePropertiesDialog dialog(const_cast<Hole&>(i->getHole()),
-                                mContext.undoStack, getDefaultLengthUnit(),
-                                "package_editor/hole_properties_dialog",
-                                &mContext.editorWidget);
+    HolePropertiesDialog dialog(
+        const_cast<Hole&>(i->getHole()), mContext.undoStack, getLengthUnit(),
+        "package_editor/hole_properties_dialog", &mContext.editorWidget);
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();
     return true;

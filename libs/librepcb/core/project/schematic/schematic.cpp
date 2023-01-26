@@ -28,7 +28,6 @@
 #include "../../graphics/graphicsscene.h"
 #include "../../library/sym/symbolpin.h"
 #include "../../serialization/sexpression.h"
-#include "../../types/gridproperties.h"
 #include "../../utils/scopeguardlist.h"
 #include "../project.h"
 #include "items/si_netlabel.h"
@@ -63,9 +62,10 @@ Schematic::Schematic(Project& project,
     mDirectory(std::move(directory)),
     mIsAddedToProject(false),
     mGraphicsScene(new GraphicsScene()),
-    mGridProperties(new GridProperties()),
     mUuid(uuid),
-    mName(name) {
+    mName(name),
+    mGridInterval(2540000),
+    mGridUnit(LengthUnit::millimeters()) {
   if (mDirectoryName.isEmpty()) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -88,7 +88,6 @@ Schematic::~Schematic() noexcept {
   qDeleteAll(mSymbols);
   mSymbols.clear();
 
-  mGridProperties.reset();
   mGraphicsScene.reset();
 }
 
@@ -104,10 +103,6 @@ bool Schematic::isEmpty() const noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
-
-void Schematic::setGridProperties(const GridProperties& grid) noexcept {
-  *mGridProperties = grid;
-}
 
 void Schematic::setName(const ElementName& name) noexcept {
   mName = name;
@@ -261,7 +256,6 @@ void Schematic::addToProject() {
   }
 
   mIsAddedToProject = true;
-  updateIcon();
   sgl.dismiss();
 }
 
@@ -303,7 +297,9 @@ void Schematic::save() {
   root.ensureLineBreak();
   root.appendChild("name", mName);
   root.ensureLineBreak();
-  mGridProperties->serialize(root.appendList("grid"));
+  SExpression& gridNode = root.appendList("grid");
+  gridNode.appendChild("interval", mGridInterval);
+  gridNode.appendChild("unit", mGridUnit);
   root.ensureLineBreak();
   for (const SI_Symbol* obj : mSymbols) {
     root.ensureLineBreak();
@@ -398,14 +394,6 @@ QString Schematic::getBuiltInAttributeValue(const QString& key) const noexcept {
 QVector<const AttributeProvider*> Schematic::getAttributeProviderParents() const
     noexcept {
   return QVector<const AttributeProvider*>{&mProject};
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Schematic::updateIcon() noexcept {
-  mIcon = QIcon(mGraphicsScene->toPixmap(QSize(297, 210), Qt::white));
 }
 
 /*******************************************************************************

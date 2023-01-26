@@ -110,6 +110,7 @@ public:
   FileFormatMigrationV01& operator=(const FileFormatMigrationV01& rhs) = delete;
 
 private:  // Methods
+  void upgradeGrid(SExpression& node);
   void upgradeHoles(SExpression& node);
 };
 

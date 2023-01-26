@@ -28,6 +28,8 @@
 #include "../editorwidgetbase.h"
 
 #include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/types/lengthunit.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,7 +43,6 @@ namespace librepcb {
 
 class FootprintGraphicsItem;
 class GraphicsScene;
-class GridProperties;
 class Package;
 
 namespace editor {
@@ -126,12 +127,14 @@ private:  // Methods
       bool applyFix) override;
   bool execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept override;
-  void setGridProperties(const GridProperties& grid) noexcept;
+  void setGridProperties(const PositiveLength& interval, const LengthUnit& unit,
+                         Theme::GridStyle style) noexcept;
 
 private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<GraphicsScene> mGraphicsScene;
+  LengthUnit mLengthUnit;
   std::unique_ptr<Package> mPackage;
 
   // broken interface detection

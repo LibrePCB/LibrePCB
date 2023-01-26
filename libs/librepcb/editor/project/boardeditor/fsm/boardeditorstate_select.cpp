@@ -141,7 +141,7 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       // Ask for file path and import options.
       DxfImportDialog dialog(getAllowedGeometryLayers(*board),
                              GraphicsLayerName(GraphicsLayer::sBoardOutlines),
-                             true, getDefaultLengthUnit(),
+                             true, getLengthUnit(),
                              "board_editor/dxf_import_dialog", parentWidget());
       FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
       if ((!fp.isValid()) || (dialog.exec() != QDialog::Accepted)) {
@@ -1475,14 +1475,14 @@ void BoardEditorState_Select::openDevicePropertiesDialog(
     BI_Device& device) noexcept {
   DeviceInstancePropertiesDialog dialog(
       mContext.workspace.getSettings(), mContext.project, device,
-      mContext.undoStack, getDefaultLengthUnit(),
+      mContext.undoStack, getLengthUnit(),
       "board_editor/device_properties_dialog", parentWidget());
   dialog.exec();
 }
 
 void BoardEditorState_Select::openViaPropertiesDialog(BI_Via& via) noexcept {
   BoardViaPropertiesDialog dialog(
-      mContext.project, via, mContext.undoStack, getDefaultLengthUnit(),
+      mContext.project, via, mContext.undoStack, getLengthUnit(),
       "board_editor/via_properties_dialog", parentWidget());
   dialog.exec();
 }
@@ -1490,7 +1490,7 @@ void BoardEditorState_Select::openViaPropertiesDialog(BI_Via& via) noexcept {
 void BoardEditorState_Select::openPlanePropertiesDialog(
     BI_Plane& plane) noexcept {
   BoardPlanePropertiesDialog dialog(
-      mContext.project, plane, mContext.undoStack, getDefaultLengthUnit(),
+      mContext.project, plane, mContext.undoStack, getLengthUnit(),
       "board_editor/plane_properties_dialog", parentWidget());
 
   // Make sure the plane is visible visible since it's useful to see the actual
@@ -1508,7 +1508,7 @@ void BoardEditorState_Select::openPolygonPropertiesDialog(
     Board& board, Polygon& polygon) noexcept {
   PolygonPropertiesDialog dialog(
       polygon, mContext.undoStack, getAllowedGeometryLayers(board),
-      getDefaultLengthUnit(), "board_editor/polygon_properties_dialog",
+      getLengthUnit(), "board_editor/polygon_properties_dialog",
       parentWidget());
   dialog.exec();
 }
@@ -1517,7 +1517,7 @@ void BoardEditorState_Select::openStrokeTextPropertiesDialog(
     Board& board, StrokeText& text) noexcept {
   StrokeTextPropertiesDialog dialog(
       text, mContext.undoStack, getAllowedGeometryLayers(board),
-      getDefaultLengthUnit(), "board_editor/stroke_text_properties_dialog",
+      getLengthUnit(), "board_editor/stroke_text_properties_dialog",
       parentWidget());
   dialog.exec();
 }
@@ -1525,7 +1525,7 @@ void BoardEditorState_Select::openStrokeTextPropertiesDialog(
 void BoardEditorState_Select::openHolePropertiesDialog(Board& board,
                                                        Hole& hole) noexcept {
   Q_UNUSED(board);
-  HolePropertiesDialog dialog(hole, mContext.undoStack, getDefaultLengthUnit(),
+  HolePropertiesDialog dialog(hole, mContext.undoStack, getLengthUnit(),
                               "board_editor/hole_properties_dialog",
                               parentWidget());
   dialog.exec();

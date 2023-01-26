@@ -170,9 +170,14 @@ public:
   SExpression& appendChild(const QString& child, const T& obj) {
     return appendList(child).appendChild(obj);
   }
+  void removeChild(const SExpression& child);
   QByteArray toByteArray() const;
 
   // Operator Overloadings
+  bool operator==(const SExpression& rhs) const noexcept;
+  bool operator!=(const SExpression& rhs) const noexcept {
+    return !(*this == rhs);
+  }
   SExpression& operator=(const SExpression& rhs) noexcept;
 
   // Static Methods

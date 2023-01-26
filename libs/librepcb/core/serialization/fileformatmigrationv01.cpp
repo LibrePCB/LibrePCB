@@ -266,6 +266,8 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
 
+      upgradeGrid(root);
+
       // Symbols.
       for (SExpression* symNode : root.getChildren("symbol")) {
         const Uuid cmpUuid =
@@ -359,9 +361,12 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
 
   // Boards.
   foreach (const QString& dirName, dir.getDirs("boards")) {
-    const QString fp = "boards/" % dirName % "/board.lp";
+    // Board content.
+    QString fp = "boards/" % dirName % "/board.lp";
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+      upgradeGrid(root);
 
       // Fabrication output settings.
       {
@@ -372,6 +377,23 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir) {
 
       // Holes.
       upgradeHoles(root);
+
+      dir.write(fp, root.toByteArray());
+    }
+
+    // User settings.
+    fp = "boards/" % dirName % "/settings.user.lp";
+    if (dir.fileExists(fp)) {
+      SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+      // Layers.
+      foreach (SExpression* node, root.getChildren("layer")) {
+        for (const auto tagName : {"color", "color_hl"}) {
+          if (SExpression* child = node->tryGetChild(tagName)) {
+            node->removeChild(*child);
+          }
+        }
+      }
 
       dir.write(fp, root.toByteArray());
     }
@@ -402,6 +424,11 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void FileFormatMigrationV01::upgradeGrid(SExpression& node) {
+  SExpression& gridNode = node.getChild("grid");
+  gridNode.removeChild(gridNode.getChild("type"));
+}
 
 void FileFormatMigrationV01::upgradeHoles(SExpression& node) {
   for (SExpression* holeNode : node.getChildren("hole")) {

@@ -33,7 +33,6 @@
 #include <librepcb/core/graphics/circlegraphicsitem.h>
 #include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/graphics/textgraphicsitem.h>
-#include <librepcb/core/types/gridproperties.h>
 
 #include <QtCore>
 
@@ -58,7 +57,7 @@ CmdDragSelectedSymbolItems::CmdDragSelectedSymbolItems(
     mSnappedToGrid(false),
     mHasOffTheGridElements(false) {
   int count = 0;
-  PositiveLength grid = mContext.graphicsView.getGridProperties().getInterval();
+  PositiveLength grid = mContext.graphicsView.getGridInterval();
 
   QList<std::shared_ptr<SymbolPinGraphicsItem>> pins =
       context.symbolGraphicsItem.getSelectedPins();
@@ -136,7 +135,7 @@ int CmdDragSelectedSymbolItems::getSelectedItemsCount() const noexcept {
  ******************************************************************************/
 
 void CmdDragSelectedSymbolItems::snapToGrid() noexcept {
-  PositiveLength grid = mContext.graphicsView.getGridProperties().getInterval();
+  PositiveLength grid = mContext.graphicsView.getGridInterval();
   foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) { cmd->snapToGrid(grid, true); }
   foreach (CmdCircleEdit* cmd, mCircleEditCmds) { cmd->snapToGrid(grid, true); }
   foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {

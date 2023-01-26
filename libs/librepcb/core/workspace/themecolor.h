@@ -17,12 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_GRAPHICSSCENE_H
-#define LIBREPCB_CORE_GRAPHICSSCENE_H
+#ifndef LIBREPCB_CORE_THEMECOLOR_H
+#define LIBREPCB_CORE_THEMECOLOR_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../serialization/sexpression.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -31,35 +33,50 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Point;
-
 /*******************************************************************************
- *  Class GraphicsScene
+ *  Class ThemeColor
  ******************************************************************************/
 
 /**
- * @brief The GraphicsScene class
+ * @brief Color settings as used by ::librepcb::Theme
  */
-class GraphicsScene final : public QGraphicsScene {
-  Q_OBJECT
-
+class ThemeColor final {
 public:
   // Constructors / Destructor
-  explicit GraphicsScene() noexcept;
-  ~GraphicsScene() noexcept;
+  ThemeColor() = delete;
+  ThemeColor(const QString& identifier, const QString& nameTr,
+             const QColor& primary, const QColor& secondary) noexcept;
+  ThemeColor(const ThemeColor& other) noexcept;
+  ~ThemeColor() noexcept;
+
+  // Getters
+  const QString& getIdentifier() const noexcept { return mIdentifier; }
+  const QString& getNameTr() const noexcept { return mNameTr; }
+  const QColor& getPrimaryColor() const noexcept { return mPrimary; }
+  const QColor& getSecondaryColor() const noexcept { return mSecondary; }
+  bool isEdited() const noexcept { return mEdited; }
+
+  // Setters
+  void setPrimaryColor(const QColor& color) noexcept;
+  void setSecondaryColor(const QColor& color) noexcept;
 
   // General Methods
-  void addItem(QGraphicsItem& item) noexcept;
-  void removeItem(QGraphicsItem& item) noexcept;
-  void setSelectionRectColors(const QColor& line, const QColor& fill) noexcept;
-  void setSelectionRect(const Point& p1, const Point& p2) noexcept;
-  QPixmap toPixmap(int dpi,
-                   const QColor& background = Qt::transparent) noexcept;
-  QPixmap toPixmap(const QSize& size,
-                   const QColor& background = Qt::transparent) noexcept;
+  void load(const SExpression& root);
+  SExpression serialize() const;
 
-private:
-  QGraphicsRectItem* mSelectionRectItem;
+  // Operator Overloadings
+  bool operator==(const ThemeColor& rhs) const noexcept;
+  bool operator!=(const ThemeColor& rhs) const noexcept {
+    return !(*this == rhs);
+  }
+  ThemeColor& operator=(const ThemeColor& rhs) noexcept;
+
+private:  // Data
+  QString mIdentifier;
+  QString mNameTr;
+  QColor mPrimary;
+  QColor mSecondary;  ///< Null if not applicable
+  bool mEdited;
 };
 
 /*******************************************************************************

@@ -28,6 +28,7 @@
 #include "workspacesettingsitem_genericvalue.h"
 #include "workspacesettingsitem_genericvaluelist.h"
 #include "workspacesettingsitem_keyboardshortcuts.h"
+#include "workspacesettingsitem_themes.h"
 
 #include <QtCore>
 
@@ -259,6 +260,13 @@ public:
    * @see ::librepcb::WorkspaceSettingsItem_KeyboardShortcuts
    */
   WorkspaceSettingsItem_KeyboardShortcuts keyboardShortcuts;
+
+  /**
+   * @brief Themes
+   *
+   * @see ::librepcb::WorkspaceSettingsItem_KeyboardShortcuts
+   */
+  WorkspaceSettingsItem_Themes themes;
 
   /**
    * @brief Dismissed messages
