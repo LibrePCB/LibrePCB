@@ -65,7 +65,6 @@ BoardEditorState_AddVia::BoardEditorState_AddVia(
     mIsUndoCmdActive(false),
     mLastViaProperties(Uuid::createRandom(),  // UUID is not relevant here
                        Point(),  // Position is not relevant here
-                       Via::Shape::Round,  // Default shape
                        PositiveLength(700000),  // Default size
                        PositiveLength(300000)  // Default drill diameter
                        ),
@@ -91,31 +90,6 @@ bool BoardEditorState_AddVia::entry() noexcept {
   if (!addVia(pos)) return false;
 
   EditorCommandSet& cmd = EditorCommandSet::instance();
-
-  // Add shape actions to the "command" toolbar
-  std::unique_ptr<QActionGroup> shapeActionGroup(
-      new QActionGroup(&mContext.commandToolBar));
-  QAction* aShapeRound = cmd.thtShapeRound.createAction(
-      shapeActionGroup.get(), this,
-      [this]() { shapeChanged(Via::Shape::Round); });
-  aShapeRound->setCheckable(true);
-  aShapeRound->setChecked(mLastViaProperties.getShape() == Via::Shape::Round);
-  aShapeRound->setActionGroup(shapeActionGroup.get());
-  QAction* aShapeRect = cmd.thtShapeRectangular.createAction(
-      shapeActionGroup.get(), this,
-      [this]() { shapeChanged(Via::Shape::Square); });
-  aShapeRect->setCheckable(true);
-  aShapeRect->setChecked(mLastViaProperties.getShape() == Via::Shape::Square);
-  aShapeRect->setActionGroup(shapeActionGroup.get());
-  QAction* aShapeOctagon = cmd.thtShapeOctagonal.createAction(
-      shapeActionGroup.get(), this,
-      [this]() { shapeChanged(Via::Shape::Octagon); });
-  aShapeOctagon->setCheckable(true);
-  aShapeOctagon->setChecked(mLastViaProperties.getShape() ==
-                            Via::Shape::Octagon);
-  aShapeOctagon->setActionGroup(shapeActionGroup.get());
-  mContext.commandToolBar.addActionGroup(std::move(shapeActionGroup));
-  mContext.commandToolBar.addSeparator();
 
   // Add the size edit to the toolbar
   mContext.commandToolBar.addLabel(tr("Size:"), 10);
@@ -385,13 +359,6 @@ bool BoardEditorState_AddVia::abortCommand(bool showErrMsgBox) noexcept {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
     return false;
-  }
-}
-
-void BoardEditorState_AddVia::shapeChanged(Via::Shape shape) noexcept {
-  mLastViaProperties.setShape(shape);
-  if (mCurrentViaEditCmd) {
-    mCurrentViaEditCmd->setShape(mLastViaProperties.getShape(), true);
   }
 }
 

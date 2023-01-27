@@ -376,6 +376,26 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
         drillNode.appendChild("g85_slots", false);
       }
 
+      // Net segments.
+      int nonRoundViaCount = 0;
+      for (SExpression* segNode : root.getChildren("netsegment")) {
+        // Vias.
+        for (SExpression* viaNode : segNode->getChildren("via")) {
+          SExpression& shapeNode = viaNode->getChild("shape");
+          if (shapeNode.getChild("@0").getValue() != "round") {
+            ++nonRoundViaCount;
+          }
+          viaNode->removeChild(shapeNode);
+        }
+      }
+      if (nonRoundViaCount > 0) {
+        messages.append(
+            buildMessage(Message::Severity::Warning,
+                         tr("Non-circular via shapes are no longer supported, "
+                            "all vias were changed to circular now."),
+                         nonRoundViaCount));
+      }
+
       // Holes.
       upgradeHoles(root);
 

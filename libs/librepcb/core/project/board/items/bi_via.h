@@ -57,7 +57,6 @@ public:
   BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   const Via& getVia() const noexcept { return mVia; }
   const Uuid& getUuid() const noexcept { return mVia.getUuid(); }
-  Via::Shape getShape() const noexcept { return mVia.getShape(); }
   const PositiveLength& getDrillDiameter() const noexcept {
     return mVia.getDrillDiameter();
   }
@@ -69,7 +68,6 @@ public:
 
   // Setters
   void setPosition(const Point& position) noexcept;
-  void setShape(Via::Shape shape) noexcept;
   void setSize(const PositiveLength& size) noexcept;
   void setDrillDiameter(const PositiveLength& diameter) noexcept;
 

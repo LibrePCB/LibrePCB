@@ -193,8 +193,8 @@ bool CmdPasteBoardItems::performExecute() {
       QHash<Uuid, BI_Via*> viaMap;
       for (const Via& v : segment.vias) {
         BI_Via* via = cmdAddElements->addVia(
-            Via(Uuid::createRandom(), v.getPosition() + mPosOffset,
-                v.getShape(), v.getSize(), v.getDrillDiameter()));
+            Via(Uuid::createRandom(), v.getPosition() + mPosOffset, v.getSize(),
+                v.getDrillDiameter()));
         via->setSelected(true);
         viaMap.insert(v.getUuid(), via);
       }

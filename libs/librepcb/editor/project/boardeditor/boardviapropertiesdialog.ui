@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>346</width>
-    <height>168</height>
+    <height>142</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,23 +34,13 @@
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Shape:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="cbxShape"/>
-     </item>
-     <item row="2" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
         <string>Position:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="1">
+     <item row="1" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true"/>
@@ -60,14 +50,17 @@
        </item>
       </layout>
      </item>
-     <item row="3" column="0">
+     <item row="2" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>Outer Size:</string>
+        <string>Outer Diameter:</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="2" column="1">
+      <widget class="librepcb::editor::PositiveLengthEdit" name="edtSize" native="true"/>
+     </item>
+     <item row="3" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Drill Diameter:</string>
@@ -75,9 +68,6 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="librepcb::editor::PositiveLengthEdit" name="edtSize" native="true"/>
-     </item>
-     <item row="4" column="1">
       <widget class="librepcb::editor::PositiveLengthEdit" name="edtDrillDiameter" native="true"/>
      </item>
     </layout>
@@ -109,7 +99,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>cbxShape</tabstop>
   <tabstop>edtPosX</tabstop>
   <tabstop>edtPosY</tabstop>
   <tabstop>edtSize</tabstop>

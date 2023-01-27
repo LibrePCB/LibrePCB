@@ -81,12 +81,6 @@ void BI_Via::setPosition(const Point& position) noexcept {
   }
 }
 
-void BI_Via::setShape(Via::Shape shape) noexcept {
-  if (mVia.setShape(shape)) {
-    mGraphicsItem->updateCacheAndRepaint();
-  }
-}
-
 void BI_Via::setSize(const PositiveLength& size) noexcept {
   if (mVia.setSize(size)) {
     mGraphicsItem->updateCacheAndRepaint();

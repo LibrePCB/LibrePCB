@@ -41,8 +41,6 @@ CmdBoardViaEdit::CmdBoardViaEdit(BI_Via& via) noexcept
     mVia(via),
     mOldPos(via.getPosition()),
     mNewPos(mOldPos),
-    mOldShape(via.getShape()),
-    mNewShape(mOldShape),
     mOldSize(via.getSize()),
     mNewSize(mOldSize),
     mOldDrillDiameter(via.getDrillDiameter()),
@@ -52,7 +50,6 @@ CmdBoardViaEdit::CmdBoardViaEdit(BI_Via& via) noexcept
 CmdBoardViaEdit::~CmdBoardViaEdit() noexcept {
   if (!wasEverExecuted()) {
     mVia.setPosition(mOldPos);
-    mVia.setShape(mOldShape);
     mVia.setSize(mOldSize);
     mVia.setDrillDiameter(mOldDrillDiameter);
   }
@@ -86,13 +83,6 @@ void CmdBoardViaEdit::rotate(const Angle& angle, const Point& center,
   mNewPos.rotate(angle, center);
   if (immediate) mVia.setPosition(mNewPos);
 }
-
-void CmdBoardViaEdit::setShape(Via::Shape shape, bool immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewShape = shape;
-  if (immediate) mVia.setShape(mNewShape);
-}
-
 void CmdBoardViaEdit::setSize(const PositiveLength& size,
                               bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
@@ -115,7 +105,6 @@ bool CmdBoardViaEdit::performExecute() {
   performRedo();  // can throw
 
   if (mNewPos != mOldPos) return true;
-  if (mNewShape != mOldShape) return true;
   if (mNewSize != mOldSize) return true;
   if (mNewDrillDiameter != mOldDrillDiameter) return true;
   return false;
@@ -123,14 +112,12 @@ bool CmdBoardViaEdit::performExecute() {
 
 void CmdBoardViaEdit::performUndo() {
   mVia.setPosition(mOldPos);
-  mVia.setShape(mOldShape);
   mVia.setSize(mOldSize);
   mVia.setDrillDiameter(mOldDrillDiameter);
 }
 
 void CmdBoardViaEdit::performRedo() {
   mVia.setPosition(mNewPos);
-  mVia.setShape(mNewShape);
   mVia.setSize(mNewSize);
   mVia.setDrillDiameter(mNewDrillDiameter);
 }

@@ -626,26 +626,8 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
       net = netName;
     }
 
-    switch (via.getShape()) {
-      case Via::Shape::Round: {
-        gen.flashCircle(via.getPosition(), outerDiameter, function, net,
-                        QString(), QString(), QString());
-        break;
-      }
-      case Via::Shape::Square: {
-        gen.flashRect(via.getPosition(), outerDiameter, outerDiameter, radius,
-                      Angle::deg0(), function, net, QString(), QString(),
-                      QString());
-        break;
-      }
-      case Via::Shape::Octagon: {
-        gen.flashOctagon(via.getPosition(), outerDiameter, outerDiameter,
-                         radius, Angle::deg0(), function, net, QString(),
-                         QString(), QString());
-        break;
-      }
-      default: { throw LogicError(__FILE__, __LINE__); }
-    }
+    gen.flashCircle(via.getPosition(), outerDiameter, function, net, QString(),
+                    QString(), QString());
   }
 }
 

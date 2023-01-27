@@ -69,7 +69,6 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     mTempVia(nullptr),
     mCurrentViaProperties(Uuid::createRandom(),  // UUID is not relevant here
                           Point(),  // Position is not relevant here
-                          Via::Shape::Round,  // Default shape
                           PositiveLength(700000),  // Default size
                           PositiveLength(300000)  // Default drill diameter
                           ),
@@ -177,33 +176,6 @@ bool BoardEditorState_DrawTrace::entry() noexcept {
           &BoardEditorState_DrawTrace::layerChanged);
   mContext.commandToolBar.addWidget(
       std::unique_ptr<GraphicsLayerComboBox>(mLayerComboBox));
-
-  // Add shape actions to the "command" toolbar
-  std::unique_ptr<QActionGroup> shapeActionGroup(
-      new QActionGroup(&mContext.commandToolBar));
-  QAction* aShapeRound = cmd.thtShapeRound.createAction(
-      shapeActionGroup.get(), this,
-      [this]() { viaShapeChanged(Via::Shape::Round); });
-  aShapeRound->setCheckable(true);
-  aShapeRound->setChecked(mCurrentViaProperties.getShape() ==
-                          Via::Shape::Round);
-  aShapeRound->setActionGroup(shapeActionGroup.get());
-  QAction* aShapeRect = cmd.thtShapeRectangular.createAction(
-      shapeActionGroup.get(), this,
-      [this]() { viaShapeChanged(Via::Shape::Square); });
-  aShapeRect->setCheckable(true);
-  aShapeRect->setChecked(mCurrentViaProperties.getShape() ==
-                         Via::Shape::Square);
-  aShapeRect->setActionGroup(shapeActionGroup.get());
-  QAction* aShapeOctagon = cmd.thtShapeOctagonal.createAction(
-      shapeActionGroup.get(), this,
-      [this]() { viaShapeChanged(Via::Shape::Octagon); });
-  aShapeOctagon->setCheckable(true);
-  aShapeOctagon->setChecked(mCurrentViaProperties.getShape() ==
-                            Via::Shape::Octagon);
-  aShapeOctagon->setActionGroup(shapeActionGroup.get());
-  mContext.commandToolBar.addActionGroup(std::move(shapeActionGroup));
-  mContext.commandToolBar.addSeparator();
 
   // Add the size edit to the toolbar
   mContext.commandToolBar.addLabel(tr("Size:"), 10);
@@ -857,7 +829,6 @@ void BoardEditorState_DrawTrace::showVia(bool isVisible) noexcept {
     } else if (mTempVia) {
       mTempVia->setPosition(mTargetPos);
       mTempVia->setSize(mCurrentViaProperties.getSize());
-      mTempVia->setShape(mCurrentViaProperties.getShape());
       mTempVia->setDrillDiameter(mCurrentViaProperties.getDrillDiameter());
     }
   } catch (const Exception& e) {
@@ -938,11 +909,6 @@ void BoardEditorState_DrawTrace::layerChanged(
     showVia(false);
     mCurrentLayerName = *layer;
   }
-}
-
-void BoardEditorState_DrawTrace::viaShapeChanged(Via::Shape shape) noexcept {
-  mCurrentViaProperties.setShape(shape);
-  updateNetpointPositions();
 }
 
 void BoardEditorState_DrawTrace::sizeEditValueChanged(
