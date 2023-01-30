@@ -52,13 +52,13 @@ BoardDesignRulesDialog::BoardDesignRulesDialog(const BoardDesignRules& rules,
   mUi->edtStopMaskMaxViaDia->configure(
       lengthUnit, LengthEditBase::Steps::generic(),
       settingsPrefix % "/stopmask_max_via_diameter");
-  mUi->edtCreamMaskClrRatio->setSingleStep(5.0);  // [%]
-  mUi->edtCreamMaskClrMin->configure(
+  mUi->edtSolderPasteClrRatio->setSingleStep(5.0);  // [%]
+  mUi->edtSolderPasteClrMin->configure(
       lengthUnit, LengthEditBase::Steps::generic(),
-      settingsPrefix % "/creammask_clearance_min");
-  mUi->edtCreamMaskClrMax->configure(
+      settingsPrefix % "/solderpaste_clearance_min");
+  mUi->edtSolderPasteClrMax->configure(
       lengthUnit, LengthEditBase::Steps::generic(),
-      settingsPrefix % "/creammask_clearance_max");
+      settingsPrefix % "/solderpaste_clearance_max");
   mUi->edtPadAnnularRingRatio->setSingleStep(5.0);  // [%]
   mUi->edtPadAnnularRingMin->configure(
       lengthUnit, LengthEditBase::Steps::generic(),
@@ -115,11 +115,13 @@ void BoardDesignRulesDialog::updateWidgets() noexcept {
   mUi->edtStopMaskClrMin->setValue(mDesignRules.getStopMaskClearanceMin());
   mUi->edtStopMaskClrMax->setValue(mDesignRules.getStopMaskClearanceMax());
   mUi->edtStopMaskMaxViaDia->setValue(mDesignRules.getStopMaskMaxViaDiameter());
-  // cream mask
-  mUi->edtCreamMaskClrRatio->setValue(
-      mDesignRules.getCreamMaskClearanceRatio());
-  mUi->edtCreamMaskClrMin->setValue(mDesignRules.getCreamMaskClearanceMin());
-  mUi->edtCreamMaskClrMax->setValue(mDesignRules.getCreamMaskClearanceMax());
+  // solder paste
+  mUi->edtSolderPasteClrRatio->setValue(
+      mDesignRules.getSolderPasteClearanceRatio());
+  mUi->edtSolderPasteClrMin->setValue(
+      mDesignRules.getSolderPasteClearanceMin());
+  mUi->edtSolderPasteClrMax->setValue(
+      mDesignRules.getSolderPasteClearanceMax());
   // pad annular ring
   mUi->edtPadAnnularRingRatio->setValue(mDesignRules.getPadAnnularRingRatio());
   mUi->edtPadAnnularRingMin->setValue(mDesignRules.getPadAnnularRingMin());
@@ -140,12 +142,12 @@ void BoardDesignRulesDialog::applyRules() noexcept {
         mUi->edtStopMaskClrMax->getValue());  // can throw
     mDesignRules.setStopMaskMaxViaDiameter(
         mUi->edtStopMaskMaxViaDia->getValue());
-    // cream mask
-    mDesignRules.setCreamMaskClearanceRatio(
-        mUi->edtCreamMaskClrRatio->getValue());
-    mDesignRules.setCreamMaskClearanceBounds(
-        mUi->edtCreamMaskClrMin->getValue(),
-        mUi->edtCreamMaskClrMax->getValue());  // can throw
+    // solder paste
+    mDesignRules.setSolderPasteClearanceRatio(
+        mUi->edtSolderPasteClrRatio->getValue());
+    mDesignRules.setSolderPasteClearanceBounds(
+        mUi->edtSolderPasteClrMin->getValue(),
+        mUi->edtSolderPasteClrMax->getValue());  // can throw
     // pad annular ring
     mDesignRules.setPadAnnularRingRatio(
         mUi->edtPadAnnularRingRatio->getValue());

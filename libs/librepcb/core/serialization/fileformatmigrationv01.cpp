@@ -476,6 +476,7 @@ void FileFormatMigrationV01::upgradeBoardDesignRules(SExpression& root) {
     QString name = child->getName();
     name.replace("restring_pad_", "pad_annular_ring_");
     name.replace("restring_via_", "via_annular_ring_");
+    name.replace("creammask_", "solderpaste_");
     child->setName(name);
   }
 }

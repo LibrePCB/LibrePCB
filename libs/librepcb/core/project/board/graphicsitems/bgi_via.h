@@ -86,7 +86,6 @@ private:  // Data
   QPainterPath mShape;
   QPainterPath mCopper;
   QPainterPath mStopMask;
-  QPainterPath mCreamMask;
   QRectF mBoundingRect;
   QFont mFont;
 

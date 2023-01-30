@@ -66,15 +66,15 @@ public:
     return mStopMaskMaxViaDrillDiameter;
   }
 
-  // Getters: Cream Mask
-  const UnsignedRatio& getCreamMaskClearanceRatio() const noexcept {
-    return mCreamMaskClearanceRatio;
+  // Getters: Solder Paste
+  const UnsignedRatio& getSolderPasteClearanceRatio() const noexcept {
+    return mSolderPasteClearanceRatio;
   }
-  const UnsignedLength& getCreamMaskClearanceMin() const noexcept {
-    return mCreamMaskClearanceMin;
+  const UnsignedLength& getSolderPasteClearanceMin() const noexcept {
+    return mSolderPasteClearanceMin;
   }
-  const UnsignedLength& getCreamMaskClearanceMax() const noexcept {
-    return mCreamMaskClearanceMax;
+  const UnsignedLength& getSolderPasteClearanceMax() const noexcept {
+    return mSolderPasteClearanceMax;
   }
 
   // Getters: Pad Annular Ring
@@ -110,11 +110,11 @@ public:
   }
 
   // Setters: Clear Mask
-  void setCreamMaskClearanceRatio(const UnsignedRatio& ratio) noexcept {
-    mCreamMaskClearanceRatio = ratio;
+  void setSolderPasteClearanceRatio(const UnsignedRatio& ratio) noexcept {
+    mSolderPasteClearanceRatio = ratio;
   }
-  void setCreamMaskClearanceBounds(const UnsignedLength& min,
-                                   const UnsignedLength& max);
+  void setSolderPasteClearanceBounds(const UnsignedLength& min,
+                                     const UnsignedLength& max);
 
   // Setters: Pad Annular Ring
   void setPadAnnularRingRatio(const UnsignedRatio& ratio) noexcept {
@@ -143,7 +143,7 @@ public:
   // Helper Methods
   bool doesViaRequireStopMask(const Length& drillDia) const noexcept;
   UnsignedLength calcStopMaskClearance(const Length& padSize) const noexcept;
-  UnsignedLength calcCreamMaskClearance(const Length& padSize) const noexcept;
+  UnsignedLength calcSolderPasteClearance(const Length& padSize) const noexcept;
   UnsignedLength calcPadAnnularRing(const Length& drillDia) const noexcept;
   UnsignedLength calcViaAnnularRing(const Length& drillDia) const noexcept;
 
@@ -157,10 +157,10 @@ private:
   UnsignedLength mStopMaskClearanceMax;
   UnsignedLength mStopMaskMaxViaDrillDiameter;
 
-  // Cream Mask
-  UnsignedRatio mCreamMaskClearanceRatio;
-  UnsignedLength mCreamMaskClearanceMin;
-  UnsignedLength mCreamMaskClearanceMax;
+  // Solder Paste
+  UnsignedRatio mSolderPasteClearanceRatio;
+  UnsignedLength mSolderPasteClearanceMin;
+  UnsignedLength mSolderPasteClearanceMax;
 
   // Pad Annular Ring
   UnsignedRatio mPadAnnularRingRatio;  /// Percentage of the drill diameter

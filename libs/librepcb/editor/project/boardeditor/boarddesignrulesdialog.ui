@@ -27,7 +27,7 @@
    <item row="3" column="0">
     <widget class="QLabel" name="label_8">
      <property name="text">
-      <string>Cream Mask Clearance:</string>
+      <string>Solder Paste Clearance:</string>
      </property>
     </widget>
    </item>
@@ -65,7 +65,7 @@
     <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskClrMax" native="true"/>
    </item>
    <item row="3" column="3">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtCreamMaskClrMax" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtSolderPasteClrMax" native="true"/>
    </item>
    <item row="6" column="0" colspan="4">
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -108,10 +108,10 @@
     <widget class="librepcb::editor::UnsignedLengthEdit" name="edtPadAnnularRingMin" native="true"/>
    </item>
    <item row="3" column="1">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtCreamMaskClrMin" native="true"/>
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtSolderPasteClrMin" native="true"/>
    </item>
    <item row="3" column="2">
-    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtCreamMaskClrRatio" native="true"/>
+    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtSolderPasteClrRatio" native="true"/>
    </item>
    <item row="2" column="1">
     <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskClrMin" native="true"/>
@@ -140,9 +140,9 @@
   <tabstop>edtStopMaskClrMin</tabstop>
   <tabstop>edtStopMaskClrRatio</tabstop>
   <tabstop>edtStopMaskClrMax</tabstop>
-  <tabstop>edtCreamMaskClrMin</tabstop>
-  <tabstop>edtCreamMaskClrRatio</tabstop>
-  <tabstop>edtCreamMaskClrMax</tabstop>
+  <tabstop>edtSolderPasteClrMin</tabstop>
+  <tabstop>edtSolderPasteClrRatio</tabstop>
+  <tabstop>edtSolderPasteClrMax</tabstop>
   <tabstop>edtPadAnnularRingMin</tabstop>
   <tabstop>edtPadAnnularRingRatio</tabstop>
   <tabstop>edtPadAnnularRingMax</tabstop>

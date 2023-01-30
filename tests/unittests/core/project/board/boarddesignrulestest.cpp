@@ -47,9 +47,9 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
       " (stopmask_clearance_min 1.1)\n"
       " (stopmask_clearance_max 2.1)\n"
       " (stopmask_max_via_drill_diameter 0.2)\n"
-      " (creammask_clearance_ratio 0.3)\n"
-      " (creammask_clearance_min 1.3)\n"
-      " (creammask_clearance_max 2.3)\n"
+      " (solderpaste_clearance_ratio 0.3)\n"
+      " (solderpaste_clearance_min 1.3)\n"
+      " (solderpaste_clearance_max 2.3)\n"
       " (pad_annular_ring_ratio 0.4)\n"
       " (pad_annular_ring_min 1.4)\n"
       " (pad_annular_ring_max 2.4)\n"
@@ -63,9 +63,9 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
   EXPECT_EQ(UnsignedLength(1100000), obj.getStopMaskClearanceMin());
   EXPECT_EQ(UnsignedLength(2100000), obj.getStopMaskClearanceMax());
   EXPECT_EQ(UnsignedLength(200000), obj.getStopMaskMaxViaDiameter());
-  EXPECT_EQ(UnsignedRatio(Ratio(300000)), obj.getCreamMaskClearanceRatio());
-  EXPECT_EQ(UnsignedLength(1300000), obj.getCreamMaskClearanceMin());
-  EXPECT_EQ(UnsignedLength(2300000), obj.getCreamMaskClearanceMax());
+  EXPECT_EQ(UnsignedRatio(Ratio(300000)), obj.getSolderPasteClearanceRatio());
+  EXPECT_EQ(UnsignedLength(1300000), obj.getSolderPasteClearanceMin());
+  EXPECT_EQ(UnsignedLength(2300000), obj.getSolderPasteClearanceMax());
   EXPECT_EQ(UnsignedRatio(Ratio(400000)), obj.getPadAnnularRingRatio());
   EXPECT_EQ(UnsignedLength(1400000), obj.getPadAnnularRingMin());
   EXPECT_EQ(UnsignedLength(2400000), obj.getPadAnnularRingMax());
@@ -79,8 +79,8 @@ TEST_F(BoardDesignRulesTest, testSerializeAndDeserialize) {
   obj1.setStopMaskClearanceRatio(UnsignedRatio(Ratio(11)));
   obj1.setStopMaskClearanceBounds(UnsignedLength(22), UnsignedLength(33));
   obj1.setStopMaskMaxViaDiameter(UnsignedLength(44));
-  obj1.setCreamMaskClearanceRatio(UnsignedRatio(Ratio(55)));
-  obj1.setCreamMaskClearanceBounds(UnsignedLength(66), UnsignedLength(77));
+  obj1.setSolderPasteClearanceRatio(UnsignedRatio(Ratio(55)));
+  obj1.setSolderPasteClearanceBounds(UnsignedLength(66), UnsignedLength(77));
   obj1.setPadAnnularRingRatio(UnsignedRatio(Ratio(88)));
   obj1.setPadAnnularRingBounds(UnsignedLength(99), UnsignedLength(111));
   obj1.setViaAnnularRingRatio(UnsignedRatio(Ratio(222)));

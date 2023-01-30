@@ -734,7 +734,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
     height += radius * 2;
   } else if (isOnSolderPasteTop || isOnSolderPasteBottom) {
     Length size = qMin(width, height);
-    Length clearance = -mBoard.getDesignRules().calcCreamMaskClearance(size);
+    Length clearance = -mBoard.getDesignRules().calcSolderPasteClearance(size);
     width += clearance * 2;
     height += clearance * 2;
     if (clearance > 0) {

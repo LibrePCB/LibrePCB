@@ -41,10 +41,10 @@ BoardDesignRules::BoardDesignRules() noexcept
     mStopMaskClearanceMin(100000),  // 0.1mm
     mStopMaskClearanceMax(100000),  // 0.1mm
     mStopMaskMaxViaDrillDiameter(500000),  // 0.5mm
-    // cream mask
-    mCreamMaskClearanceRatio(Ratio::percent100() / 10),  // 10%
-    mCreamMaskClearanceMin(0),  // 0.0mm
-    mCreamMaskClearanceMax(1000000),  // 1.0mm
+    // solder paste
+    mSolderPasteClearanceRatio(Ratio::percent100() / 10),  // 10%
+    mSolderPasteClearanceMin(0),  // 0.0mm
+    mSolderPasteClearanceMax(1000000),  // 1.0mm
     // pad annular ring
     mPadAnnularRingRatio(Ratio::percent100() / 4),  // 25%
     mPadAnnularRingMin(250000),  // 0.25mm
@@ -71,13 +71,13 @@ BoardDesignRules::BoardDesignRules(const SExpression& node)
         node.getChild("stopmask_clearance_max/@0"))),
     mStopMaskMaxViaDrillDiameter(deserialize<UnsignedLength>(
         node.getChild("stopmask_max_via_drill_diameter/@0"))),
-    // cream mask
-    mCreamMaskClearanceRatio(deserialize<UnsignedRatio>(
-        node.getChild("creammask_clearance_ratio/@0"))),
-    mCreamMaskClearanceMin(deserialize<UnsignedLength>(
-        node.getChild("creammask_clearance_min/@0"))),
-    mCreamMaskClearanceMax(deserialize<UnsignedLength>(
-        node.getChild("creammask_clearance_max/@0"))),
+    // solder paste
+    mSolderPasteClearanceRatio(deserialize<UnsignedRatio>(
+        node.getChild("solderpaste_clearance_ratio/@0"))),
+    mSolderPasteClearanceMin(deserialize<UnsignedLength>(
+        node.getChild("solderpaste_clearance_min/@0"))),
+    mSolderPasteClearanceMax(deserialize<UnsignedLength>(
+        node.getChild("solderpaste_clearance_max/@0"))),
     // pad annular ring
     mPadAnnularRingRatio(
         deserialize<UnsignedRatio>(node.getChild("pad_annular_ring_ratio/@0"))),
@@ -95,7 +95,8 @@ BoardDesignRules::BoardDesignRules(const SExpression& node)
   // force validating properties, throw exception on error
   try {
     setStopMaskClearanceBounds(mStopMaskClearanceMin, mStopMaskClearanceMax);
-    setCreamMaskClearanceBounds(mCreamMaskClearanceMin, mCreamMaskClearanceMax);
+    setSolderPasteClearanceBounds(mSolderPasteClearanceMin,
+                                  mSolderPasteClearanceMax);
     setPadAnnularRingBounds(mPadAnnularRingMin, mPadAnnularRingMax);
     setViaAnnularRingBounds(mViaAnnularRingMin, mViaAnnularRingMax);
   } catch (const Exception& e) {
@@ -122,14 +123,14 @@ void BoardDesignRules::setStopMaskClearanceBounds(const UnsignedLength& min,
   }
 }
 
-void BoardDesignRules::setCreamMaskClearanceBounds(const UnsignedLength& min,
-                                                   const UnsignedLength& max) {
+void BoardDesignRules::setSolderPasteClearanceBounds(
+    const UnsignedLength& min, const UnsignedLength& max) {
   if (max >= min) {
-    mCreamMaskClearanceMin = min;
-    mCreamMaskClearanceMax = max;
+    mSolderPasteClearanceMin = min;
+    mSolderPasteClearanceMax = max;
   } else {
     throw RuntimeError(__FILE__, __LINE__,
-                       tr("Cream mask clearance: MAX must be >= MIN"));
+                       tr("Solder paste clearance: MAX must be >= MIN"));
   }
 }
 
@@ -174,13 +175,13 @@ void BoardDesignRules::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("stopmask_max_via_drill_diameter",
                    mStopMaskMaxViaDrillDiameter);
-  // cream mask
+  // solder paste
   root.ensureLineBreak();
-  root.appendChild("creammask_clearance_ratio", mCreamMaskClearanceRatio);
+  root.appendChild("solderpaste_clearance_ratio", mSolderPasteClearanceRatio);
   root.ensureLineBreak();
-  root.appendChild("creammask_clearance_min", mCreamMaskClearanceMin);
+  root.appendChild("solderpaste_clearance_min", mSolderPasteClearanceMin);
   root.ensureLineBreak();
-  root.appendChild("creammask_clearance_max", mCreamMaskClearanceMax);
+  root.appendChild("solderpaste_clearance_max", mSolderPasteClearanceMax);
   // pad annular ring
   root.ensureLineBreak();
   root.appendChild("pad_annular_ring_ratio", mPadAnnularRingRatio);
@@ -215,12 +216,12 @@ UnsignedLength BoardDesignRules::calcStopMaskClearance(
              *mStopMaskClearanceMax));
 }
 
-UnsignedLength BoardDesignRules::calcCreamMaskClearance(
+UnsignedLength BoardDesignRules::calcSolderPasteClearance(
     const Length& padSize) const noexcept {
   return UnsignedLength(
-      qBound(*mCreamMaskClearanceMin,
-             padSize.scaled(mCreamMaskClearanceRatio->toNormalized()),
-             *mCreamMaskClearanceMax));
+      qBound(*mSolderPasteClearanceMin,
+             padSize.scaled(mSolderPasteClearanceRatio->toNormalized()),
+             *mSolderPasteClearanceMax));
 }
 
 UnsignedLength BoardDesignRules::calcPadAnnularRing(
@@ -250,10 +251,10 @@ BoardDesignRules& BoardDesignRules::operator=(
   mStopMaskClearanceMin = rhs.mStopMaskClearanceMin;
   mStopMaskClearanceMax = rhs.mStopMaskClearanceMax;
   mStopMaskMaxViaDrillDiameter = rhs.mStopMaskMaxViaDrillDiameter;
-  // cream mask
-  mCreamMaskClearanceRatio = rhs.mCreamMaskClearanceRatio;
-  mCreamMaskClearanceMin = rhs.mCreamMaskClearanceMin;
-  mCreamMaskClearanceMax = rhs.mCreamMaskClearanceMax;
+  // solder paste
+  mSolderPasteClearanceRatio = rhs.mSolderPasteClearanceRatio;
+  mSolderPasteClearanceMin = rhs.mSolderPasteClearanceMin;
+  mSolderPasteClearanceMax = rhs.mSolderPasteClearanceMax;
   // pad annular ring
   mPadAnnularRingRatio = rhs.mPadAnnularRingRatio;
   mPadAnnularRingMin = rhs.mPadAnnularRingMin;
