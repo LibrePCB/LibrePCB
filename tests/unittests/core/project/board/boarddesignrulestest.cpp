@@ -43,8 +43,6 @@ class BoardDesignRulesTest : public ::testing::Test {};
 TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
   SExpression sexpr = SExpression::parse(
       "(design_rules\n"
-      " (name \"Foo Bar\")\n"
-      " (description \"Hello World\")\n"
       " (stopmask_clearance_ratio 0.1)\n"
       " (stopmask_clearance_min 1.1)\n"
       " (stopmask_clearance_max 2.1)\n"
@@ -61,8 +59,6 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
       ")",
       FilePath());
   BoardDesignRules obj(sexpr);
-  EXPECT_EQ("Foo Bar", obj.getName());
-  EXPECT_EQ("Hello World", obj.getDescription());
   EXPECT_EQ(UnsignedRatio(Ratio(100000)), obj.getStopMaskClearanceRatio());
   EXPECT_EQ(UnsignedLength(1100000), obj.getStopMaskClearanceMin());
   EXPECT_EQ(UnsignedLength(2100000), obj.getStopMaskClearanceMax());
@@ -80,8 +76,6 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
 
 TEST_F(BoardDesignRulesTest, testSerializeAndDeserialize) {
   BoardDesignRules obj1;
-  obj1.setName(ElementName("foo bar"));
-  obj1.setDescription("Foo Bar");
   obj1.setStopMaskClearanceRatio(UnsignedRatio(Ratio(11)));
   obj1.setStopMaskClearanceBounds(UnsignedLength(22), UnsignedLength(33));
   obj1.setStopMaskMaxViaDiameter(UnsignedLength(44));

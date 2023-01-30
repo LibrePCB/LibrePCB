@@ -410,6 +410,7 @@ void FileFormatMigrationV01::upgradeSchematic(LoadedData& data,
 void FileFormatMigrationV01::upgradeBoard(SExpression& root,
                                           QList<Message>& messages) {
   upgradeGrid(root);
+  upgradeBoardDesignRules(root);
 
   // Fabrication output settings.
   {
@@ -465,6 +466,12 @@ void FileFormatMigrationV01::upgradeBoardUserSettings(SExpression& root) {
       }
     }
   }
+}
+
+void FileFormatMigrationV01::upgradeBoardDesignRules(SExpression& root) {
+  SExpression& node = root.getChild("design_rules");
+  node.removeChild(node.getChild("name"));
+  node.removeChild(node.getChild("description"));
 }
 
 void FileFormatMigrationV01::upgradeGrid(SExpression& node) {

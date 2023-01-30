@@ -6,85 +6,68 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>539</width>
-    <height>396</height>
+    <width>579</width>
+    <height>188</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Board Design Rules</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Name:</string>
-     </property>
-    </widget>
+   <item row="4" column="3">
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringPadsMax" native="true"/>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Description:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Minimum</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Ratio (% of diam.)</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="QLabel" name="label_9">
-     <property name="text">
-      <string>Maximum</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Stop Mask Max. Via Diam.:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
+   <item row="2" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Stop Mask Clearance:</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="label_8">
      <property name="text">
       <string>Cream Mask Clearance:</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="0">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Stop Mask Max. Via Diam.:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Ratio (% of diam.)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
+    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtStopMaskClrRatio" native="true"/>
+   </item>
+   <item row="5" column="2">
+    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRestringViasRatio" native="true"/>
+   </item>
+   <item row="5" column="1">
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringViasMin" native="true"/>
+   </item>
+   <item row="4" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string>Restring THT Pads:</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_10">
-     <property name="text">
-      <string>Restring Vias:</string>
-     </property>
-    </widget>
+   <item row="2" column="3">
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskClrMax" native="true"/>
    </item>
-   <item row="8" column="0" colspan="4">
+   <item row="3" column="3">
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtCreamMaskClrMax" native="true"/>
+   </item>
+   <item row="6" column="0" colspan="4">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -94,54 +77,47 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="3">
-    <widget class="QPlainTextEdit" name="txtDescription">
-     <property name="tabChangesFocus">
-      <bool>true</bool>
+   <item row="1" column="3">
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskMaxViaDia" native="true"/>
+   </item>
+   <item row="0" column="3">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Maximum</string>
      </property>
     </widget>
    </item>
-   <item row="0" column="1" colspan="3">
-    <widget class="QLineEdit" name="edtName"/>
-   </item>
-   <item row="3" column="3">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskMaxViaDia" native="true"/>
-   </item>
-   <item row="4" column="1">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskClrMin" native="true"/>
-   </item>
-   <item row="5" column="1">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtCreamMaskClrMin" native="true"/>
-   </item>
-   <item row="6" column="1">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringPadsMin" native="true"/>
-   </item>
-   <item row="7" column="1">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringViasMin" native="true"/>
-   </item>
-   <item row="4" column="3">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskClrMax" native="true"/>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Restring Vias:</string>
+     </property>
+    </widget>
    </item>
    <item row="5" column="3">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtCreamMaskClrMax" native="true"/>
-   </item>
-   <item row="6" column="3">
-    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringPadsMax" native="true"/>
-   </item>
-   <item row="7" column="3">
     <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringViasMax" native="true"/>
    </item>
-   <item row="4" column="2">
-    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtStopMaskClrRatio" native="true"/>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Minimum</string>
+     </property>
+    </widget>
    </item>
-   <item row="5" column="2">
+   <item row="4" column="1">
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRestringPadsMin" native="true"/>
+   </item>
+   <item row="3" column="1">
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtCreamMaskClrMin" native="true"/>
+   </item>
+   <item row="3" column="2">
     <widget class="librepcb::editor::UnsignedRatioEdit" name="edtCreamMaskClrRatio" native="true"/>
    </item>
-   <item row="6" column="2">
-    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRestringPadsRatio" native="true"/>
+   <item row="2" column="1">
+    <widget class="librepcb::editor::UnsignedLengthEdit" name="edtStopMaskClrMin" native="true"/>
    </item>
-   <item row="7" column="2">
-    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRestringViasRatio" native="true"/>
+   <item row="4" column="2">
+    <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRestringPadsRatio" native="true"/>
    </item>
   </layout>
  </widget>
@@ -160,8 +136,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>edtName</tabstop>
-  <tabstop>txtDescription</tabstop>
   <tabstop>edtStopMaskMaxViaDia</tabstop>
   <tabstop>edtStopMaskClrMin</tabstop>
   <tabstop>edtStopMaskClrRatio</tabstop>

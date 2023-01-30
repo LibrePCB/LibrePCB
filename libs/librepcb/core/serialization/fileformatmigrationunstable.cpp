@@ -98,6 +98,7 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                QList<Message>& messages) {
   Q_UNUSED(root);
   Q_UNUSED(messages);
+  upgradeBoardDesignRules(root);
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

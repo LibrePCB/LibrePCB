@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "boarddesignrules.h"
 
+#include "../../serialization/sexpression.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -34,10 +36,7 @@ namespace librepcb {
  ******************************************************************************/
 
 BoardDesignRules::BoardDesignRules() noexcept
-  :  // general attributes
-    mName(tr("LibrePCB Default Design Rules")),
-    mDescription(),
-    // stop mask
+  :  // stop mask
     mStopMaskClearanceRatio(Ratio::percent0()),  // 0%
     mStopMaskClearanceMin(100000),  // 0.1mm
     mStopMaskClearanceMax(100000),  // 0.1mm
@@ -62,10 +61,7 @@ BoardDesignRules::BoardDesignRules(const BoardDesignRules& other)
 }
 
 BoardDesignRules::BoardDesignRules(const SExpression& node)
-  :  // general attributes
-    mName(deserialize<ElementName>(node.getChild("name/@0"))),
-    mDescription(node.getChild("description/@0").getValue()),
-    // stop mask
+  :  // stop mask
     mStopMaskClearanceRatio(deserialize<UnsignedRatio>(
         node.getChild("stopmask_clearance_ratio/@0"))),
     mStopMaskClearanceMin(deserialize<UnsignedLength>(
@@ -166,13 +162,8 @@ void BoardDesignRules::restoreDefaults() noexcept {
 }
 
 void BoardDesignRules::serialize(SExpression& root) const {
-  // general attributes
-  root.ensureLineBreak();
-  root.appendChild("name", mName);
-  root.ensureLineBreak();
-  root.appendChild("description", mDescription);
-  root.ensureLineBreak();
   // stop mask
+  root.ensureLineBreak();
   root.appendChild("stopmask_clearance_ratio", mStopMaskClearanceRatio);
   root.ensureLineBreak();
   root.appendChild("stopmask_clearance_min", mStopMaskClearanceMin);
@@ -181,15 +172,15 @@ void BoardDesignRules::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("stopmask_max_via_drill_diameter",
                    mStopMaskMaxViaDrillDiameter);
-  root.ensureLineBreak();
   // cream mask
+  root.ensureLineBreak();
   root.appendChild("creammask_clearance_ratio", mCreamMaskClearanceRatio);
   root.ensureLineBreak();
   root.appendChild("creammask_clearance_min", mCreamMaskClearanceMin);
   root.ensureLineBreak();
   root.appendChild("creammask_clearance_max", mCreamMaskClearanceMax);
-  root.ensureLineBreak();
   // restring
+  root.ensureLineBreak();
   root.appendChild("restring_pad_ratio", mRestringPadRatio);
   root.ensureLineBreak();
   root.appendChild("restring_pad_min", mRestringPadMin);
@@ -249,9 +240,6 @@ UnsignedLength BoardDesignRules::calcViaRestring(const Length& drillDia) const
 
 BoardDesignRules& BoardDesignRules::operator=(
     const BoardDesignRules& rhs) noexcept {
-  // general attributes
-  mName = rhs.mName;
-  mDescription = rhs.mDescription;
   // stop mask
   mStopMaskClearanceRatio = rhs.mStopMaskClearanceRatio;
   mStopMaskClearanceMin = rhs.mStopMaskClearanceMin;

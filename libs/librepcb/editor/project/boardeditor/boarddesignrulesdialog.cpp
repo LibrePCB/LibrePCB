@@ -75,9 +75,6 @@ BoardDesignRulesDialog::BoardDesignRulesDialog(const BoardDesignRules& rules,
                                      settingsPrefix % "/restring_vias_max");
 
   updateWidgets();
-
-  // set focus to name so the user can immediately start typing to change it
-  mUi->edtName->setFocus();
 }
 
 BoardDesignRulesDialog::~BoardDesignRulesDialog() {
@@ -113,9 +110,6 @@ void BoardDesignRulesDialog::on_buttonBox_clicked(QAbstractButton* button) {
  ******************************************************************************/
 
 void BoardDesignRulesDialog::updateWidgets() noexcept {
-  // general attributes
-  mUi->edtName->setText(*mDesignRules.getName());
-  mUi->txtDescription->setPlainText(mDesignRules.getDescription());
   // stop mask
   mUi->edtStopMaskClrRatio->setValue(mDesignRules.getStopMaskClearanceRatio());
   mUi->edtStopMaskClrMin->setValue(mDesignRules.getStopMaskClearanceMin());
@@ -137,9 +131,6 @@ void BoardDesignRulesDialog::updateWidgets() noexcept {
 
 void BoardDesignRulesDialog::applyRules() noexcept {
   try {
-    // general attributes
-    mDesignRules.setName(ElementName(mUi->edtName->text()));  // can throw
-    mDesignRules.setDescription(mUi->txtDescription->toPlainText());
     // stop mask
     mDesignRules.setStopMaskClearanceRatio(
         mUi->edtStopMaskClrRatio->getValue());

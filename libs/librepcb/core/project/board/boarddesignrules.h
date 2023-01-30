@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../types/elementname.h"
 #include "../../types/length.h"
 #include "../../types/ratio.h"
 
@@ -33,6 +32,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class SExpression;
 
 /*******************************************************************************
  *  Class BoardDesignRules
@@ -50,10 +51,6 @@ public:
   BoardDesignRules(const BoardDesignRules& other);
   explicit BoardDesignRules(const SExpression& node);
   ~BoardDesignRules() noexcept;
-
-  // Getters : General Attributes
-  const ElementName& getName() const noexcept { return mName; }
-  const QString& getDescription() const noexcept { return mDescription; }
 
   // Getters: Stop Mask
   const UnsignedRatio& getStopMaskClearanceRatio() const noexcept {
@@ -99,10 +96,6 @@ public:
   const UnsignedLength& getRestringViaMax() const noexcept {
     return mRestringViaMax;
   }
-
-  // Setters: General Attributes
-  void setName(const ElementName& name) noexcept { mName = name; }
-  void setDescription(const QString& desc) noexcept { mDescription = desc; }
 
   // Setters: Stop Mask
   void setStopMaskClearanceRatio(const UnsignedRatio& ratio) noexcept {
@@ -154,10 +147,6 @@ public:
   BoardDesignRules& operator=(const BoardDesignRules& rhs) noexcept;
 
 private:
-  // General Attributes
-  ElementName mName;
-  QString mDescription;
-
   // Stop Mask
   UnsignedRatio mStopMaskClearanceRatio;
   UnsignedLength mStopMaskClearanceMin;

@@ -115,6 +115,7 @@ protected:  // Methods
   virtual void upgradeSchematic(LoadedData& data, SExpression& root);
   virtual void upgradeBoard(SExpression& root, QList<Message>& messages);
   virtual void upgradeBoardUserSettings(SExpression& root);
+  virtual void upgradeBoardDesignRules(SExpression& root);
   virtual void upgradeGrid(SExpression& node);
   virtual void upgradeHoles(SExpression& node);
 };
