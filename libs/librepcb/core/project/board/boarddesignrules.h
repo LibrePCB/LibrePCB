@@ -53,6 +53,9 @@ public:
   ~BoardDesignRules() noexcept;
 
   // Getters: Stop Mask
+  const UnsignedLength& getStopMaskMaxViaDiameter() const noexcept {
+    return mStopMaskMaxViaDrillDiameter;
+  }
   const UnsignedRatio& getStopMaskClearanceRatio() const noexcept {
     return mStopMaskClearanceRatio;
   }
@@ -61,9 +64,6 @@ public:
   }
   const UnsignedLength& getStopMaskClearanceMax() const noexcept {
     return mStopMaskClearanceMax;
-  }
-  const UnsignedLength& getStopMaskMaxViaDiameter() const noexcept {
-    return mStopMaskMaxViaDrillDiameter;
   }
 
   // Getters: Solder Paste
@@ -99,36 +99,20 @@ public:
     return mViaAnnularRingMax;
   }
 
-  // Setters: Stop Mask
-  void setStopMaskClearanceRatio(const UnsignedRatio& ratio) noexcept {
-    mStopMaskClearanceRatio = ratio;
-  }
-  void setStopMaskClearanceBounds(const UnsignedLength& min,
-                                  const UnsignedLength& max);
+  // Setters
   void setStopMaskMaxViaDiameter(const UnsignedLength& dia) noexcept {
     mStopMaskMaxViaDrillDiameter = dia;
   }
-
-  // Setters: Clear Mask
-  void setSolderPasteClearanceRatio(const UnsignedRatio& ratio) noexcept {
-    mSolderPasteClearanceRatio = ratio;
-  }
-  void setSolderPasteClearanceBounds(const UnsignedLength& min,
-                                     const UnsignedLength& max);
-
-  // Setters: Pad Annular Ring
-  void setPadAnnularRingRatio(const UnsignedRatio& ratio) noexcept {
-    mPadAnnularRingRatio = ratio;
-  }
-  void setPadAnnularRingBounds(const UnsignedLength& min,
+  void setStopMaskClearance(const UnsignedRatio& ratio,
+                            const UnsignedLength& min,
+                            const UnsignedLength& max);
+  void setSolderPasteClearance(const UnsignedRatio& ratio,
+                               const UnsignedLength& min,
                                const UnsignedLength& max);
-
-  // Setters: Via Annular Ring
-  void setViaAnnularRingRatio(const UnsignedRatio& ratio) noexcept {
-    mViaAnnularRingRatio = ratio;
-  }
-  void setViaAnnularRingBounds(const UnsignedLength& min,
-                               const UnsignedLength& max);
+  void setPadAnnularRing(const UnsignedRatio& ratio, const UnsignedLength& min,
+                         const UnsignedLength& max);
+  void setViaAnnularRing(const UnsignedRatio& ratio, const UnsignedLength& min,
+                         const UnsignedLength& max);
 
   // General Methods
   void restoreDefaults() noexcept;
@@ -152,10 +136,10 @@ public:
 
 private:
   // Stop Mask
+  UnsignedLength mStopMaskMaxViaDrillDiameter;
   UnsignedRatio mStopMaskClearanceRatio;
   UnsignedLength mStopMaskClearanceMin;
   UnsignedLength mStopMaskClearanceMax;
-  UnsignedLength mStopMaskMaxViaDrillDiameter;
 
   // Solder Paste
   UnsignedRatio mSolderPasteClearanceRatio;

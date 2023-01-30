@@ -43,26 +43,18 @@ class BoardDesignRulesTest : public ::testing::Test {};
 TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
   SExpression sexpr = SExpression::parse(
       "(design_rules\n"
-      " (stopmask_clearance_ratio 0.1)\n"
-      " (stopmask_clearance_min 1.1)\n"
-      " (stopmask_clearance_max 2.1)\n"
       " (stopmask_max_via_drill_diameter 0.2)\n"
-      " (solderpaste_clearance_ratio 0.3)\n"
-      " (solderpaste_clearance_min 1.3)\n"
-      " (solderpaste_clearance_max 2.3)\n"
-      " (pad_annular_ring_ratio 0.4)\n"
-      " (pad_annular_ring_min 1.4)\n"
-      " (pad_annular_ring_max 2.4)\n"
-      " (via_annular_ring_ratio 0.5)\n"
-      " (via_annular_ring_min 1.5)\n"
-      " (via_annular_ring_max 2.5)\n"
+      " (stopmask_clearance (ratio 0.1) (min 1.1) (max 2.1))\n"
+      " (solderpaste_clearance (ratio 0.3) (min 1.3) (max 2.3))\n"
+      " (pad_annular_ring (ratio 0.4) (min 1.4) (max 2.4))\n"
+      " (via_annular_ring (ratio 0.5) (min 1.5) (max 2.5))\n"
       ")",
       FilePath());
   BoardDesignRules obj(sexpr);
+  EXPECT_EQ(UnsignedLength(200000), obj.getStopMaskMaxViaDiameter());
   EXPECT_EQ(UnsignedRatio(Ratio(100000)), obj.getStopMaskClearanceRatio());
   EXPECT_EQ(UnsignedLength(1100000), obj.getStopMaskClearanceMin());
   EXPECT_EQ(UnsignedLength(2100000), obj.getStopMaskClearanceMax());
-  EXPECT_EQ(UnsignedLength(200000), obj.getStopMaskMaxViaDiameter());
   EXPECT_EQ(UnsignedRatio(Ratio(300000)), obj.getSolderPasteClearanceRatio());
   EXPECT_EQ(UnsignedLength(1300000), obj.getSolderPasteClearanceMin());
   EXPECT_EQ(UnsignedLength(2300000), obj.getSolderPasteClearanceMax());
@@ -76,15 +68,15 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
 
 TEST_F(BoardDesignRulesTest, testSerializeAndDeserialize) {
   BoardDesignRules obj1;
-  obj1.setStopMaskClearanceRatio(UnsignedRatio(Ratio(11)));
-  obj1.setStopMaskClearanceBounds(UnsignedLength(22), UnsignedLength(33));
   obj1.setStopMaskMaxViaDiameter(UnsignedLength(44));
-  obj1.setSolderPasteClearanceRatio(UnsignedRatio(Ratio(55)));
-  obj1.setSolderPasteClearanceBounds(UnsignedLength(66), UnsignedLength(77));
-  obj1.setPadAnnularRingRatio(UnsignedRatio(Ratio(88)));
-  obj1.setPadAnnularRingBounds(UnsignedLength(99), UnsignedLength(111));
-  obj1.setViaAnnularRingRatio(UnsignedRatio(Ratio(222)));
-  obj1.setViaAnnularRingBounds(UnsignedLength(333), UnsignedLength(444));
+  obj1.setStopMaskClearance(UnsignedRatio(Ratio(11)), UnsignedLength(22),
+                            UnsignedLength(33));
+  obj1.setSolderPasteClearance(UnsignedRatio(Ratio(55)), UnsignedLength(66),
+                               UnsignedLength(77));
+  obj1.setPadAnnularRing(UnsignedRatio(Ratio(88)), UnsignedLength(99),
+                         UnsignedLength(111));
+  obj1.setViaAnnularRing(UnsignedRatio(Ratio(222)), UnsignedLength(333),
+                         UnsignedLength(444));
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);
 

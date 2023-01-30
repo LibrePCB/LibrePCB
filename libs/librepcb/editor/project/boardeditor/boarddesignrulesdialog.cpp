@@ -134,30 +134,22 @@ void BoardDesignRulesDialog::updateWidgets() noexcept {
 
 void BoardDesignRulesDialog::applyRules() noexcept {
   try {
-    // stop mask
-    mDesignRules.setStopMaskClearanceRatio(
-        mUi->edtStopMaskClrRatio->getValue());
-    mDesignRules.setStopMaskClearanceBounds(
-        mUi->edtStopMaskClrMin->getValue(),
-        mUi->edtStopMaskClrMax->getValue());  // can throw
     mDesignRules.setStopMaskMaxViaDiameter(
         mUi->edtStopMaskMaxViaDia->getValue());
-    // solder paste
-    mDesignRules.setSolderPasteClearanceRatio(
-        mUi->edtSolderPasteClrRatio->getValue());
-    mDesignRules.setSolderPasteClearanceBounds(
+    mDesignRules.setStopMaskClearance(
+        mUi->edtStopMaskClrRatio->getValue(),
+        mUi->edtStopMaskClrMin->getValue(),
+        mUi->edtStopMaskClrMax->getValue());  // can throw
+    mDesignRules.setSolderPasteClearance(
+        mUi->edtSolderPasteClrRatio->getValue(),
         mUi->edtSolderPasteClrMin->getValue(),
         mUi->edtSolderPasteClrMax->getValue());  // can throw
-    // pad annular ring
-    mDesignRules.setPadAnnularRingRatio(
-        mUi->edtPadAnnularRingRatio->getValue());
-    mDesignRules.setPadAnnularRingBounds(
+    mDesignRules.setPadAnnularRing(
+        mUi->edtPadAnnularRingRatio->getValue(),
         mUi->edtPadAnnularRingMin->getValue(),
         mUi->edtPadAnnularRingMax->getValue());  // can throw
-    // via annular ring
-    mDesignRules.setViaAnnularRingRatio(
-        mUi->edtViaAnnularRingRatio->getValue());
-    mDesignRules.setViaAnnularRingBounds(
+    mDesignRules.setViaAnnularRing(
+        mUi->edtViaAnnularRingRatio->getValue(),
         mUi->edtViaAnnularRingMin->getValue(),
         mUi->edtViaAnnularRingMax->getValue());  // can throw
   } catch (const Exception& e) {
