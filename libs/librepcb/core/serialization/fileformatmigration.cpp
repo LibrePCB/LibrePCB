@@ -22,10 +22,12 @@
  ******************************************************************************/
 #include "fileformatmigration.h"
 
+#include "../application.h"
 #include "../exceptions.h"
 #include "../fileio/transactionaldirectory.h"
 #include "../fileio/versionfile.h"
 #include "../types/version.h"
+#include "fileformatmigrationunstable.h"
 #include "fileformatmigrationv01.h"
 
 #include <QtCore>
@@ -75,6 +77,15 @@ QList<std::shared_ptr<FileFormatMigration>> FileFormatMigration::getMigrations(
   if (fileFormat <= Version::fromString("0.1")) {
     migrations.append(std::make_shared<FileFormatMigrationV01>());
   }
+
+  // Allow partially upgrading previous unstable file format releases if the
+  // LIBREPCB_UPGRADE_UNSTABLE environment variable is set to 1.
+  static const bool upgradeUnstable =
+      (qgetenv("LIBREPCB_UPGRADE_UNSTABLE") == "1");
+  if (upgradeUnstable && (fileFormat == qApp->getFileFormatVersion())) {
+    migrations.append(std::make_shared<FileFormatMigrationUnstable>());
+  }
+
   return migrations;
 }
 

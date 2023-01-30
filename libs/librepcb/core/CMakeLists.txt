@@ -430,6 +430,8 @@ add_library(
   project/schematic/schematicselectionquery.h
   serialization/fileformatmigration.cpp
   serialization/fileformatmigration.h
+  serialization/fileformatmigrationunstable.cpp
+  serialization/fileformatmigrationunstable.h
   serialization/fileformatmigrationv01.cpp
   serialization/fileformatmigrationv01.h
   serialization/serializablekeyvaluemap.h

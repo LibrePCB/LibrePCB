@@ -17,18 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_FILEFORMATMIGRATIONV01_H
-#define LIBREPCB_CORE_FILEFORMATMIGRATIONV01_H
+#ifndef LIBREPCB_CORE_FILEFORMATMIGRATIONUNSTABLE_H
+#define LIBREPCB_CORE_FILEFORMATMIGRATIONUNSTABLE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../graphics/graphicslayername.h"
-#include "../types/alignment.h"
-#include "../types/angle.h"
-#include "../types/point.h"
-#include "../types/uuid.h"
-#include "fileformatmigration.h"
+#include "fileformatmigrationv01.h"
 
 #include <QtCore>
 
@@ -40,61 +35,27 @@ namespace librepcb {
 class SExpression;
 
 /*******************************************************************************
- *  Class FileFormatMigrationV01
+ *  Class FileFormatMigrationUnstable
  ******************************************************************************/
 
 /**
- * @brief Migration to upgrade file format v0.1
+ * @brief Migration to upgrade a previous unstable file format
+ *
+ * This class overrides the stable file format migration class to perform
+ * only a partial upgrade. This allows to upgrade file from the previous
+ * unstable file format (master branch) to the latest unstable file format
+ * (feature branch). This upgrade is only performed when the environment
+ * variable `LIBREPCB_UPGRADE_UNSTABLE=1` is set.
  */
-class FileFormatMigrationV01 : public FileFormatMigration {
+class FileFormatMigrationUnstable final : public FileFormatMigrationV01 {
   Q_OBJECT
-
-protected:
-  struct Text {
-    Uuid uuid;
-    GraphicsLayerName layerName;
-    QString text;
-    Point position;
-    Angle rotation;
-    PositiveLength height;
-    Alignment align;
-  };
-
-  struct Symbol {
-    QList<Text> texts;
-  };
-
-  struct Gate {
-    Uuid uuid;
-    Uuid symbolUuid;
-  };
-
-  struct ComponentSymbolVariant {
-    Uuid uuid;
-    QList<Gate> gates;
-  };
-
-  struct Component {
-    QList<ComponentSymbolVariant> symbolVariants;
-    ;
-  };
-
-  struct ComponentInstance {
-    Uuid libCmpUuid;
-    Uuid libSymbVarUuid;
-  };
-
-  struct LoadedData {
-    QHash<Uuid, Symbol> symbols;
-    QHash<Uuid, Component> components;
-    QMap<Uuid, ComponentInstance> componentInstances;
-  };
 
 public:
   // Constructors / Destructor
-  explicit FileFormatMigrationV01(QObject* parent = nullptr) noexcept;
-  FileFormatMigrationV01(const FileFormatMigrationV01& other) = delete;
-  virtual ~FileFormatMigrationV01() noexcept;
+  explicit FileFormatMigrationUnstable(QObject* parent = nullptr) noexcept;
+  FileFormatMigrationUnstable(const FileFormatMigrationUnstable& other) =
+      delete;
+  ~FileFormatMigrationUnstable() noexcept;
 
   // General Methods
   virtual void upgradeComponentCategory(TransactionalDirectory& dir) override;
@@ -104,19 +65,17 @@ public:
   virtual void upgradeComponent(TransactionalDirectory& dir) override;
   virtual void upgradeDevice(TransactionalDirectory& dir) override;
   virtual void upgradeLibrary(TransactionalDirectory& dir) override;
-  virtual void upgradeProject(TransactionalDirectory& dir,
-                              QList<Message>& messages) override;
   virtual void upgradeWorkspaceData(TransactionalDirectory& dir) override;
 
   // Operator Overloadings
-  FileFormatMigrationV01& operator=(const FileFormatMigrationV01& rhs) = delete;
+  FileFormatMigrationUnstable& operator=(
+      const FileFormatMigrationUnstable& rhs) = delete;
 
-protected:  // Methods
-  virtual void upgradeSchematic(LoadedData& data, SExpression& root);
-  virtual void upgradeBoard(SExpression& root, QList<Message>& messages);
-  virtual void upgradeBoardUserSettings(SExpression& root);
-  virtual void upgradeGrid(SExpression& node);
-  virtual void upgradeHoles(SExpression& node);
+private:  // Methods
+  virtual void upgradeSchematic(LoadedData& data, SExpression& root) override;
+  virtual void upgradeBoard(SExpression& root,
+                            QList<Message>& messages) override;
+  virtual void upgradeBoardUserSettings(SExpression& root) override;
 };
 
 /*******************************************************************************

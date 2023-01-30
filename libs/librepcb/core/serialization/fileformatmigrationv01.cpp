@@ -161,6 +161,10 @@ void FileFormatMigrationV01::upgradeLibrary(TransactionalDirectory& dir) {
 
 void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
                                             QList<Message>& messages) {
+  // ATTENTION: Do not actually perform any upgrade in this method! Instead,
+  // just call virtual protected methods which do the upgrade. This allows
+  // FileFormatMigrationUnstable to override them with partial upgrades.
+
   LoadedData data;
 
   // Version File.
@@ -266,96 +270,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     const QString fp = "schematics/" % dirName % "/schematic.lp";
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-
-      upgradeGrid(root);
-
-      // Symbols.
-      for (SExpression* symNode : root.getChildren("symbol")) {
-        const Uuid cmpUuid =
-            deserialize<Uuid>(symNode->getChild("component/@0"));
-        const Uuid gateUuid =
-            deserialize<Uuid>(symNode->getChild("lib_gate/@0"));
-        auto cmpInstIt = data.componentInstances.find(cmpUuid);
-        if (cmpInstIt == data.componentInstances.end()) {
-          throw RuntimeError(__FILE__, __LINE__,
-                             QString("Failed to find component instance '%1'.")
-                                 .arg(cmpUuid.toStr()));
-        }
-        auto libCmpIt = data.components.find(cmpInstIt->libCmpUuid);
-        if (libCmpIt == data.components.end()) {
-          throw RuntimeError(__FILE__, __LINE__,
-                             QString("Failed to find component '%1'.")
-                                 .arg(cmpInstIt->libCmpUuid.toStr()));
-        }
-        const ComponentSymbolVariant* cmpSymbVar = nullptr;
-        foreach (const auto& var, libCmpIt->symbolVariants) {
-          if (var.uuid == cmpInstIt->libSymbVarUuid) {
-            cmpSymbVar = &var;
-            break;
-          }
-        }
-        if (!cmpSymbVar) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString("Failed to find component symbol variant '%1'.")
-                  .arg(cmpInstIt->libSymbVarUuid.toStr()));
-        }
-        const Gate* gate = nullptr;
-        foreach (const auto& g, cmpSymbVar->gates) {
-          if (g.uuid == gateUuid) {
-            gate = &g;
-            break;
-          }
-        }
-        if (!gate) {
-          throw RuntimeError(
-              __FILE__, __LINE__,
-              QString("Failed to find gate '%1'.").arg(gateUuid.toStr()));
-        }
-        auto symIt = data.symbols.find(gate->symbolUuid);
-        if (symIt == data.symbols.end()) {
-          throw RuntimeError(__FILE__, __LINE__,
-                             QString("Failed to find symbol '%1'.")
-                                 .arg(gate->symbolUuid.toStr()));
-        }
-        const Point symPos(symNode->getChild("position"));
-        const Angle symRot =
-            deserialize<Angle>(symNode->getChild("rotation/@0"));
-        const bool symMirror =
-            deserialize<bool>(symNode->getChild("mirror/@0"));
-        foreach (const Text& text, symIt->texts) {
-          Point position = text.position.rotated(symRot);
-          if (symMirror) {
-            position.mirror(Qt::Horizontal);
-          }
-          position += symPos;
-          Angle rotation = symMirror
-              ? (Angle::deg180() - symRot - text.rotation)
-              : (symRot + text.rotation);
-          Alignment align = text.align;
-          if (symMirror) {
-            align.mirrorV();
-          }
-
-          SExpression& textNode = symNode->appendList("text");
-          textNode.appendChild(text.uuid);
-          textNode.appendChild("layer", text.layerName);
-          textNode.appendChild("value", text.text);
-          align.serialize(textNode.appendList("align"));
-          textNode.appendChild("height", text.height);
-          position.serialize(textNode.appendList("position"));
-          textNode.appendChild("rotation", rotation);
-        }
-      }
-
-      // Net segments.
-      for (SExpression* segNode : root.getChildren("netsegment")) {
-        // Net labels.
-        for (SExpression* lblNode : segNode->getChildren("label")) {
-          lblNode->appendChild("mirror", false);
-        }
-      }
-
+      upgradeSchematic(data, root);
       dir.write(fp, root.toByteArray());
     }
   }
@@ -366,53 +281,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     QString fp = "boards/" % dirName % "/board.lp";
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-
-      upgradeGrid(root);
-
-      // Fabrication output settings.
-      {
-        SExpression& node = root.getChild("fabrication_output_settings");
-        SExpression& drillNode = node.getChild("drills");
-        drillNode.appendChild("g85_slots", false);
-      }
-
-      // Net segments.
-      int nonRoundViaCount = 0;
-      for (SExpression* segNode : root.getChildren("netsegment")) {
-        // Vias.
-        for (SExpression* viaNode : segNode->getChildren("via")) {
-          SExpression& shapeNode = viaNode->getChild("shape");
-          if (shapeNode.getChild("@0").getValue() != "round") {
-            ++nonRoundViaCount;
-          }
-          viaNode->removeChild(shapeNode);
-        }
-      }
-      if (nonRoundViaCount > 0) {
-        messages.append(
-            buildMessage(Message::Severity::Warning,
-                         tr("Non-circular via shapes are no longer supported, "
-                            "all vias were changed to circular now."),
-                         nonRoundViaCount));
-      }
-
-      // Holes.
-      upgradeHoles(root);
-
-      // Planes.
-      int planeCount = 0;
-      for (SExpression* planeNode : root.getChildren("plane")) {
-        Q_UNUSED(planeNode);
-        ++planeCount;
-      }
-      if (planeCount > 0) {
-        messages.append(buildMessage(
-            Message::Severity::Note,
-            tr("Plane area calculations have been adjusted, manual review and "
-               "running the DRC is recommended."),
-            planeCount));
-      }
-
+      upgradeBoard(root, messages);
       dir.write(fp, root.toByteArray());
     }
 
@@ -420,16 +289,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     fp = "boards/" % dirName % "/settings.user.lp";
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-
-      // Layers.
-      foreach (SExpression* node, root.getChildren("layer")) {
-        for (const auto tagName : {"color", "color_hl"}) {
-          if (SExpression* child = node->tryGetChild(tagName)) {
-            node->removeChild(*child);
-          }
-        }
-      }
-
+      upgradeBoardUserSettings(root);
       dir.write(fp, root.toByteArray());
     }
   }
@@ -459,6 +319,153 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void FileFormatMigrationV01::upgradeSchematic(LoadedData& data,
+                                              SExpression& root) {
+  upgradeGrid(root);
+
+  // Symbols.
+  for (SExpression* symNode : root.getChildren("symbol")) {
+    const Uuid cmpUuid = deserialize<Uuid>(symNode->getChild("component/@0"));
+    const Uuid gateUuid = deserialize<Uuid>(symNode->getChild("lib_gate/@0"));
+    auto cmpInstIt = data.componentInstances.find(cmpUuid);
+    if (cmpInstIt == data.componentInstances.end()) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("Failed to find component instance '%1'.")
+                             .arg(cmpUuid.toStr()));
+    }
+    auto libCmpIt = data.components.find(cmpInstIt->libCmpUuid);
+    if (libCmpIt == data.components.end()) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("Failed to find component '%1'.")
+                             .arg(cmpInstIt->libCmpUuid.toStr()));
+    }
+    const ComponentSymbolVariant* cmpSymbVar = nullptr;
+    foreach (const auto& var, libCmpIt->symbolVariants) {
+      if (var.uuid == cmpInstIt->libSymbVarUuid) {
+        cmpSymbVar = &var;
+        break;
+      }
+    }
+    if (!cmpSymbVar) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString("Failed to find component symbol variant '%1'.")
+              .arg(cmpInstIt->libSymbVarUuid.toStr()));
+    }
+    const Gate* gate = nullptr;
+    foreach (const auto& g, cmpSymbVar->gates) {
+      if (g.uuid == gateUuid) {
+        gate = &g;
+        break;
+      }
+    }
+    if (!gate) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString("Failed to find gate '%1'.").arg(gateUuid.toStr()));
+    }
+    auto symIt = data.symbols.find(gate->symbolUuid);
+    if (symIt == data.symbols.end()) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          QString("Failed to find symbol '%1'.").arg(gate->symbolUuid.toStr()));
+    }
+    const Point symPos(symNode->getChild("position"));
+    const Angle symRot = deserialize<Angle>(symNode->getChild("rotation/@0"));
+    const bool symMirror = deserialize<bool>(symNode->getChild("mirror/@0"));
+    foreach (const Text& text, symIt->texts) {
+      Point position = text.position.rotated(symRot);
+      if (symMirror) {
+        position.mirror(Qt::Horizontal);
+      }
+      position += symPos;
+      Angle rotation = symMirror ? (Angle::deg180() - symRot - text.rotation)
+                                 : (symRot + text.rotation);
+      Alignment align = text.align;
+      if (symMirror) {
+        align.mirrorV();
+      }
+
+      SExpression& textNode = symNode->appendList("text");
+      textNode.appendChild(text.uuid);
+      textNode.appendChild("layer", text.layerName);
+      textNode.appendChild("value", text.text);
+      align.serialize(textNode.appendList("align"));
+      textNode.appendChild("height", text.height);
+      position.serialize(textNode.appendList("position"));
+      textNode.appendChild("rotation", rotation);
+    }
+  }
+
+  // Net segments.
+  for (SExpression* segNode : root.getChildren("netsegment")) {
+    // Net labels.
+    for (SExpression* lblNode : segNode->getChildren("label")) {
+      lblNode->appendChild("mirror", false);
+    }
+  }
+}
+
+void FileFormatMigrationV01::upgradeBoard(SExpression& root,
+                                          QList<Message>& messages) {
+  upgradeGrid(root);
+
+  // Fabrication output settings.
+  {
+    SExpression& node = root.getChild("fabrication_output_settings");
+    SExpression& drillNode = node.getChild("drills");
+    drillNode.appendChild("g85_slots", false);
+  }
+
+  // Net segments.
+  int nonRoundViaCount = 0;
+  for (SExpression* segNode : root.getChildren("netsegment")) {
+    // Vias.
+    for (SExpression* viaNode : segNode->getChildren("via")) {
+      SExpression& shapeNode = viaNode->getChild("shape");
+      if (shapeNode.getChild("@0").getValue() != "round") {
+        ++nonRoundViaCount;
+      }
+      viaNode->removeChild(shapeNode);
+    }
+  }
+  if (nonRoundViaCount > 0) {
+    messages.append(
+        buildMessage(Message::Severity::Warning,
+                     tr("Non-circular via shapes are no longer supported, "
+                        "all vias were changed to circular now."),
+                     nonRoundViaCount));
+  }
+
+  // Holes.
+  upgradeHoles(root);
+
+  // Planes.
+  int planeCount = 0;
+  for (SExpression* planeNode : root.getChildren("plane")) {
+    Q_UNUSED(planeNode);
+    ++planeCount;
+  }
+  if (planeCount > 0) {
+    messages.append(buildMessage(
+        Message::Severity::Note,
+        tr("Plane area calculations have been adjusted, manual review and "
+           "running the DRC is recommended."),
+        planeCount));
+  }
+}
+
+void FileFormatMigrationV01::upgradeBoardUserSettings(SExpression& root) {
+  // Layers.
+  foreach (SExpression* node, root.getChildren("layer")) {
+    for (const auto tagName : {"color", "color_hl"}) {
+      if (SExpression* child = node->tryGetChild(tagName)) {
+        node->removeChild(*child);
+      }
+    }
+  }
+}
 
 void FileFormatMigrationV01::upgradeGrid(SExpression& node) {
   SExpression& gridNode = node.getChild("grid");
