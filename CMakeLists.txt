@@ -5,6 +5,13 @@ if(${CMAKE_VERSION} VERSION_LESS 3.12)
   cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif()
 
+# Support older macOS versions. Needs to be set before calling project()!
+# https://github.com/LibrePCB/LibrePCB/issues/1091
+set(CMAKE_OSX_DEPLOYMENT_TARGET
+    "10.14"
+    CACHE STRING "Minimum OS X deployment version"
+)
+
 # WARNING:
 # Read the release workflow documentation (at https://developers.librepcb.org)
 # before making changes to the version numbers!
