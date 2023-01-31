@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../types/elementname.h"
 #include "../../types/length.h"
 #include "../../types/ratio.h"
 
@@ -33,6 +32,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class SExpression;
 
 /*******************************************************************************
  *  Class BoardDesignRules
@@ -51,11 +52,10 @@ public:
   explicit BoardDesignRules(const SExpression& node);
   ~BoardDesignRules() noexcept;
 
-  // Getters : General Attributes
-  const ElementName& getName() const noexcept { return mName; }
-  const QString& getDescription() const noexcept { return mDescription; }
-
   // Getters: Stop Mask
+  const UnsignedLength& getStopMaskMaxViaDiameter() const noexcept {
+    return mStopMaskMaxViaDrillDiameter;
+  }
   const UnsignedRatio& getStopMaskClearanceRatio() const noexcept {
     return mStopMaskClearanceRatio;
   }
@@ -65,73 +65,54 @@ public:
   const UnsignedLength& getStopMaskClearanceMax() const noexcept {
     return mStopMaskClearanceMax;
   }
-  const UnsignedLength& getStopMaskMaxViaDiameter() const noexcept {
-    return mStopMaskMaxViaDrillDiameter;
+
+  // Getters: Solder Paste
+  const UnsignedRatio& getSolderPasteClearanceRatio() const noexcept {
+    return mSolderPasteClearanceRatio;
+  }
+  const UnsignedLength& getSolderPasteClearanceMin() const noexcept {
+    return mSolderPasteClearanceMin;
+  }
+  const UnsignedLength& getSolderPasteClearanceMax() const noexcept {
+    return mSolderPasteClearanceMax;
   }
 
-  // Getters: Cream Mask
-  const UnsignedRatio& getCreamMaskClearanceRatio() const noexcept {
-    return mCreamMaskClearanceRatio;
+  // Getters: Pad Annular Ring
+  const UnsignedRatio& getPadAnnularRingRatio() const noexcept {
+    return mPadAnnularRingRatio;
   }
-  const UnsignedLength& getCreamMaskClearanceMin() const noexcept {
-    return mCreamMaskClearanceMin;
+  const UnsignedLength& getPadAnnularRingMin() const noexcept {
+    return mPadAnnularRingMin;
   }
-  const UnsignedLength& getCreamMaskClearanceMax() const noexcept {
-    return mCreamMaskClearanceMax;
-  }
-
-  // Getters: Restring
-  const UnsignedRatio& getRestringPadRatio() const noexcept {
-    return mRestringPadRatio;
-  }
-  const UnsignedLength& getRestringPadMin() const noexcept {
-    return mRestringPadMin;
-  }
-  const UnsignedLength& getRestringPadMax() const noexcept {
-    return mRestringPadMax;
-  }
-  const UnsignedRatio& getRestringViaRatio() const noexcept {
-    return mRestringViaRatio;
-  }
-  const UnsignedLength& getRestringViaMin() const noexcept {
-    return mRestringViaMin;
-  }
-  const UnsignedLength& getRestringViaMax() const noexcept {
-    return mRestringViaMax;
+  const UnsignedLength& getPadAnnularRingMax() const noexcept {
+    return mPadAnnularRingMax;
   }
 
-  // Setters: General Attributes
-  void setName(const ElementName& name) noexcept { mName = name; }
-  void setDescription(const QString& desc) noexcept { mDescription = desc; }
-
-  // Setters: Stop Mask
-  void setStopMaskClearanceRatio(const UnsignedRatio& ratio) noexcept {
-    mStopMaskClearanceRatio = ratio;
+  // Getters: Via Annular Ring
+  const UnsignedRatio& getViaAnnularRingRatio() const noexcept {
+    return mViaAnnularRingRatio;
   }
-  void setStopMaskClearanceBounds(const UnsignedLength& min,
-                                  const UnsignedLength& max);
+  const UnsignedLength& getViaAnnularRingMin() const noexcept {
+    return mViaAnnularRingMin;
+  }
+  const UnsignedLength& getViaAnnularRingMax() const noexcept {
+    return mViaAnnularRingMax;
+  }
+
+  // Setters
   void setStopMaskMaxViaDiameter(const UnsignedLength& dia) noexcept {
     mStopMaskMaxViaDrillDiameter = dia;
   }
-
-  // Setters: Clear Mask
-  void setCreamMaskClearanceRatio(const UnsignedRatio& ratio) noexcept {
-    mCreamMaskClearanceRatio = ratio;
-  }
-  void setCreamMaskClearanceBounds(const UnsignedLength& min,
-                                   const UnsignedLength& max);
-
-  // Setters: Restring
-  void setRestringPadRatio(const UnsignedRatio& ratio) noexcept {
-    mRestringPadRatio = ratio;
-  }
-  void setRestringPadBounds(const UnsignedLength& min,
+  void setStopMaskClearance(const UnsignedRatio& ratio,
+                            const UnsignedLength& min,
                             const UnsignedLength& max);
-  void setRestringViaRatio(const UnsignedRatio& ratio) noexcept {
-    mRestringViaRatio = ratio;
-  }
-  void setRestringViaBounds(const UnsignedLength& min,
-                            const UnsignedLength& max);
+  void setSolderPasteClearance(const UnsignedRatio& ratio,
+                               const UnsignedLength& min,
+                               const UnsignedLength& max);
+  void setPadAnnularRing(const UnsignedRatio& ratio, const UnsignedLength& min,
+                         const UnsignedLength& max);
+  void setViaAnnularRing(const UnsignedRatio& ratio, const UnsignedLength& min,
+                         const UnsignedLength& max);
 
   // General Methods
   void restoreDefaults() noexcept;
@@ -146,36 +127,34 @@ public:
   // Helper Methods
   bool doesViaRequireStopMask(const Length& drillDia) const noexcept;
   UnsignedLength calcStopMaskClearance(const Length& padSize) const noexcept;
-  UnsignedLength calcCreamMaskClearance(const Length& padSize) const noexcept;
-  UnsignedLength calcPadRestring(const Length& drillDia) const noexcept;
-  UnsignedLength calcViaRestring(const Length& drillDia) const noexcept;
+  UnsignedLength calcSolderPasteClearance(const Length& padSize) const noexcept;
+  UnsignedLength calcPadAnnularRing(const Length& drillDia) const noexcept;
+  UnsignedLength calcViaAnnularRing(const Length& drillDia) const noexcept;
 
   // Operator Overloadings
   BoardDesignRules& operator=(const BoardDesignRules& rhs) noexcept;
 
 private:
-  // General Attributes
-  ElementName mName;
-  QString mDescription;
-
   // Stop Mask
+  UnsignedLength mStopMaskMaxViaDrillDiameter;
   UnsignedRatio mStopMaskClearanceRatio;
   UnsignedLength mStopMaskClearanceMin;
   UnsignedLength mStopMaskClearanceMax;
-  UnsignedLength mStopMaskMaxViaDrillDiameter;
 
-  // Cream Mask
-  UnsignedRatio mCreamMaskClearanceRatio;
-  UnsignedLength mCreamMaskClearanceMin;
-  UnsignedLength mCreamMaskClearanceMax;
+  // Solder Paste
+  UnsignedRatio mSolderPasteClearanceRatio;
+  UnsignedLength mSolderPasteClearanceMin;
+  UnsignedLength mSolderPasteClearanceMax;
 
-  // Restring
-  UnsignedRatio mRestringPadRatio;
-  UnsignedLength mRestringPadMin;
-  UnsignedLength mRestringPadMax;
-  UnsignedRatio mRestringViaRatio;
-  UnsignedLength mRestringViaMin;
-  UnsignedLength mRestringViaMax;
+  // Pad Annular Ring
+  UnsignedRatio mPadAnnularRingRatio;  /// Percentage of the drill diameter
+  UnsignedLength mPadAnnularRingMin;
+  UnsignedLength mPadAnnularRingMax;
+
+  // Via Annular Ring
+  UnsignedRatio mViaAnnularRingRatio;  /// Percentage of the drill diameter
+  UnsignedLength mViaAnnularRingMin;
+  UnsignedLength mViaAnnularRingMax;
 };
 
 /*******************************************************************************

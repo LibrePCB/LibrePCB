@@ -75,8 +75,8 @@ public:
     bool checkCopperNpthClearance;
     UnsignedLength minCopperNpthClearance;
 
-    bool checkPthRestring;
-    UnsignedLength minPthRestring;
+    bool checkPthAnnularRing;
+    UnsignedLength minPthAnnularRing;
 
     bool checkNpthDrillDiameter;
     UnsignedLength minNpthDrillDiameter;
@@ -111,8 +111,8 @@ public:
         minCopperBoardClearance(300000),  // 300um
         checkCopperNpthClearance(true),
         minCopperNpthClearance(200000),  // 200um
-        checkPthRestring(true),
-        minPthRestring(150000),  // 150um
+        checkPthAnnularRing(true),
+        minPthAnnularRing(150000),  // 150um
         checkNpthDrillDiameter(true),
         minNpthDrillDiameter(250000),  // 250um
         checkNpthSlotWidth(true),
@@ -160,7 +160,7 @@ private:  // Methods
   void checkCopperCopperClearances(int progressStart, int progressEnd);
   void checkCourtyardClearances(int progressStart, int progressEnd);
   void checkMinimumCopperWidth(int progressStart, int progressEnd);
-  void checkMinimumPthRestring(int progressStart, int progressEnd);
+  void checkMinimumPthAnnularRing(int progressStart, int progressEnd);
   void checkMinimumNpthDrillDiameter(int progressStart, int progressEnd);
   void checkMinimumNpthSlotWidth(int progressStart, int progressEnd);
   void checkMinimumPthDrillDiameter(int progressStart, int progressEnd);

@@ -53,8 +53,8 @@ BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept
     mPadLayer(nullptr),
     mTopStopMaskLayer(nullptr),
     mBottomStopMaskLayer(nullptr),
-    mTopCreamMaskLayer(nullptr),
-    mBottomCreamMaskLayer(nullptr),
+    mTopSolderPasteLayer(nullptr),
+    mBottomSolderPasteLayer(nullptr),
     mOnLayerEditedSlot(*this, &BGI_FootprintPad::layerEdited) {
   mFont = qApp->getDefaultSansSerifFont();
   mFont.setPixelSize(1);
@@ -96,35 +96,35 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
   if (mLibPad.isTht()) {
     mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
     mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
-    mTopCreamMaskLayer = nullptr;
-    mBottomCreamMaskLayer = nullptr;
+    mTopSolderPasteLayer = nullptr;
+    mBottomSolderPasteLayer = nullptr;
   } else if (mLibPad.getComponentSide() ==
              FootprintPad::ComponentSide::Bottom) {
     mTopStopMaskLayer = nullptr;
     mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
-    mTopCreamMaskLayer = nullptr;
-    mBottomCreamMaskLayer = getLayer(GraphicsLayer::sBotSolderPaste);
+    mTopSolderPasteLayer = nullptr;
+    mBottomSolderPasteLayer = getLayer(GraphicsLayer::sBotSolderPaste);
   } else {
     mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
     mBottomStopMaskLayer = nullptr;
-    mTopCreamMaskLayer = getLayer(GraphicsLayer::sTopSolderPaste);
-    mBottomCreamMaskLayer = nullptr;
+    mTopSolderPasteLayer = getLayer(GraphicsLayer::sTopSolderPaste);
+    mBottomSolderPasteLayer = nullptr;
   }
   connectLayerEditedSlots();
   updateVisibility();
 
-  // determine stop/cream mask clearance
+  // determine clearances
   PositiveLength size = qMin(mLibPad.getWidth(), mLibPad.getHeight());
   Length stopMaskClearance =
       *mPad.getBoard().getDesignRules().calcStopMaskClearance(*size);
-  Length creamMaskClearance =
-      -mPad.getBoard().getDesignRules().calcCreamMaskClearance(*size);
+  Length solderPasteClearance =
+      -mPad.getBoard().getDesignRules().calcSolderPasteClearance(*size);
 
   // set shapes and bounding rect
   mShape = mLibPad.getOutline().toQPainterPathPx();
   mCopper = mLibPad.toQPainterPathPx();
   mStopMask = mLibPad.getOutline(stopMaskClearance).toQPainterPathPx();
-  mCreamMask = mLibPad.getOutline(creamMaskClearance).toQPainterPathPx();
+  mSolderPaste = mLibPad.getOutline(solderPasteClearance).toQPainterPathPx();
   mBoundingRect = mStopMask.boundingRect();
 
   update();
@@ -144,11 +144,11 @@ void BGI_FootprintPad::paint(QPainter* painter,
   bool highlight =
       mPad.isSelected() || (netsignal && netsignal->isHighlighted());
 
-  if (mBottomCreamMaskLayer && mBottomCreamMaskLayer->isVisible()) {
-    // draw bottom cream mask
+  if (mBottomSolderPasteLayer && mBottomSolderPasteLayer->isVisible()) {
+    // draw bottom solder paste
     painter->setPen(Qt::NoPen);
-    painter->setBrush(mBottomCreamMaskLayer->getColor(highlight));
-    painter->drawPath(mCreamMask);
+    painter->setBrush(mBottomSolderPasteLayer->getColor(highlight));
+    painter->drawPath(mSolderPaste);
   }
 
   if (mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible()) {
@@ -177,11 +177,11 @@ void BGI_FootprintPad::paint(QPainter* painter,
     painter->drawPath(mStopMask);
   }
 
-  if (mTopCreamMaskLayer && mTopCreamMaskLayer->isVisible()) {
-    // draw top cream mask
+  if (mTopSolderPasteLayer && mTopSolderPasteLayer->isVisible()) {
+    // draw top solder paste
     painter->setPen(Qt::NoPen);
-    painter->setBrush(mTopCreamMaskLayer->getColor(highlight));
-    painter->drawPath(mCreamMask);
+    painter->setBrush(mTopSolderPasteLayer->getColor(highlight));
+    painter->drawPath(mSolderPaste);
   }
 }
 
@@ -196,8 +196,8 @@ GraphicsLayer* BGI_FootprintPad::getLayer(QString name) const noexcept {
 
 void BGI_FootprintPad::connectLayerEditedSlots() noexcept {
   for (GraphicsLayer* layer :
-       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer, mTopCreamMaskLayer,
-        mBottomCreamMaskLayer}) {
+       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer,
+        mTopSolderPasteLayer, mBottomSolderPasteLayer}) {
     if (layer) {
       layer->onEdited.attach(mOnLayerEditedSlot);
     }
@@ -206,8 +206,8 @@ void BGI_FootprintPad::connectLayerEditedSlots() noexcept {
 
 void BGI_FootprintPad::disconnectLayerEditedSlots() noexcept {
   for (GraphicsLayer* layer :
-       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer, mTopCreamMaskLayer,
-        mBottomCreamMaskLayer}) {
+       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer,
+        mTopSolderPasteLayer, mBottomSolderPasteLayer}) {
     if (layer) {
       layer->onEdited.detach(mOnLayerEditedSlot);
     }
@@ -237,8 +237,8 @@ void BGI_FootprintPad::layerEdited(const GraphicsLayer& layer,
 void BGI_FootprintPad::updateVisibility() noexcept {
   bool visible = false;
   for (GraphicsLayer* layer :
-       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer, mTopCreamMaskLayer,
-        mBottomCreamMaskLayer}) {
+       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer,
+        mTopSolderPasteLayer, mBottomSolderPasteLayer}) {
     if (layer && layer->isVisible()) {
       visible = true;
       break;

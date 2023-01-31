@@ -85,12 +85,12 @@ private:  // Data
   GraphicsLayer* mPadLayer;
   GraphicsLayer* mTopStopMaskLayer;
   GraphicsLayer* mBottomStopMaskLayer;
-  GraphicsLayer* mTopCreamMaskLayer;
-  GraphicsLayer* mBottomCreamMaskLayer;
+  GraphicsLayer* mTopSolderPasteLayer;
+  GraphicsLayer* mBottomSolderPasteLayer;
   QPainterPath mShape;
   QPainterPath mCopper;
   QPainterPath mStopMask;
-  QPainterPath mCreamMask;
+  QPainterPath mSolderPaste;
   QRectF mBoundingRect;
   QFont mFont;
 

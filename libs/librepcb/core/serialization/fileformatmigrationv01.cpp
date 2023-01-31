@@ -410,6 +410,7 @@ void FileFormatMigrationV01::upgradeSchematic(LoadedData& data,
 void FileFormatMigrationV01::upgradeBoard(SExpression& root,
                                           QList<Message>& messages) {
   upgradeGrid(root);
+  upgradeBoardDesignRules(root);
 
   // Fabrication output settings.
   {
@@ -463,6 +464,28 @@ void FileFormatMigrationV01::upgradeBoardUserSettings(SExpression& root) {
       if (SExpression* child = node->tryGetChild(tagName)) {
         node->removeChild(*child);
       }
+    }
+  }
+}
+
+void FileFormatMigrationV01::upgradeBoardDesignRules(SExpression& root) {
+  SExpression& node = root.getChild("design_rules");
+  node.removeChild(node.getChild("name"));
+  node.removeChild(node.getChild("description"));
+  for (SExpression* child : node.getChildren(SExpression::Type::List)) {
+    QString name = child->getName();
+    name.replace("restring_pad_", "pad_annular_ring_");
+    name.replace("restring_via_", "via_annular_ring_");
+    name.replace("creammask_", "solderpaste_");
+    child->setName(name);
+  }
+  for (const QString param : {"stopmask_clearance", "solderpaste_clearance",
+                              "pad_annular_ring", "via_annular_ring"}) {
+    SExpression& newChild = node.appendList(param);
+    for (const QString property : {"ratio", "min", "max"}) {
+      SExpression& oldChild = node.getChild(param % "_" % property);
+      newChild.appendChild(property, oldChild.getChild("@0"));
+      node.removeChild(oldChild);
     }
   }
 }

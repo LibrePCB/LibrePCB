@@ -58,9 +58,9 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
   mUi->edtMinCopperWidth->configure(lengthUnit,
                                     LengthEditBase::Steps::generic(),
                                     settingsPrefix % "/min_copper_width");
-  mUi->edtMinPthRestring->configure(lengthUnit,
-                                    LengthEditBase::Steps::generic(),
-                                    settingsPrefix % "/min_pth_restring");
+  mUi->edtMinPthAnnularRing->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/min_pth_annular_ring");
   mUi->edtMinNpthDrillDiameter->configure(
       lengthUnit, LengthEditBase::Steps::drillDiameter(),
       settingsPrefix % "/min_npth_drill_diameter");
@@ -101,7 +101,7 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
     mUi->cbxClearanceCopperBoard->setChecked(checked);
     mUi->cbxClearanceCopperNpth->setChecked(checked);
     mUi->cbxMinCopperWidth->setChecked(checked);
-    mUi->cbxMinPthRestring->setChecked(checked);
+    mUi->cbxMinPthAnnularRing->setChecked(checked);
     mUi->cbxMinNpthDrillDiameter->setChecked(checked);
     mUi->cbxMinNpthSlotWidth->setChecked(checked);
     mUi->cbxMinPthDrillDiameter->setChecked(checked);
@@ -122,8 +122,8 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
   mUi->edtClearanceCopperNpth->setValue(options.minCopperNpthClearance);
   mUi->cbxMinCopperWidth->setChecked(options.checkCopperWidth);
   mUi->edtMinCopperWidth->setValue(options.minCopperWidth);
-  mUi->cbxMinPthRestring->setChecked(options.checkPthRestring);
-  mUi->edtMinPthRestring->setValue(options.minPthRestring);
+  mUi->cbxMinPthAnnularRing->setChecked(options.checkPthAnnularRing);
+  mUi->edtMinPthAnnularRing->setValue(options.minPthAnnularRing);
   mUi->cbxMinNpthDrillDiameter->setChecked(options.checkNpthDrillDiameter);
   mUi->edtMinNpthDrillDiameter->setValue(options.minNpthDrillDiameter);
   mUi->cbxMinNpthSlotWidth->setChecked(options.checkNpthSlotWidth);
@@ -173,8 +173,8 @@ BoardDesignRuleCheck::Options BoardDesignRuleCheckDialog::getOptions() const
   options.minCopperNpthClearance = mUi->edtClearanceCopperNpth->getValue();
   options.checkCopperWidth = mUi->cbxMinCopperWidth->isChecked();
   options.minCopperWidth = mUi->edtMinCopperWidth->getValue();
-  options.checkPthRestring = mUi->cbxMinPthRestring->isChecked();
-  options.minPthRestring = mUi->edtMinPthRestring->getValue();
+  options.checkPthAnnularRing = mUi->cbxMinPthAnnularRing->isChecked();
+  options.minPthAnnularRing = mUi->edtMinPthAnnularRing->getValue();
   options.checkNpthDrillDiameter = mUi->cbxMinNpthDrillDiameter->isChecked();
   options.minNpthDrillDiameter = mUi->edtMinNpthDrillDiameter->getValue();
   options.checkNpthSlotWidth = mUi->cbxMinNpthSlotWidth->isChecked();

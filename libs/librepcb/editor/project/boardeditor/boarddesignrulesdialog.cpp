@@ -52,32 +52,29 @@ BoardDesignRulesDialog::BoardDesignRulesDialog(const BoardDesignRules& rules,
   mUi->edtStopMaskMaxViaDia->configure(
       lengthUnit, LengthEditBase::Steps::generic(),
       settingsPrefix % "/stopmask_max_via_diameter");
-  mUi->edtCreamMaskClrRatio->setSingleStep(5.0);  // [%]
-  mUi->edtCreamMaskClrMin->configure(
+  mUi->edtSolderPasteClrRatio->setSingleStep(5.0);  // [%]
+  mUi->edtSolderPasteClrMin->configure(
       lengthUnit, LengthEditBase::Steps::generic(),
-      settingsPrefix % "/creammask_clearance_min");
-  mUi->edtCreamMaskClrMax->configure(
+      settingsPrefix % "/solderpaste_clearance_min");
+  mUi->edtSolderPasteClrMax->configure(
       lengthUnit, LengthEditBase::Steps::generic(),
-      settingsPrefix % "/creammask_clearance_max");
-  mUi->edtRestringPadsRatio->setSingleStep(5.0);  // [%]
-  mUi->edtRestringPadsMin->configure(lengthUnit,
-                                     LengthEditBase::Steps::generic(),
-                                     settingsPrefix % "/restring_pads_min");
-  mUi->edtRestringPadsMax->configure(lengthUnit,
-                                     LengthEditBase::Steps::generic(),
-                                     settingsPrefix % "/restring_pads_max");
-  mUi->edtRestringViasRatio->setSingleStep(5.0);  // [%]
-  mUi->edtRestringViasMin->configure(lengthUnit,
-                                     LengthEditBase::Steps::generic(),
-                                     settingsPrefix % "/restring_vias_min");
-  mUi->edtRestringViasMax->configure(lengthUnit,
-                                     LengthEditBase::Steps::generic(),
-                                     settingsPrefix % "/restring_vias_max");
+      settingsPrefix % "/solderpaste_clearance_max");
+  mUi->edtPadAnnularRingRatio->setSingleStep(5.0);  // [%]
+  mUi->edtPadAnnularRingMin->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/pad_annular_ring_min");
+  mUi->edtPadAnnularRingMax->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/pad_annular_ring_max");
+  mUi->edtViaAnnularRingRatio->setSingleStep(5.0);  // [%]
+  mUi->edtViaAnnularRingMin->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/via_annular_ring_min");
+  mUi->edtViaAnnularRingMax->configure(
+      lengthUnit, LengthEditBase::Steps::generic(),
+      settingsPrefix % "/via_annular_ring_max");
 
   updateWidgets();
-
-  // set focus to name so the user can immediately start typing to change it
-  mUi->edtName->setFocus();
 }
 
 BoardDesignRulesDialog::~BoardDesignRulesDialog() {
@@ -113,56 +110,48 @@ void BoardDesignRulesDialog::on_buttonBox_clicked(QAbstractButton* button) {
  ******************************************************************************/
 
 void BoardDesignRulesDialog::updateWidgets() noexcept {
-  // general attributes
-  mUi->edtName->setText(*mDesignRules.getName());
-  mUi->txtDescription->setPlainText(mDesignRules.getDescription());
   // stop mask
   mUi->edtStopMaskClrRatio->setValue(mDesignRules.getStopMaskClearanceRatio());
   mUi->edtStopMaskClrMin->setValue(mDesignRules.getStopMaskClearanceMin());
   mUi->edtStopMaskClrMax->setValue(mDesignRules.getStopMaskClearanceMax());
   mUi->edtStopMaskMaxViaDia->setValue(mDesignRules.getStopMaskMaxViaDiameter());
-  // cream mask
-  mUi->edtCreamMaskClrRatio->setValue(
-      mDesignRules.getCreamMaskClearanceRatio());
-  mUi->edtCreamMaskClrMin->setValue(mDesignRules.getCreamMaskClearanceMin());
-  mUi->edtCreamMaskClrMax->setValue(mDesignRules.getCreamMaskClearanceMax());
-  // restring
-  mUi->edtRestringPadsRatio->setValue(mDesignRules.getRestringPadRatio());
-  mUi->edtRestringPadsMin->setValue(mDesignRules.getRestringPadMin());
-  mUi->edtRestringPadsMax->setValue(mDesignRules.getRestringPadMax());
-  mUi->edtRestringViasRatio->setValue(mDesignRules.getRestringViaRatio());
-  mUi->edtRestringViasMin->setValue(mDesignRules.getRestringViaMin());
-  mUi->edtRestringViasMax->setValue(mDesignRules.getRestringViaMax());
+  // solder paste
+  mUi->edtSolderPasteClrRatio->setValue(
+      mDesignRules.getSolderPasteClearanceRatio());
+  mUi->edtSolderPasteClrMin->setValue(
+      mDesignRules.getSolderPasteClearanceMin());
+  mUi->edtSolderPasteClrMax->setValue(
+      mDesignRules.getSolderPasteClearanceMax());
+  // pad annular ring
+  mUi->edtPadAnnularRingRatio->setValue(mDesignRules.getPadAnnularRingRatio());
+  mUi->edtPadAnnularRingMin->setValue(mDesignRules.getPadAnnularRingMin());
+  mUi->edtPadAnnularRingMax->setValue(mDesignRules.getPadAnnularRingMax());
+  // via annular ring
+  mUi->edtViaAnnularRingRatio->setValue(mDesignRules.getViaAnnularRingRatio());
+  mUi->edtViaAnnularRingMin->setValue(mDesignRules.getViaAnnularRingMin());
+  mUi->edtViaAnnularRingMax->setValue(mDesignRules.getViaAnnularRingMax());
 }
 
 void BoardDesignRulesDialog::applyRules() noexcept {
   try {
-    // general attributes
-    mDesignRules.setName(ElementName(mUi->edtName->text()));  // can throw
-    mDesignRules.setDescription(mUi->txtDescription->toPlainText());
-    // stop mask
-    mDesignRules.setStopMaskClearanceRatio(
-        mUi->edtStopMaskClrRatio->getValue());
-    mDesignRules.setStopMaskClearanceBounds(
-        mUi->edtStopMaskClrMin->getValue(),
-        mUi->edtStopMaskClrMax->getValue());  // can throw
     mDesignRules.setStopMaskMaxViaDiameter(
         mUi->edtStopMaskMaxViaDia->getValue());
-    // cream mask
-    mDesignRules.setCreamMaskClearanceRatio(
-        mUi->edtCreamMaskClrRatio->getValue());
-    mDesignRules.setCreamMaskClearanceBounds(
-        mUi->edtCreamMaskClrMin->getValue(),
-        mUi->edtCreamMaskClrMax->getValue());  // can throw
-    // restring
-    mDesignRules.setRestringPadRatio(mUi->edtRestringPadsRatio->getValue());
-    mDesignRules.setRestringPadBounds(
-        mUi->edtRestringPadsMin->getValue(),
-        mUi->edtRestringPadsMax->getValue());  // can throw
-    mDesignRules.setRestringViaRatio(mUi->edtRestringViasRatio->getValue());
-    mDesignRules.setRestringViaBounds(
-        mUi->edtRestringViasMin->getValue(),
-        mUi->edtRestringViasMax->getValue());  // can throw
+    mDesignRules.setStopMaskClearance(
+        mUi->edtStopMaskClrRatio->getValue(),
+        mUi->edtStopMaskClrMin->getValue(),
+        mUi->edtStopMaskClrMax->getValue());  // can throw
+    mDesignRules.setSolderPasteClearance(
+        mUi->edtSolderPasteClrRatio->getValue(),
+        mUi->edtSolderPasteClrMin->getValue(),
+        mUi->edtSolderPasteClrMax->getValue());  // can throw
+    mDesignRules.setPadAnnularRing(
+        mUi->edtPadAnnularRingRatio->getValue(),
+        mUi->edtPadAnnularRingMin->getValue(),
+        mUi->edtPadAnnularRingMax->getValue());  // can throw
+    mDesignRules.setViaAnnularRing(
+        mUi->edtViaAnnularRingRatio->getValue(),
+        mUi->edtViaAnnularRingMin->getValue(),
+        mUi->edtViaAnnularRingMax->getValue());  // can throw
   } catch (const Exception& e) {
     QMessageBox::warning(this, tr("Could not apply settings"), e.getMsg());
   }

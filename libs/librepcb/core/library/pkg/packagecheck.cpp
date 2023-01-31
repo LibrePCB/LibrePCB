@@ -28,9 +28,9 @@
 #include "msg/msgmissingfootprint.h"
 #include "msg/msgmissingfootprintname.h"
 #include "msg/msgmissingfootprintvalue.h"
+#include "msg/msgpadannularringviolation.h"
 #include "msg/msgpadclearanceviolation.h"
 #include "msg/msgpadoverlapswithplacement.h"
-#include "msg/msgpadrestringviolation.h"
 #include "msg/msgwrongfootprinttextlayer.h"
 #include "package.h"
 
@@ -64,7 +64,7 @@ LibraryElementCheckMessageList PackageCheck::runChecks() const {
   checkWrongTextLayers(msgs);
   checkPadsClearanceToPads(msgs);
   checkPadsClearanceToPlacement(msgs);
-  checkPadsRestring(msgs);
+  checkPadsAnnularRing(msgs);
   return msgs;
 }
 
@@ -230,8 +230,8 @@ void PackageCheck::checkPadsClearanceToPlacement(MsgList& msgs) const {
   }
 }
 
-void PackageCheck::checkPadsRestring(MsgList& msgs) const {
-  const Length restring(150000);  // 150 µm
+void PackageCheck::checkPadsAnnularRing(MsgList& msgs) const {
+  const Length annularRing(150000);  // 150 µm
   const Length tolerance(10);  // 0.01 µm, to avoid rounding issues
 
   // Check all footprints.
@@ -254,11 +254,12 @@ void PackageCheck::checkPadsRestring(MsgList& msgs) const {
            itHole1 != (*itPad).getHoles().end(); ++itHole1) {
         std::shared_ptr<const Hole> hole1 = itHole1.ptr();
         const QVector<Path> hole1Paths = hole1->getPath()->toOutlineStrokes(
-            hole1->getDiameter() + PositiveLength((restring * 2) - tolerance));
+            hole1->getDiameter() +
+            PositiveLength((annularRing * 2) - tolerance));
         const QPainterPath hole1PathPx =
             Path::toQPainterPathPx(hole1Paths, true);
 
-        // Check restrings.
+        // Check annular rings.
         if (!padPathPx.contains(hole1PathPx)) {
           emitWarning = true;
         } else {
@@ -272,7 +273,7 @@ void PackageCheck::checkPadsRestring(MsgList& msgs) const {
             const QPainterPath hole2PathPx =
                 Path::toQPainterPathPx(hole2Paths, true);
 
-            // Now check if the restring is really too small.
+            // Now check if the annular ring is really too small.
             if (hole1PathPx.intersects(hole2PathPx)) {
               emitWarning = true;
             }
@@ -282,8 +283,9 @@ void PackageCheck::checkPadsRestring(MsgList& msgs) const {
 
       // Only show one warning even if there are multiple violations.
       if (emitWarning) {
-        msgs.append(std::make_shared<MsgPadRestringViolation>(
-            footprint, pad, pkgPad ? *pkgPad->getName() : QString(), restring));
+        msgs.append(std::make_shared<MsgPadAnnularRingViolation>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString(),
+            annularRing));
       }
     }
   }

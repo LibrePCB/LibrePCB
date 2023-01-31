@@ -92,8 +92,8 @@ void BoardDesignRuleCheck::execute() {
   if (mOptions.checkCopperWidth) {
     checkMinimumCopperWidth(70, 72);
   }
-  if (mOptions.checkPthRestring) {
-    checkMinimumPthRestring(72, 74);
+  if (mOptions.checkPthAnnularRing) {
+    checkMinimumPthAnnularRing(72, 74);
   }
   if (mOptions.checkNpthDrillDiameter) {
     checkMinimumNpthDrillDiameter(74, 76);
@@ -400,10 +400,10 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressStart,
   emit progressPercent(progressEnd);
 }
 
-void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
-                                                   int progressEnd) {
+void BoardDesignRuleCheck::checkMinimumPthAnnularRing(int progressStart,
+                                                      int progressEnd) {
   Q_UNUSED(progressStart);
-  emitStatus(tr("Check minimum PTH restrings..."));
+  emitStatus(tr("Check minimum PTH annular rings..."));
 
   // Determine tha areas where copper is available on *all* layers.
   QList<ClipperLib::Paths> thtCopperAreas;
@@ -417,12 +417,12 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
   const ClipperLib::Paths thtCopperAreaPaths =
       ClipperHelpers::treeToPaths(*thtCopperAreaIntersections);
 
-  // Check via restrings.
+  // Check via annular rings.
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
     foreach (const BI_Via* via, netsegment->getVias()) {
-      // Determine via area including minimum restring.
+      // Determine via area including minimum annular ring.
       const Length diameter =
-          via->getDrillDiameter() + (*mOptions.minPthRestring * 2) - 1;
+          via->getDrillDiameter() + (*mOptions.minPthAnnularRing * 2) - 1;
       if (diameter <= 0) {
         continue;
       }
@@ -436,25 +436,25 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
       const ClipperLib::Paths remainingAreas =
           ClipperHelpers::flattenTree(*remainingAreasTree);
       if (!remainingAreas.empty()) {
-        QString msg = tr("Restring of via '%1' < %2",
-                         "Placeholders are net name + restring width")
+        QString msg = tr("Annular ring of via '%1' < %2",
+                         "Placeholders are net name + annular ring width")
                           .arg(netsegment->getNetNameToDisplay(true),
-                               formatLength(*mOptions.minPthRestring));
+                               formatLength(*mOptions.minPthAnnularRing));
         const QVector<Path> location = ClipperHelpers::convert(remainingAreas);
         emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
     }
   }
 
-  // Check pad restrings.
+  // Check pad annular rings.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      // Determine hole areas including minimum restring.
+      // Determine hole areas including minimum annular ring.
       const Transform transform(*pad);
       ClipperLib::Paths areas;
       for (const Hole& hole : pad->getLibPad().getHoles()) {
         const Length diameter =
-            hole.getDiameter() + (*mOptions.minPthRestring * 2) - 1;
+            hole.getDiameter() + (*mOptions.minPthAnnularRing * 2) - 1;
         if (diameter <= 0) {
           continue;
         }
@@ -472,10 +472,10 @@ void BoardDesignRuleCheck::checkMinimumPthRestring(int progressStart,
       const ClipperLib::Paths remainingAreas =
           ClipperHelpers::flattenTree(*remainingAreasTree);
       if (!remainingAreas.empty()) {
-        QString msg = tr("Restring of pad '%1' < %2",
-                         "Placeholders are pad name + restring width")
+        QString msg = tr("Annular ring of pad '%1' < %2",
+                         "Placeholders are pad name + annular ring width")
                           .arg(pad->getDisplayText().simplified(),
-                               formatLength(*mOptions.minPthRestring));
+                               formatLength(*mOptions.minPthAnnularRing));
         const QVector<Path> location = ClipperHelpers::convert(remainingAreas);
         emitMessage(BoardDesignRuleCheckMessage(msg, location));
       }
