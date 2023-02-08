@@ -98,7 +98,11 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                QList<Message>& messages) {
   Q_UNUSED(root);
   Q_UNUSED(messages);
-  upgradeBoardDesignRules(root);
+  {
+    SExpression& child = root.getChild("design_rules/pad_annular_ring");
+    child.appendChild("outer", SExpression::createToken("full"));
+    child.appendChild("inner", SExpression::createToken("full"));
+  }
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

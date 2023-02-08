@@ -128,6 +128,7 @@ private:  // Methods
   QString getNetSignalName() const noexcept;
   QList<PadGeometry> getGeometryOnCopperLayer(const QString& layer) const
       noexcept;
+  bool isConnectedOnLayer(const QString& layer) const noexcept;
 
 private:  // Data
   BI_Device& mDevice;

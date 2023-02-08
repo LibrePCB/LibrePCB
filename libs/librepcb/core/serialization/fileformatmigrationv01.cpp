@@ -488,6 +488,11 @@ void FileFormatMigrationV01::upgradeBoardDesignRules(SExpression& root) {
       node.removeChild(oldChild);
     }
   }
+  {
+    SExpression& child = node.getChild("pad_annular_ring");
+    child.appendChild("outer", SExpression::createToken("full"));
+    child.appendChild("inner", SExpression::createToken("full"));
+  }
 }
 
 void FileFormatMigrationV01::upgradeGrid(SExpression& node) {

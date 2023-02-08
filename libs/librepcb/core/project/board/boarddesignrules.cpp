@@ -46,6 +46,8 @@ BoardDesignRules::BoardDesignRules() noexcept
     mSolderPasteClearanceMin(0),  // 0.0mm
     mSolderPasteClearanceMax(1000000),  // 1.0mm
     // pad annular ring
+    mPadCmpSideAutoAnnularRing(false),
+    mPadInnerAutoAnnularRing(true),
     mPadAnnularRingRatio(Ratio::percent100() / 4),  // 25%
     mPadAnnularRingMin(250000),  // 0.25mm
     mPadAnnularRingMax(2000000),  // 2.0mm
@@ -79,6 +81,10 @@ BoardDesignRules::BoardDesignRules(const SExpression& node)
     mSolderPasteClearanceMax(deserialize<UnsignedLength>(
         node.getChild("solderpaste_clearance/max/@0"))),
     // pad annular ring
+    mPadCmpSideAutoAnnularRing(
+        parsePadAutoAnnular(node.getChild("pad_annular_ring/outer/@0"))),
+    mPadInnerAutoAnnularRing(
+        parsePadAutoAnnular(node.getChild("pad_annular_ring/inner/@0"))),
     mPadAnnularRingRatio(
         deserialize<UnsignedRatio>(node.getChild("pad_annular_ring/ratio/@0"))),
     mPadAnnularRingMin(
@@ -141,6 +147,14 @@ void BoardDesignRules::setSolderPasteClearance(const UnsignedRatio& ratio,
   }
 }
 
+void BoardDesignRules::setPadCmpSideAutoAnnularRing(bool enabled) noexcept {
+  mPadCmpSideAutoAnnularRing = enabled;
+}
+
+void BoardDesignRules::setPadInnerAutoAnnularRing(bool enabled) noexcept {
+  mPadInnerAutoAnnularRing = enabled;
+}
+
 void BoardDesignRules::setPadAnnularRing(const UnsignedRatio& ratio,
                                          const UnsignedLength& min,
                                          const UnsignedLength& max) {
@@ -201,6 +215,12 @@ void BoardDesignRules::serialize(SExpression& root) const {
   {
     root.ensureLineBreak();
     SExpression& node = root.appendList("pad_annular_ring");
+    node.appendChild(
+        "outer",
+        SExpression::createToken(mPadCmpSideAutoAnnularRing ? "auto" : "full"));
+    node.appendChild(
+        "inner",
+        SExpression::createToken(mPadInnerAutoAnnularRing ? "auto" : "full"));
     node.appendChild("ratio", mPadAnnularRingRatio);
     node.appendChild("min", mPadAnnularRingMin);
     node.appendChild("max", mPadAnnularRingMax);
@@ -275,6 +295,8 @@ BoardDesignRules& BoardDesignRules::operator=(
   mSolderPasteClearanceMin = rhs.mSolderPasteClearanceMin;
   mSolderPasteClearanceMax = rhs.mSolderPasteClearanceMax;
   // pad annular ring
+  mPadCmpSideAutoAnnularRing = rhs.mPadCmpSideAutoAnnularRing;
+  mPadInnerAutoAnnularRing = rhs.mPadInnerAutoAnnularRing;
   mPadAnnularRingRatio = rhs.mPadAnnularRingRatio;
   mPadAnnularRingMin = rhs.mPadAnnularRingMin;
   mPadAnnularRingMax = rhs.mPadAnnularRingMax;
@@ -283,6 +305,22 @@ BoardDesignRules& BoardDesignRules::operator=(
   mViaAnnularRingMin = rhs.mViaAnnularRingMin;
   mViaAnnularRingMax = rhs.mViaAnnularRingMax;
   return *this;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+bool BoardDesignRules::parsePadAutoAnnular(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == "auto") {
+    return true;
+  } else if (str == "full") {
+    return false;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid pad annular shape: '%1'").arg(str));
+  }
 }
 
 /*******************************************************************************

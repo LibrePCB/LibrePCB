@@ -78,6 +78,12 @@ public:
   }
 
   // Getters: Pad Annular Ring
+  bool getPadCmpSideAutoAnnularRing() const noexcept {
+    return mPadCmpSideAutoAnnularRing;
+  }
+  bool getPadInnerAutoAnnularRing() const noexcept {
+    return mPadInnerAutoAnnularRing;
+  }
   const UnsignedRatio& getPadAnnularRingRatio() const noexcept {
     return mPadAnnularRingRatio;
   }
@@ -109,6 +115,8 @@ public:
   void setSolderPasteClearance(const UnsignedRatio& ratio,
                                const UnsignedLength& min,
                                const UnsignedLength& max);
+  void setPadCmpSideAutoAnnularRing(bool enabled) noexcept;
+  void setPadInnerAutoAnnularRing(bool enabled) noexcept;
   void setPadAnnularRing(const UnsignedRatio& ratio, const UnsignedLength& min,
                          const UnsignedLength& max);
   void setViaAnnularRing(const UnsignedRatio& ratio, const UnsignedLength& min,
@@ -134,7 +142,10 @@ public:
   // Operator Overloadings
   BoardDesignRules& operator=(const BoardDesignRules& rhs) noexcept;
 
-private:
+private:  // Methods
+  static bool parsePadAutoAnnular(const SExpression& node);
+
+private:  // Data
   // Stop Mask
   UnsignedLength mStopMaskMaxViaDrillDiameter;
   UnsignedRatio mStopMaskClearanceRatio;
@@ -147,6 +158,8 @@ private:
   UnsignedLength mSolderPasteClearanceMax;
 
   // Pad Annular Ring
+  bool mPadCmpSideAutoAnnularRing;
+  bool mPadInnerAutoAnnularRing;
   UnsignedRatio mPadAnnularRingRatio;  /// Percentage of the drill diameter
   UnsignedLength mPadAnnularRingMin;
   UnsignedLength mPadAnnularRingMax;

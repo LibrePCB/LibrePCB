@@ -215,6 +215,7 @@ void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
   }
   mRegisteredNetLines.insert(&netline);
   netline.updateLine();
+  mGraphicsItem->updateCacheAndRepaint();  // Update omitted annular rings.
 }
 
 void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline) {
@@ -223,6 +224,7 @@ void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline) {
   }
   mRegisteredNetLines.remove(&netline);
   netline.updateLine();
+  mGraphicsItem->updateCacheAndRepaint();  // Update omitted annular rings.
 }
 
 void BI_FootprintPad::updatePosition() noexcept {
@@ -359,12 +361,31 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
 
   // Determine pad shape.
   bool fullShape = false;
+  bool autoAnnular = false;
+  bool minimalAnnular = false;
   const QString componentSideLayer =
       (getComponentSide() == FootprintPad::ComponentSide::Top)
       ? GraphicsLayer::sTopCopper
       : GraphicsLayer::sBotCopper;
   if (mFootprintPad->isTht()) {
-    fullShape = true;
+    const QString solderSideLayer =
+        (getComponentSide() == FootprintPad::ComponentSide::Top)
+        ? GraphicsLayer::sBotCopper
+        : GraphicsLayer::sTopCopper;
+    const bool fullComponentSide =
+        !mBoard.getDesignRules().getPadCmpSideAutoAnnularRing();
+    const bool fullInner =
+        !mBoard.getDesignRules().getPadInnerAutoAnnularRing();
+    if ((layer == solderSideLayer) ||  // solder side
+        (fullComponentSide &&
+         (layer == componentSideLayer)) ||  // component side
+        (fullInner && GraphicsLayer::isInnerLayer(layer))) {  // inner layer
+      fullShape = true;
+    } else if (isConnectedOnLayer(layer)) {
+      autoAnnular = true;
+    } else {
+      minimalAnnular = true;
+    }
   } else if (layer == componentSideLayer) {
     fullShape = true;
   }
@@ -373,8 +394,26 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
   QList<PadGeometry> result;
   if (fullShape) {
     result.append(mFootprintPad->getGeometry());
+  } else if (autoAnnular || minimalAnnular) {
+    for (const Hole& hole : mFootprintPad->getHoles()) {
+      const UnsignedLength annularWidth = autoAnnular
+          ? mBoard.getDesignRules().calcPadAnnularRing(*hole.getDiameter())
+          : mBoard.getDesignRules().getPadAnnularRingMin();  // Min. Annular
+      result.append(PadGeometry::stroke(
+          hole.getDiameter() + annularWidth + annularWidth, hole.getPath(),
+          HoleList{std::make_shared<Hole>(hole)}));
+    }
   }
   return result;
+}
+
+bool BI_FootprintPad::isConnectedOnLayer(const QString& layer) const noexcept {
+  foreach (const BI_NetLine* line, mRegisteredNetLines) {
+    if (line->getLayer().getName() == layer) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /*******************************************************************************
