@@ -322,6 +322,28 @@ void GerberGenerator::flashOctagon(const Point& pos, const PositiveLength& w,
   flashAtPosition(pos);
 }
 
+void GerberGenerator::flashOutline(const Point& pos,
+                                   const StraightAreaPath& path,
+                                   const Angle& rot, Function function,
+                                   const tl::optional<QString>& net,
+                                   const QString& component, const QString& pin,
+                                   const QString& signal) noexcept {
+  setCurrentAperture(mApertureList->addOutline(path, rot, function));
+  setCurrentAttributes(tl::nullopt,  // Aperture: Function
+                       net,  // Object: Net name
+                       component,  // Object: Component designator
+                       pin,  // Object: Pin number/name
+                       signal,  // Object: Pin signal
+                       QString(),  // Object: Component value
+                       tl::nullopt,  // Object: Component mount type
+                       QString(),  // Object: Component manufacturer
+                       QString(),  // Object: Component MPN
+                       QString(),  // Object: Component footprint name
+                       tl::nullopt  // Object: Component rotation
+  );
+  flashAtPosition(pos);
+}
+
 void GerberGenerator::flashComponent(const Point& pos, const Angle& rot,
                                      const QString& designator,
                                      const QString& value, MountType mountType,

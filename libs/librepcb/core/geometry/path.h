@@ -223,6 +223,44 @@ inline NonEmptyPath makeNonEmptyPath(const Point& pos) noexcept {
 }
 
 /*******************************************************************************
+ *  Class StraightAreaPath
+ ******************************************************************************/
+
+struct StraightAreaPathVerifier {
+  template <typename Value, typename Predicate>
+  static constexpr auto verify(Value&& val, const Predicate& p) ->
+      typename std::decay<Value>::type {
+    return p(val) ? std::forward<Value>(val)
+                  : (throw RuntimeError(
+                         __FILE__, __LINE__,
+                         Path::tr("Path is not fillable or contains arcs!")),
+                     std::forward<Value>(val));
+  }
+};
+
+struct StraightAreaPathConstraint {
+  bool operator()(const Path& p) const noexcept {
+    return (p.getVertices().count() >= 4) && p.isClosed() && (!p.isCurved());
+  }
+};
+
+/**
+ * StraightAreaPath is a wrapper around a ::librepcb::Path object which is
+ * guaranteed to always contain a closed path with at least 4 vertices and no
+ * arcs (only straight segments).
+ *
+ * The constructor throws an exception if constructed from a ::librepcb::Path
+ * which does not fulfil these requirements.
+ */
+using StraightAreaPath =
+    type_safe::constrained_type<Path, StraightAreaPathConstraint,
+                                StraightAreaPathVerifier>;
+
+inline uint qHash(const StraightAreaPath& key, uint seed = 0) noexcept {
+  return ::qHash(*key, seed);
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

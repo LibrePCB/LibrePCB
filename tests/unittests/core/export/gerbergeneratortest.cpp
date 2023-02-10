@@ -158,6 +158,15 @@ protected:
                                    UnsignedLength(20000), rot, function, net,
                                    component, pin, signal);
 
+                  gen.flashOutline(Point(100, 200),
+                                   StraightAreaPath(Path({
+                                       Vertex(Point(-100, -100)),
+                                       Vertex(Point(100, -100)),
+                                       Vertex(Point(0, 100)),
+                                       Vertex(Point(-100, -100)),
+                                   })),
+                                   rot, function, net, component, pin, signal);
+
                   gen.flashComponent(Point(100, 200), rot, component, "",
                                      GerberGenerator::MountType::Tht, "", "",
                                      "");
