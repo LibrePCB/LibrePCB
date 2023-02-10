@@ -151,6 +151,90 @@ TEST_F(PathTest, testReversed) {
   EXPECT_EQ(str(expected), str(actual));
 }
 
+TEST_F(PathTest, testFlattenArcsEmptyPath) {
+  Path input = Path();
+  const Path expected = Path();
+  const Path actual = input.flattenArcs(PositiveLength(1));
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_EQ(str(expected), str(input));
+}
+
+TEST_F(PathTest, testFlattenArcsOneVertex) {
+  Path input = Path({Vertex(Point(10, 20), Angle::deg180())});
+  const Path expected = Path({Vertex(Point(10, 20), Angle::deg0())});
+  const Path actual = input.flattenArcs(PositiveLength(1));
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_EQ(str(expected), str(input));
+}
+
+TEST_F(PathTest, testFlattenArcsTwoVerticesArc) {
+  Path input = Path({
+      Vertex(Point(1000, 2000), Angle::deg180()),
+      Vertex(Point(1000, 3000), Angle::deg180()),
+  });
+  const Path expected = Path({
+      Vertex(Point(1000, 2000), Angle::deg0()),
+      Vertex(Point(1433, 2250), Angle::deg0()),
+      Vertex(Point(1433, 2750), Angle::deg0()),
+      Vertex(Point(1000, 3000), Angle::deg0()),
+  });
+  const Path actual = input.flattenArcs(PositiveLength(600));
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_EQ(str(expected), str(input));
+}
+
+TEST_F(PathTest, testFlattenArcsMultipleVertices) {
+  Path input = Path({
+      Vertex(Point(1000, 1000), Angle::deg180()),
+      Vertex(Point(1000, 2000), Angle::deg0()),
+      Vertex(Point(1000, 3000), Angle::deg180()),
+      Vertex(Point(1000, 4000), Angle::deg0()),
+      Vertex(Point(1000, 5000), Angle::deg180()),
+      Vertex(Point(1000, 6000), Angle::deg180()),
+      Vertex(Point(1000, 7000), Angle::deg180()),
+      Vertex(Point(1000, 8000), Angle::deg180()),
+  });
+  const Path expected = Path({
+      Vertex(Point(1000, 1000), Angle::deg0()),
+      Vertex(Point(1433, 1250), Angle::deg0()),
+      Vertex(Point(1433, 1750), Angle::deg0()),
+      Vertex(Point(1000, 2000), Angle::deg0()),
+      Vertex(Point(1000, 3000), Angle::deg0()),
+      Vertex(Point(1433, 3250), Angle::deg0()),
+      Vertex(Point(1433, 3750), Angle::deg0()),
+      Vertex(Point(1000, 4000), Angle::deg0()),
+      Vertex(Point(1000, 5000), Angle::deg0()),
+      Vertex(Point(1433, 5250), Angle::deg0()),
+      Vertex(Point(1433, 5750), Angle::deg0()),
+      Vertex(Point(1000, 6000), Angle::deg0()),
+      Vertex(Point(1433, 6250), Angle::deg0()),
+      Vertex(Point(1433, 6750), Angle::deg0()),
+      Vertex(Point(1000, 7000), Angle::deg0()),
+      Vertex(Point(1433, 7250), Angle::deg0()),
+      Vertex(Point(1433, 7750), Angle::deg0()),
+      Vertex(Point(1000, 8000), Angle::deg0()),
+
+  });
+  const Path actual = input.flattenArcs(PositiveLength(600));
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_EQ(str(expected), str(input));
+}
+
+TEST_F(PathTest, testFlattenedArcs) {
+  const Path input = Path({
+      Vertex(Point(1000, 2000), Angle::deg180()),
+      Vertex(Point(1000, 3000), Angle::deg180()),
+  });
+  const Path expected = Path({
+      Vertex(Point(1000, 2000), Angle::deg0()),
+      Vertex(Point(1433, 2250), Angle::deg0()),
+      Vertex(Point(1433, 2750), Angle::deg0()),
+      Vertex(Point(1000, 3000), Angle::deg0()),
+  });
+  const Path actual = input.flattenedArcs(PositiveLength(600));
+  EXPECT_EQ(str(expected), str(actual));
+}
+
 TEST_F(PathTest, testOperatorCompareLess) {
   EXPECT_FALSE(Path() < Path());
   EXPECT_FALSE(Path({Vertex(Point(1, 2))}) < Path());

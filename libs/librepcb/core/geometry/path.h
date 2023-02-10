@@ -94,6 +94,8 @@ public:
                 const Point& center = Point(0, 0)) const noexcept;
   Path& reverse() noexcept;
   Path reversed() const noexcept;
+  Path& flattenArcs(const PositiveLength& maxTolerance) noexcept;
+  Path flattenedArcs(const PositiveLength& maxTolerance) const noexcept;
 
   // General Methods
   void addVertex(const Vertex& vertex) noexcept;
