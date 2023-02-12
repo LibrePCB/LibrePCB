@@ -26,6 +26,7 @@
 #include "../../../geometry/stroketext.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../library/pkg/footprintpad.h"
+#include "../../../library/pkg/packagepad.h"
 #include "../../../utils/clipperhelpers.h"
 #include "../../../utils/toolbox.h"
 #include "../../../utils/transform.h"
@@ -116,8 +117,11 @@ void BoardDesignRuleCheck::execute() {
   if (mOptions.checkCourtyardClearance) {
     checkCourtyardClearances(84, 88);
   }
+  if (mOptions.checkBrokenPadConnections) {
+    checkInvalidPadConnections(88, 89);
+  }
   if (mOptions.checkMissingConnections) {
-    checkForMissingConnections(88, 90);
+    checkForMissingConnections(89, 90);
   }
 
   emitStatus(
@@ -661,6 +665,49 @@ void BoardDesignRuleCheck::checkWarnPthSlots(int progressStart,
       for (const Hole& hole : pad->getLibPad().getHoles()) {
         processHoleSlotWarning(hole, mOptions.pthSlotsWarning, padTransform,
                                devTransform);
+      }
+    }
+  }
+
+  emit progressPercent(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkInvalidPadConnections(int progressStart,
+                                                      int progressEnd) {
+  Q_UNUSED(progressStart);
+  emitStatus(tr("Check pad connections..."));
+
+  const QString msgTr = tr("Invalid pad connection: %1:%2 on %3",
+                           "Placeholders: Device name, pad name, layer name.");
+
+  // Pads.
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
+      QSet<const GraphicsLayer*> connectedLayers;
+      foreach (const BI_NetLine* netLine, pad->getNetLines()) {
+        connectedLayers.insert(&netLine->getLayer());
+      }
+      foreach (const GraphicsLayer* layer, connectedLayers) {
+        bool isOriginInCopper = false;
+        foreach (const PadGeometry& geometry,
+                 pad->getGeometryOnLayer(layer->getName())) {
+          if (geometry.toFilledQPainterPathPx().contains(QPointF(0, 0))) {
+            isOriginInCopper = true;
+            break;
+          }
+        }
+        if (!isOriginInCopper) {
+          emitMessage(BoardDesignRuleCheckMessage(
+              msgTr.arg(*device->getComponentInstance().getName())
+                  .arg(*pad->getLibPackagePad()->getName())
+                  .arg(layer->getNameTr()),
+              Path::circle(PositiveLength(500000))
+                  .translated(pad->getPosition()),
+              tr("The pad origin must be located within the pads copper area, "
+                 "or for THT pads within a hole. Otherwise traces might not be "
+                 "connected fully. This issue needs to be fixed in the "
+                 "library.")));
+        }
       }
     }
   }

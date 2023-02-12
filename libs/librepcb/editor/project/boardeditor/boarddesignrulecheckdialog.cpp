@@ -109,6 +109,7 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
     mUi->cbxWarnNpthSlots->setChecked(checked);
     mUi->cbxWarnPthSlots->setChecked(checked);
     mUi->cbxCourtyardOffset->setChecked(checked);
+    mUi->cbxBrokenPadConnections->setChecked(checked);
     mUi->cbxMissingConnections->setChecked(checked);
   });
 
@@ -142,6 +143,7 @@ BoardDesignRuleCheckDialog::BoardDesignRuleCheckDialog(
           QVariant::fromValue(options.pthSlotsWarning)));
   mUi->cbxCourtyardOffset->setChecked(options.checkCourtyardClearance);
   mUi->edtCourtyardOffset->setValue(options.courtyardOffset);
+  mUi->cbxBrokenPadConnections->setChecked(options.checkBrokenPadConnections);
   mUi->cbxMissingConnections->setChecked(options.checkMissingConnections);
 
   // Load the window geometry.
@@ -193,6 +195,7 @@ BoardDesignRuleCheck::Options BoardDesignRuleCheckDialog::getOptions() const
           .value<BoardDesignRuleCheck::SlotsWarningLevel>();
   options.checkCourtyardClearance = mUi->cbxCourtyardOffset->isChecked();
   options.courtyardOffset = mUi->edtCourtyardOffset->getValue();
+  options.checkBrokenPadConnections = mUi->cbxBrokenPadConnections->isChecked();
   options.checkMissingConnections = mUi->cbxMissingConnections->isChecked();
   return options;
 }

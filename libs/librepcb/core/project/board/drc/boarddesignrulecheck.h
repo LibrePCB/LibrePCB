@@ -99,6 +99,8 @@ public:
     bool checkCourtyardClearance;
     Length courtyardOffset;
 
+    bool checkBrokenPadConnections;
+
     bool checkMissingConnections;
 
     Options()
@@ -127,6 +129,7 @@ public:
         pthSlotsWarning(SlotsWarningLevel::MultiSegment),
         checkCourtyardClearance(true),
         courtyardOffset(0),  // 0um
+        checkBrokenPadConnections(true),
         checkMissingConnections(true) {}
   };
 
@@ -167,6 +170,7 @@ private:  // Methods
   void checkMinimumPthSlotWidth(int progressStart, int progressEnd);
   void checkWarnNpthSlots(int progressStart, int progressEnd);
   void checkWarnPthSlots(int progressStart, int progressEnd);
+  void checkInvalidPadConnections(int progressStart, int progressEnd);
   void processHoleSlotWarning(const Hole& hole, SlotsWarningLevel level,
                               const Transform& transform1 = Transform(),
                               const Transform& transform2 = Transform());
