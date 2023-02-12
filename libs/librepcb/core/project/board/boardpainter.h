@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../export/graphicsexport.h"
 #include "../../graphics/graphicslayername.h"
+#include "../../library/pkg/footprintpad.h"
 #include "../../types/length.h"
 #include "../../utils/transform.h"
 
@@ -38,7 +39,6 @@ namespace librepcb {
 
 class Board;
 class Circle;
-class FootprintPad;
 class Hole;
 class Path;
 class Polygon;
@@ -64,9 +64,15 @@ class BoardPainter final : public GraphicsPagePainter {
     PositiveLength width;
   };
 
+  struct Pad {
+    Transform transform;
+    QList<std::pair<QString, PadGeometry>> layerGeometries;
+    QList<Hole> holes;
+  };
+
   struct Footprint {
     Transform transform;
-    QList<FootprintPad> pads;
+    QList<Pad> pads;
     QList<Polygon> polygons;
     QList<Circle> circles;
     QList<Hole> holes;
@@ -79,6 +85,7 @@ class BoardPainter final : public GraphicsPagePainter {
 
   struct LayerContent {
     QList<QPainterPath> areas;
+    QList<QPainterPath> thtPadAreas;  ///< Drawn on GraphicsLayer::sBoardPadsTht
     QList<Trace> traces;
     QList<Polygon> polygons;
     QList<Circle> circles;

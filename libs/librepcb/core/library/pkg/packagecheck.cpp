@@ -24,6 +24,7 @@
 
 #include "../../graphics/graphicslayer.h"
 #include "../../utils/toolbox.h"
+#include "../../utils/transform.h"
 #include "msg/msgduplicatepadname.h"
 #include "msg/msgmissingfootprint.h"
 #include "msg/msgmissingfootprintname.h"
@@ -141,9 +142,11 @@ void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
       std::shared_ptr<const PackagePad> pkgPad1 = pad1->getPackagePadUuid()
           ? mPackage.getPads().find(*pad1->getPackagePadUuid())
           : nullptr;
-      Path pad1Path = pad1->getOutline(clearance - tolerance);
-      pad1Path.rotate(pad1->getRotation()).translate(pad1->getPosition());
-      const QPainterPath pad1PathPx = pad1Path.toQPainterPathPx();
+      const Transform pad1Transform(pad1->getPosition(), pad1->getRotation());
+      const QPainterPath pad1PathPx =
+          pad1Transform.mapPx(pad1->getGeometry()
+                                  .withOffset(clearance - tolerance)
+                                  .toFilledQPainterPathPx());
 
       // Compare with all pads *after* pad1 to avoid duplicate messages!
       // So, don't initialize the iterator with begin() but with pad1 + 1.
@@ -153,9 +156,9 @@ void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
         std::shared_ptr<const PackagePad> pkgPad2 = pad2->getPackagePadUuid()
             ? mPackage.getPads().find(*pad2->getPackagePadUuid())
             : nullptr;
-        Path pad2Path = pad2->getOutline();
-        pad2Path.rotate(pad2->getRotation()).translate(pad2->getPosition());
-        const QPainterPath pad2PathPx = pad2Path.toQPainterPathPx();
+        const Transform pad2Transform(pad2->getPosition(), pad2->getRotation());
+        const QPainterPath pad2PathPx =
+            pad2Transform.mapPx(pad2->getGeometry().toFilledQPainterPathPx());
 
         // Only warn if both pads have copper on the same board side.
         if ((pad1->getComponentSide() == pad2->getComponentSide()) ||
@@ -212,9 +215,11 @@ void PackageCheck::checkPadsClearanceToPlacement(MsgList& msgs) const {
           : nullptr;
       Length clearance(150000);  // 150 µm
       Length tolerance(10);  // 0.01 µm, to avoid rounding issues
-      Path stopMaskPath = pad->getOutline(clearance - tolerance);
-      stopMaskPath.rotate(pad->getRotation()).translate(pad->getPosition());
-      QPainterPath stopMask = stopMaskPath.toQPainterPathPx();
+      const Transform transform(pad->getPosition(), pad->getRotation());
+      const QPainterPath stopMask =
+          transform.mapPx(pad->getGeometry()
+                              .withOffset(clearance - tolerance)
+                              .toFilledQPainterPathPx());
       if (pad->isOnLayer(GraphicsLayer::sTopCopper) &&
           stopMask.intersects(topPlacement)) {
         msgs.append(std::make_shared<MsgPadOverlapsWithPlacement>(
@@ -246,7 +251,8 @@ void PackageCheck::checkPadsAnnularRing(MsgList& msgs) const {
       std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
           ? mPackage.getPads().find(*pad->getPackagePadUuid())
           : nullptr;
-      const QPainterPath padPathPx = pad->getOutline().toQPainterPathPx();
+      const QPainterPath padPathPx =
+          pad->getGeometry().toFilledQPainterPathPx();
 
       // Check all holes.
       bool emitWarning = false;

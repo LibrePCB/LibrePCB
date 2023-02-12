@@ -135,6 +135,8 @@ add_library(
   geometry/netlabel.h
   geometry/netline.cpp
   geometry/netline.h
+  geometry/padgeometry.cpp
+  geometry/padgeometry.h
   geometry/path.cpp
   geometry/path.h
   geometry/polygon.cpp

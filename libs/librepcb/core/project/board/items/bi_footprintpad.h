@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/path.h"
+#include "../../../library/pkg/footprintpad.h"
 #include "../graphicsitems/bgi_footprintpad.h"
 #include "./bi_netline.h"
 #include "bi_base.h"
@@ -38,7 +39,6 @@ namespace librepcb {
 class BI_Device;
 class ComponentSignal;
 class ComponentSignalInstance;
-class FootprintPad;
 
 /*******************************************************************************
  *  Class BI_FootprintPad
@@ -83,6 +83,7 @@ public:
   const Uuid& getLibPadUuid() const noexcept;
   QString getDisplayText() const noexcept;
   BI_Device& getDevice() const noexcept { return mDevice; }
+  FootprintPad::ComponentSide getComponentSide() const noexcept;
   QString getLayerName() const noexcept;
   bool isOnLayer(const QString& layerName) const noexcept;
   const FootprintPad& getLibPad() const noexcept { return *mFootprintPad; }
@@ -93,8 +94,7 @@ public:
   NetSignal* getCompSigInstNetSignal() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   bool isSelectable() const noexcept override;
-  Path getOutline(const Length& expansion = Length(0)) const noexcept;
-  Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
+  QList<PadGeometry> getGeometryOnLayer(const QString& layer) const noexcept;
   TraceAnchor toTraceAnchor() const noexcept override;
 
   // General Methods
@@ -126,6 +126,8 @@ private:  // Methods
   QString getComponentInstanceName() const noexcept;
   QString getPadNameOrUuid() const noexcept;
   QString getNetSignalName() const noexcept;
+  QList<PadGeometry> getGeometryOnCopperLayer(const QString& layer) const
+      noexcept;
 
 private:  // Data
   BI_Device& mDevice;

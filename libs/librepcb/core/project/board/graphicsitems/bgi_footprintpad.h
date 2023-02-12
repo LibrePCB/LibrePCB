@@ -69,7 +69,8 @@ public:
   BGI_FootprintPad& operator=(const BGI_FootprintPad& rhs) = delete;
 
 private:  // Methods
-  GraphicsLayer* getLayer(QString name) const noexcept;
+  GraphicsLayer* getLayer(const QString& name) const noexcept;
+  QSet<GraphicsLayer*> getAllInvolvedLayers() const noexcept;
   void connectLayerEditedSlots() noexcept;
   void disconnectLayerEditedSlots() noexcept;
   void layerEdited(const GraphicsLayer& layer,
@@ -77,20 +78,20 @@ private:  // Methods
   void updateVisibility() noexcept;
 
 private:  // Data
+  struct LayerContent {
+    GraphicsLayer* visibilityLayer;
+    GraphicsLayer* drawLayer;
+    QPainterPath path;
+  };
+
   // General Attributes
   BI_FootprintPad& mPad;
   const FootprintPad& mLibPad;
 
   // Cached Attributes
-  GraphicsLayer* mPadLayer;
-  GraphicsLayer* mTopStopMaskLayer;
-  GraphicsLayer* mBottomStopMaskLayer;
-  GraphicsLayer* mTopSolderPasteLayer;
-  GraphicsLayer* mBottomSolderPasteLayer;
+  GraphicsLayer* mCopperLayer;
+  QVector<LayerContent> mContents;
   QPainterPath mShape;
-  QPainterPath mCopper;
-  QPainterPath mStopMask;
-  QPainterPath mSolderPaste;
   QRectF mBoundingRect;
   QFont mFont;
 

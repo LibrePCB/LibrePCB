@@ -270,11 +270,17 @@ void BoardClipperPathGenerator::addCopper(
           (!netsignals.contains(pad->getCompSigInstNetSignal()))) {
         continue;
       }
-      Transform transform(*pad);
-      ClipperHelpers::unite(
-          mPaths,
-          ClipperHelpers::convert(transform.map(pad->getOutline()),
-                                  mMaxArcTolerance));
+      const Transform padTransform(pad->getLibPad().getPosition(),
+                                   pad->getLibPad().getRotation());
+      foreach (const PadGeometry& geometry,
+               pad->getGeometryOnLayer(layerName)) {
+        foreach (const Path& outline, geometry.toOutlines()) {
+          ClipperHelpers::unite(
+              mPaths,
+              ClipperHelpers::convert(transform.map(padTransform.map(outline)),
+                                      mMaxArcTolerance));
+        }
+      }
     }
   }
 

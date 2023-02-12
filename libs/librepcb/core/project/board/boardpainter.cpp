@@ -32,6 +32,7 @@
 #include "../../library/pkg/footprint.h"
 #include "../project.h"
 #include "board.h"
+#include "boardlayerstack.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
@@ -62,7 +63,22 @@ BoardPainter::BoardPainter(const Board& board)
     Footprint fpt;
     fpt.transform = Transform(*device);
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      fpt.pads.append(pad->getLibPad());
+      Pad padObj;
+      padObj.transform = Transform(pad->getLibPad().getPosition(),
+                                   pad->getLibPad().getRotation());
+      for (const Hole& hole : pad->getLibPad().getHoles()) {
+        padObj.holes.append(hole);
+      }
+      foreach (GraphicsLayer* layer, board.getLayerStack().getAllLayers()) {
+        if (layer->isEnabled()) {
+          foreach (const PadGeometry& geometry,
+                   pad->getGeometryOnLayer(layer->getName())) {
+            padObj.layerGeometries.append(
+                std::make_pair(layer->getName(), geometry));
+          }
+        }
+      }
+      fpt.pads.append(padObj);
     }
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
       fpt.polygons.append(polygon);
@@ -119,6 +135,15 @@ void BoardPainter::paint(QPainter& painter,
   // Determine what to paint on which layer.
   initContentByLayer();
 
+  // Draw THT pads depending on copper layers visibility.
+  bool thtPadsOnlyOnCopperLayers = false;
+  foreach (const QString& layer, settings.getLayerPaintOrder()) {
+    if (GraphicsLayer::isCopperLayer(layer)) {
+      thtPadsOnlyOnCopperLayers = true;
+      break;
+    }
+  }
+
   // Draw pad circles only if holes are enabled, but pads not.
   const bool drawPadHoles =
       settings.getLayerPaintOrder().contains(GraphicsLayer::sBoardDrillsNpth) &&
@@ -128,11 +153,21 @@ void BoardPainter::paint(QPainter& painter,
   GraphicsPainter p(painter);
   p.setMinLineWidth(settings.getMinLineWidth());
   foreach (const QString& layer, settings.getLayerPaintOrder()) {
+    if (thtPadsOnlyOnCopperLayers && (layer == GraphicsLayer::sBoardPadsTht)) {
+      continue;
+    }
+
     LayerContent content = mContentByLayer.value(layer);
 
     // Draw areas.
     foreach (const QPainterPath& area, content.areas) {
       p.drawPath(area, Length(0), QColor(), settings.getColor(layer));
+    }
+
+    // Draw THT pad areas.
+    foreach (const QPainterPath& area, content.thtPadAreas) {
+      p.drawPath(area, Length(0), QColor(),
+                 settings.getColor(GraphicsLayer::sBoardPadsTht));
     }
 
     // Draw traces.
@@ -212,18 +247,26 @@ void BoardPainter::initContentByLayer() const noexcept {
       }
 
       // Footprint pads.
-      foreach (FootprintPad pad, footprint.pads) {
-        const Transform transform(pad.getPosition(), pad.getRotation());
-        const QPainterPath path =
-            footprint.transform.mapPx(transform.mapPx(pad.toQPainterPathPx()));
-        const QString layer = footprint.transform.map(pad.getLayerName());
-        mContentByLayer[layer].areas.append(path);
-
+      foreach (const Pad& pad, footprint.pads) {
+        foreach (const auto& layerGeometry, pad.layerGeometries) {
+          const QPainterPath path = footprint.transform.mapPx(
+              pad.transform.mapPx(layerGeometry.second.toQPainterPathPx()));
+          if ((!pad.holes.isEmpty()) &&
+              GraphicsLayer::isCopperLayer(layerGeometry.first)) {
+            LayerContent& tht = mContentByLayer[GraphicsLayer::sBoardPadsTht];
+            if (!tht.areas.contains(path)) {
+              tht.areas.append(path);
+            }
+            mContentByLayer[layerGeometry.first].thtPadAreas.append(path);
+          } else {
+            mContentByLayer[layerGeometry.first].areas.append(path);
+          }
+        }
         // Also add the holes for THT pads.
-        for (const Hole& hole : pad.getHoles()) {
+        for (const Hole& hole : pad.holes) {
           mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(
               Hole(hole.getUuid(), hole.getDiameter(),
-                   footprint.transform.map(transform.map(hole.getPath()))));
+                   footprint.transform.map(pad.transform.map(hole.getPath()))));
         }
       }
     }

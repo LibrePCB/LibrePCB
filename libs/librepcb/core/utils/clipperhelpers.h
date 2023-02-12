@@ -52,9 +52,12 @@ public:
   ~ClipperHelpers() = delete;
 
   // General Methods
-  static void unite(ClipperLib::Paths& paths);
+  static void unite(ClipperLib::Paths& paths,
+                    ClipperLib::PolyFillType fillType);
   static void unite(ClipperLib::Paths& subject, const ClipperLib::Path& clip);
   static void unite(ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
+  static std::unique_ptr<ClipperLib::PolyTree> uniteToTree(
+      const ClipperLib::Paths& paths, ClipperLib::PolyFillType fillType);
   static std::unique_ptr<ClipperLib::PolyTree> intersect(
       const ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
   static std::unique_ptr<ClipperLib::PolyTree> intersect(

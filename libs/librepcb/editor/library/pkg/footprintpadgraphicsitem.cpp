@@ -71,7 +71,7 @@ FootprintPadGraphicsItem::FootprintPadGraphicsItem(
   // pad properties
   setPosition(mPad->getPosition());
   setRotation(mPad->getRotation());
-  setShape(mPad->toQPainterPathPx());
+  setShape(mPad->getGeometry().toQPainterPathPx());
   setLayerName(mPad->getLayerName());
   updateText();
 
@@ -156,14 +156,14 @@ void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
     case FootprintPad::Event::ShapeChanged:
     case FootprintPad::Event::WidthChanged:
     case FootprintPad::Event::HeightChanged:
-      setShape(pad.toQPainterPathPx());
+      setShape(pad.getGeometry().toQPainterPathPx());
       break;
     case FootprintPad::Event::ComponentSideChanged:
       setLayerName(pad.getLayerName());
       break;
     case FootprintPad::Event::HolesEdited:
       setLayerName(pad.getLayerName());
-      setShape(pad.toQPainterPathPx());
+      setShape(pad.getGeometry().toQPainterPathPx());
       break;
     default:
       qWarning()

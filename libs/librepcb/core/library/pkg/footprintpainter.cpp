@@ -156,7 +156,8 @@ void FootprintPainter::initContentByLayer() const noexcept {
     // Footprint pads.
     foreach (FootprintPad pad, mPads) {
       const Transform transform(pad.getPosition(), pad.getRotation());
-      const QPainterPath path = transform.mapPx(pad.toQPainterPathPx());
+      const QPainterPath path =
+          transform.mapPx(pad.getGeometry().toQPainterPathPx());
       const QString layer = pad.getLayerName();
       mContentByLayer[layer].areas.append(path);
 

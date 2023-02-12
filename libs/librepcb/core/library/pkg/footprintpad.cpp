@@ -176,41 +176,20 @@ bool FootprintPad::isOnLayer(const QString& name) const noexcept {
   }
 }
 
-Path FootprintPad::getOutline(const Length& expansion) const noexcept {
-  const Length width = mWidth + (expansion * 2);
-  const Length height = mHeight + (expansion * 2);
-  if (width > 0 && height > 0) {
-    const PositiveLength pWidth(width);
-    const PositiveLength pHeight(height);
-    const UnsignedLength cornerRadius(std::max(expansion, Length(0)));
-    switch (mShape) {
-      case Shape::ROUND:
-        return Path::obround(pWidth, pHeight);
-      case Shape::RECT:
-        return Path::centeredRect(pWidth, pHeight, cornerRadius);
-      case Shape::OCTAGON:
-        return Path::octagon(pWidth, pHeight, cornerRadius);
-      default:
-        Q_ASSERT(false);
-        break;
-    }
+PadGeometry FootprintPad::getGeometry() const noexcept {
+  switch (mShape) {
+    case Shape::ROUND:
+      return PadGeometry::round(mWidth, mHeight, mHoles);
+    case Shape::RECT:
+      return PadGeometry::rect(mWidth, mHeight, mHoles);
+    case Shape::OCTAGON:
+      return PadGeometry::octagon(mWidth, mHeight, mHoles);
+    default:
+      qCritical() << "Unhandled switch-case in FootprintPad::getGeometry():"
+                  << static_cast<int>(mShape);
+      Q_ASSERT(false);
+      return PadGeometry::round(mWidth, mHeight, mHoles);
   }
-  return Path();
-}
-
-QPainterPath FootprintPad::toQPainterPathPx(const Length& expansion) const
-    noexcept {
-  QPainterPath holesArea;
-  for (const Hole& h : mHoles) {
-    for (const Path& p : h.getPath()->toOutlineStrokes(h.getDiameter())) {
-      holesArea.addPath(p.toQPainterPathPx());
-    }
-  }
-
-  QPainterPath p = getOutline(expansion).toQPainterPathPx();
-  p.setFillRule(Qt::OddEvenFill);  // Important to subtract the holes!
-  p.addPath(holesArea);
-  return p;
 }
 
 /*******************************************************************************

@@ -33,12 +33,12 @@ namespace librepcb {
  *  General Methods
  ******************************************************************************/
 
-void ClipperHelpers::unite(ClipperLib::Paths& paths) {
+void ClipperHelpers::unite(ClipperLib::Paths& paths,
+                           ClipperLib::PolyFillType fillType) {
   try {
     ClipperLib::Clipper c;
     c.AddPaths(paths, ClipperLib::ptSubject, true);
-    c.Execute(ClipperLib::ctUnion, paths, ClipperLib::pftEvenOdd,
-              ClipperLib::pftEvenOdd);
+    c.Execute(ClipperLib::ctUnion, paths, fillType, ClipperLib::pftEvenOdd);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to unite paths: %1").arg(e.what()));
@@ -67,6 +67,22 @@ void ClipperHelpers::unite(ClipperLib::Paths& subject,
     c.AddPaths(clip, ClipperLib::ptClip, true);
     c.Execute(ClipperLib::ctUnion, subject, ClipperLib::pftEvenOdd,
               ClipperLib::pftEvenOdd);
+  } catch (const std::exception& e) {
+    throw LogicError(__FILE__, __LINE__,
+                     QString("Failed to unite paths: %1").arg(e.what()));
+  }
+}
+
+std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::uniteToTree(
+    const ClipperLib::Paths& paths, ClipperLib::PolyFillType fillType) {
+  try {
+    // Wrap the PolyTree object in a smart pointer since PolyTree cannot
+    // safely be copied (i.e. returned by value), it would lead to a crash!!!
+    std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
+    ClipperLib::Clipper c;
+    c.AddPaths(paths, ClipperLib::ptSubject, true);
+    c.Execute(ClipperLib::ctUnion, *result, fillType, ClipperLib::pftEvenOdd);
+    return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to unite paths: %1").arg(e.what()));
@@ -241,20 +257,8 @@ ClipperLib::Paths ClipperHelpers::convert(
 ClipperLib::Path ClipperHelpers::convert(
     const Path& path, const PositiveLength& maxArcTolerance) noexcept {
   ClipperLib::Path p;
-  for (int i = 0; i < path.getVertices().count(); ++i) {
-    const Vertex& v = path.getVertices().at(i);
-    const Vertex& v0 = path.getVertices().at(qMax(i - 1, 0));
-    if ((i == 0) || (v0.getAngle() == 0)) {
-      p.push_back(convert(v.getPos()));
-    } else {
-      // approximate arcs by many short straight line segments
-      Path arc = Path::flatArc(v0.getPos(), v.getPos(), v0.getAngle(),
-                               maxArcTolerance);
-      // skip first point as it is would be a duplicate
-      for (int k = 1; k < arc.getVertices().count(); ++k) {
-        p.push_back(convert(arc.getVertices().at(k).getPos()));
-      }
-    }
+  foreach (const Vertex& v, path.flattenedArcs(maxArcTolerance).getVertices()) {
+    p.push_back(convert(v.getPos()));
   }
   // make sure all paths have the same orientation, otherwise we get strange
   // results
