@@ -17,62 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_PACKAGECHECK_H
-#define LIBREPCB_CORE_PACKAGECHECK_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../libraryelementcheck.h"
+#include "msgpadoriginoutsidecopper.h"
 
-#include <QtCore>
+#include "../footprint.h"
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 
-class Package;
-
 /*******************************************************************************
- *  Class PackageCheck
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The PackageCheck class
- */
-class PackageCheck : public LibraryElementCheck {
-public:
-  // Constructors / Destructor
-  PackageCheck() = delete;
-  PackageCheck(const PackageCheck& other) = delete;
-  explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+MsgPadOriginOutsideCopper::MsgPadOriginOutsideCopper(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Error,
+        tr("Invalid origin of pad '%1' in '%2'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("The origin of each pad must be located within its copper area, "
+           "otherwise traces won't be connected properly.\n\n"
+           "For THT pads, the origin must be located within a drill "
+           "hole since on some layers the pad might only have a small annular "
+           "ring instead of the full pad shape.")),
+    mFootprint(footprint),
+    mPad(pad) {
+}
 
-  // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
-
-  // Operator Overloadings
-  PackageCheck& operator=(const PackageCheck& rhs) = delete;
-
-protected:  // Methods
-  void checkDuplicatePadNames(MsgList& msgs) const;
-  void checkMissingFootprint(MsgList& msgs) const;
-  void checkMissingTexts(MsgList& msgs) const;
-  void checkWrongTextLayers(MsgList& msgs) const;
-  void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
-  void checkPadsAnnularRing(MsgList& msgs) const;
-  void checkPadsConnectionPoint(MsgList& msgs) const;
-
-private:  // Data
-  const Package& mPackage;
-};
+MsgPadOriginOutsideCopper::~MsgPadOriginOutsideCopper() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace librepcb
-
-#endif

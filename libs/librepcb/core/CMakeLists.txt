@@ -258,6 +258,8 @@ add_library(
   library/pkg/msg/msgpadannularringviolation.h
   library/pkg/msg/msgpadclearanceviolation.cpp
   library/pkg/msg/msgpadclearanceviolation.h
+  library/pkg/msg/msgpadoriginoutsidecopper.cpp
+  library/pkg/msg/msgpadoriginoutsidecopper.h
   library/pkg/msg/msgpadoverlapswithplacement.cpp
   library/pkg/msg/msgpadoverlapswithplacement.h
   library/pkg/msg/msgwrongfootprinttextlayer.cpp

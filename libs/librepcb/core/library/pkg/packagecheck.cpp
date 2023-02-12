@@ -31,6 +31,7 @@
 #include "msg/msgmissingfootprintvalue.h"
 #include "msg/msgpadannularringviolation.h"
 #include "msg/msgpadclearanceviolation.h"
+#include "msg/msgpadoriginoutsidecopper.h"
 #include "msg/msgpadoverlapswithplacement.h"
 #include "msg/msgwrongfootprinttextlayer.h"
 #include "package.h"
@@ -66,6 +67,7 @@ LibraryElementCheckMessageList PackageCheck::runChecks() const {
   checkPadsClearanceToPads(msgs);
   checkPadsClearanceToPlacement(msgs);
   checkPadsAnnularRing(msgs);
+  checkPadsConnectionPoint(msgs);
   return msgs;
 }
 
@@ -292,6 +294,27 @@ void PackageCheck::checkPadsAnnularRing(MsgList& msgs) const {
         msgs.append(std::make_shared<MsgPadAnnularRingViolation>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString(),
             annularRing));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkPadsConnectionPoint(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itPad = (*itFtp).getPads().begin();
+         itPad != (*itFtp).getPads().end(); ++itPad) {
+      std::shared_ptr<const FootprintPad> pad = itPad.ptr();
+      std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
+          ? mPackage.getPads().find(*pad->getPackagePadUuid())
+          : nullptr;
+      const QPainterPath allowedArea = pad->isTht()
+          ? pad->getGeometry().toHolesQPainterPathPx()
+          : pad->getGeometry().toFilledQPainterPathPx();
+      if (!allowedArea.contains(QPointF(0, 0))) {
+        msgs.append(std::make_shared<MsgPadOriginOutsideCopper>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
       }
     }
   }
