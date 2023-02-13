@@ -56,7 +56,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
             obj.getPackagePadUuid());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(Angle::deg45(), obj.getRotation());
-  EXPECT_EQ(FootprintPad::Shape::RECT, obj.getShape());
+  EXPECT_EQ(FootprintPad::Shape::Rect, obj.getShape());
   EXPECT_EQ(PositiveLength(1100000), obj.getWidth());
   EXPECT_EQ(UnsignedLength(2200000), obj.getHeight());
   EXPECT_EQ(FootprintPad::ComponentSide::Top, obj.getComponentSide());
@@ -65,9 +65,12 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
 
 TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   SExpression sexpr = SExpression::parse(
-      "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side bottom) (shape rect)\n"
+      "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side bottom) (shape custom)\n"
       " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2)\n"
       " (package_pad none)\n"
+      " (vertex (position -1.1 -2.2) (angle 45.0))\n"
+      " (vertex (position 1.1 -2.2) (angle 90.0))\n"
+      " (vertex (position 0.0 2.2) (angle 0.0))\n"
       " (hole 7040952d-7016-49cd-8c3e-6078ecca98b9 (diameter 1.0)\n"
       "  (vertex (position 1.1 2.2) (angle 45.0))\n"
       " )\n"
@@ -82,17 +85,19 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   EXPECT_EQ(tl::nullopt, obj.getPackagePadUuid());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(Angle::deg45(), obj.getRotation());
-  EXPECT_EQ(FootprintPad::Shape::RECT, obj.getShape());
+  EXPECT_EQ(FootprintPad::Shape::Custom, obj.getShape());
   EXPECT_EQ(PositiveLength(1100000), obj.getWidth());
   EXPECT_EQ(UnsignedLength(2200000), obj.getHeight());
   EXPECT_EQ(FootprintPad::ComponentSide::Bottom, obj.getComponentSide());
+  EXPECT_EQ(3, obj.getCustomShapeOutline().getVertices().count());
   EXPECT_EQ(2, obj.getHoles().count());
 }
 
 TEST_F(FootprintPadTest, testSerializeAndDeserialize) {
   FootprintPad obj1(
       Uuid::createRandom(), Uuid::createRandom(), Point(123, 567), Angle(789),
-      FootprintPad::Shape::OCTAGON, PositiveLength(123), PositiveLength(456),
+      FootprintPad::Shape::Octagon, PositiveLength(123), PositiveLength(456),
+      Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
       FootprintPad::ComponentSide::Top,
       HoleList{
           std::make_shared<Hole>(Uuid::createRandom(), PositiveLength(100000),

@@ -235,6 +235,97 @@ TEST_F(PathTest, testFlattenedArcs) {
   EXPECT_EQ(str(expected), str(actual));
 }
 
+TEST_F(PathTest, testCleanEmptyPath) {
+  Path actual = Path();
+  const Path expected = Path();
+  const bool modified = actual.clean();
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_FALSE(modified);
+}
+
+TEST_F(PathTest, testCleanOneVertex) {
+  Path actual = Path({Vertex(Point(1, 2), Angle::deg90())});
+  const Path expected = Path({Vertex(Point(1, 2), Angle::deg90())});
+  const bool modified = actual.clean();
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_FALSE(modified);
+}
+
+TEST_F(PathTest, testCleanMultipleVertices) {
+  Path actual = Path({
+      Vertex(Point(1, 2), Angle::deg45()),
+      Vertex(Point(1, 2), Angle::deg90()),  // duplicate
+      Vertex(Point(3, 4), Angle::deg0()), Vertex(Point(5, 6), Angle::deg0()),
+      Vertex(Point(5, 6), Angle::deg180()),  // duplicate
+      Vertex(Point(5, 6), Angle::deg270()),  // duplicate
+      Vertex(Point(7, 8), Angle::deg0()), Vertex(Point(9, 9), Angle::deg180()),
+      Vertex(Point(9, 9), Angle::deg270()),  // duplicate
+  });
+  const Path expected = Path({
+      Vertex(Point(1, 2), Angle::deg90()),
+      Vertex(Point(3, 4), Angle::deg0()),
+      Vertex(Point(5, 6), Angle::deg270()),
+      Vertex(Point(7, 8), Angle::deg0()),
+      Vertex(Point(9, 9), Angle::deg270()),
+  });
+  const bool modified = actual.clean();
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_TRUE(modified);
+}
+
+TEST_F(PathTest, testOpenEmptyPath) {
+  Path actual = Path();
+  const Path expected = Path();
+  const bool modified = actual.open();
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_FALSE(modified);
+}
+
+TEST_F(PathTest, testOpenTwoVertices) {
+  Path actual = Path({
+      Vertex(Point(1, 2), Angle::deg180()),
+      Vertex(Point(1, 2), Angle::deg180()),
+  });
+  const Path expected = Path({
+      Vertex(Point(1, 2), Angle::deg180()),
+      Vertex(Point(1, 2), Angle::deg180()),
+  });
+  const bool modified = actual.open();
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_FALSE(modified);
+}
+
+TEST_F(PathTest, testOpenMultipleVerticesClosed) {
+  Path actual = Path({
+      Vertex(Point(1, 2), Angle::deg45()),
+      Vertex(Point(3, 4), Angle::deg90()),
+      Vertex(Point(1, 2), Angle::deg180()),
+  });
+  const Path expected = Path({
+      Vertex(Point(1, 2), Angle::deg45()),
+      Vertex(Point(3, 4), Angle::deg90()),
+  });
+  const bool modified = actual.open();
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_TRUE(modified);
+}
+
+TEST_F(PathTest, testOpenMultipleVerticesOpen) {
+  Path actual = Path({
+      Vertex(Point(1, 2), Angle::deg45()),
+      Vertex(Point(3, 4), Angle::deg90()),
+      Vertex(Point(5, 6), Angle::deg180()),
+  });
+  const Path expected = Path({
+      Vertex(Point(1, 2), Angle::deg45()),
+      Vertex(Point(3, 4), Angle::deg90()),
+      Vertex(Point(5, 6), Angle::deg180()),
+  });
+  const bool modified = actual.open();
+  EXPECT_EQ(str(expected), str(actual));
+  EXPECT_FALSE(modified);
+}
+
 TEST_F(PathTest, testOperatorCompareLess) {
   EXPECT_FALSE(Path() < Path());
   EXPECT_FALSE(Path({Vertex(Point(1, 2))}) < Path());

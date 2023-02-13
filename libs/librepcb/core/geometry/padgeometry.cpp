@@ -112,6 +112,23 @@ QVector<Path> PadGeometry::toOutlines() const {
       }
       break;
     }
+    case Shape::Custom: {
+      const Path outline = mPath.toClosedPath();
+      if (outline.getVertices().count() >= 3) {
+        // Note: If mOffset is zero, the offset operation sounds superfluous.
+        // However, this operation ensures that invalid outlines (e.g.
+        // overlaps or intersections) will be cleaned before any further
+        // processing of the pad shape (e.g. Gerber export).
+        ClipperLib::Paths paths{
+            ClipperHelpers::convert(outline, maxArcTolerance())};
+        std::unique_ptr<ClipperLib::PolyTree> tree =
+            ClipperHelpers::offsetToTree(paths, mOffset,
+                                         maxArcTolerance());  // can throw
+        paths = ClipperHelpers::flattenTree(*tree);  // can throw
+        result = ClipperHelpers::convert(paths);
+      }
+      break;
+    }
     default: {
       qCritical() << "Unhandled switch-case in PadGeometry::toOutlines():"
                   << static_cast<int>(mShape);
@@ -196,6 +213,16 @@ PadGeometry PadGeometry::stroke(const PositiveLength& diameter,
                                 const HoleList& holes) noexcept {
   return PadGeometry(Shape::Stroke, *diameter, Length(0), *path, Length(0),
                      holes);
+}
+
+PadGeometry PadGeometry::custom(const Path& outline, const HoleList& holes) {
+  return PadGeometry(Shape::Custom, Length(0), Length(0), outline, Length(0),
+                     holes);
+}
+
+bool PadGeometry::isValidCustomOutline(const Path& path) noexcept {
+  return std::abs(ClipperLib::Area(ClipperHelpers::convert(
+             path.toClosedPath(), maxArcTolerance()))) > 1;
 }
 
 /*******************************************************************************

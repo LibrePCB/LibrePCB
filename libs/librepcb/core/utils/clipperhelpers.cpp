@@ -184,6 +184,23 @@ void ClipperHelpers::offset(ClipperLib::Paths& paths, const Length& offset,
   }
 }
 
+std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::offsetToTree(
+    const ClipperLib::Paths& paths, const Length& offset,
+    const PositiveLength& maxArcTolerance) {
+  try {
+    // Wrap the PolyTree object in a smart pointer since PolyTree cannot
+    // safely be copied (i.e. returned by value), it would lead to a crash!!!
+    std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
+    ClipperLib::ClipperOffset o(2.0, maxArcTolerance->toNm());
+    o.AddPaths(paths, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+    o.Execute(*result, offset.toNm());
+    return result;
+  } catch (const std::exception& e) {
+    throw LogicError(__FILE__, __LINE__,
+                     QString("Failed to offset paths: %1").arg(e.what()));
+  }
+}
+
 ClipperLib::Paths ClipperHelpers::treeToPaths(
     const ClipperLib::PolyTree& tree) {
   try {

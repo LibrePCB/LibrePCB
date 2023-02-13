@@ -57,13 +57,14 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
     mPackagePadComboBox(nullptr),
     mLastPad(
         Uuid::createRandom(), tl::nullopt, Point(0, 0), Angle::deg0(),
-        FootprintPad::Shape::ROUND,  // Commonly used pad shape
+        FootprintPad::Shape::Round,  // Commonly used pad shape
         PositiveLength(2500000),  // There is no default/recommended pad size
         PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
+        Path(),  // Custom shape outline
         FootprintPad::ComponentSide::Top,  // Default side
         HoleList{}) {
   if (mPadType == PadType::SMT) {
-    mLastPad.setShape(FootprintPad::Shape::RECT);  // Commonly used SMT shape
+    mLastPad.setShape(FootprintPad::Shape::Rect);  // Commonly used SMT shape
     mLastPad.setWidth(PositiveLength(1500000));  // Same as for THT pads ->
     mLastPad.setHeight(PositiveLength(700000));  // reasonable multiple of 0.1mm
   } else {
@@ -121,28 +122,28 @@ bool PackageEditorState_AddPads::entry() noexcept {
       new QActionGroup(&mContext.commandToolBar));
   QAction* aShapeRound =
       cmd.thtShapeRound.createAction(shapeActionGroup.get(), this, [this]() {
-        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::ROUND);
+        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::Round);
       });
   aShapeRound->setIcon(QIcon(":/img/command_toolbars/shape_round.png"));
   aShapeRound->setCheckable(true);
-  aShapeRound->setChecked(mLastPad.getShape() == FootprintPad::Shape::ROUND);
+  aShapeRound->setChecked(mLastPad.getShape() == FootprintPad::Shape::Round);
   aShapeRound->setActionGroup(shapeActionGroup.get());
   QAction* aShapeRect = cmd.thtShapeRectangular.createAction(
       shapeActionGroup.get(), this, [this]() {
-        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::RECT);
+        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::Rect);
       });
   aShapeRect->setIcon(QIcon(":/img/command_toolbars/shape_rect.png"));
   aShapeRect->setCheckable(true);
-  aShapeRect->setChecked(mLastPad.getShape() == FootprintPad::Shape::RECT);
+  aShapeRect->setChecked(mLastPad.getShape() == FootprintPad::Shape::Rect);
   aShapeRect->setActionGroup(shapeActionGroup.get());
   QAction* aShapeOctagon = cmd.thtShapeOctagonal.createAction(
       shapeActionGroup.get(), this, [this]() {
-        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::OCTAGON);
+        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::Octagon);
       });
   aShapeOctagon->setIcon(QIcon(":/img/command_toolbars/shape_octagon.png"));
   aShapeOctagon->setCheckable(true);
   aShapeOctagon->setChecked(mLastPad.getShape() ==
-                            FootprintPad::Shape::OCTAGON);
+                            FootprintPad::Shape::Octagon);
   aShapeOctagon->setActionGroup(shapeActionGroup.get());
   mContext.commandToolBar.addActionGroup(std::move(shapeActionGroup));
   mContext.commandToolBar.addSeparator();
@@ -309,7 +310,8 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
     mCurrentPad = std::make_shared<FootprintPad>(
         Uuid::createRandom(), mLastPad.getPackagePadUuid(),
         mLastPad.getPosition(), mLastPad.getRotation(), mLastPad.getShape(),
-        mLastPad.getWidth(), mLastPad.getHeight(), mLastPad.getComponentSide(),
+        mLastPad.getWidth(), mLastPad.getHeight(),
+        mLastPad.getCustomShapeOutline(), mLastPad.getComponentSide(),
         HoleList{});
     for (const Hole& hole : mLastPad.getHoles()) {
       mCurrentPad->getHoles().append(std::make_shared<Hole>(

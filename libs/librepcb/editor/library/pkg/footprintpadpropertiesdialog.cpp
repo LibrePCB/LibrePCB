@@ -61,6 +61,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
                           settingsPrefix % "/pos_y");
   mUi->edtRotation->setSingleStep(90.0);  // [°]
+  mUi->customShapePathEditor->setLengthUnit(lengthUnit);
   mUi->holeEditorWidget->configureClientSettings(
       lengthUnit, settingsPrefix % "/hole_editor");
   connect(mUi->lblHoleDetails, &QLabel::linkActivated, this,
@@ -87,6 +88,31 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
           &FootprintPadPropertiesDialog::addHole);
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &FootprintPadPropertiesDialog::on_buttonBox_clicked);
+
+  // Disable width/height inputs if custom shape is selected.
+  connect(mUi->rbtnShapeCustom, &QRadioButton::toggled, mUi->edtWidth,
+          &PositiveLengthEdit::setDisabled);
+  connect(mUi->rbtnShapeCustom, &QRadioButton::toggled, mUi->edtHeight,
+          &PositiveLengthEdit::setDisabled);
+
+  // Automatically set/clear custom shape outline to improve user experience.
+  mAutoCustomOutline = mPad.getCustomShapeOutline();
+  if (mPad.getShape() != FootprintPad::Shape::Custom) {
+    const QVector<Path> outlines = mPad.getGeometry().toOutlines();
+    if (!outlines.isEmpty()) {
+      mAutoCustomOutline = outlines.first().toOpenPath();
+    }
+  }
+  connect(mUi->rbtnShapeCustom, &QRadioButton::toggled, this,
+          [this](bool custom) {
+            const Path path = mUi->customShapePathEditor->getPath();
+            if (custom && (path.getVertices().isEmpty())) {
+              mUi->customShapePathEditor->setPath(mAutoCustomOutline);
+            } else if (!custom) {
+              mAutoCustomOutline = path;
+              mUi->customShapePathEditor->setPath(Path());
+            }
+          });
 
   // Avoid creating pads with a drill diameter larger than its size!
   // See https://github.com/LibrePCB/LibrePCB/issues/946.
@@ -132,14 +158,17 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
     mUi->rbtnComponentSideTop->setChecked(true);
   }
   switch (mPad.getShape()) {
-    case FootprintPad::Shape::ROUND:
+    case FootprintPad::Shape::Round:
       mUi->rbtnShapeRound->setChecked(true);
       break;
-    case FootprintPad::Shape::RECT:
+    case FootprintPad::Shape::Rect:
       mUi->rbtnShapeRect->setChecked(true);
       break;
-    case FootprintPad::Shape::OCTAGON:
+    case FootprintPad::Shape::Octagon:
       mUi->rbtnShapeOctagon->setChecked(true);
+      break;
+    case FootprintPad::Shape::Custom:
+      mUi->rbtnShapeCustom->setChecked(true);
       break;
     default:
       Q_ASSERT(false);
@@ -150,6 +179,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   mUi->edtPosX->setValue(mPad.getPosition().getX());
   mUi->edtPosY->setValue(mPad.getPosition().getY());
   mUi->edtRotation->setValue(mPad.getRotation());
+  mUi->customShapePathEditor->setPath(mPad.getCustomShapeOutline());
   updateGeneralTabHoleWidgets();
   setSelectedHole(0);
 
@@ -171,6 +201,7 @@ void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->rbtnShapeRound->setDisabled(readOnly);
   mUi->rbtnShapeRect->setDisabled(readOnly);
   mUi->rbtnShapeOctagon->setDisabled(readOnly);
+  mUi->rbtnShapeCustom->setDisabled(readOnly);
   mUi->edtHoleDiameter->setReadOnly(readOnly);
   mUi->btnConvertToSmt->setEnabled(!readOnly);
   mUi->btnConvertToTht->setEnabled(!readOnly);
@@ -181,6 +212,7 @@ void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->edtRotation->setReadOnly(readOnly);
   mUi->btnRemoveHole->setVisible(!readOnly);
   mUi->btnAddHole->setVisible(!readOnly);
+  mUi->customShapePathEditor->setReadOnly(readOnly);
   mUi->holeEditorWidget->setReadOnly(readOnly);
   if (readOnly) {
     mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
@@ -272,6 +304,18 @@ void FootprintPadPropertiesDialog::on_buttonBox_clicked(
 }
 
 bool FootprintPadPropertiesDialog::applyChanges() noexcept {
+  // Clean and validate custom outline path.
+  const Path customOutlinePath =
+      mUi->customShapePathEditor->getPath().cleaned().toOpenPath();
+  mUi->customShapePathEditor->setPath(customOutlinePath);
+  if (mUi->rbtnShapeCustom->isChecked() &&
+      (!PadGeometry::isValidCustomOutline(customOutlinePath))) {
+    QMessageBox::critical(
+        this, tr("Invalid outline"),
+        tr("The custom pad outline does not represent a valid area."));
+    return false;
+  }
+
   try {
     QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(mPad));
     tl::optional<Uuid> pkgPad =
@@ -285,16 +329,19 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
       Q_ASSERT(false);
     }
     if (mUi->rbtnShapeRound->isChecked()) {
-      cmd->setShape(FootprintPad::Shape::ROUND, false);
+      cmd->setShape(FootprintPad::Shape::Round, false);
     } else if (mUi->rbtnShapeRect->isChecked()) {
-      cmd->setShape(FootprintPad::Shape::RECT, false);
+      cmd->setShape(FootprintPad::Shape::Rect, false);
     } else if (mUi->rbtnShapeOctagon->isChecked()) {
-      cmd->setShape(FootprintPad::Shape::OCTAGON, false);
+      cmd->setShape(FootprintPad::Shape::Octagon, false);
+    } else if (mUi->rbtnShapeCustom->isChecked()) {
+      cmd->setShape(FootprintPad::Shape::Custom, false);
     } else {
       Q_ASSERT(false);
     }
     cmd->setWidth(mUi->edtWidth->getValue(), false);
     cmd->setHeight(mUi->edtHeight->getValue(), false);
+    cmd->setCustomShapeOutline(customOutlinePath);
     cmd->setHoles(mHoles, false);
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);

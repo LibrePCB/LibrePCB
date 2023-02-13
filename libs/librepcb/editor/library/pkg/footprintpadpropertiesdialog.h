@@ -90,6 +90,7 @@ private:  // Data
   HoleList mHoles;
   int mSelectedHoleIndex;
   QScopedPointer<Ui::FootprintPadPropertiesDialog> mUi;
+  Path mAutoCustomOutline;
 };
 
 /*******************************************************************************

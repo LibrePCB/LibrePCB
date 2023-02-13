@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>510</width>
+    <width>587</width>
     <height>325</height>
    </rect>
   </property>
@@ -116,6 +116,13 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QRadioButton" name="rbtnShapeCustom">
+            <property name="text">
+             <string>Custom</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -209,6 +216,31 @@
        </item>
        <item row="6" column="1">
         <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabCustomShape">
+      <attribute name="title">
+       <string>Custom Shape</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+       <item>
+        <widget class="librepcb::editor::PathEditorWidget" name="customShapePathEditor" native="true"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Coordinates are relative to the pad origin and before rotation.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -344,6 +376,12 @@
    <class>librepcb::editor::HoleEditorWidget</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/holeeditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::PathEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/patheditorwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
