@@ -37,6 +37,7 @@ namespace librepcb {
 class BI_FootprintPad;
 class BI_Plane;
 class BI_Via;
+class Transform;
 
 /*******************************************************************************
  *  Class BoardPlaneFragmentsBuilder
@@ -69,7 +70,9 @@ private:  // Methods
   void removeOrphans();
 
   // Helper Methods
-  ClipperLib::Path createPadCutOut(const BI_FootprintPad& pad) const noexcept;
+  ClipperLib::Paths createPadCutOuts(const Transform& deviceTransform,
+                                     const Transform& padTransform,
+                                     const BI_FootprintPad& pad) const;
   ClipperLib::Path createViaCutOut(const BI_Via& via) const noexcept;
 
   /**

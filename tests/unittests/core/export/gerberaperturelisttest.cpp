@@ -1006,6 +1006,37 @@ TEST_F(GerberApertureListTest, testWideOctagon100deg) {
   }
 }
 
+// Test if outline apertures with rotations of -350° and 10° are exported as
+// the same aperture macro.
+TEST_F(GerberApertureListTest, testOutline10deg) {
+  GerberApertureList l;
+  StraightAreaPath p(Path({
+      Vertex(Point(-100000, 100000)),
+      Vertex(Point(500000, 700000)),
+      Vertex(Point(-500000, 700000)),
+      Vertex(Point(-100000, 100000)),
+  }));
+  QVector<Angle> rotations = {
+      Angle(-350000000),
+      Angle(10000000),
+  };
+
+  const char* expected =
+      "%AMOUTLINE10*"
+      "4,1,3,"
+      "-0.1,0.1,"
+      "0.5,0.7,"
+      "-0.5,0.7,"
+      "-0.1,0.1,"
+      "10.0*%\n"
+      "%ADD10OUTLINE10*%\n";
+
+  for (const Angle& rot : rotations) {
+    EXPECT_EQ(10, l.addOutline(p, rot, tl::nullopt));
+    EXPECT_EQ(expected, l.generateString().toStdString());
+  }
+}
+
 TEST_F(GerberApertureListTest, testComponentMain) {
   GerberApertureList l;
 

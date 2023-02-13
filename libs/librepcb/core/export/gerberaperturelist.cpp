@@ -248,6 +248,12 @@ int GerberApertureList::addOctagon(const PositiveLength& w,
   }
 }
 
+int GerberApertureList::addOutline(const StraightAreaPath& path,
+                                   const Angle& rot,
+                                   Function function) noexcept {
+  return addOutline("OUTLINE", *path, rot.mappedTo0_360deg(), function);
+}
+
 int GerberApertureList::addComponentMain() noexcept {
   // Note: The aperture shape, size and function is defined in the Gerber
   // specs, do not change them!
@@ -276,7 +282,7 @@ int GerberApertureList::addOutline(const QString& name, const Path& path,
                                    Function function) noexcept {
   QString s = QString("%AM%1{}*").arg(name);
   s += buildOutlineMacro(path, rot);
-  s += QString("%\n").arg(rot.toDegString());
+  s += QString("%\n");
   s += QString("%ADD{}%1{}*%\n").arg(name);
   return addAperture(s, function);
 }

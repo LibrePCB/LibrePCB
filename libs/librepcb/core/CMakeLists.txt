@@ -135,6 +135,8 @@ add_library(
   geometry/netlabel.h
   geometry/netline.cpp
   geometry/netline.h
+  geometry/padgeometry.cpp
+  geometry/padgeometry.h
   geometry/path.cpp
   geometry/path.h
   geometry/polygon.cpp
@@ -256,6 +258,8 @@ add_library(
   library/pkg/msg/msgpadannularringviolation.h
   library/pkg/msg/msgpadclearanceviolation.cpp
   library/pkg/msg/msgpadclearanceviolation.h
+  library/pkg/msg/msgpadoriginoutsidecopper.cpp
+  library/pkg/msg/msgpadoriginoutsidecopper.h
   library/pkg/msg/msgpadoverlapswithplacement.cpp
   library/pkg/msg/msgpadoverlapswithplacement.h
   library/pkg/msg/msgwrongfootprinttextlayer.cpp

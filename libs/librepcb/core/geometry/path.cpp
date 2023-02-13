@@ -227,6 +227,30 @@ Path Path::reversed() const noexcept {
   return Path(*this).reverse();
 }
 
+Path& Path::flattenArcs(const PositiveLength& maxTolerance) noexcept {
+  if (!mVertices.isEmpty()) {
+    mVertices.last().setAngle(Angle::deg0());
+  }
+  for (int i = mVertices.count() - 2; i >= 0; --i) {
+    if (mVertices.at(i).getAngle() != Angle::deg0()) {
+      const Path arc =
+          flatArc(mVertices.at(i).getPos(), mVertices.at(i + 1).getPos(),
+                  mVertices.at(i).getAngle(), maxTolerance);
+      Q_ASSERT(arc.getVertices().count() >= 2);
+      mVertices.insert(i + 1, arc.getVertices().count() - 2, Vertex());
+      for (int k = 0; k < arc.getVertices().count(); ++k) {
+        mVertices[i + k] = arc.getVertices().at(k);
+      }
+    }
+  }
+  invalidatePainterPath();
+  return *this;
+}
+
+Path Path::flattenedArcs(const PositiveLength& maxTolerance) const noexcept {
+  return Path(*this).flattenArcs(maxTolerance);
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/

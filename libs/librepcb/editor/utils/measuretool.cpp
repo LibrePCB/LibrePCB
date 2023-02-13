@@ -311,13 +311,14 @@ QSet<Point> MeasureTool::snapCandidatesFromFootprint(
   QSet<Point> candidates;
   for (const FootprintPad& p : footprint.getPads()) {
     candidates.insert(transform.map(p.getPosition()));
-    Path path = p.getOutline();
-    path.addVertex(Point(p.getWidth() / 2, 0));
-    path.addVertex(Point(-p.getWidth() / 2, 0));
-    path.addVertex(Point(0, p.getHeight() / 2));
-    path.addVertex(Point(0, -p.getHeight() / 2));
-    candidates |= snapCandidatesFromPath(transform.map(
-        path.rotated(p.getRotation()).translated(p.getPosition())));
+    try {
+      foreach (const Path& outline, p.getGeometry().toOutlines()) {
+        candidates |= snapCandidatesFromPath(transform.map(
+            outline.rotated(p.getRotation()).translated(p.getPosition())));
+      }
+    } catch (const Exception& e) {
+      qWarning() << "Failed to determine snap candidates:" << e.getMsg();
+    }
     const Transform padTransform(p.getPosition(), p.getRotation());
     for (const Hole& h : p.getHoles()) {
       foreach (const Vertex& vertex,
@@ -348,8 +349,16 @@ QSet<Point> MeasureTool::snapCandidatesFromFootprint(
 
 QSet<Point> MeasureTool::snapCandidatesFromPath(const Path& path) noexcept {
   QSet<Point> candidates;
-  foreach (const Vertex& v, path.getVertices()) {
+  for (int i = 0; i < path.getVertices().count(); ++i) {
+    const Vertex& v = path.getVertices().at(i);
     candidates.insert(v.getPos());
+    if ((v.getAngle().abs() == Angle::deg180()) &&
+        (i < (path.getVertices().count() - 1))) {
+      const Point& p2 = path.getVertices().at(i + 1).getPos();
+      const Point center = (v.getPos() + p2) / 2;
+      const Point middle = v.getPos().rotated(v.getAngle() / 2, center);
+      candidates.insert(middle);
+    }
   }
   return candidates;
 }

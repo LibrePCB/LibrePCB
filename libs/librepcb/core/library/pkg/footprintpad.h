@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../exceptions.h"
 #include "../../geometry/hole.h"
+#include "../../geometry/padgeometry.h"
 #include "../../geometry/path.h"
 #include "../../serialization/serializableobjectlist.h"
 #include "../../types/angle.h"
@@ -96,9 +97,7 @@ public:
   QString getLayerName() const noexcept;
   bool isTht() const noexcept;
   bool isOnLayer(const QString& name) const noexcept;
-  Path getOutline(const Length& expansion = Length(0)) const noexcept;
-  QPainterPath toQPainterPathPx(const Length& expansion = Length(0)) const
-      noexcept;
+  PadGeometry getGeometry() const noexcept;
 
   // Setters
   bool setPackagePadUuid(const tl::optional<Uuid>& pad) noexcept;

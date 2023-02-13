@@ -29,7 +29,6 @@
 #include "../../project.h"
 #include "../../projectsettings.h"
 #include "../board.h"
-#include "../boarddesignrules.h"
 #include "../boardlayerstack.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprintpad.h"
@@ -50,11 +49,8 @@ BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad) noexcept
   : BGI_Base(),
     mPad(pad),
     mLibPad(pad.getLibPad()),
-    mPadLayer(nullptr),
-    mTopStopMaskLayer(nullptr),
-    mBottomStopMaskLayer(nullptr),
-    mTopSolderPasteLayer(nullptr),
-    mBottomSolderPasteLayer(nullptr),
+    mCopperLayer(nullptr),
+    mContents(),
     mOnLayerEditedSlot(*this, &BGI_FootprintPad::layerEdited) {
   mFont = qApp->getDefaultSansSerifFont();
   mFont.setPixelSize(1);
@@ -70,7 +66,7 @@ BGI_FootprintPad::~BGI_FootprintPad() noexcept {
  ******************************************************************************/
 
 bool BGI_FootprintPad::isSelectable() const noexcept {
-  return mPadLayer && mPadLayer->isVisible();
+  return mCopperLayer && mCopperLayer->isVisible();
 }
 
 /*******************************************************************************
@@ -82,50 +78,57 @@ void BGI_FootprintPad::updateCacheAndRepaint() noexcept {
 
   setToolTip(mPad.getDisplayText());
 
-  // set Z value
-  if ((mLibPad.getComponentSide() == FootprintPad::ComponentSide::Bottom) !=
-      mPad.getMirrored()) {
+  // Set Z value.
+  if (mPad.getComponentSide() == FootprintPad::ComponentSide::Bottom) {
     setZValue(Board::ZValue_FootprintPadsBottom);
   } else {
     setZValue(Board::ZValue_FootprintPadsTop);
   }
 
-  // set layers
+  // Determine layers to draw something on (in stackup order).
+  QStringList layers{
+      GraphicsLayer::sBotSolderPaste,
+      GraphicsLayer::sBotStopMask,
+      GraphicsLayer::sBotCopper,
+  };
+  if (mPad.getLibPad().isTht()) {
+    for (int i = 1; i <= mPad.getBoard().getLayerStack().getInnerLayerCount();
+         ++i) {
+      layers.append(GraphicsLayer::getInnerLayerName(i));
+    }
+  }
+  layers += {
+      GraphicsLayer::sTopCopper,
+      GraphicsLayer::sBoardPadsTht,
+      GraphicsLayer::sTopStopMask,
+      GraphicsLayer::sTopSolderPaste,
+  };
+
+  // Determine content to draw on each layer.
   disconnectLayerEditedSlots();
-  mPadLayer = getLayer(mLibPad.getLayerName());
-  if (mLibPad.isTht()) {
-    mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
-    mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
-    mTopSolderPasteLayer = nullptr;
-    mBottomSolderPasteLayer = nullptr;
-  } else if (mLibPad.getComponentSide() ==
-             FootprintPad::ComponentSide::Bottom) {
-    mTopStopMaskLayer = nullptr;
-    mBottomStopMaskLayer = getLayer(GraphicsLayer::sBotStopMask);
-    mTopSolderPasteLayer = nullptr;
-    mBottomSolderPasteLayer = getLayer(GraphicsLayer::sBotSolderPaste);
-  } else {
-    mTopStopMaskLayer = getLayer(GraphicsLayer::sTopStopMask);
-    mBottomStopMaskLayer = nullptr;
-    mTopSolderPasteLayer = getLayer(GraphicsLayer::sTopSolderPaste);
-    mBottomSolderPasteLayer = nullptr;
+  mCopperLayer = getLayer(mPad.getLayerName());
+  mContents.clear();
+  foreach (const QString& layerName, layers) {
+    if (GraphicsLayer* layer = getLayer(layerName)) {
+      foreach (const PadGeometry& geometry,
+               mPad.getGeometryOnLayer(layerName)) {
+        mContents.append(LayerContent{
+            layer,
+            layer->isCopperLayer() ? mCopperLayer : layer,
+            geometry.toQPainterPathPx(),
+        });
+      }
+    }
   }
   connectLayerEditedSlots();
   updateVisibility();
 
-  // determine clearances
-  PositiveLength size = qMin(mLibPad.getWidth(), mLibPad.getHeight());
-  Length stopMaskClearance =
-      *mPad.getBoard().getDesignRules().calcStopMaskClearance(*size);
-  Length solderPasteClearance =
-      -mPad.getBoard().getDesignRules().calcSolderPasteClearance(*size);
-
-  // set shapes and bounding rect
-  mShape = mLibPad.getOutline().toQPainterPathPx();
-  mCopper = mLibPad.toQPainterPathPx();
-  mStopMask = mLibPad.getOutline(stopMaskClearance).toQPainterPathPx();
-  mSolderPaste = mLibPad.getOutline(solderPasteClearance).toQPainterPathPx();
-  mBoundingRect = mStopMask.boundingRect();
+  // Set bounding rect and shape.
+  mBoundingRect = QRectF();
+  foreach (const LayerContent& content, mContents) {
+    mBoundingRect |= content.path.boundingRect();
+  }
+  mShape = mLibPad.getGeometry().toFilledQPainterPathPx();
 
   update();
 }
@@ -144,44 +147,62 @@ void BGI_FootprintPad::paint(QPainter* painter,
   bool highlight =
       mPad.isSelected() || (netsignal && netsignal->isHighlighted());
 
-  if (mBottomSolderPasteLayer && mBottomSolderPasteLayer->isVisible()) {
-    // draw bottom solder paste
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mBottomSolderPasteLayer->getColor(highlight));
-    painter->drawPath(mSolderPaste);
+  // Draw bottom non-copper layers.
+  foreach (const LayerContent& content, mContents) {
+    if ((content.drawLayer != mCopperLayer) &&
+        (content.drawLayer->isBottomLayer()) &&
+        (content.drawLayer->isVisible())) {
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(content.drawLayer->getColor(highlight));
+      painter->drawPath(content.path);
+    }
   }
 
-  if (mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible()) {
-    // draw bottom stop mask
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
-    painter->drawPath(mStopMask);
+  // Draw filled copper layers.
+  QVector<QPainterPath> filledCopperPaths;
+  foreach (const LayerContent& content, mContents) {
+    if ((content.drawLayer == mCopperLayer) && content.drawLayer->isVisible() &&
+        content.visibilityLayer->isEnabled() &&
+        content.visibilityLayer->isVisible() &&
+        (!filledCopperPaths.contains(content.path))) {
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(content.drawLayer->getColor(highlight));
+      painter->drawPath(content.path);
+      filledCopperPaths.append(content.path);
+    }
   }
 
-  if (mPadLayer && mPadLayer->isVisible()) {
-    // draw pad
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mPadLayer->getColor(highlight));
-    painter->drawPath(mCopper);
-    // draw pad text
+  // Draw outline copper layers.
+  QVector<QPainterPath> outlineCopperPaths;
+  foreach (const LayerContent& content, mContents) {
+    if ((content.drawLayer == mCopperLayer) && content.drawLayer->isVisible() &&
+        content.visibilityLayer->isEnabled() &&
+        (!content.visibilityLayer->isVisible()) &&
+        (!filledCopperPaths.contains(content.path)) &&
+        (!outlineCopperPaths.contains(content.path))) {
+      painter->setPen(QPen(content.drawLayer->getColor(highlight), 0));
+      painter->setBrush(Qt::NoBrush);
+      painter->drawPath(content.path);
+      outlineCopperPaths.append(content.path);
+    }
+  }
+
+  // Draw text.
+  if (mCopperLayer && mCopperLayer->isVisible()) {
     painter->setFont(mFont);
-    painter->setPen(mPadLayer->getColor(highlight).lighter(150));
+    painter->setPen(mCopperLayer->getColor(highlight).lighter(150));
     painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
                       mPad.getDisplayText());
   }
 
-  if (mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {
-    // draw top stop mask
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mTopStopMaskLayer->getColor(highlight));
-    painter->drawPath(mStopMask);
-  }
-
-  if (mTopSolderPasteLayer && mTopSolderPasteLayer->isVisible()) {
-    // draw top solder paste
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(mTopSolderPasteLayer->getColor(highlight));
-    painter->drawPath(mSolderPaste);
+  // Draw top non-copper layers.
+  foreach (const LayerContent& content, mContents) {
+    if ((content.drawLayer != mCopperLayer) &&
+        (content.drawLayer->isTopLayer()) && (content.drawLayer->isVisible())) {
+      painter->setPen(Qt::NoPen);
+      painter->setBrush(content.drawLayer->getColor(highlight));
+      painter->drawPath(content.path);
+    }
   }
 }
 
@@ -189,28 +210,28 @@ void BGI_FootprintPad::paint(QPainter* painter,
  *  Private Methods
  ******************************************************************************/
 
-GraphicsLayer* BGI_FootprintPad::getLayer(QString name) const noexcept {
-  if (mPad.getMirrored()) name = GraphicsLayer::getMirroredLayerName(name);
+GraphicsLayer* BGI_FootprintPad::getLayer(const QString& name) const noexcept {
   return mPad.getDevice().getBoard().getLayerStack().getLayer(name);
 }
 
+QSet<GraphicsLayer*> BGI_FootprintPad::getAllInvolvedLayers() const noexcept {
+  QSet<GraphicsLayer*> layers;
+  foreach (const LayerContent& content, mContents) {
+    layers.insert(content.visibilityLayer);
+    layers.insert(content.drawLayer);
+  }
+  return layers;
+}
+
 void BGI_FootprintPad::connectLayerEditedSlots() noexcept {
-  for (GraphicsLayer* layer :
-       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer,
-        mTopSolderPasteLayer, mBottomSolderPasteLayer}) {
-    if (layer) {
-      layer->onEdited.attach(mOnLayerEditedSlot);
-    }
+  foreach (GraphicsLayer* layer, getAllInvolvedLayers()) {
+    layer->onEdited.attach(mOnLayerEditedSlot);
   }
 }
 
 void BGI_FootprintPad::disconnectLayerEditedSlots() noexcept {
-  for (GraphicsLayer* layer :
-       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer,
-        mTopSolderPasteLayer, mBottomSolderPasteLayer}) {
-    if (layer) {
-      layer->onEdited.detach(mOnLayerEditedSlot);
-    }
+  foreach (GraphicsLayer* layer, getAllInvolvedLayers()) {
+    layer->onEdited.detach(mOnLayerEditedSlot);
   }
 }
 
@@ -235,13 +256,14 @@ void BGI_FootprintPad::layerEdited(const GraphicsLayer& layer,
 }
 
 void BGI_FootprintPad::updateVisibility() noexcept {
-  bool visible = false;
-  for (GraphicsLayer* layer :
-       {mPadLayer, mTopStopMaskLayer, mBottomStopMaskLayer,
-        mTopSolderPasteLayer, mBottomSolderPasteLayer}) {
-    if (layer && layer->isVisible()) {
-      visible = true;
-      break;
+  bool visible = (mCopperLayer && mCopperLayer->isVisible());
+  if (!visible) {
+    foreach (const LayerContent& content, mContents) {
+      if (content.visibilityLayer->isVisible() &&
+          content.drawLayer->isVisible()) {
+        visible = true;
+        break;
+      }
     }
   }
   setVisible(visible);

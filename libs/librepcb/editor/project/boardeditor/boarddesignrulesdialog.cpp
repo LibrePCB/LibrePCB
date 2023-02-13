@@ -74,6 +74,30 @@ BoardDesignRulesDialog::BoardDesignRulesDialog(const BoardDesignRules& rules,
       lengthUnit, LengthEditBase::Steps::generic(),
       settingsPrefix % "/via_annular_ring_max");
 
+  // Add tooltips for annular rings.
+  for (auto rbtn : {mUi->rbtnCmpSidePadFullShape, mUi->rbtnInnerPadFullShape}) {
+    rbtn->setToolTip(
+        tr("<p>Always use the full pad shape as defined in the footprint from "
+           "the library.</p><p>This is the safer and thus preferred option, "
+           "but requires more space for the pads.</p>"));
+  }
+  for (auto rbtn :
+       {mUi->rbtnCmpSidePadAutoAnnular, mUi->rbtnInnerPadAutoAnnular}) {
+    rbtn->setToolTip(
+        tr("<p>Don't use the defined pad shape, but automatic annular rings "
+           "calculated by the parameters below. The annular ring of "
+           "unconnected pads is reduced to the specified mimimum value.</p>"
+           "<p>This option is more space-efficient, but works only reliable "
+           "if the entered parameters comply with the PCB manufacturers "
+           "capabilities.</p>"));
+  }
+
+  // Show warning only when relevant.
+  mUi->lblCmpSidePadWarning->setVisible(
+      mUi->rbtnCmpSidePadAutoAnnular->isChecked());
+  connect(mUi->rbtnCmpSidePadAutoAnnular, &QRadioButton::toggled,
+          mUi->lblCmpSidePadWarning, &QLabel::setVisible);
+
   updateWidgets();
 }
 
@@ -123,6 +147,16 @@ void BoardDesignRulesDialog::updateWidgets() noexcept {
   mUi->edtSolderPasteClrMax->setValue(
       mDesignRules.getSolderPasteClearanceMax());
   // pad annular ring
+  if (mDesignRules.getPadCmpSideAutoAnnularRing()) {
+    mUi->rbtnCmpSidePadAutoAnnular->setChecked(true);
+  } else {
+    mUi->rbtnCmpSidePadFullShape->setChecked(true);
+  }
+  if (mDesignRules.getPadInnerAutoAnnularRing()) {
+    mUi->rbtnInnerPadAutoAnnular->setChecked(true);
+  } else {
+    mUi->rbtnInnerPadFullShape->setChecked(true);
+  }
   mUi->edtPadAnnularRingRatio->setValue(mDesignRules.getPadAnnularRingRatio());
   mUi->edtPadAnnularRingMin->setValue(mDesignRules.getPadAnnularRingMin());
   mUi->edtPadAnnularRingMax->setValue(mDesignRules.getPadAnnularRingMax());
@@ -144,6 +178,10 @@ void BoardDesignRulesDialog::applyRules() noexcept {
         mUi->edtSolderPasteClrRatio->getValue(),
         mUi->edtSolderPasteClrMin->getValue(),
         mUi->edtSolderPasteClrMax->getValue());  // can throw
+    mDesignRules.setPadCmpSideAutoAnnularRing(
+        mUi->rbtnCmpSidePadAutoAnnular->isChecked());
+    mDesignRules.setPadInnerAutoAnnularRing(
+        mUi->rbtnInnerPadAutoAnnular->isChecked());
     mDesignRules.setPadAnnularRing(
         mUi->edtPadAnnularRingRatio->getValue(),
         mUi->edtPadAnnularRingMin->getValue(),

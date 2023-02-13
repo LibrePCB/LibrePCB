@@ -112,6 +112,10 @@ public:
                     const Angle& rot, Function function,
                     const tl::optional<QString>& net, const QString& component,
                     const QString& pin, const QString& signal) noexcept;
+  void flashOutline(const Point& pos, const StraightAreaPath& path,
+                    const Angle& rot, Function function,
+                    const tl::optional<QString>& net, const QString& component,
+                    const QString& pin, const QString& signal) noexcept;
   void flashComponent(const Point& pos, const Angle& rot,
                       const QString& designator, const QString& value,
                       MountType mountType, const QString& manufacturer,

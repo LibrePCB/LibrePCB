@@ -30,6 +30,7 @@
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
+#include "../boarddesignrules.h"
 #include "bi_device.h"
 #include "bi_netsegment.h"
 
@@ -114,6 +115,17 @@ QString BI_FootprintPad::getDisplayText() const noexcept {
     return *mPackagePad->getName();
   } else {
     return QString();  // Unconnected pad, no name to display...
+  }
+}
+
+FootprintPad::ComponentSide BI_FootprintPad::getComponentSide() const noexcept {
+  if (getMirrored()) {
+    return (mFootprintPad->getComponentSide() ==
+            FootprintPad::ComponentSide::Top)
+        ? FootprintPad::ComponentSide::Bottom
+        : FootprintPad::ComponentSide::Top;
+  } else {
+    return mFootprintPad->getComponentSide();
   }
 }
 
@@ -203,6 +215,7 @@ void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
   }
   mRegisteredNetLines.insert(&netline);
   netline.updateLine();
+  mGraphicsItem->updateCacheAndRepaint();  // Update omitted annular rings.
 }
 
 void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline) {
@@ -211,6 +224,7 @@ void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline) {
   }
   mRegisteredNetLines.remove(&netline);
   netline.updateLine();
+  mGraphicsItem->updateCacheAndRepaint();  // Update omitted annular rings.
 }
 
 void BI_FootprintPad::updatePosition() noexcept {
@@ -249,17 +263,35 @@ void BI_FootprintPad::setSelected(bool selected) noexcept {
   mGraphicsItem->update();
 }
 
-Path BI_FootprintPad::getOutline(const Length& expansion) const noexcept {
-  return mFootprintPad->getOutline(expansion);
-}
+QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
+    const QString& layer) const noexcept {
+  if (GraphicsLayer::isCopperLayer(layer)) {
+    return getGeometryOnCopperLayer(layer);
+  }
 
-Path BI_FootprintPad::getSceneOutline(const Length& expansion) const noexcept {
-  const Path path = getOutline(expansion)
-                        .rotated(mFootprintPad->getRotation())
-                        .translated(mFootprintPad->getPosition());
-  const Transform transform(mDevice.getPosition(), mDevice.getRotation(),
-                            mDevice.getMirrored());
-  return transform.map(path);
+  QList<PadGeometry> result;
+  tl::optional<Length> offset;
+  if ((layer == GraphicsLayer::sTopStopMask) ||
+      (layer == GraphicsLayer::sBotStopMask)) {
+    const PositiveLength size =
+        std::min(mFootprintPad->getWidth(), mFootprintPad->getHeight());
+    offset = *mBoard.getDesignRules().calcStopMaskClearance(*size);
+  } else if ((!mFootprintPad->isTht()) &&
+             ((layer == GraphicsLayer::sTopSolderPaste) ||
+              (layer == GraphicsLayer::sBotSolderPaste))) {
+    const PositiveLength size =
+        std::min(mFootprintPad->getWidth(), mFootprintPad->getHeight());
+    offset = -mBoard.getDesignRules().calcSolderPasteClearance(*size);
+  }
+  if (offset) {
+    const QString copperLayer = GraphicsLayer::isTopLayer(layer)
+        ? GraphicsLayer::sTopCopper
+        : GraphicsLayer::sBotCopper;
+    foreach (const PadGeometry& pg, getGeometryOnCopperLayer(copperLayer)) {
+      result.append(pg.withoutHoles().withOffset(*offset));
+    }
+  }
+  return result;
 }
 
 TraceAnchor BI_FootprintPad::toTraceAnchor() const noexcept {
@@ -321,6 +353,67 @@ QString BI_FootprintPad::getNetSignalName() const noexcept {
   } else {
     return QString();
   }
+}
+
+QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
+    const QString& layer) const noexcept {
+  Q_ASSERT(GraphicsLayer::isCopperLayer(layer));
+
+  // Determine pad shape.
+  bool fullShape = false;
+  bool autoAnnular = false;
+  bool minimalAnnular = false;
+  const QString componentSideLayer =
+      (getComponentSide() == FootprintPad::ComponentSide::Top)
+      ? GraphicsLayer::sTopCopper
+      : GraphicsLayer::sBotCopper;
+  if (mFootprintPad->isTht()) {
+    const QString solderSideLayer =
+        (getComponentSide() == FootprintPad::ComponentSide::Top)
+        ? GraphicsLayer::sBotCopper
+        : GraphicsLayer::sTopCopper;
+    const bool fullComponentSide =
+        !mBoard.getDesignRules().getPadCmpSideAutoAnnularRing();
+    const bool fullInner =
+        !mBoard.getDesignRules().getPadInnerAutoAnnularRing();
+    if ((layer == solderSideLayer) ||  // solder side
+        (fullComponentSide &&
+         (layer == componentSideLayer)) ||  // component side
+        (fullInner && GraphicsLayer::isInnerLayer(layer))) {  // inner layer
+      fullShape = true;
+    } else if (isConnectedOnLayer(layer)) {
+      autoAnnular = true;
+    } else {
+      minimalAnnular = true;
+    }
+  } else if (layer == componentSideLayer) {
+    fullShape = true;
+  }
+
+  // Build geometry.
+  QList<PadGeometry> result;
+  if (fullShape) {
+    result.append(mFootprintPad->getGeometry());
+  } else if (autoAnnular || minimalAnnular) {
+    for (const Hole& hole : mFootprintPad->getHoles()) {
+      const UnsignedLength annularWidth = autoAnnular
+          ? mBoard.getDesignRules().calcPadAnnularRing(*hole.getDiameter())
+          : mBoard.getDesignRules().getPadAnnularRingMin();  // Min. Annular
+      result.append(PadGeometry::stroke(
+          hole.getDiameter() + annularWidth + annularWidth, hole.getPath(),
+          HoleList{std::make_shared<Hole>(hole)}));
+    }
+  }
+  return result;
+}
+
+bool BI_FootprintPad::isConnectedOnLayer(const QString& layer) const noexcept {
+  foreach (const BI_NetLine* line, mRegisteredNetLines) {
+    if (line->getLayer().getName() == layer) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /*******************************************************************************

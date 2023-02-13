@@ -145,6 +145,18 @@ public:
                  Function function) noexcept;
 
   /**
+   * @brief Add a custom outline aperture
+   *
+   * @param path      The vertices.
+   * @param rot       Rotation.
+   * @param function  Function attribute.
+   *
+   * @return Aperture number.
+   */
+  int addOutline(const StraightAreaPath& path, const Angle& rot,
+                 Function function) noexcept;
+
+  /**
    * @brief Add a component main aperture (for component layers only)
    *
    * @return Aperture number.
@@ -166,11 +178,6 @@ public:
 private:  // Methods
   /**
    * @brief Add a custom outline aperture
-   *
-   * @note  This is private because it does not implement proper error handling
-   *        yet, so you could create invalid Gerber files when passing invalid
-   *        parameters! Let's implement proper error handling once we need to
-   *        make it public.
    *
    * @param name      Macro name (use only characters A..Z!).
    * @param path      The vertices. ATTENTION: After closing the path, it must

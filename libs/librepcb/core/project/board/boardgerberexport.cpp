@@ -707,90 +707,106 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
 void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
                                          const BI_FootprintPad& pad,
                                          const QString& layerName) const {
-  bool isSmt = !pad.getLibPad().isTht();
-  bool isOnCopperLayer = pad.isOnLayer(layerName);
-  bool isOnSolderMaskTop = pad.isOnLayer(GraphicsLayer::sTopCopper) &&
-      (layerName == GraphicsLayer::sTopStopMask);
-  bool isOnSolderMaskBottom = pad.isOnLayer(GraphicsLayer::sBotCopper) &&
-      (layerName == GraphicsLayer::sBotStopMask);
-  bool isOnSolderPasteTop = isSmt && pad.isOnLayer(GraphicsLayer::sTopCopper) &&
-      (layerName == GraphicsLayer::sTopSolderPaste);
-  bool isOnSolderPasteBottom = isSmt &&
-      pad.isOnLayer(GraphicsLayer::sBotCopper) &&
-      (layerName == GraphicsLayer::sBotSolderPaste);
-  if (!isOnCopperLayer && !isOnSolderMaskTop && !isOnSolderMaskBottom &&
-      !isOnSolderPasteTop && !isOnSolderPasteBottom) {
-    return;
-  }
+  foreach (const PadGeometry& geometry, pad.getGeometryOnLayer(layerName)) {
+    // Pad attributes (most of them only on copper layers).
+    GerberGenerator::Function function = tl::nullopt;
+    tl::optional<QString> net = tl::nullopt;
+    QString component = *pad.getDevice().getComponentInstance().getName();
+    QString pin, signal;
+    if (GraphicsLayer::isCopperLayer(layerName)) {
+      if (pad.getLibPad().isTht()) {
+        function = GerberAttribute::ApertureFunction::ComponentPad;
+      } else {
+        function = GerberAttribute::ApertureFunction::SmdPadCopperDefined;
+      }
+      net = pad.getCompSigInstNetSignal()
+          ? *pad.getCompSigInstNetSignal()->getName()  // Named net.
+          : "N/C";  // Anonymous net (reserved name by Gerber specs).
+      if (const PackagePad* pkgPad = pad.getLibPackagePad()) {
+        pin = *pkgPad->getName();
+      }
+      if (ComponentSignalInstance* cmpSig = pad.getComponentSignalInstance()) {
+        signal = *cmpSig->getCompSignal().getName();
+      }
+    }
 
-  const FootprintPad& libPad = pad.getLibPad();
-  Length width = *libPad.getWidth();
-  Length height = *libPad.getHeight();
-  UnsignedLength radius(0);
-  if (isOnSolderMaskTop || isOnSolderMaskBottom) {
-    Length size = qMin(width, height);
-    radius = mBoard.getDesignRules().calcStopMaskClearance(size);
-    width += radius * 2;
-    height += radius * 2;
-  } else if (isOnSolderPasteTop || isOnSolderPasteBottom) {
-    Length size = qMin(width, height);
-    Length clearance = -mBoard.getDesignRules().calcSolderPasteClearance(size);
-    width += clearance * 2;
-    height += clearance * 2;
-    if (clearance > 0) {
-      radius = UnsignedLength(clearance);
-    }
-  }
+    // Helper to flash a custom outline by flattening all arcs.
+    const Transform padTransform(pad.getLibPad().getPosition(),
+                                 pad.getLibPad().getRotation());
+    const Transform devTransform(pad.getDevice());
+    auto flashPadOutline = [&]() {
+      foreach (Path outline, geometry.toOutlines()) {
+        outline.flattenArcs(PositiveLength(5000));
+        outline = devTransform.map(padTransform.map(outline))
+                      .translated(-pad.getPosition());
+        gen.flashOutline(pad.getPosition(), StraightAreaPath(outline),
+                         Angle::deg0(), function, net, component, pin,
+                         signal);  // can throw
+      }
+    };
 
-  if ((width <= 0) || (height <= 0)) {
-    qWarning() << "Pad with zero size ignored in Gerber export:"
-               << pad.getLibPadUuid();
-    return;
-  }
-
-  PositiveLength pWidth(width);
-  PositiveLength pHeight(height);
-
-  // Pad attributes (most of them only on copper layers).
-  GerberGenerator::Function function = tl::nullopt;
-  tl::optional<QString> net = tl::nullopt;
-  QString component = *pad.getDevice().getComponentInstance().getName();
-  QString pin, signal;
-  if (isOnCopperLayer) {
-    if (!isSmt) {
-      function = GerberAttribute::ApertureFunction::ComponentPad;
-    } else {
-      function = GerberAttribute::ApertureFunction::SmdPadCopperDefined;
+    // Flash shape.
+    const Length width = geometry.getWidth();
+    const Length height = geometry.getHeight();
+    switch (geometry.getShape()) {
+      case PadGeometry::Shape::Round: {
+        if ((width > 0) && (height > 0)) {
+          gen.flashObround(pad.getPosition(), PositiveLength(width),
+                           PositiveLength(height), pad.getRotation(), function,
+                           net, component, pin, signal);
+        }
+        break;
+      }
+      case PadGeometry::Shape::Rect: {
+        if ((width > 0) && (height > 0)) {
+          gen.flashRect(pad.getPosition(), PositiveLength(width),
+                        PositiveLength(height), geometry.getCornerRadius(),
+                        pad.getRotation(), function, net, component, pin,
+                        signal);
+        }
+        break;
+      }
+      case PadGeometry::Shape::Octagon: {
+        if ((width > 0) && (height > 0)) {
+          gen.flashOctagon(pad.getPosition(), PositiveLength(width),
+                           PositiveLength(height), geometry.getCornerRadius(),
+                           pad.getRotation(), function, net, component, pin,
+                           signal);
+        }
+        break;
+      }
+      case PadGeometry::Shape::Stroke: {
+        if ((width > 0) && (!geometry.getPath().getVertices().isEmpty())) {
+          const Path path =
+              devTransform.map(padTransform.map(geometry.getPath()));
+          if (path.getVertices().count() == 1) {
+            // For maximum compatibility, convert the stroke to a circle.
+            gen.flashCircle(path.getVertices().first().getPos(),
+                            PositiveLength(width), function, net, component,
+                            pin, signal);
+          } else if ((path.getVertices().count() == 2) &&
+                     (path.getVertices().first().getAngle() == 0)) {
+            // For maximum compatibility, convert the stroke to an obround.
+            const Point p0 = path.getVertices().at(0).getPos();
+            const Point p1 = path.getVertices().at(1).getPos();
+            const Point delta = p1 - p0;
+            const Point center = (p0 + p1) / 2;
+            const PositiveLength height(width);
+            const PositiveLength width = height + (p1 - p0).getLength();
+            const Angle rotation = Angle::fromRad(
+                qAtan2(delta.getY().toMm(), delta.getX().toMm()));
+            gen.flashObround(center, width, height, rotation, function, net,
+                             component, pin, signal);
+          } else {
+            // As a last resort, convert the outlines to straight path segments
+            // and flash them with outline apertures.
+            flashPadOutline();  // can throw
+          }
+        }
+        break;
+      }
+      default: { throw LogicError(__FILE__, __LINE__, "Unknown pad shape!"); }
     }
-    net = pad.getCompSigInstNetSignal()
-        ? *pad.getCompSigInstNetSignal()->getName()  // Named net.
-        : "N/C";  // Anonymous net (reserved name by Gerber specs).
-    if (const PackagePad* pkgPad = pad.getLibPackagePad()) {
-      pin = *pkgPad->getName();
-    }
-    if (ComponentSignalInstance* cmpSig = pad.getComponentSignalInstance()) {
-      signal = *cmpSig->getCompSignal().getName();
-    }
-  }
-
-  switch (libPad.getShape()) {
-    case FootprintPad::Shape::ROUND: {
-      gen.flashObround(pad.getPosition(), pWidth, pHeight, pad.getRotation(),
-                       function, net, component, pin, signal);
-      break;
-    }
-    case FootprintPad::Shape::RECT: {
-      gen.flashRect(pad.getPosition(), pWidth, pHeight, radius,
-                    pad.getRotation(), function, net, component, pin, signal);
-      break;
-    }
-    case FootprintPad::Shape::OCTAGON: {
-      gen.flashOctagon(pad.getPosition(), pWidth, pHeight, radius,
-                       pad.getRotation(), function, net, component, pin,
-                       signal);
-      break;
-    }
-    default: { throw LogicError(__FILE__, __LINE__); }
   }
 }
 

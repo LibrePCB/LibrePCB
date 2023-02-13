@@ -159,12 +159,20 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
     }
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       if (!pad->isOnLayer(*mPlane.getLayerName())) continue;
+      const Transform padTransform(pad->getLibPad().getPosition(),
+                                   pad->getLibPad().getRotation());
       if (pad->getCompSigInstNetSignal() == &mPlane.getNetSignal()) {
-        ClipperLib::Path path =
-            ClipperHelpers::convert(pad->getSceneOutline(), maxArcTolerance());
-        mConnectedNetSignalAreas.push_back(path);
+        foreach (const PadGeometry& geometry,
+                 pad->getGeometryOnLayer(*mPlane.getLayerName())) {
+          foreach (const Path& outline, geometry.toOutlines()) {
+            ClipperLib::Path path = ClipperHelpers::convert(
+                transform.map(padTransform.map(outline)), maxArcTolerance());
+            mConnectedNetSignalAreas.push_back(path);
+          }
+        }
       }
-      c.AddPath(createPadCutOut(*pad), ClipperLib::ptClip, true);
+      c.AddPaths(createPadCutOuts(transform, padTransform, *pad),
+                 ClipperLib::ptClip, true);
     }
   }
 
@@ -251,17 +259,24 @@ void BoardPlaneFragmentsBuilder::removeOrphans() {
  *  Helper Methods
  ******************************************************************************/
 
-ClipperLib::Path BoardPlaneFragmentsBuilder::createPadCutOut(
-    const BI_FootprintPad& pad) const noexcept {
+ClipperLib::Paths BoardPlaneFragmentsBuilder::createPadCutOuts(
+    const Transform& deviceTransform, const Transform& padTransform,
+    const BI_FootprintPad& pad) const {
+  ClipperLib::Paths result;
   bool differentNetSignal =
       (pad.getCompSigInstNetSignal() != &mPlane.getNetSignal());
   if ((mPlane.getConnectStyle() == BI_Plane::ConnectStyle::None) ||
       differentNetSignal) {
-    return ClipperHelpers::convert(
-        pad.getSceneOutline(*mPlane.getMinClearance()), maxArcTolerance());
-  } else {
-    return ClipperLib::Path();
+    foreach (const PadGeometry& geometry,
+             pad.getGeometryOnLayer(*mPlane.getLayerName())) {
+      foreach (const Path& outline,
+               geometry.withOffset(*mPlane.getMinClearance()).toOutlines()) {
+        result.push_back(ClipperHelpers::convert(
+            deviceTransform.map(padTransform.map(outline)), maxArcTolerance()));
+      }
+    }
   }
+  return result;
 }
 
 ClipperLib::Path BoardPlaneFragmentsBuilder::createViaCutOut(
