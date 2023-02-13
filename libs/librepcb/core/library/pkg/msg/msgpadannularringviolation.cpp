@@ -39,7 +39,7 @@ MsgPadAnnularRingViolation::MsgPadAnnularRingViolation(
     const Length& annularRing) noexcept
   : LibraryElementCheckMessage(
         Severity::Warning,
-        tr("Annular ring of pad '%1' in '%3'")
+        tr("Annular ring of pad '%1' in '%2'")
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
         tr("Pads should have at least %1 annular ring (copper around each pad "
            "hole). Note that this value is just a general recommendation, the "

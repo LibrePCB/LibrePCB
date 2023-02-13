@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_MSGPADANNULARRINGVIOLATION_H
-#define LIBREPCB_CORE_MSGPADANNULARRINGVIOLATION_H
+#ifndef LIBREPCB_CORE_MSGPADHOLEOUTSIDECOPPER_H
+#define LIBREPCB_CORE_MSGPADHOLEOUTSIDECOPPER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../types/length.h"
 #include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
@@ -37,27 +36,26 @@ class Footprint;
 class FootprintPad;
 
 /*******************************************************************************
- *  Class MsgPadAnnularRingViolation
+ *  Class MsgPadHoleOutsideCopper
  ******************************************************************************/
 
 /**
- * @brief The MsgPadAnnularRingViolation class
+ * @brief The MsgPadHoleOutsideCopper class
  */
-class MsgPadAnnularRingViolation final : public LibraryElementCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(MsgPadAnnularRingViolation)
+class MsgPadHoleOutsideCopper final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgPadHoleOutsideCopper)
 
 public:
   // Constructors / Destructor
-  MsgPadAnnularRingViolation() = delete;
-  MsgPadAnnularRingViolation(std::shared_ptr<const Footprint> footprint,
-                             std::shared_ptr<const FootprintPad> pad,
-                             const QString& pkgPadName,
-                             const Length& annularRing) noexcept;
-  MsgPadAnnularRingViolation(const MsgPadAnnularRingViolation& other) noexcept
+  MsgPadHoleOutsideCopper() = delete;
+  MsgPadHoleOutsideCopper(std::shared_ptr<const Footprint> footprint,
+                          std::shared_ptr<const FootprintPad> pad,
+                          const QString& pkgPadName) noexcept;
+  MsgPadHoleOutsideCopper(const MsgPadHoleOutsideCopper& other) noexcept
     : LibraryElementCheckMessage(other),
       mFootprint(other.mFootprint),
       mPad(other.mPad) {}
-  virtual ~MsgPadAnnularRingViolation() noexcept;
+  virtual ~MsgPadHoleOutsideCopper() noexcept;
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {

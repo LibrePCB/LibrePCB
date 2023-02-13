@@ -31,6 +31,7 @@
 #include "msg/msgmissingfootprintvalue.h"
 #include "msg/msgpadannularringviolation.h"
 #include "msg/msgpadclearanceviolation.h"
+#include "msg/msgpadholeoutsidecopper.h"
 #include "msg/msgpadoriginoutsidecopper.h"
 #include "msg/msgpadoverlapswithplacement.h"
 #include "msg/msgwrongfootprinttextlayer.h"
@@ -257,18 +258,26 @@ void PackageCheck::checkPadsAnnularRing(MsgList& msgs) const {
           pad->getGeometry().toFilledQPainterPathPx();
 
       // Check all holes.
+      bool emitError = false;
       bool emitWarning = false;
       for (auto itHole1 = (*itPad).getHoles().begin();
            itHole1 != (*itPad).getHoles().end(); ++itHole1) {
         std::shared_ptr<const Hole> hole1 = itHole1.ptr();
-        const QVector<Path> hole1Paths = hole1->getPath()->toOutlineStrokes(
-            hole1->getDiameter() +
-            PositiveLength((annularRing * 2) - tolerance));
+        const QVector<Path> hole1Paths =
+            hole1->getPath()->toOutlineStrokes(hole1->getDiameter());
+        const QVector<Path> hole1PathsWithAnnular =
+            hole1->getPath()->toOutlineStrokes(
+                hole1->getDiameter() +
+                PositiveLength((annularRing * 2) - tolerance));
         const QPainterPath hole1PathPx =
             Path::toQPainterPathPx(hole1Paths, true);
+        const QPainterPath hole1PathPxWithAnnular =
+            Path::toQPainterPathPx(hole1PathsWithAnnular, true);
 
         // Check annular rings.
         if (!padPathPx.contains(hole1PathPx)) {
+          emitError = true;
+        } else if (!padPathPx.contains(hole1PathPxWithAnnular)) {
           emitWarning = true;
         } else {
           // Compare with all holes *after* hole1 to avoid redundant checks.
@@ -283,14 +292,19 @@ void PackageCheck::checkPadsAnnularRing(MsgList& msgs) const {
 
             // Now check if the annular ring is really too small.
             if (hole1PathPx.intersects(hole2PathPx)) {
+              emitError = true;
+            } else if (hole1PathPxWithAnnular.intersects(hole2PathPx)) {
               emitWarning = true;
             }
           }
         }
       }
 
-      // Only show one warning even if there are multiple violations.
-      if (emitWarning) {
+      // Only show one message even if there are multiple violations.
+      if (emitError) {
+        msgs.append(std::make_shared<MsgPadHoleOutsideCopper>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      } else if (emitWarning) {
         msgs.append(std::make_shared<MsgPadAnnularRingViolation>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString(),
             annularRing));
