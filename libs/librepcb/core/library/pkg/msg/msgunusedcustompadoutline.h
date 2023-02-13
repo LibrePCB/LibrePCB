@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_PACKAGECHECK_H
-#define LIBREPCB_CORE_PACKAGECHECK_H
+#ifndef LIBREPCB_CORE_MSGUNUSEDCUSTOMPADOUTLINE_H
+#define LIBREPCB_CORE_MSGUNUSEDCUSTOMPADOUTLINE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../libraryelementcheck.h"
+#include "../../../types/length.h"
+#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -32,42 +33,40 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Package;
+class Footprint;
+class FootprintPad;
 
 /*******************************************************************************
- *  Class PackageCheck
+ *  Class MsgUnusedCustomPadOutline
  ******************************************************************************/
 
 /**
- * @brief The PackageCheck class
+ * @brief The MsgUnusedCustomPadOutline class
  */
-class PackageCheck : public LibraryElementCheck {
+class MsgUnusedCustomPadOutline final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgUnusedCustomPadOutline)
+
 public:
   // Constructors / Destructor
-  PackageCheck() = delete;
-  PackageCheck(const PackageCheck& other) = delete;
-  explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+  MsgUnusedCustomPadOutline() = delete;
+  MsgUnusedCustomPadOutline(std::shared_ptr<const Footprint> footprint,
+                            std::shared_ptr<const FootprintPad> pad,
+                            const QString& pkgPadName) noexcept;
+  MsgUnusedCustomPadOutline(const MsgUnusedCustomPadOutline& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mPad(other.mPad) {}
+  virtual ~MsgUnusedCustomPadOutline() noexcept;
 
-  // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
 
-  // Operator Overloadings
-  PackageCheck& operator=(const PackageCheck& rhs) = delete;
-
-protected:  // Methods
-  void checkDuplicatePadNames(MsgList& msgs) const;
-  void checkMissingFootprint(MsgList& msgs) const;
-  void checkMissingTexts(MsgList& msgs) const;
-  void checkWrongTextLayers(MsgList& msgs) const;
-  void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
-  void checkPadsAnnularRing(MsgList& msgs) const;
-  void checkPadsConnectionPoint(MsgList& msgs) const;
-  void checkCustomPadOutline(MsgList& msgs) const;
-
-private:  // Data
-  const Package& mPackage;
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
 };
 
 /*******************************************************************************

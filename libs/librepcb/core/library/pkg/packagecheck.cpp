@@ -26,6 +26,7 @@
 #include "../../utils/toolbox.h"
 #include "../../utils/transform.h"
 #include "msg/msgduplicatepadname.h"
+#include "msg/msginvalidcustompadoutline.h"
 #include "msg/msgmissingfootprint.h"
 #include "msg/msgmissingfootprintname.h"
 #include "msg/msgmissingfootprintvalue.h"
@@ -34,6 +35,7 @@
 #include "msg/msgpadholeoutsidecopper.h"
 #include "msg/msgpadoriginoutsidecopper.h"
 #include "msg/msgpadoverlapswithplacement.h"
+#include "msg/msgunusedcustompadoutline.h"
 #include "msg/msgwrongfootprinttextlayer.h"
 #include "package.h"
 
@@ -69,6 +71,7 @@ LibraryElementCheckMessageList PackageCheck::runChecks() const {
   checkPadsClearanceToPlacement(msgs);
   checkPadsAnnularRing(msgs);
   checkPadsConnectionPoint(msgs);
+  checkCustomPadOutline(msgs);
   return msgs;
 }
 
@@ -328,6 +331,29 @@ void PackageCheck::checkPadsConnectionPoint(MsgList& msgs) const {
           : pad->getGeometry().toFilledQPainterPathPx();
       if (!allowedArea.contains(QPointF(0, 0))) {
         msgs.append(std::make_shared<MsgPadOriginOutsideCopper>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkCustomPadOutline(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itPad = (*itFtp).getPads().begin();
+         itPad != (*itFtp).getPads().end(); ++itPad) {
+      std::shared_ptr<const FootprintPad> pad = itPad.ptr();
+      std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
+          ? mPackage.getPads().find(*pad->getPackagePadUuid())
+          : nullptr;
+      if ((pad->getShape() == FootprintPad::Shape::Custom) &&
+          (!PadGeometry::isValidCustomOutline(pad->getCustomShapeOutline()))) {
+        msgs.append(std::make_shared<MsgInvalidCustomPadOutline>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      } else if ((pad->getShape() != FootprintPad::Shape::Custom) &&
+                 (!pad->getCustomShapeOutline().getVertices().isEmpty())) {
+        msgs.append(std::make_shared<MsgUnusedCustomPadOutline>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
       }
     }
