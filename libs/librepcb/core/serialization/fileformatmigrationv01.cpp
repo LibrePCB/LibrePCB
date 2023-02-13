@@ -444,9 +444,13 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
 
   // Planes.
   int planeCount = 0;
+  int planeConnectNoneCount = 0;
   for (SExpression* planeNode : root.getChildren("plane")) {
     Q_UNUSED(planeNode);
     ++planeCount;
+    if (planeNode->getChild("connect_style/@0").getValue() == "none") {
+      ++planeConnectNoneCount;
+    }
   }
   if (planeCount > 0) {
     messages.append(buildMessage(
@@ -454,6 +458,15 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
         tr("Plane area calculations have been adjusted, manual review and "
            "running the DRC is recommended."),
         planeCount));
+  }
+  if (planeConnectNoneCount > 0) {
+    messages.append(buildMessage(
+        Message::Severity::Warning,
+        tr("Vias within planes with connect style 'None' are now fully "
+           "connected to the planes since the connect style is no longer "
+           "respected for vias. You might want to remove traces now which are "
+           "no longer needed to connect these vias."),
+        planeConnectNoneCount));
   }
 }
 

@@ -281,10 +281,11 @@ ClipperLib::Paths BoardPlaneFragmentsBuilder::createPadCutOuts(
 
 ClipperLib::Path BoardPlaneFragmentsBuilder::createViaCutOut(
     const BI_Via& via) const noexcept {
-  bool differentNetSignal =
-      (via.getNetSegment().getNetSignal() != &mPlane.getNetSignal());
-  if ((mPlane.getConnectStyle() == BI_Plane::ConnectStyle::None) ||
-      differentNetSignal) {
+  // Note: Do not respect the plane connect style for vias, but always connect
+  // them with solid style. Since vias are not soldered, heat dissipation is
+  // not an issue or often even desired. See discussion in
+  // https://github.com/LibrePCB/LibrePCB/issues/454#issuecomment-1373402172
+  if (via.getNetSegment().getNetSignal() != &mPlane.getNetSignal()) {
     return ClipperHelpers::convert(
         via.getVia().getSceneOutline(*mPlane.getMinClearance()),
         maxArcTolerance());
