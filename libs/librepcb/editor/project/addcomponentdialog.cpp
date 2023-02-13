@@ -114,6 +114,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   mUi->viewComponent->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+  mUi->viewComponent->setGridStyle(theme.getBoardGridStyle());
   mUi->viewComponent->setOriginCrossVisible(false);
   mUi->viewComponent->setScene(mComponentPreviewScene.data());
 
@@ -121,6 +122,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   mUi->viewDevice->setBackgroundColors(
       theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+  mUi->viewDevice->setGridStyle(theme.getBoardGridStyle());
   mUi->viewDevice->setOriginCrossVisible(false);
   mUi->viewDevice->setScene(mDevicePreviewScene.data());
 

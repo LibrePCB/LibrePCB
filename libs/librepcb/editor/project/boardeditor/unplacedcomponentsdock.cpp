@@ -90,8 +90,9 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
       mProjectEditor.getWorkspace().getSettings().themes.getActive();
   mGraphicsLayerProvider->applyTheme(theme);
   mUi->graphicsView->setBackgroundColors(
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
+  mUi->graphicsView->setGridStyle(theme.getBoardGridStyle());
   mUi->graphicsView->setOriginCrossVisible(false);
   mUi->graphicsView->setScene(mPreviewGraphicsScene.data());
 
