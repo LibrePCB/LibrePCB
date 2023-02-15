@@ -79,6 +79,11 @@ SExpression serialize(const UnsignedRatio& obj) {
 }
 
 template <>
+SExpression serialize(const UnsignedLimitedRatio& obj) {
+  return serialize(*obj);
+}
+
+template <>
 Ratio deserialize(const SExpression& node) {
   return Ratio::fromNormalized(node.getValue());
 }
@@ -86,6 +91,11 @@ Ratio deserialize(const SExpression& node) {
 template <>
 UnsignedRatio deserialize(const SExpression& node) {
   return UnsignedRatio(deserialize<Ratio>(node));  // can throw
+}
+
+template <>
+UnsignedLimitedRatio deserialize(const SExpression& node) {
+  return UnsignedLimitedRatio(deserialize<Ratio>(node));  // can throw
 }
 
 /*******************************************************************************
