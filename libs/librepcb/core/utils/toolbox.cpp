@@ -114,6 +114,15 @@ Angle Toolbox::arcAngle(const Point& p1, const Point& p2,
   return Angle::fromRad(angle2 - angle1).mapTo0_360deg();
 }
 
+Angle Toolbox::angleBetweenPoints(const Point& p1, const Point& p2) noexcept {
+  const Point delta = p2 - p1;
+  if (delta.isOrigin()) {
+    return Angle::deg0();
+  }
+  return Angle::fromRad(qAtan2(delta.getY().toMm(), delta.getX().toMm()))
+      .mapTo0_360deg();
+}
+
 Point Toolbox::nearestPointOnLine(const Point& p, const Point& l1,
                                   const Point& l2) noexcept {
   Point a = l2 - l1;

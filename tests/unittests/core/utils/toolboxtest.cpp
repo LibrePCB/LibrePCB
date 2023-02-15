@@ -162,6 +162,45 @@ INSTANTIATE_TEST_SUITE_P(ToolboxArcAngleTest, ToolboxArcAngleTest,
                          ::testing::ValuesIn(sToolboxArcAngleTestData));
 
 /*******************************************************************************
+ *  Parametrized angleBetweenPoints() Tests
+ ******************************************************************************/
+
+struct ToolboxAngleBetweenPointsTestData {
+  Point p1;
+  Point p2;
+  Angle angle;
+};
+
+class ToolboxAngleBetweenPointsTest
+  : public ToolboxTest,
+    public ::testing::WithParamInterface<ToolboxAngleBetweenPointsTestData> {};
+
+TEST_P(ToolboxAngleBetweenPointsTest, test) {
+  const ToolboxAngleBetweenPointsTestData& data = GetParam();
+
+  EXPECT_EQ(data.angle.toDegString().toStdString(),
+            Toolbox::angleBetweenPoints(data.p1, data.p2)
+                .toDegString()
+                .toStdString());
+}
+
+// clang-format off
+static ToolboxAngleBetweenPointsTestData sToolboxAngleBetweenPointsTestData[] = {
+// p1,                        p2,                       angle
+  {Point(0, 0),               Point(0, 0),              Angle::deg0()   },
+  {Point(2000000, 0),         Point(3000000, 0),        Angle::deg0()   },
+  {Point(2000000, 0),         Point(-1000000, 0),       Angle::deg180() },
+  {Point(2000000, 0),         Point(2000000, 5000000),  Angle::deg90()  },
+  {Point(2000000, 0),         Point(2000000, -5000000), Angle::deg270() },
+  {Point(2000000, 2000000),   Point(1000000, 1000000),  Angle::deg225() },
+};
+// clang-format on
+
+INSTANTIATE_TEST_SUITE_P(
+    ToolboxAngleBetweenPointsTest, ToolboxAngleBetweenPointsTest,
+    ::testing::ValuesIn(sToolboxAngleBetweenPointsTestData));
+
+/*******************************************************************************
  *  Parametrized incrementNumberInString() Tests
  ******************************************************************************/
 
