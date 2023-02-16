@@ -23,6 +23,7 @@
 #include "footprintpadgraphicsitem.h"
 
 #include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/graphics/origincrossgraphicsitem.h>
 #include <librepcb/core/graphics/primitivepathgraphicsitem.h>
 #include <librepcb/core/graphics/primitivetextgraphicsitem.h>
 #include <librepcb/core/types/angle.h>
@@ -49,6 +50,7 @@ FootprintPadGraphicsItem::FootprintPadGraphicsItem(
     mPad(pad),
     mLayerProvider(lp),
     mPackagePadList(packagePadList),
+    mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
     mPathGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
     mOnPadEditedSlot(*this, &FootprintPadGraphicsItem::padEdited),
@@ -59,6 +61,11 @@ FootprintPadGraphicsItem::FootprintPadGraphicsItem(
   setFlag(QGraphicsItem::ItemHasNoContents, false);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(10);
+
+  // Origin cross properties
+  // Note: Should be smaller than the smallest pad, otherwise it would be
+  // annoying due to too large grab area.
+  mOriginCrossGraphicsItem->setSize(UnsignedLength(250000));
 
   // path properties
   mPathGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -101,6 +108,7 @@ void FootprintPadGraphicsItem::setRotation(const Angle& rot) noexcept {
 }
 
 void FootprintPadGraphicsItem::setSelected(bool selected) noexcept {
+  mOriginCrossGraphicsItem->setSelected(selected);
   mPathGraphicsItem->setSelected(selected);
   mTextGraphicsItem->setSelected(selected);
   QGraphicsItem::setSelected(selected);
@@ -124,7 +132,7 @@ void FootprintPadGraphicsItem::updateText() noexcept {
  ******************************************************************************/
 
 QPainterPath FootprintPadGraphicsItem::shape() const noexcept {
-  return mPathGraphicsItem->shape();
+  return mPathGraphicsItem->shape() | mOriginCrossGraphicsItem->shape();
 }
 
 void FootprintPadGraphicsItem::paint(QPainter* painter,
@@ -156,6 +164,7 @@ void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
     case FootprintPad::Event::ShapeChanged:
     case FootprintPad::Event::WidthChanged:
     case FootprintPad::Event::HeightChanged:
+    case FootprintPad::Event::CustomShapeOutlineChanged:
       setShape(pad.getGeometry().toQPainterPathPx());
       break;
     case FootprintPad::Event::ComponentSideChanged:
@@ -190,6 +199,10 @@ void FootprintPadGraphicsItem::setShape(const QPainterPath& shape) noexcept {
 }
 
 void FootprintPadGraphicsItem::setLayerName(const QString& name) noexcept {
+  const QString originCrossLayer = GraphicsLayer::isBottomLayer(name)
+      ? GraphicsLayer::sBotReferences
+      : GraphicsLayer::sTopReferences;
+  mOriginCrossGraphicsItem->setLayer(mLayerProvider.getLayer(originCrossLayer));
   mPathGraphicsItem->setFillLayer(mLayerProvider.getLayer(name));
   mTextGraphicsItem->setLayer(mLayerProvider.getLayer(name));
 }

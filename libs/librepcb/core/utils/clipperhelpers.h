@@ -68,6 +68,9 @@ public:
       const ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
   static void offset(ClipperLib::Paths& paths, const Length& offset,
                      const PositiveLength& maxArcTolerance);
+  static std::unique_ptr<ClipperLib::PolyTree> offsetToTree(
+      const ClipperLib::Paths& paths, const Length& offset,
+      const PositiveLength& maxArcTolerance);
   static ClipperLib::Paths treeToPaths(const ClipperLib::PolyTree& tree);
   static ClipperLib::Paths flattenTree(const ClipperLib::PolyNode& node);
 

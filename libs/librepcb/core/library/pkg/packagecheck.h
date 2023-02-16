@@ -64,6 +64,7 @@ protected:  // Methods
   void checkPadsClearanceToPlacement(MsgList& msgs) const;
   void checkPadsAnnularRing(MsgList& msgs) const;
   void checkPadsConnectionPoint(MsgList& msgs) const;
+  void checkCustomPadOutline(MsgList& msgs) const;
 
 private:  // Data
   const Package& mPackage;

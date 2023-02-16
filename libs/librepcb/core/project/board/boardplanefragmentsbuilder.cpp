@@ -274,6 +274,17 @@ ClipperLib::Paths BoardPlaneFragmentsBuilder::createPadCutOuts(
         result.push_back(ClipperHelpers::convert(
             deviceTransform.map(padTransform.map(outline)), maxArcTolerance()));
       }
+      // Also create cut-outs for each hole to ensure correct clearance even if
+      // the pad outline is too small or invalid.
+      for (const Hole& hole : geometry.getHoles()) {
+        const PositiveLength width(hole.getDiameter() +
+                                   (mPlane.getMinClearance() * 2));
+        foreach (const Path& outline, hole.getPath()->toOutlineStrokes(width)) {
+          result.push_back(ClipperHelpers::convert(
+              deviceTransform.map(padTransform.map(outline)),
+              maxArcTolerance()));
+        }
+      }
     }
   }
   return result;

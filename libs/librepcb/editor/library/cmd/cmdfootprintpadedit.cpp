@@ -47,6 +47,8 @@ CmdFootprintPadEdit::CmdFootprintPadEdit(FootprintPad& pad) noexcept
     mNewWidth(mOldWidth),
     mOldHeight(pad.getHeight()),
     mNewHeight(mOldHeight),
+    mOldCustomShapeOutline(pad.getCustomShapeOutline()),
+    mNewCustomShapeOutline(mOldCustomShapeOutline),
     mOldPos(pad.getPosition()),
     mNewPos(mOldPos),
     mOldRotation(pad.getRotation()),
@@ -104,6 +106,11 @@ void CmdFootprintPadEdit::setHeight(const PositiveLength& height,
   if (immediate) mPad.setHeight(mNewHeight);
 }
 
+void CmdFootprintPadEdit::setCustomShapeOutline(const Path& outline) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewCustomShapeOutline = outline;
+}
+
 void CmdFootprintPadEdit::setPosition(const Point& pos,
                                       bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
@@ -151,9 +158,11 @@ void CmdFootprintPadEdit::mirrorGeometry(Qt::Orientation orientation,
   } else {
     mNewRotation = -mNewRotation;
   }
+  mNewCustomShapeOutline.mirror(orientation);
   if (immediate) {
     mPad.setPosition(mNewPos);
     mPad.setRotation(mNewRotation);
+    mPad.setCustomShapeOutline(mNewCustomShapeOutline);
   }
 }
 
@@ -189,6 +198,7 @@ bool CmdFootprintPadEdit::performExecute() {
   if (mNewShape != mOldShape) return true;
   if (mNewWidth != mOldWidth) return true;
   if (mNewHeight != mOldHeight) return true;
+  if (mNewCustomShapeOutline != mOldCustomShapeOutline) return true;
   if (mNewPos != mOldPos) return true;
   if (mNewRotation != mOldRotation) return true;
   if (mNewHoles != mOldHoles) return true;
@@ -201,6 +211,7 @@ void CmdFootprintPadEdit::performUndo() {
   mPad.setShape(mOldShape);
   mPad.setWidth(mOldWidth);
   mPad.setHeight(mOldHeight);
+  mPad.setCustomShapeOutline(mOldCustomShapeOutline);
   mPad.setPosition(mOldPos);
   mPad.setRotation(mOldRotation);
   mPad.getHoles() = mOldHoles;
@@ -212,6 +223,7 @@ void CmdFootprintPadEdit::performRedo() {
   mPad.setShape(mNewShape);
   mPad.setWidth(mNewWidth);
   mPad.setHeight(mNewHeight);
+  mPad.setCustomShapeOutline(mNewCustomShapeOutline);
   mPad.setPosition(mNewPos);
   mPad.setRotation(mNewRotation);
   mPad.getHoles() = mNewHoles;

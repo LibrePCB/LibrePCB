@@ -805,6 +805,10 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
         }
         break;
       }
+      case PadGeometry::Shape::Custom: {
+        flashPadOutline();  // can throw
+        break;
+      }
       default: { throw LogicError(__FILE__, __LINE__, "Unknown pad shape!"); }
     }
   }

@@ -17,16 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
-#define LIBREPCB_EDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
+#ifndef LIBREPCB_CORE_MSGUNUSEDCUSTOMPADOUTLINE_H
+#define LIBREPCB_CORE_MSGUNUSEDCUSTOMPADOUTLINE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/geometry/hole.h>
+#include "../../../types/length.h"
+#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -35,69 +35,44 @@ namespace librepcb {
 
 class Footprint;
 class FootprintPad;
-class LengthUnit;
-class Package;
-
-namespace editor {
-
-class UndoStack;
-
-namespace Ui {
-class FootprintPadPropertiesDialog;
-}
 
 /*******************************************************************************
- *  Class FootprintPadPropertiesDialog
+ *  Class MsgUnusedCustomPadOutline
  ******************************************************************************/
 
 /**
- * @brief The FootprintPadPropertiesDialog class
+ * @brief The MsgUnusedCustomPadOutline class
  */
-class FootprintPadPropertiesDialog final : public QDialog {
-  Q_OBJECT
+class MsgUnusedCustomPadOutline final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgUnusedCustomPadOutline)
 
 public:
   // Constructors / Destructor
-  FootprintPadPropertiesDialog() = delete;
-  FootprintPadPropertiesDialog(const FootprintPadPropertiesDialog& other) =
-      delete;
-  FootprintPadPropertiesDialog(const Package& pkg, FootprintPad& pad,
-                               UndoStack& undoStack,
-                               const LengthUnit& lengthUnit,
-                               const QString& settingsPrefix,
-                               QWidget* parent = nullptr) noexcept;
-  ~FootprintPadPropertiesDialog() noexcept;
+  MsgUnusedCustomPadOutline() = delete;
+  MsgUnusedCustomPadOutline(std::shared_ptr<const Footprint> footprint,
+                            std::shared_ptr<const FootprintPad> pad,
+                            const QString& pkgPadName) noexcept;
+  MsgUnusedCustomPadOutline(const MsgUnusedCustomPadOutline& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mPad(other.mPad) {}
+  virtual ~MsgUnusedCustomPadOutline() noexcept;
 
-  // Setters
-  void setReadOnly(bool readOnly) noexcept;
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
 
-  // Operator Overloadings
-  FootprintPadPropertiesDialog& operator=(
-      const FootprintPadPropertiesDialog& rhs) = delete;
-
-private:  // Methods
-  void addHole() noexcept;
-  void removeSelectedHole() noexcept;
-  void removeAllHoles() noexcept;
-  void updateGeneralTabHoleWidgets() noexcept;
-  void setSelectedHole(int index) noexcept;
-  void on_buttonBox_clicked(QAbstractButton* button);
-  bool applyChanges() noexcept;
-
-private:  // Data
-  FootprintPad& mPad;
-  UndoStack& mUndoStack;
-  HoleList mHoles;
-  int mSelectedHoleIndex;
-  QScopedPointer<Ui::FootprintPadPropertiesDialog> mUi;
-  Path mAutoCustomOutline;
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
 
 #endif

@@ -31,6 +31,7 @@
 #include "../../widgets/statusbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdfootprintedit.h"
+#include "../cmd/cmdfootprintpadedit.h"
 #include "fsm/packageeditorfsm.h"
 #include "ui_packageeditorwidget.h"
 
@@ -39,9 +40,11 @@
 #include <librepcb/core/library/msg/msgmissingcategories.h>
 #include <librepcb/core/library/msg/msgnamenottitlecase.h>
 #include <librepcb/core/library/pkg/footprintpainter.h>
+#include <librepcb/core/library/pkg/msg/msginvalidcustompadoutline.h>
 #include <librepcb/core/library/pkg/msg/msgmissingfootprint.h>
 #include <librepcb/core/library/pkg/msg/msgmissingfootprintname.h>
 #include <librepcb/core/library/pkg/msg/msgmissingfootprintvalue.h>
+#include <librepcb/core/library/pkg/msg/msgunusedcustompadoutline.h>
 #include <librepcb/core/library/pkg/msg/msgwrongfootprinttextlayer.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -594,6 +597,28 @@ void PackageEditorWidget::fixMsg(const MsgWrongFootprintTextLayer& msg) {
   mUndoStack->execCmd(cmd.take());
 }
 
+template <>
+void PackageEditorWidget::fixMsg(const MsgUnusedCustomPadOutline& msg) {
+  std::shared_ptr<Footprint> footprint =
+      mPackage->getFootprints().get(msg.getFootprint().get());
+  std::shared_ptr<FootprintPad> pad =
+      footprint->getPads().get(msg.getPad().get());
+  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  cmd->setCustomShapeOutline(Path());
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgInvalidCustomPadOutline& msg) {
+  std::shared_ptr<Footprint> footprint =
+      mPackage->getFootprints().get(msg.getFootprint().get());
+  std::shared_ptr<FootprintPad> pad =
+      footprint->getPads().get(msg.getPad().get());
+  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  cmd->setShape(FootprintPad::Shape::Round, false);
+  mUndoStack->execCmd(cmd.take());
+}
+
 template <typename MessageType>
 bool PackageEditorWidget::fixMsgHelper(
     std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
@@ -615,6 +640,8 @@ bool PackageEditorWidget::processCheckMessage(
   if (fixMsgHelper<MsgMissingFootprintName>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprintValue>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgWrongFootprintTextLayer>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgUnusedCustomPadOutline>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgInvalidCustomPadOutline>(msg, applyFix)) return true;
   return false;
 }
 

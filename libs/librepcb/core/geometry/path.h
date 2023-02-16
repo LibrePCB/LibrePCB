@@ -76,7 +76,9 @@ public:
   const QVector<Vertex>& getVertices() const noexcept { return mVertices; }
   UnsignedLength getTotalStraightLength() const noexcept;
   Point calcNearestPointBetweenVertices(const Point& p) const noexcept;
+  Path cleaned() const noexcept;
   Path toClosedPath() const noexcept;
+  Path toOpenPath() const noexcept;
   QVector<Path> toOutlineStrokes(const PositiveLength& width) const noexcept;
   const QPainterPath& toQPainterPathPx() const noexcept;
 
@@ -103,7 +105,9 @@ public:
   void insertVertex(int index, const Vertex& vertex) noexcept;
   void insertVertex(int index, const Point& pos,
                     const Angle& angle = Angle::deg0()) noexcept;
+  bool clean() noexcept;
   bool close() noexcept;
+  bool open() noexcept;
 
   /**
    * @brief Serialize into ::librepcb::SExpression node

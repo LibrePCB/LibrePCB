@@ -100,9 +100,21 @@ Point Path::calcNearestPointBetweenVertices(const Point& p) const noexcept {
   }
 }
 
+Path Path::cleaned() const noexcept {
+  Path p(*this);
+  p.clean();
+  return p;
+}
+
 Path Path::toClosedPath() const noexcept {
   Path p(*this);
   p.close();
+  return p;
+}
+
+Path Path::toOpenPath() const noexcept {
+  Path p(*this);
+  p.open();
   return p;
 }
 
@@ -274,10 +286,32 @@ void Path::insertVertex(int index, const Point& pos,
   insertVertex(index, Vertex(pos, angle));
 }
 
+bool Path::clean() noexcept {
+  bool modified = false;
+  for (int i = mVertices.count() - 1; i > 0; --i) {
+    Vertex& v0 = mVertices[i - 1];
+    Vertex& v1 = mVertices[i];
+    if (v0.getPos() == v1.getPos()) {
+      mVertices.removeAt(i - 1);
+      modified = true;
+    }
+  }
+  return modified;
+}
+
 bool Path::close() noexcept {
   if (!isClosed() && (mVertices.count() > 1)) {
     addVertex(mVertices.first().getPos(), Angle::deg0());
     Q_ASSERT(isClosed());
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool Path::open() noexcept {
+  if ((mVertices.count() > 2) && isClosed()) {
+    mVertices.removeLast();
     return true;
   } else {
     return false;

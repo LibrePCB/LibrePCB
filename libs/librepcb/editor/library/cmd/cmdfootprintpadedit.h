@@ -61,6 +61,7 @@ public:
   void setShape(FootprintPad::Shape shape, bool immediate) noexcept;
   void setWidth(const PositiveLength& width, bool immediate) noexcept;
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
+  void setCustomShapeOutline(const Path& outline) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
@@ -102,6 +103,8 @@ private:
   PositiveLength mNewWidth;
   PositiveLength mOldHeight;
   PositiveLength mNewHeight;
+  Path mOldCustomShapeOutline;
+  Path mNewCustomShapeOutline;
   Point mOldPos;
   Point mNewPos;
   Angle mOldRotation;

@@ -248,6 +248,8 @@ add_library(
   library/pkg/footprintpainter.h
   library/pkg/msg/msgduplicatepadname.cpp
   library/pkg/msg/msgduplicatepadname.h
+  library/pkg/msg/msginvalidcustompadoutline.cpp
+  library/pkg/msg/msginvalidcustompadoutline.h
   library/pkg/msg/msgmissingfootprint.cpp
   library/pkg/msg/msgmissingfootprint.h
   library/pkg/msg/msgmissingfootprintname.cpp
@@ -258,10 +260,14 @@ add_library(
   library/pkg/msg/msgpadannularringviolation.h
   library/pkg/msg/msgpadclearanceviolation.cpp
   library/pkg/msg/msgpadclearanceviolation.h
+  library/pkg/msg/msgpadholeoutsidecopper.cpp
+  library/pkg/msg/msgpadholeoutsidecopper.h
   library/pkg/msg/msgpadoriginoutsidecopper.cpp
   library/pkg/msg/msgpadoriginoutsidecopper.h
   library/pkg/msg/msgpadoverlapswithplacement.cpp
   library/pkg/msg/msgpadoverlapswithplacement.h
+  library/pkg/msg/msgunusedcustompadoutline.cpp
+  library/pkg/msg/msgunusedcustompadoutline.h
   library/pkg/msg/msgwrongfootprinttextlayer.cpp
   library/pkg/msg/msgwrongfootprinttextlayer.h
   library/pkg/package.cpp

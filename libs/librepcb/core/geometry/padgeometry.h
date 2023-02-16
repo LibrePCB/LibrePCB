@@ -52,6 +52,7 @@ public:
     Rect,
     Octagon,
     Stroke,
+    Custom,
   };
 
   // Constructors / Destructor
@@ -90,6 +91,8 @@ public:
   static PadGeometry stroke(const PositiveLength& diameter,
                             const NonEmptyPath& path,
                             const HoleList& holes) noexcept;
+  static PadGeometry custom(const Path& outline, const HoleList& holes);
+  static bool isValidCustomOutline(const Path& path) noexcept;
 
   // Operator Overloadings
   bool operator==(const PadGeometry& rhs) const noexcept;

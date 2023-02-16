@@ -39,12 +39,14 @@ namespace librepcb {
 template <>
 SExpression serialize(const FootprintPad::Shape& obj) {
   switch (obj) {
-    case FootprintPad::Shape::ROUND:
+    case FootprintPad::Shape::Round:
       return SExpression::createToken("round");
-    case FootprintPad::Shape::RECT:
+    case FootprintPad::Shape::Rect:
       return SExpression::createToken("rect");
-    case FootprintPad::Shape::OCTAGON:
+    case FootprintPad::Shape::Octagon:
       return SExpression::createToken("octagon");
+    case FootprintPad::Shape::Custom:
+      return SExpression::createToken("custom");
     default:
       throw LogicError(__FILE__, __LINE__);
   }
@@ -54,11 +56,13 @@ template <>
 inline FootprintPad::Shape deserialize(const SExpression& node) {
   const QString str = node.getValue();
   if (str == QLatin1String("round")) {
-    return FootprintPad::Shape::ROUND;
+    return FootprintPad::Shape::Round;
   } else if (str == QLatin1String("rect")) {
-    return FootprintPad::Shape::RECT;
+    return FootprintPad::Shape::Rect;
   } else if (str == QLatin1String("octagon")) {
-    return FootprintPad::Shape::OCTAGON;
+    return FootprintPad::Shape::Octagon;
+  } else if (str == QLatin1String("custom")) {
+    return FootprintPad::Shape::Custom;
   } else {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Unknown footprint pad shape: '%1'").arg(str));
@@ -104,6 +108,7 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
     mShape(other.mShape),
     mWidth(other.mWidth),
     mHeight(other.mHeight),
+    mCustomShapeOutline(other.mCustomShapeOutline),
     mComponentSide(other.mComponentSide),
     mHoles(other.mHoles),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
@@ -114,7 +119,8 @@ FootprintPad::FootprintPad(const Uuid& uuid,
                            const tl::optional<Uuid>& pkgPadUuid,
                            const Point& pos, const Angle& rot, Shape shape,
                            const PositiveLength& width,
-                           const PositiveLength& height, ComponentSide side,
+                           const PositiveLength& height,
+                           const Path& customShapeOutline, ComponentSide side,
                            const HoleList& holes) noexcept
   : onEdited(*this),
     mUuid(uuid),
@@ -124,6 +130,7 @@ FootprintPad::FootprintPad(const Uuid& uuid,
     mShape(shape),
     mWidth(width),
     mHeight(height),
+    mCustomShapeOutline(customShapeOutline),
     mComponentSide(side),
     mHoles(holes),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
@@ -140,6 +147,7 @@ FootprintPad::FootprintPad(const SExpression& node)
     mShape(deserialize<Shape>(node.getChild("shape/@0"))),
     mWidth(deserialize<PositiveLength>(node.getChild("size/@0"))),
     mHeight(deserialize<PositiveLength>(node.getChild("size/@1"))),
+    mCustomShapeOutline(node),
     mComponentSide(deserialize<ComponentSide>(node.getChild("side/@0"))),
     mHoles(node),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
@@ -178,12 +186,14 @@ bool FootprintPad::isOnLayer(const QString& name) const noexcept {
 
 PadGeometry FootprintPad::getGeometry() const noexcept {
   switch (mShape) {
-    case Shape::ROUND:
+    case Shape::Round:
       return PadGeometry::round(mWidth, mHeight, mHoles);
-    case Shape::RECT:
+    case Shape::Rect:
       return PadGeometry::rect(mWidth, mHeight, mHoles);
-    case Shape::OCTAGON:
+    case Shape::Octagon:
       return PadGeometry::octagon(mWidth, mHeight, mHoles);
+    case Shape::Custom:
+      return PadGeometry::custom(mCustomShapeOutline, mHoles);
     default:
       qCritical() << "Unhandled switch-case in FootprintPad::getGeometry():"
                   << static_cast<int>(mShape);
@@ -195,6 +205,7 @@ PadGeometry FootprintPad::getGeometry() const noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
 bool FootprintPad::setPosition(const Point& pos) noexcept {
   if (pos == mPosition) {
     return false;
@@ -255,6 +266,16 @@ bool FootprintPad::setHeight(const PositiveLength& height) noexcept {
   return true;
 }
 
+bool FootprintPad::setCustomShapeOutline(const Path& outline) noexcept {
+  if (outline == mCustomShapeOutline) {
+    return false;
+  }
+
+  mCustomShapeOutline = outline;
+  onEdited.notify(Event::CustomShapeOutlineChanged);
+  return true;
+}
+
 bool FootprintPad::setComponentSide(ComponentSide side) noexcept {
   if (side == mComponentSide) {
     return false;
@@ -280,6 +301,8 @@ void FootprintPad::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("package_pad", mPackagePadUuid);
   root.ensureLineBreak();
+  mCustomShapeOutline.serialize(root);
+  root.ensureLineBreak();
   mHoles.serialize(root);
   root.ensureLineBreak();
 }
@@ -296,6 +319,7 @@ bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
   if (mShape != rhs.mShape) return false;
   if (mWidth != rhs.mWidth) return false;
   if (mHeight != rhs.mHeight) return false;
+  if (mCustomShapeOutline != rhs.mCustomShapeOutline) return false;
   if (mComponentSide != rhs.mComponentSide) return false;
   if (mHoles != rhs.mHoles) return false;
   return true;
@@ -312,6 +336,7 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
   setShape(rhs.mShape);
   setWidth(rhs.mWidth);
   setHeight(rhs.mHeight);
+  setCustomShapeOutline(rhs.mCustomShapeOutline);
   setComponentSide(rhs.mComponentSide);
   mHoles = rhs.mHoles;
   return *this;

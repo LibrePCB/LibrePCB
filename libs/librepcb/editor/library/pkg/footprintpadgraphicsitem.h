@@ -37,6 +37,7 @@
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
+class OriginCrossGraphicsItem;
 class PrimitivePathGraphicsItem;
 class PrimitiveTextGraphicsItem;
 
@@ -94,6 +95,7 @@ private:  // Data
   std::shared_ptr<FootprintPad> mPad;
   const IF_GraphicsLayerProvider& mLayerProvider;
   const PackagePadList* mPackagePadList;
+  QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QScopedPointer<PrimitivePathGraphicsItem> mPathGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
 

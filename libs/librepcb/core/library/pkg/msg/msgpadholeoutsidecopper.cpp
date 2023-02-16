@@ -17,63 +17,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_MSGPADANNULARRINGVIOLATION_H
-#define LIBREPCB_CORE_MSGPADANNULARRINGVIOLATION_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../types/length.h"
-#include "../../msg/libraryelementcheckmessage.h"
+#include "msgpadholeoutsidecopper.h"
 
-#include <QtCore>
+#include "../footprint.h"
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 
-class Footprint;
-class FootprintPad;
-
 /*******************************************************************************
- *  Class MsgPadAnnularRingViolation
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The MsgPadAnnularRingViolation class
- */
-class MsgPadAnnularRingViolation final : public LibraryElementCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(MsgPadAnnularRingViolation)
+MsgPadHoleOutsideCopper::MsgPadHoleOutsideCopper(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Error,
+        tr("Hole outside copper of pad '%1' in '%2'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("All THT pad holes must be fully surrounded by copper, otherwise "
+           "they could lead to serious issues during the design rule check or "
+           "manufacturing process.")),
+    mFootprint(footprint),
+    mPad(pad) {
+}
 
-public:
-  // Constructors / Destructor
-  MsgPadAnnularRingViolation() = delete;
-  MsgPadAnnularRingViolation(std::shared_ptr<const Footprint> footprint,
-                             std::shared_ptr<const FootprintPad> pad,
-                             const QString& pkgPadName,
-                             const Length& annularRing) noexcept;
-  MsgPadAnnularRingViolation(const MsgPadAnnularRingViolation& other) noexcept
-    : LibraryElementCheckMessage(other),
-      mFootprint(other.mFootprint),
-      mPad(other.mPad) {}
-  virtual ~MsgPadAnnularRingViolation() noexcept;
-
-  // Getters
-  std::shared_ptr<const Footprint> getFootprint() const noexcept {
-    return mFootprint;
-  }
-  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
-
-private:
-  std::shared_ptr<const Footprint> mFootprint;
-  std::shared_ptr<const FootprintPad> mPad;
-};
+MsgPadHoleOutsideCopper::~MsgPadHoleOutsideCopper() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace librepcb
-
-#endif

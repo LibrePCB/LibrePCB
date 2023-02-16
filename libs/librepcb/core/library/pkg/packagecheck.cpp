@@ -26,13 +26,16 @@
 #include "../../utils/toolbox.h"
 #include "../../utils/transform.h"
 #include "msg/msgduplicatepadname.h"
+#include "msg/msginvalidcustompadoutline.h"
 #include "msg/msgmissingfootprint.h"
 #include "msg/msgmissingfootprintname.h"
 #include "msg/msgmissingfootprintvalue.h"
 #include "msg/msgpadannularringviolation.h"
 #include "msg/msgpadclearanceviolation.h"
+#include "msg/msgpadholeoutsidecopper.h"
 #include "msg/msgpadoriginoutsidecopper.h"
 #include "msg/msgpadoverlapswithplacement.h"
+#include "msg/msgunusedcustompadoutline.h"
 #include "msg/msgwrongfootprinttextlayer.h"
 #include "package.h"
 
@@ -68,6 +71,7 @@ LibraryElementCheckMessageList PackageCheck::runChecks() const {
   checkPadsClearanceToPlacement(msgs);
   checkPadsAnnularRing(msgs);
   checkPadsConnectionPoint(msgs);
+  checkCustomPadOutline(msgs);
   return msgs;
 }
 
@@ -257,18 +261,26 @@ void PackageCheck::checkPadsAnnularRing(MsgList& msgs) const {
           pad->getGeometry().toFilledQPainterPathPx();
 
       // Check all holes.
+      bool emitError = false;
       bool emitWarning = false;
       for (auto itHole1 = (*itPad).getHoles().begin();
            itHole1 != (*itPad).getHoles().end(); ++itHole1) {
         std::shared_ptr<const Hole> hole1 = itHole1.ptr();
-        const QVector<Path> hole1Paths = hole1->getPath()->toOutlineStrokes(
-            hole1->getDiameter() +
-            PositiveLength((annularRing * 2) - tolerance));
+        const QVector<Path> hole1Paths =
+            hole1->getPath()->toOutlineStrokes(hole1->getDiameter());
+        const QVector<Path> hole1PathsWithAnnular =
+            hole1->getPath()->toOutlineStrokes(
+                hole1->getDiameter() +
+                PositiveLength((annularRing * 2) - tolerance));
         const QPainterPath hole1PathPx =
             Path::toQPainterPathPx(hole1Paths, true);
+        const QPainterPath hole1PathPxWithAnnular =
+            Path::toQPainterPathPx(hole1PathsWithAnnular, true);
 
         // Check annular rings.
         if (!padPathPx.contains(hole1PathPx)) {
+          emitError = true;
+        } else if (!padPathPx.contains(hole1PathPxWithAnnular)) {
           emitWarning = true;
         } else {
           // Compare with all holes *after* hole1 to avoid redundant checks.
@@ -283,14 +295,19 @@ void PackageCheck::checkPadsAnnularRing(MsgList& msgs) const {
 
             // Now check if the annular ring is really too small.
             if (hole1PathPx.intersects(hole2PathPx)) {
+              emitError = true;
+            } else if (hole1PathPxWithAnnular.intersects(hole2PathPx)) {
               emitWarning = true;
             }
           }
         }
       }
 
-      // Only show one warning even if there are multiple violations.
-      if (emitWarning) {
+      // Only show one message even if there are multiple violations.
+      if (emitError) {
+        msgs.append(std::make_shared<MsgPadHoleOutsideCopper>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      } else if (emitWarning) {
         msgs.append(std::make_shared<MsgPadAnnularRingViolation>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString(),
             annularRing));
@@ -314,6 +331,29 @@ void PackageCheck::checkPadsConnectionPoint(MsgList& msgs) const {
           : pad->getGeometry().toFilledQPainterPathPx();
       if (!allowedArea.contains(QPointF(0, 0))) {
         msgs.append(std::make_shared<MsgPadOriginOutsideCopper>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkCustomPadOutline(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itPad = (*itFtp).getPads().begin();
+         itPad != (*itFtp).getPads().end(); ++itPad) {
+      std::shared_ptr<const FootprintPad> pad = itPad.ptr();
+      std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
+          ? mPackage.getPads().find(*pad->getPackagePadUuid())
+          : nullptr;
+      if ((pad->getShape() == FootprintPad::Shape::Custom) &&
+          (!PadGeometry::isValidCustomOutline(pad->getCustomShapeOutline()))) {
+        msgs.append(std::make_shared<MsgInvalidCustomPadOutline>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      } else if ((pad->getShape() != FootprintPad::Shape::Custom) &&
+                 (!pad->getCustomShapeOutline().getVertices().isEmpty())) {
+        msgs.append(std::make_shared<MsgUnusedCustomPadOutline>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
       }
     }
