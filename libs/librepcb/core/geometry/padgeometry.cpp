@@ -82,12 +82,6 @@ QVector<Path> PadGeometry::toOutlines() const {
 
   QVector<Path> result;
   switch (mShape) {
-    case Shape::Round: {
-      if ((w > 0) && (h > 0)) {
-        result.append(Path::obround(PositiveLength(w), PositiveLength(h)));
-      }
-      break;
-    }
     case Shape::RoundedRect: {
       if ((w > 0) && (h > 0)) {
         result.append(
@@ -198,14 +192,6 @@ PadGeometry PadGeometry::withoutHoles() const noexcept {
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
-
-PadGeometry PadGeometry::round(const PositiveLength& width,
-                               const PositiveLength& height,
-                               const HoleList& holes) noexcept {
-  return PadGeometry(Shape::Round, *width, *height,
-                     UnsignedLimitedRatio(Ratio::percent0()), Path(), Length(0),
-                     holes);
-}
 
 PadGeometry PadGeometry::roundedRect(const PositiveLength& width,
                                      const PositiveLength& height,

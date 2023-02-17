@@ -384,6 +384,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
   }
   PositiveLength width(size);
   PositiveLength height(size);
+  UnsignedLimitedRatio radius(Ratio::percent0());
   FootprintPad::Shape shape;
   switch (p.getShape()) {
     case parseagle::ThtPad::Shape::Square:
@@ -393,10 +394,12 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
       shape = FootprintPad::Shape::RoundedOctagon;
       break;
     case parseagle::ThtPad::Shape::Round:
-      shape = FootprintPad::Shape::Round;
+      shape = FootprintPad::Shape::RoundedRect;
+      radius = UnsignedLimitedRatio(Ratio::percent100());
       break;
     case parseagle::ThtPad::Shape::Long:
-      shape = FootprintPad::Shape::Round;
+      shape = FootprintPad::Shape::RoundedRect;
+      radius = UnsignedLimitedRatio(Ratio::percent100());
       width = PositiveLength(size * 2);
       break;
     default:
@@ -416,7 +419,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           shape,  // Shape
           width,  // Width
           height,  // Height
-          UnsignedLimitedRatio(Ratio::percent0()),  // Radius
+          radius,  // Radius
           Path(),  // Custom shape outline
           FootprintPad::ComponentSide::Top,  // Side
           HoleList{std::make_shared<Hole>(

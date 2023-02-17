@@ -58,10 +58,10 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
     mPackagePadComboBox(nullptr),
     mLastPad(
         Uuid::createRandom(), tl::nullopt, Point(0, 0), Angle::deg0(),
-        FootprintPad::Shape::Round,  // Commonly used pad shape
+        FootprintPad::Shape::RoundedRect,  // Commonly used pad shape
         PositiveLength(2500000),  // There is no default/recommended pad size
         PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
-        UnsignedLimitedRatio(Ratio::percent0()),  // No radius
+        UnsignedLimitedRatio(Ratio::percent100()),  // Rounded pad
         Path(),  // Custom shape outline
         FootprintPad::ComponentSide::Top,  // Default side
         HoleList{}) {
@@ -128,11 +128,13 @@ bool PackageEditorState_AddPads::entry() noexcept {
   QAction* aShapeRound =
       cmd.shapeRound.createAction(shapeActionGroup.get(), this, [this]() {
         shapeSelectorCurrentShapeChanged(
-            FootprintPad::Shape::Round, UnsignedLimitedRatio(Ratio::percent0()),
-            false);
+            FootprintPad::Shape::RoundedRect,
+            UnsignedLimitedRatio(Ratio::percent100()), false);
       });
   aShapeRound->setCheckable(true);
-  aShapeRound->setChecked(mLastPad.getShape() == FootprintPad::Shape::Round);
+  aShapeRound->setChecked(
+      (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
+      (*mLastPad.getRadius() == Ratio::percent100()));
   aShapeRound->setActionGroup(shapeActionGroup.get());
   QAction* aShapeRoundedRect =
       cmd.shapeRoundedRect.createAction(shapeActionGroup.get(), this, [this]() {
@@ -143,7 +145,8 @@ bool PackageEditorState_AddPads::entry() noexcept {
   aShapeRoundedRect->setCheckable(true);
   aShapeRoundedRect->setChecked(
       (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
-      (*mLastPad.getRadius() != Ratio::percent0()));
+      (*mLastPad.getRadius() != Ratio::percent0()) &&
+      (*mLastPad.getRadius() != Ratio::percent100()));
   aShapeRoundedRect->setActionGroup(shapeActionGroup.get());
   QAction* aShapeRect =
       cmd.shapeRect.createAction(shapeActionGroup.get(), this, [this]() {

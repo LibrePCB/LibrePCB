@@ -55,7 +55,6 @@ class FootprintPad final {
 public:
   // Types
   enum class Shape {
-    Round,
     RoundedRect,
     RoundedOctagon,
     Custom,

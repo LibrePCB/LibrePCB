@@ -49,7 +49,6 @@ class PadGeometry final {
 public:
   // Types
   enum class Shape {
-    Round,
     RoundedRect,
     RoundedOctagon,
     Stroke,
@@ -78,9 +77,6 @@ public:
   PadGeometry withoutHoles() const noexcept;
 
   // Static Methods
-  static PadGeometry round(const PositiveLength& width,
-                           const PositiveLength& height,
-                           const HoleList& holes) noexcept;
   static PadGeometry roundedRect(const PositiveLength& width,
                                  const PositiveLength& height,
                                  const UnsignedLimitedRatio& radius,

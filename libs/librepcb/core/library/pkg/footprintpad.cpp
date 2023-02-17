@@ -38,10 +38,8 @@ namespace librepcb {
 template <>
 SExpression serialize(const FootprintPad::Shape& obj) {
   switch (obj) {
-    case FootprintPad::Shape::Round:
-      return SExpression::createToken("round");
     case FootprintPad::Shape::RoundedRect:
-      return SExpression::createToken("rect");
+      return SExpression::createToken("roundrect");
     case FootprintPad::Shape::RoundedOctagon:
       return SExpression::createToken("octagon");
     case FootprintPad::Shape::Custom:
@@ -54,9 +52,7 @@ SExpression serialize(const FootprintPad::Shape& obj) {
 template <>
 inline FootprintPad::Shape deserialize(const SExpression& node) {
   const QString str = node.getValue();
-  if (str == QLatin1String("round")) {
-    return FootprintPad::Shape::Round;
-  } else if (str == QLatin1String("rect")) {
+  if (str == QLatin1String("roundrect")) {
     return FootprintPad::Shape::RoundedRect;
   } else if (str == QLatin1String("octagon")) {
     return FootprintPad::Shape::RoundedOctagon;
@@ -189,8 +185,6 @@ bool FootprintPad::isOnLayer(const QString& name) const noexcept {
 
 PadGeometry FootprintPad::getGeometry() const noexcept {
   switch (mShape) {
-    case Shape::Round:
-      return PadGeometry::round(mWidth, mHeight, mHoles);
     case Shape::RoundedRect:
       return PadGeometry::roundedRect(mWidth, mHeight, mRadius, mHoles);
     case Shape::RoundedOctagon:
@@ -201,7 +195,7 @@ PadGeometry FootprintPad::getGeometry() const noexcept {
       qCritical() << "Unhandled switch-case in FootprintPad::getGeometry():"
                   << static_cast<int>(mShape);
       Q_ASSERT(false);
-      return PadGeometry::round(mWidth, mHeight, mHoles);
+      return PadGeometry::roundedRect(mWidth, mHeight, mRadius, mHoles);
   }
 }
 

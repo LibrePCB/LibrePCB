@@ -112,8 +112,15 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
         const Uuid uuid = deserialize<Uuid>(padNode->getChild("@0"));
         padNode->appendChild("package_pad", uuid);
 
-        // Specify corner radius.
-        padNode->appendChild("radius", SExpression::createToken("0.0"));
+        // Convert shape & corner radius.
+        SExpression& padShape = padNode->getChild("shape/@0");
+        const bool isRoundShape = (padShape.getValue() == "round");
+        const bool isRectShape = (padShape.getValue() == "rect");
+        padNode->appendChild(
+            "radius", SExpression::createToken(isRoundShape ? "1.0" : "0.0"));
+        if (isRoundShape || isRectShape) {
+          padShape = SExpression::createToken("roundrect");
+        }
 
         // Convert holes.
         // Note: In the Gerber export, drills on SMT pads were ignored thus

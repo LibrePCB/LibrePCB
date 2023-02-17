@@ -177,13 +177,12 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
     mUi->btnComponentSideTop->setChecked(true);
   }
   switch (mPad.getShape()) {
-    case FootprintPad::Shape::Round:
-      mUi->btnShapeRound->setChecked(true);
-      break;
     case FootprintPad::Shape::RoundedRect:
+      mUi->btnShapeRound->setChecked(*mPad.getRadius() == Ratio::percent100());
       mUi->btnShapeRect->setChecked(*mPad.getRadius() == Ratio::percent0());
-      mUi->btnShapeRoundedRect->setChecked(*mPad.getRadius() !=
-                                           Ratio::percent0());
+      mUi->btnShapeRoundedRect->setChecked(
+          (*mPad.getRadius() != Ratio::percent0()) &&
+          (*mPad.getRadius() != Ratio::percent100()));
       break;
     case FootprintPad::Shape::RoundedOctagon:
       mUi->btnShapeOctagon->setChecked(true);
@@ -262,6 +261,7 @@ void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
 void FootprintPadPropertiesDialog::updateShapeDependentWidgets(
     bool checked) noexcept {
   if (checked) {
+    const bool round = mUi->btnShapeRound->isChecked();
     const bool roundedRect = mUi->btnShapeRoundedRect->isChecked();
     const bool octagon = mUi->btnShapeOctagon->isChecked();
     const bool custom = mUi->btnShapeCustom->isChecked();
@@ -269,7 +269,9 @@ void FootprintPadPropertiesDialog::updateShapeDependentWidgets(
     mUi->edtRadiusAbs->setEnabled(roundedRect || octagon);
     mUi->edtWidth->setEnabled(!custom);
     mUi->edtHeight->setEnabled(!custom);
-    if (roundedRect) {
+    if (round) {
+      mUi->edtRadiusRatio->setValue(UnsignedLimitedRatio(Ratio::percent100()));
+    } else if (roundedRect) {
       applyRecommendedRadius();
     } else {
       mUi->edtRadiusRatio->setValue(UnsignedLimitedRatio(Ratio::percent0()));
@@ -404,9 +406,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     } else {
       Q_ASSERT(false);
     }
-    if (mUi->btnShapeRound->isChecked()) {
-      cmd->setShape(FootprintPad::Shape::Round, false);
-    } else if (mUi->btnShapeOctagon->isChecked()) {
+    if (mUi->btnShapeOctagon->isChecked()) {
       cmd->setShape(FootprintPad::Shape::RoundedOctagon, false);
     } else if (mUi->btnShapeCustom->isChecked()) {
       cmd->setShape(FootprintPad::Shape::Custom, false);
