@@ -387,10 +387,10 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
   FootprintPad::Shape shape;
   switch (p.getShape()) {
     case parseagle::ThtPad::Shape::Square:
-      shape = FootprintPad::Shape::Rect;
+      shape = FootprintPad::Shape::RoundedRect;
       break;
     case parseagle::ThtPad::Shape::Octagon:
-      shape = FootprintPad::Shape::Octagon;
+      shape = FootprintPad::Shape::RoundedOctagon;
       break;
     case parseagle::ThtPad::Shape::Round:
       shape = FootprintPad::Shape::Round;
@@ -416,6 +416,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           shape,  // Shape
           width,  // Width
           height,  // Height
+          UnsignedLimitedRatio(Ratio::percent0()),  // Radius
           Path(),  // Custom shape outline
           FootprintPad::ComponentSide::Top,  // Side
           HoleList{std::make_shared<Hole>(
@@ -447,9 +448,10 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           uuid,  // Package pad UUID
           convertPoint(p.getPosition()),  // Position
           convertAngle(p.getRotation().getAngle()),  // Rotation
-          FootprintPad::Shape::Rect,  // Shape
+          FootprintPad::Shape::RoundedRect,  // Shape
           PositiveLength(convertLength(p.getWidth())),  // Width
           PositiveLength(convertLength(p.getHeight())),  // Height
+          UnsignedLimitedRatio(Ratio::percent0()),  // Radius
           Path(),  // Custom shape outline
           side,  // Side
           HoleList{}  // Holes

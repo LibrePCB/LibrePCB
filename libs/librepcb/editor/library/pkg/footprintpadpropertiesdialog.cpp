@@ -53,6 +53,9 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
                            settingsPrefix % "/width");
   mUi->edtHeight->configure(lengthUnit, LengthEditBase::Steps::generic(),
                             settingsPrefix % "/height");
+  mUi->edtRadiusRatio->setSingleStep(1.0);  // [%]
+  mUi->edtRadiusAbs->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                               settingsPrefix % "/radius_abs");
   mUi->edtHoleDiameter->configure(lengthUnit,
                                   LengthEditBase::Steps::drillDiameter(),
                                   settingsPrefix % "/hole_diameter");
@@ -89,11 +92,17 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &FootprintPadPropertiesDialog::on_buttonBox_clicked);
 
-  // Disable width/height inputs if custom shape is selected.
-  connect(mUi->rbtnShapeCustom, &QRadioButton::toggled, mUi->edtWidth,
-          &PositiveLengthEdit::setDisabled);
-  connect(mUi->rbtnShapeCustom, &QRadioButton::toggled, mUi->edtHeight,
-          &PositiveLengthEdit::setDisabled);
+  // Disable some widgets if not applicable for the selected shape.
+  connect(mUi->btnShapeRound, &QRadioButton::toggled, this,
+          &FootprintPadPropertiesDialog::updateShapeDependentWidgets);
+  connect(mUi->btnShapeRect, &QRadioButton::toggled, this,
+          &FootprintPadPropertiesDialog::updateShapeDependentWidgets);
+  connect(mUi->btnShapeRoundedRect, &QRadioButton::toggled, this,
+          &FootprintPadPropertiesDialog::updateShapeDependentWidgets);
+  connect(mUi->btnShapeOctagon, &QRadioButton::toggled, this,
+          &FootprintPadPropertiesDialog::updateShapeDependentWidgets);
+  connect(mUi->btnShapeCustom, &QRadioButton::toggled, this,
+          &FootprintPadPropertiesDialog::updateShapeDependentWidgets);
 
   // Automatically set/clear custom shape outline to improve user experience.
   mAutoCustomOutline = mPad.getCustomShapeOutline();
@@ -103,7 +112,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
       mAutoCustomOutline = outlines.first().toOpenPath();
     }
   }
-  connect(mUi->rbtnShapeCustom, &QRadioButton::toggled, this,
+  connect(mUi->btnShapeCustom, &QRadioButton::toggled, this,
           [this](bool custom) {
             const Path path = mUi->customShapePathEditor->getPath();
             if (custom && (path.getVertices().isEmpty())) {
@@ -113,6 +122,16 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
               mUi->customShapePathEditor->setPath(Path());
             }
           });
+
+  // Auto-update relative and absolute radius input widgets.
+  connect(mUi->edtRadiusAbs, &UnsignedLengthEdit::valueChanged, this,
+          &FootprintPadPropertiesDialog::updateRelativeRadius);
+  connect(mUi->edtRadiusRatio, &UnsignedLimitedRatioEdit::valueChanged, this,
+          &FootprintPadPropertiesDialog::updateAbsoluteRadius);
+  connect(mUi->edtWidth, &PositiveLengthEdit::valueChanged, this,
+          &FootprintPadPropertiesDialog::updateAbsoluteRadius);
+  connect(mUi->edtHeight, &PositiveLengthEdit::valueChanged, this,
+          &FootprintPadPropertiesDialog::updateAbsoluteRadius);
 
   // Avoid creating pads with a drill diameter larger than its size!
   // See https://github.com/LibrePCB/LibrePCB/issues/946.
@@ -153,27 +172,30 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   }
   mUi->cbxPackagePad->setCurrentIndex(currentPadIndex);
   if (mPad.getComponentSide() == FootprintPad::ComponentSide::Bottom) {
-    mUi->rbtnComponentSideBottom->setChecked(true);
+    mUi->btnComponentSideBottom->setChecked(true);
   } else {
-    mUi->rbtnComponentSideTop->setChecked(true);
+    mUi->btnComponentSideTop->setChecked(true);
   }
   switch (mPad.getShape()) {
     case FootprintPad::Shape::Round:
-      mUi->rbtnShapeRound->setChecked(true);
+      mUi->btnShapeRound->setChecked(true);
       break;
-    case FootprintPad::Shape::Rect:
-      mUi->rbtnShapeRect->setChecked(true);
+    case FootprintPad::Shape::RoundedRect:
+      mUi->btnShapeRect->setChecked(*mPad.getRadius() == Ratio::percent0());
+      mUi->btnShapeRoundedRect->setChecked(*mPad.getRadius() !=
+                                           Ratio::percent0());
       break;
-    case FootprintPad::Shape::Octagon:
-      mUi->rbtnShapeOctagon->setChecked(true);
+    case FootprintPad::Shape::RoundedOctagon:
+      mUi->btnShapeOctagon->setChecked(true);
       break;
     case FootprintPad::Shape::Custom:
-      mUi->rbtnShapeCustom->setChecked(true);
+      mUi->btnShapeCustom->setChecked(true);
       break;
     default:
       Q_ASSERT(false);
       break;
   }
+  mUi->edtRadiusRatio->setValue(mPad.getRadius());
   mUi->edtWidth->setValue(mPad.getWidth());
   mUi->edtHeight->setValue(mPad.getHeight());
   mUi->edtPosX->setValue(mPad.getPosition().getX());
@@ -182,6 +204,12 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   mUi->customShapePathEditor->setPath(mPad.getCustomShapeOutline());
   updateGeneralTabHoleWidgets();
   setSelectedHole(0);
+
+  // Auto-update radius when manually(!) modifying the size.
+  connect(mUi->edtWidth, &PositiveLengthEdit::valueChanged, this,
+          &FootprintPadPropertiesDialog::applyRecommendedRadius);
+  connect(mUi->edtHeight, &PositiveLengthEdit::valueChanged, this,
+          &FootprintPadPropertiesDialog::applyRecommendedRadius);
 
   // Always select first tab.
   mUi->tabWidget->setCurrentIndex(0);
@@ -196,12 +224,15 @@ FootprintPadPropertiesDialog::~FootprintPadPropertiesDialog() noexcept {
 
 void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->cbxPackagePad->setDisabled(readOnly);
-  mUi->rbtnComponentSideTop->setDisabled(readOnly);
-  mUi->rbtnComponentSideBottom->setDisabled(readOnly);
-  mUi->rbtnShapeRound->setDisabled(readOnly);
-  mUi->rbtnShapeRect->setDisabled(readOnly);
-  mUi->rbtnShapeOctagon->setDisabled(readOnly);
-  mUi->rbtnShapeCustom->setDisabled(readOnly);
+  mUi->btnComponentSideTop->setDisabled(readOnly);
+  mUi->btnComponentSideBottom->setDisabled(readOnly);
+  mUi->btnShapeRound->setDisabled(readOnly);
+  mUi->btnShapeRect->setDisabled(readOnly);
+  mUi->btnShapeRoundedRect->setDisabled(readOnly);
+  mUi->btnShapeOctagon->setDisabled(readOnly);
+  mUi->btnShapeCustom->setDisabled(readOnly);
+  mUi->edtRadiusRatio->setReadOnly(readOnly);
+  mUi->edtRadiusAbs->setReadOnly(readOnly);
   mUi->edtHoleDiameter->setReadOnly(readOnly);
   mUi->btnConvertToSmt->setEnabled(!readOnly);
   mUi->btnConvertToTht->setEnabled(!readOnly);
@@ -227,6 +258,51 @@ void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void FootprintPadPropertiesDialog::updateShapeDependentWidgets(
+    bool checked) noexcept {
+  if (checked) {
+    const bool roundedRect = mUi->btnShapeRoundedRect->isChecked();
+    const bool octagon = mUi->btnShapeOctagon->isChecked();
+    const bool custom = mUi->btnShapeCustom->isChecked();
+    mUi->edtRadiusRatio->setEnabled(roundedRect || octagon);
+    mUi->edtRadiusAbs->setEnabled(roundedRect || octagon);
+    mUi->edtWidth->setEnabled(!custom);
+    mUi->edtHeight->setEnabled(!custom);
+    if (roundedRect) {
+      applyRecommendedRadius();
+    } else {
+      mUi->edtRadiusRatio->setValue(UnsignedLimitedRatio(Ratio::percent0()));
+    }
+  }
+}
+
+void FootprintPadPropertiesDialog::updateAbsoluteRadius() noexcept {
+  QSignalBlocker blocker(mUi->edtRadiusAbs);  // Avoid endless loop.
+  const UnsignedLimitedRatio ratio = mUi->edtRadiusRatio->getValue();
+  const Length maxValue =
+      std::min(mUi->edtWidth->getValue(), mUi->edtHeight->getValue()) / 2;
+  mUi->edtRadiusAbs->setValue(UnsignedLength(
+      qBound(Length(0), Length::fromMm(maxValue.toMm() * ratio->toNormalized()),
+             maxValue)));
+}
+
+void FootprintPadPropertiesDialog::updateRelativeRadius() noexcept {
+  QSignalBlocker blocker(mUi->edtRadiusRatio);  // Avoid endless loop.
+  const UnsignedLength value = mUi->edtRadiusAbs->getValue();
+  const Length maxValue =
+      std::min(mUi->edtWidth->getValue(), mUi->edtHeight->getValue()) / 2;
+  mUi->edtRadiusRatio->setValue(UnsignedLimitedRatio(qBound(
+      Ratio::percent0(), Ratio::fromNormalized(value->toMm() / maxValue.toMm()),
+      Ratio::percent100())));
+}
+
+void FootprintPadPropertiesDialog::applyRecommendedRadius() noexcept {
+  if (mUi->btnShapeRoundedRect->isChecked()) {
+    mUi->edtRadiusRatio->setValue(FootprintPad::getRecommendedRadius(
+        mUi->edtWidth->getValue(), mUi->edtHeight->getValue()));
+  }
+}
 
 void FootprintPadPropertiesDialog::addHole() noexcept {
   mHoles.append(std::make_shared<Hole>(
@@ -308,7 +384,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
   const Path customOutlinePath =
       mUi->customShapePathEditor->getPath().cleaned().toOpenPath();
   mUi->customShapePathEditor->setPath(customOutlinePath);
-  if (mUi->rbtnShapeCustom->isChecked() &&
+  if (mUi->btnShapeCustom->isChecked() &&
       (!PadGeometry::isValidCustomOutline(customOutlinePath))) {
     QMessageBox::critical(
         this, tr("Invalid outline"),
@@ -321,24 +397,23 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     tl::optional<Uuid> pkgPad =
         Uuid::tryFromString(mUi->cbxPackagePad->currentData().toString());
     cmd->setPackagePadUuid(pkgPad, false);
-    if (mUi->rbtnComponentSideTop->isChecked()) {
+    if (mUi->btnComponentSideTop->isChecked()) {
       cmd->setComponentSide(FootprintPad::ComponentSide::Top, false);
-    } else if (mUi->rbtnComponentSideBottom->isChecked()) {
+    } else if (mUi->btnComponentSideBottom->isChecked()) {
       cmd->setComponentSide(FootprintPad::ComponentSide::Bottom, false);
     } else {
       Q_ASSERT(false);
     }
-    if (mUi->rbtnShapeRound->isChecked()) {
+    if (mUi->btnShapeRound->isChecked()) {
       cmd->setShape(FootprintPad::Shape::Round, false);
-    } else if (mUi->rbtnShapeRect->isChecked()) {
-      cmd->setShape(FootprintPad::Shape::Rect, false);
-    } else if (mUi->rbtnShapeOctagon->isChecked()) {
-      cmd->setShape(FootprintPad::Shape::Octagon, false);
-    } else if (mUi->rbtnShapeCustom->isChecked()) {
+    } else if (mUi->btnShapeOctagon->isChecked()) {
+      cmd->setShape(FootprintPad::Shape::RoundedOctagon, false);
+    } else if (mUi->btnShapeCustom->isChecked()) {
       cmd->setShape(FootprintPad::Shape::Custom, false);
     } else {
-      Q_ASSERT(false);
+      cmd->setShape(FootprintPad::Shape::RoundedRect, false);
     }
+    cmd->setRadius(mUi->edtRadiusRatio->getValue(), false);
     cmd->setWidth(mUi->edtWidth->getValue(), false);
     cmd->setHeight(mUi->edtHeight->getValue(), false);
     cmd->setCustomShapeOutline(customOutlinePath);

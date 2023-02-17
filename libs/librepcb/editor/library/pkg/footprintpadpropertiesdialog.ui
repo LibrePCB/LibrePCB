@@ -41,38 +41,6 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="QWidget" name="boardSideWidget" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QRadioButton" name="rbtnComponentSideTop">
-            <property name="text">
-             <string>Top</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="rbtnComponentSideBottom">
-            <property name="text">
-             <string>Bottom</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
@@ -80,60 +48,14 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
-        <widget class="QWidget" name="shapeWidget" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QRadioButton" name="rbtnShapeRound">
-            <property name="text">
-             <string>Round</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="rbtnShapeRect">
-            <property name="text">
-             <string>Rect</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="rbtnShapeOctagon">
-            <property name="text">
-             <string>Octagon</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QRadioButton" name="rbtnShapeCustom">
-            <property name="text">
-             <string>Custom</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="3" column="0">
+       <item row="6" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>Hole Diameter:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="6" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="librepcb::editor::PositiveLengthEdit" name="edtHoleDiameter" native="true"/>
@@ -173,31 +95,14 @@
          </item>
         </layout>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Size:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="librepcb::editor::PositiveLengthEdit" name="edtWidth" native="true"/>
-         </item>
-         <item>
-          <widget class="librepcb::editor::PositiveLengthEdit" name="edtHeight" native="true"/>
-         </item>
-        </layout>
-       </item>
-       <item row="5" column="0">
+       <item row="8" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
           <string>Position:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="8" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true"/>
@@ -207,15 +112,239 @@
          </item>
         </layout>
        </item>
-       <item row="6" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
           <string>Rotation:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="9" column="1">
         <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Corner Radius:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="librepcb::editor::UnsignedLimitedRatioEdit" name="edtRadiusRatio" native="true"/>
+         </item>
+         <item>
+          <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRadiusAbs" native="true"/>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QToolButton" name="btnComponentSideTop">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Top</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextOnly</enum>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupComponentSide</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnComponentSideBottom">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Bottom</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextOnly</enum>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupComponentSide</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QToolButton" name="btnShapeRound">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Obround</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/command_toolbars/shape_round.png</normaloff>:/img/command_toolbars/shape_round.png</iconset>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupShape</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnShapeRoundedRect">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Rounded rectangle</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/command_toolbars/shape_rounded_rect.png</normaloff>:/img/command_toolbars/shape_rounded_rect.png</iconset>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupShape</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnShapeRect">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Rectangle</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/command_toolbars/shape_rect.png</normaloff>:/img/command_toolbars/shape_rect.png</iconset>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupShape</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnShapeOctagon">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Octagon</string>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/img/command_toolbars/shape_octagon.png</normaloff>:/img/command_toolbars/shape_octagon.png</iconset>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupShape</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnShapeCustom">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Custom shape outline as defined on next tab</string>
+           </property>
+           <property name="text">
+            <string>Custom</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+           <property name="toolButtonStyle">
+            <enum>Qt::ToolButtonTextOnly</enum>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupShape</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Size:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="librepcb::editor::PositiveLengthEdit" name="edtWidth" native="true"/>
+         </item>
+         <item>
+          <widget class="librepcb::editor::PositiveLengthEdit" name="edtHeight" native="true"/>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -384,17 +513,43 @@
    <header location="global">librepcb/editor/widgets/patheditorwidget.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>librepcb::editor::UnsignedLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::UnsignedLimitedRatioEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/unsignedlimitedratioedit.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>cbxPackagePad</tabstop>
-  <tabstop>boardSideWidget</tabstop>
-  <tabstop>shapeWidget</tabstop>
+  <tabstop>btnComponentSideTop</tabstop>
+  <tabstop>btnComponentSideBottom</tabstop>
+  <tabstop>btnShapeRound</tabstop>
+  <tabstop>btnShapeRoundedRect</tabstop>
+  <tabstop>btnShapeRect</tabstop>
+  <tabstop>btnShapeOctagon</tabstop>
+  <tabstop>btnShapeCustom</tabstop>
   <tabstop>edtWidth</tabstop>
   <tabstop>edtHeight</tabstop>
+  <tabstop>edtRadiusRatio</tabstop>
+  <tabstop>edtRadiusAbs</tabstop>
+  <tabstop>edtHoleDiameter</tabstop>
+  <tabstop>btnConvertToSmt</tabstop>
+  <tabstop>btnConvertToTht</tabstop>
   <tabstop>edtPosX</tabstop>
   <tabstop>edtPosY</tabstop>
   <tabstop>edtRotation</tabstop>
  </tabstops>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="btnGroupComponentSide"/>
+  <buttongroup name="btnGroupShape"/>
+ </buttongroups>
 </ui>

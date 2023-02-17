@@ -112,6 +112,9 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
         const Uuid uuid = deserialize<Uuid>(padNode->getChild("@0"));
         padNode->appendChild("package_pad", uuid);
 
+        // Specify corner radius.
+        padNode->appendChild("radius", SExpression::createToken("0.0"));
+
         // Convert holes.
         // Note: In the Gerber export, drills on SMT pads were ignored thus
         // we delete such drills now to keep the same behavior.

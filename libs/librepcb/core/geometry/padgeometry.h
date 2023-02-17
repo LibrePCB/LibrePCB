@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../types/ratio.h"
 #include "hole.h"
 #include "path.h"
 
@@ -49,8 +50,8 @@ public:
   // Types
   enum class Shape {
     Round,
-    Rect,
-    Octagon,
+    RoundedRect,
+    RoundedOctagon,
     Stroke,
     Custom,
   };
@@ -64,9 +65,7 @@ public:
   Shape getShape() const noexcept { return mShape; }
   Length getWidth() const noexcept { return mBaseWidth + (mOffset * 2); }
   Length getHeight() const noexcept { return mBaseHeight + (mOffset * 2); }
-  UnsignedLength getCornerRadius() const noexcept {
-    return UnsignedLength((mOffset >= 0) ? mOffset : 0);
-  }
+  UnsignedLength getCornerRadius() const noexcept;
   const Path& getPath() const noexcept { return mPath; }
   const HoleList& getHoles() const noexcept { return mHoles; }
 
@@ -82,12 +81,14 @@ public:
   static PadGeometry round(const PositiveLength& width,
                            const PositiveLength& height,
                            const HoleList& holes) noexcept;
-  static PadGeometry rect(const PositiveLength& width,
-                          const PositiveLength& height,
-                          const HoleList& holes) noexcept;
-  static PadGeometry octagon(const PositiveLength& width,
-                             const PositiveLength& height,
-                             const HoleList& holes) noexcept;
+  static PadGeometry roundedRect(const PositiveLength& width,
+                                 const PositiveLength& height,
+                                 const UnsignedLimitedRatio& radius,
+                                 const HoleList& holes) noexcept;
+  static PadGeometry roundedOctagon(const PositiveLength& width,
+                                    const PositiveLength& height,
+                                    const UnsignedLimitedRatio& radius,
+                                    const HoleList& holes) noexcept;
   static PadGeometry stroke(const PositiveLength& diameter,
                             const NonEmptyPath& path,
                             const HoleList& holes) noexcept;
@@ -103,8 +104,8 @@ public:
 
 private:  // Methods
   PadGeometry(Shape shape, const Length& width, const Length& height,
-              const Path& path, const Length& offset,
-              const HoleList& holes) noexcept;
+              const UnsignedLimitedRatio& radius, const Path& path,
+              const Length& offset, const HoleList& holes) noexcept;
 
   /**
    * Returns the maximum allowed arc tolerance when flattening arcs. Do not
@@ -119,6 +120,7 @@ private:  // Data
   Shape mShape;
   Length mBaseWidth;
   Length mBaseHeight;
+  UnsignedLimitedRatio mRadius;
   Path mPath;
   Length mOffset;
   HoleList mHoles;

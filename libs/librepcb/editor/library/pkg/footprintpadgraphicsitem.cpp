@@ -164,6 +164,7 @@ void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
     case FootprintPad::Event::ShapeChanged:
     case FootprintPad::Event::WidthChanged:
     case FootprintPad::Event::HeightChanged:
+    case FootprintPad::Event::RadiusChanged:
     case FootprintPad::Event::CustomShapeOutlineChanged:
       setShape(pad.getGeometry().toQPainterPathPx());
       break;

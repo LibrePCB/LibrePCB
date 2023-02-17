@@ -23,7 +23,6 @@
 #include "footprintpad.h"
 
 #include "../../graphics/graphicslayer.h"
-#include "../../types/version.h"
 
 #include <QtCore>
 
@@ -41,9 +40,9 @@ SExpression serialize(const FootprintPad::Shape& obj) {
   switch (obj) {
     case FootprintPad::Shape::Round:
       return SExpression::createToken("round");
-    case FootprintPad::Shape::Rect:
+    case FootprintPad::Shape::RoundedRect:
       return SExpression::createToken("rect");
-    case FootprintPad::Shape::Octagon:
+    case FootprintPad::Shape::RoundedOctagon:
       return SExpression::createToken("octagon");
     case FootprintPad::Shape::Custom:
       return SExpression::createToken("custom");
@@ -58,9 +57,9 @@ inline FootprintPad::Shape deserialize(const SExpression& node) {
   if (str == QLatin1String("round")) {
     return FootprintPad::Shape::Round;
   } else if (str == QLatin1String("rect")) {
-    return FootprintPad::Shape::Rect;
+    return FootprintPad::Shape::RoundedRect;
   } else if (str == QLatin1String("octagon")) {
-    return FootprintPad::Shape::Octagon;
+    return FootprintPad::Shape::RoundedOctagon;
   } else if (str == QLatin1String("custom")) {
     return FootprintPad::Shape::Custom;
   } else {
@@ -108,6 +107,7 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
     mShape(other.mShape),
     mWidth(other.mWidth),
     mHeight(other.mHeight),
+    mRadius(other.mRadius),
     mCustomShapeOutline(other.mCustomShapeOutline),
     mComponentSide(other.mComponentSide),
     mHoles(other.mHoles),
@@ -120,6 +120,7 @@ FootprintPad::FootprintPad(const Uuid& uuid,
                            const Point& pos, const Angle& rot, Shape shape,
                            const PositiveLength& width,
                            const PositiveLength& height,
+                           const UnsignedLimitedRatio& radius,
                            const Path& customShapeOutline, ComponentSide side,
                            const HoleList& holes) noexcept
   : onEdited(*this),
@@ -130,6 +131,7 @@ FootprintPad::FootprintPad(const Uuid& uuid,
     mShape(shape),
     mWidth(width),
     mHeight(height),
+    mRadius(radius),
     mCustomShapeOutline(customShapeOutline),
     mComponentSide(side),
     mHoles(holes),
@@ -147,6 +149,7 @@ FootprintPad::FootprintPad(const SExpression& node)
     mShape(deserialize<Shape>(node.getChild("shape/@0"))),
     mWidth(deserialize<PositiveLength>(node.getChild("size/@0"))),
     mHeight(deserialize<PositiveLength>(node.getChild("size/@1"))),
+    mRadius(deserialize<UnsignedLimitedRatio>(node.getChild("radius/@0"))),
     mCustomShapeOutline(node),
     mComponentSide(deserialize<ComponentSide>(node.getChild("side/@0"))),
     mHoles(node),
@@ -188,10 +191,10 @@ PadGeometry FootprintPad::getGeometry() const noexcept {
   switch (mShape) {
     case Shape::Round:
       return PadGeometry::round(mWidth, mHeight, mHoles);
-    case Shape::Rect:
-      return PadGeometry::rect(mWidth, mHeight, mHoles);
-    case Shape::Octagon:
-      return PadGeometry::octagon(mWidth, mHeight, mHoles);
+    case Shape::RoundedRect:
+      return PadGeometry::roundedRect(mWidth, mHeight, mRadius, mHoles);
+    case Shape::RoundedOctagon:
+      return PadGeometry::roundedOctagon(mWidth, mHeight, mRadius, mHoles);
     case Shape::Custom:
       return PadGeometry::custom(mCustomShapeOutline, mHoles);
     default:
@@ -266,6 +269,16 @@ bool FootprintPad::setHeight(const PositiveLength& height) noexcept {
   return true;
 }
 
+bool FootprintPad::setRadius(const UnsignedLimitedRatio& radius) noexcept {
+  if (radius == mRadius) {
+    return false;
+  }
+
+  mRadius = radius;
+  onEdited.notify(Event::RadiusChanged);
+  return true;
+}
+
 bool FootprintPad::setCustomShapeOutline(const Path& outline) noexcept {
   if (outline == mCustomShapeOutline) {
     return false;
@@ -298,6 +311,7 @@ void FootprintPad::serialize(SExpression& root) const {
   mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   Point(*mWidth, *mHeight).serialize(root.appendList("size"));
+  root.appendChild("radius", mRadius);
   root.ensureLineBreak();
   root.appendChild("package_pad", mPackagePadUuid);
   root.ensureLineBreak();
@@ -319,6 +333,7 @@ bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
   if (mShape != rhs.mShape) return false;
   if (mWidth != rhs.mWidth) return false;
   if (mHeight != rhs.mHeight) return false;
+  if (mRadius != rhs.mRadius) return false;
   if (mCustomShapeOutline != rhs.mCustomShapeOutline) return false;
   if (mComponentSide != rhs.mComponentSide) return false;
   if (mHoles != rhs.mHoles) return false;
@@ -336,10 +351,26 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
   setShape(rhs.mShape);
   setWidth(rhs.mWidth);
   setHeight(rhs.mHeight);
+  setRadius(rhs.mRadius);
   setCustomShapeOutline(rhs.mCustomShapeOutline);
   setComponentSide(rhs.mComponentSide);
   mHoles = rhs.mHoles;
   return *this;
+}
+
+/*******************************************************************************
+ *  Static Methods
+ ******************************************************************************/
+
+UnsignedLimitedRatio FootprintPad::getRecommendedRadius(
+    const PositiveLength& width, const PositiveLength& height) noexcept {
+  // Use 50% ratio, but maximum 0.25mm as recommended by IPC7351C.
+  const PositiveLength size = std::min(width, height);
+  Ratio maxRadius = Ratio::fromNormalized(qreal(0.5) / size->toMm());
+  maxRadius /= Ratio::percent1();
+  maxRadius *= Ratio::percent1();
+  return UnsignedLimitedRatio(
+      qBound(Ratio::percent0(), maxRadius, Ratio::percent50()));
 }
 
 /*******************************************************************************

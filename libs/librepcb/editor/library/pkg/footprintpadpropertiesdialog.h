@@ -76,6 +76,10 @@ public:
       const FootprintPadPropertiesDialog& rhs) = delete;
 
 private:  // Methods
+  void updateShapeDependentWidgets(bool checked) noexcept;
+  void updateAbsoluteRadius() noexcept;
+  void updateRelativeRadius() noexcept;
+  void applyRecommendedRadius() noexcept;
   void addHole() noexcept;
   void removeSelectedHole() noexcept;
   void removeAllHoles() noexcept;

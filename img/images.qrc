@@ -104,6 +104,7 @@
         <file>command_toolbars/shape_octagon.png</file>
         <file>command_toolbars/shape_rect.png</file>
         <file>command_toolbars/shape_round.png</file>
+        <file>command_toolbars/shape_rounded_rect.png</file>
         <file>command_toolbars/via_octagon.png</file>
         <file>command_toolbars/via_round.png</file>
         <file>command_toolbars/via_square.png</file>

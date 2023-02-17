@@ -193,6 +193,9 @@ public:
 
   // Static Methods to create often used ratios
   static Ratio percent0() noexcept { return Ratio(0); }
+  static Ratio percent1() noexcept { return Ratio(10000); }
+  static Ratio percent5() noexcept { return Ratio(50000); }
+  static Ratio percent10() noexcept { return Ratio(100000); }
   static Ratio percent50() noexcept { return Ratio(500000); }
   static Ratio percent100() noexcept { return Ratio(1000000); }
 

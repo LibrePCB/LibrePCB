@@ -23,6 +23,7 @@
 #include "fileformatmigrationunstable.h"
 
 #include "../application.h"
+#include "../fileio/transactionaldirectory.h"
 
 #include <QtCore>
 
@@ -63,7 +64,14 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 }
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
-  Q_UNUSED(dir);
+  const QString fp = "package.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  for (SExpression* fptNode : root.getChildren("footprint")) {
+    for (SExpression* padNode : fptNode->getChildren("pad")) {
+      padNode->appendChild("radius", SExpression::createToken("0.0"));
+    }
+  }
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(

@@ -83,12 +83,14 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
 
   std::shared_ptr<FootprintPad> footprintPad1 = std::make_shared<FootprintPad>(
       Uuid::createRandom(), packagePad1->getUuid(), Point(12, 34), Angle(56),
-      FootprintPad::Shape::Octagon, PositiveLength(11), PositiveLength(22),
-      Path(), FootprintPad::ComponentSide::Bottom, HoleList{});
+      FootprintPad::Shape::RoundedOctagon, PositiveLength(11),
+      PositiveLength(22), UnsignedLimitedRatio(Ratio::percent50()), Path(),
+      FootprintPad::ComponentSide::Bottom, HoleList{});
 
   std::shared_ptr<FootprintPad> footprintPad2 = std::make_shared<FootprintPad>(
       Uuid::createRandom(), tl::nullopt, Point(12, 34), Angle(56),
-      FootprintPad::Shape::Rect, PositiveLength(123), PositiveLength(456),
+      FootprintPad::Shape::RoundedRect, PositiveLength(123),
+      PositiveLength(456), UnsignedLimitedRatio(Ratio::percent100()),
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
       FootprintPad::ComponentSide::Top,
       HoleList{std::make_shared<Hole>(Uuid::createRandom(), PositiveLength(789),

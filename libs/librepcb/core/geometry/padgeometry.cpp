@@ -39,17 +39,19 @@ PadGeometry::PadGeometry(const PadGeometry& other) noexcept
   : mShape(other.mShape),
     mBaseWidth(other.mBaseWidth),
     mBaseHeight(other.mBaseHeight),
+    mRadius(other.mRadius),
     mPath(other.mPath),
     mOffset(other.mOffset),
     mHoles(other.mHoles) {
 }
 
 PadGeometry::PadGeometry(Shape shape, const Length& width, const Length& height,
-                         const Path& path, const Length& offset,
-                         const HoleList& holes) noexcept
+                         const UnsignedLimitedRatio& radius, const Path& path,
+                         const Length& offset, const HoleList& holes) noexcept
   : mShape(shape),
     mBaseWidth(width),
     mBaseHeight(height),
+    mRadius(radius),
     mPath(path),
     mOffset(offset),
     mHoles(holes) {
@@ -61,6 +63,13 @@ PadGeometry::~PadGeometry() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
+
+UnsignedLength PadGeometry::getCornerRadius() const noexcept {
+  const Length size = std::min(mBaseWidth, mBaseHeight) / 2;
+  const Length radius = qBound(
+      Length(0), Length::fromMm(size.toMm() * mRadius->toNormalized()), size);
+  return UnsignedLength(std::max(Length(0), radius + mOffset));
+}
 
 /*******************************************************************************
  *  General Methods
@@ -79,14 +88,14 @@ QVector<Path> PadGeometry::toOutlines() const {
       }
       break;
     }
-    case Shape::Rect: {
+    case Shape::RoundedRect: {
       if ((w > 0) && (h > 0)) {
         result.append(
             Path::centeredRect(PositiveLength(w), PositiveLength(h), r));
       }
       break;
     }
-    case Shape::Octagon: {
+    case Shape::RoundedOctagon: {
       if ((w > 0) && (h > 0)) {
         result.append(Path::octagon(PositiveLength(w), PositiveLength(h), r));
       }
@@ -177,12 +186,12 @@ QPainterPath PadGeometry::toHolesQPainterPathPx() const noexcept {
 }
 
 PadGeometry PadGeometry::withOffset(const Length& offset) const noexcept {
-  return PadGeometry(mShape, mBaseWidth, mBaseHeight, mPath, mOffset + offset,
-                     mHoles);
+  return PadGeometry(mShape, mBaseWidth, mBaseHeight, mRadius, mPath,
+                     mOffset + offset, mHoles);
 }
 
 PadGeometry PadGeometry::withoutHoles() const noexcept {
-  return PadGeometry(mShape, mBaseWidth, mBaseHeight, mPath, mOffset,
+  return PadGeometry(mShape, mBaseWidth, mBaseHeight, mRadius, mPath, mOffset,
                      HoleList{});
 }
 
@@ -193,31 +202,39 @@ PadGeometry PadGeometry::withoutHoles() const noexcept {
 PadGeometry PadGeometry::round(const PositiveLength& width,
                                const PositiveLength& height,
                                const HoleList& holes) noexcept {
-  return PadGeometry(Shape::Round, *width, *height, Path(), Length(0), holes);
+  return PadGeometry(Shape::Round, *width, *height,
+                     UnsignedLimitedRatio(Ratio::percent0()), Path(), Length(0),
+                     holes);
 }
 
-PadGeometry PadGeometry::rect(const PositiveLength& width,
-                              const PositiveLength& height,
-                              const HoleList& holes) noexcept {
-  return PadGeometry(Shape::Rect, *width, *height, Path(), Length(0), holes);
+PadGeometry PadGeometry::roundedRect(const PositiveLength& width,
+                                     const PositiveLength& height,
+                                     const UnsignedLimitedRatio& radius,
+                                     const HoleList& holes) noexcept {
+  return PadGeometry(Shape::RoundedRect, *width, *height, radius, Path(),
+                     Length(0), holes);
 }
 
-PadGeometry PadGeometry::octagon(const PositiveLength& width,
-                                 const PositiveLength& height,
-                                 const HoleList& holes) noexcept {
-  return PadGeometry(Shape::Octagon, *width, *height, Path(), Length(0), holes);
+PadGeometry PadGeometry::roundedOctagon(const PositiveLength& width,
+                                        const PositiveLength& height,
+                                        const UnsignedLimitedRatio& radius,
+                                        const HoleList& holes) noexcept {
+  return PadGeometry(Shape::RoundedOctagon, *width, *height, radius, Path(),
+                     Length(0), holes);
 }
 
 PadGeometry PadGeometry::stroke(const PositiveLength& diameter,
                                 const NonEmptyPath& path,
                                 const HoleList& holes) noexcept {
-  return PadGeometry(Shape::Stroke, *diameter, Length(0), *path, Length(0),
+  return PadGeometry(Shape::Stroke, *diameter, Length(0),
+                     UnsignedLimitedRatio(Ratio::percent0()), *path, Length(0),
                      holes);
 }
 
 PadGeometry PadGeometry::custom(const Path& outline, const HoleList& holes) {
-  return PadGeometry(Shape::Custom, Length(0), Length(0), outline, Length(0),
-                     holes);
+  return PadGeometry(Shape::Custom, Length(0), Length(0),
+                     UnsignedLimitedRatio(Ratio::percent0()), outline,
+                     Length(0), holes);
 }
 
 bool PadGeometry::isValidCustomOutline(const Path& path) noexcept {
@@ -233,6 +250,7 @@ bool PadGeometry::operator==(const PadGeometry& rhs) const noexcept {
   if (mShape != rhs.mShape) return false;
   if (mBaseWidth != rhs.mBaseWidth) return false;
   if (mBaseHeight != rhs.mBaseHeight) return false;
+  if (mRadius != rhs.mRadius) return false;
   if (mPath != rhs.mPath) return false;
   if (mOffset != rhs.mOffset) return false;
   if (mHoles != rhs.mHoles) return false;
@@ -243,6 +261,7 @@ PadGeometry& PadGeometry::operator=(const PadGeometry& rhs) noexcept {
   mShape = rhs.mShape;
   mBaseWidth = rhs.mBaseWidth;
   mBaseHeight = rhs.mBaseHeight;
+  mRadius = rhs.mRadius;
   mPath = rhs.mPath;
   mOffset = rhs.mOffset;
   mHoles = rhs.mHoles;
