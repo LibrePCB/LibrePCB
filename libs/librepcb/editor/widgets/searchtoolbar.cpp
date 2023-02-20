@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "searchtoolbar.h"
 
+#include <librepcb/core/utils/toolbox.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -94,15 +96,7 @@ void SearchToolBar::findPrevious() noexcept {
 void SearchToolBar::updateCompleter() noexcept {
   QStringList list =
       mCompleterListFunction ? mCompleterListFunction() : QStringList();
-
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(list.begin(), list.end(),
-            [&collator](const QString& lhs, const QString& rhs) {
-              return collator(lhs, rhs);
-            });
+  Toolbox::sortNumeric(list, Qt::CaseInsensitive, false);
 
   QCompleter* completer = new QCompleter(list);
   completer->setCaseSensitivity(Qt::CaseInsensitive);

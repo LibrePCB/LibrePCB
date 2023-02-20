@@ -24,6 +24,7 @@
 
 #include <librepcb/core/library/cat/componentcategory.h>
 #include <librepcb/core/library/cat/packagecategory.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
 #include <QtCore>
@@ -192,15 +193,13 @@ QVector<std::shared_ptr<CategoryTreeModel::Item>> CategoryTreeModel::getChilds(
   }
 
   // Sort items by text.
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(
-      childs.begin(), childs.end(),
-      [&collator](const std::shared_ptr<Item>& a, std::shared_ptr<Item>& b) {
-        return collator(a->text, b->text);
-      });
+  Toolbox::sortNumeric(
+      childs,
+      [](const QCollator& cmp, const std::shared_ptr<Item>& lhs,
+         const std::shared_ptr<Item>& rhs) {
+        return cmp(lhs->text, rhs->text);
+      },
+      Qt::CaseInsensitive, false);
 
   return childs;
 }

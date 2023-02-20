@@ -22,12 +22,25 @@
  ******************************************************************************/
 #include "bom.h"
 
+#include "../utils/toolbox.h"
+
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+/*******************************************************************************
+ *  Class BomItem
+ ******************************************************************************/
+
+void BomItem::addDesignator(const QString& designator) noexcept {
+  mDesignators.append(designator);
+
+  // sort designators to improve readability of the BOM
+  Toolbox::sortNumeric(mDesignators, Qt::CaseInsensitive, false);
+}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -59,16 +72,13 @@ void Bom::addItem(const QString& designator,
     mItems.append(BomItem(designator, attributes));
   }
 
-  // Sort items by designator to improve readability of the BOM
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(mItems.begin(), mItems.end(),
-            [&collator](const BomItem& lhs, const BomItem& rhs) {
-              return collator(lhs.getDesignators().first(),
-                              rhs.getDesignators().first());
-            });
+  // Sort items by designator to improve readability of the BOM.
+  Toolbox::sortNumeric(
+      mItems,
+      [](const QCollator& cmp, const BomItem& lhs, const BomItem& rhs) {
+        return cmp(lhs.getDesignators().first(), rhs.getDesignators().first());
+      },
+      Qt::CaseInsensitive, false);
 }
 
 /*******************************************************************************

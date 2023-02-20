@@ -97,6 +97,50 @@ public:
   }
 
   /**
+   * @brief Sort a container of arbitrary objects using QCollators numeric mode
+   *
+   * @param container           A string container as supported by QCollator.
+   * @param compare             Custom comparison function with the signature
+   *                            `bool(const QCollator& const V&, const V&)`
+   *                            where `V` represents the container item type.
+   * @param caseSensitivity     Case sensitivity of comparison.
+   * @param ignorePunctuation   Whether punctuation is ignored or not.
+   */
+  template <typename T, typename Compare>
+  static void sortNumeric(
+      T& container, Compare compare,
+      Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive,
+      bool ignorePunctuation = false) noexcept {
+    QCollator collator;
+    collator.setNumericMode(true);
+    collator.setCaseSensitivity(caseSensitivity);
+    collator.setIgnorePunctuation(ignorePunctuation);
+    std::sort(container.begin(), container.end(),
+              [&collator, &compare](const typename T::value_type& lhs,
+                                    const typename T::value_type& rhs) {
+                return compare(collator, lhs, rhs);
+              });
+  }
+
+  /**
+   * @brief Sort a container of strings using QCollators numeric mode
+   *
+   * @param container           A string container as supported by QCollator.
+   * @param caseSensitivity     Case sensitivity of comparison.
+   * @param ignorePunctuation   Whether punctuation is ignored or not.
+   */
+  template <typename T>
+  static void sortNumeric(
+      T& container, Qt::CaseSensitivity caseSensitivity = Qt::CaseInsensitive,
+      bool ignorePunctuation = false) noexcept {
+    return sortNumeric(
+        container,
+        [](const QCollator& collator, const typename T::value_type& lhs,
+           const typename T::value_type& rhs) { return collator(lhs, rhs); },
+        caseSensitivity, ignorePunctuation);
+  }
+
+  /**
    * @brief Check if a text with a given rotation is considered as upside down
    *
    * A text is considered as upside down if it is rotated counterclockwise by

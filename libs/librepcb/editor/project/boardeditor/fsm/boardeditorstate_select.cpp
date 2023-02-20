@@ -71,6 +71,7 @@
 #include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 
@@ -1556,16 +1557,12 @@ QList<BoardEditorState_Select::DeviceMenuItem>
                                   icon, deviceUuid});
     }
 
-    // sort by name
-    QCollator collator;
-    collator.setCaseSensitivity(Qt::CaseInsensitive);
-    collator.setIgnorePunctuation(false);
-    collator.setNumericMode(true);
-    std::sort(
-        items.begin(), items.end(),
-        [&collator](const DeviceMenuItem& lhs, const DeviceMenuItem& rhs) {
-          return collator(lhs.name, rhs.name);
-        });
+    // sort by name.
+    Toolbox::sortNumeric(
+        items,
+        [](const QCollator& cmp, const DeviceMenuItem& lhs,
+           const DeviceMenuItem& rhs) { return cmp(lhs.name, rhs.name); },
+        Qt::CaseInsensitive, false);
   } catch (const Exception& e) {
     qCritical() << "Failed to list devices in context menu:" << e.getMsg();
   }

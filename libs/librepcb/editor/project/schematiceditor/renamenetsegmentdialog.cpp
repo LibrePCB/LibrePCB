@@ -32,6 +32,7 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -74,14 +75,7 @@ RenameNetSegmentDialog::RenameNetSegmentDialog(UndoStack& undoStack,
       netsignals.append(*signal->getName());
     }
   }
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(netsignals.begin(), netsignals.end(),
-            [&collator](const QString& lhs, const QString& rhs) {
-              return collator(lhs, rhs);
-            });
+  Toolbox::sortNumeric(netsignals, Qt::CaseInsensitive, false);
   mUi->cbxNetName->addItems(netsignals);
   int index = netsignals.indexOf(*segment.getNetSignal().getName());
   if (index >= 0) {
