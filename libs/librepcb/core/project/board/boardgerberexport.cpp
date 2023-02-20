@@ -749,15 +749,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
     const Length width = geometry.getWidth();
     const Length height = geometry.getHeight();
     switch (geometry.getShape()) {
-      case PadGeometry::Shape::Round: {
-        if ((width > 0) && (height > 0)) {
-          gen.flashObround(pad.getPosition(), PositiveLength(width),
-                           PositiveLength(height), pad.getRotation(), function,
-                           net, component, pin, signal);
-        }
-        break;
-      }
-      case PadGeometry::Shape::Rect: {
+      case PadGeometry::Shape::RoundedRect: {
         if ((width > 0) && (height > 0)) {
           gen.flashRect(pad.getPosition(), PositiveLength(width),
                         PositiveLength(height), geometry.getCornerRadius(),
@@ -766,7 +758,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
         }
         break;
       }
-      case PadGeometry::Shape::Octagon: {
+      case PadGeometry::Shape::RoundedOctagon: {
         if ((width > 0) && (height > 0)) {
           gen.flashOctagon(pad.getPosition(), PositiveLength(width),
                            PositiveLength(height), geometry.getCornerRadius(),

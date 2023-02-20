@@ -724,6 +724,8 @@ add_library(
   widgets/tabwidget.h
   widgets/unsignedlengthedit.cpp
   widgets/unsignedlengthedit.h
+  widgets/unsignedlimitedratioedit.cpp
+  widgets/unsignedlimitedratioedit.h
   widgets/unsignedratioedit.cpp
   widgets/unsignedratioedit.h
   widgets/waitingspinnerwidget.cpp

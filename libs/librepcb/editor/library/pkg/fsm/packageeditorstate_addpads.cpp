@@ -26,6 +26,7 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../../widgets/unsignedlengthedit.h"
+#include "../../../widgets/unsignedlimitedratioedit.h"
 #include "../../cmd/cmdfootprintpadedit.h"
 #include "../boardsideselectorwidget.h"
 #include "../footprintgraphicsitem.h"
@@ -57,16 +58,20 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
     mPackagePadComboBox(nullptr),
     mLastPad(
         Uuid::createRandom(), tl::nullopt, Point(0, 0), Angle::deg0(),
-        FootprintPad::Shape::Round,  // Commonly used pad shape
+        FootprintPad::Shape::RoundedRect,  // Commonly used pad shape
         PositiveLength(2500000),  // There is no default/recommended pad size
         PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
+        UnsignedLimitedRatio(Ratio::percent100()),  // Rounded pad
         Path(),  // Custom shape outline
         FootprintPad::ComponentSide::Top,  // Default side
         HoleList{}) {
   if (mPadType == PadType::SMT) {
-    mLastPad.setShape(FootprintPad::Shape::Rect);  // Commonly used SMT shape
+    mLastPad.setShape(
+        FootprintPad::Shape::RoundedRect);  // Commonly used SMT shape
+    mLastPad.setRadius(UnsignedLimitedRatio(Ratio::percent50()));
     mLastPad.setWidth(PositiveLength(1500000));  // Same as for THT pads ->
     mLastPad.setHeight(PositiveLength(700000));  // reasonable multiple of 0.1mm
+    applyRecommendedRoundedRectRadius();
   } else {
     mLastPad.getHoles().append(std::make_shared<Hole>(
         Uuid::createRandom(),
@@ -121,29 +126,48 @@ bool PackageEditorState_AddPads::entry() noexcept {
   std::unique_ptr<QActionGroup> shapeActionGroup(
       new QActionGroup(&mContext.commandToolBar));
   QAction* aShapeRound =
-      cmd.thtShapeRound.createAction(shapeActionGroup.get(), this, [this]() {
-        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::Round);
+      cmd.shapeRound.createAction(shapeActionGroup.get(), this, [this]() {
+        shapeSelectorCurrentShapeChanged(
+            FootprintPad::Shape::RoundedRect,
+            UnsignedLimitedRatio(Ratio::percent100()), false);
       });
-  aShapeRound->setIcon(QIcon(":/img/command_toolbars/shape_round.png"));
   aShapeRound->setCheckable(true);
-  aShapeRound->setChecked(mLastPad.getShape() == FootprintPad::Shape::Round);
+  aShapeRound->setChecked(
+      (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
+      (*mLastPad.getRadius() == Ratio::percent100()));
   aShapeRound->setActionGroup(shapeActionGroup.get());
-  QAction* aShapeRect = cmd.thtShapeRectangular.createAction(
-      shapeActionGroup.get(), this, [this]() {
-        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::Rect);
+  QAction* aShapeRoundedRect =
+      cmd.shapeRoundedRect.createAction(shapeActionGroup.get(), this, [this]() {
+        shapeSelectorCurrentShapeChanged(
+            FootprintPad::Shape::RoundedRect,
+            UnsignedLimitedRatio(Ratio::percent50()), true);
       });
-  aShapeRect->setIcon(QIcon(":/img/command_toolbars/shape_rect.png"));
+  aShapeRoundedRect->setCheckable(true);
+  aShapeRoundedRect->setChecked(
+      (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
+      (*mLastPad.getRadius() != Ratio::percent0()) &&
+      (*mLastPad.getRadius() != Ratio::percent100()));
+  aShapeRoundedRect->setActionGroup(shapeActionGroup.get());
+  QAction* aShapeRect =
+      cmd.shapeRect.createAction(shapeActionGroup.get(), this, [this]() {
+        shapeSelectorCurrentShapeChanged(
+            FootprintPad::Shape::RoundedRect,
+            UnsignedLimitedRatio(Ratio::percent0()), false);
+      });
   aShapeRect->setCheckable(true);
-  aShapeRect->setChecked(mLastPad.getShape() == FootprintPad::Shape::Rect);
+  aShapeRect->setChecked(
+      (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
+      (*mLastPad.getRadius() == Ratio::percent0()));
   aShapeRect->setActionGroup(shapeActionGroup.get());
-  QAction* aShapeOctagon = cmd.thtShapeOctagonal.createAction(
-      shapeActionGroup.get(), this, [this]() {
-        shapeSelectorCurrentShapeChanged(FootprintPad::Shape::Octagon);
+  QAction* aShapeOctagon =
+      cmd.shapeOctagon.createAction(shapeActionGroup.get(), this, [this]() {
+        shapeSelectorCurrentShapeChanged(
+            FootprintPad::Shape::RoundedOctagon,
+            UnsignedLimitedRatio(Ratio::percent0()), true);
       });
-  aShapeOctagon->setIcon(QIcon(":/img/command_toolbars/shape_octagon.png"));
   aShapeOctagon->setCheckable(true);
   aShapeOctagon->setChecked(mLastPad.getShape() ==
-                            FootprintPad::Shape::Octagon);
+                            FootprintPad::Shape::RoundedOctagon);
   aShapeOctagon->setActionGroup(shapeActionGroup.get());
   mContext.commandToolBar.addActionGroup(std::move(shapeActionGroup));
   mContext.commandToolBar.addSeparator();
@@ -228,6 +252,22 @@ bool PackageEditorState_AddPads::entry() noexcept {
             });
   }
 
+  // Radius.
+  mContext.commandToolBar.addLabel(tr("Radius:"), 10);
+  std::unique_ptr<UnsignedLimitedRatioEdit> edtRadius(
+      new UnsignedLimitedRatioEdit());
+  edtRadius->setSingleStep(1.0);  // [%]
+  edtRadius->setValue(mLastPad.getRadius());
+  edtRadius->setEnabled(aShapeRoundedRect->isChecked() ||
+                        aShapeOctagon->isChecked());
+  connect(this, &PackageEditorState_AddPads::requestRadiusInputEnabled,
+          edtRadius.get(), &UnsignedLimitedRatioEdit::setEnabled);
+  connect(this, &PackageEditorState_AddPads::requestRadius, edtRadius.get(),
+          &UnsignedLimitedRatioEdit::setValue);
+  connect(edtRadius.get(), &UnsignedLimitedRatioEdit::valueChanged, this,
+          &PackageEditorState_AddPads::radiusEditValueChanged);
+  mContext.commandToolBar.addWidget(std::move(edtRadius));
+
   Point pos =
       mContext.graphicsView.mapGlobalPosToScenePos(QCursor::pos(), true, true);
   if (!startAddPad(pos)) {
@@ -310,7 +350,7 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
     mCurrentPad = std::make_shared<FootprintPad>(
         Uuid::createRandom(), mLastPad.getPackagePadUuid(),
         mLastPad.getPosition(), mLastPad.getRotation(), mLastPad.getShape(),
-        mLastPad.getWidth(), mLastPad.getHeight(),
+        mLastPad.getWidth(), mLastPad.getHeight(), mLastPad.getRadius(),
         mLastPad.getCustomShapeOutline(), mLastPad.getComponentSide(),
         HoleList{});
     for (const Hole& hole : mLastPad.getHoles()) {
@@ -402,11 +442,15 @@ void PackageEditorState_AddPads::boardSideSelectorCurrentSideChanged(
 }
 
 void PackageEditorState_AddPads::shapeSelectorCurrentShapeChanged(
-    FootprintPad::Shape shape) noexcept {
+    FootprintPad::Shape shape, const UnsignedLimitedRatio& radius,
+    bool customRadius) noexcept {
   mLastPad.setShape(shape);
   if (mEditCmd) {
     mEditCmd->setShape(shape, true);
   }
+  requestRadius(radius);
+  requestRadiusInputEnabled(customRadius);
+  applyRecommendedRoundedRectRadius();
 }
 
 void PackageEditorState_AddPads::widthEditValueChanged(
@@ -415,6 +459,7 @@ void PackageEditorState_AddPads::widthEditValueChanged(
   if (mEditCmd) {
     mEditCmd->setWidth(mLastPad.getWidth(), true);
   }
+  applyRecommendedRoundedRectRadius();
 }
 
 void PackageEditorState_AddPads::heightEditValueChanged(
@@ -423,6 +468,7 @@ void PackageEditorState_AddPads::heightEditValueChanged(
   if (mEditCmd) {
     mEditCmd->setHeight(mLastPad.getHeight(), true);
   }
+  applyRecommendedRoundedRectRadius();
 }
 
 void PackageEditorState_AddPads::drillDiameterEditValueChanged(
@@ -432,6 +478,22 @@ void PackageEditorState_AddPads::drillDiameterEditValueChanged(
     if (mEditCmd) {
       mEditCmd->setHoles(mLastPad.getHoles(), true);
     }
+  }
+}
+
+void PackageEditorState_AddPads::radiusEditValueChanged(
+    const UnsignedLimitedRatio& value) noexcept {
+  mLastPad.setRadius(value);
+  if (mEditCmd) {
+    mEditCmd->setRadius(mLastPad.getRadius(), true);
+  }
+}
+
+void PackageEditorState_AddPads::applyRecommendedRoundedRectRadius() noexcept {
+  if ((*mLastPad.getRadius() > Ratio::percent0()) &&
+      (*mLastPad.getRadius() < Ratio::percent100())) {
+    emit requestRadius(FootprintPad::getRecommendedRadius(
+        mLastPad.getWidth(), mLastPad.getHeight()));
   }
 }
 

@@ -1186,31 +1186,40 @@ public:
       {QKeySequence(Qt::Key_5)},
       &categoryCommands,
   };
-  EditorCommand thtShapeRound{
-      "tht_shape_round",  // clang-format break
+  EditorCommand shapeRound{
+      "shape_round",  // clang-format break
       QT_TR_NOOP("Round"),
       QT_TR_NOOP("Shape: Round"),
-      QIcon(":/img/command_toolbars/via_round.png"),
+      QIcon(":/img/command_toolbars/shape_round.png"),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::Key_7)},
+      {QKeySequence(Qt::Key_1)},
       &categoryCommands,
   };
-  EditorCommand thtShapeRectangular{
-      "tht_shape_rectangular",  // clang-format break
-      QT_TR_NOOP("Rectangular"),
-      QT_TR_NOOP("Shape: Rectangular"),
-      QIcon(":/img/command_toolbars/via_square.png"),
+  EditorCommand shapeRoundedRect{
+      "shape_rounded_rect",  // clang-format break
+      QT_TR_NOOP("Rounded Rectangle"),
+      QT_TR_NOOP("Shape: Rounded Rectangle"),
+      QIcon(":/img/command_toolbars/shape_rounded_rect.png"),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::Key_8)},
+      {QKeySequence(Qt::Key_2)},
       &categoryCommands,
   };
-  EditorCommand thtShapeOctagonal{
-      "tht_shape_octagonal",  // clang-format break
-      QT_TR_NOOP("Octagonal"),
-      QT_TR_NOOP("Shape: Octagonal"),
-      QIcon(":/img/command_toolbars/via_octagon.png"),
+  EditorCommand shapeRect{
+      "shape_rect",  // clang-format break
+      QT_TR_NOOP("Rectangle"),
+      QT_TR_NOOP("Shape: Rectangle"),
+      QIcon(":/img/command_toolbars/shape_rect.png"),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::Key_9)},
+      {QKeySequence(Qt::Key_3)},
+      &categoryCommands,
+  };
+  EditorCommand shapeOctagon{
+      "shape_octagon",  // clang-format break
+      QT_TR_NOOP("Octagon"),
+      QT_TR_NOOP("Shape: Octagon"),
+      QIcon(":/img/command_toolbars/shape_octagon.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::Key_4)},
       &categoryCommands,
   };
 

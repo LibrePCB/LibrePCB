@@ -615,7 +615,7 @@ void PackageEditorWidget::fixMsg(const MsgInvalidCustomPadOutline& msg) {
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
   QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
-  cmd->setShape(FootprintPad::Shape::Round, false);
+  cmd->setShape(FootprintPad::Shape::RoundedRect, false);
   mUndoStack->execCmd(cmd.take());
 }
 

@@ -31,6 +31,7 @@
 #include "../../types/angle.h"
 #include "../../types/length.h"
 #include "../../types/point.h"
+#include "../../types/ratio.h"
 #include "../../types/uuid.h"
 
 #include <QtCore>
@@ -53,8 +54,16 @@ class FootprintPad final {
 
 public:
   // Types
-  enum class Shape { Round, Rect, Octagon, Custom };
-  enum class ComponentSide { Top, Bottom };
+  enum class Shape {
+    RoundedRect,
+    RoundedOctagon,
+    Custom,
+  };
+
+  enum class ComponentSide {
+    Top,
+    Bottom,
+  };
 
   // Signals
   enum class Event {
@@ -65,6 +74,7 @@ public:
     ShapeChanged,
     WidthChanged,
     HeightChanged,
+    RadiusChanged,
     CustomShapeOutlineChanged,
     ComponentSideChanged,
     HolesEdited,
@@ -78,6 +88,7 @@ public:
   FootprintPad(const Uuid& uuid, const tl::optional<Uuid>& pkgPadUuid,
                const Point& pos, const Angle& rot, Shape shape,
                const PositiveLength& width, const PositiveLength& height,
+               const UnsignedLimitedRatio& radius,
                const Path& customShapeOutline, ComponentSide side,
                const HoleList& holes) noexcept;
   explicit FootprintPad(const SExpression& node);
@@ -93,6 +104,7 @@ public:
   Shape getShape() const noexcept { return mShape; }
   const PositiveLength& getWidth() const noexcept { return mWidth; }
   const PositiveLength& getHeight() const noexcept { return mHeight; }
+  const UnsignedLimitedRatio& getRadius() const noexcept { return mRadius; }
   const Path& getCustomShapeOutline() const noexcept {
     return mCustomShapeOutline;
   }
@@ -111,6 +123,7 @@ public:
   bool setShape(Shape shape) noexcept;
   bool setWidth(const PositiveLength& width) noexcept;
   bool setHeight(const PositiveLength& height) noexcept;
+  bool setRadius(const UnsignedLimitedRatio& radius) noexcept;
   bool setCustomShapeOutline(const Path& outline) noexcept;
   bool setComponentSide(ComponentSide side) noexcept;
 
@@ -129,6 +142,10 @@ public:
     return !(*this == rhs);
   }
   FootprintPad& operator=(const FootprintPad& rhs) noexcept;
+
+  // Static Methods
+  static UnsignedLimitedRatio getRecommendedRadius(
+      const PositiveLength& width, const PositiveLength& height) noexcept;
 
 private:  // Methods
   void holesEdited(const HoleList& list, int index,
@@ -149,6 +166,7 @@ private:  // Data
   Shape mShape;
   PositiveLength mWidth;
   PositiveLength mHeight;
+  UnsignedLimitedRatio mRadius;
   Path mCustomShapeOutline;  ///< Empty if not needed; Implicitly closed
   ComponentSide mComponentSide;
   HoleList mHoles;  ///< If not empty, it's a THT pad.

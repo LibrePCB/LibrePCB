@@ -193,6 +193,9 @@ public:
 
   // Static Methods to create often used ratios
   static Ratio percent0() noexcept { return Ratio(0); }
+  static Ratio percent1() noexcept { return Ratio(10000); }
+  static Ratio percent5() noexcept { return Ratio(50000); }
+  static Ratio percent10() noexcept { return Ratio(100000); }
   static Ratio percent50() noexcept { return Ratio(500000); }
   static Ratio percent100() noexcept { return Ratio(1000000); }
 
@@ -329,6 +332,53 @@ inline QDebug operator<<(QDebug stream, const UnsignedRatio& ratio) {
 }
 
 inline uint qHash(const UnsignedRatio& key, uint seed = 0) noexcept {
+  return ::qHash(key->toPpm(), seed);
+}
+
+/*******************************************************************************
+ *  Class UnsignedLimitedRatio
+ ******************************************************************************/
+
+struct UnsignedLimitedRatioVerifier {
+  template <typename Value, typename Predicate>
+  static constexpr auto verify(Value&& val, const Predicate& p) ->
+      typename std::decay<Value>::type {
+    return p(val) ? std::forward<Value>(val)
+                  : (throw RuntimeError(__FILE__, __LINE__,
+                                        Ratio::tr("Value must be 0..1!")),
+                     std::forward<Value>(val));
+  }
+};
+
+struct UnsignedLimitedRatioConstraint {
+  constexpr bool operator()(const Ratio& r) const noexcept {
+    return (r >= 0) && (r <= Ratio::percent100());
+  }
+};
+
+/**
+ * UnsignedLimitedRatio is a wrapper around a ::librepcb::Ratio object which is
+ * guaranteed to always contain a value in the range [0..1].
+ *
+ * The constructor throws an exception if constructed from a ::librepcb::Ratio
+ * object with a value smaller than 0 or larger than 1.
+ */
+using UnsignedLimitedRatio =
+    type_safe::constrained_type<Ratio, UnsignedLimitedRatioConstraint,
+                                UnsignedLimitedRatioVerifier>;
+
+inline QDataStream& operator<<(QDataStream& stream,
+                               const UnsignedLimitedRatio& ratio) {
+  stream << ratio->toNormalizedString();
+  return stream;
+}
+
+inline QDebug operator<<(QDebug stream, const UnsignedLimitedRatio& ratio) {
+  stream << QString("UnsignedLimitedRatio(%1%%)").arg(ratio->toPercent());
+  return stream;
+}
+
+inline uint qHash(const UnsignedLimitedRatio& key, uint seed = 0) noexcept {
   return ::qHash(key->toPpm(), seed);
 }
 

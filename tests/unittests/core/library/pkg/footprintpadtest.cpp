@@ -44,8 +44,8 @@ class FootprintPadTest : public ::testing::Test {};
 
 TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
   SExpression sexpr = SExpression::parse(
-      "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side top) (shape rect)\n"
-      " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2)\n"
+      "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side top) (shape roundrect)\n"
+      " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2) (radius 0.5)\n"
       " (package_pad d48b8bd2-a46c-4495-87a5-662747034098)\n"
       ")",
       FilePath());
@@ -56,9 +56,10 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
             obj.getPackagePadUuid());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(Angle::deg45(), obj.getRotation());
-  EXPECT_EQ(FootprintPad::Shape::Rect, obj.getShape());
+  EXPECT_EQ(FootprintPad::Shape::RoundedRect, obj.getShape());
   EXPECT_EQ(PositiveLength(1100000), obj.getWidth());
   EXPECT_EQ(UnsignedLength(2200000), obj.getHeight());
+  EXPECT_EQ(UnsignedLimitedRatio(Ratio::percent50()), obj.getRadius());
   EXPECT_EQ(FootprintPad::ComponentSide::Top, obj.getComponentSide());
   EXPECT_EQ(0, obj.getHoles().count());
 }
@@ -66,7 +67,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
 TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   SExpression sexpr = SExpression::parse(
       "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side bottom) (shape custom)\n"
-      " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2)\n"
+      " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2) (radius 0.5)\n"
       " (package_pad none)\n"
       " (vertex (position -1.1 -2.2) (angle 45.0))\n"
       " (vertex (position 1.1 -2.2) (angle 90.0))\n"
@@ -88,6 +89,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   EXPECT_EQ(FootprintPad::Shape::Custom, obj.getShape());
   EXPECT_EQ(PositiveLength(1100000), obj.getWidth());
   EXPECT_EQ(UnsignedLength(2200000), obj.getHeight());
+  EXPECT_EQ(UnsignedLimitedRatio(Ratio::percent50()), obj.getRadius());
   EXPECT_EQ(FootprintPad::ComponentSide::Bottom, obj.getComponentSide());
   EXPECT_EQ(3, obj.getCustomShapeOutline().getVertices().count());
   EXPECT_EQ(2, obj.getHoles().count());
@@ -96,7 +98,8 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
 TEST_F(FootprintPadTest, testSerializeAndDeserialize) {
   FootprintPad obj1(
       Uuid::createRandom(), Uuid::createRandom(), Point(123, 567), Angle(789),
-      FootprintPad::Shape::Octagon, PositiveLength(123), PositiveLength(456),
+      FootprintPad::Shape::RoundedOctagon, PositiveLength(123),
+      PositiveLength(456), UnsignedLimitedRatio(Ratio::percent50()),
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
       FootprintPad::ComponentSide::Top,
       HoleList{

@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
-#define LIBREPCB_EDITOR_FOOTPRINTPADPROPERTIESDIALOG_H
+#ifndef LIBREPCB_EDITOR_UNSIGNEDLIMITEDRATIOEDIT_H
+#define LIBREPCB_EDITOR_UNSIGNEDLIMITEDRATIOEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/geometry/hole.h>
+#include "../widgets/numbereditbase.h"
+
+#include <librepcb/core/types/ratio.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -32,69 +34,46 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Footprint;
-class FootprintPad;
-class LengthUnit;
-class Package;
-
 namespace editor {
 
-class UndoStack;
-
-namespace Ui {
-class FootprintPadPropertiesDialog;
-}
-
 /*******************************************************************************
- *  Class FootprintPadPropertiesDialog
+ *  Class UnsignedLimitedRatioEdit
  ******************************************************************************/
 
 /**
- * @brief The FootprintPadPropertiesDialog class
+ * @brief The UnsignedLimitedRatioEdit class is a widget to view/edit
+ *        ::librepcb::UnsignedLimitedRatio values
  */
-class FootprintPadPropertiesDialog final : public QDialog {
+class UnsignedLimitedRatioEdit final : public NumberEditBase {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  FootprintPadPropertiesDialog() = delete;
-  FootprintPadPropertiesDialog(const FootprintPadPropertiesDialog& other) =
-      delete;
-  FootprintPadPropertiesDialog(const Package& pkg, FootprintPad& pad,
-                               UndoStack& undoStack,
-                               const LengthUnit& lengthUnit,
-                               const QString& settingsPrefix,
-                               QWidget* parent = nullptr) noexcept;
-  ~FootprintPadPropertiesDialog() noexcept;
+  explicit UnsignedLimitedRatioEdit(QWidget* parent = nullptr) noexcept;
+  UnsignedLimitedRatioEdit(const UnsignedLimitedRatioEdit& other) = delete;
+  virtual ~UnsignedLimitedRatioEdit() noexcept;
+
+  // Getters
+  const UnsignedLimitedRatio& getValue() const noexcept { return mValue; }
 
   // Setters
-  void setReadOnly(bool readOnly) noexcept;
+  void setValue(const UnsignedLimitedRatio& value) noexcept;
 
   // Operator Overloadings
-  FootprintPadPropertiesDialog& operator=(
-      const FootprintPadPropertiesDialog& rhs) = delete;
+  UnsignedLimitedRatioEdit& operator=(const UnsignedLimitedRatioEdit& rhs) =
+      delete;
+
+signals:
+  void valueChanged(const UnsignedLimitedRatio& value);
 
 private:  // Methods
-  void updateShapeDependentWidgets(bool checked) noexcept;
-  void updateAbsoluteRadius() noexcept;
-  void updateRelativeRadius() noexcept;
-  void applyRecommendedRadius() noexcept;
-  void addHole() noexcept;
-  void removeSelectedHole() noexcept;
-  void removeAllHoles() noexcept;
-  void updateGeneralTabHoleWidgets() noexcept;
-  void setSelectedHole(int index) noexcept;
-  void on_buttonBox_clicked(QAbstractButton* button);
-  bool applyChanges() noexcept;
+  void updateSpinBox() noexcept override;
+  void spinBoxValueChanged(double value) noexcept override;
 
 private:  // Data
-  FootprintPad& mPad;
-  UndoStack& mUndoStack;
-  HoleList mHoles;
-  int mSelectedHoleIndex;
-  QScopedPointer<Ui::FootprintPadPropertiesDialog> mUi;
-  Path mAutoCustomOutline;
+  UnsignedLimitedRatio mMinValue;
+  UnsignedLimitedRatio mMaxValue;
+  UnsignedLimitedRatio mValue;
 };
 
 /*******************************************************************************

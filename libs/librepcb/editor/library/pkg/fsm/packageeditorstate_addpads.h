@@ -92,10 +92,18 @@ private:  // Methods
   void packagePadComboBoxCurrentPadChanged(tl::optional<Uuid> pad) noexcept;
   void boardSideSelectorCurrentSideChanged(
       FootprintPad::ComponentSide side) noexcept;
-  void shapeSelectorCurrentShapeChanged(FootprintPad::Shape shape) noexcept;
+  void shapeSelectorCurrentShapeChanged(FootprintPad::Shape shape,
+                                        const UnsignedLimitedRatio& radius,
+                                        bool customRadius) noexcept;
   void widthEditValueChanged(const PositiveLength& value) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
+  void radiusEditValueChanged(const UnsignedLimitedRatio& value) noexcept;
+  void applyRecommendedRoundedRectRadius() noexcept;
+
+signals:
+  void requestRadiusInputEnabled(bool enabled);
+  void requestRadius(const UnsignedLimitedRatio& radius);
 
 private:  // Types / Data
   PadType mPadType;

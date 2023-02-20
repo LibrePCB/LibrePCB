@@ -47,6 +47,8 @@ CmdFootprintPadEdit::CmdFootprintPadEdit(FootprintPad& pad) noexcept
     mNewWidth(mOldWidth),
     mOldHeight(pad.getHeight()),
     mNewHeight(mOldHeight),
+    mOldRadius(pad.getRadius()),
+    mNewRadius(mOldRadius),
     mOldCustomShapeOutline(pad.getCustomShapeOutline()),
     mNewCustomShapeOutline(mOldCustomShapeOutline),
     mOldPos(pad.getPosition()),
@@ -104,6 +106,13 @@ void CmdFootprintPadEdit::setHeight(const PositiveLength& height,
   Q_ASSERT(!wasEverExecuted());
   mNewHeight = height;
   if (immediate) mPad.setHeight(mNewHeight);
+}
+
+void CmdFootprintPadEdit::setRadius(const UnsignedLimitedRatio& radius,
+                                    bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewRadius = radius;
+  if (immediate) mPad.setRadius(mNewRadius);
 }
 
 void CmdFootprintPadEdit::setCustomShapeOutline(const Path& outline) noexcept {
@@ -198,6 +207,7 @@ bool CmdFootprintPadEdit::performExecute() {
   if (mNewShape != mOldShape) return true;
   if (mNewWidth != mOldWidth) return true;
   if (mNewHeight != mOldHeight) return true;
+  if (mNewRadius != mOldRadius) return true;
   if (mNewCustomShapeOutline != mOldCustomShapeOutline) return true;
   if (mNewPos != mOldPos) return true;
   if (mNewRotation != mOldRotation) return true;
@@ -211,6 +221,7 @@ void CmdFootprintPadEdit::performUndo() {
   mPad.setShape(mOldShape);
   mPad.setWidth(mOldWidth);
   mPad.setHeight(mOldHeight);
+  mPad.setRadius(mOldRadius);
   mPad.setCustomShapeOutline(mOldCustomShapeOutline);
   mPad.setPosition(mOldPos);
   mPad.setRotation(mOldRotation);
@@ -223,6 +234,7 @@ void CmdFootprintPadEdit::performRedo() {
   mPad.setShape(mNewShape);
   mPad.setWidth(mNewWidth);
   mPad.setHeight(mNewHeight);
+  mPad.setRadius(mNewRadius);
   mPad.setCustomShapeOutline(mNewCustomShapeOutline);
   mPad.setPosition(mNewPos);
   mPad.setRotation(mNewRotation);
