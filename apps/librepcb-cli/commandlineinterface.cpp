@@ -49,6 +49,7 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -499,8 +500,8 @@ bool CommandLineInterface::openProject(
       }
       print("  " % tr("Approved messages: %1").arg(approvedMsgCount));
       print("  " % tr("Non-approved messages: %1").arg(messages.count()));
-      // sort messages to increases readability of console output
-      std::sort(messages.begin(), messages.end());
+      // Sort messages to increases readability of console output.
+      Toolbox::sortNumeric(messages, Qt::CaseInsensitive, false);
       foreach (const QString& msg, messages) { printErr(msg); }
       if (messages.count() > 0) {
         success = false;

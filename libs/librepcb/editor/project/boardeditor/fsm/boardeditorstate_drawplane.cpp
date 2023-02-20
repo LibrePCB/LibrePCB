@@ -38,6 +38,7 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -91,10 +92,18 @@ bool BoardEditorState_DrawPlane::entry() noexcept {
   netSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   netSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
   netSignalComboBox->setEditable(false);
-  foreach (NetSignal* netsignal, mContext.project.getCircuit().getNetSignals())
+  QList<NetSignal*> netSignals =
+      mContext.project.getCircuit().getNetSignals().values();
+  Toolbox::sortNumeric(
+      netSignals,
+      [](const QCollator& cmp, const NetSignal* lhs, const NetSignal* rhs) {
+        return cmp(*lhs->getName(), *rhs->getName());
+      },
+      Qt::CaseInsensitive, false);
+  foreach (const NetSignal* netsignal, netSignals) {
     netSignalComboBox->addItem(*netsignal->getName(),
                                netsignal->getUuid().toStr());
-  netSignalComboBox->model()->sort(0);
+  }
   netSignalComboBox->setCurrentText(mLastNetSignal ? *mLastNetSignal->getName()
                                                    : "");
   connect(

@@ -31,6 +31,7 @@
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -64,11 +65,17 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
           &BoardPlanePropertiesDialog::buttonBoxClicked);
 
   // net signal combobox
-  foreach (NetSignal* netsignal, mPlane.getCircuit().getNetSignals()) {
+  QList<NetSignal*> netSignals = mPlane.getCircuit().getNetSignals().values();
+  Toolbox::sortNumeric(
+      netSignals,
+      [](const QCollator& cmp, const NetSignal* lhs, const NetSignal* rhs) {
+        return cmp(*lhs->getName(), *rhs->getName());
+      },
+      Qt::CaseInsensitive, false);
+  foreach (NetSignal* netsignal, netSignals) {
     mUi->cbxNetSignal->addItem(*netsignal->getName(),
                                netsignal->getUuid().toStr());
   }
-  mUi->cbxNetSignal->model()->sort(0);
   mUi->cbxNetSignal->setCurrentIndex(
       mUi->cbxNetSignal->findData(mPlane.getNetSignal().getUuid().toStr()));
 

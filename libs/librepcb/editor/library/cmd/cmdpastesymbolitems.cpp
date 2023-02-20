@@ -82,7 +82,14 @@ bool CmdPasteSymbolItems::performExecute() {
   //  - The graphics items of the added elements are selected immediately to
   //    allow dragging them afterwards.
 
-  for (const SymbolPin& pin : mData->getPins().sortedByName()) {
+  QCollator collator;
+  collator.setNumericMode(true);
+  collator.setCaseSensitivity(Qt::CaseInsensitive);
+  collator.setIgnorePunctuation(false);
+  for (const SymbolPin &pin : mData->getPins().sorted(
+           [&collator](const SymbolPin&lhs, const SymbolPin&rhs) {
+             return collator(*lhs.getName(), *rhs.getName());
+           })) {
     Uuid uuid = pin.getUuid();
     if (mSymbol.getPins().contains(uuid) ||
         (mSymbol.getUuid() != mData->getSymbolUuid())) {

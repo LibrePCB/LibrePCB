@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "comboboxdelegate.h"
 
+#include <librepcb/core/utils/toolbox.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -29,6 +31,17 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
+
+/*******************************************************************************
+ *  Class ComboBoxDelegate::Items
+ ******************************************************************************/
+
+void ComboBoxDelegate::Items::sort() noexcept {
+  Toolbox::sortNumeric(*this,
+                       [](const QCollator& cmp, const Item& lhs,
+                          const Item& rhs) { return cmp(lhs.text, rhs.text); },
+                       Qt::CaseInsensitive, false);
+}
 
 /*******************************************************************************
  *  Constructors / Destructor

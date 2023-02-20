@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "libraryelementchecklistwidget.h"
 
+#include <librepcb/core/utils/toolbox.h>
+
 #include <algorithm>
 
 /*******************************************************************************
@@ -71,11 +73,22 @@ void LibraryElementCheckListWidget::setHandler(
 void LibraryElementCheckListWidget::setMessages(
     LibraryElementCheckMessageList messages) noexcept {
   // Sort by severity and message.
-  std::sort(messages.begin(), messages.end(),
-            [](std::shared_ptr<const LibraryElementCheckMessage> a,
-               std::shared_ptr<const LibraryElementCheckMessage> b) {
-              return (a && b) ? (*b) < (*a) : false;
-            });
+  Toolbox::sortNumeric(
+      messages,
+      [](const QCollator& cmp,
+         const std::shared_ptr<const LibraryElementCheckMessage>& lhs,
+         const std::shared_ptr<const LibraryElementCheckMessage>& rhs) {
+        if (lhs && rhs) {
+          if (lhs->getSeverity() != rhs->getSeverity()) {
+            return lhs->getSeverity() > rhs->getSeverity();
+          } else {
+            return cmp(lhs->getMessage(), rhs->getMessage());
+          }
+        } else {
+          return false;
+        }
+      },
+      Qt::CaseInsensitive, false);
 
   // Detect if messages have changed.
   bool isSame = (mMessages.count() == messages.count());

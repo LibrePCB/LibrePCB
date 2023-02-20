@@ -64,6 +64,7 @@
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -1122,15 +1123,13 @@ void BoardEditor::goToDevice(const QString& name, int index) noexcept {
   }
 
   // Sort by name for a natural order of results.
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(deviceCandidates.begin(), deviceCandidates.end(),
-            [&collator](const BI_Device* a, const BI_Device* b) {
-              return collator(*a->getComponentInstance().getName(),
-                              *b->getComponentInstance().getName());
-            });
+  Toolbox::sortNumeric(
+      deviceCandidates,
+      [](const QCollator& cmp, const BI_Device* a, const BI_Device* b) {
+        return cmp(*a->getComponentInstance().getName(),
+                   *b->getComponentInstance().getName());
+      },
+      Qt::CaseInsensitive, false);
 
   if (deviceCandidates.count()) {
     while (index < 0) {

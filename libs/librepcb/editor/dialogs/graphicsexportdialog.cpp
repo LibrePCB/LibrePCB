@@ -985,19 +985,18 @@ void GraphicsExportDialog::printerChanged(int index) noexcept {
 
 void GraphicsExportDialog::setAvailablePageSizes(
     QList<tl::optional<QPageSize>> sizes) noexcept {
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(sizes.begin(), sizes.end(),
-            [&collator](const tl::optional<QPageSize>& lhs,
-                        const tl::optional<QPageSize>& rhs) {
-              if (lhs && rhs) {
-                return collator(lhs->name(), rhs->name());
-              } else {
-                return lhs.has_value() < rhs.has_value();
-              }
-            });
+  // Sort page sizes.
+  Toolbox::sortNumeric(
+      sizes,
+      [](const QCollator& cmp, const tl::optional<QPageSize>& lhs,
+         const tl::optional<QPageSize>& rhs) {
+        if (lhs && rhs) {
+          return cmp(lhs->name(), rhs->name());
+        } else {
+          return lhs.has_value() < rhs.has_value();
+        }
+      },
+      Qt::CaseInsensitive, false);
 
   tl::optional<QPageSize> selectedSize = getPageSize();
   mAvailablePageSizes = sizes;

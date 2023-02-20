@@ -54,19 +54,7 @@ public:
   const QStringList& getAttributes() const noexcept { return mAttributes; }
 
   // General Methods
-  void addDesignator(const QString& designator) noexcept {
-    mDesignators.append(designator);
-
-    // sort designators to improve readability of the BOM
-    QCollator collator;
-    collator.setCaseSensitivity(Qt::CaseInsensitive);
-    collator.setIgnorePunctuation(false);
-    collator.setNumericMode(true);
-    std::sort(mDesignators.begin(), mDesignators.end(),
-              [&collator](const QString& lhs, const QString& rhs) {
-                return collator(lhs, rhs);
-              });
-  }
+  void addDesignator(const QString& designator) noexcept;
 
   // Operator Overloadings
   BomItem& operator=(const BomItem& rhs) noexcept {

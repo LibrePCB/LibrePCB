@@ -53,6 +53,7 @@
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/project/schematic/schematiclayerprovider.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -1050,14 +1051,12 @@ void SchematicEditor::goToSymbol(const QString& name, int index) noexcept {
   }
 
   // Sort by name for a natural order of results.
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(symbolCandidates.begin(), symbolCandidates.end(),
-            [&collator](const SI_Symbol* a, const SI_Symbol* b) {
-              return collator(a->getName(), b->getName());
-            });
+  Toolbox::sortNumeric(
+      symbolCandidates,
+      [](const QCollator& cmp, const SI_Symbol* lhs, const SI_Symbol* rhs) {
+        return cmp(lhs->getName(), rhs->getName());
+      },
+      Qt::CaseInsensitive, false);
 
   if (symbolCandidates.count()) {
     while (index < 0) {

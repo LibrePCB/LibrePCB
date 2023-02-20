@@ -53,15 +53,7 @@ public:
     QVariant data;
   };
   struct Items final : public QVector<Item> {
-    void sort() noexcept {
-      QCollator collator;
-      collator.setCaseSensitivity(Qt::CaseInsensitive);
-      collator.setIgnorePunctuation(false);
-      collator.setNumericMode(true);
-      std::sort(begin(), end(), [&collator](const Item& lhs, const Item& rhs) {
-        return collator(lhs.text, rhs.text);
-      });
-    }
+    void sort() noexcept;
   };
 
   // Constructors / Destructor

@@ -32,6 +32,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <parseagle/library.h>
 
 #include <QtCore>
@@ -193,26 +194,30 @@ QStringList EagleLibraryImport::open(const FilePath& lbr) {
     }
 
     // Sort all elements by name to improve readability.
-    QCollator collator;
-    collator.setCaseSensitivity(Qt::CaseInsensitive);
-    collator.setIgnorePunctuation(false);
-    collator.setNumericMode(true);
-    std::sort(mSymbols.begin(), mSymbols.end(),
-              [&collator](const Symbol& lhs, const Symbol& rhs) {
-                return collator(lhs.displayName, rhs.displayName);
-              });
-    std::sort(mPackages.begin(), mPackages.end(),
-              [&collator](const Package& lhs, const Package& rhs) {
-                return collator(lhs.displayName, rhs.displayName);
-              });
-    std::sort(mComponents.begin(), mComponents.end(),
-              [&collator](const Component& lhs, const Component& rhs) {
-                return collator(lhs.displayName, rhs.displayName);
-              });
-    std::sort(mDevices.begin(), mDevices.end(),
-              [&collator](const Device& lhs, const Device& rhs) {
-                return collator(lhs.displayName, rhs.displayName);
-              });
+    Toolbox::sortNumeric(
+        mSymbols,
+        [](const QCollator& cmp, const Symbol& lhs, const Symbol& rhs) {
+          return cmp(lhs.displayName, rhs.displayName);
+        },
+        Qt::CaseInsensitive, false);
+    Toolbox::sortNumeric(
+        mPackages,
+        [](const QCollator& cmp, const Package& lhs, const Package& rhs) {
+          return cmp(lhs.displayName, rhs.displayName);
+        },
+        Qt::CaseInsensitive, false);
+    Toolbox::sortNumeric(
+        mComponents,
+        [](const QCollator& cmp, const Component& lhs, const Component& rhs) {
+          return cmp(lhs.displayName, rhs.displayName);
+        },
+        Qt::CaseInsensitive, false);
+    Toolbox::sortNumeric(
+        mDevices,
+        [](const QCollator& cmp, const Device& lhs, const Device& rhs) {
+          return cmp(lhs.displayName, rhs.displayName);
+        },
+        Qt::CaseInsensitive, false);
 
     mAbort = false;
     mLoadedFilePath = lbr;

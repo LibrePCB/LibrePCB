@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "pickplacedata.h"
 
+#include "../utils/toolbox.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -52,16 +54,13 @@ PickPlaceData::~PickPlaceData() noexcept {
 void PickPlaceData::addItem(const PickPlaceDataItem& item) noexcept {
   mItems.append(item);
 
-  // Sort items by designator to improve readability of the BOM
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(
-      mItems.begin(), mItems.end(),
-      [&collator](const PickPlaceDataItem& lhs, const PickPlaceDataItem& rhs) {
-        return collator(lhs.getDesignator(), rhs.getDesignator());
-      });
+  // Sort items by designator to improve readability of the BOM.
+  Toolbox::sortNumeric(mItems,
+                       [](const QCollator& cmp, const PickPlaceDataItem& lhs,
+                          const PickPlaceDataItem& rhs) {
+                         return cmp(lhs.getDesignator(), rhs.getDesignator());
+                       },
+                       Qt::CaseInsensitive, false);
 }
 
 /*******************************************************************************

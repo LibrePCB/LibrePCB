@@ -46,6 +46,7 @@
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
 #include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -195,15 +196,12 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
     const QMap<Uuid, BI_Device*> boardDeviceList = mBoard->getDeviceInstances();
 
     // Sort components manually using numeric sort.
-    QCollator collator;
-    collator.setCaseSensitivity(Qt::CaseInsensitive);
-    collator.setIgnorePunctuation(false);
-    collator.setNumericMode(true);
-    std::sort(componentsList.begin(), componentsList.end(),
-              [&collator](const ComponentInstance* lhs,
-                          const ComponentInstance* rhs) {
-                return collator(*lhs->getName(), *rhs->getName());
-              });
+    Toolbox::sortNumeric(componentsList,
+                         [](const QCollator& cmp, const ComponentInstance* lhs,
+                            const ComponentInstance* rhs) {
+                           return cmp(*lhs->getName(), *rhs->getName());
+                         },
+                         Qt::CaseInsensitive, false);
 
     foreach (ComponentInstance* component, componentsList) {
       if (boardDeviceList.contains(component->getUuid())) continue;
@@ -611,14 +609,12 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
   }
 
   // Sort by device name, using numeric sort.
-  QCollator collator;
-  collator.setCaseSensitivity(Qt::CaseInsensitive);
-  collator.setIgnorePunctuation(false);
-  collator.setNumericMode(true);
-  std::sort(devices.begin(), devices.end(),
-            [&collator](const DeviceMetadata& lhs, const DeviceMetadata& rhs) {
-              return collator(lhs.deviceName, rhs.deviceName);
-            });
+  Toolbox::sortNumeric(devices,
+                       [](const QCollator& cmp, const DeviceMetadata& lhs,
+                          const DeviceMetadata& rhs) {
+                         return cmp(lhs.deviceName, rhs.deviceName);
+                       },
+                       Qt::CaseInsensitive, false);
 
   // Prio 1: Use the device chosen in the schematic.
   if (tl::optional<Uuid> dev = cmp.getDefaultDeviceUuid()) {
