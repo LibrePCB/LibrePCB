@@ -81,15 +81,6 @@ bool LibraryElementCheckMessage::operator!=(
   return !(*this == rhs);
 }
 
-bool LibraryElementCheckMessage::operator<(
-    const LibraryElementCheckMessage& rhs) const noexcept {
-  if (mSeverity == rhs.mSeverity) {
-    return mMessage < rhs.mMessage;
-  } else {
-    return mSeverity < rhs.mSeverity;
-  }
-}
-
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

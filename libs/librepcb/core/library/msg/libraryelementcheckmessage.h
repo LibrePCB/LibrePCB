@@ -76,7 +76,6 @@ public:
   // Operator Overloads
   bool operator==(const LibraryElementCheckMessage& rhs) const noexcept;
   bool operator!=(const LibraryElementCheckMessage& rhs) const noexcept;
-  bool operator<(const LibraryElementCheckMessage& rhs) const noexcept;
 
 protected:  // Methods
   LibraryElementCheckMessage(const LibraryElementCheckMessage& other) noexcept;
