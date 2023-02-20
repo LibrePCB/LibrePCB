@@ -1,28 +1,35 @@
 # Contributing Guidelines
 
+## Ways to Contribute
+
+Note that this file only contains a guide for **code contributions**. However,
+there are many other ways how to contribute to the LibrePCB project, see
+**[librepcb.org/contribute](https://librepcb.org/contribute/)** for details.
+
 ## Notes
 
-- **Before spending lots of time on something, ask for feedback on your idea first!**
+- **Before spending lots of time on something, please ask for feedback on
+  your idea first!**
 - Please search issues and pull requests before adding something new to avoid duplicating efforts and conversations.
 - Issues which are considered to be easy to solve are marked with the label `easy`:
   [Browse all easy issues](https://github.com/LibrePCB/LibrePCB/labels/easy).
-  Some issues even have a mentor assigned:
-  [Browse all mentored issues](https://github.com/LibrePCB/LibrePCB/labels/mentored).
 - To contact us use one of the following options:
   - Our [discussion platform](https://librepcb.discourse.group/) (preferred)
   - GitHub issues
-  - [IRC](https://webchat.freenode.net/?channels=#librepcb) or
-    [Telegram](https://telegram.me/LibrePCB_dev) chat (they are automatically
-    synchronized)
+  - [Telegram](https://telegram.me/LibrePCB_dev) or
+    [Libera.Chat](https://web.libera.chat/?channels=#librepcb)
+    (they are automatically synchronized)
 
 ## Getting Started
 
 - Make sure you have a [GitHub account](https://github.com/signup/free).
 - Open a new issue for your idea, assuming one does not already exist.
 - Fork the repository on GitHub.
-- Have a look at our [development resources](https://github.com/LibrePCB/LibrePCB/tree/master/dev),
-  especially at the [Doxygen documentation](https://doxygen.librepcb.org/).
-- When using QtCreator, import and use our [code style guide file](https://github.com/LibrePCB/LibrePCB/blob/master/dev/CodingStyle_QtCreator.xml).
+- Have a look at our
+  [development resources](https://github.com/LibrePCB/LibrePCB/tree/master/dev),
+  especially at the [developers documentation](https://developers.librepcb.org/).
+- When using QtCreator, import and use our
+  [code style guide file](https://github.com/LibrePCB/LibrePCB/blob/master/dev/CodingStyle_QtCreator.xml).
 
 ## Making Changes
 
@@ -31,28 +38,32 @@
   - To quickly create a topic branch based on master:
     `git checkout -b my_contribution master`
   - Please avoid working directly on the `master` branch.
-- Write code which follows our [code style guides](https://doxygen.librepcb.org/df/d24/doc_code_style_guide.html)
+- Write code which follows our
+  [code style guides](https://developers.librepcb.org/df/d24/doc_code_style_guide.html)
   and [.editorconfig settings](https://github.com/LibrePCB/LibrePCB/blob/master/.editorconfig).
   - You can use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to
     automatically format the code. To format all files at once, just run the
     script [`./dev/format_code.sh`](dev/format_code.sh).
 - Make commits of logical units.
-  - Make sure your commit messages are in the [proper format](http://chris.beams.io/posts/git-commit/):
-```
-ScopeGuardList: Fix crash when constructing with size
+  - Make sure your commit messages are in the
+    [proper format](http://chris.beams.io/posts/git-commit/):
+    ```
+    ScopeGuardList: Fix crash when constructing with size
 
-Default constructed std::function is empty and throws an
-std::bad_function_call when being called.
+    Default constructed std::function is empty and throws an
+    std::bad_function_call when being called.
 
-Check if it is empty and use reserve() when constructing with size.
+    Check if it is empty and use reserve() when constructing with size.
 
-Fixes #62
-```
+    Fixes #62
+    ```
 - Make sure you have added the necessary tests for your changes.
 - Run all tests to ensure nothing else was accidentally broken.
-  - This is done by running the binary `./build/output/librepcb-unittests`
+  - This is done by running the binary
+    `./build/tests/unittests/librepcb-unittests`.
 - If you like, feel free to add yourself to the
-  [AUTHORS.md](https://github.com/LibrePCB/LibrePCB/blob/master/AUTHORS.md) file.
+  [AUTHORS.md](https://github.com/LibrePCB/LibrePCB/blob/master/AUTHORS.md)
+  file.
 
 ## Submitting Changes
 
@@ -63,30 +74,7 @@ Fixes #62
 Please also take a look at our
 [Pull Request Guidelines](https://developers.librepcb.org/df/d30/doc_developers.html#doc_developers_pullrequests).
 
-## Other Contributions
-
-This project welcomes non-code contributions, too! The following types of contributions are welcome:
-
-- **Ideas**: Participate in an issue thread or start your own to have your voice heard.
-- **Bugreports**: Found a bug in LibrePCB? Just open an issue and describe how to reproduce that bug.
-- **Small Fixes**: Fix typos, clarify language, and generally improve the quality of the content.
-- **Documentation**: Create/improve [documentations for users](https://github.com/LibrePCB/librepcb-doc)
-  or developers of LibrePCB.
-- **Part Libraries**: Fork an existing part library from
-  https://github.com/LibrePCB-Libraries/ and add or improve parts. If you want
-  to create a new library, open a discussion [here](https://librepcb.discourse.group/c/libraries).
-- **Translations**: Add/improve translations for LibrePCB using
-  [Transifex](https://www.transifex.com/librepcb/librepcb-application/dashboard/).
-  Follow [this guide](https://docs.transifex.com/getting-started/translators) to
-  get started.
-- **Website**: Improve our [website](https://librepcb.org) which is hosted in
-  the repository
-  [LibrePCB/librepcb-website](https://github.com/LibrePCB/librepcb-website).
-- **Sharing**: Speak about LibrePCB with your friends and colleagues, or write about it in the internet!
-- **Donations**: There are several ways to contribute financially to LibrePCB,
-  see [details here](https://librepcb.org/donate/).
-
-# Additional Resources
+## Additional Resources
 
 - [General GitHub documentation](https://help.github.com/)
 - [GitHub pull request documentation](https://help.github.com/send-pull-requests/)

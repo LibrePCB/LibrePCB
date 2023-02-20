@@ -1,52 +1,37 @@
 # LibrePCB
 
 [![Azure Build Status](https://dev.azure.com/LibrePCB/LibrePCB/_apis/build/status/LibrePCB.LibrePCB?branchName=master)](https://dev.azure.com/LibrePCB/LibrePCB/_build/latest?definitionId=2&branchName=master)
-[![Become a Patron](https://img.shields.io/badge/patreon-donate-orange.svg)](https://www.patreon.com/librepcb)
-[![Donate with Bitcoin](https://img.shields.io/badge/bitcoin-donate-yellow.svg)](https://blockchain.info/address/1FiXZxoXe3px1nNuNygRb1NwcYr6U8AvG8)
-[![irc.freenode.net](https://img.shields.io/badge/IRC-%23librepcb-blue.svg)](https://webchat.freenode.net/?channels=#librepcb)
-
+[![Become a Patron](https://img.shields.io/badge/Patreon-donate-orange.svg)](https://www.patreon.com/librepcb)
+[![Discourse](https://img.shields.io/badge/Discourse-discuss-blueviolet.svg)](https://librepcb.discourse.group/)
+[![Telegram](https://img.shields.io/badge/Telegram-chat-blue.svg)](https://telegram.me/LibrePCB_dev)
+[![Website](https://img.shields.io/badge/Website-librepcb.org-29d682.svg)](https://librepcb.org/)
+[![Docs](https://img.shields.io/badge/Docs-read-yellow.svg)](https://librepcb.org/docs/)
 
 ## About LibrePCB
 
 LibrePCB is a free
-[EDA](https://en.wikipedia.org/wiki/Electronic_design_automation) software to
-develop printed circuit boards. It runs on Linux, Windows and Mac. The project
-is still in a rather early development stage. See
-[Project Status](https://docs.librepcb.org/#projectstatus) for more information
-about the currently available features, limitations and known bugs.
-
-![Screenshot](doc/screenshot.png)
-
-### Features
-
-- Cross-platform (Unix/Linux/BSD/Solaris, macOS, Windows)
-- Multilingual (both application and library elements)
-- All-In-One: project management + library/schematic/board editors
-- Intuitive, modern and easy-to-use graphical user interface
-- Very powerful library design with some innovative concepts
-- Human-readable file formats for both libraries and projects
-- Multi-PCB feature (different PCB variants of the same schematic)
-- Automatic netlist synchronisation between schematic and board
-
+[EDA](https://en.wikipedia.org/wiki/Electronic_design_automation) suite to
+develop printed circuit boards on Windows, Linux and MacOS. More information
+and screenshots are available at [librepcb.org](https://librepcb.org).
 
 ## Installation & Usage
 
 **Official stable releases are provided at our
 [download page](https://librepcb.org/download/).**
 
-**Please read our [user manual](https://docs.librepcb.org/) to see how you can
-install and use LibrePCB.**
-The [Getting Started](https://docs.librepcb.org/#gettingstarted) guide
-gives you a quick introduction to LibrePCB.
-
+**Please read our [user manual](https://librepcb.org/docs/) to see how you can
+install and use LibrePCB.** The
+[quickstart tutorial](https://librepcb.org/docs/quickstart/) provides a
+step-by-step guide through the whole process of designing a PCB.
 
 ## Contributing
 
-Contributions are welcome! See our [Contributing Guide](CONTRIBUTING.md) for
-details.
+Contributions are welcome! See
+[librepcb.org/contribute](https://librepcb.org/contribute/) and
+[`CONTRIBUTING.md`](CONTRIBUTING.md) for details.
 
 For internal details take a look at the
-[automatically generated documentation (doxygen)](https://doxygen.librepcb.org/)
+[developers documentation](https://developers.librepcb.org/).
 
 ## Development
 
@@ -54,13 +39,8 @@ For internal details take a look at the
 LibrePCB. Everything you do with this unstable version could break your
 workspace, libraries or projects, so you should not use it productively! For
 productive use, please install an official release as described in the
-[user manual](https://docs.librepcb.org/). For development, please read details
+[user manual](https://librepcb.org/docs/). For development, please read details
 [here](https://developers.librepcb.org/df/d30/doc_developers.html#doc_developers_unstable_versions).***
-
-Instead of building LibrePCB manually, Arch Linux users could install the
-package [librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from
-the AUR. The package clones and builds the latest (unstable!) version of the
-`master` branch from GitHub.
 
 ### Requirements
 
@@ -97,6 +77,12 @@ sudo pacman -S git base-devel qt5-base qt5-svg qt5-tools desktop-file-utils shar
      openssl zlib cmake
 sudo pacman -S qt5-doc qtcreator # optional
 ```
+
+*Note: Instead of installing the dependencies and building LibrePCB manually,
+you could install the package
+[librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
+The package clones and builds the latest version of the `master` branch from
+GitHub.*
 
 #### Installation on Mac OS X
 
@@ -149,14 +135,15 @@ The binary can then be found in `build/apps/librepcb/`.
 For more detailed instructions (including how to set up Qt Creator), see
 https://developers.librepcb.org/d5/d96/doc_building.html
 
-
 ## Credits
 
 - First of all, many thanks to all of our [contributors](AUTHORS.md)!
-- Thanks also to [cloudscale.ch](https://www.cloudscale.ch/) for sponsoring our
-  API server!
-
+- A big thank you goes to all [our sponsors](https://librepcb.org/sponsors/)
+  which help to keep this project alive!
+- Special thanks also to [cloudscale.ch](https://www.cloudscale.ch/)
+  for sponsoring our API server!
 
 ## License
 
-LibrePCB is published under the [GNU GPLv3](http://www.gnu.org/licenses/gpl-3.0.html) license.
+LibrePCB is published under the
+[GNU GPLv3](http://www.gnu.org/licenses/gpl-3.0.html) license.
