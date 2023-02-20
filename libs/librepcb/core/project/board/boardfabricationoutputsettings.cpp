@@ -56,8 +56,8 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings() noexcept
         {GraphicsLayer::sBotPlacement, GraphicsLayer::sBotNames}),
     mMergeDrillFiles(false),
     mUseG85SlotCommand(false),
-    mEnableSolderPasteTop(false),
-    mEnableSolderPasteBot(false) {
+    mEnableSolderPasteTop(true),
+    mEnableSolderPasteBot(true) {
 }
 
 BoardFabricationOutputSettings::BoardFabricationOutputSettings(
