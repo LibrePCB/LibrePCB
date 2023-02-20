@@ -61,6 +61,8 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkPadsAnnularRing(msgs);
   checkPadsConnectionPoint(msgs);
   checkCustomPadOutline(msgs);
+  checkStopMaskOnPads(msgs);
+  checkSolderPasteOnPads(msgs);
   checkHolesStopMask(msgs);
   return msgs;
 }
@@ -364,6 +366,45 @@ void PackageCheck::checkCustomPadOutline(MsgList& msgs) const {
       } else if ((pad->getShape() != FootprintPad::Shape::Custom) &&
                  (!pad->getCustomShapeOutline().getVertices().isEmpty())) {
         msgs.append(std::make_shared<MsgUnusedCustomPadOutline>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkStopMaskOnPads(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itPad = (*itFtp).getPads().begin();
+         itPad != (*itFtp).getPads().end(); ++itPad) {
+      std::shared_ptr<const FootprintPad> pad = itPad.ptr();
+      std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
+          ? mPackage.getPads().find(*pad->getPackagePadUuid())
+          : nullptr;
+      if (!pad->getStopMaskConfig().isEnabled()) {
+        msgs.append(std::make_shared<MsgPadWithoutStopMask>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkSolderPasteOnPads(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itPad = (*itFtp).getPads().begin();
+         itPad != (*itFtp).getPads().end(); ++itPad) {
+      std::shared_ptr<const FootprintPad> pad = itPad.ptr();
+      std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
+          ? mPackage.getPads().find(*pad->getPackagePadUuid())
+          : nullptr;
+      if ((!pad->isTht()) && (!pad->getSolderPasteConfig().isEnabled())) {
+        msgs.append(std::make_shared<MsgSmtPadWithoutSolderPaste>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      } else if (pad->isTht() && pad->getSolderPasteConfig().isEnabled()) {
+        msgs.append(std::make_shared<MsgThtPadWithSolderPaste>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
       }
     }
