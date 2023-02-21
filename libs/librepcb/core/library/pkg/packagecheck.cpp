@@ -30,6 +30,7 @@
 #include "msg/msgmissingfootprint.h"
 #include "msg/msgmissingfootprintname.h"
 #include "msg/msgmissingfootprintvalue.h"
+#include "msg/msgoverlappingpads.h"
 #include "msg/msgpadannularringviolation.h"
 #include "msg/msgpadclearanceviolation.h"
 #include "msg/msgpadholeoutsidecopper.h"
@@ -149,7 +150,9 @@ void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
           ? mPackage.getPads().find(*pad1->getPackagePadUuid())
           : nullptr;
       const Transform pad1Transform(pad1->getPosition(), pad1->getRotation());
-      const QPainterPath pad1PathPx =
+      const QPainterPath pad1PathPxWithoutClearance =
+          pad1Transform.mapPx(pad1->getGeometry().toFilledQPainterPathPx());
+      const QPainterPath pad1PathPxWithClearance =
           pad1Transform.mapPx(pad1->getGeometry()
                                   .withOffset(clearance - tolerance)
                                   .toFilledQPainterPathPx());
@@ -175,7 +178,11 @@ void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
           if ((pad1->getPackagePadUuid() != pad2->getPackagePadUuid()) ||
               (!pad1->getPackagePadUuid()) || (!pad2->getPackagePadUuid())) {
             // Now check if the clearance is really too small.
-            if (pad1PathPx.intersects(pad2PathPx)) {
+            if (pad1PathPxWithoutClearance.intersects(pad2PathPx)) {
+              msgs.append(std::make_shared<MsgOverlappingPads>(
+                  footprint, pad1, pkgPad1 ? *pkgPad1->getName() : QString(),
+                  pad2, pkgPad2 ? *pkgPad2->getName() : QString()));
+            } else if (pad1PathPxWithClearance.intersects(pad2PathPx)) {
               msgs.append(std::make_shared<MsgPadClearanceViolation>(
                   footprint, pad1, pkgPad1 ? *pkgPad1->getName() : QString(),
                   pad2, pkgPad2 ? *pkgPad2->getName() : QString(), clearance));

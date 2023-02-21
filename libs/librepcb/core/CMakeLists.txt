@@ -256,6 +256,8 @@ add_library(
   library/pkg/msg/msgmissingfootprintname.h
   library/pkg/msg/msgmissingfootprintvalue.cpp
   library/pkg/msg/msgmissingfootprintvalue.h
+  library/pkg/msg/msgoverlappingpads.cpp
+  library/pkg/msg/msgoverlappingpads.h
   library/pkg/msg/msgpadannularringviolation.cpp
   library/pkg/msg/msgpadannularringviolation.h
   library/pkg/msg/msgpadclearanceviolation.cpp
