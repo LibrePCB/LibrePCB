@@ -25,6 +25,7 @@
 #include "../application.h"
 #include "../fileio/versionfile.h"
 #include "../serialization/sexpression.h"
+#include "../utils/toolbox.h"
 #include "librarybaseelementcheck.h"
 
 #include <QtCore>
@@ -56,7 +57,8 @@ LibraryBaseElement::LibraryBaseElement(const QString& shortElementName,
     mIsDeprecated(false),
     mNames(name_en_US),
     mDescriptions(description_en_US),
-    mKeywords(keywords_en_US) {
+    mKeywords(keywords_en_US),
+    mMessageApprovals() {
 }
 
 LibraryBaseElement::LibraryBaseElement(
@@ -74,7 +76,13 @@ LibraryBaseElement::LibraryBaseElement(
     mIsDeprecated(deserialize<bool>(root.getChild("deprecated/@0"))),
     mNames(root),
     mDescriptions(root),
-    mKeywords(root) {
+    mKeywords(root),
+    mMessageApprovals() {
+  // Load message approvals.
+  foreach (const SExpression* child, root.getChildren("approved")) {
+    mMessageApprovals.insert(*child);
+  }
+
   // Check directory name.
   const QString dirName = mDirectory->getAbsPath().getFilename();
   if (dirnameMustBeUuid && (dirName != mUuid.toStr())) {
@@ -158,6 +166,14 @@ void LibraryBaseElement::serialize(SExpression& root) const {
   root.appendChild("created", mCreated);
   root.ensureLineBreak();
   root.appendChild("deprecated", mIsDeprecated);
+  root.ensureLineBreak();
+}
+
+void LibraryBaseElement::serializeMessageApprovals(SExpression& root) const {
+  foreach (const SExpression& node, Toolbox::sortedQSet(mMessageApprovals)) {
+    root.ensureLineBreak();
+    root.appendChild(node);
+  }
   root.ensureLineBreak();
 }
 

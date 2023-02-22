@@ -93,6 +93,8 @@ void Package::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mFootprints.serialize(root);
   root.ensureLineBreak();
+  serializeMessageApprovals(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

@@ -34,17 +34,21 @@ namespace librepcb {
 LibraryElementCheckMessage::LibraryElementCheckMessage(
     const LibraryElementCheckMessage& other) noexcept
   : mSeverity(other.mSeverity),
-    mSeverityPixmap(other.mSeverityPixmap),
+    mSeverityIcon(other.mSeverityIcon),
     mMessage(other.mMessage),
-    mDescription(other.mDescription) {
+    mDescription(other.mDescription),
+    mApproval(other.mApproval) {
 }
 
 LibraryElementCheckMessage::LibraryElementCheckMessage(
-    Severity severity, const QString& msg, const QString& description) noexcept
+    Severity severity, const QString& msg, const QString& description,
+    const QString& approvalName) noexcept
   : mSeverity(severity),
-    mSeverityPixmap(getSeverityPixmap(severity)),
+    mSeverityIcon(getSeverityIcon(severity)),
     mMessage(msg),
-    mDescription(description) {
+    mDescription(description),
+    mApproval(SExpression::createList("approved")) {
+  mApproval.appendChild(SExpression::createToken(approvalName));  // snake_case
 }
 
 LibraryElementCheckMessage::~LibraryElementCheckMessage() noexcept {
@@ -54,14 +58,13 @@ LibraryElementCheckMessage::~LibraryElementCheckMessage() noexcept {
  *  Static Methods
  ******************************************************************************/
 
-QPixmap LibraryElementCheckMessage::getSeverityPixmap(
-    Severity severity) noexcept {
-  static QMap<Severity, QPixmap> pixmap = {
-      {Severity::Hint, QPixmap(":/img/status/info.png")},
-      {Severity::Warning, QPixmap(":/img/status/dialog_warning.png")},
-      {Severity::Error, QPixmap(":/img/status/dialog_error.png")},
+QIcon LibraryElementCheckMessage::getSeverityIcon(Severity severity) noexcept {
+  static QMap<Severity, QIcon> icon = {
+      {Severity::Hint, QIcon(":/img/status/info.png")},
+      {Severity::Warning, QIcon(":/img/status/dialog_warning.png")},
+      {Severity::Error, QIcon(":/img/status/dialog_error.png")},
   };
-  return pixmap.value(severity);
+  return icon.value(severity);
 }
 
 /*******************************************************************************

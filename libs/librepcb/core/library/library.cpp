@@ -197,6 +197,8 @@ void Library::serialize(SExpression& root) const {
     root.appendChild("dependency", uuid);
   }
   root.ensureLineBreak();
+  serializeMessageApprovals(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

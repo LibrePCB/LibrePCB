@@ -181,6 +181,7 @@ public:
   bool operator!=(const SExpression& rhs) const noexcept {
     return !(*this == rhs);
   }
+  bool operator<(const SExpression& rhs) const noexcept;
   SExpression& operator=(const SExpression& rhs) noexcept;
 
   // Static Methods
@@ -217,6 +218,28 @@ private:  // Data
   QList<SExpression> mChildren;
   FilePath mFilePath;
 };
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+inline uint qHash(const SExpression& node, uint seed = 0) noexcept {
+  switch (node.getType()) {
+    case SExpression::Type::LineBreak:
+      return ::qHash(static_cast<int>(node.getType()), seed);
+    case SExpression::Type::String:
+    case SExpression::Type::Token:
+      return ::qHash(
+          qMakePair(static_cast<int>(node.getType()), node.getValue()), seed);
+    case SExpression::Type::List: {
+      const QList<SExpression>& children = node.getChildren();
+      return ::qHashRange(children.begin(), children.end(), seed);
+    }
+    default:
+      Q_ASSERT(false);
+      return 0;
+  }
+}
 
 /*******************************************************************************
  *  End of File

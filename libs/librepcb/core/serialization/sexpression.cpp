@@ -26,6 +26,8 @@
 
 #include <QtCore>
 
+#include <algorithm>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -222,6 +224,22 @@ bool SExpression::operator==(const SExpression& rhs) const noexcept {
   // Note: Ignore the filepath since it's not part of the actual node.
   return (mType == rhs.mType) && (mValue == rhs.mValue) &&
       (mChildren == rhs.mChildren);
+}
+
+bool SExpression::operator<(const SExpression& rhs) const noexcept {
+  if (mType != rhs.mType) {
+    return static_cast<int>(mType) < static_cast<int>(rhs.mType);
+  } else if (mValue != rhs.mValue) {
+    return mValue < rhs.mValue;
+  } else {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    return mChildren < rhs.mChildren;
+#else
+    return std::lexicographical_compare(mChildren.begin(), mChildren.end(),
+                                        rhs.mChildren.begin(),
+                                        rhs.mChildren.end());
+#endif
+  }
 }
 
 SExpression& SExpression::operator=(const SExpression& rhs) noexcept {

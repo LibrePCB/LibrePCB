@@ -82,6 +82,9 @@ public:
   }
   const LocalizedKeywordsMap& getKeywords() const noexcept { return mKeywords; }
   QStringList getAllAvailableLocales() const noexcept;
+  const QSet<SExpression>& getMessageApprovals() const noexcept {
+    return mMessageApprovals;
+  }
 
   // Setters
   void setVersion(const Version& version) noexcept { mVersion = version; }
@@ -93,6 +96,9 @@ public:
   }
   void setKeywords(const LocalizedKeywordsMap& keywords) noexcept {
     mKeywords = keywords;
+  }
+  void setMessageApprovals(const QSet<SExpression>& approvals) noexcept {
+    mMessageApprovals = approvals;
   }
 
   // General Methods
@@ -127,6 +133,8 @@ protected:  // Methods
    */
   virtual void serialize(SExpression& root) const;
 
+  void serializeMessageApprovals(SExpression& root) const;
+
   static Version readFileFormat(const TransactionalDirectory& directory,
                                 const QString& fileName);
 
@@ -145,6 +153,9 @@ protected:  // Data
   LocalizedNameMap mNames;
   LocalizedDescriptionMap mDescriptions;
   LocalizedKeywordsMap mKeywords;
+
+  // Library element check
+  QSet<SExpression> mMessageApprovals;
 };
 
 /*******************************************************************************

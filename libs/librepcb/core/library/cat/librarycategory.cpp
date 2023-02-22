@@ -64,6 +64,8 @@ void LibraryCategory::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("parent", mParentUuid);
   root.ensureLineBreak();
+  serializeMessageApprovals(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

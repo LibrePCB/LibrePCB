@@ -42,9 +42,15 @@ MsgPadHoleOutsideCopper::MsgPadHoleOutsideCopper(
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
         tr("All THT pad holes must be fully surrounded by copper, otherwise "
            "they could lead to serious issues during the design rule check or "
-           "manufacturing process.")),
+           "manufacturing process."),
+        "pad_hole_outside_copper"),
     mFootprint(footprint),
     mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgPadHoleOutsideCopper::~MsgPadHoleOutsideCopper() noexcept {

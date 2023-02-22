@@ -40,8 +40,20 @@ MsgOverlappingSymbolPins::MsgOverlappingSymbolPins(
         Severity::Error, buildMessage(pins),
         tr("There are multiple pins at the same position. This is not allowed "
            "because you cannot connect wires to these pins in the schematic "
-           "editor.")),
+           "editor."),
+        "overlapping_pins"),
     mPins(pins) {
+  QVector<std::shared_ptr<const SymbolPin>> sortedPins = pins;
+  std::sort(sortedPins.begin(), sortedPins.end(),
+            [](const std::shared_ptr<const SymbolPin>& a,
+               const std::shared_ptr<const SymbolPin>& b) {
+              return a->getUuid() < b->getUuid();
+            });
+  foreach (const auto& pin, pins) {
+    mApproval.ensureLineBreak();
+    mApproval.appendChild("pin", pin->getUuid());
+  }
+  mApproval.ensureLineBreak();
 }
 
 MsgOverlappingSymbolPins::~MsgOverlappingSymbolPins() noexcept {

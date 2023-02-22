@@ -37,7 +37,8 @@ MsgMissingComponentPrefix::MsgMissingComponentPrefix() noexcept
         tr("Most components should have a prefix defined. The prefix is used "
            "to generate the component's name when adding it to a schematic. "
            "For example the prefix 'R' (resistor) leads to component names "
-           "'R1', 'R2', 'R3' etc.")) {
+           "'R1', 'R2', 'R3' etc."),
+        "empty_prefix") {
 }
 
 MsgMissingComponentPrefix::~MsgMissingComponentPrefix() noexcept {

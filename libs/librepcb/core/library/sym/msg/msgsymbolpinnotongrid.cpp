@@ -42,9 +42,13 @@ MsgSymbolPinNotOnGrid::MsgSymbolPinNotOnGrid(
             .arg(gridInterval->toMmString(), *pin->getName()),
         tr("Every pin must be placed exactly on the %1mm grid, "
            "otherwise it cannot be connected in the schematic editor.")
-            .arg(gridInterval->toMmString())),
+            .arg(gridInterval->toMmString()),
+        "pin_not_on_grid"),
     mPin(pin),
     mGridInterval(gridInterval) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pin", pin->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgSymbolPinNotOnGrid::~MsgSymbolPinNotOnGrid() noexcept {

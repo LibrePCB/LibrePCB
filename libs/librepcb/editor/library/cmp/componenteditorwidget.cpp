@@ -151,6 +151,10 @@ QSet<EditorWidgetBase::Feature> ComponentEditorWidget::getAvailableFeatures()
  ******************************************************************************/
 
 bool ComponentEditorWidget::save() noexcept {
+  // Remove obsolete message approvals (bypassing the undo stack).
+  mComponent->setMessageApprovals(mComponent->getMessageApprovals() -
+                                  mDisappearedApprovals);
+
   // Commit metadata.
   QString errorMsg = commitMetadata();
   if (!errorMsg.isEmpty()) {
@@ -183,6 +187,7 @@ void ComponentEditorWidget::updateMetadata() noexcept {
   mUi->edtAuthor->setText(mComponent->getAuthor());
   mUi->edtVersion->setText(mComponent->getVersion().toStr());
   mUi->cbxDeprecated->setChecked(mComponent->isDeprecated());
+  mUi->lstMessages->setApprovals(mComponent->getMessageApprovals());
   mCategoriesEditorWidget->setUuids(mComponent->getCategories());
   mUi->cbxSchematicOnly->setChecked(mComponent->isSchematicOnly());
   mUi->edtPrefix->setText(*mComponent->getPrefixes().getDefaultValue());
@@ -349,6 +354,13 @@ bool ComponentEditorWidget::processCheckMessage(
   if (fixMsgHelper<MsgMissingComponentDefaultValue>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingSymbolVariant>(msg, applyFix)) return true;
   return false;
+}
+
+void ComponentEditorWidget::libraryElementCheckApproveRequested(
+    std::shared_ptr<const LibraryElementCheckMessage> msg,
+    bool approve) noexcept {
+  setMessageApproved(*mComponent, msg, approve);
+  updateMetadata();
 }
 
 /*******************************************************************************

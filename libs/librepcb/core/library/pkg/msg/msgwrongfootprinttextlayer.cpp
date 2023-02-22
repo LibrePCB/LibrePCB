@@ -46,10 +46,16 @@ MsgWrongFootprintTextLayer::MsgWrongFootprintTextLayer(
                  GraphicsLayer::getTranslation(expectedLayerName)),
         tr("The text element '%1' should normally be on layer '%2'.")
             .arg(text->getText(),
-                 GraphicsLayer::getTranslation(expectedLayerName))),
+                 GraphicsLayer::getTranslation(expectedLayerName)),
+        "unusual_text_layer"),
     mFootprint(footprint),
     mText(text),
     mExpectedLayerName(expectedLayerName) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("text", text->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgWrongFootprintTextLayer::~MsgWrongFootprintTextLayer() noexcept {

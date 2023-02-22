@@ -162,6 +162,8 @@ void Component::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mSymbolVariants.serialize(root);
   root.ensureLineBreak();
+  serializeMessageApprovals(root);
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************

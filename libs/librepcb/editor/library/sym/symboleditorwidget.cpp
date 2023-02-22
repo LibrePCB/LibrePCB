@@ -252,6 +252,10 @@ void SymbolEditorWidget::disconnectEditor() noexcept {
  ******************************************************************************/
 
 bool SymbolEditorWidget::save() noexcept {
+  // Remove obsolete message approvals (bypassing the undo stack).
+  mSymbol->setMessageApprovals(mSymbol->getMessageApprovals() -
+                               mDisappearedApprovals);
+
   // Commit metadata.
   QString errorMsg = commitMetadata();
   if (!errorMsg.isEmpty()) {
@@ -372,6 +376,7 @@ void SymbolEditorWidget::updateMetadata() noexcept {
   mUi->edtAuthor->setText(mSymbol->getAuthor());
   mUi->edtVersion->setText(mSymbol->getVersion().toStr());
   mUi->cbxDeprecated->setChecked(mSymbol->isDeprecated());
+  mUi->lstMessages->setApprovals(mSymbol->getMessageApprovals());
   mCategoriesEditorWidget->setUuids(mSymbol->getCategories());
 }
 
@@ -576,6 +581,13 @@ bool SymbolEditorWidget::processCheckMessage(
   if (fixMsgHelper<MsgWrongSymbolTextLayer>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgSymbolPinNotOnGrid>(msg, applyFix)) return true;
   return false;
+}
+
+void SymbolEditorWidget::libraryElementCheckApproveRequested(
+    std::shared_ptr<const LibraryElementCheckMessage> msg,
+    bool approve) noexcept {
+  setMessageApproved(*mSymbol, msg, approve);
+  updateMetadata();
 }
 
 bool SymbolEditorWidget::execGraphicsExportDialog(

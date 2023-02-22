@@ -104,6 +104,9 @@ private:  // Methods
   bool processCheckMessage(
       std::shared_ptr<const LibraryElementCheckMessage> msg,
       bool applyFix) override;
+  void libraryElementCheckApproveRequested(
+      std::shared_ptr<const LibraryElementCheckMessage> msg,
+      bool approve) noexcept override;
 
 private:  // Data
   QScopedPointer<Ui::DeviceEditorWidget> mUi;

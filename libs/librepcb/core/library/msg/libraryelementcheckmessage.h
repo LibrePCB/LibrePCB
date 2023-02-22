@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../serialization/sexpression.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -56,9 +58,10 @@ public:
 
   // Getters
   Severity getSeverity() const noexcept { return mSeverity; }
-  const QPixmap& getSeverityPixmap() const noexcept { return mSeverityPixmap; }
+  const QIcon& getSeverityIcon() const noexcept { return mSeverityIcon; }
   const QString& getMessage() const noexcept { return mMessage; }
   const QString& getDescription() const noexcept { return mDescription; }
+  const SExpression& getApproval() const noexcept { return mApproval; }
 
   // General Methods
   template <typename T>
@@ -71,7 +74,7 @@ public:
   }
 
   // Static Methods
-  static QPixmap getSeverityPixmap(Severity severity) noexcept;
+  static QIcon getSeverityIcon(Severity severity) noexcept;
 
   // Operator Overloads
   bool operator==(const LibraryElementCheckMessage& rhs) const noexcept;
@@ -80,14 +83,16 @@ public:
 protected:  // Methods
   LibraryElementCheckMessage(const LibraryElementCheckMessage& other) noexcept;
   LibraryElementCheckMessage(Severity severity, const QString& msg,
-                             const QString& description) noexcept;
+                             const QString& description,
+                             const QString& approvalName) noexcept;
   virtual ~LibraryElementCheckMessage() noexcept;
 
 protected:  // Data
   Severity mSeverity;
-  QPixmap mSeverityPixmap;
+  QIcon mSeverityIcon;
   QString mMessage;
   QString mDescription;
+  SExpression mApproval;
 };
 
 typedef QVector<std::shared_ptr<const LibraryElementCheckMessage>>

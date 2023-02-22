@@ -48,6 +48,9 @@ public:
       std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept = 0;
   virtual void libraryElementCheckDescriptionRequested(
       std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept = 0;
+  virtual void libraryElementCheckApproveRequested(
+      std::shared_ptr<const LibraryElementCheckMessage> msg,
+      bool approve) noexcept = 0;
 
 protected:
   IF_LibraryElementCheckHandler() noexcept {}
@@ -70,7 +73,7 @@ public:
   // Constructors / Destructor
   explicit LibraryElementCheckListItemWidget(
       std::shared_ptr<const LibraryElementCheckMessage> msg,
-      IF_LibraryElementCheckHandler& handler,
+      IF_LibraryElementCheckHandler& handler, bool approved,
       QWidget* parent = nullptr) noexcept
     : QWidget(parent),
       mMessage(msg),
@@ -79,33 +82,58 @@ public:
     if (!msg) return;
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(3);
+    layout->setSpacing(0);
 
     // severity icon
     mIconLabel->setScaledContents(true);
-    mIconLabel->setPixmap(msg->getSeverityPixmap());
+    mIconLabel->setPixmap(msg->getSeverityIcon().pixmap(
+        48, approved ? QIcon::Disabled : QIcon::Normal));
     layout->addWidget(mIconLabel.data());
+    layout->addSpacing(3);
 
     // message
     QLabel* lblMsg = new QLabel(msg->getMessage(), this);
     lblMsg->setToolTip(msg->getMessage());
+    if (approved) {
+      QFont font = lblMsg->font();
+      font.setItalic(true);
+      font.setStrikeOut(true);
+      lblMsg->setFont(font);
+    }
     layout->addWidget(lblMsg);
+    layout->addSpacing(3);
     layout->setStretch(1, 100);
 
     // "fix" button
     if (mHandler.libraryElementCheckFixAvailable(mMessage)) {
       QToolButton* btnFix = new QToolButton(this);
       btnFix->setText(tr("Fix"));
-      connect(btnFix, &QToolButton::clicked,
+      btnFix->setToolTip(tr("Fix Problem"));
+      btnFix->setStatusTip(
+          tr("Automatically apply a modification to fix this message"));
+      connect(btnFix, &QToolButton::clicked, this,
               [this]() { mHandler.libraryElementCheckFixRequested(mMessage); });
       layout->addWidget(btnFix);
     }
+
+    // "approve" button
+    QToolButton* btnApprove = new QToolButton(this);
+    btnApprove->setText("✔");
+    btnApprove->setToolTip(tr("Approve/Disapprove"));
+    btnApprove->setStatusTip(tr("Mark/unmark this message as approved"));
+    btnApprove->setCheckable(true);
+    btnApprove->setChecked(approved);
+    connect(btnApprove, &QToolButton::clicked, this, [this, msg](bool checked) {
+      mHandler.libraryElementCheckApproveRequested(mMessage, checked);
+    });
+    layout->addWidget(btnApprove);
 
     // "details" button
     QToolButton* btnDetails = new QToolButton(this);
     btnDetails->setText("?");
     btnDetails->setToolTip(tr("Details"));
-    connect(btnDetails, &QToolButton::clicked, [this]() {
+    btnDetails->setStatusTip(tr("Show more information about this message"));
+    connect(btnDetails, &QToolButton::clicked, this, [this]() {
       mHandler.libraryElementCheckDescriptionRequested(mMessage);
     });
     layout->addWidget(btnDetails);
@@ -153,6 +181,7 @@ public:
   void setProvideFixes(bool provideFixes) noexcept;
   void setHandler(IF_LibraryElementCheckHandler* handler) noexcept;
   void setMessages(LibraryElementCheckMessageList messages) noexcept;
+  void setApprovals(const QSet<SExpression>& approvals) noexcept;
 
   // Operator Overloadings
   LibraryElementCheckListWidget& operator=(
@@ -167,11 +196,15 @@ private:  // Methods
       std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
   void libraryElementCheckDescriptionRequested(
       std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
+  void libraryElementCheckApproveRequested(
+      std::shared_ptr<const LibraryElementCheckMessage> msg,
+      bool approve) noexcept override;
 
 private:  // Data
   QScopedPointer<QListWidget> mListWidget;
   IF_LibraryElementCheckHandler* mHandler;
   LibraryElementCheckMessageList mMessages;
+  QSet<SExpression> mApprovals;
   bool mProvideFixes;
 };
 

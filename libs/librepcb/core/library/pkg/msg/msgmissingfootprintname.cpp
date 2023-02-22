@@ -43,7 +43,11 @@ MsgMissingFootprintName::MsgMissingFootprintName(
            "name, otherwise you won't see that name on the PCB (e.g. on "
            "silkscreen). There are only a few exceptions which don't need a "
            "name (e.g. if the footprint is only a drawing), for those you can "
-           "ignore this message.")) {
+           "ignore this message."),
+        "missing_name_text") {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 MsgMissingFootprintName::~MsgMissingFootprintName() noexcept {
