@@ -135,7 +135,7 @@ QList<std::shared_ptr<QGraphicsItem>> SymbolGraphicsItem::findItemsAtPos(
   QMultiMap<std::pair<int, qreal>, std::shared_ptr<QGraphicsItem>> items;
   auto processItem = [this, &items, &pos, &posAreaSmall, &posAreaLarge, flags](
                          const std::shared_ptr<QGraphicsItem>& item,
-                         int priority, bool large = false) {
+                         int priority, bool large) {
     Q_ASSERT(item);
     const QPainterPath grabArea = mapFromItem(item.get(), item->shape());
     const QPointF center = grabArea.controlPointRect().center();
@@ -151,13 +151,13 @@ QList<std::shared_ptr<QGraphicsItem>> SymbolGraphicsItem::findItemsAtPos(
 
   if (flags.testFlag(FindFlag::Pins)) {
     foreach (auto ptr, mPinGraphicsItems) {
-      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 0);
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 0, false);
     }
   }
 
   if (flags.testFlag(FindFlag::Texts)) {
     foreach (auto ptr, mTextGraphicsItems) {
-      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 10);
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 10, false);
     }
   }
 

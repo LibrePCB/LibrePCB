@@ -45,7 +45,7 @@ namespace cli {
  * @brief The CommandLineInterface class
  */
 class CommandLineInterface final {
-  Q_DECLARE_TR_FUNCTIONS(CommandLineInterface);
+  Q_DECLARE_TR_FUNCTIONS(CommandLineInterface)
 
 public:
   // Constructors / Destructor

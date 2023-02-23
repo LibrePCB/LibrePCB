@@ -178,7 +178,7 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
   };
   auto processItem = [this, &items, &pos, &posAreaSmall, &posAreaLarge, flags](
                          const std::shared_ptr<QGraphicsItem>& item,
-                         int priority, bool large = false) {
+                         int priority, bool large) {
     Q_ASSERT(item);
     const QPainterPath grabArea = mapFromItem(item.get(), item->shape());
     const QPointF center = grabArea.controlPointRect().center();
@@ -194,21 +194,22 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
 
   if (flags.testFlag(FindFlag::Holes)) {
     foreach (auto ptr, mHoleGraphicsItems) {
-      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 0);
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 0, false);
     }
   }
 
   if (flags.testFlag(FindFlag::Pads)) {
     foreach (auto ptr, mPadGraphicsItems) {
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
-                  10 + priorityFromLayer(ptr->getPad()->getLayerName()));
+                  10 + priorityFromLayer(ptr->getPad()->getLayerName()), false);
     }
   }
 
   if (flags.testFlag(FindFlag::StrokeTexts)) {
     foreach (auto ptr, mStrokeTextGraphicsItems) {
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
-                  20 + priorityFromLayer(*ptr->getText().getLayerName()));
+                  20 + priorityFromLayer(*ptr->getText().getLayerName()),
+                  false);
     }
   }
 

@@ -172,8 +172,7 @@ TEST(FilePathTest, testCleanFileName) {
  ******************************************************************************/
 
 // clang-format off
-INSTANTIATE_TEST_SUITE_P(FilePathTest, FilePathTest, ::testing::Values(
-
+static auto sFilePathTestData = ::testing::Values(
     // valid paths   {valid, "inputFilePath"         , "inputBasePath"  , "toStr"           , "toWindowsStyle"      , "toRelative"      , "isRoot" }
 #ifdef Q_OS_WIN
     FilePathTestData({true , "C:\\foo\\bar"          , "C:/foo"         , "C:/foo/bar"      , "C:\\foo\\bar"        , "bar"             , false}), // Win path to a dir
@@ -199,8 +198,10 @@ INSTANTIATE_TEST_SUITE_P(FilePathTest, FilePathTest, ::testing::Values(
     FilePathTestData({false, "foo/bar"               , ""               , ""                , ""                    , ""                , false}), // rel. UNIX path to a dir
     FilePathTestData({false, "foo/bar.txt"           , ""               , ""                , ""                    , ""                , false}), // rel. UNIX path to a file
     FilePathTestData({false, ""                      , ""               , ""                , ""                    , ""                , false})  // empty path
-));
+);
 // clang-format on
+
+INSTANTIATE_TEST_SUITE_P(FilePathTest, FilePathTest, sFilePathTestData);
 
 /*******************************************************************************
  *  End of File
