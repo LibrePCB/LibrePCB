@@ -15,6 +15,9 @@ Options:
   -v, --verbose  Verbose output.
   --all          Perform the selected action(s) on all elements contained in
                  the opened library.
+  --check        Run the library element check, print all non-approved messages
+                 and report failure (exit code = 1) if there are non-approved
+                 messages.
   --save         Save library (and contained elements if '--all' is given)
                  before closing them (useful to upgrade file format).
   --strict       Fail if the opened files are not strictly canonical, i.e.
