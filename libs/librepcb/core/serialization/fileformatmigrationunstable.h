@@ -72,9 +72,10 @@ public:
       const FileFormatMigrationUnstable& rhs) = delete;
 
 private:  // Methods
-  virtual void upgradeSchematic(LoadedData& data, SExpression& root) override;
+  virtual void upgradeSchematic(SExpression& root,
+                                ProjectContext& context) override;
   virtual void upgradeBoard(SExpression& root,
-                            QList<Message>& messages) override;
+                            ProjectContext& context) override;
   virtual void upgradeBoardUserSettings(SExpression& root) override;
 };
 

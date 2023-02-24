@@ -83,10 +83,16 @@ protected:
     Uuid libSymbVarUuid;
   };
 
-  struct LoadedData {
+  struct ProjectContext {
+    // Project library.
     QHash<Uuid, Symbol> symbols;
     QHash<Uuid, Component> components;
     QMap<Uuid, ComponentInstance> componentInstances;
+
+    // Counters for emitting messages.
+    int nonRoundViaCount = 0;
+    int planeCount = 0;
+    int planeConnectNoneCount = 0;
   };
 
 public:
@@ -111,8 +117,8 @@ public:
   FileFormatMigrationV01& operator=(const FileFormatMigrationV01& rhs) = delete;
 
 protected:  // Methods
-  virtual void upgradeSchematic(LoadedData& data, SExpression& root);
-  virtual void upgradeBoard(SExpression& root, QList<Message>& messages);
+  virtual void upgradeSchematic(SExpression& root, ProjectContext& context);
+  virtual void upgradeBoard(SExpression& root, ProjectContext& context);
   virtual void upgradeBoardUserSettings(SExpression& root);
   virtual void upgradeBoardDesignRules(SExpression& root);
   virtual void upgradeGrid(SExpression& node);

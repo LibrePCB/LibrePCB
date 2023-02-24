@@ -103,16 +103,16 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
  *  Private Methods
  ******************************************************************************/
 
-void FileFormatMigrationUnstable::upgradeSchematic(LoadedData& data,
-                                                   SExpression& root) {
-  Q_UNUSED(data);
+void FileFormatMigrationUnstable::upgradeSchematic(SExpression& root,
+                                                   ProjectContext& context) {
   Q_UNUSED(root);
+  Q_UNUSED(context);
 }
 
 void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
-                                               QList<Message>& messages) {
+                                               ProjectContext& context) {
   Q_UNUSED(root);
-  Q_UNUSED(messages);
+  Q_UNUSED(context);
   {
     SExpression& child = root.getChild("design_rules/pad_annular_ring");
     child.appendChild("outer", SExpression::createToken("full"));

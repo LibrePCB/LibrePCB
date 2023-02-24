@@ -175,7 +175,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
   // just call virtual protected methods which do the upgrade. This allows
   // FileFormatMigrationUnstable to override them with partial upgrades.
 
-  LoadedData data;
+  ProjectContext context;
 
   // Version File.
   upgradeVersionFile(dir, ".librepcb-project");
@@ -203,7 +203,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
         });
       }
 
-      data.symbols.insert(uuid, sym);
+      context.symbols.insert(uuid, sym);
 
       upgradeSymbol(subDir);
     }
@@ -245,7 +245,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
         cmp.symbolVariants.append(symbVar);
       }
 
-      data.components.insert(uuid, cmp);
+      context.components.insert(uuid, cmp);
 
       upgradeComponent(subDir);
     }
@@ -271,7 +271,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
           deserialize<Uuid>(cmpNode->getChild("lib_component/@0")),
           deserialize<Uuid>(cmpNode->getChild("lib_variant/@0")),
       };
-      data.componentInstances.insert(uuid, cmpInst);
+      context.componentInstances.insert(uuid, cmpInst);
     }
   }
 
@@ -280,7 +280,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     const QString fp = "schematics/" % dirName % "/schematic.lp";
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      upgradeSchematic(data, root);
+      upgradeSchematic(root, context);
       dir.write(fp, root.toByteArray());
     }
   }
@@ -291,7 +291,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     QString fp = "boards/" % dirName % "/board.lp";
     if (dir.fileExists(fp)) {
       SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-      upgradeBoard(root, messages);
+      upgradeBoard(root, context);
       dir.write(fp, root.toByteArray());
     }
 
@@ -302,6 +302,32 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
       upgradeBoardUserSettings(root);
       dir.write(fp, root.toByteArray());
     }
+  }
+
+  // Emit messages at the very end to avoid duplicate messages caused my
+  // multiple schematics/boards.
+  if (context.nonRoundViaCount > 0) {
+    messages.append(
+        buildMessage(Message::Severity::Warning,
+                     tr("Non-circular via shapes are no longer supported, "
+                        "all vias were changed to circular now."),
+                     context.nonRoundViaCount));
+  }
+  if (context.planeCount > 0) {
+    messages.append(buildMessage(
+        Message::Severity::Note,
+        tr("Plane area calculations have been adjusted, manual review and "
+           "running the DRC is recommended."),
+        context.planeCount));
+  }
+  if (context.planeConnectNoneCount > 0) {
+    messages.append(buildMessage(
+        Message::Severity::Warning,
+        tr("Vias within planes with connect style 'None' are now fully "
+           "connected to the planes since the connect style is no longer "
+           "respected for vias. You might want to remove traces now which are "
+           "no longer needed to connect these vias."),
+        context.planeConnectNoneCount));
   }
 }
 
@@ -330,22 +356,22 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
  *  Private Methods
  ******************************************************************************/
 
-void FileFormatMigrationV01::upgradeSchematic(LoadedData& data,
-                                              SExpression& root) {
+void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
+                                              ProjectContext& context) {
   upgradeGrid(root);
 
   // Symbols.
   for (SExpression* symNode : root.getChildren("symbol")) {
     const Uuid cmpUuid = deserialize<Uuid>(symNode->getChild("component/@0"));
     const Uuid gateUuid = deserialize<Uuid>(symNode->getChild("lib_gate/@0"));
-    auto cmpInstIt = data.componentInstances.find(cmpUuid);
-    if (cmpInstIt == data.componentInstances.end()) {
+    auto cmpInstIt = context.componentInstances.find(cmpUuid);
+    if (cmpInstIt == context.componentInstances.end()) {
       throw RuntimeError(__FILE__, __LINE__,
                          QString("Failed to find component instance '%1'.")
                              .arg(cmpUuid.toStr()));
     }
-    auto libCmpIt = data.components.find(cmpInstIt->libCmpUuid);
-    if (libCmpIt == data.components.end()) {
+    auto libCmpIt = context.components.find(cmpInstIt->libCmpUuid);
+    if (libCmpIt == context.components.end()) {
       throw RuntimeError(__FILE__, __LINE__,
                          QString("Failed to find component '%1'.")
                              .arg(cmpInstIt->libCmpUuid.toStr()));
@@ -375,8 +401,8 @@ void FileFormatMigrationV01::upgradeSchematic(LoadedData& data,
           __FILE__, __LINE__,
           QString("Failed to find gate '%1'.").arg(gateUuid.toStr()));
     }
-    auto symIt = data.symbols.find(gate->symbolUuid);
-    if (symIt == data.symbols.end()) {
+    auto symIt = context.symbols.find(gate->symbolUuid);
+    if (symIt == context.symbols.end()) {
       throw RuntimeError(
           __FILE__, __LINE__,
           QString("Failed to find symbol '%1'.").arg(gate->symbolUuid.toStr()));
@@ -418,7 +444,7 @@ void FileFormatMigrationV01::upgradeSchematic(LoadedData& data,
 }
 
 void FileFormatMigrationV01::upgradeBoard(SExpression& root,
-                                          QList<Message>& messages) {
+                                          ProjectContext& context) {
   upgradeGrid(root);
   upgradeBoardDesignRules(root);
 
@@ -430,53 +456,27 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
   }
 
   // Net segments.
-  int nonRoundViaCount = 0;
   for (SExpression* segNode : root.getChildren("netsegment")) {
     // Vias.
     for (SExpression* viaNode : segNode->getChildren("via")) {
       SExpression& shapeNode = viaNode->getChild("shape");
       if (shapeNode.getChild("@0").getValue() != "round") {
-        ++nonRoundViaCount;
+        ++context.nonRoundViaCount;
       }
       viaNode->removeChild(shapeNode);
     }
-  }
-  if (nonRoundViaCount > 0) {
-    messages.append(
-        buildMessage(Message::Severity::Warning,
-                     tr("Non-circular via shapes are no longer supported, "
-                        "all vias were changed to circular now."),
-                     nonRoundViaCount));
   }
 
   // Holes.
   upgradeHoles(root);
 
   // Planes.
-  int planeCount = 0;
-  int planeConnectNoneCount = 0;
   for (SExpression* planeNode : root.getChildren("plane")) {
     Q_UNUSED(planeNode);
-    ++planeCount;
+    ++context.planeCount;
     if (planeNode->getChild("connect_style/@0").getValue() == "none") {
-      ++planeConnectNoneCount;
+      ++context.planeConnectNoneCount;
     }
-  }
-  if (planeCount > 0) {
-    messages.append(buildMessage(
-        Message::Severity::Note,
-        tr("Plane area calculations have been adjusted, manual review and "
-           "running the DRC is recommended."),
-        planeCount));
-  }
-  if (planeConnectNoneCount > 0) {
-    messages.append(buildMessage(
-        Message::Severity::Warning,
-        tr("Vias within planes with connect style 'None' are now fully "
-           "connected to the planes since the connect style is no longer "
-           "respected for vias. You might want to remove traces now which are "
-           "no longer needed to connect these vias."),
-        planeConnectNoneCount));
   }
 }
 
