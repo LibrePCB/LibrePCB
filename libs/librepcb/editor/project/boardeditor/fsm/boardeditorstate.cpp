@@ -213,7 +213,7 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
   auto processItem = [&pos, &posExact, &posOnGrid, &posArea, &posAreaLarge,
                       flags, &except, &addItem,
                       &canSkip](BI_Base* item, const Point& nearestPos,
-                                int priority, bool large = false) {
+                                int priority, bool large) {
     if (except.contains(item) || (!item->isSelectable())) {
       return;
     }
@@ -254,7 +254,8 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::Holes)) {
     foreach (BI_Hole* hole, board->getHoles()) {
       processItem(hole,
-                  hole->getHole().getPath()->getVertices().first().getPos(), 5);
+                  hole->getHole().getPath()->getVertices().first().getPos(), 5,
+                  false);
     }
   }
 
@@ -266,7 +267,7 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
       }
       if (flags.testFlag(FindFlag::Vias)) {
         foreach (BI_Via* via, segment->getVias()) {
-          processItem(via, via->getPosition(), 0);
+          processItem(via, via->getPosition(), 0, false);
         }
       }
       if (flags.testFlag(FindFlag::NetPoints)) {
@@ -276,7 +277,8 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
             continue;
           }
           processItem(netpoint, netpoint->getPosition(),
-                      10 + (layer ? priorityFromLayer(layer->getName()) : 0));
+                      10 + (layer ? priorityFromLayer(layer->getName()) : 0),
+                      false);
         }
       }
       if (flags.testFlag(FindFlag::NetLines)) {
@@ -290,7 +292,7 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
                           pos.mappedToGrid(getGridInterval()),
                           netline->getStartPoint().getPosition(),
                           netline->getEndPoint().getPosition()),
-                      20 + priorityFromLayer(layer.getName()));
+                      20 + priorityFromLayer(layer.getName()), false);
         }
       }
     }
@@ -318,7 +320,7 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
     foreach (BI_Device* device, board->getDeviceInstances()) {
       if (flags.testFlag(FindFlag::Footprints)) {
         processItem(device, device->getPosition(),
-                    40 + (device->getMirrored() ? 300 : 100));
+                    40 + (device->getMirrored() ? 300 : 100), false);
       }
       if (flags.testFlag(FindFlag::FootprintPads)) {
         foreach (BI_FootprintPad* pad, device->getPads()) {
@@ -330,13 +332,14 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
             continue;
           }
           processItem(pad, pad->getPosition(),
-                      50 + (pad->getMirrored() ? 300 : 100));
+                      50 + (pad->getMirrored() ? 300 : 100), false);
         }
       }
       if (flags.testFlag(FindFlag::StrokeTexts)) {
         foreach (BI_StrokeText* text, device->getStrokeTexts()) {
           processItem(text, text->getPosition(),
-                      60 + priorityFromLayer(*text->getText().getLayerName()));
+                      60 + priorityFromLayer(*text->getText().getLayerName()),
+                      false);
         }
       }
     }
@@ -355,7 +358,8 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::StrokeTexts)) {
     foreach (BI_StrokeText* text, board->getStrokeTexts()) {
       processItem(text, text->getPosition(),
-                  60 + priorityFromLayer(*text->getText().getLayerName()));
+                  60 + priorityFromLayer(*text->getText().getLayerName()),
+                  false);
     }
   }
 

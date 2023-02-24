@@ -162,7 +162,7 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
   auto processItem = [&pos, &posExact, &posArea, &posAreaLarge, &posAreaInGrid,
                       flags, &except, &addItem,
                       &canSkip](SI_Base* item, const Point& nearestPos,
-                                int priority, bool large = false) {
+                                int priority, bool large) {
     if (except.contains(item)) {
       return;
     }
@@ -207,7 +207,7 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
       if (flags.testFlag(FindFlag::NetPoints)) {
         foreach (SI_NetPoint* netpoint, segment->getNetPoints()) {
           processItem(netpoint, netpoint->getPosition(),
-                      netpoint->isVisibleJunction() ? 0 : 10);
+                      netpoint->isVisibleJunction() ? 0 : 10, false);
         }
       }
       if (flags.testFlag(FindFlag::NetLines)) {
@@ -222,7 +222,7 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
       }
       if (flags.testFlag(FindFlag::NetLabels)) {
         foreach (SI_NetLabel* netlabel, segment->getNetLabels()) {
-          processItem(netlabel, netlabel->getPosition(), 30);
+          processItem(netlabel, netlabel->getPosition(), 30, false);
         }
       }
     }
@@ -233,20 +233,20 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
        FindFlag::SymbolPinsWithComponentSignal | FindFlag::Texts)) {
     foreach (SI_Symbol* symbol, schematic->getSymbols()) {
       if (flags.testFlag(FindFlag::Symbols)) {
-        processItem(symbol, symbol->getPosition(), 40);
+        processItem(symbol, symbol->getPosition(), 40, false);
       }
       if (flags &
           (FindFlag::SymbolPins | FindFlag::SymbolPinsWithComponentSignal)) {
         foreach (SI_SymbolPin* pin, symbol->getPins()) {
           if (flags.testFlag(FindFlag::SymbolPins) ||
               (pin->getComponentSignalInstance())) {
-            processItem(pin, pin->getPosition(), 50);
+            processItem(pin, pin->getPosition(), 50, false);
           }
         }
       }
       if (flags.testFlag(FindFlag::Texts)) {
         foreach (SI_Text* text, symbol->getTexts()) {
-          processItem(text, text->getPosition(), 70);
+          processItem(text, text->getPosition(), 70, false);
         }
       }
     }
@@ -263,7 +263,7 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
 
   if (flags.testFlag(FindFlag::Texts)) {
     foreach (SI_Text* text, schematic->getTexts()) {
-      processItem(text, text->getPosition(), 70);
+      processItem(text, text->getPosition(), 70, false);
     }
   }
 

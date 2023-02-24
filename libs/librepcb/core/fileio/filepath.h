@@ -137,7 +137,7 @@ public:  // Types
     // default
     Default = KeepSpaces | KeepCase,
   };
-  Q_DECLARE_FLAGS(CleanFileNameOptions, CleanFileNameOption);
+  Q_DECLARE_FLAGS(CleanFileNameOptions, CleanFileNameOption)
 
 public:  // Methods
   // Constructors / Destructor

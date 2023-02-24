@@ -123,7 +123,7 @@ private:  // Data
 }  // namespace editor
 }  // namespace librepcb
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::editor::CategoryTreeModel::Filters);
+Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::editor::CategoryTreeModel::Filters)
 
 /*******************************************************************************
  *  End of File

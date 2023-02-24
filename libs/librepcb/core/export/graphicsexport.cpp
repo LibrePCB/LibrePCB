@@ -31,8 +31,8 @@
 #include <QtPrintSupport>
 #include <QtSvg>
 
-Q_DECLARE_METATYPE(QImage);
-Q_DECLARE_METATYPE(std::shared_ptr<QPicture>);
+Q_DECLARE_METATYPE(QImage)
+Q_DECLARE_METATYPE(std::shared_ptr<QPicture>)
 
 /*******************************************************************************
  *  Namespace

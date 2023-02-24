@@ -89,9 +89,15 @@ endif()
 # Create "common" interface library which is used for DRY configuration of
 # build flags.
 add_library(common INTERFACE)
-target_compile_options(common INTERFACE -Wall -Wextra)
+target_compile_options(common INTERFACE -Wall -Wextra -Wpedantic)
 if(BUILD_DISALLOW_WARNINGS)
   target_compile_options(common INTERFACE -Werror)
+endif()
+
+# Clang emits some warnings within the muParser library when compiling with
+# -Wpedantic, so let's suppress these warnings when compiling with Clang.
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+target_compile_options(common INTERFACE -Wno-nested-anon-types)
 endif()
 
 # Find required Qt packages
