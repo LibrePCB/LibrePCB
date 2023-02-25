@@ -74,10 +74,11 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   connect(mUi->btnConvertToTht, &QToolButton::clicked, this,
           &FootprintPadPropertiesDialog::addHole);
   connect(mUi->holeEditorWidget, &HoleEditorWidget::holeChanged, this,
-          [this](const Hole& hole) {
+          [this](const PositiveLength& diameter, const NonEmptyPath& path) {
             const int index = qBound(0, mSelectedHoleIndex, mHoles.count() - 1);
-            if (const std::shared_ptr<Hole> holePtr = mHoles.value(index)) {
-              *holePtr = hole;
+            if (const std::shared_ptr<PadHole> holePtr = mHoles.value(index)) {
+              holePtr->setDiameter(diameter);
+              holePtr->setPath(path);
               updateGeneralTabHoleWidgets();
             }
           });
@@ -155,9 +156,9 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
             if (value > mUi->edtHeight->getValue()) {
               mUi->edtHeight->setValue(value);
             }
-            if (const std::shared_ptr<Hole> holePtr = mHoles.value(0)) {
+            if (const std::shared_ptr<PadHole> holePtr = mHoles.value(0)) {
               holePtr->setDiameter(value);
-              mUi->holeEditorWidget->setHole(*holePtr);
+              mUi->holeEditorWidget->setDiameter(value);
             }
           });
 
@@ -307,7 +308,7 @@ void FootprintPadPropertiesDialog::applyRecommendedRadius() noexcept {
 }
 
 void FootprintPadPropertiesDialog::addHole() noexcept {
-  mHoles.append(std::make_shared<Hole>(
+  mHoles.append(std::make_shared<PadHole>(
       Uuid::createRandom(), PositiveLength(800000), makeNonEmptyPath(Point())));
   setSelectedHole(mHoles.count() - 1);
   updateGeneralTabHoleWidgets();
@@ -347,11 +348,12 @@ void FootprintPadPropertiesDialog::updateGeneralTabHoleWidgets() noexcept {
 
 void FootprintPadPropertiesDialog::setSelectedHole(int index) noexcept {
   mSelectedHoleIndex = qBound(0, index, mHoles.count() - 1);
-  const std::shared_ptr<Hole> hole = mHoles.value(mSelectedHoleIndex);
+  const std::shared_ptr<PadHole> hole = mHoles.value(mSelectedHoleIndex);
   if (hole) {
     mUi->lblSelectedHole->setText(
         tr("Hole %1 of %2").arg(mSelectedHoleIndex + 1).arg(mHoles.count()));
-    mUi->holeEditorWidget->setHole(*hole);
+    mUi->holeEditorWidget->setDiameter(hole->getDiameter());
+    mUi->holeEditorWidget->setPath(hole->getPath());
   } else {
     mUi->lblSelectedHole->setText(tr("Pad has no holes"));
   }

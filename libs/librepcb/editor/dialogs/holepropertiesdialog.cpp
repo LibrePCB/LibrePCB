@@ -49,7 +49,8 @@ HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
           &HolePropertiesDialog::on_buttonBox_clicked);
 
   // Set properties.
-  mUi->holeEditorWidget->setHole(mHole);
+  mUi->holeEditorWidget->setDiameter(mHole.getDiameter());
+  mUi->holeEditorWidget->setPath(mHole.getPath());
 
   // Set focus to diameter so the user can immediately start typing to change it
   mUi->holeEditorWidget->setFocusToDiameterEdit();
@@ -99,11 +100,9 @@ void HolePropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
 
 bool HolePropertiesDialog::applyChanges() noexcept {
   try {
-    const Hole newHole = mUi->holeEditorWidget->getHole();
-
     QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(mHole));
-    cmd->setDiameter(newHole.getDiameter(), false);
-    cmd->setPath(newHole.getPath(), false);
+    cmd->setDiameter(mUi->holeEditorWidget->getDiameter(), false);
+    cmd->setPath(mUi->holeEditorWidget->getPath(), false);
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

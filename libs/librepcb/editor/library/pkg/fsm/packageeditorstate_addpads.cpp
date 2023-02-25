@@ -64,7 +64,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
         UnsignedLimitedRatio(Ratio::percent100()),  // Rounded pad
         Path(),  // Custom shape outline
         FootprintPad::ComponentSide::Top,  // Default side
-        HoleList{}) {
+        PadHoleList{}) {
   if (mPadType == PadType::SMT) {
     mLastPad.setShape(
         FootprintPad::Shape::RoundedRect);  // Commonly used SMT shape
@@ -73,7 +73,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
     mLastPad.setHeight(PositiveLength(700000));  // reasonable multiple of 0.1mm
     applyRecommendedRoundedRectRadius();
   } else {
-    mLastPad.getHoles().append(std::make_shared<Hole>(
+    mLastPad.getHoles().append(std::make_shared<PadHole>(
         Uuid::createRandom(),
         PositiveLength(800000),  // Commonly used drill diameter
         makeNonEmptyPath(Point())));
@@ -352,9 +352,9 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
         mLastPad.getPosition(), mLastPad.getRotation(), mLastPad.getShape(),
         mLastPad.getWidth(), mLastPad.getHeight(), mLastPad.getRadius(),
         mLastPad.getCustomShapeOutline(), mLastPad.getComponentSide(),
-        HoleList{});
-    for (const Hole& hole : mLastPad.getHoles()) {
-      mCurrentPad->getHoles().append(std::make_shared<Hole>(
+        PadHoleList{});
+    for (const PadHole& hole : mLastPad.getHoles()) {
+      mCurrentPad->getHoles().append(std::make_shared<PadHole>(
           Uuid::createRandom(), hole.getDiameter(), hole.getPath()));
     }
     mContext.undoStack.appendToCmdGroup(new CmdFootprintPadInsert(
@@ -473,7 +473,7 @@ void PackageEditorState_AddPads::heightEditValueChanged(
 
 void PackageEditorState_AddPads::drillDiameterEditValueChanged(
     const PositiveLength& value) noexcept {
-  if (std::shared_ptr<Hole> hole = mLastPad.getHoles().value(0)) {
+  if (std::shared_ptr<PadHole> hole = mLastPad.getHoles().value(0)) {
     hole->setDiameter(value);
     if (mEditCmd) {
       mEditCmd->setHoles(mLastPad.getHoles(), true);

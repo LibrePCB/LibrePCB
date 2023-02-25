@@ -186,7 +186,7 @@ void CmdFootprintPadEdit::mirrorLayer(bool immediate) noexcept {
   }
 }
 
-void CmdFootprintPadEdit::setHoles(const HoleList& holes,
+void CmdFootprintPadEdit::setHoles(const PadHoleList& holes,
                                    bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewHoles = holes;

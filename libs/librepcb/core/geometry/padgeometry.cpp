@@ -47,7 +47,8 @@ PadGeometry::PadGeometry(const PadGeometry& other) noexcept
 
 PadGeometry::PadGeometry(Shape shape, const Length& width, const Length& height,
                          const UnsignedLimitedRatio& radius, const Path& path,
-                         const Length& offset, const HoleList& holes) noexcept
+                         const Length& offset,
+                         const PadHoleList& holes) noexcept
   : mShape(shape),
     mBaseWidth(width),
     mBaseHeight(height),
@@ -170,7 +171,7 @@ QPainterPath PadGeometry::toFilledQPainterPathPx() const noexcept {
 QPainterPath PadGeometry::toHolesQPainterPathPx() const noexcept {
   QPainterPath p;
   p.setFillRule(Qt::WindingFill);
-  for (const Hole& hole : mHoles) {
+  for (const PadHole& hole : mHoles) {
     for (const Path& path :
          hole.getPath()->toOutlineStrokes(hole.getDiameter())) {
       p.addPath(path.toQPainterPathPx());
@@ -186,7 +187,7 @@ PadGeometry PadGeometry::withOffset(const Length& offset) const noexcept {
 
 PadGeometry PadGeometry::withoutHoles() const noexcept {
   return PadGeometry(mShape, mBaseWidth, mBaseHeight, mRadius, mPath, mOffset,
-                     HoleList{});
+                     PadHoleList{});
 }
 
 /*******************************************************************************
@@ -196,7 +197,7 @@ PadGeometry PadGeometry::withoutHoles() const noexcept {
 PadGeometry PadGeometry::roundedRect(const PositiveLength& width,
                                      const PositiveLength& height,
                                      const UnsignedLimitedRatio& radius,
-                                     const HoleList& holes) noexcept {
+                                     const PadHoleList& holes) noexcept {
   return PadGeometry(Shape::RoundedRect, *width, *height, radius, Path(),
                      Length(0), holes);
 }
@@ -204,20 +205,20 @@ PadGeometry PadGeometry::roundedRect(const PositiveLength& width,
 PadGeometry PadGeometry::roundedOctagon(const PositiveLength& width,
                                         const PositiveLength& height,
                                         const UnsignedLimitedRatio& radius,
-                                        const HoleList& holes) noexcept {
+                                        const PadHoleList& holes) noexcept {
   return PadGeometry(Shape::RoundedOctagon, *width, *height, radius, Path(),
                      Length(0), holes);
 }
 
 PadGeometry PadGeometry::stroke(const PositiveLength& diameter,
                                 const NonEmptyPath& path,
-                                const HoleList& holes) noexcept {
+                                const PadHoleList& holes) noexcept {
   return PadGeometry(Shape::Stroke, *diameter, Length(0),
                      UnsignedLimitedRatio(Ratio::percent0()), *path, Length(0),
                      holes);
 }
 
-PadGeometry PadGeometry::custom(const Path& outline, const HoleList& holes) {
+PadGeometry PadGeometry::custom(const Path& outline, const PadHoleList& holes) {
   return PadGeometry(Shape::Custom, Length(0), Length(0),
                      UnsignedLimitedRatio(Ratio::percent0()), outline,
                      Length(0), holes);

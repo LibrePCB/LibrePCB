@@ -66,7 +66,7 @@ BoardPainter::BoardPainter(const Board& board)
       Pad padObj;
       padObj.transform = Transform(pad->getLibPad().getPosition(),
                                    pad->getLibPad().getRotation());
-      for (const Hole& hole : pad->getLibPad().getHoles()) {
+      for (const PadHole& hole : pad->getLibPad().getHoles()) {
         padObj.holes.append(hole);
       }
       foreach (GraphicsLayer* layer, board.getLayerStack().getAllLayers()) {
@@ -263,7 +263,7 @@ void BoardPainter::initContentByLayer() const noexcept {
           }
         }
         // Also add the holes for THT pads.
-        for (const Hole& hole : pad.holes) {
+        for (const PadHole& hole : pad.holes) {
           mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(
               Hole(hole.getUuid(), hole.getDiameter(),
                    footprint.transform.map(pad.transform.map(hole.getPath()))));

@@ -171,14 +171,16 @@ private:  // Methods
   void checkWarnNpthSlots(int progressStart, int progressEnd);
   void checkWarnPthSlots(int progressStart, int progressEnd);
   void checkInvalidPadConnections(int progressStart, int progressEnd);
-  void processHoleSlotWarning(const Hole& hole, SlotsWarningLevel level,
+  template <typename THole>
+  void processHoleSlotWarning(const THole& hole, SlotsWarningLevel level,
                               const Transform& transform1 = Transform(),
                               const Transform& transform2 = Transform());
   const ClipperLib::Paths& getCopperPaths(
       const GraphicsLayer& layer, const QSet<const NetSignal*>& netsignals);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
                                             const GraphicsLayer* layer);
-  QVector<Path> getHoleLocation(const Hole& hole,
+  template <typename THole>
+  QVector<Path> getHoleLocation(const THole& hole,
                                 const Transform& transform1 = Transform(),
                                 const Transform& transform2 = Transform()) const
       noexcept;

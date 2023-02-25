@@ -71,7 +71,7 @@ public:
   void mirrorGeometry(Qt::Orientation orientation, const Point& center,
                       bool immediate) noexcept;
   void mirrorLayer(bool immediate) noexcept;
-  void setHoles(const HoleList& holes, bool immediate) noexcept;
+  void setHoles(const PadHoleList& holes, bool immediate) noexcept;
 
   // Operator Overloadings
   CmdFootprintPadEdit& operator=(const CmdFootprintPadEdit& rhs) = delete;
@@ -112,8 +112,8 @@ private:
   Point mNewPos;
   Angle mOldRotation;
   Angle mNewRotation;
-  HoleList mOldHoles;
-  HoleList mNewHoles;
+  PadHoleList mOldHoles;
+  PadHoleList mNewHoles;
 };
 
 /*******************************************************************************

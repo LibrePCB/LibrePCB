@@ -24,8 +24,8 @@
  *  Includes
  ******************************************************************************/
 #include "../../exceptions.h"
-#include "../../geometry/hole.h"
 #include "../../geometry/padgeometry.h"
+#include "../../geometry/padhole.h"
 #include "../../geometry/path.h"
 #include "../../serialization/serializableobjectlist.h"
 #include "../../types/angle.h"
@@ -90,7 +90,7 @@ public:
                const PositiveLength& width, const PositiveLength& height,
                const UnsignedLimitedRatio& radius,
                const Path& customShapeOutline, ComponentSide side,
-               const HoleList& holes) noexcept;
+               const PadHoleList& holes) noexcept;
   explicit FootprintPad(const SExpression& node);
   ~FootprintPad() noexcept;
 
@@ -109,8 +109,8 @@ public:
     return mCustomShapeOutline;
   }
   ComponentSide getComponentSide() const noexcept { return mComponentSide; }
-  const HoleList& getHoles() const noexcept { return mHoles; }
-  HoleList& getHoles() noexcept { return mHoles; }
+  const PadHoleList& getHoles() const noexcept { return mHoles; }
+  PadHoleList& getHoles() noexcept { return mHoles; }
   QString getLayerName() const noexcept;
   bool isTht() const noexcept;
   bool isOnLayer(const QString& name) const noexcept;
@@ -148,9 +148,9 @@ public:
       const PositiveLength& width, const PositiveLength& height) noexcept;
 
 private:  // Methods
-  void holesEdited(const HoleList& list, int index,
-                   const std::shared_ptr<const Hole>& hole,
-                   HoleList::Event event) noexcept;
+  void holesEdited(const PadHoleList& list, int index,
+                   const std::shared_ptr<const PadHole>& hole,
+                   PadHoleList::Event event) noexcept;
 
 private:  // Data
   Uuid mUuid;
@@ -169,10 +169,10 @@ private:  // Data
   UnsignedLimitedRatio mRadius;
   Path mCustomShapeOutline;  ///< Empty if not needed; Implicitly closed
   ComponentSide mComponentSide;
-  HoleList mHoles;  ///< If not empty, it's a THT pad.
+  PadHoleList mHoles;  ///< If not empty, it's a THT pad.
 
   // Slots
-  HoleList::OnEditedSlot mHolesEditedSlot;
+  PadHoleList::OnEditedSlot mHolesEditedSlot;
 };
 
 /*******************************************************************************

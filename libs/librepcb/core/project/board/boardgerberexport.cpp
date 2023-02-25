@@ -496,7 +496,7 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       const FootprintPad& libPad = pad->getLibPad();
       const Transform padTransform(libPad.getPosition(), libPad.getRotation());
-      for (const Hole& hole : libPad.getHoles()) {
+      for (const PadHole& hole : libPad.getHoles()) {
         gen.drill(deviceTransform.map(padTransform.map(hole.getPath())),
                   hole.getDiameter(), true,
                   ExcellonGenerator::Function::ComponentDrill);  // can throw

@@ -320,7 +320,7 @@ QSet<Point> MeasureTool::snapCandidatesFromFootprint(
       qWarning() << "Failed to determine snap candidates:" << e.getMsg();
     }
     const Transform padTransform(p.getPosition(), p.getRotation());
-    for (const Hole& h : p.getHoles()) {
+    for (const PadHole& h : p.getHoles()) {
       foreach (const Vertex& vertex,
                padTransform.map(h.getPath())->getVertices()) {
         candidates |= snapCandidatesFromCircle(transform.map(vertex.getPos()),

@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../export/graphicsexport.h"
+#include "../../geometry/hole.h"
 #include "../../graphics/graphicslayername.h"
 #include "../../library/pkg/footprintpad.h"
 #include "../../types/length.h"
@@ -67,7 +68,7 @@ class BoardPainter final : public GraphicsPagePainter {
   struct Pad {
     Transform transform;
     QList<std::pair<QString, PadGeometry>> layerGeometries;
-    QList<Hole> holes;
+    QList<PadHole> holes;
   };
 
   struct Footprint {
