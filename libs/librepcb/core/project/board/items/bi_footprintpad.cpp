@@ -273,15 +273,13 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
   tl::optional<Length> offset;
   if ((layer == GraphicsLayer::sTopStopMask) ||
       (layer == GraphicsLayer::sBotStopMask)) {
-    const PositiveLength size =
-        std::min(mFootprintPad->getWidth(), mFootprintPad->getHeight());
-    offset = *mBoard.getDesignRules().calcStopMaskClearance(*size);
+    offset = *mBoard.getDesignRules().calcStopMaskClearance(
+        *getSizeForMaskOffsetCalculaton());
   } else if ((!mFootprintPad->isTht()) &&
              ((layer == GraphicsLayer::sTopSolderPaste) ||
               (layer == GraphicsLayer::sBotSolderPaste))) {
-    const PositiveLength size =
-        std::min(mFootprintPad->getWidth(), mFootprintPad->getHeight());
-    offset = -mBoard.getDesignRules().calcSolderPasteClearance(*size);
+    offset = -mBoard.getDesignRules().calcSolderPasteClearance(
+        *getSizeForMaskOffsetCalculaton());
   }
   if (offset) {
     const QString copperLayer = GraphicsLayer::isTopLayer(layer)
@@ -352,6 +350,19 @@ QString BI_FootprintPad::getNetSignalName() const noexcept {
     return *signal->getName();
   } else {
     return QString();
+  }
+}
+
+UnsignedLength BI_FootprintPad::getSizeForMaskOffsetCalculaton() const
+    noexcept {
+  if (mFootprintPad->getShape() == FootprintPad::Shape::Custom) {
+    // Width/height of the shape are not directly known and difficulat/heavy to
+    // determine. So let's consider the pad as small to always get the smallest
+    // offset from the design rule. Not perfect, but should be good enough.
+    return UnsignedLength(0);
+  } else {
+    return positiveToUnsigned(
+        std::min(mFootprintPad->getWidth(), mFootprintPad->getHeight()));
   }
 }
 

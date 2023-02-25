@@ -126,6 +126,7 @@ private:  // Methods
   QString getComponentInstanceName() const noexcept;
   QString getPadNameOrUuid() const noexcept;
   QString getNetSignalName() const noexcept;
+  UnsignedLength getSizeForMaskOffsetCalculaton() const noexcept;
   QList<PadGeometry> getGeometryOnCopperLayer(const QString& layer) const
       noexcept;
   bool isConnectedOnLayer(const QString& layer) const noexcept;
