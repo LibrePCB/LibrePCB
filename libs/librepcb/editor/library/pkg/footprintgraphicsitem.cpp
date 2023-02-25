@@ -404,7 +404,9 @@ void FootprintGraphicsItem::syncHoles() noexcept {
   for (auto& obj : mFootprint->getHoles().values()) {
     if (!mHoleGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
-      auto i = std::make_shared<HoleGraphicsItem>(*obj, mLayerProvider, this);
+      auto i =
+          std::make_shared<HoleGraphicsItem>(*obj, mLayerProvider, true, this);
+      i->setAutoStopMaskOffset(Length(100000));  // Just for illustration.
       mHoleGraphicsItems.insert(obj, i);
     }
   }

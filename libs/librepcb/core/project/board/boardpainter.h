@@ -40,7 +40,6 @@ namespace librepcb {
 
 class Board;
 class Circle;
-class Hole;
 class Path;
 class Polygon;
 class StrokeFont;
@@ -76,7 +75,7 @@ class BoardPainter final : public GraphicsPagePainter {
     QList<Pad> pads;
     QList<Polygon> polygons;
     QList<Circle> circles;
-    QList<Hole> holes;
+    QList<Hole> holes;  ///< Important: Stop mask set to explicit value!
   };
 
   struct Plane {
@@ -121,7 +120,7 @@ private:  // Data
   QList<Plane> mPlanes;
   QList<Polygon> mPolygons;
   QList<StrokeText> mStrokeTexts;
-  QList<Hole> mHoles;
+  QList<Hole> mHoles;  ///< Important: Stop mask set to explicit value!
 
   mutable QMutex mMutex;
   mutable QHash<QString, LayerContent> mContentByLayer;

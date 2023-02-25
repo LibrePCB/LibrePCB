@@ -17,14 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_BI_HOLE_H
-#define LIBREPCB_CORE_BI_HOLE_H
+#ifndef LIBREPCB_CORE_MASKCONFIG_H
+#define LIBREPCB_CORE_MASKCONFIG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../geometry/hole.h"
-#include "bi_base.h"
+#include "length.h"
+
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
@@ -33,58 +34,49 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Board;
-class HoleGraphicsItem;
-class Project;
-
 /*******************************************************************************
- *  Class BI_Hole
+ *  Class MaskConfig
  ******************************************************************************/
 
 /**
- * @brief The BI_Hole class
+ * @brief The MaskConfig class defines how to add automatic stop mask or
+ *        solder paste
  */
-class BI_Hole final : public BI_Base {
-  Q_OBJECT
+class MaskConfig final {
+  Q_DECLARE_TR_FUNCTIONS(MaskConfig)
 
 public:
   // Constructors / Destructor
-  BI_Hole() = delete;
-  BI_Hole(const BI_Hole& other) = delete;
-  BI_Hole(Board& board, const Hole& hole);
-  ~BI_Hole() noexcept;
+  MaskConfig() = delete;
+  MaskConfig(const MaskConfig& other) noexcept;
+  ~MaskConfig() noexcept;
 
   // Getters
-  Hole& getHole() noexcept { return *mHole; }
-  const Hole& getHole() const noexcept { return *mHole; }
-  const Uuid& getUuid() const
-      noexcept;  // convenience function, e.g. for template usage
-  bool isSelectable() const noexcept override;
-  tl::optional<Length> getStopMaskOffset() const noexcept;
-
-  // General Methods
-  void addToBoard() override;
-  void removeFromBoard() override;
-
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override { return BI_Base::Type_t::Hole; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
+  bool isEnabled() const noexcept { return mEnabled; }
+  const tl::optional<Length>& getOffset() const noexcept { return mOffset; }
 
   // Operator Overloadings
-  BI_Hole& operator=(const BI_Hole& rhs) = delete;
+  bool operator==(const MaskConfig& rhs) const noexcept;
+  bool operator!=(const MaskConfig& rhs) const noexcept {
+    return !(*this == rhs);
+  }
+  MaskConfig& operator=(const MaskConfig& rhs) noexcept;
+
+  // Static Methods
+  static MaskConfig off() noexcept { return MaskConfig(false, tl::nullopt); }
+  static MaskConfig automatic() noexcept {
+    return MaskConfig(true, tl::nullopt);
+  }
+  static MaskConfig manual(const Length& offset) noexcept {
+    return MaskConfig(true, offset);
+  }
 
 private:  // Methods
-  void holeEdited(const Hole& hole, Hole::Event event) noexcept;
-  void updateAutoStopMaskOffset() noexcept;
-  UnsignedLength getAutoStopMaskOffset() const noexcept;
+  MaskConfig(bool enabled, const tl::optional<Length>& offset) noexcept;
 
 private:  // Data
-  QScopedPointer<Hole> mHole;
-  QScopedPointer<HoleGraphicsItem> mGraphicsItem;
-
-  // Slots
-  Hole::OnEditedSlot mOnEditedSlot;
+  bool mEnabled;  ///< Whether an automatic mask is added or not
+  tl::optional<Length> mOffset;  ///< `nullopt` means "from design rules"
 };
 
 /*******************************************************************************

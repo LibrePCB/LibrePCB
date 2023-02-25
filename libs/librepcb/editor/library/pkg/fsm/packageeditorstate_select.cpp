@@ -567,9 +567,9 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
     }
     for (const auto& circle : import.getCircles()) {
       if (dialog.getImportCirclesAsDrills()) {
-        data->getHoles().append(
-            std::make_shared<Hole>(Uuid::createRandom(), circle.diameter,
-                                   makeNonEmptyPath(circle.position)));
+        data->getHoles().append(std::make_shared<Hole>(
+            Uuid::createRandom(), circle.diameter,
+            makeNonEmptyPath(circle.position), MaskConfig::automatic()));
       } else {
         data->getPolygons().append(std::make_shared<Polygon>(
             Uuid::createRandom(), dialog.getLayerName(), dialog.getLineWidth(),

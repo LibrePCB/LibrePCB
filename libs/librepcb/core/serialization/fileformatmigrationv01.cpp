@@ -213,6 +213,15 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
   foreach (const QString& dirName, dir.getDirs("library/pkg")) {
     TransactionalDirectory subDir(dir, "library/pkg/" % dirName);
     if (subDir.fileExists(".librepcb-pkg")) {
+      const QString fp = "package.lp";
+      SExpression root =
+          SExpression::parse(subDir.read(fp), subDir.getAbsPath(fp));
+
+      // Footprints.
+      for (SExpression* fptNode : root.getChildren("footprint")) {
+        context.holesCount += fptNode->getChildren("hole").count();
+      }
+
       upgradePackage(subDir);
     }
   }
@@ -306,6 +315,15 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
 
   // Emit messages at the very end to avoid duplicate messages caused my
   // multiple schematics/boards.
+  if (context.holesCount > 0) {
+    messages.append(
+        buildMessage(Message::Severity::Note,
+                     tr("All non-plated holes (NPTH) now have automatic stop "
+                        "mask added on both board sides. The expansion value "
+                        "is determined by the boards design rule settings but "
+                        "can be overridden in the hole properties dialog."),
+                     context.holesCount));
+  }
   if (context.nonRoundViaCount > 0) {
     messages.append(
         buildMessage(Message::Severity::Warning,
@@ -468,6 +486,7 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
   }
 
   // Holes.
+  context.holesCount += root.getChildren("hole").count();
   upgradeHoles(root);
 
   // Planes.
@@ -525,6 +544,7 @@ void FileFormatMigrationV01::upgradeGrid(SExpression& node) {
 
 void FileFormatMigrationV01::upgradeHoles(SExpression& node) {
   for (SExpression* holeNode : node.getChildren("hole")) {
+    holeNode->appendChild("stop_mask", SExpression::createToken("auto"));
     const Point pos(holeNode->getChild("position"));
     SExpression& vertexNode = holeNode->appendList("vertex");
     pos.serialize(vertexNode.appendList("position"));

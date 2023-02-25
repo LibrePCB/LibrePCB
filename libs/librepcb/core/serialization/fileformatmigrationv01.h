@@ -90,6 +90,7 @@ protected:
     QMap<Uuid, ComponentInstance> componentInstances;
 
     // Counters for emitting messages.
+    int holesCount = 0;
     int nonRoundViaCount = 0;
     int planeCount = 0;
     int planeConnectNoneCount = 0;

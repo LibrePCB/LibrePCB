@@ -153,6 +153,10 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
           &BI_Device::attributesChanged);
   connect(&mCompInstance, &ComponentInstance::attributesChanged, this,
           &BI_Device::attributesChanged);
+
+  // Update graphics item if design rules were modified.
+  connect(&mBoard, &Board::attributesChanged, this,
+          [this]() { mGraphicsItem->updateDesignRules(); });
 }
 
 BI_Device::~BI_Device() noexcept {

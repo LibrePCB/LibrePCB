@@ -40,7 +40,9 @@ CmdHoleEdit::CmdHoleEdit(Hole& hole) noexcept
     mOldPath(hole.getPath()),
     mNewPath(mOldPath),
     mOldDiameter(hole.getDiameter()),
-    mNewDiameter(mOldDiameter) {
+    mNewDiameter(mOldDiameter),
+    mOldStopMaskConfig(hole.getStopMaskConfig()),
+    mNewStopMaskConfig(mOldStopMaskConfig) {
 }
 
 CmdHoleEdit::~CmdHoleEdit() noexcept {
@@ -90,6 +92,11 @@ void CmdHoleEdit::setDiameter(const PositiveLength& diameter,
   if (immediate) mHole.setDiameter(mNewDiameter);
 }
 
+void CmdHoleEdit::setStopMaskConfig(const MaskConfig& config) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewStopMaskConfig = config;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -99,17 +106,20 @@ bool CmdHoleEdit::performExecute() {
 
   if (mNewPath != mOldPath) return true;
   if (mNewDiameter != mOldDiameter) return true;
+  if (mNewStopMaskConfig != mOldStopMaskConfig) return true;
   return false;
 }
 
 void CmdHoleEdit::performUndo() {
   mHole.setPath(mOldPath);
   mHole.setDiameter(mOldDiameter);
+  mHole.setStopMaskConfig(mOldStopMaskConfig);
 }
 
 void CmdHoleEdit::performRedo() {
   mHole.setPath(mNewPath);
   mHole.setDiameter(mNewDiameter);
+  mHole.setStopMaskConfig(mNewStopMaskConfig);
 }
 
 /*******************************************************************************

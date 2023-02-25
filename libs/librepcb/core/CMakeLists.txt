@@ -466,6 +466,8 @@ add_library(
   types/length.h
   types/lengthunit.cpp
   types/lengthunit.h
+  types/maskconfig.cpp
+  types/maskconfig.h
   types/point.cpp
   types/point.h
   types/ratio.cpp

@@ -129,11 +129,12 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
       Alignment(HAlign::center(), VAlign::bottom()), true, false);
 
   std::shared_ptr<Hole> hole1 = std::make_shared<Hole>(
-      Uuid::createRandom(), PositiveLength(3), makeNonEmptyPath(Point(1, 2)));
+      Uuid::createRandom(), PositiveLength(3), makeNonEmptyPath(Point(1, 2)),
+      MaskConfig::automatic());
 
-  std::shared_ptr<Hole> hole2 =
-      std::make_shared<Hole>(Uuid::createRandom(), PositiveLength(30),
-                             makeNonEmptyPath(Point(10, 20)));
+  std::shared_ptr<Hole> hole2 = std::make_shared<Hole>(
+      Uuid::createRandom(), PositiveLength(30), makeNonEmptyPath(Point(10, 20)),
+      MaskConfig::manual(Length(123456)));
 
   // Create object
   FootprintClipboardData obj1(uuid, packagePads, pos);

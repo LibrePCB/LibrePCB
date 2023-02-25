@@ -37,7 +37,8 @@ Hole::Hole(const Hole& other) noexcept
   : onEdited(*this),
     mUuid(other.mUuid),
     mDiameter(other.mDiameter),
-    mPath(other.mPath) {
+    mPath(other.mPath),
+    mStopMaskConfig(other.mStopMaskConfig) {
 }
 
 Hole::Hole(const Uuid& uuid, const Hole& other) noexcept : Hole(other) {
@@ -45,15 +46,20 @@ Hole::Hole(const Uuid& uuid, const Hole& other) noexcept : Hole(other) {
 }
 
 Hole::Hole(const Uuid& uuid, const PositiveLength& diameter,
-           const NonEmptyPath& path) noexcept
-  : onEdited(*this), mUuid(uuid), mDiameter(diameter), mPath(path) {
+           const NonEmptyPath& path, const MaskConfig& stopMaskConfig) noexcept
+  : onEdited(*this),
+    mUuid(uuid),
+    mDiameter(diameter),
+    mPath(path),
+    mStopMaskConfig(stopMaskConfig) {
 }
 
 Hole::Hole(const SExpression& node)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mDiameter(deserialize<PositiveLength>(node.getChild("diameter/@0"))),
-    mPath(Path(node)) {
+    mPath(Path(node)),
+    mStopMaskConfig(deserialize<MaskConfig>(node.getChild("stop_mask/@0"))) {
 }
 
 Hole::~Hole() noexcept {
@@ -99,6 +105,16 @@ bool Hole::setPath(const NonEmptyPath& path) noexcept {
   return true;
 }
 
+bool Hole::setStopMaskConfig(const MaskConfig& config) noexcept {
+  if (config == mStopMaskConfig) {
+    return false;
+  }
+
+  mStopMaskConfig = config;
+  onEdited.notify(Event::StopMaskConfigChanged);
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -106,6 +122,7 @@ bool Hole::setPath(const NonEmptyPath& path) noexcept {
 void Hole::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("diameter", mDiameter);
+  root.appendChild("stop_mask", mStopMaskConfig);
   mPath->serialize(root);
 }
 
@@ -117,6 +134,7 @@ bool Hole::operator==(const Hole& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mDiameter != rhs.mDiameter) return false;
   if (mPath != rhs.mPath) return false;
+  if (mStopMaskConfig != rhs.mStopMaskConfig) return false;
   return true;
 }
 
@@ -127,6 +145,7 @@ Hole& Hole::operator=(const Hole& rhs) noexcept {
   }
   setDiameter(mDiameter = rhs.mDiameter);
   setPath(rhs.mPath);
+  setStopMaskConfig(rhs.mStopMaskConfig);
   return *this;
 }
 

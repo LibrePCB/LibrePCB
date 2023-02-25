@@ -45,31 +45,49 @@ class OriginCrossGraphicsItem;
  * @brief The HoleGraphicsItem class is the graphical representation of a
  *        librepcb::Hole
  */
-class HoleGraphicsItem final : public PrimitivePathGraphicsItem {
+class HoleGraphicsItem final : public QGraphicsItem {
 public:
   // Constructors / Destructor
   HoleGraphicsItem() = delete;
   HoleGraphicsItem(const HoleGraphicsItem& other) = delete;
   HoleGraphicsItem(const Hole& hole, const IF_GraphicsLayerProvider& lp,
+                   bool originCrossesVisible,
                    QGraphicsItem* parent = nullptr) noexcept;
   ~HoleGraphicsItem() noexcept;
 
   // Getters
   const Hole& getHole() noexcept { return mHole; }
 
+  // Setters
+  void setAutoStopMaskOffset(const Length& offset) noexcept;
+
+  // Inherited from QGraphicsItem
+  QRectF boundingRect() const noexcept override {
+    return mHoleGraphicsItem->boundingRect();
+  }
+  QPainterPath shape() const noexcept override {
+    return mHoleGraphicsItem->shape();
+  }
+  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+             QWidget* widget = 0) noexcept override;
+
   // Operator Overloadings
   HoleGraphicsItem& operator=(const HoleGraphicsItem& rhs) = delete;
 
 private:  // Methods
   void holeEdited(const Hole& hole, Hole::Event event) noexcept;
-  void setShape(const PositiveLength& diameter,
-                const NonEmptyPath& path) noexcept;
+  void updateGeometry() noexcept;
+  void updateMasksVisibility() noexcept;
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
 
 private:  // Data
   const Hole& mHole;
   const IF_GraphicsLayerProvider& mLayerProvider;
+  Length mAutoStopMaskOffset;
+  QScopedPointer<PrimitivePathGraphicsItem> mHoleGraphicsItem;
+  QScopedPointer<PrimitivePathGraphicsItem> mStopMaskGraphicsItemBot;
+  QScopedPointer<PrimitivePathGraphicsItem> mStopMaskGraphicsItemTop;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItemStart;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItemEnd;
 

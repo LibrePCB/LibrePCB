@@ -139,9 +139,10 @@ bool BoardEditorState_AddHole::addHole(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add hole to board"));
     mIsUndoCmdActive = true;
-    mCurrentHoleToPlace = new BI_Hole(
-        *board,
-        Hole(Uuid::createRandom(), mLastDiameter, makeNonEmptyPath(pos)));
+    mCurrentHoleToPlace =
+        new BI_Hole(*board,
+                    Hole(Uuid::createRandom(), mLastDiameter,
+                         makeNonEmptyPath(pos), MaskConfig::automatic()));
     QScopedPointer<CmdBoardHoleAdd> cmdAdd(
         new CmdBoardHoleAdd(*mCurrentHoleToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());

@@ -26,6 +26,7 @@
 #include "../../../graphics/holegraphicsitem.h"
 #include "../../project.h"
 #include "../board.h"
+#include "../boarddesignrules.h"
 #include "../boardlayerstack.h"
 
 #include <QtCore>
@@ -42,12 +43,35 @@ namespace librepcb {
 BI_Hole::BI_Hole(Board& board, const Hole& hole)
   : BI_Base(board),
     mHole(new Hole(hole)),
-    mGraphicsItem(new HoleGraphicsItem(*mHole, mBoard.getLayerStack())) {
+    mGraphicsItem(new HoleGraphicsItem(*mHole, mBoard.getLayerStack(), true)),
+    mOnEditedSlot(*this, &BI_Hole::holeEdited) {
+  // Update automatic stop mask offset if design rules were modified.
+  connect(&mBoard, &Board::attributesChanged, this,
+          &BI_Hole::updateAutoStopMaskOffset);
+  updateAutoStopMaskOffset();
+
+  // Register to the hole to get attribute updates.
+  mHole->onEdited.attach(mOnEditedSlot);
 }
 
 BI_Hole::~BI_Hole() noexcept {
   mGraphicsItem.reset();
   mHole.reset();
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+tl::optional<Length> BI_Hole::getStopMaskOffset() const noexcept {
+  if (!mHole->getStopMaskConfig().isEnabled()) {
+    return tl::nullopt;
+  } else if (const tl::optional<Length>& offset =
+                 mHole->getStopMaskConfig().getOffset()) {
+    return *offset;
+  } else {
+    return *getAutoStopMaskOffset();
+  }
 }
 
 /*******************************************************************************
@@ -89,6 +113,30 @@ bool BI_Hole::isSelectable() const noexcept {
 void BI_Hole::setSelected(bool selected) noexcept {
   BI_Base::setSelected(selected);
   mGraphicsItem->setSelected(selected);
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void BI_Hole::holeEdited(const Hole& hole, Hole::Event event) noexcept {
+  Q_UNUSED(hole);
+
+  switch (event) {
+    case Hole::Event::DiameterChanged:
+      updateAutoStopMaskOffset();
+      break;
+    default:
+      break;
+  }
+}
+
+void BI_Hole::updateAutoStopMaskOffset() noexcept {
+  mGraphicsItem->setAutoStopMaskOffset(*getAutoStopMaskOffset());
+}
+
+UnsignedLength BI_Hole::getAutoStopMaskOffset() const noexcept {
+  return mBoard.getDesignRules().calcStopMaskClearance(*mHole->getDiameter());
 }
 
 /*******************************************************************************

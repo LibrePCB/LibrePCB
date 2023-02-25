@@ -163,8 +163,9 @@ void FootprintPainter::initContentByLayer() const noexcept {
 
       // Also add the holes for THT pads.
       for (const PadHole& hole : pad.getHoles()) {
-        mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(Hole(
-            hole.getUuid(), hole.getDiameter(), transform.map(hole.getPath())));
+        mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(
+            Hole(hole.getUuid(), hole.getDiameter(),
+                 transform.map(hole.getPath()), MaskConfig::off()));
       }
     }
 
