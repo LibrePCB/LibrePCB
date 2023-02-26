@@ -250,6 +250,8 @@ add_library(
   library/pkg/footprintpainter.h
   library/pkg/msg/msgduplicatepadname.cpp
   library/pkg/msg/msgduplicatepadname.h
+  library/pkg/msg/msgholewithoutstopmask.cpp
+  library/pkg/msg/msgholewithoutstopmask.h
   library/pkg/msg/msginvalidcustompadoutline.cpp
   library/pkg/msg/msginvalidcustompadoutline.h
   library/pkg/msg/msgmissingfootprint.cpp

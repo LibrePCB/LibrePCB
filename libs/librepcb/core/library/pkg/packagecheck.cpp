@@ -26,6 +26,7 @@
 #include "../../utils/toolbox.h"
 #include "../../utils/transform.h"
 #include "msg/msgduplicatepadname.h"
+#include "msg/msgholewithoutstopmask.h"
 #include "msg/msginvalidcustompadoutline.h"
 #include "msg/msgmissingfootprint.h"
 #include "msg/msgmissingfootprintname.h"
@@ -73,6 +74,7 @@ LibraryElementCheckMessageList PackageCheck::runChecks() const {
   checkPadsAnnularRing(msgs);
   checkPadsConnectionPoint(msgs);
   checkCustomPadOutline(msgs);
+  checkHolesStopMask(msgs);
   return msgs;
 }
 
@@ -362,6 +364,20 @@ void PackageCheck::checkCustomPadOutline(MsgList& msgs) const {
                  (!pad->getCustomShapeOutline().getVertices().isEmpty())) {
         msgs.append(std::make_shared<MsgUnusedCustomPadOutline>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkHolesStopMask(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itHole = (*itFtp).getHoles().begin();
+         itHole != (*itFtp).getHoles().end(); ++itHole) {
+      std::shared_ptr<const Hole> hole = itHole.ptr();
+      if (!hole->getStopMaskConfig().isEnabled()) {
+        msgs.append(std::make_shared<MsgHoleWithoutStopMask>(footprint, hole));
       }
     }
   }
