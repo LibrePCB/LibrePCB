@@ -134,7 +134,6 @@ private:
   void setGridProperties(const PositiveLength& interval, const LengthUnit& unit,
                          Theme::GridStyle style, bool applyToBoard) noexcept;
   void execGridPropertiesDialog() noexcept;
-  void execDesignRulesDialog() noexcept;
   void execDesignRuleCheckDialog() noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
@@ -173,8 +172,7 @@ private:
   QScopedPointer<QAction> mActionProjectSettings;
   QScopedPointer<QAction> mActionNetClasses;
   QScopedPointer<QAction> mActionUpdateLibrary;
-  QScopedPointer<QAction> mActionLayerStack;
-  QScopedPointer<QAction> mActionDesignRules;
+  QScopedPointer<QAction> mActionBoardSetup;
   QScopedPointer<QAction> mActionDesignRuleCheck;
   QScopedPointer<QAction> mActionImportDxf;
   QScopedPointer<QAction> mActionExportLppz;

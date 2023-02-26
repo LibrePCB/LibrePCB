@@ -307,6 +307,32 @@ BoardDesignRules& BoardDesignRules::operator=(
   return *this;
 }
 
+bool BoardDesignRules::operator==(const BoardDesignRules& rhs) const noexcept {
+  // stop mask
+  if (mStopMaskMaxViaDrillDiameter != rhs.mStopMaskMaxViaDrillDiameter)
+    return false;
+  if (mStopMaskClearanceRatio != rhs.mStopMaskClearanceRatio) return false;
+  if (mStopMaskClearanceMin != rhs.mStopMaskClearanceMin) return false;
+  if (mStopMaskClearanceMax != rhs.mStopMaskClearanceMax) return false;
+  // solder paste
+  if (mSolderPasteClearanceRatio != rhs.mSolderPasteClearanceRatio)
+    return false;
+  if (mSolderPasteClearanceMin != rhs.mSolderPasteClearanceMin) return false;
+  if (mSolderPasteClearanceMax != rhs.mSolderPasteClearanceMax) return false;
+  // pad annular ring
+  if (mPadCmpSideAutoAnnularRing != rhs.mPadCmpSideAutoAnnularRing)
+    return false;
+  if (mPadInnerAutoAnnularRing != rhs.mPadInnerAutoAnnularRing) return false;
+  if (mPadAnnularRingRatio != rhs.mPadAnnularRingRatio) return false;
+  if (mPadAnnularRingMin != rhs.mPadAnnularRingMin) return false;
+  if (mPadAnnularRingMax != rhs.mPadAnnularRingMax) return false;
+  // via annular ring
+  if (mViaAnnularRingRatio != rhs.mViaAnnularRingRatio) return false;
+  if (mViaAnnularRingMin != rhs.mViaAnnularRingMin) return false;
+  if (mViaAnnularRingMax != rhs.mViaAnnularRingMax) return false;
+  return true;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

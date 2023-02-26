@@ -20,8 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdboardlayerstackedit.h"
+#include "cmdboardedit.h"
 
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
 
 #include <QtCore>
@@ -36,43 +37,62 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdBoardLayerStackEdit::CmdBoardLayerStackEdit(
-    BoardLayerStack& layerStack) noexcept
-  : UndoCommand(tr("Modify board layer stack")),
-    mLayerStack(layerStack),
-    mOldInnerLayerCount(mLayerStack.getInnerLayerCount()),
-    mNewInnerLayerCount(mOldInnerLayerCount) {
+CmdBoardEdit::CmdBoardEdit(Board& board) noexcept
+  : UndoCommand(tr("Modify Board Setup")),
+    mBoard(board),
+    mOldName(mBoard.getName()),
+    mNewName(mOldName),
+    mOldInnerLayerCount(mBoard.getLayerStack().getInnerLayerCount()),
+    mNewInnerLayerCount(mOldInnerLayerCount),
+    mOldDesignRules(mBoard.getDesignRules()),
+    mNewDesignRules(mOldDesignRules) {
 }
 
-CmdBoardLayerStackEdit::~CmdBoardLayerStackEdit() noexcept {
+CmdBoardEdit::~CmdBoardEdit() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void CmdBoardLayerStackEdit::setInnerLayerCount(int count) noexcept {
+void CmdBoardEdit::setName(const ElementName& name) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewName = name;
+}
+
+void CmdBoardEdit::setInnerLayerCount(int count) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewInnerLayerCount = count;
+}
+
+void CmdBoardEdit::setDesignRules(const BoardDesignRules& rules) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewDesignRules = rules;
 }
 
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdBoardLayerStackEdit::performExecute() {
+bool CmdBoardEdit::performExecute() {
   performRedo();  // can throw
 
+  if (mNewName != mOldName) return true;
   if (mNewInnerLayerCount != mOldInnerLayerCount) return true;
+  if (mNewDesignRules != mOldDesignRules) return true;
   return false;
 }
 
-void CmdBoardLayerStackEdit::performUndo() {
-  mLayerStack.setInnerLayerCount(mOldInnerLayerCount);
+void CmdBoardEdit::performUndo() {
+  mBoard.setName(mOldName);
+  mBoard.getLayerStack().setInnerLayerCount(mOldInnerLayerCount);
+  mBoard.setDesignRules(mOldDesignRules);
 }
 
-void CmdBoardLayerStackEdit::performRedo() {
-  mLayerStack.setInnerLayerCount(mNewInnerLayerCount);
+void CmdBoardEdit::performRedo() {
+  mBoard.setName(mNewName);
+  mBoard.getLayerStack().setInnerLayerCount(mNewInnerLayerCount);
+  mBoard.setDesignRules(mNewDesignRules);
 }
 
 /*******************************************************************************

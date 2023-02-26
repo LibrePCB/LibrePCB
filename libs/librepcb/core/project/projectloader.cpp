@@ -499,7 +499,7 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   board->setDefaultFontName(root.getChild("default_font/@0").getValue());
   board->getLayerStack().setInnerLayerCount(
       deserialize<uint>(root.getChild("layers/inner/@0")));
-  board->getDesignRules() = BoardDesignRules(root.getChild("design_rules"));
+  board->setDesignRules(BoardDesignRules(root.getChild("design_rules")));
   board->getFabricationOutputSettings() = BoardFabricationOutputSettings(
       root.getChild("fabrication_output_settings"));
   p.addBoard(*board);

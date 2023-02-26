@@ -141,6 +141,10 @@ public:
 
   // Operator Overloadings
   BoardDesignRules& operator=(const BoardDesignRules& rhs) noexcept;
+  bool operator==(const BoardDesignRules& rhs) const noexcept;
+  bool operator!=(const BoardDesignRules& rhs) const noexcept {
+    return !(*this == rhs);
+  }
 
 private:  // Methods
   static bool parsePadAutoAnnular(const SExpression& node);

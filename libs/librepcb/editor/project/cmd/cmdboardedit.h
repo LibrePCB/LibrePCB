@@ -17,71 +17,67 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_BOARDDESIGNRULESDIALOG_H
-#define LIBREPCB_EDITOR_BOARDDESIGNRULESDIALOG_H
+#ifndef LIBREPCB_EDITOR_CMDBOARDEDIT_H
+#define LIBREPCB_EDITOR_CMDBOARDEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../undocommand.h"
+
 #include <librepcb/core/project/board/boarddesignrules.h>
+#include <librepcb/core/types/elementname.h>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class LengthUnit;
+class Board;
 
 namespace editor {
 
-namespace Ui {
-class BoardDesignRulesDialog;
-}
-
 /*******************************************************************************
- *  Class BoardDesignRulesDialog
+ *  Class CmdBoardEdit
  ******************************************************************************/
 
 /**
- * @brief The BoardDesignRulesDialog class
+ * @brief The CmdBoardEdit class
  */
-class BoardDesignRulesDialog final : public QDialog {
-  Q_OBJECT
-
+class CmdBoardEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  BoardDesignRulesDialog() = delete;
-  BoardDesignRulesDialog(const BoardDesignRulesDialog& other) = delete;
-  BoardDesignRulesDialog(const BoardDesignRules& rules,
-                         const LengthUnit& lengthUnit,
-                         const QString& settingsPrefix, QWidget* parent = 0);
-  ~BoardDesignRulesDialog();
+  CmdBoardEdit() = delete;
+  CmdBoardEdit(const CmdBoardEdit& other) = delete;
+  explicit CmdBoardEdit(Board& board) noexcept;
+  ~CmdBoardEdit() noexcept;
 
-  // Getters
-  const BoardDesignRules& getDesignRules() const noexcept {
-    return mDesignRules;
-  }
+  // Setters
+  void setName(const ElementName& name) noexcept;
+  void setInnerLayerCount(int count) noexcept;
+  void setDesignRules(const BoardDesignRules& rules) noexcept;
 
-  // Operator Overloadings
-  BoardDesignRulesDialog& operator=(const BoardDesignRulesDialog& rhs) = delete;
+private:  // Methods
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
 
-signals:
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
 
-  void rulesChanged(const BoardDesignRules& newRules);
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
 
-private slots:
+private:  // Data
+  Board& mBoard;
 
-  void on_buttonBox_clicked(QAbstractButton* button);
-
-private:
-  void updateWidgets() noexcept;
-  void applyRules() noexcept;
-
-  Ui::BoardDesignRulesDialog* mUi;
-  BoardDesignRules mDesignRules;
+  ElementName mOldName;
+  ElementName mNewName;
+  int mOldInnerLayerCount;
+  int mNewInnerLayerCount;
+  BoardDesignRules mOldDesignRules;
+  BoardDesignRules mNewDesignRules;
 };
 
 /*******************************************************************************

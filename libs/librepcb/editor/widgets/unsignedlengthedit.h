@@ -53,6 +53,8 @@ public:
 
   // Setters
   void setValue(const UnsignedLength& value) noexcept;
+  void clipToMinimum(const UnsignedLength& value) noexcept;
+  void clipToMaximum(const UnsignedLength& value) noexcept;
 
   // Operator Overloadings
   UnsignedLengthEdit& operator=(const UnsignedLengthEdit& rhs) = delete;
