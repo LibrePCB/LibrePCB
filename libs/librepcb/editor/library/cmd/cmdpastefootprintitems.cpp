@@ -174,7 +174,8 @@ bool CmdPasteFootprintItems::performExecute() {
     }
     std::shared_ptr<Hole> copy = std::make_shared<Hole>(
         uuid, hole.getDiameter(),
-        NonEmptyPath(hole.getPath()->translated(mPosOffset)));
+        NonEmptyPath(hole.getPath()->translated(mPosOffset)),
+        hole.getStopMaskConfig());
     execNewChildCmd(new CmdHoleInsert(mFootprint.getHoles(), copy));
     if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
       graphicsItem->setSelected(true);

@@ -17,86 +17,98 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_HOLEEDITORWIDGET_H
-#define LIBREPCB_EDITOR_HOLEEDITORWIDGET_H
+#ifndef LIBREPCB_CORE_PADHOLE_H
+#define LIBREPCB_CORE_PADHOLE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/geometry/path.h>
-#include <librepcb/core/types/length.h>
+#include "../geometry/path.h"
+#include "../serialization/serializableobjectlist.h"
+#include "../types/length.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class LengthUnit;
-
-namespace editor {
-
-namespace Ui {
-class HoleEditorWidget;
-}
-
 /*******************************************************************************
- *  Class HoleEditorWidget
+ *  Class PadHole
  ******************************************************************************/
 
 /**
- * @brief The HoleEditorWidget class
+ * @brief The PadHole class
  */
-class HoleEditorWidget : public QWidget {
-  Q_OBJECT
+class PadHole {
+  Q_DECLARE_TR_FUNCTIONS(PadHole)
 
 public:
+  // Signals
+  enum class Event {
+    UuidChanged,
+    DiameterChanged,
+    PathChanged,
+  };
+  Signal<PadHole, Event> onEdited;
+  typedef Slot<PadHole, Event> OnEditedSlot;
+
   // Constructors / Destructor
-  HoleEditorWidget() = delete;
-  explicit HoleEditorWidget(QWidget* parent = nullptr) noexcept;
-  HoleEditorWidget(const HoleEditorWidget& other) = delete;
-  virtual ~HoleEditorWidget() noexcept;
+  PadHole() = delete;
+  PadHole(const PadHole& other) noexcept;
+  PadHole(const Uuid& uuid, const PadHole& other) noexcept;
+  PadHole(const Uuid& uuid, const PositiveLength& diameter,
+          const NonEmptyPath& path) noexcept;
+  explicit PadHole(const SExpression& node);
+  virtual ~PadHole() noexcept;
 
   // Getters
+  const Uuid& getUuid() const noexcept { return mUuid; }
   const PositiveLength& getDiameter() const noexcept { return mDiameter; }
   const NonEmptyPath& getPath() const noexcept { return mPath; }
+  bool isSlot() const noexcept;
+  bool isMultiSegmentSlot() const noexcept;
+  bool isCurvedSlot() const noexcept;
 
   // Setters
-  void setReadOnly(bool readOnly) noexcept;
-  void setDiameter(const PositiveLength& diameter) noexcept;
-  void setPath(const NonEmptyPath& path) noexcept;
+  bool setDiameter(const PositiveLength& diameter) noexcept;
+  bool setPath(const NonEmptyPath& path) noexcept;
 
   // General Methods
-  void setFocusToDiameterEdit() noexcept;
-  void configureClientSettings(const LengthUnit& lengthUnit,
-                               const QString& settingsPrefix) noexcept;
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  virtual void serialize(SExpression& root) const;
 
   // Operator Overloadings
-  HoleEditorWidget& operator=(const HoleEditorWidget& rhs) = delete;
+  bool operator==(const PadHole& rhs) const noexcept;
+  bool operator!=(const PadHole& rhs) const noexcept { return !(*this == rhs); }
+  PadHole& operator=(const PadHole& rhs) noexcept;
 
-signals:
-  void holeChanged(const PositiveLength& diameter, const NonEmptyPath& path);
-
-private:  // Methods
-  void updatePathFromCircularTab() noexcept;
-  void updatePathFromLinearTab() noexcept;
-  void updateCircularTabFromPath(const Path& path) noexcept;
-  void updateLinearTabFromPath(const Path& path) noexcept;
-  void updateLinearOuterSize(const Path& path) noexcept;
-
-private:  // Data
-  QScopedPointer<Ui::HoleEditorWidget> mUi;
+protected:  // Data
+  Uuid mUuid;
   PositiveLength mDiameter;
   NonEmptyPath mPath;
 };
 
 /*******************************************************************************
+ *  Class PadHoleList
+ ******************************************************************************/
+
+struct PadHoleListNameProvider {
+  static constexpr const char* tagname = "hole";
+};
+using PadHoleList =
+    SerializableObjectList<PadHole, PadHoleListNameProvider, PadHole::Event>;
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
 
 #endif

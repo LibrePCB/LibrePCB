@@ -26,6 +26,7 @@
 #include "../geometry/path.h"
 #include "../serialization/serializableobjectlist.h"
 #include "../types/length.h"
+#include "../types/maskconfig.h"
 
 #include <QtCore>
 
@@ -50,6 +51,7 @@ public:
     UuidChanged,
     DiameterChanged,
     PathChanged,
+    StopMaskConfigChanged,
   };
   Signal<Hole, Event> onEdited;
   typedef Slot<Hole, Event> OnEditedSlot;
@@ -59,7 +61,7 @@ public:
   Hole(const Hole& other) noexcept;
   Hole(const Uuid& uuid, const Hole& other) noexcept;
   Hole(const Uuid& uuid, const PositiveLength& diameter,
-       const NonEmptyPath& path) noexcept;
+       const NonEmptyPath& path, const MaskConfig& stopMaskConfig) noexcept;
   explicit Hole(const SExpression& node);
   ~Hole() noexcept;
 
@@ -67,6 +69,9 @@ public:
   const Uuid& getUuid() const noexcept { return mUuid; }
   const PositiveLength& getDiameter() const noexcept { return mDiameter; }
   const NonEmptyPath& getPath() const noexcept { return mPath; }
+  const MaskConfig& getStopMaskConfig() const noexcept {
+    return mStopMaskConfig;
+  }
   bool isSlot() const noexcept;
   bool isMultiSegmentSlot() const noexcept;
   bool isCurvedSlot() const noexcept;
@@ -74,6 +79,7 @@ public:
   // Setters
   bool setDiameter(const PositiveLength& diameter) noexcept;
   bool setPath(const NonEmptyPath& path) noexcept;
+  bool setStopMaskConfig(const MaskConfig& config) noexcept;
 
   // General Methods
 
@@ -93,6 +99,7 @@ private:  // Data
   Uuid mUuid;
   PositiveLength mDiameter;
   NonEmptyPath mPath;
+  MaskConfig mStopMaskConfig;
 };
 
 /*******************************************************************************

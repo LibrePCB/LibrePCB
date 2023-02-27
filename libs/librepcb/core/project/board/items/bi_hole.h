@@ -60,6 +60,7 @@ public:
   const Uuid& getUuid() const
       noexcept;  // convenience function, e.g. for template usage
   bool isSelectable() const noexcept override;
+  tl::optional<Length> getStopMaskOffset() const noexcept;
 
   // General Methods
   void addToBoard() override;
@@ -73,9 +74,17 @@ public:
   // Operator Overloadings
   BI_Hole& operator=(const BI_Hole& rhs) = delete;
 
+private:  // Methods
+  void holeEdited(const Hole& hole, Hole::Event event) noexcept;
+  void updateAutoStopMaskOffset() noexcept;
+  UnsignedLength getAutoStopMaskOffset() const noexcept;
+
 private:  // Data
   QScopedPointer<Hole> mHole;
   QScopedPointer<HoleGraphicsItem> mGraphicsItem;
+
+  // Slots
+  Hole::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

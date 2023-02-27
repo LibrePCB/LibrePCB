@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packageeditorwidget.h"
 
+#include "../../cmd/cmdholeedit.h"
 #include "../../cmd/cmdstroketextedit.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
@@ -40,6 +41,7 @@
 #include <librepcb/core/library/msg/msgmissingcategories.h>
 #include <librepcb/core/library/msg/msgnamenottitlecase.h>
 #include <librepcb/core/library/pkg/footprintpainter.h>
+#include <librepcb/core/library/pkg/msg/msgholewithoutstopmask.h>
 #include <librepcb/core/library/pkg/msg/msginvalidcustompadoutline.h>
 #include <librepcb/core/library/pkg/msg/msgmissingfootprint.h>
 #include <librepcb/core/library/pkg/msg/msgmissingfootprintname.h>
@@ -624,6 +626,16 @@ void PackageEditorWidget::fixMsg(const MsgInvalidCustomPadOutline& msg) {
   mUndoStack->execCmd(cmd.take());
 }
 
+template <>
+void PackageEditorWidget::fixMsg(const MsgHoleWithoutStopMask& msg) {
+  std::shared_ptr<Footprint> footprint =
+      mPackage->getFootprints().get(msg.getFootprint().get());
+  std::shared_ptr<Hole> hole = footprint->getHoles().get(msg.getHole().get());
+  QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(*hole));
+  cmd->setStopMaskConfig(MaskConfig::automatic());
+  mUndoStack->execCmd(cmd.take());
+}
+
 template <typename MessageType>
 bool PackageEditorWidget::fixMsgHelper(
     std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
@@ -647,6 +659,7 @@ bool PackageEditorWidget::processCheckMessage(
   if (fixMsgHelper<MsgWrongFootprintTextLayer>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgUnusedCustomPadOutline>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgInvalidCustomPadOutline>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgHoleWithoutStopMask>(msg, applyFix)) return true;
   return false;
 }
 

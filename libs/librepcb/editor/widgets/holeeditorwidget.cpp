@@ -43,16 +43,16 @@ namespace editor {
 HoleEditorWidget::HoleEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
     mUi(new Ui::HoleEditorWidget),
-    mHole(Uuid::createRandom(), PositiveLength(1000000),
-          makeNonEmptyPath(Point(0, 0))) {
+    mDiameter(1000000),
+    mPath(makeNonEmptyPath(Point(0, 0))) {
   mUi->setupUi(this);
   mUi->pathEditorWidget->setFrameShape(QFrame::NoFrame);
   mUi->pathEditorWidget->setMinimumVertexCount(1);
   connect(mUi->edtDiameter, &PositiveLengthEdit::valueChanged, this,
           [this](const PositiveLength& value) {
-            mHole.setDiameter(value);
-            updateLinearOuterSize(*mHole.getPath());
-            emit holeChanged(mHole);
+            mDiameter = value;
+            updateLinearOuterSize(*mPath);
+            emit holeChanged(mDiameter, mPath);
           });
   connect(mUi->edtPosX, &LengthEdit::valueChanged, this,
           &HoleEditorWidget::updatePathFromCircularTab);
@@ -69,11 +69,11 @@ HoleEditorWidget::HoleEditorWidget(QWidget* parent) noexcept
   connect(mUi->pathEditorWidget, &PathEditorWidget::pathChanged, this,
           [this](const Path& path) {
             if (!path.getVertices().isEmpty()) {
-              mHole.setPath(NonEmptyPath(path));
+              mPath = NonEmptyPath(path);
               updateCircularTabFromPath(path);
               updateLinearTabFromPath(path);
               updateLinearOuterSize(path);
-              emit holeChanged(mHole);
+              emit holeChanged(mDiameter, mPath);
             }
           });
 }
@@ -96,11 +96,14 @@ void HoleEditorWidget::setReadOnly(bool readOnly) noexcept {
   mUi->pathEditorWidget->setReadOnly(readOnly);
 }
 
-void HoleEditorWidget::setHole(const Hole& hole) noexcept {
-  // Load attributes.
-  mHole = hole;
-  mUi->edtDiameter->setValue(mHole.getDiameter());
-  mUi->pathEditorWidget->setPath(*mHole.getPath());
+void HoleEditorWidget::setDiameter(const PositiveLength& diameter) noexcept {
+  mDiameter = diameter;
+  mUi->edtDiameter->setValue(diameter);
+}
+
+void HoleEditorWidget::setPath(const NonEmptyPath& path) noexcept {
+  mPath = path;
+  mUi->pathEditorWidget->setPath(*path);
 
   // Open the most reasonable tab.
   if (mUi->tabCircular->isEnabled()) {
@@ -146,12 +149,12 @@ void HoleEditorWidget::updatePathFromCircularTab() noexcept {
 
   const NonEmptyPath path(Path(
       {Vertex(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()))}));
-  if (path != mHole.getPath()) {
-    mHole.setPath(path);
+  if (path != mPath) {
+    mPath = path;
     mUi->pathEditorWidget->setPath(*path);
     updateLinearTabFromPath(*path);
     updateLinearOuterSize(*path);
-    emit holeChanged(mHole);
+    emit holeChanged(mDiameter, mPath);
   }
 }
 
@@ -169,12 +172,12 @@ void HoleEditorWidget::updatePathFromLinearTab() noexcept {
     path.addVertex(p2);
   }
 
-  if (path != *mHole.getPath()) {
-    mHole.setPath(NonEmptyPath(path));
+  if (path != *mPath) {
+    mPath = NonEmptyPath(path);
     mUi->pathEditorWidget->setPath(path);
     updateCircularTabFromPath(path);
     updateLinearOuterSize(path);
-    emit holeChanged(mHole);
+    emit holeChanged(mDiameter, mPath);
   }
 }
 

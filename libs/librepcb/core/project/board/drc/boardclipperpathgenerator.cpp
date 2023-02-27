@@ -282,7 +282,7 @@ void BoardClipperPathGenerator::addCopper(
         }
         // Also add each hole to ensure correct copper areas even if
         // the pad outline is too small or invalid.
-        for (const Hole& hole : geometry.getHoles()) {
+        for (const PadHole& hole : geometry.getHoles()) {
           foreach (const Path& outline,
                    hole.getPath()->toOutlineStrokes(hole.getDiameter())) {
             ClipperHelpers::unite(mPaths,

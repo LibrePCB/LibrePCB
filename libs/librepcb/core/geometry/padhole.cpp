@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "hole.h"
+#include "padhole.h"
 
 #include <QtCore>
 
@@ -33,51 +33,46 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Hole::Hole(const Hole& other) noexcept
+PadHole::PadHole(const PadHole& other) noexcept
   : onEdited(*this),
     mUuid(other.mUuid),
     mDiameter(other.mDiameter),
-    mPath(other.mPath),
-    mStopMaskConfig(other.mStopMaskConfig) {
+    mPath(other.mPath) {
 }
 
-Hole::Hole(const Uuid& uuid, const Hole& other) noexcept : Hole(other) {
+PadHole::PadHole(const Uuid& uuid, const PadHole& other) noexcept
+  : PadHole(other) {
   mUuid = uuid;
 }
 
-Hole::Hole(const Uuid& uuid, const PositiveLength& diameter,
-           const NonEmptyPath& path, const MaskConfig& stopMaskConfig) noexcept
-  : onEdited(*this),
-    mUuid(uuid),
-    mDiameter(diameter),
-    mPath(path),
-    mStopMaskConfig(stopMaskConfig) {
+PadHole::PadHole(const Uuid& uuid, const PositiveLength& diameter,
+                 const NonEmptyPath& path) noexcept
+  : onEdited(*this), mUuid(uuid), mDiameter(diameter), mPath(path) {
 }
 
-Hole::Hole(const SExpression& node)
+PadHole::PadHole(const SExpression& node)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mDiameter(deserialize<PositiveLength>(node.getChild("diameter/@0"))),
-    mPath(Path(node)),
-    mStopMaskConfig(deserialize<MaskConfig>(node.getChild("stop_mask/@0"))) {
+    mPath(Path(node)) {
 }
 
-Hole::~Hole() noexcept {
+PadHole::~PadHole() noexcept {
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
 
-bool Hole::isSlot() const noexcept {
+bool PadHole::isSlot() const noexcept {
   return mPath->getVertices().count() > 1;
 }
 
-bool Hole::isMultiSegmentSlot() const noexcept {
+bool PadHole::isMultiSegmentSlot() const noexcept {
   return mPath->getVertices().count() > 2;
 }
 
-bool Hole::isCurvedSlot() const noexcept {
+bool PadHole::isCurvedSlot() const noexcept {
   return mPath->isCurved();
 }
 
@@ -85,7 +80,7 @@ bool Hole::isCurvedSlot() const noexcept {
  *  Setters
  ******************************************************************************/
 
-bool Hole::setDiameter(const PositiveLength& diameter) noexcept {
+bool PadHole::setDiameter(const PositiveLength& diameter) noexcept {
   if (diameter == mDiameter) {
     return false;
   }
@@ -95,7 +90,7 @@ bool Hole::setDiameter(const PositiveLength& diameter) noexcept {
   return true;
 }
 
-bool Hole::setPath(const NonEmptyPath& path) noexcept {
+bool PadHole::setPath(const NonEmptyPath& path) noexcept {
   if (path == mPath) {
     return false;
   }
@@ -105,24 +100,13 @@ bool Hole::setPath(const NonEmptyPath& path) noexcept {
   return true;
 }
 
-bool Hole::setStopMaskConfig(const MaskConfig& config) noexcept {
-  if (config == mStopMaskConfig) {
-    return false;
-  }
-
-  mStopMaskConfig = config;
-  onEdited.notify(Event::StopMaskConfigChanged);
-  return true;
-}
-
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void Hole::serialize(SExpression& root) const {
+void PadHole::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("diameter", mDiameter);
-  root.appendChild("stop_mask", mStopMaskConfig);
   mPath->serialize(root);
 }
 
@@ -130,22 +114,20 @@ void Hole::serialize(SExpression& root) const {
  *  Operator Overloadings
  ******************************************************************************/
 
-bool Hole::operator==(const Hole& rhs) const noexcept {
+bool PadHole::operator==(const PadHole& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mDiameter != rhs.mDiameter) return false;
   if (mPath != rhs.mPath) return false;
-  if (mStopMaskConfig != rhs.mStopMaskConfig) return false;
   return true;
 }
 
-Hole& Hole::operator=(const Hole& rhs) noexcept {
+PadHole& PadHole::operator=(const PadHole& rhs) noexcept {
   if (mUuid != rhs.mUuid) {
     mUuid = rhs.mUuid;
     onEdited.notify(Event::UuidChanged);
   }
   setDiameter(mDiameter = rhs.mDiameter);
   setPath(rhs.mPath);
-  setStopMaskConfig(rhs.mStopMaskConfig);
   return *this;
 }
 

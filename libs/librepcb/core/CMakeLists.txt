@@ -137,6 +137,8 @@ add_library(
   geometry/netline.h
   geometry/padgeometry.cpp
   geometry/padgeometry.h
+  geometry/padhole.cpp
+  geometry/padhole.h
   geometry/path.cpp
   geometry/path.h
   geometry/polygon.cpp
@@ -248,6 +250,8 @@ add_library(
   library/pkg/footprintpainter.h
   library/pkg/msg/msgduplicatepadname.cpp
   library/pkg/msg/msgduplicatepadname.h
+  library/pkg/msg/msgholewithoutstopmask.cpp
+  library/pkg/msg/msgholewithoutstopmask.h
   library/pkg/msg/msginvalidcustompadoutline.cpp
   library/pkg/msg/msginvalidcustompadoutline.h
   library/pkg/msg/msgmissingfootprint.cpp
@@ -464,6 +468,8 @@ add_library(
   types/length.h
   types/lengthunit.cpp
   types/lengthunit.h
+  types/maskconfig.cpp
+  types/maskconfig.h
   types/point.cpp
   types/point.h
   types/ratio.cpp

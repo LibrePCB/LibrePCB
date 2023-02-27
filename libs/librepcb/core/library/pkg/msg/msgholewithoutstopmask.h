@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_PACKAGECHECK_H
-#define LIBREPCB_CORE_PACKAGECHECK_H
+#ifndef LIBREPCB_CORE_MSGHOLEWITHOUTSTOPMASK_H
+#define LIBREPCB_CORE_MSGHOLEWITHOUTSTOPMASK_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../libraryelementcheck.h"
+#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -32,43 +32,39 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Package;
+class Footprint;
+class Hole;
 
 /*******************************************************************************
- *  Class PackageCheck
+ *  Class MsgHoleWithoutStopMask
  ******************************************************************************/
 
 /**
- * @brief The PackageCheck class
+ * @brief The MsgHoleWithoutStopMask class
  */
-class PackageCheck : public LibraryElementCheck {
+class MsgHoleWithoutStopMask final : public LibraryElementCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgHoleWithoutStopMask)
+
 public:
   // Constructors / Destructor
-  PackageCheck() = delete;
-  PackageCheck(const PackageCheck& other) = delete;
-  explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+  MsgHoleWithoutStopMask() = delete;
+  MsgHoleWithoutStopMask(std::shared_ptr<const Footprint> footprint,
+                         std::shared_ptr<const Hole> hole) noexcept;
+  MsgHoleWithoutStopMask(const MsgHoleWithoutStopMask& other) noexcept
+    : LibraryElementCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mHole(other.mHole) {}
+  virtual ~MsgHoleWithoutStopMask() noexcept;
 
-  // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const Hole> getHole() const noexcept { return mHole; }
 
-  // Operator Overloadings
-  PackageCheck& operator=(const PackageCheck& rhs) = delete;
-
-protected:  // Methods
-  void checkDuplicatePadNames(MsgList& msgs) const;
-  void checkMissingFootprint(MsgList& msgs) const;
-  void checkMissingTexts(MsgList& msgs) const;
-  void checkWrongTextLayers(MsgList& msgs) const;
-  void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
-  void checkPadsAnnularRing(MsgList& msgs) const;
-  void checkPadsConnectionPoint(MsgList& msgs) const;
-  void checkCustomPadOutline(MsgList& msgs) const;
-  void checkHolesStopMask(MsgList& msgs) const;
-
-private:  // Data
-  const Package& mPackage;
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const Hole> mHole;
 };
 
 /*******************************************************************************

@@ -118,7 +118,7 @@ FootprintPad::FootprintPad(const Uuid& uuid,
                            const PositiveLength& height,
                            const UnsignedLimitedRatio& radius,
                            const Path& customShapeOutline, ComponentSide side,
-                           const HoleList& holes) noexcept
+                           const PadHoleList& holes) noexcept
   : onEdited(*this),
     mUuid(uuid),
     mPackagePadUuid(pkgPadUuid),
@@ -371,9 +371,9 @@ UnsignedLimitedRatio FootprintPad::getRecommendedRadius(
  *  Private Methods
  ******************************************************************************/
 
-void FootprintPad::holesEdited(const HoleList& list, int index,
-                               const std::shared_ptr<const Hole>& hole,
-                               HoleList::Event event) noexcept {
+void FootprintPad::holesEdited(const PadHoleList& list, int index,
+                               const std::shared_ptr<const PadHole>& hole,
+                               PadHoleList::Event event) noexcept {
   Q_UNUSED(list);
   Q_UNUSED(index);
   Q_UNUSED(hole);

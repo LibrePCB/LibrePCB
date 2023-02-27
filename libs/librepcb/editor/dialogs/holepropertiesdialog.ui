@@ -15,7 +15,73 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
    <item>
-    <widget class="librepcb::editor::HoleEditorWidget" name="holeEditorWidget" native="true"/>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabGeneral">
+      <attribute name="title">
+       <string>General</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="librepcb::editor::HoleEditorWidget" name="holeEditorWidget" native="true"/>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabAdvanced">
+      <attribute name="title">
+       <string>Advanced</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Stop Mask:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QRadioButton" name="rbtnStopMaskOff">
+           <property name="text">
+            <string>Off</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnStopMaskAuto">
+           <property name="text">
+            <string>From Design Rules</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnStopMaskManual">
+           <property name="text">
+            <string>Manual:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="librepcb::editor::LengthEdit" name="edtStopMaskOffset" native="true">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -34,6 +100,12 @@
    <class>librepcb::editor::HoleEditorWidget</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/holeeditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::LengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/lengthedit.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

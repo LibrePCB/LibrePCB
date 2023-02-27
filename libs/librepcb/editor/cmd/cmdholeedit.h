@@ -66,6 +66,7 @@ public:
   void mirror(Qt::Orientation orientation, const Point& center,
               bool immediate) noexcept;
   void setDiameter(const PositiveLength& diameter, bool immediate) noexcept;
+  void setStopMaskConfig(const MaskConfig& config) noexcept;
 
   // Operator Overloadings
   CmdHoleEdit& operator=(const CmdHoleEdit& rhs) = delete;
@@ -92,6 +93,8 @@ private:
   NonEmptyPath mNewPath;
   PositiveLength mOldDiameter;
   PositiveLength mNewDiameter;
+  MaskConfig mOldStopMaskConfig;
+  MaskConfig mNewStopMaskConfig;
 };
 
 /*******************************************************************************

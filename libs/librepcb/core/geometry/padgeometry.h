@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../types/ratio.h"
-#include "hole.h"
+#include "padhole.h"
 #include "path.h"
 
 #include <optional/tl/optional.hpp>
@@ -66,7 +66,7 @@ public:
   Length getHeight() const noexcept { return mBaseHeight + (mOffset * 2); }
   UnsignedLength getCornerRadius() const noexcept;
   const Path& getPath() const noexcept { return mPath; }
-  const HoleList& getHoles() const noexcept { return mHoles; }
+  const PadHoleList& getHoles() const noexcept { return mHoles; }
 
   // General Methods
   QVector<Path> toOutlines() const;
@@ -80,15 +80,15 @@ public:
   static PadGeometry roundedRect(const PositiveLength& width,
                                  const PositiveLength& height,
                                  const UnsignedLimitedRatio& radius,
-                                 const HoleList& holes) noexcept;
+                                 const PadHoleList& holes) noexcept;
   static PadGeometry roundedOctagon(const PositiveLength& width,
                                     const PositiveLength& height,
                                     const UnsignedLimitedRatio& radius,
-                                    const HoleList& holes) noexcept;
+                                    const PadHoleList& holes) noexcept;
   static PadGeometry stroke(const PositiveLength& diameter,
                             const NonEmptyPath& path,
-                            const HoleList& holes) noexcept;
-  static PadGeometry custom(const Path& outline, const HoleList& holes);
+                            const PadHoleList& holes) noexcept;
+  static PadGeometry custom(const Path& outline, const PadHoleList& holes);
   static bool isValidCustomOutline(const Path& path) noexcept;
 
   // Operator Overloadings
@@ -101,7 +101,7 @@ public:
 private:  // Methods
   PadGeometry(Shape shape, const Length& width, const Length& height,
               const UnsignedLimitedRatio& radius, const Path& path,
-              const Length& offset, const HoleList& holes) noexcept;
+              const Length& offset, const PadHoleList& holes) noexcept;
 
   /**
    * Returns the maximum allowed arc tolerance when flattening arcs. Do not
@@ -119,7 +119,7 @@ private:  // Data
   UnsignedLimitedRatio mRadius;
   Path mPath;
   Length mOffset;
-  HoleList mHoles;
+  PadHoleList mHoles;
 };
 
 /*******************************************************************************

@@ -276,7 +276,7 @@ ClipperLib::Paths BoardPlaneFragmentsBuilder::createPadCutOuts(
       }
       // Also create cut-outs for each hole to ensure correct clearance even if
       // the pad outline is too small or invalid.
-      for (const Hole& hole : geometry.getHoles()) {
+      for (const PadHole& hole : geometry.getHoles()) {
         const PositiveLength width(hole.getDiameter() +
                                    (mPlane.getMinClearance() * 2));
         foreach (const Path& outline, hole.getPath()->toOutlineStrokes(width)) {

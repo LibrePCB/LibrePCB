@@ -315,7 +315,8 @@ std::shared_ptr<Hole> EagleTypeConverter::convertHole(
   return std::make_shared<Hole>(
       Uuid::createRandom(),  // UUID
       PositiveLength(convertLength(h.getDiameter())),  // Diameter
-      makeNonEmptyPath(convertPoint(h.getPosition()))  // Path
+      makeNonEmptyPath(convertPoint(h.getPosition())),  // Path
+      MaskConfig::automatic()  // Stop mask
   );
 }
 
@@ -422,7 +423,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           radius,  // Radius
           Path(),  // Custom shape outline
           FootprintPad::ComponentSide::Top,  // Side
-          HoleList{std::make_shared<Hole>(
+          PadHoleList{std::make_shared<PadHole>(
               Uuid::createRandom(),
               PositiveLength(convertLength(p.getDrillDiameter())),
               makeNonEmptyPath(Point(0, 0)))}  // Holes
@@ -457,7 +458,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           UnsignedLimitedRatio(Ratio::percent0()),  // Radius
           Path(),  // Custom shape outline
           side,  // Side
-          HoleList{}  // Holes
+          PadHoleList{}  // Holes
           ));
 }
 

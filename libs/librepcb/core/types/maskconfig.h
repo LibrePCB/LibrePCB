@@ -17,86 +17,72 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_HOLEEDITORWIDGET_H
-#define LIBREPCB_EDITOR_HOLEEDITORWIDGET_H
+#ifndef LIBREPCB_CORE_MASKCONFIG_H
+#define LIBREPCB_CORE_MASKCONFIG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/geometry/path.h>
-#include <librepcb/core/types/length.h>
+#include "length.h"
+
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class LengthUnit;
-
-namespace editor {
-
-namespace Ui {
-class HoleEditorWidget;
-}
-
 /*******************************************************************************
- *  Class HoleEditorWidget
+ *  Class MaskConfig
  ******************************************************************************/
 
 /**
- * @brief The HoleEditorWidget class
+ * @brief The MaskConfig class defines how to add automatic stop mask or
+ *        solder paste
  */
-class HoleEditorWidget : public QWidget {
-  Q_OBJECT
+class MaskConfig final {
+  Q_DECLARE_TR_FUNCTIONS(MaskConfig)
 
 public:
   // Constructors / Destructor
-  HoleEditorWidget() = delete;
-  explicit HoleEditorWidget(QWidget* parent = nullptr) noexcept;
-  HoleEditorWidget(const HoleEditorWidget& other) = delete;
-  virtual ~HoleEditorWidget() noexcept;
+  MaskConfig() = delete;
+  MaskConfig(const MaskConfig& other) noexcept;
+  ~MaskConfig() noexcept;
 
   // Getters
-  const PositiveLength& getDiameter() const noexcept { return mDiameter; }
-  const NonEmptyPath& getPath() const noexcept { return mPath; }
-
-  // Setters
-  void setReadOnly(bool readOnly) noexcept;
-  void setDiameter(const PositiveLength& diameter) noexcept;
-  void setPath(const NonEmptyPath& path) noexcept;
-
-  // General Methods
-  void setFocusToDiameterEdit() noexcept;
-  void configureClientSettings(const LengthUnit& lengthUnit,
-                               const QString& settingsPrefix) noexcept;
+  bool isEnabled() const noexcept { return mEnabled; }
+  const tl::optional<Length>& getOffset() const noexcept { return mOffset; }
 
   // Operator Overloadings
-  HoleEditorWidget& operator=(const HoleEditorWidget& rhs) = delete;
+  bool operator==(const MaskConfig& rhs) const noexcept;
+  bool operator!=(const MaskConfig& rhs) const noexcept {
+    return !(*this == rhs);
+  }
+  MaskConfig& operator=(const MaskConfig& rhs) noexcept;
 
-signals:
-  void holeChanged(const PositiveLength& diameter, const NonEmptyPath& path);
+  // Static Methods
+  static MaskConfig off() noexcept { return MaskConfig(false, tl::nullopt); }
+  static MaskConfig automatic() noexcept {
+    return MaskConfig(true, tl::nullopt);
+  }
+  static MaskConfig manual(const Length& offset) noexcept {
+    return MaskConfig(true, offset);
+  }
 
 private:  // Methods
-  void updatePathFromCircularTab() noexcept;
-  void updatePathFromLinearTab() noexcept;
-  void updateCircularTabFromPath(const Path& path) noexcept;
-  void updateLinearTabFromPath(const Path& path) noexcept;
-  void updateLinearOuterSize(const Path& path) noexcept;
+  MaskConfig(bool enabled, const tl::optional<Length>& offset) noexcept;
 
 private:  // Data
-  QScopedPointer<Ui::HoleEditorWidget> mUi;
-  PositiveLength mDiameter;
-  NonEmptyPath mPath;
+  bool mEnabled;  ///< Whether an automatic mask is added or not
+  tl::optional<Length> mOffset;  ///< `nullopt` means "from design rules"
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
 
 #endif

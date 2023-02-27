@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/geometry/hole.h>
+#include <librepcb/core/geometry/padhole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -91,7 +91,7 @@ private:  // Methods
 private:  // Data
   FootprintPad& mPad;
   UndoStack& mUndoStack;
-  HoleList mHoles;
+  PadHoleList mHoles;
   int mSelectedHoleIndex;
   QScopedPointer<Ui::FootprintPadPropertiesDialog> mUi;
   Path mAutoCustomOutline;

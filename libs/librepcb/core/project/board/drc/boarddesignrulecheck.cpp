@@ -456,7 +456,7 @@ void BoardDesignRuleCheck::checkMinimumPthAnnularRing(int progressStart,
       // Determine hole areas including minimum annular ring.
       const Transform transform(*pad);
       ClipperLib::Paths areas;
-      for (const Hole& hole : pad->getLibPad().getHoles()) {
+      for (const PadHole& hole : pad->getLibPad().getHoles()) {
         const Length diameter =
             hole.getDiameter() + (*mOptions.minPthAnnularRing * 2) - 1;
         if (diameter <= 0) {
@@ -584,7 +584,7 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressStart,
   // Pads.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      for (const Hole& hole : pad->getLibPad().getHoles()) {
+      for (const PadHole& hole : pad->getLibPad().getHoles()) {
         if (hole.getDiameter() < *mOptions.minPthDrillDiameter) {
           QString msg = tr("Min. pad drill diameter ('%1'): %2",
                            "Placeholders are pad name + drill diameter")
@@ -615,7 +615,7 @@ void BoardDesignRuleCheck::checkMinimumPthSlotWidth(int progressStart,
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       Transform padTransform(pad->getLibPad().getPosition(),
                              pad->getLibPad().getRotation());
-      for (const Hole& hole : pad->getLibPad().getHoles()) {
+      for (const PadHole& hole : pad->getLibPad().getHoles()) {
         if ((hole.isSlot()) &&
             (hole.getDiameter() < *mOptions.minPthSlotWidth)) {
           emitMessage(BoardDesignRuleCheckMessage(
@@ -662,7 +662,7 @@ void BoardDesignRuleCheck::checkWarnPthSlots(int progressStart,
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       Transform padTransform(pad->getLibPad().getPosition(),
                              pad->getLibPad().getRotation());
-      for (const Hole& hole : pad->getLibPad().getHoles()) {
+      for (const PadHole& hole : pad->getLibPad().getHoles()) {
         processHoleSlotWarning(hole, mOptions.pthSlotsWarning, padTransform,
                                devTransform);
       }
@@ -715,7 +715,8 @@ void BoardDesignRuleCheck::checkInvalidPadConnections(int progressStart,
   emit progressPercent(progressEnd);
 }
 
-void BoardDesignRuleCheck::processHoleSlotWarning(const Hole& hole,
+template <typename THole>
+void BoardDesignRuleCheck::processHoleSlotWarning(const THole& hole,
                                                   SlotsWarningLevel level,
                                                   const Transform& transform1,
                                                   const Transform& transform2) {
@@ -789,8 +790,9 @@ ClipperLib::Paths BoardDesignRuleCheck::getDeviceCourtyardPaths(
   return paths;
 }
 
+template <typename THole>
 QVector<Path> BoardDesignRuleCheck::getHoleLocation(
-    const Hole& hole, const Transform& transform1,
+    const THole& hole, const Transform& transform1,
     const Transform& transform2) const noexcept {
   return transform2.map(
       transform1.map(hole.getPath())->toOutlineStrokes(hole.getDiameter()));

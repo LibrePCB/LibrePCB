@@ -38,6 +38,7 @@ namespace librepcb {
 
 class BI_Device;
 class GraphicsLayer;
+class HoleGraphicsItem;
 class OriginCrossGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitivePathGraphicsItem;
@@ -61,6 +62,7 @@ public:
   bool isSelectable() const noexcept;
   void setSelected(bool selected) noexcept;
   void updateBoardSide() noexcept;
+  void updateDesignRules() noexcept;
 
   // Inherited from QGraphicsItem
   QRectF boundingRect() const noexcept { return mBoundingRect; }
@@ -82,7 +84,7 @@ private:  // Data
   std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;
   QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mPolygonGraphicsItems;
-  QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mHoleGraphicsItems;
+  QVector<std::shared_ptr<HoleGraphicsItem>> mHoleGraphicsItems;
   QRectF mBoundingRect;
   QPainterPath mShape;
 

@@ -395,13 +395,13 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
   if (fullShape) {
     result.append(mFootprintPad->getGeometry());
   } else if (autoAnnular || minimalAnnular) {
-    for (const Hole& hole : mFootprintPad->getHoles()) {
+    for (const PadHole& hole : mFootprintPad->getHoles()) {
       const UnsignedLength annularWidth = autoAnnular
           ? mBoard.getDesignRules().calcPadAnnularRing(*hole.getDiameter())
           : mBoard.getDesignRules().getPadAnnularRingMin();  // Min. Annular
       result.append(PadGeometry::stroke(
           hole.getDiameter() + annularWidth + annularWidth, hole.getPath(),
-          HoleList{std::make_shared<Hole>(hole)}));
+          PadHoleList{std::make_shared<PadHole>(hole)}));
     }
   }
   return result;

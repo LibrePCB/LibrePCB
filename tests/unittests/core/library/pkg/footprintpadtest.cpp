@@ -102,11 +102,13 @@ TEST_F(FootprintPadTest, testSerializeAndDeserialize) {
       PositiveLength(456), UnsignedLimitedRatio(Ratio::percent50()),
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
       FootprintPad::ComponentSide::Top,
-      HoleList{
-          std::make_shared<Hole>(Uuid::createRandom(), PositiveLength(100000),
-                                 makeNonEmptyPath(Point(100, 200))),
-          std::make_shared<Hole>(Uuid::createRandom(), PositiveLength(200000),
-                                 makeNonEmptyPath(Point(300, 400))),
+      PadHoleList{
+          std::make_shared<PadHole>(Uuid::createRandom(),
+                                    PositiveLength(100000),
+                                    makeNonEmptyPath(Point(100, 200))),
+          std::make_shared<PadHole>(Uuid::createRandom(),
+                                    PositiveLength(200000),
+                                    makeNonEmptyPath(Point(300, 400))),
       });
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);

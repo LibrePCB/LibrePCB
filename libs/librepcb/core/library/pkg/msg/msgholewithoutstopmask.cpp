@@ -17,64 +17,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_PACKAGECHECK_H
-#define LIBREPCB_CORE_PACKAGECHECK_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../libraryelementcheck.h"
+#include "msgholewithoutstopmask.h"
 
-#include <QtCore>
+#include "../footprint.h"
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 
-class Package;
-
 /*******************************************************************************
- *  Class PackageCheck
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The PackageCheck class
- */
-class PackageCheck : public LibraryElementCheck {
-public:
-  // Constructors / Destructor
-  PackageCheck() = delete;
-  PackageCheck(const PackageCheck& other) = delete;
-  explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+MsgHoleWithoutStopMask::MsgHoleWithoutStopMask(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const Hole> hole) noexcept
+  : LibraryElementCheckMessage(
+        Severity::Warning,
+        tr("No stop mask on %1 hole in '%2'",
+           "First placeholder is the hole diameter.")
+            .arg(hole->getDiameter()->toMmString() % "mm",
+                 *footprint->getNames().getDefaultValue()),
+        tr("Non-plated holes should have a stop mask opening to avoid solder "
+           "resist flowing into the hole. An automatic stop mask opening can "
+           "be enabled in the hole properties."),
+        "hole_without_stop_mask"),
+    mFootprint(footprint),
+    mHole(hole) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("hole", hole->getUuid());
+  mApproval.ensureLineBreak();
+}
 
-  // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
-
-  // Operator Overloadings
-  PackageCheck& operator=(const PackageCheck& rhs) = delete;
-
-protected:  // Methods
-  void checkDuplicatePadNames(MsgList& msgs) const;
-  void checkMissingFootprint(MsgList& msgs) const;
-  void checkMissingTexts(MsgList& msgs) const;
-  void checkWrongTextLayers(MsgList& msgs) const;
-  void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
-  void checkPadsAnnularRing(MsgList& msgs) const;
-  void checkPadsConnectionPoint(MsgList& msgs) const;
-  void checkCustomPadOutline(MsgList& msgs) const;
-  void checkHolesStopMask(MsgList& msgs) const;
-
-private:  // Data
-  const Package& mPackage;
-};
+MsgHoleWithoutStopMask::~MsgHoleWithoutStopMask() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace librepcb
-
-#endif

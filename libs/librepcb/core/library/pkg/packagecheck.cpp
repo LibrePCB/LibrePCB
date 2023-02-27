@@ -26,6 +26,7 @@
 #include "../../utils/toolbox.h"
 #include "../../utils/transform.h"
 #include "msg/msgduplicatepadname.h"
+#include "msg/msgholewithoutstopmask.h"
 #include "msg/msginvalidcustompadoutline.h"
 #include "msg/msgmissingfootprint.h"
 #include "msg/msgmissingfootprintname.h"
@@ -73,6 +74,7 @@ LibraryElementCheckMessageList PackageCheck::runChecks() const {
   checkPadsAnnularRing(msgs);
   checkPadsConnectionPoint(msgs);
   checkCustomPadOutline(msgs);
+  checkHolesStopMask(msgs);
   return msgs;
 }
 
@@ -272,7 +274,7 @@ void PackageCheck::checkPadsAnnularRing(MsgList& msgs) const {
       bool emitWarning = false;
       for (auto itHole1 = (*itPad).getHoles().begin();
            itHole1 != (*itPad).getHoles().end(); ++itHole1) {
-        std::shared_ptr<const Hole> hole1 = itHole1.ptr();
+        std::shared_ptr<const PadHole> hole1 = itHole1.ptr();
         const QVector<Path> hole1Paths =
             hole1->getPath()->toOutlineStrokes(hole1->getDiameter());
         const QVector<Path> hole1PathsWithAnnular =
@@ -294,7 +296,7 @@ void PackageCheck::checkPadsAnnularRing(MsgList& msgs) const {
           // So, don't initialize the iterator with begin() but with hole1 + 1.
           auto itHole2 = itHole1;
           for (++itHole2; itHole2 != (*itPad).getHoles().end(); ++itHole2) {
-            std::shared_ptr<const Hole> hole2 = itHole2.ptr();
+            std::shared_ptr<const PadHole> hole2 = itHole2.ptr();
             const QVector<Path> hole2Paths =
                 hole2->getPath()->toOutlineStrokes(hole2->getDiameter());
             const QPainterPath hole2PathPx =
@@ -362,6 +364,20 @@ void PackageCheck::checkCustomPadOutline(MsgList& msgs) const {
                  (!pad->getCustomShapeOutline().getVertices().isEmpty())) {
         msgs.append(std::make_shared<MsgUnusedCustomPadOutline>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkHolesStopMask(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itHole = (*itFtp).getHoles().begin();
+         itHole != (*itFtp).getHoles().end(); ++itHole) {
+      std::shared_ptr<const Hole> hole = itHole.ptr();
+      if (!hole->getStopMaskConfig().isEnabled()) {
+        msgs.append(std::make_shared<MsgHoleWithoutStopMask>(footprint, hole));
       }
     }
   }

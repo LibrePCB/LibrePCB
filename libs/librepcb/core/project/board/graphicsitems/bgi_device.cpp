@@ -24,9 +24,11 @@
 
 #include "../../../library/pkg/footprint.h"
 #include "../board.h"
+#include "../boarddesignrules.h"
 #include "../boardlayerstack.h"
 #include "../items/bi_device.h"
 
+#include <librepcb/core/graphics/holegraphicsitem.h>
 #include <librepcb/core/graphics/origincrossgraphicsitem.h>
 #include <librepcb/core/graphics/primitivecirclegraphicsitem.h>
 #include <librepcb/core/graphics/primitivepathgraphicsitem.h>
@@ -86,16 +88,15 @@ BGI_Device::BGI_Device(BI_Device& device) noexcept
 
   for (auto& obj : mDevice.getLibFootprint().getHoles().values()) {
     Q_ASSERT(obj);
-    auto i = std::make_shared<PrimitivePathGraphicsItem>(this);
-    i->setPath(Path::toQPainterPathPx(
-        obj->getPath()->toOutlineStrokes(obj->getDiameter()), false));
-    i->setLineLayer(getLayer(GraphicsLayer::sBoardDrillsNpth));
+    auto i = std::make_shared<HoleGraphicsItem>(
+        *obj, mDevice.getBoard().getLayerStack(), false, this);
     i->setFlag(QGraphicsItem::ItemIsSelectable, true);
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     mHoleGraphicsItems.append(i);
   }
 
   updateBoardSide();
+  updateDesignRules();
 
   mBoundingRect = childrenBoundingRect();
 }
@@ -116,6 +117,7 @@ void BGI_Device::setSelected(bool selected) noexcept {
   mOriginCrossGraphicsItem->setSelected(selected);
   foreach (const auto& i, mCircleGraphicsItems) { i->setSelected(selected); }
   foreach (const auto& i, mPolygonGraphicsItems) { i->setSelected(selected); }
+  foreach (const auto& i, mHoleGraphicsItems) { i->setSelected(selected); }
   QGraphicsItem::setSelected(selected);
 }
 
@@ -170,6 +172,14 @@ void BGI_Device::updateBoardSide() noexcept {
     } else if (polygons.at(i)->isGrabArea()) {
       mPolygonGraphicsItems.at(i)->setFillLayer(mGrabAreaLayer);
     }
+  }
+}
+
+void BGI_Device::updateDesignRules() noexcept {
+  foreach (const auto& i, mHoleGraphicsItems) {
+    i->setAutoStopMaskOffset(
+        *mDevice.getBoard().getDesignRules().calcStopMaskClearance(
+            *i->getHole().getDiameter()));
   }
 }
 

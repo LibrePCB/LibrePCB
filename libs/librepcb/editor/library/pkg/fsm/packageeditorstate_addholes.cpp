@@ -142,8 +142,9 @@ bool PackageEditorState_AddHoles::processGraphicsSceneLeftMouseButtonPressed(
 bool PackageEditorState_AddHoles::startAddHole(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add hole"));
-    mCurrentHole = std::make_shared<Hole>(Uuid::createRandom(), mLastDiameter,
-                                          makeNonEmptyPath(pos));
+    mCurrentHole =
+        std::make_shared<Hole>(Uuid::createRandom(), mLastDiameter,
+                               makeNonEmptyPath(pos), MaskConfig::automatic());
     mContext.undoStack.appendToCmdGroup(
         new CmdHoleInsert(mContext.currentFootprint->getHoles(), mCurrentHole));
     mEditCmd.reset(new CmdHoleEdit(*mCurrentHole));

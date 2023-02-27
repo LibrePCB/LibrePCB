@@ -496,7 +496,7 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       const FootprintPad& libPad = pad->getLibPad();
       const Transform padTransform(libPad.getPosition(), libPad.getRotation());
-      for (const Hole& hole : libPad.getHoles()) {
+      for (const PadHole& hole : libPad.getHoles()) {
         gen.drill(deviceTransform.map(padTransform.map(hole.getPath())),
                   hole.getDiameter(), true,
                   ExcellonGenerator::Function::ComponentDrill);  // can throw
@@ -601,6 +601,28 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
       }
     }
   }
+
+  // Draw holes.
+  if ((layerName == GraphicsLayer::sTopStopMask) ||
+      (layerName == GraphicsLayer::sBotStopMask)) {
+    foreach (const BI_Hole* hole, mBoard.getHoles()) {
+      if (const tl::optional<Length>& offset = hole->getStopMaskOffset()) {
+        const Length diameter =
+            (*hole->getHole().getDiameter()) + (*offset) + (*offset);
+        const Path path = hole->getHole().getPath()->cleaned();
+        if (diameter > 0) {
+          if (path.getVertices().count() == 1) {
+            gen.flashCircle(path.getVertices().first().getPos(),
+                            PositiveLength(diameter), tl::nullopt, tl::nullopt,
+                            QString(), QString(), QString());
+          } else {
+            gen.drawPathOutline(path, UnsignedLength(diameter), tl::nullopt,
+                                tl::nullopt, QString());
+          }
+        }
+      }
+    }
+  }
 }
 
 void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
@@ -699,6 +721,32 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
       foreach (Path path, transform.map(text->generatePaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             component);
+      }
+    }
+  }
+
+  // Draw holes.
+  if ((layerName == GraphicsLayer::sTopStopMask) ||
+      (layerName == GraphicsLayer::sBotStopMask)) {
+    for (const Hole& hole :
+         device.getLibFootprint().getHoles().sortedByUuid()) {
+      if (hole.getStopMaskConfig().isEnabled()) {
+        const Length offset = hole.getStopMaskConfig().getOffset()
+            ? (*hole.getStopMaskConfig().getOffset())
+            : (*mBoard.getDesignRules().calcStopMaskClearance(
+                  *hole.getDiameter()));
+        const Length diameter = hole.getDiameter() + offset + offset;
+        const Path path = transform.map(hole.getPath()->cleaned());
+        if (diameter > 0) {
+          if (path.getVertices().count() == 1) {
+            gen.flashCircle(path.getVertices().first().getPos(),
+                            PositiveLength(diameter), tl::nullopt, tl::nullopt,
+                            QString(), QString(), QString());
+          } else {
+            gen.drawPathOutline(path, UnsignedLength(diameter), tl::nullopt,
+                                tl::nullopt, QString());
+          }
+        }
       }
     }
   }

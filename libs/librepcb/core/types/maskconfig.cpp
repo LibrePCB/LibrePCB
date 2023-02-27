@@ -20,62 +20,76 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <gtest/gtest.h>
-#include <librepcb/core/geometry/hole.h>
-#include <librepcb/core/serialization/sexpression.h>
+#include "maskconfig.h"
+
+#include "../serialization/sexpression.h"
+
+#include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace tests {
 
 /*******************************************************************************
- *  Test Class
+ *  Constructors / Destructor
  ******************************************************************************/
 
-class HoleTest : public ::testing::Test {};
-
-/*******************************************************************************
- *  Test Methods
- ******************************************************************************/
-
-TEST_F(HoleTest, testConstructFromSExpression) {
-  SExpression sexpr = SExpression::parse(
-      "(hole b9445237-8982-4a9f-af06-bfc6c507e010"
-      " (diameter 0.5) (stop_mask auto)"
-      " (vertex (position 1.234 2.345) (angle 45.0))"
-      ")",
-      FilePath());
-  Hole obj(sexpr);
-  EXPECT_EQ(Uuid::fromString("b9445237-8982-4a9f-af06-bfc6c507e010"),
-            obj.getUuid());
-  EXPECT_EQ(PositiveLength(500000), obj.getDiameter());
-  EXPECT_EQ(1, obj.getPath()->getVertices().count());
-  EXPECT_EQ(Point(1234000, 2345000),
-            obj.getPath()->getVertices().first().getPos());
-  EXPECT_EQ(Angle(45000000), obj.getPath()->getVertices().first().getAngle());
-  EXPECT_EQ(MaskConfig::automatic(), obj.getStopMaskConfig());
+MaskConfig::MaskConfig(bool enabled,
+                       const tl::optional<Length>& offset) noexcept
+  : mEnabled(enabled), mOffset(offset) {
 }
 
-TEST_F(HoleTest, testSerializeAndDeserialize) {
-  Hole obj1(Uuid::createRandom(), PositiveLength(123),
-            NonEmptyPath(Path({Vertex(Point(123, 456), Angle::deg45()),
-                               Vertex(Point(789, 321), Angle::deg0())})),
-            MaskConfig::manual(Length(123456)));
-  SExpression sexpr1 = SExpression::createList("obj");
-  obj1.serialize(sexpr1);
+MaskConfig::MaskConfig(const MaskConfig& other) noexcept
+  : mEnabled(other.mEnabled), mOffset(other.mOffset) {
+}
 
-  Hole obj2(sexpr1);
-  SExpression sexpr2 = SExpression::createList("obj");
-  obj2.serialize(sexpr2);
+MaskConfig::~MaskConfig() noexcept {
+}
 
-  EXPECT_EQ(sexpr1.toByteArray(), sexpr2.toByteArray());
+/*******************************************************************************
+ *  Operator Overloadings
+ ******************************************************************************/
+
+bool MaskConfig::operator==(const MaskConfig& rhs) const noexcept {
+  return (mEnabled == rhs.mEnabled) && (mOffset == rhs.mOffset);
+}
+
+MaskConfig& MaskConfig::operator=(const MaskConfig& rhs) noexcept {
+  mEnabled = rhs.mEnabled;
+  mOffset = rhs.mOffset;
+  return *this;
+}
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const MaskConfig& obj) {
+  if (!obj.isEnabled()) {
+    return SExpression::createToken("off");
+  } else if (tl::optional<Length> offset = obj.getOffset()) {
+    return serialize(*offset);
+  } else {
+    return SExpression::createToken("auto");
+  }
+}
+
+template <>
+MaskConfig deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == "off") {
+    return MaskConfig::off();
+  } else if (str == "auto") {
+    return MaskConfig::automatic();
+  } else {
+    return MaskConfig::manual(deserialize<Length>(node));
+  }
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace tests
 }  // namespace librepcb

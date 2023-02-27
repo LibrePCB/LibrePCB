@@ -32,6 +32,7 @@
 #include "../../library/pkg/footprint.h"
 #include "../project.h"
 #include "board.h"
+#include "boarddesignrules.h"
 #include "boardlayerstack.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
@@ -66,7 +67,7 @@ BoardPainter::BoardPainter(const Board& board)
       Pad padObj;
       padObj.transform = Transform(pad->getLibPad().getPosition(),
                                    pad->getLibPad().getRotation());
-      for (const Hole& hole : pad->getLibPad().getHoles()) {
+      for (const PadHole& hole : pad->getLibPad().getHoles()) {
         padObj.holes.append(hole);
       }
       foreach (GraphicsLayer* layer, board.getLayerStack().getAllLayers()) {
@@ -86,7 +87,14 @@ BoardPainter::BoardPainter(const Board& board)
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
       fpt.circles.append(circle);
     }
-    for (const Hole& hole : device->getLibFootprint().getHoles()) {
+    for (Hole hole : device->getLibFootprint().getHoles()) {
+      if (hole.getStopMaskConfig().isEnabled() &&
+          (!hole.getStopMaskConfig().getOffset())) {
+        // Calculate stop mask offset now to avoid needing design rules later.
+        hole.setStopMaskConfig(
+            MaskConfig::manual(*board.getDesignRules().calcStopMaskClearance(
+                *hole.getDiameter())));
+      }
       fpt.holes.append(hole);
     }
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
@@ -108,7 +116,13 @@ BoardPainter::BoardPainter(const Board& board)
     mStrokeTexts.append(copy);
   }
   foreach (const BI_Hole* hole, board.getHoles()) {
-    mHoles.append(hole->getHole());
+    Hole holeObj = hole->getHole();
+    if (holeObj.getStopMaskConfig().isEnabled() &&
+        (!holeObj.getStopMaskConfig().getOffset())) {
+      // Calculate stop mask offset now to avoid needing design rules later.
+      holeObj.setStopMaskConfig(MaskConfig::manual(*hole->getStopMaskOffset()));
+    }
+    mHoles.append(holeObj);
   }
   foreach (const BI_NetSegment* segment, board.getNetSegments()) {
     for (const BI_Via* via : segment->getVias()) {
@@ -244,6 +258,15 @@ void BoardPainter::initContentByLayer() const noexcept {
       foreach (Hole hole, footprint.holes) {
         hole.setPath(NonEmptyPath(footprint.transform.map(hole.getPath())));
         mContentByLayer[GraphicsLayer::sBoardDrillsNpth].holes.append(hole);
+        PadGeometry geometry =
+            PadGeometry::stroke(hole.getDiameter(), hole.getPath(), {});
+        if (hole.getStopMaskConfig().isEnabled() &&
+            hole.getStopMaskConfig().getOffset()) {
+          geometry = geometry.withOffset(*hole.getStopMaskConfig().getOffset());
+        }
+        const QPainterPath stopMask = geometry.toFilledQPainterPathPx();
+        mContentByLayer[GraphicsLayer::sTopStopMask].areas.append(stopMask);
+        mContentByLayer[GraphicsLayer::sBotStopMask].areas.append(stopMask);
       }
 
       // Footprint pads.
@@ -263,10 +286,11 @@ void BoardPainter::initContentByLayer() const noexcept {
           }
         }
         // Also add the holes for THT pads.
-        for (const Hole& hole : pad.holes) {
+        for (const PadHole& hole : pad.holes) {
           mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(
               Hole(hole.getUuid(), hole.getDiameter(),
-                   footprint.transform.map(pad.transform.map(hole.getPath()))));
+                   footprint.transform.map(pad.transform.map(hole.getPath())),
+                   MaskConfig::off()));
         }
       }
     }
@@ -297,6 +321,15 @@ void BoardPainter::initContentByLayer() const noexcept {
     // Holes.
     foreach (const Hole& hole, mHoles) {
       mContentByLayer[GraphicsLayer::sBoardDrillsNpth].holes.append(hole);
+      PadGeometry geometry =
+          PadGeometry::stroke(hole.getDiameter(), hole.getPath(), {});
+      if (hole.getStopMaskConfig().isEnabled() &&
+          hole.getStopMaskConfig().getOffset()) {
+        geometry = geometry.withOffset(*hole.getStopMaskConfig().getOffset());
+      }
+      const QPainterPath stopMask = geometry.toFilledQPainterPathPx();
+      mContentByLayer[GraphicsLayer::sTopStopMask].areas.append(stopMask);
+      mContentByLayer[GraphicsLayer::sBotStopMask].areas.append(stopMask);
     }
 
     // Texts.
