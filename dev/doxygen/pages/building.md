@@ -89,6 +89,15 @@ pass the `BUILD_DISALLOW_WARNINGS` parameter to CMake:
 
   cmake .. -DBUILD_DISALLOW_WARNINGS=1
 
+## Author Information
+
+For investigating bug reports, it's useful to know where the application binary
+is coming from. Therefore this information can be compiled into the executable
+with the `LIBREPCB_BUILD_AUTHOR` parameter. Its value is then shown in the
+"About LibrePCB" dialog.
+
+  cmake .. -DLIBREPCB_BUILD_AUTHOR="Flathub Buildbot"
+
 ## Shared Resources Path
 
 The share directory contains icons, fonts, templates and more resources that

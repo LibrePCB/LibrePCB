@@ -73,6 +73,7 @@ public:
   }
   const QString& getGitRevision() const noexcept { return mGitRevision; }
   const QDateTime& getBuildDate() const noexcept { return mBuildDate; }
+  const QString& getBuildAuthor() const noexcept { return mBuildAuthor; }
   const Version& getFileFormatVersion() const noexcept {
     return mFileFormatVersion;
   }
@@ -115,6 +116,7 @@ private:  // Data
   QString mAppVersionLabel;
   QString mGitRevision;
   QDateTime mBuildDate;
+  QString mBuildAuthor;
   Version mFileFormatVersion;
   bool mIsFileFormatStable;
   FilePath mResourcesDir;

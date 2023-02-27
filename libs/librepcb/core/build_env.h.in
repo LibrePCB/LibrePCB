@@ -32,6 +32,9 @@
 // Commit information
 #define GIT_COMMIT_SHA "@GIT_COMMIT_SHA@"
 
+// Build information
+#define LIBREPCB_BUILD_AUTHOR "@LIBREPCB_BUILD_AUTHOR@"
+
 // Directories
 #define LIBREPCB_SHARE "@LIBREPCB_SHARE@"
 #cmakedefine LIBREPCB_SHARE_SOURCE "@LIBREPCB_SHARE_SOURCE@"

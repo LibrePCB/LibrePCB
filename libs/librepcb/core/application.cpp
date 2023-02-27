@@ -46,6 +46,8 @@ Application::Application(int& argc, char** argv) noexcept
         Version::fromString(QString(LIBREPCB_APP_VERSION).section('-', 0, 0))),
     mAppVersionLabel(QString(LIBREPCB_APP_VERSION).section('-', 1, 1)),
     mGitRevision(GIT_COMMIT_SHA),
+    mBuildDate(),
+    mBuildAuthor(LIBREPCB_BUILD_AUTHOR),
     mFileFormatVersion(Version::fromString(LIBREPCB_FILE_FORMAT_VERSION)),
     mIsFileFormatStable(LIBREPCB_FILE_FORMAT_STABLE) {
   // register meta types
