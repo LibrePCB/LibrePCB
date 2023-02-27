@@ -186,6 +186,30 @@ const StrokeFont& Application::getDefaultStrokeFont() const noexcept {
   }
 }
 
+QString Application::detectRuntime() const noexcept {
+  // Manually specified runtime has priority.
+  static QString envRuntime = qgetenv("LIBREPCB_RUNTIME").trimmed();
+  if (!envRuntime.isEmpty()) {
+    return envRuntime;
+  }
+
+  // Combine any other autodetected runtime, just in case multiple are set.
+  QStringList runtimes;
+  static QString envSnap = qgetenv("SNAP").trimmed();
+  if (!envSnap.isEmpty()) {
+    runtimes << "Snap";
+  }
+  static QString envFlatpak = qgetenv("FLATPAK_ID").trimmed();
+  if (!envFlatpak.isEmpty()) {
+    runtimes << "Flatpak";
+  }
+  static QString envAppimage = qgetenv("APPIMAGE").trimmed();
+  if (!envAppimage.isEmpty()) {
+    runtimes << "AppImage";
+  }
+  return runtimes.join(", ");
+}
+
 /*******************************************************************************
  *  Setters
  ******************************************************************************/

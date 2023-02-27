@@ -108,6 +108,9 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
   details << "Operating System: " + QSysInfo::prettyProductName();
   details << "Platform Plugin:  " + qApp->platformName();
   details << "TLS Library:      " + QSslSocket::sslLibraryVersionString();
+  if (!qApp->detectRuntime().isEmpty()) {
+    details << "Runtime:          " + qApp->detectRuntime();
+  }
   mUi->txtDetails->setPlainText(details.join("\n"));
 }
 
