@@ -3,6 +3,12 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC OFF)
 set(CMAKE_AUTORCC OFF)
 
+# Allow specifying the author of the build to help investigating bug reports.
+set(LIBREPCB_BUILD_AUTHOR
+    ""
+    CACHE STRING "Author of this build."
+)
+
 # Allow overriding the share directory path
 set(LIBREPCB_SHARE
     "../share/librepcb"

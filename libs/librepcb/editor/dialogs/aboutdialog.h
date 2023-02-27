@@ -33,6 +33,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class WorkspaceSettings;
+
 namespace editor {
 
 namespace Ui {
@@ -53,18 +56,18 @@ public:
   // Constructors / Destructor
   AboutDialog() = delete;
   AboutDialog(const AboutDialog& other) = delete;
-  explicit AboutDialog(QWidget* parent = nullptr) noexcept;
+  explicit AboutDialog(const WorkspaceSettings& settings,
+                       QWidget* parent = nullptr) noexcept;
   ~AboutDialog() noexcept;
 
   // Operator Overloadings
   AboutDialog& operator=(const AboutDialog& rhs) = delete;
 
 private:  // Methods
-  void formatLabelHeading(QLabel* label) noexcept;
-  void formatLabelText(QLabel* label, bool selectable,
-                       bool containsLinks) noexcept;
+  void openExternalLink(const QString& url) noexcept;
 
 private:  // Data
+  const WorkspaceSettings& mSettings;
   QScopedPointer<Ui::AboutDialog> mUi;
 };
 

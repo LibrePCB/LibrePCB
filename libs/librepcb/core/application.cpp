@@ -46,6 +46,8 @@ Application::Application(int& argc, char** argv) noexcept
         Version::fromString(QString(LIBREPCB_APP_VERSION).section('-', 0, 0))),
     mAppVersionLabel(QString(LIBREPCB_APP_VERSION).section('-', 1, 1)),
     mGitRevision(GIT_COMMIT_SHA),
+    mBuildDate(),
+    mBuildAuthor(LIBREPCB_BUILD_AUTHOR),
     mFileFormatVersion(Version::fromString(LIBREPCB_FILE_FORMAT_VERSION)),
     mIsFileFormatStable(LIBREPCB_FILE_FORMAT_STABLE) {
   // register meta types
@@ -182,6 +184,30 @@ const StrokeFont& Application::getDefaultStrokeFont() const noexcept {
     // Abort the application!!!
     qFatal("Default stroke font could not be loaded, terminating application!");
   }
+}
+
+QString Application::detectRuntime() const noexcept {
+  // Manually specified runtime has priority.
+  static QString envRuntime = qgetenv("LIBREPCB_RUNTIME").trimmed();
+  if (!envRuntime.isEmpty()) {
+    return envRuntime;
+  }
+
+  // Combine any other autodetected runtime, just in case multiple are set.
+  QStringList runtimes;
+  static QString envSnap = qgetenv("SNAP").trimmed();
+  if (!envSnap.isEmpty()) {
+    runtimes << "Snap";
+  }
+  static QString envFlatpak = qgetenv("FLATPAK_ID").trimmed();
+  if (!envFlatpak.isEmpty()) {
+    runtimes << "Flatpak";
+  }
+  static QString envAppimage = qgetenv("APPIMAGE").trimmed();
+  if (!envAppimage.isEmpty()) {
+    runtimes << "AppImage";
+  }
+  return runtimes.join(", ");
 }
 
 /*******************************************************************************

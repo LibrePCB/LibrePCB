@@ -27,7 +27,8 @@ echo "Using CC=$CC"
 mkdir -p build && pushd build
 cmake .. \
   -DCMAKE_INSTALL_PREFIX=$(pwd)/install/opt \
-  -DBUILD_DISALLOW_WARNINGS=1
+  -DBUILD_DISALLOW_WARNINGS=1 \
+  -DLIBREPCB_BUILD_AUTHOR="LibrePCB CI"
 VERBOSE=1 $MAKE -j8
 $MAKE install
 popd
