@@ -122,7 +122,6 @@ public:
   GraphicsScene& getGraphicsScene() const noexcept { return *mGraphicsScene; }
   BoardLayerStack& getLayerStack() noexcept { return *mLayerStack; }
   const BoardLayerStack& getLayerStack() const noexcept { return *mLayerStack; }
-  BoardDesignRules& getDesignRules() noexcept { return *mDesignRules; }
   const BoardDesignRules& getDesignRules() const noexcept {
     return *mDesignRules;
   }
@@ -162,6 +161,7 @@ public:
     mGridInterval = interval;
   }
   void setGridUnit(const LengthUnit& unit) noexcept { mGridUnit = unit; }
+  void setDesignRules(const BoardDesignRules& rules) noexcept;
 
   // DeviceInstance Methods
   const QMap<Uuid, BI_Device*>& getDeviceInstances() const noexcept {

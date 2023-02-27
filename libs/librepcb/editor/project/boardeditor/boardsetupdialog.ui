@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>librepcb::editor::BoardSetupDialog</class>
+ <widget class="QDialog" name="librepcb::editor::BoardSetupDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>642</width>
+    <height>387</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Board Setup</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabGeneral">
+      <attribute name="title">
+       <string>General</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Name:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="edtBoardName">
+         <property name="maxLength">
+          <number>255</number>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Inner Copper Layers:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QSpinBox" name="spbxInnerCopperLayerCount">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="maximum">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabDesignRules">
+      <attribute name="title">
+       <string>Design Rules</string>
+      </attribute>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="2">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Ratio (% of Diameter)</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRulesSolderPasteClrRatio" native="true"/>
+       </item>
+       <item row="2" column="3">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesStopMaskClrMax" native="true"/>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Vias Annular Ring:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>Inner Layer Pads:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0" colspan="4">
+        <widget class="QLabel" name="label_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Note: These settings define the shape of board objects which are automatically generated (e.g. stop masks, where not manually overridden). They are not related to the design rule check (DRC) at all. In contrast to these settings, DRC parameters do not have any impact on the board.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Solder Paste Clearance:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="3">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesViaAnnularRingMax" native="true"/>
+       </item>
+       <item row="4" column="1" colspan="3">
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QRadioButton" name="rbtnRulesCmpSidePadFullShape">
+           <property name="text">
+            <string>Full Shape</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupRulesCmpSidePadShape</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnRulesCmpSidePadAutoAnnular">
+           <property name="text">
+            <string>Automatic Annular Ring</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupRulesCmpSidePadShape</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblRulesCmpSidePadWarning">
+           <property name="minimumSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>&lt;b&gt;Use with caution!&lt;/b&gt; If automatic annular rings are enabled for component-side pads, make sure all pads have set the 'component side' property to the correct value. With a wrong configuration, soldering may not be possible due to too small pad area.</string>
+           </property>
+           <property name="text">
+            <string notr="true"/>
+           </property>
+           <property name="pixmap">
+            <pixmap>:/img/status/dialog_warning.png</pixmap>
+           </property>
+           <property name="scaledContents">
+            <bool>true</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="openExternalLinks">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item row="6" column="2">
+        <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRulesPadAnnularRingRatio" native="true"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesStopMaskClrMin" native="true"/>
+       </item>
+       <item row="5" column="1" colspan="3">
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,1">
+         <item>
+          <widget class="QRadioButton" name="rbtnRulesInnerPadFullShape">
+           <property name="text">
+            <string>Full Shape</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupRulesInnerPadShape</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnRulesInnerPadAutoAnnular">
+           <property name="text">
+            <string>Automatic Annular Ring</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupRulesInnerPadShape</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Autom. Pads Annular Ring:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Stop Mask Clearance:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Maximum</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2">
+        <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRulesViaAnnularRingRatio" native="true"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>Component Side Pads:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesSolderPasteClrMax" native="true"/>
+       </item>
+       <item row="6" column="3">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesPadAnnularRingMax" native="true"/>
+       </item>
+       <item row="3" column="1">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesSolderPasteClrMin" native="true"/>
+       </item>
+       <item row="2" column="2">
+        <widget class="librepcb::editor::UnsignedRatioEdit" name="edtRulesStopMaskClrRatio" native="true"/>
+       </item>
+       <item row="7" column="1">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesViaAnnularRingMin" native="true"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Minimum</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesPadAnnularRingMin" native="true"/>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="toolTip">
+          <string>Vias with a drill diameter up to this diameter will be covered with solder resist (if not manually overridden). For larger vias, a stop mask opening is added.</string>
+         </property>
+         <property name="text">
+          <string>Tented Vias Diameter:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="3">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtRulesStopMaskMaxViaDia" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>librepcb::editor::UnsignedLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::UnsignedRatioEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/unsignedratioedit.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>edtBoardName</tabstop>
+  <tabstop>spbxInnerCopperLayerCount</tabstop>
+  <tabstop>edtRulesStopMaskClrMin</tabstop>
+  <tabstop>edtRulesStopMaskClrRatio</tabstop>
+  <tabstop>edtRulesStopMaskClrMax</tabstop>
+  <tabstop>edtRulesSolderPasteClrMin</tabstop>
+  <tabstop>edtRulesSolderPasteClrRatio</tabstop>
+  <tabstop>edtRulesSolderPasteClrMax</tabstop>
+  <tabstop>rbtnRulesCmpSidePadFullShape</tabstop>
+  <tabstop>rbtnRulesCmpSidePadAutoAnnular</tabstop>
+  <tabstop>rbtnRulesInnerPadFullShape</tabstop>
+  <tabstop>rbtnRulesInnerPadAutoAnnular</tabstop>
+  <tabstop>edtRulesPadAnnularRingMin</tabstop>
+  <tabstop>edtRulesPadAnnularRingRatio</tabstop>
+  <tabstop>edtRulesPadAnnularRingMax</tabstop>
+  <tabstop>edtRulesViaAnnularRingMin</tabstop>
+  <tabstop>edtRulesViaAnnularRingRatio</tabstop>
+  <tabstop>edtRulesViaAnnularRingMax</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+ <buttongroups>
+  <buttongroup name="btnGroupRulesInnerPadShape"/>
+  <buttongroup name="btnGroupRulesCmpSidePadShape"/>
+ </buttongroups>
+</ui>

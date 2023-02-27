@@ -26,7 +26,6 @@
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
 #include "../../project/cmd/cmdboardadd.h"
-#include "../../project/cmd/cmdboarddesignrulesmodify.h"
 #include "../../project/cmd/cmdboardremove.h"
 #include "../../undostack.h"
 #include "../../utils/exclusiveactiongroup.h"
@@ -43,10 +42,9 @@
 #include "../projectpropertieseditordialog.h"
 #include "boarddesignrulecheckdialog.h"
 #include "boarddesignrulecheckmessagesdock.h"
-#include "boarddesignrulesdialog.h"
 #include "boardlayersdock.h"
-#include "boardlayerstacksetupdialog.h"
 #include "boardpickplacegeneratordialog.h"
+#include "boardsetupdialog.h"
 #include "fabricationoutputdialog.h"
 #include "fsm/boardeditorfsm.h"
 #include "unplacedcomponentsdock.h"
@@ -380,20 +378,13 @@ void BoardEditor::createActions() noexcept {
         emit mProjectEditor.openProjectLibraryUpdaterClicked(
             mProject.getFilepath());
       }));
-  mActionLayerStack.reset(cmd.layerStack.createAction(this, this, [this]() {
-    try {
-      if (Board* board = getActiveBoard()) {
-        abortBlockingToolsInOtherEditors();  // Release undo stack.
-        BoardLayerStackSetupDialog dialog(board->getLayerStack(),
-                                          mProjectEditor.getUndoStack(), this);
-        dialog.exec();
-      }
-    } catch (Exception& e) {
-      QMessageBox::warning(this, tr("Error"), e.getMsg());
+  mActionBoardSetup.reset(cmd.boardSetup.createAction(this, this, [this]() {
+    if (Board* board = getActiveBoard()) {
+      abortBlockingToolsInOtherEditors();  // Release undo stack.
+      BoardSetupDialog dialog(*board, mProjectEditor.getUndoStack(), this);
+      dialog.exec();
     }
   }));
-  mActionDesignRules.reset(cmd.designRules.createAction(
-      this, this, &BoardEditor::execDesignRulesDialog));
   mActionDesignRuleCheck.reset(cmd.designRuleCheck.createAction(
       this, this, &BoardEditor::execDesignRuleCheckDialog));
   mActionImportDxf.reset(cmd.importDxf.createAction(
@@ -845,9 +836,8 @@ void BoardEditor::createMenus() noexcept {
 
   // Board.
   mMenuBoard = mb.newMenu(&MenuBuilder::createBoardMenu);
-  mb.addAction(mActionLayerStack);
+  mb.addAction(mActionBoardSetup);
   mb.addSeparator();
-  mb.addAction(mActionDesignRules);
   mb.addAction(mActionDesignRuleCheck);
   mb.addSeparator();
   mb.addAction(mActionRebuildPlanes);
@@ -1251,33 +1241,6 @@ void BoardEditor::execGridPropertiesDialog() noexcept {
       setGridProperties(dialog.getInterval(), dialog.getUnit(),
                         dialog.getStyle(), true);
     }
-  }
-}
-
-void BoardEditor::execDesignRulesDialog() noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return;
-
-  try {
-    abortBlockingToolsInOtherEditors();  // Release undo stack.
-    BoardDesignRules originalRules = board->getDesignRules();
-    BoardDesignRulesDialog dialog(board->getDesignRules(),
-                                  mProjectEditor.getDefaultLengthUnit(),
-                                  "board_editor/design_rules_dialog", this);
-    connect(&dialog, &BoardDesignRulesDialog::rulesChanged,
-            [&](const BoardDesignRules& rules) {
-              board->getDesignRules() = rules;
-              emit board->attributesChanged();
-            });
-    int result = dialog.exec();
-    board->getDesignRules() = originalRules;  // important hack ;)
-    if (result == QDialog::Accepted) {
-      CmdBoardDesignRulesModify* cmd =
-          new CmdBoardDesignRulesModify(*board, dialog.getDesignRules());
-      mProjectEditor.getUndoStack().execCmd(cmd);
-    }
-  } catch (Exception& e) {
-    QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
 }
 

@@ -185,6 +185,15 @@ QList<BI_Base*> Board::getAllItems() const noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void Board::setDesignRules(const BoardDesignRules& rules) noexcept {
+  *mDesignRules = rules;
+  emit attributesChanged();
+}
+
+/*******************************************************************************
  *  DeviceInstance Methods
  ******************************************************************************/
 

@@ -61,6 +61,18 @@ void UnsignedLengthEdit::setValue(const UnsignedLength& value) noexcept {
   setValueImpl(*value);
 }
 
+void UnsignedLengthEdit::clipToMinimum(const UnsignedLength& value) noexcept {
+  if (mValue < *value) {
+    setValueImpl(*value);
+  }
+}
+
+void UnsignedLengthEdit::clipToMaximum(const UnsignedLength& value) noexcept {
+  if (mValue > *value) {
+    setValueImpl(*value);
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

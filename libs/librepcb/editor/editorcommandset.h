@@ -288,22 +288,13 @@ public:
       {QKeySequence(Qt::Key_F4)},
       &categoryEditor,
   };
-  EditorCommand layerStack{
-      "layer_stack",  // clang-format break
-      QT_TR_NOOP("Layer Stack"),
-      QT_TR_NOOP("View/modify the board layer stack setup"),
-      QIcon(),
+  EditorCommand boardSetup{
+      "board_setup",  // clang-format break
+      QT_TR_NOOP("Board Setup"),
+      QT_TR_NOOP("View/modify the board setup"),
+      QIcon(":/img/actions/settings.png"),
       EditorCommand::Flag::OpensPopup,
       {QKeySequence(Qt::Key_F6)},
-      &categoryEditor,
-  };
-  EditorCommand designRules{
-      "design_rules",  // clang-format break
-      QT_TR_NOOP("Design Rules"),
-      QT_TR_NOOP("View/modify the board design rules"),
-      QIcon(),
-      EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::Key_F7)},
       &categoryEditor,
   };
   EditorCommand designRuleCheck{

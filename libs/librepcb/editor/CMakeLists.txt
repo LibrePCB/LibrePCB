@@ -351,18 +351,12 @@ add_library(
   project/boardeditor/boarddesignrulecheckmessagesdock.cpp
   project/boardeditor/boarddesignrulecheckmessagesdock.h
   project/boardeditor/boarddesignrulecheckmessagesdock.ui
-  project/boardeditor/boarddesignrulesdialog.cpp
-  project/boardeditor/boarddesignrulesdialog.h
-  project/boardeditor/boarddesignrulesdialog.ui
   project/boardeditor/boardeditor.cpp
   project/boardeditor/boardeditor.h
   project/boardeditor/boardeditor.ui
   project/boardeditor/boardlayersdock.cpp
   project/boardeditor/boardlayersdock.h
   project/boardeditor/boardlayersdock.ui
-  project/boardeditor/boardlayerstacksetupdialog.cpp
-  project/boardeditor/boardlayerstacksetupdialog.h
-  project/boardeditor/boardlayerstacksetupdialog.ui
   project/boardeditor/boardnetsegmentsplitter.cpp
   project/boardeditor/boardnetsegmentsplitter.h
   project/boardeditor/boardpickplacegeneratordialog.cpp
@@ -371,6 +365,9 @@ add_library(
   project/boardeditor/boardplanepropertiesdialog.cpp
   project/boardeditor/boardplanepropertiesdialog.h
   project/boardeditor/boardplanepropertiesdialog.ui
+  project/boardeditor/boardsetupdialog.cpp
+  project/boardeditor/boardsetupdialog.h
+  project/boardeditor/boardsetupdialog.ui
   project/boardeditor/boardviapropertiesdialog.cpp
   project/boardeditor/boardviapropertiesdialog.h
   project/boardeditor/boardviapropertiesdialog.ui
@@ -419,14 +416,12 @@ add_library(
   project/cmd/cmdaddsymboltoschematic.h
   project/cmd/cmdboardadd.cpp
   project/cmd/cmdboardadd.h
-  project/cmd/cmdboarddesignrulesmodify.cpp
-  project/cmd/cmdboarddesignrulesmodify.h
+  project/cmd/cmdboardedit.cpp
+  project/cmd/cmdboardedit.h
   project/cmd/cmdboardholeadd.cpp
   project/cmd/cmdboardholeadd.h
   project/cmd/cmdboardholeremove.cpp
   project/cmd/cmdboardholeremove.h
-  project/cmd/cmdboardlayerstackedit.cpp
-  project/cmd/cmdboardlayerstackedit.h
   project/cmd/cmdboardnetlineedit.cpp
   project/cmd/cmdboardnetlineedit.h
   project/cmd/cmdboardnetpointedit.cpp

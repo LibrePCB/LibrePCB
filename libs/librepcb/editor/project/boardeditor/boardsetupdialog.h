@@ -17,61 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDBOARDLAYERSTACKEDIT_H
-#define LIBREPCB_EDITOR_CMDBOARDLAYERSTACKEDIT_H
+#ifndef LIBREPCB_EDITOR_BOARDSETUPDIALOG_H
+#define LIBREPCB_EDITOR_BOARDSETUPDIALOG_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommand.h"
-
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class BoardLayerStack;
+class Board;
 
 namespace editor {
 
+class UndoStack;
+
+namespace Ui {
+class BoardSetupDialog;
+}
+
 /*******************************************************************************
- *  Class CmdBoardLayerStackEdit
+ *  Class BoardSetupDialog
  ******************************************************************************/
 
 /**
- * @brief The CmdBoardLayerStackEdit class
+ * @brief The BoardSetupDialog class
  */
-class CmdBoardLayerStackEdit final : public UndoCommand {
+class BoardSetupDialog final : public QDialog {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  CmdBoardLayerStackEdit() = delete;
-  CmdBoardLayerStackEdit(const CmdBoardLayerStackEdit& other) = delete;
-  CmdBoardLayerStackEdit(BoardLayerStack& layerStack) noexcept;
-  ~CmdBoardLayerStackEdit() noexcept;
+  BoardSetupDialog() = delete;
+  BoardSetupDialog(const BoardSetupDialog& other) = delete;
+  BoardSetupDialog(Board& board, UndoStack& undoStack,
+                   QWidget* parent = 0) noexcept;
+  ~BoardSetupDialog();
 
-  // Setters
-  void setInnerLayerCount(int count) noexcept;
+  // Operator Overloadings
+  BoardSetupDialog& operator=(const BoardSetupDialog& rhs) = delete;
 
-private:
-  // Private Methods
+private:  // Methods
+  void buttonBoxClicked(QAbstractButton* button);
+  void load() noexcept;
+  bool apply() noexcept;
 
-  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  bool performExecute() override;
+private:  // Date
+  Board& mBoard;
+  UndoStack& mUndoStack;
+  QScopedPointer<Ui::BoardSetupDialog> mUi;
 
-  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  void performUndo() override;
-
-  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  void performRedo() override;
-
-  // Attributes from the constructor
-  BoardLayerStack& mLayerStack;
-
-  // General Attributes
-  int mOldInnerLayerCount;
-  int mNewInnerLayerCount;
+  static const QString sSettingsPrefix;
 };
 
 /*******************************************************************************
