@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>286</width>
+    <width>294</width>
     <height>412</height>
    </rect>
   </property>
@@ -43,6 +43,18 @@
       </property>
       <item>
        <widget class="QCheckBox" name="cbxCenterInView">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>18</height>
+         </size>
+        </property>
         <property name="text">
          <string>Zoom to location</string>
         </property>
@@ -53,6 +65,18 @@
       </item>
       <item>
        <widget class="QProgressBar" name="prgProgress">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>18</height>
+         </size>
+        </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>
@@ -62,7 +86,71 @@
        </widget>
       </item>
       <item>
+       <widget class="QToolButton" name="btnRunQuickCheck">
+        <property name="minimumSize">
+         <size>
+          <width>18</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>18</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Run Quick Check</string>
+        </property>
+        <property name="text">
+         <string notr="true"/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/img/actions/quick_check.png</normaloff>:/img/actions/quick_check.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnRunDrc">
+        <property name="minimumSize">
+         <size>
+          <width>18</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>18</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>Run DRC</string>
+        </property>
+        <property name="text">
+         <string notr="true"/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/img/actions/drc.png</normaloff>:/img/actions/drc.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="btnSettings">
+        <property name="minimumSize">
+         <size>
+          <width>18</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>18</width>
+          <height>18</height>
+         </size>
+        </property>
         <property name="toolTip">
          <string>Open DRC Settings</string>
         </property>
@@ -72,20 +160,6 @@
         <property name="icon">
          <iconset>
           <normaloff>:/img/actions/settings.png</normaloff>:/img/actions/settings.png</iconset>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="btnRun">
-        <property name="toolTip">
-         <string>Run DRC</string>
-        </property>
-        <property name="text">
-         <string notr="true"/>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/img/actions/refresh.png</normaloff>:/img/actions/refresh.png</iconset>
         </property>
        </widget>
       </item>

@@ -76,6 +76,7 @@ public:
 signals:
   void settingsDialogRequested();
   void runDrcRequested();
+  void runQuickCheckRequested();
   void messageSelected(const BoardDesignRuleCheckMessage& msg, bool zoomTo);
 
 private:  // Methods

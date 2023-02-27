@@ -297,6 +297,15 @@ public:
       {QKeySequence(Qt::Key_F6)},
       &categoryEditor,
   };
+  EditorCommand runQuickCheck{
+      "run_quick_check",  // clang-format break
+      QT_TR_NOOP("Run Quick Check"),
+      QT_TR_NOOP("Run only the most important copper checks from the DRC"),
+      QIcon(":/img/actions/quick_check.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::SHIFT + Qt::Key_F8)},
+      &categoryEditor,
+  };
   EditorCommand runDesignRuleCheck{
       "run_design_rule_check",  // clang-format break
       QT_TR_NOOP("Run Design Rule Check"),

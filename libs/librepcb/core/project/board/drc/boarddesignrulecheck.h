@@ -69,7 +69,7 @@ public:
   }
 
   // General Methods
-  void execute();
+  void execute(bool quick);
 
 signals:
   void started();
@@ -122,6 +122,7 @@ private:  // Methods
 private:  // Data
   Board& mBoard;
   const BoardDesignRuleCheckSettings& mSettings;
+  bool mIgnorePlanes;
   int mProgressPercent;
   QStringList mProgressStatus;
   QList<BoardDesignRuleCheckMessage> mMessages;

@@ -121,7 +121,8 @@ void BoardClipperPathGenerator::addHoles(const Length& offset) {
 }
 
 void BoardClipperPathGenerator::addCopper(
-    const QString& layerName, const QSet<const NetSignal*>& netsignals) {
+    const QString& layerName, const QSet<const NetSignal*>& netsignals,
+    bool ignorePlanes) {
   // polygons
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     if (polygon->getPolygon().getLayerName() != layerName) {
@@ -170,17 +171,19 @@ void BoardClipperPathGenerator::addCopper(
   }
 
   // planes
-  foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-    if (plane->getLayerName() != layerName) {
-      continue;
-    }
-    if ((!netsignals.isEmpty()) &&
-        (!netsignals.contains(&plane->getNetSignal()))) {
-      continue;
-    }
-    foreach (const Path& p, plane->getFragments()) {
-      ClipperHelpers::unite(mPaths,
-                            ClipperHelpers::convert(p, mMaxArcTolerance));
+  if (!ignorePlanes) {
+    foreach (const BI_Plane* plane, mBoard.getPlanes()) {
+      if (plane->getLayerName() != layerName) {
+        continue;
+      }
+      if ((!netsignals.isEmpty()) &&
+          (!netsignals.contains(&plane->getNetSignal()))) {
+        continue;
+      }
+      foreach (const Path& p, plane->getFragments()) {
+        ClipperHelpers::unite(mPaths,
+                              ClipperHelpers::convert(p, mMaxArcTolerance));
+      }
     }
   }
 

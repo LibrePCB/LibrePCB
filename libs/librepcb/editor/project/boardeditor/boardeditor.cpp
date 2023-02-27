@@ -381,8 +381,10 @@ void BoardEditor::createActions() noexcept {
       }));
   mActionBoardSetup.reset(cmd.boardSetup.createAction(
       this, this, &BoardEditor::execBoardSetupDialog));
-  mActionRunDesignRuleCheck.reset(
-      cmd.runDesignRuleCheck.createAction(this, this, &BoardEditor::runDrc));
+  mActionRunQuickCheck.reset(
+      cmd.runQuickCheck.createAction(this, this, [this]() { runDrc(true); }));
+  mActionRunDesignRuleCheck.reset(cmd.runDesignRuleCheck.createAction(
+      this, this, [this]() { runDrc(false); }));
   mActionImportDxf.reset(cmd.importDxf.createAction(
       this, mFsm.data(), &BoardEditorFsm::processImportDxf));
   mActionExportLppz.reset(cmd.exportLppz.createAction(
@@ -702,6 +704,7 @@ void BoardEditor::createToolBars() noexcept {
   mToolBarTools->addSeparator();
   mToolBarTools->addAction(mActionToolMeasure.data());
   mToolBarTools->addAction(mActionRebuildPlanes.data());
+  mToolBarTools->addAction(mActionRunQuickCheck.data());
   mToolBarTools->addAction(mActionRunDesignRuleCheck.data());
   addToolBar(Qt::LeftToolBarArea, mToolBarTools.data());
 }
@@ -718,7 +721,7 @@ void BoardEditor::createDockWidgets() noexcept {
   addDockWidget(Qt::RightDockWidgetArea, mDockUnplacedComponents.data(),
                 Qt::Vertical);
 
-  // Layers-
+  // Layers.
   mDockLayers.reset(new BoardLayersDock(*this));
   addDockWidget(Qt::RightDockWidgetArea, mDockLayers.data(), Qt::Vertical);
   tabifyDockWidget(mDockUnplacedComponents.data(), mDockLayers.data());
@@ -734,7 +737,10 @@ void BoardEditor::createDockWidgets() noexcept {
           &BoardDesignRuleCheckMessagesDock::settingsDialogRequested, this,
           [this]() { execBoardSetupDialog(true); });
   connect(mDockDrc.data(), &BoardDesignRuleCheckMessagesDock::runDrcRequested,
-          this, &BoardEditor::runDrc);
+          this, [this]() { runDrc(false); });
+  connect(mDockDrc.data(),
+          &BoardDesignRuleCheckMessagesDock::runQuickCheckRequested, this,
+          [this]() { runDrc(true); });
   connect(mDockDrc.data(), &BoardDesignRuleCheckMessagesDock::messageSelected,
           this, &BoardEditor::highlightDrcMessage);
   addDockWidget(Qt::RightDockWidgetArea, mDockDrc.data());
@@ -835,6 +841,7 @@ void BoardEditor::createMenus() noexcept {
   mb.addAction(mActionBoardSetup);
   mb.addSeparator();
   mb.addAction(mActionRebuildPlanes);
+  mb.addAction(mActionRunQuickCheck);
   mb.addAction(mActionRunDesignRuleCheck);
   mb.addSeparator();
   mb.addAction(mActionNewBoard);
@@ -1022,7 +1029,7 @@ void BoardEditor::unplacedComponentsCountChanged(int count) noexcept {
   mUi->lblUnplacedComponentsNote->setVisible(count > 0);
 }
 
-void BoardEditor::runDrc() noexcept {
+void BoardEditor::runDrc(bool quick) noexcept {
   try {
     Board* board = getActiveBoard();
     if (!board) return;
@@ -1045,7 +1052,7 @@ void BoardEditor::runDrc() noexcept {
             &BoardDesignRuleCheckMessagesDock::setProgressPercent);
     connect(&drc, &BoardDesignRuleCheck::progressStatus, mDockDrc.data(),
             &BoardDesignRuleCheckMessagesDock::setProgressStatus);
-    drc.execute();  // can throw
+    drc.execute(quick);  // can throw
 
     // Update DRC messages.
     clearDrcMarker();

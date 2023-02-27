@@ -43,6 +43,7 @@ actions/plus_2.png icons/png/48x48/actions/edit-add-4.png LGPL-2.1
 actions/plus.png icons/png/48x48/actions/dialog-more.png GPLv2
 actions/print_preview.png icons/png/48x48/actions/document-print-preview-4.png LGPL-2.1
 actions/print.png icons/png/48x48/actions/document-print-5.png CC-BY-SA 3.0 or LGPL
+actions/quick_check.png icons/png/48x48/actions/quickopen.png CC-BY-SA 3.0 or LGPL
 actions/quit.png icons/png/48x48/actions/system-exit.png GPLv2
 actions/recent.png icons/png/48x48/status/appointment-soon.png GPLv2
 actions/redo.png icons/png/48x48/actions/edit-redo-3.png GPLv2
