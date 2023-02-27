@@ -465,6 +465,7 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
                                           ProjectContext& context) {
   upgradeGrid(root);
   upgradeBoardDesignRules(root);
+  upgradeBoardDrcSettings(root);
 
   // Fabrication output settings.
   {
@@ -535,6 +536,26 @@ void FileFormatMigrationV01::upgradeBoardDesignRules(SExpression& root) {
     child.appendChild("outer", SExpression::createToken("full"));
     child.appendChild("inner", SExpression::createToken("full"));
   }
+}
+
+void FileFormatMigrationV01::upgradeBoardDrcSettings(SExpression& root) {
+  SExpression& node = root.appendList("design_rule_check");
+  node.appendChild("min_copper_width", SExpression::createToken("0.2"));
+  node.appendChild("min_copper_copper_clearance",
+                   SExpression::createToken("0.2"));
+  node.appendChild("min_copper_board_clearance",
+                   SExpression::createToken("0.3"));
+  node.appendChild("min_copper_npth_clearance",
+                   SExpression::createToken("0.25"));
+  node.appendChild("min_annular_ring", SExpression::createToken("0.2"));
+  node.appendChild("min_npth_drill_diameter", SExpression::createToken("0.3"));
+  node.appendChild("min_pth_drill_diameter", SExpression::createToken("0.3"));
+  node.appendChild("min_npth_slot_width", SExpression::createToken("1.0"));
+  node.appendChild("min_pth_slot_width", SExpression::createToken("0.7"));
+  node.appendChild("allowed_npth_slots",
+                   SExpression::createToken("single_segment_straight"));
+  node.appendChild("allowed_pth_slots",
+                   SExpression::createToken("single_segment_straight"));
 }
 
 void FileFormatMigrationV01::upgradeGrid(SExpression& node) {

@@ -33,6 +33,7 @@
 #include "board/boarddesignrules.h"
 #include "board/boardfabricationoutputsettings.h"
 #include "board/boardlayerstack.h"
+#include "board/drc/boarddesignrulechecksettings.h"
 #include "board/items/bi_device.h"
 #include "board/items/bi_footprintpad.h"
 #include "board/items/bi_hole.h"
@@ -500,6 +501,8 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   board->getLayerStack().setInnerLayerCount(
       deserialize<uint>(root.getChild("layers/inner/@0")));
   board->setDesignRules(BoardDesignRules(root.getChild("design_rules")));
+  board->setDrcSettings(
+      BoardDesignRuleCheckSettings(root.getChild("design_rule_check")));
   board->getFabricationOutputSettings() = BoardFabricationOutputSettings(
       root.getChild("fabrication_output_settings"));
   p.addBoard(*board);

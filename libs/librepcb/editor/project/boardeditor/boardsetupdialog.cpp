@@ -29,6 +29,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boarddesignrules.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
 
 #include <QtCore>
 
@@ -130,7 +131,53 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   connect(mUi->edtRulesViaAnnularRingMax, &UnsignedLengthEdit::valueChanged,
           mUi->edtRulesViaAnnularRingMin, &UnsignedLengthEdit::clipToMaximum);
 
-  // Load all settings.
+  // Tab: DRC Settings
+  mUi->edtDrcMinCopperWidth->configure(mBoard.getGridUnit(),
+                                       LengthEditBase::Steps::generic(),
+                                       sSettingsPrefix % "/min_copper_width");
+  mUi->edtDrcClearanceCopperCopper->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/clearance_copper_copper");
+  mUi->edtDrcClearanceCopperBoard->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/clearance_copper_board");
+  mUi->edtDrcClearanceCopperNpth->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/clearance_copper_npth");
+  mUi->edtDrcMinPthAnnularRing->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/min_pth_annular_ring");
+  mUi->edtDrcMinNpthDrillDiameter->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
+      sSettingsPrefix % "/min_npth_drill_diameter");
+  mUi->edtDrcMinNpthSlotWidth->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
+      sSettingsPrefix % "/min_npth_slot_width");
+  mUi->edtDrcMinPthDrillDiameter->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
+      sSettingsPrefix % "/min_pth_drill_diameter");
+  mUi->edtDrcMinPthSlotWidth->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
+      sSettingsPrefix % "/min_pth_slot_width");
+  for (QComboBox* cbx :
+       {mUi->cbxDrcAllowedNpthSlots, mUi->cbxDrcAllowedPthSlots}) {
+    cbx->addItem(
+        tr("None"),
+        QVariant::fromValue(BoardDesignRuleCheckSettings::AllowedSlots::None));
+    cbx->addItem(
+        tr("Only Simple Oblongs"),
+        QVariant::fromValue(
+            BoardDesignRuleCheckSettings::AllowedSlots::SingleSegmentStraight));
+    cbx->addItem(
+        tr("Any Without Curves"),
+        QVariant::fromValue(
+            BoardDesignRuleCheckSettings::AllowedSlots::MultiSegmentStraight));
+    cbx->addItem(
+        tr("Any"),
+        QVariant::fromValue(BoardDesignRuleCheckSettings::AllowedSlots::Any));
+  }
+
+  // Load all s.
   load();
 
   // Load the window geometry.
@@ -146,6 +193,14 @@ BoardSetupDialog::~BoardSetupDialog() {
   // Save the window geometry.
   QSettings clientSettings;
   clientSettings.setValue(sSettingsPrefix % "/window_geometry", saveGeometry());
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void BoardSetupDialog::openDrcSettingsTab() noexcept {
+  mUi->tabWidget->setCurrentWidget(mUi->tabDrcSettings);
 }
 
 /*******************************************************************************
@@ -202,6 +257,32 @@ void BoardSetupDialog::load() noexcept {
   mUi->edtRulesViaAnnularRingMin->setValue(r.getViaAnnularRingMin());
   mUi->edtRulesViaAnnularRingMax->setValue(r.getViaAnnularRingMax());
   mUi->edtRulesStopMaskMaxViaDia->setValue(r.getStopMaskMaxViaDiameter());
+
+  // Tab: DRC Settings
+  mUi->edtDrcMinCopperWidth->setValue(
+      mBoard.getDrcSettings().getMinCopperWidth());
+  mUi->edtDrcClearanceCopperCopper->setValue(
+      mBoard.getDrcSettings().getMinCopperCopperClearance());
+  mUi->edtDrcClearanceCopperBoard->setValue(
+      mBoard.getDrcSettings().getMinCopperBoardClearance());
+  mUi->edtDrcClearanceCopperNpth->setValue(
+      mBoard.getDrcSettings().getMinCopperNpthClearance());
+  mUi->edtDrcMinPthAnnularRing->setValue(
+      mBoard.getDrcSettings().getMinPthAnnularRing());
+  mUi->edtDrcMinNpthDrillDiameter->setValue(
+      mBoard.getDrcSettings().getMinNpthDrillDiameter());
+  mUi->edtDrcMinNpthSlotWidth->setValue(
+      mBoard.getDrcSettings().getMinNpthSlotWidth());
+  mUi->edtDrcMinPthDrillDiameter->setValue(
+      mBoard.getDrcSettings().getMinPthDrillDiameter());
+  mUi->edtDrcMinPthSlotWidth->setValue(
+      mBoard.getDrcSettings().getMinPthSlotWidth());
+  mUi->cbxDrcAllowedNpthSlots->setCurrentIndex(
+      mUi->cbxDrcAllowedNpthSlots->findData(
+          QVariant::fromValue(mBoard.getDrcSettings().getAllowedNpthSlots())));
+  mUi->cbxDrcAllowedPthSlots->setCurrentIndex(
+      mUi->cbxDrcAllowedPthSlots->findData(
+          QVariant::fromValue(mBoard.getDrcSettings().getAllowedPthSlots())));
 }
 
 bool BoardSetupDialog::apply() noexcept {
@@ -237,6 +318,25 @@ bool BoardSetupDialog::apply() noexcept {
         mUi->edtRulesViaAnnularRingMax->getValue());  // can throw
     r.setStopMaskMaxViaDiameter(mUi->edtRulesStopMaskMaxViaDia->getValue());
     cmd->setDesignRules(r);
+
+    // Tab: DRC Settings
+    BoardDesignRuleCheckSettings s = mBoard.getDrcSettings();
+    s.setMinCopperWidth(mUi->edtDrcMinCopperWidth->getValue());
+    s.setMinCopperCopperClearance(mUi->edtDrcClearanceCopperCopper->getValue());
+    s.setMinCopperBoardClearance(mUi->edtDrcClearanceCopperBoard->getValue());
+    s.setMinCopperNpthClearance(mUi->edtDrcClearanceCopperNpth->getValue());
+    s.setMinPthAnnularRing(mUi->edtDrcMinPthAnnularRing->getValue());
+    s.setMinNpthDrillDiameter(mUi->edtDrcMinNpthDrillDiameter->getValue());
+    s.setMinNpthSlotWidth(mUi->edtDrcMinNpthSlotWidth->getValue());
+    s.setMinPthDrillDiameter(mUi->edtDrcMinPthDrillDiameter->getValue());
+    s.setMinPthSlotWidth(mUi->edtDrcMinPthSlotWidth->getValue());
+    s.setAllowedNpthSlots(
+        mUi->cbxDrcAllowedNpthSlots->currentData()
+            .value<BoardDesignRuleCheckSettings::AllowedSlots>());
+    s.setAllowedPthSlots(
+        mUi->cbxDrcAllowedPthSlots->currentData()
+            .value<BoardDesignRuleCheckSettings::AllowedSlots>());
+    cmd->setDrcSettings(s);
 
     mUndoStack.execCmd(cmd.take());  // can throw
     return true;

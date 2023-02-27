@@ -64,12 +64,7 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 }
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
-  const QString fp = "package.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  for (SExpression* fptNode : root.getChildren("footprint")) {
-    upgradeHoles(*fptNode);
-  }
-  dir.write(fp, root.toByteArray());
+  Q_UNUSED(dir);
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -104,17 +99,11 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  upgradeHoles(root);
+  upgradeBoardDrcSettings(root);
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {
   Q_UNUSED(root);
-}
-
-void FileFormatMigrationUnstable::upgradeHoles(SExpression& node) {
-  for (SExpression* holeNode : node.getChildren("hole")) {
-    holeNode->appendChild("stop_mask", SExpression::createToken("auto"));
-  }
 }
 
 /*******************************************************************************

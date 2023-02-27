@@ -98,6 +98,8 @@ void BoardDesignRuleCheckMessagesDock::setMessages(
   mMessages = messages;
 
   mUi->prgProgress->hide();
+  mUi->prgProgress->setValue(0);
+  mUi->prgProgress->setFormat(QString());
   mUi->cbxCenterInView->show();
 
   bool signalsBlocked = mUi->lstMessages->blockSignals(true);

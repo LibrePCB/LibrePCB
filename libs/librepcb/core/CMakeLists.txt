@@ -347,6 +347,8 @@ add_library(
   project/board/drc/boarddesignrulecheck.h
   project/board/drc/boarddesignrulecheckmessage.cpp
   project/board/drc/boarddesignrulecheckmessage.h
+  project/board/drc/boarddesignrulechecksettings.cpp
+  project/board/drc/boarddesignrulechecksettings.h
   project/board/graphicsitems/bgi_airwire.cpp
   project/board/graphicsitems/bgi_airwire.h
   project/board/graphicsitems/bgi_base.cpp

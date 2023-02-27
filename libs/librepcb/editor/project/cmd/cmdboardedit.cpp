@@ -45,7 +45,9 @@ CmdBoardEdit::CmdBoardEdit(Board& board) noexcept
     mOldInnerLayerCount(mBoard.getLayerStack().getInnerLayerCount()),
     mNewInnerLayerCount(mOldInnerLayerCount),
     mOldDesignRules(mBoard.getDesignRules()),
-    mNewDesignRules(mOldDesignRules) {
+    mNewDesignRules(mOldDesignRules),
+    mOldDrcSettings(mBoard.getDrcSettings()),
+    mNewDrcSettings(mOldDrcSettings) {
 }
 
 CmdBoardEdit::~CmdBoardEdit() noexcept {
@@ -70,6 +72,12 @@ void CmdBoardEdit::setDesignRules(const BoardDesignRules& rules) noexcept {
   mNewDesignRules = rules;
 }
 
+void CmdBoardEdit::setDrcSettings(
+    const BoardDesignRuleCheckSettings& settings) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewDrcSettings = settings;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -80,6 +88,7 @@ bool CmdBoardEdit::performExecute() {
   if (mNewName != mOldName) return true;
   if (mNewInnerLayerCount != mOldInnerLayerCount) return true;
   if (mNewDesignRules != mOldDesignRules) return true;
+  if (mNewDrcSettings != mOldDrcSettings) return true;
   return false;
 }
 
@@ -87,12 +96,14 @@ void CmdBoardEdit::performUndo() {
   mBoard.setName(mOldName);
   mBoard.getLayerStack().setInnerLayerCount(mOldInnerLayerCount);
   mBoard.setDesignRules(mOldDesignRules);
+  mBoard.setDrcSettings(mOldDrcSettings);
 }
 
 void CmdBoardEdit::performRedo() {
   mBoard.setName(mNewName);
   mBoard.getLayerStack().setInnerLayerCount(mNewInnerLayerCount);
   mBoard.setDesignRules(mNewDesignRules);
+  mBoard.setDrcSettings(mNewDrcSettings);
 }
 
 /*******************************************************************************

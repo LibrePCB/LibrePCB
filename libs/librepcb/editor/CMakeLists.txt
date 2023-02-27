@@ -345,9 +345,6 @@ add_library(
   project/boardeditor/boardclipboarddata.h
   project/boardeditor/boardclipboarddatabuilder.cpp
   project/boardeditor/boardclipboarddatabuilder.h
-  project/boardeditor/boarddesignrulecheckdialog.cpp
-  project/boardeditor/boarddesignrulecheckdialog.h
-  project/boardeditor/boarddesignrulecheckdialog.ui
   project/boardeditor/boarddesignrulecheckmessagesdock.cpp
   project/boardeditor/boarddesignrulecheckmessagesdock.h
   project/boardeditor/boarddesignrulecheckmessagesdock.ui
