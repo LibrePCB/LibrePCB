@@ -57,7 +57,7 @@ StandardEditorCommandHandler::~StandardEditorCommandHandler() noexcept {
  ******************************************************************************/
 
 void StandardEditorCommandHandler::aboutLibrePcb() const noexcept {
-  AboutDialog aboutDialog(mParent);
+  AboutDialog aboutDialog(mSettings, mParent);
   aboutDialog.exec();
 }
 

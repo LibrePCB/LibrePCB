@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "aboutdialog.h"
 
+#include "../workspace/desktopservices.h"
 #include "ui_aboutdialog.h"
 
 #include <librepcb/core/application.h>
@@ -36,15 +37,23 @@
 namespace librepcb {
 namespace editor {
 
-AboutDialog::AboutDialog(QWidget* parent) noexcept
-  : QDialog(parent), mUi(new Ui::AboutDialog) {
+AboutDialog::AboutDialog(const WorkspaceSettings& settings,
+                         QWidget* parent) noexcept
+  : QDialog(parent), mSettings(settings), mUi(new Ui::AboutDialog) {
   // Set up base dialog
   mUi->setupUi(this);
   mUi->txtDetails->setFont(qApp->getDefaultMonospaceFont());
 
   // Event handlers
-  connect(mUi->btnCopyDetailsToClipboard, &QPushButton::clicked, [this]() {
+  connect(mUi->lblIntro, &QLabel::linkActivated, this,
+          &AboutDialog::openExternalLink);
+  connect(mUi->lblContributing, &QLabel::linkActivated, this,
+          &AboutDialog::openExternalLink);
+  connect(mUi->lblCopyDetailsToClipboard, &QLabel::linkActivated, [this]() {
     QApplication::clipboard()->setText(mUi->txtDetails->toPlainText());
+    QToolTip::showText(QCursor::pos(), tr("Copied!"),
+                       mUi->lblCopyDetailsToClipboard,
+                       mUi->lblCopyDetailsToClipboard->rect(), 1000);
   });
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &AboutDialog::close);
@@ -59,40 +68,82 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
   const QString& buildDate =
       qApp->getBuildDate().toString("yyyy-MM-dd hh:mm:ss (t)");
 
-  // Dynamic text
-  mUi->textVersion->setText(
-      QString("Version: %1<br>Git revision: %2<br>Build date: %3")
-          .arg(appVersion, gitRevision, buildDate));
-  mUi->textLinks->setText(
-      tr("For more information, please check out <a href='%1'>librepcb.org</a> "
-         "or our <a href='%2'>GitHub repository</a>.")
-          .arg("https://librepcb.org/",
-               "https://github.com/LibrePCB/LibrePCB"));
-  mUi->textContributeFinancially->setText(
-      tr("Support sustainable development of LibrePCB by donating financially "
-         "via Patreon, PayPal or Bitcoin. Check out <a href='%1'>%1</a> for "
-         "details.")
-          .arg("https://librepcb.org/donate/"));
-  mUi->textContributeCode->setText(
-      tr("Check out our <a href='%1'>Contribution Guidelines</a> if you're "
-         "interested in development of LibrePCB!")
-          .arg("https://github.com/LibrePCB/LibrePCB/blob/master/"
-               "CONTRIBUTING.md"));
+  // Set title text.
+  mUi->lblTitle->setText(QString("LibrePCB %1").arg(appVersion));
 
-  // Format content
-  formatLabelHeading(mUi->headerLinks);
-  formatLabelHeading(mUi->headerLicense);
-  formatLabelHeading(mUi->headerContributeFinancially);
-  formatLabelHeading(mUi->headerContributeCode);
-  formatLabelHeading(mUi->headerContributeShare);
-  formatLabelText(mUi->textIntro, false, true);
-  formatLabelText(mUi->textVersion, true, false);
-  formatLabelText(mUi->textLinks, false, true);
-  formatLabelText(mUi->textLicense, false, true);
-  formatLabelText(mUi->textIconLicense, false, true);
-  formatLabelText(mUi->textContributeFinancially, false, true);
-  formatLabelText(mUi->textContributeCode, false, true);
-  formatLabelText(mUi->textContributeShare, false, false);
+  // Set revision text.
+  mUi->lblRevision->setText(QString("Git revision: %2<br>Build date: %3")
+                                .arg(gitRevision, buildDate));
+
+  // Set intro text (not using Qt designer to avoid layouting issues).
+  {
+    QString text;
+    text += "<p>" %
+        tr("LibrePCB is a free &amp; open source schematic/layout-editor. "
+           "It is mainly developed by Urban Bruhin, with the support of "
+           "<a href='%1'>many other contributors</a>.")
+            .arg("https://github.com/LibrePCB/LibrePCB/graphs/contributors") %
+        "<p>";
+    text += "<h4>" % tr("Links") % "</h4>";
+    text += "<p>" %
+        tr("For more information, check out "
+           "<a href='%1'>librepcb.org</a> or our "
+           "<a href='%2'>GitHub repository</a>.")
+            .arg("https://librepcb.org/",
+                 "https://github.com/LibrePCB/LibrePCB") %
+        "</p>";
+    text += "<h4>" % tr("Help") % "</h4>";
+    text += "<p>" %
+        tr("If you need help, please check out the "
+           "<a href='%1'>documentation</a> or <a href='%2'>contact us</a>.")
+            .arg("https://librepcb.org/docs/", "https://librepcb.org/help/") %
+        "</p>";
+    text += "<h4>" % tr("License") % "</h4>";
+    text += "<p>" %
+        tr("LibrePCB is free software, released under the GNU General Public "
+           "License (GPL) version 3 or later. You can find the full license "
+           "text <a href='%1'>in our source code</a>.")
+            .arg(
+                "https://github.com/LibrePCB/LibrePCB/blob/master/"
+                "LICENSE.txt") %
+        "</p>";
+    text += "<p>" %
+        tr("Some of the icons used in LibrePCB are provided by "
+           "<a href='%1'>icons8.com</a>, thank you!")
+            .arg("https://icons8.com") %
+        "</p>";
+    mUi->lblIntro->setText(text);
+  }
+
+  // Set contributing text (not using Qt designer to avoid layouting issues).
+  {
+    QString text;
+    text += "<p>" %
+        tr("LibrePCB is a community project, and therefore it relies on "
+           "contributions! There are different ways you can contribute:") %
+        "<p>";
+    text += "<h4>" % tr("Donate") % "</h4>";
+    text += "<p>" %
+        tr("Support sustainable development of LibrePCB by donating "
+           "financially via Patreon, PayPal, Bitcoin or other ways. Check out "
+           "<a href='%1'>%2</a> for details.")
+            .arg("https://librepcb.org/donate/", "librepcb.org/donate") %
+        "</p>";
+    text += "<h4>" % tr("Improve LibrePCB") % "</h4>";
+    text += "<p>" %
+        tr("If you're interested in helping us to develop LibrePCB, check out "
+           "<a href='%1'>%2</a> to see how you can contribute!")
+            .arg("https://librepcb.org/contribute/",
+                 "librepcb.org/contribute") %
+        "</p>";
+    text += "<h4>" % tr("Spread The Word") % "</h4>";
+    text += "<p>" %
+        tr("Speak about LibrePCB with your friends and colleagues, or write "
+           "about it in the internet! Write a blogpost, or create a video "
+           "tutorial. We're happy if more people can get to know LibrePCB.") %
+        "</p>";
+    mUi->lblContributing->setText(text);
+  }
 
   // Information text (always English, not translatable)
   QStringList details;
@@ -114,36 +165,16 @@ AboutDialog::AboutDialog(QWidget* parent) noexcept
   mUi->txtDetails->setPlainText(details.join("\n"));
 }
 
-/**
- * @brief Format a heading label in the about dialog.
- * @param label Pointer to the QLabel instance
- */
-void AboutDialog::formatLabelHeading(QLabel* label) noexcept {
-  int headerMarginTop = 12;
-  int headerMarginBottom = 4;
-  label->setContentsMargins(0, headerMarginTop, 0, headerMarginBottom);
-}
-
-/**
- * @brief Format a text label in the about dialog.
- * @param label Pointer to the QLabel instance
- * @param selectable Whether to make the text mouse-selectable
- * @param containsLinks Whether to open links in external application (e.g. web
- * browser)
- */
-void AboutDialog::formatLabelText(QLabel* label, bool selectable,
-                                  bool containsLinks) noexcept {
-  label->setOpenExternalLinks(containsLinks);
-  if (selectable) {
-    label->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    // If text is selectable, external links won't work anymore!
-    if (containsLinks) {
-      qWarning() << "Invalid label configuration in about dialog!";
-    }
-  }
-}
-
 AboutDialog::~AboutDialog() noexcept {
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void AboutDialog::openExternalLink(const QString& url) noexcept {
+  DesktopServices ds(mSettings, this);
+  ds.openWebUrl(QUrl(url));
 }
 
 /*******************************************************************************
