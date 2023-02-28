@@ -44,6 +44,7 @@
 #include "boardlayerstack.h"
 #include "boardplanefragmentsbuilder.h"
 #include "boardselectionquery.h"
+#include "drc/boarddesignrulechecksettings.h"
 #include "items/bi_airwire.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
@@ -82,6 +83,7 @@ Board::Board(Project& project,
     mGraphicsScene(new GraphicsScene()),
     mLayerStack(new BoardLayerStack(*this)),
     mDesignRules(new BoardDesignRules()),
+    mDrcSettings(new BoardDesignRuleCheckSettings()),
     mFabricationOutputSettings(new BoardFabricationOutputSettings()),
     mUuid(uuid),
     mName(name),
@@ -126,6 +128,7 @@ Board::~Board() noexcept {
   mDeviceInstances.clear();
 
   mFabricationOutputSettings.reset();
+  mDrcSettings.reset();
   mDesignRules.reset();
   mLayerStack.reset();
   mGraphicsScene.reset();
@@ -191,6 +194,11 @@ QList<BI_Base*> Board::getAllItems() const noexcept {
 void Board::setDesignRules(const BoardDesignRules& rules) noexcept {
   *mDesignRules = rules;
   emit attributesChanged();
+}
+
+void Board::setDrcSettings(
+    const BoardDesignRuleCheckSettings& settings) noexcept {
+  *mDrcSettings = settings;
 }
 
 /*******************************************************************************
@@ -638,6 +646,8 @@ void Board::save() {
     }
     root.ensureLineBreak();
     mDesignRules->serialize(root.appendList("design_rules"));
+    root.ensureLineBreak();
+    mDrcSettings->serialize(root.appendList("design_rule_check"));
     root.ensureLineBreak();
     mFabricationOutputSettings->serialize(
         root.appendList("fabrication_output_settings"));

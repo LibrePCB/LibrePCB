@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../../utils/transform.h"
 #include "boarddesignrulecheckmessage.h"
+#include "boarddesignrulechecksettings.h"
 
 #include <polyclipping/clipper.hpp>
 
@@ -53,88 +54,9 @@ class BoardDesignRuleCheck final : public QObject {
   Q_OBJECT
 
 public:
-  // Types
-  enum class SlotsWarningLevel : int {
-    Curved = 0,  ///< Only warn about slots with curves.
-    MultiSegment = 1,  ///< Warn about slots with multiple segments or curves.
-    All = 2,  ///< Warn about all slots.
-  };
-
-  struct Options {
-    bool rebuildPlanes;
-
-    bool checkCopperWidth;
-    UnsignedLength minCopperWidth;
-
-    bool checkCopperCopperClearance;
-    UnsignedLength minCopperCopperClearance;
-
-    bool checkCopperBoardClearance;
-    UnsignedLength minCopperBoardClearance;
-
-    bool checkCopperNpthClearance;
-    UnsignedLength minCopperNpthClearance;
-
-    bool checkPthAnnularRing;
-    UnsignedLength minPthAnnularRing;
-
-    bool checkNpthDrillDiameter;
-    UnsignedLength minNpthDrillDiameter;
-
-    bool checkNpthSlotWidth;
-    UnsignedLength minNpthSlotWidth;
-
-    bool checkPthDrillDiameter;
-    UnsignedLength minPthDrillDiameter;
-
-    bool checkPthSlotWidth;
-    UnsignedLength minPthSlotWidth;
-
-    bool checkNpthSlotsWarning;
-    SlotsWarningLevel npthSlotsWarning;
-
-    bool checkPthSlotsWarning;
-    SlotsWarningLevel pthSlotsWarning;
-
-    bool checkCourtyardClearance;
-    Length courtyardOffset;
-
-    bool checkBrokenPadConnections;
-
-    bool checkMissingConnections;
-
-    Options()
-      : rebuildPlanes(true),
-        checkCopperWidth(true),
-        minCopperWidth(200000),  // 200um
-        checkCopperCopperClearance(true),
-        minCopperCopperClearance(200000),  // 200um
-        checkCopperBoardClearance(true),
-        minCopperBoardClearance(300000),  // 300um
-        checkCopperNpthClearance(true),
-        minCopperNpthClearance(200000),  // 200um
-        checkPthAnnularRing(true),
-        minPthAnnularRing(150000),  // 150um
-        checkNpthDrillDiameter(true),
-        minNpthDrillDiameter(250000),  // 250um
-        checkNpthSlotWidth(true),
-        minNpthSlotWidth(1000000),  // 1mm
-        checkPthDrillDiameter(true),
-        minPthDrillDiameter(250000),  // 250um
-        checkPthSlotWidth(true),
-        minPthSlotWidth(700000),  // 0.7mm
-        checkNpthSlotsWarning(true),
-        npthSlotsWarning(SlotsWarningLevel::MultiSegment),
-        checkPthSlotsWarning(true),
-        pthSlotsWarning(SlotsWarningLevel::MultiSegment),
-        checkCourtyardClearance(true),
-        courtyardOffset(0),  // 0um
-        checkBrokenPadConnections(true),
-        checkMissingConnections(true) {}
-  };
-
   // Constructors / Destructor
-  explicit BoardDesignRuleCheck(Board& board, const Options& options,
+  explicit BoardDesignRuleCheck(Board& board,
+                                const BoardDesignRuleCheckSettings& settings,
                                 QObject* parent = nullptr) noexcept;
   ~BoardDesignRuleCheck() noexcept;
 
@@ -157,24 +79,25 @@ signals:
   void finished();
 
 private:  // Methods
-  void rebuildPlanes(int progressStart, int progressEnd);
-  void checkForMissingConnections(int progressStart, int progressEnd);
-  void checkCopperBoardClearances(int progressStart, int progressEnd);
-  void checkCopperCopperClearances(int progressStart, int progressEnd);
-  void checkCourtyardClearances(int progressStart, int progressEnd);
-  void checkMinimumCopperWidth(int progressStart, int progressEnd);
-  void checkMinimumPthAnnularRing(int progressStart, int progressEnd);
-  void checkMinimumNpthDrillDiameter(int progressStart, int progressEnd);
-  void checkMinimumNpthSlotWidth(int progressStart, int progressEnd);
-  void checkMinimumPthDrillDiameter(int progressStart, int progressEnd);
-  void checkMinimumPthSlotWidth(int progressStart, int progressEnd);
-  void checkWarnNpthSlots(int progressStart, int progressEnd);
-  void checkWarnPthSlots(int progressStart, int progressEnd);
-  void checkInvalidPadConnections(int progressStart, int progressEnd);
+  void rebuildPlanes(int progressEnd);
+  void checkMinimumCopperWidth(int progressEnd);
+  void checkCopperCopperClearances(int progressEnd);
+  void checkCopperBoardAndNpthClearances(int progressEnd);
+  void checkMinimumPthAnnularRing(int progressEnd);
+  void checkMinimumNpthDrillDiameter(int progressEnd);
+  void checkMinimumNpthSlotWidth(int progressEnd);
+  void checkMinimumPthDrillDiameter(int progressEnd);
+  void checkMinimumPthSlotWidth(int progressEnd);
+  void checkAllowedNpthSlots(int progressEnd);
+  void checkAllowedPthSlots(int progressEnd);
+  void checkInvalidPadConnections(int progressEnd);
+  void checkCourtyardClearances(int progressEnd);
+  void checkForMissingConnections(int progressEnd);
   template <typename THole>
-  void processHoleSlotWarning(const THole& hole, SlotsWarningLevel level,
-                              const Transform& transform1 = Transform(),
-                              const Transform& transform2 = Transform());
+  void processHoleSlotWarning(
+      const THole& hole, BoardDesignRuleCheckSettings::AllowedSlots allowed,
+      const Transform& transform1 = Transform(),
+      const Transform& transform2 = Transform());
   const ClipperLib::Paths& getCopperPaths(
       const GraphicsLayer& layer, const QSet<const NetSignal*>& netsignals);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
@@ -184,6 +107,7 @@ private:  // Methods
                                 const Transform& transform1 = Transform(),
                                 const Transform& transform2 = Transform()) const
       noexcept;
+  void emitProgress(int percent) noexcept;
   void emitStatus(const QString& status) noexcept;
   void emitMessage(const BoardDesignRuleCheckMessage& msg) noexcept;
   QString formatLength(const Length& length) const noexcept;
@@ -197,7 +121,8 @@ private:  // Methods
 
 private:  // Data
   Board& mBoard;
-  Options mOptions;
+  const BoardDesignRuleCheckSettings& mSettings;
+  int mProgressPercent;
   QStringList mProgressStatus;
   QList<BoardDesignRuleCheckMessage> mMessages;
   QHash<QPair<const GraphicsLayer*, QSet<const NetSignal*>>, ClipperLib::Paths>
@@ -209,7 +134,5 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace librepcb
-
-Q_DECLARE_METATYPE(librepcb::BoardDesignRuleCheck::SlotsWarningLevel)
 
 #endif

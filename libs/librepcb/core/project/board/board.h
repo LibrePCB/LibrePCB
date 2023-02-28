@@ -54,6 +54,7 @@ class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
+class BoardDesignRuleCheckSettings;
 class BoardDesignRules;
 class BoardFabricationOutputSettings;
 class BoardLayerStack;
@@ -125,6 +126,9 @@ public:
   const BoardDesignRules& getDesignRules() const noexcept {
     return *mDesignRules;
   }
+  const BoardDesignRuleCheckSettings& getDrcSettings() const noexcept {
+    return *mDrcSettings;
+  }
   BoardFabricationOutputSettings& getFabricationOutputSettings() noexcept {
     return *mFabricationOutputSettings;
   }
@@ -162,6 +166,7 @@ public:
   }
   void setGridUnit(const LengthUnit& unit) noexcept { mGridUnit = unit; }
   void setDesignRules(const BoardDesignRules& rules) noexcept;
+  void setDrcSettings(const BoardDesignRuleCheckSettings& settings) noexcept;
 
   // DeviceInstance Methods
   const QMap<Uuid, BI_Device*>& getDeviceInstances() const noexcept {
@@ -257,6 +262,7 @@ private:
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<BoardLayerStack> mLayerStack;
   QScopedPointer<BoardDesignRules> mDesignRules;
+  QScopedPointer<BoardDesignRuleCheckSettings> mDrcSettings;
   QScopedPointer<BoardFabricationOutputSettings> mFabricationOutputSettings;
   QRectF mViewRect;
   QSet<NetSignal*> mScheduledNetSignalsForAirWireRebuild;

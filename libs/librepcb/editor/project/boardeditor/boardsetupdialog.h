@@ -59,6 +59,9 @@ public:
                    QWidget* parent = 0) noexcept;
   ~BoardSetupDialog();
 
+  // General Methods
+  void openDrcSettingsTab() noexcept;
+
   // Operator Overloadings
   BoardSetupDialog& operator=(const BoardSetupDialog& rhs) = delete;
 

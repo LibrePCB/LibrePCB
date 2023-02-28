@@ -26,6 +26,7 @@
 #include "../../undocommand.h"
 
 #include <librepcb/core/project/board/boarddesignrules.h>
+#include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
 #include <librepcb/core/types/elementname.h>
 
 #include <QtCore>
@@ -58,6 +59,7 @@ public:
   void setName(const ElementName& name) noexcept;
   void setInnerLayerCount(int count) noexcept;
   void setDesignRules(const BoardDesignRules& rules) noexcept;
+  void setDrcSettings(const BoardDesignRuleCheckSettings& settings) noexcept;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
@@ -78,6 +80,8 @@ private:  // Data
   int mNewInnerLayerCount;
   BoardDesignRules mOldDesignRules;
   BoardDesignRules mNewDesignRules;
+  BoardDesignRuleCheckSettings mOldDrcSettings;
+  BoardDesignRuleCheckSettings mNewDrcSettings;
 };
 
 /*******************************************************************************

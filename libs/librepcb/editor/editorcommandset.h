@@ -297,12 +297,12 @@ public:
       {QKeySequence(Qt::Key_F6)},
       &categoryEditor,
   };
-  EditorCommand designRuleCheck{
-      "design_rule_check",  // clang-format break
-      QT_TR_NOOP("Design Rule Check"),
+  EditorCommand runDesignRuleCheck{
+      "run_design_rule_check",  // clang-format break
+      QT_TR_NOOP("Run Design Rule Check"),
       QT_TR_NOOP("Run the design rule check (DRC)"),
       QIcon(":/img/actions/drc.png"),
-      EditorCommand::Flag::OpensPopup,
+      EditorCommand::Flags(),
       {QKeySequence(Qt::Key_F8)},
       &categoryEditor,
   };

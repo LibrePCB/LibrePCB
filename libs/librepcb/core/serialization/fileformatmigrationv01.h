@@ -122,6 +122,7 @@ protected:  // Methods
   virtual void upgradeBoard(SExpression& root, ProjectContext& context);
   virtual void upgradeBoardUserSettings(SExpression& root);
   virtual void upgradeBoardDesignRules(SExpression& root);
+  virtual void upgradeBoardDrcSettings(SExpression& root);
   virtual void upgradeGrid(SExpression& node);
   virtual void upgradeHoles(SExpression& node);
 };

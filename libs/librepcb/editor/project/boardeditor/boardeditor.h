@@ -28,7 +28,6 @@
 #include "ui_boardeditor.h"
 
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
@@ -39,6 +38,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BoardDesignRuleCheckMessage;
 class ComponentInstance;
 class Project;
 
@@ -118,10 +118,7 @@ private:
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void unplacedComponentsCountChanged(int count) noexcept;
-  void runDrcNonInteractive() noexcept;
-  void updateBoardDrcMessages(
-      const Board& board,
-      const QList<BoardDesignRuleCheckMessage>& messages) noexcept;
+  void runDrc() noexcept;
   void highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
                            bool zoomTo) noexcept;
   void clearDrcMarker() noexcept;
@@ -134,7 +131,7 @@ private:
   void setGridProperties(const PositiveLength& interval, const LengthUnit& unit,
                          Theme::GridStyle style, bool applyToBoard) noexcept;
   void execGridPropertiesDialog() noexcept;
-  void execDesignRuleCheckDialog() noexcept;
+  void execBoardSetupDialog(bool switchToDrcSettings = false) noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
 
@@ -146,7 +143,6 @@ private:
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
 
   // DRC
-  BoardDesignRuleCheck::Options mDrcOptions;
   QHash<Uuid, QList<BoardDesignRuleCheckMessage>>
       mDrcMessages;  ///< Key: Board UUID
   QScopedPointer<QGraphicsPathItem> mDrcLocationGraphicsItem;
@@ -173,7 +169,7 @@ private:
   QScopedPointer<QAction> mActionNetClasses;
   QScopedPointer<QAction> mActionUpdateLibrary;
   QScopedPointer<QAction> mActionBoardSetup;
-  QScopedPointer<QAction> mActionDesignRuleCheck;
+  QScopedPointer<QAction> mActionRunDesignRuleCheck;
   QScopedPointer<QAction> mActionImportDxf;
   QScopedPointer<QAction> mActionExportLppz;
   QScopedPointer<QAction> mActionExportImage;

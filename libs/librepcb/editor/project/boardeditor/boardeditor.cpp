@@ -40,7 +40,6 @@
 #include "../erc/ercmsgdock.h"
 #include "../projecteditor.h"
 #include "../projectpropertieseditordialog.h"
-#include "boarddesignrulecheckdialog.h"
 #include "boarddesignrulecheckmessagesdock.h"
 #include "boardlayersdock.h"
 #include "boardpickplacegeneratordialog.h"
@@ -56,12 +55,14 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/boardpainter.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectsettings.h>
+#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -378,15 +379,10 @@ void BoardEditor::createActions() noexcept {
         emit mProjectEditor.openProjectLibraryUpdaterClicked(
             mProject.getFilepath());
       }));
-  mActionBoardSetup.reset(cmd.boardSetup.createAction(this, this, [this]() {
-    if (Board* board = getActiveBoard()) {
-      abortBlockingToolsInOtherEditors();  // Release undo stack.
-      BoardSetupDialog dialog(*board, mProjectEditor.getUndoStack(), this);
-      dialog.exec();
-    }
-  }));
-  mActionDesignRuleCheck.reset(cmd.designRuleCheck.createAction(
-      this, this, &BoardEditor::execDesignRuleCheckDialog));
+  mActionBoardSetup.reset(cmd.boardSetup.createAction(
+      this, this, &BoardEditor::execBoardSetupDialog));
+  mActionRunDesignRuleCheck.reset(
+      cmd.runDesignRuleCheck.createAction(this, this, &BoardEditor::runDrc));
   mActionImportDxf.reset(cmd.importDxf.createAction(
       this, mFsm.data(), &BoardEditorFsm::processImportDxf));
   mActionExportLppz.reset(cmd.exportLppz.createAction(
@@ -706,7 +702,7 @@ void BoardEditor::createToolBars() noexcept {
   mToolBarTools->addSeparator();
   mToolBarTools->addAction(mActionToolMeasure.data());
   mToolBarTools->addAction(mActionRebuildPlanes.data());
-  mToolBarTools->addAction(mActionDesignRuleCheck.data());
+  mToolBarTools->addAction(mActionRunDesignRuleCheck.data());
   addToolBar(Qt::LeftToolBarArea, mToolBarTools.data());
 }
 
@@ -736,9 +732,9 @@ void BoardEditor::createDockWidgets() noexcept {
   mDockDrc.reset(new BoardDesignRuleCheckMessagesDock(this));
   connect(mDockDrc.data(),
           &BoardDesignRuleCheckMessagesDock::settingsDialogRequested, this,
-          &BoardEditor::execDesignRuleCheckDialog);
+          [this]() { execBoardSetupDialog(true); });
   connect(mDockDrc.data(), &BoardDesignRuleCheckMessagesDock::runDrcRequested,
-          this, &BoardEditor::runDrcNonInteractive);
+          this, &BoardEditor::runDrc);
   connect(mDockDrc.data(), &BoardDesignRuleCheckMessagesDock::messageSelected,
           this, &BoardEditor::highlightDrcMessage);
   addDockWidget(Qt::RightDockWidgetArea, mDockDrc.data());
@@ -838,9 +834,8 @@ void BoardEditor::createMenus() noexcept {
   mMenuBoard = mb.newMenu(&MenuBuilder::createBoardMenu);
   mb.addAction(mActionBoardSetup);
   mb.addSeparator();
-  mb.addAction(mActionDesignRuleCheck);
-  mb.addSeparator();
   mb.addAction(mActionRebuildPlanes);
+  mb.addAction(mActionRunDesignRuleCheck);
   mb.addSeparator();
   mb.addAction(mActionNewBoard);
   mb.addAction(mActionCopyBoard);
@@ -1027,34 +1022,37 @@ void BoardEditor::unplacedComponentsCountChanged(int count) noexcept {
   mUi->lblUnplacedComponentsNote->setVisible(count > 0);
 }
 
-void BoardEditor::runDrcNonInteractive() noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return;
-
-  bool wasInteractive = mDockDrc->setInteractive(false);
-
+void BoardEditor::runDrc() noexcept {
   try {
-    BoardDesignRuleCheck drc(*board, mDrcOptions);
+    Board* board = getActiveBoard();
+    if (!board) return;
+
+    // Make sure the DRC dock is visible because of the progress bar.
+    mDockDrc->show();
+    mDockDrc->raise();
+
+    // Set UI into busy state during the checks.
+    setCursor(Qt::WaitCursor);
+    bool wasInteractive = mDockDrc->setInteractive(false);
+    auto busyScopeGuard = scopeGuard([this, wasInteractive]() {
+      mDockDrc->setInteractive(wasInteractive);
+      unsetCursor();
+    });
+
+    // Run the DRC.
+    BoardDesignRuleCheck drc(*board, board->getDrcSettings());
     connect(&drc, &BoardDesignRuleCheck::progressPercent, mDockDrc.data(),
             &BoardDesignRuleCheckMessagesDock::setProgressPercent);
     connect(&drc, &BoardDesignRuleCheck::progressStatus, mDockDrc.data(),
             &BoardDesignRuleCheckMessagesDock::setProgressStatus);
     drc.execute();  // can throw
-    updateBoardDrcMessages(*board, drc.getMessages());
+
+    // Update DRC messages.
+    clearDrcMarker();
+    mDrcMessages.insert(board->getUuid(), drc.getMessages());
+    mDockDrc->setMessages(drc.getMessages());
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
-  }
-
-  mDockDrc->setInteractive(wasInteractive);
-}
-
-void BoardEditor::updateBoardDrcMessages(
-    const Board& board,
-    const QList<BoardDesignRuleCheckMessage>& messages) noexcept {
-  clearDrcMarker();
-  mDrcMessages.insert(board.getUuid(), messages);
-  if (&board == getActiveBoard()) {
-    mDockDrc->setMessages(messages);
   }
 }
 
@@ -1244,21 +1242,14 @@ void BoardEditor::execGridPropertiesDialog() noexcept {
   }
 }
 
-void BoardEditor::execDesignRuleCheckDialog() noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return;
-
-  BoardDesignRuleCheckDialog dialog(*board, mDrcOptions,
-                                    mProjectEditor.getDefaultLengthUnit(),
-                                    "board_editor/drc_dialog", this);
-  dialog.exec();
-  mDrcOptions = dialog.getOptions();
-  if (auto messages = dialog.getMessages()) {
-    updateBoardDrcMessages(*board, *messages);
-    if (messages->count() > 0) {
-      mDockDrc->show();
-      mDockDrc->raise();
+void BoardEditor::execBoardSetupDialog(bool switchToDrcSettings) noexcept {
+  if (Board* board = getActiveBoard()) {
+    abortBlockingToolsInOtherEditors();  // Release undo stack.
+    BoardSetupDialog dialog(*board, mProjectEditor.getUndoStack(), this);
+    if (switchToDrcSettings) {
+      dialog.openDrcSettingsTab();
     }
+    dialog.exec();
   }
 }
 
