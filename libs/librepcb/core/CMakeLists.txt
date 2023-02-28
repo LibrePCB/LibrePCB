@@ -202,6 +202,8 @@ add_library(
   library/cmp/component.h
   library/cmp/componentcheck.cpp
   library/cmp/componentcheck.h
+  library/cmp/componentcheckmessages.cpp
+  library/cmp/componentcheckmessages.h
   library/cmp/componentpinsignalmap.cpp
   library/cmp/componentpinsignalmap.h
   library/cmp/componentprefix.h
@@ -212,96 +214,48 @@ add_library(
   library/cmp/componentsymbolvariantitem.cpp
   library/cmp/componentsymbolvariantitem.h
   library/cmp/componentsymbolvariantitemsuffix.h
-  library/cmp/msg/msgduplicatesignalname.cpp
-  library/cmp/msg/msgduplicatesignalname.h
-  library/cmp/msg/msgmissingcomponentdefaultvalue.cpp
-  library/cmp/msg/msgmissingcomponentdefaultvalue.h
-  library/cmp/msg/msgmissingcomponentprefix.cpp
-  library/cmp/msg/msgmissingcomponentprefix.h
-  library/cmp/msg/msgmissingsymbolvariant.cpp
-  library/cmp/msg/msgmissingsymbolvariant.h
-  library/cmp/msg/msgmissingsymbolvariantitem.cpp
-  library/cmp/msg/msgmissingsymbolvariantitem.h
   library/dev/device.cpp
   library/dev/device.h
   library/dev/devicecheck.cpp
   library/dev/devicecheck.h
+  library/dev/devicecheckmessages.cpp
+  library/dev/devicecheckmessages.h
   library/dev/devicepadsignalmap.cpp
   library/dev/devicepadsignalmap.h
-  library/dev/msg/msgnopadsindeviceconnected.cpp
-  library/dev/msg/msgnopadsindeviceconnected.h
   library/library.cpp
   library/library.h
   library/librarybaseelement.cpp
   library/librarybaseelement.h
   library/librarybaseelementcheck.cpp
   library/librarybaseelementcheck.h
+  library/librarybaseelementcheckmessages.cpp
+  library/librarybaseelementcheckmessages.h
   library/libraryelement.cpp
   library/libraryelement.h
   library/libraryelementcheck.cpp
   library/libraryelementcheck.h
-  library/msg/msgmissingauthor.cpp
-  library/msg/msgmissingauthor.h
-  library/msg/msgmissingcategories.cpp
-  library/msg/msgmissingcategories.h
-  library/msg/msgnamenottitlecase.cpp
-  library/msg/msgnamenottitlecase.h
+  library/libraryelementcheckmessages.cpp
+  library/libraryelementcheckmessages.h
   library/pkg/footprint.cpp
   library/pkg/footprint.h
   library/pkg/footprintpad.cpp
   library/pkg/footprintpad.h
   library/pkg/footprintpainter.cpp
   library/pkg/footprintpainter.h
-  library/pkg/msg/msgduplicatepadname.cpp
-  library/pkg/msg/msgduplicatepadname.h
-  library/pkg/msg/msgholewithoutstopmask.cpp
-  library/pkg/msg/msgholewithoutstopmask.h
-  library/pkg/msg/msginvalidcustompadoutline.cpp
-  library/pkg/msg/msginvalidcustompadoutline.h
-  library/pkg/msg/msgmissingfootprint.cpp
-  library/pkg/msg/msgmissingfootprint.h
-  library/pkg/msg/msgmissingfootprintname.cpp
-  library/pkg/msg/msgmissingfootprintname.h
-  library/pkg/msg/msgmissingfootprintvalue.cpp
-  library/pkg/msg/msgmissingfootprintvalue.h
-  library/pkg/msg/msgoverlappingpads.cpp
-  library/pkg/msg/msgoverlappingpads.h
-  library/pkg/msg/msgpadannularringviolation.cpp
-  library/pkg/msg/msgpadannularringviolation.h
-  library/pkg/msg/msgpadclearanceviolation.cpp
-  library/pkg/msg/msgpadclearanceviolation.h
-  library/pkg/msg/msgpadholeoutsidecopper.cpp
-  library/pkg/msg/msgpadholeoutsidecopper.h
-  library/pkg/msg/msgpadoriginoutsidecopper.cpp
-  library/pkg/msg/msgpadoriginoutsidecopper.h
-  library/pkg/msg/msgpadoverlapswithplacement.cpp
-  library/pkg/msg/msgpadoverlapswithplacement.h
-  library/pkg/msg/msgunusedcustompadoutline.cpp
-  library/pkg/msg/msgunusedcustompadoutline.h
-  library/pkg/msg/msgwrongfootprinttextlayer.cpp
-  library/pkg/msg/msgwrongfootprinttextlayer.h
   library/pkg/package.cpp
   library/pkg/package.h
   library/pkg/packagecheck.cpp
   library/pkg/packagecheck.h
+  library/pkg/packagecheckmessages.cpp
+  library/pkg/packagecheckmessages.h
   library/pkg/packagepad.cpp
   library/pkg/packagepad.h
-  library/sym/msg/msgduplicatepinname.cpp
-  library/sym/msg/msgduplicatepinname.h
-  library/sym/msg/msgmissingsymbolname.cpp
-  library/sym/msg/msgmissingsymbolname.h
-  library/sym/msg/msgmissingsymbolvalue.cpp
-  library/sym/msg/msgmissingsymbolvalue.h
-  library/sym/msg/msgoverlappingsymbolpins.cpp
-  library/sym/msg/msgoverlappingsymbolpins.h
-  library/sym/msg/msgsymbolpinnotongrid.cpp
-  library/sym/msg/msgsymbolpinnotongrid.h
-  library/sym/msg/msgwrongsymboltextlayer.cpp
-  library/sym/msg/msgwrongsymboltextlayer.h
   library/sym/symbol.cpp
   library/sym/symbol.h
   library/sym/symbolcheck.cpp
   library/sym/symbolcheck.h
+  library/sym/symbolcheckmessages.cpp
+  library/sym/symbolcheckmessages.h
   library/sym/symbolpainter.cpp
   library/sym/symbolpainter.h
   library/sym/symbolpin.cpp

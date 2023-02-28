@@ -17,42 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_CORE_DEVICECHECKMESSAGES_H
+#define LIBREPCB_CORE_DEVICECHECKMESSAGES_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "msgmissingsymbolvariantitem.h"
+#include "../../rulecheck/rulecheckmessage.h"
 
-#include "../componentsymbolvariant.h"
+#include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class MsgNoPadsInDeviceConnected
  ******************************************************************************/
 
-MsgMissingSymbolVariantItem::MsgMissingSymbolVariantItem(
-    std::shared_ptr<const ComponentSymbolVariant> symbVar) noexcept
-  : RuleCheckMessage(
-        Severity::Error,
-        tr("Symbol variant '%1' has no items")
-            .arg(*symbVar->getNames().getDefaultValue()),
-        tr("Every symbol variant requires at least one symbol item, otherwise "
-           "it can't be added to schematics."),
-        "missing_gates"),
-    mSymbVar(symbVar) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("variant", symbVar->getUuid());
-  mApproval.ensureLineBreak();
-}
+/**
+ * @brief The MsgNoPadsInDeviceConnected class
+ */
+class MsgNoPadsInDeviceConnected final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgNoPadsInDeviceConnected)
 
-MsgMissingSymbolVariantItem::~MsgMissingSymbolVariantItem() noexcept {
-}
+public:
+  // Constructors / Destructor
+  MsgNoPadsInDeviceConnected() noexcept;
+  MsgNoPadsInDeviceConnected(const MsgNoPadsInDeviceConnected& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgNoPadsInDeviceConnected() noexcept {}
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace librepcb
+
+#endif

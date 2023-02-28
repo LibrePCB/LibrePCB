@@ -23,8 +23,7 @@
 #include "librarybaseelementcheck.h"
 
 #include "librarybaseelement.h"
-#include "msg/msgmissingauthor.h"
-#include "msg/msgnamenottitlecase.h"
+#include "librarybaseelementcheckmessages.h"
 
 #include <QtCore>
 

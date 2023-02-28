@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_MSGUNUSEDCUSTOMPADOUTLINE_H
-#define LIBREPCB_CORE_MSGUNUSEDCUSTOMPADOUTLINE_H
+#ifndef LIBREPCB_CORE_LIBRARYBASEELEMENTCHECKMESSAGES_H
+#define LIBREPCB_CORE_LIBRARYBASEELEMENTCHECKMESSAGES_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../rulecheck/rulecheckmessage.h"
-#include "../../../types/length.h"
+#include "../rulecheck/rulecheckmessage.h"
+#include "../types/elementname.h"
 
 #include <QtCore>
 
@@ -33,38 +33,50 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Footprint;
-class FootprintPad;
-
 /*******************************************************************************
- *  Class MsgUnusedCustomPadOutline
+ *  Class MsgMissingAuthor
  ******************************************************************************/
 
 /**
- * @brief The MsgUnusedCustomPadOutline class
+ * @brief The MsgMissingAuthor class
  */
-class MsgUnusedCustomPadOutline final : public RuleCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(MsgUnusedCustomPadOutline)
+class MsgMissingAuthor final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgMissingAuthor)
 
 public:
   // Constructors / Destructor
-  MsgUnusedCustomPadOutline() = delete;
-  MsgUnusedCustomPadOutline(std::shared_ptr<const Footprint> footprint,
-                            std::shared_ptr<const FootprintPad> pad,
-                            const QString& pkgPadName) noexcept;
-  MsgUnusedCustomPadOutline(const MsgUnusedCustomPadOutline& other) noexcept
-    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgUnusedCustomPadOutline() noexcept;
+  MsgMissingAuthor() noexcept;
+  MsgMissingAuthor(const MsgMissingAuthor& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgMissingAuthor() noexcept {}
+};
 
-  // Getters
-  std::shared_ptr<const Footprint> getFootprint() const noexcept {
-    return mFootprint;
-  }
-  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
+/*******************************************************************************
+ *  Class MsgNameNotTitleCase
+ ******************************************************************************/
+
+/**
+ * @brief The MsgNameNotTitleCase class
+ */
+class MsgNameNotTitleCase final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgNameNotTitleCase)
+
+public:
+  // Constructors / Destructor
+  MsgNameNotTitleCase() = delete;
+  explicit MsgNameNotTitleCase(const ElementName& name) noexcept;
+  MsgNameNotTitleCase(const MsgNameNotTitleCase& other) noexcept
+    : RuleCheckMessage(other), mName(other.mName) {}
+  virtual ~MsgNameNotTitleCase() noexcept {}
+
+  const ElementName& getName() const noexcept { return mName; }
+  ElementName getFixedName() const noexcept { return getFixedName(mName); }
+
+  static bool isTitleCase(const ElementName& name) noexcept;
+  static ElementName getFixedName(const ElementName& name) noexcept;
 
 private:
-  std::shared_ptr<const Footprint> mFootprint;
-  std::shared_ptr<const FootprintPad> mPad;
+  ElementName mName;
 };
 
 /*******************************************************************************

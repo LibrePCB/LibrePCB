@@ -25,21 +25,8 @@
 #include "../../graphics/graphicslayer.h"
 #include "../../utils/toolbox.h"
 #include "../../utils/transform.h"
-#include "msg/msgduplicatepadname.h"
-#include "msg/msgholewithoutstopmask.h"
-#include "msg/msginvalidcustompadoutline.h"
-#include "msg/msgmissingfootprint.h"
-#include "msg/msgmissingfootprintname.h"
-#include "msg/msgmissingfootprintvalue.h"
-#include "msg/msgoverlappingpads.h"
-#include "msg/msgpadannularringviolation.h"
-#include "msg/msgpadclearanceviolation.h"
-#include "msg/msgpadholeoutsidecopper.h"
-#include "msg/msgpadoriginoutsidecopper.h"
-#include "msg/msgpadoverlapswithplacement.h"
-#include "msg/msgunusedcustompadoutline.h"
-#include "msg/msgwrongfootprinttextlayer.h"
 #include "package.h"
+#include "packagecheckmessages.h"
 
 #include <QtCore>
 

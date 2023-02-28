@@ -17,55 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_CORE_LIBRARYELEMENTCHECKMESSAGES_H
+#define LIBREPCB_CORE_LIBRARYELEMENTCHECKMESSAGES_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "msgpadclearanceviolation.h"
+#include "../rulecheck/rulecheckmessage.h"
 
-#include "../footprint.h"
+#include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class MsgMissingCategories
  ******************************************************************************/
 
-MsgPadClearanceViolation::MsgPadClearanceViolation(
-    std::shared_ptr<const Footprint> footprint,
-    std::shared_ptr<const FootprintPad> pad1, const QString& pkgPad1Name,
-    std::shared_ptr<const FootprintPad> pad2, const QString& pkgPad2Name,
-    const Length& clearance) noexcept
-  : RuleCheckMessage(
-        Severity::Warning,
-        tr("Clearance of pad '%1' to pad '%2' in '%3'")
-            .arg(pkgPad1Name, pkgPad2Name,
-                 *footprint->getNames().getDefaultValue()),
-        tr("Pads should have at least %1 clearance between each other. In some "
-           "situations it might be needed to use smaller clearances but not "
-           "all PCB manufacturers are able to reliably produce such small "
-           "clearances, so usually this should be avoided.")
-            .arg(QString::number(clearance.toMm() * 1000) % "μm"),
-        "small_pad_clearance"),
-    mFootprint(footprint),
-    mPad1(pad1),
-    mPad2(pad2) {
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("footprint", footprint->getUuid());
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", std::min(pad1->getUuid(), pad2->getUuid()));
-  mApproval.ensureLineBreak();
-  mApproval.appendChild("pad", std::max(pad1->getUuid(), pad2->getUuid()));
-  mApproval.ensureLineBreak();
-}
+/**
+ * @brief The MsgMissingCategories class
+ */
+class MsgMissingCategories final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgMissingCategories)
 
-MsgPadClearanceViolation::~MsgPadClearanceViolation() noexcept {
-}
+public:
+  // Constructors / Destructor
+  MsgMissingCategories() noexcept;
+  MsgMissingCategories(const MsgMissingCategories& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgMissingCategories() noexcept {}
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace librepcb
+
+#endif

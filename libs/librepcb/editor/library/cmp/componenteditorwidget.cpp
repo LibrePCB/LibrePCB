@@ -29,11 +29,9 @@
 #include "ui_componenteditorwidget.h"
 
 #include <librepcb/core/library/cmp/component.h>
-#include <librepcb/core/library/cmp/msg/msgmissingcomponentdefaultvalue.h>
-#include <librepcb/core/library/cmp/msg/msgmissingsymbolvariant.h>
-#include <librepcb/core/library/msg/msgmissingauthor.h>
-#include <librepcb/core/library/msg/msgmissingcategories.h>
-#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/cmp/componentcheckmessages.h>
+#include <librepcb/core/library/librarybaseelementcheckmessages.h>
+#include <librepcb/core/library/libraryelementcheckmessages.h>
 
 #include <QtCore>
 #include <QtWidgets>

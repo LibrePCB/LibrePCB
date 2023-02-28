@@ -28,8 +28,7 @@
 #include "ui_packagecategoryeditorwidget.h"
 
 #include <librepcb/core/library/cat/packagecategory.h>
-#include <librepcb/core/library/msg/msgmissingauthor.h>
-#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>

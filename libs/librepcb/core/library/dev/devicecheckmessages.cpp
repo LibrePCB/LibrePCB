@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "msgmissingauthor.h"
+#include "devicecheckmessages.h"
 
 /*******************************************************************************
  *  Namespace
@@ -28,18 +28,21 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  MsgNoPadsInDeviceConnected
  ******************************************************************************/
 
-MsgMissingAuthor::MsgMissingAuthor() noexcept
+MsgNoPadsInDeviceConnected::MsgNoPadsInDeviceConnected() noexcept
   : RuleCheckMessage(
-        Severity::Warning, tr("Author not set"),
-        tr("It is recommended to set an author (e.g. full name or nickname), "
-           "although it's not required."),
-        "empty_author") {
-}
-
-MsgMissingAuthor::~MsgMissingAuthor() noexcept {
+        Severity::Warning,  // Only warning because it could be a false-positive
+        tr("No pads connected"),
+        tr("The chosen package contains pads, but none of them are connected "
+           "to component signals. So these pads have no electrical function "
+           "and when adding the device to a PCB, no traces can be connected to "
+           "them.\n\nTo fix this issue, connect the package pads to their "
+           "corresponding component signals in the table widget.\n\nIf all "
+           "pads have only a mechanical purpose and thus don't need to be "
+           "connected to component signals, this message can be ignored."),
+        "no_pads_connected") {
 }
 
 /*******************************************************************************

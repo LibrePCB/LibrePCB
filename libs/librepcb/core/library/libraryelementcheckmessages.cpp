@@ -17,57 +17,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_MSGWRONGSYMBOLTEXTLAYER_H
-#define LIBREPCB_CORE_MSGWRONGSYMBOLTEXTLAYER_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../rulecheck/rulecheckmessage.h"
-
-#include <QtCore>
+#include "libraryelementcheckmessages.h"
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
 
-class Text;
-
 /*******************************************************************************
- *  Class MsgWrongSymbolTextLayer
+ *  MsgMissingCategories
  ******************************************************************************/
 
-/**
- * @brief The MsgWrongSymbolTextLayer class
- */
-class MsgWrongSymbolTextLayer final : public RuleCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(MsgWrongSymbolTextLayer)
-
-public:
-  // Constructors / Destructor
-  MsgWrongSymbolTextLayer() = delete;
-  MsgWrongSymbolTextLayer(std::shared_ptr<const Text> text,
-                          const QString& expectedLayerName) noexcept;
-  MsgWrongSymbolTextLayer(const MsgWrongSymbolTextLayer& other) noexcept
-    : RuleCheckMessage(other),
-      mText(other.mText),
-      mExpectedLayerName(other.mExpectedLayerName) {}
-  virtual ~MsgWrongSymbolTextLayer() noexcept;
-
-  // Getters
-  std::shared_ptr<const Text> getText() const noexcept { return mText; }
-  QString getExpectedLayerName() const noexcept { return mExpectedLayerName; }
-
-private:
-  std::shared_ptr<const Text> mText;
-  QString mExpectedLayerName;
-};
+MsgMissingCategories::MsgMissingCategories() noexcept
+  : RuleCheckMessage(
+        Severity::Error, tr("No categories set"),
+        tr("It's very important to assign every library element to at least "
+           "one category. Otherwise it will be very hard to find the element "
+           "in the workspace library, so it's highly recommended to fix "
+           "this."),
+        "missing_categories") {
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
 }  // namespace librepcb
-
-#endif

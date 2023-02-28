@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "msgnamenottitlecase.h"
+#include "librarybaseelementcheckmessages.h"
 
 /*******************************************************************************
  *  Namespace
@@ -28,7 +28,19 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  MsgMissingAuthor
+ ******************************************************************************/
+
+MsgMissingAuthor::MsgMissingAuthor() noexcept
+  : RuleCheckMessage(
+        Severity::Warning, tr("Author not set"),
+        tr("It is recommended to set an author (e.g. full name or nickname), "
+           "although it's not required."),
+        "empty_author") {
+}
+
+/*******************************************************************************
+ *  MsgNameNotTitleCase
  ******************************************************************************/
 
 MsgNameNotTitleCase::MsgNameNotTitleCase(const ElementName& name) noexcept
@@ -41,13 +53,6 @@ MsgNameNotTitleCase::MsgNameNotTitleCase(const ElementName& name) noexcept
         "name_not_title_case"),
     mName(name) {
 }
-
-MsgNameNotTitleCase::~MsgNameNotTitleCase() noexcept {
-}
-
-/*******************************************************************************
- *  Static Methods
- ******************************************************************************/
 
 bool MsgNameNotTitleCase::isTitleCase(const ElementName& name) noexcept {
   bool lastCharWasSpace = true;

@@ -39,14 +39,10 @@
 #include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/cmpsigpindisplaytype.h>
-#include <librepcb/core/library/msg/msgmissingauthor.h>
-#include <librepcb/core/library/msg/msgmissingcategories.h>
-#include <librepcb/core/library/msg/msgnamenottitlecase.h>
-#include <librepcb/core/library/sym/msg/msgmissingsymbolname.h>
-#include <librepcb/core/library/sym/msg/msgmissingsymbolvalue.h>
-#include <librepcb/core/library/sym/msg/msgsymbolpinnotongrid.h>
-#include <librepcb/core/library/sym/msg/msgwrongsymboltextlayer.h>
+#include <librepcb/core/library/librarybaseelementcheckmessages.h>
+#include <librepcb/core/library/libraryelementcheckmessages.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolcheckmessages.h>
 #include <librepcb/core/library/sym/symbolpainter.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>

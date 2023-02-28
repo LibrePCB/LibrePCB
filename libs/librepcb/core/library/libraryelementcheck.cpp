@@ -23,7 +23,7 @@
 #include "libraryelementcheck.h"
 
 #include "libraryelement.h"
-#include "msg/msgmissingcategories.h"
+#include "libraryelementcheckmessages.h"
 
 #include <QtCore>
 

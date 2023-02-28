@@ -23,7 +23,7 @@
 #include "devicecheck.h"
 
 #include "device.h"
-#include "msg/msgnopadsindeviceconnected.h"
+#include "devicecheckmessages.h"
 
 #include <QtCore>
 
