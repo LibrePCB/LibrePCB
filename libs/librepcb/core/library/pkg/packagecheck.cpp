@@ -63,8 +63,8 @@ PackageCheck::~PackageCheck() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList PackageCheck::runChecks() const {
-  LibraryElementCheckMessageList msgs = LibraryElementCheck::runChecks();
+RuleCheckMessageList PackageCheck::runChecks() const {
+  RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
   checkDuplicatePadNames(msgs);
   checkMissingFootprint(msgs);
   checkMissingTexts(msgs);

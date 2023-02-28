@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -39,14 +39,14 @@ namespace librepcb {
 /**
  * @brief The MsgMissingSymbolVariant class
  */
-class MsgMissingSymbolVariant final : public LibraryElementCheckMessage {
+class MsgMissingSymbolVariant final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgMissingSymbolVariant)
 
 public:
   // Constructors / Destructor
   MsgMissingSymbolVariant() noexcept;
   MsgMissingSymbolVariant(const MsgMissingSymbolVariant& other) noexcept
-    : LibraryElementCheckMessage(other) {}
+    : RuleCheckMessage(other) {}
   virtual ~MsgMissingSymbolVariant() noexcept;
 };
 

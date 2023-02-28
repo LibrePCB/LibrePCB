@@ -47,8 +47,8 @@ LibraryElementCheck::~LibraryElementCheck() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList LibraryElementCheck::runChecks() const {
-  LibraryElementCheckMessageList msgs = LibraryBaseElementCheck::runChecks();
+RuleCheckMessageList LibraryElementCheck::runChecks() const {
+  RuleCheckMessageList msgs = LibraryBaseElementCheck::runChecks();
   checkMissingCategories(msgs);
   return msgs;
 }

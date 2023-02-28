@@ -51,8 +51,8 @@ ComponentCheck::~ComponentCheck() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList ComponentCheck::runChecks() const {
-  LibraryElementCheckMessageList msgs = LibraryElementCheck::runChecks();
+RuleCheckMessageList ComponentCheck::runChecks() const {
+  RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
   checkMissingPrefix(msgs);
   checkMissingDefaultValue(msgs);
   checkDuplicateSignalNames(msgs);

@@ -50,7 +50,7 @@ public:
   virtual ~SymbolCheck() noexcept;
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   SymbolCheck& operator=(const SymbolCheck& rhs) = delete;

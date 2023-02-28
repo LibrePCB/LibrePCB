@@ -32,7 +32,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MsgMissingComponentPrefix::MsgMissingComponentPrefix() noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning, tr("No component prefix set"),
         tr("Most components should have a prefix defined. The prefix is used "
            "to generate the component's name when adding it to a schematic. "

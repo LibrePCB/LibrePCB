@@ -65,7 +65,7 @@ LibraryElement::~LibraryElement() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList LibraryElement::runChecks() const {
+RuleCheckMessageList LibraryElement::runChecks() const {
   LibraryElementCheck check(*this);
   return check.runChecks();  // can throw
 }

@@ -32,7 +32,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MsgNameNotTitleCase::MsgNameNotTitleCase(const ElementName& name) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Hint, tr("Name not title case: '%1'").arg(*name),
         tr("Generally the library element name should be written in title case "
            "(for consistency). As the current name has words starting with a "

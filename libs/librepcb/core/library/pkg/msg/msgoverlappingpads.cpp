@@ -38,7 +38,7 @@ MsgOverlappingPads::MsgOverlappingPads(
     std::shared_ptr<const FootprintPad> pad1, const QString& pkgPad1Name,
     std::shared_ptr<const FootprintPad> pad2,
     const QString& pkgPad2Name) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Error,
         tr("Overlapping pads '%1' and '%2' in '%3'")
             .arg(pkgPad1Name, pkgPad2Name,

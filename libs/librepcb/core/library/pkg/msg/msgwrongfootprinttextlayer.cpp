@@ -39,7 +39,7 @@ MsgWrongFootprintTextLayer::MsgWrongFootprintTextLayer(
     std::shared_ptr<const Footprint> footprint,
     std::shared_ptr<const StrokeText> text,
     const QString& expectedLayerName) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning,
         tr("Layer of '%1' in '%2' is not '%3'")
             .arg(text->getText(), *footprint->getNames().getDefaultValue(),

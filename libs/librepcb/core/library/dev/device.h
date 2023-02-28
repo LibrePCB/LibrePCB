@@ -78,7 +78,7 @@ public:
   void setPackageUuid(const Uuid& uuid) noexcept;
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   Device& operator=(const Device& rhs) = delete;

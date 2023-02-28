@@ -183,8 +183,6 @@ add_library(
   library/libraryeditor.ui
   library/libraryelementcache.cpp
   library/libraryelementcache.h
-  library/libraryelementchecklistwidget.cpp
-  library/libraryelementchecklistwidget.h
   library/newelementwizard/newelementwizard.cpp
   library/newelementwizard/newelementwizard.h
   library/newelementwizard/newelementwizard.ui
@@ -706,6 +704,8 @@ add_library(
   widgets/positivelengthedit.h
   widgets/ratioedit.cpp
   widgets/ratioedit.h
+  widgets/rulechecklistwidget.cpp
+  widgets/rulechecklistwidget.h
   widgets/searchtoolbar.cpp
   widgets/searchtoolbar.h
   widgets/signalrolecombobox.cpp

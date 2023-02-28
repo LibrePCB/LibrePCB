@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -39,8 +39,7 @@ namespace librepcb {
 /**
  * @brief The MsgMissingComponentDefaultValue class
  */
-class MsgMissingComponentDefaultValue final
-  : public LibraryElementCheckMessage {
+class MsgMissingComponentDefaultValue final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgMissingComponentDefaultValue)
 
 public:
@@ -48,7 +47,7 @@ public:
   MsgMissingComponentDefaultValue() noexcept;
   MsgMissingComponentDefaultValue(
       const MsgMissingComponentDefaultValue& other) noexcept
-    : LibraryElementCheckMessage(other) {}
+    : RuleCheckMessage(other) {}
   virtual ~MsgMissingComponentDefaultValue() noexcept;
 };
 

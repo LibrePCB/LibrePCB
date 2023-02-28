@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "libraryelementcheckmessage.h"
+#include "../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -39,14 +39,14 @@ namespace librepcb {
 /**
  * @brief The MsgMissingCategories class
  */
-class MsgMissingCategories final : public LibraryElementCheckMessage {
+class MsgMissingCategories final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgMissingCategories)
 
 public:
   // Constructors / Destructor
   MsgMissingCategories() noexcept;
   MsgMissingCategories(const MsgMissingCategories& other) noexcept
-    : LibraryElementCheckMessage(other) {}
+    : RuleCheckMessage(other) {}
   virtual ~MsgMissingCategories() noexcept;
 };
 

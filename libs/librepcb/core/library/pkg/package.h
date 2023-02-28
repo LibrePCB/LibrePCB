@@ -73,7 +73,7 @@ public:
   const FootprintList& getFootprints() const noexcept { return mFootprints; }
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   Package& operator=(const Package& rhs) = delete;

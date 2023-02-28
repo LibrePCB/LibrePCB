@@ -32,7 +32,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MsgMissingSymbolValue::MsgMissingSymbolValue() noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning, tr("Missing text: '%1'").arg("{{VALUE}}"),
         tr("Most symbols should have a text element for the component's value, "
            "otherwise you won't see that value in the schematics. There are "

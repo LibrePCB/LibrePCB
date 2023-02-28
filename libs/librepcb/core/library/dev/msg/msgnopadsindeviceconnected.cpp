@@ -32,7 +32,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MsgNoPadsInDeviceConnected::MsgNoPadsInDeviceConnected() noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning,  // Only warning because it could be a false-positive
         tr("No pads connected"),
         tr("The chosen package contains pads, but none of them are connected "

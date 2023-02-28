@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -39,14 +39,14 @@ namespace librepcb {
 /**
  * @brief The MsgMissingFootprint class
  */
-class MsgMissingFootprint final : public LibraryElementCheckMessage {
+class MsgMissingFootprint final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgMissingFootprint)
 
 public:
   // Constructors / Destructor
   MsgMissingFootprint() noexcept;
   MsgMissingFootprint(const MsgMissingFootprint& other) noexcept
-    : LibraryElementCheckMessage(other) {}
+    : RuleCheckMessage(other) {}
   virtual ~MsgMissingFootprint() noexcept;
 };
 

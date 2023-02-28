@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -42,7 +42,7 @@ class FootprintPad;
 /**
  * @brief The MsgPadHoleOutsideCopper class
  */
-class MsgPadHoleOutsideCopper final : public LibraryElementCheckMessage {
+class MsgPadHoleOutsideCopper final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgPadHoleOutsideCopper)
 
 public:
@@ -52,9 +52,7 @@ public:
                           std::shared_ptr<const FootprintPad> pad,
                           const QString& pkgPadName) noexcept;
   MsgPadHoleOutsideCopper(const MsgPadHoleOutsideCopper& other) noexcept
-    : LibraryElementCheckMessage(other),
-      mFootprint(other.mFootprint),
-      mPad(other.mPad) {}
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
   virtual ~MsgPadHoleOutsideCopper() noexcept;
 
   // Getters

@@ -34,7 +34,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MsgDuplicatePadName::MsgDuplicatePadName(const PackagePad& pad) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Error, tr("Duplicate pad name: '%1'").arg(*pad.getName()),
         tr("All package pads must have unique names, otherwise they cannot be "
            "distinguished later in the device editor. If your part has several "

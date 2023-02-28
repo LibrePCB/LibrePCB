@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -41,7 +41,7 @@ class SymbolPin;
 /**
  * @brief The MsgDuplicatePinName class
  */
-class MsgDuplicatePinName final : public LibraryElementCheckMessage {
+class MsgDuplicatePinName final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgDuplicatePinName)
 
 public:
@@ -49,7 +49,7 @@ public:
   MsgDuplicatePinName() = delete;
   explicit MsgDuplicatePinName(const SymbolPin& pin) noexcept;
   MsgDuplicatePinName(const MsgDuplicatePinName& other) noexcept
-    : LibraryElementCheckMessage(other) {}
+    : RuleCheckMessage(other) {}
   virtual ~MsgDuplicatePinName() noexcept;
 };
 

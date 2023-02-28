@@ -36,7 +36,7 @@ namespace librepcb {
 MsgSymbolPinNotOnGrid::MsgSymbolPinNotOnGrid(
     std::shared_ptr<const SymbolPin> pin,
     const PositiveLength& gridInterval) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Error,
         tr("Pin not on %1mm grid: '%2'")
             .arg(gridInterval->toMmString(), *pin->getName()),

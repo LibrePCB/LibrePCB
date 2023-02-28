@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../rulecheck/rulecheckmessage.h"
 #include "../../../types/length.h"
-#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -43,7 +43,7 @@ class FootprintPad;
 /**
  * @brief The MsgPadClearanceViolation class
  */
-class MsgPadClearanceViolation final : public LibraryElementCheckMessage {
+class MsgPadClearanceViolation final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgPadClearanceViolation)
 
 public:
@@ -56,7 +56,7 @@ public:
                            const QString& pkgPad2Name,
                            const Length& clearance) noexcept;
   MsgPadClearanceViolation(const MsgPadClearanceViolation& other) noexcept
-    : LibraryElementCheckMessage(other),
+    : RuleCheckMessage(other),
       mFootprint(other.mFootprint),
       mPad1(other.mPad1),
       mPad2(other.mPad2) {}

@@ -38,7 +38,7 @@ MsgPadClearanceViolation::MsgPadClearanceViolation(
     std::shared_ptr<const FootprintPad> pad1, const QString& pkgPad1Name,
     std::shared_ptr<const FootprintPad> pad2, const QString& pkgPad2Name,
     const Length& clearance) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning,
         tr("Clearance of pad '%1' to pad '%2' in '%3'")
             .arg(pkgPad1Name, pkgPad2Name,

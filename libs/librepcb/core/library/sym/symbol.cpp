@@ -82,7 +82,7 @@ Symbol::~Symbol() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList Symbol::runChecks() const {
+RuleCheckMessageList Symbol::runChecks() const {
   SymbolCheck check(*this);
   return check.runChecks();  // can throw
 }

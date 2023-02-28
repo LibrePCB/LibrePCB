@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -42,7 +42,7 @@ class FootprintPad;
 /**
  * @brief The MsgOverlappingPads class
  */
-class MsgOverlappingPads final : public LibraryElementCheckMessage {
+class MsgOverlappingPads final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgOverlappingPads)
 
 public:
@@ -54,7 +54,7 @@ public:
                      std::shared_ptr<const FootprintPad> pad2,
                      const QString& pkgPad2Name) noexcept;
   MsgOverlappingPads(const MsgOverlappingPads& other) noexcept
-    : LibraryElementCheckMessage(other),
+    : RuleCheckMessage(other),
       mFootprint(other.mFootprint),
       mPad1(other.mPad1),
       mPad2(other.mPad2) {}

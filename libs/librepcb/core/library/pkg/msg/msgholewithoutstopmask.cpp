@@ -36,7 +36,7 @@ namespace librepcb {
 MsgHoleWithoutStopMask::MsgHoleWithoutStopMask(
     std::shared_ptr<const Footprint> footprint,
     std::shared_ptr<const Hole> hole) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning,
         tr("No stop mask on %1 hole in '%2'",
            "First placeholder is the hole diameter.")

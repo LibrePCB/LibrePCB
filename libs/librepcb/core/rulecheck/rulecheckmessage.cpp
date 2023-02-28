@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "libraryelementcheckmessage.h"
+#include "rulecheckmessage.h"
 
 /*******************************************************************************
  *  Namespace
@@ -31,8 +31,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryElementCheckMessage::LibraryElementCheckMessage(
-    const LibraryElementCheckMessage& other) noexcept
+RuleCheckMessage::RuleCheckMessage(const RuleCheckMessage& other) noexcept
   : mSeverity(other.mSeverity),
     mSeverityIcon(other.mSeverityIcon),
     mMessage(other.mMessage),
@@ -40,9 +39,9 @@ LibraryElementCheckMessage::LibraryElementCheckMessage(
     mApproval(other.mApproval) {
 }
 
-LibraryElementCheckMessage::LibraryElementCheckMessage(
-    Severity severity, const QString& msg, const QString& description,
-    const QString& approvalName) noexcept
+RuleCheckMessage::RuleCheckMessage(Severity severity, const QString& msg,
+                                   const QString& description,
+                                   const QString& approvalName) noexcept
   : mSeverity(severity),
     mSeverityIcon(getSeverityIcon(severity)),
     mMessage(msg),
@@ -51,14 +50,14 @@ LibraryElementCheckMessage::LibraryElementCheckMessage(
   mApproval.appendChild(SExpression::createToken(approvalName));  // snake_case
 }
 
-LibraryElementCheckMessage::~LibraryElementCheckMessage() noexcept {
+RuleCheckMessage::~RuleCheckMessage() noexcept {
 }
 
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
 
-QIcon LibraryElementCheckMessage::getSeverityIcon(Severity severity) noexcept {
+QIcon RuleCheckMessage::getSeverityIcon(Severity severity) noexcept {
   static QMap<Severity, QIcon> icon = {
       {Severity::Hint, QIcon(":/img/status/info.png")},
       {Severity::Warning, QIcon(":/img/status/dialog_warning.png")},
@@ -71,16 +70,14 @@ QIcon LibraryElementCheckMessage::getSeverityIcon(Severity severity) noexcept {
  *  Operator Overloads
  ******************************************************************************/
 
-bool LibraryElementCheckMessage::operator==(
-    const LibraryElementCheckMessage& rhs) const noexcept {
+bool RuleCheckMessage::operator==(const RuleCheckMessage& rhs) const noexcept {
   if (mSeverity != rhs.mSeverity) return false;
   if (mMessage != rhs.mMessage) return false;
   if (mDescription != rhs.mDescription) return false;
   return true;
 }
 
-bool LibraryElementCheckMessage::operator!=(
-    const LibraryElementCheckMessage& rhs) const noexcept {
+bool RuleCheckMessage::operator!=(const RuleCheckMessage& rhs) const noexcept {
   return !(*this == rhs);
 }
 

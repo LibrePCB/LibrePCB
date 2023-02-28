@@ -79,18 +79,15 @@ private:  // Methods
   void updateMetadata() noexcept;
   QString commitMetadata() noexcept;
   bool isInterfaceBroken() const noexcept override { return false; }
-  bool runChecks(LibraryElementCheckMessageList& msgs) const override;
+  bool runChecks(RuleCheckMessageList& msgs) const override;
   template <typename MessageType>
   void fixMsg(const MessageType& msg);
   template <typename MessageType>
-  bool fixMsgHelper(std::shared_ptr<const LibraryElementCheckMessage> msg,
-                    bool applyFix);
-  bool processCheckMessage(
-      std::shared_ptr<const LibraryElementCheckMessage> msg,
-      bool applyFix) override;
-  void libraryElementCheckApproveRequested(
-      std::shared_ptr<const LibraryElementCheckMessage> msg,
-      bool approve) noexcept override;
+  bool fixMsgHelper(std::shared_ptr<const RuleCheckMessage> msg, bool applyFix);
+  bool processRuleCheckMessage(std::shared_ptr<const RuleCheckMessage> msg,
+                               bool applyFix) override;
+  void ruleCheckApproveRequested(std::shared_ptr<const RuleCheckMessage> msg,
+                                 bool approve) noexcept override;
   void btnChooseParentCategoryClicked() noexcept;
   void btnResetParentCategoryClicked() noexcept;
   void updateCategoryLabel() noexcept;

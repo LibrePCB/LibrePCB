@@ -114,7 +114,7 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList LibraryBaseElement::runChecks() const {
+RuleCheckMessageList LibraryBaseElement::runChecks() const {
   LibraryBaseElementCheck check(*this);
   return check.runChecks();  // can throw
 }

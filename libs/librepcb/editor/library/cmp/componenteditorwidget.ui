@@ -345,7 +345,7 @@
         </widget>
        </item>
        <item row="12" column="1">
-        <widget class="librepcb::editor::LibraryElementCheckListWidget" name="lstMessages" native="true">
+        <widget class="librepcb::editor::RuleCheckListWidget" name="lstMessages" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -367,9 +367,9 @@
    <header location="global">librepcb/editor/widgets/plaintextedit.h</header>
   </customwidget>
   <customwidget>
-   <class>librepcb::editor::LibraryElementCheckListWidget</class>
+   <class>librepcb::editor::RuleCheckListWidget</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/editor/library/libraryelementchecklistwidget.h</header>
+   <header location="global">librepcb/editor/widgets/rulechecklistwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

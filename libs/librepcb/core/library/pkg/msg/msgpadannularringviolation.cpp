@@ -37,7 +37,7 @@ MsgPadAnnularRingViolation::MsgPadAnnularRingViolation(
     std::shared_ptr<const Footprint> footprint,
     std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName,
     const Length& annularRing) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning,
         tr("Annular ring of pad '%1' in '%2'")
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),

@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../rulecheck/rulecheckmessage.h"
 #include "../../types/elementname.h"
-#include "libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -40,7 +40,7 @@ namespace librepcb {
 /**
  * @brief The MsgNameNotTitleCase class
  */
-class MsgNameNotTitleCase final : public LibraryElementCheckMessage {
+class MsgNameNotTitleCase final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgNameNotTitleCase)
 
 public:
@@ -48,7 +48,7 @@ public:
   MsgNameNotTitleCase() = delete;
   explicit MsgNameNotTitleCase(const ElementName& name) noexcept;
   MsgNameNotTitleCase(const MsgNameNotTitleCase& other) noexcept
-    : LibraryElementCheckMessage(other), mName(other.mName) {}
+    : RuleCheckMessage(other), mName(other.mName) {}
   virtual ~MsgNameNotTitleCase() noexcept;
 
   const ElementName& getName() const noexcept { return mName; }

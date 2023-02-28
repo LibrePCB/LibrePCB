@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../rulecheck/rulecheckmessage.h"
 #include "../../../types/length.h"
-#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -43,7 +43,7 @@ class FootprintPad;
 /**
  * @brief The MsgPadOverlapsWithPlacement class
  */
-class MsgPadOverlapsWithPlacement final : public LibraryElementCheckMessage {
+class MsgPadOverlapsWithPlacement final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgPadOverlapsWithPlacement)
 
 public:
@@ -54,9 +54,7 @@ public:
                               const QString& pkgPadName,
                               const Length& clearance) noexcept;
   MsgPadOverlapsWithPlacement(const MsgPadOverlapsWithPlacement& other) noexcept
-    : LibraryElementCheckMessage(other),
-      mFootprint(other.mFootprint),
-      mPad(other.mPad) {}
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
   virtual ~MsgPadOverlapsWithPlacement() noexcept;
 
   // Getters

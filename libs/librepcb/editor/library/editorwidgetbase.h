@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "../dialogs/graphicsexportdialog.h"
 #include "../undostack.h"
-#include "libraryelementchecklistwidget.h"
+#include "../widgets/rulechecklistwidget.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 
@@ -58,8 +58,7 @@ class UndoStackActionGroup;
 /**
  * @brief The EditorWidgetBase class
  */
-class EditorWidgetBase : public QWidget,
-                         protected IF_LibraryElementCheckHandler {
+class EditorWidgetBase : public QWidget, protected IF_RuleCheckHandler {
   Q_OBJECT
 
 public:
@@ -182,9 +181,9 @@ protected:  // Methods
     Q_UNUSED(newTool);
     return false;
   }
-  virtual bool runChecks(LibraryElementCheckMessageList& msgs) const = 0;
+  virtual bool runChecks(RuleCheckMessageList& msgs) const = 0;
   void setMessageApproved(LibraryBaseElement& element,
-                          std::shared_ptr<const LibraryElementCheckMessage> msg,
+                          std::shared_ptr<const RuleCheckMessage> msg,
                           bool approve) noexcept;
   virtual bool execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                         const QString& settingsKey) noexcept {
@@ -215,14 +214,14 @@ private:  // Methods
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void undoStackCleanChanged(bool clean) noexcept;
   void scheduleLibraryElementChecks() noexcept;
-  virtual bool processCheckMessage(
-      std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) = 0;
-  bool libraryElementCheckFixAvailable(
-      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
-  void libraryElementCheckFixRequested(
-      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
-  void libraryElementCheckDescriptionRequested(
-      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
+  virtual bool processRuleCheckMessage(
+      std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) = 0;
+  bool ruleCheckFixAvailable(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
+  void ruleCheckFixRequested(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
+  void ruleCheckDescriptionRequested(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
 
 signals:
   void dirtyChanged(bool dirty);

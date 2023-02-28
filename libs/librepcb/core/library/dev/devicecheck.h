@@ -50,7 +50,7 @@ public:
   virtual ~DeviceCheck() noexcept;
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   DeviceCheck& operator=(const DeviceCheck& rhs) = delete;

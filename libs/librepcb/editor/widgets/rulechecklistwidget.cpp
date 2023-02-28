@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "libraryelementchecklistwidget.h"
+#include "rulechecklistwidget.h"
 
 #include <librepcb/core/utils/toolbox.h>
 
@@ -36,8 +36,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryElementCheckListWidget::LibraryElementCheckListWidget(
-    QWidget* parent) noexcept
+RuleCheckListWidget::RuleCheckListWidget(QWidget* parent) noexcept
   : QWidget(parent),
     mListWidget(new QListWidget(this)),
     mHandler(nullptr),
@@ -47,49 +46,45 @@ LibraryElementCheckListWidget::LibraryElementCheckListWidget(
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mListWidget.data());
   connect(mListWidget.data(), &QListWidget::itemDoubleClicked, this,
-          &LibraryElementCheckListWidget::itemDoubleClicked);
+          &RuleCheckListWidget::itemDoubleClicked);
   updateList();  // adds the "looks good" message
 }
 
-LibraryElementCheckListWidget::~LibraryElementCheckListWidget() noexcept {
+RuleCheckListWidget::~RuleCheckListWidget() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void LibraryElementCheckListWidget::setProvideFixes(
-    bool provideFixes) noexcept {
+void RuleCheckListWidget::setProvideFixes(bool provideFixes) noexcept {
   if (provideFixes != mProvideFixes) {
     mProvideFixes = provideFixes;
     updateList();
   }
 }
 
-void LibraryElementCheckListWidget::setHandler(
-    IF_LibraryElementCheckHandler* handler) noexcept {
+void RuleCheckListWidget::setHandler(IF_RuleCheckHandler* handler) noexcept {
   mHandler = handler;
 }
 
-void LibraryElementCheckListWidget::setMessages(
-    LibraryElementCheckMessageList messages) noexcept {
+void RuleCheckListWidget::setMessages(RuleCheckMessageList messages) noexcept {
   // Sort by severity and message.
-  Toolbox::sortNumeric(
-      messages,
-      [](const QCollator& cmp,
-         const std::shared_ptr<const LibraryElementCheckMessage>& lhs,
-         const std::shared_ptr<const LibraryElementCheckMessage>& rhs) {
-        if (lhs && rhs) {
-          if (lhs->getSeverity() != rhs->getSeverity()) {
-            return lhs->getSeverity() > rhs->getSeverity();
-          } else {
-            return cmp(lhs->getMessage(), rhs->getMessage());
-          }
-        } else {
-          return false;
-        }
-      },
-      Qt::CaseInsensitive, false);
+  Toolbox::sortNumeric(messages,
+                       [](const QCollator& cmp,
+                          const std::shared_ptr<const RuleCheckMessage>& lhs,
+                          const std::shared_ptr<const RuleCheckMessage>& rhs) {
+                         if (lhs && rhs) {
+                           if (lhs->getSeverity() != rhs->getSeverity()) {
+                             return lhs->getSeverity() > rhs->getSeverity();
+                           } else {
+                             return cmp(lhs->getMessage(), rhs->getMessage());
+                           }
+                         } else {
+                           return false;
+                         }
+                       },
+                       Qt::CaseInsensitive, false);
 
   // Detect if messages have changed.
   bool isSame = (mMessages.count() == messages.count());
@@ -110,7 +105,7 @@ void LibraryElementCheckListWidget::setMessages(
   }
 }
 
-void LibraryElementCheckListWidget::setApprovals(
+void RuleCheckListWidget::setApprovals(
     const QSet<SExpression>& approvals) noexcept {
   if (approvals != mApprovals) {
     mApprovals = approvals;
@@ -122,15 +117,15 @@ void LibraryElementCheckListWidget::setApprovals(
  *  Private Methods
  ******************************************************************************/
 
-void LibraryElementCheckListWidget::updateList() noexcept {
+void RuleCheckListWidget::updateList() noexcept {
   mListWidget->setUpdatesEnabled(false);  // Avoid flicker.
   mListWidget->clear();
   foreach (const auto& msg, mMessages) {
     QListWidgetItem* item = new QListWidgetItem();
     mListWidget->addItem(item);
     const bool approved = mApprovals.contains(msg->getApproval());
-    LibraryElementCheckListItemWidget* widget =
-        new LibraryElementCheckListItemWidget(msg, *this, approved);
+    RuleCheckListItemWidget* widget =
+        new RuleCheckListItemWidget(msg, *this, approved);
     mListWidget->setItemWidget(item, widget);
   }
   if (mListWidget->count() == 0) {
@@ -142,47 +137,45 @@ void LibraryElementCheckListWidget::updateList() noexcept {
   mListWidget->setUpdatesEnabled(true);
 }
 
-void LibraryElementCheckListWidget::itemDoubleClicked(
-    QListWidgetItem* item) noexcept {
-  std::shared_ptr<const LibraryElementCheckMessage> msg =
+void RuleCheckListWidget::itemDoubleClicked(QListWidgetItem* item) noexcept {
+  std::shared_ptr<const RuleCheckMessage> msg =
       mMessages.value(mListWidget->row(item));
   if (msg && mHandler) {
-    if (mProvideFixes && mHandler->libraryElementCheckFixAvailable(msg)) {
-      mHandler->libraryElementCheckFixRequested(msg);
+    if (mProvideFixes && mHandler->ruleCheckFixAvailable(msg)) {
+      mHandler->ruleCheckFixRequested(msg);
     } else {
-      mHandler->libraryElementCheckDescriptionRequested(msg);
+      mHandler->ruleCheckDescriptionRequested(msg);
     }
   }
 }
 
-bool LibraryElementCheckListWidget::libraryElementCheckFixAvailable(
-    std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
+bool RuleCheckListWidget::ruleCheckFixAvailable(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
   if (mProvideFixes && mHandler) {
-    return mHandler->libraryElementCheckFixAvailable(msg);
+    return mHandler->ruleCheckFixAvailable(msg);
   } else {
     return false;
   }
 }
 
-void LibraryElementCheckListWidget::libraryElementCheckFixRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
+void RuleCheckListWidget::ruleCheckFixRequested(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
   if (mProvideFixes && mHandler) {
-    mHandler->libraryElementCheckFixRequested(msg);
+    mHandler->ruleCheckFixRequested(msg);
   }
 }
 
-void LibraryElementCheckListWidget::libraryElementCheckDescriptionRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
+void RuleCheckListWidget::ruleCheckDescriptionRequested(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
   if (mHandler) {
-    mHandler->libraryElementCheckDescriptionRequested(msg);
+    mHandler->ruleCheckDescriptionRequested(msg);
   }
 }
 
-void LibraryElementCheckListWidget::libraryElementCheckApproveRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg,
-    bool approve) noexcept {
+void RuleCheckListWidget::ruleCheckApproveRequested(
+    std::shared_ptr<const RuleCheckMessage> msg, bool approve) noexcept {
   if (mHandler) {
-    mHandler->libraryElementCheckApproveRequested(msg, approve);
+    mHandler->ruleCheckApproveRequested(msg, approve);
   }
 }
 

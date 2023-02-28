@@ -35,7 +35,7 @@ namespace librepcb {
 
 MsgMissingFootprintName::MsgMissingFootprintName(
     std::shared_ptr<const Footprint> footprint) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning,
         tr("Missing text '%1' in footprint '%2'")
             .arg("{{NAME}}", *footprint->getNames().getDefaultValue()),

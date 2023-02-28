@@ -67,7 +67,7 @@ public:
   void setCategories(const QSet<Uuid>& uuids) noexcept { mCategories = uuids; }
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   LibraryElement& operator=(const LibraryElement& rhs) = delete;

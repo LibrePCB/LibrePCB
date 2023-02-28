@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
-#define LIBREPCB_EDITOR_LIBRARYELEMENTCHECKLISTWIDGET_H
+#ifndef LIBREPCB_EDITOR_RULECHECKLISTWIDGET_H
+#define LIBREPCB_EDITOR_RULECHECKLISTWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/library/msg/libraryelementcheckmessage.h>
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,44 +37,41 @@ namespace librepcb {
 namespace editor {
 
 /*******************************************************************************
- *  Interface IF_LibraryElementCheckHandler
+ *  Interface IF_RuleCheckHandler
  ******************************************************************************/
 
-class IF_LibraryElementCheckHandler {
+class IF_RuleCheckHandler {
 public:
-  virtual bool libraryElementCheckFixAvailable(
-      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept = 0;
-  virtual void libraryElementCheckFixRequested(
-      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept = 0;
-  virtual void libraryElementCheckDescriptionRequested(
-      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept = 0;
-  virtual void libraryElementCheckApproveRequested(
-      std::shared_ptr<const LibraryElementCheckMessage> msg,
-      bool approve) noexcept = 0;
+  virtual bool ruleCheckFixAvailable(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept = 0;
+  virtual void ruleCheckFixRequested(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept = 0;
+  virtual void ruleCheckDescriptionRequested(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept = 0;
+  virtual void ruleCheckApproveRequested(
+      std::shared_ptr<const RuleCheckMessage> msg, bool approve) noexcept = 0;
 
 protected:
-  IF_LibraryElementCheckHandler() noexcept {}
-  IF_LibraryElementCheckHandler(const IF_LibraryElementCheckHandler&) noexcept {
-  }
-  virtual ~IF_LibraryElementCheckHandler() noexcept {}
+  IF_RuleCheckHandler() noexcept {}
+  IF_RuleCheckHandler(const IF_RuleCheckHandler&) noexcept {}
+  virtual ~IF_RuleCheckHandler() noexcept {}
 };
 
 /*******************************************************************************
- *  Class LibraryElementCheckListItemWidget
+ *  Class RuleCheckListItemWidget
  ******************************************************************************/
 
 /**
- * @brief The LibraryElementCheckListItemWidget class
+ * @brief The RuleCheckListItemWidget class
  */
-class LibraryElementCheckListItemWidget final : public QWidget {
+class RuleCheckListItemWidget final : public QWidget {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit LibraryElementCheckListItemWidget(
-      std::shared_ptr<const LibraryElementCheckMessage> msg,
-      IF_LibraryElementCheckHandler& handler, bool approved,
-      QWidget* parent = nullptr) noexcept
+  explicit RuleCheckListItemWidget(std::shared_ptr<const RuleCheckMessage> msg,
+                                   IF_RuleCheckHandler& handler, bool approved,
+                                   QWidget* parent = nullptr) noexcept
     : QWidget(parent),
       mMessage(msg),
       mHandler(handler),
@@ -105,14 +102,14 @@ public:
     layout->setStretch(1, 100);
 
     // "fix" button
-    if (mHandler.libraryElementCheckFixAvailable(mMessage)) {
+    if (mHandler.ruleCheckFixAvailable(mMessage)) {
       QToolButton* btnFix = new QToolButton(this);
       btnFix->setText(tr("Fix"));
       btnFix->setToolTip(tr("Fix Problem"));
       btnFix->setStatusTip(
           tr("Automatically apply a modification to fix this message"));
       connect(btnFix, &QToolButton::clicked, this,
-              [this]() { mHandler.libraryElementCheckFixRequested(mMessage); });
+              [this]() { mHandler.ruleCheckFixRequested(mMessage); });
       layout->addWidget(btnFix);
     }
 
@@ -124,7 +121,7 @@ public:
     btnApprove->setCheckable(true);
     btnApprove->setChecked(approved);
     connect(btnApprove, &QToolButton::clicked, this, [this, msg](bool checked) {
-      mHandler.libraryElementCheckApproveRequested(mMessage, checked);
+      mHandler.ruleCheckApproveRequested(mMessage, checked);
     });
     layout->addWidget(btnApprove);
 
@@ -133,18 +130,16 @@ public:
     btnDetails->setText("?");
     btnDetails->setToolTip(tr("Details"));
     btnDetails->setStatusTip(tr("Show more information about this message"));
-    connect(btnDetails, &QToolButton::clicked, this, [this]() {
-      mHandler.libraryElementCheckDescriptionRequested(mMessage);
-    });
+    connect(btnDetails, &QToolButton::clicked, this,
+            [this]() { mHandler.ruleCheckDescriptionRequested(mMessage); });
     layout->addWidget(btnDetails);
   }
-  LibraryElementCheckListItemWidget(
-      const LibraryElementCheckListItemWidget& other) = delete;
-  ~LibraryElementCheckListItemWidget() noexcept {}
+  RuleCheckListItemWidget(const RuleCheckListItemWidget& other) = delete;
+  ~RuleCheckListItemWidget() noexcept {}
 
   // Operator Overloadings
-  LibraryElementCheckListItemWidget& operator=(
-      const LibraryElementCheckListItemWidget& rhs) = delete;
+  RuleCheckListItemWidget& operator=(const RuleCheckListItemWidget& rhs) =
+      delete;
 
 private:  // Methods
   void resizeEvent(QResizeEvent* event) override {
@@ -153,57 +148,52 @@ private:  // Methods
   }
 
 private:  // Data
-  std::shared_ptr<const LibraryElementCheckMessage> mMessage;
-  IF_LibraryElementCheckHandler& mHandler;
+  std::shared_ptr<const RuleCheckMessage> mMessage;
+  IF_RuleCheckHandler& mHandler;
   QScopedPointer<QLabel> mIconLabel;
 };
 
 /*******************************************************************************
- *  Class LibraryElementCheckListWidget
+ *  Class RuleCheckListWidget
  ******************************************************************************/
 
 /**
- * @brief The LibraryElementCheckListWidget class
+ * @brief The RuleCheckListWidget class
  */
-class LibraryElementCheckListWidget final
-  : public QWidget,
-    private IF_LibraryElementCheckHandler {
+class RuleCheckListWidget final : public QWidget, private IF_RuleCheckHandler {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit LibraryElementCheckListWidget(QWidget* parent = nullptr) noexcept;
-  LibraryElementCheckListWidget(const LibraryElementCheckListWidget& other) =
-      delete;
-  ~LibraryElementCheckListWidget() noexcept;
+  explicit RuleCheckListWidget(QWidget* parent = nullptr) noexcept;
+  RuleCheckListWidget(const RuleCheckListWidget& other) = delete;
+  ~RuleCheckListWidget() noexcept;
 
   // Setters
   void setProvideFixes(bool provideFixes) noexcept;
-  void setHandler(IF_LibraryElementCheckHandler* handler) noexcept;
-  void setMessages(LibraryElementCheckMessageList messages) noexcept;
+  void setHandler(IF_RuleCheckHandler* handler) noexcept;
+  void setMessages(RuleCheckMessageList messages) noexcept;
   void setApprovals(const QSet<SExpression>& approvals) noexcept;
 
   // Operator Overloadings
-  LibraryElementCheckListWidget& operator=(
-      const LibraryElementCheckListWidget& rhs) = delete;
+  RuleCheckListWidget& operator=(const RuleCheckListWidget& rhs) = delete;
 
 private:  // Methods
   void updateList() noexcept;
   void itemDoubleClicked(QListWidgetItem* item) noexcept;
-  bool libraryElementCheckFixAvailable(
-      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
-  void libraryElementCheckFixRequested(
-      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
-  void libraryElementCheckDescriptionRequested(
-      std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept override;
-  void libraryElementCheckApproveRequested(
-      std::shared_ptr<const LibraryElementCheckMessage> msg,
-      bool approve) noexcept override;
+  bool ruleCheckFixAvailable(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
+  void ruleCheckFixRequested(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
+  void ruleCheckDescriptionRequested(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
+  void ruleCheckApproveRequested(std::shared_ptr<const RuleCheckMessage> msg,
+                                 bool approve) noexcept override;
 
 private:  // Data
   QScopedPointer<QListWidget> mListWidget;
-  IF_LibraryElementCheckHandler* mHandler;
-  LibraryElementCheckMessageList mMessages;
+  IF_RuleCheckHandler* mHandler;
+  RuleCheckMessageList mMessages;
   QSet<SExpression> mApprovals;
   bool mProvideFixes;
 };

@@ -37,7 +37,7 @@ MsgPadOverlapsWithPlacement::MsgPadOverlapsWithPlacement(
     std::shared_ptr<const Footprint> footprint,
     std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName,
     const Length& clearance) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning,
         tr("Clearance of pad '%1' in '%2' to placement layer")
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),

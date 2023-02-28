@@ -32,7 +32,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MsgMissingFootprint::MsgMissingFootprint() noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Error, tr("No footprint defined"),
         tr("Every package must have at least one footprint, otherwise it can't "
            "be added to a board."),

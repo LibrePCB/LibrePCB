@@ -32,7 +32,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MsgMissingSymbolVariant::MsgMissingSymbolVariant() noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Error, tr("No symbol variant defined"),
         tr("Every component requires at least one symbol variant, otherwise it "
            "can't be added to schematics."),

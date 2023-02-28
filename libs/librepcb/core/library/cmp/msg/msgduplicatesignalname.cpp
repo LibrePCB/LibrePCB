@@ -35,7 +35,7 @@ namespace librepcb {
 
 MsgDuplicateSignalName::MsgDuplicateSignalName(
     const ComponentSignal& signal) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Error,
         tr("Duplicate signal name: '%1'").arg(*signal.getName()),
         tr("All component signals must have unique names, otherwise they "

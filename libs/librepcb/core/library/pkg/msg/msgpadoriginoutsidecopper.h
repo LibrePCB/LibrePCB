@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../rulecheck/rulecheckmessage.h"
 #include "../../../types/length.h"
-#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -44,7 +44,7 @@ class Hole;
 /**
  * @brief The MsgPadOriginOutsideCopper class
  */
-class MsgPadOriginOutsideCopper final : public LibraryElementCheckMessage {
+class MsgPadOriginOutsideCopper final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgPadOriginOutsideCopper)
 
 public:
@@ -54,9 +54,7 @@ public:
                             std::shared_ptr<const FootprintPad> pad,
                             const QString& pkgPadName) noexcept;
   MsgPadOriginOutsideCopper(const MsgPadOriginOutsideCopper& other) noexcept
-    : LibraryElementCheckMessage(other),
-      mFootprint(other.mFootprint),
-      mPad(other.mPad) {}
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
   virtual ~MsgPadOriginOutsideCopper() noexcept;
 
   // Getters

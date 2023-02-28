@@ -81,7 +81,7 @@ void Device::setPackageUuid(const Uuid& uuid) noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList Device::runChecks() const {
+RuleCheckMessageList Device::runChecks() const {
   DeviceCheck check(*this);
   return check.runChecks();  // can throw
 }

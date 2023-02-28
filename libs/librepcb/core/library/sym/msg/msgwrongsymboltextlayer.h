@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -41,7 +41,7 @@ class Text;
 /**
  * @brief The MsgWrongSymbolTextLayer class
  */
-class MsgWrongSymbolTextLayer final : public LibraryElementCheckMessage {
+class MsgWrongSymbolTextLayer final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgWrongSymbolTextLayer)
 
 public:
@@ -50,7 +50,7 @@ public:
   MsgWrongSymbolTextLayer(std::shared_ptr<const Text> text,
                           const QString& expectedLayerName) noexcept;
   MsgWrongSymbolTextLayer(const MsgWrongSymbolTextLayer& other) noexcept
-    : LibraryElementCheckMessage(other),
+    : RuleCheckMessage(other),
       mText(other.mText),
       mExpectedLayerName(other.mExpectedLayerName) {}
   virtual ~MsgWrongSymbolTextLayer() noexcept;

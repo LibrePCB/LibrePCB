@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../rulecheck/rulecheckmessage.h"
 #include "../../../types/length.h"
-#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -43,7 +43,7 @@ class FootprintPad;
 /**
  * @brief The MsgInvalidCustomPadOutline class
  */
-class MsgInvalidCustomPadOutline final : public LibraryElementCheckMessage {
+class MsgInvalidCustomPadOutline final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgInvalidCustomPadOutline)
 
 public:
@@ -53,9 +53,7 @@ public:
                              std::shared_ptr<const FootprintPad> pad,
                              const QString& pkgPadName) noexcept;
   MsgInvalidCustomPadOutline(const MsgInvalidCustomPadOutline& other) noexcept
-    : LibraryElementCheckMessage(other),
-      mFootprint(other.mFootprint),
-      mPad(other.mPad) {}
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
   virtual ~MsgInvalidCustomPadOutline() noexcept;
 
   // Getters

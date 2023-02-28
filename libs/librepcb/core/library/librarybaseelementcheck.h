@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "./msg/libraryelementcheckmessage.h"
+#include "../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -50,14 +50,14 @@ public:
   virtual ~LibraryBaseElementCheck() noexcept;
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const;
+  virtual RuleCheckMessageList runChecks() const;
 
   // Operator Overloadings
   LibraryBaseElementCheck& operator=(const LibraryBaseElementCheck& rhs) =
       delete;
 
 protected:
-  typedef LibraryElementCheckMessageList MsgList;
+  typedef RuleCheckMessageList MsgList;
   void checkDefaultNameTitleCase(MsgList& msgs) const;
   void checkMissingAuthor(MsgList& msgs) const;
 

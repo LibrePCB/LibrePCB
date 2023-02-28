@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -41,7 +41,7 @@ class Footprint;
 /**
  * @brief The MsgMissingFootprintValue class
  */
-class MsgMissingFootprintValue final : public LibraryElementCheckMessage {
+class MsgMissingFootprintValue final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgMissingFootprintValue)
 
 public:
@@ -50,7 +50,7 @@ public:
   explicit MsgMissingFootprintValue(
       std::shared_ptr<const Footprint> footprint) noexcept;
   MsgMissingFootprintValue(const MsgMissingFootprintValue& other) noexcept
-    : LibraryElementCheckMessage(other) {}
+    : RuleCheckMessage(other) {}
   virtual ~MsgMissingFootprintValue() noexcept;
 };
 

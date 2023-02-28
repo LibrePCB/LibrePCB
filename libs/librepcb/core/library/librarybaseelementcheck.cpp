@@ -49,8 +49,8 @@ LibraryBaseElementCheck::~LibraryBaseElementCheck() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList LibraryBaseElementCheck::runChecks() const {
-  LibraryElementCheckMessageList msgs;
+RuleCheckMessageList LibraryBaseElementCheck::runChecks() const {
+  RuleCheckMessageList msgs;
   checkDefaultNameTitleCase(msgs);
   checkMissingAuthor(msgs);
   return msgs;

@@ -36,7 +36,7 @@ namespace librepcb {
 MsgUnusedCustomPadOutline::MsgUnusedCustomPadOutline(
     std::shared_ptr<const Footprint> footprint,
     std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning,
         tr("Unused custom outline of pad '%1' in '%2'")
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),

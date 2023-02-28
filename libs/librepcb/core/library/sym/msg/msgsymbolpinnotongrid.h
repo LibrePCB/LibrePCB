@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../rulecheck/rulecheckmessage.h"
 #include "../../../types/length.h"
-#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -42,7 +42,7 @@ class SymbolPin;
 /**
  * @brief The MsgSymbolPinNotOnGrid class
  */
-class MsgSymbolPinNotOnGrid final : public LibraryElementCheckMessage {
+class MsgSymbolPinNotOnGrid final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgSymbolPinNotOnGrid)
 
 public:
@@ -51,7 +51,7 @@ public:
   MsgSymbolPinNotOnGrid(std::shared_ptr<const SymbolPin> pin,
                         const PositiveLength& gridInterval) noexcept;
   MsgSymbolPinNotOnGrid(const MsgSymbolPinNotOnGrid& other) noexcept
-    : LibraryElementCheckMessage(other),
+    : RuleCheckMessage(other),
       mPin(other.mPin),
       mGridInterval(other.mGridInterval) {}
   virtual ~MsgSymbolPinNotOnGrid() noexcept;

@@ -34,7 +34,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MsgDuplicatePinName::MsgDuplicatePinName(const SymbolPin& pin) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Error, tr("Duplicate pin name: '%1'").arg(*pin.getName()),
         tr("All symbol pins must have unique names, otherwise they cannot be "
            "distinguished later in the component editor. If your part has "

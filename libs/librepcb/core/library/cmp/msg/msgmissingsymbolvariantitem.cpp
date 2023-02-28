@@ -35,7 +35,7 @@ namespace librepcb {
 
 MsgMissingSymbolVariantItem::MsgMissingSymbolVariantItem(
     std::shared_ptr<const ComponentSymbolVariant> symbVar) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Error,
         tr("Symbol variant '%1' has no items")
             .arg(*symbVar->getNames().getDefaultValue()),

@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../rulecheck/rulecheckmessage.h"
 #include "../../../types/length.h"
-#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -43,7 +43,7 @@ class FootprintPad;
 /**
  * @brief The MsgPadAnnularRingViolation class
  */
-class MsgPadAnnularRingViolation final : public LibraryElementCheckMessage {
+class MsgPadAnnularRingViolation final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgPadAnnularRingViolation)
 
 public:
@@ -54,9 +54,7 @@ public:
                              const QString& pkgPadName,
                              const Length& annularRing) noexcept;
   MsgPadAnnularRingViolation(const MsgPadAnnularRingViolation& other) noexcept
-    : LibraryElementCheckMessage(other),
-      mFootprint(other.mFootprint),
-      mPad(other.mPad) {}
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
   virtual ~MsgPadAnnularRingViolation() noexcept;
 
   // Getters

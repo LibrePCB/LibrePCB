@@ -181,8 +181,7 @@ QString PackageCategoryEditorWidget::commitMetadata() noexcept {
   return QString();
 }
 
-bool PackageCategoryEditorWidget::runChecks(
-    LibraryElementCheckMessageList& msgs) const {
+bool PackageCategoryEditorWidget::runChecks(RuleCheckMessageList& msgs) const {
   msgs = mCategory->runChecks();  // can throw
   mUi->lstMessages->setMessages(msgs);
   return true;
@@ -203,7 +202,7 @@ void PackageCategoryEditorWidget::fixMsg(const MsgMissingAuthor& msg) {
 
 template <typename MessageType>
 bool PackageCategoryEditorWidget::fixMsgHelper(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (msg) {
     if (auto m = msg->as<MessageType>()) {
       if (applyFix) fixMsg(*m);  // can throw
@@ -213,16 +212,15 @@ bool PackageCategoryEditorWidget::fixMsgHelper(
   return false;
 }
 
-bool PackageCategoryEditorWidget::processCheckMessage(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+bool PackageCategoryEditorWidget::processRuleCheckMessage(
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   return false;
 }
 
-void PackageCategoryEditorWidget::libraryElementCheckApproveRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg,
-    bool approve) noexcept {
+void PackageCategoryEditorWidget::ruleCheckApproveRequested(
+    std::shared_ptr<const RuleCheckMessage> msg, bool approve) noexcept {
   setMessageApproved(*mCategory, msg, approve);
   updateMetadata();
 }

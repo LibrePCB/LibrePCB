@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -42,7 +42,7 @@ class StrokeText;
 /**
  * @brief The MsgWrongFootprintTextLayer class
  */
-class MsgWrongFootprintTextLayer final : public LibraryElementCheckMessage {
+class MsgWrongFootprintTextLayer final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgWrongFootprintTextLayer)
 
 public:
@@ -52,7 +52,7 @@ public:
                              std::shared_ptr<const StrokeText> text,
                              const QString& expectedLayerName) noexcept;
   MsgWrongFootprintTextLayer(const MsgWrongFootprintTextLayer& other) noexcept
-    : LibraryElementCheckMessage(other),
+    : RuleCheckMessage(other),
       mFootprint(other.mFootprint),
       mText(other.mText),
       mExpectedLayerName(other.mExpectedLayerName) {}

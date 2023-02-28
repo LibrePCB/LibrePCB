@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -41,7 +41,7 @@ class ComponentSymbolVariant;
 /**
  * @brief The MsgMissingSymbolVariantItem class
  */
-class MsgMissingSymbolVariantItem final : public LibraryElementCheckMessage {
+class MsgMissingSymbolVariantItem final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgMissingSymbolVariantItem)
 
 public:
@@ -50,7 +50,7 @@ public:
   explicit MsgMissingSymbolVariantItem(
       std::shared_ptr<const ComponentSymbolVariant> symbVar) noexcept;
   MsgMissingSymbolVariantItem(const MsgMissingSymbolVariantItem& other) noexcept
-    : LibraryElementCheckMessage(other), mSymbVar(other.mSymbVar) {}
+    : RuleCheckMessage(other), mSymbVar(other.mSymbVar) {}
   virtual ~MsgMissingSymbolVariantItem() noexcept;
 
   // Getters

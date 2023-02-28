@@ -32,7 +32,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MsgMissingCategories::MsgMissingCategories() noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Error, tr("No categories set"),
         tr("It's very important to assign every library element to at least "
            "one category. Otherwise it will be very hard to find the element "

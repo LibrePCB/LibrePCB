@@ -240,8 +240,6 @@ add_library(
   library/libraryelement.h
   library/libraryelementcheck.cpp
   library/libraryelementcheck.h
-  library/msg/libraryelementcheckmessage.cpp
-  library/msg/libraryelementcheckmessage.h
   library/msg/msgmissingauthor.cpp
   library/msg/msgmissingauthor.h
   library/msg/msgmissingcategories.cpp
@@ -452,6 +450,8 @@ add_library(
   project/schematic/schematicpainter.h
   project/schematic/schematicselectionquery.cpp
   project/schematic/schematicselectionquery.h
+  rulecheck/rulecheckmessage.cpp
+  rulecheck/rulecheckmessage.h
   serialization/fileformatmigration.cpp
   serialization/fileformatmigration.h
   serialization/fileformatmigrationunstable.cpp

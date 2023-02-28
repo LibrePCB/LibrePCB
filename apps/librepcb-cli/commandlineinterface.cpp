@@ -914,13 +914,13 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
                              .arg(prettyPath(fs.getPath(), libDir));
 
     const QSet<SExpression>& approvals = element.getMessageApprovals();
-    LibraryElementCheckMessageList messageList = element.runChecks();
+    RuleCheckMessageList messageList = element.runChecks();
     // Sort messages to increases readability of console output.
     Toolbox::sortNumeric(
         messageList,
         [](const QCollator& cmp,
-           const std::shared_ptr<const LibraryElementCheckMessage>& lhs,
-           const std::shared_ptr<const LibraryElementCheckMessage>& rhs) {
+           const std::shared_ptr<const RuleCheckMessage>& lhs,
+           const std::shared_ptr<const RuleCheckMessage>& rhs) {
           if (lhs->getSeverity() != rhs->getSeverity()) {
             return lhs->getSeverity() > rhs->getSeverity();
           } else {
@@ -936,13 +936,13 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
       } else {
         QString severity = tr("ERROR");
         switch (msg->getSeverity()) {
-          case LibraryElementCheckMessage::Severity::Hint:
+          case RuleCheckMessage::Severity::Hint:
             severity = tr("HINT");
             break;
-          case LibraryElementCheckMessage::Severity::Warning:
+          case RuleCheckMessage::Severity::Warning:
             severity = tr("WARNING");
             break;
-          case LibraryElementCheckMessage::Severity::Error:
+          case RuleCheckMessage::Severity::Error:
             break;
           default:
             qCritical() << "Unknown message severity:"

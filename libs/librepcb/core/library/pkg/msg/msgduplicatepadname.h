@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -41,7 +41,7 @@ class PackagePad;
 /**
  * @brief The MsgDuplicatePadName class
  */
-class MsgDuplicatePadName final : public LibraryElementCheckMessage {
+class MsgDuplicatePadName final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgDuplicatePadName)
 
 public:
@@ -49,7 +49,7 @@ public:
   MsgDuplicatePadName() = delete;
   explicit MsgDuplicatePadName(const PackagePad& pad) noexcept;
   MsgDuplicatePadName(const MsgDuplicatePadName& other) noexcept
-    : LibraryElementCheckMessage(other) {}
+    : RuleCheckMessage(other) {}
   virtual ~MsgDuplicatePadName() noexcept;
 };
 

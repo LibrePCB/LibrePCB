@@ -120,7 +120,7 @@ std::shared_ptr<const ComponentSymbolVariantItem> Component::getSymbVarItem(
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList Component::runChecks() const {
+RuleCheckMessageList Component::runChecks() const {
   ComponentCheck check(*this);
   return check.runChecks();  // can throw
 }

@@ -17,13 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_LIBRARYELEMENTCHECKMESSAGE_H
-#define LIBREPCB_CORE_LIBRARYELEMENTCHECKMESSAGE_H
+#ifndef LIBREPCB_CORE_RULECHECKMESSAGE_H
+#define LIBREPCB_CORE_RULECHECKMESSAGE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../serialization/sexpression.h"
+#include "../serialization/sexpression.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,14 +36,14 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Class LibraryElementCheckMessage
+ *  Class RuleCheckMessage
  ******************************************************************************/
 
 /**
- * @brief The LibraryElementCheckMessage class
+ * @brief The RuleCheckMessage class
  */
-class LibraryElementCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(LibraryElementCheckMessage)
+class RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(RuleCheckMessage)
 
 public:
   /// Message severity type (higher number = higher severity)
@@ -54,7 +54,7 @@ public:
   };
 
   // Constructors / Destructor
-  LibraryElementCheckMessage() = delete;
+  RuleCheckMessage() = delete;
 
   // Getters
   Severity getSeverity() const noexcept { return mSeverity; }
@@ -77,15 +77,15 @@ public:
   static QIcon getSeverityIcon(Severity severity) noexcept;
 
   // Operator Overloads
-  bool operator==(const LibraryElementCheckMessage& rhs) const noexcept;
-  bool operator!=(const LibraryElementCheckMessage& rhs) const noexcept;
+  bool operator==(const RuleCheckMessage& rhs) const noexcept;
+  bool operator!=(const RuleCheckMessage& rhs) const noexcept;
 
 protected:  // Methods
-  LibraryElementCheckMessage(const LibraryElementCheckMessage& other) noexcept;
-  LibraryElementCheckMessage(Severity severity, const QString& msg,
-                             const QString& description,
-                             const QString& approvalName) noexcept;
-  virtual ~LibraryElementCheckMessage() noexcept;
+  RuleCheckMessage(const RuleCheckMessage& other) noexcept;
+  RuleCheckMessage(Severity severity, const QString& msg,
+                   const QString& description,
+                   const QString& approvalName) noexcept;
+  virtual ~RuleCheckMessage() noexcept;
 
 protected:  // Data
   Severity mSeverity;
@@ -95,8 +95,7 @@ protected:  // Data
   SExpression mApproval;
 };
 
-typedef QVector<std::shared_ptr<const LibraryElementCheckMessage>>
-    LibraryElementCheckMessageList;
+typedef QVector<std::shared_ptr<const RuleCheckMessage>> RuleCheckMessageList;
 
 /*******************************************************************************
  *  End of File

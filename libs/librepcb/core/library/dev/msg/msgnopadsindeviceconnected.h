@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -39,14 +39,14 @@ namespace librepcb {
 /**
  * @brief The MsgNoPadsInDeviceConnected class
  */
-class MsgNoPadsInDeviceConnected final : public LibraryElementCheckMessage {
+class MsgNoPadsInDeviceConnected final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgNoPadsInDeviceConnected)
 
 public:
   // Constructors / Destructor
   MsgNoPadsInDeviceConnected() noexcept;
   MsgNoPadsInDeviceConnected(const MsgNoPadsInDeviceConnected& other) noexcept
-    : LibraryElementCheckMessage(other) {}
+    : RuleCheckMessage(other) {}
   virtual ~MsgNoPadsInDeviceConnected() noexcept;
 };
 

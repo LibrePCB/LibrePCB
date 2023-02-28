@@ -53,8 +53,8 @@ SymbolCheck::~SymbolCheck() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList SymbolCheck::runChecks() const {
-  LibraryElementCheckMessageList msgs = LibraryElementCheck::runChecks();
+RuleCheckMessageList SymbolCheck::runChecks() const {
+  RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
   checkDuplicatePinNames(msgs);
   checkOffTheGridPins(msgs);
   checkOverlappingPins(msgs);

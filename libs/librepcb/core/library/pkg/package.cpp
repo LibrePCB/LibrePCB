@@ -59,7 +59,7 @@ Package::~Package() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList Package::runChecks() const {
+RuleCheckMessageList Package::runChecks() const {
   PackageCheck check(*this);
   return check.runChecks();  // can throw
 }

@@ -32,7 +32,7 @@ namespace librepcb {
  ******************************************************************************/
 
 MsgMissingComponentDefaultValue::MsgMissingComponentDefaultValue() noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning, tr("No default value set"),
         tr("Most components should have a default value set. The "
            "default value becomes the component's value when adding it "

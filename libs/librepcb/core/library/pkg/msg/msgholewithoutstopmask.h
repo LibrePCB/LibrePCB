@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -42,7 +42,7 @@ class Hole;
 /**
  * @brief The MsgHoleWithoutStopMask class
  */
-class MsgHoleWithoutStopMask final : public LibraryElementCheckMessage {
+class MsgHoleWithoutStopMask final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgHoleWithoutStopMask)
 
 public:
@@ -51,7 +51,7 @@ public:
   MsgHoleWithoutStopMask(std::shared_ptr<const Footprint> footprint,
                          std::shared_ptr<const Hole> hole) noexcept;
   MsgHoleWithoutStopMask(const MsgHoleWithoutStopMask& other) noexcept
-    : LibraryElementCheckMessage(other),
+    : RuleCheckMessage(other),
       mFootprint(other.mFootprint),
       mHole(other.mHole) {}
   virtual ~MsgHoleWithoutStopMask() noexcept;

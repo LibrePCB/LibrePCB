@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../rulecheck/rulecheckmessage.h"
 #include "../../../types/length.h"
-#include "../../msg/libraryelementcheckmessage.h"
 
 #include <QtCore>
 
@@ -42,7 +42,7 @@ class SymbolPin;
 /**
  * @brief The MsgOverlappingSymbolPins class
  */
-class MsgOverlappingSymbolPins final : public LibraryElementCheckMessage {
+class MsgOverlappingSymbolPins final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgOverlappingSymbolPins)
 
 public:
@@ -51,7 +51,7 @@ public:
   MsgOverlappingSymbolPins(
       QVector<std::shared_ptr<const SymbolPin>> pins) noexcept;
   MsgOverlappingSymbolPins(const MsgOverlappingSymbolPins& other) noexcept
-    : LibraryElementCheckMessage(other), mPins(other.mPins) {}
+    : RuleCheckMessage(other), mPins(other.mPins) {}
   virtual ~MsgOverlappingSymbolPins() noexcept;
 
   // Getters

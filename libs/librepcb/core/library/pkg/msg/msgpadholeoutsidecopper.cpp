@@ -36,7 +36,7 @@ namespace librepcb {
 MsgPadHoleOutsideCopper::MsgPadHoleOutsideCopper(
     std::shared_ptr<const Footprint> footprint,
     std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Error,
         tr("Hole outside copper of pad '%1' in '%2'")
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),

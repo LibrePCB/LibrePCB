@@ -130,7 +130,7 @@ public:
       const Uuid& symbVar, const Uuid& item) const;
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   Component& operator=(const Component& rhs) = delete;

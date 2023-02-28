@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../msg/libraryelementcheckmessage.h"
+#include "../../../rulecheck/rulecheckmessage.h"
 
 #include <QtCore>
 
@@ -41,7 +41,7 @@ class ComponentSignal;
 /**
  * @brief The MsgDuplicateSignalName class
  */
-class MsgDuplicateSignalName final : public LibraryElementCheckMessage {
+class MsgDuplicateSignalName final : public RuleCheckMessage {
   Q_DECLARE_TR_FUNCTIONS(MsgDuplicateSignalName)
 
 public:
@@ -49,7 +49,7 @@ public:
   MsgDuplicateSignalName() = delete;
   explicit MsgDuplicateSignalName(const ComponentSignal& signal) noexcept;
   MsgDuplicateSignalName(const MsgDuplicateSignalName& other) noexcept
-    : LibraryElementCheckMessage(other) {}
+    : RuleCheckMessage(other) {}
   virtual ~MsgDuplicateSignalName() noexcept;
 };
 

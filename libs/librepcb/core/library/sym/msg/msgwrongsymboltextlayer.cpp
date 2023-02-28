@@ -36,7 +36,7 @@ namespace librepcb {
 
 MsgWrongSymbolTextLayer::MsgWrongSymbolTextLayer(
     std::shared_ptr<const Text> text, const QString& expectedLayerName) noexcept
-  : LibraryElementCheckMessage(
+  : RuleCheckMessage(
         Severity::Warning,
         tr("Layer of '%1' is not '%2'")
             .arg(text->getText(),
