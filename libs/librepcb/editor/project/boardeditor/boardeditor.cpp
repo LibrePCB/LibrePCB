@@ -1065,7 +1065,10 @@ void BoardEditor::runDrc(bool quick) noexcept {
 
 void BoardEditor::highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
                                       bool zoomTo) noexcept {
-  if (QGraphicsScene* scene = mUi->graphicsView->scene()) {
+  if (msg.getLocations().isEmpty()) {
+    // Position on board not known.
+    clearDrcMarker();
+  } else if (QGraphicsScene* scene = mUi->graphicsView->scene()) {
     const ThemeColor& color =
         mProjectEditor.getWorkspace().getSettings().themes.getActive().getColor(
             Theme::Color::sBoardOverlays);

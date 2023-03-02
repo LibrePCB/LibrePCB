@@ -30,7 +30,6 @@
 #include "../../types/length.h"
 #include "../../types/lengthunit.h"
 #include "../../types/uuid.h"
-#include "../erc/if_ercmsgprovider.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -72,11 +71,8 @@ class Project;
  * @brief The Board class represents a PCB of a project and is always part of a
  * circuit
  */
-class Board final : public QObject,
-                    public AttributeProvider,
-                    public IF_ErcMsgProvider {
+class Board final : public QObject, public AttributeProvider {
   Q_OBJECT
-  DECLARE_ERC_MSG_CLASS_NAME(Board)
 
 public:
   // Types
@@ -251,8 +247,6 @@ signals:
   void deviceRemoved(BI_Device& comp);
 
 private:
-  void updateErcMessages() noexcept;
-
   // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
   const QString mDirectoryName;
@@ -282,9 +276,6 @@ private:
   QMap<Uuid, BI_StrokeText*> mStrokeTexts;
   QMap<Uuid, BI_Hole*> mHoles;
   QMultiHash<NetSignal*, BI_AirWire*> mAirWires;
-
-  // ERC messages
-  QHash<Uuid, ErcMsg*> mErcMsgListUnplacedComponentInstances;
 };
 
 /*******************************************************************************

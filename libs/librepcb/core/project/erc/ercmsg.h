@@ -50,8 +50,6 @@ public:
     CircuitWarning,  ///< example: nets with only one pin
     SchematicError,  ///< example: unplaced required symbols
     SchematicWarning,  ///< example: unplaced optional symbols
-    BoardError,  ///< example: unplaced footprints
-    BoardWarning,  ///< example: ???
     _Count  ///< count of message types
   };
 

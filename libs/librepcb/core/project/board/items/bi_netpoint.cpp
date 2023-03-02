@@ -23,7 +23,6 @@
 #include "bi_netpoint.h"
 
 #include "../../circuit/netsignal.h"
-#include "../../erc/ercmsg.h"
 #include "bi_netsegment.h"
 
 #include <QtCore>
@@ -45,14 +44,6 @@ BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const Uuid& uuid,
   // create the graphics item
   mGraphicsItem.reset(new BGI_NetPoint(*this));
   mGraphicsItem->setPos(mJunction.getPosition().toPxQPointF());
-
-  // create ERC messages
-  mErcMsgDeadNetPoint.reset(new ErcMsg(mBoard.getProject(), *this,
-                                       mJunction.getUuid().toStr(), "Dead",
-                                       ErcMsg::ErcMsgType_t::BoardError,
-                                       tr("Dead net point in board \"%1\": %2")
-                                           .arg(*mBoard.getName())
-                                           .arg(mJunction.getUuid().toStr())));
 }
 
 BI_NetPoint::~BI_NetPoint() noexcept {
@@ -104,7 +95,6 @@ void BI_NetPoint::addToBoard() {
                 [this]() { mGraphicsItem->update(); });
     mBoard.scheduleAirWiresRebuild(netsignal);
   }
-  mErcMsgDeadNetPoint->setVisible(true);
   BI_Base::addToBoard(mGraphicsItem.data());
 }
 
@@ -119,7 +109,6 @@ void BI_NetPoint::removeFromBoard() {
     disconnect(mHighlightChangedConnection);
     mBoard.scheduleAirWiresRebuild(netsignal);
   }
-  mErcMsgDeadNetPoint->setVisible(false);
   BI_Base::removeFromBoard(mGraphicsItem.data());
 }
 
@@ -141,7 +130,6 @@ void BI_NetPoint::registerNetLine(BI_NetLine& netline) {
   mRegisteredNetLines.insert(&netline);
   netline.updateLine();
   mGraphicsItem->updateCacheAndRepaint();
-  mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
 }
 
 void BI_NetPoint::unregisterNetLine(BI_NetLine& netline) {
@@ -153,7 +141,6 @@ void BI_NetPoint::unregisterNetLine(BI_NetLine& netline) {
   mRegisteredNetLines.remove(&netline);
   netline.updateLine();
   mGraphicsItem->updateCacheAndRepaint();
-  mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
 }
 
 /*******************************************************************************

@@ -493,7 +493,6 @@ bool CommandLineInterface::openProject(
           switch (msg->getMsgType()) {
             case ErcMsg::ErcMsgType_t::CircuitWarning:
             case ErcMsg::ErcMsgType_t::SchematicWarning:
-            case ErcMsg::ErcMsgType_t::BoardWarning:
               severity = tr("WARNING");
               break;
             default:
