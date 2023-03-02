@@ -59,10 +59,6 @@ ErcMsgDock::ErcMsgDock(Project& project)
   mTopLevelItems.insert(
       static_cast<int>(ErcMsg::ErcMsgType_t::SchematicWarning),
       new QTreeWidgetItem(mUi->treeWidget));
-  mTopLevelItems.insert(static_cast<int>(ErcMsg::ErcMsgType_t::BoardError),
-                        new QTreeWidgetItem(mUi->treeWidget));
-  mTopLevelItems.insert(static_cast<int>(ErcMsg::ErcMsgType_t::BoardWarning),
-                        new QTreeWidgetItem(mUi->treeWidget));
   mTopLevelItems.insert(static_cast<int>(ErcMsg::ErcMsgType_t::_Count),
                         new QTreeWidgetItem(mUi->treeWidget));
 
@@ -80,10 +76,6 @@ ErcMsgDock::ErcMsgDock(Project& project)
       ->setIcon(0, QIcon(":/img/status/dialog_error.png"));
   mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::SchematicWarning)]
       ->setIcon(0, QIcon(":/img/status/dialog_warning.png"));
-  mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardError)]->setIcon(
-      0, QIcon(":/img/status/dialog_error.png"));
-  mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardWarning)]->setIcon(
-      0, QIcon(":/img/status/dialog_warning.png"));
   mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::_Count)]->setIcon(
       0, QIcon(":/img/actions/apply.png"));
 
@@ -95,10 +87,6 @@ ErcMsgDock::ErcMsgDock(Project& project)
   mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::SchematicError)]
       ->setExpanded(true);
   mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::SchematicWarning)]
-      ->setExpanded(true);
-  mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardError)]
-      ->setExpanded(true);
-  mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardWarning)]
       ->setExpanded(true);
 
   // add all already existing ERC messages
@@ -227,14 +215,6 @@ void ErcMsgDock::updateTopLevelItemTexts() noexcept {
   item =
       mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::SchematicWarning)];
   item->setText(0, tr("Schematic Warnings (%1)").arg(item->childCount()));
-  item->setHidden(item->childCount() == 0);
-  countOfNonIgnoredErcMessages += item->childCount();
-  item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardError)];
-  item->setText(0, tr("Board Errors (%1)").arg(item->childCount()));
-  item->setHidden(item->childCount() == 0);
-  countOfNonIgnoredErcMessages += item->childCount();
-  item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::BoardWarning)];
-  item->setText(0, tr("Board Warnings (%1)").arg(item->childCount()));
   item->setHidden(item->childCount() == 0);
   countOfNonIgnoredErcMessages += item->childCount();
   item = mTopLevelItems[static_cast<int>(ErcMsg::ErcMsgType_t::_Count)];

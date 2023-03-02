@@ -36,7 +36,6 @@
 #include "../circuit/circuit.h"
 #include "../circuit/componentinstance.h"
 #include "../circuit/netsignal.h"
-#include "../erc/ercmsg.h"
 #include "../project.h"
 #include "boardairwiresbuilder.h"
 #include "boarddesignrules.h"
@@ -97,19 +96,10 @@ Board::Board(Project& project,
   // Emit the "attributesChanged" signal when the project has emitted it.
   connect(&mProject, &Project::attributesChanged, this,
           &Board::attributesChanged);
-
-  // Update ERC messages if devices were added/removed.
-  connect(&mProject.getCircuit(), &Circuit::componentAdded, this,
-          &Board::updateErcMessages);
-  connect(&mProject.getCircuit(), &Circuit::componentRemoved, this,
-          &Board::updateErcMessages);
 }
 
 Board::~Board() noexcept {
   Q_ASSERT(!mIsAddedToProject);
-
-  qDeleteAll(mErcMsgListUnplacedComponentInstances);
-  mErcMsgListUnplacedComponentInstances.clear();
 
   // delete all items
   qDeleteAll(mAirWires);
@@ -225,7 +215,6 @@ void Board::addDeviceInstance(BI_Device& instance) {
     instance.addToBoard();  // can throw
   }
   mDeviceInstances.insert(instance.getComponentInstanceUuid(), &instance);
-  updateErcMessages();
   emit deviceAdded(instance);
 }
 
@@ -238,7 +227,6 @@ void Board::removeDeviceInstance(BI_Device& instance) {
     instance.removeFromBoard();  // can throw
   }
   mDeviceInstances.remove(instance.getComponentInstanceUuid());
-  updateErcMessages();
   emit deviceRemoved(instance);
 }
 
@@ -600,7 +588,6 @@ void Board::addToProject() {
 
   mIsAddedToProject = true;
   forceAirWiresRebuild();
-  updateErcMessages();
   sgl.dismiss();
 }
 
@@ -622,7 +609,6 @@ void Board::removeFromProject() {
   mDirectory->moveTo(tmp);  // can throw
 
   mIsAddedToProject = false;
-  updateErcMessages();
   sgl.dismiss();
 }
 
@@ -806,44 +792,6 @@ QString Board::getBuiltInAttributeValue(const QString& key) const noexcept {
 QVector<const AttributeProvider*> Board::getAttributeProviderParents() const
     noexcept {
   return QVector<const AttributeProvider*>{&mProject};
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Board::updateErcMessages() noexcept {
-  // type: UnplacedComponent (ComponentInstances without DeviceInstance)
-  if (mIsAddedToProject) {
-    const QMap<Uuid, ComponentInstance*>& componentInstances =
-        mProject.getCircuit().getComponentInstances();
-    foreach (const ComponentInstance* component, componentInstances) {
-      if (component->getLibComponent().isSchematicOnly()) continue;
-      BI_Device* device = mDeviceInstances.value(component->getUuid());
-      ErcMsg* ercMsg =
-          mErcMsgListUnplacedComponentInstances.value(component->getUuid());
-      if ((!device) && (!ercMsg)) {
-        ErcMsg* ercMsg = new ErcMsg(
-            mProject, *this,
-            QString("%1/%2").arg(mUuid.toStr(), component->getUuid().toStr()),
-            "UnplacedComponent", ErcMsg::ErcMsgType_t::BoardError,
-            QString("Unplaced Component: %1 (Board: %2)")
-                .arg(*component->getName(), *mName));
-        ercMsg->setVisible(true);
-        mErcMsgListUnplacedComponentInstances.insert(component->getUuid(),
-                                                     ercMsg);
-      } else if ((device) && (ercMsg)) {
-        delete mErcMsgListUnplacedComponentInstances.take(component->getUuid());
-      }
-    }
-    foreach (const Uuid& uuid, mErcMsgListUnplacedComponentInstances.keys()) {
-      if (!componentInstances.contains(uuid))
-        delete mErcMsgListUnplacedComponentInstances.take(uuid);
-    }
-  } else {
-    qDeleteAll(mErcMsgListUnplacedComponentInstances);
-    mErcMsgListUnplacedComponentInstances.clear();
-  }
 }
 
 /*******************************************************************************

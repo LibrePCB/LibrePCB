@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/junction.h"
-#include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/bgi_netpoint.h"
 #include "./bi_netline.h"
 #include "bi_base.h"
@@ -43,11 +42,8 @@ namespace librepcb {
 /**
  * @brief The BI_NetPoint class
  */
-class BI_NetPoint final : public BI_Base,
-                          public BI_NetLineAnchor,
-                          public IF_ErcMsgProvider {
+class BI_NetPoint final : public BI_Base, public BI_NetLineAnchor {
   Q_OBJECT
-  DECLARE_ERC_MSG_CLASS_NAME(BI_NetPoint)
 
 public:
   // Constructors / Destructor
@@ -103,10 +99,6 @@ private:
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;  ///< all registered netlines
-
-  // ERC Messages
-  /// @brief The ERC message for dead netpoints
-  QScopedPointer<ErcMsg> mErcMsgDeadNetPoint;
 };
 
 /*******************************************************************************

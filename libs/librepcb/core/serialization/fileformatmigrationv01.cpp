@@ -284,6 +284,14 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     }
   }
 
+  // ERC.
+  {
+    const QString fp = "circuit/erc.lp";
+    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeErc(root);
+    dir.write(fp, root.toByteArray());
+  }
+
   // Schematics.
   foreach (const QString& dirName, dir.getDirs("schematics")) {
     const QString fp = "schematics/" % dirName % "/schematic.lp";
@@ -373,6 +381,19 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void FileFormatMigrationV01::upgradeErc(SExpression& root) {
+  for (SExpression* node : root.getChildren("approved")) {
+    if (node->getChild("class/@0").getValue() == "Board") {
+      root.removeChild(*node);  // Board error migrated to DRC.
+      continue;
+    }
+    if (node->getChild("class/@0").getValue() == "BI_NetPoint") {
+      root.removeChild(*node);  // Board error migrated to DRC.
+      continue;
+    }
+  }
+}
 
 void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
                                               ProjectContext& context) {

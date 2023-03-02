@@ -92,7 +92,9 @@ private:  // Methods
   void checkAllowedPthSlots(int progressEnd);
   void checkInvalidPadConnections(int progressEnd);
   void checkCourtyardClearances(int progressEnd);
+  void checkForUnplacedComponents(int progressEnd);
   void checkForMissingConnections(int progressEnd);
+  void checkForStaleObjects(int progressEnd);
   template <typename THole>
   void processHoleSlotWarning(
       const THole& hole, BoardDesignRuleCheckSettings::AllowedSlots allowed,

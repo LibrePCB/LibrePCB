@@ -24,6 +24,7 @@
 
 #include "../../../geometry/hole.h"
 #include "../../../geometry/stroketext.h"
+#include "../../../library/cmp/component.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../library/pkg/footprintpad.h"
 #include "../../../library/pkg/packagepad.h"
@@ -41,6 +42,7 @@
 #include "../items/bi_footprintpad.h"
 #include "../items/bi_hole.h"
 #include "../items/bi_netline.h"
+#include "../items/bi_netpoint.h"
 #include "../items/bi_netsegment.h"
 #include "../items/bi_plane.h"
 #include "../items/bi_stroketext.h"
@@ -102,8 +104,10 @@ void BoardDesignRuleCheck::execute(bool quick) {
     checkAllowedNpthSlots(74);  // 2%
     checkAllowedPthSlots(76);  // 2%
     checkInvalidPadConnections(78);  // 2%
-    checkCourtyardClearances(93);  // 15%
+    checkCourtyardClearances(91);  // 13%
+    checkForUnplacedComponents(93);  // 2%
     checkForMissingConnections(95);  // 2%
+    checkForStaleObjects(97);  // 2%
   }
 
   emitStatus(
@@ -697,6 +701,24 @@ void BoardDesignRuleCheck::checkCourtyardClearances(int progressEnd) {
   emitProgress(progressEnd);
 }
 
+void BoardDesignRuleCheck::checkForUnplacedComponents(int progressEnd) {
+  emitStatus(tr("Check for unplaced components..."));
+
+  foreach (const ComponentInstance* cmp,
+           mBoard.getProject().getCircuit().getComponentInstances()) {
+    const BI_Device* dev =
+        mBoard.getDeviceInstanceByComponentUuid(cmp->getUuid());
+    if ((!dev) && (!cmp->getLibComponent().isSchematicOnly())) {
+      const QString msg =
+          tr("Unplaced component: '%1'", "Placeholder is component name")
+              .arg(*cmp->getName());
+      emitMessage(BoardDesignRuleCheckMessage(msg, QVector<Path>()));
+    }
+  }
+
+  emitProgress(progressEnd);
+}
+
 void BoardDesignRuleCheck::checkForMissingConnections(int progressEnd) {
   emitStatus(tr("Check for missing connections..."));
 
@@ -709,6 +731,36 @@ void BoardDesignRuleCheck::checkForMissingConnections(int progressEnd) {
     Path location = Path::obround(airwire->getP1(), airwire->getP2(),
                                   PositiveLength(50000));
     emitMessage(BoardDesignRuleCheckMessage(msg, location));
+  }
+
+  emitProgress(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkForStaleObjects(int progressEnd) {
+  emitStatus(tr("Check for stale objects..."));
+
+  foreach (const BI_NetSegment* netSegment, mBoard.getNetSegments()) {
+    // Warn about empty net segments.
+    if (!netSegment->isUsed()) {
+      const QString msg =
+          tr("Empty segment of net '%1': %2", "Placeholders: Net name, UUID")
+              .arg(netSegment->getNetNameToDisplay(true),
+                   netSegment->getUuid().toStr());
+      emitMessage(BoardDesignRuleCheckMessage(msg, QVector<Path>()));
+    }
+
+    // Warn about net points without any net lines.
+    foreach (const BI_NetPoint* netPoint, netSegment->getNetPoints()) {
+      if (!netPoint->isUsed()) {
+        const QString msg = tr("Unused junction of net '%1': %2",
+                               "Placeholders: Net name, UUID")
+                                .arg(netSegment->getNetNameToDisplay(true),
+                                     netPoint->getUuid().toStr());
+        const QVector<Path> locations{Path::circle(PositiveLength(300000))
+                                          .translated(netPoint->getPosition())};
+        emitMessage(BoardDesignRuleCheckMessage(msg, locations));
+      }
+    }
   }
 
   emitProgress(progressEnd);
