@@ -41,16 +41,13 @@ BoardDesignRuleCheckMessagesDock::BoardDesignRuleCheckMessagesDock(
     QWidget* parent) noexcept
   : QDockWidget(parent), mUi(new Ui::BoardDesignRuleCheckMessagesDock) {
   mUi->setupUi(this);
-  mUi->prgProgress->setFixedHeight(mUi->cbxCenterInView->height());
   mUi->prgProgress->hide();
-  mUi->btnSettings->setFixedSize(mUi->cbxCenterInView->height(),
-                                 mUi->cbxCenterInView->height());
-  mUi->btnRun->setFixedSize(mUi->cbxCenterInView->height(),
-                            mUi->cbxCenterInView->height());
   connect(mUi->btnSettings, &QToolButton::clicked, this,
           &BoardDesignRuleCheckMessagesDock::settingsDialogRequested);
-  connect(mUi->btnRun, &QToolButton::clicked, this,
+  connect(mUi->btnRunDrc, &QToolButton::clicked, this,
           &BoardDesignRuleCheckMessagesDock::runDrcRequested);
+  connect(mUi->btnRunQuickCheck, &QToolButton::clicked, this,
+          &BoardDesignRuleCheckMessagesDock::runQuickCheckRequested);
   connect(mUi->lstMessages, &QListWidget::currentRowChanged, this,
           &BoardDesignRuleCheckMessagesDock::listWidgetCurrentItemChanged);
   connect(mUi->lstMessages, &QListWidget::itemClicked, this,
@@ -71,11 +68,12 @@ BoardDesignRuleCheckMessagesDock::~BoardDesignRuleCheckMessagesDock() noexcept {
 
 bool BoardDesignRuleCheckMessagesDock::setInteractive(
     bool interactive) noexcept {
-  bool wasInteractive = mUi->btnRun->isEnabled();
+  bool wasInteractive = mUi->btnRunDrc->isEnabled();
   mUi->lstMessages->setEnabled(interactive);
   mUi->cbxCenterInView->setEnabled(interactive);
   mUi->btnSettings->setEnabled(interactive);
-  mUi->btnRun->setEnabled(interactive);
+  mUi->btnRunDrc->setEnabled(interactive);
+  mUi->btnRunQuickCheck->setEnabled(interactive);
   return wasInteractive;
 }
 

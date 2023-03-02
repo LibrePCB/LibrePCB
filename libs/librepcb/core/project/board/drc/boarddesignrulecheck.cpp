@@ -64,6 +64,7 @@ BoardDesignRuleCheck::BoardDesignRuleCheck(
   : QObject(parent),
     mBoard(board),
     mSettings(settings),
+    mIgnorePlanes(false),
     mProgressPercent(0),
     mProgressStatus(),
     mMessages() {
@@ -76,27 +77,34 @@ BoardDesignRuleCheck::~BoardDesignRuleCheck() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void BoardDesignRuleCheck::execute() {
+void BoardDesignRuleCheck::execute(bool quick) {
   emit started();
   emitProgress(2);
 
+  mIgnorePlanes = quick;
   mProgressStatus.clear();
   mMessages.clear();
 
-  rebuildPlanes(12);  // 10%
+  if (!quick) {
+    rebuildPlanes(12);  // 10%
+  }
+
   checkMinimumCopperWidth(14);  // 2%
   checkCopperCopperClearances(34);  // 20%
   checkCopperBoardAndNpthClearances(54);  // 20%
-  checkMinimumPthAnnularRing(64);  // 10%
-  checkMinimumNpthDrillDiameter(66);  // 2%
-  checkMinimumNpthSlotWidth(68);  // 2%
-  checkMinimumPthDrillDiameter(70);  // 2%
-  checkMinimumPthSlotWidth(72);  // 2%
-  checkAllowedNpthSlots(74);  // 2%
-  checkAllowedPthSlots(76);  // 2%
-  checkInvalidPadConnections(78);  // 2%
-  checkCourtyardClearances(93);  // 15%
-  checkForMissingConnections(95);  // 2%
+
+  if (!quick) {
+    checkMinimumPthAnnularRing(64);  // 10%
+    checkMinimumNpthDrillDiameter(66);  // 2%
+    checkMinimumNpthSlotWidth(68);  // 2%
+    checkMinimumPthDrillDiameter(70);  // 2%
+    checkMinimumPthSlotWidth(72);  // 2%
+    checkAllowedNpthSlots(74);  // 2%
+    checkAllowedPthSlots(76);  // 2%
+    checkInvalidPadConnections(78);  // 2%
+    checkCourtyardClearances(93);  // 15%
+    checkForMissingConnections(95);  // 2%
+  }
 
   emitStatus(
       tr("Finished with %1 message(s)!", "Count of messages", mMessages.count())
@@ -751,7 +759,7 @@ const ClipperLib::Paths& BoardDesignRuleCheck::getCopperPaths(
   const auto key = qMakePair(&layer, netsignals);
   if (!mCachedPaths.contains(key)) {
     BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-    gen.addCopper(layer.getName(), netsignals);
+    gen.addCopper(layer.getName(), netsignals, mIgnorePlanes);
     mCachedPaths[key] = gen.getPaths();
   }
   return mCachedPaths[key];

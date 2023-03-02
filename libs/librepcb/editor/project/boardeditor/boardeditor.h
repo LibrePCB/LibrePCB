@@ -118,7 +118,7 @@ private:
   bool graphicsViewEventHandler(QEvent* event);
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void unplacedComponentsCountChanged(int count) noexcept;
-  void runDrc() noexcept;
+  void runDrc(bool quick) noexcept;
   void highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
                            bool zoomTo) noexcept;
   void clearDrcMarker() noexcept;
@@ -169,6 +169,7 @@ private:
   QScopedPointer<QAction> mActionNetClasses;
   QScopedPointer<QAction> mActionUpdateLibrary;
   QScopedPointer<QAction> mActionBoardSetup;
+  QScopedPointer<QAction> mActionRunQuickCheck;
   QScopedPointer<QAction> mActionRunDesignRuleCheck;
   QScopedPointer<QAction> mActionImportDxf;
   QScopedPointer<QAction> mActionExportLppz;
