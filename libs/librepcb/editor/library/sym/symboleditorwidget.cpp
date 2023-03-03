@@ -67,7 +67,7 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
-  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->lstMessages->setReadOnly(mContext.readOnly);
   mUi->edtName->setReadOnly(mContext.readOnly);
   mUi->edtDescription->setReadOnly(mContext.readOnly);
   mUi->edtKeywords->setReadOnly(mContext.readOnly);

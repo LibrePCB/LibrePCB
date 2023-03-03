@@ -934,23 +934,9 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
       if (approvals.contains(msg->getApproval())) {
         ++approvedMsgCount;
       } else {
-        QString severity = tr("ERROR");
-        switch (msg->getSeverity()) {
-          case RuleCheckMessage::Severity::Hint:
-            severity = tr("HINT");
-            break;
-          case RuleCheckMessage::Severity::Warning:
-            severity = tr("WARNING");
-            break;
-          case RuleCheckMessage::Severity::Error:
-            break;
-          default:
-            qCritical() << "Unknown message severity:"
-                        << static_cast<int>(msg->getSeverity());
-            break;
-        }
         messages.append(
-            QString("    - [%1] %2").arg(severity, msg->getMessage()));
+            QString("    - [%1] %2")
+                .arg(msg->getSeverityTr().toUpper(), msg->getMessage()));
       }
     }
     qInfo().noquote() << "  " %

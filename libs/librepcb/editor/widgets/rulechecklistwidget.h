@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -50,6 +51,10 @@ public:
       std::shared_ptr<const RuleCheckMessage> msg) noexcept = 0;
   virtual void ruleCheckApproveRequested(
       std::shared_ptr<const RuleCheckMessage> msg, bool approve) noexcept = 0;
+  virtual void ruleCheckMessageSelected(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept = 0;
+  virtual void ruleCheckMessageDoubleClicked(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept = 0;
 
 protected:
   IF_RuleCheckHandler() noexcept {}
@@ -169,10 +174,15 @@ public:
   RuleCheckListWidget(const RuleCheckListWidget& other) = delete;
   ~RuleCheckListWidget() noexcept;
 
+  // Getters
+  const tl::optional<int>& getUnapprovedMessageCount() const noexcept {
+    return mUnapprovedMessageCount;
+  }
+
   // Setters
-  void setProvideFixes(bool provideFixes) noexcept;
+  void setReadOnly(bool readOnly) noexcept;
   void setHandler(IF_RuleCheckHandler* handler) noexcept;
-  void setMessages(RuleCheckMessageList messages) noexcept;
+  void setMessages(const tl::optional<RuleCheckMessageList>& messages) noexcept;
   void setApprovals(const QSet<SExpression>& approvals) noexcept;
 
   // Operator Overloadings
@@ -180,6 +190,8 @@ public:
 
 private:  // Methods
   void updateList() noexcept;
+  void currentItemChanged(QListWidgetItem* current,
+                          QListWidgetItem* previous) noexcept;
   void itemDoubleClicked(QListWidgetItem* item) noexcept;
   bool ruleCheckFixAvailable(
       std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
@@ -189,13 +201,19 @@ private:  // Methods
       std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
   void ruleCheckApproveRequested(std::shared_ptr<const RuleCheckMessage> msg,
                                  bool approve) noexcept override;
+  void ruleCheckMessageSelected(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
+  void ruleCheckMessageDoubleClicked(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
 
 private:  // Data
   QScopedPointer<QListWidget> mListWidget;
+  bool mReadOnly;
   IF_RuleCheckHandler* mHandler;
-  RuleCheckMessageList mMessages;
+  tl::optional<RuleCheckMessageList> mMessages;
+  RuleCheckMessageList mDisplayedMessages;
   QSet<SExpression> mApprovals;
-  bool mProvideFixes;
+  tl::optional<int> mUnapprovedMessageCount;
 };
 
 /*******************************************************************************

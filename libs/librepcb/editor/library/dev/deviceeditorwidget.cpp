@@ -63,7 +63,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   : EditorWidgetBase(context, fp, parent), mUi(new Ui::DeviceEditorWidget) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
-  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->lstMessages->setReadOnly(mContext.readOnly);
   mUi->edtName->setReadOnly(mContext.readOnly);
   mUi->edtDescription->setReadOnly(mContext.readOnly);
   mUi->edtKeywords->setReadOnly(mContext.readOnly);

@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../geometry/path.h"
 #include "../serialization/sexpression.h"
 
 #include <QtCore>
@@ -58,10 +59,12 @@ public:
 
   // Getters
   Severity getSeverity() const noexcept { return mSeverity; }
-  const QIcon& getSeverityIcon() const noexcept { return mSeverityIcon; }
+  QString getSeverityTr() const noexcept;
+  const QIcon& getSeverityIcon() const noexcept;
   const QString& getMessage() const noexcept { return mMessage; }
   const QString& getDescription() const noexcept { return mDescription; }
   const SExpression& getApproval() const noexcept { return mApproval; }
+  const QVector<Path>& getLocations() const noexcept { return mLocations; }
 
   // General Methods
   template <typename T>
@@ -74,7 +77,11 @@ public:
   }
 
   // Static Methods
-  static QIcon getSeverityIcon(Severity severity) noexcept;
+  static QString getSeverityTr(Severity severity) noexcept;
+  static const QIcon& getSeverityIcon(Severity severity) noexcept;
+  static QSet<SExpression> getAllApprovals(
+      const QVector<std::shared_ptr<const RuleCheckMessage>>&
+          messages) noexcept;
 
   // Operator Overloads
   bool operator==(const RuleCheckMessage& rhs) const noexcept;
@@ -83,16 +90,16 @@ public:
 protected:  // Methods
   RuleCheckMessage(const RuleCheckMessage& other) noexcept;
   RuleCheckMessage(Severity severity, const QString& msg,
-                   const QString& description,
-                   const QString& approvalName) noexcept;
+                   const QString& description, const QString& approvalName,
+                   const QVector<Path>& locations = {}) noexcept;
   virtual ~RuleCheckMessage() noexcept;
 
 protected:  // Data
   Severity mSeverity;
-  QIcon mSeverityIcon;
   QString mMessage;
   QString mDescription;
   SExpression mApproval;
+  QVector<Path> mLocations;
 };
 
 typedef QVector<std::shared_ptr<const RuleCheckMessage>> RuleCheckMessageList;

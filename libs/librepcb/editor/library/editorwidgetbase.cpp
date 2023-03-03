@@ -289,8 +289,8 @@ void EditorWidgetBase::updateCheckMessages() noexcept {
   try {
     RuleCheckMessageList msgs;
     if (runChecks(msgs)) {  // can throw
-      QSet<SExpression> approvals;
-      foreach (const auto& msg, msgs) { approvals.insert(msg->getApproval()); }
+      const QSet<SExpression> approvals =
+          RuleCheckMessage::getAllApprovals(msgs);
       mSupportedApprovals |= approvals;
       mDisappearedApprovals = mSupportedApprovals - approvals;
 
@@ -335,6 +335,16 @@ void EditorWidgetBase::ruleCheckDescriptionRequested(
   if (msg) {
     QMessageBox::information(this, msg->getMessage(), msg->getDescription());
   }
+}
+
+void EditorWidgetBase::ruleCheckMessageSelected(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
+  Q_UNUSED(msg);
+}
+
+void EditorWidgetBase::ruleCheckMessageDoubleClicked(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
+  ruleCheckDescriptionRequested(msg);
 }
 
 /*******************************************************************************

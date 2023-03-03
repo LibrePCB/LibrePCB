@@ -222,6 +222,10 @@ private:  // Methods
       std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
   void ruleCheckDescriptionRequested(
       std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
+  void ruleCheckMessageSelected(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
+  void ruleCheckMessageDoubleClicked(
+      std::shared_ptr<const RuleCheckMessage> msg) noexcept override;
 
 signals:
   void dirtyChanged(bool dirty);

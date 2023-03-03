@@ -39,15 +39,18 @@ namespace editor {
 RuleCheckListWidget::RuleCheckListWidget(QWidget* parent) noexcept
   : QWidget(parent),
     mListWidget(new QListWidget(this)),
+    mReadOnly(false),
     mHandler(nullptr),
     mApprovals(),
-    mProvideFixes(true) {
+    mUnapprovedMessageCount(tl::nullopt) {
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mListWidget.data());
+  connect(mListWidget.data(), &QListWidget::currentItemChanged, this,
+          &RuleCheckListWidget::currentItemChanged);
   connect(mListWidget.data(), &QListWidget::itemDoubleClicked, this,
           &RuleCheckListWidget::itemDoubleClicked);
-  updateList();  // adds the "looks good" message
+  updateList();  // Ensure consistent GUI enabled state.
 }
 
 RuleCheckListWidget::~RuleCheckListWidget() noexcept {
@@ -57,9 +60,9 @@ RuleCheckListWidget::~RuleCheckListWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
-void RuleCheckListWidget::setProvideFixes(bool provideFixes) noexcept {
-  if (provideFixes != mProvideFixes) {
-    mProvideFixes = provideFixes;
+void RuleCheckListWidget::setReadOnly(bool readOnly) noexcept {
+  if (readOnly != mReadOnly) {
+    mReadOnly = readOnly;
     updateList();
   }
 }
@@ -68,38 +71,9 @@ void RuleCheckListWidget::setHandler(IF_RuleCheckHandler* handler) noexcept {
   mHandler = handler;
 }
 
-void RuleCheckListWidget::setMessages(RuleCheckMessageList messages) noexcept {
-  // Sort by severity and message.
-  Toolbox::sortNumeric(messages,
-                       [](const QCollator& cmp,
-                          const std::shared_ptr<const RuleCheckMessage>& lhs,
-                          const std::shared_ptr<const RuleCheckMessage>& rhs) {
-                         if (lhs && rhs) {
-                           if (lhs->getSeverity() != rhs->getSeverity()) {
-                             return lhs->getSeverity() > rhs->getSeverity();
-                           } else {
-                             return cmp(lhs->getMessage(), rhs->getMessage());
-                           }
-                         } else {
-                           return false;
-                         }
-                       },
-                       Qt::CaseInsensitive, false);
-
-  // Detect if messages have changed.
-  bool isSame = (mMessages.count() == messages.count());
-  if (isSame) {
-    for (int i = 0; i < mMessages.count(); ++i) {
-      auto m1 = mMessages.value(i);
-      auto m2 = messages.value(i);
-      if ((!m1) || (!m2) || (*m1 != *m2)) {
-        isSame = false;
-      }
-    }
-  }
-
-  // Only update if messages have changed (avoid GUI flickering).
-  if (!isSame) {
+void RuleCheckListWidget::setMessages(
+    const tl::optional<RuleCheckMessageList>& messages) noexcept {
+  if (messages != mMessages) {
     mMessages = messages;
     updateList();
   }
@@ -118,40 +92,81 @@ void RuleCheckListWidget::setApprovals(
  ******************************************************************************/
 
 void RuleCheckListWidget::updateList() noexcept {
+  // Sort by approval state, severity and message.
+  mDisplayedMessages = mMessages ? (*mMessages) : RuleCheckMessageList();
+  Toolbox::sortNumeric(
+      mDisplayedMessages,
+      [this](const QCollator& cmp,
+             const std::shared_ptr<const RuleCheckMessage>& lhs,
+             const std::shared_ptr<const RuleCheckMessage>& rhs) {
+        if (lhs && rhs) {
+          const bool lhsApproved = mApprovals.contains(lhs->getApproval());
+          const bool rhsApproved = mApprovals.contains(rhs->getApproval());
+          if (lhsApproved != rhsApproved) {
+            return rhsApproved;
+          } else if (lhs->getSeverity() != rhs->getSeverity()) {
+            return lhs->getSeverity() > rhs->getSeverity();
+          } else {
+            return cmp(lhs->getMessage(), rhs->getMessage());
+          }
+        } else {
+          return false;
+        }
+      },
+      Qt::CaseInsensitive, false);
+
+  // Update list widget.
   mListWidget->setUpdatesEnabled(false);  // Avoid flicker.
+  const bool signalsBlocked = blockSignals(true);
   mListWidget->clear();
-  foreach (const auto& msg, mMessages) {
+  int unapprovedMessageCount = 0;
+  foreach (const auto& msg, mDisplayedMessages) {
     QListWidgetItem* item = new QListWidgetItem();
     mListWidget->addItem(item);
     const bool approved = mApprovals.contains(msg->getApproval());
     RuleCheckListItemWidget* widget =
         new RuleCheckListItemWidget(msg, *this, approved);
     mListWidget->setItemWidget(item, widget);
+    if (!approved) {
+      ++unapprovedMessageCount;
+    }
   }
-  if (mListWidget->count() == 0) {
-    mListWidget->setEnabled(false);
+  if (mMessages && mMessages->isEmpty()) {
     mListWidget->addItem(tr("Looks good so far :-)"));
-  } else {
-    mListWidget->setEnabled(true);
   }
+  mListWidget->setEnabled(!mDisplayedMessages.isEmpty());
+  blockSignals(signalsBlocked);
   mListWidget->setUpdatesEnabled(true);
+
+  // Update count of unapproved messages.
+  if (mMessages) {
+    mUnapprovedMessageCount = unapprovedMessageCount;
+  } else {
+    mUnapprovedMessageCount = tl::nullopt;
+  }
+}
+
+void RuleCheckListWidget::currentItemChanged(
+    QListWidgetItem* current, QListWidgetItem* previous) noexcept {
+  Q_UNUSED(previous);
+  std::shared_ptr<const RuleCheckMessage> msg =
+      mDisplayedMessages.value(mListWidget->row(current));
+  if (msg && mHandler) {
+    mHandler->ruleCheckMessageSelected(msg);
+  }
 }
 
 void RuleCheckListWidget::itemDoubleClicked(QListWidgetItem* item) noexcept {
   std::shared_ptr<const RuleCheckMessage> msg =
-      mMessages.value(mListWidget->row(item));
+      mDisplayedMessages.value(mListWidget->row(item));
   if (msg && mHandler) {
-    if (mProvideFixes && mHandler->ruleCheckFixAvailable(msg)) {
-      mHandler->ruleCheckFixRequested(msg);
-    } else {
-      mHandler->ruleCheckDescriptionRequested(msg);
-    }
+    mHandler->ruleCheckMessageDoubleClicked(msg);
   }
 }
 
 bool RuleCheckListWidget::ruleCheckFixAvailable(
     std::shared_ptr<const RuleCheckMessage> msg) noexcept {
-  if (mProvideFixes && mHandler) {
+  if ((!mReadOnly) && mHandler) {
     return mHandler->ruleCheckFixAvailable(msg);
   } else {
     return false;
@@ -160,7 +175,7 @@ bool RuleCheckListWidget::ruleCheckFixAvailable(
 
 void RuleCheckListWidget::ruleCheckFixRequested(
     std::shared_ptr<const RuleCheckMessage> msg) noexcept {
-  if (mProvideFixes && mHandler) {
+  if (mHandler) {
     mHandler->ruleCheckFixRequested(msg);
   }
 }
@@ -176,6 +191,20 @@ void RuleCheckListWidget::ruleCheckApproveRequested(
     std::shared_ptr<const RuleCheckMessage> msg, bool approve) noexcept {
   if (mHandler) {
     mHandler->ruleCheckApproveRequested(msg, approve);
+  }
+}
+
+void RuleCheckListWidget::ruleCheckMessageSelected(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
+  if (mHandler) {
+    mHandler->ruleCheckMessageSelected(msg);
+  }
+}
+
+void RuleCheckListWidget::ruleCheckMessageDoubleClicked(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
+  if (mHandler) {
+    mHandler->ruleCheckMessageDoubleClicked(msg);
   }
 }
 

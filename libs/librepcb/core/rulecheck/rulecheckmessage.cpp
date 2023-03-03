@@ -33,37 +33,70 @@ namespace librepcb {
 
 RuleCheckMessage::RuleCheckMessage(const RuleCheckMessage& other) noexcept
   : mSeverity(other.mSeverity),
-    mSeverityIcon(other.mSeverityIcon),
     mMessage(other.mMessage),
     mDescription(other.mDescription),
-    mApproval(other.mApproval) {
+    mApproval(other.mApproval),
+    mLocations(other.mLocations) {
 }
 
 RuleCheckMessage::RuleCheckMessage(Severity severity, const QString& msg,
                                    const QString& description,
-                                   const QString& approvalName) noexcept
+                                   const QString& approvalName,
+                                   const QVector<Path>& locations) noexcept
   : mSeverity(severity),
-    mSeverityIcon(getSeverityIcon(severity)),
     mMessage(msg),
     mDescription(description),
-    mApproval(SExpression::createList("approved")) {
+    mApproval(SExpression::createList("approved")),
+    mLocations(locations) {
   mApproval.appendChild(SExpression::createToken(approvalName));  // snake_case
 }
 
 RuleCheckMessage::~RuleCheckMessage() noexcept {
 }
 
+QString RuleCheckMessage::getSeverityTr() const noexcept {
+  return getSeverityTr(mSeverity);
+}
+
+const QIcon& RuleCheckMessage::getSeverityIcon() const noexcept {
+  return getSeverityIcon(mSeverity);
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
 
-QIcon RuleCheckMessage::getSeverityIcon(Severity severity) noexcept {
+QString RuleCheckMessage::getSeverityTr(Severity severity) noexcept {
+  switch (severity) {
+    case Severity::Hint:
+      return tr("Hint");
+    case Severity::Warning:
+      return tr("Warning");
+    case Severity::Error:
+      return tr("Error");
+    default:
+      qCritical() << "Unknown message severity:" << static_cast<int>(severity);
+      return "Unknown";
+  }
+}
+
+const QIcon& RuleCheckMessage::getSeverityIcon(Severity severity) noexcept {
   static QMap<Severity, QIcon> icon = {
       {Severity::Hint, QIcon(":/img/status/info.png")},
       {Severity::Warning, QIcon(":/img/status/dialog_warning.png")},
       {Severity::Error, QIcon(":/img/status/dialog_error.png")},
   };
-  return icon.value(severity);
+  return icon[severity];
+}
+
+QSet<SExpression> RuleCheckMessage::getAllApprovals(
+    const QVector<std::shared_ptr<const RuleCheckMessage>>& messages) noexcept {
+  QSet<SExpression> approvals;
+  foreach (const auto& msg, messages) {
+    Q_ASSERT(msg);
+    approvals.insert(msg->getApproval());
+  }
+  return approvals;
 }
 
 /*******************************************************************************
@@ -74,6 +107,7 @@ bool RuleCheckMessage::operator==(const RuleCheckMessage& rhs) const noexcept {
   if (mSeverity != rhs.mSeverity) return false;
   if (mMessage != rhs.mMessage) return false;
   if (mDescription != rhs.mDescription) return false;
+  if (mLocations != rhs.mLocations) return false;
   return true;
 }
 
