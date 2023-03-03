@@ -80,6 +80,7 @@ private:  // Methods
                            const QString& type,
                            void (ProjectLibrary::*addFunction)(ElementType&));
   void loadCircuit(Project& p);
+  void loadErc(Project& p);
   void loadSchematics(Project& p);
   void loadSchematic(Project& p, const QString& relativeFilePath);
   void loadSchematicSymbol(Schematic& s, const SExpression& node);
@@ -90,7 +91,6 @@ private:  // Methods
   void loadBoardNetSegment(Board& b, const SExpression& node);
   void loadBoardPlane(Board& b, const SExpression& node);
   void loadBoardUserSettings(Board& b);
-  void restoreApprovedErcMessages(Project& p);
 
 private:  // Data
   tl::optional<QList<FileFormatMigration::Message>> mUpgradeMessages;

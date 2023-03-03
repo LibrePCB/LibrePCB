@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../types/circuitidentifier.h"
 #include "../../types/uuid.h"
-#include "../erc/if_ercmsgprovider.h"
 
 #include <QtCore>
 
@@ -38,7 +37,6 @@ class BI_NetSegment;
 class BI_Plane;
 class Circuit;
 class ComponentSignalInstance;
-class ErcMsg;
 class NetClass;
 class SI_NetSegment;
 
@@ -49,9 +47,8 @@ class SI_NetSegment;
 /**
  * @brief The NetSignal class
  */
-class NetSignal final : public QObject, public IF_ErcMsgProvider {
+class NetSignal final : public QObject {
   Q_OBJECT
-  DECLARE_ERC_MSG_CLASS_NAME(NetSignal)
 
 public:
   // Constructors / Destructor
@@ -121,8 +118,6 @@ signals:
   void highlightedChanged(bool isHighlighted);
 
 private:
-  void updateErcMessages() noexcept;
-
   // General
   Circuit& mCircuit;
   bool mIsAddedToCircuit;
@@ -139,13 +134,6 @@ private:
   QList<SI_NetSegment*> mRegisteredSchematicNetSegments;
   QList<BI_NetSegment*> mRegisteredBoardNetSegments;
   QList<BI_Plane*> mRegisteredBoardPlanes;
-
-  // ERC Messages
-  /// @brief the ERC message for unused netsignals
-  QScopedPointer<ErcMsg> mErcMsgUnusedNetSignal;
-  /// @brief the ERC messages for netsignals with less than two component
-  /// signals
-  QScopedPointer<ErcMsg> mErcMsgConnectedToLessThanTwoPins;
 };
 
 /*******************************************************************************

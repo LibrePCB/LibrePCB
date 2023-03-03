@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/attribute/attributeprovider.h>
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/serialization/fileformatmigration.h>
 #include <optional/tl/optional.hpp>
 
@@ -225,28 +226,55 @@ public slots:
    */
   bool closeAndDestroy(bool askForSave, QWidget* msgBoxParent = 0) noexcept;
 
+  /**
+   * @brief Set the flag that manual modifications (no undo stack) are made
+   */
+  void setManualModificationsMade() noexcept {
+    mManualModificationsMade = true;
+  }
+
+  /**
+   * @brief Approve/unapprove an ERC message
+   *
+   * @param msg       The message to modify
+   * @param approve   The new approval state
+   */
+  void setErcMessageApproved(const RuleCheckMessage& msg,
+                             bool approve) noexcept;
+
 signals:
+  void ercFinished(const RuleCheckMessageList& messages);
   void projectSavedToDisk();
   void showControlPanelClicked();
   void openProjectLibraryUpdaterClicked(const FilePath& fp);
   void projectEditorClosed();
 
 private:  // Methods
+  void runErc() noexcept;
+  void saveErcMessageApprovals(const QSet<SExpression>& approvals) noexcept;
   int getCountOfVisibleEditorWindows() const noexcept;
 
 private:  // Data
   Workspace& mWorkspace;
   Project& mProject;
-  QTimer mAutoSaveTimer;  ///< the timer for the periodically automatic saving
-                          ///< functionality (see also @ref doc_project_save)
+
+  /// The timer for the periodically automatic saving
+  /// functionality (see also @ref doc_project_save)
+  QTimer mAutoSaveTimer;
+
+  QSet<SExpression> mSupportedErcApprovals;
+  QSet<SExpression> mDisappearedErcApprovals;
+  RuleCheckMessageList mErcMessages;
+
   UndoStack* mUndoStack;  ///< See @ref doc_project_undostack
   SchematicEditor* mSchematicEditor;  ///< The schematic editor (GUI)
   BoardEditor* mBoardEditor;  ///< The board editor (GUI)
 
-  /**
-   * The UndoStack state ID of the last successful project (auto)save
-   */
+  /// The UndoStack state ID of the last successful project (auto)save
   uint mLastAutosaveStateId;
+
+  /// Modifications bypassing the undo stack
+  bool mManualModificationsMade;
 };
 
 /*******************************************************************************

@@ -43,10 +43,10 @@ class Schematic;
 
 namespace editor {
 
-class ErcMsgDock;
 class ExclusiveActionGroup;
 class GraphicsView;
 class ProjectEditor;
+class RuleCheckDock;
 class SchematicEditorFsm;
 class SchematicPagesDock;
 class SearchToolBar;
@@ -221,7 +221,7 @@ private:
 
   // Docks
   QScopedPointer<SchematicPagesDock> mDockPages;
-  QScopedPointer<ErcMsgDock> mDockErc;
+  QScopedPointer<RuleCheckDock> mDockErc;
 
   // Connections
   QVector<QMetaObject::Connection> mSchematicConnections;

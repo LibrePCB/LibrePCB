@@ -34,10 +34,10 @@
 #include "../../utils/toolbarproxy.h"
 #include "../../utils/undostackactiongroup.h"
 #include "../../widgets/graphicsview.h"
+#include "../../widgets/rulecheckdock.h"
 #include "../../widgets/searchtoolbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
-#include "../erc/ercmsgdock.h"
 #include "../projecteditor.h"
 #include "../projectpropertieseditordialog.h"
 #include "boarddesignrulecheckmessagesdock.h"
@@ -727,12 +727,22 @@ void BoardEditor::createDockWidgets() noexcept {
   tabifyDockWidget(mDockUnplacedComponents.data(), mDockLayers.data());
 
   // ERC Messages.
-  mDockErc.reset(new ErcMsgDock(mProject));
+  mDockErc.reset(
+      new RuleCheckDock(RuleCheckDock::Mode::ElectricalRuleCheck, this));
+  mDockErc->setObjectName("dockErc");
+  mDockErc->setApprovals(mProject.getErcMessageApprovals());
+  connect(&mProject, &Project::ercMessageApprovalsChanged, mDockErc.data(),
+          &RuleCheckDock::setApprovals);
+  connect(mDockErc.data(), &RuleCheckDock::messageApprovalRequested,
+          &mProjectEditor, &ProjectEditor::setErcMessageApproved);
+  connect(&mProjectEditor, &ProjectEditor::ercFinished, mDockErc.data(),
+          &RuleCheckDock::setMessages);
   addDockWidget(Qt::RightDockWidgetArea, mDockErc.data(), Qt::Vertical);
   tabifyDockWidget(mDockLayers.data(), mDockErc.data());
 
   // DRC Messages.
   mDockDrc.reset(new BoardDesignRuleCheckMessagesDock(this));
+  mDockDrc->setInteractive(false);
   connect(mDockDrc.data(),
           &BoardDesignRuleCheckMessagesDock::settingsDialogRequested, this,
           [this]() { execBoardSetupDialog(true); });

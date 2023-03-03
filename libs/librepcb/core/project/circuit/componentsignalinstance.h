@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../types/circuitidentifier.h"
-#include "../erc/if_ercmsgprovider.h"
 
 #include <QtCore>
 
@@ -37,7 +36,6 @@ class BI_FootprintPad;
 class Circuit;
 class ComponentInstance;
 class ComponentSignal;
-class ErcMsg;
 class NetSignal;
 class SI_SymbolPin;
 
@@ -48,9 +46,8 @@ class SI_SymbolPin;
 /**
  * @brief The ComponentSignalInstance class
  */
-class ComponentSignalInstance final : public QObject, public IF_ErcMsgProvider {
+class ComponentSignalInstance final : public QObject {
   Q_OBJECT
-  DECLARE_ERC_MSG_CLASS_NAME(ComponentSignalInstance)
 
 public:
   // Constructors / Destructor
@@ -120,11 +117,6 @@ public:
 signals:
   void netSignalChanged(NetSignal* from, NetSignal* to);
 
-private slots:
-
-  void netSignalNameChanged(const CircuitIdentifier& newName) noexcept;
-  void updateErcMessages() noexcept;
-
 private:
   // General
   Circuit& mCircuit;
@@ -138,12 +130,6 @@ private:
   // Registered Elements
   QList<SI_SymbolPin*> mRegisteredSymbolPins;
   QList<BI_FootprintPad*> mRegisteredFootprintPads;
-
-  // ERC Messages
-  /// @brief The ERC message for an unconnected required component signal
-  QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredSignal;
-  /// @brief The ERC message for a global net signal name mismatch
-  QScopedPointer<ErcMsg> mErcMsgForcedNetSignalNameConflict;
 };
 
 /*******************************************************************************

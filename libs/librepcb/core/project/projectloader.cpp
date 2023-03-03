@@ -49,8 +49,7 @@
 #include "circuit/componentsignalinstance.h"
 #include "circuit/netclass.h"
 #include "circuit/netsignal.h"
-#include "erc/ercmsg.h"
-#include "erc/ercmsglist.h"
+#include "erc/electricalrulecheck.h"
 #include "project.h"
 #include "projectlibrary.h"
 #include "projectsettings.h"
@@ -141,9 +140,18 @@ std::unique_ptr<Project> ProjectLoader::open(
   loadSettings(*p);
   loadLibrary(*p);
   loadCircuit(*p);
+  loadErc(*p);
   loadSchematics(*p);
   loadBoards(*p);
-  restoreApprovedErcMessages(*p);
+
+  // If the file format was migrated, clean up obsolete ERC messages.
+  if (mUpgradeMessages) {
+    qInfo() << "Running ERC to clean up obsolete message approvals...";
+    ElectricalRuleCheck erc(*p);
+    const RuleCheckMessageList msgs = erc.runChecks();
+    const QSet<SExpression> approvals = RuleCheckMessage::getAllApprovals(msgs);
+    p->setErcMessageApprovals(p->getErcMessageApprovals() & approvals);
+  }
 
   // Done!
   qDebug() << "Successfully opened project in" << timer.elapsed() << "ms.";
@@ -326,6 +334,22 @@ void ProjectLoader::loadCircuit(Project& p) {
   }
 
   qDebug() << "Successfully loaded circuit.";
+}
+
+void ProjectLoader::loadErc(Project& p) {
+  qDebug() << "Load ERC approvals...";
+  const QString fp = "circuit/erc.lp";
+  const SExpression root = SExpression::parse(p.getDirectory().read(fp),
+                                              p.getDirectory().getAbsPath(fp));
+
+  // Load approvals.
+  QSet<SExpression> approvals;
+  foreach (const SExpression* node, root.getChildren("approved")) {
+    approvals.insert(*node);
+  }
+  p.setErcMessageApprovals(approvals);
+
+  qDebug() << "Successfully loaded ERC approvals.";
 }
 
 void ProjectLoader::loadSchematics(Project& p) {
@@ -720,23 +744,6 @@ void ProjectLoader::loadBoardUserSettings(Board& b) {
     // ignore these errors and load the default settings instead...
     qCritical() << "Could not load board user settings, defaults will be "
                    "used instead.";
-  }
-}
-
-void ProjectLoader::restoreApprovedErcMessages(Project& p) {
-  const QString fp = "circuit/erc.lp";
-  const SExpression root = SExpression::parse(p.getDirectory().read(fp),
-                                              p.getDirectory().getAbsPath(fp));
-
-  foreach (const SExpression* node, root.getChildren("approved")) {
-    foreach (ErcMsg* ercMsg, p.getErcMsgList().getItems()) {
-      if ((ercMsg->getOwner().getErcMsgOwnerClassName() ==
-           node->getChild("class/@0").getValue()) &&
-          (ercMsg->getOwnerKey() == node->getChild("instance/@0").getValue()) &&
-          (ercMsg->getMsgKey() == node->getChild("message/@0").getValue())) {
-        ercMsg->setIgnored(true);
-      }
-    }
   }
 }
 

@@ -571,9 +571,6 @@ add_library(
   project/cmd/cmdsymbolinstancetextremove.h
   project/cmd/cmdsymbolinstancetextsreset.cpp
   project/cmd/cmdsymbolinstancetextsreset.h
-  project/erc/ercmsgdock.cpp
-  project/erc/ercmsgdock.h
-  project/erc/ercmsgdock.ui
   project/newprojectwizard/newprojectwizard.cpp
   project/newprojectwizard/newprojectwizard.h
   project/newprojectwizard/newprojectwizard.ui
@@ -704,6 +701,9 @@ add_library(
   widgets/positivelengthedit.h
   widgets/ratioedit.cpp
   widgets/ratioedit.h
+  widgets/rulecheckdock.cpp
+  widgets/rulecheckdock.h
+  widgets/rulecheckdock.ui
   widgets/rulechecklistwidget.cpp
   widgets/rulechecklistwidget.h
   widgets/searchtoolbar.cpp

@@ -27,7 +27,6 @@
 #include "../../attribute/attributeprovider.h"
 #include "../../types/circuitidentifier.h"
 #include "../../types/uuid.h"
-#include "../erc/if_ercmsgprovider.h"
 
 #include <QtCore>
 
@@ -41,7 +40,6 @@ class Circuit;
 class Component;
 class ComponentSignalInstance;
 class ComponentSymbolVariant;
-class ErcMsg;
 class SI_Symbol;
 
 /*******************************************************************************
@@ -51,11 +49,8 @@ class SI_Symbol;
 /**
  * @brief The ComponentInstance class
  */
-class ComponentInstance : public QObject,
-                          public AttributeProvider,
-                          public IF_ErcMsgProvider {
+class ComponentInstance : public QObject, public AttributeProvider {
   Q_OBJECT
-  DECLARE_ERC_MSG_CLASS_NAME(ComponentInstance)
 
 public:
   // Constructors / Destructor
@@ -89,12 +84,9 @@ public:
 
   // Getters: General
   Circuit& getCircuit() const noexcept { return mCircuit; }
-  int getPlacedSymbolsCount() const noexcept {
-    return mRegisteredSymbols.count();
+  const QHash<Uuid, SI_Symbol*>& getSymbols() const noexcept {
+    return mRegisteredSymbols;
   }
-  int getUnplacedSymbolsCount() const noexcept;
-  int getUnplacedRequiredSymbolsCount() const noexcept;
-  int getUnplacedOptionalSymbolsCount() const noexcept;
   int getRegisteredElementsCount() const noexcept;
   bool isUsed() const noexcept;
   bool isAddedToCircuit() const noexcept { return mIsAddedToCircuit; }
@@ -164,7 +156,6 @@ signals:
 
 private:
   bool checkAttributesValidity() const noexcept;
-  void updateErcMessages() noexcept;
   const QStringList& getLocaleOrder() const noexcept;
 
   // General
@@ -218,14 +209,6 @@ private:
    * @see #registerDevice(), #unregisterDevice()
    */
   QList<BI_Device*> mRegisteredDevices;
-
-  // ERC Messages
-
-  /// @brief The ERC message for unplaced required symbols of this component
-  QScopedPointer<ErcMsg> mErcMsgUnplacedRequiredSymbols;
-
-  /// @brief The ERC message for unplaced optional symbols of this component
-  QScopedPointer<ErcMsg> mErcMsgUnplacedOptionalSymbols;
 };
 
 /*******************************************************************************

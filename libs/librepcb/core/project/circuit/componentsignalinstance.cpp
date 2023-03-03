@@ -27,7 +27,6 @@
 #include "../../library/cmp/component.h"
 #include "../../utils/scopeguardlist.h"
 #include "../board/items/bi_footprintpad.h"
-#include "../erc/ercmsg.h"
 #include "../project.h"
 #include "../projectsettings.h"
 #include "../schematic/items/si_symbolpin.h"
@@ -55,32 +54,6 @@ ComponentSignalInstance::ComponentSignalInstance(
     mComponentSignal(cmpSignal),
     mIsAddedToCircuit(false),
     mNetSignal(netsignal) {
-  // create ERC messages
-  mErcMsgUnconnectedRequiredSignal.reset(
-      new ErcMsg(mCircuit.getProject(), *this,
-                 QString("%1/%2")
-                     .arg(mComponentInstance.getUuid().toStr())
-                     .arg(mComponentSignal.getUuid().toStr()),
-                 "UnconnectedRequiredSignal",
-                 ErcMsg::ErcMsgType_t::CircuitError, QString()));
-  mErcMsgForcedNetSignalNameConflict.reset(
-      new ErcMsg(mCircuit.getProject(), *this,
-                 QString("%1/%2")
-                     .arg(mComponentInstance.getUuid().toStr())
-                     .arg(mComponentSignal.getUuid().toStr()),
-                 "ForcedNetSignalNameConflict",
-                 ErcMsg::ErcMsgType_t::SchematicError, QString()));
-  updateErcMessages();
-
-  // register to component attributes changed
-  connect(&mComponentInstance, &ComponentInstance::attributesChanged, this,
-          &ComponentSignalInstance::updateErcMessages);
-
-  // register to net signal name changed
-  if (mNetSignal) {
-    connect(mNetSignal, &NetSignal::nameChanged, this,
-            &ComponentSignalInstance::netSignalNameChanged);
-  }
 }
 
 ComponentSignalInstance::~ComponentSignalInstance() noexcept {
@@ -144,27 +117,14 @@ void ComponentSignalInstance::setNetSignal(NetSignal* netsignal) {
   ScopeGuardList sgl;
   if (mNetSignal) {
     mNetSignal->unregisterComponentSignal(*this);  // can throw
-    disconnect(mNetSignal, &NetSignal::nameChanged, this,
-               &ComponentSignalInstance::netSignalNameChanged);
-    sgl.add([&]() {
-      mNetSignal->registerComponentSignal(*this);
-      connect(mNetSignal, &NetSignal::nameChanged, this,
-              &ComponentSignalInstance::netSignalNameChanged);
-    });
+    sgl.add([&]() { mNetSignal->registerComponentSignal(*this); });
   }
   if (netsignal) {
     netsignal->registerComponentSignal(*this);  // can throw
-    connect(netsignal, &NetSignal::nameChanged, this,
-            &ComponentSignalInstance::netSignalNameChanged);
-    sgl.add([&]() {
-      netsignal->unregisterComponentSignal(*this);
-      disconnect(netsignal, &NetSignal::nameChanged, this,
-                 &ComponentSignalInstance::netSignalNameChanged);
-    });
+    sgl.add([&]() { netsignal->unregisterComponentSignal(*this); });
   }
   NetSignal* old = mNetSignal;
   mNetSignal = netsignal;
-  updateErcMessages();
   sgl.dismiss();
   emit netSignalChanged(old, mNetSignal);
 }
@@ -181,7 +141,6 @@ void ComponentSignalInstance::addToCircuit() {
     mNetSignal->registerComponentSignal(*this);  // can throw
   }
   mIsAddedToCircuit = true;
-  updateErcMessages();
 }
 
 void ComponentSignalInstance::removeFromCircuit() {
@@ -198,7 +157,6 @@ void ComponentSignalInstance::removeFromCircuit() {
     mNetSignal->unregisterComponentSignal(*this);  // can throw
   }
   mIsAddedToCircuit = false;
-  updateErcMessages();
 }
 
 void ComponentSignalInstance::registerSymbolPin(SI_SymbolPin& pin) {
@@ -236,35 +194,6 @@ void ComponentSignalInstance::serialize(SExpression& root) const {
   root.appendChild(
       "net",
       mNetSignal ? tl::make_optional(mNetSignal->getUuid()) : tl::nullopt);
-}
-
-/*******************************************************************************
- *  Private Slots
- ******************************************************************************/
-
-void ComponentSignalInstance::netSignalNameChanged(
-    const CircuitIdentifier& newName) noexcept {
-  Q_UNUSED(newName);
-  updateErcMessages();
-}
-
-void ComponentSignalInstance::updateErcMessages() noexcept {
-  mErcMsgUnconnectedRequiredSignal->setMsg(
-      tr("Unconnected component signal: \"%1\" from \"%2\"")
-          .arg(*mComponentSignal.getName())
-          .arg(*mComponentInstance.getName()));
-  mErcMsgForcedNetSignalNameConflict->setMsg(
-      tr("Signal name conflict: \"%1\" != \"%2\" (\"%3\" from \"%4\")")
-          .arg((mNetSignal ? *mNetSignal->getName() : QString()),
-               getForcedNetSignalName(), *mComponentSignal.getName(),
-               *mComponentInstance.getName()));
-
-  mErcMsgUnconnectedRequiredSignal->setVisible(
-      (mIsAddedToCircuit) && (!mNetSignal) && (mComponentSignal.isRequired()));
-  mErcMsgForcedNetSignalNameConflict->setVisible(
-      (mIsAddedToCircuit) && (isNetSignalNameForced()) &&
-      (mNetSignal ? (getForcedNetSignalName() != mNetSignal->getName())
-                  : false));
 }
 
 /*******************************************************************************

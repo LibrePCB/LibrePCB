@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../types/elementname.h"
 #include "../../types/uuid.h"
-#include "../erc/if_ercmsgprovider.h"
 
 #include <QtCore>
 
@@ -35,7 +34,6 @@
 namespace librepcb {
 
 class Circuit;
-class ErcMsg;
 class NetSignal;
 
 /*******************************************************************************
@@ -45,9 +43,8 @@ class NetSignal;
 /**
  * @brief The NetClass class
  */
-class NetClass final : public QObject, public IF_ErcMsgProvider {
+class NetClass final : public QObject {
   Q_OBJECT
-  DECLARE_ERC_MSG_CLASS_NAME(NetClass)
 
 public:
   // Constructors / Destructor
@@ -86,8 +83,6 @@ public:
   NetClass& operator=(const NetClass& rhs) = delete;
 
 private:
-  void updateErcMessages() noexcept;
-
   // General
   Circuit& mCircuit;
   bool mIsAddedToCircuit;
@@ -99,10 +94,6 @@ private:
   // Registered Elements
   /// @brief all registered netsignals
   QHash<Uuid, NetSignal*> mRegisteredNetSignals;
-
-  // ERC Messages
-  /// @brief the ERC message for unused netclasses
-  QScopedPointer<ErcMsg> mErcMsgUnusedNetClass;
 };
 
 /*******************************************************************************

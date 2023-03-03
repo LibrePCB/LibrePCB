@@ -32,6 +32,7 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -57,7 +58,8 @@ ProjectEditor::ProjectEditor(
     mUndoStack(nullptr),
     mSchematicEditor(nullptr),
     mBoardEditor(nullptr),
-    mLastAutosaveStateId(0) {
+    mLastAutosaveStateId(0),
+    mManualModificationsMade(false) {
   try {
     mUndoStack = new UndoStack();
     mLastAutosaveStateId = mUndoStack->getUniqueStateId();
@@ -75,6 +77,10 @@ ProjectEditor::ProjectEditor(
     mUndoStack = nullptr;
     throw;  // ...and rethrow the exception
   }
+
+  // Run the ERC after opening and after every modification.
+  QTimer::singleShot(200, this, &ProjectEditor::runErc);
+  connect(mUndoStack, &UndoStack::stateModified, this, &ProjectEditor::runErc);
 
   // setup the timer for automatic backups, if enabled in the settings
   int intervalSecs =
@@ -256,6 +262,7 @@ bool ProjectEditor::saveProject() noexcept {
     mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->save();  // can throw
     mLastAutosaveStateId = mUndoStack->getUniqueStateId();
+    mManualModificationsMade = false;
 
     // saving was successful --> clean the undo stack
     mUndoStack->setClean();
@@ -300,8 +307,8 @@ bool ProjectEditor::autosaveProject() noexcept {
 
 bool ProjectEditor::closeAndDestroy(bool askForSave,
                                     QWidget* msgBoxParent) noexcept {
-  if (mUndoStack->isClean() || (!mProject.getDirectory().isWritable()) ||
-      (!askForSave)) {
+  if ((mUndoStack->isClean() && (!mManualModificationsMade)) ||
+      (!mProject.getDirectory().isWritable()) || (!askForSave)) {
     // no unsaved changes or opened in read-only mode or don't save --> close
     // project
     deleteLater();  // this project object will be deleted later in the event
@@ -335,9 +342,49 @@ bool ProjectEditor::closeAndDestroy(bool askForSave,
   }
 }
 
+void ProjectEditor::setErcMessageApproved(const RuleCheckMessage& msg,
+                                          bool approve) noexcept {
+  QSet<SExpression> approvals = mProject.getErcMessageApprovals();
+  if (approve) {
+    approvals.insert(msg.getApproval());
+  } else {
+    approvals.remove(msg.getApproval());
+  }
+  saveErcMessageApprovals(approvals);
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void ProjectEditor::runErc() noexcept {
+  try {
+    QElapsedTimer timer;
+    timer.start();
+    ElectricalRuleCheck erc(mProject);
+    mErcMessages = erc.runChecks();
+
+    // Detect disappeared messages & remove their approvals.
+    QSet<SExpression> approvals =
+        RuleCheckMessage::getAllApprovals(mErcMessages);
+    mSupportedErcApprovals |= approvals;
+    mDisappearedErcApprovals = mSupportedErcApprovals - approvals;
+    approvals = mProject.getErcMessageApprovals() - mDisappearedErcApprovals;
+    saveErcMessageApprovals(approvals);
+
+    emit ercFinished(mErcMessages);
+    qDebug() << "ERC succeeded after" << timer.elapsed() << "ms.";
+  } catch (const Exception& e) {
+    qCritical() << "ERC failed:" << e.getMsg();
+  }
+}
+
+void ProjectEditor::saveErcMessageApprovals(
+    const QSet<SExpression>& approvals) noexcept {
+  if (mProject.setErcMessageApprovals(approvals)) {
+    setManualModificationsMade();
+  }
+}
 
 int ProjectEditor::getCountOfVisibleEditorWindows() const noexcept {
   int count = 0;

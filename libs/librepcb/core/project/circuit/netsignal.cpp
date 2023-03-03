@@ -26,7 +26,6 @@
 #include "../../library/cmp/component.h"
 #include "../board/items/bi_netsegment.h"
 #include "../board/items/bi_plane.h"
-#include "../erc/ercmsg.h"
 #include "../schematic/items/si_netsegment.h"
 #include "circuit.h"
 #include "componentinstance.h"
@@ -98,7 +97,6 @@ void NetSignal::setName(const CircuitIdentifier& name,
   }
   mName = name;
   mHasAutoName = isAutoName;
-  updateErcMessages();
   emit nameChanged(mName);
 }
 
@@ -119,7 +117,6 @@ void NetSignal::addToCircuit() {
   }
   mNetClass.registerNetSignal(*this);  // can throw
   mIsAddedToCircuit = true;
-  updateErcMessages();
 }
 
 void NetSignal::removeFromCircuit() {
@@ -134,7 +131,6 @@ void NetSignal::removeFromCircuit() {
   }
   mNetClass.unregisterNetSignal(*this);  // can throw
   mIsAddedToCircuit = false;
-  updateErcMessages();
 }
 
 void NetSignal::registerComponentSignal(ComponentSignalInstance& signal) {
@@ -143,7 +139,6 @@ void NetSignal::registerComponentSignal(ComponentSignalInstance& signal) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredComponentSignals.append(&signal);
-  updateErcMessages();
 }
 
 void NetSignal::unregisterComponentSignal(ComponentSignalInstance& signal) {
@@ -152,7 +147,6 @@ void NetSignal::unregisterComponentSignal(ComponentSignalInstance& signal) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredComponentSignals.removeOne(&signal);
-  updateErcMessages();
 }
 
 void NetSignal::registerSchematicNetSegment(SI_NetSegment& netsegment) {
@@ -166,7 +160,6 @@ void NetSignal::registerSchematicNetSegment(SI_NetSegment& netsegment) {
     throw LogicError(__FILE__, __LINE__, "NetSegment is from other circuit.");
   }
   mRegisteredSchematicNetSegments.append(&netsegment);
-  updateErcMessages();
 }
 
 void NetSignal::unregisterSchematicNetSegment(SI_NetSegment& netsegment) {
@@ -175,7 +168,6 @@ void NetSignal::unregisterSchematicNetSegment(SI_NetSegment& netsegment) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredSchematicNetSegments.removeOne(&netsegment);
-  updateErcMessages();
 }
 
 void NetSignal::registerBoardNetSegment(BI_NetSegment& netsegment) {
@@ -185,7 +177,6 @@ void NetSignal::registerBoardNetSegment(BI_NetSegment& netsegment) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredBoardNetSegments.append(&netsegment);
-  updateErcMessages();
 }
 
 void NetSignal::unregisterBoardNetSegment(BI_NetSegment& netsegment) {
@@ -194,7 +185,6 @@ void NetSignal::unregisterBoardNetSegment(BI_NetSegment& netsegment) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredBoardNetSegments.removeOne(&netsegment);
-  updateErcMessages();
 }
 
 void NetSignal::registerBoardPlane(BI_Plane& plane) {
@@ -203,7 +193,6 @@ void NetSignal::registerBoardPlane(BI_Plane& plane) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredBoardPlanes.append(&plane);
-  updateErcMessages();
 }
 
 void NetSignal::unregisterBoardPlane(BI_Plane& plane) {
@@ -211,7 +200,6 @@ void NetSignal::unregisterBoardPlane(BI_Plane& plane) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredBoardPlanes.removeOne(&plane);
-  updateErcMessages();
 }
 
 void NetSignal::serialize(SExpression& root) const {
@@ -221,47 +209,6 @@ void NetSignal::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("netclass", mNetClass.getUuid());
   root.ensureLineBreak();
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void NetSignal::updateErcMessages() noexcept {
-  if (mIsAddedToCircuit && (!isUsed())) {
-    if (!mErcMsgUnusedNetSignal) {
-      mErcMsgUnusedNetSignal.reset(
-          new ErcMsg(mCircuit.getProject(), *this, mUuid.toStr(), "Unused",
-                     ErcMsg::ErcMsgType_t::CircuitError, QString()));
-    }
-    mErcMsgUnusedNetSignal->setMsg(tr("Unused net signal: \"%1\"").arg(*mName));
-    mErcMsgUnusedNetSignal->setVisible(true);
-  } else if (mErcMsgUnusedNetSignal) {
-    mErcMsgUnusedNetSignal.reset();
-  }
-
-  // Raise a warning if the net signal is connected to less then two component
-  // signals. But do not count component signals of schematic-only components
-  // since these are just "virtual" connections, i.e. not represented by a
-  // real pad (see https://github.com/LibrePCB/LibrePCB/issues/739).
-  int registeredRealComponentCount = 0;
-  foreach (ComponentSignalInstance* signal, mRegisteredComponentSignals) {
-    if (!signal->getComponentInstance().getLibComponent().isSchematicOnly()) {
-      registeredRealComponentCount++;
-    }
-  }
-  if (mIsAddedToCircuit && (registeredRealComponentCount < 2)) {
-    if (!mErcMsgConnectedToLessThanTwoPins) {
-      mErcMsgConnectedToLessThanTwoPins.reset(new ErcMsg(
-          mCircuit.getProject(), *this, mUuid.toStr(),
-          "ConnectedToLessThanTwoPins", ErcMsg::ErcMsgType_t::CircuitWarning));
-    }
-    mErcMsgConnectedToLessThanTwoPins->setMsg(
-        tr("Net signal connected to less than two pins: \"%1\"").arg(*mName));
-    mErcMsgConnectedToLessThanTwoPins->setVisible(true);
-  } else if (mErcMsgConnectedToLessThanTwoPins) {
-    mErcMsgConnectedToLessThanTwoPins.reset();
-  }
 }
 
 /*******************************************************************************

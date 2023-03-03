@@ -23,7 +23,6 @@
 #include "netclass.h"
 
 #include "../../exceptions.h"
-#include "../erc/ercmsg.h"
 #include "circuit.h"
 #include "netsignal.h"
 
@@ -60,7 +59,6 @@ void NetClass::setName(const ElementName& name) noexcept {
     return;
   }
   mName = name;
-  updateErcMessages();
 }
 
 /*******************************************************************************
@@ -72,7 +70,6 @@ void NetClass::addToCircuit() {
     throw LogicError(__FILE__, __LINE__);
   }
   mIsAddedToCircuit = true;
-  updateErcMessages();
 }
 
 void NetClass::removeFromCircuit() {
@@ -86,7 +83,6 @@ void NetClass::removeFromCircuit() {
                            .arg(*mName));
   }
   mIsAddedToCircuit = false;
-  updateErcMessages();
 }
 
 void NetClass::registerNetSignal(NetSignal& signal) {
@@ -96,7 +92,6 @@ void NetClass::registerNetSignal(NetSignal& signal) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredNetSignals.insert(signal.getUuid(), &signal);
-  updateErcMessages();
 }
 
 void NetClass::unregisterNetSignal(NetSignal& signal) {
@@ -105,30 +100,11 @@ void NetClass::unregisterNetSignal(NetSignal& signal) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredNetSignals.remove(signal.getUuid());
-  updateErcMessages();
 }
 
 void NetClass::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("name", mName);
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void NetClass::updateErcMessages() noexcept {
-  if (mIsAddedToCircuit && (!isUsed())) {
-    if (!mErcMsgUnusedNetClass) {
-      mErcMsgUnusedNetClass.reset(
-          new ErcMsg(mCircuit.getProject(), *this, mUuid.toStr(), "Unused",
-                     ErcMsg::ErcMsgType_t::CircuitWarning));
-    }
-    mErcMsgUnusedNetClass->setMsg(tr("Unused net class: \"%1\"").arg(*mName));
-    mErcMsgUnusedNetClass->setVisible(true);
-  } else if (mErcMsgUnusedNetClass) {
-    mErcMsgUnusedNetClass.reset();
-  }
 }
 
 /*******************************************************************************

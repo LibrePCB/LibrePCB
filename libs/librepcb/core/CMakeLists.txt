@@ -353,11 +353,10 @@ add_library(
   project/circuit/netclass.h
   project/circuit/netsignal.cpp
   project/circuit/netsignal.h
-  project/erc/ercmsg.cpp
-  project/erc/ercmsg.h
-  project/erc/ercmsglist.cpp
-  project/erc/ercmsglist.h
-  project/erc/if_ercmsgprovider.h
+  project/erc/electricalrulecheck.cpp
+  project/erc/electricalrulecheck.h
+  project/erc/electricalrulecheckmessages.cpp
+  project/erc/electricalrulecheckmessages.h
   project/project.cpp
   project/project.h
   project/projectlibrary.cpp

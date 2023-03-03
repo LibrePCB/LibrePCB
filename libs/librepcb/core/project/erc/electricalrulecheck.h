@@ -17,52 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_IF_ERCMSGPROVIDER_H
-#define LIBREPCB_CORE_IF_ERCMSGPROVIDER_H
+#ifndef LIBREPCB_CORE_ELECTRICALRULECHECK_H
+#define LIBREPCB_CORE_ELECTRICALRULECHECK_H
+
+/*******************************************************************************
+ *  Includes
+ ******************************************************************************/
+#include "../../rulecheck/rulecheckmessage.h"
+
+#include <QtCore>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class ErcMsg;  // all classes which implement IF_ErcMsgProvider will need this
-               // declaration
+class ComponentInstance;
+class Project;
+class SI_NetSegment;
+class SI_Symbol;
+class Schematic;
 
 /*******************************************************************************
- *  Macros
+ *  Class ElectricalRuleCheck
  ******************************************************************************/
 
 /**
- * @note    The specified class name should be unique within the whole core
- *          library, so we won't use the namespace as a prefix. Simple use
- *          the class name.
- *
- * @warning Do not change the name of an existing class if you don't know what
- * you're doing!
+ * @brief The ElectricalRuleCheck class checks a ::librepcb::Board for
+ *        design rule violations
  */
-#define DECLARE_ERC_MSG_CLASS_NAME(msgOwnerClassName) \
-public: \
-  virtual const char* getErcMsgOwnerClassName() const noexcept override { \
-    return #msgOwnerClassName; \
-  } \
-\
-private:
-
-/*******************************************************************************
- *  Class IF_ErcMsgProvider
- ******************************************************************************/
-
-/**
- * @brief The IF_ErcMsgProvider class
- */
-class IF_ErcMsgProvider {
+class ElectricalRuleCheck final {
 public:
   // Constructors / Destructor
-  IF_ErcMsgProvider() {}
-  virtual ~IF_ErcMsgProvider() {}
+  explicit ElectricalRuleCheck(const Project& project) noexcept;
+  ~ElectricalRuleCheck() noexcept;
 
-  // Getters
-  virtual const char* getErcMsgOwnerClassName() const noexcept = 0;
+  // General Methods
+  RuleCheckMessageList runChecks() const;
+
+private:  // Methods
+  void checkNetClasses(RuleCheckMessageList& msgs) const;
+  void checkNetSignals(RuleCheckMessageList& msgs) const;
+  void checkComponents(RuleCheckMessageList& msgs) const;
+  void checkComponentSignals(const ComponentInstance& cmp,
+                             RuleCheckMessageList& msgs) const;
+  void checkSchematics(RuleCheckMessageList& msgs) const;
+  void checkSymbols(const Schematic& schematic,
+                    RuleCheckMessageList& msgs) const;
+  void checkPins(const SI_Symbol& symbol, RuleCheckMessageList& msgs) const;
+  void checkNetSegments(const Schematic& schematic,
+                        RuleCheckMessageList& msgs) const;
+  void checkNetPoints(const SI_NetSegment& netSegment,
+                      RuleCheckMessageList& msgs) const;
+
+private:  // Data
+  const Project& mProject;
 };
 
 /*******************************************************************************
