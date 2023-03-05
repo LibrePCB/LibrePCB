@@ -135,6 +135,8 @@ protected:  // Methods
 
   void serializeMessageApprovals(SExpression& root) const;
 
+  void removeObsoleteMessageApprovals();
+
   static Version readFileFormat(const TransactionalDirectory& directory,
                                 const QString& fileName);
 

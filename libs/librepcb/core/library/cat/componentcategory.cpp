@@ -64,7 +64,8 @@ std::unique_ptr<ComponentCategory> ComponentCategory::open(
   // Upgrade file format, if needed.
   const Version fileFormat =
       readFileFormat(*directory, ".librepcb-" % getShortElementName());
-  for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
+  const auto migrations = FileFormatMigration::getMigrations(fileFormat);
+  for (auto migration : migrations) {
     migration->upgradeComponentCategory(*directory);
   }
 
@@ -72,8 +73,12 @@ std::unique_ptr<ComponentCategory> ComponentCategory::open(
   const QString fileName = getLongElementName() % ".lp";
   const SExpression root = SExpression::parse(directory->read(fileName),
                                               directory->getAbsPath(fileName));
-  return std::unique_ptr<ComponentCategory>(
+  std::unique_ptr<ComponentCategory> obj(
       new ComponentCategory(std::move(directory), root));
+  if (!migrations.isEmpty()) {
+    obj->removeObsoleteMessageApprovals();
+  }
+  return obj;
 }
 
 /*******************************************************************************

@@ -177,6 +177,11 @@ void LibraryBaseElement::serializeMessageApprovals(SExpression& root) const {
   root.ensureLineBreak();
 }
 
+void LibraryBaseElement::removeObsoleteMessageApprovals() {
+  const RuleCheckMessageList messages = runChecks();
+  mMessageApprovals &= RuleCheckMessage::getAllApprovals(messages);
+}
+
 Version LibraryBaseElement::readFileFormat(
     const TransactionalDirectory& directory, const QString& fileName) {
   const VersionFile versionFile =
