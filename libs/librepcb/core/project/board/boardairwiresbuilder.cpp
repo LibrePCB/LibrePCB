@@ -60,7 +60,8 @@ BoardAirWiresBuilder::~BoardAirWiresBuilder() noexcept {
  *  General Methods
  ******************************************************************************/
 
-QVector<QPair<Point, Point>> BoardAirWiresBuilder::buildAirWires() const {
+QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
+    BoardAirWiresBuilder::buildAirWires() const {
   AirWiresBuilder builder;
   QHash<int, std::pair<Point, QString>> pointLayerMap;  // ID -> (point, layer)
   QHash<const BI_NetLineAnchor*, int> anchorMap;  // anchor -> ID
@@ -132,7 +133,20 @@ QVector<QPair<Point, Point>> BoardAirWiresBuilder::buildAirWires() const {
     }
   }
 
-  return builder.buildAirWires();
+  // Calculate the airwires and convert them back to the result type.
+  const AirWiresBuilder::AirWires airWireIds = builder.buildAirWires();
+  QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>> result;
+  result.reserve(airWireIds.size());
+  foreach (const AirWiresBuilder::AirWire& airWire, airWireIds) {
+    const BI_NetLineAnchor* p1 = anchorMap.key(airWire.first, nullptr);
+    const BI_NetLineAnchor* p2 = anchorMap.key(airWire.second, nullptr);
+    if ((!p1) || (!p2)) {
+      throw LogicError(__FILE__, __LINE__, "Unknown air wire IDs received.");
+    }
+    result.append(std::make_pair(p1, p2));
+  }
+
+  return result;
 }
 
 /*******************************************************************************

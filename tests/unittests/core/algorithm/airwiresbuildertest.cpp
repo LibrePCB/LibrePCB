@@ -69,28 +69,26 @@ TEST_F(AirWiresBuilderTest, testOnePoint) {
 
 TEST_F(AirWiresBuilderTest, testTwoUnconnectedPoints) {
   AirWiresBuilder builder;
-  builder.addPoint(Point(1000000, 2000000));
-  builder.addPoint(Point(3000000, 4000000));
+  const int id0 = builder.addPoint(Point(1000000, 2000000));
+  const int id1 = builder.addPoint(Point(3000000, 4000000));
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
-  AirWiresBuilder::AirWires expected = {
-      {Point(1000000, 2000000), Point(3000000, 4000000)}};
+  AirWiresBuilder::AirWires expected = {{id0, id1}};
   EXPECT_EQ(expected, airwires);
 }
 
 TEST_F(AirWiresBuilderTest, testTwoUnconnectedOverlappingPoints) {
   AirWiresBuilder builder;
-  builder.addPoint(Point(100000, 200000));
-  builder.addPoint(Point(100000, 200000));
+  const int id0 = builder.addPoint(Point(100000, 200000));
+  const int id1 = builder.addPoint(Point(100000, 200000));
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
-  AirWiresBuilder::AirWires expected = {
-      {Point(100000, 200000), Point(100000, 200000)}};
+  AirWiresBuilder::AirWires expected = {{id0, id1}};
   EXPECT_EQ(expected, airwires);
 }
 
 TEST_F(AirWiresBuilderTest, testTwoConnectedPoints) {
   AirWiresBuilder builder;
-  int id0 = builder.addPoint(Point(100000, 200000));
-  int id1 = builder.addPoint(Point(300000, 400000));
+  const int id0 = builder.addPoint(Point(100000, 200000));
+  const int id1 = builder.addPoint(Point(300000, 400000));
   builder.addEdge(id0, id1);
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
   EXPECT_EQ(0, airwires.size());
@@ -98,83 +96,87 @@ TEST_F(AirWiresBuilderTest, testTwoConnectedPoints) {
 
 TEST_F(AirWiresBuilderTest, testThreeUnconnectedPoints) {
   AirWiresBuilder builder;
-  builder.addPoint(Point(100000, 200000));
-  builder.addPoint(Point(300000, 400000));
-  builder.addPoint(Point(-50000, -50000));
+  const int id0 = builder.addPoint(Point(100000, 200000));
+  const int id1 = builder.addPoint(Point(300000, 400000));
+  const int id2 = builder.addPoint(Point(-50000, -50000));
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
   AirWiresBuilder::AirWires expected = {
-      {Point(-50000, -50000), Point(100000, 200000)},
-      {Point(100000, 200000), Point(300000, 400000)}};
+      {id0, id1},
+      {id0, id2},
+  };
   EXPECT_EQ(expected, airwires);
 }
 
 TEST_F(AirWiresBuilderTest, testThreeUnconnectedPointsVshape) {
   AirWiresBuilder builder;
-  builder.addPoint(Point(-50000, 0));
-  builder.addPoint(Point(100000, 0));
-  builder.addPoint(Point(0, -1000000));
+  const int id0 = builder.addPoint(Point(-50000, 0));
+  const int id1 = builder.addPoint(Point(100000, 0));
+  const int id2 = builder.addPoint(Point(0, -1000000));
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
-  AirWiresBuilder::AirWires expected = {{Point(-50000, 0), Point(0, -1000000)},
-                                        {Point(-50000, 0), Point(100000, 0)}};
+  AirWiresBuilder::AirWires expected = {
+      {id0, id1},
+      {id0, id2},
+  };
   EXPECT_EQ(expected, airwires);
 }
 
 // Test added for bug https://github.com/LibrePCB/LibrePCB/issues/588
 TEST_F(AirWiresBuilderTest, testThreeUnconnectedColinearPoints) {
   AirWiresBuilder builder;
-  builder.addPoint(Point(0, 0));
-  builder.addPoint(Point(100000, 0));
-  builder.addPoint(Point(-100000, 0));
+  const int id0 = builder.addPoint(Point(0, 0));
+  const int id1 = builder.addPoint(Point(100000, 0));
+  const int id2 = builder.addPoint(Point(-100000, 0));
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
-  AirWiresBuilder::AirWires expected = {{Point(-100000, 0), Point(0, 0)},
-                                        {Point(0, 0), Point(100000, 0)}};
+  AirWiresBuilder::AirWires expected = {
+      {id0, id1},
+      {id0, id2},
+  };
   EXPECT_EQ(expected, airwires);
 }
 
 // Test added for bug https://github.com/LibrePCB/LibrePCB/issues/588
 TEST_F(AirWiresBuilderTest, testThreeUnconnectedDiagonalColinearPoints) {
   AirWiresBuilder builder;
-  builder.addPoint(Point(0, 0));
-  builder.addPoint(Point(1000000, 1000000));
-  builder.addPoint(Point(2000000, 2000000));
+  const int id0 = builder.addPoint(Point(0, 0));
+  const int id1 = builder.addPoint(Point(1000000, 1000000));
+  const int id2 = builder.addPoint(Point(2000000, 2000000));
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
   AirWiresBuilder::AirWires expected = {
-      {Point(0, 0), Point(1000000, 1000000)},
-      {Point(1000000, 1000000), Point(2000000, 2000000)}};
+      {id0, id1},
+      {id1, id2},
+  };
   EXPECT_EQ(expected, airwires);
 }
 
 // Test added for bug https://github.com/LibrePCB/LibrePCB/issues/588
 TEST_F(AirWiresBuilderTest, testThreeUnconnectedDiagonalColinearPoints2) {
   AirWiresBuilder builder;
-  builder.addPoint(Point(71437500, 78898800));
-  builder.addPoint(Point(70485000, 80010000));
-  builder.addPoint(Point(72707500, 77470000));
+  const int id0 = builder.addPoint(Point(71437500, 78898800));
+  const int id1 = builder.addPoint(Point(70485000, 80010000));
+  const int id2 = builder.addPoint(Point(72707500, 77470000));
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
   AirWiresBuilder::AirWires expected = {
-      {Point(70485000, 80010000), Point(71437500, 78898800)},
-      {Point(71437500, 78898800), Point(72707500, 77470000)}};
+      {id0, id1},
+      {id0, id2},
+  };
   EXPECT_EQ(expected, airwires);
 }
 
 // Test added for bug https://github.com/LibrePCB/LibrePCB/issues/588
 TEST_F(AirWiresBuilderTest, testPartlyConnectedColinearPoints) {
   AirWiresBuilder builder;
-  /*int id0 = */ builder.addPoint(Point(0, 0));
-  int id1 = builder.addPoint(Point(100000, 100000));
-  int id2 = builder.addPoint(Point(200000, 200000));
-  /*int id3 = */ builder.addPoint(Point(300000, 300000));
-  /*int id4 = */ builder.addPoint(Point(400000, 400000));
-  /*int id5 = */ builder.addPoint(Point(500000, 500000));
-  /*int id5 = */ builder.addPoint(Point(600000, 600000));
+  const int id0 = builder.addPoint(Point(0, 0));
+  const int id1 = builder.addPoint(Point(100000, 100000));
+  const int id2 = builder.addPoint(Point(200000, 200000));
+  const int id3 = builder.addPoint(Point(300000, 300000));
+  const int id4 = builder.addPoint(Point(400000, 400000));
+  const int id5 = builder.addPoint(Point(500000, 500000));
+  const int id6 = builder.addPoint(Point(600000, 600000));
   builder.addEdge(id1, id2);
   AirWiresBuilder::AirWires airwires = sorted(builder.buildAirWires());
   AirWiresBuilder::AirWires expected = {
-      {Point(0, 0), Point(100000, 100000)},
-      {Point(200000, 200000), Point(300000, 300000)},
-      {Point(300000, 300000), Point(400000, 400000)},
-      {Point(400000, 400000), Point(500000, 500000)},
-      {Point(500000, 500000), Point(600000, 600000)}};
+      {id0, id1}, {id2, id3}, {id3, id4}, {id4, id5}, {id5, id6},
+  };
   EXPECT_EQ(expected, airwires);
 }
 

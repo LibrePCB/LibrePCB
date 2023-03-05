@@ -728,8 +728,9 @@ void BoardDesignRuleCheck::checkForMissingConnections(int progressEnd) {
   foreach (const BI_AirWire* airwire, mBoard.getAirWires()) {
     QString msg = tr("Missing connection: '%1'", "Placeholder is net name")
                       .arg(*airwire->getNetSignal().getName());
-    Path location = Path::obround(airwire->getP1(), airwire->getP2(),
-                                  PositiveLength(50000));
+    Path location =
+        Path::obround(airwire->getP1().getPosition(),
+                      airwire->getP2().getPosition(), PositiveLength(50000));
     emitMessage(BoardDesignRuleCheckMessage(msg, location));
   }
 

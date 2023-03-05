@@ -32,6 +32,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BI_NetLineAnchor;
 class Board;
 class NetSignal;
 
@@ -51,7 +52,8 @@ public:
   ~BoardAirWiresBuilder() noexcept;
 
   // General Methods
-  QVector<QPair<Point, Point>> buildAirWires() const;
+  QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
+      buildAirWires() const;
 
   // Operator Overloadings
   BoardAirWiresBuilder& operator=(const BoardAirWiresBuilder& rhs) = delete;

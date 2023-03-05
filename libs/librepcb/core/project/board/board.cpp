@@ -412,12 +412,13 @@ void Board::triggerAirWiresRebuild() noexcept {
       if (netsignal && netsignal->isAddedToCircuit()) {
         // calculate new airwires
         BoardAirWiresBuilder builder(*this, *netsignal);
-        QVector<QPair<Point, Point>> airwires = builder.buildAirWires();
+        QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
+            airwires = builder.buildAirWires();
 
         // add new airwires
         foreach (const auto& points, airwires) {
           QScopedPointer<BI_AirWire> airWire(
-              new BI_AirWire(*this, *netsignal, points.first, points.second));
+              new BI_AirWire(*this, *netsignal, *points.first, *points.second));
           airWire->addToBoard();  // can throw
           mAirWires.insertMulti(netsignal, airWire.take());
         }

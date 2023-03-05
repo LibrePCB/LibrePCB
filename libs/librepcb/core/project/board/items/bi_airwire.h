@@ -33,6 +33,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BI_NetLineAnchor;
+
 /*******************************************************************************
  *  Class BI_AirWire
  ******************************************************************************/
@@ -47,15 +49,15 @@ public:
   // Constructors / Destructor
   BI_AirWire() = delete;
   BI_AirWire(const BI_AirWire& other) = delete;
-  BI_AirWire(Board& board, const NetSignal& netsignal, const Point& p1,
-             const Point& p2);
+  BI_AirWire(Board& board, const NetSignal& netsignal,
+             const BI_NetLineAnchor& p1, const BI_NetLineAnchor& p2);
   ~BI_AirWire() noexcept;
 
   // Getters
   const NetSignal& getNetSignal() const noexcept { return mNetSignal; }
-  const Point& getP1() const noexcept { return mP1; }
-  const Point& getP2() const noexcept { return mP2; }
-  bool isVertical() const noexcept { return mP1 == mP2; }
+  const BI_NetLineAnchor& getP1() const noexcept { return mP1; }
+  const BI_NetLineAnchor& getP2() const noexcept { return mP2; }
+  bool isVertical() const noexcept;
 
   // General Methods
   void addToBoard() override;
@@ -74,8 +76,8 @@ private:
   QScopedPointer<BGI_AirWire> mGraphicsItem;
   QMetaObject::Connection mHighlightChangedConnection;
   const NetSignal& mNetSignal;
-  Point mP1;
-  Point mP2;
+  const BI_NetLineAnchor& mP1;
+  const BI_NetLineAnchor& mP2;
 };
 
 /*******************************************************************************

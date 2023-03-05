@@ -160,8 +160,7 @@ private:  // Methods
           // assert( newEdge.GetSourceNode()->GetTag() !=
           // newEdge.GetTargetNode()->GetTag() );
           // assert(dt.p1.tag != dt.p2.tag);
-          mst.append(
-              qMakePair(Point(dt.p1.x, dt.p1.y), Point(dt.p2.x, dt.p2.y)));
+          mst.append(std::make_pair(dt.p1.id, dt.p2.id));
           ++mstSize;
         } else {
           // for( it = cycles[trgTag].begin(), itEnd =
