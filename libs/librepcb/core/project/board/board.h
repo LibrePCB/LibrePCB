@@ -30,6 +30,7 @@
 #include "../../types/length.h"
 #include "../../types/lengthunit.h"
 #include "../../types/uuid.h"
+#include "../../types/version.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -164,6 +165,17 @@ public:
   void setDesignRules(const BoardDesignRules& rules) noexcept;
   void setDrcSettings(const BoardDesignRuleCheckSettings& settings) noexcept;
 
+  // DRC Message Approval Methods
+  const QSet<SExpression>& getDrcMessageApprovals() const noexcept {
+    return mDrcMessageApprovals;
+  }
+  void loadDrcMessageApprovals(const Version& version,
+                               const QSet<SExpression>& approvals) noexcept;
+  bool updateDrcMessageApprovals(QSet<SExpression> approvals,
+                                 bool partialRun) noexcept;
+  void setDrcMessageApproved(const SExpression& approval,
+                             bool approved) noexcept;
+
   // DeviceInstance Methods
   const QMap<Uuid, BI_Device*>& getDeviceInstances() const noexcept {
     return mDeviceInstances;
@@ -267,6 +279,11 @@ private:
   QString mDefaultFontFileName;
   PositiveLength mGridInterval;
   LengthUnit mGridUnit;
+
+  // DRC
+  Version mDrcMessageApprovalsVersion;
+  QSet<SExpression> mDrcMessageApprovals;
+  QSet<SExpression> mSupportedDrcMessageApprovals;
 
   // items
   QMap<Uuid, BI_Device*> mDeviceInstances;

@@ -621,6 +621,7 @@ void FileFormatMigrationV01::upgradeBoardDrcSettings(SExpression& root) {
                    SExpression::createToken("single_segment_straight"));
   node.appendChild("allowed_pth_slots",
                    SExpression::createToken("single_segment_straight"));
+  node.appendChild("approvals_version", SExpression::createToken("0.2"));
 }
 
 void FileFormatMigrationV01::upgradeGrid(SExpression& node) {

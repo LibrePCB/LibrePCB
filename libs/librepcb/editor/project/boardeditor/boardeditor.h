@@ -119,6 +119,8 @@ private:
   void unplacedComponentsCountChanged(int count) noexcept;
   void runDrc(bool quick) noexcept;
   void highlightDrcMessage(const RuleCheckMessage& msg, bool zoomTo) noexcept;
+  void setDrcMessageApproved(const RuleCheckMessage& msg,
+                             bool approved) noexcept;
   void clearDrcMarker() noexcept;
   QList<BI_Device*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;

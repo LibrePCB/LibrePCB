@@ -104,6 +104,8 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
+  SExpression& node = root.getChild("design_rule_check");
+  node.appendChild("approvals_version", SExpression::createToken("0.2"));
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

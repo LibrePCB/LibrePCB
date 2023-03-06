@@ -244,6 +244,8 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
     mDockDrc->setInteractive(mActiveBoard != nullptr);
     mDockDrc->setMessages(mActiveBoard ? mDrcMessages[mActiveBoard->getUuid()]
                                        : tl::nullopt);
+    mDockDrc->setApprovals(mActiveBoard ? mActiveBoard->getDrcMessageApprovals()
+                                        : QSet<SExpression>());
 
     // update toolbars
     mActionGridProperties->setEnabled(mActiveBoard != nullptr);
@@ -752,6 +754,8 @@ void BoardEditor::createDockWidgets() noexcept {
           [this]() { runDrc(true); });
   connect(mDockDrc.data(), &RuleCheckDock::messageSelected, this,
           &BoardEditor::highlightDrcMessage);
+  connect(mDockDrc.data(), &RuleCheckDock::messageApprovalRequested, this,
+          &BoardEditor::setDrcMessageApproved);
   addDockWidget(Qt::RightDockWidgetArea, mDockDrc.data());
   tabifyDockWidget(mDockErc.data(), mDockDrc.data());
 
@@ -1070,6 +1074,14 @@ void BoardEditor::runDrc(bool quick) noexcept {
     mDrcMessages.insert(board->getUuid(), drc.getMessages());
     mDockDrc->setMessages(drc.getMessages());
 
+    // Detect & remove disappeared messages.
+    const QSet<SExpression> approvals =
+        RuleCheckMessage::getAllApprovals(drc.getMessages());
+    if (board->updateDrcMessageApprovals(approvals, quick)) {
+      mDockDrc->setApprovals(board->getDrcMessageApprovals());
+      mProjectEditor.setManualModificationsMade();
+    }
+
     // Print how long it took.
     qDebug() << (quick ? "Quick check" : "DRC") << "succeeded after"
              << timer.elapsed() << "ms.";
@@ -1102,6 +1114,15 @@ void BoardEditor::highlightDrcMessage(const RuleCheckMessage& msg,
     if (zoomTo) {
       mUi->graphicsView->zoomToRect(rect);
     }
+  }
+}
+
+void BoardEditor::setDrcMessageApproved(const RuleCheckMessage& msg,
+                                        bool approved) noexcept {
+  if (Board* board = getActiveBoard()) {
+    board->setDrcMessageApproved(msg.getApproval(), approved);
+    mDockDrc->setApprovals(board->getDrcMessageApprovals());
+    mProjectEditor.setManualModificationsMade();
   }
 }
 
