@@ -301,7 +301,7 @@ void CmdRemoveSelectedSchematicItems::removeSymbol(SI_Symbol& symbol) {
 
   // do we also need to remove the component instance?
   ComponentInstance& component = symbol.getComponentInstance();
-  if (component.getPlacedSymbolsCount() == 0) {
+  if (component.getSymbols().isEmpty()) {
     foreach (Board* board, mSchematic.getProject().getBoards()) {
       BI_Device* device =
           board->getDeviceInstanceByComponentUuid(component.getUuid());

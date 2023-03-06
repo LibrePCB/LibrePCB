@@ -320,7 +320,7 @@ schematicEditorWidget = {schematicEditor}::centralWidget
 
 # Toolbars
 schematicEditorToolbarFile = {schematicEditor}::toolBarFile
-schematicEditorDockErcMsg = {schematicEditor}::librepcb__editor__ErcMsgDock
+schematicEditorDockErcMsg = {schematicEditor}::dockErc
 
 # Actions
 schematicEditorActionCloseProject = {schematicEditor}::actionProjectClose
@@ -376,7 +376,7 @@ boardEditorWidget = {boardEditor}::centralWidget
 
 # Toolbars
 boardEditorToolbarFile = {boardEditor}::toolBarFile
-boardEditorDockErcMsg = {boardEditor}::librepcb__editor__ErcMsgDock
+boardEditorDockErcMsg = {boardEditor}::dockErc
 
 # Actions
 boardEditorActionCloseProject = {boardEditor}::actionProjectClose

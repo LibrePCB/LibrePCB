@@ -24,10 +24,10 @@
  *  Includes
  ******************************************************************************/
 #include "../fileio/transactionaldirectory.h"
+#include "../rulecheck/rulecheckmessage.h"
 #include "../serialization/serializablekeyvaluemap.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
-#include "./msg/libraryelementcheckmessage.h"
 
 #include <QObject>
 
@@ -102,7 +102,7 @@ public:
   }
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const;
+  virtual RuleCheckMessageList runChecks() const;
   virtual void save();
   virtual void saveTo(TransactionalDirectory& dest);
   virtual void moveTo(TransactionalDirectory& dest);
@@ -134,6 +134,8 @@ protected:  // Methods
   virtual void serialize(SExpression& root) const;
 
   void serializeMessageApprovals(SExpression& root) const;
+
+  void removeObsoleteMessageApprovals();
 
   static Version readFileFormat(const TransactionalDirectory& directory,
                                 const QString& fileName);

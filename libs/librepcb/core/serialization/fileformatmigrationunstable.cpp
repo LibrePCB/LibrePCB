@@ -89,6 +89,11 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
  *  Private Methods
  ******************************************************************************/
 
+void FileFormatMigrationUnstable::upgradeErc(SExpression& root,
+                                             ProjectContext& context) {
+  FileFormatMigrationV01::upgradeErc(root, context);
+}
+
 void FileFormatMigrationUnstable::upgradeSchematic(SExpression& root,
                                                    ProjectContext& context) {
   Q_UNUSED(root);
@@ -99,7 +104,6 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  upgradeBoardDrcSettings(root);
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

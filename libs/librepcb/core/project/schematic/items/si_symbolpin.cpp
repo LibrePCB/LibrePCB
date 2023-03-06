@@ -29,7 +29,6 @@
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
-#include "../../erc/ercmsg.h"
 #include "si_symbol.h"
 
 #include <QtCore>
@@ -64,15 +63,6 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid)
 
   mGraphicsItem.reset(new SGI_SymbolPin(*this));
   updatePosition(true);
-
-  // create ERC messages
-  mErcMsgUnconnectedRequiredPin.reset(new ErcMsg(
-      mSchematic.getProject(), *this,
-      QString("%1/%2")
-          .arg(mSymbol.getUuid().toStr())
-          .arg(mSymbolPin->getUuid().toStr()),
-      "UnconnectedRequiredPin", ErcMsg::ErcMsgType_t::SchematicError));
-  updateErcMessages();
 }
 
 SI_SymbolPin::~SI_SymbolPin() {
@@ -166,7 +156,6 @@ void SI_SymbolPin::addToSchematic() {
                 [this]() { mGraphicsItem->updateSelection(); });
   }
   SI_Base::addToSchematic(mGraphicsItem.data());
-  updateErcMessages();
   mGraphicsItem->updateData();
   mGraphicsItem->updateSelection();
 }
@@ -184,7 +173,6 @@ void SI_SymbolPin::removeFromSchematic() {
     disconnect(mHighlightChangedConnection);
   }
   SI_Base::removeFromSchematic(mGraphicsItem.data());
-  updateErcMessages();
 }
 
 void SI_SymbolPin::registerNetLine(SI_NetLine& netline) {
@@ -216,7 +204,6 @@ void SI_SymbolPin::registerNetLine(SI_NetLine& netline) {
   }
   mRegisteredNetLines.insert(&netline);
   netline.updateLine();
-  updateErcMessages();
   mGraphicsItem->updateData();
 }
 
@@ -226,7 +213,6 @@ void SI_SymbolPin::unregisterNetLine(SI_NetLine& netline) {
   }
   mRegisteredNetLines.remove(&netline);
   netline.updateLine();
-  updateErcMessages();
   mGraphicsItem->updateData();
 }
 
@@ -252,20 +238,6 @@ QPainterPath SI_SymbolPin::getGrabAreaScenePx() const noexcept {
 void SI_SymbolPin::setSelected(bool selected) noexcept {
   SI_Base::setSelected(selected);
   mGraphicsItem->updateSelection();
-}
-
-/*******************************************************************************
- *  Private Slots
- ******************************************************************************/
-
-void SI_SymbolPin::updateErcMessages() noexcept {
-  mErcMsgUnconnectedRequiredPin->setMsg(
-      tr("Unconnected pin: \"%1\" of symbol \"%2\"")
-          .arg(getDisplayText(true, true))
-          .arg(mSymbol.getName()));
-
-  mErcMsgUnconnectedRequiredPin->setVisible(isAddedToSchematic() &&
-                                            isRequired() && (!isUsed()));
 }
 
 /*******************************************************************************

@@ -34,10 +34,10 @@
 #include "../../utils/standardeditorcommandhandler.h"
 #include "../../utils/toolbarproxy.h"
 #include "../../utils/undostackactiongroup.h"
+#include "../../widgets/rulecheckdock.h"
 #include "../../widgets/searchtoolbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
-#include "../erc/ercmsgdock.h"
 #include "../projecteditor.h"
 #include "../projectpropertieseditordialog.h"
 #include "fsm/schematiceditorfsm.h"
@@ -717,7 +717,16 @@ void SchematicEditor::createDockWidgets() noexcept {
   addDockWidget(Qt::LeftDockWidgetArea, mDockPages.data(), Qt::Vertical);
 
   // ERC Messages.
-  mDockErc.reset(new ErcMsgDock(mProject));
+  mDockErc.reset(
+      new RuleCheckDock(RuleCheckDock::Mode::ElectricalRuleCheck, this));
+  mDockErc->setObjectName("dockErc");
+  mDockErc->setApprovals(mProject.getErcMessageApprovals());
+  connect(&mProject, &Project::ercMessageApprovalsChanged, mDockErc.data(),
+          &RuleCheckDock::setApprovals);
+  connect(mDockErc.data(), &RuleCheckDock::messageApprovalRequested,
+          &mProjectEditor, &ProjectEditor::setErcMessageApproved);
+  connect(&mProjectEditor, &ProjectEditor::ercFinished, mDockErc.data(),
+          &RuleCheckDock::setMessages);
   addDockWidget(Qt::RightDockWidgetArea, mDockErc.data(), Qt::Vertical);
 
   // Set reasonable default dock size.

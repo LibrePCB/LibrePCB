@@ -47,10 +47,10 @@ namespace editor {
 class BoardDesignRuleCheckMessagesDock;
 class BoardEditorFsm;
 class BoardLayersDock;
-class ErcMsgDock;
 class ExclusiveActionGroup;
 class GraphicsView;
 class ProjectEditor;
+class RuleCheckDock;
 class SearchToolBar;
 class StandardEditorCommandHandler;
 class ToolBarProxy;
@@ -245,7 +245,7 @@ private:
   // Docks
   QScopedPointer<UnplacedComponentsDock> mDockUnplacedComponents;
   QScopedPointer<BoardLayersDock> mDockLayers;
-  QScopedPointer<ErcMsgDock> mDockErc;
+  QScopedPointer<RuleCheckDock> mDockErc;
   QScopedPointer<BoardDesignRuleCheckMessagesDock> mDockDrc;
 
   // Menus

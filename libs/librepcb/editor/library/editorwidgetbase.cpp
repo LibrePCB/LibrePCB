@@ -188,8 +188,7 @@ void EditorWidgetBase::setupErrorNotificationWidget(QWidget& widget) noexcept {
 }
 
 void EditorWidgetBase::setMessageApproved(
-    LibraryBaseElement& element,
-    std::shared_ptr<const LibraryElementCheckMessage> msg,
+    LibraryBaseElement& element, std::shared_ptr<const RuleCheckMessage> msg,
     bool approve) noexcept {
   if (msg) {
     QSet<SExpression> approvals = element.getMessageApprovals();
@@ -288,16 +287,16 @@ void EditorWidgetBase::scheduleLibraryElementChecks() noexcept {
 
 void EditorWidgetBase::updateCheckMessages() noexcept {
   try {
-    LibraryElementCheckMessageList msgs;
+    RuleCheckMessageList msgs;
     if (runChecks(msgs)) {  // can throw
-      QSet<SExpression> approvals;
-      foreach (const auto& msg, msgs) { approvals.insert(msg->getApproval()); }
+      const QSet<SExpression> approvals =
+          RuleCheckMessage::getAllApprovals(msgs);
       mSupportedApprovals |= approvals;
       mDisappearedApprovals = mSupportedApprovals - approvals;
 
       int errors = 0;
       foreach (const auto& msg, msgs) {
-        if (msg->getSeverity() == LibraryElementCheckMessage::Severity::Error) {
+        if (msg->getSeverity() == RuleCheckMessage::Severity::Error) {
           ++errors;
         }
       }
@@ -312,29 +311,40 @@ void EditorWidgetBase::updateCheckMessages() noexcept {
   }
 }
 
-bool EditorWidgetBase::libraryElementCheckFixAvailable(
-    std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
+bool EditorWidgetBase::ruleCheckFixAvailable(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
   try {
-    return processCheckMessage(msg, false);  // can throw, but should really not
+    return processRuleCheckMessage(msg,
+                                   false);  // can throw, but should really not
   } catch (const Exception&) {
     return false;
   }
 }
 
-void EditorWidgetBase::libraryElementCheckFixRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
+void EditorWidgetBase::ruleCheckFixRequested(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
   try {
-    processCheckMessage(msg, true);  // can throw
+    processRuleCheckMessage(msg, true);  // can throw
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
 }
 
-void EditorWidgetBase::libraryElementCheckDescriptionRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg) noexcept {
+void EditorWidgetBase::ruleCheckDescriptionRequested(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
   if (msg) {
     QMessageBox::information(this, msg->getMessage(), msg->getDescription());
   }
+}
+
+void EditorWidgetBase::ruleCheckMessageSelected(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
+  Q_UNUSED(msg);
+}
+
+void EditorWidgetBase::ruleCheckMessageDoubleClicked(
+    std::shared_ptr<const RuleCheckMessage> msg) noexcept {
+  ruleCheckDescriptionRequested(msg);
 }
 
 /*******************************************************************************

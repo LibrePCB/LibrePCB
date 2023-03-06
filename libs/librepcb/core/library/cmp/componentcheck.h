@@ -50,7 +50,7 @@ public:
   virtual ~ComponentCheck() noexcept;
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   ComponentCheck& operator=(const ComponentCheck& rhs) = delete;

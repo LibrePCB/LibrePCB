@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/sgi_symbolpin.h"
 #include "./si_netline.h"
 #include "si_base.h"
@@ -39,7 +38,6 @@ class Circuit;
 class ComponentPinSignalMapItem;
 class ComponentSignal;
 class ComponentSignalInstance;
-class ErcMsg;
 class SI_Symbol;
 class SymbolPin;
 
@@ -50,11 +48,8 @@ class SymbolPin;
 /**
  * @brief The SI_SymbolPin class
  */
-class SI_SymbolPin final : public SI_Base,
-                           public SI_NetLineAnchor,
-                           public IF_ErcMsgProvider {
+class SI_SymbolPin final : public SI_Base, public SI_NetLineAnchor {
   Q_OBJECT
-  DECLARE_ERC_MSG_CLASS_NAME(SI_SymbolPin)
 
 public:
   // Constructors / Destructor
@@ -116,10 +111,6 @@ public:
   // Operator Overloadings
   SI_SymbolPin& operator=(const SI_SymbolPin& rhs) = delete;
 
-private slots:
-
-  void updateErcMessages() noexcept;
-
 private:
   void netSignalChanged(NetSignal* from, NetSignal* to) noexcept;
   QString getLibraryComponentName() const noexcept;
@@ -142,9 +133,6 @@ private:
 
   // Registered Elements
   QSet<SI_NetLine*> mRegisteredNetLines;  ///< all registered netlines
-
-  /// @brief The ERC message for unconnected required pins
-  QScopedPointer<ErcMsg> mErcMsgUnconnectedRequiredPin;
 };
 
 /*******************************************************************************

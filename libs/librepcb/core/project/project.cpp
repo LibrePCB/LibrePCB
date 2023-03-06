@@ -33,7 +33,6 @@
 #include "board/items/bi_polygon.h"
 #include "circuit/circuit.h"
 #include "circuit/netclass.h"
-#include "erc/ercmsglist.h"
 #include "projectlibrary.h"
 #include "projectsettings.h"
 #include "schematic/schematic.h"
@@ -79,9 +78,6 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
   mProjectLibrary.reset(
       new ProjectLibrary(std::unique_ptr<TransactionalDirectory>(
           new TransactionalDirectory(*mDirectory, "library"))));
-
-  // Initialize ERC.
-  mErcMsgList.reset(new ErcMsgList(*this));
 
   // Initialize circuit.
   mCircuit.reset(new Circuit(*this));
@@ -162,6 +158,17 @@ void Project::setAttributes(const AttributeList& newAttributes) noexcept {
   if (newAttributes != mAttributes) {
     mAttributes = newAttributes;
     emit attributesChanged();
+  }
+}
+
+bool Project::setErcMessageApprovals(
+    const QSet<SExpression>& approvals) noexcept {
+  if (approvals != mErcMessageApprovals) {
+    mErcMessageApprovals = approvals;
+    emit ercMessageApprovalsChanged(mErcMessageApprovals);
+    return true;
+  } else {
+    return false;
   }
 }
 
@@ -383,7 +390,12 @@ void Project::save() {
   // ERC.
   {
     SExpression root = SExpression::createList("librepcb_erc");
-    mErcMsgList->serialize(root);
+    foreach (const SExpression& node,
+             Toolbox::sortedQSet(mErcMessageApprovals)) {
+      root.ensureLineBreak();
+      root.appendChild(node);
+    }
+    root.ensureLineBreak();
     mDirectory->write("circuit/erc.lp", root.toByteArray());
   }
 

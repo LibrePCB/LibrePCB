@@ -29,8 +29,7 @@
 #include "ui_componentcategoryeditorwidget.h"
 
 #include <librepcb/core/library/cat/componentcategory.h>
-#include <librepcb/core/library/msg/msgmissingauthor.h>
-#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
@@ -52,7 +51,7 @@ ComponentCategoryEditorWidget::ComponentCategoryEditorWidget(
     mUi(new Ui::ComponentCategoryEditorWidget) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
-  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->lstMessages->setReadOnly(mContext.readOnly);
   mUi->edtName->setReadOnly(mContext.readOnly);
   mUi->edtDescription->setReadOnly(mContext.readOnly);
   mUi->edtKeywords->setReadOnly(mContext.readOnly);
@@ -182,7 +181,7 @@ QString ComponentCategoryEditorWidget::commitMetadata() noexcept {
 }
 
 bool ComponentCategoryEditorWidget::runChecks(
-    LibraryElementCheckMessageList& msgs) const {
+    RuleCheckMessageList& msgs) const {
   msgs = mCategory->runChecks();  // can throw
   mUi->lstMessages->setMessages(msgs);
   return true;
@@ -203,7 +202,7 @@ void ComponentCategoryEditorWidget::fixMsg(const MsgMissingAuthor& msg) {
 
 template <typename MessageType>
 bool ComponentCategoryEditorWidget::fixMsgHelper(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (msg) {
     if (auto m = msg->as<MessageType>()) {
       if (applyFix) fixMsg(*m);  // can throw
@@ -213,16 +212,15 @@ bool ComponentCategoryEditorWidget::fixMsgHelper(
   return false;
 }
 
-bool ComponentCategoryEditorWidget::processCheckMessage(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+bool ComponentCategoryEditorWidget::processRuleCheckMessage(
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   return false;
 }
 
-void ComponentCategoryEditorWidget::libraryElementCheckApproveRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg,
-    bool approve) noexcept {
+void ComponentCategoryEditorWidget::ruleCheckApproveRequested(
+    std::shared_ptr<const RuleCheckMessage> msg, bool approve) noexcept {
   setMessageApproved(*mCategory, msg, approve);
   updateMetadata();
 }

@@ -90,6 +90,7 @@ protected:
     QMap<Uuid, ComponentInstance> componentInstances;
 
     // Counters for emitting messages.
+    int removedErcApprovals = 0;
     int holesCount = 0;
     int nonRoundViaCount = 0;
     int planeCount = 0;
@@ -118,7 +119,7 @@ public:
   FileFormatMigrationV01& operator=(const FileFormatMigrationV01& rhs) = delete;
 
 protected:  // Methods
-  virtual void upgradeErc(SExpression& root);
+  virtual void upgradeErc(SExpression& root, ProjectContext& context);
   virtual void upgradeSchematic(SExpression& root, ProjectContext& context);
   virtual void upgradeBoard(SExpression& root, ProjectContext& context);
   virtual void upgradeBoardUserSettings(SExpression& root);

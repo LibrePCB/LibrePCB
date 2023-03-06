@@ -44,8 +44,7 @@
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/board/boardpickplacegenerator.h>
 #include <librepcb/core/project/bomgenerator.h>
-#include <librepcb/core/project/erc/ercmsg.h>
-#include <librepcb/core/project/erc/ercmsglist.h>
+#include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
@@ -482,33 +481,15 @@ bool CommandLineInterface::openProject(
     // ERC
     if (runErc) {
       print(tr("Run ERC..."));
-      QStringList messages;
+      ElectricalRuleCheck erc(*project);
       int approvedMsgCount = 0;
-      foreach (const ErcMsg* msg, project->getErcMsgList().getItems()) {
-        if (!msg->isVisible()) continue;
-        if (msg->isIgnored()) {
-          ++approvedMsgCount;
-        } else {
-          QString severity;
-          switch (msg->getMsgType()) {
-            case ErcMsg::ErcMsgType_t::CircuitWarning:
-            case ErcMsg::ErcMsgType_t::SchematicWarning:
-              severity = tr("WARNING");
-              break;
-            default:
-              severity = tr("ERROR");
-              break;
-          }
-          messages.append(
-              QString("    - [%1] %2").arg(severity, msg->getMsg()));
-        }
-      }
+      const RuleCheckMessageList messages = erc.runChecks();
+      const QStringList nonApproved = prepareRuleCheckMessages(
+          messages, project->getErcMessageApprovals(), approvedMsgCount);
       print("  " % tr("Approved messages: %1").arg(approvedMsgCount));
-      print("  " % tr("Non-approved messages: %1").arg(messages.count()));
-      // Sort messages to increases readability of console output.
-      Toolbox::sortNumeric(messages, Qt::CaseInsensitive, false);
-      foreach (const QString& msg, messages) { printErr(msg); }
-      if (messages.count() > 0) {
+      print("  " % tr("Non-approved messages: %1").arg(nonApproved.count()));
+      foreach (const QString& msg, nonApproved) {
+        printErr(msg);
         success = false;
       }
     }
@@ -912,54 +893,17 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
   if (runCheck) {
     qInfo().noquote() << tr("Check '%1' for non-approved messages...")
                              .arg(prettyPath(fs.getPath(), libDir));
-
-    const QSet<SExpression>& approvals = element.getMessageApprovals();
-    LibraryElementCheckMessageList messageList = element.runChecks();
-    // Sort messages to increases readability of console output.
-    Toolbox::sortNumeric(
-        messageList,
-        [](const QCollator& cmp,
-           const std::shared_ptr<const LibraryElementCheckMessage>& lhs,
-           const std::shared_ptr<const LibraryElementCheckMessage>& rhs) {
-          if (lhs->getSeverity() != rhs->getSeverity()) {
-            return lhs->getSeverity() > rhs->getSeverity();
-          } else {
-            return cmp(lhs->getMessage(), rhs->getMessage());
-          }
-        },
-        Qt::CaseInsensitive, false);
     int approvedMsgCount = 0;
-    QStringList messages;
-    foreach (const auto& msg, messageList) {
-      if (approvals.contains(msg->getApproval())) {
-        ++approvedMsgCount;
-      } else {
-        QString severity = tr("ERROR");
-        switch (msg->getSeverity()) {
-          case LibraryElementCheckMessage::Severity::Hint:
-            severity = tr("HINT");
-            break;
-          case LibraryElementCheckMessage::Severity::Warning:
-            severity = tr("WARNING");
-            break;
-          case LibraryElementCheckMessage::Severity::Error:
-            break;
-          default:
-            qCritical() << "Unknown message severity:"
-                        << static_cast<int>(msg->getSeverity());
-            break;
-        }
-        messages.append(
-            QString("    - [%1] %2").arg(severity, msg->getMessage()));
-      }
-    }
+    const RuleCheckMessageList messages = element.runChecks();
+    const QStringList nonApproved = prepareRuleCheckMessages(
+        messages, element.getMessageApprovals(), approvedMsgCount);
     qInfo().noquote() << "  " %
             tr("Approved messages: %1").arg(approvedMsgCount);
     qInfo().noquote() << "  " %
-            tr("Non-approved messages: %1").arg(messages.count());
-    if (!messages.isEmpty()) {
+            tr("Non-approved messages: %1").arg(nonApproved.count());
+    foreach (const QString& msg, nonApproved) {
       printErrorHeaderOnce();
-      foreach (const QString& msg, messages) { printErr(msg); }
+      printErr(msg);
       success = false;
     }
   }
@@ -978,6 +922,35 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
   // Do not propagate changes in the transactional file system to the
   // following checks
   fs.discardChanges();
+}
+
+QStringList CommandLineInterface::prepareRuleCheckMessages(
+    RuleCheckMessageList messages, const QSet<SExpression>& approvals,
+    int& approvedMsgCount) noexcept {
+  // Sort messages to increases readability of console output.
+  Toolbox::sortNumeric(messages,
+                       [](const QCollator& cmp,
+                          const std::shared_ptr<const RuleCheckMessage>& lhs,
+                          const std::shared_ptr<const RuleCheckMessage>& rhs) {
+                         if (lhs->getSeverity() != rhs->getSeverity()) {
+                           return lhs->getSeverity() > rhs->getSeverity();
+                         } else {
+                           return cmp(lhs->getMessage(), rhs->getMessage());
+                         }
+                       },
+                       Qt::CaseInsensitive, false);
+  approvedMsgCount = 0;
+  QStringList printedMessages;
+  foreach (const auto& msg, messages) {
+    if (approvals.contains(msg->getApproval())) {
+      ++approvedMsgCount;
+    } else {
+      printedMessages.append(
+          QString("    - [%1] %2")
+              .arg(msg->getSeverityTr().toUpper(), msg->getMessage()));
+    }
+  }
+  return printedMessages;
 }
 
 QString CommandLineInterface::prettyPath(const FilePath& path,

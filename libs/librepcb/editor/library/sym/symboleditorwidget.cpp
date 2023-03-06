@@ -39,14 +39,10 @@
 #include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/cmpsigpindisplaytype.h>
-#include <librepcb/core/library/msg/msgmissingauthor.h>
-#include <librepcb/core/library/msg/msgmissingcategories.h>
-#include <librepcb/core/library/msg/msgnamenottitlecase.h>
-#include <librepcb/core/library/sym/msg/msgmissingsymbolname.h>
-#include <librepcb/core/library/sym/msg/msgmissingsymbolvalue.h>
-#include <librepcb/core/library/sym/msg/msgsymbolpinnotongrid.h>
-#include <librepcb/core/library/sym/msg/msgwrongsymboltextlayer.h>
+#include <librepcb/core/library/librarybaseelementcheckmessages.h>
+#include <librepcb/core/library/libraryelementcheckmessages.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/library/sym/symbolcheckmessages.h>
 #include <librepcb/core/library/sym/symbolpainter.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -71,7 +67,7 @@ SymbolEditorWidget::SymbolEditorWidget(const Context& context,
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
-  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->lstMessages->setReadOnly(mContext.readOnly);
   mUi->edtName->setReadOnly(mContext.readOnly);
   mUi->edtDescription->setReadOnly(mContext.readOnly);
   mUi->edtKeywords->setReadOnly(mContext.readOnly);
@@ -498,7 +494,7 @@ bool SymbolEditorWidget::isInterfaceBroken() const noexcept {
   return mSymbol->getPins().getUuidSet() != mOriginalSymbolPinUuids;
 }
 
-bool SymbolEditorWidget::runChecks(LibraryElementCheckMessageList& msgs) const {
+bool SymbolEditorWidget::runChecks(RuleCheckMessageList& msgs) const {
   if ((mFsm->getCurrentTool() != NONE) && (mFsm->getCurrentTool() != SELECT)) {
     // Do not run checks if a tool is active because it could lead to annoying,
     // flickering messages. For example when placing pins, they always overlap
@@ -561,7 +557,7 @@ void SymbolEditorWidget::fixMsg(const MsgSymbolPinNotOnGrid& msg) {
 
 template <typename MessageType>
 bool SymbolEditorWidget::fixMsgHelper(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (msg) {
     if (auto m = msg->as<MessageType>()) {
       if (applyFix) fixMsg(*m);  // can throw
@@ -571,8 +567,8 @@ bool SymbolEditorWidget::fixMsgHelper(
   return false;
 }
 
-bool SymbolEditorWidget::processCheckMessage(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+bool SymbolEditorWidget::processRuleCheckMessage(
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
@@ -583,9 +579,8 @@ bool SymbolEditorWidget::processCheckMessage(
   return false;
 }
 
-void SymbolEditorWidget::libraryElementCheckApproveRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg,
-    bool approve) noexcept {
+void SymbolEditorWidget::ruleCheckApproveRequested(
+    std::shared_ptr<const RuleCheckMessage> msg, bool approve) noexcept {
   setMessageApproved(*mSymbol, msg, approve);
   updateMetadata();
 }

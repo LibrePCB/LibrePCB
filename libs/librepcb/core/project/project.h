@@ -40,7 +40,6 @@ namespace librepcb {
 
 class Board;
 class Circuit;
-class ErcMsgList;
 class ProjectLibrary;
 class ProjectSettings;
 class Schematic;
@@ -94,7 +93,7 @@ public:
    */
   ~Project() noexcept;
 
-  // Getters: General
+  // Getters
 
   /**
    * @brief Get the filepath of the project file (*.lpp)
@@ -194,18 +193,20 @@ public:
   ProjectLibrary& getLibrary() const noexcept { return *mProjectLibrary; }
 
   /**
-   * @brief Get the ERC messages list
-   *
-   * @return A reference to the ErcMsgList object
-   */
-  ErcMsgList& getErcMsgList() const noexcept { return *mErcMsgList; }
-
-  /**
    * @brief Get the Circuit object
    *
    * @return A reference to the Circuit object
    */
   Circuit& getCircuit() const noexcept { return *mCircuit; }
+
+  /**
+   * @brief Get all ERC message approvals
+   *
+   * @return Approval nodes
+   */
+  const QSet<SExpression>& getErcMessageApprovals() const noexcept {
+    return mErcMessageApprovals;
+  }
 
   // Setters
 
@@ -258,6 +259,16 @@ public:
    * @param newAttributes     The new list of attributes
    */
   void setAttributes(const AttributeList& newAttributes) noexcept;
+
+  /**
+   * @brief Set all ERC message approvals
+   *
+   * @param approvals   Approval nodes
+   *
+   * @retval false      If approvals have not been modified (no change)
+   * @retval true       If approvals have been moified
+   */
+  bool setErcMessageApprovals(const QSet<SExpression>& approvals) noexcept;
 
   // Schematic Methods
 
@@ -439,6 +450,13 @@ signals:
   void attributesChanged() override;
 
   /**
+   * @brief Called by #setErcMessageApprovals()
+   *
+   * @param approvals   The new approvals
+   */
+  void ercMessageApprovalsChanged(const QSet<SExpression>& approvals);
+
+  /**
    * @brief This signal is emitted after a schematic was added to the project
    *
    * @param newIndex  The index of the added schematic
@@ -504,19 +522,27 @@ private:
   /// Ehe library which contains all elements needed in this project.
   QScopedPointer<ProjectLibrary> mProjectLibrary;
 
-  QScopedPointer<ErcMsgList>
-      mErcMsgList;  ///< A list which contains all electrical rule check (ERC)
-                    ///< messages
-  QScopedPointer<Circuit>
-      mCircuit;  ///< The whole circuit of this project (contains all
-                 ///< netclasses, netsignals, component instances, ...)
-  QList<Schematic*> mSchematics;  ///< All schematics of this project
-  QList<Schematic*>
-      mRemovedSchematics;  ///< All removed schematics of this project
-  QScopedPointer<SchematicLayerProvider>
-      mSchematicLayerProvider;  ///< All schematic layers of this project
-  QList<Board*> mBoards;  ///< All boards of this project
-  QList<Board*> mRemovedBoards;  ///< All removed boards of this project
+  /// The whole circuit of this project (contains all netclasses, netsignals,
+  /// component instances, ...)
+  QScopedPointer<Circuit> mCircuit;
+
+  /// All schematics of this project
+  QList<Schematic*> mSchematics;
+
+  /// All removed schematics of this project
+  QList<Schematic*> mRemovedSchematics;
+
+  /// All schematic layers of this project
+  QScopedPointer<SchematicLayerProvider> mSchematicLayerProvider;
+
+  /// All boards of this project
+  QList<Board*> mBoards;
+
+  /// All removed boards of this project
+  QList<Board*> mRemovedBoards;
+
+  /// All approved ERC messages
+  QSet<SExpression> mErcMessageApprovals;
 };
 
 /*******************************************************************************

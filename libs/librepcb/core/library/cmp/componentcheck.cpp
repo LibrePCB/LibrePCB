@@ -23,11 +23,7 @@
 #include "componentcheck.h"
 
 #include "component.h"
-#include "msg/msgduplicatesignalname.h"
-#include "msg/msgmissingcomponentdefaultvalue.h"
-#include "msg/msgmissingcomponentprefix.h"
-#include "msg/msgmissingsymbolvariant.h"
-#include "msg/msgmissingsymbolvariantitem.h"
+#include "componentcheckmessages.h"
 
 #include <QtCore>
 
@@ -51,8 +47,8 @@ ComponentCheck::~ComponentCheck() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList ComponentCheck::runChecks() const {
-  LibraryElementCheckMessageList msgs = LibraryElementCheck::runChecks();
+RuleCheckMessageList ComponentCheck::runChecks() const {
+  RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
   checkMissingPrefix(msgs);
   checkMissingDefaultValue(msgs);
   checkDuplicateSignalNames(msgs);

@@ -23,7 +23,7 @@
 #include "devicecheck.h"
 
 #include "device.h"
-#include "msg/msgnopadsindeviceconnected.h"
+#include "devicecheckmessages.h"
 
 #include <QtCore>
 
@@ -47,8 +47,8 @@ DeviceCheck::~DeviceCheck() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList DeviceCheck::runChecks() const {
-  LibraryElementCheckMessageList msgs = LibraryElementCheck::runChecks();
+RuleCheckMessageList DeviceCheck::runChecks() const {
+  RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
   checkNoPadsConnected(msgs);
   return msgs;
 }

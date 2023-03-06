@@ -85,7 +85,7 @@ public:
   const TextList& getTexts() const noexcept { return mTexts; }
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   Symbol& operator=(const Symbol& rhs) = delete;

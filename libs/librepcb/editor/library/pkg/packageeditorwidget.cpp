@@ -37,18 +37,11 @@
 #include "ui_packageeditorwidget.h"
 
 #include <librepcb/core/graphics/graphicsscene.h>
-#include <librepcb/core/library/msg/msgmissingauthor.h>
-#include <librepcb/core/library/msg/msgmissingcategories.h>
-#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/librarybaseelementcheckmessages.h>
+#include <librepcb/core/library/libraryelementcheckmessages.h>
 #include <librepcb/core/library/pkg/footprintpainter.h>
-#include <librepcb/core/library/pkg/msg/msgholewithoutstopmask.h>
-#include <librepcb/core/library/pkg/msg/msginvalidcustompadoutline.h>
-#include <librepcb/core/library/pkg/msg/msgmissingfootprint.h>
-#include <librepcb/core/library/pkg/msg/msgmissingfootprintname.h>
-#include <librepcb/core/library/pkg/msg/msgmissingfootprintvalue.h>
-#include <librepcb/core/library/pkg/msg/msgunusedcustompadoutline.h>
-#include <librepcb/core/library/pkg/msg/msgwrongfootprinttextlayer.h>
 #include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/library/pkg/packagecheckmessages.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -72,7 +65,7 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
     mGraphicsScene(new GraphicsScene()) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
-  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->lstMessages->setReadOnly(mContext.readOnly);
   mUi->edtName->setReadOnly(mContext.readOnly);
   mUi->edtDescription->setReadOnly(mContext.readOnly);
   mUi->edtKeywords->setReadOnly(mContext.readOnly);
@@ -540,8 +533,7 @@ bool PackageEditorWidget::isInterfaceBroken() const noexcept {
   return false;
 }
 
-bool PackageEditorWidget::runChecks(
-    LibraryElementCheckMessageList& msgs) const {
+bool PackageEditorWidget::runChecks(RuleCheckMessageList& msgs) const {
   if ((mFsm->getCurrentTool() != NONE) && (mFsm->getCurrentTool() != SELECT)) {
     // Do not run checks if a tool is active because it could lead to annoying,
     // flickering messages. For example when placing pads, they always overlap
@@ -638,7 +630,7 @@ void PackageEditorWidget::fixMsg(const MsgHoleWithoutStopMask& msg) {
 
 template <typename MessageType>
 bool PackageEditorWidget::fixMsgHelper(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (msg) {
     if (auto m = msg->as<MessageType>()) {
       if (applyFix) fixMsg(*m);  // can throw
@@ -648,8 +640,8 @@ bool PackageEditorWidget::fixMsgHelper(
   return false;
 }
 
-bool PackageEditorWidget::processCheckMessage(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+bool PackageEditorWidget::processRuleCheckMessage(
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
@@ -663,9 +655,8 @@ bool PackageEditorWidget::processCheckMessage(
   return false;
 }
 
-void PackageEditorWidget::libraryElementCheckApproveRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg,
-    bool approve) noexcept {
+void PackageEditorWidget::ruleCheckApproveRequested(
+    std::shared_ptr<const RuleCheckMessage> msg, bool approve) noexcept {
   setMessageApproved(*mPackage, msg, approve);
   updateMetadata();
 }

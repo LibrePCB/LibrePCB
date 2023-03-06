@@ -26,7 +26,6 @@
 #include "../../../attribute/attribute.h"
 #include "../../../attribute/attributeprovider.h"
 #include "../../../types/uuid.h"
-#include "../../erc/if_ercmsgprovider.h"
 #include "../graphicsitems/bgi_device.h"
 #include "bi_base.h"
 #include "bi_stroketext.h"
@@ -52,11 +51,8 @@ class Project;
 /**
  * @brief The BI_Device class
  */
-class BI_Device final : public BI_Base,
-                        public AttributeProvider,
-                        public IF_ErcMsgProvider {
+class BI_Device final : public BI_Base, public AttributeProvider {
   Q_OBJECT
-  DECLARE_ERC_MSG_CLASS_NAME(BI_Device)
 
 public:
   // Types

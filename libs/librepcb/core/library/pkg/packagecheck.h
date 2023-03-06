@@ -50,7 +50,7 @@ public:
   virtual ~PackageCheck() noexcept;
 
   // General Methods
-  virtual LibraryElementCheckMessageList runChecks() const override;
+  virtual RuleCheckMessageList runChecks() const override;
 
   // Operator Overloadings
   PackageCheck& operator=(const PackageCheck& rhs) = delete;

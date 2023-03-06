@@ -114,7 +114,7 @@ QStringList LibraryBaseElement::getAllAvailableLocales() const noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList LibraryBaseElement::runChecks() const {
+RuleCheckMessageList LibraryBaseElement::runChecks() const {
   LibraryBaseElementCheck check(*this);
   return check.runChecks();  // can throw
 }
@@ -175,6 +175,11 @@ void LibraryBaseElement::serializeMessageApprovals(SExpression& root) const {
     root.appendChild(node);
   }
   root.ensureLineBreak();
+}
+
+void LibraryBaseElement::removeObsoleteMessageApprovals() {
+  const RuleCheckMessageList messages = runChecks();
+  mMessageApprovals &= RuleCheckMessage::getAllApprovals(messages);
 }
 
 Version LibraryBaseElement::readFileFormat(

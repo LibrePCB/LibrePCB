@@ -36,8 +36,7 @@
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/library.h>
-#include <librepcb/core/library/msg/msgmissingauthor.h>
-#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -337,8 +336,7 @@ QString LibraryOverviewWidget::commitMetadata() noexcept {
   return QString();
 }
 
-bool LibraryOverviewWidget::runChecks(
-    LibraryElementCheckMessageList& msgs) const {
+bool LibraryOverviewWidget::runChecks(RuleCheckMessageList& msgs) const {
   msgs = mLibrary->runChecks();  // can throw
   mUi->lstMessages->setMessages(msgs);
   return true;
@@ -359,7 +357,7 @@ void LibraryOverviewWidget::fixMsg(const MsgMissingAuthor& msg) {
 
 template <typename MessageType>
 bool LibraryOverviewWidget::fixMsgHelper(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (msg) {
     if (auto m = msg->as<MessageType>()) {
       if (applyFix) fixMsg(*m);  // can throw
@@ -369,16 +367,15 @@ bool LibraryOverviewWidget::fixMsgHelper(
   return false;
 }
 
-bool LibraryOverviewWidget::processCheckMessage(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+bool LibraryOverviewWidget::processRuleCheckMessage(
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   return false;
 }
 
-void LibraryOverviewWidget::libraryElementCheckApproveRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg,
-    bool approve) noexcept {
+void LibraryOverviewWidget::ruleCheckApproveRequested(
+    std::shared_ptr<const RuleCheckMessage> msg, bool approve) noexcept {
   setMessageApproved(*mLibrary, msg, approve);
   updateMetadata();
 }

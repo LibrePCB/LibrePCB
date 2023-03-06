@@ -82,7 +82,7 @@ Symbol::~Symbol() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList Symbol::runChecks() const {
+RuleCheckMessageList Symbol::runChecks() const {
   SymbolCheck check(*this);
   return check.runChecks();  // can throw
 }
@@ -94,7 +94,8 @@ std::unique_ptr<Symbol> Symbol::open(
   // Upgrade file format, if needed.
   const Version fileFormat =
       readFileFormat(*directory, ".librepcb-" % getShortElementName());
-  for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
+  const auto migrations = FileFormatMigration::getMigrations(fileFormat);
+  for (auto migration : migrations) {
     migration->upgradeSymbol(*directory);
   }
 
@@ -102,7 +103,11 @@ std::unique_ptr<Symbol> Symbol::open(
   const QString fileName = getLongElementName() % ".lp";
   const SExpression root = SExpression::parse(directory->read(fileName),
                                               directory->getAbsPath(fileName));
-  return std::unique_ptr<Symbol>(new Symbol(std::move(directory), root));
+  std::unique_ptr<Symbol> obj(new Symbol(std::move(directory), root));
+  if (!migrations.isEmpty()) {
+    obj->removeObsoleteMessageApprovals();
+  }
+  return obj;
 }
 
 /*******************************************************************************

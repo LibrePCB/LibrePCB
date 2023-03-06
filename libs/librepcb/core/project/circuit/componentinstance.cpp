@@ -27,7 +27,6 @@
 #include "../../library/cmp/component.h"
 #include "../../utils/scopeguardlist.h"
 #include "../board/items/bi_device.h"
-#include "../erc/ercmsg.h"
 #include "../project.h"
 #include "../projectlibrary.h"
 #include "../projectsettings.h"
@@ -69,15 +68,6 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const Uuid& uuid,
     mSignals.insert(signalInstance->getCompSignal().getUuid(), signalInstance);
   }
 
-  // create ERC messages
-  mErcMsgUnplacedRequiredSymbols.reset(new ErcMsg(
-      mCircuit.getProject(), *this, mUuid.toStr(), "UnplacedRequiredSymbols",
-      ErcMsg::ErcMsgType_t::SchematicError));
-  mErcMsgUnplacedOptionalSymbols.reset(new ErcMsg(
-      mCircuit.getProject(), *this, mUuid.toStr(), "UnplacedOptionalSymbols",
-      ErcMsg::ErcMsgType_t::SchematicWarning));
-  updateErcMessages();
-
   // emit the "attributesChanged" signal when the project has emitted it
   connect(&mCircuit.getProject(), &Project::attributesChanged, this,
           &ComponentInstance::attributesChanged);
@@ -101,33 +91,6 @@ QString ComponentInstance::getValue(bool replaceAttributes) const noexcept {
   } else {
     return mValue;
   }
-}
-
-int ComponentInstance::getUnplacedSymbolsCount() const noexcept {
-  return (mCompSymbVar->getSymbolItems().count() - mRegisteredSymbols.count());
-}
-
-int ComponentInstance::getUnplacedRequiredSymbolsCount() const noexcept {
-  int count = 0;
-  for (const ComponentSymbolVariantItem& item :
-       mCompSymbVar->getSymbolItems()) {
-    if ((item.isRequired()) && (!mRegisteredSymbols.contains(item.getUuid()))) {
-      count++;
-    }
-  }
-  return count;
-}
-
-int ComponentInstance::getUnplacedOptionalSymbolsCount() const noexcept {
-  int count = 0;
-  for (const ComponentSymbolVariantItem& item :
-       mCompSymbVar->getSymbolItems()) {
-    if ((!item.isRequired()) &&
-        (!mRegisteredSymbols.contains(item.getUuid()))) {
-      count++;
-    }
-  }
-  return count;
 }
 
 int ComponentInstance::getRegisteredElementsCount() const noexcept {
@@ -156,7 +119,6 @@ bool ComponentInstance::isUsed() const noexcept {
 void ComponentInstance::setName(const CircuitIdentifier& name) noexcept {
   if (name != mName) {
     mName = name;
-    updateErcMessages();
     emit attributesChanged();
   }
 }
@@ -198,7 +160,6 @@ void ComponentInstance::addToCircuit() {
     sgl.add([signal]() { signal->removeFromCircuit(); });
   }
   mIsAddedToCircuit = true;
-  updateErcMessages();
   sgl.dismiss();
 }
 
@@ -218,7 +179,6 @@ void ComponentInstance::removeFromCircuit() {
     sgl.add([signal]() { signal->addToCircuit(); });
   }
   mIsAddedToCircuit = false;
-  updateErcMessages();
   sgl.dismiss();
 }
 
@@ -252,7 +212,6 @@ void ComponentInstance::registerSymbol(SI_Symbol& symbol) {
     }
   }
   mRegisteredSymbols.insert(itemUuid, &symbol);
-  updateErcMessages();
 }
 
 void ComponentInstance::unregisterSymbol(SI_Symbol& symbol) {
@@ -262,7 +221,6 @@ void ComponentInstance::unregisterSymbol(SI_Symbol& symbol) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredSymbols.remove(itemUuid);
-  updateErcMessages();
 }
 
 void ComponentInstance::registerDevice(BI_Device& device) {
@@ -272,7 +230,6 @@ void ComponentInstance::registerDevice(BI_Device& device) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredDevices.append(&device);
-  updateErcMessages();
   emit attributesChanged();  // parent attribute provider may have changed!
 }
 
@@ -281,7 +238,6 @@ void ComponentInstance::unregisterDevice(BI_Device& device) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredDevices.removeOne(&device);
-  updateErcMessages();
   emit attributesChanged();  // parent attribute provider may have changed!
 }
 
@@ -349,23 +305,6 @@ QVector<const AttributeProvider*>
 bool ComponentInstance::checkAttributesValidity() const noexcept {
   if (mCompSymbVar == nullptr) return false;
   return true;
-}
-
-void ComponentInstance::updateErcMessages() noexcept {
-  int required = getUnplacedRequiredSymbolsCount();
-  int optional = getUnplacedOptionalSymbolsCount();
-  mErcMsgUnplacedRequiredSymbols->setMsg(
-      tr("Unplaced required symbols of component \"%1\": %2")
-          .arg(*mName)
-          .arg(required));
-  mErcMsgUnplacedOptionalSymbols->setMsg(
-      tr("Unplaced optional symbols of component \"%1\": %2")
-          .arg(*mName)
-          .arg(optional));
-  mErcMsgUnplacedRequiredSymbols->setVisible((mIsAddedToCircuit) &&
-                                             (required > 0));
-  mErcMsgUnplacedOptionalSymbols->setVisible((mIsAddedToCircuit) &&
-                                             (optional > 0));
 }
 
 const QStringList& ComponentInstance::getLocaleOrder() const noexcept {

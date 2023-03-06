@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -33,6 +35,7 @@ namespace librepcb {
 class Application;
 class FilePath;
 class LibraryBaseElement;
+class SExpression;
 class TransactionalFileSystem;
 
 namespace cli {
@@ -73,6 +76,9 @@ private:  // Methods
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
                              LibraryBaseElement& element, bool runCheck,
                              bool save, bool strict, bool& success) const;
+  static QStringList prepareRuleCheckMessages(
+      RuleCheckMessageList messages, const QSet<SExpression>& approvals,
+      int& approvedMsgCount) noexcept;
   static QString prettyPath(const FilePath& path,
                             const QString& style) noexcept;
   static bool failIfFileFormatUnstable() noexcept;

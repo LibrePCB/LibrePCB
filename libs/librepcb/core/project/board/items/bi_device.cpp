@@ -30,7 +30,6 @@
 #include "../../../utils/transform.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
-#include "../../erc/ercmsg.h"
 #include "../../project.h"
 #include "../../projectlibrary.h"
 #include "../../projectsettings.h"

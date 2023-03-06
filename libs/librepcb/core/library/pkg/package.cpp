@@ -59,7 +59,7 @@ Package::~Package() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList Package::runChecks() const {
+RuleCheckMessageList Package::runChecks() const {
   PackageCheck check(*this);
   return check.runChecks();  // can throw
 }
@@ -71,7 +71,8 @@ std::unique_ptr<Package> Package::open(
   // Upgrade file format, if needed.
   const Version fileFormat =
       readFileFormat(*directory, ".librepcb-" % getShortElementName());
-  for (auto migration : FileFormatMigration::getMigrations(fileFormat)) {
+  const auto migrations = FileFormatMigration::getMigrations(fileFormat);
+  for (auto migration : migrations) {
     migration->upgradePackage(*directory);
   }
 
@@ -79,7 +80,11 @@ std::unique_ptr<Package> Package::open(
   const QString fileName = getLongElementName() % ".lp";
   const SExpression root = SExpression::parse(directory->read(fileName),
                                               directory->getAbsPath(fileName));
-  return std::unique_ptr<Package>(new Package(std::move(directory), root));
+  std::unique_ptr<Package> obj(new Package(std::move(directory), root));
+  if (!migrations.isEmpty()) {
+    obj->removeObsoleteMessageApprovals();
+  }
+  return obj;
 }
 
 /*******************************************************************************

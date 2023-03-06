@@ -23,13 +23,8 @@
 #include "symbolcheck.h"
 
 #include "../../graphics/graphicslayer.h"
-#include "msg/msgduplicatepinname.h"
-#include "msg/msgmissingsymbolname.h"
-#include "msg/msgmissingsymbolvalue.h"
-#include "msg/msgoverlappingsymbolpins.h"
-#include "msg/msgsymbolpinnotongrid.h"
-#include "msg/msgwrongsymboltextlayer.h"
 #include "symbol.h"
+#include "symbolcheckmessages.h"
 
 #include <QtCore>
 
@@ -53,8 +48,8 @@ SymbolCheck::~SymbolCheck() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList SymbolCheck::runChecks() const {
-  LibraryElementCheckMessageList msgs = LibraryElementCheck::runChecks();
+RuleCheckMessageList SymbolCheck::runChecks() const {
+  RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
   checkDuplicatePinNames(msgs);
   checkOffTheGridPins(msgs);
   checkOverlappingPins(msgs);

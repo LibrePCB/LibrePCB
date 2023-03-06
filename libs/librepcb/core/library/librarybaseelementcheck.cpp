@@ -23,8 +23,7 @@
 #include "librarybaseelementcheck.h"
 
 #include "librarybaseelement.h"
-#include "msg/msgmissingauthor.h"
-#include "msg/msgnamenottitlecase.h"
+#include "librarybaseelementcheckmessages.h"
 
 #include <QtCore>
 
@@ -49,8 +48,8 @@ LibraryBaseElementCheck::~LibraryBaseElementCheck() noexcept {
  *  General Methods
  ******************************************************************************/
 
-LibraryElementCheckMessageList LibraryBaseElementCheck::runChecks() const {
-  LibraryElementCheckMessageList msgs;
+RuleCheckMessageList LibraryBaseElementCheck::runChecks() const {
+  RuleCheckMessageList msgs;
   checkDefaultNameTitleCase(msgs);
   checkMissingAuthor(msgs);
   return msgs;

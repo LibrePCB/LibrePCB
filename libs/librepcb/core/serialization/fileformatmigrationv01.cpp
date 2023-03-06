@@ -288,7 +288,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
   {
     const QString fp = "circuit/erc.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    upgradeErc(root);
+    upgradeErc(root, context);
     dir.write(fp, root.toByteArray());
   }
 
@@ -323,6 +323,14 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
 
   // Emit messages at the very end to avoid duplicate messages caused my
   // multiple schematics/boards.
+  if (context.removedErcApprovals > 0) {
+    messages.append(buildMessage(
+        Message::Severity::Note,
+        tr("Some particular ERC message approvals cannot be migrated and "
+           "therefore have been removed. Please check the remaining ERC "
+           "messages and approve them if desired."),
+        context.removedErcApprovals));
+  }
   if (context.holesCount > 0) {
     messages.append(
         buildMessage(Message::Severity::Note,
@@ -382,17 +390,53 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
  *  Private Methods
  ******************************************************************************/
 
-void FileFormatMigrationV01::upgradeErc(SExpression& root) {
-  for (SExpression* node : root.getChildren("approved")) {
-    if (node->getChild("class/@0").getValue() == "Board") {
-      root.removeChild(*node);  // Board error migrated to DRC.
-      continue;
-    }
-    if (node->getChild("class/@0").getValue() == "BI_NetPoint") {
-      root.removeChild(*node);  // Board error migrated to DRC.
-      continue;
+void FileFormatMigrationV01::upgradeErc(SExpression& root,
+                                        ProjectContext& context) {
+  SExpression newRoot = SExpression::createList(root.getName());
+  for (const SExpression* node : root.getChildren("approved")) {
+    const QString msgClass = node->getChild("class/@0").getValue();
+    const QString instance = node->getChild("instance/@0").getValue();
+    const QString message = node->getChild("message/@0").getValue();
+    if ((msgClass == "NetClass") && (message == "Unused")) {
+      SExpression& child = newRoot.appendList("approved");
+      child.appendChild(SExpression::createToken("unused_netclass"));
+      child.appendChild("netclass", SExpression::createToken(instance));
+    } else if ((msgClass == "NetSignal") && (message == "Unused")) {
+      SExpression& child = newRoot.appendList("approved");
+      child.appendChild(SExpression::createToken("open_net"));
+      child.appendChild("net", SExpression::createToken(instance));
+    } else if ((msgClass == "NetSignal") &&
+               (message == "ConnectedToLessThanTwoPins")) {
+      SExpression& child = newRoot.appendList("approved");
+      child.appendChild(SExpression::createToken("open_net"));
+      child.appendChild("net", SExpression::createToken(instance));
+    } else if (message == "UnconnectedRequiredSignal") {
+      SExpression& child = newRoot.appendList("approved");
+      child.appendChild(
+          SExpression::createToken("unconnected_required_signal"));
+      child.ensureLineBreak();
+      child.appendChild("component",
+                        SExpression::createToken(instance.split("/").first()));
+      child.ensureLineBreak();
+      child.appendChild("signal",
+                        SExpression::createToken(instance.split("/").last()));
+      child.ensureLineBreak();
+    } else if (message == "ForcedNetSignalNameConflict") {
+      SExpression& child = newRoot.appendList("approved");
+      child.appendChild(
+          SExpression::createToken("unconnected_required_signal"));
+      child.ensureLineBreak();
+      child.appendChild("component",
+                        SExpression::createToken(instance.split("/").first()));
+      child.ensureLineBreak();
+      child.appendChild("signal",
+                        SExpression::createToken(instance.split("/").last()));
+      child.ensureLineBreak();
+    } else {
+      ++context.removedErcApprovals;
     }
   }
+  root = newRoot;
 }
 
 void FileFormatMigrationV01::upgradeSchematic(SExpression& root,

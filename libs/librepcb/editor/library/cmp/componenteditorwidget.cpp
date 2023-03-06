@@ -29,11 +29,9 @@
 #include "ui_componenteditorwidget.h"
 
 #include <librepcb/core/library/cmp/component.h>
-#include <librepcb/core/library/cmp/msg/msgmissingcomponentdefaultvalue.h>
-#include <librepcb/core/library/cmp/msg/msgmissingsymbolvariant.h>
-#include <librepcb/core/library/msg/msgmissingauthor.h>
-#include <librepcb/core/library/msg/msgmissingcategories.h>
-#include <librepcb/core/library/msg/msgnamenottitlecase.h>
+#include <librepcb/core/library/cmp/componentcheckmessages.h>
+#include <librepcb/core/library/librarybaseelementcheckmessages.h>
+#include <librepcb/core/library/libraryelementcheckmessages.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -54,7 +52,7 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
   : EditorWidgetBase(context, fp, parent), mUi(new Ui::ComponentEditorWidget) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
-  mUi->lstMessages->setProvideFixes(!mContext.readOnly);
+  mUi->lstMessages->setReadOnly(mContext.readOnly);
   mUi->edtName->setReadOnly(mContext.readOnly);
   mUi->edtDescription->setReadOnly(mContext.readOnly);
   mUi->edtKeywords->setReadOnly(mContext.readOnly);
@@ -279,8 +277,7 @@ bool ComponentEditorWidget::isInterfaceBroken() const noexcept {
   return false;
 }
 
-bool ComponentEditorWidget::runChecks(
-    LibraryElementCheckMessageList& msgs) const {
+bool ComponentEditorWidget::runChecks(RuleCheckMessageList& msgs) const {
   msgs = mComponent->runChecks();  // can throw
   mUi->lstMessages->setMessages(msgs);
   return true;
@@ -336,7 +333,7 @@ void ComponentEditorWidget::fixMsg(const MsgMissingSymbolVariant& msg) {
 
 template <typename MessageType>
 bool ComponentEditorWidget::fixMsgHelper(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (msg) {
     if (auto m = msg->as<MessageType>()) {
       if (applyFix) fixMsg(*m);  // can throw
@@ -346,8 +343,8 @@ bool ComponentEditorWidget::fixMsgHelper(
   return false;
 }
 
-bool ComponentEditorWidget::processCheckMessage(
-    std::shared_ptr<const LibraryElementCheckMessage> msg, bool applyFix) {
+bool ComponentEditorWidget::processRuleCheckMessage(
+    std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
   if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
@@ -356,9 +353,8 @@ bool ComponentEditorWidget::processCheckMessage(
   return false;
 }
 
-void ComponentEditorWidget::libraryElementCheckApproveRequested(
-    std::shared_ptr<const LibraryElementCheckMessage> msg,
-    bool approve) noexcept {
+void ComponentEditorWidget::ruleCheckApproveRequested(
+    std::shared_ptr<const RuleCheckMessage> msg, bool approve) noexcept {
   setMessageApproved(*mComponent, msg, approve);
   updateMetadata();
 }

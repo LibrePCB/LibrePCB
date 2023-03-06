@@ -23,7 +23,6 @@
 #include "si_netpoint.h"
 
 #include "../../circuit/netsignal.h"
-#include "../../erc/ercmsg.h"
 #include "si_netsegment.h"
 
 #include <QtCore>
@@ -45,14 +44,6 @@ SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const Uuid& uuid,
   // create the graphics item
   mGraphicsItem.reset(new SGI_NetPoint(*this));
   mGraphicsItem->setPos(mJunction.getPosition().toPxQPointF());
-
-  // create ERC messages
-  mErcMsgDeadNetPoint.reset(
-      new ErcMsg(mSchematic.getProject(), *this, mJunction.getUuid().toStr(),
-                 "Dead", ErcMsg::ErcMsgType_t::SchematicError,
-                 tr("Dead net point in schematic page \"%1\": %2")
-                     .arg(*mSchematic.getName())
-                     .arg(mJunction.getUuid().toStr())));
 }
 
 SI_NetPoint::~SI_NetPoint() noexcept {
@@ -101,7 +92,6 @@ void SI_NetPoint::addToSchematic() {
   mHighlightChangedConnection =
       connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
               [this]() { mGraphicsItem->update(); });
-  mErcMsgDeadNetPoint->setVisible(true);
   SI_Base::addToSchematic(mGraphicsItem.data());
 }
 
@@ -110,7 +100,6 @@ void SI_NetPoint::removeFromSchematic() {
     throw LogicError(__FILE__, __LINE__);
   }
   disconnect(mHighlightChangedConnection);
-  mErcMsgDeadNetPoint->setVisible(false);
   SI_Base::removeFromSchematic(mGraphicsItem.data());
 }
 
@@ -122,7 +111,6 @@ void SI_NetPoint::registerNetLine(SI_NetLine& netline) {
   mRegisteredNetLines.insert(&netline);
   netline.updateLine();
   mGraphicsItem->updateCacheAndRepaint();
-  mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
 }
 
 void SI_NetPoint::unregisterNetLine(SI_NetLine& netline) {
@@ -132,7 +120,6 @@ void SI_NetPoint::unregisterNetLine(SI_NetLine& netline) {
   mRegisteredNetLines.remove(&netline);
   netline.updateLine();
   mGraphicsItem->updateCacheAndRepaint();
-  mErcMsgDeadNetPoint->setVisible(mRegisteredNetLines.isEmpty());
 }
 
 /*******************************************************************************
