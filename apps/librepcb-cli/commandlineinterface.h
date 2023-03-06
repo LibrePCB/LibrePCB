@@ -69,6 +69,7 @@ private:  // Methods
                    const QString& pcbFabricationSettingsPath,
                    const QStringList& exportPnpTopFiles,
                    const QStringList& exportPnpBottomFiles,
+                   const QStringList& exportNetlistFiles,
                    const QStringList& boardNames,
                    const QStringList& boardIndices, bool removeOtherBoards,
                    bool save, bool strict) const noexcept;
