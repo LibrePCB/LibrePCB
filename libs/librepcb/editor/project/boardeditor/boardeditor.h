@@ -28,6 +28,7 @@
 #include "ui_boardeditor.h"
 
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
@@ -38,13 +39,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BoardDesignRuleCheckMessage;
 class ComponentInstance;
 class Project;
 
 namespace editor {
 
-class BoardDesignRuleCheckMessagesDock;
 class BoardEditorFsm;
 class BoardLayersDock;
 class ExclusiveActionGroup;
@@ -119,8 +118,7 @@ private:
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void unplacedComponentsCountChanged(int count) noexcept;
   void runDrc(bool quick) noexcept;
-  void highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
-                           bool zoomTo) noexcept;
+  void highlightDrcMessage(const RuleCheckMessage& msg, bool zoomTo) noexcept;
   void clearDrcMarker() noexcept;
   QList<BI_Device*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;
@@ -143,8 +141,7 @@ private:
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
 
   // DRC
-  QHash<Uuid, QList<BoardDesignRuleCheckMessage>>
-      mDrcMessages;  ///< Key: Board UUID
+  QHash<Uuid, tl::optional<RuleCheckMessageList>> mDrcMessages;  ///< UUID=Board
   QScopedPointer<QGraphicsPathItem> mDrcLocationGraphicsItem;
 
   // Misc
@@ -246,7 +243,7 @@ private:
   QScopedPointer<UnplacedComponentsDock> mDockUnplacedComponents;
   QScopedPointer<BoardLayersDock> mDockLayers;
   QScopedPointer<RuleCheckDock> mDockErc;
-  QScopedPointer<BoardDesignRuleCheckMessagesDock> mDockDrc;
+  QScopedPointer<RuleCheckDock> mDockDrc;
 
   // Menus
   QPointer<QMenu> mMenuBoard;

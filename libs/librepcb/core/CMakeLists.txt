@@ -297,8 +297,8 @@ add_library(
   project/board/drc/boardclipperpathgenerator.h
   project/board/drc/boarddesignrulecheck.cpp
   project/board/drc/boarddesignrulecheck.h
-  project/board/drc/boarddesignrulecheckmessage.cpp
-  project/board/drc/boarddesignrulecheckmessage.h
+  project/board/drc/boarddesignrulecheckmessages.cpp
+  project/board/drc/boarddesignrulecheckmessages.h
   project/board/drc/boarddesignrulechecksettings.cpp
   project/board/drc/boarddesignrulechecksettings.h
   project/board/graphicsitems/bgi_airwire.cpp

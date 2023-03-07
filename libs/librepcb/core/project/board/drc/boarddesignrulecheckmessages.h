@@ -1,0 +1,420 @@
+/*
+ * LibrePCB - Professional EDA for everyone!
+ * Copyright (C) 2013 LibrePCB Developers, see AUTHORS.md for contributors.
+ * https://librepcb.org/
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef LIBREPCB_CORE_BOARDDESIGNRULECHECKMESSAGES_H
+#define LIBREPCB_CORE_BOARDDESIGNRULECHECKMESSAGES_H
+
+/*******************************************************************************
+ *  Includes
+ ******************************************************************************/
+#include "../../../rulecheck/rulecheckmessage.h"
+#include "../../../types/length.h"
+
+#include <QtCore>
+
+/*******************************************************************************
+ *  Namespace / Forward Declarations
+ ******************************************************************************/
+namespace librepcb {
+
+class BI_Base;
+class BI_Device;
+class BI_FootprintPad;
+class BI_Hole;
+class BI_NetLine;
+class BI_NetLineAnchor;
+class BI_NetPoint;
+class BI_NetSegment;
+class BI_Plane;
+class BI_StrokeText;
+class BI_Via;
+class Circle;
+class ComponentInstance;
+class GraphicsLayer;
+class Hole;
+class NetSignal;
+class PadHole;
+class Polygon;
+class StrokeText;
+
+/*******************************************************************************
+ *  Class DrcMsgMissingDevice
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMissingDevice class
+ */
+class DrcMsgMissingDevice final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMissingDevice)
+
+public:
+  // Constructors / Destructor
+  DrcMsgMissingDevice() = delete;
+  explicit DrcMsgMissingDevice(const ComponentInstance& component) noexcept;
+  DrcMsgMissingDevice(const DrcMsgMissingDevice& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgMissingDevice() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgMissingConnection
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMissingConnection class
+ */
+class DrcMsgMissingConnection final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMissingConnection)
+
+public:
+  // Constructors / Destructor
+  DrcMsgMissingConnection() = delete;
+  DrcMsgMissingConnection(const BI_NetLineAnchor& p1,
+                          const BI_NetLineAnchor& p2,
+                          const NetSignal& netSignal,
+                          const QVector<Path>& locations);
+  DrcMsgMissingConnection(const DrcMsgMissingConnection& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgMissingConnection() noexcept {}
+
+private:
+  static QString getAnchorName(const BI_NetLineAnchor& anchor);
+  static void serializeAnchor(SExpression& node,
+                              const BI_NetLineAnchor& anchor);
+};
+
+/*******************************************************************************
+ *  Class DrcMsgEmptyNetSegment
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgEmptyNetSegment class
+ */
+class DrcMsgEmptyNetSegment final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgEmptyNetSegment)
+
+public:
+  // Constructors / Destructor
+  DrcMsgEmptyNetSegment() = delete;
+  explicit DrcMsgEmptyNetSegment(const BI_NetSegment& netSegment) noexcept;
+  DrcMsgEmptyNetSegment(const DrcMsgEmptyNetSegment& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgEmptyNetSegment() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgUnconnectedJunction
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgUnconnectedJunction class
+ */
+class DrcMsgUnconnectedJunction final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgUnconnectedJunction)
+
+public:
+  // Constructors / Destructor
+  DrcMsgUnconnectedJunction() = delete;
+  DrcMsgUnconnectedJunction(const BI_NetPoint& netPoint,
+                            const QVector<Path>& locations) noexcept;
+  DrcMsgUnconnectedJunction(const DrcMsgUnconnectedJunction& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgUnconnectedJunction() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgMinimumWidthViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMinimumWidthViolation class
+ */
+class DrcMsgMinimumWidthViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMinimumWidthViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgMinimumWidthViolation() = delete;
+  DrcMsgMinimumWidthViolation(const BI_NetLine& netLine,
+                              const UnsignedLength& minWidth,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumWidthViolation(const BI_Plane& plane,
+                              const UnsignedLength& minWidth,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumWidthViolation(const BI_StrokeText& text,
+                              const UnsignedLength& minWidth,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumWidthViolation(const DrcMsgMinimumWidthViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgMinimumWidthViolation() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgBoardCopperClearanceViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgBoardCopperClearanceViolation class
+ */
+class DrcMsgBoardCopperClearanceViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgBoardCopperClearanceViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgBoardCopperClearanceViolation() = delete;
+  DrcMsgBoardCopperClearanceViolation(
+      const QString& layer1, const NetSignal* net1, const BI_Base& item1,
+      const Polygon* polygon1, const Circle* circle1, const QString& layer2,
+      const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
+      const Circle* circle2, const UnsignedLength& minClearance,
+      const QVector<Path>& locations);
+  DrcMsgBoardCopperClearanceViolation(
+      const DrcMsgBoardCopperClearanceViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgBoardCopperClearanceViolation() noexcept {}
+
+private:
+  static QString getLayerName(const QString& layer1, const QString& layer2);
+  static QString getObjectName(const NetSignal* net, const BI_Base& item,
+                               const Polygon* polygon, const Circle* circle);
+  static void serializeObject(SExpression& node, const BI_Base& item,
+                              const Polygon* polygon, const Circle* circle);
+};
+
+/*******************************************************************************
+ *  Class DrcMsgBoardOutlineClearanceViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgBoardOutlineClearanceViolation class
+ */
+class DrcMsgBoardOutlineClearanceViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgBoardOutlineClearanceViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgBoardOutlineClearanceViolation() = delete;
+  DrcMsgBoardOutlineClearanceViolation(const BI_Via& via,
+                                       const UnsignedLength& minClearance,
+                                       const QVector<Path>& locations) noexcept;
+  DrcMsgBoardOutlineClearanceViolation(const BI_NetLine& netLine,
+                                       const UnsignedLength& minClearance,
+                                       const QVector<Path>& locations) noexcept;
+  DrcMsgBoardOutlineClearanceViolation(const BI_FootprintPad& pad,
+                                       const UnsignedLength& minClearance,
+                                       const QVector<Path>& locations) noexcept;
+  DrcMsgBoardOutlineClearanceViolation(const BI_Plane& plane,
+                                       const UnsignedLength& minClearance,
+                                       const QVector<Path>& locations) noexcept;
+  DrcMsgBoardOutlineClearanceViolation(const BI_Device* device,
+                                       const Polygon& polygon,
+                                       const UnsignedLength& minClearance,
+                                       const QVector<Path>& locations) noexcept;
+  DrcMsgBoardOutlineClearanceViolation(const BI_Device* device,
+                                       const Circle& circle,
+                                       const UnsignedLength& minClearance,
+                                       const QVector<Path>& locations) noexcept;
+  DrcMsgBoardOutlineClearanceViolation(const BI_Device* device,
+                                       const StrokeText& strokeText,
+                                       const UnsignedLength& minClearance,
+                                       const QVector<Path>& locations) noexcept;
+  DrcMsgBoardOutlineClearanceViolation(
+      const DrcMsgBoardOutlineClearanceViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgBoardOutlineClearanceViolation() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgCopperHoleClearanceViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgCopperHoleClearanceViolation class
+ */
+class DrcMsgCopperHoleClearanceViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgCopperHoleClearanceViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgCopperHoleClearanceViolation() = delete;
+  DrcMsgCopperHoleClearanceViolation(const BI_Device* device, const Hole& hole,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations) noexcept;
+  DrcMsgCopperHoleClearanceViolation(
+      const DrcMsgCopperHoleClearanceViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgCopperHoleClearanceViolation() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgCourtyardOverlap
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgCourtyardOverlap class
+ */
+class DrcMsgCourtyardOverlap final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgCourtyardOverlap)
+
+public:
+  // Constructors / Destructor
+  DrcMsgCourtyardOverlap() = delete;
+  DrcMsgCourtyardOverlap(const BI_Device& device1, const BI_Device& device2,
+                         const QVector<Path>& locations) noexcept;
+  DrcMsgCourtyardOverlap(const DrcMsgCourtyardOverlap& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgCourtyardOverlap() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgMinimumAnnularRingViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMinimumAnnularRingViolation class
+ */
+class DrcMsgMinimumAnnularRingViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgBoardAnnularRingViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgMinimumAnnularRingViolation() = delete;
+  DrcMsgMinimumAnnularRingViolation(const BI_Via& via,
+                                    const UnsignedLength& minAnnularWidth,
+                                    const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumAnnularRingViolation(const BI_FootprintPad& pad,
+                                    const UnsignedLength& minAnnularWidth,
+                                    const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumAnnularRingViolation(
+      const DrcMsgMinimumAnnularRingViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgMinimumAnnularRingViolation() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgMinimumDrillDiameterViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMinimumDrillDiameterViolation class
+ */
+class DrcMsgMinimumDrillDiameterViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMinimumDrillDiameterViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgMinimumDrillDiameterViolation() = delete;
+  DrcMsgMinimumDrillDiameterViolation(const BI_Device* device, const Hole& hole,
+                                      const UnsignedLength& minDiameter,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumDrillDiameterViolation(const BI_Via& via,
+                                      const UnsignedLength& minDiameter,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumDrillDiameterViolation(const BI_FootprintPad& pad,
+                                      const PadHole& padHole,
+                                      const UnsignedLength& minDiameter,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumDrillDiameterViolation(
+      const DrcMsgMinimumDrillDiameterViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgMinimumDrillDiameterViolation() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgMinimumSlotWidthViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMinimumSlotWidthViolation class
+ */
+class DrcMsgMinimumSlotWidthViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMinimumSlotWidthViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgMinimumSlotWidthViolation() = delete;
+  DrcMsgMinimumSlotWidthViolation(const BI_Device* device, const Hole& hole,
+                                  const UnsignedLength& minWidth,
+                                  const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumSlotWidthViolation(const BI_FootprintPad& pad,
+                                  const PadHole& padHole,
+                                  const UnsignedLength& minWidth,
+                                  const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumSlotWidthViolation(
+      const DrcMsgMinimumSlotWidthViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgMinimumSlotWidthViolation() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgInvalidPadConnection
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgInvalidPadConnection class
+ */
+class DrcMsgInvalidPadConnection final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgInvalidPadConnection)
+
+public:
+  // Constructors / Destructor
+  DrcMsgInvalidPadConnection() = delete;
+  DrcMsgInvalidPadConnection(const BI_FootprintPad& pad,
+                             const GraphicsLayer& layer,
+                             const QVector<Path>& locations) noexcept;
+  DrcMsgInvalidPadConnection(const DrcMsgInvalidPadConnection& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgInvalidPadConnection() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgForbiddenSlot
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgForbiddenSlot class
+ */
+class DrcMsgForbiddenSlot final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgForbiddenSlot)
+
+public:
+  // Constructors / Destructor
+  DrcMsgForbiddenSlot() = delete;
+  DrcMsgForbiddenSlot(const BI_Hole& hole,
+                      const QVector<Path>& locations) noexcept;
+  DrcMsgForbiddenSlot(const BI_Device& device, const Hole& hole,
+                      const QVector<Path>& locations) noexcept;
+  DrcMsgForbiddenSlot(const BI_FootprintPad& pad, const PadHole& padHole,
+                      const QVector<Path>& locations) noexcept;
+  DrcMsgForbiddenSlot(const DrcMsgForbiddenSlot& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgForbiddenSlot() noexcept {}
+
+private:
+  static QString determineMessage(const NonEmptyPath& path) noexcept;
+  static QString determineDescription(const NonEmptyPath& path) noexcept;
+};
+
+/*******************************************************************************
+ *  End of File
+ ******************************************************************************/
+
+}  // namespace librepcb
+
+#endif

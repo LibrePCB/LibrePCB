@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../utils/transform.h"
-#include "boarddesignrulecheckmessage.h"
+#include "boarddesignrulecheckmessages.h"
 #include "boarddesignrulechecksettings.h"
 
 #include <polyclipping/clipper.hpp>
@@ -64,9 +64,7 @@ public:
   const QStringList& getProgressStatus() const noexcept {
     return mProgressStatus;
   }
-  const QList<BoardDesignRuleCheckMessage>& getMessages() const noexcept {
-    return mMessages;
-  }
+  const RuleCheckMessageList& getMessages() const noexcept { return mMessages; }
 
   // General Methods
   void execute(bool quick);
@@ -82,7 +80,8 @@ private:  // Methods
   void rebuildPlanes(int progressEnd);
   void checkMinimumCopperWidth(int progressEnd);
   void checkCopperCopperClearances(int progressEnd);
-  void checkCopperBoardAndNpthClearances(int progressEnd);
+  void checkCopperBoardClearances(int progressEnd);
+  void checkCopperHoleClearances(int progressEnd);
   void checkMinimumPthAnnularRing(int progressEnd);
   void checkMinimumNpthDrillDiameter(int progressEnd);
   void checkMinimumNpthSlotWidth(int progressEnd);
@@ -96,10 +95,8 @@ private:  // Methods
   void checkForMissingConnections(int progressEnd);
   void checkForStaleObjects(int progressEnd);
   template <typename THole>
-  void processHoleSlotWarning(
-      const THole& hole, BoardDesignRuleCheckSettings::AllowedSlots allowed,
-      const Transform& transform1 = Transform(),
-      const Transform& transform2 = Transform());
+  bool requiresHoleSlotWarning(
+      const THole& hole, BoardDesignRuleCheckSettings::AllowedSlots allowed);
   const ClipperLib::Paths& getCopperPaths(
       const GraphicsLayer& layer, const QSet<const NetSignal*>& netsignals);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
@@ -111,7 +108,7 @@ private:  // Methods
       noexcept;
   void emitProgress(int percent) noexcept;
   void emitStatus(const QString& status) noexcept;
-  void emitMessage(const BoardDesignRuleCheckMessage& msg) noexcept;
+  void emitMessage(const std::shared_ptr<const RuleCheckMessage>& msg) noexcept;
   QString formatLength(const Length& length) const noexcept;
 
   /**
@@ -127,7 +124,7 @@ private:  // Data
   bool mIgnorePlanes;
   int mProgressPercent;
   QStringList mProgressStatus;
-  QList<BoardDesignRuleCheckMessage> mMessages;
+  RuleCheckMessageList mMessages;
   QHash<QPair<const GraphicsLayer*, QSet<const NetSignal*>>, ClipperLib::Paths>
       mCachedPaths;
 };
