@@ -60,7 +60,8 @@ public:
   int execute() noexcept;
 
 private:  // Methods
-  bool openProject(const QString& projectFile, bool runErc,
+  bool openProject(const QString& projectFile, bool runErc, bool runDrc,
+                   const QString& drcSettingsPath,
                    const QStringList& exportSchematicsFiles,
                    const QStringList& exportBomFiles,
                    const QStringList& exportBoardBomFiles,

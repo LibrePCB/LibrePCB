@@ -43,6 +43,7 @@
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/board/boardpickplacegenerator.h>
+#include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/bomgenerator.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
@@ -105,6 +106,17 @@ int CommandLineInterface::execute() noexcept {
       tr("Run the electrical rule check, print all non-approved "
          "warnings/errors and "
          "report failure (exit code = 1) if there are non-approved messages."));
+  QCommandLineOption drcOption(
+      "drc",
+      tr("Run the design rule check, print all non-approved warnings/errors "
+         "and report failure (exit code = 1) if there are non-approved "
+         "messages."));
+  QCommandLineOption drcSettingsOption(
+      "drc-settings",
+      tr("Override DRC settings by providing a *.lp file containing custom "
+         "settings. If not set, the settings from the boards will be used "
+         "instead."),
+      tr("file"));
   QCommandLineOption exportSchematicsOption(
       "export-schematics",
       tr("Export schematics to given file(s). Existing files will be "
@@ -224,6 +236,8 @@ int CommandLineInterface::execute() noexcept {
                                  tr("Path to project file (*.lpp[z])."));
     positionalArgNames.append("project");
     parser.addOption(ercOption);
+    parser.addOption(drcOption);
+    parser.addOption(drcSettingsOption);
     parser.addOption(exportSchematicsOption);
     parser.addOption(exportBomOption);
     parser.addOption(exportBoardBomOption);
@@ -315,6 +329,8 @@ int CommandLineInterface::execute() noexcept {
     cmdSuccess = openProject(
         positionalArgs.value(1),  // project filepath
         parser.isSet(ercOption),  // run ERC
+        parser.isSet(drcOption),  // run DRC
+        parser.value(drcSettingsOption),  // DRC settings
         parser.values(exportSchematicsOption),  // export schematics
         parser.values(exportBomOption),  // export generic BOM
         parser.values(exportBoardBomOption),  // export board BOM
@@ -353,10 +369,11 @@ int CommandLineInterface::execute() noexcept {
  ******************************************************************************/
 
 bool CommandLineInterface::openProject(
-    const QString& projectFile, bool runErc,
-    const QStringList& exportSchematicsFiles, const QStringList& exportBomFiles,
-    const QStringList& exportBoardBomFiles, const QString& bomAttributes,
-    bool exportPcbFabricationData, const QString& pcbFabricationSettingsPath,
+    const QString& projectFile, bool runErc, bool runDrc,
+    const QString& drcSettingsPath, const QStringList& exportSchematicsFiles,
+    const QStringList& exportBomFiles, const QStringList& exportBoardBomFiles,
+    const QString& bomAttributes, bool exportPcbFabricationData,
+    const QString& pcbFabricationSettingsPath,
     const QStringList& exportPnpTopFiles,
     const QStringList& exportPnpBottomFiles, const QStringList& boardNames,
     const QStringList& boardIndices, bool removeOtherBoards, bool save,
@@ -489,8 +506,46 @@ bool CommandLineInterface::openProject(
       print("  " % tr("Approved messages: %1").arg(approvedMsgCount));
       print("  " % tr("Non-approved messages: %1").arg(nonApproved.count()));
       foreach (const QString& msg, nonApproved) {
-        printErr(msg);
+        printErr("    - " % msg);
         success = false;
+      }
+    }
+
+    // DRC
+    if (runDrc) {
+      print(tr("Run DRC..."));
+      tl::optional<BoardDesignRuleCheckSettings> customSettings;
+      QList<Board*> boardsToCheck = boards;
+      if (!drcSettingsPath.isEmpty()) {
+        try {
+          qDebug() << "Load custom DRC settings:" << drcSettingsPath;
+          const FilePath fp(QFileInfo(drcSettingsPath).absoluteFilePath());
+          const SExpression root =
+              SExpression::parse(FileUtils::readFile(fp), fp);
+          customSettings = BoardDesignRuleCheckSettings(root);  // can throw
+        } catch (const Exception& e) {
+          printErr(
+              tr("ERROR: Failed to load custom settings: %1").arg(e.getMsg()));
+          success = false;
+          boardsToCheck.clear();  // avoid exporting any boards
+        }
+      }
+      foreach (Board* board, boardsToCheck) {
+        print("  " % tr("Board '%1':").arg(*board->getName()));
+        BoardDesignRuleCheck drc(
+            *board, customSettings ? *customSettings : board->getDrcSettings());
+        drc.execute(false);
+        int approvedMsgCount = 0;
+        const QStringList nonApproved = prepareRuleCheckMessages(
+            drc.getMessages(), board->getDrcMessageApprovals(),
+            approvedMsgCount);
+        print("    " % tr("Approved messages: %1").arg(approvedMsgCount));
+        print("    " %
+              tr("Non-approved messages: %1").arg(nonApproved.count()));
+        foreach (const QString& msg, nonApproved) {
+          printErr("      - " % msg);
+          success = false;
+        }
       }
     }
 
@@ -903,7 +958,7 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
             tr("Non-approved messages: %1").arg(nonApproved.count());
     foreach (const QString& msg, nonApproved) {
       printErrorHeaderOnce();
-      printErr(msg);
+      printErr("    - " % msg);
       success = false;
     }
   }
@@ -945,9 +1000,8 @@ QStringList CommandLineInterface::prepareRuleCheckMessages(
     if (approvals.contains(msg->getApproval())) {
       ++approvedMsgCount;
     } else {
-      printedMessages.append(
-          QString("    - [%1] %2")
-              .arg(msg->getSeverityTr().toUpper(), msg->getMessage()));
+      printedMessages.append(QString("[%1] %2").arg(
+          msg->getSeverityTr().toUpper(), msg->getMessage()));
     }
   }
   return printedMessages;
