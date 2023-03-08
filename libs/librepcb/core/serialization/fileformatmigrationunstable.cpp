@@ -105,10 +105,8 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
   Q_UNUSED(root);
   Q_UNUSED(context);
   SExpression& node = root.getChild("design_rule_check");
-  node.appendChild("min_drill_drill_clearance",
-                   SExpression::createToken("0.35"));
-  node.appendChild("min_drill_board_clearance",
-                   SExpression::createToken("0.5"));
+  node.appendChild("min_outline_tool_diameter",
+                   SExpression::createToken("2.0"));
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

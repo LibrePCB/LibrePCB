@@ -92,6 +92,9 @@ public:
   const UnsignedLength& getMinPthSlotWidth() const noexcept {
     return mMinPthSlotWidth;
   }
+  const UnsignedLength& getMinOutlineToolDiameter() const noexcept {
+    return mMinOutlineToolDiameter;
+  }
   AllowedSlots getAllowedNpthSlots() const noexcept {
     return mAllowedNpthSlots;
   }
@@ -130,6 +133,9 @@ public:
   }
   void setMinPthSlotWidth(const UnsignedLength& value) noexcept {
     mMinPthSlotWidth = value;
+  }
+  void setMinOutlineToolDiameter(const UnsignedLength& value) noexcept {
+    mMinOutlineToolDiameter = value;
   }
   void setAllowedPthSlots(AllowedSlots value) noexcept {
     mAllowedNpthSlots = value;
@@ -170,6 +176,7 @@ private:  // Data
   UnsignedLength mMinPthDrillDiameter;
   UnsignedLength mMinNpthSlotWidth;
   UnsignedLength mMinPthSlotWidth;
+  UnsignedLength mMinOutlineToolDiameter;
 
   // Allowed features
   AllowedSlots mAllowedNpthSlots;

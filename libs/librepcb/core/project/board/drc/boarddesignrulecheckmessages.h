@@ -101,6 +101,85 @@ private:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgMissingBoardOutline
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMissingBoardOutline class
+ */
+class DrcMsgMissingBoardOutline final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMissingBoardOutline)
+
+public:
+  // Constructors / Destructor
+  DrcMsgMissingBoardOutline() noexcept;
+  DrcMsgMissingBoardOutline(const DrcMsgMissingBoardOutline& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgMissingBoardOutline() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgMultipleBoardOutlines
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMultipleBoardOutlines class
+ */
+class DrcMsgMultipleBoardOutlines final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMultipleBoardOutlines)
+
+public:
+  // Constructors / Destructor
+  explicit DrcMsgMultipleBoardOutlines(const QVector<Path>& locations) noexcept;
+  DrcMsgMultipleBoardOutlines(const DrcMsgMultipleBoardOutlines& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgMultipleBoardOutlines() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgOpenBoardOutlinePolygon
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgOpenBoardOutlinePolygon class
+ */
+class DrcMsgOpenBoardOutlinePolygon final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgOpenBoardOutlinePolygon)
+
+public:
+  // Constructors / Destructor
+  DrcMsgOpenBoardOutlinePolygon() = delete;
+  DrcMsgOpenBoardOutlinePolygon(const BI_Device* device, const Polygon& polygon,
+                                const QVector<Path>& locations) noexcept;
+  DrcMsgOpenBoardOutlinePolygon(
+      const DrcMsgOpenBoardOutlinePolygon& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgOpenBoardOutlinePolygon() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgMinimumBoardOutlineInnerRadiusViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMinimumBoardOutlineInnerRadiusViolation class
+ */
+class DrcMsgMinimumBoardOutlineInnerRadiusViolation final
+  : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMinimumBoardOutlineInnerRadiusViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgMinimumBoardOutlineInnerRadiusViolation() = delete;
+  DrcMsgMinimumBoardOutlineInnerRadiusViolation(
+      const UnsignedLength& minRadius, const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumBoardOutlineInnerRadiusViolation(
+      const DrcMsgMinimumBoardOutlineInnerRadiusViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgMinimumBoardOutlineInnerRadiusViolation() noexcept {}
+};
+
+/*******************************************************************************
  *  Class DrcMsgEmptyNetSegment
  ******************************************************************************/
 

@@ -165,6 +165,9 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   mUi->edtDrcMinPthSlotWidth->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
       sSettingsPrefix % "/min_pth_slot_width");
+  mUi->edtDrcMinOutlineToolDiameter->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
+      sSettingsPrefix % "/min_outline_tool_diameter");
   for (QComboBox* cbx :
        {mUi->cbxDrcAllowedNpthSlots, mUi->cbxDrcAllowedPthSlots}) {
     cbx->addItem(
@@ -287,6 +290,8 @@ void BoardSetupDialog::load() noexcept {
       mBoard.getDrcSettings().getMinPthDrillDiameter());
   mUi->edtDrcMinPthSlotWidth->setValue(
       mBoard.getDrcSettings().getMinPthSlotWidth());
+  mUi->edtDrcMinOutlineToolDiameter->setValue(
+      mBoard.getDrcSettings().getMinOutlineToolDiameter());
   mUi->cbxDrcAllowedNpthSlots->setCurrentIndex(
       mUi->cbxDrcAllowedNpthSlots->findData(
           QVariant::fromValue(mBoard.getDrcSettings().getAllowedNpthSlots())));
@@ -342,6 +347,7 @@ bool BoardSetupDialog::apply() noexcept {
     s.setMinNpthSlotWidth(mUi->edtDrcMinNpthSlotWidth->getValue());
     s.setMinPthDrillDiameter(mUi->edtDrcMinPthDrillDiameter->getValue());
     s.setMinPthSlotWidth(mUi->edtDrcMinPthSlotWidth->getValue());
+    s.setMinOutlineToolDiameter(mUi->edtDrcMinOutlineToolDiameter->getValue());
     s.setAllowedNpthSlots(
         mUi->cbxDrcAllowedNpthSlots->currentData()
             .value<BoardDesignRuleCheckSettings::AllowedSlots>());
