@@ -78,6 +78,8 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings() noexcept
     mMinCopperCopperClearance(200000),  // 200um
     mMinCopperBoardClearance(300000),  // 300um
     mMinCopperNpthClearance(250000),  // 250um
+    mMinDrillDrillClearance(350000),  // 350um
+    mMinDrillBoardClearance(500000),  // 500um
     mMinPthAnnularRing(200000),  // 200um
     mMinNpthDrillDiameter(300000),  // 300um
     mMinPthDrillDiameter(300000),  // 300um
@@ -104,6 +106,10 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings(
         node.getChild("min_copper_board_clearance/@0"))),
     mMinCopperNpthClearance(deserialize<UnsignedLength>(
         node.getChild("min_copper_npth_clearance/@0"))),
+    mMinDrillDrillClearance(deserialize<UnsignedLength>(
+        node.getChild("min_drill_drill_clearance/@0"))),
+    mMinDrillBoardClearance(deserialize<UnsignedLength>(
+        node.getChild("min_drill_board_clearance/@0"))),
     mMinPthAnnularRing(
         deserialize<UnsignedLength>(node.getChild("min_annular_ring/@0"))),
     mMinNpthDrillDiameter(deserialize<UnsignedLength>(
@@ -137,6 +143,10 @@ void BoardDesignRuleCheckSettings::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("min_copper_npth_clearance", mMinCopperNpthClearance);
   root.ensureLineBreak();
+  root.appendChild("min_drill_drill_clearance", mMinDrillDrillClearance);
+  root.ensureLineBreak();
+  root.appendChild("min_drill_board_clearance", mMinDrillBoardClearance);
+  root.ensureLineBreak();
   root.appendChild("min_annular_ring", mMinPthAnnularRing);
   root.ensureLineBreak();
   root.appendChild("min_npth_drill_diameter", mMinNpthDrillDiameter);
@@ -163,6 +173,8 @@ BoardDesignRuleCheckSettings& BoardDesignRuleCheckSettings::operator=(
   mMinCopperCopperClearance = rhs.mMinCopperCopperClearance;
   mMinCopperBoardClearance = rhs.mMinCopperBoardClearance;
   mMinCopperNpthClearance = rhs.mMinCopperNpthClearance;
+  mMinDrillDrillClearance = rhs.mMinDrillDrillClearance;
+  mMinDrillBoardClearance = rhs.mMinDrillBoardClearance;
   mMinPthAnnularRing = rhs.mMinPthAnnularRing;
   mMinNpthDrillDiameter = rhs.mMinNpthDrillDiameter;
   mMinPthDrillDiameter = rhs.mMinPthDrillDiameter;
@@ -179,6 +191,8 @@ bool BoardDesignRuleCheckSettings::operator==(
   if (mMinCopperCopperClearance != rhs.mMinCopperCopperClearance) return false;
   if (mMinCopperBoardClearance != rhs.mMinCopperBoardClearance) return false;
   if (mMinCopperNpthClearance != rhs.mMinCopperNpthClearance) return false;
+  if (mMinDrillDrillClearance != rhs.mMinDrillDrillClearance) return false;
+  if (mMinDrillBoardClearance != rhs.mMinDrillBoardClearance) return false;
   if (mMinPthAnnularRing != rhs.mMinPthAnnularRing) return false;
   if (mMinNpthDrillDiameter != rhs.mMinNpthDrillDiameter) return false;
   if (mMinPthDrillDiameter != rhs.mMinPthDrillDiameter) return false;

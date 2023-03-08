@@ -588,6 +588,131 @@ DrcMsgCopperHoleClearanceViolation::DrcMsgCopperHoleClearanceViolation(
 }
 
 /*******************************************************************************
+ *  DrcMsgDrillDrillClearanceViolation
+ ******************************************************************************/
+
+DrcMsgDrillDrillClearanceViolation::DrcMsgDrillDrillClearanceViolation(
+    const BI_Base& item1, const Uuid& hole1, const BI_Base& item2,
+    const Uuid& hole2, const UnsignedLength& minClearance,
+    const QVector<Path>& locations)
+  : RuleCheckMessage(Severity::Error,
+                     tr("Clearance drill ↔ drill < %1 %2",
+                        "Placeholders: Clearance value, unit")
+                         .arg(minClearance->toMmString(), "mm"),
+                     tr("The clearance between two drills is smaller than the "
+                        "drill clearance configured in the DRC settings.") %
+                         " " % seriousTroublesTr() % "\n\n" %
+                         tr("Check the DRC settings and move the drills to "
+                            "increase their distance if needed."),
+                     "drill_clearance_violation", locations) {
+  mApproval.ensureLineBreak();
+  SExpression& node1 = mApproval.appendList("drill");
+  mApproval.ensureLineBreak();
+  SExpression& node2 = mApproval.appendList("drill");
+  mApproval.ensureLineBreak();
+
+  // Sort nodes to make the approval canonical.
+  serializeObject(node1, item1, hole1);
+  serializeObject(node2, item2, hole2);
+  if (node2 < node1) {
+    std::swap(node1, node2);
+  }
+}
+
+void DrcMsgDrillDrillClearanceViolation::serializeObject(SExpression& node,
+                                                         const BI_Base& item,
+                                                         const Uuid& hole) {
+  if (const BI_Via* via = dynamic_cast<const BI_Via*>(&item)) {
+    node.ensureLineBreak();
+    node.appendChild("netsegment", via->getNetSegment().getUuid());
+    node.ensureLineBreak();
+    node.appendChild("via", via->getUuid());
+    node.ensureLineBreak();
+  } else if (const BI_Hole* boardHole = dynamic_cast<const BI_Hole*>(&item)) {
+    node.appendChild("hole", boardHole->getUuid());
+  } else if (const BI_FootprintPad* pad =
+                 dynamic_cast<const BI_FootprintPad*>(&item)) {
+    node.ensureLineBreak();
+    node.appendChild("device", pad->getDevice().getComponentInstanceUuid());
+    node.ensureLineBreak();
+    node.appendChild("pad", pad->getLibPadUuid());
+    node.ensureLineBreak();
+    node.appendChild("hole", hole);
+    node.ensureLineBreak();
+  } else if (const BI_Device* device = dynamic_cast<const BI_Device*>(&item)) {
+    node.ensureLineBreak();
+    node.appendChild("device", device->getComponentInstanceUuid());
+    node.ensureLineBreak();
+    node.appendChild("hole", hole);
+    node.ensureLineBreak();
+  } else {
+    throw LogicError(__FILE__, __LINE__, "Unknown drill clearance object.");
+  }
+}
+
+/*******************************************************************************
+ *  DrcMsgDrillBoardClearanceViolation
+ ******************************************************************************/
+
+DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
+    const BI_Via& via, const UnsignedLength& minClearance,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
+                     getDescription(), "drill_board_clearance_violation",
+                     locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("via", via.getUuid());
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
+    const BI_FootprintPad& pad, const PadHole& hole,
+    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
+                     getDescription(), "drill_board_clearance_violation",
+                     locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad.getLibPadUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("hole", hole.getUuid());
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
+    const BI_Device* device, const Hole& hole,
+    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
+                     getDescription(), "drill_board_clearance_violation",
+                     locations) {
+  mApproval.ensureLineBreak();
+  if (device) {
+    mApproval.appendChild("device", device->getComponentInstanceUuid());
+    mApproval.ensureLineBreak();
+  }
+  mApproval.appendChild("hole", hole.getUuid());
+  mApproval.ensureLineBreak();
+}
+
+QString DrcMsgDrillBoardClearanceViolation::getMessage(
+    const UnsignedLength& minClearance) noexcept {
+  return tr("Clearance drill ↔ board outline < %1 %2",
+            "Placeholders: Clearance value, unit")
+      .arg(minClearance->toMmString(), "mm");
+}
+
+QString DrcMsgDrillBoardClearanceViolation::getDescription() noexcept {
+  return tr("The clearance between a drill and the board outline is smaller "
+            "than the drill clearance configured in the DRC settings.") %
+      " " % seriousTroublesTr() % "\n\n" %
+      tr("Check the DRC settings and move the drill away from the board "
+         "outline if needed.");
+}
+
+/*******************************************************************************
  *  DrcMsgCourtyardOverlap
  ******************************************************************************/
 

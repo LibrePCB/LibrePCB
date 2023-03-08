@@ -71,6 +71,12 @@ public:
   const UnsignedLength& getMinCopperNpthClearance() const noexcept {
     return mMinCopperNpthClearance;
   }
+  const UnsignedLength& getMinDrillDrillClearance() const noexcept {
+    return mMinDrillDrillClearance;
+  }
+  const UnsignedLength& getMinDrillBoardClearance() const noexcept {
+    return mMinDrillBoardClearance;
+  }
   const UnsignedLength& getMinPthAnnularRing() const noexcept {
     return mMinPthAnnularRing;
   }
@@ -103,6 +109,12 @@ public:
   }
   void setMinCopperNpthClearance(const UnsignedLength& value) noexcept {
     mMinCopperNpthClearance = value;
+  }
+  void setMinDrillDrillClearance(const UnsignedLength& value) noexcept {
+    mMinDrillDrillClearance = value;
+  }
+  void setMinDrillBoardClearance(const UnsignedLength& value) noexcept {
+    mMinDrillBoardClearance = value;
   }
   void setMinPthAnnularRing(const UnsignedLength& value) noexcept {
     mMinPthAnnularRing = value;
@@ -144,15 +156,22 @@ public:
   }
 
 private:  // Data
+  // Clearances
   UnsignedLength mMinCopperWidth;
   UnsignedLength mMinCopperCopperClearance;
   UnsignedLength mMinCopperBoardClearance;
   UnsignedLength mMinCopperNpthClearance;
+  UnsignedLength mMinDrillDrillClearance;
+  UnsignedLength mMinDrillBoardClearance;
+
+  // Minimum sizes
   UnsignedLength mMinPthAnnularRing;
   UnsignedLength mMinNpthDrillDiameter;
   UnsignedLength mMinPthDrillDiameter;
   UnsignedLength mMinNpthSlotWidth;
   UnsignedLength mMinPthSlotWidth;
+
+  // Allowed features
   AllowedSlots mAllowedNpthSlots;
   AllowedSlots mAllowedPthSlots;
 };

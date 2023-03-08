@@ -52,6 +52,7 @@ class NetSignal;
 class PadHole;
 class Polygon;
 class StrokeText;
+class Uuid;
 
 /*******************************************************************************
  *  Class DrcMsgMissingDevice
@@ -260,6 +261,66 @@ public:
       const DrcMsgCopperHoleClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgCopperHoleClearanceViolation() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgDrillDrillClearanceViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgDrillDrillClearanceViolation class
+ */
+class DrcMsgDrillDrillClearanceViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgDrillDrillClearanceViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgDrillDrillClearanceViolation() = delete;
+  DrcMsgDrillDrillClearanceViolation(const BI_Base& item1, const Uuid& hole1,
+                                     const BI_Base& item2, const Uuid& hole2,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations);
+  DrcMsgDrillDrillClearanceViolation(
+      const DrcMsgDrillDrillClearanceViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgDrillDrillClearanceViolation() noexcept {}
+
+private:  // Methods
+  static void serializeObject(SExpression& node, const BI_Base& item,
+                              const Uuid& hole);
+};
+
+/*******************************************************************************
+ *  Class DrcMsgDrillBoardClearanceViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgDrillBoardClearanceViolation class
+ */
+class DrcMsgDrillBoardClearanceViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgDrillBoardClearanceViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgDrillBoardClearanceViolation() = delete;
+  DrcMsgDrillBoardClearanceViolation(const BI_Via& via,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations) noexcept;
+  DrcMsgDrillBoardClearanceViolation(const BI_FootprintPad& pad,
+                                     const PadHole& hole,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations) noexcept;
+  DrcMsgDrillBoardClearanceViolation(const BI_Device* device, const Hole& hole,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations) noexcept;
+  DrcMsgDrillBoardClearanceViolation(
+      const DrcMsgDrillBoardClearanceViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgDrillBoardClearanceViolation() noexcept {}
+
+private:  // Methods
+  static QString getMessage(const UnsignedLength& minClearance) noexcept;
+  static QString getDescription() noexcept;
 };
 
 /*******************************************************************************
