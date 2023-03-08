@@ -368,7 +368,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
             ClipperHelpers::flattenTree(*intersections);
         if (!paths.empty()) {
           const QVector<Path> locations = ClipperHelpers::convert(paths);
-          emitMessage(std::make_shared<DrcMsgBoardCopperClearanceViolation>(
+          emitMessage(std::make_shared<DrcMsgCopperCopperClearanceViolation>(
               it1->layer, it1->netSignal, *it1->item, it1->polygon, it1->circle,
               it2->layer, it2->netSignal, *it2->item, it2->polygon, it2->circle,
               clearance, locations));
@@ -431,7 +431,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addVia(*via);
       if (intersects(gen.getPaths())) {
-        emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+        emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
             *via, clearance, locations));
       }
     }
@@ -441,7 +441,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addNetLine(*netLine);
       if (intersects(gen.getPaths())) {
-        emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+        emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
             *netLine, clearance, locations));
       }
     }
@@ -453,7 +453,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addPlane(*plane);
       if (intersects(gen.getPaths())) {
-        emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+        emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
             *plane, clearance, locations));
       }
     }
@@ -467,7 +467,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addPolygon(*polygon);
       if (intersects(gen.getPaths())) {
-        emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+        emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
             nullptr, polygon->getPolygon(), clearance, locations));
       }
     }
@@ -481,7 +481,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addStrokeText(*strokeText);
       if (intersects(gen.getPaths())) {
-        emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+        emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
             nullptr, strokeText->getText(), clearance, locations));
       }
     }
@@ -500,7 +500,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
           BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
           gen.addPad(*pad, transform, layer->getName());
           if (intersects(gen.getPaths())) {
-            emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+            emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
                 *pad, clearance, locations));
           }
         }
@@ -515,7 +515,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addPolygon(polygon, transform);
         if (intersects(gen.getPaths())) {
-          emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+          emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
               device, polygon, clearance, locations));
         }
       }
@@ -529,7 +529,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addCircle(circle, transform);
         if (intersects(gen.getPaths())) {
-          emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+          emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
               device, circle, clearance, locations));
         }
       }
@@ -543,7 +543,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addStrokeText(*strokeText);
         if (intersects(gen.getPaths())) {
-          emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+          emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
               device, strokeText->getText(), clearance, locations));
         }
       }

@@ -265,10 +265,10 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
 }
 
 /*******************************************************************************
- *  DrcMsgBoardCopperClearanceViolation
+ *  DrcMsgCopperCopperClearanceViolation
  ******************************************************************************/
 
-DrcMsgBoardCopperClearanceViolation::DrcMsgBoardCopperClearanceViolation(
+DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
     const QString& layer1, const NetSignal* net1, const BI_Base& item1,
     const Polygon* polygon1, const Circle* circle1, const QString& layer2,
     const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
@@ -304,7 +304,7 @@ DrcMsgBoardCopperClearanceViolation::DrcMsgBoardCopperClearanceViolation(
   }
 }
 
-QString DrcMsgBoardCopperClearanceViolation::getLayerName(
+QString DrcMsgCopperCopperClearanceViolation::getLayerName(
     const QString& layer1, const QString& layer2) {
   if (!layer1.isEmpty()) {
     return "'" % GraphicsLayer::getTranslation(layer1) % "'";
@@ -315,7 +315,7 @@ QString DrcMsgBoardCopperClearanceViolation::getLayerName(
   }
 }
 
-QString DrcMsgBoardCopperClearanceViolation::getObjectName(
+QString DrcMsgCopperCopperClearanceViolation::getObjectName(
     const NetSignal* net, const BI_Base& item, const Polygon* polygon,
     const Circle* circle) {
   QString name;
@@ -345,7 +345,7 @@ QString DrcMsgBoardCopperClearanceViolation::getObjectName(
   return name;
 }
 
-void DrcMsgBoardCopperClearanceViolation::serializeObject(
+void DrcMsgCopperCopperClearanceViolation::serializeObject(
     SExpression& node, const BI_Base& item, const Polygon* polygon,
     const Circle* circle) {
   if (const BI_Device* device = dynamic_cast<const BI_Device*>(&item)) {
@@ -402,10 +402,10 @@ void DrcMsgBoardCopperClearanceViolation::serializeObject(
 }
 
 /*******************************************************************************
- *  DrcMsgBoardOutlineClearanceViolation
+ *  DrcMsgCopperBoardClearanceViolation
  ******************************************************************************/
 
-DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
+DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
     const BI_Via& via, const UnsignedLength& minClearance,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error,
@@ -418,7 +418,7 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
                          " " % seriousTroublesTr() % "\n\n" %
                          tr("Check the DRC settings and move the via away from "
                             "the board outline if needed."),
-                     "board_outline_clearance_violation", locations) {
+                     "copper_board_clearance_violation", locations) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
   mApproval.ensureLineBreak();
@@ -426,12 +426,12 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
   mApproval.ensureLineBreak();
 }
 
-DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
+DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
     const BI_NetLine& netLine, const UnsignedLength& minClearance,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
-        tr("Clearance board outline ↔ trace < %1 %2",
+        tr("Clearance trace ↔ board outline < %1 %2",
            "Placeholders: Clearance value, unit")
             .arg(minClearance->toMmString(), "mm"),
         tr("The clearance between a trace and the board outline is smaller "
@@ -440,7 +440,7 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
             " " % seriousTroublesTr() % "\n\n" %
             tr("Check the DRC settings and move the trace away from the board "
                "outline if needed."),
-        "board_outline_clearance_violation", locations) {
+        "copper_board_clearance_violation", locations) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("netsegment", netLine.getNetSegment().getUuid());
   mApproval.ensureLineBreak();
@@ -448,12 +448,12 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
   mApproval.ensureLineBreak();
 }
 
-DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
+DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
     const BI_FootprintPad& pad, const UnsignedLength& minClearance,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
-        tr("Clearance board outline ↔ pad < %1 %2",
+        tr("Clearance pad ↔ board outline < %1 %2",
            "Placeholders: Clearance value, unit")
             .arg(minClearance->toMmString(), "mm"),
         tr("The clearance between a footprint pad and the board outline is "
@@ -462,7 +462,7 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
             " " % seriousTroublesTr() % "\n\n" %
             tr("Check the DRC settings and move the device away from the board "
                "outline if needed."),
-        "board_outline_clearance_violation", locations) {
+        "copper_board_clearance_violation", locations) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
   mApproval.ensureLineBreak();
@@ -470,12 +470,12 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
   mApproval.ensureLineBreak();
 }
 
-DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
+DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
     const BI_Plane& plane, const UnsignedLength& minClearance,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
-        tr("Clearance board outline ↔ plane < %1 %2",
+        tr("Clearance plane ↔ board outline < %1 %2",
            "Placeholders: Clearance value, unit")
             .arg(minClearance->toMmString(), "mm"),
         tr("The clearance between a plane and the board outline is smaller "
@@ -484,18 +484,18 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
             " " % seriousTroublesTr() % "\n\n" %
             tr("Check the DRC settings and increase the configured plane "
                "clearance if needed."),
-        "board_outline_clearance_violation", locations) {
+        "copper_board_clearance_violation", locations) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("plane", plane.getUuid());
   mApproval.ensureLineBreak();
 }
 
-DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
+DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
     const BI_Device* device, const Polygon& polygon,
     const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
-        tr("Clearance board outline ↔ polygon < %1 %2",
+        tr("Clearance copper polygon ↔ board outline < %1 %2",
            "Placeholders: Clearance value, unit")
             .arg(minClearance->toMmString(), "mm"),
         tr("The clearance between a polygon and the board outline is smaller "
@@ -503,7 +503,7 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
             "\n\n" %
             tr("Check the DRC settings and move the polygon away from the "
                "board outline if needed."),
-        "board_outline_clearance_violation", locations) {
+        "copper_board_clearance_violation", locations) {
   mApproval.ensureLineBreak();
   if (device) {
     mApproval.appendChild("device", device->getComponentInstanceUuid());
@@ -513,12 +513,12 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
   mApproval.ensureLineBreak();
 }
 
-DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
+DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
     const BI_Device* device, const Circle& circle,
     const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
-        tr("Clearance board outline ↔ circle < %1 %2",
+        tr("Clearance copper circle ↔ board outline < %1 %2",
            "Placeholders: Clearance value, unit")
             .arg(minClearance->toMmString(), "mm"),
         tr("The clearance between a circle and the board outline is smaller "
@@ -526,7 +526,7 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
             "\n\n" %
             tr("Check the DRC settings and move the circle away from the board "
                "outline if needed."),
-        "board_outline_clearance_violation", locations) {
+        "copper_board_clearance_violation", locations) {
   mApproval.ensureLineBreak();
   if (device) {
     mApproval.appendChild("device", device->getComponentInstanceUuid());
@@ -536,12 +536,12 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
   mApproval.ensureLineBreak();
 }
 
-DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
+DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
     const BI_Device* device, const StrokeText& strokeText,
     const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
-        tr("Clearance board outline ↔ text < %1 %2",
+        tr("Clearance copper text ↔ board outline < %1 %2",
            "Placeholders: Clearance value, unit")
             .arg(minClearance->toMmString(), "mm"),
         tr("The clearance between a stroke text and the board outline is "
@@ -550,7 +550,7 @@ DrcMsgBoardOutlineClearanceViolation::DrcMsgBoardOutlineClearanceViolation(
             "\n\n" %
             tr("Check the DRC settings and move the stroke text away from the "
                "board outline if needed."),
-        "board_outline_clearance_violation", locations) {
+        "copper_board_clearance_violation", locations) {
   mApproval.ensureLineBreak();
   if (device) {
     mApproval.appendChild("device", device->getComponentInstanceUuid());
@@ -577,7 +577,7 @@ DrcMsgCopperHoleClearanceViolation::DrcMsgCopperHoleClearanceViolation(
             " " % seriousTroublesTr() % "\n\n" %
             tr("Check the DRC settings and move the copper objects away from "
                "the hole if needed."),
-        "hole_clearance_violation", locations) {
+        "copper_hole_clearance_violation", locations) {
   mApproval.ensureLineBreak();
   if (device) {
     mApproval.appendChild("device", device->getComponentInstanceUuid());
