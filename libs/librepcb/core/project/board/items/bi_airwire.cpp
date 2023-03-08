@@ -23,6 +23,7 @@
 #include "bi_airwire.h"
 
 #include "../../circuit/netsignal.h"
+#include "bi_netline.h"
 
 #include <QtCore>
 
@@ -36,12 +37,20 @@ namespace librepcb {
  ******************************************************************************/
 
 BI_AirWire::BI_AirWire(Board& board, const NetSignal& netsignal,
-                       const Point& p1, const Point& p2)
+                       const BI_NetLineAnchor& p1, const BI_NetLineAnchor& p2)
   : BI_Base(board), mNetSignal(netsignal), mP1(p1), mP2(p2) {
   mGraphicsItem.reset(new BGI_AirWire(*this));
 }
 
 BI_AirWire::~BI_AirWire() noexcept {
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+bool BI_AirWire::isVertical() const noexcept {
+  return (mP1.getPosition() == mP2.getPosition());
 }
 
 /*******************************************************************************

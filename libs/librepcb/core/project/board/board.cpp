@@ -88,7 +88,10 @@ Board::Board(Project& project,
     mName(name),
     mDefaultFontFileName(qApp->getDefaultStrokeFontName()),
     mGridInterval(635000),
-    mGridUnit(LengthUnit::millimeters()) {
+    mGridUnit(LengthUnit::millimeters()),
+    mDrcMessageApprovalsVersion(qApp->getFileFormatVersion()),
+    mDrcMessageApprovals(),
+    mSupportedDrcMessageApprovals() {
   if (mDirectoryName.isEmpty()) {
     throw LogicError(__FILE__, __LINE__);
   }
@@ -189,6 +192,56 @@ void Board::setDesignRules(const BoardDesignRules& rules) noexcept {
 void Board::setDrcSettings(
     const BoardDesignRuleCheckSettings& settings) noexcept {
   *mDrcSettings = settings;
+}
+
+/*******************************************************************************
+ *  DRC Message Approval Methods
+ ******************************************************************************/
+
+void Board::loadDrcMessageApprovals(
+    const Version& version, const QSet<SExpression>& approvals) noexcept {
+  mDrcMessageApprovalsVersion = version;
+  mDrcMessageApprovals = approvals;
+}
+
+bool Board::updateDrcMessageApprovals(QSet<SExpression> approvals,
+                                      bool partialRun) noexcept {
+  mSupportedDrcMessageApprovals |= approvals;
+
+  // Don't remove obsolete approvals after a partial DRC run because we would
+  // loose all approvals which don't occur during the partial run!
+  if (partialRun) {
+    return false;
+  }
+
+  // When running the DRC the first time after a file format upgrade, remove
+  // all approvals not occurring anymore to clean up obsolete approvals from
+  // the board file.
+  if (mDrcMessageApprovalsVersion < qApp->getFileFormatVersion()) {
+    mDrcMessageApprovalsVersion = qApp->getFileFormatVersion();
+    mDrcMessageApprovals &= approvals;
+    return true;
+  }
+
+  // Remove only approvals which disappeared during this session to avoid
+  // removing approvals added by newer minor application versions.
+  approvals =
+      mDrcMessageApprovals - (mSupportedDrcMessageApprovals - approvals);
+  if (approvals != mDrcMessageApprovals) {
+    mDrcMessageApprovals = approvals;
+    return true;
+  }
+
+  return false;
+}
+
+void Board::setDrcMessageApproved(const SExpression& approval,
+                                  bool approved) noexcept {
+  if (approved) {
+    mDrcMessageApprovals.insert(approval);
+  } else {
+    mDrcMessageApprovals.remove(approval);
+  }
 }
 
 /*******************************************************************************
@@ -412,12 +465,13 @@ void Board::triggerAirWiresRebuild() noexcept {
       if (netsignal && netsignal->isAddedToCircuit()) {
         // calculate new airwires
         BoardAirWiresBuilder builder(*this, *netsignal);
-        QVector<QPair<Point, Point>> airwires = builder.buildAirWires();
+        QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
+            airwires = builder.buildAirWires();
 
         // add new airwires
         foreach (const auto& points, airwires) {
           QScopedPointer<BI_AirWire> airWire(
-              new BI_AirWire(*this, *netsignal, points.first, points.second));
+              new BI_AirWire(*this, *netsignal, *points.first, *points.second));
           airWire->addToBoard();  // can throw
           mAirWires.insertMulti(netsignal, airWire.take());
         }
@@ -633,7 +687,17 @@ void Board::save() {
     root.ensureLineBreak();
     mDesignRules->serialize(root.appendList("design_rules"));
     root.ensureLineBreak();
-    mDrcSettings->serialize(root.appendList("design_rule_check"));
+    {
+      SExpression& node = root.appendList("design_rule_check");
+      mDrcSettings->serialize(node);
+      node.appendChild("approvals_version", mDrcMessageApprovalsVersion);
+      node.ensureLineBreak();
+      foreach (const SExpression& child,
+               Toolbox::sortedQSet(mDrcMessageApprovals)) {
+        node.appendChild(child);
+        node.ensureLineBreak();
+      }
+    }
     root.ensureLineBreak();
     mFabricationOutputSettings->serialize(
         root.appendList("fabrication_output_settings"));

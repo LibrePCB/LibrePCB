@@ -525,8 +525,17 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   board->getLayerStack().setInnerLayerCount(
       deserialize<uint>(root.getChild("layers/inner/@0")));
   board->setDesignRules(BoardDesignRules(root.getChild("design_rules")));
-  board->setDrcSettings(
-      BoardDesignRuleCheckSettings(root.getChild("design_rule_check")));
+  {
+    const SExpression& node = root.getChild("design_rule_check");
+    const Version approvalsVersion =
+        deserialize<Version>(node.getChild("approvals_version/@0"));
+    QSet<SExpression> approvals;
+    foreach (const SExpression* child, node.getChildren("approved")) {
+      approvals.insert(*child);
+    }
+    board->setDrcSettings(BoardDesignRuleCheckSettings(node));
+    board->loadDrcMessageApprovals(approvalsVersion, approvals);
+  }
   board->getFabricationOutputSettings() = BoardFabricationOutputSettings(
       root.getChild("fabrication_output_settings"));
   p.addBoard(*board);

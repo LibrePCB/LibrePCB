@@ -46,7 +46,7 @@ class AirWiresBuilder final {
 
 public:
   // Types
-  typedef QPair<Point, Point> AirWire;
+  typedef std::pair<int, int> AirWire;
   typedef QVector<AirWire> AirWires;
 
   // Constructors / Destructor
@@ -88,7 +88,7 @@ public:
   /**
    * @brief Build the air wires
    *
-   * @return Coordinates of air wires
+   * @return IDs of air wires
    */
   AirWires buildAirWires() noexcept;
 

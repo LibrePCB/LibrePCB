@@ -26,6 +26,7 @@
 #include "../board.h"
 #include "../boardlayerstack.h"
 #include "../items/bi_airwire.h"
+#include "../items/bi_netline.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -67,19 +68,19 @@ void BGI_AirWire::updateCacheAndRepaint() noexcept {
   mLines.clear();
   if (mAirWire.isVertical()) {
     Length size(200000);
-    Point p1 = mAirWire.getP1() + Point(size, size);
-    Point p2 = mAirWire.getP1() - Point(size, size);
-    Point p3 = mAirWire.getP1() + Point(size, -size);
-    Point p4 = mAirWire.getP1() - Point(size, -size);
+    Point p1 = mAirWire.getP1().getPosition() + Point(size, size);
+    Point p2 = mAirWire.getP1().getPosition() - Point(size, size);
+    Point p3 = mAirWire.getP1().getPosition() + Point(size, -size);
+    Point p4 = mAirWire.getP1().getPosition() - Point(size, -size);
     mLines.append(QLineF(p1.toPxQPointF(), p2.toPxQPointF()));
     mLines.append(QLineF(p3.toPxQPointF(), p4.toPxQPointF()));
     mBoundingRect = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
   } else {
-    mLines.append(
-        QLineF(mAirWire.getP1().toPxQPointF(), mAirWire.getP2().toPxQPointF()));
-    mBoundingRect =
-        QRectF(mAirWire.getP1().toPxQPointF(), mAirWire.getP2().toPxQPointF())
-            .normalized();
+    mLines.append(QLineF(mAirWire.getP1().getPosition().toPxQPointF(),
+                         mAirWire.getP2().getPosition().toPxQPointF()));
+    mBoundingRect = QRectF(mAirWire.getP1().getPosition().toPxQPointF(),
+                           mAirWire.getP2().getPosition().toPxQPointF())
+                        .normalized();
   }
 
   update();

@@ -40,7 +40,6 @@
 #include "../bomgeneratordialog.h"
 #include "../projecteditor.h"
 #include "../projectpropertieseditordialog.h"
-#include "boarddesignrulecheckmessagesdock.h"
 #include "boardlayersdock.h"
 #include "boardpickplacegeneratordialog.h"
 #include "boardsetupdialog.h"
@@ -244,7 +243,9 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
     mDockLayers->setActiveBoard(mActiveBoard);
     mDockDrc->setInteractive(mActiveBoard != nullptr);
     mDockDrc->setMessages(mActiveBoard ? mDrcMessages[mActiveBoard->getUuid()]
-                                       : QList<BoardDesignRuleCheckMessage>());
+                                       : tl::nullopt);
+    mDockDrc->setApprovals(mActiveBoard ? mActiveBoard->getDrcMessageApprovals()
+                                        : QSet<SExpression>());
 
     // update toolbars
     mActionGridProperties->setEnabled(mActiveBoard != nullptr);
@@ -741,18 +742,20 @@ void BoardEditor::createDockWidgets() noexcept {
   tabifyDockWidget(mDockLayers.data(), mDockErc.data());
 
   // DRC Messages.
-  mDockDrc.reset(new BoardDesignRuleCheckMessagesDock(this));
+  mDockDrc.reset(
+      new RuleCheckDock(RuleCheckDock::Mode::BoardDesignRuleCheck, this));
+  mDockDrc->setObjectName("dockDrc");
   mDockDrc->setInteractive(false);
-  connect(mDockDrc.data(),
-          &BoardDesignRuleCheckMessagesDock::settingsDialogRequested, this,
+  connect(mDockDrc.data(), &RuleCheckDock::settingsDialogRequested, this,
           [this]() { execBoardSetupDialog(true); });
-  connect(mDockDrc.data(), &BoardDesignRuleCheckMessagesDock::runDrcRequested,
-          this, [this]() { runDrc(false); });
-  connect(mDockDrc.data(),
-          &BoardDesignRuleCheckMessagesDock::runQuickCheckRequested, this,
+  connect(mDockDrc.data(), &RuleCheckDock::runDrcRequested, this,
+          [this]() { runDrc(false); });
+  connect(mDockDrc.data(), &RuleCheckDock::runQuickCheckRequested, this,
           [this]() { runDrc(true); });
-  connect(mDockDrc.data(), &BoardDesignRuleCheckMessagesDock::messageSelected,
-          this, &BoardEditor::highlightDrcMessage);
+  connect(mDockDrc.data(), &RuleCheckDock::messageSelected, this,
+          &BoardEditor::highlightDrcMessage);
+  connect(mDockDrc.data(), &RuleCheckDock::messageApprovalRequested, this,
+          &BoardEditor::setDrcMessageApproved);
   addDockWidget(Qt::RightDockWidgetArea, mDockDrc.data());
   tabifyDockWidget(mDockErc.data(), mDockDrc.data());
 
@@ -1057,23 +1060,37 @@ void BoardEditor::runDrc(bool quick) noexcept {
     });
 
     // Run the DRC.
+    QElapsedTimer timer;
+    timer.start();
     BoardDesignRuleCheck drc(*board, board->getDrcSettings());
     connect(&drc, &BoardDesignRuleCheck::progressPercent, mDockDrc.data(),
-            &BoardDesignRuleCheckMessagesDock::setProgressPercent);
+            &RuleCheckDock::setProgressPercent);
     connect(&drc, &BoardDesignRuleCheck::progressStatus, mDockDrc.data(),
-            &BoardDesignRuleCheckMessagesDock::setProgressStatus);
+            &RuleCheckDock::setProgressStatus);
     drc.execute(quick);  // can throw
 
     // Update DRC messages.
     clearDrcMarker();
     mDrcMessages.insert(board->getUuid(), drc.getMessages());
     mDockDrc->setMessages(drc.getMessages());
+
+    // Detect & remove disappeared messages.
+    const QSet<SExpression> approvals =
+        RuleCheckMessage::getAllApprovals(drc.getMessages());
+    if (board->updateDrcMessageApprovals(approvals, quick)) {
+      mDockDrc->setApprovals(board->getDrcMessageApprovals());
+      mProjectEditor.setManualModificationsMade();
+    }
+
+    // Print how long it took.
+    qDebug() << (quick ? "Quick check" : "DRC") << "succeeded after"
+             << timer.elapsed() << "ms.";
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
   }
 }
 
-void BoardEditor::highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
+void BoardEditor::highlightDrcMessage(const RuleCheckMessage& msg,
                                       bool zoomTo) noexcept {
   if (msg.getLocations().isEmpty()) {
     // Position on board not known.
@@ -1097,6 +1114,15 @@ void BoardEditor::highlightDrcMessage(const BoardDesignRuleCheckMessage& msg,
     if (zoomTo) {
       mUi->graphicsView->zoomToRect(rect);
     }
+  }
+}
+
+void BoardEditor::setDrcMessageApproved(const RuleCheckMessage& msg,
+                                        bool approved) noexcept {
+  if (Board* board = getActiveBoard()) {
+    board->setDrcMessageApproved(msg.getApproval(), approved);
+    mDockDrc->setApprovals(board->getDrcMessageApprovals());
+    mProjectEditor.setManualModificationsMade();
   }
 }
 

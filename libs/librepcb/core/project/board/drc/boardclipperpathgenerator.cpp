@@ -60,270 +60,224 @@ BoardClipperPathGenerator::~BoardClipperPathGenerator() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void BoardClipperPathGenerator::addBoardOutline() {
-  // board polygons
-  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (polygon->getPolygon().getLayerName() != GraphicsLayer::sBoardOutlines) {
-      continue;
-    }
-    ClipperHelpers::unite(
-        mPaths,
-        ClipperHelpers::convert(polygon->getPolygon().getPath(),
-                                mMaxArcTolerance));
-  }
-
-  // footprint polygons
-  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    Transform transform(*device);
-    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      if (polygon.getLayerName() != GraphicsLayer::sBoardOutlines) {
-        continue;
-      }
-      Path path = transform.map(polygon.getPath());
-      ClipperHelpers::unite(mPaths,
-                            ClipperHelpers::convert(path, mMaxArcTolerance));
-    }
-  }
-}
-
-void BoardClipperPathGenerator::addHoles(const Length& offset) {
-  // board holes
-  foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    Length diameter = hole->getHole().getDiameter() + (offset * 2);
-    if (diameter <= 0) {
-      continue;
-    }
-    const QVector<Path> areas =
-        hole->getHole().getPath()->toOutlineStrokes(PositiveLength(diameter));
-    foreach (const Path& area, areas) {
-      ClipperHelpers::unite(mPaths,
-                            ClipperHelpers::convert(area, mMaxArcTolerance));
-    }
-  }
-
-  // footprint holes
-  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    Transform transform(*device);
-    for (const Hole& hole : device->getLibFootprint().getHoles()) {
-      Length diameter = hole.getDiameter() + (offset * 2);
-      if (diameter <= 0) {
-        continue;
-      }
-      const QVector<Path> areas =
-          transform.map(hole.getPath())
-              ->toOutlineStrokes(PositiveLength(diameter));
-      foreach (const Path& area, areas) {
-        ClipperHelpers::unite(mPaths,
-                              ClipperHelpers::convert(area, mMaxArcTolerance));
-      }
-    }
-  }
-}
-
 void BoardClipperPathGenerator::addCopper(
     const QString& layerName, const QSet<const NetSignal*>& netsignals,
     bool ignorePlanes) {
-  // polygons
+  // Board polygons.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (polygon->getPolygon().getLayerName() != layerName) {
-      continue;
-    }
-    if ((!netsignals.isEmpty()) && (!netsignals.contains(nullptr))) {
-      continue;
-    }
-    // outline
-    if (polygon->getPolygon().getLineWidth() > 0) {
-      QVector<Path> paths = polygon->getPolygon().getPath().toOutlineStrokes(
-          PositiveLength(*polygon->getPolygon().getLineWidth()));
-      foreach (const Path& p, paths) {
-        ClipperHelpers::unite(mPaths,
-                              ClipperHelpers::convert(p, mMaxArcTolerance));
-      }
-    }
-    // area (only fill closed paths, for consistency with the appearance in the
-    // board editor and Gerber output)
-    if (polygon->getPolygon().isFilled() &&
-        polygon->getPolygon().getPath().isClosed()) {
-      ClipperHelpers::unite(
-          mPaths,
-          ClipperHelpers::convert(polygon->getPolygon().getPath(),
-                                  mMaxArcTolerance));
+    if ((polygon->getPolygon().getLayerName() == layerName) &&
+        (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
+      addPolygon(*polygon);
     }
   }
 
-  // stroke texts
-  foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
-    if (text->getText().getLayerName() != layerName) {
-      continue;
-    }
-    if ((!netsignals.isEmpty()) && (!netsignals.contains(nullptr))) {
-      continue;
-    }
-    PositiveLength width(qMax(*text->getText().getStrokeWidth(), Length(1)));
-    Transform transform(text->getText());
-    foreach (Path path, transform.map(text->generatePaths())) {
-      QVector<Path> paths = path.toOutlineStrokes(width);
-      foreach (const Path& p, paths) {
-        ClipperHelpers::unite(mPaths,
-                              ClipperHelpers::convert(p, mMaxArcTolerance));
-      }
+  // Stroke texts.
+  foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
+    if ((strokeText->getText().getLayerName() == layerName) &&
+        (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
+      addStrokeText(*strokeText);
     }
   }
 
-  // planes
+  // Planes.
   if (!ignorePlanes) {
     foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-      if (plane->getLayerName() != layerName) {
-        continue;
-      }
-      if ((!netsignals.isEmpty()) &&
-          (!netsignals.contains(&plane->getNetSignal()))) {
-        continue;
-      }
-      foreach (const Path& p, plane->getFragments()) {
-        ClipperHelpers::unite(mPaths,
-                              ClipperHelpers::convert(p, mMaxArcTolerance));
+      if ((plane->getLayerName() == layerName) &&
+          (netsignals.isEmpty() ||
+           netsignals.contains(&plane->getNetSignal()))) {
+        addPlane(*plane);
       }
     }
   }
 
-  // devices
+  // Devices.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     Transform transform(*device);
 
-    // polygons
+    // Polygons.
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      GraphicsLayerName polygonLayer = transform.map(polygon.getLayerName());
-      if (polygonLayer != layerName) {
-        continue;
-      }
-      if ((!netsignals.isEmpty()) && (!netsignals.contains(nullptr))) {
-        continue;
-      }
-      Path path = transform.map(polygon.getPath());
-      // outline
-      if (polygon.getLineWidth() > 0) {
-        QVector<Path> paths =
-            path.toOutlineStrokes(PositiveLength(*polygon.getLineWidth()));
-        foreach (const Path& p, paths) {
-          ClipperHelpers::unite(mPaths,
-                                ClipperHelpers::convert(p, mMaxArcTolerance));
-        }
-      }
-      // area (only fill closed paths, for consistency with the appearance in
-      // the board editor and Gerber output)
-      if (polygon.isFilled() && path.isClosed()) {
-        ClipperHelpers::unite(mPaths,
-                              ClipperHelpers::convert(path, mMaxArcTolerance));
+      const GraphicsLayerName polygonLayer =
+          transform.map(polygon.getLayerName());
+      if ((polygonLayer == layerName) &&
+          (netsignals.isEmpty() || netsignals.contains(nullptr))) {
+        addPolygon(polygon, transform);
       }
     }
 
-    // circles
+    // Circles.
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
-      GraphicsLayerName circleLayer = transform.map(circle.getLayerName());
-      if (circleLayer != layerName) {
-        continue;
-      }
-      if ((!netsignals.isEmpty()) && (!netsignals.contains(nullptr))) {
-        continue;
-      }
-      Path path = Path::circle(circle.getDiameter())
-                      .translated(transform.map(circle.getCenter()));
-      // outline
-      if (circle.getLineWidth() > 0) {
-        QVector<Path> paths =
-            path.toOutlineStrokes(PositiveLength(*circle.getLineWidth()));
-        foreach (const Path& p, paths) {
-          ClipperHelpers::unite(mPaths,
-                                ClipperHelpers::convert(p, mMaxArcTolerance));
-        }
-      }
-      // area
-      if (circle.isFilled()) {
-        ClipperHelpers::unite(mPaths,
-                              ClipperHelpers::convert(path, mMaxArcTolerance));
+      const GraphicsLayerName circleLayer =
+          transform.map(circle.getLayerName());
+      if ((circleLayer == layerName) &&
+          (netsignals.isEmpty() || netsignals.contains(nullptr))) {
+        addCircle(circle, transform);
       }
     }
 
-    // stroke texts
-    foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
+    // Stroke texts.
+    foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
-      if (*text->getText().getLayerName() != layerName) {
-        continue;
-      }
-      if ((!netsignals.isEmpty()) && (!netsignals.contains(nullptr))) {
-        continue;
-      }
-      PositiveLength width(qMax(*text->getText().getStrokeWidth(), Length(1)));
-      Transform transform(text->getText());
-      foreach (Path path, transform.map(text->generatePaths())) {
-        foreach (const Path& p, path.toOutlineStrokes(width)) {
-          ClipperHelpers::unite(mPaths,
-                                ClipperHelpers::convert(p, mMaxArcTolerance));
-        }
+      if ((*strokeText->getText().getLayerName() == layerName) &&
+          (netsignals.isEmpty() || netsignals.contains(nullptr))) {
+        addStrokeText(*strokeText);
       }
     }
 
-    // pads
+    // Pads.
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      if (!pad->isOnLayer(layerName)) {
-        continue;
-      }
-      if ((!netsignals.isEmpty()) &&
-          (!netsignals.contains(pad->getCompSigInstNetSignal()))) {
-        continue;
-      }
-      const Transform padTransform(pad->getLibPad().getPosition(),
-                                   pad->getLibPad().getRotation());
-      foreach (const PadGeometry& geometry,
-               pad->getGeometryOnLayer(layerName)) {
-        foreach (const Path& outline, geometry.toOutlines()) {
-          ClipperHelpers::unite(
-              mPaths,
-              ClipperHelpers::convert(transform.map(padTransform.map(outline)),
-                                      mMaxArcTolerance));
-        }
-        // Also add each hole to ensure correct copper areas even if
-        // the pad outline is too small or invalid.
-        for (const PadHole& hole : geometry.getHoles()) {
-          foreach (const Path& outline,
-                   hole.getPath()->toOutlineStrokes(hole.getDiameter())) {
-            ClipperHelpers::unite(mPaths,
-                                  ClipperHelpers::convert(
-                                      transform.map(padTransform.map(outline)),
-                                      mMaxArcTolerance));
-          }
-        }
+      if (pad->isOnLayer(layerName) &&
+          (netsignals.isEmpty() ||
+           netsignals.contains(pad->getCompSigInstNetSignal()))) {
+        addPad(*pad, transform, layerName);
       }
     }
   }
 
-  // net segment items
+  // Net segment items.
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
-    if ((!netsignals.isEmpty()) &&
-        (!netsignals.contains(netsegment->getNetSignal()))) {
-      continue;
-    }
-
-    // vias
-    foreach (const BI_Via* via, netsegment->getVias()) {
-      if (!via->isOnLayer(layerName)) {
-        continue;
+    if (netsignals.isEmpty() ||
+        netsignals.contains(netsegment->getNetSignal())) {
+      // Vias.
+      foreach (const BI_Via* via, netsegment->getVias()) {
+        if (via->isOnLayer(layerName)) {
+          addVia(*via);
+        }
       }
+
+      // Net lines.
+      foreach (const BI_NetLine* netLine, netsegment->getNetLines()) {
+        if (netLine->getLayer().getName() == layerName) {
+          addNetLine(*netLine);
+        }
+      }
+    }
+  }
+}
+
+void BoardClipperPathGenerator::addVia(const BI_Via& via,
+                                       const Length& offset) {
+  ClipperHelpers::unite(
+      mPaths,
+      ClipperHelpers::convert(via.getVia().getSceneOutline(offset),
+                              mMaxArcTolerance));
+}
+
+void BoardClipperPathGenerator::addNetLine(const BI_NetLine& netLine,
+                                           const Length& offset) {
+  ClipperHelpers::unite(mPaths,
+                        ClipperHelpers::convert(netLine.getSceneOutline(offset),
+                                                mMaxArcTolerance));
+}
+
+void BoardClipperPathGenerator::addPlane(const BI_Plane& plane) {
+  foreach (const Path& p, plane.getFragments()) {
+    ClipperHelpers::unite(mPaths, ClipperHelpers::convert(p, mMaxArcTolerance));
+  }
+}
+
+void BoardClipperPathGenerator::addPolygon(const BI_Polygon& polygon) {
+  addPolygon(polygon.getPolygon(), Transform());
+}
+
+void BoardClipperPathGenerator::addPolygon(const Polygon& polygon,
+                                           const Transform& transform) {
+  const Path path = transform.map(polygon.getPath());
+
+  // Outline.
+  if (polygon.getLineWidth() > 0) {
+    QVector<Path> paths =
+        path.toOutlineStrokes(PositiveLength(*polygon.getLineWidth()));
+    foreach (const Path& p, paths) {
+      ClipperHelpers::unite(mPaths,
+                            ClipperHelpers::convert(p, mMaxArcTolerance));
+    }
+  }
+
+  // Area (only fill closed paths, for consistency with the appearance in
+  // the board editor and Gerber output).
+  if (polygon.isFilled() && path.isClosed()) {
+    ClipperHelpers::unite(mPaths,
+                          ClipperHelpers::convert(path, mMaxArcTolerance));
+  }
+}
+
+void BoardClipperPathGenerator::addCircle(const Circle& circle,
+                                          const Transform& transform,
+                                          const Length& offset) {
+  const PositiveLength diameter(
+      std::max(*circle.getDiameter() + (offset * 2), Length(1)));
+  const Path path =
+      Path::circle(diameter).translated(transform.map(circle.getCenter()));
+
+  // Outline.
+  if (circle.getLineWidth() > 0) {
+    QVector<Path> paths =
+        path.toOutlineStrokes(PositiveLength(*circle.getLineWidth()));
+    foreach (const Path& p, paths) {
+      ClipperHelpers::unite(mPaths,
+                            ClipperHelpers::convert(p, mMaxArcTolerance));
+    }
+  }
+
+  // Area.
+  if (circle.isFilled()) {
+    ClipperHelpers::unite(mPaths,
+                          ClipperHelpers::convert(path, mMaxArcTolerance));
+  }
+}
+
+void BoardClipperPathGenerator::addStrokeText(const BI_StrokeText& strokeText,
+                                              const Length& offset) {
+  const PositiveLength width(
+      qMax(*strokeText.getText().getStrokeWidth() + (offset * 2), Length(1)));
+  const Transform transform(strokeText.getText());
+  foreach (const Path path, transform.map(strokeText.generatePaths())) {
+    QVector<Path> paths = path.toOutlineStrokes(width);
+    foreach (const Path& p, paths) {
+      ClipperHelpers::unite(mPaths,
+                            ClipperHelpers::convert(p, mMaxArcTolerance));
+    }
+  }
+}
+
+void BoardClipperPathGenerator::addHole(const Hole& hole,
+                                        const Transform& transform,
+                                        const Length& offset) {
+  const PositiveLength width(
+      std::max(*hole.getDiameter() + offset + offset, Length(1)));
+  const Path path = transform.map(*hole.getPath());
+  ClipperHelpers::unite(
+      mPaths,
+      ClipperHelpers::convert(path.toOutlineStrokes(width), mMaxArcTolerance));
+}
+
+void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,
+                                       const Transform& transform,
+                                       const QString& layerName,
+                                       const Length& offset) {
+  const Transform padTransform(pad.getLibPad().getPosition(),
+                               pad.getLibPad().getRotation());
+  foreach (PadGeometry geometry, pad.getGeometryOnLayer(layerName)) {
+    if (offset != 0) {
+      geometry = geometry.withOffset(offset);
+    }
+    foreach (const Path& outline, geometry.toOutlines()) {
       ClipperHelpers::unite(
           mPaths,
-          ClipperHelpers::convert(via->getVia().getSceneOutline(),
+          ClipperHelpers::convert(transform.map(padTransform.map(outline)),
                                   mMaxArcTolerance));
     }
 
-    // netlines
-    foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
-      if (&netline->getLayer().getName() != layerName) {
-        continue;
+    // Also add each hole to ensure correct copper areas even if
+    // the pad outline is too small or invalid.
+    for (const PadHole& hole : geometry.getHoles()) {
+      foreach (const Path& outline,
+               hole.getPath()->toOutlineStrokes(hole.getDiameter())) {
+        ClipperHelpers::unite(
+            mPaths,
+            ClipperHelpers::convert(transform.map(padTransform.map(outline)),
+                                    mMaxArcTolerance));
       }
-      ClipperHelpers::unite(mPaths,
-                            ClipperHelpers::convert(netline->getSceneOutline(),
-                                                    mMaxArcTolerance));
     }
   }
 }
