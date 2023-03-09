@@ -93,6 +93,7 @@ private:  // Methods
   void checkAllowedPthSlots(int progressEnd);
   void checkInvalidPadConnections(int progressEnd);
   void checkCourtyardClearances(int progressEnd);
+  void checkBoardOutline(int progressEnd);
   void checkForUnplacedComponents(int progressEnd);
   void checkForMissingConnections(int progressEnd);
   void checkForStaleObjects(int progressEnd);

@@ -85,6 +85,7 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings() noexcept
     mMinPthDrillDiameter(300000),  // 300um
     mMinNpthSlotWidth(1000000),  // 1mm
     mMinPthSlotWidth(700000),  // 0.7mm
+    mMinOutlineToolDiameter(2000000),  // 2mm
     mAllowedNpthSlots(AllowedSlots::SingleSegmentStraight),
     mAllowedPthSlots(AllowedSlots::SingleSegmentStraight) {
 }
@@ -120,6 +121,8 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings(
         deserialize<UnsignedLength>(node.getChild("min_npth_slot_width/@0"))),
     mMinPthSlotWidth(
         deserialize<UnsignedLength>(node.getChild("min_pth_slot_width/@0"))),
+    mMinOutlineToolDiameter(deserialize<UnsignedLength>(
+        node.getChild("min_outline_tool_diameter/@0"))),
     mAllowedNpthSlots(
         deserialize<AllowedSlots>(node.getChild("allowed_npth_slots/@0"))),
     mAllowedPthSlots(
@@ -157,6 +160,8 @@ void BoardDesignRuleCheckSettings::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("min_pth_slot_width", mMinPthSlotWidth);
   root.ensureLineBreak();
+  root.appendChild("min_outline_tool_diameter", mMinOutlineToolDiameter);
+  root.ensureLineBreak();
   root.appendChild("allowed_npth_slots", mAllowedNpthSlots);
   root.ensureLineBreak();
   root.appendChild("allowed_pth_slots", mAllowedPthSlots);
@@ -180,6 +185,7 @@ BoardDesignRuleCheckSettings& BoardDesignRuleCheckSettings::operator=(
   mMinPthDrillDiameter = rhs.mMinPthDrillDiameter;
   mMinNpthSlotWidth = rhs.mMinNpthSlotWidth;
   mMinPthSlotWidth = rhs.mMinPthSlotWidth;
+  mMinOutlineToolDiameter = rhs.mMinOutlineToolDiameter;
   mAllowedNpthSlots = rhs.mAllowedNpthSlots;
   mAllowedPthSlots = rhs.mAllowedPthSlots;
   return *this;
@@ -198,6 +204,7 @@ bool BoardDesignRuleCheckSettings::operator==(
   if (mMinPthDrillDiameter != rhs.mMinPthDrillDiameter) return false;
   if (mMinNpthSlotWidth != rhs.mMinNpthSlotWidth) return false;
   if (mMinPthSlotWidth != rhs.mMinPthSlotWidth) return false;
+  if (mMinOutlineToolDiameter != rhs.mMinOutlineToolDiameter) return false;
   if (mAllowedNpthSlots != rhs.mAllowedNpthSlots) return false;
   if (mAllowedPthSlots != rhs.mAllowedPthSlots) return false;
   return true;

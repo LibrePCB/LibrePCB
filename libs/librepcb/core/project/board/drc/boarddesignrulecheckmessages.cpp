@@ -147,6 +147,86 @@ void DrcMsgMissingConnection::serializeAnchor(SExpression& node,
 }
 
 /*******************************************************************************
+ *  DrcMsgMissingBoardOutline
+ ******************************************************************************/
+
+DrcMsgMissingBoardOutline::DrcMsgMissingBoardOutline() noexcept
+  : RuleCheckMessage(Severity::Error, tr("Missing board outline"),
+                     tr("There's no board outline defined at all, so the board "
+                        "cannot be manufactured.") %
+                         "\n\n" %
+                         tr("Add a closed, zero-width polygon on the layer "
+                            "'%1' to draw the board outline.")
+                             .arg(GraphicsLayer::getTranslation(
+                                 GraphicsLayer::sBoardOutlines)),
+                     "missing_board_outline", {}) {
+}
+
+/*******************************************************************************
+ *  DrcMsgMultipleBoardOutlines
+ ******************************************************************************/
+
+DrcMsgMultipleBoardOutlines::DrcMsgMultipleBoardOutlines(
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Warning, tr("Multiple board outlines"),
+        tr("There are multiple, independent board outlines defined.") % "\n\n" %
+            tr("Either add only a single board outline or make sure the PCB "
+               "manufacturer can handle production data containing multiple "
+               "PCBs."),
+        "multiple_board_outlines", locations) {
+}
+
+/*******************************************************************************
+ *  DrcMsgOpenBoardOutlinePolygon
+ ******************************************************************************/
+
+DrcMsgOpenBoardOutlinePolygon::DrcMsgOpenBoardOutlinePolygon(
+    const BI_Device* device, const Polygon& polygon,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error, tr("Non-closed board outline"),
+        tr("The board outline polygon is not closed, i.e. the last vertex is "
+           "not at the same coordinate as the first vertex.") %
+            " " % seriousTroublesTr() % "\n\n" %
+            tr("Replace multiple coincident polygons with a single, connected "
+               "polygon and append an explicit last vertex to make the polygon "
+               "closed."),
+        "open_board_outline", locations) {
+  mApproval.ensureLineBreak();
+  if (device) {
+    mApproval.appendChild("device", device->getComponentInstanceUuid());
+    mApproval.ensureLineBreak();
+  }
+  mApproval.appendChild("polygon", polygon.getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
+ *  DrcMsgMinimumBoardOutlineInnerRadiusViolation
+ ******************************************************************************/
+
+DrcMsgMinimumBoardOutlineInnerRadiusViolation::
+    DrcMsgMinimumBoardOutlineInnerRadiusViolation(
+        const UnsignedLength& minRadius,
+        const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Board outline inner radius < %1 %2",
+           "Placeholders: Minimum radius, unit")
+            .arg(minRadius->toMmString(), "mm"),
+        tr("The board outline polygon is not manufacturable with the minimum "
+           "tool diameter configured in the DRC settings due to edges with a "
+           "smaller radius. Thus the actually produced board outline might "
+           "contain larger edge radii and too small cutouts might even be "
+           "missing completely.") %
+            "\n\n" %
+            tr("Check the DRC settings and add/increase the radius of inner "
+               "board edges if needed."),
+        "minimum_board_inner_radius_violation", locations) {
+}
+
+/*******************************************************************************
  *  DrcMsgEmptyNetSegment
  ******************************************************************************/
 

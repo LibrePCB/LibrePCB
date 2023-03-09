@@ -108,7 +108,8 @@ void BoardDesignRuleCheck::execute(bool quick) {
     checkAllowedNpthSlots(74);  // 2%
     checkAllowedPthSlots(76);  // 2%
     checkInvalidPadConnections(78);  // 2%
-    checkCourtyardClearances(91);  // 13%
+    checkCourtyardClearances(88);  // 10%
+    checkBoardOutline(91);  // 3%
     checkForUnplacedComponents(93);  // 2%
     checkForMissingConnections(95);  // 2%
     checkForStaleObjects(97);  // 2%
@@ -1077,6 +1078,82 @@ void BoardDesignRuleCheck::checkCourtyardClearances(int progressEnd) {
                                                                locations));
         }
       }
+    }
+  }
+
+  emitProgress(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkBoardOutline(int progressEnd) {
+  emitStatus(tr("Check board outline..."));
+
+  // Collect all board outline objects and report open polygons.
+  QVector<Path> outlines;
+  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
+    if (polygon->getPolygon().getLayerName() == GraphicsLayer::sBoardOutlines) {
+      outlines.append(polygon->getPolygon().getPath());
+    }
+  }
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    const Transform transform(*device);
+    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
+      if (polygon.getLayerName() == GraphicsLayer::sBoardOutlines) {
+        const Path path = transform.map(polygon.getPath());
+        if (!path.isClosed()) {
+          const QVector<Path> locations = path.toOutlineStrokes(PositiveLength(
+              std::max(*polygon.getLineWidth(), Length(100000))));
+          emitMessage(std::make_shared<DrcMsgOpenBoardOutlinePolygon>(
+              device, polygon, locations));
+        }
+        outlines.append(path);
+      }
+    }
+    for (Circle circle : device->getLibFootprint().getCircles()) {
+      if (circle.getLayerName() == GraphicsLayer::sBoardOutlines) {
+        const Path path = Path::circle(circle.getDiameter())
+                              .translated(transform.map(circle.getCenter()));
+        outlines.append(path);
+      }
+    }
+  }
+
+  // Check if there's at least one board outline.
+  if (outlines.isEmpty()) {
+    emitMessage(std::make_shared<DrcMsgMissingBoardOutline>());
+  }
+
+  // Determine actually drawn board area.
+  ClipperLib::Paths drawnBoardArea =
+      ClipperHelpers::convert(outlines, maxArcTolerance());
+  const std::unique_ptr<ClipperLib::PolyTree> drawnBoardAreaTree =
+      ClipperHelpers::uniteToTree(drawnBoardArea, ClipperLib::pftEvenOdd);
+
+  // Check if there are multiple independent boards.
+  const ClipperLib::Paths flattenedBoardArea =
+      ClipperHelpers::flattenTree(*drawnBoardAreaTree);
+  if (flattenedBoardArea.size() > 1) {
+    QVector<Path> locations = ClipperHelpers::convert(flattenedBoardArea);
+    emitMessage(std::make_shared<DrcMsgMultipleBoardOutlines>(locations));
+  }
+
+  // Check if the board outline can be manufactured with the smallest tool.
+  const UnsignedLength minEdgeRadius(mSettings.getMinOutlineToolDiameter() / 2);
+  if (minEdgeRadius > 0) {
+    const Length offset1 = std::max(minEdgeRadius - Length(10000), Length(0));
+    const Length offset2 = -minEdgeRadius;
+    drawnBoardArea = ClipperHelpers::treeToPaths(*drawnBoardAreaTree);
+    ClipperLib::Paths nonManufacturableAreas = drawnBoardArea;
+    ClipperHelpers::offset(nonManufacturableAreas, offset1, maxArcTolerance());
+    ClipperHelpers::offset(nonManufacturableAreas, offset2, maxArcTolerance());
+    const std::unique_ptr<ClipperLib::PolyTree> difference =
+        ClipperHelpers::subtractToTree(nonManufacturableAreas, drawnBoardArea);
+    nonManufacturableAreas = ClipperHelpers::flattenTree(*difference);
+    if (!nonManufacturableAreas.empty()) {
+      const QVector<Path> locations =
+          ClipperHelpers::convert(nonManufacturableAreas);
+      emitMessage(
+          std::make_shared<DrcMsgMinimumBoardOutlineInnerRadiusViolation>(
+              minEdgeRadius, locations));
     }
   }
 
