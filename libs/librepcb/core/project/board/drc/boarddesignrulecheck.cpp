@@ -25,6 +25,7 @@
 #include "../../../geometry/hole.h"
 #include "../../../geometry/stroketext.h"
 #include "../../../library/cmp/component.h"
+#include "../../../library/dev/device.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../library/pkg/footprintpad.h"
 #include "../../../library/pkg/packagepad.h"
@@ -110,7 +111,8 @@ void BoardDesignRuleCheck::execute(bool quick) {
     checkInvalidPadConnections(78);  // 2%
     checkCourtyardClearances(88);  // 10%
     checkBoardOutline(91);  // 3%
-    checkForUnplacedComponents(93);  // 2%
+    checkForUnplacedComponents(92);  // 1%
+    checkCircuitDefaultDevices(93);  // 1%
     checkForMissingConnections(95);  // 2%
     checkForStaleObjects(97);  // 2%
   }
@@ -1175,6 +1177,21 @@ void BoardDesignRuleCheck::checkForUnplacedComponents(int progressEnd) {
   emitProgress(progressEnd);
 }
 
+void BoardDesignRuleCheck::checkCircuitDefaultDevices(int progressEnd) {
+  emitStatus(tr("Check configured default devices..."));
+
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    const tl::optional<Uuid> defaultDevice =
+        device->getComponentInstance().getDefaultDeviceUuid();
+    if (defaultDevice && (*defaultDevice != device->getLibDevice().getUuid())) {
+      emitMessage(std::make_shared<DrcMsgDefaultDeviceMismatch>(
+          device->getComponentInstance(), getDeviceLocation(*device)));
+    }
+  }
+
+  emitProgress(progressEnd);
+}
+
 void BoardDesignRuleCheck::checkForMissingConnections(int progressEnd) {
   emitStatus(tr("Check for missing connections..."));
 
@@ -1299,6 +1316,61 @@ ClipperLib::Paths BoardDesignRuleCheck::getDeviceCourtyardPaths(
                                 maxArcTolerance()));
   }
   return paths;
+}
+
+QVector<Path> BoardDesignRuleCheck::getDeviceLocation(
+    const BI_Device& device) const {
+  QVector<Path> locations;
+
+  // Helper function to add paths.
+  auto addPath = [&device, &locations](
+                     Path path, const UnsignedLength& lineWidth, bool fill) {
+    const Transform transform(device);
+    path = transform.map(path);
+    if (lineWidth > 0) {
+      locations.append(path.toOutlineStrokes(PositiveLength(*lineWidth)));
+    }
+    if (path.isClosed() && fill) {
+      locations.append(path);
+    }
+  };
+
+  // Helper function to add drawings on a particular layer.
+  auto addDrawing = [&device, &addPath](const QString& layer) {
+    for (const Polygon& polygon : device.getLibFootprint().getPolygons()) {
+      if (*polygon.getLayerName() == layer) {
+        addPath(polygon.getPath(), polygon.getLineWidth(), polygon.isFilled());
+      }
+    }
+    for (const Circle& circle : device.getLibFootprint().getCircles()) {
+      if (*circle.getLayerName() == layer) {
+        addPath(
+            Path::circle(circle.getDiameter()).translated(circle.getCenter()),
+            circle.getLineWidth(), circle.isFilled());
+      }
+    }
+  };
+
+  // Add drawings on documentation layer.
+  addDrawing(GraphicsLayer::sTopDocumentation);
+  addDrawing(GraphicsLayer::sBotDocumentation);
+
+  // If there's no documentation, add drawings on placement layer.
+  if (locations.isEmpty()) {
+    addDrawing(GraphicsLayer::sTopPlacement);
+    addDrawing(GraphicsLayer::sBotPlacement);
+  }
+
+  // Add origin cross.
+  const Path originLine({Vertex(Point(-500000, 0)), Vertex(Point(500000, 0))});
+  PositiveLength strokeWidth(50000);
+  locations.append(originLine.translated(device.getPosition())
+                       .toOutlineStrokes(strokeWidth));
+  locations.append(originLine.rotated(Angle::deg90())
+                       .translated(device.getPosition())
+                       .toOutlineStrokes(strokeWidth));
+
+  return locations;
 }
 
 template <typename THole>

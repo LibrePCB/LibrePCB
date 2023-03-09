@@ -74,6 +74,26 @@ public:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgDefaultDeviceMismatch
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgDefaultDeviceMismatch class
+ */
+class DrcMsgDefaultDeviceMismatch final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgDefaultDeviceMismatch)
+
+public:
+  // Constructors / Destructor
+  DrcMsgDefaultDeviceMismatch() = delete;
+  DrcMsgDefaultDeviceMismatch(const ComponentInstance& component,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgDefaultDeviceMismatch(const DrcMsgDefaultDeviceMismatch& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgDefaultDeviceMismatch() noexcept {}
+};
+
+/*******************************************************************************
  *  Class DrcMsgMissingConnection
  ******************************************************************************/
 

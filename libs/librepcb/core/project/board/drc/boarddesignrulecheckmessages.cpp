@@ -74,6 +74,29 @@ DrcMsgMissingDevice::DrcMsgMissingDevice(
 }
 
 /*******************************************************************************
+ *  DrcMsgDefaultDeviceMismatch
+ ******************************************************************************/
+
+DrcMsgDefaultDeviceMismatch::DrcMsgDefaultDeviceMismatch(
+    const ComponentInstance& component, const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Device differs from schematic: '%1'", "Placeholders: Device name")
+            .arg(*component.getName()),
+        tr("The placed device is not the one specified in the schematics. The "
+           "component in the schematics has selected a different default "
+           "device.") %
+            "\n\n" %
+            tr("Check if the correct device was placed on the board or "
+               "optionally change the selected default device in the "
+               "schematics."),
+        "default_device_mismatch", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("device", component.getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  DrcMsgMissingConnection
  ******************************************************************************/
 
