@@ -52,6 +52,7 @@ class NetSignal;
 class PadHole;
 class Polygon;
 class StrokeText;
+class Uuid;
 
 /*******************************************************************************
  *  Class DrcMsgMissingDevice
@@ -166,28 +167,28 @@ public:
 };
 
 /*******************************************************************************
- *  Class DrcMsgBoardCopperClearanceViolation
+ *  Class DrcMsgCopperCopperClearanceViolation
  ******************************************************************************/
 
 /**
- * @brief The DrcMsgBoardCopperClearanceViolation class
+ * @brief The DrcMsgCopperCopperClearanceViolation class
  */
-class DrcMsgBoardCopperClearanceViolation final : public RuleCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(DrcMsgBoardCopperClearanceViolation)
+class DrcMsgCopperCopperClearanceViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgCopperCopperClearanceViolation)
 
 public:
   // Constructors / Destructor
-  DrcMsgBoardCopperClearanceViolation() = delete;
-  DrcMsgBoardCopperClearanceViolation(
+  DrcMsgCopperCopperClearanceViolation() = delete;
+  DrcMsgCopperCopperClearanceViolation(
       const QString& layer1, const NetSignal* net1, const BI_Base& item1,
       const Polygon* polygon1, const Circle* circle1, const QString& layer2,
       const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
       const Circle* circle2, const UnsignedLength& minClearance,
       const QVector<Path>& locations);
-  DrcMsgBoardCopperClearanceViolation(
-      const DrcMsgBoardCopperClearanceViolation& other) noexcept
+  DrcMsgCopperCopperClearanceViolation(
+      const DrcMsgCopperCopperClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgBoardCopperClearanceViolation() noexcept {}
+  virtual ~DrcMsgCopperCopperClearanceViolation() noexcept {}
 
 private:
   static QString getLayerName(const QString& layer1, const QString& layer2);
@@ -198,46 +199,46 @@ private:
 };
 
 /*******************************************************************************
- *  Class DrcMsgBoardOutlineClearanceViolation
+ *  Class DrcMsgCopperBoardClearanceViolation
  ******************************************************************************/
 
 /**
- * @brief The DrcMsgBoardOutlineClearanceViolation class
+ * @brief The DrcMsgCopperBoardClearanceViolation class
  */
-class DrcMsgBoardOutlineClearanceViolation final : public RuleCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(DrcMsgBoardOutlineClearanceViolation)
+class DrcMsgCopperBoardClearanceViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgCopperBoardClearanceViolation)
 
 public:
   // Constructors / Destructor
-  DrcMsgBoardOutlineClearanceViolation() = delete;
-  DrcMsgBoardOutlineClearanceViolation(const BI_Via& via,
-                                       const UnsignedLength& minClearance,
-                                       const QVector<Path>& locations) noexcept;
-  DrcMsgBoardOutlineClearanceViolation(const BI_NetLine& netLine,
-                                       const UnsignedLength& minClearance,
-                                       const QVector<Path>& locations) noexcept;
-  DrcMsgBoardOutlineClearanceViolation(const BI_FootprintPad& pad,
-                                       const UnsignedLength& minClearance,
-                                       const QVector<Path>& locations) noexcept;
-  DrcMsgBoardOutlineClearanceViolation(const BI_Plane& plane,
-                                       const UnsignedLength& minClearance,
-                                       const QVector<Path>& locations) noexcept;
-  DrcMsgBoardOutlineClearanceViolation(const BI_Device* device,
-                                       const Polygon& polygon,
-                                       const UnsignedLength& minClearance,
-                                       const QVector<Path>& locations) noexcept;
-  DrcMsgBoardOutlineClearanceViolation(const BI_Device* device,
-                                       const Circle& circle,
-                                       const UnsignedLength& minClearance,
-                                       const QVector<Path>& locations) noexcept;
-  DrcMsgBoardOutlineClearanceViolation(const BI_Device* device,
-                                       const StrokeText& strokeText,
-                                       const UnsignedLength& minClearance,
-                                       const QVector<Path>& locations) noexcept;
-  DrcMsgBoardOutlineClearanceViolation(
-      const DrcMsgBoardOutlineClearanceViolation& other) noexcept
+  DrcMsgCopperBoardClearanceViolation() = delete;
+  DrcMsgCopperBoardClearanceViolation(const BI_Via& via,
+                                      const UnsignedLength& minClearance,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgCopperBoardClearanceViolation(const BI_NetLine& netLine,
+                                      const UnsignedLength& minClearance,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgCopperBoardClearanceViolation(const BI_FootprintPad& pad,
+                                      const UnsignedLength& minClearance,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgCopperBoardClearanceViolation(const BI_Plane& plane,
+                                      const UnsignedLength& minClearance,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgCopperBoardClearanceViolation(const BI_Device* device,
+                                      const Polygon& polygon,
+                                      const UnsignedLength& minClearance,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgCopperBoardClearanceViolation(const BI_Device* device,
+                                      const Circle& circle,
+                                      const UnsignedLength& minClearance,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgCopperBoardClearanceViolation(const BI_Device* device,
+                                      const StrokeText& strokeText,
+                                      const UnsignedLength& minClearance,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgCopperBoardClearanceViolation(
+      const DrcMsgCopperBoardClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgBoardOutlineClearanceViolation() noexcept {}
+  virtual ~DrcMsgCopperBoardClearanceViolation() noexcept {}
 };
 
 /*******************************************************************************
@@ -260,6 +261,66 @@ public:
       const DrcMsgCopperHoleClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgCopperHoleClearanceViolation() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgDrillDrillClearanceViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgDrillDrillClearanceViolation class
+ */
+class DrcMsgDrillDrillClearanceViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgDrillDrillClearanceViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgDrillDrillClearanceViolation() = delete;
+  DrcMsgDrillDrillClearanceViolation(const BI_Base& item1, const Uuid& hole1,
+                                     const BI_Base& item2, const Uuid& hole2,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations);
+  DrcMsgDrillDrillClearanceViolation(
+      const DrcMsgDrillDrillClearanceViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgDrillDrillClearanceViolation() noexcept {}
+
+private:  // Methods
+  static void serializeObject(SExpression& node, const BI_Base& item,
+                              const Uuid& hole);
+};
+
+/*******************************************************************************
+ *  Class DrcMsgDrillBoardClearanceViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgDrillBoardClearanceViolation class
+ */
+class DrcMsgDrillBoardClearanceViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgDrillBoardClearanceViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgDrillBoardClearanceViolation() = delete;
+  DrcMsgDrillBoardClearanceViolation(const BI_Via& via,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations) noexcept;
+  DrcMsgDrillBoardClearanceViolation(const BI_FootprintPad& pad,
+                                     const PadHole& hole,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations) noexcept;
+  DrcMsgDrillBoardClearanceViolation(const BI_Device* device, const Hole& hole,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations) noexcept;
+  DrcMsgDrillBoardClearanceViolation(
+      const DrcMsgDrillBoardClearanceViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgDrillBoardClearanceViolation() noexcept {}
+
+private:  // Methods
+  static QString getMessage(const UnsignedLength& minClearance) noexcept;
+  static QString getDescription() noexcept;
 };
 
 /*******************************************************************************

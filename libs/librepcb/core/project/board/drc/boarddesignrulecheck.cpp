@@ -93,11 +93,13 @@ void BoardDesignRuleCheck::execute(bool quick) {
   }
 
   checkMinimumCopperWidth(14);  // 2%
-  checkCopperCopperClearances(34);  // 20%
-  checkCopperBoardClearances(44);  // 10%
-  checkCopperHoleClearances(54);  // 10%
+  checkCopperCopperClearances(24);  // 10%
+  checkCopperBoardClearances(34);  // 10%
+  checkCopperHoleClearances(44);  // 10%
 
   if (!quick) {
+    checkDrillDrillClearances(49);  // 5%
+    checkDrillBoardClearances(54);  // 5%
     checkMinimumPthAnnularRing(64);  // 10%
     checkMinimumNpthDrillDiameter(66);  // 2%
     checkMinimumNpthSlotWidth(68);  // 2%
@@ -135,7 +137,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
     return;
   }
 
-  emitStatus(tr("Check minimum copper width..."));
+  emitStatus(tr("Check copper widths..."));
 
   // stroke texts
   foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
@@ -368,7 +370,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
             ClipperHelpers::flattenTree(*intersections);
         if (!paths.empty()) {
           const QVector<Path> locations = ClipperHelpers::convert(paths);
-          emitMessage(std::make_shared<DrcMsgBoardCopperClearanceViolation>(
+          emitMessage(std::make_shared<DrcMsgCopperCopperClearanceViolation>(
               it1->layer, it1->netSignal, *it1->item, it1->polygon, it1->circle,
               it2->layer, it2->netSignal, *it2->item, it2->polygon, it2->circle,
               clearance, locations));
@@ -389,29 +391,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
   emitStatus(tr("Check board clearances..."));
 
   // Determine restricted area around board outline.
-  const PositiveLength clearanceWidth(
-      std::max(clearance + clearance - maxArcTolerance() - 1, Length(1)));
-  ClipperLib::Paths restrictedArea;
-  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (polygon->getPolygon().getLayerName() == GraphicsLayer::sBoardOutlines) {
-      const ClipperLib::Paths paths = ClipperHelpers::convert(
-          polygon->getPolygon().getPath().toOutlineStrokes(clearanceWidth),
-          maxArcTolerance());
-      restrictedArea.insert(restrictedArea.end(), paths.begin(), paths.end());
-    }
-  }
-  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    Transform transform(*device);
-    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      if (polygon.getLayerName() == GraphicsLayer::sBoardOutlines) {
-        const ClipperLib::Paths paths = ClipperHelpers::convert(
-            transform.map(polygon.getPath()).toOutlineStrokes(clearanceWidth),
-            maxArcTolerance());
-        restrictedArea.insert(restrictedArea.end(), paths.begin(), paths.end());
-      }
-    }
-  }
-  ClipperHelpers::unite(restrictedArea, ClipperLib::pftNonZero);
+  const ClipperLib::Paths restrictedArea = getBoardClearanceArea(clearance);
 
   // Helper for the actual check.
   QVector<Path> locations;
@@ -431,7 +411,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addVia(*via);
       if (intersects(gen.getPaths())) {
-        emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+        emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
             *via, clearance, locations));
       }
     }
@@ -441,7 +421,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addNetLine(*netLine);
       if (intersects(gen.getPaths())) {
-        emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+        emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
             *netLine, clearance, locations));
       }
     }
@@ -453,7 +433,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addPlane(*plane);
       if (intersects(gen.getPaths())) {
-        emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+        emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
             *plane, clearance, locations));
       }
     }
@@ -467,7 +447,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addPolygon(*polygon);
       if (intersects(gen.getPaths())) {
-        emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+        emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
             nullptr, polygon->getPolygon(), clearance, locations));
       }
     }
@@ -481,7 +461,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addStrokeText(*strokeText);
       if (intersects(gen.getPaths())) {
-        emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+        emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
             nullptr, strokeText->getText(), clearance, locations));
       }
     }
@@ -500,7 +480,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
           BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
           gen.addPad(*pad, transform, layer->getName());
           if (intersects(gen.getPaths())) {
-            emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+            emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
                 *pad, clearance, locations));
           }
         }
@@ -515,7 +495,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addPolygon(polygon, transform);
         if (intersects(gen.getPaths())) {
-          emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+          emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
               device, polygon, clearance, locations));
         }
       }
@@ -529,7 +509,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addCircle(circle, transform);
         if (intersects(gen.getPaths())) {
-          emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+          emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
               device, circle, clearance, locations));
         }
       }
@@ -543,7 +523,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addStrokeText(*strokeText);
         if (intersects(gen.getPaths())) {
-          emitMessage(std::make_shared<DrcMsgBoardOutlineClearanceViolation>(
+          emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
               device, strokeText->getText(), clearance, locations));
         }
       }
@@ -604,13 +584,175 @@ void BoardDesignRuleCheck::checkCopperHoleClearances(int progressEnd) {
   emitProgress(progressEnd);
 }
 
+void BoardDesignRuleCheck::checkDrillDrillClearances(int progressEnd) {
+  const UnsignedLength clearance = mSettings.getMinDrillDrillClearance();
+  if (clearance == 0) {
+    return;
+  }
+
+  emitStatus(tr("Check drill clearances..."));
+
+  // Determine diameter expansion.
+  const UnsignedLength diameterExpansion(
+      std::max(clearance - maxArcTolerance() - 1, Length(0)));
+
+  // Determine the area of each drill.
+  struct Item {
+    const BI_Base* item;
+    tl::optional<Uuid> hole;
+    ClipperLib::Paths areas;
+  };
+  QVector<Item> items;
+
+  // Helper to add an item.
+  auto addItem = [&diameterExpansion, &items](
+                     const BI_Base& item, const Uuid& hole,
+                     const NonEmptyPath& path, const PositiveLength& diameter) {
+    const QVector<Path> area =
+        path->toOutlineStrokes(diameter + diameterExpansion);
+    const ClipperLib::Paths paths =
+        ClipperHelpers::convert(area, maxArcTolerance());
+    items.append(Item{&item, hole, paths});
+  };
+
+  // Vias.
+  foreach (const BI_NetSegment* netSegment, mBoard.getNetSegments()) {
+    foreach (const BI_Via* via, netSegment->getVias()) {
+      addItem(*via, via->getUuid(), makeNonEmptyPath(via->getPosition()),
+              via->getDrillDiameter());
+    }
+  }
+
+  // Board holes.
+  foreach (const BI_Hole* hole, mBoard.getHoles()) {
+    addItem(*hole, hole->getUuid(), hole->getHole().getPath(),
+            hole->getHole().getDiameter());
+  }
+
+  // Devices.
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    const Transform transform(*device);
+
+    // Footprint pads.
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
+      const Transform padTransform(pad->getLibPad().getPosition(),
+                                   pad->getLibPad().getRotation());
+      for (const PadHole& hole : pad->getLibPad().getHoles()) {
+        addItem(*pad, hole.getUuid(),
+                transform.map(padTransform.map(hole.getPath())),
+                hole.getDiameter());
+      }
+    }
+
+    // Holes.
+    for (const Hole& hole : device->getLibFootprint().getHoles()) {
+      addItem(*device, hole.getUuid(), transform.map(hole.getPath()),
+              hole.getDiameter());
+    }
+  }
+
+  // Now check for intersections.
+  auto lastItem = items.isEmpty() ? items.end() : std::prev(items.end());
+  for (auto it1 = items.begin(); it1 != lastItem; it1++) {
+    for (auto it2 = it1 + 1; it2 != items.end(); it2++) {
+      const std::unique_ptr<ClipperLib::PolyTree> intersections =
+          ClipperHelpers::intersect(it1->areas, it2->areas);
+      const ClipperLib::Paths paths =
+          ClipperHelpers::flattenTree(*intersections);
+      if ((!paths.empty()) && it1->item && it1->hole && it2->item &&
+          it2->hole) {
+        const QVector<Path> locations = ClipperHelpers::convert(paths);
+        emitMessage(std::make_shared<DrcMsgDrillDrillClearanceViolation>(
+            *it1->item, *it1->hole, *it2->item, *it2->hole, clearance,
+            locations));
+      }
+    }
+  }
+
+  emitProgress(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkDrillBoardClearances(int progressEnd) {
+  const UnsignedLength clearance = mSettings.getMinDrillBoardClearance();
+  if (clearance == 0) {
+    return;
+  }
+
+  emitStatus(tr("Check drill to board edge clearances..."));
+
+  // Determine restricted area around board outline.
+  const ClipperLib::Paths restrictedArea = getBoardClearanceArea(clearance);
+
+  // Helper for the actual check.
+  QVector<Path> locations;
+  auto intersects = [&restrictedArea, &locations](
+                        const NonEmptyPath& path,
+                        const PositiveLength& diameter) {
+    const QVector<Path> area = path->toOutlineStrokes(diameter);
+    const ClipperLib::Paths paths =
+        ClipperHelpers::convert(area, maxArcTolerance());
+    std::unique_ptr<ClipperLib::PolyTree> intersections =
+        ClipperHelpers::intersect(restrictedArea, paths);
+    locations =
+        ClipperHelpers::convert(ClipperHelpers::flattenTree(*intersections));
+    return (!locations.isEmpty());
+  };
+
+  // Check vias.
+  foreach (const BI_NetSegment* netSegment, mBoard.getNetSegments()) {
+    foreach (const BI_Via* via, netSegment->getVias()) {
+      if (intersects(makeNonEmptyPath(via->getPosition()),
+                     via->getDrillDiameter())) {
+        emitMessage(std::make_shared<DrcMsgDrillBoardClearanceViolation>(
+            *via, clearance, locations));
+      }
+    }
+  }
+
+  // Check board holes.
+  foreach (const BI_Hole* hole, mBoard.getHoles()) {
+    if (intersects(hole->getHole().getPath(), hole->getHole().getDiameter())) {
+      emitMessage(std::make_shared<DrcMsgDrillBoardClearanceViolation>(
+          nullptr, hole->getHole(), clearance, locations));
+    }
+  }
+
+  // Check devices.
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    const Transform transform(*device);
+
+    // Check footprint pads.
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
+      const Transform padTransform(pad->getLibPad().getPosition(),
+                                   pad->getLibPad().getRotation());
+      for (const PadHole& hole : pad->getLibPad().getHoles()) {
+        if (intersects(transform.map(padTransform.map(hole.getPath())),
+                       hole.getDiameter())) {
+          emitMessage(std::make_shared<DrcMsgDrillBoardClearanceViolation>(
+              *pad, hole, clearance, locations));
+        }
+      }
+    }
+
+    // Check holes.
+    for (const Hole& hole : device->getLibFootprint().getHoles()) {
+      if (intersects(transform.map(hole.getPath()), hole.getDiameter())) {
+        emitMessage(std::make_shared<DrcMsgDrillBoardClearanceViolation>(
+            device, hole, clearance, locations));
+      }
+    }
+  }
+
+  emitProgress(progressEnd);
+}
+
 void BoardDesignRuleCheck::checkMinimumPthAnnularRing(int progressEnd) {
   const UnsignedLength annularWidth = mSettings.getMinPthAnnularRing();
   if (annularWidth == 0) {
     return;
   }
 
-  emitStatus(tr("Check minimum PTH annular rings..."));
+  emitStatus(tr("Check PTH annular rings..."));
 
   // Determine tha areas where copper is available on *all* layers.
   QList<ClipperLib::Paths> thtCopperAreas;
@@ -690,7 +832,7 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressEnd) {
     return;
   }
 
-  emitStatus(tr("Check minimum NPTH drill diameters..."));
+  emitStatus(tr("Check NPTH drill diameters..."));
 
   // Board holes.
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
@@ -722,7 +864,7 @@ void BoardDesignRuleCheck::checkMinimumNpthSlotWidth(int progressEnd) {
     return;
   }
 
-  emitStatus(tr("Check minimum NPTH slot width..."));
+  emitStatus(tr("Check NPTH slot widths..."));
 
   // Board holes.
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
@@ -754,7 +896,7 @@ void BoardDesignRuleCheck::checkMinimumPthDrillDiameter(int progressEnd) {
     return;
   }
 
-  emitStatus(tr("Check minimum PTH drill diameters..."));
+  emitStatus(tr("Check PTH drill diameters..."));
 
   // Vias.
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
@@ -792,7 +934,7 @@ void BoardDesignRuleCheck::checkMinimumPthSlotWidth(int progressEnd) {
     return;
   }
 
-  emitStatus(tr("Check minimum PTH slot width..."));
+  emitStatus(tr("Check PTH slot widths..."));
 
   // Pads.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
@@ -1014,6 +1156,34 @@ bool BoardDesignRuleCheck::requiresHoleSlotWarning(
   } else {
     return false;
   }
+}
+
+ClipperLib::Paths BoardDesignRuleCheck::getBoardClearanceArea(
+    const UnsignedLength& clearance) const {
+  ClipperLib::Paths result;
+  const PositiveLength clearanceWidth(
+      std::max(clearance + clearance - maxArcTolerance() - 1, Length(1)));
+  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
+    if (polygon->getPolygon().getLayerName() == GraphicsLayer::sBoardOutlines) {
+      const ClipperLib::Paths paths = ClipperHelpers::convert(
+          polygon->getPolygon().getPath().toOutlineStrokes(clearanceWidth),
+          maxArcTolerance());
+      result.insert(result.end(), paths.begin(), paths.end());
+    }
+  }
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    Transform transform(*device);
+    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
+      if (polygon.getLayerName() == GraphicsLayer::sBoardOutlines) {
+        const ClipperLib::Paths paths = ClipperHelpers::convert(
+            transform.map(polygon.getPath()).toOutlineStrokes(clearanceWidth),
+            maxArcTolerance());
+        result.insert(result.end(), paths.begin(), paths.end());
+      }
+    }
+  }
+  ClipperHelpers::unite(result, ClipperLib::pftNonZero);
+  return result;
 }
 
 const ClipperLib::Paths& BoardDesignRuleCheck::getCopperPaths(

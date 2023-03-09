@@ -619,6 +619,26 @@ QAbstractScrollArea {
              </property>
             </spacer>
            </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_26">
+             <property name="text">
+              <string>Drill ↔ Drill:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QLabel" name="label_27">
+             <property name="text">
+              <string>Drill ↔ Board Edge:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceDrillDrill" native="true"/>
+           </item>
+           <item row="3" column="3">
+            <widget class="librepcb::editor::UnsignedLengthEdit" name="edtDrcClearanceDrillBoard" native="true"/>
+           </item>
           </layout>
          </widget>
         </widget>
@@ -675,7 +695,7 @@ QAbstractScrollArea {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGroupRulesInnerPadShape"/>
   <buttongroup name="btnGroupRulesCmpSidePadShape"/>
+  <buttongroup name="btnGroupRulesInnerPadShape"/>
  </buttongroups>
 </ui>

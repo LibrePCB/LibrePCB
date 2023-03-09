@@ -144,6 +144,12 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   mUi->edtDrcClearanceCopperNpth->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
       sSettingsPrefix % "/clearance_copper_npth");
+  mUi->edtDrcClearanceDrillDrill->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/clearance_drill_drill");
+  mUi->edtDrcClearanceDrillBoard->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/clearance_drill_board");
   mUi->edtDrcMinPthAnnularRing->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
       sSettingsPrefix % "/min_pth_annular_ring");
@@ -267,6 +273,10 @@ void BoardSetupDialog::load() noexcept {
       mBoard.getDrcSettings().getMinCopperBoardClearance());
   mUi->edtDrcClearanceCopperNpth->setValue(
       mBoard.getDrcSettings().getMinCopperNpthClearance());
+  mUi->edtDrcClearanceDrillDrill->setValue(
+      mBoard.getDrcSettings().getMinDrillDrillClearance());
+  mUi->edtDrcClearanceDrillBoard->setValue(
+      mBoard.getDrcSettings().getMinDrillBoardClearance());
   mUi->edtDrcMinPthAnnularRing->setValue(
       mBoard.getDrcSettings().getMinPthAnnularRing());
   mUi->edtDrcMinNpthDrillDiameter->setValue(
@@ -325,6 +335,8 @@ bool BoardSetupDialog::apply() noexcept {
     s.setMinCopperCopperClearance(mUi->edtDrcClearanceCopperCopper->getValue());
     s.setMinCopperBoardClearance(mUi->edtDrcClearanceCopperBoard->getValue());
     s.setMinCopperNpthClearance(mUi->edtDrcClearanceCopperNpth->getValue());
+    s.setMinDrillDrillClearance(mUi->edtDrcClearanceDrillDrill->getValue());
+    s.setMinDrillBoardClearance(mUi->edtDrcClearanceDrillBoard->getValue());
     s.setMinPthAnnularRing(mUi->edtDrcMinPthAnnularRing->getValue());
     s.setMinNpthDrillDiameter(mUi->edtDrcMinNpthDrillDiameter->getValue());
     s.setMinNpthSlotWidth(mUi->edtDrcMinNpthSlotWidth->getValue());

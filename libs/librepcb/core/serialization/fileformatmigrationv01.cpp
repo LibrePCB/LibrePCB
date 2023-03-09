@@ -612,6 +612,10 @@ void FileFormatMigrationV01::upgradeBoardDrcSettings(SExpression& root) {
                    SExpression::createToken("0.3"));
   node.appendChild("min_copper_npth_clearance",
                    SExpression::createToken("0.25"));
+  node.appendChild("min_drill_drill_clearance",
+                   SExpression::createToken("0.35"));
+  node.appendChild("min_drill_board_clearance",
+                   SExpression::createToken("0.5"));
   node.appendChild("min_annular_ring", SExpression::createToken("0.2"));
   node.appendChild("min_npth_drill_diameter", SExpression::createToken("0.3"));
   node.appendChild("min_pth_drill_diameter", SExpression::createToken("0.3"));

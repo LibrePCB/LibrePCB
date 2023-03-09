@@ -82,6 +82,8 @@ private:  // Methods
   void checkCopperCopperClearances(int progressEnd);
   void checkCopperBoardClearances(int progressEnd);
   void checkCopperHoleClearances(int progressEnd);
+  void checkDrillDrillClearances(int progressEnd);
+  void checkDrillBoardClearances(int progressEnd);
   void checkMinimumPthAnnularRing(int progressEnd);
   void checkMinimumNpthDrillDiameter(int progressEnd);
   void checkMinimumNpthSlotWidth(int progressEnd);
@@ -97,6 +99,8 @@ private:  // Methods
   template <typename THole>
   bool requiresHoleSlotWarning(
       const THole& hole, BoardDesignRuleCheckSettings::AllowedSlots allowed);
+  ClipperLib::Paths getBoardClearanceArea(
+      const UnsignedLength& clearance) const;
   const ClipperLib::Paths& getCopperPaths(
       const GraphicsLayer& layer, const QSet<const NetSignal*>& netsignals);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
