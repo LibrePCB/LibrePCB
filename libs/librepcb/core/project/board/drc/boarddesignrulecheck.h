@@ -95,6 +95,7 @@ private:  // Methods
   void checkCourtyardClearances(int progressEnd);
   void checkBoardOutline(int progressEnd);
   void checkForUnplacedComponents(int progressEnd);
+  void checkCircuitDefaultDevices(int progressEnd);
   void checkForMissingConnections(int progressEnd);
   void checkForStaleObjects(int progressEnd);
   template <typename THole>
@@ -106,6 +107,7 @@ private:  // Methods
       const GraphicsLayer& layer, const QSet<const NetSignal*>& netsignals);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
                                             const GraphicsLayer* layer);
+  QVector<Path> getDeviceLocation(const BI_Device& device) const;
   template <typename THole>
   QVector<Path> getHoleLocation(const THole& hole,
                                 const Transform& transform1 = Transform(),
