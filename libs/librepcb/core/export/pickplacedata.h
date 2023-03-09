@@ -48,8 +48,15 @@ class PickPlaceDataItem final {
 
 public:
   enum class BoardSide {
-    TOP,
-    BOTTOM,
+    Top,
+    Bottom,
+  };
+
+  enum class Type {
+    Tht,
+    Smt,
+    Fiducial,
+    Other,
   };
 
   // Constructors / Destructor
@@ -57,14 +64,15 @@ public:
   PickPlaceDataItem(const QString& designator, const QString& value,
                     const QString& deviceName, const QString& packageName,
                     const Point& position, const Angle& rotation,
-                    BoardSide boardSide) noexcept
+                    BoardSide boardSide, Type type) noexcept
     : mDesignator(designator),
       mValue(value),
       mDeviceName(deviceName),
       mPackageName(packageName),
       mPosition(position),
       mRotation(rotation),
-      mBoardSide(boardSide) {}
+      mBoardSide(boardSide),
+      mType(type) {}
   PickPlaceDataItem(const PickPlaceDataItem& other) noexcept
     : mDesignator(other.mDesignator),
       mValue(other.mValue),
@@ -72,7 +80,8 @@ public:
       mPackageName(other.mPackageName),
       mPosition(other.mPosition),
       mRotation(other.mRotation),
-      mBoardSide(other.mBoardSide) {}
+      mBoardSide(other.mBoardSide),
+      mType(other.mType) {}
   ~PickPlaceDataItem() noexcept {}
 
   // Getters
@@ -83,6 +92,7 @@ public:
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
   BoardSide getBoardSide() const noexcept { return mBoardSide; }
+  Type getType() const noexcept { return mType; }
 
   // Operator Overloadings
   PickPlaceDataItem& operator=(const PickPlaceDataItem& rhs) noexcept {
@@ -93,6 +103,7 @@ public:
     mPosition = rhs.mPosition;
     mRotation = rhs.mRotation;
     mBoardSide = rhs.mBoardSide;
+    mType = rhs.mType;
     return *this;
   }
 
@@ -104,6 +115,7 @@ private:
   Point mPosition;
   Angle mRotation;
   BoardSide mBoardSide;
+  Type mType;
 };
 
 /*******************************************************************************
