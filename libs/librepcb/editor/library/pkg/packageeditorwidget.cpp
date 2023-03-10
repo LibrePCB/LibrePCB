@@ -575,6 +575,22 @@ bool PackageEditorWidget::runChecks(RuleCheckMessageList& msgs) const {
 }
 
 template <>
+void PackageEditorWidget::fixMsg(const MsgDeprecatedAssemblyType& msg) {
+  Q_UNUSED(msg);
+  QScopedPointer<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
+  cmd->setAssemblyType(mPackage->guessAssemblyType());
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgSuspiciousAssemblyType& msg) {
+  Q_UNUSED(msg);
+  QScopedPointer<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
+  cmd->setAssemblyType(mPackage->guessAssemblyType());
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <>
 void PackageEditorWidget::fixMsg(const MsgNameNotTitleCase& msg) {
   mUi->edtName->setText(*msg.getFixedName());
   commitMetadata();
@@ -670,6 +686,8 @@ bool PackageEditorWidget::fixMsgHelper(
 
 bool PackageEditorWidget::processRuleCheckMessage(
     std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
+  if (fixMsgHelper<MsgDeprecatedAssemblyType>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgSuspiciousAssemblyType>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
