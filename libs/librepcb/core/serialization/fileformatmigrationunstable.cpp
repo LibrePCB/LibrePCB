@@ -65,6 +65,11 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  const QString fp = "package.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  root.appendChild("assembly_type", SExpression::createToken("auto"));
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -104,9 +109,6 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  SExpression& node = root.getChild("design_rule_check");
-  node.appendChild("min_outline_tool_diameter",
-                   SExpression::createToken("2.0"));
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

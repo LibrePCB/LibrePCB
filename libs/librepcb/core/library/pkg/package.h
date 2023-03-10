@@ -58,19 +58,34 @@ class Package final : public LibraryElement {
   Q_OBJECT
 
 public:
+  // Types
+  enum class AssemblyType {
+    None,  ///< Nothing to mount (i.e. not a package, just a footprint)
+    Tht,  ///< Pure THT package
+    Smt,  ///< Pure SMT package
+    Mixed,  ///< Mixed THT/SMT package
+    Other,  ///< Anything special, e.g. mechanical parts
+    Auto,  ///< Auto detection (deprecated, only for file format migration!)
+  };
+
   // Constructors / Destructor
   Package() = delete;
   Package(const Package& other) = delete;
   Package(const Uuid& uuid, const Version& version, const QString& author,
           const ElementName& name_en_US, const QString& description_en_US,
-          const QString& keywords_en_US);
+          const QString& keywords_en_US, AssemblyType assemblyType);
   ~Package() noexcept;
 
   // Getters
+  AssemblyType getAssemblyType(bool resolveAuto) const noexcept;
+  AssemblyType guessAssemblyType() const noexcept;
   PackagePadList& getPads() noexcept { return mPads; }
   const PackagePadList& getPads() const noexcept { return mPads; }
   FootprintList& getFootprints() noexcept { return mFootprints; }
   const FootprintList& getFootprints() const noexcept { return mFootprints; }
+
+  // Setters
+  void setAssemblyType(AssemblyType type) noexcept { mAssemblyType = type; }
 
   // General Methods
   virtual RuleCheckMessageList runChecks() const override;
@@ -96,6 +111,7 @@ private:  // Methods
           const SExpression& root);
 
 private:  // Data
+  AssemblyType mAssemblyType;  ///< Package assembly type (metadata)
   PackagePadList mPads;  ///< empty list if the package has no pads
   FootprintList mFootprints;  ///< minimum one footprint
 };
@@ -105,5 +121,7 @@ private:  // Data
  ******************************************************************************/
 
 }  // namespace librepcb
+
+Q_DECLARE_METATYPE(librepcb::Package::AssemblyType)
 
 #endif

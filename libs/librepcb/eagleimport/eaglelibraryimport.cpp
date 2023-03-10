@@ -444,7 +444,7 @@ void EagleLibraryImport::run() noexcept {
           Uuid::createRandom(), mVersion, mAuthor,
           EagleTypeConverter::convertElementName(mNamePrefix + pkg.displayName),
           EagleTypeConverter::convertElementDescription(pkg.description),
-          mKeywords);
+          mKeywords, librepcb::Package::AssemblyType::Auto);
       package->setCategories(mPackageCategories);
       auto footprint = std::make_shared<Footprint>(Uuid::createRandom(),
                                                    ElementName("default"), "");

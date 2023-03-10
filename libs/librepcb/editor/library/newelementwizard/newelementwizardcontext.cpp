@@ -52,6 +52,7 @@ NewElementWizardContext::NewElementWizardContext(
     mLibrary(lib),
     mLayerProvider(lp),
     mElementType(ElementType::None),
+    mPackageAssemblyType(Package::AssemblyType::Auto),
     mComponentPrefixes(ComponentPrefix("")) {
   reset();
 }
@@ -88,6 +89,7 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   mSymbolTexts.clear();
 
   // package
+  mPackageAssemblyType = Package::AssemblyType::Auto;
   mPackagePads.clear();
   mPackageFootprints.clear();
 
@@ -203,6 +205,7 @@ void NewElementWizardContext::copyElement(ElementType type,
     case ElementType::Package: {
       const Package* package = dynamic_cast<Package*>(element.get());
       Q_ASSERT(package);
+      mPackageAssemblyType = package->getAssemblyType(false);
       // copy pads but generate new UUIDs
       QHash<Uuid, tl::optional<Uuid>> padUuidMap;
       mPackagePads.clear();
@@ -378,7 +381,8 @@ void NewElementWizardContext::createLibraryElement() {
     }
     case NewElementWizardContext::ElementType::Package: {
       Package element(Uuid::createRandom(), *mElementVersion, mElementAuthor,
-                      *mElementName, mElementDescription, mElementKeywords);
+                      *mElementName, mElementDescription, mElementKeywords,
+                      mPackageAssemblyType);
       element.setCategories(mElementCategoryUuids);
       element.getPads() = mPackagePads;
       element.getFootprints() = mPackageFootprints;

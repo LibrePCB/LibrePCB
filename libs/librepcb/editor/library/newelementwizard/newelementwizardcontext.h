@@ -132,6 +132,7 @@ public:  // Data
   TextList mSymbolTexts;
 
   // package
+  Package::AssemblyType mPackageAssemblyType;
   PackagePadList mPackagePads;
   FootprintList mPackageFootprints;
 
