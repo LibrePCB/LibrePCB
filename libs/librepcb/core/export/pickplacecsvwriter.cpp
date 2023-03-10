@@ -48,6 +48,23 @@ PickPlaceCsvWriter::~PickPlaceCsvWriter() noexcept {
  ******************************************************************************/
 
 std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
+  // Names for all mount types.
+  static QVector<PickPlaceDataItem::Type> types = {
+      PickPlaceDataItem::Type::Tht,
+      PickPlaceDataItem::Type::Smt,
+      PickPlaceDataItem::Type::Fiducial,
+      PickPlaceDataItem::Type::Other,
+  };
+  static QStringList typeNames = {
+      "THT",
+      "SMT",
+      "Fiducial",
+      "Other",
+  };
+  auto getTypeName = [](PickPlaceDataItem::Type type) {
+    return typeNames.value(types.indexOf(type), "Other");
+  };
+
   std::shared_ptr<CsvFile> file(new CsvFile());
 
   // Optionally add some metadata to to the CSV as a help for readers.
@@ -63,20 +80,22 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
             "Generation Date:     %5\n"
             "Unit:                mm\n"
             "Rotation:            Degrees CCW\n"
-            "Board Side:          %6")
+            "Board Side:          %6\n"
+            "Supported Types:     %7")
             .arg(mData.getProjectName())
             .arg(mData.getProjectVersion())
             .arg(mData.getBoardName())
             .arg(qApp->applicationVersion())
             .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-            .arg(boardSideToString(mBoardSide));
+            .arg(boardSideToString(mBoardSide))
+            .arg(typeNames.join(", "));
     file->setComment(comment);
   }
 
   // Don't translate the CSV header to make pick&place files independent of the
   // user's language.
   file->setHeader({"Designator", "Value", "Device", "Package", "Position X",
-                   "Position Y", "Rotation", "Side"});
+                   "Position Y", "Rotation", "Side", "Type"});
 
   foreach (const PickPlaceDataItem& item, mData.getItems()) {
     if (isOnBoardSide(item, mBoardSide)) {
@@ -88,9 +107,10 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
       values += item.getPosition().getX().toMmString();
       values += item.getPosition().getY().toMmString();
       values += item.getRotation().mappedTo0_360deg().toDegString();
-      values += item.getBoardSide() == PickPlaceDataItem::BoardSide::TOP
+      values += item.getBoardSide() == PickPlaceDataItem::BoardSide::Top
           ? "Top"
           : "Bottom";
+      values += getTypeName(item.getType());
       file->addValue(values);  // can throw
     }
   }
@@ -106,9 +126,9 @@ bool PickPlaceCsvWriter::isOnBoardSide(const PickPlaceDataItem& item,
                                        BoardSide side) noexcept {
   switch (side) {
     case BoardSide::TOP:
-      return (item.getBoardSide() == PickPlaceDataItem::BoardSide::TOP);
+      return (item.getBoardSide() == PickPlaceDataItem::BoardSide::Top);
     case BoardSide::BOTTOM:
-      return (item.getBoardSide() == PickPlaceDataItem::BoardSide::BOTTOM);
+      return (item.getBoardSide() == PickPlaceDataItem::BoardSide::Bottom);
     default:
       return true;
   }

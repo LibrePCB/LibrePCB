@@ -45,14 +45,16 @@ protected:
         std::make_shared<PickPlaceData>("project", "version", "board");
     data->addItem(PickPlaceDataItem("R10", "", "device", "pack,\"age\"",
                                     Point(-1000000, -2000000), -Angle::deg45(),
-                                    PickPlaceDataItem::BoardSide::TOP));
+                                    PickPlaceDataItem::BoardSide::Top,
+                                    PickPlaceDataItem::Type::Tht));
     data->addItem(PickPlaceDataItem("U5", "1kΩ\r\n\r\n", "device", "package",
                                     Point(1000000, 2000000), Angle::deg45(),
-                                    PickPlaceDataItem::BoardSide::BOTTOM));
-    data->addItem(PickPlaceDataItem("R1", " 1kΩ\n1W\n100V ", "device \"foo\"",
-                                    "pack,age", Point(1000000, 2000000),
-                                    Angle::deg45(),
-                                    PickPlaceDataItem::BoardSide::TOP));
+                                    PickPlaceDataItem::BoardSide::Bottom,
+                                    PickPlaceDataItem::Type::Smt));
+    data->addItem(PickPlaceDataItem(
+        "R1", " 1kΩ\n1W\n100V ", "device \"foo\"", "pack,age",
+        Point(1000000, 2000000), Angle::deg45(),
+        PickPlaceDataItem::BoardSide::Top, PickPlaceDataItem::Type::Fiducial));
     return data;
   }
 };
@@ -67,7 +69,8 @@ TEST_F(PickPlaceCsvWriterTest, testEmptyData) {
   writer.setIncludeMetadataComment(false);
   std::shared_ptr<CsvFile> file = writer.generateCsv();
   EXPECT_EQ(
-      "Designator,Value,Device,Package,Position X,Position Y,Rotation,Side\n",
+      "Designator,Value,Device,Package,Position X,Position Y,Rotation,Side,"
+      "Type\n",
       file->toString().toStdString());
 }
 
@@ -84,19 +87,23 @@ TEST_F(PickPlaceCsvWriterTest, testBothSides) {
   EXPECT_EQ("# Unit:                mm", lines[7].toStdString());
   EXPECT_EQ("# Rotation:            Degrees CCW", lines[8].toStdString());
   EXPECT_EQ("# Board Side:          Top + Bottom", lines[9].toStdString());
-  EXPECT_EQ("", lines[10].toStdString());
+  EXPECT_EQ("# Supported Types:     THT, SMT, Fiducial, Other",
+            lines[10].toStdString());
+  EXPECT_EQ("", lines[11].toStdString());
   EXPECT_EQ(
-      "Designator,Value,Device,Package,Position X,Position Y,Rotation,Side",
-      lines[11].toStdString());
-  EXPECT_EQ(
-      "R1, 1kΩ 1W 100V ,\"device \"\"foo\"\"\",\"pack,age\",1.0,2.0,45.0,Top",
+      "Designator,Value,Device,Package,Position X,Position Y,Rotation,Side,"
+      "Type",
       lines[12].toStdString());
-  EXPECT_EQ("R10,,device,\"pack,\"\"age\"\"\",-1.0,-2.0,315.0,Top",
-            lines[13].toStdString());
-  EXPECT_EQ("U5,1kΩ  ,device,package,1.0,2.0,45.0,Bottom",
+  EXPECT_EQ(
+      "R1, 1kΩ 1W 100V ,\"device "
+      "\"\"foo\"\"\",\"pack,age\",1.0,2.0,45.0,Top,Fiducial",
+      lines[13].toStdString());
+  EXPECT_EQ("R10,,device,\"pack,\"\"age\"\"\",-1.0,-2.0,315.0,Top,THT",
             lines[14].toStdString());
-  EXPECT_EQ("", lines[15].toStdString());
-  EXPECT_EQ(16, lines.count());
+  EXPECT_EQ("U5,1kΩ  ,device,package,1.0,2.0,45.0,Bottom,SMT",
+            lines[15].toStdString());
+  EXPECT_EQ("", lines[16].toStdString());
+  EXPECT_EQ(17, lines.count());
 }
 
 TEST_F(PickPlaceCsvWriterTest, testTopSide) {
@@ -107,12 +114,14 @@ TEST_F(PickPlaceCsvWriterTest, testTopSide) {
   std::shared_ptr<CsvFile> file = writer.generateCsv();
   QStringList lines = file->toString().split("\n");
   EXPECT_EQ(
-      "Designator,Value,Device,Package,Position X,Position Y,Rotation,Side",
+      "Designator,Value,Device,Package,Position X,Position Y,Rotation,Side,"
+      "Type",
       lines[0].toStdString());
   EXPECT_EQ(
-      "R1, 1kΩ 1W 100V ,\"device \"\"foo\"\"\",\"pack,age\",1.0,2.0,45.0,Top",
+      "R1, 1kΩ 1W 100V ,\"device "
+      "\"\"foo\"\"\",\"pack,age\",1.0,2.0,45.0,Top,Fiducial",
       lines[1].toStdString());
-  EXPECT_EQ("R10,,device,\"pack,\"\"age\"\"\",-1.0,-2.0,315.0,Top",
+  EXPECT_EQ("R10,,device,\"pack,\"\"age\"\"\",-1.0,-2.0,315.0,Top,THT",
             lines[2].toStdString());
   EXPECT_EQ("", lines[3].toStdString());
   EXPECT_EQ(4, lines.count());
@@ -126,9 +135,10 @@ TEST_F(PickPlaceCsvWriterTest, testBottomSide) {
   std::shared_ptr<CsvFile> file = writer.generateCsv();
   QStringList lines = file->toString().split("\n");
   EXPECT_EQ(
-      "Designator,Value,Device,Package,Position X,Position Y,Rotation,Side",
+      "Designator,Value,Device,Package,Position X,Position Y,Rotation,Side,"
+      "Type",
       lines[0].toStdString());
-  EXPECT_EQ("U5,1kΩ  ,device,package,1.0,2.0,45.0,Bottom",
+  EXPECT_EQ("U5,1kΩ  ,device,package,1.0,2.0,45.0,Bottom,SMT",
             lines[1].toStdString());
   EXPECT_EQ("", lines[2].toStdString());
   EXPECT_EQ(3, lines.count());
