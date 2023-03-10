@@ -185,39 +185,6 @@ QRectF BI_Device::getBoundingRect() const noexcept {
   return mGraphicsItem->sceneTransform().mapRect(mGraphicsItem->boundingRect());
 }
 
-BI_Device::MountType BI_Device::determineMountType() const noexcept {
-  const QString mountType = getAttributeValue("MOUNT_TYPE").trimmed().toLower();
-  if (mountType.isEmpty()) {
-    // Auto-detection depending on footprint pads.
-    bool hasThtPads = false;
-    bool hasSmtPads = false;
-    foreach (const BI_FootprintPad* pad, mPads) {
-      if (pad->getLibPad().isTht()) {
-        hasThtPads = true;
-      } else {
-        hasSmtPads = true;
-      }
-    }
-    if (hasThtPads) {
-      return MountType::Tht;
-    } else if (hasSmtPads) {
-      return MountType::Smt;
-    } else {
-      return MountType::None;
-    }
-  } else if (mountType == "tht") {
-    return MountType::Tht;
-  } else if (mountType == "smt") {
-    return MountType::Smt;
-  } else if (mountType == "fiducial") {
-    return MountType::Fiducial;
-  } else if (mountType == "none") {
-    return MountType::None;
-  } else {
-    return MountType::Other;
-  }
-}
-
 /*******************************************************************************
  *  StrokeText Methods
  ******************************************************************************/

@@ -50,16 +50,12 @@ PickPlaceCsvWriter::~PickPlaceCsvWriter() noexcept {
 std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
   // Names for all mount types.
   static QVector<PickPlaceDataItem::Type> types = {
-      PickPlaceDataItem::Type::Tht,
-      PickPlaceDataItem::Type::Smt,
-      PickPlaceDataItem::Type::Fiducial,
+      PickPlaceDataItem::Type::Tht,   PickPlaceDataItem::Type::Smt,
+      PickPlaceDataItem::Type::Mixed, PickPlaceDataItem::Type::Fiducial,
       PickPlaceDataItem::Type::Other,
   };
   static QStringList typeNames = {
-      "THT",
-      "SMT",
-      "Fiducial",
-      "Other",
+      "THT", "SMT", "THT+SMT", "Fiducial", "Other",
   };
   auto getTypeName = [](PickPlaceDataItem::Type type) {
     return typeNames.value(types.indexOf(type), "Other");
