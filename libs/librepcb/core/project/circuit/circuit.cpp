@@ -26,7 +26,6 @@
 #include "../../library/cmp/component.h"
 #include "../../serialization/sexpression.h"
 #include "../project.h"
-#include "../projectsettings.h"
 #include "componentinstance.h"
 #include "netclass.h"
 #include "netsignal.h"

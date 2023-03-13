@@ -37,7 +37,6 @@
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
-#include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -83,7 +82,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
   mUi->edtCompInstValue->setText(mComponentInstance.getValue());
   mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
 
-  const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+  const QStringList& localeOrder = mProject.getLocaleOrder();
 
   // Component Library Element Attributes
   QString htmlLink("<a href=\"%1\">%2<a>");

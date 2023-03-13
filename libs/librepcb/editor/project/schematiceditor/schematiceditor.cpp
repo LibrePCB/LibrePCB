@@ -39,7 +39,7 @@
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
 #include "../projecteditor.h"
-#include "../projectpropertieseditordialog.h"
+#include "../projectsetupdialog.h"
 #include "fsm/schematiceditorfsm.h"
 #include "schematicpagesdock.h"
 
@@ -48,7 +48,6 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/project/schematic/schematiclayerprovider.h>
@@ -349,18 +348,11 @@ void SchematicEditor::createActions() noexcept {
       this, &mProjectEditor, &ProjectEditor::showBoardEditor));
   mActionControlPanel.reset(cmd.controlPanel.createAction(
       this, &mProjectEditor, &ProjectEditor::showControlPanelClicked));
-  mActionProjectProperties.reset(
-      cmd.projectProperties.createAction(this, this, [this]() {
-        abortBlockingToolsInOtherEditors();  // Release undo stack.
-        ProjectPropertiesEditorDialog dialog(
-            mProject, mProjectEditor.getUndoStack(), this);
-        dialog.exec();
-      }));
-  mActionProjectSettings.reset(cmd.projectSettings.createAction(
-      this, this,
-      [this]() { mProjectEditor.execProjectSettingsDialog(this); }));
-  mActionNetClasses.reset(cmd.netClasses.createAction(this, this, [this]() {
-    mProjectEditor.execNetClassesEditorDialog(this);
+  mActionProjectSetup.reset(cmd.projectSetup.createAction(this, this, [this]() {
+    abortBlockingToolsInOtherEditors();  // Release undo stack.
+    ProjectSetupDialog dialog(mProject, mProjectEditor.getUndoStack(),
+                              "schematic_editor", this);
+    dialog.exec();
   }));
   mActionUpdateLibrary.reset(
       cmd.projectLibraryUpdate.createAction(this, this, [this]() {
@@ -690,7 +682,7 @@ void SchematicEditor::createToolBars() noexcept {
   addToolBarBreak(Qt::LeftToolBarArea);
   addToolBar(Qt::LeftToolBarArea, mToolBarComponents.data());
   updateComponentToolbarIcons();  // Load icons according workspace settings.
-  connect(&mProject.getSettings(), &ProjectSettings::settingsChanged, this,
+  connect(&mProject, &Project::normOrderChanged, this,
           &SchematicEditor::updateComponentToolbarIcons);
 }
 
@@ -824,9 +816,7 @@ void SchematicEditor::createMenus() noexcept {
 
   // Project.
   mb.newMenu(&MenuBuilder::createProjectMenu);
-  mb.addAction(mActionNetClasses);
-  mb.addAction(mActionProjectProperties);
-  mb.addAction(mActionProjectSettings);
+  mb.addAction(mActionProjectSetup);
   mb.addSeparator();
   mb.addAction(mActionUpdateLibrary);
 
@@ -1185,7 +1175,7 @@ void SchematicEditor::execGraphicsExportDialog(
 }
 
 bool SchematicEditor::useIeee315Symbols() const noexcept {
-  foreach (const QString& norm, mProject.getSettings().getNormOrder()) {
+  foreach (const QString& norm, mProject.getNormOrder()) {
     if (norm.toLower() == "ieee 315") {
       return true;
     } else if (norm.toLower() == "iec 60617") {

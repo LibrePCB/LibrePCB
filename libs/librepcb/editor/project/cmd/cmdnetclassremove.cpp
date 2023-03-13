@@ -37,9 +37,8 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdNetClassRemove::CmdNetClassRemove(Circuit& circuit,
-                                     NetClass& netclass) noexcept
-  : UndoCommand(tr("Remove netclass")), mCircuit(circuit), mNetClass(netclass) {
+CmdNetClassRemove::CmdNetClassRemove(NetClass& netclass) noexcept
+  : UndoCommand(tr("Remove netclass")), mNetClass(netclass) {
 }
 
 CmdNetClassRemove::~CmdNetClassRemove() noexcept {
@@ -56,11 +55,11 @@ bool CmdNetClassRemove::performExecute() {
 }
 
 void CmdNetClassRemove::performUndo() {
-  mCircuit.addNetClass(mNetClass);  // can throw
+  mNetClass.getCircuit().addNetClass(mNetClass);  // can throw
 }
 
 void CmdNetClassRemove::performRedo() {
-  mCircuit.removeNetClass(mNetClass);  // can throw
+  mNetClass.getCircuit().removeNetClass(mNetClass);  // can throw
 }
 
 /*******************************************************************************

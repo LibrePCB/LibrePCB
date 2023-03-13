@@ -55,6 +55,7 @@ public:
   ~AttributeListEditorWidget() noexcept;
 
   // Setters
+  void setFrameStyle(int style) noexcept;
   void setReadOnly(bool readOnly) noexcept;
   void setReferences(UndoStack* undoStack, AttributeList* list) noexcept;
 

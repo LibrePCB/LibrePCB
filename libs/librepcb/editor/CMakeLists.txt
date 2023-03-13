@@ -399,9 +399,6 @@ add_library(
   project/bomgeneratordialog.cpp
   project/bomgeneratordialog.h
   project/bomgeneratordialog.ui
-  project/circuit/editnetclassesdialog.cpp
-  project/circuit/editnetclassesdialog.h
-  project/circuit/editnetclassesdialog.ui
   project/cmd/cmdaddcomponenttocircuit.cpp
   project/cmd/cmdaddcomponenttocircuit.h
   project/cmd/cmdadddevicetoboard.cpp
@@ -508,8 +505,6 @@ add_library(
   project/cmd/cmdprojectlibraryaddelement.h
   project/cmd/cmdprojectlibraryremoveelement.cpp
   project/cmd/cmdprojectlibraryremoveelement.h
-  project/cmd/cmdprojectsettingschange.cpp
-  project/cmd/cmdprojectsettingschange.h
   project/cmd/cmdremoveboarditems.cpp
   project/cmd/cmdremoveboarditems.h
   project/cmd/cmdremoveselectedboarditems.cpp
@@ -587,12 +582,9 @@ add_library(
   project/orderpcbdialog.ui
   project/projecteditor.cpp
   project/projecteditor.h
-  project/projectpropertieseditordialog.cpp
-  project/projectpropertieseditordialog.h
-  project/projectpropertieseditordialog.ui
-  project/projectsettingsdialog.cpp
-  project/projectsettingsdialog.h
-  project/projectsettingsdialog.ui
+  project/projectsetupdialog.cpp
+  project/projectsetupdialog.h
+  project/projectsetupdialog.ui
   project/schematiceditor/fsm/schematiceditorfsm.cpp
   project/schematiceditor/fsm/schematiceditorfsm.h
   project/schematiceditor/fsm/schematiceditorstate.cpp

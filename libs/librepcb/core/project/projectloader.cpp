@@ -52,7 +52,6 @@
 #include "erc/electricalrulecheck.h"
 #include "project.h"
 #include "projectlibrary.h"
-#include "projectsettings.h"
 #include "schematic/items/si_netlabel.h"
 #include "schematic/items/si_netline.h"
 #include "schematic/items/si_netpoint.h"
@@ -183,13 +182,14 @@ void ProjectLoader::loadSettings(Project& p) {
   const QString fp = "project/settings.lp";
   const SExpression root = SExpression::parse(p.getDirectory().read(fp),
                                               p.getDirectory().getAbsPath(fp));
+
   {
     QStringList l;
     foreach (const SExpression* node,
              root.getChild("library_locale_order").getChildren("locale")) {
       l.append(node->getChild("@0").getValue());
     }
-    p.getSettings().setLocaleOrder(l);
+    p.setLocaleOrder(l);
   }
 
   {
@@ -198,7 +198,7 @@ void ProjectLoader::loadSettings(Project& p) {
              root.getChild("library_norm_order").getChildren("locale")) {
       l.append(node->getChild("@0").getValue());
     }
-    p.getSettings().setNormOrder(l);
+    p.setNormOrder(l);
   }
 
   qDebug() << "Successfully loaded project settings.";

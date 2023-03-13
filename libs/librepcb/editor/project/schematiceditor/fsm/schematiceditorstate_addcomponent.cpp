@@ -37,7 +37,6 @@
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -346,15 +345,12 @@ void SchematicEditorState_AddComponent::startAddingComponent(
     } else {
       // show component chooser dialog
       if (mAddComponentDialog) {
-        mAddComponentDialog->setLocaleOrder(
-            mContext.project.getSettings().getLocaleOrder());
-        mAddComponentDialog->setNormOrder(
-            mContext.project.getSettings().getNormOrder());
+        mAddComponentDialog->setLocaleOrder(mContext.project.getLocaleOrder());
+        mAddComponentDialog->setNormOrder(mContext.project.getNormOrder());
       } else {
         mAddComponentDialog.reset(new AddComponentDialog(
             mContext.workspace.getLibraryDb(),
-            mContext.project.getSettings().getLocaleOrder(),
-            mContext.project.getSettings().getNormOrder(),
+            mContext.project.getLocaleOrder(), mContext.project.getNormOrder(),
             mContext.workspace.getSettings().themes.getActive(),
             parentWidget()));
       }

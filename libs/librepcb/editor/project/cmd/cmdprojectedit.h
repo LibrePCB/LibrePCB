@@ -57,6 +57,8 @@ public:
   void setAuthor(const QString& newAuthor) noexcept;
   void setVersion(const QString& newVersion) noexcept;
   void setAttributes(const AttributeList& attributes) noexcept;
+  void setLocaleOrder(const QStringList& order) noexcept;
+  void setNormOrder(const QStringList& order) noexcept;
 
 private:
   // Private Methods
@@ -84,6 +86,10 @@ private:
   QString mNewVersion;
   AttributeList mOldAttributes;
   AttributeList mNewAttributes;
+  QStringList mOldLocaleOrder;
+  QStringList mNewLocaleOrder;
+  QStringList mOldNormOrder;
+  QStringList mNewNormOrder;
 };
 
 /*******************************************************************************

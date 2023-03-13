@@ -163,9 +163,7 @@ private:
   QScopedPointer<QAction> mActionFileManager;
   QScopedPointer<QAction> mActionSchematicEditor;
   QScopedPointer<QAction> mActionControlPanel;
-  QScopedPointer<QAction> mActionProjectProperties;
-  QScopedPointer<QAction> mActionProjectSettings;
-  QScopedPointer<QAction> mActionNetClasses;
+  QScopedPointer<QAction> mActionProjectSetup;
   QScopedPointer<QAction> mActionUpdateLibrary;
   QScopedPointer<QAction> mActionBoardSetup;
   QScopedPointer<QAction> mActionRunQuickCheck;

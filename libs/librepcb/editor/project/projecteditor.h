@@ -153,20 +153,6 @@ public slots:
   void showBoardEditor() noexcept;
 
   /**
-   * @brief Execute the project settings dialog (blocking!)
-   *
-   * @param parent    parent widget of the settings dialog (optional)
-   */
-  void execProjectSettingsDialog(QWidget* parent = nullptr) noexcept;
-
-  /**
-   * @brief Execute the netclasses editor dialog (blocking!)
-   *
-   * @param parent    parent widget of the dialog (optional)
-   */
-  void execNetClassesEditorDialog(QWidget* parent = nullptr) noexcept;
-
-  /**
    * @brief Execute the *.lppz export dialog (blocking!)
    *
    * @param parent    parent widget of the dialog (optional)

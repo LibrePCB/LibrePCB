@@ -84,6 +84,10 @@ AttributeListEditorWidget::~AttributeListEditorWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void AttributeListEditorWidget::setFrameStyle(int style) noexcept {
+  mView->setFrameStyle(style);
+}
+
 void AttributeListEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);
 }

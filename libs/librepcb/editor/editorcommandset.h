@@ -252,31 +252,13 @@ public:
       {QKeySequence(Qt::CTRL + Qt::Key_S)},
       &categoryEditor,
   };
-  EditorCommand projectSettings{
-      "project_settings",  // clang-format break
-      QT_TR_NOOP("Project Settings"),
-      QT_TR_NOOP("View/modify the project settings"),
+  EditorCommand projectSetup{
+      "project_setup",  // clang-format break
+      QT_TR_NOOP("Project Setup"),
+      QT_TR_NOOP("View/modify the project setup"),
       QIcon(":/img/actions/settings.png"),
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_T)},
-      &categoryEditor,
-  };
-  EditorCommand projectProperties{
-      "project_properties",  // clang-format break
-      QT_TR_NOOP("Project Properties"),
-      QT_TR_NOOP("View/modify the project properties"),
-      QIcon(),
-      EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_R)},
-      &categoryEditor,
-  };
-  EditorCommand netClasses{
-      "net_classes",  // clang-format break
-      QT_TR_NOOP("Net Classes"),
-      QT_TR_NOOP("View/modify the net classes"),
-      QIcon(),
-      EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::CTRL + Qt::ALT + Qt::Key_N)},
+      {QKeySequence(Qt::Key_F6)},
       &categoryEditor,
   };
   EditorCommand gridProperties{
@@ -294,7 +276,7 @@ public:
       QT_TR_NOOP("View/modify the board setup"),
       QIcon(":/img/actions/settings.png"),
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::Key_F6)},
+      {QKeySequence(Qt::Key_F7)},
       &categoryEditor,
   };
   EditorCommand runQuickCheck{
@@ -452,6 +434,15 @@ public:
       QIcon(":/img/actions/delete.png"),
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL + Qt::Key_Delete)},
+      &categoryTextInput,
+  };
+  EditorCommand inputAcceptAdd{
+      "input_accept_add",  // clang-format break
+      QT_TR_NOOP("Add"),
+      QT_TR_NOOP("Add this item"),
+      QIcon(":/img/actions/plus_2.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::Key_Return)},
       &categoryTextInput,
   };
 

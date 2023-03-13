@@ -46,7 +46,11 @@ CmdProjectEdit::CmdProjectEdit(Project& project) noexcept
     mOldVersion(mProject.getVersion()),
     mNewVersion(mProject.getVersion()),
     mOldAttributes(mProject.getAttributes()),
-    mNewAttributes(mOldAttributes) {
+    mNewAttributes(mOldAttributes),
+    mOldLocaleOrder(mProject.getLocaleOrder()),
+    mNewLocaleOrder(mOldLocaleOrder),
+    mOldNormOrder(mProject.getNormOrder()),
+    mNewNormOrder(mOldNormOrder) {
 }
 
 CmdProjectEdit::~CmdProjectEdit() noexcept {
@@ -76,6 +80,16 @@ void CmdProjectEdit::setAttributes(const AttributeList& attributes) noexcept {
   mNewAttributes = attributes;
 }
 
+void CmdProjectEdit::setLocaleOrder(const QStringList& order) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewLocaleOrder = order;
+}
+
+void CmdProjectEdit::setNormOrder(const QStringList& order) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewNormOrder = order;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -87,6 +101,8 @@ bool CmdProjectEdit::performExecute() {
   if (mNewAuthor != mOldAuthor) return true;
   if (mNewVersion != mOldVersion) return true;
   if (mNewAttributes != mOldAttributes) return true;
+  if (mNewLocaleOrder != mOldLocaleOrder) return true;
+  if (mNewNormOrder != mOldNormOrder) return true;
   return false;
 }
 
@@ -95,6 +111,8 @@ void CmdProjectEdit::performUndo() {
   mProject.setAuthor(mOldAuthor);
   mProject.setVersion(mOldVersion);
   mProject.setAttributes(mOldAttributes);
+  mProject.setLocaleOrder(mOldLocaleOrder);
+  mProject.setNormOrder(mOldNormOrder);
 }
 
 void CmdProjectEdit::performRedo() {
@@ -102,6 +120,8 @@ void CmdProjectEdit::performRedo() {
   mProject.setAuthor(mNewAuthor);
   mProject.setVersion(mNewVersion);
   mProject.setAttributes(mNewAttributes);
+  mProject.setLocaleOrder(mNewLocaleOrder);
+  mProject.setNormOrder(mNewNormOrder);
 }
 
 /*******************************************************************************

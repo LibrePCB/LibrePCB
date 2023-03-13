@@ -27,7 +27,6 @@
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
-#include <librepcb/core/project/projectsettings.h>
 
 #include <QtCore>
 
@@ -80,8 +79,7 @@ bool CmdComponentInstanceAdd::performExecute() {
              "project's library!")
               .arg(mComponentUuid.toStr()));
     }
-    const QStringList& normOrder =
-        mCircuit.getProject().getSettings().getNormOrder();
+    const QStringList& normOrder = mCircuit.getProject().getNormOrder();
     QString name = mCircuit.generateAutoComponentInstanceName(
         cmp->getPrefixes().value(normOrder));
     mComponentInstance =

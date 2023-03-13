@@ -39,7 +39,7 @@
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
 #include "../projecteditor.h"
-#include "../projectpropertieseditordialog.h"
+#include "../projectsetupdialog.h"
 #include "boardlayersdock.h"
 #include "boardpickplacegeneratordialog.h"
 #include "boardsetupdialog.h"
@@ -60,7 +60,6 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -361,18 +360,11 @@ void BoardEditor::createActions() noexcept {
       this, &mProjectEditor, &ProjectEditor::showSchematicEditor));
   mActionControlPanel.reset(cmd.controlPanel.createAction(
       this, &mProjectEditor, &ProjectEditor::showControlPanelClicked));
-  mActionProjectProperties.reset(
-      cmd.projectProperties.createAction(this, this, [this]() {
-        abortBlockingToolsInOtherEditors();  // Release undo stack.
-        ProjectPropertiesEditorDialog dialog(
-            mProject, mProjectEditor.getUndoStack(), this);
-        dialog.exec();
-      }));
-  mActionProjectSettings.reset(cmd.projectSettings.createAction(
-      this, this,
-      [this]() { mProjectEditor.execProjectSettingsDialog(this); }));
-  mActionNetClasses.reset(cmd.netClasses.createAction(this, this, [this]() {
-    mProjectEditor.execNetClassesEditorDialog(this);
+  mActionProjectSetup.reset(cmd.projectSetup.createAction(this, this, [this]() {
+    abortBlockingToolsInOtherEditors();  // Release undo stack.
+    ProjectSetupDialog dialog(mProject, mProjectEditor.getUndoStack(),
+                              "board_editor", this);
+    dialog.exec();
   }));
   mActionUpdateLibrary.reset(
       cmd.projectLibraryUpdate.createAction(this, this, [this]() {
@@ -865,9 +857,7 @@ void BoardEditor::createMenus() noexcept {
 
   // Project.
   mb.newMenu(&MenuBuilder::createProjectMenu);
-  mb.addAction(mActionNetClasses);
-  mb.addAction(mActionProjectProperties);
-  mb.addAction(mActionProjectSettings);
+  mb.addAction(mActionProjectSetup);
   mb.addSeparator();
   mb.addAction(mActionUpdateLibrary);
 

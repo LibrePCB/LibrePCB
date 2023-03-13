@@ -41,7 +41,6 @@ namespace librepcb {
 class Board;
 class Circuit;
 class ProjectLibrary;
-class ProjectSettings;
 class Schematic;
 class SchematicLayerProvider;
 class StrokeFontPool;
@@ -178,11 +177,18 @@ public:
   const AttributeList& getAttributes() const noexcept { return mAttributes; }
 
   /**
-   * @brief Get the ProjectSettings object which contains all project settings
+   * @brief Get the configured locale order
    *
-   * @return A reference to the ProjectSettings object
+   * @return Locales in a specific order
    */
-  ProjectSettings& getSettings() const noexcept { return *mProjectSettings; }
+  const QStringList& getLocaleOrder() const noexcept { return mLocaleOrder; }
+
+  /**
+   * @brief Get the configured norm order
+   *
+   * @return Norms in a specific order
+   */
+  const QStringList& getNormOrder() const noexcept { return mNormOrder; }
 
   /**
    * @brief Get the ProjectLibrary object which contains all library elements
@@ -256,9 +262,23 @@ public:
   /**
    * @brief Set all project attributes
    *
-   * @param newAttributes     The new list of attributes
+   * @param newAttributes     The new list of attributes.
    */
   void setAttributes(const AttributeList& newAttributes) noexcept;
+
+  /**
+   * @brief Set the locale order
+   *
+   * @param newLocales        The new locale order.
+   */
+  void setLocaleOrder(const QStringList& newLocales) noexcept;
+
+  /**
+   * @brief Set the norm order
+   *
+   * @param newNorms          The new norm order.
+   */
+  void setNormOrder(const QStringList& newNorms) noexcept;
 
   /**
    * @brief Set all ERC message approvals
@@ -450,6 +470,11 @@ signals:
   void attributesChanged() override;
 
   /**
+   * @brief The norm order has been changed
+   */
+  void normOrderChanged();
+
+  /**
    * @brief Called by #setErcMessageApprovals()
    *
    * @param approvals   The new approvals
@@ -516,8 +541,11 @@ private:
   /// User-defined attributes in the specified order.
   AttributeList mAttributes;
 
-  /// All project specific settings.
-  QScopedPointer<ProjectSettings> mProjectSettings;
+  /// Configured locales (e.g. "de_CH") in a particular order.
+  QStringList mLocaleOrder;
+
+  /// Configured norms in a particular order.
+  QStringList mNormOrder;
 
   /// Ehe library which contains all elements needed in this project.
   QScopedPointer<ProjectLibrary> mProjectLibrary;

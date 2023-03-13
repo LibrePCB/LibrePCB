@@ -28,7 +28,6 @@
 #include "../../utils/scopeguardlist.h"
 #include "../board/items/bi_footprintpad.h"
 #include "../project.h"
-#include "../projectsettings.h"
 #include "../schematic/items/si_symbolpin.h"
 #include "circuit.h"
 #include "componentinstance.h"

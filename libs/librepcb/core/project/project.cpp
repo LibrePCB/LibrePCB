@@ -34,7 +34,6 @@
 #include "circuit/circuit.h"
 #include "circuit/netclass.h"
 #include "projectlibrary.h"
-#include "projectsettings.h"
 #include "schematic/schematic.h"
 #include "schematic/schematiclayerprovider.h"
 
@@ -60,7 +59,9 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
     mAuthor(),
     mVersion(),
     mCreated(QDateTime::currentDateTime()),
-    mLastModified(QDateTime::currentDateTime()) {
+    mLastModified(QDateTime::currentDateTime()),
+    mLocaleOrder(),
+    mNormOrder() {
   // Check if the file extension is correct
   if (!mFilename.endsWith(".lpp")) {
     throw RuntimeError(__FILE__, __LINE__,
@@ -70,9 +71,6 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
   // Load stroke fonts.
   mStrokeFontPool.reset(new StrokeFontPool(
       TransactionalDirectory(*mDirectory, "resources/fontobene")));
-
-  // Initialize settings.
-  mProjectSettings.reset(new ProjectSettings(*this));
 
   // Load project library.
   mProjectLibrary.reset(
@@ -158,6 +156,21 @@ void Project::setAttributes(const AttributeList& newAttributes) noexcept {
   if (newAttributes != mAttributes) {
     mAttributes = newAttributes;
     emit attributesChanged();
+  }
+}
+
+void Project::setLocaleOrder(const QStringList& newLocales) noexcept {
+  if (newLocales != mLocaleOrder) {
+    mLocaleOrder = newLocales;
+    emit attributesChanged();
+  }
+}
+
+void Project::setNormOrder(const QStringList& newNorms) noexcept {
+  if (newNorms != mNormOrder) {
+    mNormOrder = newNorms;
+    emit attributesChanged();
+    emit normOrderChanged();
   }
 }
 
@@ -376,7 +389,25 @@ void Project::save() {
   // Settings.
   {
     SExpression root = SExpression::createList("librepcb_project_settings");
-    mProjectSettings->serialize(root);
+    root.ensureLineBreak();
+    {
+      SExpression& node = root.appendList("library_locale_order");
+      foreach (const QString& locale, mLocaleOrder) {
+        node.ensureLineBreak();
+        node.appendChild("locale", locale);
+      }
+      node.ensureLineBreak();
+    }
+    root.ensureLineBreak();
+    {
+      SExpression& node = root.appendList("library_norm_order");
+      foreach (const QString& norm, mNormOrder) {
+        node.ensureLineBreak();
+        node.appendChild("norm", norm);
+      }
+      node.ensureLineBreak();
+    }
+    root.ensureLineBreak();
     mDirectory->write("project/settings.lp", root.toByteArray());
   }
 

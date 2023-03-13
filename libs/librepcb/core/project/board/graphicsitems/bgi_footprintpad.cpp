@@ -27,7 +27,6 @@
 #include "../../../library/pkg/package.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
-#include "../../projectsettings.h"
 #include "../board.h"
 #include "../boardlayerstack.h"
 #include "../items/bi_device.h"

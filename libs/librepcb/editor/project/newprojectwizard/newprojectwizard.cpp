@@ -32,7 +32,6 @@
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/project/schematic/schematic.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -89,9 +88,8 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   project->setAuthor(mPageMetadata->getProjectAuthor());
 
   // set project settings (copy from workspace settings)
-  ProjectSettings& settings = project->getSettings();
-  settings.setLocaleOrder(mWorkspace.getSettings().libraryLocaleOrder.get());
-  settings.setNormOrder(mWorkspace.getSettings().libraryNormOrder.get());
+  project->setLocaleOrder(mWorkspace.getSettings().libraryLocaleOrder.get());
+  project->setNormOrder(mWorkspace.getSettings().libraryNormOrder.get());
 
   // add schematic
   if (mPageInitialization->getCreateSchematic()) {

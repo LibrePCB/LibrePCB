@@ -25,9 +25,7 @@
 #include "../dialogs/filedialog.h"
 #include "../undostack.h"
 #include "boardeditor/boardeditor.h"
-#include "circuit/editnetclassesdialog.h"
 #include "orderpcbdialog.h"
-#include "projectsettingsdialog.h"
 #include "schematiceditor/schematiceditor.h"
 
 #include <librepcb/core/application.h>
@@ -186,16 +184,6 @@ void ProjectEditor::showBoardEditor() noexcept {
   mBoardEditor->show();
   mBoardEditor->raise();
   mBoardEditor->activateWindow();
-}
-
-void ProjectEditor::execProjectSettingsDialog(QWidget* parent) noexcept {
-  ProjectSettingsDialog d(mProject.getSettings(), *mUndoStack, parent);
-  d.exec();
-}
-
-void ProjectEditor::execNetClassesEditorDialog(QWidget* parent) noexcept {
-  EditNetClassesDialog d(mProject.getCircuit(), *mUndoStack, parent);
-  d.exec();
 }
 
 void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {

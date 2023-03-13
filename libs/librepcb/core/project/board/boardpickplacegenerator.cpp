@@ -27,7 +27,6 @@
 #include "../../library/pkg/package.h"
 #include "../circuit/componentinstance.h"
 #include "../project.h"
-#include "../projectsettings.h"
 #include "board.h"
 #include "items/bi_device.h"
 
@@ -65,8 +64,7 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
   std::shared_ptr<PickPlaceData> data = std::make_shared<PickPlaceData>(
       *mBoard.getProject().getName(), mBoard.getProject().getVersion(),
       *mBoard.getName());
-  const QStringList& locale =
-      mBoard.getProject().getSettings().getLocaleOrder();
+  const QStringList& locale = mBoard.getProject().getLocaleOrder();
 
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     // Skip devices which are considered as no device to be mounted.

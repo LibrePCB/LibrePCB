@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_PROJECTPROPERTIESEDITORDIALOG_H
-#define LIBREPCB_EDITOR_PROJECTPROPERTIESEDITORDIALOG_H
+#ifndef LIBREPCB_EDITOR_PROJECTSETUPDIALOG_H
+#define LIBREPCB_EDITOR_PROJECTSETUPDIALOG_H
 
 /*******************************************************************************
  *  Includes
@@ -40,42 +40,42 @@ namespace editor {
 class UndoStack;
 
 namespace Ui {
-class ProjectPropertiesEditorDialog;
+class ProjectSetupDialog;
 }
 
 /*******************************************************************************
- *  Class ProjectPropertiesEditorDialog
+ *  Class ProjectSetupDialog
  ******************************************************************************/
 
 /**
- * @brief The ProjectPropertiesEditorDialog class
+ * @brief The ProjectSetupDialog class
  */
-class ProjectPropertiesEditorDialog final : public QDialog {
+class ProjectSetupDialog final : public QDialog {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  ProjectPropertiesEditorDialog() = delete;
-  ProjectPropertiesEditorDialog(const ProjectPropertiesEditorDialog& other) =
-      delete;
-  ProjectPropertiesEditorDialog(Project& project, UndoStack& undoStack,
-                                QWidget* parent) noexcept;
-  ~ProjectPropertiesEditorDialog() noexcept;
+  ProjectSetupDialog() = delete;
+  ProjectSetupDialog(const ProjectSetupDialog& other) = delete;
+  ProjectSetupDialog(Project& project, UndoStack& undoStack,
+                     const QString& settingsPrefix,
+                     QWidget* parent = nullptr) noexcept;
+  ~ProjectSetupDialog();
 
   // Operator Overloadings
-  ProjectPropertiesEditorDialog& operator=(
-      const ProjectPropertiesEditorDialog& rhs) = delete;
+  ProjectSetupDialog& operator=(const ProjectSetupDialog& rhs) = delete;
 
 private:  // Methods
-  void keyPressEvent(QKeyEvent* e);
-  void accept();
-  bool applyChanges() noexcept;
+  void buttonBoxClicked(QAbstractButton* button);
+  void load() noexcept;
+  bool apply() noexcept;
 
-private:  // Data
+private:  // Date
   Project& mProject;
   UndoStack& mUndoStack;
+  const QString mSettingsPrefix;
   AttributeList mAttributes;
-  QScopedPointer<Ui::ProjectPropertiesEditorDialog> mUi;
+  QScopedPointer<Ui::ProjectSetupDialog> mUi;
 };
 
 /*******************************************************************************
