@@ -53,10 +53,11 @@ public:
   };
 
   enum class Type {
-    Tht,
-    Smt,
-    Fiducial,
-    Other,
+    Tht,  ///< Pure THT package
+    Smt,  ///< Pure SMT package
+    Mixed,  ///< Mixed THT/SMT package
+    Fiducial,  ///< No package to mount, just a fiducial
+    Other,  ///< Anything special, e.g. mechanical parts
   };
 
   // Constructors / Destructor

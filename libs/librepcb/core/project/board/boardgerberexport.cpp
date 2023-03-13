@@ -147,21 +147,26 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   // Export all components on the selected board side.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     if (device->getMirrored() == (side == BoardSide::Bottom)) {
-      // Skip devices which are considered as no device to be mounted.
+      const Package::AssemblyType assemblyType =
+          device->getLibPackage().getAssemblyType(true);
       GerberGenerator::MountType mountType = GerberGenerator::MountType::Other;
-      switch (device->determineMountType()) {
-        case BI_Device::MountType::Tht:
+      switch (assemblyType) {
+        case Package::AssemblyType::None:
+          // Skip devices which don't represent a mountable package.
+          continue;
+        case Package::AssemblyType::Tht:
+        case Package::AssemblyType::Mixed:  // Does this make sense?!
           mountType = GerberGenerator::MountType::Tht;
           break;
-        case BI_Device::MountType::Smt:
+        case Package::AssemblyType::Smt:
           mountType = GerberGenerator::MountType::Smt;
           break;
-        case BI_Device::MountType::Fiducial:
-          mountType = GerberGenerator::MountType::Fiducial;
+        case Package::AssemblyType::Other:
+          mountType = GerberGenerator::MountType::Other;
           break;
-        case BI_Device::MountType::None:
-          continue;
         default:
+          qWarning() << "Unknown assembly type:"
+                     << static_cast<int>(assemblyType);
           break;
       }
 

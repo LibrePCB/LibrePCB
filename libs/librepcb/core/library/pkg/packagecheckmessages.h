@@ -40,6 +40,42 @@ class PackagePad;
 class StrokeText;
 
 /*******************************************************************************
+ *  Class MsgDeprecatedAssemblyType
+ ******************************************************************************/
+
+/**
+ * @brief The MsgDeprecatedAssemblyType class
+ */
+class MsgDeprecatedAssemblyType final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgDeprecatedAssemblyType)
+
+public:
+  // Constructors / Destructor
+  MsgDeprecatedAssemblyType() noexcept;
+  MsgDeprecatedAssemblyType(const MsgDeprecatedAssemblyType& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgDeprecatedAssemblyType() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class MsgSuspiciousAssemblyType
+ ******************************************************************************/
+
+/**
+ * @brief The MsgSuspiciousAssemblyType class
+ */
+class MsgSuspiciousAssemblyType final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgSuspiciousAssemblyType)
+
+public:
+  // Constructors / Destructor
+  MsgSuspiciousAssemblyType() noexcept;
+  MsgSuspiciousAssemblyType(const MsgSuspiciousAssemblyType& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgSuspiciousAssemblyType() noexcept {}
+};
+
+/*******************************************************************************
  *  Class MsgDuplicatePadName
  ******************************************************************************/
 

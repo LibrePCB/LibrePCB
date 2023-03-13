@@ -17,65 +17,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_PACKAGECHECK_H
-#define LIBREPCB_CORE_PACKAGECHECK_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../libraryelementcheck.h"
+#include "cmdpackageedit.h"
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class Package;
+namespace editor {
 
 /*******************************************************************************
- *  Class PackageCheck
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief The PackageCheck class
- */
-class PackageCheck : public LibraryElementCheck {
-public:
-  // Constructors / Destructor
-  PackageCheck() = delete;
-  PackageCheck(const PackageCheck& other) = delete;
-  explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+CmdPackageEdit::CmdPackageEdit(Package& package) noexcept
+  : CmdLibraryElementEdit(package, tr("Edit Package Metadata")),
+    mPackage(package),
+    mOldAssemblyType(package.getAssemblyType(false)),
+    mNewAssemblyType(mOldAssemblyType) {
+}
 
-  // General Methods
-  virtual RuleCheckMessageList runChecks() const override;
+CmdPackageEdit::~CmdPackageEdit() noexcept {
+}
 
-  // Operator Overloadings
-  PackageCheck& operator=(const PackageCheck& rhs) = delete;
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
 
-protected:  // Methods
-  void checkAssemblyType(MsgList& msgs) const;
-  void checkDuplicatePadNames(MsgList& msgs) const;
-  void checkMissingFootprint(MsgList& msgs) const;
-  void checkMissingTexts(MsgList& msgs) const;
-  void checkWrongTextLayers(MsgList& msgs) const;
-  void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
-  void checkPadsAnnularRing(MsgList& msgs) const;
-  void checkPadsConnectionPoint(MsgList& msgs) const;
-  void checkCustomPadOutline(MsgList& msgs) const;
-  void checkHolesStopMask(MsgList& msgs) const;
+void CmdPackageEdit::setAssemblyType(Package::AssemblyType type) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewAssemblyType = type;
+}
 
-private:  // Data
-  const Package& mPackage;
-};
+/*******************************************************************************
+ *  Inherited from UndoCommand
+ ******************************************************************************/
+
+bool CmdPackageEdit::performExecute() {
+  if (CmdLibraryElementEdit::performExecute()) return true;  // can throw
+  if (mNewAssemblyType != mOldAssemblyType) return true;
+  return false;
+}
+
+void CmdPackageEdit::performUndo() {
+  CmdLibraryElementEdit::performUndo();  // can throw
+  mPackage.setAssemblyType(mOldAssemblyType);
+}
+
+void CmdPackageEdit::performRedo() {
+  CmdLibraryElementEdit::performRedo();  // can throw
+  mPackage.setAssemblyType(mNewAssemblyType);
+}
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
-
-#endif

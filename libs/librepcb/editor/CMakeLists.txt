@@ -103,6 +103,8 @@ add_library(
   library/cmd/cmdlibraryedit.h
   library/cmd/cmdlibraryelementedit.cpp
   library/cmd/cmdlibraryelementedit.h
+  library/cmd/cmdpackageedit.cpp
+  library/cmd/cmdpackageedit.h
   library/cmd/cmdpackagepadedit.cpp
   library/cmd/cmdpackagepadedit.h
   library/cmd/cmdpastefootprintitems.cpp

@@ -168,7 +168,8 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
 
   // Create package
   TransactionalDirectory pkg1Dir(mFs, uuid(5).toStr());
-  Package pkg1(uuid(5), version("0.1"), "", ElementName("pkg 1"), "", "");
+  Package pkg1(uuid(5), version("0.1"), "", ElementName("pkg 1"), "", "",
+               Package::AssemblyType::Tht);
   pkg1.saveTo(pkg1Dir);
 
   // Create device

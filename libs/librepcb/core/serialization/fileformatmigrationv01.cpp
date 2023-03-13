@@ -100,6 +100,9 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
     const QString fp = "package.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
 
+    // Assembly type.
+    root.appendChild("assembly_type", SExpression::createToken("auto"));
+
     // Footprints.
     for (SExpression* fptNode : root.getChildren("footprint")) {
       // Pads.

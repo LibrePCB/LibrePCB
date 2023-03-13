@@ -33,26 +33,112 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const Package::AssemblyType& obj) {
+  switch (obj) {
+    case Package::AssemblyType::None:
+      return SExpression::createToken("none");
+    case Package::AssemblyType::Tht:
+      return SExpression::createToken("tht");
+    case Package::AssemblyType::Smt:
+      return SExpression::createToken("smt");
+    case Package::AssemblyType::Mixed:
+      return SExpression::createToken("mixed");
+    case Package::AssemblyType::Other:
+      return SExpression::createToken("other");
+    case Package::AssemblyType::Auto:
+      return SExpression::createToken("auto");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+inline Package::AssemblyType deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == QLatin1String("none")) {
+    return Package::AssemblyType::None;
+  } else if (str == QLatin1String("tht")) {
+    return Package::AssemblyType::Tht;
+  } else if (str == QLatin1String("smt")) {
+    return Package::AssemblyType::Smt;
+  } else if (str == QLatin1String("mixed")) {
+    return Package::AssemblyType::Mixed;
+  } else if (str == QLatin1String("other")) {
+    return Package::AssemblyType::Other;
+  } else if (str == QLatin1String("auto")) {
+    return Package::AssemblyType::Auto;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Unknown package assembly type: '%1'").arg(str));
+  }
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 Package::Package(const Uuid& uuid, const Version& version,
                  const QString& author, const ElementName& name_en_US,
                  const QString& description_en_US,
-                 const QString& keywords_en_US)
+                 const QString& keywords_en_US, AssemblyType assemblyType)
   : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
-                   author, name_en_US, description_en_US, keywords_en_US) {
+                   author, name_en_US, description_en_US, keywords_en_US),
+    mAssemblyType(assemblyType),
+    mPads(),
+    mFootprints() {
 }
 
 Package::Package(std::unique_ptr<TransactionalDirectory> directory,
                  const SExpression& root)
   : LibraryElement(getShortElementName(), getLongElementName(), true,
                    std::move(directory), root),
+    mAssemblyType(deserialize<AssemblyType>(root.getChild("assembly_type/@0"))),
     mPads(root),
     mFootprints(root) {
 }
 
 Package::~Package() noexcept {
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+Package::AssemblyType Package::getAssemblyType(bool resolveAuto) const
+    noexcept {
+  if (resolveAuto && (mAssemblyType == AssemblyType::Auto)) {
+    return guessAssemblyType();
+  } else {
+    return mAssemblyType;
+  }
+}
+
+Package::AssemblyType Package::guessAssemblyType() const noexcept {
+  // Auto-detect based on default footprint pads.
+  bool hasThtPads = false;
+  bool hasSmtPads = false;
+  if (!mFootprints.isEmpty()) {
+    for (const FootprintPad& pad : mFootprints.first()->getPads()) {
+      if (pad.isTht()) {
+        hasThtPads = true;
+      } else {
+        hasSmtPads = true;
+      }
+    }
+  }
+  if (hasThtPads && hasSmtPads) {
+    return AssemblyType::Mixed;
+  } else if (hasThtPads) {
+    return AssemblyType::Tht;
+  } else if (hasSmtPads) {
+    return AssemblyType::Smt;
+  } else {
+    return AssemblyType::None;
+  }
 }
 
 /*******************************************************************************
@@ -93,6 +179,8 @@ std::unique_ptr<Package> Package::open(
 
 void Package::serialize(SExpression& root) const {
   LibraryElement::serialize(root);
+  root.ensureLineBreak();
+  root.appendChild("assembly_type", mAssemblyType);
   root.ensureLineBreak();
   mPads.serialize(root);
   root.ensureLineBreak();

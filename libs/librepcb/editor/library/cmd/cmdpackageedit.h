@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_PACKAGECHECK_H
-#define LIBREPCB_CORE_PACKAGECHECK_H
+#ifndef LIBREPCB_EDITOR_CMDPACKAGEEDIT_H
+#define LIBREPCB_EDITOR_CMDPACKAGEEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../libraryelementcheck.h"
+#include "cmdlibraryelementedit.h"
+
+#include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -31,51 +33,51 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Package;
+namespace editor {
 
 /*******************************************************************************
- *  Class PackageCheck
+ *  Class CmdPackageEdit
  ******************************************************************************/
 
 /**
- * @brief The PackageCheck class
+ * @brief The CmdPackageEdit class
  */
-class PackageCheck : public LibraryElementCheck {
+class CmdPackageEdit : public CmdLibraryElementEdit {
 public:
   // Constructors / Destructor
-  PackageCheck() = delete;
-  PackageCheck(const PackageCheck& other) = delete;
-  explicit PackageCheck(const Package& package) noexcept;
-  virtual ~PackageCheck() noexcept;
+  CmdPackageEdit() = delete;
+  CmdPackageEdit(const CmdPackageEdit& other) = delete;
+  explicit CmdPackageEdit(Package& package) noexcept;
+  virtual ~CmdPackageEdit() noexcept;
 
-  // General Methods
-  virtual RuleCheckMessageList runChecks() const override;
+  // Setters
+  void setAssemblyType(Package::AssemblyType type) noexcept;
 
   // Operator Overloadings
-  PackageCheck& operator=(const PackageCheck& rhs) = delete;
+  CmdPackageEdit& operator=(const CmdPackageEdit& rhs) = delete;
 
 protected:  // Methods
-  void checkAssemblyType(MsgList& msgs) const;
-  void checkDuplicatePadNames(MsgList& msgs) const;
-  void checkMissingFootprint(MsgList& msgs) const;
-  void checkMissingTexts(MsgList& msgs) const;
-  void checkWrongTextLayers(MsgList& msgs) const;
-  void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
-  void checkPadsAnnularRing(MsgList& msgs) const;
-  void checkPadsConnectionPoint(MsgList& msgs) const;
-  void checkCustomPadOutline(MsgList& msgs) const;
-  void checkHolesStopMask(MsgList& msgs) const;
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  virtual bool performExecute() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  virtual void performUndo() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  virtual void performRedo() override;
 
 private:  // Data
-  const Package& mPackage;
+  Package& mPackage;
+
+  Package::AssemblyType mOldAssemblyType;
+  Package::AssemblyType mNewAssemblyType;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

@@ -52,6 +52,7 @@ PackageCheck::~PackageCheck() noexcept {
 
 RuleCheckMessageList PackageCheck::runChecks() const {
   RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
+  checkAssemblyType(msgs);
   checkDuplicatePadNames(msgs);
   checkMissingFootprint(msgs);
   checkMissingTexts(msgs);
@@ -68,6 +69,21 @@ RuleCheckMessageList PackageCheck::runChecks() const {
 /*******************************************************************************
  *  Protected Methods
  ******************************************************************************/
+
+void PackageCheck::checkAssemblyType(MsgList& msgs) const {
+  // Check for deprecated assembly type.
+  if (mPackage.getAssemblyType(false) == Package::AssemblyType::Auto) {
+    msgs.append(std::make_shared<MsgDeprecatedAssemblyType>());
+  }
+
+  // Check if the assembly type looks reasonable (only possible if there is at
+  // least one footprint).
+  if ((!mPackage.getFootprints().isEmpty()) &&
+      (mPackage.getAssemblyType(false) != Package::AssemblyType::Auto) &&
+      (mPackage.getAssemblyType(false) != mPackage.guessAssemblyType())) {
+    msgs.append(std::make_shared<MsgSuspiciousAssemblyType>());
+  }
+}
 
 void PackageCheck::checkDuplicatePadNames(MsgList& msgs) const {
   QSet<CircuitIdentifier> padNames;

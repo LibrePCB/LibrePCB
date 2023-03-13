@@ -26,13 +26,13 @@
 #include "../../cmd/cmdstroketextedit.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
-#include "../../library/cmd/cmdlibraryelementedit.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/toolbarproxy.h"
 #include "../../widgets/statusbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdfootprintedit.h"
 #include "../cmd/cmdfootprintpadedit.h"
+#include "../cmd/cmdpackageedit.h"
 #include "fsm/packageeditorfsm.h"
 #include "ui_packageeditorwidget.h"
 
@@ -72,6 +72,7 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   mUi->edtAuthor->setReadOnly(mContext.readOnly);
   mUi->edtVersion->setReadOnly(mContext.readOnly);
   mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
+  mUi->cbxAssemblyType->setEnabled(!mContext.readOnly);
   mUi->footprintEditorWidget->setReadOnly(mContext.readOnly);
   mUi->padListEditorWidget->setReadOnly(mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
@@ -106,6 +107,24 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   setGridProperties(PositiveLength(2540000),
                     mContext.workspace.getSettings().defaultLengthUnit.get(),
                     theme.getBoardGridStyle());
+
+  // List mount types.
+  mUi->cbxAssemblyType->addItem(
+      tr("THT (all leads)"), QVariant::fromValue(Package::AssemblyType::Tht));
+  mUi->cbxAssemblyType->addItem(
+      tr("SMT (all leads)"), QVariant::fromValue(Package::AssemblyType::Smt));
+  mUi->cbxAssemblyType->addItem(
+      tr("THT+SMT (mixed leads)"),
+      QVariant::fromValue(Package::AssemblyType::Mixed));
+  mUi->cbxAssemblyType->addItem(
+      tr("Other (included in BOM/PnP)"),
+      QVariant::fromValue(Package::AssemblyType::Other));
+  mUi->cbxAssemblyType->addItem(
+      tr("None (excluded from BOM/PnP)"),
+      QVariant::fromValue(Package::AssemblyType::None));
+  mUi->cbxAssemblyType->addItem(
+      tr("Auto-detect (not recommended)"),
+      QVariant::fromValue(Package::AssemblyType::Auto));
 
   // Insert category list editor widget.
   mCategoriesEditorWidget.reset(new CategoryListEditorWidget(
@@ -155,6 +174,10 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
           &PackageEditorWidget::commitMetadata);
   connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
           &PackageEditorWidget::commitMetadata);
+  connect(
+      mUi->cbxAssemblyType,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &PackageEditorWidget::commitMetadata);
   connect(mCategoriesEditorWidget.data(), &CategoryListEditorWidget::edited,
           this, &PackageEditorWidget::commitMetadata);
 
@@ -390,14 +413,15 @@ void PackageEditorWidget::updateMetadata() noexcept {
   mUi->edtAuthor->setText(mPackage->getAuthor());
   mUi->edtVersion->setText(mPackage->getVersion().toStr());
   mUi->cbxDeprecated->setChecked(mPackage->isDeprecated());
+  mUi->cbxAssemblyType->setCurrentIndex(mUi->cbxAssemblyType->findData(
+      QVariant::fromValue(mPackage->getAssemblyType(false))));
   mUi->lstMessages->setApprovals(mPackage->getMessageApprovals());
   mCategoriesEditorWidget->setUuids(mPackage->getCategories());
 }
 
 QString PackageEditorWidget::commitMetadata() noexcept {
   try {
-    QScopedPointer<CmdLibraryElementEdit> cmd(
-        new CmdLibraryElementEdit(*mPackage, tr("Edit package metadata")));
+    QScopedPointer<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
     try {
       // throws on invalid name
       cmd->setName("", ElementName(mUi->edtName->text().trimmed()));
@@ -412,6 +436,10 @@ QString PackageEditorWidget::commitMetadata() noexcept {
     }
     cmd->setAuthor(mUi->edtAuthor->text().trimmed());
     cmd->setDeprecated(mUi->cbxDeprecated->isChecked());
+    const QVariant asblyType = mUi->cbxAssemblyType->currentData();
+    if (asblyType.isValid() && asblyType.canConvert<Package::AssemblyType>()) {
+      cmd->setAssemblyType(asblyType.value<Package::AssemblyType>());
+    }
     cmd->setCategories(mCategoriesEditorWidget->getUuids());
 
     // Commit all changes.
@@ -547,6 +575,22 @@ bool PackageEditorWidget::runChecks(RuleCheckMessageList& msgs) const {
 }
 
 template <>
+void PackageEditorWidget::fixMsg(const MsgDeprecatedAssemblyType& msg) {
+  Q_UNUSED(msg);
+  QScopedPointer<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
+  cmd->setAssemblyType(mPackage->guessAssemblyType());
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgSuspiciousAssemblyType& msg) {
+  Q_UNUSED(msg);
+  QScopedPointer<CmdPackageEdit> cmd(new CmdPackageEdit(*mPackage));
+  cmd->setAssemblyType(mPackage->guessAssemblyType());
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <>
 void PackageEditorWidget::fixMsg(const MsgNameNotTitleCase& msg) {
   mUi->edtName->setText(*msg.getFixedName());
   commitMetadata();
@@ -642,6 +686,8 @@ bool PackageEditorWidget::fixMsgHelper(
 
 bool PackageEditorWidget::processRuleCheckMessage(
     std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
+  if (fixMsgHelper<MsgDeprecatedAssemblyType>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgSuspiciousAssemblyType>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;

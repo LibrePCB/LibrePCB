@@ -33,6 +33,31 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  MsgDeprecatedAssemblyType
+ ******************************************************************************/
+
+MsgDeprecatedAssemblyType::MsgDeprecatedAssemblyType() noexcept
+  : RuleCheckMessage(Severity::Hint, tr("Non-recommended assembly type"),
+                     tr("The assembly type 'Auto-detect' is not recommended as "
+                        "the detection might not be correct in every case. "
+                        "It's safer to specify the assembly type manually."),
+                     "auto_assembly_type") {
+}
+
+/*******************************************************************************
+ *  MsgSuspiciousAssemblyType
+ ******************************************************************************/
+
+MsgSuspiciousAssemblyType::MsgSuspiciousAssemblyType() noexcept
+  : RuleCheckMessage(
+        Severity::Warning, tr("Suspicious assembly type"),
+        tr("The specified assembly type differs from the assembly type which "
+           "is auto-detected from the footprint contents. Double-check if the "
+           "specified assembly type is really correct."),
+        "suspicious_assembly_type") {
+}
+
+/*******************************************************************************
  *  MsgDuplicatePadName
  ******************************************************************************/
 
