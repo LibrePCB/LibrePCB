@@ -86,7 +86,8 @@ class SchematicPainter final : public GraphicsPagePainter {
 public:
   // Constructors / Destructor
   SchematicPainter() = delete;
-  explicit SchematicPainter(const Schematic& schematic) noexcept;
+  explicit SchematicPainter(const Schematic& schematic,
+                            bool thumbnail = false) noexcept;
   SchematicPainter(const SchematicPainter& other) = delete;
   ~SchematicPainter() noexcept;
 

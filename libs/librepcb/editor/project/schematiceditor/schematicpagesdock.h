@@ -23,17 +23,27 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/uuid.h>
+
 #include <QtCore>
 #include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
+class GraphicsExport;
+class GraphicsExportSettings;
 class Project;
+class SI_Symbol;
+class Theme;
 
 namespace editor {
+
+class UndoStack;
 
 namespace Ui {
 class SchematicPagesDock;
@@ -53,7 +63,7 @@ public:
   // Constructors / Destructor
   SchematicPagesDock() = delete;
   SchematicPagesDock(const SchematicPagesDock& other) = delete;
-  SchematicPagesDock(Project& project, const QColor& background,
+  SchematicPagesDock(Project& project, UndoStack& undoStack, const Theme& theme,
                      QWidget* parent = nullptr);
   ~SchematicPagesDock();
 
@@ -78,12 +88,25 @@ private:  // Methods
   void renameSelectedSchematic() noexcept;
   void schematicAdded(int newIndex) noexcept;
   void schematicRemoved(int oldIndex) noexcept;
+  void schematicModified(SI_Symbol& symbol) noexcept;
   void updateSchematicNames() noexcept;
+  void updateNextThumbnail() noexcept;
+  void thumbnailReady(int index, const QSize& pageSize, const QRectF margins,
+                      std::shared_ptr<QPicture> picture);
 
 private:  // Data
   Project& mProject;
+  UndoStack& mUndoStack;
   QScopedPointer<Ui::SchematicPagesDock> mUi;
   QColor mBackgroundColor;
+
+  // Thumbnail generator.
+  QSet<Uuid> mScheduledThumbnailSchematics;
+  tl::optional<Uuid> mCurrentThumbnailSchematic;
+  QScopedPointer<GraphicsExport> mThumbnailGenerator;
+  std::shared_ptr<GraphicsExportSettings> mThumbnailSettings;
+  QTimer mThumbnailTimer;
+  QVector<QVector<QMetaObject::Connection>> mSchematicConnections;
 };
 
 /*******************************************************************************
