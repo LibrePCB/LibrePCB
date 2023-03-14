@@ -23,11 +23,16 @@
 #include "schematicpagesdock.h"
 
 #include "../../editorcommandset.h"
+#include "../../undostack.h"
 #include "ui_schematicpagesdock.h"
 
-#include <librepcb/core/graphics/graphicsscene.h>
+#include <librepcb/core/export/graphicsexport.h>
+#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/project/schematic/schematicpainter.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -42,13 +47,19 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SchematicPagesDock::SchematicPagesDock(Project& project,
-                                       const QColor& background,
-                                       QWidget* parent)
+SchematicPagesDock::SchematicPagesDock(Project& project, UndoStack& undoStack,
+                                       const Theme& theme, QWidget* parent)
   : QDockWidget(parent),
     mProject(project),
+    mUndoStack(undoStack),
     mUi(new Ui::SchematicPagesDock),
-    mBackgroundColor(background) {
+    mBackgroundColor(
+        theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor()),
+    mScheduledThumbnailSchematics(),
+    mCurrentThumbnailSchematic(tl::nullopt),
+    mThumbnailGenerator(new GraphicsExport()),
+    mThumbnailSettings(new GraphicsExportSettings()),
+    mThumbnailTimer() {
   mUi->setupUi(this);
 
   // disable wrapping to avoid "disappearing" schematic pages, see
@@ -81,6 +92,35 @@ SchematicPagesDock::SchematicPagesDock(Project& project,
   mUi->listWidget->addAction(cmd.remove.createAction(
       this, this, &SchematicPagesDock::removeSelectedSchematic,
       EditorCommand::ActionFlag::WidgetShortcut));
+
+  // Setup thumbnail generator.
+  {
+    QList<std::pair<QString, QColor>> colors;
+    QSet<QString> layers = {
+        GraphicsLayer::sSchematicSheetFrames,
+        GraphicsLayer::sSchematicNetLines,
+        GraphicsLayer::sSchematicNetLabels,
+        GraphicsLayer::sSchematicDocumentation,
+        GraphicsLayer::sSchematicComments,
+        GraphicsLayer::sSchematicGuide,
+        GraphicsLayer::sSymbolOutlines,
+        GraphicsLayer::sSymbolGrabAreas,
+        GraphicsLayer::sSymbolPinLines,
+    };
+    foreach (const QString layer, layers) {
+      colors.append(std::make_pair(
+          layer, theme.getColorForLayer(layer).getPrimaryColor()));
+    }
+    mThumbnailSettings->setLayers(colors);
+    mThumbnailSettings->setBackgroundColor(Qt::transparent);
+    mThumbnailSettings->setPixmapDpi(40);
+    mThumbnailSettings->setMinLineWidth(UnsignedLength(700000));
+    connect(mThumbnailGenerator.data(), &GraphicsExport::previewReady, this,
+            &SchematicPagesDock::thumbnailReady);
+    connect(&mThumbnailTimer, &QTimer::timeout, this,
+            &SchematicPagesDock::updateNextThumbnail);
+    mThumbnailTimer.start(300);
+  }
 }
 
 SchematicPagesDock::~SchematicPagesDock() {
@@ -123,13 +163,32 @@ void SchematicPagesDock::schematicAdded(int newIndex) noexcept {
 
   QListWidgetItem* item = new QListWidgetItem();
   item->setText(QString("%1: %2").arg(newIndex + 1).arg(*schematic->getName()));
-  item->setIcon(QIcon(schematic->getGraphicsScene().toPixmap(
-      QSize(297, 210), mBackgroundColor)));
+  item->setData(Qt::UserRole, schematic->getUuid().toStr());
   mUi->listWidget->insertItem(newIndex, item);
+
+  mSchematicConnections.insert(
+      newIndex,
+      {
+          connect(schematic, &Schematic::symbolAdded, this,
+                  &SchematicPagesDock::schematicModified),
+          connect(schematic, &Schematic::symbolRemoved, this,
+                  &SchematicPagesDock::schematicModified),
+      });
+
+  mScheduledThumbnailSchematics.insert(schematic->getUuid());
+  updateNextThumbnail();
 }
 
 void SchematicPagesDock::schematicRemoved(int oldIndex) noexcept {
+  foreach (auto connection, mSchematicConnections.takeAt(oldIndex)) {
+    disconnect(connection);
+  }
+
   delete mUi->listWidget->item(oldIndex);
+}
+
+void SchematicPagesDock::schematicModified(SI_Symbol& symbol) noexcept {
+  mScheduledThumbnailSchematics.insert(symbol.getSchematic().getUuid());
 }
 
 void SchematicPagesDock::updateSchematicNames() noexcept {
@@ -139,6 +198,63 @@ void SchematicPagesDock::updateSchematicNames() noexcept {
     if (item && schematic) {
       item->setText(*schematic->getName());
     }
+  }
+}
+
+void SchematicPagesDock::updateNextThumbnail() noexcept {
+  if (mCurrentThumbnailSchematic) {
+    return;  // Still busy.
+  }
+
+  if (mScheduledThumbnailSchematics.isEmpty()) {
+    return;  // Nothing to do.
+  }
+
+  if (mUndoStack.isCommandGroupActive()) {
+    return;  // Too annoying while the user is doing something.
+  }
+
+  const Uuid schematicUuid = *mScheduledThumbnailSchematics.begin();
+  mScheduledThumbnailSchematics -= schematicUuid;
+
+  if (const Schematic* schematic = mProject.getSchematicByUuid(schematicUuid)) {
+    qDebug().noquote() << "Generating thumbnail of schematic:"
+                       << schematicUuid.toStr();
+    mCurrentThumbnailSchematic = schematicUuid;
+    std::shared_ptr<GraphicsPagePainter> painter =
+        std::make_shared<SchematicPainter>(*schematic, true);
+    GraphicsExport::Pages pages = {
+        std::make_pair(painter, mThumbnailSettings),
+    };
+    mThumbnailGenerator->startPreview(pages);
+  }
+}
+
+void SchematicPagesDock::thumbnailReady(int index, const QSize& pageSize,
+                                        const QRectF margins,
+                                        std::shared_ptr<QPicture> picture) {
+  Q_UNUSED(index);
+  Q_UNUSED(margins);
+  Q_ASSERT(picture);
+  if (mCurrentThumbnailSchematic) {
+    const Uuid uuid = *mCurrentThumbnailSchematic;
+    for (int i = 0; i < mUi->listWidget->count(); ++i) {
+      QListWidgetItem* item = mUi->listWidget->item(i);
+      Q_ASSERT(item);
+      if (item->data(Qt::UserRole).toString() == uuid.toStr()) {
+        QPixmap pixmap(pageSize.expandedTo(QSize(250, 100)));
+        pixmap.fill(mBackgroundColor);
+        QPainter painter(&pixmap);
+        picture->play(&painter);
+        item->setIcon(pixmap);
+        qDebug().noquote() << "Schematic thumbnail updated:" << uuid.toStr();
+        // Workaround for broken list widget layout update.
+        mUi->listWidget->setSpacing(1);
+        mUi->listWidget->setSpacing(0);
+        break;
+      }
+    }
+    mCurrentThumbnailSchematic = tl::nullopt;
   }
 }
 

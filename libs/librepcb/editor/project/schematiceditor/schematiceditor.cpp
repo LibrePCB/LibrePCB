@@ -688,14 +688,9 @@ void SchematicEditor::createToolBars() noexcept {
 
 void SchematicEditor::createDockWidgets() noexcept {
   // Pages.
-  mDockPages.reset(
-      new SchematicPagesDock(mProject,
-                             mProjectEditor.getWorkspace()
-                                 .getSettings()
-                                 .themes.getActive()
-                                 .getColor(Theme::Color::sSchematicBackground)
-                                 .getPrimaryColor(),
-                             this));
+  mDockPages.reset(new SchematicPagesDock(
+      mProject, mProjectEditor.getUndoStack(),
+      mProjectEditor.getWorkspace().getSettings().themes.getActive(), this));
   connect(this, &SchematicEditor::activeSchematicChanged, mDockPages.data(),
           &SchematicPagesDock::setSelectedSchematic);
   connect(mDockPages.data(), &SchematicPagesDock::selectedSchematicChanged,
