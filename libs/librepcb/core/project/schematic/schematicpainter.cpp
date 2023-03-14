@@ -51,7 +51,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SchematicPainter::SchematicPainter(const Schematic& schematic) noexcept {
+SchematicPainter::SchematicPainter(const Schematic& schematic,
+                                   bool thumbnail) noexcept {
   foreach (const SI_Symbol* symbol, schematic.getSymbols()) {
     Symbol sym;
     sym.transform = Transform(*symbol);
@@ -66,7 +67,7 @@ SchematicPainter::SchematicPainter(const Schematic& schematic) noexcept {
           pin->getLibPin().getNameHeight(),
           pin->getLibPin().getNameAlignment(),
       });
-      if (pin->isVisibleJunction()) {
+      if (pin->isVisibleJunction() && (!thumbnail)) {
         mJunctions.append(pin->getPosition());
       }
     }
@@ -76,36 +77,44 @@ SchematicPainter::SchematicPainter(const Schematic& schematic) noexcept {
     for (const Circle& circle : symbol->getLibSymbol().getCircles()) {
       sym.circles.append(circle);
     }
-    for (const SI_Text* text : symbol->getTexts()) {
-      Text copy(text->getText());
-      copy.setText(AttributeSubstitutor::substitute(copy.getText(), symbol));
-      mTexts.append(copy);
+    if (!thumbnail) {
+      for (const SI_Text* text : symbol->getTexts()) {
+        Text copy(text->getText());
+        copy.setText(AttributeSubstitutor::substitute(copy.getText(), symbol));
+        mTexts.append(copy);
+      }
     }
     mSymbols.append(sym);
   }
   foreach (const SI_Polygon* polygon, schematic.getPolygons()) {
     mPolygons.append(polygon->getPolygon());
   }
-  foreach (const SI_Text* text, schematic.getTexts()) {
-    Text copy(text->getText());
-    copy.setText(AttributeSubstitutor::substitute(copy.getText(), &schematic));
-    mTexts.append(copy);
+  if (!thumbnail) {
+    foreach (const SI_Text* text, schematic.getTexts()) {
+      Text copy(text->getText());
+      copy.setText(
+          AttributeSubstitutor::substitute(copy.getText(), &schematic));
+      mTexts.append(copy);
+    }
   }
   foreach (const SI_NetSegment* segment, schematic.getNetSegments()) {
-    for (const SI_NetLabel* netlabel : segment->getNetLabels()) {
-      mNetLabels.append(Label{netlabel->getPosition(), netlabel->getRotation(),
-                              netlabel->getMirrored(),
-                              *netlabel->getNetSignalOfNetSegment().getName()});
+    if (!thumbnail) {
+      for (const SI_NetLabel* netlabel : segment->getNetLabels()) {
+        mNetLabels.append(
+            Label{netlabel->getPosition(), netlabel->getRotation(),
+                  netlabel->getMirrored(),
+                  *netlabel->getNetSignalOfNetSegment().getName()});
+      }
+      for (const SI_NetPoint* netpoint : segment->getNetPoints()) {
+        if (netpoint->isVisibleJunction()) {
+          mJunctions.append(netpoint->getPosition());
+        }
+      }
     }
     for (const SI_NetLine* netline : segment->getNetLines()) {
       mNetLines.append(Line{netline->getStartPoint().getPosition(),
                             netline->getEndPoint().getPosition(),
                             netline->getWidth()});
-    }
-    for (const SI_NetPoint* netpoint : segment->getNetPoints()) {
-      if (netpoint->isVisibleJunction()) {
-        mJunctions.append(netpoint->getPosition());
-      }
     }
   }
 }
