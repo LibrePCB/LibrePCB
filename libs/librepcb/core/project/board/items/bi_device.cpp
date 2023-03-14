@@ -32,7 +32,6 @@
 #include "../../circuit/componentinstance.h"
 #include "../../project.h"
 #include "../../projectlibrary.h"
-#include "../../projectsettings.h"
 #include "../board.h"
 #include "bi_footprintpad.h"
 
@@ -417,7 +416,7 @@ void BI_Device::updateGraphicsItemTransform() noexcept {
 }
 
 const QStringList& BI_Device::getLocaleOrder() const noexcept {
-  return getProject().getSettings().getLocaleOrder();
+  return getProject().getLocaleOrder();
 }
 
 /*******************************************************************************

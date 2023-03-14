@@ -44,7 +44,6 @@
 #include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
-#include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
@@ -133,8 +132,7 @@ bool CmdPasteSchematicItems::performExecute() {
     if (mProject.getCircuit().getComponentInstanceByName(*name)) {
       name = CircuitIdentifier(
           mProject.getCircuit().generateAutoComponentInstanceName(
-              libCmp->getPrefixes().value(
-                  mProject.getSettings().getLocaleOrder())));
+              libCmp->getPrefixes().value(mProject.getLocaleOrder())));
     }
     QScopedPointer<ComponentInstance> copy(new ComponentInstance(
         mProject.getCircuit(), Uuid::createRandom(), *libCmp,

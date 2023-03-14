@@ -68,7 +68,6 @@
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -709,8 +708,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
              device->getLibPackage().getFootprints()) {
           QAction* a = fptMenu->addAction(
               fptMenu->icon(),
-              *footprint.getNames().value(
-                  mContext.project.getSettings().getLocaleOrder()));
+              *footprint.getNames().value(mContext.project.getLocaleOrder()));
           if (footprint.getUuid() == device->getLibFootprint().getUuid()) {
             a->setCheckable(true);
             a->setChecked(true);
@@ -1545,14 +1543,14 @@ QList<BoardEditorState_Select::DeviceMenuItem>
       FilePath devFp =
           mContext.workspace.getLibraryDb().getLatest<Device>(deviceUuid);
       mContext.workspace.getLibraryDb().getTranslations<Device>(
-          devFp, mContext.project.getSettings().getLocaleOrder(), &devName);
+          devFp, mContext.project.getLocaleOrder(), &devName);
       Uuid pkgUuid = Uuid::createRandom();  // only for initialization...
       mContext.workspace.getLibraryDb().getDeviceMetadata(devFp, nullptr,
                                                           &pkgUuid);
       FilePath pkgFp =
           mContext.workspace.getLibraryDb().getLatest<Package>(pkgUuid);
       mContext.workspace.getLibraryDb().getTranslations<Package>(
-          pkgFp, mContext.project.getSettings().getLocaleOrder(), &pkgName);
+          pkgFp, mContext.project.getLocaleOrder(), &pkgName);
       items.append(DeviceMenuItem{QString("%1 [%2]").arg(devName, pkgName),
                                   icon, deviceUuid});
     }

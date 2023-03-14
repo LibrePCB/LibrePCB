@@ -29,7 +29,6 @@
 #include "../board/items/bi_device.h"
 #include "../project.h"
 #include "../projectlibrary.h"
-#include "../projectsettings.h"
 #include "../schematic/items/si_symbol.h"
 #include "circuit.h"
 #include "componentsignalinstance.h"
@@ -308,7 +307,7 @@ bool ComponentInstance::checkAttributesValidity() const noexcept {
 }
 
 const QStringList& ComponentInstance::getLocaleOrder() const noexcept {
-  return mCircuit.getProject().getSettings().getLocaleOrder();
+  return mCircuit.getProject().getLocaleOrder();
 }
 
 /*******************************************************************************

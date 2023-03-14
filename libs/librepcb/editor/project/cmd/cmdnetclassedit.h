@@ -34,7 +34,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Circuit;
 class NetClass;
 
 namespace editor {
@@ -49,7 +48,7 @@ namespace editor {
 class CmdNetClassEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdNetClassEdit(Circuit& circuit, NetClass& netclass) noexcept;
+  explicit CmdNetClassEdit(NetClass& netclass) noexcept;
   ~CmdNetClassEdit() noexcept;
 
   // Setters
@@ -70,7 +69,6 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  Circuit& mCircuit;
   NetClass& mNetClass;
 
   // General Attributes

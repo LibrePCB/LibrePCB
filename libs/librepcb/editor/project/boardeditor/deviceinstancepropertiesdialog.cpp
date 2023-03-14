@@ -33,7 +33,6 @@
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/project/projectsettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -76,7 +75,7 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
   mUi->edtCompInstValue->setText(cmp.getValue());
   mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
 
-  const QStringList& localeOrder = mProject.getSettings().getLocaleOrder();
+  const QStringList& localeOrder = mProject.getLocaleOrder();
 
   // Library Element Information
   QString htmlLink("<a href=\"%1\">%2<a>");

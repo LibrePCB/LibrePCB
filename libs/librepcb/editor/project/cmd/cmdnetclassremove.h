@@ -32,7 +32,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Circuit;
 class NetClass;
 
 namespace editor {
@@ -47,7 +46,7 @@ namespace editor {
 class CmdNetClassRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdNetClassRemove(Circuit& circuit, NetClass& netclass) noexcept;
+  explicit CmdNetClassRemove(NetClass& netclass) noexcept;
   ~CmdNetClassRemove() noexcept;
 
 private:
@@ -63,8 +62,6 @@ private:
   void performRedo() override;
 
   // Private Member Variables
-
-  Circuit& mCircuit;
   NetClass& mNetClass;
 };
 

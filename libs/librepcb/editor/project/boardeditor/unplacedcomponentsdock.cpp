@@ -45,7 +45,6 @@
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
-#include <librepcb/core/project/projectsettings.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
@@ -213,7 +212,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
                           .split("\n", QString::SkipEmptyParts)
                           .join("|");
       QString libCmpName = *component->getLibComponent().getNames().value(
-          mProject.getSettings().getLocaleOrder());
+          mProject.getLocaleOrder());
       QStringList text = {*component->getName() % ":"};
       if (hasPreSelectedDevice) {
         text += "✔";
@@ -377,7 +376,7 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(
     } else if (mSelectedComponent->getDefaultDeviceUuid()) {
       mUi->cbxIsDefaultDevice->setCheckState(Qt::PartiallyChecked);
     }
-    QStringList localeOrder = mProject.getSettings().getLocaleOrder();
+    QStringList localeOrder = mProject.getLocaleOrder();
     for (const Footprint& fpt : mSelectedPackage->getFootprints()) {
       mUi->cbxSelectedFootprint->addItem(*fpt.getNames().value(localeOrder),
                                          fpt.getUuid().toStr());
@@ -419,8 +418,7 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(
       mPreviewGraphicsItem.reset(new FootprintGraphicsItem(
           footprint, *mGraphicsLayerProvider.data(),
           qApp->getDefaultStrokeFont(), &mSelectedPackage->getPads(),
-          &mSelectedComponent->getLibComponent(),
-          mProject.getSettings().getLocaleOrder()));
+          &mSelectedComponent->getLibComponent(), mProject.getLocaleOrder()));
       mPreviewGraphicsScene->addItem(*mPreviewGraphicsItem);
       mUi->graphicsView->zoomAll();
       mUi->btnAdd->setEnabled(true);
@@ -544,7 +542,7 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
     noexcept {
   QList<DeviceMetadata> devices;
   Uuid cmpUuid = cmp.getLibComponent().getUuid();
-  QStringList localeOrder = mProject.getSettings().getLocaleOrder();
+  QStringList localeOrder = mProject.getLocaleOrder();
 
   // Get matching devices in project library.
   QHash<Uuid, Device*> prjLibDev =

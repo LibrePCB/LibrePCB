@@ -363,8 +363,6 @@ add_library(
   project/projectlibrary.h
   project/projectloader.cpp
   project/projectloader.h
-  project/projectsettings.cpp
-  project/projectsettings.h
   project/schematic/graphicsitems/sgi_base.cpp
   project/schematic/graphicsitems/sgi_base.h
   project/schematic/graphicsitems/sgi_netlabel.cpp

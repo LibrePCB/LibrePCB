@@ -148,9 +148,7 @@ private:
   QScopedPointer<QAction> mActionFileManager;
   QScopedPointer<QAction> mActionBoardEditor;
   QScopedPointer<QAction> mActionControlPanel;
-  QScopedPointer<QAction> mActionProjectProperties;
-  QScopedPointer<QAction> mActionProjectSettings;
-  QScopedPointer<QAction> mActionNetClasses;
+  QScopedPointer<QAction> mActionProjectSetup;
   QScopedPointer<QAction> mActionUpdateLibrary;
   QScopedPointer<QAction> mActionExportLppz;
   QScopedPointer<QAction> mActionExportImage;
