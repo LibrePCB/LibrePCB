@@ -19,6 +19,14 @@ Options:
                                      non-approved warnings/errors and report
                                      failure (exit code = 1) if there are
                                      non-approved messages.
+  --drc                              Run the design rule check, print all
+                                     non-approved warnings/errors and report
+                                     failure (exit code = 1) if there are
+                                     non-approved messages.
+  --drc-settings <file>              Override DRC settings by providing a *.lp
+                                     file containing custom settings. If not
+                                     set, the settings from the boards will be
+                                     used instead.
   --export-schematics <file>         Export schematics to given file(s).
                                      Existing files will be overwritten.
                                      Supported file extensions: pdf, svg, ***
