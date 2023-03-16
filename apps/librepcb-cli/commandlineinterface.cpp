@@ -40,6 +40,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardd356netlistexport.h>
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/board/boardpickplacegenerator.h>
@@ -165,6 +166,12 @@ int CommandLineInterface::execute() noexcept {
          "%1")
           .arg("csv, gbr"),
       tr("file"));
+  QCommandLineOption exportNetlistOption(
+      "export-netlist",
+      tr("Export netlist file for automated PCB testing. Existing files will "
+         "be overwritten. Supported file extensions: %1")
+          .arg("d356"),
+      tr("file"));
   QCommandLineOption boardOption("board",
                                  tr("The name of the board(s) to export. Can "
                                     "be given multiple times. If not set, "
@@ -246,6 +253,7 @@ int CommandLineInterface::execute() noexcept {
     parser.addOption(pcbFabricationSettingsOption);
     parser.addOption(exportPnpTopOption);
     parser.addOption(exportPnpBottomOption);
+    parser.addOption(exportNetlistOption);
     parser.addOption(boardOption);
     parser.addOption(boardIndexOption);
     parser.addOption(removeOtherBoardsOption);
@@ -339,6 +347,7 @@ int CommandLineInterface::execute() noexcept {
         parser.value(pcbFabricationSettingsOption),  // PCB fab. settings
         parser.values(exportPnpTopOption),  // export PnP top
         parser.values(exportPnpBottomOption),  // export PnP bottom
+        parser.values(exportNetlistOption),  // export netlist
         parser.values(boardOption),  // board names
         parser.values(boardIndexOption),  // board indices
         parser.isSet(removeOtherBoardsOption),  // remove other boards
@@ -375,7 +384,8 @@ bool CommandLineInterface::openProject(
     const QString& bomAttributes, bool exportPcbFabricationData,
     const QString& pcbFabricationSettingsPath,
     const QStringList& exportPnpTopFiles,
-    const QStringList& exportPnpBottomFiles, const QStringList& boardNames,
+    const QStringList& exportPnpBottomFiles,
+    const QStringList& exportNetlistFiles, const QStringList& boardNames,
     const QStringList& boardIndices, bool removeOtherBoards, bool save,
     bool strict) const noexcept {
   try {
@@ -723,6 +733,30 @@ bool CommandLineInterface::openProject(
             printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
             success = false;
           }
+        }
+      }
+    }
+
+    // Export netlist files
+    foreach (const QString& destStr, exportNetlistFiles) {
+      print(tr("Export netlist to '%1'...").arg(destStr));
+      foreach (const Board* board, boards) {
+        QString destPathStr = AttributeSubstitutor::substitute(
+            destStr, board, [&](const QString& str) {
+              return FilePath::cleanFileName(
+                  str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+            });
+        const FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
+        print(QString("  - '%1' => '%2'")
+                  .arg(*board->getName(), prettyPath(fp, destPathStr)));
+        const QString suffix = destStr.split('.').last().toLower();
+        if (suffix == "d356") {
+          BoardD356NetlistExport exp(*board);
+          FileUtils::writeFile(fp, exp.generate());  // can throw
+          writtenFilesCounter[fp]++;
+        } else {
+          printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
+          success = false;
         }
       }
     }

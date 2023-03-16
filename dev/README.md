@@ -18,3 +18,5 @@ Useful Links:
 - Official Reference Gerber Viewer: https://gerber.ucamco.com/index.html
 - Online 3D PCB Viewer: http://mayhewlabs.com/webGerber/
 - [DXF Specifications](http://images.autodesk.com/adsk/files/autocad_2012_pdf_dxf-reference_enu.pdf)
+- [IPC-D-356A Netlist Format](https://web.pa.msu.edu/hep/atlas/l1calo/hub/hardware/components/circuit_board/ipc_356a_net_list.pdf)
+- [IPC-D-356 Simplified](https://www.downstreamtech.com/downloads/IPCD356_Simplified.pdf)

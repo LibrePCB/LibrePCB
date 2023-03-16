@@ -21,6 +21,7 @@ add_executable(
   core/attribute/attributetest.cpp
   core/attribute/attributetypetest.cpp
   core/attribute/attributeunittest.cpp
+  core/export/d356netlistgeneratortest.cpp
   core/export/excellongeneratortest.cpp
   core/export/gerberaperturelisttest.cpp
   core/export/gerberattributetest.cpp
@@ -54,6 +55,7 @@ add_executable(
   core/network/filedownloadtest.cpp
   core/network/networkrequestbasesignalreceiver.h
   core/network/networkrequesttest.cpp
+  core/project/board/boardd356netlistexporttest.cpp
   core/project/board/boarddesignrulestest.cpp
   core/project/board/boardfabricationoutputsettingstest.cpp
   core/project/board/boardgerberexporttest.cpp

@@ -221,6 +221,15 @@ public:
   QString toNmString() const noexcept { return QString::number(toNm()); }
 
   /**
+   * @brief Get the length in micrometers
+   *
+   * @return The length in micrometers
+   *
+   * @warning Be careful with this method, as it can decrease the precision!
+   */
+  qreal toMicrometers() const noexcept { return (qreal)mNanometers / 1e3; }
+
+  /**
    * @brief Get the length in millimeters
    *
    * @return The length in millimeters

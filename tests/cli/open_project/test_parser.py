@@ -55,6 +55,10 @@ Options:
                                      assembly of the bottom board side. Existing
                                      files will be overwritten. Supported file
                                      extensions: csv, gbr
+  --export-netlist <file>            Export netlist file for automated PCB
+                                     testing. Existing files will be
+                                     overwritten. Supported file extensions:
+                                     d356
   --board <name>                     The name of the board(s) to export. Can be
                                      given multiple times. If not set, all
                                      boards are exported.
