@@ -65,11 +65,6 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  const QString fp = "package.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  root.appendChild("assembly_type", SExpression::createToken("auto"));
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -94,9 +89,14 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
  *  Private Methods
  ******************************************************************************/
 
+void FileFormatMigrationUnstable::upgradeSettings(SExpression& root) {
+  FileFormatMigrationV01::upgradeSettings(root);
+}
+
 void FileFormatMigrationUnstable::upgradeErc(SExpression& root,
                                              ProjectContext& context) {
-  FileFormatMigrationV01::upgradeErc(root, context);
+  Q_UNUSED(root);
+  Q_UNUSED(context);
 }
 
 void FileFormatMigrationUnstable::upgradeSchematic(SExpression& root,

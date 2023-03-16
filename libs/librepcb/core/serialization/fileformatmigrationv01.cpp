@@ -271,6 +271,14 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     }
   }
 
+  // Settings.
+  {
+    const QString fp = "project/settings.lp";
+    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeSettings(root);
+    dir.write(fp, root.toByteArray());
+  }
+
   // Circuit.
   {
     const QString fp = "circuit/circuit.lp";
@@ -392,6 +400,10 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void FileFormatMigrationV01::upgradeSettings(SExpression& root) {
+  root.appendList("custom_bom_attributes");
+}
 
 void FileFormatMigrationV01::upgradeErc(SExpression& root,
                                         ProjectContext& context) {

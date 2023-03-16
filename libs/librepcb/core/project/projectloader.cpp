@@ -201,6 +201,15 @@ void ProjectLoader::loadSettings(Project& p) {
     p.setNormOrder(l);
   }
 
+  {
+    QStringList l;
+    foreach (const SExpression* node,
+             root.getChild("custom_bom_attributes").getChildren("attribute")) {
+      l.append(node->getChild("@0").getValue());
+    }
+    p.setCustomBomAttributes(l);
+  }
+
   qDebug() << "Successfully loaded project settings.";
 }
 

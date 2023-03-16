@@ -397,6 +397,8 @@ void BoardEditor::createActions() noexcept {
   mActionGenerateBom.reset(cmd.generateBom.createAction(this, this, [this]() {
     BomGeneratorDialog dialog(mProjectEditor.getWorkspace().getSettings(),
                               mProject, getActiveBoard(), this);
+    connect(&dialog, &BomGeneratorDialog::projectSettingsModified,
+            &mProjectEditor, &ProjectEditor::setManualModificationsMade);
     dialog.exec();
   }));
   mActionGenerateFabricationData.reset(

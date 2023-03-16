@@ -72,6 +72,7 @@ public:
       const FileFormatMigrationUnstable& rhs) = delete;
 
 private:  // Methods
+  virtual void upgradeSettings(SExpression& root) override;
   virtual void upgradeErc(SExpression& root, ProjectContext& context) override;
   virtual void upgradeSchematic(SExpression& root,
                                 ProjectContext& context) override;

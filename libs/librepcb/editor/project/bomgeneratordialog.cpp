@@ -52,8 +52,7 @@ namespace editor {
  ******************************************************************************/
 
 BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
-                                       const Project& project,
-                                       const Board* board,
+                                       Project& project, const Board* board,
                                        QWidget* parent) noexcept
   : QDialog(parent),
     mSettings(settings),
@@ -79,11 +78,16 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
           EditorCommand::ActionFlag::WidgetShortcut),
       QLineEdit::TrailingPosition);
 
+  // List boards.
   mUi->cbxBoard->addItem(tr("None"));
   foreach (const Board* brd, mProject.getBoards()) {
     mUi->cbxBoard->addItem(*brd->getName());
   }
 
+  // List attributes.
+  mUi->edtAttributes->setText(mProject.getCustomBomAttributes().join(", "));
+
+  // Select board.
   int index = board ? mProject.getBoardIndex(*board) + 1 : 0;
   mUi->cbxBoard->setCurrentIndex(index);
   updateBom();
@@ -93,7 +97,7 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, &BomGeneratorDialog::updateBom);
   connect(mUi->edtAttributes, &QLineEdit::textEdited, this,
-          &BomGeneratorDialog::updateBom);
+          &BomGeneratorDialog::updateAttributes);
   connect(mUi->btnBrowseOutputDir, &QPushButton::clicked, this,
           &BomGeneratorDialog::btnOpenOutputDirectoryClicked);
   connect(mBtnGenerate, &QPushButton::clicked, this,
@@ -147,19 +151,31 @@ void BomGeneratorDialog::btnGenerateClicked() noexcept {
  *  Private Methods
  ******************************************************************************/
 
+void BomGeneratorDialog::updateAttributes() noexcept {
+  try {
+    QStringList attributes;
+    foreach (const QString str,
+             mUi->edtAttributes->text().simplified().split(',')) {
+      if (!str.trimmed().isEmpty()) {
+        attributes.append(str.trimmed());
+      }
+    }
+    if (attributes != mProject.getCustomBomAttributes()) {
+      mProject.setCustomBomAttributes(attributes);
+      emit projectSettingsModified();
+      updateBom();
+    }
+  } catch (const Exception& e) {
+    qCritical() << "Failed to update custom BOM attributes:" << e.getMsg();
+  }
+}
+
 void BomGeneratorDialog::updateBom() noexcept {
   const Board* board =
       mProject.getBoardByIndex(mUi->cbxBoard->currentIndex() - 1);
 
-  QStringList attributes;
-  foreach (const QString str,
-           mUi->edtAttributes->text().simplified().split(
-               ',', QString::SkipEmptyParts)) {
-    attributes.append(str.trimmed());
-  }
-
   BomGenerator gen(mProject);
-  gen.setAdditionalAttributes(attributes);
+  gen.setAdditionalAttributes(mProject.getCustomBomAttributes());
   mBom = gen.generate(board);
   updateTable();
 

@@ -378,6 +378,8 @@ void SchematicEditor::createActions() noexcept {
         : nullptr;
     BomGeneratorDialog dialog(mProjectEditor.getWorkspace().getSettings(),
                               mProject, board, this);
+    connect(&dialog, &BomGeneratorDialog::projectSettingsModified,
+            &mProjectEditor, &ProjectEditor::setManualModificationsMade);
     dialog.exec();
   }));
   mActionOrderPcb.reset(cmd.orderPcb.createAction(
