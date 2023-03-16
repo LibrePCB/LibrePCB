@@ -195,7 +195,7 @@ void ProjectLoader::loadSettings(Project& p) {
   {
     QStringList l;
     foreach (const SExpression* node,
-             root.getChild("library_norm_order").getChildren("locale")) {
+             root.getChild("library_norm_order").getChildren("norm")) {
       l.append(node->getChild("@0").getValue());
     }
     p.setNormOrder(l);
