@@ -195,10 +195,19 @@ void ProjectLoader::loadSettings(Project& p) {
   {
     QStringList l;
     foreach (const SExpression* node,
-             root.getChild("library_norm_order").getChildren("locale")) {
+             root.getChild("library_norm_order").getChildren("norm")) {
       l.append(node->getChild("@0").getValue());
     }
     p.setNormOrder(l);
+  }
+
+  {
+    QStringList l;
+    foreach (const SExpression* node,
+             root.getChild("custom_bom_attributes").getChildren("attribute")) {
+      l.append(node->getChild("@0").getValue());
+    }
+    p.setCustomBomAttributes(l);
   }
 
   qDebug() << "Successfully loaded project settings.";

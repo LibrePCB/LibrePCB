@@ -191,6 +191,15 @@ public:
   const QStringList& getNormOrder() const noexcept { return mNormOrder; }
 
   /**
+   * @brief Get the configured custom BOM attributes
+   *
+   * @return Attribute keys in a specific order
+   */
+  const QStringList& getCustomBomAttributes() const noexcept {
+    return mCustomBomAttributes;
+  }
+
+  /**
    * @brief Get the ProjectLibrary object which contains all library elements
    * used in this project
    *
@@ -279,6 +288,13 @@ public:
    * @param newNorms          The new norm order.
    */
   void setNormOrder(const QStringList& newNorms) noexcept;
+
+  /**
+   * @brief Set the custom BOM attributes
+   *
+   * @param newKeys           The new attribute keys.
+   */
+  void setCustomBomAttributes(const QStringList& newKeys) noexcept;
 
   /**
    * @brief Set all ERC message approvals
@@ -546,6 +562,9 @@ private:
 
   /// Configured norms in a particular order.
   QStringList mNormOrder;
+
+  /// Custom attributes to be included in BOM export.
+  QStringList mCustomBomAttributes;
 
   /// Ehe library which contains all elements needed in this project.
   QScopedPointer<ProjectLibrary> mProjectLibrary;

@@ -61,7 +61,8 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
     mCreated(QDateTime::currentDateTime()),
     mLastModified(QDateTime::currentDateTime()),
     mLocaleOrder(),
-    mNormOrder() {
+    mNormOrder(),
+    mCustomBomAttributes() {
   // Check if the file extension is correct
   if (!mFilename.endsWith(".lpp")) {
     throw RuntimeError(__FILE__, __LINE__,
@@ -171,6 +172,12 @@ void Project::setNormOrder(const QStringList& newNorms) noexcept {
     mNormOrder = newNorms;
     emit attributesChanged();
     emit normOrderChanged();
+  }
+}
+
+void Project::setCustomBomAttributes(const QStringList& newKeys) noexcept {
+  if (newKeys != mCustomBomAttributes) {
+    mCustomBomAttributes = newKeys;
   }
 }
 
@@ -404,6 +411,15 @@ void Project::save() {
       foreach (const QString& norm, mNormOrder) {
         node.ensureLineBreak();
         node.appendChild("norm", norm);
+      }
+      node.ensureLineBreak();
+    }
+    root.ensureLineBreak();
+    {
+      SExpression& node = root.appendList("custom_bom_attributes");
+      foreach (const QString& key, mCustomBomAttributes) {
+        node.ensureLineBreak();
+        node.appendChild("attribute", key);
       }
       node.ensureLineBreak();
     }

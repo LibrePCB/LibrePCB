@@ -119,6 +119,7 @@ public:
   FileFormatMigrationV01& operator=(const FileFormatMigrationV01& rhs) = delete;
 
 protected:  // Methods
+  virtual void upgradeSettings(SExpression& root);
   virtual void upgradeErc(SExpression& root, ProjectContext& context);
   virtual void upgradeSchematic(SExpression& root, ProjectContext& context);
   virtual void upgradeBoard(SExpression& root, ProjectContext& context);

@@ -601,9 +601,14 @@ bool CommandLineInterface::openProject(
         jobs.append(qMakePair(fp, true));
       }
       QStringList attributes;
-      foreach (const QString str,
-               bomAttributes.simplified().split(',', QString::SkipEmptyParts)) {
-        attributes.append(str.trimmed());
+      if (bomAttributes.isEmpty()) {
+        attributes = project->getCustomBomAttributes();
+      } else {
+        foreach (const QString str, bomAttributes.simplified().split(',')) {
+          if (!str.trimmed().isEmpty()) {
+            attributes.append(str.trimmed());
+          }
+        }
       }
       foreach (const auto& job, jobs) {
         QList<Board*> boardsToExport;

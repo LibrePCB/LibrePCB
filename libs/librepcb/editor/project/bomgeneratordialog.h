@@ -61,13 +61,16 @@ public:
   // Constructors / Destructor
   BomGeneratorDialog() = delete;
   BomGeneratorDialog(const BomGeneratorDialog& other) = delete;
-  BomGeneratorDialog(const WorkspaceSettings& settings, const Project& project,
+  BomGeneratorDialog(const WorkspaceSettings& settings, Project& project,
                      const Board* board = nullptr,
                      QWidget* parent = nullptr) noexcept;
   ~BomGeneratorDialog() noexcept;
 
   // Operator Overloads
   BomGeneratorDialog& operator=(const BomGeneratorDialog& rhs) = delete;
+
+signals:
+  void projectSettingsModified();
 
 private:  // GUI Event Handlers
   void cbxBoardCurrentIndexChanged(int index) noexcept;
@@ -76,13 +79,14 @@ private:  // GUI Event Handlers
   void btnGenerateClicked() noexcept;
 
 private:  // Methods
+  void updateAttributes() noexcept;
   void updateBom() noexcept;
   void updateTable() noexcept;
   FilePath getOutputFilePath() const noexcept;
 
 private:  // Data
   const WorkspaceSettings& mSettings;
-  const Project& mProject;
+  Project& mProject;
   std::shared_ptr<Bom> mBom;
   QScopedPointer<Ui::BomGeneratorDialog> mUi;
   QPointer<QPushButton> mBtnGenerate;
