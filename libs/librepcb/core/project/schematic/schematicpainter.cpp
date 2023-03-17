@@ -61,7 +61,7 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
           pin->getLibPin().getPosition(),
           pin->getLibPin().getRotation(),
           pin->getLibPin().getLength(),
-          pin->getDisplayText(),
+          pin->getText(),
           pin->getLibPin().getNamePosition(),
           pin->getLibPin().getNameRotation(),
           pin->getLibPin().getNameHeight(),
@@ -79,8 +79,8 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
     }
     if (!thumbnail) {
       for (const SI_Text* text : symbol->getTexts()) {
-        Text copy(text->getText());
-        copy.setText(AttributeSubstitutor::substitute(copy.getText(), symbol));
+        Text copy(text->getTextObj());
+        copy.setText(text->getText());  // Memorize substituted text.
         mTexts.append(copy);
       }
     }
@@ -91,9 +91,8 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
   }
   if (!thumbnail) {
     foreach (const SI_Text* text, schematic.getTexts()) {
-      Text copy(text->getText());
-      copy.setText(
-          AttributeSubstitutor::substitute(copy.getText(), &schematic));
+      Text copy(text->getTextObj());
+      copy.setText(text->getText());  // Memorize substituted text.
       mTexts.append(copy);
     }
   }

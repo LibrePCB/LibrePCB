@@ -22,12 +22,12 @@
  ******************************************************************************/
 #include "graphicsview.h"
 
+#include "../graphics/graphicsscene.h"
 #include "QtOpenGL"
 #include "if_graphicsvieweventhandler.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/graphics/graphicspainter.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/utils/toolbox.h>

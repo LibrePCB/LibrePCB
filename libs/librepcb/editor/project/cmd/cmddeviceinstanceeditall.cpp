@@ -46,7 +46,7 @@ CmdDeviceInstanceEditAll::CmdDeviceInstanceEditAll(BI_Device& dev) noexcept
   appendChild(mDevEditCmd);
 
   foreach (BI_StrokeText* text, dev.getStrokeTexts()) {
-    CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getText());
+    CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getTextObj());
     mTextEditCmds.append(cmd);
     appendChild(cmd);
   }

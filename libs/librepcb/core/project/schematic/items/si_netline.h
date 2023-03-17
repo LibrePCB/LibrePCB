@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/netline.h"
-#include "../graphicsitems/sgi_netline.h"
 #include "si_base.h"
 
 #include <QtCore>
@@ -35,6 +34,7 @@
 namespace librepcb {
 
 class NetSignal;
+class SI_NetLine;
 class SI_NetSegment;
 
 /*******************************************************************************
@@ -65,6 +65,14 @@ class SI_NetLine final : public SI_Base {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionsChanged,
+    NetSignalNameChanged,
+  };
+  Signal<SI_NetLine, Event> onEdited;
+  typedef Slot<SI_NetLine, Event> OnEditedSlot;
+
   // Constructors / Destructor
   SI_NetLine() = delete;
   SI_NetLine(const SI_NetLine& other) = delete;
@@ -92,22 +100,14 @@ public:
   // General Methods
   void addToSchematic() override;
   void removeFromSchematic() override;
-  void updateLine() noexcept;
-
-  // Inherited from SI_Base
-  Type_t getType() const noexcept override { return SI_Base::Type_t::NetLine; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
+  void updatePositions() noexcept;
 
   // Operator Overloadings
   SI_NetLine& operator=(const SI_NetLine& rhs) = delete;
 
-private:
-  // General
+private:  // Data
   SI_NetSegment& mNetSegment;
   NetLine mNetLine;
-  QScopedPointer<SGI_NetLine> mGraphicsItem;
-  QMetaObject::Connection mHighlightChangedConnection;
 
   // References
   SI_NetLineAnchor* mStartPoint;

@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "si_symbol.h"
 
-#include "../../../graphics/graphicsscene.h"
 #include "../../../library/cmp/component.h"
 #include "../../../library/sym/symbol.h"
 #include "../../../utils/scopeguardlist.h"
@@ -33,6 +32,7 @@
 #include "../../projectlibrary.h"
 #include "../schematic.h"
 #include "si_symbolpin.h"
+#include "si_text.h"
 
 #include <QtCore>
 
@@ -50,6 +50,7 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const Uuid& uuid,
                      const Point& position, const Angle& rotation,
                      bool mirrored, bool loadInitialTexts)
   : SI_Base(schematic),
+    onEdited(*this),
     mComponentInstance(cmpInstance),
     mSymbVarItem(mComponentInstance.getSymbolVariant()
                      .getSymbolItems()
@@ -68,9 +69,6 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const Uuid& uuid,
                           "project's library.")
                            .arg(mSymbVarItem->getSymbolUuid().toStr()));
   }
-
-  mGraphicsItem.reset(new SGI_Symbol(*this));
-  mGraphicsItem->setPosition(mPosition);
 
   // Add initial texts.
   if (loadInitialTexts) {
@@ -106,7 +104,6 @@ SI_Symbol::SI_Symbol(Schematic& schematic, const Uuid& uuid,
 }
 
 SI_Symbol::~SI_Symbol() noexcept {
-  mGraphicsItem.reset();
   qDeleteAll(mTexts);
   mTexts.clear();
   qDeleteAll(mPins);
@@ -125,10 +122,6 @@ QString SI_Symbol::getName() const noexcept {
   }
 }
 
-QRectF SI_Symbol::getBoundingRect() const noexcept {
-  return mGraphicsItem->sceneTransform().mapRect(mGraphicsItem->boundingRect());
-}
-
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
@@ -136,25 +129,21 @@ QRectF SI_Symbol::getBoundingRect() const noexcept {
 void SI_Symbol::setPosition(const Point& newPos) noexcept {
   if (newPos != mPosition) {
     mPosition = newPos;
-    mGraphicsItem->setPosition(newPos);
-    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(false); }
-    foreach (SI_Text* text, mTexts) { text->updateAnchor(); }
+    onEdited.notify(Event::PositionChanged);
   }
 }
 
 void SI_Symbol::setRotation(const Angle& newRotation) noexcept {
   if (newRotation != mRotation) {
     mRotation = newRotation;
-    mGraphicsItem->updateRotationAndMirror();
-    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(true); }
+    onEdited.notify(Event::RotationChanged);
   }
 }
 
 void SI_Symbol::setMirrored(bool newMirrored) noexcept {
   if (newMirrored != mMirrored) {
     mMirrored = newMirrored;
-    mGraphicsItem->updateRotationAndMirror();
-    foreach (SI_SymbolPin* pin, mPins) { pin->updatePosition(true); }
+    onEdited.notify(Event::MirroredChanged);
   }
 }
 
@@ -195,7 +184,7 @@ void SI_Symbol::addText(SI_Text& text) {
     text.addToSchematic();  // can throw
   }
   mTexts.insert(text.getUuid(), &text);
-  text.setSelected(isSelected());
+  emit textAdded(text);
 }
 
 void SI_Symbol::removeText(SI_Text& text) {
@@ -206,6 +195,7 @@ void SI_Symbol::removeText(SI_Text& text) {
     text.removeFromSchematic();  // can throw
   }
   mTexts.remove(text.getUuid());
+  emit textRemoved(text);
 }
 
 /*******************************************************************************
@@ -227,7 +217,7 @@ void SI_Symbol::addToSchematic() {
     text->addToSchematic();  // can throw
     sgl.add([text]() { text->removeFromSchematic(); });
   }
-  SI_Base::addToSchematic(mGraphicsItem.data());
+  SI_Base::addToSchematic();
   sgl.dismiss();
 }
 
@@ -246,7 +236,7 @@ void SI_Symbol::removeFromSchematic() {
   }
   mComponentInstance.unregisterSymbol(*this);  // can throw
   sgl.add([&]() { mComponentInstance.registerSymbol(*this); });
-  SI_Base::removeFromSchematic(mGraphicsItem.data());
+  SI_Base::removeFromSchematic();
   sgl.dismiss();
 }
 
@@ -265,7 +255,7 @@ void SI_Symbol::serialize(SExpression& root) const {
   root.ensureLineBreak();
   for (const SI_Text* obj : mTexts) {
     root.ensureLineBreak();
-    obj->getText().serialize(root.appendList("text"));
+    obj->getTextObj().serialize(root.appendList("text"));
   }
   root.ensureLineBreak();
 }
@@ -285,21 +275,6 @@ QString SI_Symbol::getBuiltInAttributeValue(const QString& key) const noexcept {
 QVector<const AttributeProvider*> SI_Symbol::getAttributeProviderParents() const
     noexcept {
   return QVector<const AttributeProvider*>{&mSchematic, &mComponentInstance};
-}
-
-/*******************************************************************************
- *  Inherited from SI_Base
- ******************************************************************************/
-
-QPainterPath SI_Symbol::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-void SI_Symbol::setSelected(bool selected) noexcept {
-  SI_Base::setSelected(selected);
-  mGraphicsItem->setSelected(selected);
-  foreach (SI_SymbolPin* pin, mPins) { pin->setSelected(selected); }
-  foreach (SI_Text* text, mTexts) { text->setSelected(selected); }
 }
 
 /*******************************************************************************

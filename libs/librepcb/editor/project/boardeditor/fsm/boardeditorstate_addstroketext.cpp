@@ -228,7 +228,7 @@ bool BoardEditorState_AddStrokeText::addText(const Point& pos) noexcept {
         new CmdBoardStrokeTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());
     mCurrentTextEditCmd.reset(
-        new CmdStrokeTextEdit(mCurrentTextToPlace->getText()));
+        new CmdStrokeTextEdit(mCurrentTextToPlace->getTextObj()));
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -241,7 +241,7 @@ bool BoardEditorState_AddStrokeText::rotateText(const Angle& angle) noexcept {
   if ((!mCurrentTextEditCmd) || (!mCurrentTextToPlace)) return false;
 
   mCurrentTextEditCmd->rotate(angle, mCurrentTextToPlace->getPosition(), true);
-  mLastStrokeTextProperties = mCurrentTextToPlace->getText();
+  mLastStrokeTextProperties = mCurrentTextToPlace->getTextObj();
 
   return true;  // Event handled
 }
@@ -253,7 +253,7 @@ bool BoardEditorState_AddStrokeText::flipText(
   mCurrentTextEditCmd->mirrorGeometry(orientation,
                                       mCurrentTextToPlace->getPosition(), true);
   mCurrentTextEditCmd->mirrorLayer(true);
-  mLastStrokeTextProperties = mCurrentTextToPlace->getText();
+  mLastStrokeTextProperties = mCurrentTextToPlace->getTextObj();
 
   // Update toolbar widgets
   mLayerComboBox->setCurrentLayer(mLastStrokeTextProperties.getLayerName());

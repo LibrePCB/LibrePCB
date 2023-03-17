@@ -31,10 +31,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BGI_Base;
 class Board;
 class Circuit;
-class GraphicsScene;
 class Point;
 class Project;
 
@@ -49,21 +47,6 @@ class BI_Base : public QObject {
   Q_OBJECT
 
 public:
-  // Types
-  enum class Type_t {
-    NetSegment,  ///< ::librepcb::BI_NetSegment
-    NetPoint,  ///< ::librepcb::BI_NetPoint
-    NetLine,  ///< ::librepcb::BI_NetLine
-    Via,  ///< ::librepcb::BI_Via
-    Device,  ///< ::librepcb::BI_Device
-    FootprintPad,  ///< ::librepcb::BI_FootprintPad
-    Polygon,  ///< ::librepcb::BI_Polygon
-    StrokeText,  ///< ::librepcb::BI_StrokeText
-    Hole,  ///< ::librepcb::BI_Hole
-    Plane,  ///< ::librepcb::BI_Plane
-    AirWire,  ///< ::librepcb::BI_AirWire
-  };
-
   // Constructors / Destructor
   BI_Base() = delete;
   BI_Base(const BI_Base& other) = delete;
@@ -74,26 +57,14 @@ public:
   Project& getProject() const noexcept;
   Circuit& getCircuit() const noexcept;
   Board& getBoard() const noexcept { return mBoard; }
-  virtual Type_t getType() const noexcept = 0;
-  virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
   virtual bool isAddedToBoard() const noexcept { return mIsAddedToBoard; }
-  virtual bool isSelectable() const noexcept = 0;
-  virtual bool isSelected() const noexcept { return mIsSelected; }
-
-  // Setters
-  virtual void setSelected(bool selected) noexcept;
 
   // General Methods
-  virtual void addToBoard() = 0;
-  virtual void removeFromBoard() = 0;
+  virtual void addToBoard();
+  virtual void removeFromBoard();
 
   // Operator Overloadings
   BI_Base& operator=(const BI_Base& rhs) = delete;
-
-protected:
-  // General Methods
-  void addToBoard(QGraphicsItem* item) noexcept;
-  void removeFromBoard(QGraphicsItem* item) noexcept;
 
 protected:
   Board& mBoard;
@@ -101,7 +72,6 @@ protected:
 private:
   // General Attributes
   bool mIsAddedToBoard;
-  bool mIsSelected;
 };
 
 /*******************************************************************************

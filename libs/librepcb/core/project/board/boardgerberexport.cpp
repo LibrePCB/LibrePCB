@@ -38,7 +38,6 @@
 #include "../circuit/netsignal.h"
 #include "../project.h"
 #include "board.h"
-#include "boarddesignrules.h"
 #include "boardfabricationoutputsettings.h"
 #include "boardlayerstack.h"
 #include "items/bi_device.h"
@@ -596,11 +595,11 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   }
   foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
     Q_ASSERT(text);
-    if (layerName == text->getText().getLayerName()) {
+    if (layerName == text->getTextObj().getLayerName()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
-      const Transform transform(text->getText());
-      foreach (Path path, transform.map(text->generatePaths())) {
+          calcWidthOfLayer(text->getTextObj().getStrokeWidth(), layerName);
+      const Transform transform(text->getTextObj());
+      foreach (Path path, transform.map(text->getPaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             QString());
       }
@@ -636,13 +635,12 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
   bool drawCopper = via.isOnLayer(layerName);
   bool drawStopMask = (layerName == GraphicsLayer::sTopStopMask ||
                        layerName == GraphicsLayer::sBotStopMask) &&
-      mBoard.getDesignRules().doesViaRequireStopMask(*via.getDrillDiameter());
+      via.getStopMaskOffset();
   if (drawCopper || drawStopMask) {
     PositiveLength outerDiameter = via.getSize();
     UnsignedLength radius(0);
     if (drawStopMask) {
-      radius = mBoard.getDesignRules().getStopMaskClearance().calcValue(
-          *via.getSize());
+      radius = UnsignedLength(std::max(*via.getStopMaskOffset(), Length(0)));
       outerDiameter += UnsignedLength(radius * 2);
     }
 
@@ -720,11 +718,11 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
     textFunction = GerberAttribute::ApertureFunction::NonConductor;
   }
   foreach (const BI_StrokeText* text, device.getStrokeTexts()) {
-    if (layerName == text->getText().getLayerName()) {
+    if (layerName == text->getTextObj().getLayerName()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
-      Transform transform(text->getText());
-      foreach (Path path, transform.map(text->generatePaths())) {
+          calcWidthOfLayer(text->getTextObj().getStrokeWidth(), layerName);
+      Transform transform(text->getTextObj());
+      foreach (Path path, transform.map(text->getPaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             component);
       }
@@ -736,14 +734,11 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
       (layerName == GraphicsLayer::sBotStopMask)) {
     for (const Hole& hole :
          device.getLibFootprint().getHoles().sortedByUuid()) {
-      if (hole.getStopMaskConfig().isEnabled()) {
-        const Length offset = hole.getStopMaskConfig().getOffset()
-            ? (*hole.getStopMaskConfig().getOffset())
-            : (*mBoard.getDesignRules().getStopMaskClearance().calcValue(
-                  *hole.getDiameter()));
-        const Length diameter = hole.getDiameter() + offset + offset;
-        const Path path = transform.map(hole.getPath()->cleaned());
+      if (tl::optional<Length> offset =
+              device.getHoleStopMasks().value(hole.getUuid())) {
+        const Length diameter = (*hole.getDiameter()) + (*offset) + (*offset);
         if (diameter > 0) {
+          const Path path = transform.map(hole.getPath()->cleaned());
           if (path.getVertices().count() == 1) {
             gen.flashCircle(path.getVertices().first().getPos(),
                             PositiveLength(diameter), tl::nullopt, tl::nullopt,
@@ -761,7 +756,7 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
 void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
                                          const BI_FootprintPad& pad,
                                          const QString& layerName) const {
-  foreach (const PadGeometry& geometry, pad.getGeometryOnLayer(layerName)) {
+  foreach (const PadGeometry& geometry, pad.getGeometries().value(layerName)) {
     // Pad attributes (most of them only on copper layers).
     GerberGenerator::Function function = tl::nullopt;
     tl::optional<QString> net = tl::nullopt;

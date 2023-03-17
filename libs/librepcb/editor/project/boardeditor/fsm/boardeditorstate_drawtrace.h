@@ -130,12 +130,12 @@ private:
   /**
    * @brief Finalize the BI_NetLines and connect them to other
    * existing traces if necessary.
-   * @param board On which board the drawing is finalized.
+   * @param scene On which board scene the drawing is finalized.
    * @return True, when the trace is successfully drawn. When the trace is
    * continued, return the result of startPositioning(). False when canceled or
    * an error occurred
    */
-  bool addNextNetPoint(Board& board) noexcept;
+  bool addNextNetPoint(BoardGraphicsScene& scene) noexcept;
 
   /**
    * @brief Abort or cancel the current drawing of the trace.

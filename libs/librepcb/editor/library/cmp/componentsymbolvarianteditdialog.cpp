@@ -22,14 +22,14 @@
  ******************************************************************************/
 #include "componentsymbolvarianteditdialog.h"
 
+#include "../../graphics/defaultgraphicslayerprovider.h"
+#include "../../graphics/graphicsscene.h"
 #include "../../library/libraryelementcache.h"
 #include "../sym/symbolgraphicsitem.h"
 #include "ui_componentsymbolvarianteditdialog.h"
 
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentsymbolvariant.h>
 #include <librepcb/core/library/sym/symbol.h>

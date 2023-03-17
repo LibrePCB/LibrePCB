@@ -73,51 +73,6 @@ bool BI_NetSegment::isUsed() const noexcept {
           (!mNetLines.isEmpty()));
 }
 
-int BI_NetSegment::getViasAtScenePos(const Point& pos,
-                                     QList<BI_Via*>& vias) const noexcept {
-  int count = 0;
-  foreach (BI_Via* via, mVias) {
-    if (via->isSelectable() &&
-        via->getGrabAreaScenePx().contains(pos.toPxQPointF())) {
-      vias.append(via);
-      ++count;
-    }
-  }
-  return count;
-}
-
-int BI_NetSegment::getNetPointsAtScenePos(const Point& pos,
-                                          const GraphicsLayer* layer,
-                                          QList<BI_NetPoint*>& points) const
-    noexcept {
-  int count = 0;
-  foreach (BI_NetPoint* netpoint, mNetPoints) {
-    if (netpoint->isSelectable() &&
-        netpoint->getGrabAreaScenePx().contains(pos.toPxQPointF()) &&
-        ((!layer) || (netpoint->getLayerOfLines() == layer))) {
-      points.append(netpoint);
-      ++count;
-    }
-  }
-  return count;
-}
-
-int BI_NetSegment::getNetLinesAtScenePos(const Point& pos,
-                                         const GraphicsLayer* layer,
-                                         QList<BI_NetLine*>& lines) const
-    noexcept {
-  int count = 0;
-  foreach (BI_NetLine* netline, mNetLines) {
-    if (netline->isSelectable() &&
-        netline->getGrabAreaScenePx().contains(pos.toPxQPointF()) &&
-        ((!layer) || (&netline->getLayer() == layer))) {
-      lines.append(netline);
-      ++count;
-    }
-  }
-  return count;
-}
-
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
@@ -225,6 +180,8 @@ void BI_NetSegment::addElements(const QList<BI_Via*>& vias,
   }
 
   sgl.dismiss();
+
+  emit elementsAdded(vias, netpoints, netlines);
 }
 
 void BI_NetSegment::removeElements(const QList<BI_Via*>& vias,
@@ -285,6 +242,8 @@ void BI_NetSegment::removeElements(const QList<BI_Via*>& vias,
   }
 
   sgl.dismiss();
+
+  emit elementsRemoved(vias, netpoints, netlines);
 }
 
 /*******************************************************************************
@@ -314,7 +273,7 @@ void BI_NetSegment::addToBoard() {
     sgl.add([netline]() { netline->removeFromBoard(); });
   }
 
-  BI_Base::addToBoard(nullptr);
+  BI_Base::addToBoard();
   sgl.dismiss();
 }
 
@@ -341,38 +300,8 @@ void BI_NetSegment::removeFromBoard() {
     sgl.add([&]() { mNetSignal->registerBoardNetSegment(*this); });
   }
 
-  BI_Base::removeFromBoard(nullptr);
+  BI_Base::removeFromBoard();
   sgl.dismiss();
-}
-
-void BI_NetSegment::selectAll() noexcept {
-  foreach (BI_Via* via, mVias)
-    via->setSelected(via->isSelectable());
-  foreach (BI_NetPoint* netpoint, mNetPoints)
-    netpoint->setSelected(netpoint->isSelectable());
-  foreach (BI_NetLine* netline, mNetLines)
-    netline->setSelected(netline->isSelectable());
-}
-
-void BI_NetSegment::setSelectionRect(const QRectF rectPx) noexcept {
-  foreach (BI_Via* via, mVias)
-    via->setSelected(via->isSelectable() &&
-                     via->getGrabAreaScenePx().intersects(rectPx));
-  foreach (BI_NetPoint* netpoint, mNetPoints)
-    netpoint->setSelected(netpoint->isSelectable() &&
-                          netpoint->getGrabAreaScenePx().intersects(rectPx));
-  foreach (BI_NetLine* netline, mNetLines)
-    netline->setSelected(netline->isSelectable() &&
-                         netline->getGrabAreaScenePx().intersects(rectPx));
-}
-
-void BI_NetSegment::clearSelection() const noexcept {
-  foreach (BI_Via* via, mVias)
-    via->setSelected(false);
-  foreach (BI_NetPoint* netpoint, mNetPoints)
-    netpoint->setSelected(false);
-  foreach (BI_NetLine* netline, mNetLines)
-    netline->setSelected(false);
 }
 
 void BI_NetSegment::serialize(SExpression& root) const {
@@ -398,32 +327,6 @@ void BI_NetSegment::serialize(SExpression& root) const {
     obj->getTrace().serialize(root.appendList("trace"));
   }
   root.ensureLineBreak();
-}
-
-/*******************************************************************************
- *  Inherited from SI_Base
- ******************************************************************************/
-
-QPainterPath BI_NetSegment::getGrabAreaScenePx() const noexcept {
-  return QPainterPath();
-}
-
-bool BI_NetSegment::isSelected() const noexcept {
-  if (mNetLines.isEmpty()) return false;
-  foreach (const BI_NetLine* netline, mNetLines) {
-    if (!netline->isSelected()) return false;
-  }
-  return true;
-}
-
-void BI_NetSegment::setSelected(bool selected) noexcept {
-  foreach (BI_Via* via, mVias)
-    via->setSelected(selected);
-  foreach (BI_NetPoint* netpoint, mNetPoints)
-    netpoint->setSelected(selected);
-  foreach (BI_NetLine* netline, mNetLines)
-    netline->setSelected(selected);
-  BI_Base::setSelected(selected);
 }
 
 /*******************************************************************************

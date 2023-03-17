@@ -23,11 +23,6 @@
 #include "bi_polygon.h"
 
 #include "../../../geometry/polygon.h"
-#include "../../../graphics/graphicsscene.h"
-#include "../../../graphics/polygongraphicsitem.h"
-#include "../../project.h"
-#include "../board.h"
-#include "../boardlayerstack.h"
 
 #include <QtCore>
 
@@ -41,20 +36,18 @@ namespace librepcb {
  ******************************************************************************/
 
 BI_Polygon::BI_Polygon(Board& board, const Polygon& polygon)
-  : BI_Base(board),
-    mPolygon(new Polygon(polygon)),
-    mGraphicsItem(new PolygonGraphicsItem(*mPolygon, mBoard.getLayerStack())) {
-  mGraphicsItem->setEditable(true);
-  mGraphicsItem->setZValue(Board::ZValue_Default);
-
-  // connect to the "attributes changed" signal of the board
-  connect(&mBoard, &Board::attributesChanged, this,
-          &BI_Polygon::boardAttributesChanged);
+  : BI_Base(board), mPolygon(new Polygon(polygon)) {
 }
 
 BI_Polygon::~BI_Polygon() noexcept {
-  mGraphicsItem.reset();
-  mPolygon.reset();
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+const Uuid& BI_Polygon::getUuid() const noexcept {
+  return mPolygon->getUuid();
 }
 
 /*******************************************************************************
@@ -65,45 +58,14 @@ void BI_Polygon::addToBoard() {
   if (isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  BI_Base::addToBoard(mGraphicsItem.data());
+  BI_Base::addToBoard();
 }
 
 void BI_Polygon::removeFromBoard() {
   if (!isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  BI_Base::removeFromBoard(mGraphicsItem.data());
-}
-
-/*******************************************************************************
- *  Inherited from BI_Base
- ******************************************************************************/
-
-QPainterPath BI_Polygon::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-const Uuid& BI_Polygon::getUuid() const noexcept {
-  return mPolygon->getUuid();
-}
-
-bool BI_Polygon::isSelectable() const noexcept {
-  const GraphicsLayer* layer =
-      mBoard.getLayerStack().getLayer(*mPolygon->getLayerName());
-  return layer && layer->isVisible();
-}
-
-void BI_Polygon::setSelected(bool selected) noexcept {
-  BI_Base::setSelected(selected);
-  mGraphicsItem->setSelected(selected);
-}
-
-/*******************************************************************************
- *  Private Slots
- ******************************************************************************/
-
-void BI_Polygon::boardAttributesChanged() {
-  mGraphicsItem->update();
+  BI_Base::removeFromBoard();
 }
 
 /*******************************************************************************

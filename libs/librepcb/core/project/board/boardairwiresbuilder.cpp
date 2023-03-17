@@ -94,10 +94,11 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
     }
     foreach (const BI_NetPoint* netpoint, netsegment->getNetPoints()) {
       Q_ASSERT(netpoint);
-      if (const GraphicsLayer* layer = netpoint->getLayerOfLines()) {
+      const QString layer = netpoint->getLayerOfLines();
+      if (!layer.isEmpty()) {
         Point pos = netpoint->getPosition();
         int id = builder.addPoint(pos);
-        pointLayerMap[id] = std::make_pair(pos, layer->getName());
+        pointLayerMap[id] = std::make_pair(pos, layer);
         anchorMap[netpoint] = id;
       }
     }

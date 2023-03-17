@@ -40,9 +40,7 @@ namespace librepcb {
 
 class Component;
 class ComponentSymbolVariant;
-class DefaultGraphicsLayerProvider;
 class Device;
-class GraphicsScene;
 class Package;
 class Symbol;
 class Theme;
@@ -50,7 +48,9 @@ class WorkspaceLibraryDb;
 
 namespace editor {
 
+class DefaultGraphicsLayerProvider;
 class FootprintGraphicsItem;
+class GraphicsScene;
 class SymbolGraphicsItem;
 
 namespace Ui {

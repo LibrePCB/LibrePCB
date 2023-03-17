@@ -34,9 +34,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Schematic;
-
 namespace editor {
 
 class CmdPolygonEdit;
@@ -45,6 +42,7 @@ class CmdSchematicNetPointEdit;
 class CmdSymbolInstanceEdit;
 class CmdSymbolInstanceTextsReset;
 class CmdTextEdit;
+class SchematicGraphicsScene;
 
 /*******************************************************************************
  *  Class CmdDragSelectedSchematicItems
@@ -56,7 +54,7 @@ class CmdTextEdit;
 class CmdDragSelectedSchematicItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdDragSelectedSchematicItems(Schematic& schematic,
+  CmdDragSelectedSchematicItems(SchematicGraphicsScene& scene,
                                 const Point& startPos = Point()) noexcept;
   ~CmdDragSelectedSchematicItems() noexcept;
 
@@ -73,7 +71,7 @@ private:
   bool performExecute() override;
 
   // Private Member Variables
-  Schematic& mSchematic;
+  SchematicGraphicsScene& mScene;
   int mItemCount;
   Point mStartPos;
   Point mDeltaPos;

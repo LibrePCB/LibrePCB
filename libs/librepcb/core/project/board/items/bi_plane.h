@@ -29,6 +29,8 @@
 #include "../../../types/uuid.h"
 #include "bi_base.h"
 
+#include <librepcb/core/utils/signalslot.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -36,7 +38,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BGI_Plane;
 class Board;
 class NetSignal;
 class Project;
@@ -52,6 +53,16 @@ class BI_Plane final : public BI_Base {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    OutlineChanged,
+    LayerChanged,
+    VisibilityChanged,
+    FragmentsChanged,
+  };
+  Signal<BI_Plane, Event> onEdited;
+  typedef Slot<BI_Plane, Event> OnEditedSlot;
+
   // Types
   enum class ConnectStyle {
     None,  ///< do not connect pads/vias to plane
@@ -82,8 +93,6 @@ public:
   // {return mThermalSpokeWidth;}
   const Path& getOutline() const noexcept { return mOutline; }
   const QVector<Path>& getFragments() const noexcept { return mFragments; }
-  BGI_Plane& getGraphicsItem() noexcept { return *mGraphicsItem; }
-  bool isSelectable() const noexcept override;
   bool isVisible() const noexcept { return mIsVisible; }
 
   // Setters
@@ -101,7 +110,6 @@ public:
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
-  void clear() noexcept;
 
   /**
    * @brief Serialize into ::librepcb::SExpression node
@@ -110,17 +118,9 @@ public:
    */
   void serialize(SExpression& root) const;
 
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override { return BI_Base::Type_t::Plane; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
-
   // Operator Overloadings
   BI_Plane& operator=(const BI_Plane& rhs) = delete;
   bool operator<(const BI_Plane& rhs) const noexcept;
-
-private slots:
-  void boardAttributesChanged();
 
 private:  // Data
   Uuid mUuid;
@@ -135,7 +135,6 @@ private:  // Data
   // Length mThermalGapWidth;
   // Length mThermalSpokeWidth;
   // style [round square miter] ?
-  QScopedPointer<BGI_Plane> mGraphicsItem;
   bool mIsVisible;  // volatile, not saved to file
 
   QVector<Path> mFragments;

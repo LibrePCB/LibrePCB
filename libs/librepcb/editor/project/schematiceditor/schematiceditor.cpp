@@ -25,6 +25,7 @@
 #include "../../dialogs/filedialog.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
+#include "../../graphics/graphicsscene.h"
 #include "../../project/cmd/cmdschematicadd.h"
 #include "../../project/cmd/cmdschematicedit.h"
 #include "../../project/cmd/cmdschematicremove.h"
@@ -41,10 +42,11 @@
 #include "../projecteditor.h"
 #include "../projectsetupdialog.h"
 #include "fsm/schematiceditorfsm.h"
+#include "graphicsitems/sgi_symbol.h"
+#include "schematicgraphicsscene.h"
 #include "schematicpagesdock.h"
 
 #include <librepcb/core/application.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
@@ -83,6 +85,8 @@ SchematicEditor::SchematicEditor(
     mStandardCommandHandler(new StandardEditorCommandHandler(
         mProjectEditor.getWorkspace().getSettings(), this)),
     mActiveSchematicIndex(-1),
+    mGraphicsScene(),
+    mVisibleSceneRect(),
     mFsm() {
   mUi->setupUi(this);
 
@@ -126,6 +130,7 @@ SchematicEditor::SchematicEditor(
   // Build the whole schematic editor finite state machine.
   SchematicEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
                                          mProject,
+                                         mProjectEditor,
                                          *this,
                                          *mUi->graphicsView,
                                          *mCommandToolBarProxy,
@@ -244,22 +249,35 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
   // event accepted --> change the schematic page
   Schematic* schematic = getActiveSchematic();
   if (schematic) {
-    // save current view scene rect
-    schematic->saveViewSceneRect(mUi->graphicsView->getVisibleSceneRect());
+    // Save current view scene rect.
+    mVisibleSceneRect[schematic->getUuid()] =
+        mUi->graphicsView->getVisibleSceneRect();
   }
+  mUi->graphicsView->setScene(nullptr);
+  mGraphicsScene.reset();
   while (!mSchematicConnections.isEmpty()) {
     disconnect(mSchematicConnections.takeLast());
   }
+
   schematic = mProject.getSchematicByIndex(index);
+
   if (schematic) {
     // show scene, restore view scene rect, set grid properties
+    mGraphicsScene.reset(new SchematicGraphicsScene(
+        *schematic, mProjectEditor.getHighlightedNetSignals()));
+    connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
+            mGraphicsScene.data(),
+            &SchematicGraphicsScene::updateHighlightedNetSignals);
     const Theme& theme =
         mProjectEditor.getWorkspace().getSettings().themes.getActive();
-    schematic->getGraphicsScene().setSelectionRectColors(
+    mGraphicsScene->setSelectionRectColors(
         theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
         theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
-    mUi->graphicsView->setScene(&schematic->getGraphicsScene());
-    mUi->graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
+    mUi->graphicsView->setScene(mGraphicsScene.data());
+    const QRectF sceneRect = mVisibleSceneRect.value(schematic->getUuid());
+    if (!sceneRect.isEmpty()) {
+      mUi->graphicsView->setVisibleSceneRect(sceneRect);
+    }
     mUi->graphicsView->setGridInterval(schematic->getGridInterval());
     mUi->statusbar->setLengthUnit(schematic->getGridUnit());
     mSchematicConnections.append(
@@ -1061,15 +1079,19 @@ void SchematicEditor::goToSymbol(const QString& name, int index) noexcept {
     index %= symbolCandidates.count();
     SI_Symbol* symbol = symbolCandidates[index];
     Schematic& schematic = symbol->getSchematic();
-    if (setActiveSchematicIndex(mProject.getSchematics().indexOf(&schematic))) {
-      schematic.clearSelection();
-      symbol->setSelected(true);
-      QRectF rect = symbol->getBoundingRect();
-      // Zoom to a rectangle relative to the maximum symbol dimension. The
-      // symbol is 1/4th of the screen.
-      qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());
-      rect.adjust(-margin, -margin, margin, margin);
-      mUi->graphicsView->zoomToRect(rect);
+    if (setActiveSchematicIndex(mProject.getSchematics().indexOf(&schematic)) &&
+        mGraphicsScene) {
+      mGraphicsScene->clearSelection();
+      if (auto item = mGraphicsScene->getSymbols().value(symbol)) {
+        item->setSelected(true);
+        QRectF rect = item->mapRectToScene(item->childrenBoundingRect());
+        // Zoom to a rectangle relative to the maximum symbol dimension. The
+        // symbol is 1/4th of the screen.
+        qreal margin =
+            1.5f * std::max(rect.size().width(), rect.size().height());
+        rect.adjust(-margin, -margin, margin, margin);
+        mUi->graphicsView->zoomToRect(rect);
+      }
     }
   }
 }

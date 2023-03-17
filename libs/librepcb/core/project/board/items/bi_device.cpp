@@ -28,11 +28,11 @@
 #include "../../../library/sym/symbol.h"
 #include "../../../utils/scopeguardlist.h"
 #include "../../../utils/transform.h"
-#include "../../circuit/circuit.h"
 #include "../../circuit/componentinstance.h"
 #include "../../project.h"
 #include "../../projectlibrary.h"
 #include "../board.h"
+#include "../boarddesignrules.h"
 #include "bi_footprintpad.h"
 
 #include <QtCore>
@@ -51,6 +51,7 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
                      const Point& position, const Angle& rotation, bool mirror,
                      bool loadInitialStrokeTexts)
   : BI_Base(board),
+    onEdited(*this),
     mCompInstance(compInstance),
     mLibDevice(nullptr),
     mLibPackage(nullptr),
@@ -140,10 +141,10 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
     mPads.insert(libPad.getUuid(), pad);
   }
 
-  // Create graphics item.
-  mGraphicsItem.reset(new BGI_Device(*this));
-  mGraphicsItem->setPos(mPosition.toPxQPointF());
-  updateGraphicsItemTransform();
+  // Update hole stop masks from design rules.
+  updateHoleStopMaskOffsets();
+  connect(&mBoard, &Board::designRulesModified, this,
+          &BI_Device::updateHoleStopMaskOffsets);
 
   // Emit the "attributesChanged" signal when the board or component instance
   // has emitted it.
@@ -151,14 +152,9 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
           &BI_Device::attributesChanged);
   connect(&mCompInstance, &ComponentInstance::attributesChanged, this,
           &BI_Device::attributesChanged);
-
-  // Update graphics item if design rules were modified.
-  connect(&mBoard, &Board::attributesChanged, this,
-          [this]() { mGraphicsItem->updateDesignRules(); });
 }
 
 BI_Device::~BI_Device() noexcept {
-  mGraphicsItem.reset();
   qDeleteAll(mPads);
   mPads.clear();
   qDeleteAll(mStrokeTexts);
@@ -178,10 +174,6 @@ bool BI_Device::isUsed() const noexcept {
     if (pad->isUsed()) return true;
   }
   return false;
-}
-
-QRectF BI_Device::getBoundingRect() const noexcept {
-  return mGraphicsItem->sceneTransform().mapRect(mGraphicsItem->boundingRect());
 }
 
 /*******************************************************************************
@@ -225,7 +217,7 @@ void BI_Device::addStrokeText(BI_StrokeText& text) {
     text.addToBoard();  // can throw
   }
   mStrokeTexts.insert(text.getUuid(), &text);
-  text.setSelected(isSelected());
+  emit strokeTextAdded(text);
 }
 
 void BI_Device::removeStrokeText(BI_StrokeText& text) {
@@ -236,6 +228,7 @@ void BI_Device::removeStrokeText(BI_StrokeText& text) {
     text.removeFromBoard();  // can throw
   }
   mStrokeTexts.remove(text.getUuid());
+  emit strokeTextRemoved(text);
 }
 
 /*******************************************************************************
@@ -245,23 +238,14 @@ void BI_Device::removeStrokeText(BI_StrokeText& text) {
 void BI_Device::setPosition(const Point& pos) noexcept {
   if (pos != mPosition) {
     mPosition = pos;
-    mGraphicsItem->setPos(pos.toPxQPointF());
-    foreach (BI_FootprintPad* pad, mPads) {
-      pad->updatePosition();
-      mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
-    }
-    foreach (BI_StrokeText* text, mStrokeTexts) { text->updateGraphicsItems(); }
+    onEdited.notify(Event::PositionChanged);
   }
 }
 
 void BI_Device::setRotation(const Angle& rot) noexcept {
   if (rot != mRotation) {
     mRotation = rot;
-    updateGraphicsItemTransform();
-    foreach (BI_FootprintPad* pad, mPads) {
-      pad->updatePosition();
-      mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
-    }
+    onEdited.notify(Event::RotationChanged);
   }
 }
 
@@ -271,12 +255,7 @@ void BI_Device::setMirrored(bool mirror) {
       throw LogicError(__FILE__, __LINE__);
     }
     mMirrored = mirror;
-    updateGraphicsItemTransform();
-    mGraphicsItem->updateBoardSide();
-    foreach (BI_FootprintPad* pad, mPads) {
-      pad->updatePosition();
-      mBoard.scheduleAirWiresRebuild(pad->getCompSigInstNetSignal());
-    }
+    onEdited.notify(Event::MirroredChanged);
   }
 }
 
@@ -302,7 +281,7 @@ void BI_Device::addToBoard() {
     text->addToBoard();  // can throw
     sgl.add([text]() { text->removeFromBoard(); });
   }
-  BI_Base::addToBoard(mGraphicsItem.data());
+  BI_Base::addToBoard();
   sgl.dismiss();
 }
 
@@ -321,7 +300,7 @@ void BI_Device::removeFromBoard() {
   }
   mCompInstance.unregisterDevice(*this);  // can throw
   sgl.add([&]() { mCompInstance.registerDevice(*this); });
-  BI_Base::removeFromBoard(mGraphicsItem.data());
+  BI_Base::removeFromBoard();
   sgl.dismiss();
 }
 
@@ -342,7 +321,7 @@ void BI_Device::serialize(SExpression& root) const {
   root.ensureLineBreak();
   for (const BI_StrokeText* obj : mStrokeTexts) {
     root.ensureLineBreak();
-    obj->getText().serialize(root.appendList("stroke_text"));
+    obj->getTextObj().serialize(root.appendList("stroke_text"));
   }
   root.ensureLineBreak();
 }
@@ -376,28 +355,6 @@ QVector<const AttributeProvider*> BI_Device::getAttributeProviderParents() const
     noexcept {
   return QVector<const AttributeProvider*>{&mBoard, &mCompInstance};
 }
-
-/*******************************************************************************
- *  Inherited from BI_Base
- ******************************************************************************/
-
-QPainterPath BI_Device::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-bool BI_Device::isSelectable() const noexcept {
-  return mGraphicsItem->isSelectable();
-}
-
-void BI_Device::setSelected(bool selected) noexcept {
-  BI_Base::setSelected(selected);
-  mGraphicsItem->setSelected(selected);
-  foreach (BI_FootprintPad* pad, mPads)
-    pad->setSelected(selected);
-  foreach (BI_StrokeText* text, mStrokeTexts)
-    text->setSelected(selected);
-}
-
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -408,11 +365,24 @@ bool BI_Device::checkAttributesValidity() const noexcept {
   return true;
 }
 
-void BI_Device::updateGraphicsItemTransform() noexcept {
-  QTransform t;
-  if (mMirrored) t.scale(qreal(-1), qreal(1));
-  t.rotate(-mRotation.toDeg());
-  mGraphicsItem->setTransform(t);
+void BI_Device::updateHoleStopMaskOffsets() noexcept {
+  QHash<Uuid, tl::optional<Length>> offsets;
+  for (const Hole& hole : mLibFootprint->getHoles()) {
+    if (!hole.getStopMaskConfig().isEnabled()) {
+      offsets[hole.getUuid()] = tl::nullopt;
+    } else if (auto offset = hole.getStopMaskConfig().getOffset()) {
+      offsets[hole.getUuid()] = offset;
+    } else {
+      offsets[hole.getUuid()] =
+          *mBoard.getDesignRules().getStopMaskClearance().calcValue(
+              *hole.getDiameter());
+    }
+  }
+
+  if (offsets != mHoleStopMaskOffsets) {
+    mHoleStopMaskOffsets = offsets;
+    onEdited.notify(Event::StopMaskOffsetsChanged);
+  }
 }
 
 const QStringList& BI_Device::getLocaleOrder() const noexcept {

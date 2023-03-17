@@ -42,12 +42,12 @@
 namespace librepcb {
 
 class Text;
-class TextGraphicsItem;
 
 namespace editor {
 
 class CmdTextEdit;
 class HAlignActionGroup;
+class TextGraphicsItem;
 class VAlignActionGroup;
 
 /*******************************************************************************

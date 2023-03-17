@@ -36,10 +36,10 @@ class BI_NetLine;
 class BI_NetPoint;
 class BI_NetSegment;
 class BI_Via;
-class Board;
 
 namespace editor {
 
+class BoardGraphicsScene;
 class CmdRemoveBoardItems;
 
 /*******************************************************************************
@@ -52,7 +52,7 @@ class CmdRemoveBoardItems;
 class CmdRemoveSelectedBoardItems final : public UndoCommand {
 public:
   // Constructors / Destructor
-  explicit CmdRemoveSelectedBoardItems(Board& board) noexcept;
+  explicit CmdRemoveSelectedBoardItems(BoardGraphicsScene& scene) noexcept;
   ~CmdRemoveSelectedBoardItems() noexcept;
 
 private:  // Methods
@@ -66,7 +66,7 @@ private:  // Methods
   void performRedo() override;
 
 private:  // Data
-  Board& mBoard;
+  BoardGraphicsScene& mScene;
   QScopedPointer<CmdRemoveBoardItems> mWrappedCommand;
 };
 

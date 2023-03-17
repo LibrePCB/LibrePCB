@@ -36,11 +36,11 @@
 namespace librepcb {
 
 class Hole;
-class HoleGraphicsItem;
 
 namespace editor {
 
 class CmdHoleEdit;
+class HoleGraphicsItem;
 
 /*******************************************************************************
  *  Class PackageEditorState_AddHoles

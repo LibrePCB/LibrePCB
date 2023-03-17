@@ -22,9 +22,19 @@
  ******************************************************************************/
 #include "boardeditorstate.h"
 
+#include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../widgets/graphicsview.h"
 #include "../boardeditor.h"
+#include "../boardgraphicsscene.h"
+#include "../graphicsitems/bgi_device.h"
+#include "../graphicsitems/bgi_footprintpad.h"
+#include "../graphicsitems/bgi_hole.h"
+#include "../graphicsitems/bgi_netline.h"
+#include "../graphicsitems/bgi_netpoint.h"
+#include "../graphicsitems/bgi_plane.h"
+#include "../graphicsitems/bgi_stroketext.h"
+#include "../graphicsitems/bgi_via.h"
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/graphics/graphicslayer.h>
@@ -69,6 +79,10 @@ BoardEditorState::~BoardEditorState() noexcept {
 
 Board* BoardEditorState::getActiveBoard() noexcept {
   return mContext.editor.getActiveBoard();
+}
+
+BoardGraphicsScene* BoardEditorState::getActiveBoardScene() noexcept {
+  return mContext.editor.getActiveBoardScene();
 }
 
 PositiveLength BoardEditorState::getGridInterval() const noexcept {
@@ -130,13 +144,13 @@ QWidget* BoardEditorState::parentWidget() noexcept {
   return &mContext.editor;
 }
 
-QList<BI_Base*> BoardEditorState::findItemsAtPos(
+QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     const Point& pos, FindFlags flags, const GraphicsLayer* cuLayer,
     const QSet<const NetSignal*>& netsignals,
-    const QSet<BI_Base*>& except) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) {
-    return QList<BI_Base*>();
+    const QVector<std::shared_ptr<QGraphicsItem>>& except) noexcept {
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) {
+    return QList<std::shared_ptr<QGraphicsItem>>();
   }
 
   const QPointF posExact = pos.toPxQPointF();
@@ -186,10 +200,11 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
   // And for items not directly under the cursor, but very close to the cursor,
   // add +1000. For items not under the cursor, but on the next grid interval,
   // add +2000.
-  QMultiMap<std::pair<int, int>, BI_Base*> items;
+  QMultiMap<std::pair<int, int>, std::shared_ptr<QGraphicsItem>> items;
   tl::optional<std::pair<int, int>> lowestPriority;
-  auto addItem = [&items, &lowestPriority](const std::pair<int, int>& prio,
-                                           BI_Base* item) {
+  auto addItem = [&items, &lowestPriority](
+                     const std::pair<int, int>& prio,
+                     std::shared_ptr<QGraphicsItem> item) {
     if ((!lowestPriority) || (prio < (*lowestPriority))) {
       lowestPriority = prio;
     }
@@ -211,17 +226,20 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
     }
   };
   auto processItem = [&pos, &posExact, &posOnGrid, &posArea, &posAreaLarge,
-                      flags, &except, &addItem,
-                      &canSkip](BI_Base* item, const Point& nearestPos,
-                                int priority, bool large) {
-    if (except.contains(item) || (!item->isSelectable())) {
+                      flags, &except, &addItem, &canSkip](
+                         std::shared_ptr<QGraphicsItem> item,
+                         const Point& nearestPos, int priority, bool large) {
+    if (except.contains(item)) {
       return;
     }
     auto prio = std::make_pair(priority, 0);
     if (canSkip(prio)) {
       return;
     }
-    const QPainterPath grabArea = item->getGrabAreaScenePx();
+    const QPainterPath grabArea = item->mapToScene(item->shape());
+    if (grabArea.isEmpty()) {
+      return;
+    }
     const int distance = qRound((nearestPos - pos).getLength()->toPx());
     prio = std::make_pair(priority, distance);
     if (canSkip(prio)) {
@@ -252,46 +270,51 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
   };
 
   if (flags.testFlag(FindFlag::Holes)) {
-    foreach (BI_Hole* hole, board->getHoles()) {
-      processItem(hole,
-                  hole->getHole().getPath()->getVertices().first().getPos(), 5,
-                  false);
+    for (auto it = scene->getHoles().begin(); it != scene->getHoles().end();
+         it++) {
+      processItem(it.value(),
+                  it.key()->getHole().getPath()->getVertices().first().getPos(),
+                  5, false);
     }
   }
 
-  if (flags & (FindFlag::Vias | FindFlag::NetPoints | FindFlag::NetLines)) {
-    foreach (BI_NetSegment* segment, board->getNetSegments()) {
-      if ((!netsignals.isEmpty()) &&
-          (!netsignals.contains(segment->getNetSignal()))) {
-        continue;
+  if (flags.testFlag(FindFlag::Vias)) {
+    for (auto it = scene->getVias().begin(); it != scene->getVias().end();
+         it++) {
+      if (netsignals.isEmpty() ||
+          netsignals.contains(it.key()->getNetSegment().getNetSignal())) {
+        processItem(it.value(), it.key()->getPosition(), 0, false);
       }
-      if (flags.testFlag(FindFlag::Vias)) {
-        foreach (BI_Via* via, segment->getVias()) {
-          processItem(via, via->getPosition(), 0, false);
-        }
-      }
-      if (flags.testFlag(FindFlag::NetPoints)) {
-        foreach (BI_NetPoint* netpoint, segment->getNetPoints()) {
-          const GraphicsLayer* layer = netpoint->getLayerOfLines();
-          if (cuLayer && (layer != cuLayer)) {
-            continue;
-          }
-          processItem(netpoint, netpoint->getPosition(),
-                      10 + (layer ? priorityFromLayer(layer->getName()) : 0),
+    }
+  }
+
+  if (flags.testFlag(FindFlag::NetPoints)) {
+    for (auto it = scene->getNetPoints().begin();
+         it != scene->getNetPoints().end(); it++) {
+      if (netsignals.isEmpty() ||
+          netsignals.contains(it.key()->getNetSegment().getNetSignal())) {
+        const QString layer = it.key()->getLayerOfLines();
+        if ((!cuLayer) || (cuLayer->getName() == layer)) {
+          processItem(it.value(), it.key()->getPosition(),
+                      10 + (layer.isEmpty() ? 0 : priorityFromLayer(layer)),
                       false);
         }
       }
-      if (flags.testFlag(FindFlag::NetLines)) {
-        foreach (BI_NetLine* netline, segment->getNetLines()) {
-          const GraphicsLayer& layer = netline->getLayer();
-          if (cuLayer && (&layer != cuLayer)) {
-            continue;
-          }
-          processItem(netline,
+    }
+  }
+
+  if (flags.testFlag(FindFlag::NetLines)) {
+    for (auto it = scene->getNetLines().begin();
+         it != scene->getNetLines().end(); it++) {
+      if (netsignals.isEmpty() ||
+          netsignals.contains(it.key()->getNetSegment().getNetSignal())) {
+        const GraphicsLayer& layer = it.key()->getLayer();
+        if ((!cuLayer) || (cuLayer == &layer)) {
+          processItem(it.value(),
                       Toolbox::nearestPointOnLine(
                           pos.mappedToGrid(getGridInterval()),
-                          netline->getStartPoint().getPosition(),
-                          netline->getEndPoint().getPosition()),
+                          it.key()->getStartPoint().getPosition(),
+                          it.key()->getEndPoint().getPosition()),
                       20 + priorityFromLayer(layer.getName()), false);
         }
       }
@@ -299,67 +322,60 @@ QList<BI_Base*> BoardEditorState::findItemsAtPos(
   }
 
   if (flags.testFlag(FindFlag::Planes)) {
-    foreach (BI_Plane* plane, board->getPlanes()) {
-      if ((!netsignals.isEmpty()) &&
-          (!netsignals.contains(&plane->getNetSignal()))) {
-        continue;
+    for (auto it = scene->getPlanes().begin(); it != scene->getPlanes().end();
+         it++) {
+      if (netsignals.isEmpty() ||
+          netsignals.contains(&it.key()->getNetSignal())) {
+        if ((!cuLayer) || (cuLayer->getName() == *it.key()->getLayerName())) {
+          processItem(
+              it.value(),
+              it.key()->getOutline().calcNearestPointBetweenVertices(pos),
+              30 + priorityFromLayer(*it.key()->getLayerName()),
+              true);  // Probably large grab area makes sense?
+        }
       }
-      if (cuLayer && (*plane->getLayerName() != cuLayer->getName())) {
-        continue;
-      }
-      processItem(plane,
-                  plane->getOutline().calcNearestPointBetweenVertices(pos),
-                  30 + priorityFromLayer(*plane->getLayerName()),
-                  true);  // Probably large grab area makes sense?
     }
   }
 
-  if (flags &
-      (FindFlag::Footprints | FindFlag::FootprintPads |
-       FindFlag::StrokeTexts)) {
-    foreach (BI_Device* device, board->getDeviceInstances()) {
-      if (flags.testFlag(FindFlag::Footprints)) {
-        processItem(device, device->getPosition(),
-                    40 + (device->getMirrored() ? 300 : 100), false);
-      }
-      if (flags.testFlag(FindFlag::FootprintPads)) {
-        foreach (BI_FootprintPad* pad, device->getPads()) {
-          if ((!netsignals.isEmpty()) &&
-              (!netsignals.contains(pad->getCompSigInstNetSignal()))) {
-            continue;
-          }
-          if (cuLayer && (!pad->isOnLayer(cuLayer->getName()))) {
-            continue;
-          }
-          processItem(pad, pad->getPosition(),
-                      50 + (pad->getMirrored() ? 300 : 100), false);
-        }
-      }
-      if (flags.testFlag(FindFlag::StrokeTexts)) {
-        foreach (BI_StrokeText* text, device->getStrokeTexts()) {
-          processItem(text, text->getPosition(),
-                      60 + priorityFromLayer(*text->getText().getLayerName()),
-                      false);
+  if (flags.testFlag(FindFlag::Devices)) {
+    for (auto it = scene->getDevices().begin(); it != scene->getDevices().end();
+         it++) {
+      processItem(it.value(), it.key()->getPosition(),
+                  40 + (it.key()->getMirrored() ? 300 : 100), false);
+    }
+  }
+
+  if (flags.testFlag(FindFlag::FootprintPads)) {
+    for (auto it = scene->getFootprintPads().begin();
+         it != scene->getFootprintPads().end(); it++) {
+      if (netsignals.isEmpty() ||
+          netsignals.contains(it.key()->getCompSigInstNetSignal())) {
+        if ((!cuLayer) || (it.key()->isOnLayer(cuLayer->getName()))) {
+          processItem(it.value(), it.key()->getPosition(),
+                      50 + (it.key()->getMirrored() ? 300 : 100), false);
         }
       }
     }
   }
 
   if (flags.testFlag(FindFlag::Polygons)) {
-    foreach (BI_Polygon* polygon, board->getPolygons()) {
+    for (auto it = scene->getPolygons().begin();
+         it != scene->getPolygons().end(); it++) {
       processItem(
-          polygon,
-          polygon->getPolygon().getPath().calcNearestPointBetweenVertices(pos),
-          60 + priorityFromLayer(*polygon->getPolygon().getLayerName()),
+          it.value(),
+          it.key()->getPolygon().getPath().calcNearestPointBetweenVertices(pos),
+          60 + priorityFromLayer(*it.key()->getPolygon().getLayerName()),
           true);  // Probably large grab area makes sense?
     }
   }
 
   if (flags.testFlag(FindFlag::StrokeTexts)) {
-    foreach (BI_StrokeText* text, board->getStrokeTexts()) {
-      processItem(text, text->getPosition(),
-                  60 + priorityFromLayer(*text->getText().getLayerName()),
-                  false);
+    for (auto it = scene->getStrokeTexts().begin();
+         it != scene->getStrokeTexts().end(); it++) {
+      processItem(
+          it.value(), it.key()->getPosition(),
+          60 + priorityFromLayer(*it.key()->getTextObj().getLayerName()),
+          false);
     }
   }
 

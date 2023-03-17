@@ -25,6 +25,8 @@
 #include "../../dialogs/filedialog.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
+#include "../../graphics/graphicsscene.h"
+#include "../../graphics/primitivepathgraphicsitem.h"
 #include "../../project/cmd/cmdboardadd.h"
 #include "../../project/cmd/cmdboardremove.h"
 #include "../../undostack.h"
@@ -40,18 +42,18 @@
 #include "../bomgeneratordialog.h"
 #include "../projecteditor.h"
 #include "../projectsetupdialog.h"
+#include "boardgraphicsscene.h"
 #include "boardlayersdock.h"
 #include "boardpickplacegeneratordialog.h"
 #include "boardsetupdialog.h"
 #include "fabricationoutputdialog.h"
 #include "fsm/boardeditorfsm.h"
+#include "graphicsitems/bgi_device.h"
 #include "unplacedcomponentsdock.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/fileio/fileutils.h>
-#include <librepcb/core/graphics/graphicsscene.h>
-#include <librepcb/core/graphics/primitivepathgraphicsitem.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardd356netlistexport.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
@@ -92,6 +94,8 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mStandardCommandHandler(new StandardEditorCommandHandler(
         mProjectEditor.getWorkspace().getSettings(), this)),
     mActiveBoard(nullptr),
+    mGraphicsScene(),
+    mVisibleSceneRect(),
     mFsm() {
   mUi->setupUi(this);
   mUi->tabBar->setDocumentMode(true);  // For MacOS
@@ -136,6 +140,7 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   // Build the whole board editor finite state machine.
   BoardEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
                                      mProject,
+                                     mProjectEditor,
                                      *this,
                                      *mUi->graphicsView,
                                      *mCommandToolBarProxy,
@@ -214,21 +219,33 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
       // reasons)
       disconnect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified,
                  mActiveBoard.data(), &Board::triggerAirWiresRebuild);
-      // save current view scene rect
-      mActiveBoard->saveViewSceneRect(mUi->graphicsView->getVisibleSceneRect());
+      // Save current view scene rect.
+      mVisibleSceneRect[mActiveBoard->getUuid()] =
+          mUi->graphicsView->getVisibleSceneRect();
     }
+
+    mUi->graphicsView->setScene(nullptr);
+    mGraphicsScene.reset();
     mActiveBoard = newBoard;
+
     if (mActiveBoard) {
       // show scene, restore view scene rect, set grid properties
+      mGraphicsScene.reset(new BoardGraphicsScene(
+          *mActiveBoard, mProjectEditor.getHighlightedNetSignals()));
+      connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
+              mGraphicsScene.data(),
+              &BoardGraphicsScene::updateHighlightedNetSignals);
       const Theme& theme =
           mProjectEditor.getWorkspace().getSettings().themes.getActive();
       mActiveBoard->getLayerStack().applyTheme(theme);
-      mActiveBoard->getGraphicsScene().setSelectionRectColors(
+      mGraphicsScene->setSelectionRectColors(
           theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
           theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
-      mUi->graphicsView->setScene(&mActiveBoard->getGraphicsScene());
-      mUi->graphicsView->setVisibleSceneRect(
-          mActiveBoard->restoreViewSceneRect());
+      mUi->graphicsView->setScene(mGraphicsScene.data());
+      const QRectF sceneRect = mVisibleSceneRect.value(mActiveBoard->getUuid());
+      if (!sceneRect.isEmpty()) {
+        mUi->graphicsView->setVisibleSceneRect(sceneRect);
+      }
       mUi->graphicsView->setGridInterval(mActiveBoard->getGridInterval());
       mUi->statusbar->setLengthUnit(mActiveBoard->getGridUnit());
       // force airwire rebuild immediately and on every project modification
@@ -1098,7 +1115,7 @@ void BoardEditor::highlightDrcMessage(const RuleCheckMessage& msg,
             Theme::Color::sBoardOverlays);
     QPainterPath path = Path::toQPainterPathPx(msg.getLocations(), true);
     mDrcLocationGraphicsItem.reset(new QGraphicsPathItem());
-    mDrcLocationGraphicsItem->setZValue(Board::ZValue_AirWires);
+    mDrcLocationGraphicsItem->setZValue(BoardGraphicsScene::ZValue_AirWires);
     mDrcLocationGraphicsItem->setPen(QPen(color.getPrimaryColor(), 0));
     mDrcLocationGraphicsItem->setBrush(color.getSecondaryColor());
     mDrcLocationGraphicsItem->setPath(path);
@@ -1162,22 +1179,22 @@ void BoardEditor::goToDevice(const QString& name, int index) noexcept {
       },
       Qt::CaseInsensitive, false);
 
-  if (deviceCandidates.count()) {
+  if ((!deviceCandidates.isEmpty()) && mGraphicsScene) {
+    mGraphicsScene->clearSelection();
     while (index < 0) {
       index += deviceCandidates.count();
     }
     index %= deviceCandidates.count();
     BI_Device* device = deviceCandidates[index];
-    Board* board = getActiveBoard();
-    Q_ASSERT(board);
-    board->clearSelection();
-    device->setSelected(true);
-    QRectF rect = device->getBoundingRect();
-    // Zoom to a rectangle relative to the maximum device dimension. The
-    // device is 1/4th of the screen.
-    qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());
-    rect.adjust(-margin, -margin, margin, margin);
-    mUi->graphicsView->zoomToRect(rect);
+    if (auto item = mGraphicsScene->getDevices().value(device)) {
+      item->setSelected(true);
+      QRectF rect = item->mapRectToScene(item->childrenBoundingRect());
+      // Zoom to a rectangle relative to the maximum device dimension. The
+      // device is 1/4th of the screen.
+      qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());
+      rect.adjust(-margin, -margin, margin, margin);
+      mUi->graphicsView->zoomToRect(rect);
+    }
   }
 }
 

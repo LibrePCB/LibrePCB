@@ -34,11 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Board;
-
 namespace editor {
 
+class BoardGraphicsScene;
 class CmdBoardNetPointEdit;
 class CmdBoardPlaneEdit;
 class CmdBoardViaEdit;
@@ -58,7 +56,7 @@ class CmdStrokeTextEdit;
 class CmdDragSelectedBoardItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  explicit CmdDragSelectedBoardItems(Board& board,
+  explicit CmdDragSelectedBoardItems(BoardGraphicsScene& scene,
                                      const Point& startPos = Point()) noexcept;
   ~CmdDragSelectedBoardItems() noexcept;
 
@@ -76,7 +74,7 @@ private:
   bool performExecute() override;
 
   // Private Member Variables
-  Board& mBoard;
+  BoardGraphicsScene& mScene;
   int mItemCount;
   Point mStartPos;
   Point mDeltaPos;

@@ -116,7 +116,8 @@ public:
       delete;
 
 private:  // Methods
-  bool startMovingSelectedItems(Board& board, const Point& startPos) noexcept;
+  bool startMovingSelectedItems(BoardGraphicsScene& scene,
+                                const Point& startPos) noexcept;
   bool moveSelectedItems(const Point& delta) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;
@@ -132,7 +133,8 @@ private:  // Methods
   void startAddingPlaneVertex(BI_Plane& plane, int vertex,
                               const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
-  bool startPaste(Board& board, std::unique_ptr<BoardClipboardData> data,
+  bool startPaste(BoardGraphicsScene& scene,
+                  std::unique_ptr<BoardClipboardData> data,
                   const tl::optional<Point>& fixedPosition);
   bool abortCommand(bool showErrMsgBox) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
@@ -151,6 +153,7 @@ private:  // Methods
   /**
    * @brief Internal helper method used by #measureSelectedItems
    *
+   * @param scene Scene of the board containing the traces.
    * @param directionBackwards If set to true, the segments are traversed
    *   "backwards" starting at the start anchor. Otherwise, the segments are
    *   traversed starting at the end anchor.
@@ -161,18 +164,19 @@ private:  // Methods
    *   found segments will be appended to this total length.
    * @throws LogicError if there are branches or loops.
    */
-  void measureLengthInDirection(bool directionBackwards,
+  void measureLengthInDirection(BoardGraphicsScene& scene,
+                                bool directionBackwards,
                                 const BI_NetLine& netline,
                                 QSet<Uuid>& visitedNetLines,
                                 UnsignedLength& totalLength);
 
-  bool openPropertiesDialog(BI_Base* item);
+  bool openPropertiesDialog(std::shared_ptr<QGraphicsItem> item);
   void openDevicePropertiesDialog(BI_Device& device) noexcept;
   void openViaPropertiesDialog(BI_Via& via) noexcept;
   void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
-  void openPolygonPropertiesDialog(Board& board, Polygon& polygon) noexcept;
-  void openStrokeTextPropertiesDialog(Board& board, StrokeText& text) noexcept;
-  void openHolePropertiesDialog(Board& board, Hole& hole) noexcept;
+  void openPolygonPropertiesDialog(Polygon& polygon) noexcept;
+  void openStrokeTextPropertiesDialog(StrokeText& text) noexcept;
+  void openHolePropertiesDialog(Hole& hole) noexcept;
   QList<DeviceMenuItem> getDeviceMenuItems(
       const ComponentInstance& cmpInst) const noexcept;
 

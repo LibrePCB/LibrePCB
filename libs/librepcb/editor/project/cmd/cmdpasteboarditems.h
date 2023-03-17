@@ -43,6 +43,7 @@ class Project;
 namespace editor {
 
 class BoardClipboardData;
+class BoardGraphicsScene;
 
 /*******************************************************************************
  *  Class CmdPasteBoardItems
@@ -56,7 +57,8 @@ public:
   // Constructors / Destructor
   CmdPasteBoardItems() = delete;
   CmdPasteBoardItems(const CmdPasteBoardItems& other) = delete;
-  CmdPasteBoardItems(Board& board, std::unique_ptr<BoardClipboardData> data,
+  CmdPasteBoardItems(BoardGraphicsScene& scene,
+                     std::unique_ptr<BoardClipboardData> data,
                      const Point& posOffset) noexcept;
   ~CmdPasteBoardItems() noexcept;
 
@@ -70,8 +72,9 @@ private:  // Methods
   NetSignal* getOrCreateNetSignal(const QString& name);
 
 private:  // Data
-  Project& mProject;
+  BoardGraphicsScene& mScene;
   Board& mBoard;
+  Project& mProject;
   std::unique_ptr<BoardClipboardData> mData;
   Point mPosOffset;
 };

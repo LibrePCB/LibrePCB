@@ -28,6 +28,7 @@
 #include "../../../library/pkg/packagepad.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/netsignal.h"
+#include "../board.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprintpad.h"
 #include "../items/bi_hole.h"
@@ -349,8 +350,9 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
         Severity::Warning,
         tr("Stroke width on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(GraphicsLayer::getTranslation(*text.getText().getLayerName()),
-                 text.getText().getStrokeWidth()->toMmString(),
+            .arg(GraphicsLayer::getTranslation(
+                     *text.getTextObj().getLayerName()),
+                 text.getTextObj().getStrokeWidth()->toMmString(),
                  minWidth->toMmString(), "mm"),
         tr("The text stroke width is smaller than the minimum copper width "
            "configured in the DRC settings.") %
@@ -881,8 +883,7 @@ DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
         Severity::Error,
         tr("Pad annular ring of '%1' < %2 %3",
            "Placeholders: Net name, minimum annular width, unit")
-            .arg(pad.getDisplayText().simplified(),
-                 minAnnularWidth->toMmString(), "mm"),
+            .arg(pad.getText(), minAnnularWidth->toMmString(), "mm"),
         tr("The through-hole pad annular ring width (i.e. the copper around "
            "the hole) is smaller than the minimum annular width configured in "
            "the DRC settings.") %
@@ -955,9 +956,8 @@ DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
         Severity::Warning,
         tr("Pad drill diameter of '%1': %2 < %3 %4",
            "Placeholders: Net name, actual diameter, minimum diameter")
-            .arg(pad.getDisplayText().simplified(),
-                 padHole.getDiameter()->toMmString(), minDiameter->toMmString(),
-                 "mm"),
+            .arg(pad.getText(), padHole.getDiameter()->toMmString(),
+                 minDiameter->toMmString(), "mm"),
         tr("The drill diameter of the through-hole pad is smaller than the "
            "minimum plated drill diameter configured in the DRC settings.") %
             "\n\n" %
@@ -1008,9 +1008,8 @@ DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
         Severity::Warning,
         tr("Pad slot width of '%1': %2 < %3 %4",
            "Placeholders: Net name, actual width, minimum width, unit")
-            .arg(pad.getDisplayText().simplified(),
-                 padHole.getDiameter()->toMmString(), minWidth->toMmString(),
-                 "mm"),
+            .arg(pad.getText(), padHole.getDiameter()->toMmString(),
+                 minWidth->toMmString(), "mm"),
         tr("The width of the plated slot is smaller than the minimum plated "
            "slot width configured in the DRC settings.") %
             "\n\n" %
@@ -1036,7 +1035,7 @@ DrcMsgInvalidPadConnection::DrcMsgInvalidPadConnection(
         Severity::Error,
         tr("Invalid connection of pad '%1' on '%2'",
            "Placeholders: Pad name, layer name")
-            .arg(pad.getDisplayText().simplified()),
+            .arg(pad.getText()),
         tr("The pad origin must be located within the pads copper area, "
            "or for THT pads within a hole. Otherwise traces might not be"
            "connected fully. This issue needs to be fixed in the "

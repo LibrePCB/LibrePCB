@@ -101,12 +101,13 @@ public:
       const SchematicEditorState_DrawWire& rhs) = delete;
 
 private:  //  Methods
-  bool startPositioning(Schematic& schematic, bool snap,
+  bool startPositioning(SchematicGraphicsScene& scene, bool snap,
                         SI_NetPoint* fixedPoint = nullptr) noexcept;
-  bool addNextNetPoint(Schematic& schematic, bool snap) noexcept;
+  bool addNextNetPoint(SchematicGraphicsScene& scene, bool snap) noexcept;
   bool abortPositioning(bool showErrMsgBox) noexcept;
-  SI_Base* findItem(const Point& pos,
-                    const QSet<SI_Base*>& except = {}) noexcept;
+  std::shared_ptr<QGraphicsItem> findItem(
+      const Point& pos,
+      const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept;
   Point updateNetpointPositions(bool snap) noexcept;
   void wireModeChanged(WireMode mode) noexcept;
   Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const

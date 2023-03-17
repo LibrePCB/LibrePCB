@@ -73,7 +73,7 @@ void BoardClipperPathGenerator::addCopper(
 
   // Stroke texts.
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    if ((strokeText->getText().getLayerName() == layerName) &&
+    if ((strokeText->getTextObj().getLayerName() == layerName) &&
         (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
       addStrokeText(*strokeText);
     }
@@ -117,7 +117,7 @@ void BoardClipperPathGenerator::addCopper(
     // Stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
-      if ((*strokeText->getText().getLayerName() == layerName) &&
+      if ((*strokeText->getTextObj().getLayerName() == layerName) &&
           (netsignals.isEmpty() || netsignals.contains(nullptr))) {
         addStrokeText(*strokeText);
       }
@@ -228,10 +228,10 @@ void BoardClipperPathGenerator::addCircle(const Circle& circle,
 
 void BoardClipperPathGenerator::addStrokeText(const BI_StrokeText& strokeText,
                                               const Length& offset) {
-  const PositiveLength width(
-      qMax(*strokeText.getText().getStrokeWidth() + (offset * 2), Length(1)));
-  const Transform transform(strokeText.getText());
-  foreach (const Path path, transform.map(strokeText.generatePaths())) {
+  const PositiveLength width(qMax(
+      *strokeText.getTextObj().getStrokeWidth() + (offset * 2), Length(1)));
+  const Transform transform(strokeText.getTextObj());
+  foreach (const Path path, transform.map(strokeText.getPaths())) {
     QVector<Path> paths = path.toOutlineStrokes(width);
     foreach (const Path& p, paths) {
       ClipperHelpers::unite(mPaths,
@@ -257,7 +257,7 @@ void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,
                                        const Length& offset) {
   const Transform padTransform(pad.getLibPad().getPosition(),
                                pad.getLibPad().getRotation());
-  foreach (PadGeometry geometry, pad.getGeometryOnLayer(layerName)) {
+  foreach (PadGeometry geometry, pad.getGeometries().value(layerName)) {
     if (offset != 0) {
       geometry = geometry.withOffset(offset);
     }

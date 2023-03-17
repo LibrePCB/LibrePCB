@@ -85,11 +85,6 @@ public:
   QString getNetNameToDisplay(bool fallback = false) const noexcept;
 
   bool isUsed() const noexcept;
-  int getViasAtScenePos(const Point& pos, QList<BI_Via*>& vias) const noexcept;
-  int getNetPointsAtScenePos(const Point& pos, const GraphicsLayer* layer,
-                             QList<BI_NetPoint*>& points) const noexcept;
-  int getNetLinesAtScenePos(const Point& pos, const GraphicsLayer* layer,
-                            QList<BI_NetLine*>& lines) const noexcept;
 
   // Setters
   void setNetSignal(NetSignal* netsignal);
@@ -114,9 +109,6 @@ public:
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
-  void selectAll() noexcept;
-  void setSelectionRect(const QRectF rectPx) noexcept;
-  void clearSelection() const noexcept;
 
   /**
    * @brief Serialize into ::librepcb::SExpression node
@@ -125,19 +117,18 @@ public:
    */
   void serialize(SExpression& root) const;
 
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override {
-    return BI_Base::Type_t::NetSegment;
-  }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  bool isSelectable() const noexcept override { return false; }
-  bool isSelected() const noexcept override;
-  void setSelected(bool selected) noexcept override;
-
   // Operator Overloadings
   BI_NetSegment& operator=(const BI_NetSegment& rhs) = delete;
   bool operator==(const BI_NetSegment& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const BI_NetSegment& rhs) noexcept { return (this != &rhs); }
+
+signals:
+  void elementsAdded(const QList<BI_Via*>& vias,
+                     const QList<BI_NetPoint*>& netPoints,
+                     const QList<BI_NetLine*>& netLines);
+  void elementsRemoved(const QList<BI_Via*>& vias,
+                       const QList<BI_NetPoint*>& netPoints,
+                       const QList<BI_NetLine*>& netLines);
 
 private:
   bool checkAttributesValidity() const noexcept;

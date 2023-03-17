@@ -40,6 +40,7 @@ class Workspace;
 namespace editor {
 
 class GraphicsView;
+class ProjectEditor;
 class SchematicEditor;
 class SchematicEditorState;
 class ToolBarProxy;
@@ -80,6 +81,7 @@ public:
   struct Context {
     Workspace& workspace;
     Project& project;
+    ProjectEditor& projectEditor;
     SchematicEditor& editor;
     GraphicsView& editorGraphicsView;
     ToolBarProxy& commandToolBar;

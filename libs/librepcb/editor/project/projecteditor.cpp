@@ -49,10 +49,11 @@ namespace editor {
 
 ProjectEditor::ProjectEditor(
     Workspace& workspace, Project& project,
-    const tl::optional<QList<FileFormatMigration::Message> >& upgradeMessages)
+    const tl::optional<QList<FileFormatMigration::Message>>& upgradeMessages)
   : QObject(nullptr),
     mWorkspace(workspace),
     mProject(project),
+    mHighlightedNetSignals(new QSet<const NetSignal*>()),
     mUndoStack(nullptr),
     mSchematicEditor(nullptr),
     mBoardEditor(nullptr),
@@ -339,6 +340,18 @@ void ProjectEditor::setErcMessageApproved(const RuleCheckMessage& msg,
     approvals.remove(msg.getApproval());
   }
   saveErcMessageApprovals(approvals);
+}
+
+void ProjectEditor::setHighlightedNetSignals(
+    const QSet<const NetSignal*>& netSignals) noexcept {
+  if (netSignals != *mHighlightedNetSignals) {
+    *mHighlightedNetSignals = netSignals;
+    emit highlightedNetSignalsChanged();
+  }
+}
+
+void ProjectEditor::clearHighlightedNetSignals() noexcept {
+  setHighlightedNetSignals({});
 }
 
 /*******************************************************************************

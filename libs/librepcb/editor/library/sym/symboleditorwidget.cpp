@@ -25,6 +25,8 @@
 #include "../../cmd/cmdtextedit.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
+#include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/graphicsscene.h"
 #include "../../library/cmd/cmdlibraryelementedit.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/toolbarproxy.h"
@@ -35,9 +37,6 @@
 #include "symbolgraphicsitem.h"
 #include "ui_symboleditorwidget.h"
 
-#include <librepcb/core/graphics/circlegraphicsitem.h>
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/cmpsigpindisplaytype.h>
 #include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/library/libraryelementcheckmessages.h>

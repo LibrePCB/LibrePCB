@@ -37,12 +37,12 @@ namespace librepcb {
 
 class Angle;
 class Polygon;
-class SI_Base;
 class SI_NetLabel;
 class SI_Polygon;
 class SI_Symbol;
 class SI_Text;
 class Schematic;
+class Text;
 
 namespace editor {
 
@@ -100,7 +100,7 @@ public:
       const SchematicEditorState_Select& rhs) = delete;
 
 private:  // Methods
-  bool startMovingSelectedItems(Schematic& schematic,
+  bool startMovingSelectedItems(SchematicGraphicsScene& scene,
                                 const Point& startPos) noexcept;
   bool moveSelectedItems(const Point& delta) noexcept;
   bool rotateSelectedItems(const Angle& angle) noexcept;
@@ -114,11 +114,11 @@ private:  // Methods
   bool copySelectedItemsToClipboard() noexcept;
   bool pasteFromClipboard() noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
-  bool openPropertiesDialog(SI_Base* item) noexcept;
+  bool openPropertiesDialog(std::shared_ptr<QGraphicsItem> item) noexcept;
   void openSymbolPropertiesDialog(SI_Symbol& symbol) noexcept;
   void openNetLabelPropertiesDialog(SI_NetLabel& netlabel) noexcept;
-  void openPolygonPropertiesDialog(SI_Polygon& polygon) noexcept;
-  void openTextPropertiesDialog(SI_Text& text) noexcept;
+  void openPolygonPropertiesDialog(Polygon& polygon) noexcept;
+  void openTextPropertiesDialog(Text& text) noexcept;
 
 private:  // Data
   /// enum for all possible substates

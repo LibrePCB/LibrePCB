@@ -27,6 +27,7 @@
 #include "../../library/pkg/footprintpad.h"
 #include "../../utils/clipperhelpers.h"
 #include "../../utils/transform.h"
+#include "board.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
@@ -163,7 +164,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
                                    pad->getLibPad().getRotation());
       if (pad->getCompSigInstNetSignal() == &mPlane.getNetSignal()) {
         foreach (const PadGeometry& geometry,
-                 pad->getGeometryOnLayer(*mPlane.getLayerName())) {
+                 pad->getGeometries().value(*mPlane.getLayerName())) {
           foreach (const Path& outline, geometry.toOutlines()) {
             ClipperLib::Path path = ClipperHelpers::convert(
                 transform.map(padTransform.map(outline)), maxArcTolerance());
@@ -268,7 +269,7 @@ ClipperLib::Paths BoardPlaneFragmentsBuilder::createPadCutOuts(
   if ((mPlane.getConnectStyle() == BI_Plane::ConnectStyle::None) ||
       differentNetSignal) {
     foreach (const PadGeometry& geometry,
-             pad.getGeometryOnLayer(*mPlane.getLayerName())) {
+             pad.getGeometries().value(*mPlane.getLayerName())) {
       foreach (const Path& outline,
                geometry.withOffset(*mPlane.getMinClearance()).toOutlines()) {
         result.push_back(ClipperHelpers::convert(

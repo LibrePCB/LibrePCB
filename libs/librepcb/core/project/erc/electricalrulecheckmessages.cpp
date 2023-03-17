@@ -32,6 +32,7 @@
 #include "../schematic/items/si_netsegment.h"
 #include "../schematic/items/si_symbol.h"
 #include "../schematic/items/si_symbolpin.h"
+#include "../schematic/schematic.h"
 
 /*******************************************************************************
  *  Namespace
@@ -167,7 +168,7 @@ ErcMsgConnectedPinWithoutWire::ErcMsgConnectedPinWithoutWire(
   : RuleCheckMessage(
         Severity::Warning,
         tr("Connected pin without wire: '%1:%2'")
-            .arg(pin.getSymbol().getName(), pin.getDisplayText(true, true)),
+            .arg(pin.getSymbol().getName(), pin.getText()),
         tr("The pin is electrically connected to a net, but has no wire "
            "attached so this connection is not visible in the schematic. Add a "
            "wire to make the connection visible."),

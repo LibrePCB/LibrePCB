@@ -22,13 +22,13 @@
  ******************************************************************************/
 #include "componentchooserdialog.h"
 
+#include "../../graphics/graphicsscene.h"
 #include "../../widgets/waitingspinnerwidget.h"
 #include "../../workspace/categorytreemodel.h"
 #include "../sym/symbolgraphicsitem.h"
 #include "ui_componentchooserdialog.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/workspace/workspace.h>

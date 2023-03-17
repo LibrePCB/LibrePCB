@@ -41,7 +41,6 @@
 namespace librepcb {
 
 class ComponentInstance;
-class GraphicsScene;
 class NetSignal;
 class Point;
 class Project;
@@ -54,7 +53,6 @@ class SI_Polygon;
 class SI_Symbol;
 class SI_SymbolPin;
 class SI_Text;
-class SchematicSelectionQuery;
 
 /*******************************************************************************
  *  Class Schematic
@@ -64,8 +62,7 @@ class SchematicSelectionQuery;
  * @brief The Schematic class represents one schematic page of a project and is
  * always part of a circuit
  *
- * A schematic can contain following items (see ::librepcb::SI_Base and
- * ::librepcb::SGI_Base):
+ * A schematic can contain following items:
  *  - netsegment:       ::librepcb::SI_NetSegment
  *      - netpoint:     ::librepcb::SI_NetPoint
  *      - netline:      ::librepcb::SI_NetLine
@@ -80,33 +77,6 @@ class Schematic final : public QObject, public AttributeProvider {
   Q_OBJECT
 
 public:
-  // Types
-
-  /**
-   * @brief Z Values of all items in a schematic scene (to define the stacking
-   * order)
-   *
-   * These values are used for QGraphicsItem::setZValue() to define the stacking
-   * order of all items in a schematic QGraphicsScene. We use integer values,
-   * even if the z-value of QGraphicsItem is a qreal attribute...
-   *
-   * Low number = background, high number = foreground
-   */
-  enum ItemZValue {
-    ZValue_Default = 0,  ///< this is the default value (behind all other items)
-    ZValue_TextAnchors,  ///< Z value for ::librepcb::SI_Text anchor lines
-    ZValue_Symbols,  ///< Z value for ::librepcb::SI_Symbol items
-    ZValue_SymbolPins,  ///< Z value for ::librepcb::SI_SymbolPin items
-    ZValue_Polygons,  ///< Z value for ::librepcb::SI_Polygon items
-    ZValue_Texts,  ///< Z value for ::librepcb::SI_Text items
-    ZValue_NetLabels,  ///< Z value for ::librepcb::SI_NetLabel items
-    ZValue_NetLines,  ///< Z value for ::librepcb::SI_NetLine items
-    ZValue_HiddenNetPoints,  ///< Z value for hidden
-                             ///< ::librepcb::SI_NetPoint items
-    ZValue_VisibleNetPoints,  ///< Z value for visible
-                              ///< ::librepcb::SI_NetPoint items
-  };
-
   // Constructors / Destructor
   Schematic() = delete;
   Schematic(const Schematic& other) = delete;
@@ -119,7 +89,6 @@ public:
   Project& getProject() const noexcept { return mProject; }
   const QString& getDirectoryName() const noexcept { return mDirectoryName; }
   TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
-  GraphicsScene& getGraphicsScene() const noexcept { return *mGraphicsScene; }
   bool isEmpty() const noexcept;
 
   // Getters: Attributes
@@ -165,15 +134,7 @@ public:
   void addToProject();
   void removeFromProject();
   void save();
-  void saveViewSceneRect(const QRectF& rect) noexcept { mViewRect = rect; }
-  const QRectF& restoreViewSceneRect() const noexcept { return mViewRect; }
-  void selectAll() noexcept;
-  void setSelectionRect(const Point& p1, const Point& p2,
-                        bool updateItems) noexcept;
-  void clearSelection() const noexcept;
   void updateAllNetLabelAnchors() noexcept;
-  std::unique_ptr<SchematicSelectionQuery> createSelectionQuery() const
-      noexcept;
 
   // Inherited from AttributeProvider
   /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
@@ -190,6 +151,12 @@ public:
 signals:
   void symbolAdded(SI_Symbol& symbol);
   void symbolRemoved(SI_Symbol& symbol);
+  void netSegmentAdded(SI_NetSegment& netSegment);
+  void netSegmentRemoved(SI_NetSegment& netSegment);
+  void polygonAdded(SI_Polygon& polygon);
+  void polygonRemoved(SI_Polygon& polygon);
+  void textAdded(SI_Text& text);
+  void textRemoved(SI_Text& text);
 
   /// @copydoc AttributeProvider::attributesChanged()
   void attributesChanged() override;
@@ -200,9 +167,6 @@ private:
   const QString mDirectoryName;
   std::unique_ptr<TransactionalDirectory> mDirectory;
   bool mIsAddedToProject;
-
-  QScopedPointer<GraphicsScene> mGraphicsScene;
-  QRectF mViewRect;
 
   // Attributes
   Uuid mUuid;

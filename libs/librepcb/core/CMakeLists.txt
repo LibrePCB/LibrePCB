@@ -161,35 +161,11 @@ add_library(
   geometry/vertex.h
   geometry/via.cpp
   geometry/via.h
-  graphics/circlegraphicsitem.cpp
-  graphics/circlegraphicsitem.h
-  graphics/defaultgraphicslayerprovider.cpp
-  graphics/defaultgraphicslayerprovider.h
   graphics/graphicslayer.cpp
   graphics/graphicslayer.h
   graphics/graphicslayername.h
   graphics/graphicspainter.cpp
   graphics/graphicspainter.h
-  graphics/graphicsscene.cpp
-  graphics/graphicsscene.h
-  graphics/holegraphicsitem.cpp
-  graphics/holegraphicsitem.h
-  graphics/linegraphicsitem.cpp
-  graphics/linegraphicsitem.h
-  graphics/origincrossgraphicsitem.cpp
-  graphics/origincrossgraphicsitem.h
-  graphics/polygongraphicsitem.cpp
-  graphics/polygongraphicsitem.h
-  graphics/primitivecirclegraphicsitem.cpp
-  graphics/primitivecirclegraphicsitem.h
-  graphics/primitivepathgraphicsitem.cpp
-  graphics/primitivepathgraphicsitem.h
-  graphics/primitivetextgraphicsitem.cpp
-  graphics/primitivetextgraphicsitem.h
-  graphics/stroketextgraphicsitem.cpp
-  graphics/stroketextgraphicsitem.h
-  graphics/textgraphicsitem.cpp
-  graphics/textgraphicsitem.h
   import/dxfreader.cpp
   import/dxfreader.h
   library/cat/componentcategory.cpp
@@ -295,8 +271,6 @@ add_library(
   project/board/boardpickplacegenerator.h
   project/board/boardplanefragmentsbuilder.cpp
   project/board/boardplanefragmentsbuilder.h
-  project/board/boardselectionquery.cpp
-  project/board/boardselectionquery.h
   project/board/drc/boardclipperpathgenerator.cpp
   project/board/drc/boardclipperpathgenerator.h
   project/board/drc/boarddesignrulecheck.cpp
@@ -305,22 +279,6 @@ add_library(
   project/board/drc/boarddesignrulecheckmessages.h
   project/board/drc/boarddesignrulechecksettings.cpp
   project/board/drc/boarddesignrulechecksettings.h
-  project/board/graphicsitems/bgi_airwire.cpp
-  project/board/graphicsitems/bgi_airwire.h
-  project/board/graphicsitems/bgi_base.cpp
-  project/board/graphicsitems/bgi_base.h
-  project/board/graphicsitems/bgi_device.cpp
-  project/board/graphicsitems/bgi_device.h
-  project/board/graphicsitems/bgi_footprintpad.cpp
-  project/board/graphicsitems/bgi_footprintpad.h
-  project/board/graphicsitems/bgi_netline.cpp
-  project/board/graphicsitems/bgi_netline.h
-  project/board/graphicsitems/bgi_netpoint.cpp
-  project/board/graphicsitems/bgi_netpoint.h
-  project/board/graphicsitems/bgi_plane.cpp
-  project/board/graphicsitems/bgi_plane.h
-  project/board/graphicsitems/bgi_via.cpp
-  project/board/graphicsitems/bgi_via.h
   project/board/items/bi_airwire.cpp
   project/board/items/bi_airwire.h
   project/board/items/bi_base.cpp
@@ -367,18 +325,6 @@ add_library(
   project/projectlibrary.h
   project/projectloader.cpp
   project/projectloader.h
-  project/schematic/graphicsitems/sgi_base.cpp
-  project/schematic/graphicsitems/sgi_base.h
-  project/schematic/graphicsitems/sgi_netlabel.cpp
-  project/schematic/graphicsitems/sgi_netlabel.h
-  project/schematic/graphicsitems/sgi_netline.cpp
-  project/schematic/graphicsitems/sgi_netline.h
-  project/schematic/graphicsitems/sgi_netpoint.cpp
-  project/schematic/graphicsitems/sgi_netpoint.h
-  project/schematic/graphicsitems/sgi_symbol.cpp
-  project/schematic/graphicsitems/sgi_symbol.h
-  project/schematic/graphicsitems/sgi_symbolpin.cpp
-  project/schematic/graphicsitems/sgi_symbolpin.h
   project/schematic/items/si_base.cpp
   project/schematic/items/si_base.h
   project/schematic/items/si_netlabel.cpp
@@ -403,8 +349,6 @@ add_library(
   project/schematic/schematiclayerprovider.h
   project/schematic/schematicpainter.cpp
   project/schematic/schematicpainter.h
-  project/schematic/schematicselectionquery.cpp
-  project/schematic/schematicselectionquery.h
   rulecheck/rulecheckmessage.cpp
   rulecheck/rulecheckmessage.h
   serialization/fileformatmigration.cpp

@@ -28,6 +28,10 @@
 #include "../../../dialogs/polygonpropertiesdialog.h"
 #include "../../../dialogs/textpropertiesdialog.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/circlegraphicsitem.h"
+#include "../../../graphics/graphicsscene.h"
+#include "../../../graphics/polygongraphicsitem.h"
+#include "../../../graphics/textgraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
 #include "../../../widgets/graphicsview.h"
@@ -40,10 +44,6 @@
 #include "../symbolpingraphicsitem.h"
 #include "../symbolpinpropertiesdialog.h"
 
-#include <librepcb/core/graphics/circlegraphicsitem.h>
-#include <librepcb/core/graphics/graphicsscene.h>
-#include <librepcb/core/graphics/polygongraphicsitem.h>
-#include <librepcb/core/graphics/textgraphicsitem.h>
 #include <librepcb/core/import/dxfreader.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/utils/scopeguard.h>

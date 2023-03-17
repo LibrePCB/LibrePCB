@@ -41,12 +41,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class FootprintGraphicsItem;
-class GraphicsScene;
 class Package;
 
 namespace editor {
 
+class GraphicsScene;
 class PackageEditorFsm;
 
 namespace Ui {

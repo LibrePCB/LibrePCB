@@ -37,11 +37,10 @@
 namespace librepcb {
 
 class IF_GraphicsLayerProvider;
-class OriginCrossGraphicsItem;
-class PrimitivePathGraphicsItem;
-class PrimitiveTextGraphicsItem;
 
 namespace editor {
+
+class PrimitiveFootprintPadGraphicsItem;
 
 /*******************************************************************************
  *  Class FootprintPadGraphicsItem
@@ -50,7 +49,7 @@ namespace editor {
 /**
  * @brief The FootprintPadGraphicsItem class
  */
-class FootprintPadGraphicsItem final : public QGraphicsItem {
+class FootprintPadGraphicsItem final : public QGraphicsItemGroup {
 public:
   // Constructors / Destructor
   FootprintPadGraphicsItem() = delete;
@@ -64,19 +63,11 @@ public:
   // Getters
   const std::shared_ptr<FootprintPad>& getPad() noexcept { return mPad; }
 
-  // Setters
-  void setPosition(const Point& pos) noexcept;
-  void setRotation(const Angle& rot) noexcept;
-  void setSelected(bool selected) noexcept;
-
   // General Methods
   void updateText() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept override { return QRectF(); }
   QPainterPath shape() const noexcept override;
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
   FootprintPadGraphicsItem& operator=(const FootprintPadGraphicsItem& rhs) =
@@ -87,17 +78,14 @@ private:  // Methods
   void packagePadListEdited(const PackagePadList& list, int index,
                             const std::shared_ptr<const PackagePad>& pad,
                             PackagePadList::Event event) noexcept;
-  void setShape(const QPainterPath& shape) noexcept;
-  void setLayerName(const QString& name) noexcept;
-  void updateTextHeight() noexcept;
+  virtual QVariant itemChange(GraphicsItemChange change,
+                              const QVariant& value) noexcept override;
+  void updateGeometries() noexcept;
 
 private:  // Data
   std::shared_ptr<FootprintPad> mPad;
-  const IF_GraphicsLayerProvider& mLayerProvider;
   const PackagePadList* mPackagePadList;
-  QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
-  QScopedPointer<PrimitivePathGraphicsItem> mPathGraphicsItem;
-  QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
+  QScopedPointer<PrimitiveFootprintPadGraphicsItem> mGraphicsItem;
 
   // Slots
   FootprintPad::OnEditedSlot mOnPadEditedSlot;

@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -38,11 +40,11 @@ namespace librepcb {
 class GraphicsLayer;
 class LengthUnit;
 class Point;
-class SI_Base;
 class Schematic;
 
 namespace editor {
 
+class SchematicGraphicsScene;
 class UndoCommand;
 
 /*******************************************************************************
@@ -169,20 +171,24 @@ signals:
 
 protected:  // Methods
   Schematic* getActiveSchematic() noexcept;
+  SchematicGraphicsScene* getActiveSchematicScene() noexcept;
   PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;
   QList<GraphicsLayer*> getAllowedGeometryLayers() const noexcept;
   void abortBlockingToolsInOtherEditors() noexcept;
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;
-  QList<SI_Base*> findItemsAtPos(const Point& pos, FindFlags flags,
-                                 const QSet<SI_Base*>& except = {}) noexcept;
-  template <typename T = SI_Base>
-  T* findItemAtPos(const Point& pos, FindFlags flags,
-                   const QSet<SI_Base*>& except = {}) noexcept {
-    const QList<SI_Base*> items =
+  QList<std::shared_ptr<QGraphicsItem>> findItemsAtPos(
+      const Point& pos, FindFlags flags,
+      const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept;
+  template <typename T = QGraphicsItem>
+  std::shared_ptr<T> findItemAtPos(
+      const Point& pos, FindFlags flags,
+      const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept {
+    const QList<std::shared_ptr<QGraphicsItem>> items =
         findItemsAtPos(pos, flags | FindFlag::SkipLowerPriorityMatches, except);
-    T* castedItem = qobject_cast<T*>(items.value(0, nullptr));
+    std::shared_ptr<T> castedItem =
+        std::dynamic_pointer_cast<T>(items.value(0, nullptr));
     if ((!items.isEmpty()) && (!castedItem)) {
       // Probably wrong flags are passed?!?!
       qCritical() << "Found a schematic item, but it has the wrong type!";

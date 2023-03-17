@@ -32,12 +32,13 @@
 #include "../../project/cmd/cmdboardplaneedit.h"
 #include "../../project/cmd/cmdboardviaedit.h"
 #include "../../project/cmd/cmddeviceinstanceedit.h"
+#include "../boardeditor/boardgraphicsscene.h"
+#include "../boardeditor/boardselectionquery.h"
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
-#include <librepcb/core/project/board/boardselectionquery.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
@@ -64,9 +65,9 @@ namespace editor {
  ******************************************************************************/
 
 CmdFlipSelectedBoardItems::CmdFlipSelectedBoardItems(
-    Board& board, Qt::Orientation orientation) noexcept
+    BoardGraphicsScene& scene, Qt::Orientation orientation) noexcept
   : UndoCommandGroup(tr("Flip Board Elements")),
-    mBoard(board),
+    mScene(scene),
     mOrientation(orientation) {
 }
 
@@ -82,60 +83,60 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
   // get all selected items
-  std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
-  query->addDeviceInstancesOfSelectedFootprints();
-  query->addSelectedNetLines();
-  query->addSelectedVias();
-  query->addSelectedPlanes();
-  query->addSelectedPolygons();
-  query->addSelectedBoardStrokeTexts();
-  query->addSelectedFootprintStrokeTexts();
-  query->addSelectedHoles();
-  query->addNetPointsOfNetLines();
+  BoardSelectionQuery query(mScene);
+  query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedNetLines();
+  query.addSelectedVias();
+  query.addSelectedPlanes();
+  query.addSelectedPolygons();
+  query.addSelectedBoardStrokeTexts();
+  query.addSelectedFootprintStrokeTexts();
+  query.addSelectedHoles();
+  query.addNetPointsOfNetLines();
 
   // find the center of all elements
   Point center = Point(0, 0);
   int count = 0;
-  foreach (BI_Device* device, query->getDeviceInstances()) {
+  foreach (BI_Device* device, query.getDeviceInstances()) {
     center += device->getPosition();
     ++count;
   }
-  foreach (BI_NetLine* netline, query->getNetLines()) {
+  foreach (BI_NetLine* netline, query.getNetLines()) {
     center += netline->getStartPoint().getPosition();
     center += netline->getEndPoint().getPosition();
     count += 2;
   }
-  foreach (BI_NetPoint* netpoint, query->getNetPoints()) {
+  foreach (BI_NetPoint* netpoint, query.getNetPoints()) {
     center += netpoint->getPosition();
     ++count;
   }
-  foreach (BI_Via* via, query->getVias()) {
+  foreach (BI_Via* via, query.getVias()) {
     center += via->getPosition();
     ++count;
   }
-  foreach (BI_Plane* plane, query->getPlanes()) {
+  foreach (BI_Plane* plane, query.getPlanes()) {
     for (const Vertex& vertex :
          Toolbox::toSet(plane->getOutline().getVertices().toList())) {
       center += vertex.getPos();
       ++count;
     }
   }
-  foreach (BI_Polygon* polygon, query->getPolygons()) {
+  foreach (BI_Polygon* polygon, query.getPolygons()) {
     for (const Vertex& vertex : Toolbox::toSet(
              polygon->getPolygon().getPath().getVertices().toList())) {
       center += vertex.getPos();
       ++count;
     }
   }
-  foreach (BI_StrokeText* text, query->getStrokeTexts()) {
+  foreach (BI_StrokeText* text, query.getStrokeTexts()) {
     // do not count texts of devices if the device is selected too
     if ((!text->getDevice()) ||
-        (!query->getDeviceInstances().contains(text->getDevice()))) {
+        (!query.getDeviceInstances().contains(text->getDevice()))) {
       center += text->getPosition();
       ++count;
     }
   }
-  foreach (BI_Hole* hole, query->getHoles()) {
+  foreach (BI_Hole* hole, query.getHoles()) {
     center += hole->getHole().getPath()->getVertices().first().getPos();
     ++count;
   }
@@ -151,13 +152,13 @@ bool CmdFlipSelectedBoardItems::performExecute() {
 
   // determine affected netsegments
   QSet<BI_NetSegment*> netsegments;
-  foreach (BI_NetLine* netline, query->getNetLines()) {
+  foreach (BI_NetLine* netline, query.getNetLines()) {
     netsegments.insert(&netline->getNetSegment());
   }
-  foreach (BI_Via* via, query->getVias()) {
+  foreach (BI_Via* via, query.getVias()) {
     netsegments.insert(&via->getNetSegment());
   }
-  foreach (BI_Device* device, query->getDeviceInstances()) {
+  foreach (BI_Device* device, query.getDeviceInstances()) {
     foreach (BI_FootprintPad* pad, device->getPads()) {
       if (pad->getNetSegmentOfLines()) {
         netsegments.insert(pad->getNetSegmentOfLines());
@@ -172,7 +173,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   }
 
   // flip all device instances
-  foreach (BI_Device* device, query->getDeviceInstances()) {
+  foreach (BI_Device* device, query.getDeviceInstances()) {
     Q_ASSERT(device);
     QScopedPointer<CmdDeviceInstanceEdit> cmd(
         new CmdDeviceInstanceEdit(*device));
@@ -181,9 +182,9 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   }
 
   // mirror all netlines
-  foreach (BI_NetLine* netline, query->getNetLines()) {
+  foreach (BI_NetLine* netline, query.getNetLines()) {
     Q_ASSERT(netline);
-    GraphicsLayer* layer = mBoard.getLayerStack().getLayer(
+    GraphicsLayer* layer = mScene.getBoard().getLayerStack().getLayer(
         GraphicsLayer::getMirroredLayerName(netline->getLayer().getName()));
     Q_ASSERT(layer);
     QScopedPointer<CmdBoardNetLineEdit> cmd(new CmdBoardNetLineEdit(*netline));
@@ -192,7 +193,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   }
 
   // move all netpoints
-  foreach (BI_NetPoint* netpoint, query->getNetPoints()) {
+  foreach (BI_NetPoint* netpoint, query.getNetPoints()) {
     Q_ASSERT(netpoint);
     QScopedPointer<CmdBoardNetPointEdit> cmd(
         new CmdBoardNetPointEdit(*netpoint));
@@ -202,7 +203,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   }
 
   // move all vias
-  foreach (BI_Via* via, query->getVias()) {
+  foreach (BI_Via* via, query.getVias()) {
     Q_ASSERT(via);
     QScopedPointer<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(*via));
     cmd->setPosition(via->getPosition().mirrored(mOrientation, center), false);
@@ -210,14 +211,14 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   }
 
   // flip all planes
-  foreach (BI_Plane* plane, query->getPlanes()) {
+  foreach (BI_Plane* plane, query.getPlanes()) {
     QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(*plane, false));
     cmd->mirror(center, mOrientation, false);
     execNewChildCmd(cmd.take());  // can throw
   }
 
   // flip all polygons
-  foreach (BI_Polygon* polygon, query->getPolygons()) {
+  foreach (BI_Polygon* polygon, query.getPolygons()) {
     QScopedPointer<CmdPolygonEdit> cmd(
         new CmdPolygonEdit(polygon->getPolygon()));
     cmd->mirrorGeometry(mOrientation, center, false);
@@ -226,16 +227,16 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   }
 
   // flip all stroke texts
-  foreach (BI_StrokeText* text, query->getStrokeTexts()) {
+  foreach (BI_StrokeText* text, query.getStrokeTexts()) {
     QScopedPointer<CmdStrokeTextEdit> cmd(
-        new CmdStrokeTextEdit(text->getText()));
+        new CmdStrokeTextEdit(text->getTextObj()));
     cmd->mirrorGeometry(mOrientation, center, false);
     cmd->mirrorLayer(false);
     execNewChildCmd(cmd.take());  // can throw
   }
 
   // mirror all holes
-  foreach (BI_Hole* hole, query->getHoles()) {
+  foreach (BI_Hole* hole, query.getHoles()) {
     QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(hole->getHole()));
     cmd->mirror(mOrientation, center, false);
     execNewChildCmd(cmd.take());  // can throw

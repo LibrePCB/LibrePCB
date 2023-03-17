@@ -43,6 +43,7 @@ namespace editor {
 class BoardEditor;
 class BoardEditorState;
 class GraphicsView;
+class ProjectEditor;
 class ToolBarProxy;
 class UndoStack;
 
@@ -85,6 +86,7 @@ public:
   struct Context {
     Workspace& workspace;
     Project& project;
+    ProjectEditor& projectEditor;
     BoardEditor& editor;
     GraphicsView& editorGraphicsView;
     ToolBarProxy& commandToolBar;

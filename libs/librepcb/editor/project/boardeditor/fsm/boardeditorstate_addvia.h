@@ -40,6 +40,7 @@ class BI_Via;
 
 namespace editor {
 
+class BoardGraphicsScene;
 class CmdBoardViaEdit;
 class PositiveLengthEdit;
 
@@ -78,14 +79,15 @@ public:
 
 private:  // Methods
   bool addVia(const Point& pos) noexcept;
-  bool updatePosition(Board& board, const Point& pos) noexcept;
+  bool updatePosition(BoardGraphicsScene& scene, const Point& pos) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;
-  bool fixPosition(Board& board, const Point& pos) noexcept;
+  bool fixPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
   void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void applySelectedNetSignal() noexcept;
-  void updateClosestNetSignal(const Point& pos) noexcept;
+  void updateClosestNetSignal(BoardGraphicsScene& scene,
+                              const Point& pos) noexcept;
   NetSignal* getCurrentNetSignal() const noexcept;
 
 private:  // Data

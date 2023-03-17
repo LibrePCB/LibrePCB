@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdtextedit.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/textgraphicsitem.h"
 #include "../../../utils/halignactiongroup.h"
 #include "../../../utils/valignactiongroup.h"
 #include "../../../widgets/graphicslayercombobox.h"
@@ -34,7 +35,6 @@
 
 #include <librepcb/core/geometry/text.h>
 #include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/textgraphicsitem.h>
 #include <librepcb/core/library/sym/symbol.h>
 
 #include <QtCore>

@@ -22,13 +22,7 @@
  ******************************************************************************/
 #include "footprintpadgraphicsitem.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/origincrossgraphicsitem.h>
-#include <librepcb/core/graphics/primitivepathgraphicsitem.h>
-#include <librepcb/core/graphics/primitivetextgraphicsitem.h>
-#include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/length.h>
-#include <librepcb/core/types/point.h>
+#include "../../graphics/primitivefootprintpadgraphicsitem.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -46,40 +40,23 @@ namespace editor {
 FootprintPadGraphicsItem::FootprintPadGraphicsItem(
     std::shared_ptr<FootprintPad> pad, const IF_GraphicsLayerProvider& lp,
     const PackagePadList* packagePadList, QGraphicsItem* parent) noexcept
-  : QGraphicsItem(parent),
+  : QGraphicsItemGroup(parent),
     mPad(pad),
-    mLayerProvider(lp),
     mPackagePadList(packagePadList),
-    mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
-    mPathGraphicsItem(new PrimitivePathGraphicsItem(this)),
-    mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
+    mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(lp, true, this)),
     mOnPadEditedSlot(*this, &FootprintPadGraphicsItem::padEdited),
     mOnPackagePadsEditedSlot(*this,
                              &FootprintPadGraphicsItem::packagePadListEdited) {
   Q_ASSERT(mPad);
 
-  setFlag(QGraphicsItem::ItemHasNoContents, false);
+  setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(10);
 
-  // Origin cross properties
-  // Note: Should be smaller than the smallest pad, otherwise it would be
-  // annoying due to too large grab area.
-  mOriginCrossGraphicsItem->setSize(UnsignedLength(250000));
-
-  // path properties
-  mPathGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
-
-  // text properties
-  mTextGraphicsItem->setHeight(PositiveLength(1000000));
-  mTextGraphicsItem->setAlignment(
-      Alignment(HAlign::center(), VAlign::center()));
-
-  // pad properties
-  setPosition(mPad->getPosition());
-  setRotation(mPad->getRotation());
-  setShape(mPad->getGeometry().toQPainterPathPx());
-  setLayerName(mPad->getLayerName());
+  setPos(mPad->getPosition().toPxQPointF());
+  mGraphicsItem->setRotation(mPad->getRotation());
+  mGraphicsItem->setLayer(mPad->getLayerName());
+  updateGeometries();
   updateText();
 
   // Register to the pad(s) to get notified about any modifications.
@@ -96,24 +73,6 @@ FootprintPadGraphicsItem::~FootprintPadGraphicsItem() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void FootprintPadGraphicsItem::setPosition(const Point& pos) noexcept {
-  QGraphicsItem::setPos(pos.toPxQPointF());
-}
-
-void FootprintPadGraphicsItem::setRotation(const Angle& rot) noexcept {
-  QGraphicsItem::setRotation(-rot.toDeg());
-
-  // Keep the text always at 0° for readability.
-  mTextGraphicsItem->setRotation(-rot);
-}
-
-void FootprintPadGraphicsItem::setSelected(bool selected) noexcept {
-  mOriginCrossGraphicsItem->setSelected(selected);
-  mPathGraphicsItem->setSelected(selected);
-  mTextGraphicsItem->setSelected(selected);
-  QGraphicsItem::setSelected(selected);
-}
-
 void FootprintPadGraphicsItem::updateText() noexcept {
   QString text;
   if (mPackagePadList && mPad->getPackagePadUuid()) {
@@ -122,9 +81,7 @@ void FootprintPadGraphicsItem::updateText() noexcept {
       text = *pad->getName();
     }
   }
-  setToolTip(text);
-  mTextGraphicsItem->setText(text);
-  updateTextHeight();
+  mGraphicsItem->setText(text);
 }
 
 /*******************************************************************************
@@ -132,15 +89,16 @@ void FootprintPadGraphicsItem::updateText() noexcept {
  ******************************************************************************/
 
 QPainterPath FootprintPadGraphicsItem::shape() const noexcept {
-  return mPathGraphicsItem->shape() | mOriginCrossGraphicsItem->shape();
+  Q_ASSERT(mGraphicsItem);
+  return mGraphicsItem->mapToParent(mGraphicsItem->shape());
 }
 
-void FootprintPadGraphicsItem::paint(QPainter* painter,
-                                     const QStyleOptionGraphicsItem* option,
-                                     QWidget* widget) noexcept {
-  Q_UNUSED(painter);
-  Q_UNUSED(option);
-  Q_UNUSED(widget);
+QVariant FootprintPadGraphicsItem::itemChange(GraphicsItemChange change,
+                                              const QVariant& value) noexcept {
+  if ((change == ItemSelectedHasChanged) && mGraphicsItem) {
+    mGraphicsItem->setSelected(value.toBool());
+  }
+  return QGraphicsItem::itemChange(change, value);
 }
 
 /*******************************************************************************
@@ -156,24 +114,22 @@ void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
       updateText();
       break;
     case FootprintPad::Event::PositionChanged:
-      setPosition(pad.getPosition());
+      setPos(pad.getPosition().toPxQPointF());
       break;
     case FootprintPad::Event::RotationChanged:
-      setRotation(pad.getRotation());
+      mGraphicsItem->setRotation(pad.getRotation());
       break;
     case FootprintPad::Event::ShapeChanged:
     case FootprintPad::Event::WidthChanged:
     case FootprintPad::Event::HeightChanged:
     case FootprintPad::Event::RadiusChanged:
     case FootprintPad::Event::CustomShapeOutlineChanged:
-      setShape(pad.getGeometry().toQPainterPathPx());
+      updateGeometries();
       break;
     case FootprintPad::Event::ComponentSideChanged:
-      setLayerName(pad.getLayerName());
-      break;
     case FootprintPad::Event::HolesEdited:
-      setLayerName(pad.getLayerName());
-      setShape(pad.getGeometry().toQPainterPathPx());
+      mGraphicsItem->setLayer(pad.getLayerName());
+      updateGeometries();
       break;
     default:
       qWarning()
@@ -194,27 +150,31 @@ void FootprintPadGraphicsItem::packagePadListEdited(
   updateText();
 }
 
-void FootprintPadGraphicsItem::setShape(const QPainterPath& shape) noexcept {
-  mPathGraphicsItem->setPath(shape);
-  updateTextHeight();
-}
+void FootprintPadGraphicsItem::updateGeometries() noexcept {
+  const bool hasTopCopper = mPad->isTht() ||
+      (mPad->getComponentSide() == FootprintPad::ComponentSide::Top);
+  const bool hasBotCopper = mPad->isTht() ||
+      (mPad->getComponentSide() == FootprintPad::ComponentSide::Bottom);
+  const QList<PadGeometry> stopMask{
+      mPad->getGeometry().withOffset(Length(100000))};
+  const QList<PadGeometry> solderPaste{
+      mPad->getGeometry().withOffset(Length(-100000))};
 
-void FootprintPadGraphicsItem::setLayerName(const QString& name) noexcept {
-  const QString originCrossLayer = GraphicsLayer::isBottomLayer(name)
-      ? GraphicsLayer::sBotReferences
-      : GraphicsLayer::sTopReferences;
-  mOriginCrossGraphicsItem->setLayer(mLayerProvider.getLayer(originCrossLayer));
-  mPathGraphicsItem->setFillLayer(mLayerProvider.getLayer(name));
-  mTextGraphicsItem->setLayer(mLayerProvider.getLayer(name));
-}
-
-void FootprintPadGraphicsItem::updateTextHeight() noexcept {
-  QRectF padRect = mPathGraphicsItem->boundingRect();
-  QRectF textRect = mTextGraphicsItem->boundingRect();
-  qreal heightRatio = textRect.height() / padRect.height();
-  qreal widthRatio = textRect.width() / padRect.width();
-  qreal ratio = qMax(heightRatio, widthRatio);
-  mTextGraphicsItem->setScale(1.0 / ratio);
+  QMap<QString, QList<PadGeometry>> geometries;
+  geometries.insert(mPad->getLayerName(), {mPad->getGeometry()});
+  if (hasTopCopper) {
+    geometries.insert(GraphicsLayer::sTopStopMask, stopMask);
+    if (!mPad->isTht()) {
+      geometries.insert(GraphicsLayer::sTopSolderPaste, solderPaste);
+    }
+  }
+  if (hasBotCopper) {
+    geometries.insert(GraphicsLayer::sBotStopMask, stopMask);
+    if (!mPad->isTht()) {
+      geometries.insert(GraphicsLayer::sBotSolderPaste, solderPaste);
+    }
+  }
+  mGraphicsItem->setGeometries(geometries);
 }
 
 /*******************************************************************************

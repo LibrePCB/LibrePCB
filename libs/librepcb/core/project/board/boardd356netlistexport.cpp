@@ -30,7 +30,6 @@
 #include "../circuit/netsignal.h"
 #include "../project.h"
 #include "boardd356netlistexport.h"
-#include "boarddesignrules.h"
 #include "boardlayerstack.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
@@ -71,9 +70,7 @@ QByteArray BoardD356NetlistExport::generate() const {
       netName = *netSignal->getName();
     }
     foreach (const BI_Via* via, segment->getVias()) {
-      const bool solderMaskCovered =
-          !mBoard.getDesignRules().doesViaRequireStopMask(
-              *via->getDrillDiameter());
+      const bool solderMaskCovered = !via->getStopMaskOffset();
       gen.via(netName, via->getPosition(), via->getSize(), via->getSize(),
               Angle::deg0(), via->getDrillDiameter(), solderMaskCovered);
     }

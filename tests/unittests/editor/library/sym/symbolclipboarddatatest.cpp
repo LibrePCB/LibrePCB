@@ -21,7 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
+#include <librepcb/editor/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/editor/library/sym/symbolclipboarddata.h>
 
 #include <QtCore>

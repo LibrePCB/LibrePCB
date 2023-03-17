@@ -30,7 +30,9 @@
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
+#include "../board.h"
 #include "../boarddesignrules.h"
+#include "../boardlayerstack.h"
 #include "bi_device.h"
 #include "bi_netsegment.h"
 
@@ -47,10 +49,12 @@ namespace librepcb {
 
 BI_FootprintPad::BI_FootprintPad(BI_Device& device, const Uuid& padUuid)
   : BI_Base(device.getBoard()),
+    onEdited(*this),
     mDevice(device),
     mFootprintPad(nullptr),
     mPackagePad(nullptr),
-    mComponentSignalInstance(nullptr) {
+    mComponentSignalInstance(nullptr),
+    mOnDeviceEditedSlot(*this, &BI_FootprintPad::deviceEdited) {
   mFootprintPad =
       mDevice.getLibFootprint().getPads().get(padUuid).get();  // can throw
   if (mFootprintPad->getPackagePadUuid()) {
@@ -69,53 +73,34 @@ BI_FootprintPad::BI_FootprintPad(BI_Device& device, const Uuid& padUuid)
           mDevice.getComponentInstance().getSignalInstance(*cmpSignalUuid);
       connect(mComponentSignalInstance,
               &ComponentSignalInstance::netSignalChanged, this,
-              &BI_FootprintPad::componentSignalInstanceNetSignalChanged);
+              &BI_FootprintPad::netSignalChanged);
     }
   }
 
   if (NetSignal* netsignal = getCompSigInstNetSignal()) {
-    mHighlightChangedConnection =
-        connect(netsignal, &NetSignal::highlightedChanged,
-                [this]() { mGraphicsItem->update(); });
-    mNetSignalNameChangedConnection =
-        connect(netsignal, &NetSignal::nameChanged,
-                [this]() { mGraphicsItem->updateCacheAndRepaint(); });
+    connect(netsignal, &NetSignal::nameChanged, this,
+            &BI_FootprintPad::updateText);
   }
 
-  mGraphicsItem.reset(new BGI_FootprintPad(*this));
-  updatePosition();
+  updateTransform();
+  updateText();
+  updateGeometries();
 
-  // connect to the "attributes changed" signal of the footprint
-  connect(&mDevice, &BI_Device::attributesChanged, this,
-          &BI_FootprintPad::deviceAttributesChanged);
+  mDevice.onEdited.attach(mOnDeviceEditedSlot);
+  connect(&mBoard, &Board::designRulesModified, this,
+          &BI_FootprintPad::updateGeometries);
 }
 
 BI_FootprintPad::~BI_FootprintPad() {
   Q_ASSERT(!isUsed());
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
 
-bool BI_FootprintPad::getMirrored() const noexcept {
-  return mDevice.getMirrored();
-}
-
 const Uuid& BI_FootprintPad::getLibPadUuid() const noexcept {
   return mFootprintPad->getUuid();
-}
-
-QString BI_FootprintPad::getDisplayText() const noexcept {
-  NetSignal* signal = getCompSigInstNetSignal();
-  if (signal && mPackagePad) {
-    return QString("%1:\n%2").arg(*mPackagePad->getName(), *signal->getName());
-  } else if (mPackagePad) {
-    return *mPackagePad->getName();
-  } else {
-    return QString();  // Unconnected pad, no name to display...
-  }
 }
 
 FootprintPad::ComponentSide BI_FootprintPad::getComponentSide() const noexcept {
@@ -153,6 +138,11 @@ NetSignal* BI_FootprintPad::getCompSigInstNetSignal() const noexcept {
   }
 }
 
+TraceAnchor BI_FootprintPad::toTraceAnchor() const noexcept {
+  return TraceAnchor::pad(mDevice.getComponentInstanceUuid(),
+                          mFootprintPad->getUuid());
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -164,8 +154,8 @@ void BI_FootprintPad::addToBoard() {
   if (mComponentSignalInstance) {
     mComponentSignalInstance->registerFootprintPad(*this);  // can throw
   }
-  componentSignalInstanceNetSignalChanged(nullptr, getCompSigInstNetSignal());
-  BI_Base::addToBoard(mGraphicsItem.data());
+  netSignalChanged(nullptr, getCompSigInstNetSignal());
+  BI_Base::addToBoard();
 }
 
 void BI_FootprintPad::removeFromBoard() {
@@ -175,8 +165,8 @@ void BI_FootprintPad::removeFromBoard() {
   if (mComponentSignalInstance) {
     mComponentSignalInstance->unregisterFootprintPad(*this);  // can throw
   }
-  componentSignalInstanceNetSignalChanged(getCompSigInstNetSignal(), nullptr);
-  BI_Base::removeFromBoard(mGraphicsItem.data());
+  netSignalChanged(getCompSigInstNetSignal(), nullptr);
+  BI_Base::removeFromBoard();
 }
 
 void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
@@ -214,8 +204,7 @@ void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
     }
   }
   mRegisteredNetLines.insert(&netline);
-  netline.updateLine();
-  mGraphicsItem->updateCacheAndRepaint();  // Update omitted annular rings.
+  updateGeometries();
 }
 
 void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline) {
@@ -223,114 +212,108 @@ void BI_FootprintPad::unregisterNetLine(BI_NetLine& netline) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredNetLines.remove(&netline);
-  netline.updateLine();
-  mGraphicsItem->updateCacheAndRepaint();  // Update omitted annular rings.
-}
-
-void BI_FootprintPad::updatePosition() noexcept {
-  Transform transform(mDevice);
-  mPosition = transform.map(mFootprintPad->getPosition());
-  mRotation = transform.map(mFootprintPad->getRotation());
-
-  Angle rot = mRotation;
-  if (mDevice.getMirrored()) {
-    rot = Angle::deg180() - rot;
-  }
-
-  QTransform t;
-  if (mDevice.getMirrored()) t.scale(qreal(-1), qreal(1));
-  t.rotate(-rot.toDeg());
-  mGraphicsItem->setTransform(t);
-  mGraphicsItem->setPos(mPosition.toPxQPointF());
-  mGraphicsItem->updateCacheAndRepaint();
-  foreach (BI_NetLine* netline, mRegisteredNetLines) { netline->updateLine(); }
-}
-
-/*******************************************************************************
- *  Inherited from BI_Base
- ******************************************************************************/
-
-QPainterPath BI_FootprintPad::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-bool BI_FootprintPad::isSelectable() const noexcept {
-  return mGraphicsItem->isSelectable();
-}
-
-void BI_FootprintPad::setSelected(bool selected) noexcept {
-  BI_Base::setSelected(selected);
-  mGraphicsItem->update();
-}
-
-QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
-    const QString& layer) const noexcept {
-  if (GraphicsLayer::isCopperLayer(layer)) {
-    return getGeometryOnCopperLayer(layer);
-  }
-
-  QList<PadGeometry> result;
-  tl::optional<Length> offset;
-  if ((layer == GraphicsLayer::sTopStopMask) ||
-      (layer == GraphicsLayer::sBotStopMask)) {
-    offset = *mBoard.getDesignRules().getStopMaskClearance().calcValue(
-        *getSizeForMaskOffsetCalculaton());
-  } else if ((!mFootprintPad->isTht()) &&
-             ((layer == GraphicsLayer::sTopSolderPaste) ||
-              (layer == GraphicsLayer::sBotSolderPaste))) {
-    offset = -mBoard.getDesignRules().getSolderPasteClearance().calcValue(
-        *getSizeForMaskOffsetCalculaton());
-  }
-  if (offset) {
-    const QString copperLayer = GraphicsLayer::isTopLayer(layer)
-        ? GraphicsLayer::sTopCopper
-        : GraphicsLayer::sBotCopper;
-    foreach (const PadGeometry& pg, getGeometryOnCopperLayer(copperLayer)) {
-      result.append(pg.withoutHoles().withOffset(*offset));
-    }
-  }
-  return result;
-}
-
-TraceAnchor BI_FootprintPad::toTraceAnchor() const noexcept {
-  return TraceAnchor::pad(mDevice.getComponentInstanceUuid(),
-                          mFootprintPad->getUuid());
+  updateGeometries();
 }
 
 /*******************************************************************************
  *  Private Slots
  ******************************************************************************/
 
-void BI_FootprintPad::deviceAttributesChanged() {
-  mGraphicsItem->updateCacheAndRepaint();
+void BI_FootprintPad::deviceEdited(const BI_Device& obj,
+                                   BI_Device::Event event) noexcept {
+  Q_UNUSED(obj);
+  switch (event) {
+    case BI_Device::Event::PositionChanged:
+    case BI_Device::Event::RotationChanged:
+    case BI_Device::Event::MirroredChanged:
+      updateTransform();
+      break;
+    case BI_Device::Event::StopMaskOffsetsChanged:
+      break;
+    default: {
+      qWarning() << "Unhandled switch-case in BI_FootprintPad::deviceEdited():"
+                 << static_cast<int>(event);
+      break;
+    }
+  }
 }
 
-void BI_FootprintPad::componentSignalInstanceNetSignalChanged(NetSignal* from,
-                                                              NetSignal* to) {
+void BI_FootprintPad::netSignalChanged(NetSignal* from, NetSignal* to) {
   Q_ASSERT(!isUsed());  // no netlines must be connected when netsignal changes!
-  if (mHighlightChangedConnection) {
-    disconnect(mHighlightChangedConnection);
-    mHighlightChangedConnection = QMetaObject::Connection();
-  }
-  if (mNetSignalNameChangedConnection) {
-    disconnect(mNetSignalNameChangedConnection);
-    mNetSignalNameChangedConnection = QMetaObject::Connection();
+  if (from) {
+    disconnect(from, &NetSignal::nameChanged, this,
+               &BI_FootprintPad::updateText);
+    mBoard.scheduleAirWiresRebuild(from);
   }
   if (to) {
-    mHighlightChangedConnection =
-        connect(to, &NetSignal::highlightedChanged,
-                [this]() { mGraphicsItem->update(); });
-    mNetSignalNameChangedConnection =
-        connect(to, &NetSignal::nameChanged,
-                [this]() { mGraphicsItem->updateCacheAndRepaint(); });
+    connect(to, &NetSignal::nameChanged, this, &BI_FootprintPad::updateText);
+    mBoard.scheduleAirWiresRebuild(to);
   }
-  mBoard.scheduleAirWiresRebuild(from);
-  mBoard.scheduleAirWiresRebuild(to);
+  updateText();
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void BI_FootprintPad::updateTransform() noexcept {
+  Transform transform(mDevice);
+  const Point position = transform.map(mFootprintPad->getPosition());
+  const Angle rotation = transform.map(mFootprintPad->getRotation());
+  const bool mirrored = mDevice.getMirrored();
+  if (position != mPosition) {
+    mPosition = position;
+    mBoard.scheduleAirWiresRebuild(getCompSigInstNetSignal());
+    onEdited.notify(Event::PositionChanged);
+    foreach (BI_NetLine* netLine, mRegisteredNetLines) {
+      netLine->updatePositions();
+    }
+  }
+  if (rotation != mRotation) {
+    mRotation = rotation;
+    onEdited.notify(Event::RotationChanged);
+  }
+  if (mirrored != mMirrored) {
+    mMirrored = mirrored;
+    onEdited.notify(Event::MirroredChanged);
+    updateGeometries();
+  }
+}
+
+void BI_FootprintPad::updateText() noexcept {
+  QString text;
+  if (mPackagePad) {
+    text += *mPackagePad->getName();
+  }
+  if (NetSignal* signal = getCompSigInstNetSignal()) {
+    text += ": " % *signal->getName();
+  }
+  if (text != mText) {
+    mText = text;
+    onEdited.notify(Event::TextChanged);
+  }
+}
+
+void BI_FootprintPad::updateGeometries() noexcept {
+  QSet<QString> layers = {
+      GraphicsLayer::sTopStopMask,    GraphicsLayer::sBotStopMask,
+      GraphicsLayer::sTopSolderPaste, GraphicsLayer::sBotSolderPaste,
+      GraphicsLayer::sTopCopper,      GraphicsLayer::sBotCopper,
+  };
+  for (int i = 1; i <= mBoard.getLayerStack().getInnerLayerCount(); ++i) {
+    layers.insert(GraphicsLayer::getInnerLayerName(i));
+  }
+
+  QMap<QString, QList<PadGeometry>> geometries;
+  foreach (const QString& layer, layers) {
+    geometries.insert(layer, getGeometryOnLayer(layer));
+  }
+
+  if (geometries != mGeometries) {
+    mGeometries = geometries;
+    onEdited.notify(Event::GeometriesChanged);
+  }
+}
 
 QString BI_FootprintPad::getLibraryDeviceName() const noexcept {
   return *mDevice.getLibDevice().getNames().getDefaultValue();
@@ -364,6 +347,35 @@ UnsignedLength BI_FootprintPad::getSizeForMaskOffsetCalculaton() const
     return positiveToUnsigned(
         std::min(mFootprintPad->getWidth(), mFootprintPad->getHeight()));
   }
+}
+
+QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
+    const QString& layer) const noexcept {
+  if (GraphicsLayer::isCopperLayer(layer)) {
+    return getGeometryOnCopperLayer(layer);
+  }
+
+  QList<PadGeometry> result;
+  tl::optional<Length> offset;
+  if ((layer == GraphicsLayer::sTopStopMask) ||
+      (layer == GraphicsLayer::sBotStopMask)) {
+    offset = *mBoard.getDesignRules().getStopMaskClearance().calcValue(
+        *getSizeForMaskOffsetCalculaton());
+  } else if ((!mFootprintPad->isTht()) &&
+             ((layer == GraphicsLayer::sTopSolderPaste) ||
+              (layer == GraphicsLayer::sBotSolderPaste))) {
+    offset = -mBoard.getDesignRules().getSolderPasteClearance().calcValue(
+        *getSizeForMaskOffsetCalculaton());
+  }
+  if (offset) {
+    const QString copperLayer = GraphicsLayer::isTopLayer(layer)
+        ? GraphicsLayer::sTopCopper
+        : GraphicsLayer::sBotCopper;
+    foreach (const PadGeometry& pg, getGeometryOnCopperLayer(copperLayer)) {
+      result.append(pg.withoutHoles().withOffset(*offset));
+    }
+  }
+  return result;
 }
 
 QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(

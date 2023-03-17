@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "si_netline.h"
 
-#include "../../../graphics/graphicsscene.h"
 #include "../../../utils/scopeguard.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
@@ -47,6 +46,7 @@ SI_NetLine::SI_NetLine(SI_NetSegment& segment, const Uuid& uuid,
                        SI_NetLineAnchor& startPoint, SI_NetLineAnchor& endPoint,
                        const UnsignedLength& width)
   : SI_Base(segment.getSchematic()),
+    onEdited(*this),
     mNetSegment(segment),
     mNetLine(uuid, width, startPoint.toNetLineAnchor(),
              endPoint.toNetLineAnchor()),
@@ -58,12 +58,11 @@ SI_NetLine::SI_NetLine(SI_NetSegment& segment, const Uuid& uuid,
                      "SI_NetLine: both endpoints are the same.");
   }
 
-  mGraphicsItem.reset(new SGI_NetLine(*this));
-  updateLine();
+  connect(&mNetSegment.getNetSignal(), &NetSignal::nameChanged, this,
+          [this]() { onEdited.notify(Event::NetSignalNameChanged); });
 }
 
 SI_NetLine::~SI_NetLine() noexcept {
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
@@ -90,9 +89,7 @@ NetSignal& SI_NetLine::getNetSignalOfNetSegment() const noexcept {
  ******************************************************************************/
 
 void SI_NetLine::setWidth(const UnsignedLength& width) noexcept {
-  if (mNetLine.setWidth(width)) {
-    mGraphicsItem->updateCacheAndRepaint();
-  }
+  mNetLine.setWidth(width);
 }
 
 /*******************************************************************************
@@ -108,10 +105,7 @@ void SI_NetLine::addToSchematic() {
   auto sg = scopeGuard([&]() { mStartPoint->unregisterNetLine(*this); });
   mEndPoint->registerNetLine(*this);  // can throw
 
-  mHighlightChangedConnection =
-      connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
-              [this]() { mGraphicsItem->update(); });
-  SI_Base::addToSchematic(mGraphicsItem.data());
+  SI_Base::addToSchematic();
   sg.dismiss();
 }
 
@@ -124,26 +118,12 @@ void SI_NetLine::removeFromSchematic() {
   auto sg = scopeGuard([&]() { mEndPoint->registerNetLine(*this); });
   mStartPoint->unregisterNetLine(*this);  // can throw
 
-  disconnect(mHighlightChangedConnection);
-  SI_Base::removeFromSchematic(mGraphicsItem.data());
+  SI_Base::removeFromSchematic();
   sg.dismiss();
 }
 
-void SI_NetLine::updateLine() noexcept {
-  mGraphicsItem->updateCacheAndRepaint();
-}
-
-/*******************************************************************************
- *  Inherited from SI_Base
- ******************************************************************************/
-
-QPainterPath SI_NetLine::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->shape();
-}
-
-void SI_NetLine::setSelected(bool selected) noexcept {
-  SI_Base::setSelected(selected);
-  mGraphicsItem->update();
+void SI_NetLine::updatePositions() noexcept {
+  onEdited.notify(Event::PositionsChanged);
 }
 
 /*******************************************************************************

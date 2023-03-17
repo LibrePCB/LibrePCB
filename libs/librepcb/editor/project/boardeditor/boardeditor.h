@@ -45,6 +45,7 @@ class Project;
 namespace editor {
 
 class BoardEditorFsm;
+class BoardGraphicsScene;
 class BoardLayersDock;
 class ExclusiveActionGroup;
 class GraphicsView;
@@ -82,6 +83,9 @@ public:
   ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
   Project& getProject() const noexcept { return mProject; }
   Board* getActiveBoard() const noexcept { return mActiveBoard.data(); }
+  BoardGraphicsScene* getActiveBoardScene() noexcept {
+    return mGraphicsScene.data();
+  }
 
   // Setters
   bool setActiveBoardIndex(int index) noexcept;
@@ -143,13 +147,15 @@ private:
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
 
+  // Misc
+  QPointer<Board> mActiveBoard;
+  QScopedPointer<BoardGraphicsScene> mGraphicsScene;
+  QHash<Uuid, QRectF> mVisibleSceneRect;
+  QScopedPointer<BoardEditorFsm> mFsm;
+
   // DRC
   QHash<Uuid, tl::optional<RuleCheckMessageList>> mDrcMessages;  ///< UUID=Board
   QScopedPointer<QGraphicsPathItem> mDrcLocationGraphicsItem;
-
-  // Misc
-  QPointer<Board> mActiveBoard;
-  QScopedPointer<BoardEditorFsm> mFsm;
 
   // Actions
   QScopedPointer<QAction> mActionAboutLibrePcb;

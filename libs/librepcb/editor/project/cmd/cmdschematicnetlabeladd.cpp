@@ -38,7 +38,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdSchematicNetLabelAdd::CmdSchematicNetLabelAdd(SI_NetLabel& netLabel) noexcept
-  : UndoCommand(tr("Add netlabel")), mNetLabel(netLabel) {
+  : UndoCommand(tr("Add Net Label")), mNetLabel(netLabel) {
 }
 
 CmdSchematicNetLabelAdd::~CmdSchematicNetLabelAdd() noexcept {

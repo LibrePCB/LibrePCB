@@ -23,6 +23,8 @@
 #include "addcomponentdialog.h"
 
 #include "../editorcommandset.h"
+#include "../graphics/defaultgraphicslayerprovider.h"
+#include "../graphics/graphicsscene.h"
 #include "../library/pkg/footprintgraphicsitem.h"
 #include "../library/sym/symbolgraphicsitem.h"
 #include "../widgets/graphicsview.h"
@@ -33,8 +35,6 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentsymbolvariant.h>
 #include <librepcb/core/library/dev/device.h>

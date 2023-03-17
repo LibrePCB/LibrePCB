@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdpolygonedit.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/polygongraphicsitem.h"
 #include "../../../widgets/angleedit.h"
 #include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
@@ -33,7 +34,6 @@
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/library/sym/symbol.h>
 
 #include <QtCore>

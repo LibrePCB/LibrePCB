@@ -25,7 +25,6 @@
 #include "../../application.h"
 #include "../../exceptions.h"
 #include "../../geometry/polygon.h"
-#include "../../graphics/graphicsscene.h"
 #include "../../library/sym/symbolpin.h"
 #include "../../serialization/sexpression.h"
 #include "../../utils/scopeguardlist.h"
@@ -38,7 +37,6 @@
 #include "items/si_symbol.h"
 #include "items/si_symbolpin.h"
 #include "items/si_text.h"
-#include "schematicselectionquery.h"
 
 #include <QtCore>
 
@@ -61,7 +59,6 @@ Schematic::Schematic(Project& project,
     mDirectoryName(directoryName),
     mDirectory(std::move(directory)),
     mIsAddedToProject(false),
-    mGraphicsScene(new GraphicsScene()),
     mUuid(uuid),
     mName(name),
     mGridInterval(2540000),
@@ -87,8 +84,6 @@ Schematic::~Schematic() noexcept {
   mNetSegments.clear();
   qDeleteAll(mSymbols);
   mSymbols.clear();
-
-  mGraphicsScene.reset();
 }
 
 /*******************************************************************************
@@ -155,6 +150,7 @@ void Schematic::addNetSegment(SI_NetSegment& netsegment) {
   }
   netsegment.addToSchematic();  // can throw
   mNetSegments.insert(netsegment.getUuid(), &netsegment);
+  emit netSegmentAdded(netsegment);
 }
 
 void Schematic::removeNetSegment(SI_NetSegment& netsegment) {
@@ -164,6 +160,7 @@ void Schematic::removeNetSegment(SI_NetSegment& netsegment) {
   }
   netsegment.removeFromSchematic();  // can throw
   mNetSegments.remove(netsegment.getUuid());
+  emit netSegmentRemoved(netsegment);
 }
 
 /*******************************************************************************
@@ -183,6 +180,7 @@ void Schematic::addPolygon(SI_Polygon& polygon) {
   }
   polygon.addToSchematic();  // can throw
   mPolygons.insert(polygon.getUuid(), &polygon);
+  emit polygonAdded(polygon);
 }
 
 void Schematic::removePolygon(SI_Polygon& polygon) {
@@ -192,6 +190,7 @@ void Schematic::removePolygon(SI_Polygon& polygon) {
   }
   polygon.removeFromSchematic();  // can throw
   mPolygons.remove(polygon.getUuid());
+  emit polygonRemoved(polygon);
 }
 
 /*******************************************************************************
@@ -210,6 +209,7 @@ void Schematic::addText(SI_Text& text) {
   }
   text.addToSchematic();  // can throw
   mTexts.insert(text.getUuid(), &text);
+  emit textAdded(text);
 }
 
 void Schematic::removeText(SI_Text& text) {
@@ -218,6 +218,7 @@ void Schematic::removeText(SI_Text& text) {
   }
   text.removeFromSchematic();  // can throw
   mTexts.remove(text.getUuid());
+  emit textRemoved(text);
 }
 
 /*******************************************************************************
@@ -318,63 +319,16 @@ void Schematic::save() {
   root.ensureLineBreak();
   for (const SI_Text* obj : mTexts) {
     root.ensureLineBreak();
-    obj->getText().serialize(root.appendList("text"));
+    obj->getTextObj().serialize(root.appendList("text"));
   }
   root.ensureLineBreak();
   mDirectory->write("schematic.lp", root.toByteArray());
-}
-
-void Schematic::selectAll() noexcept {
-  foreach (SI_Symbol* symbol, mSymbols) { symbol->setSelected(true); }
-  foreach (SI_NetSegment* segment, mNetSegments) { segment->selectAll(); }
-  foreach (SI_Polygon* polygon, mPolygons) { polygon->setSelected(true); }
-  foreach (SI_Text* text, mTexts) { text->setSelected(true); }
-}
-
-void Schematic::setSelectionRect(const Point& p1, const Point& p2,
-                                 bool updateItems) noexcept {
-  mGraphicsScene->setSelectionRect(p1, p2);
-  if (updateItems) {
-    QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-    foreach (SI_Symbol* symbol, mSymbols) {
-      bool selectSymbol = symbol->getGrabAreaScenePx().intersects(rectPx);
-      symbol->setSelected(selectSymbol);
-      foreach (SI_SymbolPin* pin, symbol->getPins()) {
-        bool selectPin = pin->getGrabAreaScenePx().intersects(rectPx);
-        pin->setSelected(selectSymbol || selectPin);
-      }
-    }
-    foreach (SI_NetSegment* segment, mNetSegments) {
-      segment->setSelectionRect(rectPx);
-    }
-    foreach (SI_Polygon* polygon, mPolygons) {
-      bool select = polygon->getGrabAreaScenePx().intersects(rectPx);
-      polygon->setSelected(select);
-    }
-    foreach (SI_Text* text, mTexts) {
-      bool selectText = text->getGrabAreaScenePx().intersects(rectPx);
-      text->setSelected(selectText);
-    }
-  }
-}
-
-void Schematic::clearSelection() const noexcept {
-  foreach (SI_Symbol* symbol, mSymbols) { symbol->setSelected(false); }
-  foreach (SI_NetSegment* segment, mNetSegments) { segment->clearSelection(); }
-  foreach (SI_Polygon* polygon, mPolygons) { polygon->setSelected(false); }
-  foreach (SI_Text* text, mTexts) { text->setSelected(false); }
 }
 
 void Schematic::updateAllNetLabelAnchors() noexcept {
   foreach (SI_NetSegment* netsegment, mNetSegments) {
     netsegment->updateAllNetLabelAnchors();
   }
-}
-
-std::unique_ptr<SchematicSelectionQuery> Schematic::createSelectionQuery() const
-    noexcept {
-  return std::unique_ptr<SchematicSelectionQuery>(new SchematicSelectionQuery(
-      mSymbols, mNetSegments, mPolygons, mTexts, const_cast<Schematic*>(this)));
 }
 
 /*******************************************************************************

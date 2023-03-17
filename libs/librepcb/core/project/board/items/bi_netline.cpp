@@ -24,6 +24,7 @@
 
 #include "../../../utils/scopeguard.h"
 #include "../../circuit/netsignal.h"
+#include "../board.h"
 #include "../boardlayerstack.h"
 #include "bi_device.h"
 #include "bi_footprintpad.h"
@@ -84,6 +85,7 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
                        BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
                        GraphicsLayer& layer, const PositiveLength& width)
   : BI_Base(segment.getBoard()),
+    onEdited(*this),
     mNetSegment(segment),
     mTrace(uuid, GraphicsLayerName(layer.getName()), width,
            startPoint.toTraceAnchor(), endPoint.toTraceAnchor()),
@@ -103,13 +105,9 @@ BI_NetLine::BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
     throw LogicError(__FILE__, __LINE__,
                      "BI_NetLine: both endpoints are the same.");
   }
-
-  mGraphicsItem.reset(new BGI_NetLine(*this));
-  updateLine();
 }
 
 BI_NetLine::~BI_NetLine() noexcept {
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
@@ -152,13 +150,13 @@ void BI_NetLine::setLayer(GraphicsLayer& layer) {
   }
   if (mTrace.setLayer(GraphicsLayerName(layer.getName()))) {
     mLayer = &layer;
-    mGraphicsItem->updateCacheAndRepaint();
+    onEdited.notify(Event::LayerChanged);
   }
 }
 
 void BI_NetLine::setWidth(const PositiveLength& width) noexcept {
   if (mTrace.setWidth(width)) {
-    mGraphicsItem->updateCacheAndRepaint();
+    onEdited.notify(Event::WidthChanged);
   }
 }
 
@@ -175,15 +173,14 @@ void BI_NetLine::addToBoard() {
   auto sg = scopeGuard([&]() { mStartPoint->unregisterNetLine(*this); });
   mEndPoint->registerNetLine(*this);  // can throw
 
-  if (const NetSignal* netsignal = mNetSegment.getNetSignal()) {
-    mConnections.append(connect(netsignal, &NetSignal::nameChanged, this,
-                                &BI_NetLine::updateLine));
-    mConnections.append(connect(netsignal, &NetSignal::highlightedChanged,
-                                [this]() { mGraphicsItem->update(); }));
-  }
-
-  BI_Base::addToBoard(mGraphicsItem.data());
+  BI_Base::addToBoard();
   sg.dismiss();
+
+  if (const NetSignal* netsignal = mNetSegment.getNetSignal()) {
+    mNetSignalNameChangedConnection =
+        connect(netsignal, &NetSignal::nameChanged, this,
+                [this]() { onEdited.notify(Event::NetSignalNameChanged); });
+  }
 }
 
 void BI_NetLine::removeFromBoard() {
@@ -195,16 +192,17 @@ void BI_NetLine::removeFromBoard() {
   auto sg = scopeGuard([&]() { mEndPoint->registerNetLine(*this); });
   mEndPoint->unregisterNetLine(*this);  // can throw
 
-  while (!mConnections.isEmpty()) {
-    disconnect(mConnections.takeLast());
-  }
-
-  BI_Base::removeFromBoard(mGraphicsItem.data());
+  BI_Base::removeFromBoard();
   sg.dismiss();
+
+  if (mNetSignalNameChangedConnection) {
+    disconnect(mNetSignalNameChangedConnection);
+    mNetSignalNameChangedConnection = QMetaObject::Connection();
+  }
 }
 
-void BI_NetLine::updateLine() noexcept {
-  mGraphicsItem->updateCacheAndRepaint();
+void BI_NetLine::updatePositions() noexcept {
+  onEdited.notify(Event::PositionsChanged);
 }
 
 BI_NetLineAnchor* BI_NetLine::getAnchor(const TraceAnchor& anchor) {
@@ -219,23 +217,6 @@ BI_NetLineAnchor* BI_NetLine::getAnchor(const TraceAnchor& anchor) {
   } else {
     return nullptr;
   }
-}
-
-/*******************************************************************************
- *  Inherited from BI_Base
- ******************************************************************************/
-
-QPainterPath BI_NetLine::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->shape();
-}
-
-bool BI_NetLine::isSelectable() const noexcept {
-  return mGraphicsItem->isSelectable();
-}
-
-void BI_NetLine::setSelected(bool selected) noexcept {
-  BI_Base::setSelected(selected);
-  mGraphicsItem->update();
 }
 
 /*******************************************************************************

@@ -30,12 +30,13 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class BI_Base;
 class Board;
 class GraphicsLayer;
 class LengthUnit;
@@ -44,6 +45,7 @@ class Point;
 
 namespace editor {
 
+class BoardGraphicsScene;
 class UndoCommand;
 
 /*******************************************************************************
@@ -64,13 +66,13 @@ public:
     Vias = (1 << 0),
     NetPoints = (1 << 1),
     NetLines = (1 << 2),
-    Footprints = (1 << 3),
+    Devices = (1 << 3),
     FootprintPads = (1 << 4),
     Planes = (1 << 5),
     Polygons = (1 << 6),
     StrokeTexts = (1 << 7),
     Holes = (1 << 8),
-    All = Vias | NetPoints | NetLines | Footprints | FootprintPads | Planes |
+    All = Vias | NetPoints | NetLines | Devices | FootprintPads | Planes |
         Polygons | StrokeTexts | Holes,
 
     // Match behavior
@@ -177,6 +179,7 @@ signals:
 
 protected:  // Methods
   Board* getActiveBoard() noexcept;
+  BoardGraphicsScene* getActiveBoardScene() noexcept;
   PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;
   QList<GraphicsLayer*> getAllowedGeometryLayers(const Board& board) const
@@ -184,19 +187,20 @@ protected:  // Methods
   void abortBlockingToolsInOtherEditors() noexcept;
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;
-  QList<BI_Base*> findItemsAtPos(const Point& pos, FindFlags flags,
-                                 const GraphicsLayer* cuLayer = nullptr,
-                                 const QSet<const NetSignal*>& netsignals = {},
-                                 const QSet<BI_Base*>& except = {}) noexcept;
-  template <typename T = BI_Base>
-  T* findItemAtPos(const Point& pos, FindFlags flags,
-                   const GraphicsLayer* cuLayer = nullptr,
-                   const QSet<const NetSignal*>& netsignals = {},
-                   const QSet<BI_Base*>& except = {}) noexcept {
-    const QList<BI_Base*> items =
+  QList<std::shared_ptr<QGraphicsItem>> findItemsAtPos(
+      const Point& pos, FindFlags flags, const GraphicsLayer* cuLayer = nullptr,
+      const QSet<const NetSignal*>& netsignals = {},
+      const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept;
+  template <typename T = QGraphicsItem>
+  std::shared_ptr<T> findItemAtPos(
+      const Point& pos, FindFlags flags, const GraphicsLayer* cuLayer = nullptr,
+      const QSet<const NetSignal*>& netsignals = {},
+      const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept {
+    const QList<std::shared_ptr<QGraphicsItem>> items =
         findItemsAtPos(pos, flags | FindFlag::SkipLowerPriorityMatches, cuLayer,
                        netsignals, except);
-    T* castedItem = qobject_cast<T*>(items.value(0, nullptr));
+    std::shared_ptr<T> castedItem =
+        std::dynamic_pointer_cast<T>(items.value(0, nullptr));
     if ((!items.isEmpty()) && (!castedItem)) {
       // Probably wrong flags are passed?!?!
       qCritical() << "Found a board item, but it has the wrong type!";

@@ -34,6 +34,7 @@
 #include "../boardeditor/boardnetsegmentsplitter.h"
 #include "cmdremoveunusedlibraryelements.h"
 
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>

@@ -158,7 +158,7 @@ bool SchematicEditorState_AddText::processMirror(
 
   mCurrentTextEditCmd->mirror(orientation, mCurrentTextToPlace->getPosition(),
                               true);
-  mLastTextProperties = mCurrentTextToPlace->getText();
+  mLastTextProperties = mCurrentTextToPlace->getTextObj();
   return true;
 }
 
@@ -221,7 +221,8 @@ bool SchematicEditorState_AddText::addText(const Point& pos) noexcept {
     QScopedPointer<CmdSchematicTextAdd> cmdAdd(
         new CmdSchematicTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());
-    mCurrentTextEditCmd.reset(new CmdTextEdit(mCurrentTextToPlace->getText()));
+    mCurrentTextEditCmd.reset(
+        new CmdTextEdit(mCurrentTextToPlace->getTextObj()));
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -234,7 +235,7 @@ bool SchematicEditorState_AddText::rotateText(const Angle& angle) noexcept {
   if ((!mCurrentTextEditCmd) || (!mCurrentTextToPlace)) return false;
 
   mCurrentTextEditCmd->rotate(angle, mCurrentTextToPlace->getPosition(), true);
-  mLastTextProperties = mCurrentTextToPlace->getText();
+  mLastTextProperties = mCurrentTextToPlace->getTextObj();
 
   return true;  // Event handled
 }

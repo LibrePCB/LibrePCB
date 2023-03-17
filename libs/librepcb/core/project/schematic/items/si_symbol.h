@@ -24,9 +24,12 @@
  *  Includes
  ******************************************************************************/
 #include "../../../attribute/attributeprovider.h"
-#include "../graphicsitems/sgi_symbol.h"
+#include "../../../geometry/text.h"
+#include "../../../types/angle.h"
+#include "../../../types/point.h"
+#include "../../../types/uuid.h"
+#include "../../../utils/signalslot.h"
 #include "si_base.h"
-#include "si_text.h"
 
 #include <QtCore>
 
@@ -38,6 +41,7 @@ namespace librepcb {
 class ComponentInstance;
 class ComponentSymbolVariantItem;
 class SI_SymbolPin;
+class SI_Text;
 class Schematic;
 class Symbol;
 
@@ -52,6 +56,15 @@ class SI_Symbol final : public SI_Base, public AttributeProvider {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionChanged,
+    RotationChanged,
+    MirroredChanged,
+  };
+  Signal<SI_Symbol, Event> onEdited;
+  typedef Slot<SI_Symbol, Event> OnEditedSlot;
+
   // Constructors / Destructor
   SI_Symbol() = delete;
   SI_Symbol(const SI_Symbol& other) = delete;
@@ -78,7 +91,6 @@ public:
   const ComponentSymbolVariantItem& getCompSymbVarItem() const noexcept {
     return *mSymbVarItem;
   }
-  QRectF getBoundingRect() const noexcept;
 
   // Setters
   void setPosition(const Point& newPos) noexcept;
@@ -109,15 +121,13 @@ public:
   QVector<const AttributeProvider*> getAttributeProviderParents() const
       noexcept override;
 
-  // Inherited from SI_Base
-  Type_t getType() const noexcept override { return SI_Base::Type_t::Symbol; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
-
   // Operator Overloadings
   SI_Symbol& operator=(const SI_Symbol& rhs) = delete;
 
 signals:
+  void textAdded(SI_Text& text);
+  void textRemoved(SI_Text& text);
+
   /// @copydoc AttributeProvider::attributesChanged()
   void attributesChanged() override;
 
@@ -130,7 +140,6 @@ private:
   const Symbol* mSymbol;
   QHash<Uuid, SI_SymbolPin*> mPins;  ///< key: symbol pin UUID
   QMap<Uuid, SI_Text*> mTexts;  ///< key: text UUID
-  QScopedPointer<SGI_Symbol> mGraphicsItem;
 
   // Attributes
   Uuid mUuid;

@@ -58,9 +58,7 @@ class BoardDesignRuleCheckSettings;
 class BoardDesignRules;
 class BoardFabricationOutputSettings;
 class BoardLayerStack;
-class BoardSelectionQuery;
 class GraphicsLayer;
-class GraphicsScene;
 class NetSignal;
 class Project;
 
@@ -76,35 +74,6 @@ class Board final : public QObject, public AttributeProvider {
   Q_OBJECT
 
 public:
-  // Types
-
-  /**
-   * @brief Z Values of all items in a board scene (to define the stacking
-   * order)
-   *
-   * These values are used for QGraphicsItem::setZValue() to define the stacking
-   * order of all items in a board QGraphicsScene. We use integer values, even
-   * if the z-value of QGraphicsItem is a qreal attribute...
-   *
-   * Low number = background, high number = foreground
-   */
-  enum ItemZValue {
-    ZValue_Default = 0,  ///< this is the default value (behind all other items)
-    ZValue_TextsBottom,  ///< Z value for librepcb::BI_StrokeText items
-    ZValue_DevicesBottom,  ///< Z value for librepcb::BI_Device items
-    ZValue_FootprintPadsBottom,  ///< Z value for
-                                 ///< librepcb::BI_FootprintPad items
-    ZValue_CopperBottom,
-    ZValue_CopperTop,
-    ZValue_FootprintPadsTop,  ///< Z value for
-                              ///< librepcb::BI_FootprintPad items
-    ZValue_DevicesTop,  ///< Z value for librepcb::BI_Device items
-    ZValue_TextsTop,  ///< Z value for librepcb::BI_StrokeText items
-    ZValue_Vias,  ///< Z value for librepcb::BI_Via items
-    ZValue_Texts,  ///< Z value for librepcb::BI_StrokeText items
-    ZValue_AirWires,  ///< Z value for librepcb::BI_AirWire items
-  };
-
   // Constructors / Destructor
   Board() = delete;
   Board(const Board& other) = delete;
@@ -117,7 +86,6 @@ public:
   Project& getProject() const noexcept { return mProject; }
   const QString& getDirectoryName() const noexcept { return mDirectoryName; }
   TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
-  GraphicsScene& getGraphicsScene() const noexcept { return *mGraphicsScene; }
   BoardLayerStack& getLayerStack() noexcept { return *mLayerStack; }
   const BoardLayerStack& getLayerStack() const noexcept { return *mLayerStack; }
   const BoardDesignRules& getDesignRules() const noexcept {
@@ -134,12 +102,6 @@ public:
     return *mFabricationOutputSettings;
   }
   bool isEmpty() const noexcept;
-  QList<BI_NetPoint*> getNetPointsAtScenePos(
-      const Point& pos, const GraphicsLayer* layer = nullptr,
-      const QSet<const NetSignal*>& netsignals = {}) const noexcept;
-  QList<BI_NetLine*> getNetLinesAtScenePos(
-      const Point& pos, const GraphicsLayer* layer = nullptr,
-      const QSet<const NetSignal*>& netsignals = {}) const noexcept;
   QList<BI_Base*> getAllItems() const noexcept;
 
   // Getters: Attributes
@@ -230,13 +192,6 @@ public:
   void addToProject();
   void removeFromProject();
   void save();
-  void saveViewSceneRect(const QRectF& rect) noexcept { mViewRect = rect; }
-  const QRectF& restoreViewSceneRect() const noexcept { return mViewRect; }
-  void selectAll() noexcept;
-  void setSelectionRect(const Point& p1, const Point& p2,
-                        bool updateItems) noexcept;
-  void clearSelection() const noexcept;
-  std::unique_ptr<BoardSelectionQuery> createSelectionQuery() const noexcept;
 
   // Inherited from AttributeProvider
   /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
@@ -255,8 +210,22 @@ signals:
   /// @copydoc AttributeProvider::attributesChanged()
   void attributesChanged() override;
 
-  void deviceAdded(BI_Device& comp);
-  void deviceRemoved(BI_Device& comp);
+  void designRulesModified();
+
+  void deviceAdded(BI_Device& device);
+  void deviceRemoved(BI_Device& device);
+  void netSegmentAdded(BI_NetSegment& netSegment);
+  void netSegmentRemoved(BI_NetSegment& netSegment);
+  void planeAdded(BI_Plane& plane);
+  void planeRemoved(BI_Plane& plane);
+  void polygonAdded(BI_Polygon& polygon);
+  void polygonRemoved(BI_Polygon& polygon);
+  void strokeTextAdded(BI_StrokeText& strokeText);
+  void strokeTextRemoved(BI_StrokeText& strokeText);
+  void holeAdded(BI_Hole& hole);
+  void holeRemoved(BI_Hole& hole);
+  void airWireAdded(BI_AirWire& airWire);
+  void airWireRemoved(BI_AirWire& airWire);
 
 private:
   // General
@@ -265,12 +234,10 @@ private:
   std::unique_ptr<TransactionalDirectory> mDirectory;
   bool mIsAddedToProject;
 
-  QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<BoardLayerStack> mLayerStack;
   QScopedPointer<BoardDesignRules> mDesignRules;
   QScopedPointer<BoardDesignRuleCheckSettings> mDrcSettings;
   QScopedPointer<BoardFabricationOutputSettings> mFabricationOutputSettings;
-  QRectF mViewRect;
   QSet<NetSignal*> mScheduledNetSignalsForAirWireRebuild;
 
   // Attributes

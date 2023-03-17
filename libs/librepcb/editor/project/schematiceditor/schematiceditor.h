@@ -48,6 +48,7 @@ class GraphicsView;
 class ProjectEditor;
 class RuleCheckDock;
 class SchematicEditorFsm;
+class SchematicGraphicsScene;
 class SchematicPagesDock;
 class SearchToolBar;
 class StandardEditorCommandHandler;
@@ -83,6 +84,9 @@ public:
   Project& getProject() const noexcept { return mProject; }
   int getActiveSchematicIndex() const noexcept { return mActiveSchematicIndex; }
   Schematic* getActiveSchematic() const noexcept;
+  SchematicGraphicsScene* getActiveSchematicScene() noexcept {
+    return mGraphicsScene.data();
+  }
 
   // Setters
   bool setActiveSchematicIndex(int index) noexcept;
@@ -133,6 +137,8 @@ private:
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
   int mActiveSchematicIndex;
+  QScopedPointer<SchematicGraphicsScene> mGraphicsScene;
+  QHash<Uuid, QRectF> mVisibleSceneRect;
   QScopedPointer<SchematicEditorFsm> mFsm;
 
   // Actions

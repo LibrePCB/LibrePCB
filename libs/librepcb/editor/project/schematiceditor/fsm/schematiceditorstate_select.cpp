@@ -26,23 +26,28 @@
 #include "../../../dialogs/polygonpropertiesdialog.h"
 #include "../../../dialogs/textpropertiesdialog.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmddragselectedschematicitems.h"
 #include "../../cmd/cmdpasteschematicitems.h"
 #include "../../cmd/cmdremoveselectedschematicitems.h"
+#include "../graphicsitems/sgi_netlabel.h"
+#include "../graphicsitems/sgi_symbol.h"
+#include "../graphicsitems/sgi_text.h"
 #include "../renamenetsegmentdialog.h"
 #include "../schematicclipboarddatabuilder.h"
+#include "../schematicgraphicsscene.h"
+#include "../schematicselectionquery.h"
 #include "../symbolinstancepropertiesdialog.h"
 
-#include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_polygon.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
-#include <librepcb/core/project/schematic/schematicselectionquery.h>
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -93,9 +98,9 @@ bool SchematicEditorState_Select::exit() noexcept {
   mSubState = SubState::IDLE;
 
   // Avoid propagating the selection to other, non-selectable tools, thus
-  // clearing the selection on *all* schematics.
-  foreach (Schematic* schematic, mContext.project.getSchematics()) {
-    schematic->clearSelection();
+  // clearing the selection.
+  if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
+    scene->clearSelection();
   }
 
   return true;
@@ -107,8 +112,8 @@ bool SchematicEditorState_Select::exit() noexcept {
 
 bool SchematicEditorState_Select::processSelectAll() noexcept {
   if (mSubState == SubState::IDLE) {
-    if (Schematic* schematic = getActiveSchematic()) {
-      schematic->selectAll();
+    if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
+      scene->selectAll();
       return true;
     }
   }
@@ -202,24 +207,33 @@ bool SchematicEditorState_Select::processEditProperties() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Schematic* schematic = getActiveSchematic();
-  if ((!schematic) || (mSubState != SubState::IDLE)) {
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if ((!scene) || (mSubState != SubState::IDLE)) {
     return false;
   }
 
-  std::unique_ptr<SchematicSelectionQuery> query =
-      schematic->createSelectionQuery();
-  query->addSelectedSymbols();
-  query->addSelectedNetLabels();
-  query->addSelectedPolygons();
-  query->addSelectedSchematicTexts();
-  query->addSelectedSymbolTexts();
-  foreach (auto ptr, query->getSymbols()) { return openPropertiesDialog(ptr); }
-  foreach (auto ptr, query->getNetLabels()) {
-    return openPropertiesDialog(ptr);
+  SchematicSelectionQuery query(*scene);
+  query.addSelectedSymbols();
+  query.addSelectedNetLabels();
+  query.addSelectedPolygons();
+  query.addSelectedSchematicTexts();
+  query.addSelectedSymbolTexts();
+  foreach (auto ptr, query.getSymbols()) {
+    openSymbolPropertiesDialog(*ptr);
+    return true;
   }
-  foreach (auto ptr, query->getPolygons()) { return openPropertiesDialog(ptr); }
-  foreach (auto ptr, query->getTexts()) { return openPropertiesDialog(ptr); }
+  foreach (auto ptr, query.getNetLabels()) {
+    openNetLabelPropertiesDialog(*ptr);
+    return true;
+  }
+  foreach (auto ptr, query.getPolygons()) {
+    openPolygonPropertiesDialog(ptr->getPolygon());
+    return true;
+  }
+  foreach (auto ptr, query.getTexts()) {
+    openTextPropertiesDialog(ptr->getTextObj());
+    return true;
+  }
   return false;
 }
 
@@ -227,8 +241,8 @@ bool SchematicEditorState_Select::processAbortCommand() noexcept {
   try {
     switch (mSubState) {
       case SubState::IDLE: {
-        if (Schematic* schematic = getActiveSchematic()) {
-          schematic->clearSelection();
+        if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
+          scene->clearSelection();
         }
         return true;
       }
@@ -256,14 +270,13 @@ bool SchematicEditorState_Select::processAbortCommand() noexcept {
 
 bool SchematicEditorState_Select::processGraphicsSceneMouseMoved(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
 
   switch (mSubState) {
     case SubState::SELECTING: {
-      // update selection rectangle
-      Point pos = Point::fromPx(e.scenePos());
-      schematic->setSelectionRect(mStartPos, pos, true);
+      // Update selection rectangle.
+      scene->selectItemsInRect(mStartPos, Point::fromPx(e.scenePos()));
       return true;
     }
 
@@ -301,8 +314,8 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
 
   if (mSubState == SubState::IDLE) {
     if (findPolygonVerticesAtPosition(Point::fromPx(mouseEvent.scenePos()))) {
@@ -313,18 +326,18 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     } else {
       // handle items selection
       Point pos = Point::fromPx(mouseEvent.scenePos());
-      const QList<SI_Base*> items =
+      const QList<std::shared_ptr<QGraphicsItem>> items =
           findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
-        schematic->clearSelection();
+        scene->clearSelection();
         mStartPos = pos;
         mSubState = SubState::SELECTING;
         return true;
       }
 
       // Check if there's already an item selected.
-      SI_Base* selectedItem = nullptr;
+      std::shared_ptr<QGraphicsItem> selectedItem;
       foreach (auto item, items) {
         if (item->isSelected()) {
           selectedItem = item;
@@ -346,16 +359,16 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         }
         Q_ASSERT((nextSelectionIndex >= 0) &&
                  (nextSelectionIndex < items.count()));
-        schematic->clearSelection();
+        scene->clearSelection();
         items[nextSelectionIndex]->setSelected(true);
       } else if (!selectedItem) {
         // Only select the topmost item when clicking an unselected item
         // without CTRL.
-        schematic->clearSelection();
+        scene->clearSelection();
         items.first()->setSelected(true);
       }
 
-      if (startMovingSelectedItems(*schematic,
+      if (startMovingSelectedItems(*scene,
                                    Point::fromPx(mouseEvent.scenePos()))) {
         return true;
       }
@@ -384,12 +397,12 @@ bool SchematicEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
 
   if (mSubState == SubState::SELECTING) {
     // remove selection rectangle and keep the selection state of all items
-    schematic->setSelectionRect(Point(), Point(), false);
+    scene->clearSelectionRect();
     mSubState = SubState::IDLE;
     return true;
   } else if (mSubState == SubState::MOVING) {
@@ -433,7 +446,7 @@ bool SchematicEditorState_Select::
 
   if (mSubState == SubState::IDLE) {
     // Open the properties editor dialog of the selected item, if any.
-    const QList<SI_Base*> items = findItemsAtPos(
+    const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
         Point::fromPx(e.scenePos()), FindFlag::All | FindFlag::AcceptNearMatch);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
@@ -454,23 +467,23 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     return rotateSelectedItems(Angle::deg90());
   }
 
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
   if (mSubState != SubState::IDLE) return false;
 
   // handle item selection
   Point pos = Point::fromPx(e.scenePos());
-  QList<SI_Base*> items =
+  QList<std::shared_ptr<QGraphicsItem>> items =
       findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
   if (items.isEmpty()) return false;
-  SI_Base* selectedItem = nullptr;
-  foreach (SI_Base* item, items) {
+  std::shared_ptr<QGraphicsItem> selectedItem;
+  foreach (auto item, items) {
     if (item->isSelected()) {
       selectedItem = item;
     }
   }
   if (!selectedItem) {
-    schematic->clearSelection();
+    scene->clearSelection();
     selectedItem = items.first();
     selectedItem->setSelected(true);
   }
@@ -481,150 +494,130 @@ bool SchematicEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   QMenu menu;
   MenuBuilder mb(&menu);
   const EditorCommandSet& cmd = EditorCommandSet::instance();
-  switch (selectedItem->getType()) {
-    case SI_Base::Type_t::Symbol: {
-      SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(selectedItem);
-      Q_ASSERT(symbol);
+  if (std::dynamic_pointer_cast<SGI_Symbol>(selectedItem)) {
+    mb.addAction(
+        cmd.properties.createAction(
+            &menu, this,
+            [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+        MenuBuilder::Flag::DefaultAction);
+    mb.addSeparator();
+    mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
+      copySelectedItemsToClipboard();
+      removeSelectedItems();
+    }));
+    mb.addAction(cmd.clipboardCopy.createAction(
+        &menu, this, [this]() { copySelectedItemsToClipboard(); }));
+    mb.addAction(cmd.remove.createAction(&menu, this,
+                                         [this]() { removeSelectedItems(); }));
+    mb.addSeparator();
+    mb.addAction(cmd.rotateCcw.createAction(
+        &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+    mb.addAction(cmd.rotateCw.createAction(
+        &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+    mb.addAction(cmd.mirrorHorizontal.createAction(
+        &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
+    mb.addAction(cmd.mirrorVertical.createAction(
+        &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
+    mb.addSeparator();
+    mb.addAction(cmd.deviceResetTextAll.createAction(
+        &menu, this,
+        &SchematicEditorState_Select::resetAllTextsOfSelectedItems));
+  } else if (std::dynamic_pointer_cast<SGI_NetLabel>(selectedItem)) {
+    mb.addAction(
+        cmd.properties.createAction(
+            &menu, this,
+            [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+        MenuBuilder::Flag::DefaultAction);
+    mb.addSeparator();
+    mb.addAction(cmd.remove.createAction(&menu, this,
+                                         [this]() { removeSelectedItems(); }));
+    mb.addSeparator();
+    mb.addAction(cmd.rotateCcw.createAction(
+        &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+    mb.addAction(cmd.rotateCw.createAction(
+        &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+    mb.addAction(cmd.mirrorHorizontal.createAction(
+        &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
+    mb.addAction(cmd.mirrorVertical.createAction(
+        &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
+  } else if (auto item =
+                 std::dynamic_pointer_cast<PolygonGraphicsItem>(selectedItem)) {
+    SI_Polygon* polygon =
+        scene->getSchematic().getPolygons().value(item->getPolygon().getUuid());
+    if (!polygon) return false;
 
-      mb.addAction(
-          cmd.properties.createAction(
-              &menu, this,
-              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
-          MenuBuilder::Flag::DefaultAction);
-      mb.addSeparator();
-      mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
-        copySelectedItemsToClipboard();
-        removeSelectedItems();
-      }));
-      mb.addAction(cmd.clipboardCopy.createAction(
-          &menu, this, [this]() { copySelectedItemsToClipboard(); }));
-      mb.addAction(cmd.remove.createAction(
-          &menu, this, [this]() { removeSelectedItems(); }));
-      mb.addSeparator();
-      mb.addAction(cmd.rotateCcw.createAction(
-          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
-      mb.addAction(cmd.rotateCw.createAction(
-          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
-      mb.addAction(cmd.mirrorHorizontal.createAction(
-          &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
-      mb.addAction(cmd.mirrorVertical.createAction(
-          &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
-      mb.addSeparator();
-      mb.addAction(cmd.deviceResetTextAll.createAction(
-          &menu, this,
-          &SchematicEditorState_Select::resetAllTextsOfSelectedItems));
-      break;
+    int lineIndex = item->getLineIndexAtPosition(pos);
+    QVector<int> vertices = item->getVertexIndicesAtPosition(pos);
+
+    mb.addAction(
+        cmd.properties.createAction(
+            &menu, this,
+            [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+        MenuBuilder::Flag::DefaultAction);
+    mb.addSeparator();
+    if (!vertices.isEmpty()) {
+      QAction* action = cmd.vertexRemove.createAction(
+          &menu, this, [this, polygon, vertices]() {
+            removePolygonVertices(polygon->getPolygon(), vertices);
+          });
+      int remainingVertices =
+          polygon->getPolygon().getPath().getVertices().count() -
+          vertices.count();
+      action->setEnabled(remainingVertices >= 2);
+      mb.addAction(action);
     }
-
-    case SI_Base::Type_t::NetLabel: {
-      SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(selectedItem);
-      Q_ASSERT(netlabel);
-
-      mb.addAction(
-          cmd.properties.createAction(
-              &menu, this,
-              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
-          MenuBuilder::Flag::DefaultAction);
-      mb.addSeparator();
-      mb.addAction(cmd.remove.createAction(
-          &menu, this, [this]() { removeSelectedItems(); }));
-      mb.addSeparator();
-      mb.addAction(cmd.rotateCcw.createAction(
-          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
-      mb.addAction(cmd.rotateCw.createAction(
-          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
-      mb.addAction(cmd.mirrorHorizontal.createAction(
-          &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
-      mb.addAction(cmd.mirrorVertical.createAction(
-          &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
-      break;
+    if (lineIndex >= 0) {
+      mb.addAction(cmd.vertexAdd.createAction(
+          &menu, this, [this, polygon, lineIndex, pos]() {
+            startAddingPolygonVertex(*polygon, lineIndex, pos);
+          }));
     }
-
-    case SI_Base::Type_t::Polygon: {
-      SI_Polygon* polygon = dynamic_cast<SI_Polygon*>(selectedItem);
-      Q_ASSERT(polygon);
-      int lineIndex = polygon->getGraphicsItem().getLineIndexAtPosition(pos);
-      QVector<int> vertices =
-          polygon->getGraphicsItem().getVertexIndicesAtPosition(pos);
-
-      mb.addAction(
-          cmd.properties.createAction(
-              &menu, this,
-              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
-          MenuBuilder::Flag::DefaultAction);
+    if ((lineIndex >= 0) || (!vertices.isEmpty())) {
       mb.addSeparator();
-      if (!vertices.isEmpty()) {
-        QAction* action = cmd.vertexRemove.createAction(
-            &menu, this, [this, polygon, vertices]() {
-              removePolygonVertices(polygon->getPolygon(), vertices);
-            });
-        int remainingVertices =
-            polygon->getPolygon().getPath().getVertices().count() -
-            vertices.count();
-        action->setEnabled(remainingVertices >= 2);
-        mb.addAction(action);
-      }
-      if (lineIndex >= 0) {
-        mb.addAction(cmd.vertexAdd.createAction(
-            &menu, this, [this, polygon, lineIndex, pos]() {
-              startAddingPolygonVertex(*polygon, lineIndex, pos);
-            }));
-      }
-      if ((lineIndex >= 0) || (!vertices.isEmpty())) {
-        mb.addSeparator();
-      }
-      mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
-        copySelectedItemsToClipboard();
-        removeSelectedItems();
-      }));
-      mb.addAction(cmd.clipboardCopy.createAction(
-          &menu, this, [this]() { copySelectedItemsToClipboard(); }));
-      mb.addAction(cmd.remove.createAction(
-          &menu, this, [this]() { removeSelectedItems(); }));
-      mb.addSeparator();
-      mb.addAction(cmd.rotateCcw.createAction(
-          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
-      mb.addAction(cmd.rotateCw.createAction(
-          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
-      mb.addAction(cmd.mirrorHorizontal.createAction(
-          &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
-      mb.addAction(cmd.mirrorVertical.createAction(
-          &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
-      break;
     }
-
-    case SI_Base::Type_t::Text: {
-      SI_Text* text = dynamic_cast<SI_Text*>(selectedItem);
-      Q_ASSERT(text);
-
-      mb.addAction(
-          cmd.properties.createAction(
-              &menu, this,
-              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
-          MenuBuilder::Flag::DefaultAction);
-      mb.addSeparator();
-      mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
-        copySelectedItemsToClipboard();
-        removeSelectedItems();
-      }));
-      mb.addAction(cmd.clipboardCopy.createAction(
-          &menu, this, [this]() { copySelectedItemsToClipboard(); }));
-      mb.addAction(cmd.remove.createAction(
-          &menu, this, [this]() { removeSelectedItems(); }));
-      mb.addSeparator();
-      mb.addAction(cmd.rotateCcw.createAction(
-          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
-      mb.addAction(cmd.rotateCw.createAction(
-          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
-      mb.addAction(cmd.mirrorHorizontal.createAction(
-          &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
-      mb.addAction(cmd.mirrorVertical.createAction(
-          &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
-      break;
-    }
-
-    default:
-      return false;
+    mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
+      copySelectedItemsToClipboard();
+      removeSelectedItems();
+    }));
+    mb.addAction(cmd.clipboardCopy.createAction(
+        &menu, this, [this]() { copySelectedItemsToClipboard(); }));
+    mb.addAction(cmd.remove.createAction(&menu, this,
+                                         [this]() { removeSelectedItems(); }));
+    mb.addSeparator();
+    mb.addAction(cmd.rotateCcw.createAction(
+        &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+    mb.addAction(cmd.rotateCw.createAction(
+        &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+    mb.addAction(cmd.mirrorHorizontal.createAction(
+        &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
+    mb.addAction(cmd.mirrorVertical.createAction(
+        &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
+  } else if (std::dynamic_pointer_cast<SGI_Text>(selectedItem)) {
+    mb.addAction(
+        cmd.properties.createAction(
+            &menu, this,
+            [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+        MenuBuilder::Flag::DefaultAction);
+    mb.addSeparator();
+    mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
+      copySelectedItemsToClipboard();
+      removeSelectedItems();
+    }));
+    mb.addAction(cmd.clipboardCopy.createAction(
+        &menu, this, [this]() { copySelectedItemsToClipboard(); }));
+    mb.addAction(cmd.remove.createAction(&menu, this,
+                                         [this]() { removeSelectedItems(); }));
+    mb.addSeparator();
+    mb.addAction(cmd.rotateCcw.createAction(
+        &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+    mb.addAction(cmd.rotateCw.createAction(
+        &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+    mb.addAction(cmd.mirrorHorizontal.createAction(
+        &menu, this, [this]() { mirrorSelectedItems(Qt::Horizontal); }));
+    mb.addAction(cmd.mirrorVertical.createAction(
+        &menu, this, [this]() { mirrorSelectedItems(Qt::Vertical); }));
+  } else {
+    return false;
   }
 
   // execute the context menu
@@ -643,22 +636,22 @@ bool SchematicEditorState_Select::processSwitchToSchematicPage(
  ******************************************************************************/
 
 bool SchematicEditorState_Select::startMovingSelectedItems(
-    Schematic& schematic, const Point& startPos) noexcept {
+    SchematicGraphicsScene& scene, const Point& startPos) noexcept {
   Q_ASSERT(mSelectedItemsDragCommand.isNull());
   mSelectedItemsDragCommand.reset(
-      new CmdDragSelectedSchematicItems(schematic, startPos));
+      new CmdDragSelectedSchematicItems(scene, startPos));
   mSubState = SubState::MOVING;
   return true;
 }
 
 bool SchematicEditorState_Select::moveSelectedItems(
     const Point& delta) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if ((!schematic) || (mSelectedItemsDragCommand)) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if ((!scene) || (mSelectedItemsDragCommand)) return false;
 
   try {
     QScopedPointer<CmdDragSelectedSchematicItems> cmd(
-        new CmdDragSelectedSchematicItems(*schematic, Point(0, 0)));
+        new CmdDragSelectedSchematicItems(*scene, Point(0, 0)));
     cmd->setCurrentPosition(delta);
     return execCmd(cmd.take());
   } catch (const Exception& e) {
@@ -669,15 +662,15 @@ bool SchematicEditorState_Select::moveSelectedItems(
 
 bool SchematicEditorState_Select::rotateSelectedItems(
     const Angle& angle) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
 
   try {
     if (mSelectedItemsDragCommand) {
       mSelectedItemsDragCommand->rotate(angle, true);
     } else {
       QScopedPointer<CmdDragSelectedSchematicItems> cmd(
-          new CmdDragSelectedSchematicItems(*schematic));
+          new CmdDragSelectedSchematicItems(*scene));
       cmd->rotate(angle, false);
       execCmd(cmd.take());
     }
@@ -690,15 +683,15 @@ bool SchematicEditorState_Select::rotateSelectedItems(
 
 bool SchematicEditorState_Select::mirrorSelectedItems(
     Qt::Orientation orientation) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
 
   try {
     if (mSelectedItemsDragCommand) {
       mSelectedItemsDragCommand->mirror(orientation, true);
     } else {
       QScopedPointer<CmdDragSelectedSchematicItems> cmd(
-          new CmdDragSelectedSchematicItems(*schematic));
+          new CmdDragSelectedSchematicItems(*scene));
       cmd->mirror(orientation, false);
       execCmd(cmd.take());
     }
@@ -710,12 +703,12 @@ bool SchematicEditorState_Select::mirrorSelectedItems(
 }
 
 bool SchematicEditorState_Select::resetAllTextsOfSelectedItems() noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
 
   try {
     QScopedPointer<CmdDragSelectedSchematicItems> cmd(
-        new CmdDragSelectedSchematicItems(*schematic));
+        new CmdDragSelectedSchematicItems(*scene));
     cmd->resetAllTexts();
     mContext.undoStack.execCmd(cmd.take());
     return true;
@@ -726,12 +719,12 @@ bool SchematicEditorState_Select::resetAllTextsOfSelectedItems() noexcept {
 }
 
 bool SchematicEditorState_Select::removeSelectedItems() noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
 
   try {
     CmdRemoveSelectedSchematicItems* cmd =
-        new CmdRemoveSelectedSchematicItems(*schematic);
+        new CmdRemoveSelectedSchematicItems(*scene);
     execCmd(cmd);
     return true;
   } catch (const Exception& e) {
@@ -786,13 +779,13 @@ void SchematicEditorState_Select::startAddingPolygonVertex(
 }
 
 bool SchematicEditorState_Select::copySelectedItemsToClipboard() noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
 
   try {
     Point cursorPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
         QCursor::pos(), true, false);
-    SchematicClipboardDataBuilder builder(*schematic);
+    SchematicClipboardDataBuilder builder(*scene);
     std::unique_ptr<SchematicClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
   } catch (const Exception& e) {
@@ -802,8 +795,8 @@ bool SchematicEditorState_Select::copySelectedItemsToClipboard() noexcept {
 }
 
 bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) return false;
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) return false;
 
   try {
     // get symbol items and abort if there are no items
@@ -819,7 +812,7 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
         QCursor::pos(), true, false);
 
     // start undo command group
-    schematic->clearSelection();
+    scene->clearSelection();
     mContext.undoStack.beginCmdGroup(tr("Paste Schematic Elements"));
     mSubState = SubState::PASTING;
 
@@ -827,12 +820,12 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
     Point offset =
         (mStartPos - data->getCursorPos()).mappedToGrid(getGridInterval());
     QScopedPointer<CmdPasteSchematicItems> cmd(
-        new CmdPasteSchematicItems(*schematic, std::move(data), offset));
+        new CmdPasteSchematicItems(*scene, std::move(data), offset));
 
     if (mContext.undoStack.appendToCmdGroup(cmd.take())) {  // can throw
       // start moving the selected items
       mSelectedItemsDragCommand.reset(
-          new CmdDragSelectedSchematicItems(*schematic, mStartPos));
+          new CmdDragSelectedSchematicItems(*scene, mStartPos));
       return true;
     } else {
       // no items pasted -> abort
@@ -855,13 +848,13 @@ bool SchematicEditorState_Select::pasteFromClipboard() noexcept {
 
 bool SchematicEditorState_Select::findPolygonVerticesAtPosition(
     const Point& pos) noexcept {
-  if (Schematic* schematic = getActiveSchematic()) {
-    foreach (SI_Polygon* polygon, schematic->getPolygons()) {
-      if (polygon->isSelected()) {
-        mSelectedPolygonVertices =
-            polygon->getGraphicsItem().getVertexIndicesAtPosition(pos);
+  if (SchematicGraphicsScene* scene = getActiveSchematicScene()) {
+    for (auto it = scene->getPolygons().begin();
+         it != scene->getPolygons().end(); it++) {
+      if (it.value()->isSelected()) {
+        mSelectedPolygonVertices = it.value()->getVertexIndicesAtPosition(pos);
         if (!mSelectedPolygonVertices.isEmpty()) {
-          mSelectedPolygon = polygon;
+          mSelectedPolygon = it.key();
           return true;
         }
       }
@@ -873,38 +866,21 @@ bool SchematicEditorState_Select::findPolygonVerticesAtPosition(
   return false;
 }
 
-bool SchematicEditorState_Select::openPropertiesDialog(SI_Base* item) noexcept {
-  if (!item) {
-    return false;
-  }
-
-  switch (item->getType()) {
-    case SI_Base::Type_t::Symbol: {
-      SI_Symbol* symbol = dynamic_cast<SI_Symbol*>(item);
-      Q_ASSERT(symbol);
-      openSymbolPropertiesDialog(*symbol);
-      return true;
-    }
-    case SI_Base::Type_t::NetLabel: {
-      SI_NetLabel* netlabel = dynamic_cast<SI_NetLabel*>(item);
-      Q_ASSERT(netlabel);
-      openNetLabelPropertiesDialog(*netlabel);
-      return true;
-    }
-    case SI_Base::Type_t::Polygon: {
-      SI_Polygon* polygon = dynamic_cast<SI_Polygon*>(item);
-      Q_ASSERT(polygon);
-      openPolygonPropertiesDialog(*polygon);
-      return true;
-    }
-    case SI_Base::Type_t::Text: {
-      SI_Text* text = dynamic_cast<SI_Text*>(item);
-      Q_ASSERT(text);
-      openTextPropertiesDialog(*text);
-      return true;
-    }
-    default:
-      break;
+bool SchematicEditorState_Select::openPropertiesDialog(
+    std::shared_ptr<QGraphicsItem> item) noexcept {
+  if (auto symbol = std::dynamic_pointer_cast<SGI_Symbol>(item)) {
+    openSymbolPropertiesDialog(symbol->getSymbol());
+    return true;
+  } else if (auto netLabel = std::dynamic_pointer_cast<SGI_NetLabel>(item)) {
+    openNetLabelPropertiesDialog(netLabel->getNetLabel());
+    return true;
+  } else if (auto polygon =
+                 std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
+    openPolygonPropertiesDialog(polygon->getPolygon());
+    return true;
+  } else if (auto text = std::dynamic_pointer_cast<SGI_Text>(item)) {
+    openTextPropertiesDialog(text->getText().getTextObj());
+    return true;
   }
   return false;
 }
@@ -926,20 +902,18 @@ void SchematicEditorState_Select::openNetLabelPropertiesDialog(
 }
 
 void SchematicEditorState_Select::openPolygonPropertiesDialog(
-    SI_Polygon& polygon) noexcept {
-  PolygonPropertiesDialog dialog(polygon.getPolygon(), mContext.undoStack,
-                                 getAllowedGeometryLayers(), getLengthUnit(),
-                                 "schematic_editor/polygon_properties_dialog",
-                                 parentWidget());
+    Polygon& polygon) noexcept {
+  PolygonPropertiesDialog dialog(
+      polygon, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
+      "schematic_editor/polygon_properties_dialog", parentWidget());
   dialog.exec();
 }
 
 void SchematicEditorState_Select::openTextPropertiesDialog(
-    SI_Text& text) noexcept {
-  TextPropertiesDialog dialog(text.getText(), mContext.undoStack,
-                              getAllowedGeometryLayers(), getLengthUnit(),
-                              "schematic_editor/text_properties_dialog",
-                              parentWidget());
+    Text& text) noexcept {
+  TextPropertiesDialog dialog(
+      text, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
+      "schematic_editor/text_properties_dialog", parentWidget());
   dialog.exec();  // performs the modifications
 }
 

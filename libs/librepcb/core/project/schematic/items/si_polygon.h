@@ -35,7 +35,6 @@
 namespace librepcb {
 
 class Polygon;
-class PolygonGraphicsItem;
 class Schematic;
 
 /*******************************************************************************
@@ -59,23 +58,16 @@ public:
   const Uuid& getUuid() const noexcept;
   Polygon& getPolygon() noexcept { return *mPolygon; }
   const Polygon& getPolygon() const noexcept { return *mPolygon; }
-  PolygonGraphicsItem& getGraphicsItem() noexcept { return *mGraphicsItem; }
 
   // General Methods
   void addToSchematic() override;
   void removeFromSchematic() override;
-
-  // Inherited from SI_Base
-  Type_t getType() const noexcept override { return SI_Base::Type_t::Polygon; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   SI_Polygon& operator=(const SI_Polygon& rhs) = delete;
 
 private:  // Attributes
   QScopedPointer<Polygon> mPolygon;
-  QScopedPointer<PolygonGraphicsItem> mGraphicsItem;
 };
 
 /*******************************************************************************

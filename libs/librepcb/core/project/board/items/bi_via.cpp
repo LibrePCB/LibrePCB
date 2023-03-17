@@ -22,8 +22,10 @@
  ******************************************************************************/
 #include "bi_via.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../../circuit/netsignal.h"
-#include "../boardlayerstack.h"
+#include "../board.h"
+#include "../boarddesignrules.h"
 #include "bi_netsegment.h"
 
 #include <QtCore>
@@ -39,18 +41,17 @@ namespace librepcb {
 
 BI_Via::BI_Via(BI_NetSegment& netsegment, const Via& via)
   : BI_Base(netsegment.getBoard()),
+    onEdited(*this),
     mVia(via),
     mNetSegment(netsegment),
-    mGraphicsItem(new BGI_Via(*this)) {
-  mGraphicsItem->setPos(mVia.getPosition().toPxQPointF());
+    mStopMaskOffset() {
+  updateStopMaskOffset();
 
-  // connect to the "attributes changed" signal of the board
-  connect(&mBoard, &Board::attributesChanged, this,
-          &BI_Via::boardOrNetAttributesChanged);
+  connect(&mBoard, &Board::designRulesModified, this,
+          &BI_Via::updateStopMaskOffset);
 }
 
 BI_Via::~BI_Via() noexcept {
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
@@ -71,25 +72,27 @@ TraceAnchor BI_Via::toTraceAnchor() const noexcept {
 
 void BI_Via::setPosition(const Point& position) noexcept {
   if (mVia.setPosition(position)) {
-    mGraphicsItem->setPos(position.toPxQPointF());
-    foreach (BI_NetLine* netline, mRegisteredNetLines) {
-      netline->updateLine();
+    foreach (BI_NetLine* netLine, mRegisteredNetLines) {
+      netLine->updatePositions();
     }
     if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
       mBoard.scheduleAirWiresRebuild(netsignal);
     }
+    onEdited.notify(Event::PositionChanged);
   }
 }
 
 void BI_Via::setSize(const PositiveLength& size) noexcept {
   if (mVia.setSize(size)) {
-    mGraphicsItem->updateCacheAndRepaint();
+    onEdited.notify(Event::SizeChanged);
+    updateStopMaskOffset();
   }
 }
 
 void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
   if (mVia.setDrillDiameter(diameter)) {
-    mGraphicsItem->updateCacheAndRepaint();
+    onEdited.notify(Event::DrillDiameterChanged);
+    updateStopMaskOffset();
   }
 }
 
@@ -101,28 +104,27 @@ void BI_Via::addToBoard() {
   if (isAddedToBoard() || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
+  BI_Base::addToBoard();
   if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
-    mConnections.append(connect(netsignal, &NetSignal::nameChanged, this,
-                                &BI_Via::boardOrNetAttributesChanged));
-    mConnections.append(connect(netsignal, &NetSignal::highlightedChanged,
-                                [this]() { mGraphicsItem->update(); }));
+    mNetSignalNameChangedConnection =
+        connect(netsignal, &NetSignal::nameChanged, this,
+                [this]() { onEdited.notify(Event::NetSignalNameChanged); });
     mBoard.scheduleAirWiresRebuild(netsignal);
   }
-  BI_Base::addToBoard(mGraphicsItem.data());
-  mGraphicsItem->updateCacheAndRepaint();  // Force updating tooltip.
 }
 
 void BI_Via::removeFromBoard() {
   if ((!isAddedToBoard()) || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  while (!mConnections.isEmpty()) {
-    disconnect(mConnections.takeLast());
-  }
+  BI_Base::removeFromBoard();
   if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
     mBoard.scheduleAirWiresRebuild(netsignal);
   }
-  BI_Base::removeFromBoard(mGraphicsItem.data());
+  if (mNetSignalNameChangedConnection) {
+    disconnect(mNetSignalNameChangedConnection);
+    mNetSignalNameChangedConnection = QMetaObject::Connection();
+  }
 }
 
 void BI_Via::registerNetLine(BI_NetLine& netline) {
@@ -131,8 +133,6 @@ void BI_Via::registerNetLine(BI_NetLine& netline) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredNetLines.insert(&netline);
-  netline.updateLine();
-  mGraphicsItem->updateCacheAndRepaint();
 }
 
 void BI_Via::unregisterNetLine(BI_NetLine& netline) {
@@ -140,33 +140,20 @@ void BI_Via::unregisterNetLine(BI_NetLine& netline) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredNetLines.remove(&netline);
-  netline.updateLine();
-  mGraphicsItem->updateCacheAndRepaint();
 }
 
-/*******************************************************************************
- *  Inherited from BI_Base
- ******************************************************************************/
+void BI_Via::updateStopMaskOffset() noexcept {
+  tl::optional<Length> offset;
+  if (mBoard.getDesignRules().doesViaRequireStopMaskOpening(
+          *mVia.getDrillDiameter())) {
+    offset = *mBoard.getDesignRules().getStopMaskClearance().calcValue(
+        *mVia.getSize());
+  }
 
-QPainterPath BI_Via::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->shape().translated(mVia.getPosition().toPxQPointF());
-}
-
-bool BI_Via::isSelectable() const noexcept {
-  return mGraphicsItem->isSelectable();
-}
-
-void BI_Via::setSelected(bool selected) noexcept {
-  BI_Base::setSelected(selected);
-  mGraphicsItem->update();
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void BI_Via::boardOrNetAttributesChanged() {
-  mGraphicsItem->updateCacheAndRepaint();
+  if (offset != mStopMaskOffset) {
+    mStopMaskOffset = offset;
+    onEdited.notify(Event::StopMaskOffsetChanged);
+  }
 }
 
 /*******************************************************************************

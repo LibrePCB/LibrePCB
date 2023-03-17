@@ -22,9 +22,7 @@
  ******************************************************************************/
 #include "si_base.h"
 
-#include "../../../graphics/graphicsscene.h"
 #include "../../project.h"
-#include "../graphicsitems/sgi_base.h"
 #include "../schematic.h"
 
 #include <QtCore>
@@ -39,10 +37,7 @@ namespace librepcb {
  ******************************************************************************/
 
 SI_Base::SI_Base(Schematic& schematic) noexcept
-  : QObject(&schematic),
-    mSchematic(schematic),
-    mIsAddedToSchematic(false),
-    mIsSelected(false) {
+  : QObject(&schematic), mSchematic(schematic), mIsAddedToSchematic(false) {
 }
 
 SI_Base::~SI_Base() noexcept {
@@ -62,30 +57,16 @@ Circuit& SI_Base::getCircuit() const noexcept {
 }
 
 /*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-void SI_Base::setSelected(bool selected) noexcept {
-  mIsSelected = selected;
-}
-
-/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void SI_Base::addToSchematic(QGraphicsItem* item) noexcept {
+void SI_Base::addToSchematic() {
   Q_ASSERT(!mIsAddedToSchematic);
-  if (item) {
-    mSchematic.getGraphicsScene().addItem(*item);
-  }
   mIsAddedToSchematic = true;
 }
 
-void SI_Base::removeFromSchematic(QGraphicsItem* item) noexcept {
+void SI_Base::removeFromSchematic() {
   Q_ASSERT(mIsAddedToSchematic);
-  if (item) {
-    mSchematic.getGraphicsScene().removeItem(*item);
-  }
   mIsAddedToSchematic = false;
 }
 

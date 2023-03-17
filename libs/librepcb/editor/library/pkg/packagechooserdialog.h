@@ -36,7 +36,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsScene;
 class IF_GraphicsLayerProvider;
 class Package;
 class Workspace;
@@ -44,6 +43,7 @@ class Workspace;
 namespace editor {
 
 class FootprintGraphicsItem;
+class GraphicsScene;
 
 namespace Ui {
 class PackageChooserDialog;

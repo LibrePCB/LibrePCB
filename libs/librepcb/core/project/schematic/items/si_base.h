@@ -32,7 +32,6 @@
 namespace librepcb {
 
 class Circuit;
-class GraphicsScene;
 class Point;
 class Project;
 class Schematic;
@@ -48,18 +47,6 @@ class SI_Base : public QObject {
   Q_OBJECT
 
 public:
-  // Types
-  enum class Type_t {
-    NetSegment,  ///< ::librepcb::SI_NetSegment
-    NetPoint,  ///< ::librepcb::SI_NetPoint
-    NetLine,  ///< ::librepcb::SI_NetLine
-    NetLabel,  ///< ::librepcb::SI_NetLabel
-    Symbol,  ///< ::librepcb::SI_Symbol
-    SymbolPin,  ///< ::librepcb::SI_SymbolPin
-    Polygon,  ///< ::librepcb::SI_Polygon
-    Text,  ///< ::librepcb::SI_Text
-  };
-
   // Constructors / Destructor
   SI_Base() = delete;
   SI_Base(const SI_Base& other) = delete;
@@ -70,27 +57,16 @@ public:
   Project& getProject() const noexcept;
   Circuit& getCircuit() const noexcept;
   Schematic& getSchematic() const noexcept { return mSchematic; }
-  virtual Type_t getType() const noexcept = 0;
-  virtual QPainterPath getGrabAreaScenePx() const noexcept = 0;
   virtual bool isAddedToSchematic() const noexcept {
     return mIsAddedToSchematic;
   }
-  virtual bool isSelected() const noexcept { return mIsSelected; }
-
-  // Setters
-  virtual void setSelected(bool selected) noexcept;
 
   // General Methods
-  virtual void addToSchematic() = 0;
-  virtual void removeFromSchematic() = 0;
+  virtual void addToSchematic();
+  virtual void removeFromSchematic();
 
   // Operator Overloadings
   SI_Base& operator=(const SI_Base& rhs) = delete;
-
-protected:
-  // General Methods
-  void addToSchematic(QGraphicsItem* item) noexcept;
-  void removeFromSchematic(QGraphicsItem* item) noexcept;
 
 protected:
   Schematic& mSchematic;
@@ -98,7 +74,6 @@ protected:
 private:
   // General Attributes
   bool mIsAddedToSchematic;
-  bool mIsSelected;
 };
 
 /*******************************************************************************

@@ -23,9 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../geometry/path.h"
 #include "../../../geometry/stroketext.h"
-#include "../../../types/uuid.h"
+#include "../../../utils/signalslot.h"
 #include "bi_base.h"
 
 #include <QtCore>
@@ -38,9 +37,6 @@ namespace librepcb {
 class AttributeProvider;
 class BI_Device;
 class Board;
-class LineGraphicsItem;
-class Project;
-class StrokeTextGraphicsItem;
 
 /*******************************************************************************
  *  Class BI_StrokeText
@@ -53,6 +49,19 @@ class BI_StrokeText final : public BI_Base {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionChanged,
+    RotationChanged,
+    MirroredChanged,
+    LayerNameChanged,
+    StrokeWidthChanged,
+    TextChanged,
+    PathsChanged,
+  };
+  Signal<BI_StrokeText, Event> onEdited;
+  typedef Slot<BI_StrokeText, Event> OnEditedSlot;
+
   // Constructors / Destructor
   BI_StrokeText() = delete;
   BI_StrokeText(const BI_StrokeText& other) = delete;
@@ -60,46 +69,40 @@ public:
   ~BI_StrokeText() noexcept;
 
   // Getters
-  StrokeText& getText() noexcept { return *mText; }
-  const StrokeText& getText() const noexcept { return *mText; }
-  const Uuid& getUuid() const
-      noexcept;  // convenience function, e.g. for template usage
+  const Uuid& getUuid() const noexcept;  // for convenience, e.g. template usage
   const Point& getPosition() const noexcept;
-  const StrokeFont& getFont() const;
-  bool isSelectable() const noexcept override;
+  const Angle& getRotation() const noexcept;
+  bool getMirrored() const noexcept;
+  const QString& getText() const noexcept { return mText; }
+  StrokeText& getTextObj() noexcept { return *mTextObj; }
+  const StrokeText& getTextObj() const noexcept { return *mTextObj; }
+  const StrokeFont& getFont() const noexcept { return mFont; }
+  const QVector<Path>& getPaths() const noexcept { return mPaths; }
 
   // General Methods
   BI_Device* getDevice() const noexcept { return mDevice; }
   void setDevice(BI_Device* device) noexcept;
   const AttributeProvider* getAttributeProvider() const noexcept;
-  QVector<Path> generatePaths() const;
-  void updateGraphicsItems() noexcept;
   void addToBoard() override;
   void removeFromBoard() override;
-
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override {
-    return BI_Base::Type_t::StrokeText;
-  }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   BI_StrokeText& operator=(const BI_StrokeText& rhs) = delete;
 
-private slots:
-  void boardOrDeviceAttributesChanged();
-
 private:  // Methods
-  void updatePaths() noexcept;
   void strokeTextEdited(const StrokeText& text,
                         StrokeText::Event event) noexcept;
+  void updateText() noexcept;
+  void updatePaths() noexcept;
 
 private:  // Data
   BI_Device* mDevice;
-  QScopedPointer<StrokeText> mText;
-  QScopedPointer<StrokeTextGraphicsItem> mGraphicsItem;
-  QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
+  QScopedPointer<StrokeText> mTextObj;
+  const StrokeFont& mFont;
+
+  // Cached Attributes
+  QString mText;
+  QVector<Path> mPaths;
 
   // Slots
   StrokeText::OnEditedSlot mOnStrokeTextEditedSlot;

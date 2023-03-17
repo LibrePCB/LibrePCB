@@ -38,10 +38,10 @@
 namespace librepcb {
 
 class Circle;
-class CircleGraphicsItem;
 
 namespace editor {
 
+class CircleGraphicsItem;
 class CmdCircleEdit;
 
 /*******************************************************************************

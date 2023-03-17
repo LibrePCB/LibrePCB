@@ -46,7 +46,7 @@ CmdSymbolInstanceEditAll::CmdSymbolInstanceEditAll(SI_Symbol& symbol) noexcept
   appendChild(mSymEditCmd);
 
   foreach (SI_Text* text, symbol.getTexts()) {
-    CmdTextEdit* cmd = new CmdTextEdit(text->getText());
+    CmdTextEdit* cmd = new CmdTextEdit(text->getTextObj());
     mTextEditCmds.append(cmd);
     appendChild(cmd);
   }

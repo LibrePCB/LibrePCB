@@ -22,9 +22,17 @@
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
+#include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../widgets/graphicsview.h"
+#include "../graphicsitems/sgi_netlabel.h"
+#include "../graphicsitems/sgi_netline.h"
+#include "../graphicsitems/sgi_netpoint.h"
+#include "../graphicsitems/sgi_symbol.h"
+#include "../graphicsitems/sgi_symbolpin.h"
+#include "../graphicsitems/sgi_text.h"
 #include "../schematiceditor.h"
+#include "../schematicgraphicsscene.h"
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/graphics/graphicslayer.h>
@@ -70,6 +78,11 @@ Schematic* SchematicEditorState::getActiveSchematic() noexcept {
   return mContext.editor.getActiveSchematic();
 }
 
+SchematicGraphicsScene*
+    SchematicEditorState::getActiveSchematicScene() noexcept {
+  return mContext.editor.getActiveSchematicScene();
+}
+
 PositiveLength SchematicEditorState::getGridInterval() const noexcept {
   return mContext.editorGraphicsView.getGridInterval();
 }
@@ -109,11 +122,12 @@ QWidget* SchematicEditorState::parentWidget() noexcept {
   return &mContext.editor;
 }
 
-QList<SI_Base*> SchematicEditorState::findItemsAtPos(
-    const Point& pos, FindFlags flags, const QSet<SI_Base*>& except) noexcept {
-  Schematic* schematic = getActiveSchematic();
-  if (!schematic) {
-    return QList<SI_Base*>();
+QList<std::shared_ptr<QGraphicsItem>> SchematicEditorState::findItemsAtPos(
+    const Point& pos, FindFlags flags,
+    const QVector<std::shared_ptr<QGraphicsItem>>& except) noexcept {
+  SchematicGraphicsScene* scene = getActiveSchematicScene();
+  if (!scene) {
+    return QList<std::shared_ptr<QGraphicsItem>>();
   }
 
   const QPointF posExact = pos.toPxQPointF();
@@ -146,10 +160,11 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
   // And for items not directly under the cursor, but very close to the cursor,
   // add +1000. For items not under the cursor, but on the next grid interval,
   // add +2000.
-  QMultiMap<std::pair<int, int>, SI_Base*> items;
+  QMultiMap<std::pair<int, int>, std::shared_ptr<QGraphicsItem>> items;
   tl::optional<std::pair<int, int>> lowestPriority;
-  auto addItem = [&items, &lowestPriority](const std::pair<int, int>& prio,
-                                           SI_Base* item) {
+  auto addItem = [&items, &lowestPriority](
+                     const std::pair<int, int>& prio,
+                     std::shared_ptr<QGraphicsItem> item) {
     if ((!lowestPriority) || (prio < (*lowestPriority))) {
       lowestPriority = prio;
     }
@@ -160,9 +175,9 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
         lowestPriority && (prio > (*lowestPriority));
   };
   auto processItem = [&pos, &posExact, &posArea, &posAreaLarge, &posAreaInGrid,
-                      flags, &except, &addItem,
-                      &canSkip](SI_Base* item, const Point& nearestPos,
-                                int priority, bool large) {
+                      flags, &except, &addItem, &canSkip](
+                         std::shared_ptr<QGraphicsItem> item,
+                         const Point& nearestPos, int priority, bool large) {
     if (except.contains(item)) {
       return;
     }
@@ -170,7 +185,7 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
     if (canSkip(prio)) {
       return;
     }
-    const QPainterPath grabArea = item->getGrabAreaScenePx();
+    const QPainterPath grabArea = item->mapToScene(item->shape());
     const int distance = qRound((nearestPos - pos).getLength()->toPx());
     prio = std::make_pair(priority, distance);
     if (canSkip(prio)) {
@@ -201,69 +216,66 @@ QList<SI_Base*> SchematicEditorState::findItemsAtPos(
     }
   };
 
-  if (flags &
-      (FindFlag::NetPoints | FindFlag::NetLines | FindFlag::NetLabels)) {
-    foreach (SI_NetSegment* segment, schematic->getNetSegments()) {
-      if (flags.testFlag(FindFlag::NetPoints)) {
-        foreach (SI_NetPoint* netpoint, segment->getNetPoints()) {
-          processItem(netpoint, netpoint->getPosition(),
-                      netpoint->isVisibleJunction() ? 0 : 10, false);
-        }
-      }
-      if (flags.testFlag(FindFlag::NetLines)) {
-        foreach (SI_NetLine* netline, segment->getNetLines()) {
-          processItem(netline,
-                      Toolbox::nearestPointOnLine(
-                          pos.mappedToGrid(getGridInterval()),
-                          netline->getStartPoint().getPosition(),
-                          netline->getEndPoint().getPosition()),
-                      20, true);  // Large grab area, better usability!
-        }
-      }
-      if (flags.testFlag(FindFlag::NetLabels)) {
-        foreach (SI_NetLabel* netlabel, segment->getNetLabels()) {
-          processItem(netlabel, netlabel->getPosition(), 30, false);
-        }
-      }
+  if (flags.testFlag(FindFlag::NetPoints)) {
+    for (auto it = scene->getNetPoints().begin();
+         it != scene->getNetPoints().end(); it++) {
+      processItem(it.value(), it.key()->getPosition(),
+                  it.key()->isVisibleJunction() ? 0 : 10, false);
+    }
+  }
+
+  if (flags.testFlag(FindFlag::NetLines)) {
+    for (auto it = scene->getNetLines().begin();
+         it != scene->getNetLines().end(); it++) {
+      processItem(
+          it.value(),
+          Toolbox::nearestPointOnLine(pos.mappedToGrid(getGridInterval()),
+                                      it.key()->getStartPoint().getPosition(),
+                                      it.key()->getEndPoint().getPosition()),
+          20, true);  // Large grab area, better usability!
+    }
+  }
+
+  if (flags.testFlag(FindFlag::NetLabels)) {
+    for (auto it = scene->getNetLabels().begin();
+         it != scene->getNetLabels().end(); it++) {
+      processItem(it.value(), it.key()->getPosition(), 30, false);
+    }
+  }
+
+  if (flags.testFlag(FindFlag::Symbols)) {
+    for (auto it = scene->getSymbols().begin(); it != scene->getSymbols().end();
+         it++) {
+      processItem(it.value(), it.key()->getPosition(), 40, false);
     }
   }
 
   if (flags &
-      (FindFlag::Symbols | FindFlag::SymbolPins |
-       FindFlag::SymbolPinsWithComponentSignal | FindFlag::Texts)) {
-    foreach (SI_Symbol* symbol, schematic->getSymbols()) {
-      if (flags.testFlag(FindFlag::Symbols)) {
-        processItem(symbol, symbol->getPosition(), 40, false);
-      }
-      if (flags &
-          (FindFlag::SymbolPins | FindFlag::SymbolPinsWithComponentSignal)) {
-        foreach (SI_SymbolPin* pin, symbol->getPins()) {
-          if (flags.testFlag(FindFlag::SymbolPins) ||
-              (pin->getComponentSignalInstance())) {
-            processItem(pin, pin->getPosition(), 50, false);
-          }
-        }
-      }
-      if (flags.testFlag(FindFlag::Texts)) {
-        foreach (SI_Text* text, symbol->getTexts()) {
-          processItem(text, text->getPosition(), 70, false);
-        }
+      (FindFlag::SymbolPins | FindFlag::SymbolPinsWithComponentSignal)) {
+    for (auto it = scene->getSymbolPins().begin();
+         it != scene->getSymbolPins().end(); it++) {
+      if (flags.testFlag(FindFlag::SymbolPins) ||
+          (it.key()->getComponentSignalInstance())) {
+        processItem(it.value(), it.key()->getPosition(), 50, false);
       }
     }
   }
 
   if (flags.testFlag(FindFlag::Polygons)) {
-    foreach (SI_Polygon* polygon, schematic->getPolygons()) {
+    for (auto it = scene->getPolygons().begin();
+         it != scene->getPolygons().end(); it++) {
       processItem(
-          polygon,
-          polygon->getPolygon().getPath().calcNearestPointBetweenVertices(pos),
-          60, true);  // Probably large grab area makes sense?
+          it.value(),
+          it.key()->getPolygon().getPath().calcNearestPointBetweenVertices(pos),
+          60,
+          true);  // Probably large grab area makes sense?
     }
   }
 
   if (flags.testFlag(FindFlag::Texts)) {
-    foreach (SI_Text* text, schematic->getTexts()) {
-      processItem(text, text->getPosition(), 70, false);
+    for (auto it = scene->getTexts().begin(); it != scene->getTexts().end();
+         it++) {
+      processItem(it.value(), it.key()->getPosition(), 70, false);
     }
   }
 

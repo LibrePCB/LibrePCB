@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include "schematicclipboarddata.h"
 
 #include <QtCore>
@@ -35,10 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Schematic;
-
 namespace editor {
+
+class SchematicGraphicsScene;
 
 /*******************************************************************************
  *  Class SchematicClipboardDataBuilder
@@ -53,7 +51,8 @@ public:
   SchematicClipboardDataBuilder() = delete;
   SchematicClipboardDataBuilder(const SchematicClipboardDataBuilder& other) =
       delete;
-  explicit SchematicClipboardDataBuilder(Schematic& schematic) noexcept;
+  explicit SchematicClipboardDataBuilder(
+      SchematicGraphicsScene& scene) noexcept;
   ~SchematicClipboardDataBuilder() noexcept;
 
   // General Methods
@@ -65,7 +64,7 @@ public:
       const SchematicClipboardDataBuilder& rhs) = delete;
 
 private:  // Data
-  Schematic& mSchematic;
+  SchematicGraphicsScene& mScene;
 };
 
 /*******************************************************************************

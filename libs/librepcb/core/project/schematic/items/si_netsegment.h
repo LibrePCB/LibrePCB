@@ -97,9 +97,6 @@ public:
   // General Methods
   void addToSchematic() override;
   void removeFromSchematic() override;
-  void selectAll() noexcept;
-  void setSelectionRect(const QRectF rectPx) noexcept;
-  void clearSelection() const noexcept;
 
   /**
    * @brief Serialize into ::librepcb::SExpression node
@@ -108,18 +105,18 @@ public:
    */
   void serialize(SExpression& root) const;
 
-  // Inherited from SI_Base
-  Type_t getType() const noexcept override {
-    return SI_Base::Type_t::NetSegment;
-  }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  bool isSelected() const noexcept override;
-  void setSelected(bool selected) noexcept override;
-
   // Operator Overloadings
   SI_NetSegment& operator=(const SI_NetSegment& rhs) = delete;
   bool operator==(const SI_NetSegment& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const SI_NetSegment& rhs) noexcept { return (this != &rhs); }
+
+signals:
+  void netPointsAndNetLinesAdded(const QList<SI_NetPoint*>& netPoints,
+                                 const QList<SI_NetLine*>& netLines);
+  void netPointsAndNetLinesRemoved(const QList<SI_NetPoint*>& netPoints,
+                                   const QList<SI_NetLine*>& netLines);
+  void netLabelAdded(SI_NetLabel& netLabel);
+  void netLabelRemoved(SI_NetLabel& netLabel);
 
 private:
   bool checkAttributesValidity() const noexcept;

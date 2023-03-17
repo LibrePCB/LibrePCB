@@ -22,12 +22,13 @@
  ******************************************************************************/
 #include "footprintgraphicsitem.h"
 
+#include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/holegraphicsitem.h"
+#include "../../graphics/polygongraphicsitem.h"
+#include "../../graphics/stroketextgraphicsitem.h"
 #include "footprintpadgraphicsitem.h"
 
-#include <librepcb/core/graphics/circlegraphicsitem.h>
-#include <librepcb/core/graphics/holegraphicsitem.h>
-#include <librepcb/core/graphics/polygongraphicsitem.h>
-#include <librepcb/core/graphics/stroketextgraphicsitem.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
@@ -49,7 +50,7 @@ FootprintGraphicsItem::FootprintGraphicsItem(
     std::shared_ptr<Footprint> footprint, const IF_GraphicsLayerProvider& lp,
     const StrokeFont& font, const PackagePadList* packagePadList,
     const Component* component, const QStringList& localeOrder) noexcept
-  : QGraphicsItem(nullptr),
+  : QGraphicsItemGroup(nullptr),
     mFootprint(footprint),
     mLayerProvider(lp),
     mFont(font),
@@ -246,7 +247,7 @@ void FootprintGraphicsItem::setRotation(const Angle& rot) noexcept {
 
 void FootprintGraphicsItem::updateAllTexts() noexcept {
   foreach (const auto& ptr, mPadGraphicsItems) { ptr->updateText(); }
-  foreach (const auto& ptr, mStrokeTextGraphicsItems) { ptr->updateText(); }
+  foreach (const auto& ptr, mStrokeTextGraphicsItems) { substituteText(*ptr); }
 }
 
 void FootprintGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
@@ -272,18 +273,6 @@ void FootprintGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
     QPainterPath mappedPath = mapToItem(ptr.get(), path);
     ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
-}
-
-/*******************************************************************************
- *  Inherited from QGraphicsItem
- ******************************************************************************/
-
-void FootprintGraphicsItem::paint(QPainter* painter,
-                                  const QStyleOptionGraphicsItem* option,
-                                  QWidget* widget) noexcept {
-  Q_UNUSED(painter);
-  Q_UNUSED(option);
-  Q_UNUSED(widget);
 }
 
 /*******************************************************************************
@@ -380,9 +369,7 @@ void FootprintGraphicsItem::syncStrokeTexts() noexcept {
       Q_ASSERT(obj);
       auto i = std::make_shared<StrokeTextGraphicsItem>(*obj, mLayerProvider,
                                                         mFont, this);
-      if (mComponent) {
-        i->setAttributeProvider(this);
-      }
+      substituteText(*i);
       mStrokeTextGraphicsItems.insert(obj, i);
     }
   }
@@ -406,7 +393,6 @@ void FootprintGraphicsItem::syncHoles() noexcept {
       Q_ASSERT(obj);
       auto i =
           std::make_shared<HoleGraphicsItem>(*obj, mLayerProvider, true, this);
-      i->setAutoStopMaskOffset(Length(100000));  // Just for illustration.
       mHoleGraphicsItems.insert(obj, i);
     }
   }
@@ -433,6 +419,14 @@ void FootprintGraphicsItem::footprintEdited(const Footprint& footprint,
       break;
     default:
       break;
+  }
+}
+
+void FootprintGraphicsItem::substituteText(
+    StrokeTextGraphicsItem& text) noexcept {
+  if (mComponent) {
+    text.setTextOverride(
+        AttributeSubstitutor::substitute(text.getText().getText(), this));
   }
 }
 

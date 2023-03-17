@@ -26,6 +26,7 @@
 #include "cmdsymbolinstancetextremove.h"
 
 #include <librepcb/core/project/schematic/items/si_symbol.h>
+#include <librepcb/core/project/schematic/items/si_text.h>
 
 #include <QtCore>
 

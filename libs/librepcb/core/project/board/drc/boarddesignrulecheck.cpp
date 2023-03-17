@@ -145,16 +145,16 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
   // stroke texts
   foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
     const GraphicsLayer* layer =
-        mBoard.getLayerStack().getLayer(*text->getText().getLayerName());
+        mBoard.getLayerStack().getLayer(*text->getTextObj().getLayerName());
     if ((!layer) || (!layer->isCopperLayer()) || (!layer->isEnabled())) {
       continue;
     }
-    if (text->getText().getStrokeWidth() < minWidth) {
+    if (text->getTextObj().getStrokeWidth() < minWidth) {
       QVector<Path> locations;
-      Transform transform(text->getText());
-      foreach (Path path, transform.map(text->generatePaths())) {
+      Transform transform(text->getTextObj());
+      foreach (Path path, transform.map(text->getPaths())) {
         locations += path.toOutlineStrokes(PositiveLength(
-            qMax(*text->getText().getStrokeWidth(), Length(50000))));
+            qMax(*text->getTextObj().getStrokeWidth(), Length(50000))));
       }
       emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(*text, minWidth,
                                                                 locations));
@@ -182,16 +182,16 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
       const GraphicsLayer* layer =
-          mBoard.getLayerStack().getLayer(*text->getText().getLayerName());
+          mBoard.getLayerStack().getLayer(*text->getTextObj().getLayerName());
       if ((!layer) || (!layer->isCopperLayer()) || (!layer->isEnabled())) {
         continue;
       }
-      if (text->getText().getStrokeWidth() < minWidth) {
+      if (text->getTextObj().getStrokeWidth() < minWidth) {
         QVector<Path> locations;
-        Transform transform(text->getText());
-        foreach (Path path, transform.map(text->generatePaths())) {
+        Transform transform(text->getTextObj());
+        foreach (Path path, transform.map(text->getPaths())) {
           locations += path.toOutlineStrokes(PositiveLength(
-              qMax(*text->getText().getStrokeWidth(), Length(50000))));
+              qMax(*text->getTextObj().getStrokeWidth(), Length(50000))));
         }
         emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
             *text, minWidth, locations));
@@ -300,11 +300,11 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
   // Board stroke texts.
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    if (layers.contains(*strokeText->getText().getLayerName())) {
+    if (layers.contains(*strokeText->getTextObj().getLayerName())) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addStrokeText(*strokeText, offset);
       items.append(Item{strokeText, nullptr, nullptr,
-                        *strokeText->getText().getLayerName(), nullptr,
+                        *strokeText->getTextObj().getLayerName(), nullptr,
                         gen.getPaths()});
     }
   }
@@ -349,11 +349,11 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
     // Stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
-      if (layers.contains(*strokeText->getText().getLayerName())) {
+      if (layers.contains(*strokeText->getTextObj().getLayerName())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addStrokeText(*strokeText, offset);
         items.append(Item{strokeText, nullptr, nullptr,
-                          *strokeText->getText().getLayerName(), nullptr,
+                          *strokeText->getTextObj().getLayerName(), nullptr,
                           gen.getPaths()});
       }
     }
@@ -458,14 +458,14 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
   // Check board stroke texts.
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    const GraphicsLayer* layer =
-        mBoard.getLayerStack().getLayer(*strokeText->getText().getLayerName());
+    const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(
+        *strokeText->getTextObj().getLayerName());
     if (layer && layer->isCopperLayer() && layer->isEnabled()) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addStrokeText(*strokeText);
       if (intersects(gen.getPaths())) {
         emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
-            nullptr, strokeText->getText(), clearance, locations));
+            nullptr, strokeText->getTextObj(), clearance, locations));
       }
     }
   }
@@ -521,13 +521,13 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
     // Check stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
       const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(
-          *strokeText->getText().getLayerName());
+          *strokeText->getTextObj().getLayerName());
       if (layer && layer->isCopperLayer() && layer->isEnabled()) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addStrokeText(*strokeText);
         if (intersects(gen.getPaths())) {
           emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
-              device, strokeText->getText(), clearance, locations));
+              device, strokeText->getTextObj(), clearance, locations));
         }
       }
     }
@@ -1029,7 +1029,7 @@ void BoardDesignRuleCheck::checkInvalidPadConnections(int progressEnd) {
       foreach (const GraphicsLayer* layer, connectedLayers) {
         bool isOriginInCopper = false;
         foreach (const PadGeometry& geometry,
-                 pad->getGeometryOnLayer(layer->getName())) {
+                 pad->getGeometries().value(layer->getName())) {
           if (geometry.toFilledQPainterPathPx().contains(QPointF(0, 0))) {
             isOriginInCopper = true;
             break;

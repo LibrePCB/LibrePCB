@@ -25,14 +25,13 @@
 #include "../../cmd/cmdcircleedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdtextedit.h"
+#include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/polygongraphicsitem.h"
+#include "../../graphics/textgraphicsitem.h"
 #include "../../widgets/graphicsview.h"
 #include "../cmd/cmdsymbolpinedit.h"
 #include "../sym/symbolgraphicsitem.h"
 #include "../sym/symbolpingraphicsitem.h"
-
-#include <librepcb/core/graphics/circlegraphicsitem.h>
-#include <librepcb/core/graphics/polygongraphicsitem.h>
-#include <librepcb/core/graphics/textgraphicsitem.h>
 
 #include <QtCore>
 

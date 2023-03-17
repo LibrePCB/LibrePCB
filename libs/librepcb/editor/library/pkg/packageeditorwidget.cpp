@@ -26,6 +26,7 @@
 #include "../../cmd/cmdstroketextedit.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
+#include "../../graphics/graphicsscene.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/toolbarproxy.h"
 #include "../../widgets/statusbar.h"
@@ -36,7 +37,6 @@
 #include "fsm/packageeditorfsm.h"
 #include "ui_packageeditorwidget.h"
 
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/library/libraryelementcheckmessages.h>
 #include <librepcb/core/library/pkg/footprintpainter.h>

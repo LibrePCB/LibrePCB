@@ -32,7 +32,6 @@
 #include "../../library/pkg/footprint.h"
 #include "../project.h"
 #include "board.h"
-#include "boarddesignrules.h"
 #include "boardlayerstack.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
@@ -73,7 +72,7 @@ BoardPainter::BoardPainter(const Board& board)
       foreach (GraphicsLayer* layer, board.getLayerStack().getAllLayers()) {
         if (layer->isEnabled()) {
           foreach (const PadGeometry& geometry,
-                   pad->getGeometryOnLayer(layer->getName())) {
+                   pad->getGeometries().value(layer->getName())) {
             padObj.layerGeometries.append(
                 std::make_pair(layer->getName(), geometry));
           }
@@ -88,17 +87,13 @@ BoardPainter::BoardPainter(const Board& board)
       fpt.circles.append(circle);
     }
     for (Hole hole : device->getLibFootprint().getHoles()) {
-      if (hole.getStopMaskConfig().isEnabled() &&
-          (!hole.getStopMaskConfig().getOffset())) {
-        // Calculate stop mask offset now to avoid needing design rules later.
-        hole.setStopMaskConfig(MaskConfig::manual(
-            *board.getDesignRules().getStopMaskClearance().calcValue(
-                *hole.getDiameter())));
-      }
+      // Memorize stop mask offset now to avoid needing design rules later.
+      hole.setStopMaskConfig(
+          MaskConfig::maybe(device->getHoleStopMasks().value(hole.getUuid())));
       fpt.holes.append(hole);
     }
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
-      StrokeText copy(text->getText());
+      StrokeText copy(text->getTextObj());
       copy.setText(AttributeSubstitutor::substitute(copy.getText(), device));
       mStrokeTexts.append(copy);
     }
@@ -111,17 +106,14 @@ BoardPainter::BoardPainter(const Board& board)
     mPolygons.append(polygon->getPolygon());
   }
   foreach (const BI_StrokeText* text, board.getStrokeTexts()) {
-    StrokeText copy(text->getText());
+    StrokeText copy(text->getTextObj());
     copy.setText(AttributeSubstitutor::substitute(copy.getText(), &board));
     mStrokeTexts.append(copy);
   }
   foreach (const BI_Hole* hole, board.getHoles()) {
     Hole holeObj = hole->getHole();
-    if (holeObj.getStopMaskConfig().isEnabled() &&
-        (!holeObj.getStopMaskConfig().getOffset())) {
-      // Calculate stop mask offset now to avoid needing design rules later.
-      holeObj.setStopMaskConfig(MaskConfig::manual(*hole->getStopMaskOffset()));
-    }
+    // Memorize stop mask offset now to avoid needing design rules later.
+    holeObj.setStopMaskConfig(MaskConfig::maybe(hole->getStopMaskOffset()));
     mHoles.append(holeObj);
   }
   foreach (const BI_NetSegment* segment, board.getNetSegments()) {

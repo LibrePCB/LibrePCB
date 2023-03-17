@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdholeedit.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/holegraphicsitem.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../footprintgraphicsitem.h"
@@ -31,7 +32,6 @@
 
 #include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/holegraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
 
 #include <QtCore>

@@ -25,9 +25,8 @@
  ******************************************************************************/
 #include "../../../geometry/path.h"
 #include "../../../library/pkg/footprintpad.h"
-#include "../graphicsitems/bgi_footprintpad.h"
-#include "./bi_netline.h"
-#include "bi_base.h"
+#include "bi_device.h"
+#include "bi_netline.h"
 
 #include <QtCore>
 
@@ -36,9 +35,8 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BI_Device;
-class ComponentSignal;
 class ComponentSignalInstance;
+class PackagePad;
 
 /*******************************************************************************
  *  Class BI_FootprintPad
@@ -51,6 +49,17 @@ class BI_FootprintPad final : public BI_Base, public BI_NetLineAnchor {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionChanged,
+    RotationChanged,
+    MirroredChanged,
+    TextChanged,
+    GeometriesChanged,
+  };
+  Signal<BI_FootprintPad, Event> onEdited;
+  typedef Slot<BI_FootprintPad, Event> OnEditedSlot;
+
   // Constructors / Destructor
   BI_FootprintPad() = delete;
   BI_FootprintPad(const BI_FootprintPad& other) = delete;
@@ -78,10 +87,11 @@ public:
    *
    * @return Global pad mirror state
    */
-  bool getMirrored() const noexcept;
+  bool getMirrored() const noexcept { return mMirrored; }
+
+  const QString& getText() const noexcept { return mText; }
 
   const Uuid& getLibPadUuid() const noexcept;
-  QString getDisplayText() const noexcept;
   BI_Device& getDevice() const noexcept { return mDevice; }
   FootprintPad::ComponentSide getComponentSide() const noexcept;
   QString getLayerName() const noexcept;
@@ -93,21 +103,14 @@ public:
   }
   NetSignal* getCompSigInstNetSignal() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
-  bool isSelectable() const noexcept override;
-  QList<PadGeometry> getGeometryOnLayer(const QString& layer) const noexcept;
+  const QMap<QString, QList<PadGeometry>>& getGeometries() const noexcept {
+    return mGeometries;
+  }
   TraceAnchor toTraceAnchor() const noexcept override;
 
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
-  void updatePosition() noexcept;
-
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override {
-    return BI_Base::Type_t::FootprintPad;
-  }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
 
   // Inherited from BI_NetLineAnchor
   void registerNetLine(BI_NetLine& netline) override;
@@ -120,13 +123,17 @@ public:
   BI_FootprintPad& operator=(const BI_FootprintPad& rhs) = delete;
 
 private:  // Methods
-  void deviceAttributesChanged();
-  void componentSignalInstanceNetSignalChanged(NetSignal* from, NetSignal* to);
+  void deviceEdited(const BI_Device& obj, BI_Device::Event event) noexcept;
+  void netSignalChanged(NetSignal* from, NetSignal* to);
+  void updateTransform() noexcept;
+  void updateText() noexcept;
+  void updateGeometries() noexcept;
   QString getLibraryDeviceName() const noexcept;
   QString getComponentInstanceName() const noexcept;
   QString getPadNameOrUuid() const noexcept;
   QString getNetSignalName() const noexcept;
   UnsignedLength getSizeForMaskOffsetCalculaton() const noexcept;
+  QList<PadGeometry> getGeometryOnLayer(const QString& layer) const noexcept;
   QList<PadGeometry> getGeometryOnCopperLayer(const QString& layer) const
       noexcept;
   bool isConnectedOnLayer(const QString& layer) const noexcept;
@@ -145,16 +152,18 @@ private:  // Data
   /// @attention This is `nullptr` if the footprint pad is not connected!
   ComponentSignalInstance* mComponentSignalInstance;
 
-  QMetaObject::Connection mHighlightChangedConnection;
-  QMetaObject::Connection mNetSignalNameChangedConnection;
-
-  // Misc
+  // Cached Properties
   Point mPosition;
   Angle mRotation;
-  QScopedPointer<BGI_FootprintPad> mGraphicsItem;
+  bool mMirrored;
+  QString mText;
+  QMap<QString, QList<PadGeometry>> mGeometries;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;
+
+  // Slots
+  BI_Device::OnEditedSlot mOnDeviceEditedSlot;
 };
 
 /*******************************************************************************

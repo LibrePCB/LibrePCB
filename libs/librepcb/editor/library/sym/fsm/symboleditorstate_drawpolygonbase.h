@@ -41,11 +41,11 @@
 namespace librepcb {
 
 class Polygon;
-class PolygonGraphicsItem;
 
 namespace editor {
 
 class CmdPolygonEdit;
+class PolygonGraphicsItem;
 
 /*******************************************************************************
  *  Class SymbolEditorState_DrawPolygonBase

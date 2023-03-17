@@ -25,7 +25,6 @@
 #include "../../application.h"
 #include "../../exceptions.h"
 #include "../../geometry/polygon.h"
-#include "../../graphics/graphicsscene.h"
 #include "../../library/cmp/component.h"
 #include "../../library/dev/device.h"
 #include "../../library/pkg/footprint.h"
@@ -42,7 +41,6 @@
 #include "boardfabricationoutputsettings.h"
 #include "boardlayerstack.h"
 #include "boardplanefragmentsbuilder.h"
-#include "boardselectionquery.h"
 #include "drc/boarddesignrulechecksettings.h"
 #include "items/bi_airwire.h"
 #include "items/bi_device.h"
@@ -79,7 +77,6 @@ Board::Board(Project& project,
     mDirectoryName(directoryName),
     mDirectory(std::move(directory)),
     mIsAddedToProject(false),
-    mGraphicsScene(new GraphicsScene()),
     mLayerStack(new BoardLayerStack(*this)),
     mDesignRules(new BoardDesignRules()),
     mDrcSettings(new BoardDesignRuleCheckSettings()),
@@ -124,7 +121,6 @@ Board::~Board() noexcept {
   mDrcSettings.reset();
   mDesignRules.reset();
   mLayerStack.reset();
-  mGraphicsScene.reset();
 }
 
 /*******************************************************************************
@@ -135,30 +131,6 @@ bool Board::isEmpty() const noexcept {
   return (mDeviceInstances.isEmpty() && mNetSegments.isEmpty() &&
           mPlanes.isEmpty() && mPolygons.isEmpty() && mStrokeTexts.isEmpty() &&
           mHoles.isEmpty());
-}
-
-QList<BI_NetPoint*> Board::getNetPointsAtScenePos(
-    const Point& pos, const GraphicsLayer* layer,
-    const QSet<const NetSignal*>& netsignals) const noexcept {
-  QList<BI_NetPoint*> list;
-  foreach (BI_NetSegment* segment, mNetSegments) {
-    if (netsignals.isEmpty() || netsignals.contains(segment->getNetSignal())) {
-      segment->getNetPointsAtScenePos(pos, layer, list);
-    }
-  }
-  return list;
-}
-
-QList<BI_NetLine*> Board::getNetLinesAtScenePos(
-    const Point& pos, const GraphicsLayer* layer,
-    const QSet<const NetSignal*>& netsignals) const noexcept {
-  QList<BI_NetLine*> list;
-  foreach (BI_NetSegment* segment, mNetSegments) {
-    if (netsignals.isEmpty() || netsignals.contains(segment->getNetSignal())) {
-      segment->getNetLinesAtScenePos(pos, layer, list);
-    }
-  }
-  return list;
 }
 
 QList<BI_Base*> Board::getAllItems() const noexcept {
@@ -185,8 +157,11 @@ QList<BI_Base*> Board::getAllItems() const noexcept {
  ******************************************************************************/
 
 void Board::setDesignRules(const BoardDesignRules& rules) noexcept {
-  *mDesignRules = rules;
-  emit attributesChanged();
+  if (rules != *mDesignRules) {
+    *mDesignRules = rules;
+    emit designRulesModified();
+    emit attributesChanged();
+  }
 }
 
 void Board::setDrcSettings(
@@ -302,6 +277,7 @@ void Board::addNetSegment(BI_NetSegment& netsegment) {
     netsegment.addToBoard();  // can throw
   }
   mNetSegments.insert(netsegment.getUuid(), &netsegment);
+  emit netSegmentAdded(netsegment);
 }
 
 void Board::removeNetSegment(BI_NetSegment& netsegment) {
@@ -312,6 +288,7 @@ void Board::removeNetSegment(BI_NetSegment& netsegment) {
     netsegment.removeFromBoard();  // can throw
   }
   mNetSegments.remove(netsegment.getUuid());
+  emit netSegmentRemoved(netsegment);
 }
 
 /*******************************************************************************
@@ -331,6 +308,7 @@ void Board::addPlane(BI_Plane& plane) {
     plane.addToBoard();  // can throw
   }
   mPlanes.insert(plane.getUuid(), &plane);
+  emit planeAdded(plane);
 }
 
 void Board::removePlane(BI_Plane& plane) {
@@ -341,6 +319,7 @@ void Board::removePlane(BI_Plane& plane) {
     plane.removeFromBoard();  // can throw
   }
   mPlanes.remove(plane.getUuid());
+  emit planeRemoved(plane);
 }
 
 void Board::rebuildAllPlanes() noexcept {
@@ -374,6 +353,7 @@ void Board::addPolygon(BI_Polygon& polygon) {
     polygon.addToBoard();  // can throw
   }
   mPolygons.insert(polygon.getUuid(), &polygon);
+  emit polygonAdded(polygon);
 }
 
 void Board::removePolygon(BI_Polygon& polygon) {
@@ -384,6 +364,7 @@ void Board::removePolygon(BI_Polygon& polygon) {
     polygon.removeFromBoard();  // can throw
   }
   mPolygons.remove(polygon.getUuid());
+  emit polygonRemoved(polygon);
 }
 
 /*******************************************************************************
@@ -404,6 +385,7 @@ void Board::addStrokeText(BI_StrokeText& text) {
     text.addToBoard();  // can throw
   }
   mStrokeTexts.insert(text.getUuid(), &text);
+  emit strokeTextAdded(text);
 }
 
 void Board::removeStrokeText(BI_StrokeText& text) {
@@ -414,6 +396,7 @@ void Board::removeStrokeText(BI_StrokeText& text) {
     text.removeFromBoard();  // can throw
   }
   mStrokeTexts.remove(text.getUuid());
+  emit strokeTextRemoved(text);
 }
 
 /*******************************************************************************
@@ -433,6 +416,7 @@ void Board::addHole(BI_Hole& hole) {
     hole.addToBoard();  // can throw
   }
   mHoles.insert(hole.getUuid(), &hole);
+  emit holeAdded(hole);
 }
 
 void Board::removeHole(BI_Hole& hole) {
@@ -443,6 +427,7 @@ void Board::removeHole(BI_Hole& hole) {
     hole.removeFromBoard();  // can throw
   }
   mHoles.remove(hole.getUuid());
+  emit holeRemoved(hole);
 }
 
 /*******************************************************************************
@@ -459,6 +444,7 @@ void Board::triggerAirWiresRebuild() noexcept {
       // remove old airwires
       while (BI_AirWire* airWire = mAirWires.take(netsignal)) {
         airWire->removeFromBoard();  // can throw
+        emit airWireRemoved(*airWire);
         delete airWire;
       }
 
@@ -473,7 +459,8 @@ void Board::triggerAirWiresRebuild() noexcept {
           QScopedPointer<BI_AirWire> airWire(
               new BI_AirWire(*this, *netsignal, *points.first, *points.second));
           airWire->addToBoard();  // can throw
-          mAirWires.insertMulti(netsignal, airWire.take());
+          mAirWires.insertMulti(netsignal, airWire.data());
+          emit airWireAdded(*airWire.take());
         }
       }
     }
@@ -522,7 +509,7 @@ void Board::copyFrom(const Board& other) {
         device->getRotation(), device->getMirrored(), false);
     copy->setAttributes(device->getAttributes());
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
-      copy->addStrokeText(*new BI_StrokeText(*this, text->getText()));
+      copy->addStrokeText(*new BI_StrokeText(*this, text->getTextObj()));
     }
     addDeviceInstance(*copy);
     devMap.insert(device, copy);
@@ -608,7 +595,7 @@ void Board::copyFrom(const Board& other) {
   // Copy stroke texts.
   foreach (const BI_StrokeText* text, other.getStrokeTexts()) {
     BI_StrokeText* copy = new BI_StrokeText(
-        *this, StrokeText(Uuid::createRandom(), text->getText()));
+        *this, StrokeText(Uuid::createRandom(), text->getTextObj()));
     addStrokeText(*copy);
   }
 
@@ -724,7 +711,7 @@ void Board::save() {
     root.ensureLineBreak();
     for (const BI_StrokeText* obj : mStrokeTexts) {
       root.ensureLineBreak();
-      obj->getText().serialize(root.appendList("stroke_text"));
+      obj->getTextObj().serialize(root.appendList("stroke_text"));
     }
     root.ensureLineBreak();
     for (const BI_Hole* obj : mHoles) {
@@ -755,86 +742,6 @@ void Board::save() {
     root.ensureLineBreak();
     mDirectory->write("settings.user.lp", root.toByteArray());
   }
-}
-
-void Board::selectAll() noexcept {
-  foreach (BI_Device* device, mDeviceInstances) {
-    device->setSelected(device->isSelectable());
-  }
-  foreach (BI_NetSegment* segment, mNetSegments) { segment->selectAll(); }
-  foreach (BI_Plane* plane, mPlanes) {
-    plane->setSelected(plane->isSelectable());
-  }
-  foreach (BI_Polygon* polygon, mPolygons) {
-    polygon->setSelected(polygon->isSelectable());
-  }
-  foreach (BI_StrokeText* text, mStrokeTexts) {
-    text->setSelected(text->isSelectable());
-  }
-  foreach (BI_Hole* hole, mHoles) { hole->setSelected(hole->isSelectable()); }
-}
-
-void Board::setSelectionRect(const Point& p1, const Point& p2,
-                             bool updateItems) noexcept {
-  mGraphicsScene->setSelectionRect(p1, p2);
-  if (updateItems) {
-    QRectF rectPx = QRectF(p1.toPxQPointF(), p2.toPxQPointF()).normalized();
-    foreach (BI_Device* device, mDeviceInstances) {
-      bool selectDevice = device->isSelectable() &&
-          device->getGrabAreaScenePx().intersects(rectPx);
-      device->setSelected(selectDevice);
-      foreach (BI_FootprintPad* pad, device->getPads()) {
-        bool selectPad =
-            pad->isSelectable() && pad->getGrabAreaScenePx().intersects(rectPx);
-        pad->setSelected(selectDevice || selectPad);
-      }
-      foreach (BI_StrokeText* text, device->getStrokeTexts()) {
-        bool selectText = text->isSelectable() &&
-            text->getGrabAreaScenePx().intersects(rectPx);
-        text->setSelected(selectDevice || selectText);
-      }
-    }
-    foreach (BI_NetSegment* segment, mNetSegments) {
-      segment->setSelectionRect(rectPx);
-    }
-    foreach (BI_Plane* plane, mPlanes) {
-      bool select = plane->isSelectable() &&
-          plane->getGrabAreaScenePx().intersects(rectPx);
-      plane->setSelected(select);
-    }
-    foreach (BI_Polygon* polygon, mPolygons) {
-      bool select = polygon->isSelectable() &&
-          polygon->getGrabAreaScenePx().intersects(rectPx);
-      polygon->setSelected(select);
-    }
-    foreach (BI_StrokeText* text, mStrokeTexts) {
-      bool select =
-          text->isSelectable() && text->getGrabAreaScenePx().intersects(rectPx);
-      text->setSelected(select);
-    }
-    foreach (BI_Hole* hole, mHoles) {
-      bool select =
-          hole->isSelectable() && hole->getGrabAreaScenePx().intersects(rectPx);
-      hole->setSelected(select);
-    }
-  }
-}
-
-void Board::clearSelection() const noexcept {
-  foreach (BI_Device* device, mDeviceInstances)
-    device->setSelected(false);
-  foreach (BI_NetSegment* segment, mNetSegments) { segment->clearSelection(); }
-  foreach (BI_Plane* plane, mPlanes) { plane->setSelected(false); }
-  foreach (BI_Polygon* polygon, mPolygons) { polygon->setSelected(false); }
-  foreach (BI_StrokeText* text, mStrokeTexts) { text->setSelected(false); }
-  foreach (BI_Hole* hole, mHoles) { hole->setSelected(false); }
-}
-
-std::unique_ptr<BoardSelectionQuery> Board::createSelectionQuery() const
-    noexcept {
-  return std::unique_ptr<BoardSelectionQuery>(new BoardSelectionQuery(
-      mDeviceInstances, mNetSegments, mPlanes, mPolygons, mStrokeTexts, mHoles,
-      const_cast<Board*>(this)));
 }
 
 /*******************************************************************************

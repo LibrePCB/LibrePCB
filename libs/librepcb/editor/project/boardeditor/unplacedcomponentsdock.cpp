@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "unplacedcomponentsdock.h"
 
+#include "../../graphics/defaultgraphicslayerprovider.h"
+#include "../../graphics/graphicsscene.h"
 #include "../../library/pkg/footprintgraphicsitem.h"
 #include "../../project/cmd/cmdcomponentinstanceedit.h"
 #include "../../undostack.h"
@@ -32,8 +34,6 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>

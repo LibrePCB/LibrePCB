@@ -115,7 +115,7 @@ public:
   void serialize(SExpression& root) const;
 
   // Helper Methods
-  bool doesViaRequireStopMask(const Length& drillDia) const noexcept;
+  bool doesViaRequireStopMaskOpening(const Length& drillDia) const noexcept;
 
   // Operator Overloadings
   BoardDesignRules& operator=(const BoardDesignRules& rhs) noexcept;

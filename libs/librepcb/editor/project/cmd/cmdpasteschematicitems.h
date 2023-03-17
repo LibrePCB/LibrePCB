@@ -42,6 +42,7 @@ class Schematic;
 namespace editor {
 
 class SchematicClipboardData;
+class SchematicGraphicsScene;
 
 /*******************************************************************************
  *  Class CmdPasteSchematicItems
@@ -55,7 +56,7 @@ public:
   // Constructors / Destructor
   CmdPasteSchematicItems() = delete;
   CmdPasteSchematicItems(const CmdPasteSchematicItems& other) = delete;
-  CmdPasteSchematicItems(Schematic& schematic,
+  CmdPasteSchematicItems(SchematicGraphicsScene& scene,
                          std::unique_ptr<SchematicClipboardData> data,
                          const Point& posOffset) noexcept;
   ~CmdPasteSchematicItems() noexcept;
@@ -68,8 +69,9 @@ private:  // Methods
   bool performExecute() override;
 
 private:  // Data
-  Project& mProject;
+  SchematicGraphicsScene& mScene;
   Schematic& mSchematic;
+  Project& mProject;
   std::unique_ptr<SchematicClipboardData> mData;
   Point mPosOffset;
 };

@@ -127,9 +127,9 @@ void BoardDesignRules::serialize(SExpression& root) const {
  *  Helper Methods
  ******************************************************************************/
 
-bool BoardDesignRules::doesViaRequireStopMask(const Length& drillDia) const
-    noexcept {
-  return (drillDia > *mStopMaskMaxViaDrillDiameter ? true : false);
+bool BoardDesignRules::doesViaRequireStopMaskOpening(
+    const Length& drillDia) const noexcept {
+  return drillDia > (*mStopMaskMaxViaDrillDiameter);
 }
 
 /*******************************************************************************

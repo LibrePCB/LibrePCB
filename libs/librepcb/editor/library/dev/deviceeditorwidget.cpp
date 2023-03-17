@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "deviceeditorwidget.h"
 
+#include "../../graphics/defaultgraphicslayerprovider.h"
+#include "../../graphics/graphicsscene.h"
 #include "../../library/cmd/cmdlibraryelementedit.h"
 #include "../../undocommandgroup.h"
 #include "../cmd/cmddeviceedit.h"
@@ -33,8 +35,6 @@
 #include "ui_deviceeditorwidget.h"
 
 #include <librepcb/core/application.h>
-#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/librarybaseelementcheckmessages.h>

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdpasteboarditems.h"
 
+#include "../../graphics/polygongraphicsitem.h"
 #include "../../project/cmd/cmdboardholeadd.h"
 #include "../../project/cmd/cmdboardnetsegmentadd.h"
 #include "../../project/cmd/cmdboardnetsegmentaddelements.h"
@@ -33,11 +34,20 @@
 #include "../../project/cmd/cmdnetsignaladd.h"
 #include "../../project/cmd/cmdprojectlibraryaddelement.h"
 #include "../boardeditor/boardclipboarddata.h"
+#include "../boardeditor/boardgraphicsscene.h"
 #include "../boardeditor/boardnetsegmentsplitter.h"
+#include "../boardeditor/graphicsitems/bgi_device.h"
+#include "../boardeditor/graphicsitems/bgi_hole.h"
+#include "../boardeditor/graphicsitems/bgi_netline.h"
+#include "../boardeditor/graphicsitems/bgi_netpoint.h"
+#include "../boardeditor/graphicsitems/bgi_plane.h"
+#include "../boardeditor/graphicsitems/bgi_stroketext.h"
+#include "../boardeditor/graphicsitems/bgi_via.h"
 #include "cmdremoveboarditems.h"
 
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
@@ -68,12 +78,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdPasteBoardItems::CmdPasteBoardItems(Board& board,
+CmdPasteBoardItems::CmdPasteBoardItems(BoardGraphicsScene& scene,
                                        std::unique_ptr<BoardClipboardData> data,
                                        const Point& posOffset) noexcept
   : UndoCommandGroup(tr("Paste Board Elements")),
-    mProject(board.getProject()),
-    mBoard(board),
+    mScene(scene),
+    mBoard(mScene.getBoard()),
+    mProject(mBoard.getProject()),
     mData(std::move(data)),
     mPosOffset(posOffset) {
   Q_ASSERT(mData);
@@ -146,11 +157,12 @@ bool CmdPasteBoardItems::performExecute() {
       StrokeText copy(text);
       copy.setPosition(copy.getPosition() + mPosOffset);  // move
       BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
-      item->setSelected(true);
       device->addStrokeText(*item);
     }
-    device->setSelected(true);
-    execNewChildCmd(new CmdDeviceInstanceAdd(*device.take()));
+    execNewChildCmd(new CmdDeviceInstanceAdd(*device));
+    if (auto item = mScene.getDevices().value(device.take())) {
+      item->setSelected(true);
+    }
     pastedDevices.insert(dev.componentUuid);
   }
 
@@ -184,7 +196,6 @@ bool CmdPasteBoardItems::performExecute() {
           seg.netName ? getOrCreateNetSignal(**seg.netName) : nullptr;
       BI_NetSegment* copy =
           new BI_NetSegment(mBoard, Uuid::createRandom(), netsignal);
-      copy->setSelected(true);
       execNewChildCmd(new CmdBoardNetSegmentAdd(*copy));
 
       // Add vias, netpoints and netlines
@@ -195,14 +206,12 @@ bool CmdPasteBoardItems::performExecute() {
         BI_Via* via = cmdAddElements->addVia(
             Via(Uuid::createRandom(), v.getPosition() + mPosOffset, v.getSize(),
                 v.getDrillDiameter()));
-        via->setSelected(true);
         viaMap.insert(v.getUuid(), via);
       }
       QHash<Uuid, BI_NetPoint*> netPointMap;
       for (const Junction& junction : segment.junctions) {
         BI_NetPoint* netpoint =
             cmdAddElements->addNetPoint(junction.getPosition() + mPosOffset);
-        netpoint->setSelected(true);
         netPointMap.insert(junction.getUuid(), netpoint);
       }
       for (const Trace& trace : segment.traces) {
@@ -238,11 +247,26 @@ bool CmdPasteBoardItems::performExecute() {
         if ((!start) || (!end) || (!layer)) {
           throw LogicError(__FILE__, __LINE__);
         }
-        BI_NetLine* netline =
-            cmdAddElements->addNetLine(*start, *end, *layer, trace.getWidth());
-        netline->setSelected(true);
+        cmdAddElements->addNetLine(*start, *end, *layer, trace.getWidth());
       }
       execNewChildCmd(cmdAddElements.take());
+
+      // Select pasted net segment items.
+      foreach (BI_Via* via, copy->getVias()) {
+        if (auto item = mScene.getVias().value(via)) {
+          item->setSelected(true);
+        }
+      }
+      foreach (BI_NetPoint* netPoint, copy->getNetPoints()) {
+        if (auto item = mScene.getNetPoints().value(netPoint)) {
+          item->setSelected(true);
+        }
+      }
+      foreach (BI_NetLine* netLine, copy->getNetLines()) {
+        if (auto item = mScene.getNetLines().value(netLine)) {
+          item->setSelected(true);
+        }
+      }
     }
   }
 
@@ -259,8 +283,10 @@ bool CmdPasteBoardItems::performExecute() {
     copy->setKeepOrphans(plane.keepOrphans);
     copy->setPriority(plane.priority);
     copy->setConnectStyle(plane.connectStyle);
-    copy->setSelected(true);
     execNewChildCmd(new CmdBoardPlaneAdd(*copy));
+    if (auto item = mScene.getPlanes().value(copy)) {
+      item->setSelected(true);
+    }
   }
 
   // Paste polygons
@@ -268,8 +294,10 @@ bool CmdPasteBoardItems::performExecute() {
     Polygon copy(Uuid::createRandom(), polygon);  // assign new UUID
     copy.setPath(copy.getPath().translated(mPosOffset));  // move
     BI_Polygon* item = new BI_Polygon(mBoard, copy);
-    item->setSelected(true);
     execNewChildCmd(new CmdBoardPolygonAdd(*item));
+    if (auto graphicsItem = mScene.getPolygons().value(item)) {
+      graphicsItem->setSelected(true);
+    }
   }
 
   // Paste stroke texts
@@ -277,8 +305,10 @@ bool CmdPasteBoardItems::performExecute() {
     StrokeText copy(Uuid::createRandom(), text);  // assign new UUID
     copy.setPosition(copy.getPosition() + mPosOffset);  // move
     BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
-    item->setSelected(true);
     execNewChildCmd(new CmdBoardStrokeTextAdd(*item));
+    if (auto graphicsItem = mScene.getStrokeTexts().value(item)) {
+      graphicsItem->setSelected(true);
+    }
   }
 
   // Paste holes
@@ -286,8 +316,10 @@ bool CmdPasteBoardItems::performExecute() {
     Hole copy(Uuid::createRandom(), hole);  // assign new UUID
     copy.setPath(NonEmptyPath(copy.getPath()->translated(mPosOffset)));  // move
     BI_Hole* item = new BI_Hole(mBoard, copy);
-    item->setSelected(true);
     execNewChildCmd(new CmdBoardHoleAdd(*item));
+    if (auto graphicsItem = mScene.getHoles().value(item)) {
+      graphicsItem->setSelected(true);
+    }
   }
 
   undoScopeGuard.dismiss();  // no undo required

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packagechooserdialog.h"
 
+#include "../../graphics/graphicsscene.h"
 #include "../../widgets/waitingspinnerwidget.h"
 #include "../../workspace/categorytreemodel.h"
 #include "footprintgraphicsitem.h"
@@ -29,7 +30,6 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>

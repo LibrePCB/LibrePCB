@@ -36,16 +36,16 @@ namespace librepcb {
 
 class Board;
 class ComponentInstance;
-class DefaultGraphicsLayerProvider;
 class Device;
 class Footprint;
-class GraphicsScene;
 class Package;
 class Project;
 
 namespace editor {
 
+class DefaultGraphicsLayerProvider;
 class FootprintGraphicsItem;
+class GraphicsScene;
 class ProjectEditor;
 
 namespace Ui {

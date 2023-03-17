@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdstroketextedit.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../../utils/halignactiongroup.h"
 #include "../../../utils/valignactiongroup.h"
 #include "../../../widgets/graphicslayercombobox.h"
@@ -35,7 +36,6 @@
 
 #include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
 
 #include <QtCore>

@@ -22,10 +22,8 @@
  ******************************************************************************/
 #include "bi_base.h"
 
-#include "../../../graphics/graphicsscene.h"
 #include "../../project.h"
 #include "../board.h"
-#include "../graphicsitems/bgi_base.h"
 
 #include <QtCore>
 
@@ -39,7 +37,7 @@ namespace librepcb {
  ******************************************************************************/
 
 BI_Base::BI_Base(Board& board) noexcept
-  : QObject(&board), mBoard(board), mIsAddedToBoard(false), mIsSelected(false) {
+  : QObject(&board), mBoard(board), mIsAddedToBoard(false) {
 }
 
 BI_Base::~BI_Base() noexcept {
@@ -59,30 +57,16 @@ Circuit& BI_Base::getCircuit() const noexcept {
 }
 
 /*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-void BI_Base::setSelected(bool selected) noexcept {
-  mIsSelected = selected;
-}
-
-/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void BI_Base::addToBoard(QGraphicsItem* item) noexcept {
+void BI_Base::addToBoard() {
   Q_ASSERT(!mIsAddedToBoard);
-  if (item) {
-    mBoard.getGraphicsScene().addItem(*item);
-  }
   mIsAddedToBoard = true;
 }
 
-void BI_Base::removeFromBoard(QGraphicsItem* item) noexcept {
+void BI_Base::removeFromBoard() {
   Q_ASSERT(mIsAddedToBoard);
-  if (item) {
-    mBoard.getGraphicsScene().removeItem(*item);
-  }
   mIsAddedToBoard = false;
 }
 

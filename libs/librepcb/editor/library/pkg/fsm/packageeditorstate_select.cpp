@@ -29,6 +29,11 @@
 #include "../../../dialogs/polygonpropertiesdialog.h"
 #include "../../../dialogs/stroketextpropertiesdialog.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/circlegraphicsitem.h"
+#include "../../../graphics/graphicsscene.h"
+#include "../../../graphics/holegraphicsitem.h"
+#include "../../../graphics/polygongraphicsitem.h"
+#include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
 #include "../../../widgets/graphicsview.h"
@@ -41,11 +46,6 @@
 #include "../footprintpadpropertiesdialog.h"
 #include "../packageeditorwidget.h"
 
-#include <librepcb/core/graphics/circlegraphicsitem.h>
-#include <librepcb/core/graphics/graphicsscene.h>
-#include <librepcb/core/graphics/holegraphicsitem.h>
-#include <librepcb/core/graphics/polygongraphicsitem.h>
-#include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/import/dxfreader.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/utils/scopeguard.h>

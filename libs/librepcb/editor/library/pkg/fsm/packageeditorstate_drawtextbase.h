@@ -42,13 +42,13 @@
 namespace librepcb {
 
 class StrokeText;
-class StrokeTextGraphicsItem;
 
 namespace editor {
 
 class CmdStrokeTextEdit;
 class GraphicsLayerComboBox;
 class HAlignActionGroup;
+class StrokeTextGraphicsItem;
 class VAlignActionGroup;
 
 /*******************************************************************************
