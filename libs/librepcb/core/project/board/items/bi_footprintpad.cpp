@@ -273,12 +273,12 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
   tl::optional<Length> offset;
   if ((layer == GraphicsLayer::sTopStopMask) ||
       (layer == GraphicsLayer::sBotStopMask)) {
-    offset = *mBoard.getDesignRules().calcStopMaskClearance(
+    offset = *mBoard.getDesignRules().getStopMaskClearance().calcValue(
         *getSizeForMaskOffsetCalculaton());
   } else if ((!mFootprintPad->isTht()) &&
              ((layer == GraphicsLayer::sTopSolderPaste) ||
               (layer == GraphicsLayer::sBotSolderPaste))) {
-    offset = -mBoard.getDesignRules().calcSolderPasteClearance(
+    offset = -mBoard.getDesignRules().getSolderPasteClearance().calcValue(
         *getSizeForMaskOffsetCalculaton());
   }
   if (offset) {
@@ -408,8 +408,11 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
   } else if (autoAnnular || minimalAnnular) {
     for (const PadHole& hole : mFootprintPad->getHoles()) {
       const UnsignedLength annularWidth = autoAnnular
-          ? mBoard.getDesignRules().calcPadAnnularRing(*hole.getDiameter())
-          : mBoard.getDesignRules().getPadAnnularRingMin();  // Min. Annular
+          ? mBoard.getDesignRules().getPadAnnularRing().calcValue(
+                *hole.getDiameter())
+          : mBoard.getDesignRules()
+                .getPadAnnularRing()
+                .getMinValue();  // Min. Annular
       result.append(PadGeometry::stroke(
           hole.getDiameter() + annularWidth + annularWidth, hole.getPath(),
           PadHoleList{std::make_shared<PadHole>(hole)}));

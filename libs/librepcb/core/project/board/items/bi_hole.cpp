@@ -136,7 +136,8 @@ void BI_Hole::updateAutoStopMaskOffset() noexcept {
 }
 
 UnsignedLength BI_Hole::getAutoStopMaskOffset() const noexcept {
-  return mBoard.getDesignRules().calcStopMaskClearance(*mHole->getDiameter());
+  return mBoard.getDesignRules().getStopMaskClearance().calcValue(
+      *mHole->getDiameter());
 }
 
 /*******************************************************************************

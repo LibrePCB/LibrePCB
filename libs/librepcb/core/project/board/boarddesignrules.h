@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../types/boundedunsignedratio.h"
 #include "../../types/length.h"
-#include "../../types/ratio.h"
 
 #include <QtCore>
 
@@ -56,25 +56,13 @@ public:
   const UnsignedLength& getStopMaskMaxViaDiameter() const noexcept {
     return mStopMaskMaxViaDrillDiameter;
   }
-  const UnsignedRatio& getStopMaskClearanceRatio() const noexcept {
-    return mStopMaskClearanceRatio;
-  }
-  const UnsignedLength& getStopMaskClearanceMin() const noexcept {
-    return mStopMaskClearanceMin;
-  }
-  const UnsignedLength& getStopMaskClearanceMax() const noexcept {
-    return mStopMaskClearanceMax;
+  const BoundedUnsignedRatio& getStopMaskClearance() const noexcept {
+    return mStopMaskClearance;
   }
 
   // Getters: Solder Paste
-  const UnsignedRatio& getSolderPasteClearanceRatio() const noexcept {
-    return mSolderPasteClearanceRatio;
-  }
-  const UnsignedLength& getSolderPasteClearanceMin() const noexcept {
-    return mSolderPasteClearanceMin;
-  }
-  const UnsignedLength& getSolderPasteClearanceMax() const noexcept {
-    return mSolderPasteClearanceMax;
+  const BoundedUnsignedRatio& getSolderPasteClearance() const noexcept {
+    return mSolderPasteClearance;
   }
 
   // Getters: Pad Annular Ring
@@ -84,43 +72,37 @@ public:
   bool getPadInnerAutoAnnularRing() const noexcept {
     return mPadInnerAutoAnnularRing;
   }
-  const UnsignedRatio& getPadAnnularRingRatio() const noexcept {
-    return mPadAnnularRingRatio;
-  }
-  const UnsignedLength& getPadAnnularRingMin() const noexcept {
-    return mPadAnnularRingMin;
-  }
-  const UnsignedLength& getPadAnnularRingMax() const noexcept {
-    return mPadAnnularRingMax;
+  const BoundedUnsignedRatio& getPadAnnularRing() const noexcept {
+    return mPadAnnularRing;
   }
 
   // Getters: Via Annular Ring
-  const UnsignedRatio& getViaAnnularRingRatio() const noexcept {
-    return mViaAnnularRingRatio;
-  }
-  const UnsignedLength& getViaAnnularRingMin() const noexcept {
-    return mViaAnnularRingMin;
-  }
-  const UnsignedLength& getViaAnnularRingMax() const noexcept {
-    return mViaAnnularRingMax;
+  const BoundedUnsignedRatio& getViaAnnularRing() const noexcept {
+    return mViaAnnularRing;
   }
 
   // Setters
   void setStopMaskMaxViaDiameter(const UnsignedLength& dia) noexcept {
     mStopMaskMaxViaDrillDiameter = dia;
   }
-  void setStopMaskClearance(const UnsignedRatio& ratio,
-                            const UnsignedLength& min,
-                            const UnsignedLength& max);
-  void setSolderPasteClearance(const UnsignedRatio& ratio,
-                               const UnsignedLength& min,
-                               const UnsignedLength& max);
-  void setPadCmpSideAutoAnnularRing(bool enabled) noexcept;
-  void setPadInnerAutoAnnularRing(bool enabled) noexcept;
-  void setPadAnnularRing(const UnsignedRatio& ratio, const UnsignedLength& min,
-                         const UnsignedLength& max);
-  void setViaAnnularRing(const UnsignedRatio& ratio, const UnsignedLength& min,
-                         const UnsignedLength& max);
+  void setStopMaskClearance(const BoundedUnsignedRatio& value) noexcept {
+    mStopMaskClearance = value;
+  }
+  void setSolderPasteClearance(const BoundedUnsignedRatio& value) noexcept {
+    mSolderPasteClearance = value;
+  }
+  void setPadCmpSideAutoAnnularRing(bool enabled) noexcept {
+    mPadCmpSideAutoAnnularRing = enabled;
+  }
+  void setPadInnerAutoAnnularRing(bool enabled) noexcept {
+    mPadInnerAutoAnnularRing = enabled;
+  }
+  void setPadAnnularRing(const BoundedUnsignedRatio& value) {
+    mPadAnnularRing = value;
+  }
+  void setViaAnnularRing(const BoundedUnsignedRatio& value) {
+    mViaAnnularRing = value;
+  }
 
   // General Methods
   void restoreDefaults() noexcept;
@@ -134,10 +116,6 @@ public:
 
   // Helper Methods
   bool doesViaRequireStopMask(const Length& drillDia) const noexcept;
-  UnsignedLength calcStopMaskClearance(const Length& padSize) const noexcept;
-  UnsignedLength calcSolderPasteClearance(const Length& padSize) const noexcept;
-  UnsignedLength calcPadAnnularRing(const Length& drillDia) const noexcept;
-  UnsignedLength calcViaAnnularRing(const Length& drillDia) const noexcept;
 
   // Operator Overloadings
   BoardDesignRules& operator=(const BoardDesignRules& rhs) noexcept;
@@ -152,26 +130,18 @@ private:  // Methods
 private:  // Data
   // Stop Mask
   UnsignedLength mStopMaskMaxViaDrillDiameter;
-  UnsignedRatio mStopMaskClearanceRatio;
-  UnsignedLength mStopMaskClearanceMin;
-  UnsignedLength mStopMaskClearanceMax;
+  BoundedUnsignedRatio mStopMaskClearance;
 
   // Solder Paste
-  UnsignedRatio mSolderPasteClearanceRatio;
-  UnsignedLength mSolderPasteClearanceMin;
-  UnsignedLength mSolderPasteClearanceMax;
+  BoundedUnsignedRatio mSolderPasteClearance;
 
   // Pad Annular Ring
   bool mPadCmpSideAutoAnnularRing;
   bool mPadInnerAutoAnnularRing;
-  UnsignedRatio mPadAnnularRingRatio;  /// Percentage of the drill diameter
-  UnsignedLength mPadAnnularRingMin;
-  UnsignedLength mPadAnnularRingMax;
+  BoundedUnsignedRatio mPadAnnularRing;  /// Percentage of the drill diameter
 
   // Via Annular Ring
-  UnsignedRatio mViaAnnularRingRatio;  /// Percentage of the drill diameter
-  UnsignedLength mViaAnnularRingMin;
-  UnsignedLength mViaAnnularRingMax;
+  BoundedUnsignedRatio mViaAnnularRing;  /// Percentage of the drill diameter
 };
 
 /*******************************************************************************

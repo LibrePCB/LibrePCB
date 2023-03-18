@@ -91,8 +91,8 @@ BoardPainter::BoardPainter(const Board& board)
       if (hole.getStopMaskConfig().isEnabled() &&
           (!hole.getStopMaskConfig().getOffset())) {
         // Calculate stop mask offset now to avoid needing design rules later.
-        hole.setStopMaskConfig(
-            MaskConfig::manual(*board.getDesignRules().calcStopMaskClearance(
+        hole.setStopMaskConfig(MaskConfig::manual(
+            *board.getDesignRules().getStopMaskClearance().calcValue(
                 *hole.getDiameter())));
       }
       fpt.holes.append(hole);

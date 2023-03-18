@@ -425,6 +425,8 @@ add_library(
   types/alignment.h
   types/angle.cpp
   types/angle.h
+  types/boundedunsignedratio.cpp
+  types/boundedunsignedratio.h
   types/circuitidentifier.h
   types/elementname.h
   types/length.cpp

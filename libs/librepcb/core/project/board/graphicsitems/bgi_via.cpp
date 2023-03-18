@@ -90,7 +90,8 @@ void BGI_Via::updateCacheAndRepaint() noexcept {
   mDrawStopMask = mVia.getBoard().getDesignRules().doesViaRequireStopMask(
       *mVia.getDrillDiameter());
   UnsignedLength stopMaskClearance =
-      mVia.getBoard().getDesignRules().calcStopMaskClearance(*mVia.getSize());
+      mVia.getBoard().getDesignRules().getStopMaskClearance().calcValue(
+          *mVia.getSize());
 
   // set shapes and bounding rect
   mShape = mVia.getVia().getOutline().toQPainterPathPx();

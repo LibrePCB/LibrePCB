@@ -178,7 +178,7 @@ void BGI_Device::updateBoardSide() noexcept {
 void BGI_Device::updateDesignRules() noexcept {
   foreach (const auto& i, mHoleGraphicsItems) {
     i->setAutoStopMaskOffset(
-        *mDevice.getBoard().getDesignRules().calcStopMaskClearance(
+        *mDevice.getBoard().getDesignRules().getStopMaskClearance().calcValue(
             *i->getHole().getDiameter()));
   }
 }

@@ -641,7 +641,8 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
     PositiveLength outerDiameter = via.getSize();
     UnsignedLength radius(0);
     if (drawStopMask) {
-      radius = mBoard.getDesignRules().calcStopMaskClearance(*via.getSize());
+      radius = mBoard.getDesignRules().getStopMaskClearance().calcValue(
+          *via.getSize());
       outerDiameter += UnsignedLength(radius * 2);
     }
 
@@ -738,7 +739,7 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
       if (hole.getStopMaskConfig().isEnabled()) {
         const Length offset = hole.getStopMaskConfig().getOffset()
             ? (*hole.getStopMaskConfig().getOffset())
-            : (*mBoard.getDesignRules().calcStopMaskClearance(
+            : (*mBoard.getDesignRules().getStopMaskClearance().calcValue(
                   *hole.getDiameter()));
         const Length diameter = hole.getDiameter() + offset + offset;
         const Path path = transform.map(hole.getPath()->cleaned());
