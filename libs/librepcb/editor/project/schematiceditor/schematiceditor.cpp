@@ -224,9 +224,6 @@ SchematicEditor::~SchematicEditor() {
   // Important: Release command toolbar proxy since otherwise the actions will
   // be deleted first.
   mCommandToolBarProxy->setToolBar(nullptr);
-
-  qDeleteAll(mLayers);
-  mLayers.clear();
 }
 
 /*******************************************************************************
@@ -340,9 +337,9 @@ void SchematicEditor::closeEvent(QCloseEvent* event) noexcept {
 void SchematicEditor::addLayers(const Theme& theme) noexcept {
   auto addLayer = [this, &theme](const QString& name) {
     const ThemeColor& color = theme.getColor(name);
-    mLayers.append(new GraphicsLayer(name, color.getNameTr(),
-                                     color.getPrimaryColor(),
-                                     color.getSecondaryColor()));
+    mLayers.append(std::make_shared<GraphicsLayer>(name, color.getNameTr(),
+                                                   color.getPrimaryColor(),
+                                                   color.getSecondaryColor()));
   };
 
   addLayer(Theme::Color::sSchematicReferences);

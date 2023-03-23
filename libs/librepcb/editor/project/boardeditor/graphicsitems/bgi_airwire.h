@@ -78,7 +78,7 @@ private:  // Methods
 private:  // Data
   BI_AirWire& mAirWire;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  GraphicsLayer* mLayer;
+  std::shared_ptr<GraphicsLayer> mLayer;
 
   // Cached Attributes
   QVector<QLineF> mLines;

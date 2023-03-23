@@ -198,8 +198,8 @@ void SGI_SymbolPin::updateJunction() noexcept {
   Q_ASSERT(mCircleGraphicsItem);
 
   bool isConnected = mPin.getCompSigInstNetSignal();
-  const GraphicsLayer* lineLayer = nullptr;
-  const GraphicsLayer* fillLayer = nullptr;
+  std::shared_ptr<GraphicsLayer> lineLayer = nullptr;
+  std::shared_ptr<GraphicsLayer> fillLayer = nullptr;
   if (mPin.isVisibleJunction()) {
     fillLayer = mLayerProvider.getLayer(Theme::Color::sSchematicWires);
   } else if ((!isConnected) && mPin.isRequired()) {

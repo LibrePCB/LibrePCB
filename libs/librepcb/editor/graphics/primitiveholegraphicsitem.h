@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -74,7 +76,7 @@ private:  // Methods
                       const QVariant& value) noexcept override;
 
 private:  // Data
-  const GraphicsLayer* mHoleLayer;
+  std::shared_ptr<GraphicsLayer> mHoleLayer;
   QScopedPointer<PrimitivePathGraphicsItem> mHoleGraphicsItem;
   QScopedPointer<PrimitivePathGraphicsItem> mStopMaskGraphicsItemBot;
   QScopedPointer<PrimitivePathGraphicsItem> mStopMaskGraphicsItemTop;

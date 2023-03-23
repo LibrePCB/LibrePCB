@@ -83,9 +83,9 @@ private:  // Data
   // General Attributes
   BI_Via& mVia;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  GraphicsLayer* mViaLayer;
-  GraphicsLayer* mTopStopMaskLayer;
-  GraphicsLayer* mBottomStopMaskLayer;
+  std::shared_ptr<GraphicsLayer> mViaLayer;
+  std::shared_ptr<GraphicsLayer> mTopStopMaskLayer;
+  std::shared_ptr<GraphicsLayer> mBottomStopMaskLayer;
 
   // Cached Attributes
   bool mDrawStopMask;

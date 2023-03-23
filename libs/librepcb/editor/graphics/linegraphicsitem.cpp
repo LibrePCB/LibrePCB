@@ -77,7 +77,8 @@ void LineGraphicsItem::setLineWidth(const UnsignedLength& width) noexcept {
   updateBoundingRectAndShape();
 }
 
-void LineGraphicsItem::setLayer(const GraphicsLayer* layer) noexcept {
+void LineGraphicsItem::setLayer(
+    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
@@ -130,9 +131,6 @@ void LineGraphicsItem::layerEdited(const GraphicsLayer& layer,
     case GraphicsLayer::Event::VisibleChanged:
     case GraphicsLayer::Event::EnabledChanged:
       setVisible(layer.isVisible() && layer.isEnabled());
-      break;
-    case GraphicsLayer::Event::Destroyed:
-      setLayer(nullptr);
       break;
     default:
       qWarning() << "Unhandled switch-case in LineGraphicsItem::layerEdited():"

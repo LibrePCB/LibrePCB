@@ -241,8 +241,6 @@ LibraryEditor::~LibraryEditor() noexcept {
   setActiveEditorWidget(nullptr);
   mLibrary = nullptr;
   closeAllTabs(true, false);
-  qDeleteAll(mLayers);
-  mLayers.clear();
 }
 
 /*******************************************************************************
@@ -1059,9 +1057,9 @@ bool LibraryEditor::closeAllTabs(bool withNonClosable,
 void LibraryEditor::addLayer(const QString& name) noexcept {
   const Theme& theme = mWorkspace.getSettings().themes.getActive();
   const ThemeColor& color = theme.getColor(name);
-  mLayers.append(new GraphicsLayer(name, color.getNameTr(),
-                                   color.getPrimaryColor(),
-                                   color.getSecondaryColor()));
+  mLayers.append(std::make_shared<GraphicsLayer>(name, color.getNameTr(),
+                                                 color.getPrimaryColor(),
+                                                 color.getSecondaryColor()));
 }
 
 /*******************************************************************************

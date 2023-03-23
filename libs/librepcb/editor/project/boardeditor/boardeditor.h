@@ -91,8 +91,9 @@ public:
   }
 
   /// @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
-  virtual GraphicsLayer* getLayer(const QString& name) const noexcept override {
-    foreach (GraphicsLayer* layer, mLayers) {
+  virtual std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const
+      noexcept override {
+    foreach (const std::shared_ptr<GraphicsLayer>& layer, mLayers) {
       if (layer->getName() == name) {
         return layer;
       }
@@ -100,7 +101,7 @@ public:
     return nullptr;
   }
 
-  QList<GraphicsLayer*> getAllLayers() const noexcept override {
+  QList<std::shared_ptr<GraphicsLayer>> getAllLayers() const noexcept override {
     return mLayers;
   }
 
@@ -170,7 +171,7 @@ private:
 
   // Misc
   QPointer<Board> mActiveBoard;
-  QList<GraphicsLayer*> mLayers;
+  QList<std::shared_ptr<GraphicsLayer>> mLayers;
   QScopedPointer<BoardGraphicsScene> mGraphicsScene;
   QHash<Uuid, QRectF> mVisibleSceneRect;
   QScopedPointer<BoardEditorFsm> mFsm;

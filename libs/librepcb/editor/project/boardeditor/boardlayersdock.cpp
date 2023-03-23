@@ -63,8 +63,8 @@ BoardLayersDock::~BoardLayersDock() noexcept {
  ******************************************************************************/
 
 void BoardLayersDock::on_listWidget_itemChanged(QListWidgetItem* item) {
-  const QString layerName = item->data(Qt::UserRole).toString();
-  if (GraphicsLayer* layer = mLayerProvider.getLayer(layerName)) {
+  const QString name = item->data(Qt::UserRole).toString();
+  if (std::shared_ptr<GraphicsLayer> layer = mLayerProvider.getLayer(name)) {
     layer->setVisible(item->checkState() == Qt::Checked);
   }
 }
@@ -113,7 +113,6 @@ void BoardLayersDock::layerEdited(const GraphicsLayer& layer,
       QTimer::singleShot(10, this, &BoardLayersDock::updateListWidget);
       break;
     case GraphicsLayer::Event::HighlightColorChanged:
-    case GraphicsLayer::Event::Destroyed:
       break;
     default:
       qWarning() << "Unhandled switch-case in "
@@ -137,7 +136,7 @@ void BoardLayersDock::updateListWidget() noexcept {
   }
   for (int i = 0; i < layerNames.count(); i++) {
     QString layerName = layerNames.at(i);
-    GraphicsLayer* layer = mLayerProvider.getLayer(layerName);
+    std::shared_ptr<GraphicsLayer> layer = mLayerProvider.getLayer(layerName);
     Q_ASSERT(layer);
     QListWidgetItem* item = nullptr;
     if (simpleUpdate) {

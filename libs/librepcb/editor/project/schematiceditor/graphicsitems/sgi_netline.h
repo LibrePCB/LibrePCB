@@ -72,12 +72,12 @@ private:  // Methods
   void netLineEdited(const SI_NetLine& obj, SI_NetLine::Event event) noexcept;
   void updatePositions() noexcept;
   void updateNetSignalName() noexcept;
-  GraphicsLayer* getLayer(const QString& name) const noexcept;
+  std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const noexcept;
 
 private:  // Data
   SI_NetLine& mNetLine;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  GraphicsLayer* mLayer;
+  std::shared_ptr<GraphicsLayer> mLayer;
 
   // Cached Attributes
   QLineF mLineF;

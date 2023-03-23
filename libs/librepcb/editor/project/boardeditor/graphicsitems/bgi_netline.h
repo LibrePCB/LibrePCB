@@ -84,7 +84,7 @@ private:  // Data
   BI_NetLine& mNetLine;
   const IF_GraphicsLayerProvider& mLayerProvider;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  GraphicsLayer* mLayer;
+  std::shared_ptr<GraphicsLayer> mLayer;
 
   // Cached Attributes
   QLineF mLineF;

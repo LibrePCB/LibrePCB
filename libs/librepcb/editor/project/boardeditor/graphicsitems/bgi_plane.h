@@ -112,7 +112,7 @@ private:  // Data
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
 
   // Cached Attributes
-  GraphicsLayer* mLayer;
+  std::shared_ptr<GraphicsLayer> mLayer;
   QRectF mBoundingRect;
   qreal mBoundingRectMarginPx;
   QPainterPath mShape;

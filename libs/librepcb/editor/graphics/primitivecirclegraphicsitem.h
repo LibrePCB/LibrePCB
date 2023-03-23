@@ -70,8 +70,8 @@ public:
   void setPosition(const Point& pos) noexcept;
   void setDiameter(const UnsignedLength& dia) noexcept;
   void setLineWidth(const UnsignedLength& width) noexcept;
-  void setLineLayer(const GraphicsLayer* layer) noexcept;
-  void setFillLayer(const GraphicsLayer* layer) noexcept;
+  void setLineLayer(const std::shared_ptr<GraphicsLayer>& layer) noexcept;
+  void setFillLayer(const std::shared_ptr<GraphicsLayer>& layer) noexcept;
   void setShapeMode(ShapeMode mode) noexcept;
 
   // Inherited from QGraphicsItem
@@ -94,8 +94,8 @@ private:  // Methods
   void updateVisibility() noexcept;
 
 private:  // Data
-  const GraphicsLayer* mLineLayer;
-  const GraphicsLayer* mFillLayer;
+  std::shared_ptr<GraphicsLayer> mLineLayer;
+  std::shared_ptr<GraphicsLayer> mFillLayer;
   ShapeMode mShapeMode;
   QPen mPen;
   QPen mPenHighlighted;

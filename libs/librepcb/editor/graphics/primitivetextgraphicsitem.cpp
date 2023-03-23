@@ -118,7 +118,8 @@ void PrimitiveTextGraphicsItem::setFont(Font font) noexcept {
   updateBoundingRectAndShape();
 }
 
-void PrimitiveTextGraphicsItem::setLayer(const GraphicsLayer* layer) noexcept {
+void PrimitiveTextGraphicsItem::setLayer(
+    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
@@ -174,9 +175,6 @@ void PrimitiveTextGraphicsItem::layerEdited(
     case GraphicsLayer::Event::VisibleChanged:
     case GraphicsLayer::Event::EnabledChanged:
       setVisible(layer.isVisible() && layer.isEnabled());
-      break;
-    case GraphicsLayer::Event::Destroyed:
-      setLayer(nullptr);
       break;
     default:
       qWarning() << "Unhandled switch-case in "

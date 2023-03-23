@@ -90,13 +90,13 @@ private:  // Methods
 
 private:  // Data
   const IF_GraphicsLayerProvider& mLayerProvider;
-  GraphicsLayer* mCopperLayer;
+  std::shared_ptr<GraphicsLayer> mCopperLayer;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
-  QVector<std::tuple<const GraphicsLayer*, bool,
+  QVector<std::tuple<std::shared_ptr<GraphicsLayer>, bool,
                      std::shared_ptr<PrimitivePathGraphicsItem>>>
       mPathGraphicsItems;
-  QHash<GraphicsLayer*, QPainterPath> mShapes;
+  QMap<std::shared_ptr<GraphicsLayer>, QPainterPath> mShapes;
   QRectF mShapesBoundingRect;
 
   // Slots

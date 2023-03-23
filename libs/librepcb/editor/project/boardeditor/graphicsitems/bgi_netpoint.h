@@ -79,7 +79,7 @@ private:  // Data
   // General Attributes
   BI_NetPoint& mNetPoint;
   const IF_GraphicsLayerProvider& mLayerProvider;
-  GraphicsLayer* mLayer;
+  std::shared_ptr<GraphicsLayer> mLayer;
 
   // Cached Attributes
   QRectF mBoundingRect;

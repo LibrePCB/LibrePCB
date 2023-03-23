@@ -584,9 +584,9 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
 
     // Sanity check that the chosen layer is really visible, but this should
     // always be the case anyway.
-    const GraphicsLayer* polygonLayer =
+    std::shared_ptr<GraphicsLayer> polygonLayer =
         mContext.editorContext.layerProvider.getLayer(dialog.getLayer());
-    const GraphicsLayer* holeLayer =
+    std::shared_ptr<GraphicsLayer> holeLayer =
         mContext.editorContext.layerProvider.getLayer(
             Theme::Color::sBoardHoles);
     if ((!polygonLayer) || (!polygonLayer->isVisible()) || (!holeLayer) ||

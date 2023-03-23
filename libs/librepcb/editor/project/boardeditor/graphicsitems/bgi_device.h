@@ -88,12 +88,12 @@ private:  // Methods
   void updateRotationAndMirrored() noexcept;
   void updateBoardSide() noexcept;
   void updateHoleStopMaskOffsets() noexcept;
-  GraphicsLayer* getLayer(const Layer& layer) const noexcept;
+  std::shared_ptr<GraphicsLayer> getLayer(const Layer& layer) const noexcept;
 
 private:  // Data
   BI_Device& mDevice;
   const IF_GraphicsLayerProvider& mLayerProvider;
-  const GraphicsLayer* mGrabAreaLayer;
+  std::shared_ptr<GraphicsLayer> mGrabAreaLayer;
   std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;
   QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mPolygonGraphicsItems;

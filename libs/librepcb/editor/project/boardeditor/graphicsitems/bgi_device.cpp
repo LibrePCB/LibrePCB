@@ -157,7 +157,6 @@ void BGI_Device::layerEdited(const GraphicsLayer& layer,
   switch (event) {
     case GraphicsLayer::Event::ColorChanged:
     case GraphicsLayer::Event::HighlightColorChanged:
-    case GraphicsLayer::Event::Destroyed:
       break;
     case GraphicsLayer::Event::VisibleChanged:
     case GraphicsLayer::Event::EnabledChanged:
@@ -210,7 +209,7 @@ void BGI_Device::updateBoardSide() noexcept {
   }
 
   // Update grab area layer.
-  GraphicsLayer* grabAreaLayer =
+  std::shared_ptr<GraphicsLayer> grabAreaLayer =
       mLayerProvider.getLayer(top ? Theme::Color::sBoardGrabAreasTop
                                   : Theme::Color::sBoardGrabAreasBot);
   if (grabAreaLayer != mGrabAreaLayer) {
@@ -272,7 +271,8 @@ void BGI_Device::updateHoleStopMaskOffsets() noexcept {
   }
 }
 
-GraphicsLayer* BGI_Device::getLayer(const Layer& layer) const noexcept {
+std::shared_ptr<GraphicsLayer> BGI_Device::getLayer(const Layer& layer) const
+    noexcept {
   return mLayerProvider.getLayer(mDevice.getMirrored()
                                      ? layer.mirrored().getThemeColor()
                                      : layer.getThemeColor());

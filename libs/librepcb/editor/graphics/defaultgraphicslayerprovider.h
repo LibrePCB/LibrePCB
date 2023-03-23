@@ -51,15 +51,16 @@ public:
   ~DefaultGraphicsLayerProvider() noexcept;
 
   // Getters
-  GraphicsLayer* getLayer(const QString& name) const noexcept override;
-  QList<GraphicsLayer*> getAllLayers() const noexcept override {
+  std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const
+      noexcept override;
+  QList<std::shared_ptr<GraphicsLayer>> getAllLayers() const noexcept override {
     return mLayers;
   }
 
 private:
   void addLayer(const Theme& theme, const QString& name) noexcept;
 
-  QList<GraphicsLayer*> mLayers;
+  QList<std::shared_ptr<GraphicsLayer>> mLayers;
 };
 
 /*******************************************************************************

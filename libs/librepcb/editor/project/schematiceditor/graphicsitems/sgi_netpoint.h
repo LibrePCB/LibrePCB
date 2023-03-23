@@ -77,7 +77,7 @@ private:  // Methods
 private:  // Data
   SI_NetPoint& mNetPoint;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  GraphicsLayer* mLayer;
+  std::shared_ptr<GraphicsLayer> mLayer;
 
   // Cached Attributes
   bool mIsVisibleJunction;

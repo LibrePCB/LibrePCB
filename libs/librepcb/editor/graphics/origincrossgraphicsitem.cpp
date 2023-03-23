@@ -73,7 +73,8 @@ void OriginCrossGraphicsItem::setSize(const UnsignedLength& size) noexcept {
   updateBoundingRectAndShape();
 }
 
-void OriginCrossGraphicsItem::setLayer(const GraphicsLayer* layer) noexcept {
+void OriginCrossGraphicsItem::setLayer(
+    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
@@ -126,9 +127,6 @@ void OriginCrossGraphicsItem::layerEdited(const GraphicsLayer& layer,
     case GraphicsLayer::Event::VisibleChanged:
     case GraphicsLayer::Event::EnabledChanged:
       setVisible(layer.isVisible() && layer.isEnabled());
-      break;
-    case GraphicsLayer::Event::Destroyed:
-      setLayer(nullptr);
       break;
     default:
       qWarning()

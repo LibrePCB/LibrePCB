@@ -139,7 +139,7 @@ void StrokeTextGraphicsItem::strokeTextEdited(
 }
 
 void StrokeTextGraphicsItem::updateLayer(const Layer& layer) noexcept {
-  const GraphicsLayer* obj = mLayerProvider.getLayer(layer);
+  std::shared_ptr<GraphicsLayer> obj = mLayerProvider.getLayer(layer);
   mPathGraphicsItem->setLineLayer(obj);
   mOriginCrossGraphicsItem->setLayer(obj);
 }

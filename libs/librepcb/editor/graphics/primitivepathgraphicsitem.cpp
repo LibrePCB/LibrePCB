@@ -86,7 +86,7 @@ void PrimitivePathGraphicsItem::setLineWidth(
 }
 
 void PrimitivePathGraphicsItem::setLineLayer(
-    const GraphicsLayer* layer) noexcept {
+    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
   if (mLineLayer) {
     mLineLayer->onEdited.detach(mOnLayerEditedSlot);
   }
@@ -100,7 +100,7 @@ void PrimitivePathGraphicsItem::setLineLayer(
 }
 
 void PrimitivePathGraphicsItem::setFillLayer(
-    const GraphicsLayer* layer) noexcept {
+    const std::shared_ptr<GraphicsLayer>& layer) noexcept {
   if (mFillLayer) {
     mFillLayer->onEdited.detach(mOnLayerEditedSlot);
   }
@@ -147,6 +147,7 @@ void PrimitivePathGraphicsItem::paint(QPainter* painter,
 
 void PrimitivePathGraphicsItem::layerEdited(
     const GraphicsLayer& layer, GraphicsLayer::Event event) noexcept {
+  Q_UNUSED(layer);
   switch (event) {
     case GraphicsLayer::Event::ColorChanged:
     case GraphicsLayer::Event::HighlightColorChanged:
@@ -154,15 +155,6 @@ void PrimitivePathGraphicsItem::layerEdited(
     case GraphicsLayer::Event::EnabledChanged:
       updateColors();
       updateVisibility();
-      break;
-    case GraphicsLayer::Event::Destroyed:
-      if (&layer == mLineLayer) {
-        setLineLayer(nullptr);
-      } else if (&layer == mFillLayer) {
-        setFillLayer(nullptr);
-      } else {
-        Q_ASSERT(false);
-      }
       break;
     default:
       qWarning() << "Unhandled switch-case in "

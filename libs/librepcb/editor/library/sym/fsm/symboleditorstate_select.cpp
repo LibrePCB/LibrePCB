@@ -541,7 +541,7 @@ bool SymbolEditorState_Select::processImportDxf() noexcept {
 
     // Sanity check that the chosen layer is really visible, but this should
     // always be the case anyway.
-    const GraphicsLayer* layer =
+    std::shared_ptr<GraphicsLayer> layer =
         mContext.editorContext.layerProvider.getLayer(dialog.getLayer());
     if ((!layer) || (!layer->isVisible())) {
       throw LogicError(__FILE__, __LINE__, "Layer is not visible!");  // no tr()

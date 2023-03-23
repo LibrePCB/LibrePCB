@@ -201,9 +201,6 @@ BoardEditor::~BoardEditor() {
   mCommandToolBarProxy->setToolBar(nullptr);
 
   mFsm.reset();
-
-  qDeleteAll(mLayers);
-  mLayers.clear();
 }
 
 /*******************************************************************************
@@ -359,11 +356,11 @@ void BoardEditor::on_lblUnplacedComponentsNote_linkActivated() {
 void BoardEditor::addLayers(const Theme& theme) noexcept {
   auto addLayer = [this, &theme](const QString& name, bool visible) {
     const ThemeColor& color = theme.getColor(name);
-    QScopedPointer<GraphicsLayer> layer(
-        new GraphicsLayer(name, color.getNameTr(), color.getPrimaryColor(),
-                          color.getSecondaryColor()));
+    auto layer = std::make_shared<GraphicsLayer>(name, color.getNameTr(),
+                                                 color.getPrimaryColor(),
+                                                 color.getSecondaryColor());
     layer->setVisible(visible);
-    mLayers.append(layer.take());
+    mLayers.append(layer);
   };
 
   // asymmetric board layers
@@ -421,7 +418,8 @@ void BoardEditor::addLayers(const Theme& theme) noexcept {
 void BoardEditor::updateEnabledCopperLayers() noexcept {
   if (Board* board = getActiveBoard()) {
     foreach (const Layer* layer, Layer::innerCopper()) {
-      if (GraphicsLayer* gLayer = IF_GraphicsLayerProvider::getLayer(*layer)) {
+      if (std::shared_ptr<GraphicsLayer> gLayer =
+              IF_GraphicsLayerProvider::getLayer(*layer)) {
         gLayer->setEnabled(board->getCopperLayers().contains(layer));
       }
     }
@@ -430,7 +428,7 @@ void BoardEditor::updateEnabledCopperLayers() noexcept {
 
 void BoardEditor::loadLayersVisibility() noexcept {
   if (Board* board = getActiveBoard()) {
-    foreach (GraphicsLayer* layer, mLayers) {
+    foreach (std::shared_ptr<GraphicsLayer> layer, mLayers) {
       if (board->getLayersVisibility().contains(layer->getName())) {
         layer->setVisible(board->getLayersVisibility().value(layer->getName()));
       }
@@ -441,7 +439,7 @@ void BoardEditor::loadLayersVisibility() noexcept {
 void BoardEditor::storeLayersVisibility() noexcept {
   if (Board* board = getActiveBoard()) {
     QMap<QString, bool> visibility;
-    foreach (GraphicsLayer* layer, mLayers) {
+    foreach (std::shared_ptr<GraphicsLayer> layer, mLayers) {
       if (layer->isEnabled()) {
         visibility[layer->getName()] = layer->isVisible();
       }

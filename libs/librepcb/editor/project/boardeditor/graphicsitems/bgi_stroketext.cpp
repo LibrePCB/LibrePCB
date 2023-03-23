@@ -182,7 +182,7 @@ void BGI_StrokeText::updateLayer() noexcept {
   setZValue(static_cast<qreal>(zValue));
   mAnchorGraphicsItem->setZValue(static_cast<qreal>(zValue));
 
-  const GraphicsLayer* layer =
+  std::shared_ptr<GraphicsLayer> layer =
       mLayerProvider.getLayer(mText.getTextObj().getLayer());
   mPathGraphicsItem->setLineLayer(layer);
   mOriginCrossGraphicsItem->setLayer(layer);

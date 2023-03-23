@@ -62,7 +62,6 @@ GraphicsLayer::GraphicsLayer(const QString& name, const QString& nameTr,
 }
 
 GraphicsLayer::~GraphicsLayer() noexcept {
-  onEdited.notify(Event::Destroyed);
 }
 
 /*******************************************************************************
@@ -101,12 +100,12 @@ void GraphicsLayer::setEnabled(bool enable) noexcept {
  *  Class IF_GraphicsLayerProvider
  ******************************************************************************/
 
-GraphicsLayer* IF_GraphicsLayerProvider::getLayer(const Layer& layer) const
-    noexcept {
+std::shared_ptr<GraphicsLayer> IF_GraphicsLayerProvider::getLayer(
+    const Layer& layer) const noexcept {
   return getLayer(layer.getThemeColor());
 }
 
-GraphicsLayer* IF_GraphicsLayerProvider::getGrabAreaLayer(
+std::shared_ptr<GraphicsLayer> IF_GraphicsLayerProvider::getGrabAreaLayer(
     const Layer& outlineLayer) const noexcept {
   return getLayer(Theme::getGrabAreaColorName(outlineLayer.getThemeColor()));
 }

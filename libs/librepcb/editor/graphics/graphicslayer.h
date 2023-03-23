@@ -28,6 +28,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <memory>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -58,7 +60,6 @@ public:
     HighlightColorChanged,
     VisibleChanged,
     EnabledChanged,
-    Destroyed,
   };
   Signal<GraphicsLayer, Event> onEdited;
   typedef Slot<GraphicsLayer, Event> OnEditedSlot;
@@ -110,10 +111,13 @@ protected:  // Data
 class IF_GraphicsLayerProvider {
 public:
   virtual ~IF_GraphicsLayerProvider() noexcept {}
-  virtual QList<GraphicsLayer*> getAllLayers() const noexcept = 0;
-  virtual GraphicsLayer* getLayer(const QString& name) const noexcept = 0;
-  GraphicsLayer* getLayer(const Layer& layer) const noexcept;
-  GraphicsLayer* getGrabAreaLayer(const Layer& outlineLayer) const noexcept;
+  virtual QList<std::shared_ptr<GraphicsLayer>> getAllLayers() const
+      noexcept = 0;
+  virtual std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const
+      noexcept = 0;
+  std::shared_ptr<GraphicsLayer> getLayer(const Layer& layer) const noexcept;
+  std::shared_ptr<GraphicsLayer> getGrabAreaLayer(
+      const Layer& outlineLayer) const noexcept;
 };
 
 /*******************************************************************************

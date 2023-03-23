@@ -81,8 +81,8 @@ private:  // Methods
 private:  // Data
   SI_NetLabel& mNetLabel;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
-  const GraphicsLayer* mOriginCrossLayer;
-  const GraphicsLayer* mNetLabelLayer;
+  std::shared_ptr<GraphicsLayer> mOriginCrossLayer;
+  std::shared_ptr<GraphicsLayer> mNetLabelLayer;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
 
   // Cached Attributes

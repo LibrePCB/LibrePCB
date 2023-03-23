@@ -136,8 +136,7 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
   mShapesBoundingRect = QRectF();
   mPathGraphicsItems.clear();
   for (auto it = geometries.begin(); it != geometries.end(); it++) {
-    if (GraphicsLayer* layer =
-            mLayerProvider.getLayer(it.key()->getThemeColor())) {
+    if (auto layer = mLayerProvider.getLayer(it.key()->getThemeColor())) {
       const bool isCopperLayer =
           (layer == mCopperLayer) || (it.key()->isCopper());
       QPainterPath shape;
@@ -219,7 +218,7 @@ void PrimitiveFootprintPadGraphicsItem::layerEdited(
 
 void PrimitiveFootprintPadGraphicsItem::updatePathLayers() noexcept {
   foreach (auto& tuple, mPathGraphicsItems) {
-    const GraphicsLayer* layer =
+    std::shared_ptr<GraphicsLayer> layer =
         std::get<1>(tuple) ? mCopperLayer : std::get<0>(tuple);
     if (std::get<0>(tuple)->isVisible()) {
       std::get<2>(tuple)->setFillLayer(layer);

@@ -108,17 +108,15 @@ DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider(
 }
 
 DefaultGraphicsLayerProvider::~DefaultGraphicsLayerProvider() noexcept {
-  qDeleteAll(mLayers);
-  mLayers.clear();
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
 
-GraphicsLayer* DefaultGraphicsLayerProvider::getLayer(const QString& name) const
-    noexcept {
-  foreach (GraphicsLayer* layer, mLayers) {
+std::shared_ptr<GraphicsLayer> DefaultGraphicsLayerProvider::getLayer(
+    const QString& name) const noexcept {
+  foreach (const std::shared_ptr<GraphicsLayer>& layer, mLayers) {
     if (layer->getName() == name) {
       return layer;
     }
@@ -133,9 +131,9 @@ GraphicsLayer* DefaultGraphicsLayerProvider::getLayer(const QString& name) const
 void DefaultGraphicsLayerProvider::addLayer(const Theme& theme,
                                             const QString& name) noexcept {
   const ThemeColor& color = theme.getColor(name);
-  mLayers.append(new GraphicsLayer(name, color.getNameTr(),
-                                   color.getPrimaryColor(),
-                                   color.getSecondaryColor()));
+  mLayers.append(std::make_shared<GraphicsLayer>(name, color.getNameTr(),
+                                                 color.getPrimaryColor(),
+                                                 color.getSecondaryColor()));
 }
 
 /*******************************************************************************
