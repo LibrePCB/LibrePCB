@@ -174,6 +174,9 @@ public:
     return appendList(child).appendChild(obj);
   }
   void removeChild(const SExpression& child);
+  void removeChildrenWithNodeRecursive(const SExpression& search) noexcept;
+  void replaceRecursive(const SExpression& search,
+                        const SExpression& replace) noexcept;
   QByteArray toByteArray() const;
 
   // Operator Overloadings

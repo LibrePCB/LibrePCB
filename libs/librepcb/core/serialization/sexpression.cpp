@@ -208,6 +208,28 @@ void SExpression::removeChild(const SExpression& child) {
   throw LogicError(__FILE__, __LINE__);
 }
 
+void SExpression::removeChildrenWithNodeRecursive(
+    const SExpression& search) noexcept {
+  for (int i = mChildren.count() - 1; i >= 0; --i) {
+    if (mChildren.at(i).mChildren.contains(search)) {
+      mChildren.removeAt(i);
+    } else {
+      mChildren[i].removeChildrenWithNodeRecursive(search);
+    }
+  }
+}
+
+void SExpression::replaceRecursive(const SExpression& search,
+                                   const SExpression& replace) noexcept {
+  for (SExpression& child : mChildren) {
+    if (child == search) {
+      child = replace;
+    } else {
+      child.replaceRecursive(search, replace);
+    }
+  }
+}
+
 QByteArray SExpression::toByteArray() const {
   QString str = toString(0);  // can throw
   if (!str.endsWith('\n')) {

@@ -82,7 +82,7 @@ const Layer& Layer::mirrored() const noexcept {
  ******************************************************************************/
 
 const Layer& Layer::schematicSheetFrames() noexcept {
-  static Layer layer("sch_scheet_frames", tr("Sheet Frames"),
+  static Layer layer("sch_frames", tr("Sheet Frames"),
                      Theme::Color::sSchematicFrames, Flag::Schematic);
   return layer;
 }
@@ -136,7 +136,7 @@ const Layer& Layer::symbolPinNames() noexcept {
 }
 
 const Layer& Layer::boardSheetFrames() noexcept {
-  static Layer layer("brd_sheet_frames", tr("Sheet Frames"),
+  static Layer layer("brd_frames", tr("Sheet Frames"),
                      Theme::Color::sBoardFrames, Flag::Board);
   return layer;
 }
