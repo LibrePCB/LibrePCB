@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/geometry/text.h>
 #include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/types/layer.h>
 
 /*******************************************************************************
  *  Namespace
@@ -49,7 +50,7 @@ TEST_F(TextTest, testConstructFromSExpression) {
   Text obj(sexpr);
   EXPECT_EQ(Uuid::fromString("eabf43fb-496b-4dc8-8ff7-ffac67991390"),
             obj.getUuid());
-  EXPECT_EQ(GraphicsLayerName("sym_names"), obj.getLayerName());
+  EXPECT_EQ("sym_names", obj.getLayer().getId());
   EXPECT_EQ("{{NAME}}", obj.getText());
   EXPECT_EQ(Alignment(HAlign::center(), VAlign::bottom()), obj.getAlign());
   EXPECT_EQ(PositiveLength(2540000), obj.getHeight());
@@ -58,8 +59,8 @@ TEST_F(TextTest, testConstructFromSExpression) {
 }
 
 TEST_F(TextTest, testSerializeAndDeserialize) {
-  Text obj1(Uuid::createRandom(), GraphicsLayerName("foo"), "foo bar",
-            Point(12, 34), Angle(56), PositiveLength(78),
+  Text obj1(Uuid::createRandom(), Layer::botCopper(), "foo bar", Point(12, 34),
+            Angle(56), PositiveLength(78),
             Alignment(HAlign::right(), VAlign::center()));
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);

@@ -23,7 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/graphics/graphicslayer.h>
+#include "../../../graphics/graphicslayer.h"
+
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 
 #include <QtCore>
@@ -47,7 +48,8 @@ public:
   // Constructors / Destructor
   BGI_NetPoint() = delete;
   BGI_NetPoint(const BGI_NetPoint& other) = delete;
-  explicit BGI_NetPoint(BI_NetPoint& netpoint) noexcept;
+  BGI_NetPoint(BI_NetPoint& netpoint,
+               const IF_GraphicsLayerProvider& lp) noexcept;
   virtual ~BGI_NetPoint() noexcept;
 
   // General Methods
@@ -72,11 +74,11 @@ private:  // Methods
   void updateDiameter() noexcept;
   void updateNetSignalName() noexcept;
   void updateVisibility() noexcept;
-  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 private:  // Data
   // General Attributes
   BI_NetPoint& mNetPoint;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   GraphicsLayer* mLayer;
 
   // Cached Attributes

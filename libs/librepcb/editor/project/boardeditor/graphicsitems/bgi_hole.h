@@ -34,6 +34,7 @@
 namespace librepcb {
 namespace editor {
 
+class IF_GraphicsLayerProvider;
 class PrimitiveHoleGraphicsItem;
 
 /*******************************************************************************
@@ -48,7 +49,7 @@ public:
   // Constructors / Destructor
   BGI_Hole() = delete;
   BGI_Hole(const BGI_Hole& other) = delete;
-  explicit BGI_Hole(BI_Hole& hole) noexcept;
+  BGI_Hole(BI_Hole& hole, const IF_GraphicsLayerProvider& lp) noexcept;
   virtual ~BGI_Hole() noexcept;
 
   // General Methods

@@ -32,10 +32,10 @@
 #include "../../cmd/cmdschematictextadd.h"
 #include "../schematiceditor.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -55,7 +55,7 @@ SchematicEditorState_AddText::SchematicEditorState_AddText(
     mIsUndoCmdActive(false),
     mLastTextProperties(
         Uuid::createRandom(),  // UUID is not relevant here
-        GraphicsLayerName(GraphicsLayer::sSchematicComments),  // Layer
+        Layer::schematicComments(),  // Layer
         "{{PROJECT}}",  // Text
         Point(),  // Position is not relevant here
         Angle::deg0(),  // Rotation
@@ -87,7 +87,7 @@ bool SchematicEditorState_AddText::entry() noexcept {
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
   layerComboBox->setLayers(getAllowedGeometryLayers());
-  layerComboBox->setCurrentLayer(mLastTextProperties.getLayerName());
+  layerComboBox->setCurrentLayer(mLastTextProperties.getLayer());
   layerComboBox->addAction(
       cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
                                &GraphicsLayerComboBox::stepDown));
@@ -291,10 +291,10 @@ bool SchematicEditorState_AddText::abortCommand(bool showErrMsgBox) noexcept {
 }
 
 void SchematicEditorState_AddText::layerComboBoxLayerChanged(
-    const GraphicsLayerName& layerName) noexcept {
-  mLastTextProperties.setLayerName(layerName);
+    const Layer& layer) noexcept {
+  mLastTextProperties.setLayer(layer);
   if (mCurrentTextEditCmd) {
-    mCurrentTextEditCmd->setLayerName(mLastTextProperties.getLayerName(), true);
+    mCurrentTextEditCmd->setLayer(mLastTextProperties.getLayer(), true);
   }
 }
 

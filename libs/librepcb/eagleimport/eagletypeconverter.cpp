@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "eagletypeconverter.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <parseagle/common/circle.h>
 #include <parseagle/common/point.h>
 #include <parseagle/common/polygon.h>
@@ -85,11 +84,11 @@ CircuitIdentifier EagleTypeConverter::convertPinOrPadName(const QString& n) {
   return CircuitIdentifier(name);
 }
 
-GraphicsLayerName EagleTypeConverter::convertLayer(int id) {
+const Layer& EagleTypeConverter::convertLayer(int id) {
   QString eagleLayerName = "unknown";
   switch (id) {
     case 1:  // tCu
-      return GraphicsLayerName(GraphicsLayer::sTopCopper);
+      return Layer::topCopper();
     case 2:  // inner copper
     case 3:  // inner copper
     case 4:  // inner copper
@@ -104,9 +103,13 @@ GraphicsLayerName EagleTypeConverter::convertLayer(int id) {
     case 13:  // inner copper
     case 14:  // inner copper
     case 15:  // inner copper
-      return GraphicsLayerName(GraphicsLayer::getInnerLayerName(id - 1));
+      if (const Layer* layer = Layer::innerCopper(id - 1)) {
+        return *layer;
+      }
+      eagleLayerName = "inner";
+      break;
     case 16:  // bCu
-      return GraphicsLayerName(GraphicsLayer::sBotCopper);
+      return Layer::botCopper();
     case 17:  // pads
       eagleLayerName = "pads";
       break;
@@ -117,11 +120,11 @@ GraphicsLayerName EagleTypeConverter::convertLayer(int id) {
       eagleLayerName = "unrouted";
       break;
     case 20:  // dimension
-      return GraphicsLayerName(GraphicsLayer::sBoardOutlines);
+      return Layer::boardOutlines();
     case 21:  // tPlace
-      return GraphicsLayerName(GraphicsLayer::sTopPlacement);
+      return Layer::topPlacement();
     case 22:  // bPlace
-      return GraphicsLayerName(GraphicsLayer::sBotPlacement);
+      return Layer::botPlacement();
     case 23:  // tOrigins
       eagleLayerName = "tOrigins";
       break;
@@ -129,21 +132,21 @@ GraphicsLayerName EagleTypeConverter::convertLayer(int id) {
       eagleLayerName = "bOrigins";
       break;
     case 25:  // tNames
-      return GraphicsLayerName(GraphicsLayer::sTopNames);
+      return Layer::topNames();
     case 26:  // bNames
-      return GraphicsLayerName(GraphicsLayer::sBotNames);
+      return Layer::botNames();
     case 27:  // tValues
-      return GraphicsLayerName(GraphicsLayer::sTopValues);
+      return Layer::topValues();
     case 28:  // bValues
-      return GraphicsLayerName(GraphicsLayer::sBotValues);
+      return Layer::botValues();
     case 29:  // tStop
-      return GraphicsLayerName(GraphicsLayer::sTopStopMask);
+      return Layer::topStopMask();
     case 30:  // bStop
-      return GraphicsLayerName(GraphicsLayer::sBotStopMask);
+      return Layer::botStopMask();
     case 31:  // tCream
-      return GraphicsLayerName(GraphicsLayer::sTopSolderPaste);
+      return Layer::topSolderPaste();
     case 32:  // bCream
-      return GraphicsLayerName(GraphicsLayer::sBotSolderPaste);
+      return Layer::botSolderPaste();
     case 33:  // tFinish
       eagleLayerName = "tFinish";
       break;
@@ -151,9 +154,9 @@ GraphicsLayerName EagleTypeConverter::convertLayer(int id) {
       eagleLayerName = "bFinish";
       break;
     case 35:  // tGlue
-      return GraphicsLayerName(GraphicsLayer::sTopGlue);
+      return Layer::topGlue();
     case 36:  // bGlue
-      return GraphicsLayerName(GraphicsLayer::sBotGlue);
+      return Layer::botGlue();
     case 37:  // tTest
       eagleLayerName = "tTest";
       break;
@@ -161,9 +164,9 @@ GraphicsLayerName EagleTypeConverter::convertLayer(int id) {
       eagleLayerName = "bTest";
       break;
     case 39:  // tKeepout
-      return GraphicsLayerName(GraphicsLayer::sTopCourtyard);
+      return Layer::topCourtyard();
     case 40:  // bKeepout
-      return GraphicsLayerName(GraphicsLayer::sBotCourtyard);
+      return Layer::botCourtyard();
     case 41:  // tRestrict
       eagleLayerName = "tRestrict";
       break;
@@ -180,19 +183,19 @@ GraphicsLayerName EagleTypeConverter::convertLayer(int id) {
       eagleLayerName = "holes";
       break;
     case 46:  // milling
-      return GraphicsLayerName(GraphicsLayer::sBoardMillingPth);
+      return Layer::boardMillingPth();
     case 47:  // measures
-      return GraphicsLayerName(GraphicsLayer::sBoardDocumentation);
+      return Layer::boardDocumentation();
     case 48:  // document
-      return GraphicsLayerName(GraphicsLayer::sBoardDocumentation);
+      return Layer::boardDocumentation();
     case 49:  // ReferenceLC
-      return GraphicsLayerName(GraphicsLayer::sBoardDocumentation);
+      return Layer::boardDocumentation();
     case 50:  // ReferenceLS
-      return GraphicsLayerName(GraphicsLayer::sBoardDocumentation);
+      return Layer::boardDocumentation();
     case 51:  // tDocu
-      return GraphicsLayerName(GraphicsLayer::sTopDocumentation);
+      return Layer::topDocumentation();
     case 52:  // bDocu
-      return GraphicsLayerName(GraphicsLayer::sBotDocumentation);
+      return Layer::botDocumentation();
     case 90:  // modules
       eagleLayerName = "modules";
       break;
@@ -203,17 +206,17 @@ GraphicsLayerName EagleTypeConverter::convertLayer(int id) {
       eagleLayerName = "buses";
       break;
     case 93:  // pins
-      return GraphicsLayerName(GraphicsLayer::sSymbolPinNames);
+      return Layer::symbolPinNames();
     case 94:  // symbols
-      return GraphicsLayerName(GraphicsLayer::sSymbolOutlines);
+      return Layer::symbolOutlines();
     case 95:  // names
-      return GraphicsLayerName(GraphicsLayer::sSymbolNames);
+      return Layer::symbolNames();
     case 96:  // values
-      return GraphicsLayerName(GraphicsLayer::sSymbolValues);
+      return Layer::symbolValues();
     case 97:  // info
-      return GraphicsLayerName(GraphicsLayer::sSchematicDocumentation);
+      return Layer::schematicDocumentation();
     case 98:  // guide
-      return GraphicsLayerName(GraphicsLayer::sSchematicGuide);
+      return Layer::schematicGuide();
     case 99:  // spice order
       eagleLayerName = "spice order";
       break;
@@ -433,15 +436,15 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
 std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
     EagleTypeConverter::convertSmtPad(const parseagle::SmtPad& p) {
   Uuid uuid = Uuid::createRandom();
-  GraphicsLayerName layer = convertLayer(p.getLayer());
+  const Layer& layer = convertLayer(p.getLayer());
   FootprintPad::ComponentSide side;
-  if (layer == GraphicsLayer::sTopCopper) {
+  if (layer == Layer::topCopper()) {
     side = FootprintPad::ComponentSide::Top;
-  } else if (layer == GraphicsLayer::sBotCopper) {
+  } else if (layer == Layer::botCopper()) {
     side = FootprintPad::ComponentSide::Bottom;
   } else {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString("Invalid pad layer: %1").arg(*layer));
+                       QString("Invalid pad layer: %1").arg(layer.getNameTr()));
   }
   return std::make_pair(
       std::make_shared<PackagePad>(uuid,  // UUID

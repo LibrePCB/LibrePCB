@@ -22,7 +22,8 @@
  ******************************************************************************/
 #include "polygongraphicsitem.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
+#include "graphicslayer.h"
+
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -49,7 +50,7 @@ PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
     mVertexHandles(),
     mOnEditedSlot(*this, &PolygonGraphicsItem::polygonEdited) {
   setLineWidth(mPolygon.getLineWidth());
-  setLineLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
+  setLineLayer(mLayerProvider.getLayer(mPolygon.getLayer()));
   updatePath();
   updateFillLayer();
   setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -163,8 +164,8 @@ void PolygonGraphicsItem::paint(QPainter* painter,
 void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
                                         Polygon::Event event) noexcept {
   switch (event) {
-    case Polygon::Event::LayerNameChanged:
-      setLineLayer(mLayerProvider.getLayer(*polygon.getLayerName()));
+    case Polygon::Event::LayerChanged:
+      setLineLayer(mLayerProvider.getLayer(polygon.getLayer()));
       updateFillLayer();  // required if the area is filled with the line layer
       break;
     case Polygon::Event::LineWidthChanged:
@@ -189,9 +190,9 @@ void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
 void PolygonGraphicsItem::updateFillLayer() noexcept {
   // Don't fill if path is not closed (for consistency with Gerber export)!
   if (mPolygon.isFilled() && mPolygon.getPath().isClosed()) {
-    setFillLayer(mLayerProvider.getLayer(*mPolygon.getLayerName()));
+    setFillLayer(mLayerProvider.getLayer(mPolygon.getLayer()));
   } else if (mPolygon.isGrabArea()) {
-    setFillLayer(mLayerProvider.getGrabAreaLayer(*mPolygon.getLayerName()));
+    setFillLayer(mLayerProvider.getGrabAreaLayer(mPolygon.getLayer()));
   } else {
     setFillLayer(nullptr);
   }

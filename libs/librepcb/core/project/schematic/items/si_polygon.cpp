@@ -23,9 +23,6 @@
 #include "si_polygon.h"
 
 #include "../../../geometry/polygon.h"
-#include "../../project.h"
-#include "../schematic.h"
-#include "../schematiclayerprovider.h"
 
 #include <QtCore>
 

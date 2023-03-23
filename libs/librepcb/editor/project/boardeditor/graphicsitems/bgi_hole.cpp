@@ -25,9 +25,6 @@
 #include "../../../graphics/primitiveholegraphicsitem.h"
 #include "../boardgraphicsscene.h"
 
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -41,11 +38,10 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Hole::BGI_Hole(BI_Hole& hole) noexcept
+BGI_Hole::BGI_Hole(BI_Hole& hole, const IF_GraphicsLayerProvider& lp) noexcept
   : QGraphicsItemGroup(),
     mHole(hole),
-    mGraphicsItem(new PrimitiveHoleGraphicsItem(
-        mHole.getBoard().getLayerStack(), true, this)),
+    mGraphicsItem(new PrimitiveHoleGraphicsItem(lp, true, this)),
     mOnEditedSlot(*this, &BGI_Hole::holeEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);

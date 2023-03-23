@@ -27,10 +27,8 @@
 #include "../../../graphics/primitivepathgraphicsitem.h"
 #include "../boardgraphicsscene.h"
 
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
-#include <librepcb/core/project/project.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -46,10 +44,12 @@ namespace editor {
  ******************************************************************************/
 
 BGI_StrokeText::BGI_StrokeText(BI_StrokeText& text,
-                               std::weak_ptr<BGI_Device> deviceItem) noexcept
+                               std::weak_ptr<BGI_Device> deviceItem,
+                               const IF_GraphicsLayerProvider& lp) noexcept
   : QGraphicsItemGroup(),
     mText(text),
     mDeviceGraphicsItem(deviceItem),
+    mLayerProvider(lp),
     mPathGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
     mAnchorGraphicsItem(new LineGraphicsItem()),
@@ -174,16 +174,16 @@ void BGI_StrokeText::updateLayer() noexcept {
 
   // Update z-value.
   BoardGraphicsScene::ItemZValue zValue = BoardGraphicsScene::ZValue_Texts;
-  if (GraphicsLayer::isTopLayer(*mText.getTextObj().getLayerName())) {
+  if (mText.getTextObj().getLayer().isTop()) {
     zValue = BoardGraphicsScene::ZValue_TextsTop;
-  } else if (GraphicsLayer::isBottomLayer(*mText.getTextObj().getLayerName())) {
+  } else if (mText.getTextObj().getLayer().isBottom()) {
     zValue = BoardGraphicsScene::ZValue_TextsBottom;
   }
   setZValue(static_cast<qreal>(zValue));
   mAnchorGraphicsItem->setZValue(static_cast<qreal>(zValue));
 
-  const GraphicsLayer* layer = mText.getBoard().getLayerStack().getLayer(
-      *mText.getTextObj().getLayerName());
+  const GraphicsLayer* layer =
+      mLayerProvider.getLayer(mText.getTextObj().getLayer());
   mPathGraphicsItem->setLineLayer(layer);
   mOriginCrossGraphicsItem->setLayer(layer);
 }
@@ -200,8 +200,8 @@ void BGI_StrokeText::updatePaths() noexcept {
 void BGI_StrokeText::updateAnchorLayer() noexcept {
   Q_ASSERT(mAnchorGraphicsItem);
   if (mText.getDevice() && isSelected()) {
-    mAnchorGraphicsItem->setLayer(mText.getBoard().getLayerStack().getLayer(
-        *mText.getTextObj().getLayerName()));
+    mAnchorGraphicsItem->setLayer(
+        mLayerProvider.getLayer(mText.getTextObj().getLayer()));
   } else {
     mAnchorGraphicsItem->setLayer(nullptr);
   }

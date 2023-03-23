@@ -34,11 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class GraphicsLayer;
-
 namespace editor {
 
+class IF_GraphicsLayerProvider;
 class LineGraphicsItem;
 class OriginCrossGraphicsItem;
 class PrimitivePathGraphicsItem;
@@ -55,8 +53,8 @@ public:
   // Constructors / Destructor
   BGI_StrokeText() = delete;
   BGI_StrokeText(const BGI_StrokeText& other) = delete;
-  BGI_StrokeText(BI_StrokeText& text,
-                 std::weak_ptr<BGI_Device> deviceItem) noexcept;
+  BGI_StrokeText(BI_StrokeText& text, std::weak_ptr<BGI_Device> deviceItem,
+                 const IF_GraphicsLayerProvider& lp) noexcept;
   virtual ~BGI_StrokeText() noexcept;
 
   // General Methods
@@ -89,6 +87,7 @@ private:  // Methods
 private:  // Data
   BI_StrokeText& mText;
   std::weak_ptr<BGI_Device> mDeviceGraphicsItem;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   QScopedPointer<PrimitivePathGraphicsItem> mPathGraphicsItem;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;

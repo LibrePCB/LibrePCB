@@ -25,9 +25,9 @@
 #include "../../application.h"
 #include "../../attribute/attributesubstitutor.h"
 #include "../../export/graphicsexportsettings.h"
-#include "../../graphics/graphicslayer.h"
-#include "../../graphics/graphicspainter.h"
+#include "../../export/graphicspainter.h"
 #include "../../library/sym/symbol.h"
+#include "../../workspace/theme.h"
 #include "../circuit/netsignal.h"
 #include "items/si_netlabel.h"
 #include "items/si_netline.h"
@@ -139,21 +139,22 @@ void SchematicPainter::paint(QPainter& painter,
       // Draw Symbol Polygons.
       foreach (const Polygon& polygon, symbol.polygons) {
         if (polygon.isGrabArea() != grabArea) continue;
-        p.drawPolygon(
-            symbol.transform.map(polygon.getPath()), *polygon.getLineWidth(),
-            settings.getColor(*polygon.getLayerName()),
-            settings.getFillColor(*polygon.getLayerName(), polygon.isFilled(),
-                                  polygon.isGrabArea()));
+        const QString color = polygon.getLayer().getThemeColor();
+        p.drawPolygon(symbol.transform.map(polygon.getPath()),
+                      *polygon.getLineWidth(), settings.getColor(color),
+                      settings.getFillColor(color, polygon.isFilled(),
+                                            polygon.isGrabArea()));
       }
 
       // Draw Symbol Circles.
       foreach (const Circle& circle, symbol.circles) {
         if (circle.isGrabArea() != grabArea) continue;
-        p.drawCircle(
-            symbol.transform.map(circle.getCenter()), *circle.getDiameter(),
-            *circle.getLineWidth(), settings.getColor(*circle.getLayerName()),
-            settings.getFillColor(*circle.getLayerName(), circle.isFilled(),
-                                  circle.isGrabArea()));
+        const QString color = circle.getLayer().getThemeColor();
+        p.drawCircle(symbol.transform.map(circle.getCenter()),
+                     *circle.getDiameter(), *circle.getLineWidth(),
+                     settings.getColor(color),
+                     settings.getFillColor(color, circle.isFilled(),
+                                           circle.isGrabArea()));
       }
     }
 
@@ -161,7 +162,7 @@ void SchematicPainter::paint(QPainter& painter,
     foreach (const Pin& pin, symbol.pins) {
       p.drawSymbolPin(symbol.transform.map(pin.position),
                       symbol.transform.map(pin.rotation), *pin.length,
-                      settings.getColor(GraphicsLayer::sSymbolPinLines),
+                      settings.getColor(Theme::Color::sSchematicPinLines),
                       QColor());
       Alignment nameAlignment = pin.nameAlignment;
       if (symbol.transform.getMirrored()) {
@@ -172,37 +173,36 @@ void SchematicPainter::paint(QPainter& painter,
                  symbol.transform.map(pin.rotation + pin.nameRotation),
                  *pin.nameHeight, nameAlignment, pin.name,
                  qApp->getDefaultSansSerifFont(),
-                 settings.getColor(GraphicsLayer::sSymbolPinNames), true,
+                 settings.getColor(Theme::Color::sSchematicPinNames), true,
                  false);
     }
   }
 
   // Draw Polygons.
   foreach (const Polygon& polygon, mPolygons) {
+    const QString color = polygon.getLayer().getThemeColor();
     p.drawPolygon(
-        polygon.getPath(), *polygon.getLineWidth(),
-        settings.getColor(*polygon.getLayerName()),
-        settings.getFillColor(*polygon.getLayerName(), polygon.isFilled(),
-                              polygon.isGrabArea()));
+        polygon.getPath(), *polygon.getLineWidth(), settings.getColor(color),
+        settings.getFillColor(color, polygon.isFilled(), polygon.isGrabArea()));
   }
 
   // Draw Texts.
   foreach (const Text& text, mTexts) {
+    const QString color = text.getLayer().getThemeColor();
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
                text.getAlign(), text.getText(), qApp->getDefaultSansSerifFont(),
-               settings.getColor(*text.getLayerName()), true, false);
+               settings.getColor(color), true, false);
   }
 
   // Draw Net Lines.
   foreach (const Line& netline, mNetLines) {
     p.drawLine(netline.startPosition, netline.endPosition, *netline.width,
-               settings.getColor(GraphicsLayer::sSchematicNetLines));
+               settings.getColor(Theme::Color::sSchematicWires));
   }
 
   // Draw Junctions.
   foreach (const Point& pos, mJunctions) {
-    p.drawNetJunction(pos,
-                      settings.getColor(GraphicsLayer::sSchematicNetLines));
+    p.drawNetJunction(pos, settings.getColor(Theme::Color::sSchematicWires));
   }
 
   // Draw Net Labels.
@@ -211,7 +211,7 @@ void SchematicPainter::paint(QPainter& painter,
     font.setPixelSize(4);
     p.drawNetLabel(netlabel.position, netlabel.rotation, netlabel.mirrored,
                    netlabel.text, font,
-                   settings.getColor(GraphicsLayer::sSchematicNetLabels));
+                   settings.getColor(Theme::Color::sSchematicNetLabels));
   }
 }
 

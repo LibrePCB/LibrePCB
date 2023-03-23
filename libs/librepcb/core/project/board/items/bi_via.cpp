@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "bi_via.h"
 
-#include "../../../graphics/graphicslayer.h"
+#include "../../../types/layer.h"
 #include "../../circuit/netsignal.h"
 #include "../board.h"
 #include "../boarddesignrules.h"
@@ -58,8 +58,8 @@ BI_Via::~BI_Via() noexcept {
  *  Getters
  ******************************************************************************/
 
-bool BI_Via::isOnLayer(const QString& layerName) const noexcept {
-  return GraphicsLayer::isCopperLayer(layerName);
+bool BI_Via::isOnLayer(const Layer& layer) const noexcept {
+  return layer.isCopper();
 }
 
 TraceAnchor BI_Via::toTraceAnchor() const noexcept {

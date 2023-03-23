@@ -23,7 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/graphics/graphicslayer.h>
+#include "../../../graphics/graphicslayer.h"
+
 #include <librepcb/core/project/board/items/bi_device.h>
 
 #include <QtCore>
@@ -36,7 +37,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
+class Layer;
 
 namespace editor {
 
@@ -65,7 +66,7 @@ public:
   // Constructors / Destructor
   BGI_Device() = delete;
   BGI_Device(const BGI_Device& other) = delete;
-  explicit BGI_Device(BI_Device& device) noexcept;
+  BGI_Device(BI_Device& device, const IF_GraphicsLayerProvider& lp) noexcept;
   virtual ~BGI_Device() noexcept;
 
   // General Methods
@@ -87,11 +88,12 @@ private:  // Methods
   void updateRotationAndMirrored() noexcept;
   void updateBoardSide() noexcept;
   void updateHoleStopMaskOffsets() noexcept;
-  GraphicsLayer* getLayer(QString name) const noexcept;
+  GraphicsLayer* getLayer(const Layer& layer) const noexcept;
 
 private:  // Data
   BI_Device& mDevice;
-  QPointer<GraphicsLayer> mGrabAreaLayer;
+  const IF_GraphicsLayerProvider& mLayerProvider;
+  const GraphicsLayer* mGrabAreaLayer;
   std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;
   QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mPolygonGraphicsItems;

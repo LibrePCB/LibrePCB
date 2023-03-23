@@ -22,13 +22,12 @@
  ******************************************************************************/
 #include "bgi_netline.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../boardgraphicsscene.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -44,10 +43,12 @@ namespace editor {
  ******************************************************************************/
 
 BGI_NetLine::BGI_NetLine(BI_NetLine& netline,
+                         const IF_GraphicsLayerProvider& lp,
                          std::shared_ptr<const QSet<const NetSignal*>>
                              highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mNetLine(netline),
+    mLayerProvider(lp),
     mHighlightedNetSignals(highlightedNetSignals),
     mLayer(nullptr),
     mOnNetLineEditedSlot(*this, &BGI_NetLine::netLineEdited),
@@ -157,14 +158,13 @@ void BGI_NetLine::updateLine() noexcept {
 
 void BGI_NetLine::updateLayer() noexcept {
   // set Z value
-  setZValue(BoardGraphicsScene::getZValueOfCopperLayer(
-      mNetLine.getLayer().getName()));
+  setZValue(BoardGraphicsScene::getZValueOfCopperLayer(mNetLine.getLayer()));
 
   // set layer
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
-  mLayer = &mNetLine.getLayer();
+  mLayer = mLayerProvider.getLayer(mNetLine.getLayer());
   if (mLayer) {
     mLayer->onEdited.attach(mOnLayerEditedSlot);
   }
@@ -176,10 +176,6 @@ void BGI_NetLine::updateNetSignalName() noexcept {
 
 void BGI_NetLine::updateVisibility() noexcept {
   setVisible(mLayer && mLayer->isVisible());
-}
-
-GraphicsLayer* BGI_NetLine::getLayer(const QString& name) const noexcept {
-  return mNetLine.getBoard().getLayerStack().getLayer(name);
 }
 
 /*******************************************************************************

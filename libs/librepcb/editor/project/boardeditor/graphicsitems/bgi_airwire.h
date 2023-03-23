@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../graphics/graphicslayer.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -34,10 +36,12 @@
 namespace librepcb {
 
 class BI_AirWire;
-class GraphicsLayer;
 class NetSignal;
 
 namespace editor {
+
+class GraphicsLayer;
+class IF_GraphicsLayerProvider;
 
 /*******************************************************************************
  *  Class BGI_AirWire
@@ -51,7 +55,7 @@ public:
   // Constructors / Destructor
   BGI_AirWire() = delete;
   BGI_AirWire(const BGI_AirWire& other) = delete;
-  BGI_AirWire(BI_AirWire& airwire,
+  BGI_AirWire(BI_AirWire& airwire, const IF_GraphicsLayerProvider& lp,
               std::shared_ptr<const QSet<const NetSignal*>>
                   highlightedNetSignals) noexcept;
   virtual ~BGI_AirWire() noexcept;
@@ -67,11 +71,11 @@ public:
   // Operator Overloadings
   BGI_AirWire& operator=(const BGI_AirWire& rhs) = delete;
 
-private:
-  // Private Methods
-  GraphicsLayer* getLayer(const QString& name) const noexcept;
+private:  // Methods
+  void layerEdited(const GraphicsLayer& layer,
+                   GraphicsLayer::Event event) noexcept;
 
-  // Attributes
+private:  // Data
   BI_AirWire& mAirWire;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   GraphicsLayer* mLayer;
@@ -79,6 +83,9 @@ private:
   // Cached Attributes
   QVector<QLineF> mLines;
   QRectF mBoundingRect;
+
+  // Slots
+  GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;
 };
 
 /*******************************************************************************

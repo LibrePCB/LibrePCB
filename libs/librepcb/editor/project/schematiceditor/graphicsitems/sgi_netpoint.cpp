@@ -22,12 +22,12 @@
  ******************************************************************************/
 #include "sgi_netpoint.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../schematicgraphicsscene.h"
 
 #include <librepcb/core/project/circuit/netsignal.h>
-#include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
-#include <librepcb/core/project/schematic/schematiclayerprovider.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -45,18 +45,16 @@ QRectF SGI_NetPoint::sBoundingRect;
  ******************************************************************************/
 
 SGI_NetPoint::SGI_NetPoint(SI_NetPoint& netpoint,
+                           const IF_GraphicsLayerProvider& lp,
                            std::shared_ptr<const QSet<const NetSignal*>>
                                highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mNetPoint(netpoint),
     mHighlightedNetSignals(highlightedNetSignals),
-    mLayer(nullptr),
+    mLayer(lp.getLayer(Theme::Color::sSchematicWires)),
     mOnEditedSlot(*this, &SGI_NetPoint::netPointEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_VisibleNetPoints);
-
-  mLayer = getLayer(GraphicsLayer::sSchematicNetLines);
-  Q_ASSERT(mLayer);
 
   if (sBoundingRect.isNull()) {
     qreal radius = Length(600000).toPx();
@@ -139,10 +137,6 @@ void SGI_NetPoint::updateJunction() noexcept {
 
 void SGI_NetPoint::updateNetName() noexcept {
   setToolTip(*mNetPoint.getNetSignalOfNetSegment().getName());
-}
-
-GraphicsLayer* SGI_NetPoint::getLayer(const QString& name) const noexcept {
-  return mNetPoint.getProject().getLayers().getLayer(name);
 }
 
 /*******************************************************************************

@@ -22,16 +22,16 @@
  ******************************************************************************/
 #include "sgi_netlabel.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../../../graphics/linegraphicsitem.h"
 #include "../schematicgraphicsscene.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/project/circuit/netsignal.h>
-#include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
-#include <librepcb/core/project/schematic/schematiclayerprovider.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -49,11 +49,14 @@ QVector<QLineF> SGI_NetLabel::sOriginCrossLines;
  ******************************************************************************/
 
 SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel,
+                           const IF_GraphicsLayerProvider& lp,
                            std::shared_ptr<const QSet<const NetSignal*>>
                                highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mNetLabel(netlabel),
     mHighlightedNetSignals(highlightedNetSignals),
+    mOriginCrossLayer(lp.getLayer(Theme::Color::sSchematicReferences)),
+    mNetLabelLayer(lp.getLayer(Theme::Color::sSchematicNetLabels)),
     mOnEditedSlot(*this, &SGI_NetLabel::netLabelEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_NetLabels);
@@ -74,7 +77,7 @@ SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel,
   mAnchorGraphicsItem.reset(new LineGraphicsItem());
   mAnchorGraphicsItem->setZValue(SchematicGraphicsScene::ZValue_NetLabels);
   mAnchorGraphicsItem->setLayer(
-      getLayer(GraphicsLayer::sSchematicNetLabelAnchors));
+      lp.getLayer(Theme::Color::sSchematicNetLabelAnchors));
 
   updatePosition();
   updateRotation();
@@ -101,19 +104,15 @@ void SGI_NetLabel::paint(QPainter* painter,
   const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
       mHighlightedNetSignals->contains(&mNetLabel.getNetSignalOfNetSegment());
 
-  GraphicsLayer* layer = getLayer(GraphicsLayer::sSchematicReferences);
-  Q_ASSERT(layer);
-  if ((layer->isVisible()) && (lod > 2)) {
+  if (mOriginCrossLayer && mOriginCrossLayer->isVisible() && (lod > 2)) {
     // draw origin cross
-    painter->setPen(QPen(layer->getColor(highlight), 0));
+    painter->setPen(QPen(mOriginCrossLayer->getColor(highlight), 0));
     painter->drawLines(sOriginCrossLines);
   }
 
-  layer = getLayer(GraphicsLayer::sSchematicNetLabels);
-  Q_ASSERT(layer);
-  if ((layer->isVisible()) && (lod > 1)) {
+  if (mNetLabelLayer && mNetLabelLayer->isVisible() && (lod > 1)) {
     // draw text
-    painter->setPen(QPen(layer->getColor(highlight), 0));
+    painter->setPen(QPen(mNetLabelLayer->getColor(highlight), 0));
     painter->setFont(mFont);
     if (mRotate180) {
       painter->save();
@@ -125,7 +124,8 @@ void SGI_NetLabel::paint(QPainter* painter,
   } else {
     // draw filled rect
     painter->setPen(Qt::NoPen);
-    painter->setBrush(QBrush(layer->getColor(highlight), Qt::Dense5Pattern));
+    painter->setBrush(
+        QBrush(mNetLabelLayer->getColor(highlight), Qt::Dense5Pattern));
     painter->drawRect(mBoundingRect);
   }
 }
@@ -215,10 +215,6 @@ void SGI_NetLabel::updateText() noexcept {
 void SGI_NetLabel::updateAnchor() noexcept {
   mAnchorGraphicsItem->setLine(mNetLabel.getPosition(),
                                mNetLabel.getAnchorPosition());
-}
-
-GraphicsLayer* SGI_NetLabel::getLayer(const QString& name) const noexcept {
-  return mNetLabel.getProject().getLayers().getLayer(name);
 }
 
 /*******************************************************************************

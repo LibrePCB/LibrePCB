@@ -36,7 +36,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
+class Layer;
 class LengthUnit;
 
 namespace editor {
@@ -137,8 +137,8 @@ signals:
 protected:  // Methods
   const PositiveLength& getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;
-  QList<GraphicsLayer*> getAllowedTextLayers() const noexcept;
-  QList<GraphicsLayer*> getAllowedCircleAndPolygonLayers() const noexcept;
+  static const QSet<const Layer*>& getAllowedTextLayers() noexcept;
+  static const QSet<const Layer*>& getAllowedCircleAndPolygonLayers() noexcept;
 
 protected:  // Data
   Context& mContext;

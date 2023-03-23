@@ -22,10 +22,9 @@
  ******************************************************************************/
 #include "stroketextgraphicsitem.h"
 
+#include "graphicslayer.h"
 #include "origincrossgraphicsitem.h"
 #include "primitivepathgraphicsitem.h"
-
-#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -59,7 +58,7 @@ StrokeTextGraphicsItem::StrokeTextGraphicsItem(
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
 
   setPos(mText.getPosition().toPxQPointF());
-  updateLayer(mText.getLayerName());
+  updateLayer(mText.getLayer());
   updateText();
   updateTransform();
 
@@ -108,8 +107,8 @@ QVariant StrokeTextGraphicsItem::itemChange(GraphicsItemChange change,
 void StrokeTextGraphicsItem::strokeTextEdited(
     const StrokeText& text, StrokeText::Event event) noexcept {
   switch (event) {
-    case StrokeText::Event::LayerNameChanged:
-      updateLayer(text.getLayerName());
+    case StrokeText::Event::LayerChanged:
+      updateLayer(text.getLayer());
       break;
     case StrokeText::Event::TextChanged:
     case StrokeText::Event::HeightChanged:
@@ -139,11 +138,10 @@ void StrokeTextGraphicsItem::strokeTextEdited(
   }
 }
 
-void StrokeTextGraphicsItem::updateLayer(
-    const GraphicsLayerName& layerName) noexcept {
-  const GraphicsLayer* layer = mLayerProvider.getLayer(*layerName);
-  mPathGraphicsItem->setLineLayer(layer);
-  mOriginCrossGraphicsItem->setLayer(layer);
+void StrokeTextGraphicsItem::updateLayer(const Layer& layer) noexcept {
+  const GraphicsLayer* obj = mLayerProvider.getLayer(layer);
+  mPathGraphicsItem->setLineLayer(obj);
+  mOriginCrossGraphicsItem->setLayer(obj);
 }
 
 void StrokeTextGraphicsItem::updateText() noexcept {

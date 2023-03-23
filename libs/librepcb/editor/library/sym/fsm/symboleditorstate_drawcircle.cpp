@@ -32,8 +32,8 @@
 #include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/circle.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -52,7 +52,7 @@ SymbolEditorState_DrawCircle::SymbolEditorState_DrawCircle(
   : SymbolEditorState(context),
     mCurrentCircle(nullptr),
     mCurrentGraphicsItem(nullptr),
-    mLastLayerName(GraphicsLayer::sSymbolOutlines),  // Most important layer
+    mLastLayer(&Layer::symbolOutlines()),  // Most important layer
     mLastLineWidth(200000),  // Typical width according library conventions
     mLastFill(false),  // Fill is needed very rarely
     mLastGrabArea(true)  // Most symbol outlines are used as grab areas
@@ -74,7 +74,7 @@ bool SymbolEditorState_DrawCircle::entry() noexcept {
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
   layerComboBox->setLayers(getAllowedCircleAndPolygonLayers());
-  layerComboBox->setCurrentLayer(mLastLayerName);
+  layerComboBox->setCurrentLayer(*mLastLayer);
   layerComboBox->addAction(
       cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
                                &GraphicsLayerComboBox::stepDown));
@@ -179,7 +179,7 @@ bool SymbolEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add symbol circle"));
     mCurrentCircle = std::make_shared<Circle>(
-        Uuid::createRandom(), mLastLayerName, mLastLineWidth, mLastFill,
+        Uuid::createRandom(), *mLastLayer, mLastLineWidth, mLastFill,
         mLastGrabArea, pos, PositiveLength(1));
     mContext.undoStack.appendToCmdGroup(
         new CmdCircleInsert(mContext.symbol.getCircles(), mCurrentCircle));
@@ -243,10 +243,10 @@ bool SymbolEditorState_DrawCircle::abortAddCircle() noexcept {
 }
 
 void SymbolEditorState_DrawCircle::layerComboBoxValueChanged(
-    const GraphicsLayerName& layerName) noexcept {
-  mLastLayerName = layerName;
+    const Layer& layer) noexcept {
+  mLastLayer = &layer;
   if (mEditCmd) {
-    mEditCmd->setLayerName(mLastLayerName, true);
+    mEditCmd->setLayer(*mLastLayer, true);
   }
 }
 

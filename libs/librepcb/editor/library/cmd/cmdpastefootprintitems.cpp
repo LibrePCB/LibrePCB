@@ -118,7 +118,7 @@ bool CmdPasteFootprintItems::performExecute() {
       uuid = Uuid::createRandom();
     }
     std::shared_ptr<Circle> copy = std::make_shared<Circle>(
-        uuid, circle.getLayerName(), circle.getLineWidth(), circle.isFilled(),
+        uuid, circle.getLayer(), circle.getLineWidth(), circle.isFilled(),
         circle.isGrabArea(), circle.getCenter() + mPosOffset,
         circle.getDiameter());
     execNewChildCmd(new CmdCircleInsert(mFootprint.getCircles(), copy));
@@ -136,9 +136,8 @@ bool CmdPasteFootprintItems::performExecute() {
       uuid = Uuid::createRandom();
     }
     std::shared_ptr<Polygon> copy = std::make_shared<Polygon>(
-        uuid, polygon.getLayerName(), polygon.getLineWidth(),
-        polygon.isFilled(), polygon.isGrabArea(),
-        polygon.getPath().translated(mPosOffset));
+        uuid, polygon.getLayer(), polygon.getLineWidth(), polygon.isFilled(),
+        polygon.isGrabArea(), polygon.getPath().translated(mPosOffset));
     execNewChildCmd(new CmdPolygonInsert(mFootprint.getPolygons(), copy));
     if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
       graphicsItem->setSelected(true);
@@ -154,10 +153,10 @@ bool CmdPasteFootprintItems::performExecute() {
       uuid = Uuid::createRandom();
     }
     std::shared_ptr<StrokeText> copy = std::make_shared<StrokeText>(
-        uuid, text.getLayerName(), text.getText(),
-        text.getPosition() + mPosOffset, text.getRotation(), text.getHeight(),
-        text.getStrokeWidth(), text.getLetterSpacing(), text.getLineSpacing(),
-        text.getAlign(), text.getMirrored(), text.getAutoRotate());
+        uuid, text.getLayer(), text.getText(), text.getPosition() + mPosOffset,
+        text.getRotation(), text.getHeight(), text.getStrokeWidth(),
+        text.getLetterSpacing(), text.getLineSpacing(), text.getAlign(),
+        text.getMirrored(), text.getAutoRotate());
     execNewChildCmd(new CmdStrokeTextInsert(mFootprint.getStrokeTexts(), copy));
     if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
       graphicsItem->setSelected(true);

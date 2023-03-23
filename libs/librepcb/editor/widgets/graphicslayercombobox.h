@@ -23,8 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/graphics/graphicslayername.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -35,7 +33,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
+class Layer;
 
 namespace editor {
 
@@ -56,12 +54,11 @@ public:
   ~GraphicsLayerComboBox() noexcept;
 
   // Getters
-  tl::optional<GraphicsLayerName> getCurrentLayerName() const noexcept;
+  tl::optional<const Layer&> getCurrentLayer() const noexcept;
 
   // Setters
-  void setLayers(const QList<GraphicsLayer*>& layers) noexcept;
-  void setCurrentLayer(const GraphicsLayerName& name) noexcept;
-  void setCurrentLayer(const QString& name) noexcept;
+  void setLayers(const QSet<const Layer*>& layers) noexcept;
+  void setCurrentLayer(const Layer& layer) noexcept;
 
   // General Methods
   void stepUp() noexcept;
@@ -71,7 +68,7 @@ public:
   GraphicsLayerComboBox& operator=(const GraphicsLayerComboBox& rhs) = delete;
 
 signals:
-  void currentLayerChanged(const GraphicsLayerName& name);
+  void currentLayerChanged(const Layer& layer);
 
 private:  // Methods
   void currentIndexChanged(int index) noexcept;

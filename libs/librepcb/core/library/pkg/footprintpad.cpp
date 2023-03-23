@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "footprintpad.h"
 
-#include "../../graphics/graphicslayer.h"
+#include "../../types/layer.h"
 
 #include <QtCore>
 
@@ -160,26 +160,23 @@ FootprintPad::~FootprintPad() noexcept {
  *  Getters
  ******************************************************************************/
 
-QString FootprintPad::getLayerName() const noexcept {
-  if (isTht()) {
-    return GraphicsLayer::sBoardPadsTht;
-  } else if (mComponentSide == ComponentSide::Bottom) {
-    return GraphicsLayer::sBotCopper;
-  } else {
-    Q_ASSERT(mComponentSide == ComponentSide::Top);
-    return GraphicsLayer::sTopCopper;
-  }
-}
-
 bool FootprintPad::isTht() const noexcept {
   return !mHoles.isEmpty();
 }
 
-bool FootprintPad::isOnLayer(const QString& name) const noexcept {
+bool FootprintPad::isOnLayer(const Layer& layer) const noexcept {
   if (isTht()) {
-    return GraphicsLayer::isCopperLayer(name);
+    return layer.isCopper();
   } else {
-    return (name == getLayerName());
+    return (layer == getSmtLayer());
+  }
+}
+
+const Layer& FootprintPad::getSmtLayer() const noexcept {
+  if (mComponentSide == ComponentSide::Bottom) {
+    return Layer::botCopper();
+  } else {
+    return Layer::topCopper();
   }
 }
 

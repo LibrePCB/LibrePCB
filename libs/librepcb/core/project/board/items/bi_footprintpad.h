@@ -94,8 +94,8 @@ public:
   const Uuid& getLibPadUuid() const noexcept;
   BI_Device& getDevice() const noexcept { return mDevice; }
   FootprintPad::ComponentSide getComponentSide() const noexcept;
-  QString getLayerName() const noexcept;
-  bool isOnLayer(const QString& layerName) const noexcept;
+  const Layer& getSmtLayer() const noexcept;
+  bool isOnLayer(const Layer& layer) const noexcept;
   const FootprintPad& getLibPad() const noexcept { return *mFootprintPad; }
   const PackagePad* getLibPackagePad() const noexcept { return mPackagePad; }
   ComponentSignalInstance* getComponentSignalInstance() const noexcept {
@@ -103,7 +103,8 @@ public:
   }
   NetSignal* getCompSigInstNetSignal() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
-  const QMap<QString, QList<PadGeometry>>& getGeometries() const noexcept {
+  const QHash<const Layer*, QList<PadGeometry>>& getGeometries() const
+      noexcept {
     return mGeometries;
   }
   TraceAnchor toTraceAnchor() const noexcept override;
@@ -133,10 +134,10 @@ private:  // Methods
   QString getPadNameOrUuid() const noexcept;
   QString getNetSignalName() const noexcept;
   UnsignedLength getSizeForMaskOffsetCalculaton() const noexcept;
-  QList<PadGeometry> getGeometryOnLayer(const QString& layer) const noexcept;
-  QList<PadGeometry> getGeometryOnCopperLayer(const QString& layer) const
+  QList<PadGeometry> getGeometryOnLayer(const Layer& layer) const noexcept;
+  QList<PadGeometry> getGeometryOnCopperLayer(const Layer& layer) const
       noexcept;
-  bool isConnectedOnLayer(const QString& layer) const noexcept;
+  bool isConnectedOnLayer(const Layer& layer) const noexcept;
 
 private:  // Data
   BI_Device& mDevice;
@@ -157,7 +158,7 @@ private:  // Data
   Angle mRotation;
   bool mMirrored;
   QString mText;
-  QMap<QString, QList<PadGeometry>> mGeometries;
+  QHash<const Layer*, QList<PadGeometry>> mGeometries;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;

@@ -24,7 +24,6 @@
 
 #include "../../../geometry/circle.h"
 #include "../../../geometry/polygon.h"
-#include "../../../graphics/graphicslayer.h"
 #include "../../../library/pkg/packagepad.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/netsignal.h"
@@ -181,8 +180,7 @@ DrcMsgMissingBoardOutline::DrcMsgMissingBoardOutline() noexcept
                          "\n\n" %
                          tr("Add a closed, zero-width polygon on the layer "
                             "'%1' to draw the board outline.")
-                             .arg(GraphicsLayer::getTranslation(
-                                 GraphicsLayer::sBoardOutlines)),
+                             .arg(Layer::boardOutlines().getNameTr()),
                      "missing_board_outline", {}) {
 }
 
@@ -329,7 +327,7 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
         Severity::Error,
         tr("Min. plane width on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(GraphicsLayer::getTranslation(*plane.getLayerName()),
+            .arg(plane.getLayer().getNameTr(),
                  plane.getMinWidth()->toMmString(), minWidth->toMmString(),
                  "mm"),
         tr("The configured minimum width of the plane is smaller than the "
@@ -350,8 +348,7 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
         Severity::Warning,
         tr("Stroke width on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(GraphicsLayer::getTranslation(
-                     *text.getTextObj().getLayerName()),
+            .arg(text.getTextObj().getLayer().getNameTr(),
                  text.getTextObj().getStrokeWidth()->toMmString(),
                  minWidth->toMmString(), "mm"),
         tr("The text stroke width is smaller than the minimum copper width "
@@ -374,8 +371,8 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
  ******************************************************************************/
 
 DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
-    const QString& layer1, const NetSignal* net1, const BI_Base& item1,
-    const Polygon* polygon1, const Circle* circle1, const QString& layer2,
+    const Layer* layer1, const NetSignal* net1, const BI_Base& item1,
+    const Polygon* polygon1, const Circle* circle1, const Layer* layer2,
     const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
     const Circle* circle2, const UnsignedLength& minClearance,
     const QVector<Path>& locations)
@@ -410,11 +407,11 @@ DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
 }
 
 QString DrcMsgCopperCopperClearanceViolation::getLayerName(
-    const QString& layer1, const QString& layer2) {
-  if (!layer1.isEmpty()) {
-    return "'" % GraphicsLayer::getTranslation(layer1) % "'";
-  } else if (!layer2.isEmpty()) {
-    return "'" % GraphicsLayer::getTranslation(layer2) % "'";
+    const Layer* layer1, const Layer* layer2) {
+  if (layer1) {
+    return "'" % layer1->getNameTr() % "'";
+  } else if (layer2) {
+    return "'" % layer2->getNameTr() % "'";
   } else {
     return tr("copper layers");
   }
@@ -1029,7 +1026,7 @@ DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
  ******************************************************************************/
 
 DrcMsgInvalidPadConnection::DrcMsgInvalidPadConnection(
-    const BI_FootprintPad& pad, const GraphicsLayer& layer,
+    const BI_FootprintPad& pad, const Layer& layer,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
@@ -1041,7 +1038,7 @@ DrcMsgInvalidPadConnection::DrcMsgInvalidPadConnection(
            "connected fully. This issue needs to be fixed in the "
            "library."),
         "invalid_pad_connection", locations) {
-  mApproval.appendChild("layer", SExpression::createToken(layer.getName()));
+  mApproval.appendChild("layer", layer);
   mApproval.ensureLineBreak();
   mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
   mApproval.ensureLineBreak();

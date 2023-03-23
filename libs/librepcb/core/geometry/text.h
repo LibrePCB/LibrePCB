@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../graphics/graphicslayername.h"
 #include "../serialization/serializableobjectlist.h"
 #include "../types/alignment.h"
 #include "../types/angle.h"
@@ -36,6 +35,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Layer;
 
 /*******************************************************************************
  *  Class Text
@@ -51,7 +52,7 @@ public:
   // Signals
   enum class Event {
     UuidChanged,
-    LayerNameChanged,
+    LayerChanged,
     TextChanged,
     PositionChanged,
     RotationChanged,
@@ -65,15 +66,15 @@ public:
   Text() = delete;
   Text(const Text& other) noexcept;
   Text(const Uuid& uuid, const Text& other) noexcept;
-  Text(const Uuid& uuid, const GraphicsLayerName& layerName,
-       const QString& text, const Point& pos, const Angle& rotation,
-       const PositiveLength& height, const Alignment& align) noexcept;
+  Text(const Uuid& uuid, const Layer& layer, const QString& text,
+       const Point& pos, const Angle& rotation, const PositiveLength& height,
+       const Alignment& align) noexcept;
   explicit Text(const SExpression& node);
   ~Text() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
-  const GraphicsLayerName& getLayerName() const noexcept { return mLayerName; }
+  const Layer& getLayer() const noexcept { return *mLayer; }
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
   const PositiveLength& getHeight() const noexcept { return mHeight; }
@@ -81,7 +82,7 @@ public:
   const QString& getText() const noexcept { return mText; }
 
   // Setters
-  bool setLayerName(const GraphicsLayerName& name) noexcept;
+  bool setLayer(const Layer& layer) noexcept;
   bool setText(const QString& text) noexcept;
   bool setPosition(const Point& pos) noexcept;
   bool setRotation(const Angle& rotation) noexcept;
@@ -104,7 +105,7 @@ public:
 
 private:  // Data
   Uuid mUuid;
-  GraphicsLayerName mLayerName;
+  const Layer* mLayer;
   QString mText;
   Point mPosition;
   Angle mRotation;

@@ -40,13 +40,12 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Plane::BI_Plane(Board& board, const Uuid& uuid,
-                   const GraphicsLayerName& layerName, NetSignal& netsignal,
-                   const Path& outline)
+BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
+                   NetSignal& netsignal, const Path& outline)
   : BI_Base(board),
     onEdited(*this),
     mUuid(uuid),
-    mLayerName(layerName),
+    mLayer(&layer),
     mNetSignal(&netsignal),
     mOutline(outline),
     mMinWidth(200000),
@@ -73,9 +72,9 @@ void BI_Plane::setOutline(const Path& outline) noexcept {
   }
 }
 
-void BI_Plane::setLayerName(const GraphicsLayerName& layerName) noexcept {
-  if (layerName != mLayerName) {
-    mLayerName = layerName;
+void BI_Plane::setLayer(const Layer& layer) noexcept {
+  if (&layer != mLayer) {
+    mLayer = &layer;
     onEdited.notify(Event::LayerChanged);
   }
 }
@@ -164,7 +163,7 @@ void BI_Plane::removeFromBoard() {
 
 void BI_Plane::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName);
+  root.appendChild("layer", *mLayer);
   root.ensureLineBreak();
   root.appendChild("net", mNetSignal->getUuid());
   root.appendChild("priority", mPriority);

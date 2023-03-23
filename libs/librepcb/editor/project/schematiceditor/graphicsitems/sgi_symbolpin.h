@@ -36,11 +36,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class GraphicsLayer;
-
 namespace editor {
 
+class IF_GraphicsLayerProvider;
 class LineGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;
@@ -58,6 +56,7 @@ public:
   SGI_SymbolPin() = delete;
   SGI_SymbolPin(const SGI_SymbolPin& other) = delete;
   SGI_SymbolPin(SI_SymbolPin& pin, std::weak_ptr<SGI_Symbol> symbolItem,
+                const IF_GraphicsLayerProvider& lp,
                 std::shared_ptr<const QSet<const NetSignal*>>
                     highlightedNetSignals) noexcept;
   virtual ~SGI_SymbolPin() noexcept;
@@ -85,11 +84,11 @@ private:  // Methods
   void updateRotation() noexcept;
   void updateJunction() noexcept;
   void updateText() noexcept;
-  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 private:  // Data
   SI_SymbolPin& mPin;
   std::weak_ptr<SGI_Symbol> mSymbolGraphicsItem;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;

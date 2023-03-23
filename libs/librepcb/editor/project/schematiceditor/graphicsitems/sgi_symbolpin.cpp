@@ -29,10 +29,9 @@
 
 #include <librepcb/core/library/sym/symbolpin.h>
 #include <librepcb/core/project/circuit/netsignal.h>
-#include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
-#include <librepcb/core/project/schematic/schematiclayerprovider.h>
 #include <librepcb/core/utils/transform.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -49,11 +48,13 @@ namespace editor {
 
 SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
                              std::weak_ptr<SGI_Symbol> symbolItem,
+                             const IF_GraphicsLayerProvider& lp,
                              std::shared_ptr<const QSet<const NetSignal*>>
                                  highlightedNetSignals) noexcept
   : QGraphicsItemGroup(),
     mPin(pin),
     mSymbolGraphicsItem(symbolItem),
+    mLayerProvider(lp),
     mHighlightedNetSignals(highlightedNetSignals),
     mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
     mLineGraphicsItem(new LineGraphicsItem(this)),
@@ -76,14 +77,16 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
   mLineGraphicsItem->setLine(Point(0, 0),
                              Point(*mPin.getLibPin().getLength(), 0));
   mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
-  mLineGraphicsItem->setLayer(getLayer(GraphicsLayer::sSymbolPinLines));
+  mLineGraphicsItem->setLayer(
+      mLayerProvider.getLayer(Theme::Color::sSchematicPinLines));
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
   // Setup text.
   mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
   mTextGraphicsItem->setHeight(mPin.getLibPin().getNameHeight());
-  mTextGraphicsItem->setLayer(getLayer(GraphicsLayer::sSymbolPinNames));
+  mTextGraphicsItem->setLayer(
+      mLayerProvider.getLayer(Theme::Color::sSchematicPinNames));
   mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mTextGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
@@ -198,11 +201,11 @@ void SGI_SymbolPin::updateJunction() noexcept {
   const GraphicsLayer* lineLayer = nullptr;
   const GraphicsLayer* fillLayer = nullptr;
   if (mPin.isVisibleJunction()) {
-    fillLayer = getLayer(GraphicsLayer::sSchematicNetLines);
+    fillLayer = mLayerProvider.getLayer(Theme::Color::sSchematicWires);
   } else if ((!isConnected) && mPin.isRequired()) {
-    lineLayer = getLayer(GraphicsLayer::sSymbolPinCirclesReq);
+    lineLayer = mLayerProvider.getLayer(Theme::Color::sSchematicRequiredPins);
   } else if (!isConnected) {
-    lineLayer = getLayer(GraphicsLayer::sSymbolPinCirclesOpt);
+    lineLayer = mLayerProvider.getLayer(Theme::Color::sSchematicOptionalPins);
   }
   mCircleGraphicsItem->setLineLayer(lineLayer);
   mCircleGraphicsItem->setFillLayer(fillLayer);
@@ -211,10 +214,6 @@ void SGI_SymbolPin::updateJunction() noexcept {
 void SGI_SymbolPin::updateText() noexcept {
   Q_ASSERT(mTextGraphicsItem);
   mTextGraphicsItem->setText(mPin.getText());
-}
-
-GraphicsLayer* SGI_SymbolPin::getLayer(const QString& name) const noexcept {
-  return mPin.getSymbol().getProject().getLayers().getLayer(name);
 }
 
 /*******************************************************************************

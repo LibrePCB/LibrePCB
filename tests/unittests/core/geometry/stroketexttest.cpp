@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/types/layer.h>
 
 /*******************************************************************************
  *  Namespace
@@ -50,7 +51,7 @@ TEST_F(StrokeTextTest, testConstructFromSExpression) {
   StrokeText obj(sexpr);
   EXPECT_EQ(Uuid::fromString("0a8d7180-68e1-4749-bf8c-538b0d88f08c"),
             obj.getUuid());
-  EXPECT_EQ(GraphicsLayerName("bot_placement"), obj.getLayerName());
+  EXPECT_EQ("bot_placement", obj.getLayer().getId());
   EXPECT_EQ(PositiveLength(1000000), obj.getHeight());
   EXPECT_EQ(UnsignedLength(200000), obj.getStrokeWidth());
   EXPECT_EQ(true, obj.getLetterSpacing().isAuto());
@@ -64,7 +65,7 @@ TEST_F(StrokeTextTest, testConstructFromSExpression) {
 }
 
 TEST_F(StrokeTextTest, testSerializeAndDeserialize) {
-  StrokeText obj1(Uuid::createRandom(), GraphicsLayerName("foo"), "hello world",
+  StrokeText obj1(Uuid::createRandom(), Layer::botCopper(), "hello world",
                   Point(12, 34), Angle(56), PositiveLength(123),
                   UnsignedLength(456), StrokeTextSpacing(),
                   StrokeTextSpacing(Ratio(1234)),

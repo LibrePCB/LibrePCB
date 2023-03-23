@@ -23,6 +23,7 @@
 #include "sgi_symbol.h"
 
 #include "../../../graphics/circlegraphicsitem.h"
+#include "../../../graphics/graphicslayer.h"
 #include "../../../graphics/origincrossgraphicsitem.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../schematicgraphicsscene.h"
@@ -30,8 +31,8 @@
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
-#include <librepcb/core/project/schematic/schematiclayerprovider.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -46,7 +47,8 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_Symbol::SGI_Symbol(SI_Symbol& symbol) noexcept
+SGI_Symbol::SGI_Symbol(SI_Symbol& symbol,
+                       const IF_GraphicsLayerProvider& lp) noexcept
   : QGraphicsItemGroup(),
     onEdited(*this),
     mSymbol(symbol),
@@ -57,8 +59,8 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol) noexcept
 
   mOriginCrossGraphicsItem = std::make_shared<OriginCrossGraphicsItem>(this);
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1400000));
-  mOriginCrossGraphicsItem->setLayer(mSymbol.getProject().getLayers().getLayer(
-      GraphicsLayer::sSchematicReferences));
+  mOriginCrossGraphicsItem->setLayer(
+      lp.getLayer(Theme::Color::sSchematicReferences));
   mShape.addRect(mOriginCrossGraphicsItem->boundingRect());
 
   // Draw grab areas first to make them appearing behind every other graphics
@@ -67,8 +69,7 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol) noexcept
     for (auto& obj : mSymbol.getLibSymbol().getCircles().values()) {
       Q_ASSERT(obj);
       if (obj->isGrabArea() != grabArea) continue;
-      auto i = std::make_shared<CircleGraphicsItem>(
-          *obj, mSymbol.getProject().getLayers(), this);
+      auto i = std::make_shared<CircleGraphicsItem>(*obj, lp, this);
       i->setFlag(QGraphicsItem::ItemIsSelectable, true);
       i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
       if (obj->isGrabArea()) {
@@ -83,8 +84,7 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol) noexcept
     for (auto& obj : mSymbol.getLibSymbol().getPolygons().values()) {
       Q_ASSERT(obj);
       if (obj->isGrabArea() != grabArea) continue;
-      auto i = std::make_shared<PolygonGraphicsItem>(
-          *obj, mSymbol.getProject().getLayers(), this);
+      auto i = std::make_shared<PolygonGraphicsItem>(*obj, lp, this);
       i->setFlag(QGraphicsItem::ItemIsSelectable, true);
       i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
       if (obj->isGrabArea()) {

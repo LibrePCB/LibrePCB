@@ -22,7 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/transform.h>
 
 #include <QtCore>
@@ -40,6 +41,8 @@ namespace tests {
 class TransformTest : public ::testing::Test {
 protected:
   std::string str(const QString& s) const { return s.toStdString(); }
+
+  std::string str(const Layer& l) const { return l.getId().toStdString(); }
 
   std::string str(const Point& p) const {
     SExpression sexpr = SExpression::createList("pos");
@@ -126,26 +129,18 @@ TEST_F(TransformTest, testMapPathMirrored) {
 
 TEST_F(TransformTest, testMapLayerNonMirrored) {
   Transform t(Point(1000, 2000), Angle(3000), false);
-  EXPECT_EQ(str(GraphicsLayer::sSymbolOutlines),
-            str(t.map(QString(GraphicsLayer::sSymbolOutlines))));
-  EXPECT_EQ(str(GraphicsLayer::sTopCopper),
-            str(t.map(QString(GraphicsLayer::sTopCopper))));
-  EXPECT_EQ(str(GraphicsLayer::sSymbolOutlines),
-            str(*t.map(GraphicsLayerName(GraphicsLayer::sSymbolOutlines))));
-  EXPECT_EQ(str(GraphicsLayer::sTopCopper),
-            str(*t.map(GraphicsLayerName(GraphicsLayer::sTopCopper))));
+  EXPECT_EQ(str(Layer::symbolOutlines()), str(t.map(Layer::symbolOutlines())));
+  EXPECT_EQ(str(Layer::topCopper()), str(t.map(Layer::topCopper())));
+  EXPECT_EQ(str(*Layer::innerCopper(3)), str(t.map(*Layer::innerCopper(3))));
+  EXPECT_EQ(str(Layer::botCourtyard()), str(t.map(Layer::botCourtyard())));
 }
 
 TEST_F(TransformTest, testMapLayerMirrored) {
   Transform t(Point(1000, 2000), Angle(3000), true);
-  EXPECT_EQ(str(GraphicsLayer::sSymbolOutlines),
-            str(t.map(QString(GraphicsLayer::sSymbolOutlines))));
-  EXPECT_EQ(str(GraphicsLayer::sBotCopper),
-            str(t.map(QString(GraphicsLayer::sTopCopper))));
-  EXPECT_EQ(str(GraphicsLayer::sSymbolOutlines),
-            str(*t.map(GraphicsLayerName(GraphicsLayer::sSymbolOutlines))));
-  EXPECT_EQ(str(GraphicsLayer::sBotCopper),
-            str(*t.map(GraphicsLayerName(GraphicsLayer::sTopCopper))));
+  EXPECT_EQ(str(Layer::symbolOutlines()), str(t.map(Layer::symbolOutlines())));
+  EXPECT_EQ(str(Layer::botCopper()), str(t.map(Layer::topCopper())));
+  EXPECT_EQ(str(*Layer::innerCopper(3)), str(t.map(*Layer::innerCopper(3))));
+  EXPECT_EQ(str(Layer::topCourtyard()), str(t.map(Layer::botCourtyard())));
 }
 
 TEST_F(TransformTest, testOperatorAssign) {

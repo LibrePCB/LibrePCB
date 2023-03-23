@@ -22,14 +22,14 @@
  ******************************************************************************/
 #include "sgi_netline.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../schematicgraphicsscene.h"
 
 #include <librepcb/core/project/circuit/netsignal.h>
-#include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
 #include <librepcb/core/project/schematic/items/si_netpoint.h>
-#include <librepcb/core/project/schematic/schematiclayerprovider.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -45,18 +45,16 @@ namespace editor {
  ******************************************************************************/
 
 SGI_NetLine::SGI_NetLine(SI_NetLine& netline,
+                         const IF_GraphicsLayerProvider& lp,
                          std::shared_ptr<const QSet<const NetSignal*>>
                              highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mNetLine(netline),
     mHighlightedNetSignals(highlightedNetSignals),
-    mLayer(nullptr),
+    mLayer(lp.getLayer(Theme::Color::sSchematicWires)),
     mOnNetLineEditedSlot(*this, &SGI_NetLine::netLineEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(SchematicGraphicsScene::ZValue_NetLines);
-
-  mLayer = getLayer(GraphicsLayer::sSchematicNetLines);
-  Q_ASSERT(mLayer);
 
   updatePositions();
   updateNetSignalName();
@@ -84,7 +82,7 @@ void SGI_NetLine::paint(QPainter* painter,
       mHighlightedNetSignals->contains(&mNetLine.getNetSignalOfNetSegment());
 
   // draw line
-  if (mLayer->isVisible()) {
+  if (mLayer && mLayer->isVisible()) {
     QPen pen(mLayer->getColor(highlight), mNetLine.getWidth()->toPx(),
              Qt::SolidLine, Qt::RoundCap);
     painter->setPen(pen);
@@ -131,10 +129,6 @@ void SGI_NetLine::updatePositions() noexcept {
 
 void SGI_NetLine::updateNetSignalName() noexcept {
   setToolTip(*mNetLine.getNetSignalOfNetSegment().getName());
-}
-
-GraphicsLayer* SGI_NetLine::getLayer(const QString& name) const noexcept {
-  return mNetLine.getProject().getLayers().getLayer(name);
 }
 
 /*******************************************************************************

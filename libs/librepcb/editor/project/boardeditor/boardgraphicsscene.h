@@ -47,6 +47,7 @@ class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
 class Board;
+class Layer;
 class NetSignal;
 
 namespace editor {
@@ -61,6 +62,7 @@ class BGI_Plane;
 class BGI_Plane;
 class BGI_StrokeText;
 class BGI_Via;
+class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem;
 
 /*******************************************************************************
@@ -108,7 +110,7 @@ public:
   BoardGraphicsScene() = delete;
   BoardGraphicsScene(const BoardGraphicsScene& other) = delete;
   explicit BoardGraphicsScene(
-      Board& board,
+      Board& board, const IF_GraphicsLayerProvider& lp,
       std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
       QObject* parent = nullptr) noexcept;
   virtual ~BoardGraphicsScene() noexcept;
@@ -158,7 +160,7 @@ public:
   void selectNetSegment(BI_NetSegment& netSegment) noexcept;
   void clearSelection() noexcept;
   void updateHighlightedNetSignals() noexcept;
-  static qreal getZValueOfCopperLayer(const QString& name) noexcept;
+  static qreal getZValueOfCopperLayer(const Layer& layer) noexcept;
 
   // Operator Overloadings
   BoardGraphicsScene& operator=(const BoardGraphicsScene& rhs) = delete;
@@ -196,6 +198,7 @@ private:  // Methods
 
 private:  // Data
   Board& mBoard;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   QHash<BI_Device*, std::shared_ptr<BGI_Device>> mDevices;
   QHash<BI_FootprintPad*, std::shared_ptr<BGI_FootprintPad>> mFootprintPads;

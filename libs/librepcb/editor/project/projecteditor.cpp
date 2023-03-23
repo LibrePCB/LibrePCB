@@ -248,6 +248,7 @@ void ProjectEditor::execOrderPcbDialog(QWidget* parent) noexcept {
 bool ProjectEditor::saveProject() noexcept {
   try {
     qDebug() << "Save project...";
+    emit projectAboutToBeSaved();
     mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->save();  // can throw
     mLastAutosaveStateId = mUndoStack->getUniqueStateId();
@@ -284,6 +285,7 @@ bool ProjectEditor::autosaveProject() noexcept {
 
   try {
     qDebug() << "Autosave project...";
+    emit projectAboutToBeSaved();
     mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->autosave();  // can throw
     mLastAutosaveStateId = mUndoStack->getUniqueStateId();

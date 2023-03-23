@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../geometry/path.h"
-#include "../graphics/graphicslayername.h"
 #include "../types/angle.h"
 #include "../types/point.h"
 
@@ -34,6 +33,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Layer;
 
 /*******************************************************************************
  *  Class Transform
@@ -160,22 +161,13 @@ public:
   NonEmptyPath map(const NonEmptyPath& path) const noexcept;
 
   /**
-   * @brief Map a given layer name to the transformed coordinate system
+   * @brief Map a given layer to the transformed coordinate system
    *
-   * @param layerName The layer to map.
-   * @return The mirrored layer name if it's a symetric layer and the
+   * @param layer The layer to map.
+   * @return The mirrored layer if it's a symetric layer and the
    *         transformation is mirroring, otherwise the layer is returned as-is.
    */
-  QString map(const QString& layerName) const noexcept;
-
-  /**
-   * @brief Map a given layer name to the transformed coordinate system
-   *
-   * @param layerName The layer to map.
-   * @return The mirrored layer name if it's a symetric layer and the
-   *         transformation is mirroring, otherwise the layer is returned as-is.
-   */
-  GraphicsLayerName map(const GraphicsLayerName& layerName) const noexcept;
+  const Layer& map(const Layer& layer) const noexcept;
 
   /**
    * @brief Map all items of a container to the transformed coordinate system

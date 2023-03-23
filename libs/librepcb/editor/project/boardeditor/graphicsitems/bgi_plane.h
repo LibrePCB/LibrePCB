@@ -23,7 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/graphics/graphicslayer.h>
+#include "../../../graphics/graphicslayer.h"
+
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/types/point.h>
 
@@ -55,7 +56,7 @@ public:
   // Constructors / Destructor
   BGI_Plane() = delete;
   BGI_Plane(const BGI_Plane& other) = delete;
-  BGI_Plane(BI_Plane& plane,
+  BGI_Plane(BI_Plane& plane, const IF_GraphicsLayerProvider& lp,
             std::shared_ptr<const QSet<const NetSignal*>>
                 highlightedNetSignals) noexcept;
   virtual ~BGI_Plane() noexcept;
@@ -103,11 +104,11 @@ private:  // Methods
   void updateLayer() noexcept;
   void updateVisibility() noexcept;
   void updateBoundingRectMargin() noexcept;
-  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 private:  // Data
   // General Attributes
   BI_Plane& mPlane;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
 
   // Cached Attributes

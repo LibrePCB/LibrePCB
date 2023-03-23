@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "boardeditorstate.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../widgets/graphicsview.h"
@@ -37,9 +38,7 @@
 #include "../graphicsitems/bgi_via.h"
 
 #include <librepcb/core/geometry/polygon.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
@@ -98,38 +97,47 @@ const LengthUnit& BoardEditorState::getLengthUnit() const noexcept {
   }
 }
 
-QList<GraphicsLayer*> BoardEditorState::getAllowedGeometryLayers(
-    const Board& board) const noexcept {
-  return board.getLayerStack().getLayers({
-      GraphicsLayer::sBoardSheetFrames,
-      GraphicsLayer::sBoardOutlines,
-      GraphicsLayer::sBoardMillingPth,
-      GraphicsLayer::sBoardMeasures,
-      GraphicsLayer::sBoardAlignment,
-      GraphicsLayer::sBoardDocumentation,
-      GraphicsLayer::sBoardComments,
-      GraphicsLayer::sBoardGuide,
-      GraphicsLayer::sTopPlacement,
-      // GraphicsLayer::sTopHiddenGrabAreas, -> makes no sense in boards
-      GraphicsLayer::sTopDocumentation,
-      GraphicsLayer::sTopNames,
-      GraphicsLayer::sTopValues,
-      GraphicsLayer::sTopCopper,
-      GraphicsLayer::sTopCourtyard,
-      GraphicsLayer::sTopGlue,
-      GraphicsLayer::sTopSolderPaste,
-      GraphicsLayer::sTopStopMask,
-      GraphicsLayer::sBotPlacement,
-      // GraphicsLayer::sBotHiddenGrabAreas, -> makes no sense in boards
-      GraphicsLayer::sBotDocumentation,
-      GraphicsLayer::sBotNames,
-      GraphicsLayer::sBotValues,
-      GraphicsLayer::sBotCopper,
-      GraphicsLayer::sBotCourtyard,
-      GraphicsLayer::sBotGlue,
-      GraphicsLayer::sBotSolderPaste,
-      GraphicsLayer::sBotStopMask,
-  });
+const QSet<const Layer*>&
+    BoardEditorState::getAllowedGeometryLayers() noexcept {
+  static const QSet<const Layer*> layers = {
+      &Layer::boardSheetFrames(),
+      &Layer::boardOutlines(),
+      &Layer::boardMillingPth(),
+      &Layer::boardMeasures(),
+      &Layer::boardAlignment(),
+      &Layer::boardDocumentation(),
+      &Layer::boardComments(),
+      &Layer::boardGuide(),
+      &Layer::topPlacement(),
+      // &Layer::topHiddenGrabAreas(), -> makes no sense in boards
+      &Layer::topDocumentation(),
+      &Layer::topNames(),
+      &Layer::topValues(),
+      &Layer::topCopper(),
+      &Layer::topCourtyard(),
+      &Layer::topGlue(),
+      &Layer::topSolderPaste(),
+      &Layer::topStopMask(),
+      &Layer::botPlacement(),
+      // &Layer::botHiddenGrabAreas(), -> makes no sense in boards
+      &Layer::botDocumentation(),
+      &Layer::botNames(),
+      &Layer::botValues(),
+      &Layer::botCopper(),
+      &Layer::botCourtyard(),
+      &Layer::botGlue(),
+      &Layer::botSolderPaste(),
+      &Layer::botStopMask(),
+  };
+  return layers;
+}
+
+void BoardEditorState::makeLayerVisible(const QString& layer) noexcept {
+  if (GraphicsLayer* l = mContext.editor.getLayer(layer)) {
+    if (l->isEnabled()) {
+      l->setVisible(true);
+    }
+  }
 }
 
 void BoardEditorState::abortBlockingToolsInOtherEditors() noexcept {
@@ -145,7 +153,7 @@ QWidget* BoardEditorState::parentWidget() noexcept {
 }
 
 QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
-    const Point& pos, FindFlags flags, const GraphicsLayer* cuLayer,
+    const Point& pos, FindFlags flags, const tl::optional<const Layer&> cuLayer,
     const QSet<const NetSignal*>& netsignals,
     const QVector<std::shared_ptr<QGraphicsItem>>& except) noexcept {
   BoardGraphicsScene* scene = getActiveBoardScene();
@@ -214,12 +222,12 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     return flags.testFlag(FindFlag::SkipLowerPriorityMatches) &&
         lowestPriority && (prio > (*lowestPriority));
   };
-  auto priorityFromLayer = [](const QString& layerName) {
-    if (GraphicsLayer::isTopLayer(layerName)) {
+  auto priorityFromLayer = [](const Layer& layer) {
+    if (layer.isTop()) {
       return 100;
-    } else if (GraphicsLayer::isInnerLayer(layerName)) {
+    } else if (layer.isInner()) {
       return 200;
-    } else if (GraphicsLayer::isBottomLayer(layerName)) {
+    } else if (layer.isBottom()) {
       return 300;
     } else {
       return 0;
@@ -293,11 +301,10 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
          it != scene->getNetPoints().end(); it++) {
       if (netsignals.isEmpty() ||
           netsignals.contains(it.key()->getNetSegment().getNetSignal())) {
-        const QString layer = it.key()->getLayerOfLines();
-        if ((!cuLayer) || (cuLayer->getName() == layer)) {
+        const Layer* layer = it.key()->getLayerOfTraces();
+        if ((!cuLayer) || (&*cuLayer == layer)) {
           processItem(it.value(), it.key()->getPosition(),
-                      10 + (layer.isEmpty() ? 0 : priorityFromLayer(layer)),
-                      false);
+                      10 + (layer ? priorityFromLayer(*layer) : 0), false);
         }
       }
     }
@@ -308,14 +315,14 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
          it != scene->getNetLines().end(); it++) {
       if (netsignals.isEmpty() ||
           netsignals.contains(it.key()->getNetSegment().getNetSignal())) {
-        const GraphicsLayer& layer = it.key()->getLayer();
-        if ((!cuLayer) || (cuLayer == &layer)) {
+        const Layer& layer = it.key()->getLayer();
+        if ((!cuLayer) || (*cuLayer == layer)) {
           processItem(it.value(),
                       Toolbox::nearestPointOnLine(
                           pos.mappedToGrid(getGridInterval()),
                           it.key()->getStartPoint().getPosition(),
                           it.key()->getEndPoint().getPosition()),
-                      20 + priorityFromLayer(layer.getName()), false);
+                      20 + priorityFromLayer(layer), false);
         }
       }
     }
@@ -326,11 +333,11 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
          it++) {
       if (netsignals.isEmpty() ||
           netsignals.contains(&it.key()->getNetSignal())) {
-        if ((!cuLayer) || (cuLayer->getName() == *it.key()->getLayerName())) {
+        if ((!cuLayer) || (*cuLayer == it.key()->getLayer())) {
           processItem(
               it.value(),
               it.key()->getOutline().calcNearestPointBetweenVertices(pos),
-              30 + priorityFromLayer(*it.key()->getLayerName()),
+              30 + priorityFromLayer(it.key()->getLayer()),
               true);  // Probably large grab area makes sense?
         }
       }
@@ -350,7 +357,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
          it != scene->getFootprintPads().end(); it++) {
       if (netsignals.isEmpty() ||
           netsignals.contains(it.key()->getCompSigInstNetSignal())) {
-        if ((!cuLayer) || (it.key()->isOnLayer(cuLayer->getName()))) {
+        if ((!cuLayer) || (it.key()->isOnLayer(*cuLayer))) {
           processItem(it.value(), it.key()->getPosition(),
                       50 + (it.key()->getMirrored() ? 300 : 100), false);
         }
@@ -364,7 +371,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
       processItem(
           it.value(),
           it.key()->getPolygon().getPath().calcNearestPointBetweenVertices(pos),
-          60 + priorityFromLayer(*it.key()->getPolygon().getLayerName()),
+          60 + priorityFromLayer(it.key()->getPolygon().getLayer()),
           true);  // Probably large grab area makes sense?
     }
   }
@@ -372,10 +379,9 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::StrokeTexts)) {
     for (auto it = scene->getStrokeTexts().begin();
          it != scene->getStrokeTexts().end(); it++) {
-      processItem(
-          it.value(), it.key()->getPosition(),
-          60 + priorityFromLayer(*it.key()->getTextObj().getLayerName()),
-          false);
+      processItem(it.value(), it.key()->getPosition(),
+                  60 + priorityFromLayer(it.key()->getTextObj().getLayer()),
+                  false);
     }
   }
 

@@ -24,7 +24,7 @@
 
 #include "../../../widgets/graphicsview.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -57,58 +57,59 @@ const LengthUnit& PackageEditorState::getLengthUnit() const noexcept {
   return mContext.lengthUnit;
 }
 
-QList<GraphicsLayer*> PackageEditorState::getAllowedTextLayers() const
-    noexcept {
-  return mContext.editorContext.layerProvider.getLayers({
-      GraphicsLayer::sBoardSheetFrames,
-      GraphicsLayer::sBoardOutlines,
-      GraphicsLayer::sBoardMillingPth,
-      GraphicsLayer::sBoardMeasures,
-      GraphicsLayer::sBoardAlignment,
-      GraphicsLayer::sBoardDocumentation,
-      GraphicsLayer::sBoardComments,
-      GraphicsLayer::sBoardGuide,
-      GraphicsLayer::sTopPlacement,
-      // GraphicsLayer::sTopHiddenGrabAreas, -> makes no sense for texts
-      GraphicsLayer::sTopDocumentation,
-      GraphicsLayer::sTopNames,
-      GraphicsLayer::sTopValues,
-      GraphicsLayer::sTopCopper,
-      GraphicsLayer::sTopCourtyard,
-      GraphicsLayer::sTopGlue,
-      GraphicsLayer::sTopSolderPaste,
-      GraphicsLayer::sTopStopMask,
-      GraphicsLayer::sBotPlacement,
-      // GraphicsLayer::sBotHiddenGrabAreas, -> makes no sense for texts
-      GraphicsLayer::sBotDocumentation,
-      GraphicsLayer::sBotNames,
-      GraphicsLayer::sBotValues,
-      GraphicsLayer::sBotCopper,
-      GraphicsLayer::sBotCourtyard,
-      GraphicsLayer::sBotGlue,
-      GraphicsLayer::sBotSolderPaste,
-      GraphicsLayer::sBotStopMask,
-  });
+const QSet<const Layer*>& PackageEditorState::getAllowedTextLayers() noexcept {
+  static const QSet<const Layer*> layers = {
+      &Layer::boardSheetFrames(),
+      &Layer::boardOutlines(),
+      &Layer::boardMillingPth(),
+      &Layer::boardMeasures(),
+      &Layer::boardAlignment(),
+      &Layer::boardDocumentation(),
+      &Layer::boardComments(),
+      &Layer::boardGuide(),
+      &Layer::topPlacement(),
+      // &Layer::topHiddenGrabAreas(), -> makes no sense for texts
+      &Layer::topDocumentation(),
+      &Layer::topNames(),
+      &Layer::topValues(),
+      &Layer::topCopper(),
+      &Layer::topCourtyard(),
+      &Layer::topGlue(),
+      &Layer::topSolderPaste(),
+      &Layer::topStopMask(),
+      &Layer::botPlacement(),
+      // &Layer::botHiddenGrabAreas(), -> makes no sense for texts
+      &Layer::botDocumentation(),
+      &Layer::botNames(),
+      &Layer::botValues(),
+      &Layer::botCopper(),
+      &Layer::botCourtyard(),
+      &Layer::botGlue(),
+      &Layer::botSolderPaste(),
+      &Layer::botStopMask(),
+  };
+  return layers;
 }
 
-QList<GraphicsLayer*> PackageEditorState::getAllowedCircleAndPolygonLayers()
-    const noexcept {
-  return mContext.editorContext.layerProvider.getLayers({
-      GraphicsLayer::sBoardSheetFrames, GraphicsLayer::sBoardOutlines,
-      GraphicsLayer::sBoardMillingPth,  GraphicsLayer::sBoardMeasures,
-      GraphicsLayer::sBoardAlignment,   GraphicsLayer::sBoardDocumentation,
-      GraphicsLayer::sBoardComments,    GraphicsLayer::sBoardGuide,
-      GraphicsLayer::sTopPlacement,     GraphicsLayer::sTopHiddenGrabAreas,
-      GraphicsLayer::sTopDocumentation, GraphicsLayer::sTopNames,
-      GraphicsLayer::sTopValues,        GraphicsLayer::sTopCopper,
-      GraphicsLayer::sTopCourtyard,     GraphicsLayer::sTopGlue,
-      GraphicsLayer::sTopSolderPaste,   GraphicsLayer::sTopStopMask,
-      GraphicsLayer::sBotPlacement,     GraphicsLayer::sBotHiddenGrabAreas,
-      GraphicsLayer::sBotDocumentation, GraphicsLayer::sBotNames,
-      GraphicsLayer::sBotValues,        GraphicsLayer::sBotCopper,
-      GraphicsLayer::sBotCourtyard,     GraphicsLayer::sBotGlue,
-      GraphicsLayer::sBotSolderPaste,   GraphicsLayer::sBotStopMask,
-  });
+const QSet<const Layer*>&
+    PackageEditorState::getAllowedCircleAndPolygonLayers() noexcept {
+  static const QSet<const Layer*> layers = {
+      &Layer::boardSheetFrames(), &Layer::boardOutlines(),
+      &Layer::boardMillingPth(),  &Layer::boardMeasures(),
+      &Layer::boardAlignment(),   &Layer::boardDocumentation(),
+      &Layer::boardComments(),    &Layer::boardGuide(),
+      &Layer::topPlacement(),     &Layer::topHiddenGrabAreas(),
+      &Layer::topDocumentation(), &Layer::topNames(),
+      &Layer::topValues(),        &Layer::topCopper(),
+      &Layer::topCourtyard(),     &Layer::topGlue(),
+      &Layer::topSolderPaste(),   &Layer::topStopMask(),
+      &Layer::botPlacement(),     &Layer::botHiddenGrabAreas(),
+      &Layer::botDocumentation(), &Layer::botNames(),
+      &Layer::botValues(),        &Layer::botCopper(),
+      &Layer::botCourtyard(),     &Layer::botGlue(),
+      &Layer::botSolderPaste(),   &Layer::botStopMask(),
+  };
+  return layers;
 }
 
 /*******************************************************************************

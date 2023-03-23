@@ -166,12 +166,12 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
   // And for items not directly under the cursor, but very close to the cursor,
   // add +1000.
   QMultiMap<std::pair<int, qreal>, std::shared_ptr<QGraphicsItem>> items;
-  auto priorityFromLayer = [](const QString& layerName) {
-    if (GraphicsLayer::isTopLayer(layerName)) {
+  auto priorityFromLayer = [](const Layer& layer) {
+    if (layer.isTop()) {
       return 100;
-    } else if (GraphicsLayer::isInnerLayer(layerName)) {
+    } else if (layer.isInner()) {
       return 200;
-    } else if (GraphicsLayer::isBottomLayer(layerName)) {
+    } else if (layer.isBottom()) {
       return 300;
     } else {
       return 0;
@@ -201,23 +201,26 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
 
   if (flags.testFlag(FindFlag::Pads)) {
     foreach (auto ptr, mPadGraphicsItems) {
-      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
-                  10 + priorityFromLayer(ptr->getPad()->getLayerName()), false);
+      int priority = 10;
+      if (!ptr->getPad()->isTht()) {
+        priority += priorityFromLayer(ptr->getPad()->getSmtLayer());
+      }
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
+                  false);
     }
   }
 
   if (flags.testFlag(FindFlag::StrokeTexts)) {
     foreach (auto ptr, mStrokeTextGraphicsItems) {
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
-                  20 + priorityFromLayer(*ptr->getText().getLayerName()),
-                  false);
+                  20 + priorityFromLayer(ptr->getText().getLayer()), false);
     }
   }
 
   if (flags.testFlag(FindFlag::Circles)) {
     foreach (auto ptr, mCircleGraphicsItems) {
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
-                  30 + priorityFromLayer(*ptr->getCircle().getLayerName()),
+                  30 + priorityFromLayer(ptr->getCircle().getLayer()),
                   true);  // Probably large grab area makes sense?
     }
   }
@@ -225,7 +228,7 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
   if (flags.testFlag(FindFlag::Polygons)) {
     foreach (auto ptr, mPolygonGraphicsItems) {
       processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
-                  30 + priorityFromLayer(*ptr->getPolygon().getLayerName()),
+                  30 + priorityFromLayer(ptr->getPolygon().getLayer()),
                   true);  // Probably large grab area makes sense?
     }
   }

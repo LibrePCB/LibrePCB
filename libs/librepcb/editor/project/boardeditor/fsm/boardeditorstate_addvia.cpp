@@ -293,7 +293,7 @@ bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
     QList<BI_NetLine*> otherNetLines;
     foreach (auto item,
              findItemsAtPos(pos, FindFlag::NetPoints | FindFlag::NetLines,
-                            nullptr, {netsignal})) {
+                            tl::nullopt, {netsignal})) {
       if (auto netPoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
         otherNetPoints.append(&netPoint->getNetPoint());
       } else if (auto netLine = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
@@ -334,8 +334,9 @@ bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
     }
 
     // Replace all NetPoints at the given position with the newly added Via
-    foreach (auto item,
-             findItemsAtPos(pos, FindFlag::NetPoints, nullptr, {netsignal})) {
+    foreach (
+        auto item,
+        findItemsAtPos(pos, FindFlag::NetPoints, tl::nullopt, {netsignal})) {
       if (auto netPoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
         if (&netPoint->getNetPoint().getNetSegment() ==
             &mCurrentViaToPlace->getNetSegment()) {
@@ -447,11 +448,11 @@ void BoardEditorState_AddVia::updateClosestNetSignal(
   // Otherwise the last candidate is returned.
   if (!mClosestNetSignalIsUpToDate) {
     const NetSignal* netsignal = getCurrentNetSignal();
-    std::shared_ptr<QGraphicsItem> item =
-        findItemAtPos(pos,
-                      FindFlag::Vias | FindFlag::FootprintPads |
-                          FindFlag::NetLines | FindFlag::AcceptNextGridMatch,
-                      nullptr, {}, {scene.getVias().value(mCurrentViaToPlace)});
+    std::shared_ptr<QGraphicsItem> item = findItemAtPos(
+        pos,
+        FindFlag::Vias | FindFlag::FootprintPads | FindFlag::NetLines |
+            FindFlag::AcceptNextGridMatch,
+        tl::nullopt, {}, {scene.getVias().value(mCurrentViaToPlace)});
     if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
       netsignal = netline->getNetLine().getNetSegment().getNetSignal();
     } else if (auto pad = std::dynamic_pointer_cast<BGI_FootprintPad>(item)) {

@@ -25,8 +25,6 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
-#include <librepcb/core/graphics/graphicslayername.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -38,6 +36,7 @@
 namespace librepcb {
 
 class Circle;
+class Layer;
 
 namespace editor {
 
@@ -85,7 +84,7 @@ private:  // Methods
   bool finishAddCircle(const Point& pos) noexcept;
   bool abortAddCircle() noexcept;
 
-  void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
+  void layerComboBoxValueChanged(const Layer& layer) noexcept;
   void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
   void fillCheckBoxCheckedChanged(bool checked) noexcept;
   void grabAreaCheckBoxCheckedChanged(bool checked) noexcept;
@@ -96,7 +95,7 @@ private:  // Types / Data
   std::shared_ptr<CircleGraphicsItem> mCurrentGraphicsItem;
 
   // parameter memory
-  GraphicsLayerName mLastLayerName;
+  const Layer* mLastLayer;
   UnsignedLength mLastLineWidth;
   bool mLastFill;
   bool mLastGrabArea;

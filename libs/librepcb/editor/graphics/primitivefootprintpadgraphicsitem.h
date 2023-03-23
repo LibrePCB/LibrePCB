@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/graphics/graphicslayer.h>
+#include "graphicslayer.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,7 +36,7 @@
 namespace librepcb {
 
 class Angle;
-class IF_GraphicsLayerProvider;
+class Layer;
 class PadGeometry;
 class Point;
 
@@ -70,7 +70,7 @@ public:
   void setText(const QString& text) noexcept;
   void setLayer(const QString& layerName) noexcept;
   void setGeometries(
-      const QMap<QString, QList<PadGeometry>>& geometries) noexcept;
+      const QHash<const Layer*, QList<PadGeometry>>& geometries) noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
@@ -86,13 +86,15 @@ private:  // Methods
                               const QVariant& value) noexcept override;
   void updatePathLayers() noexcept;
   void updateTextHeight() noexcept;
+  void updateRegisteredLayers() noexcept;
 
 private:  // Data
   const IF_GraphicsLayerProvider& mLayerProvider;
   GraphicsLayer* mCopperLayer;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
-  QHash<GraphicsLayer*, std::shared_ptr<PrimitivePathGraphicsItem>>
+  QVector<std::tuple<const GraphicsLayer*, bool,
+                     std::shared_ptr<PrimitivePathGraphicsItem>>>
       mPathGraphicsItems;
   QHash<GraphicsLayer*, QPainterPath> mShapes;
   QRectF mShapesBoundingRect;

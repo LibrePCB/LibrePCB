@@ -34,6 +34,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Layer;
+
 /*******************************************************************************
  *  Class BI_NetPoint
  ******************************************************************************/
@@ -69,7 +71,7 @@ public:
   const Junction& getJunction() const noexcept { return mJunction; }
   BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
-  const QString& getLayerOfLines() const noexcept { return mLayerOfTraces; }
+  const Layer* getLayerOfTraces() const noexcept { return mLayerOfTraces; }
   const UnsignedLength& getMaxTraceWidth() const noexcept {
     return mMaxTraceWidth;
   }
@@ -105,7 +107,7 @@ private:  // Data
   QMetaObject::Connection mNetSignalNameChangedConnection;
 
   // Cached Attributes
-  QString mLayerOfTraces;
+  const Layer* mLayerOfTraces;
   UnsignedLength mMaxTraceWidth;
 
   // Registered Elements

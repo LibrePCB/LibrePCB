@@ -23,14 +23,12 @@
 #include "board.h"
 
 #include "../../export/d356netlistgenerator.h"
-#include "../../graphics/graphicslayer.h"
 #include "../../library/pkg/footprintpad.h"
 #include "../../library/pkg/packagepad.h"
 #include "../circuit/componentinstance.h"
 #include "../circuit/netsignal.h"
 #include "../project.h"
 #include "boardd356netlistexport.h"
-#include "boardlayerstack.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_netsegment.h"
@@ -99,9 +97,9 @@ QByteArray BoardD356NetlistExport::generate() const {
       } else {
         // SMT pad.
         const int layerNumber =
-            (pad->getLayerName() == GraphicsLayer::sTopCopper)
+            (pad->getComponentSide() == FootprintPad::ComponentSide::Top)
             ? 1
-            : (mBoard.getLayerStack().getInnerLayerCount() + 2);
+            : (mBoard.getInnerLayerCount() + 2);
         gen.smtPad(netName, cmpName, padName, pad->getPosition(),
                    pad->getLibPad().getWidth(), pad->getLibPad().getHeight(),
                    pad->getRotation(), layerNumber);

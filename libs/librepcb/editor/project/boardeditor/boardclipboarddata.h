@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/geometry/junction.h>
@@ -48,6 +47,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Layer;
 class TransactionalDirectory;
 class TransactionalFileSystem;
 
@@ -170,7 +170,7 @@ public:
     static constexpr const char* tagname = "plane";
 
     Uuid uuid;
-    GraphicsLayerName layer;
+    const Layer* layer;
     CircuitIdentifier netSignalName;
     Path outline;
     UnsignedLength minWidth;
@@ -180,12 +180,12 @@ public:
     BI_Plane::ConnectStyle connectStyle;
     Signal<Plane> onEdited;  ///< Dummy event, not used
 
-    Plane(const Uuid& uuid, const GraphicsLayerName& layer,
+    Plane(const Uuid& uuid, const Layer& layer,
           const CircuitIdentifier& netSignalName, const Path& outline,
           const UnsignedLength& minWidth, const UnsignedLength& minClearance,
           bool keepOrphans, int priority, BI_Plane::ConnectStyle connectStyle)
       : uuid(uuid),
-        layer(layer),
+        layer(&layer),
         netSignalName(netSignalName),
         outline(outline),
         minWidth(minWidth),
@@ -197,7 +197,7 @@ public:
 
     explicit Plane(const SExpression& node)
       : uuid(deserialize<Uuid>(node.getChild("@0"))),
-        layer(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+        layer(deserialize<const Layer*>(node.getChild("layer/@0"))),
         netSignalName(deserialize<CircuitIdentifier>(node.getChild("net/@0"))),
         outline(node),
         minWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"))),
@@ -211,7 +211,7 @@ public:
 
     void serialize(SExpression& root) const {
       root.appendChild(uuid);
-      root.appendChild("layer", layer);
+      root.appendChild("layer", *layer);
       root.ensureLineBreak();
       root.appendChild("net", netSignalName);
       root.appendChild("priority", priority);

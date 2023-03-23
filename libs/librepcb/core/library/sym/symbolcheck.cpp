@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "symbolcheck.h"
 
-#include "../../graphics/graphicslayer.h"
 #include "symbol.h"
 #include "symbolcheckmessages.h"
 
@@ -111,16 +110,16 @@ void SymbolCheck::checkMissingTexts(MsgList& msgs) const {
 }
 
 void SymbolCheck::checkWrongTextLayers(MsgList& msgs) const {
-  QHash<QString, QString> textLayers = {
-      std::make_pair("{{NAME}}", QString(GraphicsLayer::sSymbolNames)),
-      std::make_pair("{{VALUE}}", QString(GraphicsLayer::sSymbolValues)),
+  QHash<QString, const Layer*> textLayers = {
+      std::make_pair("{{NAME}}", &Layer::symbolNames()),
+      std::make_pair("{{VALUE}}", &Layer::symbolValues()),
   };
   for (auto it = mSymbol.getTexts().begin(); it != mSymbol.getTexts().end();
        ++it) {
-    QString expectedLayer = textLayers.value((*it).getText());
-    if ((!expectedLayer.isEmpty()) && ((*it).getLayerName() != expectedLayer)) {
+    const Layer* expectedLayer = textLayers.value((*it).getText());
+    if (expectedLayer && (&(*it).getLayer() != expectedLayer)) {
       msgs.append(
-          std::make_shared<MsgWrongSymbolTextLayer>(it.ptr(), expectedLayer));
+          std::make_shared<MsgWrongSymbolTextLayer>(it.ptr(), *expectedLayer));
     }
   }
 }

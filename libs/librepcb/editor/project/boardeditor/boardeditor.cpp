@@ -56,7 +56,6 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardd356netlistexport.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/boardpainter.h>
 #include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/board/items/bi_device.h>
@@ -64,6 +63,7 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -137,6 +137,9 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   }
   setWindowTitle(tr("%1 - LibrePCB Board Editor").arg(filenameStr));
 
+  // Add all required layers.
+  addLayers(theme);
+
   // Build the whole board editor finite state machine.
   BoardEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
                                      mProject,
@@ -198,6 +201,9 @@ BoardEditor::~BoardEditor() {
   mCommandToolBarProxy->setToolBar(nullptr);
 
   mFsm.reset();
+
+  qDeleteAll(mLayers);
+  mLayers.clear();
 }
 
 /*******************************************************************************
@@ -222,6 +228,8 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
       // Save current view scene rect.
       mVisibleSceneRect[mActiveBoard->getUuid()] =
           mUi->graphicsView->getVisibleSceneRect();
+      // Save layers visibility.
+      storeLayersVisibility();
     }
 
     mUi->graphicsView->setScene(nullptr);
@@ -229,15 +237,19 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
     mActiveBoard = newBoard;
 
     if (mActiveBoard) {
+      // Update layers.
+      connect(mActiveBoard, &Board::innerLayerCountChanged, this,
+              &BoardEditor::updateEnabledCopperLayers);
+      updateEnabledCopperLayers();
+      loadLayersVisibility();
       // show scene, restore view scene rect, set grid properties
       mGraphicsScene.reset(new BoardGraphicsScene(
-          *mActiveBoard, mProjectEditor.getHighlightedNetSignals()));
+          *mActiveBoard, *this, mProjectEditor.getHighlightedNetSignals()));
       connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
               mGraphicsScene.data(),
               &BoardGraphicsScene::updateHighlightedNetSignals);
       const Theme& theme =
           mProjectEditor.getWorkspace().getSettings().themes.getActive();
-      mActiveBoard->getLayerStack().applyTheme(theme);
       mGraphicsScene->setSelectionRectColors(
           theme.getColor(Theme::Color::sBoardSelection).getPrimaryColor(),
           theme.getColor(Theme::Color::sBoardSelection).getSecondaryColor());
@@ -258,7 +270,6 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
 
     // update dock widgets
     mDockUnplacedComponents->setBoard(mActiveBoard);
-    mDockLayers->setActiveBoard(mActiveBoard);
     mDockDrc->setInteractive(mActiveBoard != nullptr);
     mDockDrc->setMessages(mActiveBoard ? mDrcMessages[mActiveBoard->getUuid()]
                                        : tl::nullopt);
@@ -299,7 +310,7 @@ void BoardEditor::abortBlockingToolsInOtherEditors() noexcept {
  *  Inherited Methods
  ******************************************************************************/
 
-void BoardEditor::closeEvent(QCloseEvent* event) {
+void BoardEditor::closeEvent(QCloseEvent* event) noexcept {
   if (!mProjectEditor.windowIsAboutToClose(*this))
     event->ignore();
   else
@@ -344,6 +355,100 @@ void BoardEditor::on_lblUnplacedComponentsNote_linkActivated() {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void BoardEditor::addLayers(const Theme& theme) noexcept {
+  auto addLayer = [this, &theme](const QString& name, bool visible) {
+    const ThemeColor& color = theme.getColor(name);
+    QScopedPointer<GraphicsLayer> layer(
+        new GraphicsLayer(name, color.getNameTr(), color.getPrimaryColor(),
+                          color.getSecondaryColor()));
+    layer->setVisible(visible);
+    mLayers.append(layer.take());
+  };
+
+  // asymmetric board layers
+  addLayer(Theme::Color::sBoardFrames, true);
+  addLayer(Theme::Color::sBoardOutlines, true);
+  addLayer(Theme::Color::sBoardMilling, true);
+  addLayer(Theme::Color::sBoardHoles, true);
+  addLayer(Theme::Color::sBoardVias, true);
+  addLayer(Theme::Color::sBoardPads, true);
+  addLayer(Theme::Color::sBoardAirWires, true);
+
+  // copper layers
+  addLayer(Theme::Color::sBoardCopperTop, true);
+  for (int i = 1; i <= Layer::innerCopperCount(); ++i) {
+    addLayer(QString(Theme::Color::sBoardCopperInner).arg(i), true);
+  }
+  addLayer(Theme::Color::sBoardCopperBot, true);
+
+  // symmetric board layers
+  addLayer(Theme::Color::sBoardReferencesTop, true);
+  addLayer(Theme::Color::sBoardReferencesBot, true);
+  addLayer(Theme::Color::sBoardGrabAreasTop, false);
+  addLayer(Theme::Color::sBoardGrabAreasBot, false);
+  // addLayer(Theme::Color::sBoardHiddenGrabAreasTop, true); Not needed!
+  // addLayer(Theme::Color::sBoardHiddenGrabAreasBot, true); Not needed!
+  addLayer(Theme::Color::sBoardPlacementTop, true);
+  addLayer(Theme::Color::sBoardPlacementBot, true);
+  addLayer(Theme::Color::sBoardDocumentationTop, true);
+  addLayer(Theme::Color::sBoardDocumentationBot, true);
+  addLayer(Theme::Color::sBoardNamesTop, true);
+  addLayer(Theme::Color::sBoardNamesBot, true);
+  addLayer(Theme::Color::sBoardValuesTop, true);
+  addLayer(Theme::Color::sBoardValuesBot, true);
+  addLayer(Theme::Color::sBoardCourtyardTop, false);
+  addLayer(Theme::Color::sBoardCourtyardBot, false);
+  addLayer(Theme::Color::sBoardStopMaskTop, true);
+  addLayer(Theme::Color::sBoardStopMaskBot, true);
+  addLayer(Theme::Color::sBoardSolderPasteTop, false);
+  addLayer(Theme::Color::sBoardSolderPasteBot, false);
+  addLayer(Theme::Color::sBoardGlueTop, false);
+  addLayer(Theme::Color::sBoardGlueBot, false);
+
+  // other asymmetric board layers
+  addLayer(Theme::Color::sBoardMeasures, true);
+  addLayer(Theme::Color::sBoardAlignment, true);
+  addLayer(Theme::Color::sBoardDocumentation, true);
+  addLayer(Theme::Color::sBoardComments, true);
+  addLayer(Theme::Color::sBoardGuide, true);
+
+  // Store layers visibility on save.
+  connect(&mProjectEditor, &ProjectEditor::projectAboutToBeSaved, this,
+          &BoardEditor::storeLayersVisibility);
+}
+
+void BoardEditor::updateEnabledCopperLayers() noexcept {
+  if (Board* board = getActiveBoard()) {
+    foreach (const Layer* layer, Layer::innerCopper()) {
+      if (GraphicsLayer* gLayer = IF_GraphicsLayerProvider::getLayer(*layer)) {
+        gLayer->setEnabled(board->getCopperLayers().contains(layer));
+      }
+    }
+  }
+}
+
+void BoardEditor::loadLayersVisibility() noexcept {
+  if (Board* board = getActiveBoard()) {
+    foreach (GraphicsLayer* layer, mLayers) {
+      if (board->getLayersVisibility().contains(layer->getName())) {
+        layer->setVisible(board->getLayersVisibility().value(layer->getName()));
+      }
+    }
+  }
+}
+
+void BoardEditor::storeLayersVisibility() noexcept {
+  if (Board* board = getActiveBoard()) {
+    QMap<QString, bool> visibility;
+    foreach (GraphicsLayer* layer, mLayers) {
+      if (layer->isEnabled()) {
+        visibility[layer->getName()] = layer->isVisible();
+      }
+    }
+    board->setLayersVisibility(visibility);
+  }
+}
 
 void BoardEditor::createActions() noexcept {
   const EditorCommandSet& cmd = EditorCommandSet::instance();
@@ -1343,9 +1448,9 @@ void BoardEditor::execGraphicsExportDialog(
     GraphicsExportDialog dialog(
         GraphicsExportDialog::Mode::Board, output, pages, 0,
         *mProject.getName(),
-        mActiveBoard ? mActiveBoard->getLayerStack().getInnerLayerCount() : 0,
-        defaultFilePath,
+        mActiveBoard ? mActiveBoard->getInnerLayerCount() : 0, defaultFilePath,
         mProjectEditor.getWorkspace().getSettings().defaultLengthUnit.get(),
+        mProjectEditor.getWorkspace().getSettings().themes.getActive(),
         "board_editor/" % settingsKey, this);
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {

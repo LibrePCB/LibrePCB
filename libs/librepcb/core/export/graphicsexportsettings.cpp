@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "graphicsexportsettings.h"
 
-#include "../graphics/graphicslayer.h"
+#include "../types/layer.h"
 #include "../workspace/theme.h"
 
 #include <QtCore>
@@ -51,60 +51,8 @@ GraphicsExportSettings::GraphicsExportSettings() noexcept
     mBlackWhite(false),
     mBackgroundColor(Qt::transparent),
     mMinLineWidth(100000),
-    mLayers() {
-  // Schematic layers.
-  addLayer(GraphicsLayer::sSchematicSheetFrames);
-  addLayer(GraphicsLayer::sSymbolOutlines);
-  addLayer(GraphicsLayer::sSymbolGrabAreas);
-  addLayer(GraphicsLayer::sSymbolPinLines);
-  addLayer(GraphicsLayer::sSymbolPinNames);
-  addLayer(GraphicsLayer::sSymbolPinNumbers);
-  addLayer(GraphicsLayer::sSymbolNames);
-  addLayer(GraphicsLayer::sSymbolValues);
-  addLayer(GraphicsLayer::sSchematicNetLines);
-  addLayer(GraphicsLayer::sSchematicNetLabels);
-  addLayer(GraphicsLayer::sSchematicDocumentation);
-  addLayer(GraphicsLayer::sSchematicComments);
-  addLayer(GraphicsLayer::sSchematicGuide);
-
-  // Asymmetric board layers.
-  addLayer(GraphicsLayer::sBoardGuide);
-  addLayer(GraphicsLayer::sBoardComments);
-  addLayer(GraphicsLayer::sBoardDocumentation);
-  addLayer(GraphicsLayer::sBoardAlignment);
-  addLayer(GraphicsLayer::sBoardMeasures);
-  addLayer(GraphicsLayer::sBoardSheetFrames);
-  addLayer(GraphicsLayer::sBoardAirWires);
-  addLayer(GraphicsLayer::sBoardOutlines);
-  addLayer(GraphicsLayer::sBoardDrillsNpth);
-  addLayer(GraphicsLayer::sBoardMillingPth);
-  addLayer(GraphicsLayer::sBoardPadsTht);
-  addLayer(GraphicsLayer::sBoardViasTht);
-
-  // Symmetric board layers in logical order.
-  addLayer(GraphicsLayer::sTopDocumentation);
-  addLayer(GraphicsLayer::sTopNames);
-  addLayer(GraphicsLayer::sTopValues);
-  addLayer(GraphicsLayer::sTopCourtyard);
-  addLayer(GraphicsLayer::sTopGrabAreas);
-  addLayer(GraphicsLayer::sTopPlacement);
-  addLayer(GraphicsLayer::sTopGlue);
-  addLayer(GraphicsLayer::sTopSolderPaste);
-  addLayer(GraphicsLayer::sTopStopMask);
-  addLayer(GraphicsLayer::sTopCopper);
-  for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {
-    addLayer(GraphicsLayer::getInnerLayerName(i));
-  }
-  addLayer(GraphicsLayer::sBotCopper);
-  addLayer(GraphicsLayer::sBotStopMask);
-  addLayer(GraphicsLayer::sBotSolderPaste);
-  addLayer(GraphicsLayer::sBotGlue);
-  addLayer(GraphicsLayer::sBotPlacement);
-  addLayer(GraphicsLayer::sBotGrabAreas);
-  addLayer(GraphicsLayer::sBotCourtyard);
-  addLayer(GraphicsLayer::sBotValues);
-  addLayer(GraphicsLayer::sBotNames);
-  addLayer(GraphicsLayer::sBotDocumentation);
+    mColors() {
+  loadColorsFromTheme(Theme(), true, true, Layer::innerCopperCount());
 }
 
 GraphicsExportSettings::GraphicsExportSettings(
@@ -120,30 +68,29 @@ GraphicsExportSettings::~GraphicsExportSettings() noexcept {
  *  Getters
  ******************************************************************************/
 
-QStringList GraphicsExportSettings::getLayerPaintOrder() const noexcept {
+QStringList GraphicsExportSettings::getPaintOrder() const noexcept {
   QStringList l;
-  for (int i = mLayers.count() - 1; i >= 0; --i) {
-    l.append(mLayers.at(i).first);
+  for (int i = mColors.count() - 1; i >= 0; --i) {
+    l.append(mColors.at(i).first);
   }
   return l;
 }
 
-QColor GraphicsExportSettings::getColor(const QString& layerName) const
+QColor GraphicsExportSettings::getColor(const QString& colorName) const
     noexcept {
-  QColor color = getLayerColor(layerName);
+  QColor color = getColorImpl(colorName);
   if (color.isValid() && mBlackWhite) {
     color = (mBackgroundColor == Qt::black) ? Qt::white : Qt::black;
   }
   return color;
 }
 
-QColor GraphicsExportSettings::getFillColor(const QString& layerName,
+QColor GraphicsExportSettings::getFillColor(const QString& colorName,
                                             bool isFilled,
                                             bool isGrabArea) const noexcept {
-  QColor grabAreaColor =
-      getLayerColor(GraphicsLayer::getGrabAreaLayerName(layerName));
+  QColor grabAreaColor = getColorImpl(Theme::getGrabAreaColorName(colorName));
   if (isFilled) {
-    return getColor(layerName);
+    return getColor(colorName);
   } else if (isGrabArea && grabAreaColor.isValid()) {
     if (mBlackWhite) {
       int gray = qGray(grabAreaColor.rgb());
@@ -153,6 +100,88 @@ QColor GraphicsExportSettings::getFillColor(const QString& layerName,
     }
   } else {
     return QColor();
+  }
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
+                                                 bool schematic, bool board,
+                                                 int innerLayerCount) noexcept {
+  auto addColor = [this, &theme](const QString& colorName, bool autoAdjust) {
+    QColor color = theme.getColor(colorName).getPrimaryColor();
+    if (autoAdjust) {
+      // Make board layers looking better on white background since usually the
+      // graphics export uses white background.
+      int h = color.hsvHue();
+      int s = color.hsvSaturation();
+      int v = color.value() / 2;  // avoid white colors
+      int a = (color.alpha() / 2) + 127;  // avoid transparent colors
+      color = QColor::fromHsv(h, s, v, a);
+    }
+    mColors.append(std::make_pair(colorName, color));
+  };
+
+  mColors.clear();
+
+  // Schematic layers.
+  if (schematic) {
+    addColor(Theme::Color::sSchematicFrames, false);
+    addColor(Theme::Color::sSchematicOutlines, false);
+    addColor(Theme::Color::sSchematicGrabAreas, false);
+    addColor(Theme::Color::sSchematicPinLines, false);
+    addColor(Theme::Color::sSchematicPinNames, false);
+    addColor(Theme::Color::sSchematicPinNumbers, false);
+    addColor(Theme::Color::sSchematicNames, false);
+    addColor(Theme::Color::sSchematicValues, false);
+    addColor(Theme::Color::sSchematicWires, false);
+    addColor(Theme::Color::sSchematicNetLabels, false);
+    addColor(Theme::Color::sSchematicDocumentation, false);
+    addColor(Theme::Color::sSchematicComments, false);
+    addColor(Theme::Color::sSchematicGuide, false);
+  }
+
+  if (board) {
+    // Asymmetric board layers.
+    addColor(Theme::Color::sBoardGuide, true);
+    addColor(Theme::Color::sBoardComments, true);
+    addColor(Theme::Color::sBoardDocumentation, true);
+    addColor(Theme::Color::sBoardAlignment, true);
+    addColor(Theme::Color::sBoardMeasures, true);
+    addColor(Theme::Color::sBoardFrames, true);
+    addColor(Theme::Color::sBoardAirWires, true);
+    addColor(Theme::Color::sBoardOutlines, true);
+    addColor(Theme::Color::sBoardHoles, true);
+    addColor(Theme::Color::sBoardMilling, true);
+    addColor(Theme::Color::sBoardPads, true);
+    addColor(Theme::Color::sBoardVias, true);
+
+    // Symmetric board layers in logical order.
+    addColor(Theme::Color::sBoardDocumentationTop, true);
+    addColor(Theme::Color::sBoardNamesTop, true);
+    addColor(Theme::Color::sBoardValuesTop, true);
+    addColor(Theme::Color::sBoardCourtyardTop, true);
+    addColor(Theme::Color::sBoardGrabAreasTop, true);
+    addColor(Theme::Color::sBoardPlacementTop, true);
+    addColor(Theme::Color::sBoardGlueTop, true);
+    addColor(Theme::Color::sBoardSolderPasteTop, true);
+    addColor(Theme::Color::sBoardStopMaskTop, true);
+    addColor(Theme::Color::sBoardCopperTop, true);
+    for (int i = 1; i <= innerLayerCount; ++i) {
+      addColor(QString(Theme::Color::sBoardCopperInner).arg(i), true);
+    }
+    addColor(Theme::Color::sBoardCopperBot, true);
+    addColor(Theme::Color::sBoardStopMaskBot, true);
+    addColor(Theme::Color::sBoardSolderPasteBot, true);
+    addColor(Theme::Color::sBoardGlueBot, true);
+    addColor(Theme::Color::sBoardPlacementBot, true);
+    addColor(Theme::Color::sBoardGrabAreasBot, true);
+    addColor(Theme::Color::sBoardCourtyardBot, true);
+    addColor(Theme::Color::sBoardValuesBot, true);
+    addColor(Theme::Color::sBoardNamesBot, true);
+    addColor(Theme::Color::sBoardDocumentationBot, true);
   }
 }
 
@@ -175,7 +204,7 @@ GraphicsExportSettings& GraphicsExportSettings::operator=(
   mBlackWhite = rhs.mBlackWhite;
   mBackgroundColor = rhs.mBackgroundColor;
   mMinLineWidth = rhs.mMinLineWidth;
-  mLayers = rhs.mLayers;
+  mColors = rhs.mColors;
   return *this;
 }
 
@@ -194,7 +223,7 @@ bool GraphicsExportSettings::operator==(const GraphicsExportSettings& rhs) const
   if (mBlackWhite != rhs.mBlackWhite) return false;
   if (mBackgroundColor != rhs.mBackgroundColor) return false;
   if (mMinLineWidth != rhs.mMinLineWidth) return false;
-  if (mLayers != rhs.mLayers) return false;
+  if (mColors != rhs.mColors) return false;
   return true;
 }
 
@@ -207,24 +236,9 @@ bool GraphicsExportSettings::operator!=(const GraphicsExportSettings& rhs) const
  *  Private Methods
  ******************************************************************************/
 
-void GraphicsExportSettings::addLayer(const QString& name) noexcept {
-  static Theme defaultTheme;
-  QColor color = defaultTheme.getColorForLayer(name).getPrimaryColor();
-  if (GraphicsLayer::isBoardLayer(name)) {
-    // Make board layer looking better on white background since usually the
-    // graphics export uses white background.
-    int h = color.hsvHue();
-    int s = color.hsvSaturation();
-    int v = color.value() / 2;  // avoid white colors
-    int a = (color.alpha() / 2) + 127;  // avoid transparent colors
-    color = QColor::fromHsv(h, s, v, a);
-  }
-  mLayers.append(std::make_pair(name, color));
-}
-
-QColor GraphicsExportSettings::getLayerColor(const QString& name) const
+QColor GraphicsExportSettings::getColorImpl(const QString& name) const
     noexcept {
-  foreach (const auto& pair, mLayers) {
+  foreach (const auto& pair, mColors) {
     if (pair.first == name) {
       return pair.second;
     }

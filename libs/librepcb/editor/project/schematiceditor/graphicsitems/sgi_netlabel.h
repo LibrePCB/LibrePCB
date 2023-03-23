@@ -34,11 +34,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class GraphicsLayer;
-
 namespace editor {
 
+class GraphicsLayer;
+class IF_GraphicsLayerProvider;
 class LineGraphicsItem;
 
 /*******************************************************************************
@@ -53,7 +52,7 @@ public:
   // Constructors / Destructor
   SGI_NetLabel() = delete;
   SGI_NetLabel(const SGI_NetLabel& other) = delete;
-  SGI_NetLabel(SI_NetLabel& netlabel,
+  SGI_NetLabel(SI_NetLabel& netlabel, const IF_GraphicsLayerProvider& lp,
                std::shared_ptr<const QSet<const NetSignal*>>
                    highlightedNetSignals) noexcept;
   virtual ~SGI_NetLabel() noexcept;
@@ -78,11 +77,12 @@ private:  // Methods
   void updateRotation() noexcept;
   void updateText() noexcept;
   void updateAnchor() noexcept;
-  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 private:  // Data
   SI_NetLabel& mNetLabel;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
+  const GraphicsLayer* mOriginCrossLayer;
+  const GraphicsLayer* mNetLabelLayer;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
 
   // Cached Attributes

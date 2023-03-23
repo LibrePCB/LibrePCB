@@ -35,11 +35,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class IF_GraphicsLayerProvider;
-
 namespace editor {
 
+class IF_GraphicsLayerProvider;
 class PrimitiveFootprintPadGraphicsItem;
 
 /*******************************************************************************
@@ -80,6 +78,7 @@ private:  // Methods
                             PackagePadList::Event event) noexcept;
   virtual QVariant itemChange(GraphicsItemChange change,
                               const QVariant& value) noexcept override;
+  void updateLayer() noexcept;
   void updateGeometries() noexcept;
 
 private:  // Data

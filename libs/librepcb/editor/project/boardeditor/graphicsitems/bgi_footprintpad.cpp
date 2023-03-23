@@ -25,10 +25,10 @@
 #include "../../../graphics/primitivefootprintpadgraphicsitem.h"
 #include "../boardgraphicsscene.h"
 
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/types/layer.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -45,14 +45,14 @@ namespace editor {
 
 BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad,
                                    std::weak_ptr<BGI_Device> deviceItem,
+                                   const IF_GraphicsLayerProvider& lp,
                                    std::shared_ptr<const QSet<const NetSignal*>>
                                        highlightedNetSignals) noexcept
   : QGraphicsItemGroup(),
     mPad(pad),
     mDeviceGraphicsItem(deviceItem),
     mHighlightedNetSignals(highlightedNetSignals),
-    mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(
-        pad.getBoard().getLayerStack(), false, this)),
+    mGraphicsItem(new PrimitiveFootprintPadGraphicsItem(lp, false, this)),
     mOnPadEditedSlot(*this, &BGI_FootprintPad::padEdited),
     mOnDeviceEditedSlot(*this, &BGI_FootprintPad::deviceGraphicsItemEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
@@ -128,12 +128,16 @@ void BGI_FootprintPad::deviceGraphicsItemEdited(
 }
 
 void BGI_FootprintPad::updateLayer() noexcept {
-  if (mPad.getLayerName() == GraphicsLayer::sBotCopper) {
-    setZValue(BoardGraphicsScene::ZValue_FootprintPadsBottom);
-  } else {
+  if (mPad.getLibPad().isTht()) {
     setZValue(BoardGraphicsScene::ZValue_FootprintPadsTop);
+    mGraphicsItem->setLayer(Theme::Color::sBoardPads);
+  } else if (mPad.getSmtLayer() == Layer::topCopper()) {
+    setZValue(BoardGraphicsScene::ZValue_FootprintPadsTop);
+    mGraphicsItem->setLayer(Theme::Color::sBoardCopperTop);
+  } else {
+    setZValue(BoardGraphicsScene::ZValue_FootprintPadsBottom);
+    mGraphicsItem->setLayer(Theme::Color::sBoardCopperBot);
   }
-  mGraphicsItem->setLayer(mPad.getLayerName());
 }
 
 /*******************************************************************************

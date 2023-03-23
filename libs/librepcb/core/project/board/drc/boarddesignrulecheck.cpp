@@ -37,7 +37,6 @@
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../board.h"
-#include "../boardlayerstack.h"
 #include "../items/bi_airwire.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprintpad.h"
@@ -144,9 +143,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
 
   // stroke texts
   foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
-    const GraphicsLayer* layer =
-        mBoard.getLayerStack().getLayer(*text->getTextObj().getLayerName());
-    if ((!layer) || (!layer->isCopperLayer()) || (!layer->isEnabled())) {
+    if (!mBoard.getCopperLayers().contains(&text->getTextObj().getLayer())) {
       continue;
     }
     if (text->getTextObj().getStrokeWidth() < minWidth) {
@@ -163,9 +160,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
 
   // planes
   foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-    const GraphicsLayer* layer =
-        mBoard.getLayerStack().getLayer(*plane->getLayerName());
-    if ((!layer) || (!layer->isCopperLayer()) || (!layer->isEnabled())) {
+    if (!mBoard.getCopperLayers().contains(&plane->getLayer())) {
       continue;
     }
     if (plane->getMinWidth() < minWidth) {
@@ -181,9 +176,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
-      const GraphicsLayer* layer =
-          mBoard.getLayerStack().getLayer(*text->getTextObj().getLayerName());
-      if ((!layer) || (!layer->isCopperLayer()) || (!layer->isEnabled())) {
+      if (!mBoard.getCopperLayers().contains(&text->getTextObj().getLayer())) {
         continue;
       }
       if (text->getTextObj().getStrokeWidth() < minWidth) {
@@ -202,8 +195,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
   // netlines
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
     foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
-      if ((!netline->getLayer().isCopperLayer()) ||
-          (!netline->getLayer().isEnabled())) {
+      if (!mBoard.getCopperLayers().contains(&netline->getLayer())) {
         continue;
       }
       if (netline->getWidth() < minWidth) {
@@ -231,20 +223,12 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
   const Length offset =
       std::max(((clearance - maxArcTolerance()) / 2) - Length(1), Length(0));
 
-  // Determine all copper layers.
-  QSet<QString> layers;
-  foreach (const GraphicsLayer* layer, mBoard.getLayerStack().getAllLayers()) {
-    if (layer->isCopperLayer() && layer->isEnabled()) {
-      layers.insert(layer->getName());
-    }
-  }
-
   // Determine the area of each copper object.
   struct Item {
     const BI_Base* item;
     const Polygon* polygon;  // Only relevant if item is a BI_Device
     const Circle* circle;  // Only relevant if item is a BI_Device
-    QString layer;  // Empty = THT
+    const Layer* layer;  // nullptr = THT
     const NetSignal* netSignal;  // nullptr = no net
     ClipperLib::Paths areas;
   };
@@ -256,18 +240,18 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
     foreach (const BI_Via* via, netSegment->getVias()) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addVia(*via, offset);
-      items.append(Item{via, nullptr, nullptr, QString(),
+      items.append(Item{via, nullptr, nullptr, nullptr,
                         via->getNetSegment().getNetSignal(), gen.getPaths()});
     }
 
     // Net lines.
     foreach (const BI_NetLine* netLine, netSegment->getNetLines()) {
-      if (layers.contains(netLine->getLayer().getName())) {
+      if (mBoard.getCopperLayers().contains(&netLine->getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addNetLine(*netLine, offset);
-        items.append(
-            Item{netLine, nullptr, nullptr, netLine->getLayer().getName(),
-                 netLine->getNetSegment().getNetSignal(), gen.getPaths()});
+        items.append(Item{netLine, nullptr, nullptr, &netLine->getLayer(),
+                          netLine->getNetSegment().getNetSignal(),
+                          gen.getPaths()});
       }
     }
   }
@@ -275,12 +259,12 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
   // Planes.
   if (!mIgnorePlanes) {
     foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-      if (layers.contains(*plane->getLayerName())) {
+      if (mBoard.getCopperLayers().contains(&plane->getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addPlane(*plane);
         ClipperLib::Paths paths = gen.getPaths();
         ClipperHelpers::offset(paths, offset, maxArcTolerance());
-        items.append(Item{plane, nullptr, nullptr, *plane->getLayerName(),
+        items.append(Item{plane, nullptr, nullptr, &plane->getLayer(),
                           &plane->getNetSignal(), paths});
       }
     }
@@ -288,23 +272,24 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
   // Board polygons.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (layers.contains(*polygon->getPolygon().getLayerName())) {
+    if (mBoard.getCopperLayers().contains(&polygon->getPolygon().getLayer())) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addPolygon(*polygon);
       ClipperLib::Paths paths = gen.getPaths();
       ClipperHelpers::offset(paths, offset, maxArcTolerance());
       items.append(Item{polygon, nullptr, nullptr,
-                        *polygon->getPolygon().getLayerName(), nullptr, paths});
+                        &polygon->getPolygon().getLayer(), nullptr, paths});
     }
   }
 
   // Board stroke texts.
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    if (layers.contains(*strokeText->getTextObj().getLayerName())) {
+    if (mBoard.getCopperLayers().contains(
+            &strokeText->getTextObj().getLayer())) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addStrokeText(*strokeText, offset);
       items.append(Item{strokeText, nullptr, nullptr,
-                        *strokeText->getTextObj().getLayerName(), nullptr,
+                        &strokeText->getTextObj().getLayer(), nullptr,
                         gen.getPaths()});
     }
   }
@@ -315,10 +300,10 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
     // Pads.
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      foreach (const QString& layer, layers) {
-        if (pad->isOnLayer(layer)) {
+      foreach (const Layer* layer, mBoard.getCopperLayers()) {
+        if (pad->isOnLayer(*layer)) {
           BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-          gen.addPad(*pad, transform, layer, offset);
+          gen.addPad(*pad, transform, *layer, offset);
           items.append(Item{pad, nullptr, nullptr, layer,
                             pad->getCompSigInstNetSignal(), gen.getPaths()});
         }
@@ -327,33 +312,34 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
     // Polygons.
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      if (layers.contains(*polygon.getLayerName())) {
+      if (mBoard.getCopperLayers().contains(&polygon.getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addPolygon(polygon, transform);
         ClipperLib::Paths paths = gen.getPaths();
         ClipperHelpers::offset(paths, offset, maxArcTolerance());
-        items.append(Item{device, &polygon, nullptr, *polygon.getLayerName(),
+        items.append(Item{device, &polygon, nullptr, &polygon.getLayer(),
                           nullptr, paths});
       }
     }
 
     // Circles.
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
-      if (layers.contains(*circle.getLayerName())) {
+      if (mBoard.getCopperLayers().contains(&circle.getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addCircle(circle, transform, offset);
-        items.append(Item{device, nullptr, &circle, *circle.getLayerName(),
-                          nullptr, gen.getPaths()});
+        items.append(Item{device, nullptr, &circle, &circle.getLayer(), nullptr,
+                          gen.getPaths()});
       }
     }
 
     // Stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
-      if (layers.contains(*strokeText->getTextObj().getLayerName())) {
+      if (mBoard.getCopperLayers().contains(
+              &strokeText->getTextObj().getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addStrokeText(*strokeText, offset);
         items.append(Item{strokeText, nullptr, nullptr,
-                          *strokeText->getTextObj().getLayerName(), nullptr,
+                          &strokeText->getTextObj().getLayer(), nullptr,
                           gen.getPaths()});
       }
     }
@@ -365,8 +351,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
     for (auto it2 = it1 + 1; it2 != items.end(); it2++) {
       if (((it1->netSignal != it2->netSignal) || (!it1->netSignal) ||
            (!it2->netSignal)) &&
-          (it1->layer.isEmpty() || it2->layer.isEmpty() ||
-           (it1->layer == it2->layer))) {
+          ((!it1->layer) || (!it2->layer) || (it1->layer == it2->layer))) {
         const std::unique_ptr<ClipperLib::PolyTree> intersections =
             ClipperHelpers::intersect(it1->areas, it2->areas);
         const ClipperLib::Paths paths =
@@ -444,9 +429,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
   // Check board polygons.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    const GraphicsLayer* layer =
-        mBoard.getLayerStack().getLayer(*polygon->getPolygon().getLayerName());
-    if (layer && layer->isCopperLayer() && layer->isEnabled()) {
+    if (mBoard.getCopperLayers().contains(&polygon->getPolygon().getLayer())) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addPolygon(*polygon);
       if (intersects(gen.getPaths())) {
@@ -458,9 +441,8 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
   // Check board stroke texts.
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(
-        *strokeText->getTextObj().getLayerName());
-    if (layer && layer->isCopperLayer() && layer->isEnabled()) {
+    if (mBoard.getCopperLayers().contains(
+            &strokeText->getTextObj().getLayer())) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addStrokeText(*strokeText);
       if (intersects(gen.getPaths())) {
@@ -476,12 +458,10 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
     // Check pads.
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      foreach (const GraphicsLayer* layer,
-               mBoard.getLayerStack().getAllLayers()) {
-        if (layer->isCopperLayer() && layer->isEnabled() &&
-            pad->isOnLayer(layer->getName())) {
+      foreach (const Layer* layer, mBoard.getCopperLayers()) {
+        if (pad->isOnLayer(*layer)) {
           BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-          gen.addPad(*pad, transform, layer->getName());
+          gen.addPad(*pad, transform, *layer);
           if (intersects(gen.getPaths())) {
             emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
                 *pad, clearance, locations));
@@ -492,9 +472,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
     // Check polygons.
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      const GraphicsLayer* layer =
-          mBoard.getLayerStack().getLayer(*polygon.getLayerName());
-      if (layer && layer->isCopperLayer() && layer->isEnabled()) {
+      if (mBoard.getCopperLayers().contains(&polygon.getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addPolygon(polygon, transform);
         if (intersects(gen.getPaths())) {
@@ -506,9 +484,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
     // Check circles.
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
-      const GraphicsLayer* layer =
-          mBoard.getLayerStack().getLayer(*circle.getLayerName());
-      if (layer && layer->isCopperLayer() && layer->isEnabled()) {
+      if (mBoard.getCopperLayers().contains(&circle.getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addCircle(circle, transform);
         if (intersects(gen.getPaths())) {
@@ -520,9 +496,8 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
     // Check stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
-      const GraphicsLayer* layer = mBoard.getLayerStack().getLayer(
-          *strokeText->getTextObj().getLayerName());
-      if (layer && layer->isCopperLayer() && layer->isEnabled()) {
+      if (mBoard.getCopperLayers().contains(
+              &strokeText->getTextObj().getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addStrokeText(*strokeText);
         if (intersects(gen.getPaths())) {
@@ -546,10 +521,8 @@ void BoardDesignRuleCheck::checkCopperHoleClearances(int progressEnd) {
 
   // Determine tha areas where copper is available on *any* layer.
   ClipperLib::Paths copperAreas;
-  for (const GraphicsLayer* l : mBoard.getLayerStack().getAllLayers()) {
-    if (l->isCopperLayer() && l->isEnabled()) {
-      ClipperHelpers::unite(copperAreas, getCopperPaths(*l, {}));
-    }
+  foreach (const Layer* layer, mBoard.getCopperLayers()) {
+    ClipperHelpers::unite(copperAreas, getCopperPaths(*layer, {}));
   }
 
   // Helper for the actual check.
@@ -759,10 +732,8 @@ void BoardDesignRuleCheck::checkMinimumPthAnnularRing(int progressEnd) {
 
   // Determine tha areas where copper is available on *all* layers.
   QList<ClipperLib::Paths> thtCopperAreas;
-  for (const GraphicsLayer* l : mBoard.getLayerStack().getAllLayers()) {
-    if (l->isCopperLayer() && l->isEnabled()) {
-      thtCopperAreas.append(getCopperPaths(*l, {}));
-    }
+  foreach (const Layer* layer, mBoard.getCopperLayers()) {
+    thtCopperAreas.append(getCopperPaths(*layer, {}));
   }
   std::unique_ptr<ClipperLib::PolyTree> thtCopperAreaIntersections =
       ClipperHelpers::intersect(thtCopperAreas);
@@ -1022,14 +993,14 @@ void BoardDesignRuleCheck::checkInvalidPadConnections(int progressEnd) {
   // Pads.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      QSet<const GraphicsLayer*> connectedLayers;
+      QSet<const Layer*> connectedLayers;
       foreach (const BI_NetLine* netLine, pad->getNetLines()) {
         connectedLayers.insert(&netLine->getLayer());
       }
-      foreach (const GraphicsLayer* layer, connectedLayers) {
+      foreach (const Layer* layer, connectedLayers) {
         bool isOriginInCopper = false;
         foreach (const PadGeometry& geometry,
-                 pad->getGeometries().value(layer->getName())) {
+                 pad->getGeometries().value(layer)) {
           if (geometry.toFilledQPainterPathPx().contains(QPointF(0, 0))) {
             isOriginInCopper = true;
             break;
@@ -1053,9 +1024,7 @@ void BoardDesignRuleCheck::checkInvalidPadConnections(int progressEnd) {
 void BoardDesignRuleCheck::checkCourtyardClearances(int progressEnd) {
   emitStatus(tr("Check courtyard clearances..."));
 
-  auto layers = mBoard.getLayerStack().getLayers(
-      {GraphicsLayer::sTopCourtyard, GraphicsLayer::sBotCourtyard});
-  foreach (const GraphicsLayer* layer, layers) {
+  for (const Layer& layer : {Layer::topCourtyard(), Layer::botCourtyard()}) {
     // determine device courtyard areas
     QMap<const BI_Device*, ClipperLib::Paths> deviceCourtyards;
     foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
@@ -1092,14 +1061,14 @@ void BoardDesignRuleCheck::checkBoardOutline(int progressEnd) {
   // Collect all board outline objects and report open polygons.
   QVector<Path> outlines;
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (polygon->getPolygon().getLayerName() == GraphicsLayer::sBoardOutlines) {
+    if (polygon->getPolygon().getLayer() == Layer::boardOutlines()) {
       outlines.append(polygon->getPolygon().getPath());
     }
   }
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     const Transform transform(*device);
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      if (polygon.getLayerName() == GraphicsLayer::sBoardOutlines) {
+      if (polygon.getLayer() == Layer::boardOutlines()) {
         const Path path = transform.map(polygon.getPath());
         if (!path.isClosed()) {
           const QVector<Path> locations = path.toOutlineStrokes(PositiveLength(
@@ -1111,7 +1080,7 @@ void BoardDesignRuleCheck::checkBoardOutline(int progressEnd) {
       }
     }
     for (Circle circle : device->getLibFootprint().getCircles()) {
-      if (circle.getLayerName() == GraphicsLayer::sBoardOutlines) {
+      if (circle.getLayer() == Layer::boardOutlines()) {
         const Path path = Path::circle(circle.getDiameter())
                               .translated(transform.map(circle.getCenter()));
         outlines.append(path);
@@ -1258,7 +1227,7 @@ ClipperLib::Paths BoardDesignRuleCheck::getBoardClearanceArea(
   const PositiveLength clearanceWidth(
       std::max(clearance + clearance - maxArcTolerance() - 1, Length(1)));
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (polygon->getPolygon().getLayerName() == GraphicsLayer::sBoardOutlines) {
+    if (polygon->getPolygon().getLayer() == Layer::boardOutlines()) {
       const ClipperLib::Paths paths = ClipperHelpers::convert(
           polygon->getPolygon().getPath().toOutlineStrokes(clearanceWidth),
           maxArcTolerance());
@@ -1268,7 +1237,7 @@ ClipperLib::Paths BoardDesignRuleCheck::getBoardClearanceArea(
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     Transform transform(*device);
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      if (polygon.getLayerName() == GraphicsLayer::sBoardOutlines) {
+      if (polygon.getLayer() == Layer::boardOutlines()) {
         const ClipperLib::Paths paths = ClipperHelpers::convert(
             transform.map(polygon.getPath()).toOutlineStrokes(clearanceWidth),
             maxArcTolerance());
@@ -1281,23 +1250,23 @@ ClipperLib::Paths BoardDesignRuleCheck::getBoardClearanceArea(
 }
 
 const ClipperLib::Paths& BoardDesignRuleCheck::getCopperPaths(
-    const GraphicsLayer& layer, const QSet<const NetSignal*>& netsignals) {
+    const Layer& layer, const QSet<const NetSignal*>& netsignals) {
   const auto key = qMakePair(&layer, netsignals);
   if (!mCachedPaths.contains(key)) {
     BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-    gen.addCopper(layer.getName(), netsignals, mIgnorePlanes);
+    gen.addCopper(layer, netsignals, mIgnorePlanes);
     mCachedPaths[key] = gen.getPaths();
   }
   return mCachedPaths[key];
 }
 
 ClipperLib::Paths BoardDesignRuleCheck::getDeviceCourtyardPaths(
-    const BI_Device& device, const GraphicsLayer* layer) {
+    const BI_Device& device, const Layer& layer) {
   ClipperLib::Paths paths;
   Transform transform(device);
   for (const Polygon& polygon : device.getLibFootprint().getPolygons()) {
-    GraphicsLayerName polygonLayer = transform.map(polygon.getLayerName());
-    if (polygonLayer != layer->getName()) {
+    const Layer& polygonLayer = transform.map(polygon.getLayer());
+    if (polygonLayer != layer) {
       continue;
     }
     Path path = transform.map(polygon.getPath());
@@ -1305,8 +1274,8 @@ ClipperLib::Paths BoardDesignRuleCheck::getDeviceCourtyardPaths(
                           ClipperHelpers::convert(path, maxArcTolerance()));
   }
   for (const Circle& circle : device.getLibFootprint().getCircles()) {
-    GraphicsLayerName circleLayer = transform.map(circle.getLayerName());
-    if (circleLayer != layer->getName()) {
+    const Layer& circleLayer = transform.map(circle.getLayer());
+    if (circleLayer != layer) {
       continue;
     }
     Point absolutePos = transform.map(circle.getCenter());
@@ -1336,14 +1305,14 @@ QVector<Path> BoardDesignRuleCheck::getDeviceLocation(
   };
 
   // Helper function to add drawings on a particular layer.
-  auto addDrawing = [&device, &addPath](const QString& layer) {
+  auto addDrawing = [&device, &addPath](const Layer& layer) {
     for (const Polygon& polygon : device.getLibFootprint().getPolygons()) {
-      if (*polygon.getLayerName() == layer) {
+      if (polygon.getLayer() == layer) {
         addPath(polygon.getPath(), polygon.getLineWidth(), polygon.isFilled());
       }
     }
     for (const Circle& circle : device.getLibFootprint().getCircles()) {
-      if (*circle.getLayerName() == layer) {
+      if (circle.getLayer() == layer) {
         addPath(
             Path::circle(circle.getDiameter()).translated(circle.getCenter()),
             circle.getLineWidth(), circle.isFilled());
@@ -1352,13 +1321,13 @@ QVector<Path> BoardDesignRuleCheck::getDeviceLocation(
   };
 
   // Add drawings on documentation layer.
-  addDrawing(GraphicsLayer::sTopDocumentation);
-  addDrawing(GraphicsLayer::sBotDocumentation);
+  addDrawing(Layer::topDocumentation());
+  addDrawing(Layer::botDocumentation());
 
   // If there's no documentation, add drawings on placement layer.
   if (locations.isEmpty()) {
-    addDrawing(GraphicsLayer::sTopPlacement);
-    addDrawing(GraphicsLayer::sBotPlacement);
+    addDrawing(Layer::topPlacement());
+    addDrawing(Layer::botPlacement());
   }
 
   // Add origin cross.

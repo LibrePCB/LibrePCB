@@ -22,15 +22,14 @@
  ******************************************************************************/
 #include "bgi_via.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../boardgraphicsscene.h"
 
 #include <librepcb/core/application.h>
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -45,18 +44,15 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Via::BGI_Via(BI_Via& via,
+BGI_Via::BGI_Via(BI_Via& via, const IF_GraphicsLayerProvider& lp,
                  std::shared_ptr<const QSet<const NetSignal*>>
                      highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mVia(via),
     mHighlightedNetSignals(highlightedNetSignals),
-    mViaLayer(
-        mVia.getBoard().getLayerStack().getLayer(GraphicsLayer::sBoardViasTht)),
-    mTopStopMaskLayer(
-        mVia.getBoard().getLayerStack().getLayer(GraphicsLayer::sTopStopMask)),
-    mBottomStopMaskLayer(
-        mVia.getBoard().getLayerStack().getLayer(GraphicsLayer::sBotStopMask)),
+    mViaLayer(lp.getLayer(Theme::Color::sBoardVias)),
+    mTopStopMaskLayer(lp.getLayer(Theme::Color::sBoardStopMaskTop)),
+    mBottomStopMaskLayer(lp.getLayer(Theme::Color::sBoardStopMaskBot)),
     mOnEditedSlot(*this, &BGI_Via::viaEdited),
     mOnLayerEditedSlot(*this, &BGI_Via::layerEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);

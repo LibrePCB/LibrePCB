@@ -24,8 +24,8 @@
 
 #include "../../application.h"
 #include "../../export/graphicsexportsettings.h"
-#include "../../graphics/graphicslayer.h"
-#include "../../graphics/graphicspainter.h"
+#include "../../export/graphicspainter.h"
+#include "../../workspace/theme.h"
 #include "symbol.h"
 
 #include <QtCore>
@@ -74,41 +74,42 @@ void SymbolPainter::paint(QPainter& painter,
     // Draw Polygons.
     foreach (const Polygon& polygon, mPolygons) {
       if (polygon.isGrabArea() != grabArea) continue;
-      p.drawPolygon(
-          polygon.getPath(), *polygon.getLineWidth(),
-          settings.getColor(*polygon.getLayerName()),
-          settings.getFillColor(*polygon.getLayerName(), polygon.isFilled(),
-                                polygon.isGrabArea()));
+      const QString color = polygon.getLayer().getThemeColor();
+      p.drawPolygon(polygon.getPath(), *polygon.getLineWidth(),
+                    settings.getColor(color),
+                    settings.getFillColor(color, polygon.isFilled(),
+                                          polygon.isGrabArea()));
     }
 
     // Draw Circles.
     foreach (const Circle& circle, mCircles) {
       if (circle.isGrabArea() != grabArea) continue;
+      const QString color = circle.getLayer().getThemeColor();
       p.drawCircle(
           circle.getCenter(), *circle.getDiameter(), *circle.getLineWidth(),
-          settings.getColor(*circle.getLayerName()),
-          settings.getFillColor(*circle.getLayerName(), circle.isFilled(),
-                                circle.isGrabArea()));
+          settings.getColor(color),
+          settings.getFillColor(color, circle.isFilled(), circle.isGrabArea()));
     }
   }
 
   // Draw Texts.
   foreach (const Text& text, mTexts) {
+    const QString color = text.getLayer().getThemeColor();
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
                text.getAlign(), text.getText(), qApp->getDefaultSansSerifFont(),
-               settings.getColor(*text.getLayerName()), true, false);
+               settings.getColor(color), true, false);
   }
 
   // Draw Pins.
   foreach (const SymbolPin& pin, mPins) {
     p.drawSymbolPin(pin.getPosition(), pin.getRotation(), *pin.getLength(),
-                    settings.getColor(GraphicsLayer::sSymbolPinLines),
+                    settings.getColor(Theme::Color::sSchematicPinLines),
                     QColor());
     p.drawText(
         pin.getPosition() + pin.getNamePosition().rotated(pin.getRotation()),
         pin.getRotation() + pin.getNameRotation(), *pin.getNameHeight(),
         pin.getNameAlignment(), *pin.getName(), qApp->getDefaultSansSerifFont(),
-        settings.getColor(GraphicsLayer::sSymbolPinNames), true, false);
+        settings.getColor(Theme::Color::sSchematicPinNames), true, false);
   }
 }
 

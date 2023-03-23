@@ -28,8 +28,8 @@
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boarddesignrules.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -58,8 +58,7 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
 
   // Tab: General
   mUi->spbxInnerCopperLayerCount->setMinimum(0);
-  mUi->spbxInnerCopperLayerCount->setMaximum(
-      GraphicsLayer::getInnerLayerCount());
+  mUi->spbxInnerCopperLayerCount->setMaximum(Layer::innerCopperCount());
 
   // Tab: Design Rules
   mUi->edtRulesStopMaskClrRatio->setSingleStep(5.0);  // [%]
@@ -238,8 +237,7 @@ void BoardSetupDialog::buttonBoxClicked(QAbstractButton* button) {
 void BoardSetupDialog::load() noexcept {
   // Tab: General
   mUi->edtBoardName->setText(*mBoard.getName());
-  mUi->spbxInnerCopperLayerCount->setValue(
-      mBoard.getLayerStack().getInnerLayerCount());
+  mUi->spbxInnerCopperLayerCount->setValue(mBoard.getInnerLayerCount());
 
   // Tab: Design Rules
   const BoardDesignRules& r = mBoard.getDesignRules();

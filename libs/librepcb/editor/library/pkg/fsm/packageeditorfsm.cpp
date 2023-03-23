@@ -186,7 +186,7 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
     mSelectFootprintGraphicsItem->setText(tr("Please select a footprint."));
     mSelectFootprintGraphicsItem->setLayer(
         mContext.editorContext.layerProvider.getLayer(
-            GraphicsLayer::sBoardOutlines));
+            Theme::Color::sBoardOutlines));
     mContext.graphicsScene.addItem(*mSelectFootprintGraphicsItem);
     mContext.graphicsView.setEnabled(false);
     mContext.graphicsView.zoomAll();

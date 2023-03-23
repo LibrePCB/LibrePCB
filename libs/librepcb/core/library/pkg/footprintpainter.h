@@ -52,7 +52,7 @@ class Text;
  * Used for ::librepcb::GraphicsExport.
  */
 class FootprintPainter final : public GraphicsPagePainter {
-  struct LayerContent {
+  struct ColorContent {
     QList<QPainterPath> areas;
     QList<Polygon> polygons;
     QList<Circle> circles;
@@ -76,7 +76,7 @@ public:
   FootprintPainter& operator=(const FootprintPainter& rhs) = delete;
 
 private:  // Methods
-  void initContentByLayer() const noexcept;
+  void initContentByColor() const noexcept;
 
 private:  // Data
   const StrokeFont& mStrokeFont;
@@ -88,7 +88,7 @@ private:  // Data
   QList<Hole> mHoles;
 
   mutable QMutex mMutex;
-  mutable QHash<QString, LayerContent> mContentByLayer;
+  mutable QHash<QString, ColorContent> mContentByColor;
 };
 
 /*******************************************************************************

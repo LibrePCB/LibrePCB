@@ -25,11 +25,11 @@
 #include "../../workspace/desktopservices.h"
 #include "ui_fabricationoutputdialog.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
@@ -127,21 +127,19 @@ FabricationOutputDialog::FabricationOutputDialog(
   mUi->cbxSolderPasteTop->setChecked(s.getEnableSolderPasteTop());
   mUi->cbxSolderPasteBot->setChecked(s.getEnableSolderPasteBot());
 
-  QStringList topSilkscreen = s.getSilkscreenLayersTop();
+  const QVector<const Layer*>& topSilkscreen = s.getSilkscreenLayersTop();
   mUi->cbxSilkTopPlacement->setChecked(
-      topSilkscreen.contains(GraphicsLayer::sTopPlacement));
-  mUi->cbxSilkTopNames->setChecked(
-      topSilkscreen.contains(GraphicsLayer::sTopNames));
+      topSilkscreen.contains(&Layer::topPlacement()));
+  mUi->cbxSilkTopNames->setChecked(topSilkscreen.contains(&Layer::topNames()));
   mUi->cbxSilkTopValues->setChecked(
-      topSilkscreen.contains(GraphicsLayer::sTopValues));
+      topSilkscreen.contains(&Layer::topValues()));
 
-  QStringList botSilkscreen = s.getSilkscreenLayersBot();
+  const QVector<const Layer*>& botSilkscreen = s.getSilkscreenLayersBot();
   mUi->cbxSilkBotPlacement->setChecked(
-      botSilkscreen.contains(GraphicsLayer::sBotPlacement));
-  mUi->cbxSilkBotNames->setChecked(
-      botSilkscreen.contains(GraphicsLayer::sBotNames));
+      botSilkscreen.contains(&Layer::botPlacement()));
+  mUi->cbxSilkBotNames->setChecked(botSilkscreen.contains(&Layer::botNames()));
   mUi->cbxSilkBotValues->setChecked(
-      botSilkscreen.contains(GraphicsLayer::sBotValues));
+      botSilkscreen.contains(&Layer::botValues()));
 
   // Load window geometry.
   QSettings clientSettings;
@@ -266,30 +264,32 @@ void FabricationOutputDialog::btnBrowseOutputDirClicked() {
  *  Private Methods
  ******************************************************************************/
 
-QStringList FabricationOutputDialog::getTopSilkscreenLayers() const noexcept {
-  QStringList layers;
+QVector<const Layer*> FabricationOutputDialog::getTopSilkscreenLayers() const
+    noexcept {
+  QVector<const Layer*> layers;
   if (mUi->cbxSilkTopPlacement->isChecked()) {
-    layers << GraphicsLayer::sTopPlacement;
+    layers << &Layer::topPlacement();
   }
   if (mUi->cbxSilkTopNames->isChecked()) {
-    layers << GraphicsLayer::sTopNames;
+    layers << &Layer::topNames();
   }
   if (mUi->cbxSilkTopValues->isChecked()) {
-    layers << GraphicsLayer::sTopValues;
+    layers << &Layer::topValues();
   }
   return layers;
 }
 
-QStringList FabricationOutputDialog::getBotSilkscreenLayers() const noexcept {
-  QStringList layers;
+QVector<const Layer*> FabricationOutputDialog::getBotSilkscreenLayers() const
+    noexcept {
+  QVector<const Layer*> layers;
   if (mUi->cbxSilkBotPlacement->isChecked()) {
-    layers << GraphicsLayer::sBotPlacement;
+    layers << &Layer::botPlacement();
   }
   if (mUi->cbxSilkBotNames->isChecked()) {
-    layers << GraphicsLayer::sBotNames;
+    layers << &Layer::botNames();
   }
   if (mUi->cbxSilkBotValues->isChecked()) {
-    layers << GraphicsLayer::sBotValues;
+    layers << &Layer::botValues();
   }
   return layers;
 }

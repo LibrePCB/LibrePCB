@@ -40,7 +40,6 @@ class BI_NetLine;
 class BI_NetLineAnchor;
 class BI_NetPoint;
 class BI_Via;
-class GraphicsLayer;
 class NetSignal;
 
 /*******************************************************************************

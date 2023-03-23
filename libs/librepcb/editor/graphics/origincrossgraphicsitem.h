@@ -23,7 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/graphics/graphicslayer.h>
+#include "graphicslayer.h"
+
 #include <librepcb/core/types/length.h>
 
 #include <QtCore>

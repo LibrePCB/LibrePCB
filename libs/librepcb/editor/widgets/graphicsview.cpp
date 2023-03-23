@@ -27,7 +27,7 @@
 #include "if_graphicsvieweventhandler.h"
 
 #include <librepcb/core/application.h>
-#include <librepcb/core/graphics/graphicspainter.h>
+#include <librepcb/core/export/graphicspainter.h>
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/utils/toolbox.h>

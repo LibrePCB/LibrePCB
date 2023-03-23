@@ -31,13 +31,12 @@
 #include "../../cmd/cmdboardplaneedit.h"
 #include "../boardeditor.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -57,7 +56,7 @@ BoardEditorState_DrawPlane::BoardEditorState_DrawPlane(
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
     mLastNetSignal(nullptr),
-    mLastLayerName(GraphicsLayer::sTopCopper),
+    mLastLayer(&Layer::topCopper()),
     mLastVertexPos(),
     mCurrentPlane(nullptr) {
 }
@@ -117,16 +116,12 @@ bool BoardEditorState_DrawPlane::entry() noexcept {
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
-  QList<GraphicsLayer*> layers;
+  QSet<const Layer*> layers;
   if (Board* board = getActiveBoard()) {
-    foreach (GraphicsLayer* layer, board->getLayerStack().getAllLayers()) {
-      if (layer->isCopperLayer() && layer->isEnabled()) {
-        layers.append(layer);
-      }
-    }
+    layers = board->getCopperLayers();
   }
   layerComboBox->setLayers(layers);
-  layerComboBox->setCurrentLayer(mLastLayerName);
+  layerComboBox->setCurrentLayer(*mLastLayer);
   layerComboBox->addAction(
       cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
                                &GraphicsLayerComboBox::stepDown));
@@ -213,14 +208,14 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
 
     // Add plane with two vertices
     Path path({Vertex(pos), Vertex(pos)});
-    mCurrentPlane = new BI_Plane(*board, Uuid::createRandom(), mLastLayerName,
+    mCurrentPlane = new BI_Plane(*board, Uuid::createRandom(), *mLastLayer,
                                  *mLastNetSignal, path);
     mContext.undoStack.appendToCmdGroup(new CmdBoardPlaneAdd(*mCurrentPlane));
 
     // Start undo command
     mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane, false));
     mLastVertexPos = pos;
-    makeSelectedLayerVisible();
+    makeLayerVisible(mLastLayer->getThemeColor());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -315,19 +310,11 @@ bool BoardEditorState_DrawPlane::abortCommand(bool showErrMsgBox) noexcept {
 }
 
 void BoardEditorState_DrawPlane::layerComboBoxLayerChanged(
-    const GraphicsLayerName& layerName) noexcept {
-  mLastLayerName = layerName;
+    const Layer& layer) noexcept {
+  mLastLayer = &layer;
   if (mCurrentPlaneEditCmd) {
-    mCurrentPlaneEditCmd->setLayerName(mLastLayerName, true);
-    makeSelectedLayerVisible();
-  }
-}
-
-void BoardEditorState_DrawPlane::makeSelectedLayerVisible() noexcept {
-  if (mCurrentPlane) {
-    Board& board = mCurrentPlane->getBoard();
-    GraphicsLayer* layer = board.getLayerStack().getLayer(*mLastLayerName);
-    if (layer && layer->isEnabled()) layer->setVisible(true);
+    mCurrentPlaneEditCmd->setLayer(*mLastLayer, true);
+    makeLayerVisible(mLastLayer->getThemeColor());
   }
 }
 

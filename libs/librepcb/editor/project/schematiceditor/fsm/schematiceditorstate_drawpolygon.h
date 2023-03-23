@@ -35,6 +35,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Layer;
 class SI_Polygon;
 class Schematic;
 
@@ -85,7 +86,7 @@ private:  // Methods
   bool addSegment(const Point& pos) noexcept;
   bool updateLastVertexPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void layerComboBoxLayerChanged(const GraphicsLayerName& layerName) noexcept;
+  void layerComboBoxLayerChanged(const Layer& layer) noexcept;
   void widthEditValueChanged(const UnsignedLength& value) noexcept;
   void filledCheckBoxCheckedChanged(bool checked) noexcept;
 

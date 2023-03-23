@@ -35,7 +35,6 @@
 #include "cmdremoveunusedlibraryelements.h"
 
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
@@ -235,12 +234,11 @@ void CmdRemoveBoardItems::removeNetSegmentItems(
             mBoard.getDeviceInstanceByComponentUuid(anchor->device);
         end = device ? device->getPad(anchor->pad) : nullptr;
       }
-      GraphicsLayer* layer = mBoard.getLayerStack().getLayer(*trace.getLayer());
-      if ((!start) || (!end) || (!layer)) {
+      if ((!start) || (!end)) {
         throw LogicError(__FILE__, __LINE__);
       }
-      BI_NetLine* newNetLine =
-          cmdAddElements->addNetLine(*start, *end, *layer, trace.getWidth());
+      BI_NetLine* newNetLine = cmdAddElements->addNetLine(
+          *start, *end, trace.getLayer(), trace.getWidth());
       Q_ASSERT(newNetLine);
     }
     execNewChildCmd(cmdAddElements);  // can throw

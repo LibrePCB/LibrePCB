@@ -34,11 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class GraphicsLayer;
-
 namespace editor {
 
+class IF_GraphicsLayerProvider;
 class LineGraphicsItem;
 class TextGraphicsItem;
 
@@ -54,7 +52,8 @@ public:
   // Constructors / Destructor
   SGI_Text() = delete;
   SGI_Text(const SGI_Text& other) = delete;
-  SGI_Text(SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem) noexcept;
+  SGI_Text(SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
+           const IF_GraphicsLayerProvider& lp) noexcept;
   virtual ~SGI_Text() noexcept;
 
   // General Methods
@@ -82,6 +81,7 @@ private:  // Methods
 private:  // Data
   SI_Text& mText;
   std::weak_ptr<SGI_Symbol> mSymbolGraphicsItem;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   QScopedPointer<TextGraphicsItem> mTextGraphicsItem;
   QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
 

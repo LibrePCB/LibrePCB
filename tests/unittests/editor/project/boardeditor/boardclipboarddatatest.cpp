@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/attribute/attrtypestring.h>
 #include <librepcb/core/attribute/attrtypevoltage.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/editor/project/boardeditor/boardclipboarddata.h>
 
 #include <QtCore>
@@ -82,13 +83,13 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       AttrTypeVoltage::instance().getUnitFromString("millivolt"));
 
   std::shared_ptr<StrokeText> strokeText1 = std::make_shared<StrokeText>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), "text 1", Point(1, 2),
-      Angle(3), PositiveLength(4), UnsignedLength(5), StrokeTextSpacing(),
+      Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
+      PositiveLength(4), UnsignedLength(5), StrokeTextSpacing(),
       StrokeTextSpacing(Ratio(6)), Alignment(HAlign::left(), VAlign::top()),
       false, true);
 
   std::shared_ptr<StrokeText> strokeText2 = std::make_shared<StrokeText>(
-      Uuid::createRandom(), GraphicsLayerName("bar"), "text 2", Point(10, 20),
+      Uuid::createRandom(), Layer::topPlacement(), "text 2", Point(10, 20),
       Angle(30), PositiveLength(40), UnsignedLength(0),
       StrokeTextSpacing(Ratio(6)), StrokeTextSpacing(),
       Alignment(HAlign::center(), VAlign::bottom()), true, false);
@@ -121,11 +122,11 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   netSegment1->junctions.append(
       std::make_shared<Junction>(Uuid::createRandom(), Point(3, 4)));
   netSegment1->traces.append(std::make_shared<Trace>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), PositiveLength(1),
+      Uuid::createRandom(), Layer::topCopper(), PositiveLength(1),
       TraceAnchor::junction(Uuid::createRandom()),
       TraceAnchor::via(Uuid::createRandom())));
   netSegment1->traces.append(std::make_shared<Trace>(
-      Uuid::createRandom(), GraphicsLayerName("bar"), PositiveLength(10),
+      Uuid::createRandom(), Layer::botCopper(), PositiveLength(10),
       TraceAnchor::junction(Uuid::createRandom()),
       TraceAnchor::pad(Uuid::createRandom(), Uuid::createRandom())));
 
@@ -143,41 +144,37 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   netSegment2->junctions.append(
       std::make_shared<Junction>(Uuid::createRandom(), Point(3, 4)));
   netSegment2->traces.append(std::make_shared<Trace>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), PositiveLength(1),
+      Uuid::createRandom(), Layer::topCopper(), PositiveLength(1),
       TraceAnchor::junction(Uuid::createRandom()),
       TraceAnchor::via(Uuid::createRandom())));
   netSegment2->traces.append(std::make_shared<Trace>(
-      Uuid::createRandom(), GraphicsLayerName("bar"), PositiveLength(10),
+      Uuid::createRandom(), Layer::botCopper(), PositiveLength(10),
       TraceAnchor::junction(Uuid::createRandom()),
       TraceAnchor::pad(Uuid::createRandom(), Uuid::createRandom())));
 
   std::shared_ptr<BoardClipboardData::Plane> plane1 =
       std::make_shared<BoardClipboardData::Plane>(
-          Uuid::createRandom(), GraphicsLayerName("foo"),
-          CircuitIdentifier("bar"),
+          Uuid::createRandom(), Layer::topCopper(), CircuitIdentifier("bar"),
           Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
           UnsignedLength(1), UnsignedLength(2), false, 0,
           BI_Plane::ConnectStyle::None);
 
   std::shared_ptr<BoardClipboardData::Plane> plane2 =
       std::make_shared<BoardClipboardData::Plane>(
-          Uuid::createRandom(), GraphicsLayerName("bar"),
-          CircuitIdentifier("foo"),
+          Uuid::createRandom(), Layer::botCopper(), CircuitIdentifier("foo"),
           Path({Vertex(Point(10, 20), Angle(30)),
                 Vertex(Point(40, 50), Angle(60))}),
           UnsignedLength(10), UnsignedLength(20), true, 5,
           BI_Plane::ConnectStyle::Solid);
 
   std::shared_ptr<Polygon> polygon1 = std::make_shared<Polygon>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(1), false,
-      true,
+      Uuid::createRandom(), Layer::topCopper(), UnsignedLength(1), false, true,
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
 
-  std::shared_ptr<Polygon> polygon2 =
-      std::make_shared<Polygon>(Uuid::createRandom(), GraphicsLayerName("bar"),
-                                UnsignedLength(10), true, false,
-                                Path({Vertex(Point(10, 20), Angle(30)),
-                                      Vertex(Point(40, 50), Angle(60))}));
+  std::shared_ptr<Polygon> polygon2 = std::make_shared<Polygon>(
+      Uuid::createRandom(), Layer::botCopper(), UnsignedLength(10), true, false,
+      Path({Vertex(Point(10, 20), Angle(30)),
+            Vertex(Point(40, 50), Angle(60))}));
 
   std::shared_ptr<Hole> hole1 = std::make_shared<Hole>(
       Uuid::createRandom(), PositiveLength(3), makeNonEmptyPath(Point(1, 2)),

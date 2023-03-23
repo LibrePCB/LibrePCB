@@ -23,7 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/graphics/graphicslayer.h>
+#include "../../../graphics/graphicslayer.h"
+
 #include <librepcb/core/project/board/items/bi_via.h>
 
 #include <QtCore>
@@ -52,7 +53,7 @@ public:
   // Constructors / Destructor
   BGI_Via() = delete;
   BGI_Via(const BGI_Via& other) = delete;
-  BGI_Via(BI_Via& via,
+  BGI_Via(BI_Via& via, const IF_GraphicsLayerProvider& lp,
           std::shared_ptr<const QSet<const NetSignal*>>
               highlightedNetSignals) noexcept;
   virtual ~BGI_Via() noexcept;

@@ -48,6 +48,7 @@ class Schematic;
 
 namespace editor {
 
+class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem;
 class SGI_NetLabel;
 class SGI_NetLine;
@@ -93,7 +94,7 @@ public:
   SchematicGraphicsScene() = delete;
   SchematicGraphicsScene(const SchematicGraphicsScene& other) = delete;
   explicit SchematicGraphicsScene(
-      Schematic& schematic,
+      Schematic& schematic, const IF_GraphicsLayerProvider& lp,
       std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
       QObject* parent = nullptr) noexcept;
   virtual ~SchematicGraphicsScene() noexcept;
@@ -161,6 +162,7 @@ private:  // Methods
 
 private:  // Data
   Schematic& mSchematic;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   QHash<SI_Symbol*, std::shared_ptr<SGI_Symbol>> mSymbols;
   QHash<SI_SymbolPin*, std::shared_ptr<SGI_SymbolPin>> mSymbolPins;

@@ -22,13 +22,13 @@
  ******************************************************************************/
 #include "bgi_plane.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../../../graphics/primitivepathgraphicsitem.h"
 #include "../boardgraphicsscene.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/types/layer.h>
+#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -43,11 +43,12 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Plane::BGI_Plane(BI_Plane& plane,
+BGI_Plane::BGI_Plane(BI_Plane& plane, const IF_GraphicsLayerProvider& lp,
                      std::shared_ptr<const QSet<const NetSignal*>>
                          highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mPlane(plane),
+    mLayerProvider(lp),
     mHighlightedNetSignals(highlightedNetSignals),
     mLayer(nullptr),
     mBoundingRectMarginPx(0),
@@ -264,20 +265,18 @@ void BGI_Plane::updateOutlineAndFragments() noexcept {
 }
 
 void BGI_Plane::updateLayer() noexcept {
-  if (mPlane.getLayerName() == GraphicsLayer::sTopCopper) {
+  if (mPlane.getLayer() == Layer::topCopper()) {
     setZValue(BoardGraphicsScene::ZValue_PlanesTop);
-  } else if (mPlane.getLayerName() == GraphicsLayer::sBotCopper) {
+  } else if (mPlane.getLayer() == Layer::botCopper()) {
     setZValue(BoardGraphicsScene::ZValue_PlanesBottom);
   } else {
-    setZValue(
-        BoardGraphicsScene::getZValueOfCopperLayer(*mPlane.getLayerName()));
+    setZValue(BoardGraphicsScene::getZValueOfCopperLayer(mPlane.getLayer()));
   }
 
-  // set layer
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
-  mLayer = getLayer(*mPlane.getLayerName());
+  mLayer = mLayerProvider.getLayer(mPlane.getLayer());
   if (mLayer) {
     mLayer->onEdited.attach(mOnLayerEditedSlot);
   }
@@ -302,10 +301,6 @@ void BGI_Plane::updateBoundingRectMargin() noexcept {
     }
   }
   update();
-}
-
-GraphicsLayer* BGI_Plane::getLayer(const QString& name) const noexcept {
-  return mPlane.getBoard().getLayerStack().getLayer(name);
 }
 
 /*******************************************************************************

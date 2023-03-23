@@ -134,7 +134,7 @@ void BI_StrokeText::strokeTextEdited(const StrokeText& text,
                                      StrokeText::Event event) noexcept {
   Q_UNUSED(text);
   switch (event) {
-    case StrokeText::Event::LayerNameChanged: {
+    case StrokeText::Event::LayerChanged: {
       onEdited.notify(Event::LayerNameChanged);
       break;
     }

@@ -136,7 +136,6 @@ public:
   const QString& getName() const noexcept { return mName; }
   const QList<ThemeColor>& getColors() const noexcept { return mColors; }
   const ThemeColor& getColor(const QString& identifier) const noexcept;
-  const ThemeColor& getColorForLayer(const QString& layerName) const noexcept;
   GridStyle getSchematicGridStyle() const noexcept {
     return mSchematicGridStyle;
   }
@@ -158,9 +157,13 @@ public:
   bool operator!=(const Theme& rhs) const noexcept { return !(*this == rhs); }
   Theme& operator=(const Theme& rhs) noexcept;
 
+  // Static Methods
+  static const QSet<QString>& getCopperColorNames() noexcept;
+  static QString getGrabAreaColorName(const QString& outlineColorName) noexcept;
+
 private:  // Methods
-  void addColor(const QString& id, const QString& name, const QColor& primary,
-                const QColor& secondary) noexcept;
+  void addColor(const QString& id, const QString& category, const QString& name,
+                const QColor& primary, const QColor& secondary) noexcept;
   SExpression& addNode(const QString& name) noexcept;
 
 private:  // Data

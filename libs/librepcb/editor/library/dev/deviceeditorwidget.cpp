@@ -88,8 +88,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   mPackageGraphicsScene.reset(new GraphicsScene());
   mUi->viewComponent->setScene(mComponentGraphicsScene.data());
   mUi->viewPackage->setScene(mPackageGraphicsScene.data());
-  mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
-  mGraphicsLayerProvider->applyTheme(theme);
+  mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider(theme));
 
   // Insert category list editor widget.
   mCategoriesEditorWidget.reset(new CategoryListEditorWidget(

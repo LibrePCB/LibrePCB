@@ -32,11 +32,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class IF_GraphicsLayerProvider;
-
 namespace editor {
 
+class IF_GraphicsLayerProvider;
 class OriginCrossGraphicsItem;
 class PrimitivePathGraphicsItem;
 
@@ -75,7 +73,7 @@ private:  // Methods
                         StrokeText::Event event) noexcept;
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
-  void updateLayer(const GraphicsLayerName& layerName) noexcept;
+  void updateLayer(const Layer& layer) noexcept;
   void updateText() noexcept;
   void updateTransform() noexcept;
 

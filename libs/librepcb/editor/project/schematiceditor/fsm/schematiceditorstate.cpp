@@ -35,7 +35,6 @@
 #include "../schematicgraphicsscene.h"
 
 #include <librepcb/core/geometry/polygon.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
@@ -46,7 +45,7 @@
 #include <librepcb/core/project/schematic/items/si_symbolpin.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
-#include <librepcb/core/project/schematic/schematiclayerprovider.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -96,18 +95,19 @@ const LengthUnit& SchematicEditorState::getLengthUnit() const noexcept {
   }
 }
 
-QList<GraphicsLayer*> SchematicEditorState::getAllowedGeometryLayers() const
-    noexcept {
-  return mContext.project.getLayers().getLayers({
-      GraphicsLayer::sSymbolOutlines,
-      // GraphicsLayer::sSymbolHiddenGrabAreas, -> makes no sense in schematics
-      GraphicsLayer::sSymbolNames,
-      GraphicsLayer::sSymbolValues,
-      GraphicsLayer::sSchematicSheetFrames,
-      GraphicsLayer::sSchematicDocumentation,
-      GraphicsLayer::sSchematicComments,
-      GraphicsLayer::sSchematicGuide,
-  });
+const QSet<const Layer*>&
+    SchematicEditorState::getAllowedGeometryLayers() noexcept {
+  static QSet<const Layer*> layers = {
+      &Layer::symbolOutlines(),
+      // &Layer::symbolHiddenGrabAreas(), -> makes no sense in schematics
+      &Layer::symbolNames(),
+      &Layer::symbolValues(),
+      &Layer::schematicSheetFrames(),
+      &Layer::schematicDocumentation(),
+      &Layer::schematicComments(),
+      &Layer::schematicGuide(),
+  };
+  return layers;
 }
 
 void SchematicEditorState::abortBlockingToolsInOtherEditors() noexcept {

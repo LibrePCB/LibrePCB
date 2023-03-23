@@ -24,10 +24,10 @@
 
 #include "../../application.h"
 #include "../../export/graphicsexportsettings.h"
+#include "../../export/graphicspainter.h"
 #include "../../geometry/text.h"
-#include "../../graphics/graphicslayer.h"
-#include "../../graphics/graphicspainter.h"
 #include "../../utils/transform.h"
+#include "../../workspace/theme.h"
 #include "footprint.h"
 
 #include <QtCore>
@@ -71,30 +71,30 @@ FootprintPainter::~FootprintPainter() noexcept {
 void FootprintPainter::paint(QPainter& painter,
                              const GraphicsExportSettings& settings) const
     noexcept {
-  // Determine what to paint on which layer.
-  initContentByLayer();
+  // Determine what to paint on which color layer.
+  initContentByColor();
 
   // Draw pad circles only if holes are enabled, but pads not.
   const bool drawPadHoles =
-      settings.getLayerPaintOrder().contains(GraphicsLayer::sBoardDrillsNpth) &&
-      (!settings.getLayerPaintOrder().contains(GraphicsLayer::sBoardPadsTht));
+      settings.getPaintOrder().contains(Theme::Color::sBoardHoles) &&
+      (!settings.getPaintOrder().contains(Theme::Color::sBoardPads));
 
   // Draw each layer in reverse order for correct stackup.
   GraphicsPainter p(painter);
   p.setMinLineWidth(settings.getMinLineWidth());
-  foreach (const QString& layer, settings.getLayerPaintOrder()) {
-    LayerContent content = mContentByLayer.value(layer);
+  foreach (const QString& color, settings.getPaintOrder()) {
+    ColorContent content = mContentByColor.value(color);
 
     // Draw areas.
     foreach (const QPainterPath& area, content.areas) {
-      p.drawPath(area, Length(0), QColor(), settings.getColor(layer));
+      p.drawPath(area, Length(0), QColor(), settings.getColor(color));
     }
 
     // Draw polygons.
     foreach (const Polygon& polygon, content.polygons) {
       p.drawPolygon(polygon.getPath(), *polygon.getLineWidth(),
-                    settings.getColor(layer),
-                    settings.getFillColor(layer, polygon.isFilled(),
+                    settings.getColor(color),
+                    settings.getFillColor(color, polygon.isFilled(),
                                           polygon.isGrabArea()));
     }
 
@@ -102,21 +102,21 @@ void FootprintPainter::paint(QPainter& painter,
     foreach (const Circle& circle, content.circles) {
       p.drawCircle(
           circle.getCenter(), *circle.getDiameter(), *circle.getLineWidth(),
-          settings.getColor(layer),
-          settings.getFillColor(layer, circle.isFilled(), circle.isGrabArea()));
+          settings.getColor(color),
+          settings.getFillColor(color, circle.isFilled(), circle.isGrabArea()));
     }
 
     // Draw holes.
     foreach (const Hole& hole, content.holes) {
       p.drawSlot(*hole.getPath(), hole.getDiameter(), Length(0),
-                 settings.getColor(layer), QColor());
+                 settings.getColor(color), QColor());
     }
 
     // Draw pad holes.
     if (drawPadHoles) {
       foreach (const Hole& hole, content.padHoles) {
         p.drawSlot(*hole.getPath(), hole.getDiameter(), Length(0),
-                   settings.getColor(layer), QColor());
+                   settings.getColor(color), QColor());
       }
     }
 
@@ -135,22 +135,24 @@ void FootprintPainter::paint(QPainter& painter,
  *  Private Methods
  ******************************************************************************/
 
-void FootprintPainter::initContentByLayer() const noexcept {
+void FootprintPainter::initContentByColor() const noexcept {
   QMutexLocker lock(&mMutex);
-  if (mContentByLayer.isEmpty()) {
+  if (mContentByColor.isEmpty()) {
     // Footprint polygons.
     foreach (Polygon polygon, mPolygons) {
-      mContentByLayer[*polygon.getLayerName()].polygons.append(polygon);
+      const QString color = polygon.getLayer().getThemeColor();
+      mContentByColor[color].polygons.append(polygon);
     }
 
     // Footprint circles.
     foreach (Circle circle, mCircles) {
-      mContentByLayer[*circle.getLayerName()].circles.append(circle);
+      const QString color = circle.getLayer().getThemeColor();
+      mContentByColor[color].circles.append(circle);
     }
 
     // Footprint holes.
     foreach (Hole hole, mHoles) {
-      mContentByLayer[GraphicsLayer::sBoardDrillsNpth].holes.append(hole);
+      mContentByColor[Theme::Color::sBoardHoles].holes.append(hole);
     }
 
     // Footprint pads.
@@ -158,12 +160,13 @@ void FootprintPainter::initContentByLayer() const noexcept {
       const Transform transform(pad.getPosition(), pad.getRotation());
       const QPainterPath path =
           transform.mapPx(pad.getGeometry().toQPainterPathPx());
-      const QString layer = pad.getLayerName();
-      mContentByLayer[layer].areas.append(path);
+      const QString color = pad.isTht() ? Theme::Color::sBoardPads
+                                        : pad.getSmtLayer().getThemeColor();
+      mContentByColor[color].areas.append(path);
 
       // Also add the holes for THT pads.
       for (const PadHole& hole : pad.getHoles()) {
-        mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(
+        mContentByColor[Theme::Color::sBoardHoles].padHoles.append(
             Hole(hole.getUuid(), hole.getDiameter(),
                  transform.map(hole.getPath()), MaskConfig::off()));
       }
@@ -172,9 +175,10 @@ void FootprintPainter::initContentByLayer() const noexcept {
     // Texts.
     foreach (StrokeText text, mStrokeTexts) {
       Transform transform(text);
+      const QString color = text.getLayer().getThemeColor();
       foreach (Path path, transform.map(text.generatePaths(mStrokeFont))) {
-        mContentByLayer[*text.getLayerName()].polygons.append(
-            Polygon(text.getUuid(), text.getLayerName(), text.getStrokeWidth(),
+        mContentByColor[color].polygons.append(
+            Polygon(text.getUuid(), text.getLayer(), text.getStrokeWidth(),
                     false, false, path));
       }
 
@@ -191,8 +195,8 @@ void FootprintPainter::initContentByLayer() const noexcept {
         baselineOffset.setY(baseline);
       }
       baselineOffset.rotate(rotation);
-      mContentByLayer[*text.getLayerName()].texts.append(
-          Text(text.getUuid(), text.getLayerName(), text.getText(),
+      mContentByColor[color].texts.append(
+          Text(text.getUuid(), text.getLayer(), text.getText(),
                text.getPosition() + baselineOffset, rotation,
                PositiveLength(totalHeight), align));
     }

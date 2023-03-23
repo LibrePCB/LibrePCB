@@ -35,7 +35,6 @@
 namespace librepcb {
 
 class Footprint;
-class IF_GraphicsLayerProvider;
 class Package;
 
 namespace editor {

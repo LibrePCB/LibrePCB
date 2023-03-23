@@ -77,8 +77,7 @@ ComponentSymbolVariantEditDialog::ComponentSymbolVariantEditDialog(
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mGraphicsScene.data());
   mUi->graphicsView->setOriginCrossVisible(false);
-  mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider());
-  mGraphicsLayerProvider->applyTheme(theme);
+  mGraphicsLayerProvider.reset(new DefaultGraphicsLayerProvider(theme));
 
   // load metadata
   mUi->edtName->setText(*mSymbVar.getNames().getDefaultValue());

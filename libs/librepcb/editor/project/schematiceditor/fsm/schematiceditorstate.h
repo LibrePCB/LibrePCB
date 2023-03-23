@@ -37,7 +37,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
+class Layer;
 class LengthUnit;
 class Point;
 class Schematic;
@@ -174,7 +174,7 @@ protected:  // Methods
   SchematicGraphicsScene* getActiveSchematicScene() noexcept;
   PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;
-  QList<GraphicsLayer*> getAllowedGeometryLayers() const noexcept;
+  static const QSet<const Layer*>& getAllowedGeometryLayers() noexcept;
   void abortBlockingToolsInOtherEditors() noexcept;
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;

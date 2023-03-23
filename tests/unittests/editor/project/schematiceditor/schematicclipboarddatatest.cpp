@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/attribute/attrtypestring.h>
 #include <librepcb/core/attribute/attrtypevoltage.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/editor/project/schematiceditor/schematicclipboarddata.h>
 
 #include <QtCore>
@@ -80,13 +81,13 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       AttrTypeVoltage::instance().getUnitFromString("millivolt"));
 
   std::shared_ptr<Text> text1 = std::make_shared<Text>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), "text 1", Point(1, 2),
-      Angle(3), PositiveLength(4), Alignment(HAlign::left(), VAlign::top()));
+      Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
+      PositiveLength(4), Alignment(HAlign::left(), VAlign::top()));
 
-  std::shared_ptr<Text> text2 = std::make_shared<Text>(
-      Uuid::createRandom(), GraphicsLayerName("bar"), "text 2", Point(10, 20),
-      Angle(30), PositiveLength(40),
-      Alignment(HAlign::center(), VAlign::bottom()));
+  std::shared_ptr<Text> text2 =
+      std::make_shared<Text>(Uuid::createRandom(), Layer::topCopper(), "text 2",
+                             Point(10, 20), Angle(30), PositiveLength(40),
+                             Alignment(HAlign::center(), VAlign::bottom()));
 
   std::shared_ptr<SchematicClipboardData::ComponentInstance> component1 =
       std::make_shared<SchematicClipboardData::ComponentInstance>(
@@ -151,15 +152,13 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       Uuid::createRandom(), Point(1230, 4560), Angle(7890), false));
 
   std::shared_ptr<Polygon> polygon1 = std::make_shared<Polygon>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(1), false,
-      true,
+      Uuid::createRandom(), Layer::botCopper(), UnsignedLength(1), false, true,
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
 
-  std::shared_ptr<Polygon> polygon2 =
-      std::make_shared<Polygon>(Uuid::createRandom(), GraphicsLayerName("bar"),
-                                UnsignedLength(10), true, false,
-                                Path({Vertex(Point(10, 20), Angle(30)),
-                                      Vertex(Point(40, 50), Angle(60))}));
+  std::shared_ptr<Polygon> polygon2 = std::make_shared<Polygon>(
+      Uuid::createRandom(), Layer::topCopper(), UnsignedLength(10), true, false,
+      Path({Vertex(Point(10, 20), Angle(30)),
+            Vertex(Point(40, 50), Angle(60))}));
 
   // Create object
   SchematicClipboardData obj1(uuid, pos);

@@ -27,7 +27,6 @@
 #include "ui_circlepropertiesdialog.h"
 
 #include <librepcb/core/geometry/circle.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,7 +39,7 @@ namespace editor {
 
 CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle,
                                                UndoStack& undoStack,
-                                               QList<GraphicsLayer*> layers,
+                                               const QSet<const Layer*>& layers,
                                                const LengthUnit& lengthUnit,
                                                const QString& settingsPrefix,
                                                QWidget* parent) noexcept
@@ -49,6 +48,7 @@ CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle,
     mUndoStack(undoStack),
     mUi(new Ui::CirclePropertiesDialog) {
   mUi->setupUi(this);
+  mUi->cbxLayer->setLayers(layers);
   mUi->edtLineWidth->configure(lengthUnit, LengthEditBase::Steps::generic(),
                                settingsPrefix % "/line_width");
   mUi->edtDiameter->configure(lengthUnit, LengthEditBase::Steps::generic(),
@@ -58,15 +58,11 @@ CirclePropertiesDialog::CirclePropertiesDialog(Circle& circle,
   mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
                           settingsPrefix % "/pos_y");
 
-  foreach (const GraphicsLayer* layer, layers) {
-    mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
-  }
-
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &CirclePropertiesDialog::buttonBoxClicked);
 
   // load circle attributes
-  selectLayerNameInCombobox(*mCircle.getLayerName());
+  mUi->cbxLayer->setCurrentLayer(mCircle.getLayer());
   mUi->edtLineWidth->setValue(mCircle.getLineWidth());
   mUi->cbxFillArea->setChecked(mCircle.isFilled());
   mUi->cbxIsGrabArea->setChecked(mCircle.isGrabArea());
@@ -127,11 +123,8 @@ void CirclePropertiesDialog::buttonBoxClicked(
 bool CirclePropertiesDialog::applyChanges() noexcept {
   try {
     QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(mCircle));
-    if (mUi->cbxLayer->currentIndex() >= 0 &&
-        mUi->cbxLayer->currentData().isValid()) {
-      cmd->setLayerName(
-          GraphicsLayerName(mUi->cbxLayer->currentData().toString()),
-          false);  // can throw
+    if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
+      cmd->setLayer(*layer, false);
     }
     cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
     cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
@@ -145,11 +138,6 @@ bool CirclePropertiesDialog::applyChanges() noexcept {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
     return false;
   }
-}
-
-void CirclePropertiesDialog::selectLayerNameInCombobox(
-    const QString& name) noexcept {
-  mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(name));
 }
 
 /*******************************************************************************

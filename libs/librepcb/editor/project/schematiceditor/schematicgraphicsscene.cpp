@@ -40,7 +40,6 @@
 #include <librepcb/core/project/schematic/items/si_symbolpin.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
-#include <librepcb/core/project/schematic/schematiclayerprovider.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -56,11 +55,12 @@ namespace editor {
  ******************************************************************************/
 
 SchematicGraphicsScene::SchematicGraphicsScene(
-    Schematic& schematic,
+    Schematic& schematic, const IF_GraphicsLayerProvider& lp,
     std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
     QObject* parent) noexcept
   : GraphicsScene(parent),
     mSchematic(schematic),
+    mLayerProvider(lp),
     mHighlightedNetSignals(highlightedNetSignals) {
   foreach (SI_Symbol* obj, mSchematic.getSymbols()) { addSymbol(*obj); }
   foreach (SI_NetSegment* obj, mSchematic.getNetSegments()) {
@@ -174,7 +174,8 @@ void SchematicGraphicsScene::updateHighlightedNetSignals() noexcept {
 
 void SchematicGraphicsScene::addSymbol(SI_Symbol& symbol) noexcept {
   Q_ASSERT(!mSymbols.contains(&symbol));
-  std::shared_ptr<SGI_Symbol> item = std::make_shared<SGI_Symbol>(symbol);
+  std::shared_ptr<SGI_Symbol> item =
+      std::make_shared<SGI_Symbol>(symbol, mLayerProvider);
   addItem(*item);
   mSymbols.insert(&symbol, item);
 
@@ -206,8 +207,8 @@ void SchematicGraphicsScene::removeSymbol(SI_Symbol& symbol) noexcept {
 void SchematicGraphicsScene::addSymbolPin(
     SI_SymbolPin& pin, std::weak_ptr<SGI_Symbol> symbol) noexcept {
   Q_ASSERT(!mSymbolPins.contains(&pin));
-  std::shared_ptr<SGI_SymbolPin> item =
-      std::make_shared<SGI_SymbolPin>(pin, symbol, mHighlightedNetSignals);
+  std::shared_ptr<SGI_SymbolPin> item = std::make_shared<SGI_SymbolPin>(
+      pin, symbol, mLayerProvider, mHighlightedNetSignals);
   addItem(*item);
   mSymbolPins.insert(&pin, item);
 }
@@ -269,8 +270,8 @@ void SchematicGraphicsScene::removeNetPointsAndNetLines(
 
 void SchematicGraphicsScene::addNetPoint(SI_NetPoint& netPoint) noexcept {
   Q_ASSERT(!mNetPoints.contains(&netPoint));
-  std::shared_ptr<SGI_NetPoint> item =
-      std::make_shared<SGI_NetPoint>(netPoint, mHighlightedNetSignals);
+  std::shared_ptr<SGI_NetPoint> item = std::make_shared<SGI_NetPoint>(
+      netPoint, mLayerProvider, mHighlightedNetSignals);
   addItem(*item);
   mNetPoints.insert(&netPoint, item);
 }
@@ -285,8 +286,8 @@ void SchematicGraphicsScene::removeNetPoint(SI_NetPoint& netPoint) noexcept {
 
 void SchematicGraphicsScene::addNetLine(SI_NetLine& netLine) noexcept {
   Q_ASSERT(!mNetLines.contains(&netLine));
-  std::shared_ptr<SGI_NetLine> item =
-      std::make_shared<SGI_NetLine>(netLine, mHighlightedNetSignals);
+  std::shared_ptr<SGI_NetLine> item = std::make_shared<SGI_NetLine>(
+      netLine, mLayerProvider, mHighlightedNetSignals);
   addItem(*item);
   mNetLines.insert(&netLine, item);
 }
@@ -301,8 +302,8 @@ void SchematicGraphicsScene::removeNetLine(SI_NetLine& netLine) noexcept {
 
 void SchematicGraphicsScene::addNetLabel(SI_NetLabel& netLabel) noexcept {
   Q_ASSERT(!mNetLabels.contains(&netLabel));
-  std::shared_ptr<SGI_NetLabel> item =
-      std::make_shared<SGI_NetLabel>(netLabel, mHighlightedNetSignals);
+  std::shared_ptr<SGI_NetLabel> item = std::make_shared<SGI_NetLabel>(
+      netLabel, mLayerProvider, mHighlightedNetSignals);
   addItem(*item);
   mNetLabels.insert(&netLabel, item);
 }
@@ -318,8 +319,8 @@ void SchematicGraphicsScene::removeNetLabel(SI_NetLabel& netLabel) noexcept {
 void SchematicGraphicsScene::addPolygon(SI_Polygon& polygon) noexcept {
   Q_ASSERT(!mPolygons.contains(&polygon));
   std::shared_ptr<PolygonGraphicsItem> item =
-      std::make_shared<PolygonGraphicsItem>(
-          polygon.getPolygon(), mSchematic.getProject().getLayers());
+      std::make_shared<PolygonGraphicsItem>(polygon.getPolygon(),
+                                            mLayerProvider);
   addItem(*item);
   mPolygons.insert(&polygon, item);
 }
@@ -334,8 +335,8 @@ void SchematicGraphicsScene::removePolygon(SI_Polygon& polygon) noexcept {
 
 void SchematicGraphicsScene::addText(SI_Text& text) noexcept {
   Q_ASSERT(!mTexts.contains(&text));
-  std::shared_ptr<SGI_Text> item =
-      std::make_shared<SGI_Text>(text, mSymbols.value(text.getSymbol()));
+  std::shared_ptr<SGI_Text> item = std::make_shared<SGI_Text>(
+      text, mSymbols.value(text.getSymbol()), mLayerProvider);
   addItem(*item);
   mTexts.insert(&text, item);
 }

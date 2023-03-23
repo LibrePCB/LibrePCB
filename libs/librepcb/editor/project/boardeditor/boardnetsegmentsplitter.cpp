@@ -104,9 +104,9 @@ QList<BoardNetSegmentSplitter::Segment>
  ******************************************************************************/
 
 TraceAnchor BoardNetSegmentSplitter::replaceAnchor(
-    const TraceAnchor& anchor, const GraphicsLayerName& layer) noexcept {
+    const TraceAnchor& anchor, const Layer& layer) noexcept {
   if (mAnchorsToReplace.contains(anchor)) {
-    auto key = qMakePair(anchor, layer);
+    auto key = qMakePair(anchor, &layer);
     auto it = mReplacedAnchors.find(key);
     if (it == mReplacedAnchors.constEnd()) {
       std::shared_ptr<Junction> newJunction = std::make_shared<Junction>(

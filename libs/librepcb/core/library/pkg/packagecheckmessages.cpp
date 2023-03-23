@@ -23,7 +23,7 @@
 #include "packagecheckmessages.h"
 
 #include "../../geometry/stroketext.h"
-#include "../../graphics/graphicslayer.h"
+#include "../../types/layer.h"
 #include "footprint.h"
 #include "packagepad.h"
 
@@ -365,20 +365,18 @@ MsgUnusedCustomPadOutline::MsgUnusedCustomPadOutline(
 
 MsgWrongFootprintTextLayer::MsgWrongFootprintTextLayer(
     std::shared_ptr<const Footprint> footprint,
-    std::shared_ptr<const StrokeText> text,
-    const QString& expectedLayerName) noexcept
+    std::shared_ptr<const StrokeText> text, const Layer& expectedLayer) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Layer of '%1' in '%2' is not '%3'")
             .arg(text->getText(), *footprint->getNames().getDefaultValue(),
-                 GraphicsLayer::getTranslation(expectedLayerName)),
+                 expectedLayer.getNameTr()),
         tr("The text element '%1' should normally be on layer '%2'.")
-            .arg(text->getText(),
-                 GraphicsLayer::getTranslation(expectedLayerName)),
+            .arg(text->getText(), expectedLayer.getNameTr()),
         "unusual_text_layer"),
     mFootprint(footprint),
     mText(text),
-    mExpectedLayerName(expectedLayerName) {
+    mExpectedLayer(&expectedLayer) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("footprint", footprint->getUuid());
   mApproval.ensureLineBreak();

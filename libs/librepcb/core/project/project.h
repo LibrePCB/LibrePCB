@@ -42,7 +42,6 @@ class Board;
 class Circuit;
 class ProjectLibrary;
 class Schematic;
-class SchematicLayerProvider;
 class StrokeFontPool;
 
 /*******************************************************************************
@@ -308,13 +307,6 @@ public:
 
   // Schematic Methods
 
-  SchematicLayerProvider& getLayers() noexcept {
-    return *mSchematicLayerProvider;
-  }
-  const SchematicLayerProvider& getLayers() const noexcept {
-    return *mSchematicLayerProvider;
-  }
-
   /**
    * @brief Get the page index of a specific schematic
    *
@@ -578,9 +570,6 @@ private:
 
   /// All removed schematics of this project
   QList<Schematic*> mRemovedSchematics;
-
-  /// All schematic layers of this project
-  QScopedPointer<SchematicLayerProvider> mSchematicLayerProvider;
 
   /// All boards of this project
   QList<Board*> mBoards;

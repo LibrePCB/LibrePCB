@@ -80,7 +80,6 @@ private:  // Methods
   bool fixPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
   void diameterEditValueChanged(const PositiveLength& value) noexcept;
-  void makeLayerVisible() noexcept;
 
 private:  // Data
   // State

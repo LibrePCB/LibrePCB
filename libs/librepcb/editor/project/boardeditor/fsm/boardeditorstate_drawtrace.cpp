@@ -44,13 +44,13 @@
 
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -70,7 +70,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
   : BoardEditorState(context),
     mSubState(SubState_Idle),
     mCurrentWireMode(WireMode::HV),
-    mCurrentLayerName(GraphicsLayer::sTopCopper),
+    mCurrentLayer(&Layer::topCopper()),
     mAddVia(false),
     mTempVia(nullptr),
     mCurrentViaProperties(Uuid::createRandom(),  // UUID is not relevant here
@@ -78,7 +78,7 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
                           PositiveLength(700000),  // Default size
                           PositiveLength(300000)  // Default drill diameter
                           ),
-    mViaLayerName(""),
+    mViaLayer(tl::nullopt),
     mTargetPos(),
     mCursorPos(),
     mCurrentWidth(500000),
@@ -164,16 +164,12 @@ bool BoardEditorState_DrawTrace::entry() noexcept {
   // Add the layers combobox to the toolbar
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
   mLayerComboBox = new GraphicsLayerComboBox();
-  QList<GraphicsLayer*> layers;
+  QSet<const Layer*> layers;
   if (Board* board = getActiveBoard()) {
-    foreach (GraphicsLayer* layer, board->getLayerStack().getAllLayers()) {
-      if (layer->isCopperLayer() && layer->isEnabled()) {
-        layers.append(layer);
-      }
-    }
+    layers = board->getCopperLayers();
   }
   mLayerComboBox->setLayers(layers);
-  mLayerComboBox->setCurrentLayer(mCurrentLayerName);
+  mLayerComboBox->setCurrentLayer(*mCurrentLayer);
   mLayerComboBox->addAction(cmd.layerUp.createAction(
       mLayerComboBox, mLayerComboBox.data(), &GraphicsLayerComboBox::stepDown));
   mLayerComboBox->addAction(cmd.layerDown.createAction(
@@ -392,10 +388,10 @@ bool BoardEditorState_DrawTrace::startPositioning(
     mAddVia = false;
     showVia(false);
 
-    // get layer
-    GraphicsLayer* layer = board.getLayerStack().getLayer(mCurrentLayerName);
-    if (!layer) {
-      throw RuntimeError(__FILE__, __LINE__, tr("No layer selected."));
+    // Check layer.
+    const Layer* layer = mCurrentLayer;
+    if (!board.getCopperLayers().contains(layer)) {
+      throw RuntimeError(__FILE__, __LINE__, tr("Invalid layer selected."));
     }
 
     // helper to avoid defining the translation string multiple times
@@ -414,9 +410,8 @@ bool BoardEditorState_DrawTrace::startPositioning(
     if (fixedPoint) {
       mFixedStartAnchor = fixedPoint;
       mCurrentNetSegment = &fixedPoint->getNetSegment();
-      if (GraphicsLayer* linesLayer =
-              board.getLayerStack().getLayer(fixedPoint->getLayerOfLines())) {
-        layer = linesLayer;
+      if (board.getCopperLayers().contains(fixedPoint->getLayerOfTraces())) {
+        layer = fixedPoint->getLayerOfTraces();
       }
     } else if (fixedVia) {
       mFixedStartAnchor = fixedVia;
@@ -426,11 +421,10 @@ bool BoardEditorState_DrawTrace::startPositioning(
       if (BI_NetSegment* segment = fixedPad->getNetSegmentOfLines()) {
         mCurrentNetSegment = segment;
       }
-      if (!fixedPad->isOnLayer(layer->getName())) {
-        if (GraphicsLayer* padLayer =
-                board.getLayerStack().getLayer(fixedPad->getLayerName())) {
-          layer = padLayer;
-        }
+      if ((!fixedPad->isOnLayer(*layer)) &&
+          board.getCopperLayers().contains(&fixedPad->getSmtLayer())) {
+        Q_ASSERT(!fixedPad->getLibPad().isTht());
+        layer = &fixedPad->getSmtLayer();
       }
       netsignal = fixedPad->getCompSigInstNetSignal();
       if (!netsignal) {
@@ -443,9 +437,9 @@ bool BoardEditorState_DrawTrace::startPositioning(
     } else if (auto netpoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
       mFixedStartAnchor = &netpoint->getNetPoint();
       mCurrentNetSegment = &netpoint->getNetPoint().getNetSegment();
-      if (GraphicsLayer* linesLayer = board.getLayerStack().getLayer(
-              netpoint->getNetPoint().getLayerOfLines())) {
-        layer = linesLayer;
+      if (board.getCopperLayers().contains(
+              netpoint->getNetPoint().getLayerOfTraces())) {
+        layer = netpoint->getNetPoint().getLayerOfTraces();
       }
     } else if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
       mFixedStartAnchor = &via->getVia();
@@ -462,7 +456,7 @@ bool BoardEditorState_DrawTrace::startPositioning(
         throwPadNotConnectedException();
       }
       if (!pad->getPad().getLibPad().isTht()) {
-        layer = board.getLayerStack().getLayer(pad->getPad().getLayerName());
+        layer = &pad->getPad().getSmtLayer();
       }
     } else if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
       // split netline
@@ -496,10 +490,10 @@ bool BoardEditorState_DrawTrace::startPositioning(
     Q_ASSERT(mFixedStartAnchor);
 
     // update layer
-    Q_ASSERT(layer);
-    layer->setVisible(true);
-    mCurrentLayerName = layer->getName();
-    mLayerComboBox->setCurrentLayer(mCurrentLayerName);
+    Q_ASSERT(board.getCopperLayers().contains(layer));
+    makeLayerVisible(layer->getThemeColor());
+    mCurrentLayer = layer;
+    mLayerComboBox->setCurrentLayer(*mCurrentLayer);
 
     // update line width
     if (mCurrentAutoWidth && mFixedStartAnchor->getMaxLineWidth() > 0) {
@@ -553,11 +547,11 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
     // find anchor under cursor use the target position as already determined
     const NetSignal* netsignal =
         mPositioningNetPoint1->getNetSegment().getNetSignal();
-    GraphicsLayer& layer = mPositioningNetLine1->getLayer();
+    const Layer& layer = mPositioningNetLine1->getLayer();
     QList<BI_NetLineAnchor*> otherAnchors = {};
     const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
         mTargetPos, FindFlag::Vias | FindFlag::NetPoints | FindFlag::NetLines,
-        mAddVia ? nullptr : &layer, {netsignal},
+        mAddVia ? tl::nullopt : tl::optional<const Layer&>(layer), {netsignal},
         {
             scene.getNetPoints().value(mPositioningNetPoint1),
             scene.getNetPoints().value(mPositioningNetPoint2),
@@ -566,27 +560,27 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
         });
 
     // Only the combination with 1 via can be handled correctly
-    if (mTempVia) {
-      mCurrentLayerName = mViaLayerName;
+    if (mTempVia && mViaLayer) {
+      mCurrentLayer = &*mViaLayer;
     } else {
       foreach (auto item, items) {
         if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
           if (mCurrentSnapActive || mTargetPos == via->getVia().getPosition()) {
             otherAnchors.append(&via->getVia());
-            if (mAddVia) {
-              mCurrentLayerName = mViaLayerName;
+            if (mAddVia && mViaLayer) {
+              mCurrentLayer = &*mViaLayer;
             }
           }
         }
       }
       if (auto pad = findItemAtPos<BGI_FootprintPad>(
               mTargetPos,
-              FindFlag::FootprintPads | FindFlag::AcceptNextGridMatch, &layer,
+              FindFlag::FootprintPads | FindFlag::AcceptNextGridMatch, layer,
               {netsignal})) {
         if (mCurrentSnapActive || mTargetPos == pad->getPad().getPosition()) {
           otherAnchors.append(&pad->getPad());
-          if (mAddVia && pad->getPad().getLibPad().isTht()) {
-            mCurrentLayerName = mViaLayerName;
+          if (mAddVia && mViaLayer && pad->getPad().getLibPad().isTht()) {
+            mCurrentLayer = &*mViaLayer;
           }
         }
       }
@@ -688,7 +682,7 @@ bool BoardEditorState_DrawTrace::addNextNetPoint(
         // connected
         Q_ASSERT(mAddVia);
         foreach (auto item,
-                 findItemsAtPos(mTargetPos, FindFlag::NetPoints, nullptr,
+                 findItemsAtPos(mTargetPos, FindFlag::NetPoints, tl::nullopt,
                                 {netsignal})) {
           if (auto netPoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
             combineAnchors(*mTempVia, netPoint->getNetPoint());
@@ -762,13 +756,13 @@ void BoardEditorState_DrawTrace::updateNetpointPositions() noexcept {
   bool isOnVia = false;
   if (mCurrentSnapActive) {
     // find anchor under cursor
-    GraphicsLayer& layer = mPositioningNetLine1->getLayer();
+    const Layer& layer = mPositioningNetLine1->getLayer();
     const NetSignal* netsignal = mCurrentNetSegment->getNetSignal();
     std::shared_ptr<QGraphicsItem> item = findItemAtPos(
         mCursorPos,
         FindFlag::Vias | FindFlag::NetPoints | FindFlag::NetLines |
             FindFlag::FootprintPads | FindFlag::AcceptNextGridMatch,
-        &layer, {netsignal},
+        layer, {netsignal},
         {
             scene->getVias().value(mTempVia),
             scene->getNetPoints().value(mPositioningNetPoint1),
@@ -894,15 +888,13 @@ void BoardEditorState_DrawTrace::wireModeChanged(WireMode mode) noexcept {
   updateNetpointPositions();
 }
 
-void BoardEditorState_DrawTrace::layerChanged(
-    const GraphicsLayerName& layer) noexcept {
+void BoardEditorState_DrawTrace::layerChanged(const Layer& layer) noexcept {
   Board* board = getActiveBoard();
   if (!board) return;
-  GraphicsLayer* layerObj = board->getLayerStack().getLayer(*layer);
-  if (!layerObj) return;
-  layerObj->setVisible(true);
+  if (!board->getCopperLayers().contains(&layer)) return;
+  makeLayerVisible(layer.getThemeColor());
   if ((mSubState == SubState_PositioningNetPoint) &&
-      (layer != mCurrentLayerName)) {
+      (&layer != mCurrentLayer)) {
     // If the start anchor is a via or THT pad, delete current trace segment
     // and start a new one on the selected layer. Otherwise, just add a via
     // at the current position, i.e. at the end of the current trace segment.
@@ -914,18 +906,18 @@ void BoardEditorState_DrawTrace::layerChanged(
     }
     if (via || pad) {
       abortPositioning(false);
-      mCurrentLayerName = *layer;
+      mCurrentLayer = &layer;
       startPositioning(*board, startPos, nullptr, via, pad);
       updateNetpointPositions();
     } else {
       mAddVia = true;
       showVia(true);
-      mViaLayerName = *layer;
+      mViaLayer = layer;
     }
   } else {
     mAddVia = false;
     showVia(false);
-    mCurrentLayerName = *layer;
+    mCurrentLayer = &layer;
   }
 }
 

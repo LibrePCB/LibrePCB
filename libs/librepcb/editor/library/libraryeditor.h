@@ -23,11 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../graphics/graphicslayer.h"
 #include "editorwidgetbase.h"
 #include "newelementwizard/newelementwizard.h"
 
 #include <librepcb/core/fileio/directorylock.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -74,7 +74,7 @@ public:
   ~LibraryEditor() noexcept;
 
   /**
-   * @copydoc ::librepcb::IF_GraphicsLayerProvider::getLayer()
+   * @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
    */
   GraphicsLayer* getLayer(const QString& name) const noexcept override {
     foreach (GraphicsLayer* layer, mLayers) {
@@ -86,7 +86,7 @@ public:
   }
 
   /**
-   * @copydoc ::librepcb::IF_GraphicsLayerProvider::getAllLayers()
+   * @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getAllLayers()
    */
   QList<GraphicsLayer*> getAllLayers() const noexcept override {
     return mLayers;

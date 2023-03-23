@@ -26,10 +26,6 @@
 #include "../../../graphics/textgraphicsitem.h"
 #include "../schematicgraphicsscene.h"
 
-#include <librepcb/core/project/project.h>
-#include <librepcb/core/project/schematic/schematic.h>
-#include <librepcb/core/project/schematic/schematiclayerprovider.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -43,13 +39,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SGI_Text::SGI_Text(SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem) noexcept
+SGI_Text::SGI_Text(SI_Text& text, std::weak_ptr<SGI_Symbol> symbolItem,
+                   const IF_GraphicsLayerProvider& lp) noexcept
   : QGraphicsItemGroup(),
     mText(text),
     mSymbolGraphicsItem(symbolItem),
-    mTextGraphicsItem(new TextGraphicsItem(
-        mText.getTextObj(), mText.getSchematic().getProject().getLayers(),
-        this)),
+    mLayerProvider(lp),
+    mTextGraphicsItem(new TextGraphicsItem(mText.getTextObj(), lp, this)),
     mAnchorGraphicsItem(new LineGraphicsItem()),
     mOnEditedSlot(*this, &SGI_Text::textEdited),
     mOnSymbolEditedSlot(*this, &SGI_Text::symbolGraphicsItemEdited) {
@@ -145,8 +141,8 @@ void SGI_Text::updateText() noexcept {
 void SGI_Text::updateAnchorLayer() noexcept {
   Q_ASSERT(mAnchorGraphicsItem);
   if (mText.getSymbol() && isSelected()) {
-    mAnchorGraphicsItem->setLayer(mText.getProject().getLayers().getLayer(
-        *mText.getTextObj().getLayerName()));
+    mAnchorGraphicsItem->setLayer(
+        mLayerProvider.getLayer(mText.getTextObj().getLayer()));
   } else {
     mAnchorGraphicsItem->setLayer(nullptr);
   }

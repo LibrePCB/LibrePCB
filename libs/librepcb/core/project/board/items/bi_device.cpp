@@ -196,7 +196,7 @@ StrokeTextList BI_Device::getDefaultStrokeTexts() const noexcept {
                        (text.getMirrored() ? -getRotation() : getRotation()));
     }
     text.setMirrored(transform.map(text.getMirrored()));
-    text.setLayerName(transform.map(text.getLayerName()));
+    text.setLayer(transform.map(text.getLayer()));
   }
   return texts;
 }

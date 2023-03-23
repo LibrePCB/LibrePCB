@@ -22,11 +22,9 @@
  ******************************************************************************/
 #include "bgi_netpoint.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../boardgraphicsscene.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
 
@@ -43,9 +41,11 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_NetPoint::BGI_NetPoint(BI_NetPoint& netpoint) noexcept
+BGI_NetPoint::BGI_NetPoint(BI_NetPoint& netpoint,
+                           const IF_GraphicsLayerProvider& lp) noexcept
   : QGraphicsItem(),
     mNetPoint(netpoint),
+    mLayerProvider(lp),
     mLayer(nullptr),
     mOnEditedSlot(*this, &BGI_NetPoint::netPointEdited),
     mOnLayerEditedSlot(*this, &BGI_NetPoint::layerEdited) {
@@ -128,16 +128,15 @@ void BGI_NetPoint::layerEdited(const GraphicsLayer& layer,
 
 void BGI_NetPoint::updateLayer() noexcept {
   // Set Z value.
-  const QString layer = mNetPoint.getLayerOfLines();
-  setZValue(layer.isEmpty()
-                ? static_cast<qreal>(BoardGraphicsScene::ZValue_Default)
-                : BoardGraphicsScene::getZValueOfCopperLayer(layer));
+  const Layer* layer = mNetPoint.getLayerOfTraces();
+  setZValue(layer ? BoardGraphicsScene::getZValueOfCopperLayer(*layer)
+                  : static_cast<qreal>(BoardGraphicsScene::ZValue_Default));
 
   // Set layer.
   if (mLayer) {
     mLayer->onEdited.detach(mOnLayerEditedSlot);
   }
-  mLayer = getLayer(layer);
+  mLayer = layer ? mLayerProvider.getLayer(*layer) : nullptr;
   if (mLayer) {
     mLayer->onEdited.attach(mOnLayerEditedSlot);
   }
@@ -166,10 +165,6 @@ void BGI_NetPoint::updateNetSignalName() noexcept {
 
 void BGI_NetPoint::updateVisibility() noexcept {
   setVisible(mLayer && mLayer->isVisible());
-}
-
-GraphicsLayer* BGI_NetPoint::getLayer(const QString& name) const noexcept {
-  return mNetPoint.getBoard().getLayerStack().getLayer(name);
 }
 
 /*******************************************************************************

@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdcircleedit.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -39,8 +39,8 @@ namespace editor {
 CmdCircleEdit::CmdCircleEdit(Circle& circle) noexcept
   : UndoCommand(tr("Edit circle")),
     mCircle(circle),
-    mOldLayerName(circle.getLayerName()),
-    mNewLayerName(mOldLayerName),
+    mOldLayer(&circle.getLayer()),
+    mNewLayer(mOldLayer),
     mOldLineWidth(circle.getLineWidth()),
     mNewLineWidth(mOldLineWidth),
     mOldIsFilled(circle.isFilled()),
@@ -63,11 +63,10 @@ CmdCircleEdit::~CmdCircleEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdCircleEdit::setLayerName(const GraphicsLayerName& name,
-                                 bool immediate) noexcept {
+void CmdCircleEdit::setLayer(const Layer& layer, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewLayerName = name;
-  if (immediate) mCircle.setLayerName(mNewLayerName);
+  mNewLayer = &layer;
+  if (immediate) mCircle.setLayer(*mNewLayer);
 }
 
 void CmdCircleEdit::setLineWidth(const UnsignedLength& width,
@@ -133,9 +132,7 @@ void CmdCircleEdit::mirrorGeometry(Qt::Orientation orientation,
 }
 
 void CmdCircleEdit::mirrorLayer(bool immediate) noexcept {
-  setLayerName(
-      GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)),
-      immediate);
+  setLayer(mNewLayer->mirrored(), immediate);
 }
 
 /*******************************************************************************
@@ -145,7 +142,7 @@ void CmdCircleEdit::mirrorLayer(bool immediate) noexcept {
 bool CmdCircleEdit::performExecute() {
   performRedo();  // can throw
 
-  if (mNewLayerName != mOldLayerName) return true;
+  if (mNewLayer != mOldLayer) return true;
   if (mNewLineWidth != mOldLineWidth) return true;
   if (mNewIsFilled != mOldIsFilled) return true;
   if (mNewIsGrabArea != mOldIsGrabArea) return true;
@@ -155,7 +152,7 @@ bool CmdCircleEdit::performExecute() {
 }
 
 void CmdCircleEdit::performUndo() {
-  mCircle.setLayerName(mOldLayerName);
+  mCircle.setLayer(*mOldLayer);
   mCircle.setLineWidth(mOldLineWidth);
   mCircle.setIsFilled(mOldIsFilled);
   mCircle.setIsGrabArea(mOldIsGrabArea);
@@ -164,7 +161,7 @@ void CmdCircleEdit::performUndo() {
 }
 
 void CmdCircleEdit::performRedo() {
-  mCircle.setLayerName(mNewLayerName);
+  mCircle.setLayer(*mNewLayer);
   mCircle.setLineWidth(mNewLineWidth);
   mCircle.setIsFilled(mNewIsFilled);
   mCircle.setIsGrabArea(mNewIsGrabArea);

@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdpolygonedit.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -39,8 +39,8 @@ namespace editor {
 CmdPolygonEdit::CmdPolygonEdit(Polygon& polygon) noexcept
   : UndoCommand(tr("Edit polygon")),
     mPolygon(polygon),
-    mOldLayerName(polygon.getLayerName()),
-    mNewLayerName(mOldLayerName),
+    mOldLayer(&polygon.getLayer()),
+    mNewLayer(mOldLayer),
     mOldLineWidth(polygon.getLineWidth()),
     mNewLineWidth(mOldLineWidth),
     mOldIsFilled(polygon.isFilled()),
@@ -61,11 +61,10 @@ CmdPolygonEdit::~CmdPolygonEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdPolygonEdit::setLayerName(const GraphicsLayerName& name,
-                                  bool immediate) noexcept {
+void CmdPolygonEdit::setLayer(const Layer& layer, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewLayerName = name;
-  if (immediate) mPolygon.setLayerName(mNewLayerName);
+  mNewLayer = &layer;
+  if (immediate) mPolygon.setLayer(*mNewLayer);
 }
 
 void CmdPolygonEdit::setLineWidth(const UnsignedLength& width,
@@ -114,9 +113,7 @@ void CmdPolygonEdit::mirrorGeometry(Qt::Orientation orientation,
 }
 
 void CmdPolygonEdit::mirrorLayer(bool immediate) noexcept {
-  setLayerName(
-      GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)),
-      immediate);
+  setLayer(mNewLayer->mirrored(), immediate);
 }
 
 /*******************************************************************************
@@ -126,7 +123,7 @@ void CmdPolygonEdit::mirrorLayer(bool immediate) noexcept {
 bool CmdPolygonEdit::performExecute() {
   performRedo();  // can throw
 
-  if (mNewLayerName != mOldLayerName) return true;
+  if (mNewLayer != mOldLayer) return true;
   if (mNewLineWidth != mOldLineWidth) return true;
   if (mNewIsFilled != mOldIsFilled) return true;
   if (mNewIsGrabArea != mOldIsGrabArea) return true;
@@ -135,7 +132,7 @@ bool CmdPolygonEdit::performExecute() {
 }
 
 void CmdPolygonEdit::performUndo() {
-  mPolygon.setLayerName(mOldLayerName);
+  mPolygon.setLayer(*mOldLayer);
   mPolygon.setLineWidth(mOldLineWidth);
   mPolygon.setIsFilled(mOldIsFilled);
   mPolygon.setIsGrabArea(mOldIsGrabArea);
@@ -143,7 +140,7 @@ void CmdPolygonEdit::performUndo() {
 }
 
 void CmdPolygonEdit::performRedo() {
-  mPolygon.setLayerName(mNewLayerName);
+  mPolygon.setLayer(*mNewLayer);
   mPolygon.setLineWidth(mNewLineWidth);
   mPolygon.setIsFilled(mNewIsFilled);
   mPolygon.setIsGrabArea(mNewIsGrabArea);

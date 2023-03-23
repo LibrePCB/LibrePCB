@@ -32,11 +32,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class IF_GraphicsLayerProvider;
-
 namespace editor {
 
+class IF_GraphicsLayerProvider;
 class PrimitiveHoleGraphicsItem;
 
 /*******************************************************************************

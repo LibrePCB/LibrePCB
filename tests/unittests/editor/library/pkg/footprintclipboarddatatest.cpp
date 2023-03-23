@@ -21,6 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/core/types/layer.h>
+#include <librepcb/core/workspace/theme.h>
 #include <librepcb/editor/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/editor/library/pkg/footprintclipboarddata.h>
 
@@ -53,7 +55,8 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataEmpty) {
   FootprintClipboardData obj1(uuid, packagePads, pos);
 
   // Serialize to MIME data
-  DefaultGraphicsLayerProvider layerProvider;
+  Theme theme;
+  DefaultGraphicsLayerProvider layerProvider(theme);
   std::unique_ptr<QMimeData> mime1 = obj1.toMimeData(layerProvider);
 
   // Load from MIME data and validate
@@ -98,32 +101,30 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
                                             makeNonEmptyPath(Point(0, 0)))});
 
   std::shared_ptr<Polygon> polygon1 = std::make_shared<Polygon>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(1), false,
-      true,
+      Uuid::createRandom(), Layer::botCopper(), UnsignedLength(1), false, true,
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
 
-  std::shared_ptr<Polygon> polygon2 =
-      std::make_shared<Polygon>(Uuid::createRandom(), GraphicsLayerName("bar"),
-                                UnsignedLength(10), true, false,
-                                Path({Vertex(Point(10, 20), Angle(30)),
-                                      Vertex(Point(40, 50), Angle(60))}));
+  std::shared_ptr<Polygon> polygon2 = std::make_shared<Polygon>(
+      Uuid::createRandom(), Layer::topCopper(), UnsignedLength(10), true, false,
+      Path({Vertex(Point(10, 20), Angle(30)),
+            Vertex(Point(40, 50), Angle(60))}));
 
   std::shared_ptr<Circle> circle1 = std::make_shared<Circle>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(123),
-      false, true, Point(12, 34), PositiveLength(1234));
+      Uuid::createRandom(), Layer::botCopper(), UnsignedLength(123), false,
+      true, Point(12, 34), PositiveLength(1234));
 
   std::shared_ptr<Circle> circle2 = std::make_shared<Circle>(
-      Uuid::createRandom(), GraphicsLayerName("bar"), UnsignedLength(0), true,
-      false, Point(120, 340), PositiveLength(12));
+      Uuid::createRandom(), Layer::topCopper(), UnsignedLength(0), true, false,
+      Point(120, 340), PositiveLength(12));
 
   std::shared_ptr<StrokeText> strokeText1 = std::make_shared<StrokeText>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), "text 1", Point(1, 2),
-      Angle(3), PositiveLength(4), UnsignedLength(5), StrokeTextSpacing(),
+      Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
+      PositiveLength(4), UnsignedLength(5), StrokeTextSpacing(),
       StrokeTextSpacing(Ratio(6)), Alignment(HAlign::left(), VAlign::top()),
       false, true);
 
   std::shared_ptr<StrokeText> strokeText2 = std::make_shared<StrokeText>(
-      Uuid::createRandom(), GraphicsLayerName("bar"), "text 2", Point(10, 20),
+      Uuid::createRandom(), Layer::topCopper(), "text 2", Point(10, 20),
       Angle(30), PositiveLength(40), UnsignedLength(0),
       StrokeTextSpacing(Ratio(6)), StrokeTextSpacing(),
       Alignment(HAlign::center(), VAlign::bottom()), true, false);
@@ -152,7 +153,8 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
   obj1.getHoles().append(hole2);
 
   // Serialize to MIME data
-  DefaultGraphicsLayerProvider layerProvider;
+  Theme theme;
+  DefaultGraphicsLayerProvider layerProvider(theme);
   std::unique_ptr<QMimeData> mime1 = obj1.toMimeData(layerProvider);
 
   // Load from MIME data and validate

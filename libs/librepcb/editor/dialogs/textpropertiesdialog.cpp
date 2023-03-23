@@ -27,7 +27,6 @@
 #include "ui_textpropertiesdialog.h"
 
 #include <librepcb/core/geometry/text.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,7 +38,7 @@ namespace librepcb {
 namespace editor {
 
 TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
-                                           QList<GraphicsLayer*> layers,
+                                           const QSet<const Layer*>& layers,
                                            const LengthUnit& lengthUnit,
                                            const QString& settingsPrefix,
                                            QWidget* parent) noexcept
@@ -48,6 +47,7 @@ TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
     mUndoStack(undoStack),
     mUi(new Ui::TextPropertiesDialog) {
   mUi->setupUi(this);
+  mUi->cbxLayer->setLayers(layers);
   mUi->edtHeight->configure(lengthUnit, LengthEditBase::Steps::textHeight(),
                             settingsPrefix % "/height");
   mUi->edtPosX->configure(lengthUnit, LengthEditBase::Steps::generic(),
@@ -56,15 +56,11 @@ TextPropertiesDialog::TextPropertiesDialog(Text& text, UndoStack& undoStack,
                           settingsPrefix % "/pos_y");
   mUi->edtRotation->setSingleStep(90.0);  // [°]
 
-  foreach (const GraphicsLayer* layer, layers) {
-    mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
-  }
-
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &TextPropertiesDialog::on_buttonBox_clicked);
 
   // load text attributes
-  selectLayerNameInCombobox(*mText.getLayerName());
+  mUi->cbxLayer->setCurrentLayer(mText.getLayer());
   mUi->edtText->setPlainText(mText.getText());
   mUi->alignmentSelector->setAlignment(mText.getAlign());
   mUi->edtHeight->setValue(mText.getHeight());
@@ -128,11 +124,8 @@ void TextPropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
 bool TextPropertiesDialog::applyChanges() noexcept {
   try {
     QScopedPointer<CmdTextEdit> cmd(new CmdTextEdit(mText));
-    if (mUi->cbxLayer->currentIndex() >= 0 &&
-        mUi->cbxLayer->currentData().isValid()) {
-      cmd->setLayerName(
-          GraphicsLayerName(mUi->cbxLayer->currentData().toString()),
-          false);  // can throw
+    if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
+      cmd->setLayer(*layer, false);
     }
     cmd->setText(mUi->edtText->toPlainText().trimmed(), false);
     cmd->setAlignment(mUi->alignmentSelector->getAlignment(), false);
@@ -146,11 +139,6 @@ bool TextPropertiesDialog::applyChanges() noexcept {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
     return false;
   }
-}
-
-void TextPropertiesDialog::selectLayerNameInCombobox(
-    const QString& name) noexcept {
-  mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(name));
 }
 
 /*******************************************************************************

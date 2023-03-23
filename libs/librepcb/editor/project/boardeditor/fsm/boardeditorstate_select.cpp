@@ -62,7 +62,6 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
@@ -146,8 +145,7 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (scene)) {
     try {
       // Ask for file path and import options.
-      DxfImportDialog dialog(getAllowedGeometryLayers(scene->getBoard()),
-                             GraphicsLayerName(GraphicsLayer::sBoardOutlines),
+      DxfImportDialog dialog(getAllowedGeometryLayers(), Layer::boardOutlines(),
                              true, getLengthUnit(),
                              "board_editor/dxf_import_dialog", parentWidget());
       FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
@@ -178,7 +176,7 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
           new BoardClipboardData(scene->getBoard().getUuid(), Point(0, 0)));
       foreach (const auto& path, paths) {
         data->getPolygons().append(std::make_shared<Polygon>(
-            Uuid::createRandom(), dialog.getLayerName(), dialog.getLineWidth(),
+            Uuid::createRandom(), dialog.getLayer(), dialog.getLineWidth(),
             false, false, path));
       }
       for (const auto& circle : import.getCircles()) {
@@ -188,8 +186,8 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
               makeNonEmptyPath(circle.position), MaskConfig::automatic()));
         } else {
           data->getPolygons().append(std::make_shared<Polygon>(
-              Uuid::createRandom(), dialog.getLayerName(),
-              dialog.getLineWidth(), false, false,
+              Uuid::createRandom(), dialog.getLayer(), dialog.getLineWidth(),
+              false, false,
               Path::circle(circle.diameter).translated(circle.position)));
         }
       }
@@ -202,16 +200,10 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       // Shaw the layers of the imported objects, otherwise the user might
       // not even see these objects.
       if (!data->getHoles().isEmpty()) {
-        if (GraphicsLayer* layer = scene->getBoard().getLayerStack().getLayer(
-                GraphicsLayer::sBoardDrillsNpth)) {
-          layer->setVisible(true);
-        }
+        makeLayerVisible(Theme::Color::sBoardHoles);
       }
       if (!data->getPolygons().isEmpty()) {
-        if (GraphicsLayer* layer = scene->getBoard().getLayerStack().getLayer(
-                *dialog.getLayerName())) {
-          layer->setVisible(true);
-        }
+        makeLayerVisible(dialog.getLayer().getThemeColor());
       }
 
       // Start the paste tool.
@@ -1469,24 +1461,18 @@ void BoardEditorState_Select::openPlanePropertiesDialog(
 
 void BoardEditorState_Select::openPolygonPropertiesDialog(
     Polygon& polygon) noexcept {
-  if (Board* board = getActiveBoard()) {
-    PolygonPropertiesDialog dialog(
-        polygon, mContext.undoStack, getAllowedGeometryLayers(*board),
-        getLengthUnit(), "board_editor/polygon_properties_dialog",
-        parentWidget());
-    dialog.exec();
-  }
+  PolygonPropertiesDialog dialog(
+      polygon, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
+      "board_editor/polygon_properties_dialog", parentWidget());
+  dialog.exec();
 }
 
 void BoardEditorState_Select::openStrokeTextPropertiesDialog(
     StrokeText& text) noexcept {
-  if (Board* board = getActiveBoard()) {
-    StrokeTextPropertiesDialog dialog(
-        text, mContext.undoStack, getAllowedGeometryLayers(*board),
-        getLengthUnit(), "board_editor/stroke_text_properties_dialog",
-        parentWidget());
-    dialog.exec();
-  }
+  StrokeTextPropertiesDialog dialog(
+      text, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
+      "board_editor/stroke_text_properties_dialog", parentWidget());
+  dialog.exec();
 }
 
 void BoardEditorState_Select::openHolePropertiesDialog(Hole& hole) noexcept {

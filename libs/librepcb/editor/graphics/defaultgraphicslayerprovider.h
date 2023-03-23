@@ -23,7 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/graphics/graphicslayer.h>
+#include "graphicslayer.h"
 
 #include <QtCore>
 
@@ -31,6 +31,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Theme;
+
 namespace editor {
 
 /*******************************************************************************
@@ -43,7 +46,8 @@ namespace editor {
 class DefaultGraphicsLayerProvider final : public IF_GraphicsLayerProvider {
 public:
   // Constructors / Destructor
-  DefaultGraphicsLayerProvider() noexcept;
+  DefaultGraphicsLayerProvider() = delete;
+  explicit DefaultGraphicsLayerProvider(const Theme& theme) noexcept;
   ~DefaultGraphicsLayerProvider() noexcept;
 
   // Getters
@@ -53,7 +57,7 @@ public:
   }
 
 private:
-  void addLayer(const QString& name) noexcept;
+  void addLayer(const Theme& theme, const QString& name) noexcept;
 
   QList<GraphicsLayer*> mLayers;
 };

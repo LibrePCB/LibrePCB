@@ -22,10 +22,10 @@
  ******************************************************************************/
 #include "bi_netline.h"
 
+#include "../../../types/layer.h"
 #include "../../../utils/scopeguard.h"
 #include "../../circuit/netsignal.h"
 #include "../board.h"
-#include "../boardlayerstack.h"
 #include "bi_device.h"
 #include "bi_footprintpad.h"
 #include "bi_netpoint.h"
@@ -83,21 +83,20 @@ BI_NetSegment* BI_NetLineAnchor::getNetSegmentOfLines() const noexcept {
 
 BI_NetLine::BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
                        BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
-                       GraphicsLayer& layer, const PositiveLength& width)
+                       const Layer& layer, const PositiveLength& width)
   : BI_Base(segment.getBoard()),
     onEdited(*this),
     mNetSegment(segment),
-    mTrace(uuid, GraphicsLayerName(layer.getName()), width,
-           startPoint.toTraceAnchor(), endPoint.toTraceAnchor()),
+    mTrace(uuid, layer, width, startPoint.toTraceAnchor(),
+           endPoint.toTraceAnchor()),
     mStartPoint(&startPoint),
-    mEndPoint(&endPoint),
-    mLayer(&layer) {
+    mEndPoint(&endPoint) {
   // check layer
-  if (!mLayer->isCopperLayer()) {
+  if (!mTrace.getLayer().isCopper()) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("The layer of netpoint \"%1\" is invalid (%2).")
                            .arg(mTrace.getUuid().toStr())
-                           .arg(mLayer->getName()));
+                           .arg(mTrace.getLayer().getNameTr()));
   }
 
   // check if both netpoints are different
@@ -143,13 +142,11 @@ UnsignedLength BI_NetLine::getLength() const noexcept {
  *  Setters
  ******************************************************************************/
 
-void BI_NetLine::setLayer(GraphicsLayer& layer) {
-  if (isAddedToBoard() || (!layer.isCopperLayer()) ||
-      (mBoard.getLayerStack().getLayer(layer.getName()) != &layer)) {
+void BI_NetLine::setLayer(const Layer& layer) {
+  if (isAddedToBoard() || (!layer.isCopper())) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (mTrace.setLayer(GraphicsLayerName(layer.getName()))) {
-    mLayer = &layer;
+  if (mTrace.setLayer(layer)) {
     onEdited.notify(Event::LayerChanged);
   }
 }

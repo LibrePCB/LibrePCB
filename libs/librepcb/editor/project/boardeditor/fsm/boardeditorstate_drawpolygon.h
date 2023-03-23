@@ -26,7 +26,6 @@
 #include "boardeditorstate.h"
 
 #include <librepcb/core/geometry/polygon.h>
-#include <librepcb/core/graphics/graphicslayername.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -37,6 +36,7 @@
 namespace librepcb {
 
 class BI_Polygon;
+class Layer;
 
 namespace editor {
 
@@ -85,10 +85,9 @@ private:  // Methods
   bool addSegment(const Point& pos) noexcept;
   bool updateLastVertexPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void layerComboBoxLayerChanged(const GraphicsLayerName& layerName) noexcept;
+  void layerComboBoxLayerChanged(const Layer& layer) noexcept;
   void widthEditValueChanged(const UnsignedLength& value) noexcept;
   void filledCheckBoxCheckedChanged(bool checked) noexcept;
-  void makeSelectedLayerVisible() noexcept;
 
 private:
   // State

@@ -38,7 +38,6 @@ namespace librepcb {
 
 class BI_Device;
 class Board;
-class GraphicsLayer;
 class Hole;
 class NetSignal;
 
@@ -104,9 +103,9 @@ private:  // Methods
   ClipperLib::Paths getBoardClearanceArea(
       const UnsignedLength& clearance) const;
   const ClipperLib::Paths& getCopperPaths(
-      const GraphicsLayer& layer, const QSet<const NetSignal*>& netsignals);
+      const Layer& layer, const QSet<const NetSignal*>& netsignals);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
-                                            const GraphicsLayer* layer);
+                                            const Layer& layer);
   QVector<Path> getDeviceLocation(const BI_Device& device) const;
   template <typename THole>
   QVector<Path> getHoleLocation(const THole& hole,
@@ -132,7 +131,7 @@ private:  // Data
   int mProgressPercent;
   QStringList mProgressStatus;
   RuleCheckMessageList mMessages;
-  QHash<QPair<const GraphicsLayer*, QSet<const NetSignal*>>, ClipperLib::Paths>
+  QHash<QPair<const Layer*, QSet<const NetSignal*>>, ClipperLib::Paths>
       mCachedPaths;
 };
 

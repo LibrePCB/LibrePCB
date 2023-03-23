@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../export/graphicsexport.h"
 #include "../../geometry/hole.h"
-#include "../../graphics/graphicslayername.h"
 #include "../../library/pkg/footprintpad.h"
 #include "../../types/length.h"
 #include "../../utils/transform.h"
@@ -58,7 +57,7 @@ class Via;
  */
 class BoardPainter final : public GraphicsPagePainter {
   struct Trace {
-    QString layerName;
+    const Layer* layer;
     Point startPosition;
     Point endPosition;
     PositiveLength width;
@@ -66,7 +65,7 @@ class BoardPainter final : public GraphicsPagePainter {
 
   struct Pad {
     Transform transform;
-    QList<std::pair<QString, PadGeometry>> layerGeometries;
+    QList<std::pair<const Layer*, PadGeometry>> layerGeometries;
     QList<PadHole> holes;
   };
 
@@ -79,13 +78,13 @@ class BoardPainter final : public GraphicsPagePainter {
   };
 
   struct Plane {
-    QString layerName;
+    const Layer* layer;
     QVector<Path> fragments;
   };
 
-  struct LayerContent {
+  struct ColorContent {
     QList<QPainterPath> areas;
-    QList<QPainterPath> thtPadAreas;  ///< Drawn on GraphicsLayer::sBoardPadsTht
+    QList<QPainterPath> thtPadAreas;  ///< Drawn on Theme::Color::sBoardPads
     QList<Trace> traces;
     QList<Polygon> polygons;
     QList<Circle> circles;
@@ -109,7 +108,7 @@ public:
   BoardPainter& operator=(const BoardPainter& rhs) = delete;
 
 private:  // Methods
-  void initContentByLayer() const noexcept;
+  void initContentByColor() const noexcept;
 
 private:  // Data
   const StrokeFont& mStrokeFont;
@@ -123,7 +122,7 @@ private:  // Data
   QList<Hole> mHoles;  ///< Important: Stop mask set to explicit value!
 
   mutable QMutex mMutex;
-  mutable QHash<QString, LayerContent> mContentByLayer;
+  mutable QHash<QString, ColorContent> mContentByColor;
 };
 
 /*******************************************************************************

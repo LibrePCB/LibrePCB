@@ -34,12 +34,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 class GraphicsLayer;
 class IF_GraphicsLayerProvider;
-
-namespace editor {
-
 class OriginCrossGraphicsItem;
 class PrimitivePathGraphicsItem;
 

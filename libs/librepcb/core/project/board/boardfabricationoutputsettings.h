@@ -30,6 +30,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Layer;
 class SExpression;
 
 /*******************************************************************************
@@ -85,10 +86,10 @@ public:
   const QString& getSuffixSolderPasteBot() const noexcept {
     return mSuffixSolderPasteBot;
   }
-  const QStringList& getSilkscreenLayersTop() const noexcept {
+  const QVector<const Layer*>& getSilkscreenLayersTop() const noexcept {
     return mSilkscreenLayersTop;
   }
-  const QStringList& getSilkscreenLayersBot() const noexcept {
+  const QVector<const Layer*>& getSilkscreenLayersBot() const noexcept {
     return mSilkscreenLayersBot;
   }
   bool getMergeDrillFiles() const noexcept { return mMergeDrillFiles; }
@@ -129,10 +130,10 @@ public:
   void setSuffixSolderPasteBot(const QString& s) noexcept {
     mSuffixSolderPasteBot = s;
   }
-  void setSilkscreenLayersTop(const QStringList& l) noexcept {
+  void setSilkscreenLayersTop(const QVector<const Layer*>& l) noexcept {
     mSilkscreenLayersTop = l;
   }
-  void setSilkscreenLayersBot(const QStringList& l) noexcept {
+  void setSilkscreenLayersBot(const QVector<const Layer*>& l) noexcept {
     mSilkscreenLayersBot = l;
   }
   void setMergeDrillFiles(bool m) noexcept { mMergeDrillFiles = m; }
@@ -172,8 +173,8 @@ private:  // Data
   QString mSuffixSilkscreenBot;
   QString mSuffixSolderPasteTop;
   QString mSuffixSolderPasteBot;
-  QStringList mSilkscreenLayersTop;
-  QStringList mSilkscreenLayersBot;
+  QVector<const Layer*> mSilkscreenLayersTop;
+  QVector<const Layer*> mSilkscreenLayersBot;
   bool mMergeDrillFiles;
   bool mUseG85SlotCommand;
   bool mEnableSolderPasteTop;

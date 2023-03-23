@@ -35,10 +35,10 @@ namespace librepcb {
 
 class Component;
 class ComponentSymbolVariantItem;
-class IF_GraphicsLayerProvider;
 
 namespace editor {
 
+class IF_GraphicsLayerProvider;
 class LineGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;

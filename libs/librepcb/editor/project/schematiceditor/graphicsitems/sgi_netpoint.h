@@ -34,10 +34,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 class GraphicsLayer;
-
-namespace editor {
+class IF_GraphicsLayerProvider;
 
 /*******************************************************************************
  *  Class SGI_NetPoint
@@ -51,7 +51,7 @@ public:
   // Constructors / Destructor
   SGI_NetPoint() = delete;
   SGI_NetPoint(const SGI_NetPoint& other) = delete;
-  SGI_NetPoint(SI_NetPoint& netpoint,
+  SGI_NetPoint(SI_NetPoint& netpoint, const IF_GraphicsLayerProvider& lp,
                std::shared_ptr<const QSet<const NetSignal*>>
                    highlightedNetSignals) noexcept;
   virtual ~SGI_NetPoint() noexcept;
@@ -73,7 +73,6 @@ private:  // Methods
   void updatePosition() noexcept;
   void updateJunction() noexcept;
   void updateNetName() noexcept;
-  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 private:  // Data
   SI_NetPoint& mNetPoint;

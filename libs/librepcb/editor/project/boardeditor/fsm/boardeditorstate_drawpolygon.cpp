@@ -34,8 +34,8 @@
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -53,14 +53,13 @@ BoardEditorState_DrawPolygon::BoardEditorState_DrawPolygon(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mLastPolygonProperties(
-        Uuid::createRandom(),  // UUID is not relevant here
-        GraphicsLayerName(GraphicsLayer::sBoardOutlines),  // Layer
-        UnsignedLength(0),  // Line width
-        false,  // Is filled
-        false,  // Is grab area
-        Path()  // Path is not relevant here
-        ),
+    mLastPolygonProperties(Uuid::createRandom(),  // UUID is not relevant here
+                           Layer::boardOutlines(),  // Layer
+                           UnsignedLength(0),  // Line width
+                           false,  // Is filled
+                           false,  // Is grab area
+                           Path()  // Path is not relevant here
+                           ),
     mLastSegmentPos(),
     mCurrentPolygon(nullptr),
     mCurrentPolygonEditCmd(nullptr) {
@@ -82,10 +81,8 @@ bool BoardEditorState_DrawPolygon::entry() noexcept {
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
-  if (Board* board = getActiveBoard()) {
-    layerComboBox->setLayers(getAllowedGeometryLayers(*board));
-  }
-  layerComboBox->setCurrentLayer(mLastPolygonProperties.getLayerName());
+  layerComboBox->setLayers(getAllowedGeometryLayers());
+  layerComboBox->setCurrentLayer(mLastPolygonProperties.getLayer());
   layerComboBox->addAction(
       cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
                                &GraphicsLayerComboBox::stepDown));
@@ -203,7 +200,7 @@ bool BoardEditorState_DrawPolygon::startAddPolygon(const Point& pos) noexcept {
     mCurrentPolygonEditCmd.reset(
         new CmdPolygonEdit(mCurrentPolygon->getPolygon()));
     mLastSegmentPos = pos;
-    makeSelectedLayerVisible();
+    makeLayerVisible(mLastPolygonProperties.getLayer().getThemeColor());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -289,12 +286,11 @@ bool BoardEditorState_DrawPolygon::abortCommand(bool showErrMsgBox) noexcept {
 }
 
 void BoardEditorState_DrawPolygon::layerComboBoxLayerChanged(
-    const GraphicsLayerName& layerName) noexcept {
-  mLastPolygonProperties.setLayerName(layerName);
+    const Layer& layer) noexcept {
+  mLastPolygonProperties.setLayer(layer);
   if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setLayerName(mLastPolygonProperties.getLayerName(),
-                                         true);
-    makeSelectedLayerVisible();
+    mCurrentPolygonEditCmd->setLayer(layer, true);
+    makeLayerVisible(layer.getThemeColor());
   }
 }
 
@@ -315,15 +311,6 @@ void BoardEditorState_DrawPolygon::filledCheckBoxCheckedChanged(
                                         true);
     mCurrentPolygonEditCmd->setIsGrabArea(mLastPolygonProperties.isFilled(),
                                           true);
-  }
-}
-
-void BoardEditorState_DrawPolygon::makeSelectedLayerVisible() noexcept {
-  if (mCurrentPolygon) {
-    Board& board = mCurrentPolygon->getBoard();
-    GraphicsLayer* layer =
-        board.getLayerStack().getLayer(*mLastPolygonProperties.getLayerName());
-    if (layer && layer->isEnabled()) layer->setVisible(true);
   }
 }
 

@@ -34,8 +34,8 @@
 #include "../symbolgraphicsitem.h"
 
 #include <librepcb/core/geometry/text.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -55,7 +55,7 @@ SymbolEditorState_DrawTextBase::SymbolEditorState_DrawTextBase(
     mMode(mode),
     mCurrentText(nullptr),
     mCurrentGraphicsItem(nullptr),
-    mLastLayerName(GraphicsLayer::sSymbolNames),
+    mLastLayer(&Layer::symbolNames()),
     mLastHeight(1),
     mLastAlignment(HAlign::left(), VAlign::bottom()),
     mLastText() {
@@ -79,7 +79,7 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
     std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
         new GraphicsLayerComboBox());
     layerComboBox->setLayers(getAllowedTextLayers());
-    layerComboBox->setCurrentLayer(mLastLayerName);
+    layerComboBox->setCurrentLayer(*mLastLayer);
     layerComboBox->addAction(
         cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
                                  &GraphicsLayerComboBox::stepDown));
@@ -247,7 +247,7 @@ bool SymbolEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
     mStartPos = pos;
     mContext.undoStack.beginCmdGroup(tr("Add symbol text"));
     mCurrentText =
-        std::make_shared<Text>(Uuid::createRandom(), mLastLayerName, mLastText,
+        std::make_shared<Text>(Uuid::createRandom(), *mLastLayer, mLastText,
                                pos, mLastRotation, mLastHeight, mLastAlignment);
     mContext.undoStack.appendToCmdGroup(
         new CmdTextInsert(mContext.symbol.getTexts(), mCurrentText));
@@ -304,21 +304,21 @@ void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
   switch (mMode) {
     case Mode::NAME:
       // Set all properties according library conventions
-      mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolNames);
+      mLastLayer = &Layer::symbolNames();
       mLastHeight = PositiveLength(2500000);
       mLastAlignment = Alignment(HAlign::left(), VAlign::bottom());
       mLastText = "{{NAME}}";
       break;
     case Mode::VALUE:
       // Set all properties according library conventions
-      mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolValues);
+      mLastLayer = &Layer::symbolValues();
       mLastHeight = PositiveLength(2500000);
       mLastAlignment = Alignment(HAlign::left(), VAlign::top());
       mLastText = "{{VALUE}}";
       break;
     default:
       // Set properties to something reasonable
-      mLastLayerName = GraphicsLayerName(GraphicsLayer::sSymbolOutlines);
+      mLastLayer = &Layer::symbolOutlines();
       mLastHeight = PositiveLength(2500000);
       mLastAlignment = Alignment(HAlign::left(), VAlign::bottom());
       mLastText = "Text";  // Non-empty to avoid invisible graphics item
@@ -327,10 +327,10 @@ void SymbolEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
 }
 
 void SymbolEditorState_DrawTextBase::layerComboBoxValueChanged(
-    const GraphicsLayerName& layerName) noexcept {
-  mLastLayerName = layerName;
+    const Layer& layer) noexcept {
+  mLastLayer = &layer;
   if (mEditCmd) {
-    mEditCmd->setLayerName(mLastLayerName, true);
+    mEditCmd->setLayer(*mLastLayer, true);
   }
 }
 

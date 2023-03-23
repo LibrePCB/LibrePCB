@@ -29,7 +29,6 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/font/strokefont.h>
 #include <librepcb/core/geometry/stroketext.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,7 +40,7 @@ namespace librepcb {
 namespace editor {
 
 StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
-    StrokeText& text, UndoStack& undoStack, QList<GraphicsLayer*> layers,
+    StrokeText& text, UndoStack& undoStack, const QSet<const Layer*>& layers,
     const LengthUnit& lengthUnit, const QString& settingsPrefix,
     QWidget* parent) noexcept
   : QDialog(parent),
@@ -49,6 +48,7 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
     mUndoStack(undoStack),
     mUi(new Ui::StrokeTextPropertiesDialog) {
   mUi->setupUi(this);
+  mUi->cbxLayer->setLayers(layers);
   mUi->edtHeight->configure(lengthUnit, LengthEditBase::Steps::textHeight(),
                             settingsPrefix % "/height");
   mUi->edtStrokeWidth->configure(lengthUnit, LengthEditBase::Steps::generic(),
@@ -59,10 +59,6 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
                           settingsPrefix % "/pos_y");
   mUi->edtRotation->setSingleStep(90.0);  // [°]
 
-  foreach (const GraphicsLayer* layer, layers) {
-    mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
-  }
-
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &StrokeTextPropertiesDialog::on_buttonBox_clicked);
   connect(mUi->cbxLetterSpacingAuto, &QCheckBox::toggled,
@@ -71,7 +67,7 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
           mUi->edtLineSpacingRatio, &RatioEdit::setDisabled);
 
   // load text attributes
-  selectLayerNameInCombobox(*mText.getLayerName());
+  mUi->cbxLayer->setCurrentLayer(mText.getLayer());
   mUi->edtText->setPlainText(mText.getText());
   mUi->alignmentSelector->setAlignment(mText.getAlign());
   mUi->edtHeight->setValue(mText.getHeight());
@@ -164,11 +160,8 @@ void StrokeTextPropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
 bool StrokeTextPropertiesDialog::applyChanges() noexcept {
   try {
     QScopedPointer<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(mText));
-    if (mUi->cbxLayer->currentIndex() >= 0 &&
-        mUi->cbxLayer->currentData().isValid()) {
-      cmd->setLayerName(
-          GraphicsLayerName(mUi->cbxLayer->currentData().toString()),
-          false);  // can throw
+    if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
+      cmd->setLayer(*layer, false);
     }
     cmd->setText(mUi->edtText->toPlainText(), false);
     cmd->setAlignment(mUi->alignmentSelector->getAlignment(), false);
@@ -197,11 +190,6 @@ bool StrokeTextPropertiesDialog::applyChanges() noexcept {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
     return false;
   }
-}
-
-void StrokeTextPropertiesDialog::selectLayerNameInCombobox(
-    const QString& name) noexcept {
-  mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(name));
 }
 
 /*******************************************************************************

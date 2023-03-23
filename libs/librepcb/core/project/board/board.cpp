@@ -39,7 +39,6 @@
 #include "boardairwiresbuilder.h"
 #include "boarddesignrules.h"
 #include "boardfabricationoutputsettings.h"
-#include "boardlayerstack.h"
 #include "boardplanefragmentsbuilder.h"
 #include "drc/boarddesignrulechecksettings.h"
 #include "items/bi_airwire.h"
@@ -77,7 +76,6 @@ Board::Board(Project& project,
     mDirectoryName(directoryName),
     mDirectory(std::move(directory)),
     mIsAddedToProject(false),
-    mLayerStack(new BoardLayerStack(*this)),
     mDesignRules(new BoardDesignRules()),
     mDrcSettings(new BoardDesignRuleCheckSettings()),
     mFabricationOutputSettings(new BoardFabricationOutputSettings()),
@@ -86,12 +84,16 @@ Board::Board(Project& project,
     mDefaultFontFileName(qApp->getDefaultStrokeFontName()),
     mGridInterval(635000),
     mGridUnit(LengthUnit::millimeters()),
+    mInnerLayerCount(-1),  // Force update of setter.
+    mCopperLayers(),
     mDrcMessageApprovalsVersion(qApp->getFileFormatVersion()),
     mDrcMessageApprovals(),
     mSupportedDrcMessageApprovals() {
   if (mDirectoryName.isEmpty()) {
     throw LogicError(__FILE__, __LINE__);
   }
+
+  setInnerLayerCount(0);
 
   // Emit the "attributesChanged" signal when the project has emitted it.
   connect(&mProject, &Project::attributesChanged, this,
@@ -120,7 +122,6 @@ Board::~Board() noexcept {
   mFabricationOutputSettings.reset();
   mDrcSettings.reset();
   mDesignRules.reset();
-  mLayerStack.reset();
 }
 
 /*******************************************************************************
@@ -155,6 +156,21 @@ QList<BI_Base*> Board::getAllItems() const noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void Board::setInnerLayerCount(int count) noexcept {
+  if (count != mInnerLayerCount) {
+    mInnerLayerCount = count;
+    mCopperLayers.clear();
+    mCopperLayers.insert(&Layer::topCopper());
+    mCopperLayers.insert(&Layer::botCopper());
+    for (int i = 1; i <= mInnerLayerCount; ++i) {
+      if (const Layer* layer = Layer::innerCopper(i)) {
+        mCopperLayers.insert(layer);
+      }
+    }
+    emit innerLayerCountChanged();
+  }
+}
 
 void Board::setDesignRules(const BoardDesignRules& rules) noexcept {
   if (rules != *mDesignRules) {
@@ -486,9 +502,8 @@ void Board::addDefaultContent() {
   // Add 100x80mm board outline (1/2 Eurocard size).
   addPolygon(*new BI_Polygon(
       *this,
-      Polygon(Uuid::createRandom(),
-              GraphicsLayerName(GraphicsLayer::sBoardOutlines),
-              UnsignedLength(0), false, false,
+      Polygon(Uuid::createRandom(), Layer::boardOutlines(), UnsignedLength(0),
+              false, false,
               Path::rect(Point(0, 0), Point(100000000, 80000000)))));
 }
 
@@ -496,7 +511,8 @@ void Board::copyFrom(const Board& other) {
   mDefaultFontFileName = other.getDefaultFontName();
   mGridInterval = other.getGridInterval();
   mGridUnit = other.getGridUnit();
-  *mLayerStack = other.getLayerStack();
+  mInnerLayerCount = other.getInnerLayerCount();
+  mCopperLayers = other.getCopperLayers();
   *mDesignRules = other.getDesignRules();
   *mFabricationOutputSettings = other.getFabricationOutputSettings();
 
@@ -555,14 +571,9 @@ void Board::copyFrom(const Board& other) {
       Q_ASSERT(start);
       BI_NetLineAnchor* end = anchorsMap.value(&netLine->getEndPoint());
       Q_ASSERT(end);
-      GraphicsLayer* layer =
-          getLayerStack().getLayer(netLine->getLayer().getName());
-      if (!layer) {
-        throw LogicError(__FILE__, __LINE__);
-      }
       BI_NetLine* netLineCopy =
-          new BI_NetLine(*copy, Uuid::createRandom(), *start, *end, *layer,
-                         netLine->getWidth());
+          new BI_NetLine(*copy, Uuid::createRandom(), *start, *end,
+                         netLine->getLayer(), netLine->getWidth());
       netLines.append(netLineCopy);
     }
 
@@ -573,7 +584,7 @@ void Board::copyFrom(const Board& other) {
   // Copy planes.
   foreach (const BI_Plane* plane, other.getPlanes()) {
     BI_Plane* copy =
-        new BI_Plane(*this, Uuid::createRandom(), plane->getLayerName(),
+        new BI_Plane(*this, Uuid::createRandom(), plane->getLayer(),
                      plane->getNetSignal(), plane->getOutline());
     copy->setMinWidth(plane->getMinWidth());
     copy->setMinClearance(plane->getMinClearance());
@@ -669,7 +680,7 @@ void Board::save() {
     root.ensureLineBreak();
     {
       SExpression& node = root.appendList("layers");
-      node.appendChild("inner", mLayerStack->getInnerLayerCount());
+      node.appendChild("inner", mInnerLayerCount);
     }
     root.ensureLineBreak();
     mDesignRules->serialize(root.appendList("design_rules"));
@@ -725,11 +736,12 @@ void Board::save() {
   // User settings.
   {
     SExpression root = SExpression::createList("librepcb_board_user_settings");
-    for (const GraphicsLayer* layer : mLayerStack->getAllLayers()) {
+    for (auto it = mLayersVisibility.begin(); it != mLayersVisibility.end();
+         it++) {
       root.ensureLineBreak();
       SExpression& child = root.appendList("layer");
-      child.appendChild(SExpression::createToken(layer->getName()));
-      child.appendChild("visible", layer->getVisible());
+      child.appendChild(SExpression::createToken(it.key()));
+      child.appendChild("visible", it.value());
     }
     root.ensureLineBreak();
     for (const BI_Plane* plane : mPlanes) {

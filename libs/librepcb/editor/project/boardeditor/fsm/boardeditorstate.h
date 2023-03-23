@@ -26,6 +26,7 @@
 #include "boardeditorfsm.h"
 
 #include <librepcb/core/types/length.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,7 +39,7 @@
 namespace librepcb {
 
 class Board;
-class GraphicsLayer;
+class Layer;
 class LengthUnit;
 class NetSignal;
 class Point;
@@ -182,18 +183,20 @@ protected:  // Methods
   BoardGraphicsScene* getActiveBoardScene() noexcept;
   PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;
-  QList<GraphicsLayer*> getAllowedGeometryLayers(const Board& board) const
-      noexcept;
+  static const QSet<const Layer*>& getAllowedGeometryLayers() noexcept;
+  void makeLayerVisible(const QString& layer) noexcept;
   void abortBlockingToolsInOtherEditors() noexcept;
   bool execCmd(UndoCommand* cmd);
   QWidget* parentWidget() noexcept;
   QList<std::shared_ptr<QGraphicsItem>> findItemsAtPos(
-      const Point& pos, FindFlags flags, const GraphicsLayer* cuLayer = nullptr,
+      const Point& pos, FindFlags flags,
+      const tl::optional<const Layer&> cuLayer = tl::nullopt,
       const QSet<const NetSignal*>& netsignals = {},
       const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept;
   template <typename T = QGraphicsItem>
   std::shared_ptr<T> findItemAtPos(
-      const Point& pos, FindFlags flags, const GraphicsLayer* cuLayer = nullptr,
+      const Point& pos, FindFlags flags,
+      const tl::optional<const Layer&> cuLayer = tl::nullopt,
       const QSet<const NetSignal*>& netsignals = {},
       const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept {
     const QList<std::shared_ptr<QGraphicsItem>> items =

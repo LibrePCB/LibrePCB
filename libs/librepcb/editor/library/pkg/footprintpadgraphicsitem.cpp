@@ -24,6 +24,9 @@
 
 #include "../../graphics/primitivefootprintpadgraphicsitem.h"
 
+#include <librepcb/core/types/layer.h>
+#include <librepcb/core/workspace/theme.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -55,7 +58,7 @@ FootprintPadGraphicsItem::FootprintPadGraphicsItem(
 
   setPos(mPad->getPosition().toPxQPointF());
   mGraphicsItem->setRotation(mPad->getRotation());
-  mGraphicsItem->setLayer(mPad->getLayerName());
+  updateLayer();
   updateGeometries();
   updateText();
 
@@ -128,7 +131,7 @@ void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
       break;
     case FootprintPad::Event::ComponentSideChanged:
     case FootprintPad::Event::HolesEdited:
-      mGraphicsItem->setLayer(pad.getLayerName());
+      updateLayer();
       updateGeometries();
       break;
     default:
@@ -150,28 +153,33 @@ void FootprintPadGraphicsItem::packagePadListEdited(
   updateText();
 }
 
+void FootprintPadGraphicsItem::updateLayer() noexcept {
+  mGraphicsItem->setLayer(mPad->isTht() ? Theme::Color::sBoardPads
+                                        : mPad->getSmtLayer().getThemeColor());
+}
+
 void FootprintPadGraphicsItem::updateGeometries() noexcept {
   const bool hasTopCopper = mPad->isTht() ||
       (mPad->getComponentSide() == FootprintPad::ComponentSide::Top);
   const bool hasBotCopper = mPad->isTht() ||
       (mPad->getComponentSide() == FootprintPad::ComponentSide::Bottom);
-  const QList<PadGeometry> stopMask{
-      mPad->getGeometry().withOffset(Length(100000))};
-  const QList<PadGeometry> solderPaste{
-      mPad->getGeometry().withOffset(Length(-100000))};
+  const PadGeometry copper = mPad->getGeometry();
+  const QList<PadGeometry> stopMask{copper.withOffset(Length(100000))};
+  const QList<PadGeometry> solderPaste{copper.withOffset(Length(-100000))};
 
-  QMap<QString, QList<PadGeometry>> geometries;
-  geometries.insert(mPad->getLayerName(), {mPad->getGeometry()});
+  QHash<const Layer*, QList<PadGeometry>> geometries;
   if (hasTopCopper) {
-    geometries.insert(GraphicsLayer::sTopStopMask, stopMask);
+    geometries.insert(&Layer::topCopper(), {copper});
+    geometries.insert(&Layer::topStopMask(), stopMask);
     if (!mPad->isTht()) {
-      geometries.insert(GraphicsLayer::sTopSolderPaste, solderPaste);
+      geometries.insert(&Layer::topSolderPaste(), solderPaste);
     }
   }
   if (hasBotCopper) {
-    geometries.insert(GraphicsLayer::sBotStopMask, stopMask);
+    geometries.insert(&Layer::botCopper(), {copper});
+    geometries.insert(&Layer::botStopMask(), stopMask);
     if (!mPad->isTht()) {
-      geometries.insert(GraphicsLayer::sBotSolderPaste, solderPaste);
+      geometries.insert(&Layer::botSolderPaste(), solderPaste);
     }
   }
   mGraphicsItem->setGeometries(geometries);

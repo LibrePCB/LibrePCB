@@ -38,11 +38,11 @@
 namespace librepcb {
 
 class Component;
-class IF_GraphicsLayerProvider;
 
 namespace editor {
 
 class CircleGraphicsItem;
+class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem;
 class SymbolPinGraphicsItem;
 class TextGraphicsItem;

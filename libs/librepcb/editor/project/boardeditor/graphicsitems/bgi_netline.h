@@ -23,7 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/graphics/graphicslayer.h>
+#include "../../../graphics/graphicslayer.h"
+
 #include <librepcb/core/project/board/items/bi_netline.h>
 
 #include <QtCore>
@@ -52,7 +53,7 @@ public:
   // Constructors / Destructor
   BGI_NetLine() = delete;
   BGI_NetLine(const BGI_NetLine& other) = delete;
-  BGI_NetLine(BI_NetLine& netline,
+  BGI_NetLine(BI_NetLine& netline, const IF_GraphicsLayerProvider& lp,
               std::shared_ptr<const QSet<const NetSignal*>>
                   highlightedNetSignals) noexcept;
   virtual ~BGI_NetLine() noexcept;
@@ -77,11 +78,11 @@ private:  // Methods
   void updateLayer() noexcept;
   void updateNetSignalName() noexcept;
   void updateVisibility() noexcept;
-  GraphicsLayer* getLayer(const QString& name) const noexcept;
 
 private:  // Data
   // Attributes
   BI_NetLine& mNetLine;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   GraphicsLayer* mLayer;
 

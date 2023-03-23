@@ -34,10 +34,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 class IF_GraphicsLayerProvider;
-
-namespace editor {
 
 /*******************************************************************************
  *  Class PolygonGraphicsItem

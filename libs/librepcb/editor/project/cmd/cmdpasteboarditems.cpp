@@ -48,7 +48,6 @@
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
@@ -242,12 +241,11 @@ bool CmdPasteBoardItems::performExecute() {
               mBoard.getDeviceInstanceByComponentUuid(anchor->device);
           end = device ? device->getPad(anchor->pad) : nullptr;
         }
-        GraphicsLayer* layer =
-            mBoard.getLayerStack().getLayer(*trace.getLayer());
-        if ((!start) || (!end) || (!layer)) {
+        if ((!start) || (!end)) {
           throw LogicError(__FILE__, __LINE__);
         }
-        cmdAddElements->addNetLine(*start, *end, *layer, trace.getWidth());
+        cmdAddElements->addNetLine(*start, *end, trace.getLayer(),
+                                   trace.getWidth());
       }
       execNewChildCmd(cmdAddElements.take());
 
@@ -272,12 +270,12 @@ bool CmdPasteBoardItems::performExecute() {
 
   // Paste planes
   for (const BoardClipboardData::Plane& plane : mData->getPlanes()) {
-    BI_Plane* copy = new BI_Plane(mBoard,
-                                  Uuid::createRandom(),  // assign new UUID
-                                  GraphicsLayerName(plane.layer),
-                                  *getOrCreateNetSignal(*plane.netSignalName),
-                                  plane.outline.translated(mPosOffset)  // move
-    );
+    BI_Plane* copy =
+        new BI_Plane(mBoard,
+                     Uuid::createRandom(),  // assign new UUID
+                     *plane.layer, *getOrCreateNetSignal(*plane.netSignalName),
+                     plane.outline.translated(mPosOffset)  // move
+        );
     copy->setMinWidth(plane.minWidth);
     copy->setMinClearance(plane.minClearance);
     copy->setKeepOrphans(plane.keepOrphans);

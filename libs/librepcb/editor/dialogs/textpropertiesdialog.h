@@ -31,7 +31,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
+class Layer;
 class LengthUnit;
 class Text;
 
@@ -58,7 +58,7 @@ public:
   TextPropertiesDialog() = delete;
   TextPropertiesDialog(const TextPropertiesDialog& other) = delete;
   TextPropertiesDialog(Text& text, UndoStack& undoStack,
-                       QList<GraphicsLayer*> layers,
+                       const QSet<const Layer*>& layers,
                        const LengthUnit& lengthUnit,
                        const QString& settingsPrefix,
                        QWidget* parent = nullptr) noexcept;
@@ -73,8 +73,6 @@ public:
 private:  // Methods
   void on_buttonBox_clicked(QAbstractButton* button);
   bool applyChanges() noexcept;
-  void addLayersToCombobox(const QList<QString>& names) noexcept;
-  void selectLayerNameInCombobox(const QString& name) noexcept;
 
 private:  // Data
   Text& mText;

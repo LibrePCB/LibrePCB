@@ -38,7 +38,7 @@ namespace librepcb {
 Polygon::Polygon(const Polygon& other) noexcept
   : onEdited(*this),
     mUuid(other.mUuid),
-    mLayerName(other.mLayerName),
+    mLayer(other.mLayer),
     mLineWidth(other.mLineWidth),
     mIsFilled(other.mIsFilled),
     mIsGrabArea(other.mIsGrabArea),
@@ -50,12 +50,12 @@ Polygon::Polygon(const Uuid& uuid, const Polygon& other) noexcept
   mUuid = uuid;
 }
 
-Polygon::Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
+Polygon::Polygon(const Uuid& uuid, const Layer& layer,
                  const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
                  const Path& path) noexcept
   : onEdited(*this),
     mUuid(uuid),
-    mLayerName(layerName),
+    mLayer(&layer),
     mLineWidth(lineWidth),
     mIsFilled(fill),
     mIsGrabArea(isGrabArea),
@@ -65,7 +65,7 @@ Polygon::Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
 Polygon::Polygon(const SExpression& node)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+    mLayer(deserialize<const Layer*>(node.getChild("layer/@0"))),
     mLineWidth(deserialize<UnsignedLength>(node.getChild("width/@0"))),
     mIsFilled(deserialize<bool>(node.getChild("fill/@0"))),
     mIsGrabArea(deserialize<bool>(node.getChild("grab_area/@0"))),
@@ -79,13 +79,13 @@ Polygon::~Polygon() noexcept {
  *  Setters
  ******************************************************************************/
 
-bool Polygon::setLayerName(const GraphicsLayerName& name) noexcept {
-  if (name == mLayerName) {
+bool Polygon::setLayer(const Layer& layer) noexcept {
+  if (&layer == mLayer) {
     return false;
   }
 
-  mLayerName = name;
-  onEdited.notify(Event::LayerNameChanged);
+  mLayer = &layer;
+  onEdited.notify(Event::LayerChanged);
   return true;
 }
 
@@ -135,7 +135,7 @@ bool Polygon::setPath(const Path& path) noexcept {
 
 void Polygon::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName);
+  root.appendChild("layer", *mLayer);
   root.ensureLineBreak();
   root.appendChild("width", mLineWidth);
   root.appendChild("fill", mIsFilled);
@@ -151,7 +151,7 @@ void Polygon::serialize(SExpression& root) const {
 
 bool Polygon::operator==(const Polygon& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
-  if (mLayerName != rhs.mLayerName) return false;
+  if (mLayer != rhs.mLayer) return false;
   if (mLineWidth != rhs.mLineWidth) return false;
   if (mIsFilled != rhs.mIsFilled) return false;
   if (mIsGrabArea != rhs.mIsGrabArea) return false;
@@ -164,7 +164,7 @@ Polygon& Polygon::operator=(const Polygon& rhs) noexcept {
     mUuid = rhs.mUuid;
     onEdited.notify(Event::UuidChanged);
   }
-  setLayerName(rhs.mLayerName);
+  setLayer(*rhs.mLayer);
   setLineWidth(rhs.mLineWidth);
   setIsFilled(rhs.mIsFilled);
   setIsGrabArea(rhs.mIsGrabArea);

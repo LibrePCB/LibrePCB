@@ -61,6 +61,8 @@ add_library(
   graphics/circlegraphicsitem.h
   graphics/defaultgraphicslayerprovider.cpp
   graphics/defaultgraphicslayerprovider.h
+  graphics/graphicslayer.cpp
+  graphics/graphicslayer.h
   graphics/graphicsscene.cpp
   graphics/graphicsscene.h
   graphics/holegraphicsitem.cpp

@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/graphics/graphicslayername.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/point.h>
 
@@ -38,7 +37,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
+class Layer;
 class LengthUnit;
 
 namespace editor {
@@ -61,15 +60,15 @@ public:
   // Constructors / Destructor
   DxfImportDialog() = delete;
   DxfImportDialog(const DxfImportDialog& other) = delete;
-  explicit DxfImportDialog(QList<GraphicsLayer*> layers,
-                           const GraphicsLayerName& defaultLayer,
-                           bool supportHoles, const LengthUnit& lengthUnit,
+  explicit DxfImportDialog(const QSet<const Layer*>& layers,
+                           const Layer& defaultLayer, bool supportHoles,
+                           const LengthUnit& lengthUnit,
                            const QString& settingsPrefix,
                            QWidget* parent = nullptr) noexcept;
   ~DxfImportDialog() noexcept;
 
   // Getters
-  GraphicsLayerName getLayerName() const noexcept;
+  const Layer& getLayer() const noexcept;
   UnsignedLength getLineWidth() const noexcept;
   qreal getScaleFactor() const noexcept;
   tl::optional<Point> getPlacementPosition() const noexcept;
@@ -86,7 +85,7 @@ public:
 private:  // Data
   QScopedPointer<Ui::DxfImportDialog> mUi;
   QString mSettingsPrefix;
-  GraphicsLayerName mDefaultLayer;
+  const Layer& mDefaultLayer;
 };
 
 /*******************************************************************************

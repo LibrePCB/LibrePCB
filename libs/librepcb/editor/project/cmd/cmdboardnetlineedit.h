@@ -33,6 +33,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Layer;
+
 namespace editor {
 
 /*******************************************************************************
@@ -49,7 +52,7 @@ public:
   ~CmdBoardNetLineEdit() noexcept;
 
   // Setters
-  void setLayer(GraphicsLayer& layer) noexcept;
+  void setLayer(const Layer& layer) noexcept;
   void setWidth(const PositiveLength& width) noexcept;
 
 private:  // Methods
@@ -64,8 +67,8 @@ private:  // Methods
 
 private:  // Data
   BI_NetLine& mNetLine;
-  GraphicsLayer* mOldLayer;
-  GraphicsLayer* mNewLayer;
+  const Layer* mOldLayer;
+  const Layer* mNewLayer;
   PositiveLength mOldWidth;
   PositiveLength mNewWidth;
 };

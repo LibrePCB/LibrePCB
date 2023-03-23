@@ -25,14 +25,13 @@
 #include "../../application.h"
 #include "../../attribute/attributesubstitutor.h"
 #include "../../export/graphicsexportsettings.h"
+#include "../../export/graphicspainter.h"
 #include "../../font/strokefontpool.h"
 #include "../../geometry/text.h"
-#include "../../graphics/graphicslayer.h"
-#include "../../graphics/graphicspainter.h"
 #include "../../library/pkg/footprint.h"
+#include "../../workspace/theme.h"
 #include "../project.h"
 #include "board.h"
-#include "boardlayerstack.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
@@ -69,13 +68,10 @@ BoardPainter::BoardPainter(const Board& board)
       for (const PadHole& hole : pad->getLibPad().getHoles()) {
         padObj.holes.append(hole);
       }
-      foreach (GraphicsLayer* layer, board.getLayerStack().getAllLayers()) {
-        if (layer->isEnabled()) {
-          foreach (const PadGeometry& geometry,
-                   pad->getGeometries().value(layer->getName())) {
-            padObj.layerGeometries.append(
-                std::make_pair(layer->getName(), geometry));
-          }
+      for (auto it = pad->getGeometries().begin();
+           it != pad->getGeometries().end(); it++) {
+        foreach (const PadGeometry& geometry, it.value()) {
+          padObj.layerGeometries.append(std::make_pair(it.key(), geometry));
         }
       }
       fpt.pads.append(padObj);
@@ -100,7 +96,7 @@ BoardPainter::BoardPainter(const Board& board)
     mFootprints.append(fpt);
   }
   foreach (const BI_Plane* plane, board.getPlanes()) {
-    mPlanes.append(Plane{*plane->getLayerName(), plane->getFragments()});
+    mPlanes.append(Plane{&plane->getLayer(), plane->getFragments()});
   }
   foreach (const BI_Polygon* polygon, board.getPolygons()) {
     mPolygons.append(polygon->getPolygon());
@@ -121,9 +117,9 @@ BoardPainter::BoardPainter(const Board& board)
       mVias.append(via->getVia());
     }
     for (const BI_NetLine* netline : segment->getNetLines()) {
-      mTraces.append(Trace{
-          netline->getLayer().getName(), netline->getStartPoint().getPosition(),
-          netline->getEndPoint().getPosition(), netline->getWidth()});
+      mTraces.append(
+          Trace{&netline->getLayer(), netline->getStartPoint().getPosition(),
+                netline->getEndPoint().getPosition(), netline->getWidth()});
     }
   }
 }
@@ -138,55 +134,51 @@ BoardPainter::~BoardPainter() noexcept {
 void BoardPainter::paint(QPainter& painter,
                          const GraphicsExportSettings& settings) const
     noexcept {
-  // Determine what to paint on which layer.
-  initContentByLayer();
+  // Determine what to paint on which color layer.
+  initContentByColor();
 
   // Draw THT pads depending on copper layers visibility.
-  bool thtPadsOnlyOnCopperLayers = false;
-  foreach (const QString& layer, settings.getLayerPaintOrder()) {
-    if (GraphicsLayer::isCopperLayer(layer)) {
-      thtPadsOnlyOnCopperLayers = true;
-      break;
-    }
-  }
+  const QSet<QString> enabledCopperLayers =
+      settings.getPaintOrder().toSet() & Theme::getCopperColorNames();
+  bool thtPadsOnlyOnCopperLayers = !enabledCopperLayers.isEmpty();
 
   // Draw pad circles only if holes are enabled, but pads not.
   const bool drawPadHoles =
-      settings.getLayerPaintOrder().contains(GraphicsLayer::sBoardDrillsNpth) &&
-      (!settings.getLayerPaintOrder().contains(GraphicsLayer::sBoardPadsTht));
+      settings.getPaintOrder().contains(Theme::Color::sBoardHoles) &&
+      (!settings.getPaintOrder().contains(Theme::Color::sBoardPads));
 
-  // Draw each layer in reverse order for correct stackup.
+  // Draw each color in reverse order for correct stackup.
   GraphicsPainter p(painter);
   p.setMinLineWidth(settings.getMinLineWidth());
-  foreach (const QString& layer, settings.getLayerPaintOrder()) {
-    if (thtPadsOnlyOnCopperLayers && (layer == GraphicsLayer::sBoardPadsTht)) {
+  foreach (const QString& color, settings.getPaintOrder()) {
+    if (thtPadsOnlyOnCopperLayers && (color == Theme::Color::sBoardPads)) {
       continue;
     }
 
-    LayerContent content = mContentByLayer.value(layer);
+    ColorContent content = mContentByColor.value(color);
 
     // Draw areas.
     foreach (const QPainterPath& area, content.areas) {
-      p.drawPath(area, Length(0), QColor(), settings.getColor(layer));
+      p.drawPath(area, Length(0), QColor(), settings.getColor(color));
     }
 
     // Draw THT pad areas.
     foreach (const QPainterPath& area, content.thtPadAreas) {
       p.drawPath(area, Length(0), QColor(),
-                 settings.getColor(GraphicsLayer::sBoardPadsTht));
+                 settings.getColor(Theme::Color::sBoardPads));
     }
 
     // Draw traces.
     foreach (const Trace& trace, content.traces) {
       p.drawLine(trace.startPosition, trace.endPosition, *trace.width,
-                 settings.getColor(layer));
+                 settings.getColor(color));
     }
 
     // Draw polygons.
     foreach (const Polygon& polygon, content.polygons) {
       p.drawPolygon(polygon.getPath(), *polygon.getLineWidth(),
-                    settings.getColor(layer),
-                    settings.getFillColor(layer, polygon.isFilled(),
+                    settings.getColor(color),
+                    settings.getFillColor(color, polygon.isFilled(),
                                           polygon.isGrabArea()));
     }
 
@@ -194,21 +186,21 @@ void BoardPainter::paint(QPainter& painter,
     foreach (const Circle& circle, content.circles) {
       p.drawCircle(
           circle.getCenter(), *circle.getDiameter(), *circle.getLineWidth(),
-          settings.getColor(layer),
-          settings.getFillColor(layer, circle.isFilled(), circle.isGrabArea()));
+          settings.getColor(color),
+          settings.getFillColor(color, circle.isFilled(), circle.isGrabArea()));
     }
 
     // Draw holes.
     foreach (const Hole& hole, content.holes) {
       p.drawSlot(*hole.getPath(), hole.getDiameter(), Length(0),
-                 settings.getColor(layer), QColor());
+                 settings.getColor(color), QColor());
     }
 
     // Draw pad holes.
     if (drawPadHoles) {
       foreach (const Hole& hole, content.padHoles) {
         p.drawSlot(*hole.getPath(), hole.getDiameter(), Length(0),
-                   settings.getColor(layer), QColor());
+                   settings.getColor(color), QColor());
       }
     }
 
@@ -227,29 +219,31 @@ void BoardPainter::paint(QPainter& painter,
  *  Private Methods
  ******************************************************************************/
 
-void BoardPainter::initContentByLayer() const noexcept {
+void BoardPainter::initContentByColor() const noexcept {
   QMutexLocker lock(&mMutex);
-  if (mContentByLayer.isEmpty()) {
+  if (mContentByColor.isEmpty()) {
     // Footprints.
     foreach (const Footprint& footprint, mFootprints) {
       // Footprint polygons.
       foreach (Polygon polygon, footprint.polygons) {
-        polygon.setLayerName(footprint.transform.map(polygon.getLayerName()));
+        polygon.setLayer(footprint.transform.map(polygon.getLayer()));
         polygon.setPath(footprint.transform.map(polygon.getPath()));
-        mContentByLayer[*polygon.getLayerName()].polygons.append(polygon);
+        const QString color = polygon.getLayer().getThemeColor();
+        mContentByColor[color].polygons.append(polygon);
       }
 
       // Footprint circles.
       foreach (Circle circle, footprint.circles) {
-        circle.setLayerName(footprint.transform.map(circle.getLayerName()));
+        circle.setLayer(footprint.transform.map(circle.getLayer()));
         circle.setCenter(footprint.transform.map(circle.getCenter()));
-        mContentByLayer[*circle.getLayerName()].circles.append(circle);
+        const QString color = circle.getLayer().getThemeColor();
+        mContentByColor[color].circles.append(circle);
       }
 
       // Footprint holes.
       foreach (Hole hole, footprint.holes) {
         hole.setPath(NonEmptyPath(footprint.transform.map(hole.getPath())));
-        mContentByLayer[GraphicsLayer::sBoardDrillsNpth].holes.append(hole);
+        mContentByColor[Theme::Color::sBoardHoles].holes.append(hole);
         PadGeometry geometry =
             PadGeometry::stroke(hole.getDiameter(), hole.getPath(), {});
         if (hole.getStopMaskConfig().isEnabled() &&
@@ -257,8 +251,8 @@ void BoardPainter::initContentByLayer() const noexcept {
           geometry = geometry.withOffset(*hole.getStopMaskConfig().getOffset());
         }
         const QPainterPath stopMask = geometry.toFilledQPainterPathPx();
-        mContentByLayer[GraphicsLayer::sTopStopMask].areas.append(stopMask);
-        mContentByLayer[GraphicsLayer::sBotStopMask].areas.append(stopMask);
+        mContentByColor[Theme::Color::sBoardStopMaskTop].areas.append(stopMask);
+        mContentByColor[Theme::Color::sBoardStopMaskBot].areas.append(stopMask);
       }
 
       // Footprint pads.
@@ -266,20 +260,21 @@ void BoardPainter::initContentByLayer() const noexcept {
         foreach (const auto& layerGeometry, pad.layerGeometries) {
           const QPainterPath path = footprint.transform.mapPx(
               pad.transform.mapPx(layerGeometry.second.toQPainterPathPx()));
+          const QString color = layerGeometry.first->getThemeColor();
           if ((!pad.holes.isEmpty()) &&
-              GraphicsLayer::isCopperLayer(layerGeometry.first)) {
-            LayerContent& tht = mContentByLayer[GraphicsLayer::sBoardPadsTht];
+              Theme::getCopperColorNames().contains(color)) {
+            ColorContent& tht = mContentByColor[Theme::Color::sBoardPads];
             if (!tht.areas.contains(path)) {
               tht.areas.append(path);
             }
-            mContentByLayer[layerGeometry.first].thtPadAreas.append(path);
+            mContentByColor[color].thtPadAreas.append(path);
           } else {
-            mContentByLayer[layerGeometry.first].areas.append(path);
+            mContentByColor[color].areas.append(path);
           }
         }
         // Also add the holes for THT pads.
         for (const PadHole& hole : pad.holes) {
-          mContentByLayer[GraphicsLayer::sBoardDrillsNpth].padHoles.append(
+          mContentByColor[Theme::Color::sBoardHoles].padHoles.append(
               Hole(hole.getUuid(), hole.getDiameter(),
                    footprint.transform.map(pad.transform.map(hole.getPath())),
                    MaskConfig::off()));
@@ -289,30 +284,33 @@ void BoardPainter::initContentByLayer() const noexcept {
 
     // Planes.
     foreach (const Plane& plane, mPlanes) {
+      const QString color = plane.layer->getThemeColor();
       foreach (const Path& path, plane.fragments) {
-        mContentByLayer[plane.layerName].areas.append(path.toQPainterPathPx());
+        mContentByColor[color].areas.append(path.toQPainterPathPx());
       }
     }
 
     // Vias.
     foreach (const Via& via, mVias) {
-      mContentByLayer[GraphicsLayer::sBoardViasTht].areas.append(
+      mContentByColor[Theme::Color::sBoardVias].areas.append(
           via.toQPainterPathPx().translated(via.getPosition().toPxQPointF()));
     }
 
     // Traces.
     foreach (const Trace& trace, mTraces) {
-      mContentByLayer[trace.layerName].traces.append(trace);
+      const QString color = trace.layer->getThemeColor();
+      mContentByColor[color].traces.append(trace);
     }
 
     // Polygons.
     foreach (const Polygon& polygon, mPolygons) {
-      mContentByLayer[*polygon.getLayerName()].polygons.append(polygon);
+      const QString color = polygon.getLayer().getThemeColor();
+      mContentByColor[color].polygons.append(polygon);
     }
 
     // Holes.
     foreach (const Hole& hole, mHoles) {
-      mContentByLayer[GraphicsLayer::sBoardDrillsNpth].holes.append(hole);
+      mContentByColor[Theme::Color::sBoardHoles].holes.append(hole);
       PadGeometry geometry =
           PadGeometry::stroke(hole.getDiameter(), hole.getPath(), {});
       if (hole.getStopMaskConfig().isEnabled() &&
@@ -320,16 +318,17 @@ void BoardPainter::initContentByLayer() const noexcept {
         geometry = geometry.withOffset(*hole.getStopMaskConfig().getOffset());
       }
       const QPainterPath stopMask = geometry.toFilledQPainterPathPx();
-      mContentByLayer[GraphicsLayer::sTopStopMask].areas.append(stopMask);
-      mContentByLayer[GraphicsLayer::sBotStopMask].areas.append(stopMask);
+      mContentByColor[Theme::Color::sBoardStopMaskTop].areas.append(stopMask);
+      mContentByColor[Theme::Color::sBoardStopMaskBot].areas.append(stopMask);
     }
 
     // Texts.
     foreach (StrokeText text, mStrokeTexts) {
       Transform transform(text);
+      const QString color = text.getLayer().getThemeColor();
       foreach (Path path, transform.map(text.generatePaths(mStrokeFont))) {
-        mContentByLayer[*text.getLayerName()].polygons.append(
-            Polygon(text.getUuid(), text.getLayerName(), text.getStrokeWidth(),
+        mContentByColor[color].polygons.append(
+            Polygon(text.getUuid(), text.getLayer(), text.getStrokeWidth(),
                     false, false, path));
       }
 
@@ -346,8 +345,8 @@ void BoardPainter::initContentByLayer() const noexcept {
         baselineOffset.setY(baseline);
       }
       baselineOffset.rotate(rotation);
-      mContentByLayer[*text.getLayerName()].texts.append(
-          Text(text.getUuid(), text.getLayerName(), text.getText(),
+      mContentByColor[color].texts.append(
+          Text(text.getUuid(), text.getLayer(), text.getText(),
                text.getPosition() + baselineOffset, rotation,
                PositiveLength(totalHeight), align));
     }

@@ -34,7 +34,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class IF_GraphicsLayerProvider;
 class Symbol;
 
 namespace editor {

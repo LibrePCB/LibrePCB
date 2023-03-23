@@ -34,7 +34,6 @@
 #include "graphicsitems/bgi_via.h"
 
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_airwire.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
@@ -47,6 +46,7 @@
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -62,11 +62,12 @@ namespace editor {
  ******************************************************************************/
 
 BoardGraphicsScene::BoardGraphicsScene(
-    Board& board,
+    Board& board, const IF_GraphicsLayerProvider& lp,
     std::shared_ptr<const QSet<const NetSignal*>> highlightedNetSignals,
     QObject* parent) noexcept
   : GraphicsScene(parent),
     mBoard(board),
+    mLayerProvider(lp),
     mHighlightedNetSignals(highlightedNetSignals) {
   foreach (BI_Device* obj, mBoard.getDeviceInstances()) { addDevice(*obj); }
   foreach (BI_NetSegment* obj, mBoard.getNetSegments()) { addNetSegment(*obj); }
@@ -215,15 +216,15 @@ void BoardGraphicsScene::updateHighlightedNetSignals() noexcept {
   foreach (auto item, mAirWires) { item->update(); }
 }
 
-qreal BoardGraphicsScene::getZValueOfCopperLayer(const QString& name) noexcept {
-  if (GraphicsLayer::isTopLayer(name)) {
+qreal BoardGraphicsScene::getZValueOfCopperLayer(const Layer& layer) noexcept {
+  if (layer.isTop()) {
     return ZValue_CopperTop;
-  } else if (GraphicsLayer::isBottomLayer(name)) {
+  } else if (layer.isBottom()) {
     return ZValue_CopperBottom;
-  } else if (GraphicsLayer::isCopperLayer(name)) {
+  } else if (layer.isInner()) {
     // 0.0 => TOP
     // 1.0 => BOTTOM
-    qreal delta = QString(name).remove("in").remove("_cu").toDouble() / 100.0;
+    const qreal delta = static_cast<qreal>(layer.getCopperNumber()) / 100.0;
     return (ZValue_InnerTop - delta);
   } else {
     return ZValue_Default;
@@ -236,7 +237,8 @@ qreal BoardGraphicsScene::getZValueOfCopperLayer(const QString& name) noexcept {
 
 void BoardGraphicsScene::addDevice(BI_Device& device) noexcept {
   Q_ASSERT(!mDevices.contains(&device));
-  std::shared_ptr<BGI_Device> item = std::make_shared<BGI_Device>(device);
+  std::shared_ptr<BGI_Device> item =
+      std::make_shared<BGI_Device>(device, mLayerProvider);
   addItem(*item);
   mDevices.insert(&device, item);
 
@@ -272,8 +274,8 @@ void BoardGraphicsScene::removeDevice(BI_Device& device) noexcept {
 void BoardGraphicsScene::addFootprintPad(
     BI_FootprintPad& pad, std::weak_ptr<BGI_Device> device) noexcept {
   Q_ASSERT(!mFootprintPads.contains(&pad));
-  std::shared_ptr<BGI_FootprintPad> item =
-      std::make_shared<BGI_FootprintPad>(pad, device, mHighlightedNetSignals);
+  std::shared_ptr<BGI_FootprintPad> item = std::make_shared<BGI_FootprintPad>(
+      pad, device, mLayerProvider, mHighlightedNetSignals);
   addItem(*item);
   mFootprintPads.insert(&pad, item);
 }
@@ -327,7 +329,7 @@ void BoardGraphicsScene::removeNetSegmentElements(
 void BoardGraphicsScene::addVia(BI_Via& via) noexcept {
   Q_ASSERT(!mVias.contains(&via));
   std::shared_ptr<BGI_Via> item =
-      std::make_shared<BGI_Via>(via, mHighlightedNetSignals);
+      std::make_shared<BGI_Via>(via, mLayerProvider, mHighlightedNetSignals);
   addItem(*item);
   mVias.insert(&via, item);
 }
@@ -342,7 +344,8 @@ void BoardGraphicsScene::removeVia(BI_Via& via) noexcept {
 
 void BoardGraphicsScene::addNetPoint(BI_NetPoint& netPoint) noexcept {
   Q_ASSERT(!mNetPoints.contains(&netPoint));
-  std::shared_ptr<BGI_NetPoint> item = std::make_shared<BGI_NetPoint>(netPoint);
+  std::shared_ptr<BGI_NetPoint> item =
+      std::make_shared<BGI_NetPoint>(netPoint, mLayerProvider);
   addItem(*item);
   mNetPoints.insert(&netPoint, item);
 }
@@ -357,8 +360,8 @@ void BoardGraphicsScene::removeNetPoint(BI_NetPoint& netPoint) noexcept {
 
 void BoardGraphicsScene::addNetLine(BI_NetLine& netLine) noexcept {
   Q_ASSERT(!mNetLines.contains(&netLine));
-  std::shared_ptr<BGI_NetLine> item =
-      std::make_shared<BGI_NetLine>(netLine, mHighlightedNetSignals);
+  std::shared_ptr<BGI_NetLine> item = std::make_shared<BGI_NetLine>(
+      netLine, mLayerProvider, mHighlightedNetSignals);
   addItem(*item);
   mNetLines.insert(&netLine, item);
 }
@@ -373,8 +376,8 @@ void BoardGraphicsScene::removeNetLine(BI_NetLine& netLine) noexcept {
 
 void BoardGraphicsScene::addPlane(BI_Plane& plane) noexcept {
   Q_ASSERT(!mPlanes.contains(&plane));
-  std::shared_ptr<BGI_Plane> item =
-      std::make_shared<BGI_Plane>(plane, mHighlightedNetSignals);
+  std::shared_ptr<BGI_Plane> item = std::make_shared<BGI_Plane>(
+      plane, mLayerProvider, mHighlightedNetSignals);
   addItem(*item);
   mPlanes.insert(&plane, item);
 }
@@ -391,7 +394,7 @@ void BoardGraphicsScene::addPolygon(BI_Polygon& polygon) noexcept {
   Q_ASSERT(!mPolygons.contains(&polygon));
   std::shared_ptr<PolygonGraphicsItem> item =
       std::make_shared<PolygonGraphicsItem>(polygon.getPolygon(),
-                                            mBoard.getLayerStack());
+                                            mLayerProvider);
   addItem(*item);
   mPolygons.insert(&polygon, item);
 }
@@ -406,8 +409,8 @@ void BoardGraphicsScene::removePolygon(BI_Polygon& polygon) noexcept {
 
 void BoardGraphicsScene::addStrokeText(BI_StrokeText& text) noexcept {
   Q_ASSERT(!mStrokeTexts.contains(&text));
-  std::shared_ptr<BGI_StrokeText> item =
-      std::make_shared<BGI_StrokeText>(text, mDevices.value(text.getDevice()));
+  std::shared_ptr<BGI_StrokeText> item = std::make_shared<BGI_StrokeText>(
+      text, mDevices.value(text.getDevice()), mLayerProvider);
   addItem(*item);
   mStrokeTexts.insert(&text, item);
 }
@@ -422,7 +425,8 @@ void BoardGraphicsScene::removeStrokeText(BI_StrokeText& text) noexcept {
 
 void BoardGraphicsScene::addHole(BI_Hole& hole) noexcept {
   Q_ASSERT(!mHoles.contains(&hole));
-  std::shared_ptr<BGI_Hole> item = std::make_shared<BGI_Hole>(hole);
+  std::shared_ptr<BGI_Hole> item =
+      std::make_shared<BGI_Hole>(hole, mLayerProvider);
   addItem(*item);
   mHoles.insert(&hole, item);
 }
@@ -437,8 +441,8 @@ void BoardGraphicsScene::removeHole(BI_Hole& hole) noexcept {
 
 void BoardGraphicsScene::addAirWire(BI_AirWire& airWire) noexcept {
   Q_ASSERT(!mAirWires.contains(&airWire));
-  std::shared_ptr<BGI_AirWire> item =
-      std::make_shared<BGI_AirWire>(airWire, mHighlightedNetSignals);
+  std::shared_ptr<BGI_AirWire> item = std::make_shared<BGI_AirWire>(
+      airWire, mLayerProvider, mHighlightedNetSignals);
   addItem(*item);
   mAirWires.insert(&airWire, item);
 }

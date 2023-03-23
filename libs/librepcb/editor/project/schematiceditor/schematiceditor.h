@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../dialogs/graphicsexportdialog.h"
+#include "../../graphics/graphicslayer.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "ui_schematiceditor.h"
 
@@ -40,6 +41,7 @@ namespace librepcb {
 class Project;
 class SI_Symbol;
 class Schematic;
+class Theme;
 
 namespace editor {
 
@@ -67,6 +69,7 @@ class SchematicEditor;
  * @brief The SchematicEditor class
  */
 class SchematicEditor final : public QMainWindow,
+                              public IF_GraphicsLayerProvider,
                               public IF_GraphicsViewEventHandler {
   Q_OBJECT
 
@@ -88,6 +91,20 @@ public:
     return mGraphicsScene.data();
   }
 
+  /// @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
+  virtual GraphicsLayer* getLayer(const QString& name) const noexcept override {
+    foreach (GraphicsLayer* layer, mLayers) {
+      if (layer->getName() == name) {
+        return layer;
+      }
+    }
+    return nullptr;
+  }
+
+  virtual QList<GraphicsLayer*> getAllLayers() const noexcept override {
+    return mLayers;
+  }
+
   // Setters
   bool setActiveSchematicIndex(int index) noexcept;
 
@@ -99,18 +116,19 @@ public:
   SchematicEditor& operator=(const SchematicEditor& rhs) = delete;
 
 protected:
-  void closeEvent(QCloseEvent* event);
+  virtual void closeEvent(QCloseEvent* event) noexcept override;
 
 signals:
   void activeSchematicChanged(int index);
 
 private:
   // Private Methods
+  void addLayers(const Theme& theme) noexcept;
   void createActions() noexcept;
   void createToolBars() noexcept;
   void createDockWidgets() noexcept;
   void createMenus() noexcept;
-  bool graphicsViewEventHandler(QEvent* event);
+  virtual bool graphicsViewEventHandler(QEvent* event) override;
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void addSchematic() noexcept;
   void removeSchematic(int index) noexcept;
@@ -137,6 +155,7 @@ private:
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
   int mActiveSchematicIndex;
+  QList<GraphicsLayer*> mLayers;
   QScopedPointer<SchematicGraphicsScene> mGraphicsScene;
   QHash<Uuid, QRectF> mVisibleSceneRect;
   QScopedPointer<SchematicEditorFsm> mFsm;

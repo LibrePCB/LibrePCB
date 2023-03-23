@@ -67,7 +67,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
     mUi(new Ui::AddComponentDialog),
     mComponentPreviewScene(new GraphicsScene()),
     mDevicePreviewScene(new GraphicsScene()),
-    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider()),
+    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider(theme)),
     mCategoryTreeModel(new CategoryTreeModel(
         mDb, mLocaleOrder, CategoryTreeModel::Filter::CmpCatWithComponents)),
     mCurrentSearchTerm(),
@@ -126,7 +126,6 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   mUi->viewDevice->setOriginCrossVisible(false);
   mUi->viewDevice->setScene(mDevicePreviewScene.data());
 
-  mGraphicsLayerProvider->applyTheme(theme);
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,

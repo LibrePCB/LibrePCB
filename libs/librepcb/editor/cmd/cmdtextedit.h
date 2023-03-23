@@ -36,6 +36,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Layer;
+
 namespace editor {
 
 /*******************************************************************************
@@ -54,7 +57,7 @@ public:
   ~CmdTextEdit() noexcept;
 
   // Setters
-  void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
+  void setLayer(const Layer& layer, bool immediate) noexcept;
   void setText(const QString& text, bool immediate) noexcept;
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
   void setAlignment(const Alignment& align, bool immediate) noexcept;
@@ -87,8 +90,8 @@ private:
   Text& mText;
 
   // General Attributes
-  GraphicsLayerName mOldLayerName;
-  GraphicsLayerName mNewLayerName;
+  const Layer* mOldLayer;
+  const Layer* mNewLayer;
   QString mOldText;
   QString mNewText;
   Point mOldPosition;

@@ -42,7 +42,6 @@ class Circle;
 class Component;
 class FootprintPad;
 class Hole;
-class IF_GraphicsLayerProvider;
 class Point;
 class Polygon;
 class StrokeText;
@@ -52,6 +51,7 @@ namespace editor {
 class CircleGraphicsItem;
 class FootprintPadGraphicsItem;
 class HoleGraphicsItem;
+class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem;
 class StrokeTextGraphicsItem;
 

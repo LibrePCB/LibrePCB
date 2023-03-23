@@ -22,14 +22,15 @@
  ******************************************************************************/
 #include "symbolpingraphicsitem.h"
 
+#include "../../graphics/graphicslayer.h"
 #include "../../graphics/linegraphicsitem.h"
 #include "../../graphics/primitivecirclegraphicsitem.h"
 #include "../../graphics/primitivetextgraphicsitem.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -67,21 +68,21 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
   // circle
   mCircleGraphicsItem->setDiameter(UnsignedLength(1200000));
   mCircleGraphicsItem->setLineLayer(
-      lp.getLayer(GraphicsLayer::sSymbolPinCirclesOpt));
+      lp.getLayer(Theme::Color::sSchematicOptionalPins));
   mCircleGraphicsItem->setShapeMode(
       PrimitiveCircleGraphicsItem::ShapeMode::FilledOutline);
 
   // line
   mLineGraphicsItem->setRotation(mPin->getRotation());
   mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
-  mLineGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinLines));
+  mLineGraphicsItem->setLayer(lp.getLayer(Theme::Color::sSchematicPinLines));
 
   // text
   mTextGraphicsItem->setRotation(mPin->getRotation() + mPin->getNameRotation());
   mTextGraphicsItem->setAlignment(mPin->getNameAlignment());
   mTextGraphicsItem->setHeight(mPin->getNameHeight());
   mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
-  mTextGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinNames));
+  mTextGraphicsItem->setLayer(lp.getLayer(Theme::Color::sSchematicPinNames));
   updateTextPosition();
   updateText();
 
@@ -109,10 +110,10 @@ void SymbolPinGraphicsItem::updateText() noexcept {
           : nullptr;
       if (signal && signal->isRequired()) {
         mCircleGraphicsItem->setLineLayer(
-            mLayerProvider.getLayer(GraphicsLayer::sSymbolPinCirclesReq));
+            mLayerProvider.getLayer(Theme::Color::sSchematicRequiredPins));
       } else if (signal && (!signal->isRequired())) {
         mCircleGraphicsItem->setLineLayer(
-            mLayerProvider.getLayer(GraphicsLayer::sSymbolPinCirclesOpt));
+            mLayerProvider.getLayer(Theme::Color::sSchematicOptionalPins));
       } else {
         mCircleGraphicsItem->setLineLayer(nullptr);
       }

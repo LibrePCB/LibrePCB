@@ -33,13 +33,13 @@
  ******************************************************************************/
 namespace librepcb {
 
-class IF_GraphicsLayerProvider;
 class Workspace;
 
 namespace editor {
 
 class ComponentSymbolVariantItemListModel;
 class EditableTableWidget;
+class IF_GraphicsLayerProvider;
 class LibraryElementCache;
 class UndoStack;
 

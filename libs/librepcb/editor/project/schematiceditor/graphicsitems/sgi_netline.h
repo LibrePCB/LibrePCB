@@ -34,10 +34,10 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 class GraphicsLayer;
-
-namespace editor {
+class IF_GraphicsLayerProvider;
 
 /*******************************************************************************
  *  Class SGI_NetLine
@@ -51,7 +51,7 @@ public:
   // Constructors / Destructor
   SGI_NetLine() = delete;
   SGI_NetLine(const SGI_NetLine& other) = delete;
-  SGI_NetLine(SI_NetLine& netline,
+  SGI_NetLine(SI_NetLine& netline, const IF_GraphicsLayerProvider& lp,
               std::shared_ptr<const QSet<const NetSignal*>>
                   highlightedNetSignals) noexcept;
   virtual ~SGI_NetLine() noexcept;

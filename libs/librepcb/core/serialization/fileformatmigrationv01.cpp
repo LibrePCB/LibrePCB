@@ -197,7 +197,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
       for (SExpression* textNode : root.getChildren("text")) {
         sym.texts.append(Text{
             deserialize<Uuid>(textNode->getChild("@0")),
-            deserialize<GraphicsLayerName>(textNode->getChild("layer/@0")),
+            textNode->getChild("layer/@0").getValue(),
             textNode->getChild("value/@0").getValue(),
             Point(textNode->getChild("position")),
             deserialize<Angle>(textNode->getChild("rotation/@0")),

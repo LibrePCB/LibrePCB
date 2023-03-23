@@ -44,7 +44,6 @@ add_executable(
   core/geometry/tracetest.cpp
   core/geometry/vertextest.cpp
   core/geometry/viatest.cpp
-  core/graphics/graphicslayernametest.cpp
   core/import/dxfreadertest.cpp
   core/library/cmp/componentprefixtest.cpp
   core/library/cmp/componentsymbolvariantitemsuffixtest.cpp

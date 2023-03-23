@@ -46,9 +46,6 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="cbxLayer"/>
-     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_7">
        <property name="text">
@@ -173,6 +170,9 @@
        </item>
       </layout>
      </item>
+     <item row="1" column="1">
+      <widget class="librepcb::editor::GraphicsLayerComboBox" name="cbxLayer" native="true"/>
+     </item>
     </layout>
    </item>
    <item>
@@ -224,10 +224,15 @@
    <header location="global">librepcb/editor/widgets/ratioedit.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>librepcb::editor::GraphicsLayerComboBox</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/graphicslayercombobox.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>edtText</tabstop>
-  <tabstop>cbxLayer</tabstop>
   <tabstop>alignmentSelector</tabstop>
   <tabstop>edtHeight</tabstop>
   <tabstop>edtStrokeWidth</tabstop>

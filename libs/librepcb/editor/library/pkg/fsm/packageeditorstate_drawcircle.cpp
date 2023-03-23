@@ -25,6 +25,7 @@
 #include "../../../cmd/cmdcircleedit.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/circlegraphicsitem.h"
+#include "../../../graphics/graphicslayer.h"
 #include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/unsignedlengthedit.h"
@@ -32,7 +33,6 @@
 #include "../packageeditorwidget.h"
 
 #include <librepcb/core/geometry/circle.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/library/pkg/footprint.h>
 
 #include <QtCore>
@@ -52,7 +52,7 @@ PackageEditorState_DrawCircle::PackageEditorState_DrawCircle(
   : PackageEditorState(context),
     mCurrentCircle(nullptr),
     mCurrentGraphicsItem(nullptr),
-    mLastLayerName(GraphicsLayer::sTopPlacement),  // Most important layer
+    mLastLayer(&Layer::topPlacement()),  // Most important layer
     mLastLineWidth(200000),  // typical width according library conventions
     mLastFill(false),  // Fill is needed very rarely
     mLastGrabArea(false)  // Avoid creating annoying grab areas "by accident"
@@ -74,7 +74,7 @@ bool PackageEditorState_DrawCircle::entry() noexcept {
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
   layerComboBox->setLayers(getAllowedCircleAndPolygonLayers());
-  layerComboBox->setCurrentLayer(mLastLayerName);
+  layerComboBox->setCurrentLayer(*mLastLayer);
   layerComboBox->addAction(
       cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
                                &GraphicsLayerComboBox::stepDown));
@@ -179,7 +179,7 @@ bool PackageEditorState_DrawCircle::startAddCircle(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add symbol circle"));
     mCurrentCircle = std::make_shared<Circle>(
-        Uuid::createRandom(), mLastLayerName, mLastLineWidth, mLastFill,
+        Uuid::createRandom(), *mLastLayer, mLastLineWidth, mLastFill,
         mLastGrabArea, pos, PositiveLength(1));
     mContext.undoStack.appendToCmdGroup(new CmdCircleInsert(
         mContext.currentFootprint->getCircles(), mCurrentCircle));
@@ -243,10 +243,10 @@ bool PackageEditorState_DrawCircle::abortAddCircle() noexcept {
 }
 
 void PackageEditorState_DrawCircle::layerComboBoxValueChanged(
-    const GraphicsLayerName& layerName) noexcept {
-  mLastLayerName = layerName;
+    const Layer& layer) noexcept {
+  mLastLayer = &layer;
   if (mEditCmd) {
-    mEditCmd->setLayerName(mLastLayerName, true);
+    mEditCmd->setLayer(*mLastLayer, true);
   }
 }
 

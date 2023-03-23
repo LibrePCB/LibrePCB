@@ -25,7 +25,6 @@
 #include "../../../attribute/attributesubstitutor.h"
 #include "../../project.h"
 #include "../schematic.h"
-#include "../schematiclayerprovider.h"
 #include "si_symbol.h"
 
 #include <QtCore>
@@ -115,7 +114,7 @@ void SI_Text::textEdited(const Text& text, Text::Event event) noexcept {
       onEdited.notify(Event::PositionChanged);
       break;
     }
-    case Text::Event::LayerNameChanged: {
+    case Text::Event::LayerChanged: {
       onEdited.notify(Event::LayerNameChanged);
       break;
     }

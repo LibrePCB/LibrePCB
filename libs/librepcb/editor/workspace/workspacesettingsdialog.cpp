@@ -321,12 +321,14 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
       }
     });
     mUi->treeThemeColors->header()->setSectionsMovable(false);
-    mUi->treeThemeColors->header()->setSectionResizeMode(0, QHeaderView::Fixed);
-    mUi->treeThemeColors->header()->setSectionResizeMode(1, QHeaderView::Fixed);
-    mUi->treeThemeColors->header()->setSectionResizeMode(2,
+    mUi->treeThemeColors->header()->setSectionResizeMode(
+        0, QHeaderView::ResizeToContents);
+    mUi->treeThemeColors->header()->setSectionResizeMode(
+        1, QHeaderView::ResizeToContents);
+    mUi->treeThemeColors->header()->setSectionResizeMode(
+        2, QHeaderView::ResizeToContents);
+    mUi->treeThemeColors->header()->setSectionResizeMode(3,
                                                          QHeaderView::Stretch);
-    mUi->treeThemeColors->header()->resizeSection(0, 20);
-    mUi->treeThemeColors->header()->resizeSection(1, 20);
     connect(mUi->treeThemeColors, &QTreeWidget::itemDoubleClicked, this,
             [this](QTreeWidgetItem* item, int column) {
               Theme* theme = getCurrentTheme();
@@ -575,7 +577,8 @@ void WorkspaceSettingsDialog::initColorTreeWidgetItem(
   init(0, tr("Primary color: %1"), color.getPrimaryColor());
   init(1, tr("Secondary color: %1"), color.getSecondaryColor());
 
-  item.setText(2, color.getNameTr());
+  item.setText(2, color.getCategoryTr());
+  item.setText(3, color.getNameTr());
 }
 
 Theme* WorkspaceSettingsDialog::getCurrentTheme() noexcept {

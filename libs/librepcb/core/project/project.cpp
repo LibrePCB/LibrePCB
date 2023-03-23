@@ -35,7 +35,6 @@
 #include "circuit/netclass.h"
 #include "projectlibrary.h"
 #include "schematic/schematic.h"
-#include "schematic/schematiclayerprovider.h"
 
 #include <QtCore>
 
@@ -80,9 +79,6 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
 
   // Initialize circuit.
   mCircuit.reset(new Circuit(*this));
-
-  // Load all schematic layers.
-  mSchematicLayerProvider.reset(new SchematicLayerProvider(*this));
 }
 
 Project::~Project() noexcept {

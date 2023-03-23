@@ -28,8 +28,10 @@
 
 #include <librepcb/core/geometry/padgeometry.h>
 #include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/point.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -63,7 +65,7 @@ PrimitiveFootprintPadGraphicsItem::PrimitiveFootprintPadGraphicsItem(
   mOriginCrossGraphicsItem->setSize(UnsignedLength(250000));
   if (originCrossVisible) {
     mOriginCrossGraphicsItem->setLayer(
-        mLayerProvider.getLayer(GraphicsLayer::sTopReferences));
+        mLayerProvider.getLayer(Theme::Color::sBoardReferencesTop));
   }
   mOriginCrossGraphicsItem->setZValue(1000);
 
@@ -91,7 +93,9 @@ void PrimitiveFootprintPadGraphicsItem::setPosition(
 void PrimitiveFootprintPadGraphicsItem::setRotation(
     const Angle& rotation) noexcept {
   mOriginCrossGraphicsItem->setRotation(rotation);
-  foreach (auto item, mPathGraphicsItems) { item->setRotation(rotation); }
+  foreach (auto item, mPathGraphicsItems) {
+    std::get<2>(item)->setRotation(rotation);
+  }
   // Keep the text always at 0° for readability.
 }
 
@@ -99,37 +103,43 @@ void PrimitiveFootprintPadGraphicsItem::setText(const QString& text) noexcept {
   setToolTip(text);
   mOriginCrossGraphicsItem->setToolTip(text);
   mTextGraphicsItem->setText(text);
-  foreach (auto item, mPathGraphicsItems) { item->setToolTip(text); }
+  foreach (auto item, mPathGraphicsItems) {
+    std::get<2>(item)->setToolTip(text);
+  }
   updateTextHeight();
 }
 
 void PrimitiveFootprintPadGraphicsItem::setLayer(
     const QString& layerName) noexcept {
-  mCopperLayer = mLayerProvider.getLayer(layerName);
-  mTextGraphicsItem->setLayer(mCopperLayer);
-  updatePathLayers();
+  auto layer = mLayerProvider.getLayer(layerName);
+  if (layer != mCopperLayer) {
+    mCopperLayer = layer;
+    mTextGraphicsItem->setLayer(mCopperLayer);
+    updateRegisteredLayers();
+    updatePathLayers();
+  }
 }
 
 void PrimitiveFootprintPadGraphicsItem::setGeometries(
-    const QMap<QString, QList<PadGeometry>>& geometries) noexcept {
+    const QHash<const Layer*, QList<PadGeometry> >& geometries) noexcept {
   static const QHash<QString, float> zValues = {
-      {QString(GraphicsLayer::sBotSolderPaste), -300},
-      {QString(GraphicsLayer::sBotStopMask), -200},
-      {QString(GraphicsLayer::sBotCopper), -100},
-      {QString(GraphicsLayer::sBoardPadsTht), 0},
-      {QString(GraphicsLayer::sTopCopper), 100},
-      {QString(GraphicsLayer::sTopStopMask), 200},
-      {QString(GraphicsLayer::sTopSolderPaste), 300},
+      {QString(Theme::Color::sBoardSolderPasteBot), -300},
+      {QString(Theme::Color::sBoardStopMaskBot), -200},
+      {QString(Theme::Color::sBoardCopperBot), -100},
+      {QString(Theme::Color::sBoardPads), 0},
+      {QString(Theme::Color::sBoardCopperTop), 100},
+      {QString(Theme::Color::sBoardStopMaskTop), 200},
+      {QString(Theme::Color::sBoardSolderPasteTop), 300},
   };
 
-  mOnLayerEditedSlot.detachAll();
   mShapes.clear();
   mShapesBoundingRect = QRectF();
   mPathGraphicsItems.clear();
   for (auto it = geometries.begin(); it != geometries.end(); it++) {
-    if (GraphicsLayer* layer = mLayerProvider.getLayer(it.key())) {
+    if (GraphicsLayer* layer =
+            mLayerProvider.getLayer(it.key()->getThemeColor())) {
       const bool isCopperLayer =
-          (layer == mCopperLayer) || (layer->isCopperLayer());
+          (layer == mCopperLayer) || (it.key()->isCopper());
       QPainterPath shape;
       shape.setFillRule(Qt::WindingFill);
       foreach (const PadGeometry& geometry, it.value()) {
@@ -150,19 +160,14 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
       if (zValues.contains(layer->getName())) {
         item->setZValue(zValues.value(layer->getName()));
       } else {
-        item->setZValue(static_cast<qreal>(layer->getInnerLayerNumber()));
+        item->setZValue(static_cast<qreal>(it.key()->getCopperNumber()));
       }
-      mPathGraphicsItems[layer] = item;
-      if (layer != mCopperLayer) {
-        layer->onEdited.attach(mOnLayerEditedSlot);
-      }
+      mPathGraphicsItems.append(std::make_tuple(layer, isCopperLayer, item));
     }
-  }
-  if (mCopperLayer) {
-    mCopperLayer->onEdited.attach(mOnLayerEditedSlot);
   }
   updatePathLayers();
   updateTextHeight();
+  updateRegisteredLayers();
 }
 
 /*******************************************************************************
@@ -189,7 +194,7 @@ QVariant PrimitiveFootprintPadGraphicsItem::itemChange(
     mOriginCrossGraphicsItem->setSelected(value.toBool());
     mTextGraphicsItem->setSelected(value.toBool());
     foreach (auto item, mPathGraphicsItems) {
-      item->setSelected(value.toBool());
+      std::get<2>(item)->setSelected(value.toBool());
     }
   }
   return QGraphicsItem::itemChange(change, value);
@@ -213,17 +218,17 @@ void PrimitiveFootprintPadGraphicsItem::layerEdited(
 }
 
 void PrimitiveFootprintPadGraphicsItem::updatePathLayers() noexcept {
-  for (auto it = mPathGraphicsItems.begin(); it != mPathGraphicsItems.end();
-       it++) {
-    GraphicsLayer* layer = it.key()->isCopperLayer() ? mCopperLayer : it.key();
-    if (it.key()->isVisible()) {
-      it.value()->setFillLayer(layer);
-      it.value()->setLineLayer(nullptr);
+  foreach (auto& tuple, mPathGraphicsItems) {
+    const GraphicsLayer* layer =
+        std::get<1>(tuple) ? mCopperLayer : std::get<0>(tuple);
+    if (std::get<0>(tuple)->isVisible()) {
+      std::get<2>(tuple)->setFillLayer(layer);
+      std::get<2>(tuple)->setLineLayer(nullptr);
     } else {
-      it.value()->setLineLayer(layer);
-      it.value()->setFillLayer(nullptr);
+      std::get<2>(tuple)->setLineLayer(layer);
+      std::get<2>(tuple)->setFillLayer(nullptr);
     }
-    it.value()->setSelected(isSelected());
+    std::get<2>(tuple)->setSelected(isSelected());
   }
 }
 
@@ -235,6 +240,18 @@ void PrimitiveFootprintPadGraphicsItem::updateTextHeight() noexcept {
   const qreal widthRatio = textRect.width() / size;
   const qreal ratio = qMax(heightRatio, widthRatio);
   mTextGraphicsItem->setScale(1.0 / ratio);
+}
+
+void PrimitiveFootprintPadGraphicsItem::updateRegisteredLayers() noexcept {
+  mOnLayerEditedSlot.detachAll();
+  if (mCopperLayer) {
+    mCopperLayer->onEdited.attach(mOnLayerEditedSlot);
+  }
+  foreach (auto& tuple, mPathGraphicsItems) {
+    if (std::get<0>(tuple) != mCopperLayer) {
+      std::get<0>(tuple)->onEdited.attach(mOnLayerEditedSlot);
+    }
+  }
 }
 
 /*******************************************************************************

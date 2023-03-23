@@ -57,8 +57,7 @@ class BI_Via;
 class BoardDesignRuleCheckSettings;
 class BoardDesignRules;
 class BoardFabricationOutputSettings;
-class BoardLayerStack;
-class GraphicsLayer;
+class Layer;
 class NetSignal;
 class Project;
 
@@ -86,8 +85,6 @@ public:
   Project& getProject() const noexcept { return mProject; }
   const QString& getDirectoryName() const noexcept { return mDirectoryName; }
   TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
-  BoardLayerStack& getLayerStack() noexcept { return *mLayerStack; }
-  const BoardLayerStack& getLayerStack() const noexcept { return *mLayerStack; }
   const BoardDesignRules& getDesignRules() const noexcept {
     return *mDesignRules;
   }
@@ -114,6 +111,13 @@ public:
     return mGridInterval;
   }
   const LengthUnit& getGridUnit() const noexcept { return mGridUnit; }
+  int getInnerLayerCount() const noexcept { return mInnerLayerCount; }
+  const QSet<const Layer*> getCopperLayers() const noexcept {
+    return mCopperLayers;
+  }
+  const QMap<QString, bool>& getLayersVisibility() const noexcept {
+    return mLayersVisibility;
+  }
 
   // Setters
   void setName(const ElementName& name) noexcept { mName = name; }
@@ -124,6 +128,10 @@ public:
     mGridInterval = interval;
   }
   void setGridUnit(const LengthUnit& unit) noexcept { mGridUnit = unit; }
+  void setInnerLayerCount(int count) noexcept;
+  void setLayersVisibility(const QMap<QString, bool>& visibility) noexcept {
+    mLayersVisibility = visibility;
+  }
   void setDesignRules(const BoardDesignRules& rules) noexcept;
   void setDrcSettings(const BoardDesignRuleCheckSettings& settings) noexcept;
 
@@ -211,6 +219,7 @@ signals:
   void attributesChanged() override;
 
   void designRulesModified();
+  void innerLayerCountChanged();
 
   void deviceAdded(BI_Device& device);
   void deviceRemoved(BI_Device& device);
@@ -234,7 +243,6 @@ private:
   std::unique_ptr<TransactionalDirectory> mDirectory;
   bool mIsAddedToProject;
 
-  QScopedPointer<BoardLayerStack> mLayerStack;
   QScopedPointer<BoardDesignRules> mDesignRules;
   QScopedPointer<BoardDesignRuleCheckSettings> mDrcSettings;
   QScopedPointer<BoardFabricationOutputSettings> mFabricationOutputSettings;
@@ -246,6 +254,9 @@ private:
   QString mDefaultFontFileName;
   PositiveLength mGridInterval;
   LengthUnit mGridUnit;
+  int mInnerLayerCount;
+  QSet<const Layer*> mCopperLayers;
+  QMap<QString, bool> mLayersVisibility;
 
   // DRC
   Version mDrcMessageApprovalsVersion;

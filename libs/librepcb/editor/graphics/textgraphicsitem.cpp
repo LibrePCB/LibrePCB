@@ -22,10 +22,11 @@
  ******************************************************************************/
 #include "textgraphicsitem.h"
 
+#include "graphicslayer.h"
 #include "origincrossgraphicsitem.h"
 #include "primitivetextgraphicsitem.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -58,14 +59,14 @@ TextGraphicsItem::TextGraphicsItem(Text& text,
 
   mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
   mTextGraphicsItem->setHeight(mText.getHeight());
-  mTextGraphicsItem->setLayer(mLayerProvider.getLayer(*mText.getLayerName()));
+  mTextGraphicsItem->setLayer(mLayerProvider.getLayer(mText.getLayer()));
   mTextGraphicsItem->setRotation(mText.getRotation());
   mTextGraphicsItem->setAlignment(mText.getAlign());
   updateText();
 
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1000000));
   mOriginCrossGraphicsItem->setLayer(
-      mLayerProvider.getLayer(GraphicsLayer::sSchematicReferences));
+      mLayerProvider.getLayer(Theme::Color::sSchematicReferences));
   mOriginCrossGraphicsItem->setRotation(mText.getRotation());
 
   // register to the text to get attribute updates
@@ -114,9 +115,8 @@ QVariant TextGraphicsItem::itemChange(GraphicsItemChange change,
 void TextGraphicsItem::textEdited(const Text& text,
                                   Text::Event event) noexcept {
   switch (event) {
-    case Text::Event::LayerNameChanged:
-      mTextGraphicsItem->setLayer(
-          mLayerProvider.getLayer(*text.getLayerName()));
+    case Text::Event::LayerChanged:
+      mTextGraphicsItem->setLayer(mLayerProvider.getLayer(text.getLayer()));
       break;
     case Text::Event::TextChanged:
       updateText();

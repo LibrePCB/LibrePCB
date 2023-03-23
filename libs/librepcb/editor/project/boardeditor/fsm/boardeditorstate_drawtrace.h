@@ -26,7 +26,6 @@
 #include "boardeditorstate.h"
 
 #include <librepcb/core/geometry/via.h>
-#include <librepcb/core/graphics/graphicslayername.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -42,7 +41,7 @@ class BI_NetLineAnchor;
 class BI_NetPoint;
 class BI_NetSegment;
 class BI_Via;
-class GraphicsLayer;
+class Layer;
 class NetSignal;
 
 namespace editor {
@@ -173,7 +172,7 @@ private:
 
   // Callback Functions for the Gui elements
   void wireModeChanged(WireMode mode) noexcept;
-  void layerChanged(const GraphicsLayerName& layer) noexcept;
+  void layerChanged(const Layer& layer) noexcept;
   void sizeEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
   void wireWidthEditValueChanged(const PositiveLength& value) noexcept;
@@ -193,13 +192,12 @@ private:
   // State
   SubState mSubState;  ///< the current substate
   WireMode mCurrentWireMode;  ///< the current wire mode
-  QString mCurrentLayerName;  ///< the current board layer name
+  const Layer* mCurrentLayer;  ///< the current board layer name
   bool mAddVia;  ///< whether a via add is requested
   BI_Via* mTempVia;
   Via mCurrentViaProperties;  ///< The current Via properties
                               ///< diameter
-  QString mViaLayerName;  ///< the name of the layer where the via
-                          ///< was started
+  tl::optional<const Layer&> mViaLayer;  ///< Layer where the via was started
   Point mTargetPos;  ///< the current target position of the
                      ///< active trace
 

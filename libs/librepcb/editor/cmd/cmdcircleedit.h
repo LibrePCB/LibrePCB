@@ -36,6 +36,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Layer;
+
 namespace editor {
 
 /*******************************************************************************
@@ -54,7 +57,7 @@ public:
   ~CmdCircleEdit() noexcept;
 
   // Setters
-  void setLayerName(const GraphicsLayerName& name, bool immediate) noexcept;
+  void setLayer(const Layer& layer, bool immediate) noexcept;
   void setLineWidth(const UnsignedLength& width, bool immediate) noexcept;
   void setIsFilled(bool filled, bool immediate) noexcept;
   void setIsGrabArea(bool grabArea, bool immediate) noexcept;
@@ -88,8 +91,8 @@ private:
   Circle& mCircle;
 
   // General Attributes
-  GraphicsLayerName mOldLayerName;
-  GraphicsLayerName mNewLayerName;
+  const Layer* mOldLayer;
+  const Layer* mNewLayer;
   UnsignedLength mOldLineWidth;
   UnsignedLength mNewLineWidth;
   bool mOldIsFilled;

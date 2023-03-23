@@ -22,17 +22,17 @@
  ******************************************************************************/
 #include "bgi_device.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../../../graphics/origincrossgraphicsitem.h"
 #include "../../../graphics/primitivecirclegraphicsitem.h"
 #include "../../../graphics/primitiveholegraphicsitem.h"
 #include "../../../graphics/primitivepathgraphicsitem.h"
 #include "../boardgraphicsscene.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/types/layer.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -47,11 +47,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BGI_Device::BGI_Device(BI_Device& device) noexcept
+BGI_Device::BGI_Device(BI_Device& device,
+                       const IF_GraphicsLayerProvider& lp) noexcept
   : QGraphicsItemGroup(),
     onEdited(*this),
     mDevice(device),
-    mGrabAreaLayer(),
+    mLayerProvider(lp),
+    mGrabAreaLayer(nullptr),
     mOnEditedSlot(*this, &BGI_Device::deviceEdited),
     mOnLayerEditedSlot(*this, &BGI_Device::layerEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
@@ -92,8 +94,8 @@ BGI_Device::BGI_Device(BI_Device& device) noexcept
 
   for (auto& obj : mDevice.getLibFootprint().getHoles().values()) {
     Q_ASSERT(obj);
-    auto i = std::make_shared<PrimitiveHoleGraphicsItem>(
-        mDevice.getBoard().getLayerStack(), false, this);
+    auto i = std::make_shared<PrimitiveHoleGraphicsItem>(mLayerProvider, false,
+                                                         this);
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     mHoleGraphicsItems.append(i);
   }
@@ -200,14 +202,17 @@ void BGI_Device::updateRotationAndMirrored() noexcept {
 
 void BGI_Device::updateBoardSide() noexcept {
   // Update Z value.
-  if (mDevice.getMirrored()) {
-    setZValue(BoardGraphicsScene::ZValue_DevicesBottom);
-  } else {
+  const bool top = !mDevice.getMirrored();
+  if (top) {
     setZValue(BoardGraphicsScene::ZValue_DevicesTop);
+  } else {
+    setZValue(BoardGraphicsScene::ZValue_DevicesBottom);
   }
 
   // Update grab area layer.
-  GraphicsLayer* grabAreaLayer = getLayer(GraphicsLayer::sTopGrabAreas);
+  GraphicsLayer* grabAreaLayer =
+      mLayerProvider.getLayer(top ? Theme::Color::sBoardGrabAreasTop
+                                  : Theme::Color::sBoardGrabAreasBot);
   if (grabAreaLayer != mGrabAreaLayer) {
     if (mGrabAreaLayer) {
       mGrabAreaLayer->onEdited.detach(mOnLayerEditedSlot);
@@ -220,17 +225,19 @@ void BGI_Device::updateBoardSide() noexcept {
   }
 
   // Update origin cross layer.
-  mOriginCrossGraphicsItem->setLayer(getLayer(GraphicsLayer::sTopReferences));
+  mOriginCrossGraphicsItem->setLayer(
+      mLayerProvider.getLayer(top ? Theme::Color::sBoardReferencesTop
+                                  : Theme::Color::sBoardReferencesBot));
 
   // Update circle layers.
   const CircleList& circles = mDevice.getLibFootprint().getCircles();
   for (int i = 0; i < std::min(circles.count(), mCircleGraphicsItems.count());
        ++i) {
     mCircleGraphicsItems.at(i)->setLineLayer(
-        getLayer(*circles.at(i)->getLayerName()));
+        getLayer(circles.at(i)->getLayer()));
     if (circles.at(i)->isFilled()) {
       mCircleGraphicsItems.at(i)->setFillLayer(
-          getLayer(*circles.at(i)->getLayerName()));
+          getLayer(circles.at(i)->getLayer()));
     } else if (circles.at(i)->isGrabArea()) {
       mCircleGraphicsItems.at(i)->setFillLayer(mGrabAreaLayer);
     }
@@ -241,11 +248,11 @@ void BGI_Device::updateBoardSide() noexcept {
   for (int i = 0; i < std::min(polygons.count(), mPolygonGraphicsItems.count());
        ++i) {
     mPolygonGraphicsItems.at(i)->setLineLayer(
-        getLayer(*polygons.at(i)->getLayerName()));
+        getLayer(polygons.at(i)->getLayer()));
     // Don't fill if path is not closed (for consistency with Gerber export)!
     if (polygons.at(i)->isFilled() && polygons.at(i)->getPath().isClosed()) {
       mPolygonGraphicsItems.at(i)->setFillLayer(
-          getLayer(*polygons.at(i)->getLayerName()));
+          getLayer(polygons.at(i)->getLayer()));
     } else if (polygons.at(i)->isGrabArea()) {
       mPolygonGraphicsItems.at(i)->setFillLayer(mGrabAreaLayer);
     }
@@ -265,11 +272,10 @@ void BGI_Device::updateHoleStopMaskOffsets() noexcept {
   }
 }
 
-GraphicsLayer* BGI_Device::getLayer(QString name) const noexcept {
-  if (mDevice.getMirrored()) {
-    name = GraphicsLayer::getMirroredLayerName(name);
-  }
-  return mDevice.getBoard().getLayerStack().getLayer(name);
+GraphicsLayer* BGI_Device::getLayer(const Layer& layer) const noexcept {
+  return mLayerProvider.getLayer(mDevice.getMirrored()
+                                     ? layer.mirrored().getThemeColor()
+                                     : layer.getThemeColor());
 }
 
 /*******************************************************************************

@@ -39,7 +39,6 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
@@ -80,7 +79,8 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
     mSelectedPackage(nullptr),
     mSelectedPackageOwned(false),
     mSelectedFootprintUuid(),
-    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider()),
+    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider(
+        mProjectEditor.getWorkspace().getSettings().themes.getActive())),
     mPreviewGraphicsScene(new GraphicsScene()),
     mPreviewGraphicsItem(nullptr) {
   mUi->setupUi(this);
@@ -88,7 +88,6 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
   // Setup graphics view.
   const Theme& theme =
       mProjectEditor.getWorkspace().getSettings().themes.getActive();
-  mGraphicsLayerProvider->applyTheme(theme);
   mUi->graphicsView->setBackgroundColors(
       theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());

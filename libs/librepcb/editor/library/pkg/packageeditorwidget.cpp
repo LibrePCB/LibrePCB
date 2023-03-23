@@ -636,7 +636,7 @@ void PackageEditorWidget::fixMsg(const MsgWrongFootprintTextLayer& msg) {
   std::shared_ptr<StrokeText> text =
       footprint->getStrokeTexts().get(msg.getText().get());
   QScopedPointer<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(*text));
-  cmd->setLayerName(GraphicsLayerName(msg.getExpectedLayerName()), false);
+  cmd->setLayer(msg.getExpectedLayer(), false);
   mUndoStack->execCmd(cmd.take());
 }
 
@@ -734,6 +734,7 @@ bool PackageEditorWidget::execGraphicsExportDialog(
         GraphicsExportDialog::Mode::Board, output, pages, 0,
         *mPackage->getNames().getDefaultValue(), 0, defaultFilePath,
         mContext.workspace.getSettings().defaultLengthUnit.get(),
+        mContext.workspace.getSettings().themes.getActive(),
         "package_editor/" % settingsKey, this);
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {

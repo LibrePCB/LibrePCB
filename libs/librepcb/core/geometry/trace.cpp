@@ -114,12 +114,11 @@ Trace::Trace(const Uuid& uuid, const Trace& other) noexcept : Trace(other) {
   mUuid = uuid;
 }
 
-Trace::Trace(const Uuid& uuid, const GraphicsLayerName& layer,
-             const PositiveLength& width, const TraceAnchor& start,
-             const TraceAnchor& end) noexcept
+Trace::Trace(const Uuid& uuid, const Layer& layer, const PositiveLength& width,
+             const TraceAnchor& start, const TraceAnchor& end) noexcept
   : onEdited(*this),
     mUuid(uuid),
-    mLayer(layer),
+    mLayer(&layer),
     mWidth(width),
     mStart(start),
     mEnd(end) {
@@ -128,7 +127,7 @@ Trace::Trace(const Uuid& uuid, const GraphicsLayerName& layer,
 Trace::Trace(const SExpression& node)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mLayer(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+    mLayer(deserialize<const Layer*>(node.getChild("layer/@0"))),
     mWidth(deserialize<PositiveLength>(node.getChild("width/@0"))),
     mStart(node.getChild("from")),
     mEnd(node.getChild("to")) {
@@ -151,12 +150,12 @@ bool Trace::setUuid(const Uuid& uuid) noexcept {
   return true;
 }
 
-bool Trace::setLayer(const GraphicsLayerName& layer) noexcept {
-  if (layer == mLayer) {
+bool Trace::setLayer(const Layer& layer) noexcept {
+  if (&layer == mLayer) {
     return false;
   }
 
-  mLayer = layer;
+  mLayer = &layer;
   onEdited.notify(Event::LayerChanged);
   return true;
 }
@@ -197,7 +196,7 @@ bool Trace::setEndPoint(const TraceAnchor& end) noexcept {
 
 void Trace::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayer);
+  root.appendChild("layer", *mLayer);
   root.appendChild("width", mWidth);
   root.ensureLineBreak();
   mStart.serialize(root.appendList("from"));
@@ -221,7 +220,7 @@ bool Trace::operator==(const Trace& rhs) const noexcept {
 
 Trace& Trace::operator=(const Trace& rhs) noexcept {
   setUuid(rhs.mUuid);
-  setLayer(rhs.mLayer);
+  setLayer(*rhs.mLayer);
   setWidth(rhs.mWidth);
   setStartPoint(rhs.mStart);
   setEndPoint(rhs.mEnd);

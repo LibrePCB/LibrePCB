@@ -22,11 +22,10 @@
  ******************************************************************************/
 #include "boardlayersdock.h"
 
-#include "boardeditor.h"
+#include "../../graphics/graphicslayer.h"
 #include "ui_boardlayersdock.h"
 
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,34 +40,22 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardLayersDock::BoardLayersDock(BoardEditor& editor) noexcept
+BoardLayersDock::BoardLayersDock(const IF_GraphicsLayerProvider& lp) noexcept
   : QDockWidget(nullptr),
+    mLayerProvider(lp),
     mUi(new Ui::BoardLayersDock),
-    mBoardEditor(editor),
-    mActiveBoard(nullptr) {
+    mUpdateScheduled(true),
+    mOnLayerEditedSlot(*this, &BoardLayersDock::layerEdited) {
   mUi->setupUi(this);
-}
 
-BoardLayersDock::~BoardLayersDock() noexcept {
-}
-
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
-
-void BoardLayersDock::setActiveBoard(Board* board) {
-  if (mActiveBoard) {
-    disconnect(mActiveBoardConnection);
-  }
-
-  mActiveBoard = board;
-
-  if (mActiveBoard) {
-    mActiveBoardConnection = connect(mActiveBoard, &Board::attributesChanged,
-                                     this, &BoardLayersDock::updateListWidget);
+  foreach (auto& layer, mLayerProvider.getAllLayers()) {
+    layer->onEdited.attach(mOnLayerEditedSlot);
   }
 
   updateListWidget();
+}
+
+BoardLayersDock::~BoardLayersDock() noexcept {
 }
 
 /*******************************************************************************
@@ -76,11 +63,10 @@ void BoardLayersDock::setActiveBoard(Board* board) {
  ******************************************************************************/
 
 void BoardLayersDock::on_listWidget_itemChanged(QListWidgetItem* item) {
-  if (!mActiveBoard) return;
-  QString layerName = item->data(Qt::UserRole).toString();
-  GraphicsLayer* layer = mActiveBoard->getLayerStack().getLayer(layerName);
-  if (!layer) return;
-  layer->setVisible(item->checkState() == Qt::Checked);
+  const QString layerName = item->data(Qt::UserRole).toString();
+  if (GraphicsLayer* layer = mLayerProvider.getLayer(layerName)) {
+    layer->setVisible(item->checkState() == Qt::Checked);
+  }
 }
 
 void BoardLayersDock::on_btnTop_clicked() {
@@ -116,9 +102,29 @@ void BoardLayersDock::on_btnNone_clicked() {
  *  Private Methods
  ******************************************************************************/
 
+void BoardLayersDock::layerEdited(const GraphicsLayer& layer,
+                                  GraphicsLayer::Event event) noexcept {
+  Q_UNUSED(layer);
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      mUpdateScheduled = true;
+      QTimer::singleShot(10, this, &BoardLayersDock::updateListWidget);
+      break;
+    case GraphicsLayer::Event::HighlightColorChanged:
+    case GraphicsLayer::Event::Destroyed:
+      break;
+    default:
+      qWarning() << "Unhandled switch-case in "
+                    "BoardLayersDock::layerEdited():"
+                 << static_cast<int>(event);
+      break;
+  }
+}
+
 void BoardLayersDock::updateListWidget() noexcept {
-  if (!mActiveBoard) {
-    mUi->listWidget->clear();
+  if (!mUpdateScheduled) {
     return;
   }
 
@@ -131,7 +137,7 @@ void BoardLayersDock::updateListWidget() noexcept {
   }
   for (int i = 0; i < layerNames.count(); i++) {
     QString layerName = layerNames.at(i);
-    GraphicsLayer* layer = mActiveBoard->getLayerStack().getLayer(layerName);
+    GraphicsLayer* layer = mLayerProvider.getLayer(layerName);
     Q_ASSERT(layer);
     QListWidgetItem* item = nullptr;
     if (simpleUpdate) {
@@ -155,59 +161,61 @@ void BoardLayersDock::updateListWidget() noexcept {
   }
   mUi->listWidget->blockSignals(false);
   mUi->listWidget->setUpdatesEnabled(true);
+  mUpdateScheduled = false;
 }
 
 void BoardLayersDock::setVisibleLayers(const QList<QString>& layers) noexcept {
-  if (!mActiveBoard) return;
-  foreach (auto& layer, mActiveBoard->getLayerStack().getAllLayers()) {
+  foreach (auto& layer, mLayerProvider.getAllLayers()) {
     layer->setVisible(layers.contains(layer->getName()));
   }
 }
 
 QList<QString> BoardLayersDock::getCommonLayers() const noexcept {
   QList<QString> layers;
-  // layers.append(GraphicsLayer::sBoardBackground));
-  // layers.append(GraphicsLayer::sBoardErcAirWires));
-  layers.append(GraphicsLayer::sBoardOutlines);
-  layers.append(GraphicsLayer::sBoardDrillsNpth);
-  layers.append(GraphicsLayer::sBoardViasTht);
-  layers.append(GraphicsLayer::sBoardPadsTht);
-  layers.append(GraphicsLayer::sBoardAirWires);
+  // layers.append(Theme::Color::sBoardBackground));
+  // layers.append(Theme::Color::sBoardErcAirWires));
+  layers.append(Theme::Color::sBoardOutlines);
+  layers.append(Theme::Color::sBoardHoles);
+  layers.append(Theme::Color::sBoardVias);
+  layers.append(Theme::Color::sBoardPads);
+  layers.append(Theme::Color::sBoardAirWires);
   return layers;
 }
 
 QList<QString> BoardLayersDock::getTopLayers() const noexcept {
   QList<QString> layers;
-  layers.append(GraphicsLayer::sTopPlacement);
-  layers.append(GraphicsLayer::sTopReferences);
-  layers.append(GraphicsLayer::sTopGrabAreas);
-  // layers.append(GraphicsLayer::sTopTestPoints);
-  layers.append(GraphicsLayer::sTopNames);
-  layers.append(GraphicsLayer::sTopValues);
-  // layers.append(GraphicsLayer::sTopCourtyard);
-  layers.append(GraphicsLayer::sTopDocumentation);
-  layers.append(GraphicsLayer::sTopCopper);
+  layers.append(Theme::Color::sBoardPlacementTop);
+  layers.append(Theme::Color::sBoardReferencesTop);
+  layers.append(Theme::Color::sBoardGrabAreasTop);
+  // layers.append(Theme::Color::sBoardTestPointsTop);
+  layers.append(Theme::Color::sBoardNamesTop);
+  layers.append(Theme::Color::sBoardValuesTop);
+  // layers.append(Theme::Color::sBoardCourtyardTop);
+  layers.append(Theme::Color::sBoardDocumentationTop);
+  layers.append(Theme::Color::sBoardCopperTop);
   return layers;
 }
 
 QList<QString> BoardLayersDock::getBottomLayers() const noexcept {
   QList<QString> layers;
-  layers.append(GraphicsLayer::sBotPlacement);
-  layers.append(GraphicsLayer::sBotReferences);
-  layers.append(GraphicsLayer::sBotGrabAreas);
-  // layers.append(GraphicsLayer::sBotTestPoints);
-  layers.append(GraphicsLayer::sBotNames);
-  layers.append(GraphicsLayer::sBotValues);
-  // layers.append(GraphicsLayer::sBotCourtyard);
-  layers.append(GraphicsLayer::sBotDocumentation);
-  layers.append(GraphicsLayer::sBotCopper);
+  layers.append(Theme::Color::sBoardPlacementBot);
+  layers.append(Theme::Color::sBoardReferencesBot);
+  layers.append(Theme::Color::sBoardGrabAreasBot);
+  // layers.append(Theme::Color::sBoardTestPointsBot);
+  layers.append(Theme::Color::sBoardNamesBot);
+  layers.append(Theme::Color::sBoardValuesBot);
+  // layers.append(Theme::Color::sBoardCourtyardBot);
+  layers.append(Theme::Color::sBoardDocumentationBot);
+  layers.append(Theme::Color::sBoardCopperBot);
   return layers;
 }
 
 QList<QString> BoardLayersDock::getAllLayers() const noexcept {
   QList<QString> layers;
-  foreach (auto& layer, mActiveBoard->getLayerStack().getAllLayers()) {
-    layers.append(layer->getName());
+  foreach (auto& layer, mLayerProvider.getAllLayers()) {
+    if (layer->isEnabled()) {
+      layers.append(layer->getName());
+    }
   }
   return layers;
 }

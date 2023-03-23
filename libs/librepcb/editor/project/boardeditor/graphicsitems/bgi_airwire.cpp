@@ -22,13 +22,12 @@
  ******************************************************************************/
 #include "bgi_airwire.h"
 
+#include "../../../graphics/graphicslayer.h"
 #include "../boardgraphicsscene.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_airwire.h>
 #include <librepcb/core/project/board/items/bi_netline.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -44,13 +43,14 @@ namespace editor {
  ******************************************************************************/
 
 BGI_AirWire::BGI_AirWire(BI_AirWire& airwire,
+                         const IF_GraphicsLayerProvider& lp,
                          std::shared_ptr<const QSet<const NetSignal*>>
                              highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mAirWire(airwire),
     mHighlightedNetSignals(highlightedNetSignals),
-    mLayer(nullptr) {
-  mLayer = getLayer(GraphicsLayer::sBoardAirWires);
+    mLayer(lp.getLayer(Theme::Color::sBoardAirWires)),
+    mOnLayerEditedSlot(*this, &BGI_AirWire::layerEdited) {
   setZValue(BoardGraphicsScene::ZValue_AirWires);
 
   if (mAirWire.isVertical()) {
@@ -68,6 +68,12 @@ BGI_AirWire::BGI_AirWire(BI_AirWire& airwire,
     mBoundingRect = QRectF(mAirWire.getP1().getPosition().toPxQPointF(),
                            mAirWire.getP2().getPosition().toPxQPointF())
                         .normalized();
+  }
+
+  setVisible(mLayer && mLayer->isVisible());
+
+  if (mLayer) {
+    mLayer->onEdited.attach(mOnLayerEditedSlot);
   }
 }
 
@@ -105,8 +111,22 @@ void BGI_AirWire::paint(QPainter* painter,
  *  Private Methods
  ******************************************************************************/
 
-GraphicsLayer* BGI_AirWire::getLayer(const QString& name) const noexcept {
-  return mAirWire.getBoard().getLayerStack().getLayer(name);
+void BGI_AirWire::layerEdited(const GraphicsLayer& layer,
+                              GraphicsLayer::Event event) noexcept {
+  switch (event) {
+    case GraphicsLayer::Event::ColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::HighlightColorChanged:
+      update();
+      break;
+    case GraphicsLayer::Event::VisibleChanged:
+    case GraphicsLayer::Event::EnabledChanged:
+      setVisible(layer.isVisible());
+      break;
+    default:
+      break;
+  }
 }
 
 /*******************************************************************************

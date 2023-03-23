@@ -35,6 +35,7 @@
 namespace librepcb {
 
 class Board;
+class Layer;
 
 namespace editor {
 
@@ -87,11 +88,10 @@ private:  // Methods
   bool updatePosition(const Point& pos) noexcept;
   bool fixPosition(const Point& pos) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void layerComboBoxLayerChanged(const GraphicsLayerName& layerName) noexcept;
+  void layerComboBoxLayerChanged(const Layer& layer) noexcept;
   void textComboBoxValueChanged(const QString& value) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
   void mirrorCheckBoxToggled(bool checked) noexcept;
-  void makeLayerVisible() noexcept;
 
 private:  // Data
   // State

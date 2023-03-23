@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "bi_netpoint.h"
 
-#include "../../../graphics/graphicslayer.h"
 #include "../../circuit/netsignal.h"
 #include "../board.h"
 #include "bi_netsegment.h"
@@ -44,7 +43,7 @@ BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const Uuid& uuid,
     onEdited(*this),
     mNetSegment(segment),
     mJunction(uuid, position),
-    mLayerOfTraces(),
+    mLayerOfTraces(nullptr),
     mMaxTraceWidth(0),
     mOnNetLineEditedSlot(*this, &BI_NetPoint::netLineEdited) {
 }
@@ -128,7 +127,7 @@ void BI_NetPoint::registerNetLine(BI_NetLine& netline) {
     throw LogicError(__FILE__, __LINE__,
                      "NetLine has different NetSegment than the NetPoint.");
   } else if ((mRegisteredNetLines.count() > 0) &&
-             (netline.getLayer().getName() != getLayerOfLines())) {
+             (&netline.getLayer() != getLayerOfTraces())) {
     throw LogicError(__FILE__, __LINE__,
                      "NetPoint already has NetLines on different layer.");
   }
@@ -167,9 +166,9 @@ void BI_NetPoint::netLineEdited(const BI_NetLine& obj,
 }
 
 void BI_NetPoint::updateLayerOfTraces() noexcept {
-  QString layer;
+  const Layer* layer = nullptr;
   if (!mRegisteredNetLines.isEmpty()) {
-    layer = (*mRegisteredNetLines.begin())->getLayer().getName();
+    layer = &(*mRegisteredNetLines.begin())->getLayer();
   }
   if (layer != mLayerOfTraces) {
     mLayerOfTraces = layer;

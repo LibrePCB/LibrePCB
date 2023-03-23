@@ -38,7 +38,6 @@
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
@@ -49,6 +48,7 @@
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 
@@ -184,11 +184,8 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   // mirror all netlines
   foreach (BI_NetLine* netline, query.getNetLines()) {
     Q_ASSERT(netline);
-    GraphicsLayer* layer = mScene.getBoard().getLayerStack().getLayer(
-        GraphicsLayer::getMirroredLayerName(netline->getLayer().getName()));
-    Q_ASSERT(layer);
     QScopedPointer<CmdBoardNetLineEdit> cmd(new CmdBoardNetLineEdit(*netline));
-    cmd->setLayer(*layer);
+    cmd->setLayer(netline->getLayer().mirrored());
     execNewChildCmd(cmd.take());  // can throw
   }
 

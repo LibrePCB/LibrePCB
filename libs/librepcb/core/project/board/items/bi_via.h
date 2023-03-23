@@ -77,7 +77,7 @@ public:
     return mStopMaskOffset;
   }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
-  bool isOnLayer(const QString& layerName) const noexcept;
+  bool isOnLayer(const Layer& layer) const noexcept;
   TraceAnchor toTraceAnchor() const noexcept override;
 
   // Setters

@@ -240,6 +240,7 @@ public slots:
 signals:
   void ercFinished(const RuleCheckMessageList& messages);
   void highlightedNetSignalsChanged();
+  void projectAboutToBeSaved();
   void projectSavedToDisk();
   void showControlPanelClicked();
   void openProjectLibraryUpdaterClicked(const FilePath& fp);

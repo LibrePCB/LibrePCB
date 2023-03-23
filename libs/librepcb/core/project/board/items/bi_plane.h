@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../../exceptions.h"
 #include "../../../geometry/path.h"
-#include "../../../graphics/graphicslayername.h"
 #include "../../../types/uuid.h"
 #include "bi_base.h"
 
@@ -39,6 +38,7 @@
 namespace librepcb {
 
 class Board;
+class Layer;
 class NetSignal;
 class Project;
 
@@ -73,13 +73,13 @@ public:
   // Constructors / Destructor
   BI_Plane() = delete;
   BI_Plane(const BI_Plane& other) = delete;
-  BI_Plane(Board& board, const Uuid& uuid, const GraphicsLayerName& layerName,
+  BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
            NetSignal& netsignal, const Path& outline);
   ~BI_Plane() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
-  const GraphicsLayerName& getLayerName() const noexcept { return mLayerName; }
+  const Layer& getLayer() const noexcept { return *mLayer; }
   NetSignal& getNetSignal() const noexcept { return *mNetSignal; }
   const UnsignedLength& getMinWidth() const noexcept { return mMinWidth; }
   const UnsignedLength& getMinClearance() const noexcept {
@@ -97,7 +97,7 @@ public:
 
   // Setters
   void setOutline(const Path& outline) noexcept;
-  void setLayerName(const GraphicsLayerName& layerName) noexcept;
+  void setLayer(const Layer& layer) noexcept;
   void setNetSignal(NetSignal& netsignal);
   void setMinWidth(const UnsignedLength& minWidth) noexcept;
   void setMinClearance(const UnsignedLength& minClearance) noexcept;
@@ -124,7 +124,7 @@ public:
 
 private:  // Data
   Uuid mUuid;
-  GraphicsLayerName mLayerName;
+  const Layer* mLayer;
   NetSignal* mNetSignal;
   Path mOutline;
   UnsignedLength mMinWidth;

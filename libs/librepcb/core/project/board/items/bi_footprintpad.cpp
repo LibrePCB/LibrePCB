@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "bi_footprintpad.h"
 
-#include "../../../graphics/graphicslayer.h"
 #include "../../../library/dev/device.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../library/pkg/package.h"
@@ -32,7 +31,6 @@
 #include "../../circuit/netsignal.h"
 #include "../board.h"
 #include "../boarddesignrules.h"
-#include "../boardlayerstack.h"
 #include "bi_device.h"
 #include "bi_netsegment.h"
 
@@ -114,19 +112,17 @@ FootprintPad::ComponentSide BI_FootprintPad::getComponentSide() const noexcept {
   }
 }
 
-QString BI_FootprintPad::getLayerName() const noexcept {
-  if (getMirrored())
-    return GraphicsLayer::getMirroredLayerName(mFootprintPad->getLayerName());
-  else
-    return mFootprintPad->getLayerName();
+const Layer& BI_FootprintPad::getSmtLayer() const noexcept {
+  return (getComponentSide() == FootprintPad::ComponentSide::Bottom)
+      ? Layer::botCopper()
+      : Layer::topCopper();
 }
 
-bool BI_FootprintPad::isOnLayer(const QString& layerName) const noexcept {
-  if (getMirrored()) {
-    return mFootprintPad->isOnLayer(
-        GraphicsLayer::getMirroredLayerName(layerName));
+bool BI_FootprintPad::isOnLayer(const Layer& layer) const noexcept {
+  if (mFootprintPad->isTht()) {
+    return layer.isCopper();
   } else {
-    return mFootprintPad->isOnLayer(layerName);
+    return layer == getSmtLayer();
   }
 }
 
@@ -184,14 +180,14 @@ void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
                  getPadNameOrUuid(), getComponentInstanceName(),
                  getLibraryDeviceName(), getNetSignalName()));
   }
-  if (!isOnLayer(netline.getLayer().getName())) {
+  if (!isOnLayer(netline.getLayer())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("Trace on layer \"%1\" cannot be connected to the pad \"%2\" "
                 "of device \"%3\" (%4) since it is on layer \"%5\".")
-            .arg(netline.getLayer().getName(), getPadNameOrUuid(),
+            .arg(netline.getLayer().getNameTr(), getPadNameOrUuid(),
                  getComponentInstanceName(), getLibraryDeviceName(),
-                 getLayerName()));
+                 getSmtLayer().getNameTr()));
   }
   foreach (const BI_NetLine* l, mRegisteredNetLines) {
     if (&l->getNetSegment() != &netline.getNetSegment()) {
@@ -295,18 +291,17 @@ void BI_FootprintPad::updateText() noexcept {
 }
 
 void BI_FootprintPad::updateGeometries() noexcept {
-  QSet<QString> layers = {
-      GraphicsLayer::sTopStopMask,    GraphicsLayer::sBotStopMask,
-      GraphicsLayer::sTopSolderPaste, GraphicsLayer::sBotSolderPaste,
-      GraphicsLayer::sTopCopper,      GraphicsLayer::sBotCopper,
-  };
-  for (int i = 1; i <= mBoard.getLayerStack().getInnerLayerCount(); ++i) {
-    layers.insert(GraphicsLayer::getInnerLayerName(i));
-  }
+  const QSet<const Layer*> layers = mBoard.getCopperLayers() +
+      QSet<const Layer*>{
+          &Layer::topStopMask(),
+          &Layer::botStopMask(),
+          &Layer::topSolderPaste(),
+          &Layer::botSolderPaste(),
+      };
 
-  QMap<QString, QList<PadGeometry>> geometries;
-  foreach (const QString& layer, layers) {
-    geometries.insert(layer, getGeometryOnLayer(layer));
+  QHash<const Layer*, QList<PadGeometry>> geometries;
+  foreach (const Layer* layer, layers) {
+    geometries.insert(layer, getGeometryOnLayer(*layer));
   }
 
   if (geometries != mGeometries) {
@@ -349,28 +344,24 @@ UnsignedLength BI_FootprintPad::getSizeForMaskOffsetCalculaton() const
   }
 }
 
-QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
-    const QString& layer) const noexcept {
-  if (GraphicsLayer::isCopperLayer(layer)) {
+QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(const Layer& layer) const
+    noexcept {
+  if (layer.isCopper()) {
     return getGeometryOnCopperLayer(layer);
   }
 
   QList<PadGeometry> result;
   tl::optional<Length> offset;
-  if ((layer == GraphicsLayer::sTopStopMask) ||
-      (layer == GraphicsLayer::sBotStopMask)) {
+  if (layer.isStopMask()) {
     offset = *mBoard.getDesignRules().getStopMaskClearance().calcValue(
         *getSizeForMaskOffsetCalculaton());
-  } else if ((!mFootprintPad->isTht()) &&
-             ((layer == GraphicsLayer::sTopSolderPaste) ||
-              (layer == GraphicsLayer::sBotSolderPaste))) {
+  } else if ((!mFootprintPad->isTht()) && (layer.isSolderPaste())) {
     offset = -mBoard.getDesignRules().getSolderPasteClearance().calcValue(
         *getSizeForMaskOffsetCalculaton());
   }
   if (offset) {
-    const QString copperLayer = GraphicsLayer::isTopLayer(layer)
-        ? GraphicsLayer::sTopCopper
-        : GraphicsLayer::sBotCopper;
+    const Layer& copperLayer =
+        layer.isTop() ? Layer::topCopper() : Layer::botCopper();
     foreach (const PadGeometry& pg, getGeometryOnCopperLayer(copperLayer)) {
       result.append(pg.withoutHoles().withOffset(*offset));
     }
@@ -379,22 +370,22 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
 }
 
 QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
-    const QString& layer) const noexcept {
-  Q_ASSERT(GraphicsLayer::isCopperLayer(layer));
+    const Layer& layer) const noexcept {
+  Q_ASSERT(layer.isCopper());
 
   // Determine pad shape.
   bool fullShape = false;
   bool autoAnnular = false;
   bool minimalAnnular = false;
-  const QString componentSideLayer =
+  const Layer& componentSideLayer =
       (getComponentSide() == FootprintPad::ComponentSide::Top)
-      ? GraphicsLayer::sTopCopper
-      : GraphicsLayer::sBotCopper;
+      ? Layer::topCopper()
+      : Layer::botCopper();
   if (mFootprintPad->isTht()) {
-    const QString solderSideLayer =
+    const Layer& solderSideLayer =
         (getComponentSide() == FootprintPad::ComponentSide::Top)
-        ? GraphicsLayer::sBotCopper
-        : GraphicsLayer::sTopCopper;
+        ? Layer::botCopper()
+        : Layer::topCopper();
     const bool fullComponentSide =
         !mBoard.getDesignRules().getPadCmpSideAutoAnnularRing();
     const bool fullInner =
@@ -402,7 +393,7 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
     if ((layer == solderSideLayer) ||  // solder side
         (fullComponentSide &&
          (layer == componentSideLayer)) ||  // component side
-        (fullInner && GraphicsLayer::isInnerLayer(layer))) {  // inner layer
+        (fullInner && layer.isInner())) {  // inner layer
       fullShape = true;
     } else if (isConnectedOnLayer(layer)) {
       autoAnnular = true;
@@ -433,9 +424,9 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnCopperLayer(
   return result;
 }
 
-bool BI_FootprintPad::isConnectedOnLayer(const QString& layer) const noexcept {
+bool BI_FootprintPad::isConnectedOnLayer(const Layer& layer) const noexcept {
   foreach (const BI_NetLine* line, mRegisteredNetLines) {
-    if (line->getLayer().getName() == layer) {
+    if (line->getLayer() == layer) {
       return true;
     }
   }

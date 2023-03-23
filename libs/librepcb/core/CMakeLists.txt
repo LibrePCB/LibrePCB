@@ -108,6 +108,8 @@ add_library(
   export/graphicsexport.h
   export/graphicsexportsettings.cpp
   export/graphicsexportsettings.h
+  export/graphicspainter.cpp
+  export/graphicspainter.h
   export/pickplacecsvwriter.cpp
   export/pickplacecsvwriter.h
   export/pickplacedata.cpp
@@ -161,11 +163,6 @@ add_library(
   geometry/vertex.h
   geometry/via.cpp
   geometry/via.h
-  graphics/graphicslayer.cpp
-  graphics/graphicslayer.h
-  graphics/graphicslayername.h
-  graphics/graphicspainter.cpp
-  graphics/graphicspainter.h
   import/dxfreader.cpp
   import/dxfreader.h
   library/cat/componentcategory.cpp
@@ -263,8 +260,6 @@ add_library(
   project/board/boardfabricationoutputsettings.h
   project/board/boardgerberexport.cpp
   project/board/boardgerberexport.h
-  project/board/boardlayerstack.cpp
-  project/board/boardlayerstack.h
   project/board/boardpainter.cpp
   project/board/boardpainter.h
   project/board/boardpickplacegenerator.cpp
@@ -345,8 +340,6 @@ add_library(
   project/schematic/items/si_text.h
   project/schematic/schematic.cpp
   project/schematic/schematic.h
-  project/schematic/schematiclayerprovider.cpp
-  project/schematic/schematiclayerprovider.h
   project/schematic/schematicpainter.cpp
   project/schematic/schematicpainter.h
   rulecheck/rulecheckmessage.cpp
@@ -373,6 +366,8 @@ add_library(
   types/boundedunsignedratio.h
   types/circuitidentifier.h
   types/elementname.h
+  types/layer.cpp
+  types/layer.h
   types/length.cpp
   types/length.h
   types/lengthunit.cpp

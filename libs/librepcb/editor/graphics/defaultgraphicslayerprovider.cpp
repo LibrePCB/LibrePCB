@@ -22,6 +22,9 @@
  ******************************************************************************/
 #include "defaultgraphicslayerprovider.h"
 
+#include <librepcb/core/types/layer.h>
+#include <librepcb/core/workspace/theme.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -34,73 +37,74 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider() noexcept {
+DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider(
+    const Theme& theme) noexcept {
   // schematic layers
-  addLayer(GraphicsLayer::sSchematicReferences);
-  addLayer(GraphicsLayer::sSchematicSheetFrames);
-  addLayer(GraphicsLayer::sSymbolOutlines);
-  addLayer(GraphicsLayer::sSymbolGrabAreas);
-  // addLayer(GraphicsLayer::sSymbolHiddenGrabAreas); Not needed!
-  addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
-  addLayer(GraphicsLayer::sSymbolPinCirclesReq);
-  addLayer(GraphicsLayer::sSymbolPinLines);
-  addLayer(GraphicsLayer::sSymbolPinNames);
-  addLayer(GraphicsLayer::sSymbolPinNumbers);
-  addLayer(GraphicsLayer::sSymbolNames);
-  addLayer(GraphicsLayer::sSymbolValues);
-  addLayer(GraphicsLayer::sSchematicNetLines);
-  addLayer(GraphicsLayer::sSchematicNetLabels);
-  addLayer(GraphicsLayer::sSchematicNetLabelAnchors);
-  addLayer(GraphicsLayer::sSchematicDocumentation);
-  addLayer(GraphicsLayer::sSchematicComments);
-  addLayer(GraphicsLayer::sSchematicGuide);
+  addLayer(theme, Theme::Color::sSchematicReferences);
+  addLayer(theme, Theme::Color::sSchematicFrames);
+  addLayer(theme, Theme::Color::sSchematicOutlines);
+  addLayer(theme, Theme::Color::sSchematicGrabAreas);
+  // addLayer(theme, Theme::Color::sSchematicHiddenGrabAreas); Not needed!
+  addLayer(theme, Theme::Color::sSchematicOptionalPins);
+  addLayer(theme, Theme::Color::sSchematicRequiredPins);
+  addLayer(theme, Theme::Color::sSchematicPinLines);
+  addLayer(theme, Theme::Color::sSchematicPinNames);
+  addLayer(theme, Theme::Color::sSchematicPinNumbers);
+  addLayer(theme, Theme::Color::sSchematicNames);
+  addLayer(theme, Theme::Color::sSchematicValues);
+  addLayer(theme, Theme::Color::sSchematicWires);
+  addLayer(theme, Theme::Color::sSchematicNetLabels);
+  addLayer(theme, Theme::Color::sSchematicNetLabelAnchors);
+  addLayer(theme, Theme::Color::sSchematicDocumentation);
+  addLayer(theme, Theme::Color::sSchematicComments);
+  addLayer(theme, Theme::Color::sSchematicGuide);
 
   // asymmetric board layers
-  addLayer(GraphicsLayer::sBoardSheetFrames);
-  addLayer(GraphicsLayer::sBoardOutlines);
-  addLayer(GraphicsLayer::sBoardMillingPth);
-  addLayer(GraphicsLayer::sBoardDrillsNpth);
-  addLayer(GraphicsLayer::sBoardViasTht);
-  addLayer(GraphicsLayer::sBoardPadsTht);
-  addLayer(GraphicsLayer::sBoardAirWires);
+  addLayer(theme, Theme::Color::sBoardFrames);
+  addLayer(theme, Theme::Color::sBoardOutlines);
+  addLayer(theme, Theme::Color::sBoardMilling);
+  addLayer(theme, Theme::Color::sBoardHoles);
+  addLayer(theme, Theme::Color::sBoardVias);
+  addLayer(theme, Theme::Color::sBoardPads);
+  addLayer(theme, Theme::Color::sBoardAirWires);
 
   // copper layers
-  addLayer(GraphicsLayer::sTopCopper);
-  for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {
-    addLayer(GraphicsLayer::getInnerLayerName(i));
+  addLayer(theme, Theme::Color::sBoardCopperTop);
+  for (int i = 1; i <= Layer::innerCopperCount(); ++i) {
+    addLayer(theme, QString(Theme::Color::sBoardCopperInner).arg(i));
   }
-  addLayer(GraphicsLayer::sBotCopper);
+  addLayer(theme, Theme::Color::sBoardCopperBot);
 
   // symmetric board layers
-  addLayer(GraphicsLayer::sTopReferences);
-  addLayer(GraphicsLayer::sBotReferences);
-  addLayer(GraphicsLayer::sTopGrabAreas);
-  addLayer(GraphicsLayer::sBotGrabAreas);
-  // addLayer(GraphicsLayer::sTopHiddenGrabAreas); Not needed!
-  // addLayer(GraphicsLayer::sBotHiddenGrabAreas); Not needed!
-  addLayer(GraphicsLayer::sTopPlacement);
-  addLayer(GraphicsLayer::sBotPlacement);
-  addLayer(GraphicsLayer::sTopDocumentation);
-  addLayer(GraphicsLayer::sBotDocumentation);
-  addLayer(GraphicsLayer::sTopNames);
-  addLayer(GraphicsLayer::sBotNames);
-  addLayer(GraphicsLayer::sTopValues);
-  addLayer(GraphicsLayer::sBotValues);
-  addLayer(GraphicsLayer::sTopCourtyard);
-  addLayer(GraphicsLayer::sBotCourtyard);
-  addLayer(GraphicsLayer::sTopStopMask);
-  addLayer(GraphicsLayer::sBotStopMask);
-  addLayer(GraphicsLayer::sTopSolderPaste);
-  addLayer(GraphicsLayer::sBotSolderPaste);
-  addLayer(GraphicsLayer::sTopGlue);
-  addLayer(GraphicsLayer::sBotGlue);
+  addLayer(theme, Theme::Color::sBoardReferencesTop);
+  addLayer(theme, Theme::Color::sBoardReferencesBot);
+  addLayer(theme, Theme::Color::sBoardGrabAreasTop);
+  addLayer(theme, Theme::Color::sBoardGrabAreasBot);
+  // addLayer(theme, Theme::Color::sBoardHiddenGrabAreasTop); Not needed!
+  // addLayer(theme, Theme::Color::sBoardHiddenGrabAreasBot); Not needed!
+  addLayer(theme, Theme::Color::sBoardPlacementTop);
+  addLayer(theme, Theme::Color::sBoardPlacementBot);
+  addLayer(theme, Theme::Color::sBoardDocumentationTop);
+  addLayer(theme, Theme::Color::sBoardDocumentationBot);
+  addLayer(theme, Theme::Color::sBoardNamesTop);
+  addLayer(theme, Theme::Color::sBoardNamesBot);
+  addLayer(theme, Theme::Color::sBoardValuesTop);
+  addLayer(theme, Theme::Color::sBoardValuesBot);
+  addLayer(theme, Theme::Color::sBoardCourtyardTop);
+  addLayer(theme, Theme::Color::sBoardCourtyardBot);
+  addLayer(theme, Theme::Color::sBoardStopMaskTop);
+  addLayer(theme, Theme::Color::sBoardStopMaskBot);
+  addLayer(theme, Theme::Color::sBoardSolderPasteTop);
+  addLayer(theme, Theme::Color::sBoardSolderPasteBot);
+  addLayer(theme, Theme::Color::sBoardGlueTop);
+  addLayer(theme, Theme::Color::sBoardGlueBot);
 
   // other asymmetric board layers
-  addLayer(GraphicsLayer::sBoardMeasures);
-  addLayer(GraphicsLayer::sBoardAlignment);
-  addLayer(GraphicsLayer::sBoardDocumentation);
-  addLayer(GraphicsLayer::sBoardComments);
-  addLayer(GraphicsLayer::sBoardGuide);
+  addLayer(theme, Theme::Color::sBoardMeasures);
+  addLayer(theme, Theme::Color::sBoardAlignment);
+  addLayer(theme, Theme::Color::sBoardDocumentation);
+  addLayer(theme, Theme::Color::sBoardComments);
+  addLayer(theme, Theme::Color::sBoardGuide);
 }
 
 DefaultGraphicsLayerProvider::~DefaultGraphicsLayerProvider() noexcept {
@@ -126,10 +130,12 @@ GraphicsLayer* DefaultGraphicsLayerProvider::getLayer(const QString& name) const
  *  Private Methods
  ******************************************************************************/
 
-void DefaultGraphicsLayerProvider::addLayer(const QString& name) noexcept {
-  if (!getLayer(name)) {
-    mLayers.append(new GraphicsLayer(name));
-  }
+void DefaultGraphicsLayerProvider::addLayer(const Theme& theme,
+                                            const QString& name) noexcept {
+  const ThemeColor& color = theme.getColor(name);
+  mLayers.append(new GraphicsLayer(name, color.getNameTr(),
+                                   color.getPrimaryColor(),
+                                   color.getSecondaryColor()));
 }
 
 /*******************************************************************************
