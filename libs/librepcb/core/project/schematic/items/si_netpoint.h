@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/junction.h"
-#include "../graphicsitems/sgi_netpoint.h"
 #include "./si_netline.h"
 #include "si_base.h"
 
@@ -46,6 +45,15 @@ class SI_NetPoint final : public SI_Base, public SI_NetLineAnchor {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionChanged,
+    JunctionChanged,
+    NetSignalNameChanged,
+  };
+  Signal<SI_NetPoint, Event> onEdited;
+  typedef Slot<SI_NetPoint, Event> OnEditedSlot;
+
   // Constructors / Destructor
   SI_NetPoint() = delete;
   SI_NetPoint(const SI_NetPoint& other) = delete;
@@ -54,6 +62,9 @@ public:
 
   // Getters
   const Uuid& getUuid() const noexcept { return mJunction.getUuid(); }
+  const Point& getPosition() const noexcept override {
+    return mJunction.getPosition();
+  }
   const Junction& getJunction() const noexcept { return mJunction; }
   bool isVisibleJunction() const noexcept;
   bool isOpenLineEnd() const noexcept;
@@ -69,14 +80,6 @@ public:
   void addToSchematic() override;
   void removeFromSchematic() override;
 
-  // Inherited from SI_Base
-  Type_t getType() const noexcept override { return SI_Base::Type_t::NetPoint; }
-  const Point& getPosition() const noexcept override {
-    return mJunction.getPosition();
-  }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
-
   // Inherited from SI_NetLineAnchor
   void registerNetLine(SI_NetLine& netline) override;
   void unregisterNetLine(SI_NetLine& netline) override;
@@ -90,10 +93,6 @@ public:
   bool operator!=(const SI_NetPoint& rhs) noexcept { return (this != &rhs); }
 
 private:
-  // General
-  QScopedPointer<SGI_NetPoint> mGraphicsItem;
-  QMetaObject::Connection mHighlightChangedConnection;
-
   // Attributes
   SI_NetSegment& mNetSegment;
   Junction mJunction;

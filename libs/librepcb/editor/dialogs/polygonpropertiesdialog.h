@@ -31,7 +31,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
+class Layer;
 class LengthUnit;
 class Polygon;
 
@@ -58,7 +58,7 @@ public:
   PolygonPropertiesDialog() = delete;
   PolygonPropertiesDialog(const PolygonPropertiesDialog& other) = delete;
   PolygonPropertiesDialog(Polygon& polygon, UndoStack& undoStack,
-                          QList<GraphicsLayer*> layers,
+                          const QSet<const Layer*>& layers,
                           const LengthUnit& lengthUnit,
                           const QString& settingsPrefix,
                           QWidget* parent = nullptr) noexcept;
@@ -76,7 +76,6 @@ private:  // GUI Events
 
 private:  // Methods
   bool applyChanges() noexcept;
-  void selectLayerNameInCombobox(const QString& name) noexcept;
 
 private:  // Data
   Polygon& mPolygon;

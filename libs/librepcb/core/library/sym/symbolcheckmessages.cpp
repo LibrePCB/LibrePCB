@@ -23,7 +23,7 @@
 #include "symbolcheckmessages.h"
 
 #include "../../geometry/text.h"
-#include "../../graphics/graphicslayer.h"
+#include "../../types/layer.h"
 #include "../../utils/toolbox.h"
 #include "symbolpin.h"
 
@@ -139,18 +139,16 @@ MsgSymbolPinNotOnGrid::MsgSymbolPinNotOnGrid(
  ******************************************************************************/
 
 MsgWrongSymbolTextLayer::MsgWrongSymbolTextLayer(
-    std::shared_ptr<const Text> text, const QString& expectedLayerName) noexcept
+    std::shared_ptr<const Text> text, const Layer& expectedLayer) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Layer of '%1' is not '%2'")
-            .arg(text->getText(),
-                 GraphicsLayer::getTranslation(expectedLayerName)),
+            .arg(text->getText(), expectedLayer.getNameTr()),
         tr("The text element '%1' should normally be on layer '%2'.")
-            .arg(text->getText(),
-                 GraphicsLayer::getTranslation(expectedLayerName)),
+            .arg(text->getText(), expectedLayer.getNameTr()),
         "unusual_text_layer"),
     mText(text),
-    mExpectedLayerName(expectedLayerName) {
+    mExpectedLayer(&expectedLayer) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("text", text->getUuid());
   mApproval.ensureLineBreak();

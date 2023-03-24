@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdpolygonedit.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/polygongraphicsitem.h"
 #include "../../../widgets/angleedit.h"
 #include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
@@ -32,9 +33,8 @@
 #include "../packageeditorwidget.h"
 
 #include <librepcb/core/geometry/polygon.h>
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -57,7 +57,7 @@ PackageEditorState_DrawPolygonBase::PackageEditorState_DrawPolygonBase(
     mCurrentGraphicsItem(nullptr),
     mArcCenter(),
     mArcInSecondState(false),
-    mLastLayerName(GraphicsLayer::sTopPlacement),  // Most important layer
+    mLastLayer(&Layer::topPlacement()),  // Most important layer
     mLastLineWidth(200000),  // Typical width according library conventions
     mLastAngle(0),
     mLastFill(false),  // Fill is needed very rarely
@@ -80,7 +80,7 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
   layerComboBox->setLayers(getAllowedCircleAndPolygonLayers());
-  layerComboBox->setCurrentLayer(mLastLayerName);
+  layerComboBox->setCurrentLayer(*mLastLayer);
   layerComboBox->addAction(
       cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
                                &GraphicsLayerComboBox::stepDown));
@@ -268,7 +268,7 @@ bool PackageEditorState_DrawPolygonBase::start() noexcept {
     mContext.undoStack.beginCmdGroup(tr("Add footprint polygon"));
     mIsUndoCmdActive = true;
     mCurrentPolygon = std::make_shared<Polygon>(Uuid::createRandom(),
-                                                mLastLayerName, mLastLineWidth,
+                                                *mLastLayer, mLastLineWidth,
                                                 mLastFill, mLastGrabArea, path);
     mContext.undoStack.appendToCmdGroup(new CmdPolygonInsert(
         mContext.currentFootprint->getPolygons(), mCurrentPolygon));
@@ -568,10 +568,10 @@ void PackageEditorState_DrawPolygonBase::updateStatusBarMessage() noexcept {
 }
 
 void PackageEditorState_DrawPolygonBase::layerComboBoxValueChanged(
-    const GraphicsLayerName& layerName) noexcept {
-  mLastLayerName = layerName;
+    const Layer& layer) noexcept {
+  mLastLayer = &layer;
   if (mEditCmd) {
-    mEditCmd->setLayerName(mLastLayerName, true);
+    mEditCmd->setLayer(*mLastLayer, true);
   }
 }
 

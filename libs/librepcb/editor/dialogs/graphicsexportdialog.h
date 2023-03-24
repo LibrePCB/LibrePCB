@@ -40,9 +40,9 @@ namespace librepcb {
 
 class GraphicsExport;
 class GraphicsExportSettings;
-class GraphicsLayer;
 class GraphicsPagePainter;
 class LengthUnit;
+class Theme;
 
 namespace editor {
 
@@ -70,7 +70,7 @@ class GraphicsExportDialog final : public QDialog {
     QString name;
     bool enabled;
     bool mirror;
-    QSet<QString> layers;
+    QSet<QString> colors;
   };
 
 public:
@@ -99,7 +99,8 @@ public:
       const QList<std::shared_ptr<GraphicsPagePainter>>& pages, int currentPage,
       const QString& documentName, int innerLayerCount,
       const FilePath& defaultFilePath, const LengthUnit& lengthUnit,
-      const QString& settingsPrefix, QWidget* parent = nullptr) noexcept;
+      const Theme& theme, const QString& settingsPrefix,
+      QWidget* parent = nullptr) noexcept;
   ~GraphicsExportDialog() noexcept;
 
   // General Methods
@@ -163,7 +164,7 @@ private:  // Methods
   const QList<ContentItem>& getPageContent() const noexcept;
   void setOpenExportedFiles(bool open) noexcept;
   bool getOpenExportedFiles() const noexcept;
-  void updateLayerColorsListWidget() noexcept;
+  void updateColorsListWidget() noexcept;
 
 private:  // Data
   const Mode mMode;
@@ -171,10 +172,12 @@ private:  // Data
   const QList<std::shared_ptr<GraphicsPagePainter>> mInputPages;
   const int mCurrentPage;  // Note: Might be out of range!
   const FilePath mDefaultFilePath;
+  const Theme& mTheme;
   const QString mSettingsPrefix;
   SaveAsCallback mSaveAsCallback;  // Guaranteed to be not null.
 
-  QList<GraphicsLayer> mLayers;
+  QScopedPointer<GraphicsExportSettings> mDefaultSettings;
+  QList<std::pair<QString, QColor>> mColors;
 
   QString mSettingsPrinterName;
   tl::optional<QPageSize::PageSizeId> mSettingsPageSize;

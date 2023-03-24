@@ -25,6 +25,7 @@
 #include "../../dialogs/filedialog.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
+#include "../../graphics/graphicsscene.h"
 #include "../../project/cmd/cmdschematicadd.h"
 #include "../../project/cmd/cmdschematicedit.h"
 #include "../../project/cmd/cmdschematicremove.h"
@@ -41,18 +42,19 @@
 #include "../projecteditor.h"
 #include "../projectsetupdialog.h"
 #include "fsm/schematiceditorfsm.h"
+#include "graphicsitems/sgi_symbol.h"
+#include "schematicgraphicsscene.h"
 #include "schematicpagesdock.h"
 
 #include <librepcb/core/application.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/schematic.h>
-#include <librepcb/core/project/schematic/schematiclayerprovider.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -83,13 +85,14 @@ SchematicEditor::SchematicEditor(
     mStandardCommandHandler(new StandardEditorCommandHandler(
         mProjectEditor.getWorkspace().getSettings(), this)),
     mActiveSchematicIndex(-1),
+    mGraphicsScene(),
+    mVisibleSceneRect(),
     mFsm() {
   mUi->setupUi(this);
 
   // Setup graphics view.
   const Theme& theme =
       mProjectEditor.getWorkspace().getSettings().themes.getActive();
-  mProject.getLayers().applyTheme(theme);
   mUi->graphicsView->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
@@ -123,9 +126,13 @@ SchematicEditor::SchematicEditor(
   }
   setWindowTitle(tr("%1 - LibrePCB Schematic Editor").arg(filenameStr));
 
+  // Add all required layers.
+  addLayers(theme);
+
   // Build the whole schematic editor finite state machine.
   SchematicEditorFsm::Context fsmContext{mProjectEditor.getWorkspace(),
                                          mProject,
+                                         mProjectEditor,
                                          *this,
                                          *mUi->graphicsView,
                                          *mCommandToolBarProxy,
@@ -244,22 +251,35 @@ bool SchematicEditor::setActiveSchematicIndex(int index) noexcept {
   // event accepted --> change the schematic page
   Schematic* schematic = getActiveSchematic();
   if (schematic) {
-    // save current view scene rect
-    schematic->saveViewSceneRect(mUi->graphicsView->getVisibleSceneRect());
+    // Save current view scene rect.
+    mVisibleSceneRect[schematic->getUuid()] =
+        mUi->graphicsView->getVisibleSceneRect();
   }
+  mUi->graphicsView->setScene(nullptr);
+  mGraphicsScene.reset();
   while (!mSchematicConnections.isEmpty()) {
     disconnect(mSchematicConnections.takeLast());
   }
+
   schematic = mProject.getSchematicByIndex(index);
+
   if (schematic) {
     // show scene, restore view scene rect, set grid properties
+    mGraphicsScene.reset(new SchematicGraphicsScene(
+        *schematic, *this, mProjectEditor.getHighlightedNetSignals()));
+    connect(&mProjectEditor, &ProjectEditor::highlightedNetSignalsChanged,
+            mGraphicsScene.data(),
+            &SchematicGraphicsScene::updateHighlightedNetSignals);
     const Theme& theme =
         mProjectEditor.getWorkspace().getSettings().themes.getActive();
-    schematic->getGraphicsScene().setSelectionRectColors(
+    mGraphicsScene->setSelectionRectColors(
         theme.getColor(Theme::Color::sSchematicSelection).getPrimaryColor(),
         theme.getColor(Theme::Color::sSchematicSelection).getSecondaryColor());
-    mUi->graphicsView->setScene(&schematic->getGraphicsScene());
-    mUi->graphicsView->setVisibleSceneRect(schematic->restoreViewSceneRect());
+    mUi->graphicsView->setScene(mGraphicsScene.data());
+    const QRectF sceneRect = mVisibleSceneRect.value(schematic->getUuid());
+    if (!sceneRect.isEmpty()) {
+      mUi->graphicsView->setVisibleSceneRect(sceneRect);
+    }
     mUi->graphicsView->setGridInterval(schematic->getGridInterval());
     mUi->statusbar->setLengthUnit(schematic->getGridUnit());
     mSchematicConnections.append(
@@ -303,7 +323,7 @@ void SchematicEditor::abortBlockingToolsInOtherEditors() noexcept {
  *  Inherited Methods
  ******************************************************************************/
 
-void SchematicEditor::closeEvent(QCloseEvent* event) {
+void SchematicEditor::closeEvent(QCloseEvent* event) noexcept {
   if (!mProjectEditor.windowIsAboutToClose(*this))
     event->ignore();
   else
@@ -313,6 +333,34 @@ void SchematicEditor::closeEvent(QCloseEvent* event) {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void SchematicEditor::addLayers(const Theme& theme) noexcept {
+  auto addLayer = [this, &theme](const QString& name) {
+    const ThemeColor& color = theme.getColor(name);
+    mLayers.append(std::make_shared<GraphicsLayer>(name, color.getNameTr(),
+                                                   color.getPrimaryColor(),
+                                                   color.getSecondaryColor()));
+  };
+
+  addLayer(Theme::Color::sSchematicReferences);
+  addLayer(Theme::Color::sSchematicFrames);
+  addLayer(Theme::Color::sSchematicOutlines);
+  addLayer(Theme::Color::sSchematicGrabAreas);
+  // addLayer(Theme::Color::sSchematicHiddenGrabAreas); Not needed!
+  addLayer(Theme::Color::sSchematicOptionalPins);
+  addLayer(Theme::Color::sSchematicRequiredPins);
+  addLayer(Theme::Color::sSchematicPinLines);
+  addLayer(Theme::Color::sSchematicPinNames);
+  addLayer(Theme::Color::sSchematicPinNumbers);
+  addLayer(Theme::Color::sSchematicNames);
+  addLayer(Theme::Color::sSchematicValues);
+  addLayer(Theme::Color::sSchematicWires);
+  addLayer(Theme::Color::sSchematicNetLabels);
+  addLayer(Theme::Color::sSchematicNetLabelAnchors);
+  addLayer(Theme::Color::sSchematicDocumentation);
+  addLayer(Theme::Color::sSchematicComments);
+  addLayer(Theme::Color::sSchematicGuide);
+}
 
 void SchematicEditor::createActions() noexcept {
   const EditorCommandSet& cmd = EditorCommandSet::instance();
@@ -1061,15 +1109,19 @@ void SchematicEditor::goToSymbol(const QString& name, int index) noexcept {
     index %= symbolCandidates.count();
     SI_Symbol* symbol = symbolCandidates[index];
     Schematic& schematic = symbol->getSchematic();
-    if (setActiveSchematicIndex(mProject.getSchematics().indexOf(&schematic))) {
-      schematic.clearSelection();
-      symbol->setSelected(true);
-      QRectF rect = symbol->getBoundingRect();
-      // Zoom to a rectangle relative to the maximum symbol dimension. The
-      // symbol is 1/4th of the screen.
-      qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());
-      rect.adjust(-margin, -margin, margin, margin);
-      mUi->graphicsView->zoomToRect(rect);
+    if (setActiveSchematicIndex(mProject.getSchematics().indexOf(&schematic)) &&
+        mGraphicsScene) {
+      mGraphicsScene->clearSelection();
+      if (auto item = mGraphicsScene->getSymbols().value(symbol)) {
+        item->setSelected(true);
+        QRectF rect = item->mapRectToScene(item->childrenBoundingRect());
+        // Zoom to a rectangle relative to the maximum symbol dimension. The
+        // symbol is 1/4th of the screen.
+        qreal margin =
+            1.5f * std::max(rect.size().width(), rect.size().height());
+        rect.adjust(-margin, -margin, margin, margin);
+        mUi->graphicsView->zoomToRect(rect);
+      }
     }
   }
 }
@@ -1158,6 +1210,7 @@ void SchematicEditor::execGraphicsExportDialog(
         GraphicsExportDialog::Mode::Schematic, output, pages,
         getActiveSchematicIndex(), *mProject.getName(), 0, defaultFilePath,
         mProjectEditor.getWorkspace().getSettings().defaultLengthUnit.get(),
+        mProjectEditor.getWorkspace().getSettings().themes.getActive(),
         "schematic_editor/" % settingsKey, this);
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {

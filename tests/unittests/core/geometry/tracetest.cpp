@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/geometry/trace.h>
 #include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/types/layer.h>
 
 /*******************************************************************************
  *  Namespace
@@ -50,7 +51,7 @@ TEST_F(TraceTest, testConstructFromSExpression) {
   Trace obj(sexpr);
   EXPECT_EQ(Uuid::fromString("c893f5a0-3fec-498b-99d6-467d5d69825d"),
             obj.getUuid());
-  EXPECT_EQ(GraphicsLayerName("bot_cu"), obj.getLayer());
+  EXPECT_EQ("bot_cu", obj.getLayer().getId());
   EXPECT_EQ(PositiveLength(500000), obj.getWidth());
   EXPECT_EQ(TraceAnchor::pad(
                 Uuid::fromString("0d8f2ef9-34f4-4400-a313-f17cdcdfe924"),
@@ -62,8 +63,8 @@ TEST_F(TraceTest, testConstructFromSExpression) {
 }
 
 TEST_F(TraceTest, testSerializeAndDeserialize) {
-  Trace obj1(Uuid::createRandom(), GraphicsLayerName("foo"),
-             PositiveLength(123), TraceAnchor::junction(Uuid::createRandom()),
+  Trace obj1(Uuid::createRandom(), Layer::topCopper(), PositiveLength(123),
+             TraceAnchor::junction(Uuid::createRandom()),
              TraceAnchor::pad(Uuid::createRandom(), Uuid::createRandom()));
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);

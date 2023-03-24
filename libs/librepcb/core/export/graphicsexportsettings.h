@@ -35,6 +35,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Theme;
+
 /*******************************************************************************
  *  Class GraphicsExportSettings
  ******************************************************************************/
@@ -77,12 +79,12 @@ public:
   const UnsignedLength& getMinLineWidth() const noexcept {
     return mMinLineWidth;
   }
-  const QList<std::pair<QString, QColor>>& getLayers() const noexcept {
-    return mLayers;
+  const QList<std::pair<QString, QColor>>& getColors() const noexcept {
+    return mColors;
   }
-  QStringList getLayerPaintOrder() const noexcept;
-  QColor getColor(const QString& layerName) const noexcept;
-  QColor getFillColor(const QString& layerName, bool isFilled,
+  QStringList getPaintOrder() const noexcept;
+  QColor getColor(const QString& colorName) const noexcept;
+  QColor getFillColor(const QString& colorName, bool isFilled,
                       bool isGrabArea) const noexcept;
 
   // Setters
@@ -114,9 +116,14 @@ public:
   void setMinLineWidth(const UnsignedLength& width) noexcept {
     mMinLineWidth = width;
   }
-  void setLayers(const QList<std::pair<QString, QColor>>& layers) noexcept {
-    mLayers = layers;
+  void setColors(const QList<std::pair<QString, QColor>>& colors) noexcept {
+    mColors = colors;
   }
+
+  // General Methods
+  void loadColorsFromTheme(const Theme& theme, bool schematic = true,
+                           bool board = true,
+                           int innerLayerCount = -1) noexcept;
 
   // Operator Overloadings
   GraphicsExportSettings& operator=(const GraphicsExportSettings& rhs) noexcept;
@@ -124,8 +131,7 @@ public:
   bool operator!=(const GraphicsExportSettings& rhs) const noexcept;
 
 private:  // Methods
-  void addLayer(const QString& name) noexcept;
-  QColor getLayerColor(const QString& name) const noexcept;
+  QColor getColorImpl(const QString& name) const noexcept;
 
 private:  // Data
   tl::optional<QPageSize> mPageSize;
@@ -141,7 +147,7 @@ private:  // Data
   bool mBlackWhite;
   Qt::GlobalColor mBackgroundColor;
   UnsignedLength mMinLineWidth;
-  QList<std::pair<QString, QColor>> mLayers;
+  QList<std::pair<QString, QColor>> mColors;
 };
 
 /*******************************************************************************

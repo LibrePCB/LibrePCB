@@ -36,6 +36,7 @@ namespace librepcb {
 class Footprint;
 class FootprintPad;
 class Hole;
+class Layer;
 class PackagePad;
 class StrokeText;
 
@@ -464,12 +465,12 @@ public:
   MsgWrongFootprintTextLayer() = delete;
   MsgWrongFootprintTextLayer(std::shared_ptr<const Footprint> footprint,
                              std::shared_ptr<const StrokeText> text,
-                             const QString& expectedLayerName) noexcept;
+                             const Layer& expectedLayer) noexcept;
   MsgWrongFootprintTextLayer(const MsgWrongFootprintTextLayer& other) noexcept
     : RuleCheckMessage(other),
       mFootprint(other.mFootprint),
       mText(other.mText),
-      mExpectedLayerName(other.mExpectedLayerName) {}
+      mExpectedLayer(other.mExpectedLayer) {}
   virtual ~MsgWrongFootprintTextLayer() noexcept {}
 
   // Getters
@@ -477,12 +478,12 @@ public:
     return mFootprint;
   }
   std::shared_ptr<const StrokeText> getText() const noexcept { return mText; }
-  QString getExpectedLayerName() const noexcept { return mExpectedLayerName; }
+  const Layer& getExpectedLayer() const noexcept { return *mExpectedLayer; }
 
 private:
   std::shared_ptr<const Footprint> mFootprint;
   std::shared_ptr<const StrokeText> mText;
-  QString mExpectedLayerName;
+  const Layer* mExpectedLayer;
 };
 
 /*******************************************************************************

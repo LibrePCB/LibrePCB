@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "packageeditorfsm.h"
 
+#include "../../../graphics/graphicsscene.h"
+#include "../../../graphics/primitivetextgraphicsitem.h"
 #include "../../../widgets/graphicsview.h"
 #include "../footprintgraphicsitem.h"
 #include "packageeditorstate_addholes.h"
@@ -38,8 +40,6 @@
 #include "packageeditorstate_select.h"
 
 #include <librepcb/core/application.h>
-#include <librepcb/core/graphics/graphicsscene.h>
-#include <librepcb/core/graphics/primitivetextgraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/library/pkg/package.h>
 
@@ -186,7 +186,7 @@ bool PackageEditorFsm::processChangeCurrentFootprint(
     mSelectFootprintGraphicsItem->setText(tr("Please select a footprint."));
     mSelectFootprintGraphicsItem->setLayer(
         mContext.editorContext.layerProvider.getLayer(
-            GraphicsLayer::sBoardOutlines));
+            Theme::Color::sBoardOutlines));
     mContext.graphicsScene.addItem(*mSelectFootprintGraphicsItem);
     mContext.graphicsView.setEnabled(false);
     mContext.graphicsView.zoomAll();

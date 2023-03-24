@@ -25,6 +25,8 @@
 #include "../../cmd/cmdtextedit.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
+#include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/graphicsscene.h"
 #include "../../library/cmd/cmdlibraryelementedit.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/toolbarproxy.h"
@@ -35,9 +37,6 @@
 #include "symbolgraphicsitem.h"
 #include "ui_symboleditorwidget.h"
 
-#include <librepcb/core/graphics/circlegraphicsitem.h>
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/cmpsigpindisplaytype.h>
 #include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/library/libraryelementcheckmessages.h>
@@ -542,7 +541,7 @@ template <>
 void SymbolEditorWidget::fixMsg(const MsgWrongSymbolTextLayer& msg) {
   std::shared_ptr<Text> text = mSymbol->getTexts().get(msg.getText().get());
   QScopedPointer<CmdTextEdit> cmd(new CmdTextEdit(*text));
-  cmd->setLayerName(GraphicsLayerName(msg.getExpectedLayerName()), false);
+  cmd->setLayer(msg.getExpectedLayer(), false);
   mUndoStack->execCmd(cmd.take());
 }
 
@@ -604,6 +603,7 @@ bool SymbolEditorWidget::execGraphicsExportDialog(
         GraphicsExportDialog::Mode::Schematic, output, pages, 0,
         *mSymbol->getNames().getDefaultValue(), 0, defaultFilePath,
         mContext.workspace.getSettings().defaultLengthUnit.get(),
+        mContext.workspace.getSettings().themes.getActive(),
         "symbol_editor/" % settingsKey, this);
     connect(&dialog, &GraphicsExportDialog::requestOpenFile, this,
             [this](const FilePath& fp) {

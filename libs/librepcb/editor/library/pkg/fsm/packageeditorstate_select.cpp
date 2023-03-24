@@ -29,6 +29,11 @@
 #include "../../../dialogs/polygonpropertiesdialog.h"
 #include "../../../dialogs/stroketextpropertiesdialog.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/circlegraphicsitem.h"
+#include "../../../graphics/graphicsscene.h"
+#include "../../../graphics/holegraphicsitem.h"
+#include "../../../graphics/polygongraphicsitem.h"
+#include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
 #include "../../../widgets/graphicsview.h"
@@ -41,11 +46,6 @@
 #include "../footprintpadpropertiesdialog.h"
 #include "../packageeditorwidget.h"
 
-#include <librepcb/core/graphics/circlegraphicsitem.h>
-#include <librepcb/core/graphics/graphicsscene.h>
-#include <librepcb/core/graphics/holegraphicsitem.h>
-#include <librepcb/core/graphics/polygongraphicsitem.h>
-#include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/import/dxfreader.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/utils/scopeguard.h>
@@ -529,8 +529,7 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
 
     // Ask for file path and import options.
     DxfImportDialog dialog(getAllowedCircleAndPolygonLayers(),
-                           GraphicsLayerName(GraphicsLayer::sTopDocumentation),
-                           true, getLengthUnit(),
+                           Layer::topDocumentation(), true, getLengthUnit(),
                            "package_editor/dxf_import_dialog",
                            &mContext.editorWidget);
     FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
@@ -562,7 +561,7 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
                                    mContext.package.getPads(), Point(0, 0)));
     foreach (const auto& path, paths) {
       data->getPolygons().append(
-          std::make_shared<Polygon>(Uuid::createRandom(), dialog.getLayerName(),
+          std::make_shared<Polygon>(Uuid::createRandom(), dialog.getLayer(),
                                     dialog.getLineWidth(), false, false, path));
     }
     for (const auto& circle : import.getCircles()) {
@@ -572,7 +571,7 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
             makeNonEmptyPath(circle.position), MaskConfig::automatic()));
       } else {
         data->getPolygons().append(std::make_shared<Polygon>(
-            Uuid::createRandom(), dialog.getLayerName(), dialog.getLineWidth(),
+            Uuid::createRandom(), dialog.getLayer(), dialog.getLineWidth(),
             false, false,
             Path::circle(circle.diameter).translated(circle.position)));
       }
@@ -585,11 +584,11 @@ bool PackageEditorState_Select::processImportDxf() noexcept {
 
     // Sanity check that the chosen layer is really visible, but this should
     // always be the case anyway.
-    const GraphicsLayer* polygonLayer =
-        mContext.editorContext.layerProvider.getLayer(*dialog.getLayerName());
-    const GraphicsLayer* holeLayer =
+    std::shared_ptr<GraphicsLayer> polygonLayer =
+        mContext.editorContext.layerProvider.getLayer(dialog.getLayer());
+    std::shared_ptr<GraphicsLayer> holeLayer =
         mContext.editorContext.layerProvider.getLayer(
-            GraphicsLayer::sBoardDrillsNpth);
+            Theme::Color::sBoardHoles);
     if ((!polygonLayer) || (!polygonLayer->isVisible()) || (!holeLayer) ||
         (!holeLayer->isVisible())) {
       throw LogicError(__FILE__, __LINE__, "Layer is not visible!");  // no tr()

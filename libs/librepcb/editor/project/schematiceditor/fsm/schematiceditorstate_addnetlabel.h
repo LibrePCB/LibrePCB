@@ -84,6 +84,7 @@ private:  // Methods
   bool addLabel(const Point& pos) noexcept;
   bool updateLabel(const Point& pos) noexcept;
   bool fixLabel(const Point& pos) noexcept;
+  bool abortCommand(bool showErrMsgBox) noexcept;
 
 private:  // Data
   bool mUndoCmdActive;

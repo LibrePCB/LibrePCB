@@ -70,6 +70,9 @@ public:
   static MaskConfig manual(const Length& offset) noexcept {
     return MaskConfig(true, offset);
   }
+  static MaskConfig maybe(const tl::optional<Length>& offset) noexcept {
+    return MaskConfig(offset.has_value(), offset);
+  }
 
 private:  // Methods
   MaskConfig(bool enabled, const tl::optional<Length>& offset) noexcept;

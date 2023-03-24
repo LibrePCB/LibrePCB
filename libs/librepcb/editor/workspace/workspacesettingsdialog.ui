@@ -637,8 +637,11 @@
             <bool>false</bool>
            </property>
            <property name="columnCount">
-            <number>3</number>
+            <number>4</number>
            </property>
+           <attribute name="headerMinimumSectionSize">
+            <number>20</number>
+           </attribute>
            <column>
             <property name="text">
              <string notr="true">①</string>
@@ -657,7 +660,12 @@
            </column>
            <column>
             <property name="text">
-             <string>Colors</string>
+             <string>Category</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Objects</string>
             </property>
            </column>
           </widget>

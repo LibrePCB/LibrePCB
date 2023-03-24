@@ -40,11 +40,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsScene;
 class Symbol;
 
 namespace editor {
 
+class GraphicsScene;
 class SymbolEditorFsm;
 class SymbolGraphicsItem;
 

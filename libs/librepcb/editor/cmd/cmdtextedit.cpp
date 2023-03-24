@@ -37,8 +37,8 @@ namespace editor {
 CmdTextEdit::CmdTextEdit(Text& text) noexcept
   : UndoCommand(tr("Edit text")),
     mText(text),
-    mOldLayerName(text.getLayerName()),
-    mNewLayerName(mOldLayerName),
+    mOldLayer(&text.getLayer()),
+    mNewLayer(mOldLayer),
     mOldText(text.getText()),
     mNewText(mOldText),
     mOldPosition(text.getPosition()),
@@ -61,11 +61,10 @@ CmdTextEdit::~CmdTextEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdTextEdit::setLayerName(const GraphicsLayerName& name,
-                               bool immediate) noexcept {
+void CmdTextEdit::setLayer(const Layer& layer, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewLayerName = name;
-  if (immediate) mText.setLayerName(mNewLayerName);
+  mNewLayer = &layer;
+  if (immediate) mText.setLayer(*mNewLayer);
 }
 
 void CmdTextEdit::setText(const QString& text, bool immediate) noexcept {
@@ -146,7 +145,7 @@ void CmdTextEdit::mirror(Qt::Orientation orientation, const Point& center,
 bool CmdTextEdit::performExecute() {
   performRedo();  // can throw
 
-  if (mNewLayerName != mOldLayerName) return true;
+  if (mNewLayer != mOldLayer) return true;
   if (mNewText != mOldText) return true;
   if (mNewPosition != mOldPosition) return true;
   if (mNewRotation != mOldRotation) return true;
@@ -156,7 +155,7 @@ bool CmdTextEdit::performExecute() {
 }
 
 void CmdTextEdit::performUndo() {
-  mText.setLayerName(mOldLayerName);
+  mText.setLayer(*mOldLayer);
   mText.setText(mOldText);
   mText.setPosition(mOldPosition);
   mText.setRotation(mOldRotation);
@@ -165,7 +164,7 @@ void CmdTextEdit::performUndo() {
 }
 
 void CmdTextEdit::performRedo() {
-  mText.setLayerName(mNewLayerName);
+  mText.setLayer(*mNewLayer);
   mText.setText(mNewText);
   mText.setPosition(mNewPosition);
   mText.setRotation(mNewRotation);

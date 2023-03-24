@@ -33,9 +33,10 @@
 namespace librepcb {
 
 class BI_Device;
-class Board;
 
 namespace editor {
+
+class BoardGraphicsScene;
 
 /*******************************************************************************
  *  Class CmdFlipSelectedBoardItems
@@ -47,7 +48,8 @@ namespace editor {
 class CmdFlipSelectedBoardItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  CmdFlipSelectedBoardItems(Board& board, Qt::Orientation orientation) noexcept;
+  CmdFlipSelectedBoardItems(BoardGraphicsScene& scene,
+                            Qt::Orientation orientation) noexcept;
   ~CmdFlipSelectedBoardItems() noexcept;
 
 private:
@@ -59,7 +61,7 @@ private:
   // Private Member Variables
 
   // Attributes from the constructor
-  Board& mBoard;
+  BoardGraphicsScene& mScene;
   Qt::Orientation mOrientation;
 };
 

@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../graphics/graphicslayername.h"
 #include "../serialization/serializableobjectlist.h"
 #include "../types/length.h"
 
@@ -33,6 +32,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Layer;
 
 /*******************************************************************************
  *  Class TraceAnchor
@@ -127,22 +128,21 @@ public:
   Trace() = delete;
   Trace(const Trace& other) noexcept;
   Trace(const Uuid& uuid, const Trace& other) noexcept;
-  Trace(const Uuid& uuid, const GraphicsLayerName& layer,
-        const PositiveLength& width, const TraceAnchor& start,
-        const TraceAnchor& end) noexcept;
+  Trace(const Uuid& uuid, const Layer& layer, const PositiveLength& width,
+        const TraceAnchor& start, const TraceAnchor& end) noexcept;
   explicit Trace(const SExpression& node);
   ~Trace() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
-  const GraphicsLayerName& getLayer() const noexcept { return mLayer; }
+  const Layer& getLayer() const noexcept { return *mLayer; }
   const PositiveLength& getWidth() const noexcept { return mWidth; }
   const TraceAnchor& getStartPoint() const noexcept { return mStart; }
   const TraceAnchor& getEndPoint() const noexcept { return mEnd; }
 
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;
-  bool setLayer(const GraphicsLayerName& layer) noexcept;
+  bool setLayer(const Layer& layer) noexcept;
   bool setWidth(const PositiveLength& width) noexcept;
   bool setStartPoint(const TraceAnchor& start) noexcept;
   bool setEndPoint(const TraceAnchor& end) noexcept;
@@ -163,7 +163,7 @@ public:
 
 private:  // Data
   Uuid mUuid;
-  GraphicsLayerName mLayer;
+  const Layer* mLayer;
   PositiveLength mWidth;
   TraceAnchor mStart;
   TraceAnchor mEnd;

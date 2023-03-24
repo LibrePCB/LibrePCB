@@ -28,6 +28,7 @@
 #include "../../../dialogs/polygonpropertiesdialog.h"
 #include "../../../dialogs/stroketextpropertiesdialog.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/polygongraphicsitem.h"
 #include "../../../library/pkg/footprintclipboarddata.h"
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
@@ -42,20 +43,25 @@
 #include "../../cmd/cmdreplacedevice.h"
 #include "../boardclipboarddatabuilder.h"
 #include "../boardeditor.h"
+#include "../boardgraphicsscene.h"
 #include "../boardplanepropertiesdialog.h"
+#include "../boardselectionquery.h"
 #include "../boardviapropertiesdialog.h"
 #include "../deviceinstancepropertiesdialog.h"
+#include "../graphicsitems/bgi_device.h"
+#include "../graphicsitems/bgi_hole.h"
+#include "../graphicsitems/bgi_netline.h"
+#include "../graphicsitems/bgi_netpoint.h"
+#include "../graphicsitems/bgi_plane.h"
+#include "../graphicsitems/bgi_stroketext.h"
+#include "../graphicsitems/bgi_via.h"
 
-#include <librepcb/core/graphics/polygongraphicsitem.h>
 #include <librepcb/core/import/dxfreader.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
-#include <librepcb/core/project/board/boardselectionquery.h>
-#include <librepcb/core/project/board/graphicsitems/bgi_plane.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
@@ -118,9 +124,9 @@ bool BoardEditorState_Select::exit() noexcept {
   if (!abortCommand(true)) return false;
 
   // Avoid propagating the selection to other, non-selectable tools, thus
-  // clearing the selection on *all* boards.
-  foreach (Board* board, mContext.project.getBoards()) {
-    board->clearSelection();
+  // clearing the selection.
+  if (BoardGraphicsScene* scene = getActiveBoardScene()) {
+    scene->clearSelection();
   }
 
   return true;
@@ -134,13 +140,12 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Board* board = getActiveBoard();
+  BoardGraphicsScene* scene = getActiveBoardScene();
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (board)) {
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (scene)) {
     try {
       // Ask for file path and import options.
-      DxfImportDialog dialog(getAllowedGeometryLayers(*board),
-                             GraphicsLayerName(GraphicsLayer::sBoardOutlines),
+      DxfImportDialog dialog(getAllowedGeometryLayers(), Layer::boardOutlines(),
                              true, getLengthUnit(),
                              "board_editor/dxf_import_dialog", parentWidget());
       FilePath fp = dialog.chooseFile();  // Opens the file chooser dialog.
@@ -168,10 +173,10 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       // Build board elements to import. ALthough this has nothing to do with
       // the clipboard, we use BoardClipboardData since it works very well :-)
       std::unique_ptr<BoardClipboardData> data(
-          new BoardClipboardData(board->getUuid(), Point(0, 0)));
+          new BoardClipboardData(scene->getBoard().getUuid(), Point(0, 0)));
       foreach (const auto& path, paths) {
         data->getPolygons().append(std::make_shared<Polygon>(
-            Uuid::createRandom(), dialog.getLayerName(), dialog.getLineWidth(),
+            Uuid::createRandom(), dialog.getLayer(), dialog.getLineWidth(),
             false, false, path));
       }
       for (const auto& circle : import.getCircles()) {
@@ -181,8 +186,8 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
               makeNonEmptyPath(circle.position), MaskConfig::automatic()));
         } else {
           data->getPolygons().append(std::make_shared<Polygon>(
-              Uuid::createRandom(), dialog.getLayerName(),
-              dialog.getLineWidth(), false, false,
+              Uuid::createRandom(), dialog.getLayer(), dialog.getLineWidth(),
+              false, false,
               Path::circle(circle.diameter).translated(circle.position)));
         }
       }
@@ -195,20 +200,14 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       // Shaw the layers of the imported objects, otherwise the user might
       // not even see these objects.
       if (!data->getHoles().isEmpty()) {
-        if (GraphicsLayer* layer = board->getLayerStack().getLayer(
-                GraphicsLayer::sBoardDrillsNpth)) {
-          layer->setVisible(true);
-        }
+        makeLayerVisible(Theme::Color::sBoardHoles);
       }
       if (!data->getPolygons().isEmpty()) {
-        if (GraphicsLayer* layer =
-                board->getLayerStack().getLayer(*dialog.getLayerName())) {
-          layer->setVisible(true);
-        }
+        makeLayerVisible(dialog.getLayer().getThemeColor());
       }
 
       // Start the paste tool.
-      return startPaste(*board, std::move(data),
+      return startPaste(*scene, std::move(data),
                         dialog.getPlacementPosition());  // can throw
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -225,8 +224,8 @@ bool BoardEditorState_Select::processSelectAll() noexcept {
     return false;
   }
 
-  if (Board* board = getActiveBoard()) {
-    board->selectAll();
+  if (BoardGraphicsScene* scene = getActiveBoardScene()) {
+    scene->selectAll();
     return true;
   } else {
     return false;
@@ -264,9 +263,9 @@ bool BoardEditorState_Select::processPaste() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Board* board = getActiveBoard();
+  BoardGraphicsScene* scene = getActiveBoardScene();
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (board)) {
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (scene)) {
     try {
       // Get board data from clipboard.
       std::unique_ptr<BoardClipboardData> data =
@@ -290,7 +289,7 @@ bool BoardEditorState_Select::processPaste() noexcept {
 
       // If there is something to paste, start the paste tool.
       if (data) {
-        return startPaste(*board, std::move(data), tl::nullopt);  // can throw
+        return startPaste(*scene, std::move(data), tl::nullopt);  // can throw
       }
     } catch (const Exception& e) {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -372,45 +371,59 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Board* board = getActiveBoard();
-  if ((!board) || mIsUndoCmdActive || mSelectedItemsDragCommand ||
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if ((!scene) || mIsUndoCmdActive || mSelectedItemsDragCommand ||
       mCmdPolygonEdit || mCmdPlaneEdit) {
     return false;
   }
 
-  std::unique_ptr<BoardSelectionQuery> query = board->createSelectionQuery();
-  query->addDeviceInstancesOfSelectedFootprints();
-  query->addSelectedVias();
-  query->addSelectedPlanes();
-  query->addSelectedPolygons();
-  query->addSelectedBoardStrokeTexts();
-  query->addSelectedFootprintStrokeTexts();
-  query->addSelectedHoles();
-  foreach (auto ptr, query->getDeviceInstances()) {
-    return openPropertiesDialog(ptr);
+  BoardSelectionQuery query(*scene);
+  query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedVias();
+  query.addSelectedPlanes();
+  query.addSelectedPolygons();
+  query.addSelectedBoardStrokeTexts();
+  query.addSelectedFootprintStrokeTexts();
+  query.addSelectedHoles();
+  foreach (auto ptr, query.getDeviceInstances()) {
+    openDevicePropertiesDialog(*ptr);
+    return true;
   }
-  foreach (auto ptr, query->getVias()) { return openPropertiesDialog(ptr); }
-  foreach (auto ptr, query->getPlanes()) { return openPropertiesDialog(ptr); }
-  foreach (auto ptr, query->getPolygons()) { return openPropertiesDialog(ptr); }
-  foreach (auto ptr, query->getStrokeTexts()) {
-    return openPropertiesDialog(ptr);
+  foreach (auto ptr, query.getVias()) {
+    openViaPropertiesDialog(*ptr);
+    return true;
   }
-  foreach (auto ptr, query->getHoles()) { return openPropertiesDialog(ptr); }
+  foreach (auto ptr, query.getPlanes()) {
+    openPlanePropertiesDialog(*ptr);
+    return true;
+  }
+  foreach (auto ptr, query.getPolygons()) {
+    openPolygonPropertiesDialog(ptr->getPolygon());
+    return true;
+  }
+  foreach (auto ptr, query.getStrokeTexts()) {
+    openStrokeTextPropertiesDialog(ptr->getTextObj());
+    return true;
+  }
+  foreach (auto ptr, query.getHoles()) {
+    openHolePropertiesDialog(ptr->getHole());
+    return true;
+  }
   return false;
 }
 
 bool BoardEditorState_Select::processAbortCommand() noexcept {
   abortCommand(true);
-  if (Board* board = getActiveBoard()) {
-    board->clearSelection();
+  if (BoardGraphicsScene* scene = getActiveBoardScene()) {
+    scene->clearSelection();
   }
   return true;
 }
 
 bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   if (mSelectedItemsDragCommand) {
     // Move selected elements to cursor position
@@ -444,7 +457,7 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     // Draw selection rectangle
     Point p1 = Point::fromPx(e.buttonDownScenePos(Qt::LeftButton));
     Point p2 = Point::fromPx(e.scenePos());
-    board->setSelectionRect(p1, p2, true);
+    scene->selectItemsInRect(p1, p2);
     return true;
   }
 
@@ -456,8 +469,8 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   if (mIsUndoCmdActive) {
     // Place pasted items
@@ -487,17 +500,17 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       return true;
     } else {
       // handle items selection
-      QList<BI_Base*> items =
+      QList<std::shared_ptr<QGraphicsItem>> items =
           findItemsAtPos(Point::fromPx(e.scenePos()),
                          FindFlag::All | FindFlag::AcceptNearMatch);
       if (items.isEmpty()) {
         // no items under mouse --> start drawing a selection rectangle
-        board->clearSelection();
+        scene->clearSelection();
         return true;
       }
 
       // Check if there's already an item selected.
-      BI_Base* selectedItem = nullptr;
+      std::shared_ptr<QGraphicsItem> selectedItem;
       foreach (auto item, items) {
         if (item->isSelected()) {
           selectedItem = item;
@@ -519,16 +532,16 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
         }
         Q_ASSERT((nextSelectionIndex >= 0) &&
                  (nextSelectionIndex < items.count()));
-        board->clearSelection();
+        scene->clearSelection();
         items[nextSelectionIndex]->setSelected(true);
       } else if (!selectedItem) {
         // Only select the topmost item when clicking an unselected item
         // without CTRL.
-        board->clearSelection();
+        scene->clearSelection();
         items.first()->setSelected(true);
       }
 
-      if (startMovingSelectedItems(*board, Point::fromPx(e.scenePos()))) {
+      if (startMovingSelectedItems(*scene, Point::fromPx(e.scenePos()))) {
         return true;
       }
     }
@@ -539,8 +552,8 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
 
 bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   if ((!mIsUndoCmdActive) && mSelectedItemsDragCommand) {
     // Stop moving items (set position of all selected elements permanent)
@@ -574,7 +587,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     mSelectedPlaneVertices.clear();
   } else {
     // Remove selection rectangle and keep the selection state of all items
-    board->setSelectionRect(Point(), Point(), false);
+    scene->clearSelectionRect();
     return true;
   }
 
@@ -594,7 +607,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
 
   if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     // Open the properties editor dialog of the selected item, if any.
-    const QList<BI_Base*> items = findItemsAtPos(
+    const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
         Point::fromPx(e.scenePos()), FindFlag::All | FindFlag::AcceptNearMatch);
     foreach (auto item, items) {
       if (item->isSelected() && openPropertiesDialog(item)) {
@@ -611,8 +624,8 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   if (mSelectedItemsDragCommand) {
     if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
@@ -621,22 +634,22 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
   } else if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
     // handle item selection
     Point pos = Point::fromPx(e.scenePos());
-    QList<BI_Base*> items =
+    QList<std::shared_ptr<QGraphicsItem>> items =
         findItemsAtPos(pos, FindFlag::All | FindFlag::AcceptNearMatch);
     if (items.isEmpty()) return false;
 
     // If the right-clicked element is part of an active selection, keep it
     // as-is. However, if it's not part of an active selection, clear the
     // selection and select the right-clicked element instead.
-    BI_Base* selectedItem = nullptr;
-    foreach (BI_Base* item, items) {
+    std::shared_ptr<QGraphicsItem> selectedItem;
+    foreach (auto item, items) {
       if (item->isSelected()) {
         selectedItem = item;
       }
     }
     if (!selectedItem) {
       selectedItem = items.first();
-      board->clearSelection();
+      scene->clearSelection();
       selectedItem->setSelected(true);
     }
     Q_ASSERT(selectedItem);
@@ -646,362 +659,327 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     QMenu menu;
     MenuBuilder mb(&menu);
     const EditorCommandSet& cmd = EditorCommandSet::instance();
-    switch (selectedItem->getType()) {
-      case BI_Base::Type_t::Device: {
-        BI_Device* device = dynamic_cast<BI_Device*>(selectedItem);
-        Q_ASSERT(device);
-        ComponentInstance& cmpInst = device->getComponentInstance();
-        const Point pos = device->getPosition();
+    if (auto device = std::dynamic_pointer_cast<BGI_Device>(selectedItem)) {
+      ComponentInstance& cmpInst = device->getDevice().getComponentInstance();
+      const Point pos = device->getDevice().getPosition();
+      mb.addAction(
+          cmd.properties.createAction(
+              &menu, this,
+              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+          MenuBuilder::Flag::DefaultAction);
+      mb.addSeparator();
+      mb.addAction(cmd.rotateCcw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+      mb.addAction(cmd.rotateCw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+      mb.addAction(cmd.flipHorizontal.createAction(
+          &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
+      mb.addAction(cmd.flipVertical.createAction(
+          &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
+      mb.addAction(cmd.remove.createAction(
+          &menu, this, [this]() { removeSelectedItems(); }));
+      mb.addSeparator();
+      QAction* aSnap = cmd.snapToGrid.createAction(
+          &menu, this, [this]() { snapSelectedItemsToGrid(); });
+      aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
+      mb.addAction(aSnap);
+      mb.addAction(cmd.deviceResetTextAll.createAction(
+          &menu, this, &BoardEditorState_Select::resetAllTextsOfSelectedItems));
+      mb.addSeparator();
 
-        // build the context menu
-        mb.addAction(
-            cmd.properties.createAction(
-                &menu, this,
-                [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
-            MenuBuilder::Flag::DefaultAction);
-        mb.addSeparator();
-        mb.addAction(cmd.rotateCcw.createAction(
-            &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
-        mb.addAction(cmd.rotateCw.createAction(
-            &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
-        mb.addAction(cmd.flipHorizontal.createAction(
-            &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
-        mb.addAction(cmd.flipVertical.createAction(
-            &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
-        mb.addAction(cmd.remove.createAction(
-            &menu, this, [this]() { removeSelectedItems(); }));
-        mb.addSeparator();
-        QAction* aSnap = cmd.snapToGrid.createAction(
-            &menu, this, [this]() { snapSelectedItemsToGrid(); });
-        aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
-        mb.addAction(aSnap);
-        mb.addAction(cmd.deviceResetTextAll.createAction(
-            &menu, this,
-            &BoardEditorState_Select::resetAllTextsOfSelectedItems));
-        mb.addSeparator();
-
-        QMenu* devMenu = mb.addSubMenu(&MenuBuilder::createChangeDeviceMenu);
-        foreach (const DeviceMenuItem& item, getDeviceMenuItems(cmpInst)) {
-          QAction* a = devMenu->addAction(item.icon, item.name);
-          a->setData(item.uuid.toStr());
-          if (item.uuid == device->getLibDevice().getUuid()) {
-            a->setCheckable(true);
-            a->setChecked(true);
-            a->setEnabled(false);
-          } else {
-            connect(a, &QAction::triggered, [this, board, device, item]() {
-              try {
-                CmdReplaceDevice* cmd =
-                    new CmdReplaceDevice(mContext.workspace, *board, *device,
-                                         item.uuid, tl::optional<Uuid>());
-                mContext.undoStack.execCmd(cmd);
-              } catch (const Exception& e) {
-                QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-              }
-            });
-          }
+      QMenu* devMenu = mb.addSubMenu(&MenuBuilder::createChangeDeviceMenu);
+      foreach (const DeviceMenuItem& item, getDeviceMenuItems(cmpInst)) {
+        QAction* a = devMenu->addAction(item.icon, item.name);
+        a->setData(item.uuid.toStr());
+        if (item.uuid == device->getDevice().getLibDevice().getUuid()) {
+          a->setCheckable(true);
+          a->setChecked(true);
+          a->setEnabled(false);
+        } else {
+          connect(a, &QAction::triggered, [this, scene, device, item]() {
+            try {
+              CmdReplaceDevice* cmd = new CmdReplaceDevice(
+                  mContext.workspace, scene->getBoard(), device->getDevice(),
+                  item.uuid, tl::optional<Uuid>());
+              mContext.undoStack.execCmd(cmd);
+            } catch (const Exception& e) {
+              QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+            }
+          });
         }
-        devMenu->setEnabled(!devMenu->isEmpty());
-
-        QMenu* fptMenu = mb.addSubMenu(&MenuBuilder::createChangeFootprintMenu);
-        for (const Footprint& footprint :
-             device->getLibPackage().getFootprints()) {
-          QAction* a = fptMenu->addAction(
-              fptMenu->icon(),
-              *footprint.getNames().value(mContext.project.getLocaleOrder()));
-          if (footprint.getUuid() == device->getLibFootprint().getUuid()) {
-            a->setCheckable(true);
-            a->setChecked(true);
-            a->setEnabled(false);
-          } else {
-            connect(a, &QAction::triggered,
-                    [this, board, device, &footprint]() {
-                      try {
-                        Uuid deviceUuid = device->getLibDevice().getUuid();
-                        CmdReplaceDevice* cmd = new CmdReplaceDevice(
-                            mContext.workspace, *board, *device, deviceUuid,
-                            footprint.getUuid());
-                        mContext.undoStack.execCmd(cmd);
-                      } catch (const Exception& e) {
-                        QMessageBox::critical(parentWidget(), tr("Error"),
-                                              e.getMsg());
-                      }
-                    });
-          }
-        }
-        fptMenu->setEnabled(!fptMenu->isEmpty());
-        break;
       }
+      devMenu->setEnabled(!devMenu->isEmpty());
 
-      case BI_Base::Type_t::NetLine: {
-        BI_NetLine* netline = dynamic_cast<BI_NetLine*>(selectedItem);
-        Q_ASSERT(netline);
-
-        mb.addAction(cmd.remove.createAction(
-            &menu, this, [this]() { removeSelectedItems(); }));
-        mb.addAction(
-            cmd.traceRemoveWhole.createAction(&menu, this, [this, netline]() {
-              netline->getNetSegment().setSelected(true);
-              removeSelectedItems();
-            }));
+      QMenu* fptMenu = mb.addSubMenu(&MenuBuilder::createChangeFootprintMenu);
+      for (const Footprint& footprint :
+           device->getDevice().getLibPackage().getFootprints()) {
+        QAction* a = fptMenu->addAction(
+            fptMenu->icon(),
+            *footprint.getNames().value(mContext.project.getLocaleOrder()));
+        if (footprint.getUuid() ==
+            device->getDevice().getLibFootprint().getUuid()) {
+          a->setCheckable(true);
+          a->setChecked(true);
+          a->setEnabled(false);
+        } else {
+          connect(a, &QAction::triggered, [this, scene, device, &footprint]() {
+            try {
+              Uuid deviceUuid = device->getDevice().getLibDevice().getUuid();
+              CmdReplaceDevice* cmd = new CmdReplaceDevice(
+                  mContext.workspace, scene->getBoard(), device->getDevice(),
+                  deviceUuid, footprint.getUuid());
+              mContext.undoStack.execCmd(cmd);
+            } catch (const Exception& e) {
+              QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+            }
+          });
+        }
+      }
+      fptMenu->setEnabled(!fptMenu->isEmpty());
+    } else if (auto netline =
+                   std::dynamic_pointer_cast<BGI_NetLine>(selectedItem)) {
+      mb.addAction(cmd.remove.createAction(
+          &menu, this, [this]() { removeSelectedItems(); }));
+      mb.addAction(cmd.traceRemoveWhole.createAction(
+          &menu, this, [this, scene, netline]() {
+            scene->selectNetSegment(netline->getNetLine().getNetSegment());
+            removeSelectedItems();
+          }));
+      mb.addSeparator();
+      mb.addAction(
+          cmd.traceSelectWhole.createAction(&menu, this, [scene, netline]() {
+            scene->selectNetSegment(netline->getNetLine().getNetSegment());
+          }));
+      mb.addSeparator();
+      mb.addAction(
+          cmd.traceMeasureLength.createAction(&menu, this, [this, netline]() {
+            netline->setSelected(true);
+            measureSelectedItems(netline->getNetLine());
+          }));
+    } else if (auto netpoint =
+                   std::dynamic_pointer_cast<BGI_NetPoint>(selectedItem)) {
+      const Point pos = netpoint->getNetPoint().getPosition();
+      mb.addAction(cmd.traceRemoveWhole.createAction(
+          &menu, this, [this, scene, netpoint]() {
+            scene->selectNetSegment(netpoint->getNetPoint().getNetSegment());
+            removeSelectedItems();
+          }));
+      mb.addSeparator();
+      mb.addAction(
+          cmd.traceSelectWhole.createAction(&menu, this, [scene, netpoint]() {
+            scene->selectNetSegment(netpoint->getNetPoint().getNetSegment());
+          }));
+      mb.addSeparator();
+      QAction* aSnap = cmd.snapToGrid.createAction(
+          &menu, this, [this]() { snapSelectedItemsToGrid(); });
+      aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
+      mb.addAction(aSnap);
+      if (!netpoint->getNetPoint().getNetLines().isEmpty()) {
         mb.addSeparator();
-        mb.addAction(cmd.traceSelectWhole.createAction(
-            &menu, this,
-            [netline]() { netline->getNetSegment().setSelected(true); }));
-        mb.addSeparator();
-        mb.addAction(
-            cmd.traceMeasureLength.createAction(&menu, this, [this, netline]() {
-              netline->setSelected(true);
+        BI_NetLine* netline = *netpoint->getNetPoint().getNetLines().begin();
+        mb.addAction(cmd.traceMeasureLength.createAction(
+            &menu, this, [this, scene, netline]() {
+              if (auto item = scene->getNetLines().value(netline)) {
+                item->setSelected(true);
+              }
               measureSelectedItems(*netline);
             }));
-        break;
       }
+    } else if (auto via = std::dynamic_pointer_cast<BGI_Via>(selectedItem)) {
+      const Point pos = via->getVia().getPosition();
+      mb.addAction(
+          cmd.properties.createAction(
+              &menu, this,
+              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+          MenuBuilder::Flag::DefaultAction);
+      mb.addSeparator();
+      mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
+        copySelectedItemsToClipboard();
+        removeSelectedItems();
+      }));
+      mb.addAction(cmd.clipboardCopy.createAction(
+          &menu, this, [this]() { copySelectedItemsToClipboard(); }));
+      mb.addAction(cmd.remove.createAction(
+          &menu, this, [this]() { removeSelectedItems(); }));
+      mb.addAction(
+          cmd.traceRemoveWhole.createAction(&menu, this, [this, scene, via]() {
+            scene->selectNetSegment(via->getVia().getNetSegment());
+            removeSelectedItems();
+          }));
+      mb.addSeparator();
+      mb.addAction(
+          cmd.traceSelectWhole.createAction(&menu, this, [scene, via]() {
+            scene->selectNetSegment(via->getVia().getNetSegment());
+          }));
+      mb.addSeparator();
+      QAction* aSnap = cmd.snapToGrid.createAction(
+          &menu, this, [this]() { snapSelectedItemsToGrid(); });
+      aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
+      mb.addAction(aSnap);
+    } else if (auto plane =
+                   std::dynamic_pointer_cast<BGI_Plane>(selectedItem)) {
+      int lineIndex = plane->getLineIndexAtPosition(pos);
+      QVector<int> vertices = plane->getVertexIndicesAtPosition(pos);
 
-      case BI_Base::Type_t::NetPoint: {
-        BI_NetPoint* netpoint = dynamic_cast<BI_NetPoint*>(selectedItem);
-        Q_ASSERT(netpoint);
-        const Point pos = netpoint->getPosition();
-
-        mb.addAction(
-            cmd.traceRemoveWhole.createAction(&menu, this, [this, netpoint]() {
-              netpoint->getNetSegment().setSelected(true);
-              removeSelectedItems();
-            }));
-        mb.addSeparator();
-        mb.addAction(cmd.traceSelectWhole.createAction(
-            &menu, this,
-            [netpoint]() { netpoint->getNetSegment().setSelected(true); }));
-        mb.addSeparator();
-        QAction* aSnap = cmd.snapToGrid.createAction(
-            &menu, this, [this]() { snapSelectedItemsToGrid(); });
-        aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
-        mb.addAction(aSnap);
-        if (!netpoint->getNetLines().isEmpty()) {
-          mb.addSeparator();
-          BI_NetLine* netline = *netpoint->getNetLines().begin();
-          mb.addAction(cmd.traceMeasureLength.createAction(
-              &menu, this, [this, netline]() {
-                netline->setSelected(true);
-                measureSelectedItems(*netline);
-              }));
-        }
-        break;
-      }
-
-      case BI_Base::Type_t::Via: {
-        BI_Via* via = dynamic_cast<BI_Via*>(selectedItem);
-        Q_ASSERT(via);
-        const Point pos = via->getPosition();
-
-        mb.addAction(
-            cmd.properties.createAction(
-                &menu, this,
-                [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
-            MenuBuilder::Flag::DefaultAction);
-        mb.addSeparator();
-        mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
-          copySelectedItemsToClipboard();
-          removeSelectedItems();
-        }));
-        mb.addAction(cmd.clipboardCopy.createAction(
-            &menu, this, [this]() { copySelectedItemsToClipboard(); }));
-        mb.addAction(cmd.remove.createAction(
-            &menu, this, [this]() { removeSelectedItems(); }));
-        mb.addAction(
-            cmd.traceRemoveWhole.createAction(&menu, this, [this, via]() {
-              via->getNetSegment().setSelected(true);
-              removeSelectedItems();
-            }));
-        mb.addSeparator();
-        mb.addAction(cmd.traceSelectWhole.createAction(
-            &menu, this, [via]() { via->getNetSegment().setSelected(true); }));
-        mb.addSeparator();
-        QAction* aSnap = cmd.snapToGrid.createAction(
-            &menu, this, [this]() { snapSelectedItemsToGrid(); });
-        aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
-        mb.addAction(aSnap);
-        break;
-      }
-
-      case BI_Base::Type_t::Plane: {
-        BI_Plane* plane = dynamic_cast<BI_Plane*>(selectedItem);
-        Q_ASSERT(plane);
-        int lineIndex = plane->getGraphicsItem().getLineIndexAtPosition(pos);
-        QVector<int> vertices =
-            plane->getGraphicsItem().getVertexIndicesAtPosition(pos);
-
-        mb.addAction(
-            cmd.properties.createAction(
-                &menu, this,
-                [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
-            MenuBuilder::Flag::DefaultAction);
-        mb.addSeparator();
-        if (!vertices.isEmpty()) {
-          QAction* action = cmd.vertexRemove.createAction(
-              &menu, this, [this, plane, vertices]() {
-                removePlaneVertices(*plane, vertices);
-              });
-          int remainingVertices =
-              plane->getOutline().getVertices().count() - vertices.count();
-          action->setEnabled(remainingVertices >= 2);
-          mb.addAction(action);
-        }
-        if (lineIndex >= 0) {
-          mb.addAction(cmd.vertexAdd.createAction(
-              &menu, this, [this, plane, lineIndex, pos]() {
-                startAddingPlaneVertex(*plane, lineIndex, pos);
-              }));
-        }
-        if ((lineIndex >= 0) || (!vertices.isEmpty())) {
-          mb.addSeparator();
-        }
-        mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
-          copySelectedItemsToClipboard();
-          removeSelectedItems();
-        }));
-        mb.addAction(cmd.clipboardCopy.createAction(
-            &menu, this, [this]() { copySelectedItemsToClipboard(); }));
-        mb.addAction(cmd.remove.createAction(
-            &menu, this, [this]() { removeSelectedItems(); }));
-        mb.addSeparator();
-        mb.addAction(cmd.rotateCcw.createAction(
-            &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
-        mb.addAction(cmd.rotateCw.createAction(
-            &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
-        mb.addAction(cmd.flipHorizontal.createAction(
-            &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
-        mb.addAction(cmd.flipVertical.createAction(
-            &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
-        mb.addSeparator();
-        QAction* aIsVisible =
-            cmd.visible.createAction(&menu, this, [plane](bool checked) {
-              // Visibility is not saved, thus no undo command is needed here.
-              plane->setVisible(checked);
+      mb.addAction(
+          cmd.properties.createAction(
+              &menu, this,
+              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+          MenuBuilder::Flag::DefaultAction);
+      mb.addSeparator();
+      if (!vertices.isEmpty()) {
+        QAction* action = cmd.vertexRemove.createAction(
+            &menu, this, [this, plane, vertices]() {
+              removePlaneVertices(plane->getPlane(), vertices);
             });
-        aIsVisible->setCheckable(true);
-        aIsVisible->setChecked(plane->isVisible());
-        mb.addAction(aIsVisible);
-        break;
+        int remainingVertices =
+            plane->getPlane().getOutline().getVertices().count() -
+            vertices.count();
+        action->setEnabled(remainingVertices >= 2);
+        mb.addAction(action);
       }
-
-      case BI_Base::Type_t::Polygon: {
-        BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(selectedItem);
-        Q_ASSERT(polygon);
-        int lineIndex = polygon->getGraphicsItem().getLineIndexAtPosition(pos);
-        QVector<int> vertices =
-            polygon->getGraphicsItem().getVertexIndicesAtPosition(pos);
-
-        mb.addAction(
-            cmd.properties.createAction(
-                &menu, this,
-                [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
-            MenuBuilder::Flag::DefaultAction);
-        mb.addSeparator();
-        if (!vertices.isEmpty()) {
-          QAction* action = cmd.vertexRemove.createAction(
-              &menu, this, [this, polygon, vertices]() {
-                removePolygonVertices(polygon->getPolygon(), vertices);
-              });
-          int remainingVertices =
-              polygon->getPolygon().getPath().getVertices().count() -
-              vertices.count();
-          action->setEnabled(remainingVertices >= 2);
-          mb.addAction(action);
-        }
-        if (lineIndex >= 0) {
-          mb.addAction(cmd.vertexAdd.createAction(
-              &menu, this, [this, polygon, lineIndex, pos]() {
-                startAddingPolygonVertex(*polygon, lineIndex, pos);
-              }));
-        }
-        if ((lineIndex >= 0) || (!vertices.isEmpty())) {
-          mb.addSeparator();
-        }
-        mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
-          copySelectedItemsToClipboard();
-          removeSelectedItems();
-        }));
-        mb.addAction(cmd.clipboardCopy.createAction(
-            &menu, this, [this]() { copySelectedItemsToClipboard(); }));
-        mb.addAction(cmd.remove.createAction(
-            &menu, this, [this]() { removeSelectedItems(); }));
-        mb.addSeparator();
-        mb.addAction(cmd.rotateCcw.createAction(
-            &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
-        mb.addAction(cmd.rotateCw.createAction(
-            &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
-        mb.addAction(cmd.flipHorizontal.createAction(
-            &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
-        mb.addAction(cmd.flipVertical.createAction(
-            &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
-        break;
+      if (lineIndex >= 0) {
+        mb.addAction(cmd.vertexAdd.createAction(
+            &menu, this, [this, plane, lineIndex, pos]() {
+              startAddingPlaneVertex(plane->getPlane(), lineIndex, pos);
+            }));
       }
-
-      case BI_Base::Type_t::StrokeText: {
-        BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(selectedItem);
-        Q_ASSERT(text);
-        const Point pos = text->getPosition();
-
-        mb.addAction(
-            cmd.properties.createAction(
-                &menu, this,
-                [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
-            MenuBuilder::Flag::DefaultAction);
+      if ((lineIndex >= 0) || (!vertices.isEmpty())) {
         mb.addSeparator();
-        mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
-          copySelectedItemsToClipboard();
-          removeSelectedItems();
-        }));
-        mb.addAction(cmd.clipboardCopy.createAction(
-            &menu, this, [this]() { copySelectedItemsToClipboard(); }));
-        mb.addAction(cmd.remove.createAction(
-            &menu, this, [this]() { removeSelectedItems(); }));
-        mb.addSeparator();
-        mb.addAction(cmd.rotateCcw.createAction(
-            &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
-        mb.addAction(cmd.rotateCw.createAction(
-            &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
-        mb.addAction(cmd.flipHorizontal.createAction(
-            &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
-        mb.addAction(cmd.flipVertical.createAction(
-            &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
-        mb.addSeparator();
-        QAction* aSnap = cmd.snapToGrid.createAction(
-            &menu, this, [this]() { snapSelectedItemsToGrid(); });
-        aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
-        mb.addAction(aSnap);
-        break;
       }
+      mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
+        copySelectedItemsToClipboard();
+        removeSelectedItems();
+      }));
+      mb.addAction(cmd.clipboardCopy.createAction(
+          &menu, this, [this]() { copySelectedItemsToClipboard(); }));
+      mb.addAction(cmd.remove.createAction(
+          &menu, this, [this]() { removeSelectedItems(); }));
+      mb.addSeparator();
+      mb.addAction(cmd.rotateCcw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+      mb.addAction(cmd.rotateCw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+      mb.addAction(cmd.flipHorizontal.createAction(
+          &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
+      mb.addAction(cmd.flipVertical.createAction(
+          &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
+      mb.addSeparator();
+      QAction* aIsVisible =
+          cmd.visible.createAction(&menu, this, [plane](bool checked) {
+            // Visibility is not saved, thus no undo command is needed here.
+            plane->setVisible(checked);
+          });
+      aIsVisible->setCheckable(true);
+      aIsVisible->setChecked(plane->isVisible());
+      mb.addAction(aIsVisible);
+    } else if (auto item = std::dynamic_pointer_cast<PolygonGraphicsItem>(
+                   selectedItem)) {
+      BI_Polygon* polygon =
+          scene->getBoard().getPolygons().value(item->getPolygon().getUuid());
+      if (!polygon) return false;
 
-      case BI_Base::Type_t::Hole: {
-        BI_Hole* hole = dynamic_cast<BI_Hole*>(selectedItem);
-        Q_ASSERT(hole);
-        const Point pos =
-            hole->getHole().getPath()->getVertices().first().getPos();
+      int lineIndex = item->getLineIndexAtPosition(pos);
+      QVector<int> vertices = item->getVertexIndicesAtPosition(pos);
 
-        mb.addAction(
-            cmd.properties.createAction(
-                &menu, this,
-                [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
-            MenuBuilder::Flag::DefaultAction);
-        mb.addSeparator();
-        mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
-          copySelectedItemsToClipboard();
-          removeSelectedItems();
-        }));
-        mb.addAction(cmd.clipboardCopy.createAction(
-            &menu, this, [this]() { copySelectedItemsToClipboard(); }));
-        mb.addAction(cmd.remove.createAction(
-            &menu, this, [this]() { removeSelectedItems(); }));
-        mb.addSeparator();
-        QAction* aSnap = cmd.snapToGrid.createAction(
-            &menu, this, [this]() { snapSelectedItemsToGrid(); });
-        aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
-        mb.addAction(aSnap);
-        break;
+      mb.addAction(
+          cmd.properties.createAction(
+              &menu, this,
+              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+          MenuBuilder::Flag::DefaultAction);
+      mb.addSeparator();
+      if (!vertices.isEmpty()) {
+        QAction* action = cmd.vertexRemove.createAction(
+            &menu, this, [this, polygon, vertices]() {
+              removePolygonVertices(polygon->getPolygon(), vertices);
+            });
+        int remainingVertices =
+            polygon->getPolygon().getPath().getVertices().count() -
+            vertices.count();
+        action->setEnabled(remainingVertices >= 2);
+        mb.addAction(action);
       }
-
-      default: { return false; }
+      if (lineIndex >= 0) {
+        mb.addAction(cmd.vertexAdd.createAction(
+            &menu, this, [this, polygon, lineIndex, pos]() {
+              startAddingPolygonVertex(*polygon, lineIndex, pos);
+            }));
+      }
+      if ((lineIndex >= 0) || (!vertices.isEmpty())) {
+        mb.addSeparator();
+      }
+      mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
+        copySelectedItemsToClipboard();
+        removeSelectedItems();
+      }));
+      mb.addAction(cmd.clipboardCopy.createAction(
+          &menu, this, [this]() { copySelectedItemsToClipboard(); }));
+      mb.addAction(cmd.remove.createAction(
+          &menu, this, [this]() { removeSelectedItems(); }));
+      mb.addSeparator();
+      mb.addAction(cmd.rotateCcw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+      mb.addAction(cmd.rotateCw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+      mb.addAction(cmd.flipHorizontal.createAction(
+          &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
+      mb.addAction(cmd.flipVertical.createAction(
+          &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
+    } else if (auto text =
+                   std::dynamic_pointer_cast<BGI_StrokeText>(selectedItem)) {
+      const Point pos = text->getStrokeText().getPosition();
+      mb.addAction(
+          cmd.properties.createAction(
+              &menu, this,
+              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+          MenuBuilder::Flag::DefaultAction);
+      mb.addSeparator();
+      mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
+        copySelectedItemsToClipboard();
+        removeSelectedItems();
+      }));
+      mb.addAction(cmd.clipboardCopy.createAction(
+          &menu, this, [this]() { copySelectedItemsToClipboard(); }));
+      mb.addAction(cmd.remove.createAction(
+          &menu, this, [this]() { removeSelectedItems(); }));
+      mb.addSeparator();
+      mb.addAction(cmd.rotateCcw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+      mb.addAction(cmd.rotateCw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+      mb.addAction(cmd.flipHorizontal.createAction(
+          &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
+      mb.addAction(cmd.flipVertical.createAction(
+          &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
+      mb.addSeparator();
+      QAction* aSnap = cmd.snapToGrid.createAction(
+          &menu, this, [this]() { snapSelectedItemsToGrid(); });
+      aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
+      mb.addAction(aSnap);
+    } else if (auto hole = std::dynamic_pointer_cast<BGI_Hole>(selectedItem)) {
+      const Point pos =
+          hole->getHole().getHole().getPath()->getVertices().first().getPos();
+      mb.addAction(
+          cmd.properties.createAction(
+              &menu, this,
+              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+          MenuBuilder::Flag::DefaultAction);
+      mb.addSeparator();
+      mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
+        copySelectedItemsToClipboard();
+        removeSelectedItems();
+      }));
+      mb.addAction(cmd.clipboardCopy.createAction(
+          &menu, this, [this]() { copySelectedItemsToClipboard(); }));
+      mb.addAction(cmd.remove.createAction(
+          &menu, this, [this]() { removeSelectedItems(); }));
+      mb.addSeparator();
+      QAction* aSnap = cmd.snapToGrid.createAction(
+          &menu, this, [this]() { snapSelectedItemsToGrid(); });
+      aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
+      mb.addAction(aSnap);
+    } else {
+      return false;
     }
 
     // execute the context menu
@@ -1023,20 +1001,20 @@ bool BoardEditorState_Select::processSwitchToBoard(int index) noexcept {
  ******************************************************************************/
 
 bool BoardEditorState_Select::startMovingSelectedItems(
-    Board& board, const Point& startPos) noexcept {
+    BoardGraphicsScene& scene, const Point& startPos) noexcept {
   Q_ASSERT(mSelectedItemsDragCommand.isNull());
   mSelectedItemsDragCommand.reset(
-      new CmdDragSelectedBoardItems(board, startPos));
+      new CmdDragSelectedBoardItems(scene, startPos));
   return true;
 }
 
 bool BoardEditorState_Select::moveSelectedItems(const Point& delta) noexcept {
-  Board* board = getActiveBoard();
-  if ((!board) || (mSelectedItemsDragCommand)) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if ((!scene) || (mSelectedItemsDragCommand)) return false;
 
   try {
     QScopedPointer<CmdDragSelectedBoardItems> cmd(
-        new CmdDragSelectedBoardItems(*board, Point(0, 0)));
+        new CmdDragSelectedBoardItems(*scene, Point(0, 0)));
     cmd->setCurrentPosition(delta);
     return execCmd(cmd.take());
   } catch (const Exception& e) {
@@ -1046,15 +1024,15 @@ bool BoardEditorState_Select::moveSelectedItems(const Point& delta) noexcept {
 }
 
 bool BoardEditorState_Select::rotateSelectedItems(const Angle& angle) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   try {
     if (mSelectedItemsDragCommand) {
       mSelectedItemsDragCommand->rotate(angle, true);
     } else {
       QScopedPointer<CmdDragSelectedBoardItems> cmd(
-          new CmdDragSelectedBoardItems(*board));
+          new CmdDragSelectedBoardItems(*scene));
       cmd->rotate(angle, false);
       mContext.undoStack.execCmd(cmd.take());
     }
@@ -1067,12 +1045,12 @@ bool BoardEditorState_Select::rotateSelectedItems(const Angle& angle) noexcept {
 
 bool BoardEditorState_Select::flipSelectedItems(
     Qt::Orientation orientation) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   try {
     CmdFlipSelectedBoardItems* cmd =
-        new CmdFlipSelectedBoardItems(*board, orientation);
+        new CmdFlipSelectedBoardItems(*scene, orientation);
     mContext.undoStack.execCmd(cmd);
     return true;
   } catch (const Exception& e) {
@@ -1082,12 +1060,12 @@ bool BoardEditorState_Select::flipSelectedItems(
 }
 
 bool BoardEditorState_Select::snapSelectedItemsToGrid() noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   try {
     QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
-        new CmdDragSelectedBoardItems(*board));
+        new CmdDragSelectedBoardItems(*scene));
     cmdMove->snapToGrid();
     mContext.undoStack.execCmd(cmdMove.take());
     return true;
@@ -1098,12 +1076,12 @@ bool BoardEditorState_Select::snapSelectedItemsToGrid() noexcept {
 }
 
 bool BoardEditorState_Select::resetAllTextsOfSelectedItems() noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   try {
     QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
-        new CmdDragSelectedBoardItems(*board));
+        new CmdDragSelectedBoardItems(*scene));
     cmdMove->resetAllTexts();
     mContext.undoStack.execCmd(cmdMove.take());
     return true;
@@ -1114,11 +1092,11 @@ bool BoardEditorState_Select::resetAllTextsOfSelectedItems() noexcept {
 }
 
 bool BoardEditorState_Select::removeSelectedItems() noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   try {
-    CmdRemoveSelectedBoardItems* cmd = new CmdRemoveSelectedBoardItems(*board);
+    CmdRemoveSelectedBoardItems* cmd = new CmdRemoveSelectedBoardItems(*scene);
     mContext.undoStack.execCmd(cmd);
     return true;
   } catch (const Exception& e) {
@@ -1216,13 +1194,13 @@ void BoardEditorState_Select::startAddingPlaneVertex(
 }
 
 bool BoardEditorState_Select::copySelectedItemsToClipboard() noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   try {
     Point cursorPos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
         QCursor::pos(), true, false);
-    BoardClipboardDataBuilder builder(*board);
+    BoardClipboardDataBuilder builder(*scene);
     std::unique_ptr<BoardClipboardData> data = builder.generate(cursorPos);
     qApp->clipboard()->setMimeData(data->toMimeData().release());
   } catch (const Exception& e) {
@@ -1232,12 +1210,12 @@ bool BoardEditorState_Select::copySelectedItemsToClipboard() noexcept {
 }
 
 bool BoardEditorState_Select::startPaste(
-    Board& board, std::unique_ptr<BoardClipboardData> data,
+    BoardGraphicsScene& scene, std::unique_ptr<BoardClipboardData> data,
     const tl::optional<Point>& fixedPosition) {
   Q_ASSERT(data);
 
   // Start undo command group.
-  board.clearSelection();
+  scene.clearSelection();
   mContext.undoStack.beginCmdGroup(tr("Paste board elements"));
   mIsUndoCmdActive = true;
 
@@ -1248,7 +1226,7 @@ bool BoardEditorState_Select::startPaste(
       ? (*fixedPosition)
       : (startPos - data->getCursorPos()).mappedToGrid(getGridInterval());
   bool addedSomething = mContext.undoStack.appendToCmdGroup(
-      new CmdPasteBoardItems(board, std::move(data), offset));  // can throw
+      new CmdPasteBoardItems(scene, std::move(data), offset));  // can throw
 
   if (addedSomething) {
     if (fixedPosition) {
@@ -1258,7 +1236,7 @@ bool BoardEditorState_Select::startPaste(
     } else {
       // Start moving the selected items.
       mSelectedItemsDragCommand.reset(
-          new CmdDragSelectedBoardItems(board, startPos));  // can throw
+          new CmdDragSelectedBoardItems(scene, startPos));  // can throw
     }
     return true;
   } else {
@@ -1301,13 +1279,13 @@ bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
 
 bool BoardEditorState_Select::findPolygonVerticesAtPosition(
     const Point& pos) noexcept {
-  if (Board* board = getActiveBoard()) {
-    foreach (BI_Polygon* polygon, board->getPolygons()) {
-      if (polygon->isSelected()) {
-        mSelectedPolygonVertices =
-            polygon->getGraphicsItem().getVertexIndicesAtPosition(pos);
+  if (BoardGraphicsScene* scene = getActiveBoardScene()) {
+    for (auto it = scene->getPolygons().begin();
+         it != scene->getPolygons().end(); it++) {
+      if (it.value()->isSelected()) {
+        mSelectedPolygonVertices = it.value()->getVertexIndicesAtPosition(pos);
         if (!mSelectedPolygonVertices.isEmpty()) {
-          mSelectedPolygon = polygon;
+          mSelectedPolygon = it.key();
           return true;
         }
       }
@@ -1321,13 +1299,13 @@ bool BoardEditorState_Select::findPolygonVerticesAtPosition(
 
 bool BoardEditorState_Select::findPlaneVerticesAtPosition(
     const Point& pos) noexcept {
-  if (Board* board = getActiveBoard()) {
-    foreach (BI_Plane* plane, board->getPlanes()) {
-      if (plane->isSelected()) {
-        mSelectedPlaneVertices =
-            plane->getGraphicsItem().getVertexIndicesAtPosition(pos);
+  if (BoardGraphicsScene* scene = getActiveBoardScene()) {
+    for (auto it = scene->getPlanes().begin(); it != scene->getPlanes().end();
+         it++) {
+      if (it.value()->isSelected()) {
+        mSelectedPlaneVertices = it.value()->getVertexIndicesAtPosition(pos);
         if (!mSelectedPlaneVertices.isEmpty()) {
-          mSelectedPlane = plane;
+          mSelectedPlane = it.key();
           return true;
         }
       }
@@ -1341,10 +1319,8 @@ bool BoardEditorState_Select::findPlaneVerticesAtPosition(
 
 bool BoardEditorState_Select::measureSelectedItems(
     const BI_NetLine& netline) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
-  Q_ASSERT(netline.isSelected());
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   // Store UUIDs of visited netlines
   QSet<Uuid> visitedNetLines;
@@ -1354,9 +1330,9 @@ bool BoardEditorState_Select::measureSelectedItems(
   // direction, then in the other direction.
   UnsignedLength totalLength = netline.getLength();
   try {
-    measureLengthInDirection(false, netline, visitedNetLines,
+    measureLengthInDirection(*scene, false, netline, visitedNetLines,
                              totalLength);  // can throw
-    measureLengthInDirection(true, netline, visitedNetLines,
+    measureLengthInDirection(*scene, true, netline, visitedNetLines,
                              totalLength);  // can throw
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1364,9 +1340,9 @@ bool BoardEditorState_Select::measureSelectedItems(
   }
 
   // Query the total number of selected netlines
-  auto query = board->createSelectionQuery();
-  query->addSelectedNetLines();
-  int totalSelectedNetlines = query->getNetLines().size();
+  BoardSelectionQuery query(*scene);
+  query.addSelectedNetLines();
+  int totalSelectedNetlines = query.getNetLines().size();
 
   // Show result
   QLocale locale;
@@ -1390,20 +1366,22 @@ bool BoardEditorState_Select::measureSelectedItems(
 }
 
 void BoardEditorState_Select::measureLengthInDirection(
-    bool directionBackwards, const BI_NetLine& netline,
-    QSet<Uuid>& visitedNetLines, UnsignedLength& totalLength) {
+    BoardGraphicsScene& scene, bool directionBackwards,
+    const BI_NetLine& netline, QSet<Uuid>& visitedNetLines,
+    UnsignedLength& totalLength) {
   const BI_NetLineAnchor* currentAnchor =
       directionBackwards ? &netline.getStartPoint() : &netline.getEndPoint();
 
   for (;;) {
     const BI_NetLine* nextNetline = nullptr;
-    for (const BI_NetLine* nl : currentAnchor->getNetLines()) {
+    for (BI_NetLine* nl : currentAnchor->getNetLines()) {
       // Don't visit a netline twice
       if (visitedNetLines.contains(nl->getUuid())) {
         continue;
       }
       // Only visit selected netlines
-      if (nl->isSelected()) {
+      BGI_NetLine* item = scene.getNetLines().value(nl).get();
+      if (item && item->isSelected()) {
         if (nextNetline != nullptr) {
           // There's already another connected and selected netline
           throw LogicError(__FILE__, __LINE__,
@@ -1423,49 +1401,27 @@ void BoardEditorState_Select::measureLengthInDirection(
   }
 }
 
-bool BoardEditorState_Select::openPropertiesDialog(BI_Base* item) {
-  Board* board = getActiveBoard();
-  if ((!board) || (!item)) return false;
-
-  switch (item->getType()) {
-    case BI_Base::Type_t::Device: {
-      BI_Device* device = dynamic_cast<BI_Device*>(item);
-      Q_ASSERT(device);
-      openDevicePropertiesDialog(*device);
-      return true;
-    }
-    case BI_Base::Type_t::Via: {
-      BI_Via* via = dynamic_cast<BI_Via*>(item);
-      Q_ASSERT(via);
-      openViaPropertiesDialog(*via);
-      return true;
-    }
-    case BI_Base::Type_t::Plane: {
-      BI_Plane* plane = dynamic_cast<BI_Plane*>(item);
-      Q_ASSERT(plane);
-      openPlanePropertiesDialog(*plane);
-      return true;
-    }
-    case BI_Base::Type_t::Polygon: {
-      BI_Polygon* polygon = dynamic_cast<BI_Polygon*>(item);
-      Q_ASSERT(polygon);
-      openPolygonPropertiesDialog(*board, polygon->getPolygon());
-      return true;
-    }
-    case BI_Base::Type_t::StrokeText: {
-      BI_StrokeText* text = dynamic_cast<BI_StrokeText*>(item);
-      Q_ASSERT(text);
-      openStrokeTextPropertiesDialog(*board, text->getText());
-      return true;
-    }
-    case BI_Base::Type_t::Hole: {
-      BI_Hole* hole = dynamic_cast<BI_Hole*>(item);
-      Q_ASSERT(hole);
-      openHolePropertiesDialog(*board, hole->getHole());
-      return true;
-    }
-    default:
-      break;
+bool BoardEditorState_Select::openPropertiesDialog(
+    std::shared_ptr<QGraphicsItem> item) {
+  if (auto device = std::dynamic_pointer_cast<BGI_Device>(item)) {
+    openDevicePropertiesDialog(device->getDevice());
+    return true;
+  } else if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
+    openViaPropertiesDialog(via->getVia());
+    return true;
+  } else if (auto plane = std::dynamic_pointer_cast<BGI_Plane>(item)) {
+    openPlanePropertiesDialog(plane->getPlane());
+    return true;
+  } else if (auto polygon =
+                 std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
+    openPolygonPropertiesDialog(polygon->getPolygon());
+    return true;
+  } else if (auto text = std::dynamic_pointer_cast<BGI_StrokeText>(item)) {
+    openStrokeTextPropertiesDialog(text->getStrokeText().getTextObj());
+    return true;
+  } else if (auto hole = std::dynamic_pointer_cast<BGI_Hole>(item)) {
+    openHolePropertiesDialog(hole->getHole().getHole());
+    return true;
   }
   return false;
 }
@@ -1504,26 +1460,22 @@ void BoardEditorState_Select::openPlanePropertiesDialog(
 }
 
 void BoardEditorState_Select::openPolygonPropertiesDialog(
-    Board& board, Polygon& polygon) noexcept {
+    Polygon& polygon) noexcept {
   PolygonPropertiesDialog dialog(
-      polygon, mContext.undoStack, getAllowedGeometryLayers(board),
-      getLengthUnit(), "board_editor/polygon_properties_dialog",
-      parentWidget());
+      polygon, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
+      "board_editor/polygon_properties_dialog", parentWidget());
   dialog.exec();
 }
 
 void BoardEditorState_Select::openStrokeTextPropertiesDialog(
-    Board& board, StrokeText& text) noexcept {
+    StrokeText& text) noexcept {
   StrokeTextPropertiesDialog dialog(
-      text, mContext.undoStack, getAllowedGeometryLayers(board),
-      getLengthUnit(), "board_editor/stroke_text_properties_dialog",
-      parentWidget());
+      text, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
+      "board_editor/stroke_text_properties_dialog", parentWidget());
   dialog.exec();
 }
 
-void BoardEditorState_Select::openHolePropertiesDialog(Board& board,
-                                                       Hole& hole) noexcept {
-  Q_UNUSED(board);
+void BoardEditorState_Select::openHolePropertiesDialog(Hole& hole) noexcept {
   HolePropertiesDialog dialog(hole, mContext.undoStack, getLengthUnit(),
                               "board_editor/hole_properties_dialog",
                               parentWidget());

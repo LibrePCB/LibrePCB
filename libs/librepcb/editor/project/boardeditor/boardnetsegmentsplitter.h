@@ -35,7 +35,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsLayer;
+class Layer;
 
 namespace editor {
 
@@ -74,7 +74,7 @@ public:
 
 private:  // Methods
   TraceAnchor replaceAnchor(const TraceAnchor& anchor,
-                            const GraphicsLayerName& layer) noexcept;
+                            const Layer& layer) noexcept;
   void findConnectedLinesAndPoints(const TraceAnchor& anchor,
                                    ViaList& availableVias,
                                    TraceList& availableTraces, Segment& segment)
@@ -87,7 +87,7 @@ private:  // Data
   TraceList mTraces;
 
   QHash<TraceAnchor, Point> mAnchorsToReplace;
-  QHash<QPair<TraceAnchor, GraphicsLayerName>, TraceAnchor> mReplacedAnchors;
+  QHash<QPair<TraceAnchor, const Layer*>, TraceAnchor> mReplacedAnchors;
 };
 
 /*******************************************************************************

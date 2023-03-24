@@ -38,7 +38,6 @@
 namespace librepcb {
 
 class Angle;
-class IF_GraphicsLayerProvider;
 class LibraryBaseElement;
 class Point;
 class Point;
@@ -47,6 +46,7 @@ class Workspace;
 namespace editor {
 
 class ExclusiveActionGroup;
+class IF_GraphicsLayerProvider;
 class StatusBar;
 class ToolBarProxy;
 class UndoStackActionGroup;

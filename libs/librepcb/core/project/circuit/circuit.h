@@ -95,7 +95,6 @@ public:
   void removeNetSignal(NetSignal& netsignal);
   void setNetSignalName(NetSignal& netsignal, const CircuitIdentifier& newName,
                         bool isAutoName);
-  void setHighlightedNetSignal(NetSignal* signal) noexcept;
 
   // ComponentInstance Methods
   QString generateAutoComponentInstanceName(

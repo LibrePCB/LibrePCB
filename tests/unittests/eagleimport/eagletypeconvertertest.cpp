@@ -21,10 +21,10 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 #include <librepcb/core/library/sym/symbolpin.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/types/point.h>
 #include <librepcb/eagleimport/eagletypeconverter.h>
 #include <parseagle/common/domelement.h>
@@ -89,10 +89,10 @@ TEST_F(EagleTypeConverterTest, testConvertPinOrPadName) {
 }
 
 TEST_F(EagleTypeConverterTest, testConvertLayer) {
-  EXPECT_EQ(std::string(GraphicsLayer::sTopCopper),
-            C::convertLayer(1)->toStdString());
-  EXPECT_EQ(std::string(GraphicsLayer::sSymbolOutlines),
-            C::convertLayer(94)->toStdString());
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            C::convertLayer(1).getId().toStdString());
+  EXPECT_EQ(Layer::symbolOutlines().getId().toStdString(),
+            C::convertLayer(94).getId().toStdString());
   EXPECT_THROW(C::convertLayer(999), Exception);
 }
 
@@ -142,8 +142,8 @@ TEST_F(EagleTypeConverterTest, testConvertWire) {
   QString xml =
       "<wire x1=\"1\" y1=\"2\" x2=\"3\" y2=\"4\" width=\"0.254\" layer=\"1\"/>";
   auto out = C::convertWire(parseagle::Wire(dom(xml)));
-  EXPECT_EQ(std::string(GraphicsLayer::sTopCopper),
-            out->getLayerName()->toStdString());
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            out->getLayer().getId().toStdString());
   EXPECT_EQ(UnsignedLength(254000), out->getLineWidth());
   EXPECT_EQ(false, out->isFilled());
   EXPECT_EQ(false, out->isGrabArea());
@@ -157,8 +157,8 @@ TEST_F(EagleTypeConverterTest, testConvertWire) {
 TEST_F(EagleTypeConverterTest, testConvertRectangle) {
   QString xml = "<rectangle x1=\"1\" y1=\"2\" x2=\"4\" y2=\"3\" layer=\"1\"/>";
   auto out = C::convertRectangle(parseagle::Rectangle(dom(xml)), true);
-  EXPECT_EQ(std::string(GraphicsLayer::sTopCopper),
-            out->getLayerName()->toStdString());
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            out->getLayer().getId().toStdString());
   EXPECT_EQ(UnsignedLength(0), out->getLineWidth());
   EXPECT_EQ(true, out->isFilled());  // EAGLE rectangles are always filled.
   EXPECT_EQ(true, out->isGrabArea());  // Passed to function under test.
@@ -177,8 +177,8 @@ TEST_F(EagleTypeConverterTest, testConvertRectangleRotated) {
       "<rectangle x1=\"1\" y1=\"2\" x2=\"4\" y2=\"3\" layer=\"1\" "
       "rot=\"R90\"/>";
   auto out = C::convertRectangle(parseagle::Rectangle(dom(xml)), false);
-  EXPECT_EQ(std::string(GraphicsLayer::sTopCopper),
-            out->getLayerName()->toStdString());
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            out->getLayer().getId().toStdString());
   EXPECT_EQ(UnsignedLength(0), out->getLineWidth());
   EXPECT_EQ(true, out->isFilled());  // EAGLE rectangles are always filled.
   EXPECT_EQ(false, out->isGrabArea());  // Passed to function under test.
@@ -199,8 +199,8 @@ TEST_F(EagleTypeConverterTest, testConvertPolygon) {
       "<vertex x=\"3\" y=\"4\"/>"
       "</polygon>";
   auto out = C::convertPolygon(parseagle::Polygon(dom(xml)), false);
-  EXPECT_EQ(std::string(GraphicsLayer::sTopCopper),
-            out->getLayerName()->toStdString());
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            out->getLayer().getId().toStdString());
   EXPECT_EQ(UnsignedLength(2540000), out->getLineWidth());
   EXPECT_EQ(true, out->isFilled());  // EAGLE polygons are always filled.
   EXPECT_EQ(false, out->isGrabArea());  // Passed to function under test.
@@ -216,8 +216,8 @@ TEST_F(EagleTypeConverterTest, testConvertCircle) {
   QString xml =
       "<circle x=\"1\" y=\"2\" radius=\"3.5\" width=\"0.254\" layer=\"1\"/>";
   auto out = C::convertCircle(parseagle::Circle(dom(xml)), true);
-  EXPECT_EQ(std::string(GraphicsLayer::sTopCopper),
-            out->getLayerName()->toStdString());
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            out->getLayer().getId().toStdString());
   EXPECT_EQ(UnsignedLength(254000), out->getLineWidth());
   EXPECT_EQ(false, out->isFilled());  // Not filled if line width != 0.
   EXPECT_EQ(true, out->isGrabArea());  // Passed to function under test.
@@ -229,8 +229,8 @@ TEST_F(EagleTypeConverterTest, testConvertCircleFilled) {
   QString xml =
       "<circle x=\"1\" y=\"2\" radius=\"3.5\" width=\"0\" layer=\"1\"/>";
   auto out = C::convertCircle(parseagle::Circle(dom(xml)), false);
-  EXPECT_EQ(std::string(GraphicsLayer::sTopCopper),
-            out->getLayerName()->toStdString());
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            out->getLayer().getId().toStdString());
   EXPECT_EQ(UnsignedLength(0), out->getLineWidth());
   EXPECT_EQ(true, out->isFilled());  // Filled if line width == 0.
   EXPECT_EQ(false, out->isGrabArea());  // Passed to function under test.
@@ -257,8 +257,8 @@ TEST_F(EagleTypeConverterTest, testConvertTextValue) {
 TEST_F(EagleTypeConverterTest, testConvertSchematicText) {
   QString xml = "<text x=\"1\" y=\"2\" size=\"3\" layer=\"1\">foo\nbar</text>";
   auto out = C::convertSchematicText(parseagle::Text(dom(xml)));
-  EXPECT_EQ(std::string(GraphicsLayer::sTopCopper),
-            out->getLayerName()->toStdString());
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            out->getLayer().getId().toStdString());
   EXPECT_EQ(Point(1000000, 2000000), out->getPosition());
   EXPECT_EQ(Angle(0), out->getRotation());
   EXPECT_EQ(PositiveLength(2500000), out->getHeight());  // Default (hardcoded).
@@ -270,8 +270,8 @@ TEST_F(EagleTypeConverterTest, testConvertSchematicText) {
 TEST_F(EagleTypeConverterTest, testConvertBoardText) {
   QString xml = "<text x=\"1\" y=\"2\" size=\"3\" layer=\"1\">&gt;NAME</text>";
   auto out = C::convertBoardText(parseagle::Text(dom(xml)));
-  EXPECT_EQ(std::string(GraphicsLayer::sTopCopper),
-            out->getLayerName()->toStdString());
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            out->getLayer().getId().toStdString());
   EXPECT_EQ(Point(1000000, 2000000), out->getPosition());
   EXPECT_EQ(Angle(0), out->getRotation());
   EXPECT_EQ(PositiveLength(1000000), out->getHeight());  // Default (hardcoded).

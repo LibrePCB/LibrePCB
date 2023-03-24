@@ -36,7 +36,7 @@ namespace librepcb {
 Circle::Circle(const Circle& other) noexcept
   : onEdited(*this),
     mUuid(other.mUuid),
-    mLayerName(other.mLayerName),
+    mLayer(other.mLayer),
     mLineWidth(other.mLineWidth),
     mIsFilled(other.mIsFilled),
     mIsGrabArea(other.mIsGrabArea),
@@ -48,12 +48,12 @@ Circle::Circle(const Uuid& uuid, const Circle& other) noexcept : Circle(other) {
   mUuid = uuid;
 }
 
-Circle::Circle(const Uuid& uuid, const GraphicsLayerName& layerName,
+Circle::Circle(const Uuid& uuid, const Layer& layer,
                const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
                const Point& center, const PositiveLength& diameter) noexcept
   : onEdited(*this),
     mUuid(uuid),
-    mLayerName(layerName),
+    mLayer(&layer),
     mLineWidth(lineWidth),
     mIsFilled(fill),
     mIsGrabArea(isGrabArea),
@@ -64,7 +64,7 @@ Circle::Circle(const Uuid& uuid, const GraphicsLayerName& layerName,
 Circle::Circle(const SExpression& node)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+    mLayer(deserialize<const Layer*>(node.getChild("layer/@0"))),
     mLineWidth(deserialize<UnsignedLength>(node.getChild("width/@0"))),
     mIsFilled(deserialize<bool>(node.getChild("fill/@0"))),
     mIsGrabArea(deserialize<bool>(node.getChild("grab_area/@0"))),
@@ -79,13 +79,13 @@ Circle::~Circle() noexcept {
  *  Setters
  ******************************************************************************/
 
-bool Circle::setLayerName(const GraphicsLayerName& name) noexcept {
-  if (name == mLayerName) {
+bool Circle::setLayer(const Layer& layer) noexcept {
+  if (&layer == mLayer) {
     return false;
   }
 
-  mLayerName = name;
-  onEdited.notify(Event::LayerNameChanged);
+  mLayer = &layer;
+  onEdited.notify(Event::LayerChanged);
   return true;
 }
 
@@ -145,7 +145,7 @@ bool Circle::setDiameter(const PositiveLength& dia) noexcept {
 
 void Circle::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName);
+  root.appendChild("layer", *mLayer);
   root.ensureLineBreak();
   root.appendChild("width", mLineWidth);
   root.appendChild("fill", mIsFilled);
@@ -161,7 +161,7 @@ void Circle::serialize(SExpression& root) const {
 
 bool Circle::operator==(const Circle& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
-  if (mLayerName != rhs.mLayerName) return false;
+  if (mLayer != rhs.mLayer) return false;
   if (mLineWidth != rhs.mLineWidth) return false;
   if (mIsFilled != rhs.mIsFilled) return false;
   if (mIsGrabArea != rhs.mIsGrabArea) return false;
@@ -175,7 +175,7 @@ Circle& Circle::operator=(const Circle& rhs) noexcept {
     mUuid = rhs.mUuid;
     onEdited.notify(Event::UuidChanged);
   }
-  setLayerName(rhs.mLayerName);
+  setLayer(*rhs.mLayer);
   setLineWidth(rhs.mLineWidth);
   setIsFilled(rhs.mIsFilled);
   setIsGrabArea(rhs.mIsGrabArea);

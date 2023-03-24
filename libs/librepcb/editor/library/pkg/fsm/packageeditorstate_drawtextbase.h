@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "packageeditorstate.h"
 
-#include <librepcb/core/graphics/graphicslayername.h>
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/length.h>
@@ -41,14 +40,15 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Layer;
 class StrokeText;
-class StrokeTextGraphicsItem;
 
 namespace editor {
 
 class CmdStrokeTextEdit;
 class GraphicsLayerComboBox;
 class HAlignActionGroup;
+class StrokeTextGraphicsItem;
 class VAlignActionGroup;
 
 /*******************************************************************************
@@ -99,7 +99,7 @@ private:  // Methods
   bool finishAddText(const Point& pos) noexcept;
   bool abortAddText() noexcept;
   void resetToDefaultParameters() noexcept;
-  void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
+  void layerComboBoxValueChanged(const Layer& layer) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
   void strokeWidthEditValueChanged(const UnsignedLength& value) noexcept;
   void textComboBoxValueChanged(const QString& value) noexcept;
@@ -117,7 +117,7 @@ private:  // Types / Data
   QPointer<VAlignActionGroup> mVAlignActionGroup;
 
   // parameter memory
-  GraphicsLayerName mLastLayerName;
+  const Layer* mLastLayer;
   Angle mLastRotation;
   PositiveLength mLastHeight;
   UnsignedLength mLastStrokeWidth;

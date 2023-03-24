@@ -32,7 +32,6 @@
 #include "board/board.h"
 #include "board/boarddesignrules.h"
 #include "board/boardfabricationoutputsettings.h"
-#include "board/boardlayerstack.h"
 #include "board/drc/boarddesignrulechecksettings.h"
 #include "board/items/bi_device.h"
 #include "board/items/bi_footprintpad.h"
@@ -531,7 +530,7 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
       deserialize<PositiveLength>(root.getChild("grid/interval/@0")));
   board->setGridUnit(deserialize<LengthUnit>(root.getChild("grid/unit/@0")));
   board->setDefaultFontName(root.getChild("default_font/@0").getValue());
-  board->getLayerStack().setInnerLayerCount(
+  board->setInnerLayerCount(
       deserialize<uint>(root.getChild("layers/inner/@0")));
   board->setDesignRules(BoardDesignRules(root.getChild("design_rules")));
   {
@@ -685,16 +684,11 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
       }
       return anchor;
     };
-    const QString layerName = child->getChild("layer/@0").getValue();
-    GraphicsLayer* layer = b.getLayerStack().getLayer(layerName);
-    if (!layer) {
-      throw RuntimeError(__FILE__, __LINE__,
-                         QString("Invalid board layer: '%1'").arg(layerName));
-    }
     BI_NetLine* netLine = new BI_NetLine(
         *netSegment, deserialize<Uuid>(child->getChild("@0")),
         *parseAnchor(child->getChild("from")),
-        *parseAnchor(child->getChild("to")), *layer,
+        *parseAnchor(child->getChild("to")),
+        deserialize<const Layer&>(child->getChild("layer/@0")),
         deserialize<PositiveLength>(child->getChild("width/@0")));
     netLines.append(netLine);
   }
@@ -714,7 +708,7 @@ void ProjectLoader::loadBoardPlane(Board& b, const SExpression& node) {
   }
   BI_Plane* plane =
       new BI_Plane(b, deserialize<Uuid>(node.getChild("@0")),
-                   deserialize<GraphicsLayerName>(node.getChild("layer/@0")),
+                   deserialize<const Layer&>(node.getChild("layer/@0")),
                    *netSignal, Path(node));
   plane->setMinWidth(
       deserialize<UnsignedLength>(node.getChild("min_width/@0")));
@@ -734,16 +728,12 @@ void ProjectLoader::loadBoardUserSettings(Board& b) {
         b.getDirectory().read(fp), b.getDirectory().getAbsPath(fp));
 
     // Layers.
+    QMap<QString, bool> layersVisibility;
     for (const SExpression* node : root.getChildren("layer")) {
       const QString name = node->getChild("@0").getValue();
-      if (GraphicsLayer* layer = b.getLayerStack().getLayer(name)) {
-        layer->setVisible(deserialize<bool>(node->getChild("visible/@0")));
-      } else {
-        qWarning()
-            << "Layer" << name
-            << "doesn't exist, could not restore its appearance settings.";
-      }
+      layersVisibility[name] = deserialize<bool>(node->getChild("visible/@0"));
     }
+    b.setLayersVisibility(layersVisibility);
 
     // Planes visibility.
     foreach (const SExpression* node, root.getChildren("plane")) {

@@ -35,12 +35,13 @@ namespace librepcb {
 
 class Component;
 class ComponentSymbolVariantItem;
+
+namespace editor {
+
 class IF_GraphicsLayerProvider;
 class LineGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveTextGraphicsItem;
-
-namespace editor {
 
 /*******************************************************************************
  *  Class SymbolPinGraphicsItem
@@ -49,7 +50,7 @@ namespace editor {
 /**
  * @brief The SymbolPinGraphicsItem class
  */
-class SymbolPinGraphicsItem final : public QGraphicsItem {
+class SymbolPinGraphicsItem final : public QGraphicsItemGroup {
 public:
   // Constructors / Destructor
   SymbolPinGraphicsItem() = delete;
@@ -64,30 +65,21 @@ public:
   // Getters
   const std::shared_ptr<SymbolPin>& getPin() noexcept { return mPin; }
 
-  // Setters
-  void setPosition(const Point& pos) noexcept;
-  void setRotation(const Angle& rot) noexcept;
-  void setSelected(bool selected) noexcept;
-
   // General Methods
   void updateText() noexcept;
 
   // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept override { return QRectF(); }
   QPainterPath shape() const noexcept override;
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
 
   // Operator Overloadings
   SymbolPinGraphicsItem& operator=(const SymbolPinGraphicsItem& rhs) = delete;
 
 private:  // Methods
   void pinEdited(const SymbolPin& pin, SymbolPin::Event event) noexcept;
+  virtual QVariant itemChange(GraphicsItemChange change,
+                              const QVariant& value) noexcept override;
   void setLength(const UnsignedLength& length) noexcept;
-  void setNamePosition(const Point& position) noexcept;
-  void setNameHeight(const PositiveLength& height) noexcept;
-  void setNameRotationAndAlignment(const Angle& rotation,
-                                   const Alignment& align) noexcept;
+  void updateTextPosition() noexcept;
 
 private:  // Data
   std::shared_ptr<SymbolPin> mPin;

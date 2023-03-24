@@ -29,10 +29,11 @@
 #include "../../project/cmd/cmdboardplaneedit.h"
 #include "../../project/cmd/cmdboardviaedit.h"
 #include "../../project/cmd/cmddeviceinstanceedit.h"
+#include "../boardeditor/boardgraphicsscene.h"
+#include "../boardeditor/boardselectionquery.h"
 #include "cmddevicestroketextsreset.h"
 
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardselectionquery.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
@@ -54,9 +55,9 @@ namespace editor {
  ******************************************************************************/
 
 CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
-    Board& board, const Point& startPos) noexcept
+    BoardGraphicsScene& scene, const Point& startPos) noexcept
   : UndoCommandGroup(tr("Drag Board Elements")),
-    mBoard(board),
+    mScene(scene),
     mItemCount(0),
     mStartPos(startPos),
     mDeltaPos(0, 0),
@@ -65,20 +66,20 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     mSnappedToGrid(false),
     mTextsReset(false) {
   // get all selected items
-  std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
-  query->addDeviceInstancesOfSelectedFootprints();
-  query->addSelectedVias();
-  query->addSelectedNetPoints();
-  query->addSelectedNetLines();
-  query->addNetPointsOfNetLines();
-  query->addSelectedPlanes();
-  query->addSelectedPolygons();
-  query->addSelectedBoardStrokeTexts();
-  query->addSelectedFootprintStrokeTexts();
-  query->addSelectedHoles();
+  BoardSelectionQuery query(mScene);
+  query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedVias();
+  query.addSelectedNetPoints();
+  query.addSelectedNetLines();
+  query.addNetPointsOfNetLines();
+  query.addSelectedPlanes();
+  query.addSelectedPolygons();
+  query.addSelectedBoardStrokeTexts();
+  query.addSelectedFootprintStrokeTexts();
+  query.addSelectedHoles();
 
   // find the center of all elements and create undo commands
-  foreach (BI_Device* device, query->getDeviceInstances()) {
+  foreach (BI_Device* device, query.getDeviceInstances()) {
     Q_ASSERT(device);
     mCenterPos += device->getPosition();
     ++mItemCount;
@@ -86,21 +87,21 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     mDeviceEditCmds.append(cmd);
     mDeviceStrokeTextsResetCmds.append(new CmdDeviceStrokeTextsReset(*device));
   }
-  foreach (BI_Via* via, query->getVias()) {
+  foreach (BI_Via* via, query.getVias()) {
     Q_ASSERT(via);
     mCenterPos += via->getPosition();
     ++mItemCount;
     CmdBoardViaEdit* cmd = new CmdBoardViaEdit(*via);
     mViaEditCmds.append(cmd);
   }
-  foreach (BI_NetPoint* netpoint, query->getNetPoints()) {
+  foreach (BI_NetPoint* netpoint, query.getNetPoints()) {
     Q_ASSERT(netpoint);
     mCenterPos += netpoint->getPosition();
     ++mItemCount;
     CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
     mNetPointEditCmds.append(cmd);
   }
-  foreach (BI_Plane* plane, query->getPlanes()) {
+  foreach (BI_Plane* plane, query.getPlanes()) {
     Q_ASSERT(plane);
     for (const Vertex& vertex : plane->getOutline().getVertices()) {
       mCenterPos += vertex.getPos();
@@ -109,7 +110,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane, false);
     mPlaneEditCmds.append(cmd);
   }
-  foreach (BI_Polygon* polygon, query->getPolygons()) {
+  foreach (BI_Polygon* polygon, query.getPolygons()) {
     Q_ASSERT(polygon);
     for (const Vertex& vertex : polygon->getPolygon().getPath().getVertices()) {
       mCenterPos += vertex.getPos();
@@ -118,18 +119,18 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
     mPolygonEditCmds.append(cmd);
   }
-  foreach (BI_StrokeText* text, query->getStrokeTexts()) {
+  foreach (BI_StrokeText* text, query.getStrokeTexts()) {
     Q_ASSERT(text);
     // do not count texts of devices if the device is selected too
     if ((!text->getDevice()) ||
-        (!query->getDeviceInstances().contains(text->getDevice()))) {
+        (!query.getDeviceInstances().contains(text->getDevice()))) {
       mCenterPos += text->getPosition();
       ++mItemCount;
     }
-    CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getText());
+    CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getTextObj());
     mStrokeTextEditCmds.append(cmd);
   }
-  foreach (BI_Hole* hole, query->getHoles()) {
+  foreach (BI_Hole* hole, query.getHoles()) {
     Q_ASSERT(hole);
     mCenterPos += hole->getHole().getPath()->getVertices().first().getPos();
     ++mItemCount;
@@ -140,7 +141,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   // Note: If only 1 item is selected, use its exact position as center.
   if (mItemCount > 1) {
     mCenterPos /= mItemCount;
-    mCenterPos.mapToGrid(mBoard.getGridInterval());
+    mCenterPos.mapToGrid(mScene.getBoard().getGridInterval());
   }
 }
 
@@ -152,7 +153,7 @@ CmdDragSelectedBoardItems::~CmdDragSelectedBoardItems() noexcept {
  ******************************************************************************/
 
 void CmdDragSelectedBoardItems::snapToGrid() noexcept {
-  PositiveLength grid = mBoard.getGridInterval();
+  PositiveLength grid = mScene.getBoard().getGridInterval();
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
     cmd->snapToGrid(grid, true);
   }
@@ -174,7 +175,7 @@ void CmdDragSelectedBoardItems::snapToGrid() noexcept {
 
   // Force updating airwires immediately as they are important while moving
   // items.
-  mBoard.triggerAirWiresRebuild();
+  mScene.getBoard().triggerAirWiresRebuild();
 }
 
 void CmdDragSelectedBoardItems::resetAllTexts() noexcept {
@@ -185,7 +186,7 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
     const Point& pos, const bool gridIncrement) noexcept {
   Point delta = pos - mStartPos;
   if (gridIncrement) {
-    delta.mapToGrid(mBoard.getGridInterval());
+    delta.mapToGrid(mScene.getBoard().getGridInterval());
   }
 
   if (delta != mDeltaPos) {
@@ -215,14 +216,15 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
 
     // Force updating airwires immediately as they are important while moving
     // items.
-    mBoard.triggerAirWiresRebuild();
+    mScene.getBoard().triggerAirWiresRebuild();
   }
 }
 
 void CmdDragSelectedBoardItems::rotate(const Angle& angle,
                                        bool aroundCurrentPosition) noexcept {
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
-      ? (mStartPos + mDeltaPos).mappedToGrid(mBoard.getGridInterval())
+      ? (mStartPos + mDeltaPos)
+            .mappedToGrid(mScene.getBoard().getGridInterval())
       : (mCenterPos + mDeltaPos);
 
   // rotate selected elements
@@ -251,7 +253,7 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
 
   // Force updating airwires immediately as they are important while dragging
   // items.
-  mBoard.triggerAirWiresRebuild();
+  mScene.getBoard().triggerAirWiresRebuild();
 }
 
 /*******************************************************************************

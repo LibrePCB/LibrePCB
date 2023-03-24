@@ -22,10 +22,11 @@
  ******************************************************************************/
 #include "cmdremoveselectedboarditems.h"
 
+#include "../boardeditor/boardgraphicsscene.h"
+#include "../boardeditor/boardselectionquery.h"
 #include "cmdremoveboarditems.h"
 
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardselectionquery.h>
 
 #include <QtCore>
 
@@ -41,8 +42,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdRemoveSelectedBoardItems::CmdRemoveSelectedBoardItems(Board& board) noexcept
-  : UndoCommand(tr("Remove Board Items")), mBoard(board) {
+CmdRemoveSelectedBoardItems::CmdRemoveSelectedBoardItems(
+    BoardGraphicsScene& scene) noexcept
+  : UndoCommand(tr("Remove Board Items")), mScene(scene) {
 }
 
 CmdRemoveSelectedBoardItems::~CmdRemoveSelectedBoardItems() noexcept {
@@ -54,29 +56,29 @@ CmdRemoveSelectedBoardItems::~CmdRemoveSelectedBoardItems() noexcept {
 
 bool CmdRemoveSelectedBoardItems::performExecute() {
   // get all selected items
-  std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
-  query->addDeviceInstancesOfSelectedFootprints();
-  query->addSelectedVias();
-  query->addSelectedNetLines();
-  query->addNetPointsOfNetLines(true);
-  query->addSelectedPlanes();
-  query->addSelectedPolygons();
-  query->addSelectedBoardStrokeTexts();
-  query->addSelectedFootprintStrokeTexts();
-  query->addSelectedHoles();
+  BoardSelectionQuery query(mScene);
+  query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedVias();
+  query.addSelectedNetLines();
+  query.addNetPointsOfNetLines(true);
+  query.addSelectedPlanes();
+  query.addSelectedPolygons();
+  query.addSelectedBoardStrokeTexts();
+  query.addSelectedFootprintStrokeTexts();
+  query.addSelectedHoles();
 
   // clear selection because these items will be removed now
-  mBoard.clearSelection();
+  mScene.clearSelection();
 
   // remove items
-  mWrappedCommand.reset(new CmdRemoveBoardItems(mBoard));
-  mWrappedCommand->removeDeviceInstances(query->getDeviceInstances());
-  mWrappedCommand->removeVias(query->getVias());
-  mWrappedCommand->removeNetLines(query->getNetLines());
-  mWrappedCommand->removePlanes(query->getPlanes());
-  mWrappedCommand->removePolygons(query->getPolygons());
-  mWrappedCommand->removeStrokeTexts(query->getStrokeTexts());
-  mWrappedCommand->removeHoles(query->getHoles());
+  mWrappedCommand.reset(new CmdRemoveBoardItems(mScene.getBoard()));
+  mWrappedCommand->removeDeviceInstances(query.getDeviceInstances());
+  mWrappedCommand->removeVias(query.getVias());
+  mWrappedCommand->removeNetLines(query.getNetLines());
+  mWrappedCommand->removePlanes(query.getPlanes());
+  mWrappedCommand->removePolygons(query.getPolygons());
+  mWrappedCommand->removeStrokeTexts(query.getStrokeTexts());
+  mWrappedCommand->removeHoles(query.getHoles());
   return mWrappedCommand->execute();
 }
 

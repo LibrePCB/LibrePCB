@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../dialogs/graphicsexportdialog.h"
+#include "../../graphics/graphicslayer.h"
 #include "../../widgets/if_graphicsvieweventhandler.h"
 #include "ui_boardeditor.h"
 
@@ -41,10 +42,12 @@ namespace librepcb {
 
 class ComponentInstance;
 class Project;
+class Theme;
 
 namespace editor {
 
 class BoardEditorFsm;
+class BoardGraphicsScene;
 class BoardLayersDock;
 class ExclusiveActionGroup;
 class GraphicsView;
@@ -68,6 +71,7 @@ class BoardEditor;
  * @brief The BoardEditor class
  */
 class BoardEditor final : public QMainWindow,
+                          public IF_GraphicsLayerProvider,
                           public IF_GraphicsViewEventHandler {
   Q_OBJECT
 
@@ -82,6 +86,24 @@ public:
   ProjectEditor& getProjectEditor() const noexcept { return mProjectEditor; }
   Project& getProject() const noexcept { return mProject; }
   Board* getActiveBoard() const noexcept { return mActiveBoard.data(); }
+  BoardGraphicsScene* getActiveBoardScene() noexcept {
+    return mGraphicsScene.data();
+  }
+
+  /// @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
+  virtual std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const
+      noexcept override {
+    foreach (const std::shared_ptr<GraphicsLayer>& layer, mLayers) {
+      if (layer->getName() == name) {
+        return layer;
+      }
+    }
+    return nullptr;
+  }
+
+  QList<std::shared_ptr<GraphicsLayer>> getAllLayers() const noexcept override {
+    return mLayers;
+  }
 
   // Setters
   bool setActiveBoardIndex(int index) noexcept;
@@ -94,7 +116,7 @@ public:
   BoardEditor& operator=(const BoardEditor& rhs) = delete;
 
 protected:
-  void closeEvent(QCloseEvent* event);
+  virtual void closeEvent(QCloseEvent* event) noexcept override;
 
 public slots:
 
@@ -109,12 +131,16 @@ private slots:
 
 private:
   // Private Methods
+  void addLayers(const Theme& theme) noexcept;
+  void updateEnabledCopperLayers() noexcept;
+  void loadLayersVisibility() noexcept;
+  void storeLayersVisibility() noexcept;
   void createActions() noexcept;
   void createToolBars() noexcept;
   void createDockWidgets() noexcept;
   void createMenus() noexcept;
   void updateBoardActionGroup() noexcept;
-  bool graphicsViewEventHandler(QEvent* event);
+  virtual bool graphicsViewEventHandler(QEvent* event) override;
   void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
   void unplacedComponentsCountChanged(int count) noexcept;
   void runDrc(bool quick) noexcept;
@@ -143,13 +169,16 @@ private:
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
 
+  // Misc
+  QPointer<Board> mActiveBoard;
+  QList<std::shared_ptr<GraphicsLayer>> mLayers;
+  QScopedPointer<BoardGraphicsScene> mGraphicsScene;
+  QHash<Uuid, QRectF> mVisibleSceneRect;
+  QScopedPointer<BoardEditorFsm> mFsm;
+
   // DRC
   QHash<Uuid, tl::optional<RuleCheckMessageList>> mDrcMessages;  ///< UUID=Board
   QScopedPointer<QGraphicsPathItem> mDrcLocationGraphicsItem;
-
-  // Misc
-  QPointer<Board> mActiveBoard;
-  QScopedPointer<BoardEditorFsm> mFsm;
 
   // Actions
   QScopedPointer<QAction> mActionAboutLibrePcb;

@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "transform.h"
 
-#include "../graphics/graphicslayer.h"
+#include "../types/layer.h"
 
 /*******************************************************************************
  *  Namespace
@@ -71,13 +71,8 @@ NonEmptyPath Transform::map(const NonEmptyPath& path) const noexcept {
   return NonEmptyPath(map(*path));
 }
 
-QString Transform::map(const QString& layerName) const noexcept {
-  return mMirrored ? GraphicsLayer::getMirroredLayerName(layerName) : layerName;
-}
-
-GraphicsLayerName Transform::map(const GraphicsLayerName& layerName) const
-    noexcept {
-  return GraphicsLayerName(map(*layerName));
+const Layer& Transform::map(const Layer& layer) const noexcept {
+  return mMirrored ? layer.mirrored() : layer;
 }
 
 /*******************************************************************************

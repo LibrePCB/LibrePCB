@@ -34,12 +34,11 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsScene;
-class IF_GraphicsLayerProvider;
 class Symbol;
 
 namespace editor {
 
+class GraphicsScene;
 class GraphicsView;
 class SymbolEditorState;
 class SymbolEditorWidget;

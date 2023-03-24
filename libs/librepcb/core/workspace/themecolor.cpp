@@ -33,9 +33,11 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ThemeColor::ThemeColor(const QString& identifier, const QString& nameTr,
-                       const QColor& primary, const QColor& secondary) noexcept
+ThemeColor::ThemeColor(const QString& identifier, const QString& categoryTr,
+                       const QString& nameTr, const QColor& primary,
+                       const QColor& secondary) noexcept
   : mIdentifier(identifier),
+    mCategoryTr(categoryTr),
     mNameTr(nameTr),
     mPrimary(primary),
     mSecondary(secondary),
@@ -44,6 +46,7 @@ ThemeColor::ThemeColor(const QString& identifier, const QString& nameTr,
 
 ThemeColor::ThemeColor(const ThemeColor& other) noexcept
   : mIdentifier(other.mIdentifier),
+    mCategoryTr(other.mCategoryTr),
     mNameTr(other.mNameTr),
     mPrimary(other.mPrimary),
     mSecondary(other.mSecondary),
@@ -112,6 +115,7 @@ bool ThemeColor::operator==(const ThemeColor& rhs) const noexcept {
 
 ThemeColor& ThemeColor::operator=(const ThemeColor& rhs) noexcept {
   mIdentifier = rhs.mIdentifier;
+  mCategoryTr = rhs.mCategoryTr;
   mNameTr = rhs.mNameTr;
   mPrimary = rhs.mPrimary;
   mSecondary = rhs.mSecondary;

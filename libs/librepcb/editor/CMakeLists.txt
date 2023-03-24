@@ -57,6 +57,36 @@ add_library(
   editorcommand.h
   editorcommandcategory.h
   editorcommandset.h
+  graphics/circlegraphicsitem.cpp
+  graphics/circlegraphicsitem.h
+  graphics/defaultgraphicslayerprovider.cpp
+  graphics/defaultgraphicslayerprovider.h
+  graphics/graphicslayer.cpp
+  graphics/graphicslayer.h
+  graphics/graphicsscene.cpp
+  graphics/graphicsscene.h
+  graphics/holegraphicsitem.cpp
+  graphics/holegraphicsitem.h
+  graphics/linegraphicsitem.cpp
+  graphics/linegraphicsitem.h
+  graphics/origincrossgraphicsitem.cpp
+  graphics/origincrossgraphicsitem.h
+  graphics/polygongraphicsitem.cpp
+  graphics/polygongraphicsitem.h
+  graphics/primitivecirclegraphicsitem.cpp
+  graphics/primitivecirclegraphicsitem.h
+  graphics/primitivefootprintpadgraphicsitem.cpp
+  graphics/primitivefootprintpadgraphicsitem.h
+  graphics/primitiveholegraphicsitem.cpp
+  graphics/primitiveholegraphicsitem.h
+  graphics/primitivepathgraphicsitem.cpp
+  graphics/primitivepathgraphicsitem.h
+  graphics/primitivetextgraphicsitem.cpp
+  graphics/primitivetextgraphicsitem.h
+  graphics/stroketextgraphicsitem.cpp
+  graphics/stroketextgraphicsitem.h
+  graphics/textgraphicsitem.cpp
+  graphics/textgraphicsitem.h
   library/cat/categorychooserdialog.cpp
   library/cat/categorychooserdialog.h
   library/cat/categorychooserdialog.ui
@@ -348,6 +378,8 @@ add_library(
   project/boardeditor/boardeditor.cpp
   project/boardeditor/boardeditor.h
   project/boardeditor/boardeditor.ui
+  project/boardeditor/boardgraphicsscene.cpp
+  project/boardeditor/boardgraphicsscene.h
   project/boardeditor/boardlayersdock.cpp
   project/boardeditor/boardlayersdock.h
   project/boardeditor/boardlayersdock.ui
@@ -359,6 +391,8 @@ add_library(
   project/boardeditor/boardplanepropertiesdialog.cpp
   project/boardeditor/boardplanepropertiesdialog.h
   project/boardeditor/boardplanepropertiesdialog.ui
+  project/boardeditor/boardselectionquery.cpp
+  project/boardeditor/boardselectionquery.h
   project/boardeditor/boardsetupdialog.cpp
   project/boardeditor/boardsetupdialog.h
   project/boardeditor/boardsetupdialog.ui
@@ -393,6 +427,24 @@ add_library(
   project/boardeditor/fsm/boardeditorstate_measure.h
   project/boardeditor/fsm/boardeditorstate_select.cpp
   project/boardeditor/fsm/boardeditorstate_select.h
+  project/boardeditor/graphicsitems/bgi_airwire.cpp
+  project/boardeditor/graphicsitems/bgi_airwire.h
+  project/boardeditor/graphicsitems/bgi_device.cpp
+  project/boardeditor/graphicsitems/bgi_device.h
+  project/boardeditor/graphicsitems/bgi_footprintpad.cpp
+  project/boardeditor/graphicsitems/bgi_footprintpad.h
+  project/boardeditor/graphicsitems/bgi_hole.cpp
+  project/boardeditor/graphicsitems/bgi_hole.h
+  project/boardeditor/graphicsitems/bgi_netline.cpp
+  project/boardeditor/graphicsitems/bgi_netline.h
+  project/boardeditor/graphicsitems/bgi_netpoint.cpp
+  project/boardeditor/graphicsitems/bgi_netpoint.h
+  project/boardeditor/graphicsitems/bgi_plane.cpp
+  project/boardeditor/graphicsitems/bgi_plane.h
+  project/boardeditor/graphicsitems/bgi_stroketext.cpp
+  project/boardeditor/graphicsitems/bgi_stroketext.h
+  project/boardeditor/graphicsitems/bgi_via.cpp
+  project/boardeditor/graphicsitems/bgi_via.h
   project/boardeditor/unplacedcomponentsdock.cpp
   project/boardeditor/unplacedcomponentsdock.h
   project/boardeditor/unplacedcomponentsdock.ui
@@ -603,6 +655,18 @@ add_library(
   project/schematiceditor/fsm/schematiceditorstate_measure.h
   project/schematiceditor/fsm/schematiceditorstate_select.cpp
   project/schematiceditor/fsm/schematiceditorstate_select.h
+  project/schematiceditor/graphicsitems/sgi_netlabel.cpp
+  project/schematiceditor/graphicsitems/sgi_netlabel.h
+  project/schematiceditor/graphicsitems/sgi_netline.cpp
+  project/schematiceditor/graphicsitems/sgi_netline.h
+  project/schematiceditor/graphicsitems/sgi_netpoint.cpp
+  project/schematiceditor/graphicsitems/sgi_netpoint.h
+  project/schematiceditor/graphicsitems/sgi_symbol.cpp
+  project/schematiceditor/graphicsitems/sgi_symbol.h
+  project/schematiceditor/graphicsitems/sgi_symbolpin.cpp
+  project/schematiceditor/graphicsitems/sgi_symbolpin.h
+  project/schematiceditor/graphicsitems/sgi_text.cpp
+  project/schematiceditor/graphicsitems/sgi_text.h
   project/schematiceditor/renamenetsegmentdialog.cpp
   project/schematiceditor/renamenetsegmentdialog.h
   project/schematiceditor/renamenetsegmentdialog.ui
@@ -613,11 +677,15 @@ add_library(
   project/schematiceditor/schematiceditor.cpp
   project/schematiceditor/schematiceditor.h
   project/schematiceditor/schematiceditor.ui
+  project/schematiceditor/schematicgraphicsscene.cpp
+  project/schematiceditor/schematicgraphicsscene.h
   project/schematiceditor/schematicnetsegmentsplitter.cpp
   project/schematiceditor/schematicnetsegmentsplitter.h
   project/schematiceditor/schematicpagesdock.cpp
   project/schematiceditor/schematicpagesdock.h
   project/schematiceditor/schematicpagesdock.ui
+  project/schematiceditor/schematicselectionquery.cpp
+  project/schematiceditor/schematicselectionquery.h
   project/schematiceditor/symbolinstancepropertiesdialog.cpp
   project/schematiceditor/symbolinstancepropertiesdialog.h
   project/schematiceditor/symbolinstancepropertiesdialog.ui

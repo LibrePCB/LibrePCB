@@ -23,9 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../geometry/path.h"
 #include "../../../geometry/via.h"
-#include "../graphicsitems/bgi_via.h"
 #include "./bi_netline.h"
 #include "bi_base.h"
 
@@ -47,6 +45,17 @@ class BI_Via final : public BI_Base, public BI_NetLineAnchor {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionChanged,
+    SizeChanged,
+    DrillDiameterChanged,
+    NetSignalNameChanged,
+    StopMaskOffsetChanged,
+  };
+  Signal<BI_Via, Event> onEdited;
+  typedef Slot<BI_Via, Event> OnEditedSlot;
+
   // Constructors / Destructor
   BI_Via() = delete;
   BI_Via(const BI_Via& other) = delete;
@@ -55,15 +64,20 @@ public:
 
   // Getters
   BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
+  const Point& getPosition() const noexcept override {
+    return mVia.getPosition();
+  }
   const Via& getVia() const noexcept { return mVia; }
   const Uuid& getUuid() const noexcept { return mVia.getUuid(); }
   const PositiveLength& getDrillDiameter() const noexcept {
     return mVia.getDrillDiameter();
   }
   const PositiveLength& getSize() const noexcept { return mVia.getSize(); }
+  const tl::optional<Length>& getStopMaskOffset() const noexcept {
+    return mStopMaskOffset;
+  }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
-  bool isOnLayer(const QString& layerName) const noexcept;
-  bool isSelectable() const noexcept override;
+  bool isOnLayer(const Layer& layer) const noexcept;
   TraceAnchor toTraceAnchor() const noexcept override;
 
   // Setters
@@ -74,14 +88,6 @@ public:
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
-
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override { return BI_Base::Type_t::Via; }
-  const Point& getPosition() const noexcept override {
-    return mVia.getPosition();
-  }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
 
   // Inherited from BI_NetLineAnchor
   void registerNetLine(BI_NetLine& netline) override;
@@ -95,14 +101,16 @@ public:
   bool operator==(const BI_Via& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const BI_Via& rhs) noexcept { return (this != &rhs); }
 
-private:
-  void boardOrNetAttributesChanged();
+private:  // Methods
+  void updateStopMaskOffset() noexcept;
 
-  // General
+private:  // Data
   Via mVia;
   BI_NetSegment& mNetSegment;
-  QScopedPointer<BGI_Via> mGraphicsItem;
-  QVector<QMetaObject::Connection> mConnections;
+  QMetaObject::Connection mNetSignalNameChangedConnection;
+
+  // Cached Attributes
+  tl::optional<Length> mStopMaskOffset;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;

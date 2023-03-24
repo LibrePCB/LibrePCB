@@ -25,7 +25,7 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../editorwidgetbase.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -58,31 +58,29 @@ const LengthUnit& SymbolEditorState::getLengthUnit() const noexcept {
   return mContext.lengthUnit;
 }
 
-QList<GraphicsLayer*> SymbolEditorState::getAllowedTextLayers() const noexcept {
-  return mContext.editorContext.layerProvider.getLayers({
-      GraphicsLayer::sSymbolOutlines,
-      // GraphicsLayer::sSymbolHiddenGrabAreas, -> makes no sense for texts
-      GraphicsLayer::sSymbolNames,
-      GraphicsLayer::sSymbolValues,
-      GraphicsLayer::sSchematicSheetFrames,
-      GraphicsLayer::sSchematicDocumentation,
-      GraphicsLayer::sSchematicComments,
-      GraphicsLayer::sSchematicGuide,
-  });
+const QSet<const Layer*>& SymbolEditorState::getAllowedTextLayers() noexcept {
+  static const QSet<const Layer*> layers = {
+      &Layer::symbolOutlines(),
+      // &Layer::symbolHiddenGrabAreas(), -> makes no sense for texts
+      &Layer::symbolNames(),
+      &Layer::symbolValues(),
+      &Layer::schematicSheetFrames(),
+      &Layer::schematicDocumentation(),
+      &Layer::schematicComments(),
+      &Layer::schematicGuide(),
+  };
+  return layers;
 }
 
-QList<GraphicsLayer*> SymbolEditorState::getAllowedCircleAndPolygonLayers()
-    const noexcept {
-  return mContext.editorContext.layerProvider.getLayers({
-      GraphicsLayer::sSymbolOutlines,
-      GraphicsLayer::sSymbolHiddenGrabAreas,
-      GraphicsLayer::sSymbolNames,
-      GraphicsLayer::sSymbolValues,
-      GraphicsLayer::sSchematicSheetFrames,
-      GraphicsLayer::sSchematicDocumentation,
-      GraphicsLayer::sSchematicComments,
-      GraphicsLayer::sSchematicGuide,
-  });
+const QSet<const Layer*>&
+    SymbolEditorState::getAllowedCircleAndPolygonLayers() noexcept {
+  static const QSet<const Layer*> layers = {
+      &Layer::symbolOutlines(),       &Layer::symbolHiddenGrabAreas(),
+      &Layer::symbolNames(),          &Layer::symbolValues(),
+      &Layer::schematicSheetFrames(), &Layer::schematicDocumentation(),
+      &Layer::schematicComments(),    &Layer::schematicGuide(),
+  };
+  return layers;
 }
 
 /*******************************************************************************

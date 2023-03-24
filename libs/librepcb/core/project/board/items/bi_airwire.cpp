@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "bi_airwire.h"
 
-#include "../../circuit/netsignal.h"
 #include "bi_netline.h"
 
 #include <QtCore>
@@ -39,7 +38,6 @@ namespace librepcb {
 BI_AirWire::BI_AirWire(Board& board, const NetSignal& netsignal,
                        const BI_NetLineAnchor& p1, const BI_NetLineAnchor& p2)
   : BI_Base(board), mNetSignal(netsignal), mP1(p1), mP2(p2) {
-  mGraphicsItem.reset(new BGI_AirWire(*this));
 }
 
 BI_AirWire::~BI_AirWire() noexcept {
@@ -61,35 +59,14 @@ void BI_AirWire::addToBoard() {
   if (isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  mHighlightChangedConnection =
-      connect(&mNetSignal, &NetSignal::highlightedChanged,
-              [this]() { mGraphicsItem->update(); });
-  BI_Base::addToBoard(mGraphicsItem.data());
+  BI_Base::addToBoard();
 }
 
 void BI_AirWire::removeFromBoard() {
   if (!isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  disconnect(mHighlightChangedConnection);
-  BI_Base::removeFromBoard(mGraphicsItem.data());
-}
-
-/*******************************************************************************
- *  Inherited from BI_Base
- ******************************************************************************/
-
-QPainterPath BI_AirWire::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->shape();
-}
-
-void BI_AirWire::setSelected(bool selected) noexcept {
-  BI_Base::setSelected(selected);
-  mGraphicsItem->update();
-}
-
-bool BI_AirWire::isSelectable() const noexcept {
-  return mGraphicsItem->isSelectable();
+  BI_Base::removeFromBoard();
 }
 
 /*******************************************************************************

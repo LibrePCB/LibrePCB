@@ -24,9 +24,8 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/junction.h"
-#include "../graphicsitems/bgi_netpoint.h"
-#include "./bi_netline.h"
 #include "bi_base.h"
+#include "bi_netline.h"
 
 #include <QtCore>
 
@@ -34,6 +33,8 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Layer;
 
 /*******************************************************************************
  *  Class BI_NetPoint
@@ -46,6 +47,16 @@ class BI_NetPoint final : public BI_Base, public BI_NetLineAnchor {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionChanged,
+    LayerOfTracesChanged,
+    MaxTraceWidthChanged,
+    NetSignalNameChanged,
+  };
+  Signal<BI_NetPoint, Event> onEdited;
+  typedef Slot<BI_NetPoint, Event> OnEditedSlot;
+
   // Constructors / Destructor
   BI_NetPoint() = delete;
   BI_NetPoint(const BI_NetPoint& other) = delete;
@@ -54,11 +65,16 @@ public:
 
   // Getters
   const Uuid& getUuid() const noexcept { return mJunction.getUuid(); }
+  const Point& getPosition() const noexcept override {
+    return mJunction.getPosition();
+  }
   const Junction& getJunction() const noexcept { return mJunction; }
   BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
-  GraphicsLayer* getLayerOfLines() const noexcept;
-  bool isSelectable() const noexcept override;
+  const Layer* getLayerOfTraces() const noexcept { return mLayerOfTraces; }
+  const UnsignedLength& getMaxTraceWidth() const noexcept {
+    return mMaxTraceWidth;
+  }
   TraceAnchor toTraceAnchor() const noexcept override;
 
   // Setters
@@ -67,14 +83,6 @@ public:
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
-
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override { return BI_Base::Type_t::NetPoint; }
-  const Point& getPosition() const noexcept override {
-    return mJunction.getPosition();
-  }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
 
   // Inherited from BI_NetLineAnchor
   void registerNetLine(BI_NetLine& netline) override;
@@ -88,17 +96,25 @@ public:
   bool operator==(const BI_NetPoint& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const BI_NetPoint& rhs) noexcept { return (this != &rhs); }
 
-private:
-  // General
-  QScopedPointer<BGI_NetPoint> mGraphicsItem;
-  QMetaObject::Connection mHighlightChangedConnection;
+private:  // Methods
+  void netLineEdited(const BI_NetLine& obj, BI_NetLine::Event event) noexcept;
+  void updateLayerOfTraces() noexcept;
+  void updateMaxTraceWidth() noexcept;
 
-  // Attributes
+private:  // Data
   BI_NetSegment& mNetSegment;
   Junction mJunction;
+  QMetaObject::Connection mNetSignalNameChangedConnection;
+
+  // Cached Attributes
+  const Layer* mLayerOfTraces;
+  UnsignedLength mMaxTraceWidth;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;  ///< all registered netlines
+
+  // Slots
+  BI_NetLine::OnEditedSlot mOnNetLineEditedSlot;
 };
 
 /*******************************************************************************

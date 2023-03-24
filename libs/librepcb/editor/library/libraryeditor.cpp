@@ -43,6 +43,8 @@
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
+#include <librepcb/core/types/layer.h>
+#include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -92,69 +94,65 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
       mWorkspace.getLibraryDb().getScanProgressPercent());
 
   // Add all required schematic layers.
-  addLayer(GraphicsLayer::sSchematicReferences);
-  addLayer(GraphicsLayer::sSchematicSheetFrames);
-  addLayer(GraphicsLayer::sSymbolOutlines);
-  addLayer(GraphicsLayer::sSymbolGrabAreas);
-  addLayer(GraphicsLayer::sSymbolHiddenGrabAreas);
-  addLayer(GraphicsLayer::sSymbolPinCirclesOpt);
-  addLayer(GraphicsLayer::sSymbolPinCirclesReq);
-  addLayer(GraphicsLayer::sSymbolPinLines);
-  addLayer(GraphicsLayer::sSymbolPinNames);
-  addLayer(GraphicsLayer::sSymbolPinNumbers);
-  addLayer(GraphicsLayer::sSymbolNames);
-  addLayer(GraphicsLayer::sSymbolValues);
-  addLayer(GraphicsLayer::sSchematicNetLines);
-  addLayer(GraphicsLayer::sSchematicNetLabels);
-  addLayer(GraphicsLayer::sSchematicNetLabelAnchors);
-  addLayer(GraphicsLayer::sSchematicDocumentation);
-  addLayer(GraphicsLayer::sSchematicComments);
-  addLayer(GraphicsLayer::sSchematicGuide);
+  addLayer(Theme::Color::sSchematicReferences);
+  addLayer(Theme::Color::sSchematicFrames);
+  addLayer(Theme::Color::sSchematicOutlines);
+  addLayer(Theme::Color::sSchematicGrabAreas);
+  addLayer(Theme::Color::sSchematicHiddenGrabAreas);
+  addLayer(Theme::Color::sSchematicOptionalPins);
+  addLayer(Theme::Color::sSchematicRequiredPins);
+  addLayer(Theme::Color::sSchematicPinLines);
+  addLayer(Theme::Color::sSchematicPinNames);
+  addLayer(Theme::Color::sSchematicPinNumbers);
+  addLayer(Theme::Color::sSchematicNames);
+  addLayer(Theme::Color::sSchematicValues);
+  addLayer(Theme::Color::sSchematicWires);
+  addLayer(Theme::Color::sSchematicNetLabels);
+  addLayer(Theme::Color::sSchematicNetLabelAnchors);
+  addLayer(Theme::Color::sSchematicDocumentation);
+  addLayer(Theme::Color::sSchematicComments);
+  addLayer(Theme::Color::sSchematicGuide);
 
   // Add all required board layers.
-  addLayer(GraphicsLayer::sBoardSheetFrames);
-  addLayer(GraphicsLayer::sBoardOutlines);
-  addLayer(GraphicsLayer::sBoardMillingPth);
-  addLayer(GraphicsLayer::sBoardDrillsNpth);
-  addLayer(GraphicsLayer::sBoardViasTht);
-  addLayer(GraphicsLayer::sBoardPadsTht);
-  addLayer(GraphicsLayer::sBoardAirWires);
-  addLayer(GraphicsLayer::sBoardMeasures);
-  addLayer(GraphicsLayer::sBoardAlignment);
-  addLayer(GraphicsLayer::sBoardDocumentation);
-  addLayer(GraphicsLayer::sBoardComments);
-  addLayer(GraphicsLayer::sBoardGuide);
-  addLayer(GraphicsLayer::sTopCopper);
-  for (int i = 1; i <= GraphicsLayer::getInnerLayerCount(); ++i) {
-    addLayer(GraphicsLayer::getInnerLayerName(i));
+  addLayer(Theme::Color::sBoardFrames);
+  addLayer(Theme::Color::sBoardOutlines);
+  addLayer(Theme::Color::sBoardMilling);
+  addLayer(Theme::Color::sBoardHoles);
+  addLayer(Theme::Color::sBoardVias);
+  addLayer(Theme::Color::sBoardPads);
+  addLayer(Theme::Color::sBoardAirWires);
+  addLayer(Theme::Color::sBoardMeasures);
+  addLayer(Theme::Color::sBoardAlignment);
+  addLayer(Theme::Color::sBoardDocumentation);
+  addLayer(Theme::Color::sBoardComments);
+  addLayer(Theme::Color::sBoardGuide);
+  addLayer(Theme::Color::sBoardCopperTop);
+  for (int i = 1; i <= Layer::innerCopperCount(); ++i) {
+    addLayer(QString(Theme::Color::sBoardCopperInner).arg(i));
   }
-  addLayer(GraphicsLayer::sBotCopper);
-  addLayer(GraphicsLayer::sTopReferences);
-  addLayer(GraphicsLayer::sBotReferences);
-  addLayer(GraphicsLayer::sTopGrabAreas);
-  addLayer(GraphicsLayer::sBotGrabAreas);
-  addLayer(GraphicsLayer::sTopHiddenGrabAreas);
-  addLayer(GraphicsLayer::sBotHiddenGrabAreas);
-  addLayer(GraphicsLayer::sTopPlacement);
-  addLayer(GraphicsLayer::sBotPlacement);
-  addLayer(GraphicsLayer::sTopDocumentation);
-  addLayer(GraphicsLayer::sBotDocumentation);
-  addLayer(GraphicsLayer::sTopNames);
-  addLayer(GraphicsLayer::sBotNames);
-  addLayer(GraphicsLayer::sTopValues);
-  addLayer(GraphicsLayer::sBotValues);
-  addLayer(GraphicsLayer::sTopCourtyard);
-  addLayer(GraphicsLayer::sBotCourtyard);
-  addLayer(GraphicsLayer::sTopStopMask);
-  addLayer(GraphicsLayer::sBotStopMask);
-  addLayer(GraphicsLayer::sTopSolderPaste);
-  addLayer(GraphicsLayer::sBotSolderPaste);
-  addLayer(GraphicsLayer::sTopGlue);
-  addLayer(GraphicsLayer::sBotGlue);
-
-  // Load layer colors.
-  const Theme& theme = mWorkspace.getSettings().themes.getActive();
-  applyTheme(theme);
+  addLayer(Theme::Color::sBoardCopperBot);
+  addLayer(Theme::Color::sBoardReferencesTop);
+  addLayer(Theme::Color::sBoardReferencesBot);
+  addLayer(Theme::Color::sBoardGrabAreasTop);
+  addLayer(Theme::Color::sBoardGrabAreasBot);
+  addLayer(Theme::Color::sBoardHiddenGrabAreasTop);
+  addLayer(Theme::Color::sBoardHiddenGrabAreasBot);
+  addLayer(Theme::Color::sBoardPlacementTop);
+  addLayer(Theme::Color::sBoardPlacementBot);
+  addLayer(Theme::Color::sBoardDocumentationTop);
+  addLayer(Theme::Color::sBoardDocumentationBot);
+  addLayer(Theme::Color::sBoardNamesTop);
+  addLayer(Theme::Color::sBoardNamesBot);
+  addLayer(Theme::Color::sBoardValuesTop);
+  addLayer(Theme::Color::sBoardValuesBot);
+  addLayer(Theme::Color::sBoardCourtyardTop);
+  addLayer(Theme::Color::sBoardCourtyardBot);
+  addLayer(Theme::Color::sBoardStopMaskTop);
+  addLayer(Theme::Color::sBoardStopMaskBot);
+  addLayer(Theme::Color::sBoardSolderPasteTop);
+  addLayer(Theme::Color::sBoardSolderPasteBot);
+  addLayer(Theme::Color::sBoardGlueTop);
+  addLayer(Theme::Color::sBoardGlueBot);
 
   // Add overview tab.
   LibraryOverviewWidget* overviewWidget =
@@ -243,8 +241,6 @@ LibraryEditor::~LibraryEditor() noexcept {
   setActiveEditorWidget(nullptr);
   mLibrary = nullptr;
   closeAllTabs(true, false);
-  qDeleteAll(mLayers);
-  mLayers.clear();
 }
 
 /*******************************************************************************
@@ -1059,7 +1055,11 @@ bool LibraryEditor::closeAllTabs(bool withNonClosable,
 }
 
 void LibraryEditor::addLayer(const QString& name) noexcept {
-  mLayers.append(new GraphicsLayer(name));
+  const Theme& theme = mWorkspace.getSettings().themes.getActive();
+  const ThemeColor& color = theme.getColor(name);
+  mLayers.append(std::make_shared<GraphicsLayer>(name, color.getNameTr(),
+                                                 color.getPrimaryColor(),
+                                                 color.getSecondaryColor()));
 }
 
 /*******************************************************************************

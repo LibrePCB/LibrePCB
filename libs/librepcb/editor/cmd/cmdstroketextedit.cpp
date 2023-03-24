@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmdstroketextedit.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -39,8 +39,8 @@ namespace editor {
 CmdStrokeTextEdit::CmdStrokeTextEdit(StrokeText& text) noexcept
   : UndoCommand(tr("Edit stroke text")),
     mText(text),
-    mOldLayerName(text.getLayerName()),
-    mNewLayerName(mOldLayerName),
+    mOldLayer(&text.getLayer()),
+    mNewLayer(mOldLayer),
     mOldText(text.getText()),
     mNewText(mOldText),
     mOldPosition(text.getPosition()),
@@ -73,11 +73,10 @@ CmdStrokeTextEdit::~CmdStrokeTextEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdStrokeTextEdit::setLayerName(const GraphicsLayerName& name,
-                                     bool immediate) noexcept {
+void CmdStrokeTextEdit::setLayer(const Layer& layer, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewLayerName = name;
-  if (immediate) mText.setLayerName(mNewLayerName);
+  mNewLayer = &layer;
+  if (immediate) mText.setLayer(*mNewLayer);
 }
 
 void CmdStrokeTextEdit::setText(const QString& text, bool immediate) noexcept {
@@ -183,9 +182,7 @@ void CmdStrokeTextEdit::mirrorGeometry(Qt::Orientation orientation,
 }
 
 void CmdStrokeTextEdit::mirrorLayer(bool immediate) noexcept {
-  setLayerName(
-      GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)),
-      immediate);
+  setLayer(mNewLayer->mirrored(), immediate);
   setMirrored(!mNewMirrored, immediate);
 
   // Changing the mirror property inverts the rotation and alignment. To keep
@@ -212,7 +209,7 @@ void CmdStrokeTextEdit::setAutoRotate(bool autoRotate,
 bool CmdStrokeTextEdit::performExecute() {
   performRedo();  // can throw
 
-  if (mNewLayerName != mOldLayerName) return true;
+  if (mNewLayer != mOldLayer) return true;
   if (mNewText != mOldText) return true;
   if (mNewPosition != mOldPosition) return true;
   if (mNewRotation != mOldRotation) return true;
@@ -227,7 +224,7 @@ bool CmdStrokeTextEdit::performExecute() {
 }
 
 void CmdStrokeTextEdit::performUndo() {
-  mText.setLayerName(mOldLayerName);
+  mText.setLayer(*mOldLayer);
   mText.setText(mOldText);
   mText.setPosition(mOldPosition);
   mText.setRotation(mOldRotation);
@@ -241,7 +238,7 @@ void CmdStrokeTextEdit::performUndo() {
 }
 
 void CmdStrokeTextEdit::performRedo() {
-  mText.setLayerName(mNewLayerName);
+  mText.setLayer(*mNewLayer);
   mText.setText(mNewText);
   mText.setPosition(mNewPosition);
   mText.setRotation(mNewRotation);

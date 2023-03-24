@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "si_netlabel.h"
 
-#include "../../../graphics/graphicsscene.h"
 #include "../../../utils/scopeguard.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
@@ -42,15 +41,15 @@ namespace librepcb {
  ******************************************************************************/
 
 SI_NetLabel::SI_NetLabel(SI_NetSegment& segment, const NetLabel& label)
-  : SI_Base(segment.getSchematic()), mNetSegment(segment), mNetLabel(label) {
-  // create the graphics item
-  mGraphicsItem.reset(new SGI_NetLabel(*this));
-  mGraphicsItem->setPos(mNetLabel.getPosition().toPxQPointF());
-  mGraphicsItem->setRotation(-mNetLabel.getRotation().toDeg());
+  : SI_Base(segment.getSchematic()),
+    onEdited(*this),
+    mNetSegment(segment),
+    mNetLabel(label),
+    mAnchorPosition() {
+  updateAnchor();
 }
 
 SI_NetLabel::~SI_NetLabel() noexcept {
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
@@ -62,7 +61,7 @@ NetSignal& SI_NetLabel::getNetSignalOfNetSegment() const noexcept {
 }
 
 Length SI_NetLabel::getApproximateWidth() noexcept {
-  return Length::fromPx(mGraphicsItem->boundingRect().right());
+  return Length();  // TODO
 }
 
 /*******************************************************************************
@@ -71,22 +70,20 @@ Length SI_NetLabel::getApproximateWidth() noexcept {
 
 void SI_NetLabel::setPosition(const Point& position) noexcept {
   if (mNetLabel.setPosition(position)) {
-    mGraphicsItem->setPos(position.toPxQPointF());
+    onEdited.notify(Event::PositionChanged);
     updateAnchor();
   }
 }
 
 void SI_NetLabel::setRotation(const Angle& rotation) noexcept {
   if (mNetLabel.setRotation(rotation)) {
-    mGraphicsItem->setRotation(-rotation.toDeg());
-    mGraphicsItem->updateCacheAndRepaint();
-    updateAnchor();
+    onEdited.notify(Event::RotationChanged);
   }
 }
 
 void SI_NetLabel::setMirrored(const bool mirrored) noexcept {
   if (mNetLabel.setMirrored(mirrored)) {
-    mGraphicsItem->updateCacheAndRepaint();
+    onEdited.notify(Event::MirroredChanged);
   }
 }
 
@@ -94,24 +91,14 @@ void SI_NetLabel::setMirrored(const bool mirrored) noexcept {
  *  General Methods
  ******************************************************************************/
 
-void SI_NetLabel::updateAnchor() noexcept {
-  mGraphicsItem->setAnchor(
-      mNetSegment.calcNearestPoint(mNetLabel.getPosition()));
-}
-
 void SI_NetLabel::addToSchematic() {
   if (isAddedToSchematic()) {
     throw LogicError(__FILE__, __LINE__);
   }
   mNameChangedConnection =
       connect(&getNetSignalOfNetSegment(), &NetSignal::nameChanged,
-              [this]() { mGraphicsItem->updateCacheAndRepaint(); });
-  mHighlightChangedConnection =
-      connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
-              [this]() { mGraphicsItem->update(); });
-  SI_Base::addToSchematic(mGraphicsItem.data());
-  mGraphicsItem->updateCacheAndRepaint();
-  updateAnchor();
+              [this]() { onEdited.notify(Event::NetNameChanged); });
+  SI_Base::addToSchematic();
 }
 
 void SI_NetLabel::removeFromSchematic() {
@@ -119,21 +106,15 @@ void SI_NetLabel::removeFromSchematic() {
     throw LogicError(__FILE__, __LINE__);
   }
   disconnect(mNameChangedConnection);
-  disconnect(mHighlightChangedConnection);
-  SI_Base::removeFromSchematic(mGraphicsItem.data());
+  SI_Base::removeFromSchematic();
 }
 
-/*******************************************************************************
- *  Inherited from SI_Base
- ******************************************************************************/
-
-QPainterPath SI_NetLabel::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-void SI_NetLabel::setSelected(bool selected) noexcept {
-  SI_Base::setSelected(selected);
-  mGraphicsItem->update();
+void SI_NetLabel::updateAnchor() noexcept {
+  const Point p = mNetSegment.calcNearestPoint(mNetLabel.getPosition());
+  if (p != mAnchorPosition) {
+    mAnchorPosition = p;
+    onEdited.notify(Event::AnchorPositionChanged);
+  }
 }
 
 /*******************************************************************************

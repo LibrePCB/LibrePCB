@@ -212,12 +212,6 @@ void Circuit::setNetSignalName(NetSignal& netsignal,
   netsignal.setName(newName, isAutoName);  // can throw
 }
 
-void Circuit::setHighlightedNetSignal(NetSignal* signal) noexcept {
-  foreach (NetSignal* netsignal, mNetSignals) {
-    netsignal->setHighlighted(signal == netsignal);
-  }
-}
-
 /*******************************************************************************
  *  ComponentInstance Methods
  ******************************************************************************/

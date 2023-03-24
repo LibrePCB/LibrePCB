@@ -35,10 +35,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Board;
-
 namespace editor {
+
+class BoardGraphicsScene;
 
 /*******************************************************************************
  *  Class BoardClipboardDataBuilder
@@ -52,7 +51,7 @@ public:
   // Constructors / Destructor
   BoardClipboardDataBuilder() = delete;
   BoardClipboardDataBuilder(const BoardClipboardDataBuilder& other) = delete;
-  explicit BoardClipboardDataBuilder(Board& board) noexcept;
+  explicit BoardClipboardDataBuilder(BoardGraphicsScene& scene) noexcept;
   ~BoardClipboardDataBuilder() noexcept;
 
   // General Methods
@@ -64,7 +63,7 @@ public:
       delete;
 
 private:  // Data
-  Board& mBoard;
+  BoardGraphicsScene& mScene;
 };
 
 /*******************************************************************************

@@ -34,8 +34,8 @@
 
 #include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -55,7 +55,7 @@ BoardEditorState_AddStrokeText::BoardEditorState_AddStrokeText(
     mIsUndoCmdActive(false),
     mLastStrokeTextProperties(
         Uuid::createRandom(),  // UUID is not relevant here
-        GraphicsLayerName(GraphicsLayer::sBoardDocumentation),  // Layer
+        Layer::boardDocumentation(),  // Layer
         "{{PROJECT}}",  // Text
         Point(),  // Position is not relevant here
         Angle::deg0(),  // Rotation
@@ -80,7 +80,7 @@ BoardEditorState_AddStrokeText::~BoardEditorState_AddStrokeText() noexcept {
 bool BoardEditorState_AddStrokeText::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  makeLayerVisible();
+  makeLayerVisible(mLastStrokeTextProperties.getLayer().getThemeColor());
 
   // Add a new stroke text
   Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
@@ -92,10 +92,8 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
   // Add the layers combobox to the toolbar
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
   mLayerComboBox = new GraphicsLayerComboBox();
-  if (Board* board = getActiveBoard()) {
-    mLayerComboBox->setLayers(getAllowedGeometryLayers(*board));
-  }
-  mLayerComboBox->setCurrentLayer(mLastStrokeTextProperties.getLayerName());
+  mLayerComboBox->setLayers(getAllowedGeometryLayers());
+  mLayerComboBox->setCurrentLayer(mLastStrokeTextProperties.getLayer());
   mLayerComboBox->addAction(cmd.layerUp.createAction(
       mLayerComboBox, mLayerComboBox.data(), &GraphicsLayerComboBox::stepDown));
   mLayerComboBox->addAction(cmd.layerDown.createAction(
@@ -228,7 +226,7 @@ bool BoardEditorState_AddStrokeText::addText(const Point& pos) noexcept {
         new CmdBoardStrokeTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());
     mCurrentTextEditCmd.reset(
-        new CmdStrokeTextEdit(mCurrentTextToPlace->getText()));
+        new CmdStrokeTextEdit(mCurrentTextToPlace->getTextObj()));
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -241,7 +239,7 @@ bool BoardEditorState_AddStrokeText::rotateText(const Angle& angle) noexcept {
   if ((!mCurrentTextEditCmd) || (!mCurrentTextToPlace)) return false;
 
   mCurrentTextEditCmd->rotate(angle, mCurrentTextToPlace->getPosition(), true);
-  mLastStrokeTextProperties = mCurrentTextToPlace->getText();
+  mLastStrokeTextProperties = mCurrentTextToPlace->getTextObj();
 
   return true;  // Event handled
 }
@@ -253,10 +251,10 @@ bool BoardEditorState_AddStrokeText::flipText(
   mCurrentTextEditCmd->mirrorGeometry(orientation,
                                       mCurrentTextToPlace->getPosition(), true);
   mCurrentTextEditCmd->mirrorLayer(true);
-  mLastStrokeTextProperties = mCurrentTextToPlace->getText();
+  mLastStrokeTextProperties = mCurrentTextToPlace->getTextObj();
 
   // Update toolbar widgets
-  mLayerComboBox->setCurrentLayer(mLastStrokeTextProperties.getLayerName());
+  mLayerComboBox->setCurrentLayer(mLastStrokeTextProperties.getLayer());
   mMirrorCheckBox->setChecked(mLastStrokeTextProperties.getMirrored());
 
   return true;  // Event handled
@@ -313,12 +311,11 @@ bool BoardEditorState_AddStrokeText::abortCommand(bool showErrMsgBox) noexcept {
 }
 
 void BoardEditorState_AddStrokeText::layerComboBoxLayerChanged(
-    const GraphicsLayerName& layerName) noexcept {
-  mLastStrokeTextProperties.setLayerName(layerName);
+    const Layer& layer) noexcept {
+  mLastStrokeTextProperties.setLayer(layer);
   if (mCurrentTextEditCmd) {
-    mCurrentTextEditCmd->setLayerName(mLastStrokeTextProperties.getLayerName(),
-                                      true);
-    makeLayerVisible();
+    mCurrentTextEditCmd->setLayer(layer, true);
+    makeLayerVisible(layer.getThemeColor());
   }
 }
 
@@ -344,14 +341,6 @@ void BoardEditorState_AddStrokeText::mirrorCheckBoxToggled(
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setMirrored(mLastStrokeTextProperties.getMirrored(),
                                      true);
-  }
-}
-
-void BoardEditorState_AddStrokeText::makeLayerVisible() noexcept {
-  if (Board* board = getActiveBoard()) {
-    GraphicsLayer* layer = board->getLayerStack().getLayer(
-        *mLastStrokeTextProperties.getLayerName());
-    if (layer && layer->isEnabled()) layer->setVisible(true);
   }
 }
 

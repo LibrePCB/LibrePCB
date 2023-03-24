@@ -48,7 +48,6 @@ NetSignal::NetSignal(Circuit& circuit, const Uuid& uuid, NetClass& netclass,
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
-    mIsHighlighted(false),
     mUuid(uuid),
     mName(name),
     mHasAutoName(autoName),
@@ -98,13 +97,6 @@ void NetSignal::setName(const CircuitIdentifier& name,
   mName = name;
   mHasAutoName = isAutoName;
   emit nameChanged(mName);
-}
-
-void NetSignal::setHighlighted(bool hl) noexcept {
-  if (hl != mIsHighlighted) {
-    mIsHighlighted = hl;
-    emit highlightedChanged(mIsHighlighted);
-  }
 }
 
 /*******************************************************************************

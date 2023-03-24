@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "symboleditorstate.h"
 
-#include <librepcb/core/graphics/graphicslayername.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/point.h>
@@ -40,12 +39,13 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Layer;
 class Polygon;
-class PolygonGraphicsItem;
 
 namespace editor {
 
 class CmdPolygonEdit;
+class PolygonGraphicsItem;
 
 /*******************************************************************************
  *  Class SymbolEditorState_DrawPolygonBase
@@ -98,7 +98,7 @@ private:  // Methods
   void updateOverlayText() noexcept;
   void updateStatusBarMessage() noexcept;
 
-  void layerComboBoxValueChanged(const GraphicsLayerName& layerName) noexcept;
+  void layerComboBoxValueChanged(const Layer& layer) noexcept;
   void lineWidthEditValueChanged(const UnsignedLength& value) noexcept;
   void angleEditValueChanged(const Angle& value) noexcept;
   void fillCheckBoxCheckedChanged(bool checked) noexcept;
@@ -118,7 +118,7 @@ private:  // Types / Data
   bool mArcInSecondState;
 
   // parameter memory
-  GraphicsLayerName mLastLayerName;
+  const Layer* mLastLayer;
   UnsignedLength mLastLineWidth;
   Angle mLastAngle;
   bool mLastFill;

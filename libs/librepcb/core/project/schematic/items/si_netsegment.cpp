@@ -210,6 +210,8 @@ void SI_NetSegment::addNetPointsAndNetLines(
   updateAllNetLabelAnchors();
 
   sgl.dismiss();
+
+  emit netPointsAndNetLinesAdded(netpoints, netlines);
 }
 
 void SI_NetSegment::removeNetPointsAndNetLines(
@@ -252,6 +254,8 @@ void SI_NetSegment::removeNetPointsAndNetLines(
   updateAllNetLabelAnchors();
 
   sgl.dismiss();
+
+  emit netPointsAndNetLinesRemoved(netpoints, netlines);
 }
 
 /*******************************************************************************
@@ -271,6 +275,7 @@ void SI_NetSegment::addNetLabel(SI_NetLabel& netlabel) {
   }
   netlabel.addToSchematic();  // can throw
   mNetLabels.insert(netlabel.getUuid(), &netlabel);
+  emit netLabelAdded(netlabel);
 }
 
 void SI_NetSegment::removeNetLabel(SI_NetLabel& netlabel) {
@@ -280,6 +285,7 @@ void SI_NetSegment::removeNetLabel(SI_NetLabel& netlabel) {
   }
   netlabel.removeFromSchematic();  // can throw
   mNetLabels.remove(netlabel.getUuid());
+  emit netLabelRemoved(netlabel);
 }
 
 void SI_NetSegment::updateAllNetLabelAnchors() noexcept {
@@ -312,7 +318,7 @@ void SI_NetSegment::addToSchematic() {
     sgl.add([netlabel]() { netlabel->removeFromSchematic(); });
   }
 
-  SI_Base::addToSchematic(nullptr);
+  SI_Base::addToSchematic();
   sgl.dismiss();
 }
 
@@ -338,35 +344,8 @@ void SI_NetSegment::removeFromSchematic() {
   mNetSignal->unregisterSchematicNetSegment(*this);  // can throw
   sgl.add([&]() { mNetSignal->registerSchematicNetSegment(*this); });
 
-  SI_Base::removeFromSchematic(nullptr);
+  SI_Base::removeFromSchematic();
   sgl.dismiss();
-}
-
-void SI_NetSegment::selectAll() noexcept {
-  foreach (SI_NetPoint* netpoint, mNetPoints)
-    netpoint->setSelected(true);
-  foreach (SI_NetLine* netline, mNetLines)
-    netline->setSelected(true);
-  foreach (SI_NetLabel* netlabel, mNetLabels)
-    netlabel->setSelected(true);
-}
-
-void SI_NetSegment::setSelectionRect(const QRectF rectPx) noexcept {
-  foreach (SI_NetPoint* netpoint, mNetPoints)
-    netpoint->setSelected(netpoint->getGrabAreaScenePx().intersects(rectPx));
-  foreach (SI_NetLine* netline, mNetLines)
-    netline->setSelected(netline->getGrabAreaScenePx().intersects(rectPx));
-  foreach (SI_NetLabel* netlabel, mNetLabels)
-    netlabel->setSelected(netlabel->getGrabAreaScenePx().intersects(rectPx));
-}
-
-void SI_NetSegment::clearSelection() const noexcept {
-  foreach (SI_NetPoint* netpoint, mNetPoints)
-    netpoint->setSelected(false);
-  foreach (SI_NetLine* netline, mNetLines)
-    netline->setSelected(false);
-  foreach (SI_NetLabel* netlabel, mNetLabels)
-    netlabel->setSelected(false);
 }
 
 void SI_NetSegment::serialize(SExpression& root) const {
@@ -391,26 +370,6 @@ void SI_NetSegment::serialize(SExpression& root) const {
     obj->getNetLabel().serialize(root.appendList("label"));
   }
   root.ensureLineBreak();
-}
-
-/*******************************************************************************
- *  Inherited from SI_Base
- ******************************************************************************/
-
-QPainterPath SI_NetSegment::getGrabAreaScenePx() const noexcept {
-  return QPainterPath();
-}
-
-bool SI_NetSegment::isSelected() const noexcept {
-  if (mNetLines.isEmpty()) return false;
-  foreach (const SI_NetLine* netline, mNetLines) {
-    if (!netline->isSelected()) return false;
-  }
-  return true;
-}
-
-void SI_NetSegment::setSelected(bool selected) noexcept {
-  SI_Base::setSelected(selected);
 }
 
 /*******************************************************************************

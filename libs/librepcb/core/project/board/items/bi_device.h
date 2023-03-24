@@ -26,7 +26,7 @@
 #include "../../../attribute/attribute.h"
 #include "../../../attribute/attributeprovider.h"
 #include "../../../types/uuid.h"
-#include "../graphicsitems/bgi_device.h"
+#include "../../../utils/signalslot.h"
 #include "bi_base.h"
 #include "bi_stroketext.h"
 
@@ -37,6 +37,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BI_FootprintPad;
 class Board;
 class ComponentInstance;
 class Device;
@@ -55,6 +56,16 @@ class BI_Device final : public BI_Base, public AttributeProvider {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionChanged,
+    RotationChanged,
+    MirroredChanged,
+    StopMaskOffsetsChanged,
+  };
+  Signal<BI_Device, Event> onEdited;
+  typedef Slot<BI_Device, Event> OnEditedSlot;
+
   // Constructors / Destructor
   BI_Device() = delete;
   BI_Device(const BI_Device& other) = delete;
@@ -80,10 +91,10 @@ public:
     return mPads.value(padUuid);
   }
   const QMap<Uuid, BI_FootprintPad*>& getPads() const noexcept { return mPads; }
-  bool isSelectable() const noexcept override;
+  const QHash<Uuid, tl::optional<Length>>& getHoleStopMasks() const noexcept {
+    return mHoleStopMaskOffsets;
+  }
   bool isUsed() const noexcept;
-  QRectF getBoundingRect() const noexcept;
-  BGI_Device& getGraphicsItem() noexcept { return *mGraphicsItem; }
 
   // Setters
   void setPosition(const Point& pos) noexcept;
@@ -120,11 +131,6 @@ public:
   QVector<const AttributeProvider*> getAttributeProviderParents() const
       noexcept override;
 
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override { return BI_Base::Type_t::Device; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
-
   // Operator Overloadings
   BI_Device& operator=(const BI_Device& rhs) = delete;
 
@@ -132,9 +138,12 @@ signals:
   /// @copydoc AttributeProvider::attributesChanged()
   void attributesChanged() override;
 
+  void strokeTextAdded(BI_StrokeText& strokeText);
+  void strokeTextRemoved(BI_StrokeText& strokeText);
+
 private:
   bool checkAttributesValidity() const noexcept;
-  void updateGraphicsItemTransform() noexcept;
+  void updateHoleStopMaskOffsets() noexcept;
   const QStringList& getLocaleOrder() const noexcept;
 
   // General
@@ -147,13 +156,11 @@ private:
   Point mPosition;
   Angle mRotation;
   bool mMirrored;
-  AttributeList
-      mAttributes;  ///< not yet used, but already specified in file format
+  AttributeList mAttributes;  ///< Not used yet, but specified in file format
 
   QMap<Uuid, BI_FootprintPad*> mPads;  ///< key: footprint pad UUID
   QMap<Uuid, BI_StrokeText*> mStrokeTexts;
-
-  QScopedPointer<BGI_Device> mGraphicsItem;
+  QHash<Uuid, tl::optional<Length>> mHoleStopMaskOffsets;
 };
 
 /*******************************************************************************

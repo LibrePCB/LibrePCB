@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "unplacedcomponentsdock.h"
 
+#include "../../graphics/defaultgraphicslayerprovider.h"
+#include "../../graphics/graphicsscene.h"
 #include "../../library/pkg/footprintgraphicsitem.h"
 #include "../../project/cmd/cmdcomponentinstanceedit.h"
 #include "../../undostack.h"
@@ -32,14 +34,11 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
@@ -80,7 +79,8 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
     mSelectedPackage(nullptr),
     mSelectedPackageOwned(false),
     mSelectedFootprintUuid(),
-    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider()),
+    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider(
+        mProjectEditor.getWorkspace().getSettings().themes.getActive())),
     mPreviewGraphicsScene(new GraphicsScene()),
     mPreviewGraphicsItem(nullptr) {
   mUi->setupUi(this);
@@ -88,7 +88,6 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
   // Setup graphics view.
   const Theme& theme =
       mProjectEditor.getWorkspace().getSettings().themes.getActive();
-  mGraphicsLayerProvider->applyTheme(theme);
   mUi->graphicsView->setBackgroundColors(
       theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());

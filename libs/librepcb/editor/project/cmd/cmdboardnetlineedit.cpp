@@ -50,7 +50,7 @@ CmdBoardNetLineEdit::~CmdBoardNetLineEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdBoardNetLineEdit::setLayer(GraphicsLayer& layer) noexcept {
+void CmdBoardNetLineEdit::setLayer(const Layer& layer) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewLayer = &layer;
 }

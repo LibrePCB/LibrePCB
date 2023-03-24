@@ -22,13 +22,10 @@
  ******************************************************************************/
 #include "si_text.h"
 
-#include "../../../graphics/graphicsscene.h"
-#include "../../../graphics/linegraphicsitem.h"
-#include "../../../graphics/origincrossgraphicsitem.h"
-#include "../../../graphics/textgraphicsitem.h"
+#include "../../../attribute/attributesubstitutor.h"
 #include "../../project.h"
 #include "../schematic.h"
-#include "../schematiclayerprovider.h"
+#include "si_symbol.h"
 
 #include <QtCore>
 
@@ -43,26 +40,21 @@ namespace librepcb {
 
 SI_Text::SI_Text(Schematic& schematic, const Text& text)
   : SI_Base(schematic),
+    onEdited(*this),
     mSymbol(nullptr),
-    mText(text),
-    mGraphicsItem(
-        new TextGraphicsItem(mText, mSchematic.getProject().getLayers())),
-    mAnchorGraphicsItem(new LineGraphicsItem()),
+    mTextObj(text),
+    mText(),
     mOnTextEditedSlot(*this, &SI_Text::textEdited) {
-  mText.onEdited.attach(mOnTextEditedSlot);
-
-  mGraphicsItem->setZValue(Schematic::ZValue_Texts);
-  mGraphicsItem->setAttributeProvider(&mSchematic);
-
-  mAnchorGraphicsItem->setZValue(Schematic::ZValue_TextAnchors);
+  mTextObj.onEdited.attach(mOnTextEditedSlot);
 
   // Connect to the "attributes changed" signal of the schematic.
   connect(&mSchematic, &Schematic::attributesChanged, this,
-          &SI_Text::schematicOrSymbolAttributesChanged);
+          &SI_Text::updateText);
+
+  updateText();
 }
 
 SI_Text::~SI_Text() noexcept {
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
@@ -70,20 +62,23 @@ SI_Text::~SI_Text() noexcept {
  ******************************************************************************/
 
 void SI_Text::setSymbol(SI_Symbol* symbol) noexcept {
+  if (symbol == mSymbol) {
+    return;
+  }
+
   if (mSymbol) {
     disconnect(mSymbol, &SI_Symbol::attributesChanged, this,
-               &SI_Text::schematicOrSymbolAttributesChanged);
+               &SI_Text::updateText);
   }
 
   mSymbol = symbol;
-  mGraphicsItem->setAttributeProvider(getAttributeProvider());
-  updateAnchor();
 
   // Text might need to be updated if symbol attributes have changed.
   if (mSymbol) {
-    connect(mSymbol, &SI_Symbol::attributesChanged, this,
-            &SI_Text::schematicOrSymbolAttributesChanged);
+    connect(mSymbol, &SI_Symbol::attributesChanged, this, &SI_Text::updateText);
   }
+
+  updateText();
 }
 
 const AttributeProvider* SI_Text::getAttributeProvider() const noexcept {
@@ -94,64 +89,50 @@ const AttributeProvider* SI_Text::getAttributeProvider() const noexcept {
   }
 }
 
-void SI_Text::updateAnchor() noexcept {
-  if (mSymbol && isSelected()) {
-    mAnchorGraphicsItem->setLine(mText.getPosition(), mSymbol->getPosition());
-    mAnchorGraphicsItem->setLayer(
-        mSchematic.getProject().getLayers().getLayer(*mText.getLayerName()));
-  } else {
-    mAnchorGraphicsItem->setLayer(nullptr);
-  }
-}
-
 void SI_Text::addToSchematic() {
   if (isAddedToSchematic()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  SI_Base::addToSchematic(mGraphicsItem.data());
-  mSchematic.getGraphicsScene().addItem(*mAnchorGraphicsItem);
+  SI_Base::addToSchematic();
 }
 
 void SI_Text::removeFromSchematic() {
   if (!isAddedToSchematic()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  SI_Base::removeFromSchematic(mGraphicsItem.data());
-  mSchematic.getGraphicsScene().removeItem(*mAnchorGraphicsItem);
-}
-
-/*******************************************************************************
- *  Inherited from SI_Base
- ******************************************************************************/
-
-QPainterPath SI_Text::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-void SI_Text::setSelected(bool selected) noexcept {
-  SI_Base::setSelected(selected);
-  mGraphicsItem->setSelected(selected);
-  updateAnchor();
+  SI_Base::removeFromSchematic();
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-void SI_Text::schematicOrSymbolAttributesChanged() noexcept {
-  // Attribute changed -> graphics item needs to perform attribute substitution.
-  mGraphicsItem->updateText();
-}
-
 void SI_Text::textEdited(const Text& text, Text::Event event) noexcept {
   Q_UNUSED(text);
   switch (event) {
-    case Text::Event::LayerNameChanged:
-    case Text::Event::PositionChanged:
-      updateAnchor();
+    case Text::Event::PositionChanged: {
+      onEdited.notify(Event::PositionChanged);
       break;
+    }
+    case Text::Event::LayerChanged: {
+      onEdited.notify(Event::LayerNameChanged);
+      break;
+    }
+    case Text::Event::TextChanged: {
+      updateText();
+      break;
+    }
     default:
       break;
+  }
+}
+
+void SI_Text::updateText() noexcept {
+  const QString text = AttributeSubstitutor::substitute(mTextObj.getText(),
+                                                        getAttributeProvider());
+  if (text != mText) {
+    mText = text;
+    onEdited.notify(Event::TextChanged);
   }
 }
 

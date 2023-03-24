@@ -39,15 +39,14 @@ namespace librepcb {
 SI_NetPoint::SI_NetPoint(SI_NetSegment& segment, const Uuid& uuid,
                          const Point& position)
   : SI_Base(segment.getSchematic()),
+    onEdited(*this),
     mNetSegment(segment),
     mJunction(uuid, position) {
-  // create the graphics item
-  mGraphicsItem.reset(new SGI_NetPoint(*this));
-  mGraphicsItem->setPos(mJunction.getPosition().toPxQPointF());
+  connect(&mNetSegment.getNetSignal(), &NetSignal::nameChanged, this,
+          [this]() { onEdited.notify(Event::NetSignalNameChanged); });
 }
 
 SI_NetPoint::~SI_NetPoint() noexcept {
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
@@ -76,8 +75,10 @@ NetLineAnchor SI_NetPoint::toNetLineAnchor() const noexcept {
 
 void SI_NetPoint::setPosition(const Point& position) noexcept {
   if (mJunction.setPosition(position)) {
-    mGraphicsItem->setPos(position.toPxQPointF());
-    foreach (SI_NetLine* line, mRegisteredNetLines) { line->updateLine(); }
+    foreach (SI_NetLine* netLine, mRegisteredNetLines) {
+      netLine->updatePositions();
+    }
+    onEdited.notify(Event::PositionChanged);
   }
 }
 
@@ -89,18 +90,14 @@ void SI_NetPoint::addToSchematic() {
   if (isAddedToSchematic() || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  mHighlightChangedConnection =
-      connect(&getNetSignalOfNetSegment(), &NetSignal::highlightedChanged,
-              [this]() { mGraphicsItem->update(); });
-  SI_Base::addToSchematic(mGraphicsItem.data());
+  SI_Base::addToSchematic();
 }
 
 void SI_NetPoint::removeFromSchematic() {
   if ((!isAddedToSchematic()) || isUsed()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  disconnect(mHighlightChangedConnection);
-  SI_Base::removeFromSchematic(mGraphicsItem.data());
+  SI_Base::removeFromSchematic();
 }
 
 void SI_NetPoint::registerNetLine(SI_NetLine& netline) {
@@ -109,8 +106,9 @@ void SI_NetPoint::registerNetLine(SI_NetLine& netline) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredNetLines.insert(&netline);
-  netline.updateLine();
-  mGraphicsItem->updateCacheAndRepaint();
+  if (mRegisteredNetLines.count() <= 3) {
+    onEdited.notify(Event::JunctionChanged);
+  }
 }
 
 void SI_NetPoint::unregisterNetLine(SI_NetLine& netline) {
@@ -118,22 +116,9 @@ void SI_NetPoint::unregisterNetLine(SI_NetLine& netline) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredNetLines.remove(&netline);
-  netline.updateLine();
-  mGraphicsItem->updateCacheAndRepaint();
-}
-
-/*******************************************************************************
- *  Inherited from SI_Base
- ******************************************************************************/
-
-QPainterPath SI_NetPoint::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->shape().translated(
-      mJunction.getPosition().toPxQPointF());
-}
-
-void SI_NetPoint::setSelected(bool selected) noexcept {
-  SI_Base::setSelected(selected);
-  mGraphicsItem->update();
+  if (mRegisteredNetLines.count() <= 2) {
+    onEdited.notify(Event::JunctionChanged);
+  }
 }
 
 /*******************************************************************************

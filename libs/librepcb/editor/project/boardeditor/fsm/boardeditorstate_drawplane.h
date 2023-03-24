@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "boardeditorstate.h"
 
-#include <librepcb/core/graphics/graphicslayername.h>
 #include <librepcb/core/types/point.h>
 
 #include <QtCore>
@@ -37,6 +36,7 @@
 namespace librepcb {
 
 class BI_Plane;
+class Layer;
 class NetSignal;
 
 namespace editor {
@@ -85,14 +85,14 @@ private:  // Methods
   bool updateLastVertexPosition(const Point& pos) noexcept;
   void setNetSignal(NetSignal* netsignal) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
-  void layerComboBoxLayerChanged(const GraphicsLayerName& layerName) noexcept;
+  void layerComboBoxLayerChanged(const Layer& layer) noexcept;
   void makeSelectedLayerVisible() noexcept;
 
 private:  // Data
   // State
   bool mIsUndoCmdActive;
   NetSignal* mLastNetSignal;
-  GraphicsLayerName mLastLayerName;
+  const Layer* mLastLayer;
   Point mLastVertexPos;
 
   // Information about the current text to place. Only valid if

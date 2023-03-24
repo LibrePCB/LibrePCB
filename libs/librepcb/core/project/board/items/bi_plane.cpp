@@ -27,7 +27,7 @@
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
-#include "../graphicsitems/bgi_plane.h"
+#include "../board.h"
 
 #include <QtCore>
 
@@ -40,12 +40,12 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Plane::BI_Plane(Board& board, const Uuid& uuid,
-                   const GraphicsLayerName& layerName, NetSignal& netsignal,
-                   const Path& outline)
+BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
+                   NetSignal& netsignal, const Path& outline)
   : BI_Base(board),
+    onEdited(*this),
     mUuid(uuid),
-    mLayerName(layerName),
+    mLayer(&layer),
     mNetSignal(&netsignal),
     mOutline(outline),
     mMinWidth(200000),
@@ -54,19 +54,11 @@ BI_Plane::BI_Plane(Board& board, const Uuid& uuid,
     mPriority(0),
     mConnectStyle(ConnectStyle::Solid),
     // mThermalGapWidth(100000), mThermalSpokeWidth(100000),
-    mGraphicsItem(nullptr),
     mIsVisible(true),
     mFragments() {
-  mGraphicsItem.reset(new BGI_Plane(*this));
-  mGraphicsItem->setRotation(Angle::deg0().toDeg());
-
-  // connect to the "attributes changed" signal of the board
-  connect(&mBoard, &Board::attributesChanged, this,
-          &BI_Plane::boardAttributesChanged);
 }
 
 BI_Plane::~BI_Plane() noexcept {
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
@@ -76,14 +68,14 @@ BI_Plane::~BI_Plane() noexcept {
 void BI_Plane::setOutline(const Path& outline) noexcept {
   if (outline != mOutline) {
     mOutline = outline;
-    mGraphicsItem->updateCacheAndRepaint();
+    onEdited.notify(Event::OutlineChanged);
   }
 }
 
-void BI_Plane::setLayerName(const GraphicsLayerName& layerName) noexcept {
-  if (layerName != mLayerName) {
-    mLayerName = layerName;
-    mGraphicsItem->updateCacheAndRepaint();
+void BI_Plane::setLayer(const Layer& layer) noexcept {
+  if (&layer != mLayer) {
+    mLayer = &layer;
+    onEdited.notify(Event::LayerChanged);
   }
 }
 
@@ -135,14 +127,14 @@ void BI_Plane::setKeepOrphans(bool keepOrphans) noexcept {
 void BI_Plane::setVisible(bool visible) noexcept {
   if (visible != mIsVisible) {
     mIsVisible = visible;
-    mGraphicsItem->update();
+    onEdited.notify(Event::VisibilityChanged);
   }
 }
 
 void BI_Plane::setCalculatedFragments(const QVector<Path>& fragments) noexcept {
   if (fragments != mFragments) {
     mFragments = fragments;
-    mGraphicsItem->updateCacheAndRepaint();
+    onEdited.notify(Event::FragmentsChanged);
     mBoard.scheduleAirWiresRebuild(mNetSignal);
   }
 }
@@ -156,8 +148,7 @@ void BI_Plane::addToBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   mNetSignal->registerBoardPlane(*this);  // can throw
-  BI_Base::addToBoard(mGraphicsItem.data());
-  mGraphicsItem->updateCacheAndRepaint();  // TODO: remove this
+  BI_Base::addToBoard();
   mBoard.scheduleAirWiresRebuild(mNetSignal);
 }
 
@@ -166,18 +157,13 @@ void BI_Plane::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   mNetSignal->unregisterBoardPlane(*this);  // can throw
-  BI_Base::removeFromBoard(mGraphicsItem.data());
+  BI_Base::removeFromBoard();
   mBoard.scheduleAirWiresRebuild(mNetSignal);
-}
-
-void BI_Plane::clear() noexcept {
-  mFragments.clear();
-  mGraphicsItem->updateCacheAndRepaint();
 }
 
 void BI_Plane::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName);
+  root.appendChild("layer", *mLayer);
   root.ensureLineBreak();
   root.appendChild("net", mNetSignal->getUuid());
   root.appendChild("priority", mPriority);
@@ -190,23 +176,6 @@ void BI_Plane::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mOutline.serialize(root);
   root.ensureLineBreak();
-}
-
-/*******************************************************************************
- *  Inherited from BI_Base
- ******************************************************************************/
-
-QPainterPath BI_Plane::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-bool BI_Plane::isSelectable() const noexcept {
-  return mGraphicsItem->isSelectable();
-}
-
-void BI_Plane::setSelected(bool selected) noexcept {
-  BI_Base::setSelected(selected);
-  mGraphicsItem->setSelected(selected);
 }
 
 /*******************************************************************************
@@ -223,14 +192,6 @@ bool BI_Plane::operator<(const BI_Plane& rhs) const noexcept {
   } else {
     return mUuid < rhs.mUuid;
   }
-}
-
-/*******************************************************************************
- *  Private Slots
- ******************************************************************************/
-
-void BI_Plane::boardAttributesChanged() {
-  mGraphicsItem->updateCacheAndRepaint();
 }
 
 /*******************************************************************************

@@ -78,7 +78,7 @@ BI_NetLine* CmdBoardNetSegmentAddElements::addNetLine(BI_NetLine& netline) {
 
 BI_NetLine* CmdBoardNetSegmentAddElements::addNetLine(
     BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
-    GraphicsLayer& layer, const PositiveLength& width) {
+    const Layer& layer, const PositiveLength& width) {
   BI_NetLine* netline = new BI_NetLine(mNetSegment, Uuid::createRandom(),
                                        startPoint, endPoint, layer,
                                        width);  // can throw

@@ -35,11 +35,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class GraphicsScene;
-
 namespace editor {
 
+class GraphicsScene;
 class IF_GraphicsViewEventHandler;
 
 /*******************************************************************************

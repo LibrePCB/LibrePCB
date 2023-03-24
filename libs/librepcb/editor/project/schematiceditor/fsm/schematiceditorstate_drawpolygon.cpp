@@ -32,10 +32,10 @@
 #include "../../cmd/cmdschematicpolygonadd.h"
 #include "../schematiceditor.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_polygon.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -53,14 +53,13 @@ SchematicEditorState_DrawPolygon::SchematicEditorState_DrawPolygon(
     const Context& context) noexcept
   : SchematicEditorState(context),
     mIsUndoCmdActive(false),
-    mLastPolygonProperties(
-        Uuid::createRandom(),  // UUID is not relevant here
-        GraphicsLayerName(GraphicsLayer::sSchematicGuide),  // Layer
-        UnsignedLength(300000),  // Line width
-        false,  // Is filled
-        false,  // Is grab area
-        Path()  // Path is not relevant here
-        ),
+    mLastPolygonProperties(Uuid::createRandom(),  // UUID is not relevant here
+                           Layer::schematicGuide(),  // Layer
+                           UnsignedLength(300000),  // Line width
+                           false,  // Is filled
+                           false,  // Is grab area
+                           Path()  // Path is not relevant here
+                           ),
     mLastSegmentPos(),
     mCurrentPolygon(nullptr),
     mCurrentPolygonEditCmd(nullptr) {
@@ -83,7 +82,7 @@ bool SchematicEditorState_DrawPolygon::entry() noexcept {
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
   layerComboBox->setLayers(getAllowedGeometryLayers());
-  layerComboBox->setCurrentLayer(mLastPolygonProperties.getLayerName());
+  layerComboBox->setCurrentLayer(mLastPolygonProperties.getLayer());
   layerComboBox->addAction(
       cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
                                &GraphicsLayerComboBox::stepDown));
@@ -290,11 +289,10 @@ bool SchematicEditorState_DrawPolygon::abortCommand(
 }
 
 void SchematicEditorState_DrawPolygon::layerComboBoxLayerChanged(
-    const GraphicsLayerName& layerName) noexcept {
-  mLastPolygonProperties.setLayerName(layerName);
+    const Layer& layer) noexcept {
+  mLastPolygonProperties.setLayer(layer);
   if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setLayerName(mLastPolygonProperties.getLayerName(),
-                                         true);
+    mCurrentPolygonEditCmd->setLayer(mLastPolygonProperties.getLayer(), true);
   }
 }
 

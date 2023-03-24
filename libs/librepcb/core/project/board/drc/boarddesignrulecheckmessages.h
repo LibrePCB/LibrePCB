@@ -46,8 +46,8 @@ class BI_StrokeText;
 class BI_Via;
 class Circle;
 class ComponentInstance;
-class GraphicsLayer;
 class Hole;
+class Layer;
 class NetSignal;
 class PadHole;
 class Polygon;
@@ -279,8 +279,8 @@ public:
   // Constructors / Destructor
   DrcMsgCopperCopperClearanceViolation() = delete;
   DrcMsgCopperCopperClearanceViolation(
-      const QString& layer1, const NetSignal* net1, const BI_Base& item1,
-      const Polygon* polygon1, const Circle* circle1, const QString& layer2,
+      const Layer* layer1, const NetSignal* net1, const BI_Base& item1,
+      const Polygon* polygon1, const Circle* circle1, const Layer* layer2,
       const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
       const Circle* circle2, const UnsignedLength& minClearance,
       const QVector<Path>& locations);
@@ -290,7 +290,7 @@ public:
   virtual ~DrcMsgCopperCopperClearanceViolation() noexcept {}
 
 private:
-  static QString getLayerName(const QString& layer1, const QString& layer2);
+  static QString getLayerName(const Layer* layer1, const Layer* layer2);
   static QString getObjectName(const NetSignal* net, const BI_Base& item,
                                const Polygon* polygon, const Circle* circle);
   static void serializeObject(SExpression& node, const BI_Base& item,
@@ -535,8 +535,7 @@ class DrcMsgInvalidPadConnection final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgInvalidPadConnection() = delete;
-  DrcMsgInvalidPadConnection(const BI_FootprintPad& pad,
-                             const GraphicsLayer& layer,
+  DrcMsgInvalidPadConnection(const BI_FootprintPad& pad, const Layer& layer,
                              const QVector<Path>& locations) noexcept;
   DrcMsgInvalidPadConnection(const DrcMsgInvalidPadConnection& other) noexcept
     : RuleCheckMessage(other) {}

@@ -52,7 +52,7 @@ StrokeTextSpacing deserialize(const SExpression& node) {
 StrokeText::StrokeText(const StrokeText& other) noexcept
   : onEdited(*this),
     mUuid(other.mUuid),
-    mLayerName(other.mLayerName),
+    mLayer(other.mLayer),
     mText(other.mText),
     mPosition(other.mPosition),
     mRotation(other.mRotation),
@@ -70,7 +70,7 @@ StrokeText::StrokeText(const Uuid& uuid, const StrokeText& other) noexcept
   mUuid = uuid;
 }
 
-StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName,
+StrokeText::StrokeText(const Uuid& uuid, const Layer& layer,
                        const QString& text, const Point& pos,
                        const Angle& rotation, const PositiveLength& height,
                        const UnsignedLength& strokeWidth,
@@ -80,7 +80,7 @@ StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName,
                        bool autoRotate) noexcept
   : onEdited(*this),
     mUuid(uuid),
-    mLayerName(layerName),
+    mLayer(&layer),
     mText(text),
     mPosition(pos),
     mRotation(rotation),
@@ -96,7 +96,7 @@ StrokeText::StrokeText(const Uuid& uuid, const GraphicsLayerName& layerName,
 StrokeText::StrokeText(const SExpression& node)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+    mLayer(deserialize<const Layer*>(node.getChild("layer/@0"))),
     mText(node.getChild("value/@0").getValue()),
     mPosition(node.getChild("position")),
     mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
@@ -171,13 +171,13 @@ Length StrokeText::calcLineSpacing(const StrokeFont& font) const noexcept {
  *  Setters
  ******************************************************************************/
 
-bool StrokeText::setLayerName(const GraphicsLayerName& name) noexcept {
-  if (name == mLayerName) {
+bool StrokeText::setLayer(const Layer& layer) noexcept {
+  if (&layer == mLayer) {
     return false;
   }
 
-  mLayerName = name;
-  onEdited.notify(Event::LayerNameChanged);
+  mLayer = &layer;
+  onEdited.notify(Event::LayerChanged);
   return true;
 }
 
@@ -287,7 +287,7 @@ bool StrokeText::setAutoRotate(bool autoRotate) noexcept {
 
 void StrokeText::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName);
+  root.appendChild("layer", *mLayer);
   root.ensureLineBreak();
   root.appendChild("height", mHeight);
   root.appendChild("stroke_width", mStrokeWidth);
@@ -310,7 +310,7 @@ void StrokeText::serialize(SExpression& root) const {
 
 bool StrokeText::operator==(const StrokeText& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
-  if (mLayerName != rhs.mLayerName) return false;
+  if (mLayer != rhs.mLayer) return false;
   if (mText != rhs.mText) return false;
   if (mPosition != rhs.mPosition) return false;
   if (mRotation != rhs.mRotation) return false;
@@ -329,7 +329,7 @@ StrokeText& StrokeText::operator=(const StrokeText& rhs) noexcept {
     mUuid = rhs.mUuid;
     onEdited.notify(Event::UuidChanged);
   }
-  setLayerName(rhs.mLayerName);
+  setLayer(*rhs.mLayer);
   setText(rhs.mText);
   setPosition(rhs.mPosition);
   setRotation(rhs.mRotation);

@@ -22,13 +22,13 @@
  ******************************************************************************/
 #include "boardclipboarddatabuilder.h"
 
+#include "boardgraphicsscene.h"
 #include "boardnetsegmentsplitter.h"
+#include "boardselectionquery.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardselectionquery.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
@@ -54,8 +54,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardClipboardDataBuilder::BoardClipboardDataBuilder(Board& board) noexcept
-  : mBoard(board) {
+BoardClipboardDataBuilder::BoardClipboardDataBuilder(
+    BoardGraphicsScene& scene) noexcept
+  : mScene(scene) {
 }
 
 BoardClipboardDataBuilder::~BoardClipboardDataBuilder() noexcept {
@@ -68,21 +69,21 @@ BoardClipboardDataBuilder::~BoardClipboardDataBuilder() noexcept {
 std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
     const Point& cursorPos) const noexcept {
   std::unique_ptr<BoardClipboardData> data(
-      new BoardClipboardData(mBoard.getUuid(), cursorPos));
+      new BoardClipboardData(mScene.getBoard().getUuid(), cursorPos));
 
   // Get all selected items
-  std::unique_ptr<BoardSelectionQuery> query(mBoard.createSelectionQuery());
-  query->addDeviceInstancesOfSelectedFootprints();
-  query->addSelectedVias();
-  query->addSelectedNetLines();
-  query->addSelectedPlanes();
-  query->addSelectedPolygons();
-  query->addSelectedBoardStrokeTexts();
-  query->addSelectedHoles();
-  query->addNetPointsOfNetLines();
+  BoardSelectionQuery query(mScene);
+  query.addDeviceInstancesOfSelectedFootprints();
+  query.addSelectedVias();
+  query.addSelectedNetLines();
+  query.addSelectedPlanes();
+  query.addSelectedPolygons();
+  query.addSelectedBoardStrokeTexts();
+  query.addSelectedHoles();
+  query.addNetPointsOfNetLines();
 
   // Add devices
-  foreach (BI_Device* device, query->getDeviceInstances()) {
+  foreach (BI_Device* device, query.getDeviceInstances()) {
     // Copy library device
     std::unique_ptr<TransactionalDirectory> devDir =
         data->getDirectory("dev/" % device->getLibDevice().getUuid().toStr());
@@ -98,7 +99,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
     // Create list of stroke texts
     StrokeTextList strokeTexts;
     foreach (const BI_StrokeText* t, device->getStrokeTexts()) {
-      strokeTexts.append(std::make_shared<StrokeText>(t->getText()));
+      strokeTexts.append(std::make_shared<StrokeText>(t->getTextObj()));
     }
     // Add device
     data->getDevices().append(std::make_shared<BoardClipboardData::Device>(
@@ -117,14 +118,14 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
 
   // Add (splitted) net segments including vias, netpoints, and netlines
   QHash<BI_NetSegment*, BoardSelectionQuery::NetSegmentItems> netSegmentItems =
-      query->getNetSegmentItems();
+      query.getNetSegmentItems();
   for (auto it = netSegmentItems.constBegin(); it != netSegmentItems.constEnd();
        ++it) {
     BoardNetSegmentSplitter splitter;
-    foreach (BI_Device* device, mBoard.getDeviceInstances()) {
+    foreach (BI_Device* device, mScene.getBoard().getDeviceInstances()) {
       foreach (BI_FootprintPad* pad, device->getPads()) {
         if (pad->getNetSegmentOfLines() == it.key()) {
-          if (!query->getDeviceInstances().contains(device)) {
+          if (!query.getDeviceInstances().contains(device)) {
             // Pad is currently connected to this net segment, but will not be
             // copied. Thus it needs to be replaced by junctions.
             splitter.replaceFootprintPadByJunctions(pad->toTraceAnchor(),
@@ -160,10 +161,10 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
   }
 
   // Add planes
-  foreach (BI_Plane* plane, query->getPlanes()) {
+  foreach (BI_Plane* plane, query.getPlanes()) {
     std::shared_ptr<BoardClipboardData::Plane> newPlane =
         std::make_shared<BoardClipboardData::Plane>(
-            plane->getUuid(), plane->getLayerName(),
+            plane->getUuid(), plane->getLayer(),
             plane->getNetSignal().getName(), plane->getOutline(),
             plane->getMinWidth(), plane->getMinClearance(),
             plane->getKeepOrphans(), plane->getPriority(),
@@ -172,19 +173,19 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
   }
 
   // Add polygons
-  foreach (BI_Polygon* polygon, query->getPolygons()) {
+  foreach (BI_Polygon* polygon, query.getPolygons()) {
     data->getPolygons().append(
         std::make_shared<Polygon>(polygon->getPolygon()));
   }
 
   // Add stroke texts
-  foreach (BI_StrokeText* text, query->getStrokeTexts()) {
+  foreach (BI_StrokeText* text, query.getStrokeTexts()) {
     data->getStrokeTexts().append(
-        std::make_shared<StrokeText>(text->getText()));
+        std::make_shared<StrokeText>(text->getTextObj()));
   }
 
   // Add holes
-  foreach (BI_Hole* hole, query->getHoles()) {
+  foreach (BI_Hole* hole, query.getHoles()) {
     data->getHoles().append(std::make_shared<Hole>(hole->getHole()));
   }
 

@@ -30,6 +30,7 @@
 #include "../project.h"
 #include "../projectlibrary.h"
 #include "../schematic/items/si_symbol.h"
+#include "../schematic/schematic.h"
 #include "circuit.h"
 #include "componentsignalinstance.h"
 

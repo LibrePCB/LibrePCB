@@ -38,9 +38,10 @@ class SI_NetLine;
 class SI_NetPoint;
 class SI_NetSegment;
 class SI_Symbol;
-class Schematic;
 
 namespace editor {
+
+class SchematicGraphicsScene;
 
 /*******************************************************************************
  *  Class CmdRemoveSelectedSchematicItems
@@ -52,7 +53,8 @@ namespace editor {
 class CmdRemoveSelectedSchematicItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
-  explicit CmdRemoveSelectedSchematicItems(Schematic& schematic) noexcept;
+  explicit CmdRemoveSelectedSchematicItems(
+      SchematicGraphicsScene& scene) noexcept;
   ~CmdRemoveSelectedSchematicItems() noexcept;
 
 private:
@@ -69,7 +71,7 @@ private:
   void disconnectComponentSignalInstance(ComponentSignalInstance& signal);
 
   // Attributes from the constructor
-  Schematic& mSchematic;
+  SchematicGraphicsScene& mScene;
 };
 
 /*******************************************************************************

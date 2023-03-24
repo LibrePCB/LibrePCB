@@ -26,7 +26,7 @@
 #include "filedialog.h"
 #include "ui_dxfimportdialog.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -40,9 +40,8 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-DxfImportDialog::DxfImportDialog(QList<GraphicsLayer*> layers,
-                                 const GraphicsLayerName& defaultLayer,
-                                 bool supportHoles,
+DxfImportDialog::DxfImportDialog(const QSet<const Layer*>& layers,
+                                 const Layer& defaultLayer, bool supportHoles,
                                  const LengthUnit& lengthUnit,
                                  const QString& settingsPrefix,
                                  QWidget* parent) noexcept
@@ -67,8 +66,8 @@ DxfImportDialog::DxfImportDialog(QList<GraphicsLayer*> layers,
   // Load initial values and window geometry.
   try {
     QSettings clientSettings;
-    mUi->cbxLayer->setCurrentLayer(GraphicsLayerName(
-        clientSettings.value(settingsPrefix % "/layer", *defaultLayer)
+    mUi->cbxLayer->setCurrentLayer(Layer::get(
+        clientSettings.value(settingsPrefix % "/layer", defaultLayer.getId())
             .toString()));
     mUi->edtLineWidth->setValue(UnsignedLength(Length::fromMm(
         clientSettings.value(settingsPrefix % "/line_width", "0").toString())));
@@ -97,8 +96,8 @@ DxfImportDialog::DxfImportDialog(QList<GraphicsLayer*> layers,
 DxfImportDialog::~DxfImportDialog() noexcept {
   // Save the values and window geometry.
   QSettings clientSettings;
-  if (auto layerName = mUi->cbxLayer->getCurrentLayerName()) {
-    clientSettings.setValue(mSettingsPrefix % "/layer", **layerName);
+  if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
+    clientSettings.setValue(mSettingsPrefix % "/layer", layer->getId());
   }
   clientSettings.setValue(mSettingsPrefix % "/line_width",
                           mUi->edtLineWidth->getValue()->toMmString());
@@ -121,8 +120,8 @@ DxfImportDialog::~DxfImportDialog() noexcept {
  *  Getters
  ******************************************************************************/
 
-GraphicsLayerName DxfImportDialog::getLayerName() const noexcept {
-  if (auto layer = mUi->cbxLayer->getCurrentLayerName()) {
+const Layer& DxfImportDialog::getLayer() const noexcept {
+  if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
     return *layer;
   } else {
     return mDefaultLayer;

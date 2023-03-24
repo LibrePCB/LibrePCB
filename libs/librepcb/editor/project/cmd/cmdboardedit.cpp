@@ -23,7 +23,6 @@
 #include "cmdboardedit.h"
 
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 
 #include <QtCore>
 
@@ -42,7 +41,7 @@ CmdBoardEdit::CmdBoardEdit(Board& board) noexcept
     mBoard(board),
     mOldName(mBoard.getName()),
     mNewName(mOldName),
-    mOldInnerLayerCount(mBoard.getLayerStack().getInnerLayerCount()),
+    mOldInnerLayerCount(mBoard.getInnerLayerCount()),
     mNewInnerLayerCount(mOldInnerLayerCount),
     mOldDesignRules(mBoard.getDesignRules()),
     mNewDesignRules(mOldDesignRules),
@@ -94,14 +93,14 @@ bool CmdBoardEdit::performExecute() {
 
 void CmdBoardEdit::performUndo() {
   mBoard.setName(mOldName);
-  mBoard.getLayerStack().setInnerLayerCount(mOldInnerLayerCount);
+  mBoard.setInnerLayerCount(mOldInnerLayerCount);
   mBoard.setDesignRules(mOldDesignRules);
   mBoard.setDrcSettings(mOldDrcSettings);
 }
 
 void CmdBoardEdit::performRedo() {
   mBoard.setName(mNewName);
-  mBoard.getLayerStack().setInnerLayerCount(mNewInnerLayerCount);
+  mBoard.setInnerLayerCount(mNewInnerLayerCount);
   mBoard.setDesignRules(mNewDesignRules);
   mBoard.setDrcSettings(mNewDrcSettings);
 }

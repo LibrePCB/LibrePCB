@@ -29,6 +29,8 @@
 #include "../../project/cmd/cmdschematicnetpointedit.h"
 #include "../../project/cmd/cmdsymbolinstanceedit.h"
 #include "../../project/cmd/cmdsymbolinstancetextsreset.h"
+#include "../schematiceditor/schematicgraphicsscene.h"
+#include "../schematiceditor/schematicselectionquery.h"
 
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
@@ -39,7 +41,6 @@
 #include <librepcb/core/project/schematic/items/si_symbolpin.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
-#include <librepcb/core/project/schematic/schematicselectionquery.h>
 
 #include <QtCore>
 
@@ -54,9 +55,9 @@ namespace editor {
  ******************************************************************************/
 
 CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
-    Schematic& schematic, const Point& startPos) noexcept
+    SchematicGraphicsScene& scene, const Point& startPos) noexcept
   : UndoCommandGroup(tr("Drag Schematic Elements")),
-    mSchematic(schematic),
+    mScene(scene),
     mItemCount(0),
     mStartPos(startPos),
     mDeltaPos(0, 0),
@@ -65,38 +66,37 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     mMirrored(false),
     mTextsReset(false) {
   // get all selected items
-  std::unique_ptr<SchematicSelectionQuery> query(
-      mSchematic.createSelectionQuery());
-  query->addSelectedSymbols();
-  query->addSelectedNetPoints();
-  query->addSelectedNetLines();
-  query->addSelectedNetLabels();
-  query->addSelectedPolygons();
-  query->addSelectedSchematicTexts();
-  query->addSelectedSymbolTexts();
-  query->addNetPointsOfNetLines();
+  SchematicSelectionQuery query(mScene);
+  query.addSelectedSymbols();
+  query.addSelectedNetPoints();
+  query.addSelectedNetLines();
+  query.addSelectedNetLabels();
+  query.addSelectedPolygons();
+  query.addSelectedSchematicTexts();
+  query.addSelectedSymbolTexts();
+  query.addNetPointsOfNetLines();
 
   // Find the center of all elements and create undo commands.
-  foreach (SI_Symbol* symbol, query->getSymbols()) {
+  foreach (SI_Symbol* symbol, query.getSymbols()) {
     mCenterPos += symbol->getPosition();
     ++mItemCount;
     CmdSymbolInstanceEdit* cmd = new CmdSymbolInstanceEdit(*symbol);
     mSymbolEditCmds.append(cmd);
     mSymbolTextsResetCmds.append(new CmdSymbolInstanceTextsReset(*symbol));
   }
-  foreach (SI_NetPoint* netpoint, query->getNetPoints()) {
+  foreach (SI_NetPoint* netpoint, query.getNetPoints()) {
     mCenterPos += netpoint->getPosition();
     ++mItemCount;
     CmdSchematicNetPointEdit* cmd = new CmdSchematicNetPointEdit(*netpoint);
     mNetPointEditCmds.append(cmd);
   }
-  foreach (SI_NetLabel* netlabel, query->getNetLabels()) {
+  foreach (SI_NetLabel* netlabel, query.getNetLabels()) {
     mCenterPos += netlabel->getPosition();
     ++mItemCount;
     CmdSchematicNetLabelEdit* cmd = new CmdSchematicNetLabelEdit(*netlabel);
     mNetLabelEditCmds.append(cmd);
   }
-  foreach (SI_Polygon* polygon, query->getPolygons()) {
+  foreach (SI_Polygon* polygon, query.getPolygons()) {
     for (const Vertex& vertex : polygon->getPolygon().getPath().getVertices()) {
       mCenterPos += vertex.getPos();
       ++mItemCount;
@@ -104,21 +104,21 @@ CmdDragSelectedSchematicItems::CmdDragSelectedSchematicItems(
     CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
     mPolygonEditCmds.append(cmd);
   }
-  foreach (SI_Text* text, query->getTexts()) {
+  foreach (SI_Text* text, query.getTexts()) {
     // do not count texts of symbols if the symbol is selected too
     if ((!text->getSymbol()) ||
-        (!query->getSymbols().contains(text->getSymbol()))) {
+        (!query.getSymbols().contains(text->getSymbol()))) {
       mCenterPos += text->getPosition();
       ++mItemCount;
     }
-    CmdTextEdit* cmd = new CmdTextEdit(text->getText());
+    CmdTextEdit* cmd = new CmdTextEdit(text->getTextObj());
     mTextEditCmds.append(cmd);
   }
 
   // Note: If only 1 item is selected, use its exact position as center.
   if (mItemCount > 1) {
     mCenterPos /= mItemCount;
-    mCenterPos.mapToGrid(mSchematic.getGridInterval());
+    mCenterPos.mapToGrid(mScene.getSchematic().getGridInterval());
   }
 }
 
@@ -136,7 +136,7 @@ void CmdDragSelectedSchematicItems::resetAllTexts() noexcept {
 void CmdDragSelectedSchematicItems::setCurrentPosition(
     const Point& pos) noexcept {
   Point delta = pos - mStartPos;
-  delta.mapToGrid(mSchematic.getGridInterval());
+  delta.mapToGrid(mScene.getSchematic().getGridInterval());
 
   if (delta != mDeltaPos) {
     // move selected elements
@@ -162,7 +162,8 @@ void CmdDragSelectedSchematicItems::setCurrentPosition(
 void CmdDragSelectedSchematicItems::rotate(
     const Angle& angle, bool aroundCurrentPosition) noexcept {
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
-      ? (mStartPos + mDeltaPos).mappedToGrid(mSchematic.getGridInterval())
+      ? (mStartPos + mDeltaPos)
+            .mappedToGrid(mScene.getSchematic().getGridInterval())
       : (mCenterPos + mDeltaPos);
 
   // rotate selected elements
@@ -187,7 +188,8 @@ void CmdDragSelectedSchematicItems::rotate(
 void CmdDragSelectedSchematicItems::mirror(
     Qt::Orientation orientation, bool aroundCurrentPosition) noexcept {
   const Point center = (aroundCurrentPosition && (mItemCount > 1))
-      ? (mStartPos + mDeltaPos).mappedToGrid(mSchematic.getGridInterval())
+      ? (mStartPos + mDeltaPos)
+            .mappedToGrid(mScene.getSchematic().getGridInterval())
       : (mCenterPos + mDeltaPos);
 
   // rotate selected elements
@@ -258,7 +260,7 @@ bool CmdDragSelectedSchematicItems::performExecute() {
 
   // if something was modified, trigger anchors update of all netlabels
   if (getChildCount() > 0) {
-    appendChild(new CmdSchematicNetLabelAnchorsUpdate(mSchematic));
+    appendChild(new CmdSchematicNetLabelAnchorsUpdate(mScene.getSchematic()));
   }
 
   // execute all child commands

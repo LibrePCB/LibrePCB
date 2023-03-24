@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/types/layer.h>
 
 /*******************************************************************************
  *  Namespace
@@ -54,7 +55,7 @@ TEST_F(PolygonTest, testConstructFromSExpression) {
   Polygon obj(sexpr);
   EXPECT_EQ(Uuid::fromString("2889d60c-1d18-44c3-bf9e-07733b67e480"),
             obj.getUuid());
-  EXPECT_EQ(GraphicsLayerName("bot_stop_mask"), obj.getLayerName());
+  EXPECT_EQ("bot_stop_mask", obj.getLayer().getId());
   EXPECT_EQ(UnsignedLength(100000), obj.getLineWidth());
   EXPECT_EQ(true, obj.isFilled());
   EXPECT_EQ(false, obj.isGrabArea());
@@ -63,7 +64,7 @@ TEST_F(PolygonTest, testConstructFromSExpression) {
 
 TEST_F(PolygonTest, testSerializeAndDeserialize) {
   Polygon obj1(
-      Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(456), true,
+      Uuid::createRandom(), Layer::botCopper(), UnsignedLength(456), true,
       false,
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
   SExpression sexpr1 = SExpression::createList("obj");

@@ -24,10 +24,10 @@
 
 #include "../../../geometry/circle.h"
 #include "../../../geometry/polygon.h"
-#include "../../../graphics/graphicslayer.h"
 #include "../../../library/pkg/packagepad.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/netsignal.h"
+#include "../board.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprintpad.h"
 #include "../items/bi_hole.h"
@@ -180,8 +180,7 @@ DrcMsgMissingBoardOutline::DrcMsgMissingBoardOutline() noexcept
                          "\n\n" %
                          tr("Add a closed, zero-width polygon on the layer "
                             "'%1' to draw the board outline.")
-                             .arg(GraphicsLayer::getTranslation(
-                                 GraphicsLayer::sBoardOutlines)),
+                             .arg(Layer::boardOutlines().getNameTr()),
                      "missing_board_outline", {}) {
 }
 
@@ -328,7 +327,7 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
         Severity::Error,
         tr("Min. plane width on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(GraphicsLayer::getTranslation(*plane.getLayerName()),
+            .arg(plane.getLayer().getNameTr(),
                  plane.getMinWidth()->toMmString(), minWidth->toMmString(),
                  "mm"),
         tr("The configured minimum width of the plane is smaller than the "
@@ -349,8 +348,8 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
         Severity::Warning,
         tr("Stroke width on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(GraphicsLayer::getTranslation(*text.getText().getLayerName()),
-                 text.getText().getStrokeWidth()->toMmString(),
+            .arg(text.getTextObj().getLayer().getNameTr(),
+                 text.getTextObj().getStrokeWidth()->toMmString(),
                  minWidth->toMmString(), "mm"),
         tr("The text stroke width is smaller than the minimum copper width "
            "configured in the DRC settings.") %
@@ -372,8 +371,8 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
  ******************************************************************************/
 
 DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
-    const QString& layer1, const NetSignal* net1, const BI_Base& item1,
-    const Polygon* polygon1, const Circle* circle1, const QString& layer2,
+    const Layer* layer1, const NetSignal* net1, const BI_Base& item1,
+    const Polygon* polygon1, const Circle* circle1, const Layer* layer2,
     const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
     const Circle* circle2, const UnsignedLength& minClearance,
     const QVector<Path>& locations)
@@ -408,11 +407,11 @@ DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
 }
 
 QString DrcMsgCopperCopperClearanceViolation::getLayerName(
-    const QString& layer1, const QString& layer2) {
-  if (!layer1.isEmpty()) {
-    return "'" % GraphicsLayer::getTranslation(layer1) % "'";
-  } else if (!layer2.isEmpty()) {
-    return "'" % GraphicsLayer::getTranslation(layer2) % "'";
+    const Layer* layer1, const Layer* layer2) {
+  if (layer1) {
+    return "'" % layer1->getNameTr() % "'";
+  } else if (layer2) {
+    return "'" % layer2->getNameTr() % "'";
   } else {
     return tr("copper layers");
   }
@@ -881,8 +880,7 @@ DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
         Severity::Error,
         tr("Pad annular ring of '%1' < %2 %3",
            "Placeholders: Net name, minimum annular width, unit")
-            .arg(pad.getDisplayText().simplified(),
-                 minAnnularWidth->toMmString(), "mm"),
+            .arg(pad.getText(), minAnnularWidth->toMmString(), "mm"),
         tr("The through-hole pad annular ring width (i.e. the copper around "
            "the hole) is smaller than the minimum annular width configured in "
            "the DRC settings.") %
@@ -955,9 +953,8 @@ DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
         Severity::Warning,
         tr("Pad drill diameter of '%1': %2 < %3 %4",
            "Placeholders: Net name, actual diameter, minimum diameter")
-            .arg(pad.getDisplayText().simplified(),
-                 padHole.getDiameter()->toMmString(), minDiameter->toMmString(),
-                 "mm"),
+            .arg(pad.getText(), padHole.getDiameter()->toMmString(),
+                 minDiameter->toMmString(), "mm"),
         tr("The drill diameter of the through-hole pad is smaller than the "
            "minimum plated drill diameter configured in the DRC settings.") %
             "\n\n" %
@@ -1008,9 +1005,8 @@ DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
         Severity::Warning,
         tr("Pad slot width of '%1': %2 < %3 %4",
            "Placeholders: Net name, actual width, minimum width, unit")
-            .arg(pad.getDisplayText().simplified(),
-                 padHole.getDiameter()->toMmString(), minWidth->toMmString(),
-                 "mm"),
+            .arg(pad.getText(), padHole.getDiameter()->toMmString(),
+                 minWidth->toMmString(), "mm"),
         tr("The width of the plated slot is smaller than the minimum plated "
            "slot width configured in the DRC settings.") %
             "\n\n" %
@@ -1030,19 +1026,19 @@ DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
  ******************************************************************************/
 
 DrcMsgInvalidPadConnection::DrcMsgInvalidPadConnection(
-    const BI_FootprintPad& pad, const GraphicsLayer& layer,
+    const BI_FootprintPad& pad, const Layer& layer,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
         tr("Invalid connection of pad '%1' on '%2'",
            "Placeholders: Pad name, layer name")
-            .arg(pad.getDisplayText().simplified()),
+            .arg(pad.getText()),
         tr("The pad origin must be located within the pads copper area, "
            "or for THT pads within a hole. Otherwise traces might not be"
            "connected fully. This issue needs to be fixed in the "
            "library."),
         "invalid_pad_connection", locations) {
-  mApproval.appendChild("layer", SExpression::createToken(layer.getName()));
+  mApproval.appendChild("layer", layer);
   mApproval.ensureLineBreak();
   mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
   mApproval.ensureLineBreak();

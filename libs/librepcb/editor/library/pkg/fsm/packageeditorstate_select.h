@@ -124,7 +124,7 @@ private:  // Methods
                                 const Point& pos) noexcept;
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
   void clearSelectionRect(bool updateItemsSelectionState) noexcept;
-  QList<std::shared_ptr<QGraphicsItem> > findItemsAtPosition(
+  QList<std::shared_ptr<QGraphicsItem>> findItemsAtPosition(
       const Point& pos) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
   void setState(SubState state) noexcept;

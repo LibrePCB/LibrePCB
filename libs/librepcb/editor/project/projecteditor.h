@@ -43,6 +43,7 @@ namespace librepcb {
 class Board;
 class FilePath;
 class LengthUnit;
+class NetSignal;
 class Project;
 class Workspace;
 
@@ -70,9 +71,9 @@ public:
   /**
    * @brief The constructor
    */
-  ProjectEditor(Workspace& workspace, Project& project,
-                const tl::optional<QList<FileFormatMigration::Message> >&
-                    upgradeMessages);
+  ProjectEditor(
+      Workspace& workspace, Project& project,
+      const tl::optional<QList<FileFormatMigration::Message>>& upgradeMessages);
 
   /**
    * @brief The destructor
@@ -228,8 +229,18 @@ public slots:
   void setErcMessageApproved(const RuleCheckMessage& msg,
                              bool approve) noexcept;
 
+  std::shared_ptr<const QSet<const NetSignal*>> getHighlightedNetSignals() const
+      noexcept {
+    return mHighlightedNetSignals;
+  }
+  void setHighlightedNetSignals(
+      const QSet<const NetSignal*>& netSignals) noexcept;
+  void clearHighlightedNetSignals() noexcept;
+
 signals:
   void ercFinished(const RuleCheckMessageList& messages);
+  void highlightedNetSignalsChanged();
+  void projectAboutToBeSaved();
   void projectSavedToDisk();
   void showControlPanelClicked();
   void openProjectLibraryUpdaterClicked(const FilePath& fp);
@@ -251,6 +262,8 @@ private:  // Data
   QSet<SExpression> mSupportedErcApprovals;
   QSet<SExpression> mDisappearedErcApprovals;
   RuleCheckMessageList mErcMessages;
+
+  std::shared_ptr<QSet<const NetSignal*>> mHighlightedNetSignals;
 
   UndoStack* mUndoStack;  ///< See @ref doc_project_undostack
   SchematicEditor* mSchematicEditor;  ///< The schematic editor (GUI)

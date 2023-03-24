@@ -23,11 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../graphics/graphicslayer.h"
 #include "editorwidgetbase.h"
 #include "newelementwizard/newelementwizard.h"
 
 #include <librepcb/core/fileio/directorylock.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -74,10 +74,11 @@ public:
   ~LibraryEditor() noexcept;
 
   /**
-   * @copydoc ::librepcb::IF_GraphicsLayerProvider::getLayer()
+   * @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
    */
-  GraphicsLayer* getLayer(const QString& name) const noexcept override {
-    foreach (GraphicsLayer* layer, mLayers) {
+  std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const
+      noexcept override {
+    foreach (const std::shared_ptr<GraphicsLayer>& layer, mLayers) {
       if (layer->getName() == name) {
         return layer;
       }
@@ -86,9 +87,9 @@ public:
   }
 
   /**
-   * @copydoc ::librepcb::IF_GraphicsLayerProvider::getAllLayers()
+   * @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getAllLayers()
    */
-  QList<GraphicsLayer*> getAllLayers() const noexcept override {
+  QList<std::shared_ptr<GraphicsLayer>> getAllLayers() const noexcept override {
     return mLayers;
   }
 
@@ -172,7 +173,7 @@ private:  // Data
   bool mIsOpenedReadOnly;
   QScopedPointer<Ui::LibraryEditor> mUi;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
-  QList<GraphicsLayer*> mLayers;
+  QList<std::shared_ptr<GraphicsLayer>> mLayers;
   EditorWidgetBase* mCurrentEditorWidget;
   Library* mLibrary;
 

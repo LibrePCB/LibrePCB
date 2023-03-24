@@ -42,6 +42,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Layer;
+
 /*******************************************************************************
  *  Class FootprintPad
  ******************************************************************************/
@@ -111,9 +113,9 @@ public:
   ComponentSide getComponentSide() const noexcept { return mComponentSide; }
   const PadHoleList& getHoles() const noexcept { return mHoles; }
   PadHoleList& getHoles() noexcept { return mHoles; }
-  QString getLayerName() const noexcept;
   bool isTht() const noexcept;
-  bool isOnLayer(const QString& name) const noexcept;
+  bool isOnLayer(const Layer& layer) const noexcept;
+  const Layer& getSmtLayer() const noexcept;
   PadGeometry getGeometry() const noexcept;
 
   // Setters

@@ -26,15 +26,14 @@
 #include "../../cmd/cmdholeedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
+#include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/holegraphicsitem.h"
+#include "../../graphics/polygongraphicsitem.h"
+#include "../../graphics/stroketextgraphicsitem.h"
 #include "../../widgets/graphicsview.h"
 #include "../pkg/footprintgraphicsitem.h"
 #include "../pkg/footprintpadgraphicsitem.h"
 #include "cmdfootprintpadedit.h"
-
-#include <librepcb/core/graphics/circlegraphicsitem.h>
-#include <librepcb/core/graphics/holegraphicsitem.h>
-#include <librepcb/core/graphics/polygongraphicsitem.h>
-#include <librepcb/core/graphics/stroketextgraphicsitem.h>
 
 #include <QtCore>
 

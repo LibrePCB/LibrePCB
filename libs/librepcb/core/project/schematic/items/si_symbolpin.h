@@ -23,9 +23,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../graphicsitems/sgi_symbolpin.h"
-#include "./si_netline.h"
+#include "../../../types/angle.h"
+#include "../../../types/point.h"
 #include "si_base.h"
+#include "si_netline.h"
+#include "si_symbol.h"
 
 #include <QtCore>
 
@@ -38,7 +40,6 @@ class Circuit;
 class ComponentPinSignalMapItem;
 class ComponentSignal;
 class ComponentSignalInstance;
-class SI_Symbol;
 class SymbolPin;
 
 /*******************************************************************************
@@ -52,6 +53,16 @@ class SI_SymbolPin final : public SI_Base, public SI_NetLineAnchor {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionChanged,
+    RotationChanged,
+    JunctionChanged,
+    TextChanged,
+  };
+  Signal<SI_SymbolPin, Event> onEdited;
+  typedef Slot<SI_SymbolPin, Event> OnEditedSlot;
+
   // Constructors / Destructor
   SI_SymbolPin() = delete;
   SI_SymbolPin(const SI_SymbolPin& other) = delete;
@@ -74,9 +85,9 @@ public:
    */
   const Angle& getRotation() const noexcept { return mRotation; }
 
+  const QString& getText() const noexcept { return mText; }
+
   const Uuid& getLibPinUuid() const noexcept;
-  QString getDisplayText(bool returnCmpSignalNameIfEmpty = false,
-                         bool returnPinNameIfEmpty = false) const noexcept;
   SI_Symbol& getSymbol() const noexcept { return mSymbol; }
   const SymbolPin& getLibPin() const noexcept { return *mSymbolPin; }
   ComponentSignalInstance* getComponentSignalInstance() const noexcept {
@@ -92,14 +103,6 @@ public:
   // General Methods
   void addToSchematic() override;
   void removeFromSchematic() override;
-  void updatePosition(bool mirroredOrRotated) noexcept;
-
-  // Inherited from SI_Base
-  Type_t getType() const noexcept override {
-    return SI_Base::Type_t::SymbolPin;
-  }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
 
   // Inherited from SI_NetLineAnchor
   void registerNetLine(SI_NetLine& netline) override;
@@ -112,7 +115,10 @@ public:
   SI_SymbolPin& operator=(const SI_SymbolPin& rhs) = delete;
 
 private:
+  void symbolEdited(const SI_Symbol& obj, SI_Symbol::Event event) noexcept;
   void netSignalChanged(NetSignal* from, NetSignal* to) noexcept;
+  void updateTransform() noexcept;
+  void updateText() noexcept;
   QString getLibraryComponentName() const noexcept;
   QString getComponentSignalNameOrPinUuid() const noexcept;
   QString getNetSignalName() const noexcept;
@@ -122,17 +128,17 @@ private:
   const SymbolPin* mSymbolPin;
   const ComponentPinSignalMapItem* mPinSignalMapItem;
   ComponentSignalInstance* mComponentSignalInstance;
-  QMetaObject::Connection mNetSignalChangedConnection;
-  QMetaObject::Connection mNetSignalRenamedConnection;
-  QMetaObject::Connection mHighlightChangedConnection;
 
-  // Misc
+  // Cached Properties
   Point mPosition;
   Angle mRotation;
-  QScopedPointer<SGI_SymbolPin> mGraphicsItem;
+  QString mText;
 
   // Registered Elements
   QSet<SI_NetLine*> mRegisteredNetLines;  ///< all registered netlines
+
+  // Slots
+  SI_Symbol::OnEditedSlot mOnSymbolEditedSlot;
 };
 
 /*******************************************************************************

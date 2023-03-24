@@ -42,8 +42,8 @@ class BI_StrokeText;
 class BI_Via;
 class Board;
 class Circle;
-class GraphicsLayer;
 class Hole;
+class Layer;
 class NetSignal;
 class Polygon;
 class Transform;
@@ -67,8 +67,7 @@ public:
   const ClipperLib::Paths& getPaths() const noexcept { return mPaths; }
 
   // General Methods
-  void addCopper(const QString& layerName,
-                 const QSet<const NetSignal*>& netsignals,
+  void addCopper(const Layer& layer, const QSet<const NetSignal*>& netsignals,
                  bool ignorePlanes = false);
   void addVia(const BI_Via& via, const Length& offset = Length(0));
   void addNetLine(const BI_NetLine& netLine, const Length& offset = Length(0));
@@ -82,7 +81,7 @@ public:
   void addHole(const Hole& hole, const Transform& transform,
                const Length& offset = Length(0));
   void addPad(const BI_FootprintPad& pad, const Transform& transform,
-              const QString& layerName, const Length& offset = Length(0));
+              const Layer& layer, const Length& offset = Length(0));
 
 private:  // Data
   Board& mBoard;

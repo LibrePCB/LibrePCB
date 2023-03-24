@@ -22,11 +22,11 @@
  ******************************************************************************/
 #include "boardplanefragmentsbuilder.h"
 
-#include "../../graphics/graphicslayer.h"
 #include "../../library/pkg/footprint.h"
 #include "../../library/pkg/footprintpad.h"
 #include "../../utils/clipperhelpers.h"
 #include "../../utils/transform.h"
+#include "board.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
@@ -92,7 +92,7 @@ void BoardPlaneFragmentsBuilder::clipToBoardOutline() {
   ClipperLib::Paths boardArea;
   ClipperLib::Clipper boardAreaClipper;
   foreach (const BI_Polygon* polygon, mPlane.getBoard().getPolygons()) {
-    if (polygon->getPolygon().getLayerName() == GraphicsLayer::sBoardOutlines) {
+    if (polygon->getPolygon().getLayer() == Layer::boardOutlines()) {
       ClipperLib::Path path = ClipperHelpers::convert(
           polygon->getPolygon().getPath(), maxArcTolerance());
       boardAreaClipper.AddPath(path, ClipperLib::ptSubject, true);
@@ -101,7 +101,7 @@ void BoardPlaneFragmentsBuilder::clipToBoardOutline() {
   foreach (const BI_Device* device, mPlane.getBoard().getDeviceInstances()) {
     Transform transform(*device);
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      if (polygon.getLayerName() == GraphicsLayer::sBoardOutlines) {
+      if (polygon.getLayer() == Layer::boardOutlines()) {
         Path path = transform.map(polygon.getPath());
         ClipperLib::Path clipperPath =
             ClipperHelpers::convert(path, maxArcTolerance());
@@ -135,7 +135,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
   foreach (const BI_Plane* plane, mPlane.getBoard().getPlanes()) {
     if (plane == &mPlane) continue;
     if (*plane < mPlane) continue;  // ignore planes with lower priority
-    if (plane->getLayerName() != mPlane.getLayerName()) continue;
+    if (plane->getLayer() != mPlane.getLayer()) continue;
     if (&plane->getNetSignal() == &mPlane.getNetSignal()) continue;
     ClipperLib::Paths paths =
         ClipperHelpers::convert(plane->getFragments(), maxArcTolerance());
@@ -158,12 +158,12 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
       }
     }
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      if (!pad->isOnLayer(*mPlane.getLayerName())) continue;
+      if (!pad->isOnLayer(mPlane.getLayer())) continue;
       const Transform padTransform(pad->getLibPad().getPosition(),
                                    pad->getLibPad().getRotation());
       if (pad->getCompSigInstNetSignal() == &mPlane.getNetSignal()) {
         foreach (const PadGeometry& geometry,
-                 pad->getGeometryOnLayer(*mPlane.getLayerName())) {
+                 pad->getGeometries().value(&mPlane.getLayer())) {
           foreach (const Path& outline, geometry.toOutlines()) {
             ClipperLib::Path path = ClipperHelpers::convert(
                 transform.map(padTransform.map(outline)), maxArcTolerance());
@@ -203,7 +203,7 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
 
     // subtract netlines
     foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
-      if (netline->getLayer().getName() != mPlane.getLayerName()) continue;
+      if (netline->getLayer() != mPlane.getLayer()) continue;
       if (netsegment->getNetSignal() == &mPlane.getNetSignal()) {
         ClipperLib::Path path = ClipperHelpers::convert(
             netline->getSceneOutline(), maxArcTolerance());
@@ -268,7 +268,7 @@ ClipperLib::Paths BoardPlaneFragmentsBuilder::createPadCutOuts(
   if ((mPlane.getConnectStyle() == BI_Plane::ConnectStyle::None) ||
       differentNetSignal) {
     foreach (const PadGeometry& geometry,
-             pad.getGeometryOnLayer(*mPlane.getLayerName())) {
+             pad.getGeometries().value(&mPlane.getLayer())) {
       foreach (const Path& outline,
                geometry.withOffset(*mPlane.getMinClearance()).toOutlines()) {
         result.push_back(ClipperHelpers::convert(

@@ -32,6 +32,7 @@
 namespace librepcb {
 
 class Board;
+class Layer;
 class Project;
 class WorkspaceSettings;
 
@@ -67,8 +68,8 @@ private:
   void btnProtelSuffixesClicked();
   void btnGenerateClicked();
   void btnBrowseOutputDirClicked();
-  QStringList getTopSilkscreenLayers() const noexcept;
-  QStringList getBotSilkscreenLayers() const noexcept;
+  QVector<const Layer*> getTopSilkscreenLayers() const noexcept;
+  QVector<const Layer*> getBotSilkscreenLayers() const noexcept;
 
   const WorkspaceSettings& mSettings;
   Project& mProject;

@@ -40,11 +40,12 @@
  ******************************************************************************/
 namespace librepcb {
 
-class IF_GraphicsLayerProvider;
 class Library;
 class Workspace;
 
 namespace editor {
+
+class IF_GraphicsLayerProvider;
 
 /*******************************************************************************
  *  Class NewElementWizardContext

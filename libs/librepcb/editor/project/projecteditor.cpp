@@ -49,10 +49,11 @@ namespace editor {
 
 ProjectEditor::ProjectEditor(
     Workspace& workspace, Project& project,
-    const tl::optional<QList<FileFormatMigration::Message> >& upgradeMessages)
+    const tl::optional<QList<FileFormatMigration::Message>>& upgradeMessages)
   : QObject(nullptr),
     mWorkspace(workspace),
     mProject(project),
+    mHighlightedNetSignals(new QSet<const NetSignal*>()),
     mUndoStack(nullptr),
     mSchematicEditor(nullptr),
     mBoardEditor(nullptr),
@@ -247,6 +248,7 @@ void ProjectEditor::execOrderPcbDialog(QWidget* parent) noexcept {
 bool ProjectEditor::saveProject() noexcept {
   try {
     qDebug() << "Save project...";
+    emit projectAboutToBeSaved();
     mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->save();  // can throw
     mLastAutosaveStateId = mUndoStack->getUniqueStateId();
@@ -283,6 +285,7 @@ bool ProjectEditor::autosaveProject() noexcept {
 
   try {
     qDebug() << "Autosave project...";
+    emit projectAboutToBeSaved();
     mProject.save();  // can throw
     mProject.getDirectory().getFileSystem()->autosave();  // can throw
     mLastAutosaveStateId = mUndoStack->getUniqueStateId();
@@ -339,6 +342,18 @@ void ProjectEditor::setErcMessageApproved(const RuleCheckMessage& msg,
     approvals.remove(msg.getApproval());
   }
   saveErcMessageApprovals(approvals);
+}
+
+void ProjectEditor::setHighlightedNetSignals(
+    const QSet<const NetSignal*>& netSignals) noexcept {
+  if (netSignals != *mHighlightedNetSignals) {
+    *mHighlightedNetSignals = netSignals;
+    emit highlightedNetSignalsChanged();
+  }
+}
+
+void ProjectEditor::clearHighlightedNetSignals() noexcept {
+  setHighlightedNetSignals({});
 }
 
 /*******************************************************************************

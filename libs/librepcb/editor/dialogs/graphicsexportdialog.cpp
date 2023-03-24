@@ -29,8 +29,8 @@
 
 #include <librepcb/core/export/graphicsexport.h>
 #include <librepcb/core/export/graphicsexportsettings.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtConcurrent>
 #include <QtCore>
@@ -51,16 +51,18 @@ GraphicsExportDialog::GraphicsExportDialog(
     const QList<std::shared_ptr<GraphicsPagePainter>>& pages, int currentPage,
     const QString& documentName, int innerLayerCount,
     const FilePath& defaultFilePath, const LengthUnit& lengthUnit,
-    const QString& settingsPrefix, QWidget* parent) noexcept
+    const Theme& theme, const QString& settingsPrefix, QWidget* parent) noexcept
   : QDialog(parent),
     mMode(mode),
     mOutput(output),
     mInputPages(pages),
     mCurrentPage(currentPage),
     mDefaultFilePath(defaultFilePath),
+    mTheme(theme),
     mSettingsPrefix(settingsPrefix),
     mSaveAsCallback(&FileDialog::getSaveFileName),
-    mLayers(),
+    mDefaultSettings(new GraphicsExportSettings()),
+    mColors(),
     mSettingsPrinterName(),
     mSettingsPageSize(tl::nullopt),
     mSettingsDuplexMode(QPrinter::DuplexNone),
@@ -99,56 +101,11 @@ GraphicsExportDialog::GraphicsExportDialog(
       break;
   }
 
-  // Add all available layers.
+  // Add all colors.
   if (mMode == Mode::Schematic) {
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSchematicSheetFrames));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolOutlines));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolGrabAreas));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolPinLines));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolPinNames));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolPinNumbers));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolNames));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSymbolValues));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSchematicNetLines));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSchematicNetLabels));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSchematicDocumentation));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSchematicComments));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sSchematicGuide));
+    mDefaultSettings->loadColorsFromTheme(theme, true, false);
   } else if (mMode == Mode::Board) {
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardGuide));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardComments));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardDocumentation));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardAlignment));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardMeasures));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardSheetFrames));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardOutlines));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardDrillsNpth));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardMillingPth));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardPadsTht));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBoardViasTht));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sTopDocumentation));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sTopNames));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sTopValues));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sTopCourtyard));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sTopGrabAreas));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sTopPlacement));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sTopGlue));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sTopSolderPaste));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sTopStopMask));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sTopCopper));
-    for (int i = 1; i <= innerLayerCount; ++i) {
-      mLayers.append(GraphicsLayer(GraphicsLayer::getInnerLayerName(i)));
-    }
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBotCopper));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBotStopMask));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBotSolderPaste));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBotGlue));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBotPlacement));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBotGrabAreas));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBotCourtyard));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBotValues));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBotNames));
-    mLayers.append(GraphicsLayer(GraphicsLayer::sBotDocumentation));
+    mDefaultSettings->loadColorsFromTheme(theme, false, true, innerLayerCount);
   }
 
   // Open exported files checkbox.
@@ -344,7 +301,7 @@ GraphicsExportDialog::GraphicsExportDialog(
     EditorToolbox::removeFormLayoutRow(*mUi->lblBackground);
   }
 
-  // Layer colors.
+  // Colors.
   connect(mUi->lstLayerColors, &QListWidget::itemDoubleClicked, this,
           &GraphicsExportDialog::layerListItemDoubleClicked);
   connect(mUi->lstLayerColors, &QListWidget::itemChanged, this,
@@ -498,123 +455,113 @@ void GraphicsExportDialog::setSaveAsCallback(SaveAsCallback callback) noexcept {
  ******************************************************************************/
 
 void GraphicsExportDialog::loadDefaultSettings() noexcept {
-  GraphicsExportSettings defaultSettings;
-
   setPageSize(QPageSize::A4);
-  setOrientation(defaultSettings.getOrientation());
-  setMarginLeft(defaultSettings.getMarginLeft());
-  setMarginTop(defaultSettings.getMarginTop());
-  setMarginRight(defaultSettings.getMarginRight());
-  setMarginBottom(defaultSettings.getMarginBottom());
-  setRotate(defaultSettings.getRotate());
-  setMirror(defaultSettings.getMirror());
-  setFitToPage(!defaultSettings.getScale().has_value());
-  setScaleFactor(defaultSettings.getScale() ? *defaultSettings.getScale() : 1);
-  setDpi(defaultSettings.getPixmapDpi());
-  setBlackWhite(defaultSettings.getBlackWhite());
-  setBackgroundColor(defaultSettings.getBackgroundColor());
-  setMinLineWidth(defaultSettings.getMinLineWidth());
+  setOrientation(mDefaultSettings->getOrientation());
+  setMarginLeft(mDefaultSettings->getMarginLeft());
+  setMarginTop(mDefaultSettings->getMarginTop());
+  setMarginRight(mDefaultSettings->getMarginRight());
+  setMarginBottom(mDefaultSettings->getMarginBottom());
+  setRotate(mDefaultSettings->getRotate());
+  setMirror(mDefaultSettings->getMirror());
+  setFitToPage(!mDefaultSettings->getScale().has_value());
+  setScaleFactor(mDefaultSettings->getScale() ? *mDefaultSettings->getScale()
+                                              : 1);
+  setDpi(mDefaultSettings->getPixmapDpi());
+  setBlackWhite(mDefaultSettings->getBlackWhite());
+  setBackgroundColor(mDefaultSettings->getBackgroundColor());
+  setMinLineWidth(mDefaultSettings->getMinLineWidth());
   setDuplex(QPrinter::DuplexNone);
   setOpenExportedFiles(true);
   mUi->rbtnRangeAll->setChecked(true);
 
-  // Layer colors.
-  QHash<QString, QColor> defaultColors;
-  for (const std::pair<QString, QColor>& pair : defaultSettings.getLayers()) {
-    defaultColors.insert(pair.first, pair.second);
-  }
-  for (GraphicsLayer& layer : mLayers) {
-    QColor fallback = GraphicsLayer(layer.getName()).getColor();
-    layer.setColor(defaultColors.value(layer.getName(), fallback));
-  }
-  updateLayerColorsListWidget();
+  // Colors.
+  mColors = mDefaultSettings->getColors();
+  updateColorsListWidget();
 
   // Page content.
-  QSet<QString> allLayers;
-  foreach (const GraphicsLayer& layer, mLayers) {
-    allLayers.insert(layer.getName());
-  }
-  QSet<QString> commonLayers = {
-      GraphicsLayer::sBoardMeasures,
-      GraphicsLayer::sBoardSheetFrames,
-      GraphicsLayer::sBoardOutlines,
+  QSet<QString> allColors;
+  foreach (const auto& pair, mColors) { allColors.insert(pair.first); }
+  QSet<QString> commonColors = {
+      Theme::Color::sBoardMeasures,
+      Theme::Color::sBoardFrames,
+      Theme::Color::sBoardOutlines,
   };
-  QSet<QString> cutOutLayers = {
-      GraphicsLayer::sBoardDrillsNpth,
-      GraphicsLayer::sBoardMillingPth,
+  QSet<QString> cutOutColors = {
+      Theme::Color::sBoardHoles,
+      Theme::Color::sBoardMilling,
   };
-  QSet<QString> assemblyLayers = {
-      GraphicsLayer::sBoardGuide,
-      GraphicsLayer::sBoardComments,
-      GraphicsLayer::sBoardDocumentation,
+  QSet<QString> assemblyColors = {
+      Theme::Color::sBoardGuide,
+      Theme::Color::sBoardComments,
+      Theme::Color::sBoardDocumentation,
   };
   QList<ContentItem> items = {
       {
           tr("All Layers"),
           (mOutput == Output::Image),  // Imege export -> single page.
           false,
-          allLayers,
+          allColors,
       },
       {
           tr("Assembly Top"),
           (mOutput != Output::Image),  // Multi-page export.
           false,
-          commonLayers + cutOutLayers + assemblyLayers +
+          commonColors + cutOutColors + assemblyColors +
               QSet<QString>{
-                  GraphicsLayer::sTopDocumentation,
-                  GraphicsLayer::sTopNames,
-                  GraphicsLayer::sTopValues,
-                  GraphicsLayer::sTopGrabAreas,
-                  GraphicsLayer::sTopPlacement,
-                  GraphicsLayer::sTopSolderPaste,
-                  GraphicsLayer::sTopStopMask,
+                  Theme::Color::sBoardDocumentationTop,
+                  Theme::Color::sBoardNamesTop,
+                  Theme::Color::sBoardValuesTop,
+                  Theme::Color::sBoardGrabAreasTop,
+                  Theme::Color::sBoardPlacementTop,
+                  Theme::Color::sBoardSolderPasteTop,
+                  Theme::Color::sBoardStopMaskTop,
               },
       },
       {
           tr("Assembly Bottom"),
           (mOutput != Output::Image),  // Multi-page export.
           true,
-          commonLayers + cutOutLayers + assemblyLayers +
+          commonColors + cutOutColors + assemblyColors +
               QSet<QString>{
-                  GraphicsLayer::sBotDocumentation,
-                  GraphicsLayer::sBotNames,
-                  GraphicsLayer::sBotValues,
-                  GraphicsLayer::sBotGrabAreas,
-                  GraphicsLayer::sBotPlacement,
-                  GraphicsLayer::sBotSolderPaste,
-                  GraphicsLayer::sBotStopMask,
+                  Theme::Color::sBoardDocumentationBot,
+                  Theme::Color::sBoardNamesBot,
+                  Theme::Color::sBoardValuesBot,
+                  Theme::Color::sBoardGrabAreasBot,
+                  Theme::Color::sBoardPlacementBot,
+                  Theme::Color::sBoardSolderPasteBot,
+                  Theme::Color::sBoardStopMaskBot,
               },
       },
       {
           tr("Drills"),
           false,
           false,
-          commonLayers + cutOutLayers +
+          commonColors + cutOutColors +
               QSet<QString>{
-                  GraphicsLayer::sBoardPadsTht,
-                  GraphicsLayer::sBoardViasTht,
+                  Theme::Color::sBoardPads,
+                  Theme::Color::sBoardVias,
               },
       },
       {
           tr("Copper Top"),
           false,
           false,
-          commonLayers +
+          commonColors +
               QSet<QString>{
-                  GraphicsLayer::sBoardPadsTht,
-                  GraphicsLayer::sBoardViasTht,
-                  GraphicsLayer::sTopCopper,
+                  Theme::Color::sBoardPads,
+                  Theme::Color::sBoardVias,
+                  Theme::Color::sBoardCopperTop,
               },
       },
       {
           tr("Copper Bottom"),
           false,
           false,
-          commonLayers +
+          commonColors +
               QSet<QString>{
-                  GraphicsLayer::sBoardPadsTht,
-                  GraphicsLayer::sBoardViasTht,
-                  GraphicsLayer::sBotCopper,
+                  Theme::Color::sBoardPads,
+                  Theme::Color::sBoardVias,
+                  Theme::Color::sBoardCopperBot,
               },
       },
   };
@@ -830,46 +777,46 @@ void GraphicsExportDialog::syncClientSettings(
       }
     }
 
-    // Layer colors.
+    // Colors.
     if (action == ClientSettingsAction::Store) {
-      foreach (const GraphicsLayer& layer, mLayers) {
-        s.setValue(mSettingsPrefix % "/color/" % layer.getName(),
-                   layer.getColor().name(QColor::HexArgb));
+      foreach (const auto& pair, mColors) {
+        s.setValue(mSettingsPrefix % "/color/" % pair.first,
+                   pair.second.name(QColor::HexArgb));
       }
     } else {
-      for (GraphicsLayer& layer : mLayers) {
+      for (auto& pair : mColors) {
         QColor value(
-            s.value(mSettingsPrefix % "/color/" % layer.getName()).toString());
+            s.value(mSettingsPrefix % "/color/" % pair.first).toString());
         if (value.isValid()) {
-          layer.setColor(value);
+          pair.second = value;
         }
       }
-      updateLayerColorsListWidget();
+      updateColorsListWidget();
     }
 
     // Page content items.
     if (action == ClientSettingsAction::Store) {
-      s.beginWriteArray(mSettingsPrefix % "/page_content");
+      s.beginWriteArray(mSettingsPrefix % "/page_content_v2");
       for (int i = 0; i < mPageContentItems.count(); ++i) {
         s.setArrayIndex(i);
         s.setValue("name", mPageContentItems.at(i).name);
         s.setValue("enabled", mPageContentItems.at(i).enabled);
         s.setValue("mirror", mPageContentItems.at(i).mirror);
-        s.setValue("layers",
+        s.setValue("colors",
                    QVariant::fromValue(QStringList(
-                       Toolbox::sortedQSet(mPageContentItems.at(i).layers))));
+                       Toolbox::sortedQSet(mPageContentItems.at(i).colors))));
       }
       s.endArray();
     } else {
       QList<ContentItem> items;
-      int count = s.beginReadArray(mSettingsPrefix % "/page_content");
+      int count = s.beginReadArray(mSettingsPrefix % "/page_content_v2");
       for (int i = 0; i < count; ++i) {
         s.setArrayIndex(i);
         items.append(ContentItem{
             s.value("name", QString::number(i + 1)).toString(),
             s.value("enabled").toBool(),
             s.value("mirror").toBool(),
-            Toolbox::toSet(s.value("layers").toStringList()),
+            Toolbox::toSet(s.value("colors").toStringList()),
         });
       }
       s.endArray();
@@ -1050,12 +997,12 @@ void GraphicsExportDialog::applySettings() noexcept {
   settings->setBlackWhite(getBlackWhite());
   settings->setBackgroundColor(getBackgroundColor());
 
-  // Update layer colors from list widget.
-  for (int i = 0; i < qMin(mUi->lstLayerColors->count(), mLayers.count());
+  // Update colors from list widget.
+  for (int i = 0; i < std::min(mUi->lstLayerColors->count(), mColors.count());
        ++i) {
     QColor color =
         mUi->lstLayerColors->item(i)->data(Qt::DecorationRole).value<QColor>();
-    mLayers[i].setColor(color);
+    mColors[i].second = color;
   }
 
   // Update page content from tree view.
@@ -1067,13 +1014,13 @@ void GraphicsExportDialog::applySettings() noexcept {
     item.name = node->text(0);
     item.enabled = (node->checkState(0) == Qt::Checked);
     item.mirror = (node->checkState(1) == Qt::Checked);
-    for (int k = 0; k < std::min(node->childCount(), mLayers.count()); ++k) {
+    for (int k = 0; k < std::min(node->childCount(), mColors.count()); ++k) {
       const QTreeWidgetItem* child = node->child(k);
-      const QString layer = mLayers.at(k).getName();
+      const QString color = mColors.at(k).first;
       if (child->checkState(0) == Qt::Checked) {
-        item.layers.insert(layer);
+        item.colors.insert(color);
       } else {
-        item.layers.remove(layer);
+        item.colors.remove(color);
       }
     }
   }
@@ -1103,27 +1050,23 @@ void GraphicsExportDialog::applySettings() noexcept {
         pageIndices.append(i);
       }
     }
-    QList<std::pair<QString, QColor>> layers;
-    foreach (const GraphicsLayer& layer, mLayers) {
-      layers.append(std::make_pair(layer.getName(), layer.getColor()));
-    }
-    settings->setLayers(layers);
+    settings->setColors(mColors);
     foreach (int i, pageIndices) {
       mPages.append(std::make_pair(mInputPages.at(i), settings));
     }
   } else if ((mMode == Mode::Board) && (mInputPages.count() == 1)) {
     foreach (const ContentItem& item, getPageContent()) {
       if (item.enabled) {
-        QList<std::pair<QString, QColor>> layers;
-        foreach (const GraphicsLayer& layer, mLayers) {
-          if (item.layers.contains(layer.getName())) {
-            layers.append(std::make_pair(layer.getName(), layer.getColor()));
+        QList<std::pair<QString, QColor>> colors;
+        foreach (const auto& pair, mColors) {
+          if (item.colors.contains(pair.first)) {
+            colors.append(pair);
           }
         }
         std::shared_ptr<GraphicsExportSettings> pageSettings =
             std::make_shared<GraphicsExportSettings>(*settings);
         pageSettings->setMirror(settings->getMirror() ^ item.mirror);
-        pageSettings->setLayers(layers);
+        pageSettings->setColors(colors);
         mPages.append(std::make_pair(mInputPages.at(0), pageSettings));
       }
     }
@@ -1424,12 +1367,11 @@ void GraphicsExportDialog::setPageContent(
     node->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable |
                    Qt::ItemIsEnabled | Qt::ItemIsEditable |
                    Qt::ItemIsDragEnabled);
-    foreach (const GraphicsLayer& layer, mLayers) {
+    foreach (const auto& pair, mColors) {
       QTreeWidgetItem* child = new QTreeWidgetItem(node);
-      child->setText(0, layer.getNameTr());
+      child->setText(0, mTheme.getColor(pair.first).getNameTr());
       child->setCheckState(
-          0,
-          item.layers.contains(layer.getName()) ? Qt::Checked : Qt::Unchecked);
+          0, item.colors.contains(pair.first) ? Qt::Checked : Qt::Unchecked);
     }
   }
   mUi->treeContent->viewport()->update();  // Fix UI flicker.
@@ -1449,11 +1391,12 @@ bool GraphicsExportDialog::getOpenExportedFiles() const noexcept {
   return mUi->cbxOpenExportedFiles->isChecked();
 }
 
-void GraphicsExportDialog::updateLayerColorsListWidget() noexcept {
+void GraphicsExportDialog::updateColorsListWidget() noexcept {
   mUi->lstLayerColors->clear();
-  foreach (const GraphicsLayer& layer, mLayers) {
-    QListWidgetItem* item = new QListWidgetItem(layer.getNameTr());
-    item->setData(Qt::DecorationRole, layer.getColor());
+  foreach (const auto& pair, mColors) {
+    QListWidgetItem* item =
+        new QListWidgetItem(mTheme.getColor(pair.first).getNameTr());
+    item->setData(Qt::DecorationRole, pair.second);
     mUi->lstLayerColors->addItem(item);
   }
 }

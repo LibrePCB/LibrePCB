@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "packagecheck.h"
 
-#include "../../graphics/graphicslayer.h"
 #include "../../utils/toolbox.h"
 #include "../../utils/transform.h"
 #include "package.h"
@@ -120,19 +119,18 @@ void PackageCheck::checkMissingTexts(MsgList& msgs) const {
 }
 
 void PackageCheck::checkWrongTextLayers(MsgList& msgs) const {
-  QHash<QString, QString> textLayers = {
-      std::make_pair("{{NAME}}", QString(GraphicsLayer::sTopNames)),
-      std::make_pair("{{VALUE}}", QString(GraphicsLayer::sTopValues)),
+  QHash<QString, const Layer*> textLayers = {
+      std::make_pair("{{NAME}}", &Layer::topNames()),
+      std::make_pair("{{VALUE}}", &Layer::topValues()),
   };
   for (auto itFtp = mPackage.getFootprints().begin();
        itFtp != mPackage.getFootprints().end(); ++itFtp) {
     for (auto it = (*itFtp).getStrokeTexts().begin();
          it != (*itFtp).getStrokeTexts().end(); ++it) {
-      QString expectedLayer = textLayers.value((*it).getText());
-      if ((!expectedLayer.isEmpty()) &&
-          ((*it).getLayerName() != expectedLayer)) {
+      const Layer* expectedLayer = textLayers.value((*it).getText());
+      if (expectedLayer && (&(*it).getLayer() != expectedLayer)) {
         msgs.append(std::make_shared<MsgWrongFootprintTextLayer>(
-            itFtp.ptr(), it.ptr(), expectedLayer));
+            itFtp.ptr(), it.ptr(), *expectedLayer));
       }
     }
   }
@@ -218,9 +216,9 @@ void PackageCheck::checkPadsClearanceToPlacement(MsgList& msgs) const {
       }
       QPainterPath area = Toolbox::shapeFromPath(
           polygon.getPath().toQPainterPathPx(), pen, brush);
-      if (polygon.getLayerName() == GraphicsLayer::sTopPlacement) {
+      if (polygon.getLayer() == Layer::topPlacement()) {
         topPlacement.addPath(area);
-      } else if (polygon.getLayerName() == GraphicsLayer::sBotPlacement) {
+      } else if (polygon.getLayer() == Layer::botPlacement()) {
         botPlacement.addPath(area);
       }
     }
@@ -238,12 +236,12 @@ void PackageCheck::checkPadsClearanceToPlacement(MsgList& msgs) const {
           transform.mapPx(pad->getGeometry()
                               .withOffset(clearance - tolerance)
                               .toFilledQPainterPathPx());
-      if (pad->isOnLayer(GraphicsLayer::sTopCopper) &&
+      if (pad->isOnLayer(Layer::topCopper()) &&
           stopMask.intersects(topPlacement)) {
         msgs.append(std::make_shared<MsgPadOverlapsWithPlacement>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString(),
             clearance));
-      } else if (pad->isOnLayer(GraphicsLayer::sBotCopper) &&
+      } else if (pad->isOnLayer(Layer::botCopper()) &&
                  stopMask.intersects(botPlacement)) {
         msgs.append(std::make_shared<MsgPadOverlapsWithPlacement>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString(),

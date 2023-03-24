@@ -27,10 +27,10 @@
 #include "ui_boardplanepropertiesdialog.h"
 
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -80,14 +80,11 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
       mUi->cbxNetSignal->findData(mPlane.getNetSignal().getUuid().toStr()));
 
   // layer combobox
-  foreach (const GraphicsLayer* layer,
-           mPlane.getBoard().getLayerStack().getAllLayers()) {
-    if (layer->isCopperLayer() && layer->isEnabled()) {
-      mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
-    }
+  foreach (const Layer* layer, mPlane.getBoard().getCopperLayers()) {
+    mUi->cbxLayer->addItem(layer->getNameTr(), layer->getId());
   }
   mUi->cbxLayer->setCurrentIndex(
-      mUi->cbxLayer->findData(*mPlane.getLayerName()));
+      mUi->cbxLayer->findData(mPlane.getLayer().getId()));
 
   // minimum width / clearance spinbox
   mUi->edtMinWidth->setValue(mPlane.getMinWidth());
@@ -159,9 +156,8 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
     // layer
     if (mUi->cbxLayer->currentIndex() >= 0 &&
         mUi->cbxLayer->currentData().isValid()) {
-      cmd->setLayerName(
-          GraphicsLayerName(mUi->cbxLayer->currentData().toString()),
-          false);  // can throw
+      cmd->setLayer(Layer::get(mUi->cbxLayer->currentData().toString()),
+                    false);  // can throw
     }
 
     // min width/clearance

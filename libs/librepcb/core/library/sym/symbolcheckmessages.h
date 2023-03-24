@@ -33,6 +33,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Layer;
 class SymbolPin;
 class Text;
 
@@ -171,20 +172,20 @@ public:
   // Constructors / Destructor
   MsgWrongSymbolTextLayer() = delete;
   MsgWrongSymbolTextLayer(std::shared_ptr<const Text> text,
-                          const QString& expectedLayerName) noexcept;
+                          const Layer& expectedLayer) noexcept;
   MsgWrongSymbolTextLayer(const MsgWrongSymbolTextLayer& other) noexcept
     : RuleCheckMessage(other),
       mText(other.mText),
-      mExpectedLayerName(other.mExpectedLayerName) {}
+      mExpectedLayer(other.mExpectedLayer) {}
   virtual ~MsgWrongSymbolTextLayer() noexcept {}
 
   // Getters
   std::shared_ptr<const Text> getText() const noexcept { return mText; }
-  QString getExpectedLayerName() const noexcept { return mExpectedLayerName; }
+  const Layer& getExpectedLayer() const noexcept { return *mExpectedLayer; }
 
 private:
   std::shared_ptr<const Text> mText;
-  QString mExpectedLayerName;
+  const Layer* mExpectedLayer;
 };
 
 /*******************************************************************************

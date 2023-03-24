@@ -35,6 +35,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Layer;
 class NetSignal;
 
 namespace editor {
@@ -59,8 +60,7 @@ public:
   void mirror(const Point& center, Qt::Orientation orientation,
               bool immediate) noexcept;
   void setOutline(const Path& outline, bool immediate) noexcept;
-  void setLayerName(const GraphicsLayerName& layerName,
-                    bool immediate) noexcept;
+  void setLayer(const Layer& layer, bool immediate) noexcept;
   void setNetSignal(NetSignal& netsignal) noexcept;
   void setMinWidth(const UnsignedLength& minWidth) noexcept;
   void setMinClearance(const UnsignedLength& minClearance) noexcept;
@@ -89,8 +89,8 @@ private:
   // General Attributes
   Path mOldOutline;
   Path mNewOutline;
-  GraphicsLayerName mOldLayerName;
-  GraphicsLayerName mNewLayerName;
+  const Layer* mOldLayer;
+  const Layer* mNewLayer;
   NetSignal* mOldNetSignal;
   NetSignal* mNewNetSignal;
   UnsignedLength mOldMinWidth;

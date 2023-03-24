@@ -22,7 +22,9 @@
  ******************************************************************************/
 #include "schematicclipboarddatabuilder.h"
 
+#include "schematicgraphicsscene.h"
 #include "schematicnetsegmentsplitter.h"
+#include "schematicselectionquery.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cmp/component.h>
@@ -40,7 +42,6 @@
 #include <librepcb/core/project/schematic/items/si_symbolpin.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
-#include <librepcb/core/project/schematic/schematicselectionquery.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -56,8 +57,8 @@ namespace editor {
  ******************************************************************************/
 
 SchematicClipboardDataBuilder::SchematicClipboardDataBuilder(
-    Schematic& schematic) noexcept
-  : mSchematic(schematic) {
+    SchematicGraphicsScene& scene) noexcept
+  : mScene(scene) {
 }
 
 SchematicClipboardDataBuilder::~SchematicClipboardDataBuilder() noexcept {
@@ -70,20 +71,19 @@ SchematicClipboardDataBuilder::~SchematicClipboardDataBuilder() noexcept {
 std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
     const Point& cursorPos) const noexcept {
   std::unique_ptr<SchematicClipboardData> data(
-      new SchematicClipboardData(mSchematic.getUuid(), cursorPos));
+      new SchematicClipboardData(mScene.getSchematic().getUuid(), cursorPos));
 
   // Get all selected items
-  std::unique_ptr<SchematicSelectionQuery> query(
-      mSchematic.createSelectionQuery());
-  query->addSelectedSymbols();
-  query->addSelectedNetLines();
-  query->addSelectedNetLabels();
-  query->addSelectedPolygons();
-  query->addSelectedSchematicTexts();
-  query->addNetPointsOfNetLines();
+  SchematicSelectionQuery query(mScene);
+  query.addSelectedSymbols();
+  query.addSelectedNetLines();
+  query.addSelectedNetLabels();
+  query.addSelectedPolygons();
+  query.addSelectedSchematicTexts();
+  query.addNetPointsOfNetLines();
 
   // Add components
-  foreach (SI_Symbol* symbol, query->getSymbols()) {
+  foreach (SI_Symbol* symbol, query.getSymbols()) {
     // Components with multiple symbols (gates) shall be added only once.
     if (data->getComponentInstances().contains(
             symbol->getComponentInstance().getUuid())) {
@@ -108,7 +108,7 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
   }
 
   // Add symbols
-  foreach (SI_Symbol* symbol, query->getSymbols()) {
+  foreach (SI_Symbol* symbol, query.getSymbols()) {
     std::unique_ptr<TransactionalDirectory> dir =
         data->getDirectory("sym/" % symbol->getLibSymbol().getUuid().toStr());
     if (dir->getFiles().isEmpty()) {
@@ -116,7 +116,7 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
     }
     TextList texts;
     foreach (const SI_Text* t, symbol->getTexts()) {
-      texts.append(std::make_shared<Text>(t->getText()));
+      texts.append(std::make_shared<Text>(t->getTextObj()));
     }
     data->getSymbolInstances().append(
         std::make_shared<SchematicClipboardData::SymbolInstance>(
@@ -127,12 +127,12 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
 
   // Add (splitted) net segments including netpoints, netlines and netlabels
   QHash<SI_NetSegment*, SchematicSelectionQuery::NetSegmentItems>
-      netSegmentItems = query->getNetSegmentItems();
+      netSegmentItems = query.getNetSegmentItems();
   for (auto it = netSegmentItems.constBegin(); it != netSegmentItems.constEnd();
        ++it) {
     SchematicNetSegmentSplitter splitter;
     foreach (SI_SymbolPin* pin, it.key()->getAllConnectedPins()) {
-      bool replacePin = !query->getSymbols().contains(&pin->getSymbol());
+      bool replacePin = !query.getSymbols().contains(&pin->getSymbol());
       splitter.addSymbolPin(pin->toNetLineAnchor(), pin->getPosition(),
                             replacePin);
     }
@@ -159,14 +159,14 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
   }
 
   // Add polygons
-  foreach (SI_Polygon* polygon, query->getPolygons()) {
+  foreach (SI_Polygon* polygon, query.getPolygons()) {
     data->getPolygons().append(
         std::make_shared<Polygon>(polygon->getPolygon()));
   }
 
   // Add texts
-  foreach (SI_Text* text, query->getTexts()) {
-    data->getTexts().append(std::make_shared<Text>(text->getText()));
+  foreach (SI_Text* text, query.getTexts()) {
+    data->getTexts().append(std::make_shared<Text>(text->getTextObj()));
   }
 
   return data;

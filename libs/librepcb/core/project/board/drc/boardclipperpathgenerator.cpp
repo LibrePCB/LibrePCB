@@ -23,7 +23,6 @@
 #include "boardclipperpathgenerator.h"
 
 #include "../../../geometry/polygon.h"
-#include "../../../graphics/graphicslayer.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../utils/clipperhelpers.h"
 #include "../../../utils/transform.h"
@@ -61,11 +60,11 @@ BoardClipperPathGenerator::~BoardClipperPathGenerator() noexcept {
  ******************************************************************************/
 
 void BoardClipperPathGenerator::addCopper(
-    const QString& layerName, const QSet<const NetSignal*>& netsignals,
+    const Layer& layer, const QSet<const NetSignal*>& netsignals,
     bool ignorePlanes) {
   // Board polygons.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if ((polygon->getPolygon().getLayerName() == layerName) &&
+    if ((polygon->getPolygon().getLayer() == layer) &&
         (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
       addPolygon(*polygon);
     }
@@ -73,7 +72,7 @@ void BoardClipperPathGenerator::addCopper(
 
   // Stroke texts.
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    if ((strokeText->getText().getLayerName() == layerName) &&
+    if ((strokeText->getTextObj().getLayer() == layer) &&
         (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
       addStrokeText(*strokeText);
     }
@@ -82,7 +81,7 @@ void BoardClipperPathGenerator::addCopper(
   // Planes.
   if (!ignorePlanes) {
     foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-      if ((plane->getLayerName() == layerName) &&
+      if ((plane->getLayer() == layer) &&
           (netsignals.isEmpty() ||
            netsignals.contains(&plane->getNetSignal()))) {
         addPlane(*plane);
@@ -96,9 +95,8 @@ void BoardClipperPathGenerator::addCopper(
 
     // Polygons.
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      const GraphicsLayerName polygonLayer =
-          transform.map(polygon.getLayerName());
-      if ((polygonLayer == layerName) &&
+      const Layer& polygonLayer = transform.map(polygon.getLayer());
+      if ((polygonLayer == layer) &&
           (netsignals.isEmpty() || netsignals.contains(nullptr))) {
         addPolygon(polygon, transform);
       }
@@ -106,9 +104,8 @@ void BoardClipperPathGenerator::addCopper(
 
     // Circles.
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
-      const GraphicsLayerName circleLayer =
-          transform.map(circle.getLayerName());
-      if ((circleLayer == layerName) &&
+      const Layer& circleLayer = transform.map(circle.getLayer());
+      if ((circleLayer == layer) &&
           (netsignals.isEmpty() || netsignals.contains(nullptr))) {
         addCircle(circle, transform);
       }
@@ -117,7 +114,7 @@ void BoardClipperPathGenerator::addCopper(
     // Stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
-      if ((*strokeText->getText().getLayerName() == layerName) &&
+      if ((strokeText->getTextObj().getLayer() == layer) &&
           (netsignals.isEmpty() || netsignals.contains(nullptr))) {
         addStrokeText(*strokeText);
       }
@@ -125,10 +122,10 @@ void BoardClipperPathGenerator::addCopper(
 
     // Pads.
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      if (pad->isOnLayer(layerName) &&
+      if (pad->isOnLayer(layer) &&
           (netsignals.isEmpty() ||
            netsignals.contains(pad->getCompSigInstNetSignal()))) {
-        addPad(*pad, transform, layerName);
+        addPad(*pad, transform, layer);
       }
     }
   }
@@ -139,14 +136,14 @@ void BoardClipperPathGenerator::addCopper(
         netsignals.contains(netsegment->getNetSignal())) {
       // Vias.
       foreach (const BI_Via* via, netsegment->getVias()) {
-        if (via->isOnLayer(layerName)) {
+        if (via->isOnLayer(layer)) {
           addVia(*via);
         }
       }
 
       // Net lines.
       foreach (const BI_NetLine* netLine, netsegment->getNetLines()) {
-        if (netLine->getLayer().getName() == layerName) {
+        if (netLine->getLayer() == layer) {
           addNetLine(*netLine);
         }
       }
@@ -228,10 +225,10 @@ void BoardClipperPathGenerator::addCircle(const Circle& circle,
 
 void BoardClipperPathGenerator::addStrokeText(const BI_StrokeText& strokeText,
                                               const Length& offset) {
-  const PositiveLength width(
-      qMax(*strokeText.getText().getStrokeWidth() + (offset * 2), Length(1)));
-  const Transform transform(strokeText.getText());
-  foreach (const Path path, transform.map(strokeText.generatePaths())) {
+  const PositiveLength width(qMax(
+      *strokeText.getTextObj().getStrokeWidth() + (offset * 2), Length(1)));
+  const Transform transform(strokeText.getTextObj());
+  foreach (const Path path, transform.map(strokeText.getPaths())) {
     QVector<Path> paths = path.toOutlineStrokes(width);
     foreach (const Path& p, paths) {
       ClipperHelpers::unite(mPaths,
@@ -253,11 +250,11 @@ void BoardClipperPathGenerator::addHole(const Hole& hole,
 
 void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,
                                        const Transform& transform,
-                                       const QString& layerName,
+                                       const Layer& layer,
                                        const Length& offset) {
   const Transform padTransform(pad.getLibPad().getPosition(),
                                pad.getLibPad().getRotation());
-  foreach (PadGeometry geometry, pad.getGeometryOnLayer(layerName)) {
+  foreach (PadGeometry geometry, pad.getGeometries().value(&layer)) {
     if (offset != 0) {
       geometry = geometry.withOffset(offset);
     }

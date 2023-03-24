@@ -23,6 +23,8 @@
 #include "addcomponentdialog.h"
 
 #include "../editorcommandset.h"
+#include "../graphics/defaultgraphicslayerprovider.h"
+#include "../graphics/graphicsscene.h"
 #include "../library/pkg/footprintgraphicsitem.h"
 #include "../library/sym/symbolgraphicsitem.h"
 #include "../widgets/graphicsview.h"
@@ -33,8 +35,6 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
-#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/cmp/componentsymbolvariant.h>
 #include <librepcb/core/library/dev/device.h>
@@ -67,7 +67,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
     mUi(new Ui::AddComponentDialog),
     mComponentPreviewScene(new GraphicsScene()),
     mDevicePreviewScene(new GraphicsScene()),
-    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider()),
+    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider(theme)),
     mCategoryTreeModel(new CategoryTreeModel(
         mDb, mLocaleOrder, CategoryTreeModel::Filter::CmpCatWithComponents)),
     mCurrentSearchTerm(),
@@ -126,7 +126,6 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   mUi->viewDevice->setOriginCrossVisible(false);
   mUi->viewDevice->setScene(mDevicePreviewScene.data());
 
-  mGraphicsLayerProvider->applyTheme(theme);
   mUi->treeCategories->setModel(mCategoryTreeModel.data());
   connect(mUi->treeCategories->selectionModel(),
           &QItemSelectionModel::currentChanged, this,

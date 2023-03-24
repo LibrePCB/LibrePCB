@@ -31,6 +31,7 @@
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <parseagle/library.h>
@@ -307,14 +308,13 @@ bool EagleLibraryImport::setElementDependent(T& element,
 
 QVector<std::shared_ptr<Polygon> > EagleLibraryImport::convertWires(
     const QString& element, const QList<parseagle::Wire>& wires) {
-  QMap<std::pair<GraphicsLayerName, UnsignedLength>,
+  QMap<std::pair<const Layer*, UnsignedLength>,
        QVector<std::shared_ptr<Polygon> > >
       joinablePolygons;
   foreach (const parseagle::Wire& wire, wires) {
     tryOrRaiseError(element, [&joinablePolygons, &wire]() {
       auto polygon = EagleTypeConverter::convertWire(wire);
-      auto key =
-          std::make_pair(polygon->getLayerName(), polygon->getLineWidth());
+      auto key = std::make_pair(&polygon->getLayer(), polygon->getLineWidth());
       joinablePolygons[key].append(polygon);
     });
   }

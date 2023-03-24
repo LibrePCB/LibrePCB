@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../../geometry/path.h"
 #include "../../../geometry/trace.h"
-#include "../graphicsitems/bgi_netline.h"
 #include "bi_base.h"
 
 #include <QtCore>
@@ -35,8 +34,9 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BI_NetLine;
 class BI_NetSegment;
-class GraphicsLayer;
+class Layer;
 class NetSignal;
 
 /*******************************************************************************
@@ -72,41 +72,45 @@ class BI_NetLine final : public BI_Base {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionsChanged,
+    LayerChanged,
+    WidthChanged,
+    NetSignalNameChanged,
+  };
+  Signal<BI_NetLine, Event> onEdited;
+  typedef Slot<BI_NetLine, Event> OnEditedSlot;
+
   // Constructors / Destructor
   BI_NetLine() = delete;
   BI_NetLine(const BI_NetLine& other) = delete;
   BI_NetLine(BI_NetSegment& segment, const Uuid& uuid,
              BI_NetLineAnchor& startPoint, BI_NetLineAnchor& endPoint,
-             GraphicsLayer& layer, const PositiveLength& width);
+             const Layer& layer, const PositiveLength& width);
   ~BI_NetLine() noexcept;
 
   // Getters
   BI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   const Trace& getTrace() const noexcept { return mTrace; }
   const Uuid& getUuid() const noexcept { return mTrace.getUuid(); }
-  GraphicsLayer& getLayer() const noexcept { return *mLayer; }
+  const Layer& getLayer() const noexcept { return mTrace.getLayer(); }
   const PositiveLength& getWidth() const noexcept { return mTrace.getWidth(); }
   BI_NetLineAnchor& getStartPoint() const noexcept { return *mStartPoint; }
   BI_NetLineAnchor& getEndPoint() const noexcept { return *mEndPoint; }
   BI_NetLineAnchor* getOtherPoint(const BI_NetLineAnchor& firstPoint) const
       noexcept;
-  bool isSelectable() const noexcept override;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
   UnsignedLength getLength() const noexcept;
 
   // Setters
-  void setLayer(GraphicsLayer& layer);
+  void setLayer(const Layer& layer);
   void setWidth(const PositiveLength& width) noexcept;
 
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
-  void updateLine() noexcept;
-
-  // Inherited from SI_Base
-  Type_t getType() const noexcept override { return BI_Base::Type_t::NetLine; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
+  void updatePositions() noexcept;
 
   // Operator Overloadings
   BI_NetLine& operator=(const BI_NetLine& rhs) = delete;
@@ -117,13 +121,11 @@ private:
   // General
   BI_NetSegment& mNetSegment;
   Trace mTrace;
-  QScopedPointer<BGI_NetLine> mGraphicsItem;
-  QVector<QMetaObject::Connection> mConnections;
+  QMetaObject::Connection mNetSignalNameChangedConnection;
 
   // References
   BI_NetLineAnchor* mStartPoint;
   BI_NetLineAnchor* mEndPoint;
-  GraphicsLayer* mLayer;
 };
 
 /*******************************************************************************

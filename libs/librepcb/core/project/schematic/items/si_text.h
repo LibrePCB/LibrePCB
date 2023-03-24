@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/text.h"
+#include "../../../utils/signalslot.h"
 #include "si_base.h"
 #include "si_symbol.h"
 
@@ -35,9 +36,8 @@
 namespace librepcb {
 
 class AttributeProvider;
-class LineGraphicsItem;
+class SI_Symbol;
 class Schematic;
-class TextGraphicsItem;
 
 /*******************************************************************************
  *  Class SI_Text
@@ -50,6 +50,15 @@ class SI_Text final : public SI_Base {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionChanged,
+    LayerNameChanged,
+    TextChanged,
+  };
+  Signal<SI_Text, Event> onEdited;
+  typedef Slot<SI_Text, Event> OnEditedSlot;
+
   // Constructors / Destructor
   SI_Text() = delete;
   SI_Text(const SI_Text& other) = delete;
@@ -57,37 +66,33 @@ public:
   ~SI_Text() noexcept;
 
   // Getters
-  const Uuid& getUuid() const noexcept { return mText.getUuid(); }
-  const Point& getPosition() const noexcept { return mText.getPosition(); }
-  const Angle& getRotation() const noexcept { return mText.getRotation(); }
-  Text& getText() noexcept { return mText; }
-  const Text& getText() const noexcept { return mText; }
+  const Uuid& getUuid() const noexcept { return mTextObj.getUuid(); }
+  const Point& getPosition() const noexcept { return mTextObj.getPosition(); }
+  const Angle& getRotation() const noexcept { return mTextObj.getRotation(); }
+  const QString& getText() const noexcept { return mText; }
+  Text& getTextObj() noexcept { return mTextObj; }
+  const Text& getTextObj() const noexcept { return mTextObj; }
 
   // General Methods
   SI_Symbol* getSymbol() const noexcept { return mSymbol; }
   void setSymbol(SI_Symbol* symbol) noexcept;
   const AttributeProvider* getAttributeProvider() const noexcept;
-  void updateAnchor() noexcept;
   void addToSchematic() override;
   void removeFromSchematic() override;
-
-  // Inherited from SI_Base
-  Type_t getType() const noexcept override { return SI_Base::Type_t::Text; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   SI_Text& operator=(const SI_Text& rhs) = delete;
 
 private:  // Methods
-  void schematicOrSymbolAttributesChanged() noexcept;
   void textEdited(const Text& text, Text::Event event) noexcept;
+  void updateText() noexcept;
 
 private:  // Attributes
   QPointer<SI_Symbol> mSymbol;
-  Text mText;
-  QScopedPointer<TextGraphicsItem> mGraphicsItem;
-  QScopedPointer<LineGraphicsItem> mAnchorGraphicsItem;
+  Text mTextObj;
+
+  // Cached Attributes
+  QString mText;
 
   // Slots
   Text::OnEditedSlot mOnTextEditedSlot;

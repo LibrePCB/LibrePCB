@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../graphics/graphicslayername.h"
 #include "../serialization/serializableobjectlist.h"
+#include "../types/layer.h"
 #include "../types/length.h"
 #include "path.h"
 
@@ -50,7 +50,7 @@ public:
   // Signals
   enum class Event {
     UuidChanged,
-    LayerNameChanged,
+    LayerChanged,
     LineWidthChanged,
     IsFilledChanged,
     IsGrabAreaChanged,
@@ -63,22 +63,21 @@ public:
   Polygon() = delete;
   Polygon(const Polygon& other) noexcept;
   Polygon(const Uuid& uuid, const Polygon& other) noexcept;
-  Polygon(const Uuid& uuid, const GraphicsLayerName& layerName,
-          const UnsignedLength& lineWidth, bool fill, bool isGrabArea,
-          const Path& path) noexcept;
+  Polygon(const Uuid& uuid, const Layer& layer, const UnsignedLength& lineWidth,
+          bool fill, bool isGrabArea, const Path& path) noexcept;
   explicit Polygon(const SExpression& node);
   ~Polygon() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
-  const GraphicsLayerName& getLayerName() const noexcept { return mLayerName; }
+  const Layer& getLayer() const noexcept { return *mLayer; }
   const UnsignedLength& getLineWidth() const noexcept { return mLineWidth; }
   bool isFilled() const noexcept { return mIsFilled; }
   bool isGrabArea() const noexcept { return mIsGrabArea; }
   const Path& getPath() const noexcept { return mPath; }
 
   // Setters
-  bool setLayerName(const GraphicsLayerName& name) noexcept;
+  bool setLayer(const Layer& layer) noexcept;
   bool setLineWidth(const UnsignedLength& width) noexcept;
   bool setIsFilled(bool isFilled) noexcept;
   bool setIsGrabArea(bool isGrabArea) noexcept;
@@ -100,7 +99,7 @@ public:
 
 private:  // Data
   Uuid mUuid;
-  GraphicsLayerName mLayerName;
+  const Layer* mLayer;
   UnsignedLength mLineWidth;
   bool mIsFilled;
   bool mIsGrabArea;

@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../graphics/graphicslayer.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -30,15 +32,7 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class Board;
-class ComponentInstance;
-class GraphicsLayer;
-class Project;
-
 namespace editor {
-
-class BoardEditor;
 
 namespace Ui {
 class BoardLayersDock;
@@ -58,17 +52,16 @@ public:
   // Constructors / Destructor
   BoardLayersDock() = delete;
   BoardLayersDock(const BoardLayersDock& other) = delete;
-  explicit BoardLayersDock(BoardEditor& editor) noexcept;
+  explicit BoardLayersDock(const IF_GraphicsLayerProvider& lp) noexcept;
   ~BoardLayersDock() noexcept;
-
-  // Setters
-  void setActiveBoard(Board* board);
 
   // Operator Overloadings
   BoardLayersDock& operator=(const BoardLayersDock& rhs) = delete;
 
-private slots:
+signals:
+  void layersVisibilityChanged();
 
+private slots:
   void on_listWidget_itemChanged(QListWidgetItem* item);
   void on_btnTop_clicked();
   void on_btnBottom_clicked();
@@ -78,6 +71,8 @@ private slots:
 
 private:
   // Private Methods
+  void layerEdited(const GraphicsLayer& layer,
+                   GraphicsLayer::Event event) noexcept;
   void updateListWidget() noexcept;
   void setVisibleLayers(const QList<QString>& layers) noexcept;
   QList<QString> getCommonLayers() const noexcept;
@@ -86,10 +81,12 @@ private:
   QList<QString> getAllLayers() const noexcept;
 
   // General
+  const IF_GraphicsLayerProvider& mLayerProvider;
   QScopedPointer<Ui::BoardLayersDock> mUi;
-  BoardEditor& mBoardEditor;
-  Board* mActiveBoard;
-  QMetaObject::Connection mActiveBoardConnection;
+  bool mUpdateScheduled;
+
+  // Slots
+  GraphicsLayer::OnEditedSlot mOnLayerEditedSlot;
 };
 
 /*******************************************************************************

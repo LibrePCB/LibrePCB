@@ -22,7 +22,8 @@
  ******************************************************************************/
 #include "boardfabricationoutputsettings.h"
 
-#include "../../graphics/graphicslayer.h"
+#include "../../serialization/sexpression.h"
+#include "../../types/layer.h"
 
 #include <QtCore>
 
@@ -50,10 +51,8 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings() noexcept
     mSuffixSilkscreenBot("_SILKSCREEN-BOTTOM.gbr"),
     mSuffixSolderPasteTop("_SOLDERPASTE-TOP.gbr"),
     mSuffixSolderPasteBot("_SOLDERPASTE-BOTTOM.gbr"),
-    mSilkscreenLayersTop(
-        {GraphicsLayer::sTopPlacement, GraphicsLayer::sTopNames}),
-    mSilkscreenLayersBot(
-        {GraphicsLayer::sBotPlacement, GraphicsLayer::sBotNames}),
+    mSilkscreenLayersTop({&Layer::topPlacement(), &Layer::topNames()}),
+    mSilkscreenLayersBot({&Layer::botPlacement(), &Layer::botNames()}),
     mMergeDrillFiles(false),
     mUseG85SlotCommand(false),
     mEnableSolderPasteTop(true),
@@ -96,12 +95,12 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
   foreach (const SExpression* child,
            node.getChild("silkscreen_top/layers")
                .getChildren(SExpression::Type::Token)) {
-    mSilkscreenLayersTop.append(child->getValue());
+    mSilkscreenLayersTop.append(deserialize<const Layer*>(*child));
   }
   foreach (const SExpression* child,
            node.getChild("silkscreen_bot/layers")
                .getChildren(SExpression::Type::Token)) {
-    mSilkscreenLayersBot.append(child->getValue());
+    mSilkscreenLayersBot.append(deserialize<const Layer*>(*child));
   }
 }
 
@@ -133,8 +132,8 @@ void BoardFabricationOutputSettings::serialize(SExpression& root) const {
   silkscreenTop.appendChild("suffix", mSuffixSilkscreenTop);
   silkscreenTop.ensureLineBreak();
   SExpression& silkscreenTopLayers = silkscreenTop.appendList("layers");
-  foreach (const QString& layer, mSilkscreenLayersTop) {
-    silkscreenTopLayers.appendChild(SExpression::createToken(layer));
+  foreach (const Layer* layer, mSilkscreenLayersTop) {
+    silkscreenTopLayers.appendChild(*layer);
   }
   silkscreenTop.ensureLineBreak();
   root.ensureLineBreak();
@@ -143,8 +142,8 @@ void BoardFabricationOutputSettings::serialize(SExpression& root) const {
   silkscreenBot.appendChild("suffix", mSuffixSilkscreenBot);
   silkscreenBot.ensureLineBreak();
   SExpression& silkscreenBotLayers = silkscreenBot.appendList("layers");
-  foreach (const QString& layer, mSilkscreenLayersBot) {
-    silkscreenBotLayers.appendChild(SExpression::createToken(layer));
+  foreach (const Layer* layer, mSilkscreenLayersBot) {
+    silkscreenBotLayers.appendChild(*layer);
   }
   silkscreenBot.ensureLineBreak();
   root.ensureLineBreak();

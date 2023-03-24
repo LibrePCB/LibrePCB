@@ -24,7 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../../geometry/netlabel.h"
-#include "../graphicsitems/sgi_netlabel.h"
+#include "../../../utils/signalslot.h"
 #include "si_base.h"
 
 #include <QtCore>
@@ -50,6 +50,17 @@ class SI_NetLabel final : public SI_Base {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    PositionChanged,
+    RotationChanged,
+    MirroredChanged,
+    NetNameChanged,
+    AnchorPositionChanged,
+  };
+  Signal<SI_NetLabel, Event> onEdited;
+  typedef Slot<SI_NetLabel, Event> OnEditedSlot;
+
   // Constructors / Destructor
   SI_NetLabel() = delete;
   SI_NetLabel(const SI_NetLabel& other) = delete;
@@ -58,8 +69,10 @@ public:
 
   // Getters
   const Uuid& getUuid() const noexcept { return mNetLabel.getUuid(); }
+  const Point& getPosition() const noexcept { return mNetLabel.getPosition(); }
   const Angle& getRotation() const noexcept { return mNetLabel.getRotation(); }
   bool getMirrored() const noexcept { return mNetLabel.getMirrored(); }
+  const Point& getAnchorPosition() const noexcept { return mAnchorPosition; }
   const NetLabel& getNetLabel() const noexcept { return mNetLabel; }
   SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   NetSignal& getNetSignalOfNetSegment() const noexcept;
@@ -71,28 +84,23 @@ public:
   void setMirrored(const bool mirrored) noexcept;
 
   // General Methods
-  void updateAnchor() noexcept;
   void addToSchematic() override;
   void removeFromSchematic() override;
-
-  // Inherited from SI_Base
-  Type_t getType() const noexcept override { return SI_Base::Type_t::NetLabel; }
-  const Point& getPosition() const noexcept { return mNetLabel.getPosition(); }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
+  void updateAnchor() noexcept;
 
   // Operator Overloadings
   SI_NetLabel& operator=(const SI_NetLabel& rhs) = delete;
 
 private:
   // General
-  QScopedPointer<SGI_NetLabel> mGraphicsItem;
   QMetaObject::Connection mNameChangedConnection;
-  QMetaObject::Connection mHighlightChangedConnection;
 
   // Attributes
   SI_NetSegment& mNetSegment;
   NetLabel mNetLabel;
+
+  // Cached Attributes
+  Point mAnchorPosition;
 };
 
 /*******************************************************************************

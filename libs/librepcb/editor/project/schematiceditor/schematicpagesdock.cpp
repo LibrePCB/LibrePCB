@@ -27,7 +27,6 @@
 #include "ui_schematicpagesdock.h"
 
 #include <librepcb/core/export/graphicsexport.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/schematic.h>
@@ -95,23 +94,7 @@ SchematicPagesDock::SchematicPagesDock(Project& project, UndoStack& undoStack,
 
   // Setup thumbnail generator.
   {
-    QList<std::pair<QString, QColor>> colors;
-    QSet<QString> layers = {
-        GraphicsLayer::sSchematicSheetFrames,
-        GraphicsLayer::sSchematicNetLines,
-        GraphicsLayer::sSchematicNetLabels,
-        GraphicsLayer::sSchematicDocumentation,
-        GraphicsLayer::sSchematicComments,
-        GraphicsLayer::sSchematicGuide,
-        GraphicsLayer::sSymbolOutlines,
-        GraphicsLayer::sSymbolGrabAreas,
-        GraphicsLayer::sSymbolPinLines,
-    };
-    foreach (const QString layer, layers) {
-      colors.append(std::make_pair(
-          layer, theme.getColorForLayer(layer).getPrimaryColor()));
-    }
-    mThumbnailSettings->setLayers(colors);
+    mThumbnailSettings->loadColorsFromTheme(theme);
     mThumbnailSettings->setBackgroundColor(Qt::transparent);
     mThumbnailSettings->setPixmapDpi(40);
     mThumbnailSettings->setMinLineWidth(UnsignedLength(700000));

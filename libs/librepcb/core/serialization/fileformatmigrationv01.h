@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../graphics/graphicslayername.h"
 #include "../types/alignment.h"
 #include "../types/angle.h"
 #include "../types/point.h"
@@ -52,7 +51,7 @@ class FileFormatMigrationV01 : public FileFormatMigration {
 protected:
   struct Text {
     Uuid uuid;
-    GraphicsLayerName layerName;
+    QString layerName;
     QString text;
     Point position;
     Angle rotation;
@@ -128,6 +127,7 @@ protected:  // Methods
   virtual void upgradeBoardDrcSettings(SExpression& root);
   virtual void upgradeGrid(SExpression& node);
   virtual void upgradeHoles(SExpression& node);
+  virtual void upgradeLayers(SExpression& node);
 };
 
 /*******************************************************************************

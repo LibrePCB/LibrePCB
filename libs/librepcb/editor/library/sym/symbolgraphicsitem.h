@@ -37,15 +37,15 @@
  ******************************************************************************/
 namespace librepcb {
 
-class CircleGraphicsItem;
 class Component;
-class IF_GraphicsLayerProvider;
-class PolygonGraphicsItem;
-class TextGraphicsItem;
 
 namespace editor {
 
+class CircleGraphicsItem;
+class IF_GraphicsLayerProvider;
+class PolygonGraphicsItem;
 class SymbolPinGraphicsItem;
+class TextGraphicsItem;
 
 /*******************************************************************************
  *  Class SymbolGraphicsItem
@@ -54,7 +54,7 @@ class SymbolPinGraphicsItem;
 /**
  * @brief The SymbolGraphicsItem class
  */
-class SymbolGraphicsItem final : public QGraphicsItem,
+class SymbolGraphicsItem final : public QGraphicsItemGroup,
                                  public AttributeProvider {
 public:
   enum class FindFlag {
@@ -113,12 +113,6 @@ public:
   void updateAllTexts() noexcept;
   void setSelectionRect(const QRectF rect) noexcept;
 
-  // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept override { return QRectF(); }
-  QPainterPath shape() const noexcept override { return QPainterPath(); }
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
-
   // Operator Overloadings
   SymbolGraphicsItem& operator=(const SymbolGraphicsItem& rhs) = delete;
 
@@ -131,6 +125,7 @@ private:  // Methods
   void syncPolygons() noexcept;
   void syncTexts() noexcept;
   void symbolEdited(const Symbol& symbol, Symbol::Event event) noexcept;
+  void substituteText(TextGraphicsItem& text) noexcept;
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 private:  // Data

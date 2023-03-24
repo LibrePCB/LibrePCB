@@ -44,6 +44,7 @@ class Board;
 class BoardFabricationOutputSettings;
 class Circle;
 class GerberGenerator;
+class Layer;
 class Polygon;
 class Project;
 
@@ -118,13 +119,13 @@ private:
 
   int drawNpthDrills(ExcellonGenerator& gen) const;
   int drawPthDrills(ExcellonGenerator& gen) const;
-  void drawLayer(GerberGenerator& gen, const QString& layerName) const;
-  void drawVia(GerberGenerator& gen, const BI_Via& via,
-               const QString& layerName, const QString& netName) const;
+  void drawLayer(GerberGenerator& gen, const Layer& layer) const;
+  void drawVia(GerberGenerator& gen, const BI_Via& via, const Layer& layer,
+               const QString& netName) const;
   void drawDevice(GerberGenerator& gen, const BI_Device& device,
-                  const QString& layerName) const;
+                  const Layer& layer) const;
   void drawFootprintPad(GerberGenerator& gen, const BI_FootprintPad& pad,
-                        const QString& layerName) const;
+                        const Layer& layer) const;
 
   std::unique_ptr<ExcellonGenerator> createExcellonGenerator(
       const BoardFabricationOutputSettings& settings,
@@ -133,7 +134,7 @@ private:
 
   // Static Methods
   static UnsignedLength calcWidthOfLayer(const UnsignedLength& width,
-                                         const QString& name) noexcept;
+                                         const Layer& layer) noexcept;
 
   // Private Member Variables
   const Project& mProject;

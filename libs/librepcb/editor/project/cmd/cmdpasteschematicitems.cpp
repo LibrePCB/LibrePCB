@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdpasteschematicitems.h"
 
+#include "../../graphics/polygongraphicsitem.h"
 #include "../../project/cmd/cmdcomponentinstanceadd.h"
 #include "../../project/cmd/cmdcompsiginstsetnetsignal.h"
 #include "../../project/cmd/cmdnetclassadd.h"
@@ -34,7 +35,13 @@
 #include "../../project/cmd/cmdschematicpolygonadd.h"
 #include "../../project/cmd/cmdschematictextadd.h"
 #include "../../project/cmd/cmdsymbolinstanceadd.h"
+#include "../schematiceditor/graphicsitems/sgi_netlabel.h"
+#include "../schematiceditor/graphicsitems/sgi_netline.h"
+#include "../schematiceditor/graphicsitems/sgi_netpoint.h"
+#include "../schematiceditor/graphicsitems/sgi_symbol.h"
+#include "../schematiceditor/graphicsitems/sgi_text.h"
 #include "../schematiceditor/schematicclipboarddata.h"
+#include "../schematiceditor/schematicgraphicsscene.h"
 #include "cmdchangenetsignalofschematicnetsegment.h"
 
 #include <librepcb/core/library/cmp/component.h>
@@ -68,11 +75,12 @@ namespace editor {
  ******************************************************************************/
 
 CmdPasteSchematicItems::CmdPasteSchematicItems(
-    Schematic& schematic, std::unique_ptr<SchematicClipboardData> data,
+    SchematicGraphicsScene& scene, std::unique_ptr<SchematicClipboardData> data,
     const Point& posOffset) noexcept
   : UndoCommandGroup(tr("Paste Schematic Elements")),
-    mProject(schematic.getProject()),
-    mSchematic(schematic),
+    mScene(scene),
+    mSchematic(scene.getSchematic()),
+    mProject(mSchematic.getProject()),
     mData(std::move(data)),
     mPosOffset(posOffset) {
   Q_ASSERT(mData);
@@ -163,12 +171,13 @@ bool CmdPasteSchematicItems::performExecute() {
       Text copy(text);
       copy.setPosition(copy.getPosition() + mPosOffset);  // move
       SI_Text* item = new SI_Text(mSchematic, copy);
-      item->setSelected(true);
       symbol->addText(*item);
     }
-    symbol->setSelected(true);
     symbolMap.insert(sym.uuid, symbol->getUuid());
-    execNewChildCmd(new CmdSymbolInstanceAdd(*symbol.take()));
+    execNewChildCmd(new CmdSymbolInstanceAdd(*symbol));
+    if (auto item = mScene.getSymbols().value(symbol.take())) {
+      item->setSelected(true);
+    }
   }
 
   // Paste net segments
@@ -196,7 +205,6 @@ bool CmdPasteSchematicItems::performExecute() {
     // Add new segment
     SI_NetSegment* copy =
         new SI_NetSegment(mSchematic, Uuid::createRandom(), *netSignal);
-    copy->setSelected(true);
     execNewChildCmd(new CmdSchematicNetSegmentAdd(*copy));
 
     // Add netpoints and netlines
@@ -206,7 +214,6 @@ bool CmdPasteSchematicItems::performExecute() {
     for (const Junction& junction : seg.junctions) {
       SI_NetPoint* netpoint =
           cmdAddElements->addNetPoint(junction.getPosition() + mPosOffset);
-      netpoint->setSelected(true);
       netPointMap.insert(junction.getUuid(), netpoint);
     }
     for (const NetLine& nl : seg.lines) {
@@ -254,8 +261,7 @@ bool CmdPasteSchematicItems::performExecute() {
       } else {
         throw LogicError(__FILE__, __LINE__);
       }
-      SI_NetLine* netline = cmdAddElements->addNetLine(*start, *end);
-      netline->setSelected(true);
+      cmdAddElements->addNetLine(*start, *end);
     }
     execNewChildCmd(cmdAddElements.take());
 
@@ -267,7 +273,6 @@ bool CmdPasteSchematicItems::performExecute() {
                    nl.getRotation(), nl.getMirrored()));
       CmdSchematicNetLabelAdd* cmd = new CmdSchematicNetLabelAdd(*netLabel);
       execNewChildCmd(cmd);
-      netLabel->setSelected(true);
       if (!forcedNetName) {
         // If the net segment has at least one net label, copy the original
         // net name.
@@ -291,6 +296,23 @@ bool CmdPasteSchematicItems::performExecute() {
         execNewChildCmd(cmd);
       }
     }
+
+    // Select pasted net segment items.
+    foreach (SI_NetPoint* netPoint, copy->getNetPoints()) {
+      if (auto item = mScene.getNetPoints().value(netPoint)) {
+        item->setSelected(true);
+      }
+    }
+    foreach (SI_NetLine* netLine, copy->getNetLines()) {
+      if (auto item = mScene.getNetLines().value(netLine)) {
+        item->setSelected(true);
+      }
+    }
+    foreach (SI_NetLabel* netLabel, copy->getNetLabels()) {
+      if (auto item = mScene.getNetLabels().value(netLabel)) {
+        item->setSelected(true);
+      }
+    }
   }
 
   // Paste polygons
@@ -298,8 +320,10 @@ bool CmdPasteSchematicItems::performExecute() {
     Polygon copy(Uuid::createRandom(), polygon);  // assign new UUID
     copy.setPath(copy.getPath().translated(mPosOffset));  // move
     SI_Polygon* item = new SI_Polygon(mSchematic, copy);
-    item->setSelected(true);
     execNewChildCmd(new CmdSchematicPolygonAdd(*item));
+    if (auto graphicsItem = mScene.getPolygons().value(item)) {
+      graphicsItem->setSelected(true);
+    }
   }
 
   // Paste texts
@@ -307,8 +331,10 @@ bool CmdPasteSchematicItems::performExecute() {
     Text copy(Uuid::createRandom(), text);  // assign new UUID
     copy.setPosition(copy.getPosition() + mPosOffset);  // move
     SI_Text* item = new SI_Text(mSchematic, copy);
-    item->setSelected(true);
     execNewChildCmd(new CmdSchematicTextAdd(*item));
+    if (auto graphicsItem = mScene.getTexts().value(item)) {
+      graphicsItem->setSelected(true);
+    }
   }
 
   undoScopeGuard.dismiss();  // no undo required

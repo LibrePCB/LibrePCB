@@ -34,8 +34,6 @@
 namespace librepcb {
 
 class Board;
-class HoleGraphicsItem;
-class Project;
 
 /*******************************************************************************
  *  Class BI_Hole
@@ -48,6 +46,15 @@ class BI_Hole final : public BI_Base {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    DiameterChanged,
+    PathChanged,
+    StopMaskOffsetChanged,
+  };
+  Signal<BI_Hole, Event> onEdited;
+  typedef Slot<BI_Hole, Event> OnEditedSlot;
+
   // Constructors / Destructor
   BI_Hole() = delete;
   BI_Hole(const BI_Hole& other) = delete;
@@ -57,31 +64,27 @@ public:
   // Getters
   Hole& getHole() noexcept { return *mHole; }
   const Hole& getHole() const noexcept { return *mHole; }
-  const Uuid& getUuid() const
-      noexcept;  // convenience function, e.g. for template usage
-  bool isSelectable() const noexcept override;
-  tl::optional<Length> getStopMaskOffset() const noexcept;
+  const Uuid& getUuid() const noexcept;  // for convenience, e.g. template usage
+  const tl::optional<Length>& getStopMaskOffset() const noexcept {
+    return mStopMaskOffset;
+  }
 
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
-
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override { return BI_Base::Type_t::Hole; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
 
   // Operator Overloadings
   BI_Hole& operator=(const BI_Hole& rhs) = delete;
 
 private:  // Methods
   void holeEdited(const Hole& hole, Hole::Event event) noexcept;
-  void updateAutoStopMaskOffset() noexcept;
-  UnsignedLength getAutoStopMaskOffset() const noexcept;
+  void updateStopMaskOffset() noexcept;
 
 private:  // Data
   QScopedPointer<Hole> mHole;
-  QScopedPointer<HoleGraphicsItem> mGraphicsItem;
+
+  // Cached Attributes
+  tl::optional<Length> mStopMaskOffset;
 
   // Slots
   Hole::OnEditedSlot mOnEditedSlot;

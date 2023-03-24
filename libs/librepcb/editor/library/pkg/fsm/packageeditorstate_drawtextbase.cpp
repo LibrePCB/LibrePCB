@@ -24,6 +24,7 @@
 
 #include "../../../cmd/cmdstroketextedit.h"
 #include "../../../editorcommandset.h"
+#include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../../utils/halignactiongroup.h"
 #include "../../../utils/valignactiongroup.h"
 #include "../../../widgets/graphicslayercombobox.h"
@@ -34,9 +35,8 @@
 #include "../packageeditorwidget.h"
 
 #include <librepcb/core/geometry/stroketext.h>
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/stroketextgraphicsitem.h>
 #include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -56,7 +56,7 @@ PackageEditorState_DrawTextBase::PackageEditorState_DrawTextBase(
     mMode(mode),
     mCurrentText(nullptr),
     mCurrentGraphicsItem(nullptr),
-    mLastLayerName(GraphicsLayer::sTopNames),
+    mLastLayer(&Layer::topNames()),
     mLastHeight(1),
     mLastStrokeWidth(0),
     mLastAlignment(HAlign::left(), VAlign::bottom()),
@@ -82,7 +82,7 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
         new GraphicsLayerComboBox());
     mLayerComboBox = layerComboBox.get();
     layerComboBox->setLayers(getAllowedTextLayers());
-    layerComboBox->setCurrentLayer(mLastLayerName);
+    layerComboBox->setCurrentLayer(*mLastLayer);
     layerComboBox->addAction(
         cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
                                  &GraphicsLayerComboBox::stepDown));
@@ -265,12 +265,12 @@ bool PackageEditorState_DrawTextBase::processFlip(
   if (mCurrentText) {
     mEditCmd->mirrorGeometry(orientation, mCurrentText->getPosition(), true);
     mEditCmd->mirrorLayer(true);
-    mLastLayerName = mCurrentText->getLayerName();
+    mLastLayer = &mCurrentText->getLayer();
     mLastRotation = mCurrentText->getRotation();
     mLastAlignment = mCurrentText->getAlign();
     mLastMirrored = mCurrentText->getMirrored();
     if (mLayerComboBox) {
-      mLayerComboBox->setCurrentLayer(mCurrentText->getLayerName());
+      mLayerComboBox->setCurrentLayer(mCurrentText->getLayer());
     }
     if (mHAlignActionGroup) {
       mHAlignActionGroup->setValue(mLastAlignment.getH());
@@ -293,7 +293,7 @@ bool PackageEditorState_DrawTextBase::startAddText(const Point& pos) noexcept {
     mStartPos = pos;
     mContext.undoStack.beginCmdGroup(tr("Add footprint text"));
     mCurrentText = std::make_shared<StrokeText>(
-        Uuid::createRandom(), mLastLayerName, mLastText, pos, mLastRotation,
+        Uuid::createRandom(), *mLastLayer, mLastText, pos, mLastRotation,
         mLastHeight, mLastStrokeWidth, StrokeTextSpacing(), StrokeTextSpacing(),
         mLastAlignment, mLastMirrored, true);
     mContext.undoStack.appendToCmdGroup(new CmdStrokeTextInsert(
@@ -352,7 +352,7 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
   switch (mMode) {
     case Mode::NAME:
       // Set all properties according library conventions
-      mLastLayerName = GraphicsLayerName(GraphicsLayer::sTopNames);
+      mLastLayer = &Layer::topNames();
       mLastHeight = PositiveLength(1000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment = Alignment(HAlign::center(), VAlign::bottom());
@@ -360,7 +360,7 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
       break;
     case Mode::VALUE:
       // Set all properties according library conventions
-      mLastLayerName = GraphicsLayerName(GraphicsLayer::sTopValues);
+      mLastLayer = &Layer::topValues();
       mLastHeight = PositiveLength(1000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment = Alignment(HAlign::center(), VAlign::top());
@@ -368,7 +368,7 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
       break;
     default:
       // Set properties to something reasonable
-      mLastLayerName = GraphicsLayerName(GraphicsLayer::sTopPlacement);
+      mLastLayer = &Layer::topPlacement();
       mLastHeight = PositiveLength(2000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment = Alignment(HAlign::left(), VAlign::bottom());
@@ -378,10 +378,10 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
 }
 
 void PackageEditorState_DrawTextBase::layerComboBoxValueChanged(
-    const GraphicsLayerName& layerName) noexcept {
-  mLastLayerName = layerName;
+    const Layer& layer) noexcept {
+  mLastLayer = &layer;
   if (mEditCmd) {
-    mEditCmd->setLayerName(mLastLayerName, true);
+    mEditCmd->setLayer(*mLastLayer, true);
   }
 }
 

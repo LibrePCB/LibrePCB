@@ -63,7 +63,6 @@ public:
   const CircuitIdentifier& getName() const noexcept { return mName; }
   bool hasAutoName() const noexcept { return mHasAutoName; }
   NetClass& getNetClass() const noexcept { return mNetClass; }
-  bool isHighlighted() const noexcept { return mIsHighlighted; }
 
   // Getters: General
   Circuit& getCircuit() const noexcept { return mCircuit; }
@@ -86,7 +85,6 @@ public:
 
   // Setters
   void setName(const CircuitIdentifier& name, bool isAutoName) noexcept;
-  void setHighlighted(bool hl) noexcept;
 
   // General Methods
   void addToCircuit();
@@ -115,13 +113,11 @@ public:
 signals:
 
   void nameChanged(const CircuitIdentifier& newName);
-  void highlightedChanged(bool isHighlighted);
 
 private:
   // General
   Circuit& mCircuit;
   bool mIsAddedToCircuit;
-  bool mIsHighlighted;
 
   // Attributes
   Uuid mUuid;

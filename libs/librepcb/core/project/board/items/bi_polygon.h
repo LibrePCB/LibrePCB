@@ -23,10 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../graphics/graphicslayername.h"
-#include "../../../types/length.h"
-#include "../../../types/point.h"
-#include "../../../types/uuid.h"
 #include "bi_base.h"
 
 #include <QtCore>
@@ -36,12 +32,9 @@
  ******************************************************************************/
 namespace librepcb {
 
-class BGI_Polygon;
 class Board;
-class Path;
 class Polygon;
-class PolygonGraphicsItem;
-class Project;
+class Uuid;
 
 /*******************************************************************************
  *  Class BI_Polygon
@@ -63,29 +56,17 @@ public:
   // Getters
   Polygon& getPolygon() noexcept { return *mPolygon; }
   const Polygon& getPolygon() const noexcept { return *mPolygon; }
-  const Uuid& getUuid() const
-      noexcept;  // convenience function, e.g. for template usage
-  PolygonGraphicsItem& getGraphicsItem() noexcept { return *mGraphicsItem; }
-  bool isSelectable() const noexcept override;
+  const Uuid& getUuid() const noexcept;  // for convenience, e.g. template usage
 
   // General Methods
   void addToBoard() override;
   void removeFromBoard() override;
 
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override { return BI_Base::Type_t::Polygon; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
-
   // Operator Overloadings
   BI_Polygon& operator=(const BI_Polygon& rhs) = delete;
 
-private slots:
-  void boardAttributesChanged();
-
 private:
   QScopedPointer<Polygon> mPolygon;
-  QScopedPointer<PolygonGraphicsItem> mGraphicsItem;
 };
 
 /*******************************************************************************

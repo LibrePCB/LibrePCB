@@ -24,7 +24,7 @@
 #include "../../testhelpers.h"
 
 #include <gtest/gtest.h>
-#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/types/lengthunit.h>
 #include <librepcb/editor/dialogs/dxfimportdialog.h>
 #include <librepcb/editor/widgets/doublespinbox.h>
@@ -48,13 +48,13 @@ using librepcb::tests::TestHelpers;
 
 class DxfImportDialogTest : public ::testing::Test {
 protected:
-  QList<GraphicsLayer*> mLayers;
+  QList<const Layer*> mLayers;
 
   DxfImportDialogTest() {
-    mLayers.append(new GraphicsLayer(GraphicsLayer::sBoardOutlines));
-    mLayers.append(new GraphicsLayer(GraphicsLayer::sBoardComments));
-    mLayers.append(new GraphicsLayer(GraphicsLayer::sTopPlacement));
-    mLayers.append(new GraphicsLayer(GraphicsLayer::sTopDocumentation));
+    mLayers.append(&Layer::boardOutlines());
+    mLayers.append(&Layer::boardComments());
+    mLayers.append(&Layer::topPlacement());
+    mLayers.append(&Layer::topDocumentation());
     QSettings().clear();
   }
 };
@@ -68,9 +68,8 @@ TEST_F(DxfImportDialogTest, testLayerName) {
   const int newIndex = 2;
 
   {
-    DxfImportDialog dialog(mLayers,
-                           GraphicsLayerName(mLayers[defaultIndex]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[defaultIndex], true,
+                           LengthUnit::millimeters(), "test");
 
     // Check if the layer combobox contains all layers.
     QComboBox& cbx =
@@ -85,29 +84,28 @@ TEST_F(DxfImportDialogTest, testLayerName) {
     EXPECT_EQ(defaultIndex, cbx.currentIndex());
     EXPECT_EQ(mLayers[defaultIndex]->getNameTr().toStdString(),
               cbx.currentText().toStdString());
-    EXPECT_EQ(mLayers[defaultIndex]->getName().toStdString(),
-              dialog.getLayerName()->toStdString());
+    EXPECT_EQ(mLayers[defaultIndex]->getId().toStdString(),
+              dialog.getLayer().getId().toStdString());
 
     // Check if the value can be changed.
     cbx.setCurrentIndex(newIndex);
     EXPECT_EQ(mLayers[newIndex]->getNameTr().toStdString(),
               cbx.currentText().toStdString());
-    EXPECT_EQ(mLayers[newIndex]->getName().toStdString(),
-              dialog.getLayerName()->toStdString());
+    EXPECT_EQ(mLayers[newIndex]->getId().toStdString(),
+              dialog.getLayer().getId().toStdString());
   }
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers,
-                           GraphicsLayerName(mLayers[defaultIndex]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[defaultIndex], true,
+                           LengthUnit::millimeters(), "test");
     QComboBox& cbx =
         TestHelpers::getChild<QComboBox>(dialog, "cbxLayer/QComboBox");
     EXPECT_EQ(newIndex, cbx.currentIndex());
     EXPECT_EQ(mLayers[newIndex]->getNameTr().toStdString(),
               cbx.currentText().toStdString());
-    EXPECT_EQ(mLayers[newIndex]->getName().toStdString(),
-              dialog.getLayerName()->toStdString());
+    EXPECT_EQ(mLayers[newIndex]->getId().toStdString(),
+              dialog.getLayer().getId().toStdString());
   }
 }
 
@@ -116,8 +114,8 @@ TEST_F(DxfImportDialogTest, testCirclesAsDrills) {
   const bool newValue = true;
 
   {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                           LengthUnit::millimeters(), "test");
 
     // Check the default value.
     QCheckBox& cbx =
@@ -132,8 +130,8 @@ TEST_F(DxfImportDialogTest, testCirclesAsDrills) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                           LengthUnit::millimeters(), "test");
     QCheckBox& cbx =
         TestHelpers::getChild<QCheckBox>(dialog, "cbxCirclesAsDrills");
     EXPECT_EQ(newValue, cbx.isChecked());
@@ -146,8 +144,8 @@ TEST_F(DxfImportDialogTest, testJoinTangentPolylines) {
   const bool newValue = false;
 
   {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                           LengthUnit::millimeters(), "test");
 
     // Check the default value.
     QCheckBox& cbx =
@@ -162,8 +160,8 @@ TEST_F(DxfImportDialogTest, testJoinTangentPolylines) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                           LengthUnit::millimeters(), "test");
     QCheckBox& cbx =
         TestHelpers::getChild<QCheckBox>(dialog, "cbxJoinTangentPolylines");
     EXPECT_EQ(newValue, cbx.isChecked());
@@ -176,8 +174,8 @@ TEST_F(DxfImportDialogTest, testLineWidth) {
   const UnsignedLength newValue(1230000);
 
   {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                           LengthUnit::millimeters(), "test");
 
     // Check the default value.
     UnsignedLengthEdit& edt =
@@ -192,8 +190,8 @@ TEST_F(DxfImportDialogTest, testLineWidth) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                           LengthUnit::millimeters(), "test");
     UnsignedLengthEdit& edt =
         TestHelpers::getChild<UnsignedLengthEdit>(dialog, "edtLineWidth");
     EXPECT_EQ(newValue, edt.getValue());
@@ -206,8 +204,8 @@ TEST_F(DxfImportDialogTest, testScaleFactor) {
   const qreal newValue = 0.5;
 
   {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                           LengthUnit::millimeters(), "test");
 
     // Check the default value.
     DoubleSpinBox& spbx =
@@ -222,8 +220,8 @@ TEST_F(DxfImportDialogTest, testScaleFactor) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                           LengthUnit::millimeters(), "test");
     DoubleSpinBox& spbx =
         TestHelpers::getChild<DoubleSpinBox>(dialog, "spbxScaleFactor");
     EXPECT_EQ(newValue, spbx.value());
@@ -236,8 +234,8 @@ TEST_F(DxfImportDialogTest, testPlacementPosition) {
   const tl::optional<Point> newValue = Point(1000000, 2000000);
 
   {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                           LengthUnit::millimeters(), "test");
 
     // Check the default value.
     QCheckBox& cbxInteractive =
@@ -260,8 +258,8 @@ TEST_F(DxfImportDialogTest, testPlacementPosition) {
 
   // Check if the setting is saved and restored automatically.
   {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           true, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                           LengthUnit::millimeters(), "test");
     QCheckBox& cbxInteractive =
         TestHelpers::getChild<QCheckBox>(dialog, "cbxInteractivePlacement");
     LengthEdit& edtX = TestHelpers::getChild<LengthEdit>(dialog, "edtPosX");
@@ -277,8 +275,8 @@ TEST_F(DxfImportDialogTest, testPlacementPosition) {
 
 TEST_F(DxfImportDialogTest, testHolesSupport) {
   for (bool enable : {true, false}) {
-    DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                           enable, LengthUnit::millimeters(), "test");
+    DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], enable,
+                           LengthUnit::millimeters(), "test");
     QCheckBox& cbx =
         TestHelpers::getChild<QCheckBox>(dialog, "cbxCirclesAsDrills");
     EXPECT_EQ(enable, cbx.isVisibleTo(&dialog));
@@ -286,8 +284,8 @@ TEST_F(DxfImportDialogTest, testHolesSupport) {
 }
 
 TEST_F(DxfImportDialogTest, testTabOrder) {
-  DxfImportDialog dialog(mLayers, GraphicsLayerName(mLayers[0]->getName()),
-                         true, LengthUnit::millimeters(), "test");
+  DxfImportDialog dialog(mLayers.toSet(), *mLayers[0], true,
+                         LengthUnit::millimeters(), "test");
   TestHelpers::testTabOrder(dialog);
 }
 

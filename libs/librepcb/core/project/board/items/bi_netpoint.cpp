@@ -23,6 +23,7 @@
 #include "bi_netpoint.h"
 
 #include "../../circuit/netsignal.h"
+#include "../board.h"
 #include "bi_netsegment.h"
 
 #include <QtCore>
@@ -39,26 +40,20 @@ namespace librepcb {
 BI_NetPoint::BI_NetPoint(BI_NetSegment& segment, const Uuid& uuid,
                          const Point& position)
   : BI_Base(segment.getBoard()),
+    onEdited(*this),
     mNetSegment(segment),
-    mJunction(uuid, position) {
-  // create the graphics item
-  mGraphicsItem.reset(new BGI_NetPoint(*this));
-  mGraphicsItem->setPos(mJunction.getPosition().toPxQPointF());
+    mJunction(uuid, position),
+    mLayerOfTraces(nullptr),
+    mMaxTraceWidth(0),
+    mOnNetLineEditedSlot(*this, &BI_NetPoint::netLineEdited) {
 }
 
 BI_NetPoint::~BI_NetPoint() noexcept {
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
-
-GraphicsLayer* BI_NetPoint::getLayerOfLines() const noexcept {
-  auto it = mRegisteredNetLines.constBegin();
-  return (it != mRegisteredNetLines.constEnd()) ? &((*it)->getLayer())
-                                                : nullptr;
-}
 
 TraceAnchor BI_NetPoint::toTraceAnchor() const noexcept {
   return TraceAnchor::junction(mJunction.getUuid());
@@ -70,8 +65,10 @@ TraceAnchor BI_NetPoint::toTraceAnchor() const noexcept {
 
 void BI_NetPoint::setPosition(const Point& position) noexcept {
   if (mJunction.setPosition(position)) {
-    mGraphicsItem->setPos(position.toPxQPointF());
-    foreach (BI_NetLine* line, mRegisteredNetLines) { line->updateLine(); }
+    foreach (BI_NetLine* netLine, mRegisteredNetLines) {
+      netLine->updatePositions();
+    }
+    onEdited.notify(Event::PositionChanged);
     if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
       mBoard.scheduleAirWiresRebuild(netsignal);
     }
@@ -90,12 +87,15 @@ void BI_NetPoint::addToBoard() {
     throw LogicError(__FILE__, __LINE__, "NetPoint is currently in use.");
   }
   if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
-    mHighlightChangedConnection =
-        connect(netsignal, &NetSignal::highlightedChanged,
-                [this]() { mGraphicsItem->update(); });
     mBoard.scheduleAirWiresRebuild(netsignal);
   }
-  BI_Base::addToBoard(mGraphicsItem.data());
+  BI_Base::addToBoard();
+
+  if (const NetSignal* netsignal = mNetSegment.getNetSignal()) {
+    mNetSignalNameChangedConnection =
+        connect(netsignal, &NetSignal::nameChanged, this,
+                [this]() { onEdited.notify(Event::NetSignalNameChanged); });
+  }
 }
 
 void BI_NetPoint::removeFromBoard() {
@@ -106,10 +106,14 @@ void BI_NetPoint::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__, "NetPoint is currently in use.");
   }
   if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
-    disconnect(mHighlightChangedConnection);
     mBoard.scheduleAirWiresRebuild(netsignal);
   }
-  BI_Base::removeFromBoard(mGraphicsItem.data());
+  BI_Base::removeFromBoard();
+
+  if (mNetSignalNameChangedConnection) {
+    disconnect(mNetSignalNameChangedConnection);
+    mNetSignalNameChangedConnection = QMetaObject::Connection();
+  }
 }
 
 void BI_NetPoint::registerNetLine(BI_NetLine& netline) {
@@ -123,13 +127,14 @@ void BI_NetPoint::registerNetLine(BI_NetLine& netline) {
     throw LogicError(__FILE__, __LINE__,
                      "NetLine has different NetSegment than the NetPoint.");
   } else if ((mRegisteredNetLines.count() > 0) &&
-             (&netline.getLayer() != getLayerOfLines())) {
+             (&netline.getLayer() != getLayerOfTraces())) {
     throw LogicError(__FILE__, __LINE__,
                      "NetPoint already has NetLines on different layer.");
   }
   mRegisteredNetLines.insert(&netline);
-  netline.updateLine();
-  mGraphicsItem->updateCacheAndRepaint();
+  netline.onEdited.attach(mOnNetLineEditedSlot);
+  updateLayerOfTraces();
+  updateMaxTraceWidth();
 }
 
 void BI_NetPoint::unregisterNetLine(BI_NetLine& netline) {
@@ -139,26 +144,44 @@ void BI_NetPoint::unregisterNetLine(BI_NetLine& netline) {
     throw LogicError(__FILE__, __LINE__, "NetLine is not registered.");
   }
   mRegisteredNetLines.remove(&netline);
-  netline.updateLine();
-  mGraphicsItem->updateCacheAndRepaint();
+  netline.onEdited.detach(mOnNetLineEditedSlot);
+  updateLayerOfTraces();
+  updateMaxTraceWidth();
 }
 
 /*******************************************************************************
- *  Inherited from BI_Base
+ *  Private Methods
  ******************************************************************************/
 
-QPainterPath BI_NetPoint::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->shape().translated(
-      mJunction.getPosition().toPxQPointF());
+void BI_NetPoint::netLineEdited(const BI_NetLine& obj,
+                                BI_NetLine::Event event) noexcept {
+  Q_UNUSED(obj);
+  switch (event) {
+    case BI_NetLine::Event::WidthChanged:
+      updateMaxTraceWidth();
+      break;
+    default:
+      break;
+  }
 }
 
-bool BI_NetPoint::isSelectable() const noexcept {
-  return mGraphicsItem->isSelectable();
+void BI_NetPoint::updateLayerOfTraces() noexcept {
+  const Layer* layer = nullptr;
+  if (!mRegisteredNetLines.isEmpty()) {
+    layer = &(*mRegisteredNetLines.begin())->getLayer();
+  }
+  if (layer != mLayerOfTraces) {
+    mLayerOfTraces = layer;
+    onEdited.notify(Event::LayerOfTracesChanged);
+  }
 }
 
-void BI_NetPoint::setSelected(bool selected) noexcept {
-  BI_Base::setSelected(selected);
-  mGraphicsItem->update();
+void BI_NetPoint::updateMaxTraceWidth() noexcept {
+  UnsignedLength width = getMaxLineWidth();
+  if (width != mMaxTraceWidth) {
+    mMaxTraceWidth = width;
+    onEdited.notify(Event::MaxTraceWidthChanged);
+  }
 }
 
 /*******************************************************************************

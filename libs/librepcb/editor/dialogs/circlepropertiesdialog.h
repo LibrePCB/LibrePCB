@@ -32,7 +32,7 @@
 namespace librepcb {
 
 class Circle;
-class GraphicsLayer;
+class Layer;
 class LengthUnit;
 
 namespace editor {
@@ -58,7 +58,7 @@ public:
   CirclePropertiesDialog() = delete;
   CirclePropertiesDialog(const CirclePropertiesDialog& other) = delete;
   CirclePropertiesDialog(Circle& circle, UndoStack& undoStack,
-                         QList<GraphicsLayer*> layers,
+                         const QSet<const Layer*>& layers,
                          const LengthUnit& lengthUnit,
                          const QString& settingsPrefix,
                          QWidget* parent = nullptr) noexcept;
@@ -75,7 +75,6 @@ private:  // GUI Events
 
 private:  // Methods
   bool applyChanges() noexcept;
-  void selectLayerNameInCombobox(const QString& name) noexcept;
 
 private:  // Data
   Circle& mCircle;

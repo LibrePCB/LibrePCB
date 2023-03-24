@@ -22,11 +22,12 @@
  ******************************************************************************/
 #include "symbolgraphicsitem.h"
 
+#include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/polygongraphicsitem.h"
+#include "../../graphics/textgraphicsitem.h"
 #include "symbolpingraphicsitem.h"
 
-#include <librepcb/core/graphics/circlegraphicsitem.h>
-#include <librepcb/core/graphics/polygongraphicsitem.h>
-#include <librepcb/core/graphics/textgraphicsitem.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/types/angle.h>
@@ -50,7 +51,7 @@ SymbolGraphicsItem::SymbolGraphicsItem(
     std::shared_ptr<const Component> cmp,
     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
     const QStringList& localeOrder) noexcept
-  : QGraphicsItem(nullptr),
+  : QGraphicsItemGroup(nullptr),
     mSymbol(symbol),
     mLayerProvider(lp),
     mComponent(cmp),
@@ -192,7 +193,7 @@ void SymbolGraphicsItem::setRotation(const Angle& rot) noexcept {
 
 void SymbolGraphicsItem::updateAllTexts() noexcept {
   foreach (const auto& ptr, mPinGraphicsItems) { ptr->updateText(); }
-  foreach (const auto& ptr, mTextGraphicsItems) { ptr->updateText(); }
+  foreach (const auto& ptr, mTextGraphicsItems) { substituteText(*ptr); }
 }
 
 void SymbolGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
@@ -214,18 +215,6 @@ void SymbolGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
     QPainterPath mappedPath = mapToItem(ptr.get(), path);
     ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
-}
-
-/*******************************************************************************
- *  Inherited from QGraphicsItem
- ******************************************************************************/
-
-void SymbolGraphicsItem::paint(QPainter* painter,
-                               const QStyleOptionGraphicsItem* option,
-                               QWidget* widget) noexcept {
-  Q_UNUSED(painter);
-  Q_UNUSED(option);
-  Q_UNUSED(widget);
 }
 
 /*******************************************************************************
@@ -320,9 +309,7 @@ void SymbolGraphicsItem::syncTexts() noexcept {
     if (!mTextGraphicsItems.contains(obj)) {
       Q_ASSERT(obj);
       auto i = std::make_shared<TextGraphicsItem>(*obj, mLayerProvider, this);
-      if (mComponent) {
-        i->setAttributeProvider(this);
-      }
+      substituteText(*i);
       mTextGraphicsItems.insert(obj, i);
     }
   }
@@ -346,6 +333,13 @@ void SymbolGraphicsItem::symbolEdited(const Symbol& symbol,
       break;
     default:
       break;
+  }
+}
+
+void SymbolGraphicsItem::substituteText(TextGraphicsItem& text) noexcept {
+  if (mComponent) {
+    text.setTextOverride(
+        AttributeSubstitutor::substitute(text.getText().getText(), this));
   }
 }
 

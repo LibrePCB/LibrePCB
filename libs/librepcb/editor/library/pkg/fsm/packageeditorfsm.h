@@ -35,17 +35,16 @@
 namespace librepcb {
 
 class Footprint;
-class GraphicsScene;
-class IF_GraphicsLayerProvider;
 class Package;
-class PrimitiveTextGraphicsItem;
 
 namespace editor {
 
 class FootprintGraphicsItem;
+class GraphicsScene;
 class GraphicsView;
 class PackageEditorState;
 class PackageEditorWidget;
+class PrimitiveTextGraphicsItem;
 class UndoStack;
 
 /*******************************************************************************

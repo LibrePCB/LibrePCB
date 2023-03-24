@@ -35,7 +35,13 @@
 #include "../../cmd/cmdboardsplitnetline.h"
 #include "../../cmd/cmdboardviaedit.h"
 #include "../../cmd/cmdcombineboardnetsegments.h"
+#include "../../projecteditor.h"
 #include "../boardeditor.h"
+#include "../boardgraphicsscene.h"
+#include "../graphicsitems/bgi_footprintpad.h"
+#include "../graphicsitems/bgi_netline.h"
+#include "../graphicsitems/bgi_netpoint.h"
+#include "../graphicsitems/bgi_via.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
@@ -190,20 +196,17 @@ bool BoardEditorState_AddVia::exit() noexcept {
 
 bool BoardEditorState_AddVia::processGraphicsSceneMouseMoved(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
 
   Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
-  return updatePosition(*board, pos);
+  return updatePosition(*scene, pos);
 }
 
 bool BoardEditorState_AddVia::processGraphicsSceneLeftMouseButtonPressed(
     QGraphicsSceneMouseEvent& e) noexcept {
-  Board* board = getActiveBoard();
-  if (!board) return false;
-
-  Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
-  fixPosition(*board, pos);
+  const Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+  fixPosition(pos);
   addVia(pos);
   return true;
 }
@@ -241,6 +244,11 @@ bool BoardEditorState_AddVia::addVia(const Point& pos) noexcept {
     Q_ASSERT(mCurrentViaToPlace);
     mContext.undoStack.appendToCmdGroup(cmdAddVia.take());
     mCurrentViaEditCmd.reset(new CmdBoardViaEdit(*mCurrentViaToPlace));
+
+    // Highlight all elements of the current netsignal.
+    mContext.projectEditor.setHighlightedNetSignals(
+        {netsegment->getNetSignal()});
+
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -249,23 +257,22 @@ bool BoardEditorState_AddVia::addVia(const Point& pos) noexcept {
   }
 }
 
-bool BoardEditorState_AddVia::updatePosition(Board& board,
+bool BoardEditorState_AddVia::updatePosition(BoardGraphicsScene& scene,
                                              const Point& pos) noexcept {
   if (mCurrentViaEditCmd) {
     mCurrentViaEditCmd->setPosition(pos, true);
     if (mUseAutoNetSignal) {
-      updateClosestNetSignal(pos);
+      updateClosestNetSignal(scene, pos);
       applySelectedNetSignal();
     }
-    board.triggerAirWiresRebuild();
+    scene.getBoard().triggerAirWiresRebuild();
     return true;
   } else {
     return false;
   }
 }
 
-bool BoardEditorState_AddVia::fixPosition(Board& board,
-                                          const Point& pos) noexcept {
+bool BoardEditorState_AddVia::fixPosition(const Point& pos) noexcept {
   Q_ASSERT(mIsUndoCmdActive == true);
   // TODO(5n8ke): handle user errors in a more graceful way without popup
   // message
@@ -282,19 +289,29 @@ bool BoardEditorState_AddVia::fixPosition(Board& board,
     // signals here. The DRC will raise an error if the user created a short
     // circuit with this via.
     NetSignal* netsignal = mCurrentViaToPlace->getNetSegment().getNetSignal();
-    QList<BI_NetPoint*> otherNetAnchors =
-        board.getNetPointsAtScenePos(pos, nullptr, {netsignal});
-    foreach (BI_NetLine* netline,
-             board.getNetLinesAtScenePos(pos, nullptr, {netsignal})) {
-      if (!otherNetAnchors.contains(
+    QList<BI_NetPoint*> otherNetPoints;
+    QList<BI_NetLine*> otherNetLines;
+    foreach (auto item,
+             findItemsAtPos(pos, FindFlag::NetPoints | FindFlag::NetLines,
+                            tl::nullopt, {netsignal})) {
+      if (auto netPoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
+        otherNetPoints.append(&netPoint->getNetPoint());
+      } else if (auto netLine = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
+        otherNetLines.append(&netLine->getNetLine());
+      }
+    }
+
+    // Split net lines.
+    foreach (BI_NetLine* netline, otherNetLines) {
+      if (!otherNetPoints.contains(
               dynamic_cast<BI_NetPoint*>(&netline->getStartPoint())) &&
-          !otherNetAnchors.contains(
+          !otherNetPoints.contains(
               dynamic_cast<BI_NetPoint*>(&netline->getEndPoint()))) {
         // TODO(5n8ke) is this the best way to check whtether the NetLine
         // should be split?
         QScopedPointer<CmdBoardSplitNetLine> cmdSplit(
             new CmdBoardSplitNetLine(*netline, pos));
-        otherNetAnchors.append(cmdSplit->getSplitPoint());
+        otherNetPoints.append(cmdSplit->getSplitPoint());
         mContext.undoStack.appendToCmdGroup(cmdSplit.take());
       }
     }
@@ -304,7 +321,7 @@ bool BoardEditorState_AddVia::fixPosition(Board& board,
     }
 
     // Combine all NetSegments that are not yet part of the via segment with it
-    foreach (BI_NetPoint* netpoint, otherNetAnchors) {
+    foreach (BI_NetPoint* netpoint, otherNetPoints) {
       if (!netpoint->isAddedToBoard()) {
         // When multiple netpoints are part of the same NetSegment, only the
         // first one can be combined and the other ones are no longer part of
@@ -315,25 +332,31 @@ bool BoardEditorState_AddVia::fixPosition(Board& board,
           netpoint->getNetSegment(), *netpoint,
           mCurrentViaToPlace->getNetSegment(), *mCurrentViaToPlace));
     }
+
     // Replace all NetPoints at the given position with the newly added Via
-    foreach (BI_NetPoint* netpoint, board.getNetPointsAtScenePos(pos)) {
-      Q_ASSERT(netpoint->getNetSegment() ==
-               mCurrentViaToPlace->getNetSegment());
-      QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
-          new CmdBoardNetSegmentAddElements(
-              mCurrentViaToPlace->getNetSegment()));
-      QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
-          new CmdBoardNetSegmentRemoveElements(
-              mCurrentViaToPlace->getNetSegment()));
-      foreach (BI_NetLine* netline, netpoint->getNetLines()) {
-        cmdAdd->addNetLine(*mCurrentViaToPlace,
-                           *netline->getOtherPoint(*netpoint),
-                           netline->getLayer(), netline->getWidth());
-        cmdRemove->removeNetLine(*netline);
+    foreach (
+        auto item,
+        findItemsAtPos(pos, FindFlag::NetPoints, tl::nullopt, {netsignal})) {
+      if (auto netPoint = std::dynamic_pointer_cast<BGI_NetPoint>(item)) {
+        if (&netPoint->getNetPoint().getNetSegment() ==
+            &mCurrentViaToPlace->getNetSegment()) {
+          QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
+              new CmdBoardNetSegmentAddElements(
+                  mCurrentViaToPlace->getNetSegment()));
+          QScopedPointer<CmdBoardNetSegmentRemoveElements> cmdRemove(
+              new CmdBoardNetSegmentRemoveElements(
+                  mCurrentViaToPlace->getNetSegment()));
+          foreach (BI_NetLine* netline, netPoint->getNetPoint().getNetLines()) {
+            cmdAdd->addNetLine(*mCurrentViaToPlace,
+                               *netline->getOtherPoint(netPoint->getNetPoint()),
+                               netline->getLayer(), netline->getWidth());
+            cmdRemove->removeNetLine(*netline);
+          }
+          cmdRemove->removeNetPoint(netPoint->getNetPoint());
+          mContext.undoStack.appendToCmdGroup(cmdAdd.take());
+          mContext.undoStack.appendToCmdGroup(cmdRemove.take());
+        }
       }
-      cmdRemove->removeNetPoint(*netpoint);
-      mContext.undoStack.appendToCmdGroup(cmdAdd.take());
-      mContext.undoStack.appendToCmdGroup(cmdRemove.take());
     }
 
     mContext.undoStack.commitCmdGroup();
@@ -349,6 +372,9 @@ bool BoardEditorState_AddVia::fixPosition(Board& board,
 
 bool BoardEditorState_AddVia::abortCommand(bool showErrMsgBox) noexcept {
   try {
+    // Clear highlighted net signal.
+    mContext.projectEditor.clearHighlightedNetSignals();
+
     // Delete the current edit command
     mCurrentViaEditCmd.reset();
 
@@ -410,26 +436,29 @@ void BoardEditorState_AddVia::applySelectedNetSignal() noexcept {
       QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
     }
   }
+
+  // Highlight all elements of the current netsignal.
+  mContext.projectEditor.setHighlightedNetSignals({netsignal});
 }
 
 void BoardEditorState_AddVia::updateClosestNetSignal(
-    const Point& pos) noexcept {
+    BoardGraphicsScene& scene, const Point& pos) noexcept {
   // TODO(5n8ke): Get the closest candidate, instead of the most used
   // for now a _closest_ NetSignal is only found, when it is at pos.
   // Otherwise the last candidate is returned.
   if (!mClosestNetSignalIsUpToDate) {
     const NetSignal* netsignal = getCurrentNetSignal();
-    BI_Base* item =
-        findItemAtPos(pos,
-                      FindFlag::Vias | FindFlag::FootprintPads |
-                          FindFlag::NetLines | FindFlag::AcceptNextGridMatch,
-                      nullptr, {}, {mCurrentViaToPlace});
-    if (BI_NetLine* netline = qobject_cast<BI_NetLine*>(item)) {
-      netsignal = netline->getNetSegment().getNetSignal();
-    } else if (BI_FootprintPad* pad = qobject_cast<BI_FootprintPad*>(item)) {
-      netsignal = pad->getCompSigInstNetSignal();
-    } else if (BI_Via* via = qobject_cast<BI_Via*>(item)) {
-      netsignal = via->getNetSegment().getNetSignal();
+    std::shared_ptr<QGraphicsItem> item = findItemAtPos(
+        pos,
+        FindFlag::Vias | FindFlag::FootprintPads | FindFlag::NetLines |
+            FindFlag::AcceptNextGridMatch,
+        tl::nullopt, {}, {scene.getVias().value(mCurrentViaToPlace)});
+    if (auto netline = std::dynamic_pointer_cast<BGI_NetLine>(item)) {
+      netsignal = netline->getNetLine().getNetSegment().getNetSignal();
+    } else if (auto pad = std::dynamic_pointer_cast<BGI_FootprintPad>(item)) {
+      netsignal = pad->getPad().getCompSigInstNetSignal();
+    } else if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
+      netsignal = via->getVia().getNetSegment().getNetSignal();
     } else if (!netsignal) {
       // If there was and still is no "closest" net signal available, fall back
       // to the net signal with the most elements since this is often something

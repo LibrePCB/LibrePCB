@@ -39,6 +39,7 @@ class BI_NetLine;
 class BI_NetLineAnchor;
 class BI_NetPoint;
 class BI_NetSegment;
+class Layer;
 
 namespace editor {
 
@@ -62,7 +63,7 @@ public:
   BI_NetPoint* addNetPoint(const Point& position);
   BI_NetLine* addNetLine(BI_NetLine& netline);
   BI_NetLine* addNetLine(BI_NetLineAnchor& startPoint,
-                         BI_NetLineAnchor& endPoint, GraphicsLayer& layer,
+                         BI_NetLineAnchor& endPoint, const Layer& layer,
                          const PositiveLength& width);
 
 private:

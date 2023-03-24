@@ -29,6 +29,7 @@
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
 #include "../../circuit/netsignal.h"
+#include "../schematic.h"
 #include "si_symbol.h"
 
 #include <QtCore>
@@ -44,10 +45,12 @@ namespace librepcb {
 
 SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid)
   : SI_Base(symbol.getSchematic()),
+    onEdited(*this),
     mSymbol(symbol),
     mSymbolPin(nullptr),
     mPinSignalMapItem(nullptr),
-    mComponentSignalInstance(nullptr) {
+    mComponentSignalInstance(nullptr),
+    mOnSymbolEditedSlot(*this, &SI_SymbolPin::symbolEdited) {
   // read attributes
   mSymbolPin =
       mSymbol.getLibSymbol().getPins().get(pinUuid).get();  // can throw
@@ -61,13 +64,22 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid)
         mSymbol.getComponentInstance().getSignalInstance(*cmpSignalUuid);
   }
 
-  mGraphicsItem.reset(new SGI_SymbolPin(*this));
-  updatePosition(true);
+  // Register to net signal changes.
+  if (mComponentSignalInstance) {
+    netSignalChanged(nullptr, mComponentSignalInstance->getNetSignal());
+    connect(mComponentSignalInstance,
+            &ComponentSignalInstance::netSignalChanged, this,
+            &SI_SymbolPin::netSignalChanged);
+  }
+
+  updateTransform();
+  updateText();
+
+  mSymbol.onEdited.attach(mOnSymbolEditedSlot);
 }
 
 SI_SymbolPin::~SI_SymbolPin() {
   Q_ASSERT(!isUsed());
-  mGraphicsItem.reset();
 }
 
 /*******************************************************************************
@@ -76,31 +88,6 @@ SI_SymbolPin::~SI_SymbolPin() {
 
 const Uuid& SI_SymbolPin::getLibPinUuid() const noexcept {
   return mSymbolPin->getUuid();
-}
-
-QString SI_SymbolPin::getDisplayText(bool returnCmpSignalNameIfEmpty,
-                                     bool returnPinNameIfEmpty) const noexcept {
-  QString text;
-  CmpSigPinDisplayType displayType = mPinSignalMapItem->getDisplayType();
-  if (displayType == CmpSigPinDisplayType::pinName()) {
-    text = *mSymbolPin->getName();
-  } else if (displayType == CmpSigPinDisplayType::componentSignal()) {
-    if (mComponentSignalInstance) {
-      text = *mComponentSignalInstance->getCompSignal().getName();
-    }
-  } else if (displayType == CmpSigPinDisplayType::netSignal()) {
-    if (mComponentSignalInstance) {
-      if (mComponentSignalInstance->getNetSignal()) {
-        text = *mComponentSignalInstance->getNetSignal()->getName();
-      }
-    }
-  } else if (displayType != CmpSigPinDisplayType::none()) {
-    Q_ASSERT(false);
-  }
-  if (text.isEmpty() && returnCmpSignalNameIfEmpty && mComponentSignalInstance)
-    text = *mComponentSignalInstance->getCompSignal().getName();
-  if (text.isEmpty() && returnPinNameIfEmpty) text = *mSymbolPin->getName();
-  return text;
 }
 
 NetSignal* SI_SymbolPin::getCompSigInstNetSignal() const noexcept {
@@ -143,21 +130,8 @@ void SI_SymbolPin::addToSchematic() {
   }
   if (mComponentSignalInstance) {
     mComponentSignalInstance->registerSymbolPin(*this);  // can throw
-    mNetSignalChangedConnection = connect(
-        mComponentSignalInstance, &ComponentSignalInstance::netSignalChanged,
-        this, &SI_SymbolPin::netSignalChanged);
   }
-  if (NetSignal* netsignal = getCompSigInstNetSignal()) {
-    mNetSignalRenamedConnection =
-        connect(netsignal, &NetSignal::nameChanged, this,
-                [this]() { mGraphicsItem->updateData(); });
-    mHighlightChangedConnection =
-        connect(netsignal, &NetSignal::highlightedChanged, this,
-                [this]() { mGraphicsItem->updateSelection(); });
-  }
-  SI_Base::addToSchematic(mGraphicsItem.data());
-  mGraphicsItem->updateData();
-  mGraphicsItem->updateSelection();
+  SI_Base::addToSchematic();
 }
 
 void SI_SymbolPin::removeFromSchematic() {
@@ -166,13 +140,8 @@ void SI_SymbolPin::removeFromSchematic() {
   }
   if (mComponentSignalInstance) {
     mComponentSignalInstance->unregisterSymbolPin(*this);  // can throw
-    disconnect(mNetSignalChangedConnection);
   }
-  if (getCompSigInstNetSignal()) {
-    disconnect(mNetSignalRenamedConnection);
-    disconnect(mHighlightChangedConnection);
-  }
-  SI_Base::removeFromSchematic(mGraphicsItem.data());
+  SI_Base::removeFromSchematic();
 }
 
 void SI_SymbolPin::registerNetLine(SI_NetLine& netline) {
@@ -203,8 +172,9 @@ void SI_SymbolPin::registerNetLine(SI_NetLine& netline) {
     }
   }
   mRegisteredNetLines.insert(&netline);
-  netline.updateLine();
-  mGraphicsItem->updateData();
+  if (mRegisteredNetLines.count() <= 2) {
+    onEdited.notify(Event::JunctionChanged);
+  }
 }
 
 void SI_SymbolPin::unregisterNetLine(SI_NetLine& netline) {
@@ -212,53 +182,88 @@ void SI_SymbolPin::unregisterNetLine(SI_NetLine& netline) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredNetLines.remove(&netline);
-  netline.updateLine();
-  mGraphicsItem->updateData();
-}
-
-void SI_SymbolPin::updatePosition(bool mirroredOrRotated) noexcept {
-  Transform transform(mSymbol);
-  mPosition = transform.map(mSymbolPin->getPosition());
-  mRotation = transform.map(mSymbolPin->getRotation());
-  mGraphicsItem->setPos(mPosition.toPxQPointF());
-  if (mirroredOrRotated) {
-    mGraphicsItem->updateTransform();
+  if (mRegisteredNetLines.count() <= 1) {
+    onEdited.notify(Event::JunctionChanged);
   }
-  foreach (SI_NetLine* netline, mRegisteredNetLines) { netline->updateLine(); }
-}
-
-/*******************************************************************************
- *  Inherited from SI_Base
- ******************************************************************************/
-
-QPainterPath SI_SymbolPin::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-void SI_SymbolPin::setSelected(bool selected) noexcept {
-  SI_Base::setSelected(selected);
-  mGraphicsItem->updateSelection();
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
+void SI_SymbolPin::symbolEdited(const SI_Symbol& obj,
+                                SI_Symbol::Event event) noexcept {
+  Q_UNUSED(obj);
+  switch (event) {
+    case SI_Symbol::Event::PositionChanged:
+    case SI_Symbol::Event::RotationChanged:
+    case SI_Symbol::Event::MirroredChanged:
+      updateTransform();
+      break;
+    default:
+      qWarning() << "Unhandled switch-case in SI_SymbolPin::symbolEdited():"
+                 << static_cast<int>(event);
+      break;
+  }
+}
+
 void SI_SymbolPin::netSignalChanged(NetSignal* from, NetSignal* to) noexcept {
-  if (from) {
-    disconnect(mNetSignalRenamedConnection);
-    disconnect(mHighlightChangedConnection);
+  if ((!from) != (!to)) {
+    onEdited.notify(Event::JunctionChanged);
   }
-  if (to) {
-    mNetSignalRenamedConnection =
-        connect(to, &NetSignal::nameChanged, this,
-                [this]() { mGraphicsItem->updateData(); });
-    mHighlightChangedConnection =
-        connect(to, &NetSignal::highlightedChanged, this,
-                [this]() { mGraphicsItem->updateSelection(); });
+
+  if (mPinSignalMapItem &&
+      (mPinSignalMapItem->getDisplayType() ==
+       CmpSigPinDisplayType::netSignal())) {
+    updateText();
+    if (from) {
+      disconnect(from, &NetSignal::nameChanged, this,
+                 &SI_SymbolPin::updateText);
+    }
+    if (to) {
+      connect(from, &NetSignal::nameChanged, this, &SI_SymbolPin::updateText);
+    }
   }
-  mGraphicsItem->updateData();
-  mGraphicsItem->updateSelection();
+}
+
+void SI_SymbolPin::updateTransform() noexcept {
+  Transform transform(mSymbol);
+  const Point position = transform.map(mSymbolPin->getPosition());
+  const Angle rotation = transform.map(mSymbolPin->getRotation());
+  if (position != mPosition) {
+    mPosition = position;
+    onEdited.notify(Event::PositionChanged);
+    foreach (SI_NetLine* netLine, mRegisteredNetLines) {
+      netLine->updatePositions();
+    }
+  }
+  if (rotation != mRotation) {
+    mRotation = rotation;
+    onEdited.notify(Event::RotationChanged);
+  }
+}
+
+void SI_SymbolPin::updateText() noexcept {
+  QString text;
+  const CmpSigPinDisplayType displayType = mPinSignalMapItem->getDisplayType();
+  if (displayType == CmpSigPinDisplayType::pinName()) {
+    text = *mSymbolPin->getName();
+  } else if (displayType == CmpSigPinDisplayType::componentSignal()) {
+    if (mComponentSignalInstance) {
+      text = *mComponentSignalInstance->getCompSignal().getName();
+    }
+  } else if (displayType == CmpSigPinDisplayType::netSignal()) {
+    if (mComponentSignalInstance && mComponentSignalInstance->getNetSignal()) {
+      text = *mComponentSignalInstance->getNetSignal()->getName();
+    }
+  } else {
+    Q_ASSERT(displayType == CmpSigPinDisplayType::none());
+  }
+
+  if (text != mText) {
+    mText = text;
+    onEdited.notify(Event::TextChanged);
+  }
 }
 
 QString SI_SymbolPin::getLibraryComponentName() const noexcept {

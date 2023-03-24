@@ -22,8 +22,8 @@
  ******************************************************************************/
 #include "cmdboardplaneedit.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -44,8 +44,8 @@ CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane,
     mDoRebuildOnChanges(rebuildOnChanges),
     mOldOutline(plane.getOutline()),
     mNewOutline(mOldOutline),
-    mOldLayerName(plane.getLayerName()),
-    mNewLayerName(mOldLayerName),
+    mOldLayer(&plane.getLayer()),
+    mNewLayer(mOldLayer),
     mOldNetSignal(&plane.getNetSignal()),
     mNewNetSignal(mOldNetSignal),
     mOldMinWidth(plane.getMinWidth()),
@@ -63,7 +63,7 @@ CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane,
 CmdBoardPlaneEdit::~CmdBoardPlaneEdit() noexcept {
   if (!wasEverExecuted()) {
     mPlane.setOutline(mOldOutline);
-    mPlane.setLayerName(mOldLayerName);
+    mPlane.setLayer(*mOldLayer);
   }
 }
 
@@ -92,9 +92,7 @@ void CmdBoardPlaneEdit::rotate(const Angle& angle, const Point& center,
 
 void CmdBoardPlaneEdit::mirror(const Point& center, Qt::Orientation orientation,
                                bool immediate) noexcept {
-  setLayerName(
-      GraphicsLayerName(GraphicsLayer::getMirroredLayerName(*mNewLayerName)),
-      immediate);
+  setLayer(mNewLayer->mirrored(), immediate);
   setOutline(mNewOutline.mirrored(orientation, center), immediate);
 }
 
@@ -105,11 +103,10 @@ void CmdBoardPlaneEdit::setOutline(const Path& outline,
   if (immediate) mPlane.setOutline(mNewOutline);
 }
 
-void CmdBoardPlaneEdit::setLayerName(const GraphicsLayerName& layerName,
-                                     bool immediate) noexcept {
+void CmdBoardPlaneEdit::setLayer(const Layer& layer, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewLayerName = layerName;
-  if (immediate) mPlane.setLayerName(mNewLayerName);
+  mNewLayer = &layer;
+  if (immediate) mPlane.setLayer(*mNewLayer);
 }
 
 void CmdBoardPlaneEdit::setNetSignal(NetSignal& netsignal) noexcept {
@@ -151,7 +148,7 @@ bool CmdBoardPlaneEdit::performExecute() {
   performRedo();  // can throw
 
   if (mNewOutline != mOldOutline) return true;
-  if (mNewLayerName != mOldLayerName) return true;
+  if (mNewLayer != mOldLayer) return true;
   if (mNewNetSignal != mOldNetSignal) return true;
   if (mNewMinWidth != mOldMinWidth) return true;
   if (mNewMinClearance != mOldMinClearance) return true;
@@ -164,7 +161,7 @@ bool CmdBoardPlaneEdit::performExecute() {
 void CmdBoardPlaneEdit::performUndo() {
   mPlane.setNetSignal(*mOldNetSignal);  // can throw
   mPlane.setOutline(mOldOutline);
-  mPlane.setLayerName(mOldLayerName);
+  mPlane.setLayer(*mOldLayer);
   mPlane.setMinWidth(mOldMinWidth);
   mPlane.setMinClearance(mOldMinClearance);
   mPlane.setConnectStyle(mOldConnectStyle);
@@ -178,7 +175,7 @@ void CmdBoardPlaneEdit::performUndo() {
 void CmdBoardPlaneEdit::performRedo() {
   mPlane.setNetSignal(*mNewNetSignal);  // can throw
   mPlane.setOutline(mNewOutline);
-  mPlane.setLayerName(mNewLayerName);
+  mPlane.setLayer(*mNewLayer);
   mPlane.setMinWidth(mNewMinWidth);
   mPlane.setMinClearance(mNewMinClearance);
   mPlane.setConnectStyle(mNewConnectStyle);

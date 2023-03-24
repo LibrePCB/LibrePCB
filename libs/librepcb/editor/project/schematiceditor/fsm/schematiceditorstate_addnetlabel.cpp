@@ -26,9 +26,12 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdschematicnetlabeladd.h"
 #include "../../cmd/cmdschematicnetlabeledit.h"
+#include "../../projecteditor.h"
+#include "../graphicsitems/sgi_netline.h"
 
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netline.h>
+#include <librepcb/core/project/schematic/items/si_netsegment.h>
 #include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
@@ -68,14 +71,8 @@ bool SchematicEditorState_AddNetLabel::entry() noexcept {
 }
 
 bool SchematicEditorState_AddNetLabel::exit() noexcept {
-  if (mUndoCmdActive) {
-    try {
-      mContext.undoStack.abortCmdGroup();
-      mUndoCmdActive = false;
-    } catch (Exception& e) {
-      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
-      return false;
-    }
+  if (!abortCommand(true)) {
+    return false;
   }
 
   mContext.editorGraphicsView.unsetCursor();
@@ -174,12 +171,14 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
   if (!schematic) return false;
 
   try {
-    SI_NetLine* netlineUnderCursor = findItemAtPos<SI_NetLine>(
-        pos, FindFlag::NetLines | FindFlag::AcceptNearestWithinGrid);
+    std::shared_ptr<SGI_NetLine> netlineUnderCursor =
+        findItemAtPos<SGI_NetLine>(
+            pos, FindFlag::NetLines | FindFlag::AcceptNearestWithinGrid);
     if (!netlineUnderCursor) return false;
-    SI_NetSegment& netsegment = netlineUnderCursor->getNetSegment();
+    SI_NetSegment& netsegment =
+        netlineUnderCursor->getNetLine().getNetSegment();
 
-    mContext.undoStack.beginCmdGroup(tr("Add net label to schematic"));
+    mContext.undoStack.beginCmdGroup(tr("Add Net Label to Schematic"));
     mUndoCmdActive = true;
     SI_NetLabel* netLabel = new SI_NetLabel(
         netsegment,
@@ -189,16 +188,15 @@ bool SchematicEditorState_AddNetLabel::addLabel(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(cmdAdd);
     mCurrentNetLabel = netLabel;
     mEditCmd = new CmdSchematicNetLabelEdit(*mCurrentNetLabel);
+
+    // Highlight all elements of the current netsignal.
+    mContext.projectEditor.setHighlightedNetSignals(
+        {&netsegment.getNetSignal()});
+
     return true;
-  } catch (Exception& e) {
-    if (mUndoCmdActive) {
-      try {
-        mContext.undoStack.abortCmdGroup();
-      } catch (...) {
-      }
-      mUndoCmdActive = false;
-    }
+  } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    abortCommand(false);
     return false;
   }
 }
@@ -220,16 +218,28 @@ bool SchematicEditorState_AddNetLabel::fixLabel(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(mEditCmd);
     mContext.undoStack.commitCmdGroup();
     mUndoCmdActive = false;
+    mContext.projectEditor.clearHighlightedNetSignals();
     return true;
-  } catch (Exception& e) {
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    abortCommand(false);
+    return false;
+  }
+}
+
+bool SchematicEditorState_AddNetLabel::abortCommand(
+    bool showErrMsgBox) noexcept {
+  try {
+    mContext.projectEditor.clearHighlightedNetSignals();
     if (mUndoCmdActive) {
-      try {
-        mContext.undoStack.abortCmdGroup();
-      } catch (...) {
-      }
+      mContext.undoStack.abortCmdGroup();  // can throw
       mUndoCmdActive = false;
     }
-    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    return true;
+  } catch (const Exception& e) {
+    if (showErrMsgBox) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    }
     return false;
   }
 }

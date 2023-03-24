@@ -75,6 +75,9 @@ void FileFormatMigrationV01::upgradeSymbol(TransactionalDirectory& dir) {
     const QString fp = "symbol.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
 
+    // Layers.
+    upgradeLayers(root);
+
     // Pins.
     for (SExpression* pinNode : root.getChildren("pin")) {
       const UnsignedLength length =
@@ -99,6 +102,9 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
   {
     const QString fp = "package.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+    // Layers.
+    upgradeLayers(root);
 
     // Assembly type.
     root.appendChild("assembly_type", SExpression::createToken("auto"));
@@ -197,7 +203,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
       for (SExpression* textNode : root.getChildren("text")) {
         sym.texts.append(Text{
             deserialize<Uuid>(textNode->getChild("@0")),
-            deserialize<GraphicsLayerName>(textNode->getChild("layer/@0")),
+            textNode->getChild("layer/@0").getValue(),
             textNode->getChild("value/@0").getValue(),
             Point(textNode->getChild("position")),
             deserialize<Angle>(textNode->getChild("rotation/@0")),
@@ -457,6 +463,7 @@ void FileFormatMigrationV01::upgradeErc(SExpression& root,
 void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
                                               ProjectContext& context) {
   upgradeGrid(root);
+  upgradeLayers(root);
 
   // Symbols.
   for (SExpression* symNode : root.getChildren("symbol")) {
@@ -546,6 +553,7 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
   upgradeGrid(root);
   upgradeBoardDesignRules(root);
   upgradeBoardDrcSettings(root);
+  upgradeLayers(root);
 
   // Fabrication output settings.
   {
@@ -658,6 +666,27 @@ void FileFormatMigrationV01::upgradeHoles(SExpression& node) {
     pos.serialize(vertexNode.appendList("position"));
     vertexNode.appendChild("angle", Angle::deg0());
   }
+}
+
+void FileFormatMigrationV01::upgradeLayers(SExpression& node) {
+  // Rename "sch_scheet_frames" to "sch_frames".
+  SExpression search = SExpression::createList("layer");
+  search.appendChild(SExpression::createToken("sch_scheet_frames"));
+  SExpression replace = SExpression::createList("layer");
+  replace.appendChild(SExpression::createToken("sch_frames"));
+  node.replaceRecursive(search, replace);
+
+  // Rename "brd_sheet_frames" to "brd_frames".
+  search = SExpression::createList("layer");
+  search.appendChild(SExpression::createToken("brd_sheet_frames"));
+  replace = SExpression::createList("layer");
+  replace.appendChild(SExpression::createToken("brd_frames"));
+  node.replaceRecursive(search, replace);
+
+  // Remove nodes on never officially existing layer "brd_keepout".
+  search = SExpression::createList("layer");
+  search.appendChild(SExpression::createToken("brd_keepout"));
+  node.removeChildrenWithNodeRecursive(search);
 }
 
 /*******************************************************************************

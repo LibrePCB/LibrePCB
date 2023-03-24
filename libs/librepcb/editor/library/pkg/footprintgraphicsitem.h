@@ -39,21 +39,21 @@ namespace librepcb {
 
 class Angle;
 class Circle;
-class CircleGraphicsItem;
 class Component;
 class FootprintPad;
 class Hole;
-class HoleGraphicsItem;
-class IF_GraphicsLayerProvider;
 class Point;
 class Polygon;
-class PolygonGraphicsItem;
 class StrokeText;
-class StrokeTextGraphicsItem;
 
 namespace editor {
 
+class CircleGraphicsItem;
 class FootprintPadGraphicsItem;
+class HoleGraphicsItem;
+class IF_GraphicsLayerProvider;
+class PolygonGraphicsItem;
+class StrokeTextGraphicsItem;
 
 /*******************************************************************************
  *  Class FootprintGraphicsItem
@@ -62,7 +62,7 @@ class FootprintPadGraphicsItem;
 /**
  * @brief The FootprintGraphicsItem class
  */
-class FootprintGraphicsItem final : public QGraphicsItem,
+class FootprintGraphicsItem final : public QGraphicsItemGroup,
                                     public AttributeProvider {
 public:
   enum class FindFlag {
@@ -129,12 +129,6 @@ public:
   void updateAllTexts() noexcept;
   void setSelectionRect(const QRectF rect) noexcept;
 
-  // Inherited from QGraphicsItem
-  QRectF boundingRect() const noexcept override { return QRectF(); }
-  QPainterPath shape() const noexcept override { return QPainterPath(); }
-  void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-             QWidget* widget = 0) noexcept override;
-
   // Operator Overloadings
   FootprintGraphicsItem& operator=(const FootprintGraphicsItem& rhs) = delete;
 
@@ -149,6 +143,7 @@ private:  // Methods
   void syncHoles() noexcept;
   void footprintEdited(const Footprint& footprint,
                        Footprint::Event event) noexcept;
+  void substituteText(StrokeTextGraphicsItem& text) noexcept;
   QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 private:  // Data

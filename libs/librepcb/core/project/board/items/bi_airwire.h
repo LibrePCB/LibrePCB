@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../graphicsitems/bgi_airwire.h"
 #include "bi_base.h"
 
 #include <QtCore>
@@ -34,6 +33,7 @@
 namespace librepcb {
 
 class BI_NetLineAnchor;
+class NetSignal;
 
 /*******************************************************************************
  *  Class BI_AirWire
@@ -63,18 +63,10 @@ public:
   void addToBoard() override;
   void removeFromBoard() override;
 
-  // Inherited from BI_Base
-  Type_t getType() const noexcept override { return BI_Base::Type_t::AirWire; }
-  QPainterPath getGrabAreaScenePx() const noexcept override;
-  void setSelected(bool selected) noexcept override;
-  bool isSelectable() const noexcept override;
-
   // Operator Overloadings
   BI_AirWire& operator=(const BI_AirWire& rhs) = delete;
 
 private:
-  QScopedPointer<BGI_AirWire> mGraphicsItem;
-  QMetaObject::Connection mHighlightChangedConnection;
   const NetSignal& mNetSignal;
   const BI_NetLineAnchor& mP1;
   const BI_NetLineAnchor& mP2;

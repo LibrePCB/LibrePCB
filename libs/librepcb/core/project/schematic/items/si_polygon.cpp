@@ -23,10 +23,6 @@
 #include "si_polygon.h"
 
 #include "../../../geometry/polygon.h"
-#include "../../../graphics/polygongraphicsitem.h"
-#include "../../project.h"
-#include "../schematic.h"
-#include "../schematiclayerprovider.h"
 
 #include <QtCore>
 
@@ -41,14 +37,9 @@ namespace librepcb {
 
 SI_Polygon::SI_Polygon(Schematic& schematic, const Polygon& polygon)
   : SI_Base(schematic), mPolygon(new Polygon(polygon)) {
-  mGraphicsItem.reset(
-      new PolygonGraphicsItem(*mPolygon, mSchematic.getProject().getLayers()));
-  mGraphicsItem->setEditable(true);
-  mGraphicsItem->setZValue(Schematic::ZValue_Polygons);
 }
 
 SI_Polygon::~SI_Polygon() noexcept {
-  mGraphicsItem.reset();
   mPolygon.reset();
 }
 
@@ -68,27 +59,14 @@ void SI_Polygon::addToSchematic() {
   if (isAddedToSchematic()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  SI_Base::addToSchematic(mGraphicsItem.data());
+  SI_Base::addToSchematic();
 }
 
 void SI_Polygon::removeFromSchematic() {
   if (!isAddedToSchematic()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  SI_Base::removeFromSchematic(mGraphicsItem.data());
-}
-
-/*******************************************************************************
- *  Inherited from SI_Base
- ******************************************************************************/
-
-QPainterPath SI_Polygon::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-void SI_Polygon::setSelected(bool selected) noexcept {
-  SI_Base::setSelected(selected);
-  mGraphicsItem->setSelected(selected);
+  SI_Base::removeFromSchematic();
 }
 
 /*******************************************************************************

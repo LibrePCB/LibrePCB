@@ -75,7 +75,7 @@ bool CmdReplaceDevice::performExecute() {
     if (netsegment) {
       QScopedPointer<CmdBoardNetSegmentAddElements> cmdAdd(
           new CmdBoardNetSegmentAddElements(*netsegment));
-      QMap<GraphicsLayer*, BI_NetPoint*> newNetPoints = {};
+      QMap<const Layer*, BI_NetPoint*> newNetPoints = {};
       QSet<BI_NetLine*> connectedNetLines = pad->getNetLines();
       if (connectedNetLines.count() > 1) {
         foreach (BI_NetLine* netline, connectedNetLines) {

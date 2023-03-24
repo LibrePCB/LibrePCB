@@ -25,12 +25,8 @@
 #include "../../../attribute/attributesubstitutor.h"
 #include "../../../font/strokefontpool.h"
 #include "../../../geometry/stroketext.h"
-#include "../../../graphics/graphicsscene.h"
-#include "../../../graphics/linegraphicsitem.h"
-#include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../project.h"
 #include "../board.h"
-#include "../boardlayerstack.h"
 #include "bi_device.h"
 
 #include <QtCore>
@@ -46,23 +42,41 @@ namespace librepcb {
 
 BI_StrokeText::BI_StrokeText(Board& board, const StrokeText& text)
   : BI_Base(board),
+    onEdited(*this),
     mDevice(nullptr),
-    mText(new StrokeText(text)),
-    mGraphicsItem(
-        new StrokeTextGraphicsItem(*mText, mBoard.getLayerStack(), getFont())),
-    mAnchorGraphicsItem(new LineGraphicsItem()),
+    mTextObj(new StrokeText(text)),
+    mFont(mBoard.getProject().getStrokeFonts().getFont(
+        mBoard.getDefaultFontName())),
     mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
-  mText->onEdited.attach(mOnStrokeTextEditedSlot);
+  mTextObj->onEdited.attach(mOnStrokeTextEditedSlot);
 
-  mGraphicsItem->setAttributeProvider(getAttributeProvider());
-  updateGraphicsItems();
+  // Connect to the "attributes changed" signal of the board.
+  connect(&mBoard, &Board::attributesChanged, this, &BI_StrokeText::updateText);
 
-  // connect to the "attributes changed" signal of the board
-  connect(&mBoard, &Board::attributesChanged, this,
-          &BI_StrokeText::boardOrDeviceAttributesChanged);
+  updateText();
 }
 
 BI_StrokeText::~BI_StrokeText() noexcept {
+}
+
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+const Uuid& BI_StrokeText::getUuid() const noexcept {
+  return mTextObj->getUuid();
+}
+
+const Point& BI_StrokeText::getPosition() const noexcept {
+  return mTextObj->getPosition();
+}
+
+const Angle& BI_StrokeText::getRotation() const noexcept {
+  return mTextObj->getRotation();
+}
+
+bool BI_StrokeText::getMirrored() const noexcept {
+  return mTextObj->getMirrored();
 }
 
 /*******************************************************************************
@@ -70,20 +84,24 @@ BI_StrokeText::~BI_StrokeText() noexcept {
  ******************************************************************************/
 
 void BI_StrokeText::setDevice(BI_Device* device) noexcept {
+  if (device == mDevice) {
+    return;
+  }
+
   if (mDevice) {
     disconnect(mDevice, &BI_Device::attributesChanged, this,
-               &BI_StrokeText::boardOrDeviceAttributesChanged);
+               &BI_StrokeText::updateText);
   }
 
   mDevice = device;
-  mGraphicsItem->setAttributeProvider(getAttributeProvider());
-  updateGraphicsItems();
 
   // Text might need to be updated if device attributes have changed.
   if (mDevice) {
     connect(mDevice, &BI_Device::attributesChanged, this,
-            &BI_StrokeText::boardOrDeviceAttributesChanged);
+            &BI_StrokeText::updateText);
   }
+
+  updateText();
 }
 
 const AttributeProvider* BI_StrokeText::getAttributeProvider() const noexcept {
@@ -94,88 +112,18 @@ const AttributeProvider* BI_StrokeText::getAttributeProvider() const noexcept {
   }
 }
 
-QVector<Path> BI_StrokeText::generatePaths() const {
-  const QString text = AttributeSubstitutor::substitute(mText->getText(),
-                                                        getAttributeProvider());
-  return mText->generatePaths(getFont(), text);
-}
-
-void BI_StrokeText::updateGraphicsItems() noexcept {
-  // update z-value
-  Board::ItemZValue zValue = Board::ZValue_Texts;
-  if (GraphicsLayer::isTopLayer(*mText->getLayerName())) {
-    zValue = Board::ZValue_TextsTop;
-  } else if (GraphicsLayer::isBottomLayer(*mText->getLayerName())) {
-    zValue = Board::ZValue_TextsBottom;
-  }
-  mGraphicsItem->setZValue(static_cast<qreal>(zValue));
-  mAnchorGraphicsItem->setZValue(static_cast<qreal>(zValue));
-
-  // show anchor line only if there is a footprint and the text is selected
-  if (mDevice && isSelected()) {
-    mAnchorGraphicsItem->setLine(mText->getPosition(), mDevice->getPosition());
-    mAnchorGraphicsItem->setLayer(
-        mBoard.getLayerStack().getLayer(*mText->getLayerName()));
-  } else {
-    mAnchorGraphicsItem->setLayer(nullptr);
-  }
-}
-
 void BI_StrokeText::addToBoard() {
   if (isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  BI_Base::addToBoard(mGraphicsItem.data());
-  mBoard.getGraphicsScene().addItem(*mAnchorGraphicsItem);
+  BI_Base::addToBoard();
 }
 
 void BI_StrokeText::removeFromBoard() {
   if (!isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  BI_Base::removeFromBoard(mGraphicsItem.data());
-  mBoard.getGraphicsScene().removeItem(*mAnchorGraphicsItem);
-}
-
-/*******************************************************************************
- *  Inherited from BI_Base
- ******************************************************************************/
-
-const Point& BI_StrokeText::getPosition() const noexcept {
-  return mText->getPosition();
-}
-
-const StrokeFont& BI_StrokeText::getFont() const {
-  return mBoard.getProject().getStrokeFonts().getFont(
-      mBoard.getDefaultFontName());  // can throw
-}
-
-QPainterPath BI_StrokeText::getGrabAreaScenePx() const noexcept {
-  return mGraphicsItem->sceneTransform().map(mGraphicsItem->shape());
-}
-
-const Uuid& BI_StrokeText::getUuid() const noexcept {
-  return mText->getUuid();
-}
-
-bool BI_StrokeText::isSelectable() const noexcept {
-  const GraphicsLayer* layer =
-      mBoard.getLayerStack().getLayer(*mText->getLayerName());
-  return layer && layer->isVisible();
-}
-
-void BI_StrokeText::setSelected(bool selected) noexcept {
-  BI_Base::setSelected(selected);
-  mGraphicsItem->setSelected(selected);
-  updateGraphicsItems();
-}
-
-/*******************************************************************************
- *  Private Slots
- ******************************************************************************/
-
-void BI_StrokeText::boardOrDeviceAttributesChanged() {
-  mGraphicsItem->updateText();
+  BI_Base::removeFromBoard();
 }
 
 /*******************************************************************************
@@ -186,12 +134,64 @@ void BI_StrokeText::strokeTextEdited(const StrokeText& text,
                                      StrokeText::Event event) noexcept {
   Q_UNUSED(text);
   switch (event) {
-    case StrokeText::Event::LayerNameChanged:
-    case StrokeText::Event::PositionChanged:
-      updateGraphicsItems();
+    case StrokeText::Event::LayerChanged: {
+      onEdited.notify(Event::LayerNameChanged);
       break;
-    default:
+    }
+    case StrokeText::Event::TextChanged: {
+      updateText();
       break;
+    }
+    case StrokeText::Event::HeightChanged:
+    case StrokeText::Event::LetterSpacingChanged:
+    case StrokeText::Event::LineSpacingChanged:
+    case StrokeText::Event::AlignChanged:
+    case StrokeText::Event::AutoRotateChanged: {
+      updatePaths();
+      break;
+    }
+    case StrokeText::Event::PositionChanged: {
+      onEdited.notify(Event::PositionChanged);
+      break;
+    }
+    case StrokeText::Event::RotationChanged: {
+      onEdited.notify(Event::RotationChanged);
+      updatePaths();  // Auto-rotation might have changed.
+      break;
+    }
+    case StrokeText::Event::StrokeWidthChanged: {
+      onEdited.notify(Event::StrokeWidthChanged);
+      updatePaths();  // Spacing might need to be re-calculated.
+      break;
+    }
+    case StrokeText::Event::MirroredChanged:
+      onEdited.notify(Event::MirroredChanged);
+      updatePaths();  // Auto-rotation might have changed.
+      break;
+    default: {
+      qWarning() << "Unhandled switch-case in "
+                    "BI_StrokeText::strokeTextEdited():"
+                 << static_cast<int>(event);
+      break;
+    }
+  }
+}
+
+void BI_StrokeText::updateText() noexcept {
+  const QString text = AttributeSubstitutor::substitute(mTextObj->getText(),
+                                                        getAttributeProvider());
+  if (text != mText) {
+    mText = text;
+    onEdited.notify(Event::TextChanged);
+    updatePaths();
+  }
+}
+
+void BI_StrokeText::updatePaths() noexcept {
+  const QVector<Path> paths = mTextObj->generatePaths(getFont(), mText);
+  if (paths != mPaths) {
+    mPaths = paths;
+    onEdited.notify(Event::PathsChanged);
   }
 }
 

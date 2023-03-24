@@ -28,8 +28,8 @@
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boarddesignrules.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 #include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -58,8 +58,7 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
 
   // Tab: General
   mUi->spbxInnerCopperLayerCount->setMinimum(0);
-  mUi->spbxInnerCopperLayerCount->setMaximum(
-      GraphicsLayer::getInnerLayerCount());
+  mUi->spbxInnerCopperLayerCount->setMaximum(Layer::innerCopperCount());
 
   // Tab: Design Rules
   mUi->edtRulesStopMaskClrRatio->setSingleStep(5.0);  // [%]
@@ -238,17 +237,19 @@ void BoardSetupDialog::buttonBoxClicked(QAbstractButton* button) {
 void BoardSetupDialog::load() noexcept {
   // Tab: General
   mUi->edtBoardName->setText(*mBoard.getName());
-  mUi->spbxInnerCopperLayerCount->setValue(
-      mBoard.getLayerStack().getInnerLayerCount());
+  mUi->spbxInnerCopperLayerCount->setValue(mBoard.getInnerLayerCount());
 
   // Tab: Design Rules
   const BoardDesignRules& r = mBoard.getDesignRules();
-  mUi->edtRulesStopMaskClrRatio->setValue(r.getStopMaskClearanceRatio());
-  mUi->edtRulesStopMaskClrMin->setValue(r.getStopMaskClearanceMin());
-  mUi->edtRulesStopMaskClrMax->setValue(r.getStopMaskClearanceMax());
-  mUi->edtRulesSolderPasteClrRatio->setValue(r.getSolderPasteClearanceRatio());
-  mUi->edtRulesSolderPasteClrMin->setValue(r.getSolderPasteClearanceMin());
-  mUi->edtRulesSolderPasteClrMax->setValue(r.getSolderPasteClearanceMax());
+  mUi->edtRulesStopMaskClrRatio->setValue(r.getStopMaskClearance().getRatio());
+  mUi->edtRulesStopMaskClrMin->setValue(r.getStopMaskClearance().getMinValue());
+  mUi->edtRulesStopMaskClrMax->setValue(r.getStopMaskClearance().getMaxValue());
+  mUi->edtRulesSolderPasteClrRatio->setValue(
+      r.getSolderPasteClearance().getRatio());
+  mUi->edtRulesSolderPasteClrMin->setValue(
+      r.getSolderPasteClearance().getMinValue());
+  mUi->edtRulesSolderPasteClrMax->setValue(
+      r.getSolderPasteClearance().getMaxValue());
   if (r.getPadCmpSideAutoAnnularRing()) {
     mUi->rbtnRulesCmpSidePadAutoAnnular->setChecked(true);
   } else {
@@ -259,12 +260,12 @@ void BoardSetupDialog::load() noexcept {
   } else {
     mUi->rbtnRulesInnerPadFullShape->setChecked(true);
   }
-  mUi->edtRulesPadAnnularRingRatio->setValue(r.getPadAnnularRingRatio());
-  mUi->edtRulesPadAnnularRingMin->setValue(r.getPadAnnularRingMin());
-  mUi->edtRulesPadAnnularRingMax->setValue(r.getPadAnnularRingMax());
-  mUi->edtRulesViaAnnularRingRatio->setValue(r.getViaAnnularRingRatio());
-  mUi->edtRulesViaAnnularRingMin->setValue(r.getViaAnnularRingMin());
-  mUi->edtRulesViaAnnularRingMax->setValue(r.getViaAnnularRingMax());
+  mUi->edtRulesPadAnnularRingRatio->setValue(r.getPadAnnularRing().getRatio());
+  mUi->edtRulesPadAnnularRingMin->setValue(r.getPadAnnularRing().getMinValue());
+  mUi->edtRulesPadAnnularRingMax->setValue(r.getPadAnnularRing().getMaxValue());
+  mUi->edtRulesViaAnnularRingRatio->setValue(r.getViaAnnularRing().getRatio());
+  mUi->edtRulesViaAnnularRingMin->setValue(r.getViaAnnularRing().getMinValue());
+  mUi->edtRulesViaAnnularRingMax->setValue(r.getViaAnnularRing().getMaxValue());
   mUi->edtRulesStopMaskMaxViaDia->setValue(r.getStopMaskMaxViaDiameter());
 
   // Tab: DRC Settings
@@ -311,26 +312,26 @@ bool BoardSetupDialog::apply() noexcept {
 
     // Tab: Design Rules
     BoardDesignRules r = mBoard.getDesignRules();
-    r.setStopMaskClearance(
+    r.setStopMaskClearance(BoundedUnsignedRatio(
         mUi->edtRulesStopMaskClrRatio->getValue(),
         mUi->edtRulesStopMaskClrMin->getValue(),
-        mUi->edtRulesStopMaskClrMax->getValue());  // can throw
-    r.setSolderPasteClearance(
+        mUi->edtRulesStopMaskClrMax->getValue()));  // can throw
+    r.setSolderPasteClearance(BoundedUnsignedRatio(
         mUi->edtRulesSolderPasteClrRatio->getValue(),
         mUi->edtRulesSolderPasteClrMin->getValue(),
-        mUi->edtRulesSolderPasteClrMax->getValue());  // can throw
+        mUi->edtRulesSolderPasteClrMax->getValue()));  // can throw
     r.setPadCmpSideAutoAnnularRing(
         mUi->rbtnRulesCmpSidePadAutoAnnular->isChecked());
     r.setPadInnerAutoAnnularRing(
         mUi->rbtnRulesInnerPadAutoAnnular->isChecked());
-    r.setPadAnnularRing(
+    r.setPadAnnularRing(BoundedUnsignedRatio(
         mUi->edtRulesPadAnnularRingRatio->getValue(),
         mUi->edtRulesPadAnnularRingMin->getValue(),
-        mUi->edtRulesPadAnnularRingMax->getValue());  // can throw
-    r.setViaAnnularRing(
+        mUi->edtRulesPadAnnularRingMax->getValue()));  // can throw
+    r.setViaAnnularRing(BoundedUnsignedRatio(
         mUi->edtRulesViaAnnularRingRatio->getValue(),
         mUi->edtRulesViaAnnularRingMin->getValue(),
-        mUi->edtRulesViaAnnularRingMax->getValue());  // can throw
+        mUi->edtRulesViaAnnularRingMax->getValue()));  // can throw
     r.setStopMaskMaxViaDiameter(mUi->edtRulesStopMaskMaxViaDia->getValue());
     cmd->setDesignRules(r);
 

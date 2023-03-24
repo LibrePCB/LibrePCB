@@ -33,7 +33,9 @@
 #include "../../project/cmd/cmdschematictextremove.h"
 #include "../../project/cmd/cmdsymbolinstanceremove.h"
 #include "../../project/cmd/cmdsymbolinstancetextremove.h"
+#include "../schematiceditor/schematicgraphicsscene.h"
 #include "../schematiceditor/schematicnetsegmentsplitter.h"
+#include "../schematiceditor/schematicselectionquery.h"
 #include "cmdchangenetsignalofschematicnetsegment.h"
 #include "cmdremoveboarditems.h"
 #include "cmdremoveunusedlibraryelements.h"
@@ -56,8 +58,8 @@
 #include <librepcb/core/project/schematic/items/si_polygon.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/project/schematic/items/si_symbolpin.h>
+#include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
-#include <librepcb/core/project/schematic/schematicselectionquery.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 
@@ -74,8 +76,8 @@ namespace editor {
  ******************************************************************************/
 
 CmdRemoveSelectedSchematicItems::CmdRemoveSelectedSchematicItems(
-    Schematic& schematic) noexcept
-  : UndoCommandGroup(tr("Remove Schematic Elements")), mSchematic(schematic) {
+    SchematicGraphicsScene& scene) noexcept
+  : UndoCommandGroup(tr("Remove Schematic Elements")), mScene(scene) {
 }
 
 CmdRemoveSelectedSchematicItems::~CmdRemoveSelectedSchematicItems() noexcept {
@@ -90,23 +92,22 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
   // get all selected items
-  std::unique_ptr<SchematicSelectionQuery> query(
-      mSchematic.createSelectionQuery());
-  query->addSelectedSymbols();
-  query->addSelectedNetLines();
-  query->addSelectedNetLabels();
-  query->addSelectedPolygons();
-  query->addSelectedSchematicTexts();
-  query->addSelectedSymbolTexts();
-  query->addNetPointsOfNetLines(true);
-  query->addNetLinesOfSymbolPins();
+  SchematicSelectionQuery query(mScene);
+  query.addSelectedSymbols();
+  query.addSelectedNetLines();
+  query.addSelectedNetLabels();
+  query.addSelectedPolygons();
+  query.addSelectedSchematicTexts();
+  query.addSelectedSymbolTexts();
+  query.addNetPointsOfNetLines(true);
+  query.addNetLinesOfSymbolPins();
 
   // clear selection because these items will be removed now
-  mSchematic.clearSelection();
+  mScene.clearSelection();
 
   // remove netlines/netpoints/netlabels/netsegments
   QHash<SI_NetSegment*, SchematicSelectionQuery::NetSegmentItems>
-      netSegmentItems = query->getNetSegmentItems();
+      netSegmentItems = query.getNetSegmentItems();
   for (auto it = netSegmentItems.constBegin(); it != netSegmentItems.constEnd();
        ++it) {
     removeNetSegmentItems(*it.key(), it.value().netpoints, it.value().netlines,
@@ -114,7 +115,7 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   }
 
   // remove texts
-  foreach (SI_Text* text, query->getTexts()) {
+  foreach (SI_Text* text, query.getTexts()) {
     if (SI_Symbol* symbol = text->getSymbol()) {
       execNewChildCmd(
           new CmdSymbolInstanceTextRemove(*symbol, *text));  // can throw
@@ -124,26 +125,26 @@ bool CmdRemoveSelectedSchematicItems::performExecute() {
   }
 
   // remove all symbols, devices and component instances
-  foreach (SI_Symbol* symbol, query->getSymbols()) {
+  foreach (SI_Symbol* symbol, query.getSymbols()) {
     Q_ASSERT(symbol->isAddedToSchematic());
     removeSymbol(*symbol);  // can throw
   }
 
   // remove polygons
-  foreach (SI_Polygon* polygon, query->getPolygons()) {
+  foreach (SI_Polygon* polygon, query.getPolygons()) {
     execNewChildCmd(new CmdSchematicPolygonRemove(*polygon));  // can throw
   }
 
   // remove netsignals which are no longer required
   if (getChildCount() > 0) {
     execNewChildCmd(new CmdRemoveUnusedNetSignals(
-        mSchematic.getProject().getCircuit()));  // can throw
+        mScene.getSchematic().getProject().getCircuit()));  // can throw
   }
 
   // remove library elements which are no longer required
   if (getChildCount() > 0) {
     execNewChildCmd(new CmdRemoveUnusedLibraryElements(
-        mSchematic.getProject()));  // can throw
+        mScene.getSchematic().getProject()));  // can throw
   }
 
   undoScopeGuard.dismiss();  // no undo required
@@ -228,7 +229,8 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
         start = junctionMap[*anchor];
       } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
                      netline.getStartPoint().tryGetPin()) {
-        SI_Symbol* symbol = mSchematic.getSymbols().value(anchor->symbol);
+        SI_Symbol* symbol =
+            mScene.getSchematic().getSymbols().value(anchor->symbol);
         start = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
       SI_NetLineAnchor* end = nullptr;
@@ -236,7 +238,8 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
         end = junctionMap[*anchor];
       } else if (tl::optional<NetLineAnchor::PinAnchor> anchor =
                      netline.getEndPoint().tryGetPin()) {
-        SI_Symbol* symbol = mSchematic.getSymbols().value(anchor->symbol);
+        SI_Symbol* symbol =
+            mScene.getSchematic().getSymbols().value(anchor->symbol);
         end = symbol ? symbol->getPin(anchor->pin) : nullptr;
       }
       if ((!start) || (!end)) {
@@ -266,7 +269,8 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
       // Set netsignal to forced name
       if (newNetSegment->getNetSignal().getName() != forcedName) {
         newNetSignal =
-            mSchematic.getProject().getCircuit().getNetSignalByName(forcedName);
+            mScene.getSchematic().getProject().getCircuit().getNetSignalByName(
+                forcedName);
         if (!newNetSignal) {
           // Create new netsignal
           CmdNetSignalAdd* cmdAddNetSignal =
@@ -297,12 +301,12 @@ void CmdRemoveSelectedSchematicItems::removeNetSegmentItems(
 void CmdRemoveSelectedSchematicItems::removeSymbol(SI_Symbol& symbol) {
   // remove symbol
   execNewChildCmd(
-      new CmdSymbolInstanceRemove(mSchematic, symbol));  // can throw
+      new CmdSymbolInstanceRemove(mScene.getSchematic(), symbol));  // can throw
 
   // do we also need to remove the component instance?
   ComponentInstance& component = symbol.getComponentInstance();
   if (component.getSymbols().isEmpty()) {
-    foreach (Board* board, mSchematic.getProject().getBoards()) {
+    foreach (Board* board, mScene.getSchematic().getProject().getBoards()) {
       BI_Device* device =
           board->getDeviceInstanceByComponentUuid(component.getUuid());
       if (device) {
@@ -312,9 +316,9 @@ void CmdRemoveSelectedSchematicItems::removeSymbol(SI_Symbol& symbol) {
         execNewChildCmd(cmd.take());  // can throw
       }
     }
-    execNewChildCmd(
-        new CmdComponentInstanceRemove(mSchematic.getProject().getCircuit(),
-                                       component));  // can throw
+    execNewChildCmd(new CmdComponentInstanceRemove(
+        mScene.getSchematic().getProject().getCircuit(),
+        component));  // can throw
   }
 }
 

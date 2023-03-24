@@ -23,9 +23,9 @@
 #include "measuretool.h"
 
 #include "../editorcommandset.h"
+#include "../graphics/graphicsscene.h"
 #include "../widgets/graphicsview.h"
 
-#include <librepcb/core/graphics/graphicsscene.h>
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/project/board/board.h>

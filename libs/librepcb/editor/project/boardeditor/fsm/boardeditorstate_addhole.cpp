@@ -33,7 +33,6 @@
 
 #include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/project/board/board.h>
-#include <librepcb/core/project/board/boardlayerstack.h>
 
 #include <QtCore>
 
@@ -65,7 +64,7 @@ BoardEditorState_AddHole::~BoardEditorState_AddHole() noexcept {
 bool BoardEditorState_AddHole::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  makeLayerVisible();
+  makeLayerVisible(Theme::Color::sBoardHoles);
 
   // Add a new hole
   Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
@@ -210,14 +209,6 @@ void BoardEditorState_AddHole::diameterEditValueChanged(
   mLastDiameter = value;
   if (mCurrentHoleEditCmd) {
     mCurrentHoleEditCmd->setDiameter(mLastDiameter, true);
-  }
-}
-
-void BoardEditorState_AddHole::makeLayerVisible() noexcept {
-  if (Board* board = getActiveBoard()) {
-    GraphicsLayer* layer =
-        board->getLayerStack().getLayer(GraphicsLayer::sBoardDrillsNpth);
-    if (layer && layer->isEnabled()) layer->setVisible(true);
   }
 }
 

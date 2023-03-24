@@ -36,13 +36,13 @@
  ******************************************************************************/
 namespace librepcb {
 
-class GraphicsScene;
-class IF_GraphicsLayerProvider;
 class Symbol;
 class Workspace;
 
 namespace editor {
 
+class GraphicsScene;
+class IF_GraphicsLayerProvider;
 class SymbolGraphicsItem;
 
 namespace Ui {

@@ -26,7 +26,6 @@
 #include "../../export/excellongenerator.h"
 #include "../../export/gerbergenerator.h"
 #include "../../geometry/hole.h"
-#include "../../graphics/graphicslayer.h"
 #include "../../library/cmp/componentsignal.h"
 #include "../../library/pkg/footprint.h"
 #include "../../library/pkg/footprintpad.h"
@@ -38,9 +37,7 @@
 #include "../circuit/netsignal.h"
 #include "../project.h"
 #include "board.h"
-#include "boarddesignrules.h"
 #include "boardfabricationoutputsettings.h"
-#include "boardlayerstack.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_hole.h"
@@ -126,18 +123,17 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   if (side == BoardSide::Top) {
     gen.setFileFunctionComponent(1, GerberGenerator::BoardSide::Top);
   } else {
-    gen.setFileFunctionComponent(
-        mBoard.getLayerStack().getInnerLayerCount() + 2,
-        GerberGenerator::BoardSide::Bottom);
+    gen.setFileFunctionComponent(mBoard.getInnerLayerCount() + 2,
+                                 GerberGenerator::BoardSide::Bottom);
   }
 
   // Export board outline since this is useful for manual review.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     Q_ASSERT(polygon);
-    if (polygon->getPolygon().getLayerName() == GraphicsLayer::sBoardOutlines) {
+    if (polygon->getPolygon().getLayer() == Layer::boardOutlines()) {
       UnsignedLength lineWidth =
           calcWidthOfLayer(polygon->getPolygon().getLineWidth(),
-                           *polygon->getPolygon().getLayerName());
+                           polygon->getPolygon().getLayer());
       gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth,
                           GerberAttribute::ApertureFunction::Profile,
                           tl::nullopt, QString());
@@ -189,16 +185,16 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
 
       // Export component outline. But only closed ones, sunce Gerber specs say
       // that component outlines must be closed.
-      QHash<QString, GerberAttribute::ApertureFunction> layerFunction;
+      QHash<const Layer*, GerberAttribute::ApertureFunction> layerFunction;
       if (side == BoardSide::Top) {
-        layerFunction[GraphicsLayer::sTopDocumentation] =
+        layerFunction[&Layer::topDocumentation()] =
             GerberAttribute::ApertureFunction::ComponentOutlineBody;
-        layerFunction[GraphicsLayer::sTopCourtyard] =
+        layerFunction[&Layer::topCourtyard()] =
             GerberAttribute::ApertureFunction::ComponentOutlineCourtyard;
       } else {
-        layerFunction[GraphicsLayer::sBotDocumentation] =
+        layerFunction[&Layer::botDocumentation()] =
             GerberAttribute::ApertureFunction::ComponentOutlineBody;
-        layerFunction[GraphicsLayer::sBotCourtyard] =
+        layerFunction[&Layer::botCourtyard()] =
             GerberAttribute::ApertureFunction::ComponentOutlineCourtyard;
       }
       const Transform transform(*device);
@@ -210,14 +206,14 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
         if (polygon.isFilled()) {
           continue;
         }
-        QString layer = transform.map(*polygon.getLayerName());
-        if (!layerFunction.contains(layer)) {
+        const Layer& layer = transform.map(polygon.getLayer());
+        if (!layerFunction.contains(&layer)) {
           continue;
         }
         Path path = transform.map(polygon.getPath());
         gen.drawComponentOutline(path, rotation, designator, value, mountType,
                                  manufacturer, mpn, footprintName,
-                                 layerFunction[layer]);
+                                 layerFunction[&layer]);
       }
 
       // Export component pins.
@@ -320,7 +316,7 @@ void BoardGerberExport::exportLayerBoardOutlines(
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getVersion());
   gen.setFileFunctionOutlines(false);
-  drawLayer(gen, GraphicsLayer::sBoardOutlines);
+  drawLayer(gen, Layer::boardOutlines());
   gen.generate();
   gen.saveToFile(fp);
   mWrittenFiles.append(fp);
@@ -334,7 +330,7 @@ void BoardGerberExport::exportLayerTopCopper(
                       mProject.getVersion());
   gen.setFileFunctionCopper(1, GerberGenerator::CopperSide::Top,
                             GerberGenerator::Polarity::Positive);
-  drawLayer(gen, GraphicsLayer::sTopCopper);
+  drawLayer(gen, Layer::topCopper());
   gen.generate();
   gen.saveToFile(fp);
   mWrittenFiles.append(fp);
@@ -346,10 +342,10 @@ void BoardGerberExport::exportLayerBottomCopper(
                                   settings.getSuffixCopperBot());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getVersion());
-  gen.setFileFunctionCopper(mBoard.getLayerStack().getInnerLayerCount() + 2,
+  gen.setFileFunctionCopper(mBoard.getInnerLayerCount() + 2,
                             GerberGenerator::CopperSide::Bottom,
                             GerberGenerator::Polarity::Positive);
-  drawLayer(gen, GraphicsLayer::sBotCopper);
+  drawLayer(gen, Layer::botCopper());
   gen.generate();
   gen.saveToFile(fp);
   mWrittenFiles.append(fp);
@@ -357,7 +353,7 @@ void BoardGerberExport::exportLayerBottomCopper(
 
 void BoardGerberExport::exportLayerInnerCopper(
     const BoardFabricationOutputSettings& settings) const {
-  for (int i = 1; i <= mBoard.getLayerStack().getInnerLayerCount(); ++i) {
+  for (int i = 1; i <= mBoard.getInnerLayerCount(); ++i) {
     mCurrentInnerCopperLayer = i;  // used for attribute provider
     FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                     settings.getSuffixCopperInner());
@@ -365,7 +361,11 @@ void BoardGerberExport::exportLayerInnerCopper(
                         mProject.getVersion());
     gen.setFileFunctionCopper(i + 1, GerberGenerator::CopperSide::Inner,
                               GerberGenerator::Polarity::Positive);
-    drawLayer(gen, GraphicsLayer::getInnerLayerName(i));
+    if (const Layer* layer = Layer::innerCopper(i)) {
+      drawLayer(gen, *layer);
+    } else {
+      throw LogicError(__FILE__, __LINE__, "Unknown inner copper layer.");
+    }
     gen.generate();
     gen.saveToFile(fp);
     mWrittenFiles.append(fp);
@@ -381,7 +381,7 @@ void BoardGerberExport::exportLayerTopSolderMask(
                       mProject.getVersion());
   gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Top,
                                 GerberGenerator::Polarity::Negative);
-  drawLayer(gen, GraphicsLayer::sTopStopMask);
+  drawLayer(gen, Layer::topStopMask());
   gen.generate();
   gen.saveToFile(fp);
   mWrittenFiles.append(fp);
@@ -395,7 +395,7 @@ void BoardGerberExport::exportLayerBottomSolderMask(
                       mProject.getVersion());
   gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Bottom,
                                 GerberGenerator::Polarity::Negative);
-  drawLayer(gen, GraphicsLayer::sBotStopMask);
+  drawLayer(gen, Layer::botStopMask());
   gen.generate();
   gen.saveToFile(fp);
   mWrittenFiles.append(fp);
@@ -403,18 +403,17 @@ void BoardGerberExport::exportLayerBottomSolderMask(
 
 void BoardGerberExport::exportLayerTopSilkscreen(
     const BoardFabricationOutputSettings& settings) const {
-  QStringList layers = settings.getSilkscreenLayersTop();
-  if (layers.count() >
-      0) {  // don't create silkscreen file if no layers selected
+  const QVector<const Layer*>& layers = settings.getSilkscreenLayersTop();
+  if (layers.count() > 0) {  // don't export silkscreen if no layers selected
     FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                     settings.getSuffixSilkscreenTop());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Top,
                               GerberGenerator::Polarity::Positive);
-    foreach (const QString& layer, layers) { drawLayer(gen, layer); }
+    foreach (const Layer* layer, layers) { drawLayer(gen, *layer); }
     gen.setLayerPolarity(GerberGenerator::Polarity::Negative);
-    drawLayer(gen, GraphicsLayer::sTopStopMask);
+    drawLayer(gen, Layer::topStopMask());
     gen.generate();
     gen.saveToFile(fp);
     mWrittenFiles.append(fp);
@@ -423,18 +422,17 @@ void BoardGerberExport::exportLayerTopSilkscreen(
 
 void BoardGerberExport::exportLayerBottomSilkscreen(
     const BoardFabricationOutputSettings& settings) const {
-  QStringList layers = settings.getSilkscreenLayersBot();
-  if (layers.count() >
-      0) {  // don't create silkscreen file if no layers selected
+  const QVector<const Layer*>& layers = settings.getSilkscreenLayersBot();
+  if (layers.count() > 0) {  // don't export silkscreen if no layers selected
     FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                     settings.getSuffixSilkscreenBot());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Bottom,
                               GerberGenerator::Polarity::Positive);
-    foreach (const QString& layer, layers) { drawLayer(gen, layer); }
+    foreach (const Layer* layer, layers) { drawLayer(gen, *layer); }
     gen.setLayerPolarity(GerberGenerator::Polarity::Negative);
-    drawLayer(gen, GraphicsLayer::sBotStopMask);
+    drawLayer(gen, Layer::botStopMask());
     gen.generate();
     gen.saveToFile(fp);
     mWrittenFiles.append(fp);
@@ -449,7 +447,7 @@ void BoardGerberExport::exportLayerTopSolderPaste(
                       mProject.getVersion());
   gen.setFileFunctionPaste(GerberGenerator::BoardSide::Top,
                            GerberGenerator::Polarity::Positive);
-  drawLayer(gen, GraphicsLayer::sTopSolderPaste);
+  drawLayer(gen, Layer::topSolderPaste());
   gen.generate();
   gen.saveToFile(fp);
   mWrittenFiles.append(fp);
@@ -463,7 +461,7 @@ void BoardGerberExport::exportLayerBottomSolderPaste(
                       mProject.getVersion());
   gen.setFileFunctionPaste(GerberGenerator::BoardSide::Bottom,
                            GerberGenerator::Polarity::Positive);
-  drawLayer(gen, GraphicsLayer::sBotSolderPaste);
+  drawLayer(gen, Layer::botSolderPaste());
   gen.generate();
   gen.saveToFile(fp);
   mWrittenFiles.append(fp);
@@ -523,11 +521,11 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
 }
 
 void BoardGerberExport::drawLayer(GerberGenerator& gen,
-                                  const QString& layerName) const {
+                                  const Layer& layer) const {
   // draw footprints incl. pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     Q_ASSERT(device);
-    drawDevice(gen, *device, layerName);
+    drawDevice(gen, *device, layer);
   }
 
   // draw vias and traces (grouped by net)
@@ -538,11 +536,11 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
         : "N/C";  // Anonymous net (reserved name by Gerber specs).
     foreach (const BI_Via* via, netsegment->getVias()) {
       Q_ASSERT(via);
-      drawVia(gen, *via, layerName, net);
+      drawVia(gen, *via, layer, net);
     }
     foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
       Q_ASSERT(netline);
-      if (netline->getLayer().getName() == layerName) {
+      if (netline->getLayer() == layer) {
         gen.drawLine(netline->getStartPoint().getPosition(),
                      netline->getEndPoint().getPosition(),
                      positiveToUnsigned(netline->getWidth()),
@@ -555,7 +553,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   // draw planes
   foreach (const BI_Plane* plane, mBoard.getPlanes()) {
     Q_ASSERT(plane);
-    if (plane->getLayerName() == layerName) {
+    if (plane->getLayer() == layer) {
       foreach (const Path& fragment, plane->getFragments()) {
         gen.drawPathArea(fragment, GerberAttribute::ApertureFunction::Conductor,
                          *plane->getNetSignal().getName(), QString());
@@ -566,17 +564,17 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   // draw polygons
   GerberGenerator::Function graphicsFunction = tl::nullopt;
   tl::optional<QString> graphicsNet = tl::nullopt;
-  if (layerName == GraphicsLayer::sBoardOutlines) {
+  if (layer == Layer::boardOutlines()) {
     graphicsFunction = GerberAttribute::ApertureFunction::Profile;
-  } else if (GraphicsLayer::isCopperLayer(layerName)) {
+  } else if (layer.isCopper()) {
     graphicsFunction = GerberAttribute::ApertureFunction::Conductor;
     graphicsNet = "";  // Not connected to any net.
   }
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     Q_ASSERT(polygon);
-    if (layerName == polygon->getPolygon().getLayerName()) {
+    if (layer == polygon->getPolygon().getLayer()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layerName);
+          calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layer);
       gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth,
                           graphicsFunction, graphicsNet, QString());
       // Only fill closed paths (for consistency with the appearance in the
@@ -591,16 +589,16 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
 
   // draw stroke texts
   GerberGenerator::Function textFunction = tl::nullopt;
-  if (GraphicsLayer::isCopperLayer(layerName)) {
+  if (layer.isCopper()) {
     textFunction = GerberAttribute::ApertureFunction::NonConductor;
   }
   foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
     Q_ASSERT(text);
-    if (layerName == text->getText().getLayerName()) {
+    if (layer == text->getTextObj().getLayer()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
-      const Transform transform(text->getText());
-      foreach (Path path, transform.map(text->generatePaths())) {
+          calcWidthOfLayer(text->getTextObj().getStrokeWidth(), layer);
+      const Transform transform(text->getTextObj());
+      foreach (Path path, transform.map(text->getPaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             QString());
       }
@@ -608,8 +606,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   }
 
   // Draw holes.
-  if ((layerName == GraphicsLayer::sTopStopMask) ||
-      (layerName == GraphicsLayer::sBotStopMask)) {
+  if (layer.isStopMask()) {
     foreach (const BI_Hole* hole, mBoard.getHoles()) {
       if (const tl::optional<Length>& offset = hole->getStopMaskOffset()) {
         const Length diameter =
@@ -631,17 +628,15 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
 }
 
 void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
-                                const QString& layerName,
+                                const Layer& layer,
                                 const QString& netName) const {
-  bool drawCopper = via.isOnLayer(layerName);
-  bool drawStopMask = (layerName == GraphicsLayer::sTopStopMask ||
-                       layerName == GraphicsLayer::sBotStopMask) &&
-      mBoard.getDesignRules().doesViaRequireStopMask(*via.getDrillDiameter());
+  bool drawCopper = via.isOnLayer(layer);
+  bool drawStopMask = layer.isStopMask() && via.getStopMaskOffset();
   if (drawCopper || drawStopMask) {
     PositiveLength outerDiameter = via.getSize();
     UnsignedLength radius(0);
     if (drawStopMask) {
-      radius = mBoard.getDesignRules().calcStopMaskClearance(*via.getSize());
+      radius = UnsignedLength(std::max(*via.getStopMaskOffset(), Length(0)));
       outerDiameter += UnsignedLength(radius * 2);
     }
 
@@ -660,12 +655,12 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
 
 void BoardGerberExport::drawDevice(GerberGenerator& gen,
                                    const BI_Device& device,
-                                   const QString& layerName) const {
+                                   const Layer& layer) const {
   GerberGenerator::Function graphicsFunction = tl::nullopt;
   tl::optional<QString> graphicsNet = tl::nullopt;
-  if (layerName == GraphicsLayer::sBoardOutlines) {
+  if (layer == Layer::boardOutlines()) {
     graphicsFunction = GerberAttribute::ApertureFunction::Profile;
-  } else if (GraphicsLayer::isCopperLayer(layerName)) {
+  } else if (layer.isCopper()) {
     graphicsFunction = GerberAttribute::ApertureFunction::Conductor;
     graphicsNet = "";  // Not connected to any net.
   }
@@ -673,18 +668,19 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
 
   // draw pads
   foreach (const BI_FootprintPad* pad, device.getPads()) {
-    drawFootprintPad(gen, *pad, layerName);
+    drawFootprintPad(gen, *pad, layer);
   }
 
   // draw polygons
   const Transform transform(device);
   for (const Polygon& polygon :
        device.getLibFootprint().getPolygons().sortedByUuid()) {
-    QString layer = transform.map(layerName);
-    if (layer == polygon.getLayerName()) {
+    const Layer& polygonLayer = transform.map(polygon.getLayer());
+    if (polygonLayer == layer) {
       Path path = transform.map(polygon.getPath());
-      gen.drawPathOutline(path, calcWidthOfLayer(polygon.getLineWidth(), layer),
-                          graphicsFunction, graphicsNet, component);
+      gen.drawPathOutline(
+          path, calcWidthOfLayer(polygon.getLineWidth(), polygonLayer),
+          graphicsFunction, graphicsNet, component);
       // Only fill closed paths (for consistency with the appearance in the
       // board editor, and because Gerber expects area outlines as closed).
       if (polygon.isFilled() && path.isClosed()) {
@@ -696,8 +692,8 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
   // draw circles
   for (const Circle& circle :
        device.getLibFootprint().getCircles().sortedByUuid()) {
-    QString layer = transform.map(layerName);
-    if (layer == circle.getLayerName()) {
+    const Layer& circleLayer = transform.map(circle.getLayer());
+    if (circleLayer == layer) {
       Point absolutePos = transform.map(circle.getCenter());
       if (circle.isFilled()) {
         PositiveLength outerDia = circle.getDiameter() + circle.getLineWidth();
@@ -705,7 +701,7 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
                          graphicsFunction, graphicsNet, component);
       } else {
         UnsignedLength lineWidth =
-            calcWidthOfLayer(circle.getLineWidth(), layer);
+            calcWidthOfLayer(circle.getLineWidth(), circleLayer);
         gen.drawPathOutline(
             Path::circle(circle.getDiameter()).translated(absolutePos),
             lineWidth, graphicsFunction, graphicsNet, component);
@@ -715,15 +711,15 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
 
   // draw stroke texts (from footprint instance, *NOT* from library footprint!)
   GerberGenerator::Function textFunction = tl::nullopt;
-  if (GraphicsLayer::isCopperLayer(layerName)) {
+  if (layer.isCopper()) {
     textFunction = GerberAttribute::ApertureFunction::NonConductor;
   }
   foreach (const BI_StrokeText* text, device.getStrokeTexts()) {
-    if (layerName == text->getText().getLayerName()) {
+    if (layer == text->getTextObj().getLayer()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(text->getText().getStrokeWidth(), layerName);
-      Transform transform(text->getText());
-      foreach (Path path, transform.map(text->generatePaths())) {
+          calcWidthOfLayer(text->getTextObj().getStrokeWidth(), layer);
+      Transform transform(text->getTextObj());
+      foreach (Path path, transform.map(text->getPaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             component);
       }
@@ -731,18 +727,14 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
   }
 
   // Draw holes.
-  if ((layerName == GraphicsLayer::sTopStopMask) ||
-      (layerName == GraphicsLayer::sBotStopMask)) {
+  if (layer.isStopMask()) {
     for (const Hole& hole :
          device.getLibFootprint().getHoles().sortedByUuid()) {
-      if (hole.getStopMaskConfig().isEnabled()) {
-        const Length offset = hole.getStopMaskConfig().getOffset()
-            ? (*hole.getStopMaskConfig().getOffset())
-            : (*mBoard.getDesignRules().calcStopMaskClearance(
-                  *hole.getDiameter()));
-        const Length diameter = hole.getDiameter() + offset + offset;
-        const Path path = transform.map(hole.getPath()->cleaned());
+      if (tl::optional<Length> offset =
+              device.getHoleStopMasks().value(hole.getUuid())) {
+        const Length diameter = (*hole.getDiameter()) + (*offset) + (*offset);
         if (diameter > 0) {
+          const Path path = transform.map(hole.getPath()->cleaned());
           if (path.getVertices().count() == 1) {
             gen.flashCircle(path.getVertices().first().getPos(),
                             PositiveLength(diameter), tl::nullopt, tl::nullopt,
@@ -759,14 +751,14 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
 
 void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
                                          const BI_FootprintPad& pad,
-                                         const QString& layerName) const {
-  foreach (const PadGeometry& geometry, pad.getGeometryOnLayer(layerName)) {
+                                         const Layer& layer) const {
+  foreach (const PadGeometry& geometry, pad.getGeometries().value(&layer)) {
     // Pad attributes (most of them only on copper layers).
     GerberGenerator::Function function = tl::nullopt;
     tl::optional<QString> net = tl::nullopt;
     QString component = *pad.getDevice().getComponentInstance().getName();
     QString pin, signal;
-    if (GraphicsLayer::isCopperLayer(layerName)) {
+    if (layer.isCopper()) {
       if (pad.getLibPad().isTht()) {
         function = GerberAttribute::ApertureFunction::ComponentPad;
       } else {
@@ -864,7 +856,7 @@ std::unique_ptr<ExcellonGenerator> BoardGerberExport::createExcellonGenerator(
     ExcellonGenerator::Plating plating) const {
   std::unique_ptr<ExcellonGenerator> gen(new ExcellonGenerator(
       mCreationDateTime, mProjectName, mBoard.getUuid(), mProject.getVersion(),
-      plating, 1, mBoard.getLayerStack().getInnerLayerCount() + 2));
+      plating, 1, mBoard.getInnerLayerCount() + 2));
   gen->setUseG85Slots(settings.getUseG85SlotCommand());
   return gen;
 }
@@ -887,9 +879,8 @@ FilePath BoardGerberExport::getOutputFilePath(QString path) const noexcept {
  ******************************************************************************/
 
 UnsignedLength BoardGerberExport::calcWidthOfLayer(
-    const UnsignedLength& width, const QString& name) noexcept {
-  if ((name == GraphicsLayer::sBoardOutlines) &&
-      (width < UnsignedLength(1000))) {
+    const UnsignedLength& width, const Layer& layer) noexcept {
+  if ((layer == Layer::boardOutlines()) && (width < UnsignedLength(1000))) {
     return UnsignedLength(1000);  // outlines should have a minimum width of 1um
   } else {
     return width;

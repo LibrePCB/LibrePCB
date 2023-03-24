@@ -25,15 +25,15 @@
 #include "../../cmd/cmdcircleedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdtextedit.h"
+#include "../../graphics/circlegraphicsitem.h"
+#include "../../graphics/holegraphicsitem.h"
+#include "../../graphics/polygongraphicsitem.h"
+#include "../../graphics/textgraphicsitem.h"
 #include "../sym/symbolclipboarddata.h"
 #include "../sym/symbolgraphicsitem.h"
 #include "../sym/symbolpingraphicsitem.h"
 #include "cmdsymbolpinedit.h"
 
-#include <librepcb/core/graphics/circlegraphicsitem.h>
-#include <librepcb/core/graphics/holegraphicsitem.h>
-#include <librepcb/core/graphics/polygongraphicsitem.h>
-#include <librepcb/core/graphics/textgraphicsitem.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -119,7 +119,7 @@ bool CmdPasteSymbolItems::performExecute() {
       uuid = Uuid::createRandom();
     }
     std::shared_ptr<Circle> copy = std::make_shared<Circle>(
-        uuid, circle.getLayerName(), circle.getLineWidth(), circle.isFilled(),
+        uuid, circle.getLayer(), circle.getLineWidth(), circle.isFilled(),
         circle.isGrabArea(), circle.getCenter() + mPosOffset,
         circle.getDiameter());
     execNewChildCmd(new CmdCircleInsert(mSymbol.getCircles(), copy));
@@ -137,9 +137,8 @@ bool CmdPasteSymbolItems::performExecute() {
       uuid = Uuid::createRandom();
     }
     std::shared_ptr<Polygon> copy = std::make_shared<Polygon>(
-        uuid, polygon.getLayerName(), polygon.getLineWidth(),
-        polygon.isFilled(), polygon.isGrabArea(),
-        polygon.getPath().translated(mPosOffset));
+        uuid, polygon.getLayer(), polygon.getLineWidth(), polygon.isFilled(),
+        polygon.isGrabArea(), polygon.getPath().translated(mPosOffset));
     execNewChildCmd(new CmdPolygonInsert(mSymbol.getPolygons(), copy));
     if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
       graphicsItem->setSelected(true);
@@ -155,9 +154,8 @@ bool CmdPasteSymbolItems::performExecute() {
       uuid = Uuid::createRandom();
     }
     std::shared_ptr<Text> copy = std::make_shared<Text>(
-        uuid, text.getLayerName(), text.getText(),
-        text.getPosition() + mPosOffset, text.getRotation(), text.getHeight(),
-        text.getAlign());
+        uuid, text.getLayer(), text.getText(), text.getPosition() + mPosOffset,
+        text.getRotation(), text.getHeight(), text.getAlign());
     execNewChildCmd(new CmdTextInsert(mSymbol.getTexts(), copy));
     if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
       graphicsItem->setSelected(true);

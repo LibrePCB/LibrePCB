@@ -22,14 +22,15 @@
  ******************************************************************************/
 #include "symbolpingraphicsitem.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
-#include <librepcb/core/graphics/linegraphicsitem.h>
-#include <librepcb/core/graphics/primitivecirclegraphicsitem.h>
-#include <librepcb/core/graphics/primitivetextgraphicsitem.h>
+#include "../../graphics/graphicslayer.h"
+#include "../../graphics/linegraphicsitem.h"
+#include "../../graphics/primitivecirclegraphicsitem.h"
+#include "../../graphics/primitivetextgraphicsitem.h"
+
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
-#include <librepcb/core/utils/toolbox.h>
+#include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -49,7 +50,7 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
     std::shared_ptr<const Component> cmp,
     std::shared_ptr<const ComponentSymbolVariantItem> cmpItem,
     QGraphicsItem* parent) noexcept
-  : QGraphicsItem(parent),
+  : QGraphicsItemGroup(parent),
     mPin(pin),
     mLayerProvider(lp),
     mComponent(cmp),
@@ -60,64 +61,40 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
     mOnEditedSlot(*this, &SymbolPinGraphicsItem::pinEdited) {
   Q_ASSERT(mPin);
 
-  setFlag(QGraphicsItem::ItemHasNoContents, false);
+  setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(10);
 
   // circle
   mCircleGraphicsItem->setDiameter(UnsignedLength(1200000));
   mCircleGraphicsItem->setLineLayer(
-      lp.getLayer(GraphicsLayer::sSymbolPinCirclesOpt));
-  mCircleGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+      lp.getLayer(Theme::Color::sSchematicOptionalPins));
+  mCircleGraphicsItem->setShapeMode(
+      PrimitiveCircleGraphicsItem::ShapeMode::FilledOutline);
 
   // line
+  mLineGraphicsItem->setRotation(mPin->getRotation());
   mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
-  mLineGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinLines));
-  mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  mLineGraphicsItem->setLayer(lp.getLayer(Theme::Color::sSchematicPinLines));
 
   // text
+  mTextGraphicsItem->setRotation(mPin->getRotation() + mPin->getNameRotation());
+  mTextGraphicsItem->setAlignment(mPin->getNameAlignment());
+  mTextGraphicsItem->setHeight(mPin->getNameHeight());
   mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
-  mTextGraphicsItem->setLayer(lp.getLayer(GraphicsLayer::sSymbolPinNames));
-  mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  mTextGraphicsItem->setLayer(lp.getLayer(Theme::Color::sSchematicPinNames));
+  updateTextPosition();
   updateText();
 
   // pin properties
-  setPosition(mPin->getPosition());
-  setRotation(mPin->getRotation());
+  setPos(mPin->getPosition().toPxQPointF());
   setLength(mPin->getLength());
-  setNamePosition(mPin->getNamePosition());
-  setNameHeight(mPin->getNameHeight());
-  setNameRotationAndAlignment(mPin->getNameRotation(),
-                              mPin->getNameAlignment());
 
   // Register to the pin to get notified about any modifications.
   mPin->onEdited.attach(mOnEditedSlot);
 }
 
 SymbolPinGraphicsItem::~SymbolPinGraphicsItem() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-void SymbolPinGraphicsItem::setPosition(const Point& pos) noexcept {
-  QGraphicsItem::setPos(pos.toPxQPointF());
-}
-
-void SymbolPinGraphicsItem::setRotation(const Angle& rot) noexcept {
-  QGraphicsItem::setRotation(-rot.toDeg());
-
-  // Auto-rotation may need to be updated.
-  setNameRotationAndAlignment(mPin->getNameRotation(),
-                              mPin->getNameAlignment());
-}
-
-void SymbolPinGraphicsItem::setSelected(bool selected) noexcept {
-  mCircleGraphicsItem->setSelected(selected);
-  mLineGraphicsItem->setSelected(selected);
-  mTextGraphicsItem->setSelected(selected);
-  QGraphicsItem::setSelected(selected);
 }
 
 /*******************************************************************************
@@ -133,10 +110,10 @@ void SymbolPinGraphicsItem::updateText() noexcept {
           : nullptr;
       if (signal && signal->isRequired()) {
         mCircleGraphicsItem->setLineLayer(
-            mLayerProvider.getLayer(GraphicsLayer::sSymbolPinCirclesReq));
+            mLayerProvider.getLayer(Theme::Color::sSchematicRequiredPins));
       } else if (signal && (!signal->isRequired())) {
         mCircleGraphicsItem->setLineLayer(
-            mLayerProvider.getLayer(GraphicsLayer::sSymbolPinCirclesOpt));
+            mLayerProvider.getLayer(Theme::Color::sSchematicOptionalPins));
       } else {
         mCircleGraphicsItem->setLineLayer(nullptr);
       }
@@ -173,17 +150,19 @@ void SymbolPinGraphicsItem::updateText() noexcept {
  ******************************************************************************/
 
 QPainterPath SymbolPinGraphicsItem::shape() const noexcept {
-  QPainterPath p;
-  p.addEllipse(mCircleGraphicsItem->boundingRect());
-  return p;
+  Q_ASSERT(mCircleGraphicsItem);
+  return mCircleGraphicsItem->shape();
 }
 
-void SymbolPinGraphicsItem::paint(QPainter* painter,
-                                  const QStyleOptionGraphicsItem* option,
-                                  QWidget* widget) noexcept {
-  Q_UNUSED(painter);
-  Q_UNUSED(option);
-  Q_UNUSED(widget);
+QVariant SymbolPinGraphicsItem::itemChange(GraphicsItemChange change,
+                                           const QVariant& value) noexcept {
+  if ((change == ItemSelectedHasChanged) && mCircleGraphicsItem &&
+      mLineGraphicsItem && mTextGraphicsItem) {
+    mCircleGraphicsItem->setSelected(value.toBool());
+    mLineGraphicsItem->setSelected(value.toBool());
+    mTextGraphicsItem->setSelected(value.toBool());
+  }
+  return QGraphicsItem::itemChange(change, value);
 }
 
 /*******************************************************************************
@@ -199,24 +178,27 @@ void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
       updateText();
       break;
     case SymbolPin::Event::PositionChanged:
-      setPosition(pin.getPosition());
+      setPos(mPin->getPosition().toPxQPointF());
       break;
     case SymbolPin::Event::LengthChanged:
       setLength(pin.getLength());
       break;
     case SymbolPin::Event::RotationChanged:
-      setRotation(pin.getRotation());
+      mLineGraphicsItem->setRotation(pin.getRotation());
+      mTextGraphicsItem->setRotation(pin.getRotation() + pin.getNameRotation());
+      updateTextPosition();
       break;
     case SymbolPin::Event::NamePositionChanged:
-      setNamePosition(pin.getNamePosition());
+      updateTextPosition();
       break;
     case SymbolPin::Event::NameHeightChanged:
-      setNameHeight(pin.getNameHeight());
+      mTextGraphicsItem->setHeight(pin.getNameHeight());
       break;
     case SymbolPin::Event::NameRotationChanged:
+      mTextGraphicsItem->setRotation(pin.getRotation() + pin.getNameRotation());
+      break;
     case SymbolPin::Event::NameAlignmentChanged:
-      setNameRotationAndAlignment(pin.getNameRotation(),
-                                  pin.getNameAlignment());
+      mTextGraphicsItem->setAlignment(pin.getNameAlignment());
       break;
     default:
       qWarning()
@@ -228,28 +210,11 @@ void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
 
 void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept {
   mLineGraphicsItem->setLine(Point(0, 0), Point(*length, 0));
-  mTextGraphicsItem->setPosition(mPin->getNamePosition());
 }
 
-void SymbolPinGraphicsItem::setNamePosition(const Point& position) noexcept {
-  mTextGraphicsItem->setPosition(position);
-}
-
-void SymbolPinGraphicsItem::setNameHeight(
-    const PositiveLength& height) noexcept {
-  mTextGraphicsItem->setHeight(height);
-}
-
-void SymbolPinGraphicsItem::setNameRotationAndAlignment(
-    const Angle& rotation, const Alignment& align) noexcept {
-  const Angle totalRotation = mPin->getRotation() + rotation;
-  if (Toolbox::isTextUpsideDown(totalRotation, false)) {
-    mTextGraphicsItem->setRotation(rotation + Angle::deg180());
-    mTextGraphicsItem->setAlignment(align.mirrored());
-  } else {
-    mTextGraphicsItem->setRotation(rotation);
-    mTextGraphicsItem->setAlignment(align);
-  }
+void SymbolPinGraphicsItem::updateTextPosition() noexcept {
+  mTextGraphicsItem->setPosition(
+      mPin->getNamePosition().rotated(mPin->getRotation()));
 }
 
 /*******************************************************************************

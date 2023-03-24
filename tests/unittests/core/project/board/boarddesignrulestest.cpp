@@ -53,35 +53,39 @@ TEST_F(BoardDesignRulesTest, testConstructFromSExpression) {
       FilePath());
   BoardDesignRules obj(sexpr);
   EXPECT_EQ(UnsignedLength(200000), obj.getStopMaskMaxViaDiameter());
-  EXPECT_EQ(UnsignedRatio(Ratio(100000)), obj.getStopMaskClearanceRatio());
-  EXPECT_EQ(UnsignedLength(1100000), obj.getStopMaskClearanceMin());
-  EXPECT_EQ(UnsignedLength(2100000), obj.getStopMaskClearanceMax());
-  EXPECT_EQ(UnsignedRatio(Ratio(300000)), obj.getSolderPasteClearanceRatio());
-  EXPECT_EQ(UnsignedLength(1300000), obj.getSolderPasteClearanceMin());
-  EXPECT_EQ(UnsignedLength(2300000), obj.getSolderPasteClearanceMax());
+  EXPECT_EQ(UnsignedRatio(Ratio(100000)),
+            obj.getStopMaskClearance().getRatio());
+  EXPECT_EQ(UnsignedLength(1100000), obj.getStopMaskClearance().getMinValue());
+  EXPECT_EQ(UnsignedLength(2100000), obj.getStopMaskClearance().getMaxValue());
+  EXPECT_EQ(UnsignedRatio(Ratio(300000)),
+            obj.getSolderPasteClearance().getRatio());
+  EXPECT_EQ(UnsignedLength(1300000),
+            obj.getSolderPasteClearance().getMinValue());
+  EXPECT_EQ(UnsignedLength(2300000),
+            obj.getSolderPasteClearance().getMaxValue());
   EXPECT_EQ(true, obj.getPadCmpSideAutoAnnularRing());
   EXPECT_EQ(false, obj.getPadInnerAutoAnnularRing());
-  EXPECT_EQ(UnsignedRatio(Ratio(400000)), obj.getPadAnnularRingRatio());
-  EXPECT_EQ(UnsignedLength(1400000), obj.getPadAnnularRingMin());
-  EXPECT_EQ(UnsignedLength(2400000), obj.getPadAnnularRingMax());
-  EXPECT_EQ(UnsignedRatio(Ratio(500000)), obj.getViaAnnularRingRatio());
-  EXPECT_EQ(UnsignedLength(1500000), obj.getViaAnnularRingMin());
-  EXPECT_EQ(UnsignedLength(2500000), obj.getViaAnnularRingMax());
+  EXPECT_EQ(UnsignedRatio(Ratio(400000)), obj.getPadAnnularRing().getRatio());
+  EXPECT_EQ(UnsignedLength(1400000), obj.getPadAnnularRing().getMinValue());
+  EXPECT_EQ(UnsignedLength(2400000), obj.getPadAnnularRing().getMaxValue());
+  EXPECT_EQ(UnsignedRatio(Ratio(500000)), obj.getViaAnnularRing().getRatio());
+  EXPECT_EQ(UnsignedLength(1500000), obj.getViaAnnularRing().getMinValue());
+  EXPECT_EQ(UnsignedLength(2500000), obj.getViaAnnularRing().getMaxValue());
 }
 
 TEST_F(BoardDesignRulesTest, testSerializeAndDeserialize) {
   BoardDesignRules obj1;
   obj1.setStopMaskMaxViaDiameter(UnsignedLength(44));
-  obj1.setStopMaskClearance(UnsignedRatio(Ratio(11)), UnsignedLength(22),
-                            UnsignedLength(33));
-  obj1.setSolderPasteClearance(UnsignedRatio(Ratio(55)), UnsignedLength(66),
-                               UnsignedLength(77));
+  obj1.setStopMaskClearance(BoundedUnsignedRatio(
+      UnsignedRatio(Ratio(11)), UnsignedLength(22), UnsignedLength(33)));
+  obj1.setSolderPasteClearance(BoundedUnsignedRatio(
+      UnsignedRatio(Ratio(55)), UnsignedLength(66), UnsignedLength(77)));
   obj1.setPadCmpSideAutoAnnularRing(true);
   obj1.setPadInnerAutoAnnularRing(false);
-  obj1.setPadAnnularRing(UnsignedRatio(Ratio(88)), UnsignedLength(99),
-                         UnsignedLength(111));
-  obj1.setViaAnnularRing(UnsignedRatio(Ratio(222)), UnsignedLength(333),
-                         UnsignedLength(444));
+  obj1.setPadAnnularRing(BoundedUnsignedRatio(
+      UnsignedRatio(Ratio(88)), UnsignedLength(99), UnsignedLength(111)));
+  obj1.setViaAnnularRing(BoundedUnsignedRatio(
+      UnsignedRatio(Ratio(222)), UnsignedLength(333), UnsignedLength(444)));
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);
 

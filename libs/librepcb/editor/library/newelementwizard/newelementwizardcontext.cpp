@@ -179,15 +179,14 @@ void NewElementWizardContext::copyElement(ElementType type,
       mSymbolPolygons.clear();
       for (const Polygon& polygon : symbol->getPolygons()) {
         mSymbolPolygons.append(std::make_shared<Polygon>(
-            Uuid::createRandom(), polygon.getLayerName(),
-            polygon.getLineWidth(), polygon.isFilled(), polygon.isGrabArea(),
-            polygon.getPath()));
+            Uuid::createRandom(), polygon.getLayer(), polygon.getLineWidth(),
+            polygon.isFilled(), polygon.isGrabArea(), polygon.getPath()));
       }
       // copy circles but generate new UUIDs
       mSymbolCircles.clear();
       for (const Circle& circle : symbol->getCircles()) {
         mSymbolCircles.append(std::make_shared<Circle>(
-            Uuid::createRandom(), circle.getLayerName(), circle.getLineWidth(),
+            Uuid::createRandom(), circle.getLayer(), circle.getLineWidth(),
             circle.isFilled(), circle.isGrabArea(), circle.getCenter(),
             circle.getDiameter()));
       }
@@ -195,7 +194,7 @@ void NewElementWizardContext::copyElement(ElementType type,
       mSymbolTexts.clear();
       for (const Text& text : symbol->getTexts()) {
         mSymbolTexts.append(std::make_shared<Text>(
-            Uuid::createRandom(), text.getLayerName(), text.getText(),
+            Uuid::createRandom(), text.getLayer(), text.getText(),
             text.getPosition(), text.getRotation(), text.getHeight(),
             text.getAlign()));
       }
@@ -237,21 +236,20 @@ void NewElementWizardContext::copyElement(ElementType type,
         // copy polygons but generate new UUIDs
         for (const Polygon& polygon : footprint.getPolygons()) {
           newFootprint->getPolygons().append(std::make_shared<Polygon>(
-              Uuid::createRandom(), polygon.getLayerName(),
-              polygon.getLineWidth(), polygon.isFilled(), polygon.isGrabArea(),
-              polygon.getPath()));
+              Uuid::createRandom(), polygon.getLayer(), polygon.getLineWidth(),
+              polygon.isFilled(), polygon.isGrabArea(), polygon.getPath()));
         }
         // copy circles but generate new UUIDs
         for (const Circle& circle : footprint.getCircles()) {
           newFootprint->getCircles().append(std::make_shared<Circle>(
-              Uuid::createRandom(), circle.getLayerName(),
-              circle.getLineWidth(), circle.isFilled(), circle.isGrabArea(),
-              circle.getCenter(), circle.getDiameter()));
+              Uuid::createRandom(), circle.getLayer(), circle.getLineWidth(),
+              circle.isFilled(), circle.isGrabArea(), circle.getCenter(),
+              circle.getDiameter()));
         }
         // copy stroke texts but generate new UUIDs
         for (const StrokeText& text : footprint.getStrokeTexts()) {
           newFootprint->getStrokeTexts().append(std::make_shared<StrokeText>(
-              Uuid::createRandom(), text.getLayerName(), text.getText(),
+              Uuid::createRandom(), text.getLayer(), text.getText(),
               text.getPosition(), text.getRotation(), text.getHeight(),
               text.getStrokeWidth(), text.getLetterSpacing(),
               text.getLineSpacing(), text.getAlign(), text.getMirrored(),

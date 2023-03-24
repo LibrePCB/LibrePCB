@@ -36,7 +36,7 @@ namespace librepcb {
 Text::Text(const Text& other) noexcept
   : onEdited(*this),
     mUuid(other.mUuid),
-    mLayerName(other.mLayerName),
+    mLayer(other.mLayer),
     mText(other.mText),
     mPosition(other.mPosition),
     mRotation(other.mRotation),
@@ -48,12 +48,12 @@ Text::Text(const Uuid& uuid, const Text& other) noexcept : Text(other) {
   mUuid = uuid;
 }
 
-Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName,
-           const QString& text, const Point& pos, const Angle& rotation,
+Text::Text(const Uuid& uuid, const Layer& layer, const QString& text,
+           const Point& pos, const Angle& rotation,
            const PositiveLength& height, const Alignment& align) noexcept
   : onEdited(*this),
     mUuid(uuid),
-    mLayerName(layerName),
+    mLayer(&layer),
     mText(text),
     mPosition(pos),
     mRotation(rotation),
@@ -64,7 +64,7 @@ Text::Text(const Uuid& uuid, const GraphicsLayerName& layerName,
 Text::Text(const SExpression& node)
   : onEdited(*this),
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
-    mLayerName(deserialize<GraphicsLayerName>(node.getChild("layer/@0"))),
+    mLayer(deserialize<const Layer*>(node.getChild("layer/@0"))),
     mText(node.getChild("value/@0").getValue()),
     mPosition(node.getChild("position")),
     mRotation(deserialize<Angle>(node.getChild("rotation/@0"))),
@@ -79,13 +79,13 @@ Text::~Text() noexcept {
  *  Setters
  ******************************************************************************/
 
-bool Text::setLayerName(const GraphicsLayerName& name) noexcept {
-  if (name == mLayerName) {
+bool Text::setLayer(const Layer& layer) noexcept {
+  if (&layer == mLayer) {
     return false;
   }
 
-  mLayerName = name;
-  onEdited.notify(Event::LayerNameChanged);
+  mLayer = &layer;
+  onEdited.notify(Event::LayerChanged);
   return true;
 }
 
@@ -145,7 +145,7 @@ bool Text::setAlign(const Alignment& align) noexcept {
 
 void Text::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", mLayerName);
+  root.appendChild("layer", *mLayer);
   root.appendChild("value", mText);
   root.ensureLineBreak();
   mAlign.serialize(root.appendList("align"));
@@ -161,7 +161,7 @@ void Text::serialize(SExpression& root) const {
 
 bool Text::operator==(const Text& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
-  if (mLayerName != rhs.mLayerName) return false;
+  if (mLayer != rhs.mLayer) return false;
   if (mText != rhs.mText) return false;
   if (mPosition != rhs.mPosition) return false;
   if (mRotation != rhs.mRotation) return false;
@@ -175,7 +175,7 @@ Text& Text::operator=(const Text& rhs) noexcept {
     mUuid = rhs.mUuid;
     onEdited.notify(Event::UuidChanged);
   }
-  setLayerName(rhs.mLayerName);
+  setLayer(*rhs.mLayer);
   setText(rhs.mText);
   setPosition(rhs.mPosition);
   setRotation(rhs.mRotation);

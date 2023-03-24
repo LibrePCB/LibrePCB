@@ -27,7 +27,6 @@
 #include "ui_polygonpropertiesdialog.h"
 
 #include <librepcb/core/geometry/polygon.h>
-#include <librepcb/core/graphics/graphicslayer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,30 +37,25 @@
 namespace librepcb {
 namespace editor {
 
-PolygonPropertiesDialog::PolygonPropertiesDialog(Polygon& polygon,
-                                                 UndoStack& undoStack,
-                                                 QList<GraphicsLayer*> layers,
-                                                 const LengthUnit& lengthUnit,
-                                                 const QString& settingsPrefix,
-                                                 QWidget* parent) noexcept
+PolygonPropertiesDialog::PolygonPropertiesDialog(
+    Polygon& polygon, UndoStack& undoStack, const QSet<const Layer*>& layers,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
+    QWidget* parent) noexcept
   : QDialog(parent),
     mPolygon(polygon),
     mUndoStack(undoStack),
     mUi(new Ui::PolygonPropertiesDialog) {
   mUi->setupUi(this);
+  mUi->cbxLayer->setLayers(layers);
   mUi->edtLineWidth->configure(lengthUnit, LengthEditBase::Steps::generic(),
                                settingsPrefix % "/line_width");
   mUi->pathEditorWidget->setLengthUnit(lengthUnit);
-
-  foreach (const GraphicsLayer* layer, layers) {
-    mUi->cbxLayer->addItem(layer->getNameTr(), layer->getName());
-  }
 
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &PolygonPropertiesDialog::buttonBoxClicked);
 
   // load polygon attributes
-  selectLayerNameInCombobox(*mPolygon.getLayerName());
+  mUi->cbxLayer->setCurrentLayer(mPolygon.getLayer());
   mUi->edtLineWidth->setValue(mPolygon.getLineWidth());
   mUi->cbxFillArea->setChecked(mPolygon.isFilled());
   mUi->cbxIsGrabArea->setChecked(mPolygon.isGrabArea());
@@ -120,11 +114,8 @@ void PolygonPropertiesDialog::buttonBoxClicked(
 bool PolygonPropertiesDialog::applyChanges() noexcept {
   try {
     QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(mPolygon));
-    if (mUi->cbxLayer->currentIndex() >= 0 &&
-        mUi->cbxLayer->currentData().isValid()) {
-      cmd->setLayerName(
-          GraphicsLayerName(mUi->cbxLayer->currentData().toString()),
-          false);  // can throw
+    if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
+      cmd->setLayer(*layer, false);
     }
     cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
     cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
@@ -136,11 +127,6 @@ bool PolygonPropertiesDialog::applyChanges() noexcept {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
     return false;
   }
-}
-
-void PolygonPropertiesDialog::selectLayerNameInCombobox(
-    const QString& name) noexcept {
-  mUi->cbxLayer->setCurrentIndex(mUi->cbxLayer->findData(name));
 }
 
 /*******************************************************************************

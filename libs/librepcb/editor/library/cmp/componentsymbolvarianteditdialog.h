@@ -36,13 +36,13 @@
 namespace librepcb {
 
 class Component;
-class DefaultGraphicsLayerProvider;
-class GraphicsScene;
 class Symbol;
 class Workspace;
 
 namespace editor {
 
+class DefaultGraphicsLayerProvider;
+class GraphicsScene;
 class LibraryElementCache;
 class SymbolGraphicsItem;
 

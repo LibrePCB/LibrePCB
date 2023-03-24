@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "graphicslayercombobox.h"
 
-#include <librepcb/core/graphics/graphicslayer.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -62,17 +62,16 @@ GraphicsLayerComboBox::~GraphicsLayerComboBox() noexcept {
  *  Getters
  ******************************************************************************/
 
-tl::optional<GraphicsLayerName> GraphicsLayerComboBox::getCurrentLayerName()
-    const noexcept {
-  QString name = mComboBox->currentData(Qt::UserRole).toString();
-  try {
-    if (GraphicsLayerNameConstraint()(name)) {
-      return GraphicsLayerName(name);  // can throw
+tl::optional<const Layer&> GraphicsLayerComboBox::getCurrentLayer() const
+    noexcept {
+  const QString id = mComboBox->currentData(Qt::UserRole).toString();
+  foreach (const Layer* layer, Layer::all()) {
+    if (layer->getId() == id) {
+      return *layer;
     }
-  } catch (const Exception& e) {
-    // This should actually never happen, thus no user visible message here.
-    qWarning() << "Invalid graphics layer selected:" << name;
   }
+  // This should actually never happen, thus no user visible message here.
+  qWarning() << "Invalid graphics layer selected:" << id;
   return tl::nullopt;
 }
 
@@ -81,31 +80,29 @@ tl::optional<GraphicsLayerName> GraphicsLayerComboBox::getCurrentLayerName()
  ******************************************************************************/
 
 void GraphicsLayerComboBox::setLayers(
-    const QList<GraphicsLayer*>& layers) noexcept {
+    const QSet<const Layer*>& layers) noexcept {
+  QList<const Layer*> sorted = layers.toList();
+  std::sort(sorted.begin(), sorted.end(), &Layer::lessThan);
+
   blockSignals(true);
-  tl::optional<GraphicsLayerName> selected = getCurrentLayerName();
+  tl::optional<const Layer&> selected = getCurrentLayer();
   mComboBox->clear();
-  foreach (const GraphicsLayer* layer, layers) {
-    mComboBox->addItem(layer->getNameTr(), layer->getName());
+  foreach (const Layer* layer, sorted) {
+    mComboBox->addItem(layer->getNameTr(), layer->getId());
   }
   if (selected) {
     setCurrentLayer(*selected);
   }
   blockSignals(false);
 
-  tl::optional<GraphicsLayerName> current = getCurrentLayerName();
+  tl::optional<const Layer&> current = getCurrentLayer();
   if ((current != selected) && (current)) {
     emit currentLayerChanged(*current);
   }
 }
 
-void GraphicsLayerComboBox::setCurrentLayer(
-    const GraphicsLayerName& name) noexcept {
-  setCurrentLayer(*name);
-}
-
-void GraphicsLayerComboBox::setCurrentLayer(const QString& name) noexcept {
-  mComboBox->setCurrentIndex(mComboBox->findData(name, Qt::UserRole));
+void GraphicsLayerComboBox::setCurrentLayer(const Layer& layer) noexcept {
+  mComboBox->setCurrentIndex(mComboBox->findData(layer.getId(), Qt::UserRole));
 }
 
 /*******************************************************************************
@@ -132,9 +129,8 @@ void GraphicsLayerComboBox::stepDown() noexcept {
 
 void GraphicsLayerComboBox::currentIndexChanged(int index) noexcept {
   Q_UNUSED(index);
-  tl::optional<GraphicsLayerName> name = getCurrentLayerName();
-  if (name) {
-    emit currentLayerChanged(*name);
+  if (tl::optional<const Layer&> layer = getCurrentLayer()) {
+    emit currentLayerChanged(*layer);
   }
 }
 

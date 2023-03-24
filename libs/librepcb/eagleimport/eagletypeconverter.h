@@ -29,7 +29,6 @@
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/geometry/text.h>
-#include <librepcb/core/graphics/graphicslayername.h>
 #include <librepcb/core/library/cmp/componentsymbolvariantitemsuffix.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/library/pkg/packagepad.h>
@@ -66,6 +65,9 @@ struct Point;
 }  // namespace parseagle
 
 namespace librepcb {
+
+class Layer;
+
 namespace eagleimport {
 
 /*******************************************************************************
@@ -137,11 +139,11 @@ public:
    *
    * @param id  EAGLE layer ID
    *
-   * @return LibrePCB graphics layer
+   * @return LibrePCB layer
    *
    * @throw Exception   If the layer is unknown or not supported
    */
-  static GraphicsLayerName convertLayer(int id);
+  static const Layer& convertLayer(int id);
 
   /**
    * @brief Convert a length

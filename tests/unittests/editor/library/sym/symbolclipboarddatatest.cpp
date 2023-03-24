@@ -21,7 +21,9 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
-#include <librepcb/core/graphics/defaultgraphicslayerprovider.h>
+#include <librepcb/core/types/layer.h>
+#include <librepcb/core/workspace/theme.h>
+#include <librepcb/editor/graphics/defaultgraphicslayerprovider.h>
 #include <librepcb/editor/library/sym/symbolclipboarddata.h>
 
 #include <QtCore>
@@ -52,7 +54,8 @@ TEST(SymbolClipboardDataTest, testToFromMimeDataEmpty) {
   SymbolClipboardData obj1(uuid, pos);
 
   // Serialize to MIME data
-  DefaultGraphicsLayerProvider layerProvider;
+  Theme theme;
+  DefaultGraphicsLayerProvider layerProvider(theme);
   std::unique_ptr<QMimeData> mime1 = obj1.toMimeData(layerProvider);
 
   // Load from MIME data and validate
@@ -82,32 +85,31 @@ TEST(SymbolClipboardDataTest, testToFromMimeDataPopulated) {
       PositiveLength(10), Alignment(HAlign::right(), VAlign::bottom()));
 
   std::shared_ptr<Polygon> polygon1 = std::make_shared<Polygon>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(1), false,
-      true,
+      Uuid::createRandom(), Layer::botCopper(), UnsignedLength(1), false, true,
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
 
   std::shared_ptr<Polygon> polygon2 =
-      std::make_shared<Polygon>(Uuid::createRandom(), GraphicsLayerName("bar"),
+      std::make_shared<Polygon>(Uuid::createRandom(), Layer::topPlacement(),
                                 UnsignedLength(10), true, false,
                                 Path({Vertex(Point(10, 20), Angle(30)),
                                       Vertex(Point(40, 50), Angle(60))}));
 
   std::shared_ptr<Circle> circle1 = std::make_shared<Circle>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), UnsignedLength(123),
-      false, true, Point(12, 34), PositiveLength(1234));
+      Uuid::createRandom(), Layer::botStopMask(), UnsignedLength(123), false,
+      true, Point(12, 34), PositiveLength(1234));
 
   std::shared_ptr<Circle> circle2 = std::make_shared<Circle>(
-      Uuid::createRandom(), GraphicsLayerName("bar"), UnsignedLength(0), true,
+      Uuid::createRandom(), Layer::topSolderPaste(), UnsignedLength(0), true,
       false, Point(120, 340), PositiveLength(12));
 
   std::shared_ptr<Text> text1 = std::make_shared<Text>(
-      Uuid::createRandom(), GraphicsLayerName("foo"), "text 1", Point(1, 2),
-      Angle(3), PositiveLength(4), Alignment(HAlign::left(), VAlign::top()));
+      Uuid::createRandom(), Layer::topCopper(), "text 1", Point(1, 2), Angle(3),
+      PositiveLength(4), Alignment(HAlign::left(), VAlign::top()));
 
-  std::shared_ptr<Text> text2 = std::make_shared<Text>(
-      Uuid::createRandom(), GraphicsLayerName("bar"), "text 2", Point(10, 20),
-      Angle(30), PositiveLength(40),
-      Alignment(HAlign::center(), VAlign::bottom()));
+  std::shared_ptr<Text> text2 =
+      std::make_shared<Text>(Uuid::createRandom(), Layer::botCopper(), "text 2",
+                             Point(10, 20), Angle(30), PositiveLength(40),
+                             Alignment(HAlign::center(), VAlign::bottom()));
 
   // Create object
   SymbolClipboardData obj1(uuid, pos);
@@ -121,7 +123,8 @@ TEST(SymbolClipboardDataTest, testToFromMimeDataPopulated) {
   obj1.getTexts().append(text2);
 
   // Serialize to MIME data
-  DefaultGraphicsLayerProvider layerProvider;
+  Theme theme;
+  DefaultGraphicsLayerProvider layerProvider(theme);
   std::unique_ptr<QMimeData> mime1 = obj1.toMimeData(layerProvider);
 
   // Load from MIME data and validate
