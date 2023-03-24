@@ -63,6 +63,8 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
         PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
         UnsignedLimitedRatio(Ratio::percent100()),  // Rounded pad
         Path(),  // Custom shape outline
+        MaskConfig::automatic(),  // Stop mask
+        MaskConfig::off(),  // Solder paste
         FootprintPad::ComponentSide::Top,  // Default side
         PadHoleList{}) {
   if (mPadType == PadType::SMT) {
@@ -71,6 +73,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
     mLastPad.setRadius(UnsignedLimitedRatio(Ratio::percent50()));
     mLastPad.setWidth(PositiveLength(1500000));  // Same as for THT pads ->
     mLastPad.setHeight(PositiveLength(700000));  // reasonable multiple of 0.1mm
+    mLastPad.setSolderPasteConfig(MaskConfig::automatic());
     applyRecommendedRoundedRectRadius();
   } else {
     mLastPad.getHoles().append(std::make_shared<PadHole>(
@@ -351,7 +354,8 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
         Uuid::createRandom(), mLastPad.getPackagePadUuid(),
         mLastPad.getPosition(), mLastPad.getRotation(), mLastPad.getShape(),
         mLastPad.getWidth(), mLastPad.getHeight(), mLastPad.getRadius(),
-        mLastPad.getCustomShapeOutline(), mLastPad.getComponentSide(),
+        mLastPad.getCustomShapeOutline(), mLastPad.getStopMaskConfig(),
+        mLastPad.getSolderPasteConfig(), mLastPad.getComponentSide(),
         PadHoleList{});
     for (const PadHole& hole : mLastPad.getHoles()) {
       mCurrentPad->getHoles().append(std::make_shared<PadHole>(

@@ -231,6 +231,7 @@ void NewElementWizardContext::copyElement(ElementType type,
               Uuid::createRandom(), pkgPad, pad.getPosition(),
               pad.getRotation(), pad.getShape(), pad.getWidth(),
               pad.getHeight(), pad.getRadius(), pad.getCustomShapeOutline(),
+              pad.getStopMaskConfig(), pad.getSolderPasteConfig(),
               pad.getComponentSide(), pad.getHoles()));
         }
         // copy polygons but generate new UUIDs

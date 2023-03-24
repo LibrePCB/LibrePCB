@@ -102,7 +102,8 @@ bool CmdPasteFootprintItems::performExecute() {
     std::shared_ptr<FootprintPad> copy = std::make_shared<FootprintPad>(
         uuid, pkgPadUuid, pad.getPosition() + mPosOffset, pad.getRotation(),
         pad.getShape(), pad.getWidth(), pad.getHeight(), pad.getRadius(),
-        pad.getCustomShapeOutline(), pad.getComponentSide(), pad.getHoles());
+        pad.getCustomShapeOutline(), pad.getStopMaskConfig(),
+        pad.getSolderPasteConfig(), pad.getComponentSide(), pad.getHoles());
     execNewChildCmd(new CmdFootprintPadInsert(mFootprint.getPads(), copy));
     if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
       graphicsItem->setSelected(true);

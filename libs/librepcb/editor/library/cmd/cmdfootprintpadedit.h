@@ -63,6 +63,8 @@ public:
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
   void setRadius(const UnsignedLimitedRatio& radius, bool immediate) noexcept;
   void setCustomShapeOutline(const Path& outline) noexcept;
+  void setStopMaskConfig(const MaskConfig& config) noexcept;
+  void setSolderPasteConfig(const MaskConfig& config) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
@@ -108,6 +110,10 @@ private:
   UnsignedLimitedRatio mNewRadius;
   Path mOldCustomShapeOutline;
   Path mNewCustomShapeOutline;
+  MaskConfig mOldStopMaskConfig;
+  MaskConfig mNewStopMaskConfig;
+  MaskConfig mOldSolderPasteConfig;
+  MaskConfig mNewSolderPasteConfig;
   Point mOldPos;
   Point mNewPos;
   Angle mOldRotation;

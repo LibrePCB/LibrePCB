@@ -105,20 +105,21 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
     mHeight(other.mHeight),
     mRadius(other.mRadius),
     mCustomShapeOutline(other.mCustomShapeOutline),
+    mStopMaskConfig(other.mStopMaskConfig),
+    mSolderPasteConfig(other.mSolderPasteConfig),
     mComponentSide(other.mComponentSide),
     mHoles(other.mHoles),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
-FootprintPad::FootprintPad(const Uuid& uuid,
-                           const tl::optional<Uuid>& pkgPadUuid,
-                           const Point& pos, const Angle& rot, Shape shape,
-                           const PositiveLength& width,
-                           const PositiveLength& height,
-                           const UnsignedLimitedRatio& radius,
-                           const Path& customShapeOutline, ComponentSide side,
-                           const PadHoleList& holes) noexcept
+FootprintPad::FootprintPad(
+    const Uuid& uuid, const tl::optional<Uuid>& pkgPadUuid, const Point& pos,
+    const Angle& rot, Shape shape, const PositiveLength& width,
+    const PositiveLength& height, const UnsignedLimitedRatio& radius,
+    const Path& customShapeOutline, const MaskConfig& autoStopMask,
+    const MaskConfig& autoSolderPaste, ComponentSide side,
+    const PadHoleList& holes) noexcept
   : onEdited(*this),
     mUuid(uuid),
     mPackagePadUuid(pkgPadUuid),
@@ -129,6 +130,8 @@ FootprintPad::FootprintPad(const Uuid& uuid,
     mHeight(height),
     mRadius(radius),
     mCustomShapeOutline(customShapeOutline),
+    mStopMaskConfig(autoStopMask),
+    mSolderPasteConfig(autoSolderPaste),
     mComponentSide(side),
     mHoles(holes),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
@@ -147,6 +150,9 @@ FootprintPad::FootprintPad(const SExpression& node)
     mHeight(deserialize<PositiveLength>(node.getChild("size/@1"))),
     mRadius(deserialize<UnsignedLimitedRatio>(node.getChild("radius/@0"))),
     mCustomShapeOutline(node),
+    mStopMaskConfig(deserialize<MaskConfig>(node.getChild("stop_mask/@0"))),
+    mSolderPasteConfig(
+        deserialize<MaskConfig>(node.getChild("solder_paste/@0"))),
     mComponentSide(deserialize<ComponentSide>(node.getChild("side/@0"))),
     mHoles(node),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
@@ -178,6 +184,34 @@ const Layer& FootprintPad::getSmtLayer() const noexcept {
   } else {
     return Layer::topCopper();
   }
+}
+
+bool FootprintPad::hasTopCopper() const noexcept {
+  return isTht() || (mComponentSide == ComponentSide::Top);
+}
+
+bool FootprintPad::hasBottomCopper() const noexcept {
+  return isTht() || (mComponentSide == ComponentSide::Bottom);
+}
+
+bool FootprintPad::hasAutoTopStopMask() const noexcept {
+  return mStopMaskConfig.isEnabled() &&
+      (isTht() || (mComponentSide == ComponentSide::Top));
+}
+
+bool FootprintPad::hasAutoBottomStopMask() const noexcept {
+  return mStopMaskConfig.isEnabled() &&
+      (isTht() || (mComponentSide == ComponentSide::Bottom));
+}
+
+bool FootprintPad::hasAutoTopSolderPaste() const noexcept {
+  return mSolderPasteConfig.isEnabled() &&
+      (isTht() != (mComponentSide == ComponentSide::Top));
+}
+
+bool FootprintPad::hasAutoBottomSolderPaste() const noexcept {
+  return mSolderPasteConfig.isEnabled() &&
+      (isTht() != (mComponentSide == ComponentSide::Bottom));
 }
 
 PadGeometry FootprintPad::getGeometry() const noexcept {
@@ -280,6 +314,26 @@ bool FootprintPad::setCustomShapeOutline(const Path& outline) noexcept {
   return true;
 }
 
+bool FootprintPad::setStopMaskConfig(const MaskConfig& config) noexcept {
+  if (config == mStopMaskConfig) {
+    return false;
+  }
+
+  mStopMaskConfig = config;
+  onEdited.notify(Event::StopMaskConfigChanged);
+  return true;
+}
+
+bool FootprintPad::setSolderPasteConfig(const MaskConfig& config) noexcept {
+  if (config == mSolderPasteConfig) {
+    return false;
+  }
+
+  mSolderPasteConfig = config;
+  onEdited.notify(Event::SolderPasteConfigChanged);
+  return true;
+}
+
 bool FootprintPad::setComponentSide(ComponentSide side) noexcept {
   if (side == mComponentSide) {
     return false;
@@ -304,6 +358,9 @@ void FootprintPad::serialize(SExpression& root) const {
   Point(*mWidth, *mHeight).serialize(root.appendList("size"));
   root.appendChild("radius", mRadius);
   root.ensureLineBreak();
+  root.appendChild("stop_mask", mStopMaskConfig);
+  root.appendChild("solder_paste", mSolderPasteConfig);
+  root.ensureLineBreak();
   root.appendChild("package_pad", mPackagePadUuid);
   root.ensureLineBreak();
   mCustomShapeOutline.serialize(root);
@@ -326,6 +383,8 @@ bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
   if (mHeight != rhs.mHeight) return false;
   if (mRadius != rhs.mRadius) return false;
   if (mCustomShapeOutline != rhs.mCustomShapeOutline) return false;
+  if (mStopMaskConfig != rhs.mStopMaskConfig) return false;
+  if (mSolderPasteConfig != rhs.mSolderPasteConfig) return false;
   if (mComponentSide != rhs.mComponentSide) return false;
   if (mHoles != rhs.mHoles) return false;
   return true;
@@ -344,6 +403,8 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
   setHeight(rhs.mHeight);
   setRadius(rhs.mRadius);
   setCustomShapeOutline(rhs.mCustomShapeOutline);
+  setStopMaskConfig(rhs.mStopMaskConfig);
+  setSolderPasteConfig(rhs.mSolderPasteConfig);
   setComponentSide(rhs.mComponentSide);
   mHoles = rhs.mHoles;
   return *this;

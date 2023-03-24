@@ -153,6 +153,12 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
           // from the top view, it should be safe to set it to "top" now.
           boardSideNode = SExpression::createToken("top");
         }
+
+        // Add mask configs.
+        padNode->appendChild("stop_mask", SExpression::createToken("auto"));
+        padNode->appendChild(
+            "solder_paste",
+            SExpression::createToken((drill > 0) ? "off" : "auto"));
       }
 
       // Holes.
