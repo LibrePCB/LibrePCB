@@ -259,7 +259,8 @@ void ControlPanel::createActions() noexcept {
       cmd.website.createAction(this, mStandardCommandHandler.data(),
                                &StandardEditorCommandHandler::website));
   mActionQuit.reset(cmd.applicationQuit.createAction(
-      this, qApp, &Application::quitTriggered));
+      this, qApp, &QApplication::closeAllWindows,
+      EditorCommand::ActionFlag::QueuedConnection));
 }
 
 void ControlPanel::createMenus() noexcept {
