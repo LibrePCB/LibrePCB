@@ -92,7 +92,6 @@ public:
   }
   QString getDefaultStrokeFontName() const noexcept { return "newstroke.bene"; }
   const StrokeFont& getDefaultStrokeFont() const noexcept;
-  QString detectRuntime() const noexcept;
 
   // Setters
   void setTranslationLocale(const QLocale& locale) noexcept;

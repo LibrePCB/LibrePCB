@@ -75,6 +75,13 @@ public:
   static const QString& getHostname() noexcept;
 
   /**
+   * @brief Detect the environment in which LibrePCB runs
+   *
+   * @return Runtime name(s) like "Snap"or "Flatpak", or an empty string.
+   */
+  static QString detectRuntime() noexcept;
+
+  /**
    * @brief Check whether a process with a given PID is running or not
    *
    * @param pid   The process ID to query

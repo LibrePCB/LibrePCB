@@ -26,6 +26,7 @@
 #include "ui_aboutdialog.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/systeminfo.h>
 
 #include <QtCore>
 #include <QtNetwork>
@@ -159,8 +160,8 @@ AboutDialog::AboutDialog(const WorkspaceSettings& settings,
   details << "Operating System: " + QSysInfo::prettyProductName();
   details << "Platform Plugin:  " + qApp->platformName();
   details << "TLS Library:      " + QSslSocket::sslLibraryVersionString();
-  if (!qApp->detectRuntime().isEmpty()) {
-    details << "Runtime:          " + qApp->detectRuntime();
+  if (!SystemInfo::detectRuntime().isEmpty()) {
+    details << "Runtime:          " + SystemInfo::detectRuntime();
   }
   mUi->txtDetails->setPlainText(details.join("\n"));
 }
