@@ -207,7 +207,7 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
     // don't save the project on development branches. Note that unfortunately
     // this doesn't work if there are any changes in the project and an autosave
     // was already performed, but it is almost impossible to fix this issue :-(
-    if (qApp->isFileFormatStable()) {
+    if (Application::isFileFormatStable()) {
       mProject.save();  // can throw
     }
 
@@ -228,7 +228,7 @@ void ProjectEditor::execLppzExportDialog(QWidget* parent) noexcept {
 
 void ProjectEditor::execOrderPcbDialog(QWidget* parent) noexcept {
   auto callback = [this]() {
-    if (qApp->isFileFormatStable()) {
+    if (Application::isFileFormatStable()) {
       // See explanation in execLppzExportDialog().
       mProject.save();  // can throw
     }

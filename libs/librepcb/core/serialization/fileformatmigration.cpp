@@ -82,7 +82,7 @@ QList<std::shared_ptr<FileFormatMigration>> FileFormatMigration::getMigrations(
   // LIBREPCB_UPGRADE_UNSTABLE environment variable is set to 1.
   static const bool upgradeUnstable =
       (qgetenv("LIBREPCB_UPGRADE_UNSTABLE") == "1");
-  if (upgradeUnstable && (fileFormat == qApp->getFileFormatVersion())) {
+  if (upgradeUnstable && (fileFormat == Application::getFileFormatVersion())) {
     migrations.append(std::make_shared<FileFormatMigrationUnstable>());
   }
 

@@ -78,7 +78,7 @@ void GraphicsExportWidget::PageItem::paint(
 
   const QRectF paperRect(QPointF(0, 0), getSize());
   const QRectF margins = mMargins.isEmpty() ? paperRect : mMargins;
-  QFont font = qApp->getDefaultSansSerifFont();
+  QFont font = Application::getDefaultSansSerifFont();
 
   // Draw shadow.
   painter->setClipRect(option->exposedRect);

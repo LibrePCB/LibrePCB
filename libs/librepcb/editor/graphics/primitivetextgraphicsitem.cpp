@@ -48,12 +48,12 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
     mHeight(1),
     mAlignment(HAlign::left(), VAlign::bottom()),
     mRotate180(false),
+    mFont(Application::getDefaultSansSerifFont()),
     mTextFlags(0),
     mShapeEnabled(true),
     mOnLayerEditedSlot(*this, &PrimitiveTextGraphicsItem::layerEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-  mFont = qApp->getDefaultSansSerifFont();
   updateBoundingRectAndShape();
   setVisible(false);
 }
@@ -103,10 +103,10 @@ void PrimitiveTextGraphicsItem::setAlignment(const Alignment& align) noexcept {
 void PrimitiveTextGraphicsItem::setFont(Font font) noexcept {
   switch (font) {
     case Font::SansSerif:
-      mFont = qApp->getDefaultSansSerifFont();
+      mFont = Application::getDefaultSansSerifFont();
       break;
     case Font::Monospace:
-      mFont = qApp->getDefaultMonospaceFont();
+      mFont = Application::getDefaultMonospaceFont();
       break;
     default: {
       qCritical()

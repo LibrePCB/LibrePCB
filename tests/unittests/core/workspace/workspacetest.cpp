@@ -128,12 +128,14 @@ TEST_F(WorkspaceTest, testFindDataDirectories) {
   Workspace::createNewWorkspace(mWsDir);
   EXPECT_TRUE(Workspace::findDataDirectories(mWsDir).isEmpty());
   { Workspace ws(mWsDir, "data"); }
-  EXPECT_EQ((QMap<QString, Version>{{"data", qApp->getFileFormatVersion()}}),
-            Workspace::findDataDirectories(mWsDir));
+  EXPECT_EQ(
+      (QMap<QString, Version>{{"data", Application::getFileFormatVersion()}}),
+      Workspace::findDataDirectories(mWsDir));
   { Workspace ws(mWsDir, "v0.1"); }
-  EXPECT_EQ((QMap<QString, Version>{{"data", qApp->getFileFormatVersion()},
-                                    {"v0.1", Version::fromString("0.1")}}),
-            Workspace::findDataDirectories(mWsDir));
+  EXPECT_EQ(
+      (QMap<QString, Version>{{"data", Application::getFileFormatVersion()},
+                              {"v0.1", Version::fromString("0.1")}}),
+      Workspace::findDataDirectories(mWsDir));
 }
 
 TEST_F(WorkspaceTest, testDetermineDataDirectoryEmpty) {
@@ -161,9 +163,9 @@ TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyOlderVersion) {
 }
 
 TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyCurrentVersion) {
-  QString versionedDirName = "v" % qApp->getFileFormatVersion().toStr();
+  QString versionedDirName = "v" % Application::getFileFormatVersion().toStr();
   QMap<QString, Version> dataDirs = {
-      {versionedDirName, qApp->getFileFormatVersion()},
+      {versionedDirName, Application::getFileFormatVersion()},
   };
   QString copyFromDir = "foo";
   QString copyToDir = "foo";
@@ -217,7 +219,7 @@ TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyOlderVersionInData) {
 
 TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyCurrentVersionInData) {
   QMap<QString, Version> dataDirs = {
-      {"data", qApp->getFileFormatVersion()},
+      {"data", Application::getFileFormatVersion()},
   };
   QString copyFromDir = "foo";
   QString copyToDir = "foo";
@@ -229,7 +231,7 @@ TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyCurrentVersionInData) {
 }
 
 TEST_F(WorkspaceTest, testDetermineDataDirectoryOnlyNewerVersionInData) {
-  QString versionedDirName = "v" % qApp->getFileFormatVersion().toStr();
+  QString versionedDirName = "v" % Application::getFileFormatVersion().toStr();
   QMap<QString, Version> dataDirs = {
       {"data", Version::fromString("999")},
   };
@@ -262,7 +264,7 @@ TEST_F(WorkspaceTest,
   QMap<QString, Version> dataDirs = {
       {"v0.0.1", Version::fromString("0.0.1")},
       {"v0.0.2", Version::fromString("0.0.2")},
-      {"data", qApp->getFileFormatVersion()},
+      {"data", Application::getFileFormatVersion()},
   };
   QString copyFromDir = "foo";
   QString copyToDir = "foo";

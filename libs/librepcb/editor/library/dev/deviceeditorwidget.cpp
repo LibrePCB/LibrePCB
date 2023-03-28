@@ -432,8 +432,8 @@ void DeviceEditorWidget::updatePackagePreview() noexcept {
   if (mPackage && mPackage->getFootprints().count() > 0) {
     mFootprintGraphicsItem.reset(new FootprintGraphicsItem(
         mPackage->getFootprints().first(), *mGraphicsLayerProvider,
-        qApp->getDefaultStrokeFont(), &mPackage->getPads(), mComponent.get(),
-        getLibLocaleOrder()));
+        Application::getDefaultStrokeFont(), &mPackage->getPads(),
+        mComponent.get(), getLibLocaleOrder()));
     mPackageGraphicsScene->addItem(*mFootprintGraphicsItem);
     mUi->viewPackage->zoomAll();
   }

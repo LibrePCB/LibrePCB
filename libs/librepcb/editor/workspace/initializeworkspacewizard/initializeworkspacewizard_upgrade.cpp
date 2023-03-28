@@ -44,8 +44,9 @@ InitializeWorkspaceWizard_Upgrade::InitializeWorkspaceWizard_Upgrade(
     mUi(new Ui::InitializeWorkspaceWizard_Upgrade),
     mCopyOperation() {
   mUi->setupUi(this);
-  mUi->lblTitle->setText(tr("Upgrade to LibrePCB %1")
-                             .arg(qApp->getFileFormatVersion().toStr() % ".x"));
+  mUi->lblTitle->setText(
+      tr("Upgrade to LibrePCB %1")
+          .arg(Application::getFileFormatVersion().toStr() % ".x"));
   mUi->progressBarWidget->setMinimumHeight(
       mUi->progressBar->sizeHint().height());
   setButtonText(QWizard::FinishButton, tr("Upgrade"));

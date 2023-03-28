@@ -64,7 +64,7 @@ SGI_NetLabel::SGI_NetLabel(SI_NetLabel& netlabel,
   mStaticText.setTextFormat(Qt::PlainText);
   mStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
-  mFont = qApp->getDefaultMonospaceFont();
+  mFont = Application::getDefaultMonospaceFont();
   mFont.setPixelSize(4);
 
   if (sOriginCrossLines.isEmpty()) {

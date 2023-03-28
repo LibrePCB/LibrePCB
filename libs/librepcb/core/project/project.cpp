@@ -365,8 +365,9 @@ void Project::save() {
   qDebug() << "Save project files to transactional file system...";
 
   // Version file.
-  mDirectory->write(".librepcb-project",
-                    VersionFile(qApp->getFileFormatVersion()).toByteArray());
+  mDirectory->write(
+      ".librepcb-project",
+      VersionFile(Application::getFileFormatVersion()).toByteArray());
 
   // Project file.
   mDirectory->write(mFilename, "LIBREPCB-PROJECT");
@@ -541,7 +542,7 @@ std::unique_ptr<Project> Project::create(
 
   // Populate with stroke fonts.
   TransactionalDirectory fontobeneDir(*directory, "resources/fontobene");
-  FilePath src = qApp->getResourcesFilePath("fontobene");
+  FilePath src = Application::getResourcesDir().getPathTo("fontobene");
   foreach (const FilePath& fp,
            FileUtils::getFilesInDirectory(src, {"*.bene"})) {
     if (fp.getSuffix() == "bene") {

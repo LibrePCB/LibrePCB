@@ -81,12 +81,12 @@ Board::Board(Project& project,
     mFabricationOutputSettings(new BoardFabricationOutputSettings()),
     mUuid(uuid),
     mName(name),
-    mDefaultFontFileName(qApp->getDefaultStrokeFontName()),
+    mDefaultFontFileName(Application::getDefaultStrokeFontName()),
     mGridInterval(635000),
     mGridUnit(LengthUnit::millimeters()),
     mInnerLayerCount(-1),  // Force update of setter.
     mCopperLayers(),
-    mDrcMessageApprovalsVersion(qApp->getFileFormatVersion()),
+    mDrcMessageApprovalsVersion(Application::getFileFormatVersion()),
     mDrcMessageApprovals(),
     mSupportedDrcMessageApprovals() {
   if (mDirectoryName.isEmpty()) {
@@ -208,8 +208,8 @@ bool Board::updateDrcMessageApprovals(QSet<SExpression> approvals,
   // When running the DRC the first time after a file format upgrade, remove
   // all approvals not occurring anymore to clean up obsolete approvals from
   // the board file.
-  if (mDrcMessageApprovalsVersion < qApp->getFileFormatVersion()) {
-    mDrcMessageApprovalsVersion = qApp->getFileFormatVersion();
+  if (mDrcMessageApprovalsVersion < Application::getFileFormatVersion()) {
+    mDrcMessageApprovalsVersion = Application::getFileFormatVersion();
     mDrcMessageApprovals &= approvals;
     return true;
   }

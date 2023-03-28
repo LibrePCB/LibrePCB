@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "graphicsexport.h"
 
+#include "../application.h"
 #include "../fileio/fileutils.h"
 #include "graphicsexportsettings.h"
 #include "utils/qtmetatyperegistration.h"
@@ -50,7 +51,7 @@ static QtMetaTypeRegistration<std::shared_ptr<QPicture>> sSharedPictureMetaType;
 
 GraphicsExport::GraphicsExport(QObject* parent) noexcept
   : QObject(parent),
-    mCreator(QString("LibrePCB %1").arg(qApp->applicationVersion())),
+    mCreator(QString("LibrePCB %1").arg(Application::getVersion())),
     mDocumentName(),
     mFuture(),
     mAbort(false) {

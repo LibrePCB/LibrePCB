@@ -121,7 +121,7 @@ FilePath NewProjectWizardPage_Metadata::getProjectLicenseFilePath() const
   QString licenseFileName =
       mUi->cbxLicense->currentData(Qt::UserRole).toString();
   if (!licenseFileName.isEmpty()) {
-    return qApp->getResourcesDir().getPathTo(licenseFileName);
+    return Application::getResourcesDir().getPathTo(licenseFileName);
   } else {
     return FilePath();
   }

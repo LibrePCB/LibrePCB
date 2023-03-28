@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "gerbergenerator.h"
 
+#include "../application.h"
 #include "../fileio/fileutils.h"
 #include "../geometry/circle.h"
 #include "../geometry/path.h"
@@ -50,7 +51,7 @@ GerberGenerator::GerberGenerator(const QDateTime& creationDate,
     mApertureList(new GerberApertureList()),
     mCurrentApertureNumber(-1) {
   mFileAttributes.append(GerberAttribute::fileGenerationSoftware(
-      "LibrePCB", "LibrePCB", qApp->applicationVersion()));
+      "LibrePCB", "LibrePCB", Application::getVersion()));
   mFileAttributes.append(GerberAttribute::fileCreationDate(creationDate));
   mFileAttributes.append(
       GerberAttribute::fileProjectId(projName, projUuid, projRevision));

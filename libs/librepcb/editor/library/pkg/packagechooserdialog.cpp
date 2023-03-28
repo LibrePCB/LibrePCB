@@ -230,7 +230,7 @@ void PackageChooserDialog::updatePreview(const FilePath& fp) noexcept {
       if (mPackage->getFootprints().count() > 0) {
         mGraphicsItem.reset(new FootprintGraphicsItem(
             mPackage->getFootprints().first(), *mLayerProvider,
-            qApp->getDefaultStrokeFont(), &mPackage->getPads(), nullptr,
+            Application::getDefaultStrokeFont(), &mPackage->getPads(), nullptr,
             localeOrder()));
         mGraphicsScene->addItem(*mGraphicsItem);
         mUi->graphicsView->zoomAll();

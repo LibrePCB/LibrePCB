@@ -125,7 +125,7 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   // copy readme file
   try {
     FilePath source =
-        qApp->getResourcesDir().getPathTo("project/readme_template");
+        Application::getResourcesDir().getPathTo("project/readme_template");
     QByteArray content = FileUtils::readFile(source);  // can throw
     content.replace("{PROJECT_NAME}", mPageMetadata->getProjectName().toUtf8());
     if (mPageMetadata->isLicenseSet()) {
@@ -141,7 +141,7 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   // copy .gitignore
   try {
     FilePath source =
-        qApp->getResourcesDir().getPathTo("project/gitignore_template");
+        Application::getResourcesDir().getPathTo("project/gitignore_template");
     dir.write(".gitignore", FileUtils::readFile(source));  // can throw
   } catch (Exception& e) {
     qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
@@ -149,8 +149,8 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
 
   // copy .gitattributes
   try {
-    FilePath source =
-        qApp->getResourcesDir().getPathTo("project/gitattributes_template");
+    FilePath source = Application::getResourcesDir().getPathTo(
+        "project/gitattributes_template");
     dir.write(".gitattributes", FileUtils::readFile(source));  // can throw
   } catch (Exception& e) {
     qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();

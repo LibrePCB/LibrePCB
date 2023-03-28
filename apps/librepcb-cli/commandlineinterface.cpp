@@ -66,15 +66,14 @@ namespace cli {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CommandLineInterface::CommandLineInterface(const Application& app) noexcept
-  : mApp(app) {
+CommandLineInterface::CommandLineInterface() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-int CommandLineInterface::execute() noexcept {
+int CommandLineInterface::execute(const QStringList& args) noexcept {
   QStringList positionalArgNames;
   QMap<QString, QPair<QString, QString>> commands = {
       {"open-project",
@@ -217,7 +216,6 @@ int CommandLineInterface::execute() noexcept {
          "there would be changes when saving the library elements."));
 
   // Build help text.
-  const QStringList args = mApp.arguments();
   const QString executable = args.value(0);
   QString helpText = parser.helpText() % "\n" % tr("Commands:") % "\n";
   for (auto it = commands.constBegin(); it != commands.constEnd(); ++it) {
@@ -305,13 +303,17 @@ int CommandLineInterface::execute() noexcept {
 
   // --version
   if (parser.isSet(versionOption)) {
-    print(tr("LibrePCB CLI Version %1").arg(mApp.applicationVersion()));
-    print(tr("File Format %1").arg(mApp.getFileFormatVersion().toStr()) % " " %
-          (mApp.isFileFormatStable() ? tr("(stable)") : tr("(unstable)")));
-    print(tr("Git Revision %1").arg(mApp.getGitRevision()));
+    print(tr("LibrePCB CLI Version %1").arg(Application::getVersion()));
+    print(
+        tr("File Format %1").arg(Application::getFileFormatVersion().toStr()) %
+        " " %
+        (Application::isFileFormatStable() ? tr("(stable)")
+                                           : tr("(unstable)")));
+    print(tr("Git Revision %1").arg(Application::getGitRevision()));
     print(tr("Qt Version %1 (compiled against %2)")
               .arg(qVersion(), QT_VERSION_STR));
-    print(tr("Built at %1").arg(mApp.getBuildDate().toString(Qt::LocalDate)));
+    print(tr("Built at %1")
+              .arg(Application::getBuildDate().toString(Qt::LocalDate)));
     return 0;
   }
 
@@ -1059,7 +1061,7 @@ QString CommandLineInterface::prettyPath(const FilePath& path,
 }
 
 bool CommandLineInterface::failIfFileFormatUnstable() noexcept {
-  if ((!qApp->isFileFormatStable()) &&
+  if ((!Application::isFileFormatStable()) &&
       (qgetenv("LIBREPCB_DISABLE_UNSTABLE_WARNING") != "1")) {
     printErr(
         tr("This application version is UNSTABLE! Option '%1' is disabled to "

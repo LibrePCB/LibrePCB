@@ -57,7 +57,7 @@ static int appExec() noexcept;
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
-  Application app(argc, argv);
+  QApplication app(argc, argv);
 
   // Set the organization / application names must be done very early because
   // some other classes will use these values (for example QSettings, Debug)!
@@ -74,8 +74,10 @@ int main(int argc, char* argv[]) {
   // Write some information about the application instance to the log.
   writeLogHeader();
 
-  // Install translation files. This must be done before any widget is shown.
-  app.setTranslationLocale(QLocale::system());
+  // Perform global initialization tasks. This must be done before any widget is
+  // shown.
+  Application::loadBundledFonts();
+  Application::setTranslationLocale(QLocale::system());
 
   // This is to remove the ugly frames around widgets in all status bars...
   // (from http://www.qtcentre.org/threads/1904)
@@ -100,11 +102,12 @@ int main(int argc, char* argv[]) {
  ******************************************************************************/
 
 static void setApplicationMetadata() noexcept {
-  Application::setOrganizationName("LibrePCB");
-  Application::setOrganizationDomain("librepcb.org");
-  Application::setApplicationName("LibrePCB");
+  QApplication::setOrganizationName("LibrePCB");
+  QApplication::setOrganizationDomain("librepcb.org");
+  QApplication::setApplicationName("LibrePCB");
+  QApplication::setApplicationVersion(Application::getVersion());
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 7, 0))
-  Application::setDesktopFileName("org.librepcb.LibrePCB");
+  QApplication::setDesktopFileName("org.librepcb.LibrePCB");
 #endif
 }
 
@@ -136,15 +139,16 @@ static void configureApplicationSettings() noexcept {
 static void writeLogHeader() noexcept {
   // write application name and version to log
   qInfo().noquote() << QString("LibrePCB %1 (%2)")
-                           .arg(qApp->applicationVersion(),
-                                qApp->getGitRevision());
+                           .arg(Application::getVersion(),
+                                Application::getGitRevision());
 
   // write Qt version to log
   qInfo().noquote() << QString("Qt version: %1 (compiled against %2)")
                            .arg(qVersion(), QT_VERSION_STR);
 
   // write resources directory path to log
-  qInfo() << "Resources directory:" << qApp->getResourcesDir().toNative();
+  qInfo() << "Resources directory:"
+          << Application::getResourcesDir().toNative();
 
   // write application settings directory to log (nice to know for users)
   qInfo() << "Application settings:"
@@ -186,8 +190,8 @@ static int runApplication() noexcept {
       return 0;  // User canceled -> exit application.
     } catch (const Exception& e) {
       QMessageBox::critical(
-          nullptr, Application::translate("Workspace", "Error"),
-          QString(Application::translate(
+          nullptr, QApplication::translate("Workspace", "Error"),
+          QString(QApplication::translate(
                       "Workspace", "Could not open the workspace \"%1\":"))
                   .arg(path.toNative()) %
               "\n\n" % e.getMsg());
@@ -201,7 +205,7 @@ static int runApplication() noexcept {
  ******************************************************************************/
 
 static bool isFileFormatStableOrAcceptUnstable() noexcept {
-  if (qApp->isFileFormatStable() ||
+  if (Application::isFileFormatStable() ||
       (qgetenv("LIBREPCB_DISABLE_UNSTABLE_WARNING") == "1")) {
     return true;
   } else {
@@ -256,7 +260,7 @@ static int openWorkspace(FilePath& path) {
   if (!ws.getSettings().applicationLocale.get().isEmpty()) {
     QLocale locale(ws.getSettings().applicationLocale.get());
     QLocale::setDefault(locale);
-    qApp->setTranslationLocale(locale);
+    Application::setTranslationLocale(locale);
     EditorCommandSet::instance().updateTranslations();
   }
 
@@ -297,7 +301,7 @@ static int appExec() noexcept {
   //      might already be closed. It is not safe to call a GUI related function
   //      after catching an exception."
   try {
-    return Application::exec();
+    return QApplication::exec();
   } catch (std::exception& e) {
     qFatal("UNCAUGHT EXCEPTION: %s --- PROGRAM EXITED", e.what());
   } catch (...) {

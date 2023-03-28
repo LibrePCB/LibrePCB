@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "pickplacecsvwriter.h"
 
+#include "../application.h"
 #include "../fileio/csvfile.h"
 #include "pickplacedata.h"
 
@@ -81,7 +82,7 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
             .arg(mData.getProjectName())
             .arg(mData.getProjectVersion())
             .arg(mData.getBoardName())
-            .arg(qApp->applicationVersion())
+            .arg(Application::getVersion())
             .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
             .arg(boardSideToString(mBoardSide))
             .arg(typeNames.join(", "));

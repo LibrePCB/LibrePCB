@@ -132,7 +132,7 @@ QPixmap FootprintClipboardData::generatePixmap(
   }
   for (StrokeText& text : mStrokeTexts) {
     items.append(std::make_shared<StrokeTextGraphicsItem>(
-        text, lp, qApp->getDefaultStrokeFont()));
+        text, lp, Application::getDefaultStrokeFont()));
   }
   for (Hole& hole : mHoles) {
     items.append(std::make_shared<HoleGraphicsItem>(hole, lp, false));
@@ -143,7 +143,7 @@ QPixmap FootprintClipboardData::generatePixmap(
 
 QString FootprintClipboardData::getMimeType() noexcept {
   return QString("application/x-librepcb-clipboard.footprint; version=%1")
-      .arg(qApp->applicationVersion());
+      .arg(Application::getVersion());
 }
 
 /*******************************************************************************

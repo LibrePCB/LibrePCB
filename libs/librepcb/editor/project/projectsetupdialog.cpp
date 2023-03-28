@@ -69,7 +69,7 @@ ProjectSetupDialog::ProjectSetupDialog(Project& project, UndoStack& undoStack,
 
   // Tab: Locales & Norms
   QMap<QString, QString> locales;  // Map will be sorted by key.
-  foreach (const QString& locale, qApp->getAvailableTranslationLocales()) {
+  foreach (const QString& locale, Application::getTranslationLocales()) {
     locales.insert(Toolbox::prettyPrintLocale(locale), locale);
   }
   for (auto it = locales.begin(); it != locales.end(); it++) {

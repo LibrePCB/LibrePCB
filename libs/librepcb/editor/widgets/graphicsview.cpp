@@ -78,7 +78,7 @@ GraphicsView::GraphicsView(QWidget* parent,
   setSceneRect(-2000, -2000, 4000, 4000);
 
   mInfoBoxLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-  mInfoBoxLabel->setFont(qApp->getDefaultMonospaceFont());
+  mInfoBoxLabel->setFont(Application::getDefaultMonospaceFont());
   mInfoBoxLabel->setTextFormat(Qt::RichText);
   mInfoBoxLabel->move(0, 0);
   mInfoBoxLabel->hide();
@@ -571,8 +571,8 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
             p.drawText(
                 Point(textOffset, tickPos), textRotation, textHeight,
                 (gauge.xScale != xScale) ? textAlign.mirroredH() : textAlign,
-                text, qApp->getDefaultMonospaceFont(), mOverlayContentColor,
-                false, false, 10);
+                text, Application::getDefaultMonospaceFont(),
+                mOverlayContentColor, false, false, 10);
           }
         } else {
           // Draw short tick.

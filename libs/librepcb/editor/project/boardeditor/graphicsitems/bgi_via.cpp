@@ -58,7 +58,7 @@ BGI_Via::BGI_Via(BI_Via& via, const IF_GraphicsLayerProvider& lp,
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(BoardGraphicsScene::ZValue_Vias);
 
-  mFont = qApp->getDefaultSansSerifFont();
+  mFont = Application::getDefaultSansSerifFont();
   mFont.setPixelSize(1);
 
   updatePosition();

@@ -126,8 +126,9 @@ void LibraryBaseElement::save() {
   mDirectory->write(mLongElementName % ".lp", root.toByteArray());
 
   // Version file.
-  mDirectory->write(".librepcb-" % mShortElementName,
-                    VersionFile(qApp->getFileFormatVersion()).toByteArray());
+  mDirectory->write(
+      ".librepcb-" % mShortElementName,
+      VersionFile(Application::getFileFormatVersion()).toByteArray());
 }
 
 void LibraryBaseElement::saveTo(TransactionalDirectory& dest) {
@@ -187,7 +188,7 @@ Version LibraryBaseElement::readFileFormat(
   const VersionFile versionFile =
       VersionFile::fromByteArray(directory.read(fileName));
   const Version fileFormat = versionFile.getVersion();
-  if (fileFormat > qApp->getAppVersion()) {
+  if (fileFormat > Application::getFileFormatVersion()) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("This library element was created with a newer "
                           "application version.\n"

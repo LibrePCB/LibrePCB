@@ -40,7 +40,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SymbolPainter::SymbolPainter(const Symbol& symbol) noexcept {
+SymbolPainter::SymbolPainter(const Symbol& symbol) noexcept
+  : mDefaultFont(Application::getDefaultSansSerifFont()) {
   for (const SymbolPin& pin : symbol.getPins()) {
     mPins.append(pin);
   }
@@ -96,7 +97,7 @@ void SymbolPainter::paint(QPainter& painter,
   foreach (const Text& text, mTexts) {
     const QString color = text.getLayer().getThemeColor();
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
-               text.getAlign(), text.getText(), qApp->getDefaultSansSerifFont(),
+               text.getAlign(), text.getText(), mDefaultFont,
                settings.getColor(color), true, false);
   }
 
@@ -108,7 +109,7 @@ void SymbolPainter::paint(QPainter& painter,
     p.drawText(
         pin.getPosition() + pin.getNamePosition().rotated(pin.getRotation()),
         pin.getRotation() + pin.getNameRotation(), *pin.getNameHeight(),
-        pin.getNameAlignment(), *pin.getName(), qApp->getDefaultSansSerifFont(),
+        pin.getNameAlignment(), *pin.getName(), mDefaultFont,
         settings.getColor(Theme::Color::sSchematicPinNames), true, false);
   }
 }

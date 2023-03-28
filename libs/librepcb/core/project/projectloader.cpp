@@ -111,7 +111,7 @@ std::unique_ptr<Project> ProjectLoader::open(
   qDebug().noquote() << "Detected project file format:" << fileFormat.toStr();
 
   // Check file format version.
-  if (fileFormat > qApp->getFileFormatVersion()) {
+  if (fileFormat > Application::getFileFormatVersion()) {
     throw RuntimeError(
         __FILE__, __LINE__,
         tr("This project was created with a newer application version.\n"

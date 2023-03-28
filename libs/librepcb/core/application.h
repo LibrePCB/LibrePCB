@@ -23,112 +23,172 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "fileio/filepath.h"
-#include "types/version.h"
-
-#include <QApplication>
-#include <QFont>
 #include <QtCore>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
+class FilePath;
 class StrokeFont;
 class StrokeFontPool;
-
-/*******************************************************************************
- *  Macros
- ******************************************************************************/
-#if defined(qApp)
-#undef qApp
-#endif
-#define qApp (Application::instance())
+class Version;
 
 /*******************************************************************************
  *  Class Application
  ******************************************************************************/
 
 /**
- * @brief The Application class extends the QApplication with the exception-safe
- * method #notify()
+ * @brief Static functions to access some global application configuration
  */
-class Application final : public QApplication {
-  Q_OBJECT
-
+class Application final {
 public:
   // Constructors / Destructor
   Application() = delete;
   Application(const Application& other) = delete;
-  Application(int& argc, char** argv) noexcept;
-  ~Application() noexcept;
+  ~Application() = delete;
 
   // Getters
-  const Version& getAppVersion() const noexcept { return mAppVersion; }
-  const QString& getAppVersionLabel() const noexcept {
-    return mAppVersionLabel;
-  }
-  const QString& getGitRevision() const noexcept { return mGitRevision; }
-  const QDateTime& getBuildDate() const noexcept { return mBuildDate; }
-  const QString& getBuildAuthor() const noexcept { return mBuildAuthor; }
-  const Version& getFileFormatVersion() const noexcept {
-    return mFileFormatVersion;
-  }
-  bool isFileFormatStable() const noexcept { return mIsFileFormatStable; }
-  const FilePath& getResourcesDir() const noexcept { return mResourcesDir; }
-  FilePath getResourcesFilePath(const QString& filepath) const noexcept;
-  QStringList getAvailableTranslationLocales() const noexcept;
-  const QFont& getDefaultSansSerifFont() const noexcept {
-    return mSansSerifFont;
-  }
-  const QFont& getDefaultMonospaceFont() const noexcept {
-    return mMonospaceFont;
-  }
-  const StrokeFontPool& getStrokeFonts() const noexcept {
-    return *mStrokeFontPool;
-  }
-  QString getDefaultStrokeFontName() const noexcept { return "newstroke.bene"; }
-  const StrokeFont& getDefaultStrokeFont() const noexcept;
 
-  // Setters
-  void setTranslationLocale(const QLocale& locale) noexcept;
+  /**
+   * @brief Get the application version
+   *
+   * @note This function is thread-safe.
+   *
+   * @return Version string (e.g. "0.2.0-unstable")
+   */
+  static QString getVersion() noexcept;
 
-  // Reimplemented from QApplication
-  bool notify(QObject* receiver, QEvent* e);
+  /**
+   * @brief Get the git revision of the sources used to build the application
+   *
+   * @note This function is thread-safe.
+   *
+   * @return Revision hash (might be empty)
+   */
+  static QString getGitRevision() noexcept;
+
+  /**
+   * @brief Get the date/time when the application was built
+   *
+   * @note This function is thread-safe.
+   *
+   * @return Date/time (might be invalid)
+   */
+  static QDateTime getBuildDate() noexcept;
+
+  /**
+   * @brief Get the author who has built the application
+   *
+   * @note This function is thread-safe.
+   *
+   * @return Author (e.g. "LibrePCB CI"; might be empty)
+   */
+  static QString getBuildAuthor() noexcept;
+
+  /**
+   * @brief Get the used file format version
+   *
+   * @note This function is thread-safe.
+   *
+   * @return File format version number
+   */
+  static const Version& getFileFormatVersion() noexcept;
+
+  /**
+   * @brief Check whether the used file format is stable
+   *
+   * @note This function is thread-safe.
+   *
+   * @retval true Stable
+   * @retval false Unstable
+   */
+  static bool isFileFormatStable() noexcept;
+
+  /**
+   * @brief Get the path to the resources directory
+   *
+   * @note This function is thread-safe.
+   *
+   * @return Guaranteed valid file path (e.g. "/usr/share/librepcb/")
+   */
+  static const FilePath& getResourcesDir() noexcept;
+
+  /**
+   * @brief Get all available translation locales
+   *
+   * @return Locales like "de_CH"
+   */
+  static QStringList getTranslationLocales() noexcept;
+
+  /**
+   * @brief Get the default sans serif font
+   *
+   * Font to be used e.g. in schematics.
+   *
+   * @warning This function is not thread-safe!
+   *
+   * @return Reference to font object
+   */
+  static const QFont& getDefaultSansSerifFont() noexcept;
+
+  /**
+   * @brief Get the default monospace font
+   *
+   * Font to be used e.g. in schematics.
+   *
+   * @warning This function is not thread-safe!
+   *
+   * @return Reference to font object
+   */
+  static const QFont& getDefaultMonospaceFont() noexcept;
+
+  /**
+   * @brief Get all globally available stroke fonts
+   *
+   * @note This function is thread-safe.
+   *
+   * @return Reference to stroke font pool
+   */
+  static const StrokeFontPool& getStrokeFonts() noexcept;
+
+  /**
+   * @brief Get the default stroke font
+   *
+   * @note This function is thread-safe.
+   *
+   * @return Reference to stroke font
+   */
+  static const StrokeFont& getDefaultStrokeFont() noexcept;
+
+  /**
+   * @brief Get the name of the default stroke font
+   *
+   * @note This function is thread-safe.
+   *
+   * @return Name of the default stroke font
+   */
+  static QString getDefaultStrokeFontName() noexcept;
+
+  // General Methods
+
+  /**
+   * @brief Load all bundled fonts to make them available in the application
+   *
+   * To be called once at application startup.
+   */
+  static void loadBundledFonts() noexcept;
+
+  /**
+   * @brief Install all translators for a given locale
+   *
+   * @param locale    Locale to use for translated strings.
+   */
+  static void setTranslationLocale(const QLocale& locale) noexcept;
 
   // Operator Overloadings
   Application& operator=(const Application& rhs) = delete;
-
-  // Static Methods
-  static Application* instance() noexcept;
-
-private:  // Methods
-  void removeAllTranslators() noexcept;
-
-private:  // Data
-  Version mAppVersion;
-  QString mAppVersionLabel;
-  QString mGitRevision;
-  QDateTime mBuildDate;
-  QString mBuildAuthor;
-  Version mFileFormatVersion;
-  bool mIsFileFormatStable;
-  FilePath mResourcesDir;
-
-  /// Pool containing all application stroke fonts
-  QScopedPointer<StrokeFontPool> mStrokeFontPool;
-
-  /// Default sans serif font
-  QFont mSansSerifFont;
-
-  /// Default monospace font
-  QFont mMonospaceFont;
-
-  /// All currently installed translators
-  QList<std::shared_ptr<QTranslator>> mTranslators;
 };
 
 /*******************************************************************************

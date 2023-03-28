@@ -52,7 +52,10 @@ namespace librepcb {
  ******************************************************************************/
 
 SchematicPainter::SchematicPainter(const Schematic& schematic,
-                                   bool thumbnail) noexcept {
+                                   bool thumbnail) noexcept
+  : mDefaultFont(Application::getDefaultSansSerifFont()),
+    mNetLabelFont(Application::getDefaultMonospaceFont()) {
+  mDefaultFont.setPixelSize(4);
   foreach (const SI_Symbol* symbol, schematic.getSymbols()) {
     Symbol sym;
     sym.transform = Transform(*symbol);
@@ -171,8 +174,7 @@ void SchematicPainter::paint(QPainter& painter,
       p.drawText(symbol.transform.map(pin.position +
                                       pin.namePosition.rotated(pin.rotation)),
                  symbol.transform.map(pin.rotation + pin.nameRotation),
-                 *pin.nameHeight, nameAlignment, pin.name,
-                 qApp->getDefaultSansSerifFont(),
+                 *pin.nameHeight, nameAlignment, pin.name, mDefaultFont,
                  settings.getColor(Theme::Color::sSchematicPinNames), true,
                  false);
     }
@@ -190,7 +192,7 @@ void SchematicPainter::paint(QPainter& painter,
   foreach (const Text& text, mTexts) {
     const QString color = text.getLayer().getThemeColor();
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
-               text.getAlign(), text.getText(), qApp->getDefaultSansSerifFont(),
+               text.getAlign(), text.getText(), mDefaultFont,
                settings.getColor(color), true, false);
   }
 
@@ -207,10 +209,8 @@ void SchematicPainter::paint(QPainter& painter,
 
   // Draw Net Labels.
   foreach (const Label& netlabel, mNetLabels) {
-    QFont font = qApp->getDefaultMonospaceFont();
-    font.setPixelSize(4);
     p.drawNetLabel(netlabel.position, netlabel.rotation, netlabel.mirrored,
-                   netlabel.text, font,
+                   netlabel.text, mNetLabelFont,
                    settings.getColor(Theme::Color::sSchematicNetLabels));
   }
 }

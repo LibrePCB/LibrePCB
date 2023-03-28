@@ -416,7 +416,7 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(
             mSelectedPackage->getFootprints().find(*mSelectedFootprintUuid)) {
       mPreviewGraphicsItem.reset(new FootprintGraphicsItem(
           footprint, *mGraphicsLayerProvider.data(),
-          qApp->getDefaultStrokeFont(), &mSelectedPackage->getPads(),
+          Application::getDefaultStrokeFont(), &mSelectedPackage->getPads(),
           &mSelectedComponent->getLibComponent(), mProject.getLocaleOrder()));
       mPreviewGraphicsScene->addItem(*mPreviewGraphicsItem);
       mUi->graphicsView->zoomAll();

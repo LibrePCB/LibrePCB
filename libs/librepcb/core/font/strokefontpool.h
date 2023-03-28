@@ -53,6 +53,7 @@ public:
   ~StrokeFontPool() noexcept;
 
   // Getters
+  bool exists(const QString& filename) const noexcept;
   const StrokeFont& getFont(const QString& filename) const;
 
   // Operator Overloadings

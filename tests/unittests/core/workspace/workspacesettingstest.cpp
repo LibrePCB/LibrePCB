@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
+#include <librepcb/core/types/version.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
@@ -113,7 +114,7 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
       FilePath());
 
   WorkspaceSettings obj;
-  obj.load(root, qApp->getFileFormatVersion());
+  obj.load(root, Application::getFileFormatVersion());
   EXPECT_EQ("Foo Bar", obj.userName.get());
   EXPECT_EQ("de_CH", obj.applicationLocale.get());
   EXPECT_EQ(LengthUnit::micrometers(), obj.defaultLengthUnit.get());
@@ -152,7 +153,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
 
   // Load
   WorkspaceSettings obj2;
-  obj2.load(root1, qApp->getFileFormatVersion());
+  obj2.load(root1, Application::getFileFormatVersion());
   EXPECT_EQ(obj1.userName.get().toStdString(),
             obj2.userName.get().toStdString());
   EXPECT_EQ(obj1.applicationLocale.get().toStdString(),
@@ -203,7 +204,7 @@ TEST_F(WorkspaceSettingsTest, testSaveOnlyModifiedSettings) {
       FilePath());
 
   WorkspaceSettings obj;
-  obj.load(root, qApp->getFileFormatVersion());
+  obj.load(root, Application::getFileFormatVersion());
   EXPECT_EQ(1234U, obj.projectAutosaveIntervalSeconds.get());
   obj.projectAutosaveIntervalSeconds.set(42);
   const SExpression root2 = obj.serialize();
@@ -247,7 +248,7 @@ TEST_F(WorkspaceSettingsTest, testRestoreDefaultsClearsFile) {
       FilePath());
 
   WorkspaceSettings obj;
-  obj.load(root, qApp->getFileFormatVersion());
+  obj.load(root, Application::getFileFormatVersion());
   obj.restoreDefaults();
   const SExpression root2 = obj.serialize();
 

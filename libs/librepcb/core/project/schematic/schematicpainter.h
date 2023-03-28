@@ -99,6 +99,8 @@ public:
   SchematicPainter& operator=(const SchematicPainter& rhs) = delete;
 
 private:  // Data
+  QFont mDefaultFont;
+  QFont mNetLabelFont;
   QList<Symbol> mSymbols;
   QList<Point> mJunctions;
   QList<Line> mNetLines;
