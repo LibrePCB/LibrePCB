@@ -49,7 +49,6 @@ class ComponentSymbolVariantItemListModel final : public QAbstractTableModel {
 
 public:
   enum Column {
-    COLUMN_NUMBER,
     COLUMN_SYMBOL,
     COLUMN_SUFFIX,
     COLUMN_ISREQUIRED,

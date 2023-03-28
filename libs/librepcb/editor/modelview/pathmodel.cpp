@@ -213,15 +213,6 @@ QVariant PathModel::headerData(int section, Qt::Orientation orientation,
       return tr("Add a new vertex");
     } else if (role == Qt::TextAlignmentRole) {
       return QVariant(Qt::AlignRight | Qt::AlignVCenter);
-    } else if (role == Qt::FontRole) {
-      // Actually we don't show UUIDs in the vertical header, thus monospace
-      // font is not needed. However, it seems that the table rows are less
-      // high if the font is set to monospace, so the tables are more compact.
-      QFont f = QAbstractTableModel::headerData(section, orientation, role)
-                    .value<QFont>();
-      f.setStyleHint(QFont::Monospace);
-      f.setFamily("Monospace");
-      return f;
     }
   }
   return QVariant();

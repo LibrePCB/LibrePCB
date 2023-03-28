@@ -53,6 +53,7 @@ PadSignalMapEditorWidget::PadSignalMapEditorWidget(QWidget* parent) noexcept
   mView->setEditTriggers(QAbstractItemView::AllEditTriggers);
   mView->setSortingEnabled(true);
   mView->setWordWrap(false);  // avoid too high cells due to word wrap
+  mView->verticalHeader()->setVisible(false);  // no content
   mView->verticalHeader()->setMinimumSectionSize(10);  // more compact rows
   mView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
   mView->horizontalHeader()->setSectionResizeMode(

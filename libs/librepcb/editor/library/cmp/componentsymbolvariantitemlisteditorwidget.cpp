@@ -55,9 +55,6 @@ ComponentSymbolVariantItemListEditorWidget::
       ComponentSymbolVariantItemListModel::COLUMN_SYMBOL);
   mView->setModel(mModel.data());
   mView->horizontalHeader()->setSectionResizeMode(
-      ComponentSymbolVariantItemListModel::COLUMN_NUMBER,
-      QHeaderView::ResizeToContents);
-  mView->horizontalHeader()->setSectionResizeMode(
       ComponentSymbolVariantItemListModel::COLUMN_SYMBOL, QHeaderView::Stretch);
   mView->horizontalHeader()->setSectionResizeMode(
       ComponentSymbolVariantItemListModel::COLUMN_SUFFIX,

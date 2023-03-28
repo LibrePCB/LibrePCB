@@ -236,14 +236,6 @@ QVariant ComponentSymbolVariantItemListModel::data(const QModelIndex& index,
   std::shared_ptr<ComponentSymbolVariantItem> item =
       mItemList->value(index.row());
   switch (index.column()) {
-    case COLUMN_NUMBER: {
-      switch (role) {
-        case Qt::DisplayRole:
-          return index.row() + 1;
-        default:
-          return QVariant();
-      }
-    }
     case COLUMN_SYMBOL: {
       std::shared_ptr<const Symbol> symbol;
       tl::optional<Uuid> uuid = item ? item->getSymbolUuid() : mNewSymbolUuid;
@@ -353,8 +345,6 @@ QVariant ComponentSymbolVariantItemListModel::headerData(
   if (orientation == Qt::Horizontal) {
     if (role == Qt::DisplayRole) {
       switch (section) {
-        case COLUMN_NUMBER:
-          return "#";
         case COLUMN_SYMBOL:
           return tr("Symbol");
         case COLUMN_SUFFIX:
@@ -375,19 +365,13 @@ QVariant ComponentSymbolVariantItemListModel::headerData(
     if (mItemList && (role == Qt::DisplayRole)) {
       std::shared_ptr<ComponentSymbolVariantItem> item =
           mItemList->value(section);
-      return item ? item->getUuid().toStr().left(8) : tr("New:");
+      return item ? QString::number(section + 1) : tr("New:");
     } else if (mItemList && (role == Qt::ToolTipRole)) {
       std::shared_ptr<ComponentSymbolVariantItem> item =
           mItemList->value(section);
       return item ? item->getUuid().toStr() : tr("Add a new symbol");
     } else if (role == Qt::TextAlignmentRole) {
       return QVariant(Qt::AlignRight | Qt::AlignVCenter);
-    } else if (role == Qt::FontRole) {
-      QFont f = QAbstractTableModel::headerData(section, orientation, role)
-                    .value<QFont>();
-      f.setStyleHint(QFont::Monospace);  // ensure fixed column width
-      f.setFamily("Monospace");
-      return f;
     }
   }
   return QVariant();
