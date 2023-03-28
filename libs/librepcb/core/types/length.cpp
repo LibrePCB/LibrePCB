@@ -23,6 +23,7 @@
 #include "length.h"
 
 #include "../serialization/sexpression.h"
+#include "../utils/qtmetatyperegistration.h"
 #include "../utils/toolbox.h"
 
 #include <type_traits>
@@ -35,6 +36,9 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+// Register Qt meta types.
+static QtMetaTypeRegistration<Length> sMetaType;
 
 /*******************************************************************************
  *  Conversions

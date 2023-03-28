@@ -23,6 +23,7 @@
 #include "point.h"
 
 #include "../serialization/sexpression.h"
+#include "../utils/qtmetatyperegistration.h"
 #include "angle.h"
 
 #include <QtCore>
@@ -31,6 +32,9 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+// Register Qt meta type.
+static QtMetaTypeRegistration<Point> sMetaType;
 
 /*******************************************************************************
  *  Class Point

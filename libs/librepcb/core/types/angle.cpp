@@ -23,6 +23,7 @@
 #include "angle.h"
 
 #include "../serialization/sexpression.h"
+#include "../utils/qtmetatyperegistration.h"
 #include "../utils/toolbox.h"
 
 #include <QtCore>
@@ -31,6 +32,9 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+// Register Qt meta type.
+static QtMetaTypeRegistration<Angle> sMetaType;
 
 /*******************************************************************************
  *  Class Angle

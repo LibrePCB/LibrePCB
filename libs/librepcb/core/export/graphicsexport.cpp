@@ -24,6 +24,7 @@
 
 #include "../fileio/fileutils.h"
 #include "graphicsexportsettings.h"
+#include "utils/qtmetatyperegistration.h"
 
 #include <QtConcurrent>
 #include <QtCore>
@@ -39,6 +40,10 @@ Q_DECLARE_METATYPE(std::shared_ptr<QPicture>)
  ******************************************************************************/
 namespace librepcb {
 
+// Register Qt meta types.
+static QtMetaTypeRegistration<QImage> sImageMetaType;
+static QtMetaTypeRegistration<std::shared_ptr<QPicture>> sSharedPictureMetaType;
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -49,8 +54,6 @@ GraphicsExport::GraphicsExport(QObject* parent) noexcept
     mDocumentName(),
     mFuture(),
     mAbort(false) {
-  qRegisterMetaType<QImage>();
-  qRegisterMetaType<std::shared_ptr<QPicture>>();
   connect(this, &GraphicsExport::imageCopiedToClipboard, qApp->clipboard(),
           &QClipboard::setImage, Qt::BlockingQueuedConnection);
 }

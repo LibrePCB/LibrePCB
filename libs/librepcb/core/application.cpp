@@ -25,9 +25,6 @@
 #include "build_env.h"
 #include "fileio/transactionalfilesystem.h"
 #include "font/strokefontpool.h"
-#include "types/angle.h"
-#include "types/length.h"
-#include "types/point.h"
 
 #include <QtCore>
 
@@ -50,12 +47,6 @@ Application::Application(int& argc, char** argv) noexcept
     mBuildAuthor(LIBREPCB_BUILD_AUTHOR),
     mFileFormatVersion(Version::fromString(LIBREPCB_FILE_FORMAT_VERSION)),
     mIsFileFormatStable(LIBREPCB_FILE_FORMAT_STABLE) {
-  // register meta types
-  qRegisterMetaType<FilePath>();
-  qRegisterMetaType<Point>();
-  qRegisterMetaType<Length>();
-  qRegisterMetaType<Angle>();
-
   // set application version
   QApplication::setApplicationVersion(LIBREPCB_APP_VERSION);
 
