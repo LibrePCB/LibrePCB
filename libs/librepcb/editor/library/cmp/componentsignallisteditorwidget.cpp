@@ -45,6 +45,7 @@ ComponentSignalListEditorWidget::ComponentSignalListEditorWidget(
     mModel(new ComponentSignalListModel(this)),
     mProxy(new SortFilterProxyModel(this)),
     mView(new EditableTableWidget(this)) {
+  mProxy->setKeepHeaderColumnUnsorted(true);
   mProxy->setKeepLastRowAtBottom(true);
   mProxy->setSourceModel(mModel.data());
   mView->setModel(mProxy.data());

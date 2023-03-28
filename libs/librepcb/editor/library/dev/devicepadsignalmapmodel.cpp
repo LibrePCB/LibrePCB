@@ -171,24 +171,6 @@ QVariant DevicePadSignalMapModel::headerData(int section,
           return tr("Component Signal");
       }
     }
-  } else if (orientation == Qt::Vertical) {
-    if (mPadSignalMap && (role == Qt::DisplayRole)) {
-      std::shared_ptr<DevicePadSignalMapItem> item =
-          mPadSignalMap->value(section);
-      return item ? item->getPadUuid().toStr().left(8) : QVariant();
-    } else if (mPadSignalMap && (role == Qt::ToolTipRole)) {
-      std::shared_ptr<DevicePadSignalMapItem> item =
-          mPadSignalMap->value(section);
-      return item ? item->getPadUuid().toStr() : QVariant();
-    } else if (role == Qt::TextAlignmentRole) {
-      return QVariant(Qt::AlignRight | Qt::AlignVCenter);
-    } else if (role == Qt::FontRole) {
-      QFont f = QAbstractTableModel::headerData(section, orientation, role)
-                    .value<QFont>();
-      f.setStyleHint(QFont::Monospace);  // ensure fixed column width
-      f.setFamily("Monospace");
-      return f;
-    }
   }
   return QVariant();
 }

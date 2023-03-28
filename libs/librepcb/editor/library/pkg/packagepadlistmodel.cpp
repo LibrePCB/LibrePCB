@@ -197,18 +197,12 @@ QVariant PackagePadListModel::headerData(int section,
   } else if (orientation == Qt::Vertical) {
     if (mPadList && (role == Qt::DisplayRole)) {
       std::shared_ptr<PackagePad> item = mPadList->value(section);
-      return item ? item->getUuid().toStr().left(8) : tr("New:");
+      return item ? QString::number(section + 1) : tr("New:");
     } else if (mPadList && (role == Qt::ToolTipRole)) {
       std::shared_ptr<PackagePad> item = mPadList->value(section);
       return item ? item->getUuid().toStr() : tr("Add a new pad");
     } else if (role == Qt::TextAlignmentRole) {
       return QVariant(Qt::AlignRight | Qt::AlignVCenter);
-    } else if (role == Qt::FontRole) {
-      QFont f = QAbstractTableModel::headerData(section, orientation, role)
-                    .value<QFont>();
-      f.setStyleHint(QFont::Monospace);  // ensure fixed column width
-      f.setFamily("Monospace");
-      return f;
     }
   }
   return QVariant();

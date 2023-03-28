@@ -232,18 +232,12 @@ QVariant ComponentSignalListModel::headerData(int section,
   } else if (orientation == Qt::Vertical) {
     if (mSignalList && (role == Qt::DisplayRole)) {
       std::shared_ptr<ComponentSignal> item = mSignalList->value(section);
-      return item ? item->getUuid().toStr().left(8) : tr("New:");
+      return item ? QString::number(section + 1) : tr("New:");
     } else if (mSignalList && (role == Qt::ToolTipRole)) {
       std::shared_ptr<ComponentSignal> item = mSignalList->value(section);
       return item ? item->getUuid().toStr() : tr("Add a new signal");
     } else if (role == Qt::TextAlignmentRole) {
       return QVariant(Qt::AlignRight | Qt::AlignVCenter);
-    } else if (role == Qt::FontRole) {
-      QFont f = QAbstractTableModel::headerData(section, orientation, role)
-                    .value<QFont>();
-      f.setStyleHint(QFont::Monospace);  // ensure fixed column width
-      f.setFamily("Monospace");
-      return f;
     }
   }
   return QVariant();

@@ -54,9 +54,16 @@ public:
   virtual ~SortFilterProxyModel() noexcept;
 
   // Setters
+  void setKeepHeaderColumnUnsorted(bool keep) noexcept {
+    mKeepHeaderColumnUnsorted = keep;
+  }
   void setKeepLastRowAtBottom(bool keep) noexcept {
     mKeepLastRowAtBottom = keep;
   }
+
+  // Inherited from QAbstractItemModel
+  QVariant headerData(int section, Qt::Orientation orientation,
+                      int role = Qt::DisplayRole) const override;
 
   // Operator Overloadings
   SortFilterProxyModel& operator=(const SortFilterProxyModel& rhs) noexcept;
@@ -67,6 +74,7 @@ protected:
 
 private:
   QCollator mCollator;
+  bool mKeepHeaderColumnUnsorted;
   bool mKeepLastRowAtBottom;
 };
 

@@ -273,19 +273,13 @@ QVariant ComponentSymbolVariantListModel::headerData(
     if (mSymbolVariantList && (role == Qt::DisplayRole)) {
       std::shared_ptr<ComponentSymbolVariant> item =
           mSymbolVariantList->value(section);
-      return item ? item->getUuid().toStr().left(8) : tr("New:");
+      return item ? QString::number(section + 1) : tr("New:");
     } else if (mSymbolVariantList && (role == Qt::ToolTipRole)) {
       std::shared_ptr<ComponentSymbolVariant> item =
           mSymbolVariantList->value(section);
       return item ? item->getUuid().toStr() : tr("Add a new symbol variant");
     } else if (role == Qt::TextAlignmentRole) {
       return QVariant(Qt::AlignRight | Qt::AlignVCenter);
-    } else if (role == Qt::FontRole) {
-      QFont f = QAbstractTableModel::headerData(section, orientation, role)
-                    .value<QFont>();
-      f.setStyleHint(QFont::Monospace);  // ensure fixed column width
-      f.setFamily("Monospace");
-      return f;
     }
   }
   return QVariant();

@@ -35,7 +35,10 @@ namespace editor {
  ******************************************************************************/
 
 SortFilterProxyModel::SortFilterProxyModel(QObject* parent) noexcept
-  : QSortFilterProxyModel(parent), mCollator(), mKeepLastRowAtBottom(false) {
+  : QSortFilterProxyModel(parent),
+    mCollator(),
+    mKeepHeaderColumnUnsorted(false),
+    mKeepLastRowAtBottom(false) {
   mCollator.setCaseSensitivity(Qt::CaseInsensitive);
   mCollator.setIgnorePunctuation(false);
   mCollator.setNumericMode(true);
@@ -45,15 +48,30 @@ SortFilterProxyModel::~SortFilterProxyModel() noexcept {
 }
 
 /*******************************************************************************
+ *  Public Methods
+ ******************************************************************************/
+
+QVariant SortFilterProxyModel::headerData(int section,
+                                          Qt::Orientation orientation,
+                                          int role) const {
+  QAbstractItemModel* model = sourceModel();
+  if (mKeepHeaderColumnUnsorted && model && (orientation == Qt::Vertical)) {
+    return model->headerData(section, orientation, role);
+  }
+  return QSortFilterProxyModel::headerData(section, orientation, role);
+}
+
+/*******************************************************************************
  *  Protected Methods
  ******************************************************************************/
 
 bool SortFilterProxyModel::lessThan(const QModelIndex& source_left,
                                     const QModelIndex& source_right) const {
-  if (sourceModel() && mKeepLastRowAtBottom) {
-    if (source_left.row() == sourceModel()->rowCount() - 1) {
+  QAbstractItemModel* model = sourceModel();
+  if (mKeepLastRowAtBottom && model) {
+    if (source_left.row() == model->rowCount() - 1) {
       return sortOrder() == Qt::DescendingOrder;
-    } else if (source_right.row() == sourceModel()->rowCount() - 1) {
+    } else if (source_right.row() == model->rowCount() - 1) {
       return sortOrder() == Qt::AscendingOrder;
     }
   }
