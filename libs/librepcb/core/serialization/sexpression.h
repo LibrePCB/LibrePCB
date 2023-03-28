@@ -26,7 +26,6 @@
 #include "../fileio/filepath.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

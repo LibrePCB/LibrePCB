@@ -29,7 +29,7 @@
 #include <type_safe/constrained_type.hpp>
 
 #include <QtCore>
-#include <QtWidgets>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

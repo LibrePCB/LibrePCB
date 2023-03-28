@@ -33,7 +33,6 @@
 #include "../../types/version.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 

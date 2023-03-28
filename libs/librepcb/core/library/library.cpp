@@ -34,7 +34,6 @@
 #include "sym/symbol.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace

@@ -26,6 +26,7 @@
 #include <librepcb/core/debug.h>
 
 #include <QtCore>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace
@@ -49,14 +50,14 @@ int main(int argc, char* argv[]) {
   Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Fatal);
 
   // Create Application instance
-  QApplication app(argc, argv);
+  QGuiApplication app(argc, argv);
 
   // Set the organization / application names must be done very early because
   // some other classes will use these values (for example QSettings, Debug)!
-  QApplication::setOrganizationName("LibrePCB");
-  QApplication::setOrganizationDomain("librepcb.org");
-  QApplication::setApplicationName("LibrePCB CLI");
-  QApplication::setApplicationVersion(Application::getVersion());
+  QGuiApplication::setOrganizationName("LibrePCB");
+  QGuiApplication::setOrganizationDomain("librepcb.org");
+  QGuiApplication::setApplicationName("LibrePCB CLI");
+  QGuiApplication::setApplicationVersion(Application::getVersion());
 
   // Perform global initialization tasks. This must be done before any widget is
   // shown.

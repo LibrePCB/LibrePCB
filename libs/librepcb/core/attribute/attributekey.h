@@ -52,8 +52,8 @@ struct AttributeKeyVerifier {
         ? std::forward<Value>(val)
         : (throw RuntimeError(
                __FILE__, __LINE__,
-               QString(QApplication::translate("AttributeKey",
-                                               "Invalid attribute key: '%1'"))
+               QString(QCoreApplication::translate(
+                           "AttributeKey", "Invalid attribute key: '%1'"))
                    .arg(val)),
            std::forward<Value>(val));
   }

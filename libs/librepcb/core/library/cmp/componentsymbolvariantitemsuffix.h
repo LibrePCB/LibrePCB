@@ -54,7 +54,7 @@ struct ComponentSymbolVariantItemSuffixVerifier {
     return p(val) ? std::forward<Value>(val)
                   : (throw RuntimeError(
                          __FILE__, __LINE__,
-                         QString(QApplication::translate(
+                         QString(QCoreApplication::translate(
                                      "ComponentSymbolVariantItemSuffix",
                                      "Invalid component symbol suffix: '%1'"))
                              .arg(val)),

@@ -36,7 +36,6 @@
 #include "../../types/uuid.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

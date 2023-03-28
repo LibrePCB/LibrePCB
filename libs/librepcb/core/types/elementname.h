@@ -58,7 +58,7 @@ struct ElementNameVerifier {
     return p(val)
         ? std::forward<Value>(val)
         : (throw RuntimeError(__FILE__, __LINE__,
-                              QString(QApplication::translate(
+                              QString(QCoreApplication::translate(
                                           "ElementName", "Invalid name: '%1'"))
                                   .arg(val)),
            std::forward<Value>(val));

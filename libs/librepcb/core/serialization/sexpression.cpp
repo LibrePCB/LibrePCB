@@ -25,6 +25,7 @@
 #include "../exceptions.h"
 
 #include <QtCore>
+#include <QtGui>
 
 #include <algorithm>
 

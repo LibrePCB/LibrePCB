@@ -27,7 +27,6 @@
 #include "../serialization/sexpression.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 

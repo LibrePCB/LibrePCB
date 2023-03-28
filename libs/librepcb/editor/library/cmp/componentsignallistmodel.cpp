@@ -29,6 +29,7 @@
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace

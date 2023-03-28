@@ -31,7 +31,7 @@
 #include <type_traits>
 
 #include <QtCore>
-#include <QtWidgets>
+#include <QtGui>
 
 #include <algorithm>
 

@@ -30,6 +30,7 @@
 #include <librepcb/editor/workspace/categorytreemodel.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace

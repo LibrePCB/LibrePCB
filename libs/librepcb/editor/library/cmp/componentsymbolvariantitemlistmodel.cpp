@@ -30,6 +30,7 @@
 #include <librepcb/core/library/sym/symbol.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace

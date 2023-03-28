@@ -23,6 +23,7 @@
 #include "pathmodel.h"
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace

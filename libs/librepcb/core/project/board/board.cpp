@@ -54,7 +54,6 @@
 #include "items/bi_via.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <algorithm>
 
