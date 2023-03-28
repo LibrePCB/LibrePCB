@@ -353,11 +353,36 @@ QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(const Layer& layer) const
   QList<PadGeometry> result;
   tl::optional<Length> offset;
   if (layer.isStopMask()) {
-    offset = *mBoard.getDesignRules().getStopMaskClearance().calcValue(
-        *getSizeForMaskOffsetCalculaton());
-  } else if ((!mFootprintPad->isTht()) && (layer.isSolderPaste())) {
-    offset = -mBoard.getDesignRules().getSolderPasteClearance().calcValue(
-        *getSizeForMaskOffsetCalculaton());
+    const MaskConfig& cfg = mFootprintPad->getStopMaskConfig();
+    const bool isThtSolderSide =
+        (layer.isTop() ==
+         (getComponentSide() == FootprintPad::ComponentSide::Bottom));
+    const bool autoAnnularRing =
+        mBoard.getDesignRules().getPadCmpSideAutoAnnularRing();
+    if (cfg.isEnabled() && cfg.getOffset() &&
+        ((!mFootprintPad->isTht()) || isThtSolderSide || (!autoAnnularRing))) {
+      // Use offset configured in pad.
+      offset = *cfg.getOffset();
+    } else if (cfg.isEnabled()) {
+      // Use offset from design rules.
+      offset = *mBoard.getDesignRules().getStopMaskClearance().calcValue(
+          *getSizeForMaskOffsetCalculaton());
+    }
+  } else if (layer.isSolderPaste()) {
+    const MaskConfig& cfg = mFootprintPad->getSolderPasteConfig();
+    const bool isThtSolderSide =
+        (layer.isTop() ==
+         (getComponentSide() == FootprintPad::ComponentSide::Bottom));
+    if (cfg.isEnabled() && ((!mFootprintPad->isTht()) || isThtSolderSide)) {
+      if (const tl::optional<Length>& manualOffset = cfg.getOffset()) {
+        // Use offset configured in pad.
+        offset = -(*manualOffset);
+      } else {
+        // Use offset from design rules.
+        offset = -mBoard.getDesignRules().getSolderPasteClearance().calcValue(
+            *getSizeForMaskOffsetCalculaton());
+      }
+    }
   }
   if (offset) {
     const Layer& copperLayer =

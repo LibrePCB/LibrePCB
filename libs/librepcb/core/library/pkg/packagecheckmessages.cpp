@@ -337,6 +337,91 @@ MsgPadOverlapsWithPlacement::MsgPadOverlapsWithPlacement(
 }
 
 /*******************************************************************************
+ *  MsgPadWithoutStopMask
+ ******************************************************************************/
+
+MsgPadWithoutStopMask::MsgPadWithoutStopMask(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("No stop mask on pad '%1' in '%2'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("There's no stop mask opening enabled on the pad, so the copper "
+           "pad will be covered by solder resist and is thus not functional. "
+           "This is very unusual, you should double-check if this is really "
+           "what you want."),
+        "pad_without_stop_mask"),
+    mFootprint(footprint),
+    mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+MsgPadWithoutStopMask::~MsgPadWithoutStopMask() noexcept {
+}
+
+/*******************************************************************************
+ *  MsgSmtPadWithoutSolderPaste
+ ******************************************************************************/
+
+MsgSmtPadWithoutSolderPaste::MsgSmtPadWithoutSolderPaste(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("No solder paste on SMT pad '%1' in '%2'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("The SMT pad has no solder paste enabled, which is unusual since "
+           "without solder paste the pad cannot be reflow soldered. Only use "
+           "this if there's no lead to be soldered on that pad, or if you have "
+           "drawn a manual solder paste area."),
+        "smt_pad_without_solder_paste"),
+    mFootprint(footprint),
+    mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+MsgSmtPadWithoutSolderPaste::~MsgSmtPadWithoutSolderPaste() noexcept {
+}
+
+/*******************************************************************************
+ *  MsgThtPadWithSolderPaste
+ ******************************************************************************/
+
+MsgThtPadWithSolderPaste::MsgThtPadWithSolderPaste(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Solder paste on THT pad '%1' in '%2'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("The THT pad has solder paste enabled, which is very unusual since "
+           "through-hole components are usually not reflow soldered. Also the "
+           "solder paste could flow into the pads hole, possibly causing "
+           "troubles during THT assembly. Double-check if this is really what "
+           "you want."),
+        "tht_pad_with_solder_paste"),
+    mFootprint(footprint),
+    mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+MsgThtPadWithSolderPaste::~MsgThtPadWithSolderPaste() noexcept {
+}
+
+/*******************************************************************************
  *  MsgUnusedCustomPadOutline
  ******************************************************************************/
 

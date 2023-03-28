@@ -85,6 +85,8 @@ private:  // Methods
   void removeAllHoles() noexcept;
   void updateGeneralTabHoleWidgets() noexcept;
   void setSelectedHole(int index) noexcept;
+  void applyTypicalThtProperties() noexcept;
+  void applyTypicalSmtProperties() noexcept;
   void on_buttonBox_clicked(QAbstractButton* button);
   bool applyChanges() noexcept;
 

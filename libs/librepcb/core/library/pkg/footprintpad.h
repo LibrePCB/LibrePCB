@@ -30,6 +30,7 @@
 #include "../../serialization/serializableobjectlist.h"
 #include "../../types/angle.h"
 #include "../../types/length.h"
+#include "../../types/maskconfig.h"
 #include "../../types/point.h"
 #include "../../types/ratio.h"
 #include "../../types/uuid.h"
@@ -78,6 +79,8 @@ public:
     HeightChanged,
     RadiusChanged,
     CustomShapeOutlineChanged,
+    StopMaskConfigChanged,
+    SolderPasteConfigChanged,
     ComponentSideChanged,
     HolesEdited,
   };
@@ -91,7 +94,8 @@ public:
                const Point& pos, const Angle& rot, Shape shape,
                const PositiveLength& width, const PositiveLength& height,
                const UnsignedLimitedRatio& radius,
-               const Path& customShapeOutline, ComponentSide side,
+               const Path& customShapeOutline, const MaskConfig& autoStopMask,
+               const MaskConfig& autoSolderPaste, ComponentSide side,
                const PadHoleList& holes) noexcept;
   explicit FootprintPad(const SExpression& node);
   ~FootprintPad() noexcept;
@@ -110,12 +114,24 @@ public:
   const Path& getCustomShapeOutline() const noexcept {
     return mCustomShapeOutline;
   }
+  const MaskConfig& getStopMaskConfig() const noexcept {
+    return mStopMaskConfig;
+  }
+  const MaskConfig& getSolderPasteConfig() const noexcept {
+    return mSolderPasteConfig;
+  }
   ComponentSide getComponentSide() const noexcept { return mComponentSide; }
   const PadHoleList& getHoles() const noexcept { return mHoles; }
   PadHoleList& getHoles() noexcept { return mHoles; }
   bool isTht() const noexcept;
   bool isOnLayer(const Layer& layer) const noexcept;
   const Layer& getSmtLayer() const noexcept;
+  bool hasTopCopper() const noexcept;
+  bool hasBottomCopper() const noexcept;
+  bool hasAutoTopStopMask() const noexcept;
+  bool hasAutoBottomStopMask() const noexcept;
+  bool hasAutoTopSolderPaste() const noexcept;
+  bool hasAutoBottomSolderPaste() const noexcept;
   PadGeometry getGeometry() const noexcept;
 
   // Setters
@@ -127,6 +143,8 @@ public:
   bool setHeight(const PositiveLength& height) noexcept;
   bool setRadius(const UnsignedLimitedRatio& radius) noexcept;
   bool setCustomShapeOutline(const Path& outline) noexcept;
+  bool setStopMaskConfig(const MaskConfig& config) noexcept;
+  bool setSolderPasteConfig(const MaskConfig& config) noexcept;
   bool setComponentSide(ComponentSide side) noexcept;
 
   // General Methods
@@ -170,6 +188,8 @@ private:  // Data
   PositiveLength mHeight;
   UnsignedLimitedRatio mRadius;
   Path mCustomShapeOutline;  ///< Empty if not needed; Implicitly closed
+  MaskConfig mStopMaskConfig;
+  MaskConfig mSolderPasteConfig;
   ComponentSide mComponentSide;
   PadHoleList mHoles;  ///< If not empty, it's a THT pad.
 

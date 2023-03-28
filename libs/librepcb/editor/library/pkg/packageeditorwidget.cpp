@@ -663,6 +663,28 @@ void PackageEditorWidget::fixMsg(const MsgInvalidCustomPadOutline& msg) {
 }
 
 template <>
+void PackageEditorWidget::fixMsg(const MsgPadWithoutStopMask& msg) {
+  std::shared_ptr<Footprint> footprint =
+      mPackage->getFootprints().get(msg.getFootprint().get());
+  std::shared_ptr<FootprintPad> pad =
+      footprint->getPads().get(msg.getPad().get());
+  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  cmd->setStopMaskConfig(MaskConfig::automatic());
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgThtPadWithSolderPaste& msg) {
+  std::shared_ptr<Footprint> footprint =
+      mPackage->getFootprints().get(msg.getFootprint().get());
+  std::shared_ptr<FootprintPad> pad =
+      footprint->getPads().get(msg.getPad().get());
+  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  cmd->setSolderPasteConfig(MaskConfig::off());
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <>
 void PackageEditorWidget::fixMsg(const MsgHoleWithoutStopMask& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
@@ -697,6 +719,8 @@ bool PackageEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgWrongFootprintTextLayer>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgUnusedCustomPadOutline>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgInvalidCustomPadOutline>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgPadWithoutStopMask>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgThtPadWithSolderPaste>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgHoleWithoutStopMask>(msg, applyFix)) return true;
   return false;
 }

@@ -425,6 +425,8 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           height,  // Height
           radius,  // Radius
           Path(),  // Custom shape outline
+          MaskConfig::automatic(),  // Stop mask
+          MaskConfig::off(),  // Solder paste
           FootprintPad::ComponentSide::Top,  // Side
           PadHoleList{std::make_shared<PadHole>(
               Uuid::createRandom(),
@@ -460,6 +462,8 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           PositiveLength(convertLength(p.getHeight())),  // Height
           UnsignedLimitedRatio(Ratio::percent0()),  // Radius
           Path(),  // Custom shape outline
+          MaskConfig::automatic(),  // Stop mask
+          MaskConfig::automatic(),  // Solder paste
           side,  // Side
           PadHoleList{}  // Holes
           ));

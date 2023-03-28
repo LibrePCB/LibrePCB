@@ -162,6 +162,12 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
             }
           });
 
+  // Enable custom mask offset only when allowed.
+  connect(mUi->rbtnStopMaskManual, &QRadioButton::toggled,
+          mUi->edtStopMaskOffset, &LengthEdit::setEnabled);
+  connect(mUi->rbtnSolderPasteManual, &QRadioButton::toggled,
+          mUi->edtSolderPasteOffset, &LengthEdit::setEnabled);
+
   // load pad attributes
   int currentPadIndex = 0;
   mUi->cbxPackagePad->addItem(tr("(not connected)"), "");
@@ -202,6 +208,24 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   mUi->edtPosY->setValue(mPad.getPosition().getY());
   mUi->edtRotation->setValue(mPad.getRotation());
   mUi->customShapePathEditor->setPath(mPad.getCustomShapeOutline());
+  if (!mPad.getStopMaskConfig().isEnabled()) {
+    mUi->rbtnStopMaskOff->setChecked(true);
+  } else if (tl::optional<Length> offset =
+                 mPad.getStopMaskConfig().getOffset()) {
+    mUi->rbtnStopMaskManual->setChecked(true);
+    mUi->edtStopMaskOffset->setValue(*offset);
+  } else {
+    mUi->rbtnStopMaskAuto->setChecked(true);
+  }
+  if (!mPad.getSolderPasteConfig().isEnabled()) {
+    mUi->rbtnSolderPasteOff->setChecked(true);
+  } else if (tl::optional<Length> offset =
+                 mPad.getSolderPasteConfig().getOffset()) {
+    mUi->rbtnSolderPasteManual->setChecked(true);
+    mUi->edtSolderPasteOffset->setValue(*offset);
+  } else {
+    mUi->rbtnSolderPasteAuto->setChecked(true);
+  }
   updateGeneralTabHoleWidgets();
   setSelectedHole(0);
 
@@ -245,6 +269,14 @@ void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->btnAddHole->setVisible(!readOnly);
   mUi->customShapePathEditor->setReadOnly(readOnly);
   mUi->holeEditorWidget->setReadOnly(readOnly);
+  mUi->rbtnStopMaskOff->setEnabled(!readOnly);
+  mUi->rbtnStopMaskAuto->setEnabled(!readOnly);
+  mUi->rbtnStopMaskManual->setEnabled(!readOnly);
+  mUi->edtStopMaskOffset->setReadOnly(readOnly);
+  mUi->rbtnSolderPasteOff->setEnabled(!readOnly);
+  mUi->rbtnSolderPasteAuto->setEnabled(!readOnly);
+  mUi->rbtnSolderPasteManual->setEnabled(!readOnly);
+  mUi->edtSolderPasteOffset->setReadOnly(readOnly);
   if (readOnly) {
     mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
   } else {
@@ -311,18 +343,25 @@ void FootprintPadPropertiesDialog::addHole() noexcept {
   mHoles.append(std::make_shared<PadHole>(
       Uuid::createRandom(), PositiveLength(800000), makeNonEmptyPath(Point())));
   setSelectedHole(mHoles.count() - 1);
+  if (mHoles.count() == 1) {
+    applyTypicalThtProperties();
+  }
   updateGeneralTabHoleWidgets();
 }
 
 void FootprintPadPropertiesDialog::removeSelectedHole() noexcept {
   mHoles.remove(mSelectedHoleIndex);
   setSelectedHole(mSelectedHoleIndex);
+  if (mHoles.isEmpty()) {
+    applyTypicalSmtProperties();
+  }
   updateGeneralTabHoleWidgets();
 }
 
 void FootprintPadPropertiesDialog::removeAllHoles() noexcept {
   mHoles.clear();
   setSelectedHole(0);
+  applyTypicalSmtProperties();
   updateGeneralTabHoleWidgets();
 }
 
@@ -361,6 +400,14 @@ void FootprintPadPropertiesDialog::setSelectedHole(int index) noexcept {
   mUi->btnNextHole->setEnabled(mSelectedHoleIndex < (mHoles.count() - 1));
   mUi->btnRemoveHole->setEnabled(!mHoles.isEmpty());
   mUi->holeEditorWidget->setVisible(hole ? true : false);
+}
+
+void FootprintPadPropertiesDialog::applyTypicalThtProperties() noexcept {
+  mUi->rbtnSolderPasteOff->setChecked(true);
+}
+
+void FootprintPadPropertiesDialog::applyTypicalSmtProperties() noexcept {
+  mUi->rbtnSolderPasteAuto->setChecked(true);
 }
 
 void FootprintPadPropertiesDialog::on_buttonBox_clicked(
@@ -419,6 +466,22 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     cmd->setWidth(mUi->edtWidth->getValue(), false);
     cmd->setHeight(mUi->edtHeight->getValue(), false);
     cmd->setCustomShapeOutline(customOutlinePath);
+    if (mUi->rbtnStopMaskManual->isChecked()) {
+      cmd->setStopMaskConfig(
+          MaskConfig::manual(mUi->edtStopMaskOffset->getValue()));
+    } else if (mUi->rbtnStopMaskAuto->isChecked()) {
+      cmd->setStopMaskConfig(MaskConfig::automatic());
+    } else {
+      cmd->setStopMaskConfig(MaskConfig::off());
+    }
+    if (mUi->rbtnSolderPasteManual->isChecked()) {
+      cmd->setSolderPasteConfig(
+          MaskConfig::manual(mUi->edtSolderPasteOffset->getValue()));
+    } else if (mUi->rbtnSolderPasteAuto->isChecked()) {
+      cmd->setSolderPasteConfig(MaskConfig::automatic());
+    } else {
+      cmd->setSolderPasteConfig(MaskConfig::off());
+    }
     cmd->setHoles(mHoles, false);
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);

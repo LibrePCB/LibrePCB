@@ -51,6 +51,10 @@ CmdFootprintPadEdit::CmdFootprintPadEdit(FootprintPad& pad) noexcept
     mNewRadius(mOldRadius),
     mOldCustomShapeOutline(pad.getCustomShapeOutline()),
     mNewCustomShapeOutline(mOldCustomShapeOutline),
+    mOldStopMaskConfig(pad.getStopMaskConfig()),
+    mNewStopMaskConfig(mOldStopMaskConfig),
+    mOldSolderPasteConfig(pad.getSolderPasteConfig()),
+    mNewSolderPasteConfig(mOldSolderPasteConfig),
     mOldPos(pad.getPosition()),
     mNewPos(mOldPos),
     mOldRotation(pad.getRotation()),
@@ -118,6 +122,17 @@ void CmdFootprintPadEdit::setRadius(const UnsignedLimitedRatio& radius,
 void CmdFootprintPadEdit::setCustomShapeOutline(const Path& outline) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewCustomShapeOutline = outline;
+}
+
+void CmdFootprintPadEdit::setStopMaskConfig(const MaskConfig& config) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewStopMaskConfig = config;
+}
+
+void CmdFootprintPadEdit::setSolderPasteConfig(
+    const MaskConfig& config) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewSolderPasteConfig = config;
 }
 
 void CmdFootprintPadEdit::setPosition(const Point& pos,
@@ -209,6 +224,8 @@ bool CmdFootprintPadEdit::performExecute() {
   if (mNewHeight != mOldHeight) return true;
   if (mNewRadius != mOldRadius) return true;
   if (mNewCustomShapeOutline != mOldCustomShapeOutline) return true;
+  if (mNewStopMaskConfig != mOldStopMaskConfig) return true;
+  if (mNewSolderPasteConfig != mOldSolderPasteConfig) return true;
   if (mNewPos != mOldPos) return true;
   if (mNewRotation != mOldRotation) return true;
   if (mNewHoles != mOldHoles) return true;
@@ -223,6 +240,8 @@ void CmdFootprintPadEdit::performUndo() {
   mPad.setHeight(mOldHeight);
   mPad.setRadius(mOldRadius);
   mPad.setCustomShapeOutline(mOldCustomShapeOutline);
+  mPad.setStopMaskConfig(mOldStopMaskConfig);
+  mPad.setSolderPasteConfig(mOldSolderPasteConfig);
   mPad.setPosition(mOldPos);
   mPad.setRotation(mOldRotation);
   mPad.getHoles() = mOldHoles;
@@ -236,6 +255,8 @@ void CmdFootprintPadEdit::performRedo() {
   mPad.setHeight(mNewHeight);
   mPad.setRadius(mNewRadius);
   mPad.setCustomShapeOutline(mNewCustomShapeOutline);
+  mPad.setStopMaskConfig(mNewStopMaskConfig);
+  mPad.setSolderPasteConfig(mNewSolderPasteConfig);
   mPad.setPosition(mNewPos);
   mPad.setRotation(mNewRotation);
   mPad.getHoles() = mNewHoles;

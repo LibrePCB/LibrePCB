@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>587</width>
-    <height>325</height>
+    <height>335</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -348,31 +348,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabCustomShape">
-      <attribute name="title">
-       <string>Custom Shape</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
-       <item>
-        <widget class="librepcb::editor::PathEditorWidget" name="customShapePathEditor" native="true"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_8">
-         <property name="font">
-          <font>
-           <italic>true</italic>
-          </font>
-         </property>
-         <property name="text">
-          <string>Coordinates are relative to the pad origin and before rotation.</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="tabHoles">
       <attribute name="title">
        <string>Plated Holes</string>
@@ -468,6 +443,188 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabMasks">
+      <attribute name="title">
+       <string>Automatic Masks</string>
+      </attribute>
+      <layout class="QFormLayout" name="formLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Stop Mask:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QRadioButton" name="rbtnStopMaskOff">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Off</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupStopMask</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnStopMaskAuto">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>From Design Rules</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupStopMask</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnStopMaskManual">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Manual:</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupStopMask</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="librepcb::editor::LengthEdit" name="edtStopMaskOffset" native="true">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Solder Paste:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QRadioButton" name="rbtnSolderPasteOff">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Off</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupSolderPaste</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnSolderPasteAuto">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>From Design Rules</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupSolderPaste</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="rbtnSolderPasteManual">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Manual:</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">btnGroupSolderPaste</string>
+           </attribute>
+          </widget>
+         </item>
+         <item>
+          <widget class="librepcb::editor::LengthEdit" name="edtSolderPasteOffset" native="true">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="label_13">
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Note: For THT pads the solder paste should usually be set to 'Off'. But if enabled anyway, the solder paste is added only to the solder side of the pad.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabCustomShape">
+      <attribute name="title">
+       <string>Custom Shape</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0">
+       <item>
+        <widget class="librepcb::editor::PathEditorWidget" name="customShapePathEditor" native="true"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Coordinates are relative to the pad origin and before rotation.</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -549,6 +706,8 @@
  <resources/>
  <connections/>
  <buttongroups>
+  <buttongroup name="btnGroupSolderPaste"/>
+  <buttongroup name="btnGroupStopMask"/>
   <buttongroup name="btnGroupComponentSide"/>
   <buttongroup name="btnGroupShape"/>
  </buttongroups>

@@ -66,6 +66,8 @@ protected:  // Methods
   void checkPadsAnnularRing(MsgList& msgs) const;
   void checkPadsConnectionPoint(MsgList& msgs) const;
   void checkCustomPadOutline(MsgList& msgs) const;
+  void checkStopMaskOnPads(MsgList& msgs) const;
+  void checkSolderPasteOnPads(MsgList& msgs) const;
   void checkHolesStopMask(MsgList& msgs) const;
 
 private:  // Data
