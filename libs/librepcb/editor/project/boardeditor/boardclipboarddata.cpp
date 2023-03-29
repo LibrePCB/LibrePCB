@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "boardclipboarddata.h"
 
+#include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/circuit/netsignal.h>
@@ -158,7 +159,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardData::fromMimeData(
 
 QString BoardClipboardData::getMimeType() noexcept {
   return QString("application/x-librepcb-clipboard.board; version=%1")
-      .arg(qApp->applicationVersion());
+      .arg(Application::getVersion());
 }
 
 /*******************************************************************************

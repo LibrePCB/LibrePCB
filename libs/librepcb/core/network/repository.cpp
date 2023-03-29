@@ -23,6 +23,7 @@
 #include "repository.h"
 
 #include "../application.h"
+#include "../types/version.h"
 #include "network/networkrequest.h"
 
 #include <QtCore>
@@ -47,7 +48,8 @@ Repository::~Repository() noexcept {
  ******************************************************************************/
 
 void Repository::requestLibraryList() const noexcept {
-  QString path = "/api/v1/libraries/v" % qApp->getFileFormatVersion().toStr();
+  QString path =
+      "/api/v1/libraries/v" % Application::getFileFormatVersion().toStr();
   requestLibraryList(QUrl(mUrl.toString() % path));
 }
 

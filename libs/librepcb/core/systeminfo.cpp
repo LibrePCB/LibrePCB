@@ -162,6 +162,30 @@ const QString& SystemInfo::getHostname() noexcept {
   return sHostname;
 }
 
+QString SystemInfo::detectRuntime() noexcept {
+  // Manually specified runtime has priority.
+  static QString envRuntime = qgetenv("LIBREPCB_RUNTIME").trimmed();
+  if (!envRuntime.isEmpty()) {
+    return envRuntime;
+  }
+
+  // Combine any other autodetected runtime, just in case multiple are set.
+  QStringList runtimes;
+  static QString envSnap = qgetenv("SNAP").trimmed();
+  if (!envSnap.isEmpty()) {
+    runtimes << "Snap";
+  }
+  static QString envFlatpak = qgetenv("FLATPAK_ID").trimmed();
+  if (!envFlatpak.isEmpty()) {
+    runtimes << "Flatpak";
+  }
+  static QString envAppimage = qgetenv("APPIMAGE").trimmed();
+  if (!envAppimage.isEmpty()) {
+    runtimes << "AppImage";
+  }
+  return runtimes.join(", ");
+}
+
 bool SystemInfo::isProcessRunning(qint64 pid) {
 #if defined(Q_OS_UNIX)  // Mac OS X / Linux / UNIX
   // From:

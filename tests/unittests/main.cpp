@@ -26,6 +26,7 @@
 #include <librepcb/core/debug.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
@@ -41,14 +42,17 @@ int main(int argc, char* argv[]) {
   QLocale::setDefault(QLocale(QLocale::English, QLocale::UnitedStates));
 
   // many classes rely on a QApplication instance, so we create it here
-  Application app(argc, argv);
-  Application::setOrganizationName("LibrePCB");
-  Application::setOrganizationDomain("librepcb.org");
-  Application::setApplicationName("LibrePCB-UnitTests");
+  QApplication app(argc, argv);
+  QApplication::setOrganizationName("LibrePCB");
+  QApplication::setOrganizationDomain("librepcb.org");
+  QApplication::setApplicationName("LibrePCB-UnitTests");
 
   // disable the whole debug output (we want only the output from gtest)
   Debug::instance()->setDebugLevelLogFile(Debug::DebugLevel_t::Nothing);
   Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::Nothing);
+
+  // Perform global initialization tasks.
+  Application::loadBundledFonts();
 
   // init gmock and run all tests
   ::testing::InitGoogleMock(&argc, argv);

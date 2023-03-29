@@ -83,7 +83,7 @@ Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
     QByteArray raw(mFileSystem->read(versionFilePath));  // can throw
     VersionFile file = VersionFile::fromByteArray(raw);  // can throw
     loadedFileFormat = file.getVersion();
-    if (loadedFileFormat > qApp->getFileFormatVersion()) {
+    if (loadedFileFormat > Application::getFileFormatVersion()) {
       throw LogicError(__FILE__, __LINE__,
                        QString("Workspace data directory requires LibrePCB %1 "
                                "or later to open..")
@@ -116,7 +116,7 @@ Workspace::Workspace(const FilePath& wsPath, const QString& dataDirName,
   }
 
   // Write files to disk if an upgrade was performed.
-  if (loadedFileFormat != qApp->getFileFormatVersion()) {
+  if (loadedFileFormat != Application::getFileFormatVersion()) {
     saveSettingsToTransactionalFileSystem();  // can throw
     mFileSystem->save();  // can throw
   }
@@ -208,7 +208,7 @@ QMap<QString, Version> Workspace::findDataDirectories(const FilePath& wsRoot) {
 QString Workspace::determineDataDirectory(
     const QMap<QString, Version>& dataDirs, QString& copyFromDir,
     QString& copyToDir) noexcept {
-  const Version fileFormat = qApp->getFileFormatVersion();
+  const Version fileFormat = Application::getFileFormatVersion();
   const QString versionedDirName = "v" % fileFormat.toStr();
   const QString defaultDirName = "data";
   copyFromDir = QString();

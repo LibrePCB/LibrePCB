@@ -25,6 +25,7 @@
 #include "../application.h"
 #include "../fileio/fileutils.h"
 #include "../serialization/sexpression.h"
+#include "../types/version.h"
 
 #include <QtCore>
 
@@ -85,7 +86,7 @@ void WorkspaceSettings::load(const SExpression& node,
       qCritical() << "Could not load workspace settings item:" << e.getMsg();
     }
   }
-  if (fileFormat < qApp->getFileFormatVersion()) {
+  if (fileFormat < Application::getFileFormatVersion()) {
     mFileContent.clear();
     mUpgradeRequired = true;
   }

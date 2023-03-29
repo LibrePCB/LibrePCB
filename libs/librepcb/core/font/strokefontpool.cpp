@@ -59,8 +59,12 @@ StrokeFontPool::~StrokeFontPool() noexcept {
  *  Getters
  ******************************************************************************/
 
+bool StrokeFontPool::exists(const QString& filename) const noexcept {
+  return mFonts.contains(filename);
+}
+
 const StrokeFont& StrokeFontPool::getFont(const QString& filename) const {
-  if (mFonts.contains(filename)) {
+  if (exists(filename)) {
     return *mFonts[filename];
   } else {
     throw RuntimeError(

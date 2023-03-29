@@ -32,7 +32,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Application;
 class FilePath;
 class LibraryBaseElement;
 class SExpression;
@@ -52,12 +51,11 @@ class CommandLineInterface final {
 
 public:
   // Constructors / Destructor
-  CommandLineInterface() = delete;
-  explicit CommandLineInterface(const Application& app) noexcept;
+  CommandLineInterface() noexcept;
   ~CommandLineInterface() noexcept = default;
 
   // General Methods
-  int execute() noexcept;
+  int execute(const QStringList& args) noexcept;
 
 private:  // Methods
   bool openProject(const QString& projectFile, bool runErc, bool runDrc,
@@ -86,9 +84,6 @@ private:  // Methods
   static bool failIfFileFormatUnstable() noexcept;
   static void print(const QString& str) noexcept;
   static void printErr(const QString& str) noexcept;
-
-private:  // Data
-  const Application& mApp;
 };
 
 /*******************************************************************************

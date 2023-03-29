@@ -563,7 +563,7 @@ void AddComponentDialog::setSelectedDevice(const Device* dev) {
       if (mSelectedPackage->getFootprints().count() > 0) {
         mPreviewFootprintGraphicsItem.reset(new FootprintGraphicsItem(
             mSelectedPackage->getFootprints().first(), *mGraphicsLayerProvider,
-            qApp->getDefaultStrokeFont(), &mSelectedPackage->getPads(),
+            Application::getDefaultStrokeFont(), &mSelectedPackage->getPads(),
             mSelectedComponent.get(), mLocaleOrder));
         mDevicePreviewScene->addItem(*mPreviewFootprintGraphicsItem);
         mUi->viewDevice->zoomAll();

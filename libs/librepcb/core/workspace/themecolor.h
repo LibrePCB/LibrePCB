@@ -26,7 +26,7 @@
 #include "../serialization/sexpression.h"
 
 #include <QtCore>
-#include <QtWidgets>
+#include <QtGui>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations

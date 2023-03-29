@@ -28,6 +28,8 @@
 #include "../../graphics/textgraphicsitem.h"
 #include "symbolpingraphicsitem.h"
 
+#include <librepcb/core/application.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -123,7 +125,7 @@ QPixmap SymbolClipboardData::generatePixmap(
 
 QString SymbolClipboardData::getMimeType() noexcept {
   return QString("application/x-librepcb-clipboard.symbol; version=%1")
-      .arg(qApp->applicationVersion());
+      .arg(Application::getVersion());
 }
 
 /*******************************************************************************

@@ -31,7 +31,6 @@
 #include "../../types/uuid.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 

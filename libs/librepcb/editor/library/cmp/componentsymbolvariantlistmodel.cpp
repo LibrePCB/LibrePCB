@@ -26,6 +26,7 @@
 #include "../cmd/cmdcomponentsymbolvariantedit.h"
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace

@@ -55,7 +55,8 @@ namespace librepcb {
  ******************************************************************************/
 
 BoardPainter::BoardPainter(const Board& board)
-  : mStrokeFont(board.getProject().getStrokeFonts().getFont(
+  : mMonospaceFont(Application::getDefaultMonospaceFont()),
+    mStrokeFont(board.getProject().getStrokeFonts().getFont(
         board.getDefaultFontName()))  // can throw
 {
   foreach (const BI_Device* device, board.getDeviceInstances()) {
@@ -208,9 +209,8 @@ void BoardPainter::paint(QPainter& painter,
     // SVG output.
     foreach (const Text& text, content.texts) {
       p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
-                 text.getAlign(), text.getText(),
-                 qApp->getDefaultMonospaceFont(), Qt::transparent, true,
-                 settings.getMirror());
+                 text.getAlign(), text.getText(), mMonospaceFont,
+                 Qt::transparent, true, settings.getMirror());
     }
   }
 }

@@ -57,8 +57,8 @@ struct CircuitIdentifierVerifier {
         ? std::forward<Value>(val)
         : (throw RuntimeError(
                __FILE__, __LINE__,
-               QString(QApplication::translate("CircuitIdentifier",
-                                               "Invalid identifier: '%1'"))
+               QString(QCoreApplication::translate("CircuitIdentifier",
+                                                   "Invalid identifier: '%1'"))
                    .arg(val)),
            std::forward<Value>(val));
   }

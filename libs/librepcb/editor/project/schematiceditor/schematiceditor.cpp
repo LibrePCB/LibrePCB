@@ -388,7 +388,8 @@ void SchematicEditor::createActions() noexcept {
   mActionCloseWindow.reset(
       cmd.windowClose.createAction(this, this, &SchematicEditor::close));
   mActionQuit.reset(cmd.applicationQuit.createAction(
-      this, qApp, &Application::quitTriggered));
+      this, qApp, &QApplication::closeAllWindows,
+      EditorCommand::ActionFlag::QueuedConnection));
   mActionFileManager.reset(cmd.fileManager.createAction(this, this, [this]() {
     mStandardCommandHandler->fileManager(mProject.getPath());
   }));

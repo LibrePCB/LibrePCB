@@ -24,6 +24,7 @@
 
 #include "../application.h"
 #include "../exceptions.h"
+#include "../types/version.h"
 #include "networkaccessmanager.h"
 
 #include <QtCore>
@@ -52,11 +53,11 @@ NetworkRequestBase::NetworkRequestBase(const QUrl& url,
   mRequest.setHeader(QNetworkRequest::UserAgentHeader, getUserAgent());
   mRequest.setRawHeader("Accept-Language", QLocale().name().toUtf8());
   mRequest.setRawHeader("X-LibrePCB-AppVersion",
-                        qApp->applicationVersion().toUtf8());
+                        Application::getVersion().toUtf8());
   mRequest.setRawHeader("X-LibrePCB-GitRevision",
-                        qApp->getGitRevision().toUtf8());
+                        Application::getGitRevision().toUtf8());
   mRequest.setRawHeader("X-LibrePCB-FileFormatVersion",
-                        qApp->getFileFormatVersion().toStr().toUtf8());
+                        Application::getFileFormatVersion().toStr().toUtf8());
 
   // create queued connection to let executeRequest() execute in download thread
   connect(this, &NetworkRequestBase::startRequested, this,
@@ -332,7 +333,7 @@ QString NetworkRequestBase::getUserAgent() noexcept {
     details << QLocale::system().name();
     userAgent =
         QString("LibrePCB/%1 (%2) Qt/%3")
-            .arg(qApp->applicationVersion(),
+            .arg(Application::getVersion(),
                  details.join("; ").remove("(").remove(")"), qVersion());
   }
   return userAgent;

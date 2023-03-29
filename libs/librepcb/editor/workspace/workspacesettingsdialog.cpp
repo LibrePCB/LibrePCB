@@ -70,7 +70,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
   {
     mUi->cbxAppLocale->addItem(tr("System Language"), QString(""));
     QMap<QString, QString> map;  // map will be sorted by key
-    foreach (const QString& locale, qApp->getAvailableTranslationLocales()) {
+    foreach (const QString& locale, Application::getTranslationLocales()) {
       map.insert(Toolbox::prettyPrintLocale(locale), locale);
     }
     QMap<QString, QString>::const_iterator i = map.constBegin();

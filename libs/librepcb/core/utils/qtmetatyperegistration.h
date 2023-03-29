@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_SI_BASE_H
-#define LIBREPCB_CORE_SI_BASE_H
+#ifndef LIBREPCB_CORE_QTMETATYPEREGISTRATION_H
+#define LIBREPCB_CORE_QTMETATYPEREGISTRATION_H
 
 /*******************************************************************************
  *  Includes
@@ -30,49 +30,16 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Circuit;
-class Point;
-class Project;
-class Schematic;
-
 /*******************************************************************************
- *  Class SI_Base
+ *  Class QtMetaTypeRegistration
  ******************************************************************************/
 
 /**
- * @brief The Schematic Item Base (SI_Base) class
+ * @brief Wrapper around qRegisterMetaType<T> to allow static registration
  */
-class SI_Base : public QObject {
-  Q_OBJECT
-
-public:
-  // Constructors / Destructor
-  SI_Base() = delete;
-  SI_Base(const SI_Base& other) = delete;
-  SI_Base(Schematic& schematic) noexcept;
-  virtual ~SI_Base() noexcept;
-
-  // Getters
-  Project& getProject() const noexcept;
-  Circuit& getCircuit() const noexcept;
-  Schematic& getSchematic() const noexcept { return mSchematic; }
-  virtual bool isAddedToSchematic() const noexcept {
-    return mIsAddedToSchematic;
-  }
-
-  // General Methods
-  virtual void addToSchematic();
-  virtual void removeFromSchematic();
-
-  // Operator Overloadings
-  SI_Base& operator=(const SI_Base& rhs) = delete;
-
-protected:
-  Schematic& mSchematic;
-
-private:
-  // General Attributes
-  bool mIsAddedToSchematic;
+template <typename T>
+struct QtMetaTypeRegistration final {
+  inline QtMetaTypeRegistration() noexcept { qRegisterMetaType<T>(); }
 };
 
 /*******************************************************************************

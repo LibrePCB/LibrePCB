@@ -225,8 +225,8 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
                                             QString("")));  // can throw
     lib->setUrl(url);
     try {
-      lib->setIcon(FileUtils::readFile(
-          qApp->getResourcesDir().getPathTo("library/default_image.png")));
+      lib->setIcon(FileUtils::readFile(Application::getResourcesDir().getPathTo(
+          "library/default_image.png")));
     } catch (const Exception& e) {
       qCritical() << "Could not open the library image:" << e.getMsg();
     }
@@ -236,7 +236,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
     if (useCc0License) {
       try {
         FilePath source =
-            qApp->getResourcesDir().getPathTo("licenses/cc0-1.0.txt");
+            Application::getResourcesDir().getPathTo("licenses/cc0-1.0.txt");
         fs->write("LICENSE.txt", FileUtils::readFile(source));  // can throw
       } catch (Exception& e) {
         qCritical() << "Could not copy the license file:" << e.getMsg();
@@ -246,7 +246,7 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
     // copy readme file
     try {
       FilePath source =
-          qApp->getResourcesDir().getPathTo("library/readme_template");
+          Application::getResourcesDir().getPathTo("library/readme_template");
       QByteArray content = FileUtils::readFile(source);  // can throw
       content.replace("{LIBRARY_NAME}", name.toUtf8());
       if (useCc0License) {
@@ -263,8 +263,8 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
 
     // copy .gitignore
     try {
-      FilePath source =
-          qApp->getResourcesDir().getPathTo("library/gitignore_template");
+      FilePath source = Application::getResourcesDir().getPathTo(
+          "library/gitignore_template");
       fs->write(".gitignore", FileUtils::readFile(source));  // can throw
     } catch (Exception& e) {
       qCritical() << "Could not copy the .gitignore file:" << e.getMsg();
@@ -272,8 +272,8 @@ void AddLibraryWidget::createLocalLibraryButtonClicked() noexcept {
 
     // copy .gitattributes
     try {
-      FilePath source =
-          qApp->getResourcesDir().getPathTo("library/gitattributes_template");
+      FilePath source = Application::getResourcesDir().getPathTo(
+          "library/gitattributes_template");
       fs->write(".gitattributes", FileUtils::readFile(source));  // can throw
     } catch (Exception& e) {
       qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();

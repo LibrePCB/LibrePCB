@@ -64,7 +64,7 @@ InitializeWorkspaceWizardContext::~InitializeWorkspaceWizardContext() noexcept {
 bool InitializeWorkspaceWizardContext::getWorkspaceContainsNewerFileFormats()
     const noexcept {
   return (!mDataDirs.isEmpty()) &&
-      (qApp->getFileFormatVersion() <
+      (Application::getFileFormatVersion() <
        Toolbox::sorted(mDataDirs.values()).last());
 }
 

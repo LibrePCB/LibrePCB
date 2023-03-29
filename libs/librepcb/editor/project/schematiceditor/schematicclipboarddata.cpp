@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "schematicclipboarddata.h"
 
+#include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/librarybaseelement.h>
@@ -132,7 +133,7 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardData::fromMimeData(
 
 QString SchematicClipboardData::getMimeType() noexcept {
   return QString("application/x-librepcb-clipboard.schematic; version=%1")
-      .arg(qApp->applicationVersion());
+      .arg(Application::getVersion());
 }
 
 /*******************************************************************************

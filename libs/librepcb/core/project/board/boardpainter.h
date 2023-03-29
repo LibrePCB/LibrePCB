@@ -111,6 +111,7 @@ private:  // Methods
   void initContentByColor() const noexcept;
 
 private:  // Data
+  QFont mMonospaceFont;
   const StrokeFont& mStrokeFont;
 
   QList<Footprint> mFootprints;

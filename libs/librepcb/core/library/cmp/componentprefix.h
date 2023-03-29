@@ -47,7 +47,7 @@ struct ComponentPrefixVerifier {
         ? std::forward<Value>(val)
         : (throw RuntimeError(
                __FILE__, __LINE__,
-               QString(QApplication::translate(
+               QString(QCoreApplication::translate(
                            "ComponentPrefix", "Invalid component prefix: '%1'"))
                    .arg(val)),
            std::forward<Value>(val));

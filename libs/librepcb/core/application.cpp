@@ -23,11 +23,10 @@
 #include "application.h"
 
 #include "build_env.h"
+#include "fileio/filepath.h"
 #include "fileio/transactionalfilesystem.h"
 #include "font/strokefontpool.h"
-#include "types/angle.h"
-#include "types/length.h"
-#include "types/point.h"
+#include "types/version.h"
 
 #include <QtCore>
 
@@ -37,89 +36,171 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Getters
  ******************************************************************************/
 
-Application::Application(int& argc, char** argv) noexcept
-  : QApplication(argc, argv),
-    mAppVersion(
-        Version::fromString(QString(LIBREPCB_APP_VERSION).section('-', 0, 0))),
-    mAppVersionLabel(QString(LIBREPCB_APP_VERSION).section('-', 1, 1)),
-    mGitRevision(GIT_COMMIT_SHA),
-    mBuildDate(),
-    mBuildAuthor(LIBREPCB_BUILD_AUTHOR),
-    mFileFormatVersion(Version::fromString(LIBREPCB_FILE_FORMAT_VERSION)),
-    mIsFileFormatStable(LIBREPCB_FILE_FORMAT_STABLE) {
-  // register meta types
-  qRegisterMetaType<FilePath>();
-  qRegisterMetaType<Point>();
-  qRegisterMetaType<Length>();
-  qRegisterMetaType<Angle>();
+QString Application::getVersion() noexcept {
+  return QStringLiteral(LIBREPCB_APP_VERSION);
+}
 
-  // set application version
-  QApplication::setApplicationVersion(LIBREPCB_APP_VERSION);
+QString Application::getGitRevision() noexcept {
+  return QStringLiteral(GIT_COMMIT_SHA);
+}
 
-  // set build timestamp
-  QDate buildDate =
+QDateTime Application::getBuildDate() noexcept {
+  static const QDateTime value = QDateTime(
       QLocale(QLocale::C)
-          .toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy"));
-  QTime buildTime = QTime::fromString(__TIME__, Qt::TextDate);
-  mBuildDate = QDateTime(buildDate, buildTime);
+          .toDate(QString(__DATE__).simplified(), QLatin1String("MMM d yyyy")),
+      QTime::fromString(__TIME__, Qt::TextDate));
+  return value;
+}
 
-  // check file format version
-  if (!mFileFormatVersion.isPrefixOf(mAppVersion)) {
-    qFatal(
-        "The file format version is not a prefix of the application version!");
-  }
+QString Application::getBuildAuthor() noexcept {
+  return QStringLiteral(LIBREPCB_BUILD_AUTHOR);
+}
 
-  // get the directory of the currently running executable
-  FilePath executableFilePath(QApplication::applicationFilePath());
-  Q_ASSERT(executableFilePath.isValid());
+const Version& Application::getFileFormatVersion() noexcept {
+  static const Version value =
+      Version::fromString(LIBREPCB_FILE_FORMAT_VERSION);
+  Q_ASSERT(getVersion().startsWith(value.toStr() % "."));
+  return value;
+}
 
-  // determine the path to the resources directory (e.g. /usr/share/librepcb)
+bool Application::isFileFormatStable() noexcept {
+  return LIBREPCB_FILE_FORMAT_STABLE;
+}
+
+const FilePath& Application::getResourcesDir() noexcept {
+  auto detect = []() {
+    // get the directory of the currently running executable
+    const FilePath exeFilePath(qApp->applicationFilePath());
+    Q_ASSERT(exeFilePath.isValid());
+
+    // determine the path to the resources directory (e.g. /usr/share/librepcb)
+    FilePath fp;
 #if defined(LIBREPCB_BINARY_DIR) && defined(LIBREPCB_SHARE_SOURCE)
-  // TODO: The following code checks for paths related to the application
-  // binary, even though this code is located in the library source. This is a
-  // bit of a layer violation and should be refactored.
-  FilePath buildOutputDirPath(LIBREPCB_BINARY_DIR);
-  bool runningFromBuildOutput =
-      executableFilePath.isLocatedInDir(buildOutputDirPath);
-  if (runningFromBuildOutput) {
-    // The executable is located inside the build output directory, so we assume
-    // this is a developer build and thus we use the "share" directory from the
-    // repository root.
-    mResourcesDir = FilePath(LIBREPCB_SHARE_SOURCE).getPathTo("librepcb");
-  }
-#endif
-  if (!mResourcesDir.isValid()) {
-    if (QDir::isAbsolutePath(LIBREPCB_SHARE)) {
-      mResourcesDir.setPath(LIBREPCB_SHARE);
-    } else {
-      mResourcesDir =
-          executableFilePath.getParentDir().getPathTo(LIBREPCB_SHARE);
+    // TODO: The following code checks for paths related to the application
+    // binary, even though this code is located in the library source. This is a
+    // bit of a layer violation and should be refactored.
+    FilePath buildOutputDirPath(LIBREPCB_BINARY_DIR);
+    bool runningFromBuildOutput =
+        exeFilePath.isLocatedInDir(buildOutputDirPath);
+    if (runningFromBuildOutput) {
+      // The executable is located inside the build output directory, so we
+      // assume this is a developer build and thus we use the "share" directory
+      // from the repository root.
+      fp = FilePath(LIBREPCB_SHARE_SOURCE).getPathTo("librepcb");
     }
-  }
+#endif
+    if (!fp.isValid()) {
+      if (QDir::isAbsolutePath(LIBREPCB_SHARE)) {
+        fp.setPath(LIBREPCB_SHARE);
+      } else {
+        fp = exeFilePath.getParentDir().getPathTo(LIBREPCB_SHARE);
+      }
+    }
 
-  // warn if runtime resource files are not found
-  if (!getResourcesFilePath("README.md").isExistingFile()) {
-    qCritical()
-        << "Could not find resource files! Probably packaging went wrong?!";
-    qCritical() << "Expected resources location:" << mResourcesDir.toNative();
-    qCritical() << "Executable location:        "
-                << executableFilePath.toNative();
-    qCritical() << "LIBREPCB_SHARE:             " << QString(LIBREPCB_SHARE);
+    // warn if runtime resource files are not found
+    if (!fp.getPathTo("README.md").isExistingFile()) {
+      qCritical()
+          << "Could not find resource files! Probably packaging went wrong?!";
+      qCritical() << "Expected resources location:" << fp.toNative();
+      qCritical() << "Executable location:        " << exeFilePath.toNative();
+      qCritical() << "LIBREPCB_SHARE:             " << QString(LIBREPCB_SHARE);
 #ifdef LIBREPCB_BINARY_DIR
-    qCritical() << "LIBREPCB_BINARY_DIR:        "
-                << QString(LIBREPCB_BINARY_DIR);
+      qCritical() << "LIBREPCB_BINARY_DIR:        "
+                  << QString(LIBREPCB_BINARY_DIR);
 #endif
 #ifdef LIBREPCB_SHARE_SOURCE
-    qCritical() << "LIBREPCB_SHARE_SOURCE:      "
-                << QString(LIBREPCB_SHARE_SOURCE);
+      qCritical() << "LIBREPCB_SHARE_SOURCE:      "
+                  << QString(LIBREPCB_SHARE_SOURCE);
 #endif
-  }
+    }
+    return fp;
+  };
 
-  // load all bundled TrueType/OpenType fonts
-  QDir fontsDir(getResourcesFilePath("fonts").toStr());
+  static const FilePath value = detect();
+  return value;
+}
+
+QStringList Application::getTranslationLocales() noexcept {
+  auto detect = []() {
+    QStringList locales;
+    QDir dir(getResourcesDir().getPathTo("i18n").toStr());
+    foreach (QString filename,
+             dir.entryList({"*.qm"}, QDir::Files, QDir::Name)) {
+      filename.remove("librepcb_");
+      filename.remove(".qm");
+      locales.append(filename);
+    }
+    return locales;
+  };
+
+  static const QStringList value = detect();
+  return value;
+}
+
+const QFont& Application::getDefaultSansSerifFont() noexcept {
+  auto create = []() {
+    QFont font;
+    font.setStyleStrategy(
+        QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
+    font.setStyleHint(QFont::SansSerif);
+    font.setFamily("Noto Sans");
+    return font;
+  };
+
+  static const QFont value = create();
+  return value;
+}
+
+const QFont& Application::getDefaultMonospaceFont() noexcept {
+  auto create = []() {
+    QFont font;
+    font.setStyleStrategy(
+        QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
+    font.setStyleHint(QFont::TypeWriter);
+    font.setFamily("Noto Sans Mono");
+    return font;
+  };
+
+  static const QFont value = create();
+  return value;
+}
+
+const StrokeFontPool& Application::getStrokeFonts() noexcept {
+  static const TransactionalFileSystem fs(
+      getResourcesDir().getPathTo("fontobene"), false,
+      &TransactionalFileSystem::RestoreMode::no);
+  static const StrokeFontPool pool(fs);
+
+  // Abort the application if there's no default stroke font!
+  auto checkDefaultFontExistence = [](const StrokeFontPool& p) {
+    if (!p.exists(getDefaultStrokeFontName())) {
+      qFatal("Failed to load default stroke font, terminating application!");
+    }
+    return true;
+  };
+  static bool check = checkDefaultFontExistence(pool);
+  Q_UNUSED(check);
+
+  return pool;
+}
+
+const StrokeFont& Application::getDefaultStrokeFont() noexcept {
+  return getStrokeFonts().getFont(getDefaultStrokeFontName());
+}
+
+QString Application::getDefaultStrokeFontName() noexcept {
+  return QStringLiteral("newstroke.bene");
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void Application::loadBundledFonts() noexcept {
+  QDir fontsDir(Application::getResourcesDir().getPathTo("fonts").toStr());
   fontsDir.setFilter(QDir::Files);
   fontsDir.setNameFilters({"*.ttf", "*.otf"});
   foreach (const QFileInfo& info, fontsDir.entryInfoList()) {
@@ -129,159 +210,48 @@ Application::Application(int& argc, char** argv) noexcept
       qCritical().nospace() << "Failed to register font " << fp << ".";
     }
   }
-
-  // set default sans serif font
-  mSansSerifFont.setStyleStrategy(
-      QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-  mSansSerifFont.setStyleHint(QFont::SansSerif);
-  mSansSerifFont.setFamily("Noto Sans");
-
-  // set default monospace font
-  mMonospaceFont.setStyleStrategy(
-      QFont::StyleStrategy(QFont::OpenGLCompatible | QFont::PreferQuality));
-  mMonospaceFont.setStyleHint(QFont::TypeWriter);
-  mMonospaceFont.setFamily("Noto Sans Mono");
-
-  // load all stroke fonts
-  TransactionalFileSystem strokeFontsDir(
-      getResourcesFilePath("fontobene"), false,
-      &TransactionalFileSystem::RestoreMode::no);
-  mStrokeFontPool.reset(new StrokeFontPool(strokeFontsDir));
-  getDefaultStrokeFont();  // ensure that the default font is available (aborts
-                           // if not)
 }
-
-Application::~Application() noexcept {
-  // Not sure if needed, but let's unregister translators before destroying
-  // (maybe otherwise QCoreApplication has dangling pointers to translators).
-  removeAllTranslators();
-}
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-FilePath Application::getResourcesFilePath(const QString& filepath) const
-    noexcept {
-  return mResourcesDir.getPathTo(filepath);
-}
-
-QStringList Application::getAvailableTranslationLocales() const noexcept {
-  QStringList locales;
-  QDir dir(getResourcesFilePath("i18n").toStr());
-  foreach (QString filename, dir.entryList({"*.qm"}, QDir::Files, QDir::Name)) {
-    filename.remove("librepcb_");
-    filename.remove(".qm");
-    locales.append(filename);
-  }
-  return locales;
-}
-
-const StrokeFont& Application::getDefaultStrokeFont() const noexcept {
-  try {
-    return mStrokeFontPool->getFont(getDefaultStrokeFontName());
-  } catch (const Exception& e) {
-    // Abort the application!!!
-    qFatal("Default stroke font could not be loaded, terminating application!");
-  }
-}
-
-QString Application::detectRuntime() const noexcept {
-  // Manually specified runtime has priority.
-  static QString envRuntime = qgetenv("LIBREPCB_RUNTIME").trimmed();
-  if (!envRuntime.isEmpty()) {
-    return envRuntime;
-  }
-
-  // Combine any other autodetected runtime, just in case multiple are set.
-  QStringList runtimes;
-  static QString envSnap = qgetenv("SNAP").trimmed();
-  if (!envSnap.isEmpty()) {
-    runtimes << "Snap";
-  }
-  static QString envFlatpak = qgetenv("FLATPAK_ID").trimmed();
-  if (!envFlatpak.isEmpty()) {
-    runtimes << "Flatpak";
-  }
-  static QString envAppimage = qgetenv("APPIMAGE").trimmed();
-  if (!envAppimage.isEmpty()) {
-    runtimes << "AppImage";
-  }
-  return runtimes.join(", ");
-}
-
-/*******************************************************************************
- *  Setters
- ******************************************************************************/
 
 void Application::setTranslationLocale(const QLocale& locale) noexcept {
+  static QVector<QTranslator*> installedTranslators;
+
   // First, remove all currently installed translations to avoid falling back to
   // wrong languages. The fallback language must always be en_US, i.e.
   // untranslated strings. See https://github.com/LibrePCB/LibrePCB/issues/611
-  removeAllTranslators();
-
-  // Install Qt translations
-  auto qtTranslator = std::make_shared<QTranslator>(this);
-  qtTranslator->load("qt_" % locale.name(),
-                     QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-  installTranslator(qtTranslator.get());
-  mTranslators.append(qtTranslator);
-
-  // Install system language translations (all system languages defined in the
-  // system settings, in the defined order)
-  const QString dir = getResourcesFilePath("i18n").toStr();
-  auto systemTranslator = std::make_shared<QTranslator>(this);
-  systemTranslator->load(locale, "librepcb", "_", dir);
-  installTranslator(systemTranslator.get());
-  mTranslators.append(systemTranslator);
-
-  // Install language translations (like "de" for German)
-  auto appTranslator1 = std::make_shared<QTranslator>(this);
-  appTranslator1->load("librepcb_" % locale.name().split("_").at(0), dir);
-  installTranslator(appTranslator1.get());
-  mTranslators.append(appTranslator1);
-
-  // Install language/country translations (like "de_ch" for German/Switzerland)
-  auto appTranslator2 = std::make_shared<QTranslator>(this);
-  appTranslator2->load("librepcb_" % locale.name(), dir);
-  installTranslator(appTranslator2.get());
-  mTranslators.append(appTranslator2);
-}
-
-/*******************************************************************************
- *  Reimplemented from QApplication
- ******************************************************************************/
-
-bool Application::notify(QObject* receiver, QEvent* e) {
-  try {
-    return QApplication::notify(receiver, e);
-  } catch (...) {
-    qCritical() << "Exception caught in Application::notify()!";
-  }
-  return false;
-}
-
-/*******************************************************************************
- *  Static Methods
- ******************************************************************************/
-
-Application* Application::instance() noexcept {
-  Application* app = dynamic_cast<Application*>(QCoreApplication::instance());
-  Q_ASSERT(app);
-  return app;
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-void Application::removeAllTranslators() noexcept {
-  foreach (auto& translator, mTranslators) {
-    if (!qApp->removeTranslator(translator.get())) {
+  foreach (QTranslator* translator, installedTranslators) {
+    if (!qApp->removeTranslator(translator)) {
       qWarning() << "Failed to remove translator.";
     }
   }
-  mTranslators.clear();
+  qDeleteAll(installedTranslators);
+  installedTranslators.clear();
+
+  // Install Qt translations
+  QTranslator* qtTranslator = new QTranslator(qApp);
+  qtTranslator->load("qt_" % locale.name(),
+                     QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+  qApp->installTranslator(qtTranslator);
+  installedTranslators.append(qtTranslator);
+
+  // Install system language translations (all system languages defined in the
+  // system settings, in the defined order)
+  const QString dir = Application::getResourcesDir().getPathTo("i18n").toStr();
+  QTranslator* systemTranslator = new QTranslator(qApp);
+  systemTranslator->load(locale, "librepcb", "_", dir);
+  qApp->installTranslator(systemTranslator);
+  installedTranslators.append(systemTranslator);
+
+  // Install language translations (like "de" for German)
+  QTranslator* appTranslator1 = new QTranslator(qApp);
+  appTranslator1->load("librepcb_" % locale.name().split("_").at(0), dir);
+  qApp->installTranslator(appTranslator1);
+  installedTranslators.append(appTranslator1);
+
+  // Install language/country translations (like "de_ch" for German/Switzerland)
+  QTranslator* appTranslator2 = new QTranslator(qApp);
+  appTranslator2->load("librepcb_" % locale.name(), dir);
+  qApp->installTranslator(appTranslator2);
+  installedTranslators.append(appTranslator2);
 }
 
 /*******************************************************************************

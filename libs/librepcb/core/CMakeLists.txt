@@ -388,6 +388,7 @@ add_library(
   utils/clipperhelpers.h
   utils/mathparser.cpp
   utils/mathparser.h
+  utils/qtmetatyperegistration.h
   utils/scopeguard.h
   utils/scopeguardlist.h
   utils/signalslot.h
@@ -448,7 +449,6 @@ target_link_libraries(
          Qt5::PrintSupport
          Qt5::Sql
          Qt5::Svg
-         Qt5::Widgets
          # Link with -lproc on SunOS / Solaris / Illumos
          # This is required for proc_get_psinfo
          $<$<STREQUAL:$<PLATFORM_ID>,SunOS>:proc>

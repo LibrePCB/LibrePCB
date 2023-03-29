@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "d356netlistgenerator.h"
 
+#include "../application.h"
 #include "../types/angle.h"
 
 #include <QtCore>
@@ -45,7 +46,7 @@ D356NetlistGenerator::D356NetlistGenerator(
   mComments.append("Project Version:     " % projRevision);
   mComments.append("Board Name:          " % brdName);
   mComments.append("Generation Software: LibrePCB " %
-                   qApp->applicationVersion());
+                   Application::getVersion());
   mComments.append("Generation Date:     " %
                    generationDate.toString(Qt::ISODate));
   mComments.append("");

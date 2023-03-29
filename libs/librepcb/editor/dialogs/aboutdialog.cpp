@@ -26,6 +26,7 @@
 #include "ui_aboutdialog.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/systeminfo.h>
 
 #include <QtCore>
 #include <QtNetwork>
@@ -42,7 +43,7 @@ AboutDialog::AboutDialog(const WorkspaceSettings& settings,
   : QDialog(parent), mSettings(settings), mUi(new Ui::AboutDialog) {
   // Set up base dialog
   mUi->setupUi(this);
-  mUi->txtDetails->setFont(qApp->getDefaultMonospaceFont());
+  mUi->txtDetails->setFont(Application::getDefaultMonospaceFont());
 
   // Event handlers
   connect(mUi->lblIntro, &QLabel::linkActivated, this,
@@ -62,11 +63,11 @@ AboutDialog::AboutDialog(const WorkspaceSettings& settings,
   mUi->tabWidget->setCurrentIndex(0);
 
   // Get some version information
-  const QString& appVersion = qApp->applicationVersion();
-  const QString& gitRevision =
-      qApp->getGitRevision().left(10);  // 10 digits should be enough
-  const QString& buildDate =
-      qApp->getBuildDate().toString("yyyy-MM-dd hh:mm:ss (t)");
+  const QString appVersion = Application::getVersion();
+  const QString gitRevision =
+      Application::getGitRevision().left(10);  // 10 digits should be enough
+  const QString buildDate =
+      Application::getBuildDate().toString("yyyy-MM-dd hh:mm:ss (t)");
 
   // Set title text.
   mUi->lblTitle->setText(QString("LibrePCB %1").arg(appVersion));
@@ -148,19 +149,20 @@ AboutDialog::AboutDialog(const WorkspaceSettings& settings,
   // Information text (always English, not translatable)
   QStringList details;
   QString qt = QString(qVersion()) + " (built against " + QT_VERSION_STR + ")";
-  details << "LibrePCB Version: " + qApp->applicationVersion();
-  details << "Git Revision:     " + qApp->getGitRevision();
-  details << "Build Date:       " + qApp->getBuildDate().toString(Qt::ISODate);
-  if (!qApp->getBuildAuthor().isEmpty()) {
-    details << "Build Author:     " + qApp->getBuildAuthor();
+  details << "LibrePCB Version: " + Application::getVersion();
+  details << "Git Revision:     " + Application::getGitRevision();
+  details << "Build Date:       " +
+          Application::getBuildDate().toString(Qt::ISODate);
+  if (!Application::getBuildAuthor().isEmpty()) {
+    details << "Build Author:     " + Application::getBuildAuthor();
   }
   details << "Qt Version:       " + qt;
   details << "CPU Architecture: " + QSysInfo::currentCpuArchitecture();
   details << "Operating System: " + QSysInfo::prettyProductName();
   details << "Platform Plugin:  " + qApp->platformName();
   details << "TLS Library:      " + QSslSocket::sslLibraryVersionString();
-  if (!qApp->detectRuntime().isEmpty()) {
-    details << "Runtime:          " + qApp->detectRuntime();
+  if (!SystemInfo::detectRuntime().isEmpty()) {
+    details << "Runtime:          " + SystemInfo::detectRuntime();
   }
   mUi->txtDetails->setPlainText(details.join("\n"));
 }

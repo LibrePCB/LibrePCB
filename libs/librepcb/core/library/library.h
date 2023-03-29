@@ -27,7 +27,6 @@
 #include "librarybaseelement.h"
 
 #include <QtCore>
-#include <QtWidgets>
 
 #include <memory>
 

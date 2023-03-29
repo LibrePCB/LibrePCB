@@ -72,7 +72,7 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
   mUi->alignmentSelector->setAlignment(mText.getAlign());
   mUi->edtHeight->setValue(mText.getHeight());
   mUi->edtStrokeWidth->setValue(mText.getStrokeWidth());
-  const StrokeFont& font = qApp->getDefaultStrokeFont();
+  const StrokeFont& font = Application::getDefaultStrokeFont();
   if (mText.getLetterSpacing().isAuto()) {
     mUi->cbxLetterSpacingAuto->setChecked(true);
     mUi->edtLetterSpacingRatio->setEnabled(false);

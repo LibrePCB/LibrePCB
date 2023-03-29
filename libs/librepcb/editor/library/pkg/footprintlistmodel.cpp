@@ -26,6 +26,7 @@
 #include "../cmd/cmdfootprintedit.h"
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace

@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "excellongenerator.h"
 
+#include "../application.h"
 #include "../fileio/fileutils.h"
 #include "../types/point.h"
 #include "../utils/toolbox.h"
@@ -45,7 +46,7 @@ ExcellonGenerator::ExcellonGenerator(const QDateTime& creationDate,
                                      int toLayer) noexcept
   : mPlating(plating), mFileAttributes(), mUseG85Slots(false), mOutput() {
   mFileAttributes.append(GerberAttribute::fileGenerationSoftware(
-      "LibrePCB", "LibrePCB", qApp->applicationVersion()));
+      "LibrePCB", "LibrePCB", Application::getVersion()));
   mFileAttributes.append(GerberAttribute::fileCreationDate(creationDate));
   mFileAttributes.append(
       GerberAttribute::fileProjectId(projName, projUuid, projRevision));

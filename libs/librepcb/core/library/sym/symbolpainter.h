@@ -64,6 +64,7 @@ public:
   SymbolPainter& operator=(const SymbolPainter& rhs) = delete;
 
 private:  // Data
+  QFont mDefaultFont;
   QList<SymbolPin> mPins;
   QList<Polygon> mPolygons;
   QList<Circle> mCircles;

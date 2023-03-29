@@ -20,9 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
+#include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/version.h>
 
 #include <QtCore>
 
@@ -42,51 +43,32 @@ class ApplicationTest : public ::testing::Test {};
  *  Test Methods
  ******************************************************************************/
 
-TEST(ApplicationTest, testAppVersion) {
-  // read application version and check validity
-  Version v = qApp->getAppVersion();
-  EXPECT_GE(v, Version::fromString("0.1"));
-
-  // compare with QApplication version
-  Version v1 =
-      Version::fromString(qApp->applicationVersion().section('-', 0, 0));
-  EXPECT_GE(v1, Version::fromString("0.1"));
-  EXPECT_EQ(v, v1);
+TEST(ApplicationTest, testGetVersion) {
+  EXPECT_FALSE(Application::getVersion().isEmpty());
 }
 
-TEST(ApplicationTest, testFileFormatVersion) {
-  // check minimum
-  EXPECT_GE(qApp->getFileFormatVersion(), Version::fromString("0.1"));
-
-  // it can't be greater then the application version
-  EXPECT_LE(qApp->getFileFormatVersion(), qApp->getAppVersion());
+TEST(ApplicationTest, testGetFileFormatVersion) {
+  EXPECT_GE(Application::getFileFormatVersion(), Version::fromString("0.1"));
 }
 
 TEST(ApplicationTest, testGetResourcesDir) {
   // check if the resources directory is valid, exists and is not empty
-  EXPECT_TRUE(qApp->getResourcesDir().isValid());
-  EXPECT_TRUE(qApp->getResourcesDir().isExistingDir());
-  EXPECT_FALSE(qApp->getResourcesDir().isEmptyDir());
+  EXPECT_TRUE(Application::getResourcesDir().isValid());
+  EXPECT_TRUE(Application::getResourcesDir().isExistingDir());
+  EXPECT_FALSE(Application::getResourcesDir().isEmptyDir());
 
   // as the tests can't be installed, the resources must be located in the
   // repository root
-  FilePath repoRoot = qApp->getResourcesDir().getParentDir().getParentDir();
+  FilePath repoRoot =
+      Application::getResourcesDir().getParentDir().getParentDir();
   EXPECT_TRUE(repoRoot.getPathTo("LICENSE.txt").isExistingFile());
   EXPECT_TRUE(repoRoot.getPathTo("CMakeLists.txt").isExistingFile());
 }
 
-TEST(ApplicationTest, testGetResourcesFilePath) {
-  FilePath dir = qApp->getResourcesDir();
-  EXPECT_EQ(dir, qApp->getResourcesFilePath(""));
-  EXPECT_EQ(dir, qApp->getResourcesFilePath(QString()));
-  EXPECT_EQ(dir.getPathTo("foo"), qApp->getResourcesFilePath("foo"));
-  EXPECT_EQ(dir.getPathTo("foo/bar.ext"),
-            qApp->getResourcesFilePath("foo/bar.ext"));
-}
-
 TEST(ApplicationTest, testExistenceOfResourceFiles) {
-  EXPECT_TRUE(qApp->getResourcesDir().isExistingDir());
-  EXPECT_TRUE(qApp->getResourcesFilePath("README.md").isExistingFile());
+  EXPECT_TRUE(Application::getResourcesDir().isExistingDir());
+  EXPECT_TRUE(
+      Application::getResourcesDir().getPathTo("README.md").isExistingFile());
 }
 
 /*******************************************************************************

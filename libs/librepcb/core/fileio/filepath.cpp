@@ -22,12 +22,17 @@
  ******************************************************************************/
 #include "filepath.h"
 
+#include "../utils/qtmetatyperegistration.h"
+
 #include <QtCore>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+
+// Register Qt meta type.
+static QtMetaTypeRegistration<FilePath> sMetaType;
 
 /*******************************************************************************
  *  Constructors / Destructor

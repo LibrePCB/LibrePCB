@@ -43,7 +43,8 @@ namespace librepcb {
  ******************************************************************************/
 
 FootprintPainter::FootprintPainter(const Footprint& footprint) noexcept
-  : mStrokeFont(qApp->getDefaultStrokeFont()) {
+  : mMonospaceFont(Application::getDefaultSansSerifFont()),
+    mStrokeFont(Application::getDefaultStrokeFont()) {
   for (const FootprintPad& pad : footprint.getPads()) {
     mPads.append(pad);
   }
@@ -124,9 +125,8 @@ void FootprintPainter::paint(QPainter& painter,
     // SVG output.
     foreach (const Text& text, content.texts) {
       p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
-                 text.getAlign(), text.getText(),
-                 qApp->getDefaultMonospaceFont(), Qt::transparent, true,
-                 settings.getMirror());
+                 text.getAlign(), text.getText(), mMonospaceFont,
+                 Qt::transparent, true, settings.getMirror());
     }
   }
 }
