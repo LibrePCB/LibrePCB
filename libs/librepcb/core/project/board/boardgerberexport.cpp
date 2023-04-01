@@ -218,6 +218,9 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
 
       // Export component pins.
       foreach (const BI_FootprintPad* pad, device->getPads()) {
+        if (pad->getLibPad().getFunctionIsFiducial()) {
+          continue;
+        }
         QString pinName, pinSignal;
         if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
           pinName = *pkgPad->getName();
@@ -230,6 +233,31 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
         gen.flashComponentPin(pad->getPosition(), rotation, designator, value,
                               mountType, manufacturer, mpn, footprintName,
                               pinName, pinSignal, isPin1);
+      }
+    }
+  }
+
+  // Export fiducials on the selected board side.
+  const Layer& cuLayer =
+      (side == BoardSide::Bottom) ? Layer::botCopper() : Layer::topCopper();
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    int padNumber = 1;
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
+      if (pad->getLibPad().getFunctionIsFiducial() && pad->isOnLayer(cuLayer)) {
+        const Angle rotation =
+            device->getMirrored() ? -pad->getRotation() : pad->getRotation();
+        const QString designator =
+            QString("%1:%2")
+                .arg(*device->getComponentInstance().getName())
+                .arg(padNumber);
+        const QString value =
+            device->getComponentInstance().getValue(true).trimmed();
+        const QString footprintName =
+            *device->getLibPackage().getNames().getDefaultValue();
+        gen.flashComponent(pad->getPosition(), rotation, designator, value,
+                           GerberGenerator::MountType::Fiducial, QString(),
+                           QString(), footprintName);
+        ++padNumber;
       }
     }
   }

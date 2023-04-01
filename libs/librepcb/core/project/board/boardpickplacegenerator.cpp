@@ -29,6 +29,7 @@
 #include "../project.h"
 #include "board.h"
 #include "items/bi_device.h"
+#include "items/bi_footprintpad.h"
 
 #include <QtCore>
 
@@ -67,23 +68,54 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
   const QStringList& locale = mBoard.getProject().getLocaleOrder();
 
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    // Skip devices which are considered as no device to be mounted.
-    auto typeIt = types.find(device->getLibPackage().getAssemblyType(true));
-    if (typeIt == types.end()) {
-      continue;
+    QList<PickPlaceDataItem> items;
+    const QString designator = *device->getComponentInstance().getName();
+    const QString val = device->getComponentInstance().getValue(true).trimmed();
+    const QString devName = *device->getLibDevice().getNames().value(locale);
+    const QString pkgName = *device->getLibPackage().getNames().value(locale);
+
+    // Determine fiducials to be exported.
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
+      if (pad->getLibPad().getFunctionIsFiducial()) {
+        QVector<PickPlaceDataItem::BoardSide> sides;
+        if (pad->isOnLayer(Layer::topCopper())) {
+          sides.append(PickPlaceDataItem::BoardSide::Top);
+        }
+        if (pad->isOnLayer(Layer::botCopper())) {
+          sides.append(PickPlaceDataItem::BoardSide::Bottom);
+        }
+        foreach (const auto side, sides) {
+          items.append(PickPlaceDataItem(
+              designator, val, devName, pkgName, pad->getPosition(),
+              pad->getRotation(), side, PickPlaceDataItem::Type::Fiducial));
+        }
+      }
     }
 
-    QString designator = *device->getComponentInstance().getName();
-    QString value = device->getComponentInstance().getValue(true).trimmed();
-    QString deviceName = *device->getLibDevice().getNames().value(locale);
-    QString packageName = *device->getLibPackage().getNames().value(locale);
-    Point position = device->getPosition();
-    Angle rotation = device->getRotation();
-    PickPlaceDataItem::BoardSide boardSide = device->getMirrored()
-        ? PickPlaceDataItem::BoardSide::Bottom
-        : PickPlaceDataItem::BoardSide::Top;
-    data->addItem(PickPlaceDataItem(designator, value, deviceName, packageName,
-                                    position, rotation, boardSide, *typeIt));
+    // Ensure unique designators for pad items if there are multiple.
+    if (items.count() > 1) {
+      for (int i = 0; i < items.count(); ++i) {
+        items[i].setDesignator(items[i].getDesignator() % ":" %
+                               QString::number(i + 1));
+      }
+    }
+
+    // Export device only if its package is something to mount.
+    auto typeIt = types.find(device->getLibPackage().getAssemblyType(true));
+    if (typeIt != types.end()) {
+      const Point position = device->getPosition();
+      const Angle rotation = device->getRotation();
+      const PickPlaceDataItem::BoardSide boardSide = device->getMirrored()
+          ? PickPlaceDataItem::BoardSide::Bottom
+          : PickPlaceDataItem::BoardSide::Top;
+      items.append(PickPlaceDataItem(designator, val, devName, pkgName,
+                                     position, rotation, boardSide, *typeIt));
+    }
+
+    // Add all items.
+    for (const PickPlaceDataItem& item : items) {
+      data->addItem(item);
+    }
   }
 
   return data;
