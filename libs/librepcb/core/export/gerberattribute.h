@@ -57,6 +57,7 @@ public:
     // Available only on drill/rout layers:
     ViaDrill,  ///< Drill of a via (usually plated)
     ComponentDrill,  ///< Drill for component pads (usually plated)
+    ComponentDrillPressFit,  ///< Drill for press-fit component pads (plated)
     MechanicalDrill,  ///< Drill for mechanical purpose (usually not plated)
 
     // Available only on copper layers:
@@ -65,7 +66,14 @@ public:
     ComponentPad,  ///< THT pad
     SmdPadCopperDefined,  ///< SMT pad, copper-defined
     SmdPadSolderMaskDefined,  ///< SMT pad, stopmask-defined
+    BgaPadCopperDefined,  ///< BGA pad, copper-defined
+    BgaPadSolderMaskDefined,  ///< BGA pad, stopmask-defined
+    ConnectorPad,  ///< Edge connector pad
+    HeatsinkPad,  ///< Heat sink or thermal pad
     ViaPad,  ///< Via
+    TestPad,  ///< Test pad
+    FiducialPadLocal,  ///< Local fiducial pad
+    FiducialPadGlobal,  ///< Global fiducial pad
 
     // Available only on component layers:
     ComponentMain,  ///< Center of component
