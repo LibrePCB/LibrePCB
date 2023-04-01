@@ -131,7 +131,7 @@ private:
   void createDockWidgets() noexcept;
   void createMenus() noexcept;
   virtual bool graphicsViewEventHandler(QEvent* event) override;
-  void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
+  void toolRequested(const QVariant& newTool) noexcept;
   void addSchematic() noexcept;
   void removeSchematic(int index) noexcept;
   void renameSchematic(int index) noexcept;

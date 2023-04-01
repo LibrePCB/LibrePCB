@@ -110,7 +110,8 @@ private:  // Methods
   QString commitMetadata() noexcept;
   /// @see ::librepcb::editor::IF_GraphicsViewEventHandler
   bool graphicsViewEventHandler(QEvent* event) noexcept override;
-  bool toolChangeRequested(Tool newTool) noexcept override;
+  bool toolChangeRequested(Tool newTool,
+                           const QVariant& mode) noexcept override;
   bool isInterfaceBroken() const noexcept override;
   bool runChecks(RuleCheckMessageList& msgs) const override;
   template <typename MessageType>

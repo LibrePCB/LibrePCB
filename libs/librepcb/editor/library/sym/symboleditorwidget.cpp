@@ -460,7 +460,9 @@ bool SymbolEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
   }
 }
 
-bool SymbolEditorWidget::toolChangeRequested(Tool newTool) noexcept {
+bool SymbolEditorWidget::toolChangeRequested(Tool newTool,
+                                             const QVariant& mode) noexcept {
+  Q_UNUSED(mode);
   switch (newTool) {
     case Tool::SELECT:
       return mFsm->processStartSelecting();

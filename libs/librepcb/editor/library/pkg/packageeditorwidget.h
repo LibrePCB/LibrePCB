@@ -111,7 +111,8 @@ private:  // Methods
   QString commitMetadata() noexcept;
   /// @see ::librepcb::editor::IF_GraphicsViewEventHandler
   bool graphicsViewEventHandler(QEvent* event) noexcept override;
-  bool toolChangeRequested(Tool newTool) noexcept override;
+  bool toolChangeRequested(Tool newTool,
+                           const QVariant& mode) noexcept override;
   void currentFootprintChanged(int index) noexcept;
   void memorizePackageInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;

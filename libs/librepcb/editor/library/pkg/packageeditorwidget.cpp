@@ -507,7 +507,9 @@ bool PackageEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
   }
 }
 
-bool PackageEditorWidget::toolChangeRequested(Tool newTool) noexcept {
+bool PackageEditorWidget::toolChangeRequested(Tool newTool,
+                                              const QVariant& mode) noexcept {
+  Q_UNUSED(mode);
   switch (newTool) {
     case Tool::SELECT:
       return mFsm->processStartSelecting();

@@ -141,7 +141,7 @@ private:
   void createMenus() noexcept;
   void updateBoardActionGroup() noexcept;
   virtual bool graphicsViewEventHandler(QEvent* event) override;
-  void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
+  void toolRequested(const QVariant& newTool) noexcept;
   void unplacedComponentsCountChanged(int count) noexcept;
   void runDrc(bool quick) noexcept;
   void highlightDrcMessage(const RuleCheckMessage& msg, bool zoomTo) noexcept;
