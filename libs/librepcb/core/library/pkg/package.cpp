@@ -118,15 +118,22 @@ Package::AssemblyType Package::getAssemblyType(bool resolveAuto) const
 }
 
 Package::AssemblyType Package::guessAssemblyType() const noexcept {
+  // If there are no package pads, probably there's nothing to mount.
+  if (mPads.isEmpty()) {
+    return AssemblyType::None;
+  }
+
   // Auto-detect based on default footprint pads.
   bool hasThtPads = false;
   bool hasSmtPads = false;
   if (!mFootprints.isEmpty()) {
     for (const FootprintPad& pad : mFootprints.first()->getPads()) {
-      if (pad.isTht()) {
-        hasThtPads = true;
-      } else {
-        hasSmtPads = true;
+      if (pad.getFunctionNeedsSoldering()) {
+        if (pad.isTht()) {
+          hasThtPads = true;
+        } else {
+          hasSmtPads = true;
+        }
       }
     }
   }

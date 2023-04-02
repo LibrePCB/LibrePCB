@@ -119,6 +119,8 @@ private:  // Methods
   template <typename MessageType>
   void fixMsg(const MessageType& msg);
   template <typename MessageType>
+  void fixPadFunction(const MessageType& msg);
+  template <typename MessageType>
   bool fixMsgHelper(std::shared_ptr<const RuleCheckMessage> msg, bool applyFix);
   bool processRuleCheckMessage(std::shared_ptr<const RuleCheckMessage> msg,
                                bool applyFix) override;
