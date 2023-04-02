@@ -282,7 +282,7 @@ public:
       const Layer* layer1, const NetSignal* net1, const BI_Base& item1,
       const Polygon* polygon1, const Circle* circle1, const Layer* layer2,
       const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
-      const Circle* circle2, const UnsignedLength& minClearance,
+      const Circle* circle2, const Length& minClearance,
       const QVector<Path>& locations);
   DrcMsgCopperCopperClearanceViolation(
       const DrcMsgCopperCopperClearanceViolation& other) noexcept

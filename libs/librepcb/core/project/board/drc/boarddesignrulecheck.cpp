@@ -219,9 +219,8 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
   emitStatus(tr("Check copper clearances..."));
 
-  // Calculate offset to be applied to each object.
-  const Length offset =
-      std::max(((clearance - maxArcTolerance()) / 2) - Length(1), Length(0));
+  // Subtract a tolerance to avoid false-positives due to inaccuracies.
+  const Length tolerance = maxArcTolerance() + Length(1);
 
   // Determine the area of each copper object.
   struct Item {
@@ -230,28 +229,49 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
     const Circle* circle;  // Only relevant if item is a BI_Device
     const Layer* layer;  // nullptr = THT
     const NetSignal* netSignal;  // nullptr = no net
-    ClipperLib::Paths areas;
+    Length clearance;
+    ClipperLib::Paths copperArea;  // Exact copper outlines
+    ClipperLib::Paths clearanceArea;  // Copper outlines + clearance - tolerance
   };
-  QVector<Item> items;
+  typedef QVector<Item> Items;
+  Items items;
 
   // Net segments.
+  BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
   foreach (const BI_NetSegment* netSegment, mBoard.getNetSegments()) {
     // vias.
     foreach (const BI_Via* via, netSegment->getVias()) {
-      BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-      gen.addVia(*via, offset);
-      items.append(Item{via, nullptr, nullptr, nullptr,
-                        via->getNetSegment().getNetSignal(), gen.getPaths()});
+      auto it = items.insert(items.end(),
+                             Item{via,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  via->getNetSegment().getNetSignal(),
+                                  *clearance,
+                                  {},
+                                  {}});
+      gen.addVia(*via);
+      gen.takePathsTo(it->copperArea);
+      gen.addVia(*via, clearance - tolerance);
+      gen.takePathsTo(it->clearanceArea);
     }
 
     // Net lines.
     foreach (const BI_NetLine* netLine, netSegment->getNetLines()) {
       if (mBoard.getCopperLayers().contains(&netLine->getLayer())) {
-        BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-        gen.addNetLine(*netLine, offset);
-        items.append(Item{netLine, nullptr, nullptr, &netLine->getLayer(),
-                          netLine->getNetSegment().getNetSignal(),
-                          gen.getPaths()});
+        auto it = items.insert(items.end(),
+                               Item{netLine,
+                                    nullptr,
+                                    nullptr,
+                                    &netLine->getLayer(),
+                                    netLine->getNetSegment().getNetSignal(),
+                                    *clearance,
+                                    {},
+                                    {}});
+        gen.addNetLine(*netLine);
+        gen.takePathsTo(it->copperArea);
+        gen.addNetLine(*netLine, clearance - tolerance);
+        gen.takePathsTo(it->clearanceArea);
       }
     }
   }
@@ -260,12 +280,20 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
   if (!mIgnorePlanes) {
     foreach (const BI_Plane* plane, mBoard.getPlanes()) {
       if (mBoard.getCopperLayers().contains(&plane->getLayer())) {
-        BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
+        auto it = items.insert(items.end(),
+                               Item{plane,
+                                    nullptr,
+                                    nullptr,
+                                    &plane->getLayer(),
+                                    &plane->getNetSignal(),
+                                    *clearance,
+                                    {},
+                                    {}});
         gen.addPlane(*plane);
-        ClipperLib::Paths paths = gen.getPaths();
-        ClipperHelpers::offset(paths, offset, maxArcTolerance());
-        items.append(Item{plane, nullptr, nullptr, &plane->getLayer(),
-                          &plane->getNetSignal(), paths});
+        gen.takePathsTo(it->copperArea);
+        it->clearanceArea = it->copperArea;
+        ClipperHelpers::offset(it->clearanceArea, clearance - tolerance,
+                               maxArcTolerance());
       }
     }
   }
@@ -273,12 +301,20 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
   // Board polygons.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     if (mBoard.getCopperLayers().contains(&polygon->getPolygon().getLayer())) {
-      BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
+      auto it = items.insert(items.end(),
+                             Item{polygon,
+                                  nullptr,
+                                  nullptr,
+                                  &polygon->getPolygon().getLayer(),
+                                  nullptr,
+                                  *clearance,
+                                  {},
+                                  {}});
       gen.addPolygon(*polygon);
-      ClipperLib::Paths paths = gen.getPaths();
-      ClipperHelpers::offset(paths, offset, maxArcTolerance());
-      items.append(Item{polygon, nullptr, nullptr,
-                        &polygon->getPolygon().getLayer(), nullptr, paths});
+      gen.takePathsTo(it->copperArea);
+      it->clearanceArea = it->copperArea;
+      ClipperHelpers::offset(it->clearanceArea, clearance - tolerance,
+                             maxArcTolerance());
     }
   }
 
@@ -286,11 +322,19 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
     if (mBoard.getCopperLayers().contains(
             &strokeText->getTextObj().getLayer())) {
-      BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-      gen.addStrokeText(*strokeText, offset);
-      items.append(Item{strokeText, nullptr, nullptr,
-                        &strokeText->getTextObj().getLayer(), nullptr,
-                        gen.getPaths()});
+      auto it = items.insert(items.end(),
+                             Item{strokeText,
+                                  nullptr,
+                                  nullptr,
+                                  &strokeText->getTextObj().getLayer(),
+                                  nullptr,
+                                  *clearance,
+                                  {},
+                                  {}});
+      gen.addStrokeText(*strokeText);
+      gen.takePathsTo(it->copperArea);
+      gen.addStrokeText(*strokeText, clearance - tolerance);
+      gen.takePathsTo(it->clearanceArea);
     }
   }
 
@@ -302,10 +346,19 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       foreach (const Layer* layer, mBoard.getCopperLayers()) {
         if (pad->isOnLayer(*layer)) {
-          BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-          gen.addPad(*pad, transform, *layer, offset);
-          items.append(Item{pad, nullptr, nullptr, layer,
-                            pad->getCompSigInstNetSignal(), gen.getPaths()});
+          auto it = items.insert(items.end(),
+                                 Item{pad,
+                                      nullptr,
+                                      nullptr,
+                                      layer,
+                                      pad->getCompSigInstNetSignal(),
+                                      *clearance,
+                                      {},
+                                      {}});
+          gen.addPad(*pad, transform, *layer);
+          gen.takePathsTo(it->copperArea);
+          gen.addPad(*pad, transform, *layer, clearance - tolerance);
+          gen.takePathsTo(it->clearanceArea);
         }
       }
     }
@@ -313,22 +366,39 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
     // Polygons.
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
       if (mBoard.getCopperLayers().contains(&polygon.getLayer())) {
-        BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
+        auto it = items.insert(items.end(),
+                               Item{device,
+                                    &polygon,
+                                    nullptr,
+                                    &polygon.getLayer(),
+                                    nullptr,
+                                    *clearance,
+                                    {},
+                                    {}});
         gen.addPolygon(polygon, transform);
-        ClipperLib::Paths paths = gen.getPaths();
-        ClipperHelpers::offset(paths, offset, maxArcTolerance());
-        items.append(Item{device, &polygon, nullptr, &polygon.getLayer(),
-                          nullptr, paths});
+        gen.takePathsTo(it->copperArea);
+        it->clearanceArea = it->copperArea;
+        ClipperHelpers::offset(it->clearanceArea, clearance - tolerance,
+                               maxArcTolerance());
       }
     }
 
     // Circles.
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
       if (mBoard.getCopperLayers().contains(&circle.getLayer())) {
-        BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-        gen.addCircle(circle, transform, offset);
-        items.append(Item{device, nullptr, &circle, &circle.getLayer(), nullptr,
-                          gen.getPaths()});
+        auto it = items.insert(items.end(),
+                               Item{device,
+                                    nullptr,
+                                    &circle,
+                                    &circle.getLayer(),
+                                    nullptr,
+                                    *clearance,
+                                    {},
+                                    {}});
+        gen.addCircle(circle, transform);
+        gen.takePathsTo(it->copperArea);
+        gen.addCircle(circle, transform, clearance - tolerance);
+        gen.takePathsTo(it->clearanceArea);
       }
     }
 
@@ -336,32 +406,50 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
       if (mBoard.getCopperLayers().contains(
               &strokeText->getTextObj().getLayer())) {
-        BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-        gen.addStrokeText(*strokeText, offset);
-        items.append(Item{strokeText, nullptr, nullptr,
-                          &strokeText->getTextObj().getLayer(), nullptr,
-                          gen.getPaths()});
+        auto it = items.insert(items.end(),
+                               Item{strokeText,
+                                    nullptr,
+                                    nullptr,
+                                    &strokeText->getTextObj().getLayer(),
+                                    nullptr,
+                                    *clearance,
+                                    {},
+                                    {}});
+        gen.addStrokeText(*strokeText);
+        gen.takePathsTo(it->copperArea);
+        gen.addStrokeText(*strokeText, clearance - tolerance);
+        gen.takePathsTo(it->clearanceArea);
       }
     }
   }
 
   // Now check for intersections.
+  auto checkForIntersections = [](Items::Iterator& it1, Items::Iterator& it2,
+                                  QVector<Path>& locations) {
+    const std::unique_ptr<ClipperLib::PolyTree> intersections =
+        ClipperHelpers::intersect(it1->copperArea, it2->clearanceArea);
+    locations.append(
+        ClipperHelpers::convert(ClipperHelpers::flattenTree(*intersections)));
+  };
   auto lastItem = items.isEmpty() ? items.end() : std::prev(items.end());
   for (auto it1 = items.begin(); it1 != lastItem; it1++) {
     for (auto it2 = it1 + 1; it2 != items.end(); it2++) {
       if (((it1->netSignal != it2->netSignal) || (!it1->netSignal) ||
            (!it2->netSignal)) &&
           ((!it1->layer) || (!it2->layer) || (it1->layer == it2->layer))) {
-        const std::unique_ptr<ClipperLib::PolyTree> intersections =
-            ClipperHelpers::intersect(it1->areas, it2->areas);
-        const ClipperLib::Paths paths =
-            ClipperHelpers::flattenTree(*intersections);
-        if (!paths.empty()) {
-          const QVector<Path> locations = ClipperHelpers::convert(paths);
+        QVector<Path> locations;
+        checkForIntersections(it1, it2, locations);
+        // Perform the check the other way around only if:
+        //  - Either the two items have individual clearances
+        //  - Or there are any intersections -> show both violations in UI
+        if ((it1->clearance != it2->clearance) || (!locations.isEmpty())) {
+          checkForIntersections(it2, it1, locations);
+        }
+        if (!locations.isEmpty()) {
           emitMessage(std::make_shared<DrcMsgCopperCopperClearanceViolation>(
               it1->layer, it1->netSignal, *it1->item, it1->polygon, it1->circle,
               it2->layer, it2->netSignal, *it2->item, it2->polygon, it2->circle,
-              clearance, locations));
+              std::max(it1->clearance, it2->clearance), locations));
         }
       }
     }
