@@ -428,6 +428,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           MaskConfig::automatic(),  // Stop mask
           MaskConfig::off(),  // Solder paste
           FootprintPad::ComponentSide::Top,  // Side
+          FootprintPad::Function::Unspecified,  // Function
           PadHoleList{std::make_shared<PadHole>(
               Uuid::createRandom(),
               PositiveLength(convertLength(p.getDrillDiameter())),
@@ -465,6 +466,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           MaskConfig::automatic(),  // Stop mask
           MaskConfig::automatic(),  // Solder paste
           side,  // Side
+          FootprintPad::Function::Unspecified,  // Function
           PadHoleList{}  // Holes
           ));
 }

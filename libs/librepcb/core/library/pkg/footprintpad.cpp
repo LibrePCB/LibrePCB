@@ -90,6 +90,60 @@ inline FootprintPad::ComponentSide deserialize(const SExpression& node) {
   }
 }
 
+template <>
+SExpression serialize(const FootprintPad::Function& obj) {
+  switch (obj) {
+    case FootprintPad::Function::Unspecified:
+      return SExpression::createToken("unspecified");
+    case FootprintPad::Function::StandardPad:
+      return SExpression::createToken("standard");
+    case FootprintPad::Function::PressFitPad:
+      return SExpression::createToken("pressfit");
+    case FootprintPad::Function::ThermalPad:
+      return SExpression::createToken("thermal");
+    case FootprintPad::Function::BgaPad:
+      return SExpression::createToken("bga");
+    case FootprintPad::Function::EdgeConnectorPad:
+      return SExpression::createToken("edge_connector");
+    case FootprintPad::Function::TestPad:
+      return SExpression::createToken("test");
+    case FootprintPad::Function::LocalFiducial:
+      return SExpression::createToken("local_fiducial");
+    case FootprintPad::Function::GlobalFiducial:
+      return SExpression::createToken("global_fiducial");
+    default:
+      throw LogicError(__FILE__, __LINE__);
+  }
+}
+
+template <>
+inline FootprintPad::Function deserialize(const SExpression& node) {
+  const QString str = node.getValue();
+  if (str == QLatin1String("unspecified")) {
+    return FootprintPad::Function::Unspecified;
+  } else if (str == QLatin1String("standard")) {
+    return FootprintPad::Function::StandardPad;
+  } else if (str == QLatin1String("press_fit")) {
+    return FootprintPad::Function::PressFitPad;
+  } else if (str == QLatin1String("thermal")) {
+    return FootprintPad::Function::ThermalPad;
+  } else if (str == QLatin1String("bga")) {
+    return FootprintPad::Function::BgaPad;
+  } else if (str == QLatin1String("edge_connector")) {
+    return FootprintPad::Function::EdgeConnectorPad;
+  } else if (str == QLatin1String("test")) {
+    return FootprintPad::Function::TestPad;
+  } else if (str == QLatin1String("local_fiducial")) {
+    return FootprintPad::Function::LocalFiducial;
+  } else if (str == QLatin1String("global_fiducial")) {
+    return FootprintPad::Function::GlobalFiducial;
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Unknown footprint pad function: '%1'").arg(str));
+  }
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -108,6 +162,7 @@ FootprintPad::FootprintPad(const FootprintPad& other) noexcept
     mStopMaskConfig(other.mStopMaskConfig),
     mSolderPasteConfig(other.mSolderPasteConfig),
     mComponentSide(other.mComponentSide),
+    mFunction(other.mFunction),
     mHoles(other.mHoles),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
   mHoles.onEdited.attach(mHolesEditedSlot);
@@ -118,7 +173,7 @@ FootprintPad::FootprintPad(
     const Angle& rot, Shape shape, const PositiveLength& width,
     const PositiveLength& height, const UnsignedLimitedRatio& radius,
     const Path& customShapeOutline, const MaskConfig& autoStopMask,
-    const MaskConfig& autoSolderPaste, ComponentSide side,
+    const MaskConfig& autoSolderPaste, ComponentSide side, Function function,
     const PadHoleList& holes) noexcept
   : onEdited(*this),
     mUuid(uuid),
@@ -133,6 +188,7 @@ FootprintPad::FootprintPad(
     mStopMaskConfig(autoStopMask),
     mSolderPasteConfig(autoSolderPaste),
     mComponentSide(side),
+    mFunction(function),
     mHoles(holes),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
   mHoles.onEdited.attach(mHolesEditedSlot);
@@ -154,6 +210,7 @@ FootprintPad::FootprintPad(const SExpression& node)
     mSolderPasteConfig(
         deserialize<MaskConfig>(node.getChild("solder_paste/@0"))),
     mComponentSide(deserialize<ComponentSide>(node.getChild("side/@0"))),
+    mFunction(deserialize<Function>(node.getChild("function/@0"))),
     mHoles(node),
     mHolesEditedSlot(*this, &FootprintPad::holesEdited) {
   mHoles.onEdited.attach(mHolesEditedSlot);
@@ -165,6 +222,23 @@ FootprintPad::~FootprintPad() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
+
+bool FootprintPad::getFunctionIsFiducial() const noexcept {
+  return (mFunction == Function::LocalFiducial) ||
+      (mFunction == Function::GlobalFiducial);
+}
+
+bool FootprintPad::getFunctionNeedsSoldering() const noexcept {
+  switch (mFunction) {
+    case Function::EdgeConnectorPad:
+    case Function::TestPad:
+    case Function::LocalFiducial:
+    case Function::GlobalFiducial:
+      return false;
+    default:
+      return true;
+  }
+}
 
 bool FootprintPad::isTht() const noexcept {
   return !mHoles.isEmpty();
@@ -344,6 +418,16 @@ bool FootprintPad::setComponentSide(ComponentSide side) noexcept {
   return true;
 }
 
+bool FootprintPad::setFunction(Function function) noexcept {
+  if (function == mFunction) {
+    return false;
+  }
+
+  mFunction = function;
+  onEdited.notify(Event::FunctionChanged);
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -360,6 +444,7 @@ void FootprintPad::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("stop_mask", mStopMaskConfig);
   root.appendChild("solder_paste", mSolderPasteConfig);
+  root.appendChild("function", mFunction);
   root.ensureLineBreak();
   root.appendChild("package_pad", mPackagePadUuid);
   root.ensureLineBreak();
@@ -386,6 +471,7 @@ bool FootprintPad::operator==(const FootprintPad& rhs) const noexcept {
   if (mStopMaskConfig != rhs.mStopMaskConfig) return false;
   if (mSolderPasteConfig != rhs.mSolderPasteConfig) return false;
   if (mComponentSide != rhs.mComponentSide) return false;
+  if (mFunction != rhs.mFunction) return false;
   if (mHoles != rhs.mHoles) return false;
   return true;
 }
@@ -406,6 +492,7 @@ FootprintPad& FootprintPad::operator=(const FootprintPad& rhs) noexcept {
   setStopMaskConfig(rhs.mStopMaskConfig);
   setSolderPasteConfig(rhs.mSolderPasteConfig);
   setComponentSide(rhs.mComponentSide);
+  setFunction(rhs.mFunction);
   mHoles = rhs.mHoles;
   return *this;
 }
@@ -423,6 +510,34 @@ UnsignedLimitedRatio FootprintPad::getRecommendedRadius(
   maxRadius *= Ratio::percent1();
   return UnsignedLimitedRatio(
       qBound(Ratio::percent0(), maxRadius, Ratio::percent50()));
+}
+
+QString FootprintPad::getFunctionDescriptionTr(Function function) noexcept {
+  switch (function) {
+    case Function::Unspecified:
+      return tr("Not Specified");
+    case Function::StandardPad:
+      return tr("Standard Pad (soldered)");
+    case Function::PressFitPad:
+      return tr("Press-Fit Pad (THT, soldered)");
+    case Function::ThermalPad:
+      return tr("Thermal Pad (SMT, soldered)");
+    case Function::BgaPad:
+      return tr("BGA Pad (SMT, soldered)");
+    case Function::EdgeConnectorPad:
+      return tr("Edge Connector Pad (SMT, no soldering)");
+    case Function::TestPad:
+      return tr("Test Pad (SMT, no soldering)");
+    case Function::LocalFiducial:
+      return tr("Local Footprint Fiducial (SMT, no soldering)");
+    case Function::GlobalFiducial:
+      return tr("Global Board Fiducial (SMT, no soldering)");
+    default:
+      qCritical() << "Unhandled switch-case in "
+                     "FootprintPad::getFunctionDescriptionTr():"
+                  << static_cast<int>(function);
+      return QString();
+  }
 }
 
 /*******************************************************************************

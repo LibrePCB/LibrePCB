@@ -159,6 +159,10 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
         padNode->appendChild(
             "solder_paste",
             SExpression::createToken((drill > 0) ? "off" : "auto"));
+
+        // Add function.
+        padNode->appendChild("function",
+                             SExpression::createToken("unspecified"));
       }
 
       // Holes.

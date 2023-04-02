@@ -168,6 +168,13 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   connect(mUi->rbtnSolderPasteManual, &QRadioButton::toggled,
           mUi->edtSolderPasteOffset, &LengthEdit::setEnabled);
 
+  // Populate functions.
+  for (int i = 0; i < static_cast<int>(FootprintPad::Function::_COUNT); ++i) {
+    const FootprintPad::Function value = static_cast<FootprintPad::Function>(i);
+    mUi->cbxFunction->addItem(FootprintPad::getFunctionDescriptionTr(value),
+                              QVariant::fromValue(value));
+  }
+
   // load pad attributes
   int currentPadIndex = 0;
   mUi->cbxPackagePad->addItem(tr("(not connected)"), "");
@@ -178,6 +185,8 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
     }
   }
   mUi->cbxPackagePad->setCurrentIndex(currentPadIndex);
+  mUi->cbxFunction->setCurrentIndex(
+      mUi->cbxFunction->findData(QVariant::fromValue(mPad.getFunction())));
   if (mPad.getComponentSide() == FootprintPad::ComponentSide::Bottom) {
     mUi->btnComponentSideBottom->setChecked(true);
   } else {
@@ -248,6 +257,7 @@ FootprintPadPropertiesDialog::~FootprintPadPropertiesDialog() noexcept {
 
 void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->cbxPackagePad->setDisabled(readOnly);
+  mUi->cbxFunction->setDisabled(readOnly);
   mUi->btnComponentSideTop->setDisabled(readOnly);
   mUi->btnComponentSideBottom->setDisabled(readOnly);
   mUi->btnShapeRound->setDisabled(readOnly);
@@ -448,6 +458,10 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     tl::optional<Uuid> pkgPad =
         Uuid::tryFromString(mUi->cbxPackagePad->currentData().toString());
     cmd->setPackagePadUuid(pkgPad, false);
+    QVariant function = mUi->cbxFunction->currentData();
+    if (function.isValid() && function.canConvert<FootprintPad::Function>()) {
+      cmd->setFunction(function.value<FootprintPad::Function>(), false);
+    }
     if (mUi->btnComponentSideTop->isChecked()) {
       cmd->setComponentSide(FootprintPad::ComponentSide::Top, false);
     } else if (mUi->btnComponentSideBottom->isChecked()) {

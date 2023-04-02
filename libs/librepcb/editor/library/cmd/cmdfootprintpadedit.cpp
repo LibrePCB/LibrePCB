@@ -41,6 +41,8 @@ CmdFootprintPadEdit::CmdFootprintPadEdit(FootprintPad& pad) noexcept
     mNewPackagePadUuid(mOldPackagePadUuid),
     mOldComponentSide(pad.getComponentSide()),
     mNewComponentSide(mOldComponentSide),
+    mOldFunction(pad.getFunction()),
+    mNewFunction(mOldFunction),
     mOldShape(pad.getShape()),
     mNewShape(mOldShape),
     mOldWidth(pad.getWidth()),
@@ -89,6 +91,13 @@ void CmdFootprintPadEdit::setComponentSide(FootprintPad::ComponentSide side,
   Q_ASSERT(!wasEverExecuted());
   mNewComponentSide = side;
   if (immediate) mPad.setComponentSide(mNewComponentSide);
+}
+
+void CmdFootprintPadEdit::setFunction(FootprintPad::Function function,
+                                      bool immediate) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewFunction = function;
+  if (immediate) mPad.setFunction(mNewFunction);
 }
 
 void CmdFootprintPadEdit::setShape(FootprintPad::Shape shape,
@@ -219,6 +228,7 @@ bool CmdFootprintPadEdit::performExecute() {
 
   if (mNewPackagePadUuid != mOldPackagePadUuid) return true;
   if (mNewComponentSide != mOldComponentSide) return true;
+  if (mNewFunction != mOldFunction) return true;
   if (mNewShape != mOldShape) return true;
   if (mNewWidth != mOldWidth) return true;
   if (mNewHeight != mOldHeight) return true;
@@ -235,6 +245,7 @@ bool CmdFootprintPadEdit::performExecute() {
 void CmdFootprintPadEdit::performUndo() {
   mPad.setPackagePadUuid(mOldPackagePadUuid);
   mPad.setComponentSide(mOldComponentSide);
+  mPad.setFunction(mOldFunction);
   mPad.setShape(mOldShape);
   mPad.setWidth(mOldWidth);
   mPad.setHeight(mOldHeight);
@@ -250,6 +261,7 @@ void CmdFootprintPadEdit::performUndo() {
 void CmdFootprintPadEdit::performRedo() {
   mPad.setPackagePadUuid(mNewPackagePadUuid);
   mPad.setComponentSide(mNewComponentSide);
+  mPad.setFunction(mNewFunction);
   mPad.setShape(mNewShape);
   mPad.setWidth(mNewWidth);
   mPad.setHeight(mNewHeight);

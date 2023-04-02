@@ -67,6 +67,19 @@ public:
     Bottom,
   };
 
+  enum class Function {
+    Unspecified = 0,
+    StandardPad,
+    PressFitPad,
+    ThermalPad,
+    BgaPad,
+    EdgeConnectorPad,
+    TestPad,
+    LocalFiducial,
+    GlobalFiducial,
+    _COUNT,
+  };
+
   // Signals
   enum class Event {
     UuidChanged,
@@ -81,6 +94,7 @@ public:
     StopMaskConfigChanged,
     SolderPasteConfigChanged,
     ComponentSideChanged,
+    FunctionChanged,
     HolesEdited,
   };
   Signal<FootprintPad, Event> onEdited;
@@ -95,7 +109,7 @@ public:
                const UnsignedLimitedRatio& radius,
                const Path& customShapeOutline, const MaskConfig& autoStopMask,
                const MaskConfig& autoSolderPaste, ComponentSide side,
-               const PadHoleList& holes) noexcept;
+               Function function, const PadHoleList& holes) noexcept;
   explicit FootprintPad(const SExpression& node);
   ~FootprintPad() noexcept;
 
@@ -120,6 +134,9 @@ public:
     return mSolderPasteConfig;
   }
   ComponentSide getComponentSide() const noexcept { return mComponentSide; }
+  Function getFunction() const noexcept { return mFunction; }
+  bool getFunctionIsFiducial() const noexcept;
+  bool getFunctionNeedsSoldering() const noexcept;
   const PadHoleList& getHoles() const noexcept { return mHoles; }
   PadHoleList& getHoles() noexcept { return mHoles; }
   bool isTht() const noexcept;
@@ -145,6 +162,7 @@ public:
   bool setStopMaskConfig(const MaskConfig& config) noexcept;
   bool setSolderPasteConfig(const MaskConfig& config) noexcept;
   bool setComponentSide(ComponentSide side) noexcept;
+  bool setFunction(Function function) noexcept;
 
   // General Methods
 
@@ -165,6 +183,7 @@ public:
   // Static Methods
   static UnsignedLimitedRatio getRecommendedRadius(
       const PositiveLength& width, const PositiveLength& height) noexcept;
+  static QString getFunctionDescriptionTr(Function function) noexcept;
 
 private:  // Methods
   void holesEdited(const PadHoleList& list, int index,
@@ -190,11 +209,20 @@ private:  // Data
   MaskConfig mStopMaskConfig;
   MaskConfig mSolderPasteConfig;
   ComponentSide mComponentSide;
+  Function mFunction;
   PadHoleList mHoles;  ///< If not empty, it's a THT pad.
 
   // Slots
   PadHoleList::OnEditedSlot mHolesEditedSlot;
 };
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+inline uint qHash(const FootprintPad::Function& key, uint seed = 0) noexcept {
+  return ::qHash(static_cast<int>(key), seed);
+}
 
 /*******************************************************************************
  *  Class FootprintPadList
@@ -212,5 +240,7 @@ using FootprintPadList =
  ******************************************************************************/
 
 }  // namespace librepcb
+
+Q_DECLARE_METATYPE(librepcb::FootprintPad::Function)
 
 #endif

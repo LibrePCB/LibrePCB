@@ -103,7 +103,8 @@ bool CmdPasteFootprintItems::performExecute() {
         uuid, pkgPadUuid, pad.getPosition() + mPosOffset, pad.getRotation(),
         pad.getShape(), pad.getWidth(), pad.getHeight(), pad.getRadius(),
         pad.getCustomShapeOutline(), pad.getStopMaskConfig(),
-        pad.getSolderPasteConfig(), pad.getComponentSide(), pad.getHoles());
+        pad.getSolderPasteConfig(), pad.getComponentSide(), pad.getFunction(),
+        pad.getHoles());
     execNewChildCmd(new CmdFootprintPadInsert(mFootprint.getPads(), copy));
     if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
       graphicsItem->setSelected(true);

@@ -58,6 +58,7 @@ public:
                          bool immediate) noexcept;
   void setComponentSide(FootprintPad::ComponentSide side,
                         bool immediate) noexcept;
+  void setFunction(FootprintPad::Function function, bool immediate) noexcept;
   void setShape(FootprintPad::Shape shape, bool immediate) noexcept;
   void setWidth(const PositiveLength& width, bool immediate) noexcept;
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
@@ -100,6 +101,8 @@ private:
   tl::optional<Uuid> mNewPackagePadUuid;
   FootprintPad::ComponentSide mOldComponentSide;
   FootprintPad::ComponentSide mNewComponentSide;
+  FootprintPad::Function mOldFunction;
+  FootprintPad::Function mNewFunction;
   FootprintPad::Shape mOldShape;
   FootprintPad::Shape mNewShape;
   PositiveLength mOldWidth;

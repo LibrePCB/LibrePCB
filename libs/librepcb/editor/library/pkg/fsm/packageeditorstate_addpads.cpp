@@ -66,6 +66,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(Context& context,
         MaskConfig::automatic(),  // Stop mask
         MaskConfig::off(),  // Solder paste
         FootprintPad::ComponentSide::Top,  // Default side
+        FootprintPad::Function::StandardPad,  // Most common function
         PadHoleList{}) {
   if (mPadType == PadType::SMT) {
     mLastPad.setShape(
@@ -356,7 +357,7 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
         mLastPad.getWidth(), mLastPad.getHeight(), mLastPad.getRadius(),
         mLastPad.getCustomShapeOutline(), mLastPad.getStopMaskConfig(),
         mLastPad.getSolderPasteConfig(), mLastPad.getComponentSide(),
-        PadHoleList{});
+        mLastPad.getFunction(), PadHoleList{});
     for (const PadHole& hole : mLastPad.getHoles()) {
       mCurrentPad->getHoles().append(std::make_shared<PadHole>(
           Uuid::createRandom(), hole.getDiameter(), hole.getPath()));
