@@ -702,6 +702,32 @@ void PackageEditorWidget::fixMsg(const MsgThtPadWithSolderPaste& msg) {
 }
 
 template <>
+void PackageEditorWidget::fixMsg(const MsgPadWithCopperClearance& msg) {
+  std::shared_ptr<Footprint> footprint =
+      mPackage->getFootprints().get(msg.getFootprint().get());
+  std::shared_ptr<FootprintPad> pad =
+      footprint->getPads().get(msg.getPad().get());
+  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  cmd->setCopperClearance(UnsignedLength(0));
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <>
+void PackageEditorWidget::fixMsg(
+    const MsgFiducialClearanceLessThanStopMask& msg) {
+  std::shared_ptr<Footprint> footprint =
+      mPackage->getFootprints().get(msg.getFootprint().get());
+  std::shared_ptr<FootprintPad> pad =
+      footprint->getPads().get(msg.getPad().get());
+  const tl::optional<Length> offset = pad->getStopMaskConfig().getOffset();
+  if (offset && (*offset > 0)) {
+    QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+    cmd->setCopperClearance(UnsignedLength(*offset));
+    mUndoStack->execCmd(cmd.take());
+  }
+}
+
+template <>
 void PackageEditorWidget::fixMsg(const MsgHoleWithoutStopMask& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
@@ -799,6 +825,9 @@ bool PackageEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgPadStopMaskOff>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgSmtPadWithSolderPaste>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgThtPadWithSolderPaste>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgPadWithCopperClearance>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgFiducialClearanceLessThanStopMask>(msg, applyFix))
+    return true;
   if (fixMsgHelper<MsgHoleWithoutStopMask>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgUnspecifiedPadFunction>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgSuspiciousPadFunction>(msg, applyFix)) return true;

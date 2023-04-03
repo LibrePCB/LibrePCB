@@ -63,6 +63,7 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkCustomPadOutline(msgs);
   checkStopMaskOnPads(msgs);
   checkSolderPasteOnPads(msgs);
+  checkCopperClearanceOnPads(msgs);
   checkPadFunctions(msgs);
   checkHolesStopMask(msgs);
   return msgs;
@@ -425,6 +426,29 @@ void PackageCheck::checkSolderPasteOnPads(MsgList& msgs) const {
       } else if (pad->isTht() && pad->getSolderPasteConfig().isEnabled()) {
         msgs.append(std::make_shared<MsgThtPadWithSolderPaste>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkCopperClearanceOnPads(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itPad = (*itFtp).getPads().begin();
+         itPad != (*itFtp).getPads().end(); ++itPad) {
+      std::shared_ptr<const FootprintPad> pad = itPad.ptr();
+      std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
+          ? mPackage.getPads().find(*pad->getPackagePadUuid())
+          : nullptr;
+      const auto stopMaskOffset = pad->getStopMaskConfig().getOffset();
+      if ((!pad->getFunctionIsFiducial()) && (pad->getCopperClearance() > 0)) {
+        msgs.append(std::make_shared<MsgPadWithCopperClearance>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      } else if (pad->getFunctionIsFiducial() && stopMaskOffset &&
+                 (pad->getCopperClearance() < (*stopMaskOffset))) {
+        msgs.append(std::make_shared<MsgFiducialClearanceLessThanStopMask>(
+            footprint, pad));
       }
     }
   }

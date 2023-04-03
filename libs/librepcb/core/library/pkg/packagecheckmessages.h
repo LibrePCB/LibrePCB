@@ -96,6 +96,38 @@ public:
 };
 
 /*******************************************************************************
+ *  Class MsgFiducialClearanceLessThanStopMask
+ ******************************************************************************/
+
+/**
+ * @brief The MsgFiducialClearanceLessThanStopMask class
+ */
+class MsgFiducialClearanceLessThanStopMask final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgFiducialClearanceLessThanStopMask)
+
+public:
+  // Constructors / Destructor
+  MsgFiducialClearanceLessThanStopMask() = delete;
+  MsgFiducialClearanceLessThanStopMask(
+      std::shared_ptr<const Footprint> footprint,
+      std::shared_ptr<const FootprintPad> pad) noexcept;
+  MsgFiducialClearanceLessThanStopMask(
+      const MsgFiducialClearanceLessThanStopMask& other) noexcept
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
+  virtual ~MsgFiducialClearanceLessThanStopMask() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
+};
+
+/*******************************************************************************
  *  Class MsgFiducialStopMaskNotSet
  ******************************************************************************/
 
@@ -468,6 +500,37 @@ public:
   MsgPadStopMaskOff(const MsgPadStopMaskOff& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
   virtual ~MsgPadStopMaskOff() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
+};
+
+/*******************************************************************************
+ *  Class MsgPadWithCopperClearance
+ ******************************************************************************/
+
+/**
+ * @brief The MsgPadWithCopperClearance class
+ */
+class MsgPadWithCopperClearance final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgPadWithCopperClearance)
+
+public:
+  // Constructors / Destructor
+  MsgPadWithCopperClearance() = delete;
+  MsgPadWithCopperClearance(std::shared_ptr<const Footprint> footprint,
+                            std::shared_ptr<const FootprintPad> pad,
+                            const QString& pkgPadName) noexcept;
+  MsgPadWithCopperClearance(const MsgPadWithCopperClearance& other) noexcept
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
+  virtual ~MsgPadWithCopperClearance() noexcept {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {

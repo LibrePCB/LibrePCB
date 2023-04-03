@@ -76,6 +76,31 @@ MsgDuplicatePadName::MsgDuplicatePadName(const PackagePad& pad) noexcept
 }
 
 /*******************************************************************************
+ *  Class MsgFiducialClearanceLessThanStopMask
+ ******************************************************************************/
+
+MsgFiducialClearanceLessThanStopMask::MsgFiducialClearanceLessThanStopMask(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Small copper clearance on fiducial in '%1'")
+            .arg(*footprint->getNames().getDefaultValue()),
+        tr("The copper clearance of the fiducial pad is less than its stop "
+           "mask expansion, which is unusual. Typically the copper clearance "
+           "should be equal to or greater than the stop mask expansion to "
+           "avoid copper located within the stop mask opening."),
+        "fiducial_copper_clearance_less_than_stop_mask"),
+    mFootprint(footprint),
+    mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  Class MsgFiducialStopMaskNotSet
  ******************************************************************************/
 
@@ -376,6 +401,33 @@ MsgPadStopMaskOff::MsgPadStopMaskOff(std::shared_ptr<const Footprint> footprint,
            "This is very unusual, you should double-check if this is really "
            "what you want."),
         "pad_stop_mask_off"),
+    mFootprint(footprint),
+    mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
+ *  Class MsgPadWithCopperClearance
+ ******************************************************************************/
+
+MsgPadWithCopperClearance::MsgPadWithCopperClearance(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
+  : RuleCheckMessage(
+        Severity::Hint,
+        tr("Copper clearance >0 on pad '%1' in '%2'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("There is a custom copper clearance enabled on the pad, which is "
+           "unusual for pads which do not represent a fiducial. Note that the "
+           "clearance value from the board design rules is applied to all pads "
+           "anyway, thus manual clearance values are usually not needed. If "
+           "this pad is a fiducial, make sure to set its function to the "
+           "corresponding value."),
+        "pad_with_copper_clearance"),
     mFootprint(footprint),
     mPad(pad) {
   mApproval.ensureLineBreak();
