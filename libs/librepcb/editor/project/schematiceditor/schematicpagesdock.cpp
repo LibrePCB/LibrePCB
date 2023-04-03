@@ -56,8 +56,8 @@ SchematicPagesDock::SchematicPagesDock(Project& project, UndoStack& undoStack,
         theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor()),
     mScheduledThumbnailSchematics(),
     mCurrentThumbnailSchematic(tl::nullopt),
-    mThumbnailGenerator(new GraphicsExport()),
-    mThumbnailSettings(new GraphicsExportSettings()),
+    mThumbnailGenerator(),
+    mThumbnailSettings(),
     mThumbnailTimer() {
   mUi->setupUi(this);
 
@@ -93,17 +93,17 @@ SchematicPagesDock::SchematicPagesDock(Project& project, UndoStack& undoStack,
       EditorCommand::ActionFlag::WidgetShortcut));
 
   // Setup thumbnail generator.
-  {
-    mThumbnailSettings->loadColorsFromTheme(theme);
-    mThumbnailSettings->setBackgroundColor(Qt::transparent);
-    mThumbnailSettings->setPixmapDpi(40);
-    mThumbnailSettings->setMinLineWidth(UnsignedLength(700000));
-    connect(mThumbnailGenerator.data(), &GraphicsExport::previewReady, this,
-            &SchematicPagesDock::thumbnailReady);
-    connect(&mThumbnailTimer, &QTimer::timeout, this,
-            &SchematicPagesDock::updateNextThumbnail);
-    mThumbnailTimer.start(300);
-  }
+  mThumbnailGenerator.reset(new GraphicsExport());
+  mThumbnailSettings = std::make_shared<GraphicsExportSettings>();
+  mThumbnailSettings->loadColorsFromTheme(theme);
+  mThumbnailSettings->setBackgroundColor(Qt::transparent);
+  mThumbnailSettings->setPixmapDpi(40);
+  mThumbnailSettings->setMinLineWidth(UnsignedLength(700000));
+  connect(mThumbnailGenerator.data(), &GraphicsExport::previewReady, this,
+          &SchematicPagesDock::thumbnailReady);
+  connect(&mThumbnailTimer, &QTimer::timeout, this,
+          &SchematicPagesDock::updateNextThumbnail);
+  mThumbnailTimer.start(300);
 }
 
 SchematicPagesDock::~SchematicPagesDock() {
@@ -159,7 +159,6 @@ void SchematicPagesDock::schematicAdded(int newIndex) noexcept {
       });
 
   mScheduledThumbnailSchematics.insert(schematic->getUuid());
-  updateNextThumbnail();
 }
 
 void SchematicPagesDock::schematicRemoved(int oldIndex) noexcept {
