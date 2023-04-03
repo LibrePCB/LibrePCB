@@ -715,9 +715,15 @@ inline bool operator>=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
   return (*lhs) >= rhs;
 }
 inline bool operator<(const UnsignedLength& lhs, const Length& rhs) noexcept {
-  return (*lhs) <= rhs;
+  return (*lhs) < rhs;
 }
 inline bool operator<(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
+  return (*lhs) < rhs;
+}
+inline bool operator<=(const UnsignedLength& lhs, const Length& rhs) noexcept {
+  return (*lhs) <= rhs;
+}
+inline bool operator<=(const UnsignedLength& lhs, LengthBase_t rhs) noexcept {
   return (*lhs) <= rhs;
 }
 inline bool operator==(const UnsignedLength& lhs, const Length& rhs) noexcept {
@@ -885,9 +891,23 @@ inline bool operator<(const PositiveLength& lhs,
   return (*lhs) < (*rhs);
 }
 inline bool operator<(const PositiveLength& lhs, const Length& rhs) noexcept {
-  return (*lhs) <= rhs;
+  return (*lhs) < rhs;
 }
 inline bool operator<(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
+  return (*lhs) < rhs;
+}
+inline bool operator<=(const UnsignedLength& lhs,
+                       const PositiveLength& rhs) noexcept {
+  return (*lhs) <= (*rhs);
+}
+inline bool operator<=(const PositiveLength& lhs,
+                       const UnsignedLength& rhs) noexcept {
+  return (*lhs) <= (*rhs);
+}
+inline bool operator<=(const PositiveLength& lhs, const Length& rhs) noexcept {
+  return (*lhs) <= rhs;
+}
+inline bool operator<=(const PositiveLength& lhs, LengthBase_t rhs) noexcept {
   return (*lhs) <= rhs;
 }
 inline bool operator==(const UnsignedLength& lhs,
