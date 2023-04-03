@@ -721,28 +721,27 @@ void BoardEditor::createActions() noexcept {
 
   // Tools action group.
   mToolsActionGroup.reset(new ExclusiveActionGroup());
-  mToolsActionGroup->addAction(BoardEditorFsm::State::SELECT,
-                               mActionToolSelect.data());
-  mToolsActionGroup->addAction(BoardEditorFsm::State::DRAW_TRACE,
-                               mActionToolTrace.data());
-  mToolsActionGroup->addAction(BoardEditorFsm::State::ADD_VIA,
-                               mActionToolVia.data());
-  mToolsActionGroup->addAction(BoardEditorFsm::State::DRAW_POLYGON,
-                               mActionToolPolygon.data());
-  mToolsActionGroup->addAction(BoardEditorFsm::State::DRAW_PLANE,
-                               mActionToolPlane.data());
-  mToolsActionGroup->addAction(BoardEditorFsm::State::ADD_STROKE_TEXT,
-                               mActionToolText.data());
-  mToolsActionGroup->addAction(BoardEditorFsm::State::ADD_HOLE,
-                               mActionToolHole.data());
-  mToolsActionGroup->addAction(BoardEditorFsm::State::MEASURE,
-                               mActionToolMeasure.data());
+  mToolsActionGroup->addAction(mActionToolSelect.data(),
+                               BoardEditorFsm::State::SELECT);
+  mToolsActionGroup->addAction(mActionToolTrace.data(),
+                               BoardEditorFsm::State::DRAW_TRACE);
+  mToolsActionGroup->addAction(mActionToolVia.data(),
+                               BoardEditorFsm::State::ADD_VIA);
+  mToolsActionGroup->addAction(mActionToolPolygon.data(),
+                               BoardEditorFsm::State::DRAW_POLYGON);
+  mToolsActionGroup->addAction(mActionToolPlane.data(),
+                               BoardEditorFsm::State::DRAW_PLANE);
+  mToolsActionGroup->addAction(mActionToolText.data(),
+                               BoardEditorFsm::State::ADD_STROKE_TEXT);
+  mToolsActionGroup->addAction(mActionToolHole.data(),
+                               BoardEditorFsm::State::ADD_HOLE);
+  mToolsActionGroup->addAction(mActionToolMeasure.data(),
+                               BoardEditorFsm::State::MEASURE);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
   connect(mFsm.data(), &BoardEditorFsm::stateChanged, mToolsActionGroup.data(),
           &ExclusiveActionGroup::setCurrentAction);
-  connect(mToolsActionGroup.data(),
-          &ExclusiveActionGroup::changeRequestTriggered, this,
-          &BoardEditor::toolActionGroupChangeTriggered);
+  connect(mToolsActionGroup.data(), &ExclusiveActionGroup::actionTriggered,
+          this, &BoardEditor::toolRequested);
 }
 
 void BoardEditor::createToolBars() noexcept {
@@ -1121,8 +1120,7 @@ bool BoardEditor::graphicsViewEventHandler(QEvent* event) {
   return (event->type() != QEvent::GraphicsSceneWheel);
 }
 
-void BoardEditor::toolActionGroupChangeTriggered(
-    const QVariant& newTool) noexcept {
+void BoardEditor::toolRequested(const QVariant& newTool) noexcept {
   switch (newTool.toInt()) {
     case BoardEditorFsm::State::SELECT:
       mFsm->processSelect();

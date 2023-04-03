@@ -62,9 +62,37 @@ PackageEditorFsm::PackageEditorFsm(const Context& context) noexcept
     mPreviousState(State::IDLE) {
   mStates.insert(State::SELECT, new PackageEditorState_Select(mContext));
   mStates.insert(State::ADD_THT_PADS,
-                 new PackageEditorState_AddPadsTht(mContext));
-  mStates.insert(State::ADD_SMT_PADS,
-                 new PackageEditorState_AddPadsSmt(mContext));
+                 new PackageEditorState_AddPads(
+                     mContext, PackageEditorState_AddPads::PadType::THT,
+                     FootprintPad::Function::StandardPad));
+  mStates.insert(State::ADD_SMT_PADS_STANDARD,
+                 new PackageEditorState_AddPads(
+                     mContext, PackageEditorState_AddPads::PadType::SMT,
+                     FootprintPad::Function::StandardPad));
+  mStates.insert(State::ADD_SMT_PADS_THERMAL,
+                 new PackageEditorState_AddPads(
+                     mContext, PackageEditorState_AddPads::PadType::SMT,
+                     FootprintPad::Function::ThermalPad));
+  mStates.insert(State::ADD_SMT_PADS_BGA,
+                 new PackageEditorState_AddPads(
+                     mContext, PackageEditorState_AddPads::PadType::SMT,
+                     FootprintPad::Function::BgaPad));
+  mStates.insert(State::ADD_SMT_PADS_EDGE_CONNECTOR,
+                 new PackageEditorState_AddPads(
+                     mContext, PackageEditorState_AddPads::PadType::SMT,
+                     FootprintPad::Function::EdgeConnectorPad));
+  mStates.insert(State::ADD_SMT_PADS_TEST,
+                 new PackageEditorState_AddPads(
+                     mContext, PackageEditorState_AddPads::PadType::SMT,
+                     FootprintPad::Function::TestPad));
+  mStates.insert(State::ADD_SMT_PADS_LOCAL_FIDUCIAL,
+                 new PackageEditorState_AddPads(
+                     mContext, PackageEditorState_AddPads::PadType::SMT,
+                     FootprintPad::Function::LocalFiducial));
+  mStates.insert(State::ADD_SMT_PADS_GLOBAL_FIDUCIAL,
+                 new PackageEditorState_AddPads(
+                     mContext, PackageEditorState_AddPads::PadType::SMT,
+                     FootprintPad::Function::GlobalFiducial));
   mStates.insert(State::ADD_NAMES, new PackageEditorState_AddNames(mContext));
   mStates.insert(State::ADD_VALUES, new PackageEditorState_AddValues(mContext));
   mStates.insert(State::DRAW_LINE, new PackageEditorState_DrawLine(mContext));
@@ -104,7 +132,13 @@ EditorWidgetBase::Tool PackageEditorFsm::getCurrentTool() const noexcept {
       return EditorWidgetBase::Tool::SELECT;
     case State::ADD_THT_PADS:
       return EditorWidgetBase::Tool::ADD_THT_PADS;
-    case State::ADD_SMT_PADS:
+    case State::ADD_SMT_PADS_STANDARD:
+    case State::ADD_SMT_PADS_THERMAL:
+    case State::ADD_SMT_PADS_BGA:
+    case State::ADD_SMT_PADS_EDGE_CONNECTOR:
+    case State::ADD_SMT_PADS_TEST:
+    case State::ADD_SMT_PADS_LOCAL_FIDUCIAL:
+    case State::ADD_SMT_PADS_GLOBAL_FIDUCIAL:
       return EditorWidgetBase::Tool::ADD_SMT_PADS;
     case State::ADD_NAMES:
       return EditorWidgetBase::Tool::ADD_NAMES;
@@ -382,8 +416,24 @@ bool PackageEditorFsm::processStartAddingFootprintThtPads() noexcept {
   return setNextState(State::ADD_THT_PADS);
 }
 
-bool PackageEditorFsm::processStartAddingFootprintSmtPads() noexcept {
-  return setNextState(State::ADD_SMT_PADS);
+bool PackageEditorFsm::processStartAddingFootprintSmtPads(
+    FootprintPad::Function function) noexcept {
+  switch (function) {
+    case FootprintPad::Function::ThermalPad:
+      return setNextState(State::ADD_SMT_PADS_THERMAL);
+    case FootprintPad::Function::BgaPad:
+      return setNextState(State::ADD_SMT_PADS_BGA);
+    case FootprintPad::Function::EdgeConnectorPad:
+      return setNextState(State::ADD_SMT_PADS_EDGE_CONNECTOR);
+    case FootprintPad::Function::TestPad:
+      return setNextState(State::ADD_SMT_PADS_TEST);
+    case FootprintPad::Function::LocalFiducial:
+      return setNextState(State::ADD_SMT_PADS_LOCAL_FIDUCIAL);
+    case FootprintPad::Function::GlobalFiducial:
+      return setNextState(State::ADD_SMT_PADS_GLOBAL_FIDUCIAL);
+    default:
+      return setNextState(State::ADD_SMT_PADS_STANDARD);
+  }
 }
 
 bool PackageEditorFsm::processStartAddingNames() noexcept {

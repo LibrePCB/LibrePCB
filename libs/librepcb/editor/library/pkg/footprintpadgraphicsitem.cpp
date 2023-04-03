@@ -112,6 +112,7 @@ void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
                                          FootprintPad::Event event) noexcept {
   switch (event) {
     case FootprintPad::Event::UuidChanged:
+    case FootprintPad::Event::FunctionChanged:
       break;
     case FootprintPad::Event::PackagePadUuidChanged:
       updateText();

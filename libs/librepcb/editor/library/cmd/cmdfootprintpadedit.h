@@ -58,12 +58,13 @@ public:
                          bool immediate) noexcept;
   void setComponentSide(FootprintPad::ComponentSide side,
                         bool immediate) noexcept;
+  void setFunction(FootprintPad::Function function, bool immediate) noexcept;
   void setShape(FootprintPad::Shape shape, bool immediate) noexcept;
   void setWidth(const PositiveLength& width, bool immediate) noexcept;
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
   void setRadius(const UnsignedLimitedRatio& radius, bool immediate) noexcept;
   void setCustomShapeOutline(const Path& outline) noexcept;
-  void setStopMaskConfig(const MaskConfig& config) noexcept;
+  void setStopMaskConfig(const MaskConfig& config, bool immediate) noexcept;
   void setSolderPasteConfig(const MaskConfig& config) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
@@ -100,6 +101,8 @@ private:
   tl::optional<Uuid> mNewPackagePadUuid;
   FootprintPad::ComponentSide mOldComponentSide;
   FootprintPad::ComponentSide mNewComponentSide;
+  FootprintPad::Function mOldFunction;
+  FootprintPad::Function mNewFunction;
   FootprintPad::Shape mOldShape;
   FootprintPad::Shape mNewShape;
   PositiveLength mOldWidth;

@@ -236,8 +236,14 @@ private:  // Data
   QScopedPointer<QAction> mActionToolName;
   QScopedPointer<QAction> mActionToolValue;
   QScopedPointer<QAction> mActionToolPin;
-  QScopedPointer<QAction> mActionToolSmtPad;
+  QScopedPointer<QAction> mActionToolSmtPadStandard;
   QScopedPointer<QAction> mActionToolThtPad;
+  QScopedPointer<QAction> mActionToolSpecialPadThermal;
+  QScopedPointer<QAction> mActionToolSpecialPadBga;
+  QScopedPointer<QAction> mActionToolSpecialPadEdgeConnector;
+  QScopedPointer<QAction> mActionToolSpecialPadTest;
+  QScopedPointer<QAction> mActionToolSpecialPadLocalFiducial;
+  QScopedPointer<QAction> mActionToolSpecialPadGlobalFiducial;
   QScopedPointer<QAction> mActionToolHole;
   QScopedPointer<QAction> mActionToolMeasure;
 

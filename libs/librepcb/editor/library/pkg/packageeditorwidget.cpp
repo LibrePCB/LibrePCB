@@ -507,14 +507,20 @@ bool PackageEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
   }
 }
 
-bool PackageEditorWidget::toolChangeRequested(Tool newTool) noexcept {
+bool PackageEditorWidget::toolChangeRequested(Tool newTool,
+                                              const QVariant& mode) noexcept {
   switch (newTool) {
     case Tool::SELECT:
       return mFsm->processStartSelecting();
     case Tool::ADD_THT_PADS:
       return mFsm->processStartAddingFootprintThtPads();
-    case Tool::ADD_SMT_PADS:
-      return mFsm->processStartAddingFootprintSmtPads();
+    case Tool::ADD_SMT_PADS: {
+      FootprintPad::Function function = FootprintPad::Function::StandardPad;
+      if (mode.isValid() && mode.canConvert<FootprintPad::Function>()) {
+        function = mode.value<FootprintPad::Function>();
+      }
+      return mFsm->processStartAddingFootprintSmtPads(function);
+    }
     case Tool::ADD_NAMES:
       return mFsm->processStartAddingNames();
     case Tool::ADD_VALUES:
@@ -663,13 +669,24 @@ void PackageEditorWidget::fixMsg(const MsgInvalidCustomPadOutline& msg) {
 }
 
 template <>
-void PackageEditorWidget::fixMsg(const MsgPadWithoutStopMask& msg) {
+void PackageEditorWidget::fixMsg(const MsgPadStopMaskOff& msg) {
   std::shared_ptr<Footprint> footprint =
       mPackage->getFootprints().get(msg.getFootprint().get());
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
   QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
-  cmd->setStopMaskConfig(MaskConfig::automatic());
+  cmd->setStopMaskConfig(MaskConfig::automatic(), false);
+  mUndoStack->execCmd(cmd.take());
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgSmtPadWithSolderPaste& msg) {
+  std::shared_ptr<Footprint> footprint =
+      mPackage->getFootprints().get(msg.getFootprint().get());
+  std::shared_ptr<FootprintPad> pad =
+      footprint->getPads().get(msg.getPad().get());
+  QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+  cmd->setSolderPasteConfig(MaskConfig::off());
   mUndoStack->execCmd(cmd.take());
 }
 
@@ -692,6 +709,66 @@ void PackageEditorWidget::fixMsg(const MsgHoleWithoutStopMask& msg) {
   QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(*hole));
   cmd->setStopMaskConfig(MaskConfig::automatic());
   mUndoStack->execCmd(cmd.take());
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgUnspecifiedPadFunction& msg) {
+  fixPadFunction(msg);
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgSuspiciousPadFunction& msg) {
+  fixPadFunction(msg);
+}
+
+template <typename MessageType>
+void PackageEditorWidget::fixPadFunction(const MessageType& msg) {
+  QMenu menu(this);
+  QAction* aAll = menu.addAction(tr("Apply to all unspecified pads"));
+  aAll->setCheckable(true);
+  menu.addSeparator();
+  for (int i = 0; i < static_cast<int>(FootprintPad::Function::_COUNT); ++i) {
+    const FootprintPad::Function value = static_cast<FootprintPad::Function>(i);
+    if (value != FootprintPad::Function::Unspecified) {
+      QAction* action =
+          menu.addAction(FootprintPad::getFunctionDescriptionTr(value));
+      action->setData(QVariant::fromValue(value));
+    }
+  }
+
+  QAction* action = nullptr;
+  const QPoint pos = QCursor::pos();
+  do {
+    action = menu.exec(pos);
+  } while (action == aAll);
+
+  if (action && action->data().isValid() &&
+      action->data().canConvert<FootprintPad::Function>()) {
+    if (aAll->isChecked()) {
+      UndoStackTransaction transaction(*mUndoStack,
+                                       tr("Fix Unspecified Pad Functions"));
+      for (auto& footprint : mPackage->getFootprints()) {
+        for (auto& pad : footprint.getPads()) {
+          if (pad.getFunction() == FootprintPad::Function::Unspecified) {
+            QScopedPointer<CmdFootprintPadEdit> cmd(
+                new CmdFootprintPadEdit(pad));
+            cmd->setFunction(action->data().value<FootprintPad::Function>(),
+                             false);
+            transaction.append(cmd.take());
+          }
+        }
+      }
+      transaction.commit();
+    } else {
+      std::shared_ptr<Footprint> footprint =
+          mPackage->getFootprints().get(msg.getFootprint().get());
+      std::shared_ptr<FootprintPad> pad =
+          footprint->getPads().get(msg.getPad().get());
+      QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
+      cmd->setFunction(action->data().value<FootprintPad::Function>(), false);
+      mUndoStack->execCmd(cmd.take());
+    }
+  }
 }
 
 template <typename MessageType>
@@ -719,9 +796,12 @@ bool PackageEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgWrongFootprintTextLayer>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgUnusedCustomPadOutline>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgInvalidCustomPadOutline>(msg, applyFix)) return true;
-  if (fixMsgHelper<MsgPadWithoutStopMask>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgPadStopMaskOff>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgSmtPadWithSolderPaste>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgThtPadWithSolderPaste>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgHoleWithoutStopMask>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgUnspecifiedPadFunction>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgSuspiciousPadFunction>(msg, applyFix)) return true;
   return false;
 }
 

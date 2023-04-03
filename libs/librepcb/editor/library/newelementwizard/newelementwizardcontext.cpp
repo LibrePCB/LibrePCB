@@ -232,7 +232,7 @@ void NewElementWizardContext::copyElement(ElementType type,
               pad.getRotation(), pad.getShape(), pad.getWidth(),
               pad.getHeight(), pad.getRadius(), pad.getCustomShapeOutline(),
               pad.getStopMaskConfig(), pad.getSolderPasteConfig(),
-              pad.getComponentSide(), pad.getHoles()));
+              pad.getComponentSide(), pad.getFunction(), pad.getHoles()));
         }
         // copy polygons but generate new UUIDs
         for (const Polygon& polygon : footprint.getPolygons()) {

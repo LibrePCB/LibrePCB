@@ -25,6 +25,8 @@
  ******************************************************************************/
 #include "../../editorwidgetbase.h"
 
+#include <librepcb/core/library/pkg/footprintpad.h>
+
 #include <QtCore>
 
 #include <memory>
@@ -63,7 +65,13 @@ private:  // Types
     IDLE,
     SELECT,
     ADD_THT_PADS,
-    ADD_SMT_PADS,
+    ADD_SMT_PADS_STANDARD,
+    ADD_SMT_PADS_THERMAL,
+    ADD_SMT_PADS_BGA,
+    ADD_SMT_PADS_EDGE_CONNECTOR,
+    ADD_SMT_PADS_TEST,
+    ADD_SMT_PADS_LOCAL_FIDUCIAL,
+    ADD_SMT_PADS_GLOBAL_FIDUCIAL,
     ADD_NAMES,
     ADD_VALUES,
     DRAW_LINE,
@@ -135,7 +143,8 @@ public:
   bool processAbortCommand() noexcept;
   bool processStartSelecting() noexcept;
   bool processStartAddingFootprintThtPads() noexcept;
-  bool processStartAddingFootprintSmtPads() noexcept;
+  bool processStartAddingFootprintSmtPads(
+      FootprintPad::Function function) noexcept;
   bool processStartAddingNames() noexcept;
   bool processStartAddingValues() noexcept;
   bool processStartDrawLines() noexcept;

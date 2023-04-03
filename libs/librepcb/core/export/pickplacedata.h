@@ -95,6 +95,9 @@ public:
   BoardSide getBoardSide() const noexcept { return mBoardSide; }
   Type getType() const noexcept { return mType; }
 
+  // Setters
+  void setDesignator(const QString& value) noexcept { mDesignator = value; }
+
   // Operator Overloadings
   PickPlaceDataItem& operator=(const PickPlaceDataItem& rhs) noexcept {
     mDesignator = rhs.mDesignator;

@@ -76,6 +76,30 @@ MsgDuplicatePadName::MsgDuplicatePadName(const PackagePad& pad) noexcept
 }
 
 /*******************************************************************************
+ *  Class MsgFiducialStopMaskNotSet
+ ******************************************************************************/
+
+MsgFiducialStopMaskNotSet::MsgFiducialStopMaskNotSet(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Stop mask not set on fiducial in '%1'")
+            .arg(*footprint->getNames().getDefaultValue()),
+        tr("The stop mask expansion of the fiducial pad is set to automatic, "
+           "which is unusual. Typically the stop mask expansion of fiducials "
+           "need to be manually set to a much larger value."),
+        "fiducial_stop_mask_not_set"),
+    mFootprint(footprint),
+    mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  MsgHoleWithoutStopMask
  ******************************************************************************/
 
@@ -337,21 +361,21 @@ MsgPadOverlapsWithPlacement::MsgPadOverlapsWithPlacement(
 }
 
 /*******************************************************************************
- *  MsgPadWithoutStopMask
+ *  MsgPadStopMaskOff
  ******************************************************************************/
 
-MsgPadWithoutStopMask::MsgPadWithoutStopMask(
-    std::shared_ptr<const Footprint> footprint,
-    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
+MsgPadStopMaskOff::MsgPadStopMaskOff(std::shared_ptr<const Footprint> footprint,
+                                     std::shared_ptr<const FootprintPad> pad,
+                                     const QString& pkgPadName) noexcept
   : RuleCheckMessage(
         Severity::Error,
-        tr("No stop mask on pad '%1' in '%2'")
+        tr("Solder resist on pad '%1' in '%2'")
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
         tr("There's no stop mask opening enabled on the pad, so the copper "
            "pad will be covered by solder resist and is thus not functional. "
            "This is very unusual, you should double-check if this is really "
            "what you want."),
-        "pad_without_stop_mask"),
+        "pad_stop_mask_off"),
     mFootprint(footprint),
     mPad(pad) {
   mApproval.ensureLineBreak();
@@ -361,7 +385,29 @@ MsgPadWithoutStopMask::MsgPadWithoutStopMask(
   mApproval.ensureLineBreak();
 }
 
-MsgPadWithoutStopMask::~MsgPadWithoutStopMask() noexcept {
+/*******************************************************************************
+ *  MsgSmtPadWithSolderPaste
+ ******************************************************************************/
+
+MsgSmtPadWithSolderPaste::MsgSmtPadWithSolderPaste(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Solder paste on SMT pad '%1' in '%2'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("The SMT pad has solder paste enabled, but its function indicates "
+           "that there's no lead to be soldered on it (e.g. a fiducial). "
+           "Usually solder paste is not desired on such special pads which "
+           "won't be soldered."),
+        "smt_pad_with_solder_paste"),
+    mFootprint(footprint),
+    mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -389,7 +435,31 @@ MsgSmtPadWithoutSolderPaste::MsgSmtPadWithoutSolderPaste(
   mApproval.ensureLineBreak();
 }
 
-MsgSmtPadWithoutSolderPaste::~MsgSmtPadWithoutSolderPaste() noexcept {
+/*******************************************************************************
+ *  Class MsgSuspiciousPadFunction
+ ******************************************************************************/
+
+MsgSuspiciousPadFunction::MsgSuspiciousPadFunction(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Suspicious function of pad '%1' in '%2'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("The configured pad function does not match other properties of the "
+           "pad and thus looks suspicious. Possible reasons:\n\n"
+           " - Function is intended for THT pads but pad is SMT\n"
+           " - Function is intended for SMT pads but pad is THT\n"
+           " - Function is electrical but pad is not connected\n"
+           " - Function is fiducial but pad is connected"),
+        "suspicious_pad_function"),
+    mFootprint(footprint),
+    mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 /*******************************************************************************
@@ -418,7 +488,33 @@ MsgThtPadWithSolderPaste::MsgThtPadWithSolderPaste(
   mApproval.ensureLineBreak();
 }
 
-MsgThtPadWithSolderPaste::~MsgThtPadWithSolderPaste() noexcept {
+/*******************************************************************************
+ *  Class MsgUnspecifiedPadFunction
+ ******************************************************************************/
+
+MsgUnspecifiedPadFunction::MsgUnspecifiedPadFunction(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName) noexcept
+  : RuleCheckMessage(
+        Severity::Hint,
+        tr("Unspecified function of pad '%1' in '%2'")
+            .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
+        tr("The function of the pad is not specified, which could lead to "
+           "inaccurate or wrong data in exports (e.g. pick&place files). Also "
+           "the automatic checks can detect more potential issues if the "
+           "function is specified. Thus it's recommended to explicitly specify "
+           "the function of each pad.") %
+            "\n\n" %
+            tr("However, the image data of a PCB is not affected by the pad "
+               "function."),
+        "pad_function_unspecified"),
+    mFootprint(footprint),
+    mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
 }
 
 /*******************************************************************************

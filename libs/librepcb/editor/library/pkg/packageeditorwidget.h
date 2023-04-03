@@ -111,13 +111,16 @@ private:  // Methods
   QString commitMetadata() noexcept;
   /// @see ::librepcb::editor::IF_GraphicsViewEventHandler
   bool graphicsViewEventHandler(QEvent* event) noexcept override;
-  bool toolChangeRequested(Tool newTool) noexcept override;
+  bool toolChangeRequested(Tool newTool,
+                           const QVariant& mode) noexcept override;
   void currentFootprintChanged(int index) noexcept;
   void memorizePackageInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;
   bool runChecks(RuleCheckMessageList& msgs) const override;
   template <typename MessageType>
   void fixMsg(const MessageType& msg);
+  template <typename MessageType>
+  void fixPadFunction(const MessageType& msg);
   template <typename MessageType>
   bool fixMsgHelper(std::shared_ptr<const RuleCheckMessage> msg, bool applyFix);
   bool processRuleCheckMessage(std::shared_ptr<const RuleCheckMessage> msg,

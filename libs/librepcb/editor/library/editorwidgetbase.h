@@ -177,8 +177,10 @@ protected:  // Methods
   void setupInterfaceBrokenWarningWidget(QWidget& widget) noexcept;
   void setupErrorNotificationWidget(QWidget& widget) noexcept;
   virtual bool isInterfaceBroken() const noexcept = 0;
-  virtual bool toolChangeRequested(Tool newTool) noexcept {
+  virtual bool toolChangeRequested(Tool newTool,
+                                   const QVariant& mode) noexcept {
     Q_UNUSED(newTool);
+    Q_UNUSED(mode);
     return false;
   }
   virtual bool runChecks(RuleCheckMessageList& msgs) const = 0;
@@ -211,7 +213,7 @@ private:  // Methods
    * @throw Exception to abort opening the library element.
    */
   static bool askForRestoringBackup(const FilePath& dir);
-  void toolActionGroupChangeTriggered(const QVariant& newTool) noexcept;
+  void toolRequested(int tool, const QVariant& mode) noexcept;
   void undoStackCleanChanged(bool clean) noexcept;
   void scheduleLibraryElementChecks() noexcept;
   virtual bool processRuleCheckMessage(

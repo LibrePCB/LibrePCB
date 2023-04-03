@@ -620,26 +620,25 @@ void SchematicEditor::createActions() noexcept {
 
   // Tools action group.
   mToolsActionGroup.reset(new ExclusiveActionGroup());
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::SELECT,
-                               mActionToolSelect.data());
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::DRAW_WIRE,
-                               mActionToolWire.data());
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_NETLABEL,
-                               mActionToolNetLabel.data());
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::DRAW_POLYGON,
-                               mActionToolPolygon.data());
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_TEXT,
-                               mActionToolText.data());
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::ADD_COMPONENT,
-                               mActionToolComponent.data());
-  mToolsActionGroup->addAction(SchematicEditorFsm::State::MEASURE,
-                               mActionToolMeasure.data());
+  mToolsActionGroup->addAction(mActionToolSelect.data(),
+                               SchematicEditorFsm::State::SELECT);
+  mToolsActionGroup->addAction(mActionToolWire.data(),
+                               SchematicEditorFsm::State::DRAW_WIRE);
+  mToolsActionGroup->addAction(mActionToolNetLabel.data(),
+                               SchematicEditorFsm::State::ADD_NETLABEL);
+  mToolsActionGroup->addAction(mActionToolPolygon.data(),
+                               SchematicEditorFsm::State::DRAW_POLYGON);
+  mToolsActionGroup->addAction(mActionToolText.data(),
+                               SchematicEditorFsm::State::ADD_TEXT);
+  mToolsActionGroup->addAction(mActionToolComponent.data(),
+                               SchematicEditorFsm::State::ADD_COMPONENT);
+  mToolsActionGroup->addAction(mActionToolMeasure.data(),
+                               SchematicEditorFsm::State::MEASURE);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentState());
   connect(mFsm.data(), &SchematicEditorFsm::stateChanged,
           mToolsActionGroup.data(), &ExclusiveActionGroup::setCurrentAction);
-  connect(mToolsActionGroup.data(),
-          &ExclusiveActionGroup::changeRequestTriggered, this,
-          &SchematicEditor::toolActionGroupChangeTriggered);
+  connect(mToolsActionGroup.data(), &ExclusiveActionGroup::actionTriggered,
+          this, &SchematicEditor::toolRequested);
 }
 
 void SchematicEditor::createToolBars() noexcept {
@@ -977,8 +976,7 @@ bool SchematicEditor::graphicsViewEventHandler(QEvent* event) {
   return (event->type() != QEvent::GraphicsSceneWheel);
 }
 
-void SchematicEditor::toolActionGroupChangeTriggered(
-    const QVariant& newTool) noexcept {
+void SchematicEditor::toolRequested(const QVariant& newTool) noexcept {
   // Note: Converting the QVariant to SchematicEditorFsm::State doesn't work
   // with some Qt versions, thus we convert to int instead. Fixed in:
   // https://codereview.qt-project.org/c/qt/qtbase/+/159277/

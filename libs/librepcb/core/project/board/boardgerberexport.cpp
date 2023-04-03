@@ -218,6 +218,9 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
 
       // Export component pins.
       foreach (const BI_FootprintPad* pad, device->getPads()) {
+        if (pad->getLibPad().getFunctionIsFiducial()) {
+          continue;
+        }
         QString pinName, pinSignal;
         if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
           pinName = *pkgPad->getName();
@@ -230,6 +233,31 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
         gen.flashComponentPin(pad->getPosition(), rotation, designator, value,
                               mountType, manufacturer, mpn, footprintName,
                               pinName, pinSignal, isPin1);
+      }
+    }
+  }
+
+  // Export fiducials on the selected board side.
+  const Layer& cuLayer =
+      (side == BoardSide::Bottom) ? Layer::botCopper() : Layer::topCopper();
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    int padNumber = 1;
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
+      if (pad->getLibPad().getFunctionIsFiducial() && pad->isOnLayer(cuLayer)) {
+        const Angle rotation =
+            device->getMirrored() ? -pad->getRotation() : pad->getRotation();
+        const QString designator =
+            QString("%1:%2")
+                .arg(*device->getComponentInstance().getName())
+                .arg(padNumber);
+        const QString value =
+            device->getComponentInstance().getValue(true).trimmed();
+        const QString footprintName =
+            *device->getLibPackage().getNames().getDefaultValue();
+        gen.flashComponent(pad->getPosition(), rotation, designator, value,
+                           GerberGenerator::MountType::Fiducial, QString(),
+                           QString(), footprintName);
+        ++padNumber;
       }
     }
   }
@@ -499,10 +527,14 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       const FootprintPad& libPad = pad->getLibPad();
       const Transform padTransform(libPad.getPosition(), libPad.getRotation());
+      const ExcellonGenerator::Function function =
+          (libPad.getFunction() == FootprintPad::Function::PressFitPad)
+          ? ExcellonGenerator::Function::ComponentDrillPressFit
+          : ExcellonGenerator::Function::ComponentDrill;
       for (const PadHole& hole : libPad.getHoles()) {
         gen.drill(deviceTransform.map(padTransform.map(hole.getPath())),
                   hole.getDiameter(), true,
-                  ExcellonGenerator::Function::ComponentDrill);  // can throw
+                  function);  // can throw
         ++count;
       }
     }
@@ -752,6 +784,22 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
 void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
                                          const BI_FootprintPad& pad,
                                          const Layer& layer) const {
+  const QMap<FootprintPad::Function, GerberAttribute::ApertureFunction>
+      functionMap = {
+          {FootprintPad::Function::ThermalPad,
+           GerberAttribute::ApertureFunction::HeatsinkPad},
+          {FootprintPad::Function::BgaPad,
+           GerberAttribute::ApertureFunction::BgaPadCopperDefined},
+          {FootprintPad::Function::EdgeConnectorPad,
+           GerberAttribute::ApertureFunction::ConnectorPad},
+          {FootprintPad::Function::TestPad,
+           GerberAttribute::ApertureFunction::TestPad},
+          {FootprintPad::Function::LocalFiducial,
+           GerberAttribute::ApertureFunction::FiducialPadLocal},
+          {FootprintPad::Function::GlobalFiducial,
+           GerberAttribute::ApertureFunction::FiducialPadGlobal},
+      };
+
   foreach (const PadGeometry& geometry, pad.getGeometries().value(&layer)) {
     // Pad attributes (most of them only on copper layers).
     GerberGenerator::Function function = tl::nullopt;
@@ -764,6 +812,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
       } else {
         function = GerberAttribute::ApertureFunction::SmdPadCopperDefined;
       }
+      function = functionMap.value(pad.getLibPad().getFunction(), *function);
       net = pad.getCompSigInstNetSignal()
           ? *pad.getCompSigInstNetSignal()->getName()  // Named net.
           : "N/C";  // Anonymous net (reserved name by Gerber specs).

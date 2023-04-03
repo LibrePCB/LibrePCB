@@ -96,6 +96,36 @@ public:
 };
 
 /*******************************************************************************
+ *  Class MsgFiducialStopMaskNotSet
+ ******************************************************************************/
+
+/**
+ * @brief The MsgFiducialStopMaskNotSet class
+ */
+class MsgFiducialStopMaskNotSet final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgFiducialStopMaskNotSet)
+
+public:
+  // Constructors / Destructor
+  MsgFiducialStopMaskNotSet() = delete;
+  MsgFiducialStopMaskNotSet(std::shared_ptr<const Footprint> footprint,
+                            std::shared_ptr<const FootprintPad> pad) noexcept;
+  MsgFiducialStopMaskNotSet(const MsgFiducialStopMaskNotSet& other) noexcept
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
+  virtual ~MsgFiducialStopMaskNotSet() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
+};
+
+/*******************************************************************************
  *  Class MsgHoleWithoutStopMask
  ******************************************************************************/
 
@@ -420,24 +450,55 @@ private:
 };
 
 /*******************************************************************************
- *  Class MsgPadWithoutStopMask
+ *  Class MsgPadStopMaskOff
  ******************************************************************************/
 
 /**
- * @brief The MsgPadWithoutStopMask class
+ * @brief The MsgPadStopMaskOff class
  */
-class MsgPadWithoutStopMask final : public RuleCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(MsgPadWithoutStopMask)
+class MsgPadStopMaskOff final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgPadStopMaskOff)
 
 public:
   // Constructors / Destructor
-  MsgPadWithoutStopMask() = delete;
-  MsgPadWithoutStopMask(std::shared_ptr<const Footprint> footprint,
-                        std::shared_ptr<const FootprintPad> pad,
-                        const QString& pkgPadName) noexcept;
-  MsgPadWithoutStopMask(const MsgPadWithoutStopMask& other) noexcept
+  MsgPadStopMaskOff() = delete;
+  MsgPadStopMaskOff(std::shared_ptr<const Footprint> footprint,
+                    std::shared_ptr<const FootprintPad> pad,
+                    const QString& pkgPadName) noexcept;
+  MsgPadStopMaskOff(const MsgPadStopMaskOff& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgPadWithoutStopMask() noexcept;
+  virtual ~MsgPadStopMaskOff() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
+};
+
+/*******************************************************************************
+ *  Class MsgSmtPadWithSolderPaste
+ ******************************************************************************/
+
+/**
+ * @brief The MsgSmtPadWithSolderPaste class
+ */
+class MsgSmtPadWithSolderPaste final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgSmtPadWithSolderPaste)
+
+public:
+  // Constructors / Destructor
+  MsgSmtPadWithSolderPaste() = delete;
+  MsgSmtPadWithSolderPaste(std::shared_ptr<const Footprint> footprint,
+                           std::shared_ptr<const FootprintPad> pad,
+                           const QString& pkgPadName) noexcept;
+  MsgSmtPadWithSolderPaste(const MsgSmtPadWithSolderPaste& other) noexcept
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
+  virtual ~MsgSmtPadWithSolderPaste() noexcept {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -468,7 +529,37 @@ public:
                               const QString& pkgPadName) noexcept;
   MsgSmtPadWithoutSolderPaste(const MsgSmtPadWithoutSolderPaste& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgSmtPadWithoutSolderPaste() noexcept;
+  virtual ~MsgSmtPadWithoutSolderPaste() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
+};
+
+/*******************************************************************************
+ *  Class MsgSuspiciousPadFunction
+ ******************************************************************************/
+
+/**
+ * @brief The MsgSuspiciousPadFunction class
+ */
+class MsgSuspiciousPadFunction final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgSuspiciousPadFunction)
+
+public:
+  // Constructors / Destructor
+  MsgSuspiciousPadFunction(std::shared_ptr<const Footprint> footprint,
+                           std::shared_ptr<const FootprintPad> pad,
+                           const QString& pkgPadName) noexcept;
+  MsgSuspiciousPadFunction(const MsgSuspiciousPadFunction& other) noexcept
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
+  virtual ~MsgSuspiciousPadFunction() noexcept {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {
@@ -499,7 +590,37 @@ public:
                            const QString& pkgPadName) noexcept;
   MsgThtPadWithSolderPaste(const MsgThtPadWithSolderPaste& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgThtPadWithSolderPaste() noexcept;
+  virtual ~MsgThtPadWithSolderPaste() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
+};
+
+/*******************************************************************************
+ *  Class MsgUnspecifiedPadFunction
+ ******************************************************************************/
+
+/**
+ * @brief The MsgUnspecifiedPadFunction class
+ */
+class MsgUnspecifiedPadFunction final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgUnspecifiedPadFunction)
+
+public:
+  // Constructors / Destructor
+  MsgUnspecifiedPadFunction(std::shared_ptr<const Footprint> footprint,
+                            std::shared_ptr<const FootprintPad> pad,
+                            const QString& pkgPadName) noexcept;
+  MsgUnspecifiedPadFunction(const MsgUnspecifiedPadFunction& other) noexcept
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
+  virtual ~MsgUnspecifiedPadFunction() noexcept {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {

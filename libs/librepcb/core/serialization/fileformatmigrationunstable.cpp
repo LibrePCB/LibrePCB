@@ -68,10 +68,7 @@ void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
   for (SExpression* fptNode : root.getChildren("footprint")) {
     for (SExpression* padNode : fptNode->getChildren("pad")) {
-      const bool isTht = !padNode->getChildren("hole").isEmpty();
-      padNode->appendChild("stop_mask", SExpression::createToken("auto"));
-      padNode->appendChild("solder_paste",
-                           SExpression::createToken(isTht ? "off" : "auto"));
+      padNode->appendChild("function", SExpression::createToken("unspecified"));
     }
   }
   dir.write(fp, root.toByteArray());

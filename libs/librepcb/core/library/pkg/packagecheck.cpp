@@ -63,6 +63,7 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkCustomPadOutline(msgs);
   checkStopMaskOnPads(msgs);
   checkSolderPasteOnPads(msgs);
+  checkPadFunctions(msgs);
   checkHolesStopMask(msgs);
   return msgs;
 }
@@ -383,8 +384,12 @@ void PackageCheck::checkStopMaskOnPads(MsgList& msgs) const {
           ? mPackage.getPads().find(*pad->getPackagePadUuid())
           : nullptr;
       if (!pad->getStopMaskConfig().isEnabled()) {
-        msgs.append(std::make_shared<MsgPadWithoutStopMask>(
+        msgs.append(std::make_shared<MsgPadStopMaskOff>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      } else if (pad->getFunctionIsFiducial() &&
+                 (!pad->getStopMaskConfig().getOffset())) {
+        msgs.append(
+            std::make_shared<MsgFiducialStopMaskNotSet>(footprint, pad));
       }
     }
   }
@@ -400,11 +405,55 @@ void PackageCheck::checkSolderPasteOnPads(MsgList& msgs) const {
       std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
           ? mPackage.getPads().find(*pad->getPackagePadUuid())
           : nullptr;
-      if ((!pad->isTht()) && (!pad->getSolderPasteConfig().isEnabled())) {
+      if ((!pad->isTht()) && pad->getFunctionNeedsSoldering() &&
+          (!pad->getSolderPasteConfig().isEnabled())) {
         msgs.append(std::make_shared<MsgSmtPadWithoutSolderPaste>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      } else if ((!pad->isTht()) && (!pad->getFunctionNeedsSoldering()) &&
+                 pad->getSolderPasteConfig().isEnabled()) {
+        msgs.append(std::make_shared<MsgSmtPadWithSolderPaste>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
       } else if (pad->isTht() && pad->getSolderPasteConfig().isEnabled()) {
         msgs.append(std::make_shared<MsgThtPadWithSolderPaste>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkPadFunctions(MsgList& msgs) const {
+  const QSet<FootprintPad::Function> thtFuncs = {
+      FootprintPad::Function::StandardPad,
+      FootprintPad::Function::PressFitPad,
+  };
+  const QSet<FootprintPad::Function> smtFuncs = {
+      FootprintPad::Function::StandardPad,
+      FootprintPad::Function::ThermalPad,
+      FootprintPad::Function::BgaPad,
+      FootprintPad::Function::EdgeConnectorPad,
+      FootprintPad::Function::TestPad,
+      FootprintPad::Function::LocalFiducial,
+      FootprintPad::Function::GlobalFiducial,
+  };
+
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itPad = (*itFtp).getPads().begin();
+         itPad != (*itFtp).getPads().end(); ++itPad) {
+      std::shared_ptr<const FootprintPad> pad = itPad.ptr();
+      std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
+          ? mPackage.getPads().find(*pad->getPackagePadUuid())
+          : nullptr;
+      const bool isTht = pad->isTht();
+      const bool isConnected = pad->getPackagePadUuid().has_value();
+      if (pad->getFunction() == FootprintPad::Function::Unspecified) {
+        msgs.append(std::make_shared<MsgUnspecifiedPadFunction>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      } else if ((isTht && (!thtFuncs.contains(pad->getFunction()))) ||
+                 ((!isTht) && (!smtFuncs.contains(pad->getFunction()))) ||
+                 (isConnected == pad->getFunctionIsFiducial())) {
+        msgs.append(std::make_shared<MsgSuspiciousPadFunction>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
       }
     }

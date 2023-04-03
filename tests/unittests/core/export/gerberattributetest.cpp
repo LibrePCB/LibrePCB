@@ -229,9 +229,44 @@ TEST_F(GerberAttributeTest, testApertureFunction) {
                 GerberAttribute::ApertureFunction::SmdPadSolderMaskDefined)
                 .toGerberString()
                 .toStdString());
+  EXPECT_EQ("G04 #@! TA.AperFunction,BGAPad,CuDef*\n",
+            GerberAttribute::apertureFunction(
+                GerberAttribute::ApertureFunction::BgaPadCopperDefined)
+                .toGerberString()
+                .toStdString());
+  EXPECT_EQ("G04 #@! TA.AperFunction,BGAPad,SMDef*\n",
+            GerberAttribute::apertureFunction(
+                GerberAttribute::ApertureFunction::BgaPadSolderMaskDefined)
+                .toGerberString()
+                .toStdString());
+  EXPECT_EQ("G04 #@! TA.AperFunction,ConnectorPad*\n",
+            GerberAttribute::apertureFunction(
+                GerberAttribute::ApertureFunction::ConnectorPad)
+                .toGerberString()
+                .toStdString());
+  EXPECT_EQ("G04 #@! TA.AperFunction,HeatsinkPad*\n",
+            GerberAttribute::apertureFunction(
+                GerberAttribute::ApertureFunction::HeatsinkPad)
+                .toGerberString()
+                .toStdString());
   EXPECT_EQ("G04 #@! TA.AperFunction,ViaPad*\n",
             GerberAttribute::apertureFunction(
                 GerberAttribute::ApertureFunction::ViaPad)
+                .toGerberString()
+                .toStdString());
+  EXPECT_EQ("G04 #@! TA.AperFunction,TestPad*\n",
+            GerberAttribute::apertureFunction(
+                GerberAttribute::ApertureFunction::TestPad)
+                .toGerberString()
+                .toStdString());
+  EXPECT_EQ("G04 #@! TA.AperFunction,FiducialPad,Local*\n",
+            GerberAttribute::apertureFunction(
+                GerberAttribute::ApertureFunction::FiducialPadLocal)
+                .toGerberString()
+                .toStdString());
+  EXPECT_EQ("G04 #@! TA.AperFunction,FiducialPad,Global*\n",
+            GerberAttribute::apertureFunction(
+                GerberAttribute::ApertureFunction::FiducialPadGlobal)
                 .toGerberString()
                 .toStdString());
 }
@@ -245,6 +280,11 @@ TEST_F(GerberAttributeTest, testApertureFunctionExcellon) {
   EXPECT_EQ("; #@! TA.AperFunction,ComponentDrill\n",
             GerberAttribute::apertureFunction(
                 GerberAttribute::ApertureFunction::ComponentDrill)
+                .toExcellonString()
+                .toStdString());
+  EXPECT_EQ("; #@! TA.AperFunction,ComponentDrill,PressFit\n",
+            GerberAttribute::apertureFunction(
+                GerberAttribute::ApertureFunction::ComponentDrillPressFit)
                 .toExcellonString()
                 .toStdString());
   EXPECT_EQ("; #@! TA.AperFunction,MechanicalDrill\n",
@@ -265,6 +305,12 @@ TEST_F(GerberAttributeTest, testApertureFunctionMixedPlatingDrillExcellon) {
                 false, GerberAttribute::ApertureFunction::ComponentDrill)
                 .toExcellonString()
                 .toStdString());
+  EXPECT_EQ(
+      "; #@! TA.AperFunction,NonPlated,NPTH,ComponentDrill,PressFit\n",
+      GerberAttribute::apertureFunctionMixedPlatingDrill(
+          false, GerberAttribute::ApertureFunction::ComponentDrillPressFit)
+          .toExcellonString()
+          .toStdString());
   EXPECT_EQ("; #@! TA.AperFunction,NonPlated,NPTH,MechanicalDrill\n",
             GerberAttribute::apertureFunctionMixedPlatingDrill(
                 false, GerberAttribute::ApertureFunction::MechanicalDrill)
@@ -278,6 +324,11 @@ TEST_F(GerberAttributeTest, testApertureFunctionMixedPlatingDrillExcellon) {
   EXPECT_EQ("; #@! TA.AperFunction,Plated,PTH,ComponentDrill\n",
             GerberAttribute::apertureFunctionMixedPlatingDrill(
                 true, GerberAttribute::ApertureFunction::ComponentDrill)
+                .toExcellonString()
+                .toStdString());
+  EXPECT_EQ("; #@! TA.AperFunction,Plated,PTH,ComponentDrill,PressFit\n",
+            GerberAttribute::apertureFunctionMixedPlatingDrill(
+                true, GerberAttribute::ApertureFunction::ComponentDrillPressFit)
                 .toExcellonString()
                 .toStdString());
   EXPECT_EQ("; #@! TA.AperFunction,Plated,PTH,MechanicalDrill\n",

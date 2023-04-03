@@ -330,6 +330,10 @@ GerberAttribute GerberAttribute::apertureFunction(
       return GerberAttribute(Type::Aperture, ".AperFunction",
                              {"ComponentDrill"});
     }
+    case ApertureFunction::ComponentDrillPressFit: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"ComponentDrill", "PressFit"});
+    }
     case ApertureFunction::MechanicalDrill: {
       return GerberAttribute(Type::Aperture, ".AperFunction",
                              {"MechanicalDrill"});
@@ -351,8 +355,33 @@ GerberAttribute GerberAttribute::apertureFunction(
       return GerberAttribute(Type::Aperture, ".AperFunction",
                              {"SMDPad", "SMDef"});
     }
+    case ApertureFunction::BgaPadCopperDefined: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"BGAPad", "CuDef"});
+    }
+    case ApertureFunction::BgaPadSolderMaskDefined: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"BGAPad", "SMDef"});
+    }
+    case ApertureFunction::ConnectorPad: {
+      return GerberAttribute(Type::Aperture, ".AperFunction", {"ConnectorPad"});
+    }
+    case ApertureFunction::HeatsinkPad: {
+      return GerberAttribute(Type::Aperture, ".AperFunction", {"HeatsinkPad"});
+    }
     case ApertureFunction::ViaPad: {
       return GerberAttribute(Type::Aperture, ".AperFunction", {"ViaPad"});
+    }
+    case ApertureFunction::TestPad: {
+      return GerberAttribute(Type::Aperture, ".AperFunction", {"TestPad"});
+    }
+    case ApertureFunction::FiducialPadLocal: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"FiducialPad", "Local"});
+    }
+    case ApertureFunction::FiducialPadGlobal: {
+      return GerberAttribute(Type::Aperture, ".AperFunction",
+                             {"FiducialPad", "Global"});
     }
     case ApertureFunction::ComponentMain: {
       return GerberAttribute(Type::Aperture, ".AperFunction",

@@ -43,10 +43,13 @@ namespace editor {
  * (http://doc.qt.io/qt-5/qactiongroup.html). But there is one important
  * difference: When the user clicks on a QAction, that action won't be checked
  * instantly. Instead, this class only emits the signal
- * #changeRequestTriggered(). Whether the triggered action actually gets checked
+ * #actionTriggered(). Whether the triggered action actually gets checked
  * or the request is rejected can be decided from outside this class (typically
  * by the state machine of an editor window). To change the selected action,
  * #setCurrentAction() needs to be called.
+ *
+ * In addition, this class provides support for "nested" actions, used to
+ * create tools which can be entered in different modes.
  */
 class ExclusiveActionGroup final : public QObject {
   Q_OBJECT
@@ -60,23 +63,22 @@ public:
   // General Methods
   void reset() noexcept;
   void setEnabled(bool enabled) noexcept;
-  void addAction(const QVariant& key, QAction* action) noexcept;
-  void setActionEnabled(const QVariant& key, bool enabled) noexcept;
-  void setCurrentAction(const QVariant& key) noexcept;
-  const QVariant& getCurrentAction() const noexcept { return mCurrentAction; }
+  void addAction(QPointer<QAction> action, int id,
+                 const QVariant& mode = QVariant()) noexcept;
+  void setActionEnabled(int id, bool enabled) noexcept;
+  void setCurrentAction(int id) noexcept;
 
   // Operator Overloadings
   ExclusiveActionGroup& operator=(const ExclusiveActionGroup& rhs) = delete;
 
 signals:
-  void changeRequestTriggered(const QVariant& key);
+  void actionTriggered(int id, const QVariant& mode);
 
 private:  // Methods
-  void actionTriggered() noexcept;
+  void actionTriggeredSlot() noexcept;
 
 private:  // Data
-  QVariant mCurrentAction;
-  QMap<QVariant, QAction*> mActions;
+  QHash<int, QVector<std::pair<QPointer<QAction>, QVariant>>> mActions;
 };
 
 /*******************************************************************************

@@ -46,7 +46,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
   SExpression sexpr = SExpression::parse(
       "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side top) (shape roundrect)\n"
       " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2) (radius 0.5)\n"
-      " (stop_mask auto) (solder_paste 0.25)\n"
+      " (stop_mask auto) (solder_paste 0.25) (function unspecified)\n"
       " (package_pad d48b8bd2-a46c-4495-87a5-662747034098)\n"
       ")",
       FilePath());
@@ -64,6 +64,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
   EXPECT_EQ(MaskConfig::automatic(), obj.getStopMaskConfig());
   EXPECT_EQ(MaskConfig::manual(Length(250000)), obj.getSolderPasteConfig());
   EXPECT_EQ(FootprintPad::ComponentSide::Top, obj.getComponentSide());
+  EXPECT_EQ(FootprintPad::Function::Unspecified, obj.getFunction());
   EXPECT_EQ(0, obj.getHoles().count());
 }
 
@@ -71,7 +72,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   SExpression sexpr = SExpression::parse(
       "(pad 7040952d-7016-49cd-8c3e-6078ecca98b9 (side bottom) (shape custom)\n"
       " (position 1.234 2.345) (rotation 45.0) (size 1.1 2.2) (radius 0.5)\n"
-      " (stop_mask off) (solder_paste auto)\n"
+      " (stop_mask off) (solder_paste auto) (function standard)\n"
       " (package_pad none)\n"
       " (vertex (position -1.1 -2.2) (angle 45.0))\n"
       " (vertex (position 1.1 -2.2) (angle 90.0))\n"
@@ -97,6 +98,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   EXPECT_EQ(MaskConfig::off(), obj.getStopMaskConfig());
   EXPECT_EQ(MaskConfig::automatic(), obj.getSolderPasteConfig());
   EXPECT_EQ(FootprintPad::ComponentSide::Bottom, obj.getComponentSide());
+  EXPECT_EQ(FootprintPad::Function::StandardPad, obj.getFunction());
   EXPECT_EQ(3, obj.getCustomShapeOutline().getVertices().count());
   EXPECT_EQ(2, obj.getHoles().count());
 }
@@ -108,7 +110,7 @@ TEST_F(FootprintPadTest, testSerializeAndDeserialize) {
       PositiveLength(456), UnsignedLimitedRatio(Ratio::percent50()),
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
       MaskConfig::automatic(), MaskConfig::manual(Length(123456)),
-      FootprintPad::ComponentSide::Top,
+      FootprintPad::ComponentSide::Top, FootprintPad::Function::Unspecified,
       PadHoleList{
           std::make_shared<PadHole>(Uuid::createRandom(),
                                     PositiveLength(100000),

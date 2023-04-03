@@ -68,6 +68,7 @@ protected:  // Methods
   void checkCustomPadOutline(MsgList& msgs) const;
   void checkStopMaskOnPads(MsgList& msgs) const;
   void checkSolderPasteOnPads(MsgList& msgs) const;
+  void checkPadFunctions(MsgList& msgs) const;
   void checkHolesStopMask(MsgList& msgs) const;
 
 private:  // Data

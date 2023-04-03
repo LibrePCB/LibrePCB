@@ -91,8 +91,8 @@ void EditorWidgetBase::connectEditor(UndoStackActionGroup& undoStackActionGroup,
 
   mToolsActionGroup = &toolsActionGroup;
   mToolsActionGroup->reset();
-  connect(mToolsActionGroup, &ExclusiveActionGroup::changeRequestTriggered,
-          this, &EditorWidgetBase::toolActionGroupChangeTriggered);
+  connect(mToolsActionGroup, &ExclusiveActionGroup::actionTriggered, this,
+          &EditorWidgetBase::toolRequested);
 
   mCommandToolBarProxy->setToolBar(&commandToolBar);
 
@@ -104,8 +104,8 @@ void EditorWidgetBase::disconnectEditor() noexcept {
   mUndoStackActionGroup->setUndoStack(nullptr);
   mUndoStackActionGroup = nullptr;
 
-  disconnect(mToolsActionGroup, &ExclusiveActionGroup::changeRequestTriggered,
-             this, &EditorWidgetBase::toolActionGroupChangeTriggered);
+  disconnect(mToolsActionGroup, &ExclusiveActionGroup::actionTriggered, this,
+             &EditorWidgetBase::toolRequested);
   mToolsActionGroup->reset();
 
   mCommandToolBarProxy->setToolBar(nullptr);
@@ -265,9 +265,8 @@ bool EditorWidgetBase::askForRestoringBackup(const FilePath& dir) {
   }
 }
 
-void EditorWidgetBase::toolActionGroupChangeTriggered(
-    const QVariant& newTool) noexcept {
-  toolChangeRequested(static_cast<Tool>(newTool.toInt()));
+void EditorWidgetBase::toolRequested(int tool, const QVariant& mode) noexcept {
+  toolChangeRequested(static_cast<Tool>(tool), mode);
 }
 
 void EditorWidgetBase::undoStackCleanChanged(bool clean) noexcept {

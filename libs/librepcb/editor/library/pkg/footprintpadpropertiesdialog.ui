@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>587</width>
-    <height>335</height>
+    <height>367</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,28 +34,28 @@
        <item row="0" column="1">
         <widget class="QComboBox" name="cbxPackagePad"/>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="label_2">
          <property name="text">
           <string>Component Side:</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
           <string>Shape:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>Hole Diameter:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="librepcb::editor::PositiveLengthEdit" name="edtHoleDiameter" native="true"/>
@@ -95,14 +95,14 @@
          </item>
         </layout>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
           <string>Position:</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true"/>
@@ -112,24 +112,24 @@
          </item>
         </layout>
        </item>
-       <item row="9" column="0">
+       <item row="10" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
           <string>Rotation:</string>
          </property>
         </widget>
        </item>
-       <item row="9" column="1">
+       <item row="10" column="1">
         <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="label_9">
          <property name="text">
           <string>Corner Radius:</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
           <widget class="librepcb::editor::UnsignedLimitedRatioEdit" name="edtRadiusRatio" native="true"/>
@@ -139,7 +139,7 @@
          </item>
         </layout>
        </item>
-       <item row="1" column="1">
+       <item row="2" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QToolButton" name="btnComponentSideTop">
@@ -193,7 +193,7 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
           <widget class="QToolButton" name="btnShapeRound">
@@ -329,14 +329,14 @@
          </item>
         </layout>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="label_7">
          <property name="text">
           <string>Size:</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
           <widget class="librepcb::editor::PositiveLengthEdit" name="edtWidth" native="true"/>
@@ -345,6 +345,16 @@
           <widget class="librepcb::editor::PositiveLengthEdit" name="edtHeight" native="true"/>
          </item>
         </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>Function:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="cbxFunction"/>
        </item>
       </layout>
      </widget>
@@ -685,6 +695,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>cbxPackagePad</tabstop>
+  <tabstop>cbxFunction</tabstop>
   <tabstop>btnComponentSideTop</tabstop>
   <tabstop>btnComponentSideBottom</tabstop>
   <tabstop>btnShapeRound</tabstop>
@@ -706,9 +717,9 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGroupSolderPaste"/>
+  <buttongroup name="btnGroupShape"/>
   <buttongroup name="btnGroupStopMask"/>
   <buttongroup name="btnGroupComponentSide"/>
-  <buttongroup name="btnGroupShape"/>
+  <buttongroup name="btnGroupSolderPaste"/>
  </buttongroups>
 </ui>
