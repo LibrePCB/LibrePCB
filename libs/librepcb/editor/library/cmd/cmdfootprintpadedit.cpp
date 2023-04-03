@@ -133,9 +133,11 @@ void CmdFootprintPadEdit::setCustomShapeOutline(const Path& outline) noexcept {
   mNewCustomShapeOutline = outline;
 }
 
-void CmdFootprintPadEdit::setStopMaskConfig(const MaskConfig& config) noexcept {
+void CmdFootprintPadEdit::setStopMaskConfig(const MaskConfig& config,
+                                            bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewStopMaskConfig = config;
+  if (immediate) mPad.setStopMaskConfig(mNewStopMaskConfig);
 }
 
 void CmdFootprintPadEdit::setSolderPasteConfig(

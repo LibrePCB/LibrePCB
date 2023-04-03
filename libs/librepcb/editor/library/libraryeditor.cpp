@@ -646,8 +646,17 @@ void LibraryEditor::createActions() noexcept {
   mActionToolName.reset(cmd.toolName.createAction(this));
   mActionToolValue.reset(cmd.toolValue.createAction(this));
   mActionToolPin.reset(cmd.toolPin.createAction(this));
-  mActionToolSmtPad.reset(cmd.toolPadSmt.createAction(this));
+  mActionToolSmtPadStandard.reset(cmd.toolPadSmt.createAction(this));
   mActionToolThtPad.reset(cmd.toolPadTht.createAction(this));
+  mActionToolSpecialPadThermal.reset(cmd.toolPadThermal.createAction(this));
+  mActionToolSpecialPadBga.reset(cmd.toolPadBga.createAction(this));
+  mActionToolSpecialPadEdgeConnector.reset(
+      cmd.toolPadEdgeConnector.createAction(this));
+  mActionToolSpecialPadTest.reset(cmd.toolPadTest.createAction(this));
+  mActionToolSpecialPadLocalFiducial.reset(
+      cmd.toolPadLocalFiducial.createAction(this));
+  mActionToolSpecialPadGlobalFiducial.reset(
+      cmd.toolPadGlobalFiducial.createAction(this));
   mActionToolHole.reset(cmd.toolHole.createAction(this));
   mActionToolMeasure.reset(cmd.toolMeasure.createAction(this));
 
@@ -679,8 +688,30 @@ void LibraryEditor::createActions() noexcept {
                                EditorWidgetBase::Tool::ADD_PINS);
   mToolsActionGroup->addAction(mActionToolThtPad.data(),
                                EditorWidgetBase::Tool::ADD_THT_PADS);
-  mToolsActionGroup->addAction(mActionToolSmtPad.data(),
-                               EditorWidgetBase::Tool::ADD_SMT_PADS);
+  mToolsActionGroup->addAction(
+      mActionToolSmtPadStandard.data(), EditorWidgetBase::Tool::ADD_SMT_PADS,
+      QVariant::fromValue(FootprintPad::Function::StandardPad));
+  mToolsActionGroup->addAction(
+      mActionToolSpecialPadThermal.data(), EditorWidgetBase::Tool::ADD_SMT_PADS,
+      QVariant::fromValue(FootprintPad::Function::ThermalPad));
+  mToolsActionGroup->addAction(
+      mActionToolSpecialPadBga.data(), EditorWidgetBase::Tool::ADD_SMT_PADS,
+      QVariant::fromValue(FootprintPad::Function::BgaPad));
+  mToolsActionGroup->addAction(
+      mActionToolSpecialPadEdgeConnector.data(),
+      EditorWidgetBase::Tool::ADD_SMT_PADS,
+      QVariant::fromValue(FootprintPad::Function::EdgeConnectorPad));
+  mToolsActionGroup->addAction(
+      mActionToolSpecialPadTest.data(), EditorWidgetBase::Tool::ADD_SMT_PADS,
+      QVariant::fromValue(FootprintPad::Function::TestPad));
+  mToolsActionGroup->addAction(
+      mActionToolSpecialPadLocalFiducial.data(),
+      EditorWidgetBase::Tool::ADD_SMT_PADS,
+      QVariant::fromValue(FootprintPad::Function::LocalFiducial));
+  mToolsActionGroup->addAction(
+      mActionToolSpecialPadGlobalFiducial.data(),
+      EditorWidgetBase::Tool::ADD_SMT_PADS,
+      QVariant::fromValue(FootprintPad::Function::GlobalFiducial));
   mToolsActionGroup->addAction(mActionToolHole.data(),
                                EditorWidgetBase::Tool::ADD_HOLES);
   mToolsActionGroup->addAction(mActionToolMeasure.data(),
@@ -764,7 +795,19 @@ void LibraryEditor::createToolBars() noexcept {
   mToolBarTools->addAction(mActionToolPin.data());
   mToolBarTools->addSeparator();
   mToolBarTools->addAction(mActionToolThtPad.data());
-  mToolBarTools->addAction(mActionToolSmtPad.data());
+  mToolBarTools->addAction(mActionToolSmtPadStandard.data());
+  if (auto btn = qobject_cast<QToolButton*>(
+          mToolBarTools->widgetForAction(mActionToolSmtPadStandard.data()))) {
+    QMenu* menu = new QMenu(mToolBarTools.data());
+    menu->addAction(mActionToolSpecialPadThermal.data());
+    menu->addAction(mActionToolSpecialPadBga.data());
+    menu->addAction(mActionToolSpecialPadEdgeConnector.data());
+    menu->addAction(mActionToolSpecialPadTest.data());
+    menu->addAction(mActionToolSpecialPadLocalFiducial.data());
+    menu->addAction(mActionToolSpecialPadGlobalFiducial.data());
+    btn->setMenu(menu);
+    btn->setPopupMode(QToolButton::DelayedPopup);
+  }
   mToolBarTools->addAction(mActionToolHole.data());
   mToolBarTools->addSeparator();
   mToolBarTools->addAction(mActionToolMeasure.data());
@@ -850,7 +893,13 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionToolPin);
   mb.addSeparator();
   mb.addAction(mActionToolThtPad);
-  mb.addAction(mActionToolSmtPad);
+  mb.addAction(mActionToolSmtPadStandard);
+  mb.addAction(mActionToolSpecialPadThermal);
+  mb.addAction(mActionToolSpecialPadBga);
+  mb.addAction(mActionToolSpecialPadEdgeConnector);
+  mb.addAction(mActionToolSpecialPadTest);
+  mb.addAction(mActionToolSpecialPadLocalFiducial);
+  mb.addAction(mActionToolSpecialPadGlobalFiducial);
   mb.addAction(mActionToolHole);
   mb.addSeparator();
   mb.addAction(mActionToolMeasure);

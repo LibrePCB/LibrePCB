@@ -509,14 +509,18 @@ bool PackageEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
 
 bool PackageEditorWidget::toolChangeRequested(Tool newTool,
                                               const QVariant& mode) noexcept {
-  Q_UNUSED(mode);
   switch (newTool) {
     case Tool::SELECT:
       return mFsm->processStartSelecting();
     case Tool::ADD_THT_PADS:
       return mFsm->processStartAddingFootprintThtPads();
-    case Tool::ADD_SMT_PADS:
-      return mFsm->processStartAddingFootprintSmtPads();
+    case Tool::ADD_SMT_PADS: {
+      FootprintPad::Function function = FootprintPad::Function::StandardPad;
+      if (mode.isValid() && mode.canConvert<FootprintPad::Function>()) {
+        function = mode.value<FootprintPad::Function>();
+      }
+      return mFsm->processStartAddingFootprintSmtPads(function);
+    }
     case Tool::ADD_NAMES:
       return mFsm->processStartAddingNames();
     case Tool::ADD_VALUES:
@@ -671,7 +675,7 @@ void PackageEditorWidget::fixMsg(const MsgPadStopMaskOff& msg) {
   std::shared_ptr<FootprintPad> pad =
       footprint->getPads().get(msg.getPad().get());
   QScopedPointer<CmdFootprintPadEdit> cmd(new CmdFootprintPadEdit(*pad));
-  cmd->setStopMaskConfig(MaskConfig::automatic());
+  cmd->setStopMaskConfig(MaskConfig::automatic(), false);
   mUndoStack->execCmd(cmd.take());
 }
 

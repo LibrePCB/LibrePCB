@@ -64,7 +64,7 @@ public:
   void setHeight(const PositiveLength& height, bool immediate) noexcept;
   void setRadius(const UnsignedLimitedRatio& radius, bool immediate) noexcept;
   void setCustomShapeOutline(const Path& outline) noexcept;
-  void setStopMaskConfig(const MaskConfig& config) noexcept;
+  void setStopMaskConfig(const MaskConfig& config, bool immediate) noexcept;
   void setSolderPasteConfig(const MaskConfig& config) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;

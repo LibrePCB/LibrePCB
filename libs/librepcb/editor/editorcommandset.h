@@ -874,6 +874,15 @@ public:
       {QKeySequence(Qt::Key_I)},
       &categoryTools,
   };
+  EditorCommand toolPadTht{
+      "tool_pad_tht",  // clang-format break
+      QT_TR_NOOP("Add THT Pad"),
+      QT_TR_NOOP("Add plated through-hole copper pads"),
+      QIcon(":/img/actions/add_tht_pad.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::Key_H)},
+      &categoryTools,
+  };
   EditorCommand toolPadSmt{
       "tool_pad_smt",  // clang-format break
       QT_TR_NOOP("Add SMT Pad"),
@@ -883,13 +892,58 @@ public:
       {QKeySequence(Qt::Key_D)},
       &categoryTools,
   };
-  EditorCommand toolPadTht{
-      "tool_pad_tht",  // clang-format break
-      QT_TR_NOOP("Add THT Pad"),
-      QT_TR_NOOP("Add plated through-hole copper pads"),
-      QIcon(":/img/actions/add_tht_pad.png"),
+  EditorCommand toolPadThermal{
+      "tool_pad_thermal",  // clang-format break
+      QT_TR_NOOP("Add Thermal Pad"),
+      QT_TR_NOOP("Add special SMT pads used as heat sink"),
+      QIcon(),
       EditorCommand::Flags(),
-      {QKeySequence(Qt::Key_H)},
+      {},
+      &categoryTools,
+  };
+  EditorCommand toolPadBga{
+      "tool_pad_bga",  // clang-format break
+      QT_TR_NOOP("Add BGA Pad"),
+      QT_TR_NOOP("Add special SMT pads used for ball grid arrays"),
+      QIcon(),
+      EditorCommand::Flags(),
+      {},
+      &categoryTools,
+  };
+  EditorCommand toolPadEdgeConnector{
+      "tool_pad_edge_connector",  // clang-format break
+      QT_TR_NOOP("Add Edge Connector Pad"),
+      QT_TR_NOOP("Add special SMT pads used as edge connector"),
+      QIcon(),
+      EditorCommand::Flags(),
+      {},
+      &categoryTools,
+  };
+  EditorCommand toolPadTest{
+      "tool_pad_test_point",  // clang-format break
+      QT_TR_NOOP("Add Test Pad"),
+      QT_TR_NOOP("Add special SMT pads used as test points"),
+      QIcon(),
+      EditorCommand::Flags(),
+      {},
+      &categoryTools,
+  };
+  EditorCommand toolPadLocalFiducial{
+      "tool_pad_local_fiducial",  // clang-format break
+      QT_TR_NOOP("Add Local Fiducial Pad"),
+      QT_TR_NOOP("Add special SMT pads used as local fiducials"),
+      QIcon(),
+      EditorCommand::Flags(),
+      {},
+      &categoryTools,
+  };
+  EditorCommand toolPadGlobalFiducial{
+      "tool_pad_global_fiducial",  // clang-format break
+      QT_TR_NOOP("Add Global Fiducial Pad"),
+      QT_TR_NOOP("Add special SMT pads used as global fiducials"),
+      QIcon(),
+      EditorCommand::Flags(),
+      {},
       &categoryTools,
   };
   EditorCommand toolHole{

@@ -482,11 +482,11 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     cmd->setCustomShapeOutline(customOutlinePath);
     if (mUi->rbtnStopMaskManual->isChecked()) {
       cmd->setStopMaskConfig(
-          MaskConfig::manual(mUi->edtStopMaskOffset->getValue()));
+          MaskConfig::manual(mUi->edtStopMaskOffset->getValue()), false);
     } else if (mUi->rbtnStopMaskAuto->isChecked()) {
-      cmd->setStopMaskConfig(MaskConfig::automatic());
+      cmd->setStopMaskConfig(MaskConfig::automatic(), false);
     } else {
-      cmd->setStopMaskConfig(MaskConfig::off());
+      cmd->setStopMaskConfig(MaskConfig::off(), false);
     }
     if (mUi->rbtnSolderPasteManual->isChecked()) {
       cmd->setSolderPasteConfig(

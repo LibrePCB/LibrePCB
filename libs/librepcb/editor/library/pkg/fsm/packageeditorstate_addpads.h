@@ -62,7 +62,8 @@ public:
   // Constructors / Destructor
   PackageEditorState_AddPads() = delete;
   PackageEditorState_AddPads(const PackageEditorState_AddPads& other) = delete;
-  explicit PackageEditorState_AddPads(Context& context, PadType type) noexcept;
+  explicit PackageEditorState_AddPads(Context& context, PadType type,
+                                      FootprintPad::Function function) noexcept;
   virtual ~PackageEditorState_AddPads() noexcept;
 
   // General Methods
@@ -98,7 +99,9 @@ private:  // Methods
   void widthEditValueChanged(const PositiveLength& value) noexcept;
   void heightEditValueChanged(const PositiveLength& value) noexcept;
   void drillDiameterEditValueChanged(const PositiveLength& value) noexcept;
+  void fiducialClearanceEditValueChanged(const UnsignedLength& value) noexcept;
   void radiusEditValueChanged(const UnsignedLimitedRatio& value) noexcept;
+  void pressFitCheckedChanged(bool value) noexcept;
   void applyRecommendedRoundedRectRadius() noexcept;
 
 signals:
@@ -114,54 +117,6 @@ private:  // Types / Data
 
   // parameter memory
   FootprintPad mLastPad;
-};
-
-/*******************************************************************************
- *  Class PackageEditorState_AddPadsTht
- ******************************************************************************/
-
-/**
- * @brief The PackageEditorState_AddPadsTht class
- */
-class PackageEditorState_AddPadsTht final : public PackageEditorState_AddPads {
-  Q_OBJECT
-
-public:
-  // Constructors / Destructor
-  PackageEditorState_AddPadsTht() = delete;
-  PackageEditorState_AddPadsTht(const PackageEditorState_AddPadsTht& other) =
-      delete;
-  explicit PackageEditorState_AddPadsTht(Context& context) noexcept
-    : PackageEditorState_AddPads(context, PadType::THT) {}
-  ~PackageEditorState_AddPadsTht() noexcept {}
-
-  // Operator Overloadings
-  PackageEditorState_AddPadsTht& operator=(
-      const PackageEditorState_AddPadsTht& rhs) = delete;
-};
-
-/*******************************************************************************
- *  Class PackageEditorState_AddPadsSmt
- ******************************************************************************/
-
-/**
- * @brief The PackageEditorState_AddPadsSmt class
- */
-class PackageEditorState_AddPadsSmt final : public PackageEditorState_AddPads {
-  Q_OBJECT
-
-public:
-  // Constructors / Destructor
-  PackageEditorState_AddPadsSmt() = delete;
-  PackageEditorState_AddPadsSmt(const PackageEditorState_AddPadsSmt& other) =
-      delete;
-  explicit PackageEditorState_AddPadsSmt(Context& context) noexcept
-    : PackageEditorState_AddPads(context, PadType::SMT) {}
-  ~PackageEditorState_AddPadsSmt() noexcept {}
-
-  // Operator Overloadings
-  PackageEditorState_AddPadsSmt& operator=(
-      const PackageEditorState_AddPadsSmt& rhs) = delete;
 };
 
 /*******************************************************************************
