@@ -344,6 +344,8 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
     // Pads.
     foreach (const BI_FootprintPad* pad, device->getPads()) {
+      const UnsignedLength padClearance =
+          std::max(clearance, pad->getLibPad().getCopperClearance());
       foreach (const Layer* layer, mBoard.getCopperLayers()) {
         if (pad->isOnLayer(*layer)) {
           auto it = items.insert(items.end(),
@@ -352,12 +354,12 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                       nullptr,
                                       layer,
                                       pad->getCompSigInstNetSignal(),
-                                      *clearance,
+                                      *padClearance,
                                       {},
                                       {}});
           gen.addPad(*pad, transform, *layer);
           gen.takePathsTo(it->copperArea);
-          gen.addPad(*pad, transform, *layer, clearance - tolerance);
+          gen.addPad(*pad, transform, *layer, padClearance - tolerance);
           gen.takePathsTo(it->clearanceArea);
         }
       }

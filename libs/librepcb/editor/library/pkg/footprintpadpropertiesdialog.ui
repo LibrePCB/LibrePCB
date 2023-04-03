@@ -453,9 +453,9 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabMasks">
+     <widget class="QWidget" name="tabClearances">
       <attribute name="title">
-       <string>Automatic Masks</string>
+       <string>Clearances</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout_2">
        <item row="0" column="0">
@@ -608,6 +608,34 @@
          </property>
         </widget>
        </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_15">
+         <property name="text">
+          <string>Copper Keepout:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="librepcb::editor::UnsignedLengthEdit" name="edtCopperClearance" native="true"/>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="label_14">
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>Note: Intended to keep copper away from fiducials.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tabCustomShape">
@@ -717,9 +745,9 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGroupShape"/>
   <buttongroup name="btnGroupStopMask"/>
-  <buttongroup name="btnGroupComponentSide"/>
+  <buttongroup name="btnGroupShape"/>
   <buttongroup name="btnGroupSolderPaste"/>
+  <buttongroup name="btnGroupComponentSide"/>
  </buttongroups>
 </ui>

@@ -93,6 +93,7 @@ public:
     CustomShapeOutlineChanged,
     StopMaskConfigChanged,
     SolderPasteConfigChanged,
+    CopperClearanceChanged,
     ComponentSideChanged,
     FunctionChanged,
     HolesEdited,
@@ -108,7 +109,8 @@ public:
                const PositiveLength& width, const PositiveLength& height,
                const UnsignedLimitedRatio& radius,
                const Path& customShapeOutline, const MaskConfig& autoStopMask,
-               const MaskConfig& autoSolderPaste, ComponentSide side,
+               const MaskConfig& autoSolderPaste,
+               const UnsignedLength& copperClearance, ComponentSide side,
                Function function, const PadHoleList& holes) noexcept;
   explicit FootprintPad(const SExpression& node);
   ~FootprintPad() noexcept;
@@ -132,6 +134,9 @@ public:
   }
   const MaskConfig& getSolderPasteConfig() const noexcept {
     return mSolderPasteConfig;
+  }
+  const UnsignedLength& getCopperClearance() const noexcept {
+    return mCopperClearance;
   }
   ComponentSide getComponentSide() const noexcept { return mComponentSide; }
   Function getFunction() const noexcept { return mFunction; }
@@ -161,6 +166,7 @@ public:
   bool setCustomShapeOutline(const Path& outline) noexcept;
   bool setStopMaskConfig(const MaskConfig& config) noexcept;
   bool setSolderPasteConfig(const MaskConfig& config) noexcept;
+  bool setCopperClearance(const UnsignedLength& clearance) noexcept;
   bool setComponentSide(ComponentSide side) noexcept;
   bool setFunction(Function function) noexcept;
 
@@ -208,6 +214,7 @@ private:  // Data
   Path mCustomShapeOutline;  ///< Empty if not needed; Implicitly closed
   MaskConfig mStopMaskConfig;
   MaskConfig mSolderPasteConfig;
+  UnsignedLength mCopperClearance;
   ComponentSide mComponentSide;
   Function mFunction;
   PadHoleList mHoles;  ///< If not empty, it's a THT pad.

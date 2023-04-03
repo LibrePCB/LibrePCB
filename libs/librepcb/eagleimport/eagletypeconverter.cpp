@@ -427,6 +427,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           Path(),  // Custom shape outline
           MaskConfig::automatic(),  // Stop mask
           MaskConfig::off(),  // Solder paste
+          UnsignedLength(0),  // Copper clearance
           FootprintPad::ComponentSide::Top,  // Side
           FootprintPad::Function::Unspecified,  // Function
           PadHoleList{std::make_shared<PadHole>(
@@ -465,6 +466,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           Path(),  // Custom shape outline
           MaskConfig::automatic(),  // Stop mask
           MaskConfig::automatic(),  // Solder paste
+          UnsignedLength(0),  // Copper clearance
           side,  // Side
           FootprintPad::Function::Unspecified,  // Function
           PadHoleList{}  // Holes

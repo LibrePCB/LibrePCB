@@ -267,18 +267,19 @@ ClipperLib::Paths BoardPlaneFragmentsBuilder::createPadCutOuts(
       (pad.getCompSigInstNetSignal() != &mPlane.getNetSignal());
   if ((mPlane.getConnectStyle() == BI_Plane::ConnectStyle::None) ||
       differentNetSignal) {
+    const Length clearance = std::max(*mPlane.getMinClearance(),
+                                      *pad.getLibPad().getCopperClearance());
     foreach (const PadGeometry& geometry,
              pad.getGeometries().value(&mPlane.getLayer())) {
       foreach (const Path& outline,
-               geometry.withOffset(*mPlane.getMinClearance()).toOutlines()) {
+               geometry.withOffset(clearance).toOutlines()) {
         result.push_back(ClipperHelpers::convert(
             deviceTransform.map(padTransform.map(outline)), maxArcTolerance()));
       }
       // Also create cut-outs for each hole to ensure correct clearance even if
       // the pad outline is too small or invalid.
       for (const PadHole& hole : geometry.getHoles()) {
-        const PositiveLength width(hole.getDiameter() +
-                                   (mPlane.getMinClearance() * 2));
+        const PositiveLength width(hole.getDiameter() + (clearance * 2));
         foreach (const Path& outline, hole.getPath()->toOutlineStrokes(width)) {
           result.push_back(ClipperHelpers::convert(
               deviceTransform.map(padTransform.map(outline)),

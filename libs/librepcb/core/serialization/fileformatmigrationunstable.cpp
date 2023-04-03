@@ -69,6 +69,7 @@ void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   for (SExpression* fptNode : root.getChildren("footprint")) {
     for (SExpression* padNode : fptNode->getChildren("pad")) {
       padNode->appendChild("function", SExpression::createToken("unspecified"));
+      padNode->appendChild("clearance", SExpression::createToken("0.0"));
     }
   }
   dir.write(fp, root.toByteArray());

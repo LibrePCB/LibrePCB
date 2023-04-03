@@ -65,6 +65,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
         Path(),  // Custom shape outline
         MaskConfig::automatic(),  // Stop mask
         MaskConfig::off(),  // Solder paste
+        UnsignedLength(0),  // Copper clearance
         FootprintPad::ComponentSide::Top,  // Default side
         function,  // Supplied by library editor
         PadHoleList{}) {
@@ -99,7 +100,9 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
         mLastPad.setRadius(UnsignedLimitedRatio(Ratio::percent100()));
         mLastPad.setWidth(PositiveLength(1000000));
         mLastPad.setHeight(PositiveLength(1000000));
-        mLastPad.setStopMaskConfig(MaskConfig::manual(500000));
+        mLastPad.setCopperClearance(UnsignedLength(500000));
+        mLastPad.setStopMaskConfig(
+            MaskConfig::manual(*mLastPad.getCopperClearance()));
         mLastPad.setSolderPasteConfig(MaskConfig::off());
         break;
       default:
@@ -430,8 +433,8 @@ bool PackageEditorState_AddPads::startAddPad(const Point& pos) noexcept {
         mLastPad.getPosition(), mLastPad.getRotation(), mLastPad.getShape(),
         mLastPad.getWidth(), mLastPad.getHeight(), mLastPad.getRadius(),
         mLastPad.getCustomShapeOutline(), mLastPad.getStopMaskConfig(),
-        mLastPad.getSolderPasteConfig(), mLastPad.getComponentSide(),
-        mLastPad.getFunction(), PadHoleList{});
+        mLastPad.getSolderPasteConfig(), mLastPad.getCopperClearance(),
+        mLastPad.getComponentSide(), mLastPad.getFunction(), PadHoleList{});
     for (const PadHole& hole : mLastPad.getHoles()) {
       mCurrentPad->getHoles().append(std::make_shared<PadHole>(
           Uuid::createRandom(), hole.getDiameter(), hole.getPath()));

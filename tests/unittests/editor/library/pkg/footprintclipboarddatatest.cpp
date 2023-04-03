@@ -88,7 +88,7 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
       Uuid::createRandom(), packagePad1->getUuid(), Point(12, 34), Angle(56),
       FootprintPad::Shape::RoundedOctagon, PositiveLength(11),
       PositiveLength(22), UnsignedLimitedRatio(Ratio::percent50()), Path(),
-      MaskConfig::off(), MaskConfig::automatic(),
+      MaskConfig::off(), MaskConfig::automatic(), UnsignedLength(0),
       FootprintPad::ComponentSide::Bottom, FootprintPad::Function::Unspecified,
       PadHoleList{});
 
@@ -98,7 +98,8 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
       PositiveLength(456), UnsignedLimitedRatio(Ratio::percent100()),
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
       MaskConfig::automatic(), MaskConfig::manual(Length(123456)),
-      FootprintPad::ComponentSide::Top, FootprintPad::Function::TestPad,
+      UnsignedLength(123456), FootprintPad::ComponentSide::Top,
+      FootprintPad::Function::TestPad,
       PadHoleList{std::make_shared<PadHole>(Uuid::createRandom(),
                                             PositiveLength(789),
                                             makeNonEmptyPath(Point(0, 0)))});

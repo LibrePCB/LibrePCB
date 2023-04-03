@@ -64,6 +64,15 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
                           settingsPrefix % "/pos_y");
   mUi->edtRotation->setSingleStep(90.0);  // [°]
+  mUi->edtStopMaskOffset->configure(lengthUnit,
+                                    LengthEditBase::Steps::generic(),
+                                    settingsPrefix % "/stop_mask_offset");
+  mUi->edtSolderPasteOffset->configure(lengthUnit,
+                                       LengthEditBase::Steps::generic(),
+                                       settingsPrefix % "/solder_paste_offset");
+  mUi->edtCopperClearance->configure(lengthUnit,
+                                     LengthEditBase::Steps::generic(),
+                                     settingsPrefix % "/copper_clearance");
   mUi->customShapePathEditor->setLengthUnit(lengthUnit);
   mUi->holeEditorWidget->configureClientSettings(
       lengthUnit, settingsPrefix % "/hole_editor");
@@ -235,6 +244,7 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   } else {
     mUi->rbtnSolderPasteAuto->setChecked(true);
   }
+  mUi->edtCopperClearance->setValue(mPad.getCopperClearance());
   updateGeneralTabHoleWidgets();
   setSelectedHole(0);
 
@@ -287,6 +297,7 @@ void FootprintPadPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->rbtnSolderPasteAuto->setEnabled(!readOnly);
   mUi->rbtnSolderPasteManual->setEnabled(!readOnly);
   mUi->edtSolderPasteOffset->setReadOnly(readOnly);
+  mUi->edtCopperClearance->setReadOnly(readOnly);
   if (readOnly) {
     mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
   } else {
@@ -496,6 +507,7 @@ bool FootprintPadPropertiesDialog::applyChanges() noexcept {
     } else {
       cmd->setSolderPasteConfig(MaskConfig::off());
     }
+    cmd->setCopperClearance(mUi->edtCopperClearance->getValue());
     cmd->setHoles(mHoles, false);
     cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
                      false);
