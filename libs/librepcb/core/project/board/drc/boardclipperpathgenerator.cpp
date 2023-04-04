@@ -56,6 +56,15 @@ BoardClipperPathGenerator::~BoardClipperPathGenerator() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+void BoardClipperPathGenerator::takePathsTo(ClipperLib::Paths& out) noexcept {
+  out = mPaths;
+  mPaths.clear();
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 

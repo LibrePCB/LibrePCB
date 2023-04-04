@@ -128,10 +128,9 @@ void FootprintPadGraphicsItem::padEdited(const FootprintPad& pad,
     case FootprintPad::Event::HeightChanged:
     case FootprintPad::Event::RadiusChanged:
     case FootprintPad::Event::CustomShapeOutlineChanged:
-      updateGeometries();
-      break;
     case FootprintPad::Event::StopMaskConfigChanged:
     case FootprintPad::Event::SolderPasteConfigChanged:
+    case FootprintPad::Event::CopperClearanceChanged:
       updateGeometries();
       break;
     case FootprintPad::Event::ComponentSideChanged:
@@ -195,7 +194,7 @@ void FootprintPadGraphicsItem::updateGeometries() noexcept {
     geometries.insert(&Layer::botSolderPaste(),
                       {geometry.withOffset(-solderPasteOffset)});
   }
-  mGraphicsItem->setGeometries(geometries);
+  mGraphicsItem->setGeometries(geometries, *mPad->getCopperClearance());
 }
 
 /*******************************************************************************

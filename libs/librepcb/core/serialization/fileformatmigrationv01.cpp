@@ -163,6 +163,9 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
         // Add function.
         padNode->appendChild("function",
                              SExpression::createToken("unspecified"));
+
+        // Add copper clearance.
+        padNode->appendChild("clearance", SExpression::createToken("0.0"));
       }
 
       // Holes.

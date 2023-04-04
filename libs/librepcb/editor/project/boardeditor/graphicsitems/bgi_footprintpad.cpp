@@ -61,7 +61,8 @@ BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad,
   setPos(mPad.getPosition().toPxQPointF());
   mGraphicsItem->setRotation(mPad.getRotation());
   mGraphicsItem->setText(mPad.getText());
-  mGraphicsItem->setGeometries(mPad.getGeometries());
+  mGraphicsItem->setGeometries(mPad.getGeometries(),
+                               *mPad.getLibPad().getCopperClearance());
   updateLayer();
 
   mPad.onEdited.attach(mOnPadEditedSlot);
@@ -111,7 +112,8 @@ void BGI_FootprintPad::padEdited(const BI_FootprintPad& obj,
       mGraphicsItem->setText(obj.getText());
       break;
     case BI_FootprintPad::Event::GeometriesChanged:
-      mGraphicsItem->setGeometries(obj.getGeometries());
+      mGraphicsItem->setGeometries(obj.getGeometries(),
+                                   *obj.getLibPad().getCopperClearance());
       break;
     default:
       qWarning() << "Unhandled switch-case in BGI_FootprintPad::padEdited():"

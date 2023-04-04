@@ -93,9 +93,7 @@ void PrimitiveFootprintPadGraphicsItem::setPosition(
 void PrimitiveFootprintPadGraphicsItem::setRotation(
     const Angle& rotation) noexcept {
   mOriginCrossGraphicsItem->setRotation(rotation);
-  foreach (auto item, mPathGraphicsItems) {
-    std::get<2>(item)->setRotation(rotation);
-  }
+  foreach (auto& item, mPathGraphicsItems) { item.item->setRotation(rotation); }
   // Keep the text always at 0° for readability.
 }
 
@@ -103,9 +101,7 @@ void PrimitiveFootprintPadGraphicsItem::setText(const QString& text) noexcept {
   setToolTip(text);
   mOriginCrossGraphicsItem->setToolTip(text);
   mTextGraphicsItem->setText(text);
-  foreach (auto item, mPathGraphicsItems) {
-    std::get<2>(item)->setToolTip(text);
-  }
+  foreach (auto& item, mPathGraphicsItems) { item.item->setToolTip(text); }
   updateTextHeight();
 }
 
@@ -121,7 +117,8 @@ void PrimitiveFootprintPadGraphicsItem::setLayer(
 }
 
 void PrimitiveFootprintPadGraphicsItem::setGeometries(
-    const QHash<const Layer*, QList<PadGeometry> >& geometries) noexcept {
+    const QHash<const Layer*, QList<PadGeometry> >& geometries,
+    const Length& clearance) noexcept {
   static const QHash<QString, float> zValues = {
       {QString(Theme::Color::sBoardSolderPasteBot), -300},
       {QString(Theme::Color::sBoardStopMaskBot), -200},
@@ -161,7 +158,18 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
       } else {
         item->setZValue(static_cast<qreal>(it.key()->getCopperNumber()));
       }
-      mPathGraphicsItems.append(std::make_tuple(layer, isCopperLayer, item));
+      mPathGraphicsItems.append(PathItem{layer, isCopperLayer, false, item});
+      if (isCopperLayer && (clearance > 0)) {
+        foreach (const PadGeometry& geometry, it.value()) {
+          auto clrItem = std::make_shared<PrimitivePathGraphicsItem>(this);
+          clrItem->setRotation(mOriginCrossGraphicsItem->rotation());
+          clrItem->setPath(
+              geometry.withOffset(clearance).toFilledQPainterPathPx());
+          clrItem->setShapeMode(PrimitivePathGraphicsItem::ShapeMode::None);
+          clrItem->setZValue(item->zValue());
+          mPathGraphicsItems.append(PathItem{layer, true, true, clrItem});
+        }
+      }
     }
   }
   updatePathLayers();
@@ -192,8 +200,8 @@ QVariant PrimitiveFootprintPadGraphicsItem::itemChange(
       mTextGraphicsItem) {
     mOriginCrossGraphicsItem->setSelected(value.toBool());
     mTextGraphicsItem->setSelected(value.toBool());
-    foreach (auto item, mPathGraphicsItems) {
-      std::get<2>(item)->setSelected(value.toBool());
+    foreach (auto& item, mPathGraphicsItems) {
+      item.item->setSelected(value.toBool());
     }
   }
   return QGraphicsItem::itemChange(change, value);
@@ -217,17 +225,17 @@ void PrimitiveFootprintPadGraphicsItem::layerEdited(
 }
 
 void PrimitiveFootprintPadGraphicsItem::updatePathLayers() noexcept {
-  foreach (auto& tuple, mPathGraphicsItems) {
+  foreach (auto& item, mPathGraphicsItems) {
     std::shared_ptr<GraphicsLayer> layer =
-        std::get<1>(tuple) ? mCopperLayer : std::get<0>(tuple);
-    if (std::get<0>(tuple)->isVisible()) {
-      std::get<2>(tuple)->setFillLayer(layer);
-      std::get<2>(tuple)->setLineLayer(nullptr);
+        item.isCopper ? mCopperLayer : item.layer;
+    if ((!item.isClearance) && item.layer->isVisible()) {
+      item.item->setFillLayer(layer);
+      item.item->setLineLayer(nullptr);
     } else {
-      std::get<2>(tuple)->setLineLayer(layer);
-      std::get<2>(tuple)->setFillLayer(nullptr);
+      item.item->setLineLayer(layer);
+      item.item->setFillLayer(nullptr);
     }
-    std::get<2>(tuple)->setSelected(isSelected());
+    item.item->setSelected(isSelected());
   }
 }
 
@@ -246,9 +254,9 @@ void PrimitiveFootprintPadGraphicsItem::updateRegisteredLayers() noexcept {
   if (mCopperLayer) {
     mCopperLayer->onEdited.attach(mOnLayerEditedSlot);
   }
-  foreach (auto& tuple, mPathGraphicsItems) {
-    if (std::get<0>(tuple) != mCopperLayer) {
-      std::get<0>(tuple)->onEdited.attach(mOnLayerEditedSlot);
+  foreach (auto& item, mPathGraphicsItems) {
+    if (item.layer != mCopperLayer) {
+      item.layer->onEdited.attach(mOnLayerEditedSlot);
     }
   }
 }

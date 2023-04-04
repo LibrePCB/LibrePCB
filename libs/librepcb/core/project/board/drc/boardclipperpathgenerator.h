@@ -65,6 +65,7 @@ public:
 
   // Getters
   const ClipperLib::Paths& getPaths() const noexcept { return mPaths; }
+  void takePathsTo(ClipperLib::Paths& out) noexcept;
 
   // General Methods
   void addCopper(const Layer& layer, const QSet<const NetSignal*>& netsignals,

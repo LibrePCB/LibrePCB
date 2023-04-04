@@ -63,6 +63,7 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkCustomPadOutline(msgs);
   checkStopMaskOnPads(msgs);
   checkSolderPasteOnPads(msgs);
+  checkCopperClearanceOnPads(msgs);
   checkPadFunctions(msgs);
   checkHolesStopMask(msgs);
   return msgs;
@@ -156,11 +157,13 @@ void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
           ? mPackage.getPads().find(*pad1->getPackagePadUuid())
           : nullptr;
       const Transform pad1Transform(pad1->getPosition(), pad1->getRotation());
-      const QPainterPath pad1PathPxWithoutClearance =
+      const Length pad1Clearance =
+          std::max(clearance, *pad1->getCopperClearance()) - tolerance;
+      const QPainterPath pad1CopperPx =
           pad1Transform.mapPx(pad1->getGeometry().toFilledQPainterPathPx());
-      const QPainterPath pad1PathPxWithClearance =
+      const QPainterPath pad1ClearancePx =
           pad1Transform.mapPx(pad1->getGeometry()
-                                  .withOffset(clearance - tolerance)
+                                  .withOffset(pad1Clearance)
                                   .toFilledQPainterPathPx());
 
       // Compare with all pads *after* pad1 to avoid duplicate messages!
@@ -172,8 +175,14 @@ void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
             ? mPackage.getPads().find(*pad2->getPackagePadUuid())
             : nullptr;
         const Transform pad2Transform(pad2->getPosition(), pad2->getRotation());
-        const QPainterPath pad2PathPx =
+        const Length pad2Clearance =
+            std::max(clearance, *pad2->getCopperClearance()) - tolerance;
+        const QPainterPath pad2CopperPx =
             pad2Transform.mapPx(pad2->getGeometry().toFilledQPainterPathPx());
+        const QPainterPath pad2ClearancePx =
+            pad2Transform.mapPx(pad2->getGeometry()
+                                    .withOffset(pad2Clearance)
+                                    .toFilledQPainterPathPx());
 
         // Only warn if both pads have copper on the same board side.
         if ((pad1->getComponentSide() == pad2->getComponentSide()) ||
@@ -184,11 +193,12 @@ void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
           if ((pad1->getPackagePadUuid() != pad2->getPackagePadUuid()) ||
               (!pad1->getPackagePadUuid()) || (!pad2->getPackagePadUuid())) {
             // Now check if the clearance is really too small.
-            if (pad1PathPxWithoutClearance.intersects(pad2PathPx)) {
+            if (pad1CopperPx.intersects(pad2CopperPx)) {
               msgs.append(std::make_shared<MsgOverlappingPads>(
                   footprint, pad1, pkgPad1 ? *pkgPad1->getName() : QString(),
                   pad2, pkgPad2 ? *pkgPad2->getName() : QString()));
-            } else if (pad1PathPxWithClearance.intersects(pad2PathPx)) {
+            } else if (pad1ClearancePx.intersects(pad2CopperPx) ||
+                       pad1CopperPx.intersects(pad2ClearancePx)) {
               msgs.append(std::make_shared<MsgPadClearanceViolation>(
                   footprint, pad1, pkgPad1 ? *pkgPad1->getName() : QString(),
                   pad2, pkgPad2 ? *pkgPad2->getName() : QString(), clearance));
@@ -416,6 +426,29 @@ void PackageCheck::checkSolderPasteOnPads(MsgList& msgs) const {
       } else if (pad->isTht() && pad->getSolderPasteConfig().isEnabled()) {
         msgs.append(std::make_shared<MsgThtPadWithSolderPaste>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkCopperClearanceOnPads(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itPad = (*itFtp).getPads().begin();
+         itPad != (*itFtp).getPads().end(); ++itPad) {
+      std::shared_ptr<const FootprintPad> pad = itPad.ptr();
+      std::shared_ptr<const PackagePad> pkgPad = pad->getPackagePadUuid()
+          ? mPackage.getPads().find(*pad->getPackagePadUuid())
+          : nullptr;
+      const auto stopMaskOffset = pad->getStopMaskConfig().getOffset();
+      if ((!pad->getFunctionIsFiducial()) && (pad->getCopperClearance() > 0)) {
+        msgs.append(std::make_shared<MsgPadWithCopperClearance>(
+            footprint, pad, pkgPad ? *pkgPad->getName() : QString()));
+      } else if (pad->getFunctionIsFiducial() && stopMaskOffset &&
+                 (pad->getCopperClearance() < (*stopMaskOffset))) {
+        msgs.append(std::make_shared<MsgFiducialClearanceLessThanStopMask>(
+            footprint, pad));
       }
     }
   }

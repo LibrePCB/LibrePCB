@@ -374,7 +374,7 @@ DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
     const Layer* layer1, const NetSignal* net1, const BI_Base& item1,
     const Polygon* polygon1, const Circle* circle1, const Layer* layer2,
     const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
-    const Circle* circle2, const UnsignedLength& minClearance,
+    const Circle* circle2, const Length& minClearance,
     const QVector<Path>& locations)
   : RuleCheckMessage(
         Severity::Error,
@@ -384,7 +384,7 @@ DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
             .arg(getLayerName(layer1, layer2),
                  getObjectName(net1, item1, polygon1, circle1),
                  getObjectName(net2, item2, polygon2, circle2),
-                 minClearance->toMmString(), "mm"),
+                 minClearance.toMmString(), "mm"),
         tr("The clearance between two copper objects of different nets is "
            "smaller than the minimum copper clearance configured in the DRC "
            "settings.") %
@@ -426,9 +426,11 @@ QString DrcMsgCopperCopperClearanceViolation::getObjectName(
   }
   if (const BI_FootprintPad* pad =
           dynamic_cast<const BI_FootprintPad*>(&item)) {
-    name = QString("'%1:%2'").arg(
-        *pad->getDevice().getComponentInstance().getName(),
-        *pad->getLibPackagePad()->getName());
+    name = "'" % (*pad->getDevice().getComponentInstance().getName());
+    if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
+      name += ":" % *pkgPad->getName();
+    }
+    name += "'";
   } else if (dynamic_cast<const BI_Via*>(&item)) {
     name += tr("via");
   } else if (dynamic_cast<const BI_NetLine*>(&item)) {

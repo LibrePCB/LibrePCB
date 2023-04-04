@@ -66,6 +66,7 @@ public:
   void setCustomShapeOutline(const Path& outline) noexcept;
   void setStopMaskConfig(const MaskConfig& config, bool immediate) noexcept;
   void setSolderPasteConfig(const MaskConfig& config) noexcept;
+  void setCopperClearance(const UnsignedLength& clearance) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
@@ -97,32 +98,8 @@ private:
   FootprintPad& mPad;
 
   // General Attributes
-  tl::optional<Uuid> mOldPackagePadUuid;
-  tl::optional<Uuid> mNewPackagePadUuid;
-  FootprintPad::ComponentSide mOldComponentSide;
-  FootprintPad::ComponentSide mNewComponentSide;
-  FootprintPad::Function mOldFunction;
-  FootprintPad::Function mNewFunction;
-  FootprintPad::Shape mOldShape;
-  FootprintPad::Shape mNewShape;
-  PositiveLength mOldWidth;
-  PositiveLength mNewWidth;
-  PositiveLength mOldHeight;
-  PositiveLength mNewHeight;
-  UnsignedLimitedRatio mOldRadius;
-  UnsignedLimitedRatio mNewRadius;
-  Path mOldCustomShapeOutline;
-  Path mNewCustomShapeOutline;
-  MaskConfig mOldStopMaskConfig;
-  MaskConfig mNewStopMaskConfig;
-  MaskConfig mOldSolderPasteConfig;
-  MaskConfig mNewSolderPasteConfig;
-  Point mOldPos;
-  Point mNewPos;
-  Angle mOldRotation;
-  Angle mNewRotation;
-  PadHoleList mOldHoles;
-  PadHoleList mNewHoles;
+  FootprintPad mOldProperties;
+  FootprintPad mNewProperties;
 };
 
 /*******************************************************************************

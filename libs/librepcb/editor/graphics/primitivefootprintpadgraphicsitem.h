@@ -37,6 +37,7 @@ namespace librepcb {
 
 class Angle;
 class Layer;
+class Length;
 class PadGeometry;
 class Point;
 
@@ -69,8 +70,8 @@ public:
   void setRotation(const Angle& rotation) noexcept;
   void setText(const QString& text) noexcept;
   void setLayer(const QString& layerName) noexcept;
-  void setGeometries(
-      const QHash<const Layer*, QList<PadGeometry>>& geometries) noexcept;
+  void setGeometries(const QHash<const Layer*, QList<PadGeometry>>& geometries,
+                     const Length& clearance) noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
@@ -93,9 +94,13 @@ private:  // Data
   std::shared_ptr<GraphicsLayer> mCopperLayer;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
-  QVector<std::tuple<std::shared_ptr<GraphicsLayer>, bool,
-                     std::shared_ptr<PrimitivePathGraphicsItem>>>
-      mPathGraphicsItems;
+  struct PathItem {
+    std::shared_ptr<GraphicsLayer> layer;
+    bool isCopper;
+    bool isClearance;
+    std::shared_ptr<PrimitivePathGraphicsItem> item;
+  };
+  QVector<PathItem> mPathGraphicsItems;
   QMap<std::shared_ptr<GraphicsLayer>, QPainterPath> mShapes;
   QRectF mShapesBoundingRect;
 
