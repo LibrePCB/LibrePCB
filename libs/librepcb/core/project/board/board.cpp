@@ -501,9 +501,10 @@ void Board::addDefaultContent() {
   // Add 100x80mm board outline (1/2 Eurocard size).
   addPolygon(*new BI_Polygon(
       *this,
-      BoardPolygonData(
-          Uuid::createRandom(), Layer::boardOutlines(), UnsignedLength(0),
-          Path::rect(Point(0, 0), Point(100000000, 80000000)), false, false)));
+      BoardPolygonData(Uuid::createRandom(), Layer::boardOutlines(),
+                       UnsignedLength(0),
+                       Path::rect(Point(0, 0), Point(100000000, 80000000)),
+                       false, false, false)));
 }
 
 void Board::copyFrom(const Board& other) {
@@ -521,7 +522,8 @@ void Board::copyFrom(const Board& other) {
     BI_Device* copy = new BI_Device(
         *this, device->getComponentInstance(), device->getLibDevice().getUuid(),
         device->getLibFootprint().getUuid(), device->getPosition(),
-        device->getRotation(), device->getMirrored(), false);
+        device->getRotation(), device->getMirrored(), device->isLocked(),
+        false);
     copy->setAttributes(device->getAttributes());
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
       copy->addStrokeText(*new BI_StrokeText(*this, text->getData()));
@@ -590,6 +592,7 @@ void Board::copyFrom(const Board& other) {
     copy->setKeepOrphans(plane->getKeepOrphans());
     copy->setPriority(plane->getPriority());
     copy->setConnectStyle(plane->getConnectStyle());
+    copy->setLocked(plane->isLocked());
     copy->setVisible(plane->isVisible());
     copy->setCalculatedFragments(plane->getFragments());
     addPlane(*copy);

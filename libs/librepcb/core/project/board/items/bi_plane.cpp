@@ -54,6 +54,7 @@ BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
     mPriority(0),
     mConnectStyle(ConnectStyle::Solid),
     // mThermalGapWidth(100000), mThermalSpokeWidth(100000),
+    mLocked(false),
     mIsVisible(true),
     mFragments() {
 }
@@ -124,6 +125,13 @@ void BI_Plane::setKeepOrphans(bool keepOrphans) noexcept {
   }
 }
 
+void BI_Plane::setLocked(bool locked) noexcept {
+  if (locked != mLocked) {
+    mLocked = locked;
+    onEdited.notify(Event::IsLockedChanged);
+  }
+}
+
 void BI_Plane::setVisible(bool visible) noexcept {
   if (visible != mIsVisible) {
     mIsVisible = visible;
@@ -173,6 +181,7 @@ void BI_Plane::serialize(SExpression& root) const {
   root.appendChild("keep_orphans", mKeepOrphans);
   root.ensureLineBreak();
   root.appendChild("connect_style", mConnectStyle);
+  root.appendChild("lock", mLocked);
   root.ensureLineBreak();
   mOutline.serialize(root);
   root.ensureLineBreak();

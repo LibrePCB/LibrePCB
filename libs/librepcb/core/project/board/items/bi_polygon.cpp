@@ -89,6 +89,15 @@ bool BI_Polygon::setIsGrabArea(bool isGrabArea) noexcept {
   }
 }
 
+bool BI_Polygon::setLocked(bool locked) noexcept {
+  if (mData.setLocked(locked)) {
+    onEdited.notify(Event::IsLockedChanged);
+    return true;
+  } else {
+    return false;
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/

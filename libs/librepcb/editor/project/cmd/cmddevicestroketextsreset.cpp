@@ -67,7 +67,7 @@ bool CmdDeviceStrokeTextsReset::performExecute() {
                                 text.getHeight(), text.getStrokeWidth(),
                                 text.getLetterSpacing(), text.getLineSpacing(),
                                 text.getAlign(), text.getMirrored(),
-                                text.getAutoRotate()))));
+                                text.getAutoRotate(), mDevice.isLocked()))));
   }
 
   // execute all child commands

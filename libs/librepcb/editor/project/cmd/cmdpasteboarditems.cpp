@@ -147,9 +147,10 @@ bool CmdPasteBoardItems::performExecute() {
     }
 
     // Add device instance to board
-    QScopedPointer<BI_Device> device(new BI_Device(
-        mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
-        dev.position + mPosOffset, dev.rotation, dev.mirrored, false));
+    QScopedPointer<BI_Device> device(
+        new BI_Device(mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
+                      dev.position + mPosOffset, dev.rotation, dev.mirrored,
+                      dev.locked, false));
     for (const BoardStrokeTextData& text : dev.strokeTexts) {
       // Note: Keep the UUID since it acts as a reference to the original
       // library footprint text.
@@ -281,6 +282,7 @@ bool CmdPasteBoardItems::performExecute() {
     copy->setKeepOrphans(plane.keepOrphans);
     copy->setPriority(plane.priority);
     copy->setConnectStyle(plane.connectStyle);
+    copy->setLocked(plane.locked);
     execNewChildCmd(new CmdBoardPlaneAdd(*copy));
     if (auto item = mScene.getPlanes().value(copy)) {
       item->setSelected(true);

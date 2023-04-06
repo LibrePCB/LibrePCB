@@ -48,7 +48,8 @@ BoardStrokeTextData::BoardStrokeTextData(
     mLineSpacing(other.mLineSpacing),
     mAlign(other.mAlign),
     mMirrored(other.mMirrored),
-    mAutoRotate(other.mAutoRotate) {
+    mAutoRotate(other.mAutoRotate),
+    mLocked(other.mLocked) {
 }
 
 BoardStrokeTextData::BoardStrokeTextData(
@@ -64,7 +65,8 @@ BoardStrokeTextData::BoardStrokeTextData(
     mLineSpacing(other.mLineSpacing),
     mAlign(other.mAlign),
     mMirrored(other.mMirrored),
-    mAutoRotate(other.mAutoRotate) {
+    mAutoRotate(other.mAutoRotate),
+    mLocked(other.mLocked) {
 }
 
 BoardStrokeTextData::BoardStrokeTextData(
@@ -72,7 +74,7 @@ BoardStrokeTextData::BoardStrokeTextData(
     const Angle& rotation, const PositiveLength& height,
     const UnsignedLength& strokeWidth, const StrokeTextSpacing& letterSpacing,
     const StrokeTextSpacing& lineSpacing, const Alignment& align, bool mirrored,
-    bool autoRotate)
+    bool autoRotate, bool locked)
   : mUuid(uuid),
     mLayer(&layer),
     mText(text),
@@ -84,7 +86,8 @@ BoardStrokeTextData::BoardStrokeTextData(
     mLineSpacing(lineSpacing),
     mAlign(align),
     mMirrored(mirrored),
-    mAutoRotate(autoRotate) {
+    mAutoRotate(autoRotate),
+    mLocked(locked) {
 }
 
 BoardStrokeTextData::BoardStrokeTextData(const SExpression& node)
@@ -101,7 +104,8 @@ BoardStrokeTextData::BoardStrokeTextData(const SExpression& node)
         deserialize<StrokeTextSpacing>(node.getChild("line_spacing/@0"))),
     mAlign(node.getChild("align")),
     mMirrored(deserialize<bool>(node.getChild("mirror/@0"))),
-    mAutoRotate(deserialize<bool>(node.getChild("auto_rotate/@0"))) {
+    mAutoRotate(deserialize<bool>(node.getChild("auto_rotate/@0"))),
+    mLocked(deserialize<bool>(node.getChild("lock/@0"))) {
 }
 
 BoardStrokeTextData::~BoardStrokeTextData() noexcept {
@@ -222,6 +226,15 @@ bool BoardStrokeTextData::setAutoRotate(bool autoRotate) noexcept {
   return true;
 }
 
+bool BoardStrokeTextData::setLocked(bool locked) noexcept {
+  if (locked == mLocked) {
+    return false;
+  }
+
+  mLocked = locked;
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -242,6 +255,7 @@ void BoardStrokeTextData::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("auto_rotate", mAutoRotate);
   root.appendChild("mirror", mMirrored);
+  root.appendChild("lock", mLocked);
   root.appendChild("value", mText);
   root.ensureLineBreak();
 }
@@ -264,6 +278,7 @@ bool BoardStrokeTextData::operator==(const BoardStrokeTextData& rhs) const
   if (mAlign != rhs.mAlign) return false;
   if (mMirrored != rhs.mMirrored) return false;
   if (mAutoRotate != rhs.mAutoRotate) return false;
+  if (mLocked != rhs.mLocked) return false;
   return true;
 }
 

@@ -50,9 +50,8 @@ BGI_Polygon::BGI_Polygon(BI_Polygon& polygon,
   setFlag(QGraphicsItem::ItemHasNoContents, true);
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
-  mGraphicsItem->setEditable(true);
-
   updateZValue();
+  updateEditable();
 
   mPolygon.onEdited.attach(mOnEditedSlot);
 }
@@ -96,6 +95,9 @@ void BGI_Polygon::polygonEdited(const BI_Polygon& obj,
     case BI_Polygon::Event::IsGrabAreaChanged:
       mPolygonObj.setIsGrabArea(obj.getData().isGrabArea());
       break;
+    case BI_Polygon::Event::IsLockedChanged:
+      updateEditable();
+      break;
     case BI_Polygon::Event::PathChanged:
       mPolygonObj.setPath(obj.getData().getPath());
       break;
@@ -110,6 +112,10 @@ void BGI_Polygon::updateZValue() noexcept {
   setZValue(mPolygon.getData().getLayer().isBottom()
                 ? BoardGraphicsScene::ZValue_PolygonsBottom
                 : BoardGraphicsScene::ZValue_PolygonsTop);
+}
+
+void BGI_Polygon::updateEditable() noexcept {
+  mGraphicsItem->setEditable(!mPolygon.getData().isLocked());
 }
 
 /*******************************************************************************

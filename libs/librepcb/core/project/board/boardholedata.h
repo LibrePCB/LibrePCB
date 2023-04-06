@@ -49,7 +49,8 @@ public:
   BoardHoleData(const BoardHoleData& other) noexcept;
   BoardHoleData(const Uuid& uuid, const BoardHoleData& other) noexcept;
   BoardHoleData(const Uuid& uuid, const PositiveLength& diameter,
-                const NonEmptyPath& path, const MaskConfig& stopMaskConfig);
+                const NonEmptyPath& path, const MaskConfig& stopMaskConfig,
+                bool locked);
   explicit BoardHoleData(const SExpression& node);
   ~BoardHoleData() noexcept;
 
@@ -60,6 +61,7 @@ public:
   const MaskConfig& getStopMaskConfig() const noexcept {
     return mStopMaskConfig;
   }
+  bool isLocked() const noexcept { return mLocked; }
   bool isSlot() const noexcept { return mPath->getVertices().count() > 1; }
   bool isMultiSegmentSlot() const noexcept {
     return mPath->getVertices().count() > 2;
@@ -71,6 +73,7 @@ public:
   bool setDiameter(const PositiveLength& diameter) noexcept;
   bool setPath(const NonEmptyPath& path) noexcept;
   bool setStopMaskConfig(const MaskConfig& config) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
 
@@ -93,6 +96,7 @@ private:  // Data
   PositiveLength mDiameter;
   NonEmptyPath mPath;
   MaskConfig mStopMaskConfig;
+  bool mLocked;
 };
 
 /*******************************************************************************

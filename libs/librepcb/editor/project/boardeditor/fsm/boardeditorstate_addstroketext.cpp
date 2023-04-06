@@ -216,7 +216,7 @@ bool BoardEditorState_AddStrokeText::addText(const Point& pos) noexcept {
         BoardStrokeTextData(Uuid::createRandom(), *mLastLayer, mLastText, pos,
                             mLastRotation, mLastHeight, mLastStrokeWidth,
                             StrokeTextSpacing(), StrokeTextSpacing(),
-                            mLastAlignment, mLastMirrored, true));
+                            mLastAlignment, mLastMirrored, true, false));
     QScopedPointer<CmdBoardStrokeTextAdd> cmdAdd(
         new CmdBoardStrokeTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());

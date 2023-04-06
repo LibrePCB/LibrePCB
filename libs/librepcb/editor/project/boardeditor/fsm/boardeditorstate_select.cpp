@@ -178,18 +178,19 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       foreach (const auto& path, paths) {
         data->getPolygons().append(
             BoardPolygonData(Uuid::createRandom(), dialog.getLayer(),
-                             dialog.getLineWidth(), path, false, false));
+                             dialog.getLineWidth(), path, false, false, false));
       }
       for (const auto& circle : import.getCircles()) {
         if (dialog.getImportCirclesAsDrills()) {
-          data->getHoles().append(BoardHoleData(
-              Uuid::createRandom(), circle.diameter,
-              makeNonEmptyPath(circle.position), MaskConfig::automatic()));
+          data->getHoles().append(
+              BoardHoleData(Uuid::createRandom(), circle.diameter,
+                            makeNonEmptyPath(circle.position),
+                            MaskConfig::automatic(), false));
         } else {
           data->getPolygons().append(BoardPolygonData(
               Uuid::createRandom(), dialog.getLayer(), dialog.getLineWidth(),
               Path::circle(circle.diameter).translated(circle.position), false,
-              false));
+              false, false));
         }
       }
 
@@ -276,7 +277,7 @@ bool BoardEditorState_Select::processPaste() noexcept {
       // If there is no board data, get footprint data from clipboard to allow
       // pasting graphical elements from the footprint editor.
       if (!data) {
-        std::unique_ptr<FootprintClipboardData> footprintData =
+        std::unique_ptr<const FootprintClipboardData> footprintData =
             FootprintClipboardData::fromMimeData(
                 qApp->clipboard()->mimeData());  // can throw
         if (footprintData) {
@@ -285,7 +286,8 @@ bool BoardEditorState_Select::processPaste() noexcept {
           for (const auto& polygon : footprintData->getPolygons()) {
             data->getPolygons().append(BoardPolygonData(
                 polygon.getUuid(), polygon.getLayer(), polygon.getLineWidth(),
-                polygon.getPath(), polygon.isFilled(), polygon.isGrabArea()));
+                polygon.getPath(), polygon.isFilled(), polygon.isGrabArea(),
+                false));
           }
           for (const auto& text : footprintData->getStrokeTexts()) {
             data->getStrokeTexts().append(BoardStrokeTextData(
@@ -293,12 +295,12 @@ bool BoardEditorState_Select::processPaste() noexcept {
                 text.getPosition(), text.getRotation(), text.getHeight(),
                 text.getStrokeWidth(), text.getLetterSpacing(),
                 text.getLineSpacing(), text.getAlign(), text.getMirrored(),
-                text.getAutoRotate()));
+                text.getAutoRotate(), false));
           }
           for (const auto& hole : footprintData->getHoles()) {
             data->getHoles().append(
                 BoardHoleData(hole.getUuid(), hole.getDiameter(),
-                              hole.getPath(), hole.getStopMaskConfig()));
+                              hole.getPath(), hole.getStopMaskConfig(), false));
           }
         }
       }

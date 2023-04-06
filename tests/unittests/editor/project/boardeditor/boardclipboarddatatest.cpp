@@ -86,25 +86,25 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
       PositiveLength(4), UnsignedLength(5), StrokeTextSpacing(),
       StrokeTextSpacing(Ratio(6)), Alignment(HAlign::left(), VAlign::top()),
-      false, true);
+      false, true, false);
 
   BoardStrokeTextData strokeText2(
       Uuid::createRandom(), Layer::topPlacement(), "text 2", Point(10, 20),
       Angle(30), PositiveLength(40), UnsignedLength(0),
       StrokeTextSpacing(Ratio(6)), StrokeTextSpacing(),
-      Alignment(HAlign::center(), VAlign::bottom()), true, false);
+      Alignment(HAlign::center(), VAlign::bottom()), true, false, true);
 
   std::shared_ptr<BoardClipboardData::Device> device1 =
       std::make_shared<BoardClipboardData::Device>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          Point::fromMm(1, 2), Angle::fromDeg(45), false,
+          Point::fromMm(1, 2), Angle::fromDeg(45), false, true,
           AttributeList{attribute1, attribute2},
           QList<BoardStrokeTextData>{strokeText1, strokeText2});
 
   std::shared_ptr<BoardClipboardData::Device> device2 =
       std::make_shared<BoardClipboardData::Device>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          Point::fromMm(10, 20), Angle::fromDeg(-45), true,
+          Point::fromMm(10, 20), Angle::fromDeg(-45), true, false,
           AttributeList{attribute2, attribute1},
           QList<BoardStrokeTextData>{strokeText2, strokeText1});
 
@@ -157,7 +157,7 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
           Uuid::createRandom(), Layer::topCopper(), CircuitIdentifier("bar"),
           Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
           UnsignedLength(1), UnsignedLength(2), false, 0,
-          BI_Plane::ConnectStyle::None);
+          BI_Plane::ConnectStyle::None, true);
 
   std::shared_ptr<BoardClipboardData::Plane> plane2 =
       std::make_shared<BoardClipboardData::Plane>(
@@ -165,25 +165,26 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
           Path({Vertex(Point(10, 20), Angle(30)),
                 Vertex(Point(40, 50), Angle(60))}),
           UnsignedLength(10), UnsignedLength(20), true, 5,
-          BI_Plane::ConnectStyle::Solid);
+          BI_Plane::ConnectStyle::Solid, false);
 
   BoardPolygonData polygon1(
       Uuid::createRandom(), Layer::topCopper(), UnsignedLength(1),
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
-      false, true);
+      false, true, false);
 
   BoardPolygonData polygon2(Uuid::createRandom(), Layer::botCopper(),
                             UnsignedLength(10),
                             Path({Vertex(Point(10, 20), Angle(30)),
                                   Vertex(Point(40, 50), Angle(60))}),
-                            true, false);
+                            true, false, true);
 
   BoardHoleData hole1(Uuid::createRandom(), PositiveLength(3),
-                      makeNonEmptyPath(Point(1, 2)), MaskConfig::automatic());
+                      makeNonEmptyPath(Point(1, 2)), MaskConfig::automatic(),
+                      true);
 
   BoardHoleData hole2(Uuid::createRandom(), PositiveLength(30),
                       makeNonEmptyPath(Point(10, 20)),
-                      MaskConfig::manual(Length(123456)));
+                      MaskConfig::manual(Length(123456)), false);
 
   // Create object
   BoardClipboardData obj1(uuid, pos);

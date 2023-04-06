@@ -89,6 +89,7 @@ public:
   bool setAlign(const Alignment& align) noexcept;
   bool setMirrored(bool mirrored) noexcept;
   bool setAutoRotate(bool autoRotate) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
   BI_Device* getDevice() const noexcept { return mDevice; }

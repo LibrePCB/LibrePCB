@@ -50,7 +50,7 @@ public:
   BoardPolygonData(const Uuid& uuid, const BoardPolygonData& other) noexcept;
   BoardPolygonData(const Uuid& uuid, const Layer& layer,
                    const UnsignedLength& lineWidth, const Path& path, bool fill,
-                   bool isGrabArea) noexcept;
+                   bool isGrabArea, bool locked) noexcept;
   explicit BoardPolygonData(const SExpression& node);
   ~BoardPolygonData() noexcept;
 
@@ -61,6 +61,7 @@ public:
   const Path& getPath() const noexcept { return mPath; }
   bool isFilled() const noexcept { return mIsFilled; }
   bool isGrabArea() const noexcept { return mIsGrabArea; }
+  bool isLocked() const noexcept { return mLocked; }
 
   // Setters
   bool setLayer(const Layer& layer) noexcept;
@@ -68,6 +69,7 @@ public:
   bool setPath(const Path& path) noexcept;
   bool setIsFilled(bool isFilled) noexcept;
   bool setIsGrabArea(bool isGrabArea) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
 
@@ -92,6 +94,7 @@ private:  // Data
   Path mPath;
   bool mIsFilled;
   bool mIsGrabArea;
+  bool mLocked;
 };
 
 /*******************************************************************************

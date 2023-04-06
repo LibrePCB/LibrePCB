@@ -72,6 +72,7 @@ public:
   bool setDiameter(const PositiveLength& diameter) noexcept;
   bool setPath(const NonEmptyPath& path) noexcept;
   bool setStopMaskConfig(const MaskConfig& config) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
   void addToBoard() override;

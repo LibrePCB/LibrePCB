@@ -158,7 +158,7 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     painter->drawPath(mOutline);
 
     // If the plane is selected, draw vertex handles.
-    if (selected) {
+    if ((!mPlane.isLocked()) && selected) {
       const qreal radius = 20 / lod;
       mVertexHandleRadiusPx = std::min(radius, mBoundingRectMarginPx);
       QColor color = mLayer->getColor(highlight);
@@ -197,9 +197,15 @@ void BGI_Plane::planeEdited(const BI_Plane& obj,
     case BI_Plane::Event::FragmentsChanged:
       updateOutlineAndFragments();
       break;
+    case BI_Plane::Event::IsLockedChanged:
+      updateBoundingRectMargin();
+      break;
     case BI_Plane::Event::LayerChanged:
       updateLayer();
       updateVisibility();
+      break;
+    case BI_Plane::Event::VisibilityChanged:
+      update();
       break;
     default:
       qWarning() << "Unhandled switch-case in BGI_Plane::planeEdited():"
@@ -294,7 +300,7 @@ void BGI_Plane::updateBoundingRectMargin() noexcept {
   // graphics scene (e.g. leading to wrong zoom-all or graphics export scaling).
   prepareGeometryChange();
   mBoundingRectMarginPx = 0;
-  if (isSelected()) {
+  if ((!mPlane.isLocked()) && isSelected()) {
     foreach (const VertexHandle& handle, mVertexHandles) {
       mBoundingRectMarginPx =
           std::max(handle.maxGlowRadiusPx, mBoundingRectMarginPx);

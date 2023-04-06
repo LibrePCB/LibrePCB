@@ -72,13 +72,14 @@ public:
     Point position;
     Angle rotation;
     bool mirrored;
+    bool locked;
     AttributeList attributes;
     QList<BoardStrokeTextData> strokeTexts;
     Signal<Device> onEdited;  ///< Dummy event, not used
 
     Device(const Uuid& componentUuid, const Uuid& libDeviceUuid,
            const Uuid& libFootprintUuid, const Point& position,
-           const Angle& rotation, bool mirrored,
+           const Angle& rotation, bool mirrored, bool locked,
            const AttributeList& attributes,
            const QList<BoardStrokeTextData>& strokeTexts)
       : componentUuid(componentUuid),
@@ -87,6 +88,7 @@ public:
         position(position),
         rotation(rotation),
         mirrored(mirrored),
+        locked(locked),
         attributes(attributes),
         strokeTexts(strokeTexts),
         onEdited(*this) {}
@@ -98,6 +100,7 @@ public:
         position(node.getChild("position")),
         rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
         mirrored(deserialize<bool>(node.getChild("mirror/@0"))),
+        locked(deserialize<bool>(node.getChild("lock/@0"))),
         attributes(node),
         strokeTexts(),
         onEdited(*this) {
@@ -116,6 +119,7 @@ public:
       position.serialize(root.appendList("position"));
       root.appendChild("rotation", rotation);
       root.appendChild("mirror", mirrored);
+      root.appendChild("lock", locked);
       root.ensureLineBreak();
       attributes.serialize(root);
       foreach (const BoardStrokeTextData& strokeText, strokeTexts) {
@@ -130,8 +134,8 @@ public:
           (libDeviceUuid != rhs.libDeviceUuid) ||
           (libFootprintUuid != rhs.libFootprintUuid) ||
           (position != rhs.position) || (rotation != rhs.rotation) ||
-          (mirrored != rhs.mirrored) || (attributes != rhs.attributes) ||
-          (strokeTexts != rhs.strokeTexts);
+          (mirrored != rhs.mirrored) || (locked != rhs.locked) ||
+          (attributes != rhs.attributes) || (strokeTexts != rhs.strokeTexts);
     }
   };
 
@@ -185,12 +189,14 @@ public:
     bool keepOrphans;
     int priority;
     BI_Plane::ConnectStyle connectStyle;
+    bool locked;
     Signal<Plane> onEdited;  ///< Dummy event, not used
 
     Plane(const Uuid& uuid, const Layer& layer,
           const CircuitIdentifier& netSignalName, const Path& outline,
           const UnsignedLength& minWidth, const UnsignedLength& minClearance,
-          bool keepOrphans, int priority, BI_Plane::ConnectStyle connectStyle)
+          bool keepOrphans, int priority, BI_Plane::ConnectStyle connectStyle,
+          bool locked)
       : uuid(uuid),
         layer(&layer),
         netSignalName(netSignalName),
@@ -200,6 +206,7 @@ public:
         keepOrphans(keepOrphans),
         priority(priority),
         connectStyle(connectStyle),
+        locked(locked),
         onEdited(*this) {}
 
     explicit Plane(const SExpression& node)
@@ -214,6 +221,7 @@ public:
         priority(deserialize<int>(node.getChild("priority/@0"))),
         connectStyle(deserialize<BI_Plane::ConnectStyle>(
             node.getChild("connect_style/@0"))),
+        locked(deserialize<bool>(node.getChild("lock/@0"))),
         onEdited(*this) {}
 
     void serialize(SExpression& root) const {
@@ -228,6 +236,7 @@ public:
       root.appendChild("keep_orphans", keepOrphans);
       root.ensureLineBreak();
       root.appendChild("connect_style", connectStyle);
+      root.appendChild("lock", locked);
       root.ensureLineBreak();
       outline.serialize(root);
       root.ensureLineBreak();
@@ -238,7 +247,7 @@ public:
           (netSignalName != rhs.netSignalName) || (outline != rhs.outline) ||
           (minWidth != rhs.minWidth) || (minClearance != rhs.minClearance) ||
           (keepOrphans != rhs.keepOrphans) || (priority != rhs.priority) ||
-          (connectStyle != rhs.connectStyle);
+          (connectStyle != rhs.connectStyle) || (locked != rhs.locked);
     }
   };
 

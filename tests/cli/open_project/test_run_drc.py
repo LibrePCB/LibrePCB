@@ -49,7 +49,7 @@ def test_board_with_approved_message(cli, project):
     board_content = board_content.replace(
         '\n)\n',
         '\n (hole 82506db2-3323-4732-8480-f3517f10dd44 '
-        '  (diameter 0.1) (stop_mask auto)\n'
+        '  (diameter 0.1) (stop_mask auto) (lock false)\n'
         '  (vertex (position 50.0 50.0) (angle 0.0))\n'
         ' )\n'
         ')\n'
@@ -98,7 +98,7 @@ def test_board_with_nonapproved_message(cli, project):
     board_content = board_content.replace(
         '\n)\n',
         '\n (hole 82506db2-3323-4732-8480-f3517f10dd44 '
-        '  (diameter 0.1) (stop_mask auto)\n'
+        '  (diameter 0.1) (stop_mask auto) (lock false)\n'
         '  (vertex (position 50.0 50.0) (angle 0.0))\n'
         ' )\n'
         ')\n'
@@ -147,7 +147,7 @@ def test_with_custom_settings(cli, project):
     board_content = board_content.replace(
         '\n)\n',
         '\n (hole 82506db2-3323-4732-8480-f3517f10dd44 '
-        '  (diameter 0.1) (stop_mask auto)\n'
+        '  (diameter 0.1) (stop_mask auto) (lock false)\n'
         '  (vertex (position 50.0 50.0) (angle 0.0))\n'
         ' )\n'
         ')\n'

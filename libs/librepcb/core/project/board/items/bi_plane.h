@@ -57,6 +57,7 @@ public:
   enum class Event {
     OutlineChanged,
     LayerChanged,
+    IsLockedChanged,
     VisibilityChanged,
     FragmentsChanged,
   };
@@ -93,6 +94,7 @@ public:
   // {return mThermalSpokeWidth;}
   const Path& getOutline() const noexcept { return mOutline; }
   const QVector<Path>& getFragments() const noexcept { return mFragments; }
+  bool isLocked() const noexcept { return mLocked; }
   bool isVisible() const noexcept { return mIsVisible; }
 
   // Setters
@@ -104,6 +106,7 @@ public:
   void setConnectStyle(ConnectStyle style) noexcept;
   void setPriority(int priority) noexcept;
   void setKeepOrphans(bool keepOrphans) noexcept;
+  void setLocked(bool locked) noexcept;
   void setVisible(bool visible) noexcept;
   void setCalculatedFragments(const QVector<Path>& fragments) noexcept;
 
@@ -135,6 +138,7 @@ private:  // Data
   // Length mThermalGapWidth;
   // Length mThermalSpokeWidth;
   // style [round square miter] ?
+  bool mLocked;
   bool mIsVisible;  // volatile, not saved to file
 
   QVector<Path> mFragments;

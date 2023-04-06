@@ -49,7 +49,7 @@ namespace librepcb {
 BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
                      const Uuid& deviceUuid, const Uuid& footprintUuid,
                      const Point& position, const Angle& rotation, bool mirror,
-                     bool loadInitialStrokeTexts)
+                     bool locked, bool loadInitialStrokeTexts)
   : BI_Base(board),
     onEdited(*this),
     mCompInstance(compInstance),
@@ -58,7 +58,8 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
     mLibFootprint(nullptr),
     mPosition(position),
     mRotation(rotation),
-    mMirrored(mirror) {
+    mMirrored(mirror),
+    mLocked(locked) {
   // get device from library
   mLibDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
   if (!mLibDevice) {
@@ -105,7 +106,7 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
                               text.getHeight(), text.getStrokeWidth(),
                               text.getLetterSpacing(), text.getLineSpacing(),
                               text.getAlign(), text.getMirrored(),
-                              text.getAutoRotate())));
+                              text.getAutoRotate(), mLocked)));
     }
   }
 
@@ -266,6 +267,12 @@ void BI_Device::setMirrored(bool mirror) {
   }
 }
 
+void BI_Device::setLocked(bool locked) noexcept {
+  if (locked != mLocked) {
+    mLocked = locked;
+  }
+}
+
 void BI_Device::setAttributes(const AttributeList& attributes) noexcept {
   if (attributes != mAttributes) {
     mAttributes = attributes;
@@ -323,6 +330,7 @@ void BI_Device::serialize(SExpression& root) const {
   mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("mirror", mMirrored);
+  root.appendChild("lock", mLocked);
   root.ensureLineBreak();
   mAttributes.serialize(root);
   root.ensureLineBreak();

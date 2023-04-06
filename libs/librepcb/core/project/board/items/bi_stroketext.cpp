@@ -163,6 +163,14 @@ bool BI_StrokeText::setAutoRotate(bool autoRotate) noexcept {
   }
 }
 
+bool BI_StrokeText::setLocked(bool locked) noexcept {
+  if (mData.setLocked(locked)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/

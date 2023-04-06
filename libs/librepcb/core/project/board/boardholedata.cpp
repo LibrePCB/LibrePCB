@@ -39,7 +39,8 @@ BoardHoleData::BoardHoleData(const BoardHoleData& other) noexcept
   : mUuid(other.mUuid),
     mDiameter(other.mDiameter),
     mPath(other.mPath),
-    mStopMaskConfig(other.mStopMaskConfig) {
+    mStopMaskConfig(other.mStopMaskConfig),
+    mLocked(other.mLocked) {
 }
 
 BoardHoleData::BoardHoleData(const Uuid& uuid,
@@ -47,23 +48,26 @@ BoardHoleData::BoardHoleData(const Uuid& uuid,
   : mUuid(uuid),
     mDiameter(other.mDiameter),
     mPath(other.mPath),
-    mStopMaskConfig(other.mStopMaskConfig) {
+    mStopMaskConfig(other.mStopMaskConfig),
+    mLocked(other.mLocked) {
 }
 
 BoardHoleData::BoardHoleData(const Uuid& uuid, const PositiveLength& diameter,
                              const NonEmptyPath& path,
-                             const MaskConfig& stopMaskConfig)
+                             const MaskConfig& stopMaskConfig, bool locked)
   : mUuid(uuid),
     mDiameter(diameter),
     mPath(path),
-    mStopMaskConfig(stopMaskConfig) {
+    mStopMaskConfig(stopMaskConfig),
+    mLocked(locked) {
 }
 
 BoardHoleData::BoardHoleData(const SExpression& node)
   : mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mDiameter(deserialize<PositiveLength>(node.getChild("diameter/@0"))),
     mPath(Path(node)),
-    mStopMaskConfig(deserialize<MaskConfig>(node.getChild("stop_mask/@0"))) {
+    mStopMaskConfig(deserialize<MaskConfig>(node.getChild("stop_mask/@0"))),
+    mLocked(deserialize<bool>(node.getChild("lock/@0"))) {
 }
 
 BoardHoleData::~BoardHoleData() noexcept {
@@ -109,6 +113,15 @@ bool BoardHoleData::setStopMaskConfig(const MaskConfig& config) noexcept {
   return true;
 }
 
+bool BoardHoleData::setLocked(bool locked) noexcept {
+  if (locked == mLocked) {
+    return false;
+  }
+
+  mLocked = locked;
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -117,7 +130,9 @@ void BoardHoleData::serialize(SExpression& root) const {
   // Note: Keep consistent with Hole::serialize()!
   root.appendChild(mUuid);
   root.appendChild("diameter", mDiameter);
+  root.ensureLineBreak();
   root.appendChild("stop_mask", mStopMaskConfig);
+  root.appendChild("lock", mLocked);
   mPath->serialize(root);
 }
 
@@ -130,6 +145,7 @@ bool BoardHoleData::operator==(const BoardHoleData& rhs) const noexcept {
   if (mDiameter != rhs.mDiameter) return false;
   if (mPath != rhs.mPath) return false;
   if (mStopMaskConfig != rhs.mStopMaskConfig) return false;
+  if (mLocked != rhs.mLocked) return false;
   return true;
 }
 

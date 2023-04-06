@@ -53,6 +53,7 @@ public:
     LineWidthChanged,
     IsFilledChanged,
     IsGrabAreaChanged,
+    IsLockedChanged,
     PathChanged,
   };
   Signal<BI_Polygon, Event> onEdited;
@@ -73,6 +74,7 @@ public:
   bool setPath(const Path& path) noexcept;
   bool setIsFilled(bool isFilled) noexcept;
   bool setIsGrabArea(bool isGrabArea) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
   void addToBoard() override;

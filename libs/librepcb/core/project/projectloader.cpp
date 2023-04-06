@@ -592,7 +592,8 @@ void ProjectLoader::loadBoardDeviceInstance(Board& b, const SExpression& node) {
                     deserialize<Uuid>(node.getChild("lib_footprint/@0")),
                     Point(node.getChild("position")),
                     deserialize<Angle>(node.getChild("rotation/@0")),
-                    deserialize<bool>(node.getChild("mirror/@0")), false);
+                    deserialize<bool>(node.getChild("mirror/@0")),
+                    deserialize<bool>(node.getChild("lock/@0")), false);
   device->setAttributes(AttributeList(node));
   foreach (const SExpression* child, node.getChildren("stroke_text")) {
     device->addStrokeText(*new BI_StrokeText(b, BoardStrokeTextData(*child)));

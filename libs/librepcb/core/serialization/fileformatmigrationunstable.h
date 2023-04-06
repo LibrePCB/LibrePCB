@@ -79,6 +79,7 @@ private:  // Methods
   virtual void upgradeBoard(SExpression& root,
                             ProjectContext& context) override;
   virtual void upgradeBoardUserSettings(SExpression& root) override;
+  virtual void upgradeHoles(SExpression& node, bool isBoardHole) override;
 };
 
 /*******************************************************************************

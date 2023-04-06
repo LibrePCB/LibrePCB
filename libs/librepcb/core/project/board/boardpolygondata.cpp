@@ -41,7 +41,8 @@ BoardPolygonData::BoardPolygonData(const BoardPolygonData& other) noexcept
     mLineWidth(other.mLineWidth),
     mPath(other.mPath),
     mIsFilled(other.mIsFilled),
-    mIsGrabArea(other.mIsGrabArea) {
+    mIsGrabArea(other.mIsGrabArea),
+    mLocked(other.mLocked) {
 }
 
 BoardPolygonData::BoardPolygonData(const Uuid& uuid,
@@ -51,19 +52,21 @@ BoardPolygonData::BoardPolygonData(const Uuid& uuid,
     mLineWidth(other.mLineWidth),
     mPath(other.mPath),
     mIsFilled(other.mIsFilled),
-    mIsGrabArea(other.mIsGrabArea) {
+    mIsGrabArea(other.mIsGrabArea),
+    mLocked(other.mLocked) {
 }
 
 BoardPolygonData::BoardPolygonData(const Uuid& uuid, const Layer& layer,
                                    const UnsignedLength& lineWidth,
-                                   const Path& path, bool fill,
-                                   bool isGrabArea) noexcept
+                                   const Path& path, bool fill, bool isGrabArea,
+                                   bool locked) noexcept
   : mUuid(uuid),
     mLayer(&layer),
     mLineWidth(lineWidth),
     mPath(path),
     mIsFilled(fill),
-    mIsGrabArea(isGrabArea) {
+    mIsGrabArea(isGrabArea),
+    mLocked(locked) {
 }
 
 BoardPolygonData::BoardPolygonData(const SExpression& node)
@@ -72,7 +75,8 @@ BoardPolygonData::BoardPolygonData(const SExpression& node)
     mLineWidth(deserialize<UnsignedLength>(node.getChild("width/@0"))),
     mPath(node),
     mIsFilled(deserialize<bool>(node.getChild("fill/@0"))),
-    mIsGrabArea(deserialize<bool>(node.getChild("grab_area/@0"))) {
+    mIsGrabArea(deserialize<bool>(node.getChild("grab_area/@0"))),
+    mLocked(deserialize<bool>(node.getChild("lock/@0"))) {
 }
 
 BoardPolygonData::~BoardPolygonData() noexcept {
@@ -127,6 +131,15 @@ bool BoardPolygonData::setIsGrabArea(bool isGrabArea) noexcept {
   return true;
 }
 
+bool BoardPolygonData::setLocked(bool locked) noexcept {
+  if (locked == mLocked) {
+    return false;
+  }
+
+  mLocked = locked;
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -138,6 +151,7 @@ void BoardPolygonData::serialize(SExpression& root) const {
   root.appendChild("width", mLineWidth);
   root.appendChild("fill", mIsFilled);
   root.appendChild("grab_area", mIsGrabArea);
+  root.appendChild("lock", mLocked);
   root.ensureLineBreak();
   mPath.serialize(root);
   root.ensureLineBreak();
@@ -154,6 +168,7 @@ bool BoardPolygonData::operator==(const BoardPolygonData& rhs) const noexcept {
   if (mPath != rhs.mPath) return false;
   if (mIsFilled != rhs.mIsFilled) return false;
   if (mIsGrabArea != rhs.mIsGrabArea) return false;
+  if (mLocked != rhs.mLocked) return false;
   return true;
 }
 

@@ -53,12 +53,12 @@ BoardEditorState_DrawPolygon::BoardEditorState_DrawPolygon(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
+    mLastSegmentPos(),
     mLastLayer(&Layer::boardOutlines()),
     mLastLineWidth(0),
     mLastRotation(0),
     mLastIsFilled(false),
     mLastIsGrabArea(false),
-    mLastSegmentPos(),
     mCurrentPolygon(nullptr),
     mCurrentPolygonEditCmd(nullptr) {
 }
@@ -192,7 +192,7 @@ bool BoardEditorState_DrawPolygon::startAddPolygon(const Point& pos) noexcept {
         *board,
         BoardPolygonData(Uuid::createRandom(), *mLastLayer, mLastLineWidth,
                          Path({Vertex(pos), Vertex(pos)}), mLastIsFilled,
-                         mLastIsGrabArea));
+                         mLastIsGrabArea, false));
     mContext.undoStack.appendToCmdGroup(
         new CmdBoardPolygonAdd(*mCurrentPolygon));
 

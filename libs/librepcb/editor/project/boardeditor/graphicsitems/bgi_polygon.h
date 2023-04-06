@@ -70,6 +70,7 @@ private:  // Methods
   QVariant itemChange(GraphicsItemChange change,
                       const QVariant& value) noexcept override;
   void updateZValue() noexcept;
+  void updateEditable() noexcept;
 
 private:  // Data
   BI_Polygon& mPolygon;

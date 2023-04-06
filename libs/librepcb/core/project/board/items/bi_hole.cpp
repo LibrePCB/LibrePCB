@@ -79,6 +79,14 @@ bool BI_Hole::setStopMaskConfig(const MaskConfig& config) noexcept {
   }
 }
 
+bool BI_Hole::setLocked(bool locked) noexcept {
+  if (mData.setLocked(locked)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
