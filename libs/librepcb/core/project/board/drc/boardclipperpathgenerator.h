@@ -23,7 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../geometry/path.h"
 #include "../../../types/length.h"
+#include "../../../utils/transform.h"
 
 #include <polyclipping/clipper.hpp>
 
@@ -46,7 +48,6 @@ class Hole;
 class Layer;
 class NetSignal;
 class Polygon;
-class Transform;
 
 /*******************************************************************************
  *  Class BoardClipperPathGenerator
@@ -79,7 +80,8 @@ public:
                  const Length& offset = Length(0));
   void addStrokeText(const BI_StrokeText& strokeText,
                      const Length& offset = Length(0));
-  void addHole(const Hole& hole, const Transform& transform,
+  void addHole(const PositiveLength& diameter, const NonEmptyPath& path,
+               const Transform& transform = Transform(),
                const Length& offset = Length(0));
   void addPad(const BI_FootprintPad& pad, const Transform& transform,
               const Layer& layer, const Length& offset = Length(0));

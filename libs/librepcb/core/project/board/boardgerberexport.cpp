@@ -510,7 +510,7 @@ int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const {
 
   // board holes
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    gen.drill(hole->getHole().getPath(), hole->getHole().getDiameter(), false,
+    gen.drill(hole->getData().getPath(), hole->getData().getDiameter(), false,
               ExcellonGenerator::Function::MechanicalDrill);
     ++count;
   }
@@ -642,8 +642,8 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
     foreach (const BI_Hole* hole, mBoard.getHoles()) {
       if (const tl::optional<Length>& offset = hole->getStopMaskOffset()) {
         const Length diameter =
-            (*hole->getHole().getDiameter()) + (*offset) + (*offset);
-        const Path path = hole->getHole().getPath()->cleaned();
+            (*hole->getData().getDiameter()) + (*offset) + (*offset);
+        const Path path = hole->getData().getPath()->cleaned();
         if (diameter > 0) {
           if (path.getVertices().count() == 1) {
             gen.flashCircle(path.getVertices().first().getPos(),

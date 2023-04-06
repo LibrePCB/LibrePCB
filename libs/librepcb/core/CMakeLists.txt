@@ -260,6 +260,8 @@ add_library(
   project/board/boardfabricationoutputsettings.h
   project/board/boardgerberexport.cpp
   project/board/boardgerberexport.h
+  project/board/boardholedata.cpp
+  project/board/boardholedata.h
   project/board/boardpainter.cpp
   project/board/boardpainter.h
   project/board/boardpickplacegenerator.cpp

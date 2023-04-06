@@ -566,7 +566,7 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
     board->addStrokeText(*text);
   }
   foreach (const SExpression* node, root.getChildren("hole")) {
-    BI_Hole* hole = new BI_Hole(*board, Hole(*node));
+    BI_Hole* hole = new BI_Hole(*board, BoardHoleData(*node));
     board->addHole(*hole);
   }
 

@@ -31,6 +31,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BI_Hole;
 class Hole;
 class LengthUnit;
 
@@ -60,6 +61,10 @@ public:
                        const LengthUnit& lengthUnit,
                        const QString& settingsPrefix,
                        QWidget* parent = nullptr) noexcept;
+  HolePropertiesDialog(BI_Hole& hole, UndoStack& undoStack,
+                       const LengthUnit& lengthUnit,
+                       const QString& settingsPrefix,
+                       QWidget* parent = nullptr) noexcept;
   ~HolePropertiesDialog() noexcept;
 
   // Setters
@@ -69,11 +74,20 @@ public:
   HolePropertiesDialog& operator=(const HolePropertiesDialog& rhs) = delete;
 
 private:  // Methods
+  HolePropertiesDialog(Hole* libObj, BI_Hole* boardObj, UndoStack& undoStack,
+                       const LengthUnit& lengthUnit,
+                       const QString& settingsPrefix,
+                       QWidget* parent = nullptr) noexcept;
+  template <typename T>
+  void load(const T& obj) noexcept;
   void on_buttonBox_clicked(QAbstractButton* button);
   bool applyChanges() noexcept;
+  template <typename T>
+  void applyChanges(T& cmd);
 
 private:  // Data
-  Hole& mHole;
+  Hole* mLibraryObj;
+  BI_Hole* mBoardObj;
   UndoStack& mUndoStack;
   QScopedPointer<Ui::HolePropertiesDialog> mUi;
 };

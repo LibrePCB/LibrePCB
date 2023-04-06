@@ -37,12 +37,12 @@ namespace librepcb {
 namespace editor {
 
 class BoardGraphicsScene;
+class CmdBoardHoleEdit;
 class CmdBoardNetPointEdit;
 class CmdBoardPlaneEdit;
 class CmdBoardViaEdit;
 class CmdDeviceInstanceEdit;
 class CmdDeviceStrokeTextsReset;
-class CmdHoleEdit;
 class CmdPolygonEdit;
 class CmdStrokeTextEdit;
 
@@ -91,7 +91,7 @@ private:
   QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
   QList<CmdPolygonEdit*> mPolygonEditCmds;
   QList<CmdStrokeTextEdit*> mStrokeTextEditCmds;
-  QList<CmdHoleEdit*> mHoleEditCmds;
+  QList<CmdBoardHoleEdit*> mHoleEditCmds;
 };
 
 /*******************************************************************************

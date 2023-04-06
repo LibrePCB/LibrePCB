@@ -618,9 +618,11 @@ void BoardDesignRuleCheck::checkCopperHoleClearances(int progressEnd) {
   // Helper for the actual check.
   QVector<Path> locations;
   auto intersects = [this, &clearance, &copperAreas, &locations](
-                        const Hole& hole, const Transform& transform) {
+                        const PositiveLength& diameter,
+                        const NonEmptyPath& path, const Transform& transform) {
     BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-    gen.addHole(hole, transform, clearance - *maxArcTolerance() - Length(1));
+    gen.addHole(diameter, path, transform,
+                clearance - *maxArcTolerance() - Length(1));
     std::unique_ptr<ClipperLib::PolyTree> intersections =
         ClipperHelpers::intersect(copperAreas, gen.getPaths());
     locations =
@@ -630,9 +632,10 @@ void BoardDesignRuleCheck::checkCopperHoleClearances(int progressEnd) {
 
   // Check board holes.
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    if (intersects(hole->getHole(), Transform())) {
+    if (intersects(hole->getData().getDiameter(), hole->getData().getPath(),
+                   Transform())) {
       emitMessage(std::make_shared<DrcMsgCopperHoleClearanceViolation>(
-          nullptr, hole->getHole(), clearance, locations));
+          *hole, clearance, locations));
     }
   }
 
@@ -640,9 +643,9 @@ void BoardDesignRuleCheck::checkCopperHoleClearances(int progressEnd) {
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     const Transform transform(*device);
     for (const Hole& hole : device->getLibFootprint().getHoles()) {
-      if (intersects(hole, transform)) {
+      if (intersects(hole.getDiameter(), hole.getPath(), transform)) {
         emitMessage(std::make_shared<DrcMsgCopperHoleClearanceViolation>(
-            device, hole, clearance, locations));
+            *device, hole, clearance, locations));
       }
     }
   }
@@ -691,8 +694,8 @@ void BoardDesignRuleCheck::checkDrillDrillClearances(int progressEnd) {
 
   // Board holes.
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    addItem(*hole, hole->getUuid(), hole->getHole().getPath(),
-            hole->getHole().getDiameter());
+    addItem(*hole, hole->getData().getUuid(), hole->getData().getPath(),
+            hole->getData().getDiameter());
   }
 
   // Devices.
@@ -777,9 +780,9 @@ void BoardDesignRuleCheck::checkDrillBoardClearances(int progressEnd) {
 
   // Check board holes.
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    if (intersects(hole->getHole().getPath(), hole->getHole().getDiameter())) {
+    if (intersects(hole->getData().getPath(), hole->getData().getDiameter())) {
       emitMessage(std::make_shared<DrcMsgDrillBoardClearanceViolation>(
-          nullptr, hole->getHole(), clearance, locations));
+          *hole, clearance, locations));
     }
   }
 
@@ -804,7 +807,7 @@ void BoardDesignRuleCheck::checkDrillBoardClearances(int progressEnd) {
     for (const Hole& hole : device->getLibFootprint().getHoles()) {
       if (intersects(transform.map(hole.getPath()), hole.getDiameter())) {
         emitMessage(std::make_shared<DrcMsgDrillBoardClearanceViolation>(
-            device, hole, clearance, locations));
+            *device, hole, clearance, locations));
       }
     }
   }
@@ -900,11 +903,10 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressEnd) {
 
   // Board holes.
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    if ((!hole->getHole().isSlot()) &&
-        (hole->getHole().getDiameter() < minDiameter)) {
+    if ((!hole->getData().isSlot()) &&
+        (hole->getData().getDiameter() < minDiameter)) {
       emitMessage(std::make_shared<DrcMsgMinimumDrillDiameterViolation>(
-          nullptr, hole->getHole(), minDiameter,
-          getHoleLocation(hole->getHole())));
+          *hole, minDiameter, getHoleLocation(hole->getData())));
     }
   }
 
@@ -914,7 +916,7 @@ void BoardDesignRuleCheck::checkMinimumNpthDrillDiameter(int progressEnd) {
     for (const Hole& hole : device->getLibFootprint().getHoles()) {
       if ((!hole.isSlot()) && (hole.getDiameter() < *minDiameter)) {
         emitMessage(std::make_shared<DrcMsgMinimumDrillDiameterViolation>(
-            device, hole, minDiameter, getHoleLocation(hole, transform)));
+            *device, hole, minDiameter, getHoleLocation(hole, transform)));
       }
     }
   }
@@ -932,11 +934,10 @@ void BoardDesignRuleCheck::checkMinimumNpthSlotWidth(int progressEnd) {
 
   // Board holes.
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    if ((hole->getHole().isSlot()) &&
-        (hole->getHole().getDiameter() < minWidth)) {
+    if ((hole->getData().isSlot()) &&
+        (hole->getData().getDiameter() < minWidth)) {
       emitMessage(std::make_shared<DrcMsgMinimumSlotWidthViolation>(
-          nullptr, hole->getHole(), minWidth,
-          getHoleLocation(hole->getHole())));
+          *hole, minWidth, getHoleLocation(hole->getData())));
     }
   }
 
@@ -946,7 +947,7 @@ void BoardDesignRuleCheck::checkMinimumNpthSlotWidth(int progressEnd) {
     for (const Hole& hole : device->getLibFootprint().getHoles()) {
       if ((hole.isSlot()) && (hole.getDiameter() < *minWidth)) {
         emitMessage(std::make_shared<DrcMsgMinimumSlotWidthViolation>(
-            device, hole, minWidth, getHoleLocation(hole, transform)));
+            *device, hole, minWidth, getHoleLocation(hole, transform)));
       }
     }
   }
@@ -1030,9 +1031,9 @@ void BoardDesignRuleCheck::checkAllowedNpthSlots(int progressEnd) {
 
   // Board holes.
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    if (requiresHoleSlotWarning(hole->getHole(), allowed)) {
+    if (requiresHoleSlotWarning(hole->getData(), allowed)) {
       emitMessage(std::make_shared<DrcMsgForbiddenSlot>(
-          *hole, getHoleLocation(hole->getHole())));
+          *hole, getHoleLocation(hole->getData())));
     }
   }
 

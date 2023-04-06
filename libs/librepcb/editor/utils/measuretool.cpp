@@ -159,9 +159,9 @@ void MeasureTool::setBoard(const Board* board) noexcept {
       mSnapCandidates.insert(text->getPosition());
     }
     foreach (const BI_Hole* hole, board->getHoles()) {
-      foreach (const Vertex& vertex, hole->getHole().getPath()->getVertices()) {
+      foreach (const Vertex& vertex, hole->getData().getPath()->getVertices()) {
         mSnapCandidates |= snapCandidatesFromCircle(
-            vertex.getPos(), *hole->getHole().getDiameter());
+            vertex.getPos(), *hole->getData().getDiameter());
       }
     }
   }

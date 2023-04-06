@@ -181,7 +181,7 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       }
       for (const auto& circle : import.getCircles()) {
         if (dialog.getImportCirclesAsDrills()) {
-          data->getHoles().append(std::make_shared<Hole>(
+          data->getHoles().append(BoardHoleData(
               Uuid::createRandom(), circle.diameter,
               makeNonEmptyPath(circle.position), MaskConfig::automatic()));
         } else {
@@ -283,7 +283,11 @@ bool BoardEditorState_Select::processPaste() noexcept {
                                             footprintData->getCursorPos()));
           data->getPolygons().append(footprintData->getPolygons());
           data->getStrokeTexts().append(footprintData->getStrokeTexts());
-          data->getHoles().append(footprintData->getHoles());
+          for (const auto& hole : footprintData->getHoles()) {
+            data->getHoles().append(
+                BoardHoleData(hole.getUuid(), hole.getDiameter(),
+                              hole.getPath(), hole.getStopMaskConfig()));
+          }
         }
       }
 
@@ -406,7 +410,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
     return true;
   }
   foreach (auto ptr, query.getHoles()) {
-    openHolePropertiesDialog(ptr->getHole());
+    openHolePropertiesDialog(*ptr);
     return true;
   }
   return false;
@@ -958,7 +962,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       mb.addAction(aSnap);
     } else if (auto hole = std::dynamic_pointer_cast<BGI_Hole>(selectedItem)) {
       const Point pos =
-          hole->getHole().getHole().getPath()->getVertices().first().getPos();
+          hole->getHole().getData().getPath()->getVertices().first().getPos();
       mb.addAction(
           cmd.properties.createAction(
               &menu, this,
@@ -1420,7 +1424,7 @@ bool BoardEditorState_Select::openPropertiesDialog(
     openStrokeTextPropertiesDialog(text->getStrokeText().getTextObj());
     return true;
   } else if (auto hole = std::dynamic_pointer_cast<BGI_Hole>(item)) {
-    openHolePropertiesDialog(hole->getHole().getHole());
+    openHolePropertiesDialog(hole->getHole());
     return true;
   }
   return false;
@@ -1475,7 +1479,7 @@ void BoardEditorState_Select::openStrokeTextPropertiesDialog(
   dialog.exec();
 }
 
-void BoardEditorState_Select::openHolePropertiesDialog(Hole& hole) noexcept {
+void BoardEditorState_Select::openHolePropertiesDialog(BI_Hole& hole) noexcept {
   HolePropertiesDialog dialog(hole, mContext.undoStack, getLengthUnit(),
                               "board_editor/hole_properties_dialog",
                               parentWidget());

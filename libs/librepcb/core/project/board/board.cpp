@@ -422,26 +422,26 @@ void Board::addHole(BI_Hole& hole) {
   if ((mHoles.values().contains(&hole)) || (&hole.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (mHoles.contains(hole.getUuid())) {
+  if (mHoles.contains(hole.getData().getUuid())) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("There is already a hole with the UUID \"%1\"!")
-                           .arg(hole.getUuid().toStr()));
+                           .arg(hole.getData().getUuid().toStr()));
   }
   if (mIsAddedToProject) {
     hole.addToBoard();  // can throw
   }
-  mHoles.insert(hole.getUuid(), &hole);
+  mHoles.insert(hole.getData().getUuid(), &hole);
   emit holeAdded(hole);
 }
 
 void Board::removeHole(BI_Hole& hole) {
-  if (mHoles.value(hole.getUuid()) != &hole) {
+  if (mHoles.value(hole.getData().getUuid()) != &hole) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
     hole.removeFromBoard();  // can throw
   }
-  mHoles.remove(hole.getUuid());
+  mHoles.remove(hole.getData().getUuid());
   emit holeRemoved(hole);
 }
 
@@ -611,8 +611,8 @@ void Board::copyFrom(const Board& other) {
 
   // Copy holes.
   foreach (const BI_Hole* hole, other.getHoles()) {
-    BI_Hole* copy =
-        new BI_Hole(*this, Hole(Uuid::createRandom(), hole->getHole()));
+    BI_Hole* copy = new BI_Hole(
+        *this, BoardHoleData{Uuid::createRandom(), hole->getData()});
     addHole(*copy);
   }
 }
@@ -726,7 +726,7 @@ void Board::save() {
     root.ensureLineBreak();
     for (const BI_Hole* obj : mHoles) {
       root.ensureLineBreak();
-      obj->getHole().serialize(root.appendList("hole"));
+      obj->getData().serialize(root.appendList("hole"));
     }
     root.ensureLineBreak();
     mDirectory->write("board.lp", root.toByteArray());

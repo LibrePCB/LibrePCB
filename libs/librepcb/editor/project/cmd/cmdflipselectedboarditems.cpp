@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "cmdflipselectedboarditems.h"
 
-#include "../../cmd/cmdholeedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
 #include "../../project/cmd/cmdboardnetlineedit.h"
@@ -34,6 +33,7 @@
 #include "../../project/cmd/cmddeviceinstanceedit.h"
 #include "../boardeditor/boardgraphicsscene.h"
 #include "../boardeditor/boardselectionquery.h"
+#include "cmdboardholeedit.h"
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
@@ -137,7 +137,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     }
   }
   foreach (BI_Hole* hole, query.getHoles()) {
-    center += hole->getHole().getPath()->getVertices().first().getPos();
+    center += hole->getData().getPath()->getVertices().first().getPos();
     ++count;
   }
   if (count > 0) {
@@ -234,7 +234,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
 
   // mirror all holes
   foreach (BI_Hole* hole, query.getHoles()) {
-    QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(hole->getHole()));
+    QScopedPointer<CmdBoardHoleEdit> cmd(new CmdBoardHoleEdit(*hole));
     cmd->mirror(mOrientation, center, false);
     execNewChildCmd(cmd.take());  // can throw
   }

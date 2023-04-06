@@ -24,12 +24,12 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/attribute/attribute.h>
-#include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/geometry/junction.h>
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/geometry/trace.h>
 #include <librepcb/core/geometry/via.h>
+#include <librepcb/core/project/board/boardholedata.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/serialization/serializableobjectlist.h>
@@ -257,7 +257,7 @@ public:
   SerializableObjectList<Plane, Plane>& getPlanes() noexcept { return mPlanes; }
   PolygonList& getPolygons() noexcept { return mPolygons; }
   StrokeTextList& getStrokeTexts() noexcept { return mStrokeTexts; }
-  HoleList& getHoles() noexcept { return mHoles; }
+  QList<BoardHoleData>& getHoles() noexcept { return mHoles; }
   QMap<std::pair<Uuid, Uuid>, Point>& getPadPositions() noexcept {
     return mPadPositions;
   }
@@ -282,7 +282,7 @@ private:  // Data
   SerializableObjectList<Plane, Plane> mPlanes;
   PolygonList mPolygons;
   StrokeTextList mStrokeTexts;
-  HoleList mHoles;
+  QList<BoardHoleData> mHoles;
   QMap<std::pair<Uuid, Uuid>, Point> mPadPositions;
 };
 

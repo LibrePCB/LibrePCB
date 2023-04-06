@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../export/graphicsexport.h"
-#include "../../geometry/hole.h"
 #include "../../library/pkg/footprintpad.h"
 #include "../../types/length.h"
 #include "../../utils/transform.h"
@@ -69,12 +68,18 @@ class BoardPainter final : public GraphicsPagePainter {
     QList<PadHole> holes;
   };
 
+  struct HoleData {
+    PositiveLength diameter;
+    NonEmptyPath path;
+    tl::optional<Length> stopMaskOffset;
+  };
+
   struct Footprint {
     Transform transform;
     QList<Pad> pads;
     QList<Polygon> polygons;
     QList<Circle> circles;
-    QList<Hole> holes;  ///< Important: Stop mask set to explicit value!
+    QList<HoleData> holes;
   };
 
   struct Plane {
@@ -88,8 +93,8 @@ class BoardPainter final : public GraphicsPagePainter {
     QList<Trace> traces;
     QList<Polygon> polygons;
     QList<Circle> circles;
-    QList<Hole> holes;
-    QList<Hole> padHoles;
+    QList<HoleData> holes;
+    QList<HoleData> padHoles;
     QList<Text> texts;
   };
 
@@ -120,7 +125,7 @@ private:  // Data
   QList<Plane> mPlanes;
   QList<Polygon> mPolygons;
   QList<StrokeText> mStrokeTexts;
-  QList<Hole> mHoles;  ///< Important: Stop mask set to explicit value!
+  QList<HoleData> mHoles;
 
   mutable QMutex mMutex;
   mutable QHash<QString, ColorContent> mContentByColor;

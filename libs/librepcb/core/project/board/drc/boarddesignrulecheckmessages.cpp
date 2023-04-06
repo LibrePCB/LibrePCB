@@ -23,6 +23,7 @@
 #include "boarddesignrulecheckmessages.h"
 
 #include "../../../geometry/circle.h"
+#include "../../../geometry/hole.h"
 #include "../../../geometry/polygon.h"
 #include "../../../library/pkg/packagepad.h"
 #include "../../circuit/componentinstance.h"
@@ -669,26 +670,42 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
  ******************************************************************************/
 
 DrcMsgCopperHoleClearanceViolation::DrcMsgCopperHoleClearanceViolation(
-    const BI_Device* device, const Hole& hole,
-    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(
-        Severity::Error,
-        tr("Clearance copper ↔ hole < %1 %2",
-           "Placeholders: Clearance value, unit")
-            .arg(minClearance->toMmString(), "mm"),
-        tr("The clearance between a non-plated hole and copper objects is "
-           "smaller than the hole clearance configured in the DRC settings.") %
-            " " % seriousTroublesTr() % "\n\n" %
-            tr("Check the DRC settings and move the copper objects away from "
-               "the hole if needed."),
-        "copper_hole_clearance_violation", locations) {
+    const BI_Hole& hole, const UnsignedLength& minClearance,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
+                     getDescription(), "copper_hole_clearance_violation",
+                     locations) {
   mApproval.ensureLineBreak();
-  if (device) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
-  }
+  mApproval.appendChild("hole", hole.getData().getUuid());
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgCopperHoleClearanceViolation::DrcMsgCopperHoleClearanceViolation(
+    const BI_Device& device, const Hole& hole,
+    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
+                     getDescription(), "copper_hole_clearance_violation",
+                     locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
   mApproval.appendChild("hole", hole.getUuid());
   mApproval.ensureLineBreak();
+}
+
+QString DrcMsgCopperHoleClearanceViolation::getMessage(
+    const UnsignedLength& minClearance) noexcept {
+  return tr("Clearance copper ↔ hole < %1 %2",
+            "Placeholders: Clearance value, unit")
+      .arg(minClearance->toMmString(), "mm");
+}
+
+QString DrcMsgCopperHoleClearanceViolation::getDescription() noexcept {
+  return tr("The clearance between a non-plated hole and copper objects is "
+            "smaller than the hole clearance configured in the DRC settings.") %
+      " " % seriousTroublesTr() % "\n\n" %
+      tr("Check the DRC settings and move the copper objects away from "
+         "the hole if needed.");
 }
 
 /*******************************************************************************
@@ -733,7 +750,7 @@ void DrcMsgDrillDrillClearanceViolation::serializeObject(SExpression& node,
     node.appendChild("via", via->getUuid());
     node.ensureLineBreak();
   } else if (const BI_Hole* boardHole = dynamic_cast<const BI_Hole*>(&item)) {
-    node.appendChild("hole", boardHole->getUuid());
+    node.appendChild("hole", boardHole->getData().getUuid());
   } else if (const BI_FootprintPad* pad =
                  dynamic_cast<const BI_FootprintPad*>(&item)) {
     node.ensureLineBreak();
@@ -787,16 +804,25 @@ DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
 }
 
 DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
-    const BI_Device* device, const Hole& hole,
+    const BI_Hole& hole, const UnsignedLength& minClearance,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, getMessage(minClearance),
+                     getDescription(), "drill_board_clearance_violation",
+                     locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("hole", hole.getData().getUuid());
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgDrillBoardClearanceViolation::DrcMsgDrillBoardClearanceViolation(
+    const BI_Device& device, const Hole& hole,
     const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Error, getMessage(minClearance),
                      getDescription(), "drill_board_clearance_violation",
                      locations) {
   mApproval.ensureLineBreak();
-  if (device) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
-  }
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
   mApproval.appendChild("hole", hole.getUuid());
   mApproval.ensureLineBreak();
 }
@@ -901,26 +927,28 @@ DrcMsgMinimumAnnularRingViolation::DrcMsgMinimumAnnularRingViolation(
  ******************************************************************************/
 
 DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
-    const BI_Device* device, const Hole& hole,
-    const UnsignedLength& minDiameter, const QVector<Path>& locations) noexcept
+    const BI_Hole& hole, const UnsignedLength& minDiameter,
+    const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
-        tr("NPTH drill diameter: %1 < %2 %3",
-           "Placeholders: Actual diameter, minimum diameter, unit")
-            .arg(hole.getDiameter()->toMmString(), minDiameter->toMmString(),
-                 "mm"),
-        tr("The drill diameter of the non-plated hole is smaller than the "
-           "minimum non-plated drill diameter configured in the DRC "
-           "settings.") %
-            "\n\n" %
-            tr("Check the DRC settings or increase the drill diameter if "
-               "needed."),
-        "minimum_drill_diameter_violation", locations) {
+        determineMessage(hole.getData().getDiameter(), minDiameter),
+        determineDescription(false, false), "minimum_drill_diameter_violation",
+        locations) {
   mApproval.ensureLineBreak();
-  if (device) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
-  }
+  mApproval.appendChild("hole", hole.getData().getUuid());
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
+    const BI_Device& device, const Hole& hole,
+    const UnsignedLength& minDiameter, const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Warning,
+                     determineMessage(hole.getDiameter(), minDiameter),
+                     determineDescription(false, false),
+                     "minimum_drill_diameter_violation", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
   mApproval.appendChild("hole", hole.getUuid());
   mApproval.ensureLineBreak();
 }
@@ -935,12 +963,8 @@ DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
             .arg(via.getNetSegment().getNetNameToDisplay(true),
                  via.getDrillDiameter()->toMmString(),
                  minDiameter->toMmString(), "mm"),
-        tr("The drill diameter of the via is smaller than the "
-           "minimum plated drill diameter configured in the DRC settings.") %
-            "\n\n" %
-            tr("Check the DRC settings or increase the drill diameter if "
-               "needed."),
-        "minimum_drill_diameter_violation", locations) {
+        determineDescription(true, false), "minimum_drill_diameter_violation",
+        locations) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
   mApproval.ensureLineBreak();
@@ -957,12 +981,8 @@ DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
            "Placeholders: Net name, actual diameter, minimum diameter")
             .arg(pad.getText(), padHole.getDiameter()->toMmString(),
                  minDiameter->toMmString(), "mm"),
-        tr("The drill diameter of the through-hole pad is smaller than the "
-           "minimum plated drill diameter configured in the DRC settings.") %
-            "\n\n" %
-            tr("Check the DRC settings or increase the drill diameter if "
-               "needed."),
-        "minimum_drill_diameter_violation", locations) {
+        determineDescription(false, true), "minimum_drill_diameter_violation",
+        locations) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
   mApproval.ensureLineBreak();
@@ -972,30 +992,61 @@ DrcMsgMinimumDrillDiameterViolation::DrcMsgMinimumDrillDiameterViolation(
   mApproval.ensureLineBreak();
 }
 
+QString DrcMsgMinimumDrillDiameterViolation::determineMessage(
+    const PositiveLength& actualDiameter,
+    const UnsignedLength& minDiameter) noexcept {
+  return tr("NPTH drill diameter: %1 < %2 %3",
+            "Placeholders: Actual diameter, minimum diameter, unit")
+      .arg(actualDiameter->toMmString(), minDiameter->toMmString(), "mm");
+}
+
+QString DrcMsgMinimumDrillDiameterViolation::determineDescription(
+    bool isVia, bool isPad) noexcept {
+  QString s;
+  if (isVia) {
+    s +=
+        tr("The drill diameter of the via is smaller than the minimum plated "
+           "drill diameter configured in the DRC settings.");
+  } else if (isPad) {
+    s +=
+        tr("The drill diameter of the through-hole pad is smaller than the "
+           "minimum plated drill diameter configured in the DRC settings.");
+  } else {
+    s +=
+        tr("The drill diameter of the non-plated hole is smaller than the "
+           "minimum non-plated drill diameter configured in the DRC settings.");
+  }
+  s += "\n\n";
+  s += tr("Check the DRC settings and increase the drill diameter if needed.");
+  return s;
+}
+
 /*******************************************************************************
  *  DrcMsgMinimumSlotWidthViolation
  ******************************************************************************/
 
 DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
-    const BI_Device* device, const Hole& hole, const UnsignedLength& minWidth,
+    const BI_Hole& hole, const UnsignedLength& minWidth,
     const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(
-        Severity::Warning,
-        tr("NPTH slot width: %1 < %2 %3",
-           "Placeholders: Actual width, minimum width, unit")
-            .arg(hole.getDiameter()->toMmString(), minWidth->toMmString(),
-                 "mm"),
-        tr("The width of the non-plated slot is smaller than the "
-           "minimum non-plated slot width configured in the DRC settings.") %
-            "\n\n" %
-            tr("Check the DRC settings or increase the slot width if "
-               "needed."),
-        "minimum_slot_width_violation", locations) {
+  : RuleCheckMessage(Severity::Warning,
+                     determineMessage(hole.getData().getDiameter(), minWidth),
+                     determineDescription(false),
+                     "minimum_slot_width_violation", locations) {
   mApproval.ensureLineBreak();
-  if (device) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
-  }
+  mApproval.appendChild("hole", hole.getData().getUuid());
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
+    const BI_Device& device, const Hole& hole, const UnsignedLength& minWidth,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Warning,
+                     determineMessage(hole.getDiameter(), minWidth),
+                     determineDescription(false),
+                     "minimum_slot_width_violation", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
   mApproval.appendChild("hole", hole.getUuid());
   mApproval.ensureLineBreak();
 }
@@ -1009,11 +1060,7 @@ DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
            "Placeholders: Net name, actual width, minimum width, unit")
             .arg(pad.getText(), padHole.getDiameter()->toMmString(),
                  minWidth->toMmString(), "mm"),
-        tr("The width of the plated slot is smaller than the minimum plated "
-           "slot width configured in the DRC settings.") %
-            "\n\n" %
-            tr("Check the DRC settings or increase the slot width if needed."),
-        "minimum_slot_width_violation", locations) {
+        determineDescription(true), "minimum_slot_width_violation", locations) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
   mApproval.ensureLineBreak();
@@ -1021,6 +1068,31 @@ DrcMsgMinimumSlotWidthViolation::DrcMsgMinimumSlotWidthViolation(
   mApproval.ensureLineBreak();
   mApproval.appendChild("hole", padHole.getUuid());
   mApproval.ensureLineBreak();
+}
+
+QString DrcMsgMinimumSlotWidthViolation::determineMessage(
+    const PositiveLength& actualWidth,
+    const UnsignedLength& minWidth) noexcept {
+  return tr("NPTH slot width: %1 < %2 %3",
+            "Placeholders: Actual width, minimum width, unit")
+      .arg(actualWidth->toMmString(), minWidth->toMmString(), "mm");
+}
+
+QString DrcMsgMinimumSlotWidthViolation::determineDescription(
+    bool isPad) noexcept {
+  QString s;
+  if (isPad) {
+    s +=
+        tr("The width of the plated slot is smaller than the minimum plated "
+           "slot width configured in the DRC settings.");
+  } else {
+    s +=
+        tr("The width of the non-plated slot is smaller than the "
+           "minimum non-plated slot width configured in the DRC settings.");
+  }
+  s += "\n\n";
+  s += tr("Check the DRC settings and increase the slot width if needed.");
+  return s;
 }
 
 /*******************************************************************************
@@ -1055,11 +1127,11 @@ DrcMsgInvalidPadConnection::DrcMsgInvalidPadConnection(
 DrcMsgForbiddenSlot::DrcMsgForbiddenSlot(
     const BI_Hole& hole, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(Severity::Warning,
-                     determineMessage(hole.getHole().getPath()),
-                     determineDescription(hole.getHole().getPath()),
+                     determineMessage(hole.getData().getPath()),
+                     determineDescription(hole.getData().getPath()),
                      "forbidden_slot", locations) {
   mApproval.ensureLineBreak();
-  mApproval.appendChild("hole", hole.getUuid());
+  mApproval.appendChild("hole", hole.getData().getUuid());
   mApproval.ensureLineBreak();
 }
 

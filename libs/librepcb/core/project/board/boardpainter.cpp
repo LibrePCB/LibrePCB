@@ -83,11 +83,11 @@ BoardPainter::BoardPainter(const Board& board)
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
       fpt.circles.append(circle);
     }
-    for (Hole hole : device->getLibFootprint().getHoles()) {
+    for (const Hole& hole : device->getLibFootprint().getHoles()) {
       // Memorize stop mask offset now to avoid needing design rules later.
-      hole.setStopMaskConfig(
-          MaskConfig::maybe(device->getHoleStopMasks().value(hole.getUuid())));
-      fpt.holes.append(hole);
+      fpt.holes.append(
+          HoleData{hole.getDiameter(), hole.getPath(),
+                   device->getHoleStopMasks().value(hole.getUuid())});
     }
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
       StrokeText copy(text->getTextObj());
@@ -108,10 +108,9 @@ BoardPainter::BoardPainter(const Board& board)
     mStrokeTexts.append(copy);
   }
   foreach (const BI_Hole* hole, board.getHoles()) {
-    Hole holeObj = hole->getHole();
-    // Memorize stop mask offset now to avoid needing design rules later.
-    holeObj.setStopMaskConfig(MaskConfig::maybe(hole->getStopMaskOffset()));
-    mHoles.append(holeObj);
+    mHoles.append(HoleData{hole->getData().getDiameter(),
+                           hole->getData().getPath(),
+                           hole->getStopMaskOffset()});
   }
   foreach (const BI_NetSegment* segment, board.getNetSegments()) {
     for (const BI_Via* via : segment->getVias()) {
@@ -192,15 +191,15 @@ void BoardPainter::paint(QPainter& painter,
     }
 
     // Draw holes.
-    foreach (const Hole& hole, content.holes) {
-      p.drawSlot(*hole.getPath(), hole.getDiameter(), Length(0),
-                 settings.getColor(color), QColor());
+    foreach (const HoleData& hole, content.holes) {
+      p.drawSlot(*hole.path, hole.diameter, Length(0), settings.getColor(color),
+                 QColor());
     }
 
     // Draw pad holes.
     if (drawPadHoles) {
-      foreach (const Hole& hole, content.padHoles) {
-        p.drawSlot(*hole.getPath(), hole.getDiameter(), Length(0),
+      foreach (const HoleData& hole, content.padHoles) {
+        p.drawSlot(*hole.path, hole.diameter, Length(0),
                    settings.getColor(color), QColor());
       }
     }
@@ -241,14 +240,13 @@ void BoardPainter::initContentByColor() const noexcept {
       }
 
       // Footprint holes.
-      foreach (Hole hole, footprint.holes) {
-        hole.setPath(NonEmptyPath(footprint.transform.map(hole.getPath())));
+      foreach (HoleData hole, footprint.holes) {
+        hole.path = NonEmptyPath(footprint.transform.map(hole.path));
         mContentByColor[Theme::Color::sBoardHoles].holes.append(hole);
         PadGeometry geometry =
-            PadGeometry::stroke(hole.getDiameter(), hole.getPath(), {});
-        if (hole.getStopMaskConfig().isEnabled() &&
-            hole.getStopMaskConfig().getOffset()) {
-          geometry = geometry.withOffset(*hole.getStopMaskConfig().getOffset());
+            PadGeometry::stroke(hole.diameter, hole.path, {});
+        if (const tl::optional<Length>& offset = hole.stopMaskOffset) {
+          geometry = geometry.withOffset(*offset);
         }
         const QPainterPath stopMask = geometry.toFilledQPainterPathPx();
         mContentByColor[Theme::Color::sBoardStopMaskTop].areas.append(stopMask);
@@ -274,10 +272,10 @@ void BoardPainter::initContentByColor() const noexcept {
         }
         // Also add the holes for THT pads.
         for (const PadHole& hole : pad.holes) {
-          mContentByColor[Theme::Color::sBoardHoles].padHoles.append(
-              Hole(hole.getUuid(), hole.getDiameter(),
-                   footprint.transform.map(pad.transform.map(hole.getPath())),
-                   MaskConfig::off()));
+          mContentByColor[Theme::Color::sBoardHoles].padHoles.append(HoleData{
+              hole.getDiameter(),
+              footprint.transform.map(pad.transform.map(hole.getPath())),
+              tl::nullopt});
         }
       }
     }
@@ -309,13 +307,11 @@ void BoardPainter::initContentByColor() const noexcept {
     }
 
     // Holes.
-    foreach (const Hole& hole, mHoles) {
+    foreach (const HoleData& hole, mHoles) {
       mContentByColor[Theme::Color::sBoardHoles].holes.append(hole);
-      PadGeometry geometry =
-          PadGeometry::stroke(hole.getDiameter(), hole.getPath(), {});
-      if (hole.getStopMaskConfig().isEnabled() &&
-          hole.getStopMaskConfig().getOffset()) {
-        geometry = geometry.withOffset(*hole.getStopMaskConfig().getOffset());
+      PadGeometry geometry = PadGeometry::stroke(hole.diameter, hole.path, {});
+      if (const tl::optional<Length>& offset = hole.stopMaskOffset) {
+        geometry = geometry.withOffset(*offset);
       }
       const QPainterPath stopMask = geometry.toFilledQPainterPathPx();
       mContentByColor[Theme::Color::sBoardStopMaskTop].areas.append(stopMask);

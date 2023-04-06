@@ -40,12 +40,12 @@ namespace librepcb {
 class Angle;
 class BI_Base;
 class BI_Device;
+class BI_Hole;
 class BI_NetLine;
 class BI_NetSegment;
 class BI_Plane;
 class BI_Polygon;
 class BI_Via;
-class Hole;
 class Point;
 class Polygon;
 class StrokeText;
@@ -176,7 +176,7 @@ private:  // Methods
   void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
   void openPolygonPropertiesDialog(Polygon& polygon) noexcept;
   void openStrokeTextPropertiesDialog(StrokeText& text) noexcept;
-  void openHolePropertiesDialog(Hole& hole) noexcept;
+  void openHolePropertiesDialog(BI_Hole& hole) noexcept;
   QList<DeviceMenuItem> getDeviceMenuItems(
       const ComponentInstance& cmpInst) const noexcept;
 

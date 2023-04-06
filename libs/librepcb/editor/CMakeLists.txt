@@ -463,6 +463,8 @@ add_library(
   project/cmd/cmdboardedit.h
   project/cmd/cmdboardholeadd.cpp
   project/cmd/cmdboardholeadd.h
+  project/cmd/cmdboardholeedit.cpp
+  project/cmd/cmdboardholeedit.h
   project/cmd/cmdboardholeremove.cpp
   project/cmd/cmdboardholeremove.h
   project/cmd/cmdboardnetlineedit.cpp

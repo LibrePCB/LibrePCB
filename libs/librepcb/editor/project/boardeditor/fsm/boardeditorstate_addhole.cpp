@@ -22,13 +22,13 @@
  ******************************************************************************/
 #include "boardeditorstate_addhole.h"
 
-#include "../../../cmd/cmdholeedit.h"
 #include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../../utils/toolbarproxy.h"
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmdboardholeadd.h"
+#include "../../cmd/cmdboardholeedit.h"
 #include "../boardeditor.h"
 
 #include <librepcb/core/geometry/hole.h>
@@ -138,14 +138,14 @@ bool BoardEditorState_AddHole::addHole(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add hole to board"));
     mIsUndoCmdActive = true;
-    mCurrentHoleToPlace =
-        new BI_Hole(*board,
-                    Hole(Uuid::createRandom(), mLastDiameter,
-                         makeNonEmptyPath(pos), MaskConfig::automatic()));
+    mCurrentHoleToPlace = new BI_Hole(
+        *board,
+        BoardHoleData(Uuid::createRandom(), mLastDiameter,
+                      makeNonEmptyPath(pos), MaskConfig::automatic()));
     QScopedPointer<CmdBoardHoleAdd> cmdAdd(
         new CmdBoardHoleAdd(*mCurrentHoleToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());
-    mCurrentHoleEditCmd.reset(new CmdHoleEdit(mCurrentHoleToPlace->getHole()));
+    mCurrentHoleEditCmd.reset(new CmdBoardHoleEdit(*mCurrentHoleToPlace));
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

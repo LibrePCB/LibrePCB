@@ -25,7 +25,6 @@
 #include "../../../geometry/polygon.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../utils/clipperhelpers.h"
-#include "../../../utils/transform.h"
 #include "../board.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprintpad.h"
@@ -246,15 +245,15 @@ void BoardClipperPathGenerator::addStrokeText(const BI_StrokeText& strokeText,
   }
 }
 
-void BoardClipperPathGenerator::addHole(const Hole& hole,
+void BoardClipperPathGenerator::addHole(const PositiveLength& diameter,
+                                        const NonEmptyPath& path,
                                         const Transform& transform,
                                         const Length& offset) {
-  const PositiveLength width(
-      std::max(*hole.getDiameter() + offset + offset, Length(1)));
-  const Path path = transform.map(*hole.getPath());
+  const PositiveLength width(std::max(*diameter + offset + offset, Length(1)));
   ClipperHelpers::unite(
       mPaths,
-      ClipperHelpers::convert(path.toOutlineStrokes(width), mMaxArcTolerance));
+      ClipperHelpers::convert(transform.map(*path).toOutlineStrokes(width),
+                              mMaxArcTolerance));
 }
 
 void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,

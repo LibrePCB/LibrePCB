@@ -176,13 +176,12 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       Path({Vertex(Point(10, 20), Angle(30)),
             Vertex(Point(40, 50), Angle(60))}));
 
-  std::shared_ptr<Hole> hole1 = std::make_shared<Hole>(
-      Uuid::createRandom(), PositiveLength(3), makeNonEmptyPath(Point(1, 2)),
-      MaskConfig::automatic());
+  BoardHoleData hole1(Uuid::createRandom(), PositiveLength(3),
+                      makeNonEmptyPath(Point(1, 2)), MaskConfig::automatic());
 
-  std::shared_ptr<Hole> hole2 = std::make_shared<Hole>(
-      Uuid::createRandom(), PositiveLength(30), makeNonEmptyPath(Point(10, 20)),
-      MaskConfig::manual(Length(123456)));
+  BoardHoleData hole2(Uuid::createRandom(), PositiveLength(30),
+                      makeNonEmptyPath(Point(10, 20)),
+                      MaskConfig::manual(Length(123456)));
 
   // Create object
   BoardClipboardData obj1(uuid, pos);

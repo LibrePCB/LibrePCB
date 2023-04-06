@@ -67,7 +67,10 @@ BoardClipboardData::BoardClipboardData(const QByteArray& mimeData)
   mPlanes.loadFromSExpression(root);
   mPolygons.loadFromSExpression(root);
   mStrokeTexts.loadFromSExpression(root);
-  mHoles.loadFromSExpression(root);
+
+  foreach (const SExpression* child, root.getChildren("hole")) {
+    mHoles.append(BoardHoleData(*child));
+  }
 
   foreach (const SExpression* child, root.getChildren("pad_position")) {
     mPadPositions.insert(
@@ -120,8 +123,11 @@ std::unique_ptr<QMimeData> BoardClipboardData::toMimeData() const {
   mPolygons.serialize(root);
   root.ensureLineBreak();
   mStrokeTexts.serialize(root);
+  for (const BoardHoleData& data : mHoles) {
+    root.ensureLineBreak();
+    data.serialize(root.appendList("hole"));
+  }
   root.ensureLineBreak();
-  mHoles.serialize(root);
   for (auto it = mPadPositions.begin(); it != mPadPositions.end(); ++it) {
     SExpression child = SExpression::createList("pad_position");
     child.appendChild("device", it.key().first);

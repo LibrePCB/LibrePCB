@@ -353,13 +353,20 @@ class DrcMsgCopperHoleClearanceViolation final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgCopperHoleClearanceViolation() = delete;
-  DrcMsgCopperHoleClearanceViolation(const BI_Device* device, const Hole& hole,
+  DrcMsgCopperHoleClearanceViolation(const BI_Hole& hole,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations) noexcept;
+  DrcMsgCopperHoleClearanceViolation(const BI_Device& device, const Hole& hole,
                                      const UnsignedLength& minClearance,
                                      const QVector<Path>& locations) noexcept;
   DrcMsgCopperHoleClearanceViolation(
       const DrcMsgCopperHoleClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgCopperHoleClearanceViolation() noexcept {}
+
+private:
+  static QString getMessage(const UnsignedLength& minClearance) noexcept;
+  static QString getDescription() noexcept;
 };
 
 /*******************************************************************************
@@ -409,7 +416,10 @@ public:
                                      const PadHole& hole,
                                      const UnsignedLength& minClearance,
                                      const QVector<Path>& locations) noexcept;
-  DrcMsgDrillBoardClearanceViolation(const BI_Device* device, const Hole& hole,
+  DrcMsgDrillBoardClearanceViolation(const BI_Hole& hole,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations) noexcept;
+  DrcMsgDrillBoardClearanceViolation(const BI_Device& device, const Hole& hole,
                                      const UnsignedLength& minClearance,
                                      const QVector<Path>& locations) noexcept;
   DrcMsgDrillBoardClearanceViolation(
@@ -480,7 +490,10 @@ class DrcMsgMinimumDrillDiameterViolation final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgMinimumDrillDiameterViolation() = delete;
-  DrcMsgMinimumDrillDiameterViolation(const BI_Device* device, const Hole& hole,
+  DrcMsgMinimumDrillDiameterViolation(const BI_Hole& hole,
+                                      const UnsignedLength& minDiameter,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumDrillDiameterViolation(const BI_Device& device, const Hole& hole,
                                       const UnsignedLength& minDiameter,
                                       const QVector<Path>& locations) noexcept;
   DrcMsgMinimumDrillDiameterViolation(const BI_Via& via,
@@ -494,6 +507,11 @@ public:
       const DrcMsgMinimumDrillDiameterViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgMinimumDrillDiameterViolation() noexcept {}
+
+private:
+  static QString determineMessage(const PositiveLength& actualDiameter,
+                                  const UnsignedLength& minDiameter) noexcept;
+  static QString determineDescription(bool isVia, bool isPad) noexcept;
 };
 
 /*******************************************************************************
@@ -509,7 +527,10 @@ class DrcMsgMinimumSlotWidthViolation final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgMinimumSlotWidthViolation() = delete;
-  DrcMsgMinimumSlotWidthViolation(const BI_Device* device, const Hole& hole,
+  DrcMsgMinimumSlotWidthViolation(const BI_Hole& hole,
+                                  const UnsignedLength& minWidth,
+                                  const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumSlotWidthViolation(const BI_Device& device, const Hole& hole,
                                   const UnsignedLength& minWidth,
                                   const QVector<Path>& locations) noexcept;
   DrcMsgMinimumSlotWidthViolation(const BI_FootprintPad& pad,
@@ -520,6 +541,11 @@ public:
       const DrcMsgMinimumSlotWidthViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgMinimumSlotWidthViolation() noexcept {}
+
+private:
+  static QString determineMessage(const PositiveLength& actualWidth,
+                                  const UnsignedLength& minWidth) noexcept;
+  static QString determineDescription(bool isPad) noexcept;
 };
 
 /*******************************************************************************

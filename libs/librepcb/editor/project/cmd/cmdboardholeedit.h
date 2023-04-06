@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_BI_HOLE_H
-#define LIBREPCB_CORE_BI_HOLE_H
+#ifndef LIBREPCB_EDITOR_CMDBOARDHOLEEDIT_H
+#define LIBREPCB_EDITOR_CMDBOARDHOLEEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../utils/signalslot.h"
-#include "../boardholedata.h"
-#include "bi_base.h"
+#include "../../undocommand.h"
+
+#include <librepcb/core/project/board/boardholedata.h>
 
 #include <QtCore>
 
@@ -34,66 +34,60 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Board;
+class Angle;
+class BI_Hole;
+
+namespace editor {
 
 /*******************************************************************************
- *  Class BI_Hole
+ *  Class CmdBoardHoleEdit
  ******************************************************************************/
 
 /**
- * @brief The BI_Hole class
+ * @brief The CmdBoardHoleEdit class
  */
-class BI_Hole final : public BI_Base {
-  Q_OBJECT
-
+class CmdBoardHoleEdit final : public UndoCommand {
 public:
-  // Signals
-  enum class Event {
-    DiameterChanged,
-    PathChanged,
-    StopMaskOffsetChanged,
-  };
-  Signal<BI_Hole, Event> onEdited;
-  typedef Slot<BI_Hole, Event> OnEditedSlot;
-
   // Constructors / Destructor
-  BI_Hole() = delete;
-  BI_Hole(const BI_Hole& other) = delete;
-  BI_Hole(Board& board, const BoardHoleData& data);
-  ~BI_Hole() noexcept;
-
-  // Getters
-  const BoardHoleData& getData() const noexcept { return mData; }
-  const tl::optional<Length>& getStopMaskOffset() const noexcept {
-    return mStopMaskOffset;
-  }
+  CmdBoardHoleEdit() = delete;
+  CmdBoardHoleEdit(const CmdBoardHoleEdit& other) = delete;
+  explicit CmdBoardHoleEdit(BI_Hole& hole) noexcept;
+  ~CmdBoardHoleEdit() noexcept;
 
   // Setters
-  bool setDiameter(const PositiveLength& diameter) noexcept;
-  bool setPath(const NonEmptyPath& path) noexcept;
-  bool setStopMaskConfig(const MaskConfig& config) noexcept;
-
-  // General Methods
-  void addToBoard() override;
-  void removeFromBoard() override;
+  void setPath(const NonEmptyPath& path, bool immediate) noexcept;
+  void translate(const Point& deltaPos, bool immediate) noexcept;
+  void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void mirror(Qt::Orientation orientation, const Point& center,
+              bool immediate) noexcept;
+  void setDiameter(const PositiveLength& diameter, bool immediate) noexcept;
+  void setStopMaskConfig(const MaskConfig& config) noexcept;
 
   // Operator Overloadings
-  BI_Hole& operator=(const BI_Hole& rhs) = delete;
+  CmdBoardHoleEdit& operator=(const CmdBoardHoleEdit& rhs) = delete;
 
 private:  // Methods
-  void updateStopMaskOffset() noexcept;
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
 
 private:  // Data
-  BoardHoleData mData;
-
-  // Cached Attributes
-  tl::optional<Length> mStopMaskOffset;
+  BI_Hole& mHole;
+  BoardHoleData mOldData;
+  BoardHoleData mNewData;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

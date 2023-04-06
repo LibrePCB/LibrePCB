@@ -186,7 +186,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
 
   // Add holes
   foreach (BI_Hole* hole, query.getHoles()) {
-    data->getHoles().append(std::make_shared<Hole>(hole->getHole()));
+    data->getHoles().append(hole->getData());
   }
 
   return data;

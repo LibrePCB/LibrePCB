@@ -281,7 +281,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     for (auto it = scene->getHoles().begin(); it != scene->getHoles().end();
          it++) {
       processItem(it.value(),
-                  it.key()->getHole().getPath()->getVertices().first().getPos(),
+                  it.key()->getData().getPath()->getVertices().first().getPos(),
                   5, false);
     }
   }
