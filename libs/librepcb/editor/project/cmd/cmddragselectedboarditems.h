@@ -40,11 +40,11 @@ class BoardGraphicsScene;
 class CmdBoardHoleEdit;
 class CmdBoardNetPointEdit;
 class CmdBoardPlaneEdit;
+class CmdBoardStrokeTextEdit;
 class CmdBoardViaEdit;
 class CmdDeviceInstanceEdit;
 class CmdDeviceStrokeTextsReset;
 class CmdPolygonEdit;
-class CmdStrokeTextEdit;
 
 /*******************************************************************************
  *  Class CmdDragSelectedBoardItems
@@ -90,7 +90,7 @@ private:
   QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
   QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
   QList<CmdPolygonEdit*> mPolygonEditCmds;
-  QList<CmdStrokeTextEdit*> mStrokeTextEditCmds;
+  QList<CmdBoardStrokeTextEdit*> mStrokeTextEditCmds;
   QList<CmdBoardHoleEdit*> mHoleEditCmds;
 };
 

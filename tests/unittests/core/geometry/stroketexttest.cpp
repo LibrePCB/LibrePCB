@@ -54,8 +54,8 @@ TEST_F(StrokeTextTest, testConstructFromSExpression) {
   EXPECT_EQ("bot_placement", obj.getLayer().getId());
   EXPECT_EQ(PositiveLength(1000000), obj.getHeight());
   EXPECT_EQ(UnsignedLength(200000), obj.getStrokeWidth());
-  EXPECT_EQ(true, obj.getLetterSpacing().isAuto());
-  EXPECT_EQ(true, obj.getLineSpacing().isAuto());
+  EXPECT_EQ(tl::nullopt, obj.getLetterSpacing().getRatio());
+  EXPECT_EQ(tl::nullopt, obj.getLineSpacing().getRatio());
   EXPECT_EQ(Alignment(HAlign::left(), VAlign::bottom()), obj.getAlign());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(Angle::deg45(), obj.getRotation());

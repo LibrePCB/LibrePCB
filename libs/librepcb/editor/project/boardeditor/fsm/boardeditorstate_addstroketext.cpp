@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "boardeditorstate_addstroketext.h"
 
-#include "../../../cmd/cmdstroketextedit.h"
 #include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../../utils/toolbarproxy.h"
@@ -30,6 +29,7 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmdboardstroketextadd.h"
+#include "../../cmd/cmdboardstroketextedit.h"
 #include "../boardeditor.h"
 
 #include <librepcb/core/geometry/stroketext.h>
@@ -53,20 +53,13 @@ BoardEditorState_AddStrokeText::BoardEditorState_AddStrokeText(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mLastStrokeTextProperties(
-        Uuid::createRandom(),  // UUID is not relevant here
-        Layer::boardDocumentation(),  // Layer
-        "{{PROJECT}}",  // Text
-        Point(),  // Position is not relevant here
-        Angle::deg0(),  // Rotation
-        PositiveLength(1500000),  // Height
-        UnsignedLength(200000),  // Line width
-        StrokeTextSpacing(),  // Letter spacing
-        StrokeTextSpacing(),  // Line spacing
-        Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
-        false,  // Mirror
-        true  // Auto rotate
-        ),
+    mLastLayer(&Layer::boardDocumentation()),
+    mLastRotation(0),
+    mLastHeight(1500000),
+    mLastStrokeWidth(200000),
+    mLastAlignment(HAlign::left(), VAlign::bottom()),
+    mLastText("{{PROJECT}}"),
+    mLastMirrored(false),
     mCurrentTextToPlace(nullptr) {
 }
 
@@ -80,7 +73,7 @@ BoardEditorState_AddStrokeText::~BoardEditorState_AddStrokeText() noexcept {
 bool BoardEditorState_AddStrokeText::entry() noexcept {
   Q_ASSERT(mIsUndoCmdActive == false);
 
-  makeLayerVisible(mLastStrokeTextProperties.getLayer().getThemeColor());
+  makeLayerVisible(mLastLayer->getThemeColor());
 
   // Add a new stroke text
   Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(QCursor::pos(),
@@ -93,7 +86,7 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
   mLayerComboBox = new GraphicsLayerComboBox();
   mLayerComboBox->setLayers(getAllowedGeometryLayers());
-  mLayerComboBox->setCurrentLayer(mLastStrokeTextProperties.getLayer());
+  mLayerComboBox->setCurrentLayer(*mLastLayer);
   mLayerComboBox->addAction(cmd.layerUp.createAction(
       mLayerComboBox, mLayerComboBox.data(), &GraphicsLayerComboBox::stepDown));
   mLayerComboBox->addAction(cmd.layerDown.createAction(
@@ -112,9 +105,8 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
   textComboBox->addItem("{{PROJECT}}");
   textComboBox->addItem("{{AUTHOR}}");
   textComboBox->addItem("{{VERSION}}");
-  textComboBox->setCurrentIndex(
-      textComboBox->findText(mLastStrokeTextProperties.getText()));
-  textComboBox->setCurrentText(mLastStrokeTextProperties.getText());
+  textComboBox->setCurrentIndex(textComboBox->findText(mLastText));
+  textComboBox->setCurrentText(mLastText);
   connect(textComboBox.get(), &QComboBox::currentTextChanged, this,
           &BoardEditorState_AddStrokeText::textComboBoxValueChanged);
   mContext.commandToolBar.addWidget(std::move(textComboBox));
@@ -122,7 +114,7 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
   // Add the height spinbox to the toolbar
   mContext.commandToolBar.addLabel(tr("Height:"), 10);
   std::unique_ptr<PositiveLengthEdit> heightEdit(new PositiveLengthEdit());
-  heightEdit->setValue(mLastStrokeTextProperties.getHeight());
+  heightEdit->setValue(mLastHeight);
   heightEdit->addAction(cmd.sizeIncrease.createAction(
       heightEdit.get(), heightEdit.get(), &PositiveLengthEdit::stepUp));
   heightEdit->addAction(cmd.sizeDecrease.createAction(
@@ -134,7 +126,7 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
   // Add the mirror checkbox to the toolbar
   mContext.commandToolBar.addLabel(tr("Mirror:"), 10);
   mMirrorCheckBox = new QCheckBox();
-  mMirrorCheckBox->setChecked(mLastStrokeTextProperties.getMirrored());
+  mMirrorCheckBox->setChecked(mLastMirrored);
   mMirrorCheckBox->addAction(cmd.mirrorHorizontal.createAction(
       mMirrorCheckBox, mMirrorCheckBox.data(), &QCheckBox::toggle));
   connect(mMirrorCheckBox, &QCheckBox::toggled, this,
@@ -219,14 +211,16 @@ bool BoardEditorState_AddStrokeText::addText(const Point& pos) noexcept {
   try {
     mContext.undoStack.beginCmdGroup(tr("Add text to board"));
     mIsUndoCmdActive = true;
-    mLastStrokeTextProperties.setPosition(pos);
     mCurrentTextToPlace = new BI_StrokeText(
-        *board, StrokeText(Uuid::createRandom(), mLastStrokeTextProperties));
+        *board,
+        BoardStrokeTextData(Uuid::createRandom(), *mLastLayer, mLastText, pos,
+                            mLastRotation, mLastHeight, mLastStrokeWidth,
+                            StrokeTextSpacing(), StrokeTextSpacing(),
+                            mLastAlignment, mLastMirrored, true));
     QScopedPointer<CmdBoardStrokeTextAdd> cmdAdd(
         new CmdBoardStrokeTextAdd(*mCurrentTextToPlace));
     mContext.undoStack.appendToCmdGroup(cmdAdd.take());
-    mCurrentTextEditCmd.reset(
-        new CmdStrokeTextEdit(mCurrentTextToPlace->getTextObj()));
+    mCurrentTextEditCmd.reset(new CmdBoardStrokeTextEdit(*mCurrentTextToPlace));
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -238,8 +232,9 @@ bool BoardEditorState_AddStrokeText::addText(const Point& pos) noexcept {
 bool BoardEditorState_AddStrokeText::rotateText(const Angle& angle) noexcept {
   if ((!mCurrentTextEditCmd) || (!mCurrentTextToPlace)) return false;
 
-  mCurrentTextEditCmd->rotate(angle, mCurrentTextToPlace->getPosition(), true);
-  mLastStrokeTextProperties = mCurrentTextToPlace->getTextObj();
+  mCurrentTextEditCmd->rotate(
+      angle, mCurrentTextToPlace->getData().getPosition(), true);
+  mLastRotation = mCurrentTextToPlace->getData().getRotation();
 
   return true;  // Event handled
 }
@@ -248,14 +243,15 @@ bool BoardEditorState_AddStrokeText::flipText(
     Qt::Orientation orientation) noexcept {
   if ((!mCurrentTextEditCmd) || (!mCurrentTextToPlace)) return false;
 
-  mCurrentTextEditCmd->mirrorGeometry(orientation,
-                                      mCurrentTextToPlace->getPosition(), true);
+  mCurrentTextEditCmd->mirrorGeometry(
+      orientation, mCurrentTextToPlace->getData().getPosition(), true);
   mCurrentTextEditCmd->mirrorLayer(true);
-  mLastStrokeTextProperties = mCurrentTextToPlace->getTextObj();
+  mLastRotation = mCurrentTextToPlace->getData().getRotation();
+  mLastAlignment = mCurrentTextToPlace->getData().getAlign();
 
   // Update toolbar widgets
-  mLayerComboBox->setCurrentLayer(mLastStrokeTextProperties.getLayer());
-  mMirrorCheckBox->setChecked(mLastStrokeTextProperties.getMirrored());
+  mLayerComboBox->setCurrentLayer(mCurrentTextToPlace->getData().getLayer());
+  mMirrorCheckBox->setChecked(mCurrentTextToPlace->getData().getMirrored());
 
   return true;  // Event handled
 }
@@ -312,7 +308,7 @@ bool BoardEditorState_AddStrokeText::abortCommand(bool showErrMsgBox) noexcept {
 
 void BoardEditorState_AddStrokeText::layerComboBoxLayerChanged(
     const Layer& layer) noexcept {
-  mLastStrokeTextProperties.setLayer(layer);
+  mLastLayer = &layer;
   if (mCurrentTextEditCmd) {
     mCurrentTextEditCmd->setLayer(layer, true);
     makeLayerVisible(layer.getThemeColor());
@@ -321,26 +317,25 @@ void BoardEditorState_AddStrokeText::layerComboBoxLayerChanged(
 
 void BoardEditorState_AddStrokeText::textComboBoxValueChanged(
     const QString& value) noexcept {
-  mLastStrokeTextProperties.setText(value.trimmed());
+  mLastText = value.trimmed();
   if (mCurrentTextEditCmd) {
-    mCurrentTextEditCmd->setText(mLastStrokeTextProperties.getText(), true);
+    mCurrentTextEditCmd->setText(mLastText, true);
   }
 }
 
 void BoardEditorState_AddStrokeText::heightEditValueChanged(
     const PositiveLength& value) noexcept {
-  mLastStrokeTextProperties.setHeight(value);
+  mLastHeight = value;
   if (mCurrentTextEditCmd) {
-    mCurrentTextEditCmd->setHeight(mLastStrokeTextProperties.getHeight(), true);
+    mCurrentTextEditCmd->setHeight(value, true);
   }
 }
 
 void BoardEditorState_AddStrokeText::mirrorCheckBoxToggled(
     bool checked) noexcept {
-  mLastStrokeTextProperties.setMirrored(checked);
+  mLastMirrored = checked;
   if (mCurrentTextEditCmd) {
-    mCurrentTextEditCmd->setMirrored(mLastStrokeTextProperties.getMirrored(),
-                                     true);
+    mCurrentTextEditCmd->setMirrored(mLastMirrored, true);
   }
 }
 

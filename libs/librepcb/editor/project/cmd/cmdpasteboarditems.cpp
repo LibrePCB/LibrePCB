@@ -150,10 +150,10 @@ bool CmdPasteBoardItems::performExecute() {
     QScopedPointer<BI_Device> device(new BI_Device(
         mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
         dev.position + mPosOffset, dev.rotation, dev.mirrored, false));
-    for (const StrokeText& text : dev.strokeTexts) {
+    for (const BoardStrokeTextData& text : dev.strokeTexts) {
       // Note: Keep the UUID since it acts as a reference to the original
       // library footprint text.
-      StrokeText copy(text);
+      BoardStrokeTextData copy(text);
       copy.setPosition(copy.getPosition() + mPosOffset);  // move
       BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
       device->addStrokeText(*item);
@@ -299,8 +299,8 @@ bool CmdPasteBoardItems::performExecute() {
   }
 
   // Paste stroke texts
-  for (const StrokeText& text : mData->getStrokeTexts()) {
-    StrokeText copy(Uuid::createRandom(), text);  // assign new UUID
+  for (const BoardStrokeTextData& text : mData->getStrokeTexts()) {
+    BoardStrokeTextData copy(Uuid::createRandom(), text);  // assign new UUID
     copy.setPosition(copy.getPosition() + mPosOffset);  // move
     BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
     execNewChildCmd(new CmdBoardStrokeTextAdd(*item));

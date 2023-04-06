@@ -82,13 +82,13 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       AttributeKey("A2"), AttrTypeVoltage::instance(), "4.2",
       AttrTypeVoltage::instance().getUnitFromString("millivolt"));
 
-  std::shared_ptr<StrokeText> strokeText1 = std::make_shared<StrokeText>(
+  BoardStrokeTextData strokeText1(
       Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
       PositiveLength(4), UnsignedLength(5), StrokeTextSpacing(),
       StrokeTextSpacing(Ratio(6)), Alignment(HAlign::left(), VAlign::top()),
       false, true);
 
-  std::shared_ptr<StrokeText> strokeText2 = std::make_shared<StrokeText>(
+  BoardStrokeTextData strokeText2(
       Uuid::createRandom(), Layer::topPlacement(), "text 2", Point(10, 20),
       Angle(30), PositiveLength(40), UnsignedLength(0),
       StrokeTextSpacing(Ratio(6)), StrokeTextSpacing(),
@@ -99,14 +99,14 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
           Point::fromMm(1, 2), Angle::fromDeg(45), false,
           AttributeList{attribute1, attribute2},
-          StrokeTextList{strokeText1, strokeText2});
+          QList<BoardStrokeTextData>{strokeText1, strokeText2});
 
   std::shared_ptr<BoardClipboardData::Device> device2 =
       std::make_shared<BoardClipboardData::Device>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
           Point::fromMm(10, 20), Angle::fromDeg(-45), true,
           AttributeList{attribute2, attribute1},
-          StrokeTextList{strokeText2, strokeText1});
+          QList<BoardStrokeTextData>{strokeText2, strokeText1});
 
   std::shared_ptr<BoardClipboardData::NetSegment> netSegment1 =
       std::make_shared<BoardClipboardData::NetSegment>(

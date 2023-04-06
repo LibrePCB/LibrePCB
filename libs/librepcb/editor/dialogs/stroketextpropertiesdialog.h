@@ -31,8 +31,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BI_StrokeText;
 class Layer;
 class LengthUnit;
+class StrokeFont;
 class StrokeText;
 
 namespace editor {
@@ -62,6 +64,11 @@ public:
                              const LengthUnit& lengthUnit,
                              const QString& settingsPrefix,
                              QWidget* parent = nullptr) noexcept;
+  StrokeTextPropertiesDialog(BI_StrokeText& text, UndoStack& undoStack,
+                             const QSet<const Layer*>& layers,
+                             const LengthUnit& lengthUnit,
+                             const QString& settingsPrefix,
+                             QWidget* parent = nullptr) noexcept;
   ~StrokeTextPropertiesDialog() noexcept;
 
   // Setters
@@ -72,11 +79,22 @@ public:
       delete;
 
 private:  // Methods
+  StrokeTextPropertiesDialog(StrokeText* libObj, BI_StrokeText* boardObj,
+                             UndoStack& undoStack,
+                             const QSet<const Layer*>& layers,
+                             const LengthUnit& lengthUnit,
+                             const QString& settingsPrefix,
+                             QWidget* parent = nullptr) noexcept;
+  template <typename T>
+  void load(const T& obj, const StrokeFont& font) noexcept;
   void on_buttonBox_clicked(QAbstractButton* button);
   bool applyChanges() noexcept;
+  template <typename T>
+  void applyChanges(T& cmd);
 
 private:  // Data
-  StrokeText& mText;
+  StrokeText* mLibraryObj;
+  BI_StrokeText* mBoardObj;
   UndoStack& mUndoStack;
   QScopedPointer<Ui::StrokeTextPropertiesDialog> mUi;
 };

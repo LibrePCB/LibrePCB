@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../export/graphicsexport.h"
 #include "../../library/pkg/footprintpad.h"
+#include "../../types/alignment.h"
 #include "../../types/length.h"
 #include "../../utils/transform.h"
 
@@ -39,10 +40,6 @@ namespace librepcb {
 class Board;
 class Circle;
 class Path;
-class Polygon;
-class StrokeFont;
-class StrokeText;
-class Text;
 class Via;
 
 /*******************************************************************************
@@ -68,16 +65,42 @@ class BoardPainter final : public GraphicsPagePainter {
     QList<PadHole> holes;
   };
 
+  struct PolygonData {
+    const Layer* layer;
+    Path path;
+    UnsignedLength lineWidth;
+    bool filled;
+    bool grabArea;
+  };
+
   struct HoleData {
     PositiveLength diameter;
     NonEmptyPath path;
     tl::optional<Length> stopMaskOffset;
   };
 
+  struct StrokeTextData {
+    Transform transform;
+    const Layer* layer;
+    QVector<Path> paths;
+    PositiveLength height;
+    UnsignedLength strokeWidth;
+    QString text;
+    Alignment align;
+  };
+
+  struct TextData {
+    Point position;
+    Angle rotation;
+    PositiveLength height;
+    Alignment align;
+    QString text;
+  };
+
   struct Footprint {
     Transform transform;
     QList<Pad> pads;
-    QList<Polygon> polygons;
+    QList<PolygonData> polygons;
     QList<Circle> circles;
     QList<HoleData> holes;
   };
@@ -91,11 +114,11 @@ class BoardPainter final : public GraphicsPagePainter {
     QList<QPainterPath> areas;
     QList<QPainterPath> thtPadAreas;  ///< Drawn on Theme::Color::sBoardPads
     QList<Trace> traces;
-    QList<Polygon> polygons;
+    QList<PolygonData> polygons;
     QList<Circle> circles;
     QList<HoleData> holes;
     QList<HoleData> padHoles;
-    QList<Text> texts;
+    QList<TextData> texts;
   };
 
 public:
@@ -117,14 +140,13 @@ private:  // Methods
 
 private:  // Data
   QFont mMonospaceFont;
-  const StrokeFont& mStrokeFont;
 
   QList<Footprint> mFootprints;
   QList<Via> mVias;
   QList<Trace> mTraces;
   QList<Plane> mPlanes;
-  QList<Polygon> mPolygons;
-  QList<StrokeText> mStrokeTexts;
+  QList<PolygonData> mPolygons;
+  QList<StrokeTextData> mStrokeTexts;
   QList<HoleData> mHoles;
 
   mutable QMutex mMutex;

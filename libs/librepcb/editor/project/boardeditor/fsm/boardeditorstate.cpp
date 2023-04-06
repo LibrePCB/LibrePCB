@@ -379,8 +379,8 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::StrokeTexts)) {
     for (auto it = scene->getStrokeTexts().begin();
          it != scene->getStrokeTexts().end(); it++) {
-      processItem(it.value(), it.key()->getPosition(),
-                  60 + priorityFromLayer(it.key()->getTextObj().getLayer()),
+      processItem(it.value(), it.key()->getData().getPosition(),
+                  60 + priorityFromLayer(it.key()->getData().getLayer()),
                   false);
     }
   }

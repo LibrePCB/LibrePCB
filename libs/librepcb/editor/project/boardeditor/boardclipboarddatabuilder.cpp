@@ -97,9 +97,9 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
       device->getLibPackage().getDirectory().copyTo(*pkgDir);
     }
     // Create list of stroke texts
-    StrokeTextList strokeTexts;
+    QList<BoardStrokeTextData> strokeTexts;
     foreach (const BI_StrokeText* t, device->getStrokeTexts()) {
-      strokeTexts.append(std::make_shared<StrokeText>(t->getTextObj()));
+      strokeTexts.append(t->getData());
     }
     // Add device
     data->getDevices().append(std::make_shared<BoardClipboardData::Device>(
@@ -179,9 +179,8 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
   }
 
   // Add stroke texts
-  foreach (BI_StrokeText* text, query.getStrokeTexts()) {
-    data->getStrokeTexts().append(
-        std::make_shared<StrokeText>(text->getTextObj()));
+  foreach (BI_StrokeText* t, query.getStrokeTexts()) {
+    data->getStrokeTexts().append(t->getData());
   }
 
   // Add holes

@@ -562,7 +562,7 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
     board->addPolygon(*polygon);
   }
   foreach (const SExpression* node, root.getChildren("stroke_text")) {
-    BI_StrokeText* text = new BI_StrokeText(*board, StrokeText(*node));
+    BI_StrokeText* text = new BI_StrokeText(*board, BoardStrokeTextData(*node));
     board->addStrokeText(*text);
   }
   foreach (const SExpression* node, root.getChildren("hole")) {
@@ -595,7 +595,7 @@ void ProjectLoader::loadBoardDeviceInstance(Board& b, const SExpression& node) {
                     deserialize<bool>(node.getChild("mirror/@0")), false);
   device->setAttributes(AttributeList(node));
   foreach (const SExpression* child, node.getChildren("stroke_text")) {
-    device->addStrokeText(*new BI_StrokeText(b, StrokeText(*child)));
+    device->addStrokeText(*new BI_StrokeText(b, BoardStrokeTextData(*child)));
   }
   b.addDeviceInstance(*device);
 }

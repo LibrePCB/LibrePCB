@@ -143,15 +143,15 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
 
   // stroke texts
   foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
-    if (!mBoard.getCopperLayers().contains(&text->getTextObj().getLayer())) {
+    if (!mBoard.getCopperLayers().contains(&text->getData().getLayer())) {
       continue;
     }
-    if (text->getTextObj().getStrokeWidth() < minWidth) {
+    if (text->getData().getStrokeWidth() < minWidth) {
       QVector<Path> locations;
-      Transform transform(text->getTextObj());
+      Transform transform(text->getData());
       foreach (Path path, transform.map(text->getPaths())) {
         locations += path.toOutlineStrokes(PositiveLength(
-            qMax(*text->getTextObj().getStrokeWidth(), Length(50000))));
+            qMax(*text->getData().getStrokeWidth(), Length(50000))));
       }
       emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(*text, minWidth,
                                                                 locations));
@@ -176,15 +176,15 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
-      if (!mBoard.getCopperLayers().contains(&text->getTextObj().getLayer())) {
+      if (!mBoard.getCopperLayers().contains(&text->getData().getLayer())) {
         continue;
       }
-      if (text->getTextObj().getStrokeWidth() < minWidth) {
+      if (text->getData().getStrokeWidth() < minWidth) {
         QVector<Path> locations;
-        Transform transform(text->getTextObj());
+        Transform transform(text->getData());
         foreach (Path path, transform.map(text->getPaths())) {
           locations += path.toOutlineStrokes(PositiveLength(
-              qMax(*text->getTextObj().getStrokeWidth(), Length(50000))));
+              qMax(*text->getData().getStrokeWidth(), Length(50000))));
         }
         emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
             *text, minWidth, locations));
@@ -320,13 +320,12 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
   // Board stroke texts.
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    if (mBoard.getCopperLayers().contains(
-            &strokeText->getTextObj().getLayer())) {
+    if (mBoard.getCopperLayers().contains(&strokeText->getData().getLayer())) {
       auto it = items.insert(items.end(),
                              Item{strokeText,
                                   nullptr,
                                   nullptr,
-                                  &strokeText->getTextObj().getLayer(),
+                                  &strokeText->getData().getLayer(),
                                   nullptr,
                                   *clearance,
                                   {},
@@ -407,12 +406,12 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
     // Stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
       if (mBoard.getCopperLayers().contains(
-              &strokeText->getTextObj().getLayer())) {
+              &strokeText->getData().getLayer())) {
         auto it = items.insert(items.end(),
                                Item{strokeText,
                                     nullptr,
                                     nullptr,
-                                    &strokeText->getTextObj().getLayer(),
+                                    &strokeText->getData().getLayer(),
                                     nullptr,
                                     *clearance,
                                     {},
@@ -531,13 +530,12 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
   // Check board stroke texts.
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    if (mBoard.getCopperLayers().contains(
-            &strokeText->getTextObj().getLayer())) {
+    if (mBoard.getCopperLayers().contains(&strokeText->getData().getLayer())) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
       gen.addStrokeText(*strokeText);
       if (intersects(gen.getPaths())) {
         emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
-            nullptr, strokeText->getTextObj(), clearance, locations));
+            *strokeText, clearance, locations));
       }
     }
   }
@@ -587,12 +585,12 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
     // Check stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
       if (mBoard.getCopperLayers().contains(
-              &strokeText->getTextObj().getLayer())) {
+              &strokeText->getData().getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addStrokeText(*strokeText);
         if (intersects(gen.getPaths())) {
           emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
-              device, strokeText->getTextObj(), clearance, locations));
+              *strokeText, clearance, locations));
         }
       }
     }

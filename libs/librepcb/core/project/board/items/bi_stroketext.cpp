@@ -24,7 +24,7 @@
 
 #include "../../../attribute/attributesubstitutor.h"
 #include "../../../font/strokefontpool.h"
-#include "../../../geometry/stroketext.h"
+#include "../../../font/stroketextpathbuilder.h"
 #include "../../project.h"
 #include "../board.h"
 #include "bi_device.h"
@@ -40,16 +40,13 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_StrokeText::BI_StrokeText(Board& board, const StrokeText& text)
+BI_StrokeText::BI_StrokeText(Board& board, const BoardStrokeTextData& data)
   : BI_Base(board),
     onEdited(*this),
-    mDevice(nullptr),
-    mTextObj(new StrokeText(text)),
+    mData(data),
     mFont(mBoard.getProject().getStrokeFonts().getFont(
         mBoard.getDefaultFontName())),
-    mOnStrokeTextEditedSlot(*this, &BI_StrokeText::strokeTextEdited) {
-  mTextObj->onEdited.attach(mOnStrokeTextEditedSlot);
-
+    mDevice(nullptr) {
   // Connect to the "attributes changed" signal of the board.
   connect(&mBoard, &Board::attributesChanged, this, &BI_StrokeText::updateText);
 
@@ -60,23 +57,110 @@ BI_StrokeText::~BI_StrokeText() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
+ *  Setters
  ******************************************************************************/
 
-const Uuid& BI_StrokeText::getUuid() const noexcept {
-  return mTextObj->getUuid();
+bool BI_StrokeText::setLayer(const Layer& layer) noexcept {
+  if (mData.setLayer(layer)) {
+    onEdited.notify(Event::LayerChanged);
+    return true;
+  } else {
+    return false;
+  }
 }
 
-const Point& BI_StrokeText::getPosition() const noexcept {
-  return mTextObj->getPosition();
+bool BI_StrokeText::setText(const QString& text) noexcept {
+  if (mData.setText(text)) {
+    updateText();
+    return true;
+  } else {
+    return false;
+  }
 }
 
-const Angle& BI_StrokeText::getRotation() const noexcept {
-  return mTextObj->getRotation();
+bool BI_StrokeText::setPosition(const Point& pos) noexcept {
+  if (mData.setPosition(pos)) {
+    onEdited.notify(Event::PositionChanged);
+    return true;
+  } else {
+    return false;
+  }
 }
 
-bool BI_StrokeText::getMirrored() const noexcept {
-  return mTextObj->getMirrored();
+bool BI_StrokeText::setRotation(const Angle& rotation) noexcept {
+  if (mData.setRotation(rotation)) {
+    onEdited.notify(Event::RotationChanged);
+    updatePaths();  // Auto-rotation might have changed.
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_StrokeText::setHeight(const PositiveLength& height) noexcept {
+  if (mData.setHeight(height)) {
+    updatePaths();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_StrokeText::setStrokeWidth(const UnsignedLength& strokeWidth) noexcept {
+  if (mData.setStrokeWidth(strokeWidth)) {
+    onEdited.notify(Event::StrokeWidthChanged);
+    updatePaths();  // Spacing might need to be re-calculated.
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_StrokeText::setLetterSpacing(
+    const StrokeTextSpacing& spacing) noexcept {
+  if (mData.setLetterSpacing(spacing)) {
+    updatePaths();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_StrokeText::setLineSpacing(const StrokeTextSpacing& spacing) noexcept {
+  if (mData.setLineSpacing(spacing)) {
+    updatePaths();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_StrokeText::setAlign(const Alignment& align) noexcept {
+  if (mData.setAlign(align)) {
+    updatePaths();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_StrokeText::setMirrored(bool mirrored) noexcept {
+  if (mData.setMirrored(mirrored)) {
+    onEdited.notify(Event::MirroredChanged);
+    updatePaths();  // Auto-rotation might have changed.
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_StrokeText::setAutoRotate(bool autoRotate) noexcept {
+  if (mData.setAutoRotate(autoRotate)) {
+    updatePaths();
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /*******************************************************************************
@@ -130,65 +214,21 @@ void BI_StrokeText::removeFromBoard() {
  *  Private Methods
  ******************************************************************************/
 
-void BI_StrokeText::strokeTextEdited(const StrokeText& text,
-                                     StrokeText::Event event) noexcept {
-  Q_UNUSED(text);
-  switch (event) {
-    case StrokeText::Event::LayerChanged: {
-      onEdited.notify(Event::LayerNameChanged);
-      break;
-    }
-    case StrokeText::Event::TextChanged: {
-      updateText();
-      break;
-    }
-    case StrokeText::Event::HeightChanged:
-    case StrokeText::Event::LetterSpacingChanged:
-    case StrokeText::Event::LineSpacingChanged:
-    case StrokeText::Event::AlignChanged:
-    case StrokeText::Event::AutoRotateChanged: {
-      updatePaths();
-      break;
-    }
-    case StrokeText::Event::PositionChanged: {
-      onEdited.notify(Event::PositionChanged);
-      break;
-    }
-    case StrokeText::Event::RotationChanged: {
-      onEdited.notify(Event::RotationChanged);
-      updatePaths();  // Auto-rotation might have changed.
-      break;
-    }
-    case StrokeText::Event::StrokeWidthChanged: {
-      onEdited.notify(Event::StrokeWidthChanged);
-      updatePaths();  // Spacing might need to be re-calculated.
-      break;
-    }
-    case StrokeText::Event::MirroredChanged:
-      onEdited.notify(Event::MirroredChanged);
-      updatePaths();  // Auto-rotation might have changed.
-      break;
-    default: {
-      qWarning() << "Unhandled switch-case in "
-                    "BI_StrokeText::strokeTextEdited():"
-                 << static_cast<int>(event);
-      break;
-    }
-  }
-}
-
 void BI_StrokeText::updateText() noexcept {
-  const QString text = AttributeSubstitutor::substitute(mTextObj->getText(),
-                                                        getAttributeProvider());
-  if (text != mText) {
-    mText = text;
-    onEdited.notify(Event::TextChanged);
+  const QString text =
+      AttributeSubstitutor::substitute(mData.getText(), getAttributeProvider());
+  if (text != mSubstitutedText) {
+    mSubstitutedText = text;
     updatePaths();
   }
 }
 
 void BI_StrokeText::updatePaths() noexcept {
-  const QVector<Path> paths = mTextObj->generatePaths(getFont(), mText);
+  const QVector<Path> paths = StrokeTextPathBuilder::build(
+      mFont, mData.getLetterSpacing(), mData.getLineSpacing(),
+      mData.getHeight(), mData.getStrokeWidth(), mData.getAlign(),
+      mData.getRotation(), mData.getAutoRotate(), mData.getMirrored(),
+      mSubstitutedText);
   if (paths != mPaths) {
     mPaths = paths;
     onEdited.notify(Event::PathsChanged);

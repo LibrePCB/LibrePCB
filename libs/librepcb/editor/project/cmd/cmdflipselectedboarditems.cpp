@@ -23,7 +23,6 @@
 #include "cmdflipselectedboarditems.h"
 
 #include "../../cmd/cmdpolygonedit.h"
-#include "../../cmd/cmdstroketextedit.h"
 #include "../../project/cmd/cmdboardnetlineedit.h"
 #include "../../project/cmd/cmdboardnetpointedit.h"
 #include "../../project/cmd/cmdboardnetsegmentadd.h"
@@ -34,6 +33,7 @@
 #include "../boardeditor/boardgraphicsscene.h"
 #include "../boardeditor/boardselectionquery.h"
 #include "cmdboardholeedit.h"
+#include "cmdboardstroketextedit.h"
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
@@ -132,7 +132,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     // do not count texts of devices if the device is selected too
     if ((!text->getDevice()) ||
         (!query.getDeviceInstances().contains(text->getDevice()))) {
-      center += text->getPosition();
+      center += text->getData().getPosition();
       ++count;
     }
   }
@@ -225,8 +225,8 @@ bool CmdFlipSelectedBoardItems::performExecute() {
 
   // flip all stroke texts
   foreach (BI_StrokeText* text, query.getStrokeTexts()) {
-    QScopedPointer<CmdStrokeTextEdit> cmd(
-        new CmdStrokeTextEdit(text->getTextObj()));
+    QScopedPointer<CmdBoardStrokeTextEdit> cmd(
+        new CmdBoardStrokeTextEdit(*text));
     cmd->mirrorGeometry(mOrientation, center, false);
     cmd->mirrorLayer(false);
     execNewChildCmd(cmd.take());  // can throw

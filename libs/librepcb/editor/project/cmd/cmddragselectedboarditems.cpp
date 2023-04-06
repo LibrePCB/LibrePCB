@@ -23,7 +23,6 @@
 #include "cmddragselectedboarditems.h"
 
 #include "../../cmd/cmdpolygonedit.h"
-#include "../../cmd/cmdstroketextedit.h"
 #include "../../project/cmd/cmdboardnetpointedit.h"
 #include "../../project/cmd/cmdboardplaneedit.h"
 #include "../../project/cmd/cmdboardviaedit.h"
@@ -31,6 +30,7 @@
 #include "../boardeditor/boardgraphicsscene.h"
 #include "../boardeditor/boardselectionquery.h"
 #include "cmdboardholeedit.h"
+#include "cmdboardstroketextedit.h"
 #include "cmddevicestroketextsreset.h"
 
 #include <librepcb/core/project/board/board.h>
@@ -124,10 +124,10 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     // do not count texts of devices if the device is selected too
     if ((!text->getDevice()) ||
         (!query.getDeviceInstances().contains(text->getDevice()))) {
-      mCenterPos += text->getPosition();
+      mCenterPos += text->getData().getPosition();
       ++mItemCount;
     }
-    CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getTextObj());
+    CmdBoardStrokeTextEdit* cmd = new CmdBoardStrokeTextEdit(*text);
     mStrokeTextEditCmds.append(cmd);
   }
   foreach (BI_Hole* hole, query.getHoles()) {
@@ -167,7 +167,7 @@ void CmdDragSelectedBoardItems::snapToGrid() noexcept {
   foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
     cmd->snapToGrid(grid, true);
   }
-  foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
     cmd->snapToGrid(grid, true);
   }
   foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) {
@@ -208,7 +208,7 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
     foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
-    foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+    foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) {
@@ -245,7 +245,7 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
   foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
     cmd->rotate(angle, center, true);
   }
-  foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
     cmd->rotate(angle, center, true);
   }
   foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) {
@@ -308,7 +308,7 @@ bool CmdDragSelectedBoardItems::performExecute() {
   foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
     appendChild(cmd);  // can throw
   }
-  foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
     appendChild(cmd);  // can throw
   }
   foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) {

@@ -45,10 +45,10 @@ class BI_NetLine;
 class BI_NetSegment;
 class BI_Plane;
 class BI_Polygon;
+class BI_StrokeText;
 class BI_Via;
 class Point;
 class Polygon;
-class StrokeText;
 
 namespace editor {
 
@@ -175,7 +175,7 @@ private:  // Methods
   void openViaPropertiesDialog(BI_Via& via) noexcept;
   void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
   void openPolygonPropertiesDialog(Polygon& polygon) noexcept;
-  void openStrokeTextPropertiesDialog(StrokeText& text) noexcept;
+  void openStrokeTextPropertiesDialog(BI_StrokeText& text) noexcept;
   void openHolePropertiesDialog(BI_Hole& hole) noexcept;
   QList<DeviceMenuItem> getDeviceMenuItems(
       const ComponentInstance& cmpInst) const noexcept;

@@ -390,27 +390,27 @@ void Board::addStrokeText(BI_StrokeText& text) {
   if ((mStrokeTexts.values().contains(&text)) || (&text.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (mStrokeTexts.contains(text.getUuid())) {
+  if (mStrokeTexts.contains(text.getData().getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a stroke text with the UUID \"%1\"!")
-            .arg(text.getUuid().toStr()));
+            .arg(text.getData().getUuid().toStr()));
   }
   if (mIsAddedToProject) {
     text.addToBoard();  // can throw
   }
-  mStrokeTexts.insert(text.getUuid(), &text);
+  mStrokeTexts.insert(text.getData().getUuid(), &text);
   emit strokeTextAdded(text);
 }
 
 void Board::removeStrokeText(BI_StrokeText& text) {
-  if (mStrokeTexts.value(text.getUuid()) != &text) {
+  if (mStrokeTexts.value(text.getData().getUuid()) != &text) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
     text.removeFromBoard();  // can throw
   }
-  mStrokeTexts.remove(text.getUuid());
+  mStrokeTexts.remove(text.getData().getUuid());
   emit strokeTextRemoved(text);
 }
 
@@ -524,7 +524,7 @@ void Board::copyFrom(const Board& other) {
         device->getRotation(), device->getMirrored(), false);
     copy->setAttributes(device->getAttributes());
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
-      copy->addStrokeText(*new BI_StrokeText(*this, text->getTextObj()));
+      copy->addStrokeText(*new BI_StrokeText(*this, text->getData()));
     }
     addDeviceInstance(*copy);
     devMap.insert(device, copy);
@@ -605,7 +605,7 @@ void Board::copyFrom(const Board& other) {
   // Copy stroke texts.
   foreach (const BI_StrokeText* text, other.getStrokeTexts()) {
     BI_StrokeText* copy = new BI_StrokeText(
-        *this, StrokeText(Uuid::createRandom(), text->getTextObj()));
+        *this, BoardStrokeTextData(Uuid::createRandom(), text->getData()));
     addStrokeText(*copy);
   }
 
@@ -721,7 +721,7 @@ void Board::save() {
     root.ensureLineBreak();
     for (const BI_StrokeText* obj : mStrokeTexts) {
       root.ensureLineBreak();
-      obj->getTextObj().serialize(root.appendList("stroke_text"));
+      obj->getData().serialize(root.appendList("stroke_text"));
     }
     root.ensureLineBreak();
     for (const BI_Hole* obj : mHoles) {

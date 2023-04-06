@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDDEVICEINSTANCEEDITALL_H
-#define LIBREPCB_EDITOR_CMDDEVICEINSTANCEEDITALL_H
+#ifndef LIBREPCB_CORE_STROKETEXTSPACING_H
+#define LIBREPCB_CORE_STROKETEXTSPACING_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommandgroup.h"
+#include "ratio.h"
+
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 
@@ -32,46 +34,40 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Angle;
-class BI_Device;
-class Point;
-
-namespace editor {
-
-class CmdBoardStrokeTextEdit;
-class CmdDeviceInstanceEdit;
-
 /*******************************************************************************
- *  Class CmdDeviceInstanceEditAll
+ *  Class StrokeTextSpacing
  ******************************************************************************/
 
 /**
- * @brief The CmdDeviceInstanceEditAll class
+ * @brief Represents the letter- or line spacing configuration of a stroke text
  */
-class CmdDeviceInstanceEditAll final : public UndoCommandGroup {
+class StrokeTextSpacing final {
+  Q_DECLARE_TR_FUNCTIONS(StrokeTextSpacing)
+
 public:
   // Constructors / Destructor
-  explicit CmdDeviceInstanceEditAll(BI_Device& dev) noexcept;
-  ~CmdDeviceInstanceEditAll() noexcept;
+  StrokeTextSpacing(const tl::optional<Ratio>& ratio = tl::nullopt) noexcept;
+  StrokeTextSpacing(const StrokeTextSpacing& other) noexcept;
+  ~StrokeTextSpacing() noexcept;
 
-  // General Methods
-  void setPosition(const Point& pos, bool immediate) noexcept;
-  void translate(const Point& deltaPos, bool immediate) noexcept;
-  void setRotation(const Angle& angle, bool immediate) noexcept;
-  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-  void setMirrored(bool mirrored, bool immediate);
-  void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
+  // Getters
+  const tl::optional<Ratio>& getRatio() const noexcept { return mRatio; }
 
-private:
-  CmdDeviceInstanceEdit* mDevEditCmd;
-  QVector<CmdBoardStrokeTextEdit*> mTextEditCmds;
+  // Operator Overloadings
+  bool operator==(const StrokeTextSpacing& rhs) const noexcept;
+  bool operator!=(const StrokeTextSpacing& rhs) const noexcept {
+    return !(*this == rhs);
+  }
+  StrokeTextSpacing& operator=(const StrokeTextSpacing& rhs) noexcept;
+
+private:  // Data
+  tl::optional<Ratio> mRatio;  ///< `nullopt` means automatic (from font)
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
 
 #endif

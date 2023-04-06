@@ -626,10 +626,10 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   }
   foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
     Q_ASSERT(text);
-    if (layer == text->getTextObj().getLayer()) {
+    if (layer == text->getData().getLayer()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(text->getTextObj().getStrokeWidth(), layer);
-      const Transform transform(text->getTextObj());
+          calcWidthOfLayer(text->getData().getStrokeWidth(), layer);
+      const Transform transform(text->getData());
       foreach (Path path, transform.map(text->getPaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             QString());
@@ -747,10 +747,10 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
     textFunction = GerberAttribute::ApertureFunction::NonConductor;
   }
   foreach (const BI_StrokeText* text, device.getStrokeTexts()) {
-    if (layer == text->getTextObj().getLayer()) {
+    if (layer == text->getData().getLayer()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(text->getTextObj().getStrokeWidth(), layer);
-      Transform transform(text->getTextObj());
+          calcWidthOfLayer(text->getData().getStrokeWidth(), layer);
+      Transform transform(text->getData());
       foreach (Path path, transform.map(text->getPaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             component);

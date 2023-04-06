@@ -20,9 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "stroketext.h"
+#include "boardstroketextdata.h"
 
-#include "../font/stroketextpathbuilder.h"
+#include "../../serialization/sexpression.h"
 
 #include <QtCore>
 
@@ -35,9 +35,9 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-StrokeText::StrokeText(const StrokeText& other) noexcept
-  : onEdited(*this),
-    mUuid(other.mUuid),
+BoardStrokeTextData::BoardStrokeTextData(
+    const BoardStrokeTextData& other) noexcept
+  : mUuid(other.mUuid),
     mLayer(other.mLayer),
     mText(other.mText),
     mPosition(other.mPosition),
@@ -51,21 +51,29 @@ StrokeText::StrokeText(const StrokeText& other) noexcept
     mAutoRotate(other.mAutoRotate) {
 }
 
-StrokeText::StrokeText(const Uuid& uuid, const StrokeText& other) noexcept
-  : StrokeText(other) {
-  mUuid = uuid;
+BoardStrokeTextData::BoardStrokeTextData(
+    const Uuid& uuid, const BoardStrokeTextData& other) noexcept
+  : mUuid(uuid),
+    mLayer(other.mLayer),
+    mText(other.mText),
+    mPosition(other.mPosition),
+    mRotation(other.mRotation),
+    mHeight(other.mHeight),
+    mStrokeWidth(other.mStrokeWidth),
+    mLetterSpacing(other.mLetterSpacing),
+    mLineSpacing(other.mLineSpacing),
+    mAlign(other.mAlign),
+    mMirrored(other.mMirrored),
+    mAutoRotate(other.mAutoRotate) {
 }
 
-StrokeText::StrokeText(const Uuid& uuid, const Layer& layer,
-                       const QString& text, const Point& pos,
-                       const Angle& rotation, const PositiveLength& height,
-                       const UnsignedLength& strokeWidth,
-                       const StrokeTextSpacing& letterSpacing,
-                       const StrokeTextSpacing& lineSpacing,
-                       const Alignment& align, bool mirrored,
-                       bool autoRotate) noexcept
-  : onEdited(*this),
-    mUuid(uuid),
+BoardStrokeTextData::BoardStrokeTextData(
+    const Uuid& uuid, const Layer& layer, const QString& text, const Point& pos,
+    const Angle& rotation, const PositiveLength& height,
+    const UnsignedLength& strokeWidth, const StrokeTextSpacing& letterSpacing,
+    const StrokeTextSpacing& lineSpacing, const Alignment& align, bool mirrored,
+    bool autoRotate)
+  : mUuid(uuid),
     mLayer(&layer),
     mText(text),
     mPosition(pos),
@@ -79,9 +87,8 @@ StrokeText::StrokeText(const Uuid& uuid, const Layer& layer,
     mAutoRotate(autoRotate) {
 }
 
-StrokeText::StrokeText(const SExpression& node)
-  : onEdited(*this),
-    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+BoardStrokeTextData::BoardStrokeTextData(const SExpression& node)
+  : mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mLayer(deserialize<const Layer*>(node.getChild("layer/@0"))),
     mText(node.getChild("value/@0").getValue()),
     mPosition(node.getChild("position")),
@@ -97,135 +104,121 @@ StrokeText::StrokeText(const SExpression& node)
     mAutoRotate(deserialize<bool>(node.getChild("auto_rotate/@0"))) {
 }
 
-StrokeText::~StrokeText() noexcept {
-}
-
-/*******************************************************************************
- *  Getters
- ******************************************************************************/
-
-QVector<Path> StrokeText::generatePaths(const StrokeFont& font) const noexcept {
-  return generatePaths(font, mText);
-}
-
-QVector<Path> StrokeText::generatePaths(const StrokeFont& font,
-                                        const QString& text) const noexcept {
-  return StrokeTextPathBuilder::build(font, mLetterSpacing, mLineSpacing,
-                                      mHeight, mStrokeWidth, mAlign, mRotation,
-                                      mAutoRotate, mMirrored, text);
+BoardStrokeTextData::~BoardStrokeTextData() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-bool StrokeText::setLayer(const Layer& layer) noexcept {
+bool BoardStrokeTextData::setUuid(const Uuid& uuid) noexcept {
+  if (uuid == mUuid) {
+    return false;
+  }
+
+  mUuid = uuid;
+  return true;
+}
+
+bool BoardStrokeTextData::setLayer(const Layer& layer) noexcept {
   if (&layer == mLayer) {
     return false;
   }
 
   mLayer = &layer;
-  onEdited.notify(Event::LayerChanged);
   return true;
 }
 
-bool StrokeText::setText(const QString& text) noexcept {
+bool BoardStrokeTextData::setText(const QString& text) noexcept {
   if (text == mText) {
     return false;
   }
 
   mText = text;
-  onEdited.notify(Event::TextChanged);
   return true;
 }
 
-bool StrokeText::setPosition(const Point& pos) noexcept {
+bool BoardStrokeTextData::setPosition(const Point& pos) noexcept {
   if (pos == mPosition) {
     return false;
   }
 
   mPosition = pos;
-  onEdited.notify(Event::PositionChanged);
   return true;
 }
 
-bool StrokeText::setRotation(const Angle& rotation) noexcept {
+bool BoardStrokeTextData::setRotation(const Angle& rotation) noexcept {
   if (rotation == mRotation) {
     return false;
   }
 
   mRotation = rotation;
-  onEdited.notify(Event::RotationChanged);
   return true;
 }
 
-bool StrokeText::setHeight(const PositiveLength& height) noexcept {
+bool BoardStrokeTextData::setHeight(const PositiveLength& height) noexcept {
   if (height == mHeight) {
     return false;
   }
 
   mHeight = height;
-  onEdited.notify(Event::HeightChanged);
   return true;
 }
 
-bool StrokeText::setStrokeWidth(const UnsignedLength& strokeWidth) noexcept {
+bool BoardStrokeTextData::setStrokeWidth(
+    const UnsignedLength& strokeWidth) noexcept {
   if (strokeWidth == mStrokeWidth) {
     return false;
   }
 
   mStrokeWidth = strokeWidth;
-  onEdited.notify(Event::StrokeWidthChanged);
   return true;
 }
 
-bool StrokeText::setLetterSpacing(const StrokeTextSpacing& spacing) noexcept {
+bool BoardStrokeTextData::setLetterSpacing(
+    const StrokeTextSpacing& spacing) noexcept {
   if (spacing == mLetterSpacing) {
     return false;
   }
 
   mLetterSpacing = spacing;
-  onEdited.notify(Event::LetterSpacingChanged);
   return true;
 }
 
-bool StrokeText::setLineSpacing(const StrokeTextSpacing& spacing) noexcept {
+bool BoardStrokeTextData::setLineSpacing(
+    const StrokeTextSpacing& spacing) noexcept {
   if (spacing == mLineSpacing) {
     return false;
   }
 
   mLineSpacing = spacing;
-  onEdited.notify(Event::LineSpacingChanged);
   return true;
 }
 
-bool StrokeText::setAlign(const Alignment& align) noexcept {
+bool BoardStrokeTextData::setAlign(const Alignment& align) noexcept {
   if (align == mAlign) {
     return false;
   }
 
   mAlign = align;
-  onEdited.notify(Event::AlignChanged);
   return true;
 }
 
-bool StrokeText::setMirrored(bool mirrored) noexcept {
+bool BoardStrokeTextData::setMirrored(bool mirrored) noexcept {
   if (mirrored == mMirrored) {
     return false;
   }
 
   mMirrored = mirrored;
-  onEdited.notify(Event::MirroredChanged);
   return true;
 }
 
-bool StrokeText::setAutoRotate(bool autoRotate) noexcept {
+bool BoardStrokeTextData::setAutoRotate(bool autoRotate) noexcept {
   if (autoRotate == mAutoRotate) {
     return false;
   }
 
   mAutoRotate = autoRotate;
-  onEdited.notify(Event::AutoRotateChanged);
   return true;
 }
 
@@ -233,7 +226,8 @@ bool StrokeText::setAutoRotate(bool autoRotate) noexcept {
  *  General Methods
  ******************************************************************************/
 
-void StrokeText::serialize(SExpression& root) const {
+void BoardStrokeTextData::serialize(SExpression& root) const {
+  // Note: Keep consistent with StrokeText::serialize()!
   root.appendChild(mUuid);
   root.appendChild("layer", *mLayer);
   root.ensureLineBreak();
@@ -256,7 +250,8 @@ void StrokeText::serialize(SExpression& root) const {
  *  Operator Overloadings
  ******************************************************************************/
 
-bool StrokeText::operator==(const StrokeText& rhs) const noexcept {
+bool BoardStrokeTextData::operator==(const BoardStrokeTextData& rhs) const
+    noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mLayer != rhs.mLayer) return false;
   if (mText != rhs.mText) return false;
@@ -270,25 +265,6 @@ bool StrokeText::operator==(const StrokeText& rhs) const noexcept {
   if (mMirrored != rhs.mMirrored) return false;
   if (mAutoRotate != rhs.mAutoRotate) return false;
   return true;
-}
-
-StrokeText& StrokeText::operator=(const StrokeText& rhs) noexcept {
-  if (mUuid != rhs.mUuid) {
-    mUuid = rhs.mUuid;
-    onEdited.notify(Event::UuidChanged);
-  }
-  setLayer(*rhs.mLayer);
-  setText(rhs.mText);
-  setPosition(rhs.mPosition);
-  setRotation(rhs.mRotation);
-  setHeight(rhs.mHeight);
-  setStrokeWidth(rhs.mStrokeWidth);
-  setLetterSpacing(rhs.mLetterSpacing);
-  setLineSpacing(rhs.mLineSpacing);
-  setAlign(rhs.mAlign);
-  setMirrored(rhs.mMirrored);
-  setAutoRotate(rhs.mAutoRotate);
-  return *this;
 }
 
 /*******************************************************************************

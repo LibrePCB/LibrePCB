@@ -282,7 +282,14 @@ bool BoardEditorState_Select::processPaste() noexcept {
           data.reset(new BoardClipboardData(footprintData->getFootprintUuid(),
                                             footprintData->getCursorPos()));
           data->getPolygons().append(footprintData->getPolygons());
-          data->getStrokeTexts().append(footprintData->getStrokeTexts());
+          for (const auto& text : footprintData->getStrokeTexts()) {
+            data->getStrokeTexts().append(BoardStrokeTextData(
+                text.getUuid(), text.getLayer(), text.getText(),
+                text.getPosition(), text.getRotation(), text.getHeight(),
+                text.getStrokeWidth(), text.getLetterSpacing(),
+                text.getLineSpacing(), text.getAlign(), text.getMirrored(),
+                text.getAutoRotate()));
+          }
           for (const auto& hole : footprintData->getHoles()) {
             data->getHoles().append(
                 BoardHoleData(hole.getUuid(), hole.getDiameter(),
@@ -406,7 +413,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
     return true;
   }
   foreach (auto ptr, query.getStrokeTexts()) {
-    openStrokeTextPropertiesDialog(ptr->getTextObj());
+    openStrokeTextPropertiesDialog(*ptr);
     return true;
   }
   foreach (auto ptr, query.getHoles()) {
@@ -931,7 +938,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
     } else if (auto text =
                    std::dynamic_pointer_cast<BGI_StrokeText>(selectedItem)) {
-      const Point pos = text->getStrokeText().getPosition();
+      const Point pos = text->getStrokeText().getData().getPosition();
       mb.addAction(
           cmd.properties.createAction(
               &menu, this,
@@ -1421,7 +1428,7 @@ bool BoardEditorState_Select::openPropertiesDialog(
     openPolygonPropertiesDialog(polygon->getPolygon());
     return true;
   } else if (auto text = std::dynamic_pointer_cast<BGI_StrokeText>(item)) {
-    openStrokeTextPropertiesDialog(text->getStrokeText().getTextObj());
+    openStrokeTextPropertiesDialog(text->getStrokeText());
     return true;
   } else if (auto hole = std::dynamic_pointer_cast<BGI_Hole>(item)) {
     openHolePropertiesDialog(hole->getHole());
@@ -1472,7 +1479,7 @@ void BoardEditorState_Select::openPolygonPropertiesDialog(
 }
 
 void BoardEditorState_Select::openStrokeTextPropertiesDialog(
-    StrokeText& text) noexcept {
+    BI_StrokeText& text) noexcept {
   StrokeTextPropertiesDialog dialog(
       text, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
       "board_editor/stroke_text_properties_dialog", parentWidget());

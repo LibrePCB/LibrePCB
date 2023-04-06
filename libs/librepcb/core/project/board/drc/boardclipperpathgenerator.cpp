@@ -80,7 +80,7 @@ void BoardClipperPathGenerator::addCopper(
 
   // Stroke texts.
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    if ((strokeText->getTextObj().getLayer() == layer) &&
+    if ((strokeText->getData().getLayer() == layer) &&
         (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
       addStrokeText(*strokeText);
     }
@@ -122,7 +122,7 @@ void BoardClipperPathGenerator::addCopper(
     // Stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
-      if ((strokeText->getTextObj().getLayer() == layer) &&
+      if ((strokeText->getData().getLayer() == layer) &&
           (netsignals.isEmpty() || netsignals.contains(nullptr))) {
         addStrokeText(*strokeText);
       }
@@ -233,9 +233,9 @@ void BoardClipperPathGenerator::addCircle(const Circle& circle,
 
 void BoardClipperPathGenerator::addStrokeText(const BI_StrokeText& strokeText,
                                               const Length& offset) {
-  const PositiveLength width(qMax(
-      *strokeText.getTextObj().getStrokeWidth() + (offset * 2), Length(1)));
-  const Transform transform(strokeText.getTextObj());
+  const PositiveLength width(
+      qMax(*strokeText.getData().getStrokeWidth() + (offset * 2), Length(1)));
+  const Transform transform(strokeText.getData());
   foreach (const Path path, transform.map(strokeText.getPaths())) {
     QVector<Path> paths = path.toOutlineStrokes(width);
     foreach (const Path& p, paths) {

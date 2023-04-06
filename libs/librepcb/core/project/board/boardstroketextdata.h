@@ -17,19 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_STROKETEXT_H
-#define LIBREPCB_CORE_STROKETEXT_H
+#ifndef LIBREPCB_CORE_BOARDSTROKETEXTDATA_H
+#define LIBREPCB_CORE_BOARDSTROKETEXTDATA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../geometry/path.h"
-#include "../serialization/serializableobjectlist.h"
-#include "../types/alignment.h"
-#include "../types/angle.h"
-#include "../types/length.h"
-#include "../types/point.h"
-#include "../types/stroketextspacing.h"
+#include "../../types/alignment.h"
+#include "../../types/angle.h"
+#include "../../types/length.h"
+#include "../../types/point.h"
+#include "../../types/stroketextspacing.h"
+#include "../../types/uuid.h"
 
 #include <QtCore>
 
@@ -39,49 +38,30 @@
 namespace librepcb {
 
 class Layer;
-class StrokeFont;
 
 /*******************************************************************************
- *  Class StrokeText
+ *  Class BoardStrokeTextData
  ******************************************************************************/
 
 /**
- * @brief The StrokeText class
+ * @brief The BoardStrokeTextData class
  */
-class StrokeText final {
-  Q_DECLARE_TR_FUNCTIONS(StrokeText)
-
+class BoardStrokeTextData final {
 public:
-  // Signals
-  enum class Event {
-    UuidChanged,
-    LayerChanged,
-    TextChanged,
-    PositionChanged,
-    RotationChanged,
-    HeightChanged,
-    StrokeWidthChanged,
-    LetterSpacingChanged,
-    LineSpacingChanged,
-    AlignChanged,
-    MirroredChanged,
-    AutoRotateChanged,
-  };
-  Signal<StrokeText, Event> onEdited;
-  typedef Slot<StrokeText, Event> OnEditedSlot;
-
   // Constructors / Destructor
-  StrokeText() = delete;
-  StrokeText(const StrokeText& other) noexcept;
-  StrokeText(const Uuid& uuid, const StrokeText& other) noexcept;
-  StrokeText(const Uuid& uuid, const Layer& layer, const QString& text,
-             const Point& pos, const Angle& rotation,
-             const PositiveLength& height, const UnsignedLength& strokeWidth,
-             const StrokeTextSpacing& letterSpacing,
-             const StrokeTextSpacing& lineSpacing, const Alignment& align,
-             bool mirrored, bool autoRotate) noexcept;
-  explicit StrokeText(const SExpression& node);
-  ~StrokeText() noexcept;
+  BoardStrokeTextData() = delete;
+  BoardStrokeTextData(const BoardStrokeTextData& other) noexcept;
+  BoardStrokeTextData(const Uuid& uuid,
+                      const BoardStrokeTextData& other) noexcept;
+  BoardStrokeTextData(const Uuid& uuid, const Layer& layer, const QString& text,
+                      const Point& pos, const Angle& rotation,
+                      const PositiveLength& height,
+                      const UnsignedLength& strokeWidth,
+                      const StrokeTextSpacing& letterSpacing,
+                      const StrokeTextSpacing& lineSpacing,
+                      const Alignment& align, bool mirrored, bool autoRotate);
+  explicit BoardStrokeTextData(const SExpression& node);
+  ~BoardStrokeTextData() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
@@ -100,11 +80,9 @@ public:
   bool getMirrored() const noexcept { return mMirrored; }
   bool getAutoRotate() const noexcept { return mAutoRotate; }
   const QString& getText() const noexcept { return mText; }
-  QVector<Path> generatePaths(const StrokeFont& font) const noexcept;
-  QVector<Path> generatePaths(const StrokeFont& font, const QString& text) const
-      noexcept;
 
   // Setters
+  bool setUuid(const Uuid& uuid) noexcept;
   bool setLayer(const Layer& layer) noexcept;
   bool setText(const QString& text) noexcept;
   bool setPosition(const Point& pos) noexcept;
@@ -127,11 +105,11 @@ public:
   void serialize(SExpression& root) const;
 
   // Operator Overloadings
-  bool operator==(const StrokeText& rhs) const noexcept;
-  bool operator!=(const StrokeText& rhs) const noexcept {
+  bool operator==(const BoardStrokeTextData& rhs) const noexcept;
+  bool operator!=(const BoardStrokeTextData& rhs) const noexcept {
     return !(*this == rhs);
   }
-  StrokeText& operator=(const StrokeText& rhs) noexcept;
+  BoardStrokeTextData& operator=(const BoardStrokeTextData& rhs) = default;
 
 private:  // Data
   Uuid mUuid;
@@ -147,17 +125,6 @@ private:  // Data
   bool mMirrored;
   bool mAutoRotate;
 };
-
-/*******************************************************************************
- *  Class StrokeTextList
- ******************************************************************************/
-
-struct StrokeTextListNameProvider {
-  static constexpr const char* tagname = "stroke_text";
-};
-using StrokeTextList =
-    SerializableObjectList<StrokeText, StrokeTextListNameProvider,
-                           StrokeText::Event>;
 
 /*******************************************************************************
  *  End of File

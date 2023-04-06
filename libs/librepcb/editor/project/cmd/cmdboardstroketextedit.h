@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDDEVICEINSTANCEEDITALL_H
-#define LIBREPCB_EDITOR_CMDDEVICEINSTANCEEDITALL_H
+#ifndef LIBREPCB_EDITOR_CMDBOARDSTROKETEXTEDIT_H
+#define LIBREPCB_EDITOR_CMDBOARDSTROKETEXTEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommandgroup.h"
+#include "../../undocommand.h"
+
+#include <librepcb/core/project/board/boardstroketextdata.h>
 
 #include <QtCore>
 
@@ -32,39 +34,60 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Angle;
-class BI_Device;
-class Point;
+class BI_StrokeText;
 
 namespace editor {
 
-class CmdBoardStrokeTextEdit;
-class CmdDeviceInstanceEdit;
-
 /*******************************************************************************
- *  Class CmdDeviceInstanceEditAll
+ *  Class CmdBoardStrokeTextEdit
  ******************************************************************************/
 
 /**
- * @brief The CmdDeviceInstanceEditAll class
+ * @brief The CmdBoardStrokeTextEdit class
  */
-class CmdDeviceInstanceEditAll final : public UndoCommandGroup {
+class CmdBoardStrokeTextEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  explicit CmdDeviceInstanceEditAll(BI_Device& dev) noexcept;
-  ~CmdDeviceInstanceEditAll() noexcept;
+  explicit CmdBoardStrokeTextEdit(BI_StrokeText& text) noexcept;
+  ~CmdBoardStrokeTextEdit() noexcept;
 
-  // General Methods
+  // Setters
+  void setLayer(const Layer& layer, bool immediate) noexcept;
+  void setText(const QString& text, bool immediate) noexcept;
+  void setHeight(const PositiveLength& height, bool immediate) noexcept;
+  void setStrokeWidth(const UnsignedLength& strokeWidth,
+                      bool immediate) noexcept;
+  void setLetterSpacing(const StrokeTextSpacing& spacing,
+                        bool immediate) noexcept;
+  void setLineSpacing(const StrokeTextSpacing& spacing,
+                      bool immediate) noexcept;
+  void setAlignment(const Alignment& align, bool immediate) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
-  void translate(const Point& deltaPos, bool immediate) noexcept;
+  void translate(const Point& delta, bool immediate) noexcept;
+  void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-  void setMirrored(bool mirrored, bool immediate);
-  void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
+  void setMirrored(bool mirrored, bool immediate) noexcept;
+  void mirrorGeometry(Qt::Orientation orientation, const Point& center,
+                      bool immediate) noexcept;
+  void mirrorLayer(bool immediate) noexcept;
+  void setAutoRotate(bool autoRotate, bool immediate) noexcept;
 
-private:
-  CmdDeviceInstanceEdit* mDevEditCmd;
-  QVector<CmdBoardStrokeTextEdit*> mTextEditCmds;
+private:  // Methods
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
+
+private:  // Data
+  BI_StrokeText& mText;
+
+  BoardStrokeTextData mOldData;
+  BoardStrokeTextData mNewData;
 };
 
 /*******************************************************************************

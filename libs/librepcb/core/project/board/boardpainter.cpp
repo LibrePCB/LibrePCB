@@ -23,10 +23,8 @@
 #include "boardpainter.h"
 
 #include "../../application.h"
-#include "../../attribute/attributesubstitutor.h"
 #include "../../export/graphicsexportsettings.h"
 #include "../../export/graphicspainter.h"
-#include "../../font/strokefontpool.h"
 #include "../../geometry/text.h"
 #include "../../library/pkg/footprint.h"
 #include "../../workspace/theme.h"
@@ -55,10 +53,7 @@ namespace librepcb {
  ******************************************************************************/
 
 BoardPainter::BoardPainter(const Board& board)
-  : mMonospaceFont(Application::getDefaultMonospaceFont()),
-    mStrokeFont(board.getProject().getStrokeFonts().getFont(
-        board.getDefaultFontName()))  // can throw
-{
+  : mMonospaceFont(Application::getDefaultMonospaceFont()) {
   foreach (const BI_Device* device, board.getDeviceInstances()) {
     Footprint fpt;
     fpt.transform = Transform(*device);
@@ -78,7 +73,9 @@ BoardPainter::BoardPainter(const Board& board)
       fpt.pads.append(padObj);
     }
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      fpt.polygons.append(polygon);
+      fpt.polygons.append(PolygonData{
+          &polygon.getLayer(), polygon.getPath(), polygon.getLineWidth(),
+          polygon.isFilled(), polygon.isGrabArea()});
     }
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
       fpt.circles.append(circle);
@@ -90,9 +87,11 @@ BoardPainter::BoardPainter(const Board& board)
                    device->getHoleStopMasks().value(hole.getUuid())});
     }
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
-      StrokeText copy(text->getTextObj());
-      copy.setText(AttributeSubstitutor::substitute(copy.getText(), device));
-      mStrokeTexts.append(copy);
+      mStrokeTexts.append(StrokeTextData{
+          Transform(text->getData()), &text->getData().getLayer(),
+          text->getPaths(), text->getData().getHeight(),
+          text->getData().getStrokeWidth(), text->getSubstitutedText(),
+          text->getData().getAlign()});
     }
     mFootprints.append(fpt);
   }
@@ -100,12 +99,17 @@ BoardPainter::BoardPainter(const Board& board)
     mPlanes.append(Plane{&plane->getLayer(), plane->getFragments()});
   }
   foreach (const BI_Polygon* polygon, board.getPolygons()) {
-    mPolygons.append(polygon->getPolygon());
+    mPolygons.append(PolygonData{
+        &polygon->getPolygon().getLayer(), polygon->getPolygon().getPath(),
+        polygon->getPolygon().getLineWidth(), polygon->getPolygon().isFilled(),
+        polygon->getPolygon().isGrabArea()});
   }
   foreach (const BI_StrokeText* text, board.getStrokeTexts()) {
-    StrokeText copy(text->getTextObj());
-    copy.setText(AttributeSubstitutor::substitute(copy.getText(), &board));
-    mStrokeTexts.append(copy);
+    mStrokeTexts.append(
+        StrokeTextData{Transform(text->getData()), &text->getData().getLayer(),
+                       text->getPaths(), text->getData().getHeight(),
+                       text->getData().getStrokeWidth(),
+                       text->getSubstitutedText(), text->getData().getAlign()});
   }
   foreach (const BI_Hole* hole, board.getHoles()) {
     mHoles.append(HoleData{hole->getData().getDiameter(),
@@ -175,11 +179,10 @@ void BoardPainter::paint(QPainter& painter,
     }
 
     // Draw polygons.
-    foreach (const Polygon& polygon, content.polygons) {
-      p.drawPolygon(polygon.getPath(), *polygon.getLineWidth(),
-                    settings.getColor(color),
-                    settings.getFillColor(color, polygon.isFilled(),
-                                          polygon.isGrabArea()));
+    foreach (const PolygonData& polygon, content.polygons) {
+      p.drawPolygon(
+          polygon.path, *polygon.lineWidth, settings.getColor(color),
+          settings.getFillColor(color, polygon.filled, polygon.grabArea));
     }
 
     // Draw circles.
@@ -206,10 +209,10 @@ void BoardPainter::paint(QPainter& painter,
 
     // Draw invisible texts to make them selectable and searchable in PDF and
     // SVG output.
-    foreach (const Text& text, content.texts) {
-      p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
-                 text.getAlign(), text.getText(), mMonospaceFont,
-                 Qt::transparent, true, settings.getMirror());
+    foreach (const TextData& text, content.texts) {
+      p.drawText(text.position, text.rotation, *text.height, text.align,
+                 text.text, mMonospaceFont, Qt::transparent, true,
+                 settings.getMirror());
     }
   }
 }
@@ -224,10 +227,10 @@ void BoardPainter::initContentByColor() const noexcept {
     // Footprints.
     foreach (const Footprint& footprint, mFootprints) {
       // Footprint polygons.
-      foreach (Polygon polygon, footprint.polygons) {
-        polygon.setLayer(footprint.transform.map(polygon.getLayer()));
-        polygon.setPath(footprint.transform.map(polygon.getPath()));
-        const QString color = polygon.getLayer().getThemeColor();
+      foreach (PolygonData polygon, footprint.polygons) {
+        polygon.layer = &footprint.transform.map(*polygon.layer);
+        polygon.path = footprint.transform.map(polygon.path);
+        const QString color = polygon.layer->getThemeColor();
         mContentByColor[color].polygons.append(polygon);
       }
 
@@ -301,8 +304,8 @@ void BoardPainter::initContentByColor() const noexcept {
     }
 
     // Polygons.
-    foreach (const Polygon& polygon, mPolygons) {
-      const QString color = polygon.getLayer().getThemeColor();
+    foreach (const PolygonData& polygon, mPolygons) {
+      const QString color = polygon.layer->getThemeColor();
       mContentByColor[color].polygons.append(polygon);
     }
 
@@ -319,19 +322,17 @@ void BoardPainter::initContentByColor() const noexcept {
     }
 
     // Texts.
-    foreach (StrokeText text, mStrokeTexts) {
-      Transform transform(text);
-      const QString color = text.getLayer().getThemeColor();
-      foreach (Path path, transform.map(text.generatePaths(mStrokeFont))) {
+    foreach (const StrokeTextData& text, mStrokeTexts) {
+      const QString color = text.layer->getThemeColor();
+      foreach (const Path& path, text.transform.map(text.paths)) {
         mContentByColor[color].polygons.append(
-            Polygon(text.getUuid(), text.getLayer(), text.getStrokeWidth(),
-                    false, false, path));
+            PolygonData{text.layer, path, text.strokeWidth, false, false});
       }
 
-      Angle rotation = transform.map(Angle::deg0());
+      Angle rotation = text.transform.map(Angle::deg0());
       Alignment align =
-          text.getMirrored() ? text.getAlign().mirroredV() : text.getAlign();
-      Length totalHeight = *text.getHeight() + *text.getStrokeWidth();
+          text.transform.getMirrored() ? text.align.mirroredV() : text.align;
+      Length totalHeight = *text.height + *text.strokeWidth;
       totalHeight += totalHeight / 2;  // Correction factor from TTF to stroke.
       Length baseline = totalHeight / 4;  // Baseline correction TTF -> stroke.
       Point baselineOffset;
@@ -342,9 +343,8 @@ void BoardPainter::initContentByColor() const noexcept {
       }
       baselineOffset.rotate(rotation);
       mContentByColor[color].texts.append(
-          Text(text.getUuid(), text.getLayer(), text.getText(),
-               text.getPosition() + baselineOffset, rotation,
-               PositiveLength(totalHeight), align));
+          TextData{text.transform.getPosition() + baselineOffset, rotation,
+                   PositiveLength(totalHeight), align, text.text});
     }
   }
 }

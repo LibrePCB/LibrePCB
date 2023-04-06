@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../../attribute/attribute.h"
 #include "../../../attribute/attributeprovider.h"
+#include "../../../geometry/stroketext.h"
 #include "../../../types/uuid.h"
 #include "../../../utils/signalslot.h"
 #include "bi_base.h"

@@ -26,10 +26,10 @@
 #include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/geometry/junction.h>
 #include <librepcb/core/geometry/polygon.h>
-#include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/geometry/trace.h>
 #include <librepcb/core/geometry/via.h>
 #include <librepcb/core/project/board/boardholedata.h>
+#include <librepcb/core/project/board/boardstroketextdata.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/serialization/serializableobjectlist.h>
@@ -73,13 +73,14 @@ public:
     Angle rotation;
     bool mirrored;
     AttributeList attributes;
-    StrokeTextList strokeTexts;
+    QList<BoardStrokeTextData> strokeTexts;
     Signal<Device> onEdited;  ///< Dummy event, not used
 
     Device(const Uuid& componentUuid, const Uuid& libDeviceUuid,
            const Uuid& libFootprintUuid, const Point& position,
            const Angle& rotation, bool mirrored,
-           const AttributeList& attributes, const StrokeTextList& strokeTexts)
+           const AttributeList& attributes,
+           const QList<BoardStrokeTextData>& strokeTexts)
       : componentUuid(componentUuid),
         libDeviceUuid(libDeviceUuid),
         libFootprintUuid(libFootprintUuid),
@@ -98,8 +99,12 @@ public:
         rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
         mirrored(deserialize<bool>(node.getChild("mirror/@0"))),
         attributes(node),
-        strokeTexts(node),
-        onEdited(*this) {}
+        strokeTexts(),
+        onEdited(*this) {
+      foreach (const SExpression* child, node.getChildren("stroke_text")) {
+        strokeTexts.append(BoardStrokeTextData(*child));
+      }
+    }
 
     void serialize(SExpression& root) const {
       root.appendChild(componentUuid);
@@ -113,8 +118,10 @@ public:
       root.appendChild("mirror", mirrored);
       root.ensureLineBreak();
       attributes.serialize(root);
-      root.ensureLineBreak();
-      strokeTexts.serialize(root);
+      foreach (const BoardStrokeTextData& strokeText, strokeTexts) {
+        root.ensureLineBreak();
+        strokeText.serialize(root.appendList("stroke_text"));
+      }
       root.ensureLineBreak();
     }
 
@@ -256,7 +263,7 @@ public:
   }
   SerializableObjectList<Plane, Plane>& getPlanes() noexcept { return mPlanes; }
   PolygonList& getPolygons() noexcept { return mPolygons; }
-  StrokeTextList& getStrokeTexts() noexcept { return mStrokeTexts; }
+  QList<BoardStrokeTextData>& getStrokeTexts() noexcept { return mStrokeTexts; }
   QList<BoardHoleData>& getHoles() noexcept { return mHoles; }
   QMap<std::pair<Uuid, Uuid>, Point>& getPadPositions() noexcept {
     return mPadPositions;
@@ -281,7 +288,7 @@ private:  // Data
   SerializableObjectList<NetSegment, NetSegment> mNetSegments;
   SerializableObjectList<Plane, Plane> mPlanes;
   PolygonList mPolygons;
-  StrokeTextList mStrokeTexts;
+  QList<BoardStrokeTextData> mStrokeTexts;
   QList<BoardHoleData> mHoles;
   QMap<std::pair<Uuid, Uuid>, Point> mPadPositions;
 };

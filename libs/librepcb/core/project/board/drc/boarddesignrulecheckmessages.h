@@ -330,8 +330,7 @@ public:
                                       const Circle& circle,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
-  DrcMsgCopperBoardClearanceViolation(const BI_Device* device,
-                                      const StrokeText& strokeText,
+  DrcMsgCopperBoardClearanceViolation(const BI_StrokeText& strokeText,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
   DrcMsgCopperBoardClearanceViolation(

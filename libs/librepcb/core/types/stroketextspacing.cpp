@@ -20,12 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmddevicestroketextsreset.h"
+#include "stroketextspacing.h"
 
-#include "cmddevicestroketextadd.h"
-#include "cmddevicestroketextremove.h"
-
-#include <librepcb/core/project/board/items/bi_device.h>
+#include "../serialization/sexpression.h"
 
 #include <QtCore>
 
@@ -33,50 +30,61 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace editor {
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const StrokeTextSpacing& obj) {
+  if (const tl::optional<Ratio>& ratio = obj.getRatio()) {
+    return serialize(*ratio);
+  } else {
+    return SExpression::createToken("auto");
+  }
+}
+
+template <>
+StrokeTextSpacing deserialize(const SExpression& node) {
+  if (node.getValue() == "auto") {
+    return StrokeTextSpacing();
+  } else {
+    return StrokeTextSpacing(deserialize<Ratio>(node));  // can throw
+  }
+}
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdDeviceStrokeTextsReset::CmdDeviceStrokeTextsReset(BI_Device& device) noexcept
-  : UndoCommandGroup(tr("Reset footprint texts")), mDevice(device) {
+StrokeTextSpacing::StrokeTextSpacing(const tl::optional<Ratio>& ratio) noexcept
+  : mRatio(ratio) {
 }
 
-CmdDeviceStrokeTextsReset::~CmdDeviceStrokeTextsReset() noexcept {
+StrokeTextSpacing::StrokeTextSpacing(const StrokeTextSpacing& other) noexcept
+  : mRatio(other.mRatio) {
+}
+
+StrokeTextSpacing::~StrokeTextSpacing() noexcept {
 }
 
 /*******************************************************************************
- *  Inherited from UndoCommand
+ *  Operator Overloadings
  ******************************************************************************/
 
-bool CmdDeviceStrokeTextsReset::performExecute() {
-  // Remove all texts
-  foreach (BI_StrokeText* text, mDevice.getStrokeTexts()) {
-    appendChild(new CmdDeviceStrokeTextRemove(mDevice, *text));
-  }
+bool StrokeTextSpacing::operator==(const StrokeTextSpacing& rhs) const
+    noexcept {
+  return (mRatio == rhs.mRatio);
+}
 
-  // Create new texts
-  for (const StrokeText& text : mDevice.getDefaultStrokeTexts()) {
-    appendChild(new CmdDeviceStrokeTextAdd(
-        mDevice,
-        *new BI_StrokeText(
-            mDevice.getBoard(),
-            BoardStrokeTextData(text.getUuid(), text.getLayer(), text.getText(),
-                                text.getPosition(), text.getRotation(),
-                                text.getHeight(), text.getStrokeWidth(),
-                                text.getLetterSpacing(), text.getLineSpacing(),
-                                text.getAlign(), text.getMirrored(),
-                                text.getAutoRotate()))));
-  }
-
-  // execute all child commands
-  return UndoCommandGroup::performExecute();  // can throw
+StrokeTextSpacing& StrokeTextSpacing::operator=(
+    const StrokeTextSpacing& rhs) noexcept {
+  mRatio = rhs.mRatio;
+  return *this;
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb

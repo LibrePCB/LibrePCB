@@ -497,6 +497,8 @@ add_library(
   project/cmd/cmdboardsplitnetline.h
   project/cmd/cmdboardstroketextadd.cpp
   project/cmd/cmdboardstroketextadd.h
+  project/cmd/cmdboardstroketextedit.cpp
+  project/cmd/cmdboardstroketextedit.h
   project/cmd/cmdboardstroketextremove.cpp
   project/cmd/cmdboardstroketextremove.h
   project/cmd/cmdboardviaedit.cpp

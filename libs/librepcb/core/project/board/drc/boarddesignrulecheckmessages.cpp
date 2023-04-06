@@ -349,8 +349,8 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
         Severity::Warning,
         tr("Stroke width on '%1': %2 < %3 %4",
            "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(text.getTextObj().getLayer().getNameTr(),
-                 text.getTextObj().getStrokeWidth()->toMmString(),
+            .arg(text.getData().getLayer().getNameTr(),
+                 text.getData().getStrokeWidth()->toMmString(),
                  minWidth->toMmString(), "mm"),
         tr("The text stroke width is smaller than the minimum copper width "
            "configured in the DRC settings.") %
@@ -363,7 +363,7 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
     mApproval.appendChild("device", device->getComponentInstanceUuid());
     mApproval.ensureLineBreak();
   }
-  mApproval.appendChild("stroke_text", text.getUuid());
+  mApproval.appendChild("stroke_text", text.getData().getUuid());
   mApproval.ensureLineBreak();
 }
 
@@ -496,10 +496,10 @@ void DrcMsgCopperCopperClearanceViolation::serializeObject(
       node.ensureLineBreak();
       node.appendChild("device", device->getComponentInstanceUuid());
       node.ensureLineBreak();
-      node.appendChild("stroke_text", strokeText->getUuid());
+      node.appendChild("stroke_text", strokeText->getData().getUuid());
       node.ensureLineBreak();
     } else {
-      node.appendChild("stroke_text", strokeText->getUuid());
+      node.appendChild("stroke_text", strokeText->getData().getUuid());
     }
   } else {
     throw LogicError(__FILE__, __LINE__, "Unknown copper clearance object.");
@@ -642,8 +642,8 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_Device* device, const StrokeText& strokeText,
-    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
+    const BI_StrokeText& strokeText, const UnsignedLength& minClearance,
+    const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
         tr("Clearance copper text ↔ board outline < %1 %2",
@@ -657,11 +657,11 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
                "board outline if needed."),
         "copper_board_clearance_violation", locations) {
   mApproval.ensureLineBreak();
-  if (device) {
+  if (const BI_Device* device = strokeText.getDevice()) {
     mApproval.appendChild("device", device->getComponentInstanceUuid());
     mApproval.ensureLineBreak();
   }
-  mApproval.appendChild("stroke_text", strokeText.getUuid());
+  mApproval.appendChild("stroke_text", strokeText.getData().getUuid());
   mApproval.ensureLineBreak();
 }
 
