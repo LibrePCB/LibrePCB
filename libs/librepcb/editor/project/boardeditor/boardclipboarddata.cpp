@@ -65,7 +65,10 @@ BoardClipboardData::BoardClipboardData(const QByteArray& mimeData)
   mDevices.loadFromSExpression(root);
   mNetSegments.loadFromSExpression(root);
   mPlanes.loadFromSExpression(root);
-  mPolygons.loadFromSExpression(root);
+
+  foreach (const SExpression* child, root.getChildren("polygon")) {
+    mPolygons.append(BoardPolygonData(*child));
+  }
 
   foreach (const SExpression* child, root.getChildren("stroke_text")) {
     mStrokeTexts.append(BoardStrokeTextData(*child));
@@ -122,8 +125,11 @@ std::unique_ptr<QMimeData> BoardClipboardData::toMimeData() const {
   mNetSegments.serialize(root);
   root.ensureLineBreak();
   mPlanes.serialize(root);
+  for (const BoardPolygonData& data : mPolygons) {
+    root.ensureLineBreak();
+    data.serialize(root.appendList("polygon"));
+  }
   root.ensureLineBreak();
-  mPolygons.serialize(root);
   for (const BoardStrokeTextData& data : mStrokeTexts) {
     root.ensureLineBreak();
     data.serialize(root.appendList("stroke_text"));

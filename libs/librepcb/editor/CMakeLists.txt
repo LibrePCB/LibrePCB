@@ -441,6 +441,8 @@ add_library(
   project/boardeditor/graphicsitems/bgi_netpoint.h
   project/boardeditor/graphicsitems/bgi_plane.cpp
   project/boardeditor/graphicsitems/bgi_plane.h
+  project/boardeditor/graphicsitems/bgi_polygon.cpp
+  project/boardeditor/graphicsitems/bgi_polygon.h
   project/boardeditor/graphicsitems/bgi_stroketext.cpp
   project/boardeditor/graphicsitems/bgi_stroketext.h
   project/boardeditor/graphicsitems/bgi_via.cpp
@@ -489,6 +491,8 @@ add_library(
   project/cmd/cmdboardplaneremove.h
   project/cmd/cmdboardpolygonadd.cpp
   project/cmd/cmdboardpolygonadd.h
+  project/cmd/cmdboardpolygonedit.cpp
+  project/cmd/cmdboardpolygonedit.h
   project/cmd/cmdboardpolygonremove.cpp
   project/cmd/cmdboardpolygonremove.h
   project/cmd/cmdboardremove.cpp

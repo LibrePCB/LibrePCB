@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "boardgraphicsscene.h"
 
-#include "../../graphics/polygongraphicsitem.h"
 #include "graphicsitems/bgi_airwire.h"
 #include "graphicsitems/bgi_device.h"
 #include "graphicsitems/bgi_footprintpad.h"
@@ -30,6 +29,7 @@
 #include "graphicsitems/bgi_netline.h"
 #include "graphicsitems/bgi_netpoint.h"
 #include "graphicsitems/bgi_plane.h"
+#include "graphicsitems/bgi_polygon.h"
 #include "graphicsitems/bgi_stroketext.h"
 #include "graphicsitems/bgi_via.h"
 
@@ -392,15 +392,14 @@ void BoardGraphicsScene::removePlane(BI_Plane& plane) noexcept {
 
 void BoardGraphicsScene::addPolygon(BI_Polygon& polygon) noexcept {
   Q_ASSERT(!mPolygons.contains(&polygon));
-  std::shared_ptr<PolygonGraphicsItem> item =
-      std::make_shared<PolygonGraphicsItem>(polygon.getPolygon(),
-                                            mLayerProvider);
+  std::shared_ptr<BGI_Polygon> item =
+      std::make_shared<BGI_Polygon>(polygon, mLayerProvider);
   addItem(*item);
   mPolygons.insert(&polygon, item);
 }
 
 void BoardGraphicsScene::removePolygon(BI_Polygon& polygon) noexcept {
-  if (std::shared_ptr<PolygonGraphicsItem> item = mPolygons.take(&polygon)) {
+  if (std::shared_ptr<BGI_Polygon> item = mPolygons.take(&polygon)) {
     removeItem(*item);
   } else {
     Q_ASSERT(false);

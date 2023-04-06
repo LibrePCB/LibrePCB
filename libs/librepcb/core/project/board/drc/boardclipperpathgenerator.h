@@ -39,7 +39,6 @@ namespace librepcb {
 class BI_FootprintPad;
 class BI_NetLine;
 class BI_Plane;
-class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
 class Board;
@@ -47,7 +46,6 @@ class Circle;
 class Hole;
 class Layer;
 class NetSignal;
-class Polygon;
 
 /*******************************************************************************
  *  Class BoardClipperPathGenerator
@@ -74,8 +72,8 @@ public:
   void addVia(const BI_Via& via, const Length& offset = Length(0));
   void addNetLine(const BI_NetLine& netLine, const Length& offset = Length(0));
   void addPlane(const BI_Plane& plane);
-  void addPolygon(const BI_Polygon& polygon);
-  void addPolygon(const Polygon& polygon, const Transform& transform);
+  void addPolygon(const Path& path, const UnsignedLength& lineWidth,
+                  bool filled);
   void addCircle(const Circle& circle, const Transform& transform,
                  const Length& offset = Length(0));
   void addStrokeText(const BI_StrokeText& strokeText,

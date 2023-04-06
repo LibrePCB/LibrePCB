@@ -174,8 +174,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
 
   // Add polygons
   foreach (BI_Polygon* polygon, query.getPolygons()) {
-    data->getPolygons().append(
-        std::make_shared<Polygon>(polygon->getPolygon()));
+    data->getPolygons().append(polygon->getData());
   }
 
   // Add stroke texts

@@ -31,6 +31,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BI_Polygon;
 class Layer;
 class LengthUnit;
 class Polygon;
@@ -62,6 +63,11 @@ public:
                           const LengthUnit& lengthUnit,
                           const QString& settingsPrefix,
                           QWidget* parent = nullptr) noexcept;
+  PolygonPropertiesDialog(BI_Polygon& polygon, UndoStack& undoStack,
+                          const QSet<const Layer*>& layers,
+                          const LengthUnit& lengthUnit,
+                          const QString& settingsPrefix,
+                          QWidget* parent = nullptr) noexcept;
   ~PolygonPropertiesDialog() noexcept;
 
   // Setters
@@ -71,14 +77,23 @@ public:
   PolygonPropertiesDialog& operator=(const PolygonPropertiesDialog& rhs) =
       delete;
 
-private:  // GUI Events
-  void buttonBoxClicked(QAbstractButton* button) noexcept;
-
 private:  // Methods
+  PolygonPropertiesDialog(Polygon* libPolygon, BI_Polygon* boardPolygon,
+                          UndoStack& undoStack,
+                          const QSet<const Layer*>& layers,
+                          const LengthUnit& lengthUnit,
+                          const QString& settingsPrefix,
+                          QWidget* parent = nullptr) noexcept;
+  template <typename T>
+  void load(const T& obj) noexcept;
+  void buttonBoxClicked(QAbstractButton* button) noexcept;
   bool applyChanges() noexcept;
+  template <typename T>
+  void applyChanges(T& cmd);
 
 private:  // Data
-  Polygon& mPolygon;
+  Polygon* mLibraryObj;
+  BI_Polygon* mBoardObj;
   UndoStack& mUndoStack;
   QScopedPointer<Ui::PolygonPropertiesDialog> mUi;
 };

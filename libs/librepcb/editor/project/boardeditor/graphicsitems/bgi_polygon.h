@@ -17,78 +17,74 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_BI_POLYGON_H
-#define LIBREPCB_CORE_BI_POLYGON_H
+#ifndef LIBREPCB_EDITOR_BGI_POLYGON_H
+#define LIBREPCB_EDITOR_BGI_POLYGON_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../utils/signalslot.h"
-#include "../boardpolygondata.h"
-#include "bi_base.h"
+#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/project/board/items/bi_polygon.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
-class Board;
+class IF_GraphicsLayerProvider;
+class PolygonGraphicsItem;
 
 /*******************************************************************************
- *  Class BI_Polygon
+ *  Class BGI_Polygon
  ******************************************************************************/
 
 /**
- * @brief The BI_Polygon class
+ * @brief The BGI_Polygon class
  */
-class BI_Polygon final : public BI_Base {
-  Q_OBJECT
-
+class BGI_Polygon final : public QGraphicsItemGroup {
 public:
-  // Signals
-  enum class Event {
-    LayerChanged,
-    LineWidthChanged,
-    IsFilledChanged,
-    IsGrabAreaChanged,
-    PathChanged,
-  };
-  Signal<BI_Polygon, Event> onEdited;
-  typedef Slot<BI_Polygon, Event> OnEditedSlot;
-
   // Constructors / Destructor
-  BI_Polygon() = delete;
-  BI_Polygon(const BI_Polygon& other) = delete;
-  BI_Polygon(Board& board, const BoardPolygonData& data);
-  ~BI_Polygon() noexcept;
-
-  // Getters
-  const BoardPolygonData& getData() const noexcept { return mData; }
-
-  // Setters
-  bool setLayer(const Layer& layer) noexcept;
-  bool setLineWidth(const UnsignedLength& width) noexcept;
-  bool setPath(const Path& path) noexcept;
-  bool setIsFilled(bool isFilled) noexcept;
-  bool setIsGrabArea(bool isGrabArea) noexcept;
+  BGI_Polygon() = delete;
+  BGI_Polygon(const BGI_Polygon& other) = delete;
+  BGI_Polygon(BI_Polygon& polygon, const IF_GraphicsLayerProvider& lp) noexcept;
+  virtual ~BGI_Polygon() noexcept;
 
   // General Methods
-  void addToBoard() override;
-  void removeFromBoard() override;
+  BI_Polygon& getPolygon() noexcept { return mPolygon; }
+  const PolygonGraphicsItem& getGraphicsItem() const noexcept {
+    return *mGraphicsItem;
+  }
+
+  // Inherited from QGraphicsItem
+  QPainterPath shape() const noexcept override;
 
   // Operator Overloadings
-  BI_Polygon& operator=(const BI_Polygon& rhs) = delete;
+  BGI_Polygon& operator=(const BGI_Polygon& rhs) = delete;
 
-private:
-  BoardPolygonData mData;
+private:  // Methods
+  void polygonEdited(const BI_Polygon& obj, BI_Polygon::Event event) noexcept;
+  QVariant itemChange(GraphicsItemChange change,
+                      const QVariant& value) noexcept override;
+  void updateZValue() noexcept;
+
+private:  // Data
+  BI_Polygon& mPolygon;
+  Polygon mPolygonObj;
+  QScopedPointer<PolygonGraphicsItem> mGraphicsItem;
+
+  // Slots
+  BI_Polygon::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
 
 #endif

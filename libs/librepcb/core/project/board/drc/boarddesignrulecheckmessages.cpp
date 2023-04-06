@@ -489,7 +489,7 @@ void DrcMsgCopperCopperClearanceViolation::serializeObject(
     node.appendChild("plane", plane->getUuid());
   } else if (const BI_Polygon* polygon =
                  dynamic_cast<const BI_Polygon*>(&item)) {
-    node.appendChild("polygon", polygon->getUuid());
+    node.appendChild("polygon", polygon->getData().getUuid());
   } else if (const BI_StrokeText* strokeText =
                  dynamic_cast<const BI_StrokeText*>(&item)) {
     if (const BI_Device* device = strokeText->getDevice()) {
@@ -596,24 +596,25 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_Device* device, const Polygon& polygon,
-    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
-  : RuleCheckMessage(
-        Severity::Warning,
-        tr("Clearance copper polygon ↔ board outline < %1 %2",
-           "Placeholders: Clearance value, unit")
-            .arg(minClearance->toMmString(), "mm"),
-        tr("The clearance between a polygon and the board outline is smaller "
-           "than the board outline clearance configured in the DRC settings.") %
-            "\n\n" %
-            tr("Check the DRC settings and move the polygon away from the "
-               "board outline if needed."),
-        "copper_board_clearance_violation", locations) {
+    const BI_Polygon& polygon, const UnsignedLength& minClearance,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Warning, getPolygonMessage(minClearance),
+                     getPolygonDescription(),
+                     "copper_board_clearance_violation", locations) {
   mApproval.ensureLineBreak();
-  if (device) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
-  }
+  mApproval.appendChild("polygon", polygon.getData().getUuid());
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
+    const BI_Device& device, const Polygon& polygon,
+    const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Warning, getPolygonMessage(minClearance),
+                     getPolygonDescription(),
+                     "copper_board_clearance_violation", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
   mApproval.appendChild("polygon", polygon.getUuid());
   mApproval.ensureLineBreak();
 }
@@ -663,6 +664,22 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
   }
   mApproval.appendChild("stroke_text", strokeText.getData().getUuid());
   mApproval.ensureLineBreak();
+}
+
+QString DrcMsgCopperBoardClearanceViolation::getPolygonMessage(
+    const UnsignedLength& minClearance) noexcept {
+  return tr("Clearance copper polygon ↔ board outline < %1 %2",
+            "Placeholders: Clearance value, unit")
+      .arg(minClearance->toMmString(), "mm");
+}
+
+QString DrcMsgCopperBoardClearanceViolation::getPolygonDescription() noexcept {
+  return tr("The clearance between a polygon and the board outline is smaller "
+            "than the board outline clearance configured in the DRC "
+            "settings.") %
+      "\n\n" %
+      tr("Check the DRC settings and move the polygon away from the "
+         "board outline if needed.");
 }
 
 /*******************************************************************************

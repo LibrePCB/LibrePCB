@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "cmdpasteboarditems.h"
 
-#include "../../graphics/polygongraphicsitem.h"
 #include "../../project/cmd/cmdboardholeadd.h"
 #include "../../project/cmd/cmdboardnetsegmentadd.h"
 #include "../../project/cmd/cmdboardnetsegmentaddelements.h"
@@ -41,6 +40,7 @@
 #include "../boardeditor/graphicsitems/bgi_netline.h"
 #include "../boardeditor/graphicsitems/bgi_netpoint.h"
 #include "../boardeditor/graphicsitems/bgi_plane.h"
+#include "../boardeditor/graphicsitems/bgi_polygon.h"
 #include "../boardeditor/graphicsitems/bgi_stroketext.h"
 #include "../boardeditor/graphicsitems/bgi_via.h"
 #include "cmdremoveboarditems.h"
@@ -288,8 +288,8 @@ bool CmdPasteBoardItems::performExecute() {
   }
 
   // Paste polygons
-  for (const Polygon& polygon : mData->getPolygons()) {
-    Polygon copy(Uuid::createRandom(), polygon);  // assign new UUID
+  for (const BoardPolygonData& polygon : mData->getPolygons()) {
+    BoardPolygonData copy(Uuid::createRandom(), polygon);  // assign new UUID
     copy.setPath(copy.getPath().translated(mPosOffset));  // move
     BI_Polygon* item = new BI_Polygon(mBoard, copy);
     execNewChildCmd(new CmdBoardPolygonAdd(*item));

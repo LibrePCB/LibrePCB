@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "bi_polygon.h"
 
-#include "../../../geometry/polygon.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -35,19 +33,60 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Polygon::BI_Polygon(Board& board, const Polygon& polygon)
-  : BI_Base(board), mPolygon(new Polygon(polygon)) {
+BI_Polygon::BI_Polygon(Board& board, const BoardPolygonData& data)
+  : BI_Base(board), onEdited(*this), mData(data) {
 }
 
 BI_Polygon::~BI_Polygon() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
+ *  Setters
  ******************************************************************************/
 
-const Uuid& BI_Polygon::getUuid() const noexcept {
-  return mPolygon->getUuid();
+bool BI_Polygon::setLayer(const Layer& layer) noexcept {
+  if (mData.setLayer(layer)) {
+    onEdited.notify(Event::LayerChanged);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_Polygon::setLineWidth(const UnsignedLength& width) noexcept {
+  if (mData.setLineWidth(width)) {
+    onEdited.notify(Event::LineWidthChanged);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_Polygon::setPath(const Path& path) noexcept {
+  if (mData.setPath(path)) {
+    onEdited.notify(Event::PathChanged);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_Polygon::setIsFilled(bool isFilled) noexcept {
+  if (mData.setIsFilled(isFilled)) {
+    onEdited.notify(Event::IsFilledChanged);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_Polygon::setIsGrabArea(bool isGrabArea) noexcept {
+  if (mData.setIsGrabArea(isGrabArea)) {
+    onEdited.notify(Event::IsGrabAreaChanged);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /*******************************************************************************

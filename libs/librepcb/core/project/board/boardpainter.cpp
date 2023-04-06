@@ -100,9 +100,9 @@ BoardPainter::BoardPainter(const Board& board)
   }
   foreach (const BI_Polygon* polygon, board.getPolygons()) {
     mPolygons.append(PolygonData{
-        &polygon->getPolygon().getLayer(), polygon->getPolygon().getPath(),
-        polygon->getPolygon().getLineWidth(), polygon->getPolygon().isFilled(),
-        polygon->getPolygon().isGrabArea()});
+        &polygon->getData().getLayer(), polygon->getData().getPath(),
+        polygon->getData().getLineWidth(), polygon->getData().isFilled(),
+        polygon->getData().isGrabArea()});
   }
   foreach (const BI_StrokeText* text, board.getStrokeTexts()) {
     mStrokeTexts.append(

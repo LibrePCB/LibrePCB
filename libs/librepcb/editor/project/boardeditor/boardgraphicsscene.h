@@ -60,10 +60,10 @@ class BGI_NetLine;
 class BGI_NetPoint;
 class BGI_Plane;
 class BGI_Plane;
+class BGI_Polygon;
 class BGI_StrokeText;
 class BGI_Via;
 class IF_GraphicsLayerProvider;
-class PolygonGraphicsItem;
 
 /*******************************************************************************
  *  Class BoardGraphicsScene
@@ -89,6 +89,7 @@ public:
   enum ItemZValue {
     ZValue_Default = 0,  ///< this is the default value (behind all other items)
     ZValue_TextsBottom,  ///< For ::librepcb::BI_StrokeText items
+    ZValue_PolygonsBottom,  ///< For ::librepcb::BI_Polygon items
     ZValue_DevicesBottom,  ///< For ::librepcb::BI_Device items
     ZValue_CopperBottom,
     ZValue_FootprintPadsBottom,  ///< For ::librepcb::BI_FootprintPad items
@@ -99,6 +100,7 @@ public:
     ZValue_FootprintPadsTop,  ///< For ::librepcb::BI_FootprintPad items
     ZValue_CopperTop,
     ZValue_DevicesTop,  ///< For ::librepcb::BI_Device items
+    ZValue_PolygonsTop,  ///< For ::librepcb::BI_Polygon items
     ZValue_TextsTop,  ///< For ::librepcb::BI_StrokeText items
     ZValue_Holes,  ///< For ::librepcb::BI_Hole items
     ZValue_Vias,  ///< For ::librepcb::BI_Via items
@@ -138,7 +140,7 @@ public:
   const QHash<BI_Plane*, std::shared_ptr<BGI_Plane>>& getPlanes() noexcept {
     return mPlanes;
   }
-  const QHash<BI_Polygon*, std::shared_ptr<PolygonGraphicsItem>>&
+  const QHash<BI_Polygon*, std::shared_ptr<BGI_Polygon>>&
       getPolygons() noexcept {
     return mPolygons;
   }
@@ -206,7 +208,7 @@ private:  // Data
   QHash<BI_NetPoint*, std::shared_ptr<BGI_NetPoint>> mNetPoints;
   QHash<BI_NetLine*, std::shared_ptr<BGI_NetLine>> mNetLines;
   QHash<BI_Plane*, std::shared_ptr<BGI_Plane>> mPlanes;
-  QHash<BI_Polygon*, std::shared_ptr<PolygonGraphicsItem>> mPolygons;
+  QHash<BI_Polygon*, std::shared_ptr<BGI_Polygon>> mPolygons;
   QHash<BI_StrokeText*, std::shared_ptr<BGI_StrokeText>> mStrokeTexts;
   QHash<BI_Hole*, std::shared_ptr<BGI_Hole>> mHoles;
   QHash<BI_AirWire*, std::shared_ptr<BGI_AirWire>> mAirWires;

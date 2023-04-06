@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "cmdflipselectedboarditems.h"
 
-#include "../../cmd/cmdpolygonedit.h"
-#include "../../project/cmd/cmdboardnetlineedit.h"
-#include "../../project/cmd/cmdboardnetpointedit.h"
-#include "../../project/cmd/cmdboardnetsegmentadd.h"
-#include "../../project/cmd/cmdboardnetsegmentremove.h"
-#include "../../project/cmd/cmdboardplaneedit.h"
-#include "../../project/cmd/cmdboardviaedit.h"
-#include "../../project/cmd/cmddeviceinstanceedit.h"
 #include "../boardeditor/boardgraphicsscene.h"
 #include "../boardeditor/boardselectionquery.h"
 #include "cmdboardholeedit.h"
+#include "cmdboardnetlineedit.h"
+#include "cmdboardnetpointedit.h"
+#include "cmdboardnetsegmentadd.h"
+#include "cmdboardnetsegmentremove.h"
+#include "cmdboardplaneedit.h"
+#include "cmdboardpolygonedit.h"
 #include "cmdboardstroketextedit.h"
+#include "cmdboardviaedit.h"
+#include "cmddeviceinstanceedit.h"
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
@@ -122,8 +122,8 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     }
   }
   foreach (BI_Polygon* polygon, query.getPolygons()) {
-    for (const Vertex& vertex : Toolbox::toSet(
-             polygon->getPolygon().getPath().getVertices().toList())) {
+    for (const Vertex& vertex :
+         Toolbox::toSet(polygon->getData().getPath().getVertices().toList())) {
       center += vertex.getPos();
       ++count;
     }
@@ -216,8 +216,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
 
   // flip all polygons
   foreach (BI_Polygon* polygon, query.getPolygons()) {
-    QScopedPointer<CmdPolygonEdit> cmd(
-        new CmdPolygonEdit(polygon->getPolygon()));
+    QScopedPointer<CmdBoardPolygonEdit> cmd(new CmdBoardPolygonEdit(*polygon));
     cmd->mirrorGeometry(mOrientation, center, false);
     cmd->mirrorLayer(false);
     execNewChildCmd(cmd.take());  // can throw

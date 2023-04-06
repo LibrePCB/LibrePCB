@@ -152,8 +152,7 @@ void MeasureTool::setBoard(const Board* board) noexcept {
       }
     }
     foreach (const BI_Polygon* polygon, board->getPolygons()) {
-      mSnapCandidates |=
-          snapCandidatesFromPath(polygon->getPolygon().getPath());
+      mSnapCandidates |= snapCandidatesFromPath(polygon->getData().getPath());
     }
     foreach (const BI_StrokeText* text, board->getStrokeTexts()) {
       mSnapCandidates.insert(text->getData().getPosition());

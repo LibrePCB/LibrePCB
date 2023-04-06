@@ -300,17 +300,19 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
   // Board polygons.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (mBoard.getCopperLayers().contains(&polygon->getPolygon().getLayer())) {
+    if (mBoard.getCopperLayers().contains(&polygon->getData().getLayer())) {
       auto it = items.insert(items.end(),
                              Item{polygon,
                                   nullptr,
                                   nullptr,
-                                  &polygon->getPolygon().getLayer(),
+                                  &polygon->getData().getLayer(),
                                   nullptr,
                                   *clearance,
                                   {},
                                   {}});
-      gen.addPolygon(*polygon);
+      gen.addPolygon(polygon->getData().getPath(),
+                     polygon->getData().getLineWidth(),
+                     polygon->getData().isFilled());
       gen.takePathsTo(it->copperArea);
       it->clearanceArea = it->copperArea;
       ClipperHelpers::offset(it->clearanceArea, clearance - tolerance,
@@ -376,7 +378,8 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                     *clearance,
                                     {},
                                     {}});
-        gen.addPolygon(polygon, transform);
+        gen.addPolygon(transform.map(polygon.getPath()), polygon.getLineWidth(),
+                       polygon.isFilled());
         gen.takePathsTo(it->copperArea);
         it->clearanceArea = it->copperArea;
         ClipperHelpers::offset(it->clearanceArea, clearance - tolerance,
@@ -518,12 +521,14 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
   // Check board polygons.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (mBoard.getCopperLayers().contains(&polygon->getPolygon().getLayer())) {
+    if (mBoard.getCopperLayers().contains(&polygon->getData().getLayer())) {
       BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-      gen.addPolygon(*polygon);
+      gen.addPolygon(polygon->getData().getPath(),
+                     polygon->getData().getLineWidth(),
+                     polygon->getData().isFilled());
       if (intersects(gen.getPaths())) {
         emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
-            nullptr, polygon->getPolygon(), clearance, locations));
+            *polygon, clearance, locations));
       }
     }
   }
@@ -562,10 +567,11 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
       if (mBoard.getCopperLayers().contains(&polygon.getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-        gen.addPolygon(polygon, transform);
+        gen.addPolygon(transform.map(polygon.getPath()), polygon.getLineWidth(),
+                       polygon.isFilled());
         if (intersects(gen.getPaths())) {
           emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
-              device, polygon, clearance, locations));
+              *device, polygon, clearance, locations));
         }
       }
     }
@@ -1150,8 +1156,8 @@ void BoardDesignRuleCheck::checkBoardOutline(int progressEnd) {
   // Collect all board outline objects and report open polygons.
   QVector<Path> outlines;
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (polygon->getPolygon().getLayer() == Layer::boardOutlines()) {
-      outlines.append(polygon->getPolygon().getPath());
+    if (polygon->getData().getLayer() == Layer::boardOutlines()) {
+      outlines.append(polygon->getData().getPath());
     }
   }
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
@@ -1316,9 +1322,9 @@ ClipperLib::Paths BoardDesignRuleCheck::getBoardClearanceArea(
   const PositiveLength clearanceWidth(
       std::max(clearance + clearance - maxArcTolerance() - 1, Length(1)));
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (polygon->getPolygon().getLayer() == Layer::boardOutlines()) {
+    if (polygon->getData().getLayer() == Layer::boardOutlines()) {
       const ClipperLib::Paths paths = ClipperHelpers::convert(
-          polygon->getPolygon().getPath().toOutlineStrokes(clearanceWidth),
+          polygon->getData().getPath().toOutlineStrokes(clearanceWidth),
           maxArcTolerance());
       result.insert(result.end(), paths.begin(), paths.end());
     }

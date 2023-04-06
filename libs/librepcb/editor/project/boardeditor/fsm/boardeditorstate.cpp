@@ -23,7 +23,6 @@
 #include "boardeditorstate.h"
 
 #include "../../../graphics/graphicslayer.h"
-#include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../widgets/graphicsview.h"
 #include "../boardeditor.h"
@@ -34,6 +33,7 @@
 #include "../graphicsitems/bgi_netline.h"
 #include "../graphicsitems/bgi_netpoint.h"
 #include "../graphicsitems/bgi_plane.h"
+#include "../graphicsitems/bgi_polygon.h"
 #include "../graphicsitems/bgi_stroketext.h"
 #include "../graphicsitems/bgi_via.h"
 
@@ -370,8 +370,8 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
          it != scene->getPolygons().end(); it++) {
       processItem(
           it.value(),
-          it.key()->getPolygon().getPath().calcNearestPointBetweenVertices(pos),
-          60 + priorityFromLayer(it.key()->getPolygon().getLayer()),
+          it.key()->getData().getPath().calcNearestPointBetweenVertices(pos),
+          60 + priorityFromLayer(it.key()->getData().getLayer()),
           true);  // Probably large grab area makes sense?
     }
   }

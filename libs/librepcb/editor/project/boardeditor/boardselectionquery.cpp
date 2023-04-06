@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "boardselectionquery.h"
 
-#include "../../graphics/polygongraphicsitem.h"
 #include "boardgraphicsscene.h"
 #include "graphicsitems/bgi_device.h"
 #include "graphicsitems/bgi_footprintpad.h"
@@ -30,6 +29,7 @@
 #include "graphicsitems/bgi_netline.h"
 #include "graphicsitems/bgi_netpoint.h"
 #include "graphicsitems/bgi_plane.h"
+#include "graphicsitems/bgi_polygon.h"
 #include "graphicsitems/bgi_stroketext.h"
 #include "graphicsitems/bgi_via.h"
 

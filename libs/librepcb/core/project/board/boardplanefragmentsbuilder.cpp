@@ -92,9 +92,9 @@ void BoardPlaneFragmentsBuilder::clipToBoardOutline() {
   ClipperLib::Paths boardArea;
   ClipperLib::Clipper boardAreaClipper;
   foreach (const BI_Polygon* polygon, mPlane.getBoard().getPolygons()) {
-    if (polygon->getPolygon().getLayer() == Layer::boardOutlines()) {
+    if (polygon->getData().getLayer() == Layer::boardOutlines()) {
       ClipperLib::Path path = ClipperHelpers::convert(
-          polygon->getPolygon().getPath(), maxArcTolerance());
+          polygon->getData().getPath(), maxArcTolerance());
       boardAreaClipper.AddPath(path, ClipperLib::ptSubject, true);
     }
   }

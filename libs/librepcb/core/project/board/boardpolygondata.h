@@ -17,15 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_BI_POLYGON_H
-#define LIBREPCB_CORE_BI_POLYGON_H
+#ifndef LIBREPCB_CORE_BOARDPOLYGONDATA_H
+#define LIBREPCB_CORE_BOARDPOLYGONDATA_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../utils/signalslot.h"
-#include "../boardpolygondata.h"
-#include "bi_base.h"
+#include "../../geometry/path.h"
+#include "../../types/uuid.h"
 
 #include <QtCore>
 
@@ -34,38 +33,34 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Board;
+class Layer;
 
 /*******************************************************************************
- *  Class BI_Polygon
+ *  Class BoardPolygonData
  ******************************************************************************/
 
 /**
- * @brief The BI_Polygon class
+ * @brief The BoardPolygonData class
  */
-class BI_Polygon final : public BI_Base {
-  Q_OBJECT
-
+class BoardPolygonData final {
 public:
-  // Signals
-  enum class Event {
-    LayerChanged,
-    LineWidthChanged,
-    IsFilledChanged,
-    IsGrabAreaChanged,
-    PathChanged,
-  };
-  Signal<BI_Polygon, Event> onEdited;
-  typedef Slot<BI_Polygon, Event> OnEditedSlot;
-
   // Constructors / Destructor
-  BI_Polygon() = delete;
-  BI_Polygon(const BI_Polygon& other) = delete;
-  BI_Polygon(Board& board, const BoardPolygonData& data);
-  ~BI_Polygon() noexcept;
+  BoardPolygonData() = delete;
+  BoardPolygonData(const BoardPolygonData& other) noexcept;
+  BoardPolygonData(const Uuid& uuid, const BoardPolygonData& other) noexcept;
+  BoardPolygonData(const Uuid& uuid, const Layer& layer,
+                   const UnsignedLength& lineWidth, const Path& path, bool fill,
+                   bool isGrabArea) noexcept;
+  explicit BoardPolygonData(const SExpression& node);
+  ~BoardPolygonData() noexcept;
 
   // Getters
-  const BoardPolygonData& getData() const noexcept { return mData; }
+  const Uuid& getUuid() const noexcept { return mUuid; }
+  const Layer& getLayer() const noexcept { return *mLayer; }
+  const UnsignedLength& getLineWidth() const noexcept { return mLineWidth; }
+  const Path& getPath() const noexcept { return mPath; }
+  bool isFilled() const noexcept { return mIsFilled; }
+  bool isGrabArea() const noexcept { return mIsGrabArea; }
 
   // Setters
   bool setLayer(const Layer& layer) noexcept;
@@ -75,14 +70,28 @@ public:
   bool setIsGrabArea(bool isGrabArea) noexcept;
 
   // General Methods
-  void addToBoard() override;
-  void removeFromBoard() override;
+
+  /**
+   * @brief Serialize into ::librepcb::SExpression node
+   *
+   * @param root    Root node to serialize into.
+   */
+  void serialize(SExpression& root) const;
 
   // Operator Overloadings
-  BI_Polygon& operator=(const BI_Polygon& rhs) = delete;
+  bool operator==(const BoardPolygonData& rhs) const noexcept;
+  bool operator!=(const BoardPolygonData& rhs) const noexcept {
+    return !(*this == rhs);
+  }
+  BoardPolygonData& operator=(const BoardPolygonData& rhs) = default;
 
-private:
-  BoardPolygonData mData;
+private:  // Data
+  Uuid mUuid;
+  const Layer* mLayer;
+  UnsignedLength mLineWidth;
+  Path mPath;
+  bool mIsFilled;
+  bool mIsGrabArea;
 };
 
 /*******************************************************************************

@@ -270,6 +270,8 @@ add_library(
   project/board/boardpickplacegenerator.h
   project/board/boardplanefragmentsbuilder.cpp
   project/board/boardplanefragmentsbuilder.h
+  project/board/boardpolygondata.cpp
+  project/board/boardpolygondata.h
   project/board/boardstroketextdata.cpp
   project/board/boardstroketextdata.h
   project/board/drc/boardclipperpathgenerator.cpp

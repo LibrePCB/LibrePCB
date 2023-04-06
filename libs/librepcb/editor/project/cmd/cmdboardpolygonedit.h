@@ -17,16 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDDRAGSELECTEDBOARDITEMS_H
-#define LIBREPCB_EDITOR_CMDDRAGSELECTEDBOARDITEMS_H
+#ifndef LIBREPCB_EDITOR_CMDBOARDPOLYGONEDIT_H
+#define LIBREPCB_EDITOR_CMDBOARDPOLYGONEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommandgroup.h"
+#include "../../undocommand.h"
 
-#include <librepcb/core/types/angle.h>
-#include <librepcb/core/types/point.h>
+#include <librepcb/core/project/board/boardpolygondata.h>
 
 #include <QtCore>
 
@@ -34,64 +33,57 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Angle;
+class BI_Polygon;
+
 namespace editor {
 
-class BoardGraphicsScene;
-class CmdBoardHoleEdit;
-class CmdBoardNetPointEdit;
-class CmdBoardPlaneEdit;
-class CmdBoardPolygonEdit;
-class CmdBoardStrokeTextEdit;
-class CmdBoardViaEdit;
-class CmdDeviceInstanceEdit;
-class CmdDeviceStrokeTextsReset;
-
 /*******************************************************************************
- *  Class CmdDragSelectedBoardItems
+ *  Class CmdBoardPolygonEdit
  ******************************************************************************/
 
 /**
- * @brief The CmdDragSelectedBoardItems class
+ * @brief The CmdBoardPolygonEdit class
  */
-class CmdDragSelectedBoardItems final : public UndoCommandGroup {
+class CmdBoardPolygonEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  explicit CmdDragSelectedBoardItems(BoardGraphicsScene& scene,
-                                     const Point& startPos = Point()) noexcept;
-  ~CmdDragSelectedBoardItems() noexcept;
+  CmdBoardPolygonEdit() = delete;
+  CmdBoardPolygonEdit(const CmdBoardPolygonEdit& other) = delete;
+  explicit CmdBoardPolygonEdit(BI_Polygon& polygon) noexcept;
+  ~CmdBoardPolygonEdit() noexcept;
 
-  // General Methods
-  void snapToGrid() noexcept;
-  void resetAllTexts() noexcept;
-  void setCurrentPosition(const Point& pos,
-                          const bool gridIncrement = true) noexcept;
-  void rotate(const Angle& angle, bool aroundCurrentPosition) noexcept;
+  // Setters
+  void setLayer(const Layer& layer, bool immediate) noexcept;
+  void setLineWidth(const UnsignedLength& width, bool immediate) noexcept;
+  void setIsFilled(bool filled, bool immediate) noexcept;
+  void setIsGrabArea(bool grabArea, bool immediate) noexcept;
+  void setPath(const Path& path, bool immediate) noexcept;
+  void translate(const Point& deltaPos, bool immediate) noexcept;
+  void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
+  void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void mirrorGeometry(Qt::Orientation orientation, const Point& center,
+                      bool immediate) noexcept;
+  void mirrorLayer(bool immediate) noexcept;
 
-private:
-  // Private Methods
+  // Operator Overloadings
+  CmdBoardPolygonEdit& operator=(const CmdBoardPolygonEdit& rhs) = delete;
 
+private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
-  // Private Member Variables
-  BoardGraphicsScene& mScene;
-  int mItemCount;
-  Point mStartPos;
-  Point mDeltaPos;
-  Point mCenterPos;
-  Angle mDeltaAngle;
-  bool mSnappedToGrid;
-  bool mTextsReset;
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
 
-  // Move commands
-  QList<CmdDeviceInstanceEdit*> mDeviceEditCmds;
-  QList<CmdDeviceStrokeTextsReset*> mDeviceStrokeTextsResetCmds;
-  QList<CmdBoardViaEdit*> mViaEditCmds;
-  QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
-  QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
-  QList<CmdBoardPolygonEdit*> mPolygonEditCmds;
-  QList<CmdBoardStrokeTextEdit*> mStrokeTextEditCmds;
-  QList<CmdBoardHoleEdit*> mHoleEditCmds;
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
+
+private:  // Data
+  BI_Polygon& mPolygon;
+  BoardPolygonData mOldData;
+  BoardPolygonData mNewData;
 };
 
 /*******************************************************************************

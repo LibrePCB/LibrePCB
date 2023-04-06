@@ -48,14 +48,13 @@ class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
 class Point;
-class Polygon;
 
 namespace editor {
 
 class BoardClipboardData;
 class CmdBoardPlaneEdit;
+class CmdBoardPolygonEdit;
 class CmdDragSelectedBoardItems;
-class CmdPolygonEdit;
 class UndoCommandGroup;
 
 /*******************************************************************************
@@ -124,7 +123,7 @@ private:  // Methods
   bool snapSelectedItemsToGrid() noexcept;
   bool resetAllTextsOfSelectedItems() noexcept;
   bool removeSelectedItems() noexcept;
-  void removePolygonVertices(Polygon& polygon,
+  void removePolygonVertices(BI_Polygon& polygon,
                              const QVector<int> vertices) noexcept;
   void removePlaneVertices(BI_Plane& plane,
                            const QVector<int> vertices) noexcept;
@@ -174,7 +173,7 @@ private:  // Methods
   void openDevicePropertiesDialog(BI_Device& device) noexcept;
   void openViaPropertiesDialog(BI_Via& via) noexcept;
   void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
-  void openPolygonPropertiesDialog(Polygon& polygon) noexcept;
+  void openPolygonPropertiesDialog(BI_Polygon& polygon) noexcept;
   void openStrokeTextPropertiesDialog(BI_StrokeText& text) noexcept;
   void openHolePropertiesDialog(BI_Hole& hole) noexcept;
   QList<DeviceMenuItem> getDeviceMenuItems(
@@ -192,7 +191,7 @@ private:  // Data
   /// The polygon vertex indices selected for editing (empty if none)
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
-  QScopedPointer<CmdPolygonEdit> mCmdPolygonEdit;
+  QScopedPointer<CmdBoardPolygonEdit> mCmdPolygonEdit;
 
   /// The current plane selected for editing (nullptr if none)
   BI_Plane* mSelectedPlane;

@@ -42,6 +42,7 @@ class BI_NetLineAnchor;
 class BI_NetPoint;
 class BI_NetSegment;
 class BI_Plane;
+class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
 class Circle;
@@ -322,7 +323,10 @@ public:
   DrcMsgCopperBoardClearanceViolation(const BI_Plane& plane,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
-  DrcMsgCopperBoardClearanceViolation(const BI_Device* device,
+  DrcMsgCopperBoardClearanceViolation(const BI_Polygon& polygon,
+                                      const UnsignedLength& minClearance,
+                                      const QVector<Path>& locations) noexcept;
+  DrcMsgCopperBoardClearanceViolation(const BI_Device& device,
                                       const Polygon& polygon,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
@@ -337,6 +341,10 @@ public:
       const DrcMsgCopperBoardClearanceViolation& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgCopperBoardClearanceViolation() noexcept {}
+
+private:
+  static QString getPolygonMessage(const UnsignedLength& minClearance) noexcept;
+  static QString getPolygonDescription() noexcept;
 };
 
 /*******************************************************************************

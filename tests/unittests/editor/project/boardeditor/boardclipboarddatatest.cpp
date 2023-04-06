@@ -167,14 +167,16 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
           UnsignedLength(10), UnsignedLength(20), true, 5,
           BI_Plane::ConnectStyle::Solid);
 
-  std::shared_ptr<Polygon> polygon1 = std::make_shared<Polygon>(
-      Uuid::createRandom(), Layer::topCopper(), UnsignedLength(1), false, true,
-      Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
+  BoardPolygonData polygon1(
+      Uuid::createRandom(), Layer::topCopper(), UnsignedLength(1),
+      Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
+      false, true);
 
-  std::shared_ptr<Polygon> polygon2 = std::make_shared<Polygon>(
-      Uuid::createRandom(), Layer::botCopper(), UnsignedLength(10), true, false,
-      Path({Vertex(Point(10, 20), Angle(30)),
-            Vertex(Point(40, 50), Angle(60))}));
+  BoardPolygonData polygon2(Uuid::createRandom(), Layer::botCopper(),
+                            UnsignedLength(10),
+                            Path({Vertex(Point(10, 20), Angle(30)),
+                                  Vertex(Point(40, 50), Angle(60))}),
+                            true, false);
 
   BoardHoleData hole1(Uuid::createRandom(), PositiveLength(3),
                       makeNonEmptyPath(Point(1, 2)), MaskConfig::automatic());

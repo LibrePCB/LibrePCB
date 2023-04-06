@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "boardeditorstate_select.h"
 
-#include "../../../cmd/cmdpolygonedit.h"
 #include "../../../dialogs/dxfimportdialog.h"
 #include "../../../dialogs/holepropertiesdialog.h"
 #include "../../../dialogs/polygonpropertiesdialog.h"
@@ -35,6 +34,7 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmdboardplaneedit.h"
+#include "../../cmd/cmdboardpolygonedit.h"
 #include "../../cmd/cmddeviceinstanceeditall.h"
 #include "../../cmd/cmddragselectedboarditems.h"
 #include "../../cmd/cmdflipselectedboarditems.h"
@@ -53,6 +53,7 @@
 #include "../graphicsitems/bgi_netline.h"
 #include "../graphicsitems/bgi_netpoint.h"
 #include "../graphicsitems/bgi_plane.h"
+#include "../graphicsitems/bgi_polygon.h"
 #include "../graphicsitems/bgi_stroketext.h"
 #include "../graphicsitems/bgi_via.h"
 
@@ -175,9 +176,9 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       std::unique_ptr<BoardClipboardData> data(
           new BoardClipboardData(scene->getBoard().getUuid(), Point(0, 0)));
       foreach (const auto& path, paths) {
-        data->getPolygons().append(std::make_shared<Polygon>(
-            Uuid::createRandom(), dialog.getLayer(), dialog.getLineWidth(),
-            false, false, path));
+        data->getPolygons().append(
+            BoardPolygonData(Uuid::createRandom(), dialog.getLayer(),
+                             dialog.getLineWidth(), path, false, false));
       }
       for (const auto& circle : import.getCircles()) {
         if (dialog.getImportCirclesAsDrills()) {
@@ -185,10 +186,10 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
               Uuid::createRandom(), circle.diameter,
               makeNonEmptyPath(circle.position), MaskConfig::automatic()));
         } else {
-          data->getPolygons().append(std::make_shared<Polygon>(
+          data->getPolygons().append(BoardPolygonData(
               Uuid::createRandom(), dialog.getLayer(), dialog.getLineWidth(),
-              false, false,
-              Path::circle(circle.diameter).translated(circle.position)));
+              Path::circle(circle.diameter).translated(circle.position), false,
+              false));
         }
       }
 
@@ -281,7 +282,11 @@ bool BoardEditorState_Select::processPaste() noexcept {
         if (footprintData) {
           data.reset(new BoardClipboardData(footprintData->getFootprintUuid(),
                                             footprintData->getCursorPos()));
-          data->getPolygons().append(footprintData->getPolygons());
+          for (const auto& polygon : footprintData->getPolygons()) {
+            data->getPolygons().append(BoardPolygonData(
+                polygon.getUuid(), polygon.getLayer(), polygon.getLineWidth(),
+                polygon.getPath(), polygon.isFilled(), polygon.isGrabArea()));
+          }
           for (const auto& text : footprintData->getStrokeTexts()) {
             data->getStrokeTexts().append(BoardStrokeTextData(
                 text.getUuid(), text.getLayer(), text.getText(),
@@ -409,7 +414,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
     return true;
   }
   foreach (auto ptr, query.getPolygons()) {
-    openPolygonPropertiesDialog(ptr->getPolygon());
+    openPolygonPropertiesDialog(*ptr);
     return true;
   }
   foreach (auto ptr, query.getStrokeTexts()) {
@@ -444,7 +449,7 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
   } else if (mSelectedPolygon && mCmdPolygonEdit) {
     // Move polygon vertices
     QVector<Vertex> vertices =
-        mSelectedPolygon->getPolygon().getPath().getVertices();
+        mSelectedPolygon->getData().getPath().getVertices();
     foreach (int i, mSelectedPolygonVertices) {
       if ((i >= 0) && (i < vertices.count())) {
         vertices[i].setPos(
@@ -503,7 +508,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
              (!mCmdPlaneEdit)) {
     if (findPolygonVerticesAtPosition(Point::fromPx(e.scenePos()))) {
       // start moving polygon vertex
-      mCmdPolygonEdit.reset(new CmdPolygonEdit(mSelectedPolygon->getPolygon()));
+      mCmdPolygonEdit.reset(new CmdBoardPolygonEdit(*mSelectedPolygon));
       return true;
     } else if (findPlaneVerticesAtPosition(Point::fromPx(e.scenePos()))) {
       // start moving plane vertex
@@ -884,14 +889,15 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       aIsVisible->setCheckable(true);
       aIsVisible->setChecked(plane->isVisible());
       mb.addAction(aIsVisible);
-    } else if (auto item = std::dynamic_pointer_cast<PolygonGraphicsItem>(
-                   selectedItem)) {
-      BI_Polygon* polygon =
-          scene->getBoard().getPolygons().value(item->getPolygon().getUuid());
+    } else if (auto item =
+                   std::dynamic_pointer_cast<BGI_Polygon>(selectedItem)) {
+      BI_Polygon* polygon = scene->getBoard().getPolygons().value(
+          item->getPolygon().getData().getUuid());
       if (!polygon) return false;
 
-      int lineIndex = item->getLineIndexAtPosition(pos);
-      QVector<int> vertices = item->getVertexIndicesAtPosition(pos);
+      int lineIndex = item->getGraphicsItem().getLineIndexAtPosition(pos);
+      QVector<int> vertices =
+          item->getGraphicsItem().getVertexIndicesAtPosition(pos);
 
       mb.addAction(
           cmd.properties.createAction(
@@ -902,10 +908,10 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       if (!vertices.isEmpty()) {
         QAction* action = cmd.vertexRemove.createAction(
             &menu, this, [this, polygon, vertices]() {
-              removePolygonVertices(polygon->getPolygon(), vertices);
+              removePolygonVertices(*polygon, vertices);
             });
         int remainingVertices =
-            polygon->getPolygon().getPath().getVertices().count() -
+            polygon->getData().getPath().getVertices().count() -
             vertices.count();
         action->setEnabled(remainingVertices >= 2);
         mb.addAction(action);
@@ -1117,15 +1123,17 @@ bool BoardEditorState_Select::removeSelectedItems() noexcept {
 }
 
 void BoardEditorState_Select::removePolygonVertices(
-    Polygon& polygon, const QVector<int> vertices) noexcept {
+    BI_Polygon& polygon, const QVector<int> vertices) noexcept {
   try {
     Path path;
-    for (int i = 0; i < polygon.getPath().getVertices().count(); ++i) {
+    for (int i = 0; i < polygon.getData().getPath().getVertices().count();
+         ++i) {
       if (!vertices.contains(i)) {
-        path.getVertices().append(polygon.getPath().getVertices()[i]);
+        path.getVertices().append(polygon.getData().getPath().getVertices()[i]);
       }
     }
-    if (polygon.getPath().isClosed() && path.getVertices().count() > 2) {
+    if (polygon.getData().getPath().isClosed() &&
+        path.getVertices().count() > 2) {
       path.close();
     }
     if (path.isClosed() && (path.getVertices().count() == 3)) {
@@ -1134,7 +1142,7 @@ void BoardEditorState_Select::removePolygonVertices(
     if (path.getVertices().count() < 2) {
       return;  // Do not allow to create invalid polygons!
     }
-    QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(polygon));
+    QScopedPointer<CmdBoardPolygonEdit> cmd(new CmdBoardPolygonEdit(polygon));
     cmd->setPath(path, false);
     mContext.undoStack.execCmd(cmd.take());
   } catch (const Exception& e) {
@@ -1172,14 +1180,14 @@ void BoardEditorState_Select::startAddingPolygonVertex(
     BI_Polygon& polygon, int vertex, const Point& pos) noexcept {
   try {
     Q_ASSERT(vertex > 0);  // it must be the vertex *after* the clicked line
-    Path path = polygon.getPolygon().getPath();
+    Path path = polygon.getData().getPath();
     Point newPos = pos.mappedToGrid(getGridInterval());
     Angle newAngle = path.getVertices()[vertex - 1].getAngle();
     path.getVertices().insert(vertex, Vertex(newPos, newAngle));
 
     mSelectedPolygon = &polygon;
     mSelectedPolygonVertices = {vertex};
-    mCmdPolygonEdit.reset(new CmdPolygonEdit(polygon.getPolygon()));
+    mCmdPolygonEdit.reset(new CmdBoardPolygonEdit(polygon));
     mCmdPolygonEdit->setPath(path, true);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1294,7 +1302,8 @@ bool BoardEditorState_Select::findPolygonVerticesAtPosition(
     for (auto it = scene->getPolygons().begin();
          it != scene->getPolygons().end(); it++) {
       if (it.value()->isSelected()) {
-        mSelectedPolygonVertices = it.value()->getVertexIndicesAtPosition(pos);
+        mSelectedPolygonVertices =
+            it.value()->getGraphicsItem().getVertexIndicesAtPosition(pos);
         if (!mSelectedPolygonVertices.isEmpty()) {
           mSelectedPolygon = it.key();
           return true;
@@ -1423,8 +1432,7 @@ bool BoardEditorState_Select::openPropertiesDialog(
   } else if (auto plane = std::dynamic_pointer_cast<BGI_Plane>(item)) {
     openPlanePropertiesDialog(plane->getPlane());
     return true;
-  } else if (auto polygon =
-                 std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
+  } else if (auto polygon = std::dynamic_pointer_cast<BGI_Polygon>(item)) {
     openPolygonPropertiesDialog(polygon->getPolygon());
     return true;
   } else if (auto text = std::dynamic_pointer_cast<BGI_StrokeText>(item)) {
@@ -1471,7 +1479,7 @@ void BoardEditorState_Select::openPlanePropertiesDialog(
 }
 
 void BoardEditorState_Select::openPolygonPropertiesDialog(
-    Polygon& polygon) noexcept {
+    BI_Polygon& polygon) noexcept {
   PolygonPropertiesDialog dialog(
       polygon, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
       "board_editor/polygon_properties_dialog", parentWidget());

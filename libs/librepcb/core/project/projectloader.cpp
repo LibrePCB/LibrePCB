@@ -558,7 +558,7 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
     loadBoardPlane(*board, *node);
   }
   foreach (const SExpression* node, root.getChildren("polygon")) {
-    BI_Polygon* polygon = new BI_Polygon(*board, Polygon(*node));
+    BI_Polygon* polygon = new BI_Polygon(*board, BoardPolygonData(*node));
     board->addPolygon(*polygon);
   }
   foreach (const SExpression* node, root.getChildren("stroke_text")) {

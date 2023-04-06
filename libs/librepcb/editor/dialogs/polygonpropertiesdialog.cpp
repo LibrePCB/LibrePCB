@@ -23,10 +23,12 @@
 #include "polygonpropertiesdialog.h"
 
 #include "../cmd/cmdpolygonedit.h"
+#include "../project/cmd/cmdboardpolygonedit.h"
 #include "../undostack.h"
 #include "ui_polygonpropertiesdialog.h"
 
 #include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/project/board/items/bi_polygon.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -38,11 +40,12 @@ namespace librepcb {
 namespace editor {
 
 PolygonPropertiesDialog::PolygonPropertiesDialog(
-    Polygon& polygon, UndoStack& undoStack, const QSet<const Layer*>& layers,
-    const LengthUnit& lengthUnit, const QString& settingsPrefix,
-    QWidget* parent) noexcept
+    Polygon* libPolygon, BI_Polygon* boardPolygon, UndoStack& undoStack,
+    const QSet<const Layer*>& layers, const LengthUnit& lengthUnit,
+    const QString& settingsPrefix, QWidget* parent) noexcept
   : QDialog(parent),
-    mPolygon(polygon),
+    mLibraryObj(libPolygon),
+    mBoardObj(boardPolygon),
     mUndoStack(undoStack),
     mUi(new Ui::PolygonPropertiesDialog) {
   mUi->setupUi(this);
@@ -53,15 +56,24 @@ PolygonPropertiesDialog::PolygonPropertiesDialog(
 
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &PolygonPropertiesDialog::buttonBoxClicked);
+}
 
-  // load polygon attributes
-  mUi->cbxLayer->setCurrentLayer(mPolygon.getLayer());
-  mUi->edtLineWidth->setValue(mPolygon.getLineWidth());
-  mUi->cbxFillArea->setChecked(mPolygon.isFilled());
-  mUi->cbxIsGrabArea->setChecked(mPolygon.isGrabArea());
+PolygonPropertiesDialog::PolygonPropertiesDialog(
+    Polygon& polygon, UndoStack& undoStack, const QSet<const Layer*>& layers,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
+    QWidget* parent) noexcept
+  : PolygonPropertiesDialog(&polygon, nullptr, undoStack, layers, lengthUnit,
+                            settingsPrefix, parent) {
+  load(polygon);
+}
 
-  // load vertices
-  mUi->pathEditorWidget->setPath(mPolygon.getPath());
+PolygonPropertiesDialog::PolygonPropertiesDialog(
+    BI_Polygon& polygon, UndoStack& undoStack, const QSet<const Layer*>& layers,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
+    QWidget* parent) noexcept
+  : PolygonPropertiesDialog(nullptr, &polygon, undoStack, layers, lengthUnit,
+                            settingsPrefix, parent) {
+  load(polygon.getData());
 }
 
 PolygonPropertiesDialog::~PolygonPropertiesDialog() noexcept {
@@ -91,6 +103,15 @@ void PolygonPropertiesDialog::setReadOnly(bool readOnly) noexcept {
  *  Private Methods
  ******************************************************************************/
 
+template <typename T>
+void PolygonPropertiesDialog::load(const T& obj) noexcept {
+  mUi->cbxLayer->setCurrentLayer(obj.getLayer());
+  mUi->edtLineWidth->setValue(obj.getLineWidth());
+  mUi->cbxFillArea->setChecked(obj.isFilled());
+  mUi->cbxIsGrabArea->setChecked(obj.isGrabArea());
+  mUi->pathEditorWidget->setPath(obj.getPath());
+}
+
 void PolygonPropertiesDialog::buttonBoxClicked(
     QAbstractButton* button) noexcept {
   switch (mUi->buttonBox->buttonRole(button)) {
@@ -113,20 +134,33 @@ void PolygonPropertiesDialog::buttonBoxClicked(
 
 bool PolygonPropertiesDialog::applyChanges() noexcept {
   try {
-    QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(mPolygon));
-    if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
-      cmd->setLayer(*layer, false);
+    if (mLibraryObj) {
+      QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(*mLibraryObj));
+      applyChanges(*cmd);
+      mUndoStack.execCmd(cmd.take());  // can throw
     }
-    cmd->setIsFilled(mUi->cbxFillArea->isChecked(), false);
-    cmd->setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
-    cmd->setLineWidth(mUi->edtLineWidth->getValue(), false);
-    cmd->setPath(mUi->pathEditorWidget->getPath(), false);  // can throw
-    mUndoStack.execCmd(cmd.take());
+    if (mBoardObj) {
+      QScopedPointer<CmdBoardPolygonEdit> cmd(
+          new CmdBoardPolygonEdit(*mBoardObj));
+      applyChanges(*cmd);
+      mUndoStack.execCmd(cmd.take());  // can throw
+    }
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
     return false;
   }
+}
+
+template <typename T>
+void PolygonPropertiesDialog::applyChanges(T& cmd) {
+  if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
+    cmd.setLayer(*layer, false);
+  }
+  cmd.setIsFilled(mUi->cbxFillArea->isChecked(), false);
+  cmd.setIsGrabArea(mUi->cbxIsGrabArea->isChecked(), false);
+  cmd.setLineWidth(mUi->edtLineWidth->getValue(), false);
+  cmd.setPath(mUi->pathEditorWidget->getPath(), false);  // can throw
 }
 
 /*******************************************************************************

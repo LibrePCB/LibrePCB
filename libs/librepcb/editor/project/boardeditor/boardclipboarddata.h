@@ -25,10 +25,10 @@
  ******************************************************************************/
 #include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/geometry/junction.h>
-#include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/trace.h>
 #include <librepcb/core/geometry/via.h>
 #include <librepcb/core/project/board/boardholedata.h>
+#include <librepcb/core/project/board/boardpolygondata.h>
 #include <librepcb/core/project/board/boardstroketextdata.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
@@ -262,7 +262,7 @@ public:
     return mNetSegments;
   }
   SerializableObjectList<Plane, Plane>& getPlanes() noexcept { return mPlanes; }
-  PolygonList& getPolygons() noexcept { return mPolygons; }
+  QList<BoardPolygonData>& getPolygons() noexcept { return mPolygons; }
   QList<BoardStrokeTextData>& getStrokeTexts() noexcept { return mStrokeTexts; }
   QList<BoardHoleData>& getHoles() noexcept { return mHoles; }
   QMap<std::pair<Uuid, Uuid>, Point>& getPadPositions() noexcept {
@@ -287,7 +287,7 @@ private:  // Data
   SerializableObjectList<Device, Device> mDevices;
   SerializableObjectList<NetSegment, NetSegment> mNetSegments;
   SerializableObjectList<Plane, Plane> mPlanes;
-  PolygonList mPolygons;
+  QList<BoardPolygonData> mPolygons;
   QList<BoardStrokeTextData> mStrokeTexts;
   QList<BoardHoleData> mHoles;
   QMap<std::pair<Uuid, Uuid>, Point> mPadPositions;

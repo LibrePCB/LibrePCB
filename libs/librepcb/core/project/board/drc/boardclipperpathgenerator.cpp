@@ -72,9 +72,11 @@ void BoardClipperPathGenerator::addCopper(
     bool ignorePlanes) {
   // Board polygons.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if ((polygon->getPolygon().getLayer() == layer) &&
+    if ((polygon->getData().getLayer() == layer) &&
         (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
-      addPolygon(*polygon);
+      addPolygon(polygon->getData().getPath(),
+                 polygon->getData().getLineWidth(),
+                 polygon->getData().isFilled());
     }
   }
 
@@ -106,7 +108,8 @@ void BoardClipperPathGenerator::addCopper(
       const Layer& polygonLayer = transform.map(polygon.getLayer());
       if ((polygonLayer == layer) &&
           (netsignals.isEmpty() || netsignals.contains(nullptr))) {
-        addPolygon(polygon, transform);
+        addPolygon(transform.map(polygon.getPath()), polygon.getLineWidth(),
+                   polygon.isFilled());
       }
     }
 
@@ -180,18 +183,12 @@ void BoardClipperPathGenerator::addPlane(const BI_Plane& plane) {
   }
 }
 
-void BoardClipperPathGenerator::addPolygon(const BI_Polygon& polygon) {
-  addPolygon(polygon.getPolygon(), Transform());
-}
-
-void BoardClipperPathGenerator::addPolygon(const Polygon& polygon,
-                                           const Transform& transform) {
-  const Path path = transform.map(polygon.getPath());
-
+void BoardClipperPathGenerator::addPolygon(const Path& path,
+                                           const UnsignedLength& lineWidth,
+                                           bool filled) {
   // Outline.
-  if (polygon.getLineWidth() > 0) {
-    QVector<Path> paths =
-        path.toOutlineStrokes(PositiveLength(*polygon.getLineWidth()));
+  if (lineWidth > 0) {
+    QVector<Path> paths = path.toOutlineStrokes(PositiveLength(*lineWidth));
     foreach (const Path& p, paths) {
       ClipperHelpers::unite(mPaths,
                             ClipperHelpers::convert(p, mMaxArcTolerance));
@@ -200,7 +197,7 @@ void BoardClipperPathGenerator::addPolygon(const Polygon& polygon,
 
   // Area (only fill closed paths, for consistency with the appearance in
   // the board editor and Gerber output).
-  if (polygon.isFilled() && path.isClosed()) {
+  if (filled && path.isClosed()) {
     ClipperHelpers::unite(mPaths,
                           ClipperHelpers::convert(path, mMaxArcTolerance));
   }

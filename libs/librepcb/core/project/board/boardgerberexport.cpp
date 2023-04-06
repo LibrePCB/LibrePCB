@@ -130,11 +130,10 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   // Export board outline since this is useful for manual review.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     Q_ASSERT(polygon);
-    if (polygon->getPolygon().getLayer() == Layer::boardOutlines()) {
-      UnsignedLength lineWidth =
-          calcWidthOfLayer(polygon->getPolygon().getLineWidth(),
-                           polygon->getPolygon().getLayer());
-      gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth,
+    if (polygon->getData().getLayer() == Layer::boardOutlines()) {
+      UnsignedLength lineWidth = calcWidthOfLayer(
+          polygon->getData().getLineWidth(), polygon->getData().getLayer());
+      gen.drawPathOutline(polygon->getData().getPath(), lineWidth,
                           GerberAttribute::ApertureFunction::Profile,
                           tl::nullopt, QString());
     }
@@ -604,16 +603,16 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   }
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     Q_ASSERT(polygon);
-    if (layer == polygon->getPolygon().getLayer()) {
+    if (layer == polygon->getData().getLayer()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layer);
-      gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth,
+          calcWidthOfLayer(polygon->getData().getLineWidth(), layer);
+      gen.drawPathOutline(polygon->getData().getPath(), lineWidth,
                           graphicsFunction, graphicsNet, QString());
       // Only fill closed paths (for consistency with the appearance in the
       // board editor, and because Gerber expects area outlines as closed).
-      if (polygon->getPolygon().isFilled() &&
-          polygon->getPolygon().getPath().isClosed()) {
-        gen.drawPathArea(polygon->getPolygon().getPath(), graphicsFunction,
+      if (polygon->getData().isFilled() &&
+          polygon->getData().getPath().isClosed()) {
+        gen.drawPathArea(polygon->getData().getPath(), graphicsFunction,
                          graphicsNet, QString());
       }
     }
