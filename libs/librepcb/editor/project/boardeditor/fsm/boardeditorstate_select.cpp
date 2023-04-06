@@ -363,6 +363,17 @@ bool BoardEditorState_Select::processSnapToGrid() noexcept {
   return snapSelectedItemsToGrid();
 }
 
+bool BoardEditorState_Select::processSetLocked(bool locked) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
+      mCmdPlaneEdit) {
+    return false;
+  }
+  return lockSelectedItems(locked);
+}
+
 bool BoardEditorState_Select::processResetAllTexts() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
@@ -395,7 +406,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
     return false;
   }
 
-  BoardSelectionQuery query(*scene);
+  BoardSelectionQuery query(*scene, true);
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedVias();
   query.addSelectedPlanes();
@@ -701,6 +712,12 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           &menu, this, [this]() { snapSelectedItemsToGrid(); });
       aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
       mb.addAction(aSnap);
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(device->getDevice().isLocked());
+      mb.addAction(aIsLocked);
+      mb.addSeparator();
       mb.addAction(cmd.deviceResetTextAll.createAction(
           &menu, this, &BoardEditorState_Select::resetAllTextsOfSelectedItems));
       mb.addSeparator();
@@ -883,13 +900,18 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       mb.addAction(cmd.flipVertical.createAction(
           &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
       mb.addSeparator();
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(plane->getPlane().isLocked());
+      mb.addAction(aIsLocked);
       QAction* aIsVisible =
           cmd.visible.createAction(&menu, this, [plane](bool checked) {
             // Visibility is not saved, thus no undo command is needed here.
-            plane->setVisible(checked);
+            plane->getPlane().setVisible(checked);
           });
       aIsVisible->setCheckable(true);
-      aIsVisible->setChecked(plane->isVisible());
+      aIsVisible->setChecked(plane->getPlane().isVisible());
       mb.addAction(aIsVisible);
     } else if (auto item =
                    std::dynamic_pointer_cast<BGI_Polygon>(selectedItem)) {
@@ -944,6 +966,12 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
       mb.addAction(cmd.flipVertical.createAction(
           &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
+      mb.addSeparator();
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(polygon->getData().isLocked());
+      mb.addAction(aIsLocked);
     } else if (auto text =
                    std::dynamic_pointer_cast<BGI_StrokeText>(selectedItem)) {
       const Point pos = text->getStrokeText().getData().getPosition();
@@ -975,6 +1003,11 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           &menu, this, [this]() { snapSelectedItemsToGrid(); });
       aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
       mb.addAction(aSnap);
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(text->getStrokeText().getData().isLocked());
+      mb.addAction(aIsLocked);
     } else if (auto hole = std::dynamic_pointer_cast<BGI_Hole>(selectedItem)) {
       const Point pos =
           hole->getHole().getData().getPath()->getVertices().first().getPos();
@@ -997,6 +1030,11 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           &menu, this, [this]() { snapSelectedItemsToGrid(); });
       aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
       mb.addAction(aSnap);
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(hole->getHole().getData().isLocked());
+      mb.addAction(aIsLocked);
     } else {
       return false;
     }
@@ -1023,7 +1061,7 @@ bool BoardEditorState_Select::startMovingSelectedItems(
     BoardGraphicsScene& scene, const Point& startPos) noexcept {
   Q_ASSERT(mSelectedItemsDragCommand.isNull());
   mSelectedItemsDragCommand.reset(
-      new CmdDragSelectedBoardItems(scene, startPos));
+      new CmdDragSelectedBoardItems(scene, getIgnoreLocks(), startPos));
   return true;
 }
 
@@ -1033,7 +1071,7 @@ bool BoardEditorState_Select::moveSelectedItems(const Point& delta) noexcept {
 
   try {
     QScopedPointer<CmdDragSelectedBoardItems> cmd(
-        new CmdDragSelectedBoardItems(*scene, Point(0, 0)));
+        new CmdDragSelectedBoardItems(*scene, getIgnoreLocks(), Point(0, 0)));
     cmd->setCurrentPosition(delta);
     return execCmd(cmd.take());
   } catch (const Exception& e) {
@@ -1051,7 +1089,7 @@ bool BoardEditorState_Select::rotateSelectedItems(const Angle& angle) noexcept {
       mSelectedItemsDragCommand->rotate(angle, true);
     } else {
       QScopedPointer<CmdDragSelectedBoardItems> cmd(
-          new CmdDragSelectedBoardItems(*scene));
+          new CmdDragSelectedBoardItems(*scene, getIgnoreLocks()));
       cmd->rotate(angle, false);
       mContext.undoStack.execCmd(cmd.take());
     }
@@ -1069,7 +1107,7 @@ bool BoardEditorState_Select::flipSelectedItems(
 
   try {
     CmdFlipSelectedBoardItems* cmd =
-        new CmdFlipSelectedBoardItems(*scene, orientation);
+        new CmdFlipSelectedBoardItems(*scene, orientation, getIgnoreLocks());
     mContext.undoStack.execCmd(cmd);
     return true;
   } catch (const Exception& e) {
@@ -1084,9 +1122,25 @@ bool BoardEditorState_Select::snapSelectedItemsToGrid() noexcept {
 
   try {
     QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
-        new CmdDragSelectedBoardItems(*scene));
+        new CmdDragSelectedBoardItems(*scene, getIgnoreLocks()));
     cmdMove->snapToGrid();
     mContext.undoStack.execCmd(cmdMove.take());
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    return false;
+  }
+}
+
+bool BoardEditorState_Select::lockSelectedItems(bool locked) noexcept {
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
+
+  try {
+    QScopedPointer<CmdDragSelectedBoardItems> cmd(
+        new CmdDragSelectedBoardItems(*scene, true));
+    cmd->setLocked(locked);
+    mContext.undoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1100,7 +1154,7 @@ bool BoardEditorState_Select::resetAllTextsOfSelectedItems() noexcept {
 
   try {
     QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
-        new CmdDragSelectedBoardItems(*scene));
+        new CmdDragSelectedBoardItems(*scene, true));
     cmdMove->resetAllTexts();
     mContext.undoStack.execCmd(cmdMove.take());
     return true;
@@ -1115,7 +1169,8 @@ bool BoardEditorState_Select::removeSelectedItems() noexcept {
   if (!scene) return false;
 
   try {
-    CmdRemoveSelectedBoardItems* cmd = new CmdRemoveSelectedBoardItems(*scene);
+    CmdRemoveSelectedBoardItems* cmd =
+        new CmdRemoveSelectedBoardItems(*scene, getIgnoreLocks());
     mContext.undoStack.execCmd(cmd);
     return true;
   } catch (const Exception& e) {
@@ -1257,7 +1312,7 @@ bool BoardEditorState_Select::startPaste(
     } else {
       // Start moving the selected items.
       mSelectedItemsDragCommand.reset(
-          new CmdDragSelectedBoardItems(scene, startPos));  // can throw
+          new CmdDragSelectedBoardItems(scene, true, startPos));  // can throw
     }
     return true;
   } else {
@@ -1303,7 +1358,8 @@ bool BoardEditorState_Select::findPolygonVerticesAtPosition(
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     for (auto it = scene->getPolygons().begin();
          it != scene->getPolygons().end(); it++) {
-      if (it.value()->isSelected()) {
+      if (it.value()->isSelected() &&
+          ((!it.key()->getData().isLocked()) || getIgnoreLocks())) {
         mSelectedPolygonVertices =
             it.value()->getGraphicsItem().getVertexIndicesAtPosition(pos);
         if (!mSelectedPolygonVertices.isEmpty()) {
@@ -1324,7 +1380,8 @@ bool BoardEditorState_Select::findPlaneVerticesAtPosition(
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     for (auto it = scene->getPlanes().begin(); it != scene->getPlanes().end();
          it++) {
-      if (it.value()->isSelected()) {
+      if (it.value()->isSelected() &&
+          ((!it.key()->isLocked()) || getIgnoreLocks())) {
         mSelectedPlaneVertices = it.value()->getVertexIndicesAtPosition(pos);
         if (!mSelectedPlaneVertices.isEmpty()) {
           mSelectedPlane = it.key();
@@ -1362,7 +1419,7 @@ bool BoardEditorState_Select::measureSelectedItems(
   }
 
   // Query the total number of selected netlines
-  BoardSelectionQuery query(*scene);
+  BoardSelectionQuery query(*scene, true);
   query.addSelectedNetLines();
   int totalSelectedNetlines = query.getNetLines().size();
 

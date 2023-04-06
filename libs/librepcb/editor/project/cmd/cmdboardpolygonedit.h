@@ -66,6 +66,7 @@ public:
   void mirrorGeometry(Qt::Orientation orientation, const Point& center,
                       bool immediate) noexcept;
   void mirrorLayer(bool immediate) noexcept;
+  void setLocked(bool locked) noexcept;
 
   // Operator Overloadings
   CmdBoardPolygonEdit& operator=(const CmdBoardPolygonEdit& rhs) = delete;

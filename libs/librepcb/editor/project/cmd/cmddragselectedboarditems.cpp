@@ -55,7 +55,8 @@ namespace editor {
  ******************************************************************************/
 
 CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
-    BoardGraphicsScene& scene, const Point& startPos) noexcept
+    BoardGraphicsScene& scene, bool includeLockedItems,
+    const Point& startPos) noexcept
   : UndoCommandGroup(tr("Drag Board Elements")),
     mScene(scene),
     mItemCount(0),
@@ -64,9 +65,10 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     mCenterPos(0, 0),
     mDeltaAngle(0),
     mSnappedToGrid(false),
+    mLockedChanged(false),
     mTextsReset(false) {
   // get all selected items
-  BoardSelectionQuery query(mScene);
+  BoardSelectionQuery query(mScene, includeLockedItems);
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedVias();
   query.addSelectedNetPoints();
@@ -180,6 +182,21 @@ void CmdDragSelectedBoardItems::snapToGrid() noexcept {
   mScene.getBoard().triggerAirWiresRebuild();
 }
 
+void CmdDragSelectedBoardItems::setLocked(bool locked) noexcept {
+  foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
+    cmd->setLocked(locked);
+  }
+  foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) { cmd->setLocked(locked); }
+  foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->setLocked(locked);
+  }
+  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+    cmd->setLocked(locked);
+  }
+  foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) { cmd->setLocked(locked); }
+  mLockedChanged = true;
+}
+
 void CmdDragSelectedBoardItems::resetAllTexts() noexcept {
   mTextsReset = true;
 }
@@ -264,7 +281,7 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
 
 bool CmdDragSelectedBoardItems::performExecute() {
   if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0()) &&
-      (!mSnappedToGrid) && (!mTextsReset)) {
+      (!mSnappedToGrid) && (!mTextsReset) && (!mLockedChanged)) {
     // no movement required --> discard all commands
     qDeleteAll(mDeviceEditCmds);
     mDeviceEditCmds.clear();

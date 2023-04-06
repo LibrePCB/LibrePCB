@@ -186,6 +186,11 @@ void CmdBoardStrokeTextEdit::setAutoRotate(bool autoRotate,
   }
 }
 
+void CmdBoardStrokeTextEdit::setLocked(bool locked) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewData.setLocked(locked);
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -208,6 +213,7 @@ void CmdBoardStrokeTextEdit::performUndo() {
   mText.setAlign(mOldData.getAlign());
   mText.setMirrored(mOldData.getMirrored());
   mText.setAutoRotate(mOldData.getAutoRotate());
+  mText.setLocked(mOldData.isLocked());
 }
 
 void CmdBoardStrokeTextEdit::performRedo() {
@@ -222,6 +228,7 @@ void CmdBoardStrokeTextEdit::performRedo() {
   mText.setAlign(mNewData.getAlign());
   mText.setMirrored(mNewData.getMirrored());
   mText.setAutoRotate(mNewData.getAutoRotate());
+  mText.setLocked(mNewData.isLocked());
 }
 
 /*******************************************************************************

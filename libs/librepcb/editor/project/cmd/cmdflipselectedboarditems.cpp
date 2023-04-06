@@ -65,10 +65,12 @@ namespace editor {
  ******************************************************************************/
 
 CmdFlipSelectedBoardItems::CmdFlipSelectedBoardItems(
-    BoardGraphicsScene& scene, Qt::Orientation orientation) noexcept
+    BoardGraphicsScene& scene, Qt::Orientation orientation,
+    bool includeLockedItems) noexcept
   : UndoCommandGroup(tr("Flip Board Elements")),
     mScene(scene),
-    mOrientation(orientation) {
+    mOrientation(orientation),
+    mIncludeLockedItems(includeLockedItems) {
 }
 
 CmdFlipSelectedBoardItems::~CmdFlipSelectedBoardItems() noexcept {
@@ -83,7 +85,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
   // get all selected items
-  BoardSelectionQuery query(mScene);
+  BoardSelectionQuery query(mScene, mIncludeLockedItems);
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedNetLines();
   query.addSelectedVias();

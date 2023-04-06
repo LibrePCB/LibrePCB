@@ -103,8 +103,9 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
   // priority spinbox
   mUi->spbPriority->setValue(mPlane.getPriority());
 
-  // keep orphans checkbox
+  // checkboxes
   mUi->cbKeepOrphans->setChecked(mPlane.getKeepOrphans());
+  mUi->cbxLock->setChecked(mPlane.isLocked());
 
   // vertices
   mUi->pathEditorWidget->setPath(mPlane.getOutline());
@@ -171,8 +172,9 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
     // priority
     cmd->setPriority(mUi->spbPriority->value());
 
-    // keep orphans
+    // booleans
     cmd->setKeepOrphans(mUi->cbKeepOrphans->isChecked());
+    cmd->setLocked(mUi->cbxLock->isChecked());
 
     // vertices
     cmd->setOutline(mUi->pathEditorWidget->getPath(), false);  // can throw

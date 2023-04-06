@@ -67,6 +67,7 @@ public:
   void setConnectStyle(BI_Plane::ConnectStyle style) noexcept;
   void setPriority(int priority) noexcept;
   void setKeepOrphans(bool keepOrphans) noexcept;
+  void setLocked(bool locked) noexcept;
 
 private:
   // Private Methods
@@ -103,6 +104,8 @@ private:
   int mNewPriority;
   bool mOldKeepOrphans;
   bool mNewKeepOrphans;
+  bool mOldLocked;
+  bool mNewLocked;
 };
 
 /*******************************************************************************

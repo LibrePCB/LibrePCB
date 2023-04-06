@@ -62,6 +62,7 @@ public:
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void setMirrored(bool mirrored, bool immediate);
   void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
+  void setLocked(bool locked);
 
 private:
   // Private Methods
@@ -87,6 +88,8 @@ private:
   Angle mNewRotation;
   bool mOldMirrored;
   bool mNewMirrored;
+  bool mOldLocked;
+  bool mNewLocked;
 
   friend class CmdDeviceInstanceEditAll;
 };

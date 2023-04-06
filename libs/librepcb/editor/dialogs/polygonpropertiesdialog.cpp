@@ -65,6 +65,7 @@ PolygonPropertiesDialog::PolygonPropertiesDialog(
   : PolygonPropertiesDialog(&polygon, nullptr, undoStack, layers, lengthUnit,
                             settingsPrefix, parent) {
   load(polygon);
+  mUi->cbxLock->hide();
 }
 
 PolygonPropertiesDialog::PolygonPropertiesDialog(
@@ -74,6 +75,7 @@ PolygonPropertiesDialog::PolygonPropertiesDialog(
   : PolygonPropertiesDialog(nullptr, &polygon, undoStack, layers, lengthUnit,
                             settingsPrefix, parent) {
   load(polygon.getData());
+  mUi->cbxLock->setChecked(polygon.getData().isLocked());
 }
 
 PolygonPropertiesDialog::~PolygonPropertiesDialog() noexcept {
@@ -86,8 +88,9 @@ PolygonPropertiesDialog::~PolygonPropertiesDialog() noexcept {
 void PolygonPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->cbxLayer->setDisabled(readOnly);
   mUi->edtLineWidth->setReadOnly(readOnly);
-  mUi->cbxFillArea->setCheckable(!readOnly);
-  mUi->cbxIsGrabArea->setCheckable(!readOnly);
+  mUi->cbxFillArea->setEnabled(!readOnly);
+  mUi->cbxIsGrabArea->setEnabled(!readOnly);
+  mUi->cbxLock->setEnabled(!readOnly);
   mUi->pathEditorWidget->setReadOnly(readOnly);
   if (readOnly) {
     mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
@@ -143,6 +146,7 @@ bool PolygonPropertiesDialog::applyChanges() noexcept {
       QScopedPointer<CmdBoardPolygonEdit> cmd(
           new CmdBoardPolygonEdit(*mBoardObj));
       applyChanges(*cmd);
+      cmd->setLocked(mUi->cbxLock->isChecked());
       mUndoStack.execCmd(cmd.take());  // can throw
     }
     return true;

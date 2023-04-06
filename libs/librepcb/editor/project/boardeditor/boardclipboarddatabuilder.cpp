@@ -72,7 +72,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
       new BoardClipboardData(mScene.getBoard().getUuid(), cursorPos));
 
   // Get all selected items
-  BoardSelectionQuery query(mScene);
+  BoardSelectionQuery query(mScene, true);
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedVias();
   query.addSelectedNetLines();

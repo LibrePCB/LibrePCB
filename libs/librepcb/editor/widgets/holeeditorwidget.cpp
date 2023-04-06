@@ -46,6 +46,8 @@ HoleEditorWidget::HoleEditorWidget(QWidget* parent) noexcept
     mDiameter(1000000),
     mPath(makeNonEmptyPath(Point(0, 0))) {
   mUi->setupUi(this);
+  mUi->lblOptions->hide();
+  mUi->cbxLock->hide();
   mUi->pathEditorWidget->setFrameShape(QFrame::NoFrame);
   mUi->pathEditorWidget->setMinimumVertexCount(1);
   connect(mUi->edtDiameter, &PositiveLengthEdit::valueChanged, this,
@@ -82,6 +84,14 @@ HoleEditorWidget::~HoleEditorWidget() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+bool HoleEditorWidget::getLocked() const noexcept {
+  return mUi->cbxLock->isChecked();
+}
+
+/*******************************************************************************
  *  Setters
  ******************************************************************************/
 
@@ -99,6 +109,12 @@ void HoleEditorWidget::setReadOnly(bool readOnly) noexcept {
 void HoleEditorWidget::setDiameter(const PositiveLength& diameter) noexcept {
   mDiameter = diameter;
   mUi->edtDiameter->setValue(diameter);
+}
+
+void HoleEditorWidget::setLocked(bool locked) noexcept {
+  mUi->lblOptions->show();
+  mUi->cbxLock->show();
+  mUi->cbxLock->setChecked(locked);
 }
 
 void HoleEditorWidget::setPath(const NonEmptyPath& path) noexcept {

@@ -63,6 +63,7 @@ public:
               bool immediate) noexcept;
   void setDiameter(const PositiveLength& diameter, bool immediate) noexcept;
   void setStopMaskConfig(const MaskConfig& config) noexcept;
+  void setLocked(bool locked) noexcept;
 
   // Operator Overloadings
   CmdBoardHoleEdit& operator=(const CmdBoardHoleEdit& rhs) = delete;

@@ -77,6 +77,7 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
   : StrokeTextPropertiesDialog(&text, nullptr, undoStack, layers, lengthUnit,
                                settingsPrefix, parent) {
   load(text, Application::getDefaultStrokeFont());
+  mUi->cbxLock->hide();
 }
 
 StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
@@ -86,6 +87,7 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
   : StrokeTextPropertiesDialog(nullptr, &text, undoStack, layers, lengthUnit,
                                settingsPrefix, parent) {
   load(text.getData(), text.getFont());
+  mUi->cbxLock->setChecked(text.getData().isLocked());
 }
 
 StrokeTextPropertiesDialog::~StrokeTextPropertiesDialog() noexcept {
@@ -110,6 +112,7 @@ void StrokeTextPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->edtRotation->setReadOnly(readOnly);
   mUi->cbxAutoRotate->setEnabled(!readOnly);
   mUi->cbxMirrored->setEnabled(!readOnly);
+  mUi->cbxLock->setEnabled(!readOnly);
   if (readOnly) {
     mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
   } else {
@@ -192,6 +195,7 @@ bool StrokeTextPropertiesDialog::applyChanges() noexcept {
       QScopedPointer<CmdBoardStrokeTextEdit> cmd(
           new CmdBoardStrokeTextEdit(*mBoardObj));
       applyChanges(*cmd);
+      cmd->setLocked(mUi->cbxLock->isChecked());
       mUndoStack.execCmd(cmd.take());  // can throw
     }
     return true;

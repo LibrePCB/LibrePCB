@@ -57,11 +57,13 @@ class CmdDragSelectedBoardItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   explicit CmdDragSelectedBoardItems(BoardGraphicsScene& scene,
+                                     bool includeLockedItems,
                                      const Point& startPos = Point()) noexcept;
   ~CmdDragSelectedBoardItems() noexcept;
 
   // General Methods
   void snapToGrid() noexcept;
+  void setLocked(bool locked) noexcept;
   void resetAllTexts() noexcept;
   void setCurrentPosition(const Point& pos,
                           const bool gridIncrement = true) noexcept;
@@ -81,6 +83,7 @@ private:
   Point mCenterPos;
   Angle mDeltaAngle;
   bool mSnappedToGrid;
+  bool mLockedChanged;
   bool mTextsReset;
 
   // Move commands

@@ -61,6 +61,7 @@ public:
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void setMirrored(bool mirrored, bool immediate);
   void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
+  void setLocked(bool locked) noexcept;
 
 private:
   CmdDeviceInstanceEdit* mDevEditCmd;

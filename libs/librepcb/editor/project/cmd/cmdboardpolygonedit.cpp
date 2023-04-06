@@ -117,6 +117,11 @@ void CmdBoardPolygonEdit::mirrorLayer(bool immediate) noexcept {
   setLayer(mNewData.getLayer().mirrored(), immediate);
 }
 
+void CmdBoardPolygonEdit::setLocked(bool locked) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewData.setLocked(locked);
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -131,6 +136,7 @@ void CmdBoardPolygonEdit::performUndo() {
   mPolygon.setLineWidth(mOldData.getLineWidth());
   mPolygon.setIsFilled(mOldData.isFilled());
   mPolygon.setIsGrabArea(mOldData.isGrabArea());
+  mPolygon.setLocked(mOldData.isLocked());
   mPolygon.setPath(mOldData.getPath());
 }
 
@@ -139,6 +145,7 @@ void CmdBoardPolygonEdit::performRedo() {
   mPolygon.setLineWidth(mNewData.getLineWidth());
   mPolygon.setIsFilled(mNewData.isFilled());
   mPolygon.setIsGrabArea(mNewData.isGrabArea());
+  mPolygon.setLocked(mNewData.isLocked());
   mPolygon.setPath(mNewData.getPath());
 }
 

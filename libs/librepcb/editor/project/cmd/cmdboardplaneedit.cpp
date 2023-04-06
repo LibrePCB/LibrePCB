@@ -57,7 +57,9 @@ CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane,
     mOldPriority(plane.getPriority()),
     mNewPriority(mOldPriority),
     mOldKeepOrphans(plane.getKeepOrphans()),
-    mNewKeepOrphans(mOldKeepOrphans) {
+    mNewKeepOrphans(mOldKeepOrphans),
+    mOldLocked(plane.isLocked()),
+    mNewLocked(mOldLocked) {
 }
 
 CmdBoardPlaneEdit::~CmdBoardPlaneEdit() noexcept {
@@ -140,6 +142,11 @@ void CmdBoardPlaneEdit::setKeepOrphans(bool keepOrphans) noexcept {
   mNewKeepOrphans = keepOrphans;
 }
 
+void CmdBoardPlaneEdit::setLocked(bool locked) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewLocked = locked;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -155,6 +162,7 @@ bool CmdBoardPlaneEdit::performExecute() {
   if (mNewConnectStyle != mOldConnectStyle) return true;
   if (mNewPriority != mOldPriority) return true;
   if (mNewKeepOrphans != mOldKeepOrphans) return true;
+  if (mNewLocked != mOldLocked) return true;
   return false;
 }
 
@@ -167,6 +175,7 @@ void CmdBoardPlaneEdit::performUndo() {
   mPlane.setConnectStyle(mOldConnectStyle);
   mPlane.setPriority(mOldPriority);
   mPlane.setKeepOrphans(mOldKeepOrphans);
+  mPlane.setLocked(mOldLocked);
 
   // rebuild all planes to see the changes
   if (mDoRebuildOnChanges) mPlane.getBoard().rebuildAllPlanes();
@@ -181,6 +190,7 @@ void CmdBoardPlaneEdit::performRedo() {
   mPlane.setConnectStyle(mNewConnectStyle);
   mPlane.setPriority(mNewPriority);
   mPlane.setKeepOrphans(mNewKeepOrphans);
+  mPlane.setLocked(mNewLocked);
 
   // rebuild all planes to see the changes
   if (mDoRebuildOnChanges) mPlane.getBoard().rebuildAllPlanes();

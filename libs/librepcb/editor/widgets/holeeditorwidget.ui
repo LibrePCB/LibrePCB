@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>366</width>
-    <height>206</height>
+    <width>406</width>
+    <height>239</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,12 +27,15 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QFormLayout" name="formLayout">
-     <property name="fieldGrowthPolicy">
-      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-     </property>
+    <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="label_6">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string>Diameter:</string>
        </property>
@@ -40,6 +43,35 @@
      </item>
      <item row="0" column="1">
       <widget class="librepcb::editor::PositiveLengthEdit" name="edtDiameter" native="true"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="lblOptions">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Options:</string>
+       </property>
+       <property name="indent">
+        <number>30</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QCheckBox" name="cbxLock">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Lock</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -176,6 +208,12 @@
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>librepcb::editor::UnsignedLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>librepcb::editor::PositiveLengthEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
@@ -187,15 +225,10 @@
    <header location="global">librepcb/editor/widgets/patheditorwidget.h</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>librepcb::editor::UnsignedLengthEdit</class>
-   <extends>QWidget</extends>
-   <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
-   <container>1</container>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>edtDiameter</tabstop>
+  <tabstop>cbxLock</tabstop>
   <tabstop>edtPosX</tabstop>
   <tabstop>edtPosY</tabstop>
   <tabstop>edtCenterX</tabstop>

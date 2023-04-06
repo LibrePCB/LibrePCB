@@ -61,11 +61,13 @@ public:
 
   // Getters
   const PositiveLength& getDiameter() const noexcept { return mDiameter; }
+  bool getLocked() const noexcept;
   const NonEmptyPath& getPath() const noexcept { return mPath; }
 
   // Setters
   void setReadOnly(bool readOnly) noexcept;
   void setDiameter(const PositiveLength& diameter) noexcept;
+  void setLocked(bool locked) noexcept;
   void setPath(const NonEmptyPath& path) noexcept;
 
   // General Methods

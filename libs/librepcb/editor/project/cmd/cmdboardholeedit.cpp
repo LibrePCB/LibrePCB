@@ -100,6 +100,11 @@ void CmdBoardHoleEdit::setStopMaskConfig(const MaskConfig& config) noexcept {
   mNewData.setStopMaskConfig(config);
 }
 
+void CmdBoardHoleEdit::setLocked(bool locked) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewData.setLocked(locked);
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -113,12 +118,14 @@ void CmdBoardHoleEdit::performUndo() {
   mHole.setPath(mOldData.getPath());
   mHole.setDiameter(mOldData.getDiameter());
   mHole.setStopMaskConfig(mOldData.getStopMaskConfig());
+  mHole.setLocked(mOldData.isLocked());
 }
 
 void CmdBoardHoleEdit::performRedo() {
   mHole.setPath(mNewData.getPath());
   mHole.setDiameter(mNewData.getDiameter());
   mHole.setStopMaskConfig(mNewData.getStopMaskConfig());
+  mHole.setLocked(mNewData.isLocked());
 }
 
 /*******************************************************************************

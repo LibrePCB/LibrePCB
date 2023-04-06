@@ -43,8 +43,10 @@ namespace editor {
  ******************************************************************************/
 
 CmdRemoveSelectedBoardItems::CmdRemoveSelectedBoardItems(
-    BoardGraphicsScene& scene) noexcept
-  : UndoCommand(tr("Remove Board Items")), mScene(scene) {
+    BoardGraphicsScene& scene, bool includeLockedItems) noexcept
+  : UndoCommand(tr("Remove Board Items")),
+    mScene(scene),
+    mIncludeLockedItems(includeLockedItems) {
 }
 
 CmdRemoveSelectedBoardItems::~CmdRemoveSelectedBoardItems() noexcept {
@@ -56,7 +58,7 @@ CmdRemoveSelectedBoardItems::~CmdRemoveSelectedBoardItems() noexcept {
 
 bool CmdRemoveSelectedBoardItems::performExecute() {
   // get all selected items
-  BoardSelectionQuery query(mScene);
+  BoardSelectionQuery query(mScene, mIncludeLockedItems);
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedVias();
   query.addSelectedNetLines();

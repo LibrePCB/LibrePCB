@@ -84,6 +84,10 @@ BoardGraphicsScene* BoardEditorState::getActiveBoardScene() noexcept {
   return mContext.editor.getActiveBoardScene();
 }
 
+bool BoardEditorState::getIgnoreLocks() const noexcept {
+  return mContext.editor.getIgnoreLocks();
+}
+
 PositiveLength BoardEditorState::getGridInterval() const noexcept {
   return mContext.editorGraphicsView.getGridInterval();
 }

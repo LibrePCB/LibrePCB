@@ -72,6 +72,7 @@ public:
                       bool immediate) noexcept;
   void mirrorLayer(bool immediate) noexcept;
   void setAutoRotate(bool autoRotate, bool immediate) noexcept;
+  void setLocked(bool locked) noexcept;
 
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()

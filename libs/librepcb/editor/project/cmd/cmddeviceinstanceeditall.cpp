@@ -113,6 +113,14 @@ void CmdDeviceInstanceEditAll::mirror(const Point& center,
   }
 }
 
+void CmdDeviceInstanceEditAll::setLocked(bool locked) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mDevEditCmd->setLocked(locked);
+  foreach (CmdBoardStrokeTextEdit* cmd, mTextEditCmds) {
+    cmd->setLocked(locked);
+  }
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

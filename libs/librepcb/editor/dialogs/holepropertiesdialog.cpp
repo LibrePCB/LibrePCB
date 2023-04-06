@@ -73,6 +73,7 @@ HolePropertiesDialog::HolePropertiesDialog(BI_Hole& hole, UndoStack& undoStack,
   : HolePropertiesDialog(nullptr, &hole, undoStack, lengthUnit, settingsPrefix,
                          parent) {
   load(hole.getData());
+  mUi->holeEditorWidget->setLocked(hole.getData().isLocked());
 }
 
 HolePropertiesDialog::~HolePropertiesDialog() noexcept {
@@ -150,6 +151,7 @@ bool HolePropertiesDialog::applyChanges() noexcept {
     if (mBoardObj) {
       QScopedPointer<CmdBoardHoleEdit> cmd(new CmdBoardHoleEdit(*mBoardObj));
       applyChanges(*cmd);
+      cmd->setLocked(mUi->holeEditorWidget->getLocked());
       mUndoStack.execCmd(cmd.take());  // can throw
     }
     return true;

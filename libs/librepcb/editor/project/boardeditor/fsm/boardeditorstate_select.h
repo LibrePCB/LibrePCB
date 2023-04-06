@@ -94,6 +94,7 @@ public:
   virtual bool processRotate(const Angle& rotation) noexcept override;
   virtual bool processFlip(Qt::Orientation orientation) noexcept override;
   virtual bool processSnapToGrid() noexcept override;
+  virtual bool processSetLocked(bool locked) noexcept override;
   virtual bool processResetAllTexts() noexcept override;
   virtual bool processRemove() noexcept override;
   virtual bool processEditProperties() noexcept override;
@@ -121,6 +122,7 @@ private:  // Methods
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;
   bool snapSelectedItemsToGrid() noexcept;
+  bool lockSelectedItems(bool locked) noexcept;
   bool resetAllTextsOfSelectedItems() noexcept;
   bool removeSelectedItems() noexcept;
   void removePolygonVertices(BI_Polygon& polygon,

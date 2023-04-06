@@ -25,7 +25,7 @@
         </sizepolicy>
        </property>
        <property name="title">
-        <string>Device / Footprint</string>
+        <string>Placement</string>
        </property>
        <layout class="QFormLayout" name="formLayout_2">
         <property name="fieldGrowthPolicy">
@@ -38,12 +38,18 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="1">
+         <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true"/>
+        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_7">
           <property name="text">
            <string>Pos. Y:</string>
           </property>
          </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="librepcb::editor::LengthEdit" name="edtPosY" native="true"/>
         </item>
         <item row="2" column="0">
          <widget class="QLabel" name="label_8">
@@ -52,28 +58,33 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Mirror:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QCheckBox" name="cbxMirror">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="librepcb::editor::LengthEdit" name="edtPosX" native="true"/>
-        </item>
-        <item row="1" column="1">
-         <widget class="librepcb::editor::LengthEdit" name="edtPosY" native="true"/>
-        </item>
         <item row="2" column="1">
          <widget class="librepcb::editor::AngleEdit" name="edtRotation" native="true"/>
+        </item>
+        <item row="3" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QCheckBox" name="cbxMirror">
+            <property name="text">
+             <string notr="true">Mirror</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cbxLock">
+            <property name="text">
+             <string notr="true">Lock</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Options:</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -302,6 +313,7 @@
   <tabstop>edtPosY</tabstop>
   <tabstop>edtRotation</tabstop>
   <tabstop>cbxMirror</tabstop>
+  <tabstop>cbxLock</tabstop>
   <tabstop>attributeListEditorWidget</tabstop>
  </tabstops>
  <resources/>

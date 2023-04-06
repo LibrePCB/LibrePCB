@@ -697,6 +697,24 @@ public:
       {QKeySequence(Qt::Key_S)},
       &categoryModify,
   };
+  EditorCommand lock{
+      "lock",  // clang-format break
+      QT_TR_NOOP("Lock Placement"),
+      QT_TR_NOOP("Lock the placement of the selected object(s)"),
+      QIcon(":/img/status/locked.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL + Qt::Key_L)},
+      &categoryModify,
+  };
+  EditorCommand unlock{
+      "unlock",  // clang-format break
+      QT_TR_NOOP("Unlock Placement"),
+      QT_TR_NOOP("Unlock the placement of the selected object(s)"),
+      QIcon(":/img/status/unlocked.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL + Qt::Key_U)},
+      &categoryModify,
+  };
   EditorCommand deviceResetTextAll{
       "device_reset_text_all",  // clang-format break
       QT_TR_NOOP("Reset All Texts"),
@@ -779,6 +797,15 @@ public:
       QIcon(),
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Minus)},
+      &categoryView,
+  };
+  EditorCommand ignoreLocks{
+      "ignore_locks",  // clang-format break
+      QT_TR_NOOP("Ignore Placement Locks"),
+      QT_TR_NOOP("Allow dragging locked items"),
+      QIcon(":/img/status/unlocked.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_L)},
       &categoryView,
   };
 
@@ -1576,6 +1603,15 @@ public:
       QT_TR_NOOP("Remove Whole Trace"),
       QT_TR_NOOP("Remove the whole trace"),
       QIcon(":/img/actions/minus.png"),
+      EditorCommand::Flags(),
+      {},
+      &categoryContextMenu,
+  };
+  EditorCommand locked{
+      "locked",  // clang-format break
+      QT_TR_NOOP("Lock Placement"),
+      QT_TR_NOOP("Toggle placement lock"),
+      QIcon(),
       EditorCommand::Flags(),
       {},
       &categoryContextMenu,
