@@ -69,56 +69,51 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Static Variables
- ******************************************************************************/
-
-QString SystemInfo::sUsername;
-QString SystemInfo::sFullUsername;
-QString SystemInfo::sHostname;
-
-/*******************************************************************************
  *  Static Methods
  ******************************************************************************/
 
 const QString& SystemInfo::getUsername() noexcept {
-  if (sUsername.isNull()) {
+  auto get = []() {
     // this line should work for most UNIX, Linux, Mac and Windows systems
-    sUsername =
+    QString s =
         QString(qgetenv("USERNAME")).remove('\n').remove('\r').trimmed();
 
     // if the environment variable "USERNAME" is not set, we will try "USER"
-    if (sUsername.isEmpty()) {
-      sUsername = QString(qgetenv("USER")).remove('\n').remove('\r').trimmed();
+    if (s.isEmpty()) {
+      s = QString(qgetenv("USER")).remove('\n').remove('\r').trimmed();
     }
 
-    if (sUsername.isEmpty()) {
+    if (s.isEmpty()) {
       qWarning() << "Could not determine the system's username!";
     }
-  }
 
-  return sUsername;
+    return s;
+  };
+
+  static const QString value = get();  // Thread-safe initialization.
+  return value;
 }
 
 const QString& SystemInfo::getFullUsername() noexcept {
-  if (sFullUsername.isNull()) {
+  auto get = []() {
+    QString s;
 #if defined(Q_OS_OSX)  // macOS
     QString command(
         "finger `whoami` | awk -F: '{ print $3 }' | head -n1 | sed 's/^ //'");
     QProcess process;
     process.start("sh", QStringList() << "-c" << command);
     process.waitForFinished(500);
-    sFullUsername = QString(process.readAllStandardOutput())
-                        .remove('\n')
-                        .remove('\r')
-                        .trimmed();
+    s = QString(process.readAllStandardOutput())
+            .remove('\n')
+            .remove('\r')
+            .trimmed();
 #elif defined(Q_OS_UNIX)  // UNIX/Linux
     passwd* userinfo = getpwuid(getuid());
     if (userinfo == NULL) {
       qWarning() << "Could not fetch user info via getpwuid!";
     } else {
       QString gecosString = QString::fromLocal8Bit(userinfo->pw_gecos);
-      sFullUsername =
-          gecosString.section(',', 0, 0).remove('\n').remove('\r').trimmed();
+      s = gecosString.section(',', 0, 0).remove('\n').remove('\r').trimmed();
     }
 #elif defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
     QString command("net user %USERNAME%");
@@ -128,11 +123,11 @@ const QString& SystemInfo::getFullUsername() noexcept {
     QStringList lines = QString(process.readAllStandardOutput()).split('\n');
     foreach (const QString& line, lines) {
       if (line.contains("Full Name")) {
-        sFullUsername = QString(line)
-                            .remove("Full Name")
-                            .remove('\n')
-                            .remove('\r')
-                            .trimmed();
+        s = QString(line)
+                .remove("Full Name")
+                .remove('\n')
+                .remove('\r')
+                .trimmed();
         break;
       }
     }
@@ -140,26 +135,32 @@ const QString& SystemInfo::getFullUsername() noexcept {
 #error "Unknown operating system!"
 #endif
 
-    if (sFullUsername.isEmpty()) {
+    if (s.isEmpty()) {
       qWarning()
           << "The system's full username is empty or could not be determined!";
-      sFullUsername = getUsername();  // fall back to username
+      s = getUsername();  // fall back to username
     }
-  }
 
-  return sFullUsername;
+    return s;
+  };
+
+  static const QString value = get();  // Thread-safe initialization.
+  return value;
 }
 
 const QString& SystemInfo::getHostname() noexcept {
-  if (sHostname.isNull()) {
-    sHostname = QHostInfo::localHostName().remove('\n').remove('\r').trimmed();
-  }
+  auto get = []() {
+    QString s = QHostInfo::localHostName().remove('\n').remove('\r').trimmed();
 
-  if (sHostname.isEmpty()) {
-    qWarning() << "Could not determine the system's hostname!";
-  }
+    if (s.isEmpty()) {
+      qWarning() << "Could not determine the system's hostname!";
+    }
 
-  return sHostname;
+    return s;
+  };
+
+  static const QString value = get();  // Thread-safe initialization.
+  return value;
 }
 
 QString SystemInfo::detectRuntime() noexcept {

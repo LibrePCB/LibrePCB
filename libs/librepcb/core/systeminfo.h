@@ -103,12 +103,6 @@ public:
    * @throw  Exception    In case of an error.
    */
   static QString getProcessNameByPid(qint64 pid);
-
-private:
-  // Cached Data
-  static QString sUsername;
-  static QString sFullUsername;
-  static QString sHostname;
 };
 
 /*******************************************************************************
