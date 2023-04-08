@@ -63,36 +63,32 @@ class ControlPanel;
 class ControlPanel final : public QMainWindow {
   Q_OBJECT
 
-  friend
-
-      class ProjectLibraryUpdater;
-
-  // needs access to openProject() and
-  // getOpenProject()
+  // ProjectLibraryUpdater needs access to openProject() and getOpenProject()
+  friend class ProjectLibraryUpdater;
 
 public:
   // Constructors / Destructor
   ControlPanel() = delete;
   ControlPanel(const ControlPanel& other) = delete;
   explicit ControlPanel(Workspace& workspace, bool fileFormatIsOutdated);
-  ~ControlPanel();
+  virtual ~ControlPanel() noexcept;
 
   // Operator Overloadings
   ControlPanel& operator=(const ControlPanel& rhs) = delete;
 
 public slots:
-
   void showControlPanel() noexcept;
   void openProjectLibraryUpdater(const FilePath& project) noexcept;
 
 protected:
   // Inherited Methods
-  virtual void closeEvent(QCloseEvent* event);
+  virtual void closeEvent(QCloseEvent* event) override;
+  virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
-
   // private slots
   void openProjectsPassedByCommandLine() noexcept;
+  void openProjectPassedByOs(const QString& file) noexcept;
   void projectEditorClosed() noexcept;
 
   // Actions
