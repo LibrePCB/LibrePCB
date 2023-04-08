@@ -36,17 +36,6 @@ then
   brew install --overwrite qt5
   echo "Linking qt5..."
   brew link --force --overwrite qt5
-
-  # Install Qt Installer Framework
-  echo "Installing QtIFW..."
-  QTIFW_VERSION="3.2.2"
-  QTIFW_URL_BASE="https://download.qt.io/official_releases/qt-installer-framework/$QTIFW_VERSION"
-  wget -cq "$QTIFW_URL_BASE/QtInstallerFramework-mac-x64.dmg"
-  hdiutil attach ./QtInstallerFramework-mac-x64.dmg
-  QTIFW_PATH="/Volumes/QtInstallerFramework-mac-x64/QtInstallerFramework-mac-x64.app/Contents/MacOS/QtInstallerFramework-mac-x64"
-  chmod +x $QTIFW_PATH
-  $QTIFW_PATH --script ./ci/qtifw-installer-noninteractive.qs --no-force-installations -v
-  export PATH="/Users/$USER/Qt/QtIFW-$QTIFW_VERSION/bin:$PATH"
 fi
 
 # Configure pip
