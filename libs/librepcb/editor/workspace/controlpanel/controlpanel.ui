@@ -38,6 +38,9 @@
      <widget class="librepcb::editor::MessageWidget" name="msgWarnForNewerAppVersions" native="true"/>
     </item>
     <item>
+     <widget class="librepcb::editor::MessageWidget" name="msgInstallDesktopIntegration" native="true"/>
+    </item>
+    <item>
      <widget class="librepcb::editor::MessageWidget" name="msgWarnForNoLibraries" native="true"/>
     </item>
     <item>
@@ -377,7 +380,7 @@ QListView::item
      <x>0</x>
      <y>0</y>
      <width>978</width>
-     <height>22</height>
+     <height>23</height>
     </rect>
    </property>
   </widget>

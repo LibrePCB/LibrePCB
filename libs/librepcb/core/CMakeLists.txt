@@ -47,6 +47,13 @@ else()
   set(LIBREPCB_BINARY_DIR "${CMAKE_BINARY_DIR}")
 endif()
 
+# Set this to YES to enable registering the application to the desktop
+# environment at runtime (e.g. installing *.desktop file on Linux).
+set(LIBREPCB_ENABLE_DESKTOP_INTEGRATION
+    NO
+    CACHE BOOL "Allow registering the application at runtime."
+)
+
 # Generate build_env.h file
 configure_file(build_env.h.in librepcb_build_env.h @ONLY)
 

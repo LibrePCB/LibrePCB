@@ -32,6 +32,7 @@
 #include "../../utils/standardeditorcommandhandler.h"
 #include "../../workspace/desktopservices.h"
 #include "../../workspace/librarymanager/librarymanager.h"
+#include "../desktopintegration.h"
 #include "../desktopservices.h"
 #include "../initializeworkspacewizard/initializeworkspacewizard.h"
 #include "../projectlibraryupdater/projectlibraryupdater.h"
@@ -100,6 +101,22 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
          "All changes in libraries and workspace settings will not be "
          "available in newer versions of LibrePCB."),
       fileFormatIsOutdated);
+
+  // Suggest to install the desktop integration, if available.
+  mUi->msgInstallDesktopIntegration->init(
+      mWorkspace, "DESKTOP_INTEGRATION_NOT_INSTALLED",
+      tr("This application executable does not seem to be integrated into your "
+         "desktop environment. If desired, <a href=\"%1\">install it now</a> "
+         "to allow opening LibrePCB projects through the file manager.")
+          .arg("install"),
+      false);
+  updateDesktopIntegrationMessage();
+  connect(mUi->msgInstallDesktopIntegration, &MessageWidget::linkActivated,
+          this, [this]() {
+            DesktopIntegration::execDialog(DesktopIntegration::Mode::Install,
+                                           this);
+            updateDesktopIntegrationMessage();
+          });
 
   // Setup warning about missing libraries, and update visibility each time the
   // workspace library was scanned.
@@ -241,6 +258,9 @@ void ControlPanel::createActions() noexcept {
       this, this,
       [this]() {
         WorkspaceSettingsDialog dialog(mWorkspace, this);
+        connect(&dialog,
+                &WorkspaceSettingsDialog::desktopIntegrationStatusChanged, this,
+                &ControlPanel::updateDesktopIntegrationMessage);
         dialog.exec();
       },
       EditorCommand::ActionFlag::ApplicationShortcut));
@@ -358,6 +378,13 @@ void ControlPanel::loadSettings() {
   }
 
   clientSettings.endGroup();
+}
+
+void ControlPanel::updateDesktopIntegrationMessage() noexcept {
+  mUi->msgInstallDesktopIntegration->setActive(
+      DesktopIntegration::isSupported() &&
+      (DesktopIntegration::getStatus() !=
+       DesktopIntegration::Status::InstalledThis));
 }
 
 void ControlPanel::openLibraryManager() noexcept {

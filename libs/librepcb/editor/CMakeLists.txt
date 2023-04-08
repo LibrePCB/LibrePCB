@@ -804,6 +804,8 @@ add_library(
   workspace/controlpanel/projecttreemodel.h
   workspace/controlpanel/recentprojectsmodel.cpp
   workspace/controlpanel/recentprojectsmodel.h
+  workspace/desktopintegration.cpp
+  workspace/desktopintegration.h
   workspace/desktopservices.cpp
   workspace/desktopservices.h
   workspace/initializeworkspacewizard/initializeworkspacewizard.cpp
