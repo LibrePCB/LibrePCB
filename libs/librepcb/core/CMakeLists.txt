@@ -135,6 +135,8 @@ add_library(
   font/strokefont.h
   font/strokefontpool.cpp
   font/strokefontpool.h
+  font/stroketextpathbuilder.cpp
+  font/stroketextpathbuilder.h
   geometry/circle.cpp
   geometry/circle.h
   geometry/hole.cpp
@@ -260,12 +262,18 @@ add_library(
   project/board/boardfabricationoutputsettings.h
   project/board/boardgerberexport.cpp
   project/board/boardgerberexport.h
+  project/board/boardholedata.cpp
+  project/board/boardholedata.h
   project/board/boardpainter.cpp
   project/board/boardpainter.h
   project/board/boardpickplacegenerator.cpp
   project/board/boardpickplacegenerator.h
   project/board/boardplanefragmentsbuilder.cpp
   project/board/boardplanefragmentsbuilder.h
+  project/board/boardpolygondata.cpp
+  project/board/boardpolygondata.h
+  project/board/boardstroketextdata.cpp
+  project/board/boardstroketextdata.h
   project/board/drc/boardclipperpathgenerator.cpp
   project/board/drc/boardclipperpathgenerator.h
   project/board/drc/boarddesignrulecheck.cpp
@@ -380,6 +388,8 @@ add_library(
   types/ratio.h
   types/signalrole.cpp
   types/signalrole.h
+  types/stroketextspacing.cpp
+  types/stroketextspacing.h
   types/uuid.cpp
   types/uuid.h
   types/version.cpp

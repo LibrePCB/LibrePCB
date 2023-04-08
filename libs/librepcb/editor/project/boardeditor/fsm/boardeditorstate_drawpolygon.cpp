@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "boardeditorstate_drawpolygon.h"
 
-#include "../../../cmd/cmdpolygonedit.h"
 #include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../../utils/toolbarproxy.h"
@@ -30,6 +29,7 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdboardpolygonadd.h"
+#include "../../cmd/cmdboardpolygonedit.h"
 #include "../boardeditor.h"
 
 #include <librepcb/core/geometry/polygon.h>
@@ -53,14 +53,12 @@ BoardEditorState_DrawPolygon::BoardEditorState_DrawPolygon(
     const Context& context) noexcept
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
-    mLastPolygonProperties(Uuid::createRandom(),  // UUID is not relevant here
-                           Layer::boardOutlines(),  // Layer
-                           UnsignedLength(0),  // Line width
-                           false,  // Is filled
-                           false,  // Is grab area
-                           Path()  // Path is not relevant here
-                           ),
     mLastSegmentPos(),
+    mLastLayer(&Layer::boardOutlines()),
+    mLastLineWidth(0),
+    mLastRotation(0),
+    mLastIsFilled(false),
+    mLastIsGrabArea(false),
     mCurrentPolygon(nullptr),
     mCurrentPolygonEditCmd(nullptr) {
 }
@@ -82,7 +80,7 @@ bool BoardEditorState_DrawPolygon::entry() noexcept {
   std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
       new GraphicsLayerComboBox());
   layerComboBox->setLayers(getAllowedGeometryLayers());
-  layerComboBox->setCurrentLayer(mLastPolygonProperties.getLayer());
+  layerComboBox->setCurrentLayer(*mLastLayer);
   layerComboBox->addAction(
       cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
                                &GraphicsLayerComboBox::stepDown));
@@ -96,7 +94,7 @@ bool BoardEditorState_DrawPolygon::entry() noexcept {
   // Add the width edit to the toolbar
   mContext.commandToolBar.addLabel(tr("Width:"), 10);
   std::unique_ptr<UnsignedLengthEdit> widthEdit(new UnsignedLengthEdit());
-  widthEdit->setValue(mLastPolygonProperties.getLineWidth());
+  widthEdit->setValue(mLastLineWidth);
   widthEdit->addAction(cmd.lineWidthIncrease.createAction(
       widthEdit.get(), widthEdit.get(), &UnsignedLengthEdit::stepUp));
   widthEdit->addAction(cmd.lineWidthDecrease.createAction(
@@ -108,7 +106,7 @@ bool BoardEditorState_DrawPolygon::entry() noexcept {
   // Add the filled checkbox to the toolbar
   mContext.commandToolBar.addLabel(tr("Filled:"), 10);
   std::unique_ptr<QCheckBox> fillCheckBox(new QCheckBox());
-  fillCheckBox->setChecked(mLastPolygonProperties.isFilled());
+  fillCheckBox->setChecked(mLastIsFilled);
   fillCheckBox->addAction(cmd.fillToggle.createAction(
       fillCheckBox.get(), fillCheckBox.get(), &QCheckBox::toggle));
   connect(fillCheckBox.get(), &QCheckBox::toggled, this,
@@ -190,17 +188,18 @@ bool BoardEditorState_DrawPolygon::startAddPolygon(const Point& pos) noexcept {
     mIsUndoCmdActive = true;
 
     // Add polygon with two vertices
-    mLastPolygonProperties.setPath(Path({Vertex(pos), Vertex(pos)}));
     mCurrentPolygon = new BI_Polygon(
-        *board, Polygon(Uuid::createRandom(), mLastPolygonProperties));
+        *board,
+        BoardPolygonData(Uuid::createRandom(), *mLastLayer, mLastLineWidth,
+                         Path({Vertex(pos), Vertex(pos)}), mLastIsFilled,
+                         mLastIsGrabArea, false));
     mContext.undoStack.appendToCmdGroup(
         new CmdBoardPolygonAdd(*mCurrentPolygon));
 
     // Start undo command
-    mCurrentPolygonEditCmd.reset(
-        new CmdPolygonEdit(mCurrentPolygon->getPolygon()));
+    mCurrentPolygonEditCmd.reset(new CmdBoardPolygonEdit(*mCurrentPolygon));
     mLastSegmentPos = pos;
-    makeLayerVisible(mLastPolygonProperties.getLayer().getThemeColor());
+    makeLayerVisible(mLastLayer->getThemeColor());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -227,7 +226,7 @@ bool BoardEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
     mIsUndoCmdActive = false;
 
     // If the polygon is now closed, abort now
-    if (mCurrentPolygon->getPolygon().getPath().isClosed()) {
+    if (mCurrentPolygon->getData().getPath().isClosed()) {
       abortCommand(true);
       return true;
     }
@@ -235,11 +234,10 @@ bool BoardEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
     // Start a new undo command
     mContext.undoStack.beginCmdGroup(tr("Draw board polygon"));
     mIsUndoCmdActive = true;
-    mCurrentPolygonEditCmd.reset(
-        new CmdPolygonEdit(mCurrentPolygon->getPolygon()));
+    mCurrentPolygonEditCmd.reset(new CmdBoardPolygonEdit(*mCurrentPolygon));
 
     // Add new vertex
-    Path newPath = mCurrentPolygon->getPolygon().getPath();
+    Path newPath = mCurrentPolygon->getData().getPath();
     newPath.addVertex(pos, Angle::deg0());
     mCurrentPolygonEditCmd->setPath(newPath, true);
     mLastSegmentPos = pos;
@@ -254,7 +252,7 @@ bool BoardEditorState_DrawPolygon::addSegment(const Point& pos) noexcept {
 bool BoardEditorState_DrawPolygon::updateLastVertexPosition(
     const Point& pos) noexcept {
   if (mCurrentPolygonEditCmd) {
-    Path newPath = mCurrentPolygon->getPolygon().getPath();
+    Path newPath = mCurrentPolygon->getData().getPath();
     newPath.getVertices().last().setPos(pos);
     mCurrentPolygonEditCmd->setPath(newPath, true);
     return true;
@@ -287,7 +285,7 @@ bool BoardEditorState_DrawPolygon::abortCommand(bool showErrMsgBox) noexcept {
 
 void BoardEditorState_DrawPolygon::layerComboBoxLayerChanged(
     const Layer& layer) noexcept {
-  mLastPolygonProperties.setLayer(layer);
+  mLastLayer = &layer;
   if (mCurrentPolygonEditCmd) {
     mCurrentPolygonEditCmd->setLayer(layer, true);
     makeLayerVisible(layer.getThemeColor());
@@ -296,21 +294,18 @@ void BoardEditorState_DrawPolygon::layerComboBoxLayerChanged(
 
 void BoardEditorState_DrawPolygon::widthEditValueChanged(
     const UnsignedLength& value) noexcept {
-  mLastPolygonProperties.setLineWidth(value);
+  mLastLineWidth = value;
   if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setLineWidth(mLastPolygonProperties.getLineWidth(),
-                                         true);
+    mCurrentPolygonEditCmd->setLineWidth(value, true);
   }
 }
 
 void BoardEditorState_DrawPolygon::filledCheckBoxCheckedChanged(
     bool checked) noexcept {
-  mLastPolygonProperties.setIsFilled(checked);
+  mLastIsFilled = checked;
   if (mCurrentPolygonEditCmd) {
-    mCurrentPolygonEditCmd->setIsFilled(mLastPolygonProperties.isFilled(),
-                                        true);
-    mCurrentPolygonEditCmd->setIsGrabArea(mLastPolygonProperties.isFilled(),
-                                          true);
+    mCurrentPolygonEditCmd->setIsFilled(checked, true);
+    mCurrentPolygonEditCmd->setIsGrabArea(checked, true);
   }
 }
 

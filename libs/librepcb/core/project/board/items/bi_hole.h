@@ -23,7 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../geometry/hole.h"
+#include "../../../utils/signalslot.h"
+#include "../boardholedata.h"
 #include "bi_base.h"
 
 #include <QtCore>
@@ -58,16 +59,20 @@ public:
   // Constructors / Destructor
   BI_Hole() = delete;
   BI_Hole(const BI_Hole& other) = delete;
-  BI_Hole(Board& board, const Hole& hole);
+  BI_Hole(Board& board, const BoardHoleData& data);
   ~BI_Hole() noexcept;
 
   // Getters
-  Hole& getHole() noexcept { return *mHole; }
-  const Hole& getHole() const noexcept { return *mHole; }
-  const Uuid& getUuid() const noexcept;  // for convenience, e.g. template usage
+  const BoardHoleData& getData() const noexcept { return mData; }
   const tl::optional<Length>& getStopMaskOffset() const noexcept {
     return mStopMaskOffset;
   }
+
+  // Setters
+  bool setDiameter(const PositiveLength& diameter) noexcept;
+  bool setPath(const NonEmptyPath& path) noexcept;
+  bool setStopMaskConfig(const MaskConfig& config) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
   void addToBoard() override;
@@ -77,17 +82,13 @@ public:
   BI_Hole& operator=(const BI_Hole& rhs) = delete;
 
 private:  // Methods
-  void holeEdited(const Hole& hole, Hole::Event event) noexcept;
   void updateStopMaskOffset() noexcept;
 
 private:  // Data
-  QScopedPointer<Hole> mHole;
+  BoardHoleData mData;
 
   // Cached Attributes
   tl::optional<Length> mStopMaskOffset;
-
-  // Slots
-  Hole::OnEditedSlot mOnEditedSlot;
 };
 
 /*******************************************************************************

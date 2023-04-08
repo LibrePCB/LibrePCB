@@ -123,6 +123,10 @@ public:
     return false;
   }
   virtual bool processSnapToGrid() noexcept { return false; }
+  virtual bool processSetLocked(bool locked) noexcept {
+    Q_UNUSED(locked);
+    return false;
+  }
   virtual bool processResetAllTexts() noexcept { return false; }
   virtual bool processRemove() noexcept { return false; }
   virtual bool processEditProperties() noexcept { return false; }
@@ -181,6 +185,7 @@ signals:
 protected:  // Methods
   Board* getActiveBoard() noexcept;
   BoardGraphicsScene* getActiveBoardScene() noexcept;
+  bool getIgnoreLocks() const noexcept;
   PositiveLength getGridInterval() const noexcept;
   const LengthUnit& getLengthUnit() const noexcept;
   static const QSet<const Layer*>& getAllowedGeometryLayers() noexcept;

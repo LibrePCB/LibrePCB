@@ -92,9 +92,9 @@ void BoardPlaneFragmentsBuilder::clipToBoardOutline() {
   ClipperLib::Paths boardArea;
   ClipperLib::Clipper boardAreaClipper;
   foreach (const BI_Polygon* polygon, mPlane.getBoard().getPolygons()) {
-    if (polygon->getPolygon().getLayer() == Layer::boardOutlines()) {
+    if (polygon->getData().getLayer() == Layer::boardOutlines()) {
       ClipperLib::Path path = ClipperHelpers::convert(
-          polygon->getPolygon().getPath(), maxArcTolerance());
+          polygon->getData().getPath(), maxArcTolerance());
       boardAreaClipper.AddPath(path, ClipperLib::ptSubject, true);
     }
   }
@@ -178,9 +178,9 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
 
   // subtract board holes
   for (const BI_Hole* hole : mPlane.getBoard().getHoles()) {
-    const PositiveLength diameter(hole->getHole().getDiameter() +
+    const PositiveLength diameter(hole->getData().getDiameter() +
                                   mPlane.getMinClearance() * 2);
-    const NonEmptyPath path = hole->getHole().getPath();
+    const NonEmptyPath path = hole->getData().getPath();
     const QVector<Path> areas = path->toOutlineStrokes(diameter);
     foreach (const Path& area, areas) {
       c.AddPath(ClipperHelpers::convert(area, maxArcTolerance()),

@@ -22,8 +22,7 @@
  ******************************************************************************/
 #include "stroketext.h"
 
-#include "../font/strokefont.h"
-#include "../utils/toolbox.h"
+#include "../font/stroketextpathbuilder.h"
 
 #include <QtCore>
 
@@ -31,19 +30,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-/*******************************************************************************
- *  Class StrokeTextSpacing
- ******************************************************************************/
-
-template <>
-StrokeTextSpacing deserialize(const SExpression& node) {
-  if (node.getValue() == "auto") {
-    return StrokeTextSpacing();
-  } else {
-    return StrokeTextSpacing(deserialize<Ratio>(node));  // can throw
-  }
-}
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -124,47 +110,9 @@ QVector<Path> StrokeText::generatePaths(const StrokeFont& font) const noexcept {
 
 QVector<Path> StrokeText::generatePaths(const StrokeFont& font,
                                         const QString& text) const noexcept {
-  Point bottomLeft, topRight;
-  QVector<Path> paths =
-      font.stroke(text, mHeight, calcLetterSpacing(font), calcLineSpacing(font),
-                  mAlign, bottomLeft, topRight);
-  if (needsAutoRotation()) {
-    const Point center = (bottomLeft + topRight) / 2;
-    for (Path& p : paths) {
-      p.rotate(Angle::deg180(), center);
-    }
-  }
-  return paths;
-}
-
-bool StrokeText::needsAutoRotation() const noexcept {
-  return mAutoRotate && Toolbox::isTextUpsideDown(mRotation, mMirrored);
-}
-
-Length StrokeText::calcLetterSpacing(const StrokeFont& font) const noexcept {
-  if (mLetterSpacing.isAuto()) {
-    // Use recommended letter spacing of font, but add stroke width to avoid
-    // overlapped glyphs caused by thick lines.
-    return Length(mHeight->toNm() * font.getLetterSpacing().toNormalized()) +
-        mStrokeWidth;
-  } else {
-    // Use given letter spacing without additional factor or stroke width
-    // offset. Also don't use recommended letter spacing of font.
-    return Length(mHeight->toNm() * mLetterSpacing.getRatio().toNormalized());
-  }
-}
-
-Length StrokeText::calcLineSpacing(const StrokeFont& font) const noexcept {
-  if (mLineSpacing.isAuto()) {
-    // Use recommended line spacing of font, but add stroke width to avoid
-    // overlapped glyphs caused by thick lines.
-    return Length(mHeight->toNm() * font.getLineSpacing().toNormalized()) +
-        mStrokeWidth;
-  } else {
-    // Use given line spacing without additional factor or stroke width offset.
-    // Also don't use recommended line spacing of font.
-    return Length(mHeight->toNm() * mLineSpacing.getRatio().toNormalized());
-  }
+  return StrokeTextPathBuilder::build(font, mLetterSpacing, mLineSpacing,
+                                      mHeight, mStrokeWidth, mAlign, mRotation,
+                                      mAutoRotate, mMirrored, text);
 }
 
 /*******************************************************************************
@@ -341,19 +289,6 @@ StrokeText& StrokeText::operator=(const StrokeText& rhs) noexcept {
   setMirrored(rhs.mMirrored);
   setAutoRotate(rhs.mAutoRotate);
   return *this;
-}
-
-/*******************************************************************************
- *  Non-Member Functions
- ******************************************************************************/
-
-template <>
-SExpression serialize(const StrokeTextSpacing& obj) {
-  if (obj.isAuto()) {
-    return SExpression::createToken("auto");
-  } else {
-    return serialize(obj.getRatio());
-  }
 }
 
 /*******************************************************************************

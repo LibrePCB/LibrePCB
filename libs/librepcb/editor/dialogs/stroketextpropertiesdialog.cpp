@@ -23,12 +23,14 @@
 #include "stroketextpropertiesdialog.h"
 
 #include "../cmd/cmdstroketextedit.h"
+#include "../project/cmd/cmdboardstroketextedit.h"
 #include "../undostack.h"
 #include "ui_stroketextpropertiesdialog.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/font/strokefont.h>
 #include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/project/board/items/bi_stroketext.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,11 +42,12 @@ namespace librepcb {
 namespace editor {
 
 StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
-    StrokeText& text, UndoStack& undoStack, const QSet<const Layer*>& layers,
-    const LengthUnit& lengthUnit, const QString& settingsPrefix,
-    QWidget* parent) noexcept
+    StrokeText* libObj, BI_StrokeText* boardObj, UndoStack& undoStack,
+    const QSet<const Layer*>& layers, const LengthUnit& lengthUnit,
+    const QString& settingsPrefix, QWidget* parent) noexcept
   : QDialog(parent),
-    mText(text),
+    mLibraryObj(libObj),
+    mBoardObj(boardObj),
     mUndoStack(undoStack),
     mUi(new Ui::StrokeTextPropertiesDialog) {
   mUi->setupUi(this);
@@ -65,41 +68,26 @@ StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
           mUi->edtLetterSpacingRatio, &RatioEdit::setDisabled);
   connect(mUi->cbxLineSpacingAuto, &QCheckBox::toggled,
           mUi->edtLineSpacingRatio, &RatioEdit::setDisabled);
+}
 
-  // load text attributes
-  mUi->cbxLayer->setCurrentLayer(mText.getLayer());
-  mUi->edtText->setPlainText(mText.getText());
-  mUi->alignmentSelector->setAlignment(mText.getAlign());
-  mUi->edtHeight->setValue(mText.getHeight());
-  mUi->edtStrokeWidth->setValue(mText.getStrokeWidth());
-  const StrokeFont& font = Application::getDefaultStrokeFont();
-  if (mText.getLetterSpacing().isAuto()) {
-    mUi->cbxLetterSpacingAuto->setChecked(true);
-    mUi->edtLetterSpacingRatio->setEnabled(false);
-    mUi->edtLetterSpacingRatio->setValue(font.getLetterSpacing());
-  } else {
-    mUi->cbxLetterSpacingAuto->setChecked(false);
-    mUi->edtLetterSpacingRatio->setEnabled(true);
-    mUi->edtLetterSpacingRatio->setValue(mText.getLetterSpacing().getRatio());
-  }
-  if (mText.getLineSpacing().isAuto()) {
-    mUi->cbxLineSpacingAuto->setChecked(true);
-    mUi->edtLineSpacingRatio->setEnabled(false);
-    mUi->edtLineSpacingRatio->setValue(font.getLineSpacing());
-  } else {
-    mUi->cbxLineSpacingAuto->setChecked(false);
-    mUi->edtLineSpacingRatio->setEnabled(true);
-    mUi->edtLineSpacingRatio->setValue(mText.getLineSpacing().getRatio());
-  }
-  mUi->edtPosX->setValue(mText.getPosition().getX());
-  mUi->edtPosY->setValue(mText.getPosition().getY());
-  mUi->edtRotation->setValue(mText.getRotation());
-  mUi->cbxMirrored->setChecked(mText.getMirrored());
-  mUi->cbxAutoRotate->setChecked(mText.getAutoRotate());
+StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
+    StrokeText& text, UndoStack& undoStack, const QSet<const Layer*>& layers,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
+    QWidget* parent) noexcept
+  : StrokeTextPropertiesDialog(&text, nullptr, undoStack, layers, lengthUnit,
+                               settingsPrefix, parent) {
+  load(text, Application::getDefaultStrokeFont());
+  mUi->cbxLock->hide();
+}
 
-  // set focus to text so the user can immediately start typing to change it
-  mUi->edtText->selectAll();
-  mUi->edtText->setFocus();
+StrokeTextPropertiesDialog::StrokeTextPropertiesDialog(
+    BI_StrokeText& text, UndoStack& undoStack, const QSet<const Layer*>& layers,
+    const LengthUnit& lengthUnit, const QString& settingsPrefix,
+    QWidget* parent) noexcept
+  : StrokeTextPropertiesDialog(nullptr, &text, undoStack, layers, lengthUnit,
+                               settingsPrefix, parent) {
+  load(text.getData(), text.getFont());
+  mUi->cbxLock->setChecked(text.getData().isLocked());
 }
 
 StrokeTextPropertiesDialog::~StrokeTextPropertiesDialog() noexcept {
@@ -116,14 +104,15 @@ void StrokeTextPropertiesDialog::setReadOnly(bool readOnly) noexcept {
   mUi->edtHeight->setReadOnly(readOnly);
   mUi->edtStrokeWidth->setReadOnly(readOnly);
   mUi->edtLetterSpacingRatio->setReadOnly(readOnly);
-  mUi->cbxLetterSpacingAuto->setCheckable(!readOnly);
+  mUi->cbxLetterSpacingAuto->setEnabled(!readOnly);
   mUi->edtLineSpacingRatio->setReadOnly(readOnly);
-  mUi->cbxLineSpacingAuto->setCheckable(!readOnly);
+  mUi->cbxLineSpacingAuto->setEnabled(!readOnly);
   mUi->edtPosX->setReadOnly(readOnly);
   mUi->edtPosY->setReadOnly(readOnly);
   mUi->edtRotation->setReadOnly(readOnly);
-  mUi->cbxMirrored->setCheckable(!readOnly);
-  mUi->cbxAutoRotate->setCheckable(!readOnly);
+  mUi->cbxAutoRotate->setEnabled(!readOnly);
+  mUi->cbxMirrored->setEnabled(!readOnly);
+  mUi->cbxLock->setEnabled(!readOnly);
   if (readOnly) {
     mUi->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
   } else {
@@ -137,6 +126,43 @@ void StrokeTextPropertiesDialog::setReadOnly(bool readOnly) noexcept {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+template <typename T>
+void StrokeTextPropertiesDialog::load(const T& obj,
+                                      const StrokeFont& font) noexcept {
+  mUi->cbxLayer->setCurrentLayer(obj.getLayer());
+  mUi->edtText->setPlainText(obj.getText());
+  mUi->alignmentSelector->setAlignment(obj.getAlign());
+  mUi->edtHeight->setValue(obj.getHeight());
+  mUi->edtStrokeWidth->setValue(obj.getStrokeWidth());
+  if (const tl::optional<Ratio>& ratio = obj.getLetterSpacing().getRatio()) {
+    mUi->cbxLetterSpacingAuto->setChecked(false);
+    mUi->edtLetterSpacingRatio->setEnabled(true);
+    mUi->edtLetterSpacingRatio->setValue(*ratio);
+  } else {
+    mUi->cbxLetterSpacingAuto->setChecked(true);
+    mUi->edtLetterSpacingRatio->setEnabled(false);
+    mUi->edtLetterSpacingRatio->setValue(font.getLetterSpacing());
+  }
+  if (const tl::optional<Ratio>& ratio = obj.getLineSpacing().getRatio()) {
+    mUi->cbxLineSpacingAuto->setChecked(false);
+    mUi->edtLineSpacingRatio->setEnabled(true);
+    mUi->edtLineSpacingRatio->setValue(*ratio);
+  } else {
+    mUi->cbxLineSpacingAuto->setChecked(true);
+    mUi->edtLineSpacingRatio->setEnabled(false);
+    mUi->edtLineSpacingRatio->setValue(font.getLineSpacing());
+  }
+  mUi->edtPosX->setValue(obj.getPosition().getX());
+  mUi->edtPosY->setValue(obj.getPosition().getY());
+  mUi->edtRotation->setValue(obj.getRotation());
+  mUi->cbxMirrored->setChecked(obj.getMirrored());
+  mUi->cbxAutoRotate->setChecked(obj.getAutoRotate());
+
+  // set focus to text so the user can immediately start typing to change it
+  mUi->edtText->selectAll();
+  mUi->edtText->setFocus();
+}
 
 void StrokeTextPropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
   switch (mUi->buttonBox->buttonRole(button)) {
@@ -159,37 +185,52 @@ void StrokeTextPropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
 
 bool StrokeTextPropertiesDialog::applyChanges() noexcept {
   try {
-    QScopedPointer<CmdStrokeTextEdit> cmd(new CmdStrokeTextEdit(mText));
-    if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
-      cmd->setLayer(*layer, false);
+    if (mLibraryObj) {
+      QScopedPointer<CmdStrokeTextEdit> cmd(
+          new CmdStrokeTextEdit(*mLibraryObj));
+      applyChanges(*cmd);
+      mUndoStack.execCmd(cmd.take());  // can throw
     }
-    cmd->setText(mUi->edtText->toPlainText(), false);
-    cmd->setAlignment(mUi->alignmentSelector->getAlignment(), false);
-    cmd->setStrokeWidth(mUi->edtStrokeWidth->getValue(), false);
-    if (mUi->cbxLetterSpacingAuto->isChecked()) {
-      cmd->setLetterSpacing(StrokeTextSpacing(), false);
-    } else {
-      cmd->setLetterSpacing(
-          StrokeTextSpacing(mUi->edtLetterSpacingRatio->getValue()), false);
+    if (mBoardObj) {
+      QScopedPointer<CmdBoardStrokeTextEdit> cmd(
+          new CmdBoardStrokeTextEdit(*mBoardObj));
+      applyChanges(*cmd);
+      cmd->setLocked(mUi->cbxLock->isChecked());
+      mUndoStack.execCmd(cmd.take());  // can throw
     }
-    if (mUi->cbxLineSpacingAuto->isChecked()) {
-      cmd->setLineSpacing(StrokeTextSpacing(), false);
-    } else {
-      cmd->setLineSpacing(
-          StrokeTextSpacing(mUi->edtLineSpacingRatio->getValue()), false);
-    }
-    cmd->setHeight(mUi->edtHeight->getValue(), false);
-    cmd->setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
-                     false);
-    cmd->setRotation(mUi->edtRotation->getValue(), false);
-    cmd->setMirrored(mUi->cbxMirrored->isChecked(), false);
-    cmd->setAutoRotate(mUi->cbxAutoRotate->isChecked(), false);
-    mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
     return false;
   }
+}
+
+template <typename T>
+void StrokeTextPropertiesDialog::applyChanges(T& cmd) {
+  if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
+    cmd.setLayer(*layer, false);
+  }
+  cmd.setText(mUi->edtText->toPlainText(), false);
+  cmd.setAlignment(mUi->alignmentSelector->getAlignment(), false);
+  cmd.setStrokeWidth(mUi->edtStrokeWidth->getValue(), false);
+  if (mUi->cbxLetterSpacingAuto->isChecked()) {
+    cmd.setLetterSpacing(StrokeTextSpacing(), false);
+  } else {
+    cmd.setLetterSpacing(
+        StrokeTextSpacing(mUi->edtLetterSpacingRatio->getValue()), false);
+  }
+  if (mUi->cbxLineSpacingAuto->isChecked()) {
+    cmd.setLineSpacing(StrokeTextSpacing(), false);
+  } else {
+    cmd.setLineSpacing(StrokeTextSpacing(mUi->edtLineSpacingRatio->getValue()),
+                       false);
+  }
+  cmd.setHeight(mUi->edtHeight->getValue(), false);
+  cmd.setPosition(Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()),
+                  false);
+  cmd.setRotation(mUi->edtRotation->getValue(), false);
+  cmd.setMirrored(mUi->cbxMirrored->isChecked(), false);
+  cmd.setAutoRotate(mUi->cbxAutoRotate->isChecked(), false);
 }
 
 /*******************************************************************************

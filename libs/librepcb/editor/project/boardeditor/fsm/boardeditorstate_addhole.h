@@ -38,7 +38,7 @@ class Board;
 
 namespace editor {
 
-class CmdHoleEdit;
+class CmdBoardHoleEdit;
 class PositiveLengthEdit;
 
 /*******************************************************************************
@@ -89,7 +89,7 @@ private:  // Data
   // Information about the current hole to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_Hole* mCurrentHoleToPlace;
-  QScopedPointer<CmdHoleEdit> mCurrentHoleEditCmd;
+  QScopedPointer<CmdBoardHoleEdit> mCurrentHoleEditCmd;
 };
 
 /*******************************************************************************

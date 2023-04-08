@@ -169,7 +169,7 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
       }
 
       // Holes.
-      upgradeHoles(*fptNode);
+      upgradeHoles(*fptNode, false);
     }
 
     dir.write(fp, root.toByteArray());
@@ -575,6 +575,14 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
     drillNode.appendChild("g85_slots", false);
   }
 
+  // Devices.
+  for (SExpression* devNode : root.getChildren("device")) {
+    devNode->appendChild("lock", SExpression::createToken("false"));
+    for (SExpression* txtNode : devNode->getChildren("stroke_text")) {
+      txtNode->appendChild("lock", SExpression::createToken("false"));
+    }
+  }
+
   // Net segments.
   for (SExpression* segNode : root.getChildren("netsegment")) {
     // Vias.
@@ -587,9 +595,19 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
     }
   }
 
+  // Polygons.
+  for (SExpression* polyNode : root.getChildren("polygon")) {
+    polyNode->appendChild("lock", SExpression::createToken("false"));
+  }
+
+  // Stroke texts.
+  for (SExpression* txtNode : root.getChildren("stroke_text")) {
+    txtNode->appendChild("lock", SExpression::createToken("false"));
+  }
+
   // Holes.
   context.holesCount += root.getChildren("hole").count();
-  upgradeHoles(root);
+  upgradeHoles(root, true);
 
   // Planes.
   for (SExpression* planeNode : root.getChildren("plane")) {
@@ -598,6 +616,7 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
     if (planeNode->getChild("connect_style/@0").getValue() == "none") {
       ++context.planeConnectNoneCount;
     }
+    planeNode->appendChild("lock", SExpression::createToken("false"));
   }
 }
 
@@ -671,13 +690,16 @@ void FileFormatMigrationV01::upgradeGrid(SExpression& node) {
   gridNode.removeChild(gridNode.getChild("type"));
 }
 
-void FileFormatMigrationV01::upgradeHoles(SExpression& node) {
+void FileFormatMigrationV01::upgradeHoles(SExpression& node, bool isBoardHole) {
   for (SExpression* holeNode : node.getChildren("hole")) {
     holeNode->appendChild("stop_mask", SExpression::createToken("auto"));
     const Point pos(holeNode->getChild("position"));
     SExpression& vertexNode = holeNode->appendList("vertex");
     pos.serialize(vertexNode.appendList("position"));
     vertexNode.appendChild("angle", Angle::deg0());
+    if (isBoardHole) {
+      holeNode->appendChild("lock", SExpression::createToken("false"));
+    }
   }
 }
 

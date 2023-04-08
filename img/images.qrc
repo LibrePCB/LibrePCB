@@ -147,7 +147,9 @@
         <file>status/dialog_error.png</file>
         <file>status/dialog_warning.png</file>
         <file>status/info.png</file>
+        <file>status/locked.png</file>
         <file>status/success.png</file>
+        <file>status/unlocked.png</file>
         <file>wizards/eagle_watermark.png</file>
         <file>wizards/watermark.jpg</file>
     </qresource>

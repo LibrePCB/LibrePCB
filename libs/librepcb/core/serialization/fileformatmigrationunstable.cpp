@@ -64,15 +64,7 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 }
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
-  const QString fp = "package.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  for (SExpression* fptNode : root.getChildren("footprint")) {
-    for (SExpression* padNode : fptNode->getChildren("pad")) {
-      padNode->appendChild("function", SExpression::createToken("unspecified"));
-      padNode->appendChild("clearance", SExpression::createToken("0.0"));
-    }
-  }
-  dir.write(fp, root.toByteArray());
+  Q_UNUSED(dir);
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -98,7 +90,7 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
  ******************************************************************************/
 
 void FileFormatMigrationUnstable::upgradeSettings(SExpression& root) {
-  FileFormatMigrationV01::upgradeSettings(root);
+  Q_UNUSED(root);
 }
 
 void FileFormatMigrationUnstable::upgradeErc(SExpression& root,
@@ -117,10 +109,35 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
+  for (SExpression* devNode : root.getChildren("device")) {
+    devNode->appendChild("lock", SExpression::createToken("false"));
+    for (SExpression* txtNode : devNode->getChildren("stroke_text")) {
+      txtNode->appendChild("lock", SExpression::createToken("false"));
+    }
+  }
+  for (SExpression* polyNode : root.getChildren("polygon")) {
+    polyNode->appendChild("lock", SExpression::createToken("false"));
+  }
+  for (SExpression* txtNode : root.getChildren("stroke_text")) {
+    txtNode->appendChild("lock", SExpression::createToken("false"));
+  }
+  for (SExpression* planeNode : root.getChildren("plane")) {
+    planeNode->appendChild("lock", SExpression::createToken("false"));
+  }
+  upgradeHoles(root, true);
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {
   Q_UNUSED(root);
+}
+
+void FileFormatMigrationUnstable::upgradeHoles(SExpression& node,
+                                               bool isBoardHole) {
+  for (SExpression* holeNode : node.getChildren("hole")) {
+    if (isBoardHole) {
+      holeNode->appendChild("lock", SExpression::createToken("false"));
+    }
+  }
 }
 
 /*******************************************************************************

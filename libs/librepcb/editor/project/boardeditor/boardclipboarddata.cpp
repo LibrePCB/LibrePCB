@@ -65,9 +65,18 @@ BoardClipboardData::BoardClipboardData(const QByteArray& mimeData)
   mDevices.loadFromSExpression(root);
   mNetSegments.loadFromSExpression(root);
   mPlanes.loadFromSExpression(root);
-  mPolygons.loadFromSExpression(root);
-  mStrokeTexts.loadFromSExpression(root);
-  mHoles.loadFromSExpression(root);
+
+  foreach (const SExpression* child, root.getChildren("polygon")) {
+    mPolygons.append(BoardPolygonData(*child));
+  }
+
+  foreach (const SExpression* child, root.getChildren("stroke_text")) {
+    mStrokeTexts.append(BoardStrokeTextData(*child));
+  }
+
+  foreach (const SExpression* child, root.getChildren("hole")) {
+    mHoles.append(BoardHoleData(*child));
+  }
 
   foreach (const SExpression* child, root.getChildren("pad_position")) {
     mPadPositions.insert(
@@ -116,12 +125,21 @@ std::unique_ptr<QMimeData> BoardClipboardData::toMimeData() const {
   mNetSegments.serialize(root);
   root.ensureLineBreak();
   mPlanes.serialize(root);
+  for (const BoardPolygonData& data : mPolygons) {
+    root.ensureLineBreak();
+    data.serialize(root.appendList("polygon"));
+  }
   root.ensureLineBreak();
-  mPolygons.serialize(root);
+  for (const BoardStrokeTextData& data : mStrokeTexts) {
+    root.ensureLineBreak();
+    data.serialize(root.appendList("stroke_text"));
+  }
   root.ensureLineBreak();
-  mStrokeTexts.serialize(root);
+  for (const BoardHoleData& data : mHoles) {
+    root.ensureLineBreak();
+    data.serialize(root.appendList("hole"));
+  }
   root.ensureLineBreak();
-  mHoles.serialize(root);
   for (auto it = mPadPositions.begin(); it != mPadPositions.end(); ++it) {
     SExpression child = SExpression::createList("pad_position");
     child.appendChild("device", it.key().first);

@@ -40,22 +40,21 @@ namespace librepcb {
 class Angle;
 class BI_Base;
 class BI_Device;
+class BI_Hole;
 class BI_NetLine;
 class BI_NetSegment;
 class BI_Plane;
 class BI_Polygon;
+class BI_StrokeText;
 class BI_Via;
-class Hole;
 class Point;
-class Polygon;
-class StrokeText;
 
 namespace editor {
 
 class BoardClipboardData;
 class CmdBoardPlaneEdit;
+class CmdBoardPolygonEdit;
 class CmdDragSelectedBoardItems;
-class CmdPolygonEdit;
 class UndoCommandGroup;
 
 /*******************************************************************************
@@ -95,6 +94,7 @@ public:
   virtual bool processRotate(const Angle& rotation) noexcept override;
   virtual bool processFlip(Qt::Orientation orientation) noexcept override;
   virtual bool processSnapToGrid() noexcept override;
+  virtual bool processSetLocked(bool locked) noexcept override;
   virtual bool processResetAllTexts() noexcept override;
   virtual bool processRemove() noexcept override;
   virtual bool processEditProperties() noexcept override;
@@ -122,9 +122,10 @@ private:  // Methods
   bool rotateSelectedItems(const Angle& angle) noexcept;
   bool flipSelectedItems(Qt::Orientation orientation) noexcept;
   bool snapSelectedItemsToGrid() noexcept;
+  bool lockSelectedItems(bool locked) noexcept;
   bool resetAllTextsOfSelectedItems() noexcept;
   bool removeSelectedItems() noexcept;
-  void removePolygonVertices(Polygon& polygon,
+  void removePolygonVertices(BI_Polygon& polygon,
                              const QVector<int> vertices) noexcept;
   void removePlaneVertices(BI_Plane& plane,
                            const QVector<int> vertices) noexcept;
@@ -174,9 +175,9 @@ private:  // Methods
   void openDevicePropertiesDialog(BI_Device& device) noexcept;
   void openViaPropertiesDialog(BI_Via& via) noexcept;
   void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
-  void openPolygonPropertiesDialog(Polygon& polygon) noexcept;
-  void openStrokeTextPropertiesDialog(StrokeText& text) noexcept;
-  void openHolePropertiesDialog(Hole& hole) noexcept;
+  void openPolygonPropertiesDialog(BI_Polygon& polygon) noexcept;
+  void openStrokeTextPropertiesDialog(BI_StrokeText& text) noexcept;
+  void openHolePropertiesDialog(BI_Hole& hole) noexcept;
   QList<DeviceMenuItem> getDeviceMenuItems(
       const ComponentInstance& cmpInst) const noexcept;
 
@@ -192,7 +193,7 @@ private:  // Data
   /// The polygon vertex indices selected for editing (empty if none)
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
-  QScopedPointer<CmdPolygonEdit> mCmdPolygonEdit;
+  QScopedPointer<CmdBoardPolygonEdit> mCmdPolygonEdit;
 
   /// The current plane selected for editing (nullptr if none)
   BI_Plane* mSelectedPlane;

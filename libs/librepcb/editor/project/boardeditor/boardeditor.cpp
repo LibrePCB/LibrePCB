@@ -207,6 +207,14 @@ BoardEditor::~BoardEditor() {
  *  Setters
  ******************************************************************************/
 
+bool BoardEditor::getIgnoreLocks() const noexcept {
+  return mActionIgnoreLocks && mActionIgnoreLocks->isChecked();
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
 bool BoardEditor::setActiveBoardIndex(int index) noexcept {
   Board* newBoard = mProject.getBoardByIndex(index);
 
@@ -589,6 +597,8 @@ void BoardEditor::createActions() noexcept {
       }
     }
   }));
+  mActionIgnoreLocks.reset(cmd.ignoreLocks.createAction(this));
+  mActionIgnoreLocks->setCheckable(true);
   mActionZoomFit.reset(cmd.zoomFitContent.createAction(this, mUi->graphicsView,
                                                        &GraphicsView::zoomAll));
   mActionZoomIn.reset(
@@ -645,6 +655,10 @@ void BoardEditor::createActions() noexcept {
       this, this, [this]() { mFsm->processFlip(Qt::Vertical); }));
   mActionSnapToGrid.reset(cmd.snapToGrid.createAction(
       this, mFsm.data(), &BoardEditorFsm::processSnapToGrid));
+  mActionLock.reset(cmd.lock.createAction(
+      this, this, [this]() { mFsm->processSetLocked(true); }));
+  mActionUnlock.reset(cmd.unlock.createAction(
+      this, this, [this]() { mFsm->processSetLocked(false); }));
   mActionResetAllTexts.reset(cmd.deviceResetTextAll.createAction(
       this, mFsm.data(), &BoardEditorFsm::processResetAllTexts));
   mActionProperties.reset(cmd.properties.createAction(
@@ -780,6 +794,7 @@ void BoardEditor::createToolBars() noexcept {
   mToolBarView.reset(new QToolBar(tr("View"), this));
   mToolBarView->setObjectName("toolBarView");
   mToolBarView->addAction(mActionGridProperties.data());
+  mToolBarView->addAction(mActionIgnoreLocks.data());
   mToolBarView->addAction(mActionZoomIn.data());
   mToolBarView->addAction(mActionZoomOut.data());
   mToolBarView->addAction(mActionZoomFit.data());
@@ -932,6 +947,8 @@ void BoardEditor::createMenus() noexcept {
   mb.addAction(mActionFlipHorizontal);
   mb.addAction(mActionFlipVertical);
   mb.addAction(mActionSnapToGrid);
+  mb.addAction(mActionLock);
+  mb.addAction(mActionUnlock);
   mb.addAction(mActionResetAllTexts);
   mb.addSeparator();
   mb.addAction(mActionFind);
@@ -945,6 +962,8 @@ void BoardEditor::createMenus() noexcept {
   mb.addAction(mActionGridProperties);
   mb.addAction(mActionGridIncrease.data());
   mb.addAction(mActionGridDecrease.data());
+  mb.addSeparator();
+  mb.addAction(mActionIgnoreLocks);
   mb.addSeparator();
   mb.addAction(mActionHidePlanes);
   mb.addAction(mActionShowPlanes);

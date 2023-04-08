@@ -22,15 +22,15 @@
  ******************************************************************************/
 #include "cmddragselectedboarditems.h"
 
-#include "../../cmd/cmdholeedit.h"
-#include "../../cmd/cmdpolygonedit.h"
-#include "../../cmd/cmdstroketextedit.h"
-#include "../../project/cmd/cmdboardnetpointedit.h"
-#include "../../project/cmd/cmdboardplaneedit.h"
-#include "../../project/cmd/cmdboardviaedit.h"
-#include "../../project/cmd/cmddeviceinstanceedit.h"
 #include "../boardeditor/boardgraphicsscene.h"
 #include "../boardeditor/boardselectionquery.h"
+#include "cmdboardholeedit.h"
+#include "cmdboardnetpointedit.h"
+#include "cmdboardplaneedit.h"
+#include "cmdboardpolygonedit.h"
+#include "cmdboardstroketextedit.h"
+#include "cmdboardviaedit.h"
+#include "cmddeviceinstanceedit.h"
 #include "cmddevicestroketextsreset.h"
 
 #include <librepcb/core/project/board/board.h>
@@ -55,7 +55,8 @@ namespace editor {
  ******************************************************************************/
 
 CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
-    BoardGraphicsScene& scene, const Point& startPos) noexcept
+    BoardGraphicsScene& scene, bool includeLockedItems,
+    const Point& startPos) noexcept
   : UndoCommandGroup(tr("Drag Board Elements")),
     mScene(scene),
     mItemCount(0),
@@ -64,9 +65,10 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     mCenterPos(0, 0),
     mDeltaAngle(0),
     mSnappedToGrid(false),
+    mLockedChanged(false),
     mTextsReset(false) {
   // get all selected items
-  BoardSelectionQuery query(mScene);
+  BoardSelectionQuery query(mScene, includeLockedItems);
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedVias();
   query.addSelectedNetPoints();
@@ -112,11 +114,11 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   }
   foreach (BI_Polygon* polygon, query.getPolygons()) {
     Q_ASSERT(polygon);
-    for (const Vertex& vertex : polygon->getPolygon().getPath().getVertices()) {
+    for (const Vertex& vertex : polygon->getData().getPath().getVertices()) {
       mCenterPos += vertex.getPos();
       ++mItemCount;
     }
-    CmdPolygonEdit* cmd = new CmdPolygonEdit(polygon->getPolygon());
+    CmdBoardPolygonEdit* cmd = new CmdBoardPolygonEdit(*polygon);
     mPolygonEditCmds.append(cmd);
   }
   foreach (BI_StrokeText* text, query.getStrokeTexts()) {
@@ -124,17 +126,17 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     // do not count texts of devices if the device is selected too
     if ((!text->getDevice()) ||
         (!query.getDeviceInstances().contains(text->getDevice()))) {
-      mCenterPos += text->getPosition();
+      mCenterPos += text->getData().getPosition();
       ++mItemCount;
     }
-    CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getTextObj());
+    CmdBoardStrokeTextEdit* cmd = new CmdBoardStrokeTextEdit(*text);
     mStrokeTextEditCmds.append(cmd);
   }
   foreach (BI_Hole* hole, query.getHoles()) {
     Q_ASSERT(hole);
-    mCenterPos += hole->getHole().getPath()->getVertices().first().getPos();
+    mCenterPos += hole->getData().getPath()->getVertices().first().getPos();
     ++mItemCount;
-    CmdHoleEdit* cmd = new CmdHoleEdit(hole->getHole());
+    CmdBoardHoleEdit* cmd = new CmdBoardHoleEdit(*hole);
     mHoleEditCmds.append(cmd);
   }
 
@@ -164,18 +166,35 @@ void CmdDragSelectedBoardItems::snapToGrid() noexcept {
   foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
     cmd->snapToGrid(grid, true);
   }
-  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+  foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
     cmd->snapToGrid(grid, true);
   }
-  foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
     cmd->snapToGrid(grid, true);
   }
-  foreach (CmdHoleEdit* cmd, mHoleEditCmds) { cmd->snapToGrid(grid, true); }
+  foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
   mSnappedToGrid = true;
 
   // Force updating airwires immediately as they are important while moving
   // items.
   mScene.getBoard().triggerAirWiresRebuild();
+}
+
+void CmdDragSelectedBoardItems::setLocked(bool locked) noexcept {
+  foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
+    cmd->setLocked(locked);
+  }
+  foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) { cmd->setLocked(locked); }
+  foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->setLocked(locked);
+  }
+  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+    cmd->setLocked(locked);
+  }
+  foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) { cmd->setLocked(locked); }
+  mLockedChanged = true;
 }
 
 void CmdDragSelectedBoardItems::resetAllTexts() noexcept {
@@ -203,13 +222,13 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
     foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
-    foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
-    foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+    foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
-    foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
+    foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
     mDeltaPos = delta;
@@ -240,13 +259,13 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
   foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
     cmd->rotate(angle, center, true);
   }
-  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+  foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
     cmd->rotate(angle, center, true);
   }
-  foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
     cmd->rotate(angle, center, true);
   }
-  foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
+  foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) {
     cmd->rotate(angle, center, true);
   }
   mDeltaAngle += angle;
@@ -262,7 +281,7 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
 
 bool CmdDragSelectedBoardItems::performExecute() {
   if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0()) &&
-      (!mSnappedToGrid) && (!mTextsReset)) {
+      (!mSnappedToGrid) && (!mTextsReset) && (!mLockedChanged)) {
     // no movement required --> discard all commands
     qDeleteAll(mDeviceEditCmds);
     mDeviceEditCmds.clear();
@@ -303,13 +322,13 @@ bool CmdDragSelectedBoardItems::performExecute() {
   foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
     appendChild(cmd);  // can throw
   }
-  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+  foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
     appendChild(cmd);  // can throw
   }
-  foreach (CmdStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
     appendChild(cmd);  // can throw
   }
-  foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
+  foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) {
     appendChild(cmd);  // can throw
   }
 

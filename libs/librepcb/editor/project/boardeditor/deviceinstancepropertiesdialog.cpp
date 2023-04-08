@@ -113,6 +113,7 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
   mUi->edtPosY->setValue(mDevice.getPosition().getY());
   mUi->edtRotation->setValue(mDevice.getRotation());
   mUi->cbxMirror->setChecked(mDevice.getMirrored());
+  mUi->cbxLock->setChecked(mDevice.isLocked());
 
   // set focus to component instance name
   mUi->edtCompInstName->selectAll();
@@ -172,7 +173,7 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
         tr("Change properties of %1")
             .arg(*mDevice.getComponentInstance().getName()));
 
-    // Component Instance
+    // Component instance properties.
     QScopedPointer<CmdComponentInstanceEdit> cmdCmp(
         new CmdComponentInstanceEdit(mProject.getCircuit(),
                                      mDevice.getComponentInstance()));
@@ -182,14 +183,18 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
     cmdCmp->setAttributes(mAttributes);
     transaction.append(cmdCmp.take());  // can throw
 
-    // Device Instance
-    QScopedPointer<CmdDeviceInstanceEditAll> cmdDev(
+    // Device instance with associated elements.
+    QScopedPointer<CmdDeviceInstanceEditAll> cmdDevAll(
         new CmdDeviceInstanceEditAll(mDevice));
-    cmdDev->setPosition(
+    cmdDevAll->setPosition(
         Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()), false);
-    cmdDev->setRotation(mUi->edtRotation->getValue(), false);
-    cmdDev->setMirrored(mUi->cbxMirror->isChecked(), false);  // can throw
-    transaction.append(cmdDev.take());  // can throw
+    cmdDevAll->setRotation(mUi->edtRotation->getValue(), false);
+    cmdDevAll->setMirrored(mUi->cbxMirror->isChecked(), false);  // can throw
+    if (mUi->cbxLock->isChecked() != mDevice.isLocked()) {
+      // Do not apply to all elements if not modified!
+      cmdDevAll->setLocked(mUi->cbxLock->isChecked());
+    }
+    transaction.append(cmdDevAll.take());  // can throw
 
     transaction.commit();  // can throw
     return true;

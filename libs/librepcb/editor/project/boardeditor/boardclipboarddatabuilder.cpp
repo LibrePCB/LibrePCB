@@ -72,7 +72,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
       new BoardClipboardData(mScene.getBoard().getUuid(), cursorPos));
 
   // Get all selected items
-  BoardSelectionQuery query(mScene);
+  BoardSelectionQuery query(mScene, true);
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedVias();
   query.addSelectedNetLines();
@@ -97,16 +97,16 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
       device->getLibPackage().getDirectory().copyTo(*pkgDir);
     }
     // Create list of stroke texts
-    StrokeTextList strokeTexts;
+    QList<BoardStrokeTextData> strokeTexts;
     foreach (const BI_StrokeText* t, device->getStrokeTexts()) {
-      strokeTexts.append(std::make_shared<StrokeText>(t->getTextObj()));
+      strokeTexts.append(t->getData());
     }
     // Add device
     data->getDevices().append(std::make_shared<BoardClipboardData::Device>(
         device->getComponentInstanceUuid(), device->getLibDevice().getUuid(),
         device->getLibFootprint().getUuid(), device->getPosition(),
-        device->getRotation(), device->getMirrored(), device->getAttributes(),
-        strokeTexts));
+        device->getRotation(), device->getMirrored(), device->isLocked(),
+        device->getAttributes(), strokeTexts));
     // Add pad positions
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       data->getPadPositions().insert(
@@ -168,25 +168,23 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
             plane->getNetSignal().getName(), plane->getOutline(),
             plane->getMinWidth(), plane->getMinClearance(),
             plane->getKeepOrphans(), plane->getPriority(),
-            plane->getConnectStyle());
+            plane->getConnectStyle(), plane->isLocked());
     data->getPlanes().append(newPlane);
   }
 
   // Add polygons
   foreach (BI_Polygon* polygon, query.getPolygons()) {
-    data->getPolygons().append(
-        std::make_shared<Polygon>(polygon->getPolygon()));
+    data->getPolygons().append(polygon->getData());
   }
 
   // Add stroke texts
-  foreach (BI_StrokeText* text, query.getStrokeTexts()) {
-    data->getStrokeTexts().append(
-        std::make_shared<StrokeText>(text->getTextObj()));
+  foreach (BI_StrokeText* t, query.getStrokeTexts()) {
+    data->getStrokeTexts().append(t->getData());
   }
 
   // Add holes
   foreach (BI_Hole* hole, query.getHoles()) {
-    data->getHoles().append(std::make_shared<Hole>(hole->getHole()));
+    data->getHoles().append(hole->getData());
   }
 
   return data;

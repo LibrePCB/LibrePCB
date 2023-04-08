@@ -44,7 +44,9 @@ CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(BI_Device& dev) noexcept
     mOldRotation(mDevice.getRotation()),
     mNewRotation(mOldRotation),
     mOldMirrored(mDevice.getMirrored()),
-    mNewMirrored(mOldMirrored) {
+    mNewMirrored(mOldMirrored),
+    mOldLocked(mDevice.isLocked()),
+    mNewLocked(mOldLocked) {
 }
 
 CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept {
@@ -145,6 +147,11 @@ void CmdDeviceInstanceEdit::mirror(const Point& center,
   mNewRotation = rotation;
 }
 
+void CmdDeviceInstanceEdit::setLocked(bool locked) {
+  Q_ASSERT(!wasEverExecuted());
+  mNewLocked = locked;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -155,6 +162,7 @@ bool CmdDeviceInstanceEdit::performExecute() {
   if (mNewPos != mOldPos) return true;
   if (mNewRotation != mOldRotation) return true;
   if (mNewMirrored != mOldMirrored) return true;
+  if (mNewLocked != mOldLocked) return true;
   return false;
 }
 
@@ -162,12 +170,14 @@ void CmdDeviceInstanceEdit::performUndo() {
   mDevice.setMirrored(mOldMirrored);  // can throw
   mDevice.setPosition(mOldPos);
   mDevice.setRotation(mOldRotation);
+  mDevice.setLocked(mOldLocked);
 }
 
 void CmdDeviceInstanceEdit::performRedo() {
   mDevice.setMirrored(mNewMirrored);  // can throw
   mDevice.setPosition(mNewPos);
   mDevice.setRotation(mNewRotation);
+  mDevice.setLocked(mNewLocked);
 }
 
 /*******************************************************************************

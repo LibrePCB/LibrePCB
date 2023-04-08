@@ -36,15 +36,10 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Hole::BI_Hole(Board& board, const Hole& hole)
-  : BI_Base(board),
-    onEdited(*this),
-    mHole(new Hole(hole)),
-    mStopMaskOffset(),
-    mOnEditedSlot(*this, &BI_Hole::holeEdited) {
+BI_Hole::BI_Hole(Board& board, const BoardHoleData& data)
+  : BI_Base(board), onEdited(*this), mData(data), mStopMaskOffset() {
   updateStopMaskOffset();
 
-  mHole->onEdited.attach(mOnEditedSlot);
   connect(&mBoard, &Board::designRulesModified, this,
           &BI_Hole::updateStopMaskOffset);
 }
@@ -53,11 +48,43 @@ BI_Hole::~BI_Hole() noexcept {
 }
 
 /*******************************************************************************
- *  Getters
+ *  Setters
  ******************************************************************************/
 
-const Uuid& BI_Hole::getUuid() const noexcept {
-  return mHole->getUuid();
+bool BI_Hole::setDiameter(const PositiveLength& diameter) noexcept {
+  if (mData.setDiameter(diameter)) {
+    onEdited.notify(Event::DiameterChanged);
+    updateStopMaskOffset();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_Hole::setPath(const NonEmptyPath& path) noexcept {
+  if (mData.setPath(path)) {
+    onEdited.notify(Event::PathChanged);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_Hole::setStopMaskConfig(const MaskConfig& config) noexcept {
+  if (mData.setStopMaskConfig(config)) {
+    updateStopMaskOffset();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool BI_Hole::setLocked(bool locked) noexcept {
+  if (mData.setLocked(locked)) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 /*******************************************************************************
@@ -82,39 +109,15 @@ void BI_Hole::removeFromBoard() {
  *  Private Methods
  ******************************************************************************/
 
-void BI_Hole::holeEdited(const Hole& hole, Hole::Event event) noexcept {
-  Q_UNUSED(hole);
-
-  switch (event) {
-    case Hole::Event::UuidChanged:
-      break;
-    case Hole::Event::PathChanged:
-      onEdited.notify(Event::PathChanged);
-      updateStopMaskOffset();
-      break;
-    case Hole::Event::DiameterChanged:
-      onEdited.notify(Event::DiameterChanged);
-      updateStopMaskOffset();
-      break;
-    case Hole::Event::StopMaskConfigChanged:
-      updateStopMaskOffset();
-      break;
-    default:
-      qWarning() << "Unhandled switch-case in BI_Hole::holeEdited():"
-                 << static_cast<int>(event);
-      break;
-  }
-}
-
 void BI_Hole::updateStopMaskOffset() noexcept {
   tl::optional<Length> offset;
-  if (!mHole->getStopMaskConfig().isEnabled()) {
+  if (!mData.getStopMaskConfig().isEnabled()) {
     offset = tl::nullopt;
-  } else if (auto manualOffset = mHole->getStopMaskConfig().getOffset()) {
+  } else if (auto manualOffset = mData.getStopMaskConfig().getOffset()) {
     offset = *manualOffset;
   } else {
     offset = *mBoard.getDesignRules().getStopMaskClearance().calcValue(
-        *mHole->getDiameter());
+        *mData.getDiameter());
   }
 
   if (offset != mStopMaskOffset) {

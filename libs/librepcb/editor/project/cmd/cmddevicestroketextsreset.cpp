@@ -59,7 +59,15 @@ bool CmdDeviceStrokeTextsReset::performExecute() {
   // Create new texts
   for (const StrokeText& text : mDevice.getDefaultStrokeTexts()) {
     appendChild(new CmdDeviceStrokeTextAdd(
-        mDevice, *new BI_StrokeText(mDevice.getBoard(), text)));
+        mDevice,
+        *new BI_StrokeText(
+            mDevice.getBoard(),
+            BoardStrokeTextData(text.getUuid(), text.getLayer(), text.getText(),
+                                text.getPosition(), text.getRotation(),
+                                text.getHeight(), text.getStrokeWidth(),
+                                text.getLetterSpacing(), text.getLineSpacing(),
+                                text.getAlign(), text.getMirrored(),
+                                text.getAutoRotate(), mDevice.isLocked()))));
   }
 
   // execute all child commands

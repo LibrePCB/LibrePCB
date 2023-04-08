@@ -25,7 +25,8 @@
  ******************************************************************************/
 #include "boardeditorstate.h"
 
-#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/types/angle.h>
+#include <librepcb/core/types/point.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -40,7 +41,7 @@ class Layer;
 
 namespace editor {
 
-class CmdPolygonEdit;
+class CmdBoardPolygonEdit;
 class GraphicsLayerComboBox;
 class UnsignedLengthEdit;
 
@@ -92,13 +93,19 @@ private:  // Methods
 private:
   // State
   bool mIsUndoCmdActive;
-  Polygon mLastPolygonProperties;
   Point mLastSegmentPos;
+
+  // parameter memory
+  const Layer* mLastLayer;
+  UnsignedLength mLastLineWidth;
+  Angle mLastRotation;
+  bool mLastIsFilled;
+  bool mLastIsGrabArea;
 
   // Information about the current polygon to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_Polygon* mCurrentPolygon;
-  QScopedPointer<CmdPolygonEdit> mCurrentPolygonEditCmd;
+  QScopedPointer<CmdBoardPolygonEdit> mCurrentPolygonEditCmd;
 };
 
 /*******************************************************************************

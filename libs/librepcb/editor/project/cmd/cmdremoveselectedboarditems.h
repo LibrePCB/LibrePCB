@@ -52,7 +52,8 @@ class CmdRemoveBoardItems;
 class CmdRemoveSelectedBoardItems final : public UndoCommand {
 public:
   // Constructors / Destructor
-  explicit CmdRemoveSelectedBoardItems(BoardGraphicsScene& scene) noexcept;
+  explicit CmdRemoveSelectedBoardItems(BoardGraphicsScene& scene,
+                                       bool includeLockedItems) noexcept;
   ~CmdRemoveSelectedBoardItems() noexcept;
 
 private:  // Methods
@@ -67,6 +68,7 @@ private:  // Methods
 
 private:  // Data
   BoardGraphicsScene& mScene;
+  bool mIncludeLockedItems;
   QScopedPointer<CmdRemoveBoardItems> mWrappedCommand;
 };
 

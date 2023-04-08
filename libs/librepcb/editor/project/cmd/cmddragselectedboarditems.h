@@ -37,14 +37,14 @@ namespace librepcb {
 namespace editor {
 
 class BoardGraphicsScene;
+class CmdBoardHoleEdit;
 class CmdBoardNetPointEdit;
 class CmdBoardPlaneEdit;
+class CmdBoardPolygonEdit;
+class CmdBoardStrokeTextEdit;
 class CmdBoardViaEdit;
 class CmdDeviceInstanceEdit;
 class CmdDeviceStrokeTextsReset;
-class CmdHoleEdit;
-class CmdPolygonEdit;
-class CmdStrokeTextEdit;
 
 /*******************************************************************************
  *  Class CmdDragSelectedBoardItems
@@ -57,11 +57,13 @@ class CmdDragSelectedBoardItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   explicit CmdDragSelectedBoardItems(BoardGraphicsScene& scene,
+                                     bool includeLockedItems,
                                      const Point& startPos = Point()) noexcept;
   ~CmdDragSelectedBoardItems() noexcept;
 
   // General Methods
   void snapToGrid() noexcept;
+  void setLocked(bool locked) noexcept;
   void resetAllTexts() noexcept;
   void setCurrentPosition(const Point& pos,
                           const bool gridIncrement = true) noexcept;
@@ -81,6 +83,7 @@ private:
   Point mCenterPos;
   Angle mDeltaAngle;
   bool mSnappedToGrid;
+  bool mLockedChanged;
   bool mTextsReset;
 
   // Move commands
@@ -89,9 +92,9 @@ private:
   QList<CmdBoardViaEdit*> mViaEditCmds;
   QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
   QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
-  QList<CmdPolygonEdit*> mPolygonEditCmds;
-  QList<CmdStrokeTextEdit*> mStrokeTextEditCmds;
-  QList<CmdHoleEdit*> mHoleEditCmds;
+  QList<CmdBoardPolygonEdit*> mPolygonEditCmds;
+  QList<CmdBoardStrokeTextEdit*> mStrokeTextEditCmds;
+  QList<CmdBoardHoleEdit*> mHoleEditCmds;
 };
 
 /*******************************************************************************

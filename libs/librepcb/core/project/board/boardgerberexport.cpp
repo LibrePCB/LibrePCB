@@ -130,11 +130,10 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   // Export board outline since this is useful for manual review.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     Q_ASSERT(polygon);
-    if (polygon->getPolygon().getLayer() == Layer::boardOutlines()) {
-      UnsignedLength lineWidth =
-          calcWidthOfLayer(polygon->getPolygon().getLineWidth(),
-                           polygon->getPolygon().getLayer());
-      gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth,
+    if (polygon->getData().getLayer() == Layer::boardOutlines()) {
+      UnsignedLength lineWidth = calcWidthOfLayer(
+          polygon->getData().getLineWidth(), polygon->getData().getLayer());
+      gen.drawPathOutline(polygon->getData().getPath(), lineWidth,
                           GerberAttribute::ApertureFunction::Profile,
                           tl::nullopt, QString());
     }
@@ -510,7 +509,7 @@ int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const {
 
   // board holes
   foreach (const BI_Hole* hole, mBoard.getHoles()) {
-    gen.drill(hole->getHole().getPath(), hole->getHole().getDiameter(), false,
+    gen.drill(hole->getData().getPath(), hole->getData().getDiameter(), false,
               ExcellonGenerator::Function::MechanicalDrill);
     ++count;
   }
@@ -604,16 +603,16 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   }
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     Q_ASSERT(polygon);
-    if (layer == polygon->getPolygon().getLayer()) {
+    if (layer == polygon->getData().getLayer()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(polygon->getPolygon().getLineWidth(), layer);
-      gen.drawPathOutline(polygon->getPolygon().getPath(), lineWidth,
+          calcWidthOfLayer(polygon->getData().getLineWidth(), layer);
+      gen.drawPathOutline(polygon->getData().getPath(), lineWidth,
                           graphicsFunction, graphicsNet, QString());
       // Only fill closed paths (for consistency with the appearance in the
       // board editor, and because Gerber expects area outlines as closed).
-      if (polygon->getPolygon().isFilled() &&
-          polygon->getPolygon().getPath().isClosed()) {
-        gen.drawPathArea(polygon->getPolygon().getPath(), graphicsFunction,
+      if (polygon->getData().isFilled() &&
+          polygon->getData().getPath().isClosed()) {
+        gen.drawPathArea(polygon->getData().getPath(), graphicsFunction,
                          graphicsNet, QString());
       }
     }
@@ -626,10 +625,10 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   }
   foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
     Q_ASSERT(text);
-    if (layer == text->getTextObj().getLayer()) {
+    if (layer == text->getData().getLayer()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(text->getTextObj().getStrokeWidth(), layer);
-      const Transform transform(text->getTextObj());
+          calcWidthOfLayer(text->getData().getStrokeWidth(), layer);
+      const Transform transform(text->getData());
       foreach (Path path, transform.map(text->getPaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             QString());
@@ -642,8 +641,8 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
     foreach (const BI_Hole* hole, mBoard.getHoles()) {
       if (const tl::optional<Length>& offset = hole->getStopMaskOffset()) {
         const Length diameter =
-            (*hole->getHole().getDiameter()) + (*offset) + (*offset);
-        const Path path = hole->getHole().getPath()->cleaned();
+            (*hole->getData().getDiameter()) + (*offset) + (*offset);
+        const Path path = hole->getData().getPath()->cleaned();
         if (diameter > 0) {
           if (path.getVertices().count() == 1) {
             gen.flashCircle(path.getVertices().first().getPos(),
@@ -747,10 +746,10 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
     textFunction = GerberAttribute::ApertureFunction::NonConductor;
   }
   foreach (const BI_StrokeText* text, device.getStrokeTexts()) {
-    if (layer == text->getTextObj().getLayer()) {
+    if (layer == text->getData().getLayer()) {
       UnsignedLength lineWidth =
-          calcWidthOfLayer(text->getTextObj().getStrokeWidth(), layer);
-      Transform transform(text->getTextObj());
+          calcWidthOfLayer(text->getData().getStrokeWidth(), layer);
+      Transform transform(text->getData());
       foreach (Path path, transform.map(text->getPaths())) {
         gen.drawPathOutline(path, lineWidth, textFunction, graphicsNet,
                             component);

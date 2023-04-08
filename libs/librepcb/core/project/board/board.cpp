@@ -358,27 +358,27 @@ void Board::addPolygon(BI_Polygon& polygon) {
       (&polygon.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (mPolygons.contains(polygon.getUuid())) {
+  if (mPolygons.contains(polygon.getData().getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a polygon with the UUID \"%1\"!")
-            .arg(polygon.getUuid().toStr()));
+            .arg(polygon.getData().getUuid().toStr()));
   }
   if (mIsAddedToProject) {
     polygon.addToBoard();  // can throw
   }
-  mPolygons.insert(polygon.getUuid(), &polygon);
+  mPolygons.insert(polygon.getData().getUuid(), &polygon);
   emit polygonAdded(polygon);
 }
 
 void Board::removePolygon(BI_Polygon& polygon) {
-  if (mPolygons.value(polygon.getUuid()) != &polygon) {
+  if (mPolygons.value(polygon.getData().getUuid()) != &polygon) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
     polygon.removeFromBoard();  // can throw
   }
-  mPolygons.remove(polygon.getUuid());
+  mPolygons.remove(polygon.getData().getUuid());
   emit polygonRemoved(polygon);
 }
 
@@ -390,27 +390,27 @@ void Board::addStrokeText(BI_StrokeText& text) {
   if ((mStrokeTexts.values().contains(&text)) || (&text.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (mStrokeTexts.contains(text.getUuid())) {
+  if (mStrokeTexts.contains(text.getData().getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a stroke text with the UUID \"%1\"!")
-            .arg(text.getUuid().toStr()));
+            .arg(text.getData().getUuid().toStr()));
   }
   if (mIsAddedToProject) {
     text.addToBoard();  // can throw
   }
-  mStrokeTexts.insert(text.getUuid(), &text);
+  mStrokeTexts.insert(text.getData().getUuid(), &text);
   emit strokeTextAdded(text);
 }
 
 void Board::removeStrokeText(BI_StrokeText& text) {
-  if (mStrokeTexts.value(text.getUuid()) != &text) {
+  if (mStrokeTexts.value(text.getData().getUuid()) != &text) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
     text.removeFromBoard();  // can throw
   }
-  mStrokeTexts.remove(text.getUuid());
+  mStrokeTexts.remove(text.getData().getUuid());
   emit strokeTextRemoved(text);
 }
 
@@ -422,26 +422,26 @@ void Board::addHole(BI_Hole& hole) {
   if ((mHoles.values().contains(&hole)) || (&hole.getBoard() != this)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (mHoles.contains(hole.getUuid())) {
+  if (mHoles.contains(hole.getData().getUuid())) {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("There is already a hole with the UUID \"%1\"!")
-                           .arg(hole.getUuid().toStr()));
+                           .arg(hole.getData().getUuid().toStr()));
   }
   if (mIsAddedToProject) {
     hole.addToBoard();  // can throw
   }
-  mHoles.insert(hole.getUuid(), &hole);
+  mHoles.insert(hole.getData().getUuid(), &hole);
   emit holeAdded(hole);
 }
 
 void Board::removeHole(BI_Hole& hole) {
-  if (mHoles.value(hole.getUuid()) != &hole) {
+  if (mHoles.value(hole.getData().getUuid()) != &hole) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (mIsAddedToProject) {
     hole.removeFromBoard();  // can throw
   }
-  mHoles.remove(hole.getUuid());
+  mHoles.remove(hole.getData().getUuid());
   emit holeRemoved(hole);
 }
 
@@ -501,9 +501,10 @@ void Board::addDefaultContent() {
   // Add 100x80mm board outline (1/2 Eurocard size).
   addPolygon(*new BI_Polygon(
       *this,
-      Polygon(Uuid::createRandom(), Layer::boardOutlines(), UnsignedLength(0),
-              false, false,
-              Path::rect(Point(0, 0), Point(100000000, 80000000)))));
+      BoardPolygonData(Uuid::createRandom(), Layer::boardOutlines(),
+                       UnsignedLength(0),
+                       Path::rect(Point(0, 0), Point(100000000, 80000000)),
+                       false, false, false)));
 }
 
 void Board::copyFrom(const Board& other) {
@@ -521,10 +522,11 @@ void Board::copyFrom(const Board& other) {
     BI_Device* copy = new BI_Device(
         *this, device->getComponentInstance(), device->getLibDevice().getUuid(),
         device->getLibFootprint().getUuid(), device->getPosition(),
-        device->getRotation(), device->getMirrored(), false);
+        device->getRotation(), device->getMirrored(), device->isLocked(),
+        false);
     copy->setAttributes(device->getAttributes());
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
-      copy->addStrokeText(*new BI_StrokeText(*this, text->getTextObj()));
+      copy->addStrokeText(*new BI_StrokeText(*this, text->getData()));
     }
     addDeviceInstance(*copy);
     devMap.insert(device, copy);
@@ -590,6 +592,7 @@ void Board::copyFrom(const Board& other) {
     copy->setKeepOrphans(plane->getKeepOrphans());
     copy->setPriority(plane->getPriority());
     copy->setConnectStyle(plane->getConnectStyle());
+    copy->setLocked(plane->isLocked());
     copy->setVisible(plane->isVisible());
     copy->setCalculatedFragments(plane->getFragments());
     addPlane(*copy);
@@ -598,21 +601,21 @@ void Board::copyFrom(const Board& other) {
   // Copy polygons.
   foreach (const BI_Polygon* polygon, other.getPolygons()) {
     BI_Polygon* copy = new BI_Polygon(
-        *this, Polygon(Uuid::createRandom(), polygon->getPolygon()));
+        *this, BoardPolygonData(Uuid::createRandom(), polygon->getData()));
     addPolygon(*copy);
   }
 
   // Copy stroke texts.
   foreach (const BI_StrokeText* text, other.getStrokeTexts()) {
     BI_StrokeText* copy = new BI_StrokeText(
-        *this, StrokeText(Uuid::createRandom(), text->getTextObj()));
+        *this, BoardStrokeTextData(Uuid::createRandom(), text->getData()));
     addStrokeText(*copy);
   }
 
   // Copy holes.
   foreach (const BI_Hole* hole, other.getHoles()) {
-    BI_Hole* copy =
-        new BI_Hole(*this, Hole(Uuid::createRandom(), hole->getHole()));
+    BI_Hole* copy = new BI_Hole(
+        *this, BoardHoleData{Uuid::createRandom(), hole->getData()});
     addHole(*copy);
   }
 }
@@ -716,17 +719,17 @@ void Board::save() {
     root.ensureLineBreak();
     for (const BI_Polygon* obj : mPolygons) {
       root.ensureLineBreak();
-      obj->getPolygon().serialize(root.appendList("polygon"));
+      obj->getData().serialize(root.appendList("polygon"));
     }
     root.ensureLineBreak();
     for (const BI_StrokeText* obj : mStrokeTexts) {
       root.ensureLineBreak();
-      obj->getTextObj().serialize(root.appendList("stroke_text"));
+      obj->getData().serialize(root.appendList("stroke_text"));
     }
     root.ensureLineBreak();
     for (const BI_Hole* obj : mHoles) {
       root.ensureLineBreak();
-      obj->getHole().serialize(root.appendList("hole"));
+      obj->getData().serialize(root.appendList("hole"));
     }
     root.ensureLineBreak();
     mDirectory->write("board.lp", root.toByteArray());

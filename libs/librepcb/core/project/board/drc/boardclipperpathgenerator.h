@@ -23,7 +23,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../geometry/path.h"
 #include "../../../types/length.h"
+#include "../../../utils/transform.h"
 
 #include <polyclipping/clipper.hpp>
 
@@ -37,7 +39,6 @@ namespace librepcb {
 class BI_FootprintPad;
 class BI_NetLine;
 class BI_Plane;
-class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
 class Board;
@@ -45,8 +46,6 @@ class Circle;
 class Hole;
 class Layer;
 class NetSignal;
-class Polygon;
-class Transform;
 
 /*******************************************************************************
  *  Class BoardClipperPathGenerator
@@ -73,13 +72,14 @@ public:
   void addVia(const BI_Via& via, const Length& offset = Length(0));
   void addNetLine(const BI_NetLine& netLine, const Length& offset = Length(0));
   void addPlane(const BI_Plane& plane);
-  void addPolygon(const BI_Polygon& polygon);
-  void addPolygon(const Polygon& polygon, const Transform& transform);
+  void addPolygon(const Path& path, const UnsignedLength& lineWidth,
+                  bool filled);
   void addCircle(const Circle& circle, const Transform& transform,
                  const Length& offset = Length(0));
   void addStrokeText(const BI_StrokeText& strokeText,
                      const Length& offset = Length(0));
-  void addHole(const Hole& hole, const Transform& transform,
+  void addHole(const PositiveLength& diameter, const NonEmptyPath& path,
+               const Transform& transform = Transform(),
                const Length& offset = Length(0));
   void addPad(const BI_FootprintPad& pad, const Transform& transform,
               const Layer& layer, const Length& offset = Length(0));

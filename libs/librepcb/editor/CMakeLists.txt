@@ -441,6 +441,8 @@ add_library(
   project/boardeditor/graphicsitems/bgi_netpoint.h
   project/boardeditor/graphicsitems/bgi_plane.cpp
   project/boardeditor/graphicsitems/bgi_plane.h
+  project/boardeditor/graphicsitems/bgi_polygon.cpp
+  project/boardeditor/graphicsitems/bgi_polygon.h
   project/boardeditor/graphicsitems/bgi_stroketext.cpp
   project/boardeditor/graphicsitems/bgi_stroketext.h
   project/boardeditor/graphicsitems/bgi_via.cpp
@@ -463,6 +465,8 @@ add_library(
   project/cmd/cmdboardedit.h
   project/cmd/cmdboardholeadd.cpp
   project/cmd/cmdboardholeadd.h
+  project/cmd/cmdboardholeedit.cpp
+  project/cmd/cmdboardholeedit.h
   project/cmd/cmdboardholeremove.cpp
   project/cmd/cmdboardholeremove.h
   project/cmd/cmdboardnetlineedit.cpp
@@ -487,6 +491,8 @@ add_library(
   project/cmd/cmdboardplaneremove.h
   project/cmd/cmdboardpolygonadd.cpp
   project/cmd/cmdboardpolygonadd.h
+  project/cmd/cmdboardpolygonedit.cpp
+  project/cmd/cmdboardpolygonedit.h
   project/cmd/cmdboardpolygonremove.cpp
   project/cmd/cmdboardpolygonremove.h
   project/cmd/cmdboardremove.cpp
@@ -495,6 +501,8 @@ add_library(
   project/cmd/cmdboardsplitnetline.h
   project/cmd/cmdboardstroketextadd.cpp
   project/cmd/cmdboardstroketextadd.h
+  project/cmd/cmdboardstroketextedit.cpp
+  project/cmd/cmdboardstroketextedit.h
   project/cmd/cmdboardstroketextremove.cpp
   project/cmd/cmdboardstroketextremove.h
   project/cmd/cmdboardviaedit.cpp

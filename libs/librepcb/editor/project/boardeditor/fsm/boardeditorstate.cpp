@@ -23,7 +23,6 @@
 #include "boardeditorstate.h"
 
 #include "../../../graphics/graphicslayer.h"
-#include "../../../graphics/polygongraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../widgets/graphicsview.h"
 #include "../boardeditor.h"
@@ -34,6 +33,7 @@
 #include "../graphicsitems/bgi_netline.h"
 #include "../graphicsitems/bgi_netpoint.h"
 #include "../graphicsitems/bgi_plane.h"
+#include "../graphicsitems/bgi_polygon.h"
 #include "../graphicsitems/bgi_stroketext.h"
 #include "../graphicsitems/bgi_via.h"
 
@@ -82,6 +82,10 @@ Board* BoardEditorState::getActiveBoard() noexcept {
 
 BoardGraphicsScene* BoardEditorState::getActiveBoardScene() noexcept {
   return mContext.editor.getActiveBoardScene();
+}
+
+bool BoardEditorState::getIgnoreLocks() const noexcept {
+  return mContext.editor.getIgnoreLocks();
 }
 
 PositiveLength BoardEditorState::getGridInterval() const noexcept {
@@ -281,7 +285,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     for (auto it = scene->getHoles().begin(); it != scene->getHoles().end();
          it++) {
       processItem(it.value(),
-                  it.key()->getHole().getPath()->getVertices().first().getPos(),
+                  it.key()->getData().getPath()->getVertices().first().getPos(),
                   5, false);
     }
   }
@@ -370,8 +374,8 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
          it != scene->getPolygons().end(); it++) {
       processItem(
           it.value(),
-          it.key()->getPolygon().getPath().calcNearestPointBetweenVertices(pos),
-          60 + priorityFromLayer(it.key()->getPolygon().getLayer()),
+          it.key()->getData().getPath().calcNearestPointBetweenVertices(pos),
+          60 + priorityFromLayer(it.key()->getData().getLayer()),
           true);  // Probably large grab area makes sense?
     }
   }
@@ -379,8 +383,8 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   if (flags.testFlag(FindFlag::StrokeTexts)) {
     for (auto it = scene->getStrokeTexts().begin();
          it != scene->getStrokeTexts().end(); it++) {
-      processItem(it.value(), it.key()->getPosition(),
-                  60 + priorityFromLayer(it.key()->getTextObj().getLayer()),
+      processItem(it.value(), it.key()->getData().getPosition(),
+                  60 + priorityFromLayer(it.key()->getData().getLayer()),
                   false);
     }
   }

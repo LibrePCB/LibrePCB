@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "cmddeviceinstanceeditall.h"
 
-#include "../../cmd/cmdstroketextedit.h"
+#include "cmdboardstroketextedit.h"
 #include "cmddeviceinstanceedit.h"
 
 #include <librepcb/core/project/board/items/bi_device.h>
@@ -46,7 +46,7 @@ CmdDeviceInstanceEditAll::CmdDeviceInstanceEditAll(BI_Device& dev) noexcept
   appendChild(mDevEditCmd);
 
   foreach (BI_StrokeText* text, dev.getStrokeTexts()) {
-    CmdStrokeTextEdit* cmd = new CmdStrokeTextEdit(text->getTextObj());
+    CmdBoardStrokeTextEdit* cmd = new CmdBoardStrokeTextEdit(*text);
     mTextEditCmds.append(cmd);
     appendChild(cmd);
   }
@@ -69,7 +69,7 @@ void CmdDeviceInstanceEditAll::translate(const Point& deltaPos,
                                          bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mDevEditCmd->translate(deltaPos, immediate);
-  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+  foreach (CmdBoardStrokeTextEdit* cmd, mTextEditCmds) {
     cmd->translate(deltaPos, immediate);
   }
 }
@@ -81,7 +81,7 @@ void CmdDeviceInstanceEditAll::setRotation(const Angle& angle,
       ? (mDevEditCmd->mNewRotation - angle)  // Mirrored -> inverted rotation!
       : (angle - mDevEditCmd->mNewRotation);
   mDevEditCmd->setRotation(angle, immediate);
-  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+  foreach (CmdBoardStrokeTextEdit* cmd, mTextEditCmds) {
     cmd->rotate(delta, mDevEditCmd->mNewPos, immediate);
   }
 }
@@ -90,7 +90,7 @@ void CmdDeviceInstanceEditAll::rotate(const Angle& angle, const Point& center,
                                       bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mDevEditCmd->rotate(angle, center, immediate);
-  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+  foreach (CmdBoardStrokeTextEdit* cmd, mTextEditCmds) {
     cmd->rotate(angle, center, immediate);
   }
 }
@@ -107,9 +107,17 @@ void CmdDeviceInstanceEditAll::mirror(const Point& center,
                                       bool immediate) {
   Q_ASSERT(!wasEverExecuted());
   mDevEditCmd->mirror(center, orientation, immediate);  // can throw
-  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+  foreach (CmdBoardStrokeTextEdit* cmd, mTextEditCmds) {
     cmd->mirrorGeometry(orientation, center, immediate);
     cmd->mirrorLayer(immediate);
+  }
+}
+
+void CmdDeviceInstanceEditAll::setLocked(bool locked) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mDevEditCmd->setLocked(locked);
+  foreach (CmdBoardStrokeTextEdit* cmd, mTextEditCmds) {
+    cmd->setLocked(locked);
   }
 }
 

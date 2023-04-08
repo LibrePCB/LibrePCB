@@ -68,6 +68,7 @@ public:
   BoardSelectionQuery() = delete;
   BoardSelectionQuery(const BoardSelectionQuery& other) = delete;
   explicit BoardSelectionQuery(BoardGraphicsScene& scene,
+                               bool includeLockedItems,
                                QObject* parent = nullptr);
   ~BoardSelectionQuery() noexcept;
 
@@ -130,6 +131,7 @@ public:
 
 private:  // Data
   BoardGraphicsScene& mScene;
+  const bool mIncludeLockedItems;
 
   // query result
   QSet<BI_Device*> mResultDeviceInstances;

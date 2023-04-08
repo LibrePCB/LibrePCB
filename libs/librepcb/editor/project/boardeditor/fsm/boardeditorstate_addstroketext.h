@@ -39,7 +39,7 @@ class Layer;
 
 namespace editor {
 
-class CmdStrokeTextEdit;
+class CmdBoardStrokeTextEdit;
 class GraphicsLayerComboBox;
 class PositiveLengthEdit;
 
@@ -96,12 +96,20 @@ private:  // Methods
 private:  // Data
   // State
   bool mIsUndoCmdActive;
-  StrokeText mLastStrokeTextProperties;
+
+  // Parameter memory
+  const Layer* mLastLayer;
+  Angle mLastRotation;
+  PositiveLength mLastHeight;
+  UnsignedLength mLastStrokeWidth;
+  Alignment mLastAlignment;
+  QString mLastText;
+  bool mLastMirrored;
 
   // Information about the current text to place. Only valid if
   // mIsUndoCmdActive == true.
   BI_StrokeText* mCurrentTextToPlace;
-  QScopedPointer<CmdStrokeTextEdit> mCurrentTextEditCmd;
+  QScopedPointer<CmdBoardStrokeTextEdit> mCurrentTextEditCmd;
 
   // Widgets for the command toolbar
   QPointer<GraphicsLayerComboBox> mLayerComboBox;

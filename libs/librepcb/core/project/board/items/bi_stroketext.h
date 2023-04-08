@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../geometry/stroketext.h"
 #include "../../../utils/signalslot.h"
+#include "../boardstroketextdata.h"
 #include "bi_base.h"
 
 #include <QtCore>
@@ -37,6 +37,8 @@ namespace librepcb {
 class AttributeProvider;
 class BI_Device;
 class Board;
+class Path;
+class StrokeFont;
 
 /*******************************************************************************
  *  Class BI_StrokeText
@@ -51,12 +53,11 @@ class BI_StrokeText final : public BI_Base {
 public:
   // Signals
   enum class Event {
+    LayerChanged,
     PositionChanged,
     RotationChanged,
     MirroredChanged,
-    LayerNameChanged,
     StrokeWidthChanged,
-    TextChanged,
     PathsChanged,
   };
   Signal<BI_StrokeText, Event> onEdited;
@@ -65,19 +66,30 @@ public:
   // Constructors / Destructor
   BI_StrokeText() = delete;
   BI_StrokeText(const BI_StrokeText& other) = delete;
-  BI_StrokeText(Board& board, const StrokeText& text);
+  BI_StrokeText(Board& board, const BoardStrokeTextData& data);
   ~BI_StrokeText() noexcept;
 
   // Getters
-  const Uuid& getUuid() const noexcept;  // for convenience, e.g. template usage
-  const Point& getPosition() const noexcept;
-  const Angle& getRotation() const noexcept;
-  bool getMirrored() const noexcept;
-  const QString& getText() const noexcept { return mText; }
-  StrokeText& getTextObj() noexcept { return *mTextObj; }
-  const StrokeText& getTextObj() const noexcept { return *mTextObj; }
+  const BoardStrokeTextData& getData() const noexcept { return mData; }
   const StrokeFont& getFont() const noexcept { return mFont; }
+  const QString& getSubstitutedText() const noexcept {
+    return mSubstitutedText;
+  }
   const QVector<Path>& getPaths() const noexcept { return mPaths; }
+
+  // Setters
+  bool setLayer(const Layer& layer) noexcept;
+  bool setText(const QString& text) noexcept;
+  bool setPosition(const Point& pos) noexcept;
+  bool setRotation(const Angle& rotation) noexcept;
+  bool setHeight(const PositiveLength& height) noexcept;
+  bool setStrokeWidth(const UnsignedLength& strokeWidth) noexcept;
+  bool setLetterSpacing(const StrokeTextSpacing& spacing) noexcept;
+  bool setLineSpacing(const StrokeTextSpacing& spacing) noexcept;
+  bool setAlign(const Alignment& align) noexcept;
+  bool setMirrored(bool mirrored) noexcept;
+  bool setAutoRotate(bool autoRotate) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
   BI_Device* getDevice() const noexcept { return mDevice; }
@@ -90,22 +102,17 @@ public:
   BI_StrokeText& operator=(const BI_StrokeText& rhs) = delete;
 
 private:  // Methods
-  void strokeTextEdited(const StrokeText& text,
-                        StrokeText::Event event) noexcept;
   void updateText() noexcept;
   void updatePaths() noexcept;
 
 private:  // Data
-  BI_Device* mDevice;
-  QScopedPointer<StrokeText> mTextObj;
+  BoardStrokeTextData mData;
   const StrokeFont& mFont;
+  BI_Device* mDevice;
 
   // Cached Attributes
-  QString mText;
-  QVector<Path> mPaths;
-
-  // Slots
-  StrokeText::OnEditedSlot mOnStrokeTextEditedSlot;
+  QString mSubstitutedText;
+  QVector<Path> mPaths;  ///< Without transformation (position/rotation/mirror)
 };
 
 /*******************************************************************************

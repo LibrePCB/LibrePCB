@@ -122,14 +122,12 @@ void BGI_StrokeText::strokeTextEdited(const BI_StrokeText& obj,
     case BI_StrokeText::Event::MirroredChanged:
       updateTransform();
       break;
-    case BI_StrokeText::Event::LayerNameChanged:
+    case BI_StrokeText::Event::LayerChanged:
       updateLayer();
       updateAnchorLayer();
       break;
     case BI_StrokeText::Event::StrokeWidthChanged:
       updateStrokeWidth();
-      break;
-    case BI_StrokeText::Event::TextChanged:
       break;
     case BI_StrokeText::Event::PathsChanged:
       updatePaths();
@@ -158,13 +156,13 @@ void BGI_StrokeText::deviceGraphicsItemEdited(
 }
 
 void BGI_StrokeText::updatePosition() noexcept {
-  setPos(mText.getPosition().toPxQPointF());
+  setPos(mText.getData().getPosition().toPxQPointF());
 }
 
 void BGI_StrokeText::updateTransform() noexcept {
   QTransform t;
-  if (mText.getMirrored()) t.scale(qreal(-1), qreal(1));
-  t.rotate(-mText.getRotation().toDeg());
+  if (mText.getData().getMirrored()) t.scale(qreal(-1), qreal(1));
+  t.rotate(-mText.getData().getRotation().toDeg());
   setTransform(t);
 }
 
@@ -174,22 +172,22 @@ void BGI_StrokeText::updateLayer() noexcept {
 
   // Update z-value.
   BoardGraphicsScene::ItemZValue zValue = BoardGraphicsScene::ZValue_Texts;
-  if (mText.getTextObj().getLayer().isTop()) {
+  if (mText.getData().getLayer().isTop()) {
     zValue = BoardGraphicsScene::ZValue_TextsTop;
-  } else if (mText.getTextObj().getLayer().isBottom()) {
+  } else if (mText.getData().getLayer().isBottom()) {
     zValue = BoardGraphicsScene::ZValue_TextsBottom;
   }
   setZValue(static_cast<qreal>(zValue));
   mAnchorGraphicsItem->setZValue(static_cast<qreal>(zValue));
 
   std::shared_ptr<GraphicsLayer> layer =
-      mLayerProvider.getLayer(mText.getTextObj().getLayer());
+      mLayerProvider.getLayer(mText.getData().getLayer());
   mPathGraphicsItem->setLineLayer(layer);
   mOriginCrossGraphicsItem->setLayer(layer);
 }
 
 void BGI_StrokeText::updateStrokeWidth() noexcept {
-  mPathGraphicsItem->setLineWidth(mText.getTextObj().getStrokeWidth());
+  mPathGraphicsItem->setLineWidth(mText.getData().getStrokeWidth());
 }
 
 void BGI_StrokeText::updatePaths() noexcept {
@@ -201,7 +199,7 @@ void BGI_StrokeText::updateAnchorLayer() noexcept {
   Q_ASSERT(mAnchorGraphicsItem);
   if (mText.getDevice() && isSelected()) {
     mAnchorGraphicsItem->setLayer(
-        mLayerProvider.getLayer(mText.getTextObj().getLayer()));
+        mLayerProvider.getLayer(mText.getData().getLayer()));
   } else {
     mAnchorGraphicsItem->setLayer(nullptr);
   }
@@ -210,7 +208,7 @@ void BGI_StrokeText::updateAnchorLayer() noexcept {
 void BGI_StrokeText::updateAnchorLine() noexcept {
   Q_ASSERT(mAnchorGraphicsItem);
   if (BI_Device* device = mText.getDevice()) {
-    mAnchorGraphicsItem->setLine(mText.getTextObj().getPosition(),
+    mAnchorGraphicsItem->setLine(mText.getData().getPosition(),
                                  device->getPosition());
   }
 }

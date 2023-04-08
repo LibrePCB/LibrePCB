@@ -229,6 +229,15 @@ bool BoardEditorFsm::processSnapToGrid() noexcept {
   return false;
 }
 
+bool BoardEditorFsm::processSetLocked(bool locked) noexcept {
+  if (BoardEditorState* state = getCurrentStateObj()) {
+    if (state->processSetLocked(locked)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool BoardEditorFsm::processResetAllTexts() noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processResetAllTexts()) {

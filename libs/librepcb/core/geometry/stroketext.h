@@ -29,7 +29,7 @@
 #include "../types/angle.h"
 #include "../types/length.h"
 #include "../types/point.h"
-#include "../types/ratio.h"
+#include "../types/stroketextspacing.h"
 
 #include <QtCore>
 
@@ -40,48 +40,6 @@ namespace librepcb {
 
 class Layer;
 class StrokeFont;
-
-/*******************************************************************************
- *  Class StrokeTextSpacing
- ******************************************************************************/
-
-/**
- * @brief The StrokeTextSpacing class
- */
-class StrokeTextSpacing final {
-  Q_DECLARE_TR_FUNCTIONS(StrokeTextSpacing)
-
-public:
-  // Constructors / Destructor
-  StrokeTextSpacing() noexcept : mAuto(true), mRatio(Ratio::percent100()) {}
-  StrokeTextSpacing(const StrokeTextSpacing& other) noexcept
-    : mAuto(other.mAuto), mRatio(other.mRatio) {}
-  explicit StrokeTextSpacing(const Ratio& ratio) noexcept
-    : mAuto(false), mRatio(ratio) {}
-  ~StrokeTextSpacing() noexcept {}
-
-  // General Methods
-  bool isAuto() const noexcept { return mAuto; }
-  const Ratio& getRatio() const noexcept { return mRatio; }
-
-  // Operator Overloadings
-  bool operator==(const StrokeTextSpacing& rhs) const noexcept {
-    if (mAuto != rhs.mAuto) return false;
-    return mAuto ? true : (mRatio == rhs.mRatio);
-  }
-  bool operator!=(const StrokeTextSpacing& rhs) const noexcept {
-    return !(*this == rhs);
-  }
-  StrokeTextSpacing& operator=(const StrokeTextSpacing& rhs) noexcept {
-    mAuto = rhs.mAuto;
-    mRatio = rhs.mRatio;
-    return *this;
-  }
-
-private:  // Data
-  bool mAuto;
-  Ratio mRatio;
-};
 
 /*******************************************************************************
  *  Class StrokeText
@@ -145,9 +103,6 @@ public:
   QVector<Path> generatePaths(const StrokeFont& font) const noexcept;
   QVector<Path> generatePaths(const StrokeFont& font, const QString& text) const
       noexcept;
-  bool needsAutoRotation() const noexcept;
-  Length calcLetterSpacing(const StrokeFont& font) const noexcept;
-  Length calcLineSpacing(const StrokeFont& font) const noexcept;
 
   // Setters
   bool setLayer(const Layer& layer) noexcept;

@@ -91,8 +91,8 @@ void BGI_Hole::holeEdited(const BI_Hole& obj, BI_Hole::Event event) noexcept {
 }
 
 void BGI_Hole::updateHole() noexcept {
-  mGraphicsItem->setHole(mHole.getHole().getPath(),
-                         mHole.getHole().getDiameter(),
+  mGraphicsItem->setHole(mHole.getData().getPath(),
+                         mHole.getData().getDiameter(),
                          mHole.getStopMaskOffset());
 }
 

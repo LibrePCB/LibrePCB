@@ -89,6 +89,7 @@ public:
   BoardGraphicsScene* getActiveBoardScene() noexcept {
     return mGraphicsScene.data();
   }
+  bool getIgnoreLocks() const noexcept;
 
   /// @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
   virtual std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const
@@ -220,6 +221,7 @@ private:
   QScopedPointer<QAction> mActionGridProperties;
   QScopedPointer<QAction> mActionGridIncrease;
   QScopedPointer<QAction> mActionGridDecrease;
+  QScopedPointer<QAction> mActionIgnoreLocks;
   QScopedPointer<QAction> mActionZoomFit;
   QScopedPointer<QAction> mActionZoomIn;
   QScopedPointer<QAction> mActionZoomOut;
@@ -237,6 +239,8 @@ private:
   QScopedPointer<QAction> mActionFlipHorizontal;
   QScopedPointer<QAction> mActionFlipVertical;
   QScopedPointer<QAction> mActionSnapToGrid;
+  QScopedPointer<QAction> mActionLock;
+  QScopedPointer<QAction> mActionUnlock;
   QScopedPointer<QAction> mActionResetAllTexts;
   QScopedPointer<QAction> mActionProperties;
   QScopedPointer<QAction> mActionRemove;

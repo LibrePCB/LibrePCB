@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "boardeditorstate_select.h"
 
-#include "../../../cmd/cmdpolygonedit.h"
 #include "../../../dialogs/dxfimportdialog.h"
 #include "../../../dialogs/holepropertiesdialog.h"
 #include "../../../dialogs/polygonpropertiesdialog.h"
@@ -35,6 +34,7 @@
 #include "../../../widgets/graphicsview.h"
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmdboardplaneedit.h"
+#include "../../cmd/cmdboardpolygonedit.h"
 #include "../../cmd/cmddeviceinstanceeditall.h"
 #include "../../cmd/cmddragselectedboarditems.h"
 #include "../../cmd/cmdflipselectedboarditems.h"
@@ -53,6 +53,7 @@
 #include "../graphicsitems/bgi_netline.h"
 #include "../graphicsitems/bgi_netpoint.h"
 #include "../graphicsitems/bgi_plane.h"
+#include "../graphicsitems/bgi_polygon.h"
 #include "../graphicsitems/bgi_stroketext.h"
 #include "../graphicsitems/bgi_via.h"
 
@@ -175,20 +176,21 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
       std::unique_ptr<BoardClipboardData> data(
           new BoardClipboardData(scene->getBoard().getUuid(), Point(0, 0)));
       foreach (const auto& path, paths) {
-        data->getPolygons().append(std::make_shared<Polygon>(
-            Uuid::createRandom(), dialog.getLayer(), dialog.getLineWidth(),
-            false, false, path));
+        data->getPolygons().append(
+            BoardPolygonData(Uuid::createRandom(), dialog.getLayer(),
+                             dialog.getLineWidth(), path, false, false, false));
       }
       for (const auto& circle : import.getCircles()) {
         if (dialog.getImportCirclesAsDrills()) {
-          data->getHoles().append(std::make_shared<Hole>(
-              Uuid::createRandom(), circle.diameter,
-              makeNonEmptyPath(circle.position), MaskConfig::automatic()));
+          data->getHoles().append(
+              BoardHoleData(Uuid::createRandom(), circle.diameter,
+                            makeNonEmptyPath(circle.position),
+                            MaskConfig::automatic(), false));
         } else {
-          data->getPolygons().append(std::make_shared<Polygon>(
+          data->getPolygons().append(BoardPolygonData(
               Uuid::createRandom(), dialog.getLayer(), dialog.getLineWidth(),
-              false, false,
-              Path::circle(circle.diameter).translated(circle.position)));
+              Path::circle(circle.diameter).translated(circle.position), false,
+              false, false));
         }
       }
 
@@ -275,15 +277,31 @@ bool BoardEditorState_Select::processPaste() noexcept {
       // If there is no board data, get footprint data from clipboard to allow
       // pasting graphical elements from the footprint editor.
       if (!data) {
-        std::unique_ptr<FootprintClipboardData> footprintData =
+        std::unique_ptr<const FootprintClipboardData> footprintData =
             FootprintClipboardData::fromMimeData(
                 qApp->clipboard()->mimeData());  // can throw
         if (footprintData) {
           data.reset(new BoardClipboardData(footprintData->getFootprintUuid(),
                                             footprintData->getCursorPos()));
-          data->getPolygons().append(footprintData->getPolygons());
-          data->getStrokeTexts().append(footprintData->getStrokeTexts());
-          data->getHoles().append(footprintData->getHoles());
+          for (const auto& polygon : footprintData->getPolygons()) {
+            data->getPolygons().append(BoardPolygonData(
+                polygon.getUuid(), polygon.getLayer(), polygon.getLineWidth(),
+                polygon.getPath(), polygon.isFilled(), polygon.isGrabArea(),
+                false));
+          }
+          for (const auto& text : footprintData->getStrokeTexts()) {
+            data->getStrokeTexts().append(BoardStrokeTextData(
+                text.getUuid(), text.getLayer(), text.getText(),
+                text.getPosition(), text.getRotation(), text.getHeight(),
+                text.getStrokeWidth(), text.getLetterSpacing(),
+                text.getLineSpacing(), text.getAlign(), text.getMirrored(),
+                text.getAutoRotate(), false));
+          }
+          for (const auto& hole : footprintData->getHoles()) {
+            data->getHoles().append(
+                BoardHoleData(hole.getUuid(), hole.getDiameter(),
+                              hole.getPath(), hole.getStopMaskConfig(), false));
+          }
         }
       }
 
@@ -345,6 +363,17 @@ bool BoardEditorState_Select::processSnapToGrid() noexcept {
   return snapSelectedItemsToGrid();
 }
 
+bool BoardEditorState_Select::processSetLocked(bool locked) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
+      mCmdPlaneEdit) {
+    return false;
+  }
+  return lockSelectedItems(locked);
+}
+
 bool BoardEditorState_Select::processResetAllTexts() noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
@@ -377,7 +406,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
     return false;
   }
 
-  BoardSelectionQuery query(*scene);
+  BoardSelectionQuery query(*scene, true);
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedVias();
   query.addSelectedPlanes();
@@ -398,15 +427,15 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
     return true;
   }
   foreach (auto ptr, query.getPolygons()) {
-    openPolygonPropertiesDialog(ptr->getPolygon());
+    openPolygonPropertiesDialog(*ptr);
     return true;
   }
   foreach (auto ptr, query.getStrokeTexts()) {
-    openStrokeTextPropertiesDialog(ptr->getTextObj());
+    openStrokeTextPropertiesDialog(*ptr);
     return true;
   }
   foreach (auto ptr, query.getHoles()) {
-    openHolePropertiesDialog(ptr->getHole());
+    openHolePropertiesDialog(*ptr);
     return true;
   }
   return false;
@@ -433,7 +462,7 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
   } else if (mSelectedPolygon && mCmdPolygonEdit) {
     // Move polygon vertices
     QVector<Vertex> vertices =
-        mSelectedPolygon->getPolygon().getPath().getVertices();
+        mSelectedPolygon->getData().getPath().getVertices();
     foreach (int i, mSelectedPolygonVertices) {
       if ((i >= 0) && (i < vertices.count())) {
         vertices[i].setPos(
@@ -492,7 +521,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
              (!mCmdPlaneEdit)) {
     if (findPolygonVerticesAtPosition(Point::fromPx(e.scenePos()))) {
       // start moving polygon vertex
-      mCmdPolygonEdit.reset(new CmdPolygonEdit(mSelectedPolygon->getPolygon()));
+      mCmdPolygonEdit.reset(new CmdBoardPolygonEdit(*mSelectedPolygon));
       return true;
     } else if (findPlaneVerticesAtPosition(Point::fromPx(e.scenePos()))) {
       // start moving plane vertex
@@ -683,6 +712,12 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           &menu, this, [this]() { snapSelectedItemsToGrid(); });
       aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
       mb.addAction(aSnap);
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(device->getDevice().isLocked());
+      mb.addAction(aIsLocked);
+      mb.addSeparator();
       mb.addAction(cmd.deviceResetTextAll.createAction(
           &menu, this, &BoardEditorState_Select::resetAllTextsOfSelectedItems));
       mb.addSeparator();
@@ -865,22 +900,28 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       mb.addAction(cmd.flipVertical.createAction(
           &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
       mb.addSeparator();
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(plane->getPlane().isLocked());
+      mb.addAction(aIsLocked);
       QAction* aIsVisible =
           cmd.visible.createAction(&menu, this, [plane](bool checked) {
             // Visibility is not saved, thus no undo command is needed here.
-            plane->setVisible(checked);
+            plane->getPlane().setVisible(checked);
           });
       aIsVisible->setCheckable(true);
-      aIsVisible->setChecked(plane->isVisible());
+      aIsVisible->setChecked(plane->getPlane().isVisible());
       mb.addAction(aIsVisible);
-    } else if (auto item = std::dynamic_pointer_cast<PolygonGraphicsItem>(
-                   selectedItem)) {
-      BI_Polygon* polygon =
-          scene->getBoard().getPolygons().value(item->getPolygon().getUuid());
+    } else if (auto item =
+                   std::dynamic_pointer_cast<BGI_Polygon>(selectedItem)) {
+      BI_Polygon* polygon = scene->getBoard().getPolygons().value(
+          item->getPolygon().getData().getUuid());
       if (!polygon) return false;
 
-      int lineIndex = item->getLineIndexAtPosition(pos);
-      QVector<int> vertices = item->getVertexIndicesAtPosition(pos);
+      int lineIndex = item->getGraphicsItem().getLineIndexAtPosition(pos);
+      QVector<int> vertices =
+          item->getGraphicsItem().getVertexIndicesAtPosition(pos);
 
       mb.addAction(
           cmd.properties.createAction(
@@ -891,10 +932,10 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       if (!vertices.isEmpty()) {
         QAction* action = cmd.vertexRemove.createAction(
             &menu, this, [this, polygon, vertices]() {
-              removePolygonVertices(polygon->getPolygon(), vertices);
+              removePolygonVertices(*polygon, vertices);
             });
         int remainingVertices =
-            polygon->getPolygon().getPath().getVertices().count() -
+            polygon->getData().getPath().getVertices().count() -
             vertices.count();
         action->setEnabled(remainingVertices >= 2);
         mb.addAction(action);
@@ -925,9 +966,15 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
       mb.addAction(cmd.flipVertical.createAction(
           &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
+      mb.addSeparator();
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(polygon->getData().isLocked());
+      mb.addAction(aIsLocked);
     } else if (auto text =
                    std::dynamic_pointer_cast<BGI_StrokeText>(selectedItem)) {
-      const Point pos = text->getStrokeText().getPosition();
+      const Point pos = text->getStrokeText().getData().getPosition();
       mb.addAction(
           cmd.properties.createAction(
               &menu, this,
@@ -956,9 +1003,14 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           &menu, this, [this]() { snapSelectedItemsToGrid(); });
       aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
       mb.addAction(aSnap);
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(text->getStrokeText().getData().isLocked());
+      mb.addAction(aIsLocked);
     } else if (auto hole = std::dynamic_pointer_cast<BGI_Hole>(selectedItem)) {
       const Point pos =
-          hole->getHole().getHole().getPath()->getVertices().first().getPos();
+          hole->getHole().getData().getPath()->getVertices().first().getPos();
       mb.addAction(
           cmd.properties.createAction(
               &menu, this,
@@ -978,6 +1030,11 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
           &menu, this, [this]() { snapSelectedItemsToGrid(); });
       aSnap->setEnabled(!pos.isOnGrid(getGridInterval()));
       mb.addAction(aSnap);
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(hole->getHole().getData().isLocked());
+      mb.addAction(aIsLocked);
     } else {
       return false;
     }
@@ -1004,7 +1061,7 @@ bool BoardEditorState_Select::startMovingSelectedItems(
     BoardGraphicsScene& scene, const Point& startPos) noexcept {
   Q_ASSERT(mSelectedItemsDragCommand.isNull());
   mSelectedItemsDragCommand.reset(
-      new CmdDragSelectedBoardItems(scene, startPos));
+      new CmdDragSelectedBoardItems(scene, getIgnoreLocks(), startPos));
   return true;
 }
 
@@ -1014,7 +1071,7 @@ bool BoardEditorState_Select::moveSelectedItems(const Point& delta) noexcept {
 
   try {
     QScopedPointer<CmdDragSelectedBoardItems> cmd(
-        new CmdDragSelectedBoardItems(*scene, Point(0, 0)));
+        new CmdDragSelectedBoardItems(*scene, getIgnoreLocks(), Point(0, 0)));
     cmd->setCurrentPosition(delta);
     return execCmd(cmd.take());
   } catch (const Exception& e) {
@@ -1032,7 +1089,7 @@ bool BoardEditorState_Select::rotateSelectedItems(const Angle& angle) noexcept {
       mSelectedItemsDragCommand->rotate(angle, true);
     } else {
       QScopedPointer<CmdDragSelectedBoardItems> cmd(
-          new CmdDragSelectedBoardItems(*scene));
+          new CmdDragSelectedBoardItems(*scene, getIgnoreLocks()));
       cmd->rotate(angle, false);
       mContext.undoStack.execCmd(cmd.take());
     }
@@ -1050,7 +1107,7 @@ bool BoardEditorState_Select::flipSelectedItems(
 
   try {
     CmdFlipSelectedBoardItems* cmd =
-        new CmdFlipSelectedBoardItems(*scene, orientation);
+        new CmdFlipSelectedBoardItems(*scene, orientation, getIgnoreLocks());
     mContext.undoStack.execCmd(cmd);
     return true;
   } catch (const Exception& e) {
@@ -1065,9 +1122,25 @@ bool BoardEditorState_Select::snapSelectedItemsToGrid() noexcept {
 
   try {
     QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
-        new CmdDragSelectedBoardItems(*scene));
+        new CmdDragSelectedBoardItems(*scene, getIgnoreLocks()));
     cmdMove->snapToGrid();
     mContext.undoStack.execCmd(cmdMove.take());
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    return false;
+  }
+}
+
+bool BoardEditorState_Select::lockSelectedItems(bool locked) noexcept {
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
+
+  try {
+    QScopedPointer<CmdDragSelectedBoardItems> cmd(
+        new CmdDragSelectedBoardItems(*scene, true));
+    cmd->setLocked(locked);
+    mContext.undoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1081,7 +1154,7 @@ bool BoardEditorState_Select::resetAllTextsOfSelectedItems() noexcept {
 
   try {
     QScopedPointer<CmdDragSelectedBoardItems> cmdMove(
-        new CmdDragSelectedBoardItems(*scene));
+        new CmdDragSelectedBoardItems(*scene, true));
     cmdMove->resetAllTexts();
     mContext.undoStack.execCmd(cmdMove.take());
     return true;
@@ -1096,7 +1169,8 @@ bool BoardEditorState_Select::removeSelectedItems() noexcept {
   if (!scene) return false;
 
   try {
-    CmdRemoveSelectedBoardItems* cmd = new CmdRemoveSelectedBoardItems(*scene);
+    CmdRemoveSelectedBoardItems* cmd =
+        new CmdRemoveSelectedBoardItems(*scene, getIgnoreLocks());
     mContext.undoStack.execCmd(cmd);
     return true;
   } catch (const Exception& e) {
@@ -1106,15 +1180,17 @@ bool BoardEditorState_Select::removeSelectedItems() noexcept {
 }
 
 void BoardEditorState_Select::removePolygonVertices(
-    Polygon& polygon, const QVector<int> vertices) noexcept {
+    BI_Polygon& polygon, const QVector<int> vertices) noexcept {
   try {
     Path path;
-    for (int i = 0; i < polygon.getPath().getVertices().count(); ++i) {
+    for (int i = 0; i < polygon.getData().getPath().getVertices().count();
+         ++i) {
       if (!vertices.contains(i)) {
-        path.getVertices().append(polygon.getPath().getVertices()[i]);
+        path.getVertices().append(polygon.getData().getPath().getVertices()[i]);
       }
     }
-    if (polygon.getPath().isClosed() && path.getVertices().count() > 2) {
+    if (polygon.getData().getPath().isClosed() &&
+        path.getVertices().count() > 2) {
       path.close();
     }
     if (path.isClosed() && (path.getVertices().count() == 3)) {
@@ -1123,7 +1199,7 @@ void BoardEditorState_Select::removePolygonVertices(
     if (path.getVertices().count() < 2) {
       return;  // Do not allow to create invalid polygons!
     }
-    QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(polygon));
+    QScopedPointer<CmdBoardPolygonEdit> cmd(new CmdBoardPolygonEdit(polygon));
     cmd->setPath(path, false);
     mContext.undoStack.execCmd(cmd.take());
   } catch (const Exception& e) {
@@ -1161,14 +1237,14 @@ void BoardEditorState_Select::startAddingPolygonVertex(
     BI_Polygon& polygon, int vertex, const Point& pos) noexcept {
   try {
     Q_ASSERT(vertex > 0);  // it must be the vertex *after* the clicked line
-    Path path = polygon.getPolygon().getPath();
+    Path path = polygon.getData().getPath();
     Point newPos = pos.mappedToGrid(getGridInterval());
     Angle newAngle = path.getVertices()[vertex - 1].getAngle();
     path.getVertices().insert(vertex, Vertex(newPos, newAngle));
 
     mSelectedPolygon = &polygon;
     mSelectedPolygonVertices = {vertex};
-    mCmdPolygonEdit.reset(new CmdPolygonEdit(polygon.getPolygon()));
+    mCmdPolygonEdit.reset(new CmdBoardPolygonEdit(polygon));
     mCmdPolygonEdit->setPath(path, true);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1236,7 +1312,7 @@ bool BoardEditorState_Select::startPaste(
     } else {
       // Start moving the selected items.
       mSelectedItemsDragCommand.reset(
-          new CmdDragSelectedBoardItems(scene, startPos));  // can throw
+          new CmdDragSelectedBoardItems(scene, true, startPos));  // can throw
     }
     return true;
   } else {
@@ -1282,8 +1358,10 @@ bool BoardEditorState_Select::findPolygonVerticesAtPosition(
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     for (auto it = scene->getPolygons().begin();
          it != scene->getPolygons().end(); it++) {
-      if (it.value()->isSelected()) {
-        mSelectedPolygonVertices = it.value()->getVertexIndicesAtPosition(pos);
+      if (it.value()->isSelected() &&
+          ((!it.key()->getData().isLocked()) || getIgnoreLocks())) {
+        mSelectedPolygonVertices =
+            it.value()->getGraphicsItem().getVertexIndicesAtPosition(pos);
         if (!mSelectedPolygonVertices.isEmpty()) {
           mSelectedPolygon = it.key();
           return true;
@@ -1302,7 +1380,8 @@ bool BoardEditorState_Select::findPlaneVerticesAtPosition(
   if (BoardGraphicsScene* scene = getActiveBoardScene()) {
     for (auto it = scene->getPlanes().begin(); it != scene->getPlanes().end();
          it++) {
-      if (it.value()->isSelected()) {
+      if (it.value()->isSelected() &&
+          ((!it.key()->isLocked()) || getIgnoreLocks())) {
         mSelectedPlaneVertices = it.value()->getVertexIndicesAtPosition(pos);
         if (!mSelectedPlaneVertices.isEmpty()) {
           mSelectedPlane = it.key();
@@ -1340,7 +1419,7 @@ bool BoardEditorState_Select::measureSelectedItems(
   }
 
   // Query the total number of selected netlines
-  BoardSelectionQuery query(*scene);
+  BoardSelectionQuery query(*scene, true);
   query.addSelectedNetLines();
   int totalSelectedNetlines = query.getNetLines().size();
 
@@ -1412,15 +1491,14 @@ bool BoardEditorState_Select::openPropertiesDialog(
   } else if (auto plane = std::dynamic_pointer_cast<BGI_Plane>(item)) {
     openPlanePropertiesDialog(plane->getPlane());
     return true;
-  } else if (auto polygon =
-                 std::dynamic_pointer_cast<PolygonGraphicsItem>(item)) {
+  } else if (auto polygon = std::dynamic_pointer_cast<BGI_Polygon>(item)) {
     openPolygonPropertiesDialog(polygon->getPolygon());
     return true;
   } else if (auto text = std::dynamic_pointer_cast<BGI_StrokeText>(item)) {
-    openStrokeTextPropertiesDialog(text->getStrokeText().getTextObj());
+    openStrokeTextPropertiesDialog(text->getStrokeText());
     return true;
   } else if (auto hole = std::dynamic_pointer_cast<BGI_Hole>(item)) {
-    openHolePropertiesDialog(hole->getHole().getHole());
+    openHolePropertiesDialog(hole->getHole());
     return true;
   }
   return false;
@@ -1460,7 +1538,7 @@ void BoardEditorState_Select::openPlanePropertiesDialog(
 }
 
 void BoardEditorState_Select::openPolygonPropertiesDialog(
-    Polygon& polygon) noexcept {
+    BI_Polygon& polygon) noexcept {
   PolygonPropertiesDialog dialog(
       polygon, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
       "board_editor/polygon_properties_dialog", parentWidget());
@@ -1468,14 +1546,14 @@ void BoardEditorState_Select::openPolygonPropertiesDialog(
 }
 
 void BoardEditorState_Select::openStrokeTextPropertiesDialog(
-    StrokeText& text) noexcept {
+    BI_StrokeText& text) noexcept {
   StrokeTextPropertiesDialog dialog(
       text, mContext.undoStack, getAllowedGeometryLayers(), getLengthUnit(),
       "board_editor/stroke_text_properties_dialog", parentWidget());
   dialog.exec();
 }
 
-void BoardEditorState_Select::openHolePropertiesDialog(Hole& hole) noexcept {
+void BoardEditorState_Select::openHolePropertiesDialog(BI_Hole& hole) noexcept {
   HolePropertiesDialog dialog(hole, mContext.undoStack, getLengthUnit(),
                               "board_editor/hole_properties_dialog",
                               parentWidget());

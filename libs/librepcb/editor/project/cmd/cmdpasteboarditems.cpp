@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "cmdpasteboarditems.h"
 
-#include "../../graphics/polygongraphicsitem.h"
 #include "../../project/cmd/cmdboardholeadd.h"
 #include "../../project/cmd/cmdboardnetsegmentadd.h"
 #include "../../project/cmd/cmdboardnetsegmentaddelements.h"
@@ -41,6 +40,7 @@
 #include "../boardeditor/graphicsitems/bgi_netline.h"
 #include "../boardeditor/graphicsitems/bgi_netpoint.h"
 #include "../boardeditor/graphicsitems/bgi_plane.h"
+#include "../boardeditor/graphicsitems/bgi_polygon.h"
 #include "../boardeditor/graphicsitems/bgi_stroketext.h"
 #include "../boardeditor/graphicsitems/bgi_via.h"
 #include "cmdremoveboarditems.h"
@@ -147,13 +147,14 @@ bool CmdPasteBoardItems::performExecute() {
     }
 
     // Add device instance to board
-    QScopedPointer<BI_Device> device(new BI_Device(
-        mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
-        dev.position + mPosOffset, dev.rotation, dev.mirrored, false));
-    for (const StrokeText& text : dev.strokeTexts) {
+    QScopedPointer<BI_Device> device(
+        new BI_Device(mBoard, *cmpInst, dev.libDeviceUuid, dev.libFootprintUuid,
+                      dev.position + mPosOffset, dev.rotation, dev.mirrored,
+                      dev.locked, false));
+    for (const BoardStrokeTextData& text : dev.strokeTexts) {
       // Note: Keep the UUID since it acts as a reference to the original
       // library footprint text.
-      StrokeText copy(text);
+      BoardStrokeTextData copy(text);
       copy.setPosition(copy.getPosition() + mPosOffset);  // move
       BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
       device->addStrokeText(*item);
@@ -281,6 +282,7 @@ bool CmdPasteBoardItems::performExecute() {
     copy->setKeepOrphans(plane.keepOrphans);
     copy->setPriority(plane.priority);
     copy->setConnectStyle(plane.connectStyle);
+    copy->setLocked(plane.locked);
     execNewChildCmd(new CmdBoardPlaneAdd(*copy));
     if (auto item = mScene.getPlanes().value(copy)) {
       item->setSelected(true);
@@ -288,8 +290,8 @@ bool CmdPasteBoardItems::performExecute() {
   }
 
   // Paste polygons
-  for (const Polygon& polygon : mData->getPolygons()) {
-    Polygon copy(Uuid::createRandom(), polygon);  // assign new UUID
+  for (const BoardPolygonData& polygon : mData->getPolygons()) {
+    BoardPolygonData copy(Uuid::createRandom(), polygon);  // assign new UUID
     copy.setPath(copy.getPath().translated(mPosOffset));  // move
     BI_Polygon* item = new BI_Polygon(mBoard, copy);
     execNewChildCmd(new CmdBoardPolygonAdd(*item));
@@ -299,8 +301,8 @@ bool CmdPasteBoardItems::performExecute() {
   }
 
   // Paste stroke texts
-  for (const StrokeText& text : mData->getStrokeTexts()) {
-    StrokeText copy(Uuid::createRandom(), text);  // assign new UUID
+  for (const BoardStrokeTextData& text : mData->getStrokeTexts()) {
+    BoardStrokeTextData copy(Uuid::createRandom(), text);  // assign new UUID
     copy.setPosition(copy.getPosition() + mPosOffset);  // move
     BI_StrokeText* item = new BI_StrokeText(mBoard, copy);
     execNewChildCmd(new CmdBoardStrokeTextAdd(*item));
@@ -310,8 +312,8 @@ bool CmdPasteBoardItems::performExecute() {
   }
 
   // Paste holes
-  for (const Hole& hole : mData->getHoles()) {
-    Hole copy(Uuid::createRandom(), hole);  // assign new UUID
+  for (const BoardHoleData& hole : mData->getHoles()) {
+    BoardHoleData copy(Uuid::createRandom(), hole);  // assign new UUID
     copy.setPath(NonEmptyPath(copy.getPath()->translated(mPosOffset)));  // move
     BI_Hole* item = new BI_Hole(mBoard, copy);
     execNewChildCmd(new CmdBoardHoleAdd(*item));

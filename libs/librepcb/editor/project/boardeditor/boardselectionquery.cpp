@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "boardselectionquery.h"
 
-#include "../../graphics/polygongraphicsitem.h"
 #include "boardgraphicsscene.h"
 #include "graphicsitems/bgi_device.h"
 #include "graphicsitems/bgi_footprintpad.h"
@@ -30,6 +29,7 @@
 #include "graphicsitems/bgi_netline.h"
 #include "graphicsitems/bgi_netpoint.h"
 #include "graphicsitems/bgi_plane.h"
+#include "graphicsitems/bgi_polygon.h"
 #include "graphicsitems/bgi_stroketext.h"
 #include "graphicsitems/bgi_via.h"
 
@@ -58,8 +58,9 @@ namespace editor {
  ******************************************************************************/
 
 BoardSelectionQuery::BoardSelectionQuery(BoardGraphicsScene& scene,
+                                         bool includeLockedItems,
                                          QObject* parent)
-  : QObject(parent), mScene(scene) {
+  : QObject(parent), mScene(scene), mIncludeLockedItems(includeLockedItems) {
 }
 
 BoardSelectionQuery::~BoardSelectionQuery() noexcept {
@@ -98,7 +99,8 @@ int BoardSelectionQuery::getResultCount() const noexcept {
 void BoardSelectionQuery::addDeviceInstancesOfSelectedFootprints() noexcept {
   for (auto it = mScene.getDevices().begin(); it != mScene.getDevices().end();
        it++) {
-    if (it.value()->isSelected()) {
+    if (it.value()->isSelected() &&
+        ((!it.key()->isLocked()) || mIncludeLockedItems)) {
       mResultDeviceInstances.insert(it.key());
     }
   }
@@ -133,7 +135,8 @@ void BoardSelectionQuery::addSelectedNetLines() noexcept {
 void BoardSelectionQuery::addSelectedPlanes() noexcept {
   for (auto it = mScene.getPlanes().begin(); it != mScene.getPlanes().end();
        it++) {
-    if (it.value()->isSelected()) {
+    if (it.value()->isSelected() &&
+        ((!it.key()->isLocked()) || mIncludeLockedItems)) {
       mResultPlanes.insert(it.key());
     }
   }
@@ -142,7 +145,8 @@ void BoardSelectionQuery::addSelectedPlanes() noexcept {
 void BoardSelectionQuery::addSelectedPolygons() noexcept {
   for (auto it = mScene.getPolygons().begin(); it != mScene.getPolygons().end();
        it++) {
-    if (it.value()->isSelected()) {
+    if (it.value()->isSelected() &&
+        ((!it.key()->getData().isLocked()) || mIncludeLockedItems)) {
       mResultPolygons.insert(it.key());
     }
   }
@@ -151,7 +155,8 @@ void BoardSelectionQuery::addSelectedPolygons() noexcept {
 void BoardSelectionQuery::addSelectedBoardStrokeTexts() noexcept {
   for (auto it = mScene.getStrokeTexts().begin();
        it != mScene.getStrokeTexts().end(); it++) {
-    if ((!it.key()->getDevice()) && it.value()->isSelected()) {
+    if ((!it.key()->getDevice()) && it.value()->isSelected() &&
+        ((!it.key()->getData().isLocked()) || mIncludeLockedItems)) {
       mResultStrokeTexts.insert(it.key());
     }
   }
@@ -160,7 +165,8 @@ void BoardSelectionQuery::addSelectedBoardStrokeTexts() noexcept {
 void BoardSelectionQuery::addSelectedFootprintStrokeTexts() noexcept {
   for (auto it = mScene.getStrokeTexts().begin();
        it != mScene.getStrokeTexts().end(); it++) {
-    if (it.key()->getDevice() && it.value()->isSelected()) {
+    if (it.key()->getDevice() && it.value()->isSelected() &&
+        ((!it.key()->getData().isLocked()) || mIncludeLockedItems)) {
       mResultStrokeTexts.insert(it.key());
     }
   }
@@ -169,7 +175,8 @@ void BoardSelectionQuery::addSelectedFootprintStrokeTexts() noexcept {
 void BoardSelectionQuery::addSelectedHoles() noexcept {
   for (auto it = mScene.getHoles().begin(); it != mScene.getHoles().end();
        it++) {
-    if (it.value()->isSelected()) {
+    if (it.value()->isSelected() &&
+        ((!it.key()->getData().isLocked()) || mIncludeLockedItems)) {
       mResultHoles.insert(it.key());
     }
   }

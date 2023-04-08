@@ -25,7 +25,6 @@
 #include "../../../geometry/polygon.h"
 #include "../../../library/pkg/footprint.h"
 #include "../../../utils/clipperhelpers.h"
-#include "../../../utils/transform.h"
 #include "../board.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprintpad.h"
@@ -73,15 +72,17 @@ void BoardClipperPathGenerator::addCopper(
     bool ignorePlanes) {
   // Board polygons.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if ((polygon->getPolygon().getLayer() == layer) &&
+    if ((polygon->getData().getLayer() == layer) &&
         (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
-      addPolygon(*polygon);
+      addPolygon(polygon->getData().getPath(),
+                 polygon->getData().getLineWidth(),
+                 polygon->getData().isFilled());
     }
   }
 
   // Stroke texts.
   foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
-    if ((strokeText->getTextObj().getLayer() == layer) &&
+    if ((strokeText->getData().getLayer() == layer) &&
         (netsignals.isEmpty() || (netsignals.contains(nullptr)))) {
       addStrokeText(*strokeText);
     }
@@ -107,7 +108,8 @@ void BoardClipperPathGenerator::addCopper(
       const Layer& polygonLayer = transform.map(polygon.getLayer());
       if ((polygonLayer == layer) &&
           (netsignals.isEmpty() || netsignals.contains(nullptr))) {
-        addPolygon(polygon, transform);
+        addPolygon(transform.map(polygon.getPath()), polygon.getLineWidth(),
+                   polygon.isFilled());
       }
     }
 
@@ -123,7 +125,7 @@ void BoardClipperPathGenerator::addCopper(
     // Stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
       // Do *not* mirror layer since it is independent of the device!
-      if ((strokeText->getTextObj().getLayer() == layer) &&
+      if ((strokeText->getData().getLayer() == layer) &&
           (netsignals.isEmpty() || netsignals.contains(nullptr))) {
         addStrokeText(*strokeText);
       }
@@ -181,18 +183,12 @@ void BoardClipperPathGenerator::addPlane(const BI_Plane& plane) {
   }
 }
 
-void BoardClipperPathGenerator::addPolygon(const BI_Polygon& polygon) {
-  addPolygon(polygon.getPolygon(), Transform());
-}
-
-void BoardClipperPathGenerator::addPolygon(const Polygon& polygon,
-                                           const Transform& transform) {
-  const Path path = transform.map(polygon.getPath());
-
+void BoardClipperPathGenerator::addPolygon(const Path& path,
+                                           const UnsignedLength& lineWidth,
+                                           bool filled) {
   // Outline.
-  if (polygon.getLineWidth() > 0) {
-    QVector<Path> paths =
-        path.toOutlineStrokes(PositiveLength(*polygon.getLineWidth()));
+  if (lineWidth > 0) {
+    QVector<Path> paths = path.toOutlineStrokes(PositiveLength(*lineWidth));
     foreach (const Path& p, paths) {
       ClipperHelpers::unite(mPaths,
                             ClipperHelpers::convert(p, mMaxArcTolerance));
@@ -201,7 +197,7 @@ void BoardClipperPathGenerator::addPolygon(const Polygon& polygon,
 
   // Area (only fill closed paths, for consistency with the appearance in
   // the board editor and Gerber output).
-  if (polygon.isFilled() && path.isClosed()) {
+  if (filled && path.isClosed()) {
     ClipperHelpers::unite(mPaths,
                           ClipperHelpers::convert(path, mMaxArcTolerance));
   }
@@ -234,9 +230,9 @@ void BoardClipperPathGenerator::addCircle(const Circle& circle,
 
 void BoardClipperPathGenerator::addStrokeText(const BI_StrokeText& strokeText,
                                               const Length& offset) {
-  const PositiveLength width(qMax(
-      *strokeText.getTextObj().getStrokeWidth() + (offset * 2), Length(1)));
-  const Transform transform(strokeText.getTextObj());
+  const PositiveLength width(
+      qMax(*strokeText.getData().getStrokeWidth() + (offset * 2), Length(1)));
+  const Transform transform(strokeText.getData());
   foreach (const Path path, transform.map(strokeText.getPaths())) {
     QVector<Path> paths = path.toOutlineStrokes(width);
     foreach (const Path& p, paths) {
@@ -246,15 +242,15 @@ void BoardClipperPathGenerator::addStrokeText(const BI_StrokeText& strokeText,
   }
 }
 
-void BoardClipperPathGenerator::addHole(const Hole& hole,
+void BoardClipperPathGenerator::addHole(const PositiveLength& diameter,
+                                        const NonEmptyPath& path,
                                         const Transform& transform,
                                         const Length& offset) {
-  const PositiveLength width(
-      std::max(*hole.getDiameter() + offset + offset, Length(1)));
-  const Path path = transform.map(*hole.getPath());
+  const PositiveLength width(std::max(*diameter + offset + offset, Length(1)));
   ClipperHelpers::unite(
       mPaths,
-      ClipperHelpers::convert(path.toOutlineStrokes(width), mMaxArcTolerance));
+      ClipperHelpers::convert(transform.map(*path).toOutlineStrokes(width),
+                              mMaxArcTolerance));
 }
 
 void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,

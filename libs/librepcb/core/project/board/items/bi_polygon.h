@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../../utils/signalslot.h"
+#include "../boardpolygondata.h"
 #include "bi_base.h"
 
 #include <QtCore>
@@ -33,8 +35,6 @@
 namespace librepcb {
 
 class Board;
-class Polygon;
-class Uuid;
 
 /*******************************************************************************
  *  Class BI_Polygon
@@ -47,16 +47,34 @@ class BI_Polygon final : public BI_Base {
   Q_OBJECT
 
 public:
+  // Signals
+  enum class Event {
+    LayerChanged,
+    LineWidthChanged,
+    IsFilledChanged,
+    IsGrabAreaChanged,
+    IsLockedChanged,
+    PathChanged,
+  };
+  Signal<BI_Polygon, Event> onEdited;
+  typedef Slot<BI_Polygon, Event> OnEditedSlot;
+
   // Constructors / Destructor
   BI_Polygon() = delete;
   BI_Polygon(const BI_Polygon& other) = delete;
-  BI_Polygon(Board& board, const Polygon& polygon);
+  BI_Polygon(Board& board, const BoardPolygonData& data);
   ~BI_Polygon() noexcept;
 
   // Getters
-  Polygon& getPolygon() noexcept { return *mPolygon; }
-  const Polygon& getPolygon() const noexcept { return *mPolygon; }
-  const Uuid& getUuid() const noexcept;  // for convenience, e.g. template usage
+  const BoardPolygonData& getData() const noexcept { return mData; }
+
+  // Setters
+  bool setLayer(const Layer& layer) noexcept;
+  bool setLineWidth(const UnsignedLength& width) noexcept;
+  bool setPath(const Path& path) noexcept;
+  bool setIsFilled(bool isFilled) noexcept;
+  bool setIsGrabArea(bool isGrabArea) noexcept;
+  bool setLocked(bool locked) noexcept;
 
   // General Methods
   void addToBoard() override;
@@ -66,7 +84,7 @@ public:
   BI_Polygon& operator=(const BI_Polygon& rhs) = delete;
 
 private:
-  QScopedPointer<Polygon> mPolygon;
+  BoardPolygonData mData;
 };
 
 /*******************************************************************************

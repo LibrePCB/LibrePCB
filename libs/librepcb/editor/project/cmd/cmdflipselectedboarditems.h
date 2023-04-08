@@ -49,7 +49,8 @@ class CmdFlipSelectedBoardItems final : public UndoCommandGroup {
 public:
   // Constructors / Destructor
   CmdFlipSelectedBoardItems(BoardGraphicsScene& scene,
-                            Qt::Orientation orientation) noexcept;
+                            Qt::Orientation orientation,
+                            bool includeLockedItems) noexcept;
   ~CmdFlipSelectedBoardItems() noexcept;
 
 private:
@@ -63,6 +64,7 @@ private:
   // Attributes from the constructor
   BoardGraphicsScene& mScene;
   Qt::Orientation mOrientation;
+  bool mIncludeLockedItems;
 };
 
 /*******************************************************************************

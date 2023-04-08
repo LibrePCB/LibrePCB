@@ -82,31 +82,31 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       AttributeKey("A2"), AttrTypeVoltage::instance(), "4.2",
       AttrTypeVoltage::instance().getUnitFromString("millivolt"));
 
-  std::shared_ptr<StrokeText> strokeText1 = std::make_shared<StrokeText>(
+  BoardStrokeTextData strokeText1(
       Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
       PositiveLength(4), UnsignedLength(5), StrokeTextSpacing(),
       StrokeTextSpacing(Ratio(6)), Alignment(HAlign::left(), VAlign::top()),
-      false, true);
+      false, true, false);
 
-  std::shared_ptr<StrokeText> strokeText2 = std::make_shared<StrokeText>(
+  BoardStrokeTextData strokeText2(
       Uuid::createRandom(), Layer::topPlacement(), "text 2", Point(10, 20),
       Angle(30), PositiveLength(40), UnsignedLength(0),
       StrokeTextSpacing(Ratio(6)), StrokeTextSpacing(),
-      Alignment(HAlign::center(), VAlign::bottom()), true, false);
+      Alignment(HAlign::center(), VAlign::bottom()), true, false, true);
 
   std::shared_ptr<BoardClipboardData::Device> device1 =
       std::make_shared<BoardClipboardData::Device>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          Point::fromMm(1, 2), Angle::fromDeg(45), false,
+          Point::fromMm(1, 2), Angle::fromDeg(45), false, true,
           AttributeList{attribute1, attribute2},
-          StrokeTextList{strokeText1, strokeText2});
+          QList<BoardStrokeTextData>{strokeText1, strokeText2});
 
   std::shared_ptr<BoardClipboardData::Device> device2 =
       std::make_shared<BoardClipboardData::Device>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          Point::fromMm(10, 20), Angle::fromDeg(-45), true,
+          Point::fromMm(10, 20), Angle::fromDeg(-45), true, false,
           AttributeList{attribute2, attribute1},
-          StrokeTextList{strokeText2, strokeText1});
+          QList<BoardStrokeTextData>{strokeText2, strokeText1});
 
   std::shared_ptr<BoardClipboardData::NetSegment> netSegment1 =
       std::make_shared<BoardClipboardData::NetSegment>(
@@ -157,7 +157,7 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
           Uuid::createRandom(), Layer::topCopper(), CircuitIdentifier("bar"),
           Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
           UnsignedLength(1), UnsignedLength(2), false, 0,
-          BI_Plane::ConnectStyle::None);
+          BI_Plane::ConnectStyle::None, true);
 
   std::shared_ptr<BoardClipboardData::Plane> plane2 =
       std::make_shared<BoardClipboardData::Plane>(
@@ -165,24 +165,26 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
           Path({Vertex(Point(10, 20), Angle(30)),
                 Vertex(Point(40, 50), Angle(60))}),
           UnsignedLength(10), UnsignedLength(20), true, 5,
-          BI_Plane::ConnectStyle::Solid);
+          BI_Plane::ConnectStyle::Solid, false);
 
-  std::shared_ptr<Polygon> polygon1 = std::make_shared<Polygon>(
-      Uuid::createRandom(), Layer::topCopper(), UnsignedLength(1), false, true,
-      Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
+  BoardPolygonData polygon1(
+      Uuid::createRandom(), Layer::topCopper(), UnsignedLength(1),
+      Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
+      false, true, false);
 
-  std::shared_ptr<Polygon> polygon2 = std::make_shared<Polygon>(
-      Uuid::createRandom(), Layer::botCopper(), UnsignedLength(10), true, false,
-      Path({Vertex(Point(10, 20), Angle(30)),
-            Vertex(Point(40, 50), Angle(60))}));
+  BoardPolygonData polygon2(Uuid::createRandom(), Layer::botCopper(),
+                            UnsignedLength(10),
+                            Path({Vertex(Point(10, 20), Angle(30)),
+                                  Vertex(Point(40, 50), Angle(60))}),
+                            true, false, true);
 
-  std::shared_ptr<Hole> hole1 = std::make_shared<Hole>(
-      Uuid::createRandom(), PositiveLength(3), makeNonEmptyPath(Point(1, 2)),
-      MaskConfig::automatic());
+  BoardHoleData hole1(Uuid::createRandom(), PositiveLength(3),
+                      makeNonEmptyPath(Point(1, 2)), MaskConfig::automatic(),
+                      true);
 
-  std::shared_ptr<Hole> hole2 = std::make_shared<Hole>(
-      Uuid::createRandom(), PositiveLength(30), makeNonEmptyPath(Point(10, 20)),
-      MaskConfig::manual(Length(123456)));
+  BoardHoleData hole2(Uuid::createRandom(), PositiveLength(30),
+                      makeNonEmptyPath(Point(10, 20)),
+                      MaskConfig::manual(Length(123456)), false);
 
   // Create object
   BoardClipboardData obj1(uuid, pos);

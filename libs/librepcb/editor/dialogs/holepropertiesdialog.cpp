@@ -23,8 +23,12 @@
 #include "holepropertiesdialog.h"
 
 #include "../cmd/cmdholeedit.h"
+#include "../project/cmd/cmdboardholeedit.h"
 #include "../undostack.h"
 #include "ui_holepropertiesdialog.h"
+
+#include <librepcb/core/geometry/hole.h>
+#include <librepcb/core/project/board/items/bi_hole.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,12 +39,14 @@
 namespace librepcb {
 namespace editor {
 
-HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
+HolePropertiesDialog::HolePropertiesDialog(Hole* libObj, BI_Hole* boardObj,
+                                           UndoStack& undoStack,
                                            const LengthUnit& lengthUnit,
                                            const QString& settingsPrefix,
                                            QWidget* parent) noexcept
   : QDialog(parent),
-    mHole(hole),
+    mLibraryObj(libObj),
+    mBoardObj(boardObj),
     mUndoStack(undoStack),
     mUi(new Ui::HolePropertiesDialog) {
   mUi->setupUi(this);
@@ -49,23 +55,25 @@ HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
           mUi->edtStopMaskOffset, &LengthEdit::setEnabled);
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &HolePropertiesDialog::on_buttonBox_clicked);
+}
 
-  // Set properties.
-  mUi->holeEditorWidget->setDiameter(mHole.getDiameter());
-  mUi->holeEditorWidget->setPath(mHole.getPath());
-  if (!mHole.getStopMaskConfig().isEnabled()) {
-    mUi->rbtnStopMaskOff->setChecked(true);
-  } else if (tl::optional<Length> offset =
-                 mHole.getStopMaskConfig().getOffset()) {
-    mUi->rbtnStopMaskManual->setChecked(true);
-    mUi->edtStopMaskOffset->setValue(*offset);
-  } else {
-    mUi->rbtnStopMaskAuto->setChecked(true);
-  }
+HolePropertiesDialog::HolePropertiesDialog(Hole& hole, UndoStack& undoStack,
+                                           const LengthUnit& lengthUnit,
+                                           const QString& settingsPrefix,
+                                           QWidget* parent) noexcept
+  : HolePropertiesDialog(&hole, nullptr, undoStack, lengthUnit, settingsPrefix,
+                         parent) {
+  load(hole);
+}
 
-  // Set focus to diameter so the user can immediately start typing to change it
-  mUi->tabWidget->setCurrentIndex(0);
-  mUi->holeEditorWidget->setFocusToDiameterEdit();
+HolePropertiesDialog::HolePropertiesDialog(BI_Hole& hole, UndoStack& undoStack,
+                                           const LengthUnit& lengthUnit,
+                                           const QString& settingsPrefix,
+                                           QWidget* parent) noexcept
+  : HolePropertiesDialog(nullptr, &hole, undoStack, lengthUnit, settingsPrefix,
+                         parent) {
+  load(hole.getData());
+  mUi->holeEditorWidget->setLocked(hole.getData().isLocked());
 }
 
 HolePropertiesDialog::~HolePropertiesDialog() noexcept {
@@ -95,6 +103,25 @@ void HolePropertiesDialog::setReadOnly(bool readOnly) noexcept {
  *  Private Methods
  ******************************************************************************/
 
+template <typename T>
+void HolePropertiesDialog::load(const T& obj) noexcept {
+  mUi->holeEditorWidget->setDiameter(obj.getDiameter());
+  mUi->holeEditorWidget->setPath(obj.getPath());
+  if (!obj.getStopMaskConfig().isEnabled()) {
+    mUi->rbtnStopMaskOff->setChecked(true);
+  } else if (tl::optional<Length> offset =
+                 obj.getStopMaskConfig().getOffset()) {
+    mUi->rbtnStopMaskManual->setChecked(true);
+    mUi->edtStopMaskOffset->setValue(*offset);
+  } else {
+    mUi->rbtnStopMaskAuto->setChecked(true);
+  }
+
+  // Set focus to diameter so the user can immediately start typing to change it
+  mUi->tabWidget->setCurrentIndex(0);
+  mUi->holeEditorWidget->setFocusToDiameterEdit();
+}
+
 void HolePropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
   switch (mUi->buttonBox->buttonRole(button)) {
     case QDialogButtonBox::ApplyRole:
@@ -116,24 +143,37 @@ void HolePropertiesDialog::on_buttonBox_clicked(QAbstractButton* button) {
 
 bool HolePropertiesDialog::applyChanges() noexcept {
   try {
-    QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(mHole));
-    cmd->setDiameter(mUi->holeEditorWidget->getDiameter(), false);
-    cmd->setPath(mUi->holeEditorWidget->getPath(), false);
-    if (mUi->rbtnStopMaskOff->isChecked()) {
-      cmd->setStopMaskConfig(MaskConfig::off());
-    } else if (mUi->rbtnStopMaskAuto->isChecked()) {
-      cmd->setStopMaskConfig(MaskConfig::automatic());
-    } else if (mUi->rbtnStopMaskManual->isChecked()) {
-      cmd->setStopMaskConfig(
-          MaskConfig::manual(mUi->edtStopMaskOffset->getValue()));
-    } else {
-      qCritical() << "Unknown UI configuration for hole stop mask.";
+    if (mLibraryObj) {
+      QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(*mLibraryObj));
+      applyChanges(*cmd);
+      mUndoStack.execCmd(cmd.take());  // can throw
     }
-    mUndoStack.execCmd(cmd.take());
+    if (mBoardObj) {
+      QScopedPointer<CmdBoardHoleEdit> cmd(new CmdBoardHoleEdit(*mBoardObj));
+      applyChanges(*cmd);
+      cmd->setLocked(mUi->holeEditorWidget->getLocked());
+      mUndoStack.execCmd(cmd.take());  // can throw
+    }
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
     return false;
+  }
+}
+
+template <typename T>
+void HolePropertiesDialog::applyChanges(T& cmd) {
+  cmd.setDiameter(mUi->holeEditorWidget->getDiameter(), false);
+  cmd.setPath(mUi->holeEditorWidget->getPath(), false);
+  if (mUi->rbtnStopMaskOff->isChecked()) {
+    cmd.setStopMaskConfig(MaskConfig::off());
+  } else if (mUi->rbtnStopMaskAuto->isChecked()) {
+    cmd.setStopMaskConfig(MaskConfig::automatic());
+  } else if (mUi->rbtnStopMaskManual->isChecked()) {
+    cmd.setStopMaskConfig(
+        MaskConfig::manual(mUi->edtStopMaskOffset->getValue()));
+  } else {
+    qCritical() << "Unknown UI configuration for hole stop mask.";
   }
 }
 

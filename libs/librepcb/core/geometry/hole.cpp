@@ -122,6 +122,7 @@ bool Hole::setStopMaskConfig(const MaskConfig& config) noexcept {
 void Hole::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("diameter", mDiameter);
+  root.ensureLineBreak();
   root.appendChild("stop_mask", mStopMaskConfig);
   mPath->serialize(root);
 }

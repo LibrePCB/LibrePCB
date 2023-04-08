@@ -24,12 +24,12 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/attribute/attribute.h>
-#include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/geometry/junction.h>
-#include <librepcb/core/geometry/polygon.h>
-#include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/geometry/trace.h>
 #include <librepcb/core/geometry/via.h>
+#include <librepcb/core/project/board/boardholedata.h>
+#include <librepcb/core/project/board/boardpolygondata.h>
+#include <librepcb/core/project/board/boardstroketextdata.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/serialization/serializableobjectlist.h>
@@ -72,20 +72,23 @@ public:
     Point position;
     Angle rotation;
     bool mirrored;
+    bool locked;
     AttributeList attributes;
-    StrokeTextList strokeTexts;
+    QList<BoardStrokeTextData> strokeTexts;
     Signal<Device> onEdited;  ///< Dummy event, not used
 
     Device(const Uuid& componentUuid, const Uuid& libDeviceUuid,
            const Uuid& libFootprintUuid, const Point& position,
-           const Angle& rotation, bool mirrored,
-           const AttributeList& attributes, const StrokeTextList& strokeTexts)
+           const Angle& rotation, bool mirrored, bool locked,
+           const AttributeList& attributes,
+           const QList<BoardStrokeTextData>& strokeTexts)
       : componentUuid(componentUuid),
         libDeviceUuid(libDeviceUuid),
         libFootprintUuid(libFootprintUuid),
         position(position),
         rotation(rotation),
         mirrored(mirrored),
+        locked(locked),
         attributes(attributes),
         strokeTexts(strokeTexts),
         onEdited(*this) {}
@@ -97,9 +100,14 @@ public:
         position(node.getChild("position")),
         rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
         mirrored(deserialize<bool>(node.getChild("mirror/@0"))),
+        locked(deserialize<bool>(node.getChild("lock/@0"))),
         attributes(node),
-        strokeTexts(node),
-        onEdited(*this) {}
+        strokeTexts(),
+        onEdited(*this) {
+      foreach (const SExpression* child, node.getChildren("stroke_text")) {
+        strokeTexts.append(BoardStrokeTextData(*child));
+      }
+    }
 
     void serialize(SExpression& root) const {
       root.appendChild(componentUuid);
@@ -111,10 +119,13 @@ public:
       position.serialize(root.appendList("position"));
       root.appendChild("rotation", rotation);
       root.appendChild("mirror", mirrored);
+      root.appendChild("lock", locked);
       root.ensureLineBreak();
       attributes.serialize(root);
-      root.ensureLineBreak();
-      strokeTexts.serialize(root);
+      foreach (const BoardStrokeTextData& strokeText, strokeTexts) {
+        root.ensureLineBreak();
+        strokeText.serialize(root.appendList("stroke_text"));
+      }
       root.ensureLineBreak();
     }
 
@@ -123,8 +134,8 @@ public:
           (libDeviceUuid != rhs.libDeviceUuid) ||
           (libFootprintUuid != rhs.libFootprintUuid) ||
           (position != rhs.position) || (rotation != rhs.rotation) ||
-          (mirrored != rhs.mirrored) || (attributes != rhs.attributes) ||
-          (strokeTexts != rhs.strokeTexts);
+          (mirrored != rhs.mirrored) || (locked != rhs.locked) ||
+          (attributes != rhs.attributes) || (strokeTexts != rhs.strokeTexts);
     }
   };
 
@@ -178,12 +189,14 @@ public:
     bool keepOrphans;
     int priority;
     BI_Plane::ConnectStyle connectStyle;
+    bool locked;
     Signal<Plane> onEdited;  ///< Dummy event, not used
 
     Plane(const Uuid& uuid, const Layer& layer,
           const CircuitIdentifier& netSignalName, const Path& outline,
           const UnsignedLength& minWidth, const UnsignedLength& minClearance,
-          bool keepOrphans, int priority, BI_Plane::ConnectStyle connectStyle)
+          bool keepOrphans, int priority, BI_Plane::ConnectStyle connectStyle,
+          bool locked)
       : uuid(uuid),
         layer(&layer),
         netSignalName(netSignalName),
@@ -193,6 +206,7 @@ public:
         keepOrphans(keepOrphans),
         priority(priority),
         connectStyle(connectStyle),
+        locked(locked),
         onEdited(*this) {}
 
     explicit Plane(const SExpression& node)
@@ -207,6 +221,7 @@ public:
         priority(deserialize<int>(node.getChild("priority/@0"))),
         connectStyle(deserialize<BI_Plane::ConnectStyle>(
             node.getChild("connect_style/@0"))),
+        locked(deserialize<bool>(node.getChild("lock/@0"))),
         onEdited(*this) {}
 
     void serialize(SExpression& root) const {
@@ -221,6 +236,7 @@ public:
       root.appendChild("keep_orphans", keepOrphans);
       root.ensureLineBreak();
       root.appendChild("connect_style", connectStyle);
+      root.appendChild("lock", locked);
       root.ensureLineBreak();
       outline.serialize(root);
       root.ensureLineBreak();
@@ -231,7 +247,7 @@ public:
           (netSignalName != rhs.netSignalName) || (outline != rhs.outline) ||
           (minWidth != rhs.minWidth) || (minClearance != rhs.minClearance) ||
           (keepOrphans != rhs.keepOrphans) || (priority != rhs.priority) ||
-          (connectStyle != rhs.connectStyle);
+          (connectStyle != rhs.connectStyle) || (locked != rhs.locked);
     }
   };
 
@@ -255,9 +271,9 @@ public:
     return mNetSegments;
   }
   SerializableObjectList<Plane, Plane>& getPlanes() noexcept { return mPlanes; }
-  PolygonList& getPolygons() noexcept { return mPolygons; }
-  StrokeTextList& getStrokeTexts() noexcept { return mStrokeTexts; }
-  HoleList& getHoles() noexcept { return mHoles; }
+  QList<BoardPolygonData>& getPolygons() noexcept { return mPolygons; }
+  QList<BoardStrokeTextData>& getStrokeTexts() noexcept { return mStrokeTexts; }
+  QList<BoardHoleData>& getHoles() noexcept { return mHoles; }
   QMap<std::pair<Uuid, Uuid>, Point>& getPadPositions() noexcept {
     return mPadPositions;
   }
@@ -280,9 +296,9 @@ private:  // Data
   SerializableObjectList<Device, Device> mDevices;
   SerializableObjectList<NetSegment, NetSegment> mNetSegments;
   SerializableObjectList<Plane, Plane> mPlanes;
-  PolygonList mPolygons;
-  StrokeTextList mStrokeTexts;
-  HoleList mHoles;
+  QList<BoardPolygonData> mPolygons;
+  QList<BoardStrokeTextData> mStrokeTexts;
+  QList<BoardHoleData> mHoles;
   QMap<std::pair<Uuid, Uuid>, Point> mPadPositions;
 };
 

@@ -49,7 +49,7 @@ namespace librepcb {
 BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
                      const Uuid& deviceUuid, const Uuid& footprintUuid,
                      const Point& position, const Angle& rotation, bool mirror,
-                     bool loadInitialStrokeTexts)
+                     bool locked, bool loadInitialStrokeTexts)
   : BI_Base(board),
     onEdited(*this),
     mCompInstance(compInstance),
@@ -58,7 +58,8 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
     mLibFootprint(nullptr),
     mPosition(position),
     mRotation(rotation),
-    mMirrored(mirror) {
+    mMirrored(mirror),
+    mLocked(locked) {
   // get device from library
   mLibDevice = mBoard.getProject().getLibrary().getDevice(deviceUuid);
   if (!mLibDevice) {
@@ -98,7 +99,14 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
   // Add initial stroke texts.
   if (loadInitialStrokeTexts) {
     for (const StrokeText& text : getDefaultStrokeTexts()) {
-      addStrokeText(*new BI_StrokeText(mBoard, text));
+      addStrokeText(*new BI_StrokeText(
+          mBoard,
+          BoardStrokeTextData(text.getUuid(), text.getLayer(), text.getText(),
+                              text.getPosition(), text.getRotation(),
+                              text.getHeight(), text.getStrokeWidth(),
+                              text.getLetterSpacing(), text.getLineSpacing(),
+                              text.getAlign(), text.getMirrored(),
+                              text.getAutoRotate(), mLocked)));
     }
   }
 
@@ -206,28 +214,28 @@ void BI_Device::addStrokeText(BI_StrokeText& text) {
       (&text.getBoard() != &mBoard)) {
     throw LogicError(__FILE__, __LINE__);
   }
-  if (mStrokeTexts.contains(text.getUuid())) {
+  if (mStrokeTexts.contains(text.getData().getUuid())) {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("There is already a stroke text with the UUID \"%1\"!")
-            .arg(text.getUuid().toStr()));
+            .arg(text.getData().getUuid().toStr()));
   }
   text.setDevice(this);
   if (isAddedToBoard()) {
     text.addToBoard();  // can throw
   }
-  mStrokeTexts.insert(text.getUuid(), &text);
+  mStrokeTexts.insert(text.getData().getUuid(), &text);
   emit strokeTextAdded(text);
 }
 
 void BI_Device::removeStrokeText(BI_StrokeText& text) {
-  if (mStrokeTexts.value(text.getUuid()) != &text) {
+  if (mStrokeTexts.value(text.getData().getUuid()) != &text) {
     throw LogicError(__FILE__, __LINE__);
   }
   if (isAddedToBoard()) {
     text.removeFromBoard();  // can throw
   }
-  mStrokeTexts.remove(text.getUuid());
+  mStrokeTexts.remove(text.getData().getUuid());
   emit strokeTextRemoved(text);
 }
 
@@ -256,6 +264,12 @@ void BI_Device::setMirrored(bool mirror) {
     }
     mMirrored = mirror;
     onEdited.notify(Event::MirroredChanged);
+  }
+}
+
+void BI_Device::setLocked(bool locked) noexcept {
+  if (locked != mLocked) {
+    mLocked = locked;
   }
 }
 
@@ -316,12 +330,13 @@ void BI_Device::serialize(SExpression& root) const {
   mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
   root.appendChild("mirror", mMirrored);
+  root.appendChild("lock", mLocked);
   root.ensureLineBreak();
   mAttributes.serialize(root);
   root.ensureLineBreak();
   for (const BI_StrokeText* obj : mStrokeTexts) {
     root.ensureLineBreak();
-    obj->getTextObj().serialize(root.appendList("stroke_text"));
+    obj->getData().serialize(root.appendList("stroke_text"));
   }
   root.ensureLineBreak();
 }

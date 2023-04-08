@@ -22,18 +22,18 @@
  ******************************************************************************/
 #include "cmdflipselectedboarditems.h"
 
-#include "../../cmd/cmdholeedit.h"
-#include "../../cmd/cmdpolygonedit.h"
-#include "../../cmd/cmdstroketextedit.h"
-#include "../../project/cmd/cmdboardnetlineedit.h"
-#include "../../project/cmd/cmdboardnetpointedit.h"
-#include "../../project/cmd/cmdboardnetsegmentadd.h"
-#include "../../project/cmd/cmdboardnetsegmentremove.h"
-#include "../../project/cmd/cmdboardplaneedit.h"
-#include "../../project/cmd/cmdboardviaedit.h"
-#include "../../project/cmd/cmddeviceinstanceedit.h"
 #include "../boardeditor/boardgraphicsscene.h"
 #include "../boardeditor/boardselectionquery.h"
+#include "cmdboardholeedit.h"
+#include "cmdboardnetlineedit.h"
+#include "cmdboardnetpointedit.h"
+#include "cmdboardnetsegmentadd.h"
+#include "cmdboardnetsegmentremove.h"
+#include "cmdboardplaneedit.h"
+#include "cmdboardpolygonedit.h"
+#include "cmdboardstroketextedit.h"
+#include "cmdboardviaedit.h"
+#include "cmddeviceinstanceedit.h"
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
@@ -65,10 +65,12 @@ namespace editor {
  ******************************************************************************/
 
 CmdFlipSelectedBoardItems::CmdFlipSelectedBoardItems(
-    BoardGraphicsScene& scene, Qt::Orientation orientation) noexcept
+    BoardGraphicsScene& scene, Qt::Orientation orientation,
+    bool includeLockedItems) noexcept
   : UndoCommandGroup(tr("Flip Board Elements")),
     mScene(scene),
-    mOrientation(orientation) {
+    mOrientation(orientation),
+    mIncludeLockedItems(includeLockedItems) {
 }
 
 CmdFlipSelectedBoardItems::~CmdFlipSelectedBoardItems() noexcept {
@@ -83,7 +85,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   auto undoScopeGuard = scopeGuard([&]() { performUndo(); });
 
   // get all selected items
-  BoardSelectionQuery query(mScene);
+  BoardSelectionQuery query(mScene, mIncludeLockedItems);
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedNetLines();
   query.addSelectedVias();
@@ -122,8 +124,8 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     }
   }
   foreach (BI_Polygon* polygon, query.getPolygons()) {
-    for (const Vertex& vertex : Toolbox::toSet(
-             polygon->getPolygon().getPath().getVertices().toList())) {
+    for (const Vertex& vertex :
+         Toolbox::toSet(polygon->getData().getPath().getVertices().toList())) {
       center += vertex.getPos();
       ++count;
     }
@@ -132,12 +134,12 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     // do not count texts of devices if the device is selected too
     if ((!text->getDevice()) ||
         (!query.getDeviceInstances().contains(text->getDevice()))) {
-      center += text->getPosition();
+      center += text->getData().getPosition();
       ++count;
     }
   }
   foreach (BI_Hole* hole, query.getHoles()) {
-    center += hole->getHole().getPath()->getVertices().first().getPos();
+    center += hole->getData().getPath()->getVertices().first().getPos();
     ++count;
   }
   if (count > 0) {
@@ -216,8 +218,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
 
   // flip all polygons
   foreach (BI_Polygon* polygon, query.getPolygons()) {
-    QScopedPointer<CmdPolygonEdit> cmd(
-        new CmdPolygonEdit(polygon->getPolygon()));
+    QScopedPointer<CmdBoardPolygonEdit> cmd(new CmdBoardPolygonEdit(*polygon));
     cmd->mirrorGeometry(mOrientation, center, false);
     cmd->mirrorLayer(false);
     execNewChildCmd(cmd.take());  // can throw
@@ -225,8 +226,8 @@ bool CmdFlipSelectedBoardItems::performExecute() {
 
   // flip all stroke texts
   foreach (BI_StrokeText* text, query.getStrokeTexts()) {
-    QScopedPointer<CmdStrokeTextEdit> cmd(
-        new CmdStrokeTextEdit(text->getTextObj()));
+    QScopedPointer<CmdBoardStrokeTextEdit> cmd(
+        new CmdBoardStrokeTextEdit(*text));
     cmd->mirrorGeometry(mOrientation, center, false);
     cmd->mirrorLayer(false);
     execNewChildCmd(cmd.take());  // can throw
@@ -234,7 +235,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
 
   // mirror all holes
   foreach (BI_Hole* hole, query.getHoles()) {
-    QScopedPointer<CmdHoleEdit> cmd(new CmdHoleEdit(hole->getHole()));
+    QScopedPointer<CmdBoardHoleEdit> cmd(new CmdBoardHoleEdit(*hole));
     cmd->mirror(mOrientation, center, false);
     execNewChildCmd(cmd.take());  // can throw
   }
