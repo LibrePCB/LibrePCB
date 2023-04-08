@@ -48,7 +48,7 @@ else()
 endif()
 
 # Generate build_env.h file
-configure_file(build_env.h.in build_env.h @ONLY)
+configure_file(build_env.h.in librepcb_build_env.h @ONLY)
 
 # Export library
 add_library(
@@ -434,6 +434,10 @@ add_library(
 target_include_directories(
   librepcb_core
   PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../.."
+)
+target_include_directories(
+  librepcb_core
+  PUBLIC "${CMAKE_CURRENT_BINARY_DIR}"
 )
 target_link_libraries(
   librepcb_core
