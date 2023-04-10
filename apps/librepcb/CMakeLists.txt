@@ -49,19 +49,8 @@ if(APPLE)
 
   # Set bundle properties
   set_target_properties(
-    librepcb
-    PROPERTIES BUNDLE True
-               MACOSX_BUNDLE_GUI_IDENTIFIER org.librepcb.LibrePCB
-               MACOSX_BUNDLE_BUNDLE_NAME LibrePCB
-               MACOSX_BUNDLE_BUNDLE_VERSION ${LIBREPCB_APP_VERSION}
-               MACOSX_BUNDLE_SHORT_VERSION_STRING ${LIBREPCB_APP_VERSION}
-               MACOSX_BUNDLE_ICON_FILE librepcb.icns
-               MACOSX_BUNDLE_INFO_STRING
-               "A new, powerful and intuitive EDA tool for everyone."
-               MACOSX_BUNDLE_COPYRIGHT
-               "© LibrePCB contributors, released under the GPLv3 license"
-               MACOSX_BUNDLE_INFO_PLIST
-               "${CMAKE_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in"
+    librepcb PROPERTIES BUNDLE True MACOSX_BUNDLE_INFO_PLIST
+                                    "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
   )
 endif()
 

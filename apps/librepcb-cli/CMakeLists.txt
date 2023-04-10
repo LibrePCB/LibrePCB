@@ -46,17 +46,8 @@ if(APPLE)
   # Set bundle properties (used for Info.plist)
   set_target_properties(
     librepcb_cli
-    PROPERTIES BUNDLE True
-               MACOSX_BUNDLE_GUI_IDENTIFIER org.librepcb.LibrePCB-CLI
-               MACOSX_BUNDLE_BUNDLE_NAME "LibrePCB CLI"
-               MACOSX_BUNDLE_BUNDLE_VERSION ${LIBREPCB_APP_VERSION}
-               MACOSX_BUNDLE_SHORT_VERSION_STRING ${LIBREPCB_APP_VERSION}
-               MACOSX_BUNDLE_ICON_FILE librepcb.icns
-               MACOSX_BUNDLE_INFO_STRING "LibrePCB command-line utility."
-               MACOSX_BUNDLE_COPYRIGHT
-               "© LibrePCB contributors, released under the GPLv3 license"
-               MACOSX_BUNDLE_INFO_PLIST
-               "${CMAKE_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in"
+    PROPERTIES BUNDLE True MACOSX_BUNDLE_INFO_PLIST
+                           "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
   )
 endif()
 

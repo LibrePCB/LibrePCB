@@ -168,11 +168,14 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
   // to background (schematic editor should be the top most window)
   QTimer::singleShot(10, this, &ControlPanel::openProjectsPassedByCommandLine);
 
+  // To allow opening files by the MacOS Finder, install event filter.
+  qApp->installEventFilter(this);
+
   // start scanning the workspace library (asynchronously)
   mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
-ControlPanel::~ControlPanel() {
+ControlPanel::~ControlPanel() noexcept {
   mProjectLibraryUpdater.reset();
   closeAllProjects(false);
   closeAllLibraryEditors(false);
@@ -200,6 +203,16 @@ void ControlPanel::closeEvent(QCloseEvent* event) {
 
   // if the control panel is closed, we will quit the whole application
   QApplication::quit();
+}
+
+bool ControlPanel::eventFilter(QObject* watched, QEvent* event) {
+  if (event->type() == QEvent::FileOpen) {
+    QFileOpenEvent* openEvent = static_cast<QFileOpenEvent*>(event);
+    qDebug() << "Received request to open file:" << openEvent->file();
+    openProjectPassedByOs(openEvent->file());
+    return true;
+  }
+  return QMainWindow::eventFilter(watched, event);
 }
 
 void ControlPanel::showControlPanel() noexcept {
@@ -580,10 +593,16 @@ bool ControlPanel::closeAllLibraryEditors(bool askForSave) noexcept {
 void ControlPanel::openProjectsPassedByCommandLine() noexcept {
   // parse command line arguments and open all project files
   foreach (const QString& arg, qApp->arguments()) {
-    FilePath filepath(arg);
-    if ((filepath.isExistingFile()) && (filepath.getSuffix() == "lpp")) {
-      openProject(filepath);
-    }
+    openProjectPassedByOs(arg);
+  }
+}
+
+void ControlPanel::openProjectPassedByOs(const QString& file) noexcept {
+  FilePath filepath(file);
+  if ((filepath.isExistingFile()) && (filepath.getSuffix() == "lpp")) {
+    openProject(filepath);
+  } else {
+    qDebug() << "Ignore invalid request to open project:" << file;
   }
 }
 
