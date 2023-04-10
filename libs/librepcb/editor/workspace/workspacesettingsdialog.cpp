@@ -29,6 +29,7 @@
 #include "../modelview/keyboardshortcutsmodel.h"
 #include "../modelview/keysequencedelegate.h"
 #include "../utils/editortoolbox.h"
+#include "desktopintegration.h"
 #include "desktopservices.h"
 #include "ui_workspacesettingsdialog.h"
 
@@ -92,6 +93,23 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
             }
             updateDismissedMessagesCount();
           });
+
+  // Initialize desktop integration widgets
+  if (DesktopIntegration::isSupported()) {
+    connect(mUi->btnInstallApp, &QPushButton::clicked, this, [this]() {
+      DesktopIntegration::execDialog(DesktopIntegration::Mode::Install, this);
+      updateDesktopIntegrationStatus();
+      emit desktopIntegrationStatusChanged();
+    });
+    connect(mUi->btnUninstallApp, &QPushButton::clicked, this, [this]() {
+      DesktopIntegration::execDialog(DesktopIntegration::Mode::Uninstall, this);
+      updateDesktopIntegrationStatus();
+      emit desktopIntegrationStatusChanged();
+    });
+    updateDesktopIntegrationStatus();
+  } else {
+    EditorToolbox::removeFormLayoutRow(*mUi->lblDesktopIntegration);
+  }
 
   // Initialize library locale order widgets
   {
@@ -598,6 +616,31 @@ void WorkspaceSettingsDialog::updateDismissedMessagesCount() noexcept {
       "\n\n" %
       tr("Currently there are %1 dismissed message(s).", nullptr, count)
           .arg(count));
+}
+
+void WorkspaceSettingsDialog::updateDesktopIntegrationStatus() noexcept {
+  const DesktopIntegration::Status status = DesktopIntegration::getStatus();
+  switch (status) {
+    case DesktopIntegration::Status::InstalledThis:
+      mUi->lblDesktopIntegrationStatus->setText(
+          QString("<font color=\"green\">✔ %1</font>").arg(tr("Installed")));
+      break;
+    case DesktopIntegration::Status::InstalledOther:
+      mUi->lblDesktopIntegrationStatus->setText(
+          QString("<font color=\"orange\">✖ %1</font>")
+              .arg(tr("Other application installed")));
+      break;
+    case DesktopIntegration::Status::NothingInstalled:
+    case DesktopIntegration::Status::InstalledUnknown:
+    default:
+      mUi->lblDesktopIntegrationStatus->setText(
+          QString("<font color=\"red\">✖ %1</font>").arg(tr("Not installed")));
+      break;
+  }
+  mUi->btnInstallApp->setEnabled(status !=
+                                 DesktopIntegration::Status::InstalledThis);
+  mUi->btnUninstallApp->setEnabled(
+      status != DesktopIntegration::Status::NothingInstalled);
 }
 
 void WorkspaceSettingsDialog::loadSettings() noexcept {

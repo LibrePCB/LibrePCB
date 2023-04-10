@@ -83,6 +83,9 @@ public:
   WorkspaceSettingsDialog& operator=(const WorkspaceSettingsDialog& rhs) =
       delete;
 
+signals:
+  void desktopIntegrationStatusChanged();
+
 private:
   void buttonBoxClicked(QAbstractButton* button) noexcept;
   void keyPressEvent(QKeyEvent* event) noexcept override;
@@ -93,6 +96,7 @@ private:
                                const ThemeColor& color) noexcept;
   Theme* getCurrentTheme() noexcept;
   void updateDismissedMessagesCount() noexcept;
+  void updateDesktopIntegrationStatus() noexcept;
   void loadSettings() noexcept;
   void saveSettings() noexcept;
 

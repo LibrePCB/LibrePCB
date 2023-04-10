@@ -22,10 +22,10 @@
  ******************************************************************************/
 #include "application.h"
 
-#include "build_env.h"
 #include "fileio/filepath.h"
 #include "fileio/transactionalfilesystem.h"
 #include "font/strokefontpool.h"
+#include "librepcb_build_env.h"
 #include "types/version.h"
 
 #include <QtCore>
