@@ -69,6 +69,9 @@ public:
   const tl::optional<Uuid>& getDefaultDeviceUuid() const noexcept {
     return mDefaultDeviceUuid;
   }
+  const QPointer<const BI_Device>& getPrimaryDevice() const noexcept {
+    return mPrimaryDevice;
+  }
   const Component& getLibComponent() const noexcept { return mLibComponent; }
   const ComponentSymbolVariant& getSymbolVariant() const noexcept {
     return *mCompSymbVar;
@@ -150,11 +153,13 @@ public:
   ComponentInstance& operator=(const ComponentInstance& rhs) = delete;
 
 signals:
-
   /// @copydoc AttributeProvider::attributesChanged()
   void attributesChanged() override;
 
+  void primaryDeviceChanged(const BI_Device* device);
+
 private:
+  void updatePrimaryDevice() noexcept;
   bool checkAttributesValidity() const noexcept;
   const QStringList& getLocaleOrder() const noexcept;
 
@@ -209,6 +214,9 @@ private:
    * @see #registerDevice(), #unregisterDevice()
    */
   QList<BI_Device*> mRegisteredDevices;
+
+  // Cached Properties
+  QPointer<const BI_Device> mPrimaryDevice;
 };
 
 /*******************************************************************************

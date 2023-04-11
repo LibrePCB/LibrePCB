@@ -61,7 +61,8 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
     mLastModified(QDateTime::currentDateTime()),
     mLocaleOrder(),
     mNormOrder(),
-    mCustomBomAttributes() {
+    mCustomBomAttributes(),
+    mPrimaryBoard(nullptr) {
   // Check if the file extension is correct
   if (!mFilename.endsWith(".lpp")) {
     throw RuntimeError(__FILE__, __LINE__,
@@ -333,6 +334,7 @@ void Project::addBoard(Board& board, int newIndex) {
   }
 
   emit boardAdded(newIndex);
+  updatePrimaryBoard();
   emit attributesChanged();
 }
 
@@ -348,6 +350,7 @@ void Project::removeBoard(Board& board, bool deleteBoard) {
   mBoards.removeAt(index);
 
   emit boardRemoved(index);
+  updatePrimaryBoard();
   emit attributesChanged();
 
   if (deleteBoard) {
@@ -588,6 +591,18 @@ Version Project::getProjectFileFormatVersion(const FilePath& dir) {
   QByteArray content = FileUtils::readFile(dir.getPathTo(".librepcb-project"));
   VersionFile file = VersionFile::fromByteArray(content);
   return file.getVersion();
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void Project::updatePrimaryBoard() {
+  Board* primary = mBoards.value(0);
+  if (mPrimaryBoard != primary) {
+    mPrimaryBoard = primary;
+    primaryBoardChanged(mPrimaryBoard);
+  }
 }
 
 /*******************************************************************************

@@ -25,6 +25,7 @@
 #include "../../attribute/attributesubstitutor.h"
 #include "../../exceptions.h"
 #include "../../library/cmp/component.h"
+#include "../../library/pkg/packagepad.h"
 #include "../../utils/scopeguardlist.h"
 #include "../board/items/bi_footprintpad.h"
 #include "../project.h"
@@ -53,6 +54,8 @@ ComponentSignalInstance::ComponentSignalInstance(
     mComponentSignal(cmpSignal),
     mIsAddedToCircuit(false),
     mNetSignal(netsignal) {
+  connect(&mComponentInstance, &ComponentInstance::primaryDeviceChanged, this,
+          &ComponentSignalInstance::updatePadNames);
 }
 
 ComponentSignalInstance::~ComponentSignalInstance() noexcept {
@@ -179,6 +182,7 @@ void ComponentSignalInstance::registerFootprintPad(BI_FootprintPad& pad) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredFootprintPads.append(&pad);
+  updatePadNames();
 }
 
 void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad) {
@@ -186,6 +190,7 @@ void ComponentSignalInstance::unregisterFootprintPad(BI_FootprintPad& pad) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredFootprintPads.removeOne(&pad);
+  updatePadNames();
 }
 
 void ComponentSignalInstance::serialize(SExpression& root) const {
@@ -193,6 +198,30 @@ void ComponentSignalInstance::serialize(SExpression& root) const {
   root.appendChild(
       "net",
       mNetSignal ? tl::make_optional(mNetSignal->getUuid()) : tl::nullopt);
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void ComponentSignalInstance::updatePadNames() noexcept {
+  QSet<QString> names;
+  if (const BI_Device* device = mComponentInstance.getPrimaryDevice()) {
+    foreach (const BI_FootprintPad* pad, mRegisteredFootprintPads) {
+      if (&pad->getDevice() == device) {
+        if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
+          names.insert(*pkgPad->getName());
+        }
+      }
+    }
+  }
+  QStringList sortedNames = names.toList();
+  Toolbox::sortNumeric(sortedNames);
+
+  if (sortedNames != mPadNames) {
+    mPadNames = sortedNames;
+    emit padNamesChanged(mPadNames);
+  }
 }
 
 /*******************************************************************************
