@@ -58,6 +58,7 @@ public:
     WidgetShortcut = (1 << 1),  ///< Restrict the shortcut to its widget.
     ApplicationShortcut = (1 << 2),  ///< Make the shortcut application global.
     QueuedConnection = (1 << 3),  ///< Create a queued signal/slot connection.
+    ReactOnToggle = (1 << 4),  ///< React on toggled() instead of triggered().
   };
   Q_DECLARE_FLAGS(ActionFlags, ActionFlag)
 
@@ -101,7 +102,11 @@ public:
     Qt::ConnectionType conType = flags.testFlag(ActionFlag::QueuedConnection)
         ? Qt::QueuedConnection
         : Qt::AutoConnection;
-    QObject::connect(action, &QAction::triggered, context, slot, conType);
+    if (flags.testFlag(ActionFlag::ReactOnToggle)) {
+      QObject::connect(action, &QAction::toggled, context, slot, conType);
+    } else {
+      QObject::connect(action, &QAction::triggered, context, slot, conType);
+    }
     return action;
   }
 

@@ -128,6 +128,7 @@ actions/hide_planes.png
 actions/layers.png
 actions/rebuild_plane.png
 actions/schematic.png
+actions/show_pin_numbers.png
 actions/show_planes.png
 command_toolbars/pad_bottom.png
 command_toolbars/pad_tht.png

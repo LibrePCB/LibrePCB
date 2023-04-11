@@ -202,6 +202,8 @@ SchematicEditor::SchematicEditor(
       clientSettings.value("schematic_editor/window_geometry").toByteArray());
   restoreState(
       clientSettings.value("schematic_editor/window_state_v2").toByteArray());
+  mActionShowPinNumbers->setChecked(
+      clientSettings.value("schematic_editor/show_pin_numbers", true).toBool());
 
   // Load first schematic page
   if (mProject.getSchematics().count() > 0) setActiveSchematicIndex(0);
@@ -220,6 +222,8 @@ SchematicEditor::~SchematicEditor() {
   QSettings clientSettings;
   clientSettings.setValue("schematic_editor/window_geometry", saveGeometry());
   clientSettings.setValue("schematic_editor/window_state_v2", saveState());
+  clientSettings.setValue("schematic_editor/show_pin_numbers",
+                          mActionShowPinNumbers->isChecked());
 
   // Important: Release command toolbar proxy since otherwise the actions will
   // be deleted first.
@@ -477,6 +481,18 @@ void SchematicEditor::createActions() noexcept {
       }
     }
   }));
+  std::shared_ptr<GraphicsLayer> pinNumbersLayer =
+      getLayer(Theme::Color::sSchematicPinNumbers);
+  Q_ASSERT(pinNumbersLayer);
+  mActionShowPinNumbers.reset(cmd.showPinNumbers.createAction(
+      this, this,
+      [pinNumbersLayer](bool checked) {
+        if (pinNumbersLayer) pinNumbersLayer->setVisible(checked);
+      },
+      EditorCommand::ActionFlag::ReactOnToggle));
+  mActionShowPinNumbers->setCheckable(true);
+  mActionShowPinNumbers->setChecked(pinNumbersLayer &&
+                                    pinNumbersLayer->isVisible());
   mActionZoomFit.reset(cmd.zoomFitContent.createAction(this, mUi->graphicsView,
                                                        &GraphicsView::zoomAll));
   mActionZoomIn.reset(
@@ -677,6 +693,7 @@ void SchematicEditor::createToolBars() noexcept {
   mToolBarView.reset(new QToolBar(tr("View"), this));
   mToolBarView->setObjectName("toolBarView");
   mToolBarView->addAction(mActionGridProperties.data());
+  mToolBarView->addAction(mActionShowPinNumbers.data());
   mToolBarView->addAction(mActionZoomIn.data());
   mToolBarView->addAction(mActionZoomOut.data());
   mToolBarView->addAction(mActionZoomFit.data());
@@ -837,6 +854,8 @@ void SchematicEditor::createMenus() noexcept {
   mb.addAction(mActionGridProperties);
   mb.addAction(mActionGridIncrease.data());
   mb.addAction(mActionGridDecrease.data());
+  mb.addSeparator();
+  mb.addAction(mActionShowPinNumbers.data());
   mb.addSeparator();
   mb.addAction(mActionZoomIn);
   mb.addAction(mActionZoomOut);
