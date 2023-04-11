@@ -96,8 +96,8 @@ endif()
 
 # Clang emits some warnings within the muParser library when compiling with
 # -Wpedantic, so let's suppress these warnings when compiling with Clang.
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-target_compile_options(common INTERFACE -Wno-nested-anon-types)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  target_compile_options(common INTERFACE -Wno-nested-anon-types)
 endif()
 
 # Find required Qt packages
@@ -202,6 +202,10 @@ foreach(d ${SHARE_DIRS})
     )
   endif()
 endforeach()
+install(
+  DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/i18n/share/
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR} OPTIONAL
+)
 install(
   DIRECTORY ${CMAKE_BINARY_DIR}/i18n
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/librepcb
