@@ -55,7 +55,7 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
                                    bool thumbnail) noexcept
   : mDefaultFont(Application::getDefaultSansSerifFont()),
     mNetLabelFont(Application::getDefaultMonospaceFont()) {
-  mDefaultFont.setPixelSize(4);
+  mNetLabelFont.setPixelSize(4);
   foreach (const SI_Symbol* symbol, schematic.getSymbols()) {
     Symbol sym;
     sym.transform = Transform(*symbol);
