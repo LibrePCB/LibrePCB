@@ -65,9 +65,6 @@ jobs:
   - bash: ./ci/build_linux_portables.sh
     displayName: Build Portable Packages
     condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
-  - bash: ./ci/build_installer.sh
-    displayName: Build Installer
-    condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
   - bash: xvfb-run -a ./build/tests/unittests/librepcb-unittests
     displayName: Run LibrePCB Unittests
   - bash: xvfb-run -a --server-args="-screen 0 1024x768x24" pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli" ./tests/cli

@@ -25,8 +25,6 @@ jobs:
     displayName: Build LibrePCB
   - bash: ./ci/build_mac_bundle.sh
     displayName: Build Bundle
-  - bash: ./ci/build_installer.sh
-    displayName: Build Installer
   - bash: ./build/tests/unittests/librepcb-unittests
     displayName: Run LibrePCB Unittests
   - bash: pytest -vvv --librepcb-executable="build/install/opt/librepcb-cli.app/Contents/MacOS/librepcb-cli" ./tests/cli
