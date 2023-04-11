@@ -18,6 +18,9 @@ if [ -z "${CXX-}" ]; then CXX="g++"; fi
 # download latest translation files (just pull the i18n submodule), except on
 # release branches as the translation files are already available there
 if [ ! -f ./i18n/librepcb.ts ]; then
+  if [ "$OS" = "windows" ]; then  # Workaround for permission error
+    git config --global --add safe.directory '*'
+  fi
   git -C ./i18n checkout master && git -C ./i18n pull origin master
 fi
 
