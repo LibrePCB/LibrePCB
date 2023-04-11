@@ -79,7 +79,8 @@ private:  // Methods
   virtual QVariant itemChange(GraphicsItemChange change,
                               const QVariant& value) noexcept override;
   void setLength(const UnsignedLength& length) noexcept;
-  void updateTextPosition() noexcept;
+  void updateNamePosition() noexcept;
+  void updateNumbersTransform() noexcept;
 
 private:  // Data
   std::shared_ptr<SymbolPin> mPin;
@@ -88,7 +89,8 @@ private:  // Data
   std::shared_ptr<const ComponentSymbolVariantItem> mItem;  // Can be nullptr.
   QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
-  QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
+  QScopedPointer<PrimitiveTextGraphicsItem> mNameGraphicsItem;
+  QScopedPointer<PrimitiveTextGraphicsItem> mNumbersGraphicsItem;
 
   // Slots
   SymbolPin::OnEditedSlot mOnEditedSlot;

@@ -111,6 +111,13 @@ void SymbolPainter::paint(QPainter& painter,
         pin.getRotation() + pin.getNameRotation(), *pin.getNameHeight(),
         pin.getNameAlignment(), *pin.getName(), mDefaultFont,
         settings.getColor(Theme::Color::sSchematicPinNames), true, false);
+    const bool flipped = Toolbox::isTextUpsideDown(pin.getRotation(), false);
+    p.drawText(pin.getPosition() +
+                   pin.getNumbersPosition(flipped).rotated(pin.getRotation()),
+               pin.getRotation(), *SymbolPin::getNumbersHeight(),
+               pin.getNumbersAlignment(flipped), "1…", mDefaultFont,
+               settings.getColor(Theme::Color::sSchematicPinNumbers), true,
+               false);
   }
 }
 

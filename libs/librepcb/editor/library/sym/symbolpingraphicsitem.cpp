@@ -57,7 +57,8 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
     mItem(cmpItem),
     mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
     mLineGraphicsItem(new LineGraphicsItem(this)),
-    mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
+    mNameGraphicsItem(new PrimitiveTextGraphicsItem(this)),
+    mNumbersGraphicsItem(new PrimitiveTextGraphicsItem(this)),
     mOnEditedSlot(*this, &SymbolPinGraphicsItem::pinEdited) {
   Q_ASSERT(mPin);
 
@@ -77,14 +78,23 @@ SymbolPinGraphicsItem::SymbolPinGraphicsItem(
   mLineGraphicsItem->setLineWidth(UnsignedLength(158750));
   mLineGraphicsItem->setLayer(lp.getLayer(Theme::Color::sSchematicPinLines));
 
-  // text
-  mTextGraphicsItem->setRotation(mPin->getRotation() + mPin->getNameRotation());
-  mTextGraphicsItem->setAlignment(mPin->getNameAlignment());
-  mTextGraphicsItem->setHeight(mPin->getNameHeight());
-  mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
-  mTextGraphicsItem->setLayer(lp.getLayer(Theme::Color::sSchematicPinNames));
-  updateTextPosition();
+  // name
+  mNameGraphicsItem->setRotation(mPin->getRotation() + mPin->getNameRotation());
+  mNameGraphicsItem->setAlignment(mPin->getNameAlignment());
+  mNameGraphicsItem->setHeight(mPin->getNameHeight());
+  mNameGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
+  mNameGraphicsItem->setLayer(lp.getLayer(Theme::Color::sSchematicPinNames));
+  updateNamePosition();
   updateText();
+
+  // numbers
+  mNumbersGraphicsItem->setRotation(mPin->getRotation());
+  mNumbersGraphicsItem->setHeight(SymbolPin::getNumbersHeight());
+  mNumbersGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
+  mNumbersGraphicsItem->setLayer(
+      lp.getLayer(Theme::Color::sSchematicPinNumbers));
+  mNumbersGraphicsItem->setText("1…");
+  updateNumbersTransform();
 
   // pin properties
   setPos(mPin->getPosition().toPxQPointF());
@@ -142,7 +152,7 @@ void SymbolPinGraphicsItem::updateText() noexcept {
     text = *mPin->getName();
   }
   setToolTip(text);
-  mTextGraphicsItem->setText(text);
+  mNameGraphicsItem->setText(text);
 }
 
 /*******************************************************************************
@@ -157,10 +167,11 @@ QPainterPath SymbolPinGraphicsItem::shape() const noexcept {
 QVariant SymbolPinGraphicsItem::itemChange(GraphicsItemChange change,
                                            const QVariant& value) noexcept {
   if ((change == ItemSelectedHasChanged) && mCircleGraphicsItem &&
-      mLineGraphicsItem && mTextGraphicsItem) {
+      mLineGraphicsItem && mNameGraphicsItem && mNumbersGraphicsItem) {
     mCircleGraphicsItem->setSelected(value.toBool());
     mLineGraphicsItem->setSelected(value.toBool());
-    mTextGraphicsItem->setSelected(value.toBool());
+    mNameGraphicsItem->setSelected(value.toBool());
+    mNumbersGraphicsItem->setSelected(value.toBool());
   }
   return QGraphicsItem::itemChange(change, value);
 }
@@ -182,23 +193,26 @@ void SymbolPinGraphicsItem::pinEdited(const SymbolPin& pin,
       break;
     case SymbolPin::Event::LengthChanged:
       setLength(pin.getLength());
+      updateNumbersTransform();
       break;
     case SymbolPin::Event::RotationChanged:
       mLineGraphicsItem->setRotation(pin.getRotation());
-      mTextGraphicsItem->setRotation(pin.getRotation() + pin.getNameRotation());
-      updateTextPosition();
+      mNameGraphicsItem->setRotation(pin.getRotation() + pin.getNameRotation());
+      updateNamePosition();
+      mNumbersGraphicsItem->setRotation(pin.getRotation());
+      updateNumbersTransform();
       break;
     case SymbolPin::Event::NamePositionChanged:
-      updateTextPosition();
+      updateNamePosition();
       break;
     case SymbolPin::Event::NameHeightChanged:
-      mTextGraphicsItem->setHeight(pin.getNameHeight());
+      mNameGraphicsItem->setHeight(pin.getNameHeight());
       break;
     case SymbolPin::Event::NameRotationChanged:
-      mTextGraphicsItem->setRotation(pin.getRotation() + pin.getNameRotation());
+      mNameGraphicsItem->setRotation(pin.getRotation() + pin.getNameRotation());
       break;
     case SymbolPin::Event::NameAlignmentChanged:
-      mTextGraphicsItem->setAlignment(pin.getNameAlignment());
+      mNameGraphicsItem->setAlignment(pin.getNameAlignment());
       break;
     default:
       qWarning()
@@ -212,9 +226,16 @@ void SymbolPinGraphicsItem::setLength(const UnsignedLength& length) noexcept {
   mLineGraphicsItem->setLine(Point(0, 0), Point(*length, 0));
 }
 
-void SymbolPinGraphicsItem::updateTextPosition() noexcept {
-  mTextGraphicsItem->setPosition(
+void SymbolPinGraphicsItem::updateNamePosition() noexcept {
+  mNameGraphicsItem->setPosition(
       mPin->getNamePosition().rotated(mPin->getRotation()));
+}
+
+void SymbolPinGraphicsItem::updateNumbersTransform() noexcept {
+  const bool flipped = Toolbox::isTextUpsideDown(mPin->getRotation(), false);
+  mNumbersGraphicsItem->setPosition(
+      mPin->getNumbersPosition(flipped).rotated(mPin->getRotation()));
+  mNumbersGraphicsItem->setAlignment(SymbolPin::getNumbersAlignment(flipped));
 }
 
 /*******************************************************************************
