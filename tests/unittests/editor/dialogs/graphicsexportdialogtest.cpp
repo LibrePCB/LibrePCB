@@ -83,6 +83,13 @@ protected:
     dlg.show();
   }
 
+  void enablePinNumbers(GraphicsExportDialog& dlg) {
+    TestHelpers::getChild<QCheckBox>(
+        dlg,
+        "tabWidget/qt_tabwidget_stackedwidget/tabAdvanced/cbxShowPinNumbers")
+        .setChecked(true);
+  }
+
   QList<std::shared_ptr<GraphicsExportSettings>> getSettings(
       const GraphicsExportDialog& dlg, int expectedCount = -1) {
     QList<std::shared_ptr<GraphicsExportSettings>> settings;
@@ -479,6 +486,73 @@ TEST_F(GraphicsExportDialogTest, testMargins) {
     EXPECT_EQ(defaultValue, getSettings(dlg, 1).at(0)->getMarginRight());
     EXPECT_EQ(defaultValue, getSettings(dlg, 1).at(0)->getMarginTop());
     EXPECT_EQ(defaultValue, getSettings(dlg, 1).at(0)->getMarginBottom());
+
+    // Sanity check that the export is actually successful.
+    performExport(dlg);
+    EXPECT_TRUE(outFile.isExistingFile());
+  }
+}
+
+TEST_F(GraphicsExportDialogTest, testShowPinNumbers) {
+  const bool defaultValue = false;
+  const bool newValue = true;
+  const QString widget =
+      "tabWidget/qt_tabwidget_stackedwidget/tabAdvanced/cbxShowPinNumbers";
+  const FilePath outFile = getFilePath("out.pdf");
+
+  {
+    Theme theme;
+    GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
+                             GraphicsExportDialog::Output::Pdf, getPages(1), 0,
+                             "test", 0, FilePath(), LengthUnit::millimeters(),
+                             theme, "unittest");
+    prepareDialog(dlg, outFile);
+    QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
+
+    // Check the default value.
+    EXPECT_EQ(defaultValue, cbx.isChecked());
+    EXPECT_EQ(defaultValue,
+              getSettings(dlg, 1)
+                  .at(0)
+                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  .isValid());
+
+    // Check if the value can be changed and are applied properly.
+    cbx.setChecked(newValue);
+    EXPECT_EQ(newValue,
+              getSettings(dlg, 1)
+                  .at(0)
+                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  .isValid());
+  }
+
+  // Check if the setting is saved and restored automatically, and can be
+  // reset to its default value.
+  {
+    Theme theme;
+    GraphicsExportDialog dlg(GraphicsExportDialog::Mode::Schematic,
+                             GraphicsExportDialog::Output::Pdf, getPages(1), 0,
+                             "test", 0, FilePath(), LengthUnit::millimeters(),
+                             theme, "unittest");
+    prepareDialog(dlg, outFile);
+    QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widget);
+
+    // Check new value.
+    EXPECT_EQ(newValue, cbx.isChecked());
+    EXPECT_EQ(newValue,
+              getSettings(dlg, 1)
+                  .at(0)
+                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  .isValid());
+
+    // Restore default value.
+    restoreDefaults(dlg);
+    EXPECT_EQ(defaultValue, cbx.isChecked());
+    EXPECT_EQ(defaultValue,
+              getSettings(dlg, 1)
+                  .at(0)
+                  ->getColor(Theme::Color::sSchematicPinNumbers)
+                  .isValid());
 
     // Sanity check that the export is actually successful.
     performExport(dlg);
@@ -897,6 +971,7 @@ TEST_F(GraphicsExportDialogTest, testLayerColors) {
                              "test", 0, FilePath(), LengthUnit::millimeters(),
                              theme, "unittest");
     prepareDialog(dlg, outFile);
+    enablePinNumbers(dlg);
     QListWidget& lst = TestHelpers::getChild<QListWidget>(dlg, widget);
 
     // Check the default value.
@@ -923,6 +998,7 @@ TEST_F(GraphicsExportDialogTest, testLayerColors) {
                              "test", 0, FilePath(), LengthUnit::millimeters(),
                              theme, "unittest");
     prepareDialog(dlg, outFile);
+    enablePinNumbers(dlg);
     QListWidget& lst = TestHelpers::getChild<QListWidget>(dlg, widget);
 
     // Check new value.
@@ -934,6 +1010,7 @@ TEST_F(GraphicsExportDialogTest, testLayerColors) {
 
     // Restore default value.
     restoreDefaults(dlg);
+    enablePinNumbers(dlg);
     EXPECT_EQ(defaultValue.count(), lst.count());
     for (int i = 0; i < defaultValue.count(); ++i) {
       EXPECT_EQ(defaultValue.at(i).second,

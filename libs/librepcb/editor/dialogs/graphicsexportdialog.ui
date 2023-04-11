@@ -327,14 +327,14 @@
          <string>Advanced</string>
         </attribute>
         <layout class="QFormLayout" name="formLayout">
-         <item row="0" column="0">
+         <item row="1" column="0">
           <widget class="QLabel" name="lblTransformation">
            <property name="text">
             <string>Transformation:</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="1" column="1">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <widget class="QCheckBox" name="cbxRotate">
@@ -352,31 +352,31 @@
            </item>
           </layout>
          </item>
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
             <string>Minimum line width:</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinLineWidth" native="true"/>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="lblColors">
            <property name="text">
             <string>Colors:</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QCheckBox" name="cbxBlackWhite">
            <property name="text">
             <string>Black/White</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="lblCopies">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -389,7 +389,7 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="5" column="1">
           <widget class="QSpinBox" name="spbxCopies">
            <property name="enabled">
             <bool>false</bool>
@@ -405,6 +405,20 @@
            </property>
            <property name="maximum">
             <number>100</number>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblShowPinNumbers">
+           <property name="text">
+            <string>Content:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QCheckBox" name="cbxShowPinNumbers">
+           <property name="text">
+            <string>Show Pin Numbers</string>
            </property>
           </widget>
          </item>
@@ -646,6 +660,12 @@
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
       </spacer>
      </item>
      <item>
@@ -709,6 +729,7 @@
   <tabstop>edtMarginRight</tabstop>
   <tabstop>edtMarginTop</tabstop>
   <tabstop>edtMarginBottom</tabstop>
+  <tabstop>cbxShowPinNumbers</tabstop>
   <tabstop>cbxRotate</tabstop>
   <tabstop>cbxMirror</tabstop>
   <tabstop>edtMinLineWidth</tabstop>
@@ -726,7 +747,7 @@
  <connections/>
  <buttongroups>
   <buttongroup name="btnGroupOrientation"/>
-  <buttongroup name="btnGroupBackground"/>
   <buttongroup name="btnGroupPages"/>
+  <buttongroup name="btnGroupBackground"/>
  </buttongroups>
 </ui>

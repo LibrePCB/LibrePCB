@@ -140,6 +140,8 @@ private:  // Methods
   UnsignedLength getMarginRight() const noexcept;
   void setMarginBottom(const UnsignedLength& margin) noexcept;
   UnsignedLength getMarginBottom() const noexcept;
+  void setShowPinNumbers(bool show) noexcept;
+  bool getShowPinNumbers() const noexcept;
   void setRotate(bool rotate) noexcept;
   bool getRotate() const noexcept;
   void setMirror(bool mirror) noexcept;
