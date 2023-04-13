@@ -119,6 +119,7 @@ public:
 
 protected:  // Methods
   virtual void upgradeSettings(SExpression& root);
+  virtual void upgradeCircuit(SExpression& root);
   virtual void upgradeErc(SExpression& root, ProjectContext& context);
   virtual void upgradeSchematic(SExpression& root, ProjectContext& context);
   virtual void upgradeBoard(SExpression& root, ProjectContext& context);
@@ -128,6 +129,9 @@ protected:  // Methods
   virtual void upgradeGrid(SExpression& node);
   virtual void upgradeHoles(SExpression& node, bool isBoardHole);
   virtual void upgradeLayers(SExpression& node);
+  virtual void upgradeStrings(SExpression& root);
+  virtual void replaceStrings(SExpression& root,
+                              const QMap<QString, QString>& replacements);
 };
 
 /*******************************************************************************

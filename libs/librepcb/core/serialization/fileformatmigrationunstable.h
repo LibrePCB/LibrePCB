@@ -73,13 +73,13 @@ public:
 
 private:  // Methods
   virtual void upgradeSettings(SExpression& root) override;
+  virtual void upgradeCircuit(SExpression& root) override;
   virtual void upgradeErc(SExpression& root, ProjectContext& context) override;
   virtual void upgradeSchematic(SExpression& root,
                                 ProjectContext& context) override;
   virtual void upgradeBoard(SExpression& root,
                             ProjectContext& context) override;
   virtual void upgradeBoardUserSettings(SExpression& root) override;
-  virtual void upgradeHoles(SExpression& node, bool isBoardHole) override;
 };
 
 /*******************************************************************************

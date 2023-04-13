@@ -61,19 +61,35 @@ void FileFormatMigrationUnstable::upgradePackageCategory(
 
 void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+  const QString fp = "symbol.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  upgradeStrings(root);
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+  const QString fp = "package.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  upgradeStrings(root);
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+  const QString fp = "component.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  upgradeStrings(root);
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeDevice(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+  const QString fp = "device.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  upgradeStrings(root);
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
@@ -91,6 +107,12 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
 
 void FileFormatMigrationUnstable::upgradeSettings(SExpression& root) {
   Q_UNUSED(root);
+  upgradeStrings(root);
+}
+
+void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root) {
+  Q_UNUSED(root);
+  upgradeStrings(root);
 }
 
 void FileFormatMigrationUnstable::upgradeErc(SExpression& root,
@@ -103,41 +125,18 @@ void FileFormatMigrationUnstable::upgradeSchematic(SExpression& root,
                                                    ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
+  upgradeStrings(root);
 }
 
 void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  for (SExpression* devNode : root.getChildren("device")) {
-    devNode->appendChild("lock", SExpression::createToken("false"));
-    for (SExpression* txtNode : devNode->getChildren("stroke_text")) {
-      txtNode->appendChild("lock", SExpression::createToken("false"));
-    }
-  }
-  for (SExpression* polyNode : root.getChildren("polygon")) {
-    polyNode->appendChild("lock", SExpression::createToken("false"));
-  }
-  for (SExpression* txtNode : root.getChildren("stroke_text")) {
-    txtNode->appendChild("lock", SExpression::createToken("false"));
-  }
-  for (SExpression* planeNode : root.getChildren("plane")) {
-    planeNode->appendChild("lock", SExpression::createToken("false"));
-  }
-  upgradeHoles(root, true);
+  upgradeStrings(root);
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {
   Q_UNUSED(root);
-}
-
-void FileFormatMigrationUnstable::upgradeHoles(SExpression& node,
-                                               bool isBoardHole) {
-  for (SExpression* holeNode : node.getChildren("hole")) {
-    if (isBoardHole) {
-      holeNode->appendChild("lock", SExpression::createToken("false"));
-    }
-  }
 }
 
 /*******************************************************************************

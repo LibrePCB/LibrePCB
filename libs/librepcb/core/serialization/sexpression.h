@@ -158,6 +158,7 @@ public:
 
   // Setters
   void setName(const QString& name);
+  void setValue(const QString& value);
 
   // General Methods
   void ensureLineBreak();

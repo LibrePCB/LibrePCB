@@ -102,7 +102,8 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
     textComboBox->addItem("{{PROJECT}}");
     textComboBox->addItem("{{AUTHOR}}");
     textComboBox->addItem("{{VERSION}}");
-    textComboBox->addItem("{{MODIFIED_DATE}}");
+    textComboBox->addItem("{{DATE}}");
+    textComboBox->addItem("{{TIME}}");
     int currentTextIndex = textComboBox->findText(mLastText);
     if (currentTextIndex >= 0) {
       textComboBox->setCurrentIndex(currentTextIndex);

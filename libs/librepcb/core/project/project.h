@@ -159,14 +159,11 @@ public:
   const QDateTime& getCreated() const noexcept { return mCreated; }
 
   /**
-   * @brief Get the date and time when the project was last modified
+   * @brief Get the date and time when the project was opened or saved
    *
-   * @return The local date and time of last modification
-   *
-   * @todo    Dynamically determine the datetime of the last modification from
-   *          version control system, file attributes or something like that.
+   * @return The local date and time
    */
-  const QDateTime& getLastModified() const noexcept { return mLastModified; }
+  const QDateTime& getDateTime() const noexcept { return mDateTime; }
 
   /**
    * @brief Get the list of attributes
@@ -272,7 +269,7 @@ public:
   /**
    * @brief Update the last modified date/time
    */
-  void updateLastModified() noexcept;
+  void updateDateTime() noexcept;
 
   /**
    * @brief Set all project attributes
@@ -560,8 +557,8 @@ private:  // Data
   /// Date/time of project creation.
   QDateTime mCreated;
 
-  /// Date/time of last modification.
-  QDateTime mLastModified;
+  /// Date/time of opening or saving the project.
+  QDateTime mDateTime;
 
   /// User-defined attributes in the specified order.
   AttributeList mAttributes;
