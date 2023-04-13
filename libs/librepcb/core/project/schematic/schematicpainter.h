@@ -57,10 +57,13 @@ class SchematicPainter final : public GraphicsPagePainter {
     Angle rotation;
     UnsignedLength length;
     QString name;
+    QString numbers;
     Point namePosition;
     Angle nameRotation;
     PositiveLength nameHeight;
     Alignment nameAlignment;
+    Point numbersPosition;
+    Alignment numbersAlignment;
   };
 
   struct Line {

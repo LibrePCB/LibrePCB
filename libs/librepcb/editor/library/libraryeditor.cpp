@@ -1107,9 +1107,16 @@ bool LibraryEditor::closeAllTabs(bool withNonClosable,
 void LibraryEditor::addLayer(const QString& name) noexcept {
   const Theme& theme = mWorkspace.getSettings().themes.getActive();
   const ThemeColor& color = theme.getColor(name);
+  QColor primary = color.getPrimaryColor();
+  QColor secondary = color.getSecondaryColor();
+  if (name == Theme::Color::sSchematicPinNumbers) {
+    // Make pin numbers lighter since they are only for illustration but
+    // don't display a reasonable text.
+    primary.setAlpha(primary.alpha() / 3);
+    secondary.setAlpha(secondary.alpha() / 3);
+  }
   mLayers.append(std::make_shared<GraphicsLayer>(name, color.getNameTr(),
-                                                 color.getPrimaryColor(),
-                                                 color.getSecondaryColor()));
+                                                 primary, secondary));
 }
 
 /*******************************************************************************

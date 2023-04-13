@@ -51,6 +51,8 @@ class PrimitiveTextGraphicsItem;
  * @brief The SGI_SymbolPin class
  */
 class SGI_SymbolPin final : public QGraphicsItemGroup {
+  Q_DECLARE_TR_FUNCTIONS(SGI_SymbolPin)
+
 public:
   // Constructors / Destructor
   SGI_SymbolPin() = delete;
@@ -83,7 +85,11 @@ private:  // Methods
   void updatePosition() noexcept;
   void updateRotation() noexcept;
   void updateJunction() noexcept;
-  void updateText() noexcept;
+  void updateName() noexcept;
+  void updateNumbers() noexcept;
+  void updateNumbersPosition() noexcept;
+  void updateNumbersAlignment() noexcept;
+  void updateToolTip() noexcept;
 
 private:  // Data
   SI_SymbolPin& mPin;
@@ -92,7 +98,8 @@ private:  // Data
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   QScopedPointer<PrimitiveCircleGraphicsItem> mCircleGraphicsItem;
   QScopedPointer<LineGraphicsItem> mLineGraphicsItem;
-  QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
+  QScopedPointer<PrimitiveTextGraphicsItem> mNameGraphicsItem;
+  QScopedPointer<PrimitiveTextGraphicsItem> mNumbersGraphicsItem;
 
   // Slots
   SI_SymbolPin::OnEditedSlot mOnPinEditedSlot;

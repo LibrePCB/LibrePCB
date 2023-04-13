@@ -26,6 +26,7 @@
 #include "../../exceptions.h"
 #include "../../library/cmp/component.h"
 #include "../../utils/scopeguardlist.h"
+#include "../board/board.h"
 #include "../board/items/bi_device.h"
 #include "../project.h"
 #include "../projectlibrary.h"
@@ -58,7 +59,8 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const Uuid& uuid,
     mDefaultDeviceUuid(defaultDevice),
     mLibComponent(cmp),
     mCompSymbVar(cmp.getSymbolVariants().get(symbVar).get()),  // can throw
-    mAttributes(new AttributeList(cmp.getAttributes())) {
+    mAttributes(new AttributeList(cmp.getAttributes())),
+    mPrimaryDevice(nullptr) {
   Q_ASSERT(mCompSymbVar);
 
   // add signal map
@@ -67,6 +69,10 @@ ComponentInstance::ComponentInstance(Circuit& circuit, const Uuid& uuid,
         new ComponentSignalInstance(mCircuit, *this, signal, nullptr);
     mSignals.insert(signalInstance->getCompSignal().getUuid(), signalInstance);
   }
+
+  // Update primary device when the primary board has changed.
+  connect(&mCircuit.getProject(), &Project::primaryBoardChanged, this,
+          &ComponentInstance::updatePrimaryDevice);
 
   // emit the "attributesChanged" signal when the project has emitted it
   connect(&mCircuit.getProject(), &Project::attributesChanged, this,
@@ -230,6 +236,7 @@ void ComponentInstance::registerDevice(BI_Device& device) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredDevices.append(&device);
+  updatePrimaryDevice();
   emit attributesChanged();  // parent attribute provider may have changed!
 }
 
@@ -238,6 +245,7 @@ void ComponentInstance::unregisterDevice(BI_Device& device) {
     throw LogicError(__FILE__, __LINE__);
   }
   mRegisteredDevices.removeOne(&device);
+  updatePrimaryDevice();
   emit attributesChanged();  // parent attribute provider may have changed!
 }
 
@@ -292,15 +300,30 @@ QString ComponentInstance::getBuiltInAttributeValue(const QString& key) const
 
 QVector<const AttributeProvider*>
     ComponentInstance::getAttributeProviderParents() const noexcept {
-  // TODO: add support for multiple boards!
-  const BI_Device* dev =
-      (mRegisteredDevices.count() == 1) ? mRegisteredDevices.first() : nullptr;
-  return QVector<const AttributeProvider*>{&mCircuit.getProject(), dev};
+  return QVector<const AttributeProvider*>{
+      &mCircuit.getProject(),
+      getPrimaryDevice(),
+  };
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void ComponentInstance::updatePrimaryDevice() noexcept {
+  const BI_Device* primary = nullptr;
+  if (Board* board = mCircuit.getProject().getPrimaryBoard()) {
+    foreach (BI_Device* device, mRegisteredDevices) {
+      if (&device->getBoard() == board) {
+        primary = device;
+      }
+    }
+  }
+  if (primary != mPrimaryDevice) {
+    mPrimaryDevice = primary;
+    emit primaryDeviceChanged(mPrimaryDevice);
+  }
+}
 
 bool ComponentInstance::checkAttributesValidity() const noexcept {
   if (mCompSymbVar == nullptr) return false;

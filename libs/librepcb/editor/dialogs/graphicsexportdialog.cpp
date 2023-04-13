@@ -244,6 +244,14 @@ GraphicsExportDialog::GraphicsExportDialog(
   connect(mUi->edtMarginBottom, &UnsignedLengthEdit::valueChanged, this,
           &GraphicsExportDialog::applySettings);
 
+  // Show pin numbers.
+  if (mMode == Mode::Schematic) {
+    connect(mUi->cbxShowPinNumbers, &QRadioButton::toggled, this,
+            &GraphicsExportDialog::applySettings);
+  } else {
+    EditorToolbox::removeFormLayoutRow(*mUi->lblShowPinNumbers);
+  }
+
   // Rotation.
   connect(mUi->cbxRotate, &QCheckBox::toggled, this,
           &GraphicsExportDialog::applySettings);
@@ -461,6 +469,7 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
   setMarginTop(mDefaultSettings->getMarginTop());
   setMarginRight(mDefaultSettings->getMarginRight());
   setMarginBottom(mDefaultSettings->getMarginBottom());
+  setShowPinNumbers(false);
   setRotate(mDefaultSettings->getRotate());
   setMirror(mDefaultSettings->getMirror());
   setFitToPage(!mDefaultSettings->getScale().has_value());
@@ -680,6 +689,16 @@ void GraphicsExportDialog::syncClientSettings(
       value = s.value(mSettingsPrefix % "/margin_bottom").toString();
       if (!value.isEmpty()) {
         setMarginBottom(UnsignedLength(Length::fromMm(value)));
+      }
+    }
+
+    // Show pin numbers.
+    if (action == ClientSettingsAction::Store) {
+      s.setValue(mSettingsPrefix % "/show_pin_numbers", getShowPinNumbers());
+    } else {
+      QVariant value = s.value(mSettingsPrefix % "/show_pin_numbers");
+      if (!value.isNull()) {
+        setShowPinNumbers(value.toBool());
       }
     }
 
@@ -1005,6 +1024,16 @@ void GraphicsExportDialog::applySettings() noexcept {
     mColors[i].second = color;
   }
 
+  // Remove layers to hide.
+  QList<std::pair<QString, QColor>> colors = mColors;
+  if (!getShowPinNumbers()) {
+    for (int i = colors.count() - 1; i >= 0; --i) {
+      if (colors.at(i).first == Theme::Color::sSchematicPinNumbers) {
+        colors.removeAt(i);
+      }
+    }
+  }
+
   // Update page content from tree view.
   for (int i = 0; i < std::min(mUi->treeContent->topLevelItemCount(),
                                mPageContentItems.count());
@@ -1050,7 +1079,7 @@ void GraphicsExportDialog::applySettings() noexcept {
         pageIndices.append(i);
       }
     }
-    settings->setColors(mColors);
+    settings->setColors(colors);
     foreach (int i, pageIndices) {
       mPages.append(std::make_pair(mInputPages.at(i), settings));
     }
@@ -1058,7 +1087,7 @@ void GraphicsExportDialog::applySettings() noexcept {
     foreach (const ContentItem& item, getPageContent()) {
       if (item.enabled) {
         QList<std::pair<QString, QColor>> colors;
-        foreach (const auto& pair, mColors) {
+        foreach (const auto& pair, colors) {
           if (item.colors.contains(pair.first)) {
             colors.append(pair);
           }
@@ -1238,6 +1267,14 @@ void GraphicsExportDialog::setMarginBottom(
 
 UnsignedLength GraphicsExportDialog::getMarginBottom() const noexcept {
   return mUi->edtMarginBottom->getValue();
+}
+
+void GraphicsExportDialog::setShowPinNumbers(bool show) noexcept {
+  mUi->cbxShowPinNumbers->setChecked(show);
+}
+
+bool GraphicsExportDialog::getShowPinNumbers() const noexcept {
+  return mUi->cbxShowPinNumbers->isChecked();
 }
 
 void GraphicsExportDialog::setRotate(bool rotate) noexcept {

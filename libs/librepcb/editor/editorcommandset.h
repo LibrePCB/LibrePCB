@@ -799,6 +799,15 @@ public:
       {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Minus)},
       &categoryView,
   };
+  EditorCommand showPinNumbers{
+      "show_pin_numbers",  // clang-format break
+      QT_TR_NOOP("Show Pin Numbers"),
+      QT_TR_NOOP("Show or hide symbol pin numbers"),
+      QIcon(":/img/actions/show_pin_numbers.png"),
+      EditorCommand::Flags(),
+      {QKeySequence()},
+      &categoryView,
+  };
   EditorCommand ignoreLocks{
       "ignore_locks",  // clang-format break
       QT_TR_NOOP("Ignore Placement Locks"),

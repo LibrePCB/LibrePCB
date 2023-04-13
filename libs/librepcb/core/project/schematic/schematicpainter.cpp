@@ -64,11 +64,14 @@ SchematicPainter::SchematicPainter(const Schematic& schematic,
           pin->getLibPin().getPosition(),
           pin->getLibPin().getRotation(),
           pin->getLibPin().getLength(),
-          pin->getText(),
+          pin->getName(),
+          pin->getNumbersTruncated(),
           pin->getLibPin().getNamePosition(),
           pin->getLibPin().getNameRotation(),
           pin->getLibPin().getNameHeight(),
           pin->getLibPin().getNameAlignment(),
+          pin->getNumbersPosition(),
+          pin->getNumbersAlignment(),
       });
       if (pin->isVisibleJunction() && (!thumbnail)) {
         mJunctions.append(pin->getPosition());
@@ -176,6 +179,13 @@ void SchematicPainter::paint(QPainter& painter,
                  symbol.transform.map(pin.rotation + pin.nameRotation),
                  *pin.nameHeight, nameAlignment, pin.name, mDefaultFont,
                  settings.getColor(Theme::Color::sSchematicPinNames), true,
+                 false);
+      const Angle numberRot = symbol.transform.map(pin.rotation);
+      p.drawText(symbol.transform.map(
+                     pin.position + pin.numbersPosition.rotated(pin.rotation)),
+                 numberRot, *SymbolPin::getNumbersHeight(),
+                 pin.numbersAlignment, pin.numbers, mDefaultFont,
+                 settings.getColor(Theme::Color::sSchematicPinNumbers), true,
                  false);
     }
   }

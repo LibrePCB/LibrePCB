@@ -195,6 +195,7 @@ private:
   QScopedPointer<QAction> mActionGridProperties;
   QScopedPointer<QAction> mActionGridIncrease;
   QScopedPointer<QAction> mActionGridDecrease;
+  QScopedPointer<QAction> mActionShowPinNumbers;
   QScopedPointer<QAction> mActionZoomFit;
   QScopedPointer<QAction> mActionZoomIn;
   QScopedPointer<QAction> mActionZoomOut;

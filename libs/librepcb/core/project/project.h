@@ -222,6 +222,13 @@ public:
     return mErcMessageApprovals;
   }
 
+  /**
+   * @brief Get the primary board (the first one)
+   *
+   * @return Primary board (nullptr if there are no boards)
+   */
+  const QPointer<Board>& getPrimaryBoard() noexcept { return mPrimaryBoard; }
+
   // Setters
 
   /**
@@ -518,7 +525,17 @@ signals:
    */
   void boardRemoved(int oldIndex);
 
-private:
+  /**
+   * @brief A different board has become the primary board
+   *
+   * @param board   New primary board (may be nullptr)
+   */
+  void primaryBoardChanged(const QPointer<Board>& board);
+
+private:  // Methods
+  void updatePrimaryBoard();
+
+private:  // Data
   /// Project root directory.
   std::unique_ptr<TransactionalDirectory> mDirectory;
 
@@ -579,6 +596,9 @@ private:
 
   /// All approved ERC messages
   QSet<SExpression> mErcMessageApprovals;
+
+  // Cached properties
+  QPointer<Board> mPrimaryBoard;
 };
 
 /*******************************************************************************

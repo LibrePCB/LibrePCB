@@ -27,7 +27,9 @@
 #include "../../../graphics/primitivetextgraphicsitem.h"
 #include "../schematicgraphicsscene.h"
 
+#include <librepcb/core/library/cmp/componentsignal.h>
 #include <librepcb/core/library/sym/symbolpin.h>
+#include <librepcb/core/project/circuit/componentsignalinstance.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
 #include <librepcb/core/utils/transform.h>
@@ -58,7 +60,8 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
     mHighlightedNetSignals(highlightedNetSignals),
     mCircleGraphicsItem(new PrimitiveCircleGraphicsItem(this)),
     mLineGraphicsItem(new LineGraphicsItem(this)),
-    mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
+    mNameGraphicsItem(new PrimitiveTextGraphicsItem(this)),
+    mNumbersGraphicsItem(new PrimitiveTextGraphicsItem(this)),
     mOnPinEditedSlot(*this, &SGI_SymbolPin::pinEdited),
     mOnSymbolEditedSlot(*this, &SGI_SymbolPin::symbolGraphicsItemEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
@@ -82,18 +85,30 @@ SGI_SymbolPin::SGI_SymbolPin(SI_SymbolPin& pin,
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
   mLineGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
-  // Setup text.
-  mTextGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
-  mTextGraphicsItem->setHeight(mPin.getLibPin().getNameHeight());
-  mTextGraphicsItem->setLayer(
+  // Setup name text.
+  mNameGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
+  mNameGraphicsItem->setHeight(mPin.getLibPin().getNameHeight());
+  mNameGraphicsItem->setLayer(
       mLayerProvider.getLayer(Theme::Color::sSchematicPinNames));
-  mTextGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
-  mTextGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+  mNameGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  mNameGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+
+  // Setup number text.
+  mNumbersGraphicsItem->setFont(PrimitiveTextGraphicsItem::Font::SansSerif);
+  mNumbersGraphicsItem->setHeight(PositiveLength(1500000));
+  mNumbersGraphicsItem->setLayer(
+      mLayerProvider.getLayer(Theme::Color::sSchematicPinNumbers));
+  mNumbersGraphicsItem->setFlag(QGraphicsItem::ItemIsSelectable, true);
+  mNumbersGraphicsItem->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
 
   updatePosition();
   updateRotation();
   updateJunction();
-  updateText();
+  updateName();
+  updateNumbers();
+  updateNumbersPosition();
+  updateNumbersAlignment();
+  updateToolTip();
   updateHighlightedState();
 
   mPin.onEdited.attach(mOnPinEditedSlot);
@@ -114,7 +129,8 @@ void SGI_SymbolPin::updateHighlightedState() noexcept {
       mHighlightedNetSignals->contains(mPin.getCompSigInstNetSignal());
   mCircleGraphicsItem->setSelected(highlight);
   mLineGraphicsItem->setSelected(highlight);
-  mTextGraphicsItem->setSelected(highlight);
+  mNameGraphicsItem->setSelected(highlight);
+  mNumbersGraphicsItem->setSelected(highlight);
 }
 
 /*******************************************************************************
@@ -129,7 +145,7 @@ QPainterPath SGI_SymbolPin::shape() const noexcept {
 QVariant SGI_SymbolPin::itemChange(GraphicsItemChange change,
                                    const QVariant& value) noexcept {
   if ((change == ItemSelectedHasChanged) && mCircleGraphicsItem &&
-      mLineGraphicsItem && mTextGraphicsItem) {
+      mLineGraphicsItem && mNameGraphicsItem && mNumbersGraphicsItem) {
     updateHighlightedState();
   }
   return QGraphicsItem::itemChange(change, value);
@@ -148,12 +164,24 @@ void SGI_SymbolPin::pinEdited(const SI_SymbolPin& obj,
       break;
     case SI_SymbolPin::Event::RotationChanged:
       updateRotation();
+      updateNumbersPosition();
       break;
     case SI_SymbolPin::Event::JunctionChanged:
       updateJunction();
       break;
-    case SI_SymbolPin::Event::TextChanged:
-      updateText();
+    case SI_SymbolPin::Event::NameChanged:
+      updateName();
+      updateToolTip();
+      break;
+    case SI_SymbolPin::Event::NumbersChanged:
+      updateNumbers();
+      updateToolTip();
+      break;
+    case SI_SymbolPin::Event::NumbersPositionChanged:
+      updateNumbersPosition();
+      break;
+    case SI_SymbolPin::Event::NumbersAlignmentChanged:
+      updateNumbersAlignment();
       break;
     default:
       qWarning() << "Unhandled switch-case in SGI_SymbolPin::pinEdited():"
@@ -174,7 +202,7 @@ void SGI_SymbolPin::updatePosition() noexcept {
 }
 
 void SGI_SymbolPin::updateRotation() noexcept {
-  Q_ASSERT(mLineGraphicsItem && mTextGraphicsItem);
+  Q_ASSERT(mLineGraphicsItem && mNameGraphicsItem && mNumbersGraphicsItem);
 
   mLineGraphicsItem->setRotation(mPin.getRotation());
 
@@ -189,9 +217,11 @@ void SGI_SymbolPin::updateRotation() noexcept {
   if (transform.getMirrored()) {
     nameAlignment.mirrorV();
   }
-  mTextGraphicsItem->setPosition(namePosition);
-  mTextGraphicsItem->setRotation(nameRotation);
-  mTextGraphicsItem->setAlignment(nameAlignment);
+  mNameGraphicsItem->setPosition(namePosition);
+  mNameGraphicsItem->setRotation(nameRotation);
+  mNameGraphicsItem->setAlignment(nameAlignment);
+
+  mNumbersGraphicsItem->setRotation(mPin.getRotation());
 }
 
 void SGI_SymbolPin::updateJunction() noexcept {
@@ -211,9 +241,47 @@ void SGI_SymbolPin::updateJunction() noexcept {
   mCircleGraphicsItem->setFillLayer(fillLayer);
 }
 
-void SGI_SymbolPin::updateText() noexcept {
-  Q_ASSERT(mTextGraphicsItem);
-  mTextGraphicsItem->setText(mPin.getText());
+void SGI_SymbolPin::updateName() noexcept {
+  Q_ASSERT(mNameGraphicsItem);
+  mNameGraphicsItem->setText(mPin.getName());
+}
+
+void SGI_SymbolPin::updateNumbers() noexcept {
+  Q_ASSERT(mNumbersGraphicsItem);
+  mNumbersGraphicsItem->setText(mPin.getNumbersTruncated());
+}
+
+void SGI_SymbolPin::updateNumbersPosition() noexcept {
+  Q_ASSERT(mNumbersGraphicsItem);
+  mNumbersGraphicsItem->setPosition(
+      mPin.getNumbersPosition().rotated(mPin.getRotation()));
+}
+
+void SGI_SymbolPin::updateNumbersAlignment() noexcept {
+  Q_ASSERT(mNumbersGraphicsItem);
+  mNumbersGraphicsItem->setAlignment(mPin.getNumbersAlignment());
+}
+
+void SGI_SymbolPin::updateToolTip() noexcept {
+  Q_ASSERT(mCircleGraphicsItem && mNameGraphicsItem && mNumbersGraphicsItem);
+  QString s;
+  s += "<b>" % tr("Signal:") % " ";
+  if (const ComponentSignalInstance* sig = mPin.getComponentSignalInstance()) {
+    s += *sig->getCompSignal().getName();
+  } else {
+    s += "✖";
+  }
+  s += "</b><br>" % tr("Net:") % " ";
+  if (const NetSignal* net = mPin.getCompSigInstNetSignal()) {
+    s += *net->getName();
+  } else {
+    s += "✖";
+  }
+  s += "<br>" % tr("Pin:") % " " % *mPin.getLibPin().getName();
+  s += "<br>" % tr("Pad(s):") % " " % mPin.getNumbers().join(", ");
+  mCircleGraphicsItem->setToolTip(s);
+  mNameGraphicsItem->setToolTip(s);
+  mNumbersGraphicsItem->setToolTip(s);
 }
 
 /*******************************************************************************

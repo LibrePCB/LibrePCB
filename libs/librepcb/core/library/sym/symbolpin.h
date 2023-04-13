@@ -88,6 +88,7 @@ public:
   const Angle& getNameRotation() const noexcept { return mNameRotation; }
   const PositiveLength& getNameHeight() const noexcept { return mNameHeight; }
   const Alignment& getNameAlignment() const noexcept { return mNameAlignment; }
+  Point getNumbersPosition(bool flipped) const noexcept;
 
   // Setters
   bool setPosition(const Point& pos) noexcept;
@@ -124,6 +125,13 @@ public:
   }
   static Alignment getDefaultNameAlignment() noexcept {
     return Alignment(HAlign::left(), VAlign::center());
+  }
+  static PositiveLength getNumbersHeight() noexcept {
+    return PositiveLength(1500000);
+  }
+  static Alignment getNumbersAlignment(bool flipped) noexcept {
+    return Alignment(HAlign::right(),
+                     flipped ? VAlign::top() : VAlign::bottom());
   }
 
 private:  // Data

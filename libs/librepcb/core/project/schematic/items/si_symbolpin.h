@@ -58,7 +58,11 @@ public:
     PositionChanged,
     RotationChanged,
     JunctionChanged,
-    TextChanged,
+    NameChanged,
+    NumbersChanged,
+    NumbersPositionChanged,
+    NumbersAlignmentChanged,
+    NetNameChanged,
   };
   Signal<SI_SymbolPin, Event> onEdited;
   typedef Slot<SI_SymbolPin, Event> OnEditedSlot;
@@ -85,7 +89,19 @@ public:
    */
   const Angle& getRotation() const noexcept { return mRotation; }
 
-  const QString& getText() const noexcept { return mText; }
+  const QString& getName() const noexcept { return mName; }
+
+  const QStringList& getNumbers() const noexcept { return mNumbers; }
+
+  const QString& getNumbersTruncated() const noexcept {
+    return mNumbersTruncated;
+  }
+
+  const Point& getNumbersPosition() const noexcept { return mNumbersPosition; }
+
+  const Alignment& getNumbersAlignment() const noexcept {
+    return mNumbersAlignment;
+  }
 
   const Uuid& getLibPinUuid() const noexcept;
   SI_Symbol& getSymbol() const noexcept { return mSymbol; }
@@ -117,8 +133,12 @@ public:
 private:
   void symbolEdited(const SI_Symbol& obj, SI_Symbol::Event event) noexcept;
   void netSignalChanged(NetSignal* from, NetSignal* to) noexcept;
+  void netSignalNameChanged() noexcept;
+  void padNamesChanged(const QStringList& names) noexcept;
   void updateTransform() noexcept;
-  void updateText() noexcept;
+  void updateName() noexcept;
+  void updateNumbers() noexcept;
+  void updateNumbersTransform() noexcept;
   QString getLibraryComponentName() const noexcept;
   QString getComponentSignalNameOrPinUuid() const noexcept;
   QString getNetSignalName() const noexcept;
@@ -132,7 +152,11 @@ private:
   // Cached Properties
   Point mPosition;
   Angle mRotation;
-  QString mText;
+  QString mName;
+  QStringList mNumbers;
+  QString mNumbersTruncated;
+  Point mNumbersPosition;
+  Alignment mNumbersAlignment;
 
   // Registered Elements
   QSet<SI_NetLine*> mRegisteredNetLines;  ///< all registered netlines

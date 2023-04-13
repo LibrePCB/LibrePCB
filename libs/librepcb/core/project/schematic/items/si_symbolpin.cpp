@@ -25,6 +25,7 @@
 #include "../../../library/cmp/component.h"
 #include "../../../library/sym/symbol.h"
 #include "../../../library/sym/symbolpin.h"
+#include "../../../utils/toolbox.h"
 #include "../../../utils/transform.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/componentsignalinstance.h"
@@ -70,10 +71,14 @@ SI_SymbolPin::SI_SymbolPin(SI_Symbol& symbol, const Uuid& pinUuid)
     connect(mComponentSignalInstance,
             &ComponentSignalInstance::netSignalChanged, this,
             &SI_SymbolPin::netSignalChanged);
+    connect(mComponentSignalInstance, &ComponentSignalInstance::padNamesChanged,
+            this, &SI_SymbolPin::updateNumbers);
   }
 
   updateTransform();
-  updateText();
+  updateName();
+  updateNumbers();
+  updateNumbersTransform();
 
   mSymbol.onEdited.attach(mOnSymbolEditedSlot);
 }
@@ -212,18 +217,22 @@ void SI_SymbolPin::netSignalChanged(NetSignal* from, NetSignal* to) noexcept {
     onEdited.notify(Event::JunctionChanged);
   }
 
-  if (mPinSignalMapItem &&
-      (mPinSignalMapItem->getDisplayType() ==
-       CmpSigPinDisplayType::netSignal())) {
-    updateText();
+  if (mPinSignalMapItem) {
+    netSignalNameChanged();
     if (from) {
       disconnect(from, &NetSignal::nameChanged, this,
-                 &SI_SymbolPin::updateText);
+                 &SI_SymbolPin::netSignalNameChanged);
     }
     if (to) {
-      connect(from, &NetSignal::nameChanged, this, &SI_SymbolPin::updateText);
+      connect(from, &NetSignal::nameChanged, this,
+              &SI_SymbolPin::netSignalNameChanged);
     }
   }
+}
+
+void SI_SymbolPin::netSignalNameChanged() noexcept {
+  updateName();
+  onEdited.notify(Event::NetNameChanged);
 }
 
 void SI_SymbolPin::updateTransform() noexcept {
@@ -240,10 +249,11 @@ void SI_SymbolPin::updateTransform() noexcept {
   if (rotation != mRotation) {
     mRotation = rotation;
     onEdited.notify(Event::RotationChanged);
+    updateNumbersTransform();
   }
 }
 
-void SI_SymbolPin::updateText() noexcept {
+void SI_SymbolPin::updateName() noexcept {
   QString text;
   const CmpSigPinDisplayType displayType = mPinSignalMapItem->getDisplayType();
   if (displayType == CmpSigPinDisplayType::pinName()) {
@@ -260,9 +270,46 @@ void SI_SymbolPin::updateText() noexcept {
     Q_ASSERT(displayType == CmpSigPinDisplayType::none());
   }
 
-  if (text != mText) {
-    mText = text;
-    onEdited.notify(Event::TextChanged);
+  if (text != mName) {
+    mName = text;
+    onEdited.notify(Event::NameChanged);
+  }
+}
+
+void SI_SymbolPin::updateNumbers() noexcept {
+  const QStringList numbers = mComponentSignalInstance
+      ? mComponentSignalInstance->getPadNames()
+      : QStringList();
+
+  if (numbers != mNumbers) {
+    mNumbers = numbers;
+    mNumbersTruncated.clear();
+    foreach (QString number, numbers) {
+      if (!mNumbersTruncated.isEmpty()) {
+        number.prepend(",");
+      }
+      if (mNumbersTruncated.length() + number.length() < 8) {
+        mNumbersTruncated += number;
+      } else {
+        mNumbersTruncated += "…";
+        break;
+      }
+    }
+    onEdited.notify(Event::NumbersChanged);
+  }
+}
+
+void SI_SymbolPin::updateNumbersTransform() noexcept {
+  const bool flip = Toolbox::isTextUpsideDown(mRotation, false);
+  const Point position = mSymbolPin->getNumbersPosition(flip);
+  const Alignment alignment = SymbolPin::getNumbersAlignment(flip);
+  if (position != mNumbersPosition) {
+    mNumbersPosition = position;
+    onEdited.notify(Event::NumbersPositionChanged);
+  }
+  if (alignment != mNumbersAlignment) {
+    mNumbersAlignment = alignment;
+    onEdited.notify(Event::NumbersAlignmentChanged);
   }
 }
 

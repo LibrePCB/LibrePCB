@@ -168,7 +168,7 @@ ErcMsgConnectedPinWithoutWire::ErcMsgConnectedPinWithoutWire(
   : RuleCheckMessage(
         Severity::Warning,
         tr("Connected pin without wire: '%1:%2'")
-            .arg(pin.getSymbol().getName(), pin.getText()),
+            .arg(pin.getSymbol().getName(), pin.getName()),
         tr("The pin is electrically connected to a net, but has no wire "
            "attached so this connection is not visible in the schematic. Add a "
            "wire to make the connection visible."),

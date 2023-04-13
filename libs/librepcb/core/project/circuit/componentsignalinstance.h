@@ -70,6 +70,7 @@ public:
   }
   bool isNetSignalNameForced() const noexcept;
   QString getForcedNetSignalName() const noexcept;
+  const QStringList& getPadNames() const noexcept { return mPadNames; }
   const QList<SI_SymbolPin*>& getRegisteredSymbolPins() const noexcept {
     return mRegisteredSymbolPins;
   }
@@ -116,9 +117,12 @@ public:
 
 signals:
   void netSignalChanged(NetSignal* from, NetSignal* to);
+  void padNamesChanged(const QStringList& names);
 
-private:
-  // General
+private:  // Methods
+  void updatePadNames() noexcept;
+
+private:  // Data
   Circuit& mCircuit;
   ComponentInstance& mComponentInstance;
   const ComponentSignal& mComponentSignal;
@@ -126,6 +130,9 @@ private:
 
   // Attributes
   NetSignal* mNetSignal;
+
+  // Cached Properties
+  QStringList mPadNames;
 
   // Registered Elements
   QList<SI_SymbolPin*> mRegisteredSymbolPins;
