@@ -4,7 +4,6 @@ This directory contains some cmake projects to build applications, like
 
 - LibrePCB itself
 - the LibrePCB command line interface
-- a tool to generate random UUIDs (only for developers)
 
 The dependencies between applications and static libraries are shown in the
 [architecture overview diagram](../dev/diagrams/svg/architecture_overview.svg):
