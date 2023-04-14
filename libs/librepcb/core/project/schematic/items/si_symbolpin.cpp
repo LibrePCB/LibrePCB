@@ -224,7 +224,7 @@ void SI_SymbolPin::netSignalChanged(NetSignal* from, NetSignal* to) noexcept {
                  &SI_SymbolPin::netSignalNameChanged);
     }
     if (to) {
-      connect(from, &NetSignal::nameChanged, this,
+      connect(to, &NetSignal::nameChanged, this,
               &SI_SymbolPin::netSignalNameChanged);
     }
   }
