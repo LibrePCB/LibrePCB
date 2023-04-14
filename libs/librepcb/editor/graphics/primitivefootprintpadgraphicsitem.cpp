@@ -241,7 +241,7 @@ void PrimitiveFootprintPadGraphicsItem::updatePathLayers() noexcept {
 
 void PrimitiveFootprintPadGraphicsItem::updateTextHeight() noexcept {
   const qreal size =
-      std::min(mShapesBoundingRect.height(), mShapesBoundingRect.height());
+      std::min(mShapesBoundingRect.width(), mShapesBoundingRect.height());
   const QRectF textRect = mTextGraphicsItem->boundingRect();
   const qreal heightRatio = textRect.height() / size;
   const qreal widthRatio = textRect.width() / size;
