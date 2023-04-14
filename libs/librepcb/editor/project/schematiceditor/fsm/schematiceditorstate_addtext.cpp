@@ -108,7 +108,8 @@ bool SchematicEditorState_AddText::entry() noexcept {
   textComboBox->addItem("{{PROJECT}}");
   textComboBox->addItem("{{AUTHOR}}");
   textComboBox->addItem("{{VERSION}}");
-  textComboBox->addItem("{{MODIFIED_DATE}}");
+  textComboBox->addItem("{{DATE}}");
+  textComboBox->addItem("{{TIME}}");
   textComboBox->setCurrentIndex(
       textComboBox->findText(mLastTextProperties.getText()));
   textComboBox->setCurrentText(mLastTextProperties.getText());

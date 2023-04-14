@@ -97,7 +97,8 @@ bool SymbolEditorState_DrawTextBase::entry() noexcept {
     textComboBox->addItem("{{VALUE}}");
     textComboBox->addItem("{{SHEET}}");
     textComboBox->addItem("{{PROJECT}}");
-    textComboBox->addItem("{{MODIFIED_DATE}}");
+    textComboBox->addItem("{{DATE}}");
+    textComboBox->addItem("{{TIME}}");
     textComboBox->addItem("{{AUTHOR}}");
     textComboBox->addItem("{{VERSION}}");
     textComboBox->addItem("{{PAGE_X_OF_Y}}");

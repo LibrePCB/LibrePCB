@@ -212,8 +212,6 @@ void ProjectSetupDialog::load() noexcept {
   mUi->edtProjectVersion->setText(mProject.getVersion());
   mUi->lblProjectCreated->setText(
       mProject.getCreated().toString(Qt::DefaultLocaleLongDate));
-  mUi->lblProjectLastModified->setText(
-      mProject.getLastModified().toString(Qt::DefaultLocaleLongDate));
 
   // Tab: Locales & Norms
   mUi->lstLocaleOrder->clear();

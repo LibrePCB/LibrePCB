@@ -75,6 +75,9 @@ void FileFormatMigrationV01::upgradeSymbol(TransactionalDirectory& dir) {
     const QString fp = "symbol.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
 
+    // Various strings.
+    upgradeStrings(root);
+
     // Layers.
     upgradeLayers(root);
 
@@ -102,6 +105,9 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
   {
     const QString fp = "package.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+    // Various strings.
+    upgradeStrings(root);
 
     // Layers.
     upgradeLayers(root);
@@ -179,11 +185,33 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
 void FileFormatMigrationV01::upgradeComponent(TransactionalDirectory& dir) {
   // Version File.
   upgradeVersionFile(dir, ".librepcb-cmp");
+
+  // Content File.
+  {
+    const QString fp = "component.lp";
+    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+    // Various strings.
+    upgradeStrings(root);
+
+    dir.write(fp, root.toByteArray());
+  }
 }
 
 void FileFormatMigrationV01::upgradeDevice(TransactionalDirectory& dir) {
   // Version File.
   upgradeVersionFile(dir, ".librepcb-dev");
+
+  // Content File.
+  {
+    const QString fp = "device.lp";
+    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+    // Various strings.
+    upgradeStrings(root);
+
+    dir.write(fp, root.toByteArray());
+  }
 }
 
 void FileFormatMigrationV01::upgradeLibrary(TransactionalDirectory& dir) {
@@ -302,6 +330,8 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
   {
     const QString fp = "circuit/circuit.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    upgradeCircuit(root);
+    dir.write(fp, root.toByteArray());
 
     // Component instances.
     for (SExpression* cmpNode : root.getChildren("component")) {
@@ -421,7 +451,12 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
  ******************************************************************************/
 
 void FileFormatMigrationV01::upgradeSettings(SExpression& root) {
+  upgradeStrings(root);
   root.appendList("custom_bom_attributes");
+}
+
+void FileFormatMigrationV01::upgradeCircuit(SExpression& root) {
+  upgradeStrings(root);
 }
 
 void FileFormatMigrationV01::upgradeErc(SExpression& root,
@@ -475,6 +510,7 @@ void FileFormatMigrationV01::upgradeErc(SExpression& root,
 
 void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
                                               ProjectContext& context) {
+  upgradeStrings(root);
   upgradeGrid(root);
   upgradeLayers(root);
 
@@ -563,6 +599,7 @@ void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
 
 void FileFormatMigrationV01::upgradeBoard(SExpression& root,
                                           ProjectContext& context) {
+  upgradeStrings(root);
   upgradeGrid(root);
   upgradeBoardDesignRules(root);
   upgradeBoardDrcSettings(root);
@@ -722,6 +759,28 @@ void FileFormatMigrationV01::upgradeLayers(SExpression& node) {
   search = SExpression::createList("layer");
   search.appendChild(SExpression::createToken("brd_keepout"));
   node.removeChildrenWithNodeRecursive(search);
+}
+
+void FileFormatMigrationV01::upgradeStrings(SExpression& root) {
+  QMap<QString, QString> replacements = {
+      {"MODIFIED_DATE", "DATE"},
+      {"MODIFIED_TIME", "TIME"},
+  };
+  replaceStrings(root, replacements);
+}
+
+void FileFormatMigrationV01::replaceStrings(
+    SExpression& root, const QMap<QString, QString>& replacements) {
+  foreach (SExpression* child, root.getChildren(SExpression::Type::List)) {
+    replaceStrings(*child, replacements);
+  }
+  foreach (SExpression* child, root.getChildren(SExpression::Type::String)) {
+    QString s = child->getValue();
+    for (auto it = replacements.begin(); it != replacements.end(); it++) {
+      s.replace(it.key(), it.value());
+    }
+    child->setValue(s);
+  }
 }
 
 /*******************************************************************************

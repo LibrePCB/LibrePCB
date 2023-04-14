@@ -77,7 +77,7 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
               project->getCreated().toMSecsSinceEpoch(), 5000);
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
-              project->getLastModified().toMSecsSinceEpoch(), 5000);
+              project->getDateTime().toMSecsSinceEpoch(), 5000);
   EXPECT_EQ(0, project->getSchematics().count());
   EXPECT_EQ(0, project->getBoards().count());
 
@@ -107,7 +107,7 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
               project->getCreated().toMSecsSinceEpoch(), 5000);
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
-              project->getLastModified().toMSecsSinceEpoch(), 5000);
+              project->getDateTime().toMSecsSinceEpoch(), 5000);
   EXPECT_EQ(0, project->getSchematics().count());
   EXPECT_EQ(0, project->getBoards().count());
 }
@@ -140,21 +140,20 @@ TEST_F(ProjectTest, testSave) {
   }
 }
 
-TEST_F(ProjectTest, testIfLastModifiedDateTimeIsUpdatedOnSave) {
+TEST_F(ProjectTest, testIfDateTimeIsUpdatedOnSave) {
   // create new project
   std::unique_ptr<Project> project =
       Project::create(createDir(), mProjectFile.getFilename());
-  qint64 datetimeAfterCreating = project->getLastModified().toMSecsSinceEpoch();
+  qint64 datetimeAfterCreating = project->getDateTime().toMSecsSinceEpoch();
 
   // check if datetime has not changed
   QThread::msleep(1000);
-  EXPECT_EQ(datetimeAfterCreating,
-            project->getLastModified().toMSecsSinceEpoch());
+  EXPECT_EQ(datetimeAfterCreating, project->getDateTime().toMSecsSinceEpoch());
 
   // save project and verify that datetime has changed
   QThread::msleep(1000);
   project->save();
-  qint64 datetimeAfterSaving = project->getLastModified().toMSecsSinceEpoch();
+  qint64 datetimeAfterSaving = project->getDateTime().toMSecsSinceEpoch();
   EXPECT_NEAR(QDateTime::currentMSecsSinceEpoch(), datetimeAfterSaving,
               1000);  // +/- 1s
   EXPECT_NE(datetimeAfterCreating, datetimeAfterSaving);

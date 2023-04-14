@@ -176,6 +176,14 @@ void SExpression::setName(const QString& name) {
   }
 }
 
+void SExpression::setValue(const QString& value) {
+  if ((mType == Type::String) || (mType == Type::Token)) {
+    mValue = value;
+  } else {
+    throw LogicError(__FILE__, __LINE__);
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/

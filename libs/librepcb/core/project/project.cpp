@@ -58,7 +58,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
     mAuthor(),
     mVersion(),
     mCreated(QDateTime::currentDateTime()),
-    mLastModified(QDateTime::currentDateTime()),
+    mDateTime(QDateTime::currentDateTime()),
     mLocaleOrder(),
     mNormOrder(),
     mCustomBomAttributes(),
@@ -145,8 +145,8 @@ void Project::setCreated(const QDateTime& newCreated) noexcept {
   }
 }
 
-void Project::updateLastModified() noexcept {
-  mLastModified = QDateTime::currentDateTime();
+void Project::updateDateTime() noexcept {
+  mDateTime = QDateTime::currentDateTime();
   emit attributesChanged();
 }
 
@@ -473,8 +473,8 @@ void Project::save() {
     mDirectory->write("boards/boards.lp", root.toByteArray());
   }
 
-  // Update the "last modified datetime" attribute of the project.
-  updateLastModified();
+  // Update the datetime attribute of the project.
+  updateDateTime();
 }
 
 /*******************************************************************************
@@ -505,10 +505,10 @@ QString Project::getBuiltInAttributeValue(const QString& key) const noexcept {
     return mCreated.date().toString(Qt::ISODate);
   } else if (key == QLatin1String("CREATED_TIME")) {
     return mCreated.time().toString(Qt::ISODate);
-  } else if (key == QLatin1String("MODIFIED_DATE")) {
-    return mLastModified.date().toString(Qt::ISODate);
-  } else if (key == QLatin1String("MODIFIED_TIME")) {
-    return mLastModified.time().toString(Qt::ISODate);
+  } else if (key == QLatin1String("DATE")) {
+    return mDateTime.date().toString(Qt::ISODate);
+  } else if (key == QLatin1String("TIME")) {
+    return mDateTime.time().toString(Qt::ISODate);
   } else if (key == QLatin1String("AUTHOR")) {
     return mAuthor;
   } else if (key == QLatin1String("VERSION")) {
