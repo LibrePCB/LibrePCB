@@ -583,8 +583,6 @@ add_library(
   project/cmd/cmdschematicedit.h
   project/cmd/cmdschematicnetlabeladd.cpp
   project/cmd/cmdschematicnetlabeladd.h
-  project/cmd/cmdschematicnetlabelanchorsupdate.cpp
-  project/cmd/cmdschematicnetlabelanchorsupdate.h
   project/cmd/cmdschematicnetlabeledit.cpp
   project/cmd/cmdschematicnetlabeledit.h
   project/cmd/cmdschematicnetlabelremove.cpp

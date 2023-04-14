@@ -87,6 +87,16 @@ protected:
   virtual void performRedo() override;
 
   /**
+   * @brief Perform custom actions after modifying the undo stack state
+   *
+   * This gets called after #performExecute(), #performUndo() and
+   * #performRedo() if any state was modified to perform additional tasks.
+   *
+   * @attention Must never throw any exception!
+   */
+  virtual void performPostExecution() noexcept {}
+
+  /**
    * @brief Helper method for derived classes to execute and add new child
    * commands
    *
@@ -96,6 +106,11 @@ protected:
   void execNewChildCmd(UndoCommand* cmd);
 
 private:
+  /**
+   * @brief Memorized return value of #performExecute()
+   */
+  bool mHasDoneSomething;
+
   /**
    * @brief All child commands
    *

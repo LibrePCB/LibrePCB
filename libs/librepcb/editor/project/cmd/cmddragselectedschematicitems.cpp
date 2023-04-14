@@ -24,7 +24,6 @@
 
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdtextedit.h"
-#include "../../project/cmd/cmdschematicnetlabelanchorsupdate.h"
 #include "../../project/cmd/cmdschematicnetlabeledit.h"
 #include "../../project/cmd/cmdschematicnetpointedit.h"
 #include "../../project/cmd/cmdsymbolinstanceedit.h"
@@ -258,13 +257,12 @@ bool CmdDragSelectedSchematicItems::performExecute() {
     appendChild(cmd);  // can throw
   }
 
-  // if something was modified, trigger anchors update of all netlabels
-  if (getChildCount() > 0) {
-    appendChild(new CmdSchematicNetLabelAnchorsUpdate(mScene.getSchematic()));
-  }
-
   // execute all child commands
   return UndoCommandGroup::performExecute();  // can throw
+}
+
+void CmdDragSelectedSchematicItems::performPostExecution() noexcept {
+  mScene.getSchematic().updateAllNetLabelAnchors();
 }
 
 /*******************************************************************************

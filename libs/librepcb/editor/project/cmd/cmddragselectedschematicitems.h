@@ -68,7 +68,10 @@ private:
   // Private Methods
 
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  bool performExecute() override;
+  virtual bool performExecute() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommandGroup::performPostExecution()
+  virtual void performPostExecution() noexcept override;
 
   // Private Member Variables
   SchematicGraphicsScene& mScene;

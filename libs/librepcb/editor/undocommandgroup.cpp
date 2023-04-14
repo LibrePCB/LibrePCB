@@ -38,7 +38,7 @@ namespace editor {
  ******************************************************************************/
 
 UndoCommandGroup::UndoCommandGroup(const QString& text) noexcept
-  : UndoCommand(text) {
+  : UndoCommand(text), mHasDoneSomething(false) {
 }
 
 UndoCommandGroup::~UndoCommandGroup() noexcept {
@@ -80,17 +80,20 @@ bool UndoCommandGroup::appendChild(UndoCommand* cmd) {
  ******************************************************************************/
 
 bool UndoCommandGroup::performExecute() {
-  bool modified = false;
+  mHasDoneSomething = false;
   ScopeGuardList sgl(mChilds.count());
   for (int i = 0; i < mChilds.count(); ++i) {  // from bottom to top
     UndoCommand* cmd = mChilds.at(i);
-    if (cmd->execute()) {
-      modified = true;
+    if (cmd->execute()) {  // can throw
+      mHasDoneSomething = true;
     }
     sgl.add([cmd]() { cmd->undo(); });
   }
   sgl.dismiss();
-  return modified;
+  if (mHasDoneSomething) {
+    performPostExecution();
+  }
+  return mHasDoneSomething;
 }
 
 void UndoCommandGroup::performUndo() {
@@ -101,6 +104,9 @@ void UndoCommandGroup::performUndo() {
     sgl.add([cmd]() { cmd->redo(); });
   }
   sgl.dismiss();
+  if (mHasDoneSomething) {
+    performPostExecution();
+  }
 }
 
 void UndoCommandGroup::performRedo() {
@@ -111,6 +117,9 @@ void UndoCommandGroup::performRedo() {
     sgl.add([cmd]() { cmd->undo(); });
   }
   sgl.dismiss();
+  if (mHasDoneSomething) {
+    performPostExecution();
+  }
 }
 
 /*******************************************************************************
@@ -126,9 +135,10 @@ void UndoCommandGroup::execNewChildCmd(UndoCommand* cmd) {
 
   if (cmdScopeGuard->execute()) {  // can throw
     mChilds.append(cmdScopeGuard.take());
+    mHasDoneSomething = true;
+    performPostExecution();
   } else {
-    cmdScopeGuard
-        ->undo();  // just to be sure the command has executed nothing...
+    cmdScopeGuard->undo();  // Just to be sure the command has executed nothing.
   }
 }
 
