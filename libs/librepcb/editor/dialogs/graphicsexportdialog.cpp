@@ -1026,7 +1026,7 @@ void GraphicsExportDialog::applySettings() noexcept {
 
   // Remove layers to hide.
   QList<std::pair<QString, QColor>> colors = mColors;
-  if (!getShowPinNumbers()) {
+  if ((mMode == Mode::Schematic) && (!getShowPinNumbers())) {
     for (int i = colors.count() - 1; i >= 0; --i) {
       if (colors.at(i).first == Theme::Color::sSchematicPinNumbers) {
         colors.removeAt(i);
@@ -1086,16 +1086,16 @@ void GraphicsExportDialog::applySettings() noexcept {
   } else if ((mMode == Mode::Board) && (mInputPages.count() == 1)) {
     foreach (const ContentItem& item, getPageContent()) {
       if (item.enabled) {
-        QList<std::pair<QString, QColor>> colors;
+        QList<std::pair<QString, QColor>> pageColors;
         foreach (const auto& pair, colors) {
           if (item.colors.contains(pair.first)) {
-            colors.append(pair);
+            pageColors.append(pair);
           }
         }
         std::shared_ptr<GraphicsExportSettings> pageSettings =
             std::make_shared<GraphicsExportSettings>(*settings);
         pageSettings->setMirror(settings->getMirror() ^ item.mirror);
-        pageSettings->setColors(colors);
+        pageSettings->setColors(pageColors);
         mPages.append(std::make_pair(mInputPages.at(0), pageSettings));
       }
     }
