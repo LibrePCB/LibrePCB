@@ -159,20 +159,19 @@ void BoardPlaneFragmentsBuilder::subtractOtherObjects() {
     }
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       if (!pad->isOnLayer(mPlane.getLayer())) continue;
-      const Transform padTransform(pad->getLibPad().getPosition(),
-                                   pad->getLibPad().getRotation());
+      const Transform padTransform(*pad);
       if (pad->getCompSigInstNetSignal() == &mPlane.getNetSignal()) {
         foreach (const PadGeometry& geometry,
                  pad->getGeometries().value(&mPlane.getLayer())) {
           foreach (const Path& outline, geometry.toOutlines()) {
             ClipperLib::Path path = ClipperHelpers::convert(
-                transform.map(padTransform.map(outline)), maxArcTolerance());
+                padTransform.map(outline), maxArcTolerance());
             mConnectedNetSignalAreas.push_back(path);
           }
         }
       }
-      c.AddPaths(createPadCutOuts(transform, padTransform, *pad),
-                 ClipperLib::ptClip, true);
+      c.AddPaths(createPadCutOuts(padTransform, *pad), ClipperLib::ptClip,
+                 true);
     }
   }
 
@@ -260,8 +259,7 @@ void BoardPlaneFragmentsBuilder::removeOrphans() {
  ******************************************************************************/
 
 ClipperLib::Paths BoardPlaneFragmentsBuilder::createPadCutOuts(
-    const Transform& deviceTransform, const Transform& padTransform,
-    const BI_FootprintPad& pad) const {
+    const Transform& transform, const BI_FootprintPad& pad) const {
   ClipperLib::Paths result;
   bool differentNetSignal =
       (pad.getCompSigInstNetSignal() != &mPlane.getNetSignal());
@@ -273,17 +271,16 @@ ClipperLib::Paths BoardPlaneFragmentsBuilder::createPadCutOuts(
              pad.getGeometries().value(&mPlane.getLayer())) {
       foreach (const Path& outline,
                geometry.withOffset(clearance).toOutlines()) {
-        result.push_back(ClipperHelpers::convert(
-            deviceTransform.map(padTransform.map(outline)), maxArcTolerance()));
+        result.push_back(
+            ClipperHelpers::convert(transform.map(outline), maxArcTolerance()));
       }
       // Also create cut-outs for each hole to ensure correct clearance even if
       // the pad outline is too small or invalid.
       for (const PadHole& hole : geometry.getHoles()) {
         const PositiveLength width(hole.getDiameter() + (clearance * 2));
         foreach (const Path& outline, hole.getPath()->toOutlineStrokes(width)) {
-          result.push_back(ClipperHelpers::convert(
-              deviceTransform.map(padTransform.map(outline)),
-              maxArcTolerance()));
+          result.push_back(ClipperHelpers::convert(transform.map(outline),
+                                                   maxArcTolerance()));
         }
       }
     }

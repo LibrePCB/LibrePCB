@@ -60,6 +60,7 @@ BGI_FootprintPad::BGI_FootprintPad(BI_FootprintPad& pad,
 
   setPos(mPad.getPosition().toPxQPointF());
   mGraphicsItem->setRotation(mPad.getRotation());
+  mGraphicsItem->setMirrored(mPad.getMirrored());
   mGraphicsItem->setText(mPad.getText());
   mGraphicsItem->setGeometries(mPad.getGeometries(),
                                *mPad.getLibPad().getCopperClearance());
@@ -106,6 +107,7 @@ void BGI_FootprintPad::padEdited(const BI_FootprintPad& obj,
       mGraphicsItem->setRotation(obj.getRotation());
       break;
     case BI_FootprintPad::Event::MirroredChanged:
+      mGraphicsItem->setMirrored(obj.getMirrored());
       updateLayer();
       break;
     case BI_FootprintPad::Event::TextChanged:

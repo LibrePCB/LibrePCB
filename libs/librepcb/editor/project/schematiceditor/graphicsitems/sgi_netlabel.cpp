@@ -184,7 +184,7 @@ void SGI_NetLabel::updateRotation() noexcept {
 void SGI_NetLabel::updateText() noexcept {
   prepareGeometryChange();
 
-  mRotate180 = Toolbox::isTextUpsideDown(mNetLabel.getRotation(), false);
+  mRotate180 = Toolbox::isTextUpsideDown(mNetLabel.getRotation());
 
   mStaticText.setText(*mNetLabel.getNetSignalOfNetSegment().getName());
   mStaticText.prepare(QTransform(), mFont);

@@ -40,6 +40,7 @@ namespace editor {
 PrimitivePathGraphicsItem::PrimitivePathGraphicsItem(
     QGraphicsItem* parent) noexcept
   : QGraphicsItem(parent),
+    mMirror(false),
     mLineLayer(nullptr),
     mFillLayer(nullptr),
     mShapeMode(ShapeMode::StrokeAndAreaByLayer),
@@ -71,6 +72,11 @@ void PrimitivePathGraphicsItem::setPosition(const Point& pos) noexcept {
 
 void PrimitivePathGraphicsItem::setRotation(const Angle& rot) noexcept {
   QGraphicsItem::setRotation(-rot.toDeg());
+}
+
+void PrimitivePathGraphicsItem::setMirrored(bool mirrored) noexcept {
+  mMirror = mirrored;
+  update();
 }
 
 void PrimitivePathGraphicsItem::setPath(const QPainterPath& path) noexcept {
@@ -135,6 +141,10 @@ void PrimitivePathGraphicsItem::paint(QPainter* painter,
   Q_UNUSED(widget);
 
   const bool isSelected = option->state.testFlag(QStyle::State_Selected);
+
+  if (mMirror) {
+    painter->scale(-1, 1);
+  }
 
   painter->setPen(isSelected ? mPenHighlighted : mPen);
   painter->setBrush(isSelected ? mBrushHighlighted : mBrush);

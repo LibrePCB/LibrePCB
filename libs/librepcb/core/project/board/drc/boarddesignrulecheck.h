@@ -109,8 +109,7 @@ private:  // Methods
   QVector<Path> getDeviceLocation(const BI_Device& device) const;
   template <typename THole>
   QVector<Path> getHoleLocation(const THole& hole,
-                                const Transform& transform1 = Transform(),
-                                const Transform& transform2 = Transform()) const
+                                const Transform& transform = Transform()) const
       noexcept;
   void emitProgress(int percent) noexcept;
   void emitStatus(const QString& status) noexcept;

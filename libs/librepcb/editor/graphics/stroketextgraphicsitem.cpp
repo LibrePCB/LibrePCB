@@ -152,8 +152,8 @@ void StrokeTextGraphicsItem::updateText() noexcept {
 
 void StrokeTextGraphicsItem::updateTransform() noexcept {
   QTransform t;
-  if (mText.getMirrored()) t.scale(qreal(-1), qreal(1));
   t.rotate(-mText.getRotation().toDeg());
+  if (mText.getMirrored()) t.scale(qreal(-1), qreal(1));
   setTransform(t);
 }
 

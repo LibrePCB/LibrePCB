@@ -60,8 +60,7 @@ public:
                              const PositiveLength& height,
                              const UnsignedLength& strokeWidth,
                              const Alignment& align, const Angle& rotation,
-                             bool autoRotate, bool mirror,
-                             const QString& text) noexcept;
+                             bool autoRotate, const QString& text) noexcept;
   static Length calcLetterSpacing(const StrokeFont& font,
                                   const StrokeTextSpacing& spacing,
                                   const PositiveLength& height,

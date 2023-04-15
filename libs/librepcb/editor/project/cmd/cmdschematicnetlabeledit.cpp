@@ -93,12 +93,6 @@ void CmdSchematicNetLabelEdit::rotate(const Angle& angle, const Point& center,
   }
 }
 
-void CmdSchematicNetLabelEdit::mirror(bool immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewMirrored = !mNewMirrored;
-  if (immediate) mNetLabel.setMirrored(mNewMirrored);
-}
-
 void CmdSchematicNetLabelEdit::mirror(Qt::Orientation orientation,
                                       const Point& center,
                                       bool immediate) noexcept {

@@ -51,6 +51,7 @@ PrimitiveFootprintPadGraphicsItem::PrimitiveFootprintPadGraphicsItem(
     QGraphicsItem* parent) noexcept
   : QGraphicsItemGroup(parent),
     mLayerProvider(lp),
+    mMirror(false),
     mCopperLayer(nullptr),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
     mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
@@ -95,6 +96,11 @@ void PrimitiveFootprintPadGraphicsItem::setRotation(
   mOriginCrossGraphicsItem->setRotation(rotation);
   foreach (auto& item, mPathGraphicsItems) { item.item->setRotation(rotation); }
   // Keep the text always at 0° for readability.
+}
+
+void PrimitiveFootprintPadGraphicsItem::setMirrored(bool mirrored) noexcept {
+  mMirror = mirrored;
+  foreach (auto& item, mPathGraphicsItems) { item.item->setMirrored(mirrored); }
 }
 
 void PrimitiveFootprintPadGraphicsItem::setText(const QString& text) noexcept {
@@ -148,6 +154,7 @@ void PrimitiveFootprintPadGraphicsItem::setGeometries(
       }
       auto item = std::make_shared<PrimitivePathGraphicsItem>(this);
       item->setRotation(mOriginCrossGraphicsItem->rotation());
+      item->setMirrored(mMirror);
       item->setPath(shape);
       item->setShapeMode(
           isCopperLayer ? PrimitivePathGraphicsItem::ShapeMode::FilledOutline
@@ -187,7 +194,10 @@ QPainterPath PrimitiveFootprintPadGraphicsItem::shape() const noexcept {
   if (mCopperLayer && mCopperLayer->isVisible()) {
     for (auto it = mShapes.begin(); it != mShapes.end(); it++) {
       if (it.key()->isVisible()) {
-        p |= mOriginCrossGraphicsItem->mapToParent(it.value());
+        QTransform t;
+        t.rotate(mOriginCrossGraphicsItem->rotation());
+        if (mMirror) t.scale(qreal(-1), qreal(1));
+        p |= t.map(it.value());
       }
     }
   }

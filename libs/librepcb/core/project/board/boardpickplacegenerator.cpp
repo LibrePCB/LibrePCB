@@ -84,10 +84,12 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
         if (pad->isOnLayer(Layer::botCopper())) {
           sides.append(PickPlaceDataItem::BoardSide::Bottom);
         }
+        const Angle rotation =
+            pad->getMirrored() ? -pad->getRotation() : pad->getRotation();
         foreach (const auto side, sides) {
-          items.append(PickPlaceDataItem(
-              designator, val, devName, pkgName, pad->getPosition(),
-              pad->getRotation(), side, PickPlaceDataItem::Type::Fiducial));
+          items.append(PickPlaceDataItem(designator, val, devName, pkgName,
+                                         pad->getPosition(), rotation, side,
+                                         PickPlaceDataItem::Type::Fiducial));
         }
       }
     }
@@ -104,7 +106,8 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
     auto typeIt = types.find(device->getLibPackage().getAssemblyType(true));
     if (typeIt != types.end()) {
       const Point position = device->getPosition();
-      const Angle rotation = device->getRotation();
+      const Angle rotation = device->getMirrored() ? -device->getRotation()
+                                                   : device->getRotation();
       const PickPlaceDataItem::BoardSide boardSide = device->getMirrored()
           ? PickPlaceDataItem::BoardSide::Bottom
           : PickPlaceDataItem::BoardSide::Top;

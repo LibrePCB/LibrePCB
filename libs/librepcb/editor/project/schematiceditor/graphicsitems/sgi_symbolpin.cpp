@@ -211,8 +211,8 @@ void SGI_SymbolPin::updateRotation() noexcept {
       transform.map(mPin.getLibPin().getNamePosition().rotated(
           mPin.getLibPin().getRotation())) -
       transform.getPosition();
-  Angle nameRotation = transform.map(mPin.getLibPin().getRotation() +
-                                     mPin.getLibPin().getNameRotation());
+  Angle nameRotation = transform.mapNonMirrorable(
+      mPin.getLibPin().getRotation() + mPin.getLibPin().getNameRotation());
   Alignment nameAlignment = mPin.getLibPin().getNameAlignment();
   if (transform.getMirrored()) {
     nameAlignment.mirrorV();

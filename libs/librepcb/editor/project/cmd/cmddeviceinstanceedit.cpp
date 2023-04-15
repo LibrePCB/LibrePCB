@@ -93,15 +93,8 @@ void CmdDeviceInstanceEdit::setRotation(const Angle& angle,
 
 void CmdDeviceInstanceEdit::rotate(const Angle& angle, const Point& center,
                                    bool immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewPos.rotate(angle, center);
-  mNewRotation += mNewMirrored
-      ? -angle
-      : angle;  // mirror --> rotation direction is inverted!
-  if (immediate) {
-    mDevice.setPosition(mNewPos);
-    mDevice.setRotation(mNewRotation);
-  }
+  setPosition(mNewPos.rotated(angle, center), immediate);
+  setRotation(mNewRotation + angle, immediate);
 }
 
 void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) {
@@ -115,36 +108,12 @@ void CmdDeviceInstanceEdit::setMirrored(bool mirrored, bool immediate) {
 void CmdDeviceInstanceEdit::mirror(const Point& center,
                                    Qt::Orientation orientation,
                                    bool immediate) {
-  Q_ASSERT(!wasEverExecuted());
-  bool mirror = !mNewMirrored;
-  Point position = mNewPos;
-  Angle rotation = mNewRotation;
-  switch (orientation) {
-    case Qt::Vertical: {
-      position.setY(position.getY() +
-                    Length(2) * (center.getY() - position.getY()));
-      rotation += Angle::deg180();
-      break;
-    }
-    case Qt::Horizontal: {
-      position.setX(position.getX() +
-                    Length(2) * (center.getX() - position.getX()));
-      break;
-    }
-    default: {
-      qCritical() << "Unhandled switch-case in CmdDeviceInstanceEdit::mirror():"
-                  << orientation;
-      break;
-    }
-  }
-  if (immediate) {
-    mDevice.setMirrored(mirror);  // can throw
-    mDevice.setPosition(position);
-    mDevice.setRotation(rotation);
-  }
-  mNewMirrored = mirror;
-  mNewPos = position;
-  mNewRotation = rotation;
+  setMirrored(!mNewMirrored, immediate);  // can throw
+  setPosition(mNewPos.mirrored(orientation, center), immediate);
+  setRotation((orientation == Qt::Horizontal)
+                  ? -mNewRotation
+                  : (Angle::deg180() - mNewRotation),
+              immediate);
 }
 
 void CmdDeviceInstanceEdit::setLocked(bool locked) {

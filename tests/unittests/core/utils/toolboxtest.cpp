@@ -42,43 +42,23 @@ class ToolboxTest : public ::testing::Test {};
  ******************************************************************************/
 
 TEST_F(ToolboxTest, testIsTextUpsideDown) {
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-360000000), false));  // 0°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-315000000), false));  // 45°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-270000000), false));  // 90°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-225000000), false));  // 135°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-180000000), false));  // 180°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-135000000), false));  // 225°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-90000000), false));  // 270°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-45000000), false));  // 315°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(0), false));  // 0°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(45000000), false));  // 45°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(90000000), false));  // 90°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(135000000), false));  // 135°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(180000000), false));  // 180°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(225000000), false));  // 225°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(270000000), false));  // 270°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(315000000), false));  // 315°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(360000000), false));  // 0°
-}
-
-TEST_F(ToolboxTest, testIsTextUpsideDownMirrored) {
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-360000000), true));  // 0°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-315000000), true));  // 45°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-270000000), true));  // 90°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-225000000), true));  // 135°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-180000000), true));  // 180°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-135000000), true));  // 225°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-90000000), true));  // 270°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-45000000), true));  // 315°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(0), true));  // 0°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(45000000), true));  // 45°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(90000000), true));  // 90°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(135000000), true));  // 135°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(180000000), true));  // 180°
-  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(225000000), true));  // 225°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(270000000), true));  // 270°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(315000000), true));  // 315°
-  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(360000000), true));  // 0°
+  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-360000000)));  // 0°
+  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-315000000)));  // 45°
+  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-270000000)));  // 90°
+  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-225000000)));  // 135°
+  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-180000000)));  // 180°
+  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-135000000)));  // 225°
+  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(-90000000)));  // 270°
+  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(-45000000)));  // 315°
+  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(0)));  // 0°
+  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(45000000)));  // 45°
+  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(90000000)));  // 90°
+  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(135000000)));  // 135°
+  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(180000000)));  // 180°
+  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(225000000)));  // 225°
+  EXPECT_TRUE(Toolbox::isTextUpsideDown(Angle(270000000)));  // 270°
+  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(315000000)));  // 315°
+  EXPECT_FALSE(Toolbox::isTextUpsideDown(Angle(360000000)));  // 0°
 }
 
 /*******************************************************************************

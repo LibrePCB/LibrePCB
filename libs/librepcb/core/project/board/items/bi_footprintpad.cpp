@@ -255,7 +255,7 @@ void BI_FootprintPad::netSignalChanged(NetSignal* from, NetSignal* to) {
 void BI_FootprintPad::updateTransform() noexcept {
   Transform transform(mDevice);
   const Point position = transform.map(mFootprintPad->getPosition());
-  const Angle rotation = transform.map(mFootprintPad->getRotation());
+  const Angle rotation = transform.mapMirrorable(mFootprintPad->getRotation());
   const bool mirrored = mDevice.getMirrored();
   if (position != mPosition) {
     mPosition = position;

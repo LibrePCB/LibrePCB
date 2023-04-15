@@ -235,8 +235,7 @@ void BI_StrokeText::updatePaths() noexcept {
   const QVector<Path> paths = StrokeTextPathBuilder::build(
       mFont, mData.getLetterSpacing(), mData.getLineSpacing(),
       mData.getHeight(), mData.getStrokeWidth(), mData.getAlign(),
-      mData.getRotation(), mData.getAutoRotate(), mData.getMirrored(),
-      mSubstitutedText);
+      mData.getRotation(), mData.getAutoRotate(), mSubstitutedText);
   if (paths != mPaths) {
     mPaths = paths;
     onEdited.notify(Event::PathsChanged);

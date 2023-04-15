@@ -166,21 +166,21 @@ void SchematicPainter::paint(QPainter& painter,
 
     // Draw Symbol Pins.
     foreach (const Pin& pin, symbol.pins) {
-      p.drawSymbolPin(symbol.transform.map(pin.position),
-                      symbol.transform.map(pin.rotation), *pin.length,
-                      settings.getColor(Theme::Color::sSchematicPinLines),
-                      QColor());
+      p.drawSymbolPin(
+          symbol.transform.map(pin.position),
+          symbol.transform.mapNonMirrorable(pin.rotation), *pin.length,
+          settings.getColor(Theme::Color::sSchematicPinLines), QColor());
       Alignment nameAlignment = pin.nameAlignment;
       if (symbol.transform.getMirrored()) {
         nameAlignment.mirrorV();
       }
-      p.drawText(symbol.transform.map(pin.position +
-                                      pin.namePosition.rotated(pin.rotation)),
-                 symbol.transform.map(pin.rotation + pin.nameRotation),
-                 *pin.nameHeight, nameAlignment, pin.name, mDefaultFont,
-                 settings.getColor(Theme::Color::sSchematicPinNames), true,
-                 false);
-      const Angle numberRot = symbol.transform.map(pin.rotation);
+      p.drawText(
+          symbol.transform.map(pin.position +
+                               pin.namePosition.rotated(pin.rotation)),
+          symbol.transform.mapNonMirrorable(pin.rotation + pin.nameRotation),
+          *pin.nameHeight, nameAlignment, pin.name, mDefaultFont,
+          settings.getColor(Theme::Color::sSchematicPinNames), true, false);
+      const Angle numberRot = symbol.transform.mapNonMirrorable(pin.rotation);
       p.drawText(symbol.transform.map(
                      pin.position + pin.numbersPosition.rotated(pin.rotation)),
                  numberRot, *SymbolPin::getNumbersHeight(),

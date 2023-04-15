@@ -136,7 +136,7 @@ void BoardClipperPathGenerator::addCopper(
       if (pad->isOnLayer(layer) &&
           (netsignals.isEmpty() ||
            netsignals.contains(pad->getCompSigInstNetSignal()))) {
-        addPad(*pad, transform, layer);
+        addPad(*pad, layer);
       }
     }
   }
@@ -254,11 +254,9 @@ void BoardClipperPathGenerator::addHole(const PositiveLength& diameter,
 }
 
 void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,
-                                       const Transform& transform,
                                        const Layer& layer,
                                        const Length& offset) {
-  const Transform padTransform(pad.getLibPad().getPosition(),
-                               pad.getLibPad().getRotation());
+  const Transform transform(pad);
   foreach (PadGeometry geometry, pad.getGeometries().value(&layer)) {
     if (offset != 0) {
       geometry = geometry.withOffset(offset);
@@ -266,8 +264,7 @@ void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,
     foreach (const Path& outline, geometry.toOutlines()) {
       ClipperHelpers::unite(
           mPaths,
-          ClipperHelpers::convert(transform.map(padTransform.map(outline)),
-                                  mMaxArcTolerance));
+          ClipperHelpers::convert(transform.map(outline), mMaxArcTolerance));
     }
 
     // Also add each hole to ensure correct copper areas even if
@@ -277,8 +274,7 @@ void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,
                hole.getPath()->toOutlineStrokes(hole.getDiameter())) {
         ClipperHelpers::unite(
             mPaths,
-            ClipperHelpers::convert(transform.map(padTransform.map(outline)),
-                                    mMaxArcTolerance));
+            ClipperHelpers::convert(transform.map(outline), mMaxArcTolerance));
       }
     }
   }

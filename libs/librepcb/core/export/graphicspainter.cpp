@@ -123,8 +123,7 @@ void GraphicsPainter::drawText(const Point& position, const Angle& rotation,
     return;  // Nothing to draw.
   }
 
-  const bool rotate180 =
-      autoRotate && Toolbox::isTextUpsideDown(rotation, false);
+  const bool rotate180 = autoRotate && Toolbox::isTextUpsideDown(rotation);
   Alignment align = rotate180 ? alignment.mirrored() : alignment;
   if (mirrorInPlace) {
     align.mirrorH();
@@ -204,7 +203,7 @@ void GraphicsPainter::drawNetLabel(const Point& position, const Angle& rotation,
 
   const Alignment align(mirror ? HAlign::right() : HAlign::left(),
                         VAlign::bottom());
-  const bool rotate180 = Toolbox::isTextUpsideDown(rotation, false);
+  const bool rotate180 = Toolbox::isTextUpsideDown(rotation);
   const int flags =
       rotate180 ? align.mirrored().toQtAlign() : align.toQtAlign();
   const QFontMetricsF metrics(font);

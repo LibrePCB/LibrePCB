@@ -143,9 +143,7 @@ void CmdBoardStrokeTextEdit::rotate(const Angle& angle, const Point& center,
                                     bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   setPosition(mNewData.getPosition().rotated(angle, center), immediate);
-  setRotation(
-      mNewData.getRotation() + (mNewData.getMirrored() ? -angle : angle),
-      immediate);
+  setRotation(mNewData.getRotation() + angle, immediate);
 }
 
 void CmdBoardStrokeTextEdit::setMirrored(bool mirrored,
@@ -159,11 +157,24 @@ void CmdBoardStrokeTextEdit::setMirrored(bool mirrored,
 void CmdBoardStrokeTextEdit::mirrorGeometry(Qt::Orientation orientation,
                                             const Point& center,
                                             bool immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
   setPosition(mNewData.getPosition().mirrored(orientation, center), immediate);
-  setRotation((orientation == Qt::Horizontal)
-                  ? (Angle::deg180() - mNewData.getRotation())
-                  : (-mNewData.getRotation()),
+  if (orientation == Qt::Vertical) {
+    setRotation(Angle::deg180() - mNewData.getRotation(), immediate);
+  } else {
+    setRotation(-mNewData.getRotation(), immediate);
+  }
+  setAlignment(mNewData.getAlign().mirroredH(), immediate);
+}
+
+void CmdBoardStrokeTextEdit::mirrorGeometry(const Angle& rotation,
+                                            const Point& center,
+                                            bool immediate) noexcept {
+  setPosition(mNewData.getPosition()
+                  .rotated(-rotation, center)
+                  .mirrored(Qt::Horizontal, center)
+                  .rotated(rotation, center),
+              immediate);
+  setRotation(rotation + Angle::deg180() - mNewData.getRotation() + rotation,
               immediate);
   setAlignment(mNewData.getAlign().mirroredV(), immediate);
 }
@@ -171,11 +182,7 @@ void CmdBoardStrokeTextEdit::mirrorGeometry(Qt::Orientation orientation,
 void CmdBoardStrokeTextEdit::mirrorLayer(bool immediate) noexcept {
   setLayer(mNewData.getLayer().mirrored(), immediate);
   setMirrored(!mNewData.getMirrored(), immediate);
-
-  // Changing the mirror property inverts the rotation and alignment. To keep
-  // rotation and alignment, invert them manually too.
-  setRotation(Angle::deg180() - mNewData.getRotation(), immediate);
-  setAlignment(mNewData.getAlign().mirroredV(), immediate);
+  setAlignment(mNewData.getAlign().mirroredH(), immediate);
 }
 
 void CmdBoardStrokeTextEdit::setAutoRotate(bool autoRotate,

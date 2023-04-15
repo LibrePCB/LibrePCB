@@ -159,11 +159,9 @@ TextList SI_Symbol::getDefaultTexts() const noexcept {
   Transform transform(*this);
   for (Text& text : texts) {
     text.setPosition(transform.map(text.getPosition()));
+    text.setRotation(transform.mapNonMirrorable(text.getRotation()));
     if (transform.getMirrored()) {
-      text.setRotation(Angle::deg180() - text.getRotation() - getRotation());
       text.setAlign(text.getAlign().mirroredV());
-    } else {
-      text.setRotation(text.getRotation() + getRotation());
     }
   }
   return texts;

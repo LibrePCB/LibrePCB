@@ -70,8 +70,7 @@ private:  // Methods
   void removeOrphans();
 
   // Helper Methods
-  ClipperLib::Paths createPadCutOuts(const Transform& deviceTransform,
-                                     const Transform& padTransform,
+  ClipperLib::Paths createPadCutOuts(const Transform& transform,
                                      const BI_FootprintPad& pad) const;
   ClipperLib::Path createViaCutOut(const BI_Via& via) const noexcept;
 

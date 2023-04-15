@@ -41,14 +41,13 @@ QVector<Path> StrokeTextPathBuilder::build(
     const StrokeFont& font, const StrokeTextSpacing& letterSpacing,
     const StrokeTextSpacing& lineSpacing, const PositiveLength& height,
     const UnsignedLength& strokeWidth, const Alignment& align,
-    const Angle& rotation, bool autoRotate, bool mirror,
-    const QString& text) noexcept {
+    const Angle& rotation, bool autoRotate, const QString& text) noexcept {
   Point bottomLeft, topRight;
   QVector<Path> paths = font.stroke(
       text, height, calcLetterSpacing(font, letterSpacing, height, strokeWidth),
       calcLineSpacing(font, lineSpacing, height, strokeWidth), align,
       bottomLeft, topRight);
-  if (autoRotate && Toolbox::isTextUpsideDown(rotation, mirror)) {
+  if (autoRotate && Toolbox::isTextUpsideDown(rotation)) {
     const Point center = (bottomLeft + topRight) / 2;
     for (Path& p : paths) {
       p.rotate(Angle::deg180(), center);

@@ -174,6 +174,14 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
         padNode->appendChild("clearance", SExpression::createToken("0.0"));
       }
 
+      // Stroke texts.
+      for (SExpression* txtNode : fptNode->getChildren("stroke_text")) {
+        if (deserialize<bool>(txtNode->getChild("mirror/@0"))) {
+          SExpression& rotNode = txtNode->getChild("rotation/@0");
+          rotNode = serialize(-deserialize<Angle>(rotNode));
+        }
+      }
+
       // Holes.
       upgradeHoles(*fptNode, false);
     }
@@ -586,6 +594,12 @@ void FileFormatMigrationV01::upgradeSchematic(SExpression& root,
       position.serialize(textNode.appendList("position"));
       textNode.appendChild("rotation", rotation);
     }
+
+    // Swap transformation order of mirror/rotate.
+    if (symMirror) {
+      SExpression& rotNode = symNode->getChild("rotation/@0");
+      rotNode = serialize(-deserialize<Angle>(rotNode));
+    }
   }
 
   // Net segments.
@@ -614,8 +628,16 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
 
   // Devices.
   for (SExpression* devNode : root.getChildren("device")) {
+    if (deserialize<bool>(devNode->getChild("mirror/@0"))) {
+      SExpression& rotNode = devNode->getChild("rotation/@0");
+      rotNode = serialize(-deserialize<Angle>(rotNode));
+    }
     devNode->appendChild("lock", SExpression::createToken("false"));
     for (SExpression* txtNode : devNode->getChildren("stroke_text")) {
+      if (deserialize<bool>(txtNode->getChild("mirror/@0"))) {
+        SExpression& rotNode = txtNode->getChild("rotation/@0");
+        rotNode = serialize(-deserialize<Angle>(rotNode));
+      }
       txtNode->appendChild("lock", SExpression::createToken("false"));
     }
   }
@@ -639,6 +661,10 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
 
   // Stroke texts.
   for (SExpression* txtNode : root.getChildren("stroke_text")) {
+    if (deserialize<bool>(txtNode->getChild("mirror/@0"))) {
+      SExpression& rotNode = txtNode->getChild("rotation/@0");
+      rotNode = serialize(-deserialize<Angle>(rotNode));
+    }
     txtNode->appendChild("lock", SExpression::createToken("false"));
   }
 

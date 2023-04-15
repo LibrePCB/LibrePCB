@@ -358,9 +358,9 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                       *padClearance,
                                       {},
                                       {}});
-          gen.addPad(*pad, transform, *layer);
+          gen.addPad(*pad, *layer);
           gen.takePathsTo(it->copperArea);
-          gen.addPad(*pad, transform, *layer, padClearance - tolerance);
+          gen.addPad(*pad, *layer, padClearance - tolerance);
           gen.takePathsTo(it->clearanceArea);
         }
       }
@@ -554,7 +554,7 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
       foreach (const Layer* layer, mBoard.getCopperLayers()) {
         if (pad->isOnLayer(*layer)) {
           BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
-          gen.addPad(*pad, transform, *layer);
+          gen.addPad(*pad, *layer);
           if (intersects(gen.getPaths())) {
             emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
                 *pad, clearance, locations));
@@ -708,11 +708,9 @@ void BoardDesignRuleCheck::checkDrillDrillClearances(int progressEnd) {
 
     // Footprint pads.
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      const Transform padTransform(pad->getLibPad().getPosition(),
-                                   pad->getLibPad().getRotation());
+      const Transform padTransform(*pad);
       for (const PadHole& hole : pad->getLibPad().getHoles()) {
-        addItem(*pad, hole.getUuid(),
-                transform.map(padTransform.map(hole.getPath())),
+        addItem(*pad, hole.getUuid(), padTransform.map(hole.getPath()),
                 hole.getDiameter());
       }
     }
@@ -796,11 +794,9 @@ void BoardDesignRuleCheck::checkDrillBoardClearances(int progressEnd) {
 
     // Check footprint pads.
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      const Transform padTransform(pad->getLibPad().getPosition(),
-                                   pad->getLibPad().getRotation());
+      const Transform padTransform(*pad);
       for (const PadHole& hole : pad->getLibPad().getHoles()) {
-        if (intersects(transform.map(padTransform.map(hole.getPath())),
-                       hole.getDiameter())) {
+        if (intersects(padTransform.map(hole.getPath()), hole.getDiameter())) {
           emitMessage(std::make_shared<DrcMsgDrillBoardClearanceViolation>(
               *pad, hole, clearance, locations));
         }
@@ -1007,15 +1003,12 @@ void BoardDesignRuleCheck::checkMinimumPthSlotWidth(int progressEnd) {
 
   // Pads.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    Transform devTransform(*device);
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      Transform padTransform(pad->getLibPad().getPosition(),
-                             pad->getLibPad().getRotation());
+      const Transform transform(*pad);
       for (const PadHole& hole : pad->getLibPad().getHoles()) {
         if ((hole.isSlot()) && (hole.getDiameter() < *minWidth)) {
           emitMessage(std::make_shared<DrcMsgMinimumSlotWidthViolation>(
-              *pad, hole, minWidth,
-              getHoleLocation(hole, padTransform, devTransform)));
+              *pad, hole, minWidth, getHoleLocation(hole, transform)));
         }
       }
     }
@@ -1066,14 +1059,12 @@ void BoardDesignRuleCheck::checkAllowedPthSlots(int progressEnd) {
 
   // Pads.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    Transform devTransform(*device);
     foreach (const BI_FootprintPad* pad, device->getPads()) {
-      Transform padTransform(pad->getLibPad().getPosition(),
-                             pad->getLibPad().getRotation());
+      const Transform transform(*pad);
       for (const PadHole& hole : pad->getLibPad().getHoles()) {
         if (requiresHoleSlotWarning(hole, allowed)) {
           emitMessage(std::make_shared<DrcMsgForbiddenSlot>(
-              *pad, hole, getHoleLocation(hole, padTransform, devTransform)));
+              *pad, hole, getHoleLocation(hole, transform)));
         }
       }
     }
@@ -1439,10 +1430,8 @@ QVector<Path> BoardDesignRuleCheck::getDeviceLocation(
 
 template <typename THole>
 QVector<Path> BoardDesignRuleCheck::getHoleLocation(
-    const THole& hole, const Transform& transform1,
-    const Transform& transform2) const noexcept {
-  return transform2.map(
-      transform1.map(hole.getPath())->toOutlineStrokes(hole.getDiameter()));
+    const THole& hole, const Transform& transform) const noexcept {
+  return transform.map(hole.getPath())->toOutlineStrokes(hole.getDiameter());
 }
 
 void BoardDesignRuleCheck::emitProgress(int percent) noexcept {

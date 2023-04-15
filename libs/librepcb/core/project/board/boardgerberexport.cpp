@@ -166,8 +166,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
       }
 
       // Export component center and attributes.
-      Angle rotation = device->getMirrored() ? -device->getRotation()
-                                             : device->getRotation();
+      Angle rotation = device->getRotation();
       QString designator = *device->getComponentInstance().getName();
       QString value = device->getComponentInstance().getValue(true).trimmed();
       QString manufacturer =
@@ -243,8 +242,6 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
     int padNumber = 1;
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       if (pad->getLibPad().getFunctionIsFiducial() && pad->isOnLayer(cuLayer)) {
-        const Angle rotation =
-            device->getMirrored() ? -pad->getRotation() : pad->getRotation();
         const QString designator =
             QString("%1:%2")
                 .arg(*device->getComponentInstance().getName())
@@ -253,9 +250,9 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
             device->getComponentInstance().getValue(true).trimmed();
         const QString footprintName =
             *device->getLibPackage().getNames().getDefaultValue();
-        gen.flashComponent(pad->getPosition(), rotation, designator, value,
-                           GerberGenerator::MountType::Fiducial, QString(),
-                           QString(), footprintName);
+        gen.flashComponent(pad->getPosition(), pad->getRotation(), designator,
+                           value, GerberGenerator::MountType::Fiducial,
+                           QString(), QString(), footprintName);
         ++padNumber;
       }
     }
@@ -522,17 +519,15 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
 
   // footprint pads
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    const Transform deviceTransform(*device);
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       const FootprintPad& libPad = pad->getLibPad();
-      const Transform padTransform(libPad.getPosition(), libPad.getRotation());
+      const Transform transform(*pad);
       const ExcellonGenerator::Function function =
           (libPad.getFunction() == FootprintPad::Function::PressFitPad)
           ? ExcellonGenerator::Function::ComponentDrillPressFit
           : ExcellonGenerator::Function::ComponentDrill;
       for (const PadHole& hole : libPad.getHoles()) {
-        gen.drill(deviceTransform.map(padTransform.map(hole.getPath())),
-                  hole.getDiameter(), true,
+        gen.drill(transform.map(hole.getPath()), hole.getDiameter(), true,
                   function);  // can throw
         ++count;
       }
@@ -824,16 +819,14 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
     }
 
     // Helper to flash a custom outline by flattening all arcs.
-    const Transform padTransform(pad.getLibPad().getPosition(),
-                                 pad.getLibPad().getRotation());
-    const Transform devTransform(pad.getDevice());
     auto flashPadOutline = [&]() {
       foreach (Path outline, geometry.toOutlines()) {
         outline.flattenArcs(PositiveLength(5000));
-        outline = devTransform.map(padTransform.map(outline))
-                      .translated(-pad.getPosition());
+        if (pad.getMirrored()) {
+          outline.mirror(Qt::Horizontal);
+        }
         gen.flashOutline(pad.getPosition(), StraightAreaPath(outline),
-                         Angle::deg0(), function, net, component, pin,
+                         pad.getRotation(), function, net, component, pin,
                          signal);  // can throw
       }
     };
@@ -862,8 +855,8 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
       }
       case PadGeometry::Shape::Stroke: {
         if ((width > 0) && (!geometry.getPath().getVertices().isEmpty())) {
-          const Path path =
-              devTransform.map(padTransform.map(geometry.getPath()));
+          const Transform transform(pad);
+          const Path path = transform.map(geometry.getPath());
           if (path.getVertices().count() == 1) {
             // For maximum compatibility, convert the stroke to a circle.
             gen.flashCircle(path.getVertices().first().getPos(),
