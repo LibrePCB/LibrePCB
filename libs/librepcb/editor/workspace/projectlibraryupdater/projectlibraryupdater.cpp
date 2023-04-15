@@ -26,7 +26,9 @@
 #include "../controlpanel/controlpanel.h"
 #include "ui_projectlibraryupdater.h"
 
+#include <librepcb/core/application.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
+#include <librepcb/core/fileio/versionfile.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/footprint.h>
@@ -100,6 +102,22 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
           TransactionalFileSystem::openRW(
               mProjectFilePath.getParentDir(),
               &TransactionalFileSystem::RestoreMode::abort);
+
+      // Abort if the file format is outdated because it would lead to errors
+      // when library elements with a higher file format version get copied
+      // into the project. The user shall first perform a file format upgrade
+      // and review the changes before upgrading the project library.
+      const Version fileFormat =
+          VersionFile::fromByteArray(fs->read(".librepcb-project"))
+              .getVersion();
+      if (fileFormat < Application::getFileFormatVersion()) {
+        throw RuntimeError(
+            __FILE__, __LINE__,
+            tr("The project uses an outdated file format.\nPlease upgrade it "
+               "to the latest file format first, review the upgrade messages "
+               "and then save the project.\nAfterwards the project library can "
+               "be updated."));
+      }
 
       // update all elements
       updateElements<Component>(fs, "cmp");
