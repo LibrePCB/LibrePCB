@@ -69,9 +69,9 @@ void CmdPackageModelEdit::setStepContent(const QByteArray& content) noexcept {
  ******************************************************************************/
 
 bool CmdPackageModelEdit::performExecute() {
-  if ((!mNewStepContent.isNull()) &&
-      (mPackage.getDirectory().fileExists(mModel.getFileName()))) {
-    mOldStepContent = mPackage.getDirectory().read(mModel.getFileName());
+  if (!mNewStepContent.isNull()) {
+    mOldStepContent =
+        mPackage.getDirectory().readIfExists(mModel.getFileName());
   }
 
   performRedo();  // can throw

@@ -38,6 +38,9 @@ namespace librepcb {
 
 /**
  * @brief Base class / interface for all file system implementations
+ *
+ * @see ::librepcb::TransactionalFileSystem
+ * @see ::librepcb::TransactionalDirectory
  */
 class FileSystem : public QObject {
   Q_OBJECT
@@ -53,6 +56,7 @@ public:
   virtual QStringList getFiles(const QString& path = "") const noexcept = 0;
   virtual bool fileExists(const QString& path) const noexcept = 0;
   virtual QByteArray read(const QString& path) const = 0;
+  virtual QByteArray readIfExists(const QString& path) const = 0;
   virtual void write(const QString& path, const QByteArray& content) = 0;
   virtual void removeFile(const QString& path) = 0;
   virtual void removeDirRecursively(const QString& path = "") = 0;

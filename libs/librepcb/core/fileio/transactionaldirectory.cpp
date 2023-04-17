@@ -99,6 +99,10 @@ QByteArray TransactionalDirectory::read(const QString& path) const {
   return mFileSystem->read(mPath % "/" % path);
 }
 
+QByteArray TransactionalDirectory::readIfExists(const QString& path) const {
+  return mFileSystem->readIfExists(mPath % "/" % path);
+}
+
 void TransactionalDirectory::write(const QString& path,
                                    const QByteArray& content) {
   mFileSystem->write(mPath % "/" % path, content);

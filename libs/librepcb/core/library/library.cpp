@@ -70,9 +70,7 @@ Library::Library(std::unique_ptr<TransactionalDirectory> directory,
   }
 
   // Load image if available.
-  if (mDirectory->fileExists("library.png")) {
-    mIcon = mDirectory->read("library.png");  // can throw
-  }
+  mIcon = mDirectory->readIfExists("library.png");  // can throw
 
   // Check directory suffix.
   if (mDirectory->getAbsPath().getSuffix() != "lplib") {
@@ -119,7 +117,7 @@ void Library::save() {
   LibraryBaseElement::save();  // can throw
 
   // Save icon.
-  if (mIcon.isEmpty() && mDirectory->fileExists("library.png")) {
+  if (mIcon.isEmpty()) {
     mDirectory->removeFile("library.png");  // can throw
   } else if (!mIcon.isEmpty()) {
     mDirectory->write("library.png", mIcon);  // can throw

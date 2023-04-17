@@ -224,9 +224,10 @@ void NewElementWizardContext::copyElement(ElementType type,
                                                        model.getName());
         modelsUuidMap.insert(model.getUuid(), newModel->getUuid());
         mPackageModels.append(newModel);
-        if (package->getDirectory().fileExists(model.getFileName())) {
-          mFiles.insert(newModel->getFileName(),
-                        package->getDirectory().read(model.getFileName()));
+        const QByteArray fileContent =
+            package->getDirectory().readIfExists(model.getFileName());
+        if (!fileContent.isNull()) {
+          mFiles.insert(newModel->getFileName(), fileContent);
         }
       }
       // copy footprints but generate new UUIDs

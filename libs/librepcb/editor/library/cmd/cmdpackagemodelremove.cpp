@@ -54,9 +54,7 @@ CmdPackageModelRemove::~CmdPackageModelRemove() noexcept {
  ******************************************************************************/
 
 bool CmdPackageModelRemove::performExecute() {
-  if (mPackage.getDirectory().fileExists(mModel->getFileName())) {
-    mFileContent = mPackage.getDirectory().read(mModel->getFileName());
-  }
+  mFileContent = mPackage.getDirectory().readIfExists(mModel->getFileName());
 
   mIndex = mPackage.getModels().indexOf(mModel.get());
   if (mIndex < 0) throw LogicError(__FILE__, __LINE__, "Element not in list.");
