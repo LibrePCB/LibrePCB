@@ -194,8 +194,8 @@ void BGI_Device::updatePosition() noexcept {
 
 void BGI_Device::updateRotationAndMirrored() noexcept {
   QTransform t;
-  if (mDevice.getMirrored()) t.scale(qreal(-1), qreal(1));
   t.rotate(-mDevice.getRotation().toDeg());
+  if (mDevice.getMirrored()) t.scale(qreal(-1), qreal(1));
   setTransform(t);
 }
 

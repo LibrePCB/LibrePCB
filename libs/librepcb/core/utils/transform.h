@@ -51,7 +51,7 @@ class Layer;
  *     and translate. The order of the transformation is not configurable, it
  *     is hardcoded to the order of transformations applied to symbols within
  *     a schematic, and to footprints within a board. This order is:
- *     rotate CCW -> mirror horizontally (negating X-coordinate) -> translate.
+ *     mirror horizontally (negating X-coordinate) -> rotate CCW -> translate.
  *
  * Long story short, this class converts symbol- or footprint coordinates
  * into schematic- resp. board coordinates.
@@ -124,19 +124,34 @@ public:
   /**
    * @brief Map a given angle to the transformed coordinate system
    *
+   * @note Intended for mirrorable objects (e.g. footprint pads), which expects
+   *       the mapped object to mirror its geometry.
+   *
    * @param angle The angle to map.
-   * @return The passed angle, rotated by the transformations rotation, and
-   *         mirrored horizontally if the transformation is mirroring.
+   * @return The passed angle, mirrored horizontally if the transformation is
+   *         mirroring and rotated by the transformations rotation.
    */
-  Angle map(const Angle& angle) const noexcept;
+  Angle mapMirrorable(const Angle& angle) const noexcept;
+
+  /**
+   * @brief Map a given angle to the transformed coordinate system
+   *
+   * @note Intended for non-mirrorable objects (e.g. symbol pins), which will
+   *       cause the mirroring to be "emulated" by a 180° rotation.
+   *
+   * @param angle The angle to map.
+   * @return The passed angle, mirrored horizontally if the transformation is
+   *         mirroring and rotated by the transformations rotation.
+   */
+  Angle mapNonMirrorable(const Angle& angle) const noexcept;
 
   /**
    * @brief Map a given point to the transformed coordinate system
    *
    * @param point The point to map.
-   * @return The passed point, rotated by the transformations rotation,
-   *         mirrored horizontally if the transformation is mirroring, and
-   *         translated by the transformation offset.
+   * @return The passed point, mirrored horizontally if the transformation is
+   *         mirroring, rotated by the transformations rotation, and translated
+   *         by the transformation offset.
    */
   Point map(const Point& point) const noexcept;
 
@@ -144,9 +159,9 @@ public:
    * @brief Map a given path to the transformed coordinate system
    *
    * @param path  The path to map.
-   * @return The passed path, rotated by the transformations rotation,
-   *         mirrored horizontally if the transformation is mirroring, and
-   *         translated by the transformation offset.
+   * @return The passed path, mirrored horizontally if the transformation is
+   *         mirroring, rotated by the transformations rotation, and translated
+   *         by the transformation offset.
    */
   Path map(const Path& path) const noexcept;
 
@@ -154,9 +169,9 @@ public:
    * @brief Map a given path to the transformed coordinate system
    *
    * @param path  The path to map.
-   * @return The passed path, rotated by the transformations rotation,
-   *         mirrored horizontally if the transformation is mirroring, and
-   *         translated by the transformation offset.
+   * @return The passed path, mirrored horizontally if the transformation is
+   *         mirroring, rotated by the transformations rotation, and translated
+   *         by the transformation offset.
    */
   NonEmptyPath map(const NonEmptyPath& path) const noexcept;
 
@@ -174,9 +189,9 @@ public:
    *
    * @tparam Container type.
    * @param container The items to map.
-   * @return The passed items, rotated by the transformations rotation,
-   *         mirrored horizontally if the transformation is mirroring, and
-   *         translated by the transformation offset.
+   * @return The passed items, mirrored horizontally if the transformation is
+   *         mirroring, rotated by the transformations rotation, and translated
+   *         by the transformation offset.
    */
   template <typename T>
   T map(const T& container) const noexcept {
@@ -192,18 +207,18 @@ public:
    *
    * @param obj The Qt object (in pixel coordinates) to map, e.g. QPoint,
    *            QPainterPath, ...).
-   * @return The passed object, rotated by the transformations rotation,
-   *         mirrored horizontally if the transformation is mirroring, and
-   *         translated by the transformation offset.
+   * @return The passed object, mirrored horizontally if the transformation is
+   *         mirroring, rotated by the transformations rotation, and translated
+   *         by the transformation offset.
    */
   template <typename T>
   T mapPx(const T& obj) const noexcept {
     QTransform t;
     t.translate(mPosition.toPxQPointF().x(), mPosition.toPxQPointF().y());
+    t.rotate(-mRotation.toDeg());
     if (mMirrored) {
       t.scale(-1, 1);
     }
-    t.rotate(-mRotation.toDeg());
     return t.map(obj);
   }
 

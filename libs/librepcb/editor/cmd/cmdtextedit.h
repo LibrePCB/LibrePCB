@@ -68,6 +68,8 @@ public:
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void mirror(Qt::Orientation orientation, const Point& center,
               bool immediate) noexcept;
+  void mirror(const Angle& rotation, const Point& center,
+              bool immediate) noexcept;
 
   // Operator Overloadings
   CmdTextEdit& operator=(const CmdTextEdit& rhs) = delete;

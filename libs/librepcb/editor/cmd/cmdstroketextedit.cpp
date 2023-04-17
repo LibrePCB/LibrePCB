@@ -146,15 +146,8 @@ void CmdStrokeTextEdit::setRotation(const Angle& angle,
 
 void CmdStrokeTextEdit::rotate(const Angle& angle, const Point& center,
                                bool immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewPosition.rotate(angle, center);
-  mNewRotation += mNewMirrored
-      ? -angle
-      : angle;  // mirror --> rotation direction is inverted!
-  if (immediate) {
-    mText.setPosition(mNewPosition);
-    mText.setRotation(mNewRotation);
-  }
+  setPosition(mNewPosition.rotated(angle, center), immediate);
+  setRotation(mNewRotation + angle, immediate);
 }
 
 void CmdStrokeTextEdit::setMirrored(bool mirrored, bool immediate) noexcept {
@@ -166,33 +159,19 @@ void CmdStrokeTextEdit::setMirrored(bool mirrored, bool immediate) noexcept {
 void CmdStrokeTextEdit::mirrorGeometry(Qt::Orientation orientation,
                                        const Point& center,
                                        bool immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewPosition.mirror(orientation, center);
-  if (orientation == Qt::Horizontal) {
-    mNewRotation = Angle::deg180() - mNewRotation;
+  setPosition(mNewPosition.mirrored(orientation, center), immediate);
+  if (orientation == Qt::Vertical) {
+    setRotation(Angle::deg180() - mNewRotation, immediate);
   } else {
-    mNewRotation = -mNewRotation;
+    setRotation(-mNewRotation, immediate);
   }
-  mNewAlign.mirrorV();
-  if (immediate) {
-    mText.setPosition(mNewPosition);
-    mText.setRotation(mNewRotation);
-    mText.setAlign(mNewAlign);
-  }
+  setAlignment(mNewAlign.mirroredH(), immediate);
 }
 
 void CmdStrokeTextEdit::mirrorLayer(bool immediate) noexcept {
   setLayer(mNewLayer->mirrored(), immediate);
   setMirrored(!mNewMirrored, immediate);
-
-  // Changing the mirror property inverts the rotation and alignment. To keep
-  // rotation and alignment, invert them manually too.
-  mNewRotation = Angle::deg180() - mNewRotation;
-  mNewAlign.mirrorV();
-  if (immediate) {
-    mText.setRotation(mNewRotation);
-    mText.setAlign(mNewAlign);
-  }
+  setAlignment(mNewAlign.mirroredH(), immediate);
 }
 
 void CmdStrokeTextEdit::setAutoRotate(bool autoRotate,

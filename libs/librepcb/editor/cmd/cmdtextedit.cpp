@@ -112,30 +112,26 @@ void CmdTextEdit::setRotation(const Angle& angle, bool immediate) noexcept {
 
 void CmdTextEdit::rotate(const Angle& angle, const Point& center,
                          bool immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewPosition.rotate(angle, center);
-  mNewRotation += angle;
-  if (immediate) {
-    mText.setPosition(mNewPosition);
-    mText.setRotation(mNewRotation);
-  }
+  setPosition(mNewPosition.rotated(angle, center), immediate);
+  setRotation(mNewRotation + angle, immediate);
 }
 
 void CmdTextEdit::mirror(Qt::Orientation orientation, const Point& center,
                          bool immediate) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewPosition.mirror(orientation, center);
-  if (orientation == Qt::Horizontal) {
-    mNewRotation = Angle::deg180() - mNewRotation;
-  } else {
-    mNewRotation = -mNewRotation;
-  }
-  mNewAlign.mirrorV();
-  if (immediate) {
-    mText.setPosition(mNewPosition);
-    mText.setRotation(mNewRotation);
-    mText.setAlign(mNewAlign);
-  }
+  setPosition(mNewPosition.mirrored(orientation, center), immediate);
+  setRotation((orientation == Qt::Horizontal) ? (Angle::deg180() - mNewRotation)
+                                              : (-mNewRotation),
+              immediate);
+  setAlignment(mNewAlign.mirroredV(), immediate);
+}
+
+void CmdTextEdit::mirror(const Angle& rotation, const Point& center,
+                         bool immediate) noexcept {
+  setPosition(mNewPosition.rotated(-rotation, center)
+                  .mirrored(Qt::Horizontal, center)
+                  .rotated(rotation, center),
+              immediate);
+  setAlignment(mNewAlign.mirroredH(), immediate);
 }
 
 /*******************************************************************************

@@ -503,7 +503,7 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
     Angle textRotation = Angle::deg0();
     Alignment textAlign(HAlign::left(), VAlign::center());
     qreal xScale = 1;
-    if (Toolbox::isTextUpsideDown(angle - Angle::deg90(), false)) {
+    if (Toolbox::isTextUpsideDown(angle - Angle::deg90())) {
       textRotation = Angle::deg180();
       textAlign.mirrorH();
       xScale = -1;

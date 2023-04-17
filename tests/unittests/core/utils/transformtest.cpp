@@ -73,20 +73,36 @@ TEST_F(TransformTest, testCopyConstructor) {
   EXPECT_EQ(t1.getMirrored(), t2.getMirrored());
 }
 
-TEST_F(TransformTest, testMapAngleNonMirrored) {
+TEST_F(TransformTest, testMapMirrorableAngleNonMirrored) {
   Transform t(Point(1000, 2000), Angle(3000), false);
-  EXPECT_EQ(str(Angle(3000)), str(t.map(Angle(0))));
-  EXPECT_EQ(str(Angle(0)), str(t.map(Angle(-3000))));
-  EXPECT_EQ(str(Angle(180003000)), str(t.map(Angle(180000000))));
-  EXPECT_EQ(str(Angle(-179997000)), str(t.map(Angle(-180000000))));
+  EXPECT_EQ(str(Angle(3000)), str(t.mapMirrorable(Angle(0))));
+  EXPECT_EQ(str(Angle(0)), str(t.mapMirrorable(Angle(-3000))));
+  EXPECT_EQ(str(Angle(180003000)), str(t.mapMirrorable(Angle(180000000))));
+  EXPECT_EQ(str(Angle(-179997000)), str(t.mapMirrorable(Angle(-180000000))));
 }
 
-TEST_F(TransformTest, testMapAngleMirrored) {
+TEST_F(TransformTest, testMapMirrorableAngleMirrored) {
   Transform t(Point(1000, 2000), Angle(3000), true);
-  EXPECT_EQ(str(Angle(179997000)), str(t.map(Angle(0))));
-  EXPECT_EQ(str(Angle(180000000)), str(t.map(Angle(-3000))));
-  EXPECT_EQ(str(Angle(-3000)), str(t.map(Angle(180000000))));
-  EXPECT_EQ(str(Angle(359997000)), str(t.map(Angle(-180000000))));
+  EXPECT_EQ(str(Angle(3000)), str(t.mapMirrorable(Angle(0))));
+  EXPECT_EQ(str(Angle(6000)), str(t.mapMirrorable(Angle(-3000))));
+  EXPECT_EQ(str(Angle(-179997000)), str(t.mapMirrorable(Angle(180000000))));
+  EXPECT_EQ(str(Angle(180003000)), str(t.mapMirrorable(Angle(-180000000))));
+}
+
+TEST_F(TransformTest, testMapNonMirrorableAngleNonMirrored) {
+  Transform t(Point(1000, 2000), Angle(3000), false);
+  EXPECT_EQ(str(Angle(3000)), str(t.mapNonMirrorable(Angle(0))));
+  EXPECT_EQ(str(Angle(0)), str(t.mapNonMirrorable(Angle(-3000))));
+  EXPECT_EQ(str(Angle(180003000)), str(t.mapNonMirrorable(Angle(180000000))));
+  EXPECT_EQ(str(Angle(-179997000)), str(t.mapNonMirrorable(Angle(-180000000))));
+}
+
+TEST_F(TransformTest, testMapNonMirrorableAngleMirrored) {
+  Transform t(Point(1000, 2000), Angle(3000), true);
+  EXPECT_EQ(str(Angle(180003000)), str(t.mapNonMirrorable(Angle(0))));
+  EXPECT_EQ(str(Angle(180006000)), str(t.mapNonMirrorable(Angle(-3000))));
+  EXPECT_EQ(str(Angle(3000)), str(t.mapNonMirrorable(Angle(180000000))));
+  EXPECT_EQ(str(Angle(3000)), str(t.mapNonMirrorable(Angle(-180000000))));
 }
 
 TEST_F(TransformTest, testMapPointNonMirrored) {
@@ -98,7 +114,7 @@ TEST_F(TransformTest, testMapPointNonMirrored) {
 TEST_F(TransformTest, testMapPointMirrored) {
   Transform t(Point(1000, 2000), Angle(30000000), true);
   EXPECT_EQ(str(Point(1000, 2000)), str(t.map(Point(0, 0))));
-  EXPECT_EQ(str(Point(1983, 12836)), str(t.map(Point(4567, 9876))));
+  EXPECT_EQ(str(Point(-7893, 8269)), str(t.map(Point(4567, 9876))));
 }
 
 TEST_F(TransformTest, testMapPathNonMirrored) {
@@ -122,7 +138,7 @@ TEST_F(TransformTest, testMapPathMirrored) {
   });
   Path expected({
       Vertex(Point(1000, 2000), -Angle::deg90()),
-      Vertex(Point(1983, 12836), Angle::deg0()),
+      Vertex(Point(-7893, 8269), Angle::deg0()),
   });
   EXPECT_EQ(str(expected), str(t.map(input)));
 }

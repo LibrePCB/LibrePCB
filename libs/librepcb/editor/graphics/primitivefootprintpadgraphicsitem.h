@@ -68,6 +68,7 @@ public:
   // Setters
   void setPosition(const Point& position) noexcept;
   void setRotation(const Angle& rotation) noexcept;
+  void setMirrored(bool mirrored) noexcept;
   void setText(const QString& text) noexcept;
   void setLayer(const QString& layerName) noexcept;
   void setGeometries(const QHash<const Layer*, QList<PadGeometry>>& geometries,
@@ -91,6 +92,7 @@ private:  // Methods
 
 private:  // Data
   const IF_GraphicsLayerProvider& mLayerProvider;
+  bool mMirror;
   std::shared_ptr<GraphicsLayer> mCopperLayer;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;

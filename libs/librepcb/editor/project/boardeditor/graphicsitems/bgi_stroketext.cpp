@@ -161,8 +161,8 @@ void BGI_StrokeText::updatePosition() noexcept {
 
 void BGI_StrokeText::updateTransform() noexcept {
   QTransform t;
-  if (mText.getData().getMirrored()) t.scale(qreal(-1), qreal(1));
   t.rotate(-mText.getData().getRotation().toDeg());
+  if (mText.getData().getMirrored()) t.scale(qreal(-1), qreal(1));
   setTransform(t);
 }
 

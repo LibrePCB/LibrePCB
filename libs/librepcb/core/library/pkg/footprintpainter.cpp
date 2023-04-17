@@ -182,7 +182,7 @@ void FootprintPainter::initContentByColor() const noexcept {
                     false, false, path));
       }
 
-      Angle rotation = transform.map(Angle::deg0());
+      Angle rotation = transform.mapNonMirrorable(Angle::deg0());
       Alignment align =
           text.getMirrored() ? text.getAlign().mirroredV() : text.getAlign();
       Length totalHeight = *text.getHeight() + *text.getStrokeWidth();

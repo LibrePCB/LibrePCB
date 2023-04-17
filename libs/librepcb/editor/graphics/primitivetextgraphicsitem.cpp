@@ -70,7 +70,7 @@ void PrimitiveTextGraphicsItem::setPosition(const Point& pos) noexcept {
 }
 
 void PrimitiveTextGraphicsItem::setRotation(const Angle& rot) noexcept {
-  const bool rotate180 = Toolbox::isTextUpsideDown(rot, false);
+  const bool rotate180 = Toolbox::isTextUpsideDown(rot);
   if (rotate180 != mRotate180) {
     mRotate180 = rotate180;
     updateBoundingRectAndShape();

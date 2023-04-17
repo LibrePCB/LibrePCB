@@ -77,9 +77,7 @@ void CmdDeviceInstanceEditAll::translate(const Point& deltaPos,
 void CmdDeviceInstanceEditAll::setRotation(const Angle& angle,
                                            bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  const Angle delta = mDevEditCmd->mNewMirrored
-      ? (mDevEditCmd->mNewRotation - angle)  // Mirrored -> inverted rotation!
-      : (angle - mDevEditCmd->mNewRotation);
+  const Angle delta = angle - mDevEditCmd->mNewRotation;
   mDevEditCmd->setRotation(angle, immediate);
   foreach (CmdBoardStrokeTextEdit* cmd, mTextEditCmds) {
     cmd->rotate(delta, mDevEditCmd->mNewPos, immediate);
@@ -98,7 +96,12 @@ void CmdDeviceInstanceEditAll::rotate(const Angle& angle, const Point& center,
 void CmdDeviceInstanceEditAll::setMirrored(bool mirrored, bool immediate) {
   Q_ASSERT(!wasEverExecuted());
   if (mirrored != mDevEditCmd->mNewMirrored) {
-    mirror(mDevEditCmd->mNewPos, Qt::Horizontal, immediate);  // can throw
+    mDevEditCmd->setMirrored(mirrored, immediate);
+    foreach (CmdBoardStrokeTextEdit* cmd, mTextEditCmds) {
+      cmd->mirrorGeometry(mDevEditCmd->mNewRotation, mDevEditCmd->mNewPos,
+                          immediate);
+      cmd->mirrorLayer(immediate);
+    }
   }
 }
 

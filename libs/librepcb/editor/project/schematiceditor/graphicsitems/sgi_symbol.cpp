@@ -133,8 +133,8 @@ void SGI_Symbol::updatePosition() noexcept {
 
 void SGI_Symbol::updateRotationAndMirrored() noexcept {
   QTransform t;
-  if (mSymbol.getMirrored()) t.scale(qreal(-1), qreal(1));
   t.rotate(-mSymbol.getRotation().toDeg());
+  if (mSymbol.getMirrored()) t.scale(qreal(-1), qreal(1));
   setTransform(t);
 }
 

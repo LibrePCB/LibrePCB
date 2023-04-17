@@ -86,13 +86,16 @@ QByteArray BoardD356NetlistExport::generate() const {
       if (const PackagePad* pkgPad = pad->getLibPackagePad()) {
         padName = *pkgPad->getName();
       }
+      const Angle rotation = pad->getMirrored()
+          ? (pad->getRotation() + Angle::deg180())
+          : pad->getRotation();
       if (pad->getLibPad().isTht()) {
         // THT pad. Not sure if we really need to export all holes, if there
         // are multiple. Also slots are probably not supported by IPC-D-356A.
         // I suspect it's good enough to export only a single, circular hole?
         gen.thtPad(netName, cmpName, padName, pad->getPosition(),
                    pad->getLibPad().getWidth(), pad->getLibPad().getHeight(),
-                   pad->getRotation(),
+                   rotation,
                    pad->getLibPad().getHoles().first()->getDiameter());
       } else {
         // SMT pad.
@@ -102,17 +105,13 @@ QByteArray BoardD356NetlistExport::generate() const {
             : (mBoard.getInnerLayerCount() + 2);
         gen.smtPad(netName, cmpName, padName, pad->getPosition(),
                    pad->getLibPad().getWidth(), pad->getLibPad().getHeight(),
-                   pad->getRotation(), layerNumber);
+                   rotation, layerNumber);
       }
     }
   }
 
   return gen.generate();
 }
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
 
 /*******************************************************************************
  *  End of File

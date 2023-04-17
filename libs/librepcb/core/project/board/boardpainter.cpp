@@ -59,8 +59,7 @@ BoardPainter::BoardPainter(const Board& board)
     fpt.transform = Transform(*device);
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       Pad padObj;
-      padObj.transform = Transform(pad->getLibPad().getPosition(),
-                                   pad->getLibPad().getRotation());
+      padObj.transform = Transform(*pad);
       for (const PadHole& hole : pad->getLibPad().getHoles()) {
         padObj.holes.append(hole);
       }
@@ -259,8 +258,8 @@ void BoardPainter::initContentByColor() const noexcept {
       // Footprint pads.
       foreach (const Pad& pad, footprint.pads) {
         foreach (const auto& layerGeometry, pad.layerGeometries) {
-          const QPainterPath path = footprint.transform.mapPx(
-              pad.transform.mapPx(layerGeometry.second.toQPainterPathPx()));
+          const QPainterPath path =
+              pad.transform.mapPx(layerGeometry.second.toQPainterPathPx());
           const QString color = layerGeometry.first->getThemeColor();
           if ((!pad.holes.isEmpty()) &&
               Theme::getCopperColorNames().contains(color)) {
@@ -275,10 +274,9 @@ void BoardPainter::initContentByColor() const noexcept {
         }
         // Also add the holes for THT pads.
         for (const PadHole& hole : pad.holes) {
-          mContentByColor[Theme::Color::sBoardHoles].padHoles.append(HoleData{
-              hole.getDiameter(),
-              footprint.transform.map(pad.transform.map(hole.getPath())),
-              tl::nullopt});
+          mContentByColor[Theme::Color::sBoardHoles].padHoles.append(
+              HoleData{hole.getDiameter(), pad.transform.map(hole.getPath()),
+                       tl::nullopt});
         }
       }
     }
@@ -329,7 +327,7 @@ void BoardPainter::initContentByColor() const noexcept {
             PolygonData{text.layer, path, text.strokeWidth, false, false});
       }
 
-      Angle rotation = text.transform.map(Angle::deg0());
+      Angle rotation = text.transform.mapNonMirrorable(Angle::deg0());
       Alignment align =
           text.transform.getMirrored() ? text.align.mirroredV() : text.align;
       Length totalHeight = *text.height + *text.strokeWidth;

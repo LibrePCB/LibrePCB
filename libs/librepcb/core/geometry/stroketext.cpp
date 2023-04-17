@@ -112,7 +112,7 @@ QVector<Path> StrokeText::generatePaths(const StrokeFont& font,
                                         const QString& text) const noexcept {
   return StrokeTextPathBuilder::build(font, mLetterSpacing, mLineSpacing,
                                       mHeight, mStrokeWidth, mAlign, mRotation,
-                                      mAutoRotate, mMirrored, text);
+                                      mAutoRotate, text);
 }
 
 /*******************************************************************************

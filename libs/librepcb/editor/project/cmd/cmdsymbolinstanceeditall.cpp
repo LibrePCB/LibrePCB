@@ -77,9 +77,7 @@ void CmdSymbolInstanceEditAll::translate(const Point& deltaPos,
 void CmdSymbolInstanceEditAll::setRotation(const Angle& angle,
                                            bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  const Angle delta = mSymEditCmd->mNewMirrored
-      ? (mSymEditCmd->mNewRotation - angle)  // Mirrored -> inverted rotation!
-      : (angle - mSymEditCmd->mNewRotation);
+  const Angle delta = angle - mSymEditCmd->mNewRotation;
   mSymEditCmd->setRotation(angle, immediate);
   foreach (CmdTextEdit* cmd, mTextEditCmds) {
     cmd->rotate(delta, mSymEditCmd->mNewPos, immediate);
@@ -95,18 +93,22 @@ void CmdSymbolInstanceEditAll::rotate(const Angle& angle, const Point& center,
   }
 }
 
-void CmdSymbolInstanceEditAll::setMirrored(bool mirrored, bool immediate) {
+void CmdSymbolInstanceEditAll::setMirrored(bool mirrored,
+                                           bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
   if (mirrored != mSymEditCmd->mNewMirrored) {
-    mirror(mSymEditCmd->mNewPos, Qt::Horizontal, immediate);  // can throw
+    mSymEditCmd->setMirrored(mirrored, immediate);
+    foreach (CmdTextEdit* cmd, mTextEditCmds) {
+      cmd->mirror(mSymEditCmd->mNewRotation, mSymEditCmd->mNewPos, immediate);
+    }
   }
 }
 
 void CmdSymbolInstanceEditAll::mirror(const Point& center,
                                       Qt::Orientation orientation,
-                                      bool immediate) {
+                                      bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mSymEditCmd->mirror(center, orientation, immediate);  // can throw
+  mSymEditCmd->mirror(center, orientation, immediate);
   foreach (CmdTextEdit* cmd, mTextEditCmds) {
     cmd->mirror(orientation, center, immediate);
   }

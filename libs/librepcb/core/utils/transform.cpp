@@ -37,29 +37,32 @@ bool Transform::map(bool mirror) const noexcept {
   return mMirrored ? !mirror : mirror;
 }
 
-Angle Transform::map(const Angle& angle) const noexcept {
-  Angle a = mRotation + angle;
-  return mMirrored ? (Angle::deg180() - a) : a;
+Angle Transform::mapMirrorable(const Angle& angle) const noexcept {
+  return mMirrored ? (mRotation - angle) : (mRotation + angle);
+}
+
+Angle Transform::mapNonMirrorable(const Angle& angle) const noexcept {
+  return mRotation + (mMirrored ? (Angle::deg180() - angle) : angle);
 }
 
 Point Transform::map(const Point& point) const noexcept {
   Point p = point;
-  if (mRotation) {
-    p.rotate(mRotation);
-  }
   if (mMirrored) {
     p.mirror(Qt::Horizontal);
+  }
+  if (mRotation) {
+    p.rotate(mRotation);
   }
   return p + mPosition;
 }
 
 Path Transform::map(const Path& path) const noexcept {
   Path p = path;
-  if (mRotation) {
-    p.rotate(mRotation);
-  }
   if (mMirrored) {
     p.mirror(Qt::Horizontal);
+  }
+  if (mRotation) {
+    p.rotate(mRotation);
   }
   if (!mPosition.isOrigin()) {
     p.translate(mPosition);

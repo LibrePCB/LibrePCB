@@ -81,8 +81,8 @@ public:
   void addHole(const PositiveLength& diameter, const NonEmptyPath& path,
                const Transform& transform = Transform(),
                const Length& offset = Length(0));
-  void addPad(const BI_FootprintPad& pad, const Transform& transform,
-              const Layer& layer, const Length& offset = Length(0));
+  void addPad(const BI_FootprintPad& pad, const Layer& layer,
+              const Length& offset = Length(0));
 
 private:  // Data
   Board& mBoard;

@@ -232,7 +232,7 @@ void SymbolPinGraphicsItem::updateNamePosition() noexcept {
 }
 
 void SymbolPinGraphicsItem::updateNumbersTransform() noexcept {
-  const bool flipped = Toolbox::isTextUpsideDown(mPin->getRotation(), false);
+  const bool flipped = Toolbox::isTextUpsideDown(mPin->getRotation());
   mNumbersGraphicsItem->setPosition(
       mPin->getNumbersPosition(flipped).rotated(mPin->getRotation()));
   mNumbersGraphicsItem->setAlignment(SymbolPin::getNumbersAlignment(flipped));

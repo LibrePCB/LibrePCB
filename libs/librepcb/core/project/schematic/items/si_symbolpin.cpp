@@ -238,7 +238,7 @@ void SI_SymbolPin::netSignalNameChanged() noexcept {
 void SI_SymbolPin::updateTransform() noexcept {
   Transform transform(mSymbol);
   const Point position = transform.map(mSymbolPin->getPosition());
-  const Angle rotation = transform.map(mSymbolPin->getRotation());
+  const Angle rotation = transform.mapNonMirrorable(mSymbolPin->getRotation());
   if (position != mPosition) {
     mPosition = position;
     onEdited.notify(Event::PositionChanged);
@@ -300,7 +300,7 @@ void SI_SymbolPin::updateNumbers() noexcept {
 }
 
 void SI_SymbolPin::updateNumbersTransform() noexcept {
-  const bool flip = Toolbox::isTextUpsideDown(mRotation, false);
+  const bool flip = Toolbox::isTextUpsideDown(mRotation);
   const Point position = mSymbolPin->getNumbersPosition(flip);
   const Alignment alignment = SymbolPin::getNumbersAlignment(flip);
   if (position != mNumbersPosition) {
