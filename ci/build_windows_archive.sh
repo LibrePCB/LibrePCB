@@ -8,7 +8,7 @@ cp -v C:/Windows/SysWOW64/vc*140.dll ./build/install/opt/bin/
 cp -v C:/Windows/SysWOW64/msvcp140*.dll ./build/install/opt/bin/
 
 # Copy OpenSSL DLLs (required to get HTTPS working)
-cp -v C:/OpenSSL-Win32/bin/lib*.dll ./build/install/opt/bin/
+cp -v C:/Qt/Tools/OpenSSL/Win_x86/bin/lib*.dll ./build/install/opt/bin/
 
 # Copy MinGW DLLs
 cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/opt/bin/

@@ -6,14 +6,13 @@ jobs:
     variables:
       OS: 'windows'
       ARCH: 'x86'
-      CC: 'ccache gcc'
-      CXX: 'ccache g++'
       CCACHE_DIR: $(Pipeline.Workspace)/.ccache
-      CMAKE_GENERATOR: 'MinGW Makefiles'
+      CMAKE_CXX_COMPILER_LAUNCHER: ccache
+      CMAKE_GENERATOR: 'Ninja'
     strategy:
       matrix:
         Qt_5_15_MinGW_32bit:
-          IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt5.15.2-32bit-2
+          IMAGE: librepcb/librepcb-dev:windowsservercore-ltsc2019-qt5.15.2-32bit-3
           DEPLOY: true
     container: $[ variables['IMAGE'] ]
     steps:
