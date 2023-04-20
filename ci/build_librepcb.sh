@@ -3,12 +3,12 @@
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -euv -o pipefail
 
-# use mingw32 make on Windows
+# use Ninja on Windows
 if [ "$OS" = "windows" ]
 then
-  MAKE="mingw32-make"
+  MAKE="ninja"
 else
-  MAKE="make"
+  MAKE="make -j8"
 fi
 
 # default compiler
@@ -33,7 +33,7 @@ cmake .. \
   -DBUILD_DISALLOW_WARNINGS=1 \
   -DLIBREPCB_ENABLE_DESKTOP_INTEGRATION=1 \
   -DLIBREPCB_BUILD_AUTHOR="LibrePCB CI"
-VERBOSE=1 $MAKE -j8
+VERBOSE=1 $MAKE
 $MAKE install
 popd
 

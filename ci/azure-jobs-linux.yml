@@ -8,18 +8,10 @@ jobs:
     ARCH: 'x86_64'
   strategy:
     matrix:
-      Ubuntu_1604_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-4
-      Ubuntu_1604_Qt_5_15_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-16.04-qt5.15.2-2
+      Ubuntu_1804_Qt_5_15_GCC:
+        IMAGE: librepcb/librepcb-dev:ubuntu-18.04-qt5.15.2-1
         DEPLOY: true
         NO_HOEDOWN: true
-      Ubuntu_1804_Clang:
-        IMAGE: librepcb/librepcb-dev:ubuntu-18.04-4
-        CC: clang
-        CXX: clang++
-      Ubuntu_2004_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-20.04-7
       Ubuntu_2004_Unbundled:
         IMAGE: librepcb/librepcb-dev:ubuntu-20.04-7
         UNBUNDLE_DXFLIB: true
@@ -28,6 +20,10 @@ jobs:
         #UNBUNDLE_QUAZIP: true  # Note: Does not ship quazip 1.x yet
         UNBUNDLE_POLYCLIPPING: true
         LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/opt/lib
+      Ubuntu_2204_Clang:
+        IMAGE: librepcb/librepcb-dev:ubuntu-22.04-1
+        CC: clang
+        CXX: clang++
   container: $[ variables['IMAGE'] ]
   steps:
   - checkout: self

@@ -94,6 +94,10 @@ if(BUILD_DISALLOW_WARNINGS)
   target_compile_options(common INTERFACE -Werror)
 endif()
 
+# The TypeSafe library causes some compiler warnings which are not of
+# interest, so let's suppress them.
+target_compile_options(common INTERFACE -Wno-noexcept-type)
+
 # Clang emits some warnings within the muParser library when compiling with
 # -Wpedantic, so let's suppress these warnings when compiling with Clang.
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
