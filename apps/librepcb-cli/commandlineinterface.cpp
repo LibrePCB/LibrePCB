@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "commandlineinterface.h"
 
+#include <librepcb/core/3d/occmodel.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/debug.h>
@@ -207,6 +208,10 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       "check",
       tr("Run the library element check, print all non-approved messages and "
          "report failure (exit code = 1) if there are non-approved messages."));
+  QCommandLineOption libMinifyStepOption(
+      "minify-step",
+      tr("Minify the STEP models of all packages. Only works in conjunction "
+         "with '--all'. Pass '--save' to write the minified files to disk."));
   QCommandLineOption libSaveOption(
       "save",
       tr("Save library (and contained elements if '--all' is given) "
@@ -266,6 +271,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     positionalArgNames.append("library");
     parser.addOption(libAllOption);
     parser.addOption(libCheckOption);
+    parser.addOption(libMinifyStepOption);
     parser.addOption(libSaveOption);
     parser.addOption(libStrictOption);
   } else if (!command.isEmpty()) {
@@ -361,6 +367,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     cmdSuccess = openLibrary(positionalArgs.value(1),  // library directory
                              parser.isSet(libAllOption),  // all elements
                              parser.isSet(libCheckOption),  // run check
+                             parser.isSet(libMinifyStepOption),  // minify STEP
                              parser.isSet(libSaveOption),  // save
                              parser.isSet(libStrictOption)  // strict mode
     );
@@ -825,8 +832,8 @@ bool CommandLineInterface::openProject(
 }
 
 bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
-                                       bool runCheck, bool save,
-                                       bool strict) const noexcept {
+                                       bool runCheck, bool minifyStepFiles,
+                                       bool save, bool strict) const noexcept {
   try {
     bool success = true;
 
@@ -839,7 +846,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
     std::unique_ptr<Library> lib =
         Library::open(std::unique_ptr<TransactionalDirectory>(
             new TransactionalDirectory(libFs)));  // can throw
-    processLibraryElement(libDir, *libFs, *lib, runCheck, save, strict,
+    processLibraryElement(libDir, *libFs, *lib, runCheck, minifyStepFiles, save,
+                          strict,
                           success);  // can throw
 
     // Open all component categories
@@ -855,7 +863,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<ComponentCategory> element =
             ComponentCategory::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
+                              save, strict,
                               success);  // can throw
       }
     }
@@ -873,7 +882,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<PackageCategory> element =
             PackageCategory::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
+                              save, strict,
                               success);  // can throw
       }
     }
@@ -891,7 +901,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<Symbol> element =
             Symbol::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
+                              save, strict,
                               success);  // can throw
       }
     }
@@ -909,7 +920,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<Package> element =
             Package::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
+                              save, strict,
                               success);  // can throw
       }
     }
@@ -927,7 +939,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<Component> element =
             Component::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
+                              save, strict,
                               success);  // can throw
       }
     }
@@ -945,7 +958,8 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
         std::unique_ptr<Device> element =
             Device::open(std::unique_ptr<TransactionalDirectory>(
                 new TransactionalDirectory(fs)));  // can throw
-        processLibraryElement(libDir, *fs, *element, runCheck, save, strict,
+        processLibraryElement(libDir, *fs, *element, runCheck, minifyStepFiles,
+                              save, strict,
                               success);  // can throw
       }
     }
@@ -957,12 +971,10 @@ bool CommandLineInterface::openLibrary(const QString& libDir, bool all,
   }
 }
 
-void CommandLineInterface::processLibraryElement(const QString& libDir,
-                                                 TransactionalFileSystem& fs,
-                                                 LibraryBaseElement& element,
-                                                 bool runCheck, bool save,
-                                                 bool strict,
-                                                 bool& success) const {
+void CommandLineInterface::processLibraryElement(
+    const QString& libDir, TransactionalFileSystem& fs,
+    LibraryBaseElement& element, bool runCheck, bool minifyStepFiles, bool save,
+    bool strict, bool& success) const {
   // Helper function to print an error header to console only once, if
   // there is at least one error.
   bool errorHeaderPrinted = false;
@@ -978,6 +990,34 @@ void CommandLineInterface::processLibraryElement(const QString& libDir,
   // Save element to transactional file system, if needed
   if (strict || save) {
     element.save();  // can throw
+  }
+
+  // Minify STEP files, if needed.
+  if (minifyStepFiles && dynamic_cast<Package*>(&element)) {
+    foreach (const QString& file, fs.getFiles()) {
+      if (file.endsWith(".step")) {
+        const QString fp = prettyPath(fs.getAbsPath(file), libDir);
+        qInfo().noquote() << tr("Minify STEP model '%1'...").arg(fp);
+        try {
+          const QByteArray content = fs.read(file);  // can throw
+          const QByteArray minified =
+              OccModel::minifyStep(content);  // can throw
+          if (minified != content) {
+            print(tr("  - Minified '%1' from %2 to %3 bytes")
+                      .arg(fp)
+                      .arg(content.size())
+                      .arg(minified.size()));
+            OccModel::loadStep(minified);  // throws if STEP is invalid
+            fs.write(file, minified);
+          }
+        } catch (const Exception& e) {
+          printErrorHeaderOnce();
+          printErr(QString("    - Failed to minify STEP model '%1': %2")
+                       .arg(fp, e.getMsg()));
+          success = false;
+        }
+      }
+    }
   }
 
   // Check for non-canonical files (strict mode)
