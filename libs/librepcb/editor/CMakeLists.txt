@@ -866,6 +866,8 @@ target_link_libraries(
   PRIVATE common
           # LibrePCB
           LibrePCB::EagleImport
+          # Third party
+          OpenGL::GLU
 )
 target_link_libraries(
   librepcb_editor

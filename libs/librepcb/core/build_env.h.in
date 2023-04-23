@@ -42,6 +42,7 @@
 
 // Features
 #cmakedefine01 LIBREPCB_ENABLE_DESKTOP_INTEGRATION
+#cmakedefine01 USE_GLU
 #cmakedefine01 USE_OPENCASCADE
 
 #endif  // LIBREPCB_BUILD_ENV_H

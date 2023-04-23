@@ -127,6 +127,16 @@ make it easier to achieve reproducible builds in the future.
     cmake .. -DLIBREPCB_REPRODUCIBLE=1
 
 
+## OpenGL Utility Library (GLU) Dependency
+
+The OpenGL Utility Library (GLU) is needed for the 3D viewer of LibrePCB and
+thus needs to be available both at built time and runtime. If this library
+is not available for a particular platform, it is possible to compile without
+it but the 3D viewer won't render all layers then.
+
+    cmake .. -DUSE_GLU=0
+
+
 # OpenCASCADE Dependency
 
 Parts of the 3D features (e.g. reading/writing STEP files) depend on the
