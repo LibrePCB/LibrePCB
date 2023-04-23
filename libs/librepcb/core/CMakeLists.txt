@@ -452,6 +452,7 @@ target_link_libraries(
   librepcb_core
   PRIVATE common
           # Third party
+          OpenCascade::OpenCascade
           DelaunayTriangulation::DelaunayTriangulation
           Dxflib::Dxflib
           FontoBene::FontoBeneQt5

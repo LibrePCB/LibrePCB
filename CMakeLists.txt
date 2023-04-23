@@ -56,6 +56,7 @@ option(UNBUNDLE_MUPARSER "Don't use vendored MuParser library." OFF)
 option(UNBUNDLE_POLYCLIPPING "Don't use vendored Polyclipping library." OFF)
 option(UNBUNDLE_QUAZIP "Don't use vendored QuaZip library." OFF)
 option(UNBUNDLE_ALL "Don't use any vendored library." OFF)
+option(USE_OPENCASCADE "Include features depending on OpenCascade." ON)
 
 # Create a release build by default
 include(DefaultBuildType)
@@ -104,6 +105,11 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   target_compile_options(common INTERFACE -Wno-nested-anon-types)
 endif()
 
+# Enforce UNICODE on Windows to avoid an incompatibility with OpenCascade.
+if(WIN32)
+  add_definitions(-DUNICODE -D_UNICODE)
+endif()
+
 # Find required Qt packages
 find_package(
   Qt5 5.5.0
@@ -141,6 +147,7 @@ find_package(DelaunayTriangulation REQUIRED)
 find_package(Dxflib REQUIRED)
 find_package(FontoBeneQt5 REQUIRED)
 find_package(MuParser REQUIRED)
+find_package(OpenCascade REQUIRED)
 find_package(Optional REQUIRED)
 find_package(Polyclipping REQUIRED)
 find_package(QuaZip REQUIRED)
