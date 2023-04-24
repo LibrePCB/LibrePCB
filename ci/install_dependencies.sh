@@ -36,6 +36,14 @@ then
   brew install --overwrite qt5
   echo "Linking qt5..."
   brew link --force --overwrite qt5
+
+  # Install OpenCascade
+  echo "Installing opencascade..."
+  brew install opencascade
+
+  # Install dylibbundler
+  echo "Installing dylibbundler..."
+  brew install dylibbundler
 fi
 
 # Configure pip
