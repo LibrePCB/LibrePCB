@@ -619,6 +619,9 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
   upgradeBoardDrcSettings(root);
   upgradeLayers(root);
 
+  // Board setup.
+  root.appendChild("thickness", SExpression::createToken("1.6"));
+
   // Fabrication output settings.
   {
     SExpression& node = root.getChild("fabrication_output_settings");

@@ -58,6 +58,7 @@ public:
   // Setters
   void setName(const ElementName& name) noexcept;
   void setInnerLayerCount(int count) noexcept;
+  void setPcbThickness(const PositiveLength& thickness) noexcept;
   void setDesignRules(const BoardDesignRules& rules) noexcept;
   void setDrcSettings(const BoardDesignRuleCheckSettings& settings) noexcept;
 
@@ -78,6 +79,8 @@ private:  // Data
   ElementName mNewName;
   int mOldInnerLayerCount;
   int mNewInnerLayerCount;
+  PositiveLength mOldPcbThickness;
+  PositiveLength mNewPcbThickness;
   BoardDesignRules mOldDesignRules;
   BoardDesignRules mNewDesignRules;
   BoardDesignRuleCheckSettings mOldDrcSettings;

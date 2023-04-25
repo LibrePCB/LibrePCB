@@ -85,6 +85,7 @@ Board::Board(Project& project,
     mGridUnit(LengthUnit::millimeters()),
     mInnerLayerCount(-1),  // Force update of setter.
     mCopperLayers(),
+    mPcbThickness(1600000),  // 1.6mm
     mDrcMessageApprovalsVersion(Application::getFileFormatVersion()),
     mDrcMessageApprovals(),
     mSupportedDrcMessageApprovals() {
@@ -513,6 +514,7 @@ void Board::copyFrom(const Board& other) {
   mGridUnit = other.getGridUnit();
   mInnerLayerCount = other.getInnerLayerCount();
   mCopperLayers = other.getCopperLayers();
+  mPcbThickness = other.mPcbThickness;
   *mDesignRules = other.getDesignRules();
   *mFabricationOutputSettings = other.getFabricationOutputSettings();
 
@@ -684,6 +686,8 @@ void Board::save() {
       SExpression& node = root.appendList("layers");
       node.appendChild("inner", mInnerLayerCount);
     }
+    root.ensureLineBreak();
+    root.appendChild("thickness", mPcbThickness);
     root.ensureLineBreak();
     mDesignRules->serialize(root.appendList("design_rules"));
     root.ensureLineBreak();

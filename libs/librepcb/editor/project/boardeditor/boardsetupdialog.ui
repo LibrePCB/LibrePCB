@@ -58,6 +58,29 @@
          </property>
         </widget>
        </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_31">
+         <property name="text">
+          <string>Total PCB Thickness:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="librepcb::editor::PositiveLengthEdit" name="edtPcbThickness" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tabDesignRules">
@@ -682,11 +705,18 @@ QAbstractScrollArea {
    <header location="global">librepcb/editor/widgets/unsignedratioedit.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>librepcb::editor::PositiveLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>edtBoardName</tabstop>
   <tabstop>spbxInnerCopperLayerCount</tabstop>
+  <tabstop>edtPcbThickness</tabstop>
   <tabstop>edtRulesStopMaskClrMin</tabstop>
   <tabstop>edtRulesStopMaskClrRatio</tabstop>
   <tabstop>edtRulesStopMaskClrMax</tabstop>
@@ -708,7 +738,7 @@ QAbstractScrollArea {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGroupRulesCmpSidePadShape"/>
   <buttongroup name="btnGroupRulesInnerPadShape"/>
+  <buttongroup name="btnGroupRulesCmpSidePadShape"/>
  </buttongroups>
 </ui>

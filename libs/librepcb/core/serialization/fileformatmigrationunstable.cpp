@@ -65,17 +65,6 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-  const QString fp = "package.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  for (SExpression* fptNode : root.getChildren("footprint")) {
-    for (SExpression* txtNode : fptNode->getChildren("stroke_text")) {
-      if (deserialize<bool>(txtNode->getChild("mirror/@0"))) {
-        SExpression& rotNode = txtNode->getChild("rotation/@0");
-        rotNode = serialize(-deserialize<Angle>(rotNode));
-      }
-    }
-  }
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -118,36 +107,13 @@ void FileFormatMigrationUnstable::upgradeSchematic(SExpression& root,
                                                    ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  for (SExpression* symNode : root.getChildren("symbol")) {
-    if (deserialize<bool>(symNode->getChild("mirror/@0"))) {
-      SExpression& rotNode = symNode->getChild("rotation/@0");
-      rotNode = serialize(-deserialize<Angle>(rotNode));
-    }
-  }
 }
 
 void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  for (SExpression* devNode : root.getChildren("device")) {
-    if (deserialize<bool>(devNode->getChild("mirror/@0"))) {
-      SExpression& rotNode = devNode->getChild("rotation/@0");
-      rotNode = serialize(-deserialize<Angle>(rotNode));
-    }
-    for (SExpression* txtNode : devNode->getChildren("stroke_text")) {
-      if (deserialize<bool>(txtNode->getChild("mirror/@0"))) {
-        SExpression& rotNode = txtNode->getChild("rotation/@0");
-        rotNode = serialize(-deserialize<Angle>(rotNode));
-      }
-    }
-  }
-  for (SExpression* txtNode : root.getChildren("stroke_text")) {
-    if (deserialize<bool>(txtNode->getChild("mirror/@0"))) {
-      SExpression& rotNode = txtNode->getChild("rotation/@0");
-      rotNode = serialize(-deserialize<Angle>(rotNode));
-    }
-  }
+  root.appendChild("thickness", SExpression::createToken("1.6"));
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

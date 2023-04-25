@@ -532,6 +532,8 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   board->setDefaultFontName(root.getChild("default_font/@0").getValue());
   board->setInnerLayerCount(
       deserialize<uint>(root.getChild("layers/inner/@0")));
+  board->setPcbThickness(
+      deserialize<PositiveLength>(root.getChild("thickness/@0")));
   board->setDesignRules(BoardDesignRules(root.getChild("design_rules")));
   {
     const SExpression& node = root.getChild("design_rule_check");

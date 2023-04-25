@@ -59,6 +59,10 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   // Tab: General
   mUi->spbxInnerCopperLayerCount->setMinimum(0);
   mUi->spbxInnerCopperLayerCount->setMaximum(Layer::innerCopperCount());
+  mUi->edtPcbThickness->setToolTip(tr("Default:") % " 1.6 mm");
+  mUi->edtPcbThickness->configure(mBoard.getGridUnit(),
+                                  LengthEditBase::Steps::generic(),
+                                  sSettingsPrefix % "/pcb_thickness");
 
   // Tab: Design Rules
   mUi->edtRulesStopMaskClrRatio->setSingleStep(5.0);  // [%]
@@ -238,6 +242,7 @@ void BoardSetupDialog::load() noexcept {
   // Tab: General
   mUi->edtBoardName->setText(*mBoard.getName());
   mUi->spbxInnerCopperLayerCount->setValue(mBoard.getInnerLayerCount());
+  mUi->edtPcbThickness->setValue(mBoard.getPcbThickness());
 
   // Tab: Design Rules
   const BoardDesignRules& r = mBoard.getDesignRules();
@@ -309,6 +314,7 @@ bool BoardSetupDialog::apply() noexcept {
     cmd->setName(
         ElementName(mUi->edtBoardName->text().trimmed()));  // can throw
     cmd->setInnerLayerCount(mUi->spbxInnerCopperLayerCount->value());
+    cmd->setPcbThickness(mUi->edtPcbThickness->getValue());
 
     // Tab: Design Rules
     BoardDesignRules r = mBoard.getDesignRules();

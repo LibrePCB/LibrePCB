@@ -43,6 +43,8 @@ CmdBoardEdit::CmdBoardEdit(Board& board) noexcept
     mNewName(mOldName),
     mOldInnerLayerCount(mBoard.getInnerLayerCount()),
     mNewInnerLayerCount(mOldInnerLayerCount),
+    mOldPcbThickness(mBoard.getPcbThickness()),
+    mNewPcbThickness(mOldPcbThickness),
     mOldDesignRules(mBoard.getDesignRules()),
     mNewDesignRules(mOldDesignRules),
     mOldDrcSettings(mBoard.getDrcSettings()),
@@ -66,6 +68,11 @@ void CmdBoardEdit::setInnerLayerCount(int count) noexcept {
   mNewInnerLayerCount = count;
 }
 
+void CmdBoardEdit::setPcbThickness(const PositiveLength& thickness) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewPcbThickness = thickness;
+}
+
 void CmdBoardEdit::setDesignRules(const BoardDesignRules& rules) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewDesignRules = rules;
@@ -86,6 +93,7 @@ bool CmdBoardEdit::performExecute() {
 
   if (mNewName != mOldName) return true;
   if (mNewInnerLayerCount != mOldInnerLayerCount) return true;
+  if (mNewPcbThickness != mOldPcbThickness) return true;
   if (mNewDesignRules != mOldDesignRules) return true;
   if (mNewDrcSettings != mOldDrcSettings) return true;
   return false;
@@ -94,6 +102,7 @@ bool CmdBoardEdit::performExecute() {
 void CmdBoardEdit::performUndo() {
   mBoard.setName(mOldName);
   mBoard.setInnerLayerCount(mOldInnerLayerCount);
+  mBoard.setPcbThickness(mOldPcbThickness);
   mBoard.setDesignRules(mOldDesignRules);
   mBoard.setDrcSettings(mOldDrcSettings);
 }
@@ -101,6 +110,7 @@ void CmdBoardEdit::performUndo() {
 void CmdBoardEdit::performRedo() {
   mBoard.setName(mNewName);
   mBoard.setInnerLayerCount(mNewInnerLayerCount);
+  mBoard.setPcbThickness(mNewPcbThickness);
   mBoard.setDesignRules(mNewDesignRules);
   mBoard.setDrcSettings(mNewDrcSettings);
 }

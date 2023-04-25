@@ -114,6 +114,9 @@ public:
   const QSet<const Layer*> getCopperLayers() const noexcept {
     return mCopperLayers;
   }
+  const PositiveLength& getPcbThickness() const noexcept {
+    return mPcbThickness;
+  }
   const QMap<QString, bool>& getLayersVisibility() const noexcept {
     return mLayersVisibility;
   }
@@ -128,6 +131,7 @@ public:
   }
   void setGridUnit(const LengthUnit& unit) noexcept { mGridUnit = unit; }
   void setInnerLayerCount(int count) noexcept;
+  void setPcbThickness(const PositiveLength& t) noexcept { mPcbThickness = t; }
   void setLayersVisibility(const QMap<QString, bool>& visibility) noexcept {
     mLayersVisibility = visibility;
   }
@@ -253,8 +257,13 @@ private:
   QString mDefaultFontFileName;
   PositiveLength mGridInterval;
   LengthUnit mGridUnit;
+
+  // Board setup
   int mInnerLayerCount;
-  QSet<const Layer*> mCopperLayers;
+  QSet<const Layer*> mCopperLayers;  ///< Derived from #mInnerLayerCount
+  PositiveLength mPcbThickness;  ///< Total PCB thickness (all layers)
+
+  // User settings
   QMap<QString, bool> mLayersVisibility;
 
   // DRC
