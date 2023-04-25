@@ -621,6 +621,8 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
 
   // Board setup.
   root.appendChild("thickness", SExpression::createToken("1.6"));
+  root.appendChild("solder_resist", SExpression::createToken("green"));
+  root.appendChild("silkscreen", SExpression::createToken("white"));
 
   // Fabrication output settings.
   {

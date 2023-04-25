@@ -58,6 +58,7 @@ class BoardDesignRules;
 class BoardFabricationOutputSettings;
 class Layer;
 class NetSignal;
+class PcbColor;
 class Project;
 
 /*******************************************************************************
@@ -117,6 +118,10 @@ public:
   const PositiveLength& getPcbThickness() const noexcept {
     return mPcbThickness;
   }
+  const PcbColor* getSolderResist() const noexcept { return mSolderResist; }
+  const PcbColor& getSilkscreenColor() const noexcept {
+    return *mSilkscreenColor;
+  }
   const QMap<QString, bool>& getLayersVisibility() const noexcept {
     return mLayersVisibility;
   }
@@ -132,6 +137,8 @@ public:
   void setGridUnit(const LengthUnit& unit) noexcept { mGridUnit = unit; }
   void setInnerLayerCount(int count) noexcept;
   void setPcbThickness(const PositiveLength& t) noexcept { mPcbThickness = t; }
+  void setSolderResist(const PcbColor* c) noexcept { mSolderResist = c; }
+  void setSilkscreenColor(const PcbColor& c) noexcept { mSilkscreenColor = &c; }
   void setLayersVisibility(const QMap<QString, bool>& visibility) noexcept {
     mLayersVisibility = visibility;
   }
@@ -262,6 +269,8 @@ private:
   int mInnerLayerCount;
   QSet<const Layer*> mCopperLayers;  ///< Derived from #mInnerLayerCount
   PositiveLength mPcbThickness;  ///< Total PCB thickness (all layers)
+  const PcbColor* mSolderResist;  ///< `nullptr` means no solder resist!
+  const PcbColor* mSilkscreenColor;  ///< Must never be `nullptr`!
 
   // User settings
   QMap<QString, bool> mLayersVisibility;

@@ -39,7 +39,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="lblInnerLayers">
          <property name="text">
           <string>Inner Copper Layers:</string>
          </property>
@@ -59,7 +59,7 @@
         </widget>
        </item>
        <item row="2" column="0">
-        <widget class="QLabel" name="label_31">
+        <widget class="QLabel" name="lblPcbThickness">
          <property name="text">
           <string>Total PCB Thickness:</string>
          </property>
@@ -78,6 +78,64 @@
            <width>100</width>
            <height>0</height>
           </size>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="lblSolderResist">
+         <property name="text">
+          <string>Solder Resist:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="lblSilkscreenColor">
+         <property name="text">
+          <string>Silkscreen:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="cbxSolderResist">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QComboBox" name="cbxSilkscreenColor">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <widget class="QLabel" name="lblNoteAboutSettingsHandover">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>These settings might not be supported and/or automatically taken into account by the PCB manufacturer. Always check/specify these manufacturing properties manually when ordering the PCB.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -717,6 +775,8 @@ QAbstractScrollArea {
   <tabstop>edtBoardName</tabstop>
   <tabstop>spbxInnerCopperLayerCount</tabstop>
   <tabstop>edtPcbThickness</tabstop>
+  <tabstop>cbxSolderResist</tabstop>
+  <tabstop>cbxSilkscreenColor</tabstop>
   <tabstop>edtRulesStopMaskClrMin</tabstop>
   <tabstop>edtRulesStopMaskClrRatio</tabstop>
   <tabstop>edtRulesStopMaskClrMax</tabstop>

@@ -399,30 +399,34 @@ void BoardGerberExport::exportLayerInnerCopper(
 
 void BoardGerberExport::exportLayerTopSolderMask(
     const BoardFabricationOutputSettings& settings) const {
-  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                  settings.getSuffixSolderMaskTop());
-  GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getVersion());
-  gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Top,
-                                GerberGenerator::Polarity::Negative);
-  drawLayer(gen, Layer::topStopMask());
-  gen.generate();
-  gen.saveToFile(fp);
-  mWrittenFiles.append(fp);
+  if (mBoard.getSolderResist()) {
+    FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                    settings.getSuffixSolderMaskTop());
+    GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
+                        mProject.getVersion());
+    gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Top,
+                                  GerberGenerator::Polarity::Negative);
+    drawLayer(gen, Layer::topStopMask());
+    gen.generate();
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
+  }
 }
 
 void BoardGerberExport::exportLayerBottomSolderMask(
     const BoardFabricationOutputSettings& settings) const {
-  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                  settings.getSuffixSolderMaskBot());
-  GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getVersion());
-  gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Bottom,
-                                GerberGenerator::Polarity::Negative);
-  drawLayer(gen, Layer::botStopMask());
-  gen.generate();
-  gen.saveToFile(fp);
-  mWrittenFiles.append(fp);
+  if (mBoard.getSolderResist()) {
+    FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                    settings.getSuffixSolderMaskBot());
+    GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
+                        mProject.getVersion());
+    gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Bottom,
+                                  GerberGenerator::Polarity::Negative);
+    drawLayer(gen, Layer::botStopMask());
+    gen.generate();
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
+  }
 }
 
 void BoardGerberExport::exportLayerTopSilkscreen(

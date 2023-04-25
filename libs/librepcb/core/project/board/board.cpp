@@ -30,6 +30,7 @@
 #include "../../library/pkg/footprint.h"
 #include "../../serialization/sexpression.h"
 #include "../../types/lengthunit.h"
+#include "../../types/pcbcolor.h"
 #include "../../utils/scopeguardlist.h"
 #include "../../utils/toolbox.h"
 #include "../circuit/circuit.h"
@@ -86,6 +87,8 @@ Board::Board(Project& project,
     mInnerLayerCount(-1),  // Force update of setter.
     mCopperLayers(),
     mPcbThickness(1600000),  // 1.6mm
+    mSolderResist(&PcbColor::green()),
+    mSilkscreenColor(&PcbColor::white()),
     mDrcMessageApprovalsVersion(Application::getFileFormatVersion()),
     mDrcMessageApprovals(),
     mSupportedDrcMessageApprovals() {
@@ -515,6 +518,8 @@ void Board::copyFrom(const Board& other) {
   mInnerLayerCount = other.getInnerLayerCount();
   mCopperLayers = other.getCopperLayers();
   mPcbThickness = other.mPcbThickness;
+  mSolderResist = other.mSolderResist;
+  mSilkscreenColor = other.mSilkscreenColor;
   *mDesignRules = other.getDesignRules();
   *mFabricationOutputSettings = other.getFabricationOutputSettings();
 
@@ -688,6 +693,10 @@ void Board::save() {
     }
     root.ensureLineBreak();
     root.appendChild("thickness", mPcbThickness);
+    root.ensureLineBreak();
+    root.appendChild("solder_resist", mSolderResist);
+    root.ensureLineBreak();
+    root.appendChild("silkscreen", mSilkscreenColor);
     root.ensureLineBreak();
     mDesignRules->serialize(root.appendList("design_rules"));
     root.ensureLineBreak();

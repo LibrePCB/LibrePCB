@@ -389,6 +389,8 @@ add_library(
   types/lengthunit.h
   types/maskconfig.cpp
   types/maskconfig.h
+  types/pcbcolor.cpp
+  types/pcbcolor.h
   types/point.cpp
   types/point.h
   types/ratio.cpp

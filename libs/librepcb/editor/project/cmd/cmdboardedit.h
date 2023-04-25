@@ -37,6 +37,7 @@
 namespace librepcb {
 
 class Board;
+class PcbColor;
 
 namespace editor {
 
@@ -59,6 +60,8 @@ public:
   void setName(const ElementName& name) noexcept;
   void setInnerLayerCount(int count) noexcept;
   void setPcbThickness(const PositiveLength& thickness) noexcept;
+  void setSolderResist(const PcbColor* c) noexcept;
+  void setSilkscreenColor(const PcbColor& c) noexcept;
   void setDesignRules(const BoardDesignRules& rules) noexcept;
   void setDrcSettings(const BoardDesignRuleCheckSettings& settings) noexcept;
 
@@ -81,6 +84,10 @@ private:  // Data
   int mNewInnerLayerCount;
   PositiveLength mOldPcbThickness;
   PositiveLength mNewPcbThickness;
+  const PcbColor* mOldSolderResist;
+  const PcbColor* mNewSolderResist;
+  const PcbColor* mOldSilkscreenColor;
+  const PcbColor* mNewSilkscreenColor;
   BoardDesignRules mOldDesignRules;
   BoardDesignRules mNewDesignRules;
   BoardDesignRuleCheckSettings mOldDrcSettings;

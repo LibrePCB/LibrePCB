@@ -114,6 +114,8 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
   Q_UNUSED(root);
   Q_UNUSED(context);
   root.appendChild("thickness", SExpression::createToken("1.6"));
+  root.appendChild("solder_resist", SExpression::createToken("green"));
+  root.appendChild("silkscreen", SExpression::createToken("white"));
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

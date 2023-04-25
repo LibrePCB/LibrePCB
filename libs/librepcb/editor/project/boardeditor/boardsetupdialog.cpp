@@ -30,6 +30,7 @@
 #include <librepcb/core/project/board/boarddesignrules.h>
 #include <librepcb/core/project/board/drc/boarddesignrulechecksettings.h>
 #include <librepcb/core/types/layer.h>
+#include <librepcb/core/types/pcbcolor.h>
 
 #include <QtCore>
 
@@ -63,6 +64,32 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   mUi->edtPcbThickness->configure(mBoard.getGridUnit(),
                                   LengthEditBase::Steps::generic(),
                                   sSettingsPrefix % "/pcb_thickness");
+  mUi->cbxSolderResist->addItem(
+      tr("None (fully exposed copper)"),
+      QVariant::fromValue(static_cast<const PcbColor*>(nullptr)));
+  foreach (const PcbColor* color, PcbColor::all()) {
+    const QString defaultSuffix = " (" % tr("default") % ")";
+    if (color->isAvailableForSolderResist()) {
+      QString text = color->getNameTr();
+      if (color == &PcbColor::green()) text += defaultSuffix;
+      mUi->cbxSolderResist->addItem(text, QVariant::fromValue(color));
+    }
+    if (color->isAvailableForSilkscreen()) {
+      QString text = color->getNameTr();
+      if (color == &PcbColor::white()) text += defaultSuffix;
+      mUi->cbxSilkscreenColor->addItem(text, QVariant::fromValue(color));
+    }
+  }
+  for (QLabel* lbl : {
+           mUi->lblInnerLayers,
+           mUi->lblPcbThickness,
+           mUi->lblSolderResist,
+           mUi->lblSilkscreenColor,
+       }) {
+    lbl->setText(lbl->text().replace(":", "") % "*:");
+  }
+  mUi->lblNoteAboutSettingsHandover->setText(
+      "*) " % mUi->lblNoteAboutSettingsHandover->text());
 
   // Tab: Design Rules
   mUi->edtRulesStopMaskClrRatio->setSingleStep(5.0);  // [%]
@@ -243,6 +270,10 @@ void BoardSetupDialog::load() noexcept {
   mUi->edtBoardName->setText(*mBoard.getName());
   mUi->spbxInnerCopperLayerCount->setValue(mBoard.getInnerLayerCount());
   mUi->edtPcbThickness->setValue(mBoard.getPcbThickness());
+  mUi->cbxSolderResist->setCurrentIndex(mUi->cbxSolderResist->findData(
+      QVariant::fromValue(mBoard.getSolderResist())));
+  mUi->cbxSilkscreenColor->setCurrentIndex(mUi->cbxSilkscreenColor->findData(
+      QVariant::fromValue(&mBoard.getSilkscreenColor())));
 
   // Tab: Design Rules
   const BoardDesignRules& r = mBoard.getDesignRules();
@@ -315,6 +346,14 @@ bool BoardSetupDialog::apply() noexcept {
         ElementName(mUi->edtBoardName->text().trimmed()));  // can throw
     cmd->setInnerLayerCount(mUi->spbxInnerCopperLayerCount->value());
     cmd->setPcbThickness(mUi->edtPcbThickness->getValue());
+    if (mUi->cbxSolderResist->currentIndex() >= 0) {
+      cmd->setSolderResist(
+          mUi->cbxSolderResist->currentData().value<const PcbColor*>());
+    }
+    if (const PcbColor* color =
+            mUi->cbxSilkscreenColor->currentData().value<const PcbColor*>()) {
+      cmd->setSilkscreenColor(*color);
+    }
 
     // Tab: Design Rules
     BoardDesignRules r = mBoard.getDesignRules();
