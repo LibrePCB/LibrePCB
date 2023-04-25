@@ -86,12 +86,6 @@ public:
   const QString& getSuffixSolderPasteBot() const noexcept {
     return mSuffixSolderPasteBot;
   }
-  const QVector<const Layer*>& getSilkscreenLayersTop() const noexcept {
-    return mSilkscreenLayersTop;
-  }
-  const QVector<const Layer*>& getSilkscreenLayersBot() const noexcept {
-    return mSilkscreenLayersBot;
-  }
   bool getMergeDrillFiles() const noexcept { return mMergeDrillFiles; }
   bool getUseG85SlotCommand() const noexcept { return mUseG85SlotCommand; }
   bool getEnableSolderPasteTop() const noexcept {
@@ -130,12 +124,6 @@ public:
   void setSuffixSolderPasteBot(const QString& s) noexcept {
     mSuffixSolderPasteBot = s;
   }
-  void setSilkscreenLayersTop(const QVector<const Layer*>& l) noexcept {
-    mSilkscreenLayersTop = l;
-  }
-  void setSilkscreenLayersBot(const QVector<const Layer*>& l) noexcept {
-    mSilkscreenLayersBot = l;
-  }
   void setMergeDrillFiles(bool m) noexcept { mMergeDrillFiles = m; }
   void setUseG85SlotCommand(bool u) noexcept { mUseG85SlotCommand = u; }
   void setEnableSolderPasteTop(bool e) noexcept { mEnableSolderPasteTop = e; }
@@ -173,8 +161,6 @@ private:  // Data
   QString mSuffixSilkscreenBot;
   QString mSuffixSolderPasteTop;
   QString mSuffixSolderPasteBot;
-  QVector<const Layer*> mSilkscreenLayersTop;
-  QVector<const Layer*> mSilkscreenLayersBot;
   bool mMergeDrillFiles;
   bool mUseG85SlotCommand;
   bool mEnableSolderPasteTop;

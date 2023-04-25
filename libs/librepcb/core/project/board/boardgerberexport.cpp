@@ -431,7 +431,7 @@ void BoardGerberExport::exportLayerBottomSolderMask(
 
 void BoardGerberExport::exportLayerTopSilkscreen(
     const BoardFabricationOutputSettings& settings) const {
-  const QVector<const Layer*>& layers = settings.getSilkscreenLayersTop();
+  const QVector<const Layer*>& layers = mBoard.getSilkscreenLayersTop();
   if (layers.count() > 0) {  // don't export silkscreen if no layers selected
     FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                     settings.getSuffixSilkscreenTop());
@@ -450,7 +450,7 @@ void BoardGerberExport::exportLayerTopSilkscreen(
 
 void BoardGerberExport::exportLayerBottomSilkscreen(
     const BoardFabricationOutputSettings& settings) const {
-  const QVector<const Layer*>& layers = settings.getSilkscreenLayersBot();
+  const QVector<const Layer*>& layers = mBoard.getSilkscreenLayersBot();
   if (layers.count() > 0) {  // don't export silkscreen if no layers selected
     FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                     settings.getSuffixSilkscreenBot());

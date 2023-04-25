@@ -90,6 +90,12 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   }
   mUi->lblNoteAboutSettingsHandover->setText(
       "*) " % mUi->lblNoteAboutSettingsHandover->text());
+  mUi->cbxSilkTopPlacement->setText(Layer::topPlacement().getNameTr());
+  mUi->cbxSilkTopNames->setText(Layer::topNames().getNameTr());
+  mUi->cbxSilkTopValues->setText(Layer::topValues().getNameTr());
+  mUi->cbxSilkBotPlacement->setText(Layer::botPlacement().getNameTr());
+  mUi->cbxSilkBotNames->setText(Layer::botNames().getNameTr());
+  mUi->cbxSilkBotValues->setText(Layer::botValues().getNameTr());
 
   // Tab: Design Rules
   mUi->edtRulesStopMaskClrRatio->setSingleStep(5.0);  // [%]
@@ -274,6 +280,18 @@ void BoardSetupDialog::load() noexcept {
       QVariant::fromValue(mBoard.getSolderResist())));
   mUi->cbxSilkscreenColor->setCurrentIndex(mUi->cbxSilkscreenColor->findData(
       QVariant::fromValue(&mBoard.getSilkscreenColor())));
+  const QVector<const Layer*>& topSilkscreen = mBoard.getSilkscreenLayersTop();
+  mUi->cbxSilkTopPlacement->setChecked(
+      topSilkscreen.contains(&Layer::topPlacement()));
+  mUi->cbxSilkTopNames->setChecked(topSilkscreen.contains(&Layer::topNames()));
+  mUi->cbxSilkTopValues->setChecked(
+      topSilkscreen.contains(&Layer::topValues()));
+  const QVector<const Layer*>& botSilkscreen = mBoard.getSilkscreenLayersBot();
+  mUi->cbxSilkBotPlacement->setChecked(
+      botSilkscreen.contains(&Layer::botPlacement()));
+  mUi->cbxSilkBotNames->setChecked(botSilkscreen.contains(&Layer::botNames()));
+  mUi->cbxSilkBotValues->setChecked(
+      botSilkscreen.contains(&Layer::botValues()));
 
   // Tab: Design Rules
   const BoardDesignRules& r = mBoard.getDesignRules();
@@ -354,6 +372,8 @@ bool BoardSetupDialog::apply() noexcept {
             mUi->cbxSilkscreenColor->currentData().value<const PcbColor*>()) {
       cmd->setSilkscreenColor(*color);
     }
+    cmd->setSilkscreenLayersTop(getTopSilkscreenLayers());
+    cmd->setSilkscreenLayersBot(getBotSilkscreenLayers());
 
     // Tab: Design Rules
     BoardDesignRules r = mBoard.getDesignRules();
@@ -408,6 +428,36 @@ bool BoardSetupDialog::apply() noexcept {
     QMessageBox::warning(this, tr("Could not apply settings"), e.getMsg());
     return false;
   }
+}
+
+QVector<const Layer*> BoardSetupDialog::getTopSilkscreenLayers() const
+    noexcept {
+  QVector<const Layer*> layers;
+  if (mUi->cbxSilkTopPlacement->isChecked()) {
+    layers << &Layer::topPlacement();
+  }
+  if (mUi->cbxSilkTopNames->isChecked()) {
+    layers << &Layer::topNames();
+  }
+  if (mUi->cbxSilkTopValues->isChecked()) {
+    layers << &Layer::topValues();
+  }
+  return layers;
+}
+
+QVector<const Layer*> BoardSetupDialog::getBotSilkscreenLayers() const
+    noexcept {
+  QVector<const Layer*> layers;
+  if (mUi->cbxSilkBotPlacement->isChecked()) {
+    layers << &Layer::botPlacement();
+  }
+  if (mUi->cbxSilkBotNames->isChecked()) {
+    layers << &Layer::botNames();
+  }
+  if (mUi->cbxSilkBotValues->isChecked()) {
+    layers << &Layer::botValues();
+  }
+  return layers;
 }
 
 /*******************************************************************************

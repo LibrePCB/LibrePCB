@@ -49,6 +49,10 @@ CmdBoardEdit::CmdBoardEdit(Board& board) noexcept
     mNewSolderResist(mOldSolderResist),
     mOldSilkscreenColor(&mBoard.getSilkscreenColor()),
     mNewSilkscreenColor(mOldSilkscreenColor),
+    mOldSilkscreenLayersTop(mBoard.getSilkscreenLayersTop()),
+    mNewSilkscreenLayersTop(mOldSilkscreenLayersTop),
+    mOldSilkscreenLayersBot(mBoard.getSilkscreenLayersBot()),
+    mNewSilkscreenLayersBot(mOldSilkscreenLayersBot),
     mOldDesignRules(mBoard.getDesignRules()),
     mNewDesignRules(mOldDesignRules),
     mOldDrcSettings(mBoard.getDrcSettings()),
@@ -86,6 +90,18 @@ void CmdBoardEdit::setSilkscreenColor(const PcbColor& c) noexcept {
   mNewSilkscreenColor = &c;
 }
 
+void CmdBoardEdit::setSilkscreenLayersTop(
+    const QVector<const Layer*>& l) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewSilkscreenLayersTop = l;
+}
+
+void CmdBoardEdit::setSilkscreenLayersBot(
+    const QVector<const Layer*>& l) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewSilkscreenLayersBot = l;
+}
+
 void CmdBoardEdit::setDesignRules(const BoardDesignRules& rules) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewDesignRules = rules;
@@ -109,6 +125,8 @@ bool CmdBoardEdit::performExecute() {
   if (mNewPcbThickness != mOldPcbThickness) return true;
   if (mNewSolderResist != mOldSolderResist) return true;
   if (mNewSilkscreenColor != mOldSilkscreenColor) return true;
+  if (mNewSilkscreenLayersTop != mOldSilkscreenLayersTop) return true;
+  if (mNewSilkscreenLayersBot != mOldSilkscreenLayersBot) return true;
   if (mNewDesignRules != mOldDesignRules) return true;
   if (mNewDrcSettings != mOldDrcSettings) return true;
   return false;
@@ -120,6 +138,8 @@ void CmdBoardEdit::performUndo() {
   mBoard.setPcbThickness(mOldPcbThickness);
   mBoard.setSolderResist(mOldSolderResist);
   mBoard.setSilkscreenColor(*mOldSilkscreenColor);
+  mBoard.setSilkscreenLayersTop(mOldSilkscreenLayersTop);
+  mBoard.setSilkscreenLayersBot(mOldSilkscreenLayersBot);
   mBoard.setDesignRules(mOldDesignRules);
   mBoard.setDrcSettings(mOldDrcSettings);
 }
@@ -130,6 +150,8 @@ void CmdBoardEdit::performRedo() {
   mBoard.setPcbThickness(mNewPcbThickness);
   mBoard.setSolderResist(mNewSolderResist);
   mBoard.setSilkscreenColor(*mNewSilkscreenColor);
+  mBoard.setSilkscreenLayersTop(mNewSilkscreenLayersTop);
+  mBoard.setSilkscreenLayersBot(mNewSilkscreenLayersBot);
   mBoard.setDesignRules(mNewDesignRules);
   mBoard.setDrcSettings(mNewDrcSettings);
 }

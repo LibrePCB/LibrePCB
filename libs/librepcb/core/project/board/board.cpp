@@ -89,6 +89,8 @@ Board::Board(Project& project,
     mPcbThickness(1600000),  // 1.6mm
     mSolderResist(&PcbColor::green()),
     mSilkscreenColor(&PcbColor::white()),
+    mSilkscreenLayersTop({&Layer::topPlacement(), &Layer::topNames()}),
+    mSilkscreenLayersBot({&Layer::botPlacement(), &Layer::botNames()}),
     mDrcMessageApprovalsVersion(Application::getFileFormatVersion()),
     mDrcMessageApprovals(),
     mSupportedDrcMessageApprovals() {
@@ -520,6 +522,8 @@ void Board::copyFrom(const Board& other) {
   mPcbThickness = other.mPcbThickness;
   mSolderResist = other.mSolderResist;
   mSilkscreenColor = other.mSilkscreenColor;
+  mSilkscreenLayersTop = other.mSilkscreenLayersTop;
+  mSilkscreenLayersBot = other.mSilkscreenLayersBot;
   *mDesignRules = other.getDesignRules();
   *mFabricationOutputSettings = other.getFabricationOutputSettings();
 
@@ -697,6 +701,20 @@ void Board::save() {
     root.appendChild("solder_resist", mSolderResist);
     root.ensureLineBreak();
     root.appendChild("silkscreen", mSilkscreenColor);
+    root.ensureLineBreak();
+    {
+      SExpression& node = root.appendList("silkscreen_layers_top");
+      foreach (const Layer* layer, mSilkscreenLayersTop) {
+        node.appendChild(*layer);
+      }
+    }
+    root.ensureLineBreak();
+    {
+      SExpression& node = root.appendList("silkscreen_layers_bot");
+      foreach (const Layer* layer, mSilkscreenLayersBot) {
+        node.appendChild(*layer);
+      }
+    }
     root.ensureLineBreak();
     mDesignRules->serialize(root.appendList("design_rules"));
     root.ensureLineBreak();

@@ -29,7 +29,6 @@
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/project.h>
-#include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
@@ -127,20 +126,6 @@ FabricationOutputDialog::FabricationOutputDialog(
   mUi->cbxSolderPasteTop->setChecked(s.getEnableSolderPasteTop());
   mUi->cbxSolderPasteBot->setChecked(s.getEnableSolderPasteBot());
 
-  const QVector<const Layer*>& topSilkscreen = s.getSilkscreenLayersTop();
-  mUi->cbxSilkTopPlacement->setChecked(
-      topSilkscreen.contains(&Layer::topPlacement()));
-  mUi->cbxSilkTopNames->setChecked(topSilkscreen.contains(&Layer::topNames()));
-  mUi->cbxSilkTopValues->setChecked(
-      topSilkscreen.contains(&Layer::topValues()));
-
-  const QVector<const Layer*>& botSilkscreen = s.getSilkscreenLayersBot();
-  mUi->cbxSilkBotPlacement->setChecked(
-      botSilkscreen.contains(&Layer::botPlacement()));
-  mUi->cbxSilkBotNames->setChecked(botSilkscreen.contains(&Layer::botNames()));
-  mUi->cbxSilkBotValues->setChecked(
-      botSilkscreen.contains(&Layer::botValues()));
-
   // Load window geometry.
   QSettings clientSettings;
   restoreGeometry(
@@ -218,8 +203,6 @@ void FabricationOutputDialog::btnGenerateClicked() {
     s.setSuffixSilkscreenBot(mUi->edtSuffixSilkscreenBot->text().trimmed());
     s.setSuffixSolderPasteTop(mUi->edtSuffixSolderPasteTop->text().trimmed());
     s.setSuffixSolderPasteBot(mUi->edtSuffixSolderPasteBot->text().trimmed());
-    s.setSilkscreenLayersTop(getTopSilkscreenLayers());
-    s.setSilkscreenLayersBot(getBotSilkscreenLayers());
     s.setMergeDrillFiles(mUi->cbxDrillsMerge->isChecked());
     s.setUseG85SlotCommand(mUi->cbxUseG85Slots->isChecked());
     s.setEnableSolderPasteTop(mUi->cbxSolderPasteTop->isChecked());
@@ -258,40 +241,6 @@ void FabricationOutputDialog::btnBrowseOutputDirClicked() {
   } else {
     QMessageBox::warning(this, tr("Warning"), tr("Directory does not exist."));
   }
-}
-
-/*******************************************************************************
- *  Private Methods
- ******************************************************************************/
-
-QVector<const Layer*> FabricationOutputDialog::getTopSilkscreenLayers() const
-    noexcept {
-  QVector<const Layer*> layers;
-  if (mUi->cbxSilkTopPlacement->isChecked()) {
-    layers << &Layer::topPlacement();
-  }
-  if (mUi->cbxSilkTopNames->isChecked()) {
-    layers << &Layer::topNames();
-  }
-  if (mUi->cbxSilkTopValues->isChecked()) {
-    layers << &Layer::topValues();
-  }
-  return layers;
-}
-
-QVector<const Layer*> FabricationOutputDialog::getBotSilkscreenLayers() const
-    noexcept {
-  QVector<const Layer*> layers;
-  if (mUi->cbxSilkBotPlacement->isChecked()) {
-    layers << &Layer::botPlacement();
-  }
-  if (mUi->cbxSilkBotNames->isChecked()) {
-    layers << &Layer::botNames();
-  }
-  if (mUi->cbxSilkBotValues->isChecked()) {
-    layers << &Layer::botValues();
-  }
-  return layers;
 }
 
 /*******************************************************************************
