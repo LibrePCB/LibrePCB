@@ -183,6 +183,9 @@ void SGI_SymbolPin::pinEdited(const SI_SymbolPin& obj,
     case SI_SymbolPin::Event::NumbersAlignmentChanged:
       updateNumbersAlignment();
       break;
+    case SI_SymbolPin::Event::NetNameChanged:
+      updateToolTip();
+      break;
     default:
       qWarning() << "Unhandled switch-case in SGI_SymbolPin::pinEdited():"
                  << static_cast<int>(event);
