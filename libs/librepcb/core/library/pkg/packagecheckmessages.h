@@ -239,6 +239,25 @@ public:
 };
 
 /*******************************************************************************
+ *  Class MsgMissingFootprintModel
+ ******************************************************************************/
+
+/**
+ * @brief The MsgMissingFootprintModel class
+ */
+class MsgMissingFootprintModel final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgMissingFootprintModel)
+
+public:
+  // Constructors / Destructor
+  MsgMissingFootprintModel() = delete;
+  MsgMissingFootprintModel(std::shared_ptr<const Footprint> footprint) noexcept;
+  MsgMissingFootprintModel(const MsgMissingFootprintModel& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgMissingFootprintModel() noexcept {}
+};
+
+/*******************************************************************************
  *  Class MsgMissingFootprintName
  ******************************************************************************/
 

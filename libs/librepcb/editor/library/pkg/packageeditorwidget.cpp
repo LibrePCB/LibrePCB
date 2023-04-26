@@ -32,7 +32,6 @@
 #include "../../utils/toolbarproxy.h"
 #include "../../widgets/openglview.h"
 #include "../../widgets/statusbar.h"
-#include "../../widgets/waitingspinnerwidget.h"
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdfootprintedit.h"
 #include "../cmd/cmdfootprintpadedit.h"
@@ -757,6 +756,12 @@ void PackageEditorWidget::fixMsg(const MsgMissingFootprint& msg) {
 }
 
 template <>
+void PackageEditorWidget::fixMsg(const MsgMissingFootprintModel& msg) {
+  Q_UNUSED(msg);
+  toggle3DMode(true);
+}
+
+template <>
 void PackageEditorWidget::fixMsg(const MsgMissingFootprintName& msg) {
   Q_UNUSED(msg);
   mFsm->processStartAddingNames();
@@ -950,6 +955,7 @@ bool PackageEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprint>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingFootprintModel>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprintName>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprintValue>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgWrongFootprintTextLayer>(msg, applyFix)) return true;
@@ -1035,13 +1041,11 @@ void PackageEditorWidget::toggle3DMode(bool enable) noexcept {
     mUi->btnToggle3d->setArrowType(Qt::RightArrow);
     mOpenGlView.reset(new OpenGlView(this));
     mUi->mainLayout->insertWidget(0, mOpenGlView.data(), 2);
-    mOpenGlViewWaitingSpinner.reset(
-        new WaitingSpinnerWidget(mOpenGlView.data()));
     mOpenGlSceneBuilder.reset(new OpenGlSceneBuilder());
     connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::started,
-            mOpenGlViewWaitingSpinner.data(), &WaitingSpinnerWidget::show);
+            mOpenGlView.data(), &OpenGlView::startSpinning);
     connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::finished,
-            mOpenGlViewWaitingSpinner.data(), &WaitingSpinnerWidget::hide);
+            mOpenGlView.data(), &OpenGlView::stopSpinning);
     connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::objectAdded,
             mOpenGlView.data(), &OpenGlView::addObject);
     connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::objectRemoved,
@@ -1051,7 +1055,6 @@ void PackageEditorWidget::toggle3DMode(bool enable) noexcept {
             static_cast<void (OpenGlView::*)()>(&OpenGlView::update));
     scheduleOpenGlSceneUpdate();
   } else {
-    mOpenGlViewWaitingSpinner.reset();
     mOpenGlView.reset();
     mUi->modelListEditorWidget->hide();
     mUi->graphicsView->show();

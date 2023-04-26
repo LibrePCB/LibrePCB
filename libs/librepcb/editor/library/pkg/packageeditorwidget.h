@@ -50,7 +50,6 @@ class GraphicsScene;
 class OpenGlSceneBuilder;
 class OpenGlView;
 class PackageEditorFsm;
-class WaitingSpinnerWidget;
 
 namespace Ui {
 class PackageEditorWidget;
@@ -145,7 +144,6 @@ private:  // Methods
 private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;
   QScopedPointer<OpenGlView> mOpenGlView;
-  QScopedPointer<WaitingSpinnerWidget> mOpenGlViewWaitingSpinner;
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<GraphicsScene> mGraphicsScene;
   QScopedPointer<OpenGlSceneBuilder> mOpenGlSceneBuilder;

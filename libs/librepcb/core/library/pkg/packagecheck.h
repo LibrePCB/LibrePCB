@@ -71,6 +71,7 @@ protected:  // Methods
   void checkCopperClearanceOnPads(MsgList& msgs) const;
   void checkPadFunctions(MsgList& msgs) const;
   void checkHolesStopMask(MsgList& msgs) const;
+  void checkFootprintModels(MsgList& msgs) const;
 
 private:  // Data
   const Package& mPackage;

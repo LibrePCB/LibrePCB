@@ -66,6 +66,7 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkCopperClearanceOnPads(msgs);
   checkPadFunctions(msgs);
   checkHolesStopMask(msgs);
+  checkFootprintModels(msgs);
   return msgs;
 }
 
@@ -502,6 +503,20 @@ void PackageCheck::checkHolesStopMask(MsgList& msgs) const {
       std::shared_ptr<const Hole> hole = itHole.ptr();
       if (!hole->getStopMaskConfig().isEnabled()) {
         msgs.append(std::make_shared<MsgHoleWithoutStopMask>(footprint, hole));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkFootprintModels(MsgList& msgs) const {
+  if (mPackage.getAssemblyType(true) != Package::AssemblyType::None) {
+    const QSet<Uuid> packageModels = mPackage.getModels().getUuidSet();
+    for (auto itFtp = mPackage.getFootprints().begin();
+         itFtp != mPackage.getFootprints().end(); ++itFtp) {
+      std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+      const QSet<Uuid> uuids = footprint->getModels() & packageModels;
+      if (uuids.isEmpty()) {
+        msgs.append(std::make_shared<MsgMissingFootprintModel>(footprint));
       }
     }
   }
