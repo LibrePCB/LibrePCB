@@ -619,11 +619,28 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
   upgradeBoardDrcSettings(root);
   upgradeLayers(root);
 
+  // Board setup.
+  root.appendChild("thickness", SExpression::createToken("1.6"));
+  root.appendChild("solder_resist", SExpression::createToken("green"));
+  root.appendChild("silkscreen", SExpression::createToken("white"));
+
   // Fabrication output settings.
   {
     SExpression& node = root.getChild("fabrication_output_settings");
     SExpression& drillNode = node.getChild("drills");
     drillNode.appendChild("g85_slots", false);
+
+    SExpression& silkTop = node.getChild("silkscreen_top");
+    SExpression& silkLayersTop = silkTop.getChild("layers");
+    root.appendChild(SExpression(silkLayersTop))
+        .setName("silkscreen_layers_top");
+    silkTop.removeChild(silkLayersTop);
+
+    SExpression& silkBot = node.getChild("silkscreen_bot");
+    SExpression& silkLayersBot = silkBot.getChild("layers");
+    root.appendChild(SExpression(silkLayersBot))
+        .setName("silkscreen_layers_bot");
+    silkBot.removeChild(silkLayersBot);
   }
 
   // Devices.

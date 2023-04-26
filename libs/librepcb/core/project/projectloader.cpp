@@ -29,6 +29,7 @@
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
 #include "../serialization/fileformatmigration.h"
+#include "../types/pcbcolor.h"
 #include "board/board.h"
 #include "board/boarddesignrules.h"
 #include "board/boardfabricationoutputsettings.h"
@@ -532,6 +533,30 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   board->setDefaultFontName(root.getChild("default_font/@0").getValue());
   board->setInnerLayerCount(
       deserialize<uint>(root.getChild("layers/inner/@0")));
+  board->setPcbThickness(
+      deserialize<PositiveLength>(root.getChild("thickness/@0")));
+  board->setSolderResist(
+      deserialize<const PcbColor*>(root.getChild("solder_resist/@0")));
+  board->setSilkscreenColor(
+      deserialize<const PcbColor&>(root.getChild("silkscreen/@0")));
+  {
+    QVector<const Layer*> layers;
+    foreach (const SExpression* child,
+             root.getChild("silkscreen_layers_top")
+                 .getChildren(SExpression::Type::Token)) {
+      layers.append(deserialize<const Layer*>(*child));
+    }
+    board->setSilkscreenLayersTop(layers);
+  }
+  {
+    QVector<const Layer*> layers;
+    foreach (const SExpression* child,
+             root.getChild("silkscreen_layers_bot")
+                 .getChildren(SExpression::Type::Token)) {
+      layers.append(deserialize<const Layer*>(*child));
+    }
+    board->setSilkscreenLayersBot(layers);
+  }
   board->setDesignRules(BoardDesignRules(root.getChild("design_rules")));
   {
     const SExpression& node = root.getChild("design_rule_check");

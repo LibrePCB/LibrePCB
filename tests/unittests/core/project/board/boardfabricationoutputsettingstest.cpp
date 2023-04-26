@@ -23,7 +23,6 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/serialization/sexpression.h>
-#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -59,8 +58,6 @@ TEST_F(BoardFabricationOutputSettingsTest, testSerializeAndDeserialize) {
   obj1.setSuffixSilkscreenBot("l");
   obj1.setSuffixSolderPasteTop("m");
   obj1.setSuffixSolderPasteBot("n");
-  obj1.setSilkscreenLayersTop({&Layer::topCopper(), &Layer::topStopMask()});
-  obj1.setSilkscreenLayersBot({&Layer::botCopper(), &Layer::botStopMask()});
   obj1.setMergeDrillFiles(!obj1.getMergeDrillFiles());
   obj1.setUseG85SlotCommand(!obj1.getUseG85SlotCommand());
   obj1.setEnableSolderPasteTop(!obj1.getEnableSolderPasteTop());

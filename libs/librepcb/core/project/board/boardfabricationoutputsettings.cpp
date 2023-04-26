@@ -51,8 +51,6 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings() noexcept
     mSuffixSilkscreenBot("_SILKSCREEN-BOTTOM.gbr"),
     mSuffixSolderPasteTop("_SOLDERPASTE-TOP.gbr"),
     mSuffixSolderPasteBot("_SOLDERPASTE-BOTTOM.gbr"),
-    mSilkscreenLayersTop({&Layer::topPlacement(), &Layer::topNames()}),
-    mSilkscreenLayersBot({&Layer::botPlacement(), &Layer::botNames()}),
     mMergeDrillFiles(false),
     mUseG85SlotCommand(false),
     mEnableSolderPasteTop(true),
@@ -84,24 +82,12 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
         node.getChild("solderpaste_top/suffix/@0").getValue()),
     mSuffixSolderPasteBot(
         node.getChild("solderpaste_bot/suffix/@0").getValue()),
-    mSilkscreenLayersTop(),  // Initialized below.
-    mSilkscreenLayersBot(),  // Initialized below.
     mMergeDrillFiles(deserialize<bool>(node.getChild("drills/merge/@0"))),
     mUseG85SlotCommand(deserialize<bool>(node.getChild("drills/g85_slots/@0"))),
     mEnableSolderPasteTop(
         deserialize<bool>(node.getChild("solderpaste_top/create/@0"))),
     mEnableSolderPasteBot(
         deserialize<bool>(node.getChild("solderpaste_bot/create/@0"))) {
-  foreach (const SExpression* child,
-           node.getChild("silkscreen_top/layers")
-               .getChildren(SExpression::Type::Token)) {
-    mSilkscreenLayersTop.append(deserialize<const Layer*>(*child));
-  }
-  foreach (const SExpression* child,
-           node.getChild("silkscreen_bot/layers")
-               .getChildren(SExpression::Type::Token)) {
-    mSilkscreenLayersBot.append(deserialize<const Layer*>(*child));
-  }
 }
 
 BoardFabricationOutputSettings::~BoardFabricationOutputSettings() noexcept {
@@ -127,25 +113,9 @@ void BoardFabricationOutputSettings::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendList("soldermask_bot").appendChild("suffix", mSuffixSolderMaskBot);
   root.ensureLineBreak();
-
-  SExpression& silkscreenTop = root.appendList("silkscreen_top");
-  silkscreenTop.appendChild("suffix", mSuffixSilkscreenTop);
-  silkscreenTop.ensureLineBreak();
-  SExpression& silkscreenTopLayers = silkscreenTop.appendList("layers");
-  foreach (const Layer* layer, mSilkscreenLayersTop) {
-    silkscreenTopLayers.appendChild(*layer);
-  }
-  silkscreenTop.ensureLineBreak();
+  root.appendList("silkscreen_top").appendChild("suffix", mSuffixSilkscreenTop);
   root.ensureLineBreak();
-
-  SExpression& silkscreenBot = root.appendList("silkscreen_bot");
-  silkscreenBot.appendChild("suffix", mSuffixSilkscreenBot);
-  silkscreenBot.ensureLineBreak();
-  SExpression& silkscreenBotLayers = silkscreenBot.appendList("layers");
-  foreach (const Layer* layer, mSilkscreenLayersBot) {
-    silkscreenBotLayers.appendChild(*layer);
-  }
-  silkscreenBot.ensureLineBreak();
+  root.appendList("silkscreen_bot").appendChild("suffix", mSuffixSilkscreenBot);
   root.ensureLineBreak();
 
   SExpression& drills = root.appendList("drills");
@@ -192,8 +162,6 @@ BoardFabricationOutputSettings& BoardFabricationOutputSettings::operator=(
   mSuffixSilkscreenBot = rhs.mSuffixSilkscreenBot;
   mSuffixSolderPasteTop = rhs.mSuffixSolderPasteTop;
   mSuffixSolderPasteBot = rhs.mSuffixSolderPasteBot;
-  mSilkscreenLayersTop = rhs.mSilkscreenLayersTop;
-  mSilkscreenLayersBot = rhs.mSilkscreenLayersBot;
   mMergeDrillFiles = rhs.mMergeDrillFiles;
   mUseG85SlotCommand = rhs.mUseG85SlotCommand;
   mEnableSolderPasteTop = rhs.mEnableSolderPasteTop;
@@ -217,8 +185,6 @@ bool BoardFabricationOutputSettings::operator==(
   if (mSuffixSilkscreenBot != rhs.mSuffixSilkscreenBot) return false;
   if (mSuffixSolderPasteTop != rhs.mSuffixSolderPasteTop) return false;
   if (mSuffixSolderPasteBot != rhs.mSuffixSolderPasteBot) return false;
-  if (mSilkscreenLayersTop != rhs.mSilkscreenLayersTop) return false;
-  if (mSilkscreenLayersBot != rhs.mSilkscreenLayersBot) return false;
   if (mMergeDrillFiles != rhs.mMergeDrillFiles) return false;
   if (mUseG85SlotCommand != rhs.mUseG85SlotCommand) return false;
   if (mEnableSolderPasteTop != rhs.mEnableSolderPasteTop) return false;

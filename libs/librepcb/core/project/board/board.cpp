@@ -30,6 +30,7 @@
 #include "../../library/pkg/footprint.h"
 #include "../../serialization/sexpression.h"
 #include "../../types/lengthunit.h"
+#include "../../types/pcbcolor.h"
 #include "../../utils/scopeguardlist.h"
 #include "../../utils/toolbox.h"
 #include "../circuit/circuit.h"
@@ -85,6 +86,11 @@ Board::Board(Project& project,
     mGridUnit(LengthUnit::millimeters()),
     mInnerLayerCount(-1),  // Force update of setter.
     mCopperLayers(),
+    mPcbThickness(1600000),  // 1.6mm
+    mSolderResist(&PcbColor::green()),
+    mSilkscreenColor(&PcbColor::white()),
+    mSilkscreenLayersTop({&Layer::topPlacement(), &Layer::topNames()}),
+    mSilkscreenLayersBot({&Layer::botPlacement(), &Layer::botNames()}),
     mDrcMessageApprovalsVersion(Application::getFileFormatVersion()),
     mDrcMessageApprovals(),
     mSupportedDrcMessageApprovals() {
@@ -513,6 +519,11 @@ void Board::copyFrom(const Board& other) {
   mGridUnit = other.getGridUnit();
   mInnerLayerCount = other.getInnerLayerCount();
   mCopperLayers = other.getCopperLayers();
+  mPcbThickness = other.mPcbThickness;
+  mSolderResist = other.mSolderResist;
+  mSilkscreenColor = other.mSilkscreenColor;
+  mSilkscreenLayersTop = other.mSilkscreenLayersTop;
+  mSilkscreenLayersBot = other.mSilkscreenLayersBot;
   *mDesignRules = other.getDesignRules();
   *mFabricationOutputSettings = other.getFabricationOutputSettings();
 
@@ -683,6 +694,26 @@ void Board::save() {
     {
       SExpression& node = root.appendList("layers");
       node.appendChild("inner", mInnerLayerCount);
+    }
+    root.ensureLineBreak();
+    root.appendChild("thickness", mPcbThickness);
+    root.ensureLineBreak();
+    root.appendChild("solder_resist", mSolderResist);
+    root.ensureLineBreak();
+    root.appendChild("silkscreen", mSilkscreenColor);
+    root.ensureLineBreak();
+    {
+      SExpression& node = root.appendList("silkscreen_layers_top");
+      foreach (const Layer* layer, mSilkscreenLayersTop) {
+        node.appendChild(*layer);
+      }
+    }
+    root.ensureLineBreak();
+    {
+      SExpression& node = root.appendList("silkscreen_layers_bot");
+      foreach (const Layer* layer, mSilkscreenLayersBot) {
+        node.appendChild(*layer);
+      }
     }
     root.ensureLineBreak();
     mDesignRules->serialize(root.appendList("design_rules"));

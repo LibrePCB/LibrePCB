@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>691</width>
-    <height>597</height>
+    <width>699</width>
+    <height>472</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -307,88 +307,6 @@ Attention: Curved slots are not supported in G85 mode (will raise an error).</st
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QGroupBox" name="groupBox">
-       <property name="title">
-        <string>Top Silkscreen Layers</string>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QCheckBox" name="cbxSilkTopPlacement">
-          <property name="text">
-           <string>Placement</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbxSilkTopNames">
-          <property name="text">
-           <string>Names</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbxSilkTopValues">
-          <property name="text">
-           <string>Values</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox_2">
-       <property name="title">
-        <string>Bottom Silkscreen Layers</string>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QCheckBox" name="cbxSilkBotPlacement">
-          <property name="text">
-           <string>Placement</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbxSilkBotNames">
-          <property name="text">
-           <string>Names</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="cbxSilkBotValues">
-          <property name="text">
-           <string>Values</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -448,12 +366,6 @@ Attention: Curved slots are not supported in G85 mode (will raise an error).</st
   <tabstop>edtSuffixSolderPasteTop</tabstop>
   <tabstop>cbxSolderPasteBot</tabstop>
   <tabstop>edtSuffixSolderPasteBot</tabstop>
-  <tabstop>cbxSilkTopPlacement</tabstop>
-  <tabstop>cbxSilkTopNames</tabstop>
-  <tabstop>cbxSilkTopValues</tabstop>
-  <tabstop>cbxSilkBotPlacement</tabstop>
-  <tabstop>cbxSilkBotNames</tabstop>
-  <tabstop>cbxSilkBotValues</tabstop>
  </tabstops>
  <resources/>
  <connections/>

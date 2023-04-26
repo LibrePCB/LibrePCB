@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>624</width>
-    <height>383</height>
+    <height>405</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,7 +39,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="label_2">
+        <widget class="QLabel" name="lblInnerLayers">
          <property name="text">
           <string>Inner Copper Layers:</string>
          </property>
@@ -55,6 +55,163 @@
          </property>
          <property name="maximum">
           <number>0</number>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="lblPcbThickness">
+         <property name="text">
+          <string>Total PCB Thickness:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="librepcb::editor::PositiveLengthEdit" name="edtPcbThickness" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="lblSolderResist">
+         <property name="text">
+          <string>Solder Resist:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="lblSilkscreenColor">
+         <property name="text">
+          <string>Silkscreen:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="cbxSolderResist">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QComboBox" name="cbxSilkscreenColor">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>3</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QCheckBox" name="cbxSilkTopPlacement">
+             <property name="text">
+              <string notr="true"/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cbxSilkTopNames">
+             <property name="text">
+              <string notr="true"/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cbxSilkTopValues">
+             <property name="text">
+              <string notr="true"/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QCheckBox" name="cbxSilkBotPlacement">
+             <property name="text">
+              <string notr="true"/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cbxSilkBotNames">
+             <property name="text">
+              <string notr="true"/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="cbxSilkBotValues">
+             <property name="text">
+              <string notr="true"/>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_31">
+         <property name="text">
+          <string>Silkscreen Content:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0" colspan="2">
+        <widget class="QLabel" name="lblNoteAboutSettingsHandover">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <italic>true</italic>
+          </font>
+         </property>
+         <property name="text">
+          <string>These settings might not be supported and/or automatically taken into account by the PCB manufacturer. Always check/specify these manufacturing properties manually when ordering the PCB.</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -370,7 +527,7 @@ QAbstractScrollArea {
             <x>0</x>
             <y>0</y>
             <width>602</width>
-            <height>301</height>
+            <height>323</height>
            </rect>
           </property>
           <property name="sizePolicy">
@@ -682,11 +839,26 @@ QAbstractScrollArea {
    <header location="global">librepcb/editor/widgets/unsignedratioedit.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>librepcb::editor::PositiveLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>edtBoardName</tabstop>
   <tabstop>spbxInnerCopperLayerCount</tabstop>
+  <tabstop>edtPcbThickness</tabstop>
+  <tabstop>cbxSolderResist</tabstop>
+  <tabstop>cbxSilkscreenColor</tabstop>
+  <tabstop>cbxSilkTopPlacement</tabstop>
+  <tabstop>cbxSilkTopNames</tabstop>
+  <tabstop>cbxSilkTopValues</tabstop>
+  <tabstop>cbxSilkBotPlacement</tabstop>
+  <tabstop>cbxSilkBotNames</tabstop>
+  <tabstop>cbxSilkBotValues</tabstop>
   <tabstop>edtRulesStopMaskClrMin</tabstop>
   <tabstop>edtRulesStopMaskClrRatio</tabstop>
   <tabstop>edtRulesStopMaskClrMax</tabstop>
@@ -708,7 +880,7 @@ QAbstractScrollArea {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGroupRulesCmpSidePadShape"/>
   <buttongroup name="btnGroupRulesInnerPadShape"/>
+  <buttongroup name="btnGroupRulesCmpSidePadShape"/>
  </buttongroups>
 </ui>

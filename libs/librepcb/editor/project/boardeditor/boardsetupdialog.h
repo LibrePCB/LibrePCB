@@ -32,6 +32,7 @@
 namespace librepcb {
 
 class Board;
+class Layer;
 
 namespace editor {
 
@@ -69,6 +70,8 @@ private:  // Methods
   void buttonBoxClicked(QAbstractButton* button);
   void load() noexcept;
   bool apply() noexcept;
+  QVector<const Layer*> getTopSilkscreenLayers() const noexcept;
+  QVector<const Layer*> getBotSilkscreenLayers() const noexcept;
 
 private:  // Date
   Board& mBoard;

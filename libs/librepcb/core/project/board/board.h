@@ -58,6 +58,7 @@ class BoardDesignRules;
 class BoardFabricationOutputSettings;
 class Layer;
 class NetSignal;
+class PcbColor;
 class Project;
 
 /*******************************************************************************
@@ -114,6 +115,19 @@ public:
   const QSet<const Layer*> getCopperLayers() const noexcept {
     return mCopperLayers;
   }
+  const PositiveLength& getPcbThickness() const noexcept {
+    return mPcbThickness;
+  }
+  const PcbColor* getSolderResist() const noexcept { return mSolderResist; }
+  const PcbColor& getSilkscreenColor() const noexcept {
+    return *mSilkscreenColor;
+  }
+  const QVector<const Layer*>& getSilkscreenLayersTop() const noexcept {
+    return mSilkscreenLayersTop;
+  }
+  const QVector<const Layer*>& getSilkscreenLayersBot() const noexcept {
+    return mSilkscreenLayersBot;
+  }
   const QMap<QString, bool>& getLayersVisibility() const noexcept {
     return mLayersVisibility;
   }
@@ -128,6 +142,15 @@ public:
   }
   void setGridUnit(const LengthUnit& unit) noexcept { mGridUnit = unit; }
   void setInnerLayerCount(int count) noexcept;
+  void setPcbThickness(const PositiveLength& t) noexcept { mPcbThickness = t; }
+  void setSolderResist(const PcbColor* c) noexcept { mSolderResist = c; }
+  void setSilkscreenColor(const PcbColor& c) noexcept { mSilkscreenColor = &c; }
+  void setSilkscreenLayersTop(const QVector<const Layer*>& l) noexcept {
+    mSilkscreenLayersTop = l;
+  }
+  void setSilkscreenLayersBot(const QVector<const Layer*>& l) noexcept {
+    mSilkscreenLayersBot = l;
+  }
   void setLayersVisibility(const QMap<QString, bool>& visibility) noexcept {
     mLayersVisibility = visibility;
   }
@@ -253,8 +276,17 @@ private:
   QString mDefaultFontFileName;
   PositiveLength mGridInterval;
   LengthUnit mGridUnit;
+
+  // Board setup
   int mInnerLayerCount;
-  QSet<const Layer*> mCopperLayers;
+  QSet<const Layer*> mCopperLayers;  ///< Derived from #mInnerLayerCount
+  PositiveLength mPcbThickness;  ///< Total PCB thickness (all layers)
+  const PcbColor* mSolderResist;  ///< `nullptr` means no solder resist!
+  const PcbColor* mSilkscreenColor;  ///< Must never be `nullptr`!
+  QVector<const Layer*> mSilkscreenLayersTop;
+  QVector<const Layer*> mSilkscreenLayersBot;
+
+  // User settings
   QMap<QString, bool> mLayersVisibility;
 
   // DRC
