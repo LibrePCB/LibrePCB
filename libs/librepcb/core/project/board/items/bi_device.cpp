@@ -56,6 +56,7 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
     mLibDevice(nullptr),
     mLibPackage(nullptr),
     mLibFootprint(nullptr),
+    mLibModel(nullptr),
     mPosition(position),
     mRotation(rotation),
     mMirrored(mirror),
@@ -177,6 +178,18 @@ const Uuid& BI_Device::getComponentInstanceUuid() const noexcept {
   return mCompInstance.getUuid();
 }
 
+tl::optional<Uuid> BI_Device::getLibModelUuid() const noexcept {
+  return mLibModel ? tl::make_optional(mLibModel->getUuid()) : tl::nullopt;
+}
+
+tl::optional<Uuid> BI_Device::getDefaultLibModelUuid() const noexcept {
+  for (const std::shared_ptr<const PackageModel>& model :
+       mLibPackage->getModelsForFootprint(mLibFootprint->getUuid())) {
+    return model->getUuid();
+  }
+  return tl::nullopt;
+}
+
 bool BI_Device::isUsed() const noexcept {
   foreach (const BI_FootprintPad* pad, mPads) {
     if (pad->isUsed()) return true;
@@ -277,6 +290,15 @@ void BI_Device::setAttributes(const AttributeList& attributes) noexcept {
   }
 }
 
+void BI_Device::setModel(const tl::optional<Uuid>& uuid) {
+  const PackageModel* model =
+      uuid ? mLibPackage->getModels().get(*uuid).get() : nullptr;  // can throw
+  if (model != mLibModel) {
+    mLibModel = model;
+    emit attributesChanged();
+  }
+}
+
 void BI_Device::addToBoard() {
   if (isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
@@ -325,6 +347,10 @@ void BI_Device::serialize(SExpression& root) const {
   root.appendChild("lib_device", mLibDevice->getUuid());
   root.ensureLineBreak();
   root.appendChild("lib_footprint", mLibFootprint->getUuid());
+  root.ensureLineBreak();
+  root.appendChild(
+      "lib_3d_model",
+      mLibModel ? tl::make_optional(mLibModel->getUuid()) : tl::nullopt);
   root.ensureLineBreak();
   mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);

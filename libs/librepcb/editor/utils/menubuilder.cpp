@@ -169,12 +169,17 @@ QMenu* MenuBuilder::createProductionDataMenu(QWidget* parent) noexcept {
 
 QMenu* MenuBuilder::createChangeDeviceMenu(QWidget* parent) noexcept {
   return createMenu("menuChangeDevice", tr("Change &Device"),
-                    QIcon(":/img/library/device.png"), parent);
+                    QIcon(":/img/library/package.png"), parent);
 }
 
 QMenu* MenuBuilder::createChangeFootprintMenu(QWidget* parent) noexcept {
   return createMenu("menuChangeFootprint", tr("Change &Footprint"),
                     QIcon(":/img/library/footprint.png"), parent);
+}
+
+QMenu* MenuBuilder::createChangeModelMenu(QWidget* parent) noexcept {
+  return createMenu("menuChangeModel", tr("Change 3D &Model"),
+                    QIcon(":/img/library/3d_model.png"), parent);
 }
 
 QMenu* MenuBuilder::createCopyToOtherLibraryMenu(QWidget* parent) noexcept {

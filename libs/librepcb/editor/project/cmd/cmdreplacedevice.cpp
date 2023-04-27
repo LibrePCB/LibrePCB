@@ -100,8 +100,9 @@ bool CmdReplaceDevice::performExecute() {
   execNewChildCmd(new CmdDeviceInstanceRemove(mDeviceInstance));  // can throw
   CmdAddDeviceToBoard* cmd = new CmdAddDeviceToBoard(
       mWorkspace, mBoard, mDeviceInstance.getComponentInstance(),
-      mNewDeviceUuid, mNewFootprintUuid, mDeviceInstance.getPosition(),
-      mDeviceInstance.getRotation(), mDeviceInstance.getMirrored());
+      mNewDeviceUuid, mNewFootprintUuid, mDeviceInstance.getLibModelUuid(),
+      mDeviceInstance.getPosition(), mDeviceInstance.getRotation(),
+      mDeviceInstance.getMirrored());
   execNewChildCmd(cmd);  // can throw
   BI_Device* newDevice = cmd->getDeviceInstance();
   Q_ASSERT(newDevice);

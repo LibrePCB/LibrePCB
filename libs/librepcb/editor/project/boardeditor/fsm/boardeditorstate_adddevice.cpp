@@ -171,8 +171,8 @@ bool BoardEditorState_AddDevice::addDevice(ComponentInstance& cmp,
     // add selected device to board
     Point pos = mContext.editorGraphicsView.mapGlobalPosToScenePos(
         QCursor::pos(), true, true);
-    CmdAddDeviceToBoard* cmd =
-        new CmdAddDeviceToBoard(mContext.workspace, *board, cmp, dev, fpt, pos);
+    CmdAddDeviceToBoard* cmd = new CmdAddDeviceToBoard(
+        mContext.workspace, *board, cmp, dev, fpt, tl::nullopt, pos);
     mContext.undoStack.appendToCmdGroup(cmd);
     mCurrentDeviceToPlace = cmd->getDeviceInstance();
     Q_ASSERT(mCurrentDeviceToPlace);

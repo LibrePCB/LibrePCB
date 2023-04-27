@@ -684,6 +684,7 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
       txtNode->appendChild("lock", SExpression::createToken("false"));
     }
     devNode->getChild("mirror").setName("flip");
+    devNode->appendChild("lib_3d_model", SExpression::createToken("none"));
   }
 
   // Net segments.

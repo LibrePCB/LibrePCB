@@ -89,6 +89,7 @@ public:
   static QMenu* createProductionDataMenu(QWidget* parent) noexcept;
   static QMenu* createChangeDeviceMenu(QWidget* parent) noexcept;
   static QMenu* createChangeFootprintMenu(QWidget* parent) noexcept;
+  static QMenu* createChangeModelMenu(QWidget* parent) noexcept;
   static QMenu* createCopyToOtherLibraryMenu(QWidget* parent) noexcept;
   static QMenu* createMoveToOtherLibraryMenu(QWidget* parent) noexcept;
 

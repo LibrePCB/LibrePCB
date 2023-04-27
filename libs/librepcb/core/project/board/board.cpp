@@ -28,6 +28,7 @@
 #include "../../library/cmp/component.h"
 #include "../../library/dev/device.h"
 #include "../../library/pkg/footprint.h"
+#include "../../library/pkg/packagemodel.h"
 #include "../../serialization/sexpression.h"
 #include "../../types/lengthunit.h"
 #include "../../types/pcbcolor.h"
@@ -541,6 +542,9 @@ void Board::copyFrom(const Board& other) {
         device->getRotation(), device->getMirrored(), device->isLocked(),
         false);
     copy->setAttributes(device->getAttributes());
+    if (const PackageModel* model = device->getLibModel()) {
+      copy->setModel(model->getUuid());
+    }
     foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
       copy->addStrokeText(*new BI_StrokeText(*this, text->getData()));
     }

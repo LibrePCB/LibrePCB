@@ -57,6 +57,7 @@ public:
   CmdAddDeviceToBoard(Workspace& workspace, Board& board,
                       ComponentInstance& cmpInstance, const Uuid& deviceUuid,
                       const tl::optional<Uuid>& footprintUuid,
+                      const tl::optional<Uuid>& preferredModelUuid,
                       const Point& position = Point(),
                       const Angle& rotation = Angle(),
                       bool mirror = false) noexcept;
@@ -79,6 +80,7 @@ private:
   ComponentInstance& mComponentInstance;
   Uuid mDeviceUuid;
   tl::optional<Uuid> mFootprintUuid;
+  tl::optional<Uuid> mPreferredModelUuid;
   Point mPosition;
   Angle mRotation;
   bool mMirror;

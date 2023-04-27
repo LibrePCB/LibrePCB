@@ -59,6 +59,11 @@ public:
   ProjectLoader(const ProjectLoader& other) = delete;
   ~ProjectLoader() noexcept;
 
+  // Setters
+  void setAutoAssignDeviceModels(bool v) noexcept {
+    mAutoAssignDeviceModels = v;
+  }
+
   // General Methods
   std::unique_ptr<Project> open(
       std::unique_ptr<TransactionalDirectory> directory,
@@ -93,6 +98,7 @@ private:  // Methods
   void loadBoardUserSettings(Board& b);
 
 private:  // Data
+  bool mAutoAssignDeviceModels;
   tl::optional<QList<FileFormatMigration::Message>> mUpgradeMessages;
 };
 

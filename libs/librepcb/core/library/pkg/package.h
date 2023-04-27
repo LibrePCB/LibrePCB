@@ -84,6 +84,8 @@ public:
   const PackagePadList& getPads() const noexcept { return mPads; }
   PackageModelList& getModels() noexcept { return mModels; }
   const PackageModelList& getModels() const noexcept { return mModels; }
+  QVector<std::shared_ptr<const PackageModel>> getModelsForFootprint(
+      const Uuid& fpt) const noexcept;
   FootprintList& getFootprints() noexcept { return mFootprints; }
   const FootprintList& getFootprints() const noexcept { return mFootprints; }
 

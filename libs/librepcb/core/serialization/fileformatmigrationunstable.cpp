@@ -126,6 +126,9 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
+  for (SExpression* devNode : root.getChildren("device")) {
+    devNode->appendChild("lib_3d_model", SExpression::createToken("none"));
+  }
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {
