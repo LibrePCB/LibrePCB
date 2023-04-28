@@ -42,6 +42,7 @@
 namespace librepcb {
 
 class Package;
+class PackageModel;
 
 namespace editor {
 
@@ -114,6 +115,7 @@ private:  // Methods
   bool toolChangeRequested(Tool newTool,
                            const QVariant& mode) noexcept override;
   void currentFootprintChanged(int index) noexcept;
+  void currentModelChanged(int index) noexcept;
   void memorizePackageInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;
   bool runChecks(RuleCheckMessageList& msgs) const override;
@@ -131,6 +133,8 @@ private:  // Methods
                                 const QString& settingsKey) noexcept override;
   void setGridProperties(const PositiveLength& interval, const LengthUnit& unit,
                          Theme::GridStyle style) noexcept;
+  void toggle3DMode(bool enable) noexcept;
+  bool is3DModeEnabled() const noexcept;
 
 private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;
@@ -138,6 +142,8 @@ private:  // Data
   QScopedPointer<GraphicsScene> mGraphicsScene;
   LengthUnit mLengthUnit;
   std::unique_ptr<Package> mPackage;
+  std::shared_ptr<Footprint> mCurrentFootprint;
+  std::shared_ptr<PackageModel> mCurrentModel;
 
   // broken interface detection
   QSet<Uuid> mOriginalPadUuids;

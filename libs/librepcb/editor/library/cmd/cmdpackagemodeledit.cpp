@@ -20,7 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdfootprintedit.h"
+#include "cmdpackagemodeledit.h"
+
+#include <librepcb/core/library/pkg/package.h>
 
 #include <QtCore>
 
@@ -34,72 +36,68 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdFootprintEdit::CmdFootprintEdit(Footprint& fpt) noexcept
-  : UndoCommand(tr("Edit footprint")),
-    mFootprint(fpt),
-    mOldName(fpt.getNames().getDefaultValue()),
+CmdPackageModelEdit::CmdPackageModelEdit(Package& package,
+                                         PackageModel& model) noexcept
+  : UndoCommand(tr("Edit 3D Model")),
+    mPackage(package),
+    mModel(model),
+    mOldName(model.getName()),
     mNewName(mOldName),
-    mOldModelPosition(fpt.getModelPosition()),
-    mNewModelPosition(mOldModelPosition),
-    mOldModelRotation(fpt.getModelRotation()),
-    mNewModelRotation(mOldModelRotation),
-    mOldModels(fpt.getModels()),
-    mNewModels(mOldModels) {
+    mOldStepContent(),
+    mNewStepContent() {
 }
 
-CmdFootprintEdit::~CmdFootprintEdit() noexcept {
+CmdPackageModelEdit::~CmdPackageModelEdit() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void CmdFootprintEdit::setName(const ElementName& name) noexcept {
+void CmdPackageModelEdit::setName(const ElementName& name) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewName = name;
 }
 
-void CmdFootprintEdit::setModelPosition(const Point3D& pos) noexcept {
+void CmdPackageModelEdit::setStepContent(const QByteArray& content) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewModelPosition = pos;
-}
-
-void CmdFootprintEdit::setModelRotation(const Angle3D& rot) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewModelRotation = rot;
-}
-
-void CmdFootprintEdit::setModels(const QSet<Uuid>& models) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewModels = models;
+  mNewStepContent = content;
 }
 
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
 
-bool CmdFootprintEdit::performExecute() {
+bool CmdPackageModelEdit::performExecute() {
+  if ((!mNewStepContent.isNull()) &&
+      (mPackage.getDirectory().fileExists(mModel.getFileName()))) {
+    mOldStepContent = mPackage.getDirectory().read(mModel.getFileName());
+  }
+
   performRedo();  // can throw
 
   if (mNewName != mOldName) return true;
-  if (mNewModelPosition != mOldModelPosition) return true;
-  if (mNewModelRotation != mOldModelRotation) return true;
-  if (mNewModels != mOldModels) return true;
+  if (mNewStepContent != mOldStepContent) return true;
   return false;
 }
 
-void CmdFootprintEdit::performUndo() {
-  mFootprint.getNames().setDefaultValue(mOldName);
-  mFootprint.setModelPosition(mOldModelPosition);
-  mFootprint.setModelRotation(mOldModelRotation);
-  mFootprint.setModels(mOldModels);
+void CmdPackageModelEdit::performUndo() {
+  if (!mNewStepContent.isNull()) {
+    if (mOldStepContent.isNull()) {
+      mPackage.getDirectory().removeFile(mModel.getFileName());
+    } else {
+      mPackage.getDirectory().write(mModel.getFileName(), mOldStepContent);
+    }
+  }
+  mModel.setName(mOldName);
 }
 
-void CmdFootprintEdit::performRedo() {
-  mFootprint.getNames().setDefaultValue(mNewName);
-  mFootprint.setModelPosition(mNewModelPosition);
-  mFootprint.setModelRotation(mNewModelRotation);
-  mFootprint.setModels(mNewModels);
+void CmdPackageModelEdit::performRedo() {
+  if (!mNewStepContent.isNull()) {
+    mPackage.getDirectory().write(mModel.getFileName(),
+                                  mNewStepContent);  // can throw
+  }
+  mModel.setName(mNewName);
 }
 
 /*******************************************************************************

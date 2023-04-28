@@ -117,6 +117,18 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
 
     // Footprints.
     for (SExpression* fptNode : root.getChildren("footprint")) {
+      // Add 3D model position.
+      SExpression& modelPosition = fptNode->appendList("3d_position");
+      modelPosition.appendChild(SExpression::createToken("0.0"));
+      modelPosition.appendChild(SExpression::createToken("0.0"));
+      modelPosition.appendChild(SExpression::createToken("0.0"));
+
+      // Add 3D model rotation.
+      SExpression& modelRotation = fptNode->appendList("3d_rotation");
+      modelRotation.appendChild(SExpression::createToken("0.0"));
+      modelRotation.appendChild(SExpression::createToken("0.0"));
+      modelRotation.appendChild(SExpression::createToken("0.0"));
+
       // Pads.
       for (SExpression* padNode : fptNode->getChildren("pad")) {
         // In the file format 0.1, footprint pads did not have their own UUID,

@@ -73,8 +73,12 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   mUi->edtVersion->setReadOnly(mContext.readOnly);
   mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
   mUi->cbxAssemblyType->setEnabled(!mContext.readOnly);
-  mUi->footprintEditorWidget->setReadOnly(mContext.readOnly);
   mUi->padListEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->padListEditorWidget->setFrameStyle(QFrame::NoFrame);
+  mUi->footprintEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->footprintEditorWidget->setFrameStyle(QFrame::NoFrame);
+  mUi->modelListEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->modelListEditorWidget->setFrameStyle(QFrame::NoFrame);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   const Theme& theme = mContext.workspace.getSettings().themes.getActive();
   mUi->graphicsView->setBackgroundColors(
@@ -107,6 +111,12 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   setGridProperties(PositiveLength(2540000),
                     mContext.workspace.getSettings().defaultLengthUnit.get(),
                     theme.getBoardGridStyle());
+
+  // Setup 2D/3D mode switcher.
+  mUi->btnToggle3d->setToolTip(tr("Toggle 2D/3D view"));
+  connect(mUi->btnToggle3d, &QToolButton::clicked, this,
+          [this]() { toggle3DMode(!is3DModeEnabled()); });
+  mUi->modelListEditorWidget->hide();
 
   // List mount types.
   mUi->cbxAssemblyType->addItem(
@@ -142,16 +152,23 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
       new TransactionalDirectory(mFileSystem)));  // can throw
   updateMetadata();
 
+  // Setup pad list editor widget.
+  mUi->padListEditorWidget->setReferences(&mPackage->getPads(),
+                                          mUndoStack.data());
+
   // Setup footprint list editor widget.
-  mUi->footprintEditorWidget->setReferences(&mPackage->getFootprints(),
-                                            mUndoStack.data());
+  mUi->footprintEditorWidget->setReferences(mPackage.get(), mUndoStack.data());
+  mUi->footprintEditorWidget->setLengthUnit(mLengthUnit);
   connect(mUi->footprintEditorWidget,
           &FootprintListEditorWidget::currentFootprintChanged, this,
           &PackageEditorWidget::currentFootprintChanged);
 
-  // Setup pad list editor widget.
-  mUi->padListEditorWidget->setReferences(&mPackage->getPads(),
-                                          mUndoStack.data());
+  // Setup 3D model list editor widget.
+  mUi->modelListEditorWidget->setReferences(mPackage.get(), mUndoStack.data());
+  mUi->modelListEditorWidget->setCurrentFootprint(mCurrentFootprint);
+  connect(mUi->modelListEditorWidget,
+          &PackageModelListEditorWidget::currentIndexChanged, this,
+          &PackageEditorWidget::currentModelChanged);
 
   // Show "interface broken" warning when related properties are modified.
   memorizePackageInterface();
@@ -200,6 +217,7 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   connect(mFsm.data(), &PackageEditorFsm::statusBarMessageChanged, this,
           &PackageEditorWidget::setStatusBarMessage);
   currentFootprintChanged(0);  // small hack to select the first footprint...
+  currentModelChanged(0);  // one more time
 
   // Last but not least, connect the graphics scene events with the FSM.
   mUi->graphicsView->setEventHandlerObject(this);
@@ -216,6 +234,7 @@ PackageEditorWidget::~PackageEditorWidget() noexcept {
   mFsm.reset();
 
   // Disconnect UI from package to avoid dangling pointers.
+  mUi->modelListEditorWidget->setReferences(nullptr, nullptr);
   mUi->footprintEditorWidget->setReferences(nullptr, nullptr);
   mUi->padListEditorWidget->setReferences(nullptr, nullptr);
 }
@@ -547,7 +566,13 @@ bool PackageEditorWidget::toolChangeRequested(Tool newTool,
 }
 
 void PackageEditorWidget::currentFootprintChanged(int index) noexcept {
-  mFsm->processChangeCurrentFootprint(mPackage->getFootprints().value(index));
+  mCurrentFootprint = mPackage->getFootprints().value(index);
+  mFsm->processChangeCurrentFootprint(mCurrentFootprint);
+  mUi->modelListEditorWidget->setCurrentFootprint(mCurrentFootprint);
+}
+
+void PackageEditorWidget::currentModelChanged(int index) noexcept {
+  mCurrentModel = mPackage->getModels().value(index);
 }
 
 void PackageEditorWidget::memorizePackageInterface() noexcept {
@@ -893,6 +918,20 @@ void PackageEditorWidget::setGridProperties(const PositiveLength& interval,
   if (mFsm) {
     mFsm->updateAvailableFeatures();  // Re-calculate "snap to grid" feature!
   }
+}
+
+void PackageEditorWidget::toggle3DMode(bool enable) noexcept {
+  if (enable) {
+    mUi->modelListEditorWidget->show();
+    mUi->btnToggle3d->setArrowType(Qt::RightArrow);
+  } else {
+    mUi->modelListEditorWidget->hide();
+    mUi->btnToggle3d->setArrowType(Qt::LeftArrow);
+  }
+}
+
+bool PackageEditorWidget::is3DModeEnabled() const noexcept {
+  return mUi->modelListEditorWidget->isVisible();
 }
 
 /*******************************************************************************

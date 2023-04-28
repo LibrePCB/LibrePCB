@@ -121,6 +121,8 @@ void EditableTableWidget::currentChanged(const QModelIndex& current,
   if (current.isValid() &&
       (!previous.isValid() || (previous.row() != current.row()))) {
     emit currentRowChanged(current.row());
+  } else if ((!current.isValid()) && previous.isValid()) {
+    emit currentRowChanged(-1);
   }
 }
 

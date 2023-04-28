@@ -118,6 +118,7 @@ private:  // Data
 
 public:  // Data
   // common
+  QHash<QString, QByteArray> mFiles;
   ElementType mElementType;
   tl::optional<ElementName> mElementName;
   QString mElementDescription;
@@ -135,6 +136,7 @@ public:  // Data
   // package
   Package::AssemblyType mPackageAssemblyType;
   PackagePadList mPackagePads;
+  PackageModelList mPackageModels;
   FootprintList mPackageFootprints;
 
   // component

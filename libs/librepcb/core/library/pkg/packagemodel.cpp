@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "cmdfootprintedit.h"
+#include "packagemodel.h"
 
 #include <QtCore>
 
@@ -28,83 +28,72 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdFootprintEdit::CmdFootprintEdit(Footprint& fpt) noexcept
-  : UndoCommand(tr("Edit footprint")),
-    mFootprint(fpt),
-    mOldName(fpt.getNames().getDefaultValue()),
-    mNewName(mOldName),
-    mOldModelPosition(fpt.getModelPosition()),
-    mNewModelPosition(mOldModelPosition),
-    mOldModelRotation(fpt.getModelRotation()),
-    mNewModelRotation(mOldModelRotation),
-    mOldModels(fpt.getModels()),
-    mNewModels(mOldModels) {
+PackageModel::PackageModel(const PackageModel& other) noexcept
+  : onEdited(*this), mUuid(other.mUuid), mName(other.mName) {
 }
 
-CmdFootprintEdit::~CmdFootprintEdit() noexcept {
+PackageModel::PackageModel(const Uuid& uuid, const ElementName& name) noexcept
+  : onEdited(*this), mUuid(uuid), mName(name) {
+}
+
+PackageModel::PackageModel(const SExpression& node)
+  : onEdited(*this),
+    mUuid(deserialize<Uuid>(node.getChild("@0"))),
+    mName(deserialize<ElementName>(node.getChild("name/@0"))) {
+}
+
+PackageModel::~PackageModel() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void CmdFootprintEdit::setName(const ElementName& name) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewName = name;
-}
+bool PackageModel::setName(const ElementName& name) noexcept {
+  if (name == mName) {
+    return false;
+  }
 
-void CmdFootprintEdit::setModelPosition(const Point3D& pos) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewModelPosition = pos;
-}
-
-void CmdFootprintEdit::setModelRotation(const Angle3D& rot) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewModelRotation = rot;
-}
-
-void CmdFootprintEdit::setModels(const QSet<Uuid>& models) noexcept {
-  Q_ASSERT(!wasEverExecuted());
-  mNewModels = models;
+  mName = name;
+  onEdited.notify(Event::NameChanged);
+  return true;
 }
 
 /*******************************************************************************
- *  Inherited from UndoCommand
+ *  General Methods
  ******************************************************************************/
 
-bool CmdFootprintEdit::performExecute() {
-  performRedo();  // can throw
-
-  if (mNewName != mOldName) return true;
-  if (mNewModelPosition != mOldModelPosition) return true;
-  if (mNewModelRotation != mOldModelRotation) return true;
-  if (mNewModels != mOldModels) return true;
-  return false;
+void PackageModel::serialize(SExpression& root) const {
+  root.appendChild(mUuid);
+  root.appendChild("name", mName);
 }
 
-void CmdFootprintEdit::performUndo() {
-  mFootprint.getNames().setDefaultValue(mOldName);
-  mFootprint.setModelPosition(mOldModelPosition);
-  mFootprint.setModelRotation(mOldModelRotation);
-  mFootprint.setModels(mOldModels);
+/*******************************************************************************
+ *  Operator Overloadings
+ ******************************************************************************/
+
+bool PackageModel::operator==(const PackageModel& rhs) const noexcept {
+  if (mUuid != rhs.mUuid) return false;
+  if (mName != rhs.mName) return false;
+  return true;
 }
 
-void CmdFootprintEdit::performRedo() {
-  mFootprint.getNames().setDefaultValue(mNewName);
-  mFootprint.setModelPosition(mNewModelPosition);
-  mFootprint.setModelRotation(mNewModelRotation);
-  mFootprint.setModels(mNewModels);
+PackageModel& PackageModel::operator=(const PackageModel& rhs) noexcept {
+  if (mUuid != rhs.mUuid) {
+    mUuid = rhs.mUuid;
+    onEdited.notify(Event::UuidChanged);
+  }
+  setName(rhs.mName);
+  return *this;
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb

@@ -17,67 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_FOOTPRINTLISTEDITORWIDGET_H
-#define LIBREPCB_EDITOR_FOOTPRINTLISTEDITORWIDGET_H
+#ifndef LIBREPCB_EDITOR_PACKAGEMODELLISTEDITORWIDGET_H
+#define LIBREPCB_EDITOR_PACKAGEMODELLISTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/packagemodel.h>
 
 #include <QtCore>
 #include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class LengthUnit;
+class Footprint;
 class Package;
 
 namespace editor {
 
 class EditableTableWidget;
-class FootprintListModel;
-class LengthDelegate;
+class PackageModelListModel;
+class SortFilterProxyModel;
 class UndoStack;
 
 /*******************************************************************************
- *  Class FootprintListEditorWidget
+ *  Class PackageModelListEditorWidget
  ******************************************************************************/
 
 /**
- * @brief The FootprintListEditorWidget class
+ * @brief The PackageModelListEditorWidget class
  */
-class FootprintListEditorWidget final : public QWidget {
+class PackageModelListEditorWidget final : public QWidget {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit FootprintListEditorWidget(QWidget* parent = nullptr) noexcept;
-  FootprintListEditorWidget(const FootprintListEditorWidget& other) = delete;
-  ~FootprintListEditorWidget() noexcept;
+  explicit PackageModelListEditorWidget(QWidget* parent = nullptr) noexcept;
+  PackageModelListEditorWidget(const PackageModelListEditorWidget& other) =
+      delete;
+  ~PackageModelListEditorWidget() noexcept;
 
   // Setters
   void setFrameStyle(int style) noexcept;
   void setReadOnly(bool readOnly) noexcept;
   void setReferences(Package* package, UndoStack* stack) noexcept;
-  void setLengthUnit(const LengthUnit& unit) noexcept;
+  void setCurrentFootprint(std::shared_ptr<Footprint> footprint) noexcept;
 
   // Operator Overloadings
-  FootprintListEditorWidget& operator=(const FootprintListEditorWidget& rhs) =
-      delete;
+  PackageModelListEditorWidget& operator=(
+      const PackageModelListEditorWidget& rhs) = delete;
 
 signals:
-  void currentFootprintChanged(int index);
+  void currentIndexChanged(int index);
 
 private:
-  QScopedPointer<FootprintListModel> mModel;
+  QScopedPointer<PackageModelListModel> mModel;
+  QScopedPointer<SortFilterProxyModel> mProxy;
   QScopedPointer<EditableTableWidget> mView;
-  LengthDelegate* mLengthDelegateX;
-  LengthDelegate* mLengthDelegateY;
-  LengthDelegate* mLengthDelegateZ;
 };
 
 /*******************************************************************************

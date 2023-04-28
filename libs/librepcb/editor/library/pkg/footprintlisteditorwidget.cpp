@@ -23,6 +23,8 @@
 #include "footprintlisteditorwidget.h"
 
 #include "../../library/pkg/footprintlistmodel.h"
+#include "../../modelview/angledelegate.h"
+#include "../../modelview/lengthdelegate.h"
 #include "../../widgets/editabletablewidget.h"
 
 #include <QtCore>
@@ -41,12 +43,45 @@ namespace editor {
 FootprintListEditorWidget::FootprintListEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
     mModel(new FootprintListModel(this)),
-    mView(new EditableTableWidget(this)) {
+    mView(new EditableTableWidget(this)),
+    mLengthDelegateX(new LengthDelegate(this)),
+    mLengthDelegateY(new LengthDelegate(this)),
+    mLengthDelegateZ(new LengthDelegate(this)) {
   mView->setShowCopyButton(true);
   mView->setShowMoveButtons(true);
   mView->setModel(mModel.data());
+  mView->setItemDelegateForColumn(FootprintListModel::COLUMN_MODEL_POSITION_X,
+                                  mLengthDelegateX);
+  mView->setItemDelegateForColumn(FootprintListModel::COLUMN_MODEL_POSITION_Y,
+                                  mLengthDelegateY);
+  mView->setItemDelegateForColumn(FootprintListModel::COLUMN_MODEL_POSITION_Z,
+                                  mLengthDelegateZ);
+  mView->setItemDelegateForColumn(FootprintListModel::COLUMN_MODEL_ROTATION_X,
+                                  new AngleDelegate(this));
+  mView->setItemDelegateForColumn(FootprintListModel::COLUMN_MODEL_ROTATION_Y,
+                                  new AngleDelegate(this));
+  mView->setItemDelegateForColumn(FootprintListModel::COLUMN_MODEL_ROTATION_Z,
+                                  new AngleDelegate(this));
   mView->horizontalHeader()->setSectionResizeMode(
       FootprintListModel::COLUMN_NAME, QHeaderView::Stretch);
+  mView->horizontalHeader()->setSectionResizeMode(
+      FootprintListModel::COLUMN_MODEL_POSITION_X,
+      QHeaderView::ResizeToContents);
+  mView->horizontalHeader()->setSectionResizeMode(
+      FootprintListModel::COLUMN_MODEL_POSITION_Y,
+      QHeaderView::ResizeToContents);
+  mView->horizontalHeader()->setSectionResizeMode(
+      FootprintListModel::COLUMN_MODEL_POSITION_Z,
+      QHeaderView::ResizeToContents);
+  mView->horizontalHeader()->setSectionResizeMode(
+      FootprintListModel::COLUMN_MODEL_ROTATION_X,
+      QHeaderView::ResizeToContents);
+  mView->horizontalHeader()->setSectionResizeMode(
+      FootprintListModel::COLUMN_MODEL_ROTATION_Y,
+      QHeaderView::ResizeToContents);
+  mView->horizontalHeader()->setSectionResizeMode(
+      FootprintListModel::COLUMN_MODEL_ROTATION_Z,
+      QHeaderView::ResizeToContents);
   mView->horizontalHeader()->setSectionResizeMode(
       FootprintListModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
@@ -74,14 +109,24 @@ FootprintListEditorWidget::~FootprintListEditorWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void FootprintListEditorWidget::setFrameStyle(int style) noexcept {
+  mView->setFrameStyle(style);
+}
+
 void FootprintListEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);
 }
 
-void FootprintListEditorWidget::setReferences(FootprintList* list,
+void FootprintListEditorWidget::setReferences(Package* package,
                                               UndoStack* stack) noexcept {
-  mModel->setFootprintList(list);
+  mModel->setPackage(package);
   mModel->setUndoStack(stack);
+}
+
+void FootprintListEditorWidget::setLengthUnit(const LengthUnit& unit) noexcept {
+  mLengthDelegateX->setUnit(unit);
+  mLengthDelegateY->setUnit(unit);
+  mLengthDelegateZ->setUnit(unit);
 }
 
 /*******************************************************************************

@@ -17,55 +17,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDFOOTPRINTEDIT_H
-#define LIBREPCB_EDITOR_CMDFOOTPRINTEDIT_H
+#ifndef LIBREPCB_EDITOR_CMDPACKAGEMODELREMOVE_H
+#define LIBREPCB_EDITOR_CMDPACKAGEMODELREMOVE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../cmd/cmdlistelementinsert.h"
-#include "../../cmd/cmdlistelementremove.h"
-#include "../../cmd/cmdlistelementsswap.h"
 #include "../../undocommand.h"
 
-#include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/types/elementname.h>
-
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Footprint;
+class Package;
+class PackageModel;
+
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdFootprintEdit
+ *  Class CmdPackageModelRemove
  ******************************************************************************/
 
 /**
- * @brief The CmdFootprintEdit class
+ * @brief The CmdPackageModelRemove class
  */
-class CmdFootprintEdit final : public UndoCommand {
+class CmdPackageModelRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdFootprintEdit() = delete;
-  CmdFootprintEdit(const CmdFootprintEdit& other) = delete;
-  explicit CmdFootprintEdit(Footprint& fpt) noexcept;
-  ~CmdFootprintEdit() noexcept;
-
-  // Setters
-  void setName(const ElementName& name) noexcept;
-  void setModelPosition(const Point3D& pos) noexcept;
-  void setModelRotation(const Angle3D& rot) noexcept;
-  void setModels(const QSet<Uuid>& models) noexcept;
+  CmdPackageModelRemove() = delete;
+  CmdPackageModelRemove(const CmdPackageModelRemove& other) = delete;
+  CmdPackageModelRemove(Package& pkg,
+                        std::shared_ptr<PackageModel> model) noexcept;
+  ~CmdPackageModelRemove() noexcept;
 
   // Operator Overloadings
-  CmdFootprintEdit& operator=(const CmdFootprintEdit& rhs) = delete;
+  CmdPackageModelRemove& operator=(const CmdPackageModelRemove& rhs) = delete;
 
-private:
-  // Private Methods
-
+private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;
 
@@ -75,34 +69,13 @@ private:
   /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
   void performRedo() override;
 
-  // Private Member Variables
-
-  // Attributes from the constructor
-  Footprint& mFootprint;
-
-  // General Attributes
-  ElementName mOldName;
-  ElementName mNewName;
-  Point3D mOldModelPosition;
-  Point3D mNewModelPosition;
-  Angle3D mOldModelRotation;
-  Angle3D mNewModelRotation;
-  QSet<Uuid> mOldModels;
-  QSet<Uuid> mNewModels;
+private:  // Data
+  Package& mPackage;
+  std::shared_ptr<PackageModel> mModel;
+  QByteArray mFileContent;
+  QVector<std::shared_ptr<Footprint>> mRemovedFromFootprints;
+  int mIndex;
 };
-
-/*******************************************************************************
- *  Undo Commands
- ******************************************************************************/
-
-using CmdFootprintInsert =
-    CmdListElementInsert<Footprint, FootprintListNameProvider,
-                         Footprint::Event>;
-using CmdFootprintRemove =
-    CmdListElementRemove<Footprint, FootprintListNameProvider,
-                         Footprint::Event>;
-using CmdFootprintsSwap =
-    CmdListElementsSwap<Footprint, FootprintListNameProvider, Footprint::Event>;
 
 /*******************************************************************************
  *  End of File

@@ -17,19 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDFOOTPRINTEDIT_H
-#define LIBREPCB_EDITOR_CMDFOOTPRINTEDIT_H
+#ifndef LIBREPCB_EDITOR_CMDPACKAGEMODELEDIT_H
+#define LIBREPCB_EDITOR_CMDPACKAGEMODELEDIT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../cmd/cmdlistelementinsert.h"
-#include "../../cmd/cmdlistelementremove.h"
 #include "../../cmd/cmdlistelementsswap.h"
-#include "../../undocommand.h"
 
-#include <librepcb/core/library/pkg/footprint.h>
-#include <librepcb/core/types/elementname.h>
+#include <librepcb/core/library/pkg/packagemodel.h>
 
 #include <QtCore>
 
@@ -37,72 +33,60 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Package;
+
 namespace editor {
 
 /*******************************************************************************
- *  Class CmdFootprintEdit
+ *  Class CmdPackageModelEdit
  ******************************************************************************/
 
 /**
- * @brief The CmdFootprintEdit class
+ * @brief The CmdPackageModelEdit class
  */
-class CmdFootprintEdit final : public UndoCommand {
+class CmdPackageModelEdit : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdFootprintEdit() = delete;
-  CmdFootprintEdit(const CmdFootprintEdit& other) = delete;
-  explicit CmdFootprintEdit(Footprint& fpt) noexcept;
-  ~CmdFootprintEdit() noexcept;
+  CmdPackageModelEdit() = delete;
+  CmdPackageModelEdit(const CmdPackageModelEdit& other) = delete;
+  explicit CmdPackageModelEdit(Package& package, PackageModel& model) noexcept;
+  virtual ~CmdPackageModelEdit() noexcept;
 
   // Setters
   void setName(const ElementName& name) noexcept;
-  void setModelPosition(const Point3D& pos) noexcept;
-  void setModelRotation(const Angle3D& rot) noexcept;
-  void setModels(const QSet<Uuid>& models) noexcept;
+  void setStepContent(const QByteArray& content) noexcept;
 
   // Operator Overloadings
-  CmdFootprintEdit& operator=(const CmdFootprintEdit& rhs) = delete;
+  CmdPackageModelEdit& operator=(const CmdPackageModelEdit& rhs) = delete;
 
-private:
-  // Private Methods
-
+protected:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  bool performExecute() override;
+  virtual bool performExecute() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  void performUndo() override;
+  virtual void performUndo() override;
 
   /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  void performRedo() override;
+  virtual void performRedo() override;
 
-  // Private Member Variables
+private:  // Data
+  Package& mPackage;
+  PackageModel& mModel;
 
-  // Attributes from the constructor
-  Footprint& mFootprint;
-
-  // General Attributes
   ElementName mOldName;
   ElementName mNewName;
-  Point3D mOldModelPosition;
-  Point3D mNewModelPosition;
-  Angle3D mOldModelRotation;
-  Angle3D mNewModelRotation;
-  QSet<Uuid> mOldModels;
-  QSet<Uuid> mNewModels;
+  QByteArray mOldStepContent;
+  QByteArray mNewStepContent;
 };
 
 /*******************************************************************************
  *  Undo Commands
  ******************************************************************************/
 
-using CmdFootprintInsert =
-    CmdListElementInsert<Footprint, FootprintListNameProvider,
-                         Footprint::Event>;
-using CmdFootprintRemove =
-    CmdListElementRemove<Footprint, FootprintListNameProvider,
-                         Footprint::Event>;
-using CmdFootprintsSwap =
-    CmdListElementsSwap<Footprint, FootprintListNameProvider, Footprint::Event>;
+using CmdPackageModelsSwap =
+    CmdListElementsSwap<PackageModel, PackageModelListNameProvider,
+                        PackageModel::Event>;
 
 /*******************************************************************************
  *  End of File

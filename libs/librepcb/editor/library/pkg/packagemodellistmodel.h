@@ -17,15 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_FOOTPRINTLISTMODEL_H
-#define LIBREPCB_EDITOR_FOOTPRINTLISTMODEL_H
+#ifndef LIBREPCB_EDITOR_PACKAGEMODELLISTMODEL_H
+#define LIBREPCB_EDITOR_PACKAGEMODELLISTMODEL_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/packagemodel.h>
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -40,44 +43,35 @@ class UndoCommand;
 class UndoStack;
 
 /*******************************************************************************
- *  Class FootprintListModel
+ *  Class PackageModelListModel
  ******************************************************************************/
 
 /**
- * @brief The FootprintListModel class
+ * @brief The PackageModelListModel class
  */
-class FootprintListModel final : public QAbstractTableModel {
+class PackageModelListModel final : public QAbstractTableModel {
   Q_OBJECT
 
 public:
-  enum Column {
-    COLUMN_NAME,
-    COLUMN_MODEL_POSITION_X,
-    COLUMN_MODEL_POSITION_Y,
-    COLUMN_MODEL_POSITION_Z,
-    COLUMN_MODEL_ROTATION_X,
-    COLUMN_MODEL_ROTATION_Y,
-    COLUMN_MODEL_ROTATION_Z,
-    COLUMN_ACTIONS,
-    _COLUMN_COUNT,
-  };
+  enum Column { COLUMN_ENABLED, COLUMN_NAME, COLUMN_ACTIONS, _COLUMN_COUNT };
 
   // Constructors / Destructor
-  FootprintListModel() = delete;
-  FootprintListModel(const FootprintListModel& other) noexcept;
-  explicit FootprintListModel(QObject* parent = nullptr) noexcept;
-  ~FootprintListModel() noexcept;
+  PackageModelListModel() = delete;
+  PackageModelListModel(const PackageModelListModel& other) noexcept;
+  explicit PackageModelListModel(QObject* parent = nullptr) noexcept;
+  ~PackageModelListModel() noexcept;
 
   // Setters
   void setPackage(Package* package) noexcept;
+  void setFootprint(std::shared_ptr<Footprint> footprint) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
 
   // Slots
-  void addFootprint(const QVariant& editData) noexcept;
-  void copyFootprint(const QVariant& editData) noexcept;
-  void removeFootprint(const QVariant& editData) noexcept;
-  void moveFootprintUp(const QVariant& editData) noexcept;
-  void moveFootprintDown(const QVariant& editData) noexcept;
+  void add(const QVariant& editData) noexcept;
+  void remove(const QVariant& editData) noexcept;
+  void edit(const QVariant& editData) noexcept;
+  void moveUp(const QVariant& editData) noexcept;
+  void moveDown(const QVariant& editData) noexcept;
 
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -91,24 +85,27 @@ public:
                int role = Qt::EditRole) override;
 
   // Operator Overloadings
-  FootprintListModel& operator=(const FootprintListModel& rhs) noexcept;
+  PackageModelListModel& operator=(const PackageModelListModel& rhs) noexcept;
 
 private:
-  void footprintListEdited(const FootprintList& list, int index,
-                           const std::shared_ptr<const Footprint>& footprint,
-                           FootprintList::Event event) noexcept;
+  void modelListEdited(const PackageModelList& list, int index,
+                       const std::shared_ptr<const PackageModel>& obj,
+                       PackageModelList::Event event) noexcept;
+  void footprintEdited(const Footprint& obj, Footprint::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
   ElementName validateNameOrThrow(const QString& name) const;
+  bool chooseStepFile(QByteArray& content, FilePath* selectedFile = nullptr);
 
 private:  // Data
   QPointer<Package> mPackage;
+  std::shared_ptr<Footprint> mFootprint;
   UndoStack* mUndoStack;
+  bool mNewEnabled;
   QString mNewName;
-  Point3D mNewModelPosition;
-  Angle3D mNewModelRotation;
 
   // Slots
-  FootprintList::OnEditedSlot mOnEditedSlot;
+  PackageModelList::OnEditedSlot mOnEditedSlot;
+  Footprint::OnEditedSlot mOnFootprintEditedSlot;
 };
 
 /*******************************************************************************

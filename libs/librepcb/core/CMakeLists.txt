@@ -234,6 +234,8 @@ add_library(
   library/pkg/packagecheck.h
   library/pkg/packagecheckmessages.cpp
   library/pkg/packagecheckmessages.h
+  library/pkg/packagemodel.cpp
+  library/pkg/packagemodel.h
   library/pkg/packagepad.cpp
   library/pkg/packagepad.h
   library/sym/symbol.cpp

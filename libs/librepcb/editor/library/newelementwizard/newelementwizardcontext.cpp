@@ -74,6 +74,7 @@ const QStringList& NewElementWizardContext::getLibLocaleOrder() const noexcept {
 
 void NewElementWizardContext::reset(ElementType newType) noexcept {
   // common
+  mFiles.clear();
   mElementType = newType;
   mElementName = tl::nullopt;
   mElementDescription.clear();
@@ -91,6 +92,7 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   // package
   mPackageAssemblyType = Package::AssemblyType::Auto;
   mPackagePads.clear();
+  mPackageModels.clear();
   mPackageFootprints.clear();
 
   // component
@@ -214,6 +216,19 @@ void NewElementWizardContext::copyElement(ElementType type,
         mPackagePads.append(
             std::make_shared<PackagePad>(newUuid, pad.getName()));
       }
+      // Copy 3D models but generate new UUIDs.
+      QHash<Uuid, tl::optional<Uuid>> modelsUuidMap;
+      mPackageModels.clear();
+      for (const PackageModel& model : package->getModels()) {
+        auto newModel = std::make_shared<PackageModel>(Uuid::createRandom(),
+                                                       model.getName());
+        modelsUuidMap.insert(model.getUuid(), newModel->getUuid());
+        mPackageModels.append(newModel);
+        if (package->getDirectory().fileExists(model.getFileName())) {
+          mFiles.insert(newModel->getFileName(),
+                        package->getDirectory().read(model.getFileName()));
+        }
+      }
       // copy footprints but generate new UUIDs
       mPackageFootprints.clear();
       for (const Footprint& footprint : package->getFootprints()) {
@@ -221,6 +236,16 @@ void NewElementWizardContext::copyElement(ElementType type,
         std::shared_ptr<Footprint> newFootprint(new Footprint(
             Uuid::createRandom(), footprint.getNames().getDefaultValue(),
             footprint.getDescriptions().getDefaultValue()));
+        newFootprint->setModelPosition(footprint.getModelPosition());
+        newFootprint->setModelRotation(footprint.getModelRotation());
+        // Copy models but with the new UUIDs.
+        QSet<Uuid> models;
+        foreach (const Uuid& uuid, footprint.getModels()) {
+          if (auto newUuid = modelsUuidMap.value(uuid)) {
+            models.insert(*newUuid);
+          }
+        }
+        newFootprint->setModels(models);
         // copy pads but generate new UUIDs
         for (const FootprintPad& pad : footprint.getPads()) {
           tl::optional<Uuid> pkgPad = pad.getPackagePadUuid();
@@ -340,6 +365,12 @@ void NewElementWizardContext::createLibraryElement() {
     rootCategoryUuid = mElementCategoryUuids.values().first();
   }
 
+  auto copyFiles = [this](TransactionalDirectory& dst) {
+    for (auto it = mFiles.begin(); it != mFiles.end(); ++it) {
+      dst.write(it.key(), it.value());
+    }
+  };
+
   switch (mElementType) {
     case NewElementWizardContext::ElementType::ComponentCategory: {
       ComponentCategory element(Uuid::createRandom(), *mElementVersion,
@@ -350,6 +381,7 @@ void NewElementWizardContext::createLibraryElement() {
           mLibrary.getDirectory(),
           mLibrary.getElementsDirectoryName<ComponentCategory>());
       element.moveIntoParentDirectory(dir);
+      copyFiles(element.getDirectory());
       mOutputDirectory = element.getDirectory().getAbsPath();
       break;
     }
@@ -362,6 +394,7 @@ void NewElementWizardContext::createLibraryElement() {
           mLibrary.getDirectory(),
           mLibrary.getElementsDirectoryName<PackageCategory>());
       element.moveIntoParentDirectory(dir);
+      copyFiles(element.getDirectory());
       mOutputDirectory = element.getDirectory().getAbsPath();
       break;
     }
@@ -376,6 +409,7 @@ void NewElementWizardContext::createLibraryElement() {
       TransactionalDirectory dir(mLibrary.getDirectory(),
                                  mLibrary.getElementsDirectoryName<Symbol>());
       element.moveIntoParentDirectory(dir);
+      copyFiles(element.getDirectory());
       mOutputDirectory = element.getDirectory().getAbsPath();
       break;
     }
@@ -385,6 +419,7 @@ void NewElementWizardContext::createLibraryElement() {
                       mPackageAssemblyType);
       element.setCategories(mElementCategoryUuids);
       element.getPads() = mPackagePads;
+      element.getModels() = mPackageModels;
       element.getFootprints() = mPackageFootprints;
       if (element.getFootprints().isEmpty()) {
         element.getFootprints().append(std::make_shared<Footprint>(
@@ -393,6 +428,7 @@ void NewElementWizardContext::createLibraryElement() {
       TransactionalDirectory dir(mLibrary.getDirectory(),
                                  mLibrary.getElementsDirectoryName<Package>());
       element.moveIntoParentDirectory(dir);
+      copyFiles(element.getDirectory());
       mOutputDirectory = element.getDirectory().getAbsPath();
       break;
     }
@@ -410,6 +446,7 @@ void NewElementWizardContext::createLibraryElement() {
           mLibrary.getDirectory(),
           mLibrary.getElementsDirectoryName<Component>());
       element.moveIntoParentDirectory(dir);
+      copyFiles(element.getDirectory());
       mOutputDirectory = element.getDirectory().getAbsPath();
       break;
     }
@@ -424,6 +461,7 @@ void NewElementWizardContext::createLibraryElement() {
       TransactionalDirectory dir(mLibrary.getDirectory(),
                                  mLibrary.getElementsDirectoryName<Device>());
       element.moveIntoParentDirectory(dir);
+      copyFiles(element.getDirectory());
       mOutputDirectory = element.getDirectory().getAbsPath();
       break;
     }

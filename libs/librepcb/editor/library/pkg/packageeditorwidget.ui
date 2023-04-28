@@ -55,77 +55,91 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="3,2">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="3,0,2">
        <property name="spacing">
         <number>0</number>
        </property>
        <item>
-        <widget class="librepcb::editor::GraphicsView" name="graphicsView"/>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="mainLayout" stretch="2,0,1">
          <property name="spacing">
-          <number>3</number>
-         </property>
-         <property name="leftMargin">
-          <number>3</number>
-         </property>
-         <property name="topMargin">
-          <number>3</number>
-         </property>
-         <property name="rightMargin">
-          <number>3</number>
-         </property>
-         <property name="bottomMargin">
-          <number>3</number>
+          <number>0</number>
          </property>
          <item>
-          <widget class="QGroupBox" name="groupBox_2">
-           <property name="title">
-            <string>Footprint Variants</string>
+          <widget class="librepcb::editor::GraphicsView" name="graphicsView">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_2">
-            <property name="leftMargin">
-             <number>3</number>
-            </property>
-            <property name="topMargin">
-             <number>6</number>
-            </property>
-            <property name="rightMargin">
-             <number>3</number>
-            </property>
-            <property name="bottomMargin">
-             <number>3</number>
-            </property>
-            <item>
-             <widget class="librepcb::editor::FootprintListEditorWidget" name="footprintEditorWidget" native="true"/>
-            </item>
-           </layout>
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox">
-           <property name="title">
-            <string>Pads</string>
+          <widget class="QToolButton" name="btnToggle3d">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout">
-            <property name="leftMargin">
-             <number>3</number>
-            </property>
-            <property name="topMargin">
-             <number>6</number>
-            </property>
-            <property name="rightMargin">
-             <number>3</number>
-            </property>
-            <property name="bottomMargin">
-             <number>3</number>
-            </property>
-            <item>
-             <widget class="librepcb::editor::PackagePadListEditorWidget" name="padListEditorWidget" native="true"/>
-            </item>
-           </layout>
+           <property name="maximumSize">
+            <size>
+             <width>16</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>Toggle 2D/3D view</string>
+           </property>
+           <property name="text">
+            <string notr="true"/>
+           </property>
+           <property name="arrowType">
+            <enum>Qt::LeftArrow</enum>
+           </property>
           </widget>
+         </item>
+         <item>
+          <widget class="librepcb::editor::PackageModelListEditorWidget" name="modelListEditorWidget" native="true"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,0,5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="librepcb::editor::PackagePadListEditorWidget" name="padListEditorWidget" native="true"/>
+         </item>
+         <item>
+          <widget class="Line" name="line_4">
+           <property name="frameShadow">
+            <enum>QFrame::Sunken</enum>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="librepcb::editor::FootprintListEditorWidget" name="footprintEditorWidget" native="true"/>
          </item>
         </layout>
        </item>
@@ -335,6 +349,12 @@
    <class>librepcb::editor::FootprintListEditorWidget</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/library/pkg/footprintlisteditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::PackageModelListEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/library/pkg/packagemodellisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

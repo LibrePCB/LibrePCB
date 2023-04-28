@@ -20,9 +20,9 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "packagepadlisteditorwidget.h"
+#include "packagemodellisteditorwidget.h"
 
-#include "../../library/pkg/packagepadlistmodel.h"
+#include "../../library/pkg/packagemodellistmodel.h"
 #include "../../modelview/sortfilterproxymodel.h"
 #include "../../widgets/editabletablewidget.h"
 
@@ -39,49 +39,69 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-PackagePadListEditorWidget::PackagePadListEditorWidget(QWidget* parent) noexcept
+PackageModelListEditorWidget::PackageModelListEditorWidget(
+    QWidget* parent) noexcept
   : QWidget(parent),
-    mModel(new PackagePadListModel(this)),
+    mModel(new PackageModelListModel(this)),
     mProxy(new SortFilterProxyModel(this)),
     mView(new EditableTableWidget(this)) {
-  mProxy->setKeepHeaderColumnUnsorted(true);
   mProxy->setKeepLastRowAtBottom(true);
   mProxy->setSourceModel(mModel.data());
+  mView->setShowEditButton(true);
+  mView->setShowMoveButtons(true);
   mView->setModel(mProxy.data());
   mView->horizontalHeader()->setSectionResizeMode(
-      PackagePadListModel::COLUMN_NAME, QHeaderView::Stretch);
+      PackageModelListModel::COLUMN_ENABLED, QHeaderView::ResizeToContents);
   mView->horizontalHeader()->setSectionResizeMode(
-      PackagePadListModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
-  mView->sortByColumn(PackagePadListModel::COLUMN_NAME, Qt::AscendingOrder);
+      PackageModelListModel::COLUMN_NAME, QHeaderView::Stretch);
+  mView->horizontalHeader()->setSectionResizeMode(
+      PackageModelListModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
-          &PackagePadListModel::addPad);
+          &PackageModelListModel::add);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &PackagePadListModel::removePad);
+          &PackageModelListModel::remove);
+  connect(mView.data(), &EditableTableWidget::btnEditClicked, mModel.data(),
+          &PackageModelListModel::edit);
+  connect(mView.data(), &EditableTableWidget::btnMoveUpClicked, mModel.data(),
+          &PackageModelListModel::moveUp);
+  connect(mView.data(), &EditableTableWidget::btnMoveDownClicked, mModel.data(),
+          &PackageModelListModel::moveDown);
+  connect(mView.data(), &EditableTableWidget::currentRowChanged, this,
+          &PackageModelListEditorWidget::currentIndexChanged);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mView.data());
+
+  setCurrentFootprint(nullptr);
 }
 
-PackagePadListEditorWidget::~PackagePadListEditorWidget() noexcept {
+PackageModelListEditorWidget::~PackageModelListEditorWidget() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void PackagePadListEditorWidget::setFrameStyle(int style) noexcept {
+void PackageModelListEditorWidget::setFrameStyle(int style) noexcept {
   mView->setFrameStyle(style);
 }
 
-void PackagePadListEditorWidget::setReadOnly(bool readOnly) noexcept {
+void PackageModelListEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);
 }
 
-void PackagePadListEditorWidget::setReferences(PackagePadList* list,
-                                               UndoStack* stack) noexcept {
-  mModel->setPadList(list);
+void PackageModelListEditorWidget::setReferences(Package* package,
+                                                 UndoStack* stack) noexcept {
+  mModel->setPackage(package);
   mModel->setUndoStack(stack);
+}
+
+void PackageModelListEditorWidget::setCurrentFootprint(
+    std::shared_ptr<Footprint> footprint) noexcept {
+  mModel->setFootprint(footprint);
+  mView->horizontalHeader()->setSectionHidden(
+      PackageModelListModel::COLUMN_ENABLED, !footprint);
 }
 
 /*******************************************************************************
