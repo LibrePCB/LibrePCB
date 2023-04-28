@@ -97,15 +97,8 @@ void HoleGraphicsItem::holeEdited(const Hole& hole,
 }
 
 void HoleGraphicsItem::updateHole() noexcept {
-  tl::optional<Length> stopMaskOffset;
-  if (!mHole.getStopMaskConfig().isEnabled()) {
-    stopMaskOffset = tl::nullopt;
-  } else if (auto offset = mHole.getStopMaskConfig().getOffset()) {
-    stopMaskOffset = *offset;
-  } else {
-    stopMaskOffset = Length(100000);  // Only for illustration.
-  }
-  mGraphicsItem->setHole(mHole.getPath(), mHole.getDiameter(), stopMaskOffset);
+  mGraphicsItem->setHole(mHole.getPath(), mHole.getDiameter(),
+                         mHole.getPreviewStopMaskOffset());
 }
 
 /*******************************************************************************

@@ -89,6 +89,7 @@
         <file>actions/stop.png</file>
         <file>actions/undo.png</file>
         <file>actions/up.png</file>
+        <file>actions/view_3d.png</file>
         <file>actions/working.png</file>
         <file>actions/zoom_all.png</file>
         <file>actions/zoom_in.png</file>

@@ -47,7 +47,10 @@ class PackageModel;
 namespace editor {
 
 class GraphicsScene;
+class OpenGlSceneBuilder;
+class OpenGlView;
 class PackageEditorFsm;
+class WaitingSpinnerWidget;
 
 namespace Ui {
 class PackageEditorWidget;
@@ -101,6 +104,7 @@ public slots:
   bool zoomIn() noexcept override;
   bool zoomOut() noexcept override;
   bool zoomAll() noexcept override;
+  bool toggle3D() noexcept override;
   bool abortCommand() noexcept override;
   bool importDxf() noexcept override;
   bool editGridProperties() noexcept override;
@@ -116,6 +120,8 @@ private:  // Methods
                            const QVariant& mode) noexcept override;
   void currentFootprintChanged(int index) noexcept;
   void currentModelChanged(int index) noexcept;
+  void scheduleOpenGlSceneUpdate() noexcept;
+  void updateOpenGlScene() noexcept;
   void memorizePackageInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;
   bool runChecks(RuleCheckMessageList& msgs) const override;
@@ -138,8 +144,12 @@ private:  // Methods
 
 private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;
+  QScopedPointer<OpenGlView> mOpenGlView;
+  QScopedPointer<WaitingSpinnerWidget> mOpenGlViewWaitingSpinner;
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<GraphicsScene> mGraphicsScene;
+  QScopedPointer<OpenGlSceneBuilder> mOpenGlSceneBuilder;
+  bool mOpenGlSceneBuildScheduled;
   LengthUnit mLengthUnit;
   std::unique_ptr<Package> mPackage;
   std::shared_ptr<Footprint> mCurrentFootprint;

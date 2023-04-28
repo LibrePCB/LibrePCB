@@ -163,38 +163,8 @@ void FootprintPadGraphicsItem::updateLayer() noexcept {
 }
 
 void FootprintPadGraphicsItem::updateGeometries() noexcept {
-  const PadGeometry geometry = mPad->getGeometry();
-  const Length stopMaskOffset = mPad->getStopMaskConfig().getOffset()
-      ? *mPad->getStopMaskConfig().getOffset()
-      : Length(100000);
-  const Length solderPasteOffset = mPad->getSolderPasteConfig().getOffset()
-      ? *mPad->getSolderPasteConfig().getOffset()
-      : Length(100000);
-
-  QHash<const Layer*, QList<PadGeometry>> geometries;
-  if (mPad->hasTopCopper()) {
-    geometries.insert(&Layer::topCopper(), {geometry});
-  }
-  if (mPad->hasAutoTopStopMask()) {
-    geometries.insert(&Layer::topStopMask(),
-                      {geometry.withOffset(stopMaskOffset)});
-  }
-  if (mPad->hasAutoTopSolderPaste()) {
-    geometries.insert(&Layer::topSolderPaste(),
-                      {geometry.withOffset(-solderPasteOffset)});
-  }
-  if (mPad->hasBottomCopper()) {
-    geometries.insert(&Layer::botCopper(), {geometry});
-  }
-  if (mPad->hasAutoBottomStopMask()) {
-    geometries.insert(&Layer::botStopMask(),
-                      {geometry.withOffset(stopMaskOffset)});
-  }
-  if (mPad->hasAutoBottomSolderPaste()) {
-    geometries.insert(&Layer::botSolderPaste(),
-                      {geometry.withOffset(-solderPasteOffset)});
-  }
-  mGraphicsItem->setGeometries(geometries, *mPad->getCopperClearance());
+  mGraphicsItem->setGeometries(mPad->buildPreviewGeometries(),
+                               *mPad->getCopperClearance());
 }
 
 /*******************************************************************************

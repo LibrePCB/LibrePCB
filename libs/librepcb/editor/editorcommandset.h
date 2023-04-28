@@ -826,6 +826,15 @@ public:
       {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_L)},
       &categoryView,
   };
+  EditorCommand toggle3d{
+      "toggle_3d",  // clang-format break
+      QT_TR_NOOP("Toggle 2D/3D Mode"),
+      QT_TR_NOOP("Switch between 2D and 3D viewer mode"),
+      QIcon(":/img/actions/view_3d.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL + Qt::Key_3)},
+      &categoryView,
+  };
 
   EditorCommandCategory categoryTools{"categoryTools", QT_TR_NOOP("Tools"),
                                       true, &categoryRoot};

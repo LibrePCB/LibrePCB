@@ -308,6 +308,42 @@ PadGeometry FootprintPad::getGeometry() const noexcept {
   }
 }
 
+QHash<const Layer*, QList<PadGeometry>> FootprintPad::buildPreviewGeometries()
+    const noexcept {
+  const PadGeometry geometry = getGeometry();
+  const Length stopMaskOffset = getStopMaskConfig().getOffset()
+      ? *getStopMaskConfig().getOffset()
+      : Length(100000);
+  const Length solderPasteOffset = getSolderPasteConfig().getOffset()
+      ? *getSolderPasteConfig().getOffset()
+      : Length(100000);
+
+  QHash<const Layer*, QList<PadGeometry>> geometries;
+  if (hasTopCopper()) {
+    geometries.insert(&Layer::topCopper(), {geometry});
+  }
+  if (hasAutoTopStopMask()) {
+    geometries.insert(&Layer::topStopMask(),
+                      {geometry.withOffset(stopMaskOffset)});
+  }
+  if (hasAutoTopSolderPaste()) {
+    geometries.insert(&Layer::topSolderPaste(),
+                      {geometry.withOffset(-solderPasteOffset)});
+  }
+  if (hasBottomCopper()) {
+    geometries.insert(&Layer::botCopper(), {geometry});
+  }
+  if (hasAutoBottomStopMask()) {
+    geometries.insert(&Layer::botStopMask(),
+                      {geometry.withOffset(stopMaskOffset)});
+  }
+  if (hasAutoBottomSolderPaste()) {
+    geometries.insert(&Layer::botSolderPaste(),
+                      {geometry.withOffset(-solderPasteOffset)});
+  }
+  return geometries;
+}
+
 /*******************************************************************************
  *  Setters
  ******************************************************************************/

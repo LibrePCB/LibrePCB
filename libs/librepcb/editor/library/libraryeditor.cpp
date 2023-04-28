@@ -576,6 +576,9 @@ void LibraryEditor::createActions() noexcept {
   mActionZoomOut.reset(cmd.zoomOut.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->zoomOut();
   }));
+  mActionToggle3D.reset(cmd.toggle3d.createAction(this, this, [this]() {
+    if (mCurrentEditorWidget) mCurrentEditorWidget->toggle3D();
+  }));
   mActionUndo.reset(cmd.undo.createAction(this));
   mActionRedo.reset(cmd.redo.createAction(this));
   mActionCut.reset(cmd.clipboardCut.createAction(this, this, [this]() {
@@ -877,6 +880,8 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionZoomIn);
   mb.addAction(mActionZoomOut);
   mb.addAction(mActionZoomFit);
+  mb.addSeparator();
+  mb.addAction(mActionToggle3D);
 
   // Tools.
   mb.newMenu(&MenuBuilder::createToolsMenu);
@@ -950,6 +955,7 @@ void LibraryEditor::setAvailableFeatures(
   mActionZoomFit->setEnabled(features.contains(Feature::GraphicsView));
   mActionZoomIn->setEnabled(features.contains(Feature::GraphicsView));
   mActionZoomOut->setEnabled(features.contains(Feature::GraphicsView));
+  mActionToggle3D->setEnabled(features.contains(Feature::OpenGlView));
   mActionMirrorHorizontal->setEnabled(features.contains(Feature::Mirror));
   mActionMirrorVertical->setEnabled(features.contains(Feature::Mirror));
   mActionFlipHorizontal->setEnabled(features.contains(Feature::Flip));

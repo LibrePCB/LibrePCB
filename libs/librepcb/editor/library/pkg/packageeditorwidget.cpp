@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packageeditorwidget.h"
 
+#include "../../3d/openglscenebuilder.h"
 #include "../../cmd/cmdholeedit.h"
 #include "../../cmd/cmdstroketextedit.h"
 #include "../../dialogs/gridsettingsdialog.h"
@@ -29,7 +30,9 @@
 #include "../../graphics/graphicsscene.h"
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/toolbarproxy.h"
+#include "../../widgets/openglview.h"
 #include "../../widgets/statusbar.h"
+#include "../../widgets/waitingspinnerwidget.h"
 #include "../../workspace/desktopservices.h"
 #include "../cmd/cmdfootprintedit.h"
 #include "../cmd/cmdfootprintpadedit.h"
@@ -37,11 +40,14 @@
 #include "fsm/packageeditorfsm.h"
 #include "ui_packageeditorwidget.h"
 
+#include <librepcb/core/application.h>
+#include <librepcb/core/font/stroketextpathbuilder.h>
 #include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/library/libraryelementcheckmessages.h>
 #include <librepcb/core/library/pkg/footprintpainter.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/pkg/packagecheckmessages.h>
+#include <librepcb/core/types/pcbcolor.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -62,7 +68,8 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
                                          const FilePath& fp, QWidget* parent)
   : EditorWidgetBase(context, fp, parent),
     mUi(new Ui::PackageEditorWidget),
-    mGraphicsScene(new GraphicsScene()) {
+    mGraphicsScene(new GraphicsScene()),
+    mOpenGlSceneBuildScheduled(false) {
   mUi->setupUi(this);
   mUi->lstMessages->setHandler(this);
   mUi->lstMessages->setReadOnly(mContext.readOnly);
@@ -113,10 +120,15 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
                     theme.getBoardGridStyle());
 
   // Setup 2D/3D mode switcher.
-  mUi->btnToggle3d->setToolTip(tr("Toggle 2D/3D view"));
   connect(mUi->btnToggle3d, &QToolButton::clicked, this,
-          [this]() { toggle3DMode(!is3DModeEnabled()); });
+          &PackageEditorWidget::toggle3D);
   mUi->modelListEditorWidget->hide();
+  connect(mUndoStack.data(), &UndoStack::stateModified, this,
+          &PackageEditorWidget::scheduleOpenGlSceneUpdate);
+  QTimer* openGlBuilderTimer = new QTimer(this);
+  connect(openGlBuilderTimer, &QTimer::timeout, this,
+          &PackageEditorWidget::updateOpenGlScene);
+  openGlBuilderTimer->start(100);
 
   // List mount types.
   mUi->cbxAssemblyType->addItem(
@@ -248,6 +260,7 @@ QSet<EditorWidgetBase::Feature> PackageEditorWidget::getAvailableFeatures()
   QSet<EditorWidgetBase::Feature> features = {
       EditorWidgetBase::Feature::Close,
       EditorWidgetBase::Feature::GraphicsView,
+      EditorWidgetBase::Feature::OpenGlView,
       EditorWidgetBase::Feature::ExportGraphics,
   };
   return features + mFsm->getAvailableFeatures();
@@ -372,17 +385,34 @@ bool PackageEditorWidget::editProperties() noexcept {
 }
 
 bool PackageEditorWidget::zoomIn() noexcept {
-  mUi->graphicsView->zoomIn();
+  if (mOpenGlView && is3DModeEnabled()) {
+    mOpenGlView->zoomIn();
+  } else {
+    mUi->graphicsView->zoomIn();
+  }
   return true;
 }
 
 bool PackageEditorWidget::zoomOut() noexcept {
-  mUi->graphicsView->zoomOut();
+  if (mOpenGlView && is3DModeEnabled()) {
+    mOpenGlView->zoomOut();
+  } else {
+    mUi->graphicsView->zoomOut();
+  }
   return true;
 }
 
 bool PackageEditorWidget::zoomAll() noexcept {
-  mUi->graphicsView->zoomAll();
+  if (mOpenGlView && is3DModeEnabled()) {
+    mOpenGlView->zoomAll();
+  } else {
+    mUi->graphicsView->zoomAll();
+  }
+  return true;
+}
+
+bool PackageEditorWidget::toggle3D() noexcept {
+  toggle3DMode(!is3DModeEnabled());
   return true;
 }
 
@@ -569,10 +599,88 @@ void PackageEditorWidget::currentFootprintChanged(int index) noexcept {
   mCurrentFootprint = mPackage->getFootprints().value(index);
   mFsm->processChangeCurrentFootprint(mCurrentFootprint);
   mUi->modelListEditorWidget->setCurrentFootprint(mCurrentFootprint);
+  scheduleOpenGlSceneUpdate();
 }
 
 void PackageEditorWidget::currentModelChanged(int index) noexcept {
   mCurrentModel = mPackage->getModels().value(index);
+  scheduleOpenGlSceneUpdate();
+}
+
+void PackageEditorWidget::scheduleOpenGlSceneUpdate() noexcept {
+  mOpenGlSceneBuildScheduled = true;
+}
+
+void PackageEditorWidget::updateOpenGlScene() noexcept {
+  if ((!mOpenGlSceneBuildScheduled) || (!mOpenGlSceneBuilder) ||
+      mOpenGlSceneBuilder->isBusy()) {
+    return;
+  }
+
+  std::shared_ptr<SceneData3D> data = std::make_shared<SceneData3D>(
+      std::make_shared<TransactionalDirectory>(mPackage->getDirectory()), true);
+  data->setSolderResist(&PcbColor::green());
+  data->setSilkscreen(&PcbColor::white());
+  data->setSilkscreenLayersTop(
+      {&Layer::topPlacement(), &Layer::topNames(), &Layer::topValues()});
+  data->setSilkscreenLayersBot(
+      {&Layer::botPlacement(), &Layer::botNames(), &Layer::botValues()});
+  data->setStepAlphaValue(0.7);
+  if (mCurrentFootprint) {
+    for (const FootprintPad& pad : mCurrentFootprint->getPads()) {
+      const Transform transform(pad.getPosition(), pad.getRotation(), false);
+      auto geometries = pad.buildPreviewGeometries();
+      for (auto it = geometries.begin(); it != geometries.end(); it++) {
+        foreach (const PadGeometry& geometry, it.value()) {
+          foreach (const Path& outline, geometry.toOutlines()) {
+            data->addArea(*it.key(), outline, transform);
+          }
+          for (const PadHole& hole : geometry.getHoles()) {
+            data->addHole(hole.getPath(), hole.getDiameter(), true, false,
+                          transform);
+          }
+        }
+      }
+    }
+    for (const Polygon& polygon : mCurrentFootprint->getPolygons()) {
+      data->addPolygon(polygon, Transform());
+    }
+    for (const Circle& circle : mCurrentFootprint->getCircles()) {
+      data->addCircle(circle, Transform());
+    }
+    for (const StrokeText& text : mCurrentFootprint->getStrokeTexts()) {
+      data->addStroke(text.getLayer(),
+                      text.generatePaths(Application::getDefaultStrokeFont()),
+                      *text.getStrokeWidth(), Transform(text));
+    }
+    for (const Hole& hole : mCurrentFootprint->getHoles()) {
+      data->addHole(hole.getPath(), hole.getDiameter(), false, false,
+                    Transform());
+      if (auto offset = hole.getPreviewStopMaskOffset()) {
+        const Length width = hole.getDiameter() + (*offset) + (*offset);
+        for (const Layer* layer :
+             {&Layer::topStopMask(), &Layer::botStopMask()}) {
+          data->addStroke(*layer, {*hole.getPath()}, width, Transform());
+        }
+      }
+    }
+    if (mCurrentModel) {
+      data->addDevice(mPackage->getUuid(), Transform(),
+                      mCurrentModel->getFileName(),
+                      mCurrentFootprint->getModelPosition(),
+                      mCurrentFootprint->getModelRotation(), QString());
+    }
+  } else {
+    const QVector<Path> paths = StrokeTextPathBuilder::build(
+        Application::getDefaultStrokeFont(), StrokeTextSpacing(),
+        StrokeTextSpacing(), PositiveLength(10000000), UnsignedLength(1000000),
+        Alignment(HAlign::center(), VAlign::center()), Angle::deg0(), true,
+        tr("Please select a footprint."));
+    data->addStroke(Layer::topPlacement(), paths, Length(1000000), Transform());
+  }
+
+  mOpenGlSceneBuildScheduled = false;
+  mOpenGlSceneBuilder->start(data);
 }
 
 void PackageEditorWidget::memorizePackageInterface() noexcept {
@@ -922,10 +1030,31 @@ void PackageEditorWidget::setGridProperties(const PositiveLength& interval,
 
 void PackageEditorWidget::toggle3DMode(bool enable) noexcept {
   if (enable) {
+    mUi->graphicsView->hide();
     mUi->modelListEditorWidget->show();
     mUi->btnToggle3d->setArrowType(Qt::RightArrow);
+    mOpenGlView.reset(new OpenGlView(this));
+    mUi->mainLayout->insertWidget(0, mOpenGlView.data(), 2);
+    mOpenGlViewWaitingSpinner.reset(
+        new WaitingSpinnerWidget(mOpenGlView.data()));
+    mOpenGlSceneBuilder.reset(new OpenGlSceneBuilder());
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::started,
+            mOpenGlViewWaitingSpinner.data(), &WaitingSpinnerWidget::show);
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::finished,
+            mOpenGlViewWaitingSpinner.data(), &WaitingSpinnerWidget::hide);
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::objectAdded,
+            mOpenGlView.data(), &OpenGlView::addObject);
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::objectRemoved,
+            mOpenGlView.data(), &OpenGlView::removeObject);
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::objectUpdated,
+            mOpenGlView.data(),
+            static_cast<void (OpenGlView::*)()>(&OpenGlView::update));
+    scheduleOpenGlSceneUpdate();
   } else {
+    mOpenGlViewWaitingSpinner.reset();
+    mOpenGlView.reset();
     mUi->modelListEditorWidget->hide();
+    mUi->graphicsView->show();
     mUi->btnToggle3d->setArrowType(Qt::LeftArrow);
   }
 }
