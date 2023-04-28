@@ -51,6 +51,7 @@
 #include "graphicsitems/bgi_device.h"
 #include "unplacedcomponentsdock.h"
 
+#include <librepcb/core/3d/stepexport.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/fileio/fileutils.h>
@@ -539,6 +540,8 @@ void BoardEditor::createActions() noexcept {
   mActionExportPdf.reset(cmd.exportPdf.createAction(this, this, [this]() {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
   }));
+  mActionExportStep.reset(cmd.exportStep.createAction(
+      this, this, &BoardEditor::execStepExportDialog));
   mActionPrint.reset(cmd.print.createAction(this, this, [this]() {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
   }));
@@ -925,6 +928,7 @@ void BoardEditor::createMenus() noexcept {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createExportMenu));
     smb.addAction(mActionExportPdf);
     smb.addAction(mActionExportImage);
+    smb.addAction(mActionExportStep);
     smb.addAction(mActionExportLppz);
   }
   {
@@ -1545,6 +1549,44 @@ void BoardEditor::execGraphicsExportDialog(
   } catch (const Exception& e) {
     QMessageBox::warning(this, tr("Error"), e.getMsg());
   }
+}
+
+void BoardEditor::execStepExportDialog() noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return;
+
+  // Determine default file path.
+  const QString projectName = FilePath::cleanFileName(
+      *mProject.getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+  const QString projectVersion = FilePath::cleanFileName(
+      mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+  const FilePath defaultFilePath = mProject.getPath().getPathTo(
+      QString("output/%1/%2.step").arg(projectVersion, projectName));
+
+  // Ask for file path.
+  const FilePath fp(FileDialog::getSaveFileName(this, tr("Export STEP Model"),
+                                                defaultFilePath.toStr(),
+                                                "STEP Models (*.step *.stp)"));
+  if (!fp.isValid()) {
+    return;
+  }
+
+  // Start export.
+  StepExport exp;
+  QProgressDialog dlg(this);
+  dlg.setAutoClose(false);
+  dlg.setAutoReset(false);
+  connect(&exp, &StepExport::progressStatus, &dlg,
+          &QProgressDialog::setLabelText);
+  connect(&exp, &StepExport::progressPercent, &dlg, &QProgressDialog::setValue);
+  connect(&exp, &StepExport::failed, this, [this](QString errorMsg) {
+    QMessageBox::critical(this, tr("STEP Export Failure"), errorMsg);
+  });
+  connect(&exp, &StepExport::finished, &dlg, &QProgressDialog::close);
+  connect(&dlg, &QProgressDialog::canceled, &exp, &StepExport::cancel);
+  exp.start(board->buildScene3D(), fp, 700);
+  dlg.exec();
+  exp.waitForFinished();
 }
 
 void BoardEditor::execD356NetlistExportDialog() noexcept {

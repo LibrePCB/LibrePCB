@@ -60,6 +60,7 @@ class Layer;
 class NetSignal;
 class PcbColor;
 class Project;
+class SceneData3D;
 
 /*******************************************************************************
  *  Class Board
@@ -100,6 +101,7 @@ public:
   }
   bool isEmpty() const noexcept;
   QList<BI_Base*> getAllItems() const noexcept;
+  std::shared_ptr<SceneData3D> buildScene3D() const noexcept;
 
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }

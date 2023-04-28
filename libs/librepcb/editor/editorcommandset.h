@@ -493,6 +493,15 @@ public:
       {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P)},
       &categoryImportExport,
   };
+  EditorCommand exportStep{
+      "export_step",  // clang-format break
+      QT_TR_NOOP("Export STEP Model"),
+      QT_TR_NOOP("Export PCB as a STEP file for loading it into MCAD software"),
+      QIcon(":/img/actions/export_step.png"),
+      EditorCommand::Flag::OpensPopup,
+      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_T)},
+      &categoryImportExport,
+  };
   EditorCommand print{
       "print",  // clang-format break
       QT_TR_NOOP("Print"),

@@ -165,6 +165,7 @@ private:
   void execBoardSetupDialog(bool switchToDrcSettings = false) noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
+  void execStepExportDialog() noexcept;
   void execD356NetlistExportDialog() noexcept;
 
   // General Attributes
@@ -211,6 +212,7 @@ private:
   QScopedPointer<QAction> mActionExportLppz;
   QScopedPointer<QAction> mActionExportImage;
   QScopedPointer<QAction> mActionExportPdf;
+  QScopedPointer<QAction> mActionExportStep;
   QScopedPointer<QAction> mActionPrint;
   QScopedPointer<QAction> mActionGenerateBom;
   QScopedPointer<QAction> mActionGenerateFabricationData;

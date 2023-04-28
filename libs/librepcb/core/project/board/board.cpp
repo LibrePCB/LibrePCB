@@ -22,12 +22,14 @@
  ******************************************************************************/
 #include "board.h"
 
+#include "../../3d/scenedata3d.h"
 #include "../../application.h"
 #include "../../exceptions.h"
 #include "../../geometry/polygon.h"
 #include "../../library/cmp/component.h"
 #include "../../library/dev/device.h"
 #include "../../library/pkg/footprint.h"
+#include "../../library/pkg/package.h"
 #include "../../library/pkg/packagemodel.h"
 #include "../../serialization/sexpression.h"
 #include "../../types/lengthunit.h"
@@ -156,6 +158,120 @@ QList<BI_Base*> Board::getAllItems() const noexcept {
   foreach (BI_AirWire* airWire, mAirWires)
     items.append(airWire);
   return items;
+}
+
+std::shared_ptr<SceneData3D> Board::buildScene3D() const noexcept {
+  auto data = std::make_shared<SceneData3D>(
+      std::make_shared<TransactionalDirectory>(mProject.getDirectory()), false);
+  data->setProjectName(*mProject.getName());
+  data->setThickness(mPcbThickness);
+  data->setSolderResist(mSolderResist);
+  data->setSilkscreen(mSilkscreenColor);
+  data->setSilkscreenLayersTop(mSilkscreenLayersTop.toList().toSet());
+  data->setSilkscreenLayersBot(mSilkscreenLayersBot.toList().toSet());
+  foreach (const BI_Device* obj, mDeviceInstances) {
+    const Transform transform(*obj);
+    if (auto model = obj->getLibModel()) {
+      const QString stepFile = obj->getLibPackage().getDirectory().getPath() %
+          "/" % model->getFileName();
+      data->addDevice(obj->getComponentInstanceUuid(), transform, stepFile,
+                      obj->getLibFootprint().getModelPosition(),
+                      obj->getLibFootprint().getModelRotation(),
+                      *obj->getComponentInstance().getName());
+    }
+    foreach (const BI_FootprintPad* pad, obj->getPads()) {
+      const Transform padTransform(*pad);
+      auto geometries = pad->getGeometries();
+      for (auto it = geometries.begin(); it != geometries.end(); it++) {
+        foreach (const PadGeometry& geometry, it.value()) {
+          foreach (const Path& outline, geometry.toOutlines()) {
+            data->addArea(*it.key(), outline, padTransform);
+          }
+          for (const PadHole& hole : geometry.getHoles()) {
+            data->addHole(hole.getPath(), hole.getDiameter(), true, false,
+                          padTransform);
+          }
+        }
+      }
+    }
+    foreach (const BI_StrokeText* obj, obj->getStrokeTexts()) {
+      data->addStroke(obj->getData().getLayer(), obj->getPaths(),
+                      *obj->getData().getStrokeWidth(),
+                      Transform(obj->getData()));
+    }
+    for (const Polygon& polygon : obj->getLibFootprint().getPolygons()) {
+      data->addPolygon(polygon, transform);
+    }
+    for (const Circle& circle : obj->getLibFootprint().getCircles()) {
+      data->addCircle(circle, transform);
+    }
+    for (const Hole& hole : obj->getLibFootprint().getHoles()) {
+      data->addHole(hole.getPath(), hole.getDiameter(), false, false,
+                    transform);
+      if (const tl::optional<Length>& offset =
+              obj->getHoleStopMasks().value(hole.getUuid())) {
+        for (const Layer* layer :
+             {&Layer::topStopMask(), &Layer::botStopMask()}) {
+          data->addStroke(*layer, {*hole.getPath()},
+                          (*hole.getDiameter()) + (*offset) + (*offset),
+                          Transform(*obj));
+        }
+      }
+    }
+  }
+  foreach (const BI_Plane* obj, mPlanes) {
+    foreach (const Path& fragment, obj->getFragments()) {
+      data->addArea(obj->getLayer(), fragment, Transform());
+    }
+  }
+  foreach (const BI_Polygon* obj, mPolygons) {
+    data->addPolygon(
+        Polygon(obj->getData().getUuid(), obj->getData().getLayer(),
+                obj->getData().getLineWidth(), obj->getData().isFilled(),
+                obj->getData().isGrabArea(), obj->getData().getPath()),
+        Transform());
+  }
+  foreach (const BI_StrokeText* obj, mStrokeTexts) {
+    data->addStroke(obj->getData().getLayer(), obj->getPaths(),
+                    *obj->getData().getStrokeWidth(),
+                    Transform(obj->getData()));
+  }
+  foreach (const BI_Hole* obj, mHoles) {
+    data->addHole(obj->getData().getPath(), obj->getData().getDiameter(), false,
+                  false, Transform());
+    if (const tl::optional<Length>& offset = obj->getStopMaskOffset()) {
+      for (const Layer* layer :
+           {&Layer::topStopMask(), &Layer::botStopMask()}) {
+        data->addStroke(*layer, {*obj->getData().getPath()},
+                        (*obj->getData().getDiameter()) + (*offset) + (*offset),
+                        Transform());
+      }
+    }
+  }
+  foreach (const BI_NetSegment* netSegment, mNetSegments) {
+    foreach (const BI_Via* via, netSegment->getVias()) {
+      const NonEmptyPath path = makeNonEmptyPath(via->getPosition());
+      foreach (const Layer* layer, mCopperLayers) {
+        data->addStroke(*layer, {*path}, *via->getSize(), Transform());
+      }
+      data->addHole(path, via->getDrillDiameter(), true, true, Transform());
+      if (const tl::optional<Length>& offset = via->getStopMaskOffset()) {
+        for (const Layer* layer :
+             {&Layer::topStopMask(), &Layer::botStopMask()}) {
+          data->addStroke(*layer, {*path},
+                          (*via->getSize()) + (*offset) + (*offset),
+                          Transform());
+        }
+      }
+    }
+    foreach (const BI_NetLine* netLine, netSegment->getNetLines()) {
+      data->addStroke(netLine->getLayer(),
+                      {Path({Vertex(netLine->getStartPoint().getPosition()),
+                             Vertex(netLine->getEndPoint().getPosition())})},
+                      *netLine->getWidth(), Transform());
+    }
+  }
+  return data;
 }
 
 /*******************************************************************************

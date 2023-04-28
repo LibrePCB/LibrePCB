@@ -26,6 +26,7 @@ actions/draw_circle.png icons/png/32x32/actions/draw-circle-2.png CC-BY-SA 3.0 o
 actions/draw_polygon.png icons/png/32x32/actions/draw-polyline-2.png CC-BY-SA 3.0 or LGPL
 actions/draw_rectangle.png icons/png/48x48/actions/draw-rectangle-2.png CC-BY-SA 3.0 or LGPL
 actions/edit.png icons/png/48x48/actions/edit-4.png LGPL-2.1
+actions/export_step.png icons/png/48x48/mimetypes/oxygen-style/text-x-moc.png LGPL-2.1
 actions/export_svg.png icons/png/48x48/mimetypes/oxygen-style/image-svg+xml.png CC-BY-SA 3.0 or LGPL
 actions/generate_bom.png icons/png/64x64/mimetypes/gnome-style/x-office-spreadsheet-2.png LGPL-2.1
 actions/help.png icons/png/48x48/actions/help-2.png LGPL-2.1
