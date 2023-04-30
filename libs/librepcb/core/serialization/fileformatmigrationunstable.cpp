@@ -113,21 +113,9 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  root.appendChild("thickness", SExpression::createToken("1.6"));
-  root.appendChild("solder_resist", SExpression::createToken("green"));
-  root.appendChild("silkscreen", SExpression::createToken("white"));
-
-  SExpression& fabNode = root.getChild("fabrication_output_settings");
-
-  SExpression& silkTop = fabNode.getChild("silkscreen_top");
-  SExpression& silkLayersTop = silkTop.getChild("layers");
-  root.appendChild(SExpression(silkLayersTop)).setName("silkscreen_layers_top");
-  silkTop.removeChild(silkLayersTop);
-
-  SExpression& silkBot = fabNode.getChild("silkscreen_bot");
-  SExpression& silkLayersBot = silkBot.getChild("layers");
-  root.appendChild(SExpression(silkLayersBot)).setName("silkscreen_layers_bot");
-  silkBot.removeChild(silkLayersBot);
+  for (SExpression* devNode : root.getChildren("device")) {
+    devNode->getChild("mirror").setName("flip");
+  }
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

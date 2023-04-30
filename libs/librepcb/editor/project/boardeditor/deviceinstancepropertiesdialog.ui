@@ -66,7 +66,7 @@
           <item>
            <widget class="QCheckBox" name="cbxMirror">
             <property name="text">
-             <string notr="true">Mirror</string>
+             <string notr="true">Flip</string>
             </property>
            </widget>
           </item>
