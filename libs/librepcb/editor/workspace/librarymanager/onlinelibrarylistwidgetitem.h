@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_REPOSITORYLIBRARYLISTWIDGETITEM_H
-#define LIBREPCB_EDITOR_REPOSITORYLIBRARYLISTWIDGETITEM_H
+#ifndef LIBREPCB_EDITOR_ONLINELIBRARYLISTWIDGETITEM_H
+#define LIBREPCB_EDITOR_ONLINELIBRARYLISTWIDGETITEM_H
 
 /*******************************************************************************
  *  Includes
@@ -42,27 +42,26 @@ namespace editor {
 class LibraryDownload;
 
 namespace Ui {
-class RepositoryLibraryListWidgetItem;
+class OnlineLibraryListWidgetItem;
 }
 
 /*******************************************************************************
- *  Class RepositoryLibraryListWidgetItem
+ *  Class OnlineLibraryListWidgetItem
  ******************************************************************************/
 
 /**
- * @brief The RepositoryLibraryListWidgetItem class
+ * @brief The OnlineLibraryListWidgetItem class
  */
-class RepositoryLibraryListWidgetItem final : public QWidget {
+class OnlineLibraryListWidgetItem final : public QWidget {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  RepositoryLibraryListWidgetItem() = delete;
-  RepositoryLibraryListWidgetItem(
-      const RepositoryLibraryListWidgetItem& other) = delete;
-  RepositoryLibraryListWidgetItem(Workspace& ws,
-                                  const QJsonObject& obj) noexcept;
-  ~RepositoryLibraryListWidgetItem() noexcept;
+  OnlineLibraryListWidgetItem() = delete;
+  OnlineLibraryListWidgetItem(const OnlineLibraryListWidgetItem& other) =
+      delete;
+  OnlineLibraryListWidgetItem(Workspace& ws, const QJsonObject& obj) noexcept;
+  ~OnlineLibraryListWidgetItem() noexcept;
 
   // Getters
   const tl::optional<Uuid>& getUuid() const noexcept { return mUuid; }
@@ -77,8 +76,8 @@ public:
   void startDownloadIfSelected() noexcept;
 
   // Operator Overloadings
-  RepositoryLibraryListWidgetItem& operator=(
-      const RepositoryLibraryListWidgetItem& rhs) = delete;
+  OnlineLibraryListWidgetItem& operator=(
+      const OnlineLibraryListWidgetItem& rhs) = delete;
 
 signals:
   void checkedChanged(bool checked);
@@ -96,7 +95,7 @@ private:  // Data
   tl::optional<Version> mVersion;
   bool mIsRecommended;
   QSet<Uuid> mDependencies;
-  QScopedPointer<Ui::RepositoryLibraryListWidgetItem> mUi;
+  QScopedPointer<Ui::OnlineLibraryListWidgetItem> mUi;
   QScopedPointer<LibraryDownload> mLibraryDownload;
 };
 

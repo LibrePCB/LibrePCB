@@ -59,7 +59,7 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mSettings(workspace.getSettings()),
     mLibLocaleOrderModel(new LibraryLocaleOrderModel()),
     mLibNormOrderModel(new LibraryNormOrderModel()),
-    mRepositoryUrlsModel(new RepositoryUrlModel()),
+    mApiEndpointModel(new ApiEndpointModel()),
     mKeyboardShortcutsModel(new KeyboardShortcutsModel(this)),
     mKeyboardShortcutsFilterModel(new QSortFilterProxyModel(this)),
     mUi(new Ui::WorkspaceSettingsDialog) {
@@ -163,24 +163,24 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
             mLibNormOrderModel.data(), &LibraryNormOrderModel::moveItemDown);
   }
 
-  // Initialize repository URL widgets
+  // Initialize API endpoint widgets
   {
-    mRepositoryUrlsModel->setPlaceholderText(tr("Click here a add an URL"));
-    mUi->tblRepositoryUrls->setShowMoveButtons(true);
-    mUi->tblRepositoryUrls->setModel(mRepositoryUrlsModel.data());
-    mUi->tblRepositoryUrls->horizontalHeader()->setSectionResizeMode(
-        RepositoryUrlModel::COLUMN_TEXT, QHeaderView::Stretch);
-    mUi->tblRepositoryUrls->horizontalHeader()->setSectionResizeMode(
-        RepositoryUrlModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
-    connect(mUi->tblRepositoryUrls, &EditableTableWidget::btnAddClicked,
-            mRepositoryUrlsModel.data(), &RepositoryUrlModel::addItem);
-    connect(mUi->tblRepositoryUrls, &EditableTableWidget::btnRemoveClicked,
-            mRepositoryUrlsModel.data(), &RepositoryUrlModel::removeItem);
-    connect(mUi->tblRepositoryUrls, &EditableTableWidget::btnMoveUpClicked,
-            mRepositoryUrlsModel.data(), &RepositoryUrlModel::moveItemUp);
-    connect(mUi->tblRepositoryUrls, &EditableTableWidget::btnMoveDownClicked,
-            mRepositoryUrlsModel.data(), &RepositoryUrlModel::moveItemDown);
-    connect(mUi->lblRepositoriesInfo, &QLabel::linkActivated, this,
+    mApiEndpointModel->setPlaceholderText(tr("Click here a add an URL"));
+    mUi->edtApiEndpoints->setShowMoveButtons(true);
+    mUi->edtApiEndpoints->setModel(mApiEndpointModel.data());
+    mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
+        ApiEndpointModel::COLUMN_TEXT, QHeaderView::Stretch);
+    mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
+        ApiEndpointModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
+    connect(mUi->edtApiEndpoints, &EditableTableWidget::btnAddClicked,
+            mApiEndpointModel.data(), &ApiEndpointModel::addItem);
+    connect(mUi->edtApiEndpoints, &EditableTableWidget::btnRemoveClicked,
+            mApiEndpointModel.data(), &ApiEndpointModel::removeItem);
+    connect(mUi->edtApiEndpoints, &EditableTableWidget::btnMoveUpClicked,
+            mApiEndpointModel.data(), &ApiEndpointModel::moveItemUp);
+    connect(mUi->edtApiEndpoints, &EditableTableWidget::btnMoveDownClicked,
+            mApiEndpointModel.data(), &ApiEndpointModel::moveItemDown);
+    connect(mUi->lblApiEndpointsInfo, &QLabel::linkActivated, this,
             [this](const QString& url) {
               DesktopServices ds(mWorkspace.getSettings(), this);
               ds.openWebUrl(QUrl(url));
@@ -672,8 +672,8 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   // Library Norm Order
   mLibNormOrderModel->setValues(mSettings.libraryNormOrder.get());
 
-  // Repository URLs
-  mRepositoryUrlsModel->setValues(mSettings.repositoryUrls.get());
+  // API endpoints
+  mApiEndpointModel->setValues(mSettings.apiEndpoints.get());
 
   // External Applications
   for (auto& app : mExternalApplications) {
@@ -721,8 +721,8 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
     // Library Norm Order
     mSettings.libraryNormOrder.set(mLibNormOrderModel->getValues());
 
-    // Repository URLs
-    mSettings.repositoryUrls.set(mRepositoryUrlsModel->getValues());
+    // API endpoints
+    mSettings.apiEndpoints.set(mApiEndpointModel->getValues());
 
     // External Applications
     for (auto& app : mExternalApplications) {

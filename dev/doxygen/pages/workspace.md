@@ -88,7 +88,7 @@ suffix must be `.lplib`.
 
 This directory contains also libraries, but only those which are managed by
 LibrePCB itself. So all libraries which are downloaded through the
-[LibrePCB Repository API](@ref doc_repository) using the library manager.
+[LibrePCB Server API](@ref doc_server_api) using the library manager.
 Because they are updated by LibrePCB, the user cannot modify them (i.e. they
 are read-only). To modify them anyway, the user can copy them as local
 libraries and make changes there.

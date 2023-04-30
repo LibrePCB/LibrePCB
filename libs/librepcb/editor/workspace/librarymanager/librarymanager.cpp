@@ -99,8 +99,8 @@ LibraryManager::~LibraryManager() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void LibraryManager::updateRepositoryLibraryList() noexcept {
-  mAddLibraryWidget->updateRepositoryLibraryList();
+void LibraryManager::updateOnlineLibraryList() noexcept {
+  mAddLibraryWidget->updateOnlineLibraryList();
 }
 
 /*******************************************************************************

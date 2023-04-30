@@ -34,9 +34,9 @@
      <property name="movable">
       <bool>true</bool>
      </property>
-     <widget class="QWidget" name="tabDownloadFromRepo">
+     <widget class="QWidget" name="tabInstallLibraries">
       <attribute name="title">
-       <string>Download from repository</string>
+       <string>Install Libraries</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
@@ -47,19 +47,19 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="lstRepoLibs"/>
+        <widget class="QListWidget" name="lstOnlineLibraries"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
          <item>
-          <widget class="QCheckBox" name="cbxRepoLibsSelectAll">
+          <widget class="QCheckBox" name="cbxOnlineLibrariesSelectAll">
            <property name="text">
             <string>Select all</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnRepoLibsDownload">
+          <widget class="QPushButton" name="btnOnlineLibrariesDownload">
            <property name="text">
             <string>Download and install/update selected libraries</string>
            </property>
@@ -71,7 +71,7 @@
      </widget>
      <widget class="QWidget" name="tabCreateLocal">
       <attribute name="title">
-       <string>Create local library</string>
+       <string>Create Local Library</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout">
        <property name="fieldGrowthPolicy">
@@ -253,7 +253,7 @@
      </widget>
      <widget class="QWidget" name="tabDownloadManually">
       <attribute name="title">
-       <string>Download manually</string>
+       <string>Download Manually</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout_2">
        <property name="fieldGrowthPolicy">
@@ -262,7 +262,7 @@
        <item row="0" column="0" colspan="2">
         <widget class="QLabel" name="label_10">
          <property name="text">
-          <string>&lt;p&gt;Downloads a zipped library from the internet and saves it as a local library. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Libraries which are downloaded this way cannot be updated automatically. It's highly recommended to use &amp;quot;Download from repository&amp;quot; whenever possible. &lt;/span&gt;&lt;/p&gt;</string>
+          <string>&lt;p&gt;Downloads a zipped library from the internet and saves it as a local library. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Libraries which are downloaded this way cannot be updated automatically. It's highly recommended to use &amp;quot;Install Libraries&amp;quot; whenever possible. &lt;/span&gt;&lt;/p&gt;</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -342,7 +342,6 @@
         <widget class="QLabel" name="lblDownloadZipStatusMsg">
          <property name="font">
           <font>
-           <weight>75</weight>
            <bold>true</bold>
           </font>
          </property>

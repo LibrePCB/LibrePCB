@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_REPOSITORY_H
-#define LIBREPCB_CORE_REPOSITORY_H
+#ifndef LIBREPCB_CORE_APIENDPOINT_H
+#define LIBREPCB_CORE_APIENDPOINT_H
 
 /*******************************************************************************
  *  Includes
@@ -31,21 +31,23 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Class Repository
+ *  Class ApiEndpoint
  ******************************************************************************/
 
 /**
- * @brief The Repository class provides access to a LibrePCB API server
+ * @brief Access to a LibrePCB API endpoint
+ *
+ * @see @ref doc_server_api
  */
-class Repository final : public QObject {
+class ApiEndpoint final : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  Repository() = delete;
-  Repository(const Repository& other) = delete;
-  explicit Repository(const QUrl& url) noexcept;
-  ~Repository() noexcept;
+  ApiEndpoint() = delete;
+  ApiEndpoint(const ApiEndpoint& other) = delete;
+  explicit ApiEndpoint(const QUrl& url) noexcept;
+  ~ApiEndpoint() noexcept;
 
   // Getters
   const QUrl& getUrl() const noexcept { return mUrl; }
@@ -54,7 +56,7 @@ public:
   void requestLibraryList() const noexcept;
 
   // Operators
-  Repository& operator=(const Repository& rhs) = delete;
+  ApiEndpoint& operator=(const ApiEndpoint& rhs) = delete;
 
 signals:
   void libraryListReceived(const QJsonArray& libs);

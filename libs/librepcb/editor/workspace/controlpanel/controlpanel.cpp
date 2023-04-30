@@ -391,7 +391,7 @@ void ControlPanel::openLibraryManager() noexcept {
   mLibraryManager->show();
   mLibraryManager->raise();
   mLibraryManager->activateWindow();
-  mLibraryManager->updateRepositoryLibraryList();
+  mLibraryManager->updateOnlineLibraryList();
 }
 
 void ControlPanel::switchWorkspace() noexcept {

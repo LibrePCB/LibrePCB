@@ -199,14 +199,14 @@ public:
   WorkspaceSettingsItem_GenericValueList<QStringList> libraryNormOrder;
 
   /**
-   * @brief The list of API repository URLs in the right order
+   * @brief The list of API endpoint URLs in the right order
    *
-   * The repository with the highest priority is at index 0 of the list. In case
-   * of version conflicts, the repository with the higher priority will be used.
+   * The endpoint with the highest priority is at index 0 of the list. In case
+   * of version conflicts, the endpoint with the higher priority will be used.
    *
    * Default: ["https://api.librepcb.org"]
    */
-  WorkspaceSettingsItem_GenericValueList<QList<QUrl>> repositoryUrls;
+  WorkspaceSettingsItem_GenericValueList<QList<QUrl>> apiEndpoints;
 
   /**
    * @brief Custom command(s) to be used for opening web URLs
