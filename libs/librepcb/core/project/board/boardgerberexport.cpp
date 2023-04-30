@@ -25,6 +25,7 @@
 #include "../../attribute/attributesubstitutor.h"
 #include "../../export/excellongenerator.h"
 #include "../../export/gerbergenerator.h"
+#include "../../fileio/fileutils.h"
 #include "../../geometry/hole.h"
 #include "../../library/cmp/componentsignal.h"
 #include "../../library/pkg/footprint.h"
@@ -94,12 +95,9 @@ void BoardGerberExport::exportPcbLayers(
     const BoardFabricationOutputSettings& settings) const {
   mWrittenFiles.clear();
 
-  if (settings.getMergeDrillFiles()) {
-    exportDrills(settings);
-  } else {
-    exportDrillsNpth(settings);
-    exportDrillsPth(settings);
-  }
+  exportDrillsMerged(settings);
+  exportDrillsNpth(settings);
+  exportDrillsPth(settings);
   exportLayerBoardOutlines(settings);
   exportLayerTopCopper(settings);
   exportLayerInnerCopper(settings);
@@ -108,12 +106,8 @@ void BoardGerberExport::exportPcbLayers(
   exportLayerBottomSolderMask(settings);
   exportLayerTopSilkscreen(settings);
   exportLayerBottomSilkscreen(settings);
-  if (settings.getEnableSolderPasteTop()) {
-    exportLayerTopSolderPaste(settings);
-  }
-  if (settings.getEnableSolderPasteBot()) {
-    exportLayerBottomSolderPaste(settings);
-  }
+  exportLayerTopSolderPaste(settings);
+  exportLayerBottomSolderPaste(settings);
 }
 
 void BoardGerberExport::exportComponentLayer(BoardSide side,
@@ -285,52 +279,64 @@ QVector<const AttributeProvider*>
  *  Private Methods
  ******************************************************************************/
 
-void BoardGerberExport::exportDrills(
+void BoardGerberExport::exportDrillsMerged(
     const BoardFabricationOutputSettings& settings) const {
-  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                  settings.getSuffixDrills());
-  std::unique_ptr<ExcellonGenerator> gen =
-      BoardGerberExport::createExcellonGenerator(
-          settings, ExcellonGenerator::Plating::Mixed);
-  drawPthDrills(*gen);
-  drawNpthDrills(*gen);
-  gen->generate();
-  gen->saveToFile(fp);
-  mWrittenFiles.append(fp);
+  const FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                        settings.getSuffixDrills());
+  if (settings.getMergeDrillFiles()) {
+    std::unique_ptr<ExcellonGenerator> gen =
+        BoardGerberExport::createExcellonGenerator(
+            settings, ExcellonGenerator::Plating::Mixed);
+    drawPthDrills(*gen);
+    drawNpthDrills(*gen);
+    gen->generate();
+    gen->saveToFile(fp);
+    mWrittenFiles.append(fp);
+  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+    FileUtils::removeFile(fp);
+  }
 }
 
 void BoardGerberExport::exportDrillsNpth(
     const BoardFabricationOutputSettings& settings) const {
-  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                  settings.getSuffixDrillsNpth());
-  std::unique_ptr<ExcellonGenerator> gen =
-      BoardGerberExport::createExcellonGenerator(
-          settings, ExcellonGenerator::Plating::No);
-  drawNpthDrills(*gen);
+  const FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                        settings.getSuffixDrillsNpth());
+  if (!settings.getMergeDrillFiles()) {
+    std::unique_ptr<ExcellonGenerator> gen =
+        BoardGerberExport::createExcellonGenerator(
+            settings, ExcellonGenerator::Plating::No);
+    drawNpthDrills(*gen);
 
-  // Note that separate NPTH drill files could lead to issues with some PCB
-  // manufacturers, even if it's empty in many cases. However, we generate the
-  // NPTH file even if there are no NPTH drills since it could also lead to
-  // unexpected behavior if the file is generated only conditionally. See
-  // https://github.com/LibrePCB/LibrePCB/issues/998. If the PCB manufacturer
-  // doesn't support a separate NPTH file, the user shall enable the
-  // "merge PTH and NPTH drills"  option.
-  gen->generate();
-  gen->saveToFile(fp);
-  mWrittenFiles.append(fp);
+    // Note that separate NPTH drill files could lead to issues with some PCB
+    // manufacturers, even if it's empty in many cases. However, we generate the
+    // NPTH file even if there are no NPTH drills since it could also lead to
+    // unexpected behavior if the file is generated only conditionally. See
+    // https://github.com/LibrePCB/LibrePCB/issues/998. If the PCB manufacturer
+    // doesn't support a separate NPTH file, the user shall enable the
+    // "merge PTH and NPTH drills"  option.
+    gen->generate();
+    gen->saveToFile(fp);
+    mWrittenFiles.append(fp);
+  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+    FileUtils::removeFile(fp);
+  }
 }
 
 void BoardGerberExport::exportDrillsPth(
     const BoardFabricationOutputSettings& settings) const {
-  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                  settings.getSuffixDrillsPth());
-  std::unique_ptr<ExcellonGenerator> gen =
-      BoardGerberExport::createExcellonGenerator(
-          settings, ExcellonGenerator::Plating::Yes);
-  drawPthDrills(*gen);
-  gen->generate();
-  gen->saveToFile(fp);
-  mWrittenFiles.append(fp);
+  const FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                        settings.getSuffixDrillsPth());
+  if (!settings.getMergeDrillFiles()) {
+    std::unique_ptr<ExcellonGenerator> gen =
+        BoardGerberExport::createExcellonGenerator(
+            settings, ExcellonGenerator::Plating::Yes);
+    drawPthDrills(*gen);
+    gen->generate();
+    gen->saveToFile(fp);
+    mWrittenFiles.append(fp);
+  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+    FileUtils::removeFile(fp);
+  }
 }
 
 void BoardGerberExport::exportLayerBoardOutlines(
@@ -399,9 +405,9 @@ void BoardGerberExport::exportLayerInnerCopper(
 
 void BoardGerberExport::exportLayerTopSolderMask(
     const BoardFabricationOutputSettings& settings) const {
+  const FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                        settings.getSuffixSolderMaskTop());
   if (mBoard.getSolderResist()) {
-    FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                    settings.getSuffixSolderMaskTop());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getVersion());
     gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Top,
@@ -410,14 +416,16 @@ void BoardGerberExport::exportLayerTopSolderMask(
     gen.generate();
     gen.saveToFile(fp);
     mWrittenFiles.append(fp);
+  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+    FileUtils::removeFile(fp);
   }
 }
 
 void BoardGerberExport::exportLayerBottomSolderMask(
     const BoardFabricationOutputSettings& settings) const {
+  const FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                        settings.getSuffixSolderMaskBot());
   if (mBoard.getSolderResist()) {
-    FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                    settings.getSuffixSolderMaskBot());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getVersion());
     gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Bottom,
@@ -426,15 +434,17 @@ void BoardGerberExport::exportLayerBottomSolderMask(
     gen.generate();
     gen.saveToFile(fp);
     mWrittenFiles.append(fp);
+  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+    FileUtils::removeFile(fp);
   }
 }
 
 void BoardGerberExport::exportLayerTopSilkscreen(
     const BoardFabricationOutputSettings& settings) const {
+  const FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                        settings.getSuffixSilkscreenTop());
   const QVector<const Layer*>& layers = mBoard.getSilkscreenLayersTop();
   if (layers.count() > 0) {  // don't export silkscreen if no layers selected
-    FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                    settings.getSuffixSilkscreenTop());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Top,
@@ -445,15 +455,17 @@ void BoardGerberExport::exportLayerTopSilkscreen(
     gen.generate();
     gen.saveToFile(fp);
     mWrittenFiles.append(fp);
+  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+    FileUtils::removeFile(fp);
   }
 }
 
 void BoardGerberExport::exportLayerBottomSilkscreen(
     const BoardFabricationOutputSettings& settings) const {
+  const FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                        settings.getSuffixSilkscreenBot());
   const QVector<const Layer*>& layers = mBoard.getSilkscreenLayersBot();
   if (layers.count() > 0) {  // don't export silkscreen if no layers selected
-    FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                    settings.getSuffixSilkscreenBot());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                         mProject.getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Bottom,
@@ -464,35 +476,45 @@ void BoardGerberExport::exportLayerBottomSilkscreen(
     gen.generate();
     gen.saveToFile(fp);
     mWrittenFiles.append(fp);
+  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+    FileUtils::removeFile(fp);
   }
 }
 
 void BoardGerberExport::exportLayerTopSolderPaste(
     const BoardFabricationOutputSettings& settings) const {
-  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                  settings.getSuffixSolderPasteTop());
-  GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getVersion());
-  gen.setFileFunctionPaste(GerberGenerator::BoardSide::Top,
-                           GerberGenerator::Polarity::Positive);
-  drawLayer(gen, Layer::topSolderPaste());
-  gen.generate();
-  gen.saveToFile(fp);
-  mWrittenFiles.append(fp);
+  const FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                        settings.getSuffixSolderPasteTop());
+  if (settings.getEnableSolderPasteTop()) {
+    GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
+                        mProject.getVersion());
+    gen.setFileFunctionPaste(GerberGenerator::BoardSide::Top,
+                             GerberGenerator::Polarity::Positive);
+    drawLayer(gen, Layer::topSolderPaste());
+    gen.generate();
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
+  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+    FileUtils::removeFile(fp);
+  }
 }
 
 void BoardGerberExport::exportLayerBottomSolderPaste(
     const BoardFabricationOutputSettings& settings) const {
-  FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
-                                  settings.getSuffixSolderPasteBot());
-  GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getVersion());
-  gen.setFileFunctionPaste(GerberGenerator::BoardSide::Bottom,
-                           GerberGenerator::Polarity::Positive);
-  drawLayer(gen, Layer::botSolderPaste());
-  gen.generate();
-  gen.saveToFile(fp);
-  mWrittenFiles.append(fp);
+  const FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
+                                        settings.getSuffixSolderPasteBot());
+  if (settings.getEnableSolderPasteBot()) {
+    GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
+                        mProject.getVersion());
+    gen.setFileFunctionPaste(GerberGenerator::BoardSide::Bottom,
+                             GerberGenerator::Polarity::Positive);
+    drawLayer(gen, Layer::botSolderPaste());
+    gen.generate();
+    gen.saveToFile(fp);
+    mWrittenFiles.append(fp);
+  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+    FileUtils::removeFile(fp);
+  }
 }
 
 int BoardGerberExport::drawNpthDrills(ExcellonGenerator& gen) const {

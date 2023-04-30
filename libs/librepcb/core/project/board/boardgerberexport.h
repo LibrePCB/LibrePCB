@@ -93,7 +93,7 @@ signals:
 
 private:
   // Private Methods
-  void exportDrills(const BoardFabricationOutputSettings& settings) const;
+  void exportDrillsMerged(const BoardFabricationOutputSettings& settings) const;
   void exportDrillsNpth(const BoardFabricationOutputSettings& settings) const;
   void exportDrillsPth(const BoardFabricationOutputSettings& settings) const;
   void exportLayerBoardOutlines(
