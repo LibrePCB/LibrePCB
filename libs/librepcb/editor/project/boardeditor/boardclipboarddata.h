@@ -99,7 +99,7 @@ public:
         libFootprintUuid(deserialize<Uuid>(node.getChild("lib_footprint/@0"))),
         position(node.getChild("position")),
         rotation(deserialize<Angle>(node.getChild("rotation/@0"))),
-        mirrored(deserialize<bool>(node.getChild("mirror/@0"))),
+        mirrored(deserialize<bool>(node.getChild("flip/@0"))),
         locked(deserialize<bool>(node.getChild("lock/@0"))),
         attributes(node),
         strokeTexts(),
@@ -118,7 +118,7 @@ public:
       root.ensureLineBreak();
       position.serialize(root.appendList("position"));
       root.appendChild("rotation", rotation);
-      root.appendChild("mirror", mirrored);
+      root.appendChild("flip", mirrored);
       root.appendChild("lock", locked);
       root.ensureLineBreak();
       attributes.serialize(root);

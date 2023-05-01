@@ -657,6 +657,7 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
       }
       txtNode->appendChild("lock", SExpression::createToken("false"));
     }
+    devNode->getChild("mirror").setName("flip");
   }
 
   // Net segments.

@@ -323,7 +323,7 @@ void BI_Device::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mPosition.serialize(root.appendList("position"));
   root.appendChild("rotation", mRotation);
-  root.appendChild("mirror", mMirrored);
+  root.appendChild("flip", mMirrored);
   root.appendChild("lock", mLocked);
   root.ensureLineBreak();
   mAttributes.serialize(root);
