@@ -101,7 +101,7 @@ public:
    *
    * @param container           A string container as supported by QCollator.
    * @param compare             Custom comparison function with the signature
-   *                            `bool(const QCollator& const V&, const V&)`
+   *                            `bool(const QCollator&, const V&, const V&)`
    *                            where `V` represents the container item type.
    * @param caseSensitivity     Case sensitivity of comparison.
    * @param ignorePunctuation   Whether punctuation is ignored or not.

@@ -62,6 +62,10 @@ add_library(
   librepcb_core STATIC
   3d/occmodel.cpp
   3d/occmodel.h
+  3d/scenedata3d.cpp
+  3d/scenedata3d.h
+  3d/stepexport.cpp
+  3d/stepexport.h
   algorithm/airwiresbuilder.cpp
   algorithm/airwiresbuilder.h
   application.cpp
