@@ -226,6 +226,20 @@ PositiveLength deserialize(const SExpression& node) {
   return PositiveLength(deserialize<Length>(node));  // can throw
 }
 
+template <>
+Point3D deserialize(const SExpression& node) {
+  return std::make_tuple(deserialize<Length>(node.getChild("@0")),
+                         deserialize<Length>(node.getChild("@1")),
+                         deserialize<Length>(node.getChild("@2")));
+}
+
+QDebug operator<<(QDebug stream, const Point3D& obj) {
+  stream << QString("Point3D(%1mm, %2mm, %3mm)")
+                .arg(std::get<0>(obj).toMm(), std::get<1>(obj).toMm(),
+                     std::get<2>(obj).toMm());
+  return stream;
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

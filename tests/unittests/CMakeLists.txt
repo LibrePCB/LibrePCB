@@ -13,6 +13,7 @@ find_package(Threads REQUIRED)
 # Main executable
 add_executable(
   librepcb_unittests
+  core/3d/occmodeltest.cpp
   core/algorithm/airwiresbuildertest.cpp
   core/applicationtest.cpp
   core/attribute/attributekeytest.cpp

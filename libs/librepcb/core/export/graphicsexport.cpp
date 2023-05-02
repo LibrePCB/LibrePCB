@@ -398,15 +398,14 @@ QString GraphicsExport::run(RunArgs args) noexcept {
       }
     }
 
-    qDebug().nospace() << "Successfully exported graphics in "
-                       << timer.elapsed() << "ms.";
+    qDebug() << "Successfully exported graphics in" << timer.elapsed() << "ms.";
     emit progress(100, args.pages.count(), args.pages.count());
     emit succeeded();
     return QString();
   } catch (const Exception& e) {
     QString msg = e.getMsg().isEmpty() ? "Unknown error" : e.getMsg();
-    qCritical().nospace() << "Graphics export failed after " << timer.elapsed()
-                          << "ms: " << msg;
+    qCritical().noquote() << "Graphics export failed after" << timer.elapsed()
+                          << "ms:" << msg;
     emit failed(msg);
     return msg;
   }

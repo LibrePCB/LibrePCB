@@ -153,6 +153,20 @@ Angle deserialize(const SExpression& node) {
   return Angle::fromDeg(node.getValue());  // can throw
 }
 
+template <>
+Angle3D deserialize(const SExpression& node) {
+  return std::make_tuple(deserialize<Angle>(node.getChild("@0")),
+                         deserialize<Angle>(node.getChild("@1")),
+                         deserialize<Angle>(node.getChild("@2")));
+}
+
+QDebug operator<<(QDebug stream, const Angle3D& obj) {
+  stream << QString("Angle3D(%1°, %2°, %3°)")
+                .arg(std::get<0>(obj).toDeg(), std::get<1>(obj).toDeg(),
+                     std::get<2>(obj).toDeg());
+  return stream;
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/

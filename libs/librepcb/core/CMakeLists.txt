@@ -60,6 +60,8 @@ configure_file(build_env.h.in librepcb_build_env.h @ONLY)
 # Export library
 add_library(
   librepcb_core STATIC
+  3d/occmodel.cpp
+  3d/occmodel.h
   algorithm/airwiresbuilder.cpp
   algorithm/airwiresbuilder.h
   application.cpp
