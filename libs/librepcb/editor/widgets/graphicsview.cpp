@@ -25,6 +25,7 @@
 #include "../graphics/graphicsscene.h"
 #include "QtOpenGL"
 #include "if_graphicsvieweventhandler.h"
+#include "waitingspinnerwidget.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/export/graphicspainter.h>
@@ -49,6 +50,7 @@ namespace editor {
 GraphicsView::GraphicsView(QWidget* parent,
                            IF_GraphicsViewEventHandler* eventHandler) noexcept
   : QGraphicsView(parent),
+    mWaitingSpinnerWidget(new WaitingSpinnerWidget(this)),
     mInfoBoxLabel(new QLabel(this)),
     mEventHandlerObject(eventHandler),
     mScene(nullptr),
@@ -79,6 +81,9 @@ GraphicsView::GraphicsView(QWidget* parent,
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
   setSceneRect(-2000, -2000, 4000, 4000);
+
+  mWaitingSpinnerWidget->setColor(mGridColor.lighter(120));
+  mWaitingSpinnerWidget->hide();
 
   mInfoBoxLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
   mInfoBoxLabel->setFont(Application::getDefaultMonospaceFont());
@@ -119,6 +124,7 @@ void GraphicsView::setBackgroundColors(const QColor& fill,
                                        const QColor& grid) noexcept {
   mBackgroundColor = fill;
   mGridColor = grid;
+  mWaitingSpinnerWidget->setColor(mGridColor.lighter(120));
   setBackgroundBrush(backgroundBrush());  // this will repaint the background
 }
 
@@ -315,6 +321,14 @@ void GraphicsView::zoomToRect(const QRectF& rect) noexcept {
   mIdleTimeMs = 0;
 }
 
+void GraphicsView::showWaitingSpinner() noexcept {
+  mWaitingSpinnerWidget->show();
+}
+
+void GraphicsView::hideWaitingSpinner() noexcept {
+  mWaitingSpinnerWidget->hide();
+}
+
 /*******************************************************************************
  *  Private Slots
  ******************************************************************************/
@@ -438,9 +452,10 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect) {
   gridPen.setWidth((mGridStyle == Theme::GridStyle::Dots) ? 2 : 1);
   painter->setPen(gridPen);
   painter->setBrush(Qt::NoBrush);
-  qreal gridIntervalPixels = mGridInterval->toPx();
-  qreal scaleFactor = width() / rect.width();
-  if (gridIntervalPixels * scaleFactor >= (qreal)5) {
+  const qreal gridIntervalPixels = mGridInterval->toPx();
+  const qreal lod = QStyleOptionGraphicsItem::levelOfDetailFromTransform(
+      painter->worldTransform());
+  if (gridIntervalPixels * lod >= 6) {
     qreal left, right, top, bottom;
     left = qFloor(rect.left() / gridIntervalPixels) * gridIntervalPixels;
     right = rect.right();

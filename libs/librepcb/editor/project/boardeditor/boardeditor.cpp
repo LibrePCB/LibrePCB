@@ -122,6 +122,10 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   mUi->graphicsView->setEventHandlerObject(this);
   connect(mUi->graphicsView, &GraphicsView::cursorScenePositionChanged,
           mUi->statusbar, &StatusBar::setAbsoluteCursorPosition);
+  connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::started,
+          mUi->graphicsView, &GraphicsView::showWaitingSpinner);
+  connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::finished,
+          mUi->graphicsView, &GraphicsView::hideWaitingSpinner);
 
   // Setup status bar.
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |

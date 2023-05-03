@@ -58,6 +58,9 @@ public:
   WaitingSpinnerWidget(const WaitingSpinnerWidget& other) = delete;
   ~WaitingSpinnerWidget() noexcept;
 
+  // Setters
+  void setColor(const QColor& color) noexcept { mColor = color; }
+
   // Operator Overloadings
   WaitingSpinnerWidget& operator=(const WaitingSpinnerWidget& rhs) = delete;
 
@@ -73,6 +76,7 @@ private:  // Methods
   void updatePosition() noexcept;
 
 private:  // Data
+  QColor mColor;
   int mTotalRotations;
   int mCurrentRotation;
   int mCircleDiameter;

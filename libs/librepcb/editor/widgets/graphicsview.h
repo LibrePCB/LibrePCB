@@ -39,6 +39,7 @@ namespace editor {
 
 class GraphicsScene;
 class IF_GraphicsViewEventHandler;
+class WaitingSpinnerWidget;
 
 /*******************************************************************************
  *  Class GraphicsView
@@ -123,6 +124,8 @@ public slots:
   void zoomOut() noexcept;
   void zoomAll() noexcept;
   void zoomToRect(const QRectF& rect) noexcept;
+  void showWaitingSpinner() noexcept;
+  void hideWaitingSpinner() noexcept;
 
 signals:
   /**
@@ -145,6 +148,7 @@ private:
   void drawForeground(QPainter* painter, const QRectF& rect);
 
   // General Attributes
+  QScopedPointer<WaitingSpinnerWidget> mWaitingSpinnerWidget;
   QScopedPointer<QLabel> mInfoBoxLabel;
   IF_GraphicsViewEventHandler* mEventHandlerObject;
   GraphicsScene* mScene;
