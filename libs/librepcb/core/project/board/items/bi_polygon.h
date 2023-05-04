@@ -83,7 +83,10 @@ public:
   // Operator Overloadings
   BI_Polygon& operator=(const BI_Polygon& rhs) = delete;
 
-private:
+private:  // Methods
+  void invalidatePlanes(const Layer& layer) noexcept;
+
+private:  // Data
   BoardPolygonData mData;
 };
 

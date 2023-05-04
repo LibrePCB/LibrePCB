@@ -57,6 +57,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardd356netlistexport.h>
 #include <librepcb/core/project/board/boardpainter.h>
+#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
@@ -96,7 +97,9 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
     mActiveBoard(nullptr),
     mGraphicsScene(),
     mVisibleSceneRect(),
-    mFsm() {
+    mFsm(),
+    mPlaneFragmentsBuilder(new BoardPlaneFragmentsBuilder(true, this)),
+    mTimestampOfLastPlaneRebuild(0) {
   mUi->setupUi(this);
   mUi->tabBar->setDocumentMode(true);  // For MacOS
   mUi->lblUnplacedComponentsNote->hide();
@@ -158,6 +161,12 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
             }
           });
 
+  // Setup plane rebuilder.
+  connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::finished,
+          this, [this]() {
+            mTimestampOfLastPlaneRebuild = QDateTime::currentMSecsSinceEpoch();
+          });
+
   // Create all actions, window menus, toolbars and dock widgets.
   createActions();
   createToolBars();
@@ -180,6 +189,12 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
 
   // Load first board
   if (mProject.getBoards().count() > 0) setActiveBoardIndex(0);
+
+  // Setup timer for scheduled tasks.
+  QTimer* scheduledTasksTimer = new QTimer(this);
+  connect(scheduledTasksTimer, &QTimer::timeout, this,
+          &BoardEditor::performScheduledTasks);
+  scheduledTasksTimer->start(100);
 
   // Set focus to graphics view (avoid having the focus in some arbitrary
   // widget).
@@ -681,13 +696,8 @@ void BoardEditor::createActions() noexcept {
       }
     }
   }));
-  mActionRebuildPlanes.reset(
-      cmd.planeRebuildAll.createAction(this, this, [this]() {
-        if (Board* board = getActiveBoard()) {
-          board->rebuildAllPlanes();
-          board->forceAirWiresRebuild();
-        }
-      }));
+  mActionRebuildPlanes.reset(cmd.planeRebuildAll.createAction(
+      this, this, [this]() { startPlaneRebuild(true); }));
   mActionAbort.reset(cmd.abort.createAction(
       this, mFsm.data(), &BoardEditorFsm::processAbortCommand));
   mActionToolSelect.reset(cmd.toolSelect.createAction(this));
@@ -837,7 +847,6 @@ void BoardEditor::createToolBars() noexcept {
   mToolBarTools->addAction(mActionToolHole.data());
   mToolBarTools->addSeparator();
   mToolBarTools->addAction(mActionToolMeasure.data());
-  mToolBarTools->addAction(mActionRebuildPlanes.data());
   mToolBarTools->addAction(mActionRunQuickCheck.data());
   mToolBarTools->addAction(mActionRunDesignRuleCheck.data());
   addToolBar(Qt::LeftToolBarArea, mToolBarTools.data());
@@ -1317,6 +1326,60 @@ void BoardEditor::goToDevice(const QString& name, int index) noexcept {
       mUi->graphicsView->zoomToRect(rect);
     }
   }
+}
+
+void BoardEditor::performScheduledTasks() noexcept {
+  // Rebuild planes, if needed. Depending on various conditions to avoid too
+  // high CPU load caused by too frequent plane rebuilds.
+  const bool commandActive =
+      mProjectEditor.getUndoStack().isCommandGroupActive() ||
+      mUi->graphicsView->isAnyMouseButtonPressed();
+  const bool userInputIdle = (mUi->graphicsView->getIdleTimeMs() >= 700);
+  const qint64 buildPauseMs =
+      QDateTime::currentMSecsSinceEpoch() - mTimestampOfLastPlaneRebuild;
+  if (mPlaneFragmentsBuilder && (!mPlaneFragmentsBuilder->isBusy()) &&
+      ((!commandActive) || userInputIdle) && (buildPauseMs >= 1000) &&
+      isActiveTopLevelWindow()) {
+    startPlaneRebuild(false);
+  }
+}
+
+void BoardEditor::startPlaneRebuild(bool full) noexcept {
+  Board* board = getActiveBoard();
+  if (board && mPlaneFragmentsBuilder) {
+    if (full) {
+      // Forced rebuild -> all layers.
+      mPlaneFragmentsBuilder->startAsynchronously(*board);
+    } else {
+      // Automatic rebuild -> only modified & visible layers.
+      QSet<const Layer*> layers;
+      foreach (const Layer* layer, board->getCopperLayers()) {
+        if (auto graphicsLayer = IF_GraphicsLayerProvider::getLayer(*layer)) {
+          if (graphicsLayer->isVisible()) {
+            layers.insert(layer);
+          }
+        }
+      }
+      mPlaneFragmentsBuilder->startAsynchronously(*board, &layers);
+    }
+  }
+}
+
+bool BoardEditor::isActiveTopLevelWindow() const noexcept {
+  if (isActiveWindow()) {
+    return true;
+  }
+  QWidget* w = QApplication::activeWindow();
+  while (w) {
+    if (w == this) {
+      return true;
+    }
+    w = w->parentWidget();
+  }
+  if (mUi->graphicsView->getIdleTimeMs() < 2000) {
+    return true;  // Safe fallback if active window detection is not reliable.
+  }
+  return false;
 }
 
 void BoardEditor::newBoard() noexcept {

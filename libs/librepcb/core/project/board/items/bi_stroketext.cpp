@@ -25,6 +25,7 @@
 #include "../../../attribute/attributesubstitutor.h"
 #include "../../../font/strokefontpool.h"
 #include "../../../font/stroketextpathbuilder.h"
+#include "../../../types/layer.h"
 #include "../../project.h"
 #include "../board.h"
 #include "bi_device.h"
@@ -61,8 +62,11 @@ BI_StrokeText::~BI_StrokeText() noexcept {
  ******************************************************************************/
 
 bool BI_StrokeText::setLayer(const Layer& layer) noexcept {
+  const Layer& oldLayer = mData.getLayer();
   if (mData.setLayer(layer)) {
     onEdited.notify(Event::LayerChanged);
+    invalidatePlanes(oldLayer);
+    invalidatePlanes(mData.getLayer());
     return true;
   } else {
     return false;
@@ -81,6 +85,7 @@ bool BI_StrokeText::setText(const QString& text) noexcept {
 bool BI_StrokeText::setPosition(const Point& pos) noexcept {
   if (mData.setPosition(pos)) {
     onEdited.notify(Event::PositionChanged);
+    invalidatePlanes(mData.getLayer());
     return true;
   } else {
     return false;
@@ -91,6 +96,7 @@ bool BI_StrokeText::setRotation(const Angle& rotation) noexcept {
   if (mData.setRotation(rotation)) {
     onEdited.notify(Event::RotationChanged);
     updatePaths();  // Auto-rotation might have changed.
+    invalidatePlanes(mData.getLayer());
     return true;
   } else {
     return false;
@@ -110,6 +116,7 @@ bool BI_StrokeText::setStrokeWidth(const UnsignedLength& strokeWidth) noexcept {
   if (mData.setStrokeWidth(strokeWidth)) {
     onEdited.notify(Event::StrokeWidthChanged);
     updatePaths();  // Spacing might need to be re-calculated.
+    invalidatePlanes(mData.getLayer());
     return true;
   } else {
     return false;
@@ -148,6 +155,7 @@ bool BI_StrokeText::setMirrored(bool mirrored) noexcept {
   if (mData.setMirrored(mirrored)) {
     onEdited.notify(Event::MirroredChanged);
     updatePaths();  // Auto-rotation might have changed.
+    invalidatePlanes(mData.getLayer());
     return true;
   } else {
     return false;
@@ -209,6 +217,7 @@ void BI_StrokeText::addToBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   BI_Base::addToBoard();
+  invalidatePlanes(mData.getLayer());
 }
 
 void BI_StrokeText::removeFromBoard() {
@@ -216,6 +225,7 @@ void BI_StrokeText::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   BI_Base::removeFromBoard();
+  invalidatePlanes(mData.getLayer());
 }
 
 /*******************************************************************************
@@ -239,6 +249,13 @@ void BI_StrokeText::updatePaths() noexcept {
   if (paths != mPaths) {
     mPaths = paths;
     onEdited.notify(Event::PathsChanged);
+    invalidatePlanes(mData.getLayer());
+  }
+}
+
+void BI_StrokeText::invalidatePlanes(const Layer& layer) noexcept {
+  if (layer.isCopper()) {
+    mBoard.invalidatePlanes(&layer);
   }
 }
 

@@ -67,6 +67,7 @@ void BI_NetPoint::setPosition(const Point& position) noexcept {
   if (mJunction.setPosition(position)) {
     foreach (BI_NetLine* netLine, mRegisteredNetLines) {
       netLine->updatePositions();
+      mBoard.invalidatePlanes(&netLine->getLayer());
     }
     onEdited.notify(Event::PositionChanged);
     if (NetSignal* netsignal = mNetSegment.getNetSignal()) {

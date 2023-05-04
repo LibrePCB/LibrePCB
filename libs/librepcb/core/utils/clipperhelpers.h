@@ -107,7 +107,6 @@ private:  // Internal Helper Methods
       const ClipperLib::Paths& holes) noexcept;
   static ClipperLib::Path rotateCutInHole(
       const ClipperLib::Path& hole) noexcept;
-  static int getHoleConnectionPointIndex(const ClipperLib::Path& hole) noexcept;
   static void addCutInToPath(ClipperLib::Path& outline,
                              const ClipperLib::Path& hole);
   static int insertConnectionPointToPath(ClipperLib::Path& path,

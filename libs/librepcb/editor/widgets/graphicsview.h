@@ -73,6 +73,8 @@ public:
     return mGridInterval;
   }
   Theme::GridStyle getGridStyle() const noexcept { return mGridStyle; }
+  bool isAnyMouseButtonPressed() const noexcept { return mAnyButtonPressed; }
+  qint64 getIdleTimeMs() const noexcept { return mIdleTimeMs; }
 
   // Setters
   void setBackgroundColors(const QColor& fill, const QColor& grid) noexcept;
@@ -174,7 +176,9 @@ private:
 
   // State
   volatile bool mPanningActive;
+  volatile bool mAnyButtonPressed;
   QCursor mCursorBeforePanning;
+  qint64 mIdleTimeMs;
 
   // Static Variables
   static constexpr qreal sZoomStepFactor = 1.3;

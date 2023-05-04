@@ -37,11 +37,9 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane,
-                                     bool rebuildOnChanges) noexcept
+CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane) noexcept
   : UndoCommand(tr("Edit plane")),
     mPlane(plane),
-    mDoRebuildOnChanges(rebuildOnChanges),
     mOldOutline(plane.getOutline()),
     mNewOutline(mOldOutline),
     mOldLayer(&plane.getLayer()),
@@ -176,9 +174,6 @@ void CmdBoardPlaneEdit::performUndo() {
   mPlane.setPriority(mOldPriority);
   mPlane.setKeepOrphans(mOldKeepOrphans);
   mPlane.setLocked(mOldLocked);
-
-  // rebuild all planes to see the changes
-  if (mDoRebuildOnChanges) mPlane.getBoard().rebuildAllPlanes();
 }
 
 void CmdBoardPlaneEdit::performRedo() {
@@ -191,9 +186,6 @@ void CmdBoardPlaneEdit::performRedo() {
   mPlane.setPriority(mNewPriority);
   mPlane.setKeepOrphans(mNewKeepOrphans);
   mPlane.setLocked(mNewLocked);
-
-  // rebuild all planes to see the changes
-  if (mDoRebuildOnChanges) mPlane.getBoard().rebuildAllPlanes();
 }
 
 /*******************************************************************************

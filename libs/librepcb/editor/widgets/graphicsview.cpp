@@ -30,6 +30,7 @@
 #include <librepcb/core/export/graphicspainter.h>
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/angle.h>
+#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -68,7 +69,9 @@ GraphicsView::GraphicsView(QWidget* parent,
         {-1, LengthUnit::inches(), "", Length(254), Length(0)},
     }),
     mRulerPositions(),
-    mPanningActive(false) {
+    mPanningActive(false),
+    mAnyButtonPressed(false),
+    mIdleTimeMs(0) {
   setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
   setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   setOptimizationFlags(QGraphicsView::DontSavePainterState);
@@ -87,6 +90,10 @@ GraphicsView::GraphicsView(QWidget* parent,
   mZoomAnimation = new QVariantAnimation();
   connect(mZoomAnimation, &QVariantAnimation::valueChanged, this,
           &GraphicsView::zoomAnimationValueChanged);
+
+  QTimer* idleTimer = new QTimer(this);
+  connect(idleTimer, &QTimer::timeout, this, [this]() { mIdleTimeMs += 100; });
+  idleTimer->start(100);
 
   viewport()->grabGesture(Qt::PinchGesture);
 }
@@ -279,11 +286,13 @@ void GraphicsView::handleMouseWheelEvent(
 void GraphicsView::zoomIn() noexcept {
   if (!mScene) return;
   scale(sZoomStepFactor, sZoomStepFactor);
+  mIdleTimeMs = 0;
 }
 
 void GraphicsView::zoomOut() noexcept {
   if (!mScene) return;
   scale(1 / sZoomStepFactor, 1 / sZoomStepFactor);
+  mIdleTimeMs = 0;
 }
 
 void GraphicsView::zoomAll() noexcept {
@@ -294,6 +303,7 @@ void GraphicsView::zoomAll() noexcept {
   qreal yMargins = rect.height() / 50;
   rect.adjust(-xMargins, -yMargins, xMargins, yMargins);
   zoomToRect(rect);
+  mIdleTimeMs = 0;
 }
 
 void GraphicsView::zoomToRect(const QRectF& rect) noexcept {
@@ -302,6 +312,7 @@ void GraphicsView::zoomToRect(const QRectF& rect) noexcept {
   mZoomAnimation->setStartValue(getVisibleSceneRect());
   mZoomAnimation->setEndValue(rect);
   mZoomAnimation->start();
+  mIdleTimeMs = 0;
 }
 
 /*******************************************************************************
@@ -328,6 +339,8 @@ void GraphicsView::wheelEvent(QWheelEvent* event) {
 }
 
 bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
+  auto resetIdleTime = scopeGuard([this]() { mIdleTimeMs = 0; });
+
   switch (event->type()) {
     case QEvent::Gesture: {
       QGestureEvent* ge = dynamic_cast<QGestureEvent*>(event);
@@ -350,6 +363,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
       }
+      mAnyButtonPressed = (e->buttons() != Qt::NoButton);
       return true;
     }
     case QEvent::GraphicsSceneMouseRelease: {
@@ -362,6 +376,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
       }
+      mAnyButtonPressed = (e->buttons() != Qt::NoButton);
       return true;
     }
     case QEvent::GraphicsSceneMouseMove: {
@@ -378,6 +393,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
         mPanningActive = false;
       }
       emit cursorScenePositionChanged(Point::fromPx(e->scenePos()));
+      mAnyButtonPressed = (e->buttons() != Qt::NoButton);
     }
       // fall through
     case QEvent::GraphicsSceneMouseDoubleClick:
@@ -402,6 +418,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       return true;
     }
     default:
+      // Unknown event -> do not count as activity.
+      resetIdleTime.dismiss();
       break;
   }
   return QWidget::eventFilter(obj, event);

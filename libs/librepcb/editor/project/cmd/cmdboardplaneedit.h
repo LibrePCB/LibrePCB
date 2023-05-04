@@ -50,7 +50,7 @@ namespace editor {
 class CmdBoardPlaneEdit final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdBoardPlaneEdit(BI_Plane& plane, bool rebuildOnChanges) noexcept;
+  explicit CmdBoardPlaneEdit(BI_Plane& plane) noexcept;
   ~CmdBoardPlaneEdit() noexcept;
 
   // Setters
@@ -85,7 +85,6 @@ private:
 
   // Attributes from the constructor
   BI_Plane& mPlane;
-  bool mDoRebuildOnChanges;
 
   // General Attributes
   Path mOldOutline;

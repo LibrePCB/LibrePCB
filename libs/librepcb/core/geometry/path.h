@@ -270,4 +270,6 @@ inline uint qHash(const StraightAreaPath& key, uint seed = 0) noexcept {
 
 }  // namespace librepcb
 
+Q_DECLARE_METATYPE(librepcb::Path)
+
 #endif

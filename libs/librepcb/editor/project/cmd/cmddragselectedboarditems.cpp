@@ -109,7 +109,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
       mCenterPos += vertex.getPos();
       ++mItemCount;
     }
-    CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane, false);
+    CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane);
     mPlaneEditCmds.append(cmd);
   }
   foreach (BI_Polygon* polygon, query.getPolygons()) {

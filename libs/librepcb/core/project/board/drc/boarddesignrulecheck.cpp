@@ -37,6 +37,7 @@
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../board.h"
+#include "../boardplanefragmentsbuilder.h"
 #include "../items/bi_airwire.h"
 #include "../items/bi_device.h"
 #include "../items/bi_footprintpad.h"
@@ -129,7 +130,8 @@ void BoardDesignRuleCheck::execute(bool quick) {
 
 void BoardDesignRuleCheck::rebuildPlanes(int progressEnd) {
   emitStatus(tr("Rebuild planes..."));
-  mBoard.rebuildAllPlanes();
+  BoardPlaneFragmentsBuilder builder;
+  builder.runSynchronously(mBoard);
   emitProgress(progressEnd);
 }
 

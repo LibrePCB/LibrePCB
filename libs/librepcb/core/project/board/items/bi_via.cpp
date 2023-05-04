@@ -75,6 +75,7 @@ void BI_Via::setPosition(const Point& position) noexcept {
     foreach (BI_NetLine* netLine, mRegisteredNetLines) {
       netLine->updatePositions();
     }
+    mBoard.invalidatePlanes();
     if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
       mBoard.scheduleAirWiresRebuild(netsignal);
     }
@@ -86,6 +87,7 @@ void BI_Via::setSize(const PositiveLength& size) noexcept {
   if (mVia.setSize(size)) {
     onEdited.notify(Event::SizeChanged);
     updateStopMaskOffset();
+    mBoard.invalidatePlanes();
   }
 }
 
@@ -93,6 +95,7 @@ void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
   if (mVia.setDrillDiameter(diameter)) {
     onEdited.notify(Event::DrillDiameterChanged);
     updateStopMaskOffset();
+    mBoard.invalidatePlanes();
   }
 }
 
@@ -105,6 +108,7 @@ void BI_Via::addToBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   BI_Base::addToBoard();
+  mBoard.invalidatePlanes();
   if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
     mNetSignalNameChangedConnection =
         connect(netsignal, &NetSignal::nameChanged, this,
@@ -118,6 +122,7 @@ void BI_Via::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   BI_Base::removeFromBoard();
+  mBoard.invalidatePlanes();
   if (NetSignal* netsignal = mNetSegment.getNetSignal()) {
     mBoard.scheduleAirWiresRebuild(netsignal);
   }

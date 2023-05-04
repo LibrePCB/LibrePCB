@@ -152,6 +152,7 @@ void BI_FootprintPad::addToBoard() {
   }
   netSignalChanged(nullptr, getCompSigInstNetSignal());
   BI_Base::addToBoard();
+  invalidatePlanes();
 }
 
 void BI_FootprintPad::removeFromBoard() {
@@ -163,6 +164,7 @@ void BI_FootprintPad::removeFromBoard() {
   }
   netSignalChanged(getCompSigInstNetSignal(), nullptr);
   BI_Base::removeFromBoard();
+  invalidatePlanes();
 }
 
 void BI_FootprintPad::registerNetLine(BI_NetLine& netline) {
@@ -245,6 +247,7 @@ void BI_FootprintPad::netSignalChanged(NetSignal* from, NetSignal* to) {
     connect(to, &NetSignal::nameChanged, this, &BI_FootprintPad::updateText);
     mBoard.scheduleAirWiresRebuild(to);
   }
+  invalidatePlanes();
   updateText();
 }
 
@@ -264,10 +267,12 @@ void BI_FootprintPad::updateTransform() noexcept {
     foreach (BI_NetLine* netLine, mRegisteredNetLines) {
       netLine->updatePositions();
     }
+    invalidatePlanes();
   }
   if (rotation != mRotation) {
     mRotation = rotation;
     onEdited.notify(Event::RotationChanged);
+    invalidatePlanes();
   }
   if (mirrored != mMirrored) {
     mMirrored = mirrored;
@@ -307,6 +312,15 @@ void BI_FootprintPad::updateGeometries() noexcept {
   if (geometries != mGeometries) {
     mGeometries = geometries;
     onEdited.notify(Event::GeometriesChanged);
+    mBoard.invalidatePlanes();
+  }
+}
+
+void BI_FootprintPad::invalidatePlanes() noexcept {
+  if (mFootprintPad->isTht()) {
+    mBoard.invalidatePlanes();
+  } else {
+    mBoard.invalidatePlanes(&getSmtLayer());
   }
 }
 

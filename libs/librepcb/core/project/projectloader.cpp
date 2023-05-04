@@ -595,9 +595,6 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
     board->addHole(*hole);
   }
 
-  // Rebuild all planes.
-  board->rebuildAllPlanes();
-
   // Load user settings.
   loadBoardUserSettings(*board);
 }

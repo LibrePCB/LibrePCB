@@ -40,7 +40,6 @@
 #include "boardairwiresbuilder.h"
 #include "boarddesignrules.h"
 #include "boardfabricationoutputsettings.h"
-#include "boardplanefragmentsbuilder.h"
 #include "drc/boarddesignrulechecksettings.h"
 #include "items/bi_airwire.h"
 #include "items/bi_device.h"
@@ -171,6 +170,7 @@ void Board::setInnerLayerCount(int count) noexcept {
     for (int i = 1; i <= mInnerLayerCount; ++i) {
       if (const Layer* layer = Layer::innerCopper(i)) {
         mCopperLayers.insert(layer);
+        invalidatePlanes(layer);
       }
     }
     emit innerLayerCountChanged();
@@ -180,6 +180,7 @@ void Board::setInnerLayerCount(int count) noexcept {
 void Board::setDesignRules(const BoardDesignRules& rules) noexcept {
   if (rules != *mDesignRules) {
     *mDesignRules = rules;
+    invalidatePlanes();
     emit designRulesModified();
     emit attributesChanged();
   }
@@ -343,16 +344,20 @@ void Board::removePlane(BI_Plane& plane) {
   emit planeRemoved(plane);
 }
 
-void Board::rebuildAllPlanes() noexcept {
-  QList<BI_Plane*> planes = mPlanes.values();
-  std::sort(planes.begin(), planes.end(),
-            [](const BI_Plane* p1, const BI_Plane* p2) {
-              return !(*p1 < *p2);
-            });  // sort by priority (highest priority first)
-  foreach (BI_Plane* plane, planes) {
-    BoardPlaneFragmentsBuilder builder(*plane);
-    plane->setCalculatedFragments(builder.buildFragments());
+void Board::invalidatePlanes(const Layer* layer) noexcept {
+  Q_ASSERT((!layer) || (layer->isCopper()));
+  if (layer) {
+    mScheduledLayersForPlanesRebuild.insert(layer);
+  } else {
+    mScheduledLayersForPlanesRebuild |= mCopperLayers;
   }
+}
+
+QSet<const Layer*> Board::takeScheduledLayersForPlanesRebuild(
+    const QSet<const Layer*>& layers) noexcept {
+  auto result = mScheduledLayersForPlanesRebuild & layers;
+  mScheduledLayersForPlanesRebuild -= layers;
+  return result;
 }
 
 /*******************************************************************************
@@ -629,6 +634,8 @@ void Board::copyFrom(const Board& other) {
         *this, BoardHoleData{Uuid::createRandom(), hole->getData()});
     addHole(*copy);
   }
+
+  invalidatePlanes();
 }
 
 void Board::addToProject() {

@@ -355,19 +355,13 @@ ClipperLib::Path ClipperHelpers::rotateCutInHole(
   if (p.back() == p.front()) {
     p.pop_back();
   }
-  std::rotate(p.begin(), p.begin() + getHoleConnectionPointIndex(p), p.end());
+  auto minIt = std::min_element(
+      p.begin(), p.end(),
+      [](const ClipperLib::IntPoint& a, const ClipperLib::IntPoint& b) {
+        return (a.Y < b.Y) || ((a.Y == b.Y) && (a.X < b.X));
+      });
+  std::rotate(p.begin(), minIt, p.end());
   return p;
-}
-
-int ClipperHelpers::getHoleConnectionPointIndex(
-    const ClipperLib::Path& hole) noexcept {
-  int index = 0;
-  for (size_t i = 1; i < hole.size(); ++i) {
-    if (hole.at(i).Y < hole.at(index).Y) {
-      index = i;
-    }
-  }
-  return index;
 }
 
 void ClipperHelpers::addCutInToPath(ClipperLib::Path& outline,
