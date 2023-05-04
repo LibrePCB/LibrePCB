@@ -61,7 +61,7 @@ class WorkspaceSettingsDialog final : public QDialog {
   using LibraryLocaleOrderModel =
       EditableListModel<QStringList, EditableListModelType::LOCALE>;
   using LibraryNormOrderModel = EditableListModel<QStringList>;
-  using RepositoryUrlModel = EditableListModel<QList<QUrl>>;
+  using ApiEndpointModel = EditableListModel<QList<QUrl>>;
 
   struct ExternalApplication {
     QPointer<WorkspaceSettingsItem_GenericValueList<QStringList>> setting;
@@ -105,7 +105,7 @@ private:
   WorkspaceSettings& mSettings;  ///< Reference to the WorkspaceSettings object
   QScopedPointer<LibraryLocaleOrderModel> mLibLocaleOrderModel;
   QScopedPointer<LibraryNormOrderModel> mLibNormOrderModel;
-  QScopedPointer<RepositoryUrlModel> mRepositoryUrlsModel;
+  QScopedPointer<ApiEndpointModel> mApiEndpointModel;
   QScopedPointer<KeyboardShortcutsModel> mKeyboardShortcutsModel;
   QScopedPointer<QSortFilterProxyModel> mKeyboardShortcutsFilterModel;
   QScopedPointer<Ui::WorkspaceSettingsDialog> mUi;

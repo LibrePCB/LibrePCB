@@ -63,7 +63,7 @@ public:
   ~LibraryManager() noexcept;
 
   // General Methods
-  void updateRepositoryLibraryList() noexcept;
+  void updateOnlineLibraryList() noexcept;
 
   // Operator Overloadings
   LibraryManager& operator=(const LibraryManager& rhs) = delete;

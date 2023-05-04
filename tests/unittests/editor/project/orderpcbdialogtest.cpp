@@ -53,7 +53,7 @@ protected:
 
 TEST_F(OrderPcbDialogTest, testAutoOpenBrowser) {
   WorkspaceSettings settings;
-  settings.repositoryUrls.set(QList<QUrl>());  // Avoid API calls during test!
+  settings.apiEndpoints.set(QList<QUrl>());  // Avoid API calls during test!
   const bool defaultValue = true;
   const bool newValue = false;
 
@@ -78,7 +78,7 @@ TEST_F(OrderPcbDialogTest, testAutoOpenBrowser) {
 
 TEST_F(OrderPcbDialogTest, testTabOrder) {
   WorkspaceSettings settings;
-  settings.repositoryUrls.set(QList<QUrl>());  // Avoid API calls during test!
+  settings.apiEndpoints.set(QList<QUrl>());  // Avoid API calls during test!
   OrderPcbDialog dialog(settings, nullptr);
   TestHelpers::testTabOrder(dialog);
 }

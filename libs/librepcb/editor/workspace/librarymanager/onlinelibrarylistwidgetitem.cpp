@@ -20,10 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "repositorylibrarylistwidgetitem.h"
+#include "onlinelibrarylistwidgetitem.h"
 
 #include "librarydownload.h"
-#include "ui_repositorylibrarylistwidgetitem.h"
+#include "ui_onlinelibrarylistwidgetitem.h"
 
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/library/library.h>
@@ -44,17 +44,17 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(
+OnlineLibraryListWidgetItem::OnlineLibraryListWidgetItem(
     Workspace& ws, const QJsonObject& obj) noexcept
   : QWidget(nullptr),
     mWorkspace(ws),
     mJsonObject(obj),
-    mUi(new Ui::RepositoryLibraryListWidgetItem) {
+    mUi(new Ui::OnlineLibraryListWidgetItem) {
   mUi->setupUi(this);
   mUi->lblIcon->setText("");
   mUi->prgProgress->setVisible(false);
   connect(mUi->cbxDownload, &QCheckBox::toggled, this,
-          &RepositoryLibraryListWidgetItem::checkedChanged);
+          &OnlineLibraryListWidgetItem::checkedChanged);
 
   mUuid = Uuid::tryFromString(mJsonObject.value("uuid").toString());
   mVersion = Version::tryFromString(mJsonObject.value("version").toString());
@@ -81,24 +81,24 @@ RepositoryLibraryListWidgetItem::RepositoryLibraryListWidgetItem(
 
   NetworkRequest* request = new NetworkRequest(iconUrl);
   connect(request, &NetworkRequest::dataReceived, this,
-          &RepositoryLibraryListWidgetItem::iconReceived, Qt::QueuedConnection);
+          &OnlineLibraryListWidgetItem::iconReceived, Qt::QueuedConnection);
   request->start();
 
   // check if this library is already installed
   updateInstalledStatus();
   connect(&mWorkspace.getLibraryDb(),
           &WorkspaceLibraryDb::scanLibraryListUpdated, this,
-          &RepositoryLibraryListWidgetItem::updateInstalledStatus);
+          &OnlineLibraryListWidgetItem::updateInstalledStatus);
 }
 
-RepositoryLibraryListWidgetItem::~RepositoryLibraryListWidgetItem() noexcept {
+OnlineLibraryListWidgetItem::~OnlineLibraryListWidgetItem() noexcept {
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
 
-bool RepositoryLibraryListWidgetItem::isChecked() const noexcept {
+bool OnlineLibraryListWidgetItem::isChecked() const noexcept {
   return mUi->cbxDownload->isChecked();
 }
 
@@ -106,7 +106,7 @@ bool RepositoryLibraryListWidgetItem::isChecked() const noexcept {
  *  Setters
  ******************************************************************************/
 
-void RepositoryLibraryListWidgetItem::setChecked(bool checked) noexcept {
+void OnlineLibraryListWidgetItem::setChecked(bool checked) noexcept {
   mUi->cbxDownload->setChecked(checked);
 }
 
@@ -114,7 +114,7 @@ void RepositoryLibraryListWidgetItem::setChecked(bool checked) noexcept {
  *  General Methods
  ******************************************************************************/
 
-void RepositoryLibraryListWidgetItem::startDownloadIfSelected() noexcept {
+void OnlineLibraryListWidgetItem::startDownloadIfSelected() noexcept {
   if (mUuid && mUi->cbxDownload->isVisible() && mUi->cbxDownload->isChecked() &&
       (!mLibraryDownload)) {
     mUi->cbxDownload->setVisible(false);
@@ -143,7 +143,7 @@ void RepositoryLibraryListWidgetItem::startDownloadIfSelected() noexcept {
     connect(mLibraryDownload.data(), &LibraryDownload::progressPercent,
             mUi->prgProgress, &QProgressBar::setValue, Qt::QueuedConnection);
     connect(mLibraryDownload.data(), &LibraryDownload::finished, this,
-            &RepositoryLibraryListWidgetItem::downloadFinished,
+            &OnlineLibraryListWidgetItem::downloadFinished,
             Qt::QueuedConnection);
     mLibraryDownload->start();
   }
@@ -153,7 +153,7 @@ void RepositoryLibraryListWidgetItem::startDownloadIfSelected() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void RepositoryLibraryListWidgetItem::downloadFinished(
+void OnlineLibraryListWidgetItem::downloadFinished(
     bool success, const QString& errMsg) noexcept {
   Q_ASSERT(mLibraryDownload);
 
@@ -174,14 +174,14 @@ void RepositoryLibraryListWidgetItem::downloadFinished(
   mWorkspace.getLibraryDb().startLibraryRescan();
 }
 
-void RepositoryLibraryListWidgetItem::iconReceived(
+void OnlineLibraryListWidgetItem::iconReceived(
     const QByteArray& data) noexcept {
   QPixmap pixmap;
   pixmap.loadFromData(data);
   mUi->lblIcon->setPixmap(pixmap);
 }
 
-void RepositoryLibraryListWidgetItem::updateInstalledStatus() noexcept {
+void OnlineLibraryListWidgetItem::updateInstalledStatus() noexcept {
   // Don't update the widgets while the download is running, it would mess up
   // the UI!
   if (mLibraryDownload) {

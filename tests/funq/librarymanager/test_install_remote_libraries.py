@@ -24,7 +24,7 @@ def test(librepcb, helpers):
 
         # Wait until all libraries are fetched and check the count of them
         remote_library_count = 3  # The dummy API provides 3 libraries
-        remote_library_list = app.widget('libraryManagerDownloadFromRepoLibraryList')
+        remote_library_list = app.widget('libraryManagerInstallLibrariesLibraryList')
         helpers.wait_for_model_items_count(remote_library_list,
                                            remote_library_count,
                                            remote_library_count)
@@ -35,7 +35,7 @@ def test(librepcb, helpers):
         progressbars = list()
         for i in range(0, remote_library_count):
             suffix = "-{}".format(i) if i > 0 else ''
-            item_path = app.aliases['libraryManagerDownloadFromRepoLibraryListItem'] + suffix
+            item_path = app.aliases['libraryManagerInstallLibrariesLibraryListItem'] + suffix
             statuslabel = app.widget(path=item_path + '::lblInstalledVersion')
             assert statuslabel.properties()['text'] == 'Recommended'
             statuslabels.append(statuslabel)
@@ -55,7 +55,7 @@ def test(librepcb, helpers):
             assert checkboxes[i].properties()['checked'] is (True if i <= 1 else False)
 
         # Install selected libraries
-        app.widget('libraryManagerDownloadFromRepoDownloadButton').click()
+        app.widget('libraryManagerInstallLibrariesDownloadButton').click()
 
         # Check if two libraries were added
         library_count_after = library_count_before + 2

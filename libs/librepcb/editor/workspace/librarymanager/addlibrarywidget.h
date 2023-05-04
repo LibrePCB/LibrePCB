@@ -35,7 +35,7 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Repository;
+class ApiEndpoint;
 class Workspace;
 
 namespace editor {
@@ -64,7 +64,7 @@ public:
   ~AddLibraryWidget() noexcept;
 
   // General Methods
-  void updateRepositoryLibraryList() noexcept;
+  void updateOnlineLibraryList() noexcept;
 
   // Operator Overloadings
   AddLibraryWidget& operator=(const AddLibraryWidget& rhs) = delete;
@@ -78,11 +78,11 @@ private:  // Methods
   void createLocalLibraryButtonClicked() noexcept;
   void downloadZippedLibraryButtonClicked() noexcept;
   void downloadZipFinished(bool success, const QString& errMsg) noexcept;
-  void repositoryLibraryListReceived(const QJsonArray& libs) noexcept;
+  void onlineLibraryListReceived(const QJsonArray& libs) noexcept;
   void errorWhileFetchingLibraryList(const QString& errorMsg) noexcept;
-  void clearRepositoryLibraryList() noexcept;
+  void clearOnlineLibraryList() noexcept;
   void repoLibraryDownloadCheckedChanged(bool checked) noexcept;
-  void downloadLibrariesFromRepositoryButtonClicked() noexcept;
+  void downloadOnlineLibrariesButtonClicked() noexcept;
 
   static QString getTextOrPlaceholderFromQLineEdit(QLineEdit* edit,
                                                    bool isFilename) noexcept;
@@ -91,7 +91,7 @@ private:  // Data
   Workspace& mWorkspace;
   QScopedPointer<Ui::AddLibraryWidget> mUi;
   QScopedPointer<LibraryDownload> mManualLibraryDownload;
-  QList<std::shared_ptr<Repository>> mRepositories;
+  QList<std::shared_ptr<ApiEndpoint>> mApiEndpoints;
 };
 
 /*******************************************************************************

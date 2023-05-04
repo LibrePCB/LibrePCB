@@ -244,6 +244,8 @@ add_library(
   library/sym/symbolpainter.h
   library/sym/symbolpin.cpp
   library/sym/symbolpin.h
+  network/apiendpoint.cpp
+  network/apiendpoint.h
   network/filedownload.cpp
   network/filedownload.h
   network/networkaccessmanager.cpp
@@ -254,8 +256,6 @@ add_library(
   network/networkrequestbase.h
   network/orderpcbapirequest.cpp
   network/orderpcbapirequest.h
-  network/repository.cpp
-  network/repository.h
   norms.h
   project/board/board.cpp
   project/board/board.h

@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "repository.h"
+#include "apiendpoint.h"
 
 #include "../application.h"
 #include "../types/version.h"
@@ -37,17 +37,18 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Repository::Repository(const QUrl& url) noexcept : QObject(nullptr), mUrl(url) {
+ApiEndpoint::ApiEndpoint(const QUrl& url) noexcept
+  : QObject(nullptr), mUrl(url) {
 }
 
-Repository::~Repository() noexcept {
+ApiEndpoint::~ApiEndpoint() noexcept {
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void Repository::requestLibraryList() const noexcept {
+void ApiEndpoint::requestLibraryList() const noexcept {
   QString path =
       "/api/v1/libraries/v" % Application::getFileFormatVersion().toStr();
   requestLibraryList(QUrl(mUrl.toString() % path));
@@ -57,18 +58,18 @@ void Repository::requestLibraryList() const noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void Repository::requestLibraryList(const QUrl& url) const noexcept {
+void ApiEndpoint::requestLibraryList(const QUrl& url) const noexcept {
   NetworkRequest* request = new NetworkRequest(url);
   request->setHeaderField("Accept", "application/json;charset=UTF-8");
   request->setHeaderField("Accept-Charset", "UTF-8");
   connect(request, &NetworkRequest::errored, this,
-          &Repository::errorWhileFetchingLibraryList, Qt::QueuedConnection);
+          &ApiEndpoint::errorWhileFetchingLibraryList, Qt::QueuedConnection);
   connect(request, &NetworkRequest::dataReceived, this,
-          &Repository::requestedDataReceived, Qt::QueuedConnection);
+          &ApiEndpoint::requestedDataReceived, Qt::QueuedConnection);
   request->start();
 }
 
-void Repository::requestedDataReceived(const QByteArray& data) noexcept {
+void ApiEndpoint::requestedDataReceived(const QByteArray& data) noexcept {
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
     emit errorWhileFetchingLibraryList(
@@ -79,7 +80,7 @@ void Repository::requestedDataReceived(const QByteArray& data) noexcept {
   if (nextResultsLink.isString()) {
     QUrl url = QUrl(nextResultsLink.toString());
     if (url.isValid()) {
-      qDebug().nospace() << "Request more results from repository "
+      qDebug().nospace() << "Request more results from API endpoint "
                          << url.toString() << "...";
       requestLibraryList(url);
     } else {

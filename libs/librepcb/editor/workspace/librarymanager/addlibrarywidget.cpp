@@ -25,7 +25,7 @@
 #include "../../widgets/waitingspinnerwidget.h"
 #include "../desktopservices.h"
 #include "librarydownload.h"
-#include "repositorylibrarylistwidgetitem.h"
+#include "onlinelibrarylistwidgetitem.h"
 #include "ui_addlibrarywidget.h"
 
 #include <librepcb/core/application.h>
@@ -33,7 +33,7 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/library.h>
-#include <librepcb/core/network/repository.h>
+#include <librepcb/core/network/apiendpoint.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -61,8 +61,8 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
           &AddLibraryWidget::localLibraryNameLineEditTextChanged);
   connect(mUi->edtDownloadZipUrl, &QLineEdit::textChanged, this,
           &AddLibraryWidget::downloadZipUrlLineEditTextChanged);
-  connect(mUi->btnRepoLibsDownload, &QPushButton::clicked, this,
-          &AddLibraryWidget::downloadLibrariesFromRepositoryButtonClicked);
+  connect(mUi->btnOnlineLibrariesDownload, &QPushButton::clicked, this,
+          &AddLibraryWidget::downloadOnlineLibrariesButtonClicked);
   connect(mUi->lblLicenseLink, &QLabel::linkActivated, this,
           [this](const QString& url) {
             DesktopServices ds(mWorkspace.getSettings(), this);
@@ -71,7 +71,7 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
 
   // Hide text in library list since text is displayed with custom item
   // widgets, but list item texts are still set for keyboard navigation.
-  mUi->lstRepoLibs->setStyleSheet(
+  mUi->lstOnlineLibraries->setStyleSheet(
       "QListWidget::item{"
       "  color: transparent;"
       "  selection-color: transparent;"
@@ -100,32 +100,33 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
 }
 
 AddLibraryWidget::~AddLibraryWidget() noexcept {
-  clearRepositoryLibraryList();
+  clearOnlineLibraryList();
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-void AddLibraryWidget::updateRepositoryLibraryList() noexcept {
-  clearRepositoryLibraryList();
-  foreach (const QUrl& url, mWorkspace.getSettings().repositoryUrls.get()) {
-    std::shared_ptr<Repository> repo = std::make_shared<Repository>(url);
-    connect(repo.get(), &Repository::libraryListReceived, this,
-            &AddLibraryWidget::repositoryLibraryListReceived);
-    connect(repo.get(), &Repository::errorWhileFetchingLibraryList, this,
+void AddLibraryWidget::updateOnlineLibraryList() noexcept {
+  clearOnlineLibraryList();
+  foreach (const QUrl& url, mWorkspace.getSettings().apiEndpoints.get()) {
+    std::shared_ptr<ApiEndpoint> repo = std::make_shared<ApiEndpoint>(url);
+    connect(repo.get(), &ApiEndpoint::libraryListReceived, this,
+            &AddLibraryWidget::onlineLibraryListReceived);
+    connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, this,
             &AddLibraryWidget::errorWhileFetchingLibraryList);
 
     // Add waiting spinner during library list download.
-    WaitingSpinnerWidget* spinner = new WaitingSpinnerWidget(mUi->lstRepoLibs);
-    connect(repo.get(), &Repository::libraryListReceived, spinner,
+    WaitingSpinnerWidget* spinner =
+        new WaitingSpinnerWidget(mUi->lstOnlineLibraries);
+    connect(repo.get(), &ApiEndpoint::libraryListReceived, spinner,
             &WaitingSpinnerWidget::deleteLater);
-    connect(repo.get(), &Repository::errorWhileFetchingLibraryList, spinner,
+    connect(repo.get(), &ApiEndpoint::errorWhileFetchingLibraryList, spinner,
             &WaitingSpinnerWidget::deleteLater);
     spinner->show();
 
     repo->requestLibraryList();
-    mRepositories.append(repo);
+    mApiEndpoints.append(repo);
   }
 }
 
@@ -373,42 +374,43 @@ void AddLibraryWidget::downloadZipFinished(bool success,
   mManualLibraryDownload.reset();
 }
 
-void AddLibraryWidget::repositoryLibraryListReceived(
+void AddLibraryWidget::onlineLibraryListReceived(
     const QJsonArray& libs) noexcept {
   foreach (const QJsonValue& libVal, libs) {
-    RepositoryLibraryListWidgetItem* widget =
-        new RepositoryLibraryListWidgetItem(mWorkspace, libVal.toObject());
-    widget->setChecked(mUi->cbxRepoLibsSelectAll->isChecked());
-    connect(mUi->cbxRepoLibsSelectAll, &QCheckBox::clicked, widget,
-            &RepositoryLibraryListWidgetItem::setChecked);
-    connect(widget, &RepositoryLibraryListWidgetItem::checkedChanged, this,
+    OnlineLibraryListWidgetItem* widget =
+        new OnlineLibraryListWidgetItem(mWorkspace, libVal.toObject());
+    widget->setChecked(mUi->cbxOnlineLibrariesSelectAll->isChecked());
+    connect(mUi->cbxOnlineLibrariesSelectAll, &QCheckBox::clicked, widget,
+            &OnlineLibraryListWidgetItem::setChecked);
+    connect(widget, &OnlineLibraryListWidgetItem::checkedChanged, this,
             &AddLibraryWidget::repoLibraryDownloadCheckedChanged);
-    QListWidgetItem* item = new QListWidgetItem(mUi->lstRepoLibs);
+    QListWidgetItem* item = new QListWidgetItem(mUi->lstOnlineLibraries);
     // Set item text to make searching by keyboard working (type to find
     // library). However, the text would mess up the look, thus it is made
     // hidden with a stylesheet set in the constructor (see above).
     item->setText(widget->getName());
     item->setSizeHint(widget->sizeHint());
-    mUi->lstRepoLibs->setItemWidget(item, widget);
+    mUi->lstOnlineLibraries->setItemWidget(item, widget);
   }
 }
 
 void AddLibraryWidget::errorWhileFetchingLibraryList(
     const QString& errorMsg) noexcept {
-  QListWidgetItem* item = new QListWidgetItem(errorMsg, mUi->lstRepoLibs);
+  QListWidgetItem* item =
+      new QListWidgetItem(errorMsg, mUi->lstOnlineLibraries);
   item->setBackground(Qt::red);
   item->setForeground(Qt::white);
 }
 
-void AddLibraryWidget::clearRepositoryLibraryList() noexcept {
-  mRepositories.clear();  // disconnects all signal/slot connections
-  for (int i = mUi->lstRepoLibs->count() - 1; i >= 0; i--) {
-    QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+void AddLibraryWidget::clearOnlineLibraryList() noexcept {
+  mApiEndpoints.clear();  // disconnects all signal/slot connections
+  for (int i = mUi->lstOnlineLibraries->count() - 1; i >= 0; i--) {
+    QListWidgetItem* item = mUi->lstOnlineLibraries->item(i);
     Q_ASSERT(item);
-    delete mUi->lstRepoLibs->itemWidget(item);
+    delete mUi->lstOnlineLibraries->itemWidget(item);
     delete item;
   }
-  Q_ASSERT(mUi->lstRepoLibs->count() == 0);
+  Q_ASSERT(mUi->lstOnlineLibraries->count() == 0);
 }
 
 void AddLibraryWidget::repoLibraryDownloadCheckedChanged(
@@ -416,20 +418,20 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(
   if (checked) {
     // one more library is checked, check all dependencies too
     QSet<Uuid> libs;
-    for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-      QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+    for (int i = 0; i < mUi->lstOnlineLibraries->count(); i++) {
+      QListWidgetItem* item = mUi->lstOnlineLibraries->item(i);
       Q_ASSERT(item);
-      auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-          mUi->lstRepoLibs->itemWidget(item));
+      auto* widget = dynamic_cast<OnlineLibraryListWidgetItem*>(
+          mUi->lstOnlineLibraries->itemWidget(item));
       if (widget && widget->isChecked()) {
         libs.unite(widget->getDependencies());
       }
     }
-    for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-      QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+    for (int i = 0; i < mUi->lstOnlineLibraries->count(); i++) {
+      QListWidgetItem* item = mUi->lstOnlineLibraries->item(i);
       Q_ASSERT(item);
-      auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-          mUi->lstRepoLibs->itemWidget(item));
+      auto* widget = dynamic_cast<OnlineLibraryListWidgetItem*>(
+          mUi->lstOnlineLibraries->itemWidget(item));
       if (widget && widget->getUuid() && (libs.contains(*widget->getUuid()))) {
         widget->setChecked(true);
       }
@@ -438,20 +440,20 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(
     // one library was unchecked, uncheck all libraries with missing
     // dependencies
     QSet<Uuid> libs;
-    for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-      QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+    for (int i = 0; i < mUi->lstOnlineLibraries->count(); i++) {
+      QListWidgetItem* item = mUi->lstOnlineLibraries->item(i);
       Q_ASSERT(item);
-      auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-          mUi->lstRepoLibs->itemWidget(item));
+      auto* widget = dynamic_cast<OnlineLibraryListWidgetItem*>(
+          mUi->lstOnlineLibraries->itemWidget(item));
       if (widget && widget->isChecked() && widget->getUuid()) {
         libs.insert(*widget->getUuid());
       }
     }
-    for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-      QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+    for (int i = 0; i < mUi->lstOnlineLibraries->count(); i++) {
+      QListWidgetItem* item = mUi->lstOnlineLibraries->item(i);
       Q_ASSERT(item);
-      auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-          mUi->lstRepoLibs->itemWidget(item));
+      auto* widget = dynamic_cast<OnlineLibraryListWidgetItem*>(
+          mUi->lstOnlineLibraries->itemWidget(item));
       if (widget && (!libs.contains(widget->getDependencies()))) {
         widget->setChecked(false);
       }
@@ -459,12 +461,12 @@ void AddLibraryWidget::repoLibraryDownloadCheckedChanged(
   }
 }
 
-void AddLibraryWidget::downloadLibrariesFromRepositoryButtonClicked() noexcept {
-  for (int i = 0; i < mUi->lstRepoLibs->count(); i++) {
-    QListWidgetItem* item = mUi->lstRepoLibs->item(i);
+void AddLibraryWidget::downloadOnlineLibrariesButtonClicked() noexcept {
+  for (int i = 0; i < mUi->lstOnlineLibraries->count(); i++) {
+    QListWidgetItem* item = mUi->lstOnlineLibraries->item(i);
     Q_ASSERT(item);
-    auto* widget = dynamic_cast<RepositoryLibraryListWidgetItem*>(
-        mUi->lstRepoLibs->itemWidget(item));
+    auto* widget = dynamic_cast<OnlineLibraryListWidgetItem*>(
+        mUi->lstOnlineLibraries->itemWidget(item));
     if (widget) {
       widget->startDownloadIfSelected();
     } else {

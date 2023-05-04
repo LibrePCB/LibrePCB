@@ -343,33 +343,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="repositoriesTab">
-      <attribute name="title">
-       <string>Repositories</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <item>
-        <widget class="QLabel" name="lblRepositoriesInfo">
-         <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Repositories are used to browse, download and update libraries.&lt;br/&gt;You can add any server to this list which implements the LibrePCB API.&lt;br/&gt;The official LibrePCB server is &lt;a href=&quot;https://api.librepcb.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;https://api.librepcb.org&lt;/span&gt;&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="librepcb::editor::EditableTableWidget" name="tblRepositoryUrls">
-         <property name="editTriggers">
-          <set>QAbstractItemView::AllEditTriggers</set>
-         </property>
-         <attribute name="horizontalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="externalApplicationsTab">
       <attribute name="title">
        <string>External Applications</string>
@@ -753,6 +726,40 @@
           </layout>
          </item>
         </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="internetAccessTab">
+      <attribute name="title">
+       <string>Internet Access</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QLabel" name="lblApiEndpointsInfo">
+         <property name="text">
+          <string>&lt;html&gt;&lt;body&gt;
+&lt;p&gt;API endpoints are used to access online services, for example to download libraries from the Internet.&lt;/p&gt;
+&lt;p&gt;You can add any server to this list which implements the LibrePCB API. The official LibrePCB server is &lt;a href=&quot;https://api.librepcb.org&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#007af4;&quot;&gt;https://api.librepcb.org&lt;/span&gt;&lt;/a&gt;.
+To completely disable Internet access, just remove all entries.&lt;/p&gt;
+&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="librepcb::editor::EditableTableWidget" name="edtApiEndpoints">
+         <property name="editTriggers">
+          <set>QAbstractItemView::AllEditTriggers</set>
+         </property>
+         <attribute name="horizontalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
        </item>
       </layout>
      </widget>

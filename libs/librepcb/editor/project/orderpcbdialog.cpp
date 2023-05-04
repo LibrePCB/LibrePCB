@@ -91,9 +91,9 @@ OrderPcbDialog::OrderPcbDialog(const WorkspaceSettings& settings,
           .toBool());
 
   // Request upload information.
-  if (mSettings.repositoryUrls.get().count() > 0) {
+  if (mSettings.apiEndpoints.get().count() > 0) {
     mRequest.reset(
-        new OrderPcbApiRequest(mSettings.repositoryUrls.get().first()));
+        new OrderPcbApiRequest(mSettings.apiEndpoints.get().first()));
     connect(mRequest.data(), &OrderPcbApiRequest::infoRequestSucceeded, this,
             &OrderPcbDialog::infoRequestSucceeded);
     connect(mRequest.data(), &OrderPcbApiRequest::infoRequestFailed, this,

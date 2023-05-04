@@ -83,6 +83,19 @@ void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
 void FileFormatMigrationUnstable::upgradeWorkspaceData(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  const QString settingsFp = "settings.lp";
+  if (dir.fileExists(settingsFp)) {
+    SExpression root =
+        SExpression::parse(dir.read(settingsFp), dir.getAbsPath(settingsFp));
+    if (SExpression* node = root.tryGetChild("repositories")) {
+      foreach (SExpression* child, node->getChildren("repository")) {
+        child->setName("url");
+      }
+      node->setName("api_endpoints");
+    }
+    dir.write(settingsFp, root.toByteArray());
+  }
 }
 
 /*******************************************************************************

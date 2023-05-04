@@ -837,9 +837,9 @@ add_library(
   workspace/librarymanager/librarymanager.cpp
   workspace/librarymanager/librarymanager.h
   workspace/librarymanager/librarymanager.ui
-  workspace/librarymanager/repositorylibrarylistwidgetitem.cpp
-  workspace/librarymanager/repositorylibrarylistwidgetitem.h
-  workspace/librarymanager/repositorylibrarylistwidgetitem.ui
+  workspace/librarymanager/onlinelibrarylistwidgetitem.cpp
+  workspace/librarymanager/onlinelibrarylistwidgetitem.h
+  workspace/librarymanager/onlinelibrarylistwidgetitem.ui
   workspace/projectlibraryupdater/projectlibraryupdater.cpp
   workspace/projectlibraryupdater/projectlibraryupdater.h
   workspace/projectlibraryupdater/projectlibraryupdater.ui

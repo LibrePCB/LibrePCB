@@ -59,8 +59,8 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionV01) {
       " (library_norm_order\n"
       "  (norm \"IEC 60617\")\n"
       " )\n"
-      " (repositories\n"
-      "  (repository \"https://api.librepcb.org\")\n"
+      " (api_endpoints\n"
+      "  (url \"https://api.librepcb.org\")\n"
       " )\n"
       ")",
       FilePath());
@@ -75,7 +75,7 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionV01) {
   EXPECT_EQ(QStringList{"de_DE"}, obj.libraryLocaleOrder.get());
   EXPECT_EQ(QStringList{"IEC 60617"}, obj.libraryNormOrder.get());
   EXPECT_EQ(QList<QUrl>{QUrl("https://api.librepcb.org")},
-            obj.repositoryUrls.get());
+            obj.apiEndpoints.get());
   EXPECT_EQ(QStringList{}, obj.externalWebBrowserCommands.get());
   EXPECT_EQ(QStringList{}, obj.externalFileManagerCommands.get());
 }
@@ -94,8 +94,8 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
       " (library_norm_order\n"
       "  (norm \"IEC 60617\")\n"
       " )\n"
-      " (repositories\n"
-      "  (repository \"https://api.librepcb.org\")\n"
+      " (api_endpoints\n"
+      "  (url \"https://api.librepcb.org\")\n"
       " )\n"
       " (external_web_browser\n"
       "  (command \"firefox \\\"{{URL}}\\\"\")\n"
@@ -123,7 +123,7 @@ TEST_F(WorkspaceSettingsTest, testLoadFromSExpressionCurrentVersion) {
   EXPECT_EQ(QStringList{"de_DE"}, obj.libraryLocaleOrder.get());
   EXPECT_EQ(QStringList{"IEC 60617"}, obj.libraryNormOrder.get());
   EXPECT_EQ(QList<QUrl>{QUrl("https://api.librepcb.org")},
-            obj.repositoryUrls.get());
+            obj.apiEndpoints.get());
   EXPECT_EQ(QStringList{"firefox \"{{URL}}\""},
             obj.externalWebBrowserCommands.get());
   EXPECT_EQ(QStringList{"nautilus \"{{FILEPATH}}\""},
@@ -144,7 +144,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   obj1.useOpenGl.set(!obj1.useOpenGl.get());
   obj1.libraryLocaleOrder.set({"de_CH", "en_US"});
   obj1.libraryNormOrder.set({"foo", "bar"});
-  obj1.repositoryUrls.set({QUrl("https://foo"), QUrl("https://bar")});
+  obj1.apiEndpoints.set({QUrl("https://foo"), QUrl("https://bar")});
   obj1.externalWebBrowserCommands.set({"foo", "bar"});
   obj1.externalFileManagerCommands.set({"file", "manager"});
   obj1.externalPdfReaderCommands.set({"pdf", "reader"});
@@ -164,7 +164,7 @@ TEST_F(WorkspaceSettingsTest, testStoreAndLoad) {
   EXPECT_EQ(obj1.useOpenGl.get(), obj2.useOpenGl.get());
   EXPECT_EQ(obj1.libraryLocaleOrder.get(), obj2.libraryLocaleOrder.get());
   EXPECT_EQ(obj1.libraryNormOrder.get(), obj2.libraryNormOrder.get());
-  EXPECT_EQ(obj1.repositoryUrls.get(), obj2.repositoryUrls.get());
+  EXPECT_EQ(obj1.apiEndpoints.get(), obj2.apiEndpoints.get());
   EXPECT_EQ(obj1.externalWebBrowserCommands.get(),
             obj2.externalWebBrowserCommands.get());
   EXPECT_EQ(obj1.externalFileManagerCommands.get(),
