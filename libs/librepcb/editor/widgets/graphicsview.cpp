@@ -25,11 +25,13 @@
 #include "../graphics/graphicsscene.h"
 #include "QtOpenGL"
 #include "if_graphicsvieweventhandler.h"
+#include "waitingspinnerwidget.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/export/graphicspainter.h>
 #include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/angle.h>
+#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -48,6 +50,7 @@ namespace editor {
 GraphicsView::GraphicsView(QWidget* parent,
                            IF_GraphicsViewEventHandler* eventHandler) noexcept
   : QGraphicsView(parent),
+    mWaitingSpinnerWidget(new WaitingSpinnerWidget(this)),
     mInfoBoxLabel(new QLabel(this)),
     mEventHandlerObject(eventHandler),
     mScene(nullptr),
@@ -68,7 +71,9 @@ GraphicsView::GraphicsView(QWidget* parent,
         {-1, LengthUnit::inches(), "", Length(254), Length(0)},
     }),
     mRulerPositions(),
-    mPanningActive(false) {
+    mPanningActive(false),
+    mAnyButtonPressed(false),
+    mIdleTimeMs(0) {
   setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
   setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
   setOptimizationFlags(QGraphicsView::DontSavePainterState);
@@ -76,6 +81,9 @@ GraphicsView::GraphicsView(QWidget* parent,
   setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
   setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
   setSceneRect(-2000, -2000, 4000, 4000);
+
+  mWaitingSpinnerWidget->setColor(mGridColor.lighter(120));
+  mWaitingSpinnerWidget->hide();
 
   mInfoBoxLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
   mInfoBoxLabel->setFont(Application::getDefaultMonospaceFont());
@@ -87,6 +95,10 @@ GraphicsView::GraphicsView(QWidget* parent,
   mZoomAnimation = new QVariantAnimation();
   connect(mZoomAnimation, &QVariantAnimation::valueChanged, this,
           &GraphicsView::zoomAnimationValueChanged);
+
+  QTimer* idleTimer = new QTimer(this);
+  connect(idleTimer, &QTimer::timeout, this, [this]() { mIdleTimeMs += 100; });
+  idleTimer->start(100);
 
   viewport()->grabGesture(Qt::PinchGesture);
 }
@@ -112,6 +124,7 @@ void GraphicsView::setBackgroundColors(const QColor& fill,
                                        const QColor& grid) noexcept {
   mBackgroundColor = fill;
   mGridColor = grid;
+  mWaitingSpinnerWidget->setColor(mGridColor.lighter(120));
   setBackgroundBrush(backgroundBrush());  // this will repaint the background
 }
 
@@ -279,11 +292,13 @@ void GraphicsView::handleMouseWheelEvent(
 void GraphicsView::zoomIn() noexcept {
   if (!mScene) return;
   scale(sZoomStepFactor, sZoomStepFactor);
+  mIdleTimeMs = 0;
 }
 
 void GraphicsView::zoomOut() noexcept {
   if (!mScene) return;
   scale(1 / sZoomStepFactor, 1 / sZoomStepFactor);
+  mIdleTimeMs = 0;
 }
 
 void GraphicsView::zoomAll() noexcept {
@@ -294,6 +309,7 @@ void GraphicsView::zoomAll() noexcept {
   qreal yMargins = rect.height() / 50;
   rect.adjust(-xMargins, -yMargins, xMargins, yMargins);
   zoomToRect(rect);
+  mIdleTimeMs = 0;
 }
 
 void GraphicsView::zoomToRect(const QRectF& rect) noexcept {
@@ -302,6 +318,15 @@ void GraphicsView::zoomToRect(const QRectF& rect) noexcept {
   mZoomAnimation->setStartValue(getVisibleSceneRect());
   mZoomAnimation->setEndValue(rect);
   mZoomAnimation->start();
+  mIdleTimeMs = 0;
+}
+
+void GraphicsView::showWaitingSpinner() noexcept {
+  mWaitingSpinnerWidget->show();
+}
+
+void GraphicsView::hideWaitingSpinner() noexcept {
+  mWaitingSpinnerWidget->hide();
 }
 
 /*******************************************************************************
@@ -328,6 +353,8 @@ void GraphicsView::wheelEvent(QWheelEvent* event) {
 }
 
 bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
+  auto resetIdleTime = scopeGuard([this]() { mIdleTimeMs = 0; });
+
   switch (event->type()) {
     case QEvent::Gesture: {
       QGestureEvent* ge = dynamic_cast<QGestureEvent*>(event);
@@ -350,6 +377,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
       }
+      mAnyButtonPressed = (e->buttons() != Qt::NoButton);
       return true;
     }
     case QEvent::GraphicsSceneMouseRelease: {
@@ -362,6 +390,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
       }
+      mAnyButtonPressed = (e->buttons() != Qt::NoButton);
       return true;
     }
     case QEvent::GraphicsSceneMouseMove: {
@@ -378,6 +407,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
         mPanningActive = false;
       }
       emit cursorScenePositionChanged(Point::fromPx(e->scenePos()));
+      mAnyButtonPressed = (e->buttons() != Qt::NoButton);
     }
       // fall through
     case QEvent::GraphicsSceneMouseDoubleClick:
@@ -402,6 +432,8 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       return true;
     }
     default:
+      // Unknown event -> do not count as activity.
+      resetIdleTime.dismiss();
       break;
   }
   return QWidget::eventFilter(obj, event);
@@ -420,9 +452,10 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect) {
   gridPen.setWidth((mGridStyle == Theme::GridStyle::Dots) ? 2 : 1);
   painter->setPen(gridPen);
   painter->setBrush(Qt::NoBrush);
-  qreal gridIntervalPixels = mGridInterval->toPx();
-  qreal scaleFactor = width() / rect.width();
-  if (gridIntervalPixels * scaleFactor >= (qreal)5) {
+  const qreal gridIntervalPixels = mGridInterval->toPx();
+  const qreal lod = QStyleOptionGraphicsItem::levelOfDetailFromTransform(
+      painter->worldTransform());
+  if (gridIntervalPixels * lod >= 6) {
     qreal left, right, top, bottom;
     left = qFloor(rect.left() / gridIntervalPixels) * gridIntervalPixels;
     right = rect.right();

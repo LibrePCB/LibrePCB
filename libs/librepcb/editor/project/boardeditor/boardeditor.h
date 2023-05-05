@@ -40,6 +40,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class BoardPlaneFragmentsBuilder;
 class ComponentInstance;
 class Project;
 class Theme;
@@ -152,6 +153,9 @@ private:
   QList<BI_Device*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;
   void goToDevice(const QString& name, int index) noexcept;
+  void performScheduledTasks() noexcept;
+  void startPlaneRebuild(bool full = false) noexcept;
+  bool isActiveTopLevelWindow() const noexcept;
   void newBoard() noexcept;
   void copyBoard() noexcept;
   void removeBoard() noexcept;
@@ -176,6 +180,10 @@ private:
   QScopedPointer<BoardGraphicsScene> mGraphicsScene;
   QHash<Uuid, QRectF> mVisibleSceneRect;
   QScopedPointer<BoardEditorFsm> mFsm;
+
+  // Plane Fragments Builder
+  QScopedPointer<BoardPlaneFragmentsBuilder> mPlaneFragmentsBuilder;
+  qint64 mTimestampOfLastPlaneRebuild;
 
   // DRC
   QHash<Uuid, tl::optional<RuleCheckMessageList>> mDrcMessages;  ///< UUID=Board

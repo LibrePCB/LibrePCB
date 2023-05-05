@@ -241,6 +241,7 @@ void BI_Device::setPosition(const Point& pos) noexcept {
   if (pos != mPosition) {
     mPosition = pos;
     onEdited.notify(Event::PositionChanged);
+    mBoard.invalidatePlanes();
   }
 }
 
@@ -248,6 +249,7 @@ void BI_Device::setRotation(const Angle& rot) noexcept {
   if (rot != mRotation) {
     mRotation = rot;
     onEdited.notify(Event::RotationChanged);
+    mBoard.invalidatePlanes();
   }
 }
 
@@ -258,6 +260,7 @@ void BI_Device::setMirrored(bool mirror) {
     }
     mMirrored = mirror;
     onEdited.notify(Event::MirroredChanged);
+    mBoard.invalidatePlanes();
   }
 }
 
@@ -291,6 +294,7 @@ void BI_Device::addToBoard() {
   }
   BI_Base::addToBoard();
   sgl.dismiss();
+  mBoard.invalidatePlanes();
 }
 
 void BI_Device::removeFromBoard() {
@@ -310,6 +314,7 @@ void BI_Device::removeFromBoard() {
   sgl.add([&]() { mCompInstance.registerDevice(*this); });
   BI_Base::removeFromBoard();
   sgl.dismiss();
+  mBoard.invalidatePlanes();
 }
 
 void BI_Device::serialize(SExpression& root) const {

@@ -166,20 +166,24 @@ void BoardClipperPathGenerator::addVia(const BI_Via& via,
                                        const Length& offset) {
   ClipperHelpers::unite(
       mPaths,
-      ClipperHelpers::convert(via.getVia().getSceneOutline(offset),
-                              mMaxArcTolerance));
+      {ClipperHelpers::convert(via.getVia().getSceneOutline(offset),
+                               mMaxArcTolerance)},
+      ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
 }
 
 void BoardClipperPathGenerator::addNetLine(const BI_NetLine& netLine,
                                            const Length& offset) {
   ClipperHelpers::unite(mPaths,
-                        ClipperHelpers::convert(netLine.getSceneOutline(offset),
-                                                mMaxArcTolerance));
+                        {ClipperHelpers::convert(
+                            netLine.getSceneOutline(offset), mMaxArcTolerance)},
+                        ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
 }
 
 void BoardClipperPathGenerator::addPlane(const BI_Plane& plane) {
   foreach (const Path& p, plane.getFragments()) {
-    ClipperHelpers::unite(mPaths, ClipperHelpers::convert(p, mMaxArcTolerance));
+    ClipperHelpers::unite(mPaths,
+                          {ClipperHelpers::convert(p, mMaxArcTolerance)},
+                          ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
   }
 }
 
@@ -189,17 +193,17 @@ void BoardClipperPathGenerator::addPolygon(const Path& path,
   // Outline.
   if (lineWidth > 0) {
     QVector<Path> paths = path.toOutlineStrokes(PositiveLength(*lineWidth));
-    foreach (const Path& p, paths) {
-      ClipperHelpers::unite(mPaths,
-                            ClipperHelpers::convert(p, mMaxArcTolerance));
-    }
+    ClipperHelpers::unite(mPaths,
+                          ClipperHelpers::convert(paths, mMaxArcTolerance),
+                          ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
   }
 
   // Area (only fill closed paths, for consistency with the appearance in
   // the board editor and Gerber output).
   if (filled && path.isClosed()) {
     ClipperHelpers::unite(mPaths,
-                          ClipperHelpers::convert(path, mMaxArcTolerance));
+                          {ClipperHelpers::convert(path, mMaxArcTolerance)},
+                          ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
   }
 }
 
@@ -215,16 +219,16 @@ void BoardClipperPathGenerator::addCircle(const Circle& circle,
   if (circle.getLineWidth() > 0) {
     QVector<Path> paths =
         path.toOutlineStrokes(PositiveLength(*circle.getLineWidth()));
-    foreach (const Path& p, paths) {
-      ClipperHelpers::unite(mPaths,
-                            ClipperHelpers::convert(p, mMaxArcTolerance));
-    }
+    ClipperHelpers::unite(mPaths,
+                          ClipperHelpers::convert(paths, mMaxArcTolerance),
+                          ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
   }
 
   // Area.
   if (circle.isFilled()) {
     ClipperHelpers::unite(mPaths,
-                          ClipperHelpers::convert(path, mMaxArcTolerance));
+                          {ClipperHelpers::convert(path, mMaxArcTolerance)},
+                          ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
   }
 }
 
@@ -235,10 +239,9 @@ void BoardClipperPathGenerator::addStrokeText(const BI_StrokeText& strokeText,
   const Transform transform(strokeText.getData());
   foreach (const Path path, transform.map(strokeText.getPaths())) {
     QVector<Path> paths = path.toOutlineStrokes(width);
-    foreach (const Path& p, paths) {
-      ClipperHelpers::unite(mPaths,
-                            ClipperHelpers::convert(p, mMaxArcTolerance));
-    }
+    ClipperHelpers::unite(mPaths,
+                          ClipperHelpers::convert(paths, mMaxArcTolerance),
+                          ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
   }
 }
 
@@ -250,7 +253,8 @@ void BoardClipperPathGenerator::addHole(const PositiveLength& diameter,
   ClipperHelpers::unite(
       mPaths,
       ClipperHelpers::convert(transform.map(*path).toOutlineStrokes(width),
-                              mMaxArcTolerance));
+                              mMaxArcTolerance),
+      ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
 }
 
 void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,
@@ -261,21 +265,21 @@ void BoardClipperPathGenerator::addPad(const BI_FootprintPad& pad,
     if (offset != 0) {
       geometry = geometry.withOffset(offset);
     }
-    foreach (const Path& outline, geometry.toOutlines()) {
-      ClipperHelpers::unite(
-          mPaths,
-          ClipperHelpers::convert(transform.map(outline), mMaxArcTolerance));
-    }
+    ClipperHelpers::unite(
+        mPaths,
+        ClipperHelpers::convert(transform.map(geometry.toOutlines()),
+                                mMaxArcTolerance),
+        ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
 
     // Also add each hole to ensure correct copper areas even if
     // the pad outline is too small or invalid.
     for (const PadHole& hole : geometry.getHoles()) {
-      foreach (const Path& outline,
-               hole.getPath()->toOutlineStrokes(hole.getDiameter())) {
-        ClipperHelpers::unite(
-            mPaths,
-            ClipperHelpers::convert(transform.map(outline), mMaxArcTolerance));
-      }
+      ClipperHelpers::unite(mPaths,
+                            ClipperHelpers::convert(
+                                transform.map(hole.getPath()->toOutlineStrokes(
+                                    hole.getDiameter())),
+                                mMaxArcTolerance),
+                            ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
     }
   }
 }

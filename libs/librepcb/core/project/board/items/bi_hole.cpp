@@ -55,6 +55,7 @@ bool BI_Hole::setDiameter(const PositiveLength& diameter) noexcept {
   if (mData.setDiameter(diameter)) {
     onEdited.notify(Event::DiameterChanged);
     updateStopMaskOffset();
+    mBoard.invalidatePlanes();
     return true;
   } else {
     return false;
@@ -64,6 +65,7 @@ bool BI_Hole::setDiameter(const PositiveLength& diameter) noexcept {
 bool BI_Hole::setPath(const NonEmptyPath& path) noexcept {
   if (mData.setPath(path)) {
     onEdited.notify(Event::PathChanged);
+    mBoard.invalidatePlanes();
     return true;
   } else {
     return false;
@@ -96,6 +98,7 @@ void BI_Hole::addToBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   BI_Base::addToBoard();
+  mBoard.invalidatePlanes();
 }
 
 void BI_Hole::removeFromBoard() {
@@ -103,6 +106,7 @@ void BI_Hole::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   BI_Base::removeFromBoard();
+  mBoard.invalidatePlanes();
 }
 
 /*******************************************************************************

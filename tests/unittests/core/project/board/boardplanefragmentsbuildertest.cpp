@@ -25,6 +25,7 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
@@ -70,17 +71,16 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
       loader.open(std::unique_ptr<TransactionalDirectory>(
                       new TransactionalDirectory(projectFs)),
                   projectFp.getFilename());  // can throw
+  Board* board = project->getBoards().first();
 
   // force planes rebuild
-  Board* board = project->getBoards().first();
-  board->rebuildAllPlanes();
+  BoardPlaneFragmentsBuilder builder;
+  builder.runSynchronously(*board);
 
   // determine actual plane fragments
-  QMap<Uuid, QSet<Path>> actualPlaneFragments;
+  QMap<Uuid, QVector<Path>> actualPlaneFragments;
   foreach (const BI_Plane* plane, board->getPlanes()) {
-    foreach (const Path& fragment, plane->getFragments()) {
-      actualPlaneFragments[plane->getUuid()].insert(fragment);
-    }
+    actualPlaneFragments[plane->getUuid()] = plane->getFragments();
   }
 
   // write actual plane fragments into file (useful for debugging purposes)
@@ -88,8 +88,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
   foreach (const Uuid& uuid, actualPlaneFragments.keys()) {
     SExpression child = SExpression::createList("plane");
     child.appendChild(uuid);
-    foreach (const Path& fragment,
-             Toolbox::sortedQSet(actualPlaneFragments[uuid])) {
+    foreach (const Path& fragment, actualPlaneFragments[uuid]) {
       child.ensureLineBreak();
       fragment.serialize(child.appendList("fragment"));
     }

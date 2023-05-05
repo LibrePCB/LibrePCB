@@ -525,7 +525,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       return true;
     } else if (findPlaneVerticesAtPosition(Point::fromPx(e.scenePos()))) {
       // start moving plane vertex
-      mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(*mSelectedPlane, false));
+      mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(*mSelectedPlane));
       return true;
     } else {
       // handle items selection
@@ -1225,7 +1225,7 @@ void BoardEditorState_Select::removePlaneVertices(
     if (path.getVertices().count() < 2) {
       return;  // Do not allow to create invalid outlines!
     }
-    QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(plane, false));
+    QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(plane));
     cmd->setOutline(path, false);
     mContext.undoStack.execCmd(cmd.take());
   } catch (const Exception& e) {
@@ -1262,7 +1262,7 @@ void BoardEditorState_Select::startAddingPlaneVertex(
 
     mSelectedPlane = &plane;
     mSelectedPlaneVertices = {vertex};
-    mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(plane, false));
+    mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(plane));
     mCmdPlaneEdit->setOutline(path, true);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

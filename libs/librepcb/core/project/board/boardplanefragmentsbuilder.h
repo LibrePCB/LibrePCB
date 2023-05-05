@@ -24,55 +24,152 @@
  *  Includes
  ******************************************************************************/
 #include "../../geometry/path.h"
-
-#include <polyclipping/clipper.hpp>
+#include "../../types/uuid.h"
+#include "../../utils/transform.h"
+#include "items/bi_plane.h"
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class BI_FootprintPad;
-class BI_Plane;
-class BI_Via;
-class Transform;
+class Board;
+class Layer;
+class NetSignal;
+class PadGeometry;
 
 /*******************************************************************************
  *  Class BoardPlaneFragmentsBuilder
  ******************************************************************************/
 
 /**
- * @brief The BoardPlaneFragmentsBuilder class
+ * @brief Plane fragments builder working on a ::librepcb::Board
  */
-class BoardPlaneFragmentsBuilder final {
+class BoardPlaneFragmentsBuilder final : public QObject {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  BoardPlaneFragmentsBuilder() = delete;
+  explicit BoardPlaneFragmentsBuilder(bool rebuildAirWires = false,
+                                      QObject* parent = nullptr) noexcept;
   BoardPlaneFragmentsBuilder(const BoardPlaneFragmentsBuilder& other) = delete;
-  BoardPlaneFragmentsBuilder(BI_Plane& plane) noexcept;
   ~BoardPlaneFragmentsBuilder() noexcept;
 
   // General Methods
-  QVector<Path> buildFragments() noexcept;
+
+  /**
+   * @brief Build and apply plane fragments synchronously (blocking)
+   *
+   * @param board   The board to rebuild the planes of.
+   * @param layers  If not `nullptr`, rebuild only planes which are scheduled
+   *                to rebuild and located on the given layers (quick rebuild).
+   *                If `nullptr` (default), rebuild all planes (more reliable,
+   *                but slower).
+   *
+   * @retval true if *all* planes of the board were successfully built.
+   * @retval false if only parts (or none) of the planes were built.
+   */
+  bool runSynchronously(Board& board,
+                        const QSet<const Layer*>* layers = nullptr) noexcept;
+
+  /**
+   * @brief Start building plane fragments asynchronously
+   *
+   * The calculated fragments will automatically be applied to the board once
+   * the rebuild is finished.
+   *
+   * @param board   The board to rebuild the planes of.
+   * @param layers  If not `nullptr`, rebuild only planes which are scheduled
+   *                to rebuild and located on the given layers (quick rebuild).
+   *                If `nullptr` (default), rebuild all planes (more reliable,
+   *                but slower).
+   *
+   * @retval true   If the build started.
+   * @retval false  If none of the planes need a rebuild, thus did not start
+   *                a rebuild.
+   */
+  bool startAsynchronously(Board& board,
+                           const QSet<const Layer*>* layers = nullptr) noexcept;
+
+  /**
+   * @brief Check if there is currently a build in progress
+   *
+   * @retval true if a build is in progress.
+   * @retval false if idle.
+   */
+  bool isBusy() const noexcept;
+
+  /**
+   * @brief Cancel the current asynchronous job
+   */
+  void cancel() noexcept;
 
   // Operator Overloadings
   BoardPlaneFragmentsBuilder& operator=(const BoardPlaneFragmentsBuilder& rhs) =
       delete;
 
-private:  // Methods
-  void addPlaneOutline();
-  void clipToBoardOutline();
-  void subtractOtherObjects();
-  void ensureMinimumWidth();
-  void flattenResult();
-  void removeOrphans();
+signals:
+  void started();
+  void finished();
 
-  // Helper Methods
-  ClipperLib::Paths createPadCutOuts(const Transform& transform,
-                                     const BI_FootprintPad& pad) const;
-  ClipperLib::Path createViaCutOut(const BI_Via& via) const noexcept;
+private:  // Methods
+  struct PlaneData {
+    Uuid uuid;
+    const Layer* layer;
+    Uuid netSignal;
+    Path outline;
+    UnsignedLength minWidth;
+    UnsignedLength minClearance;
+    bool keepOrphans;
+    int priority;
+    BI_Plane::ConnectStyle connectStyle;
+  };
+
+  struct PolygonData {
+    Transform transform;  // Applied to path after preprocessing.
+    const Layer* layer;
+    tl::optional<Uuid> netSignal;
+    Path path;
+    UnsignedLength width;
+    bool filled;
+  };
+
+  struct PadData {
+    Transform transform;
+    tl::optional<Uuid> netSignal;
+    UnsignedLength clearance;
+    QHash<const Layer*, QList<PadGeometry>> geometries;
+  };
+
+  struct TraceData {
+    const Layer* layer;
+    tl::optional<Uuid> netSignal;
+    Point startPos;
+    Point endPos;
+    PositiveLength width;
+  };
+
+  struct JobData {
+    QPointer<Board> board;
+    QSet<const Layer*> layers;
+    QList<PlaneData> planes;
+    QList<PolygonData> polygons;
+    QList<std::tuple<tl::optional<Uuid>, Point, PositiveLength>> vias;
+    QList<PadData> pads;
+    QList<std::tuple<Transform, PositiveLength, NonEmptyPath>> holes;
+    QList<TraceData> traces;  // Converted to polygons after preprocessing.
+    QHash<Uuid, QVector<Path>> result;
+    bool finished = false;
+  };
+
+  std::shared_ptr<JobData> createJob(Board& board,
+                                     const QSet<const Layer*>* filter) noexcept;
+  std::shared_ptr<JobData> run(std::shared_ptr<JobData> data) noexcept;
+  bool applyToBoard(std::shared_ptr<JobData> data);
 
   /**
    * Returns the maximum allowed arc tolerance when flattening arcs. Do not
@@ -84,9 +181,10 @@ private:  // Methods
   }
 
 private:  // Data
-  BI_Plane& mPlane;
-  ClipperLib::Paths mConnectedNetSignalAreas;
-  ClipperLib::Paths mResult;
+  const bool mRebuildAirWires;
+  QFuture<std::shared_ptr<JobData>> mFuture;
+  QFutureWatcher<std::shared_ptr<JobData>> mWatcher;
+  bool mAbort;
 };
 
 /*******************************************************************************

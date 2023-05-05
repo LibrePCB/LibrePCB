@@ -26,6 +26,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
+#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 
@@ -74,10 +75,11 @@ TEST(BoardGerberExportTest, test) {
       loader.open(std::unique_ptr<TransactionalDirectory>(
                       new TransactionalDirectory(projectFs)),
                   projectFp.getFilename());
+  Board* board = project->getBoards().first();
 
   // force planes rebuild
-  Board* board = project->getBoards().first();
-  board->rebuildAllPlanes();
+  BoardPlaneFragmentsBuilder builder;
+  builder.runSynchronously(*board);
 
   // export fabrication data
   BoardFabricationOutputSettings config = board->getFabricationOutputSettings();

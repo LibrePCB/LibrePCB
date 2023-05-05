@@ -154,6 +154,7 @@ void BI_NetLine::setLayer(const Layer& layer) {
 void BI_NetLine::setWidth(const PositiveLength& width) noexcept {
   if (mTrace.setWidth(width)) {
     onEdited.notify(Event::WidthChanged);
+    mBoard.invalidatePlanes(&mTrace.getLayer());
   }
 }
 
@@ -173,6 +174,8 @@ void BI_NetLine::addToBoard() {
   BI_Base::addToBoard();
   sg.dismiss();
 
+  mBoard.invalidatePlanes(&mTrace.getLayer());
+
   if (const NetSignal* netsignal = mNetSegment.getNetSignal()) {
     mNetSignalNameChangedConnection =
         connect(netsignal, &NetSignal::nameChanged, this,
@@ -191,6 +194,8 @@ void BI_NetLine::removeFromBoard() {
 
   BI_Base::removeFromBoard();
   sg.dismiss();
+
+  mBoard.invalidatePlanes(&mTrace.getLayer());
 
   if (mNetSignalNameChangedConnection) {
     disconnect(mNetSignalNameChangedConnection);

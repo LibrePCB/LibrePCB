@@ -123,7 +123,6 @@ public:
 
   // Operator Overloadings
   BI_Plane& operator=(const BI_Plane& rhs) = delete;
-  bool operator<(const BI_Plane& rhs) const noexcept;
 
 private:  // Data
   Uuid mUuid;

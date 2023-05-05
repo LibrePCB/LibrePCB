@@ -213,7 +213,7 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
     mContext.undoStack.appendToCmdGroup(new CmdBoardPlaneAdd(*mCurrentPlane));
 
     // Start undo command
-    mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane, false));
+    mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane));
     mLastVertexPos = pos;
     makeLayerVisible(mLastLayer->getThemeColor());
     return true;
@@ -245,7 +245,7 @@ bool BoardEditorState_DrawPlane::addSegment(const Point& pos) noexcept {
       // Start a new undo command
       mContext.undoStack.beginCmdGroup(tr("Draw board plane"));
       mIsUndoCmdActive = true;
-      mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane, false));
+      mCurrentPlaneEditCmd.reset(new CmdBoardPlaneEdit(*mCurrentPlane));
     }
 
     // Add new vertex

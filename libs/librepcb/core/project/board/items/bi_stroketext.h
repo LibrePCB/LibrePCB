@@ -104,6 +104,7 @@ public:
 private:  // Methods
   void updateText() noexcept;
   void updatePaths() noexcept;
+  void invalidatePlanes(const Layer& layer) noexcept;
 
 private:  // Data
   BoardStrokeTextData mData;

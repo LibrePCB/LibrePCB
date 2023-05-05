@@ -39,6 +39,7 @@ namespace editor {
 
 class GraphicsScene;
 class IF_GraphicsViewEventHandler;
+class WaitingSpinnerWidget;
 
 /*******************************************************************************
  *  Class GraphicsView
@@ -73,6 +74,8 @@ public:
     return mGridInterval;
   }
   Theme::GridStyle getGridStyle() const noexcept { return mGridStyle; }
+  bool isAnyMouseButtonPressed() const noexcept { return mAnyButtonPressed; }
+  qint64 getIdleTimeMs() const noexcept { return mIdleTimeMs; }
 
   // Setters
   void setBackgroundColors(const QColor& fill, const QColor& grid) noexcept;
@@ -121,6 +124,8 @@ public slots:
   void zoomOut() noexcept;
   void zoomAll() noexcept;
   void zoomToRect(const QRectF& rect) noexcept;
+  void showWaitingSpinner() noexcept;
+  void hideWaitingSpinner() noexcept;
 
 signals:
   /**
@@ -143,6 +148,7 @@ private:
   void drawForeground(QPainter* painter, const QRectF& rect);
 
   // General Attributes
+  QScopedPointer<WaitingSpinnerWidget> mWaitingSpinnerWidget;
   QScopedPointer<QLabel> mInfoBoxLabel;
   IF_GraphicsViewEventHandler* mEventHandlerObject;
   GraphicsScene* mScene;
@@ -174,7 +180,9 @@ private:
 
   // State
   volatile bool mPanningActive;
+  volatile bool mAnyButtonPressed;
   QCursor mCursorBeforePanning;
+  qint64 mIdleTimeMs;
 
   // Static Variables
   static constexpr qreal sZoomStepFactor = 1.3;

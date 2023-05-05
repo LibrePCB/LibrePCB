@@ -70,13 +70,16 @@ void BI_Plane::setOutline(const Path& outline) noexcept {
   if (outline != mOutline) {
     mOutline = outline;
     onEdited.notify(Event::OutlineChanged);
+    mBoard.invalidatePlanes(mLayer);
   }
 }
 
 void BI_Plane::setLayer(const Layer& layer) noexcept {
   if (&layer != mLayer) {
+    mBoard.invalidatePlanes(mLayer);
     mLayer = &layer;
     onEdited.notify(Event::LayerChanged);
+    mBoard.invalidatePlanes(mLayer);
   }
 }
 
@@ -92,36 +95,42 @@ void BI_Plane::setNetSignal(NetSignal& netsignal) {
       sg.dismiss();
     }
     mNetSignal = &netsignal;
+    mBoard.invalidatePlanes(mLayer);
   }
 }
 
 void BI_Plane::setMinWidth(const UnsignedLength& minWidth) noexcept {
   if (minWidth != mMinWidth) {
     mMinWidth = minWidth;
+    mBoard.invalidatePlanes(mLayer);
   }
 }
 
 void BI_Plane::setMinClearance(const UnsignedLength& minClearance) noexcept {
   if (minClearance != mMinClearance) {
     mMinClearance = minClearance;
+    mBoard.invalidatePlanes(mLayer);
   }
 }
 
 void BI_Plane::setConnectStyle(BI_Plane::ConnectStyle style) noexcept {
   if (style != mConnectStyle) {
     mConnectStyle = style;
+    mBoard.invalidatePlanes(mLayer);
   }
 }
 
 void BI_Plane::setPriority(int priority) noexcept {
   if (priority != mPriority) {
     mPriority = priority;
+    mBoard.invalidatePlanes(mLayer);
   }
 }
 
 void BI_Plane::setKeepOrphans(bool keepOrphans) noexcept {
   if (keepOrphans != mKeepOrphans) {
     mKeepOrphans = keepOrphans;
+    mBoard.invalidatePlanes(mLayer);
   }
 }
 
@@ -157,6 +166,7 @@ void BI_Plane::addToBoard() {
   }
   mNetSignal->registerBoardPlane(*this);  // can throw
   BI_Base::addToBoard();
+  mBoard.invalidatePlanes(mLayer);
   mBoard.scheduleAirWiresRebuild(mNetSignal);
 }
 
@@ -166,6 +176,7 @@ void BI_Plane::removeFromBoard() {
   }
   mNetSignal->unregisterBoardPlane(*this);  // can throw
   BI_Base::removeFromBoard();
+  mBoard.invalidatePlanes(mLayer);
   mBoard.scheduleAirWiresRebuild(mNetSignal);
 }
 
@@ -185,22 +196,6 @@ void BI_Plane::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mOutline.serialize(root);
   root.ensureLineBreak();
-}
-
-/*******************************************************************************
- *  Operator Overloadings
- ******************************************************************************/
-
-bool BI_Plane::operator<(const BI_Plane& rhs) const noexcept {
-  // First sort by priority, then by uuid to get a really unique priority order
-  // over all existing planes. This way we can ensure that even planes with the
-  // same priority will always be filled in the same order. Random order would
-  // be dangerous!
-  if (mPriority != rhs.mPriority) {
-    return mPriority < rhs.mPriority;
-  } else {
-    return mUuid < rhs.mUuid;
-  }
 }
 
 /*******************************************************************************

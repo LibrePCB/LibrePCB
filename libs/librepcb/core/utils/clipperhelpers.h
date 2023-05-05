@@ -54,18 +54,33 @@ public:
   // General Methods
   static void unite(ClipperLib::Paths& paths,
                     ClipperLib::PolyFillType fillType);
-  static void unite(ClipperLib::Paths& subject, const ClipperLib::Path& clip);
-  static void unite(ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
+  static void unite(ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
+                    ClipperLib::PolyFillType subjectFillType,
+                    ClipperLib::PolyFillType clipFillType);
   static std::unique_ptr<ClipperLib::PolyTree> uniteToTree(
       const ClipperLib::Paths& paths, ClipperLib::PolyFillType fillType);
-  static std::unique_ptr<ClipperLib::PolyTree> intersect(
-      const ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
-  static std::unique_ptr<ClipperLib::PolyTree> intersect(
+  static std::unique_ptr<ClipperLib::PolyTree> uniteToTree(
+      const ClipperLib::Paths& paths, const ClipperLib::Paths& clip,
+      ClipperLib::PolyFillType subjectFillType,
+      ClipperLib::PolyFillType clipFillType);
+  static void intersect(ClipperLib::Paths& subject,
+                        const ClipperLib::Paths& clip,
+                        ClipperLib::PolyFillType subjectFillType,
+                        ClipperLib::PolyFillType clipFillType);
+  static std::unique_ptr<ClipperLib::PolyTree> intersectToTree(
+      const ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
+      ClipperLib::PolyFillType subjectFillType,
+      ClipperLib::PolyFillType clipFillType);
+  static std::unique_ptr<ClipperLib::PolyTree> intersectToTree(
       const QList<ClipperLib::Paths>& paths);
   static void subtract(ClipperLib::Paths& subject,
-                       const ClipperLib::Paths& clip);
+                       const ClipperLib::Paths& clip,
+                       ClipperLib::PolyFillType subjectFillType,
+                       ClipperLib::PolyFillType clipFillType);
   static std::unique_ptr<ClipperLib::PolyTree> subtractToTree(
-      const ClipperLib::Paths& subject, const ClipperLib::Paths& clip);
+      const ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
+      ClipperLib::PolyFillType subjectFillType,
+      ClipperLib::PolyFillType clipFillType);
   static void offset(ClipperLib::Paths& paths, const Length& offset,
                      const PositiveLength& maxArcTolerance);
   static std::unique_ptr<ClipperLib::PolyTree> offsetToTree(
@@ -92,7 +107,6 @@ private:  // Internal Helper Methods
       const ClipperLib::Paths& holes) noexcept;
   static ClipperLib::Path rotateCutInHole(
       const ClipperLib::Path& hole) noexcept;
-  static int getHoleConnectionPointIndex(const ClipperLib::Path& hole) noexcept;
   static void addCutInToPath(ClipperLib::Path& outline,
                              const ClipperLib::Path& hole);
   static int insertConnectionPointToPath(ClipperLib::Path& path,

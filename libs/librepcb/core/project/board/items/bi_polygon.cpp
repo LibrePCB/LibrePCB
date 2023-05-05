@@ -22,6 +22,9 @@
  ******************************************************************************/
 #include "bi_polygon.h"
 
+#include "../../../types/layer.h"
+#include "../board.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -45,8 +48,11 @@ BI_Polygon::~BI_Polygon() noexcept {
  ******************************************************************************/
 
 bool BI_Polygon::setLayer(const Layer& layer) noexcept {
+  const Layer& oldLayer = mData.getLayer();
   if (mData.setLayer(layer)) {
     onEdited.notify(Event::LayerChanged);
+    invalidatePlanes(oldLayer);
+    invalidatePlanes(mData.getLayer());
     return true;
   } else {
     return false;
@@ -56,6 +62,7 @@ bool BI_Polygon::setLayer(const Layer& layer) noexcept {
 bool BI_Polygon::setLineWidth(const UnsignedLength& width) noexcept {
   if (mData.setLineWidth(width)) {
     onEdited.notify(Event::LineWidthChanged);
+    invalidatePlanes(mData.getLayer());
     return true;
   } else {
     return false;
@@ -65,6 +72,7 @@ bool BI_Polygon::setLineWidth(const UnsignedLength& width) noexcept {
 bool BI_Polygon::setPath(const Path& path) noexcept {
   if (mData.setPath(path)) {
     onEdited.notify(Event::PathChanged);
+    invalidatePlanes(mData.getLayer());
     return true;
   } else {
     return false;
@@ -74,6 +82,7 @@ bool BI_Polygon::setPath(const Path& path) noexcept {
 bool BI_Polygon::setIsFilled(bool isFilled) noexcept {
   if (mData.setIsFilled(isFilled)) {
     onEdited.notify(Event::IsFilledChanged);
+    invalidatePlanes(mData.getLayer());
     return true;
   } else {
     return false;
@@ -107,6 +116,7 @@ void BI_Polygon::addToBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   BI_Base::addToBoard();
+  invalidatePlanes(mData.getLayer());
 }
 
 void BI_Polygon::removeFromBoard() {
@@ -114,6 +124,19 @@ void BI_Polygon::removeFromBoard() {
     throw LogicError(__FILE__, __LINE__);
   }
   BI_Base::removeFromBoard();
+  invalidatePlanes(mData.getLayer());
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void BI_Polygon::invalidatePlanes(const Layer& layer) noexcept {
+  if (layer.isCopper()) {
+    mBoard.invalidatePlanes(&layer);
+  } else if (layer == Layer::boardOutlines()) {
+    mBoard.invalidatePlanes();
+  }
 }
 
 /*******************************************************************************

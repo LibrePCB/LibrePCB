@@ -141,7 +141,7 @@ void BoardPlanePropertiesDialog::buttonBoxClicked(
 
 bool BoardPlanePropertiesDialog::applyChanges() noexcept {
   try {
-    QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(mPlane, true));
+    QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(mPlane));
 
     // net signal
     Uuid netSignalUuid = Uuid::fromString(

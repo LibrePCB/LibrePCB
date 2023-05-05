@@ -112,7 +112,7 @@ bool CmdCombineNetSignals::performExecute() {
 
   // re-add all board planes
   foreach (BI_Plane* plane, boardPlanes) {
-    CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane, false);
+    CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane);
     cmd->setNetSignal(mResultingNetSignal);
     execNewChildCmd(cmd);  // can throw
     execNewChildCmd(new CmdBoardPlaneAdd(*plane));  // can throw

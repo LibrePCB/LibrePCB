@@ -37,6 +37,7 @@ namespace editor {
 
 WaitingSpinnerWidget::WaitingSpinnerWidget(QWidget* parent) noexcept
   : QWidget(parent),
+    mColor(palette().color(QPalette::Text)),
     mTotalRotations(7),
     mCurrentRotation(0),
     mCircleDiameter(14),
@@ -87,7 +88,7 @@ void WaitingSpinnerWidget::paintEvent(QPaintEvent* e) noexcept {
   Q_UNUSED(e);
 
   const qreal center = calculateSize() / qreal(2);
-  QColor color = palette().color(QPalette::Text);
+  QColor color = mColor;
 
   QPainter painter(this);
   painter.setRenderHint(QPainter::Antialiasing, true);

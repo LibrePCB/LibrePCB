@@ -46,27 +46,14 @@ void ClipperHelpers::unite(ClipperLib::Paths& paths,
 }
 
 void ClipperHelpers::unite(ClipperLib::Paths& subject,
-                           const ClipperLib::Path& clip) {
-  try {
-    ClipperLib::Clipper c;
-    c.AddPaths(subject, ClipperLib::ptSubject, true);
-    c.AddPath(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctUnion, subject, ClipperLib::pftEvenOdd,
-              ClipperLib::pftEvenOdd);
-  } catch (const std::exception& e) {
-    throw LogicError(__FILE__, __LINE__,
-                     QString("Failed to unite paths: %1").arg(e.what()));
-  }
-}
-
-void ClipperHelpers::unite(ClipperLib::Paths& subject,
-                           const ClipperLib::Paths& clip) {
+                           const ClipperLib::Paths& clip,
+                           ClipperLib::PolyFillType subjectFillType,
+                           ClipperLib::PolyFillType clipFillType) {
   try {
     ClipperLib::Clipper c;
     c.AddPaths(subject, ClipperLib::ptSubject, true);
     c.AddPaths(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctUnion, subject, ClipperLib::pftEvenOdd,
-              ClipperLib::pftEvenOdd);
+    c.Execute(ClipperLib::ctUnion, subject, subjectFillType, clipFillType);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to unite paths: %1").arg(e.what()));
@@ -89,8 +76,45 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::uniteToTree(
   }
 }
 
-std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersect(
-    const ClipperLib::Paths& subject, const ClipperLib::Paths& clip) {
+std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::uniteToTree(
+    const ClipperLib::Paths& paths, const ClipperLib::Paths& clip,
+    ClipperLib::PolyFillType subjectFillType,
+    ClipperLib::PolyFillType clipFillType) {
+  try {
+    // Wrap the PolyTree object in a smart pointer since PolyTree cannot
+    // safely be copied (i.e. returned by value), it would lead to a crash!!!
+    std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
+    ClipperLib::Clipper c;
+    c.AddPaths(paths, ClipperLib::ptSubject, true);
+    c.AddPaths(clip, ClipperLib::ptClip, true);
+    c.Execute(ClipperLib::ctUnion, *result, subjectFillType, clipFillType);
+    return result;
+  } catch (const std::exception& e) {
+    throw LogicError(__FILE__, __LINE__,
+                     QString("Failed to unite paths: %1").arg(e.what()));
+  }
+}
+
+void ClipperHelpers::intersect(ClipperLib::Paths& subject,
+                               const ClipperLib::Paths& clip,
+                               ClipperLib::PolyFillType subjectFillType,
+                               ClipperLib::PolyFillType clipFillType) {
+  try {
+    ClipperLib::Clipper c;
+    c.AddPaths(subject, ClipperLib::ptSubject, true);
+    c.AddPaths(clip, ClipperLib::ptClip, true);
+    c.Execute(ClipperLib::ctIntersection, subject, subjectFillType,
+              clipFillType);
+  } catch (const std::exception& e) {
+    throw LogicError(__FILE__, __LINE__,
+                     QString("Failed to intersect paths: %1").arg(e.what()));
+  }
+}
+
+std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersectToTree(
+    const ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
+    ClipperLib::PolyFillType subjectFillType,
+    ClipperLib::PolyFillType clipFillType) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
@@ -98,8 +122,8 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersect(
     ClipperLib::Clipper c;
     c.AddPaths(subject, ClipperLib::ptSubject, true);
     c.AddPaths(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctIntersection, *result, ClipperLib::pftEvenOdd,
-              ClipperLib::pftEvenOdd);
+    c.Execute(ClipperLib::ctIntersection, *result, subjectFillType,
+              clipFillType);
     return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
@@ -107,7 +131,7 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersect(
   }
 }
 
-std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersect(
+std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersectToTree(
     const QList<ClipperLib::Paths>& paths) {
   try {
     // Intersection makes no sense with less than two areas (and thus method
@@ -141,13 +165,14 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersect(
 }
 
 void ClipperHelpers::subtract(ClipperLib::Paths& subject,
-                              const ClipperLib::Paths& clip) {
+                              const ClipperLib::Paths& clip,
+                              ClipperLib::PolyFillType subjectFillType,
+                              ClipperLib::PolyFillType clipFillType) {
   try {
     ClipperLib::Clipper c;
     c.AddPaths(subject, ClipperLib::ptSubject, true);
     c.AddPaths(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctDifference, subject, ClipperLib::pftEvenOdd,
-              ClipperLib::pftEvenOdd);
+    c.Execute(ClipperLib::ctDifference, subject, subjectFillType, clipFillType);
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
                      QString("Failed to subtract paths: %1").arg(e.what()));
@@ -155,7 +180,9 @@ void ClipperHelpers::subtract(ClipperLib::Paths& subject,
 }
 
 std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::subtractToTree(
-    const ClipperLib::Paths& subject, const ClipperLib::Paths& clip) {
+    const ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
+    ClipperLib::PolyFillType subjectFillType,
+    ClipperLib::PolyFillType clipFillType) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
@@ -163,8 +190,7 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::subtractToTree(
     ClipperLib::Clipper c;
     c.AddPaths(subject, ClipperLib::ptSubject, true);
     c.AddPaths(clip, ClipperLib::ptClip, true);
-    c.Execute(ClipperLib::ctDifference, *result, ClipperLib::pftEvenOdd,
-              ClipperLib::pftEvenOdd);
+    c.Execute(ClipperLib::ctDifference, *result, subjectFillType, clipFillType);
     return result;
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,
@@ -329,19 +355,13 @@ ClipperLib::Path ClipperHelpers::rotateCutInHole(
   if (p.back() == p.front()) {
     p.pop_back();
   }
-  std::rotate(p.begin(), p.begin() + getHoleConnectionPointIndex(p), p.end());
+  auto minIt = std::min_element(
+      p.begin(), p.end(),
+      [](const ClipperLib::IntPoint& a, const ClipperLib::IntPoint& b) {
+        return (a.Y < b.Y) || ((a.Y == b.Y) && (a.X < b.X));
+      });
+  std::rotate(p.begin(), minIt, p.end());
   return p;
-}
-
-int ClipperHelpers::getHoleConnectionPointIndex(
-    const ClipperLib::Path& hole) noexcept {
-  int index = 0;
-  for (size_t i = 1; i < hole.size(); ++i) {
-    if (hole.at(i).Y < hole.at(index).Y) {
-      index = i;
-    }
-  }
-  return index;
 }
 
 void ClipperHelpers::addCutInToPath(ClipperLib::Path& outline,

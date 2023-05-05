@@ -129,6 +129,7 @@ private:  // Methods
   void updateTransform() noexcept;
   void updateText() noexcept;
   void updateGeometries() noexcept;
+  void invalidatePlanes() noexcept;
   QString getLibraryDeviceName() const noexcept;
   QString getComponentInstanceName() const noexcept;
   QString getPadNameOrUuid() const noexcept;

@@ -211,7 +211,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
 
   // flip all planes
   foreach (BI_Plane* plane, query.getPlanes()) {
-    QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(*plane, false));
+    QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(*plane));
     cmd->mirror(center, mOrientation, false);
     execNewChildCmd(cmd.take());  // can throw
   }

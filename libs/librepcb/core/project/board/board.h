@@ -187,7 +187,9 @@ public:
   const QMap<Uuid, BI_Plane*>& getPlanes() const noexcept { return mPlanes; }
   void addPlane(BI_Plane& plane);
   void removePlane(BI_Plane& plane);
-  void rebuildAllPlanes() noexcept;
+  void invalidatePlanes(const Layer* layer = nullptr) noexcept;
+  QSet<const Layer*> takeScheduledLayersForPlanesRebuild(
+      const QSet<const Layer*>& layers) noexcept;
 
   // Polygon Methods
   const QMap<Uuid, BI_Polygon*>& getPolygons() const noexcept {
@@ -269,6 +271,7 @@ private:
   QScopedPointer<BoardDesignRuleCheckSettings> mDrcSettings;
   QScopedPointer<BoardFabricationOutputSettings> mFabricationOutputSettings;
   QSet<NetSignal*> mScheduledNetSignalsForAirWireRebuild;
+  QSet<const Layer*> mScheduledLayersForPlanesRebuild;
 
   // Attributes
   Uuid mUuid;

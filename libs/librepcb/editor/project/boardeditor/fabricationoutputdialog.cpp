@@ -28,6 +28,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
+#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/utils/scopeguard.h>
 
@@ -185,7 +186,8 @@ void FabricationOutputDialog::btnGenerateClicked() {
     auto cursorScopeGuard = scopeGuard([this]() { unsetCursor(); });
 
     // rebuild planes because they may be outdated!
-    mBoard.rebuildAllPlanes();
+    BoardPlaneFragmentsBuilder builder;
+    builder.runSynchronously(mBoard);
 
     // update fabrication output settings if modified
     BoardFabricationOutputSettings s = mBoard.getFabricationOutputSettings();
