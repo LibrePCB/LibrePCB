@@ -50,7 +50,7 @@ BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
     mOutline(outline),
     mMinWidth(200000),
     mMinClearance(300000),
-    mKeepOrphans(false),
+    mKeepIslands(false),
     mPriority(0),
     mConnectStyle(ConnectStyle::ThermalRelief),
     mThermalGap(300000),
@@ -142,9 +142,9 @@ void BI_Plane::setPriority(int priority) noexcept {
   }
 }
 
-void BI_Plane::setKeepOrphans(bool keepOrphans) noexcept {
-  if (keepOrphans != mKeepOrphans) {
-    mKeepOrphans = keepOrphans;
+void BI_Plane::setKeepIslands(bool keep) noexcept {
+  if (keep != mKeepIslands) {
+    mKeepIslands = keep;
     mBoard.invalidatePlanes(mLayer);
   }
 }
@@ -208,7 +208,7 @@ void BI_Plane::serialize(SExpression& root) const {
   root.appendChild("thermal_spoke", mThermalSpokeWidth);
   root.ensureLineBreak();
   root.appendChild("connect_style", mConnectStyle);
-  root.appendChild("keep_orphans", mKeepOrphans);
+  root.appendChild("keep_islands", mKeepIslands);
   root.appendChild("lock", mLocked);
   root.ensureLineBreak();
   mOutline.serialize(root);

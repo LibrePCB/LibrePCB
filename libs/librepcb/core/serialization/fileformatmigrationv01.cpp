@@ -716,6 +716,7 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
     planeNode->appendChild("thermal_spoke",
                            planeNode->getChild("min_width/@0"));
     planeNode->appendChild("lock", SExpression::createToken("false"));
+    planeNode->getChild("keep_orphans").setName("keep_islands");
   }
 }
 

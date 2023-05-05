@@ -605,7 +605,7 @@ void Board::copyFrom(const Board& other) {
                      plane->getNetSignal(), plane->getOutline());
     copy->setMinWidth(plane->getMinWidth());
     copy->setMinClearance(plane->getMinClearance());
-    copy->setKeepOrphans(plane->getKeepOrphans());
+    copy->setKeepIslands(plane->getKeepIslands());
     copy->setPriority(plane->getPriority());
     copy->setConnectStyle(plane->getConnectStyle());
     copy->setThermalGap(plane->getThermalGap());

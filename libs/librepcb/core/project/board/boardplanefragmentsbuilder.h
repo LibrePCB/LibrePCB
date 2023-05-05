@@ -123,7 +123,7 @@ private:  // Methods
     Path outline;
     UnsignedLength minWidth;
     UnsignedLength minClearance;
-    bool keepOrphans;
+    bool keepIslands;
     int priority;
     BI_Plane::ConnectStyle connectStyle;
     PositiveLength thermalGap;

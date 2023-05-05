@@ -58,8 +58,8 @@ CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane) noexcept
     mNewThermalSpokeWidth(mOldThermalSpokeWidth),
     mOldPriority(plane.getPriority()),
     mNewPriority(mOldPriority),
-    mOldKeepOrphans(plane.getKeepOrphans()),
-    mNewKeepOrphans(mOldKeepOrphans),
+    mOldKeepIslands(plane.getKeepIslands()),
+    mNewKeepIslands(mOldKeepIslands),
     mOldLocked(plane.isLocked()),
     mNewLocked(mOldLocked) {
 }
@@ -149,9 +149,9 @@ void CmdBoardPlaneEdit::setPriority(int priority) noexcept {
   mNewPriority = priority;
 }
 
-void CmdBoardPlaneEdit::setKeepOrphans(bool keepOrphans) noexcept {
+void CmdBoardPlaneEdit::setKeepIslands(bool keep) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewKeepOrphans = keepOrphans;
+  mNewKeepIslands = keep;
 }
 
 void CmdBoardPlaneEdit::setLocked(bool locked) noexcept {
@@ -175,7 +175,7 @@ bool CmdBoardPlaneEdit::performExecute() {
   if (mNewThermalGap != mOldThermalGap) return true;
   if (mNewThermalSpokeWidth != mOldThermalSpokeWidth) return true;
   if (mNewPriority != mOldPriority) return true;
-  if (mNewKeepOrphans != mOldKeepOrphans) return true;
+  if (mNewKeepIslands != mOldKeepIslands) return true;
   if (mNewLocked != mOldLocked) return true;
   return false;
 }
@@ -190,7 +190,7 @@ void CmdBoardPlaneEdit::performUndo() {
   mPlane.setThermalGap(mOldThermalGap);
   mPlane.setThermalSpokeWidth(mOldThermalSpokeWidth);
   mPlane.setPriority(mOldPriority);
-  mPlane.setKeepOrphans(mOldKeepOrphans);
+  mPlane.setKeepIslands(mOldKeepIslands);
   mPlane.setLocked(mOldLocked);
 }
 
@@ -204,7 +204,7 @@ void CmdBoardPlaneEdit::performRedo() {
   mPlane.setThermalGap(mNewThermalGap);
   mPlane.setThermalSpokeWidth(mNewThermalSpokeWidth);
   mPlane.setPriority(mNewPriority);
-  mPlane.setKeepOrphans(mNewKeepOrphans);
+  mPlane.setKeepIslands(mNewKeepIslands);
   mPlane.setLocked(mNewLocked);
 }
 

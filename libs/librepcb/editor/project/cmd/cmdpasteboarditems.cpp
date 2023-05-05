@@ -279,7 +279,7 @@ bool CmdPasteBoardItems::performExecute() {
         );
     copy->setMinWidth(plane.minWidth);
     copy->setMinClearance(plane.minClearance);
-    copy->setKeepOrphans(plane.keepOrphans);
+    copy->setKeepIslands(plane.keepIslands);
     copy->setPriority(plane.priority);
     copy->setConnectStyle(plane.connectStyle);
     copy->setThermalGap(plane.thermalGap);

@@ -183,7 +183,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       data->planes.append(PlaneData{
           plane->getUuid(), &plane->getLayer(), plane->getNetSignal().getUuid(),
           plane->getOutline(), plane->getMinWidth(), plane->getMinClearance(),
-          plane->getKeepOrphans(), plane->getPriority(),
+          plane->getKeepIslands(), plane->getPriority(),
           plane->getConnectStyle(), plane->getThermalGap(),
           plane->getThermalSpokeWidth()});
     }
@@ -600,9 +600,9 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
         break;
       }
 
-      // If requested, remove unconnected fragments (orphans).
-      if (!it->keepOrphans) {
-        auto isOrphan = [&](const ClipperLib::Path& p) {
+      // If requested, remove unconnected fragments (islands).
+      if (!it->keepIslands) {
+        auto isIsland = [&](const ClipperLib::Path& p) {
           ClipperLib::Paths intersections{p};
           ClipperHelpers::intersect(intersections, connectedNetSignalAreas,
                                     ClipperLib::pftNonZero,
@@ -610,7 +610,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
           return intersections.empty();
         };
         fragments.erase(
-            std::remove_if(fragments.begin(), fragments.end(), isOrphan),
+            std::remove_if(fragments.begin(), fragments.end(), isIsland),
             fragments.end());
       }
       if (mAbort) {

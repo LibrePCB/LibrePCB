@@ -68,7 +68,7 @@ public:
   void setThermalGap(const PositiveLength& gap) noexcept;
   void setThermalSpokeWidth(const PositiveLength& width) noexcept;
   void setPriority(int priority) noexcept;
-  void setKeepOrphans(bool keepOrphans) noexcept;
+  void setKeepIslands(bool keep) noexcept;
   void setLocked(bool locked) noexcept;
 
 private:
@@ -107,8 +107,8 @@ private:
   PositiveLength mNewThermalSpokeWidth;
   int mOldPriority;
   int mNewPriority;
-  bool mOldKeepOrphans;
-  bool mNewKeepOrphans;
+  bool mOldKeepIslands;
+  bool mNewKeepIslands;
   bool mOldLocked;
   bool mNewLocked;
 };

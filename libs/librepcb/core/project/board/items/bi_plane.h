@@ -86,7 +86,7 @@ public:
   const UnsignedLength& getMinClearance() const noexcept {
     return mMinClearance;
   }
-  bool getKeepOrphans() const noexcept { return mKeepOrphans; }
+  bool getKeepIslands() const noexcept { return mKeepIslands; }
   int getPriority() const noexcept { return mPriority; }
   ConnectStyle getConnectStyle() const noexcept { return mConnectStyle; }
   const PositiveLength& getThermalGap() const noexcept { return mThermalGap; }
@@ -108,7 +108,7 @@ public:
   void setThermalGap(const PositiveLength& gap) noexcept;
   void setThermalSpokeWidth(const PositiveLength& width) noexcept;
   void setPriority(int priority) noexcept;
-  void setKeepOrphans(bool keepOrphans) noexcept;
+  void setKeepIslands(bool keep) noexcept;
   void setLocked(bool locked) noexcept;
   void setVisible(bool visible) noexcept;
   void setCalculatedFragments(const QVector<Path>& fragments) noexcept;
@@ -134,7 +134,7 @@ private:  // Data
   Path mOutline;
   UnsignedLength mMinWidth;
   UnsignedLength mMinClearance;
-  bool mKeepOrphans;
+  bool mKeepIslands;
   int mPriority;
   ConnectStyle mConnectStyle;
   PositiveLength mThermalGap;

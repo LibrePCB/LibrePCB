@@ -737,7 +737,7 @@ void ProjectLoader::loadBoardPlane(Board& b, const SExpression& node) {
       deserialize<UnsignedLength>(node.getChild("min_width/@0")));
   plane->setMinClearance(
       deserialize<UnsignedLength>(node.getChild("min_clearance/@0")));
-  plane->setKeepOrphans(deserialize<bool>(node.getChild("keep_orphans/@0")));
+  plane->setKeepIslands(deserialize<bool>(node.getChild("keep_islands/@0")));
   plane->setPriority(deserialize<int>(node.getChild("priority/@0")));
   plane->setConnectStyle(
       deserialize<BI_Plane::ConnectStyle>(node.getChild("connect_style/@0")));
