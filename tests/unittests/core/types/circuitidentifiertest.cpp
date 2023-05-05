@@ -124,7 +124,7 @@ INSTANTIATE_TEST_SUITE_P(CircuitIdentifierTest, CircuitIdentifierTest, ::testing
     CircuitIdentifierTestData({"+", true}),
     CircuitIdentifierTestData({"-", true}),
     CircuitIdentifierTestData({"01234567890123456789012345678901", true}),
-    CircuitIdentifierTestData({"_+-/!?@#$asDF1234", true}),
+    CircuitIdentifierTestData({"._+-/!?&@#$asDF1234()", true}),
 
     // invalid identifiers
     CircuitIdentifierTestData({"", false}), // empty

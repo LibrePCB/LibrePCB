@@ -45,7 +45,7 @@ namespace librepcb {
 inline static QString cleanCircuitIdentifier(
     const QString& userInput) noexcept {
   return Toolbox::cleanUserInputString(
-      userInput, QRegularExpression("[^-a-zA-Z0-9_+/!?@#$]"), true, false,
+      userInput, QRegularExpression("[^-a-zA-Z0-9._+/!?&@#$()]"), true, false,
       false, "_", 32);
 }
 
@@ -66,7 +66,7 @@ struct CircuitIdentifierVerifier {
 
 struct CircuitIdentifierConstraint {
   bool operator()(const QString& value) const noexcept {
-    return QRegularExpression("\\A[-a-zA-Z0-9_+/!?@#$]{1,32}\\z")
+    return QRegularExpression("\\A[-a-zA-Z0-9._+/!?&@#$()]{1,32}\\z")
         .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
         .hasMatch();
   }
