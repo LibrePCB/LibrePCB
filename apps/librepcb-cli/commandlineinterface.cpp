@@ -44,6 +44,7 @@
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/board/boardpickplacegenerator.h>
+#include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/bomgenerator.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
@@ -479,6 +480,18 @@ bool CommandLineInterface::openProject(
     // If no boards are specified, export all boards.
     if (boardNames.isEmpty() && boardIndices.isEmpty()) {
       boards = project->getBoards();
+    }
+
+    // Build planes, if needed.
+    if (runDrc || exportPcbFabricationData) {
+      foreach (Board* board, boards) {
+        qInfo().nospace().noquote() << "Rebuilding all planes of board '"
+                                    << *board->getName() << "'...";
+        BoardPlaneFragmentsBuilder builder;
+        builder.runSynchronously(*board);  // can throw
+      }
+    } else {
+      qInfo() << "No need to rebuild planes, thus skipped.";
     }
 
     // Check for non-canonical files (strict mode)
