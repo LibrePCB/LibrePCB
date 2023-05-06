@@ -79,7 +79,8 @@ public:
   HoleEditorWidget& operator=(const HoleEditorWidget& rhs) = delete;
 
 signals:
-  void holeChanged(const PositiveLength& diameter, const NonEmptyPath& path);
+  void diameterChanged(const PositiveLength& diameter);
+  void pathChanged(const NonEmptyPath& path);
 
 private:  // Methods
   void updatePathFromCircularTab() noexcept;

@@ -54,7 +54,7 @@ HoleEditorWidget::HoleEditorWidget(QWidget* parent) noexcept
           [this](const PositiveLength& value) {
             mDiameter = value;
             updateLinearOuterSize(*mPath);
-            emit holeChanged(mDiameter, mPath);
+            emit diameterChanged(mDiameter);
           });
   connect(mUi->edtPosX, &LengthEdit::valueChanged, this,
           &HoleEditorWidget::updatePathFromCircularTab);
@@ -75,7 +75,7 @@ HoleEditorWidget::HoleEditorWidget(QWidget* parent) noexcept
               updateCircularTabFromPath(path);
               updateLinearTabFromPath(path);
               updateLinearOuterSize(path);
-              emit holeChanged(mDiameter, mPath);
+              emit pathChanged(mPath);
             }
           });
 }
@@ -170,7 +170,7 @@ void HoleEditorWidget::updatePathFromCircularTab() noexcept {
     mUi->pathEditorWidget->setPath(*path);
     updateLinearTabFromPath(*path);
     updateLinearOuterSize(*path);
-    emit holeChanged(mDiameter, mPath);
+    emit pathChanged(mPath);
   }
 }
 
@@ -193,7 +193,7 @@ void HoleEditorWidget::updatePathFromLinearTab() noexcept {
     mUi->pathEditorWidget->setPath(path);
     updateCircularTabFromPath(path);
     updateLinearOuterSize(path);
-    emit holeChanged(mDiameter, mPath);
+    emit pathChanged(mPath);
   }
 }
 

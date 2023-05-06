@@ -82,12 +82,19 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
           &FootprintPadPropertiesDialog::removeAllHoles);
   connect(mUi->btnConvertToTht, &QToolButton::clicked, this,
           &FootprintPadPropertiesDialog::addHole);
-  connect(mUi->holeEditorWidget, &HoleEditorWidget::holeChanged, this,
-          [this](const PositiveLength& diameter, const NonEmptyPath& path) {
-            const int index = qBound(0, mSelectedHoleIndex, mHoles.count() - 1);
-            if (const std::shared_ptr<PadHole> holePtr = mHoles.value(index)) {
-              holePtr->setDiameter(diameter);
-              holePtr->setPath(path);
+  connect(mUi->holeEditorWidget, &HoleEditorWidget::diameterChanged, this,
+          [this](const PositiveLength& diameter) {
+            if (const std::shared_ptr<PadHole> hole =
+                    mHoles.value(mSelectedHoleIndex)) {
+              hole->setDiameter(diameter);
+              updateGeneralTabHoleWidgets();
+            }
+          });
+  connect(mUi->holeEditorWidget, &HoleEditorWidget::pathChanged, this,
+          [this](const NonEmptyPath& path) {
+            if (const std::shared_ptr<PadHole> hole =
+                    mHoles.value(mSelectedHoleIndex)) {
+              hole->setPath(path);
               updateGeneralTabHoleWidgets();
             }
           });
