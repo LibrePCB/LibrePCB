@@ -33,6 +33,56 @@ namespace librepcb {
  *  General Methods
  ******************************************************************************/
 
+bool ClipperHelpers::allPointsInside(const ClipperLib::Path& points,
+                                     const ClipperLib::Path& path) {
+  try {
+    for (const ClipperLib::IntPoint& p : points) {
+      if (ClipperLib::PointInPolygon(p, path) == 0) {
+        return false;
+      }
+    }
+    return true;
+  } catch (const std::exception& e) {
+    throw LogicError(
+        __FILE__, __LINE__,
+        QString("ClipperHelpers::allPointsInside() failed: %1").arg(e.what()));
+  }
+}
+
+bool ClipperHelpers::anyPointsInside(const ClipperLib::Path& points,
+                                     const ClipperLib::Path& path) {
+  try {
+    for (const ClipperLib::IntPoint& point : points) {
+      if (ClipperLib::PointInPolygon(point, path) > 0) {
+        return true;
+      }
+    }
+    return false;
+  } catch (const std::exception& e) {
+    throw LogicError(
+        __FILE__, __LINE__,
+        QString("ClipperHelpers::anyPointsInside() failed: %1").arg(e.what()));
+  }
+}
+
+bool ClipperHelpers::anyPointsInside(const ClipperLib::Paths& points,
+                                     const ClipperLib::Path& path) {
+  try {
+    for (const ClipperLib::Path& pointsPath : points) {
+      for (const ClipperLib::IntPoint& point : pointsPath) {
+        if (ClipperLib::PointInPolygon(point, path) > 0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  } catch (const std::exception& e) {
+    throw LogicError(
+        __FILE__, __LINE__,
+        QString("ClipperHelpers::anyPointsInside() failed: %1").arg(e.what()));
+  }
+}
+
 void ClipperHelpers::unite(ClipperLib::Paths& paths,
                            ClipperLib::PolyFillType fillType) {
   try {
@@ -325,6 +375,12 @@ ClipperLib::Path ClipperHelpers::convertHolesToCutIns(
   ClipperLib::Paths preparedHoles = prepareHoles(holes);
   for (const ClipperLib::Path& hole : preparedHoles) {
     addCutInToPath(path, hole);  // can throw
+  }
+  // Remove duplicates which might have been created by cut-ins.
+  for (std::size_t i = (path.size() - 1); i > 0; --i) {
+    if (path.at(i) == path.at(i - 1)) {
+      path.erase(path.begin() + i);
+    }
   }
   return path;
 }

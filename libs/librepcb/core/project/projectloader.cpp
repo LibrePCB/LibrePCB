@@ -741,6 +741,10 @@ void ProjectLoader::loadBoardPlane(Board& b, const SExpression& node) {
   plane->setPriority(deserialize<int>(node.getChild("priority/@0")));
   plane->setConnectStyle(
       deserialize<BI_Plane::ConnectStyle>(node.getChild("connect_style/@0")));
+  plane->setThermalGap(
+      deserialize<PositiveLength>(node.getChild("thermal_gap/@0")));
+  plane->setThermalSpokeWidth(
+      deserialize<PositiveLength>(node.getChild("thermal_spoke/@0")));
   b.addPlane(*plane);
 }
 

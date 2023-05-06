@@ -66,9 +66,9 @@ public:
 
   // Types
   enum class ConnectStyle {
-    None,  ///< do not connect pads/vias to plane
-    // Thermal,    ///< add thermals to connect pads/vias to plane
-    Solid,  ///< completely connect pads/vias to plane
+    None,  ///< Do not connect pads to plane
+    ThermalRelief,  ///< Add thermal spokes to connect pads to plane
+    Solid,  ///< Completely connect pads to plane
   };
 
   // Constructors / Destructor
@@ -89,9 +89,10 @@ public:
   bool getKeepOrphans() const noexcept { return mKeepOrphans; }
   int getPriority() const noexcept { return mPriority; }
   ConnectStyle getConnectStyle() const noexcept { return mConnectStyle; }
-  // const Length& getThermalGapWidth() const noexcept {return
-  // mThermalGapWidth;} const Length& getThermalSpokeWidth() const noexcept
-  // {return mThermalSpokeWidth;}
+  const PositiveLength& getThermalGap() const noexcept { return mThermalGap; }
+  const PositiveLength& getThermalSpokeWidth() const noexcept {
+    return mThermalSpokeWidth;
+  }
   const Path& getOutline() const noexcept { return mOutline; }
   const QVector<Path>& getFragments() const noexcept { return mFragments; }
   bool isLocked() const noexcept { return mLocked; }
@@ -104,6 +105,8 @@ public:
   void setMinWidth(const UnsignedLength& minWidth) noexcept;
   void setMinClearance(const UnsignedLength& minClearance) noexcept;
   void setConnectStyle(ConnectStyle style) noexcept;
+  void setThermalGap(const PositiveLength& gap) noexcept;
+  void setThermalSpokeWidth(const PositiveLength& width) noexcept;
   void setPriority(int priority) noexcept;
   void setKeepOrphans(bool keepOrphans) noexcept;
   void setLocked(bool locked) noexcept;
@@ -134,9 +137,8 @@ private:  // Data
   bool mKeepOrphans;
   int mPriority;
   ConnectStyle mConnectStyle;
-  // Length mThermalGapWidth;
-  // Length mThermalSpokeWidth;
-  // style [round square miter] ?
+  PositiveLength mThermalGap;
+  PositiveLength mThermalSpokeWidth;
   bool mLocked;
   bool mIsVisible;  // volatile, not saved to file
 

@@ -65,6 +65,8 @@ public:
   void setMinWidth(const UnsignedLength& minWidth) noexcept;
   void setMinClearance(const UnsignedLength& minClearance) noexcept;
   void setConnectStyle(BI_Plane::ConnectStyle style) noexcept;
+  void setThermalGap(const PositiveLength& gap) noexcept;
+  void setThermalSpokeWidth(const PositiveLength& width) noexcept;
   void setPriority(int priority) noexcept;
   void setKeepOrphans(bool keepOrphans) noexcept;
   void setLocked(bool locked) noexcept;
@@ -99,6 +101,10 @@ private:
   UnsignedLength mNewMinClearance;
   BI_Plane::ConnectStyle mOldConnectStyle;
   BI_Plane::ConnectStyle mNewConnectStyle;
+  PositiveLength mOldThermalGap;
+  PositiveLength mNewThermalGap;
+  PositiveLength mOldThermalSpokeWidth;
+  PositiveLength mNewThermalSpokeWidth;
   int mOldPriority;
   int mNewPriority;
   bool mOldKeepOrphans;

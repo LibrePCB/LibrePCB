@@ -282,6 +282,8 @@ bool CmdPasteBoardItems::performExecute() {
     copy->setKeepOrphans(plane.keepOrphans);
     copy->setPriority(plane.priority);
     copy->setConnectStyle(plane.connectStyle);
+    copy->setThermalGap(plane.thermalGap);
+    copy->setThermalSpokeWidth(plane.thermalSpokeWidth);
     copy->setLocked(plane.locked);
     execNewChildCmd(new CmdBoardPlaneAdd(*copy));
     if (auto item = mScene.getPlanes().value(copy)) {

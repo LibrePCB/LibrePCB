@@ -711,6 +711,10 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
     if (planeNode->getChild("connect_style/@0").getValue() == "none") {
       ++context.planeConnectNoneCount;
     }
+    planeNode->appendChild("thermal_gap",
+                           planeNode->getChild("min_clearance/@0"));
+    planeNode->appendChild("thermal_spoke",
+                           planeNode->getChild("min_width/@0"));
     planeNode->appendChild("lock", SExpression::createToken("false"));
   }
 }

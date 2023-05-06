@@ -210,6 +210,7 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
     Path path({Vertex(pos), Vertex(pos)});
     mCurrentPlane = new BI_Plane(*board, Uuid::createRandom(), *mLastLayer,
                                  *mLastNetSignal, path);
+    mCurrentPlane->setConnectStyle(BI_Plane::ConnectStyle::ThermalRelief);
     mContext.undoStack.appendToCmdGroup(new CmdBoardPlaneAdd(*mCurrentPlane));
 
     // Start undo command

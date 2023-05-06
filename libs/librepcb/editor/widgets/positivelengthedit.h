@@ -53,6 +53,8 @@ public:
 
   // Setters
   void setValue(const PositiveLength& value) noexcept;
+  void clipToMinimum(const PositiveLength& value) noexcept;
+  void clipToMaximum(const PositiveLength& value) noexcept;
 
   // Operator Overloadings
   PositiveLengthEdit& operator=(const PositiveLengthEdit& rhs) = delete;

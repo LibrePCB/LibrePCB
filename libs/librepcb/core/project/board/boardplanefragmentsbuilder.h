@@ -126,6 +126,8 @@ private:  // Methods
     bool keepOrphans;
     int priority;
     BI_Plane::ConnectStyle connectStyle;
+    PositiveLength thermalGap;
+    PositiveLength thermalSpokeWidth;
   };
 
   struct PolygonData {
@@ -169,6 +171,8 @@ private:  // Methods
                                      const QSet<const Layer*>* filter) noexcept;
   std::shared_ptr<JobData> run(std::shared_ptr<JobData> data,
                                bool exceptionOnError);
+  static QVector<std::pair<Point, Angle>> determineThermalSpokes(
+      const PadGeometry& geometry) noexcept;
   bool applyToBoard(std::shared_ptr<JobData> data) noexcept;
 
   /**
