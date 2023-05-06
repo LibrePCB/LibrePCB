@@ -75,7 +75,7 @@ TEST(BoardPlaneFragmentsBuilderTest, testFragments) {
 
   // force planes rebuild
   BoardPlaneFragmentsBuilder builder;
-  builder.runSynchronously(*board);
+  builder.runSynchronously(*board);  // can throw
 
   // determine actual plane fragments
   QMap<Uuid, QVector<Path>> actualPlaneFragments;

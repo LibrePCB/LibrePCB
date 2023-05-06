@@ -70,11 +70,10 @@ public:
    *                If `nullptr` (default), rebuild all planes (more reliable,
    *                but slower).
    *
-   * @retval true if *all* planes of the board were successfully built.
-   * @retval false if only parts (or none) of the planes were built.
+   * @throws Exception if any error occurred.
    */
-  bool runSynchronously(Board& board,
-                        const QSet<const Layer*>* layers = nullptr) noexcept;
+  void runSynchronously(Board& board,
+                        const QSet<const Layer*>* layers = nullptr);
 
   /**
    * @brief Start building plane fragments asynchronously
@@ -168,8 +167,9 @@ private:  // Methods
 
   std::shared_ptr<JobData> createJob(Board& board,
                                      const QSet<const Layer*>* filter) noexcept;
-  std::shared_ptr<JobData> run(std::shared_ptr<JobData> data) noexcept;
-  bool applyToBoard(std::shared_ptr<JobData> data);
+  std::shared_ptr<JobData> run(std::shared_ptr<JobData> data,
+                               bool exceptionOnError);
+  bool applyToBoard(std::shared_ptr<JobData> data) noexcept;
 
   /**
    * Returns the maximum allowed arc tolerance when flattening arcs. Do not

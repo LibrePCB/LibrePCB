@@ -73,13 +73,14 @@ BoardPlaneFragmentsBuilder::~BoardPlaneFragmentsBuilder() noexcept {
  *  General Methods
  ******************************************************************************/
 
-bool BoardPlaneFragmentsBuilder::runSynchronously(
-    Board& board, const QSet<const Layer*>* layers) noexcept {
+void BoardPlaneFragmentsBuilder::runSynchronously(
+    Board& board, const QSet<const Layer*>* layers) {
   if (auto data = createJob(board, layers)) {
     cancel();
-    return applyToBoard(run(data));
-  } else {
-    return false;
+    if (!applyToBoard(run(data, true))) {  // can throw
+      throw LogicError(__FILE__, __LINE__,
+                       "Building planes did not complete?!");
+    }
   }
 }
 
@@ -87,7 +88,8 @@ bool BoardPlaneFragmentsBuilder::startAsynchronously(
     Board& board, const QSet<const Layer*>* layers) noexcept {
   if (auto data = createJob(board, layers)) {
     cancel();
-    mFuture = QtConcurrent::run(this, &BoardPlaneFragmentsBuilder::run, data);
+    mFuture =
+        QtConcurrent::run(this, &BoardPlaneFragmentsBuilder::run, data, false);
     mWatcher.setFuture(mFuture);
     return true;
   } else {
@@ -228,7 +230,8 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
 }
 
 std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
-    BoardPlaneFragmentsBuilder::run(std::shared_ptr<JobData> data) noexcept {
+    BoardPlaneFragmentsBuilder::run(std::shared_ptr<JobData> data,
+                                    bool exceptionOnError) {
   // Note: This method is called from a different thread, thus be careful with
   //       calling other methods to only call thread-safe methods!
 
@@ -514,6 +517,9 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
     } catch (const Exception& e) {
       qCritical() << "Failed to calculate plane areas, leaving empty:"
                   << e.getMsg();
+      if (exceptionOnError) {
+        throw;
+      }
     }
   }
 
@@ -529,7 +535,8 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   return data;
 }
 
-bool BoardPlaneFragmentsBuilder::applyToBoard(std::shared_ptr<JobData> data) {
+bool BoardPlaneFragmentsBuilder::applyToBoard(
+    std::shared_ptr<JobData> data) noexcept {
   if (data->board) {
     for (auto it = data->result.begin(); it != data->result.end(); it++) {
       if (BI_Plane* plane = data->board->getPlanes().value(it.key())) {
@@ -545,7 +552,7 @@ bool BoardPlaneFragmentsBuilder::applyToBoard(std::shared_ptr<JobData> data) {
     if (mRebuildAirWires) {
       data->board->forceAirWiresRebuild();
     }
-    return data->result.keys() == data->board->getPlanes().keys();
+    return data->finished;
   }
   return false;
 }

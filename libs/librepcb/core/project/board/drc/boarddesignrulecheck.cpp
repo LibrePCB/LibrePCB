@@ -131,7 +131,7 @@ void BoardDesignRuleCheck::execute(bool quick) {
 void BoardDesignRuleCheck::rebuildPlanes(int progressEnd) {
   emitStatus(tr("Rebuild planes..."));
   BoardPlaneFragmentsBuilder builder;
-  builder.runSynchronously(mBoard);
+  builder.runSynchronously(mBoard);  // can throw
   emitProgress(progressEnd);
 }
 

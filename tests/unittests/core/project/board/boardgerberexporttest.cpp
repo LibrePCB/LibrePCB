@@ -79,7 +79,7 @@ TEST(BoardGerberExportTest, test) {
 
   // force planes rebuild
   BoardPlaneFragmentsBuilder builder;
-  builder.runSynchronously(*board);
+  builder.runSynchronously(*board);  // can throw
 
   // export fabrication data
   BoardFabricationOutputSettings config = board->getFabricationOutputSettings();

@@ -187,7 +187,7 @@ void FabricationOutputDialog::btnGenerateClicked() {
 
     // rebuild planes because they may be outdated!
     BoardPlaneFragmentsBuilder builder;
-    builder.runSynchronously(mBoard);
+    builder.runSynchronously(mBoard);  // can throw
 
     // update fabrication output settings if modified
     BoardFabricationOutputSettings s = mBoard.getFabricationOutputSettings();
