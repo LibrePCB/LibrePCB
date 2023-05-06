@@ -87,6 +87,8 @@ BI_FootprintPad::BI_FootprintPad(BI_Device& device, const Uuid& padUuid)
   mDevice.onEdited.attach(mOnDeviceEditedSlot);
   connect(&mBoard, &Board::designRulesModified, this,
           &BI_FootprintPad::updateGeometries);
+  connect(&mBoard, &Board::innerLayerCountChanged, this,
+          &BI_FootprintPad::updateGeometries);
 }
 
 BI_FootprintPad::~BI_FootprintPad() {
