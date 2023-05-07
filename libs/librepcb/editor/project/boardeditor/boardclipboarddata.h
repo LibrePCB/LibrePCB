@@ -189,6 +189,8 @@ public:
     bool keepOrphans;
     int priority;
     BI_Plane::ConnectStyle connectStyle;
+    PositiveLength thermalGap;
+    PositiveLength thermalSpokeWidth;
     bool locked;
     Signal<Plane> onEdited;  ///< Dummy event, not used
 
@@ -196,7 +198,8 @@ public:
           const CircuitIdentifier& netSignalName, const Path& outline,
           const UnsignedLength& minWidth, const UnsignedLength& minClearance,
           bool keepOrphans, int priority, BI_Plane::ConnectStyle connectStyle,
-          bool locked)
+          const PositiveLength& thermalGap,
+          const PositiveLength& thermalSpokeWidth, bool locked)
       : uuid(uuid),
         layer(&layer),
         netSignalName(netSignalName),
@@ -206,6 +209,8 @@ public:
         keepOrphans(keepOrphans),
         priority(priority),
         connectStyle(connectStyle),
+        thermalGap(thermalGap),
+        thermalSpokeWidth(thermalSpokeWidth),
         locked(locked),
         onEdited(*this) {}
 
@@ -221,6 +226,10 @@ public:
         priority(deserialize<int>(node.getChild("priority/@0"))),
         connectStyle(deserialize<BI_Plane::ConnectStyle>(
             node.getChild("connect_style/@0"))),
+        thermalGap(
+            deserialize<PositiveLength>(node.getChild("thermal_gap/@0"))),
+        thermalSpokeWidth(
+            deserialize<PositiveLength>(node.getChild("thermal_spoke/@0"))),
         locked(deserialize<bool>(node.getChild("lock/@0"))),
         onEdited(*this) {}
 
@@ -233,9 +242,11 @@ public:
       root.ensureLineBreak();
       root.appendChild("min_width", minWidth);
       root.appendChild("min_clearance", minClearance);
-      root.appendChild("keep_orphans", keepOrphans);
+      root.appendChild("thermal_gap", thermalGap);
+      root.appendChild("thermal_spoke", thermalSpokeWidth);
       root.ensureLineBreak();
       root.appendChild("connect_style", connectStyle);
+      root.appendChild("keep_orphans", keepOrphans);
       root.appendChild("lock", locked);
       root.ensureLineBreak();
       outline.serialize(root);
@@ -247,7 +258,10 @@ public:
           (netSignalName != rhs.netSignalName) || (outline != rhs.outline) ||
           (minWidth != rhs.minWidth) || (minClearance != rhs.minClearance) ||
           (keepOrphans != rhs.keepOrphans) || (priority != rhs.priority) ||
-          (connectStyle != rhs.connectStyle) || (locked != rhs.locked);
+          (connectStyle != rhs.connectStyle) ||
+          (thermalGap != rhs.thermalGap) ||
+          (thermalSpokeWidth != rhs.thermalSpokeWidth) ||
+          (locked != rhs.locked);
     }
   };
 

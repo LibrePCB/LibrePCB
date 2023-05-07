@@ -52,6 +52,12 @@ public:
   ~ClipperHelpers() = delete;
 
   // General Methods
+  static bool allPointsInside(const ClipperLib::Path& points,
+                              const ClipperLib::Path& path);
+  static bool anyPointsInside(const ClipperLib::Path& points,
+                              const ClipperLib::Path& path);
+  static bool anyPointsInside(const ClipperLib::Paths& points,
+                              const ClipperLib::Path& path);
   static void unite(ClipperLib::Paths& paths,
                     ClipperLib::PolyFillType fillType);
   static void unite(ClipperLib::Paths& subject, const ClipperLib::Paths& clip,

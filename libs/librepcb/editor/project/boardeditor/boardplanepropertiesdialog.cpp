@@ -60,6 +60,11 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
                               settingsPrefix % "/min_width");
   mUi->edtMinClearance->configure(lengthUnit, LengthEditBase::Steps::generic(),
                                   settingsPrefix % "/min_clearance");
+  mUi->edtThermalGap->configure(lengthUnit, LengthEditBase::Steps::generic(),
+                                settingsPrefix % "/thermal_gap");
+  mUi->edtThermalSpokeWidth->configure(lengthUnit,
+                                       LengthEditBase::Steps::generic(),
+                                       settingsPrefix % "/thermal_spoke");
   mUi->pathEditorWidget->setLengthUnit(lengthUnit);
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardPlanePropertiesDialog::buttonBoxClicked);
@@ -94,11 +99,16 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
   mUi->cbxConnectStyle->addItem(tr("None"),
                                 static_cast<int>(BI_Plane::ConnectStyle::None));
   mUi->cbxConnectStyle->addItem(
+      tr("Thermal Relief"),
+      static_cast<int>(BI_Plane::ConnectStyle::ThermalRelief));
+  mUi->cbxConnectStyle->addItem(
       tr("Solid"), static_cast<int>(BI_Plane::ConnectStyle::Solid));
-  // mUi->cbxConnectStyle->addItem(tr("Thermals"),
-  // static_cast<int>(BI_Plane::ConnectStyle::Thermal));
   mUi->cbxConnectStyle->setCurrentIndex(mUi->cbxConnectStyle->findData(
       static_cast<int>(mPlane.getConnectStyle())));
+
+  // thermal gap/width spinbox
+  mUi->edtThermalGap->setValue(mPlane.getThermalGap());
+  mUi->edtThermalSpokeWidth->setValue(mPlane.getThermalSpokeWidth());
 
   // priority spinbox
   mUi->spbPriority->setValue(mPlane.getPriority());
@@ -109,6 +119,18 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
 
   // vertices
   mUi->pathEditorWidget->setPath(mPlane.getOutline());
+
+  // Make sure the thermal spoke width is >= minimum plane width.
+  connect(mUi->edtMinWidth, &UnsignedLengthEdit::valueChanged, this,
+          [this](const UnsignedLength& value) {
+            if (value > 0) {
+              mUi->edtThermalSpokeWidth->clipToMinimum(PositiveLength(*value));
+            }
+          });
+  connect(mUi->edtThermalSpokeWidth, &PositiveLengthEdit::valueChanged, this,
+          [this](const PositiveLength& value) {
+            mUi->edtMinWidth->clipToMaximum(positiveToUnsigned(value));
+          });
 }
 
 BoardPlanePropertiesDialog::~BoardPlanePropertiesDialog() noexcept {
@@ -168,6 +190,10 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
     // connect style
     cmd->setConnectStyle(static_cast<BI_Plane::ConnectStyle>(
         mUi->cbxConnectStyle->currentData().toInt()));
+
+    // thermal gap & spoke width spinbox
+    cmd->setThermalGap(mUi->edtThermalGap->getValue());
+    cmd->setThermalSpokeWidth(mUi->edtThermalSpokeWidth->getValue());
 
     // priority
     cmd->setPriority(mUi->spbPriority->value());

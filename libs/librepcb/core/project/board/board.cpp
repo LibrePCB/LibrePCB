@@ -608,6 +608,8 @@ void Board::copyFrom(const Board& other) {
     copy->setKeepOrphans(plane->getKeepOrphans());
     copy->setPriority(plane->getPriority());
     copy->setConnectStyle(plane->getConnectStyle());
+    copy->setThermalGap(plane->getThermalGap());
+    copy->setThermalSpokeWidth(plane->getThermalSpokeWidth());
     copy->setLocked(plane->isLocked());
     copy->setVisible(plane->isVisible());
     copy->setCalculatedFragments(plane->getFragments());

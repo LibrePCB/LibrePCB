@@ -184,7 +184,8 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
           plane->getUuid(), &plane->getLayer(), plane->getNetSignal().getUuid(),
           plane->getOutline(), plane->getMinWidth(), plane->getMinClearance(),
           plane->getKeepOrphans(), plane->getPriority(),
-          plane->getConnectStyle()});
+          plane->getConnectStyle(), plane->getThermalGap(),
+          plane->getThermalSpokeWidth()});
     }
   }
   foreach (const BI_Polygon* polygon, board.getPolygons()) {
@@ -285,6 +286,25 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
     try {
       ClipperLib::Paths removedAreas;
       ClipperLib::Paths connectedNetSignalAreas;
+
+      // Start with board outline shrinked by the given clearance.
+      ClipperLib::Paths fragments = boardArea;
+      ClipperHelpers::offset(fragments, -it->minClearance,
+                             maxArcTolerance());  // can throw
+      if (mAbort) {
+        break;
+      }
+
+      // Clip to plane outline.
+      const ClipperLib::Path planeOutline = ClipperHelpers::convert(
+          it->outline.toClosedPath(), maxArcTolerance());
+      ClipperHelpers::intersect(fragments, {planeOutline},
+                                ClipperLib::pftEvenOdd,
+                                ClipperLib::pftEvenOdd);  // can throw
+      const ClipperLib::Paths fullPlaneArea = fragments;
+      if (mAbort) {
+        break;
+      }
 
       // Collect other planes.
       for (auto otherIt = data->planes.begin(); otherIt != it; otherIt++) {
@@ -395,6 +415,9 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       }
 
       // Collect pads.
+      ClipperLib::Paths thermalPadAreas;
+      ClipperLib::Paths thermalPadAreasShrinked;
+      ClipperLib::Paths thermalPadClearanceAreas;
       foreach (const PadData& pad, data->pads) {
         const bool sameNet = (pad.netSignal == it->netSignal);
         foreach (const PadGeometry& geometry, pad.geometries.value(it->layer)) {
@@ -409,48 +432,97 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
                                            clipperPaths.end());
           }
           if ((!sameNet) ||
-              (it->connectStyle == BI_Plane::ConnectStyle::None)) {
-            // Different net signal -> subtract with clearance.
-            const Length clearance =
-                std::max(*it->minClearance, *pad.clearance);
+              (it->connectStyle != BI_Plane::ConnectStyle::Solid)) {
+            // Determine required clearance. For connection style 'none' for
+            // pads of the same net, use the thermal gap clearance since usually
+            // it is smaller than the planes clearance, so it leads to a higher
+            // plane area.
+            const Length clearance = std::max(
+                sameNet ? *it->thermalGap : *it->minClearance, *pad.clearance);
             QVector<Path> paths =
                 pad.transform.map(geometry.withOffset(clearance).toOutlines());
             ClipperLib::Paths clipperPaths =
                 ClipperHelpers::convert(paths, maxArcTolerance());
+
+            // For thermal relief connection, subtract the spokes from the
+            // cutout.
+            if (sameNet &&
+                (it->connectStyle == BI_Plane::ConnectStyle::ThermalRelief) &&
+                ClipperHelpers::anyPointsInside(clipperPaths, planeOutline)) {
+              // Note: Make spokes *slightly* thicker to avoid them to be
+              // removed due to numerical inaccuary of minimum width procedure.
+              const PositiveLength spokeWidth(it->thermalSpokeWidth + 10);
+              const Length spokeLength(100000000);  // Maximum spoke length.
+              foreach (const auto& spokeConfig,
+                       determineThermalSpokes(geometry)) {
+                const Point p1 =
+                    spokeConfig.first.rotated(pad.transform.getRotation()) +
+                    pad.transform.getPosition();
+                const Point p2 =
+                    (Point(spokeLength, 0).rotated(spokeConfig.second) +
+                     spokeConfig.first)
+                        .rotated(pad.transform.getRotation()) +
+                    pad.transform.getPosition();
+                const ClipperLib::Paths spokePaths{ClipperHelpers::convert(
+                    Path::obround(p1, p2, spokeWidth), maxArcTolerance())};
+                ClipperHelpers::subtract(clipperPaths, spokePaths,
+                                         ClipperLib::pftEvenOdd,
+                                         ClipperLib::pftNonZero);  // can throw
+              }
+              // Memorize copper area for later removal of unconnected
+              // thermal spokes,
+              ClipperLib::Paths tmp = ClipperHelpers::convert(
+                  pad.transform.map(geometry.toOutlines()), maxArcTolerance());
+              if (tmp.size() > 1) {
+                ClipperHelpers::unite(tmp,
+                                      ClipperLib::pftNonZero);  // can throw
+              }
+              thermalPadAreas.insert(thermalPadAreas.end(), tmp.begin(),
+                                     tmp.end());
+              // Memorize clearance area for later removal of unconnected
+              // thermal spokes,
+              Length offset = clearance + it->minWidth - maxArcTolerance() - 10;
+              tmp = ClipperHelpers::convert(
+                  pad.transform.map(geometry.withOffset(offset).toOutlines()),
+                  maxArcTolerance());
+              if (tmp.size() > 1) {
+                ClipperHelpers::unite(tmp,
+                                      ClipperLib::pftNonZero);  // can throw
+              }
+              thermalPadClearanceAreas.insert(thermalPadClearanceAreas.end(),
+                                              tmp.begin(), tmp.end());
+              // Memorize slightly shrinked copper area for later removal of
+              // unconnected thermal spokes,
+              offset = -maxArcTolerance() - 10;
+              tmp = ClipperHelpers::convert(
+                  pad.transform.map(geometry.withOffset(offset).toOutlines()),
+                  maxArcTolerance());
+              thermalPadAreasShrinked.insert(thermalPadAreasShrinked.end(),
+                                             tmp.begin(), tmp.end());
+            }
             removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
                                 clipperPaths.end());
+
             // Also create cut-outs for each hole to ensure correct clearance
             // even if the pad outline is too small or invalid.
-            for (const PadHole& hole : geometry.getHoles()) {
-              const PositiveLength width(hole.getDiameter() + (clearance * 2));
-              paths =
-                  pad.transform.map(hole.getPath()->toOutlineStrokes(width));
-              clipperPaths = ClipperHelpers::convert(paths, maxArcTolerance());
-              removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
-                                  clipperPaths.end());
+            if (!sameNet) {
+              for (const PadHole& hole : geometry.getHoles()) {
+                const PositiveLength width(hole.getDiameter() +
+                                           (clearance * 2));
+                paths =
+                    pad.transform.map(hole.getPath()->toOutlineStrokes(width));
+                clipperPaths =
+                    ClipperHelpers::convert(paths, maxArcTolerance());
+                removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
+                                    clipperPaths.end());
+              }
             }
           }
         }
+        if (mAbort) {
+          break;
+        }
       }
-      if (mAbort) {
-        break;
-      }
-
-      // Start with plane outline.
-      ClipperLib::Paths fragments;
-      fragments.push_back(ClipperHelpers::convert(it->outline.toClosedPath(),
-                                                  maxArcTolerance()));
-      if (mAbort) {
-        break;
-      }
-
-      // Clip to board area with the given clearance.
-      ClipperLib::Paths boardAreaWithClearance = boardArea;
-      ClipperHelpers::offset(boardAreaWithClearance, -it->minClearance,
-                             maxArcTolerance());  // can throw
-      ClipperHelpers::intersect(fragments, boardAreaWithClearance,
-                                ClipperLib::pftEvenOdd,
-                                ClipperLib::pftEvenOdd);  // can throw
       if (mAbort) {
         break;
       }
@@ -462,13 +534,67 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
         break;
       }
 
-      // Ensure minimum width and flatten paths (convert holes to cut-ins).
-      const Length minWidthOffset = it->minWidth / 2;
-      ClipperHelpers::offset(fragments, -minWidthOffset,
-                             maxArcTolerance());  // can throw
+      // Ensure minimum width. Reduce minWidth by 1nm to ensure plane areas
+      // do not disappear between two objects with a distance of *exactly*
+      // 2*minClearance+minWidth (e.g. two 0.5mm traces on a 1.0mm grid).
+      const Length minWidthOffset = (it->minWidth / 2) - 1;
+      if (minWidthOffset > 0) {
+        ClipperHelpers::offset(fragments, -minWidthOffset,
+                               maxArcTolerance());  // can throw
+        ClipperHelpers::offset(fragments, minWidthOffset,
+                               maxArcTolerance());  // can throw
+      }
+      if (mAbort) {
+        break;
+      }
+
+      // Split thermal spokes and flatten result for detecting unconnected
+      // thermal spokes.
       std::unique_ptr<ClipperLib::PolyTree> tree =
-          ClipperHelpers::offsetToTree(fragments, minWidthOffset,
-                                       maxArcTolerance());  // can throw
+          ClipperHelpers::subtractToTree(fragments, thermalPadAreasShrinked,
+                                         ClipperLib::pftEvenOdd,
+                                         ClipperLib::pftNonZero);  // can throw
+      fragments = ClipperHelpers::flattenTree(*tree);  // can throw
+      if (mAbort) {
+        break;
+      }
+
+      // Remove unconnected thermal spokes.
+      if (thermalPadAreas.size() != thermalPadClearanceAreas.size()) {
+        throw LogicError(
+            __FILE__, __LINE__,
+            "Thermal pads inconsistency, please open a bug report.");
+      }
+      auto isUnconnectedSpoke = [&](const ClipperLib::Path& fragment) {
+        tl::optional<std::size_t> padIndex;
+        for (std::size_t i = 0; i < thermalPadAreas.size(); ++i) {
+          if (ClipperHelpers::anyPointsInside(fragment,
+                                              thermalPadAreas.at(i))) {
+            if (padIndex) {
+              return false;
+            } else {
+              padIndex = i;
+            }
+          }
+        }
+        return padIndex &&
+            ClipperHelpers::allPointsInside(
+                   fragment, thermalPadClearanceAreas.at(*padIndex));
+      };
+      fragments.erase(std::remove_if(fragments.begin(), fragments.end(),
+                                     isUnconnectedSpoke),
+                      fragments.end());
+      if (mAbort) {
+        break;
+      }
+
+      // Fill thermal pads.
+      ClipperHelpers::intersect(thermalPadAreas, fullPlaneArea,
+                                ClipperLib::pftNonZero,
+                                ClipperLib::pftEvenOdd);  // can throw
+      tree = ClipperHelpers::uniteToTree(fragments, thermalPadAreas,
+                                         ClipperLib::pftEvenOdd,
+                                         ClipperLib::pftNonZero);  // can throw
       fragments = ClipperHelpers::flattenTree(*tree);  // can throw
       if (mAbort) {
         break;
@@ -476,17 +602,15 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
 
       // If requested, remove unconnected fragments (orphans).
       if (!it->keepOrphans) {
+        auto isOrphan = [&](const ClipperLib::Path& p) {
+          ClipperLib::Paths intersections{p};
+          ClipperHelpers::intersect(intersections, connectedNetSignalAreas,
+                                    ClipperLib::pftNonZero,
+                                    ClipperLib::pftNonZero);  // can throw
+          return intersections.empty();
+        };
         fragments.erase(
-            std::remove_if(
-                fragments.begin(), fragments.end(),
-                [&connectedNetSignalAreas](const ClipperLib::Path& p) {
-                  ClipperLib::Paths intersections{p};
-                  ClipperHelpers::intersect(
-                      intersections, connectedNetSignalAreas,
-                      ClipperLib::pftNonZero,
-                      ClipperLib::pftNonZero);  // can throw
-                  return intersections.empty();
-                }),
+            std::remove_if(fragments.begin(), fragments.end(), isOrphan),
             fragments.end());
       }
       if (mAbort) {
@@ -533,6 +657,73 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
 
   emit finished();
   return data;
+}
+
+QVector<std::pair<Point, Angle>>
+    BoardPlaneFragmentsBuilder::determineThermalSpokes(
+        const PadGeometry& geometry) noexcept {
+  // For circular pads, rotate spokes by 45° since this often allows to
+  // add more spokes if several pads are placed in a row.
+  const bool isCircularRound =
+      ((geometry.getShape() == PadGeometry::Shape::RoundedRect) ||
+       (geometry.getShape() == PadGeometry::Shape::RoundedOctagon)) &&
+      (geometry.getWidth() == geometry.getHeight()) &&
+      (geometry.getCornerRadius() >= (geometry.getWidth() / 2));
+  const bool isCircularStroke =
+      (geometry.getShape() == PadGeometry::Shape::Stroke) &&
+      (geometry.getPath().getVertices().count() == 1);
+  if (isCircularRound || isCircularStroke) {
+    const Point center = isCircularStroke
+        ? geometry.getPath().getVertices().first().getPos()
+        : Point(0, 0);
+    return {
+        std::make_pair(center, Angle::deg45()),
+        std::make_pair(center, Angle::deg135()),
+        std::make_pair(center, Angle::deg225()),
+        std::make_pair(center, Angle::deg315()),
+    };
+  }
+
+  // For any shape other than a complex stroke, add horizontal and vertical
+  // spokes.
+  const bool isCenteredShape =
+      (geometry.getShape() != PadGeometry::Shape::Stroke);
+  const bool isObroundStroke =
+      ((geometry.getShape() == PadGeometry::Shape::Stroke) &&
+       (geometry.getPath().getVertices().count() == 2) &&
+       (geometry.getPath().getVertices().first().getAngle() == Angle::deg0()));
+  if (isCenteredShape || isObroundStroke) {
+    Point center(0, 0);
+    Angle angle(0);
+    if (isObroundStroke) {
+      const Point p1 = geometry.getPath().getVertices().first().getPos();
+      const Point p2 = geometry.getPath().getVertices().last().getPos();
+      center = (p1 + p2) / 2;
+      angle = Toolbox::angleBetweenPoints(p1, p2);
+    }
+    return {
+        std::make_pair(center, angle),
+        std::make_pair(center, angle + Angle::deg90()),
+        std::make_pair(center, angle + Angle::deg180()),
+        std::make_pair(center, angle + Angle::deg270()),
+    };
+  }
+
+  // For complex strokes, add two 45° spokes on each end.
+  if (geometry.getPath().getVertices().count() > 1) {
+    const Point p1 = geometry.getPath().getVertices().first().getPos();
+    const Point p2 = geometry.getPath().getVertices().last().getPos();
+    const Angle angle = Toolbox::angleBetweenPoints(p1, p2);
+    return {
+        std::make_pair(p1, angle + Angle::deg135()),
+        std::make_pair(p1, angle - Angle::deg135()),
+        std::make_pair(p2, angle + Angle::deg45()),
+        std::make_pair(p2, angle - Angle::deg45()),
+    };
+  }
+
+  // For invalid strokes, add no spokes at all.
+  return {};
 }
 
 bool BoardPlaneFragmentsBuilder::applyToBoard(

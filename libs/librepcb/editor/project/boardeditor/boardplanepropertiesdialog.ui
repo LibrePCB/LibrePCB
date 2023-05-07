@@ -73,7 +73,7 @@
      <item row="5" column="1">
       <widget class="QComboBox" name="cbxConnectStyle"/>
      </item>
-     <item row="6" column="0">
+     <item row="8" column="0">
       <widget class="QLabel" name="label_6">
        <property name="text">
         <string>Options:</string>
@@ -86,7 +86,7 @@
      <item row="3" column="1">
       <widget class="librepcb::editor::UnsignedLengthEdit" name="edtMinClearance" native="true"/>
      </item>
-     <item row="6" column="1">
+     <item row="8" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QCheckBox" name="cbKeepOrphans">
@@ -103,6 +103,32 @@
         </widget>
        </item>
       </layout>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_8">
+       <property name="toolTip">
+        <string>Clearance around thermal pads</string>
+       </property>
+       <property name="text">
+        <string>Themal Gap:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="toolTip">
+        <string>Width of the thermal pad spokes</string>
+       </property>
+       <property name="text">
+        <string>Thermal Spokes:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="librepcb::editor::PositiveLengthEdit" name="edtThermalGap" native="true"/>
+     </item>
+     <item row="7" column="1">
+      <widget class="librepcb::editor::PositiveLengthEdit" name="edtThermalSpokeWidth" native="true"/>
      </item>
     </layout>
    </item>
@@ -141,6 +167,12 @@
    <header location="global">librepcb/editor/widgets/patheditorwidget.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>librepcb::editor::PositiveLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>cbxNetSignal</tabstop>
@@ -149,6 +181,8 @@
   <tabstop>edtMinClearance</tabstop>
   <tabstop>spbPriority</tabstop>
   <tabstop>cbxConnectStyle</tabstop>
+  <tabstop>edtThermalGap</tabstop>
+  <tabstop>edtThermalSpokeWidth</tabstop>
   <tabstop>cbxLock</tabstop>
   <tabstop>pathEditorWidget</tabstop>
  </tabstops>

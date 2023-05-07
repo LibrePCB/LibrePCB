@@ -61,6 +61,18 @@ void PositiveLengthEdit::setValue(const PositiveLength& value) noexcept {
   setValueImpl(*value);
 }
 
+void PositiveLengthEdit::clipToMinimum(const PositiveLength& value) noexcept {
+  if (mValue < *value) {
+    setValueImpl(*value);
+  }
+}
+
+void PositiveLengthEdit::clipToMaximum(const PositiveLength& value) noexcept {
+  if (mValue > *value) {
+    setValueImpl(*value);
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

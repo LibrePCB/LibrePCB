@@ -52,8 +52,9 @@ BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
     mMinClearance(300000),
     mKeepOrphans(false),
     mPriority(0),
-    mConnectStyle(ConnectStyle::Solid),
-    // mThermalGapWidth(100000), mThermalSpokeWidth(100000),
+    mConnectStyle(ConnectStyle::ThermalRelief),
+    mThermalGap(300000),
+    mThermalSpokeWidth(300000),
     mLocked(false),
     mIsVisible(true),
     mFragments() {
@@ -116,6 +117,20 @@ void BI_Plane::setMinClearance(const UnsignedLength& minClearance) noexcept {
 void BI_Plane::setConnectStyle(BI_Plane::ConnectStyle style) noexcept {
   if (style != mConnectStyle) {
     mConnectStyle = style;
+    mBoard.invalidatePlanes(mLayer);
+  }
+}
+
+void BI_Plane::setThermalGap(const PositiveLength& gap) noexcept {
+  if (gap != mThermalGap) {
+    mThermalGap = gap;
+    mBoard.invalidatePlanes(mLayer);
+  }
+}
+
+void BI_Plane::setThermalSpokeWidth(const PositiveLength& width) noexcept {
+  if (width != mThermalSpokeWidth) {
+    mThermalSpokeWidth = width;
     mBoard.invalidatePlanes(mLayer);
   }
 }
@@ -189,9 +204,11 @@ void BI_Plane::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("min_width", mMinWidth);
   root.appendChild("min_clearance", mMinClearance);
-  root.appendChild("keep_orphans", mKeepOrphans);
+  root.appendChild("thermal_gap", mThermalGap);
+  root.appendChild("thermal_spoke", mThermalSpokeWidth);
   root.ensureLineBreak();
   root.appendChild("connect_style", mConnectStyle);
+  root.appendChild("keep_orphans", mKeepOrphans);
   root.appendChild("lock", mLocked);
   root.ensureLineBreak();
   mOutline.serialize(root);
@@ -207,6 +224,8 @@ SExpression serialize(const BI_Plane::ConnectStyle& obj) {
   switch (obj) {
     case BI_Plane::ConnectStyle::None:
       return SExpression::createToken("none");
+    case BI_Plane::ConnectStyle::ThermalRelief:
+      return SExpression::createToken("thermal");
     case BI_Plane::ConnectStyle::Solid:
       return SExpression::createToken("solid");
     default:
@@ -219,6 +238,8 @@ BI_Plane::ConnectStyle deserialize(const SExpression& node) {
   const QString str = node.getValue();
   if (str == "none") {
     return BI_Plane::ConnectStyle::None;
+  } else if (str == "thermal") {
+    return BI_Plane::ConnectStyle::ThermalRelief;
   } else if (str == "solid") {
     return BI_Plane::ConnectStyle::Solid;
   } else {

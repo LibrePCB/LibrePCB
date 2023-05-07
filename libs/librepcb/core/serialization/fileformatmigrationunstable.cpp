@@ -126,8 +126,11 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  for (SExpression* devNode : root.getChildren("device")) {
-    devNode->getChild("mirror").setName("flip");
+  for (SExpression* planeNode : root.getChildren("plane")) {
+    planeNode->appendChild("thermal_gap",
+                           planeNode->getChild("min_clearance/@0"));
+    planeNode->appendChild("thermal_spoke",
+                           planeNode->getChild("min_width/@0"));
   }
 }
 

@@ -189,6 +189,16 @@ public:
                         const Point& center = Point(0, 0)) noexcept;
 
   /**
+   * @brief Calculate the angle between two points
+   *
+   * @param p1      First point.
+   * @param p2      Second point.
+   * @return Angle counter-clockwise from p1 to p2 (0..360°).
+   *         Zero if it could not be determined.
+   */
+  static Angle angleBetweenPoints(const Point& p1, const Point& p2) noexcept;
+
+  /**
    * @brief Calculate the point on a given line which is nearest to a given
    * point
    *
