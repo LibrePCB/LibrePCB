@@ -186,7 +186,7 @@ public:
     Path outline;
     UnsignedLength minWidth;
     UnsignedLength minClearance;
-    bool keepOrphans;
+    bool keepIslands;
     int priority;
     BI_Plane::ConnectStyle connectStyle;
     PositiveLength thermalGap;
@@ -197,7 +197,7 @@ public:
     Plane(const Uuid& uuid, const Layer& layer,
           const CircuitIdentifier& netSignalName, const Path& outline,
           const UnsignedLength& minWidth, const UnsignedLength& minClearance,
-          bool keepOrphans, int priority, BI_Plane::ConnectStyle connectStyle,
+          bool keepIslands, int priority, BI_Plane::ConnectStyle connectStyle,
           const PositiveLength& thermalGap,
           const PositiveLength& thermalSpokeWidth, bool locked)
       : uuid(uuid),
@@ -206,7 +206,7 @@ public:
         outline(outline),
         minWidth(minWidth),
         minClearance(minClearance),
-        keepOrphans(keepOrphans),
+        keepIslands(keepIslands),
         priority(priority),
         connectStyle(connectStyle),
         thermalGap(thermalGap),
@@ -222,7 +222,7 @@ public:
         minWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"))),
         minClearance(
             deserialize<UnsignedLength>(node.getChild("min_clearance/@0"))),
-        keepOrphans(deserialize<bool>(node.getChild("keep_orphans/@0"))),
+        keepIslands(deserialize<bool>(node.getChild("keep_islands/@0"))),
         priority(deserialize<int>(node.getChild("priority/@0"))),
         connectStyle(deserialize<BI_Plane::ConnectStyle>(
             node.getChild("connect_style/@0"))),
@@ -246,7 +246,7 @@ public:
       root.appendChild("thermal_spoke", thermalSpokeWidth);
       root.ensureLineBreak();
       root.appendChild("connect_style", connectStyle);
-      root.appendChild("keep_orphans", keepOrphans);
+      root.appendChild("keep_islands", keepIslands);
       root.appendChild("lock", locked);
       root.ensureLineBreak();
       outline.serialize(root);
@@ -257,7 +257,7 @@ public:
       return (uuid != rhs.uuid) || (layer != rhs.layer) ||
           (netSignalName != rhs.netSignalName) || (outline != rhs.outline) ||
           (minWidth != rhs.minWidth) || (minClearance != rhs.minClearance) ||
-          (keepOrphans != rhs.keepOrphans) || (priority != rhs.priority) ||
+          (keepIslands != rhs.keepIslands) || (priority != rhs.priority) ||
           (connectStyle != rhs.connectStyle) ||
           (thermalGap != rhs.thermalGap) ||
           (thermalSpokeWidth != rhs.thermalSpokeWidth) ||

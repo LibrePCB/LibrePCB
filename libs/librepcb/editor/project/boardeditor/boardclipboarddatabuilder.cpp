@@ -167,7 +167,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
             plane->getUuid(), plane->getLayer(),
             plane->getNetSignal().getName(), plane->getOutline(),
             plane->getMinWidth(), plane->getMinClearance(),
-            plane->getKeepOrphans(), plane->getPriority(),
+            plane->getKeepIslands(), plane->getPriority(),
             plane->getConnectStyle(), plane->getThermalGap(),
             plane->getThermalSpokeWidth(), plane->isLocked());
     data->getPlanes().append(newPlane);

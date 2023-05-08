@@ -114,7 +114,7 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
   mUi->spbPriority->setValue(mPlane.getPriority());
 
   // checkboxes
-  mUi->cbKeepOrphans->setChecked(mPlane.getKeepOrphans());
+  mUi->cbKeepIslands->setChecked(mPlane.getKeepIslands());
   mUi->cbxLock->setChecked(mPlane.isLocked());
 
   // vertices
@@ -199,7 +199,7 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
     cmd->setPriority(mUi->spbPriority->value());
 
     // booleans
-    cmd->setKeepOrphans(mUi->cbKeepOrphans->isChecked());
+    cmd->setKeepIslands(mUi->cbKeepIslands->isChecked());
     cmd->setLocked(mUi->cbxLock->isChecked());
 
     // vertices
