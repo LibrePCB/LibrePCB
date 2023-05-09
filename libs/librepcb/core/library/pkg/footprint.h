@@ -60,6 +60,9 @@ public:
     UuidChanged,
     NamesEdited,
     DescriptionsEdited,
+    ModelPositionChanged,
+    ModelRotationChanged,
+    ModelsChanged,
     PadsEdited,
     PolygonsEdited,
     CirclesEdited,
@@ -85,6 +88,9 @@ public:
   const LocalizedDescriptionMap& getDescriptions() const noexcept {
     return mDescriptions;
   }
+  const Point3D& getModelPosition() const noexcept { return mModelPosition; }
+  const Angle3D& getModelRotation() const noexcept { return mModelRotation; }
+  const QSet<Uuid>& getModels() const noexcept { return mModels; }
 
   // Getters: Geometry
   const FootprintPadList& getPads() const noexcept { return mPads; }
@@ -97,6 +103,11 @@ public:
   StrokeTextList& getStrokeTexts() noexcept { return mStrokeTexts; }
   const HoleList& getHoles() const noexcept { return mHoles; }
   HoleList& getHoles() noexcept { return mHoles; }
+
+  // Setters: General
+  bool setModelPosition(const Point3D& position) noexcept;
+  bool setModelRotation(const Angle3D& rotation) noexcept;
+  bool setModels(const QSet<Uuid>& models) noexcept;
 
   // General Methods
 
@@ -140,6 +151,9 @@ private:  // Data
   Uuid mUuid;
   LocalizedNameMap mNames;
   LocalizedDescriptionMap mDescriptions;
+  Point3D mModelPosition;
+  Angle3D mModelRotation;
+  QSet<Uuid> mModels;
   FootprintPadList mPads;
   PolygonList mPolygons;
   CircleList mCircles;

@@ -40,6 +40,9 @@ Footprint::Footprint(const Footprint& other) noexcept
     mUuid(other.mUuid),
     mNames(other.mNames),
     mDescriptions(other.mDescriptions),
+    mModelPosition(other.mModelPosition),
+    mModelRotation(other.mModelRotation),
+    mModels(other.mModels),
     mPads(other.mPads),
     mPolygons(other.mPolygons),
     mCircles(other.mCircles),
@@ -67,6 +70,9 @@ Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
     mUuid(uuid),
     mNames(name_en_US),
     mDescriptions(description_en_US),
+    mModelPosition(),
+    mModelRotation(),
+    mModels(),
     mPads(),
     mPolygons(),
     mCircles(),
@@ -93,6 +99,9 @@ Footprint::Footprint(const SExpression& node)
     mUuid(deserialize<Uuid>(node.getChild("@0"))),
     mNames(node),
     mDescriptions(node),
+    mModelPosition(deserialize<Point3D>(node.getChild("3d_position"))),
+    mModelRotation(deserialize<Angle3D>(node.getChild("3d_rotation"))),
+    mModels(),
     mPads(node),
     mPolygons(node),
     mCircles(node),
@@ -105,6 +114,9 @@ Footprint::Footprint(const SExpression& node)
     mCirclesEditedSlot(*this, &Footprint::circlesEdited),
     mStrokeTextsEditedSlot(*this, &Footprint::strokeTextsEdited),
     mHolesEditedSlot(*this, &Footprint::holesEdited) {
+  foreach (const SExpression* child, node.getChildren("3d_model")) {
+    mModels.insert(deserialize<Uuid>(child->getChild("@0")));
+  }
   mNames.onEdited.attach(mNamesEditedSlot);
   mDescriptions.onEdited.attach(mDescriptionsEditedSlot);
   mPads.onEdited.attach(mPadsEditedSlot);
@@ -118,6 +130,40 @@ Footprint::~Footprint() noexcept {
 }
 
 /*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+bool Footprint::setModelPosition(const Point3D& position) noexcept {
+  if (position == mModelPosition) {
+    return false;
+  }
+
+  mModelPosition = position;
+  onEdited.notify(Event::ModelPositionChanged);
+  return true;
+}
+
+bool Footprint::setModelRotation(const Angle3D& rotation) noexcept {
+  if (rotation == mModelRotation) {
+    return false;
+  }
+
+  mModelRotation = rotation;
+  onEdited.notify(Event::ModelRotationChanged);
+  return true;
+}
+
+bool Footprint::setModels(const QSet<Uuid>& models) noexcept {
+  if (models == mModels) {
+    return false;
+  }
+
+  mModels = models;
+  onEdited.notify(Event::ModelsChanged);
+  return true;
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
@@ -128,6 +174,23 @@ void Footprint::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mDescriptions.serialize(root);
   root.ensureLineBreak();
+  {
+    SExpression& child = root.appendList("3d_position");
+    child.appendChild(std::get<0>(mModelPosition));
+    child.appendChild(std::get<1>(mModelPosition));
+    child.appendChild(std::get<2>(mModelPosition));
+  }
+  {
+    SExpression& child = root.appendList("3d_rotation");
+    child.appendChild(std::get<0>(mModelRotation));
+    child.appendChild(std::get<1>(mModelRotation));
+    child.appendChild(std::get<2>(mModelRotation));
+  }
+  root.ensureLineBreak();
+  foreach (const Uuid& uuid, Toolbox::sortedQSet(mModels)) {
+    root.appendChild("3d_model", uuid);
+    root.ensureLineBreak();
+  }
   mPads.serialize(root);
   root.ensureLineBreak();
   mPolygons.serialize(root);
@@ -148,6 +211,9 @@ bool Footprint::operator==(const Footprint& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mNames != rhs.mNames) return false;
   if (mDescriptions != rhs.mDescriptions) return false;
+  if (mModelPosition != rhs.mModelPosition) return false;
+  if (mModelRotation != rhs.mModelRotation) return false;
+  if (mModels != rhs.mModels) return false;
   if (mPads != rhs.mPads) return false;
   if (mPolygons != rhs.mPolygons) return false;
   if (mCircles != rhs.mCircles) return false;
@@ -163,6 +229,9 @@ Footprint& Footprint::operator=(const Footprint& rhs) noexcept {
   }
   mNames = rhs.mNames;
   mDescriptions = rhs.mDescriptions;
+  setModelPosition(rhs.mModelPosition);
+  setModelRotation(rhs.mModelRotation);
+  setModels(rhs.mModels);
   mPads = rhs.mPads;
   mPolygons = rhs.mPolygons;
   mCircles = rhs.mCircles;

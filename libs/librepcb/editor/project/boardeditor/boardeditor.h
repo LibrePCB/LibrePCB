@@ -52,6 +52,9 @@ class BoardGraphicsScene;
 class BoardLayersDock;
 class ExclusiveActionGroup;
 class GraphicsView;
+class OpenGlSceneBuilder;
+class OpenGlSceneBuilder;
+class OpenGlView;
 class ProjectEditor;
 class RuleCheckDock;
 class SearchToolBar;
@@ -153,6 +156,7 @@ private:
   QList<BI_Device*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;
   void goToDevice(const QString& name, int index) noexcept;
+  void scheduleOpenGlSceneUpdate() noexcept;
   void performScheduledTasks() noexcept;
   void startPlaneRebuild(bool full = false) noexcept;
   bool isActiveTopLevelWindow() const noexcept;
@@ -165,12 +169,16 @@ private:
   void execBoardSetupDialog(bool switchToDrcSettings = false) noexcept;
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
+  void execStepExportDialog() noexcept;
   void execD356NetlistExportDialog() noexcept;
+  bool show3DView() noexcept;
+  void hide3DView() noexcept;
 
   // General Attributes
   ProjectEditor& mProjectEditor;
   Project& mProject;
   QScopedPointer<Ui::BoardEditor> mUi;
+  QScopedPointer<OpenGlView> mOpenGlView;
   QScopedPointer<ToolBarProxy> mCommandToolBarProxy;
   QScopedPointer<StandardEditorCommandHandler> mStandardCommandHandler;
 
@@ -178,6 +186,9 @@ private:
   QPointer<Board> mActiveBoard;
   QList<std::shared_ptr<GraphicsLayer>> mLayers;
   QScopedPointer<BoardGraphicsScene> mGraphicsScene;
+  QScopedPointer<OpenGlSceneBuilder> mOpenGlSceneBuilder;
+  bool mOpenGlSceneBuildScheduled;
+  qint64 mTimestampOfLastOpenGlSceneRebuild;
   QHash<Uuid, QRectF> mVisibleSceneRect;
   QScopedPointer<BoardEditorFsm> mFsm;
 
@@ -211,6 +222,7 @@ private:
   QScopedPointer<QAction> mActionExportLppz;
   QScopedPointer<QAction> mActionExportImage;
   QScopedPointer<QAction> mActionExportPdf;
+  QScopedPointer<QAction> mActionExportStep;
   QScopedPointer<QAction> mActionPrint;
   QScopedPointer<QAction> mActionGenerateBom;
   QScopedPointer<QAction> mActionGenerateFabricationData;
@@ -233,6 +245,7 @@ private:
   QScopedPointer<QAction> mActionZoomFit;
   QScopedPointer<QAction> mActionZoomIn;
   QScopedPointer<QAction> mActionZoomOut;
+  QScopedPointer<QAction> mActionToggle3D;
   QScopedPointer<QAction> mActionUndo;
   QScopedPointer<QAction> mActionRedo;
   QScopedPointer<QAction> mActionCut;

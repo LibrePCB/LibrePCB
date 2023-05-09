@@ -69,7 +69,6 @@ class BoardEditorState_Select final : public BoardEditorState {
 
   struct DeviceMenuItem {
     QString name;
-    QIcon icon;
     Uuid uuid;
   };
 

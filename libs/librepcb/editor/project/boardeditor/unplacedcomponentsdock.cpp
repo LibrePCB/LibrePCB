@@ -514,7 +514,7 @@ void UnplacedComponentsDock::autoAddDevicesToBoard(
         tl::optional<Uuid> fptUuid = getSuggestedFootprint(dev.packageUuid);
         cmd->appendChild(new CmdAddDeviceToBoard(
             mProjectEditor.getWorkspace(), *mBoard, *component, dev.deviceUuid,
-            fptUuid, mNextPosition));
+            fptUuid, tl::nullopt, mNextPosition));
 
         // Update current position.
         if (mNextPosition.getX() > Length::fromMm(100)) {

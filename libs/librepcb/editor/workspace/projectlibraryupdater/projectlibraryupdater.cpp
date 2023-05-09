@@ -129,6 +129,7 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
       try {
         log(tr("Open project %1...").arg(prettyPath(mProjectFilePath)));
         ProjectLoader loader;
+        loader.setAutoAssignDeviceModels(true);  // Make use of new 3D models.
         std::unique_ptr<Project> project =
             loader.open(std::unique_ptr<TransactionalDirectory>(
                             new TransactionalDirectory(fs)),

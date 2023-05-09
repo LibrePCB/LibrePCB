@@ -38,7 +38,13 @@ CmdFootprintEdit::CmdFootprintEdit(Footprint& fpt) noexcept
   : UndoCommand(tr("Edit footprint")),
     mFootprint(fpt),
     mOldName(fpt.getNames().getDefaultValue()),
-    mNewName(mOldName) {
+    mNewName(mOldName),
+    mOldModelPosition(fpt.getModelPosition()),
+    mNewModelPosition(mOldModelPosition),
+    mOldModelRotation(fpt.getModelRotation()),
+    mNewModelRotation(mOldModelRotation),
+    mOldModels(fpt.getModels()),
+    mNewModels(mOldModels) {
 }
 
 CmdFootprintEdit::~CmdFootprintEdit() noexcept {
@@ -53,6 +59,21 @@ void CmdFootprintEdit::setName(const ElementName& name) noexcept {
   mNewName = name;
 }
 
+void CmdFootprintEdit::setModelPosition(const Point3D& pos) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewModelPosition = pos;
+}
+
+void CmdFootprintEdit::setModelRotation(const Angle3D& rot) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewModelRotation = rot;
+}
+
+void CmdFootprintEdit::setModels(const QSet<Uuid>& models) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewModels = models;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -61,15 +82,24 @@ bool CmdFootprintEdit::performExecute() {
   performRedo();  // can throw
 
   if (mNewName != mOldName) return true;
+  if (mNewModelPosition != mOldModelPosition) return true;
+  if (mNewModelRotation != mOldModelRotation) return true;
+  if (mNewModels != mOldModels) return true;
   return false;
 }
 
 void CmdFootprintEdit::performUndo() {
   mFootprint.getNames().setDefaultValue(mOldName);
+  mFootprint.setModelPosition(mOldModelPosition);
+  mFootprint.setModelRotation(mOldModelRotation);
+  mFootprint.setModels(mOldModels);
 }
 
 void CmdFootprintEdit::performRedo() {
   mFootprint.getNames().setDefaultValue(mNewName);
+  mFootprint.setModelPosition(mNewModelPosition);
+  mFootprint.setModelRotation(mNewModelRotation);
+  mFootprint.setModels(mNewModels);
 }
 
 /*******************************************************************************

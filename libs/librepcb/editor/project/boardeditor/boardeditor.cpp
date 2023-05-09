@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "boardeditor.h"
 
+#include "../../3d/openglscenebuilder.h"
 #include "../../dialogs/filedialog.h"
 #include "../../dialogs/gridsettingsdialog.h"
 #include "../../editorcommandset.h"
@@ -36,6 +37,7 @@
 #include "../../utils/toolbarproxy.h"
 #include "../../utils/undostackactiongroup.h"
 #include "../../widgets/graphicsview.h"
+#include "../../widgets/openglview.h"
 #include "../../widgets/rulecheckdock.h"
 #include "../../widgets/searchtoolbar.h"
 #include "../../workspace/desktopservices.h"
@@ -51,16 +53,26 @@
 #include "graphicsitems/bgi_device.h"
 #include "unplacedcomponentsdock.h"
 
+#include <librepcb/core/3d/stepexport.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/fileio/fileutils.h>
+#include <librepcb/core/geometry/polygon.h>
+#include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardd356netlistexport.h>
 #include <librepcb/core/project/board/boardpainter.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/board/items/bi_footprintpad.h>
+#include <librepcb/core/project/board/items/bi_hole.h>
+#include <librepcb/core/project/board/items/bi_netline.h>
+#include <librepcb/core/project/board/items/bi_netsegment.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
+#include <librepcb/core/project/board/items/bi_polygon.h>
+#include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
@@ -96,6 +108,9 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
         mProjectEditor.getWorkspace().getSettings(), this)),
     mActiveBoard(nullptr),
     mGraphicsScene(),
+    mOpenGlSceneBuilder(),
+    mOpenGlSceneBuildScheduled(false),
+    mTimestampOfLastOpenGlSceneRebuild(0),
     mVisibleSceneRect(),
     mFsm(),
     mPlaneFragmentsBuilder(new BoardPlaneFragmentsBuilder(true, this)),
@@ -126,6 +141,17 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
           mUi->graphicsView, &GraphicsView::showWaitingSpinner);
   connect(mPlaneFragmentsBuilder.data(), &BoardPlaneFragmentsBuilder::finished,
           mUi->graphicsView, &GraphicsView::hideWaitingSpinner);
+
+  // Setup 3D view.
+  connect(mUi->btnShow3D, &QToolButton::clicked, this,
+          &BoardEditor::show3DView);
+  connect(mUi->btnHide3D, &QToolButton::clicked, this,
+          &BoardEditor::hide3DView);
+  connect(&mProjectEditor.getUndoStack(), &UndoStack::stateModified, this,
+          &BoardEditor::scheduleOpenGlSceneUpdate);
+  connect(mPlaneFragmentsBuilder.data(),
+          &BoardPlaneFragmentsBuilder::boardPlanesModified, this,
+          &BoardEditor::scheduleOpenGlSceneUpdate);
 
   // Setup status bar.
   mUi->statusbar->setFields(StatusBar::AbsolutePosition |
@@ -304,6 +330,9 @@ bool BoardEditor::setActiveBoardIndex(int index) noexcept {
     mActionGridProperties->setEnabled(mActiveBoard != nullptr);
     mActionGridIncrease->setEnabled(mActiveBoard != nullptr);
     mActionGridDecrease->setEnabled(mActiveBoard != nullptr);
+
+    // Update 3D view.
+    scheduleOpenGlSceneUpdate();
   }
 
   // update GUI
@@ -539,6 +568,8 @@ void BoardEditor::createActions() noexcept {
   mActionExportPdf.reset(cmd.exportPdf.createAction(this, this, [this]() {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Pdf, "pdf_export");
   }));
+  mActionExportStep.reset(cmd.exportStep.createAction(
+      this, this, &BoardEditor::execStepExportDialog));
   mActionPrint.reset(cmd.print.createAction(this, this, [this]() {
     execGraphicsExportDialog(GraphicsExportDialog::Output::Print, "print");
   }));
@@ -618,12 +649,33 @@ void BoardEditor::createActions() noexcept {
   }));
   mActionIgnoreLocks.reset(cmd.ignoreLocks.createAction(this));
   mActionIgnoreLocks->setCheckable(true);
-  mActionZoomFit.reset(cmd.zoomFitContent.createAction(this, mUi->graphicsView,
-                                                       &GraphicsView::zoomAll));
-  mActionZoomIn.reset(
-      cmd.zoomIn.createAction(this, mUi->graphicsView, &GraphicsView::zoomIn));
-  mActionZoomOut.reset(cmd.zoomOut.createAction(this, mUi->graphicsView,
-                                                &GraphicsView::zoomOut));
+  mActionZoomFit.reset(cmd.zoomFitContent.createAction(this, this, [this]() {
+    if (mOpenGlView && mOpenGlView->isVisible()) {
+      mOpenGlView->zoomAll();
+    } else {
+      mUi->graphicsView->zoomAll();
+    }
+  }));
+  mActionZoomIn.reset(cmd.zoomIn.createAction(this, this, [this]() {
+    if (mOpenGlView && mOpenGlView->isVisible()) {
+      mOpenGlView->zoomIn();
+    } else {
+      mUi->graphicsView->zoomIn();
+    }
+  }));
+  mActionZoomOut.reset(cmd.zoomOut.createAction(this, this, [this]() {
+    if (mOpenGlView && mOpenGlView->isVisible()) {
+      mOpenGlView->zoomOut();
+    } else {
+      mUi->graphicsView->zoomOut();
+    }
+  }));
+  mActionToggle3D.reset(cmd.toggle3d.createAction(this, this, [this]() {
+    if (!show3DView()) {
+      hide3DView();
+      hide3DView();
+    }
+  }));
   mActionUndo.reset(cmd.undo.createAction(this));
   mActionRedo.reset(cmd.redo.createAction(this));
   mActionCut.reset(cmd.clipboardCut.createAction(this, mFsm.data(),
@@ -925,6 +977,7 @@ void BoardEditor::createMenus() noexcept {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createExportMenu));
     smb.addAction(mActionExportPdf);
     smb.addAction(mActionExportImage);
+    smb.addAction(mActionExportStep);
     smb.addAction(mActionExportLppz);
   }
   {
@@ -984,6 +1037,8 @@ void BoardEditor::createMenus() noexcept {
   mb.addAction(mActionZoomIn);
   mb.addAction(mActionZoomOut);
   mb.addAction(mActionZoomFit);
+  mb.addSeparator();
+  mb.addAction(mActionToggle3D);
   mb.addSeparator();
   {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createGoToDockMenu));
@@ -1332,19 +1387,45 @@ void BoardEditor::goToDevice(const QString& name, int index) noexcept {
   }
 }
 
+void BoardEditor::scheduleOpenGlSceneUpdate() noexcept {
+  mOpenGlSceneBuildScheduled = true;
+}
+
 void BoardEditor::performScheduledTasks() noexcept {
-  // Rebuild planes, if needed. Depending on various conditions to avoid too
-  // high CPU load caused by too frequent plane rebuilds.
   const bool commandActive =
       mProjectEditor.getUndoStack().isCommandGroupActive() ||
-      mUi->graphicsView->isAnyMouseButtonPressed();
+      mUi->graphicsView->isMouseButtonPressed(Qt::LeftButton |
+                                              Qt::MiddleButton);
   const bool userInputIdle = (mUi->graphicsView->getIdleTimeMs() >= 700);
-  const qint64 buildPauseMs =
+  const bool updateAllowedInCurrentState = ((!commandActive) || userInputIdle);
+
+  // Rebuild planes, if needed. Depending on various conditions to avoid too
+  // high CPU load caused by too frequent plane rebuilds.
+  const qint64 planeBuildPauseMs =
       QDateTime::currentMSecsSinceEpoch() - mTimestampOfLastPlaneRebuild;
   if (mPlaneFragmentsBuilder && (!mPlaneFragmentsBuilder->isBusy()) &&
-      ((!commandActive) || userInputIdle) && (buildPauseMs >= 1000) &&
+      updateAllowedInCurrentState && (planeBuildPauseMs >= 1000) &&
       isActiveTopLevelWindow()) {
     startPlaneRebuild(false);
+  }
+
+  // Update 3D scene, if needed.
+  const bool planesRebuilding =
+      mPlaneFragmentsBuilder && mPlaneFragmentsBuilder->isBusy();
+  const qint64 openGlBuildPauseMs =
+      QDateTime::currentMSecsSinceEpoch() - mTimestampOfLastOpenGlSceneRebuild;
+  if ((!planesRebuilding) && (mOpenGlSceneBuildScheduled || commandActive) &&
+      mOpenGlView && mOpenGlSceneBuilder && (!mOpenGlSceneBuilder->isBusy()) &&
+      updateAllowedInCurrentState && (openGlBuildPauseMs >= 1000) &&
+      isActiveTopLevelWindow()) {
+    std::shared_ptr<SceneData3D> data;
+    if (Board* board = getActiveBoard()) {
+      data = board->buildScene3D();
+    } else {
+      data = std::make_shared<SceneData3D>();
+    }
+    mOpenGlSceneBuildScheduled = false;
+    mOpenGlSceneBuilder->start(data);
   }
 }
 
@@ -1355,11 +1436,13 @@ void BoardEditor::startPlaneRebuild(bool full) noexcept {
       // Forced rebuild -> all layers.
       mPlaneFragmentsBuilder->startAsynchronously(*board);
     } else {
-      // Automatic rebuild -> only modified & visible layers.
+      // Automatic rebuild -> only modified & visible layers. However, if the
+      // 3D view is open, all planes on outer layers are visible!
       QSet<const Layer*> layers;
       foreach (const Layer* layer, board->getCopperLayers()) {
         if (auto graphicsLayer = IF_GraphicsLayerProvider::getLayer(*layer)) {
-          if (graphicsLayer->isVisible()) {
+          if (graphicsLayer->isVisible() ||
+              (mOpenGlView && (layer->isTop() || layer->isBottom()))) {
             layers.insert(layer);
           }
         }
@@ -1380,7 +1463,8 @@ bool BoardEditor::isActiveTopLevelWindow() const noexcept {
     }
     w = w->parentWidget();
   }
-  if (mUi->graphicsView->getIdleTimeMs() < 2000) {
+  if ((mUi->graphicsView->getIdleTimeMs() < 2000) ||
+      (mOpenGlView && (mOpenGlView->getIdleTimeMs() < 2000))) {
     return true;  // Safe fallback if active window detection is not reliable.
   }
   return false;
@@ -1547,6 +1631,44 @@ void BoardEditor::execGraphicsExportDialog(
   }
 }
 
+void BoardEditor::execStepExportDialog() noexcept {
+  Board* board = getActiveBoard();
+  if (!board) return;
+
+  // Determine default file path.
+  const QString projectName = FilePath::cleanFileName(
+      *mProject.getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+  const QString projectVersion = FilePath::cleanFileName(
+      mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+  const FilePath defaultFilePath = mProject.getPath().getPathTo(
+      QString("output/%1/%2.step").arg(projectVersion, projectName));
+
+  // Ask for file path.
+  const FilePath fp(FileDialog::getSaveFileName(this, tr("Export STEP Model"),
+                                                defaultFilePath.toStr(),
+                                                "STEP Models (*.step *.stp)"));
+  if (!fp.isValid()) {
+    return;
+  }
+
+  // Start export.
+  StepExport exp;
+  QProgressDialog dlg(this);
+  dlg.setAutoClose(false);
+  dlg.setAutoReset(false);
+  connect(&exp, &StepExport::progressStatus, &dlg,
+          &QProgressDialog::setLabelText);
+  connect(&exp, &StepExport::progressPercent, &dlg, &QProgressDialog::setValue);
+  connect(&exp, &StepExport::failed, this, [this](QString errorMsg) {
+    QMessageBox::critical(this, tr("STEP Export Failure"), errorMsg);
+  });
+  connect(&exp, &StepExport::finished, &dlg, &QProgressDialog::close);
+  connect(&dlg, &QProgressDialog::canceled, &exp, &StepExport::cancel);
+  exp.start(board->buildScene3D(), fp, 700);
+  dlg.exec();
+  exp.waitForFinished();
+}
+
 void BoardEditor::execD356NetlistExportDialog() noexcept {
   Board* board = getActiveBoard();
   if (!board) return;
@@ -1572,6 +1694,48 @@ void BoardEditor::execD356NetlistExportDialog() noexcept {
     qDebug() << "Successfully exported netlist.";
   } catch (const Exception& e) {
     QMessageBox::critical(this, tr("Error"), e.getMsg());
+  }
+}
+
+bool BoardEditor::show3DView() noexcept {
+  if (!mOpenGlView) {
+    mOpenGlView.reset(new OpenGlView(this));
+    mUi->mainLayout->insertWidget(2, mOpenGlView.data(), 1);
+    mOpenGlSceneBuilder.reset(new OpenGlSceneBuilder());
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::started,
+            mOpenGlView.data(), &OpenGlView::startSpinning);
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::finished,
+            mOpenGlView.data(), &OpenGlView::stopSpinning);
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::finished, this,
+            [this]() {
+              mTimestampOfLastOpenGlSceneRebuild =
+                  QDateTime::currentMSecsSinceEpoch();
+            });
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::objectAdded,
+            mOpenGlView.data(), &OpenGlView::addObject);
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::objectRemoved,
+            mOpenGlView.data(), &OpenGlView::removeObject);
+    connect(mOpenGlSceneBuilder.data(), &OpenGlSceneBuilder::objectUpdated,
+            mOpenGlView.data(),
+            static_cast<void (OpenGlView::*)()>(&OpenGlView::update));
+    scheduleOpenGlSceneUpdate();
+    mUi->btnHide3D->setEnabled(true);
+    return true;
+  } else if (mUi->graphicsView->isVisible()) {
+    mUi->graphicsView->hide();
+    mUi->btnShow3D->setEnabled(false);
+    return true;
+  }
+  return false;
+}
+
+void BoardEditor::hide3DView() noexcept {
+  if (!mUi->graphicsView->isVisible()) {
+    mUi->graphicsView->show();
+    mUi->btnShow3D->setEnabled(true);
+  } else {
+    mOpenGlView.reset();
+    mUi->btnHide3D->setEnabled(false);
   }
 }
 

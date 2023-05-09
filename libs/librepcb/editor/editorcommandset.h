@@ -493,6 +493,15 @@ public:
       {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P)},
       &categoryImportExport,
   };
+  EditorCommand exportStep{
+      "export_step",  // clang-format break
+      QT_TR_NOOP("Export STEP Model"),
+      QT_TR_NOOP("Export PCB as a STEP file for loading it into MCAD software"),
+      QIcon(":/img/actions/export_step.png"),
+      EditorCommand::Flag::OpensPopup,
+      {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_T)},
+      &categoryImportExport,
+  };
   EditorCommand print{
       "print",  // clang-format break
       QT_TR_NOOP("Print"),
@@ -815,6 +824,15 @@ public:
       QIcon(":/img/status/unlocked.png"),
       EditorCommand::Flags(),
       {QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_L)},
+      &categoryView,
+  };
+  EditorCommand toggle3d{
+      "toggle_3d",  // clang-format break
+      QT_TR_NOOP("Toggle 2D/3D Mode"),
+      QT_TR_NOOP("Switch between 2D and 3D viewer mode"),
+      QIcon(":/img/actions/view_3d.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::CTRL + Qt::Key_3)},
       &categoryView,
   };
 

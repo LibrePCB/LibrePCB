@@ -44,6 +44,7 @@ class ComponentInstance;
 class Device;
 class Footprint;
 class Package;
+class PackageModel;
 class Project;
 
 /*******************************************************************************
@@ -84,6 +85,9 @@ public:
   const Device& getLibDevice() const noexcept { return *mLibDevice; }
   const Package& getLibPackage() const noexcept { return *mLibPackage; }
   const Footprint& getLibFootprint() const noexcept { return *mLibFootprint; }
+  const PackageModel* getLibModel() const noexcept { return mLibModel; }
+  tl::optional<Uuid> getLibModelUuid() const noexcept;
+  tl::optional<Uuid> getDefaultLibModelUuid() const noexcept;
   const Point& getPosition() const noexcept { return mPosition; }
   const Angle& getRotation() const noexcept { return mRotation; }
   bool getMirrored() const noexcept { return mMirrored; }
@@ -104,6 +108,7 @@ public:
   void setMirrored(bool mirror);
   void setLocked(bool locked) noexcept;
   void setAttributes(const AttributeList& attributes) noexcept;
+  void setModel(const tl::optional<Uuid>& uuid);
 
   // StrokeText Methods
   StrokeTextList getDefaultStrokeTexts() const noexcept;
@@ -154,6 +159,7 @@ private:
   const Device* mLibDevice;
   const Package* mLibPackage;
   const Footprint* mLibFootprint;
+  const PackageModel* mLibModel;  ///< `nullptr` if no model available/selected
 
   // Attributes
   Point mPosition;

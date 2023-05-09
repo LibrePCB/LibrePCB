@@ -207,6 +207,7 @@ private:  // Data
   QScopedPointer<QAction> mActionZoomFit;
   QScopedPointer<QAction> mActionZoomIn;
   QScopedPointer<QAction> mActionZoomOut;
+  QScopedPointer<QAction> mActionToggle3D;
   QScopedPointer<QAction> mActionUndo;
   QScopedPointer<QAction> mActionRedo;
   QScopedPointer<QAction> mActionCut;

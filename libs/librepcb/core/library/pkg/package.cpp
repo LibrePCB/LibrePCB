@@ -89,6 +89,7 @@ Package::Package(const Uuid& uuid, const Version& version,
                    author, name_en_US, description_en_US, keywords_en_US),
     mAssemblyType(assemblyType),
     mPads(),
+    mModels(),
     mFootprints() {
 }
 
@@ -98,6 +99,7 @@ Package::Package(std::unique_ptr<TransactionalDirectory> directory,
                    std::move(directory), root),
     mAssemblyType(deserialize<AssemblyType>(root.getChild("assembly_type/@0"))),
     mPads(root),
+    mModels(root),
     mFootprints(root) {
 }
 
@@ -148,6 +150,19 @@ Package::AssemblyType Package::guessAssemblyType() const noexcept {
   }
 }
 
+QVector<std::shared_ptr<const PackageModel>> Package::getModelsForFootprint(
+    const Uuid& fpt) const noexcept {
+  QVector<std::shared_ptr<const PackageModel>> result;
+  if (std::shared_ptr<const Footprint> footprint = mFootprints.find(fpt)) {
+    for (std::shared_ptr<const PackageModel> model : mModels.values()) {
+      if (footprint->getModels().contains(model->getUuid())) {
+        result.append(model);
+      }
+    }
+  }
+  return result;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -190,6 +205,8 @@ void Package::serialize(SExpression& root) const {
   root.appendChild("assembly_type", mAssemblyType);
   root.ensureLineBreak();
   mPads.serialize(root);
+  root.ensureLineBreak();
+  mModels.serialize(root);
   root.ensureLineBreak();
   mFootprints.serialize(root);
   root.ensureLineBreak();

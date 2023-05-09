@@ -42,10 +42,13 @@
 namespace librepcb {
 
 class Package;
+class PackageModel;
 
 namespace editor {
 
 class GraphicsScene;
+class OpenGlSceneBuilder;
+class OpenGlView;
 class PackageEditorFsm;
 
 namespace Ui {
@@ -100,6 +103,7 @@ public slots:
   bool zoomIn() noexcept override;
   bool zoomOut() noexcept override;
   bool zoomAll() noexcept override;
+  bool toggle3D() noexcept override;
   bool abortCommand() noexcept override;
   bool importDxf() noexcept override;
   bool editGridProperties() noexcept override;
@@ -114,6 +118,9 @@ private:  // Methods
   bool toolChangeRequested(Tool newTool,
                            const QVariant& mode) noexcept override;
   void currentFootprintChanged(int index) noexcept;
+  void currentModelChanged(int index) noexcept;
+  void scheduleOpenGlSceneUpdate() noexcept;
+  void updateOpenGlScene() noexcept;
   void memorizePackageInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;
   bool runChecks(RuleCheckMessageList& msgs) const override;
@@ -131,13 +138,20 @@ private:  // Methods
                                 const QString& settingsKey) noexcept override;
   void setGridProperties(const PositiveLength& interval, const LengthUnit& unit,
                          Theme::GridStyle style) noexcept;
+  void toggle3DMode(bool enable) noexcept;
+  bool is3DModeEnabled() const noexcept;
 
 private:  // Data
   QScopedPointer<Ui::PackageEditorWidget> mUi;
+  QScopedPointer<OpenGlView> mOpenGlView;
   QScopedPointer<CategoryListEditorWidget> mCategoriesEditorWidget;
   QScopedPointer<GraphicsScene> mGraphicsScene;
+  QScopedPointer<OpenGlSceneBuilder> mOpenGlSceneBuilder;
+  bool mOpenGlSceneBuildScheduled;
   LengthUnit mLengthUnit;
   std::unique_ptr<Package> mPackage;
+  std::shared_ptr<Footprint> mCurrentFootprint;
+  std::shared_ptr<PackageModel> mCurrentModel;
 
   // broken interface detection
   QSet<Uuid> mOriginalPadUuids;

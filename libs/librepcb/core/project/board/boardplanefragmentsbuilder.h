@@ -114,6 +114,7 @@ public:
 signals:
   void started();
   void finished();
+  void boardPlanesModified();
 
 private:  // Methods
   struct PlaneData {

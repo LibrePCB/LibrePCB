@@ -76,7 +76,7 @@ public:
   static std::unique_ptr<ClipperLib::PolyTree> intersectToTree(
       const ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
       ClipperLib::PolyFillType subjectFillType,
-      ClipperLib::PolyFillType clipFillType);
+      ClipperLib::PolyFillType clipFillType, bool closed = true);
   static std::unique_ptr<ClipperLib::PolyTree> intersectToTree(
       const QList<ClipperLib::Paths>& paths);
   static void subtract(ClipperLib::Paths& subject,
@@ -86,7 +86,7 @@ public:
   static std::unique_ptr<ClipperLib::PolyTree> subtractToTree(
       const ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
       ClipperLib::PolyFillType subjectFillType,
-      ClipperLib::PolyFillType clipFillType);
+      ClipperLib::PolyFillType clipFillType, bool closed = true);
   static void offset(ClipperLib::Paths& paths, const Length& offset,
                      const PositiveLength& maxArcTolerance);
   static std::unique_ptr<ClipperLib::PolyTree> offsetToTree(

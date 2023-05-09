@@ -53,13 +53,15 @@ namespace editor {
 CmdAddDeviceToBoard::CmdAddDeviceToBoard(
     Workspace& workspace, Board& board, ComponentInstance& cmpInstance,
     const Uuid& deviceUuid, const tl::optional<Uuid>& footprintUuid,
-    const Point& position, const Angle& rotation, bool mirror) noexcept
+    const tl::optional<Uuid>& preferredModelUuid, const Point& position,
+    const Angle& rotation, bool mirror) noexcept
   : UndoCommandGroup(tr("Add device to board")),
     mWorkspace(workspace),
     mBoard(board),
     mComponentInstance(cmpInstance),
     mDeviceUuid(deviceUuid),
     mFootprintUuid(footprintUuid),
+    mPreferredModelUuid(preferredModelUuid),
     mPosition(position),
     mRotation(rotation),
     mMirror(mirror),
@@ -138,6 +140,18 @@ bool CmdAddDeviceToBoard::performExecute() {
   mDeviceInstance =
       new BI_Device(mBoard, mComponentInstance, mDeviceUuid, *mFootprintUuid,
                     mPosition, mRotation, mMirror, false, true);  // can throw
+
+  // Assign 3D model. Use the default model if no valid preferred model was
+  // specified.
+  if ((!mPreferredModelUuid) ||
+      (!pkg->getModels().contains(*mPreferredModelUuid)) ||
+      (!pkg->getFootprints()
+            .get(*mFootprintUuid)
+            ->getModels()
+            .contains(*mPreferredModelUuid))) {
+    mPreferredModelUuid = mDeviceInstance->getDefaultLibModelUuid();
+  }
+  mDeviceInstance->setModel(mPreferredModelUuid);
 
   // add a new device instance to the board
   execNewChildCmd(new CmdDeviceInstanceAdd(*mDeviceInstance));  // can throw

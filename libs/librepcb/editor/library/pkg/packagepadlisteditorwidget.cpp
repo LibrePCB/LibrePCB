@@ -70,6 +70,10 @@ PackagePadListEditorWidget::~PackagePadListEditorWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void PackagePadListEditorWidget::setFrameStyle(int style) noexcept {
+  mView->setFrameStyle(style);
+}
+
 void PackagePadListEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);
 }

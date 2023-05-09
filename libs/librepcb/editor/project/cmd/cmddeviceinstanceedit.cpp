@@ -23,6 +23,7 @@
 #include "cmddeviceinstanceedit.h"
 
 #include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/utils/scopeguardlist.h>
 
 #include <QtCore>
 
@@ -46,7 +47,9 @@ CmdDeviceInstanceEdit::CmdDeviceInstanceEdit(BI_Device& dev) noexcept
     mOldMirrored(mDevice.getMirrored()),
     mNewMirrored(mOldMirrored),
     mOldLocked(mDevice.isLocked()),
-    mNewLocked(mOldLocked) {
+    mNewLocked(mOldLocked),
+    mOldModelUuid(mDevice.getLibModelUuid()),
+    mNewModelUuid(mOldModelUuid) {
 }
 
 CmdDeviceInstanceEdit::~CmdDeviceInstanceEdit() noexcept {
@@ -121,6 +124,11 @@ void CmdDeviceInstanceEdit::setLocked(bool locked) {
   mNewLocked = locked;
 }
 
+void CmdDeviceInstanceEdit::setModel(const tl::optional<Uuid>& uuid) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewModelUuid = uuid;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -132,21 +140,36 @@ bool CmdDeviceInstanceEdit::performExecute() {
   if (mNewRotation != mOldRotation) return true;
   if (mNewMirrored != mOldMirrored) return true;
   if (mNewLocked != mOldLocked) return true;
+  if (mNewModelUuid != mOldModelUuid) return true;
   return false;
 }
 
 void CmdDeviceInstanceEdit::performUndo() {
+  ScopeGuardList sgl;
   mDevice.setMirrored(mOldMirrored);  // can throw
+  sgl.add([this]() { mDevice.setMirrored(mNewMirrored); });
+  mDevice.setModel(mOldModelUuid);  // can throw
+  sgl.add([this]() { mDevice.setModel(mNewModelUuid); });
+
+  // Non-throwing setters
   mDevice.setPosition(mOldPos);
   mDevice.setRotation(mOldRotation);
   mDevice.setLocked(mOldLocked);
+  sgl.dismiss();
 }
 
 void CmdDeviceInstanceEdit::performRedo() {
+  ScopeGuardList sgl;
   mDevice.setMirrored(mNewMirrored);  // can throw
+  sgl.add([this]() { mDevice.setMirrored(mOldMirrored); });
+  mDevice.setModel(mNewModelUuid);  // can throw
+  sgl.add([this]() { mDevice.setModel(mOldModelUuid); });
+
+  // Non-throwing setters
   mDevice.setPosition(mNewPos);
   mDevice.setRotation(mNewRotation);
   mDevice.setLocked(mNewLocked);
+  sgl.dismiss();
 }
 
 /*******************************************************************************

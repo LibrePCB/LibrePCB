@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../libraryelement.h"
 #include "footprint.h"
+#include "packagemodel.h"
 #include "packagepad.h"
 
 #include <QtCore>
@@ -81,6 +82,10 @@ public:
   AssemblyType guessAssemblyType() const noexcept;
   PackagePadList& getPads() noexcept { return mPads; }
   const PackagePadList& getPads() const noexcept { return mPads; }
+  PackageModelList& getModels() noexcept { return mModels; }
+  const PackageModelList& getModels() const noexcept { return mModels; }
+  QVector<std::shared_ptr<const PackageModel>> getModelsForFootprint(
+      const Uuid& fpt) const noexcept;
   FootprintList& getFootprints() noexcept { return mFootprints; }
   const FootprintList& getFootprints() const noexcept { return mFootprints; }
 
@@ -113,6 +118,7 @@ private:  // Methods
 private:  // Data
   AssemblyType mAssemblyType;  ///< Package assembly type (metadata)
   PackagePadList mPads;  ///< empty list if the package has no pads
+  PackageModelList mModels;  ///< 3D models (optional)
   FootprintList mFootprints;  ///< minimum one footprint
 };
 

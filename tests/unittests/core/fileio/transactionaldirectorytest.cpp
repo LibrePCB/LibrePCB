@@ -235,6 +235,20 @@ TEST_F(TransactionalDirectoryTest, testReadInSubdirPath) {
 }
 
 /*******************************************************************************
+ *  Test readIfExists()
+ ******************************************************************************/
+
+TEST_F(TransactionalDirectoryTest, testReadIfExistsExisting) {
+  TransactionalDirectory dir(mFileSystem, "");
+  EXPECT_EQ(dir.read("a.txt"), dir.readIfExists("a.txt"));
+}
+
+TEST_F(TransactionalDirectoryTest, testReadIfExistsNonExistent) {
+  TransactionalDirectory dir(mFileSystem, "");
+  EXPECT_TRUE(dir.readIfExists("b.txt").isNull());
+}
+
+/*******************************************************************************
  *  Test write()
  ******************************************************************************/
 

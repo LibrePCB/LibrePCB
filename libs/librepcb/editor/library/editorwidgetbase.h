@@ -94,6 +94,7 @@ public:
     Close,
     Filter,
     GraphicsView,
+    OpenGlView,
     ExportGraphics,
 
     // Handled by FSM states (dynamic).
@@ -164,6 +165,7 @@ public slots:
   virtual bool zoomIn() noexcept { return false; }
   virtual bool zoomOut() noexcept { return false; }
   virtual bool zoomAll() noexcept { return false; }
+  virtual bool toggle3D() noexcept { return false; }
   virtual bool abortCommand() noexcept { return false; }
   virtual bool importDxf() noexcept { return false; }
   virtual bool exportImage() noexcept;

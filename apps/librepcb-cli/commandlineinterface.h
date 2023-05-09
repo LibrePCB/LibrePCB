@@ -71,11 +71,12 @@ private:  // Methods
                    const QStringList& boardNames,
                    const QStringList& boardIndices, bool removeOtherBoards,
                    bool save, bool strict) const noexcept;
-  bool openLibrary(const QString& libDir, bool all, bool runCheck, bool save,
-                   bool strict) const noexcept;
+  bool openLibrary(const QString& libDir, bool all, bool runCheck,
+                   bool minifyStepFiles, bool save, bool strict) const noexcept;
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,
                              LibraryBaseElement& element, bool runCheck,
-                             bool save, bool strict, bool& success) const;
+                             bool minifyStepFiles, bool save, bool strict,
+                             bool& success) const;
   static QStringList prepareRuleCheckMessages(
       RuleCheckMessageList messages, const QSet<SExpression>& approvals,
       int& approvedMsgCount) noexcept;

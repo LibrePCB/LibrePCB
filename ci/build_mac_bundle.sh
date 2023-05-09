@@ -12,8 +12,16 @@ rm -r "./build/install/opt/bin" "./build/install/opt/share"
 
 # Build bundles
 pushd "./build/install/opt/"  # Avoid having path in DMG name
-macdeployqt "LibrePCB.app" -dmg
-macdeployqt "LibrePCB-CLI.app" -dmg
+dylibbundler -ns -od -b \
+  -x LibrePCB.app/Contents/MacOS/librepcb \
+  -d LibrePCB.app/Contents/Frameworks/ \
+  -p @executable_path/../Frameworks/
+dylibbundler -ns -od -b \
+  -x LibrePCB-CLI.app/Contents/MacOS/librepcb-cli \
+  -d LibrePCB-CLI.app/Contents/Frameworks/ \
+  -p @executable_path/../Frameworks/
+macdeployqt "LibrePCB.app" -dmg -always-overwrite
+macdeployqt "LibrePCB-CLI.app" -dmg -always-overwrite
 popd
 
 # Restore lowercase app names for backwards compatibility with installers

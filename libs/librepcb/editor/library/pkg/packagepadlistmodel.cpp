@@ -190,10 +190,17 @@ QVariant PackagePadListModel::headerData(int section,
     if (role == Qt::DisplayRole) {
       switch (section) {
         case COLUMN_NAME:
-          return tr("Name");
+          return tr("Package Pads");
         default:
           return QVariant();
       }
+    } else if ((role == Qt::TextAlignmentRole) && (section == COLUMN_NAME)) {
+      return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+    } else if (role == Qt::FontRole) {
+      QFont f = QAbstractItemModel::headerData(section, orientation, role)
+                    .value<QFont>();
+      f.setBold(section == COLUMN_NAME);
+      return f;
     }
   } else if (orientation == Qt::Vertical) {
     if (mPadList && (role == Qt::DisplayRole)) {

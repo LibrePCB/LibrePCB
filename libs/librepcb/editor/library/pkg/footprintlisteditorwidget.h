@@ -32,10 +32,15 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class LengthUnit;
+class Package;
+
 namespace editor {
 
 class EditableTableWidget;
 class FootprintListModel;
+class LengthDelegate;
 class UndoStack;
 
 /*******************************************************************************
@@ -55,8 +60,10 @@ public:
   ~FootprintListEditorWidget() noexcept;
 
   // Setters
+  void setFrameStyle(int style) noexcept;
   void setReadOnly(bool readOnly) noexcept;
-  void setReferences(FootprintList* list, UndoStack* stack) noexcept;
+  void setReferences(Package* package, UndoStack* stack) noexcept;
+  void setLengthUnit(const LengthUnit& unit) noexcept;
 
   // Operator Overloadings
   FootprintListEditorWidget& operator=(const FootprintListEditorWidget& rhs) =
@@ -68,6 +75,9 @@ signals:
 private:
   QScopedPointer<FootprintListModel> mModel;
   QScopedPointer<EditableTableWidget> mView;
+  LengthDelegate* mLengthDelegateX;
+  LengthDelegate* mLengthDelegateY;
+  LengthDelegate* mLengthDelegateZ;
 };
 
 /*******************************************************************************

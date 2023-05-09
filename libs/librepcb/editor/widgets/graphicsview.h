@@ -74,7 +74,9 @@ public:
     return mGridInterval;
   }
   Theme::GridStyle getGridStyle() const noexcept { return mGridStyle; }
-  bool isAnyMouseButtonPressed() const noexcept { return mAnyButtonPressed; }
+  bool isMouseButtonPressed(Qt::MouseButtons btn) const noexcept {
+    return mPressedMouseButtons & btn;
+  }
   qint64 getIdleTimeMs() const noexcept { return mIdleTimeMs; }
 
   // Setters
@@ -180,7 +182,7 @@ private:
 
   // State
   volatile bool mPanningActive;
-  volatile bool mAnyButtonPressed;
+  Qt::MouseButtons mPressedMouseButtons;
   QCursor mCursorBeforePanning;
   qint64 mIdleTimeMs;
 

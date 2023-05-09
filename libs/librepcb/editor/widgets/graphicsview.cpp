@@ -72,7 +72,7 @@ GraphicsView::GraphicsView(QWidget* parent,
     }),
     mRulerPositions(),
     mPanningActive(false),
-    mAnyButtonPressed(false),
+    mPressedMouseButtons(Qt::NoButton),
     mIdleTimeMs(0) {
   setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
   setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
@@ -377,7 +377,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
       }
-      mAnyButtonPressed = (e->buttons() != Qt::NoButton);
+      mPressedMouseButtons = e->buttons();
       return true;
     }
     case QEvent::GraphicsSceneMouseRelease: {
@@ -390,7 +390,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
       }
-      mAnyButtonPressed = (e->buttons() != Qt::NoButton);
+      mPressedMouseButtons = e->buttons();
       return true;
     }
     case QEvent::GraphicsSceneMouseMove: {
@@ -407,7 +407,7 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
         mPanningActive = false;
       }
       emit cursorScenePositionChanged(Point::fromPx(e->scenePos()));
-      mAnyButtonPressed = (e->buttons() != Qt::NoButton);
+      mPressedMouseButtons = e->buttons();
     }
       // fall through
     case QEvent::GraphicsSceneMouseDoubleClick:

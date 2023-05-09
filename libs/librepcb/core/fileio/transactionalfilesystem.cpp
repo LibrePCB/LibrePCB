@@ -46,7 +46,8 @@ TransactionalFileSystem::TransactionalFileSystem(
     mFilePath(filepath),
     mIsWritable(writable),
     mLock(filepath),
-    mRestoredFromAutosave(false) {
+    mRestoredFromAutosave(false),
+    mMutex(QMutex::Recursive) {
   // Load the backup if there is one (i.e. last save operation has failed).
   FilePath backupFile = mFilePath.getPathTo(".backup/backup.lp");
   if (backupFile.isExistingFile()) {
@@ -101,6 +102,7 @@ QStringList TransactionalFileSystem::getDirs(const QString& path) const
   QSet<QString> dirnames;
   QString dirpath = cleanPath(path);
   if (!dirpath.isEmpty()) dirpath.append("/");
+  QMutexLocker lock(&mMutex);
 
   // add directories from file system, if not removed
   QDir dir(mFilePath.getPathTo(path).toStr());
@@ -129,6 +131,7 @@ QStringList TransactionalFileSystem::getFiles(const QString& path) const
   QSet<QString> filenames;
   QString dirpath = cleanPath(path);
   if (!dirpath.isEmpty()) dirpath.append("/");
+  QMutexLocker lock(&mMutex);
 
   // add files from file system, if not removed
   QDir dir(mFilePath.getPathTo(path).toStr());
@@ -152,7 +155,8 @@ QStringList TransactionalFileSystem::getFiles(const QString& path) const
 }
 
 bool TransactionalFileSystem::fileExists(const QString& path) const noexcept {
-  QString cleanedPath = cleanPath(path);
+  const QString cleanedPath = cleanPath(path);
+  QMutexLocker lock(&mMutex);
   if (mModifiedFiles.contains(cleanedPath)) {
     return true;
   } else if (isRemoved(cleanedPath)) {
@@ -163,27 +167,41 @@ bool TransactionalFileSystem::fileExists(const QString& path) const noexcept {
 }
 
 QByteArray TransactionalFileSystem::read(const QString& path) const {
-  QString cleanedPath = cleanPath(path);
+  const QByteArray content = readIfExists(path);
+  if (content.isNull()) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("File '%1' does not exist.")
+            .arg(mFilePath.getPathTo(cleanPath(path)).toNative()));
+  }
+  return content;
+}
+
+QByteArray TransactionalFileSystem::readIfExists(const QString& path) const {
+  const QString cleanedPath = cleanPath(path);
+  QMutexLocker lock(&mMutex);
   if (mModifiedFiles.contains(cleanedPath)) {
     return mModifiedFiles.value(cleanedPath);
   } else if (!isRemoved(cleanedPath)) {
-    return FileUtils::readFile(mFilePath.getPathTo(cleanedPath));  // can throw
-  } else {
-    throw RuntimeError(__FILE__, __LINE__,
-                       tr("File '%1' does not exist.")
-                           .arg(mFilePath.getPathTo(cleanedPath).toNative()));
+    const FilePath fp = mFilePath.getPathTo(cleanedPath);
+    if (fp.isExistingFile()) {
+      return FileUtils::readFile(fp);  // can throw
+    }
   }
+  return QByteArray();
 }
 
 void TransactionalFileSystem::write(const QString& path,
                                     const QByteArray& content) {
-  QString cleanedPath = cleanPath(path);
+  const QString cleanedPath = cleanPath(path);
+  QMutexLocker lock(&mMutex);
   mModifiedFiles[cleanedPath] = content;
   mRemovedFiles.remove(cleanedPath);
 }
 
 void TransactionalFileSystem::removeFile(const QString& path) {
-  QString cleanedPath = cleanPath(path);
+  const QString cleanedPath = cleanPath(path);
+  QMutexLocker lock(&mMutex);
   mModifiedFiles.remove(cleanedPath);
   mRemovedFiles.insert(cleanedPath);
 }
@@ -191,6 +209,7 @@ void TransactionalFileSystem::removeFile(const QString& path) {
 void TransactionalFileSystem::removeDirRecursively(const QString& path) {
   QString dirpath = cleanPath(path);
   if (!dirpath.isEmpty()) dirpath.append("/");
+  QMutexLocker lock(&mMutex);
   foreach (const QString& fp, mModifiedFiles.keys()) {
     if (dirpath.isEmpty() || fp.startsWith(dirpath)) {
       mModifiedFiles.remove(fp);
@@ -215,10 +234,14 @@ void TransactionalFileSystem::loadFromZip(QByteArray content) {
     throw RuntimeError(__FILE__, __LINE__, tr("Failed to open ZIP file '%1'."));
   }
   QuaZipFile file(&zip);
+  QMutexLocker lock(&mMutex);
   for (bool f = zip.goToFirstFile(); f; f = zip.goToNextFile()) {
-    file.open(QIODevice::ReadOnly);
-    write(file.getActualFileName(), file.readAll());
-    file.close();
+    const QString fileName = file.getActualFileName();
+    if ((!fileName.endsWith("/")) && (!fileName.endsWith("\\"))) {
+      file.open(QIODevice::ReadOnly);
+      write(fileName, file.readAll());
+      file.close();
+    }
   }
   zip.close();
 }
@@ -231,10 +254,14 @@ void TransactionalFileSystem::loadFromZip(const FilePath& fp) {
         tr("Failed to open the ZIP file '%1'.").arg(fp.toNative()));
   }
   QuaZipFile file(&zip);
+  QMutexLocker lock(&mMutex);
   for (bool f = zip.goToFirstFile(); f; f = zip.goToNextFile()) {
-    file.open(QIODevice::ReadOnly);
-    write(file.getActualFileName(), file.readAll());
-    file.close();
+    const QString fileName = file.getActualFileName();
+    if ((!fileName.endsWith("/")) && (!fileName.endsWith("\\"))) {
+      file.open(QIODevice::ReadOnly);
+      write(fileName, file.readAll());
+      file.close();
+    }
   }
   zip.close();
 }
@@ -248,6 +275,7 @@ QByteArray TransactionalFileSystem::exportToZip(FilterFunction filter) const {
   }
   try {
     QuaZipFile file(&zip);
+    QMutexLocker lock(&mMutex);
     exportDirToZip(file, fp, "", filter);
     zip.close();
   } catch (const Exception& e) {
@@ -269,6 +297,7 @@ void TransactionalFileSystem::exportToZip(const FilePath& fp,
   }
   try {
     QuaZipFile file(&zip);
+    QMutexLocker lock(&mMutex);
     exportDirToZip(file, fp, "", filter);
     zip.close();
   } catch (const Exception& e) {
@@ -280,12 +309,14 @@ void TransactionalFileSystem::exportToZip(const FilePath& fp,
 }
 
 void TransactionalFileSystem::discardChanges() noexcept {
+  QMutexLocker lock(&mMutex);
   mModifiedFiles.clear();
   mRemovedFiles.clear();
   mRemovedDirs.clear();
 }
 
 QStringList TransactionalFileSystem::checkForModifications() const {
+  QMutexLocker lock(&mMutex);
   QStringList modifications;
 
   // removed directories
@@ -318,10 +349,13 @@ QStringList TransactionalFileSystem::checkForModifications() const {
 }
 
 void TransactionalFileSystem::autosave() {
+  QMutexLocker lock(&mMutex);
   saveDiff("autosave");  // can throw
 }
 
 void TransactionalFileSystem::save() {
+  QMutexLocker lock(&mMutex);
+
   // save to backup directory
   saveDiff("backup");  // can throw
 

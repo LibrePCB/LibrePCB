@@ -187,6 +187,25 @@ MsgMissingFootprint::MsgMissingFootprint() noexcept
 }
 
 /*******************************************************************************
+ *  MsgMissingFootprintModel
+ ******************************************************************************/
+
+MsgMissingFootprintModel::MsgMissingFootprintModel(
+    std::shared_ptr<const Footprint> footprint) noexcept
+  : RuleCheckMessage(
+        Severity::Hint,
+        tr("No 3D model defined for '%1'")
+            .arg(*footprint->getNames().getDefaultValue()),
+        tr("The footprint has no 3D model specified, so the package will be "
+           "missing in the 3D viewer and in 3D data exports. However, this has "
+           "no impact on the PCB production data."),
+        "missing_footprint_3d_model") {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  MsgMissingFootprintName
  ******************************************************************************/
 

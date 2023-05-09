@@ -60,6 +60,12 @@ configure_file(build_env.h.in librepcb_build_env.h @ONLY)
 # Export library
 add_library(
   librepcb_core STATIC
+  3d/occmodel.cpp
+  3d/occmodel.h
+  3d/scenedata3d.cpp
+  3d/scenedata3d.h
+  3d/stepexport.cpp
+  3d/stepexport.h
   algorithm/airwiresbuilder.cpp
   algorithm/airwiresbuilder.h
   application.cpp
@@ -232,6 +238,8 @@ add_library(
   library/pkg/packagecheck.h
   library/pkg/packagecheckmessages.cpp
   library/pkg/packagecheckmessages.h
+  library/pkg/packagemodel.cpp
+  library/pkg/packagemodel.h
   library/pkg/packagepad.cpp
   library/pkg/packagepad.h
   library/sym/symbol.cpp
@@ -452,6 +460,7 @@ target_link_libraries(
   librepcb_core
   PRIVATE common
           # Third party
+          OpenCascade::OpenCascade
           DelaunayTriangulation::DelaunayTriangulation
           Dxflib::Dxflib
           FontoBene::FontoBeneQt5

@@ -6,6 +6,11 @@ set(CMAKE_AUTORCC OFF)
 # Export library
 add_library(
   librepcb_editor STATIC
+  3d/openglobject.h
+  3d/openglscenebuilder.cpp
+  3d/openglscenebuilder.h
+  3d/opengltriangleobject.cpp
+  3d/opengltriangleobject.h
   cmd/cmdattributeedit.cpp
   cmd/cmdattributeedit.h
   cmd/cmdcircleedit.cpp
@@ -135,6 +140,12 @@ add_library(
   library/cmd/cmdlibraryelementedit.h
   library/cmd/cmdpackageedit.cpp
   library/cmd/cmdpackageedit.h
+  library/cmd/cmdpackagemodeladd.cpp
+  library/cmd/cmdpackagemodeladd.h
+  library/cmd/cmdpackagemodeledit.cpp
+  library/cmd/cmdpackagemodeledit.h
+  library/cmd/cmdpackagemodelremove.cpp
+  library/cmd/cmdpackagemodelremove.h
   library/cmd/cmdpackagepadedit.cpp
   library/cmd/cmdpackagepadedit.h
   library/cmd/cmdpastefootprintitems.cpp
@@ -300,6 +311,10 @@ add_library(
   library/pkg/packageeditorwidget.cpp
   library/pkg/packageeditorwidget.h
   library/pkg/packageeditorwidget.ui
+  library/pkg/packagemodellisteditorwidget.cpp
+  library/pkg/packagemodellisteditorwidget.h
+  library/pkg/packagemodellistmodel.cpp
+  library/pkg/packagemodellistmodel.h
   library/pkg/packagepadcombobox.cpp
   library/pkg/packagepadcombobox.h
   library/pkg/packagepadlisteditorwidget.cpp
@@ -758,6 +773,8 @@ add_library(
   widgets/messagewidget.h
   widgets/numbereditbase.cpp
   widgets/numbereditbase.h
+  widgets/openglview.cpp
+  widgets/openglview.h
   widgets/patheditorwidget.cpp
   widgets/patheditorwidget.h
   widgets/plaintextedit.cpp
@@ -856,6 +873,8 @@ target_link_libraries(
   PRIVATE common
           # LibrePCB
           LibrePCB::EagleImport
+          # Third party
+          OpenGL::GLU
 )
 target_link_libraries(
   librepcb_editor

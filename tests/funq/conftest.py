@@ -12,6 +12,14 @@ from funq.client import ApplicationContext, ApplicationConfig
 from funq.errors import FunqError
 
 
+# Avoid errors due to too long file path on Windows :-|
+def _long_path(path):
+    if os.name == 'nt':
+        return '\\\\?\\' + path.replace('/', '\\')
+    else:
+        return path
+
+
 FUNQ_DIR = os.path.dirname(__file__)
 TESTS_DIR = os.path.dirname(FUNQ_DIR)
 REPO_DIR = os.path.dirname(TESTS_DIR)
@@ -55,8 +63,8 @@ class LibrePcbFixture(object):
                             "'--librepcb-executable'.".format(self.executable))
         self.tmpdir = tmpdir
         # Copy test data to temporary directory to avoid modifications in original data
-        shutil.copytree(os.path.join(DATA_DIR, 'workspaces', 'Empty Workspace'),
-                        os.path.join(self.tmpdir, 'Empty Workspace'))
+        shutil.copytree(_long_path(os.path.join(DATA_DIR, 'workspaces', 'Empty Workspace')),
+                        _long_path(os.path.join(self.tmpdir, 'Empty Workspace')))
         # Init members to default values
         self.workspace_path = os.path.join(self.tmpdir, 'Empty Workspace')
         self.project_path = None
@@ -93,7 +101,7 @@ class LibrePcbFixture(object):
             shutil.make_archive(dst, 'zip', src)
             shutil.move(dst + '.zip', dst + '.lppz')
         else:
-            shutil.copytree(src, dst)
+            shutil.copytree(_long_path(src), _long_path(dst))
 
     def set_project(self, path):
         if not os.path.isabs(path):
@@ -108,7 +116,7 @@ class LibrePcbFixture(object):
             path = os.path.join(DATA_DIR, path)
         dest = self.get_workspace_libraries_path('local')
         dest = os.path.join(dest, os.path.basename(path))
-        shutil.copytree(path, dest)
+        shutil.copytree(_long_path(path), _long_path(dest))
 
     def open(self):
         self._create_application_config_file()

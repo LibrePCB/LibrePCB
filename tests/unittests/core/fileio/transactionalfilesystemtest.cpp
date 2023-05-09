@@ -866,13 +866,13 @@ INSTANTIATE_TEST_SUITE_P(TransactionalFileSystemGetFilesInDirTest,
                          ::testing::ValuesIn(sGetFilesInDirTestData));
 
 /*******************************************************************************
- *  Parametrized fileExists() and read() Tests
+ *  Parametrized fileExists(), read() and readIfExists() Tests
  ******************************************************************************/
 
 struct TransactionalFileSystemFileExistsTestData {
   QString root;
   QString relPath;
-  QByteArray content;
+  QByteArray content;  // null = non-existing file
 };
 
 class TransactionalFileSystemFileExistsTest
@@ -896,6 +896,14 @@ TEST_P(TransactionalFileSystemFileExistsTest, testRead) {
   } else {
     EXPECT_EQ(data.content, fs.read(data.relPath));
   }
+}
+
+TEST_P(TransactionalFileSystemFileExistsTest, testReadIfExists) {
+  const TransactionalFileSystemFileExistsTestData& data = GetParam();
+
+  TransactionalFileSystem fs(mTmpDir.getPathTo(data.root), false);
+  EXPECT_EQ(data.content, fs.readIfExists(data.relPath));
+  EXPECT_EQ(data.content.isNull(), fs.readIfExists(data.relPath).isNull());
 }
 
 // clang-format off

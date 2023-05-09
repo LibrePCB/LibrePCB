@@ -50,6 +50,9 @@ To compile LibrePCB, you need the following software components:
 
 - g++ >= 4.8, MinGW >= 4.8, or Clang >= 3.3 (C++11 support is required)
 - [Qt](http://www.qt.io/download-open-source/) >= 5.5
+- [OpenCASCADE](https://www.opencascade.com/) OCCT or OCE (optional)
+- [OpenGL Utility Library](https://en.wikipedia.org/wiki/OpenGL_Utility_Library)
+  GLU (optional)
 - [zlib](http://www.zlib.net/)
 - [OpenSSL](https://www.openssl.org/)
 - [CMake](https://cmake.org/) 3.5 or newer
@@ -67,16 +70,17 @@ actually used for CI, but are also useful to build LibrePCB locally.
 *Note: For Ubuntu older than 22.04, replace `qtbase5-dev` by `qt5-default`.*
 
 ```bash
-sudo apt-get install git build-essential qtbase5-dev qttools5-dev-tools qttools5-dev \
-     libglu1-mesa-dev openssl zlib1g zlib1g-dev libqt5opengl5-dev libqt5svg5-dev cmake
+sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
+     qtbase5-dev qttools5-dev-tools qttools5-dev libqt5opengl5-dev libqt5svg5-dev \
+     libglu1-mesa-dev liboce-*-dev
 sudo apt-get install qt5-doc qtcreator # optional
 ```
 
 #### Installation on Arch Linux
 
 ```bash
-sudo pacman -S git base-devel qt5-base qt5-svg qt5-tools desktop-file-utils shared-mime-info \
-     openssl zlib cmake
+sudo pacman -S base-devel git cmake openssl zlib desktop-file-utils shared-mime-info \
+     qt5-base qt5-svg qt5-tools opencascade
 sudo pacman -S qt5-doc qtcreator # optional
 ```
 
@@ -90,7 +94,7 @@ GitHub.*
 
 1. Install Xcode through the app store and start it at least once (for the license)
 2. Install [homebrew](https://github.com/Homebrew/brew) (**the** package manager)
-3. Install *qt5* and *cmake*: `brew update && brew install qt5 cmake`
+3. Install dependencies: `brew update && brew install qt5 cmake opencascade`
 4. Make the toolchain available: `brew unlink qt && brew link --force qt5`
 
 #### Installation on Windows
@@ -103,6 +107,13 @@ with MSVC, so you must install following components with the Qt installer:
 - The MinGW compiler itself
 - The Qt libraries for MinGW
 - cmake
+
+For the OpenCascade library the installation procedure is not that easy
+unfortunately. Basically you have to build it by yourself, see instructions
+[here](https://dev.opencascade.org/doc/overview/html/build_upgrade__building_occt.html).
+However, to avoid this effort you could instead just set the CMake option
+`USE_OPENCASCADE=0` (can be set in the QtCreator build config) to allow
+compiling LibrePCB without OpenCascade.
 
 ### Cloning
 

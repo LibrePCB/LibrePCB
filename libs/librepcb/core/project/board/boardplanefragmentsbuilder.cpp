@@ -729,8 +729,10 @@ QVector<std::pair<Point, Angle>>
 bool BoardPlaneFragmentsBuilder::applyToBoard(
     std::shared_ptr<JobData> data) noexcept {
   if (data->board) {
+    bool modified = false;
     for (auto it = data->result.begin(); it != data->result.end(); it++) {
       if (BI_Plane* plane = data->board->getPlanes().value(it.key())) {
+        modified = modified || (plane->getFragments() != it.value());
         plane->setCalculatedFragments(it.value());
       }
     }
@@ -740,8 +742,11 @@ bool BoardPlaneFragmentsBuilder::applyToBoard(
         data->board->invalidatePlanes(layer);
       }
     }
-    if (mRebuildAirWires) {
-      data->board->forceAirWiresRebuild();
+    if (modified) {
+      if (mRebuildAirWires) {
+        data->board->forceAirWiresRebuild();
+      }
+      emit boardPlanesModified();
     }
     return data->finished;
   }

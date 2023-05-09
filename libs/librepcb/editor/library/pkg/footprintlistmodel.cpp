@@ -25,6 +25,8 @@
 #include "../../undostack.h"
 #include "../cmd/cmdfootprintedit.h"
 
+#include <librepcb/core/library/pkg/package.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -40,7 +42,7 @@ namespace editor {
 
 FootprintListModel::FootprintListModel(QObject* parent) noexcept
   : QAbstractTableModel(parent),
-    mFootprintList(nullptr),
+    mPackage(nullptr),
     mUndoStack(nullptr),
     mNewName(),
     mOnEditedSlot(*this, &FootprintListModel::footprintListEdited) {
@@ -53,17 +55,17 @@ FootprintListModel::~FootprintListModel() noexcept {
  *  Setters
  ******************************************************************************/
 
-void FootprintListModel::setFootprintList(FootprintList* list) noexcept {
+void FootprintListModel::setPackage(Package* package) noexcept {
   emit beginResetModel();
 
-  if (mFootprintList) {
-    mFootprintList->onEdited.detach(mOnEditedSlot);
+  if (mPackage) {
+    mPackage->getFootprints().onEdited.detach(mOnEditedSlot);
   }
 
-  mFootprintList = list;
+  mPackage = package;
 
-  if (mFootprintList) {
-    mFootprintList->onEdited.attach(mOnEditedSlot);
+  if (mPackage) {
+    mPackage->getFootprints().onEdited.attach(mOnEditedSlot);
   }
 
   emit endResetModel();
@@ -79,14 +81,15 @@ void FootprintListModel::setUndoStack(UndoStack* stack) noexcept {
 
 void FootprintListModel::addFootprint(const QVariant& editData) noexcept {
   Q_UNUSED(editData);
-  if (!mFootprintList) {
+  if (!mPackage) {
     return;
   }
 
   try {
     std::shared_ptr<Footprint> fpt = std::make_shared<Footprint>(
         Uuid::createRandom(), validateNameOrThrow(mNewName), "");
-    execCmd(new CmdFootprintInsert(*mFootprintList, fpt));
+    fpt->setModels(mPackage->getModels().getUuidSet());
+    execCmd(new CmdFootprintInsert(mPackage->getFootprints(), fpt));
     mNewName = QString();
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
@@ -94,23 +97,27 @@ void FootprintListModel::addFootprint(const QVariant& editData) noexcept {
 }
 
 void FootprintListModel::copyFootprint(const QVariant& editData) noexcept {
-  if (!mFootprintList) {
+  if (!mPackage) {
     return;
   }
 
   try {
     Uuid uuid = Uuid::fromString(editData.toString());
-    std::shared_ptr<const Footprint> original = mFootprintList->get(uuid);
+    std::shared_ptr<const Footprint> original =
+        mPackage->getFootprints().get(uuid);
     ElementName newName("Copy of " % original->getNames().getDefaultValue());
     std::shared_ptr<Footprint> copy(
         new Footprint(Uuid::createRandom(), newName, ""));  // can throw
     copy->getDescriptions() = original->getDescriptions();
+    copy->setModelPosition(original->getModelPosition());
+    copy->setModelRotation(original->getModelRotation());
+    copy->setModels(original->getModels());
     copy->getPads() = original->getPads();
     copy->getPolygons() = original->getPolygons();
     copy->getCircles() = original->getCircles();
     copy->getStrokeTexts() = original->getStrokeTexts();
     copy->getHoles() = original->getHoles();
-    execCmd(new CmdFootprintInsert(*mFootprintList, copy));
+    execCmd(new CmdFootprintInsert(mPackage->getFootprints(), copy));
     mNewName = QString();
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
@@ -118,29 +125,30 @@ void FootprintListModel::copyFootprint(const QVariant& editData) noexcept {
 }
 
 void FootprintListModel::removeFootprint(const QVariant& editData) noexcept {
-  if (!mFootprintList) {
+  if (!mPackage) {
     return;
   }
 
   try {
     Uuid uuid = Uuid::fromString(editData.toString());
-    std::shared_ptr<Footprint> fpt = mFootprintList->get(uuid);
-    execCmd(new CmdFootprintRemove(*mFootprintList, fpt.get()));
+    std::shared_ptr<Footprint> fpt = mPackage->getFootprints().get(uuid);
+    execCmd(new CmdFootprintRemove(mPackage->getFootprints(), fpt.get()));
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
   }
 }
 
 void FootprintListModel::moveFootprintUp(const QVariant& editData) noexcept {
-  if (!mFootprintList) {
+  if (!mPackage) {
     return;
   }
 
   try {
     Uuid uuid = Uuid::fromString(editData.toString());
-    int index = mFootprintList->indexOf(uuid);
-    if ((index >= 1) && (index < mFootprintList->count())) {
-      execCmd(new CmdFootprintsSwap(*mFootprintList, index, index - 1));
+    int index = mPackage->getFootprints().indexOf(uuid);
+    if ((index >= 1) && (index < mPackage->getFootprints().count())) {
+      execCmd(
+          new CmdFootprintsSwap(mPackage->getFootprints(), index, index - 1));
     }
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
@@ -148,15 +156,16 @@ void FootprintListModel::moveFootprintUp(const QVariant& editData) noexcept {
 }
 
 void FootprintListModel::moveFootprintDown(const QVariant& editData) noexcept {
-  if (!mFootprintList) {
+  if (!mPackage) {
     return;
   }
 
   try {
     Uuid uuid = Uuid::fromString(editData.toString());
-    int index = mFootprintList->indexOf(uuid);
-    if ((index >= 0) && (index < mFootprintList->count() - 1)) {
-      execCmd(new CmdFootprintsSwap(*mFootprintList, index, index + 1));
+    int index = mPackage->getFootprints().indexOf(uuid);
+    if ((index >= 0) && (index < mPackage->getFootprints().count() - 1)) {
+      execCmd(
+          new CmdFootprintsSwap(mPackage->getFootprints(), index, index + 1));
     }
   } catch (const Exception& e) {
     QMessageBox::critical(0, tr("Error"), e.getMsg());
@@ -168,8 +177,8 @@ void FootprintListModel::moveFootprintDown(const QVariant& editData) noexcept {
  ******************************************************************************/
 
 int FootprintListModel::rowCount(const QModelIndex& parent) const {
-  if (!parent.isValid() && mFootprintList) {
-    return mFootprintList->count() + 1;
+  if (!parent.isValid() && mPackage) {
+    return mPackage->getFootprints().count() + 1;
   }
   return 0;
 }
@@ -182,11 +191,12 @@ int FootprintListModel::columnCount(const QModelIndex& parent) const {
 }
 
 QVariant FootprintListModel::data(const QModelIndex& index, int role) const {
-  if (!index.isValid() || !mFootprintList) {
+  if (!index.isValid() || !mPackage) {
     return QVariant();
   }
 
-  std::shared_ptr<Footprint> item = mFootprintList->value(index.row());
+  std::shared_ptr<Footprint> item =
+      mPackage->getFootprints().value(index.row());
   switch (index.column()) {
     case COLUMN_NAME: {
       QString name = item ? *item->getNames().getDefaultValue() : mNewName;
@@ -207,6 +217,72 @@ QVariant FootprintListModel::data(const QModelIndex& index, int role) const {
           } else {
             return QVariant();
           }
+        default:
+          return QVariant();
+      }
+    }
+    case COLUMN_MODEL_POSITION_X: {
+      const Length val =
+          std::get<0>(item ? item->getModelPosition() : mNewModelPosition);
+      switch (role) {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+          return QVariant::fromValue(val);
+        default:
+          return QVariant();
+      }
+    }
+    case COLUMN_MODEL_POSITION_Y: {
+      const Length val =
+          std::get<1>(item ? item->getModelPosition() : mNewModelPosition);
+      switch (role) {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+          return QVariant::fromValue(val);
+        default:
+          return QVariant();
+      }
+    }
+    case COLUMN_MODEL_POSITION_Z: {
+      const Length val =
+          std::get<2>(item ? item->getModelPosition() : mNewModelPosition);
+      switch (role) {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+          return QVariant::fromValue(val);
+        default:
+          return QVariant();
+      }
+    }
+    case COLUMN_MODEL_ROTATION_X: {
+      const Angle val =
+          std::get<0>(item ? item->getModelRotation() : mNewModelRotation);
+      switch (role) {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+          return QVariant::fromValue(val);
+        default:
+          return QVariant();
+      }
+    }
+    case COLUMN_MODEL_ROTATION_Y: {
+      const Angle val =
+          std::get<1>(item ? item->getModelRotation() : mNewModelRotation);
+      switch (role) {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+          return QVariant::fromValue(val);
+        default:
+          return QVariant();
+      }
+    }
+    case COLUMN_MODEL_ROTATION_Z: {
+      const Angle val =
+          std::get<2>(item ? item->getModelRotation() : mNewModelRotation);
+      switch (role) {
+        case Qt::DisplayRole:
+        case Qt::EditRole:
+          return QVariant::fromValue(val);
         default:
           return QVariant();
       }
@@ -233,17 +309,38 @@ QVariant FootprintListModel::headerData(int section,
     if (role == Qt::DisplayRole) {
       switch (section) {
         case COLUMN_NAME:
-          return tr("Name");
+          return tr("Footprint Variants");
+        case COLUMN_MODEL_POSITION_X:
+          return QString("3D ΔX");
+        case COLUMN_MODEL_POSITION_Y:
+          return QString("3D ΔY");
+        case COLUMN_MODEL_POSITION_Z:
+          return QString("3D ΔZ");
+        case COLUMN_MODEL_ROTATION_X:
+          return QString("3D ∠X");
+        case COLUMN_MODEL_ROTATION_Y:
+          return QString("3D ∠Y");
+        case COLUMN_MODEL_ROTATION_Z:
+          return QString("3D ∠Z");
         default:
           return QVariant();
       }
+    } else if ((role == Qt::TextAlignmentRole) && (section == COLUMN_NAME)) {
+      return QVariant(Qt::AlignLeft | Qt::AlignVCenter);
+    } else if (role == Qt::FontRole) {
+      QFont f = QAbstractItemModel::headerData(section, orientation, role)
+                    .value<QFont>();
+      f.setBold(section == COLUMN_NAME);
+      return f;
     }
   } else if (orientation == Qt::Vertical) {
-    if (mFootprintList && (role == Qt::DisplayRole)) {
-      std::shared_ptr<Footprint> item = mFootprintList->value(section);
+    if (mPackage && (role == Qt::DisplayRole)) {
+      std::shared_ptr<Footprint> item =
+          mPackage->getFootprints().value(section);
       return item ? QString::number(section + 1) : tr("New:");
-    } else if (mFootprintList && (role == Qt::ToolTipRole)) {
-      std::shared_ptr<Footprint> item = mFootprintList->value(section);
+    } else if (mPackage && (role == Qt::ToolTipRole)) {
+      std::shared_ptr<Footprint> item =
+          mPackage->getFootprints().value(section);
       return item ? item->getUuid().toStr() : tr("Add a new footprint");
     } else if (role == Qt::TextAlignmentRole) {
       return QVariant(Qt::AlignRight | Qt::AlignVCenter);
@@ -262,17 +359,21 @@ Qt::ItemFlags FootprintListModel::flags(const QModelIndex& index) const {
 
 bool FootprintListModel::setData(const QModelIndex& index,
                                  const QVariant& value, int role) {
-  if (!mFootprintList) {
+  if (!mPackage) {
     return false;
   }
 
   try {
-    std::shared_ptr<Footprint> item = mFootprintList->value(index.row());
+    std::shared_ptr<Footprint> item =
+        mPackage->getFootprints().value(index.row());
     QScopedPointer<CmdFootprintEdit> cmd;
     if (item) {
       cmd.reset(new CmdFootprintEdit(*item));
     }
-    if ((index.column() == COLUMN_NAME) && role == Qt::EditRole) {
+    const bool editRole = (role == Qt::EditRole);
+    Point3D modelPos = item ? item->getModelPosition() : mNewModelPosition;
+    Angle3D modelRot = item ? item->getModelRotation() : mNewModelRotation;
+    if ((index.column() == COLUMN_NAME) && editRole) {
       QString name = value.toString().trimmed();
       QString cleanedName = cleanElementName(name);
       if (cmd) {
@@ -282,12 +383,28 @@ bool FootprintListModel::setData(const QModelIndex& index,
       } else {
         mNewName = cleanedName;
       }
+    } else if ((index.column() == COLUMN_MODEL_POSITION_X) && editRole) {
+      std::get<0>(modelPos) = value.value<Length>();
+    } else if ((index.column() == COLUMN_MODEL_POSITION_Y) && editRole) {
+      std::get<1>(modelPos) = value.value<Length>();
+    } else if ((index.column() == COLUMN_MODEL_POSITION_Z) && editRole) {
+      std::get<2>(modelPos) = value.value<Length>();
+    } else if ((index.column() == COLUMN_MODEL_ROTATION_X) && editRole) {
+      std::get<0>(modelRot) = value.value<Angle>();
+    } else if ((index.column() == COLUMN_MODEL_ROTATION_Y) && editRole) {
+      std::get<1>(modelRot) = value.value<Angle>();
+    } else if ((index.column() == COLUMN_MODEL_ROTATION_Z) && editRole) {
+      std::get<2>(modelRot) = value.value<Angle>();
     } else {
       return false;  // do not execute command!
     }
     if (cmd) {
+      cmd->setModelPosition(modelPos);
+      cmd->setModelRotation(modelRot);
       execCmd(cmd.take());
     } else if (!item) {
+      mNewModelPosition = modelPos;
+      mNewModelRotation = modelRot;
       emit dataChanged(index, index);
     }
     return true;
@@ -337,8 +454,8 @@ void FootprintListModel::execCmd(UndoCommand* cmd) {
 }
 
 ElementName FootprintListModel::validateNameOrThrow(const QString& name) const {
-  if (mFootprintList) {
-    for (const Footprint& footprint : *mFootprintList) {
+  if (mPackage) {
+    for (const Footprint& footprint : mPackage->getFootprints()) {
       if (footprint.getNames().getDefaultValue() == name) {
         throw RuntimeError(
             __FILE__, __LINE__,

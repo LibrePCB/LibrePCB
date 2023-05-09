@@ -164,13 +164,13 @@ void ClipperHelpers::intersect(ClipperLib::Paths& subject,
 std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::intersectToTree(
     const ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
     ClipperLib::PolyFillType subjectFillType,
-    ClipperLib::PolyFillType clipFillType) {
+    ClipperLib::PolyFillType clipFillType, bool closed) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
     std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
     ClipperLib::Clipper c;
-    c.AddPaths(subject, ClipperLib::ptSubject, true);
+    c.AddPaths(subject, ClipperLib::ptSubject, closed);
     c.AddPaths(clip, ClipperLib::ptClip, true);
     c.Execute(ClipperLib::ctIntersection, *result, subjectFillType,
               clipFillType);
@@ -232,13 +232,13 @@ void ClipperHelpers::subtract(ClipperLib::Paths& subject,
 std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::subtractToTree(
     const ClipperLib::Paths& subject, const ClipperLib::Paths& clip,
     ClipperLib::PolyFillType subjectFillType,
-    ClipperLib::PolyFillType clipFillType) {
+    ClipperLib::PolyFillType clipFillType, bool closed) {
   try {
     // Wrap the PolyTree object in a smart pointer since PolyTree cannot
     // safely be copied (i.e. returned by value), it would lead to a crash!!!
     std::unique_ptr<ClipperLib::PolyTree> result(new ClipperLib::PolyTree());
     ClipperLib::Clipper c;
-    c.AddPaths(subject, ClipperLib::ptSubject, true);
+    c.AddPaths(subject, ClipperLib::ptSubject, closed);
     c.AddPaths(clip, ClipperLib::ptClip, true);
     c.Execute(ClipperLib::ctDifference, *result, subjectFillType, clipFillType);
     return result;

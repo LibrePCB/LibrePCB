@@ -18,6 +18,9 @@ Options:
   --check        Run the library element check, print all non-approved messages
                  and report failure (exit code = 1) if there are non-approved
                  messages.
+  --minify-step  Minify the STEP models of all packages. Only works in
+                 conjunction with '--all'. Pass '--save' to write the minified
+                 files to disk.
   --save         Save library (and contained elements if '--all' is given)
                  before closing them (useful to upgrade file format).
   --strict       Fail if the opened files are not strictly canonical, i.e.

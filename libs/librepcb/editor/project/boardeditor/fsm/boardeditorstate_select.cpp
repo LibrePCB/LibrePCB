@@ -35,6 +35,7 @@
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmdboardplaneedit.h"
 #include "../../cmd/cmdboardpolygonedit.h"
+#include "../../cmd/cmddeviceinstanceedit.h"
 #include "../../cmd/cmddeviceinstanceeditall.h"
 #include "../../cmd/cmddragselectedboarditems.h"
 #include "../../cmd/cmdflipselectedboarditems.h"
@@ -724,7 +725,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 
       QMenu* devMenu = mb.addSubMenu(&MenuBuilder::createChangeDeviceMenu);
       foreach (const DeviceMenuItem& item, getDeviceMenuItems(cmpInst)) {
-        QAction* a = devMenu->addAction(item.icon, item.name);
+        QAction* a = devMenu->addAction(devMenu->icon(), item.name);
         a->setData(item.uuid.toStr());
         if (item.uuid == device->getDevice().getLibDevice().getUuid()) {
           a->setCheckable(true);
@@ -771,6 +772,36 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
         }
       }
       fptMenu->setEnabled(!fptMenu->isEmpty());
+
+      QMenu* modMenu = mb.addSubMenu(&MenuBuilder::createChangeModelMenu);
+      QVector<std::shared_ptr<const PackageModel>> models =
+          device->getDevice().getLibPackage().getModelsForFootprint(
+              device->getDevice().getLibFootprint().getUuid());
+      models.prepend(nullptr);
+      foreach (const std::shared_ptr<const PackageModel>& model, models) {
+        const tl::optional<Uuid> uuid =
+            model ? tl::make_optional(model->getUuid()) : tl::nullopt;
+        QAction* a =
+            modMenu->addAction(model ? modMenu->icon() : QIcon(),
+                               model ? (*model->getName()) : tr("None"));
+        if (uuid == device->getDevice().getLibModelUuid()) {
+          a->setCheckable(true);
+          a->setChecked(true);
+          a->setEnabled(false);
+        } else {
+          connect(a, &QAction::triggered, [this, device, uuid]() {
+            try {
+              QScopedPointer<CmdDeviceInstanceEdit> cmd(
+                  new CmdDeviceInstanceEdit(device->getDevice()));
+              cmd->setModel(uuid);
+              mContext.undoStack.execCmd(cmd.take());
+            } catch (const Exception& e) {
+              QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+            }
+          });
+        }
+      }
+      modMenu->setEnabled(!modMenu->isEmpty());
     } else if (auto netline =
                    std::dynamic_pointer_cast<BGI_NetLine>(selectedItem)) {
       mb.addAction(cmd.remove.createAction(
@@ -1565,7 +1596,6 @@ QList<BoardEditorState_Select::DeviceMenuItem>
         const ComponentInstance& cmpInst) const noexcept {
   QList<BoardEditorState_Select::DeviceMenuItem> items;
   try {
-    QIcon icon(":/img/library/device.png");
     QSet<Uuid> devices = mContext.workspace.getLibraryDb().getComponentDevices(
         cmpInst.getLibComponent().getUuid());  // can throw
     foreach (const Uuid& deviceUuid, devices) {
@@ -1581,8 +1611,8 @@ QList<BoardEditorState_Select::DeviceMenuItem>
           mContext.workspace.getLibraryDb().getLatest<Package>(pkgUuid);
       mContext.workspace.getLibraryDb().getTranslations<Package>(
           pkgFp, mContext.project.getLocaleOrder(), &pkgName);
-      items.append(DeviceMenuItem{QString("%1 [%2]").arg(devName, pkgName),
-                                  icon, deviceUuid});
+      items.append(
+          DeviceMenuItem{QString("%1 [%2]").arg(devName, pkgName), deviceUuid});
     }
 
     // sort by name.

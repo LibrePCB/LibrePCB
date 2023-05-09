@@ -56,6 +56,9 @@ public:
 
   // Setters
   void setName(const ElementName& name) noexcept;
+  void setModelPosition(const Point3D& pos) noexcept;
+  void setModelRotation(const Angle3D& rot) noexcept;
+  void setModels(const QSet<Uuid>& models) noexcept;
 
   // Operator Overloadings
   CmdFootprintEdit& operator=(const CmdFootprintEdit& rhs) = delete;
@@ -80,6 +83,12 @@ private:
   // General Attributes
   ElementName mOldName;
   ElementName mNewName;
+  Point3D mOldModelPosition;
+  Point3D mNewModelPosition;
+  Angle3D mOldModelRotation;
+  Angle3D mNewModelRotation;
+  QSet<Uuid> mOldModels;
+  QSet<Uuid> mNewModels;
 };
 
 /*******************************************************************************

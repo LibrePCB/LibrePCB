@@ -126,11 +126,38 @@ make it easier to achieve reproducible builds in the future.
 
     cmake .. -DLIBREPCB_REPRODUCIBLE=1
 
+
+## OpenGL Utility Library (GLU) Dependency
+
+The OpenGL Utility Library (GLU) is needed for the 3D viewer of LibrePCB and
+thus needs to be available both at built time and runtime. If this library
+is not available for a particular platform, it is possible to compile without
+it but the 3D viewer won't render all layers then.
+
+    cmake .. -DUSE_GLU=0
+
+
+# OpenCASCADE Dependency
+
+Parts of the 3D features (e.g. reading/writing STEP files) depend on the
+[OpenCASCADE](https://www.opencascade.com/) library, also known as OCCT or OCE.
+As this library might not be available on any platform, or might lead to
+packaging issues, it is possible to build LibrePCB without these 3D features.
+The OpenCASCADE dependency is then not needed, while LibrePCB is still usable
+without any issues, just without full 3D support.
+
+    cmake .. -DUSE_OPENCASCADE=0
+
+We recommend using the official OpenCASCADE library (OCCT), but generally
+LibrePCB should also work with the Community Edition (OCE). CMake should
+automatically detect the availability of both variants.
+
+
 # Dynamic Linking / Unbundling {#doc_building_unbundling}
 
-By default, all dependencies (except for Qt) will be linked statically using
-vendored git submodules. If you prefer to unbundle some libraries, set the
-`UNBUNDLE_xxx` variable:
+By default, all dependencies except Qt and OpenCascade will be linked
+statically using vendored git submodules. If you prefer to unbundle some
+libraries, set the `UNBUNDLE_xxx` variable:
 
     cmake .. -DUNBUNDLE_FONTOBENE_QT5=1 -DUNBUNDLE_POLYCLIPPING=1
 

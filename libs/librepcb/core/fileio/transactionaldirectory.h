@@ -86,6 +86,7 @@ public:
       noexcept override;
   virtual bool fileExists(const QString& path) const noexcept override;
   virtual QByteArray read(const QString& path) const override;
+  virtual QByteArray readIfExists(const QString& path) const override;
   virtual void write(const QString& path, const QByteArray& content) override;
   virtual void removeFile(const QString& path) override;
   virtual void removeDirRecursively(const QString& path = "") override;

@@ -31,6 +31,9 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Package;
+
 namespace editor {
 
 class UndoCommand;
@@ -47,7 +50,17 @@ class FootprintListModel final : public QAbstractTableModel {
   Q_OBJECT
 
 public:
-  enum Column { COLUMN_NAME, COLUMN_ACTIONS, _COLUMN_COUNT };
+  enum Column {
+    COLUMN_NAME,
+    COLUMN_MODEL_POSITION_X,
+    COLUMN_MODEL_POSITION_Y,
+    COLUMN_MODEL_POSITION_Z,
+    COLUMN_MODEL_ROTATION_X,
+    COLUMN_MODEL_ROTATION_Y,
+    COLUMN_MODEL_ROTATION_Z,
+    COLUMN_ACTIONS,
+    _COLUMN_COUNT,
+  };
 
   // Constructors / Destructor
   FootprintListModel() = delete;
@@ -56,7 +69,7 @@ public:
   ~FootprintListModel() noexcept;
 
   // Setters
-  void setFootprintList(FootprintList* list) noexcept;
+  void setPackage(Package* package) noexcept;
   void setUndoStack(UndoStack* stack) noexcept;
 
   // Slots
@@ -88,9 +101,11 @@ private:
   ElementName validateNameOrThrow(const QString& name) const;
 
 private:  // Data
-  FootprintList* mFootprintList;
+  QPointer<Package> mPackage;
   UndoStack* mUndoStack;
   QString mNewName;
+  Point3D mNewModelPosition;
+  Angle3D mNewModelRotation;
 
   // Slots
   FootprintList::OnEditedSlot mOnEditedSlot;

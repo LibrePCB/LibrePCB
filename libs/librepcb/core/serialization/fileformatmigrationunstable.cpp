@@ -65,6 +65,19 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+  const QString fp = "package.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  for (SExpression* fptNode : root.getChildren("footprint")) {
+    SExpression& modelPosition = fptNode->appendList("3d_position");
+    modelPosition.appendChild(SExpression::createToken("0.0"));
+    modelPosition.appendChild(SExpression::createToken("0.0"));
+    modelPosition.appendChild(SExpression::createToken("0.0"));
+    SExpression& modelRotation = fptNode->appendList("3d_rotation");
+    modelRotation.appendChild(SExpression::createToken("0.0"));
+    modelRotation.appendChild(SExpression::createToken("0.0"));
+    modelRotation.appendChild(SExpression::createToken("0.0"));
+  }
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -83,19 +96,6 @@ void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
 void FileFormatMigrationUnstable::upgradeWorkspaceData(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  const QString settingsFp = "settings.lp";
-  if (dir.fileExists(settingsFp)) {
-    SExpression root =
-        SExpression::parse(dir.read(settingsFp), dir.getAbsPath(settingsFp));
-    if (SExpression* node = root.tryGetChild("repositories")) {
-      foreach (SExpression* child, node->getChildren("repository")) {
-        child->setName("url");
-      }
-      node->setName("api_endpoints");
-    }
-    dir.write(settingsFp, root.toByteArray());
-  }
 }
 
 /*******************************************************************************
@@ -126,8 +126,8 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  for (SExpression* planeNode : root.getChildren("plane")) {
-    planeNode->getChild("keep_orphans").setName("keep_islands");
+  for (SExpression* devNode : root.getChildren("device")) {
+    devNode->appendChild("lib_3d_model", SExpression::createToken("none"));
   }
 }
 

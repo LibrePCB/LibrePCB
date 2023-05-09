@@ -81,6 +81,18 @@ bool Hole::isCurvedSlot() const noexcept {
   return mPath->isCurved();
 }
 
+tl::optional<Length> Hole::getPreviewStopMaskOffset() const noexcept {
+  tl::optional<Length> offset;
+  if (!mStopMaskConfig.isEnabled()) {
+    offset = tl::nullopt;
+  } else if (auto value = mStopMaskConfig.getOffset()) {
+    offset = *value;
+  } else {
+    offset = Length(100000);  // Only for preview.
+  }
+  return offset;
+}
+
 /*******************************************************************************
  *  Setters
  ******************************************************************************/

@@ -56,6 +56,7 @@ public:
   ~PackagePadListEditorWidget() noexcept;
 
   // Setters
+  void setFrameStyle(int style) noexcept;
   void setReadOnly(bool readOnly) noexcept;
   void setReferences(PackagePadList* list, UndoStack* stack) noexcept;
 

@@ -60,6 +60,13 @@ namespace librepcb {
  *  - Holds all file modifications in memory and allows to write those in an
  *    atomic way to the disk (see @ref doc_project_save).
  *  - Allows to export the whole file system to a ZIP file.
+ *
+ * In addition, all public methods of this class are thread-safe, i.e.
+ * concurrent access to the file system from multiple threads is allowed.
+ * However, be careful anyway as thread-safety does not mean you cannot
+ * generate an inconsisntent content of the file system. Generally it's
+ * recommended to make write operations only from one thread, and only
+ * read operations from all other threads.
  */
 class TransactionalFileSystem final : public FileSystem {
   Q_OBJECT
@@ -158,6 +165,7 @@ public:
       noexcept override;
   virtual bool fileExists(const QString& path) const noexcept override;
   virtual QByteArray read(const QString& path) const override;
+  virtual QByteArray readIfExists(const QString& path) const override;
   virtual void write(const QString& path, const QByteArray& content) override;
   virtual void removeFile(const QString& path) override;
   virtual void removeDirRecursively(const QString& path = "") override;
@@ -205,10 +213,11 @@ private:  // Methods
   void removeDiff(const QString& type);
 
 private:  // Data
-  FilePath mFilePath;
-  bool mIsWritable;
+  const FilePath mFilePath;
+  const bool mIsWritable;
   DirectoryLock mLock;
   bool mRestoredFromAutosave;
+  mutable QMutex mMutex;
 
   // File system modifications
   QHash<QString, QByteArray> mModifiedFiles;

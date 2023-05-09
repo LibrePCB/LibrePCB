@@ -27,8 +27,8 @@
 
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
-
-#include <QtCore>
+#include <librepcb/core/types/uuid.h>
+#include <optional/tl/optional.hpp>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -36,6 +36,7 @@
 namespace librepcb {
 
 class BI_Device;
+class Uuid;
 
 namespace editor {
 
@@ -63,6 +64,7 @@ public:
   void setMirrored(bool mirrored, bool immediate);
   void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
   void setLocked(bool locked);
+  void setModel(const tl::optional<Uuid>& uuid) noexcept;
 
 private:
   // Private Methods
@@ -90,6 +92,8 @@ private:
   bool mNewMirrored;
   bool mOldLocked;
   bool mNewLocked;
+  tl::optional<Uuid> mOldModelUuid;
+  tl::optional<Uuid> mNewModelUuid;
 
   friend class CmdDeviceInstanceEditAll;
 };

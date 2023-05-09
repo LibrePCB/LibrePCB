@@ -73,7 +73,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-ProjectLoader::ProjectLoader(QObject* parent) noexcept : QObject(parent) {
+ProjectLoader::ProjectLoader(QObject* parent) noexcept
+  : QObject(parent), mAutoAssignDeviceModels(false) {
 }
 
 ProjectLoader::~ProjectLoader() noexcept {
@@ -617,6 +618,18 @@ void ProjectLoader::loadBoardDeviceInstance(Board& b, const SExpression& node) {
                     deserialize<bool>(node.getChild("flip/@0")),
                     deserialize<bool>(node.getChild("lock/@0")), false);
   device->setAttributes(AttributeList(node));
+  {
+    // Load 3D package model. But after upgrading the project library, assign
+    // the default package model if no valid model is set on this device.
+    tl::optional<Uuid> model =
+        deserialize<tl::optional<Uuid>>(node.getChild("lib_3d_model/@0"));
+    if (mAutoAssignDeviceModels &&
+        ((!model) || (!device->getLibPackage().getModels().contains(*model)) ||
+         (!device->getLibFootprint().getModels().contains(*model)))) {
+      model = device->getDefaultLibModelUuid();
+    }
+    device->setModel(model);
+  }
   foreach (const SExpression* child, node.getChildren("stroke_text")) {
     device->addStrokeText(*new BI_StrokeText(b, BoardStrokeTextData(*child)));
   }
