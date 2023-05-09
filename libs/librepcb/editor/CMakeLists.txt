@@ -6,6 +6,11 @@ set(CMAKE_AUTORCC OFF)
 # Export library
 add_library(
   librepcb_editor STATIC
+  3d/openglobject.h
+  3d/openglscenebuilder.cpp
+  3d/openglscenebuilder.h
+  3d/opengltriangleobject.cpp
+  3d/opengltriangleobject.h
   cmd/cmdattributeedit.cpp
   cmd/cmdattributeedit.h
   cmd/cmdcircleedit.cpp
@@ -768,6 +773,8 @@ add_library(
   widgets/messagewidget.h
   widgets/numbereditbase.cpp
   widgets/numbereditbase.h
+  widgets/openglview.cpp
+  widgets/openglview.h
   widgets/patheditorwidget.cpp
   widgets/patheditorwidget.h
   widgets/plaintextedit.cpp
