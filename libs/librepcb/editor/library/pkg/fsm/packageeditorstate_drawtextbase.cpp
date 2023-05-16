@@ -27,8 +27,8 @@
 #include "../../../graphics/stroketextgraphicsitem.h"
 #include "../../../utils/halignactiongroup.h"
 #include "../../../utils/valignactiongroup.h"
-#include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
+#include "../../../widgets/layercombobox.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../footprintgraphicsitem.h"
@@ -78,19 +78,16 @@ bool PackageEditorState_DrawTextBase::entry() noexcept {
   EditorCommandSet& cmd = EditorCommandSet::instance();
   if (mMode == Mode::TEXT) {
     mContext.commandToolBar.addLabel(tr("Layer:"));
-    std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
-        new GraphicsLayerComboBox());
+    std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
     mLayerComboBox = layerComboBox.get();
     layerComboBox->setLayers(getAllowedTextLayers());
     layerComboBox->setCurrentLayer(*mLastLayer);
-    layerComboBox->addAction(
-        cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
-                                 &GraphicsLayerComboBox::stepDown));
-    layerComboBox->addAction(
-        cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
-                                   &GraphicsLayerComboBox::stepUp));
-    connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
-            this, &PackageEditorState_DrawTextBase::layerComboBoxValueChanged);
+    layerComboBox->addAction(cmd.layerUp.createAction(
+        layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+    layerComboBox->addAction(cmd.layerDown.createAction(
+        layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+    connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
+            &PackageEditorState_DrawTextBase::layerComboBoxValueChanged);
     mContext.commandToolBar.addWidget(std::move(layerComboBox));
 
     mContext.commandToolBar.addLabel(tr("Text:"), 10);

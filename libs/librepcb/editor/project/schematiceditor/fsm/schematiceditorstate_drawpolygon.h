@@ -42,7 +42,7 @@ class Schematic;
 namespace editor {
 
 class CmdPolygonEdit;
-class GraphicsLayerComboBox;
+class LayerComboBox;
 class UnsignedLengthEdit;
 
 /*******************************************************************************

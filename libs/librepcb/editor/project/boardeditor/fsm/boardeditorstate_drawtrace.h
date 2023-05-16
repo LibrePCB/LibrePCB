@@ -46,7 +46,7 @@ class NetSignal;
 
 namespace editor {
 
-class GraphicsLayerComboBox;
+class LayerComboBox;
 class PositiveLengthEdit;
 
 /*******************************************************************************
@@ -215,7 +215,7 @@ private:
   BI_NetPoint* mPositioningNetPoint2;  ///< the second netpoint to place
 
   // Widgets for the command toolbar
-  QPointer<GraphicsLayerComboBox> mLayerComboBox;
+  QPointer<LayerComboBox> mLayerComboBox;
   QPointer<PositiveLengthEdit> mSizeEdit;
   QPointer<PositiveLengthEdit> mDrillEdit;
   QPointer<PositiveLengthEdit> mWidthEdit;

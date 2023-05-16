@@ -46,8 +46,8 @@ class StrokeText;
 namespace editor {
 
 class CmdStrokeTextEdit;
-class GraphicsLayerComboBox;
 class HAlignActionGroup;
+class LayerComboBox;
 class StrokeTextGraphicsItem;
 class VAlignActionGroup;
 
@@ -112,7 +112,7 @@ private:  // Types / Data
   QScopedPointer<CmdStrokeTextEdit> mEditCmd;
   std::shared_ptr<StrokeText> mCurrentText;
   std::shared_ptr<StrokeTextGraphicsItem> mCurrentGraphicsItem;
-  QPointer<GraphicsLayerComboBox> mLayerComboBox;
+  QPointer<LayerComboBox> mLayerComboBox;
   QPointer<HAlignActionGroup> mHAlignActionGroup;
   QPointer<VAlignActionGroup> mVAlignActionGroup;
 

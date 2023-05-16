@@ -25,8 +25,8 @@
 #include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
+#include "../../../widgets/layercombobox.h"
 #include "../../cmd/cmdboardplaneadd.h"
 #include "../../cmd/cmdboardplaneedit.h"
 #include "../boardeditor.h"
@@ -114,22 +114,19 @@ bool BoardEditorState_DrawPlane::entry() noexcept {
 
   // Add the layers combobox to the toolbar
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
-  std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
-      new GraphicsLayerComboBox());
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
   QSet<const Layer*> layers;
   if (Board* board = getActiveBoard()) {
     layers = board->getCopperLayers();
   }
   layerComboBox->setLayers(layers);
   layerComboBox->setCurrentLayer(*mLastLayer);
-  layerComboBox->addAction(
-      cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
-                               &GraphicsLayerComboBox::stepDown));
-  layerComboBox->addAction(
-      cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
-                                 &GraphicsLayerComboBox::stepUp));
-  connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
-          this, &BoardEditorState_DrawPlane::layerComboBoxLayerChanged);
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
+          &BoardEditorState_DrawPlane::layerComboBoxLayerChanged);
   mContext.commandToolBar.addWidget(std::move(layerComboBox));
 
   mContext.editorGraphicsView.setCursor(Qt::CrossCursor);

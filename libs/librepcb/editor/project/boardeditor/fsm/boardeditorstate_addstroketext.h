@@ -40,7 +40,7 @@ class Layer;
 namespace editor {
 
 class CmdBoardStrokeTextEdit;
-class GraphicsLayerComboBox;
+class LayerComboBox;
 class PositiveLengthEdit;
 
 /*******************************************************************************
@@ -112,7 +112,7 @@ private:  // Data
   QScopedPointer<CmdBoardStrokeTextEdit> mCurrentTextEditCmd;
 
   // Widgets for the command toolbar
-  QPointer<GraphicsLayerComboBox> mLayerComboBox;
+  QPointer<LayerComboBox> mLayerComboBox;
   QPointer<QCheckBox> mMirrorCheckBox;
 };
 

@@ -42,7 +42,7 @@ class Layer;
 namespace editor {
 
 class CmdBoardPolygonEdit;
-class GraphicsLayerComboBox;
+class LayerComboBox;
 class UnsignedLengthEdit;
 
 /*******************************************************************************

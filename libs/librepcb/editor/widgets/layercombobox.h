@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_GRAPHICSLAYERCOMBOBOX_H
-#define LIBREPCB_EDITOR_GRAPHICSLAYERCOMBOBOX_H
+#ifndef LIBREPCB_EDITOR_LAYERCOMBOBOX_H
+#define LIBREPCB_EDITOR_LAYERCOMBOBOX_H
 
 /*******************************************************************************
  *  Includes
@@ -38,20 +38,20 @@ class Layer;
 namespace editor {
 
 /*******************************************************************************
- *  Class GraphicsLayerComboBox
+ *  Class LayerComboBox
  ******************************************************************************/
 
 /**
- * @brief The GraphicsLayerComboBox class
+ * @brief The LayerComboBox class
  */
-class GraphicsLayerComboBox final : public QWidget {
+class LayerComboBox final : public QWidget {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  explicit GraphicsLayerComboBox(QWidget* parent = nullptr) noexcept;
-  GraphicsLayerComboBox(const GraphicsLayerComboBox& other) = delete;
-  ~GraphicsLayerComboBox() noexcept;
+  explicit LayerComboBox(QWidget* parent = nullptr) noexcept;
+  LayerComboBox(const LayerComboBox& other) = delete;
+  ~LayerComboBox() noexcept;
 
   // Getters
   tl::optional<const Layer&> getCurrentLayer() const noexcept;
@@ -65,7 +65,7 @@ public:
   void stepDown() noexcept;
 
   // Operator Overloadings
-  GraphicsLayerComboBox& operator=(const GraphicsLayerComboBox& rhs) = delete;
+  LayerComboBox& operator=(const LayerComboBox& rhs) = delete;
 
 signals:
   void currentLayerChanged(const Layer& layer);

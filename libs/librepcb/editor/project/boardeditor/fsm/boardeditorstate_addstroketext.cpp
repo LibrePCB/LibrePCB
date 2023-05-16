@@ -25,8 +25,8 @@
 #include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
+#include "../../../widgets/layercombobox.h"
 #include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmdboardstroketextadd.h"
 #include "../../cmd/cmdboardstroketextedit.h"
@@ -84,17 +84,17 @@ bool BoardEditorState_AddStrokeText::entry() noexcept {
 
   // Add the layers combobox to the toolbar
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
-  mLayerComboBox = new GraphicsLayerComboBox();
+  mLayerComboBox = new LayerComboBox();
   mLayerComboBox->setLayers(getAllowedGeometryLayers());
   mLayerComboBox->setCurrentLayer(*mLastLayer);
   mLayerComboBox->addAction(cmd.layerUp.createAction(
-      mLayerComboBox, mLayerComboBox.data(), &GraphicsLayerComboBox::stepDown));
+      mLayerComboBox, mLayerComboBox.data(), &LayerComboBox::stepDown));
   mLayerComboBox->addAction(cmd.layerDown.createAction(
-      mLayerComboBox, mLayerComboBox.data(), &GraphicsLayerComboBox::stepUp));
-  connect(mLayerComboBox, &GraphicsLayerComboBox::currentLayerChanged, this,
+      mLayerComboBox, mLayerComboBox.data(), &LayerComboBox::stepUp));
+  connect(mLayerComboBox, &LayerComboBox::currentLayerChanged, this,
           &BoardEditorState_AddStrokeText::layerComboBoxLayerChanged);
   mContext.commandToolBar.addWidget(
-      std::unique_ptr<GraphicsLayerComboBox>(mLayerComboBox));
+      std::unique_ptr<LayerComboBox>(mLayerComboBox));
 
   // Add the text combobox to the toolbar
   mContext.commandToolBar.addLabel(tr("Text:"), 10);

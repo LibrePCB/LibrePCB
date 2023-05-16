@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "graphicslayercombobox.h"
+#include "layercombobox.h"
 
 #include <librepcb/core/types/layer.h>
 
@@ -37,7 +37,7 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-GraphicsLayerComboBox::GraphicsLayerComboBox(QWidget* parent) noexcept
+LayerComboBox::LayerComboBox(QWidget* parent) noexcept
   : QWidget(parent), mComboBox(new QComboBox(this)) {
   mComboBox->setObjectName("QComboBox");
   QVBoxLayout* layout = new QVBoxLayout(this);
@@ -52,26 +52,23 @@ GraphicsLayerComboBox::GraphicsLayerComboBox(QWidget* parent) noexcept
   connect(
       mComboBox.data(),
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-      this, &GraphicsLayerComboBox::currentIndexChanged);
+      this, &LayerComboBox::currentIndexChanged);
 }
 
-GraphicsLayerComboBox::~GraphicsLayerComboBox() noexcept {
+LayerComboBox::~LayerComboBox() noexcept {
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
 
-tl::optional<const Layer&> GraphicsLayerComboBox::getCurrentLayer() const
-    noexcept {
+tl::optional<const Layer&> LayerComboBox::getCurrentLayer() const noexcept {
   const QString id = mComboBox->currentData(Qt::UserRole).toString();
   foreach (const Layer* layer, Layer::all()) {
     if (layer->getId() == id) {
       return *layer;
     }
   }
-  // This should actually never happen, thus no user visible message here.
-  qWarning() << "Invalid graphics layer selected:" << id;
   return tl::nullopt;
 }
 
@@ -79,8 +76,7 @@ tl::optional<const Layer&> GraphicsLayerComboBox::getCurrentLayer() const
  *  Setters
  ******************************************************************************/
 
-void GraphicsLayerComboBox::setLayers(
-    const QSet<const Layer*>& layers) noexcept {
+void LayerComboBox::setLayers(const QSet<const Layer*>& layers) noexcept {
   QList<const Layer*> sorted = layers.toList();
   std::sort(sorted.begin(), sorted.end(), &Layer::lessThan);
 
@@ -101,7 +97,7 @@ void GraphicsLayerComboBox::setLayers(
   }
 }
 
-void GraphicsLayerComboBox::setCurrentLayer(const Layer& layer) noexcept {
+void LayerComboBox::setCurrentLayer(const Layer& layer) noexcept {
   mComboBox->setCurrentIndex(mComboBox->findData(layer.getId(), Qt::UserRole));
 }
 
@@ -109,14 +105,14 @@ void GraphicsLayerComboBox::setCurrentLayer(const Layer& layer) noexcept {
  *  General Methods
  ******************************************************************************/
 
-void GraphicsLayerComboBox::stepUp() noexcept {
+void LayerComboBox::stepUp() noexcept {
   const int newIndex = mComboBox->currentIndex() + 1;
   if (newIndex < mComboBox->count()) {
     mComboBox->setCurrentIndex(newIndex);
   }
 }
 
-void GraphicsLayerComboBox::stepDown() noexcept {
+void LayerComboBox::stepDown() noexcept {
   const int newIndex = mComboBox->currentIndex() - 1;
   if (newIndex >= 0) {
     mComboBox->setCurrentIndex(newIndex);
@@ -127,7 +123,7 @@ void GraphicsLayerComboBox::stepDown() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void GraphicsLayerComboBox::currentIndexChanged(int index) noexcept {
+void LayerComboBox::currentIndexChanged(int index) noexcept {
   Q_UNUSED(index);
   if (tl::optional<const Layer&> layer = getCurrentLayer()) {
     emit currentLayerChanged(*layer);

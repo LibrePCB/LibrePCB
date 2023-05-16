@@ -26,8 +26,8 @@
 #include "../../../editorcommandset.h"
 #include "../../../graphics/circlegraphicsitem.h"
 #include "../../../graphics/graphicslayer.h"
-#include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
+#include "../../../widgets/layercombobox.h"
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../footprintgraphicsitem.h"
 #include "../packageeditorwidget.h"
@@ -71,18 +71,15 @@ bool PackageEditorState_DrawCircle::entry() noexcept {
   // populate command toolbar
   EditorCommandSet& cmd = EditorCommandSet::instance();
   mContext.commandToolBar.addLabel(tr("Layer:"));
-  std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
-      new GraphicsLayerComboBox());
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
   layerComboBox->setLayers(getAllowedCircleAndPolygonLayers());
   layerComboBox->setCurrentLayer(*mLastLayer);
-  layerComboBox->addAction(
-      cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
-                               &GraphicsLayerComboBox::stepDown));
-  layerComboBox->addAction(
-      cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
-                                 &GraphicsLayerComboBox::stepUp));
-  connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
-          this, &PackageEditorState_DrawCircle::layerComboBoxValueChanged);
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
+          &PackageEditorState_DrawCircle::layerComboBoxValueChanged);
   mContext.commandToolBar.addWidget(std::move(layerComboBox));
 
   mContext.commandToolBar.addLabel(tr("Line Width:"), 10);

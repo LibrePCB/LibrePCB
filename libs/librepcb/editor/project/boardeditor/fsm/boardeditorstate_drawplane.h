@@ -42,7 +42,7 @@ class NetSignal;
 namespace editor {
 
 class CmdBoardPlaneEdit;
-class GraphicsLayerComboBox;
+class LayerComboBox;
 
 /*******************************************************************************
  *  Class BoardEditorState_DrawPlane

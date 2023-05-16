@@ -26,8 +26,8 @@
 #include "../../../editorcommandset.h"
 #include "../../../undostack.h"
 #include "../../../utils/toolbarproxy.h"
-#include "../../../widgets/graphicslayercombobox.h"
 #include "../../../widgets/graphicsview.h"
+#include "../../../widgets/layercombobox.h"
 #include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdschematicpolygonadd.h"
 #include "../schematiceditor.h"
@@ -79,18 +79,15 @@ bool SchematicEditorState_DrawPolygon::entry() noexcept {
 
   // Add the layers combobox to the toolbar
   mContext.commandToolBar.addLabel(tr("Layer:"), 10);
-  std::unique_ptr<GraphicsLayerComboBox> layerComboBox(
-      new GraphicsLayerComboBox());
+  std::unique_ptr<LayerComboBox> layerComboBox(new LayerComboBox());
   layerComboBox->setLayers(getAllowedGeometryLayers());
   layerComboBox->setCurrentLayer(mLastPolygonProperties.getLayer());
-  layerComboBox->addAction(
-      cmd.layerUp.createAction(layerComboBox.get(), layerComboBox.get(),
-                               &GraphicsLayerComboBox::stepDown));
-  layerComboBox->addAction(
-      cmd.layerDown.createAction(layerComboBox.get(), layerComboBox.get(),
-                                 &GraphicsLayerComboBox::stepUp));
-  connect(layerComboBox.get(), &GraphicsLayerComboBox::currentLayerChanged,
-          this, &SchematicEditorState_DrawPolygon::layerComboBoxLayerChanged);
+  layerComboBox->addAction(cmd.layerUp.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepDown));
+  layerComboBox->addAction(cmd.layerDown.createAction(
+      layerComboBox.get(), layerComboBox.get(), &LayerComboBox::stepUp));
+  connect(layerComboBox.get(), &LayerComboBox::currentLayerChanged, this,
+          &SchematicEditorState_DrawPolygon::layerComboBoxLayerChanged);
   mContext.commandToolBar.addWidget(std::move(layerComboBox));
 
   // Add the width edit to the toolbar

@@ -755,8 +755,6 @@ add_library(
   widgets/editabletablewidget.h
   widgets/graphicsexportpreviewwidget.cpp
   widgets/graphicsexportpreviewwidget.h
-  widgets/graphicslayercombobox.cpp
-  widgets/graphicslayercombobox.h
   widgets/graphicsview.cpp
   widgets/graphicsview.h
   widgets/holeeditorwidget.cpp
@@ -765,6 +763,8 @@ add_library(
   widgets/if_graphicsvieweventhandler.h
   widgets/keysequenceseditorwidget.cpp
   widgets/keysequenceseditorwidget.h
+  widgets/layercombobox.cpp
+  widgets/layercombobox.h
   widgets/lengthedit.cpp
   widgets/lengthedit.h
   widgets/lengtheditbase.cpp

@@ -27,7 +27,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="librepcb::editor::GraphicsLayerComboBox" name="cbxLayer" native="true">
+      <widget class="librepcb::editor::LayerComboBox" name="cbxLayer" native="true">
        <property name="toolTip">
         <string>The layer to set on the imported objects.</string>
        </property>
@@ -180,9 +180,9 @@ If unchecked (the default), circles will be imported as polygons.</string>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::editor::GraphicsLayerComboBox</class>
+   <class>librepcb::editor::LayerComboBox</class>
    <extends>QWidget</extends>
-   <header location="global">librepcb/editor/widgets/graphicslayercombobox.h</header>
+   <header location="global">librepcb/editor/widgets/layercombobox.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
