@@ -849,26 +849,10 @@ void BoardDesignRuleCheck::checkMinimumPthAnnularRing(int progressEnd) {
   // Check via annular rings.
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
     foreach (const BI_Via* via, netsegment->getVias()) {
-      // Determine via area including minimum annular ring.
-      const Length diameter = via->getDrillDiameter() + (*annularWidth * 2) - 1;
-      if (diameter <= 0) {
-        continue;
-      }
-      const ClipperLib::Paths areas{ClipperHelpers::convert(
-          Path::circle(PositiveLength(diameter)).translated(via->getPosition()),
-          maxArcTolerance())};
-
-      // Check if there's not a 100% overlap.
-      const std::unique_ptr<ClipperLib::PolyTree> remainingAreasTree =
-          ClipperHelpers::subtractToTree(areas, thtCopperAreaPaths,
-                                         ClipperLib::pftEvenOdd,
-                                         ClipperLib::pftEvenOdd);
-      const ClipperLib::Paths remainingAreas =
-          ClipperHelpers::flattenTree(*remainingAreasTree);
-      if (!remainingAreas.empty()) {
-        const QVector<Path> locations = ClipperHelpers::convert(remainingAreas);
+      const Length annular = (*via->getSize() - *via->getDrillDiameter()) / 2;
+      if (annular < (*annularWidth)) {
         emitMessage(std::make_shared<DrcMsgMinimumAnnularRingViolation>(
-            *via, annularWidth, locations));
+            *via, annularWidth, getViaLocation(*via)));
       }
     }
   }
@@ -1449,6 +1433,11 @@ QVector<Path> BoardDesignRuleCheck::getDeviceLocation(
                        .toOutlineStrokes(strokeWidth));
 
   return locations;
+}
+
+QVector<Path> BoardDesignRuleCheck::getViaLocation(const BI_Via& via) const
+    noexcept {
+  return {Path::circle(via.getSize()).translated(via.getPosition())};
 }
 
 template <typename THole>

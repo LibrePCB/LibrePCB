@@ -467,7 +467,7 @@ public:
  * @brief The DrcMsgMinimumAnnularRingViolation class
  */
 class DrcMsgMinimumAnnularRingViolation final : public RuleCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(MsgBoardAnnularRingViolation)
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMinimumAnnularRingViolation)
 
 public:
   // Constructors / Destructor
