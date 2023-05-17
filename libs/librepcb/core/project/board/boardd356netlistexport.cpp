@@ -25,6 +25,7 @@
 #include "../../export/d356netlistgenerator.h"
 #include "../../library/pkg/footprintpad.h"
 #include "../../library/pkg/packagepad.h"
+#include "../../types/layer.h"
 #include "../circuit/componentinstance.h"
 #include "../circuit/netsignal.h"
 #include "../project.h"
@@ -68,10 +69,24 @@ QByteArray BoardD356NetlistExport::generate() const {
       netName = *netSignal->getName();
     }
     foreach (const BI_Via* via, segment->getVias()) {
-      const bool solderMaskCovered = !via->getStopMaskOffset();
-      gen.throughVia(netName, via->getPosition(), via->getSize(),
+      const bool solderMaskCovered = (!via->getStopMaskDiameterTop()) &&
+          (!via->getStopMaskDiameterBottom());
+      if (via->getVia().isBlind()) {
+        gen.blindVia(netName, via->getPosition(), via->getSize(),
                      via->getSize(), Angle::deg0(), via->getDrillDiameter(),
+                     via->getVia().getStartLayer().getCopperNumber() + 1,
+                     via->getVia().getEndLayer().getCopperNumber() + 1,
                      solderMaskCovered);
+      } else if (via->getVia().isBuried()) {
+        gen.buriedVia(netName, via->getPosition(), via->getDrillDiameter(),
+                      via->getVia().getStartLayer().getCopperNumber() + 1,
+                      via->getVia().getEndLayer().getCopperNumber() + 1);
+      } else {
+        Q_ASSERT(via->getVia().isThrough());
+        gen.throughVia(netName, via->getPosition(), via->getSize(),
+                       via->getSize(), Angle::deg0(), via->getDrillDiameter(),
+                       solderMaskCovered);
+      }
     }
   }
 

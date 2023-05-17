@@ -146,7 +146,7 @@ public:
   /**
    * @brief Get the copper layer number
    *
-   * @return Copper layer number (0 = top, 1 = first inner, 64 = bottom)
+   * @return Copper layer number (0 = top, 1 = first inner, 63 = bottom)
    */
   int getCopperNumber() const noexcept { return mFlags & Flag::NumberMask; }
 
@@ -209,6 +209,7 @@ public:
   static const QVector<const Layer*>& innerCopper() noexcept;
   static const Layer* innerCopper(int number) noexcept;
   static int innerCopperCount() noexcept;
+  static const Layer* copper(int number) noexcept;
 
   /**
    * @brief Get a list of all available layers

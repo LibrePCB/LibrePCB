@@ -26,6 +26,7 @@
 #include "../../undostack.h"
 #include "ui_boardviapropertiesdialog.h"
 
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/circuit/netsignal.h>
@@ -62,6 +63,11 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
                           settingsPrefix % "/pos_x");
   mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
                           settingsPrefix % "/pos_y");
+  QSet<const Layer*> layers = via.getBoard().getCopperLayers();
+  layers.insert(&via.getVia().getStartLayer());
+  layers.insert(&via.getVia().getEndLayer());
+  mUi->cbxStartLayer->setLayers(layers);
+  mUi->cbxEndLayer->setLayers(layers);
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardViaPropertiesDialog::buttonBoxClicked);
 
@@ -80,6 +86,9 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
             }
           });
 
+  // netsignal name
+  mUi->lblNetSignal->setText(mVia.getNetSegment().getNetNameToDisplay(true));
+
   // Position spinboxes
   mUi->edtPosX->setValue(mVia.getPosition().getX());
   mUi->edtPosY->setValue(mVia.getPosition().getY());
@@ -90,8 +99,9 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
   // drill diameter spinbox
   mUi->edtDrillDiameter->setValue(mVia.getDrillDiameter());
 
-  // netsignal name
-  mUi->lblNetSignal->setText(mVia.getNetSegment().getNetNameToDisplay(true));
+  // Layers.
+  mUi->cbxStartLayer->setCurrentLayer(via.getVia().getStartLayer());
+  mUi->cbxEndLayer->setCurrentLayer(via.getVia().getEndLayer());
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept {
@@ -135,6 +145,12 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
                      false);
     cmd->setSize(mUi->edtSize->getValue(), false);
     cmd->setDrillDiameter(mUi->edtDrillDiameter->getValue(), false);
+    const tl::optional<const Layer&> startLayer =
+        mUi->cbxStartLayer->getCurrentLayer();
+    const tl::optional<const Layer&> endLayer =
+        mUi->cbxEndLayer->getCurrentLayer();
+    cmd->setLayers(startLayer ? *startLayer : mVia.getVia().getStartLayer(),
+                   endLayer ? *endLayer : mVia.getVia().getEndLayer());
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

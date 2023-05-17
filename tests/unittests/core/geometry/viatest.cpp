@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/geometry/via.h>
 #include <librepcb/core/serialization/sexpression.h>
+#include <librepcb/core/types/layer.h>
 
 /*******************************************************************************
  *  Namespace
@@ -42,20 +43,23 @@ class ViaTest : public ::testing::Test {};
 
 TEST_F(ViaTest, testConstructFromSExpression) {
   SExpression sexpr = SExpression::parse(
-      "(via b9445237-8982-4a9f-af06-bfc6c507e010 (position 1.234 2.345) "
-      "(size 0.9) (drill 0.4))",
+      "(via b9445237-8982-4a9f-af06-bfc6c507e010 (from top_cu) (to in2_cu)"
+      " (position 1.234 2.345) (size 0.9) (drill 0.4)"
+      ")",
       FilePath());
   Via obj(sexpr);
   EXPECT_EQ(Uuid::fromString("b9445237-8982-4a9f-af06-bfc6c507e010"),
             obj.getUuid());
+  EXPECT_EQ(&Layer::topCopper(), &obj.getStartLayer());
+  EXPECT_EQ(Layer::innerCopper(2), &obj.getEndLayer());
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(PositiveLength(900000), obj.getSize());
   EXPECT_EQ(PositiveLength(400000), obj.getDrillDiameter());
 }
 
 TEST_F(ViaTest, testSerializeAndDeserialize) {
-  Via obj1(Uuid::createRandom(), Point(123, 456), PositiveLength(789),
-           PositiveLength(321));
+  Via obj1(Uuid::createRandom(), Layer::topCopper(), Layer::botCopper(),
+           Point(123, 456), PositiveLength(789), PositiveLength(321));
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);
 

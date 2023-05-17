@@ -26,9 +26,11 @@
 #include "../boardgraphicsscene.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
@@ -49,6 +51,7 @@ BGI_Via::BGI_Via(BI_Via& via, const IF_GraphicsLayerProvider& lp,
                      highlightedNetSignals) noexcept
   : QGraphicsItem(),
     mVia(via),
+    mLayerProvider(lp),
     mHighlightedNetSignals(highlightedNetSignals),
     mViaLayer(lp.getLayer(Theme::Color::sBoardVias)),
     mTopStopMaskLayer(lp.getLayer(Theme::Color::sBoardStopMaskTop)),
@@ -63,8 +66,7 @@ BGI_Via::BGI_Via(BI_Via& via, const IF_GraphicsLayerProvider& lp,
 
   updatePosition();
   updateShapes();
-  updateNetSignalName();
-  updateVisibility();
+  updateToolTip();
 
   mVia.onEdited.attach(mOnEditedSlot);
   for (auto layer : {mViaLayer, mTopStopMaskLayer, mBottomStopMaskLayer}) {
@@ -72,6 +74,9 @@ BGI_Via::BGI_Via(BI_Via& via, const IF_GraphicsLayerProvider& lp,
       layer->onEdited.attach(mOnLayerEditedSlot);
     }
   }
+  attachToCopperLayers();
+
+  updateVisibility();
 }
 
 BGI_Via::~BGI_Via() noexcept {
@@ -93,19 +98,39 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
   const bool highlight = option->state.testFlag(QStyle::State_Selected) ||
       mHighlightedNetSignals->contains(netsignal);
 
-  if (mDrawStopMask && mBottomStopMaskLayer &&
-      mBottomStopMaskLayer->isVisible()) {
+  if (mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible() &&
+      (!mStopMaskBottom.isEmpty())) {
     // draw bottom stop mask
     painter->setPen(Qt::NoPen);
     painter->setBrush(mBottomStopMaskLayer->getColor(highlight));
-    painter->drawPath(mStopMask);
+    painter->drawPath(mStopMaskBottom);
   }
 
   if (mViaLayer && mViaLayer->isVisible()) {
-    // draw via
+    // Draw through-hole via.
     painter->setPen(Qt::NoPen);
     painter->setBrush(mViaLayer->getColor(highlight));
     painter->drawPath(mCopper);
+
+    // Draw copper layers of blind or buried via.
+    if (!mBlindBuriedCopperLayers.isEmpty()) {
+      const qreal innerRadius = mVia.getDrillDiameter()->toPx() / 2;
+      const qreal outerRadius = mVia.getSize()->toPx() / 2;
+      const qreal lineRadius = (innerRadius + outerRadius) / 2;
+      const qreal lineWidth = (outerRadius - innerRadius) / 4;
+      const QRectF rect(-lineRadius, -lineRadius, lineRadius * 2,
+                        lineRadius * 2);
+      const int spanAngle = -(16 * 360) / mBlindBuriedCopperLayers.count();
+      int startAngle = 16 * 90;
+      painter->setBrush(Qt::NoBrush);
+      for (int i = 0; i < mBlindBuriedCopperLayers.count(); ++i) {
+        painter->setPen(
+            QPen(mBlindBuriedCopperLayers.at(i)->getColor(highlight), lineWidth,
+                 Qt::SolidLine, Qt::FlatCap));
+        painter->drawArc(rect, startAngle, spanAngle);
+        startAngle += spanAngle;
+      }
+    }
 
     // draw netsignal name
     if (netsignal) {
@@ -116,11 +141,12 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     }
   }
 
-  if (mDrawStopMask && mTopStopMaskLayer && mTopStopMaskLayer->isVisible()) {
+  if (mTopStopMaskLayer && mTopStopMaskLayer->isVisible() &&
+      (!mStopMaskTop.isEmpty())) {
     // draw top stop mask
     painter->setPen(Qt::NoPen);
     painter->setBrush(mTopStopMaskLayer->getColor(highlight));
-    painter->drawPath(mStopMask);
+    painter->drawPath(mStopMaskTop);
   }
 }
 
@@ -131,16 +157,23 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 void BGI_Via::viaEdited(const BI_Via& obj, BI_Via::Event event) noexcept {
   Q_UNUSED(obj);
   switch (event) {
+    case BI_Via::Event::LayersChanged:
+      attachToCopperLayers();
+      updateToolTip();
+      updateVisibility();
+      update();
+      break;
     case BI_Via::Event::PositionChanged:
       updatePosition();
       break;
     case BI_Via::Event::SizeChanged:
     case BI_Via::Event::DrillDiameterChanged:
-    case BI_Via::Event::StopMaskOffsetChanged:
+    case BI_Via::Event::StopMaskDiametersChanged:
       updateShapes();
       break;
     case BI_Via::Event::NetSignalNameChanged:
-      updateNetSignalName();
+      updateToolTip();
+      update();
       break;
     default:
       qWarning() << "Unhandled switch-case in BGI_Via::viaEdited():"
@@ -162,8 +195,8 @@ void BGI_Via::layerEdited(const GraphicsLayer& layer,
       break;
     case GraphicsLayer::Event::VisibleChanged:
     case GraphicsLayer::Event::EnabledChanged:
-      update();
       updateVisibility();
+      update();
       break;
     default:
       break;
@@ -179,30 +212,75 @@ void BGI_Via::updateShapes() noexcept {
 
   mShape = mVia.getVia().getOutline().toQPainterPathPx();
   mCopper = mVia.getVia().toQPainterPathPx();
-  if (auto offset = mVia.getStopMaskOffset()) {
-    mStopMask = mVia.getVia().getOutline(*offset).toQPainterPathPx();
-    mDrawStopMask = true;
+  if (auto diameter = mVia.getStopMaskDiameterBottom()) {
+    mStopMaskBottom = Path::circle(*diameter).toQPainterPathPx();
   } else {
-    mDrawStopMask = false;
+    mStopMaskBottom = QPainterPath();
   }
-  mBoundingRect = mShape.boundingRect() | mStopMask.boundingRect();
+  if (auto diameter = mVia.getStopMaskDiameterTop()) {
+    mStopMaskTop = Path::circle(*diameter).toQPainterPathPx();
+  } else {
+    mStopMaskTop = QPainterPath();
+  }
+  mBoundingRect = mShape.boundingRect() | mStopMaskBottom.boundingRect() |
+      mStopMaskTop.boundingRect();
 
   update();
 }
 
-void BGI_Via::updateNetSignalName() noexcept {
-  setToolTip(mVia.getNetSegment().getNetNameToDisplay(true));
+void BGI_Via::updateToolTip() noexcept {
+  const Via& via = mVia.getVia();
+
+  QString s;
+  if (via.isThrough()) {
+    s += tr("Through-Hole Via");
+  } else if (via.isBlind()) {
+    s += tr("Blind Via");
+  } else if (via.isBuried()) {
+    s += tr("Buried Via");
+  }
+  s += "\n" % tr("Net: %1").arg(mVia.getNetSegment().getNetNameToDisplay(true));
+  if (!via.isThrough()) {
+    s += "\n" % tr("Start Layer: %1").arg(via.getStartLayer().getNameTr());
+    s += "\n" % tr("End Layer: %1").arg(via.getEndLayer().getNameTr());
+  }
+  setToolTip(s);
 }
 
 void BGI_Via::updateVisibility() noexcept {
-  bool visible = false;
-  for (auto layer : {mViaLayer, mTopStopMaskLayer, mBottomStopMaskLayer}) {
-    if (layer && layer->isVisible()) {
-      visible = true;
-      break;
+  // Check stop masks visibility.
+  bool visible = (mTopStopMaskLayer && mTopStopMaskLayer->isVisible() &&
+                  (!mStopMaskTop.isEmpty())) ||
+      (mBottomStopMaskLayer && mBottomStopMaskLayer->isVisible() &&
+       (!mStopMaskBottom.isEmpty()));
+  if (!visible) {
+    // Check copper visibility.
+    for (auto layer : mBlindBuriedCopperLayers) {
+      if (layer && layer->isVisible()) {
+        visible = true;
+        break;
+      }
     }
+    visible = (visible || mVia.getVia().isThrough()) && mViaLayer &&
+        mViaLayer->isVisible();
   }
   setVisible(visible);
+}
+
+void BGI_Via::attachToCopperLayers() noexcept {
+  while (!mBlindBuriedCopperLayers.isEmpty()) {
+    mBlindBuriedCopperLayers.takeLast()->onEdited.detach(mOnLayerEditedSlot);
+  }
+  if (!mVia.getVia().isThrough()) {
+    foreach (const Layer* layer, mVia.getBoard().getCopperLayers()) {
+      if (mVia.getVia().isOnLayer(*layer)) {
+        if (auto graphicsLayer = mLayerProvider.getLayer(*layer)) {
+          graphicsLayer->onEdited.attach(mOnLayerEditedSlot);
+          mBlindBuriedCopperLayers.append(graphicsLayer);
+        }
+      }
+    }
+  }
 }
 
 /*******************************************************************************

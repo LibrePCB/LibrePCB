@@ -229,7 +229,8 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
     const BI_Base* item;
     const Polygon* polygon;  // Only relevant if item is a BI_Device
     const Circle* circle;  // Only relevant if item is a BI_Device
-    const Layer* layer;  // nullptr = THT
+    const Layer* startLayer;
+    const Layer* endLayer;
     const NetSignal* netSignal;  // nullptr = no net
     Length clearance;
     ClipperLib::Paths copperArea;  // Exact copper outlines
@@ -247,7 +248,8 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                              Item{via,
                                   nullptr,
                                   nullptr,
-                                  nullptr,
+                                  &via->getVia().getStartLayer(),
+                                  &via->getVia().getEndLayer(),
                                   via->getNetSegment().getNetSignal(),
                                   *clearance,
                                   {},
@@ -265,6 +267,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                Item{netLine,
                                     nullptr,
                                     nullptr,
+                                    &netLine->getLayer(),
                                     &netLine->getLayer(),
                                     netLine->getNetSegment().getNetSignal(),
                                     *clearance,
@@ -287,6 +290,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                     nullptr,
                                     nullptr,
                                     &plane->getLayer(),
+                                    &plane->getLayer(),
                                     &plane->getNetSignal(),
                                     *clearance,
                                     {},
@@ -307,6 +311,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                              Item{polygon,
                                   nullptr,
                                   nullptr,
+                                  &polygon->getData().getLayer(),
                                   &polygon->getData().getLayer(),
                                   nullptr,
                                   *clearance,
@@ -329,6 +334,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                              Item{strokeText,
                                   nullptr,
                                   nullptr,
+                                  &strokeText->getData().getLayer(),
                                   &strokeText->getData().getLayer(),
                                   nullptr,
                                   *clearance,
@@ -356,6 +362,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                       nullptr,
                                       nullptr,
                                       layer,
+                                      layer,
                                       pad->getCompSigInstNetSignal(),
                                       *padClearance,
                                       {},
@@ -375,6 +382,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                Item{device,
                                     &polygon,
                                     nullptr,
+                                    &polygon.getLayer(),
                                     &polygon.getLayer(),
                                     nullptr,
                                     *clearance,
@@ -397,6 +405,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                     nullptr,
                                     &circle,
                                     &circle.getLayer(),
+                                    &circle.getLayer(),
                                     nullptr,
                                     *clearance,
                                     {},
@@ -417,6 +426,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                     nullptr,
                                     nullptr,
                                     &strokeText->getData().getLayer(),
+                                    &strokeText->getData().getLayer(),
                                     nullptr,
                                     *clearance,
                                     {},
@@ -430,6 +440,23 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
   }
 
   // Now check for intersections.
+  QVector<const Layer*> overlappingLayers;
+  auto layersOverlap = [this, &overlappingLayers](
+                           const Layer* start1, const Layer* end1,
+                           const Layer* start2, const Layer* end2) {
+    overlappingLayers.clear();
+    const int first =
+        std::max(start1->getCopperNumber(), start2->getCopperNumber());
+    const int last = std::min(end1->getCopperNumber(), end2->getCopperNumber());
+    for (int i = first; i <= last; ++i) {
+      const Layer* layer = Layer::copper(i);
+      if (mBoard.getCopperLayers().contains(layer) &&
+          (!overlappingLayers.contains(layer))) {
+        overlappingLayers.append(layer);
+      }
+    }
+    return !overlappingLayers.isEmpty();
+  };
   auto checkForIntersections = [](Items::Iterator& it1, Items::Iterator& it2,
                                   QVector<Path>& locations) {
     const std::unique_ptr<ClipperLib::PolyTree> intersections =
@@ -444,7 +471,8 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
     for (auto it2 = it1 + 1; it2 != items.end(); it2++) {
       if (((it1->netSignal != it2->netSignal) || (!it1->netSignal) ||
            (!it2->netSignal)) &&
-          ((!it1->layer) || (!it2->layer) || (it1->layer == it2->layer))) {
+          layersOverlap(it1->startLayer, it1->endLayer, it2->startLayer,
+                        it2->endLayer)) {
         QVector<Path> locations;
         checkForIntersections(it1, it2, locations);
         // Perform the check the other way around only if:
@@ -455,9 +483,10 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
         }
         if (!locations.isEmpty()) {
           emitMessage(std::make_shared<DrcMsgCopperCopperClearanceViolation>(
-              it1->layer, it1->netSignal, *it1->item, it1->polygon, it1->circle,
-              it2->layer, it2->netSignal, *it2->item, it2->polygon, it2->circle,
-              std::max(it1->clearance, it2->clearance), locations));
+              it1->netSignal, *it1->item, it1->polygon, it1->circle,
+              it2->netSignal, *it2->item, it2->polygon, it2->circle,
+              overlappingLayers, std::max(it1->clearance, it2->clearance),
+              locations));
         }
       }
     }

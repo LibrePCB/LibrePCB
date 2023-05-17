@@ -128,6 +128,13 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                             QString("_L{{START_NUMBER}}-L{{END_NUMBER}}.drl"));
     }
   }
+
+  for (SExpression* segNode : root.getChildren("netsegment")) {
+    for (SExpression* viaNode : segNode->getChildren("via")) {
+      viaNode->appendChild("from", SExpression::createToken("top_cu"));
+      viaNode->appendChild("to", SExpression::createToken("bot_cu"));
+    }
+  }
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

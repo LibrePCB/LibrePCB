@@ -372,17 +372,17 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
  ******************************************************************************/
 
 DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
-    const Layer* layer1, const NetSignal* net1, const BI_Base& item1,
-    const Polygon* polygon1, const Circle* circle1, const Layer* layer2,
-    const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
-    const Circle* circle2, const Length& minClearance,
+    const NetSignal* net1, const BI_Base& item1, const Polygon* polygon1,
+    const Circle* circle1, const NetSignal* net2, const BI_Base& item2,
+    const Polygon* polygon2, const Circle* circle2,
+    const QVector<const Layer*>& layers, const Length& minClearance,
     const QVector<Path>& locations)
   : RuleCheckMessage(
         Severity::Error,
         tr("Clearance on %1: %2 ↔ %3 < %4 %5",
            "Placeholders: Layer name, object name, object name, "
            "Clearance value, unit")
-            .arg(getLayerName(layer1, layer2),
+            .arg(getLayerName(layers),
                  getObjectName(net1, item1, polygon1, circle1),
                  getObjectName(net2, item2, polygon2, circle2),
                  minClearance.toMmString(), "mm"),
@@ -408,13 +408,11 @@ DrcMsgCopperCopperClearanceViolation::DrcMsgCopperCopperClearanceViolation(
 }
 
 QString DrcMsgCopperCopperClearanceViolation::getLayerName(
-    const Layer* layer1, const Layer* layer2) {
-  if (layer1) {
-    return "'" % layer1->getNameTr() % "'";
-  } else if (layer2) {
-    return "'" % layer2->getNameTr() % "'";
+    const QVector<const Layer*>& layers) {
+  if (layers.count() == 1) {
+    return "'" % layers.first()->getNameTr() % "'";
   } else {
-    return tr("copper layers");
+    return tr("%1 layers", "Placeholder is a number > 1.").arg(layers.count());
   }
 }
 

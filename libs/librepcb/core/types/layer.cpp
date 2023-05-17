@@ -356,6 +356,16 @@ int Layer::innerCopperCount() noexcept {
   return 62;  // Results in a total of 64 copper layers.
 }
 
+const Layer* Layer::copper(int number) noexcept {
+  if (number == 0) {
+    return &topCopper();
+  } else if (number == (innerCopperCount() + 1)) {
+    return &botCopper();
+  } else {
+    return innerCopper(number);
+  }
+}
+
 const QVector<const Layer*>& Layer::all() noexcept {
   static QVector<const Layer*> list =
       QVector<const Layer*>{

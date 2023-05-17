@@ -202,11 +202,12 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     execNewChildCmd(cmd.take());  // can throw
   }
 
-  // move all vias
+  // flip all vias
   foreach (BI_Via* via, query.getVias()) {
     Q_ASSERT(via);
     QScopedPointer<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(*via));
     cmd->setPosition(via->getPosition().mirrored(mOrientation, center), false);
+    cmd->mirrorLayers(innerLayerCount);
     execNewChildCmd(cmd.take());  // can throw
   }
 

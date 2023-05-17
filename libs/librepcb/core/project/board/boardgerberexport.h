@@ -60,6 +60,7 @@ class BoardGerberExport final : public QObject, public AttributeProvider {
 
 public:
   enum class BoardSide { Top, Bottom };
+  typedef std::pair<const Layer*, const Layer*> LayerPair;
 
   // Constructors / Destructor
   BoardGerberExport() = delete;
@@ -96,6 +97,8 @@ private:
   void exportDrillsMerged(const BoardFabricationOutputSettings& settings) const;
   void exportDrillsNpth(const BoardFabricationOutputSettings& settings) const;
   void exportDrillsPth(const BoardFabricationOutputSettings& settings) const;
+  void exportDrillsBlindBuried(
+      const BoardFabricationOutputSettings& settings) const;
   void exportLayerBoardOutlines(
       const BoardFabricationOutputSettings& settings) const;
   void exportLayerTopCopper(
@@ -119,6 +122,7 @@ private:
 
   int drawNpthDrills(ExcellonGenerator& gen) const;
   int drawPthDrills(ExcellonGenerator& gen) const;
+  QMap<LayerPair, QList<const BI_Via*> > getBlindBuriedVias() const;
   void drawLayer(GerberGenerator& gen, const Layer& layer) const;
   void drawVia(GerberGenerator& gen, const BI_Via& via, const Layer& layer,
                const QString& netName) const;
@@ -142,6 +146,8 @@ private:
   QDateTime mCreationDateTime;
   QString mProjectName;
   mutable int mCurrentInnerCopperLayer;
+  mutable const Layer* mCurrentStartLayer;
+  mutable const Layer* mCurrentEndLayer;
   mutable QVector<FilePath> mWrittenFiles;
 };
 

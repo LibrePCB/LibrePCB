@@ -215,8 +215,9 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       netSignalUuid = netSignal->getUuid();
     }
     for (const BI_Via* via : segment->getVias()) {
-      data->vias.append(std::make_tuple(
-          netSignalUuid, via->getVia().getPosition(), via->getVia().getSize()));
+      data->vias.append(ViaData{
+          netSignalUuid, via->getVia().getPosition(), via->getVia().getSize(),
+          &via->getVia().getStartLayer(), &via->getVia().getEndLayer()});
     }
     for (const BI_NetLine* netline : segment->getNetLines()) {
       if (layers.contains(&netline->getLayer())) {
@@ -340,22 +341,26 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       }
 
       // Collect vias.
-      foreach (const auto& tuple, data->vias) {
-        if (std::get<0>(tuple) == it->netSignal) {
+      foreach (const ViaData& via, data->vias) {
+        if ((via.startLayer->getCopperNumber() >
+             it->layer->getCopperNumber()) ||
+            (via.endLayer->getCopperNumber() < it->layer->getCopperNumber())) {
+          continue;
+        }
+        if (via.netSignal == it->netSignal) {
           // Via has same net as plane -> no cut-out.
           // Note: Do not respect the plane connect style for vias, but always
           // connect them with solid style. Since vias are not soldered, heat
           // dissipation is not an issue or often even desired. See discussion
           // https://github.com/LibrePCB/LibrePCB/issues/454#issuecomment-1373402172
-          const Path path =
-              Path::circle(std::get<2>(tuple)).translated(std::get<1>(tuple));
+          const Path path = Path::circle(via.diameter).translated(via.position);
           connectedNetSignalAreas.push_back(
               ClipperHelpers::convert(path, maxArcTolerance()));
         } else {
           // Vias has different net than plane -> subtract with clearance.
-          const Path path = Path::circle(PositiveLength(std::get<2>(tuple) +
-                                                        it->minClearance * 2))
-                                .translated(std::get<1>(tuple));
+          const Path path =
+              Path::circle(PositiveLength(via.diameter + it->minClearance * 2))
+                  .translated(via.position);
           const ClipperLib::Path clipperPath =
               ClipperHelpers::convert(path, maxArcTolerance());
           removedAreas.push_back(clipperPath);

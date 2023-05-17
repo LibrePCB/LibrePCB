@@ -706,6 +706,8 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
         ++context.nonRoundViaCount;
       }
       viaNode->removeChild(shapeNode);
+      viaNode->appendChild("from", SExpression::createToken("top_cu"));
+      viaNode->appendChild("to", SExpression::createToken("bot_cu"));
     }
   }
 

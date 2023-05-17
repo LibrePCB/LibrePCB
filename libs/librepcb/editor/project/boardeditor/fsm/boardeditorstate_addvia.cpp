@@ -52,6 +52,7 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -71,6 +72,8 @@ BoardEditorState_AddVia::BoardEditorState_AddVia(
   : BoardEditorState(context),
     mIsUndoCmdActive(false),
     mLastViaProperties(Uuid::createRandom(),  // UUID is not relevant here
+                       Layer::topCopper(),  // Start layer
+                       Layer::botCopper(),  // End layer
                        Point(),  // Position is not relevant here
                        PositiveLength(700000),  // Default size
                        PositiveLength(300000)  // Default drill diameter

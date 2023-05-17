@@ -280,10 +280,10 @@ public:
   // Constructors / Destructor
   DrcMsgCopperCopperClearanceViolation() = delete;
   DrcMsgCopperCopperClearanceViolation(
-      const Layer* layer1, const NetSignal* net1, const BI_Base& item1,
-      const Polygon* polygon1, const Circle* circle1, const Layer* layer2,
-      const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
-      const Circle* circle2, const Length& minClearance,
+      const NetSignal* net1, const BI_Base& item1, const Polygon* polygon1,
+      const Circle* circle1, const NetSignal* net2, const BI_Base& item2,
+      const Polygon* polygon2, const Circle* circle2,
+      const QVector<const Layer*>& layers, const Length& minClearance,
       const QVector<Path>& locations);
   DrcMsgCopperCopperClearanceViolation(
       const DrcMsgCopperCopperClearanceViolation& other) noexcept
@@ -291,7 +291,7 @@ public:
   virtual ~DrcMsgCopperCopperClearanceViolation() noexcept {}
 
 private:
-  static QString getLayerName(const Layer* layer1, const Layer* layer2);
+  static QString getLayerName(const QVector<const Layer*>& layers);
   static QString getObjectName(const NetSignal* net, const BI_Base& item,
                                const Polygon* polygon, const Circle* circle);
   static void serializeObject(SExpression& node, const BI_Base& item,

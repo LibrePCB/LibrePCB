@@ -140,6 +140,14 @@ private:  // Methods
     bool filled;
   };
 
+  struct ViaData {
+    tl::optional<Uuid> netSignal;
+    Point position;
+    PositiveLength diameter;
+    const Layer* startLayer;
+    const Layer* endLayer;
+  };
+
   struct PadData {
     Transform transform;
     tl::optional<Uuid> netSignal;
@@ -160,7 +168,7 @@ private:  // Methods
     QSet<const Layer*> layers;
     QList<PlaneData> planes;
     QList<PolygonData> polygons;
-    QList<std::tuple<tl::optional<Uuid>, Point, PositiveLength>> vias;
+    QList<ViaData> vias;
     QList<PadData> pads;
     QList<std::tuple<Transform, PositiveLength, NonEmptyPath>> holes;
     QList<TraceData> traces;  // Converted to polygons after preprocessing.

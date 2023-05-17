@@ -118,10 +118,14 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     // Convert holes to areas.
     ClipperLib::Paths platedHoles;
     ClipperLib::Paths nonPlatedHoles;
+    QHash<QString, ClipperLib::Paths> copperHoles;
     for (auto& hole : data->getHoles()) {
       const auto paths = ClipperHelpers::convert(
           hole.path->toOutlineStrokes(hole.diameter), mMaxArcTolerance);
-      if (hole.plated) {
+      if (hole.copperLayer) {
+        ClipperLib::Paths& holes = copperHoles[hole.copperLayer->getId()];
+        holes.insert(holes.end(), paths.begin(), paths.end());
+      } else if (hole.plated) {
         platedHoles.insert(platedHoles.end(), paths.begin(), paths.end());
       } else {
         nonPlatedHoles.insert(nonPlatedHoles.end(), paths.begin(), paths.end());
@@ -175,7 +179,13 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
 
       // Copper.
       layers = QStringList{transform.map(Layer::topCopper()).getId()};
-      tree = ClipperHelpers::intersectToTree(boardArea, getPaths(data, layers),
+      ClipperLib::Paths copperArea = boardArea;
+      if (copperHoles.contains(layers.first())) {
+        ClipperHelpers::subtract(copperArea, copperHoles[layers.first()],
+                                 ClipperLib::pftEvenOdd,
+                                 ClipperLib::pftNonZero);
+      }
+      tree = ClipperHelpers::intersectToTree(copperArea, getPaths(data, layers),
                                              ClipperLib::pftEvenOdd,
                                              ClipperLib::pftNonZero);
       ClipperLib::Paths paths = ClipperHelpers::flattenTree(*tree);

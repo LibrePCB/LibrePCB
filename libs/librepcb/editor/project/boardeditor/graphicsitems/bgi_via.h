@@ -49,6 +49,8 @@ namespace editor {
  * @brief The BGI_Via class
  */
 class BGI_Via final : public QGraphicsItem {
+  Q_DECLARE_TR_FUNCTIONS(BGI_Via)
+
 public:
   // Constructors / Destructor
   BGI_Via() = delete;
@@ -76,22 +78,27 @@ private:  // Methods
                    GraphicsLayer::Event event) noexcept;
   void updatePosition() noexcept;
   void updateShapes() noexcept;
-  void updateNetSignalName() noexcept;
+  void updateToolTip() noexcept;
   void updateVisibility() noexcept;
+  void attachToCopperLayers() noexcept;
 
 private:  // Data
   // General Attributes
   BI_Via& mVia;
+  const IF_GraphicsLayerProvider& mLayerProvider;
   std::shared_ptr<const QSet<const NetSignal*>> mHighlightedNetSignals;
   std::shared_ptr<GraphicsLayer> mViaLayer;
   std::shared_ptr<GraphicsLayer> mTopStopMaskLayer;
   std::shared_ptr<GraphicsLayer> mBottomStopMaskLayer;
 
+  /// Copper layers for blind- and buried vias (empty for through-hole vias)
+  QVector<std::shared_ptr<GraphicsLayer>> mBlindBuriedCopperLayers;
+
   // Cached Attributes
-  bool mDrawStopMask;
   QPainterPath mShape;
   QPainterPath mCopper;
-  QPainterPath mStopMask;
+  QPainterPath mStopMaskTop;
+  QPainterPath mStopMaskBottom;
   QRectF mBoundingRect;
   QFont mFont;
 

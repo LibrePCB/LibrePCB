@@ -53,10 +53,12 @@ public:
   ~CmdBoardViaEdit() noexcept;
 
   // Setters
+  void setLayers(const Layer& startLayer, const Layer& endLayer) noexcept;
   void setPosition(const Point& pos, bool immediate) noexcept;
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
+  void mirrorLayers(int innerLayers) noexcept;
   void setSize(const PositiveLength& size, bool immediate) noexcept;
   void setDrillDiameter(const PositiveLength& diameter,
                         bool immediate) noexcept;
@@ -79,6 +81,10 @@ private:
   BI_Via& mVia;
 
   // General Attributes
+  const Layer* mOldStartLayer;
+  const Layer* mNewStartLayer;
+  const Layer* mOldEndLayer;
+  const Layer* mNewEndLayer;
   Point mOldPos;
   Point mNewPos;
   PositiveLength mOldSize;
