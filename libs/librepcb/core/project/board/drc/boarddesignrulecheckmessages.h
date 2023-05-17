@@ -604,6 +604,49 @@ private:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgForbiddenVia
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgForbiddenVia class
+ */
+class DrcMsgForbiddenVia final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgForbiddenVia)
+
+public:
+  // Constructors / Destructor
+  DrcMsgForbiddenVia() = delete;
+  DrcMsgForbiddenVia(const BI_Via& via,
+                     const QVector<Path>& locations) noexcept;
+  DrcMsgForbiddenVia(const DrcMsgForbiddenVia& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgForbiddenVia() noexcept {}
+
+private:
+  static QString determineMessage(const BI_Via& via) noexcept;
+  static QString determineDescription(const BI_Via& via) noexcept;
+};
+
+/*******************************************************************************
+ *  Class DrcMsgUselessVia
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgUselessVia class
+ */
+class DrcMsgUselessVia final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgUselessVia)
+
+public:
+  // Constructors / Destructor
+  DrcMsgUselessVia() = delete;
+  DrcMsgUselessVia(const BI_Via& via, const QVector<Path>& locations) noexcept;
+  DrcMsgUselessVia(const DrcMsgUselessVia& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgUselessVia() noexcept {}
+};
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

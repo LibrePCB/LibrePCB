@@ -106,8 +106,9 @@ void BoardDesignRuleCheck::execute(bool quick) {
     checkMinimumNpthSlotWidth(68);  // 2%
     checkMinimumPthDrillDiameter(70);  // 2%
     checkMinimumPthSlotWidth(72);  // 2%
-    checkAllowedNpthSlots(74);  // 2%
-    checkAllowedPthSlots(76);  // 2%
+    checkVias(74);  // 2%
+    checkAllowedNpthSlots(75);  // 1%
+    checkAllowedPthSlots(76);  // 1%
     checkInvalidPadConnections(78);  // 2%
     checkCourtyardClearances(88);  // 10%
     checkBoardOutline(91);  // 3%
@@ -1041,6 +1042,27 @@ void BoardDesignRuleCheck::checkMinimumPthSlotWidth(int progressEnd) {
           emitMessage(std::make_shared<DrcMsgMinimumSlotWidthViolation>(
               *pad, hole, minWidth, getHoleLocation(hole, transform)));
         }
+      }
+    }
+  }
+
+  emitProgress(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkVias(int progressEnd) {
+  emitStatus(tr("Check for useless or disallowed vias..."));
+
+  foreach (const BI_NetSegment* segment, mBoard.getNetSegments()) {
+    foreach (const BI_Via* via, segment->getVias()) {
+      if (!via->getDrillLayerSpan()) {
+        emitMessage(
+            std::make_shared<DrcMsgUselessVia>(*via, getViaLocation(*via)));
+      } else if ((via->getVia().isBlind() &&
+                  (!mSettings.getBlindViasAllowed())) ||
+                 (via->getVia().isBuried() &&
+                  (!mSettings.getBuriedViasAllowed()))) {
+        emitMessage(
+            std::make_shared<DrcMsgForbiddenVia>(*via, getViaLocation(*via)));
       }
     }
   }

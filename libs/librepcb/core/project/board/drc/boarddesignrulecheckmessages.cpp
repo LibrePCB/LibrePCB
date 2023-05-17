@@ -1215,6 +1215,60 @@ QString DrcMsgForbiddenSlot::determineDescription(
 }
 
 /*******************************************************************************
+ *  DrcMsgForbiddenVia
+ ******************************************************************************/
+
+DrcMsgForbiddenVia::DrcMsgForbiddenVia(const BI_Via& via,
+                                       const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, determineMessage(via),
+                     determineDescription(via), "forbidden_via", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("via", via.getUuid());
+  mApproval.ensureLineBreak();
+}
+
+QString DrcMsgForbiddenVia::determineMessage(const BI_Via& via) noexcept {
+  const QString net = via.getNetSegment().getNetNameToDisplay(true);
+  if (via.getVia().isBlind()) {
+    return tr("Blind via in net '%1'").arg(net);
+  } else {
+    return tr("Buried via in net '%1'").arg(net);
+  }
+}
+
+QString DrcMsgForbiddenVia::determineDescription(const BI_Via& via) noexcept {
+  const QString suggestion = "\n" %
+      tr("Either avoid them or check if your PCB manufacturer supports them "
+         "and adjust the DRC settings accordingly.");
+  if (via.getVia().isBlind()) {
+    return tr("Blind vias are expensive to manufacture and not every PCB "
+              "manufacturer is able to create them.") %
+        suggestion;
+  } else {
+    return tr("Buried vias are expensive to manufacture and not every PCB "
+              "manufacturer is able to create them.") %
+        suggestion;
+  }
+}
+
+/*******************************************************************************
+ *  DrcMsgUselessVia
+ ******************************************************************************/
+
+DrcMsgUselessVia::DrcMsgUselessVia(const BI_Via& via,
+                                   const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Warning,
+                     tr("Useless via in net '%1'", "Placeholders: Net name")
+                         .arg(via.getNetSegment().getNetNameToDisplay(true)),
+                     tr("The via is connected on less than two layers, thus it "
+                        "seems to be useless."),
+                     "useless_via", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("via", via.getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

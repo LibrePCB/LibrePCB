@@ -803,6 +803,8 @@ void FileFormatMigrationV01::upgradeBoardDrcSettings(SExpression& root) {
   node.appendChild("min_pth_slot_width", SExpression::createToken("0.7"));
   node.appendChild("min_outline_tool_diameter",
                    SExpression::createToken("2.0"));
+  node.appendChild("blind_vias_allowed", SExpression::createToken("false"));
+  node.appendChild("buried_vias_allowed", SExpression::createToken("false"));
   node.appendChild("allowed_npth_slots",
                    SExpression::createToken("single_segment_straight"));
   node.appendChild("allowed_pth_slots",
