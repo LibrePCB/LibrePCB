@@ -245,7 +245,8 @@ bool BoardEditorState_AddStrokeText::flipText(
 
   mCurrentTextEditCmd->mirrorGeometry(
       orientation, mCurrentTextToPlace->getData().getPosition(), true);
-  mCurrentTextEditCmd->mirrorLayer(true);
+  mCurrentTextEditCmd->mirrorLayer(
+      mCurrentTextToPlace->getBoard().getInnerLayerCount(), true);
   mLastRotation = mCurrentTextToPlace->getData().getRotation();
   mLastAlignment = mCurrentTextToPlace->getData().getAlign();
 

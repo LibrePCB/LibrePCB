@@ -179,8 +179,9 @@ void CmdBoardStrokeTextEdit::mirrorGeometry(const Angle& rotation,
   setAlignment(mNewData.getAlign().mirroredV(), immediate);
 }
 
-void CmdBoardStrokeTextEdit::mirrorLayer(bool immediate) noexcept {
-  setLayer(mNewData.getLayer().mirrored(), immediate);
+void CmdBoardStrokeTextEdit::mirrorLayer(int innerLayerCount,
+                                         bool immediate) noexcept {
+  setLayer(mNewData.getLayer().mirrored(innerLayerCount), immediate);
   setMirrored(!mNewData.getMirrored(), immediate);
   setAlignment(mNewData.getAlign().mirroredH(), immediate);
 }

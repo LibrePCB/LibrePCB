@@ -203,8 +203,10 @@ bool BoardEditorState_AddDevice::mirrorDevice(
   if ((!mCurrentDeviceEditCmd) || (!mCurrentDeviceToPlace)) return false;
 
   try {
-    mCurrentDeviceEditCmd->mirror(mCurrentDeviceToPlace->getPosition(),
-                                  orientation, true);  // can throw
+    mCurrentDeviceEditCmd->mirror(
+        mCurrentDeviceToPlace->getPosition(), orientation,
+        mCurrentDeviceToPlace->getBoard().getInnerLayerCount(),
+        true);  // can throw
     mCurrentDeviceToPlace->getBoard().triggerAirWiresRebuild();
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

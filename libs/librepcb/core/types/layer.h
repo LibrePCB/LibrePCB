@@ -153,9 +153,13 @@ public:
   /**
    * @brief Mirror this layer to the other board side
    *
+   * @param innerLayers   If specified, inner copper layers will be mirrored
+   *                      within this layer count as well. Otherwise, inner
+   *                      layers are not mirrored.
+   *
    * @return Mirrored layer, or this layer if not mirrorable.
    */
-  const Layer& mirrored() const noexcept;
+  const Layer& mirrored(int innerLayers = -1) const noexcept;
 
   // Operator Overloadings
   Layer& operator=(const Layer& rhs) noexcept = delete;
@@ -223,15 +227,6 @@ public:
    * @throw Exception if the layer was not found.
    */
   static const Layer& get(const QString& id);
-
-  /**
-   * @brief Mirror a layer to the other board side
-   *
-   * @param layer The layer to mirror.
-   *
-   * @return Mirrored layer, or the passed layer if not mirrorable.
-   */
-  static const Layer& mirrored(const Layer& layer) noexcept;
 
   /**
    * @brief Comparison for sorting layers by function

@@ -93,26 +93,27 @@ void CmdDeviceInstanceEditAll::rotate(const Angle& angle, const Point& center,
   }
 }
 
-void CmdDeviceInstanceEditAll::setMirrored(bool mirrored, bool immediate) {
+void CmdDeviceInstanceEditAll::setMirrored(bool mirrored, int innerLayerCount,
+                                           bool immediate) {
   Q_ASSERT(!wasEverExecuted());
   if (mirrored != mDevEditCmd->mNewMirrored) {
     mDevEditCmd->setMirrored(mirrored, immediate);
     foreach (CmdBoardStrokeTextEdit* cmd, mTextEditCmds) {
       cmd->mirrorGeometry(mDevEditCmd->mNewRotation, mDevEditCmd->mNewPos,
                           immediate);
-      cmd->mirrorLayer(immediate);
+      cmd->mirrorLayer(innerLayerCount, immediate);
     }
   }
 }
 
 void CmdDeviceInstanceEditAll::mirror(const Point& center,
                                       Qt::Orientation orientation,
-                                      bool immediate) {
+                                      int innerLayerCount, bool immediate) {
   Q_ASSERT(!wasEverExecuted());
   mDevEditCmd->mirror(center, orientation, immediate);  // can throw
   foreach (CmdBoardStrokeTextEdit* cmd, mTextEditCmds) {
     cmd->mirrorGeometry(orientation, center, immediate);
-    cmd->mirrorLayer(immediate);
+    cmd->mirrorLayer(innerLayerCount, immediate);
   }
 }
 

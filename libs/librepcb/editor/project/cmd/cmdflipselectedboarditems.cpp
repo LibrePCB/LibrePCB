@@ -184,10 +184,11 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   }
 
   // mirror all netlines
+  const int innerLayerCount = mScene.getBoard().getInnerLayerCount();
   foreach (BI_NetLine* netline, query.getNetLines()) {
     Q_ASSERT(netline);
     QScopedPointer<CmdBoardNetLineEdit> cmd(new CmdBoardNetLineEdit(*netline));
-    cmd->setLayer(netline->getLayer().mirrored());
+    cmd->setLayer(netline->getLayer().mirrored(innerLayerCount));
     execNewChildCmd(cmd.take());  // can throw
   }
 
@@ -212,7 +213,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   // flip all planes
   foreach (BI_Plane* plane, query.getPlanes()) {
     QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(*plane));
-    cmd->mirror(center, mOrientation, false);
+    cmd->mirror(center, mOrientation, innerLayerCount, false);
     execNewChildCmd(cmd.take());  // can throw
   }
 
@@ -220,7 +221,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   foreach (BI_Polygon* polygon, query.getPolygons()) {
     QScopedPointer<CmdBoardPolygonEdit> cmd(new CmdBoardPolygonEdit(*polygon));
     cmd->mirrorGeometry(mOrientation, center, false);
-    cmd->mirrorLayer(false);
+    cmd->mirrorLayer(innerLayerCount, false);
     execNewChildCmd(cmd.take());  // can throw
   }
 
@@ -229,7 +230,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     QScopedPointer<CmdBoardStrokeTextEdit> cmd(
         new CmdBoardStrokeTextEdit(*text));
     cmd->mirrorGeometry(mOrientation, center, false);
-    cmd->mirrorLayer(false);
+    cmd->mirrorLayer(innerLayerCount, false);
     execNewChildCmd(cmd.take());  // can throw
   }
 

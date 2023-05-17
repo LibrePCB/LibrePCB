@@ -56,7 +56,7 @@ Layer::~Layer() noexcept {
  *  Getters
  ******************************************************************************/
 
-const Layer& Layer::mirrored() const noexcept {
+const Layer& Layer::mirrored(int innerLayers) const noexcept {
   static QHash<const Layer*, const Layer*> map = {
       {&topPlacement(), &botPlacement()},
       {&topDocumentation(), &botDocumentation()},
@@ -72,8 +72,15 @@ const Layer& Layer::mirrored() const noexcept {
   };
   if (map.contains(this)) {
     return *map.value(this);
+  } else if (const Layer* layer = map.key(this)) {
+    return *layer;
+  } else if ((innerLayers >= 0) && (innerLayers <= innerCopperCount()) &&
+             isInner()) {
+    const Layer* layer = innerCopper(innerLayers - getCopperNumber() + 1);
+    Q_ASSERT(layer);
+    return *layer;
   } else {
-    return *map.key(this, this);
+    return *this;
   }
 }
 
