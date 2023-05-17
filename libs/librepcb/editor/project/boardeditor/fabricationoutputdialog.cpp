@@ -120,6 +120,7 @@ FabricationOutputDialog::FabricationOutputDialog(
   mUi->edtSuffixDrillsNpth->setText(s.getSuffixDrillsNpth());
   mUi->edtSuffixDrillsPth->setText(s.getSuffixDrillsPth());
   mUi->edtSuffixDrills->setText(s.getSuffixDrills());
+  mUi->edtSuffixDrillsBuried->setText(s.getSuffixDrillsBlindBuried());
   mUi->edtSuffixSolderPasteTop->setText(s.getSuffixSolderPasteTop());
   mUi->edtSuffixSolderPasteBot->setText(s.getSuffixSolderPasteBot());
   mUi->cbxDrillsMerge->setChecked(s.getMergeDrillFiles());
@@ -157,6 +158,8 @@ void FabricationOutputDialog::btnDefaultSuffixesClicked() {
   mUi->edtSuffixDrillsNpth->setText("_DRILLS-NPTH.drl");
   mUi->edtSuffixDrillsPth->setText("_DRILLS-PTH.drl");
   mUi->edtSuffixDrills->setText("_DRILLS.drl");
+  mUi->edtSuffixDrillsBuried->setText(
+      "_DRILLS-PLATED-{{START_LAYER}}-{{END_LAYER}}.drl");
   mUi->edtSuffixSolderPasteTop->setText("_SOLDERPASTE-TOP.gbr");
   mUi->edtSuffixSolderPasteBot->setText("_SOLDERPASTE-BOTTOM.gbr");
   mUi->cbxDrillsMerge->setChecked(false);
@@ -174,6 +177,7 @@ void FabricationOutputDialog::btnProtelSuffixesClicked() {
   mUi->edtSuffixDrillsNpth->setText("_NPTH.drl");
   mUi->edtSuffixDrillsPth->setText("_PTH.drl");
   mUi->edtSuffixDrills->setText(".drl");
+  mUi->edtSuffixDrillsBuried->setText("_L{{START_NUMBER}}-L{{END_NUMBER}}.drl");
   mUi->edtSuffixSolderPasteTop->setText(".gtp");
   mUi->edtSuffixSolderPasteBot->setText(".gbp");
   mUi->cbxDrillsMerge->setChecked(true);
@@ -195,6 +199,7 @@ void FabricationOutputDialog::btnGenerateClicked() {
     s.setSuffixDrills(mUi->edtSuffixDrills->text().trimmed());
     s.setSuffixDrillsNpth(mUi->edtSuffixDrillsNpth->text().trimmed());
     s.setSuffixDrillsPth(mUi->edtSuffixDrillsPth->text().trimmed());
+    s.setSuffixDrillsBlindBuried(mUi->edtSuffixDrillsBuried->text().trimmed());
     s.setSuffixOutlines(mUi->edtSuffixOutlines->text().trimmed());
     s.setSuffixCopperTop(mUi->edtSuffixCopperTop->text().trimmed());
     s.setSuffixCopperInner(mUi->edtSuffixCopperInner->text().trimmed());

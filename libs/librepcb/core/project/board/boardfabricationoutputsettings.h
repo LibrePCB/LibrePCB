@@ -58,6 +58,9 @@ public:
   const QString& getSuffixDrillsPth() const noexcept {
     return mSuffixDrillsPth;
   }
+  const QString& getSuffixDrillsBlindBuried() const noexcept {
+    return mSuffixDrillsBlindBuried;
+  }
   const QString& getSuffixOutlines() const noexcept { return mSuffixOutlines; }
   const QString& getSuffixCopperTop() const noexcept {
     return mSuffixCopperTop;
@@ -100,6 +103,9 @@ public:
   void setSuffixDrills(const QString& s) noexcept { mSuffixDrills = s; }
   void setSuffixDrillsNpth(const QString& s) noexcept { mSuffixDrillsNpth = s; }
   void setSuffixDrillsPth(const QString& s) noexcept { mSuffixDrillsPth = s; }
+  void setSuffixDrillsBlindBuried(const QString& s) noexcept {
+    mSuffixDrillsBlindBuried = s;
+  }
   void setSuffixOutlines(const QString& s) noexcept { mSuffixOutlines = s; }
   void setSuffixCopperTop(const QString& s) noexcept { mSuffixCopperTop = s; }
   void setSuffixCopperInner(const QString& s) noexcept {
@@ -151,6 +157,7 @@ private:  // Data
   QString mSuffixDrills;  // NPTH and PTH combined
   QString mSuffixDrillsNpth;
   QString mSuffixDrillsPth;
+  QString mSuffixDrillsBlindBuried;  // Vias (plated)
   QString mSuffixOutlines;
   QString mSuffixCopperTop;
   QString mSuffixCopperInner;

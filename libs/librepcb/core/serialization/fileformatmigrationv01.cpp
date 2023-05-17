@@ -655,6 +655,16 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
     SExpression& node = root.getChild("fabrication_output_settings");
     SExpression& drillNode = node.getChild("drills");
     drillNode.appendChild("g85_slots", false);
+    if (drillNode.getChild("suffix_merged/@0").getValue().contains("DRILLS")) {
+      // Default suffixes.
+      drillNode.appendChild(
+          "suffix_buried",
+          QString("_DRILLS-PLATED-{{START_LAYER}}-{{END_LAYER}}.drl"));
+    } else {
+      // Protel suffixes.
+      drillNode.appendChild("suffix_buried",
+                            QString("_L{{START_NUMBER}}-L{{END_NUMBER}}.drl"));
+    }
 
     SExpression& silkTop = node.getChild("silkscreen_top");
     SExpression& silkLayersTop = silkTop.getChild("layers");
