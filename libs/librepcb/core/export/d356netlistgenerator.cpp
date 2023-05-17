@@ -79,7 +79,8 @@ void D356NetlistGenerator::smtPad(const QString& netName,
   mRecords.append(Record{
       OperationCode::SurfaceMount, netName, checkedComponentName(cmpName),
       padName, false, tl::nullopt, layer, position, width, height, rotation,
-      (layer == 1) ? SolderMask::SecondarySide : SolderMask::PrimarySide});
+      (layer == 1) ? SolderMask::SecondarySide : SolderMask::PrimarySide,
+      tl::nullopt, tl::nullopt});
 }
 
 void D356NetlistGenerator::thtPad(const QString& netName,
@@ -89,22 +90,51 @@ void D356NetlistGenerator::thtPad(const QString& netName,
                                   const PositiveLength& height,
                                   const Angle& rotation,
                                   const PositiveLength& drillDiameter) {
-  mRecords.append(Record{OperationCode::ThroughHole, netName,
-                         checkedComponentName(cmpName), padName, false,
-                         std::make_pair(drillDiameter, true), 0, position,
-                         width, height, rotation, SolderMask::None});
+  mRecords.append(Record{
+      OperationCode::ThroughHole, netName, checkedComponentName(cmpName),
+      padName, false, std::make_pair(drillDiameter, true), 0, position, width,
+      height, rotation, SolderMask::None, tl::nullopt, tl::nullopt});
 }
 
-void D356NetlistGenerator::via(const QString& netName, const Point& position,
-                               const PositiveLength& width,
-                               const PositiveLength& height,
-                               const Angle& rotation,
-                               const PositiveLength& drillDiameter,
-                               bool solderMaskCovered) {
+void D356NetlistGenerator::throughVia(
+    const QString& netName, const Point& position, const PositiveLength& width,
+    const PositiveLength& height, const Angle& rotation,
+    const PositiveLength& drillDiameter, bool solderMaskCovered) {
   mRecords.append(Record{
       OperationCode::ThroughHole, netName, "VIA", QString(), true,
       std::make_pair(drillDiameter, true), 0, position, width, height, rotation,
-      solderMaskCovered ? SolderMask::BothSides : SolderMask::None});
+      solderMaskCovered ? SolderMask::BothSides : SolderMask::None, tl::nullopt,
+      tl::nullopt});
+}
+
+void D356NetlistGenerator::blindVia(
+    const QString& netName, const Point& position, const PositiveLength& width,
+    const PositiveLength& height, const Angle& rotation,
+    const PositiveLength& drillDiameter, int startLayer, int endLayer,
+    bool solderMaskCovered) {
+  const bool isTop = (startLayer == 1);
+  const int accessCode = isTop ? startLayer : endLayer;
+  const SolderMask mask = solderMaskCovered
+      ? SolderMask::BothSides
+      : (isTop ? SolderMask::SecondarySide : SolderMask::PrimarySide);
+  mRecords.append(Record{OperationCode::BlindOrBuriedVia, netName, "VIA",
+                         QString(), true, std::make_pair(drillDiameter, true),
+                         accessCode, position, tl::nullopt, tl::nullopt,
+                         tl::nullopt, mask, startLayer, endLayer});
+  mRecords.append(Record{OperationCode::Continuation, tl::nullopt, "VIA",
+                         QString(), false, tl::nullopt, accessCode, position,
+                         width, height, rotation, tl::nullopt, tl::nullopt,
+                         tl::nullopt});
+}
+
+void D356NetlistGenerator::buriedVia(const QString& netName,
+                                     const Point& position,
+                                     const PositiveLength& drillDiameter,
+                                     int startLayer, int endLayer) {
+  mRecords.append(Record{
+      OperationCode::BlindOrBuriedVia, netName, "VIA", QString(), true,
+      std::make_pair(drillDiameter, true), tl::nullopt, position, tl::nullopt,
+      tl::nullopt, tl::nullopt, SolderMask::BothSides, startLayer, endLayer});
 }
 
 QByteArray D356NetlistGenerator::generate() const {
@@ -121,15 +151,16 @@ QByteArray D356NetlistGenerator::generate() const {
   QHash<QString, QString> signalNameMap;
   const int signalNameLength = 14;
   foreach (const Record& record, mRecords) {
-    QString name = record.signalName;
-    if (!signalNameMap.contains(name)) {
-      if (name.isEmpty()) {
-        name = "N/C";
-      } else {
-        const QString nbr = QString("{%1}").arg(signalNameMap.count() + 1);
-        name = cleanString(name).left(signalNameLength - nbr.length()) % nbr;
+    if (auto name = record.signalName) {
+      if (!signalNameMap.contains(*name)) {
+        if (name->isEmpty()) {
+          name = "N/C";
+        } else {
+          const QString nbr = QString("{%1}").arg(signalNameMap.count() + 1);
+          name = cleanString(*name).left(signalNameLength - nbr.length()) % nbr;
+        }
+        signalNameMap[*record.signalName] = *name;
       }
-      signalNameMap[record.signalName] = name;
     }
   }
 
@@ -138,8 +169,11 @@ QByteArray D356NetlistGenerator::generate() const {
     QString line;
     line += QString("%1").arg(static_cast<int>(record.code), 3, 10,
                               QLatin1Char('0'));
-    line +=
-        QString("%1").arg(signalNameMap[record.signalName], -signalNameLength);
+    if (const auto name = record.signalName) {
+      line += QString("%1").arg(signalNameMap[*name], -signalNameLength);
+    } else {
+      line += QString(" ").repeated(signalNameLength);
+    }
     line += "   ";
     line += QString("%1").arg(cleanString(record.componentName).left(6), -6);
     line += record.padName.isEmpty() ? " " : "-";
@@ -152,18 +186,47 @@ QByteArray D356NetlistGenerator::generate() const {
     } else {
       line += "      ";
     }
-    line += QString("A%1").arg(record.accessCode, 2, 10, QLatin1Char('0'));
+    if (const auto accessCode = record.accessCode) {
+      line += QString("A%1").arg(*accessCode, 2, 10, QLatin1Char('0'));
+    } else {
+      line += "   ";
+    }
     line += QString("X%1Y%2")
                 .arg(formatLength(record.position.getX(), true, 6))
                 .arg(formatLength(record.position.getY(), true, 6));
-    line += QString("X%1Y%2")
-                .arg(formatLength(*record.width, false, 4))
-                .arg(formatLength(*record.height, false, 4));
-    line += QString("R%1").arg(record.rotation.mappedTo0_360deg().toDeg(), 3,
-                               'f', 0, '0');
+    if (const auto width = record.width) {
+      line += QString("X%1").arg(formatLength(**width, false, 4));
+    } else {
+      line += "     ";
+    }
+    if (const auto height = record.height) {
+      line += QString("Y%1").arg(formatLength(**height, false, 4));
+    } else {
+      line += "     ";
+    }
+    if (const auto rotation = record.rotation) {
+      line += QString("R%1").arg(rotation->mappedTo0_360deg().toDeg(), 3, 'f',
+                                 0, '0');
+    } else {
+      line += "    ";
+    }
     line += " ";
-    line += QString("S%1").arg(static_cast<int>(record.solderMask));
-    lines.append(line);
+    if (const auto mask = record.solderMask) {
+      line += QString("S%1").arg(static_cast<int>(*mask));
+    } else {
+      line += "  ";
+    }
+    if (const auto layer = record.startLayer) {
+      line += QString("L%1").arg(*layer, 2, 10, QLatin1Char('0'));
+    } else {
+      line += "   ";
+    }
+    if (const auto layer = record.endLayer) {
+      line += QString("L%1").arg(*layer, 2, 10, QLatin1Char('0'));
+    } else {
+      line += "   ";
+    }
+    lines.append(line.trimmed());
   }
 
   // Add footer, including a final linebreak.

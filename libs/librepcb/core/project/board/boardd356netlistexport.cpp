@@ -69,8 +69,9 @@ QByteArray BoardD356NetlistExport::generate() const {
     }
     foreach (const BI_Via* via, segment->getVias()) {
       const bool solderMaskCovered = !via->getStopMaskOffset();
-      gen.via(netName, via->getPosition(), via->getSize(), via->getSize(),
-              Angle::deg0(), via->getDrillDiameter(), solderMaskCovered);
+      gen.throughVia(netName, via->getPosition(), via->getSize(),
+                     via->getSize(), Angle::deg0(), via->getDrillDiameter(),
+                     solderMaskCovered);
     }
   }
 

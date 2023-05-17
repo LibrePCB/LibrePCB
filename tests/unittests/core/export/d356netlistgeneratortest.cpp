@@ -122,24 +122,27 @@ TEST_F(D356NetlistGeneratorTest, testVia) {
       "My Project", "1.0", "My Board",
       QDateTime(QDate(2019, 1, 2), QTime(3, 4, 5, 6), Qt::OffsetFromUTC, 3600));
 
-  gen.via(QString(), Point(1111, -2222), PositiveLength(123456),
-          PositiveLength(654321), Angle::deg0(), PositiveLength(1300000),
-          false);
-  gen.via("N/C", Point(-11111, 22222), PositiveLength(234567),
-          PositiveLength(765432), Angle::deg90(), PositiveLength(444444),
-          false);
-  gen.via("N/C", Point(-11111, 22222), PositiveLength(234567),
-          PositiveLength(765432), -Angle::deg90(), PositiveLength(555555),
-          true);
-  gen.via("TooooLooogName", Point(55555, -66666), PositiveLength(20000000),
-          PositiveLength(30000000), -Angle::deg180(), PositiveLength(20000000),
-          true);
+  gen.throughVia(QString(), Point(1111, -2222), PositiveLength(123456),
+                 PositiveLength(654321), Angle::deg0(), PositiveLength(1300000),
+                 false);
+  gen.blindVia("N/C", Point(-11111, 22222), PositiveLength(234567),
+               PositiveLength(765432), Angle::deg90(), PositiveLength(444444),
+               1, 3, false);
+  gen.blindVia("N/C", Point(-11111, 22222), PositiveLength(234567),
+               PositiveLength(765432), -Angle::deg90(), PositiveLength(555555),
+               3, 64, true);
+  gen.buriedVia("TooooLooogName", Point(55555, -66666),
+                PositiveLength(20000000), 5, 7);
 
+  // Note: Not sure if blind and buried vias are represented correctly, we
+  // need specs which are more clear!
   const QString expected = sHeader %  // clang-format off
   "317N/C              VIA        MD1300PA00X+000001Y-000002X0123Y0654R000 S0\n"
-  "317N/C{2}           VIA        MD0444PA00X-000011Y+000022X0235Y0765R090 S0\n"
-  "317N/C{2}           VIA        MD0556PA00X-000011Y+000022X0235Y0765R270 S3\n"
-  "317TooooLooogN{3}   VIA        MD9999PA00X+000056Y-000067X9999Y9999R180 S3\n"
+  "307N/C{2}           VIA        MD0444PA01X-000011Y+000022               S2L01L03\n"
+  "027                 VIA               A01X-000011Y+000022X0235Y0765R090\n"
+  "307N/C{2}           VIA        MD0556PA64X-000011Y+000022               S3L03L64\n"
+  "027                 VIA               A64X-000011Y+000022X0235Y0765R270\n"
+  "307TooooLooogN{3}   VIA        MD9999P   X+000056Y-000067               S3L05L07\n"
   "999\n";  // clang-format on
   EXPECT_EQ(expected.toStdString(), makeComparable(gen.generate()));
 }
