@@ -698,6 +698,8 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
   }
 
   // Net segments.
+  const UnsignedLength stopMaskMaxViaDiameter = deserialize<UnsignedLength>(
+      root.getChild("design_rules/stopmask_max_via_drill_diameter/@0"));
   for (SExpression* segNode : root.getChildren("netsegment")) {
     // Vias.
     for (SExpression* viaNode : segNode->getChildren("via")) {
@@ -708,6 +710,13 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
       viaNode->removeChild(shapeNode);
       viaNode->appendChild("from", SExpression::createToken("top_cu"));
       viaNode->appendChild("to", SExpression::createToken("bot_cu"));
+      const PositiveLength drill =
+          deserialize<PositiveLength>(viaNode->getChild("drill/@0"));
+      if (drill > stopMaskMaxViaDiameter) {
+        viaNode->appendChild("exposure", SExpression::createToken("auto"));
+      } else {
+        viaNode->appendChild("exposure", SExpression::createToken("off"));
+      }
     }
   }
 

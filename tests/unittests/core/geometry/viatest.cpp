@@ -44,7 +44,7 @@ class ViaTest : public ::testing::Test {};
 TEST_F(ViaTest, testConstructFromSExpression) {
   SExpression sexpr = SExpression::parse(
       "(via b9445237-8982-4a9f-af06-bfc6c507e010 (from top_cu) (to in2_cu)"
-      " (position 1.234 2.345) (size 0.9) (drill 0.4)"
+      " (position 1.234 2.345) (size 0.9) (drill 0.4) (exposure off)"
       ")",
       FilePath());
   Via obj(sexpr);
@@ -55,11 +55,13 @@ TEST_F(ViaTest, testConstructFromSExpression) {
   EXPECT_EQ(Point(1234000, 2345000), obj.getPosition());
   EXPECT_EQ(PositiveLength(900000), obj.getSize());
   EXPECT_EQ(PositiveLength(400000), obj.getDrillDiameter());
+  EXPECT_EQ(MaskConfig::off(), obj.getExposureConfig());
 }
 
 TEST_F(ViaTest, testSerializeAndDeserialize) {
   Via obj1(Uuid::createRandom(), Layer::topCopper(), Layer::botCopper(),
-           Point(123, 456), PositiveLength(789), PositiveLength(321));
+           Point(123, 456), PositiveLength(789), PositiveLength(321),
+           MaskConfig::off());
   SExpression sexpr1 = SExpression::createList("obj");
   obj1.serialize(sexpr1);
 

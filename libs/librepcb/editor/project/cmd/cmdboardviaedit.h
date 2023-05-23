@@ -62,6 +62,7 @@ public:
   void setSize(const PositiveLength& size, bool immediate) noexcept;
   void setDrillDiameter(const PositiveLength& diameter,
                         bool immediate) noexcept;
+  void setExposureConfig(const MaskConfig& config) noexcept;
 
 private:
   // Private Methods
@@ -91,6 +92,8 @@ private:
   PositiveLength mNewSize;
   PositiveLength mOldDrillDiameter;
   PositiveLength mNewDrillDiameter;
+  MaskConfig mOldExposureConfig;
+  MaskConfig mNewExposureConfig;
 };
 
 /*******************************************************************************

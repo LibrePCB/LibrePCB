@@ -142,6 +142,12 @@ void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
   }
 }
 
+void BI_Via::setExposureConfig(const MaskConfig& config) noexcept {
+  if (mVia.setExposureConfig(config)) {
+    updateStopMaskDiameters();
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -198,17 +204,30 @@ void BI_Via::unregisterNetLine(BI_NetLine& netline) {
 }
 
 void BI_Via::updateStopMaskDiameters() noexcept {
-  const bool required = mBoard.getDesignRules().doesViaRequireStopMaskOpening(
-      *mVia.getDrillDiameter());
-  const Length base = *mVia.getSize();
-  const Length dia =
-      base + mBoard.getDesignRules().getStopMaskClearance().calcValue(base) * 2;
+  Length dia(0);
+  if (const auto& value = mVia.getExposureConfig().getOffset()) {
+    // Manual exposure offset -> relative to via size.
+    dia = mVia.getSize() + (*value * 2);
+  } else if (mVia.getExposureConfig().isEnabled()) {
+    // Automatic exposure offset -> relative to via size.
+    dia = mVia.getSize() +
+        (mBoard.getDesignRules().getStopMaskClearance().calcValue(
+             *mVia.getSize()) *
+         2);
+  } else if (mBoard.getDesignRules().doesViaRequireStopMaskOpening(
+                 *mVia.getDrillDiameter())) {
+    // No exposure, but automatic stop mask removal for drill.
+    dia = mVia.getDrillDiameter() +
+        (mBoard.getDesignRules().getStopMaskClearance().calcValue(
+             *mVia.getDrillDiameter()) *
+         2);
+  }
   const tl::optional<PositiveLength> diaTop =
-      (required && mVia.getStartLayer().isTop() && (dia > 0))
+      (mVia.getStartLayer().isTop() && (dia > 0))
       ? tl::make_optional(PositiveLength(dia))
       : tl::nullopt;
   const tl::optional<PositiveLength> diaBottom =
-      (required && mVia.getEndLayer().isBottom() && (dia > 0))
+      (mVia.getEndLayer().isBottom() && (dia > 0))
       ? tl::make_optional(PositiveLength(dia))
       : tl::nullopt;
 

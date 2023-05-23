@@ -49,7 +49,9 @@ CmdBoardViaEdit::CmdBoardViaEdit(BI_Via& via) noexcept
     mOldSize(via.getSize()),
     mNewSize(mOldSize),
     mOldDrillDiameter(via.getDrillDiameter()),
-    mNewDrillDiameter(mOldDrillDiameter) {
+    mNewDrillDiameter(mOldDrillDiameter),
+    mOldExposureConfig(via.getVia().getExposureConfig()),
+    mNewExposureConfig(mOldExposureConfig) {
 }
 
 CmdBoardViaEdit::~CmdBoardViaEdit() noexcept {
@@ -117,6 +119,11 @@ void CmdBoardViaEdit::setDrillDiameter(const PositiveLength& diameter,
   if (immediate) mVia.setDrillDiameter(mNewDrillDiameter);
 }
 
+void CmdBoardViaEdit::setExposureConfig(const MaskConfig& config) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewExposureConfig = config;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -129,6 +136,7 @@ bool CmdBoardViaEdit::performExecute() {
   if (mNewPos != mOldPos) return true;
   if (mNewSize != mOldSize) return true;
   if (mNewDrillDiameter != mOldDrillDiameter) return true;
+  if (mNewExposureConfig != mOldExposureConfig) return true;
   return false;
 }
 
@@ -137,6 +145,7 @@ void CmdBoardViaEdit::performUndo() {
   mVia.setPosition(mOldPos);
   mVia.setSize(mOldSize);
   mVia.setDrillDiameter(mOldDrillDiameter);
+  mVia.setExposureConfig(mOldExposureConfig);
 }
 
 void CmdBoardViaEdit::performRedo() {
@@ -144,6 +153,7 @@ void CmdBoardViaEdit::performRedo() {
   mVia.setPosition(mNewPos);
   mVia.setSize(mNewSize);
   mVia.setDrillDiameter(mNewDrillDiameter);
+  mVia.setExposureConfig(mNewExposureConfig);
 }
 
 /*******************************************************************************

@@ -26,6 +26,7 @@
 #include "../exceptions.h"
 #include "../serialization/serializableobjectlist.h"
 #include "../types/length.h"
+#include "../types/maskconfig.h"
 #include "../types/point.h"
 #include "path.h"
 
@@ -59,6 +60,7 @@ public:
     PositionChanged,
     SizeChanged,
     DrillDiameterChanged,
+    ExposureConfigChanged,
   };
   Signal<Via, Event> onEdited;
   typedef Slot<Via, Event> OnEditedSlot;
@@ -69,7 +71,8 @@ public:
   Via(const Uuid& uuid, const Via& other) noexcept;
   Via(const Uuid& uuid, const Layer& startLayer, const Layer& endLayer,
       const Point& position, const PositiveLength& size,
-      const PositiveLength& drillDiameter) noexcept;
+      const PositiveLength& drillDiameter,
+      const MaskConfig& exposureConfig) noexcept;
   explicit Via(const SExpression& node);
   ~Via() noexcept;
 
@@ -81,6 +84,9 @@ public:
   const PositiveLength& getSize() const noexcept { return mSize; }
   const PositiveLength& getDrillDiameter() const noexcept {
     return mDrillDiameter;
+  }
+  const MaskConfig& getExposureConfig() const noexcept {
+    return mExposureConfig;
   }
   Path getOutline(const Length& expansion = Length(0)) const noexcept;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
@@ -97,6 +103,7 @@ public:
   bool setPosition(const Point& position) noexcept;
   bool setSize(const PositiveLength& size) noexcept;
   bool setDrillDiameter(const PositiveLength& diameter) noexcept;
+  bool setExposureConfig(const MaskConfig& config) noexcept;
 
   // General Methods
 
@@ -128,6 +135,7 @@ private:  // Data
   Point mPosition;
   PositiveLength mSize;
   PositiveLength mDrillDiameter;
+  MaskConfig mExposureConfig;
 };
 
 /*******************************************************************************

@@ -63,11 +63,16 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
                           settingsPrefix % "/pos_x");
   mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
                           settingsPrefix % "/pos_y");
+  mUi->edtExposureOffset->configure(lengthUnit,
+                                    LengthEditBase::Steps::generic(),
+                                    settingsPrefix % "/exposure_offset");
   QSet<const Layer*> layers = via.getBoard().getCopperLayers();
   layers.insert(&via.getVia().getStartLayer());
   layers.insert(&via.getVia().getEndLayer());
   mUi->cbxStartLayer->setLayers(layers);
   mUi->cbxEndLayer->setLayers(layers);
+  connect(mUi->rbtnExposureManual, &QRadioButton::toggled,
+          mUi->edtExposureOffset, &LengthEdit::setEnabled);
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &BoardViaPropertiesDialog::buttonBoxClicked);
 
@@ -102,6 +107,17 @@ BoardViaPropertiesDialog::BoardViaPropertiesDialog(
   // Layers.
   mUi->cbxStartLayer->setCurrentLayer(via.getVia().getStartLayer());
   mUi->cbxEndLayer->setCurrentLayer(via.getVia().getEndLayer());
+
+  // Stop mask.
+  if (!mVia.getVia().getExposureConfig().isEnabled()) {
+    mUi->rbtnExposureOff->setChecked(true);
+  } else if (const auto& offset =
+                 mVia.getVia().getExposureConfig().getOffset()) {
+    mUi->rbtnExposureManual->setChecked(true);
+    mUi->edtExposureOffset->setValue(*offset);
+  } else {
+    mUi->rbtnExposureAuto->setChecked(true);
+  }
 }
 
 BoardViaPropertiesDialog::~BoardViaPropertiesDialog() noexcept {
@@ -151,6 +167,16 @@ bool BoardViaPropertiesDialog::applyChanges() noexcept {
         mUi->cbxEndLayer->getCurrentLayer();
     cmd->setLayers(startLayer ? *startLayer : mVia.getVia().getStartLayer(),
                    endLayer ? *endLayer : mVia.getVia().getEndLayer());
+    if (mUi->rbtnExposureOff->isChecked()) {
+      cmd->setExposureConfig(MaskConfig::off());
+    } else if (mUi->rbtnExposureAuto->isChecked()) {
+      cmd->setExposureConfig(MaskConfig::automatic());
+    } else if (mUi->rbtnExposureManual->isChecked()) {
+      cmd->setExposureConfig(
+          MaskConfig::manual(mUi->edtExposureOffset->getValue()));
+    } else {
+      qCritical() << "Unknown UI configuration for via stop mask.";
+    }
     mUndoStack.execCmd(cmd.take());
     return true;
   } catch (const Exception& e) {

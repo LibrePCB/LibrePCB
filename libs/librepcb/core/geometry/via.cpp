@@ -42,7 +42,8 @@ Via::Via(const Via& other) noexcept
     mEndLayer(other.mEndLayer),
     mPosition(other.mPosition),
     mSize(other.mSize),
-    mDrillDiameter(other.mDrillDiameter) {
+    mDrillDiameter(other.mDrillDiameter),
+    mExposureConfig(other.mExposureConfig) {
 }
 
 Via::Via(const Uuid& uuid, const Via& other) noexcept : Via(other) {
@@ -51,14 +52,16 @@ Via::Via(const Uuid& uuid, const Via& other) noexcept : Via(other) {
 
 Via::Via(const Uuid& uuid, const Layer& startLayer, const Layer& endLayer,
          const Point& position, const PositiveLength& size,
-         const PositiveLength& drillDiameter) noexcept
+         const PositiveLength& drillDiameter,
+         const MaskConfig& exposureConfig) noexcept
   : onEdited(*this),
     mUuid(uuid),
     mStartLayer(&startLayer),
     mEndLayer(&endLayer),
     mPosition(position),
     mSize(size),
-    mDrillDiameter(drillDiameter) {
+    mDrillDiameter(drillDiameter),
+    mExposureConfig(exposureConfig) {
 }
 
 Via::Via(const SExpression& node)
@@ -68,7 +71,8 @@ Via::Via(const SExpression& node)
     mEndLayer(&deserialize<const Layer&>(node.getChild("to/@0"))),
     mPosition(node.getChild("position")),
     mSize(deserialize<PositiveLength>(node.getChild("size/@0"))),
-    mDrillDiameter(deserialize<PositiveLength>(node.getChild("drill/@0"))) {
+    mDrillDiameter(deserialize<PositiveLength>(node.getChild("drill/@0"))),
+    mExposureConfig(deserialize<MaskConfig>(node.getChild("exposure/@0"))) {
   if ((!mStartLayer->isCopper()) || (!mEndLayer->isCopper()) ||
       (mStartLayer->getCopperNumber() >= mEndLayer->getCopperNumber())) {
     throw RuntimeError(__FILE__, __LINE__, "Invalid via layer specification.");
@@ -178,6 +182,16 @@ bool Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
   return true;
 }
 
+bool Via::setExposureConfig(const MaskConfig& config) noexcept {
+  if (config == mExposureConfig) {
+    return false;
+  }
+
+  mExposureConfig = config;
+  onEdited.notify(Event::ExposureConfigChanged);
+  return true;
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -190,6 +204,7 @@ void Via::serialize(SExpression& root) const {
   mPosition.serialize(root.appendList("position"));
   root.appendChild("size", mSize);
   root.appendChild("drill", mDrillDiameter);
+  root.appendChild("exposure", mExposureConfig);
   root.ensureLineBreak();
 }
 
@@ -204,6 +219,7 @@ bool Via::operator==(const Via& rhs) const noexcept {
   if (mPosition != rhs.mPosition) return false;
   if (mSize != rhs.mSize) return false;
   if (mDrillDiameter != rhs.mDrillDiameter) return false;
+  if (mExposureConfig != rhs.mExposureConfig) return false;
   return true;
 }
 
@@ -213,6 +229,7 @@ Via& Via::operator=(const Via& rhs) noexcept {
   setPosition(rhs.mPosition);
   setSize(rhs.mSize);
   setDrillDiameter(rhs.mDrillDiameter);
+  setExposureConfig(rhs.mExposureConfig);
   return *this;
 }
 
