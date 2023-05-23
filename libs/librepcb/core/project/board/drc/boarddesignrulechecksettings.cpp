@@ -86,6 +86,8 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings() noexcept
     mMinNpthSlotWidth(1000000),  // 1mm
     mMinPthSlotWidth(700000),  // 0.7mm
     mMinOutlineToolDiameter(2000000),  // 2mm
+    mBlindViasAllowed(false),  // Just to be on the safe side
+    mBuriedViasAllowed(false),  // Just to be on the safe side
     mAllowedNpthSlots(AllowedSlots::SingleSegmentStraight),
     mAllowedPthSlots(AllowedSlots::SingleSegmentStraight) {
 }
@@ -123,6 +125,10 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings(
         deserialize<UnsignedLength>(node.getChild("min_pth_slot_width/@0"))),
     mMinOutlineToolDiameter(deserialize<UnsignedLength>(
         node.getChild("min_outline_tool_diameter/@0"))),
+    mBlindViasAllowed(
+        deserialize<bool>(node.getChild("blind_vias_allowed/@0"))),
+    mBuriedViasAllowed(
+        deserialize<bool>(node.getChild("buried_vias_allowed/@0"))),
     mAllowedNpthSlots(
         deserialize<AllowedSlots>(node.getChild("allowed_npth_slots/@0"))),
     mAllowedPthSlots(
@@ -162,6 +168,10 @@ void BoardDesignRuleCheckSettings::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("min_outline_tool_diameter", mMinOutlineToolDiameter);
   root.ensureLineBreak();
+  root.appendChild("blind_vias_allowed", mBlindViasAllowed);
+  root.ensureLineBreak();
+  root.appendChild("buried_vias_allowed", mBuriedViasAllowed);
+  root.ensureLineBreak();
   root.appendChild("allowed_npth_slots", mAllowedNpthSlots);
   root.ensureLineBreak();
   root.appendChild("allowed_pth_slots", mAllowedPthSlots);
@@ -186,6 +196,8 @@ BoardDesignRuleCheckSettings& BoardDesignRuleCheckSettings::operator=(
   mMinNpthSlotWidth = rhs.mMinNpthSlotWidth;
   mMinPthSlotWidth = rhs.mMinPthSlotWidth;
   mMinOutlineToolDiameter = rhs.mMinOutlineToolDiameter;
+  mBlindViasAllowed = rhs.mBlindViasAllowed;
+  mBuriedViasAllowed = rhs.mBuriedViasAllowed;
   mAllowedNpthSlots = rhs.mAllowedNpthSlots;
   mAllowedPthSlots = rhs.mAllowedPthSlots;
   return *this;
@@ -205,6 +217,8 @@ bool BoardDesignRuleCheckSettings::operator==(
   if (mMinNpthSlotWidth != rhs.mMinNpthSlotWidth) return false;
   if (mMinPthSlotWidth != rhs.mMinPthSlotWidth) return false;
   if (mMinOutlineToolDiameter != rhs.mMinOutlineToolDiameter) return false;
+  if (mBlindViasAllowed != rhs.mBlindViasAllowed) return false;
+  if (mBuriedViasAllowed != rhs.mBuriedViasAllowed) return false;
   if (mAllowedNpthSlots != rhs.mAllowedNpthSlots) return false;
   if (mAllowedPthSlots != rhs.mAllowedPthSlots) return false;
   return true;

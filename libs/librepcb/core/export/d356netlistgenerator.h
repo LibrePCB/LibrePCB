@@ -41,6 +41,10 @@ namespace librepcb {
 
 /**
  * @brief The D356NetlistGenerator class
+ *
+ * @see https://www.downstreamtech.com/downloads/IPCD356_Simplified.pdf
+ * @see
+ * https://web.pa.msu.edu/hep/atlas/l1calo/hub/hardware/components/circuit_board/ipc_356a_net_list.pdf
  */
 class D356NetlistGenerator final {
   Q_DECLARE_TR_FUNCTIONS(D356NetlistGenerator)
@@ -63,10 +67,17 @@ public:
               const QString& padName, const Point& position,
               const PositiveLength& width, const PositiveLength& height,
               const Angle& rotation, const PositiveLength& drillDiameter);
-  void via(const QString& netName, const Point& position,
-           const PositiveLength& width, const PositiveLength& height,
-           const Angle& rotation, const PositiveLength& drillDiameter,
-           bool solderMaskCovered);
+  void throughVia(const QString& netName, const Point& position,
+                  const PositiveLength& width, const PositiveLength& height,
+                  const Angle& rotation, const PositiveLength& drillDiameter,
+                  bool solderMaskCovered);
+  void blindVia(const QString& netName, const Point& position,
+                const PositiveLength& width, const PositiveLength& height,
+                const Angle& rotation, const PositiveLength& drillDiameter,
+                int startLayer, int endLayer, bool solderMaskCovered);
+  void buriedVia(const QString& netName, const Point& position,
+                 const PositiveLength& drillDiameter, int startLayer,
+                 int endLayer);
   QByteArray generate() const;
 
   // Operator Overloadings
@@ -80,6 +91,8 @@ private:  // Methods
 
 private:  // Data
   enum class OperationCode : int {
+    Continuation = 27,
+    BlindOrBuriedVia = 307,
     ThroughHole = 317,
     SurfaceMount = 327,
   };
@@ -93,17 +106,19 @@ private:  // Data
 
   struct Record {
     OperationCode code;
-    QString signalName;
+    tl::optional<QString> signalName;
     QString componentName;
     QString padName;
     bool midPoint;
     tl::optional<std::pair<PositiveLength, bool>> hole;
-    int accessCode;
+    tl::optional<int> accessCode;
     Point position;
-    PositiveLength width;
-    PositiveLength height;
-    Angle rotation;
-    SolderMask solderMask;
+    tl::optional<PositiveLength> width;
+    tl::optional<PositiveLength> height;
+    tl::optional<Angle> rotation;
+    tl::optional<SolderMask> solderMask;
+    tl::optional<int> startLayer;
+    tl::optional<int> endLayer;
   };
 
   QStringList mComments;

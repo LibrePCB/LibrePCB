@@ -59,6 +59,16 @@ class BoardPainter final : public GraphicsPagePainter {
     PositiveLength width;
   };
 
+  struct ViaData {
+    Point position;
+    PositiveLength size;
+    PositiveLength drill;
+    const Layer* startLayer;
+    const Layer* endLayer;
+    tl::optional<PositiveLength> stopMaskDiameterTop;
+    tl::optional<PositiveLength> stopMaskDiameterBottom;
+  };
+
   struct Pad {
     Transform transform;
     QList<std::pair<const Layer*, PadGeometry>> layerGeometries;
@@ -113,6 +123,7 @@ class BoardPainter final : public GraphicsPagePainter {
   struct ColorContent {
     QList<QPainterPath> areas;
     QList<QPainterPath> thtPadAreas;  ///< Drawn on Theme::Color::sBoardPads
+    QList<QPainterPath> viaAreas;  ///< Drawn on Theme::Color::sBoardVias
     QList<Trace> traces;
     QList<PolygonData> polygons;
     QList<Circle> circles;
@@ -140,9 +151,9 @@ private:  // Methods
 
 private:  // Data
   QFont mMonospaceFont;
-
+  QSet<const Layer*> mCopperLayers;
   QList<Footprint> mFootprints;
-  QList<Via> mVias;
+  QList<ViaData> mVias;
   QList<Trace> mTraces;
   QList<Plane> mPlanes;
   QList<PolygonData> mPolygons;

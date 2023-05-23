@@ -24,6 +24,7 @@
 
 #include "../../algorithm/airwiresbuilder.h"
 #include "../../library/pkg/footprintpad.h"
+#include "../../types/layer.h"
 #include "../circuit/circuit.h"
 #include "../circuit/componentsignalinstance.h"
 #include "../circuit/netsignal.h"
@@ -62,8 +63,12 @@ BoardAirWiresBuilder::~BoardAirWiresBuilder() noexcept {
 QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
     BoardAirWiresBuilder::buildAirWires() const {
   AirWiresBuilder builder;
-  QHash<int, std::pair<Point, const Layer*>> pointLayerMap;  // ID -> (p, layer)
-  QHash<const BI_NetLineAnchor*, int> anchorMap;  // anchor -> ID
+
+  // Map from ID to (position, start layer number, end layer number)
+  QHash<int, std::tuple<Point, int, int>> pointLayerMap;
+
+  // Map from anchor to ID
+  QHash<const BI_NetLineAnchor*, int> anchorMap;
 
   // pads
   foreach (ComponentSignalInstance* cmpSig, mNetSignal.getComponentSignals()) {
@@ -72,10 +77,15 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
       if (&pad->getBoard() != &mBoard) continue;
       const Point& pos = pad->getPosition();
       int id = builder.addPoint(pos);
-      pointLayerMap[id] =
-          std::make_pair(pos,
-                         (pad->getLibPad().isTht()) ? nullptr  // on all layers
-                                                    : &pad->getSmtLayer());
+      if (pad->getLibPad().isTht()) {
+        pointLayerMap[id] =
+            std::make_tuple(pos, Layer::topCopper().getCopperNumber(),
+                            Layer::botCopper().getCopperNumber());
+      } else {
+        pointLayerMap[id] =
+            std::make_tuple(pos, pad->getSmtLayer().getCopperNumber(),
+                            pad->getSmtLayer().getCopperNumber());
+      }
       anchorMap[pad] = id;
     }
   }
@@ -88,7 +98,9 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
       Q_ASSERT(via);
       const Point& pos = via->getPosition();
       int id = builder.addPoint(pos);
-      pointLayerMap[id] = std::make_pair(pos, nullptr);  // on all layers
+      pointLayerMap[id] =
+          std::make_tuple(pos, via->getVia().getStartLayer().getCopperNumber(),
+                          via->getVia().getEndLayer().getCopperNumber());
       anchorMap[via] = id;
     }
     foreach (const BI_NetPoint* netpoint, netsegment->getNetPoints()) {
@@ -96,7 +108,8 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
       if (const Layer* layer = netpoint->getLayerOfTraces()) {
         Point pos = netpoint->getPosition();
         int id = builder.addPoint(pos);
-        pointLayerMap[id] = std::make_pair(pos, layer);
+        pointLayerMap[id] = std::make_tuple(pos, layer->getCopperNumber(),
+                                            layer->getCopperNumber());
         anchorMap[netpoint] = id;
       }
     }
@@ -113,20 +126,19 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
   foreach (const BI_Plane* plane, mNetSignal.getBoardPlanes()) {
     Q_ASSERT(plane);
     if (&plane->getBoard() != &mBoard) continue;
+    const int planeLayer = plane->getLayer().getCopperNumber();
     foreach (const Path& fragment, plane->getFragments()) {
       int lastId = -1;
-      QHashIterator<int, std::pair<Point, const Layer*>> i(pointLayerMap);
-      while (i.hasNext()) {
-        i.next();
-        const Point& pos = i.value().first;
-        const Layer* pointLayer = i.value().second;
-        if ((!pointLayer) || (pointLayer == &plane->getLayer())) {
-          if (fragment.toQPainterPathPx().contains(pos.toPxQPointF())) {
-            if (lastId >= 0) {
-              builder.addEdge(lastId, i.key());
-            }
-            lastId = i.key();
+      for (auto it = pointLayerMap.begin(); it != pointLayerMap.end(); it++) {
+        const Point& pos = std::get<0>(it.value());
+        const int startLayer = std::get<1>(it.value());
+        const int endLayer = std::get<2>(it.value());
+        if ((planeLayer >= startLayer) && (planeLayer <= endLayer) &&
+            fragment.toQPainterPathPx().contains(pos.toPxQPointF())) {
+          if (lastId >= 0) {
+            builder.addEdge(lastId, it.key());
           }
+          lastId = it.key();
         }
       }
     }

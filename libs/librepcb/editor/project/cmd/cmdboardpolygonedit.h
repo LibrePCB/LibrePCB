@@ -65,7 +65,7 @@ public:
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void mirrorGeometry(Qt::Orientation orientation, const Point& center,
                       bool immediate) noexcept;
-  void mirrorLayer(bool immediate) noexcept;
+  void mirrorLayer(int innerLayerCount, bool immediate) noexcept;
   void setLocked(bool locked) noexcept;
 
   // Operator Overloadings

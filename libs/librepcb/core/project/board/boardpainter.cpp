@@ -53,7 +53,8 @@ namespace librepcb {
  ******************************************************************************/
 
 BoardPainter::BoardPainter(const Board& board)
-  : mMonospaceFont(Application::getDefaultMonospaceFont()) {
+  : mMonospaceFont(Application::getDefaultMonospaceFont()),
+    mCopperLayers(board.getCopperLayers()) {
   foreach (const BI_Device* device, board.getDeviceInstances()) {
     Footprint fpt;
     fpt.transform = Transform(*device);
@@ -117,7 +118,10 @@ BoardPainter::BoardPainter(const Board& board)
   }
   foreach (const BI_NetSegment* segment, board.getNetSegments()) {
     for (const BI_Via* via : segment->getVias()) {
-      mVias.append(via->getVia());
+      mVias.append(ViaData{
+          via->getPosition(), via->getSize(), via->getDrillDiameter(),
+          &via->getVia().getStartLayer(), &via->getVia().getEndLayer(),
+          via->getStopMaskDiameterTop(), via->getStopMaskDiameterBottom()});
     }
     for (const BI_NetLine* netline : segment->getNetLines()) {
       mTraces.append(
@@ -140,10 +144,10 @@ void BoardPainter::paint(QPainter& painter,
   // Determine what to paint on which color layer.
   initContentByColor();
 
-  // Draw THT pads depending on copper layers visibility.
+  // Draw THT pads & vias depending on copper layers visibility.
   const QSet<QString> enabledCopperLayers =
       settings.getPaintOrder().toSet() & Theme::getCopperColorNames();
-  bool thtPadsOnlyOnCopperLayers = !enabledCopperLayers.isEmpty();
+  bool thtOnlyOnCopperLayers = !enabledCopperLayers.isEmpty();
 
   // Draw pad circles only if holes are enabled, but pads not.
   const bool drawPadHoles =
@@ -154,7 +158,9 @@ void BoardPainter::paint(QPainter& painter,
   GraphicsPainter p(painter);
   p.setMinLineWidth(settings.getMinLineWidth());
   foreach (const QString& color, settings.getPaintOrder()) {
-    if (thtPadsOnlyOnCopperLayers && (color == Theme::Color::sBoardPads)) {
+    if (thtOnlyOnCopperLayers &&
+        ((color == Theme::Color::sBoardPads) ||
+         (color == Theme::Color::sBoardVias))) {
       continue;
     }
 
@@ -169,6 +175,12 @@ void BoardPainter::paint(QPainter& painter,
     foreach (const QPainterPath& area, content.thtPadAreas) {
       p.drawPath(area, Length(0), QColor(),
                  settings.getColor(Theme::Color::sBoardPads));
+    }
+
+    // Draw via areas.
+    foreach (const QPainterPath& area, content.viaAreas) {
+      p.drawPath(area, Length(0), QColor(),
+                 settings.getColor(Theme::Color::sBoardVias));
     }
 
     // Draw traces.
@@ -290,9 +302,31 @@ void BoardPainter::initContentByColor() const noexcept {
     }
 
     // Vias.
-    foreach (const Via& via, mVias) {
-      mContentByColor[Theme::Color::sBoardVias].areas.append(
-          via.toQPainterPathPx().translated(via.getPosition().toPxQPointF()));
+    foreach (const ViaData& via, mVias) {
+      foreach (const Layer* layer, mCopperLayers) {
+        if ((layer->getCopperNumber() >= via.startLayer->getCopperNumber()) &&
+            (layer->getCopperNumber() <= via.endLayer->getCopperNumber())) {
+          const QPainterPath path = Via::toQPainterPathPx(via.size, via.drill)
+                                        .translated(via.position.toPxQPointF());
+          ColorContent& vias = mContentByColor[Theme::Color::sBoardVias];
+          if (!vias.areas.contains(path)) {
+            vias.areas.append(path);
+          }
+          mContentByColor[layer->getThemeColor()].viaAreas.append(path);
+        }
+      }
+      auto stopMasks = {
+          std::make_pair(QString(Theme::Color::sBoardStopMaskTop),
+                         via.stopMaskDiameterTop),
+          std::make_pair(QString(Theme::Color::sBoardStopMaskBot),
+                         via.stopMaskDiameterBottom),
+      };
+      for (const auto& cfg : stopMasks) {
+        if (const auto diameter = cfg.second) {
+          const Path outline = Path::circle(*diameter).translated(via.position);
+          mContentByColor[cfg.first].areas.append(outline.toQPainterPathPx());
+        }
+      }
     }
 
     // Traces.

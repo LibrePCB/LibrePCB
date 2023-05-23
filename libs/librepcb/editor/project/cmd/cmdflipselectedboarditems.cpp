@@ -184,10 +184,11 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   }
 
   // mirror all netlines
+  const int innerLayerCount = mScene.getBoard().getInnerLayerCount();
   foreach (BI_NetLine* netline, query.getNetLines()) {
     Q_ASSERT(netline);
     QScopedPointer<CmdBoardNetLineEdit> cmd(new CmdBoardNetLineEdit(*netline));
-    cmd->setLayer(netline->getLayer().mirrored());
+    cmd->setLayer(netline->getLayer().mirrored(innerLayerCount));
     execNewChildCmd(cmd.take());  // can throw
   }
 
@@ -201,18 +202,19 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     execNewChildCmd(cmd.take());  // can throw
   }
 
-  // move all vias
+  // flip all vias
   foreach (BI_Via* via, query.getVias()) {
     Q_ASSERT(via);
     QScopedPointer<CmdBoardViaEdit> cmd(new CmdBoardViaEdit(*via));
     cmd->setPosition(via->getPosition().mirrored(mOrientation, center), false);
+    cmd->mirrorLayers(innerLayerCount);
     execNewChildCmd(cmd.take());  // can throw
   }
 
   // flip all planes
   foreach (BI_Plane* plane, query.getPlanes()) {
     QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(*plane));
-    cmd->mirror(center, mOrientation, false);
+    cmd->mirror(center, mOrientation, innerLayerCount, false);
     execNewChildCmd(cmd.take());  // can throw
   }
 
@@ -220,7 +222,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   foreach (BI_Polygon* polygon, query.getPolygons()) {
     QScopedPointer<CmdBoardPolygonEdit> cmd(new CmdBoardPolygonEdit(*polygon));
     cmd->mirrorGeometry(mOrientation, center, false);
-    cmd->mirrorLayer(false);
+    cmd->mirrorLayer(innerLayerCount, false);
     execNewChildCmd(cmd.take());  // can throw
   }
 
@@ -229,7 +231,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
     QScopedPointer<CmdBoardStrokeTextEdit> cmd(
         new CmdBoardStrokeTextEdit(*text));
     cmd->mirrorGeometry(mOrientation, center, false);
-    cmd->mirrorLayer(false);
+    cmd->mirrorLayer(innerLayerCount, false);
     execNewChildCmd(cmd.take());  // can throw
   }
 

@@ -83,10 +83,20 @@ void SceneData3D::addStroke(const Layer& layer, const QVector<Path>& paths,
   mStrokes.append(StrokeData{&layer, paths, width, transform});
 }
 
+void SceneData3D::addVia(
+    const Point& position, const PositiveLength& size,
+    const PositiveLength& drillDiameter, const Layer& startLayer,
+    const Layer& endLayer,
+    const tl::optional<PositiveLength>& stopMaskDiameterTop,
+    const tl::optional<PositiveLength>& stopMaskDiameterBottom) noexcept {
+  mVias.append(ViaData{position, size, drillDiameter, &startLayer, &endLayer,
+                       stopMaskDiameterTop, stopMaskDiameterBottom});
+}
+
 void SceneData3D::addHole(const NonEmptyPath& path,
                           const PositiveLength& diameter, bool plated, bool via,
                           const Transform& transform) noexcept {
-  mHoles.append(HoleData{path, diameter, plated, via, transform});
+  mHoles.append(HoleData{path, diameter, plated, via, nullptr, transform});
 }
 
 void SceneData3D::addArea(const Layer& layer, const Path& outline,
@@ -169,6 +179,45 @@ void SceneData3D::preprocess(bool center, bool sortDevices, Length* width,
     }
   }
   mStrokes.clear();
+
+  // Convert vias to holes & areas.
+  foreach (const auto& obj, mVias) {
+    Q_ASSERT(obj.startLayer && obj.endLayer);
+    const bool onTop = (obj.startLayer == &Layer::topCopper());
+    const bool onBottom = (obj.endLayer == &Layer::botCopper());
+    // Copper area.
+    const Path outline = Path::circle(obj.size).translated(obj.position);
+    if (onTop) {
+      mAreas.append(AreaData{&Layer::topCopper(), outline, Transform()});
+    }
+    if (onBottom) {
+      mAreas.append(AreaData{&Layer::botCopper(), outline, Transform()});
+    }
+    // Stop mask area.
+    auto stopMasks = {
+        std::make_pair(&Layer::topStopMask(), obj.stopMaskDiameterTop),
+        std::make_pair(&Layer::botStopMask(), obj.stopMaskDiameterBottom),
+    };
+    for (const auto& cfg : stopMasks) {
+      if (const auto diameter = cfg.second) {
+        const Path stopMaskOutline =
+            Path::circle(*diameter).translated(obj.position);
+        mAreas.append(AreaData{cfg.first, stopMaskOutline, Transform()});
+      }
+    }
+    // Hole.
+    if (onTop && onBottom) {
+      mHoles.append(HoleData{makeNonEmptyPath(obj.position), obj.drillDiameter,
+                             true, true, nullptr, Transform()});
+    } else if (onTop) {
+      mHoles.append(HoleData{makeNonEmptyPath(obj.position), obj.drillDiameter,
+                             true, true, &Layer::topCopper(), Transform()});
+    } else if (onBottom) {
+      mHoles.append(HoleData{makeNonEmptyPath(obj.position), obj.drillDiameter,
+                             true, true, &Layer::botCopper(), Transform()});
+    }
+  }
+  mVias.clear();
 
   // Determine bounding rect of board.
   QPainterPath outlinesPx;

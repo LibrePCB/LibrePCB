@@ -95,8 +95,8 @@ void CmdBoardPlaneEdit::rotate(const Angle& angle, const Point& center,
 }
 
 void CmdBoardPlaneEdit::mirror(const Point& center, Qt::Orientation orientation,
-                               bool immediate) noexcept {
-  setLayer(mNewLayer->mirrored(), immediate);
+                               int innerLayerCount, bool immediate) noexcept {
+  setLayer(mNewLayer->mirrored(innerLayerCount), immediate);
   setOutline(mNewOutline.mirrored(orientation, center), immediate);
 }
 

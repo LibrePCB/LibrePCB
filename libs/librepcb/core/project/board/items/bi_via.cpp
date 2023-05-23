@@ -44,11 +44,14 @@ BI_Via::BI_Via(BI_NetSegment& netsegment, const Via& via)
     onEdited(*this),
     mVia(via),
     mNetSegment(netsegment),
-    mStopMaskOffset() {
-  updateStopMaskOffset();
+    mStopMaskDiameterTop(),
+    mStopMaskDiameterBottom() {
+  updateStopMaskDiameters();
 
   connect(&mBoard, &Board::designRulesModified, this,
-          &BI_Via::updateStopMaskOffset);
+          &BI_Via::updateStopMaskDiameters);
+  connect(&mBoard, &Board::innerLayerCountChanged, this,
+          [this]() { onEdited.notify(Event::LayersChanged); });
 }
 
 BI_Via::~BI_Via() noexcept {
@@ -58,8 +61,26 @@ BI_Via::~BI_Via() noexcept {
  *  Getters
  ******************************************************************************/
 
-bool BI_Via::isOnLayer(const Layer& layer) const noexcept {
-  return layer.isCopper();
+tl::optional<std::pair<const Layer*, const Layer*>> BI_Via::getDrillLayerSpan()
+    const noexcept {
+  // If start layer is not enabled, the via is invalid.
+  const int startLayerNumber = mVia.getStartLayer().getCopperNumber();
+  if (startLayerNumber > mBoard.getInnerLayerCount()) {
+    return tl::nullopt;
+  }
+  // If the via ends at the bottom layer, the via is valid.
+  if (mVia.getEndLayer().isBottom()) {
+    return std::make_pair(&mVia.getStartLayer(), &mVia.getEndLayer());
+  }
+  // Via ends on an inner layer --> check layer span.
+  const int endLayerNumber = std::min(mVia.getEndLayer().getCopperNumber(),
+                                      mBoard.getInnerLayerCount());
+  const Layer* endLayer = Layer::innerCopper(endLayerNumber);
+  if (endLayer && (startLayerNumber < endLayerNumber)) {
+    return std::make_pair(&mVia.getStartLayer(), endLayer);
+  } else {
+    return tl::nullopt;
+  }
 }
 
 TraceAnchor BI_Via::toTraceAnchor() const noexcept {
@@ -69,6 +90,28 @@ TraceAnchor BI_Via::toTraceAnchor() const noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void BI_Via::setLayers(const Layer& from, const Layer& to) {
+  // Do not allow disabling layers where traces are connected.
+  QSet<const Layer*> traceLayers;
+  foreach (const BI_NetLine* netLine, mRegisteredNetLines) {
+    traceLayers.insert(&netLine->getLayer());
+  }
+  foreach (const Layer* layer, traceLayers) {
+    if (!Via::isOnLayer(*layer, from, to)) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          tr("Could not change the vias start/end layers because there are "
+             "still traces connected on other layers."));
+    }
+  }
+
+  if (mVia.setLayers(from, to)) {  // can throw
+    onEdited.notify(Event::LayersChanged);
+    updateStopMaskDiameters();
+    mBoard.invalidatePlanes();
+  }
+}
 
 void BI_Via::setPosition(const Point& position) noexcept {
   if (mVia.setPosition(position)) {
@@ -86,7 +129,7 @@ void BI_Via::setPosition(const Point& position) noexcept {
 void BI_Via::setSize(const PositiveLength& size) noexcept {
   if (mVia.setSize(size)) {
     onEdited.notify(Event::SizeChanged);
-    updateStopMaskOffset();
+    updateStopMaskDiameters();
     mBoard.invalidatePlanes();
   }
 }
@@ -94,7 +137,7 @@ void BI_Via::setSize(const PositiveLength& size) noexcept {
 void BI_Via::setDrillDiameter(const PositiveLength& diameter) noexcept {
   if (mVia.setDrillDiameter(diameter)) {
     onEdited.notify(Event::DrillDiameterChanged);
-    updateStopMaskOffset();
+    updateStopMaskDiameters();
     mBoard.invalidatePlanes();
   }
 }
@@ -137,6 +180,13 @@ void BI_Via::registerNetLine(BI_NetLine& netline) {
       (&netline.getNetSegment() != &mNetSegment)) {
     throw LogicError(__FILE__, __LINE__);
   }
+  if (!Via::isOnLayer(netline.getLayer(), mVia.getStartLayer(),
+                      mVia.getEndLayer())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("Failed to connect trace to via because it's a blind- or buried "
+           "via which doesn't include the corresponding layer."));
+  }
   mRegisteredNetLines.insert(&netline);
 }
 
@@ -147,17 +197,26 @@ void BI_Via::unregisterNetLine(BI_NetLine& netline) {
   mRegisteredNetLines.remove(&netline);
 }
 
-void BI_Via::updateStopMaskOffset() noexcept {
-  tl::optional<Length> offset;
-  if (mBoard.getDesignRules().doesViaRequireStopMaskOpening(
-          *mVia.getDrillDiameter())) {
-    offset = *mBoard.getDesignRules().getStopMaskClearance().calcValue(
-        *mVia.getSize());
-  }
+void BI_Via::updateStopMaskDiameters() noexcept {
+  const bool required = mBoard.getDesignRules().doesViaRequireStopMaskOpening(
+      *mVia.getDrillDiameter());
+  const Length base = *mVia.getSize();
+  const Length dia =
+      base + mBoard.getDesignRules().getStopMaskClearance().calcValue(base) * 2;
+  const tl::optional<PositiveLength> diaTop =
+      (required && mVia.getStartLayer().isTop() && (dia > 0))
+      ? tl::make_optional(PositiveLength(dia))
+      : tl::nullopt;
+  const tl::optional<PositiveLength> diaBottom =
+      (required && mVia.getEndLayer().isBottom() && (dia > 0))
+      ? tl::make_optional(PositiveLength(dia))
+      : tl::nullopt;
 
-  if (offset != mStopMaskOffset) {
-    mStopMaskOffset = offset;
-    onEdited.notify(Event::StopMaskOffsetChanged);
+  if ((diaTop != mStopMaskDiameterTop) ||
+      (diaBottom != mStopMaskDiameterBottom)) {
+    mStopMaskDiameterTop = diaTop;
+    mStopMaskDiameterBottom = diaBottom;
+    onEdited.notify(Event::StopMaskDiametersChanged);
   }
 }
 

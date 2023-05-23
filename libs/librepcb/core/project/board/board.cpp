@@ -250,19 +250,10 @@ std::shared_ptr<SceneData3D> Board::buildScene3D() const noexcept {
   }
   foreach (const BI_NetSegment* netSegment, mNetSegments) {
     foreach (const BI_Via* via, netSegment->getVias()) {
-      const NonEmptyPath path = makeNonEmptyPath(via->getPosition());
-      foreach (const Layer* layer, mCopperLayers) {
-        data->addStroke(*layer, {*path}, *via->getSize(), Transform());
-      }
-      data->addHole(path, via->getDrillDiameter(), true, true, Transform());
-      if (const tl::optional<Length>& offset = via->getStopMaskOffset()) {
-        for (const Layer* layer :
-             {&Layer::topStopMask(), &Layer::botStopMask()}) {
-          data->addStroke(*layer, {*path},
-                          (*via->getSize()) + (*offset) + (*offset),
-                          Transform());
-        }
-      }
+      data->addVia(via->getPosition(), via->getSize(), via->getDrillDiameter(),
+                   via->getVia().getStartLayer(), via->getVia().getEndLayer(),
+                   via->getStopMaskDiameterTop(),
+                   via->getStopMaskDiameterBottom());
     }
     foreach (const BI_NetLine* netLine, netSegment->getNetLines()) {
       data->addStroke(netLine->getLayer(),

@@ -65,19 +65,6 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-  const QString fp = "package.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  for (SExpression* fptNode : root.getChildren("footprint")) {
-    SExpression& modelPosition = fptNode->appendList("3d_position");
-    modelPosition.appendChild(SExpression::createToken("0.0"));
-    modelPosition.appendChild(SExpression::createToken("0.0"));
-    modelPosition.appendChild(SExpression::createToken("0.0"));
-    SExpression& modelRotation = fptNode->appendList("3d_rotation");
-    modelRotation.appendChild(SExpression::createToken("0.0"));
-    modelRotation.appendChild(SExpression::createToken("0.0"));
-    modelRotation.appendChild(SExpression::createToken("0.0"));
-  }
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -126,8 +113,33 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  for (SExpression* devNode : root.getChildren("device")) {
-    devNode->appendChild("lib_3d_model", SExpression::createToken("none"));
+
+  {
+    SExpression& node = root.getChild("fabrication_output_settings");
+    SExpression& drillNode = node.getChild("drills");
+    if (drillNode.getChild("suffix_merged/@0").getValue().contains("DRILLS")) {
+      // Default suffixes.
+      drillNode.appendChild(
+          "suffix_buried",
+          QString("_DRILLS-PLATED-{{START_LAYER}}-{{END_LAYER}}.drl"));
+    } else {
+      // Protel suffixes.
+      drillNode.appendChild("suffix_buried",
+                            QString("_L{{START_NUMBER}}-L{{END_NUMBER}}.drl"));
+    }
+  }
+
+  {
+    SExpression& node = root.getChild("design_rule_check");
+    node.appendChild("blind_vias_allowed", SExpression::createToken("false"));
+    node.appendChild("buried_vias_allowed", SExpression::createToken("false"));
+  }
+
+  for (SExpression* segNode : root.getChildren("netsegment")) {
+    for (SExpression* viaNode : segNode->getChildren("via")) {
+      viaNode->appendChild("from", SExpression::createToken("top_cu"));
+      viaNode->appendChild("to", SExpression::createToken("bot_cu"));
+    }
   }
 }
 

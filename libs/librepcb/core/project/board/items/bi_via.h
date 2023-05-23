@@ -47,11 +47,12 @@ class BI_Via final : public BI_Base, public BI_NetLineAnchor {
 public:
   // Signals
   enum class Event {
+    LayersChanged,
     PositionChanged,
     SizeChanged,
     DrillDiameterChanged,
     NetSignalNameChanged,
-    StopMaskOffsetChanged,
+    StopMaskDiametersChanged,
   };
   Signal<BI_Via, Event> onEdited;
   typedef Slot<BI_Via, Event> OnEditedSlot;
@@ -73,14 +74,20 @@ public:
     return mVia.getDrillDiameter();
   }
   const PositiveLength& getSize() const noexcept { return mVia.getSize(); }
-  const tl::optional<Length>& getStopMaskOffset() const noexcept {
-    return mStopMaskOffset;
+  const tl::optional<PositiveLength>& getStopMaskDiameterTop() const noexcept {
+    return mStopMaskDiameterTop;
+  }
+  const tl::optional<PositiveLength>& getStopMaskDiameterBottom() const
+      noexcept {
+    return mStopMaskDiameterBottom;
   }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
-  bool isOnLayer(const Layer& layer) const noexcept;
+  tl::optional<std::pair<const Layer*, const Layer*> > getDrillLayerSpan() const
+      noexcept;
   TraceAnchor toTraceAnchor() const noexcept override;
 
   // Setters
+  void setLayers(const Layer& from, const Layer& to);
   void setPosition(const Point& position) noexcept;
   void setSize(const PositiveLength& size) noexcept;
   void setDrillDiameter(const PositiveLength& diameter) noexcept;
@@ -102,7 +109,7 @@ public:
   bool operator!=(const BI_Via& rhs) noexcept { return (this != &rhs); }
 
 private:  // Methods
-  void updateStopMaskOffset() noexcept;
+  void updateStopMaskDiameters() noexcept;
 
 private:  // Data
   Via mVia;
@@ -110,7 +117,8 @@ private:  // Data
   QMetaObject::Connection mNetSignalNameChangedConnection;
 
   // Cached Attributes
-  tl::optional<Length> mStopMaskOffset;
+  tl::optional<PositiveLength> mStopMaskDiameterTop;
+  tl::optional<PositiveLength> mStopMaskDiameterBottom;
 
   // Registered Elements
   QSet<BI_NetLine*> mRegisteredNetLines;

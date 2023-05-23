@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>699</width>
-    <height>472</height>
+    <height>511</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,121 +46,20 @@
       <string>Output Files</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="5" column="3">
-       <widget class="QLineEdit" name="edtSuffixSilkscreenBot">
-        <property name="maxLength">
-         <number>255</number>
+      <item row="9" column="0" colspan="4">
+       <widget class="QCheckBox" name="cbxUseG85Slots">
+        <property name="toolTip">
+         <string>Export slots as drilled (G85) instead of routed (G00..G03).
+Not recommended unless the G00..G03 are causing troubles with the PCB manufacturer.
+Attention: Curved slots are not supported in G85 mode (will raise an error).</string>
         </property>
-       </widget>
-      </item>
-      <item row="9" column="0">
-       <widget class="QCheckBox" name="cbxSolderPasteTop">
         <property name="text">
-         <string>Top Solder Paste
-(Top Stencil):</string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="2">
-       <widget class="QCheckBox" name="cbxSolderPasteBot">
-        <property name="text">
-         <string>Bottom Solder Paste
-(Bottom Stencil):</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="QLineEdit" name="edtSuffixSilkscreenTop">
-        <property name="maxLength">
-         <number>255</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" colspan="3">
-       <widget class="QLineEdit" name="edtBasePath">
-        <property name="maxLength">
-         <number>255</number>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="2">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Bottom Silkscreen:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="3">
-       <widget class="QLineEdit" name="edtSuffixSoldermaskBot">
-        <property name="maxLength">
-         <number>255</number>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Top Copper:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QLineEdit" name="edtSuffixSoldermaskTop">
-        <property name="maxLength">
-         <number>255</number>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Top Silkscreen:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="QLineEdit" name="edtSuffixDrillsNpth">
-        <property name="maxLength">
-         <number>255</number>
+         <string>Use drilled slot command in Excellon files (G85)</string>
         </property>
        </widget>
       </item>
       <item row="7" column="3">
        <widget class="QLineEdit" name="edtSuffixDrills">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="maxLength">
-         <number>255</number>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="3">
-       <widget class="QLineEdit" name="edtSuffixSolderPasteBot">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="maxLength">
-         <number>255</number>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="0" colspan="2">
-       <widget class="QCheckBox" name="cbxDrillsMerge">
-        <property name="text">
-         <string>Merge PTH and NPTH drills into one file</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Base Path:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="9" column="1">
-       <widget class="QLineEdit" name="edtSuffixSolderPasteTop">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -176,8 +75,100 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="3">
-       <widget class="QLineEdit" name="edtSuffixDrillsPth">
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="edtSuffixSoldermaskTop">
+        <property name="maxLength">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="2">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>Drills PTH:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Bottom Silkscreen:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Bottom Stopmask:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="0">
+       <widget class="QCheckBox" name="cbxSolderPasteTop">
+        <property name="text">
+         <string>Top Solder Paste
+(Top Stencil):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QLineEdit" name="edtSuffixCopperBot">
+        <property name="maxLength">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLineEdit" name="edtSuffixDrillsNpth">
+        <property name="maxLength">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QLineEdit" name="edtSuffixCopperInner">
+        <property name="maxLength">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Base Path:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="edtSuffixOutlines">
+        <property name="maxLength">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="3">
+       <widget class="QLineEdit" name="edtBasePath">
+        <property name="maxLength">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Outlines:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="3">
+       <widget class="QLineEdit" name="edtSuffixSilkscreenBot">
+        <property name="maxLength">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="edtSuffixCopperTop">
         <property name="maxLength">
          <number>255</number>
         </property>
@@ -190,15 +181,64 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="2">
-       <widget class="QLabel" name="label_13">
-        <property name="text">
-         <string>Drills PTH:</string>
+      <item row="6" column="3">
+       <widget class="QLineEdit" name="edtSuffixDrillsPth">
+        <property name="maxLength">
+         <number>255</number>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QLineEdit" name="edtSuffixCopperTop">
+      <item row="7" column="0" colspan="2">
+       <widget class="QCheckBox" name="cbxDrillsMerge">
+        <property name="text">
+         <string>Merge PTH and NPTH drills into one file</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3">
+       <widget class="QLineEdit" name="edtSuffixSoldermaskBot">
+        <property name="maxLength">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="2">
+       <widget class="QCheckBox" name="cbxSolderPasteBot">
+        <property name="text">
+         <string>Bottom Solder Paste
+(Bottom Stencil):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>Drills NPTH:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="3">
+       <widget class="QLineEdit" name="edtSuffixSolderPasteBot">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="maxLength">
+         <number>255</number>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Top Silkscreen:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="10" column="1">
+       <widget class="QLineEdit" name="edtSuffixSolderPasteTop">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="maxLength">
          <number>255</number>
         </property>
@@ -228,10 +268,10 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_14">
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_6">
         <property name="text">
-         <string>Predefined configs:</string>
+         <string>Top Copper:</string>
         </property>
        </widget>
       </item>
@@ -242,38 +282,17 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_12">
-        <property name="text">
-         <string>Drills NPTH:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="2">
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>Bottom Stopmask:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="edtSuffixOutlines">
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="edtSuffixSilkscreenTop">
         <property name="maxLength">
          <number>255</number>
         </property>
        </widget>
       </item>
-      <item row="3" column="3">
-       <widget class="QLineEdit" name="edtSuffixCopperBot">
-        <property name="maxLength">
-         <number>255</number>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_8">
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_14">
         <property name="text">
-         <string>Outlines:</string>
+         <string>Predefined configs:</string>
         </property>
        </widget>
       </item>
@@ -284,24 +303,15 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="3">
-       <widget class="QLineEdit" name="edtSuffixCopperInner">
-        <property name="maxLength">
-         <number>255</number>
+      <item row="8" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Drills Blind/Buried:</string>
         </property>
        </widget>
       </item>
-      <item row="8" column="0" colspan="4">
-       <widget class="QCheckBox" name="cbxUseG85Slots">
-        <property name="toolTip">
-         <string>Export slots as drilled (G85) instead of routed (G00..G03).
-Not recommended unless the G00..G03 are causing troubles with the PCB manufacturer.
-Attention: Curved slots are not supported in G85 mode (will raise an error).</string>
-        </property>
-        <property name="text">
-         <string>Use drilled slot command in Excellon files (G85)</string>
-        </property>
-       </widget>
+      <item row="8" column="1" colspan="3">
+       <widget class="QLineEdit" name="edtSuffixDrillsBuried"/>
       </item>
      </layout>
     </widget>

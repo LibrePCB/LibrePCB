@@ -56,7 +56,7 @@ Layer::~Layer() noexcept {
  *  Getters
  ******************************************************************************/
 
-const Layer& Layer::mirrored() const noexcept {
+const Layer& Layer::mirrored(int innerLayers) const noexcept {
   static QHash<const Layer*, const Layer*> map = {
       {&topPlacement(), &botPlacement()},
       {&topDocumentation(), &botDocumentation()},
@@ -72,8 +72,15 @@ const Layer& Layer::mirrored() const noexcept {
   };
   if (map.contains(this)) {
     return *map.value(this);
+  } else if (const Layer* layer = map.key(this)) {
+    return *layer;
+  } else if ((innerLayers >= 0) && (innerLayers <= innerCopperCount()) &&
+             isInner()) {
+    const Layer* layer = innerCopper(innerLayers - getCopperNumber() + 1);
+    Q_ASSERT(layer);
+    return *layer;
   } else {
-    return *map.key(this, this);
+    return *this;
   }
 }
 
@@ -347,6 +354,16 @@ const Layer* Layer::innerCopper(int number) noexcept {
 
 int Layer::innerCopperCount() noexcept {
   return 62;  // Results in a total of 64 copper layers.
+}
+
+const Layer* Layer::copper(int number) noexcept {
+  if (number == 0) {
+    return &topCopper();
+  } else if (number == (innerCopperCount() + 1)) {
+    return &botCopper();
+  } else {
+    return innerCopper(number);
+  }
 }
 
 const QVector<const Layer*>& Layer::all() noexcept {

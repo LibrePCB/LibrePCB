@@ -58,7 +58,7 @@ public:
   void snapToGrid(const PositiveLength& gridInterval, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
   void mirror(const Point& center, Qt::Orientation orientation,
-              bool immediate) noexcept;
+              int innerLayerCount, bool immediate) noexcept;
   void setOutline(const Path& outline, bool immediate) noexcept;
   void setLayer(const Layer& layer, bool immediate) noexcept;
   void setNetSignal(NetSignal& netsignal) noexcept;

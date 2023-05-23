@@ -23,6 +23,7 @@
 #include "cmdboardviaedit.h"
 
 #include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/types/layer.h>
 
 #include <QtCore>
 
@@ -39,6 +40,10 @@ namespace editor {
 CmdBoardViaEdit::CmdBoardViaEdit(BI_Via& via) noexcept
   : UndoCommand(tr("Edit via")),
     mVia(via),
+    mOldStartLayer(&via.getVia().getStartLayer()),
+    mNewStartLayer(mOldStartLayer),
+    mOldEndLayer(&via.getVia().getEndLayer()),
+    mNewEndLayer(mOldEndLayer),
     mOldPos(via.getPosition()),
     mNewPos(mOldPos),
     mOldSize(via.getSize()),
@@ -58,6 +63,13 @@ CmdBoardViaEdit::~CmdBoardViaEdit() noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void CmdBoardViaEdit::setLayers(const Layer& startLayer,
+                                const Layer& endLayer) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewStartLayer = &startLayer;
+  mNewEndLayer = &endLayer;
+}
 
 void CmdBoardViaEdit::setPosition(const Point& pos, bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
@@ -83,6 +95,14 @@ void CmdBoardViaEdit::rotate(const Angle& angle, const Point& center,
   mNewPos.rotate(angle, center);
   if (immediate) mVia.setPosition(mNewPos);
 }
+
+void CmdBoardViaEdit::mirrorLayers(int innerLayers) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  const Layer* tmp = mNewStartLayer;
+  mNewStartLayer = &mNewEndLayer->mirrored(innerLayers);
+  mNewEndLayer = &tmp->mirrored(innerLayers);
+}
+
 void CmdBoardViaEdit::setSize(const PositiveLength& size,
                               bool immediate) noexcept {
   Q_ASSERT(!wasEverExecuted());
@@ -104,6 +124,8 @@ void CmdBoardViaEdit::setDrillDiameter(const PositiveLength& diameter,
 bool CmdBoardViaEdit::performExecute() {
   performRedo();  // can throw
 
+  if (mNewStartLayer != mOldStartLayer) return true;
+  if (mNewEndLayer != mOldEndLayer) return true;
   if (mNewPos != mOldPos) return true;
   if (mNewSize != mOldSize) return true;
   if (mNewDrillDiameter != mOldDrillDiameter) return true;
@@ -111,12 +133,14 @@ bool CmdBoardViaEdit::performExecute() {
 }
 
 void CmdBoardViaEdit::performUndo() {
+  mVia.setLayers(*mOldStartLayer, *mOldEndLayer);  // can throw
   mVia.setPosition(mOldPos);
   mVia.setSize(mOldSize);
   mVia.setDrillDiameter(mOldDrillDiameter);
 }
 
 void CmdBoardViaEdit::performRedo() {
+  mVia.setLayers(*mNewStartLayer, *mNewEndLayer);  // can throw
   mVia.setPosition(mNewPos);
   mVia.setSize(mNewSize);
   mVia.setDrillDiameter(mNewDrillDiameter);

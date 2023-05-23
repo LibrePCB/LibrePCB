@@ -280,10 +280,10 @@ public:
   // Constructors / Destructor
   DrcMsgCopperCopperClearanceViolation() = delete;
   DrcMsgCopperCopperClearanceViolation(
-      const Layer* layer1, const NetSignal* net1, const BI_Base& item1,
-      const Polygon* polygon1, const Circle* circle1, const Layer* layer2,
-      const NetSignal* net2, const BI_Base& item2, const Polygon* polygon2,
-      const Circle* circle2, const Length& minClearance,
+      const NetSignal* net1, const BI_Base& item1, const Polygon* polygon1,
+      const Circle* circle1, const NetSignal* net2, const BI_Base& item2,
+      const Polygon* polygon2, const Circle* circle2,
+      const QVector<const Layer*>& layers, const Length& minClearance,
       const QVector<Path>& locations);
   DrcMsgCopperCopperClearanceViolation(
       const DrcMsgCopperCopperClearanceViolation& other) noexcept
@@ -291,7 +291,7 @@ public:
   virtual ~DrcMsgCopperCopperClearanceViolation() noexcept {}
 
 private:
-  static QString getLayerName(const Layer* layer1, const Layer* layer2);
+  static QString getLayerName(const QVector<const Layer*>& layers);
   static QString getObjectName(const NetSignal* net, const BI_Base& item,
                                const Polygon* polygon, const Circle* circle);
   static void serializeObject(SExpression& node, const BI_Base& item,
@@ -467,7 +467,7 @@ public:
  * @brief The DrcMsgMinimumAnnularRingViolation class
  */
 class DrcMsgMinimumAnnularRingViolation final : public RuleCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(MsgBoardAnnularRingViolation)
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMinimumAnnularRingViolation)
 
 public:
   // Constructors / Destructor
@@ -601,6 +601,49 @@ public:
 private:
   static QString determineMessage(const NonEmptyPath& path) noexcept;
   static QString determineDescription(const NonEmptyPath& path) noexcept;
+};
+
+/*******************************************************************************
+ *  Class DrcMsgForbiddenVia
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgForbiddenVia class
+ */
+class DrcMsgForbiddenVia final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgForbiddenVia)
+
+public:
+  // Constructors / Destructor
+  DrcMsgForbiddenVia() = delete;
+  DrcMsgForbiddenVia(const BI_Via& via,
+                     const QVector<Path>& locations) noexcept;
+  DrcMsgForbiddenVia(const DrcMsgForbiddenVia& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgForbiddenVia() noexcept {}
+
+private:
+  static QString determineMessage(const BI_Via& via) noexcept;
+  static QString determineDescription(const BI_Via& via) noexcept;
+};
+
+/*******************************************************************************
+ *  Class DrcMsgUselessVia
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgUselessVia class
+ */
+class DrcMsgUselessVia final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgUselessVia)
+
+public:
+  // Constructors / Destructor
+  DrcMsgUselessVia() = delete;
+  DrcMsgUselessVia(const BI_Via& via, const QVector<Path>& locations) noexcept;
+  DrcMsgUselessVia(const DrcMsgUselessVia& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgUselessVia() noexcept {}
 };
 
 /*******************************************************************************

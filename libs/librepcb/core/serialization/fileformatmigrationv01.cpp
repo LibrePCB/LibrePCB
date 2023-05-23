@@ -655,6 +655,16 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
     SExpression& node = root.getChild("fabrication_output_settings");
     SExpression& drillNode = node.getChild("drills");
     drillNode.appendChild("g85_slots", false);
+    if (drillNode.getChild("suffix_merged/@0").getValue().contains("DRILLS")) {
+      // Default suffixes.
+      drillNode.appendChild(
+          "suffix_buried",
+          QString("_DRILLS-PLATED-{{START_LAYER}}-{{END_LAYER}}.drl"));
+    } else {
+      // Protel suffixes.
+      drillNode.appendChild("suffix_buried",
+                            QString("_L{{START_NUMBER}}-L{{END_NUMBER}}.drl"));
+    }
 
     SExpression& silkTop = node.getChild("silkscreen_top");
     SExpression& silkLayersTop = silkTop.getChild("layers");
@@ -696,6 +706,8 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
         ++context.nonRoundViaCount;
       }
       viaNode->removeChild(shapeNode);
+      viaNode->appendChild("from", SExpression::createToken("top_cu"));
+      viaNode->appendChild("to", SExpression::createToken("bot_cu"));
     }
   }
 
@@ -791,6 +803,8 @@ void FileFormatMigrationV01::upgradeBoardDrcSettings(SExpression& root) {
   node.appendChild("min_pth_slot_width", SExpression::createToken("0.7"));
   node.appendChild("min_outline_tool_diameter",
                    SExpression::createToken("2.0"));
+  node.appendChild("blind_vias_allowed", SExpression::createToken("false"));
+  node.appendChild("buried_vias_allowed", SExpression::createToken("false"));
   node.appendChild("allowed_npth_slots",
                    SExpression::createToken("single_segment_straight"));
   node.appendChild("allowed_pth_slots",

@@ -57,6 +57,13 @@
  ******************************************************************************/
 namespace librepcb {
 
+// Required for correct sorting of QMap<LayerPair, T>.
+static bool operator<(const BoardGerberExport::LayerPair& lhs,
+                      const BoardGerberExport::LayerPair& rhs) noexcept {
+  return Layer::lessThan(lhs.first, rhs.first) ||
+      ((lhs.first == rhs.first) && (Layer::lessThan(lhs.second, rhs.second)));
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -66,7 +73,9 @@ BoardGerberExport::BoardGerberExport(const Board& board) noexcept
     mBoard(board),
     mCreationDateTime(QDateTime::currentDateTime()),
     mProjectName(*mProject.getName()),
-    mCurrentInnerCopperLayer(0) {
+    mCurrentInnerCopperLayer(0),
+    mCurrentStartLayer(nullptr),
+    mCurrentEndLayer(nullptr) {
   // If the project contains multiple boards, add the board name to the
   // Gerber file metadata as well to distinguish between the different boards.
   if (mProject.getBoards().count() > 1) {
@@ -98,6 +107,7 @@ void BoardGerberExport::exportPcbLayers(
   exportDrillsMerged(settings);
   exportDrillsNpth(settings);
   exportDrillsPth(settings);
+  exportDrillsBlindBuried(settings);
   exportLayerBoardOutlines(settings);
   exportLayerTopCopper(settings);
   exportLayerInnerCopper(settings);
@@ -263,8 +273,27 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
 
 QString BoardGerberExport::getBuiltInAttributeValue(const QString& key) const
     noexcept {
+  auto getLayerName = [](const Layer* layer) {
+    Q_ASSERT(layer && layer->isCopper());
+    if (layer->isTop()) {
+      return QString("TOP");  // no tr()!
+    } else if (layer->isBottom()) {
+      return QString("BOTTOM");  // no tr()!
+    } else {
+      return QString("IN%1").arg(layer->getCopperNumber());  // no tr()!
+    }
+  };
+
   if ((key == QLatin1String("CU_LAYER")) && (mCurrentInnerCopperLayer > 0)) {
     return QString::number(mCurrentInnerCopperLayer);
+  } else if ((mCurrentStartLayer) && (key == QLatin1String("START_LAYER"))) {
+    return getLayerName(mCurrentStartLayer);
+  } else if ((mCurrentEndLayer) && (key == QLatin1String("END_LAYER"))) {
+    return getLayerName(mCurrentEndLayer);
+  } else if ((mCurrentStartLayer) && (key == QLatin1String("START_NUMBER"))) {
+    return QString::number(mCurrentStartLayer->getCopperNumber() + 1);
+  } else if ((mCurrentEndLayer) && (key == QLatin1String("END_NUMBER"))) {
+    return QString::number(mCurrentEndLayer->getCopperNumber() + 1);
   } else {
     return QString();
   }
@@ -336,6 +365,27 @@ void BoardGerberExport::exportDrillsPth(
     mWrittenFiles.append(fp);
   } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
     FileUtils::removeFile(fp);
+  }
+}
+
+void BoardGerberExport::exportDrillsBlindBuried(
+    const BoardFabricationOutputSettings& settings) const {
+  auto vias = getBlindBuriedVias();
+  for (auto it = vias.begin(); it != vias.end(); it++) {
+    mCurrentStartLayer = it.key().first;
+    mCurrentEndLayer = it.key().second;
+    const FilePath fp = getOutputFilePath(
+        settings.getOutputBasePath() % settings.getSuffixDrillsBlindBuried());
+    std::unique_ptr<ExcellonGenerator> gen =
+        BoardGerberExport::createExcellonGenerator(
+            settings, ExcellonGenerator::Plating::Yes);
+    foreach (const BI_Via* via, it.value()) {
+      gen->drill(via->getPosition(), via->getDrillDiameter(), true,
+                 ExcellonGenerator::Function::ViaDrill);
+    }
+    gen->generate();
+    gen->saveToFile(fp);
+    mWrittenFiles.append(fp);
   }
 }
 
@@ -563,13 +613,30 @@ int BoardGerberExport::drawPthDrills(ExcellonGenerator& gen) const {
   // vias
   foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
     foreach (const BI_Via* via, netsegment->getVias()) {
-      gen.drill(via->getPosition(), via->getDrillDiameter(), true,
-                ExcellonGenerator::Function::ViaDrill);
-      ++count;
+      if (via->getVia().isThrough()) {
+        gen.drill(via->getPosition(), via->getDrillDiameter(), true,
+                  ExcellonGenerator::Function::ViaDrill);
+        ++count;
+      }
     }
   }
 
   return count;
+}
+
+QMap<BoardGerberExport::LayerPair, QList<const BI_Via*>>
+    BoardGerberExport::getBlindBuriedVias() const {
+  QMap<LayerPair, QList<const BI_Via*>> result;
+  foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
+    foreach (const BI_Via* via, netsegment->getVias()) {
+      if (via->getVia().isBlind() || via->getVia().isBuried()) {
+        if (auto span = via->getDrillLayerSpan()) {
+          result[*span].append(via);
+        }
+      }
+    }
+  }
+  return result;
 }
 
 void BoardGerberExport::drawLayer(GerberGenerator& gen,
@@ -682,16 +749,12 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
 void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
                                 const Layer& layer,
                                 const QString& netName) const {
-  bool drawCopper = via.isOnLayer(layer);
-  bool drawStopMask = layer.isStopMask() && via.getStopMaskOffset();
-  if (drawCopper || drawStopMask) {
-    PositiveLength outerDiameter = via.getSize();
-    UnsignedLength radius(0);
-    if (drawStopMask) {
-      radius = UnsignedLength(std::max(*via.getStopMaskOffset(), Length(0)));
-      outerDiameter += UnsignedLength(radius * 2);
-    }
-
+  const bool drawCopper = via.getVia().isOnLayer(layer);
+  const tl::optional<PositiveLength> stopMaskDiameter = layer.isStopMask()
+      ? (layer.isTop() ? via.getStopMaskDiameterTop()
+                       : via.getStopMaskDiameterBottom())
+      : tl::nullopt;
+  if (drawCopper || stopMaskDiameter) {
     // Via attributes (only on copper layers).
     GerberGenerator::Function function = tl::nullopt;
     tl::optional<QString> net = tl::nullopt;
@@ -700,7 +763,9 @@ void BoardGerberExport::drawVia(GerberGenerator& gen, const BI_Via& via,
       net = netName;
     }
 
-    gen.flashCircle(via.getPosition(), outerDiameter, function, net, QString(),
+    const PositiveLength diameter =
+        stopMaskDiameter ? (*stopMaskDiameter) : via.getSize();
+    gen.flashCircle(via.getPosition(), diameter, function, net, QString(),
                     QString(), QString());
   }
 }

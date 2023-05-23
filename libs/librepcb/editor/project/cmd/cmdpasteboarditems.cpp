@@ -203,9 +203,9 @@ bool CmdPasteBoardItems::performExecute() {
           new CmdBoardNetSegmentAddElements(*copy));
       QHash<Uuid, BI_Via*> viaMap;
       for (const Via& v : segment.vias) {
-        BI_Via* via = cmdAddElements->addVia(
-            Via(Uuid::createRandom(), v.getPosition() + mPosOffset, v.getSize(),
-                v.getDrillDiameter()));
+        BI_Via* via = cmdAddElements->addVia(Via(
+            Uuid::createRandom(), v.getStartLayer(), v.getEndLayer(),
+            v.getPosition() + mPosOffset, v.getSize(), v.getDrillDiameter()));
         viaMap.insert(v.getUuid(), via);
       }
       QHash<Uuid, BI_NetPoint*> netPointMap;

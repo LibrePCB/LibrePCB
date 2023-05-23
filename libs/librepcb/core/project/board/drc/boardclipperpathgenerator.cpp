@@ -147,7 +147,7 @@ void BoardClipperPathGenerator::addCopper(
         netsignals.contains(netsegment->getNetSignal())) {
       // Vias.
       foreach (const BI_Via* via, netsegment->getVias()) {
-        if (via->isOnLayer(layer)) {
+        if (via->getVia().isOnLayer(layer)) {
           addVia(*via);
         }
       }

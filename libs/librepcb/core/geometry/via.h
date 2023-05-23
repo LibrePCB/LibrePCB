@@ -36,6 +36,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Layer;
+
 /*******************************************************************************
  *  Class Via
  ******************************************************************************/
@@ -53,6 +55,7 @@ public:
   // Signals
   enum class Event {
     UuidChanged,
+    LayersChanged,
     PositionChanged,
     SizeChanged,
     DrillDiameterChanged,
@@ -64,13 +67,16 @@ public:
   Via() = delete;
   Via(const Via& other) noexcept;
   Via(const Uuid& uuid, const Via& other) noexcept;
-  Via(const Uuid& uuid, const Point& position, const PositiveLength& size,
+  Via(const Uuid& uuid, const Layer& startLayer, const Layer& endLayer,
+      const Point& position, const PositiveLength& size,
       const PositiveLength& drillDiameter) noexcept;
   explicit Via(const SExpression& node);
   ~Via() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
+  const Layer& getStartLayer() const noexcept { return *mStartLayer; }
+  const Layer& getEndLayer() const noexcept { return *mEndLayer; }
   const Point& getPosition() const noexcept { return mPosition; }
   const PositiveLength& getSize() const noexcept { return mSize; }
   const PositiveLength& getDrillDiameter() const noexcept {
@@ -78,11 +84,16 @@ public:
   }
   Path getOutline(const Length& expansion = Length(0)) const noexcept;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
+  bool isThrough() const noexcept;
+  bool isBlind() const noexcept;
+  bool isBuried() const noexcept;
+  bool isOnLayer(const Layer& layer) const noexcept;
   QPainterPath toQPainterPathPx(const Length& expansion = Length(0)) const
       noexcept;
 
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;
+  bool setLayers(const Layer& from, const Layer& to);
   bool setPosition(const Point& position) noexcept;
   bool setSize(const PositiveLength& size) noexcept;
   bool setDrillDiameter(const PositiveLength& diameter) noexcept;
@@ -101,8 +112,19 @@ public:
   bool operator!=(const Via& rhs) const noexcept { return !(*this == rhs); }
   Via& operator=(const Via& rhs) noexcept;
 
+  // Static Methods
+  static Path getOutline(const PositiveLength& size,
+                         const Length& expansion = Length(0)) noexcept;
+  static bool isOnLayer(const Layer& layer, const Layer& from,
+                        const Layer& to) noexcept;
+  static QPainterPath toQPainterPathPx(
+      const PositiveLength& size, const PositiveLength& drillDiameter,
+      const Length& expansion = Length(0)) noexcept;
+
 private:  // Data
   Uuid mUuid;
+  const Layer* mStartLayer;
+  const Layer* mEndLayer;
   Point mPosition;
   PositiveLength mSize;
   PositiveLength mDrillDiameter;

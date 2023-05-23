@@ -41,6 +41,8 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings() noexcept
     mSuffixDrills("_DRILLS.drl"),
     mSuffixDrillsNpth("_DRILLS-NPTH.drl"),
     mSuffixDrillsPth("_DRILLS-PTH.drl"),
+    mSuffixDrillsBlindBuried(
+        "_DRILLS-PLATED-{{START_LAYER}}-{{END_LAYER}}.drl"),
     mSuffixOutlines("_OUTLINES.gbr"),
     mSuffixCopperTop("_COPPER-TOP.gbr"),
     mSuffixCopperInner("_COPPER-IN{{CU_LAYER}}.gbr"),
@@ -70,6 +72,8 @@ BoardFabricationOutputSettings::BoardFabricationOutputSettings(
     mSuffixDrills(node.getChild("drills/suffix_merged/@0").getValue()),
     mSuffixDrillsNpth(node.getChild("drills/suffix_npth/@0").getValue()),
     mSuffixDrillsPth(node.getChild("drills/suffix_pth/@0").getValue()),
+    mSuffixDrillsBlindBuried(
+        node.getChild("drills/suffix_buried/@0").getValue()),
     mSuffixOutlines(node.getChild("outlines/suffix/@0").getValue()),
     mSuffixCopperTop(node.getChild("copper_top/suffix/@0").getValue()),
     mSuffixCopperInner(node.getChild("copper_inner/suffix/@0").getValue()),
@@ -127,6 +131,8 @@ void BoardFabricationOutputSettings::serialize(SExpression& root) const {
   drills.ensureLineBreak();
   drills.appendChild("suffix_merged", mSuffixDrills);
   drills.ensureLineBreak();
+  drills.appendChild("suffix_buried", mSuffixDrillsBlindBuried);
+  drills.ensureLineBreak();
   drills.appendChild("g85_slots", mUseG85SlotCommand);
   drills.ensureLineBreak();
   root.ensureLineBreak();
@@ -152,6 +158,7 @@ BoardFabricationOutputSettings& BoardFabricationOutputSettings::operator=(
   mSuffixDrills = rhs.mSuffixDrills;
   mSuffixDrillsNpth = rhs.mSuffixDrillsNpth;
   mSuffixDrillsPth = rhs.mSuffixDrillsPth;
+  mSuffixDrillsBlindBuried = rhs.mSuffixDrillsBlindBuried;
   mSuffixOutlines = rhs.mSuffixOutlines;
   mSuffixCopperTop = rhs.mSuffixCopperTop;
   mSuffixCopperInner = rhs.mSuffixCopperInner;
@@ -175,6 +182,7 @@ bool BoardFabricationOutputSettings::operator==(
   if (mSuffixDrills != rhs.mSuffixDrills) return false;
   if (mSuffixDrillsNpth != rhs.mSuffixDrillsNpth) return false;
   if (mSuffixDrillsPth != rhs.mSuffixDrillsPth) return false;
+  if (mSuffixDrillsBlindBuried != rhs.mSuffixDrillsBlindBuried) return false;
   if (mSuffixOutlines != rhs.mSuffixOutlines) return false;
   if (mSuffixCopperTop != rhs.mSuffixCopperTop) return false;
   if (mSuffixCopperInner != rhs.mSuffixCopperInner) return false;

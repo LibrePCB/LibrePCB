@@ -59,8 +59,9 @@ public:
   void translate(const Point& deltaPos, bool immediate) noexcept;
   void setRotation(const Angle& angle, bool immediate) noexcept;
   void rotate(const Angle& angle, const Point& center, bool immediate) noexcept;
-  void setMirrored(bool mirrored, bool immediate);
-  void mirror(const Point& center, Qt::Orientation orientation, bool immediate);
+  void setMirrored(bool mirrored, int innerLayerCount, bool immediate);
+  void mirror(const Point& center, Qt::Orientation orientation,
+              int innerLayerCount, bool immediate);
   void setLocked(bool locked) noexcept;
 
 private:

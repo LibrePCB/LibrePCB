@@ -28,6 +28,8 @@
 #include "../geometry/polygon.h"
 #include "../utils/transform.h"
 
+#include <optional/tl/optional.hpp>
+
 #include <QtCore>
 
 #include <memory>
@@ -79,11 +81,22 @@ public:
     Transform transform;
   };
 
+  struct ViaData {
+    Point position;
+    PositiveLength size;
+    PositiveLength drillDiameter;
+    const Layer* startLayer;
+    const Layer* endLayer;
+    tl::optional<PositiveLength> stopMaskDiameterTop;
+    tl::optional<PositiveLength> stopMaskDiameterBottom;
+  };
+
   struct HoleData {
     NonEmptyPath path;
     PositiveLength diameter;
     bool plated;
     bool via;
+    const Layer* copperLayer;  ///< `nullptr` for through-hole.
     Transform transform;  ///< Reset by #preprocess().
   };
 
@@ -119,6 +132,7 @@ public:
   const QList<PolygonData>& getPolygons() const noexcept { return mPolygons; }
   const QList<CircleData>& getCircles() const noexcept { return mCircles; }
   const QList<StrokeData>& getStrokes() const noexcept { return mStrokes; }
+  const QList<ViaData>& getVias() const noexcept { return mVias; }
   const QList<HoleData>& getHoles() const noexcept { return mHoles; }
   const QList<AreaData>& getAreas() const noexcept { return mAreas; }
 
@@ -148,6 +162,12 @@ public:
   void addCircle(const Circle& circle, const Transform& transform) noexcept;
   void addStroke(const Layer& layer, const QVector<Path>& paths,
                  const Length& width, const Transform& transform) noexcept;
+  void addVia(
+      const Point& position, const PositiveLength& size,
+      const PositiveLength& drillDiameter, const Layer& startLayer,
+      const Layer& endLayer,
+      const tl::optional<PositiveLength>& stopMaskDiameterTop,
+      const tl::optional<PositiveLength>& stopMaskDiameterBottom) noexcept;
   void addHole(const NonEmptyPath& path, const PositiveLength& diameter,
                bool plated, bool via, const Transform& transform) noexcept;
   void addArea(const Layer& layer, const Path& outline,
@@ -173,6 +193,7 @@ private:  // Data
   QList<PolygonData> mPolygons;  ///< Cleared by #preprocess().
   QList<CircleData> mCircles;  ///< Cleared by #preprocess().
   QList<StrokeData> mStrokes;  ///< Cleared by #preprocess().
+  QList<ViaData> mVias;  /// Cleared by #preprocess().
   QList<HoleData> mHoles;
   QList<AreaData> mAreas;
 };

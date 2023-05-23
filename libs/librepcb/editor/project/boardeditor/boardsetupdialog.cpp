@@ -347,6 +347,10 @@ void BoardSetupDialog::load() noexcept {
       mBoard.getDrcSettings().getMinPthSlotWidth());
   mUi->edtDrcMinOutlineToolDiameter->setValue(
       mBoard.getDrcSettings().getMinOutlineToolDiameter());
+  mUi->cbxBlindViasAllowed->setChecked(
+      mBoard.getDrcSettings().getBlindViasAllowed());
+  mUi->cbxBuriedViasAllowed->setChecked(
+      mBoard.getDrcSettings().getBuriedViasAllowed());
   mUi->cbxDrcAllowedNpthSlots->setCurrentIndex(
       mUi->cbxDrcAllowedNpthSlots->findData(
           QVariant::fromValue(mBoard.getDrcSettings().getAllowedNpthSlots())));
@@ -414,6 +418,8 @@ bool BoardSetupDialog::apply() noexcept {
     s.setMinPthDrillDiameter(mUi->edtDrcMinPthDrillDiameter->getValue());
     s.setMinPthSlotWidth(mUi->edtDrcMinPthSlotWidth->getValue());
     s.setMinOutlineToolDiameter(mUi->edtDrcMinOutlineToolDiameter->getValue());
+    s.setBlindViasAllowed(mUi->cbxBlindViasAllowed->isChecked());
+    s.setBuriedViasAllowed(mUi->cbxBuriedViasAllowed->isChecked());
     s.setAllowedNpthSlots(
         mUi->cbxDrcAllowedNpthSlots->currentData()
             .value<BoardDesignRuleCheckSettings::AllowedSlots>());

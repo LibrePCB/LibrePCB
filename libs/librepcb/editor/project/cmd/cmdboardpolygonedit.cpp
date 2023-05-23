@@ -113,8 +113,9 @@ void CmdBoardPolygonEdit::mirrorGeometry(Qt::Orientation orientation,
   setPath(mNewData.getPath().mirrored(orientation, center), immediate);
 }
 
-void CmdBoardPolygonEdit::mirrorLayer(bool immediate) noexcept {
-  setLayer(mNewData.getLayer().mirrored(), immediate);
+void CmdBoardPolygonEdit::mirrorLayer(int innerLayerCount,
+                                      bool immediate) noexcept {
+  setLayer(mNewData.getLayer().mirrored(innerLayerCount), immediate);
 }
 
 void CmdBoardPolygonEdit::setLocked(bool locked) noexcept {

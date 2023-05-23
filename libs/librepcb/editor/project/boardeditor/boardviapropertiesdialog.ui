@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>346</width>
-    <height>142</height>
+    <height>190</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -70,6 +70,26 @@
      <item row="3" column="1">
       <widget class="librepcb::editor::PositiveLengthEdit" name="edtDrillDiameter" native="true"/>
      </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Start Layer:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>End Layer:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="librepcb::editor::LayerComboBox" name="cbxStartLayer" native="true"/>
+     </item>
+     <item row="5" column="1">
+      <widget class="librepcb::editor::LayerComboBox" name="cbxEndLayer" native="true"/>
+     </item>
     </layout>
    </item>
    <item>
@@ -95,6 +115,12 @@
    <class>librepcb::editor::PositiveLengthEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::LayerComboBox</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/layercombobox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

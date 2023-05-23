@@ -74,6 +74,8 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
     mAddVia(false),
     mTempVia(nullptr),
     mCurrentViaProperties(Uuid::createRandom(),  // UUID is not relevant here
+                          Layer::topCopper(),  // Start layer
+                          Layer::botCopper(),  // End layer
                           Point(),  // Position is not relevant here
                           PositiveLength(700000),  // Default size
                           PositiveLength(300000)  // Default drill diameter
@@ -444,6 +446,11 @@ bool BoardEditorState_DrawTrace::startPositioning(
     } else if (auto via = std::dynamic_pointer_cast<BGI_Via>(item)) {
       mFixedStartAnchor = &via->getVia();
       mCurrentNetSegment = &via->getVia().getNetSegment();
+      if ((!via->getVia().getVia().isOnLayer(*layer)) &&
+          (board.getCopperLayers().contains(
+              &via->getVia().getVia().getStartLayer()))) {
+        layer = &via->getVia().getVia().getStartLayer();
+      }
     } else if (auto pad = std::dynamic_pointer_cast<BGI_FootprintPad>(item)) {
       mFixedStartAnchor = &pad->getPad();
       mCurrentNetSegment = pad->getPad().getNetSegmentOfLines();

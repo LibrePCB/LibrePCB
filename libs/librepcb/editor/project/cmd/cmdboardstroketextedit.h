@@ -72,7 +72,7 @@ public:
                       bool immediate) noexcept;
   void mirrorGeometry(const Angle& rotation, const Point& center,
                       bool immediate) noexcept;
-  void mirrorLayer(bool immediate) noexcept;
+  void mirrorLayer(int innerLayerCount, bool immediate) noexcept;
   void setAutoRotate(bool autoRotate, bool immediate) noexcept;
   void setLocked(bool locked) noexcept;
 

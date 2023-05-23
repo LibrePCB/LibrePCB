@@ -295,7 +295,9 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
          it++) {
       if (netsignals.isEmpty() ||
           netsignals.contains(it.key()->getNetSegment().getNetSignal())) {
-        processItem(it.value(), it.key()->getPosition(), 0, false);
+        if ((!cuLayer) || (it.key()->getVia().isOnLayer(*cuLayer))) {
+          processItem(it.value(), it.key()->getPosition(), 0, false);
+        }
       }
     }
   }

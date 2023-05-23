@@ -30,6 +30,7 @@
 
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
@@ -189,7 +190,9 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
     cmdDevAll->setPosition(
         Point(mUi->edtPosX->getValue(), mUi->edtPosY->getValue()), false);
     cmdDevAll->setRotation(mUi->edtRotation->getValue(), false);
-    cmdDevAll->setMirrored(mUi->cbxMirror->isChecked(), false);  // can throw
+    cmdDevAll->setMirrored(mUi->cbxMirror->isChecked(),
+                           mDevice.getBoard().getInnerLayerCount(),
+                           false);  // can throw
     if (mUi->cbxLock->isChecked() != mDevice.isLocked()) {
       // Do not apply to all elements if not modified!
       cmdDevAll->setLocked(mUi->cbxLock->isChecked());

@@ -95,6 +95,8 @@ public:
   const UnsignedLength& getMinOutlineToolDiameter() const noexcept {
     return mMinOutlineToolDiameter;
   }
+  bool getBlindViasAllowed() const noexcept { return mBlindViasAllowed; }
+  bool getBuriedViasAllowed() const noexcept { return mBuriedViasAllowed; }
   AllowedSlots getAllowedNpthSlots() const noexcept {
     return mAllowedNpthSlots;
   }
@@ -137,6 +139,8 @@ public:
   void setMinOutlineToolDiameter(const UnsignedLength& value) noexcept {
     mMinOutlineToolDiameter = value;
   }
+  void setBlindViasAllowed(bool value) noexcept { mBlindViasAllowed = value; }
+  void setBuriedViasAllowed(bool value) noexcept { mBuriedViasAllowed = value; }
   void setAllowedPthSlots(AllowedSlots value) noexcept {
     mAllowedNpthSlots = value;
   }
@@ -179,6 +183,8 @@ private:  // Data
   UnsignedLength mMinOutlineToolDiameter;
 
   // Allowed features
+  bool mBlindViasAllowed;
+  bool mBuriedViasAllowed;
   AllowedSlots mAllowedNpthSlots;
   AllowedSlots mAllowedPthSlots;
 };

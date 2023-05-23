@@ -88,6 +88,7 @@ private:  // Methods
   void checkMinimumNpthSlotWidth(int progressEnd);
   void checkMinimumPthDrillDiameter(int progressEnd);
   void checkMinimumPthSlotWidth(int progressEnd);
+  void checkVias(int progressEnd);
   void checkAllowedNpthSlots(int progressEnd);
   void checkAllowedPthSlots(int progressEnd);
   void checkInvalidPadConnections(int progressEnd);
@@ -107,6 +108,7 @@ private:  // Methods
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
                                             const Layer& layer);
   QVector<Path> getDeviceLocation(const BI_Device& device) const;
+  QVector<Path> getViaLocation(const BI_Via& via) const noexcept;
   template <typename THole>
   QVector<Path> getHoleLocation(const THole& hole,
                                 const Transform& transform = Transform()) const
