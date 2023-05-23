@@ -165,8 +165,10 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
     std::shared_ptr<BoardClipboardData::Plane> newPlane =
         std::make_shared<BoardClipboardData::Plane>(
             plane->getUuid(), plane->getLayer(),
-            plane->getNetSignal().getName(), plane->getOutline(),
-            plane->getMinWidth(), plane->getMinClearance(),
+            plane->getNetSignal()
+                ? tl::make_optional(plane->getNetSignal()->getName())
+                : tl::nullopt,
+            plane->getOutline(), plane->getMinWidth(), plane->getMinClearance(),
             plane->getKeepIslands(), plane->getPriority(),
             plane->getConnectStyle(), plane->getThermalGap(),
             plane->getThermalSpokeWidth(), plane->isLocked());

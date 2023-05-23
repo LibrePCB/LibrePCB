@@ -70,6 +70,15 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
           &BoardPlanePropertiesDialog::buttonBoxClicked);
 
   // net signal combobox
+  connect(
+      mUi->cbxNetSignal,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, [this](int index) {
+        const bool hasNet =
+            !mUi->cbxNetSignal->itemData(index).toString().isEmpty();
+        mUi->cbxConnectStyle->setEnabled(hasNet);
+        mUi->cbKeepIslands->setEnabled(hasNet);
+      });
   QList<NetSignal*> netSignals = mPlane.getCircuit().getNetSignals().values();
   Toolbox::sortNumeric(
       netSignals,
@@ -77,19 +86,18 @@ BoardPlanePropertiesDialog::BoardPlanePropertiesDialog(
         return cmp(*lhs->getName(), *rhs->getName());
       },
       Qt::CaseInsensitive, false);
+  mUi->cbxNetSignal->addItem("[" % tr("None") % "]", QString());
   foreach (NetSignal* netsignal, netSignals) {
     mUi->cbxNetSignal->addItem(*netsignal->getName(),
                                netsignal->getUuid().toStr());
   }
-  mUi->cbxNetSignal->setCurrentIndex(
-      mUi->cbxNetSignal->findData(mPlane.getNetSignal().getUuid().toStr()));
+  mUi->cbxNetSignal->setCurrentIndex(mUi->cbxNetSignal->findData(
+      mPlane.getNetSignal() ? mPlane.getNetSignal()->getUuid().toStr()
+                            : QString()));
 
   // layer combobox
-  foreach (const Layer* layer, mPlane.getBoard().getCopperLayers()) {
-    mUi->cbxLayer->addItem(layer->getNameTr(), layer->getId());
-  }
-  mUi->cbxLayer->setCurrentIndex(
-      mUi->cbxLayer->findData(mPlane.getLayer().getId()));
+  mUi->cbxLayer->setLayers(mPlane.getBoard().getCopperLayers());
+  mUi->cbxLayer->setCurrentLayer(mPlane.getLayer());
 
   // minimum width / clearance spinbox
   mUi->edtMinWidth->setValue(mPlane.getMinWidth());
@@ -166,21 +174,20 @@ bool BoardPlanePropertiesDialog::applyChanges() noexcept {
     QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(mPlane));
 
     // net signal
-    Uuid netSignalUuid = Uuid::fromString(
-        mUi->cbxNetSignal->currentData().toString());  // can throw
-    NetSignal* netsignal =
-        mPlane.getCircuit().getNetSignals().value(netSignalUuid);
-    if (netsignal) {
-      cmd->setNetSignal(*netsignal);
+    const tl::optional<Uuid> netSignalUuid =
+        Uuid::tryFromString(mUi->cbxNetSignal->currentData().toString());
+    if (!netSignalUuid) {
+      cmd->setNetSignal(nullptr);
+    } else if (NetSignal* netsignal =
+                   mPlane.getCircuit().getNetSignals().value(*netSignalUuid)) {
+      cmd->setNetSignal(netsignal);
     } else {
       qWarning() << "No valid netsignal selected in plane properties dialog!";
     }
 
     // layer
-    if (mUi->cbxLayer->currentIndex() >= 0 &&
-        mUi->cbxLayer->currentData().isValid()) {
-      cmd->setLayer(Layer::get(mUi->cbxLayer->currentData().toString()),
-                    false);  // can throw
+    if (auto layer = mUi->cbxLayer->getCurrentLayer()) {
+      cmd->setLayer(*layer, false);  // can throw
     }
 
     // min width/clearance

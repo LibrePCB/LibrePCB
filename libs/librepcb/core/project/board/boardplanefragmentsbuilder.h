@@ -120,7 +120,7 @@ private:  // Methods
   struct PlaneData {
     Uuid uuid;
     const Layer* layer;
-    Uuid netSignal;
+    tl::optional<Uuid> netSignal;
     Path outline;
     UnsignedLength minWidth;
     UnsignedLength minClearance;

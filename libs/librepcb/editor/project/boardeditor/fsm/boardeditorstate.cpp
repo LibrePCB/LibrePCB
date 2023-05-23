@@ -338,7 +338,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
     for (auto it = scene->getPlanes().begin(); it != scene->getPlanes().end();
          it++) {
       if (netsignals.isEmpty() ||
-          netsignals.contains(&it.key()->getNetSignal())) {
+          netsignals.contains(it.key()->getNetSignal())) {
         if ((!cuLayer) || (*cuLayer == it.key()->getLayer())) {
           processItem(
               it.value(),

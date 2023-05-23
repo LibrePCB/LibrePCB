@@ -23,7 +23,7 @@
 #include "bi_plane.h"
 
 #include "../../../serialization/sexpression.h"
-#include "../../../utils/scopeguard.h"
+#include "../../../utils/scopeguardlist.h"
 #include "../../circuit/circuit.h"
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
@@ -41,12 +41,12 @@ namespace librepcb {
  ******************************************************************************/
 
 BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
-                   NetSignal& netsignal, const Path& outline)
+                   NetSignal* netsignal, const Path& outline)
   : BI_Base(board),
     onEdited(*this),
     mUuid(uuid),
     mLayer(&layer),
-    mNetSignal(&netsignal),
+    mNetSignal(netsignal),
     mOutline(outline),
     mMinWidth(200000),
     mMinClearance(300000),
@@ -84,18 +84,23 @@ void BI_Plane::setLayer(const Layer& layer) noexcept {
   }
 }
 
-void BI_Plane::setNetSignal(NetSignal& netsignal) {
-  if (&netsignal != mNetSignal) {
-    if (netsignal.getCircuit() != getCircuit()) {
+void BI_Plane::setNetSignal(NetSignal* netsignal) {
+  if (netsignal != mNetSignal) {
+    if (netsignal && (netsignal->getCircuit() != getCircuit())) {
       throw LogicError(__FILE__, __LINE__);
     }
     if (isAddedToBoard()) {
-      mNetSignal->unregisterBoardPlane(*this);  // can throw
-      auto sg = scopeGuard([&]() { mNetSignal->registerBoardPlane(*this); });
-      netsignal.registerBoardPlane(*this);  // can throw
-      sg.dismiss();
+      ScopeGuardList sgl;
+      if (mNetSignal) {
+        mNetSignal->unregisterBoardPlane(*this);  // can throw
+        sgl.add([&]() { mNetSignal->registerBoardPlane(*this); });
+      }
+      if (netsignal) {
+        netsignal->registerBoardPlane(*this);  // can throw
+      }
+      sgl.dismiss();
     }
-    mNetSignal = &netsignal;
+    mNetSignal = netsignal;
     mBoard.invalidatePlanes(mLayer);
   }
 }
@@ -167,7 +172,9 @@ void BI_Plane::setCalculatedFragments(const QVector<Path>& fragments) noexcept {
   if (fragments != mFragments) {
     mFragments = fragments;
     onEdited.notify(Event::FragmentsChanged);
-    mBoard.scheduleAirWiresRebuild(mNetSignal);
+    if (mNetSignal) {
+      mBoard.scheduleAirWiresRebuild(mNetSignal);
+    }
   }
 }
 
@@ -179,27 +186,37 @@ void BI_Plane::addToBoard() {
   if (isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  mNetSignal->registerBoardPlane(*this);  // can throw
+  if (mNetSignal) {
+    mNetSignal->registerBoardPlane(*this);  // can throw
+  }
   BI_Base::addToBoard();
   mBoard.invalidatePlanes(mLayer);
-  mBoard.scheduleAirWiresRebuild(mNetSignal);
+  if (mNetSignal) {
+    mBoard.scheduleAirWiresRebuild(mNetSignal);
+  }
 }
 
 void BI_Plane::removeFromBoard() {
   if (!isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
   }
-  mNetSignal->unregisterBoardPlane(*this);  // can throw
+  if (mNetSignal) {
+    mNetSignal->unregisterBoardPlane(*this);  // can throw
+  }
   BI_Base::removeFromBoard();
   mBoard.invalidatePlanes(mLayer);
-  mBoard.scheduleAirWiresRebuild(mNetSignal);
+  if (mNetSignal) {
+    mBoard.scheduleAirWiresRebuild(mNetSignal);
+  }
 }
 
 void BI_Plane::serialize(SExpression& root) const {
   root.appendChild(mUuid);
   root.appendChild("layer", *mLayer);
   root.ensureLineBreak();
-  root.appendChild("net", mNetSignal->getUuid());
+  root.appendChild(
+      "net",
+      mNetSignal ? tl::make_optional(mNetSignal->getUuid()) : tl::nullopt);
   root.appendChild("priority", mPriority);
   root.ensureLineBreak();
   root.appendChild("min_width", mMinWidth);

@@ -86,7 +86,7 @@ bool BoardEditorState_DrawPlane::entry() noexcept {
   EditorCommandSet& cmd = EditorCommandSet::instance();
 
   // Add the netsignals combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Signal:"), 10);
+  mContext.commandToolBar.addLabel(tr("Net:"), 10);
   std::unique_ptr<QComboBox> netSignalComboBox(new QComboBox());
   netSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   netSignalComboBox->setInsertPolicy(QComboBox::NoInsert);
@@ -99,6 +99,7 @@ bool BoardEditorState_DrawPlane::entry() noexcept {
         return cmp(*lhs->getName(), *rhs->getName());
       },
       Qt::CaseInsensitive, false);
+  netSignalComboBox->addItem("[" % tr("None") % "]", QString());
   foreach (const NetSignal* netsignal, netSignals) {
     netSignalComboBox->addItem(*netsignal->getName(),
                                netsignal->getUuid().toStr());
@@ -206,7 +207,7 @@ bool BoardEditorState_DrawPlane::startAddPlane(const Point& pos) noexcept {
     // Add plane with two vertices
     Path path({Vertex(pos), Vertex(pos)});
     mCurrentPlane = new BI_Plane(*board, Uuid::createRandom(), *mLastLayer,
-                                 *mLastNetSignal, path);
+                                 mLastNetSignal, path);
     mCurrentPlane->setConnectStyle(BI_Plane::ConnectStyle::ThermalRelief);
     mContext.undoStack.appendToCmdGroup(new CmdBoardPlaneAdd(*mCurrentPlane));
 
@@ -274,14 +275,9 @@ bool BoardEditorState_DrawPlane::updateLastVertexPosition(
 }
 
 void BoardEditorState_DrawPlane::setNetSignal(NetSignal* netsignal) noexcept {
-  try {
-    if (!netsignal) throw LogicError(__FILE__, __LINE__);
-    mLastNetSignal = netsignal;
-    if (mCurrentPlaneEditCmd) {
-      mCurrentPlaneEditCmd->setNetSignal(*mLastNetSignal);
-    }
-  } catch (const Exception& e) {
-    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  mLastNetSignal = netsignal;
+  if (mCurrentPlaneEditCmd) {
+    mCurrentPlaneEditCmd->setNetSignal(mLastNetSignal);
   }
 }
 

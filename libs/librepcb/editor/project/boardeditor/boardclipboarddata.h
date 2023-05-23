@@ -182,7 +182,7 @@ public:
 
     Uuid uuid;
     const Layer* layer;
-    CircuitIdentifier netSignalName;
+    tl::optional<CircuitIdentifier> netSignalName;
     Path outline;
     UnsignedLength minWidth;
     UnsignedLength minClearance;
@@ -195,10 +195,10 @@ public:
     Signal<Plane> onEdited;  ///< Dummy event, not used
 
     Plane(const Uuid& uuid, const Layer& layer,
-          const CircuitIdentifier& netSignalName, const Path& outline,
-          const UnsignedLength& minWidth, const UnsignedLength& minClearance,
-          bool keepIslands, int priority, BI_Plane::ConnectStyle connectStyle,
-          const PositiveLength& thermalGap,
+          const tl::optional<CircuitIdentifier>& netSignalName,
+          const Path& outline, const UnsignedLength& minWidth,
+          const UnsignedLength& minClearance, bool keepIslands, int priority,
+          BI_Plane::ConnectStyle connectStyle, const PositiveLength& thermalGap,
           const PositiveLength& thermalSpokeWidth, bool locked)
       : uuid(uuid),
         layer(&layer),
@@ -217,7 +217,8 @@ public:
     explicit Plane(const SExpression& node)
       : uuid(deserialize<Uuid>(node.getChild("@0"))),
         layer(deserialize<const Layer*>(node.getChild("layer/@0"))),
-        netSignalName(deserialize<CircuitIdentifier>(node.getChild("net/@0"))),
+        netSignalName(deserialize<tl::optional<CircuitIdentifier>>(
+            node.getChild("net/@0"))),
         outline(node),
         minWidth(deserialize<UnsignedLength>(node.getChild("min_width/@0"))),
         minClearance(
