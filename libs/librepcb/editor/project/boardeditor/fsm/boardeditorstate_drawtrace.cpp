@@ -78,7 +78,8 @@ BoardEditorState_DrawTrace::BoardEditorState_DrawTrace(
                           Layer::botCopper(),  // End layer
                           Point(),  // Position is not relevant here
                           PositiveLength(700000),  // Default size
-                          PositiveLength(300000)  // Default drill diameter
+                          PositiveLength(300000),  // Default drill diameter
+                          MaskConfig::off()  // Exposure
                           ),
     mViaLayer(tl::nullopt),
     mTargetPos(),

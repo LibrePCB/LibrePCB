@@ -91,6 +91,7 @@ public:
   void setPosition(const Point& position) noexcept;
   void setSize(const PositiveLength& size) noexcept;
   void setDrillDiameter(const PositiveLength& diameter) noexcept;
+  void setExposureConfig(const MaskConfig& config) noexcept;
 
   // General Methods
   void addToBoard() override;

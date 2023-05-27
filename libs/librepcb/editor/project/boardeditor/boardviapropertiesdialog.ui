@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
-    <height>190</height>
+    <width>551</width>
+    <height>214</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -77,6 +77,9 @@
        </property>
       </widget>
      </item>
+     <item row="4" column="1">
+      <widget class="librepcb::editor::LayerComboBox" name="cbxStartLayer" native="true"/>
+     </item>
      <item row="5" column="0">
       <widget class="QLabel" name="label_6">
        <property name="text">
@@ -84,11 +87,62 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
-      <widget class="librepcb::editor::LayerComboBox" name="cbxStartLayer" native="true"/>
-     </item>
      <item row="5" column="1">
       <widget class="librepcb::editor::LayerComboBox" name="cbxEndLayer" native="true"/>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Exposure:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QRadioButton" name="rbtnExposureOff">
+         <property name="toolTip">
+          <string>The copper area of the via is covered with solder resist, i.e. not exposed.</string>
+         </property>
+         <property name="text">
+          <string>Off</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="rbtnExposureAuto">
+         <property name="toolTip">
+          <string>A solder resist opening is created to expose the via. The clearance is taken from the board design rules.</string>
+         </property>
+         <property name="text">
+          <string>From Design Rules</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="rbtnExposureManual">
+         <property name="toolTip">
+          <string>A solder resist opening with a custom clearance is created to expose the via.</string>
+         </property>
+         <property name="text">
+          <string>Manual:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="librepcb::editor::LengthEdit" name="edtExposureOffset" native="true">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
@@ -106,15 +160,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>librepcb::editor::LengthEdit</class>
-   <extends>QWidget</extends>
-   <header location="global">librepcb/editor/widgets/lengthedit.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>librepcb::editor::PositiveLengthEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::LengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/lengthedit.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
