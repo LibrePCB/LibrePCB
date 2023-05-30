@@ -93,7 +93,7 @@ void BoardClipperPathGenerator::addCopper(
     foreach (const BI_Plane* plane, mBoard.getPlanes()) {
       if ((plane->getLayer() == layer) &&
           (netsignals.isEmpty() ||
-           netsignals.contains(&plane->getNetSignal()))) {
+           netsignals.contains(plane->getNetSignal()))) {
         addPlane(*plane);
       }
     }

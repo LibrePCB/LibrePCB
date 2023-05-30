@@ -36,9 +36,6 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="cbxLayer"/>
-     </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_7">
        <property name="text">
@@ -133,6 +130,9 @@
      <item row="7" column="1">
       <widget class="librepcb::editor::PositiveLengthEdit" name="edtThermalSpokeWidth" native="true"/>
      </item>
+     <item row="1" column="1">
+      <widget class="librepcb::editor::LayerComboBox" name="cbxLayer" native="true"/>
+     </item>
     </layout>
    </item>
    <item>
@@ -159,6 +159,18 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>librepcb::editor::PositiveLengthEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::LayerComboBox</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/layercombobox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>librepcb::editor::UnsignedLengthEdit</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/unsignedlengthedit.h</header>
@@ -170,16 +182,9 @@
    <header location="global">librepcb/editor/widgets/patheditorwidget.h</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>librepcb::editor::PositiveLengthEdit</class>
-   <extends>QWidget</extends>
-   <header location="global">librepcb/editor/widgets/positivelengthedit.h</header>
-   <container>1</container>
-  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>cbxNetSignal</tabstop>
-  <tabstop>cbxLayer</tabstop>
   <tabstop>edtMinWidth</tabstop>
   <tabstop>edtMinClearance</tabstop>
   <tabstop>spbPriority</tabstop>

@@ -129,7 +129,7 @@ bool BoardEditorState_AddVia::entry() noexcept {
   mContext.commandToolBar.addWidget(std::move(drillEdit));
 
   // Add the netsignals combobox to the toolbar
-  mContext.commandToolBar.addLabel(tr("Signal:"), 10);
+  mContext.commandToolBar.addLabel(tr("Net:"), 10);
   mNetSignalComboBox = new QComboBox();
   mNetSignalComboBox->setSizeAdjustPolicy(QComboBox::AdjustToContents);
   mNetSignalComboBox->setInsertPolicy(QComboBox::NoInsert);

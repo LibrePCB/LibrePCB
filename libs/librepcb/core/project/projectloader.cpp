@@ -734,18 +734,20 @@ void ProjectLoader::loadBoardNetSegment(Board& b, const SExpression& node) {
 }
 
 void ProjectLoader::loadBoardPlane(Board& b, const SExpression& node) {
-  const Uuid netSignalUuid = deserialize<Uuid>(node.getChild("net/@0"));
-  NetSignal* netSignal =
-      b.getProject().getCircuit().getNetSignals().value(netSignalUuid);
-  if (!netSignal) {
+  const tl::optional<Uuid> netSignalUuid =
+      deserialize<tl::optional<Uuid>>(node.getChild("net/@0"));
+  NetSignal* netSignal = netSignalUuid
+      ? b.getProject().getCircuit().getNetSignals().value(*netSignalUuid)
+      : nullptr;
+  if (netSignalUuid && (!netSignal)) {
     throw RuntimeError(
         __FILE__, __LINE__,
-        QString("Inexistent net signal: '%1'").arg(netSignalUuid.toStr()));
+        QString("Inexistent net signal: '%1'").arg(netSignalUuid->toStr()));
   }
   BI_Plane* plane =
       new BI_Plane(b, deserialize<Uuid>(node.getChild("@0")),
                    deserialize<const Layer&>(node.getChild("layer/@0")),
-                   *netSignal, Path(node));
+                   netSignal, Path(node));
   plane->setMinWidth(
       deserialize<UnsignedLength>(node.getChild("min_width/@0")));
   plane->setMinClearance(

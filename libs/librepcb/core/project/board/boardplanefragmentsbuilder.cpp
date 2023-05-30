@@ -180,12 +180,15 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   }
   foreach (const BI_Plane* plane, board.getPlanes()) {
     if (layers.contains(&plane->getLayer())) {
-      data->planes.append(PlaneData{
-          plane->getUuid(), &plane->getLayer(), plane->getNetSignal().getUuid(),
-          plane->getOutline(), plane->getMinWidth(), plane->getMinClearance(),
-          plane->getKeepIslands(), plane->getPriority(),
-          plane->getConnectStyle(), plane->getThermalGap(),
-          plane->getThermalSpokeWidth()});
+      data->planes.append(
+          PlaneData{plane->getUuid(), &plane->getLayer(),
+                    plane->getNetSignal()
+                        ? tl::make_optional(plane->getNetSignal()->getUuid())
+                        : tl::nullopt,
+                    plane->getOutline(), plane->getMinWidth(),
+                    plane->getMinClearance(), plane->getKeepIslands(),
+                    plane->getPriority(), plane->getConnectStyle(),
+                    plane->getThermalGap(), plane->getThermalSpokeWidth()});
     }
   }
   foreach (const BI_Polygon* polygon, board.getPolygons()) {
@@ -347,7 +350,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
             (via.endLayer->getCopperNumber() < it->layer->getCopperNumber())) {
           continue;
         }
-        if (via.netSignal == it->netSignal) {
+        if (it->netSignal && (via.netSignal == it->netSignal)) {
           // Via has same net as plane -> no cut-out.
           // Note: Do not respect the plane connect style for vias, but always
           // connect them with solid style. Since vias are not soldered, heat
@@ -373,7 +376,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       // Collect traces & other strokes.
       foreach (const PolygonData& polygon, data->polygons) {
         if (polygon.layer == it->layer) {
-          if (polygon.netSignal == it->netSignal) {
+          if (it->netSignal && (polygon.netSignal == it->netSignal)) {
             // Same net signal -> memorize as connected area.
             if (polygon.filled) {
               // Area.
@@ -424,7 +427,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       ClipperLib::Paths thermalPadAreasShrinked;
       ClipperLib::Paths thermalPadClearanceAreas;
       foreach (const PadData& pad, data->pads) {
-        const bool sameNet = (pad.netSignal == it->netSignal);
+        const bool sameNet = it->netSignal && (pad.netSignal == it->netSignal);
         foreach (const PadGeometry& geometry, pad.geometries.value(it->layer)) {
           if (sameNet) {
             // Same net signal -> memorize as connected area.
@@ -606,7 +609,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       }
 
       // If requested, remove unconnected fragments (islands).
-      if (!it->keepIslands) {
+      if (it->netSignal && (!it->keepIslands)) {
         auto isIsland = [&](const ClipperLib::Path& p) {
           ClipperLib::Paths intersections{p};
           ClipperHelpers::intersect(intersections, connectedNetSignalAreas,

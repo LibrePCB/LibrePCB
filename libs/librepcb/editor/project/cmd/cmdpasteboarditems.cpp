@@ -272,12 +272,14 @@ bool CmdPasteBoardItems::performExecute() {
 
   // Paste planes
   for (const BoardClipboardData::Plane& plane : mData->getPlanes()) {
-    BI_Plane* copy =
-        new BI_Plane(mBoard,
-                     Uuid::createRandom(),  // assign new UUID
-                     *plane.layer, *getOrCreateNetSignal(*plane.netSignalName),
-                     plane.outline.translated(mPosOffset)  // move
-        );
+    BI_Plane* copy = new BI_Plane(
+        mBoard,
+        Uuid::createRandom(),  // assign new UUID
+        *plane.layer,
+        plane.netSignalName ? getOrCreateNetSignal(**plane.netSignalName)
+                            : nullptr,
+        plane.outline.translated(mPosOffset)  // move
+    );
     copy->setMinWidth(plane.minWidth);
     copy->setMinClearance(plane.minClearance);
     copy->setKeepIslands(plane.keepIslands);

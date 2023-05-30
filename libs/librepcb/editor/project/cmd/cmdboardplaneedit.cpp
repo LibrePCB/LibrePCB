@@ -44,7 +44,7 @@ CmdBoardPlaneEdit::CmdBoardPlaneEdit(BI_Plane& plane) noexcept
     mNewOutline(mOldOutline),
     mOldLayer(&plane.getLayer()),
     mNewLayer(mOldLayer),
-    mOldNetSignal(&plane.getNetSignal()),
+    mOldNetSignal(plane.getNetSignal()),
     mNewNetSignal(mOldNetSignal),
     mOldMinWidth(plane.getMinWidth()),
     mNewMinWidth(mOldMinWidth),
@@ -113,9 +113,9 @@ void CmdBoardPlaneEdit::setLayer(const Layer& layer, bool immediate) noexcept {
   if (immediate) mPlane.setLayer(*mNewLayer);
 }
 
-void CmdBoardPlaneEdit::setNetSignal(NetSignal& netsignal) noexcept {
+void CmdBoardPlaneEdit::setNetSignal(NetSignal* netsignal) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewNetSignal = &netsignal;
+  mNewNetSignal = netsignal;
 }
 
 void CmdBoardPlaneEdit::setMinWidth(const UnsignedLength& minWidth) noexcept {
@@ -181,7 +181,7 @@ bool CmdBoardPlaneEdit::performExecute() {
 }
 
 void CmdBoardPlaneEdit::performUndo() {
-  mPlane.setNetSignal(*mOldNetSignal);  // can throw
+  mPlane.setNetSignal(mOldNetSignal);  // can throw
   mPlane.setOutline(mOldOutline);
   mPlane.setLayer(*mOldLayer);
   mPlane.setMinWidth(mOldMinWidth);
@@ -195,7 +195,7 @@ void CmdBoardPlaneEdit::performUndo() {
 }
 
 void CmdBoardPlaneEdit::performRedo() {
-  mPlane.setNetSignal(*mNewNetSignal);  // can throw
+  mPlane.setNetSignal(mNewNetSignal);  // can throw
   mPlane.setOutline(mNewOutline);
   mPlane.setLayer(*mNewLayer);
   mPlane.setMinWidth(mNewMinWidth);

@@ -61,7 +61,7 @@ public:
               int innerLayerCount, bool immediate) noexcept;
   void setOutline(const Path& outline, bool immediate) noexcept;
   void setLayer(const Layer& layer, bool immediate) noexcept;
-  void setNetSignal(NetSignal& netsignal) noexcept;
+  void setNetSignal(NetSignal* netsignal) noexcept;
   void setMinWidth(const UnsignedLength& minWidth) noexcept;
   void setMinClearance(const UnsignedLength& minClearance) noexcept;
   void setConnectStyle(BI_Plane::ConnectStyle style) noexcept;

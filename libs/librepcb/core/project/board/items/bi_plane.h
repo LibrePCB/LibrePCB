@@ -75,13 +75,13 @@ public:
   BI_Plane() = delete;
   BI_Plane(const BI_Plane& other) = delete;
   BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
-           NetSignal& netsignal, const Path& outline);
+           NetSignal* netsignal, const Path& outline);
   ~BI_Plane() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
   const Layer& getLayer() const noexcept { return *mLayer; }
-  NetSignal& getNetSignal() const noexcept { return *mNetSignal; }
+  NetSignal* getNetSignal() const noexcept { return mNetSignal; }
   const UnsignedLength& getMinWidth() const noexcept { return mMinWidth; }
   const UnsignedLength& getMinClearance() const noexcept {
     return mMinClearance;
@@ -101,7 +101,7 @@ public:
   // Setters
   void setOutline(const Path& outline) noexcept;
   void setLayer(const Layer& layer) noexcept;
-  void setNetSignal(NetSignal& netsignal);
+  void setNetSignal(NetSignal* netsignal);
   void setMinWidth(const UnsignedLength& minWidth) noexcept;
   void setMinClearance(const UnsignedLength& minClearance) noexcept;
   void setConnectStyle(ConnectStyle style) noexcept;
@@ -129,8 +129,8 @@ public:
 
 private:  // Data
   Uuid mUuid;
-  const Layer* mLayer;
-  NetSignal* mNetSignal;
+  const Layer* mLayer;  ///< Mandatory (never `nullptr`)
+  NetSignal* mNetSignal;  ///< Optional (`nullptr` = no net)
   Path mOutline;
   UnsignedLength mMinWidth;
   UnsignedLength mMinClearance;

@@ -292,7 +292,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                     nullptr,
                                     &plane->getLayer(),
                                     &plane->getLayer(),
-                                    &plane->getNetSignal(),
+                                    plane->getNetSignal(),
                                     *clearance,
                                     {},
                                     {}});

@@ -145,7 +145,7 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
 
   const bool selected = option->state.testFlag(QStyle::State_Selected);
   const bool highlight =
-      selected || mHighlightedNetSignals->contains(&mPlane.getNetSignal());
+      selected || mHighlightedNetSignals->contains(mPlane.getNetSignal());
   const qreal lod =
       option->levelOfDetailFromTransform(painter->worldTransform());
 
