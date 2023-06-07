@@ -115,6 +115,15 @@ bool Via::isOnLayer(const Layer& layer) const noexcept {
   return layer.isCopper() && isOnLayer(layer, *mStartLayer, *mEndLayer);
 }
 
+bool Via::isOnAnyLayer(const QSet<const Layer*>& layers) const noexcept {
+  foreach (const Layer* layer, layers) {
+    if (layer && isOnLayer(*layer)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 QPainterPath Via::toQPainterPathPx(const Length& expansion) const noexcept {
   return toQPainterPathPx(mSize, mDrillDiameter, expansion);
 }

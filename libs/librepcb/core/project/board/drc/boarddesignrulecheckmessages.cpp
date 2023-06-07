@@ -39,6 +39,7 @@
 #include "../items/bi_polygon.h"
 #include "../items/bi_stroketext.h"
 #include "../items/bi_via.h"
+#include "../items/bi_zone.h"
 
 #include <QtCore>
 
@@ -724,6 +725,130 @@ QString DrcMsgCopperHoleClearanceViolation::getDescription() noexcept {
 }
 
 /*******************************************************************************
+ *  DrcMsgCopperInKeepoutZone
+ ******************************************************************************/
+
+DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_FootprintPad& pad,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Pad in copper keepout zone: '%1'", "Placeholder is pad name")
+            .arg(pad.getText()),
+        getDescription(), "copper_in_keepout_zone", locations) {
+  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad.getLibPadUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_Via& via,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Via in copper keepout zone: '%1'", "Placeholder is net name")
+            .arg(via.getNetSegment().getNetNameToDisplay(true)),
+        getDescription(), "copper_in_keepout_zone", locations) {
+  mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("via", via.getUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_NetLine& netLine,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Trace in copper keepout zone: '%1'", "Placeholder is net name")
+            .arg(netLine.getNetSegment().getNetNameToDisplay(true)),
+        getDescription(), "copper_in_keepout_zone", locations) {
+  mApproval.appendChild("netsegment", netLine.getNetSegment().getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("trace", netLine.getUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_Polygon& polygon,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, tr("Polygon in copper keepout zone"),
+                     getDescription(), "copper_in_keepout_zone", locations) {
+  mApproval.appendChild("polygon", polygon.getData().getUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_Device& device, const Polygon& polygon,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Polygon in copper keepout zone: '%1'", "Placeholder is device name")
+            .arg(*device.getComponentInstance().getName()),
+        getDescription(), "copper_in_keepout_zone", locations) {
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("polygon", polygon.getUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgCopperInKeepoutZone::DrcMsgCopperInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_Device& device, const Circle& circle,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Circle in copper keepout zone: '%1'", "Placeholder is device name")
+            .arg(*device.getComponentInstance().getName()),
+        getDescription(), "copper_in_keepout_zone", locations) {
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("circle", circle.getUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+void DrcMsgCopperInKeepoutZone::addZoneApprovalNodes(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone) noexcept {
+  if (boardZone) {
+    mApproval.ensureLineBreak();
+    mApproval.appendChild("zone", boardZone->getData().getUuid());
+  }
+  if (deviceZone) {
+    mApproval.ensureLineBreak();
+    mApproval.appendChild("zone", deviceZone->getUuid());
+  }
+  if (zoneDevice) {
+    mApproval.ensureLineBreak();
+    mApproval.appendChild("from_device",
+                          zoneDevice->getComponentInstanceUuid());
+  }
+}
+
+QString DrcMsgCopperInKeepoutZone::getDescription() noexcept {
+  return tr("There is a copper object within a copper keepout zone.") % "\n\n" %
+      tr("Move the object to outside the keepout zone.");
+}
+
+/*******************************************************************************
  *  DrcMsgDrillDrillClearanceViolation
  ******************************************************************************/
 
@@ -888,6 +1013,156 @@ DrcMsgCourtyardOverlap::DrcMsgCourtyardOverlap(
                         std::max(device1.getComponentInstanceUuid(),
                                  device2.getComponentInstanceUuid()));
   mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
+ *  DrcMsgExposureInKeepoutZone
+ ******************************************************************************/
+
+DrcMsgDeviceInKeepoutZone::DrcMsgDeviceInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_Device& device,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Device in keepout zone: '%1'", "Placeholder is device name")
+            .arg(*device.getComponentInstance().getName()),
+        getDescription(), "device_in_keepout_zone", locations) {
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+void DrcMsgDeviceInKeepoutZone::addZoneApprovalNodes(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone) noexcept {
+  if (boardZone) {
+    mApproval.ensureLineBreak();
+    mApproval.appendChild("zone", boardZone->getData().getUuid());
+  }
+  if (deviceZone) {
+    mApproval.ensureLineBreak();
+    mApproval.appendChild("zone", deviceZone->getUuid());
+  }
+  if (zoneDevice) {
+    mApproval.ensureLineBreak();
+    mApproval.appendChild("from_device",
+                          zoneDevice->getComponentInstanceUuid());
+  }
+}
+
+QString DrcMsgDeviceInKeepoutZone::getDescription() noexcept {
+  return tr("There is a device within a keepout zone.") % "\n\n" %
+      tr("Move the device to outside the keepout zone.");
+}
+
+/*******************************************************************************
+ *  DrcMsgExposureInKeepoutZone
+ ******************************************************************************/
+
+DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_FootprintPad& pad,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Pad in exposure keepout zone: '%1'", "Placeholder is pad name")
+            .arg(pad.getText()),
+        getDescription(), "exposure_in_keepout_zone", locations) {
+  mApproval.appendChild("device", pad.getDevice().getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad.getLibPadUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_Via& via,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Via in exposure keepout zone: '%1'", "Placeholder is net name")
+            .arg(via.getNetSegment().getNetNameToDisplay(true)),
+        getDescription(), "exposure_in_keepout_zone", locations) {
+  mApproval.appendChild("netsegment", via.getNetSegment().getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("via", via.getUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_Polygon& polygon,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error, tr("Polygon in exposure keepout zone"),
+                     getDescription(), "exposure_in_keepout_zone", locations) {
+  mApproval.appendChild("polygon", polygon.getData().getUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_Device& device, const Polygon& polygon,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error,
+                     tr("Polygon in exposure keepout zone: '%1'",
+                        "Placeholder is device name")
+                         .arg(*device.getComponentInstance().getName()),
+                     getDescription(), "exposure_in_keepout_zone", locations) {
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("polygon", polygon.getUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgExposureInKeepoutZone::DrcMsgExposureInKeepoutZone(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone, const BI_Device& device, const Circle& circle,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(Severity::Error,
+                     tr("Circle in exposure keepout zone: '%1'",
+                        "Placeholder is device name")
+                         .arg(*device.getComponentInstance().getName()),
+                     getDescription(), "exposure_in_keepout_zone", locations) {
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("circle", circle.getUuid());
+  mApproval.ensureLineBreak();
+  addZoneApprovalNodes(boardZone, zoneDevice, deviceZone);
+  mApproval.ensureLineBreak();
+}
+
+void DrcMsgExposureInKeepoutZone::addZoneApprovalNodes(
+    const BI_Zone* boardZone, const BI_Device* zoneDevice,
+    const Zone* deviceZone) noexcept {
+  if (boardZone) {
+    mApproval.ensureLineBreak();
+    mApproval.appendChild("zone", boardZone->getData().getUuid());
+  }
+  if (deviceZone) {
+    mApproval.ensureLineBreak();
+    mApproval.appendChild("zone", deviceZone->getUuid());
+  }
+  if (zoneDevice) {
+    mApproval.ensureLineBreak();
+    mApproval.appendChild("from_device",
+                          zoneDevice->getComponentInstanceUuid());
+  }
+}
+
+QString DrcMsgExposureInKeepoutZone::getDescription() noexcept {
+  return tr("There is a solder resist opening within an exposure keepout "
+            "zone.") %
+      "\n\n" % tr("Move the object to outside the keepout zone.");
 }
 
 /*******************************************************************************
@@ -1249,6 +1524,21 @@ QString DrcMsgForbiddenVia::determineDescription(const BI_Via& via) noexcept {
               "manufacturer is able to create them.") %
         suggestion;
   }
+}
+
+/*******************************************************************************
+ *  DrcMsgUselessZone
+ ******************************************************************************/
+
+DrcMsgUselessZone::DrcMsgUselessZone(const BI_Zone& zone,
+                                     const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Warning, tr("Useless zone"),
+        tr("The zone has no layer or rule enabled so it is useless."),
+        "useless_zone", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("zone", zone.getData().getUuid());
+  mApproval.ensureLineBreak();
 }
 
 /*******************************************************************************
