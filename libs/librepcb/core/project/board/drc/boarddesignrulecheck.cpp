@@ -49,6 +49,7 @@
 #include "../items/bi_polygon.h"
 #include "../items/bi_stroketext.h"
 #include "../items/bi_via.h"
+#include "../items/bi_zone.h"
 #include "boardclipperpathgenerator.h"
 
 #include <QtCore>
@@ -101,11 +102,12 @@ void BoardDesignRuleCheck::execute(bool quick) {
   if (!quick) {
     checkDrillDrillClearances(49);  // 5%
     checkDrillBoardClearances(54);  // 5%
-    checkMinimumPthAnnularRing(64);  // 10%
-    checkMinimumNpthDrillDiameter(66);  // 2%
-    checkMinimumNpthSlotWidth(68);  // 2%
-    checkMinimumPthDrillDiameter(70);  // 2%
-    checkMinimumPthSlotWidth(72);  // 2%
+    checkMinimumPthAnnularRing(59);  // 5%
+    checkMinimumNpthDrillDiameter(61);  // 2%
+    checkMinimumNpthSlotWidth(63);  // 2%
+    checkMinimumPthDrillDiameter(65);  // 2%
+    checkMinimumPthSlotWidth(67);  // 2%
+    checkZones(72);  // 5%
     checkVias(74);  // 2%
     checkAllowedNpthSlots(75);  // 1%
     checkAllowedPthSlots(76);  // 1%
@@ -1042,6 +1044,260 @@ void BoardDesignRuleCheck::checkMinimumPthSlotWidth(int progressEnd) {
           emitMessage(std::make_shared<DrcMsgMinimumSlotWidthViolation>(
               *pad, hole, minWidth, getHoleLocation(hole, transform)));
         }
+      }
+    }
+  }
+
+  emitProgress(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkZones(int progressEnd) {
+  emitStatus(tr("Check keepout zones..."));
+
+  // Collect all zones.
+  struct ZoneItem {
+    const BI_Zone* boardZone;
+    const BI_Device* device;
+    const Zone* deviceZone;
+    const Path outline;
+    const QSet<const Layer*> layers;
+    const Zone::Rules rules;
+  };
+  QVector<ZoneItem> zones;
+  foreach (const BI_Zone* zone, mBoard.getZones()) {
+    // Check validity.
+    if ((zone->getData().getLayers() & mBoard.getCopperLayers()).isEmpty() ||
+        (!zone->getData().getRules())) {
+      emitMessage(std::make_shared<DrcMsgUselessZone>(
+          *zone, QVector<Path>{zone->getData().getOutline().toClosedPath()}));
+    }
+
+    // Add to collection.
+    zones.append(ZoneItem{zone, nullptr, nullptr, zone->getData().getOutline(),
+                          zone->getData().getLayers(),
+                          zone->getData().getRules()});
+  }
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    const Transform transform(*device);
+    for (const Zone& zone : device->getLibFootprint().getZones()) {
+      QSet<const Layer*> layers;
+      if (zone.getLayers().testFlag(Zone::Layer::Top)) {
+        layers.insert(&transform.map(Layer::topCopper()));
+      }
+      if (zone.getLayers().testFlag(Zone::Layer::Inner)) {
+        foreach (const Layer* layer, mBoard.getCopperLayers()) {
+          if (layer->isInner()) {
+            layers.insert(layer);
+          }
+        }
+      }
+      if (zone.getLayers().testFlag(Zone::Layer::Bottom)) {
+        layers.insert(&transform.map(Layer::botCopper()));
+      }
+      zones.append(ZoneItem{nullptr, device, &zone,
+                            transform.map(zone.getOutline()), layers,
+                            zone.getRules()});
+    }
+  }
+
+  // Check for violations.
+  foreach (const ZoneItem& zone, zones) {
+    // Determine some zone data.
+    const QPainterPath zoneAreaPx = zone.outline.toQPainterPathPx();
+    QSet<const Layer*> noCopperLayers;
+    if (zone.rules.testFlag(Zone::Rule::NoCopper)) {
+      noCopperLayers = zone.layers;
+    }
+    QSet<const Layer*> noStopMaskLayers;
+    if (zone.rules.testFlag(Zone::Rule::NoExposure)) {
+      if (zone.layers.contains(&Layer::topCopper())) {
+        noStopMaskLayers.insert(&Layer::topStopMask());
+      }
+      if (zone.layers.contains(&Layer::botCopper())) {
+        noStopMaskLayers.insert(&Layer::botStopMask());
+      }
+    }
+    QSet<const Layer*> noDeviceLayers;
+    if (zone.rules.testFlag(Zone::Rule::NoDevices)) {
+      if (zone.layers.contains(&Layer::topCopper())) {
+        noDeviceLayers.insert(&Layer::topDocumentation());
+      }
+      if (zone.layers.contains(&Layer::botCopper())) {
+        noDeviceLayers.insert(&Layer::botDocumentation());
+      }
+    }
+
+    // Helper function.
+    QVector<Path> locations;
+    auto intersectsPad = [&zoneAreaPx, &locations](
+                             const BI_FootprintPad& pad,
+                             const QSet<const Layer*>& layers) {
+      const Transform transform(pad);
+      QSet<Path> outlines;
+      foreach (const Layer* layer, layers) {
+        foreach (const PadGeometry& geometry,
+                 pad.getGeometries().value(layer)) {
+          outlines += QSet<Path>::fromList(
+              transform.map(geometry.toOutlines()).toList());
+        }
+      }
+      if (!outlines.isEmpty()) {
+        locations = outlines.toList().toVector();
+        const QPainterPath areaPx = Path::toQPainterPathPx(locations, true);
+        return zoneAreaPx.intersects(areaPx);
+      }
+      return false;
+    };
+    auto intersectsPolygon = [&zoneAreaPx, &locations](
+                                 const Path& path,
+                                 const UnsignedLength& lineWidth, bool fill) {
+      locations.clear();
+      if (lineWidth > 0) {
+        locations += path.toOutlineStrokes(PositiveLength(*lineWidth));
+      }
+      if (fill && path.isClosed()) {
+        locations += path;
+      }
+      return (!locations.isEmpty()) &&
+          zoneAreaPx.intersects(Path::toQPainterPathPx(locations, true));
+    };
+
+    // Check devices.
+    foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+      // Skip violations within a single device since this is actually a
+      // (minor) library issue and cannot be fixed in the board. It's
+      // even handy to use this behavior to simplify zone outlines in
+      // footprints.
+      if (device == zone.device) {
+        continue;
+      }
+
+      // Check pads.
+      foreach (const BI_FootprintPad* pad, device->getPads()) {
+        if (intersectsPad(*pad, noCopperLayers)) {
+          emitMessage(std::make_shared<DrcMsgCopperInKeepoutZone>(
+              zone.boardZone, zone.device, zone.deviceZone, *pad, locations));
+        }
+        if (intersectsPad(*pad, noStopMaskLayers)) {
+          emitMessage(std::make_shared<DrcMsgExposureInKeepoutZone>(
+              zone.boardZone, zone.device, zone.deviceZone, *pad, locations));
+        }
+      }
+
+      // Check polygons.
+      const Transform transform(*device);
+      bool deviceInKeepoutZone = false;
+      for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
+        auto check = [&intersectsPolygon, &transform, &polygon]() {
+          return intersectsPolygon(transform.map(polygon.getPath()),
+                                   polygon.getLineWidth(), polygon.isFilled());
+        };
+        const Layer& layer = transform.map(polygon.getLayer());
+        if ((noCopperLayers.contains(&layer)) && check()) {
+          emitMessage(std::make_shared<DrcMsgCopperInKeepoutZone>(
+              zone.boardZone, zone.device, zone.deviceZone, *device, polygon,
+              locations));
+        } else if ((noStopMaskLayers.contains(&layer)) && check()) {
+          emitMessage(std::make_shared<DrcMsgExposureInKeepoutZone>(
+              zone.boardZone, zone.device, zone.deviceZone, *device, polygon,
+              locations));
+        } else if ((noDeviceLayers.contains(&layer)) && check()) {
+          deviceInKeepoutZone = true;
+        }
+      }
+
+      // Check circles.
+      for (const Circle& circle : device->getLibFootprint().getCircles()) {
+        auto check = [&intersectsPolygon, &transform, &circle]() {
+          return intersectsPolygon(
+              transform.map(Path::circle(circle.getDiameter())
+                                .translated(circle.getCenter())),
+              circle.getLineWidth(), circle.isFilled());
+        };
+        const Layer& layer = transform.map(circle.getLayer());
+        if ((noCopperLayers.contains(&layer)) && check()) {
+          emitMessage(std::make_shared<DrcMsgCopperInKeepoutZone>(
+              zone.boardZone, zone.device, zone.deviceZone, *device, circle,
+              locations));
+        } else if ((noStopMaskLayers.contains(&layer)) && check()) {
+          emitMessage(std::make_shared<DrcMsgExposureInKeepoutZone>(
+              zone.boardZone, zone.device, zone.deviceZone, *device, circle,
+              locations));
+        } else if ((noDeviceLayers.contains(&layer)) && check()) {
+          deviceInKeepoutZone = true;
+        }
+      }
+
+      if (deviceInKeepoutZone) {
+        emitMessage(std::make_shared<DrcMsgDeviceInKeepoutZone>(
+            zone.boardZone, zone.device, zone.deviceZone, *device,
+            getDeviceLocation(*device)));
+      }
+    }
+
+    // Check net segments.
+    foreach (const BI_NetSegment* segment, mBoard.getNetSegments()) {
+      // Check vias.
+      foreach (const BI_Via* via, segment->getVias()) {
+        if (via->getVia().isOnAnyLayer(noCopperLayers)) {
+          QPainterPath areaPx;
+          areaPx.addEllipse(via->getPosition().toPxQPointF(),
+                            via->getSize()->toPx() / 2,
+                            via->getSize()->toPx() / 2);
+          if (zoneAreaPx.intersects(areaPx)) {
+            emitMessage(std::make_shared<DrcMsgCopperInKeepoutZone>(
+                zone.boardZone, zone.device, zone.deviceZone, *via,
+                QVector<Path>{via->getVia().getSceneOutline()}));
+          }
+        }
+        for (const auto& cfg :
+             {std::make_pair(&Layer::topStopMask(),
+                             via->getStopMaskDiameterTop()),
+              std::make_pair(&Layer::botStopMask(),
+                             via->getStopMaskDiameterBottom())}) {
+          if (noStopMaskLayers.contains(cfg.first) && (cfg.second)) {
+            QPainterPath areaPx;
+            areaPx.addEllipse(via->getPosition().toPxQPointF(),
+                              (*cfg.second)->toPx() / 2,
+                              (*cfg.second)->toPx() / 2);
+            if (zoneAreaPx.intersects(areaPx)) {
+              emitMessage(std::make_shared<DrcMsgExposureInKeepoutZone>(
+                  zone.boardZone, zone.device, zone.deviceZone, *via,
+                  QVector<Path>{via->getVia().getSceneOutline()}));
+              break;
+            }
+          }
+        }
+      }
+
+      // Check traces.
+      foreach (const BI_NetLine* netLine, segment->getNetLines()) {
+        if (noCopperLayers.contains(&netLine->getLayer())) {
+          const QPainterPath areaPx =
+              netLine->getSceneOutline().toQPainterPathPx();
+          if (zoneAreaPx.intersects(areaPx)) {
+            emitMessage(std::make_shared<DrcMsgCopperInKeepoutZone>(
+                zone.boardZone, zone.device, zone.deviceZone, *netLine,
+                QVector<Path>{netLine->getSceneOutline()}));
+          }
+        }
+      }
+    }
+
+    // Check Polygons.
+    foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
+      auto check = [&intersectsPolygon, polygon]() {
+        return intersectsPolygon(polygon->getData().getPath(),
+                                 polygon->getData().getLineWidth(),
+                                 polygon->getData().isFilled());
+      };
+      const Layer& layer = polygon->getData().getLayer();
+      if ((noCopperLayers.contains(&layer)) && check()) {
+        emitMessage(std::make_shared<DrcMsgCopperInKeepoutZone>(
+            zone.boardZone, zone.device, zone.deviceZone, *polygon, locations));
+      } else if ((noStopMaskLayers.contains(&layer)) && check()) {
+        emitMessage(std::make_shared<DrcMsgExposureInKeepoutZone>(
+            zone.boardZone, zone.device, zone.deviceZone, *polygon, locations));
       }
     }
   }

@@ -88,6 +88,7 @@ private:  // Methods
   void checkMinimumNpthSlotWidth(int progressEnd);
   void checkMinimumPthDrillDiameter(int progressEnd);
   void checkMinimumPthSlotWidth(int progressEnd);
+  void checkZones(int progressEnd);
   void checkVias(int progressEnd);
   void checkAllowedNpthSlots(int progressEnd);
   void checkAllowedPthSlots(int progressEnd);
