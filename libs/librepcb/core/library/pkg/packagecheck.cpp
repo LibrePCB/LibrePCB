@@ -66,6 +66,7 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkCopperClearanceOnPads(msgs);
   checkPadFunctions(msgs);
   checkHolesStopMask(msgs);
+  checkZones(msgs);
   checkFootprintModels(msgs);
   return msgs;
 }
@@ -503,6 +504,23 @@ void PackageCheck::checkHolesStopMask(MsgList& msgs) const {
       std::shared_ptr<const Hole> hole = itHole.ptr();
       if (!hole->getStopMaskConfig().isEnabled()) {
         msgs.append(std::make_shared<MsgHoleWithoutStopMask>(footprint, hole));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkZones(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itZone = (*itFtp).getZones().begin();
+         itZone != (*itFtp).getZones().end(); ++itZone) {
+      std::shared_ptr<const Zone> zone = itZone.ptr();
+      if ((!zone->getLayers()) || (!zone->getRules()) ||
+          ((zone->getLayers() == Zone::Layers(Zone::Layer::Inner)) &&
+           (!zone->getRules().testFlag(Zone::Rule::NoCopper)) &&
+           (!zone->getRules().testFlag(Zone::Rule::NoPlanes)))) {
+        msgs.append(std::make_shared<MsgUselessZone>(footprint, zone));
       }
     }
   }

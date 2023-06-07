@@ -612,6 +612,28 @@ MsgUnusedCustomPadOutline::MsgUnusedCustomPadOutline(
 }
 
 /*******************************************************************************
+ *  MsgUselessZone
+ ******************************************************************************/
+
+MsgUselessZone::MsgUselessZone(std::shared_ptr<const Footprint> footprint,
+                               std::shared_ptr<const Zone> zone) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Useless keepout zone in '%2'")
+            .arg(*footprint->getNames().getDefaultValue()),
+        tr("The keepout zone has no layer or rule enabled so it has no effect. "
+           "Either correct its properties or remove it from the footprint."),
+        "useless_zone"),
+    mFootprint(footprint),
+    mZone(zone) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("zone", zone->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  MsgWrongFootprintTextLayer
  ******************************************************************************/
 
