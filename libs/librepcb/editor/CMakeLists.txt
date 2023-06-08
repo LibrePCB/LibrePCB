@@ -26,6 +26,8 @@ add_library(
   cmd/cmdstroketextedit.h
   cmd/cmdtextedit.cpp
   cmd/cmdtextedit.h
+  cmd/cmdzoneedit.cpp
+  cmd/cmdzoneedit.h
   dialogs/aboutdialog.cpp
   dialogs/aboutdialog.h
   dialogs/aboutdialog.ui
@@ -58,6 +60,9 @@ add_library(
   dialogs/textpropertiesdialog.cpp
   dialogs/textpropertiesdialog.h
   dialogs/textpropertiesdialog.ui
+  dialogs/zonepropertiesdialog.cpp
+  dialogs/zonepropertiesdialog.h
+  dialogs/zonepropertiesdialog.ui
   editorcommand.cpp
   editorcommand.h
   editorcommandcategory.h
@@ -88,10 +93,14 @@ add_library(
   graphics/primitivepathgraphicsitem.h
   graphics/primitivetextgraphicsitem.cpp
   graphics/primitivetextgraphicsitem.h
+  graphics/primitivezonegraphicsitem.cpp
+  graphics/primitivezonegraphicsitem.h
   graphics/stroketextgraphicsitem.cpp
   graphics/stroketextgraphicsitem.h
   graphics/textgraphicsitem.cpp
   graphics/textgraphicsitem.h
+  graphics/zonegraphicsitem.cpp
+  graphics/zonegraphicsitem.h
   library/cat/categorychooserdialog.cpp
   library/cat/categorychooserdialog.h
   library/cat/categorychooserdialog.ui
@@ -301,6 +310,8 @@ add_library(
   library/pkg/fsm/packageeditorstate_drawtext.h
   library/pkg/fsm/packageeditorstate_drawtextbase.cpp
   library/pkg/fsm/packageeditorstate_drawtextbase.h
+  library/pkg/fsm/packageeditorstate_drawzone.cpp
+  library/pkg/fsm/packageeditorstate_drawzone.h
   library/pkg/fsm/packageeditorstate_measure.cpp
   library/pkg/fsm/packageeditorstate_measure.h
   library/pkg/fsm/packageeditorstate_select.cpp
@@ -438,6 +449,8 @@ add_library(
   project/boardeditor/fsm/boardeditorstate_drawpolygon.h
   project/boardeditor/fsm/boardeditorstate_drawtrace.cpp
   project/boardeditor/fsm/boardeditorstate_drawtrace.h
+  project/boardeditor/fsm/boardeditorstate_drawzone.cpp
+  project/boardeditor/fsm/boardeditorstate_drawzone.h
   project/boardeditor/fsm/boardeditorstate_measure.cpp
   project/boardeditor/fsm/boardeditorstate_measure.h
   project/boardeditor/fsm/boardeditorstate_select.cpp
@@ -462,6 +475,8 @@ add_library(
   project/boardeditor/graphicsitems/bgi_stroketext.h
   project/boardeditor/graphicsitems/bgi_via.cpp
   project/boardeditor/graphicsitems/bgi_via.h
+  project/boardeditor/graphicsitems/bgi_zone.cpp
+  project/boardeditor/graphicsitems/bgi_zone.h
   project/boardeditor/unplacedcomponentsdock.cpp
   project/boardeditor/unplacedcomponentsdock.h
   project/boardeditor/unplacedcomponentsdock.ui
@@ -522,6 +537,12 @@ add_library(
   project/cmd/cmdboardstroketextremove.h
   project/cmd/cmdboardviaedit.cpp
   project/cmd/cmdboardviaedit.h
+  project/cmd/cmdboardzoneadd.cpp
+  project/cmd/cmdboardzoneadd.h
+  project/cmd/cmdboardzoneedit.cpp
+  project/cmd/cmdboardzoneedit.h
+  project/cmd/cmdboardzoneremove.cpp
+  project/cmd/cmdboardzoneremove.h
   project/cmd/cmdchangenetsignalofschematicnetsegment.cpp
   project/cmd/cmdchangenetsignalofschematicnetsegment.h
   project/cmd/cmdcombineboardnetsegments.cpp

@@ -29,6 +29,7 @@
 #include "boardeditorstate_drawplane.h"
 #include "boardeditorstate_drawpolygon.h"
 #include "boardeditorstate_drawtrace.h"
+#include "boardeditorstate_drawzone.h"
 #include "boardeditorstate_measure.h"
 #include "boardeditorstate_select.h"
 
@@ -59,6 +60,7 @@ BoardEditorFsm::BoardEditorFsm(const Context& context, QObject* parent) noexcept
   mStates.insert(State::DRAW_POLYGON,
                  new BoardEditorState_DrawPolygon(context));
   mStates.insert(State::DRAW_PLANE, new BoardEditorState_DrawPlane(context));
+  mStates.insert(State::DRAW_ZONE, new BoardEditorState_DrawZone(context));
   mStates.insert(State::DRAW_TRACE, new BoardEditorState_DrawTrace(context));
   mStates.insert(State::MEASURE, new BoardEditorState_Measure(context));
 
@@ -126,6 +128,10 @@ bool BoardEditorFsm::processDrawPolygon() noexcept {
 
 bool BoardEditorFsm::processDrawPlane() noexcept {
   return setNextState(State::DRAW_PLANE);
+}
+
+bool BoardEditorFsm::processDrawZone() noexcept {
+  return setNextState(State::DRAW_ZONE);
 }
 
 bool BoardEditorFsm::processDrawTrace() noexcept {

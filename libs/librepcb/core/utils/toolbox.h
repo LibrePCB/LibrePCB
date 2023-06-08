@@ -89,6 +89,13 @@ public:
     return list;
   }
 
+  template <typename T, typename Compare>
+  static QList<T> sortedQSet(const QSet<T>& set, const Compare& cmp) noexcept {
+    QList<T> list = set.values();
+    std::sort(list.begin(), list.end(), cmp);
+    return list;
+  }
+
   template <typename T>
   static T sorted(const T& container) noexcept {
     T copy(container);

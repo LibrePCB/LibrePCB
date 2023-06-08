@@ -86,7 +86,6 @@ private:  // Methods
   void setNetSignal(NetSignal* netsignal) noexcept;
   bool abortCommand(bool showErrMsgBox) noexcept;
   void layerComboBoxLayerChanged(const Layer& layer) noexcept;
-  void makeSelectedLayerVisible() noexcept;
 
 private:  // Data
   // State

@@ -30,6 +30,7 @@
 #include "cmdboardpolygonedit.h"
 #include "cmdboardstroketextedit.h"
 #include "cmdboardviaedit.h"
+#include "cmdboardzoneedit.h"
 #include "cmddeviceinstanceedit.h"
 #include "cmddevicestroketextsreset.h"
 
@@ -40,6 +41,7 @@
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/project/project.h>
 
 #include <QtCore>
@@ -75,6 +77,7 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
   query.addSelectedNetLines();
   query.addNetPointsOfNetLines();
   query.addSelectedPlanes();
+  query.addSelectedZones();
   query.addSelectedPolygons();
   query.addSelectedBoardStrokeTexts();
   query.addSelectedFootprintStrokeTexts();
@@ -111,6 +114,15 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     }
     CmdBoardPlaneEdit* cmd = new CmdBoardPlaneEdit(*plane);
     mPlaneEditCmds.append(cmd);
+  }
+  foreach (BI_Zone* plane, query.getZones()) {
+    Q_ASSERT(plane);
+    for (const Vertex& vertex : plane->getData().getOutline().getVertices()) {
+      mCenterPos += vertex.getPos();
+      ++mItemCount;
+    }
+    CmdBoardZoneEdit* cmd = new CmdBoardZoneEdit(*plane);
+    mZoneEditCmds.append(cmd);
   }
   foreach (BI_Polygon* polygon, query.getPolygons()) {
     Q_ASSERT(polygon);
@@ -166,6 +178,9 @@ void CmdDragSelectedBoardItems::snapToGrid() noexcept {
   foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
     cmd->snapToGrid(grid, true);
   }
+  foreach (CmdBoardZoneEdit* cmd, mZoneEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
   foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
     cmd->snapToGrid(grid, true);
   }
@@ -187,6 +202,7 @@ void CmdDragSelectedBoardItems::setLocked(bool locked) noexcept {
     cmd->setLocked(locked);
   }
   foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) { cmd->setLocked(locked); }
+  foreach (CmdBoardZoneEdit* cmd, mZoneEditCmds) { cmd->setLocked(locked); }
   foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
     cmd->setLocked(locked);
   }
@@ -220,6 +236,9 @@ void CmdDragSelectedBoardItems::setCurrentPosition(
       cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
+      cmd->translate(delta - mDeltaPos, true);
+    }
+    foreach (CmdBoardZoneEdit* cmd, mZoneEditCmds) {
       cmd->translate(delta - mDeltaPos, true);
     }
     foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
@@ -259,6 +278,9 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
   foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
     cmd->rotate(angle, center, true);
   }
+  foreach (CmdBoardZoneEdit* cmd, mZoneEditCmds) {
+    cmd->rotate(angle, center, true);
+  }
   foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
     cmd->rotate(angle, center, true);
   }
@@ -293,6 +315,8 @@ bool CmdDragSelectedBoardItems::performExecute() {
     mNetPointEditCmds.clear();
     qDeleteAll(mPlaneEditCmds);
     mPlaneEditCmds.clear();
+    qDeleteAll(mZoneEditCmds);
+    mZoneEditCmds.clear();
     qDeleteAll(mPolygonEditCmds);
     mPolygonEditCmds.clear();
     qDeleteAll(mStrokeTextEditCmds);
@@ -320,6 +344,9 @@ bool CmdDragSelectedBoardItems::performExecute() {
     appendChild(cmd);  // can throw
   }
   foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
+    appendChild(cmd);  // can throw
+  }
+  foreach (CmdBoardZoneEdit* cmd, mZoneEditCmds) {
     appendChild(cmd);  // can throw
   }
   foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {

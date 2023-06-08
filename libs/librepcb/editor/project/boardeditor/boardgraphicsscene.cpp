@@ -32,6 +32,7 @@
 #include "graphicsitems/bgi_polygon.h"
 #include "graphicsitems/bgi_stroketext.h"
 #include "graphicsitems/bgi_via.h"
+#include "graphicsitems/bgi_zone.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_airwire.h>
@@ -45,6 +46,7 @@
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/types/layer.h>
 
@@ -72,6 +74,7 @@ BoardGraphicsScene::BoardGraphicsScene(
   foreach (BI_Device* obj, mBoard.getDeviceInstances()) { addDevice(*obj); }
   foreach (BI_NetSegment* obj, mBoard.getNetSegments()) { addNetSegment(*obj); }
   foreach (BI_Plane* obj, mBoard.getPlanes()) { addPlane(*obj); }
+  foreach (BI_Zone* obj, mBoard.getZones()) { addZone(*obj); }
   foreach (BI_Polygon* obj, mBoard.getPolygons()) { addPolygon(*obj); }
   foreach (BI_StrokeText* obj, mBoard.getStrokeTexts()) { addStrokeText(*obj); }
   foreach (BI_Hole* obj, mBoard.getHoles()) { addHole(*obj); }
@@ -87,6 +90,8 @@ BoardGraphicsScene::BoardGraphicsScene(
   connect(&mBoard, &Board::planeAdded, this, &BoardGraphicsScene::addPlane);
   connect(&mBoard, &Board::planeRemoved, this,
           &BoardGraphicsScene::removePlane);
+  connect(&mBoard, &Board::zoneAdded, this, &BoardGraphicsScene::addZone);
+  connect(&mBoard, &Board::zoneRemoved, this, &BoardGraphicsScene::removeZone);
   connect(&mBoard, &Board::polygonAdded, this, &BoardGraphicsScene::addPolygon);
   connect(&mBoard, &Board::polygonRemoved, this,
           &BoardGraphicsScene::removePolygon);
@@ -112,6 +117,7 @@ BoardGraphicsScene::~BoardGraphicsScene() noexcept {
   foreach (BI_NetLine* obj, mNetLines.keys()) { removeNetLine(*obj); }
   foreach (BI_NetPoint* obj, mNetPoints.keys()) { removeNetPoint(*obj); }
   foreach (BI_Plane* obj, mPlanes.keys()) { removePlane(*obj); }
+  foreach (BI_Zone* obj, mZones.keys()) { removeZone(*obj); }
   foreach (BI_Polygon* obj, mPolygons.keys()) { removePolygon(*obj); }
   foreach (BI_StrokeText* obj, mStrokeTexts.keys()) { removeStrokeText(*obj); }
   foreach (BI_Hole* obj, mHoles.keys()) { removeHole(*obj); }
@@ -129,6 +135,7 @@ void BoardGraphicsScene::selectAll() noexcept {
   foreach (auto item, mNetLines) { item->setSelected(true); }
   foreach (auto item, mVias) { item->setSelected(true); }
   foreach (auto item, mPlanes) { item->setSelected(true); }
+  foreach (auto item, mZones) { item->setSelected(true); }
   foreach (auto item, mPolygons) { item->setSelected(true); }
   foreach (auto item, mStrokeTexts) { item->setSelected(true); }
   foreach (auto item, mHoles) { item->setSelected(true); }
@@ -161,6 +168,9 @@ void BoardGraphicsScene::selectItemsInRect(const Point& p1,
     item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mPlanes) {
+    item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
+  }
+  foreach (auto item, mZones) {
     item->setSelected(item->mapToScene(item->shape()).intersects(rectPx));
   }
   foreach (auto item, mPolygons) {
@@ -203,6 +213,7 @@ void BoardGraphicsScene::clearSelection() noexcept {
   foreach (auto item, mNetLines) { item->setSelected(false); }
   foreach (auto item, mVias) { item->setSelected(false); }
   foreach (auto item, mPlanes) { item->setSelected(false); }
+  foreach (auto item, mZones) { item->setSelected(false); }
   foreach (auto item, mPolygons) { item->setSelected(false); }
   foreach (auto item, mStrokeTexts) { item->setSelected(false); }
   foreach (auto item, mHoles) { item->setSelected(false); }
@@ -384,6 +395,22 @@ void BoardGraphicsScene::addPlane(BI_Plane& plane) noexcept {
 
 void BoardGraphicsScene::removePlane(BI_Plane& plane) noexcept {
   if (std::shared_ptr<BGI_Plane> item = mPlanes.take(&plane)) {
+    removeItem(*item);
+  } else {
+    Q_ASSERT(false);
+  }
+}
+
+void BoardGraphicsScene::addZone(BI_Zone& zone) noexcept {
+  Q_ASSERT(!mZones.contains(&zone));
+  std::shared_ptr<BGI_Zone> item =
+      std::make_shared<BGI_Zone>(zone, mLayerProvider);
+  addItem(*item);
+  mZones.insert(&zone, item);
+}
+
+void BoardGraphicsScene::removeZone(BI_Zone& zone) noexcept {
+  if (std::shared_ptr<BGI_Zone> item = mZones.take(&zone)) {
     removeItem(*item);
   } else {
     Q_ASSERT(false);

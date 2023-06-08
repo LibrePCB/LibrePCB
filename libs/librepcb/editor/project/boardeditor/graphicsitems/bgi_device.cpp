@@ -27,11 +27,14 @@
 #include "../../../graphics/primitivecirclegraphicsitem.h"
 #include "../../../graphics/primitiveholegraphicsitem.h"
 #include "../../../graphics/primitivepathgraphicsitem.h"
+#include "../../../graphics/primitivezonegraphicsitem.h"
 #include "../boardgraphicsscene.h"
 
 #include <librepcb/core/library/pkg/footprint.h>
+#include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/types/layer.h>
+#include <librepcb/core/utils/transform.h>
 #include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
@@ -92,6 +95,14 @@ BGI_Device::BGI_Device(BI_Device& device,
     mPolygonGraphicsItems.append(i);
   }
 
+  for (auto& obj : mDevice.getLibFootprint().getZones().values()) {
+    Q_ASSERT(obj);
+    auto i = std::make_shared<PrimitiveZoneGraphicsItem>(mLayerProvider, this);
+    i->setOutline(obj->getOutline());
+    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    mZoneGraphicsItems.append(i);
+  }
+
   for (auto& obj : mDevice.getLibFootprint().getHoles().values()) {
     Q_ASSERT(obj);
     auto i = std::make_shared<PrimitiveHoleGraphicsItem>(mLayerProvider, false,
@@ -131,6 +142,9 @@ void BGI_Device::deviceEdited(const BI_Device& obj,
                               BI_Device::Event event) noexcept {
   Q_UNUSED(obj);
   switch (event) {
+    case BI_Device::Event::BoardLayersChanged:
+      updateZoneLayers();
+      break;
     case BI_Device::Event::PositionChanged:
       updatePosition();
       break;
@@ -177,6 +191,9 @@ QVariant BGI_Device::itemChange(GraphicsItemChange change,
       i->setSelected(value.toBool());
     }
     foreach (const auto& i, mPolygonGraphicsItems) {
+      i->setSelected(value.toBool());
+    }
+    foreach (const auto& i, mZoneGraphicsItems) {
       i->setSelected(value.toBool());
     }
     foreach (const auto& i, mHoleGraphicsItems) {
@@ -256,6 +273,9 @@ void BGI_Device::updateBoardSide() noexcept {
       mPolygonGraphicsItems.at(i)->setFillLayer(mGrabAreaLayer);
     }
   }
+
+  // Update zone layers.
+  updateZoneLayers();
 }
 
 void BGI_Device::updateHoleStopMaskOffsets() noexcept {
@@ -268,6 +288,31 @@ void BGI_Device::updateHoleStopMaskOffsets() noexcept {
     const auto stopMaskOffset =
         mDevice.getHoleStopMasks().value(hole->getUuid());
     item->setHole(hole->getPath(), hole->getDiameter(), stopMaskOffset);
+  }
+}
+
+void BGI_Device::updateZoneLayers() noexcept {
+  const Transform transform(mDevice);
+  const ZoneList& zones = mDevice.getLibFootprint().getZones();
+  for (int i = 0; i < std::min(zones.count(), mZoneGraphicsItems.count());
+       ++i) {
+    mZoneGraphicsItems.at(i)->setAllLayers(
+        mDevice.getBoard().getCopperLayers());
+    QSet<const Layer*> enabledLayers;
+    if (zones.at(i)->getLayers().testFlag(Zone::Layer::Top)) {
+      enabledLayers.insert(&transform.map(Layer::topCopper()));
+    }
+    if (zones.at(i)->getLayers().testFlag(Zone::Layer::Inner)) {
+      foreach (const Layer* layer, mDevice.getBoard().getCopperLayers()) {
+        if (layer->isInner()) {
+          enabledLayers.insert(layer);
+        }
+      }
+    }
+    if (zones.at(i)->getLayers().testFlag(Zone::Layer::Bottom)) {
+      enabledLayers.insert(&transform.map(Layer::botCopper()));
+    }
+    mZoneGraphicsItems.at(i)->setEnabledLayers(enabledLayers);
   }
 }
 

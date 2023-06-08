@@ -60,6 +60,7 @@ class BI_Device final : public BI_Base, public AttributeProvider {
 public:
   // Signals
   enum class Event {
+    BoardLayersChanged,
     PositionChanged,
     RotationChanged,
     MirroredChanged,

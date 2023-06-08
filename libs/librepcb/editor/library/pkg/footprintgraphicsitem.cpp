@@ -26,6 +26,7 @@
 #include "../../graphics/holegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/stroketextgraphicsitem.h"
+#include "../../graphics/zonegraphicsitem.h"
 #include "footprintpadgraphicsitem.h"
 
 #include <librepcb/core/attribute/attributesubstitutor.h>
@@ -64,6 +65,7 @@ FootprintGraphicsItem::FootprintGraphicsItem(
   syncCircles();
   syncPolygons();
   syncStrokeTexts();
+  syncZones();
   syncHoles();
 
   // Register to the footprint to get notified about any modifications.
@@ -121,6 +123,17 @@ QList<std::shared_ptr<StrokeTextGraphicsItem>>
   return texts;
 }
 
+QList<std::shared_ptr<ZoneGraphicsItem>>
+    FootprintGraphicsItem::getSelectedZones() noexcept {
+  QList<std::shared_ptr<ZoneGraphicsItem>> zones;
+  foreach (const auto& ptr, mZoneGraphicsItems) {
+    if (ptr->isSelected()) {
+      zones.append(ptr);
+    }
+  }
+  return zones;
+}
+
 QList<std::shared_ptr<HoleGraphicsItem>>
     FootprintGraphicsItem::getSelectedHoles() noexcept {
   QList<std::shared_ptr<HoleGraphicsItem>> holes;
@@ -148,17 +161,21 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
   //   110: pads top
   //   120: texts top
   //   130: polygons/circles top
+  //   140: zones top
   //   220: texts inner
   //   230: polygons/circles inner
+  //   240: zones inner
   //   310: pads bottom
   //   320: texts bottom
   //   330: polygons/circles bottom
+  //   340: zones bottom
   //
   // So the system is:
   //      0 for holes
   //     10 for pads
   //     20 for texts
   //     30 for polygons/circles
+  //     40 for zones
   //   +100 for top layer items
   //   +200 for inner layer items
   //   +300 for bottom layer items
@@ -233,6 +250,21 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
     }
   }
 
+  if (flags.testFlag(FindFlag::Zones)) {
+    foreach (auto ptr, mZoneGraphicsItems) {
+      int priority = 40;
+      if (ptr->getZone().getLayers().testFlag(Zone::Layer::Top)) {
+        priority += 100;
+      } else if (ptr->getZone().getLayers().testFlag(Zone::Layer::Inner)) {
+        priority += 200;
+      } else if (ptr->getZone().getLayers().testFlag(Zone::Layer::Bottom)) {
+        priority += 300;
+      }
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
+                  true);  // Probably large grab area makes sense?
+    }
+  }
+
   return items.values();
 }
 
@@ -269,6 +301,10 @@ void FootprintGraphicsItem::setSelectionRect(const QRectF rect) noexcept {
     ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
   foreach (const auto& ptr, mStrokeTextGraphicsItems) {
+    QPainterPath mappedPath = mapToItem(ptr.get(), path);
+    ptr->setSelected(ptr->shape().intersects(mappedPath));
+  }
+  foreach (const auto& ptr, mZoneGraphicsItems) {
     QPainterPath mappedPath = mapToItem(ptr.get(), path);
     ptr->setSelected(ptr->shape().intersects(mappedPath));
   }
@@ -378,6 +414,29 @@ void FootprintGraphicsItem::syncStrokeTexts() noexcept {
   }
 }
 
+void FootprintGraphicsItem::syncZones() noexcept {
+  // Remove obsolete items.
+  for (auto it = mZoneGraphicsItems.begin(); it != mZoneGraphicsItems.end();) {
+    if (!mFootprint->getZones().contains(it.key().get())) {
+      Q_ASSERT(it.key() && it.value());
+      it.value()->setParentItem(nullptr);
+      it = mZoneGraphicsItems.erase(it);
+    } else {
+      it++;
+    }
+  }
+
+  // Add new items.
+  for (auto& obj : mFootprint->getZones().values()) {
+    if (!mZoneGraphicsItems.contains(obj)) {
+      Q_ASSERT(obj);
+      auto i = std::make_shared<ZoneGraphicsItem>(*obj, mLayerProvider, this);
+      i->setEditable(true);
+      mZoneGraphicsItems.insert(obj, i);
+    }
+  }
+}
+
 void FootprintGraphicsItem::syncHoles() noexcept {
   // Remove obsolete items.
   for (auto it = mHoleGraphicsItems.begin(); it != mHoleGraphicsItems.end();) {
@@ -414,11 +473,14 @@ void FootprintGraphicsItem::footprintEdited(const Footprint& footprint,
     case Footprint::Event::PolygonsEdited:
       syncPolygons();
       break;
-    case Footprint::Event::HolesEdited:
-      syncHoles();
-      break;
     case Footprint::Event::StrokeTextsEdited:
       syncStrokeTexts();
+      break;
+    case Footprint::Event::ZonesEdited:
+      syncZones();
+      break;
+    case Footprint::Event::HolesEdited:
+      syncHoles();
       break;
     default:
       break;

@@ -87,6 +87,7 @@ public:
     static constexpr const char* sBoardHoles               = "board_holes";
     static constexpr const char* sBoardPads                = "board_pads";
     static constexpr const char* sBoardVias                = "board_vias";
+    static constexpr const char* sBoardZones               = "board_zones";
     static constexpr const char* sBoardAirWires            = "board_airwires";
     static constexpr const char* sBoardMeasures            = "board_measures";
     static constexpr const char* sBoardAlignment           = "board_alignment";

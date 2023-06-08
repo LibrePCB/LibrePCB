@@ -27,6 +27,7 @@
 #include "../../graphics/holegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/stroketextgraphicsitem.h"
+#include "../../graphics/zonegraphicsitem.h"
 #include "footprintpadgraphicsitem.h"
 
 #include <librepcb/core/application.h>
@@ -60,6 +61,7 @@ FootprintClipboardData::FootprintClipboardData(const SExpression& node)
     mPolygons(node),
     mCircles(node),
     mStrokeTexts(node),
+    mZones(node),
     mHoles(node) {
 }
 
@@ -90,6 +92,8 @@ std::unique_ptr<QMimeData> FootprintClipboardData::toMimeData(
   mCircles.serialize(root);
   root.ensureLineBreak();
   mStrokeTexts.serialize(root);
+  root.ensureLineBreak();
+  mZones.serialize(root);
   root.ensureLineBreak();
   mHoles.serialize(root);
   root.ensureLineBreak();
@@ -133,6 +137,9 @@ QPixmap FootprintClipboardData::generatePixmap(
   for (StrokeText& text : mStrokeTexts) {
     items.append(std::make_shared<StrokeTextGraphicsItem>(
         text, lp, Application::getDefaultStrokeFont()));
+  }
+  for (Zone& zone : mZones) {
+    items.append(std::make_shared<ZoneGraphicsItem>(zone, lp));
   }
   for (Hole& hole : mHoles) {
     items.append(std::make_shared<HoleGraphicsItem>(hole, lp, false));

@@ -42,6 +42,7 @@ class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
+class BI_Zone;
 class Board;
 
 namespace editor {
@@ -96,6 +97,10 @@ public:
     Q_ASSERT(!wasEverExecuted());
     mPlanes += set;
   }
+  void removeZones(const QSet<BI_Zone*>& set) {
+    Q_ASSERT(!wasEverExecuted());
+    mZones += set;
+  }
   void removePolygons(const QSet<BI_Polygon*>& set) {
     Q_ASSERT(!wasEverExecuted());
     mPolygons += set;
@@ -132,6 +137,7 @@ private:  // Data
   QSet<BI_NetPoint*> mNetPoints;
   QSet<BI_NetLine*> mNetLines;
   QSet<BI_Plane*> mPlanes;
+  QSet<BI_Zone*> mZones;
   QSet<BI_Polygon*> mPolygons;
   QSet<BI_StrokeText*> mStrokeTexts;
   QSet<BI_Hole*> mHoles;

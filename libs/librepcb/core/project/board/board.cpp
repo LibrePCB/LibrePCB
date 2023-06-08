@@ -55,6 +55,7 @@
 #include "items/bi_polygon.h"
 #include "items/bi_stroketext.h"
 #include "items/bi_via.h"
+#include "items/bi_zone.h"
 
 #include <QtCore>
 
@@ -119,6 +120,8 @@ Board::~Board() noexcept {
   mStrokeTexts.clear();
   qDeleteAll(mPolygons);
   mPolygons.clear();
+  qDeleteAll(mZones);
+  mZones.clear();
   qDeleteAll(mPlanes);
   mPlanes.clear();
   qDeleteAll(mNetSegments);
@@ -137,8 +140,8 @@ Board::~Board() noexcept {
 
 bool Board::isEmpty() const noexcept {
   return (mDeviceInstances.isEmpty() && mNetSegments.isEmpty() &&
-          mPlanes.isEmpty() && mPolygons.isEmpty() && mStrokeTexts.isEmpty() &&
-          mHoles.isEmpty());
+          mPlanes.isEmpty() && mZones.isEmpty() && mPolygons.isEmpty() &&
+          mStrokeTexts.isEmpty() && mHoles.isEmpty());
 }
 
 QList<BI_Base*> Board::getAllItems() const noexcept {
@@ -149,6 +152,8 @@ QList<BI_Base*> Board::getAllItems() const noexcept {
     items.append(netsegment);
   foreach (BI_Plane* plane, mPlanes)
     items.append(plane);
+  foreach (BI_Zone* zone, mZones)
+    items.append(zone);
   foreach (BI_Polygon* polygon, mPolygons)
     items.append(polygon);
   foreach (BI_StrokeText* text, mStrokeTexts)
@@ -461,11 +466,49 @@ void Board::invalidatePlanes(const Layer* layer) noexcept {
   }
 }
 
+void Board::invalidatePlanes(const QSet<const Layer*>& layers) noexcept {
+#if defined(QT_NO_DEBUG)
+  foreach (const Layer* layer, layers) { Q_ASSERT(layer && layer->isCopper()); }
+#endif
+  mScheduledLayersForPlanesRebuild |= layers;
+}
+
 QSet<const Layer*> Board::takeScheduledLayersForPlanesRebuild(
     const QSet<const Layer*>& layers) noexcept {
   auto result = mScheduledLayersForPlanesRebuild & layers;
   mScheduledLayersForPlanesRebuild -= layers;
   return result;
+}
+
+/*******************************************************************************
+ *  Zone Methods
+ ******************************************************************************/
+
+void Board::addZone(BI_Zone& zone) {
+  if ((mZones.values().contains(&zone)) || (&zone.getBoard() != this)) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (mZones.contains(zone.getData().getUuid())) {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("There is already a zone with the UUID \"%1\"!")
+                           .arg(zone.getData().getUuid().toStr()));
+  }
+  if (mIsAddedToProject) {
+    zone.addToBoard();  // can throw
+  }
+  mZones.insert(zone.getData().getUuid(), &zone);
+  emit zoneAdded(zone);
+}
+
+void Board::removeZone(BI_Zone& zone) {
+  if (mZones.value(zone.getData().getUuid()) != &zone) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (mIsAddedToProject) {
+    zone.removeFromBoard();  // can throw
+  }
+  mZones.remove(zone.getData().getUuid());
+  emit zoneRemoved(zone);
 }
 
 /*******************************************************************************
@@ -727,6 +770,13 @@ void Board::copyFrom(const Board& other) {
     addPlane(*copy);
   }
 
+  // Copy zones.
+  foreach (const BI_Zone* zone, other.getZones()) {
+    BI_Zone* copy = new BI_Zone(
+        *this, BoardZoneData(Uuid::createRandom(), zone->getData()));
+    addZone(*copy);
+  }
+
   // Copy polygons.
   foreach (const BI_Polygon* polygon, other.getPolygons()) {
     BI_Polygon* copy = new BI_Polygon(
@@ -866,6 +916,10 @@ void Board::save() {
     for (const BI_Plane* obj : mPlanes) {
       root.ensureLineBreak();
       obj->serialize(root.appendList("plane"));
+    }
+    for (const BI_Zone* obj : mZones) {
+      root.ensureLineBreak();
+      obj->getData().serialize(root.appendList("zone"));
     }
     root.ensureLineBreak();
     for (const BI_Polygon* obj : mPolygons) {

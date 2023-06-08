@@ -257,5 +257,6 @@ private:  // Data
 }  // namespace librepcb
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(librepcb::Layer::Flags)
+Q_DECLARE_METATYPE(const librepcb::Layer*)
 
 #endif

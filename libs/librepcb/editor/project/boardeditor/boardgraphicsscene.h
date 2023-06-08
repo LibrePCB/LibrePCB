@@ -46,6 +46,7 @@ class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
+class BI_Zone;
 class Board;
 class Layer;
 class NetSignal;
@@ -63,6 +64,7 @@ class BGI_Plane;
 class BGI_Polygon;
 class BGI_StrokeText;
 class BGI_Via;
+class BGI_Zone;
 class IF_GraphicsLayerProvider;
 
 /*******************************************************************************
@@ -93,10 +95,12 @@ public:
     ZValue_DevicesBottom,  ///< For ::librepcb::BI_Device items
     ZValue_CopperBottom,
     ZValue_FootprintPadsBottom,  ///< For ::librepcb::BI_FootprintPad items
+    ZValue_ZonesBottom,  ///< For ::librepcb::BI_Zone items
     ZValue_PlanesBottom,  ///< For ::librepcb::BI_Plane items
     ZValue_InnerBottom,
     ZValue_InnerTop,
     ZValue_PlanesTop,  ///< For ::librepcb::BI_Plane items
+    ZValue_ZonesTop,  ///< For ::librepcb::BI_Zone items
     ZValue_FootprintPadsTop,  ///< For ::librepcb::BI_FootprintPad items
     ZValue_CopperTop,
     ZValue_DevicesTop,  ///< For ::librepcb::BI_Device items
@@ -139,6 +143,9 @@ public:
   }
   const QHash<BI_Plane*, std::shared_ptr<BGI_Plane>>& getPlanes() noexcept {
     return mPlanes;
+  }
+  const QHash<BI_Zone*, std::shared_ptr<BGI_Zone>>& getZones() noexcept {
+    return mZones;
   }
   const QHash<BI_Polygon*, std::shared_ptr<BGI_Polygon>>&
       getPolygons() noexcept {
@@ -189,6 +196,8 @@ private:  // Methods
   void removeNetLine(BI_NetLine& netLine) noexcept;
   void addPlane(BI_Plane& plane) noexcept;
   void removePlane(BI_Plane& plane) noexcept;
+  void addZone(BI_Zone& zone) noexcept;
+  void removeZone(BI_Zone& zone) noexcept;
   void addPolygon(BI_Polygon& polygon) noexcept;
   void removePolygon(BI_Polygon& polygon) noexcept;
   void addStrokeText(BI_StrokeText& text) noexcept;
@@ -208,6 +217,7 @@ private:  // Data
   QHash<BI_NetPoint*, std::shared_ptr<BGI_NetPoint>> mNetPoints;
   QHash<BI_NetLine*, std::shared_ptr<BGI_NetLine>> mNetLines;
   QHash<BI_Plane*, std::shared_ptr<BGI_Plane>> mPlanes;
+  QHash<BI_Zone*, std::shared_ptr<BGI_Zone>> mZones;
   QHash<BI_Polygon*, std::shared_ptr<BGI_Polygon>> mPolygons;
   QHash<BI_StrokeText*, std::shared_ptr<BGI_StrokeText>> mStrokeTexts;
   QHash<BI_Hole*, std::shared_ptr<BGI_Hole>> mHoles;

@@ -275,6 +275,7 @@ private:
   QScopedPointer<QAction> mActionToolPolygon;
   QScopedPointer<QAction> mActionToolText;
   QScopedPointer<QAction> mActionToolPlane;
+  QScopedPointer<QAction> mActionToolZone;
   QScopedPointer<QAction> mActionToolHole;
   QScopedPointer<QAction> mActionToolMeasure;
   QScopedPointer<QAction> mActionDockErc;

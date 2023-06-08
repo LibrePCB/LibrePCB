@@ -48,6 +48,7 @@ BoardClipboardData::BoardClipboardData(const Uuid& boardUuid,
     mDevices(),
     mNetSegments(),
     mPlanes(),
+    mZones(),
     mPolygons(),
     mStrokeTexts(),
     mHoles(),
@@ -65,6 +66,10 @@ BoardClipboardData::BoardClipboardData(const QByteArray& mimeData)
   mDevices.loadFromSExpression(root);
   mNetSegments.loadFromSExpression(root);
   mPlanes.loadFromSExpression(root);
+
+  foreach (const SExpression* child, root.getChildren("zone")) {
+    mZones.append(BoardZoneData(*child));
+  }
 
   foreach (const SExpression* child, root.getChildren("polygon")) {
     mPolygons.append(BoardPolygonData(*child));
@@ -100,7 +105,8 @@ BoardClipboardData::~BoardClipboardData() noexcept {
 
 bool BoardClipboardData::isEmpty() const noexcept {
   return mDevices.isEmpty() && mNetSegments.isEmpty() && mPlanes.isEmpty() &&
-      mPolygons.isEmpty() && mStrokeTexts.isEmpty() && mHoles.isEmpty();
+      mZones.isEmpty() && mPolygons.isEmpty() && mStrokeTexts.isEmpty() &&
+      mHoles.isEmpty();
 }
 
 std::unique_ptr<TransactionalDirectory> BoardClipboardData::getDirectory(
@@ -125,6 +131,11 @@ std::unique_ptr<QMimeData> BoardClipboardData::toMimeData() const {
   mNetSegments.serialize(root);
   root.ensureLineBreak();
   mPlanes.serialize(root);
+  for (const BoardZoneData& data : mZones) {
+    root.ensureLineBreak();
+    data.serialize(root.appendList("zone"));
+  }
+  root.ensureLineBreak();
   for (const BoardPolygonData& data : mPolygons) {
     root.ensureLineBreak();
     data.serialize(root.appendList("polygon"));

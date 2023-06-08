@@ -27,6 +27,7 @@
 #include "../../geometry/hole.h"
 #include "../../geometry/polygon.h"
 #include "../../geometry/stroketext.h"
+#include "../../geometry/zone.h"
 #include "../../serialization/serializablekeyvaluemap.h"
 #include "../../serialization/serializableobjectlist.h"
 #include "footprintpad.h"
@@ -68,6 +69,7 @@ public:
     CirclesEdited,
     StrokeTextsEdited,
     HolesEdited,
+    ZonesEdited,
   };
   Signal<Footprint, Event> onEdited;
   typedef Slot<Footprint, Event> OnEditedSlot;
@@ -101,6 +103,8 @@ public:
   CircleList& getCircles() noexcept { return mCircles; }
   const StrokeTextList& getStrokeTexts() const noexcept { return mStrokeTexts; }
   StrokeTextList& getStrokeTexts() noexcept { return mStrokeTexts; }
+  const ZoneList& getZones() const noexcept { return mZones; }
+  ZoneList& getZones() noexcept { return mZones; }
   const HoleList& getHoles() const noexcept { return mHoles; }
   HoleList& getHoles() noexcept { return mHoles; }
 
@@ -143,6 +147,9 @@ private:  // Methods
   void strokeTextsEdited(const StrokeTextList& list, int index,
                          const std::shared_ptr<const StrokeText>& text,
                          StrokeTextList::Event event) noexcept;
+  void zonesEdited(const ZoneList& list, int index,
+                   const std::shared_ptr<const Zone>& zone,
+                   ZoneList::Event event) noexcept;
   void holesEdited(const HoleList& list, int index,
                    const std::shared_ptr<const Hole>& hole,
                    HoleList::Event event) noexcept;
@@ -158,6 +165,7 @@ private:  // Data
   PolygonList mPolygons;
   CircleList mCircles;
   StrokeTextList mStrokeTexts;
+  ZoneList mZones;
   HoleList mHoles;
 
   // Slots
@@ -167,6 +175,7 @@ private:  // Data
   PolygonList::OnEditedSlot mPolygonsEditedSlot;
   CircleList::OnEditedSlot mCirclesEditedSlot;
   StrokeTextList::OnEditedSlot mStrokeTextsEditedSlot;
+  ZoneList::OnEditedSlot mZonesEditedSlot;
   HoleList::OnEditedSlot mHolesEditedSlot;
 };
 

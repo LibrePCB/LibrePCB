@@ -37,6 +37,7 @@
 #include "items/bi_plane.h"
 #include "items/bi_polygon.h"
 #include "items/bi_via.h"
+#include "items/bi_zone.h"
 
 #include <polyclipping/clipper.hpp>
 
@@ -164,6 +165,12 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
             circle.getLineWidth(), circle.isFilled()});
       }
     }
+    for (const Zone& zone : device->getLibFootprint().getZones()) {
+      if (zone.getRules().testFlag(Zone::Rule::NoPlanes)) {
+        data->keepoutZones.append(KeepoutZoneData{
+            transform, zone.getLayers(), {}, zone.getOutline()});
+      }
+    }
     for (const Hole& hole : device->getLibFootprint().getHoles()) {
       data->holes.append(
           std::make_tuple(transform, hole.getDiameter(), hole.getPath()));
@@ -189,6 +196,13 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
                     plane->getMinClearance(), plane->getKeepIslands(),
                     plane->getPriority(), plane->getConnectStyle(),
                     plane->getThermalGap(), plane->getThermalSpokeWidth()});
+    }
+  }
+  foreach (const BI_Zone* zone, board.getZones()) {
+    if (zone->getData().getRules().testFlag(Zone::Rule::NoPlanes)) {
+      data->keepoutZones.append(KeepoutZoneData{Transform(), Zone::Layers(),
+                                                zone->getData().getLayers(),
+                                                zone->getData().getOutline()});
     }
   }
   foreach (const BI_Polygon* polygon, board.getPolygons()) {
@@ -247,6 +261,22 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   emit started();
 
   // Preprocess data.
+  for (KeepoutZoneData& zone : data->keepoutZones) {
+    if (zone.layers.testFlag(Zone::Layer::Top)) {
+      zone.boardLayers.insert(&zone.transform.map(Layer::topCopper()));
+    }
+    if (zone.layers.testFlag(Zone::Layer::Inner)) {
+      foreach (const Layer* layer, data->layers) {
+        if (layer->isInner()) {
+          zone.boardLayers.insert(layer);
+        }
+      }
+    }
+    if (zone.layers.testFlag(Zone::Layer::Bottom)) {
+      zone.boardLayers.insert(&zone.transform.map(Layer::botCopper()));
+    }
+    zone.outline = zone.transform.map(zone.outline.toClosedPath());
+  }
   for (PolygonData& polygon : data->polygons) {
     polygon.path = polygon.transform.map(polygon.path);
   }
@@ -326,6 +356,15 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       }
       if (mAbort) {
         break;
+      }
+
+      // Collect keepout zones.
+      foreach (const KeepoutZoneData& zone, data->keepoutZones) {
+        if (zone.boardLayers.contains(it->layer)) {
+          const ClipperLib::Path clipperPath =
+              ClipperHelpers::convert(zone.outline, maxArcTolerance());
+          removedAreas.push_back(clipperPath);
+        }
       }
 
       // Collect holes.

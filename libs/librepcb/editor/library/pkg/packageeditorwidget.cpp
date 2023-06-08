@@ -288,6 +288,7 @@ void PackageEditorWidget::connectEditor(
   mToolsActionGroup->setActionEnabled(Tool::DRAW_CIRCLE, enabled);
   mToolsActionGroup->setActionEnabled(Tool::DRAW_ARC, enabled);
   mToolsActionGroup->setActionEnabled(Tool::DRAW_TEXT, enabled);
+  mToolsActionGroup->setActionEnabled(Tool::DRAW_ZONE, enabled);
   mToolsActionGroup->setActionEnabled(Tool::ADD_HOLES, enabled);
   mToolsActionGroup->setActionEnabled(Tool::MEASURE, true);
   mToolsActionGroup->setCurrentAction(mFsm->getCurrentTool());
@@ -585,6 +586,8 @@ bool PackageEditorWidget::toolChangeRequested(Tool newTool,
       return mFsm->processStartDrawArcs();
     case Tool::DRAW_TEXT:
       return mFsm->processStartDrawTexts();
+    case Tool::DRAW_ZONE:
+      return mFsm->processStartDrawZones();
     case Tool::ADD_HOLES:
       return mFsm->processStartAddingHoles();
     case Tool::MEASURE:
