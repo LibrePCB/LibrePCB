@@ -56,7 +56,7 @@ public:
   // Signals
   enum class Event {
     OutlineChanged,
-    LayerChanged,
+    LayersChanged,
     IsLockedChanged,
     VisibilityChanged,
     FragmentsChanged,
@@ -74,13 +74,13 @@ public:
   // Constructors / Destructor
   BI_Plane() = delete;
   BI_Plane(const BI_Plane& other) = delete;
-  BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
+  BI_Plane(Board& board, const Uuid& uuid, const QSet<const Layer*>& layers,
            NetSignal* netsignal, const Path& outline);
   ~BI_Plane() noexcept;
 
   // Getters
   const Uuid& getUuid() const noexcept { return mUuid; }
-  const Layer& getLayer() const noexcept { return *mLayer; }
+  const QSet<const Layer*>& getLayers() const noexcept { return mLayers; }
   NetSignal* getNetSignal() const noexcept { return mNetSignal; }
   const UnsignedLength& getMinWidth() const noexcept { return mMinWidth; }
   const UnsignedLength& getMinClearance() const noexcept {
@@ -100,7 +100,7 @@ public:
 
   // Setters
   void setOutline(const Path& outline) noexcept;
-  void setLayer(const Layer& layer) noexcept;
+  void setLayers(const QSet<const Layer*>& layers);
   void setNetSignal(NetSignal* netsignal);
   void setMinWidth(const UnsignedLength& minWidth) noexcept;
   void setMinClearance(const UnsignedLength& minClearance) noexcept;
@@ -129,7 +129,7 @@ public:
 
 private:  // Data
   Uuid mUuid;
-  const Layer* mLayer;  ///< Mandatory (never `nullptr`)
+  QSet<const Layer*> mLayers;
   NetSignal* mNetSignal;  ///< Optional (`nullptr` = no net)
   Path mOutline;
   UnsignedLength mMinWidth;

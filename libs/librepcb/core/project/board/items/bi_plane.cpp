@@ -28,7 +28,7 @@
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../board.h"
-
+#include "../../../utils/toolbox.h"
 #include <QtCore>
 
 /*******************************************************************************
@@ -40,12 +40,12 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
+BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const QSet<const Layer*>& layers,
                    NetSignal* netsignal, const Path& outline)
   : BI_Base(board),
     onEdited(*this),
     mUuid(uuid),
-    mLayer(&layer),
+    mLayers(layers),
     mNetSignal(netsignal),
     mOutline(outline),
     mMinWidth(200000),
@@ -58,6 +58,7 @@ BI_Plane::BI_Plane(Board& board, const Uuid& uuid, const Layer& layer,
     mLocked(false),
     mIsVisible(true),
     mFragments() {
+  checkLayers(mLayers);
 }
 
 BI_Plane::~BI_Plane() noexcept {
@@ -75,11 +76,12 @@ void BI_Plane::setOutline(const Path& outline) noexcept {
   }
 }
 
-void BI_Plane::setLayer(const Layer& layer) noexcept {
-  if (&layer != mLayer) {
+void BI_Plane::setLayers(const QSet<const Layer*>& layers) {
+  if (&layers != mLayers) {
+    checkLayers(layers); // can throw
     mBoard.invalidatePlanes(mLayer);
-    mLayer = &layer;
-    onEdited.notify(Event::LayerChanged);
+    mLayers = layers;
+    onEdited.notify(Event::LayersChanged);
     mBoard.invalidatePlanes(mLayer);
   }
 }
@@ -212,7 +214,6 @@ void BI_Plane::removeFromBoard() {
 
 void BI_Plane::serialize(SExpression& root) const {
   root.appendChild(mUuid);
-  root.appendChild("layer", *mLayer);
   root.ensureLineBreak();
   root.appendChild(
       "net",
@@ -228,6 +229,10 @@ void BI_Plane::serialize(SExpression& root) const {
   root.appendChild("keep_islands", mKeepIslands);
   root.appendChild("lock", mLocked);
   root.ensureLineBreak();
+  foreach (const Layer* layer, Toolbox::sortedQSet(mLayers, &Layer::lessThan)) {
+    root.appendChild("layer", *layer);
+    root.ensureLineBreak();
+  }
   mOutline.serialize(root);
   root.ensureLineBreak();
 }
