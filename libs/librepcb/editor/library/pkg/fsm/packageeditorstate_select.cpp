@@ -23,17 +23,20 @@
 #include "packageeditorstate_select.h"
 
 #include "../../../cmd/cmdpolygonedit.h"
+#include "../../../cmd/cmdzoneedit.h"
 #include "../../../dialogs/circlepropertiesdialog.h"
 #include "../../../dialogs/dxfimportdialog.h"
 #include "../../../dialogs/holepropertiesdialog.h"
 #include "../../../dialogs/polygonpropertiesdialog.h"
 #include "../../../dialogs/stroketextpropertiesdialog.h"
+#include "../../../dialogs/zonepropertiesdialog.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/circlegraphicsitem.h"
 #include "../../../graphics/graphicsscene.h"
 #include "../../../graphics/holegraphicsitem.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../graphics/stroketextgraphicsitem.h"
+#include "../../../graphics/zonegraphicsitem.h"
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
 #include "../../../widgets/graphicsview.h"
@@ -164,6 +167,23 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
       mCmdPolygonEdit->setPath(Path(vertices), true);
       return true;
     }
+    case SubState::MOVING_ZONE_VERTEX: {
+      if (!mSelectedZone) {
+        return false;
+      }
+      if (!mCmdZoneEdit) {
+        mCmdZoneEdit.reset(new CmdZoneEdit(*mSelectedZone));
+        emit availableFeaturesChanged();
+      }
+      QVector<Vertex> vertices = mSelectedZone->getOutline().getVertices();
+      foreach (int i, mSelectedZoneVertices) {
+        if ((i >= 0) && (i < vertices.count())) {
+          vertices[i].setPos(currentPos.mappedToGrid(getGridInterval()));
+        }
+      }
+      mCmdZoneEdit->setOutline(Path(vertices), true);
+      return true;
+    }
     default: { return false; }
   }
 }
@@ -180,6 +200,9 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       if (findPolygonVerticesAtPosition(mStartPos) &&
           (!mContext.editorContext.readOnly)) {
         setState(SubState::MOVING_POLYGON_VERTEX);
+      } else if (findZoneVerticesAtPosition(mStartPos) &&
+                 (!mContext.editorContext.readOnly)) {
+        setState(SubState::MOVING_ZONE_VERTEX);
       } else if (items.isEmpty()) {
         // start selecting
         clearSelectionRect(true);
@@ -286,6 +309,18 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
       if (mCmdPolygonEdit) {
         try {
           mContext.undoStack.execCmd(mCmdPolygonEdit.take());
+        } catch (const Exception& e) {
+          QMessageBox::critical(&mContext.editorWidget, tr("Error"),
+                                e.getMsg());
+        }
+      }
+      setState(SubState::IDLE);
+      return true;
+    }
+    case SubState::MOVING_ZONE_VERTEX: {
+      if (mCmdZoneEdit) {
+        try {
+          mContext.undoStack.execCmd(mCmdZoneEdit.take());
         } catch (const Exception& e) {
           QMessageBox::critical(&mContext.editorWidget, tr("Error"),
                                 e.getMsg());
@@ -513,6 +548,9 @@ bool PackageEditorState_Select::processEditProperties() noexcept {
         foreach (auto ptr, graphicsItem->getSelectedStrokeTexts()) {
           return openPropertiesDialogOfItem(ptr);
         }
+        foreach (auto ptr, graphicsItem->getSelectedZones()) {
+          return openPropertiesDialogOfItem(ptr);
+        }
       }
       break;
     }
@@ -616,6 +654,11 @@ bool PackageEditorState_Select::processAbortCommand() noexcept {
       setState(SubState::IDLE);
       return true;
     }
+    case SubState::MOVING_ZONE_VERTEX: {
+      mCmdZoneEdit.reset();
+      setState(SubState::IDLE);
+      return true;
+    }
     case SubState::PASTING: {
       try {
         mCmdDragSelectedItems.reset();
@@ -700,6 +743,39 @@ bool PackageEditorState_Select::openContextMenuAtPos(
         if (lineIndex >= 0) {
           QAction* aAddVertex = cmd.vertexAdd.createAction(&menu, this, [=]() {
             startAddingPolygonVertex(polygon, lineIndex, pos);
+          });
+          aAddVertex->setEnabled(!mContext.editorContext.readOnly);
+          mb.addAction(aAddVertex);
+        }
+
+        if ((!vertices.isEmpty()) || (lineIndex >= 0)) {
+          mb.addSeparator();
+        }
+      }
+    }
+  }
+
+  // If a zone is under the cursor, add vertex menu items.
+  if (auto i = std::dynamic_pointer_cast<ZoneGraphicsItem>(selectedItem)) {
+    if (mContext.currentFootprint) {
+      if (auto zone =
+              mContext.currentFootprint->getZones().find(&i->getZone())) {
+        QVector<int> vertices = i->getVertexIndicesAtPosition(pos);
+        if (!vertices.isEmpty()) {
+          QAction* aRemove = cmd.vertexRemove.createAction(
+              &menu, this,
+              [this, zone, vertices]() { removeZoneVertices(zone, vertices); });
+          int remainingVertices =
+              zone->getOutline().getVertices().count() - vertices.count();
+          aRemove->setEnabled((remainingVertices >= 2) &&
+                              (!mContext.editorContext.readOnly));
+          mb.addAction(aRemove);
+        }
+
+        int lineIndex = i->getLineIndexAtPosition(pos);
+        if (lineIndex >= 0) {
+          QAction* aAddVertex = cmd.vertexAdd.createAction(&menu, this, [=]() {
+            startAddingZoneVertex(zone, lineIndex, pos);
           });
           aAddVertex->setEnabled(!mContext.editorContext.readOnly);
           mb.addAction(aAddVertex);
@@ -802,6 +878,14 @@ bool PackageEditorState_Select::openPropertiesDialogOfItem(
     dialog.setReadOnly(mContext.editorContext.readOnly);
     dialog.exec();
     return true;
+  } else if (auto i = std::dynamic_pointer_cast<ZoneGraphicsItem>(item)) {
+    ZonePropertiesDialog dialog(
+        i->getZone(), mContext.undoStack, getLengthUnit(),
+        mContext.editorContext.layerProvider,
+        "package_editor/zone_properties_dialog", &mContext.editorWidget);
+    dialog.setReadOnly(mContext.editorContext.readOnly);
+    dialog.exec();
+    return true;
   } else if (auto i = std::dynamic_pointer_cast<HoleGraphicsItem>(item)) {
     // Note: The const_cast<> is a bit ugly, but it was by far the easiest
     // way and is safe since here we know that we're allowed to modify the hole.
@@ -858,6 +942,11 @@ bool PackageEditorState_Select::copySelectedItemsToClipboard() noexcept {
       Q_ASSERT(text);
       data.getStrokeTexts().append(
           std::make_shared<StrokeText>(text->getText()));
+    }
+    foreach (const std::shared_ptr<ZoneGraphicsItem>& zone,
+             mContext.currentGraphicsItem->getSelectedZones()) {
+      Q_ASSERT(zone);
+      data.getZones().append(std::make_shared<Zone>(zone->getZone()));
     }
     foreach (const std::shared_ptr<HoleGraphicsItem>& hole,
              mContext.currentGraphicsItem->getSelectedHoles()) {
@@ -1025,6 +1114,48 @@ void PackageEditorState_Select::startAddingPolygonVertex(
   }
 }
 
+void PackageEditorState_Select::removeZoneVertices(
+    std::shared_ptr<Zone> zone, const QVector<int> vertices) noexcept {
+  try {
+    Path path;
+    for (int i = 0; i < zone->getOutline().getVertices().count(); ++i) {
+      if (!vertices.contains(i)) {
+        path.getVertices().append(zone->getOutline().getVertices()[i]);
+      }
+    }
+    path.open();
+    if (path.getVertices().count() < 2) {
+      return;  // Do not allow to create invalid zones!
+    }
+    QScopedPointer<CmdZoneEdit> cmd(new CmdZoneEdit(*zone));
+    cmd->setOutline(path, false);
+    mContext.undoStack.execCmd(cmd.take());
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+}
+
+void PackageEditorState_Select::startAddingZoneVertex(
+    std::shared_ptr<Zone> zone, int vertex, const Point& pos) noexcept {
+  try {
+    Q_ASSERT(zone);
+    Q_ASSERT(vertex > 0);  // it must be the vertex *after* the clicked line
+    Path path = zone->getOutline();
+    Point newPos = pos.mappedToGrid(getGridInterval());
+    Angle newAngle = path.getVertices()[vertex - 1].getAngle();
+    path.getVertices().insert(vertex, Vertex(newPos, newAngle));
+    mCmdZoneEdit.reset(new CmdZoneEdit(*zone));
+    mCmdZoneEdit->setOutline(path, true);
+
+    mSelectedZone = zone;
+    mSelectedZoneVertices = {vertex};
+    mStartPos = pos;
+    setState(SubState::MOVING_ZONE_VERTEX);
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+}
+
 void PackageEditorState_Select::setSelectionRect(const Point& p1,
                                                  const Point& p2) noexcept {
   mContext.graphicsScene.setSelectionRect(p1, p2);
@@ -1070,6 +1201,26 @@ bool PackageEditorState_Select::findPolygonVerticesAtPosition(
 
   mSelectedPolygon.reset();
   mSelectedPolygonVertices.clear();
+  return false;
+}
+
+bool PackageEditorState_Select::findZoneVerticesAtPosition(
+    const Point& pos) noexcept {
+  if (mContext.currentFootprint) {
+    for (auto ptr : mContext.currentFootprint->getZones().values()) {
+      auto graphicsItem = mContext.currentGraphicsItem->getGraphicsItem(ptr);
+      if (graphicsItem && graphicsItem->isSelected()) {
+        mSelectedZoneVertices = graphicsItem->getVertexIndicesAtPosition(pos);
+        if (!mSelectedZoneVertices.isEmpty()) {
+          mSelectedZone = ptr;
+          return true;
+        }
+      }
+    }
+  }
+
+  mSelectedZone.reset();
+  mSelectedZoneVertices.clear();
   return false;
 }
 

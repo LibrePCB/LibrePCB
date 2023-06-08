@@ -1000,6 +1000,15 @@ public:
       {},
       &categoryTools,
   };
+  EditorCommand toolZone{
+      "tool_zone",  // clang-format break
+      QT_TR_NOOP("Draw Keepout Zone"),
+      QT_TR_NOOP("Draw keep-out zones"),
+      QIcon(":/img/actions/draw_zone.png"),
+      EditorCommand::Flags(),
+      {QKeySequence(Qt::Key_Z)},
+      &categoryTools,
+  };
   EditorCommand toolHole{
       "tool_hole",  // clang-format break
       QT_TR_NOOP("Add Hole"),

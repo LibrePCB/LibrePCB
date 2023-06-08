@@ -171,6 +171,17 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
           BI_Plane::ConnectStyle::Solid, PositiveLength(70), PositiveLength(80),
           false);
 
+  BoardZoneData zone1(
+      Uuid::createRandom(), {&Layer::topCopper()}, Zone::Rule::NoCopper,
+      Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
+      false);
+
+  BoardZoneData zone2(Uuid::createRandom(), {&Layer::botCopper()},
+                      Zone::Rule::NoDevices,
+                      Path({Vertex(Point(10, 20), Angle(30)),
+                            Vertex(Point(40, 50), Angle(60))}),
+                      true);
+
   BoardPolygonData polygon1(
       Uuid::createRandom(), Layer::topCopper(), UnsignedLength(1),
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
@@ -198,6 +209,8 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   obj1.getNetSegments().append(netSegment2);
   obj1.getPlanes().append(plane1);
   obj1.getPlanes().append(plane2);
+  obj1.getZones().append(zone1);
+  obj1.getZones().append(zone2);
   obj1.getPolygons().append(polygon1);
   obj1.getPolygons().append(polygon2);
   obj1.getStrokeTexts().append(strokeText1);
@@ -220,6 +233,7 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
   EXPECT_EQ(obj1.getDevices(), obj2->getDevices());
   EXPECT_EQ(obj1.getNetSegments(), obj2->getNetSegments());
   EXPECT_EQ(obj1.getPlanes(), obj2->getPlanes());
+  EXPECT_EQ(obj1.getZones(), obj2->getZones());
   EXPECT_EQ(obj1.getPolygons(), obj2->getPolygons());
   EXPECT_EQ(obj1.getStrokeTexts(), obj2->getStrokeTexts());
   EXPECT_EQ(obj1.getHoles(), obj2->getHoles());

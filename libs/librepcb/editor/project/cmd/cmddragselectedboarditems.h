@@ -43,6 +43,7 @@ class CmdBoardPlaneEdit;
 class CmdBoardPolygonEdit;
 class CmdBoardStrokeTextEdit;
 class CmdBoardViaEdit;
+class CmdBoardZoneEdit;
 class CmdDeviceInstanceEdit;
 class CmdDeviceStrokeTextsReset;
 
@@ -92,6 +93,7 @@ private:
   QList<CmdBoardViaEdit*> mViaEditCmds;
   QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
   QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
+  QList<CmdBoardZoneEdit*> mZoneEditCmds;
   QList<CmdBoardPolygonEdit*> mPolygonEditCmds;
   QList<CmdBoardStrokeTextEdit*> mStrokeTextEditCmds;
   QList<CmdBoardHoleEdit*> mHoleEditCmds;

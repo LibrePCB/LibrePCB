@@ -39,6 +39,7 @@
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 
 #include <QtCore>
@@ -77,6 +78,7 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
   query.addSelectedVias();
   query.addSelectedNetLines();
   query.addSelectedPlanes();
+  query.addSelectedZones();
   query.addSelectedPolygons();
   query.addSelectedBoardStrokeTexts();
   query.addSelectedHoles();
@@ -173,6 +175,11 @@ std::unique_ptr<BoardClipboardData> BoardClipboardDataBuilder::generate(
             plane->getConnectStyle(), plane->getThermalGap(),
             plane->getThermalSpokeWidth(), plane->isLocked());
     data->getPlanes().append(newPlane);
+  }
+
+  // Add zones
+  foreach (BI_Zone* zone, query.getZones()) {
+    data->getZones().append(zone->getData());
   }
 
   // Add polygons

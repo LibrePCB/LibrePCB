@@ -70,11 +70,12 @@ public:
     Devices = (1 << 3),
     FootprintPads = (1 << 4),
     Planes = (1 << 5),
-    Polygons = (1 << 6),
-    StrokeTexts = (1 << 7),
-    Holes = (1 << 8),
+    Zones = (1 << 6),
+    Polygons = (1 << 7),
+    StrokeTexts = (1 << 8),
+    Holes = (1 << 9),
     All = Vias | NetPoints | NetLines | Devices | FootprintPads | Planes |
-        Polygons | StrokeTexts | Holes,
+        Zones | Polygons | StrokeTexts | Holes,
 
     // Match behavior
     AcceptNearMatch = (1 << 10),

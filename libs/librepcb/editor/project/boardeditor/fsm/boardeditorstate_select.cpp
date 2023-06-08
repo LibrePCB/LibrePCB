@@ -26,6 +26,7 @@
 #include "../../../dialogs/holepropertiesdialog.h"
 #include "../../../dialogs/polygonpropertiesdialog.h"
 #include "../../../dialogs/stroketextpropertiesdialog.h"
+#include "../../../dialogs/zonepropertiesdialog.h"
 #include "../../../editorcommandset.h"
 #include "../../../graphics/polygongraphicsitem.h"
 #include "../../../library/pkg/footprintclipboarddata.h"
@@ -35,6 +36,7 @@
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmdboardplaneedit.h"
 #include "../../cmd/cmdboardpolygonedit.h"
+#include "../../cmd/cmdboardzoneedit.h"
 #include "../../cmd/cmddeviceinstanceedit.h"
 #include "../../cmd/cmddeviceinstanceeditall.h"
 #include "../../cmd/cmddragselectedboarditems.h"
@@ -57,6 +59,7 @@
 #include "../graphicsitems/bgi_polygon.h"
 #include "../graphicsitems/bgi_stroketext.h"
 #include "../graphicsitems/bgi_via.h"
+#include "../graphicsitems/bgi_zone.h"
 
 #include <librepcb/core/import/dxfreader.h>
 #include <librepcb/core/library/cmp/component.h>
@@ -74,6 +77,7 @@
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/utils/scopeguard.h>
@@ -103,7 +107,10 @@ BoardEditorState_Select::BoardEditorState_Select(
     mCmdPolygonEdit(),
     mSelectedPlane(nullptr),
     mSelectedPlaneVertices(),
-    mCmdPlaneEdit() {
+    mCmdPlaneEdit(),
+    mSelectedZone(nullptr),
+    mSelectedZoneVertices(),
+    mCmdZoneEdit() {
 }
 
 BoardEditorState_Select::~BoardEditorState_Select() noexcept {
@@ -118,6 +125,7 @@ bool BoardEditorState_Select::entry() noexcept {
   Q_ASSERT(mSelectedItemsDragCommand.isNull());
   Q_ASSERT(mCmdPolygonEdit.isNull());
   Q_ASSERT(mCmdPlaneEdit.isNull());
+  Q_ASSERT(mCmdZoneEdit.isNull());
   return true;
 }
 
@@ -144,7 +152,7 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
 
   BoardGraphicsScene* scene = getActiveBoardScene();
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (scene)) {
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit) && (scene)) {
     try {
       // Ask for file path and import options.
       DxfImportDialog dialog(getAllowedGeometryLayers(), Layer::boardOutlines(),
@@ -223,7 +231,7 @@ bool BoardEditorState_Select::processImportDxf() noexcept {
 
 bool BoardEditorState_Select::processSelectAll() noexcept {
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
-      mCmdPlaneEdit) {
+      mCmdPlaneEdit || mCmdZoneEdit) {
     return false;
   }
 
@@ -240,7 +248,7 @@ bool BoardEditorState_Select::processCut() noexcept {
   abortBlockingToolsInOtherEditors();
 
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
     if (copySelectedItemsToClipboard()) {
       removeSelectedItems();
       return true;
@@ -255,7 +263,7 @@ bool BoardEditorState_Select::processCopy() noexcept {
   abortBlockingToolsInOtherEditors();
 
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
     return copySelectedItemsToClipboard();
   }
 
@@ -268,7 +276,7 @@ bool BoardEditorState_Select::processPaste() noexcept {
 
   BoardGraphicsScene* scene = getActiveBoardScene();
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (scene)) {
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit) && (scene)) {
     try {
       // Get board data from clipboard.
       std::unique_ptr<BoardClipboardData> data =
@@ -324,7 +332,7 @@ bool BoardEditorState_Select::processMove(const Point& delta) noexcept {
   abortBlockingToolsInOtherEditors();
 
   if ((!mIsUndoCmdActive) && (!mSelectedItemsDragCommand) &&
-      (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
+      (!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
     return moveSelectedItems(delta);
   }
   return false;
@@ -334,7 +342,7 @@ bool BoardEditorState_Select::processRotate(const Angle& rotation) noexcept {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
+  if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
     return rotateSelectedItems(rotation);
   }
 
@@ -347,7 +355,7 @@ bool BoardEditorState_Select::processFlip(
   abortBlockingToolsInOtherEditors();
 
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
-      mCmdPlaneEdit) {
+      mCmdPlaneEdit || mCmdZoneEdit) {
     return false;
   }
   return flipSelectedItems(orientation);
@@ -358,7 +366,7 @@ bool BoardEditorState_Select::processSnapToGrid() noexcept {
   abortBlockingToolsInOtherEditors();
 
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
-      mCmdPlaneEdit) {
+      mCmdPlaneEdit || mCmdZoneEdit) {
     return false;
   }
   return snapSelectedItemsToGrid();
@@ -369,7 +377,7 @@ bool BoardEditorState_Select::processSetLocked(bool locked) noexcept {
   abortBlockingToolsInOtherEditors();
 
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
-      mCmdPlaneEdit) {
+      mCmdPlaneEdit || mCmdZoneEdit) {
     return false;
   }
   return lockSelectedItems(locked);
@@ -380,7 +388,7 @@ bool BoardEditorState_Select::processResetAllTexts() noexcept {
   abortBlockingToolsInOtherEditors();
 
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
-      mCmdPlaneEdit) {
+      mCmdPlaneEdit || mCmdZoneEdit) {
     return false;
   }
   return resetAllTextsOfSelectedItems();
@@ -391,7 +399,7 @@ bool BoardEditorState_Select::processRemove() noexcept {
   abortBlockingToolsInOtherEditors();
 
   if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
-      mCmdPlaneEdit) {
+      mCmdPlaneEdit || mCmdZoneEdit) {
     return false;
   }
   return removeSelectedItems();
@@ -403,7 +411,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
 
   BoardGraphicsScene* scene = getActiveBoardScene();
   if ((!scene) || mIsUndoCmdActive || mSelectedItemsDragCommand ||
-      mCmdPolygonEdit || mCmdPlaneEdit) {
+      mCmdPolygonEdit || mCmdPlaneEdit || mCmdZoneEdit) {
     return false;
   }
 
@@ -411,6 +419,7 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedVias();
   query.addSelectedPlanes();
+  query.addSelectedZones();
   query.addSelectedPolygons();
   query.addSelectedBoardStrokeTexts();
   query.addSelectedFootprintStrokeTexts();
@@ -425,6 +434,10 @@ bool BoardEditorState_Select::processEditProperties() noexcept {
   }
   foreach (auto ptr, query.getPlanes()) {
     openPlanePropertiesDialog(*ptr);
+    return true;
+  }
+  foreach (auto ptr, query.getZones()) {
+    openZonePropertiesDialog(*ptr);
     return true;
   }
   foreach (auto ptr, query.getPolygons()) {
@@ -483,6 +496,18 @@ bool BoardEditorState_Select::processGraphicsSceneMouseMoved(
     }
     mCmdPlaneEdit->setOutline(Path(vertices), true);
     return true;
+  } else if (mSelectedZone && mCmdZoneEdit) {
+    // Move zone vertices
+    QVector<Vertex> vertices =
+        mSelectedZone->getData().getOutline().getVertices();
+    foreach (int i, mSelectedZoneVertices) {
+      if ((i >= 0) && (i < vertices.count())) {
+        vertices[i].setPos(
+            Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval()));
+      }
+    }
+    mCmdZoneEdit->setOutline(Path(vertices), true);
+    return true;
   } else if (e.buttons().testFlag(Qt::LeftButton)) {
     // Draw selection rectangle
     Point p1 = Point::fromPx(e.buttonDownScenePos(Qt::LeftButton));
@@ -519,7 +544,7 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     }
     return true;
   } else if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) &&
-             (!mCmdPlaneEdit)) {
+             (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
     if (findPolygonVerticesAtPosition(Point::fromPx(e.scenePos()))) {
       // start moving polygon vertex
       mCmdPolygonEdit.reset(new CmdBoardPolygonEdit(*mSelectedPolygon));
@@ -527,6 +552,10 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
     } else if (findPlaneVerticesAtPosition(Point::fromPx(e.scenePos()))) {
       // start moving plane vertex
       mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(*mSelectedPlane));
+      return true;
+    } else if (findZoneVerticesAtPosition(Point::fromPx(e.scenePos()))) {
+      // start moving zone vertex
+      mCmdZoneEdit.reset(new CmdBoardZoneEdit(*mSelectedZone));
       return true;
     } else {
       // handle items selection
@@ -615,6 +644,15 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
     }
     mSelectedPlane = nullptr;
     mSelectedPlaneVertices.clear();
+  } else if (mCmdZoneEdit) {
+    // Stop moving zone vertices
+    try {
+      mContext.undoStack.execCmd(mCmdZoneEdit.take());
+    } catch (const Exception& e) {
+      QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    }
+    mSelectedZone = nullptr;
+    mSelectedZoneVertices.clear();
   } else {
     // Remove selection rectangle and keep the selection state of all items
     scene->clearSelectionRect();
@@ -635,7 +673,8 @@ bool BoardEditorState_Select::processGraphicsSceneLeftMouseButtonDoubleClicked(
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
-  if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
+  if ((!mSelectedItemsDragCommand) && (!mCmdPolygonEdit) && (!mCmdPlaneEdit) &&
+      (!mCmdZoneEdit)) {
     // Open the properties editor dialog of the selected item, if any.
     const QList<std::shared_ptr<QGraphicsItem>> items = findItemsAtPos(
         Point::fromPx(e.scenePos()), FindFlag::All | FindFlag::AcceptNearMatch);
@@ -661,7 +700,7 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     if (e.screenPos() == e.buttonDownScreenPos(Qt::RightButton)) {
       return rotateSelectedItems(Angle::deg90());
     }
-  } else if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit)) {
+  } else if ((!mCmdPolygonEdit) && (!mCmdPlaneEdit) && (!mCmdZoneEdit)) {
     // handle item selection
     Point pos = Point::fromPx(e.scenePos());
     QList<std::shared_ptr<QGraphicsItem>> items =
@@ -944,6 +983,59 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       aIsVisible->setCheckable(true);
       aIsVisible->setChecked(plane->getPlane().isVisible());
       mb.addAction(aIsVisible);
+    } else if (auto zone = std::dynamic_pointer_cast<BGI_Zone>(selectedItem)) {
+      int lineIndex = zone->getLineIndexAtPosition(pos);
+      QVector<int> vertices = zone->getVertexIndicesAtPosition(pos);
+
+      mb.addAction(
+          cmd.properties.createAction(
+              &menu, this,
+              [this, selectedItem]() { openPropertiesDialog(selectedItem); }),
+          MenuBuilder::Flag::DefaultAction);
+      mb.addSeparator();
+      if (!vertices.isEmpty()) {
+        QAction* action = cmd.vertexRemove.createAction(
+            &menu, this, [this, zone, vertices]() {
+              removeZoneVertices(zone->getZone(), vertices);
+            });
+        int remainingVertices =
+            zone->getZone().getData().getOutline().getVertices().count() -
+            vertices.count();
+        action->setEnabled(remainingVertices >= 2);
+        mb.addAction(action);
+      }
+      if (lineIndex >= 0) {
+        mb.addAction(cmd.vertexAdd.createAction(
+            &menu, this, [this, zone, lineIndex, pos]() {
+              startAddingZoneVertex(zone->getZone(), lineIndex, pos);
+            }));
+      }
+      if ((lineIndex >= 0) || (!vertices.isEmpty())) {
+        mb.addSeparator();
+      }
+      mb.addAction(cmd.clipboardCut.createAction(&menu, this, [this]() {
+        copySelectedItemsToClipboard();
+        removeSelectedItems();
+      }));
+      mb.addAction(cmd.clipboardCopy.createAction(
+          &menu, this, [this]() { copySelectedItemsToClipboard(); }));
+      mb.addAction(cmd.remove.createAction(
+          &menu, this, [this]() { removeSelectedItems(); }));
+      mb.addSeparator();
+      mb.addAction(cmd.rotateCcw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(Angle::deg90()); }));
+      mb.addAction(cmd.rotateCw.createAction(
+          &menu, this, [this]() { rotateSelectedItems(-Angle::deg90()); }));
+      mb.addAction(cmd.flipHorizontal.createAction(
+          &menu, this, [this]() { flipSelectedItems(Qt::Horizontal); }));
+      mb.addAction(cmd.flipVertical.createAction(
+          &menu, this, [this]() { flipSelectedItems(Qt::Vertical); }));
+      mb.addSeparator();
+      QAction* aIsLocked = cmd.locked.createAction(
+          &menu, this, [this](bool checked) { lockSelectedItems(checked); });
+      aIsLocked->setCheckable(true);
+      aIsLocked->setChecked(zone->getZone().getData().isLocked());
+      mb.addAction(aIsLocked);
     } else if (auto item =
                    std::dynamic_pointer_cast<BGI_Polygon>(selectedItem)) {
       BI_Polygon* polygon = scene->getBoard().getPolygons().value(
@@ -1081,7 +1173,8 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
 bool BoardEditorState_Select::processSwitchToBoard(int index) noexcept {
   Q_UNUSED(index);
   return (!mIsUndoCmdActive) && mSelectedItemsDragCommand.isNull() &&
-      mCmdPolygonEdit.isNull() && mCmdPlaneEdit.isNull();
+      mCmdPolygonEdit.isNull() && mCmdPlaneEdit.isNull() &&
+      mCmdZoneEdit.isNull();
 }
 
 /*******************************************************************************
@@ -1264,6 +1357,28 @@ void BoardEditorState_Select::removePlaneVertices(
   }
 }
 
+void BoardEditorState_Select::removeZoneVertices(
+    BI_Zone& zone, const QVector<int> vertices) noexcept {
+  try {
+    Path path;
+    for (int i = 0; i < zone.getData().getOutline().getVertices().count();
+         ++i) {
+      if (!vertices.contains(i)) {
+        path.getVertices().append(zone.getData().getOutline().getVertices()[i]);
+      }
+    }
+    path.open();
+    if (path.getVertices().count() < 2) {
+      return;  // Do not allow to create invalid outlines!
+    }
+    QScopedPointer<CmdBoardZoneEdit> cmd(new CmdBoardZoneEdit(zone));
+    cmd->setOutline(path, false);
+    mContext.undoStack.execCmd(cmd.take());
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
+}
+
 void BoardEditorState_Select::startAddingPolygonVertex(
     BI_Polygon& polygon, int vertex, const Point& pos) noexcept {
   try {
@@ -1295,6 +1410,24 @@ void BoardEditorState_Select::startAddingPlaneVertex(
     mSelectedPlaneVertices = {vertex};
     mCmdPlaneEdit.reset(new CmdBoardPlaneEdit(plane));
     mCmdPlaneEdit->setOutline(path, true);
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+  }
+}
+
+void BoardEditorState_Select::startAddingZoneVertex(BI_Zone& zone, int vertex,
+                                                    const Point& pos) noexcept {
+  try {
+    Q_ASSERT(vertex > 0);  // it must be the vertex *after* the clicked line
+    Path path = zone.getData().getOutline();
+    Point newPos = pos.mappedToGrid(getGridInterval());
+    Angle newAngle = path.getVertices()[vertex - 1].getAngle();
+    path.getVertices().insert(vertex, Vertex(newPos, newAngle));
+
+    mSelectedZone = &zone;
+    mSelectedZoneVertices = {vertex};
+    mCmdZoneEdit.reset(new CmdBoardZoneEdit(zone));
+    mCmdZoneEdit->setOutline(path, true);
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
   }
@@ -1366,6 +1499,11 @@ bool BoardEditorState_Select::abortCommand(bool showErrMsgBox) noexcept {
     mSelectedPlane = nullptr;
     mSelectedPlaneVertices.clear();
 
+    // Stop editing zones
+    mCmdZoneEdit.reset();
+    mSelectedZone = nullptr;
+    mSelectedZoneVertices.clear();
+
     // Delete the current undo command
     mSelectedItemsDragCommand.reset();
 
@@ -1424,6 +1562,27 @@ bool BoardEditorState_Select::findPlaneVerticesAtPosition(
 
   mSelectedPlane = nullptr;
   mSelectedPlaneVertices.clear();
+  return false;
+}
+
+bool BoardEditorState_Select::findZoneVerticesAtPosition(
+    const Point& pos) noexcept {
+  if (BoardGraphicsScene* scene = getActiveBoardScene()) {
+    for (auto it = scene->getZones().begin(); it != scene->getZones().end();
+         it++) {
+      if (it.value()->isSelected() &&
+          ((!it.key()->getData().isLocked()) || getIgnoreLocks())) {
+        mSelectedZoneVertices = it.value()->getVertexIndicesAtPosition(pos);
+        if (!mSelectedZoneVertices.isEmpty()) {
+          mSelectedZone = it.key();
+          return true;
+        }
+      }
+    }
+  }
+
+  mSelectedZone = nullptr;
+  mSelectedZoneVertices.clear();
   return false;
 }
 
@@ -1522,6 +1681,9 @@ bool BoardEditorState_Select::openPropertiesDialog(
   } else if (auto plane = std::dynamic_pointer_cast<BGI_Plane>(item)) {
     openPlanePropertiesDialog(plane->getPlane());
     return true;
+  } else if (auto zone = std::dynamic_pointer_cast<BGI_Zone>(item)) {
+    openZonePropertiesDialog(zone->getZone());
+    return true;
   } else if (auto polygon = std::dynamic_pointer_cast<BGI_Polygon>(item)) {
     openPolygonPropertiesDialog(polygon->getPolygon());
     return true;
@@ -1566,6 +1728,13 @@ void BoardEditorState_Select::openPlanePropertiesDialog(
 
   // Restore visibility
   plane.setVisible(visible);
+}
+
+void BoardEditorState_Select::openZonePropertiesDialog(BI_Zone& zone) noexcept {
+  ZonePropertiesDialog dialog(
+      zone, mContext.undoStack, getLengthUnit(), mContext.editor,
+      "board_editor/zone_properties_dialog", parentWidget());
+  dialog.exec();
 }
 
 void BoardEditorState_Select::openPolygonPropertiesDialog(

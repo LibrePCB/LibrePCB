@@ -133,6 +133,15 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
       StrokeTextSpacing(Ratio(6)), StrokeTextSpacing(),
       Alignment(HAlign::center(), VAlign::bottom()), true, false);
 
+  std::shared_ptr<Zone> zone1 = std::make_shared<Zone>(
+      Uuid::createRandom(), Zone::Layer::Top, Zone::Rule::NoCopper,
+      Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}));
+
+  std::shared_ptr<Zone> zone2 = std::make_shared<Zone>(
+      Uuid::createRandom(), Zone::Layer::Inner, Zone::Rule::NoDevices,
+      Path({Vertex(Point(10, 20), Angle(30)),
+            Vertex(Point(40, 50), Angle(60))}));
+
   std::shared_ptr<Hole> hole1 = std::make_shared<Hole>(
       Uuid::createRandom(), PositiveLength(3), makeNonEmptyPath(Point(1, 2)),
       MaskConfig::automatic());
@@ -153,6 +162,8 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
   obj1.getCircles().append(circle2);
   obj1.getStrokeTexts().append(strokeText1);
   obj1.getStrokeTexts().append(strokeText2);
+  obj1.getZones().append(zone1);
+  obj1.getZones().append(zone2);
   obj1.getHoles().append(hole1);
   obj1.getHoles().append(hole2);
 
@@ -171,6 +182,7 @@ TEST(FootprintClipboardDataTest, testToFromMimeDataPopulated) {
   EXPECT_EQ(obj1.getPolygons(), obj2->getPolygons());
   EXPECT_EQ(obj1.getCircles(), obj2->getCircles());
   EXPECT_EQ(obj1.getStrokeTexts(), obj2->getStrokeTexts());
+  EXPECT_EQ(obj1.getZones(), obj2->getZones());
   EXPECT_EQ(obj1.getHoles(), obj2->getHoles());
 }
 

@@ -31,6 +31,7 @@
         <file>actions/draw_polygon.png</file>
         <file>actions/draw_rectangle.png</file>
         <file>actions/draw_wire.png</file>
+        <file>actions/draw_zone.png</file>
         <file>actions/drc.png</file>
         <file>actions/edit.png</file>
         <file>actions/export.png</file>

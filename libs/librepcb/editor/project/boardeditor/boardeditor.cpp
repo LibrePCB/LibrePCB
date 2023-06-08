@@ -426,6 +426,7 @@ void BoardEditor::addLayers(const Theme& theme) noexcept {
   addLayer(Theme::Color::sBoardHoles, true);
   addLayer(Theme::Color::sBoardVias, true);
   addLayer(Theme::Color::sBoardPads, true);
+  addLayer(Theme::Color::sBoardZones, true);
   addLayer(Theme::Color::sBoardAirWires, true);
 
   // copper layers
@@ -762,6 +763,7 @@ void BoardEditor::createActions() noexcept {
   mActionToolPolygon.reset(cmd.toolPolygon.createAction(this));
   mActionToolText.reset(cmd.toolText.createAction(this));
   mActionToolPlane.reset(cmd.toolPlane.createAction(this));
+  mActionToolZone.reset(cmd.toolZone.createAction(this));
   mActionToolHole.reset(cmd.toolHole.createAction(this));
   mActionToolMeasure.reset(cmd.toolMeasure.createAction(this));
   mActionDockErc.reset(cmd.dockErc.createAction(this, this, [this]() {
@@ -811,6 +813,8 @@ void BoardEditor::createActions() noexcept {
                                BoardEditorFsm::State::DRAW_POLYGON);
   mToolsActionGroup->addAction(mActionToolPlane.data(),
                                BoardEditorFsm::State::DRAW_PLANE);
+  mToolsActionGroup->addAction(mActionToolZone.data(),
+                               BoardEditorFsm::State::DRAW_ZONE);
   mToolsActionGroup->addAction(mActionToolText.data(),
                                BoardEditorFsm::State::ADD_STROKE_TEXT);
   mToolsActionGroup->addAction(mActionToolHole.data(),
@@ -900,6 +904,7 @@ void BoardEditor::createToolBars() noexcept {
   mToolBarTools->addAction(mActionToolPolygon.data());
   mToolBarTools->addAction(mActionToolText.data());
   mToolBarTools->addAction(mActionToolPlane.data());
+  mToolBarTools->addAction(mActionToolZone.data());
   mToolBarTools->addAction(mActionToolHole.data());
   mToolBarTools->addSeparator();
   mToolBarTools->addAction(mActionToolMeasure.data());
@@ -1083,6 +1088,7 @@ void BoardEditor::createMenus() noexcept {
   mb.addAction(mActionToolPolygon);
   mb.addAction(mActionToolText);
   mb.addAction(mActionToolPlane);
+  mb.addAction(mActionToolZone);
   mb.addAction(mActionToolHole);
   mb.addSeparator();
   mb.addAction(mActionToolMeasure);
@@ -1220,6 +1226,9 @@ void BoardEditor::toolRequested(const QVariant& newTool) noexcept {
       break;
     case BoardEditorFsm::State::DRAW_PLANE:
       mFsm->processDrawPlane();
+      break;
+    case BoardEditorFsm::State::DRAW_ZONE:
+      mFsm->processDrawZone();
       break;
     case BoardEditorFsm::State::ADD_VIA:
       mFsm->processAddVia();

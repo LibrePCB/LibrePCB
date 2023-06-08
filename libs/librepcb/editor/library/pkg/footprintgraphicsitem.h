@@ -45,6 +45,7 @@ class Hole;
 class Point;
 class Polygon;
 class StrokeText;
+class Zone;
 
 namespace editor {
 
@@ -54,6 +55,7 @@ class HoleGraphicsItem;
 class IF_GraphicsLayerProvider;
 class PolygonGraphicsItem;
 class StrokeTextGraphicsItem;
+class ZoneGraphicsItem;
 
 /*******************************************************************************
  *  Class FootprintGraphicsItem
@@ -71,8 +73,9 @@ public:
     Circles = (1 << 1),
     Polygons = (1 << 2),
     StrokeTexts = (1 << 3),
-    Holes = (1 << 4),
-    All = Pads | Circles | Polygons | StrokeTexts | Holes,
+    Zones = (1 << 4),
+    Holes = (1 << 5),
+    All = Pads | Circles | Polygons | StrokeTexts | Zones | Holes,
 
     // Match behavior
     AcceptNearMatch = (1 << 10),
@@ -107,6 +110,10 @@ public:
       std::shared_ptr<StrokeText> text) noexcept {
     return mStrokeTextGraphicsItems.value(text);
   }
+  std::shared_ptr<ZoneGraphicsItem> getGraphicsItem(
+      std::shared_ptr<Zone> zone) noexcept {
+    return mZoneGraphicsItems.value(zone);
+  }
   std::shared_ptr<HoleGraphicsItem> getGraphicsItem(
       std::shared_ptr<Hole> hole) noexcept {
     return mHoleGraphicsItems.value(hole);
@@ -116,6 +123,7 @@ public:
   QList<std::shared_ptr<PolygonGraphicsItem>> getSelectedPolygons() noexcept;
   QList<std::shared_ptr<StrokeTextGraphicsItem>>
       getSelectedStrokeTexts() noexcept;
+  QList<std::shared_ptr<ZoneGraphicsItem>> getSelectedZones() noexcept;
   QList<std::shared_ptr<HoleGraphicsItem>> getSelectedHoles() noexcept;
   QList<std::shared_ptr<QGraphicsItem>> findItemsAtPos(
       const QPainterPath& posAreaSmall, const QPainterPath& posAreaLarge,
@@ -140,6 +148,7 @@ private:  // Methods
   void syncCircles() noexcept;
   void syncPolygons() noexcept;
   void syncStrokeTexts() noexcept;
+  void syncZones() noexcept;
   void syncHoles() noexcept;
   void footprintEdited(const Footprint& footprint,
                        Footprint::Event event) noexcept;
@@ -161,6 +170,8 @@ private:  // Data
       mPolygonGraphicsItems;
   QMap<std::shared_ptr<StrokeText>, std::shared_ptr<StrokeTextGraphicsItem>>
       mStrokeTextGraphicsItems;
+  QMap<std::shared_ptr<Zone>, std::shared_ptr<ZoneGraphicsItem>>
+      mZoneGraphicsItems;
   QMap<std::shared_ptr<Hole>, std::shared_ptr<HoleGraphicsItem>>
       mHoleGraphicsItems;
 

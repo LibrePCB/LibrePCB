@@ -245,6 +245,7 @@ private:  // Data
   QScopedPointer<QAction> mActionToolSpecialPadTest;
   QScopedPointer<QAction> mActionToolSpecialPadLocalFiducial;
   QScopedPointer<QAction> mActionToolSpecialPadGlobalFiducial;
+  QScopedPointer<QAction> mActionToolZone;
   QScopedPointer<QAction> mActionToolHole;
   QScopedPointer<QAction> mActionToolMeasure;
 

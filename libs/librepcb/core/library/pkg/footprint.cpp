@@ -47,6 +47,7 @@ Footprint::Footprint(const Footprint& other) noexcept
     mPolygons(other.mPolygons),
     mCircles(other.mCircles),
     mStrokeTexts(other.mStrokeTexts),
+    mZones(other.mZones),
     mHoles(other.mHoles),
     mNamesEditedSlot(*this, &Footprint::namesEdited),
     mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
@@ -54,6 +55,7 @@ Footprint::Footprint(const Footprint& other) noexcept
     mPolygonsEditedSlot(*this, &Footprint::polygonsEdited),
     mCirclesEditedSlot(*this, &Footprint::circlesEdited),
     mStrokeTextsEditedSlot(*this, &Footprint::strokeTextsEdited),
+    mZonesEditedSlot(*this, &Footprint::zonesEdited),
     mHolesEditedSlot(*this, &Footprint::holesEdited) {
   mNames.onEdited.attach(mNamesEditedSlot);
   mDescriptions.onEdited.attach(mDescriptionsEditedSlot);
@@ -61,6 +63,7 @@ Footprint::Footprint(const Footprint& other) noexcept
   mPolygons.onEdited.attach(mPolygonsEditedSlot);
   mCircles.onEdited.attach(mCirclesEditedSlot);
   mStrokeTexts.onEdited.attach(mStrokeTextsEditedSlot);
+  mZones.onEdited.attach(mZonesEditedSlot);
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
@@ -77,6 +80,7 @@ Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
     mPolygons(),
     mCircles(),
     mStrokeTexts(),
+    mZones(),
     mHoles(),
     mNamesEditedSlot(*this, &Footprint::namesEdited),
     mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
@@ -84,6 +88,7 @@ Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
     mPolygonsEditedSlot(*this, &Footprint::polygonsEdited),
     mCirclesEditedSlot(*this, &Footprint::circlesEdited),
     mStrokeTextsEditedSlot(*this, &Footprint::strokeTextsEdited),
+    mZonesEditedSlot(*this, &Footprint::zonesEdited),
     mHolesEditedSlot(*this, &Footprint::holesEdited) {
   mNames.onEdited.attach(mNamesEditedSlot);
   mDescriptions.onEdited.attach(mDescriptionsEditedSlot);
@@ -91,6 +96,7 @@ Footprint::Footprint(const Uuid& uuid, const ElementName& name_en_US,
   mPolygons.onEdited.attach(mPolygonsEditedSlot);
   mCircles.onEdited.attach(mCirclesEditedSlot);
   mStrokeTexts.onEdited.attach(mStrokeTextsEditedSlot);
+  mZones.onEdited.attach(mZonesEditedSlot);
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
@@ -106,6 +112,7 @@ Footprint::Footprint(const SExpression& node)
     mPolygons(node),
     mCircles(node),
     mStrokeTexts(node),
+    mZones(node),
     mHoles(node),
     mNamesEditedSlot(*this, &Footprint::namesEdited),
     mDescriptionsEditedSlot(*this, &Footprint::descriptionsEdited),
@@ -113,6 +120,7 @@ Footprint::Footprint(const SExpression& node)
     mPolygonsEditedSlot(*this, &Footprint::polygonsEdited),
     mCirclesEditedSlot(*this, &Footprint::circlesEdited),
     mStrokeTextsEditedSlot(*this, &Footprint::strokeTextsEdited),
+    mZonesEditedSlot(*this, &Footprint::zonesEdited),
     mHolesEditedSlot(*this, &Footprint::holesEdited) {
   foreach (const SExpression* child, node.getChildren("3d_model")) {
     mModels.insert(deserialize<Uuid>(child->getChild("@0")));
@@ -123,6 +131,7 @@ Footprint::Footprint(const SExpression& node)
   mPolygons.onEdited.attach(mPolygonsEditedSlot);
   mCircles.onEdited.attach(mCirclesEditedSlot);
   mStrokeTexts.onEdited.attach(mStrokeTextsEditedSlot);
+  mZones.onEdited.attach(mZonesEditedSlot);
   mHoles.onEdited.attach(mHolesEditedSlot);
 }
 
@@ -199,6 +208,8 @@ void Footprint::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mStrokeTexts.serialize(root);
   root.ensureLineBreak();
+  mZones.serialize(root);
+  root.ensureLineBreak();
   mHoles.serialize(root);
   root.ensureLineBreak();
 }
@@ -218,6 +229,7 @@ bool Footprint::operator==(const Footprint& rhs) const noexcept {
   if (mPolygons != rhs.mPolygons) return false;
   if (mCircles != rhs.mCircles) return false;
   if (mStrokeTexts != rhs.mStrokeTexts) return false;
+  if (mZones != rhs.mZones) return false;
   if (mHoles != rhs.mHoles) return false;
   return true;
 }
@@ -236,6 +248,7 @@ Footprint& Footprint::operator=(const Footprint& rhs) noexcept {
   mPolygons = rhs.mPolygons;
   mCircles = rhs.mCircles;
   mStrokeTexts = rhs.mStrokeTexts;
+  mZones = rhs.mZones;
   mHoles = rhs.mHoles;
   return *this;
 }
@@ -299,6 +312,16 @@ void Footprint::strokeTextsEdited(const StrokeTextList& list, int index,
   Q_UNUSED(text);
   Q_UNUSED(event);
   onEdited.notify(Event::StrokeTextsEdited);
+}
+
+void Footprint::zonesEdited(const ZoneList& list, int index,
+                            const std::shared_ptr<const Zone>& zone,
+                            ZoneList::Event event) noexcept {
+  Q_UNUSED(list);
+  Q_UNUSED(index);
+  Q_UNUSED(zone);
+  Q_UNUSED(event);
+  onEdited.notify(Event::ZonesEdited);
 }
 
 void Footprint::holesEdited(const HoleList& list, int index,

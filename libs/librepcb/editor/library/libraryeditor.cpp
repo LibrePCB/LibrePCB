@@ -120,6 +120,7 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   addLayer(Theme::Color::sBoardHoles);
   addLayer(Theme::Color::sBoardVias);
   addLayer(Theme::Color::sBoardPads);
+  addLayer(Theme::Color::sBoardZones);
   addLayer(Theme::Color::sBoardAirWires);
   addLayer(Theme::Color::sBoardMeasures);
   addLayer(Theme::Color::sBoardAlignment);
@@ -660,6 +661,7 @@ void LibraryEditor::createActions() noexcept {
       cmd.toolPadLocalFiducial.createAction(this));
   mActionToolSpecialPadGlobalFiducial.reset(
       cmd.toolPadGlobalFiducial.createAction(this));
+  mActionToolZone.reset(cmd.toolZone.createAction(this));
   mActionToolHole.reset(cmd.toolHole.createAction(this));
   mActionToolMeasure.reset(cmd.toolMeasure.createAction(this));
 
@@ -715,6 +717,8 @@ void LibraryEditor::createActions() noexcept {
       mActionToolSpecialPadGlobalFiducial.data(),
       EditorWidgetBase::Tool::ADD_SMT_PADS,
       QVariant::fromValue(FootprintPad::Function::GlobalFiducial));
+  mToolsActionGroup->addAction(mActionToolZone.data(),
+                               EditorWidgetBase::Tool::DRAW_ZONE);
   mToolsActionGroup->addAction(mActionToolHole.data(),
                                EditorWidgetBase::Tool::ADD_HOLES);
   mToolsActionGroup->addAction(mActionToolMeasure.data(),
@@ -811,6 +815,7 @@ void LibraryEditor::createToolBars() noexcept {
     btn->setMenu(menu);
     btn->setPopupMode(QToolButton::DelayedPopup);
   }
+  mToolBarTools->addAction(mActionToolZone.data());
   mToolBarTools->addAction(mActionToolHole.data());
   mToolBarTools->addSeparator();
   mToolBarTools->addAction(mActionToolMeasure.data());
@@ -905,6 +910,7 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionToolSpecialPadTest);
   mb.addAction(mActionToolSpecialPadLocalFiducial);
   mb.addAction(mActionToolSpecialPadGlobalFiducial);
+  mb.addAction(mActionToolZone);
   mb.addAction(mActionToolHole);
   mb.addSeparator();
   mb.addAction(mActionToolMeasure);

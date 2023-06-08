@@ -36,6 +36,7 @@
 #include "packageeditorstate_drawpolygon.h"
 #include "packageeditorstate_drawrect.h"
 #include "packageeditorstate_drawtext.h"
+#include "packageeditorstate_drawzone.h"
 #include "packageeditorstate_measure.h"
 #include "packageeditorstate_select.h"
 
@@ -103,6 +104,7 @@ PackageEditorFsm::PackageEditorFsm(const Context& context) noexcept
                  new PackageEditorState_DrawCircle(mContext));
   mStates.insert(State::DRAW_ARC, new PackageEditorState_DrawArc(mContext));
   mStates.insert(State::DRAW_TEXT, new PackageEditorState_DrawText(mContext));
+  mStates.insert(State::DRAW_ZONE, new PackageEditorState_DrawZone(mContext));
   mStates.insert(State::ADD_HOLES, new PackageEditorState_AddHoles(mContext));
   mStates.insert(State::MEASURE, new PackageEditorState_Measure(mContext));
 
@@ -156,6 +158,8 @@ EditorWidgetBase::Tool PackageEditorFsm::getCurrentTool() const noexcept {
       return EditorWidgetBase::Tool::DRAW_CIRCLE;
     case State::DRAW_TEXT:
       return EditorWidgetBase::Tool::DRAW_TEXT;
+    case State::DRAW_ZONE:
+      return EditorWidgetBase::Tool::DRAW_ZONE;
     case State::ADD_HOLES:
       return EditorWidgetBase::Tool::ADD_HOLES;
     case State::MEASURE:
@@ -466,6 +470,10 @@ bool PackageEditorFsm::processStartDrawCircles() noexcept {
 
 bool PackageEditorFsm::processStartDrawTexts() noexcept {
   return setNextState(State::DRAW_TEXT);
+}
+
+bool PackageEditorFsm::processStartDrawZones() noexcept {
+  return setNextState(State::DRAW_ZONE);
 }
 
 bool PackageEditorFsm::processStartAddingHoles() noexcept {

@@ -40,6 +40,7 @@ class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
+class BI_Zone;
 class Uuid;
 
 namespace editor {
@@ -84,6 +85,7 @@ public:
   }
   const QSet<BI_Via*>& getVias() const noexcept { return mResultVias; }
   const QSet<BI_Plane*>& getPlanes() const noexcept { return mResultPlanes; }
+  const QSet<BI_Zone*>& getZones() const noexcept { return mResultZones; }
   const QSet<BI_Polygon*>& getPolygons() const noexcept {
     return mResultPolygons;
   }
@@ -111,6 +113,7 @@ public:
   void addSelectedNetPoints() noexcept;
   void addSelectedNetLines() noexcept;
   void addSelectedPlanes() noexcept;
+  void addSelectedZones() noexcept;
   void addSelectedPolygons() noexcept;
   void addSelectedBoardStrokeTexts() noexcept;
   void addSelectedFootprintStrokeTexts() noexcept;
@@ -139,6 +142,7 @@ private:  // Data
   QSet<BI_NetLine*> mResultNetLines;
   QSet<BI_Via*> mResultVias;
   QSet<BI_Plane*> mResultPlanes;
+  QSet<BI_Zone*> mResultZones;
   QSet<BI_Polygon*> mResultPolygons;
   QSet<BI_StrokeText*> mResultStrokeTexts;
   QSet<BI_Hole*> mResultHoles;

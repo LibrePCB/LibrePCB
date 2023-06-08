@@ -52,9 +52,6 @@ public:
   explicit CmdBoardPolygonAdd(BI_Polygon& polygon) noexcept;
   ~CmdBoardPolygonAdd() noexcept;
 
-  // Getters
-  // BI_Device* getDeviceInstance() const noexcept {return mDeviceInstance;}
-
 private:  // Methods
   /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
   bool performExecute() override;

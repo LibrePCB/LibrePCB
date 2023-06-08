@@ -45,6 +45,7 @@ class OriginCrossGraphicsItem;
 class PrimitiveCircleGraphicsItem;
 class PrimitiveHoleGraphicsItem;
 class PrimitivePathGraphicsItem;
+class PrimitiveZoneGraphicsItem;
 
 /*******************************************************************************
  *  Class BGI_Device
@@ -88,6 +89,7 @@ private:  // Methods
   void updateRotationAndMirrored() noexcept;
   void updateBoardSide() noexcept;
   void updateHoleStopMaskOffsets() noexcept;
+  void updateZoneLayers() noexcept;
   std::shared_ptr<GraphicsLayer> getLayer(const Layer& layer) const noexcept;
 
 private:  // Data
@@ -97,6 +99,7 @@ private:  // Data
   std::shared_ptr<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
   QVector<std::shared_ptr<PrimitiveCircleGraphicsItem>> mCircleGraphicsItems;
   QVector<std::shared_ptr<PrimitivePathGraphicsItem>> mPolygonGraphicsItems;
+  QVector<std::shared_ptr<PrimitiveZoneGraphicsItem>> mZoneGraphicsItems;
   QVector<std::shared_ptr<PrimitiveHoleGraphicsItem>> mHoleGraphicsItems;
   QPainterPath mShape;
 

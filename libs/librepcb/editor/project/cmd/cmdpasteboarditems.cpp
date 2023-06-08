@@ -28,6 +28,7 @@
 #include "../../project/cmd/cmdboardplaneadd.h"
 #include "../../project/cmd/cmdboardpolygonadd.h"
 #include "../../project/cmd/cmdboardstroketextadd.h"
+#include "../../project/cmd/cmdboardzoneadd.h"
 #include "../../project/cmd/cmddeviceinstanceadd.h"
 #include "../../project/cmd/cmdnetclassadd.h"
 #include "../../project/cmd/cmdnetsignaladd.h"
@@ -43,6 +44,7 @@
 #include "../boardeditor/graphicsitems/bgi_polygon.h"
 #include "../boardeditor/graphicsitems/bgi_stroketext.h"
 #include "../boardeditor/graphicsitems/bgi_via.h"
+#include "../boardeditor/graphicsitems/bgi_zone.h"
 #include "cmdremoveboarditems.h"
 
 #include <librepcb/core/library/dev/device.h>
@@ -58,6 +60,7 @@
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/project.h>
@@ -291,6 +294,17 @@ bool CmdPasteBoardItems::performExecute() {
     execNewChildCmd(new CmdBoardPlaneAdd(*copy));
     if (auto item = mScene.getPlanes().value(copy)) {
       item->setSelected(true);
+    }
+  }
+
+  // Paste zones
+  for (const BoardZoneData& zone : mData->getZones()) {
+    BoardZoneData copy(Uuid::createRandom(), zone);  // assign new UUID
+    copy.setOutline(copy.getOutline().translated(mPosOffset));  // move
+    BI_Zone* item = new BI_Zone(mBoard, copy);
+    execNewChildCmd(new CmdBoardZoneAdd(*item));
+    if (auto graphicsItem = mScene.getZones().value(item)) {
+      graphicsItem->setSelected(true);
     }
   }
 

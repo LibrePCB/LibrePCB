@@ -155,6 +155,10 @@ BI_Device::BI_Device(Board& board, ComponentInstance& compInstance,
   connect(&mBoard, &Board::designRulesModified, this,
           &BI_Device::updateHoleStopMaskOffsets);
 
+  // Notify about board layer changes.
+  connect(&mBoard, &Board::innerLayerCountChanged, this,
+          [this]() { onEdited.notify(Event::BoardLayersChanged); });
+
   // Emit the "attributesChanged" signal when the board or component instance
   // has emitted it.
   connect(&mBoard, &Board::attributesChanged, this,
