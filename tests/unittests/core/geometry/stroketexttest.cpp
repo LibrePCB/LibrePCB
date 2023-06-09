@@ -43,15 +43,16 @@ class StrokeTextTest : public ::testing::Test {};
 
 TEST_F(StrokeTextTest, testConstructFromSExpression) {
   SExpression sexpr = SExpression::parse(
-      "(stroke_text 0a8d7180-68e1-4749-bf8c-538b0d88f08c (layer bot_placement) "
-      "(height 1.0) (stroke_width 0.2) (letter_spacing auto) "
-      "(line_spacing auto) (align left bottom) (position 1.234 2.345) "
-      "(rotation 45.0) (auto_rotate true) (mirror true) (value \"Foo Bar\"))",
+      "(stroke_text 0a8d7180-68e1-4749-bf8c-538b0d88f08c "
+      "(layer bot_names) (height 1.0) (stroke_width 0.2) "
+      "(letter_spacing auto) (line_spacing auto) (align left bottom) "
+      "(position 1.234 2.345) (rotation 45.0) (auto_rotate true) "
+      "(mirror true) (value \"Foo Bar\"))",
       FilePath());
   StrokeText obj(sexpr);
   EXPECT_EQ(Uuid::fromString("0a8d7180-68e1-4749-bf8c-538b0d88f08c"),
             obj.getUuid());
-  EXPECT_EQ("bot_placement", obj.getLayer().getId());
+  EXPECT_EQ("bot_names", obj.getLayer().getId());
   EXPECT_EQ(PositiveLength(1000000), obj.getHeight());
   EXPECT_EQ(UnsignedLength(200000), obj.getStrokeWidth());
   EXPECT_EQ(tl::nullopt, obj.getLetterSpacing().getRatio());

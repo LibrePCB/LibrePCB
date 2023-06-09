@@ -112,7 +112,7 @@ const QSet<const Layer*>&
       &Layer::boardDocumentation(),
       &Layer::boardComments(),
       &Layer::boardGuide(),
-      &Layer::topPlacement(),
+      &Layer::topLegend(),
       // &Layer::topHiddenGrabAreas(), -> makes no sense in boards
       &Layer::topDocumentation(),
       &Layer::topNames(),
@@ -122,7 +122,7 @@ const QSet<const Layer*>&
       &Layer::topGlue(),
       &Layer::topSolderPaste(),
       &Layer::topStopMask(),
-      &Layer::botPlacement(),
+      &Layer::botLegend(),
       // &Layer::botHiddenGrabAreas(), -> makes no sense in boards
       &Layer::botDocumentation(),
       &Layer::botNames(),

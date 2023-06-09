@@ -183,7 +183,7 @@ QList<QString> BoardLayersDock::getCommonLayers() const noexcept {
 
 QList<QString> BoardLayersDock::getTopLayers() const noexcept {
   QList<QString> layers;
-  layers.append(Theme::Color::sBoardPlacementTop);
+  layers.append(Theme::Color::sBoardLegendTop);
   layers.append(Theme::Color::sBoardReferencesTop);
   layers.append(Theme::Color::sBoardGrabAreasTop);
   // layers.append(Theme::Color::sBoardTestPointsTop);
@@ -197,7 +197,7 @@ QList<QString> BoardLayersDock::getTopLayers() const noexcept {
 
 QList<QString> BoardLayersDock::getBottomLayers() const noexcept {
   QList<QString> layers;
-  layers.append(Theme::Color::sBoardPlacementBot);
+  layers.append(Theme::Color::sBoardLegendBot);
   layers.append(Theme::Color::sBoardReferencesBot);
   layers.append(Theme::Color::sBoardGrabAreasBot);
   // layers.append(Theme::Color::sBoardTestPointsBot);

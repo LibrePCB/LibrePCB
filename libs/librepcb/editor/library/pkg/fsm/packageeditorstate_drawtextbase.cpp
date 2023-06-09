@@ -366,7 +366,7 @@ void PackageEditorState_DrawTextBase::resetToDefaultParameters() noexcept {
       break;
     default:
       // Set properties to something reasonable
-      mLastLayer = &Layer::topPlacement();
+      mLastLayer = &Layer::topLegend();
       mLastHeight = PositiveLength(2000000);
       mLastStrokeWidth = UnsignedLength(200000);
       mLastAlignment = Alignment(HAlign::left(), VAlign::bottom());

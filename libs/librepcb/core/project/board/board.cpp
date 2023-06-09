@@ -91,8 +91,8 @@ Board::Board(Project& project,
     mPcbThickness(1600000),  // 1.6mm
     mSolderResist(&PcbColor::green()),
     mSilkscreenColor(&PcbColor::white()),
-    mSilkscreenLayersTop({&Layer::topPlacement(), &Layer::topNames()}),
-    mSilkscreenLayersBot({&Layer::botPlacement(), &Layer::botNames()}),
+    mSilkscreenLayersTop({&Layer::topLegend(), &Layer::topNames()}),
+    mSilkscreenLayersBot({&Layer::botLegend(), &Layer::botNames()}),
     mDrcMessageApprovalsVersion(Application::getFileFormatVersion()),
     mDrcMessageApprovals(),
     mSupportedDrcMessageApprovals() {

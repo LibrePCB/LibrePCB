@@ -62,7 +62,7 @@ protected:  // Methods
   void checkMissingTexts(MsgList& msgs) const;
   void checkWrongTextLayers(MsgList& msgs) const;
   void checkPadsClearanceToPads(MsgList& msgs) const;
-  void checkPadsClearanceToPlacement(MsgList& msgs) const;
+  void checkPadsClearanceToLegend(MsgList& msgs) const;
   void checkPadsAnnularRing(MsgList& msgs) const;
   void checkPadsConnectionPoint(MsgList& msgs) const;
   void checkCustomPadOutline(MsgList& msgs) const;

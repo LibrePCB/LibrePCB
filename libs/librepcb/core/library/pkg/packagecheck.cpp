@@ -57,7 +57,7 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkMissingTexts(msgs);
   checkWrongTextLayers(msgs);
   checkPadsClearanceToPads(msgs);
-  checkPadsClearanceToPlacement(msgs);
+  checkPadsClearanceToLegend(msgs);
   checkPadsAnnularRing(msgs);
   checkPadsConnectionPoint(msgs);
   checkCustomPadOutline(msgs);
@@ -211,13 +211,13 @@ void PackageCheck::checkPadsClearanceToPads(MsgList& msgs) const {
   }
 }
 
-void PackageCheck::checkPadsClearanceToPlacement(MsgList& msgs) const {
+void PackageCheck::checkPadsClearanceToLegend(MsgList& msgs) const {
   for (auto itFtp = mPackage.getFootprints().begin();
        itFtp != mPackage.getFootprints().end(); ++itFtp) {
     std::shared_ptr<const Footprint> footprint = itFtp.ptr();
 
-    QPainterPath topPlacement;
-    QPainterPath botPlacement;
+    QPainterPath topLegend;
+    QPainterPath botLegend;
     for (const Polygon& polygon : footprint->getPolygons()) {
       QPen pen(Qt::NoPen);
       if (polygon.getLineWidth() > 0) {
@@ -230,10 +230,10 @@ void PackageCheck::checkPadsClearanceToPlacement(MsgList& msgs) const {
       }
       QPainterPath area = Toolbox::shapeFromPath(
           polygon.getPath().toQPainterPathPx(), pen, brush);
-      if (polygon.getLayer() == Layer::topPlacement()) {
-        topPlacement.addPath(area);
-      } else if (polygon.getLayer() == Layer::botPlacement()) {
-        botPlacement.addPath(area);
+      if (polygon.getLayer() == Layer::topLegend()) {
+        topLegend.addPath(area);
+      } else if (polygon.getLayer() == Layer::botLegend()) {
+        botLegend.addPath(area);
       }
     }
 
@@ -251,13 +251,13 @@ void PackageCheck::checkPadsClearanceToPlacement(MsgList& msgs) const {
                               .withOffset(clearance - tolerance)
                               .toFilledQPainterPathPx());
       if (pad->isOnLayer(Layer::topCopper()) &&
-          stopMask.intersects(topPlacement)) {
-        msgs.append(std::make_shared<MsgPadOverlapsWithPlacement>(
+          stopMask.intersects(topLegend)) {
+        msgs.append(std::make_shared<MsgPadOverlapsWithLegend>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString(),
             clearance));
       } else if (pad->isOnLayer(Layer::botCopper()) &&
-                 stopMask.intersects(botPlacement)) {
-        msgs.append(std::make_shared<MsgPadOverlapsWithPlacement>(
+                 stopMask.intersects(botLegend)) {
+        msgs.append(std::make_shared<MsgPadOverlapsWithLegend>(
             footprint, pad, pkgPad ? *pkgPad->getName() : QString(),
             clearance));
       }

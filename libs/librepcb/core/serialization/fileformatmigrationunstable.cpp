@@ -65,6 +65,10 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+  const QString fp = "package.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  upgradeLayers(root);
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -83,6 +87,16 @@ void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
 void FileFormatMigrationUnstable::upgradeWorkspaceData(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+  const QString settingsFp = "settings.lp";
+  if (dir.fileExists(settingsFp)) {
+    SExpression root =
+        SExpression::parse(dir.read(settingsFp), dir.getAbsPath(settingsFp));
+    root.replaceRecursive(SExpression::createToken("board_placement_top"),
+                          SExpression::createToken("board_legend_top"));
+    root.replaceRecursive(SExpression::createToken("board_placement_bottom"),
+                          SExpression::createToken("board_legend_bottom"));
+    dir.write(settingsFp, root.toByteArray());
+  }
 }
 
 /*******************************************************************************
@@ -113,47 +127,12 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-
-  {
-    SExpression& node = root.getChild("fabrication_output_settings");
-    SExpression& drillNode = node.getChild("drills");
-    if (drillNode.getChild("suffix_merged/@0").getValue().contains("DRILLS")) {
-      // Default suffixes.
-      drillNode.appendChild(
-          "suffix_buried",
-          QString("_DRILLS-PLATED-{{START_LAYER}}-{{END_LAYER}}.drl"));
-    } else {
-      // Protel suffixes.
-      drillNode.appendChild("suffix_buried",
-                            QString("_L{{START_NUMBER}}-L{{END_NUMBER}}.drl"));
-    }
-  }
-
-  {
-    SExpression& node = root.getChild("design_rule_check");
-    node.appendChild("blind_vias_allowed", SExpression::createToken("false"));
-    node.appendChild("buried_vias_allowed", SExpression::createToken("false"));
-  }
-
-  const UnsignedLength stopMaskMaxViaDiameter = deserialize<UnsignedLength>(
-      root.getChild("design_rules/stopmask_max_via_drill_diameter/@0"));
-  for (SExpression* segNode : root.getChildren("netsegment")) {
-    for (SExpression* viaNode : segNode->getChildren("via")) {
-      viaNode->appendChild("from", SExpression::createToken("top_cu"));
-      viaNode->appendChild("to", SExpression::createToken("bot_cu"));
-      const PositiveLength drill =
-          deserialize<PositiveLength>(viaNode->getChild("drill/@0"));
-      if (drill > stopMaskMaxViaDiameter) {
-        viaNode->appendChild("exposure", SExpression::createToken("auto"));
-      } else {
-        viaNode->appendChild("exposure", SExpression::createToken("off"));
-      }
-    }
-  }
+  upgradeLayers(root);
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {
   Q_UNUSED(root);
+  upgradeLayers(root);
 }
 
 /*******************************************************************************

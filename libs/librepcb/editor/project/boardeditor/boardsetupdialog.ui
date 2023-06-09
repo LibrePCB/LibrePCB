@@ -91,7 +91,7 @@
        <item row="4" column="0">
         <widget class="QLabel" name="lblSilkscreenColor">
          <property name="text">
-          <string>Silkscreen:</string>
+          <string>Silkscreen Color:</string>
          </property>
         </widget>
        </item>
@@ -123,7 +123,7 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QCheckBox" name="cbxSilkTopPlacement">
+            <widget class="QCheckBox" name="cbxSilkTopLegend">
              <property name="text">
               <string notr="true"/>
              </property>
@@ -154,7 +154,7 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_7">
            <item>
-            <widget class="QCheckBox" name="cbxSilkBotPlacement">
+            <widget class="QCheckBox" name="cbxSilkBotLegend">
              <property name="text">
               <string notr="true"/>
              </property>
@@ -187,7 +187,7 @@
        <item row="5" column="0">
         <widget class="QLabel" name="label_31">
          <property name="text">
-          <string>Silkscreen Content:</string>
+          <string>Silkscreen Layers:</string>
          </property>
         </widget>
        </item>
@@ -883,10 +883,10 @@ QAbstractScrollArea {
   <tabstop>edtPcbThickness</tabstop>
   <tabstop>cbxSolderResist</tabstop>
   <tabstop>cbxSilkscreenColor</tabstop>
-  <tabstop>cbxSilkTopPlacement</tabstop>
+  <tabstop>cbxSilkTopLegend</tabstop>
   <tabstop>cbxSilkTopNames</tabstop>
   <tabstop>cbxSilkTopValues</tabstop>
-  <tabstop>cbxSilkBotPlacement</tabstop>
+  <tabstop>cbxSilkBotLegend</tabstop>
   <tabstop>cbxSilkBotNames</tabstop>
   <tabstop>cbxSilkBotValues</tabstop>
   <tabstop>edtRulesStopMaskClrMin</tabstop>
@@ -910,7 +910,7 @@ QAbstractScrollArea {
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGroupRulesInnerPadShape"/>
   <buttongroup name="btnGroupRulesCmpSidePadShape"/>
+  <buttongroup name="btnGroupRulesInnerPadShape"/>
  </buttongroups>
 </ui>

@@ -58,7 +58,7 @@ Layer::~Layer() noexcept {
 
 const Layer& Layer::mirrored(int innerLayers) const noexcept {
   static QHash<const Layer*, const Layer*> map = {
-      {&topPlacement(), &botPlacement()},
+      {&topLegend(), &botLegend()},
       {&topDocumentation(), &botDocumentation()},
       {&topHiddenGrabAreas(), &botHiddenGrabAreas()},
       {&topNames(), &botNames()},
@@ -190,16 +190,15 @@ const Layer& Layer::boardGuide() noexcept {
   return layer;
 }
 
-const Layer& Layer::topPlacement() noexcept {
-  static Layer layer("top_placement", tr("Top Placement"),
-                     Theme::Color::sBoardPlacementTop, Flag::Board | Flag::Top);
+const Layer& Layer::topLegend() noexcept {
+  static Layer layer("top_legend", tr("Top Legend"),
+                     Theme::Color::sBoardLegendTop, Flag::Board | Flag::Top);
   return layer;
 }
 
-const Layer& Layer::botPlacement() noexcept {
-  static Layer layer("bot_placement", tr("Bottom Placement"),
-                     Theme::Color::sBoardPlacementBot,
-                     Flag::Board | Flag::Bottom);
+const Layer& Layer::botLegend() noexcept {
+  static Layer layer("bot_legend", tr("Bottom Legend"),
+                     Theme::Color::sBoardLegendBot, Flag::Board | Flag::Bottom);
   return layer;
 }
 
@@ -386,7 +385,7 @@ const QVector<const Layer*>& Layer::all() noexcept {
           &boardDocumentation(),  //
           &boardComments(),  //
           &boardGuide(),  //
-          &topPlacement(),  //
+          &topLegend(),  //
           &topDocumentation(),  //
           &topHiddenGrabAreas(),  //
           &topNames(),  //
@@ -401,7 +400,7 @@ const QVector<const Layer*>& Layer::all() noexcept {
       innerCopper() +
       QVector<const Layer*>{
           &botCopper(),  //
-          &botPlacement(),  //
+          &botLegend(),  //
           &botDocumentation(),  //
           &botHiddenGrabAreas(),  //
           &botNames(),  //

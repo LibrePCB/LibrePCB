@@ -621,9 +621,9 @@ void PackageEditorWidget::updateOpenGlScene() noexcept {
   data->setSolderResist(&PcbColor::green());
   data->setSilkscreen(&PcbColor::white());
   data->setSilkscreenLayersTop(
-      {&Layer::topPlacement(), &Layer::topNames(), &Layer::topValues()});
+      {&Layer::topLegend(), &Layer::topNames(), &Layer::topValues()});
   data->setSilkscreenLayersBot(
-      {&Layer::botPlacement(), &Layer::botNames(), &Layer::botValues()});
+      {&Layer::botLegend(), &Layer::botNames(), &Layer::botValues()});
   data->setStepAlphaValue(0.7);
   if (mCurrentFootprint) {
     for (const FootprintPad& pad : mCurrentFootprint->getPads()) {
@@ -675,7 +675,7 @@ void PackageEditorWidget::updateOpenGlScene() noexcept {
         StrokeTextSpacing(), PositiveLength(10000000), UnsignedLength(1000000),
         Alignment(HAlign::center(), VAlign::center()), Angle::deg0(), true,
         tr("Please select a footprint."));
-    data->addStroke(Layer::topPlacement(), paths, Length(1000000), Transform());
+    data->addStroke(Layer::topLegend(), paths, Length(1000000), Transform());
   }
 
   mOpenGlSceneBuildScheduled = false;

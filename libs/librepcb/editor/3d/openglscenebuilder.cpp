@@ -241,11 +241,11 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
             ClipperLib::pftNonZero);
         paths = ClipperHelpers::flattenTree(*tree);
         publishTriangleData(
-            transform.map(Layer::topPlacement()).getId(),
+            transform.map(Layer::topLegend()).getId(),
             color->toSilkscreenColor(),
             extrude(paths, (d + 0.052) * side, 0.01 * side, scaleFactor));
       } else {
-        publishTriangleData(transform.map(Layer::topPlacement()).getId(),
+        publishTriangleData(transform.map(Layer::topLegend()).getId(),
                             Qt::transparent, {});
       }
       if (mAbort) return;

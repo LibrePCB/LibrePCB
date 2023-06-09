@@ -90,10 +90,10 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   }
   mUi->lblNoteAboutSettingsHandover->setText(
       "*) " % mUi->lblNoteAboutSettingsHandover->text());
-  mUi->cbxSilkTopPlacement->setText(Layer::topPlacement().getNameTr());
+  mUi->cbxSilkTopLegend->setText(Layer::topLegend().getNameTr());
   mUi->cbxSilkTopNames->setText(Layer::topNames().getNameTr());
   mUi->cbxSilkTopValues->setText(Layer::topValues().getNameTr());
-  mUi->cbxSilkBotPlacement->setText(Layer::botPlacement().getNameTr());
+  mUi->cbxSilkBotLegend->setText(Layer::botLegend().getNameTr());
   mUi->cbxSilkBotNames->setText(Layer::botNames().getNameTr());
   mUi->cbxSilkBotValues->setText(Layer::botValues().getNameTr());
 
@@ -280,18 +280,14 @@ void BoardSetupDialog::load() noexcept {
       QVariant::fromValue(mBoard.getSolderResist())));
   mUi->cbxSilkscreenColor->setCurrentIndex(mUi->cbxSilkscreenColor->findData(
       QVariant::fromValue(&mBoard.getSilkscreenColor())));
-  const QVector<const Layer*>& topSilkscreen = mBoard.getSilkscreenLayersTop();
-  mUi->cbxSilkTopPlacement->setChecked(
-      topSilkscreen.contains(&Layer::topPlacement()));
-  mUi->cbxSilkTopNames->setChecked(topSilkscreen.contains(&Layer::topNames()));
-  mUi->cbxSilkTopValues->setChecked(
-      topSilkscreen.contains(&Layer::topValues()));
-  const QVector<const Layer*>& botSilkscreen = mBoard.getSilkscreenLayersBot();
-  mUi->cbxSilkBotPlacement->setChecked(
-      botSilkscreen.contains(&Layer::botPlacement()));
-  mUi->cbxSilkBotNames->setChecked(botSilkscreen.contains(&Layer::botNames()));
-  mUi->cbxSilkBotValues->setChecked(
-      botSilkscreen.contains(&Layer::botValues()));
+  const QVector<const Layer*>& topLegend = mBoard.getSilkscreenLayersTop();
+  mUi->cbxSilkTopLegend->setChecked(topLegend.contains(&Layer::topLegend()));
+  mUi->cbxSilkTopNames->setChecked(topLegend.contains(&Layer::topNames()));
+  mUi->cbxSilkTopValues->setChecked(topLegend.contains(&Layer::topValues()));
+  const QVector<const Layer*>& botLegend = mBoard.getSilkscreenLayersBot();
+  mUi->cbxSilkBotLegend->setChecked(botLegend.contains(&Layer::botLegend()));
+  mUi->cbxSilkBotNames->setChecked(botLegend.contains(&Layer::botNames()));
+  mUi->cbxSilkBotValues->setChecked(botLegend.contains(&Layer::botValues()));
 
   // Tab: Design Rules
   const BoardDesignRules& r = mBoard.getDesignRules();
@@ -439,8 +435,8 @@ bool BoardSetupDialog::apply() noexcept {
 QVector<const Layer*> BoardSetupDialog::getTopSilkscreenLayers() const
     noexcept {
   QVector<const Layer*> layers;
-  if (mUi->cbxSilkTopPlacement->isChecked()) {
-    layers << &Layer::topPlacement();
+  if (mUi->cbxSilkTopLegend->isChecked()) {
+    layers << &Layer::topLegend();
   }
   if (mUi->cbxSilkTopNames->isChecked()) {
     layers << &Layer::topNames();
@@ -454,8 +450,8 @@ QVector<const Layer*> BoardSetupDialog::getTopSilkscreenLayers() const
 QVector<const Layer*> BoardSetupDialog::getBotSilkscreenLayers() const
     noexcept {
   QVector<const Layer*> layers;
-  if (mUi->cbxSilkBotPlacement->isChecked()) {
-    layers << &Layer::botPlacement();
+  if (mUi->cbxSilkBotLegend->isChecked()) {
+    layers << &Layer::botLegend();
   }
   if (mUi->cbxSilkBotNames->isChecked()) {
     layers << &Layer::botNames();

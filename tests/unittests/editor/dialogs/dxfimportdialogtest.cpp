@@ -53,7 +53,7 @@ protected:
   DxfImportDialogTest() {
     mLayers.append(&Layer::boardOutlines());
     mLayers.append(&Layer::boardComments());
-    mLayers.append(&Layer::topPlacement());
+    mLayers.append(&Layer::topLegend());
     mLayers.append(&Layer::topDocumentation());
     QSettings().clear();
   }
