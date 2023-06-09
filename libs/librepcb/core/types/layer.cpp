@@ -150,20 +150,22 @@ const Layer& Layer::boardSheetFrames() noexcept {
 
 const Layer& Layer::boardOutlines() noexcept {
   static Layer layer("brd_outlines", tr("Board Outlines"),
-                     Theme::Color::sBoardOutlines, Flag::Board);
+                     Theme::Color::sBoardOutlines,
+                     Flag::Board | Flag::BoardEdge);
   return layer;
 }
 
 const Layer& Layer::boardCutouts() noexcept {
   static Layer layer("brd_cutouts", tr("Board Cutouts"),
                      Theme::Color::sBoardOutlines,  // No dedicated theme layer.
-                     Flag::Board);
+                     Flag::Board | Flag::BoardEdge);
   return layer;
 }
 
 const Layer& Layer::boardPlatedCutouts() noexcept {
   static Layer layer("brd_plated_cutouts", tr("Plated Board Cutouts"),
-                     Theme::Color::sBoardPlatedCutouts, Flag::Board);
+                     Theme::Color::sBoardPlatedCutouts,
+                     Flag::Board | Flag::BoardEdge);
   return layer;
 }
 

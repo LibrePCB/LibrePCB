@@ -120,7 +120,10 @@ const Layer& EagleTypeConverter::convertLayer(int id) {
       eagleLayerName = "unrouted";
       break;
     case 20:  // dimension
-      return Layer::boardOutlines();
+      // Note: We cannot know whether we need to return Layer::boardOutlines()
+      // or Layer::boardCutouts(), but for footprints the dimension layer is
+      // more likely used for cutouts.
+      return Layer::boardCutouts();
     case 21:  // tPlace
       return Layer::topLegend();
     case 22:  // bPlace

@@ -68,6 +68,9 @@ void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   const QString fp = "package.lp";
   SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
   upgradeLayers(root);
+  for (SExpression* fptNode : root.getChildren("footprint")) {
+    upgradeCutouts(*fptNode, nullptr);
+  }
   dir.write(fp, root.toByteArray());
 }
 
@@ -128,6 +131,7 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
   Q_UNUSED(root);
   Q_UNUSED(context);
   upgradeLayers(root);
+  upgradeCutouts(root, &context);
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {

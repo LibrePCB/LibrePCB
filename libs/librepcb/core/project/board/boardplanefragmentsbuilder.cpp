@@ -136,6 +136,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
   data->board = &board;
   data->layers = layers;
   layers.insert(&Layer::boardOutlines());
+  layers.insert(&Layer::boardCutouts());
   foreach (const BI_Device* device, board.getDeviceInstances()) {
     const Transform transform(*device);
     foreach (const BI_FootprintPad* pad, device->getPads()) {
@@ -263,14 +264,20 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
 
   // Determine board area.
   QVector<Path> boardOutlines;
+  QVector<Path> boardCutouts;
   foreach (const PolygonData& polygon, data->polygons) {
-    if (polygon.layer == &Layer::boardOutlines()) {
+    if ((polygon.layer == &Layer::boardOutlines()) && polygon.path.isClosed()) {
       boardOutlines.append(polygon.path);
+    } else if ((polygon.layer == &Layer::boardCutouts()) &&
+               polygon.path.isClosed()) {
+      boardCutouts.append(polygon.path);
     }
   }
   ClipperLib::Paths boardArea =
       ClipperHelpers::convert(boardOutlines, maxArcTolerance());
-  ClipperHelpers::unite(boardArea, ClipperLib::pftEvenOdd);
+  ClipperHelpers::subtract(
+      boardArea, ClipperHelpers::convert(boardCutouts, maxArcTolerance()),
+      ClipperLib::pftNonZero, ClipperLib::pftNonZero);
 
   // Sort planes: First by priority, then by uuid to get a really unique
   // priority order over all existing planes. This way we can ensure that even

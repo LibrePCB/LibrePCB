@@ -103,6 +103,8 @@ private:  // Methods
       const THole& hole, BoardDesignRuleCheckSettings::AllowedSlots allowed);
   ClipperLib::Paths getBoardClearanceArea(
       const UnsignedLength& clearance) const;
+  QVector<Path> getBoardOutlines(const QSet<const Layer*>& layers) const
+      noexcept;
   const ClipperLib::Paths& getCopperPaths(
       const Layer& layer, const QSet<const NetSignal*>& netsignals);
   ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,

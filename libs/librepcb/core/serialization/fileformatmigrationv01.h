@@ -94,6 +94,8 @@ protected:
     int nonRoundViaCount = 0;
     int planeCount = 0;
     int planeConnectNoneCount = 0;
+    int footprintBoardOutlinesObjectCount = 0;
+    int topLevelBoardOutlinesObjectCount = 0;
   };
 
 public:
@@ -127,6 +129,7 @@ protected:  // Methods
   virtual void upgradeBoardDesignRules(SExpression& root);
   virtual void upgradeBoardDrcSettings(SExpression& root);
   virtual void upgradeGrid(SExpression& node);
+  virtual void upgradeCutouts(SExpression& node, ProjectContext* context);
   virtual void upgradeHoles(SExpression& node, bool isBoardHole);
   virtual void upgradeLayers(SExpression& node);
   virtual void upgradeStrings(SExpression& root);

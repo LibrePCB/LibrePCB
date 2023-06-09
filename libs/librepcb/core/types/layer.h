@@ -52,6 +52,7 @@ public:
     Copper = (1 << 20),
     StopMask = (1 << 21),
     SolderPaste = (1 << 22),
+    BoardEdge = (1 << 23),
   };
   Q_DECLARE_FLAGS(Flags, Flag)
 
@@ -142,6 +143,16 @@ public:
   bool isSolderPaste() const noexcept {
     return mFlags.testFlag(Flag::SolderPaste);
   }
+
+  /**
+   * @brief Check if this is a layer defining the board edge
+   *
+   * This is true for #boardOutlines(), #boardCutouts() and
+   * #boardPlatedCutouts().
+   *
+   * @return Whether this is a board edge layer or not
+   */
+  bool isBoardEdge() const noexcept { return mFlags.testFlag(Flag::BoardEdge); }
 
   /**
    * @brief Get the copper layer number

@@ -1198,54 +1198,51 @@ void BoardDesignRuleCheck::checkCourtyardClearances(int progressEnd) {
 void BoardDesignRuleCheck::checkBoardOutline(int progressEnd) {
   emitStatus(tr("Check board outline..."));
 
-  // Collect all board outline objects and report open polygons.
-  QVector<Path> outlines;
+  // Report all open polygons.
+  const QSet<const Layer*> allOutlineLayers = {
+      &Layer::boardOutlines(),
+      &Layer::boardCutouts(),
+      &Layer::boardPlatedCutouts(),
+  };
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (polygon->getData().getLayer() == Layer::boardOutlines()) {
-      outlines.append(polygon->getData().getPath());
+    if (allOutlineLayers.contains(&polygon->getData().getLayer()) &&
+        (!polygon->getData().getPath().isClosed())) {
+      const QVector<Path> locations =
+          polygon->getData().getPath().toOutlineStrokes(PositiveLength(
+              std::max(*polygon->getData().getLineWidth(), Length(100000))));
+      emitMessage(std::make_shared<DrcMsgOpenBoardOutlinePolygon>(
+          nullptr, polygon->getData().getUuid(), locations));
     }
   }
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    const Transform transform(*device);
+    Transform transform(*device);
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      if (polygon.getLayer() == Layer::boardOutlines()) {
-        const Path path = transform.map(polygon.getPath());
-        if (!path.isClosed()) {
-          const QVector<Path> locations = path.toOutlineStrokes(PositiveLength(
-              std::max(*polygon.getLineWidth(), Length(100000))));
-          emitMessage(std::make_shared<DrcMsgOpenBoardOutlinePolygon>(
-              device, polygon, locations));
-        }
-        outlines.append(path);
-      }
-    }
-    for (Circle circle : device->getLibFootprint().getCircles()) {
-      if (circle.getLayer() == Layer::boardOutlines()) {
-        const Path path = Path::circle(circle.getDiameter())
-                              .translated(transform.map(circle.getCenter()));
-        outlines.append(path);
+      if (allOutlineLayers.contains(&polygon.getLayer()) &&
+          (!polygon.getPath().isClosed())) {
+        const QVector<Path> locations =
+            transform.map(polygon.getPath())
+                .toOutlineStrokes(PositiveLength(
+                    std::max(*polygon.getLineWidth(), Length(100000))));
+        emitMessage(std::make_shared<DrcMsgOpenBoardOutlinePolygon>(
+            device, polygon.getUuid(), locations));
       }
     }
   }
 
-  // Check if there's at least one board outline.
+  // Check if there's exactly one board outline.
+  const QVector<Path> outlines = getBoardOutlines({&Layer::boardOutlines()});
   if (outlines.isEmpty()) {
     emitMessage(std::make_shared<DrcMsgMissingBoardOutline>());
+  } else if (outlines.count() > 1) {
+    emitMessage(std::make_shared<DrcMsgMultipleBoardOutlines>(outlines));
   }
 
   // Determine actually drawn board area.
+  QVector<Path> allOutlines = getBoardOutlines(allOutlineLayers);
   ClipperLib::Paths drawnBoardArea =
-      ClipperHelpers::convert(outlines, maxArcTolerance());
+      ClipperHelpers::convert(allOutlines, maxArcTolerance());
   const std::unique_ptr<ClipperLib::PolyTree> drawnBoardAreaTree =
       ClipperHelpers::uniteToTree(drawnBoardArea, ClipperLib::pftEvenOdd);
-
-  // Check if there are multiple independent boards.
-  const ClipperLib::Paths flattenedBoardArea =
-      ClipperHelpers::flattenTree(*drawnBoardAreaTree);
-  if (flattenedBoardArea.size() > 1) {
-    QVector<Path> locations = ClipperHelpers::convert(flattenedBoardArea);
-    emitMessage(std::make_shared<DrcMsgMultipleBoardOutlines>(locations));
-  }
 
   // Check if the board outline can be manufactured with the smallest tool.
   const UnsignedLength minEdgeRadius(mSettings.getMinOutlineToolDiameter() / 2);
@@ -1365,30 +1362,48 @@ bool BoardDesignRuleCheck::requiresHoleSlotWarning(
 
 ClipperLib::Paths BoardDesignRuleCheck::getBoardClearanceArea(
     const UnsignedLength& clearance) const {
+  const QVector<Path> outlines = getBoardOutlines({
+      &Layer::boardOutlines(),
+      &Layer::boardCutouts(),
+  });
+
   ClipperLib::Paths result;
   const PositiveLength clearanceWidth(
       std::max(clearance + clearance - maxArcTolerance() - 1, Length(1)));
+  foreach (const Path& outline, outlines) {
+    const ClipperLib::Paths clipperPaths = ClipperHelpers::convert(
+        outline.toOutlineStrokes(clearanceWidth), maxArcTolerance());
+    result.insert(result.end(), clipperPaths.begin(), clipperPaths.end());
+  }
+  ClipperHelpers::unite(result, ClipperLib::pftNonZero);
+  return result;
+}
+
+QVector<Path> BoardDesignRuleCheck::getBoardOutlines(
+    const QSet<const Layer*>& layers) const noexcept {
+  QVector<Path> outlines;
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
-    if (polygon->getData().getLayer() == Layer::boardOutlines()) {
-      const ClipperLib::Paths paths = ClipperHelpers::convert(
-          polygon->getData().getPath().toOutlineStrokes(clearanceWidth),
-          maxArcTolerance());
-      result.insert(result.end(), paths.begin(), paths.end());
+    if (layers.contains(&polygon->getData().getLayer()) &&
+        polygon->getData().getPath().isClosed()) {
+      outlines.append(polygon->getData().getPath());
     }
   }
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     Transform transform(*device);
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      if (polygon.getLayer() == Layer::boardOutlines()) {
-        const ClipperLib::Paths paths = ClipperHelpers::convert(
-            transform.map(polygon.getPath()).toOutlineStrokes(clearanceWidth),
-            maxArcTolerance());
-        result.insert(result.end(), paths.begin(), paths.end());
+      if (layers.contains(&polygon.getLayer()) &&
+          polygon.getPath().isClosed()) {
+        outlines.append(transform.map(polygon.getPath()));
+      }
+    }
+    for (const Circle& circle : device->getLibFootprint().getCircles()) {
+      if (layers.contains(&circle.getLayer())) {
+        outlines.append(transform.map(
+            Path::circle(circle.getDiameter()).translate(circle.getCenter())));
       }
     }
   }
-  ClipperHelpers::unite(result, ClipperLib::pftNonZero);
-  return result;
+  return outlines;
 }
 
 const ClipperLib::Paths& BoardDesignRuleCheck::getCopperPaths(

@@ -170,7 +170,7 @@ class DrcMsgOpenBoardOutlinePolygon final : public RuleCheckMessage {
 public:
   // Constructors / Destructor
   DrcMsgOpenBoardOutlinePolygon() = delete;
-  DrcMsgOpenBoardOutlinePolygon(const BI_Device* device, const Polygon& polygon,
+  DrcMsgOpenBoardOutlinePolygon(const BI_Device* device, const Uuid& polygon,
                                 const QVector<Path>& locations) noexcept;
   DrcMsgOpenBoardOutlinePolygon(
       const DrcMsgOpenBoardOutlinePolygon& other) noexcept
