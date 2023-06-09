@@ -62,7 +62,7 @@ DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider(
   // asymmetric board layers
   addLayer(theme, Theme::Color::sBoardFrames);
   addLayer(theme, Theme::Color::sBoardOutlines);
-  addLayer(theme, Theme::Color::sBoardMilling);
+  addLayer(theme, Theme::Color::sBoardPlatedCutouts);
   addLayer(theme, Theme::Color::sBoardHoles);
   addLayer(theme, Theme::Color::sBoardVias);
   addLayer(theme, Theme::Color::sBoardPads);

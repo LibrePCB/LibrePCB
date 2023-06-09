@@ -108,7 +108,7 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
   addColor(Color::sBoardSelection,             brd, tr("Selection"),                QColor(120, 170, 255, 255), QColor(150, 200, 255, 80));
   addColor(Color::sBoardFrames,                brd, tr("Frames"),                   QColor("#96E0E0E0"),        QColor("#FFFFFFFF"));
   addColor(Color::sBoardOutlines,              brd, tr("Outlines"),                 QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"));
-  addColor(Color::sBoardMilling,               brd, tr("Milling"),                  QColor("#C800DDFF"),        QColor("#FF00FFFF"));
+  addColor(Color::sBoardPlatedCutouts,         brd, tr("Plated Cutouts"),           QColor("#C800DDFF"),        QColor("#FF00FFFF"));
   addColor(Color::sBoardHoles,                 brd, tr("Holes"),                    QColor("#C8FFFFFF"),        QColor("#FFFFFFFF"));
   addColor(Color::sBoardPads,                  brd, tr("Pads"),                     QColor("#966DB515"),        QColor("#B44EFC14"));
   addColor(Color::sBoardVias,                  brd, tr("Vias"),                     QColor("#966DB515"),        QColor("#B44EFC14"));

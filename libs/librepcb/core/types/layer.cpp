@@ -154,9 +154,9 @@ const Layer& Layer::boardOutlines() noexcept {
   return layer;
 }
 
-const Layer& Layer::boardMillingPth() noexcept {
-  static Layer layer("brd_milling_pth", tr("Milling (PTH)"),
-                     Theme::Color::sBoardMilling, Flag::Board);
+const Layer& Layer::boardPlatedCutouts() noexcept {
+  static Layer layer("brd_plated_cutouts", tr("Plated Board Cutouts"),
+                     Theme::Color::sBoardPlatedCutouts, Flag::Board);
   return layer;
 }
 
@@ -379,7 +379,7 @@ const QVector<const Layer*>& Layer::all() noexcept {
           &symbolPinNames(),  //
           &boardSheetFrames(),  //
           &boardOutlines(),  //
-          &boardMillingPth(),  //
+          &boardPlatedCutouts(),  //
           &boardMeasures(),  //
           &boardAlignment(),  //
           &boardDocumentation(),  //

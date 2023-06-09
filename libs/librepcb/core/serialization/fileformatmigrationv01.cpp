@@ -854,6 +854,10 @@ void FileFormatMigrationV01::upgradeLayers(SExpression& node) {
   node.replaceRecursive(SExpression::createToken("brd_sheet_frames"),
                         SExpression::createToken("brd_frames"));
 
+  // Rename "brd_milling_pth" to "brd_plated_cutouts".
+  node.replaceRecursive(SExpression::createToken("brd_milling_pth"),
+                        SExpression::createToken("brd_plated_cutouts"));
+
   // Remove nodes on never officially existing layer "brd_keepout".
   SExpression search = SExpression::createList("layer");
   search.appendChild(SExpression::createToken("brd_keepout"));

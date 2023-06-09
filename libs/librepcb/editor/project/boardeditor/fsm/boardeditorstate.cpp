@@ -106,7 +106,7 @@ const QSet<const Layer*>&
   static const QSet<const Layer*> layers = {
       &Layer::boardSheetFrames(),
       &Layer::boardOutlines(),
-      &Layer::boardMillingPth(),
+      &Layer::boardPlatedCutouts(),
       &Layer::boardMeasures(),
       &Layer::boardAlignment(),
       &Layer::boardDocumentation(),
