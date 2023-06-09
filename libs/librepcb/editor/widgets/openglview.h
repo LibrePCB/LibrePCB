@@ -65,7 +65,7 @@ public:
   void zoomOut() noexcept;
   void zoomAll() noexcept;
   void startSpinning() noexcept;
-  void stopSpinning() noexcept;
+  void stopSpinning(QString errorMsg) noexcept;
 
   // Operator Overloadings
   OpenGlView& operator=(const OpenGlView& rhs) = delete;
@@ -80,6 +80,8 @@ protected:
   void paintGL() override;
 
 private:
+  QScopedPointer<QVBoxLayout> mLayout;
+  QScopedPointer<QLabel> mErrorLabel;
   bool mInitialized;
   QOpenGLShaderProgram mProgram;
   QMatrix4x4 mProjection;

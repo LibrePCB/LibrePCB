@@ -72,6 +72,8 @@ static const char* sFragmentShader =
 OpenGlView::OpenGlView(QWidget* parent) noexcept
   : QOpenGLWidget(parent),
     QOpenGLFunctions(),
+    mLayout(new QVBoxLayout(this)),
+    mErrorLabel(new QLabel(this)),
     mInitialized(false),
     mIdleTimeMs(0),
     mWaitingSpinner(new WaitingSpinnerWidget(this)),
@@ -79,6 +81,12 @@ OpenGlView::OpenGlView(QWidget* parent) noexcept
   QSurfaceFormat fmt = format();
   fmt.setSamples(4);
   setFormat(fmt);
+
+  mErrorLabel->setStyleSheet("color: red; font-weight: bold;");
+  mErrorLabel->setAlignment(Qt::AlignCenter);
+  mErrorLabel->setWordWrap(true);
+  mErrorLabel->hide();
+  mLayout->addWidget(mErrorLabel.data());
 
   mAnimation->setDuration(500);
   mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
@@ -148,8 +156,14 @@ void OpenGlView::startSpinning() noexcept {
   mWaitingSpinner->show();
 }
 
-void OpenGlView::stopSpinning() noexcept {
+void OpenGlView::stopSpinning(QString errorMsg) noexcept {
   mWaitingSpinner->hide();
+  if (errorMsg.isEmpty()) {
+    mErrorLabel->hide();
+  } else {
+    mErrorLabel->setText(errorMsg);
+    mErrorLabel->show();
+  }
 }
 
 /*******************************************************************************

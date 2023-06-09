@@ -102,8 +102,9 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
   timer.start();
   qDebug() << "Start building board 3D scene in worker thread...";
 
+  QString errorMsg;
   emit started();
-  auto sg = scopeGuard([this]() { emit finished(); });
+  auto sg = scopeGuard([this, &errorMsg]() { emit finished(errorMsg); });
 
   try {
     // Preprocess the data.
@@ -114,6 +115,14 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
         1.0 / std::max(std::max(width, height).toMm(), qreal(1));
     const qreal d = data->getThickness()->toMm() / 2;
     if (mAbort) return;
+
+    // Show error if the board outline is invalid.
+    if ((width <= 0) || (height <= 0)) {
+      errorMsg = tr("The board outline is invalid. Please add exactly one "
+                    "polygon on the '%1' layer and make sure it is closed. "
+                    "For more information, check out the documentation.")
+                     .arg(Layer::boardOutlines().getNameTr());
+    }
 
     // Convert holes to areas.
     ClipperLib::Paths platedHoles =
@@ -276,6 +285,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
   } catch (const Exception& e) {
     qCritical().noquote() << "Failed to build 3D scene after" << timer.elapsed()
                           << "ms:" << e.getMsg();
+    errorMsg = QStringList{errorMsg, e.getMsg()}.join("\n\n");
   }
 }
 
