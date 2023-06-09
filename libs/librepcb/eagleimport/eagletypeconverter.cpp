@@ -183,7 +183,7 @@ const Layer& EagleTypeConverter::convertLayer(int id) {
       eagleLayerName = "holes";
       break;
     case 46:  // milling
-      return Layer::boardPlatedCutouts();
+      return Layer::boardCutouts();
     case 47:  // measures
       return Layer::boardDocumentation();
     case 48:  // document

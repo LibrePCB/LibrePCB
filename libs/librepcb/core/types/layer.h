@@ -178,6 +178,7 @@ public:
   static const Layer& symbolPinNames() noexcept;  // Used by Eagle import
   static const Layer& boardSheetFrames() noexcept;
   static const Layer& boardOutlines() noexcept;
+  static const Layer& boardCutouts() noexcept;
   static const Layer& boardPlatedCutouts() noexcept;
   static const Layer& boardMeasures() noexcept;
   static const Layer& boardAlignment() noexcept;

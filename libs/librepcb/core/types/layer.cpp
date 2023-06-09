@@ -154,6 +154,13 @@ const Layer& Layer::boardOutlines() noexcept {
   return layer;
 }
 
+const Layer& Layer::boardCutouts() noexcept {
+  static Layer layer("brd_cutouts", tr("Board Cutouts"),
+                     Theme::Color::sBoardOutlines,  // No dedicated theme layer.
+                     Flag::Board);
+  return layer;
+}
+
 const Layer& Layer::boardPlatedCutouts() noexcept {
   static Layer layer("brd_plated_cutouts", tr("Plated Board Cutouts"),
                      Theme::Color::sBoardPlatedCutouts, Flag::Board);
@@ -379,6 +386,7 @@ const QVector<const Layer*>& Layer::all() noexcept {
           &symbolPinNames(),  //
           &boardSheetFrames(),  //
           &boardOutlines(),  //
+          &boardCutouts(),  //
           &boardPlatedCutouts(),  //
           &boardMeasures(),  //
           &boardAlignment(),  //
