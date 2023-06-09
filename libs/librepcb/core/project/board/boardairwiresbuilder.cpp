@@ -126,19 +126,21 @@ QVector<std::pair<const BI_NetLineAnchor*, const BI_NetLineAnchor*>>
   foreach (const BI_Plane* plane, mNetSignal.getBoardPlanes()) {
     Q_ASSERT(plane);
     if (&plane->getBoard() != &mBoard) continue;
-    const int planeLayer = plane->getLayer().getCopperNumber();
-    foreach (const Path& fragment, plane->getFragments()) {
-      int lastId = -1;
-      for (auto it = pointLayerMap.begin(); it != pointLayerMap.end(); it++) {
-        const Point& pos = std::get<0>(it.value());
-        const int startLayer = std::get<1>(it.value());
-        const int endLayer = std::get<2>(it.value());
-        if ((planeLayer >= startLayer) && (planeLayer <= endLayer) &&
-            fragment.toQPainterPathPx().contains(pos.toPxQPointF())) {
-          if (lastId >= 0) {
-            builder.addEdge(lastId, it.key());
+    for (auto it = plane->getFragments().begin(); it != plane->getFragments().end(); it++) {
+      const int planeLayer = it.key()->getCopperNumber();
+      foreach (const Path& fragment, it.value()) {
+        int lastId = -1;
+        for (auto it = pointLayerMap.begin(); it != pointLayerMap.end(); it++) {
+          const Point& pos = std::get<0>(it.value());
+          const int startLayer = std::get<1>(it.value());
+          const int endLayer = std::get<2>(it.value());
+          if ((planeLayer >= startLayer) && (planeLayer <= endLayer) &&
+              fragment.toQPainterPathPx().contains(pos.toPxQPointF())) {
+            if (lastId >= 0) {
+              builder.addEdge(lastId, it.key());
+            }
+            lastId = it.key();
           }
-          lastId = it.key();
         }
       }
     }

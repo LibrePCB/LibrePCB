@@ -91,10 +91,9 @@ void BoardClipperPathGenerator::addCopper(
   // Planes.
   if (!ignorePlanes) {
     foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-      if ((plane->getLayer() == layer) &&
-          (netsignals.isEmpty() ||
-           netsignals.contains(plane->getNetSignal()))) {
-        addPlane(*plane);
+      if (netsignals.isEmpty() ||
+           netsignals.contains(plane->getNetSignal())) {
+        addPlane(*plane, layer);
       }
     }
   }
@@ -179,8 +178,8 @@ void BoardClipperPathGenerator::addNetLine(const BI_NetLine& netLine,
                         ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
 }
 
-void BoardClipperPathGenerator::addPlane(const BI_Plane& plane) {
-  foreach (const Path& p, plane.getFragments()) {
+void BoardClipperPathGenerator::addPlane(const BI_Plane& plane, const Layer& layer) {
+  foreach (const Path& p, plane.getFragments().value(&layer)) {
     ClipperHelpers::unite(mPaths,
                           {ClipperHelpers::convert(p, mMaxArcTolerance)},
                           ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);

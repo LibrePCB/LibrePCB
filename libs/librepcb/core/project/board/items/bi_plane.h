@@ -94,7 +94,7 @@ public:
     return mThermalSpokeWidth;
   }
   const Path& getOutline() const noexcept { return mOutline; }
-  const QVector<Path>& getFragments() const noexcept { return mFragments; }
+  const QHash<const Layer*, QVector<Path>>& getFragments() const noexcept { return mFragments; }
   bool isLocked() const noexcept { return mLocked; }
   bool isVisible() const noexcept { return mIsVisible; }
 
@@ -111,7 +111,8 @@ public:
   void setKeepIslands(bool keep) noexcept;
   void setLocked(bool locked) noexcept;
   void setVisible(bool visible) noexcept;
-  void setCalculatedFragments(const QVector<Path>& fragments) noexcept;
+  void setCalculatedFragments(const Layer& layer,
+                              const QVector<Path>& fragments) noexcept;
 
   // General Methods
   void addToBoard() override;
@@ -126,6 +127,9 @@ public:
 
   // Operator Overloadings
   BI_Plane& operator=(const BI_Plane& rhs) = delete;
+
+private:  // Methods
+  void checkLayers(const QSet<const Layer*>& layers);
 
 private:  // Data
   Uuid mUuid;
@@ -142,7 +146,7 @@ private:  // Data
   bool mLocked;
   bool mIsVisible;  // volatile, not saved to file
 
-  QVector<Path> mFragments;
+  QHash<const Layer*, QVector<Path>> mFragments;
 };
 
 /*******************************************************************************

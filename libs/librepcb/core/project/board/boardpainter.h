@@ -115,11 +115,6 @@ class BoardPainter final : public GraphicsPagePainter {
     QList<HoleData> holes;
   };
 
-  struct Plane {
-    const Layer* layer;
-    QVector<Path> fragments;
-  };
-
   struct ColorContent {
     QList<QPainterPath> areas;
     QList<QPainterPath> thtPadAreas;  ///< Drawn on Theme::Color::sBoardPads
@@ -155,7 +150,7 @@ private:  // Data
   QList<Footprint> mFootprints;
   QList<ViaData> mVias;
   QList<Trace> mTraces;
-  QList<Plane> mPlanes;
+  QHash<const Layer*, QVector<Path>> mPlanes;
   QList<PolygonData> mPolygons;
   QList<StrokeTextData> mStrokeTexts;
   QList<HoleData> mHoles;

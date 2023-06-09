@@ -327,10 +327,9 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error,
-        tr("Min. plane width on '%1': %2 < %3 %4",
-           "Placeholders: Layer name, actual width, minimum width, unit")
-            .arg(plane.getLayer().getNameTr(),
-                 plane.getMinWidth()->toMmString(), minWidth->toMmString(),
+        tr("Min. plane width: %1 < %2 %3",
+           "Placeholders: Actual width, minimum width, unit")
+            .arg(plane.getMinWidth()->toMmString(), minWidth->toMmString(),
                  "mm"),
         tr("The configured minimum width of the plane is smaller than the "
            "minimum copper width configured in the DRC settings.") %

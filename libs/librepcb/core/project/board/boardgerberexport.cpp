@@ -672,15 +672,13 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   // draw planes
   foreach (const BI_Plane* plane, mBoard.getPlanes()) {
     Q_ASSERT(plane);
-    if (plane->getLayer() == layer) {
-      foreach (const Path& fragment, plane->getFragments()) {
+      foreach (const Path& fragment, plane->getFragments().value(&layer)) {
         gen.drawPathArea(
             fragment, GerberAttribute::ApertureFunction::Conductor,
             plane->getNetSignal()
                 ? tl::make_optional(*plane->getNetSignal()->getName())
                 : tl::nullopt,
             QString());
-      }
     }
   }
 

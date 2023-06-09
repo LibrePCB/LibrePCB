@@ -118,9 +118,11 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
         Board& board, const QSet<const Layer*>* filter) noexcept {
   QSet<const Layer*> layersWithPlanes;
   foreach (const BI_Plane* plane, board.getPlanes()) {
+    foreach (const Layer* layer, plane->getLayers()) {
     if ((!filter) ||
-        (plane->isVisible() && filter->contains(&plane->getLayer()))) {
-      layersWithPlanes.insert(&plane->getLayer());
+        (plane->isVisible() && filter->contains(layer))) {
+      layersWithPlanes.insert(layer);
+    }
     }
   }
 
@@ -186,9 +188,9 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
     }
   }
   foreach (const BI_Plane* plane, board.getPlanes()) {
-    if (layers.contains(&plane->getLayer())) {
+    if (!(plane->getLayers() & layers).isEmpty()) {
       data->planes.append(
-          PlaneData{plane->getUuid(), &plane->getLayer(),
+          PlaneData{plane->getUuid(), plane->getLayers() & layers,
                     plane->getNetSignal()
                         ? tl::make_optional(plane->getNetSignal()->getUuid())
                         : tl::nullopt,
@@ -317,6 +319,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
 
   // Build all planes.
   for (auto it = data->planes.begin(); it != data->planes.end(); it++) {
+    foreach (const Layer* layer, it->layers) {
     try {
       ClipperLib::Paths removedAreas;
       ClipperLib::Paths connectedNetSignalAreas;
@@ -342,12 +345,12 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
 
       // Collect other planes.
       for (auto otherIt = data->planes.begin(); otherIt != it; otherIt++) {
-        if ((otherIt->layer == it->layer) &&
+        if ((otherIt->layers.contains(layer)) &&
             (otherIt->netSignal != it->netSignal)) {
           const UnsignedLength clearance =
               std::max(it->minClearance, otherIt->minClearance);
           ClipperLib::Paths clipperPaths = ClipperHelpers::convert(
-              data->result.value(otherIt->uuid), maxArcTolerance());
+              data->result.value(otherIt->uuid).value(layer), maxArcTolerance());
           ClipperHelpers::offset(clipperPaths, *clearance,
                                  maxArcTolerance());  // can throw
           removedAreas.insert(removedAreas.end(), clipperPaths.begin(),
@@ -360,7 +363,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
 
       // Collect keepout zones.
       foreach (const KeepoutZoneData& zone, data->keepoutZones) {
-        if (zone.boardLayers.contains(it->layer)) {
+        if (zone.boardLayers.contains(layer)) {
           const ClipperLib::Path clipperPath =
               ClipperHelpers::convert(zone.outline, maxArcTolerance());
           removedAreas.push_back(clipperPath);
@@ -385,8 +388,8 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       // Collect vias.
       foreach (const ViaData& via, data->vias) {
         if ((via.startLayer->getCopperNumber() >
-             it->layer->getCopperNumber()) ||
-            (via.endLayer->getCopperNumber() < it->layer->getCopperNumber())) {
+             layer->getCopperNumber()) ||
+            (via.endLayer->getCopperNumber() < layer->getCopperNumber())) {
           continue;
         }
         if (it->netSignal && (via.netSignal == it->netSignal)) {
@@ -414,7 +417,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
 
       // Collect traces & other strokes.
       foreach (const PolygonData& polygon, data->polygons) {
-        if (polygon.layer == it->layer) {
+        if (polygon.layer == layer) {
           if (it->netSignal && (polygon.netSignal == it->netSignal)) {
             // Same net signal -> memorize as connected area.
             if (polygon.filled) {
@@ -467,7 +470,7 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       ClipperLib::Paths thermalPadClearanceAreas;
       foreach (const PadData& pad, data->pads) {
         const bool sameNet = it->netSignal && (pad.netSignal == it->netSignal);
-        foreach (const PadGeometry& geometry, pad.geometries.value(it->layer)) {
+        foreach (const PadGeometry& geometry, pad.geometries.value(layer)) {
           if (sameNet) {
             // Same net signal -> memorize as connected area.
             const QVector<Path> paths =
@@ -684,13 +687,14 @@ std::shared_ptr<BoardPlaneFragmentsBuilder::JobData>
       }
 
       // Memorize fragments for this plane.
-      data->result[it->uuid] = ClipperHelpers::convert(fragments);
+      data->result[it->uuid][layer] = ClipperHelpers::convert(fragments);
     } catch (const Exception& e) {
       qCritical() << "Failed to calculate plane areas, leaving empty:"
                   << e.getMsg();
       if (exceptionOnError) {
         throw;
       }
+    }
     }
   }
 
@@ -779,8 +783,10 @@ bool BoardPlaneFragmentsBuilder::applyToBoard(
     bool modified = false;
     for (auto it = data->result.begin(); it != data->result.end(); it++) {
       if (BI_Plane* plane = data->board->getPlanes().value(it.key())) {
-        modified = modified || (plane->getFragments() != it.value());
-        plane->setCalculatedFragments(it.value());
+      for (auto it2 = it.value().begin(); it2 != it.value().end(); it2++) {
+        modified = modified || (plane->getFragments().value(it2.key()) != it2.value());
+        plane->setCalculatedFragments(*it2.key(), it2.value());
+      }
       }
     }
     if (!data->finished) {

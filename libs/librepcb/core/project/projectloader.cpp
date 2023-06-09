@@ -749,9 +749,13 @@ void ProjectLoader::loadBoardPlane(Board& b, const SExpression& node) {
         __FILE__, __LINE__,
         QString("Inexistent net signal: '%1'").arg(netSignalUuid->toStr()));
   }
+  QSet<const Layer*> layers;
+  foreach (const SExpression* child, node.getChildren("layer")) {
+    layers.insert(&deserialize<const Layer&>(child->getChild("@0")));
+  }
   BI_Plane* plane =
       new BI_Plane(b, deserialize<Uuid>(node.getChild("@0")),
-                   deserialize<const Layer&>(node.getChild("layer/@0")),
+                   layers,
                    netSignal, Path(node));
   plane->setMinWidth(
       deserialize<UnsignedLength>(node.getChild("min_width/@0")));

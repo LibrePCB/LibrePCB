@@ -71,7 +71,7 @@ public:
                  bool ignorePlanes = false);
   void addVia(const BI_Via& via, const Length& offset = Length(0));
   void addNetLine(const BI_NetLine& netLine, const Length& offset = Length(0));
-  void addPlane(const BI_Plane& plane);
+  void addPlane(const BI_Plane& plane, const Layer& layer);
   void addPolygon(const Path& path, const UnsignedLength& lineWidth,
                   bool filled);
   void addCircle(const Circle& circle, const Transform& transform,

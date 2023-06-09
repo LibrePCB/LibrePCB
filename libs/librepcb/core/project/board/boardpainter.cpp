@@ -96,7 +96,9 @@ BoardPainter::BoardPainter(const Board& board)
     mFootprints.append(fpt);
   }
   foreach (const BI_Plane* plane, board.getPlanes()) {
-    mPlanes.append(Plane{&plane->getLayer(), plane->getFragments()});
+    for (auto it = plane->getFragments().begin(); it != plane->getFragments().end(); it++) {
+      mPlanes[it.key()].append(it.value());
+    }
   }
   foreach (const BI_Polygon* polygon, board.getPolygons()) {
     mPolygons.append(PolygonData{
@@ -294,9 +296,9 @@ void BoardPainter::initContentByColor() const noexcept {
     }
 
     // Planes.
-    foreach (const Plane& plane, mPlanes) {
-      const QString color = plane.layer->getThemeColor();
-      foreach (const Path& path, plane.fragments) {
+    for (auto it = mPlanes.begin(); it != mPlanes.end(); it++) {
+      const QString color = it.key()->getThemeColor();
+      foreach (const Path& path, it.value()) {
         mContentByColor[color].areas.append(path.toQPainterPathPx());
       }
     }

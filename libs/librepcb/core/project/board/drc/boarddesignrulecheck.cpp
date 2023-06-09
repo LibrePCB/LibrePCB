@@ -165,7 +165,7 @@ void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
 
   // planes
   foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-    if (!mBoard.getCopperLayers().contains(&plane->getLayer())) {
+    if ((plane->getLayers() & mBoard.getCopperLayers()).isEmpty()) {
       continue;
     }
     if (plane->getMinWidth() < minWidth) {
@@ -232,8 +232,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
     const BI_Base* item;
     const Polygon* polygon;  // Only relevant if item is a BI_Device
     const Circle* circle;  // Only relevant if item is a BI_Device
-    const Layer* startLayer;
-    const Layer* endLayer;
+    const QSet<const Layer*> layers;
     const NetSignal* netSignal;  // nullptr = no net
     Length clearance;
     ClipperLib::Paths copperArea;  // Exact copper outlines
@@ -251,8 +250,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                              Item{via,
                                   nullptr,
                                   nullptr,
-                                  &via->getVia().getStartLayer(),
-                                  &via->getVia().getEndLayer(),
+                                  via->getCopperLayers(),
                                   via->getNetSegment().getNetSignal(),
                                   *clearance,
                                   {},
@@ -270,8 +268,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
                                Item{netLine,
                                     nullptr,
                                     nullptr,
-                                    &netLine->getLayer(),
-                                    &netLine->getLayer(),
+                                    {&netLine->getLayer()},
                                     netLine->getNetSegment().getNetSignal(),
                                     *clearance,
                                     {},
@@ -287,13 +284,11 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
   // Planes.
   if (!mIgnorePlanes) {
     foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-      if (mBoard.getCopperLayers().contains(&plane->getLayer())) {
         auto it = items.insert(items.end(),
                                Item{plane,
                                     nullptr,
                                     nullptr,
-                                    &plane->getLayer(),
-                                    &plane->getLayer(),
+                                    plane->getLayers() & mBoard.getCopperLayers(),
                                     plane->getNetSignal(),
                                     *clearance,
                                     {},
@@ -303,7 +298,6 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
         it->clearanceArea = it->copperArea;
         ClipperHelpers::offset(it->clearanceArea, clearance - tolerance,
                                maxArcTolerance());
-      }
     }
   }
 

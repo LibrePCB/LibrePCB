@@ -61,6 +61,16 @@ BI_Via::~BI_Via() noexcept {
  *  Getters
  ******************************************************************************/
 
+QSet<const Layer*> BI_Via::getCopperLayers() const noexcept {
+  QSet<const Layer*> layers;
+  foreach (const Layer* layer, mBoard.getCopperLayers()) {
+    if (mVia.isOnLayer(*layer)) {
+      layers.insert(layer);
+    }
+  }
+  return layers;
+}
+
 tl::optional<std::pair<const Layer*, const Layer*>> BI_Via::getDrillLayerSpan()
     const noexcept {
   // If start layer is not enabled, the via is invalid.

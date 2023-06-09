@@ -28,6 +28,7 @@
 #include "../../circuit/netsignal.h"
 #include "../../project.h"
 #include "../board.h"
+#include "../../../types/layer.h"
 #include "../../../utils/toolbox.h"
 #include <QtCore>
 
@@ -72,17 +73,24 @@ void BI_Plane::setOutline(const Path& outline) noexcept {
   if (outline != mOutline) {
     mOutline = outline;
     onEdited.notify(Event::OutlineChanged);
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
   }
 }
 
 void BI_Plane::setLayers(const QSet<const Layer*>& layers) {
-  if (&layers != mLayers) {
+  if (layers != mLayers) {
     checkLayers(layers); // can throw
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
     mLayers = layers;
     onEdited.notify(Event::LayersChanged);
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
+
+    // Remove obsolete fragments.
+    foreach (const Layer* layer, mFragments.keys()) {
+      if (!mLayers.contains(layer)) {
+        mFragments.remove(layer);
+      }
+    }
   }
 }
 
@@ -103,56 +111,56 @@ void BI_Plane::setNetSignal(NetSignal* netsignal) {
       sgl.dismiss();
     }
     mNetSignal = netsignal;
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
   }
 }
 
 void BI_Plane::setMinWidth(const UnsignedLength& minWidth) noexcept {
   if (minWidth != mMinWidth) {
     mMinWidth = minWidth;
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
   }
 }
 
 void BI_Plane::setMinClearance(const UnsignedLength& minClearance) noexcept {
   if (minClearance != mMinClearance) {
     mMinClearance = minClearance;
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
   }
 }
 
 void BI_Plane::setConnectStyle(BI_Plane::ConnectStyle style) noexcept {
   if (style != mConnectStyle) {
     mConnectStyle = style;
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
   }
 }
 
 void BI_Plane::setThermalGap(const PositiveLength& gap) noexcept {
   if (gap != mThermalGap) {
     mThermalGap = gap;
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
   }
 }
 
 void BI_Plane::setThermalSpokeWidth(const PositiveLength& width) noexcept {
   if (width != mThermalSpokeWidth) {
     mThermalSpokeWidth = width;
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
   }
 }
 
 void BI_Plane::setPriority(int priority) noexcept {
   if (priority != mPriority) {
     mPriority = priority;
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
   }
 }
 
 void BI_Plane::setKeepIslands(bool keep) noexcept {
   if (keep != mKeepIslands) {
     mKeepIslands = keep;
-    mBoard.invalidatePlanes(mLayer);
+    mBoard.invalidatePlanes(mLayers);
   }
 }
 
@@ -170,9 +178,9 @@ void BI_Plane::setVisible(bool visible) noexcept {
   }
 }
 
-void BI_Plane::setCalculatedFragments(const QVector<Path>& fragments) noexcept {
-  if (fragments != mFragments) {
-    mFragments = fragments;
+void BI_Plane::setCalculatedFragments(const Layer& layer, const QVector<Path>& fragments) noexcept {
+  if ((mLayers.contains(&layer)) && (fragments != mFragments.value(&layer))) {
+    mFragments[&layer] = fragments;
     onEdited.notify(Event::FragmentsChanged);
     if (mNetSignal) {
       mBoard.scheduleAirWiresRebuild(mNetSignal);
@@ -192,7 +200,7 @@ void BI_Plane::addToBoard() {
     mNetSignal->registerBoardPlane(*this);  // can throw
   }
   BI_Base::addToBoard();
-  mBoard.invalidatePlanes(mLayer);
+  mBoard.invalidatePlanes(mLayers);
   if (mNetSignal) {
     mBoard.scheduleAirWiresRebuild(mNetSignal);
   }
@@ -206,7 +214,7 @@ void BI_Plane::removeFromBoard() {
     mNetSignal->unregisterBoardPlane(*this);  // can throw
   }
   BI_Base::removeFromBoard();
-  mBoard.invalidatePlanes(mLayer);
+  mBoard.invalidatePlanes(mLayers);
   if (mNetSignal) {
     mBoard.scheduleAirWiresRebuild(mNetSignal);
   }
@@ -235,6 +243,19 @@ void BI_Plane::serialize(SExpression& root) const {
   }
   mOutline.serialize(root);
   root.ensureLineBreak();
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void BI_Plane::checkLayers(const QSet<const Layer*>& layers) {
+  foreach (const Layer* layer, layers) {
+    if (!layer->isCopper()) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("Invalid zone layer: %1").arg(layer->getId()));
+    }
+  }
 }
 
 /*******************************************************************************

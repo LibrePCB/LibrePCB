@@ -82,6 +82,7 @@ public:
     return mStopMaskDiameterBottom;
   }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
+  QSet<const Layer*> getCopperLayers() const noexcept;
   tl::optional<std::pair<const Layer*, const Layer*> > getDrillLayerSpan() const
       noexcept;
   TraceAnchor toTraceAnchor() const noexcept override;

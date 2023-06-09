@@ -120,7 +120,7 @@ signals:
 private:  // Methods
   struct PlaneData {
     Uuid uuid;
-    const Layer* layer;
+    QSet<const Layer*> layers;
     tl::optional<Uuid> netSignal;
     Path outline;
     UnsignedLength minWidth;
@@ -181,7 +181,7 @@ private:  // Methods
     QList<PadData> pads;
     QList<std::tuple<Transform, PositiveLength, NonEmptyPath>> holes;
     QList<TraceData> traces;  // Converted to polygons after preprocessing.
-    QHash<Uuid, QVector<Path>> result;
+    QHash<Uuid, QHash<const Layer*, QVector<Path>>> result;
     bool finished = false;
   };
 

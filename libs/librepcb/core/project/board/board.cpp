@@ -225,8 +225,10 @@ std::shared_ptr<SceneData3D> Board::buildScene3D() const noexcept {
     }
   }
   foreach (const BI_Plane* obj, mPlanes) {
-    foreach (const Path& fragment, obj->getFragments()) {
-      data->addArea(obj->getLayer(), fragment, Transform());
+    for (auto it = obj->getFragments().begin(); it != obj->getFragments().end(); it++) {
+      foreach (const Path& fragment, it.value()) {
+        data->addArea(*it.key(), fragment, Transform());
+      }
     }
   }
   foreach (const BI_Polygon* obj, mPolygons) {
@@ -755,7 +757,7 @@ void Board::copyFrom(const Board& other) {
   // Copy planes.
   foreach (const BI_Plane* plane, other.getPlanes()) {
     BI_Plane* copy =
-        new BI_Plane(*this, Uuid::createRandom(), plane->getLayer(),
+        new BI_Plane(*this, Uuid::createRandom(), plane->getLayers(),
                      plane->getNetSignal(), plane->getOutline());
     copy->setMinWidth(plane->getMinWidth());
     copy->setMinClearance(plane->getMinClearance());
@@ -766,7 +768,9 @@ void Board::copyFrom(const Board& other) {
     copy->setThermalSpokeWidth(plane->getThermalSpokeWidth());
     copy->setLocked(plane->isLocked());
     copy->setVisible(plane->isVisible());
-    copy->setCalculatedFragments(plane->getFragments());
+    for (auto it = plane->getFragments().begin(); it != plane->getFragments().end(); it++) {
+    copy->setCalculatedFragments(*it.key(), it.value());
+    }
     addPlane(*copy);
   }
 
