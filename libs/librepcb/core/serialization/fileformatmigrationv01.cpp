@@ -476,6 +476,10 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
       }
       node->setName("api_endpoints");
     }
+    root.replaceRecursive(SExpression::createToken("board_placement_top"),
+                          SExpression::createToken("board_legend_top"));
+    root.replaceRecursive(SExpression::createToken("board_placement_bottom"),
+                          SExpression::createToken("board_legend_bottom"));
     dir.write(settingsFp, root.toByteArray());
   }
 }
@@ -755,7 +759,9 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
 }
 
 void FileFormatMigrationV01::upgradeBoardUserSettings(SExpression& root) {
-  // Layers.
+  upgradeLayers(root);
+
+  // Layer colors.
   foreach (SExpression* node, root.getChildren("layer")) {
     for (const auto tagName : {"color", "color_hl"}) {
       if (SExpression* child = node->tryGetChild(tagName)) {
@@ -841,23 +847,25 @@ void FileFormatMigrationV01::upgradeHoles(SExpression& node, bool isBoardHole) {
 
 void FileFormatMigrationV01::upgradeLayers(SExpression& node) {
   // Rename "sch_scheet_frames" to "sch_frames".
-  SExpression search = SExpression::createList("layer");
-  search.appendChild(SExpression::createToken("sch_scheet_frames"));
-  SExpression replace = SExpression::createList("layer");
-  replace.appendChild(SExpression::createToken("sch_frames"));
-  node.replaceRecursive(search, replace);
+  node.replaceRecursive(SExpression::createToken("sch_scheet_frames"),
+                        SExpression::createToken("sch_frames"));
 
   // Rename "brd_sheet_frames" to "brd_frames".
-  search = SExpression::createList("layer");
-  search.appendChild(SExpression::createToken("brd_sheet_frames"));
-  replace = SExpression::createList("layer");
-  replace.appendChild(SExpression::createToken("brd_frames"));
-  node.replaceRecursive(search, replace);
+  node.replaceRecursive(SExpression::createToken("brd_sheet_frames"),
+                        SExpression::createToken("brd_frames"));
 
   // Remove nodes on never officially existing layer "brd_keepout".
-  search = SExpression::createList("layer");
+  SExpression search = SExpression::createList("layer");
   search.appendChild(SExpression::createToken("brd_keepout"));
   node.removeChildrenWithNodeRecursive(search);
+
+  // Rename "top_placement" to "top_legend".
+  node.replaceRecursive(SExpression::createToken("top_placement"),
+                        SExpression::createToken("top_legend"));
+
+  // Rename "bot_placement" to "bot_legend".
+  node.replaceRecursive(SExpression::createToken("bot_placement"),
+                        SExpression::createToken("bot_legend"));
 }
 
 void FileFormatMigrationV01::upgradeStrings(SExpression& root) {

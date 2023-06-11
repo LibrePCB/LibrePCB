@@ -184,8 +184,8 @@ public:
   static const Layer& boardDocumentation() noexcept;
   static const Layer& boardComments() noexcept;
   static const Layer& boardGuide() noexcept;
-  static const Layer& topPlacement() noexcept;
-  static const Layer& botPlacement() noexcept;
+  static const Layer& topLegend() noexcept;
+  static const Layer& botLegend() noexcept;
   static const Layer& topDocumentation() noexcept;
   static const Layer& botDocumentation() noexcept;
   static const Layer& topHiddenGrabAreas() noexcept;

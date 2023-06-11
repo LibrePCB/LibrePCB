@@ -379,22 +379,22 @@ MsgPadOriginOutsideCopper::MsgPadOriginOutsideCopper(
 }
 
 /*******************************************************************************
- *  MsgPadOverlapsWithPlacement
+ *  MsgPadOverlapsWithLegend
  ******************************************************************************/
 
-MsgPadOverlapsWithPlacement::MsgPadOverlapsWithPlacement(
+MsgPadOverlapsWithLegend::MsgPadOverlapsWithLegend(
     std::shared_ptr<const Footprint> footprint,
     std::shared_ptr<const FootprintPad> pad, const QString& pkgPadName,
     const Length& clearance) noexcept
   : RuleCheckMessage(
         Severity::Warning,
-        tr("Clearance of pad '%1' in '%2' to placement layer")
+        tr("Clearance of pad '%1' in '%2' to legend")
             .arg(pkgPadName, *footprint->getNames().getDefaultValue()),
-        tr("Pads should have at least %1 clearance to the outlines "
-           "layer because outlines are drawn on silkscreen which will "
-           "be cropped for Gerber export.")
+        tr("Pads should have at least %1 clearance to drawings on the "
+           "legend because these drawings would be cropped during the "
+           "Gerber export when used as silkscreen.")
             .arg(QString::number(clearance.toMm() * 1000) % "μm"),
-        "pad_overlaps_placement"),
+        "pad_overlaps_legend"),
     mFootprint(footprint),
     mPad(pad) {
   mApproval.ensureLineBreak();

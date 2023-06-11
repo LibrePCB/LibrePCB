@@ -122,9 +122,9 @@ const Layer& EagleTypeConverter::convertLayer(int id) {
     case 20:  // dimension
       return Layer::boardOutlines();
     case 21:  // tPlace
-      return Layer::topPlacement();
+      return Layer::topLegend();
     case 22:  // bPlace
-      return Layer::botPlacement();
+      return Layer::botLegend();
     case 23:  // tOrigins
       eagleLayerName = "tOrigins";
       break;

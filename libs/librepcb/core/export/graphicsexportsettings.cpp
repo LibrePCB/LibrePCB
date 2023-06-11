@@ -164,7 +164,7 @@ void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
     addColor(Theme::Color::sBoardValuesTop, true);
     addColor(Theme::Color::sBoardCourtyardTop, true);
     addColor(Theme::Color::sBoardGrabAreasTop, true);
-    addColor(Theme::Color::sBoardPlacementTop, true);
+    addColor(Theme::Color::sBoardLegendTop, true);
     addColor(Theme::Color::sBoardGlueTop, true);
     addColor(Theme::Color::sBoardSolderPasteTop, true);
     addColor(Theme::Color::sBoardStopMaskTop, true);
@@ -176,7 +176,7 @@ void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
     addColor(Theme::Color::sBoardStopMaskBot, true);
     addColor(Theme::Color::sBoardSolderPasteBot, true);
     addColor(Theme::Color::sBoardGlueBot, true);
-    addColor(Theme::Color::sBoardPlacementBot, true);
+    addColor(Theme::Color::sBoardLegendBot, true);
     addColor(Theme::Color::sBoardGrabAreasBot, true);
     addColor(Theme::Color::sBoardCourtyardBot, true);
     addColor(Theme::Color::sBoardValuesBot, true);

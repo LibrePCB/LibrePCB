@@ -89,7 +89,7 @@ TEST(BoardClipboardDataTest, testToFromMimeDataPopulated) {
       false, true, false);
 
   BoardStrokeTextData strokeText2(
-      Uuid::createRandom(), Layer::topPlacement(), "text 2", Point(10, 20),
+      Uuid::createRandom(), Layer::topLegend(), "text 2", Point(10, 20),
       Angle(30), PositiveLength(40), UnsignedLength(0),
       StrokeTextSpacing(Ratio(6)), StrokeTextSpacing(),
       Alignment(HAlign::center(), VAlign::bottom()), true, false, true);

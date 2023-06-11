@@ -137,8 +137,8 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   addLayer(Theme::Color::sBoardGrabAreasBot);
   addLayer(Theme::Color::sBoardHiddenGrabAreasTop);
   addLayer(Theme::Color::sBoardHiddenGrabAreasBot);
-  addLayer(Theme::Color::sBoardPlacementTop);
-  addLayer(Theme::Color::sBoardPlacementBot);
+  addLayer(Theme::Color::sBoardLegendTop);
+  addLayer(Theme::Color::sBoardLegendBot);
   addLayer(Theme::Color::sBoardDocumentationTop);
   addLayer(Theme::Color::sBoardDocumentationBot);
   addLayer(Theme::Color::sBoardNamesTop);

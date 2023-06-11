@@ -1470,8 +1470,8 @@ QVector<Path> BoardDesignRuleCheck::getDeviceLocation(
 
   // If there's no documentation, add drawings on placement layer.
   if (locations.isEmpty()) {
-    addDrawing(Layer::topPlacement());
-    addDrawing(Layer::botPlacement());
+    addDrawing(Layer::topLegend());
+    addDrawing(Layer::botLegend());
   }
 
   // Add origin cross.

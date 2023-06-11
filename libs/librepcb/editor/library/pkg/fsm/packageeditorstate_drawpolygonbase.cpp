@@ -57,7 +57,7 @@ PackageEditorState_DrawPolygonBase::PackageEditorState_DrawPolygonBase(
     mCurrentGraphicsItem(nullptr),
     mArcCenter(),
     mArcInSecondState(false),
-    mLastLayer(&Layer::topPlacement()),  // Most important layer
+    mLastLayer(&Layer::topLegend()),  // Most important layer
     mLastLineWidth(200000),  // Typical width according library conventions
     mLastAngle(0),
     mLastFill(false),  // Fill is needed very rarely

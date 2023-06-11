@@ -118,8 +118,8 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
   addColor(Color::sBoardDocumentation,         brd, tr("Documentation"),            QColor("#96E0E0E0"),        QColor("#DCE0E0E0"));
   addColor(Color::sBoardComments,              brd, tr("Comments"),                 QColor("#B4E59500"),        QColor("#DCFFBF00"));
   addColor(Color::sBoardGuide,                 brd, tr("Guide"),                    QColor("#FF808000"),        QColor("#FFA3B200"));
-  addColor(Color::sBoardPlacementTop,          brd, tr("Placement Top"),            QColor("#BBFFFFFF"),        QColor("#FFFFFFFF")  );
-  addColor(Color::sBoardPlacementBot,          brd, tr("Placement Bottom"),         QColor("#BBFFFFFF"),        QColor("#FFFFFFFF")  );
+  addColor(Color::sBoardLegendTop,             brd, tr("Legend Top"),               QColor("#BBFFFFFF"),        QColor("#FFFFFFFF")  );
+  addColor(Color::sBoardLegendBot,             brd, tr("Legend Bottom"),            QColor("#BBFFFFFF"),        QColor("#FFFFFFFF")  );
   addColor(Color::sBoardDocumentationTop,      brd, tr("Documentation Top"),        QColor("#96E0E0E0"),        QColor("#DCE0E0E0")  );
   addColor(Color::sBoardDocumentationBot,      brd, tr("Documentation Bottom"),     QColor("#96E0E0E0"),        QColor("#DCE0E0E0")  );
   addColor(Color::sBoardGrabAreasTop,          brd, tr("Grab Areas Top"),           QColor("#14FFFFFF"),        QColor("#32FFFFFF")  );
@@ -350,9 +350,9 @@ const QSet<QString>& Theme::getCopperColorNames() noexcept {
 }
 
 QString Theme::getGrabAreaColorName(const QString& outlineColorName) noexcept {
-  if (outlineColorName == Color::sBoardPlacementTop) {
+  if (outlineColorName == Color::sBoardLegendTop) {
     return Color::sBoardGrabAreasTop;
-  } else if (outlineColorName == Color::sBoardPlacementBot) {
+  } else if (outlineColorName == Color::sBoardLegendBot) {
     return Color::sBoardGrabAreasBot;
   } else if (outlineColorName == Color::sSchematicOutlines) {
     return Color::sSchematicGrabAreas;

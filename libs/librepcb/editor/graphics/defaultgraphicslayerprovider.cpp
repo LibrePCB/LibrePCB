@@ -82,8 +82,8 @@ DefaultGraphicsLayerProvider::DefaultGraphicsLayerProvider(
   addLayer(theme, Theme::Color::sBoardGrabAreasBot);
   // addLayer(theme, Theme::Color::sBoardHiddenGrabAreasTop); Not needed!
   // addLayer(theme, Theme::Color::sBoardHiddenGrabAreasBot); Not needed!
-  addLayer(theme, Theme::Color::sBoardPlacementTop);
-  addLayer(theme, Theme::Color::sBoardPlacementBot);
+  addLayer(theme, Theme::Color::sBoardLegendTop);
+  addLayer(theme, Theme::Color::sBoardLegendBot);
   addLayer(theme, Theme::Color::sBoardDocumentationTop);
   addLayer(theme, Theme::Color::sBoardDocumentationBot);
   addLayer(theme, Theme::Color::sBoardNamesTop);

@@ -469,25 +469,25 @@ private:
 };
 
 /*******************************************************************************
- *  Class MsgPadOverlapsWithPlacement
+ *  Class MsgPadOverlapsWithLegend
  ******************************************************************************/
 
 /**
- * @brief The MsgPadOverlapsWithPlacement class
+ * @brief The MsgPadOverlapsWithLegend class
  */
-class MsgPadOverlapsWithPlacement final : public RuleCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(MsgPadOverlapsWithPlacement)
+class MsgPadOverlapsWithLegend final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgPadOverlapsWithLegend)
 
 public:
   // Constructors / Destructor
-  MsgPadOverlapsWithPlacement() = delete;
-  MsgPadOverlapsWithPlacement(std::shared_ptr<const Footprint> footprint,
-                              std::shared_ptr<const FootprintPad> pad,
-                              const QString& pkgPadName,
-                              const Length& clearance) noexcept;
-  MsgPadOverlapsWithPlacement(const MsgPadOverlapsWithPlacement& other) noexcept
+  MsgPadOverlapsWithLegend() = delete;
+  MsgPadOverlapsWithLegend(std::shared_ptr<const Footprint> footprint,
+                           std::shared_ptr<const FootprintPad> pad,
+                           const QString& pkgPadName,
+                           const Length& clearance) noexcept;
+  MsgPadOverlapsWithLegend(const MsgPadOverlapsWithLegend& other) noexcept
     : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
-  virtual ~MsgPadOverlapsWithPlacement() noexcept {}
+  virtual ~MsgPadOverlapsWithLegend() noexcept {}
 
   // Getters
   std::shared_ptr<const Footprint> getFootprint() const noexcept {

@@ -93,8 +93,8 @@ public:
     static constexpr const char* sBoardDocumentation       = "board_documentation";
     static constexpr const char* sBoardComments            = "board_comments";
     static constexpr const char* sBoardGuide               = "board_guide";
-    static constexpr const char* sBoardPlacementTop        = "board_placement_top";
-    static constexpr const char* sBoardPlacementBot        = "board_placement_bottom";
+    static constexpr const char* sBoardLegendTop           = "board_legend_top";
+    static constexpr const char* sBoardLegendBot           = "board_legend_bottom";
     static constexpr const char* sBoardDocumentationTop    = "board_documentation_top";
     static constexpr const char* sBoardDocumentationBot    = "board_documentation_bottom";
     static constexpr const char* sBoardGrabAreasTop        = "board_grab_areas_top";
