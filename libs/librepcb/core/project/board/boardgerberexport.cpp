@@ -134,7 +134,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   // Export board outline since this is useful for manual review.
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     Q_ASSERT(polygon);
-    if (polygon->getData().getLayer() == Layer::boardOutlines()) {
+    if (polygon->getData().getLayer().isBoardEdge()) {
       UnsignedLength lineWidth = calcWidthOfLayer(
           polygon->getData().getLineWidth(), polygon->getData().getLayer());
       gen.drawPathOutline(polygon->getData().getPath(), lineWidth,
@@ -397,6 +397,7 @@ void BoardGerberExport::exportLayerBoardOutlines(
                       mProject.getVersion());
   gen.setFileFunctionOutlines(false);
   drawLayer(gen, Layer::boardOutlines());
+  drawLayer(gen, Layer::boardCutouts());
   gen.generate();
   gen.saveToFile(fp);
   mWrittenFiles.append(fp);
@@ -687,7 +688,7 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   // draw polygons
   GerberGenerator::Function graphicsFunction = tl::nullopt;
   tl::optional<QString> graphicsNet = tl::nullopt;
-  if (layer == Layer::boardOutlines()) {
+  if (layer.isBoardEdge()) {
     graphicsFunction = GerberAttribute::ApertureFunction::Profile;
   } else if (layer.isCopper()) {
     graphicsFunction = GerberAttribute::ApertureFunction::Conductor;
@@ -779,7 +780,7 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
                                    const Layer& layer) const {
   GerberGenerator::Function graphicsFunction = tl::nullopt;
   tl::optional<QString> graphicsNet = tl::nullopt;
-  if (layer == Layer::boardOutlines()) {
+  if (layer.isBoardEdge()) {
     graphicsFunction = GerberAttribute::ApertureFunction::Profile;
   } else if (layer.isCopper()) {
     graphicsFunction = GerberAttribute::ApertureFunction::Conductor;
@@ -1016,7 +1017,7 @@ FilePath BoardGerberExport::getOutputFilePath(QString path) const noexcept {
 
 UnsignedLength BoardGerberExport::calcWidthOfLayer(
     const UnsignedLength& width, const Layer& layer) noexcept {
-  if ((layer == Layer::boardOutlines()) && (width < UnsignedLength(1000))) {
+  if ((layer.isBoardEdge()) && (width < UnsignedLength(1000))) {
     return UnsignedLength(1000);  // outlines should have a minimum width of 1um
   } else {
     return width;

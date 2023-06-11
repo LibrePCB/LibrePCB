@@ -89,7 +89,7 @@ public:
 
 signals:
   void started();
-  void finished();
+  void finished(QString errorMsg);
   void objectAdded(std::shared_ptr<librepcb::editor::OpenGlObject> obj);
   void objectRemoved(std::shared_ptr<librepcb::editor::OpenGlObject> obj);
   void objectUpdated(std::shared_ptr<librepcb::editor::OpenGlObject> obj);

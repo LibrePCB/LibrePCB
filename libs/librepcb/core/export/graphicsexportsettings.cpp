@@ -154,7 +154,7 @@ void GraphicsExportSettings::loadColorsFromTheme(const Theme& theme,
     addColor(Theme::Color::sBoardAirWires, true);
     addColor(Theme::Color::sBoardOutlines, true);
     addColor(Theme::Color::sBoardHoles, true);
-    addColor(Theme::Color::sBoardMilling, true);
+    addColor(Theme::Color::sBoardPlatedCutouts, true);
     addColor(Theme::Color::sBoardPads, true);
     addColor(Theme::Color::sBoardVias, true);
 

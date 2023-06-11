@@ -52,6 +52,7 @@ public:
     Copper = (1 << 20),
     StopMask = (1 << 21),
     SolderPaste = (1 << 22),
+    BoardEdge = (1 << 23),
   };
   Q_DECLARE_FLAGS(Flags, Flag)
 
@@ -144,6 +145,16 @@ public:
   }
 
   /**
+   * @brief Check if this is a layer defining the board edge
+   *
+   * This is true for #boardOutlines(), #boardCutouts() and
+   * #boardPlatedCutouts().
+   *
+   * @return Whether this is a board edge layer or not
+   */
+  bool isBoardEdge() const noexcept { return mFlags.testFlag(Flag::BoardEdge); }
+
+  /**
    * @brief Get the copper layer number
    *
    * @return Copper layer number (0 = top, 1 = first inner, 63 = bottom)
@@ -178,7 +189,8 @@ public:
   static const Layer& symbolPinNames() noexcept;  // Used by Eagle import
   static const Layer& boardSheetFrames() noexcept;
   static const Layer& boardOutlines() noexcept;
-  static const Layer& boardMillingPth() noexcept;
+  static const Layer& boardCutouts() noexcept;
+  static const Layer& boardPlatedCutouts() noexcept;
   static const Layer& boardMeasures() noexcept;
   static const Layer& boardAlignment() noexcept;
   static const Layer& boardDocumentation() noexcept;

@@ -102,8 +102,9 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
   timer.start();
   qDebug() << "Start building board 3D scene in worker thread...";
 
+  QString errorMsg;
   emit started();
-  auto sg = scopeGuard([this]() { emit finished(); });
+  auto sg = scopeGuard([this, &errorMsg]() { emit finished(errorMsg); });
 
   try {
     // Preprocess the data.
@@ -115,9 +116,19 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     const qreal d = data->getThickness()->toMm() / 2;
     if (mAbort) return;
 
+    // Show error if the board outline is invalid.
+    if ((width <= 0) || (height <= 0)) {
+      errorMsg = tr("The board outline is invalid. Please add exactly one "
+                    "polygon on the '%1' layer and make sure it is closed. "
+                    "For more information, check out the documentation.")
+                     .arg(Layer::boardOutlines().getNameTr());
+    }
+
     // Convert holes to areas.
-    ClipperLib::Paths platedHoles;
-    ClipperLib::Paths nonPlatedHoles;
+    ClipperLib::Paths platedHoles =
+        getPaths(data, {Layer::boardPlatedCutouts().getId()});
+    ClipperLib::Paths nonPlatedHoles =
+        getPaths(data, {Layer::boardCutouts().getId()});
     QHash<QString, ClipperLib::Paths> copperHoles;
     for (auto& hole : data->getHoles()) {
       const auto paths = ClipperHelpers::convert(
@@ -140,11 +151,11 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     QStringList layers = {Layer::boardOutlines().getId()};
     const ClipperLib::Paths boardOutlines = getPaths(data, layers);
     std::unique_ptr<ClipperLib::PolyTree> tree = ClipperHelpers::subtractToTree(
-        boardOutlines, allHoles, ClipperLib::pftEvenOdd,
+        boardOutlines, allHoles, ClipperLib::pftNonZero,
         ClipperLib::pftNonZero);
     const ClipperLib::Paths boardArea = ClipperHelpers::flattenTree(*tree);
     tree = ClipperHelpers::subtractToTree(boardOutlines, allHoles,
-                                          ClipperLib::pftEvenOdd,
+                                          ClipperLib::pftNonZero,
                                           ClipperLib::pftNonZero, false);
     const ClipperLib::Paths boardEdges = ClipperHelpers::treeToPaths(*tree);
     publishTriangleData(
@@ -156,7 +167,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     // Plated holes.
     tree = ClipperHelpers::intersectToTree(platedHoles, boardOutlines,
                                            ClipperLib::pftNonZero,
-                                           ClipperLib::pftEvenOdd, false);
+                                           ClipperLib::pftNonZero, false);
     platedHoles = ClipperHelpers::treeToPaths(*tree);
     publishTriangleData(
         "pth", QColor(124, 104, 71),
@@ -166,7 +177,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
     // Non-plated holes.
     tree = ClipperHelpers::intersectToTree(nonPlatedHoles, boardOutlines,
                                            ClipperLib::pftNonZero,
-                                           ClipperLib::pftEvenOdd, false);
+                                           ClipperLib::pftNonZero, false);
     nonPlatedHoles = ClipperHelpers::treeToPaths(*tree);
     publishTriangleData(
         "npth", QColor(50, 50, 50),
@@ -195,7 +206,9 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
       if (mAbort) return;
 
       // Solder resist.
-      layers = QStringList{transform.map(Layer::topStopMask()).getId()};
+      layers = QStringList{transform.map(Layer::topStopMask()).getId(),
+                           Layer::boardCutouts().getId(),
+                           Layer::boardPlatedCutouts().getId()};
       ClipperLib::Paths solderResist;
       if (const PcbColor* color = data->getSolderResist()) {
         solderResist = boardOutlines;
@@ -272,6 +285,7 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
   } catch (const Exception& e) {
     qCritical().noquote() << "Failed to build 3D scene after" << timer.elapsed()
                           << "ms:" << e.getMsg();
+    errorMsg = QStringList{errorMsg, e.getMsg()}.join("\n\n");
   }
 }
 

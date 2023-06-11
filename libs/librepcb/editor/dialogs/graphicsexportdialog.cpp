@@ -497,7 +497,7 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
   };
   QSet<QString> cutOutColors = {
       Theme::Color::sBoardHoles,
-      Theme::Color::sBoardMilling,
+      Theme::Color::sBoardPlatedCutouts,
   };
   QSet<QString> assemblyColors = {
       Theme::Color::sBoardGuide,

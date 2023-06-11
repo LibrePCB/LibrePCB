@@ -24,6 +24,7 @@
 
 #include "../fileio/transactionaldirectory.h"
 #include "../fileio/versionfile.h"
+#include "../geometry/path.h"
 #include "../types/alignment.h"
 #include "../types/angle.h"
 #include "../types/length.h"
@@ -32,6 +33,8 @@
 #include "sexpression.h"
 
 #include <QtCore>
+
+#include <algorithm>
 
 /*******************************************************************************
  *  Namespace
@@ -196,6 +199,9 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
 
       // Holes.
       upgradeHoles(*fptNode, false);
+
+      // Move cutouts from the board outlines layer to the new cutouts layer.
+      upgradeCutouts(*fptNode, nullptr);
     }
 
     dir.write(fp, root.toByteArray());
@@ -290,6 +296,13 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
       // Footprints.
       for (SExpression* fptNode : root.getChildren("footprint")) {
         context.holesCount += fptNode->getChildren("hole").count();
+        foreach (
+            const SExpression* geometryNode,
+            fptNode->getChildren("polygon") + fptNode->getChildren("circle")) {
+          if (geometryNode->getChild("layer/@0").getValue() == "brd_outlines") {
+            ++context.footprintBoardOutlinesObjectCount;
+          }
+        }
       }
 
       upgradePackage(subDir);
@@ -442,6 +455,18 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
            "respected for vias. You might want to remove traces now which are "
            "no longer needed to connect these vias."),
         context.planeConnectNoneCount));
+  }
+  if ((context.footprintBoardOutlinesObjectCount > 0) ||
+      (context.topLevelBoardOutlinesObjectCount > 1)) {
+    messages.append(buildMessage(
+        Message::Severity::Warning,
+        tr("Board cutouts now have a dedicated layer, thus nested board "
+           "outline polygons and circles have automatically been moved to the "
+           "cutouts layer. As the auto-detection is not perfect, please "
+           "check if each cutout has been converted correctly. The easiest way "
+           "is to review the PCB in the 3D viewer."),
+        context.footprintBoardOutlinesObjectCount +
+            context.topLevelBoardOutlinesObjectCount));
   }
 }
 
@@ -648,6 +673,7 @@ void FileFormatMigrationV01::upgradeBoard(SExpression& root,
   upgradeBoardDesignRules(root);
   upgradeBoardDrcSettings(root);
   upgradeLayers(root);
+  upgradeCutouts(root, &context);
 
   // Board setup.
   root.appendChild("thickness", SExpression::createToken("1.6"));
@@ -832,6 +858,65 @@ void FileFormatMigrationV01::upgradeGrid(SExpression& node) {
   gridNode.removeChild(gridNode.getChild("type"));
 }
 
+void FileFormatMigrationV01::upgradeCutouts(SExpression& node,
+                                            ProjectContext* context) {
+  // Collect all outline objects.
+  struct OutlineObject {
+    SExpression* node;
+    Path outline;
+    qreal lengthMm;
+  };
+  QVector<OutlineObject> outlineObjects;
+  foreach (SExpression* child, node.getChildren("polygon")) {
+    if (child->getChild("layer/@0").getValue() == "brd_outlines") {
+      OutlineObject obj{child, Path(*child), 0};
+      obj.lengthMm = obj.outline.getTotalStraightLength()->toMm();
+      outlineObjects.append(obj);
+    }
+  }
+  foreach (SExpression* child, node.getChildren("circle")) {
+    if (child->getChild("layer/@0").getValue() == "brd_outlines") {
+      const Point position(*child);
+      const PositiveLength diameter =
+          deserialize<PositiveLength>(child->getChild("diameter/@0"));
+      OutlineObject obj{child, Path::circle(diameter).translated(position),
+                        diameter->toMm() * M_PI};
+      outlineObjects.append(obj);
+    }
+  }
+
+  // Sort by outline length ascending.
+  std::sort(outlineObjects.begin(), outlineObjects.end(),
+            [](const OutlineObject& a, const OutlineObject& b) {
+              return a.lengthMm < b.lengthMm;
+            });
+
+  // Discard the outline which is considered as the outer most board outline.
+  if (!outlineObjects.isEmpty()) {
+    if (context) {
+      // In boards, the longest outline is considered as the board outlines.
+      outlineObjects.removeLast();
+      context->topLevelBoardOutlinesObjectCount += outlineObjects.count();
+    } else {
+      // In footprints, the longest outline is only considered as the board
+      // outlines if there is any pad located *within* the outline.
+      foreach (const SExpression* padNode, node.getChildren("pad")) {
+        const Point padPosition(padNode->getChild("position"));
+        if (outlineObjects.last().outline.toQPainterPathPx().contains(
+                padPosition.toPxQPointF())) {
+          outlineObjects.removeLast();
+          break;
+        }
+      }
+    }
+  }
+
+  // Move all remaining outlines to the new cutouts layer.
+  foreach (const OutlineObject& obj, outlineObjects) {
+    obj.node->getChild("layer/@0").setValue("brd_cutouts");
+  }
+}
+
 void FileFormatMigrationV01::upgradeHoles(SExpression& node, bool isBoardHole) {
   for (SExpression* holeNode : node.getChildren("hole")) {
     holeNode->appendChild("stop_mask", SExpression::createToken("auto"));
@@ -853,6 +938,10 @@ void FileFormatMigrationV01::upgradeLayers(SExpression& node) {
   // Rename "brd_sheet_frames" to "brd_frames".
   node.replaceRecursive(SExpression::createToken("brd_sheet_frames"),
                         SExpression::createToken("brd_frames"));
+
+  // Rename "brd_milling_pth" to "brd_plated_cutouts".
+  node.replaceRecursive(SExpression::createToken("brd_milling_pth"),
+                        SExpression::createToken("brd_plated_cutouts"));
 
   // Remove nodes on never officially existing layer "brd_keepout".
   SExpression search = SExpression::createList("layer");

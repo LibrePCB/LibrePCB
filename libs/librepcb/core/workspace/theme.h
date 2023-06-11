@@ -83,7 +83,7 @@ public:
     static constexpr const char* sBoardDrcMarker           = "board_drc_marker";
     static constexpr const char* sBoardFrames              = "board_frames";
     static constexpr const char* sBoardOutlines            = "board_outlines";
-    static constexpr const char* sBoardMilling             = "board_milling";
+    static constexpr const char* sBoardPlatedCutouts       = "board_plated_cutouts";
     static constexpr const char* sBoardHoles               = "board_holes";
     static constexpr const char* sBoardPads                = "board_pads";
     static constexpr const char* sBoardVias                = "board_vias";

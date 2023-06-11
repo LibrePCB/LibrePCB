@@ -134,7 +134,7 @@ void BI_Polygon::removeFromBoard() {
 void BI_Polygon::invalidatePlanes(const Layer& layer) noexcept {
   if (layer.isCopper()) {
     mBoard.invalidatePlanes(&layer);
-  } else if (layer == Layer::boardOutlines()) {
+  } else if (layer.isBoardEdge()) {
     mBoard.invalidatePlanes();
   }
 }

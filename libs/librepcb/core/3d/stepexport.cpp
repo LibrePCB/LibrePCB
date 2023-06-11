@@ -104,21 +104,24 @@ void StepExport::run(std::shared_ptr<SceneData3D> data, FilePath fp,
     std::unique_ptr<OccModel> model =
         OccModel::createAssembly(data->getProjectName());
 
-    // Add PCB body, if outlines are valid.
+    // Add PCB body, if there is a valid outline.
     emit progressStatus(tr("Exporting PCB..."));
-    QVector<Path> outlines;
+    Path outline;
     for (const auto& obj : data->getAreas()) {
-      if (obj.layer->getId() == Layer::boardOutlines().getId()) {
-        outlines.append(obj.outline);
+      if ((obj.layer->getId() == Layer::boardOutlines().getId()) &&
+          (obj.outline.isClosed())) {
+        outline = obj.outline;
+        break;
       }
     }
-    std::unique_ptr<ClipperLib::PolyTree> tree = ClipperHelpers::uniteToTree(
-        ClipperHelpers::convert(outlines, PositiveLength(5000)),
-        ClipperLib::pftEvenOdd);
-    outlines = ClipperHelpers::convert(ClipperHelpers::flattenTree(*tree));
-    const Path outline = outlines.isEmpty() ? Path() : outlines.first();
-
     QVector<Path> holes;
+    for (const auto& obj : data->getAreas()) {
+      if (((obj.layer->getId() == Layer::boardCutouts().getId()) ||
+           (obj.layer->getId() == Layer::boardPlatedCutouts().getId())) &&
+          (obj.outline.isClosed())) {
+        holes.append(obj.outline);
+      }
+    }
     for (const auto& obj : data->getHoles()) {
       if (!obj.via) {
         holes.append(obj.path->toOutlineStrokes(obj.diameter));

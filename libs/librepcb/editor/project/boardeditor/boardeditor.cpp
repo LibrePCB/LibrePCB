@@ -422,7 +422,7 @@ void BoardEditor::addLayers(const Theme& theme) noexcept {
   // asymmetric board layers
   addLayer(Theme::Color::sBoardFrames, true);
   addLayer(Theme::Color::sBoardOutlines, true);
-  addLayer(Theme::Color::sBoardMilling, true);
+  addLayer(Theme::Color::sBoardPlatedCutouts, true);
   addLayer(Theme::Color::sBoardHoles, true);
   addLayer(Theme::Color::sBoardVias, true);
   addLayer(Theme::Color::sBoardPads, true);

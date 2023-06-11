@@ -131,7 +131,7 @@ void SceneData3D::preprocess(bool center, bool sortDevices, Length* width,
   foreach (const auto& obj, mPolygons) {
     const Layer& layer = obj.transform.map(obj.polygon.getLayer());
     const Path path = obj.transform.map(obj.polygon.getPath());
-    const bool isOutline = (layer.getId() == Layer::boardOutlines().getId());
+    const bool isOutline = layer.isBoardEdge();
     if ((!isOutline) && (obj.polygon.getLineWidth() > 0)) {
       foreach (
           const Path& outline,
@@ -151,7 +151,7 @@ void SceneData3D::preprocess(bool center, bool sortDevices, Length* width,
     const Layer& layer = obj.transform.map(obj.circle.getLayer());
     const Point center = obj.transform.map(obj.circle.getCenter());
     const Path path = Path::circle(obj.circle.getDiameter()).translated(center);
-    const bool isOutline = (layer.getId() == Layer::boardOutlines().getId());
+    const bool isOutline = layer.isBoardEdge();
     if ((!isOutline) && (obj.circle.getLineWidth() > 0)) {
       foreach (
           const Path& outline,

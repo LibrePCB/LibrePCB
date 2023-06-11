@@ -116,7 +116,7 @@ LibraryEditor::LibraryEditor(Workspace& ws, const FilePath& libFp,
   // Add all required board layers.
   addLayer(Theme::Color::sBoardFrames);
   addLayer(Theme::Color::sBoardOutlines);
-  addLayer(Theme::Color::sBoardMilling);
+  addLayer(Theme::Color::sBoardPlatedCutouts);
   addLayer(Theme::Color::sBoardHoles);
   addLayer(Theme::Color::sBoardVias);
   addLayer(Theme::Color::sBoardPads);

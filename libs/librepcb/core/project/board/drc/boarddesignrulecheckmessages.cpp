@@ -205,7 +205,7 @@ DrcMsgMultipleBoardOutlines::DrcMsgMultipleBoardOutlines(
  ******************************************************************************/
 
 DrcMsgOpenBoardOutlinePolygon::DrcMsgOpenBoardOutlinePolygon(
-    const BI_Device* device, const Polygon& polygon,
+    const BI_Device* device, const Uuid& polygon,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Error, tr("Non-closed board outline"),
@@ -221,7 +221,7 @@ DrcMsgOpenBoardOutlinePolygon::DrcMsgOpenBoardOutlinePolygon(
     mApproval.appendChild("device", device->getComponentInstanceUuid());
     mApproval.ensureLineBreak();
   }
-  mApproval.appendChild("polygon", polygon.getUuid());
+  mApproval.appendChild("polygon", polygon);
   mApproval.ensureLineBreak();
 }
 
