@@ -45,6 +45,7 @@ class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
+class BI_Zone;
 class Circle;
 class ComponentInstance;
 class Hole;
@@ -54,6 +55,7 @@ class PadHole;
 class Polygon;
 class StrokeText;
 class Uuid;
+class Zone;
 
 /*******************************************************************************
  *  Class DrcMsgMissingDevice
@@ -377,6 +379,54 @@ private:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgCopperInKeepoutZone
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgCopperInKeepoutZone class
+ */
+class DrcMsgCopperInKeepoutZone final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgCopperInKeepoutZone)
+
+public:
+  // Constructors / Destructor
+  DrcMsgCopperInKeepoutZone() = delete;
+  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
+                            const BI_Device* zoneDevice, const Zone* deviceZone,
+                            const BI_FootprintPad& pad,
+                            const QVector<Path>& locations) noexcept;
+  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
+                            const BI_Device* zoneDevice, const Zone* deviceZone,
+                            const BI_Via& via,
+                            const QVector<Path>& locations) noexcept;
+  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
+                            const BI_Device* zoneDevice, const Zone* deviceZone,
+                            const BI_NetLine& netLine,
+                            const QVector<Path>& locations) noexcept;
+  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
+                            const BI_Device* zoneDevice, const Zone* deviceZone,
+                            const BI_Polygon& polygon,
+                            const QVector<Path>& locations) noexcept;
+  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
+                            const BI_Device* zoneDevice, const Zone* deviceZone,
+                            const BI_Device& device, const Polygon& polygon,
+                            const QVector<Path>& locations) noexcept;
+  DrcMsgCopperInKeepoutZone(const BI_Zone* boardZone,
+                            const BI_Device* zoneDevice, const Zone* deviceZone,
+                            const BI_Device& device, const Circle& circle,
+                            const QVector<Path>& locations) noexcept;
+  DrcMsgCopperInKeepoutZone(const DrcMsgCopperInKeepoutZone& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgCopperInKeepoutZone() noexcept {}
+
+private:
+  void addZoneApprovalNodes(const BI_Zone* boardZone,
+                            const BI_Device* zoneDevice,
+                            const Zone* deviceZone) noexcept;
+  static QString getDescription() noexcept;
+};
+
+/*******************************************************************************
  *  Class DrcMsgDrillDrillClearanceViolation
  ******************************************************************************/
 
@@ -457,6 +507,81 @@ public:
   DrcMsgCourtyardOverlap(const DrcMsgCourtyardOverlap& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~DrcMsgCourtyardOverlap() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgDeviceInKeepoutZone
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgDeviceInKeepoutZone class
+ */
+class DrcMsgDeviceInKeepoutZone final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgDeviceInKeepoutZone)
+
+public:
+  // Constructors / Destructor
+  DrcMsgDeviceInKeepoutZone() = delete;
+  DrcMsgDeviceInKeepoutZone(const BI_Zone* boardZone,
+                            const BI_Device* zoneDevice, const Zone* deviceZone,
+                            const BI_Device& device,
+                            const QVector<Path>& locations) noexcept;
+  DrcMsgDeviceInKeepoutZone(const DrcMsgDeviceInKeepoutZone& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgDeviceInKeepoutZone() noexcept {}
+
+private:
+  void addZoneApprovalNodes(const BI_Zone* boardZone,
+                            const BI_Device* zoneDevice,
+                            const Zone* deviceZone) noexcept;
+  static QString getDescription() noexcept;
+};
+
+/*******************************************************************************
+ *  Class DrcMsgExposureInKeepoutZone
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgExposureInKeepoutZone class
+ */
+class DrcMsgExposureInKeepoutZone final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgExposureInKeepoutZone)
+
+public:
+  // Constructors / Destructor
+  DrcMsgExposureInKeepoutZone() = delete;
+  DrcMsgExposureInKeepoutZone(const BI_Zone* boardZone,
+                              const BI_Device* zoneDevice,
+                              const Zone* deviceZone,
+                              const BI_FootprintPad& pad,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgExposureInKeepoutZone(const BI_Zone* boardZone,
+                              const BI_Device* zoneDevice,
+                              const Zone* deviceZone, const BI_Via& via,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgExposureInKeepoutZone(const BI_Zone* boardZone,
+                              const BI_Device* zoneDevice,
+                              const Zone* deviceZone, const BI_Polygon& polygon,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgExposureInKeepoutZone(const BI_Zone* boardZone,
+                              const BI_Device* zoneDevice,
+                              const Zone* deviceZone, const BI_Device& device,
+                              const Polygon& polygon,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgExposureInKeepoutZone(const BI_Zone* boardZone,
+                              const BI_Device* zoneDevice,
+                              const Zone* deviceZone, const BI_Device& device,
+                              const Circle& circle,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgExposureInKeepoutZone(const DrcMsgExposureInKeepoutZone& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgExposureInKeepoutZone() noexcept {}
+
+private:
+  void addZoneApprovalNodes(const BI_Zone* boardZone,
+                            const BI_Device* zoneDevice,
+                            const Zone* deviceZone) noexcept;
+  static QString getDescription() noexcept;
 };
 
 /*******************************************************************************
@@ -625,6 +750,26 @@ public:
 private:
   static QString determineMessage(const BI_Via& via) noexcept;
   static QString determineDescription(const BI_Via& via) noexcept;
+};
+
+/*******************************************************************************
+ *  Class DrcMsgUselessZone
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgUselessZone class
+ */
+class DrcMsgUselessZone final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgUselessZone)
+
+public:
+  // Constructors / Destructor
+  DrcMsgUselessZone() = delete;
+  DrcMsgUselessZone(const BI_Zone& zone,
+                    const QVector<Path>& locations) noexcept;
+  DrcMsgUselessZone(const DrcMsgUselessZone& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgUselessZone() noexcept {}
 };
 
 /*******************************************************************************

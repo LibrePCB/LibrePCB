@@ -76,6 +76,8 @@ public:
     DRAW_POLYGON,
     /// ::librepcb::editor::BoardEditorState_DrawPlane
     DRAW_PLANE,
+    /// ::librepcb::editor::BoardEditorState_DrawZone
+    DRAW_ZONE,
     /// ::librepcb::editor::BoardEditorState_DrawTrace
     DRAW_TRACE,
     /// ::librepcb::editor::BoardEditorState_Measure
@@ -112,6 +114,7 @@ public:
                         const Uuid& footprint) noexcept;
   bool processDrawPolygon() noexcept;
   bool processDrawPlane() noexcept;
+  bool processDrawZone() noexcept;
   bool processDrawTrace() noexcept;
   bool processImportDxf() noexcept;
   bool processMeasure() noexcept;

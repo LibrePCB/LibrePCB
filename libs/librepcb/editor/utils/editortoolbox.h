@@ -91,6 +91,17 @@ public:
 
 private:
   /**
+   * @brief Helper for #removeFormLayoutRow(QLabel&)
+   *
+   * @param layout  The layout to look for the label.
+   * @param label   The label to remove from the layout.
+   *
+   * @retval true on success.
+   * @retval false if the label was not found in a form layout.
+   */
+  static bool removeFormLayoutRow(QLayout& layout, QLabel& label) noexcept;
+
+  /**
    * @brief Helper for #removeFormLayoutRow()
    *
    * @param item  The item to hide.

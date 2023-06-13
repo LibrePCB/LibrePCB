@@ -36,6 +36,7 @@
 #include "../graphicsitems/bgi_polygon.h"
 #include "../graphicsitems/bgi_stroketext.h"
 #include "../graphicsitems/bgi_via.h"
+#include "../graphicsitems/bgi_zone.h"
 
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/project/board/board.h>
@@ -49,6 +50,7 @@
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -182,17 +184,17 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   //    50: polygons/texts board layer
   //   110: netpoints top
   //   120: netlines top
-  //   130: planes top
+  //   130: planes/zones top
   //   140: footprints top
   //   150: pads top
   //   160: polygons/texts top
   //   210: netpoints inner
   //   220: netlines inner
-  //   230: planes inner
+  //   230: planes/zones inner
   //   240: polygons/texts inner
   //   310: netpoints bottom
   //   320: netlines bottom
-  //   330: planes bottom
+  //   330: planes/zones bottom
   //   340: footprints bottom
   //   350: pads bottom
   //   360: polygons/texts bottom
@@ -202,7 +204,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   //      5 for holes
   //     10 for netpoints
   //     20 for netlines
-  //     30 for planes
+  //     30 for planes/zones
   //     40 for footprints
   //     50 for pads
   //     60 for polygons/texts
@@ -347,6 +349,26 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
               30 + priorityFromLayer(it.key()->getLayer()),
               true);  // Probably large grab area makes sense?
         }
+      }
+    }
+  }
+
+  if (flags.testFlag(FindFlag::Zones)) {
+    for (auto it = scene->getZones().begin(); it != scene->getZones().end();
+         it++) {
+      if ((!cuLayer) || (it.key()->getData().getLayers().contains(&*cuLayer))) {
+        QList<const Layer*> layers = it.key()->getData().getLayers().toList();
+        std::sort(layers.begin(), layers.end(), &Layer::lessThan);
+        int priority = 30;
+        if (!layers.isEmpty()) {
+          priority += priorityFromLayer(*layers.first());
+        }
+        processItem(
+            it.value(),
+            it.key()->getData().getOutline().calcNearestPointBetweenVertices(
+                pos),
+            priority,
+            true);  // Probably large grab area makes sense?
       }
     }
   }

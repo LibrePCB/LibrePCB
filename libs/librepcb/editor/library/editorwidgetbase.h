@@ -80,6 +80,7 @@ public:
     DRAW_CIRCLE,
     DRAW_ARC,
     DRAW_TEXT,
+    DRAW_ZONE,
     ADD_NAMES,
     ADD_VALUES,
     ADD_PINS,

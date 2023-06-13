@@ -64,6 +64,7 @@ bool CmdRemoveSelectedBoardItems::performExecute() {
   query.addSelectedNetLines();
   query.addNetPointsOfNetLines(true);
   query.addSelectedPlanes();
+  query.addSelectedZones();
   query.addSelectedPolygons();
   query.addSelectedBoardStrokeTexts();
   query.addSelectedFootprintStrokeTexts();
@@ -78,6 +79,7 @@ bool CmdRemoveSelectedBoardItems::performExecute() {
   mWrappedCommand->removeVias(query.getVias());
   mWrappedCommand->removeNetLines(query.getNetLines());
   mWrappedCommand->removePlanes(query.getPlanes());
+  mWrappedCommand->removeZones(query.getZones());
   mWrappedCommand->removePolygons(query.getPolygons());
   mWrappedCommand->removeStrokeTexts(query.getStrokeTexts());
   mWrappedCommand->removeHoles(query.getHoles());

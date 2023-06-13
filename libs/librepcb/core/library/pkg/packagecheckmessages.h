@@ -39,6 +39,7 @@ class Hole;
 class Layer;
 class PackagePad;
 class StrokeText;
+class Zone;
 
 /*******************************************************************************
  *  Class MsgDeprecatedAssemblyType
@@ -744,6 +745,38 @@ public:
 private:
   std::shared_ptr<const Footprint> mFootprint;
   std::shared_ptr<const FootprintPad> mPad;
+};
+
+/*******************************************************************************
+ *  Class MsgUselessZone
+ ******************************************************************************/
+
+/**
+ * @brief The MsgUselessZone class
+ */
+class MsgUselessZone final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgUselessZone)
+
+public:
+  // Constructors / Destructor
+  MsgUselessZone() = delete;
+  MsgUselessZone(std::shared_ptr<const Footprint> footprint,
+                 std::shared_ptr<const Zone> zone) noexcept;
+  MsgUselessZone(const MsgUselessZone& other) noexcept
+    : RuleCheckMessage(other),
+      mFootprint(other.mFootprint),
+      mZone(other.mZone) {}
+  virtual ~MsgUselessZone() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const Zone> getZone() const noexcept { return mZone; }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const Zone> mZone;
 };
 
 /*******************************************************************************

@@ -33,6 +33,7 @@
 #include "cmdboardpolygonedit.h"
 #include "cmdboardstroketextedit.h"
 #include "cmdboardviaedit.h"
+#include "cmdboardzoneedit.h"
 #include "cmddeviceinstanceedit.h"
 
 #include <librepcb/core/geometry/polygon.h>
@@ -47,6 +48,7 @@
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/scopeguard.h>
@@ -90,6 +92,7 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   query.addSelectedNetLines();
   query.addSelectedVias();
   query.addSelectedPlanes();
+  query.addSelectedZones();
   query.addSelectedPolygons();
   query.addSelectedBoardStrokeTexts();
   query.addSelectedFootprintStrokeTexts();
@@ -119,6 +122,12 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   foreach (BI_Plane* plane, query.getPlanes()) {
     for (const Vertex& vertex :
          Toolbox::toSet(plane->getOutline().getVertices().toList())) {
+      center += vertex.getPos();
+      ++count;
+    }
+  }
+  foreach (BI_Zone* plane, query.getZones()) {
+    for (const Vertex& vertex : plane->getData().getOutline().getVertices()) {
       center += vertex.getPos();
       ++count;
     }
@@ -215,6 +224,14 @@ bool CmdFlipSelectedBoardItems::performExecute() {
   foreach (BI_Plane* plane, query.getPlanes()) {
     QScopedPointer<CmdBoardPlaneEdit> cmd(new CmdBoardPlaneEdit(*plane));
     cmd->mirror(center, mOrientation, innerLayerCount, false);
+    execNewChildCmd(cmd.take());  // can throw
+  }
+
+  // flip all zones
+  foreach (BI_Zone* zone, query.getZones()) {
+    QScopedPointer<CmdBoardZoneEdit> cmd(new CmdBoardZoneEdit(*zone));
+    cmd->mirrorGeometry(mOrientation, center, false);
+    cmd->mirrorLayers(innerLayerCount, false);  // can throw
     execNewChildCmd(cmd.take());  // can throw
   }
 

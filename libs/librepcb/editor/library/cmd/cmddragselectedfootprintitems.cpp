@@ -26,10 +26,12 @@
 #include "../../cmd/cmdholeedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
+#include "../../cmd/cmdzoneedit.h"
 #include "../../graphics/circlegraphicsitem.h"
 #include "../../graphics/holegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/stroketextgraphicsitem.h"
+#include "../../graphics/zonegraphicsitem.h"
 #include "../../widgets/graphicsview.h"
 #include "../pkg/footprintgraphicsitem.h"
 #include "../pkg/footprintpadgraphicsitem.h"
@@ -114,6 +116,20 @@ CmdDragSelectedFootprintItems::CmdDragSelectedFootprintItems(
     ++count;
   }
 
+  QList<std::shared_ptr<ZoneGraphicsItem>> zones =
+      context.currentGraphicsItem->getSelectedZones();
+  foreach (const std::shared_ptr<ZoneGraphicsItem>& zone, zones) {
+    Q_ASSERT(zone);
+    mZoneEditCmds.append(new CmdZoneEdit(zone->getZone()));
+    foreach (const Vertex& vertex, zone->getZone().getOutline().getVertices()) {
+      mCenterPos += vertex.getPos();
+      if (!vertex.getPos().isOnGrid(grid)) {
+        mHasOffTheGridElements = true;
+      }
+      ++count;
+    }
+  }
+
   QList<std::shared_ptr<HoleGraphicsItem>> holes =
       context.currentGraphicsItem->getSelectedHoles();
   foreach (const std::shared_ptr<HoleGraphicsItem>& hole, holes) {
@@ -146,7 +162,8 @@ CmdDragSelectedFootprintItems::~CmdDragSelectedFootprintItems() noexcept {
 
 int CmdDragSelectedFootprintItems::getSelectedItemsCount() const noexcept {
   return mPadEditCmds.count() + mCircleEditCmds.count() +
-      mPolygonEditCmds.count() + mTextEditCmds.count() + mHoleEditCmds.count();
+      mPolygonEditCmds.count() + mTextEditCmds.count() + mZoneEditCmds.count() +
+      mHoleEditCmds.count();
 }
 
 /*******************************************************************************
@@ -165,6 +182,7 @@ void CmdDragSelectedFootprintItems::snapToGrid() noexcept {
   foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
     cmd->snapToGrid(grid, true);
   }
+  foreach (CmdZoneEdit* cmd, mZoneEditCmds) { cmd->snapToGrid(grid, true); }
   foreach (CmdHoleEdit* cmd, mHoleEditCmds) { cmd->snapToGrid(grid, true); }
   mSnappedToGrid = true;
 }
@@ -188,6 +206,9 @@ void CmdDragSelectedFootprintItems::translate(const Point& deltaPos) noexcept {
     foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
       cmd->translate(deltaPos, true);
     }
+    foreach (CmdZoneEdit* cmd, mZoneEditCmds) {
+      cmd->translate(deltaPos, true);
+    }
     foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
       cmd->translate(deltaPos, true);
     }
@@ -207,6 +228,9 @@ void CmdDragSelectedFootprintItems::rotate(const Angle& angle) noexcept {
     cmd->rotate(angle, mCenterPos, true);
   }
   foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+    cmd->rotate(angle, mCenterPos, true);
+  }
+  foreach (CmdZoneEdit* cmd, mZoneEditCmds) {
     cmd->rotate(angle, mCenterPos, true);
   }
   foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
@@ -229,6 +253,9 @@ void CmdDragSelectedFootprintItems::mirrorGeometry(
   foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
     cmd->mirrorGeometry(orientation, mCenterPos, true);
   }
+  foreach (CmdZoneEdit* cmd, mZoneEditCmds) {
+    cmd->mirrorGeometry(orientation, mCenterPos, true);
+  }
   foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
     cmd->mirror(orientation, mCenterPos, true);
   }
@@ -240,6 +267,7 @@ void CmdDragSelectedFootprintItems::mirrorLayer() noexcept {
   foreach (CmdCircleEdit* cmd, mCircleEditCmds) { cmd->mirrorLayer(true); }
   foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) { cmd->mirrorLayer(true); }
   foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) { cmd->mirrorLayer(true); }
+  foreach (CmdZoneEdit* cmd, mZoneEditCmds) { cmd->mirrorLayers(true); }
   mMirroredLayer = !mMirroredLayer;
 }
 
@@ -268,6 +296,9 @@ bool CmdDragSelectedFootprintItems::performExecute() {
   while (mTextEditCmds.count() > 0) {
     appendChild(mTextEditCmds.takeLast());
   }
+  while (mZoneEditCmds.count() > 0) {
+    appendChild(mZoneEditCmds.takeLast());
+  }
   while (mHoleEditCmds.count() > 0) {
     appendChild(mHoleEditCmds.takeLast());
   }
@@ -289,6 +320,8 @@ void CmdDragSelectedFootprintItems::deleteAllCommands() noexcept {
   mPolygonEditCmds.clear();
   qDeleteAll(mTextEditCmds);
   mTextEditCmds.clear();
+  qDeleteAll(mZoneEditCmds);
+  mZoneEditCmds.clear();
   qDeleteAll(mHoleEditCmds);
   mHoleEditCmds.clear();
 }

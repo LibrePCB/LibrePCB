@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../../geometry/path.h"
+#include "../../geometry/zone.h"
 #include "../../types/uuid.h"
 #include "../../utils/transform.h"
 #include "items/bi_plane.h"
@@ -131,6 +132,13 @@ private:  // Methods
     PositiveLength thermalSpokeWidth;
   };
 
+  struct KeepoutZoneData {
+    Transform transform;  // Applied to outline after preprocessing.
+    Zone::Layers layers;  // Converted to boardLayers after preprocessing.
+    QSet<const Layer*> boardLayers;
+    Path outline;
+  };
+
   struct PolygonData {
     Transform transform;  // Applied to path after preprocessing.
     const Layer* layer;
@@ -167,6 +175,7 @@ private:  // Methods
     QPointer<Board> board;
     QSet<const Layer*> layers;
     QList<PlaneData> planes;
+    QList<KeepoutZoneData> keepoutZones;
     QList<PolygonData> polygons;
     QList<ViaData> vias;
     QList<PadData> pads;

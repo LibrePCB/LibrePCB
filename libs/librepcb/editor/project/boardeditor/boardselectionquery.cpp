@@ -32,6 +32,7 @@
 #include "graphicsitems/bgi_polygon.h"
 #include "graphicsitems/bgi_stroketext.h"
 #include "graphicsitems/bgi_via.h"
+#include "graphicsitems/bgi_zone.h"
 
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
@@ -44,6 +45,7 @@
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
 #include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/board/items/bi_zone.h>
 
 #include <QtCore>
 
@@ -88,8 +90,8 @@ QHash<BI_NetSegment*, BoardSelectionQuery::NetSegmentItems>
 int BoardSelectionQuery::getResultCount() const noexcept {
   return mResultDeviceInstances.count() + mResultNetPoints.count() +
       mResultNetLines.count() + mResultVias.count() + mResultPlanes.count() +
-      mResultPolygons.count() + mResultStrokeTexts.count() +
-      mResultHoles.count();
+      mResultZones.count() + mResultPolygons.count() +
+      mResultStrokeTexts.count() + mResultHoles.count();
 }
 
 /*******************************************************************************
@@ -138,6 +140,16 @@ void BoardSelectionQuery::addSelectedPlanes() noexcept {
     if (it.value()->isSelected() &&
         ((!it.key()->isLocked()) || mIncludeLockedItems)) {
       mResultPlanes.insert(it.key());
+    }
+  }
+}
+
+void BoardSelectionQuery::addSelectedZones() noexcept {
+  for (auto it = mScene.getZones().begin(); it != mScene.getZones().end();
+       it++) {
+    if (it.value()->isSelected() &&
+        ((!it.key()->getData().isLocked()) || mIncludeLockedItems)) {
+      mResultZones.insert(it.key());
     }
   }
 }

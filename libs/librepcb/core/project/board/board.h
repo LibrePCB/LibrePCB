@@ -53,6 +53,7 @@ class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
+class BI_Zone;
 class BoardDesignRuleCheckSettings;
 class BoardDesignRules;
 class BoardFabricationOutputSettings;
@@ -190,8 +191,14 @@ public:
   void addPlane(BI_Plane& plane);
   void removePlane(BI_Plane& plane);
   void invalidatePlanes(const Layer* layer = nullptr) noexcept;
+  void invalidatePlanes(const QSet<const Layer*>& layers) noexcept;
   QSet<const Layer*> takeScheduledLayersForPlanesRebuild(
       const QSet<const Layer*>& layers) noexcept;
+
+  // Zone Methods
+  const QMap<Uuid, BI_Zone*>& getZones() const noexcept { return mZones; }
+  void addZone(BI_Zone& zone);
+  void removeZone(BI_Zone& zone);
 
   // Polygon Methods
   const QMap<Uuid, BI_Polygon*>& getPolygons() const noexcept {
@@ -253,6 +260,8 @@ signals:
   void netSegmentRemoved(BI_NetSegment& netSegment);
   void planeAdded(BI_Plane& plane);
   void planeRemoved(BI_Plane& plane);
+  void zoneAdded(BI_Zone& zone);
+  void zoneRemoved(BI_Zone& zone);
   void polygonAdded(BI_Polygon& polygon);
   void polygonRemoved(BI_Polygon& polygon);
   void strokeTextAdded(BI_StrokeText& strokeText);
@@ -303,6 +312,7 @@ private:
   QMap<Uuid, BI_Device*> mDeviceInstances;
   QMap<Uuid, BI_NetSegment*> mNetSegments;
   QMap<Uuid, BI_Plane*> mPlanes;
+  QMap<Uuid, BI_Zone*> mZones;
   QMap<Uuid, BI_Polygon*> mPolygons;
   QMap<Uuid, BI_StrokeText*> mStrokeTexts;
   QMap<Uuid, BI_Hole*> mHoles;

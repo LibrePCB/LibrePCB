@@ -44,6 +44,7 @@
 #include "board/items/bi_polygon.h"
 #include "board/items/bi_stroketext.h"
 #include "board/items/bi_via.h"
+#include "board/items/bi_zone.h"
 #include "circuit/circuit.h"
 #include "circuit/componentinstance.h"
 #include "circuit/componentsignalinstance.h"
@@ -582,6 +583,10 @@ void ProjectLoader::loadBoard(Project& p, const QString& relativeFilePath) {
   }
   foreach (const SExpression* node, root.getChildren("plane")) {
     loadBoardPlane(*board, *node);
+  }
+  foreach (const SExpression* node, root.getChildren("zone")) {
+    BI_Zone* zone = new BI_Zone(*board, BoardZoneData(*node));
+    board->addZone(*zone);
   }
   foreach (const SExpression* node, root.getChildren("polygon")) {
     BI_Polygon* polygon = new BI_Polygon(*board, BoardPolygonData(*node));

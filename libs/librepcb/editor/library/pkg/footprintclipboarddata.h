@@ -28,6 +28,7 @@
 #include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/stroketext.h>
+#include <librepcb/core/geometry/zone.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 
@@ -65,7 +66,7 @@ public:
   // Getters
   bool getItemCount() const noexcept {
     return mFootprintPads.count() + mPolygons.count() + mCircles.count() +
-        mStrokeTexts.count() + mHoles.count();
+        mStrokeTexts.count() + mZones.count() + mHoles.count();
   }
   const Uuid& getFootprintUuid() const noexcept { return mFootprintUuid; }
   const Point& getCursorPos() const noexcept { return mCursorPos; }
@@ -81,6 +82,8 @@ public:
   const CircleList& getCircles() const noexcept { return mCircles; }
   StrokeTextList& getStrokeTexts() noexcept { return mStrokeTexts; }
   const StrokeTextList& getStrokeTexts() const noexcept { return mStrokeTexts; }
+  ZoneList& getZones() noexcept { return mZones; }
+  const ZoneList& getZones() const noexcept { return mZones; }
   HoleList& getHoles() noexcept { return mHoles; }
   const HoleList& getHoles() const noexcept { return mHoles; }
 
@@ -104,6 +107,7 @@ private:  // Data
   PolygonList mPolygons;
   CircleList mCircles;
   StrokeTextList mStrokeTexts;
+  ZoneList mZones;
   HoleList mHoles;
 };
 

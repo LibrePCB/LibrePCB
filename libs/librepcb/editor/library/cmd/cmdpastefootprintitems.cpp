@@ -26,10 +26,12 @@
 #include "../../cmd/cmdholeedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
+#include "../../cmd/cmdzoneedit.h"
 #include "../../graphics/circlegraphicsitem.h"
 #include "../../graphics/holegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/stroketextgraphicsitem.h"
+#include "../../graphics/zonegraphicsitem.h"
 #include "../pkg/footprintclipboarddata.h"
 #include "../pkg/footprintgraphicsitem.h"
 #include "../pkg/footprintpadgraphicsitem.h"
@@ -164,6 +166,23 @@ bool CmdPasteFootprintItems::performExecute() {
       graphicsItem->setSelected(true);
     } else {
       qCritical() << "Could not select stroke text graphics item!";
+    }
+  }
+
+  for (const Zone& zone : mData->getZones().sortedByUuid()) {
+    Uuid uuid = zone.getUuid();
+    if (mFootprint.getZones().contains(uuid) ||
+        (mFootprint.getUuid() != mData->getFootprintUuid())) {
+      uuid = Uuid::createRandom();
+    }
+    std::shared_ptr<Zone> copy =
+        std::make_shared<Zone>(uuid, zone.getLayers(), zone.getRules(),
+                               zone.getOutline().translated(mPosOffset));
+    execNewChildCmd(new CmdZoneInsert(mFootprint.getZones(), copy));
+    if (auto graphicsItem = mGraphicsItem.getGraphicsItem(copy)) {
+      graphicsItem->setSelected(true);
+    } else {
+      qCritical() << "Could not select zone graphics item!";
     }
   }
 

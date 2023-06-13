@@ -26,10 +26,12 @@
 #include "../../cmd/cmdholeedit.h"
 #include "../../cmd/cmdpolygonedit.h"
 #include "../../cmd/cmdstroketextedit.h"
+#include "../../cmd/cmdzoneedit.h"
 #include "../../graphics/circlegraphicsitem.h"
 #include "../../graphics/holegraphicsitem.h"
 #include "../../graphics/polygongraphicsitem.h"
 #include "../../graphics/stroketextgraphicsitem.h"
+#include "../../graphics/zonegraphicsitem.h"
 #include "../pkg/footprintgraphicsitem.h"
 #include "../pkg/footprintpadgraphicsitem.h"
 #include "cmdfootprintpadedit.h"
@@ -87,6 +89,12 @@ bool CmdRemoveSelectedFootprintItems::performExecute() {
            mContext.currentGraphicsItem->getSelectedStrokeTexts()) {
     appendChild(new CmdStrokeTextRemove(
         mContext.currentFootprint->getStrokeTexts(), &text->getText()));
+  }
+
+  // remove zones
+  foreach (const auto& zone, mContext.currentGraphicsItem->getSelectedZones()) {
+    appendChild(new CmdZoneRemove(mContext.currentFootprint->getZones(),
+                                  &zone->getZone()));
   }
 
   // remove holes

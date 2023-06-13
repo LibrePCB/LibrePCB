@@ -36,18 +36,9 @@ namespace editor {
  ******************************************************************************/
 
 void EditorToolbox::removeFormLayoutRow(QLabel& label) noexcept {
-  if (auto l = dynamic_cast<QFormLayout*>(label.parentWidget()->layout())) {
-    for (int i = 0; i < l->rowCount(); ++i) {
-      QLayoutItem* labelItem = l->itemAt(i, QFormLayout::LabelRole);
-      QLayoutItem* fieldItem = l->itemAt(i, QFormLayout::FieldRole);
-      if ((labelItem) && (labelItem->widget() == &label) && (fieldItem)) {
-        hideLayoutItem(*labelItem);
-        hideLayoutItem(*fieldItem);
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
-        l->takeRow(i);  // Avoid ugly space caused by the empty layout rows.
-#endif
-        return;
-      }
+  if (auto layout = label.parentWidget()->layout()) {
+    if (removeFormLayoutRow(*layout, label)) {
+      return;
     }
   }
   qWarning().nospace() << "Failed to remove form layout row "
@@ -93,6 +84,34 @@ bool EditorToolbox::startToolBarTabFocusCycle(
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+bool EditorToolbox::removeFormLayoutRow(QLayout& layout,
+                                        QLabel& label) noexcept {
+  if (auto formLayout = dynamic_cast<QFormLayout*>(&layout)) {
+    for (int i = 0; i < formLayout->rowCount(); ++i) {
+      QLayoutItem* labelItem = formLayout->itemAt(i, QFormLayout::LabelRole);
+      QLayoutItem* fieldItem = formLayout->itemAt(i, QFormLayout::FieldRole);
+      if ((labelItem) && (labelItem->widget() == &label) && (fieldItem)) {
+        hideLayoutItem(*labelItem);
+        hideLayoutItem(*fieldItem);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 8, 0))
+        formLayout->takeRow(i);  // Avoid ugly space caused by the empty rows.
+#endif
+        return true;
+      }
+    }
+  }
+  for (int i = 0; i < layout.count(); ++i) {
+    if (QLayoutItem* item = layout.itemAt(i)) {
+      if (QLayout* child = item->layout()) {
+        if (removeFormLayoutRow(*child, label)) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
 
 void EditorToolbox::hideLayoutItem(QLayoutItem& item) noexcept {
   if (QWidget* widget = item.widget()) {

@@ -30,6 +30,7 @@
 #include <librepcb/core/project/board/boardholedata.h>
 #include <librepcb/core/project/board/boardpolygondata.h>
 #include <librepcb/core/project/board/boardstroketextdata.h>
+#include <librepcb/core/project/board/boardzonedata.h>
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/serialization/serializableobjectlist.h>
@@ -286,6 +287,7 @@ public:
     return mNetSegments;
   }
   SerializableObjectList<Plane, Plane>& getPlanes() noexcept { return mPlanes; }
+  QList<BoardZoneData>& getZones() noexcept { return mZones; }
   QList<BoardPolygonData>& getPolygons() noexcept { return mPolygons; }
   QList<BoardStrokeTextData>& getStrokeTexts() noexcept { return mStrokeTexts; }
   QList<BoardHoleData>& getHoles() noexcept { return mHoles; }
@@ -311,6 +313,7 @@ private:  // Data
   SerializableObjectList<Device, Device> mDevices;
   SerializableObjectList<NetSegment, NetSegment> mNetSegments;
   SerializableObjectList<Plane, Plane> mPlanes;
+  QList<BoardZoneData> mZones;
   QList<BoardPolygonData> mPolygons;
   QList<BoardStrokeTextData> mStrokeTexts;
   QList<BoardHoleData> mHoles;

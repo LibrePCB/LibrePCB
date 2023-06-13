@@ -178,6 +178,8 @@ add_library(
   geometry/vertex.h
   geometry/via.cpp
   geometry/via.h
+  geometry/zone.cpp
+  geometry/zone.h
   import/dxfreader.cpp
   import/dxfreader.h
   library/cat/componentcategory.cpp
@@ -289,6 +291,8 @@ add_library(
   project/board/boardpolygondata.h
   project/board/boardstroketextdata.cpp
   project/board/boardstroketextdata.h
+  project/board/boardzonedata.cpp
+  project/board/boardzonedata.h
   project/board/drc/boardclipperpathgenerator.cpp
   project/board/drc/boardclipperpathgenerator.h
   project/board/drc/boarddesignrulecheck.cpp
@@ -321,6 +325,8 @@ add_library(
   project/board/items/bi_stroketext.h
   project/board/items/bi_via.cpp
   project/board/items/bi_via.h
+  project/board/items/bi_zone.cpp
+  project/board/items/bi_zone.h
   project/bomgenerator.cpp
   project/bomgenerator.h
   project/circuit/circuit.cpp

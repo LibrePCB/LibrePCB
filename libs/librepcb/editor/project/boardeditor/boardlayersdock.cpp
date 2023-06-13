@@ -149,7 +149,7 @@ void BoardLayersDock::updateListWidget() noexcept {
     item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
     item->setCheckState(layer->getVisible() ? Qt::Checked : Qt::Unchecked);
     QColor color = layer->getColor(false);
-    color.setAlphaF(color.alphaF() * 0.3);
+    color.setAlphaF(0.3);
     item->setBackground(color);
     // still add, but hide disabled layers because of the condition above:
     // "mUi->listWidget->count() == layerNames.count()"
@@ -177,6 +177,7 @@ QList<QString> BoardLayersDock::getCommonLayers() const noexcept {
   layers.append(Theme::Color::sBoardHoles);
   layers.append(Theme::Color::sBoardVias);
   layers.append(Theme::Color::sBoardPads);
+  layers.append(Theme::Color::sBoardZones);
   layers.append(Theme::Color::sBoardAirWires);
   return layers;
 }

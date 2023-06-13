@@ -47,6 +47,7 @@ class BI_Plane;
 class BI_Polygon;
 class BI_StrokeText;
 class BI_Via;
+class BI_Zone;
 class Point;
 
 namespace editor {
@@ -54,6 +55,7 @@ namespace editor {
 class BoardClipboardData;
 class CmdBoardPlaneEdit;
 class CmdBoardPolygonEdit;
+class CmdBoardZoneEdit;
 class CmdDragSelectedBoardItems;
 class UndoCommandGroup;
 
@@ -128,10 +130,13 @@ private:  // Methods
                              const QVector<int> vertices) noexcept;
   void removePlaneVertices(BI_Plane& plane,
                            const QVector<int> vertices) noexcept;
+  void removeZoneVertices(BI_Zone& zone, const QVector<int> vertices) noexcept;
   void startAddingPolygonVertex(BI_Polygon& polygon, int vertex,
                                 const Point& pos) noexcept;
   void startAddingPlaneVertex(BI_Plane& plane, int vertex,
                               const Point& pos) noexcept;
+  void startAddingZoneVertex(BI_Zone& zone, int vertex,
+                             const Point& pos) noexcept;
   bool copySelectedItemsToClipboard() noexcept;
   bool startPaste(BoardGraphicsScene& scene,
                   std::unique_ptr<BoardClipboardData> data,
@@ -139,6 +144,7 @@ private:  // Methods
   bool abortCommand(bool showErrMsgBox) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
   bool findPlaneVerticesAtPosition(const Point& pos) noexcept;
+  bool findZoneVerticesAtPosition(const Point& pos) noexcept;
 
   /**
    * @brief Measure the length of the selected items.
@@ -174,6 +180,7 @@ private:  // Methods
   void openDevicePropertiesDialog(BI_Device& device) noexcept;
   void openViaPropertiesDialog(BI_Via& via) noexcept;
   void openPlanePropertiesDialog(BI_Plane& plane) noexcept;
+  void openZonePropertiesDialog(BI_Zone& zone) noexcept;
   void openPolygonPropertiesDialog(BI_Polygon& polygon) noexcept;
   void openStrokeTextPropertiesDialog(BI_StrokeText& text) noexcept;
   void openHolePropertiesDialog(BI_Hole& hole) noexcept;
@@ -200,6 +207,13 @@ private:  // Data
   QVector<int> mSelectedPlaneVertices;
   /// The plane edit command (nullptr if not editing)
   QScopedPointer<CmdBoardPlaneEdit> mCmdPlaneEdit;
+
+  /// The current zone selected for editing (nullptr if none)
+  BI_Zone* mSelectedZone;
+  /// The zone vertex indices selected for editing (empty if none)
+  QVector<int> mSelectedZoneVertices;
+  /// The zone edit command (nullptr if not editing)
+  QScopedPointer<CmdBoardZoneEdit> mCmdZoneEdit;
 };
 
 /*******************************************************************************

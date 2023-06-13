@@ -40,11 +40,13 @@ namespace librepcb {
 
 class Angle;
 class Polygon;
+class Zone;
 
 namespace editor {
 
 class CmdDragSelectedFootprintItems;
 class CmdPolygonEdit;
+class CmdZoneEdit;
 class FootprintClipboardData;
 
 /*******************************************************************************
@@ -62,7 +64,8 @@ class PackageEditorState_Select final : public PackageEditorState {
     SELECTING,
     MOVING,
     PASTING,
-    MOVING_POLYGON_VERTEX
+    MOVING_POLYGON_VERTEX,
+    MOVING_ZONE_VERTEX,
   };
 
 public:
@@ -122,11 +125,16 @@ private:  // Methods
                              const QVector<int> vertices) noexcept;
   void startAddingPolygonVertex(std::shared_ptr<Polygon> polygon, int vertex,
                                 const Point& pos) noexcept;
+  void removeZoneVertices(std::shared_ptr<Zone> zone,
+                          const QVector<int> vertices) noexcept;
+  void startAddingZoneVertex(std::shared_ptr<Zone> zone, int vertex,
+                             const Point& pos) noexcept;
   void setSelectionRect(const Point& p1, const Point& p2) noexcept;
   void clearSelectionRect(bool updateItemsSelectionState) noexcept;
   QList<std::shared_ptr<QGraphicsItem>> findItemsAtPosition(
       const Point& pos) noexcept;
   bool findPolygonVerticesAtPosition(const Point& pos) noexcept;
+  bool findZoneVerticesAtPosition(const Point& pos) noexcept;
   void setState(SubState state) noexcept;
 
 private:  // Types / Data
@@ -140,6 +148,13 @@ private:  // Types / Data
   QVector<int> mSelectedPolygonVertices;
   /// The polygon edit command (nullptr if not editing)
   QScopedPointer<CmdPolygonEdit> mCmdPolygonEdit;
+
+  /// The current zone selected for editing (nullptr if none)
+  std::shared_ptr<Zone> mSelectedZone;
+  /// The zone vertex indices selected for editing (empty if none)
+  QVector<int> mSelectedZoneVertices;
+  /// The zone edit command (nullptr if not editing)
+  QScopedPointer<CmdZoneEdit> mCmdZoneEdit;
 };
 
 /*******************************************************************************

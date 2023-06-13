@@ -29,6 +29,7 @@
 #include "../../project/cmd/cmdboardplaneremove.h"
 #include "../../project/cmd/cmdboardpolygonremove.h"
 #include "../../project/cmd/cmdboardstroketextremove.h"
+#include "../../project/cmd/cmdboardzoneremove.h"
 #include "../../project/cmd/cmddeviceinstanceremove.h"
 #include "../../project/cmd/cmddevicestroketextremove.h"
 #include "../boardeditor/boardnetsegmentsplitter.h"
@@ -43,6 +44,7 @@
 #include <librepcb/core/project/board/items/bi_plane.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_via.h>
+#include <librepcb/core/project/board/items/bi_zone.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 
@@ -116,6 +118,12 @@ bool CmdRemoveBoardItems::performExecute() {
   foreach (BI_Plane* plane, mPlanes) {
     Q_ASSERT(plane->isAddedToBoard());
     execNewChildCmd(new CmdBoardPlaneRemove(*plane));  // can throw
+  }
+
+  // remove zones
+  foreach (BI_Zone* zone, mZones) {
+    Q_ASSERT(zone->isAddedToBoard());
+    execNewChildCmd(new CmdBoardZoneRemove(*zone));  // can throw
   }
 
   // remove polygons

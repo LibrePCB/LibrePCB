@@ -80,6 +80,7 @@ private:  // Types
     DRAW_POLYGON,
     DRAW_CIRCLE,
     DRAW_TEXT,
+    DRAW_ZONE,
     ADD_HOLES,
     MEASURE,
   };
@@ -153,6 +154,7 @@ public:
   bool processStartDrawPolygons() noexcept;
   bool processStartDrawCircles() noexcept;
   bool processStartDrawTexts() noexcept;
+  bool processStartDrawZones() noexcept;
   bool processStartAddingHoles() noexcept;
   bool processStartDxfImport() noexcept;
   bool processStartMeasure() noexcept;

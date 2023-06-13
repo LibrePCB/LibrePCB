@@ -42,6 +42,7 @@ class CmdFootprintPadEdit;
 class CmdHoleEdit;
 class CmdPolygonEdit;
 class CmdStrokeTextEdit;
+class CmdZoneEdit;
 
 /*******************************************************************************
  *  Class CmdDragSelectedFootprintItems
@@ -99,6 +100,7 @@ private:
   QList<CmdCircleEdit*> mCircleEditCmds;
   QList<CmdPolygonEdit*> mPolygonEditCmds;
   QList<CmdStrokeTextEdit*> mTextEditCmds;
+  QList<CmdZoneEdit*> mZoneEditCmds;
   QList<CmdHoleEdit*> mHoleEditCmds;
 };
 
