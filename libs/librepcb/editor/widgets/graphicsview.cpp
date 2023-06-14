@@ -605,7 +605,7 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
                 Point(textOffset, tickPos), textRotation, textHeight,
                 (gauge.xScale != xScale) ? textAlign.mirroredH() : textAlign,
                 text, Application::getDefaultMonospaceFont(),
-                mOverlayContentColor, false, false, 10);
+                mOverlayContentColor, false, false, false, 10);
           }
         } else {
           // Draw short tick.

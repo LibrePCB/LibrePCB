@@ -246,7 +246,7 @@ void SGI_SymbolPin::updateJunction() noexcept {
 
 void SGI_SymbolPin::updateName() noexcept {
   Q_ASSERT(mNameGraphicsItem);
-  mNameGraphicsItem->setText(mPin.getName());
+  mNameGraphicsItem->setText(mPin.getName(), true);
 }
 
 void SGI_SymbolPin::updateNumbers() noexcept {

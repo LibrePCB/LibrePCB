@@ -30,6 +30,8 @@
 #include <librepcb/core/project/circuit/netsignal.h>
 #include <librepcb/core/project/schematic/items/si_netlabel.h>
 #include <librepcb/core/project/schematic/items/si_netsegment.h>
+#include <librepcb/core/types/alignment.h>
+#include <librepcb/core/utils/overlinemarkupparser.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/theme.h>
 
@@ -114,13 +116,14 @@ void SGI_NetLabel::paint(QPainter* painter,
     // draw text
     painter->setPen(QPen(mNetLabelLayer->getColor(highlight), 0));
     painter->setFont(mFont);
+    painter->save();
     if (mRotate180) {
-      painter->save();
       painter->rotate(180);
-      painter->drawStaticText(mTextOrigin, mStaticText);
-      painter->restore();
-    } else
-      painter->drawStaticText(mTextOrigin, mStaticText);
+    }
+    painter->drawStaticText(mTextOrigin, mStaticText);
+    painter->setPen(QPen(mNetLabelLayer->getColor(highlight), qreal(4) / 15));
+    painter->drawLines(mOverlines);
+    painter->restore();
   } else {
     // draw filled rect
     painter->setPen(Qt::NoPen);
@@ -186,7 +189,19 @@ void SGI_NetLabel::updateText() noexcept {
 
   mRotate180 = Toolbox::isTextUpsideDown(mNetLabel.getRotation());
 
-  mStaticText.setText(*mNetLabel.getNetSignalOfNetSegment().getName());
+  const Alignment align(
+      mNetLabel.getMirrored() ? HAlign::right() : HAlign::left(),
+      VAlign::bottom());
+  const int flags =
+      mRotate180 ? align.mirrored().toQtAlign() : align.toQtAlign();
+
+  QString displayText;
+  const QFontMetricsF fm(mFont);
+  OverlineMarkupParser::process(*mNetLabel.getNetSignalOfNetSegment().getName(),
+                                fm, flags, displayText, mOverlines,
+                                mBoundingRect);
+
+  mStaticText.setText(displayText);
   mStaticText.prepare(QTransform(), mFont);
   if (mNetLabel.getMirrored() ^ mRotate180) {
     mTextOrigin.setX(-mStaticText.size().width());

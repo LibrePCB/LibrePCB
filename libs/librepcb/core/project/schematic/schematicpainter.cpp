@@ -179,14 +179,15 @@ void SchematicPainter::paint(QPainter& painter,
                                pin.namePosition.rotated(pin.rotation)),
           symbol.transform.mapNonMirrorable(pin.rotation + pin.nameRotation),
           *pin.nameHeight, nameAlignment, pin.name, mDefaultFont,
-          settings.getColor(Theme::Color::sSchematicPinNames), true, false);
+          settings.getColor(Theme::Color::sSchematicPinNames), true, false,
+          true);
       const Angle numberRot = symbol.transform.mapNonMirrorable(pin.rotation);
       p.drawText(symbol.transform.map(
                      pin.position + pin.numbersPosition.rotated(pin.rotation)),
                  numberRot, *SymbolPin::getNumbersHeight(),
                  pin.numbersAlignment, pin.numbers, mDefaultFont,
                  settings.getColor(Theme::Color::sSchematicPinNumbers), true,
-                 false);
+                 false, false);
     }
   }
 
@@ -203,7 +204,7 @@ void SchematicPainter::paint(QPainter& painter,
     const QString color = text.getLayer().getThemeColor();
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
                text.getAlign(), text.getText(), mDefaultFont,
-               settings.getColor(color), true, false);
+               settings.getColor(color), true, false, false);
   }
 
   // Draw Net Lines.

@@ -106,7 +106,7 @@ void PrimitiveFootprintPadGraphicsItem::setMirrored(bool mirrored) noexcept {
 void PrimitiveFootprintPadGraphicsItem::setText(const QString& text) noexcept {
   setToolTip(text);
   mOriginCrossGraphicsItem->setToolTip(text);
-  mTextGraphicsItem->setText(text);
+  mTextGraphicsItem->setText(text, true);
   foreach (auto& item, mPathGraphicsItems) { item.item->setToolTip(text); }
   updateTextHeight();
 }

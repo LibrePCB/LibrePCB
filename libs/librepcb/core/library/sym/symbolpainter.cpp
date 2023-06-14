@@ -98,7 +98,7 @@ void SymbolPainter::paint(QPainter& painter,
     const QString color = text.getLayer().getThemeColor();
     p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
                text.getAlign(), text.getText(), mDefaultFont,
-               settings.getColor(color), true, false);
+               settings.getColor(color), true, false, false);
   }
 
   // Draw Pins.
@@ -110,14 +110,14 @@ void SymbolPainter::paint(QPainter& painter,
         pin.getPosition() + pin.getNamePosition().rotated(pin.getRotation()),
         pin.getRotation() + pin.getNameRotation(), *pin.getNameHeight(),
         pin.getNameAlignment(), *pin.getName(), mDefaultFont,
-        settings.getColor(Theme::Color::sSchematicPinNames), true, false);
+        settings.getColor(Theme::Color::sSchematicPinNames), true, false, true);
     const bool flipped = Toolbox::isTextUpsideDown(pin.getRotation());
     p.drawText(pin.getPosition() +
                    pin.getNumbersPosition(flipped).rotated(pin.getRotation()),
                pin.getRotation(), *SymbolPin::getNumbersHeight(),
                pin.getNumbersAlignment(flipped), "1…", mDefaultFont,
                settings.getColor(Theme::Color::sSchematicPinNumbers), true,
-               false);
+               false, false);
   }
 }
 

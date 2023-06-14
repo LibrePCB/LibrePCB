@@ -223,7 +223,7 @@ void BoardPainter::paint(QPainter& painter,
     foreach (const TextData& text, content.texts) {
       p.drawText(text.position, text.rotation, *text.height, text.align,
                  text.text, mMonospaceFont, Qt::transparent, true,
-                 settings.getMirror());
+                 settings.getMirror(), false);
     }
   }
 }

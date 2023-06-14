@@ -87,6 +87,7 @@ private:  // Data
 
   // Cached Attributes
   QStaticText mStaticText;
+  QVector<QLineF> mOverlines;
   QFont mFont;
   bool mRotate180;
   QPointF mTextOrigin;
