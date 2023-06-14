@@ -421,6 +421,8 @@ add_library(
   utils/clipperhelpers.h
   utils/mathparser.cpp
   utils/mathparser.h
+  utils/overlinemarkupparser.cpp
+  utils/overlinemarkupparser.h
   utils/qtmetatyperegistration.h
   utils/scopeguard.h
   utils/scopeguardlist.h
