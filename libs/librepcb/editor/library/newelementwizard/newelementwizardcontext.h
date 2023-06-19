@@ -151,6 +151,7 @@ public:  // Data
   tl::optional<Uuid> mDeviceComponentUuid;
   tl::optional<Uuid> mDevicePackageUuid;
   DevicePadSignalMap mDevicePadSignalMap;
+  AttributeList mDeviceAttributes;
 };
 
 /*******************************************************************************

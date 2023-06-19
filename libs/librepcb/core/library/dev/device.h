@@ -67,11 +67,12 @@ public:
   // Getters
   const Uuid& getComponentUuid() const noexcept { return mComponentUuid; }
   const Uuid& getPackageUuid() const noexcept { return mPackageUuid; }
-  const AttributeList& getAttributes() const noexcept { return mAttributes; }
   DevicePadSignalMap& getPadSignalMap() noexcept { return mPadSignalMap; }
   const DevicePadSignalMap& getPadSignalMap() const noexcept {
     return mPadSignalMap;
   }
+  AttributeList& getAttributes() noexcept { return mAttributes; }
+  const AttributeList& getAttributes() const noexcept { return mAttributes; }
 
   // Setters
   void setComponentUuid(const Uuid& uuid) noexcept;
@@ -107,9 +108,8 @@ private:  // Methods
 private:  // Data
   Uuid mComponentUuid;
   Uuid mPackageUuid;
-  AttributeList
-      mAttributes;  ///< not yet used, but already specified in file format
   DevicePadSignalMap mPadSignalMap;
+  AttributeList mAttributes;
 };
 
 /*******************************************************************************

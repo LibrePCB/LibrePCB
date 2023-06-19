@@ -106,6 +106,8 @@ void NewElementWizardContext::reset(ElementType newType) noexcept {
   // device
   mDeviceComponentUuid = tl::nullopt;
   mDevicePackageUuid = tl::nullopt;
+  mDevicePadSignalMap.clear();
+  mDeviceAttributes.clear();
 }
 
 void NewElementWizardContext::copyElement(ElementType type,
@@ -350,6 +352,7 @@ void NewElementWizardContext::copyElement(ElementType type,
       mDeviceComponentUuid = device->getComponentUuid();
       mDevicePackageUuid = device->getPackageUuid();
       mDevicePadSignalMap = device->getPadSignalMap();
+      mDeviceAttributes = device->getAttributes();
       break;
     }
 
@@ -459,6 +462,7 @@ void NewElementWizardContext::createLibraryElement() {
                      *mDeviceComponentUuid, *mDevicePackageUuid);
       element.setCategories(mElementCategoryUuids);
       element.getPadSignalMap() = mDevicePadSignalMap;
+      element.getAttributes() = mDeviceAttributes;
       TransactionalDirectory dir(mLibrary.getDirectory(),
                                  mLibrary.getElementsDirectoryName<Device>());
       element.moveIntoParentDirectory(dir);

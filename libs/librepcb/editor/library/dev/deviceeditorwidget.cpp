@@ -73,6 +73,9 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   mUi->btnChoosePackage->setHidden(mContext.readOnly);
   mUi->btnChooseComponent->setHidden(mContext.readOnly);
   mUi->padSignalMapEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->padSignalMapEditorWidget->setFrameStyle(QFrame::NoFrame);
+  mUi->attributesEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->attributesEditorWidget->setFrameStyle(QFrame::NoFrame);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   setWindowIcon(QIcon(":/img/library/device.png"));
 
@@ -111,6 +114,10 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   updateDevicePackageUuid(mDevice->getPackageUuid());
   updateMetadata();
 
+  // Load attribute editor.
+  mUi->attributesEditorWidget->setReferences(mUndoStack.data(),
+                                             &mDevice->getAttributes());
+
   // Show "interface broken" warning when related properties are modified.
   memorizeDeviceInterface();
   setupInterfaceBrokenWarningWidget(*mUi->interfaceBrokenWarningWidget);
@@ -148,6 +155,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
 
 DeviceEditorWidget::~DeviceEditorWidget() noexcept {
   mUi->padSignalMapEditorWidget->setReferences(nullptr, nullptr);
+  mUi->attributesEditorWidget->setReferences(nullptr, nullptr);
 }
 
 /*******************************************************************************
