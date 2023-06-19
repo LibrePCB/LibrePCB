@@ -79,6 +79,7 @@ add_executable(
   core/types/versiontest.cpp
   core/utils/clipperhelperstest.cpp
   core/utils/mathparsertest.cpp
+  core/utils/overlinemarkupparsertest.cpp
   core/utils/scopeguardtest.cpp
   core/utils/signalslottest.cpp
   core/utils/tangentpathjoinertest.cpp

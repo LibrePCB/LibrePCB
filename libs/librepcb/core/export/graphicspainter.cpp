@@ -27,6 +27,7 @@
 #include "../types/angle.h"
 #include "../types/length.h"
 #include "../types/point.h"
+#include "../utils/overlinemarkupparser.h"
 #include "../utils/toolbox.h"
 
 #include <QtCore>
@@ -118,7 +119,8 @@ void GraphicsPainter::drawText(const Point& position, const Angle& rotation,
                                const Length& height, const Alignment& alignment,
                                const QString& text, QFont font,
                                const QColor& color, bool autoRotate,
-                               bool mirrorInPlace, int fontPixelSize) noexcept {
+                               bool mirrorInPlace, bool parseOverlines,
+                               int fontPixelSize) noexcept {
   if (text.trimmed().isEmpty() || (!color.isValid())) {
     return;  // Nothing to draw.
   }
@@ -134,10 +136,19 @@ void GraphicsPainter::drawText(const Point& position, const Angle& rotation,
   } else {
     font.setPixelSize(qCeil(height.toPx()));
   }
-  const QFontMetricsF metrics(font);
-  const qreal scale = height.toPx() / metrics.height();
-  const QRectF rect =
-      metrics.boundingRect(QRectF(), flags | Qt::TextDontClip, text);
+
+  const QFontMetricsF fm(font);
+  QString renderedText = text;
+  QVector<QLineF> overlines;
+  QRectF boundingRect;
+  if (parseOverlines) {
+    OverlineMarkupParser::process(text, fm, flags | Qt::TextDontClip,
+                                  renderedText, overlines, boundingRect);
+  } else {
+    boundingRect =
+        fm.boundingRect(QRectF(), flags | Qt::TextDontClip, renderedText);
+  }
+  const qreal scale = height.toPx() / fm.height();
 
   mPainter.save();
   mPainter.setPen(QPen(color, 0));
@@ -149,12 +160,17 @@ void GraphicsPainter::drawText(const Point& position, const Angle& rotation,
   if (mirrorInPlace) {
     mPainter.scale(-1, 1);
   }
-  mPainter.drawText(rect, flags, text);
-  mPainter.setPen(Qt::transparent);
+  mPainter.drawText(boundingRect, flags, renderedText);
+  if (!overlines.isEmpty()) {
+    mPainter.setPen(
+        QPen(color, OverlineMarkupParser::getLineWidth(height.toPx())));
+    mPainter.drawLines(overlines);
+  }
   if (color != Qt::transparent) {
     // Required for correct bounding rect calculation, but only if the text
     // is actually visible!
-    mPainter.drawRect(rect);
+    mPainter.setPen(Qt::transparent);
+    mPainter.drawRect(boundingRect);
   }
   mPainter.restore();
 }
@@ -206,9 +222,13 @@ void GraphicsPainter::drawNetLabel(const Point& position, const Angle& rotation,
   const bool rotate180 = Toolbox::isTextUpsideDown(rotation);
   const int flags =
       rotate180 ? align.mirrored().toQtAlign() : align.toQtAlign();
-  const QFontMetricsF metrics(font);
-  const QRectF rect =
-      metrics.boundingRect(QRectF(), flags | Qt::TextDontClip, text);
+
+  const QFontMetricsF fm(font);
+  QString renderedText;
+  QVector<QLineF> overlines;
+  QRectF rect;
+  OverlineMarkupParser::process(text, fm, flags | Qt::TextDontClip,
+                                renderedText, overlines, rect);
 
   mPainter.save();
   mPainter.setPen(QPen(color, 0));
@@ -216,7 +236,11 @@ void GraphicsPainter::drawNetLabel(const Point& position, const Angle& rotation,
   mPainter.setFont(font);
   mPainter.translate(position.toPxQPointF().x(), position.toPxQPointF().y());
   mPainter.rotate(-rotation.mappedTo180deg().toDeg() + (rotate180 ? 180 : 0));
-  mPainter.drawText(rect, flags, text);
+  mPainter.drawText(rect, flags, renderedText);
+  if (!overlines.isEmpty()) {
+    mPainter.setPen(QPen(color, qreal(4) / 15));
+    mPainter.drawLines(overlines);
+  }
   mPainter.setPen(Qt::transparent);
   mPainter.drawRect(rect);  // Required for correct bounding rect calculation!
   mPainter.restore();

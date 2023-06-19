@@ -126,7 +126,7 @@ void FootprintPainter::paint(QPainter& painter,
     foreach (const Text& text, content.texts) {
       p.drawText(text.getPosition(), text.getRotation(), *text.getHeight(),
                  text.getAlign(), text.getText(), mMonospaceFont,
-                 Qt::transparent, true, settings.getMirror());
+                 Qt::transparent, true, settings.getMirror(), false);
     }
   }
 }

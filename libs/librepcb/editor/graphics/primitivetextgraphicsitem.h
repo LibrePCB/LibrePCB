@@ -63,7 +63,7 @@ public:
   // Setters
   void setPosition(const Point& pos) noexcept;
   void setRotation(const Angle& rot) noexcept;
-  void setText(const QString& text) noexcept;
+  void setText(const QString& text, bool parseOverlines = false) noexcept;
   void setHeight(const PositiveLength& height) noexcept;
   void setAlignment(const Alignment& align) noexcept;
   void setFont(Font font) noexcept;
@@ -88,6 +88,9 @@ private:  // Methods
 private:  // Data
   std::shared_ptr<GraphicsLayer> mLayer;
   QString mText;
+  QString mDisplayText;
+  bool mParseOverlines;
+  QVector<QLineF> mOverlines;
   PositiveLength mHeight;
   Alignment mAlignment;
   bool mRotate180;

@@ -30,6 +30,7 @@
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
+#include <librepcb/core/utils/overlinemarkupparser.h>
 #include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
@@ -152,7 +153,7 @@ void SymbolPinGraphicsItem::updateText() noexcept {
     text = *mPin->getName();
   }
   setToolTip(text);
-  mNameGraphicsItem->setText(text);
+  mNameGraphicsItem->setText(text, true);
 }
 
 /*******************************************************************************

@@ -25,6 +25,7 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/point.h>
+#include <librepcb/core/utils/overlinemarkupparser.h>
 #include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
@@ -45,6 +46,9 @@ PrimitiveTextGraphicsItem::PrimitiveTextGraphicsItem(
   : QGraphicsItem(parent),
     mLayer(nullptr),
     mText(),
+    mDisplayText(),
+    mParseOverlines(false),
+    mOverlines(),
     mHeight(1),
     mAlignment(HAlign::left(), VAlign::bottom()),
     mRotate180(false),
@@ -82,9 +86,11 @@ void PrimitiveTextGraphicsItem::setRotation(const Angle& rot) noexcept {
   }
 }
 
-void PrimitiveTextGraphicsItem::setText(const QString& text) noexcept {
-  if (text != mText) {
+void PrimitiveTextGraphicsItem::setText(const QString& text,
+                                        bool parseOverlines) noexcept {
+  if ((text != mText) || (parseOverlines != mParseOverlines)) {
     mText = text;
+    mParseOverlines = parseOverlines;
     updateBoundingRectAndShape();
   }
 }
@@ -92,6 +98,8 @@ void PrimitiveTextGraphicsItem::setText(const QString& text) noexcept {
 void PrimitiveTextGraphicsItem::setHeight(
     const PositiveLength& height) noexcept {
   mHeight = height;
+  mPen.setWidthF(OverlineMarkupParser::getLineWidth(height->toPx()));
+  mPenHighlighted.setWidthF(OverlineMarkupParser::getLineWidth(height->toPx()));
   updateBoundingRectAndShape();
 }
 
@@ -154,7 +162,8 @@ void PrimitiveTextGraphicsItem::paint(QPainter* painter,
   } else {
     painter->setPen(mPen);
   }
-  painter->drawText(QRectF(), mTextFlags, mText);
+  painter->drawText(QRectF(), mTextFlags, mDisplayText);
+  painter->drawLines(mOverlines);
 }
 
 /*******************************************************************************
@@ -193,8 +202,17 @@ void PrimitiveTextGraphicsItem::updateBoundingRectAndShape() noexcept {
     mTextFlags |= mAlignment.toQtAlign();
   }
   mFont.setPixelSize(qCeil(mHeight->toPx()));
-  QFontMetricsF fm(mFont);
-  mBoundingRect = fm.boundingRect(QRectF(), mTextFlags, mText);
+
+  const QFontMetricsF fm(mFont);
+  if (mParseOverlines) {
+    OverlineMarkupParser::process(mText, fm, mTextFlags, mDisplayText,
+                                  mOverlines, mBoundingRect);
+  } else {
+    mDisplayText = mText;
+    mOverlines.clear();
+    mBoundingRect = fm.boundingRect(QRectF(), mTextFlags, mText);
+  }
+
   mShape = QPainterPath();
   mShape.addRect(mBoundingRect);
   setScale(mHeight->toPx() / fm.height());
