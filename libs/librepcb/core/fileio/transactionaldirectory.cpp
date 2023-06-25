@@ -108,6 +108,11 @@ void TransactionalDirectory::write(const QString& path,
   mFileSystem->write(mPath % "/" % path, content);
 }
 
+void TransactionalDirectory::renameFile(const QString& src,
+                                        const QString& dst) {
+  mFileSystem->renameFile(mPath % "/" % src, mPath % "/" % dst);
+}
+
 void TransactionalDirectory::removeFile(const QString& path) {
   mFileSystem->removeFile(mPath % "/" % path);
 }

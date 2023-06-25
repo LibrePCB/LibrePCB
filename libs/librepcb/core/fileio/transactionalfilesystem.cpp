@@ -199,6 +199,12 @@ void TransactionalFileSystem::write(const QString& path,
   mRemovedFiles.remove(cleanedPath);
 }
 
+void TransactionalFileSystem::renameFile(const QString& src,
+                                         const QString& dst) {
+  write(dst, read(src));
+  removeFile(src);
+}
+
 void TransactionalFileSystem::removeFile(const QString& path) {
   const QString cleanedPath = cleanPath(path);
   QMutexLocker lock(&mMutex);

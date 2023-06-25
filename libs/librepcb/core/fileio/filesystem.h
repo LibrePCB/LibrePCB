@@ -58,6 +58,7 @@ public:
   virtual QByteArray read(const QString& path) const = 0;
   virtual QByteArray readIfExists(const QString& path) const = 0;
   virtual void write(const QString& path, const QByteArray& content) = 0;
+  virtual void renameFile(const QString& src, const QString& dst) = 0;
   virtual void removeFile(const QString& path) = 0;
   virtual void removeDirRecursively(const QString& path = "") = 0;
 };
