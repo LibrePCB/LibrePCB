@@ -27,6 +27,10 @@ build/
 # Translation Files
 i18n/*.qm
 
+# draw.io
+*.bkp
+*.dtmp
+
 # Vim
 *.swp
 
