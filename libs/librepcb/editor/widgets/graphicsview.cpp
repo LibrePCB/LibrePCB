@@ -72,6 +72,7 @@ GraphicsView::GraphicsView(QWidget* parent,
     }),
     mRulerPositions(),
     mPanningActive(false),
+    mPanningButton(Qt::NoButton),
     mPressedMouseButtons(Qt::NoButton),
     mIdleTimeMs(0) {
   setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -370,11 +371,12 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       QGraphicsSceneMouseEvent* e =
           dynamic_cast<QGraphicsSceneMouseEvent*>(event);
       Q_ASSERT(e);
-      if (e->button() == Qt::MiddleButton) {
+      if ((e->button() == Qt::MiddleButton) ||
+          (e->button() == Qt::RightButton)) {
+        mPanningButton = e->button();
         mCursorBeforePanning = cursor();
         setCursor(Qt::ClosedHandCursor);
-      }
-      if (mEventHandlerObject) {
+      } else if (mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
       }
       mPressedMouseButtons = e->buttons();
@@ -384,10 +386,15 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       QGraphicsSceneMouseEvent* e =
           dynamic_cast<QGraphicsSceneMouseEvent*>(event);
       Q_ASSERT(e);
-      if (e->button() == Qt::MiddleButton) {
+      bool wasPanning = false;
+      if ((mPanningButton != Qt::NoButton) && (e->button() == mPanningButton)) {
+        const QPoint diff =
+            e->screenPos() - e->buttonDownScreenPos(mPanningButton);
+        wasPanning = diff.manhattanLength() > 10;
+        mPanningButton = Qt::NoButton;
         setCursor(mCursorBeforePanning);
       }
-      if (mEventHandlerObject) {
+      if ((!wasPanning) && mEventHandlerObject) {
         mEventHandlerObject->graphicsViewEventHandler(event);
       }
       mPressedMouseButtons = e->buttons();
@@ -397,9 +404,9 @@ bool GraphicsView::eventFilter(QObject* obj, QEvent* event) {
       QGraphicsSceneMouseEvent* e =
           dynamic_cast<QGraphicsSceneMouseEvent*>(event);
       Q_ASSERT(e);
-      if (e->buttons().testFlag(Qt::MiddleButton) && (!mPanningActive)) {
+      if ((mPanningButton != Qt::NoButton) && (!mPanningActive)) {
         QPoint diff = mapFromScene(e->scenePos()) -
-            mapFromScene(e->buttonDownScenePos(Qt::MiddleButton));
+            mapFromScene(e->buttonDownScenePos(mPanningButton));
         mPanningActive = true;  // avoid recursive calls (=> stack overflow)
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() -
                                         diff.x());
