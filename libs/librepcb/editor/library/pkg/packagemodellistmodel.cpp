@@ -103,8 +103,9 @@ void PackageModelListModel::setUndoStack(UndoStack* stack) noexcept {
  *  Slots
  ******************************************************************************/
 
-void PackageModelListModel::add(const QVariant& editData) noexcept {
-  Q_UNUSED(editData);
+void PackageModelListModel::add(
+    const QPersistentModelIndex& itemIndex) noexcept {
+  Q_UNUSED(itemIndex);
   if (!mPackage) {
     return;
   }
@@ -130,13 +131,14 @@ void PackageModelListModel::add(const QVariant& editData) noexcept {
   }
 }
 
-void PackageModelListModel::remove(const QVariant& editData) noexcept {
+void PackageModelListModel::remove(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mPackage) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     std::shared_ptr<PackageModel> obj = mPackage->getModels().get(uuid);
     execCmd(new CmdPackageModelRemove(*mPackage, obj));
   } catch (const Exception& e) {
@@ -144,13 +146,14 @@ void PackageModelListModel::remove(const QVariant& editData) noexcept {
   }
 }
 
-void PackageModelListModel::edit(const QVariant& editData) noexcept {
+void PackageModelListModel::edit(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mPackage) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     std::shared_ptr<PackageModel> obj = mPackage->getModels().get(uuid);
 
     QByteArray content;
@@ -167,13 +170,14 @@ void PackageModelListModel::edit(const QVariant& editData) noexcept {
   }
 }
 
-void PackageModelListModel::moveUp(const QVariant& editData) noexcept {
+void PackageModelListModel::moveUp(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mPackage) {
     return;
   }
 
   try {
-    const Uuid uuid = Uuid::fromString(editData.toString());
+    const Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     const int index = mPackage->getModels().indexOf(uuid);
     if ((index >= 1) && (index < mPackage->getModels().count())) {
       execCmd(
@@ -184,13 +188,14 @@ void PackageModelListModel::moveUp(const QVariant& editData) noexcept {
   }
 }
 
-void PackageModelListModel::moveDown(const QVariant& editData) noexcept {
+void PackageModelListModel::moveDown(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mPackage) {
     return;
   }
 
   try {
-    const Uuid uuid = Uuid::fromString(editData.toString());
+    const Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     const int index = mPackage->getModels().indexOf(uuid);
     if ((index >= 0) && (index < mPackage->getModels().count() - 1)) {
       execCmd(

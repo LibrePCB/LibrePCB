@@ -68,13 +68,13 @@ ComponentSymbolVariantListWidget::ComponentSymbolVariantListWidget(
       ComponentSymbolVariantListModel::COLUMN_ACTIONS,
       QHeaderView::ResizeToContents);
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
-          &ComponentSymbolVariantListModel::addSymbolVariant);
+          &ComponentSymbolVariantListModel::add);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &ComponentSymbolVariantListModel::removeSymbolVariant);
+          &ComponentSymbolVariantListModel::remove);
   connect(mView.data(), &EditableTableWidget::btnMoveUpClicked, mModel.data(),
-          &ComponentSymbolVariantListModel::moveSymbolVariantUp);
+          &ComponentSymbolVariantListModel::moveUp);
   connect(mView.data(), &EditableTableWidget::btnMoveDownClicked, mModel.data(),
-          &ComponentSymbolVariantListModel::moveSymbolVariantDown);
+          &ComponentSymbolVariantListModel::moveDown);
   connect(mView.data(), &EditableTableWidget::btnEditClicked, this,
           &ComponentSymbolVariantListWidget::btnEditClicked);
   connect(mView.data(), &EditableTableWidget::doubleClicked, this,

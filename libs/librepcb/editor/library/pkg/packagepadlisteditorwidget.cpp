@@ -54,9 +54,9 @@ PackagePadListEditorWidget::PackagePadListEditorWidget(QWidget* parent) noexcept
       PackagePadListModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
   mView->sortByColumn(PackagePadListModel::COLUMN_NAME, Qt::AscendingOrder);
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
-          &PackagePadListModel::addPad);
+          &PackagePadListModel::add);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &PackagePadListModel::removePad);
+          &PackagePadListModel::remove);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);

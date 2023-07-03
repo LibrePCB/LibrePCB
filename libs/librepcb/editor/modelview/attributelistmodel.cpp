@@ -90,8 +90,8 @@ void AttributeListModel::setUndoStack(UndoStack* stack) noexcept {
  *  Slots
  ******************************************************************************/
 
-void AttributeListModel::addAttribute(const QVariant& editData) noexcept {
-  Q_UNUSED(editData);
+void AttributeListModel::add(const QPersistentModelIndex& itemIndex) noexcept {
+  Q_UNUSED(itemIndex);
   if (!mAttributeList) {
     return;
   }
@@ -109,13 +109,14 @@ void AttributeListModel::addAttribute(const QVariant& editData) noexcept {
   }
 }
 
-void AttributeListModel::removeAttribute(const QVariant& editData) noexcept {
+void AttributeListModel::remove(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mAttributeList) {
     return;
   }
 
   try {
-    QString key = editData.toString();
+    QString key = itemIndex.data(Qt::EditRole).toString();
     std::shared_ptr<Attribute> attr = mAttributeList->get(key);
     execCmd(new CmdAttributeRemove(*mAttributeList, attr.get()));
   } catch (const Exception& e) {
@@ -123,13 +124,14 @@ void AttributeListModel::removeAttribute(const QVariant& editData) noexcept {
   }
 }
 
-void AttributeListModel::moveAttributeUp(const QVariant& editData) noexcept {
+void AttributeListModel::moveUp(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mAttributeList) {
     return;
   }
 
   try {
-    QString key = editData.toString();
+    QString key = itemIndex.data(Qt::EditRole).toString();
     int index = mAttributeList->indexOf(key);
     if ((index >= 1) && (index < mAttributeList->count())) {
       execCmd(new CmdAttributesSwap(*mAttributeList, index, index - 1));
@@ -139,13 +141,14 @@ void AttributeListModel::moveAttributeUp(const QVariant& editData) noexcept {
   }
 }
 
-void AttributeListModel::moveAttributeDown(const QVariant& editData) noexcept {
+void AttributeListModel::moveDown(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mAttributeList) {
     return;
   }
 
   try {
-    QString key = editData.toString();
+    QString key = itemIndex.data(Qt::EditRole).toString();
     int index = mAttributeList->indexOf(key);
     if ((index >= 0) && (index < mAttributeList->count() - 1)) {
       execCmd(new CmdAttributesSwap(*mAttributeList, index, index + 1));

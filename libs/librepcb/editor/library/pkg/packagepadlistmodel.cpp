@@ -80,8 +80,8 @@ void PackagePadListModel::setUndoStack(UndoStack* stack) noexcept {
  *  Slots
  ******************************************************************************/
 
-void PackagePadListModel::addPad(const QVariant& editData) noexcept {
-  Q_UNUSED(editData);
+void PackagePadListModel::add(const QPersistentModelIndex& itemIndex) noexcept {
+  Q_UNUSED(itemIndex);
   if (!mPadList) {
     return;
   }
@@ -105,13 +105,14 @@ void PackagePadListModel::addPad(const QVariant& editData) noexcept {
   }
 }
 
-void PackagePadListModel::removePad(const QVariant& editData) noexcept {
+void PackagePadListModel::remove(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mPadList) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     std::shared_ptr<PackagePad> pad = mPadList->get(uuid);
     execCmd(new CmdPackagePadRemove(*mPadList, pad.get()));
   } catch (const Exception& e) {

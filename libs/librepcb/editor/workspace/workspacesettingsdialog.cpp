@@ -130,14 +130,13 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mUi->tblLibLocaleOrder->horizontalHeader()->setSectionResizeMode(
         LibraryLocaleOrderModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
     connect(mUi->tblLibLocaleOrder, &EditableTableWidget::btnAddClicked,
-            mLibLocaleOrderModel.data(), &LibraryLocaleOrderModel::addItem);
+            mLibLocaleOrderModel.data(), &LibraryLocaleOrderModel::add);
     connect(mUi->tblLibLocaleOrder, &EditableTableWidget::btnRemoveClicked,
-            mLibLocaleOrderModel.data(), &LibraryLocaleOrderModel::removeItem);
+            mLibLocaleOrderModel.data(), &LibraryLocaleOrderModel::remove);
     connect(mUi->tblLibLocaleOrder, &EditableTableWidget::btnMoveUpClicked,
-            mLibLocaleOrderModel.data(), &LibraryLocaleOrderModel::moveItemUp);
+            mLibLocaleOrderModel.data(), &LibraryLocaleOrderModel::moveUp);
     connect(mUi->tblLibLocaleOrder, &EditableTableWidget::btnMoveDownClicked,
-            mLibLocaleOrderModel.data(),
-            &LibraryLocaleOrderModel::moveItemDown);
+            mLibLocaleOrderModel.data(), &LibraryLocaleOrderModel::moveDown);
   }
 
   // Initialize library norm order widgets
@@ -154,13 +153,13 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mUi->tblLibNormOrder->horizontalHeader()->setSectionResizeMode(
         LibraryNormOrderModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
     connect(mUi->tblLibNormOrder, &EditableTableWidget::btnAddClicked,
-            mLibNormOrderModel.data(), &LibraryNormOrderModel::addItem);
+            mLibNormOrderModel.data(), &LibraryNormOrderModel::add);
     connect(mUi->tblLibNormOrder, &EditableTableWidget::btnRemoveClicked,
-            mLibNormOrderModel.data(), &LibraryNormOrderModel::removeItem);
+            mLibNormOrderModel.data(), &LibraryNormOrderModel::remove);
     connect(mUi->tblLibNormOrder, &EditableTableWidget::btnMoveUpClicked,
-            mLibNormOrderModel.data(), &LibraryNormOrderModel::moveItemUp);
+            mLibNormOrderModel.data(), &LibraryNormOrderModel::moveUp);
     connect(mUi->tblLibNormOrder, &EditableTableWidget::btnMoveDownClicked,
-            mLibNormOrderModel.data(), &LibraryNormOrderModel::moveItemDown);
+            mLibNormOrderModel.data(), &LibraryNormOrderModel::moveDown);
   }
 
   // Initialize API endpoint widgets
@@ -173,13 +172,13 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     mUi->edtApiEndpoints->horizontalHeader()->setSectionResizeMode(
         ApiEndpointModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
     connect(mUi->edtApiEndpoints, &EditableTableWidget::btnAddClicked,
-            mApiEndpointModel.data(), &ApiEndpointModel::addItem);
+            mApiEndpointModel.data(), &ApiEndpointModel::add);
     connect(mUi->edtApiEndpoints, &EditableTableWidget::btnRemoveClicked,
-            mApiEndpointModel.data(), &ApiEndpointModel::removeItem);
+            mApiEndpointModel.data(), &ApiEndpointModel::remove);
     connect(mUi->edtApiEndpoints, &EditableTableWidget::btnMoveUpClicked,
-            mApiEndpointModel.data(), &ApiEndpointModel::moveItemUp);
+            mApiEndpointModel.data(), &ApiEndpointModel::moveUp);
     connect(mUi->edtApiEndpoints, &EditableTableWidget::btnMoveDownClicked,
-            mApiEndpointModel.data(), &ApiEndpointModel::moveItemDown);
+            mApiEndpointModel.data(), &ApiEndpointModel::moveDown);
     connect(mUi->lblApiEndpointsInfo, &QLabel::linkActivated, this,
             [this](const QString& url) {
               DesktopServices ds(mWorkspace.getSettings(), this);

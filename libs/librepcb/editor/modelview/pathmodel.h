@@ -63,11 +63,11 @@ public:
   const Path& getPath() const noexcept { return mPath; }
 
   // Slots
-  void addItem(const QVariant& editData) noexcept;
-  void copyItem(const QVariant& editData) noexcept;
-  void removeItem(const QVariant& editData) noexcept;
-  void moveItemUp(const QVariant& editData) noexcept;
-  void moveItemDown(const QVariant& editData) noexcept;
+  void add(const QPersistentModelIndex& itemIndex) noexcept;
+  void copy(const QPersistentModelIndex& itemIndex) noexcept;
+  void remove(const QPersistentModelIndex& itemIndex) noexcept;
+  void moveUp(const QPersistentModelIndex& itemIndex) noexcept;
+  void moveDown(const QPersistentModelIndex& itemIndex) noexcept;
 
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;

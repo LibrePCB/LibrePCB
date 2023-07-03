@@ -85,15 +85,15 @@ FootprintListEditorWidget::FootprintListEditorWidget(QWidget* parent) noexcept
   mView->horizontalHeader()->setSectionResizeMode(
       FootprintListModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
-          &FootprintListModel::addFootprint);
+          &FootprintListModel::add);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &FootprintListModel::removeFootprint);
+          &FootprintListModel::remove);
   connect(mView.data(), &EditableTableWidget::btnCopyClicked, mModel.data(),
-          &FootprintListModel::copyFootprint);
+          &FootprintListModel::copy);
   connect(mView.data(), &EditableTableWidget::btnMoveUpClicked, mModel.data(),
-          &FootprintListModel::moveFootprintUp);
+          &FootprintListModel::moveUp);
   connect(mView.data(), &EditableTableWidget::btnMoveDownClicked, mModel.data(),
-          &FootprintListModel::moveFootprintDown);
+          &FootprintListModel::moveDown);
   connect(mView.data(), &EditableTableWidget::currentRowChanged, this,
           &FootprintListEditorWidget::currentFootprintChanged);
 

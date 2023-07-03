@@ -79,8 +79,8 @@ void FootprintListModel::setUndoStack(UndoStack* stack) noexcept {
  *  Slots
  ******************************************************************************/
 
-void FootprintListModel::addFootprint(const QVariant& editData) noexcept {
-  Q_UNUSED(editData);
+void FootprintListModel::add(const QPersistentModelIndex& itemIndex) noexcept {
+  Q_UNUSED(itemIndex);
   if (!mPackage) {
     return;
   }
@@ -96,13 +96,13 @@ void FootprintListModel::addFootprint(const QVariant& editData) noexcept {
   }
 }
 
-void FootprintListModel::copyFootprint(const QVariant& editData) noexcept {
+void FootprintListModel::copy(const QPersistentModelIndex& itemIndex) noexcept {
   if (!mPackage) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     std::shared_ptr<const Footprint> original =
         mPackage->getFootprints().get(uuid);
     ElementName newName("Copy of " % original->getNames().getDefaultValue());
@@ -124,13 +124,14 @@ void FootprintListModel::copyFootprint(const QVariant& editData) noexcept {
   }
 }
 
-void FootprintListModel::removeFootprint(const QVariant& editData) noexcept {
+void FootprintListModel::remove(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mPackage) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     std::shared_ptr<Footprint> fpt = mPackage->getFootprints().get(uuid);
     execCmd(new CmdFootprintRemove(mPackage->getFootprints(), fpt.get()));
   } catch (const Exception& e) {
@@ -138,13 +139,14 @@ void FootprintListModel::removeFootprint(const QVariant& editData) noexcept {
   }
 }
 
-void FootprintListModel::moveFootprintUp(const QVariant& editData) noexcept {
+void FootprintListModel::moveUp(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mPackage) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     int index = mPackage->getFootprints().indexOf(uuid);
     if ((index >= 1) && (index < mPackage->getFootprints().count())) {
       execCmd(
@@ -155,13 +157,14 @@ void FootprintListModel::moveFootprintUp(const QVariant& editData) noexcept {
   }
 }
 
-void FootprintListModel::moveFootprintDown(const QVariant& editData) noexcept {
+void FootprintListModel::moveDown(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mPackage) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     int index = mPackage->getFootprints().indexOf(uuid);
     if ((index >= 0) && (index < mPackage->getFootprints().count() - 1)) {
       execCmd(

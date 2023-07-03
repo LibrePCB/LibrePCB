@@ -40,23 +40,35 @@ class EditableTableWidgetReceiver : public QObject {
   Q_OBJECT
 
 public:
-  QVariant mAddData;
-  QVariant mRemoveData;
-  QVariant mCopyData;
-  QVariant mEditData;
-  QVariant mMoveUpData;
-  QVariant mMoveDownData;
-  QVariant mBrowseData;
+  QPersistentModelIndex mAddIndex;
+  QPersistentModelIndex mRemoveIndex;
+  QPersistentModelIndex mCopyIndex;
+  QPersistentModelIndex mEditIndex;
+  QPersistentModelIndex mMoveUpIndex;
+  QPersistentModelIndex mMoveDownIndex;
+  QPersistentModelIndex mBrowseIndex;
 
-  void btnAddClicked(const QVariant& data) noexcept { mAddData = data; }
-  void btnRemoveClicked(const QVariant& data) noexcept { mRemoveData = data; }
-  void btnCopyClicked(const QVariant& data) noexcept { mCopyData = data; }
-  void btnEditClicked(const QVariant& data) noexcept { mEditData = data; }
-  void btnMoveUpClicked(const QVariant& data) noexcept { mMoveUpData = data; }
-  void btnMoveDownClicked(const QVariant& data) noexcept {
-    mMoveDownData = data;
+  void btnAddClicked(const QPersistentModelIndex& itemIndex) noexcept {
+    mAddIndex = itemIndex;
   }
-  void btnBrowseClicked(const QVariant& data) noexcept { mBrowseData = data; }
+  void btnRemoveClicked(const QPersistentModelIndex& itemIndex) noexcept {
+    mRemoveIndex = itemIndex;
+  }
+  void btnCopyClicked(const QPersistentModelIndex& itemIndex) noexcept {
+    mCopyIndex = itemIndex;
+  }
+  void btnEditClicked(const QPersistentModelIndex& itemIndex) noexcept {
+    mEditIndex = itemIndex;
+  }
+  void btnMoveUpClicked(const QPersistentModelIndex& itemIndex) noexcept {
+    mMoveUpIndex = itemIndex;
+  }
+  void btnMoveDownClicked(const QPersistentModelIndex& itemIndex) noexcept {
+    mMoveDownIndex = itemIndex;
+  }
+  void btnBrowseClicked(const QPersistentModelIndex& itemIndex) noexcept {
+    mBrowseIndex = itemIndex;
+  }
 };
 
 /*******************************************************************************

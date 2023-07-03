@@ -68,10 +68,10 @@ public:
   void setUndoStack(UndoStack* stack) noexcept;
 
   // Slots
-  void addSymbolVariant(const QVariant& editData) noexcept;
-  void removeSymbolVariant(const QVariant& editData) noexcept;
-  void moveSymbolVariantUp(const QVariant& editData) noexcept;
-  void moveSymbolVariantDown(const QVariant& editData) noexcept;
+  void add(const QPersistentModelIndex& itemIndex) noexcept;
+  void remove(const QPersistentModelIndex& itemIndex) noexcept;
+  void moveUp(const QPersistentModelIndex& itemIndex) noexcept;
+  void moveDown(const QPersistentModelIndex& itemIndex) noexcept;
 
   // Inherited from QAbstractItemModel
   int rowCount(const QModelIndex& parent = QModelIndex()) const override;

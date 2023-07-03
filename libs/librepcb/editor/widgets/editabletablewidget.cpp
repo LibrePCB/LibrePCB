@@ -219,7 +219,7 @@ void EditableTableWidget::installButtons(int row) noexcept {
 QToolButton* EditableTableWidget::createButton(
     const QString& objectName, const QIcon& icon, const QString& text,
     const QString& toolTip, int width, int height, Signal clickedSignal,
-    const QPersistentModelIndex& index, bool doesModify,
+    const QPersistentModelIndex& itemIndex, bool doesModify,
     bool doesRemove) noexcept {
   QToolButton* btn = new QToolButton();
   btn->setObjectName(objectName);
@@ -239,17 +239,16 @@ QToolButton* EditableTableWidget::createButton(
             &QPushButton::setDisabled);
   }
 
-  connect(btn, &QToolButton::clicked, this, [this, index, clickedSignal]() {
-    buttonClickedHandler(clickedSignal, index);
+  connect(btn, &QToolButton::clicked, this, [this, itemIndex, clickedSignal]() {
+    buttonClickedHandler(clickedSignal, itemIndex);
   });
   return btn;
 }
 
 void EditableTableWidget::buttonClickedHandler(
-    Signal clickedSignal, const QPersistentModelIndex& index) noexcept {
-  if (clickedSignal && index.isValid()) {
-    QVariant data = index.data(Qt::EditRole);
-    (this->*clickedSignal)(data);
+    Signal clickedSignal, const QPersistentModelIndex& itemIndex) noexcept {
+  if (clickedSignal && itemIndex.isValid()) {
+    (this->*clickedSignal)(itemIndex);
   } else {
     qCritical() << "Invalid index received in "
                    "EditableTableWidget::buttonClickedHandler().";

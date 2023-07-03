@@ -75,13 +75,13 @@ ComponentSymbolVariantItemListEditorWidget::
       ComponentSymbolVariantItemListModel::COLUMN_ACTIONS,
       QHeaderView::ResizeToContents);
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
-          &ComponentSymbolVariantItemListModel::addItem);
+          &ComponentSymbolVariantItemListModel::add);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &ComponentSymbolVariantItemListModel::removeItem);
+          &ComponentSymbolVariantItemListModel::remove);
   connect(mView.data(), &EditableTableWidget::btnMoveUpClicked, mModel.data(),
-          &ComponentSymbolVariantItemListModel::moveItemUp);
+          &ComponentSymbolVariantItemListModel::moveUp);
   connect(mView.data(), &EditableTableWidget::btnMoveDownClicked, mModel.data(),
-          &ComponentSymbolVariantItemListModel::moveItemDown);
+          &ComponentSymbolVariantItemListModel::moveDown);
   connect(mView.data(), &EditableTableWidget::btnBrowseClicked, this,
           &ComponentSymbolVariantItemListEditorWidget::btnSymbolBrowseClicked);
 
@@ -177,10 +177,10 @@ void ComponentSymbolVariantItemListEditorWidget::itemEdited(
 }
 
 void ComponentSymbolVariantItemListEditorWidget::btnSymbolBrowseClicked(
-    const QVariant& data) noexcept {
+    const QPersistentModelIndex& itemIndex) noexcept {
   SymbolChooserDialog dialog(*mWorkspace, *mLayerProvider, this);
   if ((dialog.exec() == QDialog::Accepted) && dialog.getSelectedSymbolUuid()) {
-    mModel->changeSymbol(data, *dialog.getSelectedSymbolUuid());
+    mModel->browse(itemIndex, *dialog.getSelectedSymbolUuid());
   }
 }
 

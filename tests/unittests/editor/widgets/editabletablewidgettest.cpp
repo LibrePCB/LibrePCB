@@ -82,13 +82,18 @@ TEST_F(EditableTableWidgetTest, testIfDataGetsUpdated) {
 
   QToolButton* btn = getBtnRemove(widget.indexWidget(index));
   btn->click();
-  EXPECT_EQ("foo", receiver.mRemoveData.toString().toStdString());
+  EXPECT_EQ(1, receiver.mRemoveIndex.row());
+  EXPECT_EQ("foo",
+            receiver.mRemoveIndex.data(Qt::EditRole).toString().toStdString());
 
-  // Now change the underlying data and click again to see if the callback gets
-  // called with the new data.
+  // Now change the underlying data and click again to see if the data on the
+  // returned model index has been updated.
+  receiver.mRemoveIndex = QPersistentModelIndex();
   model.setData(index, "bar", Qt::EditRole);
   btn->click();
-  EXPECT_EQ("bar", receiver.mRemoveData.toString().toStdString());
+  EXPECT_EQ(1, receiver.mRemoveIndex.row());
+  EXPECT_EQ("bar",
+            receiver.mRemoveIndex.data(Qt::EditRole).toString().toStdString());
 }
 
 /*******************************************************************************

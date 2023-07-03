@@ -129,8 +129,8 @@ public:
   }
 
   // Slots
-  void addItem(const QVariant& editData) noexcept {
-    Q_UNUSED(editData);
+  void add(const QPersistentModelIndex& itemIndex) noexcept {
+    Q_UNUSED(itemIndex);
 
     if (!mNewValue) {
       QMessageBox::critical(nullptr, tr("Error"), tr("Invalid value."));
@@ -152,8 +152,8 @@ public:
                      index(mValues.count(), _COLUMN_COUNT - 1));
   }
 
-  void removeItem(const QVariant& editData) noexcept {
-    int row = editData.toInt();
+  void remove(const QPersistentModelIndex& itemIndex) noexcept {
+    int row = itemIndex.data(Qt::EditRole).toInt();
     if ((row >= 0) && (row < mValues.count())) {
       beginRemoveRows(QModelIndex(), row, row);
       mValues.removeAt(row);
@@ -161,16 +161,16 @@ public:
     }
   }
 
-  void moveItemUp(const QVariant& editData) noexcept {
-    int row = editData.toInt();
+  void moveUp(const QPersistentModelIndex& itemIndex) noexcept {
+    int row = itemIndex.data(Qt::EditRole).toInt();
     if (row >= 1) {
       mValues.move(row, row - 1);
       emit dataChanged(index(row - 1, 0), index(row, _COLUMN_COUNT - 1));
     }
   }
 
-  void moveItemDown(const QVariant& editData) noexcept {
-    int row = editData.toInt();
+  void moveDown(const QPersistentModelIndex& itemIndex) noexcept {
+    int row = itemIndex.data(Qt::EditRole).toInt();
     if (row < (mValues.count() - 1)) {
       mValues.move(row, row + 1);
       emit dataChanged(index(row, 0), index(row + 1, _COLUMN_COUNT - 1));

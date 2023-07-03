@@ -64,13 +64,13 @@ AttributeListEditorWidget::AttributeListEditorWidget(QWidget* parent) noexcept
   mView->setItemDelegateForColumn(AttributeListModel::COLUMN_UNIT,
                                   new ComboBoxDelegate(false, this));
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
-          &AttributeListModel::addAttribute);
+          &AttributeListModel::add);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &AttributeListModel::removeAttribute);
+          &AttributeListModel::remove);
   connect(mView.data(), &EditableTableWidget::btnMoveUpClicked, mModel.data(),
-          &AttributeListModel::moveAttributeUp);
+          &AttributeListModel::moveUp);
   connect(mView.data(), &EditableTableWidget::btnMoveDownClicked, mModel.data(),
-          &AttributeListModel::moveAttributeDown);
+          &AttributeListModel::moveDown);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);

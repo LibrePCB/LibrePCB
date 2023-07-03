@@ -87,7 +87,7 @@ private:  // Methods
   void itemEdited(const ComponentSymbolVariantItemList& list, int index,
                   const std::shared_ptr<const ComponentSymbolVariantItem>& item,
                   ComponentSymbolVariantItem::Event event) noexcept;
-  void btnSymbolBrowseClicked(const QVariant& data) noexcept;
+  void btnSymbolBrowseClicked(const QPersistentModelIndex& itemIndex) noexcept;
 
 private:  // Data
   QScopedPointer<ComponentSymbolVariantItemListModel> mModel;

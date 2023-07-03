@@ -59,8 +59,8 @@ void PathModel::setPath(const Path& path) noexcept {
  *  Slots
  ******************************************************************************/
 
-void PathModel::addItem(const QVariant& editData) noexcept {
-  Q_UNUSED(editData);
+void PathModel::add(const QPersistentModelIndex& itemIndex) noexcept {
+  Q_UNUSED(itemIndex);
   beginInsertRows(QModelIndex(), mPath.getVertices().count(),
                   mPath.getVertices().count());
   mPath.addVertex(mNewVertex);
@@ -68,8 +68,8 @@ void PathModel::addItem(const QVariant& editData) noexcept {
   emit pathChanged(mPath);
 }
 
-void PathModel::copyItem(const QVariant& editData) noexcept {
-  int index = editData.toInt();
+void PathModel::copy(const QPersistentModelIndex& itemIndex) noexcept {
+  int index = itemIndex.data(Qt::EditRole).toInt();
   if ((index >= 0) && (index < mPath.getVertices().count())) {
     beginInsertRows(QModelIndex(), index, index);
     mPath.insertVertex(index, mPath.getVertices().value(index));
@@ -80,8 +80,8 @@ void PathModel::copyItem(const QVariant& editData) noexcept {
   }
 }
 
-void PathModel::removeItem(const QVariant& editData) noexcept {
-  int index = editData.toInt();
+void PathModel::remove(const QPersistentModelIndex& itemIndex) noexcept {
+  int index = itemIndex.data(Qt::EditRole).toInt();
   if ((index >= 0) && (index < mPath.getVertices().count())) {
     beginRemoveRows(QModelIndex(), index, index);
     mPath.getVertices().remove(index);
@@ -92,8 +92,8 @@ void PathModel::removeItem(const QVariant& editData) noexcept {
   }
 }
 
-void PathModel::moveItemUp(const QVariant& editData) noexcept {
-  int index = editData.toInt();
+void PathModel::moveUp(const QPersistentModelIndex& itemIndex) noexcept {
+  int index = itemIndex.data(Qt::EditRole).toInt();
   if ((index >= 1) && (index < mPath.getVertices().count())) {
     beginMoveRows(QModelIndex(), index, index, QModelIndex(), index - 1);
     mPath.getVertices().insert(index - 1, mPath.getVertices().takeAt(index));
@@ -102,8 +102,8 @@ void PathModel::moveItemUp(const QVariant& editData) noexcept {
   }
 }
 
-void PathModel::moveItemDown(const QVariant& editData) noexcept {
-  int index = editData.toInt();
+void PathModel::moveDown(const QPersistentModelIndex& itemIndex) noexcept {
+  int index = itemIndex.data(Qt::EditRole).toInt();
   if ((index >= 0) && (index < mPath.getVertices().count() - 1)) {
     // Note: destination index "+2" looks strange, but is correct. See Qt docs
     // for explanation.

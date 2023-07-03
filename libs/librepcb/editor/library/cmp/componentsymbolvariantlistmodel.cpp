@@ -82,9 +82,9 @@ void ComponentSymbolVariantListModel::setUndoStack(UndoStack* stack) noexcept {
  *  Slots
  ******************************************************************************/
 
-void ComponentSymbolVariantListModel::addSymbolVariant(
-    const QVariant& editData) noexcept {
-  Q_UNUSED(editData);
+void ComponentSymbolVariantListModel::add(
+    const QPersistentModelIndex& itemIndex) noexcept {
+  Q_UNUSED(itemIndex);
   if (!mSymbolVariantList) {
     return;
   }
@@ -103,14 +103,14 @@ void ComponentSymbolVariantListModel::addSymbolVariant(
   }
 }
 
-void ComponentSymbolVariantListModel::removeSymbolVariant(
-    const QVariant& editData) noexcept {
+void ComponentSymbolVariantListModel::remove(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mSymbolVariantList) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     std::shared_ptr<ComponentSymbolVariant> sv = mSymbolVariantList->get(uuid);
     execCmd(new CmdComponentSymbolVariantRemove(*mSymbolVariantList, sv.get()));
   } catch (const Exception& e) {
@@ -118,14 +118,14 @@ void ComponentSymbolVariantListModel::removeSymbolVariant(
   }
 }
 
-void ComponentSymbolVariantListModel::moveSymbolVariantUp(
-    const QVariant& editData) noexcept {
+void ComponentSymbolVariantListModel::moveUp(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mSymbolVariantList) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     int index = mSymbolVariantList->indexOf(uuid);
     if ((index >= 1) && (index < mSymbolVariantList->count())) {
       execCmd(new CmdComponentSymbolVariantsSwap(*mSymbolVariantList, index,
@@ -136,14 +136,14 @@ void ComponentSymbolVariantListModel::moveSymbolVariantUp(
   }
 }
 
-void ComponentSymbolVariantListModel::moveSymbolVariantDown(
-    const QVariant& editData) noexcept {
+void ComponentSymbolVariantListModel::moveDown(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mSymbolVariantList) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     int index = mSymbolVariantList->indexOf(uuid);
     if ((index >= 0) && (index < mSymbolVariantList->count() - 1)) {
       execCmd(new CmdComponentSymbolVariantsSwap(*mSymbolVariantList, index,

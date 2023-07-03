@@ -93,9 +93,9 @@ void ComponentSymbolVariantItemListModel::setUndoStack(
  *  Slots
  ******************************************************************************/
 
-void ComponentSymbolVariantItemListModel::addItem(
-    const QVariant& editData) noexcept {
-  Q_UNUSED(editData);
+void ComponentSymbolVariantItemListModel::add(
+    const QPersistentModelIndex& itemIndex) noexcept {
+  Q_UNUSED(itemIndex);
   if (!mItemList || !mSymbolsCache) {
     return;
   }
@@ -125,14 +125,14 @@ void ComponentSymbolVariantItemListModel::addItem(
   }
 }
 
-void ComponentSymbolVariantItemListModel::removeItem(
-    const QVariant& editData) noexcept {
+void ComponentSymbolVariantItemListModel::remove(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mItemList) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     std::shared_ptr<ComponentSymbolVariantItem> item = mItemList->get(uuid);
     execCmd(new CmdComponentSymbolVariantItemRemove(*mItemList, item.get()));
   } catch (const Exception& e) {
@@ -140,14 +140,14 @@ void ComponentSymbolVariantItemListModel::removeItem(
   }
 }
 
-void ComponentSymbolVariantItemListModel::moveItemUp(
-    const QVariant& editData) noexcept {
+void ComponentSymbolVariantItemListModel::moveUp(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mItemList) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     int index = mItemList->indexOf(uuid);
     if ((index >= 1) && (index < mItemList->count())) {
       execCmd(
@@ -158,14 +158,14 @@ void ComponentSymbolVariantItemListModel::moveItemUp(
   }
 }
 
-void ComponentSymbolVariantItemListModel::moveItemDown(
-    const QVariant& editData) noexcept {
+void ComponentSymbolVariantItemListModel::moveDown(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mItemList) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     int index = mItemList->indexOf(uuid);
     if ((index >= 0) && (index < mItemList->count() - 1)) {
       execCmd(
@@ -176,8 +176,8 @@ void ComponentSymbolVariantItemListModel::moveItemDown(
   }
 }
 
-void ComponentSymbolVariantItemListModel::changeSymbol(
-    const QVariant& editData, const Uuid& symbol) noexcept {
+void ComponentSymbolVariantItemListModel::browse(
+    const QPersistentModelIndex& itemIndex, const Uuid& symbol) noexcept {
   if (!mItemList || !mSymbolsCache) {
     return;
   }
@@ -189,7 +189,8 @@ void ComponentSymbolVariantItemListModel::changeSymbol(
                          tr("Symbol '%1' not found in workspace library!")
                              .arg(symbol.toStr()));
     }
-    tl::optional<Uuid> uuid = Uuid::tryFromString(editData.toString());
+    tl::optional<Uuid> uuid =
+        Uuid::tryFromString(itemIndex.data(Qt::EditRole).toString());
     if (uuid) {
       std::shared_ptr<ComponentSymbolVariantItem> item = mItemList->get(*uuid);
       QScopedPointer<CmdComponentSymbolVariantItemEdit> cmd(

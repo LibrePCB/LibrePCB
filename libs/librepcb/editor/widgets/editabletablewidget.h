@@ -42,7 +42,7 @@ namespace editor {
 class EditableTableWidget : public QTableView {
   Q_OBJECT
 
-  typedef void (EditableTableWidget::*Signal)(const QVariant& data);
+  typedef void (EditableTableWidget::*Signal)(const QPersistentModelIndex&);
 
 public:
   // Constructors / Destructor
@@ -78,13 +78,13 @@ signals:
   void readOnlyChanged(bool readOnly);
   void canRemoveChanged(bool canRemove);
   void currentRowChanged(int row);
-  void btnAddClicked(const QVariant& data);
-  void btnRemoveClicked(const QVariant& data);
-  void btnCopyClicked(const QVariant& data);
-  void btnEditClicked(const QVariant& data);
-  void btnMoveUpClicked(const QVariant& data);
-  void btnMoveDownClicked(const QVariant& data);
-  void btnBrowseClicked(const QVariant& data);
+  void btnAddClicked(const QPersistentModelIndex& itemIndex);
+  void btnRemoveClicked(const QPersistentModelIndex& itemIndex);
+  void btnCopyClicked(const QPersistentModelIndex& itemIndex);
+  void btnEditClicked(const QPersistentModelIndex& itemIndex);
+  void btnMoveUpClicked(const QPersistentModelIndex& itemIndex);
+  void btnMoveDownClicked(const QPersistentModelIndex& itemIndex);
+  void btnBrowseClicked(const QPersistentModelIndex& itemIndex);
 
 private:
   void updateCanRemove() noexcept;
@@ -92,10 +92,10 @@ private:
   QToolButton* createButton(const QString& objectName, const QIcon& icon,
                             const QString& text, const QString& toolTip,
                             int width, int height, Signal clickedSignal,
-                            const QPersistentModelIndex& index, bool doesModify,
-                            bool doesRemove) noexcept;
+                            const QPersistentModelIndex& itemIndex,
+                            bool doesModify, bool doesRemove) noexcept;
   void buttonClickedHandler(Signal clickedSignal,
-                            const QPersistentModelIndex& index) noexcept;
+                            const QPersistentModelIndex& itemIndex) noexcept;
 
   bool mShowCopyButton;
   bool mShowEditButton;

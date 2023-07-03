@@ -83,8 +83,9 @@ void ComponentSignalListModel::setUndoStack(UndoStack* stack) noexcept {
  *  Slots
  ******************************************************************************/
 
-void ComponentSignalListModel::addSignal(const QVariant& editData) noexcept {
-  Q_UNUSED(editData);
+void ComponentSignalListModel::add(
+    const QPersistentModelIndex& itemIndex) noexcept {
+  Q_UNUSED(itemIndex);
   if (!mSignalList) {
     return;
   }
@@ -108,13 +109,14 @@ void ComponentSignalListModel::addSignal(const QVariant& editData) noexcept {
   }
 }
 
-void ComponentSignalListModel::removeSignal(const QVariant& editData) noexcept {
+void ComponentSignalListModel::remove(
+    const QPersistentModelIndex& itemIndex) noexcept {
   if (!mSignalList) {
     return;
   }
 
   try {
-    Uuid uuid = Uuid::fromString(editData.toString());
+    Uuid uuid = Uuid::fromString(itemIndex.data(Qt::EditRole).toString());
     std::shared_ptr<ComponentSignal> sig = mSignalList->get(uuid);
     execCmd(new CmdComponentSignalRemove(*mSignalList, sig.get()));
   } catch (const Exception& e) {

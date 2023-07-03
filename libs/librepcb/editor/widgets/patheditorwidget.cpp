@@ -62,15 +62,15 @@ PathEditorWidget::PathEditorWidget(QWidget* parent) noexcept
   mView->horizontalHeader()->setSectionResizeMode(
       PathModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
-          &PathModel::addItem);
+          &PathModel::add);
   connect(mView.data(), &EditableTableWidget::btnCopyClicked, mModel.data(),
-          &PathModel::copyItem);
+          &PathModel::copy);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &PathModel::removeItem);
+          &PathModel::remove);
   connect(mView.data(), &EditableTableWidget::btnMoveUpClicked, mModel.data(),
-          &PathModel::moveItemUp);
+          &PathModel::moveUp);
   connect(mView.data(), &EditableTableWidget::btnMoveDownClicked, mModel.data(),
-          &PathModel::moveItemDown);
+          &PathModel::moveDown);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);

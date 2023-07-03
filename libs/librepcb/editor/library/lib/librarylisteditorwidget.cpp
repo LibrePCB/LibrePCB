@@ -64,9 +64,9 @@ LibraryListEditorWidget::LibraryListEditorWidget(const Workspace& ws,
       Model::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
   mUi->tableView->sortByColumn(Model::COLUMN_TEXT, Qt::AscendingOrder);
   connect(mUi->tableView, &EditableTableWidget::btnAddClicked, mModel.data(),
-          &Model::addItem);
+          &Model::add);
   connect(mUi->tableView, &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &Model::removeItem);
+          &Model::remove);
   connect(mModel.data(), &Model::rowsInserted, this,
           &LibraryListEditorWidget::edited);
   connect(mModel.data(), &Model::rowsRemoved, this,

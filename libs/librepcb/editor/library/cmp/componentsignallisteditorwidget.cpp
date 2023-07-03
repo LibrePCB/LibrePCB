@@ -61,9 +61,9 @@ ComponentSignalListEditorWidget::ComponentSignalListEditorWidget(
   mView->sortByColumn(ComponentSignalListModel::COLUMN_NAME,
                       Qt::AscendingOrder);
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
-          &ComponentSignalListModel::addSignal);
+          &ComponentSignalListModel::add);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &ComponentSignalListModel::removeSignal);
+          &ComponentSignalListModel::remove);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
