@@ -182,6 +182,7 @@ private:
 
   // State
   volatile bool mPanningActive;
+  Qt::MouseButton mPanningButton;
   Qt::MouseButtons mPressedMouseButtons;
   QCursor mCursorBeforePanning;
   qint64 mIdleTimeMs;

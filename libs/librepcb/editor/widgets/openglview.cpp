@@ -178,7 +178,8 @@ void OpenGlView::mousePressEvent(QMouseEvent* e) {
 
 void OpenGlView::mouseMoveEvent(QMouseEvent* e) {
   const QVector2D diff = QVector2D(e->pos()) - mMousePressPosition;
-  if (e->buttons() & Qt::MiddleButton) {
+  if (e->buttons().testFlag(Qt::MiddleButton) ||
+      e->buttons().testFlag(Qt::RightButton)) {
     mTransform = mMousePressTransform;
     mTransform.translate(
         mMousePressTransform.inverted().map(QVector3D(diff.x(), -diff.y(), 0)) /
