@@ -119,7 +119,7 @@ inline QDataStream& operator<<(QDataStream& stream,
 }
 
 inline QDebug operator<<(QDebug stream, const ComponentPrefix& obj) {
-  stream << QString("ComponentPrefix('%1'')").arg(*obj);
+  stream << QString("ComponentPrefix('%1')").arg(*obj);
   return stream;
 }
 

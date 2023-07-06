@@ -131,7 +131,7 @@ inline QDataStream& operator<<(QDataStream& stream, const ElementName& obj) {
 }
 
 inline QDebug operator<<(QDebug stream, const ElementName& obj) {
-  stream << QString("ElementName('%1'')").arg(*obj);
+  stream << QString("ElementName('%1')").arg(*obj);
   return stream;
 }
 

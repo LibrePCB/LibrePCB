@@ -130,7 +130,7 @@ inline QDataStream& operator<<(QDataStream& stream,
 
 inline QDebug operator<<(QDebug stream,
                          const ComponentSymbolVariantItemSuffix& obj) {
-  stream << QString("ComponentSymbolVariantItemSuffix('%1'')").arg(*obj);
+  stream << QString("ComponentSymbolVariantItemSuffix('%1')").arg(*obj);
   return stream;
 }
 

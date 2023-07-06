@@ -111,7 +111,7 @@ inline QDataStream& operator<<(QDataStream& stream, const AttributeKey& obj) {
 }
 
 inline QDebug operator<<(QDebug stream, const AttributeKey& obj) {
-  stream << QString("AttributeKey('%1'')").arg(*obj);
+  stream << QString("AttributeKey('%1')").arg(*obj);
   return stream;
 }
 

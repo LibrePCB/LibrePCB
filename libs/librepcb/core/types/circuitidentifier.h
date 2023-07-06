@@ -156,7 +156,7 @@ inline QDataStream& operator<<(QDataStream& stream,
 }
 
 inline QDebug operator<<(QDebug stream, const CircuitIdentifier& obj) {
-  stream << QString("CircuitIdentifier('%1'')").arg(*obj);
+  stream << QString("CircuitIdentifier('%1')").arg(*obj);
   return stream;
 }
 
