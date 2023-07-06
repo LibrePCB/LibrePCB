@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
   <Name>librepcb.registerfileextensions</Name>
-  <DisplayName>Register File Extensions</DisplayName>
-  <Description>Register *.lpp file extension to open LibrePCB by double-clicking project files.</Description>
-  <Version>0.1.0</Version><!-- it's a special package, so its version is static -->
-  <ReleaseDate>RELEASE_DATE</ReleaseDate>
-  <Default>true</Default>
   <Script>installscript.qs</Script>
   <SortingPriority>20</SortingPriority>
 </Package>
