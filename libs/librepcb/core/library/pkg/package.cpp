@@ -154,9 +154,9 @@ QVector<std::shared_ptr<const PackageModel>> Package::getModelsForFootprint(
     const Uuid& fpt) const noexcept {
   QVector<std::shared_ptr<const PackageModel>> result;
   if (std::shared_ptr<const Footprint> footprint = mFootprints.find(fpt)) {
-    for (std::shared_ptr<const PackageModel> model : mModels.values()) {
-      if (footprint->getModels().contains(model->getUuid())) {
-        result.append(model);
+    for (auto modelIt = mModels.begin(); modelIt != mModels.end(); ++modelIt) {
+      if (footprint->getModels().contains(modelIt->getUuid())) {
+        result.append(modelIt.ptr());
       }
     }
   }

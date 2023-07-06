@@ -331,12 +331,12 @@ void FootprintGraphicsItem::syncPads() noexcept {
   }
 
   // Add new items.
-  for (auto& obj : mFootprint->getPads().values()) {
-    if (!mPadGraphicsItems.contains(obj)) {
-      Q_ASSERT(obj);
+  for (auto it = mFootprint->getPads().begin();
+       it != mFootprint->getPads().end(); ++it) {
+    if (!mPadGraphicsItems.contains(it.ptr())) {
       auto i = std::make_shared<FootprintPadGraphicsItem>(
-          obj, mLayerProvider, mPackagePadList, this);
-      mPadGraphicsItems.insert(obj, i);
+          it.ptr(), mLayerProvider, mPackagePadList, this);
+      mPadGraphicsItems.insert(it.ptr(), i);
     }
   }
 }

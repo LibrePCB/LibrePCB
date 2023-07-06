@@ -111,6 +111,7 @@ public:
       return *this;
     }
     O& operator*() { return **it; }
+    O* operator->() { return it->get(); }
     std::shared_ptr<O> ptr() noexcept {
       return std::const_pointer_cast<O>(*it);
     }
@@ -193,9 +194,7 @@ public:
   // Getters
   bool isEmpty() const noexcept { return mObjects.empty(); }
   int count() const noexcept { return mObjects.count(); }
-  const QVector<std::shared_ptr<T>>& values() const noexcept {
-    return mObjects;
-  }
+  const QVector<std::shared_ptr<T>>& values() noexcept { return mObjects; }
   std::vector<Uuid> getUuids() const noexcept {
     std::vector<Uuid> uuids;
     uuids.reserve(mObjects.count());

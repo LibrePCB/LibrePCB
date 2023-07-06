@@ -59,9 +59,10 @@ bool CmdPackageModelRemove::performExecute() {
   mIndex = mPackage.getModels().indexOf(mModel.get());
   if (mIndex < 0) throw LogicError(__FILE__, __LINE__, "Element not in list.");
 
-  for (auto footprint : mPackage.getFootprints().values()) {
-    if (footprint->getModels().contains(mModel->getUuid())) {
-      mRemovedFromFootprints.append(footprint);
+  for (auto fptIt = mPackage.getFootprints().begin();
+       fptIt != mPackage.getFootprints().end(); ++fptIt) {
+    if (fptIt->getModels().contains(mModel->getUuid())) {
+      mRemovedFromFootprints.append(fptIt.ptr());
     }
   }
 

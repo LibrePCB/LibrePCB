@@ -124,9 +124,9 @@ QPixmap FootprintClipboardData::generatePixmap(
     const IF_GraphicsLayerProvider& lp) noexcept {
   GraphicsScene scene;
   QVector<std::shared_ptr<QGraphicsItem>> items;
-  for (auto pad : mFootprintPads.values()) {
-    items.append(
-        std::make_shared<FootprintPadGraphicsItem>(pad, lp, &mPackagePads));
+  for (auto it = mFootprintPads.begin(); it != mFootprintPads.end(); ++it) {
+    items.append(std::make_shared<FootprintPadGraphicsItem>(it.ptr(), lp,
+                                                            &mPackagePads));
   }
   for (Polygon& polygon : mPolygons) {
     items.append(std::make_shared<PolygonGraphicsItem>(polygon, lp));

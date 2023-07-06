@@ -57,9 +57,10 @@ CmdPackageModelAdd::~CmdPackageModelAdd() noexcept {
 
 bool CmdPackageModelAdd::performExecute() {
   if (mAddToFootprints) {
-    for (auto footprint : mPackage.getFootprints().values()) {
-      if (!footprint->getModels().contains(mModel->getUuid())) {
-        mAddedToFootprints.append(footprint);
+    for (auto fptIt = mPackage.getFootprints().begin();
+         fptIt != mPackage.getFootprints().end(); ++fptIt) {
+      if (!fptIt->getModels().contains(mModel->getUuid())) {
+        mAddedToFootprints.append(fptIt.ptr());
       }
     }
   }

@@ -65,46 +65,43 @@ BGI_Device::BGI_Device(BI_Device& device,
   mOriginCrossGraphicsItem = std::make_shared<OriginCrossGraphicsItem>(this);
   mOriginCrossGraphicsItem->setSize(UnsignedLength(1400000));
 
-  for (auto& obj : mDevice.getLibFootprint().getCircles().values()) {
-    Q_ASSERT(obj);
+  for (auto& obj : mDevice.getLibFootprint().getCircles()) {
     auto i = std::make_shared<PrimitiveCircleGraphicsItem>(this);
-    i->setPosition(obj->getCenter());
-    i->setDiameter(positiveToUnsigned(obj->getDiameter()));
-    i->setLineWidth(obj->getLineWidth());
+    i->setPosition(obj.getCenter());
+    i->setDiameter(positiveToUnsigned(obj.getDiameter()));
+    i->setLineWidth(obj.getLineWidth());
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
-    if (obj->isGrabArea()) {
-      const qreal r = (obj->getDiameter() + obj->getLineWidth())->toPx() / 2;
+    if (obj.isGrabArea()) {
+      const qreal r = (obj.getDiameter() + obj.getLineWidth())->toPx() / 2;
       QPainterPath path;
-      path.addEllipse(obj->getCenter().toPxQPointF(), r, r);
+      path.addEllipse(obj.getCenter().toPxQPointF(), r, r);
       mShape |= path;
     }
     mCircleGraphicsItems.append(i);
   }
 
-  for (auto& obj : mDevice.getLibFootprint().getPolygons().values()) {
-    Q_ASSERT(obj);
+  for (auto& obj : mDevice.getLibFootprint().getPolygons()) {
     auto i = std::make_shared<PrimitivePathGraphicsItem>(this);
-    i->setPath(obj->getPath().toQPainterPathPx());
-    i->setLineWidth(obj->getLineWidth());
+    i->setPath(obj.getPath().toQPainterPathPx());
+    i->setLineWidth(obj.getLineWidth());
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
-    if (obj->isGrabArea()) {
-      mShape |= Toolbox::shapeFromPath(obj->getPath().toQPainterPathPx(),
+    if (obj.isGrabArea()) {
+      mShape |= Toolbox::shapeFromPath(obj.getPath().toQPainterPathPx(),
                                        QPen(Qt::SolidPattern, 0),
-                                       Qt::SolidPattern, obj->getLineWidth());
+                                       Qt::SolidPattern, obj.getLineWidth());
     }
     mPolygonGraphicsItems.append(i);
   }
 
-  for (auto& obj : mDevice.getLibFootprint().getZones().values()) {
-    Q_ASSERT(obj);
+  for (auto& obj : mDevice.getLibFootprint().getZones()) {
     auto i = std::make_shared<PrimitiveZoneGraphicsItem>(mLayerProvider, this);
-    i->setOutline(obj->getOutline());
+    i->setOutline(obj.getOutline());
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     mZoneGraphicsItems.append(i);
   }
 
-  for (auto& obj : mDevice.getLibFootprint().getHoles().values()) {
-    Q_ASSERT(obj);
+  for (auto& obj : mDevice.getLibFootprint().getHoles()) {
+    Q_UNUSED(obj);
     auto i = std::make_shared<PrimitiveHoleGraphicsItem>(mLayerProvider, false,
                                                          this);
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
