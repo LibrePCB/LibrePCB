@@ -27,6 +27,7 @@
 #include "../../../font/stroketextpathbuilder.h"
 #include "../../../types/layer.h"
 #include "../../project.h"
+#include "../../projectattributelookup.h"
 #include "../board.h"
 #include "bi_device.h"
 
@@ -204,14 +205,6 @@ void BI_StrokeText::setDevice(BI_Device* device) noexcept {
   updateText();
 }
 
-const AttributeProvider* BI_StrokeText::getAttributeProvider() const noexcept {
-  if (mDevice) {
-    return mDevice;
-  } else {
-    return &mBoard;
-  }
-}
-
 void BI_StrokeText::addToBoard() {
   if (isAddedToBoard()) {
     throw LogicError(__FILE__, __LINE__);
@@ -233,8 +226,10 @@ void BI_StrokeText::removeFromBoard() {
  ******************************************************************************/
 
 void BI_StrokeText::updateText() noexcept {
-  const QString text =
-      AttributeSubstitutor::substitute(mData.getText(), getAttributeProvider());
+  const QString text = AttributeSubstitutor::substitute(
+      mData.getText(),
+      mDevice ? ProjectAttributeLookup(*mDevice)
+              : ProjectAttributeLookup(mBoard));
   if (text != mSubstitutedText) {
     mSubstitutedText = text;
     updatePaths();

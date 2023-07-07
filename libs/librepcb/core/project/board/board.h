@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../attribute/attributeprovider.h"
 #include "../../fileio/filepath.h"
 #include "../../fileio/transactionaldirectory.h"
 #include "../../types/elementname.h"
@@ -71,7 +70,7 @@ class SceneData3D;
  * @brief The Board class represents a PCB of a project and is always part of a
  * circuit
  */
-class Board final : public QObject, public AttributeProvider {
+class Board final : public QObject {
   Q_OBJECT
 
 public:
@@ -234,23 +233,13 @@ public:
   void removeFromProject();
   void save();
 
-  // Inherited from AttributeProvider
-  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
-  QVector<const AttributeProvider*> getAttributeProviderParents() const
-      noexcept override;
-
   // Operator Overloadings
   Board& operator=(const Board& rhs) = delete;
   bool operator==(const Board& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const Board& rhs) noexcept { return (this != &rhs); }
 
 signals:
-
-  /// @copydoc AttributeProvider::attributesChanged()
-  void attributesChanged() override;
-
+  void attributesChanged();
   void designRulesModified();
   void innerLayerCountChanged();
 

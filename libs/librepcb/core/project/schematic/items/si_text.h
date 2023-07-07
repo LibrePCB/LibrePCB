@@ -35,7 +35,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class AttributeProvider;
 class SI_Symbol;
 class Schematic;
 
@@ -76,7 +75,6 @@ public:
   // General Methods
   SI_Symbol* getSymbol() const noexcept { return mSymbol; }
   void setSymbol(SI_Symbol* symbol) noexcept;
-  const AttributeProvider* getAttributeProvider() const noexcept;
   void addToSchematic() override;
   void removeFromSchematic() override;
 

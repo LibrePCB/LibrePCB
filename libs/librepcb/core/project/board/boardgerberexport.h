@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../attribute/attributeprovider.h"
 #include "../../export/excellongenerator.h"
 #include "../../fileio/filepath.h"
 #include "../../types/length.h"
@@ -55,7 +54,7 @@ class Project;
 /**
  * @brief The BoardGerberExport class
  */
-class BoardGerberExport final : public QObject, public AttributeProvider {
+class BoardGerberExport final : public QObject {
   Q_OBJECT
 
 public:
@@ -79,18 +78,8 @@ public:
   void exportPcbLayers(const BoardFabricationOutputSettings& settings) const;
   void exportComponentLayer(BoardSide side, const FilePath& filePath) const;
 
-  // Inherited from AttributeProvider
-  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
-  QVector<const AttributeProvider*> getAttributeProviderParents() const
-      noexcept override;
-
   // Operator Overloadings
   BoardGerberExport& operator=(const BoardGerberExport& rhs) = delete;
-
-signals:
-  void attributesChanged() override;
 
 private:
   // Private Methods
@@ -135,6 +124,7 @@ private:
       const BoardFabricationOutputSettings& settings,
       ExcellonGenerator::Plating plating) const;
   FilePath getOutputFilePath(QString path) const noexcept;
+  QString getAttributeValue(const QString& key) const noexcept;
 
   // Static Methods
   static UnsignedLength calcWidthOfLayer(const UnsignedLength& width,

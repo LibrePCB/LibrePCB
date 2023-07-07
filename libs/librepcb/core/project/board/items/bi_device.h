@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../../attribute/attribute.h"
-#include "../../../attribute/attributeprovider.h"
 #include "../../../geometry/stroketext.h"
 #include "../../../types/uuid.h"
 #include "../../../utils/signalslot.h"
@@ -54,7 +53,7 @@ class Project;
 /**
  * @brief The BI_Device class
  */
-class BI_Device final : public BI_Base, public AttributeProvider {
+class BI_Device final : public BI_Base {
   Q_OBJECT
 
 public:
@@ -130,22 +129,11 @@ public:
    */
   void serialize(SExpression& root) const;
 
-  // Inherited from AttributeProvider
-  /// @copydoc ::librepcb::AttributeProvider::getUserDefinedAttributeValue()
-  QString getUserDefinedAttributeValue(const QString& key) const
-      noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
-  QVector<const AttributeProvider*> getAttributeProviderParents() const
-      noexcept override;
-
   // Operator Overloadings
   BI_Device& operator=(const BI_Device& rhs) = delete;
 
 signals:
-  /// @copydoc AttributeProvider::attributesChanged()
-  void attributesChanged() override;
+  void attributesChanged();
 
   void strokeTextAdded(BI_StrokeText& strokeText);
   void strokeTextRemoved(BI_StrokeText& strokeText);

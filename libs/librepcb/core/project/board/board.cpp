@@ -964,27 +964,6 @@ void Board::save() {
 }
 
 /*******************************************************************************
- *  Inherited from AttributeProvider
- ******************************************************************************/
-
-QString Board::getBuiltInAttributeValue(const QString& key) const noexcept {
-  if (key == QLatin1String("BOARD")) {
-    return *mName;
-  } else if (key == QLatin1String("BOARD_DIRNAME")) {
-    return mDirectory->getPath().split("/").last();
-  } else if (key == QLatin1String("BOARD_INDEX")) {
-    return QString::number(mProject.getBoardIndex(*this));
-  } else {
-    return QString();
-  }
-}
-
-QVector<const AttributeProvider*> Board::getAttributeProviderParents() const
-    noexcept {
-  return QVector<const AttributeProvider*>{&mProject};
-}
-
-/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

@@ -32,6 +32,7 @@
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/board/boardpickplacegenerator.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 
 #include <QtCore>
 
@@ -194,7 +195,7 @@ void BoardPickPlaceGeneratorDialog::updateTable() noexcept {
 FilePath BoardPickPlaceGeneratorDialog::getOutputFilePath(
     const QString& text) const noexcept {
   QString path = AttributeSubstitutor::substitute(
-      text.trimmed(), &mBoard.getProject(), [&](const QString& str) {
+      text.trimmed(), ProjectAttributeLookup(mBoard), [&](const QString& str) {
         return FilePath::cleanFileName(
             str, FilePath::ReplaceSpaces | FilePath::KeepCase);
       });

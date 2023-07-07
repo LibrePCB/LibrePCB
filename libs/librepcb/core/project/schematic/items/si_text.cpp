@@ -23,7 +23,9 @@
 #include "si_text.h"
 
 #include "../../../attribute/attributesubstitutor.h"
+#include "../../circuit/componentinstance.h"
 #include "../../project.h"
+#include "../../projectattributelookup.h"
 #include "../schematic.h"
 #include "si_symbol.h"
 
@@ -81,14 +83,6 @@ void SI_Text::setSymbol(SI_Symbol* symbol) noexcept {
   updateText();
 }
 
-const AttributeProvider* SI_Text::getAttributeProvider() const noexcept {
-  if (mSymbol) {
-    return mSymbol.data();
-  } else {
-    return &mSchematic;
-  }
-}
-
 void SI_Text::addToSchematic() {
   if (isAddedToSchematic()) {
     throw LogicError(__FILE__, __LINE__);
@@ -128,8 +122,17 @@ void SI_Text::textEdited(const Text& text, Text::Event event) noexcept {
 }
 
 void SI_Text::updateText() noexcept {
-  const QString text = AttributeSubstitutor::substitute(mTextObj.getText(),
-                                                        getAttributeProvider());
+  auto getLookup = [this]() {
+    if (mSymbol) {
+      QPointer<const BI_Device> device =
+          mSymbol->getComponentInstance().getPrimaryDevice();
+      return ProjectAttributeLookup(*mSymbol, device);
+    } else {
+      return ProjectAttributeLookup(mSchematic);
+    }
+  };
+  const QString text =
+      AttributeSubstitutor::substitute(mTextObj.getText(), getLookup());
   if (text != mText) {
     mText = text;
     onEdited.notify(Event::TextChanged);

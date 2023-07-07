@@ -73,8 +73,6 @@ add_library(
   attribute/attribute.cpp
   attribute/attribute.h
   attribute/attributekey.h
-  attribute/attributeprovider.cpp
-  attribute/attributeprovider.h
   attribute/attributesubstitutor.cpp
   attribute/attributesubstitutor.h
   attribute/attributetype.cpp
@@ -347,6 +345,8 @@ add_library(
   project/erc/electricalrulecheckmessages.h
   project/project.cpp
   project/project.h
+  project/projectattributelookup.cpp
+  project/projectattributelookup.h
   project/projectlibrary.cpp
   project/projectlibrary.h
   project/projectloader.cpp

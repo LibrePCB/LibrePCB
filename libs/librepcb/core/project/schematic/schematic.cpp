@@ -54,7 +54,6 @@ Schematic::Schematic(Project& project,
                      const QString& directoryName, const Uuid& uuid,
                      const ElementName& name)
   : QObject(&project),
-    AttributeProvider(),
     mProject(project),
     mDirectoryName(directoryName),
     mDirectory(std::move(directory)),
@@ -329,25 +328,6 @@ void Schematic::updateAllNetLabelAnchors() noexcept {
   foreach (SI_NetSegment* netsegment, mNetSegments) {
     netsegment->updateAllNetLabelAnchors();
   }
-}
-
-/*******************************************************************************
- *  Inherited from AttributeProvider
- ******************************************************************************/
-
-QString Schematic::getBuiltInAttributeValue(const QString& key) const noexcept {
-  if (key == QLatin1String("SHEET")) {
-    return *mName;
-  } else if (key == QLatin1String("PAGE")) {
-    return QString::number(mProject.getSchematicIndex(*this) + 1);
-  } else {
-    return QString();
-  }
-}
-
-QVector<const AttributeProvider*> Schematic::getAttributeProviderParents() const
-    noexcept {
-  return QVector<const AttributeProvider*>{&mProject};
 }
 
 /*******************************************************************************

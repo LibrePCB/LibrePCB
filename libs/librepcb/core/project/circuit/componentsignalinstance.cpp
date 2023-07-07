@@ -29,6 +29,7 @@
 #include "../../utils/scopeguardlist.h"
 #include "../board/items/bi_footprintpad.h"
 #include "../project.h"
+#include "../projectattributelookup.h"
 #include "../schematic/items/si_symbolpin.h"
 #include "circuit.h"
 #include "componentinstance.h"
@@ -73,8 +74,9 @@ bool ComponentSignalInstance::isNetSignalNameForced() const noexcept {
 }
 
 QString ComponentSignalInstance::getForcedNetSignalName() const noexcept {
-  return AttributeSubstitutor::substitute(mComponentSignal.getForcedNetName(),
-                                          &mComponentInstance);
+  return AttributeSubstitutor::substitute(
+      mComponentSignal.getForcedNetName(),
+      ProjectAttributeLookup(mComponentInstance, nullptr));
 }
 
 int ComponentSignalInstance::getRegisteredElementsCount() const noexcept {

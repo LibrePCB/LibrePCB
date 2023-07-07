@@ -37,6 +37,7 @@
 #include <librepcb/core/project/bomgenerator.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -252,7 +253,7 @@ void BomGeneratorDialog::updateTable() noexcept {
 FilePath BomGeneratorDialog::getOutputFilePath() const noexcept {
   QString path = mUi->edtOutputPath->text().trimmed();
   path = AttributeSubstitutor::substitute(
-      path, &mProject, [&](const QString& str) {
+      path, ProjectAttributeLookup(mProject), [&](const QString& str) {
         return FilePath::cleanFileName(
             str, FilePath::ReplaceSpaces | FilePath::KeepCase);
       });

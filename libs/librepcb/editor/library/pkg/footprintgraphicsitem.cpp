@@ -490,25 +490,23 @@ void FootprintGraphicsItem::footprintEdited(const Footprint& footprint,
 void FootprintGraphicsItem::substituteText(
     StrokeTextGraphicsItem& text) noexcept {
   if (mComponent) {
+    auto lookup = [this](const QString& key) {
+      if (key == "COMPONENT") {
+        return *mComponent->getNames().value(mLocaleOrder);
+      } else if (key == "NAME") {
+        return *mComponent->getPrefixes().value(mLocaleOrder) + "?";
+      } else {
+        // If an attribute is not defined, return its key. This makes sure that
+        // e.g. in a schematic frame the texts like "{{FIELD_SHEET}}" are
+        // visible as "FIELD_SHEET" instead of completely missing text. Same
+        // applies to the "{{VALUE}}" text - it's almost impossible to
+        // automatically substitute it by a reasonable value (e.g. the
+        // component's default value) so let's simply display "VALUE".
+        return key;
+      }
+    };
     text.setTextOverride(
-        AttributeSubstitutor::substitute(text.getText().getText(), this));
-  }
-}
-
-QString FootprintGraphicsItem::getBuiltInAttributeValue(
-    const QString& key) const noexcept {
-  if (mComponent && (key == "COMPONENT")) {
-    return *mComponent->getNames().value(mLocaleOrder);
-  } else if (mComponent && (key == "NAME")) {
-    return *mComponent->getPrefixes().value(mLocaleOrder) % "?";
-  } else {
-    // If an attribute is not defined, return its key. This makes sure that
-    // e.g. in a schematic frame the texts like "{{FIELD_SHEET}}" are visible
-    // as "FIELD_SHEET" instead of completely missing text. Same applies to the
-    // "{{VALUE}}" text - it's almost impossible to automatically substitute it
-    // by a reasonable value (e.g. the component's default value) so let's
-    // simply display "VALUE".
-    return key;
+        AttributeSubstitutor::substitute(text.getText().getText(), lookup));
   }
 }
 

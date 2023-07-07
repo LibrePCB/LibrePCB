@@ -22,11 +22,13 @@
  ******************************************************************************/
 #include "boardpickplacegenerator.h"
 
+#include "../../attribute/attributesubstitutor.h"
 #include "../../export/pickplacedata.h"
 #include "../../library/dev/device.h"
 #include "../../library/pkg/package.h"
 #include "../circuit/componentinstance.h"
 #include "../project.h"
+#include "../projectattributelookup.h"
 #include "board.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
@@ -68,9 +70,11 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
   const QStringList& locale = mBoard.getProject().getLocaleOrder();
 
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    ProjectAttributeLookup lookup(*device);
     QList<PickPlaceDataItem> items;
     const QString designator = *device->getComponentInstance().getName();
-    const QString val = device->getComponentInstance().getValue(true).trimmed();
+    const QString value =
+        AttributeSubstitutor::substitute(lookup("VALUE"), lookup).trimmed();
     const QString devName = *device->getLibDevice().getNames().value(locale);
     const QString pkgName = *device->getLibPackage().getNames().value(locale);
 
@@ -87,7 +91,7 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
         const Angle rotation =
             pad->getMirrored() ? -pad->getRotation() : pad->getRotation();
         foreach (const auto side, sides) {
-          items.append(PickPlaceDataItem(designator, val, devName, pkgName,
+          items.append(PickPlaceDataItem(designator, value, devName, pkgName,
                                          pad->getPosition(), rotation, side,
                                          PickPlaceDataItem::Type::Fiducial));
         }
@@ -111,7 +115,7 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
       const PickPlaceDataItem::BoardSide boardSide = device->getMirrored()
           ? PickPlaceDataItem::BoardSide::Bottom
           : PickPlaceDataItem::BoardSide::Top;
-      items.append(PickPlaceDataItem(designator, val, devName, pkgName,
+      items.append(PickPlaceDataItem(designator, value, devName, pkgName,
                                      position, rotation, boardSide, *typeIt));
     }
 

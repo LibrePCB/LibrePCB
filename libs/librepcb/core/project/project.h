@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../attribute/attribute.h"
-#include "../attribute/attributeprovider.h"
 #include "../fileio/directorylock.h"
 #include "../fileio/transactionaldirectory.h"
 #include "../types/elementname.h"
@@ -67,7 +66,7 @@ class StrokeFontPool;
  * @note !! A detailed description about projects is available here: @ref
  * doc_project !!
  */
-class Project final : public QObject, public AttributeProvider {
+class Project final : public QObject {
   Q_OBJECT
 
 public:
@@ -455,13 +454,6 @@ public:
    */
   void save();
 
-  // Inherited from AttributeProvider
-  /// @copydoc ::librepcb::AttributeProvider::getUserDefinedAttributeValue()
-  QString getUserDefinedAttributeValue(const QString& key) const
-      noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-
   // Operator Overloadings
   bool operator==(const Project& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const Project& rhs) noexcept { return (this != &rhs); }
@@ -477,9 +469,7 @@ public:
   static Version getProjectFileFormatVersion(const FilePath& dir);
 
 signals:
-
-  /// @copydoc AttributeProvider::attributesChanged()
-  void attributesChanged() override;
+  void attributesChanged();
 
   /**
    * @brief The norm order has been changed

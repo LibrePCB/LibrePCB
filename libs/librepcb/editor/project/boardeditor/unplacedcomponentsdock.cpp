@@ -33,6 +33,7 @@
 #include "ui_unplacedcomponentsdock.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
@@ -43,6 +44,7 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/projectlibrary.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -207,7 +209,8 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
       bool hasPreSelectedDevice = component->getDefaultDeviceUuid().has_value();
 
       // Add component to list.
-      QString value = component->getValue(true)
+      ProjectAttributeLookup lookup(*component, nullptr);
+      QString value = AttributeSubstitutor::substitute(lookup("VALUE"), lookup)
                           .split("\n", QString::SkipEmptyParts)
                           .join("|");
       QString libCmpName = *component->getLibComponent().getNames().value(

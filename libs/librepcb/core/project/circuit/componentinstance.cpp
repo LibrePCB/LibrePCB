@@ -22,7 +22,6 @@
  ******************************************************************************/
 #include "componentinstance.h"
 
-#include "../../attribute/attributesubstitutor.h"
 #include "../../exceptions.h"
 #include "../../library/cmp/component.h"
 #include "../../utils/scopeguardlist.h"
@@ -90,14 +89,6 @@ ComponentInstance::~ComponentInstance() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
-
-QString ComponentInstance::getValue(bool replaceAttributes) const noexcept {
-  if (replaceAttributes) {
-    return AttributeSubstitutor::substitute(mValue, this);
-  } else {
-    return mValue;
-  }
-}
 
 int ComponentInstance::getRegisteredElementsCount() const noexcept {
   int count = 0;
@@ -270,40 +261,6 @@ void ComponentInstance::serialize(SExpression& root) const {
     root.ensureLineBreak();
   }
   root.ensureLineBreak();
-}
-
-/*******************************************************************************
- *  Inherited from AttributeProvider
- ******************************************************************************/
-
-QString ComponentInstance::getUserDefinedAttributeValue(
-    const QString& key) const noexcept {
-  if (std::shared_ptr<Attribute> attr = mAttributes->find(key)) {
-    return attr->getValueTr(true);
-  } else {
-    return QString();
-  }
-}
-
-QString ComponentInstance::getBuiltInAttributeValue(const QString& key) const
-    noexcept {
-  if (key == QLatin1String("NAME")) {
-    return *mName;
-  } else if (key == QLatin1String("VALUE")) {
-    return mValue;
-  } else if (key == QLatin1String("COMPONENT")) {
-    return *mLibComponent.getNames().value(getLocaleOrder());
-  } else {
-    return QString();
-  }
-}
-
-QVector<const AttributeProvider*>
-    ComponentInstance::getAttributeProviderParents() const noexcept {
-  return QVector<const AttributeProvider*>{
-      &mCircuit.getProject(),
-      getPrimaryDevice(),
-  };
 }
 
 /*******************************************************************************

@@ -76,6 +76,7 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -1684,8 +1685,8 @@ void BoardEditor::execD356NetlistExportDialog() noexcept {
 
   try {
     QString path = "output/{{VERSION}}/{{PROJECT}}_Netlist.d356";
-    path =
-        AttributeSubstitutor::substitute(path, board, [&](const QString& str) {
+    path = AttributeSubstitutor::substitute(
+        path, ProjectAttributeLookup(*board), [&](const QString& str) {
           return FilePath::cleanFileName(
               str, FilePath::ReplaceSpaces | FilePath::KeepCase);
         });

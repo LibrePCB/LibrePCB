@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/attribute/attributeprovider.h>
 #include <librepcb/core/fileio/filepath.h>
 
 #include <QtCore>

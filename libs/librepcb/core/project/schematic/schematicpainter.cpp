@@ -23,7 +23,6 @@
 #include "schematicpainter.h"
 
 #include "../../application.h"
-#include "../../attribute/attributesubstitutor.h"
 #include "../../export/graphicsexportsettings.h"
 #include "../../export/graphicspainter.h"
 #include "../../library/sym/symbol.h"

@@ -371,35 +371,6 @@ void BI_Device::serialize(SExpression& root) const {
 }
 
 /*******************************************************************************
- *  Inherited from AttributeProvider
- ******************************************************************************/
-
-QString BI_Device::getUserDefinedAttributeValue(const QString& key) const
-    noexcept {
-  if (std::shared_ptr<const Attribute> attr = mAttributes.find(key)) {
-    return attr->getValueTr(true);
-  } else {
-    return QString();
-  }
-}
-
-QString BI_Device::getBuiltInAttributeValue(const QString& key) const noexcept {
-  if (key == QLatin1String("DEVICE")) {
-    return *mLibDevice->getNames().value(getLocaleOrder());
-  } else if (key == QLatin1String("PACKAGE")) {
-    return *mLibPackage->getNames().value(getLocaleOrder());
-  } else if (key == QLatin1String("FOOTPRINT")) {
-    return *mLibFootprint->getNames().value(getLocaleOrder());
-  } else {
-    return QString();
-  }
-}
-
-QVector<const AttributeProvider*> BI_Device::getAttributeProviderParents() const
-    noexcept {
-  return QVector<const AttributeProvider*>{&mBoard, &mCompInstance};
-}
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 

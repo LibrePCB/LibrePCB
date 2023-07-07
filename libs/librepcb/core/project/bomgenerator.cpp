@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "bomgenerator.h"
 
+#include "../attribute/attributesubstitutor.h"
 #include "../export/bom.h"
 #include "../library/cmp/component.h"
 #include "../library/dev/device.h"
@@ -31,6 +32,7 @@
 #include "circuit/circuit.h"
 #include "circuit/componentinstance.h"
 #include "project.h"
+#include "projectattributelookup.h"
 
 #include <QtCore>
 
@@ -63,6 +65,7 @@ std::shared_ptr<Bom> BomGenerator::generate(const Board* board) noexcept {
     if (cmpInst->getLibComponent().isSchematicOnly()) {
       continue;  // Don't export schematic-only components (e.g. sheet frames)
     }
+    ProjectAttributeLookup lookup(*cmpInst, nullptr);
     QString designator = *cmpInst->getName();
     QStringList attributes;
     QString devName;
@@ -75,15 +78,18 @@ std::shared_ptr<Bom> BomGenerator::generate(const Board* board) noexcept {
             Package::AssemblyType::None) {
           continue;
         }
+        lookup = ProjectAttributeLookup(*device);
         devName = *device->getLibDevice().getNames().getDefaultValue();
         pkgName = *device->getLibPackage().getNames().getDefaultValue();
       }
     }
-    attributes.append(cmpInst->getValue(true));
+    attributes.append(
+        AttributeSubstitutor::substitute(lookup("VALUE"), lookup));
     attributes.append(devName);
     attributes.append(pkgName);
     foreach (const QString& attribute, mAdditionalAttributes) {
-      attributes.append(cmpInst->getAttributeValue(attribute));
+      attributes.append(
+          AttributeSubstitutor::substitute(lookup(attribute), lookup));
     }
     bom->addItem(designator, attributes);
   }

@@ -50,6 +50,7 @@
 #include <librepcb/core/project/bomgenerator.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -585,7 +586,7 @@ bool CommandLineInterface::openProject(
     foreach (const QString& destStr, exportSchematicsFiles) {
       print(tr("Export schematics to '%1'...").arg(destStr));
       QString destPathStr = AttributeSubstitutor::substitute(
-          destStr, project.get(), [&](const QString& str) {
+          destStr, ProjectAttributeLookup(*project), [&](const QString& str) {
             return FilePath::cleanFileName(
                 str, FilePath::ReplaceSpaces | FilePath::KeepCase);
           });
@@ -644,12 +645,11 @@ bool CommandLineInterface::openProject(
           boardsToExport = {nullptr};
         }
         foreach (const Board* board, boardsToExport) {
-          const AttributeProvider* attrProvider = board;
-          if (!board) {
-            attrProvider = project.get();
-          }
           QString destPathStr = AttributeSubstitutor::substitute(
-              destStr, attrProvider, [&](const QString& str) {
+              destStr,
+              board ? ProjectAttributeLookup(*board)
+                    : ProjectAttributeLookup(*project),
+              [&](const QString& str) {
                 return FilePath::cleanFileName(
                     str, FilePath::ReplaceSpaces | FilePath::KeepCase);
               });
@@ -735,7 +735,8 @@ bool CommandLineInterface::openProject(
                   .arg(job.destStr));
         foreach (const Board* board, boards) {
           const QString destPathStr = AttributeSubstitutor::substitute(
-              job.destStr, board, [&](const QString& str) {
+              job.destStr, ProjectAttributeLookup(*board),
+              [&](const QString& str) {
                 return FilePath::cleanFileName(
                     str, FilePath::ReplaceSpaces | FilePath::KeepCase);
               });
@@ -769,7 +770,7 @@ bool CommandLineInterface::openProject(
       print(tr("Export netlist to '%1'...").arg(destStr));
       foreach (const Board* board, boards) {
         QString destPathStr = AttributeSubstitutor::substitute(
-            destStr, board, [&](const QString& str) {
+            destStr, ProjectAttributeLookup(*board), [&](const QString& str) {
               return FilePath::cleanFileName(
                   str, FilePath::ReplaceSpaces | FilePath::KeepCase);
             });

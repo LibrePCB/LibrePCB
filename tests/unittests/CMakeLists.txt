@@ -17,7 +17,6 @@ add_executable(
   core/algorithm/airwiresbuildertest.cpp
   core/applicationtest.cpp
   core/attribute/attributekeytest.cpp
-  core/attribute/attributeproviderdummy.h
   core/attribute/attributesubstitutortest.cpp
   core/attribute/attributetest.cpp
   core/attribute/attributetypetest.cpp

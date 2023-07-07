@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/attribute/attributeprovider.h>
 #include <librepcb/core/library/cmp/componentsymbolvariantitem.h>
 #include <librepcb/core/library/sym/symbol.h>
 
@@ -54,8 +53,7 @@ class TextGraphicsItem;
 /**
  * @brief The SymbolGraphicsItem class
  */
-class SymbolGraphicsItem final : public QGraphicsItemGroup,
-                                 public AttributeProvider {
+class SymbolGraphicsItem final : public QGraphicsItemGroup {
 public:
   enum class FindFlag {
     // Item types
@@ -116,9 +114,6 @@ public:
   // Operator Overloadings
   SymbolGraphicsItem& operator=(const SymbolGraphicsItem& rhs) = delete;
 
-signals:
-  void attributesChanged() override {}
-
 private:  // Methods
   void syncPins() noexcept;
   void syncCircles() noexcept;
@@ -126,7 +121,6 @@ private:  // Methods
   void syncTexts() noexcept;
   void symbolEdited(const Symbol& symbol, Symbol::Event event) noexcept;
   void substituteText(TextGraphicsItem& text) noexcept;
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 private:  // Data
   Symbol& mSymbol;

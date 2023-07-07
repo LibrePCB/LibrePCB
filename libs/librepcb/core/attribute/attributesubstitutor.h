@@ -32,8 +32,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class AttributeProvider;
-
 /*******************************************************************************
  *  Class AttributeSubstitutor
  ******************************************************************************/
@@ -46,7 +44,7 @@ class AttributeProvider;
  * Please read the documentation about the @ref doc_attributes_system to get an
  * idea how the @ref doc_attributes_system works in detail.
  *
- * @see librepcb::AttributeProvider
+ * @see ::librepcb::ProjectAttributeLookup
  * @see @ref doc_attributes_system
  *
  * @todo Fix side-effect of the endless loop detection ("{{FOO}} {{FOO}}" is
@@ -58,6 +56,7 @@ class AttributeProvider;
  */
 class AttributeSubstitutor final {
 public:
+  using LookupFunction = std::function<QString(const QString&)>;
   using FilterFunction = std::function<QString(const QString&)>;
 
   // Constructors / Destructor / Operator Overloadings
@@ -74,7 +73,7 @@ public:
    *
    * @param str       A string which can contain variables ("{{NAME}}"). The
    *                  attributes will be substituted directly in this string.
-   * @param ap        The attribute provider for attribute lookup.
+   * @param lookup    The attribute lookup function (key -> value).
    * @param filter    If a function is passed here, the substituted values will
    *                  be passed to this function first. This allows for example
    *                  to remove invalid characters if the resulting string is
@@ -82,7 +81,7 @@ public:
    *
    * @return True if str was modified in some way, false if not
    */
-  static QString substitute(QString str, const AttributeProvider* ap = nullptr,
+  static QString substitute(QString str, LookupFunction lookup = nullptr,
                             FilterFunction filter = nullptr) noexcept;
 
 private:  // Methods
@@ -109,7 +108,7 @@ private:  // Methods
                           FilterFunction filter) noexcept;
 
   static bool getValueOfKey(const QString& key, QString& value,
-                            const AttributeProvider* ap) noexcept;
+                            LookupFunction lookup) noexcept;
 };
 
 /*******************************************************************************

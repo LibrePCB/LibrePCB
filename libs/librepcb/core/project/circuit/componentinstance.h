@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../../attribute/attribute.h"
-#include "../../attribute/attributeprovider.h"
 #include "../../types/circuitidentifier.h"
 #include "../../types/uuid.h"
 
@@ -49,7 +48,7 @@ class SI_Symbol;
 /**
  * @brief The ComponentInstance class
  */
-class ComponentInstance : public QObject, public AttributeProvider {
+class ComponentInstance : public QObject {
   Q_OBJECT
 
 public:
@@ -65,7 +64,7 @@ public:
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }
   const CircuitIdentifier& getName() const noexcept { return mName; }
-  QString getValue(bool replaceAttributes = false) const noexcept;
+  const QString& getValue() const noexcept { return mValue; }
   const tl::optional<Uuid>& getDefaultDeviceUuid() const noexcept {
     return mDefaultDeviceUuid;
   }
@@ -139,23 +138,11 @@ public:
    */
   void serialize(SExpression& root) const;
 
-  // Inherited from AttributeProvider
-  /// @copydoc ::librepcb::AttributeProvider::getUserDefinedAttributeValue()
-  QString getUserDefinedAttributeValue(const QString& key) const
-      noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
-  QVector<const AttributeProvider*> getAttributeProviderParents() const
-      noexcept override;
-
   // Operator Overloadings
   ComponentInstance& operator=(const ComponentInstance& rhs) = delete;
 
 signals:
-  /// @copydoc AttributeProvider::attributesChanged()
-  void attributesChanged() override;
-
+  void attributesChanged();
   void primaryDeviceChanged(const BI_Device* device);
 
 private:
