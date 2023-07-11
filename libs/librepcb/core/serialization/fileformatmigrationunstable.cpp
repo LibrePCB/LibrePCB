@@ -61,22 +61,23 @@ void FileFormatMigrationUnstable::upgradePackageCategory(
 
 void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+  const QString fp = "symbol.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  upgradeInversionCharacters(root, "pin", "name/@0");
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-  const QString fp = "package.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  upgradeLayers(root);
-  for (SExpression* fptNode : root.getChildren("footprint")) {
-    upgradeCutouts(*fptNode, nullptr);
-  }
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+  const QString fp = "component.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  upgradeInversionCharacters(root, "signal", "name/@0");
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeDevice(TransactionalDirectory& dir) {
@@ -90,16 +91,6 @@ void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
 void FileFormatMigrationUnstable::upgradeWorkspaceData(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-  const QString settingsFp = "settings.lp";
-  if (dir.fileExists(settingsFp)) {
-    SExpression root =
-        SExpression::parse(dir.read(settingsFp), dir.getAbsPath(settingsFp));
-    root.replaceRecursive(SExpression::createToken("board_placement_top"),
-                          SExpression::createToken("board_legend_top"));
-    root.replaceRecursive(SExpression::createToken("board_placement_bottom"),
-                          SExpression::createToken("board_legend_bottom"));
-    dir.write(settingsFp, root.toByteArray());
-  }
 }
 
 /*******************************************************************************
@@ -130,13 +121,10 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  upgradeLayers(root);
-  upgradeCutouts(root, &context);
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {
   Q_UNUSED(root);
-  upgradeLayers(root);
 }
 
 /*******************************************************************************
