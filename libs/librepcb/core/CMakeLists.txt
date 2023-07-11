@@ -411,6 +411,7 @@ add_library(
   types/ratio.h
   types/signalrole.cpp
   types/signalrole.h
+  types/simplestring.h
   types/stroketextspacing.cpp
   types/stroketextspacing.h
   types/uuid.cpp

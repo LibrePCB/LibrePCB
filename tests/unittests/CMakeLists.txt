@@ -75,6 +75,7 @@ add_executable(
   core/types/pointtest.cpp
   core/types/ratiotest.cpp
   core/types/signalroletest.cpp
+  core/types/simplestringtest.cpp
   core/types/uuidtest.cpp
   core/types/versiontest.cpp
   core/utils/clipperhelperstest.cpp

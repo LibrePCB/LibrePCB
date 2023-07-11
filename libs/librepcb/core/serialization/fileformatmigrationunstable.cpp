@@ -86,6 +86,11 @@ void FileFormatMigrationUnstable::upgradeDevice(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  const QString fp = "library.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  root.appendChild("manufacturer", QString());
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeWorkspaceData(

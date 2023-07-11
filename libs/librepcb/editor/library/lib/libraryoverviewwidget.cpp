@@ -71,6 +71,7 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
   mUi->edtVersion->setReadOnly(mContext.readOnly);
   mUi->cbxDeprecated->setCheckable(!mContext.readOnly);
   mUi->edtUrl->setReadOnly(mContext.readOnly);
+  mUi->edtManufacturer->setReadOnly(mContext.readOnly);
   connect(mUi->btnIcon, &QPushButton::clicked, this,
           &LibraryOverviewWidget::btnIconClicked);
   connect(mUi->lstCmpCat, &QListWidget::doubleClicked, this,
@@ -119,6 +120,8 @@ LibraryOverviewWidget::LibraryOverviewWidget(const Context& context,
   connect(mUi->cbxDeprecated, &QCheckBox::clicked, this,
           &LibraryOverviewWidget::commitMetadata);
   connect(mUi->edtUrl, &QLineEdit::editingFinished, this,
+          &LibraryOverviewWidget::commitMetadata);
+  connect(mUi->edtManufacturer, &QLineEdit::editingFinished, this,
           &LibraryOverviewWidget::commitMetadata);
   connect(mDependenciesEditorWidget.data(), &LibraryListEditorWidget::edited,
           this, &LibraryOverviewWidget::commitMetadata);
@@ -299,6 +302,7 @@ void LibraryOverviewWidget::updateMetadata() noexcept {
   mUi->edtVersion->setText(mLibrary->getVersion().toStr());
   mUi->cbxDeprecated->setChecked(mLibrary->isDeprecated());
   mUi->edtUrl->setText(mLibrary->getUrl().toString());
+  mUi->edtManufacturer->setText(*mLibrary->getManufacturer());
   mUi->lstMessages->setApprovals(mLibrary->getMessageApprovals());
   mDependenciesEditorWidget->setUuids(mLibrary->getDependencies());
   mIcon = mLibrary->getIcon();
@@ -322,6 +326,7 @@ QString LibraryOverviewWidget::commitMetadata() noexcept {
     cmd->setAuthor(mUi->edtAuthor->text().trimmed());
     cmd->setDeprecated(mUi->cbxDeprecated->isChecked());
     cmd->setUrl(QUrl::fromUserInput(mUi->edtUrl->text().trimmed()));
+    cmd->setManufacturer(cleanSimpleString(mUi->edtManufacturer->text()));
     cmd->setDependencies(mDependenciesEditorWidget->getUuids());
     cmd->setIcon(mIcon);
 

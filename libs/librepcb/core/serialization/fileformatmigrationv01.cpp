@@ -247,6 +247,14 @@ void FileFormatMigrationV01::upgradeDevice(TransactionalDirectory& dir) {
 void FileFormatMigrationV01::upgradeLibrary(TransactionalDirectory& dir) {
   // Version File.
   upgradeVersionFile(dir, ".librepcb-lib");
+
+  // Content File.
+  {
+    const QString fp = "library.lp";
+    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root.appendChild("manufacturer", QString());
+    dir.write(fp, root.toByteArray());
+  }
 }
 
 void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,

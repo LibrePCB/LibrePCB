@@ -54,6 +54,7 @@ public:
   void setUrl(const QUrl& url) noexcept;
   void setDependencies(const QSet<Uuid>& deps) noexcept;
   void setIcon(const QByteArray& png) noexcept;
+  void setManufacturer(const SimpleString& value) noexcept;
 
   // Operator Overloadings
   CmdLibraryEdit& operator=(const CmdLibraryEdit& rhs) = delete;
@@ -77,6 +78,8 @@ private:  // Data
   QSet<Uuid> mNewDependencies;
   QByteArray mOldIcon;
   QByteArray mNewIcon;
+  SimpleString mOldManufacturer;
+  SimpleString mNewManufacturer;
 };
 
 /*******************************************************************************
