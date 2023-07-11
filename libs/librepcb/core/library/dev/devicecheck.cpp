@@ -50,6 +50,7 @@ DeviceCheck::~DeviceCheck() noexcept {
 RuleCheckMessageList DeviceCheck::runChecks() const {
   RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
   checkNoPadsConnected(msgs);
+  checkParts(msgs);
   return msgs;
 }
 
@@ -66,6 +67,12 @@ void DeviceCheck::checkNoPadsConnected(MsgList& msgs) const {
 
   if (!mDevice.getPadSignalMap().isEmpty()) {
     msgs.append(std::make_shared<MsgNoPadsInDeviceConnected>());
+  }
+}
+
+void DeviceCheck::checkParts(MsgList& msgs) const {
+  if (mDevice.getParts().isEmpty()) {
+    msgs.append(std::make_shared<MsgDeviceHasNoParts>());
   }
 }
 

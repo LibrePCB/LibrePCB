@@ -57,6 +57,7 @@ public:
 
 protected:  // Methods
   void checkNoPadsConnected(MsgList& msgs) const;
+  void checkParts(MsgList& msgs) const;
 
 private:  // Data
   const Device& mDevice;

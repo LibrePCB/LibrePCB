@@ -33,6 +33,24 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  Class MsgDeviceHasNoParts
+ ******************************************************************************/
+
+/**
+ * @brief The MsgDeviceHasNoParts class
+ */
+class MsgDeviceHasNoParts final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgDeviceHasNoParts)
+
+public:
+  // Constructors / Destructor
+  MsgDeviceHasNoParts() noexcept;
+  MsgDeviceHasNoParts(const MsgDeviceHasNoParts& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgDeviceHasNoParts() noexcept {}
+};
+
+/*******************************************************************************
  *  Class MsgNoPadsInDeviceConnected
  ******************************************************************************/
 
