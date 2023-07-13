@@ -928,10 +928,7 @@ void LibraryEditor::createMenus() noexcept {
 EditorWidgetBase::Context LibraryEditor::createContext(
     bool isNewElement) noexcept {
   return {
-      mWorkspace,
-      *this,
-      isNewElement,
-      mIsOpenedReadOnly,
+      mWorkspace, *this, isNewElement, mIsOpenedReadOnly, mLibrary,
   };
 }
 

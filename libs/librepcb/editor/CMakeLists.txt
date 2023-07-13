@@ -157,6 +157,8 @@ add_library(
   library/cmd/cmdpackagemodelremove.h
   library/cmd/cmdpackagepadedit.cpp
   library/cmd/cmdpackagepadedit.h
+  library/cmd/cmdpartedit.cpp
+  library/cmd/cmdpartedit.h
   library/cmd/cmdpastefootprintitems.cpp
   library/cmd/cmdpastefootprintitems.h
   library/cmd/cmdpastesymbolitems.cpp
@@ -202,6 +204,10 @@ add_library(
   library/dev/devicepadsignalmapmodel.h
   library/dev/padsignalmapeditorwidget.cpp
   library/dev/padsignalmapeditorwidget.h
+  library/dev/partlisteditorwidget.cpp
+  library/dev/partlisteditorwidget.h
+  library/dev/partlistmodel.cpp
+  library/dev/partlistmodel.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.cpp
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.h
   library/eaglelibraryimportwizard/eaglelibraryimportwizard.ui

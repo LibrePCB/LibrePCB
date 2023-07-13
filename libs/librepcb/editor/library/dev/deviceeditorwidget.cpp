@@ -37,6 +37,7 @@
 #include <librepcb/core/application.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/library.h>
 #include <librepcb/core/library/librarybaseelementcheckmessages.h>
 #include <librepcb/core/library/libraryelementcheckmessages.h>
 #include <librepcb/core/library/pkg/package.h>
@@ -74,6 +75,12 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   mUi->btnChooseComponent->setHidden(mContext.readOnly);
   mUi->padSignalMapEditorWidget->setReadOnly(mContext.readOnly);
   mUi->padSignalMapEditorWidget->setFrameStyle(QFrame::NoFrame);
+  mUi->partsEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->partsEditorWidget->setFrameStyle(QFrame::NoFrame);
+  if (mContext.library) {
+    mUi->partsEditorWidget->setInitialManufacturer(
+        mContext.library->getManufacturer());
+  }
   mUi->attributesEditorWidget->setReadOnly(mContext.readOnly);
   mUi->attributesEditorWidget->setFrameStyle(QFrame::NoFrame);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
@@ -114,9 +121,12 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   updateDevicePackageUuid(mDevice->getPackageUuid());
   updateMetadata();
 
-  // Load attribute editor.
-  mUi->attributesEditorWidget->setReferences(mUndoStack.data(),
-                                             &mDevice->getAttributes());
+  // Load parts editor.
+  mUi->partsEditorWidget->setReferences(mUndoStack.data(),
+                                        &mDevice->getParts());
+  connect(mUi->partsEditorWidget, &PartListEditorWidget::currentItemChanged,
+          this, &DeviceEditorWidget::setSelectedPart);
+  setSelectedPart(-1);
 
   // Show "interface broken" warning when related properties are modified.
   memorizeDeviceInterface();
@@ -155,6 +165,7 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
 
 DeviceEditorWidget::~DeviceEditorWidget() noexcept {
   mUi->padSignalMapEditorWidget->setReferences(nullptr, nullptr);
+  mUi->partsEditorWidget->setReferences(nullptr, nullptr);
   mUi->attributesEditorWidget->setReferences(nullptr, nullptr);
 }
 
@@ -444,6 +455,18 @@ void DeviceEditorWidget::updatePackagePreview() noexcept {
         mComponent.get(), getLibLocaleOrder()));
     mPackageGraphicsScene->addItem(*mFootprintGraphicsItem);
     mUi->viewPackage->zoomAll();
+  }
+}
+
+void DeviceEditorWidget::setSelectedPart(int index) noexcept {
+  if (auto part = mDevice->getParts().value(index)) {
+    mUi->gbxAttributes->setTitle(tr("Attributes of Selected Part"));
+    mUi->attributesEditorWidget->setReferences(mUndoStack.data(),
+                                               &part->getAttributes());
+  } else {
+    mUi->gbxAttributes->setTitle(tr("Device Attributes"));
+    mUi->attributesEditorWidget->setReferences(mUndoStack.data(),
+                                               &mDevice->getAttributes());
   }
 }
 

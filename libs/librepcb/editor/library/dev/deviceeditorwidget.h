@@ -93,6 +93,7 @@ private:  // Methods
   void updateComponentPreview() noexcept;
   void updateDevicePackageUuid(const Uuid& uuid) noexcept;
   void updatePackagePreview() noexcept;
+  void setSelectedPart(int index) noexcept;
   void memorizeDeviceInterface() noexcept;
   bool isInterfaceBroken() const noexcept override;
   bool runChecks(RuleCheckMessageList& msgs) const override;

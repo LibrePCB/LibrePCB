@@ -26,6 +26,7 @@
 #include "../../attribute/attribute.h"
 #include "../libraryelement.h"
 #include "devicepadsignalmap.h"
+#include "part.h"
 
 #include <QtCore>
 
@@ -73,6 +74,8 @@ public:
   }
   AttributeList& getAttributes() noexcept { return mAttributes; }
   const AttributeList& getAttributes() const noexcept { return mAttributes; }
+  PartList& getParts() noexcept { return mParts; }
+  const PartList& getParts() const noexcept { return mParts; }
 
   // Setters
   void setComponentUuid(const Uuid& uuid) noexcept;
@@ -110,6 +113,7 @@ private:  // Data
   Uuid mPackageUuid;
   DevicePadSignalMap mPadSignalMap;
   AttributeList mAttributes;
+  PartList mParts;
 };
 
 /*******************************************************************************

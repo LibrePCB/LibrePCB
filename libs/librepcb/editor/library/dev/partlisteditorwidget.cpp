@@ -20,11 +20,10 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "attributelisteditorwidget.h"
+#include "partlisteditorwidget.h"
 
-#include "../modelview/attributelistmodel.h"
-#include "../modelview/comboboxdelegate.h"
-#include "../widgets/editabletablewidget.h"
+#include "../../widgets/editabletablewidget.h"
+#include "partlistmodel.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -39,64 +38,63 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-AttributeListEditorWidget::AttributeListEditorWidget(QWidget* parent) noexcept
+PartListEditorWidget::PartListEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
-    mModel(new AttributeListModel(this)),
+    mModel(new PartListModel(this)),
     mView(new EditableTableWidget(this)) {
   mView->setShowMoveButtons(true);
+  mView->setShowCopyButton(true);
   mView->setModel(mModel.data());
-  // Start editing with a single click to immediately show the comboboxes - not
-  // very nice since edit triggers also apply to normal text cells, but better
-  // than needing one more click to drop down comboboxes...
-  mView->setEditTriggers(QAbstractItemView::AllEditTriggers);
+  mView->horizontalHeader()->setSectionResizeMode(PartListModel::COLUMN_MPN,
+                                                  QHeaderView::Stretch);
   mView->horizontalHeader()->setSectionResizeMode(
-      AttributeListModel::COLUMN_KEY, QHeaderView::Stretch);
+      PartListModel::COLUMN_MANUFACTURER, QHeaderView::Stretch);
   mView->horizontalHeader()->setSectionResizeMode(
-      AttributeListModel::COLUMN_TYPE, QHeaderView::Stretch);
+      PartListModel::COLUMN_ATTRIBUTES, QHeaderView::ResizeToContents);
   mView->horizontalHeader()->setSectionResizeMode(
-      AttributeListModel::COLUMN_VALUE, QHeaderView::Stretch);
-  mView->horizontalHeader()->setSectionResizeMode(
-      AttributeListModel::COLUMN_UNIT, QHeaderView::Stretch);
-  mView->horizontalHeader()->setSectionResizeMode(
-      AttributeListModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
-  mView->setItemDelegateForColumn(AttributeListModel::COLUMN_TYPE,
-                                  new ComboBoxDelegate(false, this));
-  mView->setItemDelegateForColumn(AttributeListModel::COLUMN_UNIT,
-                                  new ComboBoxDelegate(false, this));
+      PartListModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),
-          &AttributeListModel::add);
+          &PartListModel::add);
+  connect(mView.data(), &EditableTableWidget::btnCopyClicked, mModel.data(),
+          &PartListModel::copy);
   connect(mView.data(), &EditableTableWidget::btnRemoveClicked, mModel.data(),
-          &AttributeListModel::remove);
+          &PartListModel::remove);
   connect(mView.data(), &EditableTableWidget::btnMoveUpClicked, mModel.data(),
-          &AttributeListModel::moveUp);
+          &PartListModel::moveUp);
   connect(mView.data(), &EditableTableWidget::btnMoveDownClicked, mModel.data(),
-          &AttributeListModel::moveDown);
+          &PartListModel::moveDown);
+  connect(mView.data(), &EditableTableWidget::currentRowChanged, this,
+          &PartListEditorWidget::currentItemChanged);
 
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mView.data());
 }
 
-AttributeListEditorWidget::~AttributeListEditorWidget() noexcept {
+PartListEditorWidget::~PartListEditorWidget() noexcept {
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void AttributeListEditorWidget::setFrameStyle(int style) noexcept {
+void PartListEditorWidget::setFrameStyle(int style) noexcept {
   mView->setFrameStyle(style);
 }
 
-void AttributeListEditorWidget::setReadOnly(bool readOnly) noexcept {
+void PartListEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);
 }
 
-void AttributeListEditorWidget::setReferences(UndoStack* undoStack,
-                                              AttributeList* list) noexcept {
-  mModel->setAttributeList(list);
+void PartListEditorWidget::setInitialManufacturer(
+    const SimpleString& value) noexcept {
+  mModel->setInitialManufacturer(value);
+}
+
+void PartListEditorWidget::setReferences(UndoStack* undoStack,
+                                         PartList* list) noexcept {
+  mModel->setPartList(list);
   mModel->setUndoStack(undoStack);
-  mView->horizontalHeader()->reset();  // Fix wrong column sizes.
 }
 
 /*******************************************************************************

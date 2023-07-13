@@ -45,7 +45,8 @@ Device::Device(const Uuid& uuid, const Version& version, const QString& author,
     mComponentUuid(component),
     mPackageUuid(package),
     mPadSignalMap(),
-    mAttributes() {
+    mAttributes(),
+    mParts() {
 }
 
 Device::Device(std::unique_ptr<TransactionalDirectory> directory,
@@ -55,7 +56,8 @@ Device::Device(std::unique_ptr<TransactionalDirectory> directory,
     mComponentUuid(deserialize<Uuid>(root.getChild("component/@0"))),
     mPackageUuid(deserialize<Uuid>(root.getChild("package/@0"))),
     mPadSignalMap(root),
-    mAttributes(root) {
+    mAttributes(root),
+    mParts(root) {
 }
 
 Device::~Device() noexcept {
@@ -123,6 +125,8 @@ void Device::serialize(SExpression& root) const {
   mPadSignalMap.sortedByUuid().serialize(root);
   root.ensureLineBreak();
   mAttributes.serialize(root);
+  root.ensureLineBreak();
+  mParts.serialize(root);
   root.ensureLineBreak();
   serializeMessageApprovals(root);
   root.ensureLineBreak();

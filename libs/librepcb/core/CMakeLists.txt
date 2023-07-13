@@ -214,6 +214,8 @@ add_library(
   library/dev/devicecheckmessages.h
   library/dev/devicepadsignalmap.cpp
   library/dev/devicepadsignalmap.h
+  library/dev/part.cpp
+  library/dev/part.h
   library/library.cpp
   library/library.h
   library/librarybaseelement.cpp
