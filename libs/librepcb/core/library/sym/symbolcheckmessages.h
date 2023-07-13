@@ -93,6 +93,35 @@ public:
 };
 
 /*******************************************************************************
+ *  Class MsgNonFunctionalSymbolPinInversionSign
+ ******************************************************************************/
+
+/**
+ * @brief The MsgNonFunctionalSymbolPinInversionSign class
+ */
+class MsgNonFunctionalSymbolPinInversionSign final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgNonFunctionalSymbolPinInversionSign)
+
+public:
+  // Constructors / Destructor
+  MsgNonFunctionalSymbolPinInversionSign() = delete;
+  explicit MsgNonFunctionalSymbolPinInversionSign(
+      std::shared_ptr<const SymbolPin> pin) noexcept;
+  MsgNonFunctionalSymbolPinInversionSign(
+      const MsgNonFunctionalSymbolPinInversionSign& other) noexcept
+    : RuleCheckMessage(other), mPin(other.mPin) {}
+  virtual ~MsgNonFunctionalSymbolPinInversionSign() noexcept {}
+
+  // Getters
+  const std::shared_ptr<const SymbolPin>& getPin() const noexcept {
+    return mPin;
+  }
+
+private:
+  std::shared_ptr<const SymbolPin> mPin;
+};
+
+/*******************************************************************************
  *  Class MsgOverlappingSymbolPins
  ******************************************************************************/
 

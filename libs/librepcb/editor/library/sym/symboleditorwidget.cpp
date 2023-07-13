@@ -556,6 +556,15 @@ void SymbolEditorWidget::fixMsg(const MsgSymbolPinNotOnGrid& msg) {
   mUndoStack->execCmd(cmd.take());
 }
 
+template <>
+void SymbolEditorWidget::fixMsg(
+    const MsgNonFunctionalSymbolPinInversionSign& msg) {
+  std::shared_ptr<SymbolPin> pin = mSymbol->getPins().get(msg.getPin().get());
+  QScopedPointer<CmdSymbolPinEdit> cmd(new CmdSymbolPinEdit(pin));
+  cmd->setName(CircuitIdentifier("!" % pin->getName()->mid(1)), false);
+  mUndoStack->execCmd(cmd.take());
+}
+
 template <typename MessageType>
 bool SymbolEditorWidget::fixMsgHelper(
     std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
@@ -577,6 +586,8 @@ bool SymbolEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgMissingSymbolValue>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgWrongSymbolTextLayer>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgSymbolPinNotOnGrid>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgNonFunctionalSymbolPinInversionSign>(msg, applyFix))
+    return true;
   return false;
 }
 
