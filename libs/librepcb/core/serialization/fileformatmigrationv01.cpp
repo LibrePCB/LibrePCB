@@ -85,6 +85,7 @@ void FileFormatMigrationV01::upgradeSymbol(TransactionalDirectory& dir) {
     upgradeLayers(root);
 
     // Pins.
+    upgradeInversionCharacters(root, "pin", "name/@0");
     for (SExpression* pinNode : root.getChildren("pin")) {
       const UnsignedLength length =
           deserialize<UnsignedLength>(pinNode->getChild("length/@0"));
@@ -216,6 +217,9 @@ void FileFormatMigrationV01::upgradeComponent(TransactionalDirectory& dir) {
   {
     const QString fp = "component.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+
+    // Signals.
+    upgradeInversionCharacters(root, "signal", "name/@0");
 
     // Various strings.
     upgradeStrings(root);
@@ -955,6 +959,22 @@ void FileFormatMigrationV01::upgradeLayers(SExpression& node) {
   // Rename "bot_placement" to "bot_legend".
   node.replaceRecursive(SExpression::createToken("bot_placement"),
                         SExpression::createToken("bot_legend"));
+}
+
+void FileFormatMigrationV01::upgradeInversionCharacters(
+    SExpression& root, const QString& childName, const QString& valuePath) {
+  QSet<QString> reservedValues;
+  foreach (SExpression* child, root.getChildren(childName)) {
+    reservedValues.insert(child->getChild(valuePath).getValue());
+  }
+  foreach (SExpression* child, root.getChildren(childName)) {
+    SExpression& node = child->getChild(valuePath);
+    const QString newValue = "!" % node.getValue().mid(1);
+    if (node.getValue().startsWith("/") &&
+        (!reservedValues.contains(newValue))) {
+      node.setValue(newValue);
+    }
+  }
 }
 
 void FileFormatMigrationV01::upgradeStrings(SExpression& root) {

@@ -50,6 +50,7 @@ SymbolCheck::~SymbolCheck() noexcept {
 RuleCheckMessageList SymbolCheck::runChecks() const {
   RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
   checkDuplicatePinNames(msgs);
+  checkPinNamesInversionSign(msgs);
   checkOffTheGridPins(msgs);
   checkOverlappingPins(msgs);
   checkMissingTexts(msgs);
@@ -68,6 +69,18 @@ void SymbolCheck::checkDuplicatePinNames(MsgList& msgs) const {
       msgs.append(std::make_shared<MsgDuplicatePinName>(pin));
     } else {
       pinNames.insert(pin.getName());
+    }
+  }
+}
+
+void SymbolCheck::checkPinNamesInversionSign(MsgList& msgs) const {
+  for (auto it = mSymbol.getPins().begin(); it != mSymbol.getPins().end();
+       ++it) {
+    const QString name = *it->getName();
+    if (name.startsWith("/") ||
+        ((name.count() >= 2) && name.startsWith("n") && name.at(1).isUpper())) {
+      msgs.append(
+          std::make_shared<MsgNonFunctionalSymbolPinInversionSign>(it.ptr()));
     }
   }
 }

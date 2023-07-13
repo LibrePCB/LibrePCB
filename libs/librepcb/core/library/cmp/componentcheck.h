@@ -59,6 +59,7 @@ protected:  // Methods
   void checkMissingPrefix(MsgList& msgs) const;
   void checkMissingDefaultValue(MsgList& msgs) const;
   void checkDuplicateSignalNames(MsgList& msgs) const;
+  void checkSignalNamesInversionSign(MsgList& msgs) const;
   void checkMissingSymbolVariants(MsgList& msgs) const;
   void checkMissingSymbolVariantItems(MsgList& msgs) const;
 

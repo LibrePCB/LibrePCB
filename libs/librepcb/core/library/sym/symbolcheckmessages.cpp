@@ -77,6 +77,27 @@ MsgMissingSymbolValue::MsgMissingSymbolValue() noexcept
 }
 
 /*******************************************************************************
+ *  MsgNonFunctionalSymbolPinInversionSign
+ ******************************************************************************/
+
+MsgNonFunctionalSymbolPinInversionSign::MsgNonFunctionalSymbolPinInversionSign(
+    std::shared_ptr<const SymbolPin> pin) noexcept
+  : RuleCheckMessage(
+        Severity::Hint,
+        tr("Non-functional inversion sign: '%1'").arg(*pin->getName()),
+        tr("The pin name seems to start with an inversion sign, but LibrePCB "
+           "uses a different sign to indicate inversion.\n\nIt's recommended "
+           "to prefix inverted pin names with '%1', regardless of the "
+           "inversion sign used in the parts datasheet.")
+            .arg("!"),
+        "nonfunctional_inversion_sign"),
+    mPin(pin) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pin", pin->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  MsgOverlappingSymbolPins
  ******************************************************************************/
 

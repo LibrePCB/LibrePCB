@@ -115,6 +115,28 @@ MsgMissingSymbolVariantItem::MsgMissingSymbolVariantItem(
 }
 
 /*******************************************************************************
+ *  MsgNonFunctionalComponentSignalInversionSign
+ ******************************************************************************/
+
+MsgNonFunctionalComponentSignalInversionSign::
+    MsgNonFunctionalComponentSignalInversionSign(
+        std::shared_ptr<const ComponentSignal> signal) noexcept
+  : RuleCheckMessage(
+        Severity::Hint,
+        tr("Non-functional inversion sign: '%1'").arg(*signal->getName()),
+        tr("The signal name seems to start with an inversion sign, but "
+           "LibrePCB uses a different sign to indicate inversion.\n\nIt's "
+           "recommended to prefix inverted signal names with '%1', regardless "
+           "of the inversion sign used in the parts datasheet.")
+            .arg("!"),
+        "nonfunctional_inversion_sign"),
+    mSignal(signal) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("signal", signal->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

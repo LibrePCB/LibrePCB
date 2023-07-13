@@ -138,6 +138,36 @@ private:
 };
 
 /*******************************************************************************
+ *  Class MsgNonFunctionalComponentSignalInversionSign
+ ******************************************************************************/
+
+/**
+ * @brief The MsgNonFunctionalComponentSignalInversionSign class
+ */
+class MsgNonFunctionalComponentSignalInversionSign final
+  : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgNonFunctionalComponentSignalInversionSign)
+
+public:
+  // Constructors / Destructor
+  MsgNonFunctionalComponentSignalInversionSign() = delete;
+  explicit MsgNonFunctionalComponentSignalInversionSign(
+      std::shared_ptr<const ComponentSignal> signal) noexcept;
+  MsgNonFunctionalComponentSignalInversionSign(
+      const MsgNonFunctionalComponentSignalInversionSign& other) noexcept
+    : RuleCheckMessage(other), mSignal(other.mSignal) {}
+  virtual ~MsgNonFunctionalComponentSignalInversionSign() noexcept {}
+
+  // Getters
+  const std::shared_ptr<const ComponentSignal>& getSignal() const noexcept {
+    return mSignal;
+  }
+
+private:
+  std::shared_ptr<const ComponentSignal> mSignal;
+};
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

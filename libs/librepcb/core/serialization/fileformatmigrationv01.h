@@ -132,6 +132,9 @@ protected:  // Methods
   virtual void upgradeCutouts(SExpression& node, ProjectContext* context);
   virtual void upgradeHoles(SExpression& node, bool isBoardHole);
   virtual void upgradeLayers(SExpression& node);
+  virtual void upgradeInversionCharacters(SExpression& root,
+                                          const QString& childName,
+                                          const QString& valuePath);
   virtual void upgradeStrings(SExpression& root);
   virtual void replaceStrings(SExpression& root,
                               const QMap<QString, QString>& replacements);

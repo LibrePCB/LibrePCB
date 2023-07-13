@@ -24,6 +24,7 @@
 
 #include "../../widgets/signalrolecombobox.h"
 #include "../cmd/cmdcomponentedit.h"
+#include "../cmd/cmdcomponentsignaledit.h"
 #include "../cmd/cmdcomponentsymbolvariantedit.h"
 #include "componentsymbolvarianteditdialog.h"
 #include "ui_componenteditorwidget.h"
@@ -331,6 +332,17 @@ void ComponentEditorWidget::fixMsg(const MsgMissingSymbolVariant& msg) {
       mComponent->getSymbolVariants(), symbVar));
 }
 
+template <>
+void ComponentEditorWidget::fixMsg(
+    const MsgNonFunctionalComponentSignalInversionSign& msg) {
+  std::shared_ptr<ComponentSignal> signal =
+      mComponent->getSignals().get(msg.getSignal().get());
+  QScopedPointer<CmdComponentSignalEdit> cmd(
+      new CmdComponentSignalEdit(*signal));
+  cmd->setName(CircuitIdentifier("!" % signal->getName()->mid(1)));
+  mUndoStack->execCmd(cmd.take());
+}
+
 template <typename MessageType>
 bool ComponentEditorWidget::fixMsgHelper(
     std::shared_ptr<const RuleCheckMessage> msg, bool applyFix) {
@@ -350,6 +362,8 @@ bool ComponentEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingComponentDefaultValue>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingSymbolVariant>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgNonFunctionalComponentSignalInversionSign>(msg, applyFix))
+    return true;
   return false;
 }
 

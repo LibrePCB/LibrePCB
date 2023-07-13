@@ -52,6 +52,7 @@ RuleCheckMessageList ComponentCheck::runChecks() const {
   checkMissingPrefix(msgs);
   checkMissingDefaultValue(msgs);
   checkDuplicateSignalNames(msgs);
+  checkSignalNamesInversionSign(msgs);
   checkMissingSymbolVariants(msgs);
   checkMissingSymbolVariantItems(msgs);
   return msgs;
@@ -80,6 +81,19 @@ void ComponentCheck::checkDuplicateSignalNames(MsgList& msgs) const {
       msgs.append(std::make_shared<MsgDuplicateSignalName>(signal));
     } else {
       names.insert(signal.getName());
+    }
+  }
+}
+
+void ComponentCheck::checkSignalNamesInversionSign(MsgList& msgs) const {
+  for (auto it = mComponent.getSignals().begin();
+       it != mComponent.getSignals().end(); ++it) {
+    const QString name = *it->getName();
+    if (name.startsWith("/") ||
+        ((name.count() >= 2) && name.startsWith("n") && name.at(1).isUpper())) {
+      msgs.append(
+          std::make_shared<MsgNonFunctionalComponentSignalInversionSign>(
+              it.ptr()));
     }
   }
 }

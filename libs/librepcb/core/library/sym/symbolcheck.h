@@ -57,6 +57,7 @@ public:
 
 protected:  // Methods
   void checkDuplicatePinNames(MsgList& msgs) const;
+  void checkPinNamesInversionSign(MsgList& msgs) const;
   void checkOffTheGridPins(MsgList& msgs) const;
   void checkOverlappingPins(MsgList& msgs) const;
   void checkMissingTexts(MsgList& msgs) const;
