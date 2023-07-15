@@ -160,7 +160,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetAll) {
   for (int i = 0; i < 2; ++i) {
     QString number = QString::number(i + 1);
     mWriter->addLibrary(toAbs("lib" % number), uuid(), version("0.1." % number),
-                        false, QByteArray());
+                        false, QByteArray(), QString());
     mWriter->addCategory<ComponentCategory>(0, toAbs("cmpcat" % number), uuid(),
                                             version("0.2." % number), false,
                                             tl::nullopt);
@@ -206,9 +206,9 @@ TEST_F(WorkspaceLibraryDbTest, testGetAll) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetAllWithDuplicates) {
   int lib1 = mWriter->addLibrary(toAbs("lib1"), uuid(), version("1"), false,
-                                 QByteArray());
+                                 QByteArray(), QString());
   int lib2 = mWriter->addLibrary(toAbs("lib2"), uuid(), version("2"), false,
-                                 QByteArray());
+                                 QByteArray(), QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym1"), uuid(1), version("0.1"),
                               false);
   mWriter->addElement<Symbol>(lib1, toAbs("sym2"), uuid(2), version("0.2"),
@@ -227,9 +227,9 @@ TEST_F(WorkspaceLibraryDbTest, testGetAllWithDuplicates) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetAllWithUuid) {
   int lib1 = mWriter->addLibrary(toAbs("lib1"), uuid(), version("1"), false,
-                                 QByteArray());
+                                 QByteArray(), QString());
   int lib2 = mWriter->addLibrary(toAbs("lib2"), uuid(), version("2"), false,
-                                 QByteArray());
+                                 QByteArray(), QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym1"), uuid(1), version("0.1"),
                               false);
   mWriter->addElement<Symbol>(lib1, toAbs("sym2"), uuid(2), version("0.2"),
@@ -246,9 +246,9 @@ TEST_F(WorkspaceLibraryDbTest, testGetAllWithUuid) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetAllWithLibrary) {
   int lib1 = mWriter->addLibrary(toAbs("lib1"), uuid(), version("1"), false,
-                                 QByteArray());
+                                 QByteArray(), QString());
   int lib2 = mWriter->addLibrary(toAbs("lib2"), uuid(), version("2"), false,
-                                 QByteArray());
+                                 QByteArray(), QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym1"), uuid(1), version("0.1"),
                               false);
   mWriter->addElement<Symbol>(lib1, toAbs("sym2"), uuid(2), version("0.2"),
@@ -265,9 +265,9 @@ TEST_F(WorkspaceLibraryDbTest, testGetAllWithLibrary) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetAllWithUuidAndLibrary) {
   int lib1 = mWriter->addLibrary(toAbs("lib1"), uuid(), version("1"), false,
-                                 QByteArray());
+                                 QByteArray(), QString());
   int lib2 = mWriter->addLibrary(toAbs("lib2"), uuid(), version("2"), false,
-                                 QByteArray());
+                                 QByteArray(), QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym1"), uuid(1), version("0.1"),
                               false);
   mWriter->addElement<Symbol>(lib1, toAbs("sym2"), uuid(2), version("0.2"),
@@ -294,9 +294,9 @@ TEST_F(WorkspaceLibraryDbTest, testGetLatestEmptyDb) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetLatest) {
   int lib1 = mWriter->addLibrary(toAbs("lib1"), uuid(), version("1"), false,
-                                 QByteArray());
+                                 QByteArray(), QString());
   int lib2 = mWriter->addLibrary(toAbs("lib2"), uuid(), version("2"), false,
-                                 QByteArray());
+                                 QByteArray(), QString());
   mWriter->addElement<Symbol>(lib1, toAbs("sym1"), uuid(0), version("0.1"),
                               false);
   mWriter->addElement<Symbol>(lib1, toAbs("sym2"), uuid(0), version("0.2"),
@@ -322,7 +322,7 @@ TEST_F(WorkspaceLibraryDbTest, testFindEmptyDb) {
 
 TEST_F(WorkspaceLibraryDbTest, testFindEmptyKeyword) {
   int lib = mWriter->addLibrary(toAbs("lib"), uuid(), version("1"), false,
-                                QByteArray());
+                                QByteArray(), QString());
   int sym = mWriter->addElement<Symbol>(lib, toAbs("sym1"), uuid(),
                                         version("0.1"), false);
   mWriter->addTranslation<Symbol>(sym, "", ElementName("some name"),
@@ -333,7 +333,7 @@ TEST_F(WorkspaceLibraryDbTest, testFindEmptyKeyword) {
 
 TEST_F(WorkspaceLibraryDbTest, testFind) {
   int lib = mWriter->addLibrary(toAbs("lib"), uuid(), version("1"), false,
-                                QByteArray());
+                                QByteArray(), QString());
   int sym = mWriter->addElement<Symbol>(lib, toAbs("sym1"), uuid(1),
                                         version("0.1"), false);
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym1 name"),
@@ -359,7 +359,7 @@ TEST_F(WorkspaceLibraryDbTest, testFind) {
 
 TEST_F(WorkspaceLibraryDbTest, testFindWithDuplicates) {
   int lib = mWriter->addLibrary(toAbs("lib"), uuid(), version("1"), false,
-                                QByteArray());
+                                QByteArray(), QString());
   int sym = mWriter->addElement<Symbol>(lib, toAbs("sym1"), uuid(1),
                                         version("0.1"), false);
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym1 name"),
@@ -380,7 +380,7 @@ TEST_F(WorkspaceLibraryDbTest, testFindWithDuplicates) {
 
 TEST_F(WorkspaceLibraryDbTest, testFindWithMultipleTranslations) {
   int lib = mWriter->addLibrary(toAbs("lib"), uuid(), version("1"), false,
-                                QByteArray());
+                                QByteArray(), QString());
   int sym = mWriter->addElement<Symbol>(lib, toAbs("sym1"), uuid(1),
                                         version("0.1"), false);
   mWriter->addTranslation<Symbol>(sym, "", ElementName("the sym1 name"),
@@ -434,7 +434,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsInexistent) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetTranslationsEmpty) {
   int libId = mWriter->addLibrary(toAbs("fp"), uuid(), version("0.1"), false,
-                                  QByteArray());
+                                  QByteArray(), QString());
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp"), uuid(),
                                           version("0.1"), false, tl::nullopt);
   mWriter->addCategory<PackageCategory>(libId, toAbs("fp"), uuid(),
@@ -459,7 +459,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetTranslationsEmpty) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetTranslationsDefaultLocale) {
   int libId = mWriter->addLibrary(toAbs("fp"), uuid(), version("0.1"), false,
-                                  QByteArray());
+                                  QByteArray(), QString());
   mWriter->addTranslation<Library>(libId, "", ElementName("lib_n"), "lib_d",
                                    "lib_k");
   int id = mWriter->addCategory<ComponentCategory>(
@@ -607,8 +607,8 @@ TEST_F(WorkspaceLibraryDbTest, testGetMetadataInexistent) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetMetadata) {
   FilePath fp = toAbs("fp");
-  int libId =
-      mWriter->addLibrary(fp, uuid(1), version("1.1"), false, QByteArray());
+  int libId = mWriter->addLibrary(fp, uuid(1), version("1.1"), false,
+                                  QByteArray(), QString());
   mWriter->addCategory<ComponentCategory>(libId, fp, uuid(2), version("2.2"),
                                           true, tl::nullopt);
   mWriter->addCategory<PackageCategory>(libId, fp, uuid(3), version("3.3"),
@@ -655,24 +655,34 @@ TEST_F(WorkspaceLibraryDbTest, testGetMetadataNullptr) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetLibraryMetadataInexistent) {
   QPixmap icon;
-  EXPECT_FALSE(mWsDb->getLibraryMetadata(toAbs("fp"), &icon));
+  QString manufacturer;
+  EXPECT_FALSE(mWsDb->getLibraryMetadata(toAbs("fp"), &icon, &manufacturer));
   EXPECT_TRUE(icon.isNull());
+  EXPECT_EQ("", manufacturer.toStdString());
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetLibraryMetadataNoIcon) {
   FilePath fp = toAbs("fp");
-  mWriter->addLibrary(fp, uuid(), version("1.1"), false, QByteArray());
+  mWriter->addLibrary(fp, uuid(), version("1.1"), false, QByteArray(),
+                      "Hello World!");
 
   QPixmap icon;
-  EXPECT_TRUE(mWsDb->getLibraryMetadata(fp, &icon));
+  QString manufacturer = "foo";
+  EXPECT_TRUE(mWsDb->getLibraryMetadata(fp, &icon, &manufacturer));
   EXPECT_TRUE(icon.isNull());
+  EXPECT_EQ("Hello World!", manufacturer.toStdString());
 }
 
 TEST_F(WorkspaceLibraryDbTest, testGetLibraryMetadataNullptr) {
   FilePath fp = toAbs("fp");
-  mWriter->addLibrary(fp, uuid(), version("1.1"), false, QByteArray());
+  mWriter->addLibrary(fp, uuid(), version("1.1"), false, QByteArray(),
+                      QString());
 
+  QPixmap icon;
+  QString manufacturer;
   EXPECT_TRUE(mWsDb->getLibraryMetadata(fp));
+  EXPECT_TRUE(mWsDb->getLibraryMetadata(fp, &icon));
+  EXPECT_TRUE(mWsDb->getLibraryMetadata(fp, nullptr, &manufacturer));
 }
 
 /*******************************************************************************
@@ -689,7 +699,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetCategoryMetadataEmptyDb) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetCategoryMetadataInexistent) {
   int libId = mWriter->addLibrary(toAbs("fp"), uuid(), version("1.1"), false,
-                                  QByteArray());
+                                  QByteArray(), QString());
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp"), uuid(),
                                           version("2.2"), false, tl::nullopt);
   mWriter->addCategory<PackageCategory>(libId, toAbs("fp"), uuid(),
@@ -704,7 +714,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetCategoryMetadataInexistent) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetCategoryMetadata) {
   int libId = mWriter->addLibrary(toAbs("fp"), uuid(), version("1.1"), false,
-                                  QByteArray());
+                                  QByteArray(), QString());
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp1"), uuid(1),
                                           version("2.2"), false, tl::nullopt);
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp2"), uuid(2),
@@ -735,7 +745,7 @@ TEST_F(WorkspaceLibraryDbTest, testGetCategoryMetadata) {
 
 TEST_F(WorkspaceLibraryDbTest, testGetCategoryMetadataNullptr) {
   int libId = mWriter->addLibrary(toAbs("fp"), uuid(), version("1.1"), false,
-                                  QByteArray());
+                                  QByteArray(), QString());
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp1"), uuid(1),
                                           version("2.2"), false, tl::nullopt);
   mWriter->addCategory<ComponentCategory>(libId, toAbs("fp2"), uuid(2),

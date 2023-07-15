@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../attribute/attribute.h"
 #include "../fileio/filepath.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
@@ -56,6 +57,12 @@ class WorkspaceLibraryDb final : public QObject {
   Q_OBJECT
 
 public:
+  struct Part {
+    QString mpn;
+    QString manufacturer;
+    AttributeList attributes;
+  };
+
   // Constructors / Destructor
   WorkspaceLibraryDb() = delete;
   WorkspaceLibraryDb(const WorkspaceLibraryDb& other) = delete;
@@ -143,6 +150,30 @@ public:
   }
 
   /**
+   * @brief Find parts by keyword
+   *
+   * @param keyword   Keyword to search for.
+   *
+   * @return  All devices which contain parts matching the filter, sorted
+   *          alphabetically and without duplicates. Empty if no elements
+   *          were found.
+   */
+  QList<Uuid> findDevicesOfParts(const QString& keyword) const;
+
+  /**
+   * @brief Find parts of device by keyword
+   *
+   * @param device    Device to search for parts.
+   * @param keyword   Keyword to search for.
+   *
+   * @return  All parts of the passed device matching the filter, sorted
+   *          alphabetically and without duplicates. Empty if no elements
+   *          were found or the device doesn't exist.
+   */
+  QList<Part> findPartsOfDevice(const Uuid& device,
+                                const QString& keyword) const;
+
+  /**
    * @brief Get translations of a specific element
    *
    * @tparam ElementType  Type of the library element.
@@ -200,11 +231,15 @@ public:
    * @param libDir        Library directory.
    * @param icon          If not nullptr and the library was found, its
    *                      icon will be written here.
+   * @param manufacturer  If not nullptr and the library was found, its
+   *                      manufacturer name will be written here (may be
+   *                      empty).
    *
    * @retval true If the library was found in the database.
    * @retval false If the library was not found.
    */
-  bool getLibraryMetadata(const FilePath libDir, QPixmap* icon = nullptr) const;
+  bool getLibraryMetadata(const FilePath libDir, QPixmap* icon = nullptr,
+                          QString* manufacturer = nullptr) const;
 
   /**
    * @brief Get additional metadata of a specific category
@@ -301,6 +336,15 @@ public:
    */
   QSet<Uuid> getComponentDevices(const Uuid& component) const;
 
+  /**
+   * @brief Get all parts of a specific device
+   *
+   * @param device      Device UUID to get the parts of.
+   *
+   * @return All parts. Empty if the passed device doesn't exist.
+   */
+  QList<Part> getDeviceParts(const Uuid& device) const;
+
   // General Methods
 
   /**
@@ -335,6 +379,7 @@ private:
   bool getCategoryMetadata(const QString& categoriesTable,
                            const FilePath catDir,
                            tl::optional<Uuid>* parent) const;
+  AttributeList getPartAttributes(int partId) const;
   QSet<Uuid> getChilds(const QString& categoriesTable,
                        const tl::optional<Uuid>& categoryUuid) const;
   QSet<Uuid> getByCategory(const QString& elementsTable,
@@ -354,7 +399,7 @@ private:
   QScopedPointer<WorkspaceLibraryScanner> mLibraryScanner;
 
   // Constants
-  static const int sCurrentDbVersion = 3;
+  static const int sCurrentDbVersion = 4;
 };
 
 /*******************************************************************************
