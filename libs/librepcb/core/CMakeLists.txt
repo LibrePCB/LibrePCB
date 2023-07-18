@@ -214,6 +214,8 @@ add_library(
   library/dev/devicecheckmessages.h
   library/dev/devicepadsignalmap.cpp
   library/dev/devicepadsignalmap.h
+  library/dev/part.cpp
+  library/dev/part.h
   library/library.cpp
   library/library.h
   library/librarybaseelement.cpp
@@ -411,6 +413,7 @@ add_library(
   types/ratio.h
   types/signalrole.cpp
   types/signalrole.h
+  types/simplestring.h
   types/stroketextspacing.cpp
   types/stroketextspacing.h
   types/uuid.cpp

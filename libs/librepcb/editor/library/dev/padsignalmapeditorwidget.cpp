@@ -76,6 +76,10 @@ PadSignalMapEditorWidget::~PadSignalMapEditorWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void PadSignalMapEditorWidget::setFrameStyle(int style) noexcept {
+  mView->setFrameStyle(style);
+}
+
 void PadSignalMapEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setEditTriggers(readOnly
                              ? QAbstractItemView::EditTrigger::NoEditTriggers

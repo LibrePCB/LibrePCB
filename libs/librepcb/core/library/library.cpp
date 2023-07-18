@@ -50,7 +50,8 @@ Library::Library(const Uuid& uuid, const Version& version,
                  const QString& keywords_en_US)
   : LibraryBaseElement(getShortElementName(), getLongElementName(), uuid,
                        version, author, name_en_US, description_en_US,
-                       keywords_en_US) {
+                       keywords_en_US),
+    mManufacturer("") {
 }
 
 Library::Library(std::unique_ptr<TransactionalDirectory> directory,
@@ -62,8 +63,8 @@ Library::Library(std::unique_ptr<TransactionalDirectory> directory,
     // case.
     mUrl(root.getChild("url/@0").getValue(), QUrl::StrictMode),
     mDependencies(),  // Initialized below.
-    mIcon()  // Initialized below.
-{
+    mIcon(),  // Initialized below.
+    mManufacturer(deserialize<SimpleString>(root.getChild("manufacturer/@0"))) {
   // Read dependency UUIDs.
   foreach (const SExpression* node, root.getChildren("dependency")) {
     mDependencies.insert(deserialize<Uuid>(node->getChild("@0")));
@@ -199,6 +200,7 @@ void Library::serialize(SExpression& root) const {
     root.appendChild("dependency", uuid);
   }
   root.ensureLineBreak();
+  root.appendChild("manufacturer", mManufacturer);
   serializeMessageApprovals(root);
   root.ensureLineBreak();
 }

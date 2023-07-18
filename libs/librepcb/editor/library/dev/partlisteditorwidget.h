@@ -17,67 +17,65 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_EDITOR_PARTLISTEDITORWIDGET_H
+#define LIBREPCB_EDITOR_PARTLISTEDITORWIDGET_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "devicecheck.h"
-
-#include "device.h"
-#include "devicecheckmessages.h"
+#include <librepcb/core/library/dev/part.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
+
+class EditableTableWidget;
+class PartListModel;
+class UndoStack;
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class PartListEditorWidget
  ******************************************************************************/
 
-DeviceCheck::DeviceCheck(const Device& device) noexcept
-  : LibraryElementCheck(device), mDevice(device) {
-}
+/**
+ * @brief The PartListEditorWidget class
+ */
+class PartListEditorWidget final : public QWidget {
+  Q_OBJECT
 
-DeviceCheck::~DeviceCheck() noexcept {
-}
+public:
+  // Constructors / Destructor
+  explicit PartListEditorWidget(QWidget* parent = nullptr) noexcept;
+  PartListEditorWidget(const PartListEditorWidget& other) = delete;
+  ~PartListEditorWidget() noexcept;
 
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
+  // Setters
+  void setFrameStyle(int style) noexcept;
+  void setReadOnly(bool readOnly) noexcept;
+  void setInitialManufacturer(const SimpleString& value) noexcept;
+  void setReferences(UndoStack* undoStack, PartList* list) noexcept;
 
-RuleCheckMessageList DeviceCheck::runChecks() const {
-  RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
-  checkNoPadsConnected(msgs);
-  checkParts(msgs);
-  return msgs;
-}
+  // Operator Overloadings
+  PartListEditorWidget& operator=(const PartListEditorWidget& rhs) = delete;
 
-/*******************************************************************************
- *  Protected Methods
- ******************************************************************************/
+signals:
+  void currentItemChanged(int index);
 
-void DeviceCheck::checkNoPadsConnected(MsgList& msgs) const {
-  for (const DevicePadSignalMapItem& item : mDevice.getPadSignalMap()) {
-    if (item.getSignalUuid()) {
-      return;  // pad is connected, don't show this message
-    }
-  }
-
-  if (!mDevice.getPadSignalMap().isEmpty()) {
-    msgs.append(std::make_shared<MsgNoPadsInDeviceConnected>());
-  }
-}
-
-void DeviceCheck::checkParts(MsgList& msgs) const {
-  if (mDevice.getParts().isEmpty()) {
-    msgs.append(std::make_shared<MsgDeviceHasNoParts>());
-  }
-}
+private:  // Data
+  QScopedPointer<PartListModel> mModel;
+  QScopedPointer<EditableTableWidget> mView;
+};
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
+
+#endif

@@ -27,6 +27,7 @@
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/dev/part.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
 #include <librepcb/core/types/uuid.h>
@@ -151,6 +152,8 @@ public:  // Data
   tl::optional<Uuid> mDeviceComponentUuid;
   tl::optional<Uuid> mDevicePackageUuid;
   DevicePadSignalMap mDevicePadSignalMap;
+  AttributeList mDeviceAttributes;
+  PartList mDeviceParts;
 };
 
 /*******************************************************************************

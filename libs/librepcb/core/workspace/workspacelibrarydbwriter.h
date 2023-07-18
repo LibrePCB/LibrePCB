@@ -35,6 +35,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class Attribute;
 class Component;
 class ComponentCategory;
 class Device;
@@ -85,10 +86,12 @@ public:
    * @param version       Version of the library.
    * @param deprecated    Whether the library is deprecated or not.
    * @param iconPng       Icon as a PNG.
+   * @param manufacturer  Name of the manufacturer of this library (optional).
    * @return ID of the added library.
    */
   int addLibrary(const FilePath& fp, const Uuid& uuid, const Version& version,
-                 bool deprecated, const QByteArray& iconPng);
+                 bool deprecated, const QByteArray& iconPng,
+                 const QString& manufacturer);
 
   /**
    * @brief Update library metadata
@@ -98,10 +101,11 @@ public:
    * @param version       New version of the library.
    * @param deprecated    Whether the library is deprecated or not.
    * @param iconPng       New icon as a PNG.
+   * @param manufacturer  Name of the manufacturer of this library (optional).
    */
   void updateLibrary(const FilePath& fp, const Uuid& uuid,
                      const Version& version, bool deprecated,
-                     const QByteArray& iconPng);
+                     const QByteArray& iconPng, const QString& manufacturer);
 
   /**
    * @brief Add a library element
@@ -163,6 +167,25 @@ public:
   int addDevice(int libId, const FilePath& fp, const Uuid& uuid,
                 const Version& version, bool deprecated, const Uuid& component,
                 const Uuid& package);
+
+  /**
+   * @brief Add a part to a previously added device
+   *
+   * @param devId         ID of the device containing this part.
+   * @param mpn           Manufacturer part number.
+   * @param manufacturer  Manufacturer name.
+   * @return ID of the added part.
+   */
+  int addPart(int devId, const ElementName& mpn, const QString& manufacturer);
+
+  /**
+   * @brief Add an attribute to a previously added part
+   *
+   * @param partId        ID of the part containing this attribute.
+   * @param attribute     Attribute to add.
+   * @return ID of the added attribute.
+   */
+  int addPartAttribute(int partId, const Attribute& attribute);
 
   /**
    * @brief Remove a library element
@@ -281,6 +304,7 @@ private:  // Methods
   int addToCategory(const QString& elementsTable, int elementId,
                     const Uuid& category);
   QString filePathToString(const FilePath& fp) const noexcept;
+  static QString nonNull(const QString& s) noexcept;
 
 private:  // Data
   FilePath mLibrariesRoot;

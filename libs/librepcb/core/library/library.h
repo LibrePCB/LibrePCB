@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../types/simplestring.h"
 #include "../types/uuid.h"
 #include "librarybaseelement.h"
 
@@ -61,6 +62,7 @@ public:
   const QSet<Uuid>& getDependencies() const noexcept { return mDependencies; }
   const QByteArray& getIcon() const noexcept { return mIcon; }
   QPixmap getIconAsPixmap() const noexcept;
+  const SimpleString& getManufacturer() const noexcept { return mManufacturer; }
 
   // Setters
   void setUrl(const QUrl& url) noexcept { mUrl = url; }
@@ -68,6 +70,9 @@ public:
     mDependencies = deps;
   }
   void setIcon(const QByteArray& png) noexcept { mIcon = png; }
+  void setManufacturer(const SimpleString& value) noexcept {
+    mManufacturer = value;
+  }
 
   // General Methods
   virtual void save() override;
@@ -99,6 +104,7 @@ private:  // Data
   QUrl mUrl;
   QSet<Uuid> mDependencies;
   QByteArray mIcon;
+  SimpleString mManufacturer;
 };
 
 /*******************************************************************************

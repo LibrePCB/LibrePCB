@@ -20,10 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "devicecheck.h"
-
-#include "device.h"
-#include "devicecheckmessages.h"
+#include "cmdpartedit.h"
 
 #include <QtCore>
 
@@ -31,53 +28,63 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
-DeviceCheck::DeviceCheck(const Device& device) noexcept
-  : LibraryElementCheck(device), mDevice(device) {
+CmdPartEdit::CmdPartEdit(Part& part) noexcept
+  : UndoCommand(tr("Edit part")),
+    mPart(part),
+    mOldMpn(part.getMpn()),
+    mNewMpn(mOldMpn),
+    mOldManufacturer(part.getManufacturer()),
+    mNewManufacturer(mOldManufacturer) {
 }
 
-DeviceCheck::~DeviceCheck() noexcept {
-}
-
-/*******************************************************************************
- *  General Methods
- ******************************************************************************/
-
-RuleCheckMessageList DeviceCheck::runChecks() const {
-  RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
-  checkNoPadsConnected(msgs);
-  checkParts(msgs);
-  return msgs;
+CmdPartEdit::~CmdPartEdit() noexcept {
 }
 
 /*******************************************************************************
- *  Protected Methods
+ *  Setters
  ******************************************************************************/
 
-void DeviceCheck::checkNoPadsConnected(MsgList& msgs) const {
-  for (const DevicePadSignalMapItem& item : mDevice.getPadSignalMap()) {
-    if (item.getSignalUuid()) {
-      return;  // pad is connected, don't show this message
-    }
-  }
-
-  if (!mDevice.getPadSignalMap().isEmpty()) {
-    msgs.append(std::make_shared<MsgNoPadsInDeviceConnected>());
-  }
+void CmdPartEdit::setMpn(const ElementName& value) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewMpn = value;
 }
 
-void DeviceCheck::checkParts(MsgList& msgs) const {
-  if (mDevice.getParts().isEmpty()) {
-    msgs.append(std::make_shared<MsgDeviceHasNoParts>());
-  }
+void CmdPartEdit::setManufacturer(const SimpleString& value) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewManufacturer = value;
+}
+
+/*******************************************************************************
+ *  Inherited from UndoCommand
+ ******************************************************************************/
+
+bool CmdPartEdit::performExecute() {
+  performRedo();
+
+  if (mNewMpn != mOldMpn) return true;
+  if (mNewManufacturer != mOldManufacturer) return true;
+  return false;
+}
+
+void CmdPartEdit::performUndo() {
+  mPart.setMpn(mOldMpn);
+  mPart.setManufacturer(mOldManufacturer);
+}
+
+void CmdPartEdit::performRedo() {
+  mPart.setMpn(mNewMpn);
+  mPart.setManufacturer(mNewManufacturer);
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

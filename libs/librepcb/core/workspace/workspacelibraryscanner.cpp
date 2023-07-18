@@ -237,10 +237,12 @@ QHash<FilePath, int> WorkspaceLibraryScanner::updateLibraries(
     FilePath fp = lib->getDirectory().getAbsPath();
     if (dbLibIds.contains(fp)) {
       writer.updateLibrary(fp, lib->getUuid(), lib->getVersion(),
-                           lib->isDeprecated(), lib->getIcon());
+                           lib->isDeprecated(), lib->getIcon(),
+                           *lib->getManufacturer());
     } else {
       int id = writer.addLibrary(fp, lib->getUuid(), lib->getVersion(),
-                                 lib->isDeprecated(), lib->getIcon());
+                                 lib->isDeprecated(), lib->getIcon(),
+                                 *lib->getManufacturer());
       dbLibIds.insert(fp, id);
     }
   }
@@ -327,6 +329,13 @@ int WorkspaceLibraryScanner::addElementToDb<Device>(
       element.getVersion(), element.isDeprecated(), element.getComponentUuid(),
       element.getPackageUuid());
   addToCategories(writer, id, element);
+  for (const Part& part : element.getParts()) {
+    const int partId =
+        writer.addPart(id, part.getMpn(), *part.getManufacturer());
+    for (const Attribute& attribute : part.getAttributes()) {
+      writer.addPartAttribute(partId, attribute);
+    }
+  }
   return id;
 }
 

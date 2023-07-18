@@ -36,10 +36,24 @@ def test_messages(cli):
     code, stdout, stderr = cli.run('open-library', '--all', '--check',
                                    library.dir)
     assert stderr == \
+        "  - R-0805 (078650d3-483c-4b9e-a848-b14f1aad2edc):\n" \
+        "    - [HINT] No part numbers added\n" \
+        "  - R-0603 (483a71eb-318e-448e-82ff-f02efc4821aa):\n" \
+        "    - [HINT] No part numbers added\n" \
+        "  - Demo Device (4f5ee784-4b1b-407c-802b-44625163d90f):\n" \
+        "    - [HINT] No part numbers added\n" \
         "  - PSMN022-30PL (5738d8f9-4101-4409-bd46-d9c173b40d60):\n" \
         "    - [ERROR] No categories set\n" \
+        "    - [HINT] No part numbers added\n" \
+        "  - R-1206 (a6a6744d-7d3b-450a-b782-feca43939ca5):\n" \
+        "    - [HINT] No part numbers added\n" \
+        "  - C-0805 (c139e505-592b-46ba-bdf2-acb7383ea0cd):\n" \
+        "    - [HINT] No part numbers added\n" \
         "  - PSMN5R8 (f7fb22e8-0bbc-4f0f-aa89-596823b5bc3e):\n" \
-        "    - [ERROR] No categories set\n"
+        "    - [ERROR] No categories set\n" \
+        "    - [HINT] No part numbers added\n" \
+        "  - Crystal ABM3 (f83a5ae8-7f42-42be-9dd6-e762f4da2ec2):\n" \
+        "    - [HINT] No part numbers added\n"
     assert stdout == \
         "Open library 'Populated Library.lplib'...\n" \
         "Process {library.cmpcat} component categories...\n" \

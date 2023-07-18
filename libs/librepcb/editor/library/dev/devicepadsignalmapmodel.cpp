@@ -166,9 +166,9 @@ QVariant DevicePadSignalMapModel::headerData(int section,
     if (role == Qt::DisplayRole) {
       switch (section) {
         case COLUMN_PAD:
-          return tr("Package Pad");
+          return tr("Pad");
         case COLUMN_SIGNAL:
-          return tr("Component Signal");
+          return tr("Signal");
       }
     }
   }

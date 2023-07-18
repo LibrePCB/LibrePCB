@@ -17,67 +17,84 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_EDITOR_CMDPARTEDIT_H
+#define LIBREPCB_EDITOR_CMDPARTEDIT_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "devicecheck.h"
+#include "../../cmd/cmdlistelementinsert.h"
+#include "../../cmd/cmdlistelementremove.h"
+#include "../../cmd/cmdlistelementsswap.h"
+#include "../../undocommand.h"
 
-#include "device.h"
-#include "devicecheckmessages.h"
+#include <librepcb/core/library/dev/part.h>
 
 #include <QtCore>
 
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
- *  Constructors / Destructor
+ *  Class CmdPartEdit
  ******************************************************************************/
 
-DeviceCheck::DeviceCheck(const Device& device) noexcept
-  : LibraryElementCheck(device), mDevice(device) {
-}
+/**
+ * @brief The CmdPartEdit class
+ */
+class CmdPartEdit final : public UndoCommand {
+public:
+  // Constructors / Destructor
+  CmdPartEdit() = delete;
+  CmdPartEdit(const CmdPartEdit& other) = delete;
+  explicit CmdPartEdit(Part& part) noexcept;
+  ~CmdPartEdit() noexcept;
 
-DeviceCheck::~DeviceCheck() noexcept {
-}
+  // Setters
+  void setMpn(const ElementName& value) noexcept;
+  void setManufacturer(const SimpleString& value) noexcept;
+
+  // Operator Overloadings
+  CmdPartEdit& operator=(const CmdPartEdit& rhs) = delete;
+
+private:  // Methods
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
+
+private:  // Data
+  Part& mPart;
+
+  ElementName mOldMpn;
+  ElementName mNewMpn;
+  SimpleString mOldManufacturer;
+  SimpleString mNewManufacturer;
+};
 
 /*******************************************************************************
- *  General Methods
+ *  Undo Commands
  ******************************************************************************/
 
-RuleCheckMessageList DeviceCheck::runChecks() const {
-  RuleCheckMessageList msgs = LibraryElementCheck::runChecks();
-  checkNoPadsConnected(msgs);
-  checkParts(msgs);
-  return msgs;
-}
-
-/*******************************************************************************
- *  Protected Methods
- ******************************************************************************/
-
-void DeviceCheck::checkNoPadsConnected(MsgList& msgs) const {
-  for (const DevicePadSignalMapItem& item : mDevice.getPadSignalMap()) {
-    if (item.getSignalUuid()) {
-      return;  // pad is connected, don't show this message
-    }
-  }
-
-  if (!mDevice.getPadSignalMap().isEmpty()) {
-    msgs.append(std::make_shared<MsgNoPadsInDeviceConnected>());
-  }
-}
-
-void DeviceCheck::checkParts(MsgList& msgs) const {
-  if (mDevice.getParts().isEmpty()) {
-    msgs.append(std::make_shared<MsgDeviceHasNoParts>());
-  }
-}
+using CmdPartInsert =
+    CmdListElementInsert<Part, PartListNameProvider, Part::Event>;
+using CmdPartRemove =
+    CmdListElementRemove<Part, PartListNameProvider, Part::Event>;
+using CmdPartsSwap =
+    CmdListElementsSwap<Part, PartListNameProvider, Part::Event>;
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
+
+#endif

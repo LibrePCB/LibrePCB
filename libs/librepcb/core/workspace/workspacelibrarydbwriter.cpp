@@ -22,6 +22,9 @@
  ******************************************************************************/
 #include "workspacelibrarydbwriter.h"
 
+#include "../attribute/attribute.h"
+#include "../attribute/attributetype.h"
+#include "../attribute/attributeunit.h"
 #include "../library/cat/componentcategory.h"
 #include "../library/cat/packagecategory.h"
 #include "../library/cmp/component.h"
@@ -79,7 +82,8 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`uuid` TEXT NOT NULL, "
       "`version` TEXT NOT NULL, "
       "`deprecated` BOOLEAN NOT NULL, "
-      "`icon_png` BLOB "
+      "`icon_png` BLOB, "
+      "`manufacturer` TEXT NOT NULL"
       ")");
   queries << QString(
       "CREATE TABLE IF NOT EXISTS libraries_tr ("
@@ -261,6 +265,24 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "UNIQUE(element_id, category_uuid)"
       ")");
 
+  // parts
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS parts ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`device_id` INTEGER REFERENCES devices(id) ON DELETE CASCADE NOT NULL, "
+      "`mpn` TEXT NOT NULL, "
+      "`manufacturer` TEXT NOT NULL "
+      ")");
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS parts_attr ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`part_id` INTEGER REFERENCES parts(id) ON DELETE CASCADE NOT NULL, "
+      "`key` TEXT NOT NULL, "
+      "`type` TEXT NOT NULL, "
+      "`value` TEXT NOT NULL, "
+      "`unit` TEXT"
+      ")");
+
   // execute queries
   foreach (const QString& string, queries) {
     QSqlQuery query = mDb.prepareQuery(string);
@@ -280,34 +302,35 @@ void WorkspaceLibraryDbWriter::addInternalData(const QString& key, int value) {
 int WorkspaceLibraryDbWriter::addLibrary(const FilePath& fp, const Uuid& uuid,
                                          const Version& version,
                                          bool deprecated,
-                                         const QByteArray& iconPng) {
+                                         const QByteArray& iconPng,
+                                         const QString& manufacturer) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO libraries "
-      "(filepath, uuid, version, deprecated, icon_png) VALUES "
-      "(:filepath, :uuid, :version, :deprecated, :icon_png)");
+      "(filepath, uuid, version, deprecated, icon_png, manufacturer) VALUES "
+      "(:filepath, :uuid, :version, :deprecated, :icon_png, :manufacturer)");
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
   query.bindValue(":deprecated", deprecated);
   query.bindValue(":icon_png", iconPng);
+  query.bindValue(":manufacturer", nonNull(manufacturer));
   return mDb.insert(query);
 }
 
-void WorkspaceLibraryDbWriter::updateLibrary(const FilePath& fp,
-                                             const Uuid& uuid,
-                                             const Version& version,
-                                             bool deprecated,
-                                             const QByteArray& iconPng) {
+void WorkspaceLibraryDbWriter::updateLibrary(
+    const FilePath& fp, const Uuid& uuid, const Version& version,
+    bool deprecated, const QByteArray& iconPng, const QString& manufacturer) {
   QSqlQuery query = mDb.prepareQuery(
       "UPDATE libraries "
       "SET uuid = :uuid, version = :version, deprecated = :deprecated, "
-      "icon_png = :icon_png "
+      "icon_png = :icon_png, manufacturer = :manufacturer "
       "WHERE filepath = :filepath");
   query.bindValue(":filepath", filePathToString(fp));
   query.bindValue(":uuid", uuid.toStr());
   query.bindValue(":version", version.toStr());
   query.bindValue(":deprecated", deprecated);
   query.bindValue(":icon_png", iconPng);
+  query.bindValue(":manufacturer", nonNull(manufacturer));
   mDb.exec(query);
 }
 
@@ -329,6 +352,34 @@ int WorkspaceLibraryDbWriter::addDevice(int libId, const FilePath& fp,
   query.bindValue(":deprecated", deprecated);
   query.bindValue(":component_uuid", component.toStr());
   query.bindValue(":package_uuid", package.toStr());
+  return mDb.insert(query);
+}
+
+int WorkspaceLibraryDbWriter::addPart(int devId, const ElementName& mpn,
+                                      const QString& manufacturer) {
+  QSqlQuery query = mDb.prepareQuery(
+      "INSERT INTO parts "
+      "(device_id, mpn, manufacturer) VALUES "
+      "(:device_id, :mpn, :manufacturer)");
+  query.bindValue(":device_id", devId);
+  query.bindValue(":mpn", *mpn);
+  query.bindValue(":manufacturer", nonNull(manufacturer));
+  return mDb.insert(query);
+}
+
+int WorkspaceLibraryDbWriter::addPartAttribute(int partId,
+                                               const Attribute& attribute) {
+  QSqlQuery query = mDb.prepareQuery(
+      "INSERT INTO parts_attr "
+      "(part_id, key, type, value, unit) VALUES "
+      "(:part_id, :key, :type, :value, :unit)");
+  query.bindValue(":part_id", partId);
+  query.bindValue(":key", *attribute.getKey());
+  query.bindValue(":type", attribute.getType().getName());
+  query.bindValue(":value", nonNull(attribute.getValue()));
+  query.bindValue(
+      ":unit",
+      attribute.getUnit() ? attribute.getUnit()->getName() : QVariant());
   return mDb.insert(query);
 }
 
@@ -500,6 +551,10 @@ int WorkspaceLibraryDbWriter::addToCategory(const QString& elementsTable,
 QString WorkspaceLibraryDbWriter::filePathToString(const FilePath& fp) const
     noexcept {
   return fp.toRelative(mLibrariesRoot);
+}
+
+QString WorkspaceLibraryDbWriter::nonNull(const QString& s) noexcept {
+  return s.isNull() ? "" : s;
 }
 
 /*******************************************************************************

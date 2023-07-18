@@ -38,8 +38,8 @@
 namespace librepcb {
 
 class Angle;
+class Library;
 class LibraryBaseElement;
-class Point;
 class Point;
 class Workspace;
 
@@ -69,6 +69,7 @@ public:
     const IF_GraphicsLayerProvider& layerProvider;
     bool elementIsNewlyCreated;
     bool readOnly;
+    const Library* library;
   };
 
   enum Tool {

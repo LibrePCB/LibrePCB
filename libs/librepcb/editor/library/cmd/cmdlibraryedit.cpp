@@ -42,7 +42,9 @@ CmdLibraryEdit::CmdLibraryEdit(Library& library) noexcept
     mOldDependencies(library.getDependencies()),
     mNewDependencies(mOldDependencies),
     mOldIcon(library.getIcon()),
-    mNewIcon(mOldIcon) {
+    mNewIcon(mOldIcon),
+    mOldManufacturer(library.getManufacturer()),
+    mNewManufacturer(mOldManufacturer) {
 }
 
 CmdLibraryEdit::~CmdLibraryEdit() noexcept {
@@ -67,6 +69,11 @@ void CmdLibraryEdit::setIcon(const QByteArray& png) noexcept {
   mNewIcon = png;
 }
 
+void CmdLibraryEdit::setManufacturer(const SimpleString& value) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewManufacturer = value;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -76,6 +83,7 @@ bool CmdLibraryEdit::performExecute() {
   if (mNewUrl != mOldUrl) return true;
   if (mNewDependencies != mOldDependencies) return true;
   if (mNewIcon != mOldIcon) return true;
+  if (mNewManufacturer != mOldManufacturer) return true;
   return false;
 }
 
@@ -84,6 +92,7 @@ void CmdLibraryEdit::performUndo() {
   mLibrary.setUrl(mOldUrl);
   mLibrary.setDependencies(mOldDependencies);
   mLibrary.setIcon(mOldIcon);
+  mLibrary.setManufacturer(mOldManufacturer);
 }
 
 void CmdLibraryEdit::performRedo() {
@@ -91,6 +100,7 @@ void CmdLibraryEdit::performRedo() {
   mLibrary.setUrl(mNewUrl);
   mLibrary.setDependencies(mNewDependencies);
   mLibrary.setIcon(mNewIcon);
+  mLibrary.setManufacturer(mNewManufacturer);
 }
 
 /*******************************************************************************

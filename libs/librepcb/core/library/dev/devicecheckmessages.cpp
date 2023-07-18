@@ -28,6 +28,22 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  MsgDeviceHasNoParts
+ ******************************************************************************/
+
+MsgDeviceHasNoParts::MsgDeviceHasNoParts() noexcept
+  : RuleCheckMessage(
+        Severity::Hint, tr("No part numbers added"),
+        tr("There are no orderable parts added to the device. It's recommended "
+           "(but not mandatory) to add the concrete manufacturer part numbers "
+           "this device is valid for. These MPNs are used by the BOM export to "
+           "make BOMs of projects much more complete and accurate.\n\n"
+           "If this device doesn't represent an orderable part, just ignore "
+           "this message."),
+        "no_parts") {
+}
+
+/*******************************************************************************
  *  MsgNoPadsInDeviceConnected
  ******************************************************************************/
 

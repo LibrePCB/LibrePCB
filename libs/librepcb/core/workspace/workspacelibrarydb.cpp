@@ -22,6 +22,9 @@
  ******************************************************************************/
 #include "workspacelibrarydb.h"
 
+#include "../attribute/attributekey.h"
+#include "../attribute/attributetype.h"
+#include "../attribute/attributeunit.h"
 #include "../exceptions.h"
 #include "../fileio/filepath.h"
 #include "../library/cat/componentcategory.h"
@@ -103,10 +106,57 @@ int WorkspaceLibraryDb::getScanProgressPercent() const noexcept {
   return mLibraryScanner->getProgressPercent();
 }
 
-bool WorkspaceLibraryDb::getLibraryMetadata(const FilePath libDir,
-                                            QPixmap* icon) const {
+QList<Uuid> WorkspaceLibraryDb::findDevicesOfParts(
+    const QString& keyword) const {
   QSqlQuery query = mDb->prepareQuery(
-      "SELECT icon_png FROM libraries "
+      "SELECT devices.uuid FROM devices "
+      "LEFT JOIN parts "
+      "ON devices.id = parts.device_id "
+      "LEFT JOIN devices_tr "
+      "ON devices.id = devices_tr.element_id "
+      "WHERE parts.manufacturer LIKE :keyword "
+      "OR parts.mpn LIKE :keyword "
+      "GROUP BY devices.uuid "
+      "ORDER BY devices_tr.name ASC");
+  query.bindValue(":keyword", "%" + keyword + "%");
+  mDb->exec(query);
+
+  QList<Uuid> uuids;
+  while (query.next()) {
+    uuids.append(Uuid::fromString(query.value(0).toString()));  // can throw
+  }
+  return uuids;
+}
+
+QList<WorkspaceLibraryDb::Part> WorkspaceLibraryDb::findPartsOfDevice(
+    const Uuid& device, const QString& keyword) const {
+  SQLiteDatabase::TransactionScopeGuard sg(*mDb);  // Atomic attributes query!
+
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT parts.id, mpn, manufacturer FROM parts "
+      "LEFT JOIN devices "
+      "ON devices.id = parts.device_id "
+      "WHERE devices.uuid = :device "
+      "AND (parts.mpn LIKE :keyword OR parts.manufacturer LIKE :keyword) "
+      "GROUP BY mpn, manufacturer "
+      "ORDER BY mpn ASC, manufacturer ASC");
+  query.bindValue(":device", device.toStr());
+  query.bindValue(":keyword", "%" + keyword + "%");
+  mDb->exec(query);
+
+  QList<Part> parts;
+  while (query.next()) {
+    parts.append(Part{query.value(1).toString(), query.value(2).toString(),
+                      getPartAttributes(query.value(0).toInt())});
+  }
+  return parts;
+}
+
+bool WorkspaceLibraryDb::getLibraryMetadata(const FilePath libDir,
+                                            QPixmap* icon,
+                                            QString* manufacturer) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT icon_png, manufacturer FROM libraries "
       "WHERE filepath = :filepath "
       "LIMIT 1");
   query.bindValue(":filepath", libDir.toRelative(mLibrariesPath));
@@ -119,6 +169,9 @@ bool WorkspaceLibraryDb::getLibraryMetadata(const FilePath libDir,
 
   if (icon) {
     icon->loadFromData(query.value(0).toByteArray(), "png");
+  }
+  if (manufacturer) {
+    *manufacturer = query.value(1).toString();
   }
   return true;
 }
@@ -159,6 +212,27 @@ QSet<Uuid> WorkspaceLibraryDb::getComponentDevices(
   query.bindValue(":uuid", component.toStr());
   mDb->exec(query);
   return getUuidSet(query);
+}
+
+QList<WorkspaceLibraryDb::Part> WorkspaceLibraryDb::getDeviceParts(
+    const Uuid& device) const {
+  SQLiteDatabase::TransactionScopeGuard sg(*mDb);  // Atomic attributes query!
+
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT parts.id, mpn, manufacturer FROM parts "
+      "LEFT JOIN devices ON devices.id = parts.device_id "
+      "WHERE devices.uuid = :device "
+      "GROUP BY mpn, manufacturer "
+      "ORDER BY mpn ASC, manufacturer ASC");
+  query.bindValue(":device", device.toStr());
+  mDb->exec(query);
+
+  QList<Part> parts;
+  while (query.next()) {
+    parts.append(Part{query.value(1).toString(), query.value(2).toString(),
+                      getPartAttributes(query.value(0).toInt())});
+  }
+  return parts;
 }
 
 /*******************************************************************************
@@ -344,6 +418,26 @@ bool WorkspaceLibraryDb::getCategoryMetadata(const QString& categoriesTable,
     *parent = Uuid::tryFromString(query.value(0).toString());
   }
   return true;
+}
+
+AttributeList WorkspaceLibraryDb::getPartAttributes(int partId) const {
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT key, type, value, unit FROM parts_attr "
+      "WHERE part_id = :part_id");
+  query.bindValue(":part_id", partId);
+  mDb->exec(query);
+
+  AttributeList attributes;
+  while (query.next()) {
+    const AttributeKey key(query.value(0).toString());  // can throw
+    const AttributeType* type =
+        &AttributeType::fromString(query.value(1).toString());  // can throw
+    const QString value = query.value(2).toString();
+    const AttributeUnit* unit =
+        type->getUnitFromString(query.value(3).toString());
+    attributes.append(std::make_shared<Attribute>(key, *type, value, unit));
+  }
+  return attributes;
 }
 
 QSet<Uuid> WorkspaceLibraryDb::getChilds(

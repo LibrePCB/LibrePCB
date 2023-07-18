@@ -17,17 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_ELEMENTNAME_H
-#define LIBREPCB_CORE_ELEMENTNAME_H
+#ifndef LIBREPCB_CORE_SIMPLESTRING_H
+#define LIBREPCB_CORE_SIMPLESTRING_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include "../exceptions.h"
 #include "../serialization/sexpression.h"
-#include "../utils/toolbox.h"
 
-#include <optional/tl/optional.hpp>
 #include <type_safe/constrained_type.hpp>
 
 #include <QtCore>
@@ -38,21 +36,10 @@
 namespace librepcb {
 
 /*******************************************************************************
- *  Class ElementName
+ *  Class SimpleString
  ******************************************************************************/
 
-inline static QString cleanElementName(const QString& userInput) noexcept {
-  QString ret = userInput.trimmed();
-  for (int i = ret.length() - 1; i >= 0; --i) {
-    if (!ret[i].isPrint()) {
-      ret.remove(i, 1);
-    }
-  }
-  ret.truncate(70);
-  return ret;
-}
-
-struct ElementNameVerifier {
+struct SimpleStringVerifier {
   template <typename Value, typename Predicate>
   static constexpr auto verify(Value&& val, const Predicate& p) ->
       typename std::decay<Value>::type {
@@ -60,16 +47,14 @@ struct ElementNameVerifier {
         ? std::forward<Value>(val)
         : (throw RuntimeError(__FILE__, __LINE__,
                               QString(QCoreApplication::translate(
-                                          "ElementName", "Invalid name: '%1'"))
+                                          "SimpleString", "Invalid name: '%1'"))
                                   .arg(val)),
            std::forward<Value>(val));
   }
 };
 
-struct ElementNameConstraint {
+struct SimpleStringConstraint {
   bool operator()(const QString& value) const noexcept {
-    if (value.isEmpty()) return false;
-    if (value.length() > 70) return false;
     if (value != value.trimmed()) return false;
     foreach (const QChar& c, value) {
       if (!c.isPrint()) return false;
@@ -79,76 +64,75 @@ struct ElementNameConstraint {
 };
 
 /**
- * ElementName is a wrapper around QString which guarantees to contain a valid
- * element name (used as name for several objects)
+ * SimpleString is a wrapper around QString which guarantees to contain a
+ * string
  *
- * An element name is considered as valid if it:
- *   - contains minimum 1 and maximum 70 characters
- *   - contains only printable characters
- *   - does not start or end with whitespaces
+ * A string is considered simple if it only consists of printable characters
+ * and doesn't contain leading or trailing spaces. Note that an empty string
+ * is allowed.
  *
  * The constructor throws an exception if constructed from a QString which is
- * not a valid element name according these rules.
+ * not a valid simple string.
  */
-using ElementName = type_safe::constrained_type<QString, ElementNameConstraint,
-                                                ElementNameVerifier>;
+using SimpleString =
+    type_safe::constrained_type<QString, SimpleStringConstraint,
+                                SimpleStringVerifier>;
 
-inline bool operator==(const ElementName& lhs, const QString& rhs) noexcept {
+inline bool operator==(const SimpleString& lhs, const QString& rhs) noexcept {
   return (*lhs) == rhs;
 }
-inline bool operator==(const QString& lhs, const ElementName& rhs) noexcept {
+inline bool operator==(const QString& lhs, const SimpleString& rhs) noexcept {
   return lhs == (*rhs);
 }
-inline bool operator!=(const ElementName& lhs, const QString& rhs) noexcept {
+inline bool operator!=(const SimpleString& lhs, const QString& rhs) noexcept {
   return (*lhs) != rhs;
 }
-inline bool operator!=(const QString& lhs, const ElementName& rhs) noexcept {
+inline bool operator!=(const QString& lhs, const SimpleString& rhs) noexcept {
   return lhs != (*rhs);
 }
-inline QString operator%(const ElementName& lhs, const QString& rhs) noexcept {
+inline QString operator%(const SimpleString& lhs, const QString& rhs) noexcept {
   return (*lhs) % rhs;
 }
-inline QString operator%(const QString& lhs, const ElementName& rhs) noexcept {
+inline QString operator%(const QString& lhs, const SimpleString& rhs) noexcept {
   return lhs % (*rhs);
 }
-inline ElementName operator%(const ElementName& lhs,
-                             const ElementName& rhs) noexcept {
-  return ElementName((*lhs) % (*rhs));  // always safe, will not throw
+inline SimpleString operator%(const SimpleString& lhs,
+                              const SimpleString& rhs) noexcept {
+  return SimpleString((*lhs) % (*rhs));  // always safe, will not throw
+}
+
+inline static SimpleString cleanSimpleString(
+    const QString& userInput) noexcept {
+  QString ret = userInput.simplified();
+  for (int i = ret.length() - 1; i >= 0; --i) {
+    if (!ret[i].isPrint()) {
+      ret.remove(i, 1);
+    }
+  }
+  return SimpleString(ret);
 }
 
 template <>
-inline SExpression serialize(const ElementName& obj) {
+inline SExpression serialize(const SimpleString& obj) {
   return SExpression::createString(*obj);
 }
 
 template <>
-inline ElementName deserialize(const SExpression& node) {
-  return ElementName(node.getValue());  // can throw
+inline SimpleString deserialize(const SExpression& node) {
+  return SimpleString(node.getValue());  // can throw
 }
 
-template <>
-inline SExpression serialize(const tl::optional<ElementName>& obj) {
-  return SExpression::createString(obj ? **obj : "");
-}
-
-template <>
-inline tl::optional<ElementName> deserialize(const SExpression& node) {
-  const QString str = node.getValue();
-  return str.isEmpty() ? tl::nullopt
-                       : tl::make_optional(ElementName(str));  // can throw
-}
-
-inline QDataStream& operator<<(QDataStream& stream, const ElementName& obj) {
+inline QDataStream& operator<<(QDataStream& stream, const SimpleString& obj) {
   stream << *obj;
   return stream;
 }
 
-inline QDebug operator<<(QDebug stream, const ElementName& obj) {
-  stream << QString("ElementName('%1')").arg(*obj);
+inline QDebug operator<<(QDebug stream, const SimpleString& obj) {
+  stream << QString("SimpleString('%1')").arg(*obj);
   return stream;
 }
 
-inline uint qHash(const ElementName& key, uint seed = 0) noexcept {
+inline uint qHash(const SimpleString& key, uint seed = 0) noexcept {
   return ::qHash(*key, seed);
 }
 
