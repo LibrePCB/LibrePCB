@@ -27,6 +27,7 @@
 #include <librepcb/core/project/board/boardfabricationoutputsettings.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 
@@ -89,9 +90,11 @@ TEST(BoardGerberExportTest, test) {
   grbExport.exportPcbLayers(config);
   grbExport.exportComponentLayer(
       BoardGerberExport::BoardSide::Top,
+      project->getCircuit().getAssemblyVariants().first()->getUuid(),
       testDataDir.getPathTo("actual/test_project_ASSEMBLY-TOP.gbr"));
   grbExport.exportComponentLayer(
       BoardGerberExport::BoardSide::Bottom,
+      project->getCircuit().getAssemblyVariants().first()->getUuid(),
       testDataDir.getPathTo("actual/test_project_ASSEMBLY-BOTTOM.gbr"));
 
   // replace volatile data in exported files with well-known, constant data

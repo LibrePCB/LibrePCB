@@ -38,6 +38,7 @@ ComponentAssemblyOption::ComponentAssemblyOption(
   : onEdited(*this),
     mDevice(other.mDevice),
     mAttributes(other.mAttributes),
+    mAssemblyVariants(other.mAssemblyVariants),
     mParts(other.mParts),
     mOnPartsEditedSlot(*this, &ComponentAssemblyOption::partListEdited) {
   mParts.onEdited.attach(mOnPartsEditedSlot);
@@ -47,16 +48,22 @@ ComponentAssemblyOption::ComponentAssemblyOption(const SExpression& node)
   : onEdited(*this),
     mDevice(deserialize<Uuid>(node.getChild("@0"))),
     mAttributes(node),
+    mAssemblyVariants(),
     mParts(node),
     mOnPartsEditedSlot(*this, &ComponentAssemblyOption::partListEdited) {
+  foreach (const SExpression* devNode, node.getChildren("variant")) {
+    mAssemblyVariants.insert(deserialize<Uuid>(devNode->getChild("@0")));
+  }
   mParts.onEdited.attach(mOnPartsEditedSlot);
 }
 
 ComponentAssemblyOption::ComponentAssemblyOption(
-    const Uuid& device, const AttributeList& attributes, const PartList& parts)
+    const Uuid& device, const AttributeList& attributes,
+    const QSet<Uuid>& assemblyVariants, const PartList& parts)
   : onEdited(*this),
     mDevice(device),
     mAttributes(attributes),
+    mAssemblyVariants(assemblyVariants),
     mParts(parts),
     mOnPartsEditedSlot(*this, &ComponentAssemblyOption::partListEdited) {
   mParts.onEdited.attach(mOnPartsEditedSlot);
@@ -84,6 +91,14 @@ void ComponentAssemblyOption::setAttributes(
   }
 }
 
+void ComponentAssemblyOption::setAssemblyVariants(
+    const QSet<Uuid>& value) noexcept {
+  if (value != mAssemblyVariants) {
+    mAssemblyVariants = value;
+    onEdited.notify(Event::AssemblyVariantsChanged);
+  }
+}
+
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
@@ -93,6 +108,10 @@ void ComponentAssemblyOption::serialize(SExpression& root) const {
   root.ensureLineBreak();
   mAttributes.serialize(root);
   root.ensureLineBreak();
+  foreach (const Uuid& uuid, Toolbox::sortedQSet(mAssemblyVariants)) {
+    root.appendChild("variant", uuid);
+    root.ensureLineBreak();
+  }
   mParts.serialize(root);
   root.ensureLineBreak();
 }
@@ -105,6 +124,7 @@ bool ComponentAssemblyOption::operator==(
     const ComponentAssemblyOption& rhs) const noexcept {
   if (mDevice != rhs.mDevice) return false;
   if (mAttributes != rhs.mAttributes) return false;
+  if (mAssemblyVariants != rhs.mAssemblyVariants) return false;
   if (mParts != rhs.mParts) return false;
   return true;
 }

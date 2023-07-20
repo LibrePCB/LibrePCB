@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/uuid.h>
+
 #include <QtCore>
 
 #include <memory>
@@ -49,7 +51,8 @@ public:
   // Constructors / Destructor
   BoardPickPlaceGenerator() = delete;
   BoardPickPlaceGenerator(const BoardPickPlaceGenerator& other) = delete;
-  explicit BoardPickPlaceGenerator(const Board& board) noexcept;
+  explicit BoardPickPlaceGenerator(const Board& board,
+                                   const Uuid& assemblyVariant) noexcept;
   ~BoardPickPlaceGenerator() noexcept;
 
   // General Methods
@@ -61,6 +64,7 @@ public:
 
 private:
   const Board& mBoard;
+  const Uuid mAssemblyVariant;
 };
 
 /*******************************************************************************

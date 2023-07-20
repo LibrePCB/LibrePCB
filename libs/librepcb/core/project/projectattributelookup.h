@@ -33,8 +33,10 @@
  ******************************************************************************/
 namespace librepcb {
 
+class AssemblyVariant;
 class BI_Device;
 class Board;
+class Circuit;
 class ComponentInstance;
 class Part;
 class Project;
@@ -69,14 +71,18 @@ public:
   // Constructors / Destructor
   ProjectAttributeLookup() = delete;
   ProjectAttributeLookup(const ProjectAttributeLookup& other) noexcept;
-  explicit ProjectAttributeLookup(const Project& obj) noexcept;
+  ProjectAttributeLookup(const Project& obj,
+                         std::shared_ptr<AssemblyVariant> av) noexcept;
   ProjectAttributeLookup(const ComponentInstance& obj,
                          QPointer<const BI_Device> device,
                          std::shared_ptr<const Part> part) noexcept;
-  explicit ProjectAttributeLookup(const Schematic& obj) noexcept;
-  explicit ProjectAttributeLookup(const Board& obj) noexcept;
+  ProjectAttributeLookup(const Schematic& obj,
+                         std::shared_ptr<AssemblyVariant> av) noexcept;
+  ProjectAttributeLookup(const Board& obj,
+                         std::shared_ptr<AssemblyVariant> av) noexcept;
   ProjectAttributeLookup(const SI_Symbol& obj, QPointer<const BI_Device> device,
-                         std::shared_ptr<const Part> part) noexcept;
+                         std::shared_ptr<const Part> part,
+                         std::shared_ptr<AssemblyVariant> av) noexcept;
   ProjectAttributeLookup(const BI_Device& obj,
                          std::shared_ptr<const Part> part) noexcept;
   ~ProjectAttributeLookup() noexcept;
@@ -98,6 +104,8 @@ public:
 private:  // Methods
   static bool query(const Project& project, const QString& key,
                     QString& value) noexcept;
+  static bool query(const AssemblyVariant& av, const Circuit& circuit,
+                    const QString& key, QString& value) noexcept;
   static bool query(const ComponentInstance& cmp, const QString& key,
                     QString& value) noexcept;
   static bool query(const Schematic& schematic, const QString& key,

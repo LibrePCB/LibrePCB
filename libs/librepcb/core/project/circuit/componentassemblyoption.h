@@ -46,6 +46,7 @@ public:
   enum class Event {
     DeviceChanged,
     AttributesChanged,
+    AssemblyVariantsChanged,
     PartsEdited,
   };
   Signal<ComponentAssemblyOption, Event> onEdited;
@@ -56,18 +57,23 @@ public:
   ComponentAssemblyOption(const ComponentAssemblyOption& other) noexcept;
   explicit ComponentAssemblyOption(const SExpression& node);
   ComponentAssemblyOption(const Uuid& device, const AttributeList& attributes,
+                          const QSet<Uuid>& assemblyVariants,
                           const PartList& parts);
   ~ComponentAssemblyOption() noexcept;
 
   // Getters
   const Uuid& getDevice() const noexcept { return mDevice; }
   const AttributeList& getAttributes() const noexcept { return mAttributes; }
+  const QSet<Uuid>& getAssemblyVariants() const noexcept {
+    return mAssemblyVariants;
+  }
   PartList& getParts() noexcept { return mParts; }
   const PartList& getParts() const noexcept { return mParts; }
 
   // Setters
   void setDevice(const Uuid& value) noexcept;
   void setAttributes(const AttributeList& value) noexcept;
+  void setAssemblyVariants(const QSet<Uuid>& assemblyVariants) noexcept;
 
   /**
    * @brief Serialize into ::librepcb::SExpression node
@@ -95,6 +101,9 @@ private:  // Data
 
   /// Default attributes to copy when adding new parts
   AttributeList mAttributes;
+
+  /// UUIDs of ::librepcb::AssemblyVariant this option is available for
+  QSet<Uuid> mAssemblyVariants;
 
   /// Parts available for assembly
   PartList mParts;

@@ -32,6 +32,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
@@ -165,11 +166,15 @@ bool CmdAddDeviceToBoard::performExecute() {
              "component in the schematic, or remove the lock from the "
              "component."));
     }
+    const QSet<Uuid> assemblyVariants =
+        mDeviceInstance->doesPackageRequireAssembly(true)
+        ? mComponentInstance.getCircuit().getAssemblyVariants().getUuidSet()
+        : QSet<Uuid>();
     ComponentAssemblyOptionList assemblyOptions =
         mComponentInstance.getAssemblyOptions();
     assemblyOptions.append(std::make_shared<ComponentAssemblyOption>(
         mDeviceUuid, mDeviceInstance->getLibDevice().getAttributes(),
-        PartList{}));
+        assemblyVariants, PartList{}));
     QScopedPointer<CmdComponentInstanceEdit> cmd(new CmdComponentInstanceEdit(
         mComponentInstance.getCircuit(), mComponentInstance));
     cmd->setAssemblyOptions(assemblyOptions);

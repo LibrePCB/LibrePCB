@@ -51,7 +51,7 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataEmpty) {
   Point pos(Length(12345), Length(54321));
 
   // Create object
-  SchematicClipboardData obj1(uuid, pos);
+  SchematicClipboardData obj1(uuid, pos, {});
 
   // Serialize to MIME data
   std::unique_ptr<QMimeData> mime1 = obj1.toMimeData();
@@ -73,6 +73,12 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   Uuid uuid = Uuid::createRandom();
   Point pos(Length(12345), Length(54321));
 
+  std::shared_ptr<AssemblyVariant> av1 = std::make_shared<AssemblyVariant>(
+      Uuid::createRandom(), FileProofName("AV1"), "desc 1");
+
+  std::shared_ptr<AssemblyVariant> av2 = std::make_shared<AssemblyVariant>(
+      Uuid::createRandom(), FileProofName("AV2"), "desc 2");
+
   std::shared_ptr<Attribute> attribute1 = std::make_shared<Attribute>(
       AttributeKey("A1"), AttrTypeString::instance(), "foo bar", nullptr);
 
@@ -87,13 +93,13 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       SimpleString(""), SimpleString(""), AttributeList{attribute1});
 
   std::shared_ptr<ComponentAssemblyOption> assemblyOption1 =
-      std::make_shared<ComponentAssemblyOption>(Uuid::createRandom(),
-                                                AttributeList{attribute1},
-                                                PartList{part1, part2});
+      std::make_shared<ComponentAssemblyOption>(
+          Uuid::createRandom(), AttributeList{attribute1},
+          QSet<Uuid>{av1->getUuid()}, PartList{part1, part2});
 
   std::shared_ptr<ComponentAssemblyOption> assemblyOption2 =
-      std::make_shared<ComponentAssemblyOption>(Uuid::createRandom(),
-                                                AttributeList{}, PartList{});
+      std::make_shared<ComponentAssemblyOption>(
+          Uuid::createRandom(), AttributeList{}, QSet<Uuid>{}, PartList{});
 
   std::shared_ptr<Text> text1 = std::make_shared<Text>(
       Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
@@ -178,7 +184,7 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
             Vertex(Point(40, 50), Angle(60))}));
 
   // Create object
-  SchematicClipboardData obj1(uuid, pos);
+  SchematicClipboardData obj1(uuid, pos, {av1, av2});
   obj1.getComponentInstances().append(component1);
   obj1.getComponentInstances().append(component2);
   obj1.getSymbolInstances().append(symbol1);

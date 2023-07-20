@@ -329,6 +329,8 @@ add_library(
   project/board/items/bi_zone.h
   project/bomgenerator.cpp
   project/bomgenerator.h
+  project/circuit/assemblyvariant.cpp
+  project/circuit/assemblyvariant.h
   project/circuit/circuit.cpp
   project/circuit/circuit.h
   project/circuit/componentassemblyoption.cpp
@@ -399,6 +401,7 @@ add_library(
   types/boundedunsignedratio.h
   types/circuitidentifier.h
   types/elementname.h
+  types/fileproofname.h
   types/layer.cpp
   types/layer.h
   types/length.cpp

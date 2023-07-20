@@ -204,7 +204,7 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
 
       // Add component to list.
       ProjectAttributeLookup lookup(*component, nullptr,
-                                    component->getParts().value(0));
+                                    component->getParts(tl::nullopt).value(0));
       const QString value =
           AttributeSubstitutor::substitute(lookup("VALUE"), lookup)
               .split("\n", QString::SkipEmptyParts)

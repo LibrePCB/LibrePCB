@@ -37,6 +37,8 @@
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/dev/part.h>
+#include <librepcb/core/project/circuit/assemblyvariant.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
@@ -376,8 +378,15 @@ void SchematicEditorState_AddComponent::startAddingComponent(
               libPart->getMpn(), libPart->getManufacturer(),
               libPart->getAttributes() | libDev->getAttributes()));
         }
+        QSet<Uuid> assemblyVariants;
+        if (mAddComponentDialog->getSelectedPackageAssemblyType() !=
+            Package::AssemblyType::None) {
+          assemblyVariants =
+              mContext.project.getCircuit().getAssemblyVariants().getUuidSet();
+        }
         assemblyOptions.append(std::make_shared<ComponentAssemblyOption>(
-            libDev->getUuid(), libDev->getAttributes(), parts));
+            libDev->getUuid(), libDev->getAttributes(), assemblyVariants,
+            parts));
       }
 
       // add selected component to circuit

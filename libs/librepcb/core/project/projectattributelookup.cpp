@@ -50,12 +50,14 @@ ProjectAttributeLookup::ProjectAttributeLookup(
   : mFunction(other.mFunction) {
 }
 
-ProjectAttributeLookup::ProjectAttributeLookup(const Project& obj) noexcept {
+ProjectAttributeLookup::ProjectAttributeLookup(
+    const Project& obj, std::shared_ptr<AssemblyVariant> av) noexcept {
   QPointer<const Project> ptr(&obj);
-  mFunction = [ptr](const QString& key) {
+  mFunction = [ptr, av](const QString& key) {
     QString value;
     if (ptr) {
-      query(*ptr, key, value);  // Project
+      (av && query(*av, ptr->getCircuit(), key, value))  // Assembly Variant
+          || query(*ptr, key, value);  // Project
     }
     return value;
   };
@@ -77,24 +79,30 @@ ProjectAttributeLookup::ProjectAttributeLookup(
   };
 }
 
-ProjectAttributeLookup::ProjectAttributeLookup(const Schematic& obj) noexcept {
+ProjectAttributeLookup::ProjectAttributeLookup(
+    const Schematic& obj, std::shared_ptr<AssemblyVariant> av) noexcept {
   QPointer<const Schematic> ptr(&obj);
-  mFunction = [ptr](const QString& key) {
+  mFunction = [ptr, av](const QString& key) {
     QString value;
     if (ptr) {
+      const Circuit& circuit = ptr->getProject().getCircuit();
       query(*ptr, key, value)  // Schematic
+          || (av && query(*av, circuit, key, value))  // Assembly Variant
           || query(ptr->getProject(), key, value);  // Project
     }
     return value;
   };
 }
 
-ProjectAttributeLookup::ProjectAttributeLookup(const Board& obj) noexcept {
+ProjectAttributeLookup::ProjectAttributeLookup(
+    const Board& obj, std::shared_ptr<AssemblyVariant> av) noexcept {
   QPointer<const Board> ptr(&obj);
-  mFunction = [ptr](const QString& key) {
+  mFunction = [ptr, av](const QString& key) {
     QString value;
     if (ptr) {
+      const Circuit& circuit = ptr->getProject().getCircuit();
       query(*ptr, key, value)  // Board
+          || (av && query(*av, circuit, key, value))  // Assembly Variant
           || query(ptr->getProject(), key, value);  // Project
     }
     return value;
@@ -103,9 +111,10 @@ ProjectAttributeLookup::ProjectAttributeLookup(const Board& obj) noexcept {
 
 ProjectAttributeLookup::ProjectAttributeLookup(
     const SI_Symbol& obj, QPointer<const BI_Device> device,
-    std::shared_ptr<const Part> part) noexcept {
+    std::shared_ptr<const Part> part,
+    std::shared_ptr<AssemblyVariant> av) noexcept {
   QPointer<const SI_Symbol> ptr(&obj);
-  mFunction = [ptr, device, part](const QString& key) {
+  mFunction = [ptr, device, part, av](const QString& key) {
     QString value;
     if (ptr) {
       (part && query(*part, key, value))  // Part
@@ -113,6 +122,7 @@ ProjectAttributeLookup::ProjectAttributeLookup(
           || query(ptr->getComponentInstance(), key, value)  // Component
           || (device && query(*device, key, value))  // Device
           || query(ptr->getSchematic(), key, value)  // Schematic
+          || (av && query(*av, ptr->getCircuit(), key, value))  // Assembly Var.
           || query(ptr->getProject(), key, value);  // Project
     }
     return value;
@@ -201,6 +211,19 @@ bool ProjectAttributeLookup::query(const Project& project, const QString& key,
   } else if (key == QLatin1String("PAGE_X_OF_Y")) {
     // Do not translate this, must be the same for every user!
     value = "Page {{PAGE}} of {{PAGES}}";
+    return true;
+  }
+  return false;
+}
+
+bool ProjectAttributeLookup::query(const AssemblyVariant& av,
+                                   const Circuit& circuit, const QString& key,
+                                   QString& value) noexcept {
+  if (key == QLatin1String("VARIANT")) {
+    value = *av.getName();
+    return true;
+  } else if (key == QLatin1String("VARIANT_INDEX")) {
+    value = QString::number(circuit.getAssemblyVariants().indexOf(&av));
     return true;
   }
   return false;

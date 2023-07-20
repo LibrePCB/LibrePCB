@@ -27,9 +27,13 @@
 #include "../../library/cmp/componentprefix.h"
 #include "../../types/circuitidentifier.h"
 #include "../../types/elementname.h"
+#include "../../types/fileproofname.h"
 #include "../../types/uuid.h"
+#include "assemblyvariant.h"
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -58,6 +62,7 @@ class TransactionalDirectory;
  * "circuit.lp" in the project's "circuit" directory.
  *
  * Each #Circuit object contains:
+ *  - All assembly variants (::librepcb::AssemblyVariant objects)
  *  - All net classes (::librepcb::NetClass objects)
  *  - All net signals (::librepcb::NetSignal objects)
  *  - All component instances (::librepcb::ComponentInstance objects)
@@ -74,6 +79,18 @@ public:
 
   // Getters
   Project& getProject() const noexcept { return mProject; }
+
+  // AssemblyVariant Methods
+  AssemblyVariantList& getAssemblyVariants() noexcept {
+    return mAssemblyVariants;
+  }
+  const AssemblyVariantList& getAssemblyVariants() const noexcept {
+    return mAssemblyVariants;
+  }
+  int addAssemblyVariant(std::shared_ptr<AssemblyVariant> av, int index = -1);
+  void removeAssemblyVariant(std::shared_ptr<AssemblyVariant> av);
+  void setAssemblyVariantName(std::shared_ptr<AssemblyVariant> av,
+                              const FileProofName& newName);
 
   // NetClass Methods
   const QMap<Uuid, NetClass*>& getNetClasses() const noexcept {
@@ -126,7 +143,8 @@ public:
   bool operator!=(const Circuit& rhs) noexcept { return (this != &rhs); }
 
 signals:
-
+  void assemblyVariantAdded(std::shared_ptr<AssemblyVariant>& av);
+  void assemblyVariantRemoved(std::shared_ptr<AssemblyVariant>& av);
   void netClassAdded(NetClass& netclass);
   void netClassRemoved(NetClass& netclass);
   void netSignalAdded(NetSignal& netsignal);
@@ -135,10 +153,8 @@ signals:
   void componentRemoved(ComponentInstance& cmp);
 
 private:
-  // General
   Project& mProject;  ///< A reference to the Project object (from the ctor)
-  QScopedPointer<TransactionalDirectory> mDirectory;
-
+  AssemblyVariantList mAssemblyVariants;
   QMap<Uuid, NetClass*> mNetClasses;
   QMap<Uuid, NetSignal*> mNetSignals;
   QMap<Uuid, ComponentInstance*> mComponentInstances;

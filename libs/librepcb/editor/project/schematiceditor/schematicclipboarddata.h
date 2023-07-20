@@ -28,6 +28,7 @@
 #include <librepcb/core/geometry/netline.h>
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/text.h>
+#include <librepcb/core/project/circuit/assemblyvariant.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 
 #include <QtCore>
@@ -224,8 +225,8 @@ public:
   // Constructors / Destructor
   SchematicClipboardData() = delete;
   SchematicClipboardData(const SchematicClipboardData& other) = delete;
-  SchematicClipboardData(const Uuid& schematicUuid,
-                         const Point& cursorPos) noexcept;
+  SchematicClipboardData(const Uuid& schematicUuid, const Point& cursorPos,
+                         const AssemblyVariantList& assemblyVariants) noexcept;
   explicit SchematicClipboardData(const QByteArray& mimeData);
   ~SchematicClipboardData() noexcept;
 
@@ -234,6 +235,9 @@ public:
       const QString& path = "") noexcept;
   const Uuid& getSchematicUuid() const noexcept { return mSchematicUuid; }
   const Point& getCursorPos() const noexcept { return mCursorPos; }
+  const AssemblyVariantList& getAssemblyVariants() noexcept {
+    return mAssemblyVariants;
+  }
   SerializableObjectList<ComponentInstance, ComponentInstance>&
       getComponentInstances() noexcept {
     return mComponentInstances;
@@ -263,6 +267,7 @@ private:  // Data
   std::shared_ptr<TransactionalFileSystem> mFileSystem;
   Uuid mSchematicUuid;
   Point mCursorPos;
+  AssemblyVariantList mAssemblyVariants;
   SerializableObjectList<ComponentInstance, ComponentInstance>
       mComponentInstances;
   SerializableObjectList<SymbolInstance, SymbolInstance> mSymbolInstances;

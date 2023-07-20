@@ -48,6 +48,8 @@
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/bomgenerator.h>
+#include <librepcb/core/project/circuit/assemblyvariant.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
@@ -446,6 +448,14 @@ bool CommandLineInterface::openProject(
       }
     }
 
+    // Parse list of assembly variants.
+    // Not implemented yet, always use all assembly variants.
+    QVector<std::shared_ptr<AssemblyVariant>> assemblyVariants;
+    for (auto it = project->getCircuit().getAssemblyVariants().begin();
+         it != project->getCircuit().getAssemblyVariants().end(); ++it) {
+      assemblyVariants.append(it.ptr());
+    }
+
     // Parse list of boards.
     QList<Board*> boards;
     foreach (const QString& boardName, boardNames) {
@@ -586,7 +596,8 @@ bool CommandLineInterface::openProject(
     foreach (const QString& destStr, exportSchematicsFiles) {
       print(tr("Export schematics to '%1'...").arg(destStr));
       QString destPathStr = AttributeSubstitutor::substitute(
-          destStr, ProjectAttributeLookup(*project), [&](const QString& str) {
+          destStr, ProjectAttributeLookup(*project, nullptr),
+          [&](const QString& str) {
             return FilePath::cleanFileName(
                 str, FilePath::ReplaceSpaces | FilePath::KeepCase);
           });
@@ -645,33 +656,35 @@ bool CommandLineInterface::openProject(
           boardsToExport = {nullptr};
         }
         foreach (const Board* board, boardsToExport) {
-          QString destPathStr = AttributeSubstitutor::substitute(
-              destStr,
-              board ? ProjectAttributeLookup(*board)
-                    : ProjectAttributeLookup(*project),
-              [&](const QString& str) {
-                return FilePath::cleanFileName(
-                    str, FilePath::ReplaceSpaces | FilePath::KeepCase);
-              });
-          FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
-          BomGenerator gen(*project);
-          gen.setAdditionalAttributes(attributes);
-          std::shared_ptr<Bom> bom = gen.generate(board);
-          if (board) {
-            print(QString("  - '%1' => '%2'")
-                      .arg(*board->getName(), prettyPath(fp, destPathStr)));
-          } else {
-            print(QString("  => '%1'").arg(prettyPath(fp, destPathStr)));
-          }
-          QString suffix = destStr.split('.').last().toLower();
-          if (suffix == "csv") {
-            BomCsvWriter writer(*bom);
-            std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
-            csv->saveToFile(fp);  // can throw
-            writtenFilesCounter[fp]++;
-          } else {
-            printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
-            success = false;
+          foreach (std::shared_ptr<AssemblyVariant> av, assemblyVariants) {
+            QString destPathStr = AttributeSubstitutor::substitute(
+                destStr,
+                board ? ProjectAttributeLookup(*board, av)
+                      : ProjectAttributeLookup(*project, av),
+                [&](const QString& str) {
+                  return FilePath::cleanFileName(
+                      str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+                });
+            FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
+            BomGenerator gen(*project);
+            gen.setAdditionalAttributes(attributes);
+            std::shared_ptr<Bom> bom = gen.generate(board, av->getUuid());
+            if (board) {
+              print(QString("  - '%1' => '%2'")
+                        .arg(*board->getName(), prettyPath(fp, destPathStr)));
+            } else {
+              print(QString("  => '%1'").arg(prettyPath(fp, destPathStr)));
+            }
+            QString suffix = destStr.split('.').last().toLower();
+            if (suffix == "csv") {
+              BomCsvWriter writer(*bom);
+              std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
+              csv->saveToFile(fp);  // can throw
+              writtenFilesCounter[fp]++;
+            } else {
+              printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
+              success = false;
+            }
           }
         }
       }
@@ -734,32 +747,35 @@ bool CommandLineInterface::openProject(
                   .arg(job.boardSideStr)
                   .arg(job.destStr));
         foreach (const Board* board, boards) {
-          const QString destPathStr = AttributeSubstitutor::substitute(
-              job.destStr, ProjectAttributeLookup(*board),
-              [&](const QString& str) {
-                return FilePath::cleanFileName(
-                    str, FilePath::ReplaceSpaces | FilePath::KeepCase);
-              });
-          const FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
-          print(QString("  - '%1' => '%2'")
-                    .arg(*board->getName(), prettyPath(fp, destPathStr)));
-          const QString suffix = job.destStr.split('.').last().toLower();
-          if (suffix == "csv") {
-            BoardPickPlaceGenerator gen(*board);
-            std::shared_ptr<PickPlaceData> data = gen.generate();
-            PickPlaceCsvWriter writer(*data);
-            writer.setIncludeMetadataComment(true);
-            writer.setBoardSide(job.boardSideCsv);
-            std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
-            csv->saveToFile(fp);  // can throw
-            writtenFilesCounter[fp]++;
-          } else if (suffix == "gbr") {
-            BoardGerberExport gen(*board);
-            gen.exportComponentLayer(job.boardSideGbr, fp);  // can throw
-            writtenFilesCounter[fp]++;
-          } else {
-            printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
-            success = false;
+          foreach (std::shared_ptr<AssemblyVariant> av, assemblyVariants) {
+            const QString destPathStr = AttributeSubstitutor::substitute(
+                job.destStr, ProjectAttributeLookup(*board, av),
+                [&](const QString& str) {
+                  return FilePath::cleanFileName(
+                      str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+                });
+            const FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
+            print(QString("  - '%1' => '%2'")
+                      .arg(*board->getName(), prettyPath(fp, destPathStr)));
+            const QString suffix = job.destStr.split('.').last().toLower();
+            if (suffix == "csv") {
+              BoardPickPlaceGenerator gen(*board, av->getUuid());
+              std::shared_ptr<PickPlaceData> data = gen.generate();
+              PickPlaceCsvWriter writer(*data);
+              writer.setIncludeMetadataComment(true);
+              writer.setBoardSide(job.boardSideCsv);
+              std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
+              csv->saveToFile(fp);  // can throw
+              writtenFilesCounter[fp]++;
+            } else if (suffix == "gbr") {
+              BoardGerberExport gen(*board);
+              gen.exportComponentLayer(job.boardSideGbr, av->getUuid(),
+                                       fp);  // can throw
+              writtenFilesCounter[fp]++;
+            } else {
+              printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
+              success = false;
+            }
           }
         }
       }
@@ -770,7 +786,8 @@ bool CommandLineInterface::openProject(
       print(tr("Export netlist to '%1'...").arg(destStr));
       foreach (const Board* board, boards) {
         QString destPathStr = AttributeSubstitutor::substitute(
-            destStr, ProjectAttributeLookup(*board), [&](const QString& str) {
+            destStr, ProjectAttributeLookup(*board, nullptr),
+            [&](const QString& str) {
               return FilePath::cleanFileName(
                   str, FilePath::ReplaceSpaces | FilePath::KeepCase);
             });

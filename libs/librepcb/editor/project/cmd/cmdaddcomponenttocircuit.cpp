@@ -27,6 +27,7 @@
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
 #include <librepcb/core/workspace/workspace.h>

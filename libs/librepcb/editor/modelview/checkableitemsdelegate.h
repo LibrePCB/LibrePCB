@@ -17,69 +17,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_BOARDPICKPLACEGENERATORDIALOG_H
-#define LIBREPCB_EDITOR_BOARDPICKPLACEGENERATORDIALOG_H
+#ifndef LIBREPCB_EDITOR_CHECKABLEITEMSDELEGATE_H
+#define LIBREPCB_EDITOR_CHECKABLEITEMSDELEGATE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/types/uuid.h>
-
 #include <QtCore>
 #include <QtWidgets>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-
-class AssemblyVariant;
-class Board;
-class PickPlaceData;
-class WorkspaceSettings;
-
 namespace editor {
 
-namespace Ui {
-class BoardPickPlaceGeneratorDialog;
-}
-
 /*******************************************************************************
- *  Class BoardPickPlaceGeneratorDialog
+ *  Class CheckableItemsDelegate
  ******************************************************************************/
 
 /**
- * @brief The BoardPickPlaceGeneratorDialog class
+ * @brief Subclass of QStyledItemDelegate to display/edit a list of checkable
+ *        strings
+ *
+ * @see ::librepcb::editor::CheckableItemsEditorWidget
  */
-class BoardPickPlaceGeneratorDialog final : public QDialog {
+class CheckableItemsDelegate final : public QStyledItemDelegate {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  BoardPickPlaceGeneratorDialog() = delete;
-  BoardPickPlaceGeneratorDialog(const BoardPickPlaceGeneratorDialog& other) =
-      delete;
-  explicit BoardPickPlaceGeneratorDialog(const WorkspaceSettings& settings,
-                                         Board& board,
-                                         QWidget* parent = nullptr);
-  ~BoardPickPlaceGeneratorDialog();
+  explicit CheckableItemsDelegate(QObject* parent = nullptr) noexcept;
+  CheckableItemsDelegate(const CheckableItemsDelegate& other) = delete;
+  ~CheckableItemsDelegate() noexcept;
 
-private:  // Methods
-  void setFileExtension(const QString& extension) noexcept;
-  void btnGenerateClicked() noexcept;
-  void updateData() noexcept;
-  std::shared_ptr<AssemblyVariant> getAssemblyVariant() const noexcept;
-  tl::optional<Uuid> getAssemblyVariantUuid(bool throwIfNullopt) const;
-  FilePath getOutputFilePath(const QString& text) const noexcept;
+  // Inherited from QStyledItemDelegate
+  QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
+                        const QModelIndex& index) const override;
+  void setEditorData(QWidget* editor, const QModelIndex& index) const override;
+  void setModelData(QWidget* editor, QAbstractItemModel* model,
+                    const QModelIndex& index) const override;
+  void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
+                            const QModelIndex& index) const override;
 
-private:  // Data
-  Board& mBoard;
-  std::shared_ptr<PickPlaceData> mData;
-  QScopedPointer<Ui::BoardPickPlaceGeneratorDialog> mUi;
-  QPointer<QPushButton> mBtnGenerate;
+  // Operator Overloadings
+  CheckableItemsDelegate& operator=(const CheckableItemsDelegate& rhs) = delete;
 };
 
 /*******************************************************************************

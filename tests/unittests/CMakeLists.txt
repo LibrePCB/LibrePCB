@@ -70,6 +70,7 @@ add_executable(
   core/types/alignmenttest.cpp
   core/types/angletest.cpp
   core/types/circuitidentifiertest.cpp
+  core/types/fileproofnametest.cpp
   core/types/lengthtest.cpp
   core/types/pointtest.cpp
   core/types/ratiotest.cpp

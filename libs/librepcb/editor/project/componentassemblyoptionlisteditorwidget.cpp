@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "componentassemblyoptionlisteditorwidget.h"
 
+#include "../modelview/checkableitemsdelegate.h"
+#include "../widgets/checkableitemseditorwidget.h"
 #include "../widgets/editabletablewidget.h"
 #include "addcomponentdialog.h"
 
@@ -65,6 +67,10 @@ public:
 ComponentAssemblyOptionListEditorWidget::
     ComponentAssemblyOptionListEditorWidget(QWidget* parent) noexcept
   : QWidget(parent),
+    mWorkspace(),
+    mProject(),
+    mComponent(),
+    mMultiAssemblyVariantMode(false),
     mOptions(),
     mTreeWidget(new QTreeWidget(this)),
     mOnListEditedSlot(
@@ -88,24 +94,28 @@ ComponentAssemblyOptionListEditorWidget::
 
   mAddOptionButton.reset(new QToolButton(this));
   mAddOptionButton->setIcon(QIcon(":/img/library/device.png"));
+  mAddOptionButton->setToolTip(tr("Add a new device assembly option"));
   connect(mAddOptionButton.data(), &QToolButton::clicked, this,
           &ComponentAssemblyOptionListEditorWidget::addOption);
   buttonsLayout->addWidget(mAddOptionButton.data());
 
   mAddPartButton.reset(new QToolButton(this));
   mAddPartButton->setIcon(QIcon(":/img/library/part.png"));
+  mAddPartButton->setToolTip(tr("Add a new (alternative) part by MPN"));
   connect(mAddPartButton.data(), &QToolButton::clicked, this,
           &ComponentAssemblyOptionListEditorWidget::addPart);
   buttonsLayout->addWidget(mAddPartButton.data());
 
   mEditButton.reset(new QToolButton(this));
   mEditButton->setIcon(QIcon(":/img/actions/edit.png"));
+  mEditButton->setToolTip(tr("Choose a different device or part"));
   connect(mEditButton.data(), &QToolButton::clicked, this,
           &ComponentAssemblyOptionListEditorWidget::editOptionOrPart);
   buttonsLayout->addWidget(mEditButton.data());
 
   mRemoveButton.reset(new QToolButton(this));
   mRemoveButton->setIcon(QIcon(":/img/actions/minus.png"));
+  mRemoveButton->setToolTip(tr("Remove selected part or assembly option"));
   connect(mRemoveButton.data(), &QToolButton::clicked, this,
           &ComponentAssemblyOptionListEditorWidget::removeOptionOrPart);
   buttonsLayout->addWidget(mRemoveButton.data());
@@ -115,15 +125,28 @@ ComponentAssemblyOptionListEditorWidget::
   mTreeWidget->setRootIsDecorated(false);
   mTreeWidget->setAllColumnsShowFocus(true);
   mTreeWidget->setExpandsOnDoubleClick(false);
-  mTreeWidget->setHeaderLabels({tr("Board Device"), tr("Part Number"),
-                                tr("Manufacturer"), tr("Attributes")});
+  mTreeWidget->setColumnCount(_COLUMN_COUNT);
+  mTreeWidget->headerItem()->setText(COLUMN_MOUNT, tr("Mount"));
+  mTreeWidget->headerItem()->setText(COLUMN_DEVICE, tr("Board Device"));
+  mTreeWidget->headerItem()->setText(COLUMN_MPN, tr("Part Number"));
+  mTreeWidget->headerItem()->setText(COLUMN_MANUFACTURER, tr("Manufacturer"));
+  mTreeWidget->headerItem()->setText(COLUMN_ATTRIBUTES, tr("Attributes"));
   mTreeWidget->header()->setMinimumSectionSize(10);
-  mTreeWidget->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-  mTreeWidget->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-  mTreeWidget->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-  mTreeWidget->header()->setSectionResizeMode(3, QHeaderView::Stretch);
-  mTreeWidget->setItemDelegateForColumn(0, new NoEditDelegate(this));
-  mTreeWidget->setItemDelegateForColumn(3, new NoEditDelegate(this));
+  mTreeWidget->header()->setStretchLastSection(false);
+  mTreeWidget->header()->setSectionResizeMode(COLUMN_MOUNT,
+                                              QHeaderView::ResizeToContents);
+  mTreeWidget->header()->setSectionResizeMode(COLUMN_DEVICE,
+                                              QHeaderView::ResizeToContents);
+  mTreeWidget->header()->setSectionResizeMode(COLUMN_MPN,
+                                              QHeaderView::ResizeToContents);
+  mTreeWidget->header()->setSectionResizeMode(COLUMN_MANUFACTURER,
+                                              QHeaderView::ResizeToContents);
+  mTreeWidget->header()->setSectionResizeMode(COLUMN_ATTRIBUTES,
+                                              QHeaderView::Stretch);
+  mTreeWidget->setItemDelegateForColumn(COLUMN_DEVICE,
+                                        new NoEditDelegate(this));
+  mTreeWidget->setItemDelegateForColumn(COLUMN_ATTRIBUTES,
+                                        new NoEditDelegate(this));
   connect(mTreeWidget.data(), &QTreeWidget::itemChanged, this,
           &ComponentAssemblyOptionListEditorWidget::itemChanged);
   connect(mTreeWidget.data(), &QTreeWidget::itemSelectionChanged, this,
@@ -154,6 +177,13 @@ void ComponentAssemblyOptionListEditorWidget::setReferences(
   mWorkspace = ws;
   mProject = project;
   mComponent = component;
+
+  mMultiAssemblyVariantMode =
+      mProject && (mProject->getCircuit().getAssemblyVariants().count() > 1);
+  mTreeWidget->setItemDelegateForColumn(
+      COLUMN_MOUNT,
+      mMultiAssemblyVariantMode ? new CheckableItemsDelegate(this) : nullptr);
+
   if (component) {
     mOptions = component->getAssemblyOptions();
   } else {
@@ -189,7 +219,8 @@ void ComponentAssemblyOptionListEditorWidget::addOption() noexcept {
     }
 
     auto device = dlg.getSelectedDevice();
-    if (!device) {
+    auto assemblyType = dlg.getSelectedPackageAssemblyType();
+    if ((!device) || (!assemblyType)) {
       return;
     }
 
@@ -207,6 +238,12 @@ void ComponentAssemblyOptionListEditorWidget::addOption() noexcept {
       }
     }
 
+    // Determine assembly variants depending on package assembly type.
+    const QSet<Uuid> assemblyVariants =
+        (assemblyType != Package::AssemblyType::None)
+        ? mProject->getCircuit().getAssemblyVariants().getUuidSet()
+        : QSet<Uuid>();
+
     PartList parts;
     if (auto part = dlg.getSelectedPart()) {
       auto copy = std::make_shared<Part>(*part);
@@ -215,7 +252,8 @@ void ComponentAssemblyOptionListEditorWidget::addOption() noexcept {
     }
     mOptions.insert(newIndex,
                     std::make_shared<ComponentAssemblyOption>(
-                        device->getUuid(), device->getAttributes(), parts));
+                        device->getUuid(), device->getAttributes(),
+                        assemblyVariants, parts));
   } catch (const Exception& e) {
     qCritical() << e.getMsg();
   }
@@ -243,15 +281,18 @@ bool ComponentAssemblyOptionListEditorWidget::addPart() noexcept {
                            mWorkspace->getSettings().themes.getActive(), this);
     dlg.selectComponentByKeyword(
         mComponent->getLibComponent().getUuid().toStr(), option->getDevice());
-    std::shared_ptr<const Device> device;
-    std::shared_ptr<const Part> part;
-    if (dlg.exec() == QDialog::Accepted) {
-      device = dlg.getSelectedDevice();
-      part = dlg.getSelectedPart();
+    if (dlg.exec() != QDialog::Accepted) {
+      return false;
+    }
+
+    std::shared_ptr<const Device> device = dlg.getSelectedDevice();
+    std::shared_ptr<const Part> part = dlg.getSelectedPart();
+    if (!device) {
+      return false;
     }
 
     // Check compatibility.
-    if (device && (device->getUuid() != option->getDevice())) {
+    if (part && (device->getUuid() != option->getDevice())) {
       const int answer = QMessageBox::warning(
           this, tr("Part Compatibility Unknown"),
           tr("The selected part is taken from a different device than this "
@@ -267,12 +308,12 @@ bool ComponentAssemblyOptionListEditorWidget::addPart() noexcept {
 
     auto newPart = std::make_shared<Part>(SimpleString(""), SimpleString(""),
                                           AttributeList{});
-    if (device && part) {
+    if (part) {
       newPart->setMpn(part->getMpn());
       newPart->setManufacturer(part->getManufacturer());
       newPart->getAttributes() =
           part->getAttributes() | device->getAttributes();
-    } else if (device) {
+    } else {
       newPart->getAttributes() = device->getAttributes();
     }
     option->getParts().insert(newIndex, newPart);
@@ -330,19 +371,41 @@ void ComponentAssemblyOptionListEditorWidget::itemChanged(QTreeWidgetItem* item,
       return;
     }
 
-    std::shared_ptr<Part> part = option->getParts().value(indices.second);
-    const bool newPartCreated = !part;
-    if (newPartCreated) {
-      part = std::make_shared<Part>(SimpleString(""), SimpleString(""),
-                                    option->getAttributes());
-    }
-    if (column == 1) {
-      part->setMpn(cleanSimpleString(item->text(column)));
-    } else if (column == 2) {
-      part->setManufacturer(cleanSimpleString(item->text(column)));
-    }
-    if (newPartCreated) {
-      option->getParts().append(part);
+    if (column == COLUMN_MOUNT) {
+      QSet<Uuid> assemblyVariants;
+      if (mMultiAssemblyVariantMode) {
+        assemblyVariants = option->getAssemblyVariants();
+        const auto avItems = item->data(column, Qt::UserRole)
+                                 .value<CheckableItemsEditorWidget::ItemList>();
+        foreach (const auto& avItem, avItems) {
+          if (std::get<2>(avItem) == Qt::Checked) {
+            assemblyVariants.insert(
+                Uuid::fromString(std::get<0>(avItem).toString()));
+          } else {
+            assemblyVariants.remove(
+                Uuid::fromString(std::get<0>(avItem).toString()));
+          }
+        }
+      } else if (item->checkState(column) == Qt::Checked) {
+        assemblyVariants =
+            mProject->getCircuit().getAssemblyVariants().getUuidSet();
+      }
+      option->setAssemblyVariants(assemblyVariants);
+    } else {
+      std::shared_ptr<Part> part = option->getParts().value(indices.second);
+      const bool newPartCreated = !part;
+      if (newPartCreated) {
+        part = std::make_shared<Part>(SimpleString(""), SimpleString(""),
+                                      option->getAttributes());
+      }
+      if (column == COLUMN_MPN) {
+        part->setMpn(cleanSimpleString(item->text(column)));
+      } else if (column == COLUMN_MANUFACTURER) {
+        part->setManufacturer(cleanSimpleString(item->text(column)));
+      }
+      if (newPartCreated) {
+        option->getParts().append(part);
+      }
     }
   } catch (const Exception& e) {
     qCritical() << e.getMsg();
@@ -356,7 +419,10 @@ void ComponentAssemblyOptionListEditorWidget::itemSelectionChanged() noexcept {
       option ? option->getParts().value(pair.second) : nullptr;
   mAddPartButton->setEnabled(option || part);
   mEditButton->setEnabled(option || part);
-  mRemoveButton->setEnabled(option || part);
+  mRemoveButton->setEnabled(
+      (option && mComponent &&
+       (!mComponent->getUsedDeviceUuids().contains(option->getDevice()))) ||
+      part);
   selectedPartChanged(part);
 }
 
@@ -390,7 +456,7 @@ void ComponentAssemblyOptionListEditorWidget::optionListEdited(
 
   auto fillOptionRow = [this](QTreeWidgetItem* item,
                               const ComponentAssemblyOption& option) {
-    item->setIcon(0, QIcon(":/img/library/device.png"));
+    item->setIcon(COLUMN_DEVICE, QIcon(":/img/library/device.png"));
     QString devName = option.getDevice().toStr().left(8) % "...";
     QString toolTip;
     try {
@@ -409,31 +475,59 @@ void ComponentAssemblyOptionListEditorWidget::optionListEdited(
     } catch (const Exception& e) {
       qWarning() << "Failed to fetch device metadata:" << e.getMsg();
     }
-    item->setText(0, devName);
-    item->setToolTip(0, toolTip);
+    item->setText(COLUMN_DEVICE, devName);
+    item->setToolTip(COLUMN_DEVICE, toolTip);
+
+    QStringList avNames;
+    CheckableItemsEditorWidget::ItemList avItems;
+    for (const AssemblyVariant& av :
+         mProject->getCircuit().getAssemblyVariants()) {
+      const bool mount = option.getAssemblyVariants().contains(av.getUuid());
+      if (mMultiAssemblyVariantMode) {
+        avNames.append((mount ? "☑" : "☐") % *av.getName());
+      }
+      avItems.append(std::make_tuple(QVariant::fromValue(av.getUuid().toStr()),
+                                     *av.getName(),
+                                     mount ? Qt::Checked : Qt::Unchecked));
+    }
+    const bool inAnyVariants =
+        (option.getAssemblyVariants() &
+         mProject->getCircuit().getAssemblyVariants().getUuidSet())
+            .count() > 0;
+    item->setText(COLUMN_MOUNT, avNames.join(" "));
+    item->setData(COLUMN_MOUNT, Qt::CheckStateRole,
+                  mMultiAssemblyVariantMode
+                      ? QVariant()
+                      : QVariant(inAnyVariants ? Qt::Checked : Qt::Unchecked));
+    item->setData(COLUMN_MOUNT, Qt::UserRole, QVariant::fromValue(avItems));
+    item->setBackground(COLUMN_MOUNT,
+                        inAnyVariants ? QBrush() : QBrush(Qt::red));
   };
 
   auto fillPartRow = [](QTreeWidgetItem* item, std::shared_ptr<const Part> part,
                         int index) {
     if (index > 0) {
-      item->setText(0, "↳ " % tr("Alternative %1:").arg(index));
+      item->setText(COLUMN_DEVICE, "↳ " % tr("Alternative %1:").arg(index));
     }
-    item->setIcon(1, part ? QIcon(":/img/library/part.png") : QIcon());
-    item->setText(1, part ? *part->getMpn() : QString());
+    item->setIcon(COLUMN_MPN, part ? QIcon(":/img/library/part.png") : QIcon());
+    item->setText(COLUMN_MPN, part ? *part->getMpn() : QString());
     item->setBackground(
-        1,
+        COLUMN_MPN,
         (!part) ? QBrush(Qt::red)
                 : (part->getMpn()->isEmpty() ? QBrush(Qt::yellow) : QBrush()));
-    item->setText(2, part ? *part->getManufacturer() : QString());
+    item->setText(COLUMN_MANUFACTURER,
+                  part ? *part->getManufacturer() : QString());
     item->setBackground(
-        2,
+        COLUMN_MANUFACTURER,
         (!part) ? QBrush(Qt::red)
                 : (part->getManufacturer()->isEmpty() ? QBrush(Qt::yellow)
                                                       : QBrush()));
-    item->setText(3, part ? part->getAttributeValuesTr().join(" ") : QString());
-    item->setBackground(3, (!part) ? QBrush(Qt::red) : QBrush());
+    item->setText(COLUMN_ATTRIBUTES,
+                  part ? part->getAttributeValuesTr().join(" ") : QString());
+    item->setBackground(COLUMN_ATTRIBUTES,
+                        (!part) ? QBrush(Qt::red) : QBrush());
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable |
-                   Qt::ItemIsSelectable);
+                   Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
   };
 
   // Avoid recursion!

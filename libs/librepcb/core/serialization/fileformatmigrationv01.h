@@ -74,6 +74,7 @@ protected:
   };
 
   struct Component {
+    bool schematicOnly;
     QList<ComponentSymbolVariant> symbolVariants;
   };
 
@@ -88,6 +89,9 @@ protected:
     QHash<Uuid, Component> components;
     QMap<Uuid, ComponentInstance> componentInstances;
     QMap<Uuid, QSet<Uuid>> devicesUsedInBoards;
+
+    // Project.
+    QString projectUuid;
 
     // Counters for emitting messages.
     int removedErcApprovals = 0;

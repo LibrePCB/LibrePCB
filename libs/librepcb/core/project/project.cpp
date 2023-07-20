@@ -517,6 +517,10 @@ std::unique_ptr<Project> Project::create(
   // Create empty project.
   std::unique_ptr<Project> p(new Project(std::move(directory), filename));
 
+  // Add default assembly variant with name "Std".
+  p->getCircuit().addAssemblyVariant(std::make_shared<AssemblyVariant>(
+      Uuid::createRandom(), FileProofName("Std"), "Standard assembly"));
+
   // Add default netclass with name "default".
   {
     NetClass* netclass = new NetClass(p->getCircuit(), Uuid::createRandom(),

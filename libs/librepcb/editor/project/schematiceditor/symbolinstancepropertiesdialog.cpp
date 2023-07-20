@@ -76,7 +76,7 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
                                   settingsPrefix % "/pos_y");
   mUi->edtSymbInstRotation->setSingleStep(90.0);  // [°]
   if (mComponentInstance.getLibComponent().isSchematicOnly() &&
-      mComponentInstance.getParts().isEmpty()) {
+      mComponentInstance.getAssemblyOptions().isEmpty()) {
     mUi->gbxAssembly->setCheckable(true);
     mUi->gbxAssembly->setChecked(false);
   }

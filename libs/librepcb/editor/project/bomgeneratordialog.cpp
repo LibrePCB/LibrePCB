@@ -35,6 +35,8 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/bomgenerator.h>
+#include <librepcb/core/project/circuit/assemblyvariant.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
@@ -65,7 +67,15 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
   mUi->tableWidget->verticalHeader()->setMinimumSectionSize(10);
   mUi->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
   mUi->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-  mUi->edtOutputPath->setText("./output/{{VERSION}}/{{PROJECT}}_BOM.csv");
+  const bool multipleAssemblyVariants =
+      mProject.getCircuit().getAssemblyVariants().count() > 1;
+  mUi->lblAssemblyVariant->setVisible(multipleAssemblyVariants);
+  mUi->cbxAssemblyVariant->setVisible(multipleAssemblyVariants);
+  QString outPath = "./output/{{VERSION}}/{{PROJECT}}_BOM";
+  if (multipleAssemblyVariants) {
+    outPath += "_{{VARIANT}}";
+  }
+  mUi->edtOutputPath->setText(outPath % ".csv");
   mBtnGenerate =
       mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::AcceptRole);
   mBtnGenerate->setDefault(true);
@@ -85,6 +95,13 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
     mUi->cbxBoard->addItem(*brd->getName());
   }
 
+  // List assembly variants.
+  for (const auto& av : mProject.getCircuit().getAssemblyVariants()) {
+    mUi->cbxAssemblyVariant->addItem(av.getDisplayText(), av.getUuid().toStr());
+  }
+  mUi->cbxAssemblyVariant->setCurrentIndex(0);
+  mUi->cbxAssemblyVariant->setEnabled(mUi->cbxAssemblyVariant->count() > 1);
+
   // List attributes.
   mUi->edtAttributes->setText(mProject.getCustomBomAttributes().join(", "));
 
@@ -95,6 +112,10 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
 
   connect(
       mUi->cbxBoard,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &BomGeneratorDialog::updateBom);
+  connect(
+      mUi->cbxAssemblyVariant,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, &BomGeneratorDialog::updateBom);
   connect(mUi->edtAttributes, &QLineEdit::textEdited, this,
@@ -172,13 +193,15 @@ void BomGeneratorDialog::updateAttributes() noexcept {
 }
 
 void BomGeneratorDialog::updateBom() noexcept {
-  const Board* board =
-      mProject.getBoardByIndex(mUi->cbxBoard->currentIndex() - 1);
+  if (auto avUuid = getAssemblyVariantUuid(false)) {
+    const Board* board =
+        mProject.getBoardByIndex(mUi->cbxBoard->currentIndex() - 1);
 
-  BomGenerator gen(mProject);
-  gen.setAdditionalAttributes(mProject.getCustomBomAttributes());
-  mBom = gen.generate(board);
-  updateTable();
+    BomGenerator gen(mProject);
+    gen.setAdditionalAttributes(mProject.getCustomBomAttributes());
+    mBom = gen.generate(board, *avUuid);
+    updateTable();
+  }
 }
 
 void BomGeneratorDialog::updateTable() noexcept {
@@ -206,10 +229,28 @@ void BomGeneratorDialog::updateTable() noexcept {
   }
 }
 
+std::shared_ptr<AssemblyVariant> BomGeneratorDialog::getAssemblyVariant() const
+    noexcept {
+  auto uuid = getAssemblyVariantUuid(false);
+  return uuid ? mProject.getCircuit().getAssemblyVariants().find(*uuid)
+              : std::shared_ptr<AssemblyVariant>();
+}
+
+tl::optional<Uuid> BomGeneratorDialog::getAssemblyVariantUuid(
+    bool throwIfNullopt) const {
+  const tl::optional<Uuid> uuid =
+      Uuid::tryFromString(mUi->cbxAssemblyVariant->currentData().toString());
+  if ((!uuid) && throwIfNullopt) {
+    throw LogicError(__FILE__, __LINE__, "No assembly variant selected.");
+  }
+  return uuid;
+}
+
 FilePath BomGeneratorDialog::getOutputFilePath() const noexcept {
   QString path = mUi->edtOutputPath->text().trimmed();
   path = AttributeSubstitutor::substitute(
-      path, ProjectAttributeLookup(mProject), [&](const QString& str) {
+      path, ProjectAttributeLookup(mProject, getAssemblyVariant()),
+      [&](const QString& str) {
         return FilePath::cleanFileName(
             str, FilePath::ReplaceSpaces | FilePath::KeepCase);
       });

@@ -52,6 +52,15 @@ class PartListModel;
 class ComponentAssemblyOptionListEditorWidget final : public QWidget {
   Q_OBJECT
 
+  enum Column {
+    COLUMN_DEVICE,
+    COLUMN_MPN,
+    COLUMN_MANUFACTURER,
+    COLUMN_ATTRIBUTES,
+    COLUMN_MOUNT,
+    _COLUMN_COUNT,
+  };
+
 public:
   // Constructors / Destructor
   explicit ComponentAssemblyOptionListEditorWidget(
@@ -94,6 +103,7 @@ private:  // Data
   QPointer<const Workspace> mWorkspace;
   QPointer<const Project> mProject;
   QPointer<ComponentInstance> mComponent;
+  bool mMultiAssemblyVariantMode;
   ComponentAssemblyOptionList mOptions;
   QScopedPointer<QTreeWidget> mTreeWidget;
   QScopedPointer<QToolButton> mAddOptionButton;

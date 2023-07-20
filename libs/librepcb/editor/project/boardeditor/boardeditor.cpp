@@ -1686,7 +1686,7 @@ void BoardEditor::execD356NetlistExportDialog() noexcept {
   try {
     QString path = "output/{{VERSION}}/{{PROJECT}}_Netlist.d356";
     path = AttributeSubstitutor::substitute(
-        path, ProjectAttributeLookup(*board), [&](const QString& str) {
+        path, ProjectAttributeLookup(*board, nullptr), [&](const QString& str) {
           return FilePath::cleanFileName(
               str, FilePath::ReplaceSpaces | FilePath::KeepCase);
         });

@@ -46,6 +46,7 @@
 #include "board/items/bi_stroketext.h"
 #include "board/items/bi_via.h"
 #include "board/items/bi_zone.h"
+#include "circuit/assemblyvariant.h"
 #include "circuit/circuit.h"
 #include "circuit/componentinstance.h"
 #include "circuit/componentsignalinstance.h"
@@ -265,6 +266,15 @@ void ProjectLoader::loadCircuit(Project& p) {
   const QString fp = "circuit/circuit.lp";
   SExpression root = SExpression::parse(p.getDirectory().read(fp),
                                         p.getDirectory().getAbsPath(fp));
+
+  // Load assembly variants.
+  foreach (const SExpression* node, root.getChildren("variant")) {
+    auto av = std::make_shared<AssemblyVariant>(*node);
+    p.getCircuit().addAssemblyVariant(av);
+  }
+  if (p.getCircuit().getAssemblyVariants().isEmpty()) {
+    throw RuntimeError(__FILE__, __LINE__, "Project has no assembly variants.");
+  }
 
   // Load net classes.
   foreach (const SExpression* node, root.getChildren("netclass")) {

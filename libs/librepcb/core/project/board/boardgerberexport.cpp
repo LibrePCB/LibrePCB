@@ -122,6 +122,7 @@ void BoardGerberExport::exportPcbLayers(
 }
 
 void BoardGerberExport::exportComponentLayer(BoardSide side,
+                                             const Uuid& assemblyVariant,
                                              const FilePath& filePath) const {
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getVersion());
@@ -147,13 +148,21 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   // Export all components on the selected board side.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     if (device->getMirrored() == (side == BoardSide::Bottom)) {
+      auto part = device->getParts(assemblyVariant).value(0);
+      if (!part) {
+        continue;  // Do not mount.
+      }
+
+      // Determine assembly type.
       const Package::AssemblyType assemblyType =
           device->getLibPackage().getAssemblyType(true);
       GerberGenerator::MountType mountType = GerberGenerator::MountType::Other;
       switch (assemblyType) {
         case Package::AssemblyType::None:
-          // Skip devices which don't represent a mountable package.
-          continue;
+          qWarning()
+              << "Exported device with non-mountable package to Gerber X3:"
+              << *device->getComponentInstance().getName();
+          break;
         case Package::AssemblyType::Tht:
         case Package::AssemblyType::Mixed:  // Does this make sense?!
           mountType = GerberGenerator::MountType::Tht;
@@ -171,7 +180,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
       }
 
       // Export component center and attributes.
-      ProjectAttributeLookup lookup(*device, device->getParts().value(0));
+      ProjectAttributeLookup lookup(*device, part);
       const Angle rotation = device->getRotation();
       const QString designator = *device->getComponentInstance().getName();
       const QString value =
@@ -1002,7 +1011,7 @@ QString BoardGerberExport::getAttributeValue(const QString& key) const
   } else if ((mCurrentEndLayer) && (key == QLatin1String("END_NUMBER"))) {
     return QString::number(mCurrentEndLayer->getCopperNumber() + 1);
   } else {
-    const ProjectAttributeLookup lookup(mBoard);
+    const ProjectAttributeLookup lookup(mBoard, nullptr);
     return lookup(key);
   }
 }

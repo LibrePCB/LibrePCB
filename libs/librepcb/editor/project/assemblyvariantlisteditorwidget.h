@@ -17,69 +17,60 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_BOARDPICKPLACEGENERATORDIALOG_H
-#define LIBREPCB_EDITOR_BOARDPICKPLACEGENERATORDIALOG_H
+#ifndef LIBREPCB_EDITOR_ASSEMBLYVARIANTLISTEDITORWIDGET_H
+#define LIBREPCB_EDITOR_ASSEMBLYVARIANTLISTEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/types/uuid.h>
-
 #include <QtCore>
 #include <QtWidgets>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class AssemblyVariant;
-class Board;
-class PickPlaceData;
-class WorkspaceSettings;
+class Circuit;
 
 namespace editor {
 
-namespace Ui {
-class BoardPickPlaceGeneratorDialog;
-}
+class AssemblyVariantListModel;
+class EditableTableWidget;
+class UndoStack;
 
 /*******************************************************************************
- *  Class BoardPickPlaceGeneratorDialog
+ *  Class AssemblyVariantListEditorWidget
  ******************************************************************************/
 
 /**
- * @brief The BoardPickPlaceGeneratorDialog class
+ * @brief The AssemblyVariantListEditorWidget class
  */
-class BoardPickPlaceGeneratorDialog final : public QDialog {
+class AssemblyVariantListEditorWidget final : public QWidget {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  BoardPickPlaceGeneratorDialog() = delete;
-  BoardPickPlaceGeneratorDialog(const BoardPickPlaceGeneratorDialog& other) =
-      delete;
-  explicit BoardPickPlaceGeneratorDialog(const WorkspaceSettings& settings,
-                                         Board& board,
-                                         QWidget* parent = nullptr);
-  ~BoardPickPlaceGeneratorDialog();
+  explicit AssemblyVariantListEditorWidget(QWidget* parent = nullptr) noexcept;
+  AssemblyVariantListEditorWidget(
+      const AssemblyVariantListEditorWidget& other) = delete;
+  ~AssemblyVariantListEditorWidget() noexcept;
 
-private:  // Methods
-  void setFileExtension(const QString& extension) noexcept;
-  void btnGenerateClicked() noexcept;
-  void updateData() noexcept;
-  std::shared_ptr<AssemblyVariant> getAssemblyVariant() const noexcept;
-  tl::optional<Uuid> getAssemblyVariantUuid(bool throwIfNullopt) const;
-  FilePath getOutputFilePath(const QString& text) const noexcept;
+  // Setters
+  void setFrameStyle(int style) noexcept;
+  void setReadOnly(bool readOnly) noexcept;
+  void setReferences(UndoStack* undoStack, Circuit* circuit) noexcept;
+
+  // Operator Overloadings
+  AssemblyVariantListEditorWidget& operator=(
+      const AssemblyVariantListEditorWidget& rhs) = delete;
+
+signals:
+  void currentItemChanged(int index);
 
 private:  // Data
-  Board& mBoard;
-  std::shared_ptr<PickPlaceData> mData;
-  QScopedPointer<Ui::BoardPickPlaceGeneratorDialog> mUi;
-  QPointer<QPushButton> mBtnGenerate;
+  QScopedPointer<AssemblyVariantListModel> mModel;
+  QScopedPointer<EditableTableWidget> mView;
 };
 
 /*******************************************************************************

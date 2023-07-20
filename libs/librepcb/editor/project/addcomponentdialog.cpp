@@ -187,7 +187,7 @@ tl::optional<Package::AssemblyType>
     AddComponentDialog::getSelectedPackageAssemblyType() const noexcept {
   return (mSelectedComponent && mSelectedSymbVar && mSelectedDevice &&
           mSelectedPackage)
-      ? tl::make_optional(mSelectedPackage->getAssemblyType(false))
+      ? tl::make_optional(mSelectedPackage->getAssemblyType(true))
       : tl::nullopt;
 }
 

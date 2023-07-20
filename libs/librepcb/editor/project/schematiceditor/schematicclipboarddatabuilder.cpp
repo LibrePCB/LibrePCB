@@ -70,8 +70,9 @@ SchematicClipboardDataBuilder::~SchematicClipboardDataBuilder() noexcept {
 
 std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
     const Point& cursorPos) const noexcept {
-  std::unique_ptr<SchematicClipboardData> data(
-      new SchematicClipboardData(mScene.getSchematic().getUuid(), cursorPos));
+  std::unique_ptr<SchematicClipboardData> data(new SchematicClipboardData(
+      mScene.getSchematic().getUuid(), cursorPos,
+      mScene.getSchematic().getProject().getCircuit().getAssemblyVariants()));
 
   // Get all selected items
   SchematicSelectionQuery query(mScene);

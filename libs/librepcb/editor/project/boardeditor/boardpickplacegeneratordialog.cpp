@@ -31,6 +31,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
 #include <librepcb/core/project/board/boardpickplacegenerator.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
 
@@ -58,10 +59,16 @@ BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(
   mUi->tableWidget->verticalHeader()->setMinimumSectionSize(10);
   mUi->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
   mUi->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-  mUi->edtTopFilePath->setText(
-      "./output/{{VERSION}}/assembly/{{PROJECT}}_PnP-TOP.csv");
-  mUi->edtBottomFilePath->setText(
-      "./output/{{VERSION}}/assembly/{{PROJECT}}_PnP-BOT.csv");
+  const bool multipleAssemblyVariants =
+      mBoard.getProject().getCircuit().getAssemblyVariants().count() > 1;
+  mUi->lblAssemblyVariant->setVisible(multipleAssemblyVariants);
+  mUi->cbxAssemblyVariant->setVisible(multipleAssemblyVariants);
+  QString outPath = "./output/{{VERSION}}/assembly/{{PROJECT}}_PnP";
+  if (multipleAssemblyVariants) {
+    outPath += "_{{VARIANT}}";
+  }
+  mUi->edtTopFilePath->setText(outPath % "_TOP.csv");
+  mUi->edtBottomFilePath->setText(outPath % "_BOT.csv");
   mBtnGenerate =
       mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::AcceptRole);
   mBtnGenerate->setDefault(true);
@@ -88,14 +95,24 @@ BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(
             if (checked) setFileExtension("gbr");
           });
 
+  // List assembly variants.
+  for (const auto& av :
+       mBoard.getProject().getCircuit().getAssemblyVariants()) {
+    mUi->cbxAssemblyVariant->addItem(av.getDisplayText(), av.getUuid().toStr());
+  }
+  mUi->cbxAssemblyVariant->setCurrentIndex(0);
+  mUi->cbxAssemblyVariant->setEnabled(mUi->cbxAssemblyVariant->count() > 1);
+  connect(
+      mUi->cbxAssemblyVariant,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &BoardPickPlaceGeneratorDialog::updateData);
+
   // Load window geometry.
   QSettings clientSettings;
   restoreGeometry(
       clientSettings.value("pnp_export_dialog/window_geometry").toByteArray());
 
-  BoardPickPlaceGenerator gen(mBoard);
-  mData = gen.generate();
-  updateTable();
+  updateData();
 }
 
 BoardPickPlaceGeneratorDialog::~BoardPickPlaceGeneratorDialog() {
@@ -126,12 +143,12 @@ void BoardPickPlaceGeneratorDialog::btnGenerateClicked() noexcept {
       BoardGerberExport gen(mBoard);
       if (mUi->cbxTopDevices->isChecked()) {
         gen.exportComponentLayer(
-            BoardGerberExport::BoardSide::Top,
+            BoardGerberExport::BoardSide::Top, *getAssemblyVariantUuid(true),
             getOutputFilePath(mUi->edtTopFilePath->text()));  // can throw
       }
       if (mUi->cbxBottomDevices->isChecked()) {
         gen.exportComponentLayer(
-            BoardGerberExport::BoardSide::Bottom,
+            BoardGerberExport::BoardSide::Bottom, *getAssemblyVariantUuid(true),
             getOutputFilePath(mUi->edtBottomFilePath->text()));  // can throw
       }
     } else {
@@ -166,10 +183,13 @@ void BoardPickPlaceGeneratorDialog::btnGenerateClicked() noexcept {
   }
 }
 
-void BoardPickPlaceGeneratorDialog::updateTable() noexcept {
+void BoardPickPlaceGeneratorDialog::updateData() noexcept {
   mUi->tableWidget->clear();
 
   try {
+    BoardPickPlaceGenerator gen(mBoard, *getAssemblyVariantUuid(true));
+    mData = gen.generate();
+
     PickPlaceCsvWriter writer(*mData);
     std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
     mUi->tableWidget->setRowCount(csv->getValues().count());
@@ -192,10 +212,29 @@ void BoardPickPlaceGeneratorDialog::updateTable() noexcept {
   }
 }
 
+std::shared_ptr<AssemblyVariant>
+    BoardPickPlaceGeneratorDialog::getAssemblyVariant() const noexcept {
+  auto uuid = getAssemblyVariantUuid(false);
+  return uuid
+      ? mBoard.getProject().getCircuit().getAssemblyVariants().find(*uuid)
+      : std::shared_ptr<AssemblyVariant>();
+}
+
+tl::optional<Uuid> BoardPickPlaceGeneratorDialog::getAssemblyVariantUuid(
+    bool throwIfNullopt) const {
+  const tl::optional<Uuid> uuid =
+      Uuid::tryFromString(mUi->cbxAssemblyVariant->currentData().toString());
+  if ((!uuid) && throwIfNullopt) {
+    throw LogicError(__FILE__, __LINE__, "No assembly variant selected.");
+  }
+  return uuid;
+}
+
 FilePath BoardPickPlaceGeneratorDialog::getOutputFilePath(
     const QString& text) const noexcept {
   QString path = AttributeSubstitutor::substitute(
-      text.trimmed(), ProjectAttributeLookup(mBoard), [&](const QString& str) {
+      text.trimmed(), ProjectAttributeLookup(mBoard, getAssemblyVariant()),
+      [&](const QString& str) {
         return FilePath::cleanFileName(
             str, FilePath::ReplaceSpaces | FilePath::KeepCase);
       });

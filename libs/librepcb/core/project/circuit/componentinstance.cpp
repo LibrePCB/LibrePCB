@@ -24,6 +24,7 @@
 
 #include "../../exceptions.h"
 #include "../../library/cmp/component.h"
+#include "../../library/dev/device.h"
 #include "../../utils/scopeguardlist.h"
 #include "../board/board.h"
 #include "../board/items/bi_device.h"
@@ -97,15 +98,30 @@ QSet<Uuid> ComponentInstance::getCompatibleDevices() const noexcept {
   return result;
 }
 
-QVector<std::shared_ptr<const Part>> ComponentInstance::getParts() const
-    noexcept {
+QVector<std::shared_ptr<const Part>> ComponentInstance::getParts(
+    const tl::optional<Uuid>& assemblyVariant) const noexcept {
   QVector<std::shared_ptr<const Part>> parts;
   for (const ComponentAssemblyOption& opt : mAssemblyOptions) {
-    for (auto it = opt.getParts().begin(); it != opt.getParts().end(); ++it) {
-      parts.append(it.ptr());
+    if (((!assemblyVariant) ||
+         (opt.getAssemblyVariants().contains(*assemblyVariant)))) {
+      for (auto it = opt.getParts().begin(); it != opt.getParts().end(); ++it) {
+        parts.append(it.ptr());
+      }
+      if (opt.getParts().isEmpty()) {
+        parts.append(std::make_shared<Part>(SimpleString(""), SimpleString(""),
+                                            opt.getAttributes()));
+      }
     }
   }
   return parts;
+}
+
+QSet<Uuid> ComponentInstance::getUsedDeviceUuids() const noexcept {
+  QSet<Uuid> uuids;
+  foreach (const BI_Device* device, mRegisteredDevices) {
+    uuids.insert(device->getLibDevice().getUuid());
+  }
+  return uuids;
 }
 
 int ComponentInstance::getRegisteredElementsCount() const noexcept {

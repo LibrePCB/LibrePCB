@@ -17,69 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_BOARDPICKPLACEGENERATORDIALOG_H
-#define LIBREPCB_EDITOR_BOARDPICKPLACEGENERATORDIALOG_H
+#ifndef LIBREPCB_EDITOR_CMDASSEMBLYVARIANTREMOVE_H
+#define LIBREPCB_EDITOR_CMDASSEMBLYVARIANTREMOVE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
-#include <librepcb/core/types/uuid.h>
+#include "../../undocommand.h"
+
+#include <librepcb/core/project/circuit/assemblyvariant.h>
 
 #include <QtCore>
-#include <QtWidgets>
-
-#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class AssemblyVariant;
-class Board;
-class PickPlaceData;
-class WorkspaceSettings;
+class Circuit;
 
 namespace editor {
 
-namespace Ui {
-class BoardPickPlaceGeneratorDialog;
-}
-
 /*******************************************************************************
- *  Class BoardPickPlaceGeneratorDialog
+ *  Class CmdAssemblyVariantRemove
  ******************************************************************************/
 
 /**
- * @brief The BoardPickPlaceGeneratorDialog class
+ * @brief The CmdAssemblyVariantRemove class
  */
-class BoardPickPlaceGeneratorDialog final : public QDialog {
-  Q_OBJECT
-
+class CmdAssemblyVariantRemove final : public UndoCommand {
 public:
   // Constructors / Destructor
-  BoardPickPlaceGeneratorDialog() = delete;
-  BoardPickPlaceGeneratorDialog(const BoardPickPlaceGeneratorDialog& other) =
+  CmdAssemblyVariantRemove() = delete;
+  CmdAssemblyVariantRemove(const CmdAssemblyVariantRemove& other) = delete;
+  CmdAssemblyVariantRemove(Circuit& circuit,
+                           std::shared_ptr<AssemblyVariant> av) noexcept;
+  ~CmdAssemblyVariantRemove() noexcept;
+
+  // Operator Overloadings
+  CmdAssemblyVariantRemove& operator=(const CmdAssemblyVariantRemove& rhs) =
       delete;
-  explicit BoardPickPlaceGeneratorDialog(const WorkspaceSettings& settings,
-                                         Board& board,
-                                         QWidget* parent = nullptr);
-  ~BoardPickPlaceGeneratorDialog();
 
 private:  // Methods
-  void setFileExtension(const QString& extension) noexcept;
-  void btnGenerateClicked() noexcept;
-  void updateData() noexcept;
-  std::shared_ptr<AssemblyVariant> getAssemblyVariant() const noexcept;
-  tl::optional<Uuid> getAssemblyVariantUuid(bool throwIfNullopt) const;
-  FilePath getOutputFilePath(const QString& text) const noexcept;
+  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
+  bool performExecute() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
+  void performUndo() override;
+
+  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
+  void performRedo() override;
 
 private:  // Data
-  Board& mBoard;
-  std::shared_ptr<PickPlaceData> mData;
-  QScopedPointer<Ui::BoardPickPlaceGeneratorDialog> mUi;
-  QPointer<QPushButton> mBtnGenerate;
+  Circuit& mCircuit;
+  std::shared_ptr<AssemblyVariant> mAssemblyVariant;
+  QList<std::pair<Uuid, int>> mComponentAssemblyOptions;
+  int mIndex;
 };
 
 /*******************************************************************************

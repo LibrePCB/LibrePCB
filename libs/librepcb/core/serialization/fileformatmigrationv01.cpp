@@ -331,6 +331,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
           SExpression::parse(subDir.read(fp), subDir.getAbsPath(fp));
       const Uuid uuid = deserialize<Uuid>(root.getChild("@0"));
       Component cmp;
+      cmp.schematicOnly = deserialize<bool>(root.getChild("schematic_only/@0"));
 
       // Symbol variants.
       for (SExpression* varNode : root.getChildren("variant")) {
@@ -376,6 +377,13 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
         context.devicesUsedInBoards[cmpUuid].insert(libDevUuid);
       }
     }
+  }
+
+  // Metadata.
+  {
+    const QString fp = "project/metadata.lp";
+    SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    context.projectUuid = root.getChild("@0").getValue();
   }
 
   // Settings.
@@ -561,9 +569,25 @@ void FileFormatMigrationV01::upgradeCircuit(SExpression& root,
                                             ProjectContext& context) {
   upgradeStrings(root);
 
+  // Add default assembly variant. Use the project's UUID as assembly variant
+  // UUID to make the migration deterministic.
+  {
+    SExpression& node = root.appendList("variant");
+    node.appendChild(SExpression::createToken(context.projectUuid));
+    node.appendChild("name", SExpression::createString("Std"));
+    node.appendChild("description",
+                     SExpression::createString("Standard assembly"));
+  }
+
   // Add assembly options & parts to components.
   foreach (SExpression* cmpNode, root.getChildren("component")) {
     const Uuid cmpUuid = deserialize<Uuid>(cmpNode->getChild("@0"));
+    const Uuid libCmpUuid =
+        deserialize<Uuid>(cmpNode->getChild("lib_component/@0"));
+    const bool isLogo =
+        (libCmpUuid.toStr() == "b91cf23a-4f07-4b99-8f52-0b42304aef20");
+    const bool addToAssemblyVariant =
+        (!context.components.value(libCmpUuid).schematicOnly) && (!isLogo);
     const SExpression& libDevNode = cmpNode->getChild("lib_device");
     QSet<Uuid> libDeviceUuids = context.devicesUsedInBoards.value(cmpUuid);
     if (auto u = deserialize<tl::optional<Uuid>>(libDevNode.getChild("@0"))) {
@@ -597,6 +621,10 @@ void FileFormatMigrationV01::upgradeCircuit(SExpression& root,
           SExpression& partNode = devNode.appendList("part");
           partNode.appendChild(mpn);
           partNode.appendChild("manufacturer", manufacturer);
+        }
+        if (addToAssemblyVariant) {
+          devNode.appendChild("variant",
+                              SExpression::createToken(context.projectUuid));
         }
       }
       ++context.componentsWithAssemblyOptions;

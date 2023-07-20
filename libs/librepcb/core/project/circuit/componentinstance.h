@@ -86,7 +86,8 @@ public:
     return mAssemblyOptions;
   }
   QSet<Uuid> getCompatibleDevices() const noexcept;
-  QVector<std::shared_ptr<const Part>> getParts() const noexcept;
+  QVector<std::shared_ptr<const Part>> getParts(
+      const tl::optional<Uuid>& assemblyVariant) const noexcept;
   bool getLockAssembly() const noexcept { return mLockAssembly; }
 
   // Getters: General
@@ -97,6 +98,7 @@ public:
   const QList<BI_Device*>& getDevices() const noexcept {
     return mRegisteredDevices;
   }
+  QSet<Uuid> getUsedDeviceUuids() const noexcept;
   int getRegisteredElementsCount() const noexcept;
   bool isUsed() const noexcept;
   bool isAddedToCircuit() const noexcept { return mIsAddedToCircuit; }

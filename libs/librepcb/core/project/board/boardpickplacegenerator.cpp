@@ -44,8 +44,9 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardPickPlaceGenerator::BoardPickPlaceGenerator(const Board& board) noexcept
-  : mBoard(board) {
+BoardPickPlaceGenerator::BoardPickPlaceGenerator(
+    const Board& board, const Uuid& assemblyVariant) noexcept
+  : mBoard(board), mAssemblyVariant(assemblyVariant) {
 }
 
 BoardPickPlaceGenerator::~BoardPickPlaceGenerator() noexcept {
@@ -70,7 +71,8 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
   const QStringList& locale = mBoard.getProject().getLocaleOrder();
 
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    ProjectAttributeLookup lookup(*device, device->getParts().value(0));
+    auto part = device->getParts(mAssemblyVariant).value(0);
+    ProjectAttributeLookup lookup(*device, part);
     QList<PickPlaceDataItem> items;
     const QString designator = *device->getComponentInstance().getName();
     const QString value =
@@ -107,17 +109,20 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
       }
     }
 
-    // Export device only if its package is something to mount.
-    auto typeIt = types.find(device->getLibPackage().getAssemblyType(true));
-    if (typeIt != types.end()) {
+    // Export device only if it is contained in the assembly variant.
+    if (part) {
       const Point position = device->getPosition();
       const Angle rotation = device->getMirrored() ? -device->getRotation()
                                                    : device->getRotation();
       const PickPlaceDataItem::BoardSide boardSide = device->getMirrored()
           ? PickPlaceDataItem::BoardSide::Bottom
           : PickPlaceDataItem::BoardSide::Top;
+      const PickPlaceDataItem::Type assemblyType =
+          types.value(device->getLibPackage().getAssemblyType(true),
+                      PickPlaceDataItem::Type::Other);
       items.append(PickPlaceDataItem(designator, value, devName, pkgName,
-                                     position, rotation, boardSide, *typeIt));
+                                     position, rotation, boardSide,
+                                     assemblyType));
     }
 
     // Add all items.

@@ -101,6 +101,15 @@ void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
                                                  ProjectContext& context) {
   Q_UNUSED(root);
 
+  // Add default assembly variant.
+  if (!root.tryGetChild("variant")) {
+    SExpression& node = root.appendList("variant");
+    node.appendChild(SExpression::createToken(context.projectUuid));
+    node.appendChild("name", SExpression::createString("Std"));
+    node.appendChild("description",
+                     SExpression::createString("Standard assembly"));
+  }
+
   // Add assembly options & parts to components.
   foreach (SExpression* cmpNode, root.getChildren("component")) {
     if (!cmpNode->tryGetChild("lib_device")) {
@@ -108,6 +117,12 @@ void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
     }
 
     const Uuid cmpUuid = deserialize<Uuid>(cmpNode->getChild("@0"));
+    const Uuid libCmpUuid =
+        deserialize<Uuid>(cmpNode->getChild("lib_component/@0"));
+    const bool isLogo =
+        (libCmpUuid.toStr() == "b91cf23a-4f07-4b99-8f52-0b42304aef20");
+    const bool addToAssemblyVariant =
+        (!context.components.value(libCmpUuid).schematicOnly) && (!isLogo);
     const SExpression& libDevNode = cmpNode->getChild("lib_device");
     QSet<Uuid> libDeviceUuids = context.devicesUsedInBoards.value(cmpUuid);
     if (auto u = deserialize<tl::optional<Uuid>>(libDevNode.getChild("@0"))) {
@@ -141,6 +156,10 @@ void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
           SExpression& partNode = devNode.appendList("part");
           partNode.appendChild(mpn);
           partNode.appendChild("manufacturer", manufacturer);
+        }
+        if (addToAssemblyVariant) {
+          devNode.appendChild("variant",
+                              SExpression::createToken(context.projectUuid));
         }
       }
       ++context.componentsWithAssemblyOptions;

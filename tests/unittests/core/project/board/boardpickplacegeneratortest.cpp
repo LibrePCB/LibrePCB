@@ -29,6 +29,7 @@
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/board/boardpickplacegenerator.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
 
@@ -67,7 +68,8 @@ TEST_F(BoardPickPlaceGeneratorTest, test) {
   // export pick&place data
   QList<FilePath> writtenFiles;
   Board* board = project->getBoards().first();
-  BoardPickPlaceGenerator gen(*board);
+  BoardPickPlaceGenerator gen(
+      *board, project->getCircuit().getAssemblyVariants().first()->getUuid());
   std::shared_ptr<PickPlaceData> data = gen.generate();
   PickPlaceCsvWriter writer(*data);
 

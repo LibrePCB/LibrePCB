@@ -26,6 +26,7 @@
 #include "../../library/cmp/component.h"
 #include "../../serialization/sexpression.h"
 #include "../project.h"
+#include "assemblyvariant.h"
 #include "componentinstance.h"
 #include "netclass.h"
 #include "netsignal.h"
@@ -41,10 +42,7 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Circuit::Circuit(Project& project)
-  : QObject(&project),
-    mProject(project),
-    mDirectory(new TransactionalDirectory(project.getDirectory(), "circuit")) {
+Circuit::Circuit(Project& project) : QObject(&project), mProject(project) {
 }
 
 Circuit::~Circuit() noexcept {
@@ -71,6 +69,63 @@ Circuit::~Circuit() noexcept {
       delete netclass;
     } catch (...) {
     }
+
+  // Delete all assembly variants
+  mAssemblyVariants.clear();
+}
+
+/*******************************************************************************
+ *  AssemblyVariant Methods
+ ******************************************************************************/
+
+int Circuit::addAssemblyVariant(std::shared_ptr<AssemblyVariant> av,
+                                int index) {
+  if ((!av) || (mAssemblyVariants.contains(av.get()))) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (mAssemblyVariants.contains(av->getUuid())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("There is already an assembly variant with the UUID \"%1\"!")
+            .arg(av->getUuid().toStr()));
+  }
+  if (mAssemblyVariants.contains(*av->getName())) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("There is already an assembly variant with the name \"%1\"!")
+            .arg(*av->getName()));
+  }
+  if ((index < 0) || (index > mAssemblyVariants.count())) {
+    index = mAssemblyVariants.count();
+  }
+  mAssemblyVariants.insert(index, av);
+  emit assemblyVariantAdded(av);
+  return index;
+}
+
+void Circuit::removeAssemblyVariant(std::shared_ptr<AssemblyVariant> av) {
+  if (!mAssemblyVariants.contains(av.get())) {
+    throw LogicError(__FILE__, __LINE__);
+  }
+  if (mAssemblyVariants.count() == 1) {
+    throw LogicError(__FILE__, __LINE__,
+                     "The last assembly variant cannot be removed!");
+  }
+  mAssemblyVariants.remove(av.get());
+  assemblyVariantRemoved(av);
+}
+
+void Circuit::setAssemblyVariantName(std::shared_ptr<AssemblyVariant> av,
+                                     const FileProofName& newName) {
+  // Check if there is no assembly variant with the same name.
+  if ((av->getName() != newName) && mAssemblyVariants.contains(*newName)) {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        tr("There is already an assembly variant with the name \"%1\"!")
+            .arg(*newName));
+  }
+  // Apply the new name.
+  av->setName(newName);
 }
 
 /*******************************************************************************
@@ -295,6 +350,8 @@ void Circuit::setComponentInstanceName(ComponentInstance& cmp,
  ******************************************************************************/
 
 void Circuit::serialize(SExpression& root) const {
+  root.ensureLineBreak();
+  mAssemblyVariants.serialize(root);
   root.ensureLineBreak();
   for (const NetClass* obj : mNetClasses) {
     root.ensureLineBreak();

@@ -76,7 +76,8 @@ public:
 
   // General Methods
   void exportPcbLayers(const BoardFabricationOutputSettings& settings) const;
-  void exportComponentLayer(BoardSide side, const FilePath& filePath) const;
+  void exportComponentLayer(BoardSide side, const Uuid& assemblyVariant,
+                            const FilePath& filePath) const;
 
   // Operator Overloadings
   BoardGerberExport& operator=(const BoardGerberExport& rhs) = delete;
