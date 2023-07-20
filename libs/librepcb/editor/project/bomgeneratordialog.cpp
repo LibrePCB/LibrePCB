@@ -76,6 +76,7 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
     outPath += "_{{VARIANT}}";
   }
   mUi->edtOutputPath->setText(outPath % ".csv");
+  mUi->lblNote->setText("ⓘ " % mUi->lblNote->text());
   mBtnGenerate =
       mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::AcceptRole);
   mBtnGenerate->setDefault(true);
@@ -209,6 +210,7 @@ void BomGeneratorDialog::updateTable() noexcept {
 
   try {
     BomCsvWriter writer(*mBom);
+    writer.setIncludeNonMountedParts(true);
     std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
     mUi->tableWidget->setRowCount(csv->getValues().count());
     mUi->tableWidget->setColumnCount(csv->getHeader().count());
@@ -220,7 +222,11 @@ void BomGeneratorDialog::updateTable() noexcept {
       for (int row = 0; row < csv->getValues().count(); ++row) {
         QString text = csv->getValues()[row][column];
         text.replace("\n", " ");
-        mUi->tableWidget->setItem(row, column, new QTableWidgetItem(text));
+        QTableWidgetItem* item = new QTableWidgetItem(text);
+        if (csv->getValues()[row][0] == "0") {
+          item->setBackground(Qt::gray);
+        }
+        mUi->tableWidget->setItem(row, column, item);
       }
     }
     mUi->tableWidget->resizeRowsToContents();

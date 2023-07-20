@@ -53,6 +53,7 @@ public:
   ~BomCsvWriter() noexcept;
 
   // General Methods
+  void setIncludeNonMountedParts(bool include) noexcept;
   std::shared_ptr<CsvFile> generateCsv() const;
 
   // Operator Overloadings
@@ -60,6 +61,7 @@ public:
 
 private:
   const Bom& mBom;
+  bool mIncludeNonMountedParts;
 };
 
 /*******************************************************************************

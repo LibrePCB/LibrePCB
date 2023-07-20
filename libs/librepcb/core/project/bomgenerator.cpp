@@ -81,26 +81,46 @@ std::shared_ptr<Bom> BomGenerator::generate(
     QVector<PartItem> parts;
     QString pkgName;
     QStringList attributes;  // Those from customCommonAttributes.
+    bool mount;
   };
   QList<ComponentItem> items;
   int maxPartNumber = 1;
   foreach (const ComponentInstance* cmpInst,
            mProject.getCircuit().getComponentInstances()) {
+    ComponentItem item;
+    item.designator = *cmpInst->getName();
+    item.mount = true;
+
     ProjectAttributeLookup lookup(*cmpInst, nullptr, nullptr);
     const BI_Device* device = nullptr;
     QVector<std::shared_ptr<const Part>> parts;
+    bool assemblyExpected = !cmpInst->getLibComponent().isSchematicOnly();
     if (board) {
       device = board->getDeviceInstanceByComponentUuid(cmpInst->getUuid());
       if (device) {
         lookup = ProjectAttributeLookup(*device, nullptr);
         parts = device->getParts(assemblyVariant);
+        if (parts.isEmpty()) {
+          item.mount = false;
+          parts = device->getParts(tl::nullopt);  // Fallback for convenience.
+        }
+        assemblyExpected = device->doesPackageRequireAssembly(false);
+      } else {
+        parts = cmpInst->getParts(tl::nullopt);  // For convenience.
+        item.mount = false;
       }
     } else {
       parts = cmpInst->getParts(assemblyVariant);
+      if (parts.isEmpty()) {
+        item.mount = false;
+        parts = cmpInst->getParts(tl::nullopt);  // Fallback for convenience.
+      }
     }
 
-    ComponentItem item;
-    item.designator = *cmpInst->getName();
+    if ((!item.mount) && (!assemblyExpected)) {
+      continue;  // Skip components like frame sheets or supply symbols.
+    }
+
     item.pkgName = board ? lookup("PACKAGE") : "N/A";
     foreach (auto part, parts) {
       auto lookup = device ? ProjectAttributeLookup(*device, part)
@@ -130,9 +150,8 @@ std::shared_ptr<Bom> BomGenerator::generate(
       item.attributes.append(
           AttributeSubstitutor::substitute(lookup(attribute), lookup));
     }
-    maxPartNumber = std::max(maxPartNumber, item.parts.count());
-    if (item.parts.isEmpty()) {
-      continue;  // Skip components which have no assembly information (=DNM).
+    if (item.mount) {
+      maxPartNumber = std::max(maxPartNumber, item.parts.count());
     }
     items.append(item);
   }
@@ -167,7 +186,7 @@ std::shared_ptr<Bom> BomGenerator::generate(
         attributes.append(QString());
       }
     }
-    bom->addItem(item.designator, attributes);
+    bom->addItem(item.designator, attributes, item.mount);
   }
 
   return bom;

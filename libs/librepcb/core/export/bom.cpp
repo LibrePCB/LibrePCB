@@ -56,27 +56,32 @@ Bom::~Bom() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void Bom::addItem(const QString& designator,
-                  const QStringList& attributes) noexcept {
+void Bom::addItem(const QString& designator, const QStringList& attributes,
+                  bool mount) noexcept {
   Q_ASSERT(attributes.count() == mColumns.count());
 
   bool itemAdded = false;
   for (BomItem& item : mItems) {
-    if (item.getAttributes() == attributes) {
+    if ((item.getAttributes() == attributes) && (item.isMount() == mount)) {
       item.addDesignator(designator);
       itemAdded = true;
     }
   }
 
   if (!itemAdded) {
-    mItems.append(BomItem(designator, attributes));
+    mItems.append(BomItem(designator, attributes, mount));
   }
 
   // Sort items by designator to improve readability of the BOM.
   Toolbox::sortNumeric(
       mItems,
       [](const QCollator& cmp, const BomItem& lhs, const BomItem& rhs) {
-        return cmp(lhs.getDesignators().first(), rhs.getDesignators().first());
+        if (lhs.isMount() != rhs.isMount()) {
+          return lhs.isMount();
+        } else {
+          return cmp(lhs.getDesignators().first(),
+                     rhs.getDesignators().first());
+        }
       },
       Qt::CaseInsensitive, false);
 }
