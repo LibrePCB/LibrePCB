@@ -70,11 +70,12 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
   const QStringList& locale = mBoard.getProject().getLocaleOrder();
 
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    ProjectAttributeLookup lookup(*device);
+    ProjectAttributeLookup lookup(*device, device->getParts().value(0));
     QList<PickPlaceDataItem> items;
     const QString designator = *device->getComponentInstance().getName();
     const QString value =
-        AttributeSubstitutor::substitute(lookup("VALUE"), lookup).trimmed();
+        AttributeSubstitutor::substitute("{{MPN or VALUE or DEVICE}}", lookup)
+            .simplified();
     const QString devName = *device->getLibDevice().getNames().value(locale);
     const QString pkgName = *device->getLibPackage().getNames().value(locale);
 

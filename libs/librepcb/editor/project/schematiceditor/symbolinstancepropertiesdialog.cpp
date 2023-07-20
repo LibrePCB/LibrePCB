@@ -68,11 +68,18 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
     mAttributes(mComponentInstance.getAttributes()),
     mUi(new Ui::SymbolInstancePropertiesDialog) {
   mUi->setupUi(this);
+  mUi->attributeListEditorWidget->setFrameStyle(QFrame::NoFrame);
+  mUi->assemblyOptionListEditorWidget->setFrameStyle(QFrame::NoFrame);
   mUi->edtSymbInstPosX->configure(lengthUnit, LengthEditBase::Steps::generic(),
                                   settingsPrefix % "/pos_x");
   mUi->edtSymbInstPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
                                   settingsPrefix % "/pos_y");
   mUi->edtSymbInstRotation->setSingleStep(90.0);  // [°]
+  if (mComponentInstance.getLibComponent().isSchematicOnly() &&
+      mComponentInstance.getParts().isEmpty()) {
+    mUi->gbxAssembly->setCheckable(true);
+    mUi->gbxAssembly->setChecked(false);
+  }
   setWindowTitle(tr("Properties of %1").arg(mSymbol.getName()));
   connect(mUi->buttonBox, &QDialogButtonBox::clicked, this,
           &SymbolInstancePropertiesDialog::buttonBoxClicked);
@@ -80,7 +87,12 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
   // Component Instance Attributes
   mUi->edtCompInstName->setText(*mComponentInstance.getName());
   mUi->edtCompInstValue->setText(mComponentInstance.getValue());
-  mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
+  mUi->assemblyOptionListEditorWidget->setReferences(&mWorkspace, &mProject,
+                                                     &mComponentInstance);
+  setSelectedPart(nullptr);
+  connect(mUi->assemblyOptionListEditorWidget,
+          &ComponentAssemblyOptionListEditorWidget::selectedPartChanged, this,
+          &SymbolInstancePropertiesDialog::setSelectedPart);
 
   const QStringList& localeOrder = mProject.getLocaleOrder();
 
@@ -132,61 +144,32 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
             ds.openLocalPath(FilePath(url));
           });
 
-  // List Devices
-  try {
-    tl::optional<Uuid> device = mComponentInstance.getDefaultDeviceUuid();
-    // Add devices from project library first (higher priority)
-    QHash<Uuid, Device*> prjLibDevices =
-        mProject.getLibrary().getDevicesOfComponent(
-            mComponentInstance.getLibComponent().getUuid());
-    foreach (const Device* device, prjLibDevices) {
-      Q_ASSERT(device);
-      QString name = *device->getNames().value(localeOrder);
-      mUi->cbxPreselectedDevice->addItem(name, device->getUuid().toStr());
-    }
-    // Then add remaining devices from workspace library (lower priority)
-    QSet<Uuid> wsLibDevices = mWorkspace.getLibraryDb().getComponentDevices(
-        mComponentInstance.getLibComponent().getUuid());  // can throw
-    wsLibDevices -= Toolbox::toSet(prjLibDevices.keys());  // avoid duplicates
-    foreach (const Uuid& deviceUuid, wsLibDevices) {
-      FilePath devFp =
-          mWorkspace.getLibraryDb().getLatest<Device>(deviceUuid);  // can throw
-      if (devFp.isValid()) {
-        QString name;
-        mWorkspace.getLibraryDb().getTranslations<Device>(devFp, localeOrder,
-                                                          &name);  // can throw
-        mUi->cbxPreselectedDevice->addItem(name, deviceUuid.toStr());
-      }
-    }
-    // If the selected device was not found, show its UUID instead.
-    if ((device) && (!prjLibDevices.contains(*device)) &&
-        (!wsLibDevices.contains(*device))) {
-      mUi->cbxPreselectedDevice->addItem(device->toStr(), device->toStr());
-    }
-    mUi->cbxPreselectedDevice->model()->sort(0, Qt::AscendingOrder);
-    mUi->cbxPreselectedDevice->insertItem(0, "");
-    mUi->cbxPreselectedDevice->setCurrentIndex(
-        device ? mUi->cbxPreselectedDevice->findData(device->toStr()) : 0);
-  } catch (const Exception& e) {
-    // If something went wrong, disable the combobox to avoid breaking something
-    qCritical()
-        << "Failed to list devices in symbol instance properties dialog:"
-        << e.getMsg();
-    mUi->cbxPreselectedDevice->setEnabled(false);
-  }
-
   // set focus to component instance name
   mUi->edtCompInstName->selectAll();
   mUi->edtCompInstName->setFocus();
 }
 
 SymbolInstancePropertiesDialog::~SymbolInstancePropertiesDialog() noexcept {
+  mUi->assemblyOptionListEditorWidget->setReferences(nullptr, nullptr, nullptr);
   mUi->attributeListEditorWidget->setReferences(nullptr, nullptr);
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void SymbolInstancePropertiesDialog::setSelectedPart(
+    std::shared_ptr<Part> part) noexcept {
+  if (part) {
+    mUi->attributeListEditorWidget->setReferences(nullptr,
+                                                  &part->getAttributes());
+    mUi->gbxAttributes->setTitle(tr("Attributes of Selected Part"));
+  } else {
+    mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
+    mUi->gbxAttributes->setTitle(tr("Attributes of Component"));
+  }
+  mSelectedPart = part;  // Keep attribute list in memory!!!
+}
 
 void SymbolInstancePropertiesDialog::buttonBoxClicked(
     QAbstractButton* button) noexcept {
@@ -227,10 +210,8 @@ bool SymbolInstancePropertiesDialog::applyChanges() noexcept {
         mUi->edtCompInstName->text().trimmed()));  // can throw
     cmdCmp->setValue(mUi->edtCompInstValue->toPlainText());
     cmdCmp->setAttributes(mAttributes);
-    if (mUi->cbxPreselectedDevice->isEnabled()) {
-      cmdCmp->setDefaultDeviceUuid(Uuid::tryFromString(
-          mUi->cbxPreselectedDevice->currentData().toString()));
-    }
+    cmdCmp->setAssemblyOptions(
+        mUi->assemblyOptionListEditorWidget->getOptions());
     transaction.append(cmdCmp.take());
 
     // Symbol Instance

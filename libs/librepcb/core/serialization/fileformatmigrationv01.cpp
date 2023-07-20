@@ -29,6 +29,7 @@
 #include "../types/angle.h"
 #include "../types/length.h"
 #include "../types/point.h"
+#include "../types/simplestring.h"
 #include "../types/uuid.h"
 #include "sexpression.h"
 
@@ -363,6 +364,20 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     }
   }
 
+  // Scan boards.
+  foreach (const QString& dirName, dir.getDirs("boards")) {
+    QString fp = "boards/" % dirName % "/board.lp";
+    if (dir.fileExists(fp)) {
+      SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+      foreach (const SExpression* devNode, root.getChildren("device")) {
+        const Uuid cmpUuid = deserialize<Uuid>(devNode->getChild("@0"));
+        const Uuid libDevUuid =
+            deserialize<Uuid>(devNode->getChild("lib_device/@0"));
+        context.devicesUsedInBoards[cmpUuid].insert(libDevUuid);
+      }
+    }
+  }
+
   // Settings.
   {
     const QString fp = "project/settings.lp";
@@ -375,7 +390,7 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
   {
     const QString fp = "circuit/circuit.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-    upgradeCircuit(root);
+    upgradeCircuit(root, context);
     dir.write(fp, root.toByteArray());
 
     // Component instances.
@@ -428,6 +443,16 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
 
   // Emit messages at the very end to avoid duplicate messages caused my
   // multiple schematics/boards.
+  if (context.componentsWithAssemblyOptions > 0) {
+    messages.append(buildMessage(
+        Message::Severity::Note,
+        tr("Components were automatically populated with assembly information "
+           "required for the new, built-in MPN management and assembly variant "
+           "mechanism. If the BOM or PnP export is used, please review the "
+           "output and correct MPNs and attributes manually in the component "
+           "properties dialog where needed."),
+        context.componentsWithAssemblyOptions));
+  }
   if (context.removedErcApprovals > 0) {
     messages.append(buildMessage(
         Message::Severity::Note,
@@ -528,10 +553,58 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
 void FileFormatMigrationV01::upgradeSettings(SExpression& root) {
   upgradeStrings(root);
   root.appendList("custom_bom_attributes");
+  root.appendChild("default_lock_component_assembly",
+                   SExpression::createToken("false"));
 }
 
-void FileFormatMigrationV01::upgradeCircuit(SExpression& root) {
+void FileFormatMigrationV01::upgradeCircuit(SExpression& root,
+                                            ProjectContext& context) {
   upgradeStrings(root);
+
+  // Add assembly options & parts to components.
+  foreach (SExpression* cmpNode, root.getChildren("component")) {
+    const Uuid cmpUuid = deserialize<Uuid>(cmpNode->getChild("@0"));
+    const SExpression& libDevNode = cmpNode->getChild("lib_device");
+    QSet<Uuid> libDeviceUuids = context.devicesUsedInBoards.value(cmpUuid);
+    if (auto u = deserialize<tl::optional<Uuid>>(libDevNode.getChild("@0"))) {
+      libDeviceUuids.insert(*u);
+    }
+
+    if (!libDeviceUuids.isEmpty()) {
+      QString mpn, manufacturer;
+      QVector<SExpression*> consumedAttributes;
+      const QList<SExpression*> attributes = cmpNode->getChildren("attribute");
+      for (int i = attributes.count() - 1; i >= 0; --i) {
+        const QString key = attributes.at(i)->getChild("@0").getValue();
+        if (key == "MPN") {
+          mpn = *cleanSimpleString(
+              attributes.at(i)->getChild("value/@0").getValue());
+          consumedAttributes.append(attributes.at(i));
+        } else if (key == "MANUFACTURER") {
+          manufacturer = *cleanSimpleString(
+              attributes.at(i)->getChild("value/@0").getValue());
+          consumedAttributes.append(attributes.at(i));
+        }
+      }
+      foreach (SExpression* attrNode, consumedAttributes) {
+        cmpNode->removeChild(*attrNode);
+      }
+
+      foreach (const Uuid& devUuid, libDeviceUuids) {
+        SExpression& devNode = cmpNode->appendList("device");
+        devNode.appendChild(SExpression::createToken(devUuid.toStr()));
+        if ((!mpn.isEmpty()) || (!manufacturer.isEmpty())) {
+          SExpression& partNode = devNode.appendList("part");
+          partNode.appendChild(mpn);
+          partNode.appendChild("manufacturer", manufacturer);
+        }
+      }
+      ++context.componentsWithAssemblyOptions;
+    }
+
+    cmpNode->removeChild(libDevNode);
+    cmpNode->appendChild("lock_assembly", SExpression::createToken("false"));
+  }
 }
 
 void FileFormatMigrationV01::upgradeErc(SExpression& root,
@@ -989,6 +1062,7 @@ void FileFormatMigrationV01::upgradeStrings(SExpression& root) {
   QMap<QString, QString> replacements = {
       {"MODIFIED_DATE", "DATE"},
       {"MODIFIED_TIME", "TIME"},
+      {"PARTNUMBER", "MPN"},
   };
   replaceStrings(root, replacements);
 }

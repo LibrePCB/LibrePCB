@@ -228,7 +228,7 @@ void BI_StrokeText::removeFromBoard() {
 void BI_StrokeText::updateText() noexcept {
   const QString text = AttributeSubstitutor::substitute(
       mData.getText(),
-      mDevice ? ProjectAttributeLookup(*mDevice)
+      mDevice ? ProjectAttributeLookup(*mDevice, nullptr)
               : ProjectAttributeLookup(mBoard));
   if (text != mSubstitutedText) {
     mSubstitutedText = text;

@@ -76,7 +76,7 @@ bool ComponentSignalInstance::isNetSignalNameForced() const noexcept {
 QString ComponentSignalInstance::getForcedNetSignalName() const noexcept {
   return AttributeSubstitutor::substitute(
       mComponentSignal.getForcedNetName(),
-      ProjectAttributeLookup(mComponentInstance, nullptr));
+      ProjectAttributeLookup(mComponentInstance, nullptr, nullptr));
 }
 
 int ComponentSignalInstance::getRegisteredElementsCount() const noexcept {

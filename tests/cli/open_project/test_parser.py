@@ -38,7 +38,7 @@ Options:
                                      overwritten. Supported file extensions: csv
   --bom-attributes <attributes>      Comma-separated list of additional
                                      attributes to be exported to the BOM.
-                                     Example: "MANUFACTURER, MPN"
+                                     Example: "SUPPLIER, SKU"
   --export-pcb-fabrication-data      Export PCB fabrication data
                                      (Gerber/Excellon) according the fabrication
                                      output settings of boards. Existing files

@@ -46,13 +46,14 @@ namespace editor {
 
 CmdAddComponentToCircuit::CmdAddComponentToCircuit(
     Workspace& workspace, Project& project, const Uuid& component,
-    const Uuid& symbolVariant, const tl::optional<Uuid>& defaultDevice) noexcept
+    const Uuid& symbolVariant,
+    const tl::optional<ComponentAssemblyOptionList>& options) noexcept
   : UndoCommandGroup(tr("Add component")),
     mWorkspace(workspace),
     mProject(project),
     mComponentUuid(component),
     mSymbVarUuid(symbolVariant),
-    mDefaultDeviceUuid(defaultDevice),
+    mAssemblyOptions(options),
     mCmdAddToCircuit(nullptr) {
 }
 
@@ -76,7 +77,8 @@ ComponentInstance* CmdAddComponentToCircuit::getComponentInstance() const
 bool CmdAddComponentToCircuit::performExecute() {
   // if there is no such component in the project's library, copy it from the
   // workspace library to the project's library
-  if (!mProject.getLibrary().getComponent(mComponentUuid)) {
+  Component* cmp = mProject.getLibrary().getComponent(mComponentUuid);
+  if (!cmp) {
     FilePath cmpFp =
         mWorkspace.getLibraryDb().getLatest<Component>(mComponentUuid);
     if (!cmpFp.isValid()) {
@@ -86,11 +88,10 @@ bool CmdAddComponentToCircuit::performExecute() {
              "workspace library!")
               .arg(mComponentUuid.toStr()));
     }
-    Component* cmp =
-        Component::open(
-            std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
-                TransactionalFileSystem::openRO(cmpFp))))
-            .release();  // can throw
+    cmp = Component::open(std::unique_ptr<TransactionalDirectory>(
+                              new TransactionalDirectory(
+                                  TransactionalFileSystem::openRO(cmpFp))))
+              .release();  // can throw
     CmdProjectLibraryAddElement<Component>* cmdAddToLibrary =
         new CmdProjectLibraryAddElement<Component>(mProject.getLibrary(), *cmp);
     appendChild(cmdAddToLibrary);  // can throw
@@ -98,7 +99,8 @@ bool CmdAddComponentToCircuit::performExecute() {
 
   // create child command to add a new component instance to the circuit
   mCmdAddToCircuit = new CmdComponentInstanceAdd(
-      mProject.getCircuit(), mComponentUuid, mSymbVarUuid, mDefaultDeviceUuid);
+      mProject.getCircuit(), mComponentUuid, mSymbVarUuid,
+      mAssemblyOptions ? *mAssemblyOptions : ComponentAssemblyOptionList());
   appendChild(mCmdAddToCircuit);  // can throw
 
   // execute all child commands

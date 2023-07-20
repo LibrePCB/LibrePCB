@@ -24,6 +24,8 @@
 
 #include "../application.h"
 #include "../fileio/transactionaldirectory.h"
+#include "../types/elementname.h"
+#include "../types/simplestring.h"
 
 #include <QtCore>
 
@@ -61,10 +63,6 @@ void FileFormatMigrationUnstable::upgradePackageCategory(
 
 void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-  const QString fp = "symbol.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  upgradeInversionCharacters(root, "pin", "name/@0");
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
@@ -74,10 +72,6 @@ void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
 void FileFormatMigrationUnstable::upgradeComponent(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-  const QString fp = "component.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  upgradeInversionCharacters(root, "signal", "name/@0");
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeDevice(TransactionalDirectory& dir) {
@@ -86,11 +80,6 @@ void FileFormatMigrationUnstable::upgradeDevice(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  const QString fp = "library.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  root.appendChild("manufacturer", QString());
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeWorkspaceData(
@@ -104,10 +93,62 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
 
 void FileFormatMigrationUnstable::upgradeSettings(SExpression& root) {
   Q_UNUSED(root);
+  root.appendChild("default_lock_component_assembly",
+                   SExpression::createToken("false"));
 }
 
-void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root) {
+void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
+                                                 ProjectContext& context) {
   Q_UNUSED(root);
+
+  // Add assembly options & parts to components.
+  foreach (SExpression* cmpNode, root.getChildren("component")) {
+    if (!cmpNode->tryGetChild("lib_device")) {
+      continue;  // already migrated
+    }
+
+    const Uuid cmpUuid = deserialize<Uuid>(cmpNode->getChild("@0"));
+    const SExpression& libDevNode = cmpNode->getChild("lib_device");
+    QSet<Uuid> libDeviceUuids = context.devicesUsedInBoards.value(cmpUuid);
+    if (auto u = deserialize<tl::optional<Uuid>>(libDevNode.getChild("@0"))) {
+      libDeviceUuids.insert(*u);
+    }
+
+    if (!libDeviceUuids.isEmpty()) {
+      QString mpn, manufacturer;
+      QVector<SExpression*> consumedAttributes;
+      const QList<SExpression*> attributes = cmpNode->getChildren("attribute");
+      for (int i = attributes.count() - 1; i >= 0; --i) {
+        const QString key = attributes.at(i)->getChild("@0").getValue();
+        if (key == "MPN") {
+          mpn = *cleanSimpleString(
+              attributes.at(i)->getChild("value/@0").getValue());
+          consumedAttributes.append(attributes.at(i));
+        } else if (key == "MANUFACTURER") {
+          manufacturer = *cleanSimpleString(
+              attributes.at(i)->getChild("value/@0").getValue());
+          consumedAttributes.append(attributes.at(i));
+        }
+      }
+      foreach (SExpression* attrNode, consumedAttributes) {
+        cmpNode->removeChild(*attrNode);
+      }
+
+      foreach (const Uuid& devUuid, libDeviceUuids) {
+        SExpression& devNode = cmpNode->appendList("device");
+        devNode.appendChild(SExpression::createToken(devUuid.toStr()));
+        if ((!mpn.isEmpty()) || (!manufacturer.isEmpty())) {
+          SExpression& partNode = devNode.appendList("part");
+          partNode.appendChild(mpn);
+          partNode.appendChild("manufacturer", manufacturer);
+        }
+      }
+      ++context.componentsWithAssemblyOptions;
+    }
+
+    cmpNode->removeChild(libDevNode);
+    cmpNode->appendChild("lock_assembly", SExpression::createToken("false"));
+  }
 }
 
 void FileFormatMigrationUnstable::upgradeErc(SExpression& root,

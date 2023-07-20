@@ -142,7 +142,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       "bom-attributes",
       tr("Comma-separated list of additional attributes to be exported "
          "to the BOM. Example: \"%1\"")
-          .arg("MANUFACTURER, MPN"),
+          .arg("SUPPLIER, SKU"),
       tr("attributes"));
   QCommandLineOption exportPcbFabricationDataOption(
       "export-pcb-fabrication-data",

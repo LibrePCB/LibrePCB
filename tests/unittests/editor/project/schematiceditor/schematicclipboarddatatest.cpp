@@ -80,6 +80,21 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
       AttributeKey("A2"), AttrTypeVoltage::instance(), "4.2",
       AttrTypeVoltage::instance().getUnitFromString("millivolt"));
 
+  std::shared_ptr<Part> part1 = std::make_shared<Part>(
+      SimpleString("mpn 1"), SimpleString("man 1"), AttributeList{});
+
+  std::shared_ptr<Part> part2 = std::make_shared<Part>(
+      SimpleString(""), SimpleString(""), AttributeList{attribute1});
+
+  std::shared_ptr<ComponentAssemblyOption> assemblyOption1 =
+      std::make_shared<ComponentAssemblyOption>(Uuid::createRandom(),
+                                                AttributeList{attribute1},
+                                                PartList{part1, part2});
+
+  std::shared_ptr<ComponentAssemblyOption> assemblyOption2 =
+      std::make_shared<ComponentAssemblyOption>(Uuid::createRandom(),
+                                                AttributeList{}, PartList{});
+
   std::shared_ptr<Text> text1 = std::make_shared<Text>(
       Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
       PositiveLength(4), Alignment(HAlign::left(), VAlign::top()));
@@ -92,14 +107,16 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   std::shared_ptr<SchematicClipboardData::ComponentInstance> component1 =
       std::make_shared<SchematicClipboardData::ComponentInstance>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          Uuid::createRandom(), CircuitIdentifier("foo"), "bar",
-          AttributeList{attribute1, attribute2});
+          CircuitIdentifier("foo"), "bar",
+          AttributeList{attribute1, attribute2},
+          ComponentAssemblyOptionList{assemblyOption1, assemblyOption2}, true);
 
   std::shared_ptr<SchematicClipboardData::ComponentInstance> component2 =
       std::make_shared<SchematicClipboardData::ComponentInstance>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          tl::nullopt, CircuitIdentifier("bar"), "hello world",
-          AttributeList{attribute2, attribute1});
+          CircuitIdentifier("bar"), "hello world",
+          AttributeList{attribute2, attribute1},
+          ComponentAssemblyOptionList{assemblyOption2, assemblyOption1}, false);
 
   std::shared_ptr<SchematicClipboardData::SymbolInstance> symbol1 =
       std::make_shared<SchematicClipboardData::SymbolInstance>(

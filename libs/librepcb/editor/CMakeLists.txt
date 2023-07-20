@@ -665,6 +665,8 @@ add_library(
   project/cmd/cmdsymbolinstancetextremove.h
   project/cmd/cmdsymbolinstancetextsreset.cpp
   project/cmd/cmdsymbolinstancetextsreset.h
+  project/componentassemblyoptionlisteditorwidget.cpp
+  project/componentassemblyoptionlisteditorwidget.h
   project/newprojectwizard/newprojectwizard.cpp
   project/newprojectwizard/newprojectwizard.h
   project/newprojectwizard/newprojectwizard.ui

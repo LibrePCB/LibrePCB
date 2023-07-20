@@ -75,8 +75,9 @@ class UnplacedComponentsDock final : public QDockWidget {
     /// Package library element name
     QString packageName;
 
-    /// Whether this device is pre-selected in schematics
-    bool selectedInSchematic;
+    /// Whether this device has been added as a part in the component instance
+    /// or not
+    bool isListedInComponentInstance;
   };
 
 public:
@@ -112,13 +113,10 @@ private:  // Methods
                                    Package* package,
                                    bool packageOwned) noexcept;
   void setSelectedFootprintUuid(const tl::optional<Uuid>& uuid) noexcept;
-  void setSelectedDeviceAsDefault() noexcept;
   void addSelectedDeviceToBoard() noexcept;
   void addSimilarDevicesToBoard() noexcept;
-  void addPreSelectedDevicesToBoard() noexcept;
   void addAllDevicesToBoard() noexcept;
   void autoAddDevicesToBoard(
-      bool onlyWithPreSelectedDevice,
       const tl::optional<Uuid>& libCmpUuidFilter) noexcept;
 
   /**

@@ -195,6 +195,16 @@ public:
   }
 
   /**
+   * @brief Whether assembly options of new components are locked for the
+   *        board editor or not
+   *
+   * @return Default state for ::librepcb::ComponentInstance::mLockAssembly
+   */
+  bool getDefaultLockComponentAssembly() const noexcept {
+    return mDefaultLockComponentAssembly;
+  }
+
+  /**
    * @brief Get the ProjectLibrary object which contains all library elements
    * used in this project
    *
@@ -297,6 +307,14 @@ public:
    * @param newKeys           The new attribute keys.
    */
   void setCustomBomAttributes(const QStringList& newKeys) noexcept;
+
+  /**
+   * @brief Set the default value for
+   *        ::librepcb::ComponentInstance::mLockAssembly
+   *
+   * @param newLock           The new lock default value.
+   */
+  void setDefaultLockComponentAssembly(bool newLock) noexcept;
 
   /**
    * @brief Set all ERC message approvals
@@ -561,6 +579,9 @@ private:  // Data
 
   /// Custom attributes to be included in BOM export.
   QStringList mCustomBomAttributes;
+
+  /// Default value for ::librepcb::ComponentInstance::mLockAssembly
+  bool mDefaultLockComponentAssembly;
 
   /// Ehe library which contains all elements needed in this project.
   QScopedPointer<ProjectLibrary> mProjectLibrary;

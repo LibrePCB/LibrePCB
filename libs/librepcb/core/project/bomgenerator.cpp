@@ -57,44 +57,131 @@ BomGenerator::~BomGenerator() noexcept {
  ******************************************************************************/
 
 std::shared_ptr<Bom> BomGenerator::generate(const Board* board) noexcept {
-  std::shared_ptr<Bom> bom = std::make_shared<Bom>(
-      QStringList{"Value", "Device", "Package"} + mAdditionalAttributes);
+  // Parse custom attributes.
+  QStringList customCommonAttributes;
+  QStringList customPartAttributes;
+  foreach (const QString& attribute, mAdditionalAttributes) {
+    if (attribute.endsWith("[]")) {
+      customPartAttributes.append(attribute.chopped(2));
+    } else {
+      customCommonAttributes.append(attribute);
+    }
+  }
 
+  // Collect items.
+  struct PartItem {
+    QString mpn;
+    QString manufacturer;
+    QString value;
+    QStringList attributes;  // Those from customPartAttributes.
+  };
+  struct ComponentItem {
+    QString designator;
+    QVector<PartItem> parts;
+    QString pkgName;
+    QStringList attributes;  // Those from customCommonAttributes.
+  };
+  QList<ComponentItem> items;
+  int maxPartNumber = 1;
   foreach (const ComponentInstance* cmpInst,
            mProject.getCircuit().getComponentInstances()) {
-    if (cmpInst->getLibComponent().isSchematicOnly()) {
-      continue;  // Don't export schematic-only components (e.g. sheet frames)
-    }
-    ProjectAttributeLookup lookup(*cmpInst, nullptr);
-    QString designator = *cmpInst->getName();
-    QStringList attributes;
-    QString devName;
-    QString pkgName;
+    ProjectAttributeLookup lookup(*cmpInst, nullptr, nullptr);
+    const BI_Device* device = nullptr;
+    QVector<std::shared_ptr<const Part>> parts;
     if (board) {
-      if (const BI_Device* device =
-              board->getDeviceInstanceByComponentUuid(cmpInst->getUuid())) {
-        // Skip devices which don't represent a mountable package.
-        if (device->getLibPackage().getAssemblyType(true) ==
-            Package::AssemblyType::None) {
-          continue;
-        }
-        lookup = ProjectAttributeLookup(*device);
-        devName = *device->getLibDevice().getNames().getDefaultValue();
-        pkgName = *device->getLibPackage().getNames().getDefaultValue();
+      device = board->getDeviceInstanceByComponentUuid(cmpInst->getUuid());
+      if (device) {
+        lookup = ProjectAttributeLookup(*device, nullptr);
+        parts = device->getParts();
       }
+    } else {
+      parts = cmpInst->getParts();
     }
-    attributes.append(
-        AttributeSubstitutor::substitute(lookup("VALUE"), lookup));
-    attributes.append(devName);
-    attributes.append(pkgName);
-    foreach (const QString& attribute, mAdditionalAttributes) {
-      attributes.append(
+
+    ComponentItem item;
+    item.designator = *cmpInst->getName();
+    item.pkgName = board ? lookup("PACKAGE") : "N/A";
+    foreach (auto part, parts) {
+      auto lookup = device ? ProjectAttributeLookup(*device, part)
+                           : ProjectAttributeLookup(*cmpInst, nullptr, part);
+      PartItem partItem;
+      partItem.mpn = *part->getMpn();
+      partItem.manufacturer = *part->getManufacturer();
+      partItem.value = AttributeSubstitutor::substitute(lookup("VALUE"), lookup)
+                           .simplified();
+      // Remove redundant information from the value since it could
+      // lead to confusion.
+      if (!partItem.mpn.isEmpty()) {
+        removeSubString(partItem.value, partItem.mpn);
+        removeSubString(partItem.value, lookup("DEVICE"));
+        removeSubString(partItem.value, lookup("COMPONENT"));
+      }
+      if (!partItem.manufacturer.isEmpty()) {
+        removeSubString(partItem.value, partItem.manufacturer);
+      }
+      foreach (const QString& attribute, customPartAttributes) {
+        partItem.attributes.append(
+            AttributeSubstitutor::substitute(lookup(attribute), lookup));
+      }
+      item.parts.append(partItem);
+    }
+    foreach (const QString& attribute, customCommonAttributes) {
+      item.attributes.append(
           AttributeSubstitutor::substitute(lookup(attribute), lookup));
     }
-    bom->addItem(designator, attributes);
+    maxPartNumber = std::max(maxPartNumber, item.parts.count());
+    if (item.parts.isEmpty()) {
+      continue;  // Skip components which have no assembly information (=DNM).
+    }
+    items.append(item);
+  }
+
+  // Build BOM header.
+  QStringList columns{"Package"};
+  columns += customCommonAttributes;
+  for (int i = 0; i < maxPartNumber; ++i) {
+    const QString suffix = (i > 0) ? QString("[%1]").arg(i + 1) : QString();
+    columns.append("Value" % suffix);
+    columns.append("MPN" % suffix);
+    columns.append("Manufacturer" % suffix);
+    foreach (const QString& attribute, customPartAttributes) {
+      columns.append(attribute % suffix);
+    }
+  }
+
+  // Generate BOM.
+  std::shared_ptr<Bom> bom = std::make_shared<Bom>(columns);
+  foreach (const ComponentItem& item, items) {
+    QStringList attributes;
+    attributes.append(item.pkgName);
+    attributes += item.attributes;
+    for (int i = 0; i < maxPartNumber; ++i) {
+      const PartItem part = item.parts.value(i);
+      attributes.append(part.value);
+      attributes.append(part.mpn);
+      attributes.append(part.manufacturer);
+      attributes += part.attributes;
+      for (int k = part.attributes.count(); k < customPartAttributes.count();
+           ++k) {
+        attributes.append(QString());
+      }
+    }
+    bom->addItem(item.designator, attributes);
   }
 
   return bom;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void BomGenerator::removeSubString(QString& str,
+                                   const QString& substr) noexcept {
+  str.replace(
+      QRegularExpression(
+          QString("(^|\\s)%1($|\\s)").arg(QRegularExpression::escape(substr))),
+      " ");
 }
 
 /*******************************************************************************

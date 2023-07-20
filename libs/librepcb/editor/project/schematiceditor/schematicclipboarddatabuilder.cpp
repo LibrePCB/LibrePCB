@@ -101,10 +101,11 @@ std::unique_ptr<SchematicClipboardData> SchematicClipboardDataBuilder::generate(
             symbol->getComponentInstance().getUuid(),
             symbol->getComponentInstance().getLibComponent().getUuid(),
             symbol->getComponentInstance().getSymbolVariant().getUuid(),
-            symbol->getComponentInstance().getDefaultDeviceUuid(),
             symbol->getComponentInstance().getName(),
             symbol->getComponentInstance().getValue(),
-            symbol->getComponentInstance().getAttributes()));
+            symbol->getComponentInstance().getAttributes(),
+            symbol->getComponentInstance().getAssemblyOptions(),
+            symbol->getComponentInstance().getLockAssembly()));
   }
 
   // Add symbols

@@ -28,12 +28,14 @@
 #include "../../workspace/desktopservices.h"
 #include "ui_deviceinstancepropertiesdialog.h"
 
+#include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/workspace/workspace.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -49,17 +51,19 @@ namespace editor {
  ******************************************************************************/
 
 DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
-    const WorkspaceSettings& settings, Project& project, BI_Device& device,
+    const Workspace& ws, Project& project, BI_Device& device,
     UndoStack& undoStack, const LengthUnit& lengthUnit,
     const QString& settingsPrefix, QWidget* parent) noexcept
   : QDialog(parent),
-    mSettings(settings),
+    mWorkspace(ws),
     mProject(project),
     mDevice(device),
     mUndoStack(undoStack),
     mAttributes(mDevice.getComponentInstance().getAttributes()),
     mUi(new Ui::DeviceInstancePropertiesDialog) {
   mUi->setupUi(this);
+  mUi->attributeListEditorWidget->setFrameStyle(QFrame::NoFrame);
+  mUi->assemblyOptionListEditorWidget->setFrameStyle(QFrame::NoFrame);
   mUi->edtPosX->configure(lengthUnit, LengthEditBase::Steps::generic(),
                           settingsPrefix % "/pos_x");
   mUi->edtPosY->configure(lengthUnit, LengthEditBase::Steps::generic(),
@@ -74,7 +78,12 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
   ComponentInstance& cmp = mDevice.getComponentInstance();
   mUi->edtCompInstName->setText(*cmp.getName());
   mUi->edtCompInstValue->setText(cmp.getValue());
-  mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
+  mUi->assemblyOptionListEditorWidget->setReferences(&mWorkspace, &mProject,
+                                                     &cmp);
+  setSelectedPart(nullptr);
+  connect(mUi->assemblyOptionListEditorWidget,
+          &ComponentAssemblyOptionListEditorWidget::selectedPartChanged, this,
+          &DeviceInstancePropertiesDialog::setSelectedPart);
 
   const QStringList& localeOrder = mProject.getLocaleOrder();
 
@@ -88,26 +97,24 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
       mDevice.getLibDevice().getDirectory().getAbsPath().toNative());
   connect(mUi->lblLibDeviceName, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mSettings, this);
+            DesktopServices ds(mWorkspace.getSettings(), this);
             ds.openLocalPath(FilePath(url));
           });
 
   mUi->lblLibPackageName->setText(
       htmlLink.arg(mDevice.getLibPackage().getDirectory().getAbsPath().toStr(),
-                   *mDevice.getLibPackage().getNames().value(localeOrder)));
+                   *mDevice.getLibPackage().getNames().value(localeOrder)) %
+      QString(" (%1 \"%2\")")
+          .arg(tr("Footprint"))
+          .arg(*mDevice.getLibFootprint().getNames().value(localeOrder)));
   mUi->lblLibPackageName->setToolTip(
       mDevice.getLibPackage().getDescriptions().value(localeOrder) + "<p>" +
       mDevice.getLibPackage().getDirectory().getAbsPath().toNative());
   connect(mUi->lblLibPackageName, &QLabel::linkActivated, this,
           [this](const QString& url) {
-            DesktopServices ds(mSettings, this);
+            DesktopServices ds(mWorkspace.getSettings(), this);
             ds.openLocalPath(FilePath(url));
           });
-
-  mUi->lblLibFootprintName->setText(
-      *mDevice.getLibFootprint().getNames().value(localeOrder));
-  mUi->lblLibFootprintName->setToolTip(
-      mDevice.getLibFootprint().getDescriptions().value(localeOrder));
 
   // Device/Footprint Attributes
   mUi->edtPosX->setValue(mDevice.getPosition().getX());
@@ -122,12 +129,26 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
 }
 
 DeviceInstancePropertiesDialog::~DeviceInstancePropertiesDialog() noexcept {
+  mUi->assemblyOptionListEditorWidget->setReferences(nullptr, nullptr, nullptr);
   mUi->attributeListEditorWidget->setReferences(nullptr, nullptr);
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void DeviceInstancePropertiesDialog::setSelectedPart(
+    std::shared_ptr<Part> part) noexcept {
+  if (part) {
+    mUi->attributeListEditorWidget->setReferences(nullptr,
+                                                  &part->getAttributes());
+    mUi->gbxAttributes->setTitle(tr("Attributes of Selected Part"));
+  } else {
+    mUi->attributeListEditorWidget->setReferences(nullptr, &mAttributes);
+    mUi->gbxAttributes->setTitle(tr("Attributes of Component"));
+  }
+  mSelectedPart = part;  // Keep attribute list in memory!!!
+}
 
 void DeviceInstancePropertiesDialog::buttonBoxClicked(
     QAbstractButton* button) noexcept {
@@ -182,6 +203,8 @@ bool DeviceInstancePropertiesDialog::applyChanges() noexcept {
         mUi->edtCompInstName->text().trimmed()));  // can throw
     cmdCmp->setValue(mUi->edtCompInstValue->toPlainText());
     cmdCmp->setAttributes(mAttributes);
+    cmdCmp->setAssemblyOptions(
+        mUi->assemblyOptionListEditorWidget->getOptions());
     transaction.append(cmdCmp.take());  // can throw
 
     // Device instance with associated elements.

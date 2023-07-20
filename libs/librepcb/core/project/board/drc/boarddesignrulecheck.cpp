@@ -114,8 +114,7 @@ void BoardDesignRuleCheck::execute(bool quick) {
     checkInvalidPadConnections(78);  // 2%
     checkCourtyardClearances(88);  // 10%
     checkBoardOutline(91);  // 3%
-    checkForUnplacedComponents(92);  // 1%
-    checkCircuitDefaultDevices(93);  // 1%
+    checkForUnplacedComponents(93);  // 2%
     checkForMissingConnections(95);  // 2%
     checkForStaleObjects(97);  // 2%
   }
@@ -1535,21 +1534,6 @@ void BoardDesignRuleCheck::checkForUnplacedComponents(int progressEnd) {
         mBoard.getDeviceInstanceByComponentUuid(cmp->getUuid());
     if ((!dev) && (!cmp->getLibComponent().isSchematicOnly())) {
       emitMessage(std::make_shared<DrcMsgMissingDevice>(*cmp));
-    }
-  }
-
-  emitProgress(progressEnd);
-}
-
-void BoardDesignRuleCheck::checkCircuitDefaultDevices(int progressEnd) {
-  emitStatus(tr("Check configured default devices..."));
-
-  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    const tl::optional<Uuid> defaultDevice =
-        device->getComponentInstance().getDefaultDeviceUuid();
-    if (defaultDevice && (*defaultDevice != device->getLibDevice().getUuid())) {
-      emitMessage(std::make_shared<DrcMsgDefaultDeviceMismatch>(
-          device->getComponentInstance(), getDeviceLocation(*device)));
     }
   }
 

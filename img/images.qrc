@@ -129,6 +129,7 @@
         <file>library/inductor_eu.png</file>
         <file>library/inductor_us.png</file>
         <file>library/package.png</file>
+        <file>library/part.png</file>
         <file>library/resistor_eu.png</file>
         <file>library/resistor_us.png</file>
         <file>library/symbol.png</file>

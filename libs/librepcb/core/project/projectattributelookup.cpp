@@ -24,6 +24,7 @@
 
 #include "../library/cmp/component.h"
 #include "../library/dev/device.h"
+#include "../library/dev/part.h"
 #include "../library/pkg/package.h"
 #include "board/board.h"
 #include "board/items/bi_device.h"
@@ -61,12 +62,14 @@ ProjectAttributeLookup::ProjectAttributeLookup(const Project& obj) noexcept {
 }
 
 ProjectAttributeLookup::ProjectAttributeLookup(
-    const ComponentInstance& obj, QPointer<const BI_Device> device) noexcept {
+    const ComponentInstance& obj, QPointer<const BI_Device> device,
+    std::shared_ptr<const Part> part) noexcept {
   QPointer<const ComponentInstance> ptr(&obj);
-  mFunction = [ptr, device](const QString& key) {
+  mFunction = [ptr, device, part](const QString& key) {
     QString value;
     if (ptr) {
-      query(*ptr, key, value)  // Component
+      (part && query(*part, key, value))  // Part
+          || query(*ptr, key, value)  // Component
           || (device && query(*device, key, value))  // Device
           || query(ptr->getCircuit().getProject(), key, value);  // Project
     }
@@ -99,12 +102,14 @@ ProjectAttributeLookup::ProjectAttributeLookup(const Board& obj) noexcept {
 }
 
 ProjectAttributeLookup::ProjectAttributeLookup(
-    const SI_Symbol& obj, QPointer<const BI_Device> device) noexcept {
+    const SI_Symbol& obj, QPointer<const BI_Device> device,
+    std::shared_ptr<const Part> part) noexcept {
   QPointer<const SI_Symbol> ptr(&obj);
-  mFunction = [ptr, device](const QString& key) {
+  mFunction = [ptr, device, part](const QString& key) {
     QString value;
     if (ptr) {
-      query(*ptr, key, value)  // Symbol
+      (part && query(*part, key, value))  // Part
+          || query(*ptr, key, value)  // Symbol
           || query(ptr->getComponentInstance(), key, value)  // Component
           || (device && query(*device, key, value))  // Device
           || query(ptr->getSchematic(), key, value)  // Schematic
@@ -114,12 +119,14 @@ ProjectAttributeLookup::ProjectAttributeLookup(
   };
 }
 
-ProjectAttributeLookup::ProjectAttributeLookup(const BI_Device& obj) noexcept {
+ProjectAttributeLookup::ProjectAttributeLookup(
+    const BI_Device& obj, std::shared_ptr<const Part> part) noexcept {
   QPointer<const BI_Device> ptr(&obj);
-  mFunction = [ptr](const QString& key) {
+  mFunction = [ptr, part](const QString& key) {
     QString value;
     if (ptr) {
-      query(*ptr, key, value)  // Device
+      (part && query(*part, key, value))  // Part
+          || query(*ptr, key, value)  // Device
           || query(ptr->getComponentInstance(), key, value)  // Component
           || query(ptr->getBoard(), key, value)  // Board
           || query(ptr->getProject(), key, value);  // Project
@@ -273,6 +280,21 @@ bool ProjectAttributeLookup::query(const BI_Device& device, const QString& key,
   } else if (key == QLatin1String("FOOTPRINT")) {
     value = *device.getLibFootprint().getNames().value(
         device.getProject().getLocaleOrder());
+    return true;
+  }
+  return false;
+}
+
+bool ProjectAttributeLookup::query(const Part& part, const QString& key,
+                                   QString& value) noexcept {
+  if (const auto& attr = part.getAttributes().find(key)) {
+    value = attr->getValueTr(true);
+    return true;
+  } else if (key == QLatin1String("MPN")) {
+    value = *part.getMpn();
+    return true;
+  } else if (key == QLatin1String("MANUFACTURER")) {
+    value = *part.getManufacturer();
     return true;
   }
   return false;

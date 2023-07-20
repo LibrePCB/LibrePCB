@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../undocommandgroup.h"
 
+#include <librepcb/core/project/circuit/componentassemblyoption.h>
 #include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
@@ -56,7 +57,7 @@ public:
   CmdAddComponentToCircuit(
       Workspace& workspace, Project& project, const Uuid& component,
       const Uuid& symbolVariant,
-      const tl::optional<Uuid>& defaultDevice = tl::nullopt) noexcept;
+      const tl::optional<ComponentAssemblyOptionList>& options) noexcept;
   ~CmdAddComponentToCircuit() noexcept;
 
   // Getters
@@ -75,7 +76,7 @@ private:
   Project& mProject;
   Uuid mComponentUuid;
   Uuid mSymbVarUuid;
-  tl::optional<Uuid> mDefaultDeviceUuid;
+  tl::optional<ComponentAssemblyOptionList> mAssemblyOptions;
 
   // child commands
   CmdComponentInstanceAdd* mCmdAddToCircuit;

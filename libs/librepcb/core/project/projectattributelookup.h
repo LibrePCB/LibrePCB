@@ -26,6 +26,7 @@
 #include <QtCore>
 
 #include <functional>
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -35,6 +36,7 @@ namespace librepcb {
 class BI_Device;
 class Board;
 class ComponentInstance;
+class Part;
 class Project;
 class SI_Symbol;
 class Schematic;
@@ -69,12 +71,14 @@ public:
   ProjectAttributeLookup(const ProjectAttributeLookup& other) noexcept;
   explicit ProjectAttributeLookup(const Project& obj) noexcept;
   ProjectAttributeLookup(const ComponentInstance& obj,
-                         QPointer<const BI_Device> device) noexcept;
+                         QPointer<const BI_Device> device,
+                         std::shared_ptr<const Part> part) noexcept;
   explicit ProjectAttributeLookup(const Schematic& obj) noexcept;
   explicit ProjectAttributeLookup(const Board& obj) noexcept;
-  ProjectAttributeLookup(const SI_Symbol& obj,
-                         QPointer<const BI_Device> device) noexcept;
-  explicit ProjectAttributeLookup(const BI_Device& obj) noexcept;
+  ProjectAttributeLookup(const SI_Symbol& obj, QPointer<const BI_Device> device,
+                         std::shared_ptr<const Part> part) noexcept;
+  ProjectAttributeLookup(const BI_Device& obj,
+                         std::shared_ptr<const Part> part) noexcept;
   ~ProjectAttributeLookup() noexcept;
 
   // Operator Overloadings
@@ -103,6 +107,8 @@ private:  // Methods
   static bool query(const SI_Symbol& symbol, const QString& key,
                     QString& value) noexcept;
   static bool query(const BI_Device& device, const QString& key,
+                    QString& value) noexcept;
+  static bool query(const Part& part, const QString& key,
                     QString& value) noexcept;
 
 private:  // Data

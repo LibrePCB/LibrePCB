@@ -47,18 +47,17 @@ namespace librepcb {
 
 ComponentInstance::ComponentInstance(Circuit& circuit, const Uuid& uuid,
                                      const Component& cmp, const Uuid& symbVar,
-                                     const CircuitIdentifier& name,
-                                     const tl::optional<Uuid>& defaultDevice)
+                                     const CircuitIdentifier& name)
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
     mUuid(uuid),
     mName(name),
     mValue(cmp.getDefaultValue()),
-    mDefaultDeviceUuid(defaultDevice),
     mLibComponent(cmp),
     mCompSymbVar(cmp.getSymbolVariants().get(symbVar).get()),  // can throw
     mAttributes(new AttributeList(cmp.getAttributes())),
+    mLockAssembly(circuit.getProject().getDefaultLockComponentAssembly()),
     mPrimaryDevice(nullptr) {
   Q_ASSERT(mCompSymbVar);
 
@@ -89,6 +88,25 @@ ComponentInstance::~ComponentInstance() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
+
+QSet<Uuid> ComponentInstance::getCompatibleDevices() const noexcept {
+  QSet<Uuid> result;
+  for (const ComponentAssemblyOption& option : mAssemblyOptions) {
+    result.insert(option.getDevice());
+  }
+  return result;
+}
+
+QVector<std::shared_ptr<const Part>> ComponentInstance::getParts() const
+    noexcept {
+  QVector<std::shared_ptr<const Part>> parts;
+  for (const ComponentAssemblyOption& opt : mAssemblyOptions) {
+    for (auto it = opt.getParts().begin(); it != opt.getParts().end(); ++it) {
+      parts.append(it.ptr());
+    }
+  }
+  return parts;
+}
 
 int ComponentInstance::getRegisteredElementsCount() const noexcept {
   int count = 0;
@@ -135,10 +153,10 @@ void ComponentInstance::setAttributes(
   }
 }
 
-void ComponentInstance::setDefaultDeviceUuid(
-    const tl::optional<Uuid>& device) noexcept {
-  if (device != mDefaultDeviceUuid) {
-    mDefaultDeviceUuid = device;
+void ComponentInstance::setAssemblyOptions(
+    const ComponentAssemblyOptionList& options) noexcept {
+  if (options != mAssemblyOptions) {
+    mAssemblyOptions = options;
     emit attributesChanged();
   }
 }
@@ -249,12 +267,14 @@ void ComponentInstance::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("lib_variant", mCompSymbVar->getUuid());
   root.ensureLineBreak();
-  root.appendChild("lib_device", mDefaultDeviceUuid);
-  root.ensureLineBreak();
   root.appendChild("name", mName);
   root.appendChild("value", mValue);
   root.ensureLineBreak();
+  root.appendChild("lock_assembly", mLockAssembly);
+  root.ensureLineBreak();
   mAttributes->serialize(root);
+  root.ensureLineBreak();
+  mAssemblyOptions.serialize(root);
   root.ensureLineBreak();
   for (const ComponentSignalInstance* obj : mSignals) {
     obj->serialize(root.appendList("signal"));

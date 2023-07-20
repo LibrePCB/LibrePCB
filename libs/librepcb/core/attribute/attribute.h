@@ -92,7 +92,7 @@ public:
   bool operator!=(const Attribute& rhs) const noexcept {
     return !(*this == rhs);
   }
-  Attribute& operator=(const Attribute& rhs) = delete;
+  Attribute& operator=(const Attribute& rhs) noexcept;
 
 private:  // Methods
   bool checkAttributesValidity() const noexcept;
@@ -115,10 +115,35 @@ using AttributeList =
     SerializableObjectList<Attribute, AttributeListNameProvider,
                            Attribute::Event>;
 
+}  // namespace librepcb
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+/**
+ * @brief Extend an ::librepcb::AttributeList with additional attributes
+ *
+ * @param lhs Base attribute list, will be kept as-is.
+ * @param rhs Additional attributes to append. Keys already contained in `lhs`
+ *            will be omitted.
+ *
+ * @return `lhs` with attributes from `rhs` appended.
+ */
+inline librepcb::AttributeList operator|(
+    const librepcb::AttributeList& lhs,
+    const librepcb::AttributeList& rhs) noexcept {
+  librepcb::AttributeList result = lhs;
+  for (const auto& newAttr : rhs) {
+    if (!result.contains(newAttr.getName())) {
+      result.append(std::make_shared<librepcb::Attribute>(newAttr));
+    }
+  }
+  return result;
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
-
-}  // namespace librepcb
 
 #endif

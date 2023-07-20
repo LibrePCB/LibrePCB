@@ -44,6 +44,7 @@ class Device;
 class Footprint;
 class Package;
 class PackageModel;
+class Part;
 class Project;
 
 /*******************************************************************************
@@ -100,6 +101,7 @@ public:
   const QHash<Uuid, tl::optional<Length>>& getHoleStopMasks() const noexcept {
     return mHoleStopMaskOffsets;
   }
+  QVector<std::shared_ptr<const Part>> getParts() const noexcept;
   bool isUsed() const noexcept;
 
   // Setters

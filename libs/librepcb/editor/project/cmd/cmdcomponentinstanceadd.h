@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../undocommand.h"
 
+#include <librepcb/core/project/circuit/componentassemblyoption.h>
 #include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
@@ -50,9 +51,9 @@ namespace editor {
 class CmdComponentInstanceAdd final : public UndoCommand {
 public:
   // Constructors / Destructor
-  CmdComponentInstanceAdd(
-      Circuit& circuit, const Uuid& cmp, const Uuid& symbVar,
-      const tl::optional<Uuid>& defaultDevice = tl::nullopt) noexcept;
+  CmdComponentInstanceAdd(Circuit& circuit, const Uuid& cmp,
+                          const Uuid& symbVar,
+                          const ComponentAssemblyOptionList& options) noexcept;
   CmdComponentInstanceAdd(Circuit& circuit,
                           ComponentInstance* component) noexcept;
   ~CmdComponentInstanceAdd() noexcept;
@@ -80,7 +81,7 @@ private:
   Circuit& mCircuit;
   Uuid mComponentUuid;
   Uuid mSymbVarUuid;
-  tl::optional<Uuid> mDefaultDeviceUuid;
+  ComponentAssemblyOptionList mAssemblyOptions;
 
   /// @brief The created component instance
   ComponentInstance* mComponentInstance;

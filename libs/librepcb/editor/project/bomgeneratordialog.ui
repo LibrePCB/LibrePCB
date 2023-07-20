@@ -40,7 +40,7 @@
       <string notr="true"/>
      </property>
      <property name="placeholderText">
-      <string extracomment="Don't translate the attributes MANUFACTURER and MPN, they must be in English.">Comma-separated list of additional attributes, e.g. &quot;MANUFACTURER, MPN&quot;</string>
+      <string>Comma-separated list of custom attributes (optional)</string>
      </property>
     </widget>
    </item>
@@ -50,6 +50,9 @@
       <string>Output File:</string>
      </property>
     </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="edtOutputPath"/>
    </item>
    <item row="4" column="0" colspan="2">
     <widget class="QTableWidget" name="tableWidget">
@@ -62,22 +65,6 @@
     </widget>
    </item>
    <item row="6" column="0" colspan="2">
-    <widget class="QLabel" name="lblMessage">
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QPushButton" name="btnBrowseOutputDir">
@@ -100,9 +87,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLineEdit" name="edtOutputPath"/>
    </item>
   </layout>
  </widget>

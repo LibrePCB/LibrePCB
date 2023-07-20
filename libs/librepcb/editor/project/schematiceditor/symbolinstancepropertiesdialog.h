@@ -35,6 +35,7 @@ namespace librepcb {
 
 class ComponentInstance;
 class LengthUnit;
+class Part;
 class Project;
 class SI_Symbol;
 class Workspace;
@@ -76,6 +77,7 @@ public:
       const SymbolInstancePropertiesDialog& rhs) = delete;
 
 private:  // Methods
+  void setSelectedPart(std::shared_ptr<Part> part) noexcept;
   void buttonBoxClicked(QAbstractButton* button) noexcept;
   void accept();
   bool applyChanges() noexcept;
@@ -87,6 +89,7 @@ private:  // Data
   SI_Symbol& mSymbol;
   UndoStack& mUndoStack;
   AttributeList mAttributes;
+  std::shared_ptr<Part> mSelectedPart;  // Avoid dangling reference.
   QScopedPointer<Ui::SymbolInstancePropertiesDialog> mUi;
 };
 

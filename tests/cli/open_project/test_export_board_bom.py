@@ -72,7 +72,7 @@ def test_export_project_with_two_boards_explicit_one_attributes(cli, project):
     code, stdout, stderr = cli.run('open-project',
                                    '--export-board-bom', fp,
                                    '--board=copy',
-                                   '--bom-attributes', 'MANUFACTURER, MPN',
+                                   '--bom-attributes', 'SUPPLIER, SKU',
                                    project.path)
     assert stderr == ''
     assert stdout == \
@@ -84,7 +84,7 @@ def test_export_project_with_two_boards_explicit_one_attributes(cli, project):
     assert os.path.exists(dir)
     assert os.listdir(dir) == ['copy.csv']
     fp = cli.abspath(fp.replace('{{BOARD}}', 'copy'))
-    assert b'MANUFACTURER,MPN' in open(fp, 'rb').read()
+    assert b'SUPPLIER,SKU' in open(fp, 'rb').read()
 
 
 @pytest.mark.parametrize("project", [params.PROJECT_WITH_TWO_BOARDS_LPP])

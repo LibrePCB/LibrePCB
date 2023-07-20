@@ -311,14 +311,16 @@ QList<Uuid> WorkspaceLibraryDb::find(const QString& elementsTable,
       "SELECT %elements.uuid FROM %elements "
       "LEFT JOIN %elements_tr "
       "ON %elements.id = %elements_tr.element_id "
-      "WHERE %elements_tr.name LIKE :keyword "
-      "OR %elements_tr.keywords LIKE :keyword "
+      "WHERE %elements_tr.name LIKE :escapedKeyword "
+      "OR %elements_tr.keywords LIKE :escapedKeyword "
+      "OR %elements.uuid = :keyword "
       "GROUP BY %elements.uuid "
       "ORDER BY %elements_tr.name ASC",
       {
           {"%elements", elementsTable},
       });
-  query.bindValue(":keyword", "%" + keyword + "%");
+  query.bindValue(":keyword", keyword);
+  query.bindValue(":escapedKeyword", "%" + keyword + "%");
   mDb->exec(query);
 
   QList<Uuid> uuids;

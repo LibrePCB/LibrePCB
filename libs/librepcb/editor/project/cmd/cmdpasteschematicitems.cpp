@@ -142,11 +142,13 @@ bool CmdPasteSchematicItems::performExecute() {
           mProject.getCircuit().generateAutoComponentInstanceName(
               libCmp->getPrefixes().value(mProject.getLocaleOrder())));
     }
-    QScopedPointer<ComponentInstance> copy(new ComponentInstance(
-        mProject.getCircuit(), Uuid::createRandom(), *libCmp,
-        cmp.libVariantUuid, name, cmp.libDeviceUuid));
+    QScopedPointer<ComponentInstance> copy(
+        new ComponentInstance(mProject.getCircuit(), Uuid::createRandom(),
+                              *libCmp, cmp.libVariantUuid, name));
     copy->setValue(cmp.value);
     copy->setAttributes(cmp.attributes);
+    copy->setAssemblyOptions(cmp.assemblyOptions);
+    copy->setLockAssembly(cmp.lockAssembly);
     componentInstanceMap.insert(cmp.uuid, copy->getUuid());
     execNewChildCmd(
         new CmdComponentInstanceAdd(mProject.getCircuit(), copy.take()));

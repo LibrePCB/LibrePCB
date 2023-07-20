@@ -48,8 +48,8 @@ CmdComponentInstanceEdit::CmdComponentInstanceEdit(
     mNewValue(mOldValue),
     mOldAttributes(cmp.getAttributes()),
     mNewAttributes(mOldAttributes),
-    mOldDefaultDeviceUuid(cmp.getDefaultDeviceUuid()),
-    mNewDefaultDeviceUuid(mOldDefaultDeviceUuid) {
+    mOldAssemblyOptions(cmp.getAssemblyOptions()),
+    mNewAssemblyOptions(mOldAssemblyOptions) {
 }
 
 CmdComponentInstanceEdit::~CmdComponentInstanceEdit() noexcept {
@@ -75,10 +75,10 @@ void CmdComponentInstanceEdit::setAttributes(
   mNewAttributes = attributes;
 }
 
-void CmdComponentInstanceEdit::setDefaultDeviceUuid(
-    const tl::optional<Uuid>& device) noexcept {
+void CmdComponentInstanceEdit::setAssemblyOptions(
+    const ComponentAssemblyOptionList& options) noexcept {
   Q_ASSERT(!wasEverExecuted());
-  mNewDefaultDeviceUuid = device;
+  mNewAssemblyOptions = options;
 }
 
 /*******************************************************************************
@@ -91,7 +91,7 @@ bool CmdComponentInstanceEdit::performExecute() {
   if (mNewName != mOldName) return true;
   if (mNewValue != mOldValue) return true;
   if (mNewAttributes != mOldAttributes) return true;
-  if (mNewDefaultDeviceUuid != mOldDefaultDeviceUuid) return true;
+  if (mNewAssemblyOptions != mOldAssemblyOptions) return true;
   return false;
 }
 
@@ -99,14 +99,14 @@ void CmdComponentInstanceEdit::performUndo() {
   mCircuit.setComponentInstanceName(mComponentInstance, mOldName);  // can throw
   mComponentInstance.setValue(mOldValue);
   mComponentInstance.setAttributes(mOldAttributes);
-  mComponentInstance.setDefaultDeviceUuid(mOldDefaultDeviceUuid);
+  mComponentInstance.setAssemblyOptions(mOldAssemblyOptions);
 }
 
 void CmdComponentInstanceEdit::performRedo() {
   mCircuit.setComponentInstanceName(mComponentInstance, mNewName);  // can throw
   mComponentInstance.setValue(mNewValue);
   mComponentInstance.setAttributes(mNewAttributes);
-  mComponentInstance.setDefaultDeviceUuid(mNewDefaultDeviceUuid);
+  mComponentInstance.setAssemblyOptions(mNewAssemblyOptions);
 }
 
 /*******************************************************************************

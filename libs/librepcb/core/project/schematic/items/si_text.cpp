@@ -23,6 +23,7 @@
 #include "si_text.h"
 
 #include "../../../attribute/attributesubstitutor.h"
+#include "../../board/items/bi_device.h"
 #include "../../circuit/componentinstance.h"
 #include "../../project.h"
 #include "../../projectattributelookup.h"
@@ -126,7 +127,10 @@ void SI_Text::updateText() noexcept {
     if (mSymbol) {
       QPointer<const BI_Device> device =
           mSymbol->getComponentInstance().getPrimaryDevice();
-      return ProjectAttributeLookup(*mSymbol, device);
+      std::shared_ptr<const Part> part = device
+          ? device->getParts().value(0)
+          : mSymbol->getComponentInstance().getParts().value(0);
+      return ProjectAttributeLookup(*mSymbol, device, part);
     } else {
       return ProjectAttributeLookup(mSchematic);
     }

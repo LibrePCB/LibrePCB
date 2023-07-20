@@ -26,6 +26,7 @@
 #include "../../undocommand.h"
 
 #include <librepcb/core/attribute/attribute.h>
+#include <librepcb/core/project/circuit/componentassemblyoption.h>
 #include <librepcb/core/types/circuitidentifier.h>
 
 #include <QtCore>
@@ -59,7 +60,7 @@ public:
   void setName(const CircuitIdentifier& name) noexcept;
   void setValue(const QString& value) noexcept;
   void setAttributes(const AttributeList& attributes) noexcept;
-  void setDefaultDeviceUuid(const tl::optional<Uuid>& device) noexcept;
+  void setAssemblyOptions(const ComponentAssemblyOptionList& options) noexcept;
 
 private:
   // Private Methods
@@ -86,8 +87,8 @@ private:
   QString mNewValue;
   AttributeList mOldAttributes;
   AttributeList mNewAttributes;
-  tl::optional<Uuid> mOldDefaultDeviceUuid;
-  tl::optional<Uuid> mNewDefaultDeviceUuid;
+  ComponentAssemblyOptionList mOldAssemblyOptions;
+  ComponentAssemblyOptionList mNewAssemblyOptions;
 };
 
 /*******************************************************************************

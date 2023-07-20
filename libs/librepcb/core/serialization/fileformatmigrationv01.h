@@ -87,6 +87,7 @@ protected:
     QHash<Uuid, Symbol> symbols;
     QHash<Uuid, Component> components;
     QMap<Uuid, ComponentInstance> componentInstances;
+    QMap<Uuid, QSet<Uuid>> devicesUsedInBoards;
 
     // Counters for emitting messages.
     int removedErcApprovals = 0;
@@ -96,6 +97,7 @@ protected:
     int planeConnectNoneCount = 0;
     int footprintBoardOutlinesObjectCount = 0;
     int topLevelBoardOutlinesObjectCount = 0;
+    int componentsWithAssemblyOptions = 0;
   };
 
 public:
@@ -121,7 +123,7 @@ public:
 
 protected:  // Methods
   virtual void upgradeSettings(SExpression& root);
-  virtual void upgradeCircuit(SExpression& root);
+  virtual void upgradeCircuit(SExpression& root, ProjectContext& context);
   virtual void upgradeErc(SExpression& root, ProjectContext& context);
   virtual void upgradeSchematic(SExpression& root, ProjectContext& context);
   virtual void upgradeBoard(SExpression& root, ProjectContext& context);

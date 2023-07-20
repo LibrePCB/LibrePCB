@@ -331,6 +331,8 @@ add_library(
   project/bomgenerator.h
   project/circuit/circuit.cpp
   project/circuit/circuit.h
+  project/circuit/componentassemblyoption.cpp
+  project/circuit/componentassemblyoption.h
   project/circuit/componentinstance.cpp
   project/circuit/componentinstance.h
   project/circuit/componentsignalinstance.cpp

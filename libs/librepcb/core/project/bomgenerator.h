@@ -64,7 +64,10 @@ public:
   // Operator Overloadings
   BomGenerator& operator=(const BomGenerator& rhs) = delete;
 
-private:
+private:  // Methods
+  static void removeSubString(QString& str, const QString& substr) noexcept;
+
+private:  // Data
   const Project& mProject;
   QStringList mAdditionalAttributes;
 };

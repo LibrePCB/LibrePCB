@@ -75,6 +75,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
     mSelectedSymbVar(nullptr),
     mSelectedDevice(nullptr),
     mSelectedPackage(nullptr),
+    mSelectedPart(nullptr),
     mPreviewFootprintGraphicsItem(nullptr) {
   mUi->setupUi(this);
   mUi->treeComponents->setColumnCount(2);
@@ -182,26 +183,12 @@ void AddComponentDialog::setLocaleOrder(const QStringList& order) noexcept {
  *  Getters
  ******************************************************************************/
 
-tl::optional<Uuid> AddComponentDialog::getSelectedComponentUuid() const
-    noexcept {
-  if (mSelectedComponent && mSelectedSymbVar)
-    return mSelectedComponent->getUuid();
-  else
-    return tl::nullopt;
-}
-
-tl::optional<Uuid> AddComponentDialog::getSelectedSymbVarUuid() const noexcept {
-  if (mSelectedComponent && mSelectedSymbVar)
-    return mSelectedSymbVar->getUuid();
-  else
-    return tl::nullopt;
-}
-
-tl::optional<Uuid> AddComponentDialog::getSelectedDeviceUuid() const noexcept {
-  if (mSelectedComponent && mSelectedSymbVar && mSelectedDevice)
-    return mSelectedDevice->getUuid();
-  else
-    return tl::nullopt;
+tl::optional<Package::AssemblyType>
+    AddComponentDialog::getSelectedPackageAssemblyType() const noexcept {
+  return (mSelectedComponent && mSelectedSymbVar && mSelectedDevice &&
+          mSelectedPackage)
+      ? tl::make_optional(mSelectedPackage->getAssemblyType(false))
+      : tl::nullopt;
 }
 
 bool AddComponentDialog::getAutoOpenAgain() const noexcept {
@@ -213,9 +200,9 @@ bool AddComponentDialog::getAutoOpenAgain() const noexcept {
  ******************************************************************************/
 
 void AddComponentDialog::selectComponentByKeyword(
-    const QString keyword) noexcept {
+    const QString keyword, const tl::optional<Uuid>& selectedDevice) noexcept {
   try {
-    searchComponents(keyword, true);
+    searchComponents(keyword, selectedDevice, true);
   } catch (const Exception& e) {
     qCritical().noquote() << "Failed to pre-select component by keyword:"
                           << e.getMsg();
@@ -258,29 +245,39 @@ void AddComponentDialog::treeComponents_currentItemChanged(
   Q_UNUSED(previous);
   try {
     if (current) {
-      QTreeWidgetItem* cmpItem =
-          current->parent() ? current->parent() : current;
+      QTreeWidgetItem* partItem = current;
+      QTreeWidgetItem* devItem = current->parent();
+      QTreeWidgetItem* cmpItem = devItem ? devItem->parent() : nullptr;
+      while (!cmpItem) {
+        cmpItem = devItem;
+        devItem = partItem;
+        partItem = nullptr;
+      }
       FilePath cmpFp = FilePath(cmpItem->data(0, Qt::UserRole).toString());
       if ((!mSelectedComponent) ||
           (mSelectedComponent->getDirectory().getAbsPath() != cmpFp)) {
-        Component* component =
+        std::shared_ptr<Component> component(
             Component::open(std::unique_ptr<TransactionalDirectory>(
                                 new TransactionalDirectory(
                                     TransactionalFileSystem::openRO(cmpFp))))
-                .release();
+                .release());
         setSelectedComponent(component);
       }
-      if (current->parent()) {
-        FilePath devFp = FilePath(current->data(0, Qt::UserRole).toString());
+      if (devItem) {
+        FilePath devFp = FilePath(devItem->data(0, Qt::UserRole).toString());
         if ((!mSelectedDevice) ||
             (mSelectedDevice->getDirectory().getAbsPath() != devFp)) {
-          Device* device =
+          std::shared_ptr<Device> device(
               Device::open(std::unique_ptr<TransactionalDirectory>(
                                new TransactionalDirectory(
                                    TransactionalFileSystem::openRO(devFp))))
-                  .release();
+                  .release());
           setSelectedDevice(device);
         }
+        setSelectedPart(
+            partItem
+                ? partItem->data(0, Qt::UserRole).value<std::shared_ptr<Part>>()
+                : nullptr);
       } else {
         setSelectedDevice(nullptr);
       }
@@ -318,39 +315,64 @@ void AddComponentDialog::cbxSymbVar_currentIndexChanged(int index) noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void AddComponentDialog::searchComponents(const QString& input,
-                                          bool selectFirstResult) {
+void AddComponentDialog::searchComponents(
+    const QString& input, const tl::optional<Uuid>& selectedDevice,
+    bool selectFirstResult) {
   mCurrentSearchTerm = input;
   setSelectedComponent(nullptr);
   mUi->treeComponents->clear();
 
+  QTreeWidgetItem* selectedDeviceItem = nullptr;
+
   // min. 2 chars to avoid freeze on entering first character due to huge result
   if (input.length() > 1) {
-    SearchResult result = searchComponentsAndDevices(input);
-    QHashIterator<FilePath, SearchResultComponent> cmpIt(result);
-    while (cmpIt.hasNext()) {
-      cmpIt.next();
+    SearchResult result = search(input);
+    const bool expandAllDevices =
+        (result.partsCount <= 15) || (result.deviceCount <= 1);
+    const bool expandAllComponents =
+        (result.deviceCount <= 10) || (result.components.count() <= 1);
+    for (auto cmpIt = result.components.begin();
+         cmpIt != result.components.end(); ++cmpIt) {
       QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
+      cmpItem->setIcon(0, QIcon(":/img/library/symbol.png"));
       cmpItem->setText(0, cmpIt.value().name);
       cmpItem->setData(0, Qt::UserRole, cmpIt.key().toStr());
-      QHashIterator<FilePath, SearchResultDevice> devIt(cmpIt.value().devices);
-      while (devIt.hasNext()) {
-        devIt.next();
+      for (auto devIt = cmpIt->devices.begin(); devIt != cmpIt->devices.end();
+           ++devIt) {
         QTreeWidgetItem* devItem = new QTreeWidgetItem(cmpItem);
+        devItem->setIcon(0, QIcon(":/img/library/device.png"));
         devItem->setText(0, devIt.value().name);
         devItem->setData(0, Qt::UserRole, devIt.key().toStr());
         devItem->setText(1, devIt.value().pkgName);
         devItem->setTextAlignment(1, Qt::AlignRight);
+        QFont font = devItem->font(1);
+        font.setItalic(true);
+        devItem->setFont(1, font);
+        for (const auto& partPtr : devIt->parts.values()) {
+          addPartItem(partPtr, devItem);
+        }
+        devItem->setExpanded(
+            ((!cmpIt.value().match) && (!devIt.value().match)) ||
+            expandAllDevices);
+        if (devIt.value().uuid == selectedDevice) {
+          selectedDeviceItem = devItem;
+        }
       }
       cmpItem->setText(1, QString("[%1]").arg(cmpIt.value().devices.count()));
       cmpItem->setTextAlignment(1, Qt::AlignRight);
-      cmpItem->setExpanded(!cmpIt.value().match);
+      cmpItem->setExpanded((!cmpIt.value().match) || expandAllComponents);
     }
   }
 
   mUi->treeComponents->sortByColumn(0, Qt::AscendingOrder);
 
-  if (selectFirstResult) {
+  if (selectedDeviceItem) {
+    mUi->treeComponents->setCurrentItem(selectedDeviceItem);
+    while (selectedDeviceItem->parent()) {
+      selectedDeviceItem->parent()->setExpanded(true);
+      selectedDeviceItem = selectedDeviceItem->parent();
+    }
+  } else if (selectFirstResult) {
     if (QTreeWidgetItem* cmpItem = mUi->treeComponents->topLevelItem(0)) {
       cmpItem->setExpanded(true);
       if (QTreeWidgetItem* devItem = cmpItem->child(0)) {
@@ -362,33 +384,24 @@ void AddComponentDialog::searchComponents(const QString& input,
   }
 }
 
-AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
+AddComponentDialog::SearchResult AddComponentDialog::search(
     const QString& input) {
   SearchResult result;
-  // add matching devices and their corresponding components
-  QList<Uuid> devices = mDb.find<Device>(input);  // can throw
-  foreach (const Uuid& devUuid, devices) {
-    FilePath devFp = mDb.getLatest<Device>(devUuid);  // can throw
-    if (!devFp.isValid()) continue;
-    Uuid cmpUuid = Uuid::createRandom();
-    Uuid pkgUuid = Uuid::createRandom();
-    mDb.getDeviceMetadata(devFp, &cmpUuid,
-                          &pkgUuid);  // can throw
-    FilePath cmpFp = mDb.getLatest<Component>(cmpUuid);  // can throw
-    if (!cmpFp.isValid()) continue;
-    FilePath pkgFp = mDb.getLatest<Package>(pkgUuid);  // can throw
-    SearchResultDevice& resDev = result[cmpFp].devices[devFp];
-    resDev.pkgFp = pkgFp;
-    resDev.match = true;
-  }
 
-  // add matching components and all their devices
-  QList<Uuid> components = mDb.find<Component>(input);  // can throw
-  foreach (const Uuid& cmpUuid, components) {
+  // Find in library database.
+  const QList<Uuid> matchingComponents =
+      mDb.find<Component>(input);  // can throw
+  const QList<Uuid> matchingDevices = mDb.find<Device>(input);  // can throw
+  const QList<Uuid> matchingPartDevices =
+      mDb.findDevicesOfParts(input);  // can throw
+
+  // Add matching components and all their devices and parts.
+  QSet<Uuid> fullyAddedDevices;
+  foreach (const Uuid& cmpUuid, matchingComponents) {
     FilePath cmpFp = mDb.getLatest<Component>(cmpUuid);  // can throw
     if (!cmpFp.isValid()) continue;
     QSet<Uuid> devices = mDb.getComponentDevices(cmpUuid);  // can throw
-    SearchResultComponent& resCmp = result[cmpFp];
+    SearchResultComponent& resCmp = result.components[cmpFp];
     resCmp.match = true;
     foreach (const Uuid& devUuid, devices) {
       FilePath devFp = mDb.getLatest<Device>(devUuid);  // can throw
@@ -399,18 +412,71 @@ AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
                             &pkgUuid);  // can throw
       FilePath pkgFp = mDb.getLatest<Package>(pkgUuid);  // can throw
       SearchResultDevice& resDev = resCmp.devices[devFp];
+      resDev.uuid = devUuid;
       resDev.pkgFp = pkgFp;
+      resDev.match = matchingDevices.contains(devUuid);
+      const QList<WorkspaceLibraryDb::Part> parts =
+          mDb.getDeviceParts(devUuid);  // can throw
+      foreach (const WorkspaceLibraryDb::Part& part, parts) {
+        resDev.parts.append(std::make_shared<Part>(
+            SimpleString(part.mpn), SimpleString(part.manufacturer),
+            part.attributes));
+      }
+      fullyAddedDevices.insert(devUuid);
     }
   }
 
-  // get name of elements
-  QMutableHashIterator<FilePath, SearchResultComponent> resultIt(result);
-  while (resultIt.hasNext()) {
-    resultIt.next();
-    mDb.getTranslations<Component>(resultIt.key(), mLocaleOrder,
-                                   &resultIt.value().name);
+  // Add matching devices + parts and their corresponding components.
+  QList<Uuid> devices = matchingPartDevices;
+  foreach (const Uuid& uuid, matchingDevices) {
+    if (!devices.contains(uuid)) {
+      devices.append(uuid);
+    }
+  }
+  devices.erase(std::remove_if(devices.begin(), devices.end(),
+                               [&fullyAddedDevices](const Uuid& uuid) {
+                                 return fullyAddedDevices.contains(uuid);
+                               }),
+                devices.end());
+  foreach (const Uuid& devUuid, devices) {
+    FilePath devFp = mDb.getLatest<Device>(devUuid);  // can throw
+    if (!devFp.isValid()) continue;
+    Uuid cmpUuid = Uuid::createRandom();
+    Uuid pkgUuid = Uuid::createRandom();
+    mDb.getDeviceMetadata(devFp, &cmpUuid,
+                          &pkgUuid);  // can throw
+    const FilePath cmpFp = mDb.getLatest<Component>(cmpUuid);  // can throw
+    if (!cmpFp.isValid()) continue;
+    SearchResultDevice& resDev = result.components[cmpFp].devices[devFp];
+    FilePath pkgFp = mDb.getLatest<Package>(pkgUuid);  // can throw
+    resDev.uuid = devUuid;
+    resDev.pkgFp = pkgFp;
+    resDev.match = matchingDevices.contains(devUuid);
+
+    QList<WorkspaceLibraryDb::Part> parts;
+    if (resDev.match) {
+      // List all parts of device.
+      parts = mDb.getDeviceParts(devUuid);  // can throw
+    } else {
+      // List only matched parts of device.
+      parts = mDb.findPartsOfDevice(devUuid, input);  // can throw
+    }
+    foreach (const WorkspaceLibraryDb::Part& part, parts) {
+      resDev.parts.append(std::make_shared<Part>(
+          SimpleString(part.mpn), SimpleString(part.manufacturer),
+          part.attributes));
+    }
+  }
+
+  // Get name of elements.
+  QMutableHashIterator<FilePath, SearchResultComponent> cmpIt(
+      result.components);
+  while (cmpIt.hasNext()) {
+    cmpIt.next();
+    mDb.getTranslations<Component>(cmpIt.key(), mLocaleOrder,
+                                   &cmpIt.value().name);
     QMutableHashIterator<FilePath, SearchResultDevice> devIt(
-        resultIt.value().devices);
+        cmpIt.value().devices);
     while (devIt.hasNext()) {
       devIt.next();
       mDb.getTranslations<Device>(devIt.key(), mLocaleOrder,
@@ -419,6 +485,14 @@ AddComponentDialog::SearchResult AddComponentDialog::searchComponentsAndDevices(
         mDb.getTranslations<Package>(devIt.value().pkgFp, mLocaleOrder,
                                      &devIt.value().pkgName);
       }
+    }
+  }
+
+  // Count number it items.
+  foreach (const SearchResultComponent& cmp, result.components) {
+    result.deviceCount += cmp.devices.count();
+    foreach (const SearchResultDevice& dev, cmp.devices) {
+      result.partsCount += dev.parts.count();
     }
   }
 
@@ -440,6 +514,7 @@ void AddComponentDialog::setSelectedCategory(
     QString cmpName;
     mDb.getTranslations<Component>(cmpFp, mLocaleOrder, &cmpName);
     QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
+    cmpItem->setIcon(0, QIcon(":/img/library/symbol.png"));
     cmpItem->setText(0, cmpName);
     cmpItem->setData(0, Qt::UserRole, cmpFp.toStr());
     // devices
@@ -451,6 +526,7 @@ void AddComponentDialog::setSelectedCategory(
         QString devName;
         mDb.getTranslations<Device>(devFp, mLocaleOrder, &devName);
         QTreeWidgetItem* devItem = new QTreeWidgetItem(cmpItem);
+        devItem->setIcon(0, QIcon(":/img/library/device.png"));
         devItem->setText(0, devName);
         devItem->setData(0, Qt::UserRole, devFp.toStr());
         // package
@@ -463,6 +539,18 @@ void AddComponentDialog::setSelectedCategory(
           mDb.getTranslations<Package>(pkgFp, mLocaleOrder, &pkgName);
           devItem->setText(1, pkgName);
           devItem->setTextAlignment(1, Qt::AlignRight);
+          QFont font = devItem->font(1);
+          font.setItalic(true);
+          devItem->setFont(1, font);
+        }
+        // Parts
+        const QList<WorkspaceLibraryDb::Part> parts =
+            mDb.getDeviceParts(devUuid);
+        foreach (const WorkspaceLibraryDb::Part& partInfo, parts) {
+          std::shared_ptr<Part> part = std::make_shared<Part>(
+              SimpleString(partInfo.mpn), SimpleString(partInfo.manufacturer),
+              partInfo.attributes);
+          addPartItem(part, devItem);
         }
       } catch (const Exception& e) {
         // what could we do here?
@@ -475,15 +563,16 @@ void AddComponentDialog::setSelectedCategory(
   mUi->treeComponents->sortByColumn(0, Qt::AscendingOrder);
 }
 
-void AddComponentDialog::setSelectedComponent(const Component* cmp) {
-  if (cmp && (cmp == mSelectedComponent.get())) return;
+void AddComponentDialog::setSelectedComponent(
+    std::shared_ptr<const Component> cmp) {
+  if (cmp && (cmp == mSelectedComponent)) return;
 
   mUi->lblCompName->setText(tr("No component selected"));
   mUi->lblCompDescription->clear();
   mUi->cbxSymbVar->clear();
   setSelectedDevice(nullptr);
   setSelectedSymbVar(nullptr);
-  mSelectedComponent.reset(cmp);
+  mSelectedComponent = cmp;
 
   if (mSelectedComponent) {
     mUi->lblCompName->setText(*cmp->getNames().value(mLocaleOrder));
@@ -539,13 +628,14 @@ void AddComponentDialog::setSelectedSymbVar(
   }
 }
 
-void AddComponentDialog::setSelectedDevice(const Device* dev) {
-  if (dev && (dev == mSelectedDevice.data())) return;
+void AddComponentDialog::setSelectedDevice(std::shared_ptr<const Device> dev) {
+  if (dev && (dev == mSelectedDevice)) return;
 
   mUi->lblDeviceName->setText(tr("No device selected"));
   mPreviewFootprintGraphicsItem.reset();
   mSelectedPackage.reset();
-  mSelectedDevice.reset(dev);
+  setSelectedPart(nullptr);
+  mSelectedDevice = dev;
 
   if (mSelectedDevice) {
     FilePath pkgFp = mDb.getLatest<Package>(mSelectedDevice->getPackageUuid());
@@ -570,6 +660,32 @@ void AddComponentDialog::setSelectedDevice(const Device* dev) {
       }
     }
   }
+}
+
+void AddComponentDialog::setSelectedPart(std::shared_ptr<const Part> part) {
+  if (part && (part == mSelectedPart)) return;
+
+  mSelectedPart = part;
+}
+
+void AddComponentDialog::addPartItem(std::shared_ptr<Part> part,
+                                     QTreeWidgetItem* parent) {
+  QString text = *part->getMpn();
+  if (!part->getManufacturer()->isEmpty()) {
+    text += " | " % *part->getManufacturer();
+  }
+
+  QTreeWidgetItem* item = new QTreeWidgetItem(parent);
+  item->setIcon(0, QIcon(":/img/library/part.png"));
+  item->setText(0, text);
+  item->setText(1, part->getAttributeValuesTr().join(", "));
+  item->setToolTip(1, part->getAttributeKeyValuesTr().join("\n"));
+  item->setTextAlignment(1, Qt::AlignRight);
+  item->setData(0, Qt::UserRole, QVariant::fromValue(part));
+
+  QFont font = item->font(1);
+  font.setItalic(true);
+  item->setFont(1, font);
 }
 
 void AddComponentDialog::accept() noexcept {

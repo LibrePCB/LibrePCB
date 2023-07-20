@@ -61,6 +61,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
     mLocaleOrder(),
     mNormOrder(),
     mCustomBomAttributes(),
+    mDefaultLockComponentAssembly(false),
     mPrimaryBoard(nullptr) {
   // Check if the file extension is correct
   if (!mFilename.endsWith(".lpp")) {
@@ -175,6 +176,10 @@ void Project::setCustomBomAttributes(const QStringList& newKeys) noexcept {
   if (newKeys != mCustomBomAttributes) {
     mCustomBomAttributes = newKeys;
   }
+}
+
+void Project::setDefaultLockComponentAssembly(bool newLock) noexcept {
+  mDefaultLockComponentAssembly = newLock;
 }
 
 bool Project::setErcMessageApprovals(
@@ -422,6 +427,9 @@ void Project::save() {
       }
       node.ensureLineBreak();
     }
+    root.ensureLineBreak();
+    root.appendChild("default_lock_component_assembly",
+                     mDefaultLockComponentAssembly);
     root.ensureLineBreak();
     mDirectory->write("project/settings.lp", root.toByteArray());
   }

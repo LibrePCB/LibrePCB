@@ -96,7 +96,6 @@ private:  // Methods
   void checkCourtyardClearances(int progressEnd);
   void checkBoardOutline(int progressEnd);
   void checkForUnplacedComponents(int progressEnd);
-  void checkCircuitDefaultDevices(int progressEnd);
   void checkForMissingConnections(int progressEnd);
   void checkForStaleObjects(int progressEnd);
   template <typename THole>

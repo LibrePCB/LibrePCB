@@ -42,12 +42,12 @@ namespace editor {
 
 CmdComponentInstanceAdd::CmdComponentInstanceAdd(
     Circuit& circuit, const Uuid& cmp, const Uuid& symbVar,
-    const tl::optional<Uuid>& defaultDevice) noexcept
+    const ComponentAssemblyOptionList& options) noexcept
   : UndoCommand(tr("Add component")),
     mCircuit(circuit),
     mComponentUuid(cmp),
     mSymbVarUuid(symbVar),
-    mDefaultDeviceUuid(defaultDevice),
+    mAssemblyOptions(options),
     mComponentInstance(nullptr) {
 }
 
@@ -57,7 +57,7 @@ CmdComponentInstanceAdd::CmdComponentInstanceAdd(
     mCircuit(circuit),
     mComponentUuid(Uuid::createRandom()),
     mSymbVarUuid(Uuid::createRandom()),
-    mDefaultDeviceUuid(),
+    mAssemblyOptions(),
     mComponentInstance(component) {
 }
 
@@ -82,10 +82,10 @@ bool CmdComponentInstanceAdd::performExecute() {
     const QStringList& normOrder = mCircuit.getProject().getNormOrder();
     QString name = mCircuit.generateAutoComponentInstanceName(
         cmp->getPrefixes().value(normOrder));
-    mComponentInstance =
-        new ComponentInstance(mCircuit, Uuid::createRandom(), *cmp,
-                              mSymbVarUuid, CircuitIdentifier(name),
-                              mDefaultDeviceUuid);  // can throw
+    mComponentInstance = new ComponentInstance(
+        mCircuit, Uuid::createRandom(), *cmp, mSymbVarUuid,
+        CircuitIdentifier(name));  // can throw
+    mComponentInstance->setAssemblyOptions(mAssemblyOptions);
   }
 
   performRedo();  // can throw

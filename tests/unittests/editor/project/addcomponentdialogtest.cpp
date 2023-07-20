@@ -213,9 +213,9 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
   EXPECT_EQ("var 2", cbxSymbVar.currentText().toStdString());
 
   // Check getters
-  EXPECT_EQ(str(uuid(4)), str(dialog.getSelectedComponentUuid()));
-  EXPECT_EQ(str(uuid(8)), str(dialog.getSelectedSymbVarUuid()));
-  EXPECT_EQ(str(tl::nullopt), str(dialog.getSelectedDeviceUuid()));
+  EXPECT_EQ(str(uuid(4)), str(dialog.getSelectedComponent()->getUuid()));
+  EXPECT_EQ(str(uuid(8)), str(dialog.getSelectedSymbolVariant()->getUuid()));
+  EXPECT_EQ(nullptr, dialog.getSelectedDevice());
 
   // Now select dev 1
   QModelIndex dev1Index = cmpView.model()->index(0, 0, cmp2Index);
@@ -224,9 +224,9 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
   EXPECT_EQ("dev 1 [pkg 1]", lblDevName.text().toStdString());
 
   // Check getters again
-  EXPECT_EQ(str(uuid(4)), str(dialog.getSelectedComponentUuid()));
-  EXPECT_EQ(str(uuid(8)), str(dialog.getSelectedSymbVarUuid()));
-  EXPECT_EQ(str(uuid(6)), str(dialog.getSelectedDeviceUuid()));
+  EXPECT_EQ(str(uuid(4)), str(dialog.getSelectedComponent()->getUuid()));
+  EXPECT_EQ(str(uuid(8)), str(dialog.getSelectedSymbolVariant()->getUuid()));
+  EXPECT_EQ(str(uuid(6)), str(dialog.getSelectedDevice()->getUuid()));
 }
 
 TEST_F(AddComponentDialogTest, testSetNormOrder) {

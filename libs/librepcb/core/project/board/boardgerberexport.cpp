@@ -171,19 +171,16 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
       }
 
       // Export component center and attributes.
-      ProjectAttributeLookup lookup(*device);
-      Angle rotation = device->getRotation();
-      QString designator = *device->getComponentInstance().getName();
-      QString value =
+      ProjectAttributeLookup lookup(*device, device->getParts().value(0));
+      const Angle rotation = device->getRotation();
+      const QString designator = *device->getComponentInstance().getName();
+      const QString value =
           AttributeSubstitutor::substitute(lookup("VALUE"), lookup).trimmed();
-      QString manufacturer =
-          AttributeSubstitutor::substitute("{{MANUFACTURER}}", lookup)
-              .trimmed();
-      QString mpn = AttributeSubstitutor::substitute(
-                        "{{MPN or PARTNUMBER or DEVICE}}", lookup)
-                        .trimmed();
+      const QString mpn = lookup("MPN").simplified();
+      const QString manufacturer = lookup("MANUFACTURER").simplified();
+
       // Note: Always use english locale to make PnP files portable.
-      QString footprintName =
+      const QString footprintName =
           *device->getLibPackage().getNames().getDefaultValue();
       gen.flashComponent(device->getPosition(), rotation, designator, value,
                          mountType, manufacturer, mpn, footprintName);
@@ -249,7 +246,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
     int padNumber = 1;
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       if (pad->getLibPad().getFunctionIsFiducial() && pad->isOnLayer(cuLayer)) {
-        ProjectAttributeLookup lookup(*device);
+        ProjectAttributeLookup lookup(*device, nullptr);
         const QString designator =
             QString("%1:%2")
                 .arg(*device->getComponentInstance().getName())

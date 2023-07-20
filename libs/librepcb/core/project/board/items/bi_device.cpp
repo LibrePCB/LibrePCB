@@ -24,6 +24,7 @@
 
 #include "../../../library/cmp/component.h"
 #include "../../../library/dev/device.h"
+#include "../../../library/dev/part.h"
 #include "../../../library/pkg/package.h"
 #include "../../../library/sym/symbol.h"
 #include "../../../utils/scopeguardlist.h"
@@ -192,6 +193,19 @@ tl::optional<Uuid> BI_Device::getDefaultLibModelUuid() const noexcept {
     return model->getUuid();
   }
   return tl::nullopt;
+}
+
+QVector<std::shared_ptr<const Part>> BI_Device::getParts() const noexcept {
+  QVector<std::shared_ptr<const Part>> parts;
+  for (const ComponentAssemblyOption& opt :
+       mCompInstance.getAssemblyOptions()) {
+    if (opt.getDevice() == mLibDevice->getUuid()) {
+      for (auto it = opt.getParts().begin(); it != opt.getParts().end(); ++it) {
+        parts.append(it.ptr());
+      }
+    }
+  }
+  return parts;
 }
 
 bool BI_Device::isUsed() const noexcept {
