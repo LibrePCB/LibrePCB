@@ -27,6 +27,7 @@
 
 #include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/export/pickplacecsvwriter.h>
+#include <librepcb/core/export/pickplacedata.h>
 #include <librepcb/core/fileio/csvfile.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/boardgerberexport.h>
@@ -69,6 +70,7 @@ BoardPickPlaceGeneratorDialog::BoardPickPlaceGeneratorDialog(
   }
   mUi->edtTopFilePath->setText(outPath % "_TOP.csv");
   mUi->edtBottomFilePath->setText(outPath % "_BOT.csv");
+  mUi->lblNote->setText("ⓘ " % mUi->lblNote->text());
   mBtnGenerate =
       mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::AcceptRole);
   mBtnGenerate->setDefault(true);
@@ -191,6 +193,7 @@ void BoardPickPlaceGeneratorDialog::updateData() noexcept {
     mData = gen.generate();
 
     PickPlaceCsvWriter writer(*mData);
+    writer.setIncludeNonMountedParts(true);
     std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
     mUi->tableWidget->setRowCount(csv->getValues().count());
     mUi->tableWidget->setColumnCount(csv->getHeader().count());
@@ -203,7 +206,12 @@ void BoardPickPlaceGeneratorDialog::updateData() noexcept {
       for (int row = 0; row < csv->getValues().count(); ++row) {
         QString text = csv->getValues()[row][column];
         text.replace("\n", " ");
-        mUi->tableWidget->setItem(row, column, new QTableWidgetItem(text));
+        QTableWidgetItem* item = new QTableWidgetItem(text);
+        if ((row >= mData->getItems().count()) ||
+            (!mData->getItems().at(row).isMount())) {
+          item->setBackground(Qt::gray);
+        }
+        mUi->tableWidget->setItem(row, column, item);
       }
     }
     mUi->tableWidget->resizeRowsToContents();

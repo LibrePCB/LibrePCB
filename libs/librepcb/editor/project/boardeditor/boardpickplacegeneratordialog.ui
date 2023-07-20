@@ -147,6 +147,18 @@
       </widget>
      </item>
      <item>
+      <widget class="QLabel" name="lblNote">
+       <property name="font">
+        <font>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>Gray rows are not exported (do not mount).</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QDialogButtonBox" name="buttonBox">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

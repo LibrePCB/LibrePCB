@@ -94,9 +94,9 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
         const Angle rotation =
             pad->getMirrored() ? -pad->getRotation() : pad->getRotation();
         foreach (const auto side, sides) {
-          items.append(PickPlaceDataItem(designator, value, devName, pkgName,
-                                         pad->getPosition(), rotation, side,
-                                         PickPlaceDataItem::Type::Fiducial));
+          items.append(PickPlaceDataItem(
+              designator, value, devName, pkgName, pad->getPosition(), rotation,
+              side, PickPlaceDataItem::Type::Fiducial, true));
         }
       }
     }
@@ -110,20 +110,18 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
     }
 
     // Export device only if it is contained in the assembly variant.
-    if (part) {
-      const Point position = device->getPosition();
-      const Angle rotation = device->getMirrored() ? -device->getRotation()
-                                                   : device->getRotation();
-      const PickPlaceDataItem::BoardSide boardSide = device->getMirrored()
-          ? PickPlaceDataItem::BoardSide::Bottom
-          : PickPlaceDataItem::BoardSide::Top;
-      const PickPlaceDataItem::Type assemblyType =
-          types.value(device->getLibPackage().getAssemblyType(true),
-                      PickPlaceDataItem::Type::Other);
-      items.append(PickPlaceDataItem(designator, value, devName, pkgName,
-                                     position, rotation, boardSide,
-                                     assemblyType));
-    }
+    const Point position = device->getPosition();
+    const Angle rotation =
+        device->getMirrored() ? -device->getRotation() : device->getRotation();
+    const PickPlaceDataItem::BoardSide boardSide = device->getMirrored()
+        ? PickPlaceDataItem::BoardSide::Bottom
+        : PickPlaceDataItem::BoardSide::Top;
+    const PickPlaceDataItem::Type assemblyType =
+        types.value(device->getLibPackage().getAssemblyType(true),
+                    PickPlaceDataItem::Type::Other);
+    items.append(PickPlaceDataItem(designator, value, devName, pkgName,
+                                   position, rotation, boardSide, assemblyType,
+                                   part ? true : false));
 
     // Add all items.
     for (const PickPlaceDataItem& item : items) {

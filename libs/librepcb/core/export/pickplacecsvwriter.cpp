@@ -38,7 +38,10 @@ namespace librepcb {
  ******************************************************************************/
 
 PickPlaceCsvWriter::PickPlaceCsvWriter(const PickPlaceData& data) noexcept
-  : mData(data), mBoardSide(BoardSide::BOTH), mIncludeMetadataComment(true) {
+  : mData(data),
+    mBoardSide(BoardSide::BOTH),
+    mIncludeMetadataComment(true),
+    mIncludeNonMountedParts(false) {
 }
 
 PickPlaceCsvWriter::~PickPlaceCsvWriter() noexcept {
@@ -95,7 +98,8 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
                    "Position Y", "Rotation", "Side", "Type"});
 
   foreach (const PickPlaceDataItem& item, mData.getItems()) {
-    if (isOnBoardSide(item, mBoardSide)) {
+    if (isOnBoardSide(item, mBoardSide) &&
+        (item.isMount() || mIncludeNonMountedParts)) {
       QStringList values;
       values += item.getDesignator();
       values += item.getValue();
