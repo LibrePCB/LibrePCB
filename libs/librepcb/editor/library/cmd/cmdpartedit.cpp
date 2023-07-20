@@ -50,7 +50,7 @@ CmdPartEdit::~CmdPartEdit() noexcept {
  *  Setters
  ******************************************************************************/
 
-void CmdPartEdit::setMpn(const ElementName& value) noexcept {
+void CmdPartEdit::setMpn(const SimpleString& value) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewMpn = value;
 }

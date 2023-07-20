@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include "../../attribute/attribute.h"
 #include "../../serialization/serializableobjectlist.h"
-#include "../../types/elementname.h"
 #include "../../types/simplestring.h"
 
 #include <QtCore>
@@ -61,12 +60,13 @@ public:
   Part() = delete;
   Part(const Part& other) noexcept;
   explicit Part(const SExpression& node);
-  Part(const ElementName& mpn, const SimpleString& manufacturer,
+  Part(const SimpleString& mpn, const SimpleString& manufacturer,
        const AttributeList& attributes) noexcept;
   ~Part() noexcept;
 
   // Getters
-  const ElementName& getMpn() const noexcept { return mMpn; }
+  bool isEmpty() const noexcept;
+  const SimpleString& getMpn() const noexcept { return mMpn; }
   const SimpleString& getManufacturer() const noexcept { return mManufacturer; }
   AttributeList& getAttributes() noexcept { return mAttributes; }
   const AttributeList& getAttributes() const noexcept { return mAttributes; }
@@ -74,7 +74,7 @@ public:
   QStringList getAttributeKeyValuesTr() const noexcept;
 
   // Setters
-  void setMpn(const ElementName& value) noexcept;
+  void setMpn(const SimpleString& value) noexcept;
   void setManufacturer(const SimpleString& value) noexcept;
 
   // General Methods
@@ -97,7 +97,7 @@ private:  // Methods
                            AttributeList::Event event) noexcept;
 
 private:  // Data
-  ElementName mMpn;
+  SimpleString mMpn;
   SimpleString mManufacturer;
   AttributeList mAttributes;
 

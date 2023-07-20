@@ -330,10 +330,12 @@ int WorkspaceLibraryScanner::addElementToDb<Device>(
       element.getPackageUuid());
   addToCategories(writer, id, element);
   for (const Part& part : element.getParts()) {
-    const int partId =
-        writer.addPart(id, part.getMpn(), *part.getManufacturer());
-    for (const Attribute& attribute : part.getAttributes()) {
-      writer.addPartAttribute(partId, attribute);
+    if (!part.isEmpty()) {
+      const int partId =
+          writer.addPart(id, *part.getMpn(), *part.getManufacturer());
+      for (const Attribute& attribute : part.getAttributes()) {
+        writer.addPartAttribute(partId, attribute);
+      }
     }
   }
   return id;

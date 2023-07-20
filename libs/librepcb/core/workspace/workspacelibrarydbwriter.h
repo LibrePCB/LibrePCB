@@ -176,7 +176,7 @@ public:
    * @param manufacturer  Manufacturer name.
    * @return ID of the added part.
    */
-  int addPart(int devId, const ElementName& mpn, const QString& manufacturer);
+  int addPart(int devId, const QString& mpn, const QString& manufacturer);
 
   /**
    * @brief Add an attribute to a previously added part

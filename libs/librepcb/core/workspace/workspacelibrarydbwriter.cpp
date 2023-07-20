@@ -355,14 +355,14 @@ int WorkspaceLibraryDbWriter::addDevice(int libId, const FilePath& fp,
   return mDb.insert(query);
 }
 
-int WorkspaceLibraryDbWriter::addPart(int devId, const ElementName& mpn,
+int WorkspaceLibraryDbWriter::addPart(int devId, const QString& mpn,
                                       const QString& manufacturer) {
   QSqlQuery query = mDb.prepareQuery(
       "INSERT INTO parts "
       "(device_id, mpn, manufacturer) VALUES "
       "(:device_id, :mpn, :manufacturer)");
   query.bindValue(":device_id", devId);
-  query.bindValue(":mpn", *mpn);
+  query.bindValue(":mpn", nonNull(mpn));
   query.bindValue(":manufacturer", nonNull(manufacturer));
   return mDb.insert(query);
 }

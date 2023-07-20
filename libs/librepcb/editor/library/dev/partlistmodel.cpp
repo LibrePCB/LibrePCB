@@ -92,7 +92,7 @@ void PartListModel::add(const QPersistentModelIndex& itemIndex) noexcept {
 
   try {
     std::shared_ptr<Part> obj = std::make_shared<Part>(
-        ElementName(mNewMpn), SimpleString(mNewManufacturer),
+        SimpleString(mNewMpn), SimpleString(mNewManufacturer),
         AttributeList());  // can throw
     execCmd(new CmdPartInsert(*mPartList, obj));
     mNewMpn.clear();
@@ -190,6 +190,8 @@ QVariant PartListModel::data(const QModelIndex& index, int role) const {
 
   if ((!item) && (mPartList->isEmpty()) && (role == Qt::BackgroundRole)) {
     return QBrush(Qt::red);
+  } else if ((item) && (item->isEmpty()) && (role == Qt::BackgroundRole)) {
+    return QBrush(Qt::red);
   }
 
   switch (index.column()) {
@@ -201,7 +203,11 @@ QVariant PartListModel::data(const QModelIndex& index, int role) const {
         case Qt::ToolTipRole:
           return item
               ? QVariant()
-              : tr("Exact part number without placeholders (mandatory)");
+              : tr("Exact manufacturer part number (without placeholders)");
+        case Qt::BackgroundRole:
+          return (item && item->getMpn()->isEmpty())
+              ? QVariant(QBrush(Qt::yellow))
+              : QVariant();
         default:
           return QVariant();
       }
@@ -212,8 +218,7 @@ QVariant PartListModel::data(const QModelIndex& index, int role) const {
         case Qt::EditRole:
           return item ? *item->getManufacturer() : mNewManufacturer;
         case Qt::ToolTipRole:
-          return item ? QVariant()
-                      : tr("Name of the manufacturer (recommended)");
+          return item ? QVariant() : tr("Name of the manufacturer");
         case Qt::BackgroundRole:
           return (item && item->getManufacturer()->isEmpty())
               ? QVariant(QBrush(Qt::yellow))
@@ -245,7 +250,7 @@ QVariant PartListModel::headerData(int section, Qt::Orientation orientation,
     if (role == Qt::DisplayRole) {
       switch (section) {
         case COLUMN_MPN:
-          return tr("MPN");
+          return tr("Part Number");
         case COLUMN_MANUFACTURER:
           return tr("Manufacturer");
         case COLUMN_ATTRIBUTES:
@@ -290,17 +295,17 @@ bool PartListModel::setData(const QModelIndex& index, const QVariant& value,
       cmd.reset(new CmdPartEdit(*item));
     }
     if ((index.column() == COLUMN_MPN) && role == Qt::EditRole) {
-      const QString cleaned = cleanElementName(value.toString());
+      const SimpleString cleaned = cleanSimpleString(value.toString());
       if (cmd) {
-        cmd->setMpn(ElementName(cleaned));  // can throw
+        cmd->setMpn(cleaned);
       } else {
-        mNewMpn = cleaned;
+        mNewMpn = *cleaned;
       }
     } else if ((index.column() == COLUMN_MANUFACTURER) &&
                role == Qt::EditRole) {
       const SimpleString cleaned = cleanSimpleString(value.toString());
       if (cmd) {
-        cmd->setManufacturer(cleaned);  // can throw
+        cmd->setManufacturer(cleaned);
       } else {
         mNewManufacturer = *cleaned;
       }

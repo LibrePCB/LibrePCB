@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../attribute/attribute.h"
+#include "../attribute/attributetype.h"
 #include "../fileio/filepath.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
@@ -61,6 +62,43 @@ public:
     QString mpn;
     QString manufacturer;
     AttributeList attributes;
+
+    bool operator==(const Part& rhs) const noexcept {
+      return (mpn == rhs.mpn) && (manufacturer == rhs.manufacturer) &&
+          (attributes == rhs.attributes);
+    }
+    bool operator<(const Part& rhs) const noexcept {
+      if (mpn.isEmpty() != rhs.mpn.isEmpty()) {
+        return mpn.count() < rhs.mpn.count();
+      }
+      if (mpn != rhs.mpn) {
+        return mpn < rhs.mpn;
+      }
+      if (manufacturer != rhs.manufacturer) {
+        return manufacturer < rhs.manufacturer;
+      }
+      QCollator collator;
+      collator.setNumericMode(true);
+      collator.setCaseSensitivity(Qt::CaseInsensitive);
+      collator.setIgnorePunctuation(false);
+      for (int i = 0; i < std::max(attributes.count(), rhs.attributes.count());
+           ++i) {
+        auto a = attributes.value(i);
+        auto b = rhs.attributes.value(i);
+        if (a && (!b)) {
+          return false;
+        } else if ((!a) && b) {
+          return true;
+        } else if (a->getKey() != b->getKey()) {
+          return a->getKey() < b->getKey();
+        } else if (&a->getType() != &b->getType()) {
+          return a->getType().getName() < b->getType().getName();
+        } else if (a->getValueTr(true) != b->getValueTr(true)) {
+          return collator(a->getValueTr(true), b->getValueTr(true));
+        }
+      }
+      return false;
+    }
   };
 
   // Constructors / Destructor

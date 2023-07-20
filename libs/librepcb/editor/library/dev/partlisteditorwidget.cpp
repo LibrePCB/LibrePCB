@@ -50,7 +50,7 @@ PartListEditorWidget::PartListEditorWidget(QWidget* parent) noexcept
   mView->horizontalHeader()->setSectionResizeMode(
       PartListModel::COLUMN_MANUFACTURER, QHeaderView::Stretch);
   mView->horizontalHeader()->setSectionResizeMode(
-      PartListModel::COLUMN_ATTRIBUTES, QHeaderView::ResizeToContents);
+      PartListModel::COLUMN_ATTRIBUTES, QHeaderView::Stretch);
   mView->horizontalHeader()->setSectionResizeMode(
       PartListModel::COLUMN_ACTIONS, QHeaderView::ResizeToContents);
   connect(mView.data(), &EditableTableWidget::btnAddClicked, mModel.data(),

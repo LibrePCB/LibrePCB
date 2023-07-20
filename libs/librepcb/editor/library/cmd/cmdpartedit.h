@@ -54,7 +54,7 @@ public:
   ~CmdPartEdit() noexcept;
 
   // Setters
-  void setMpn(const ElementName& value) noexcept;
+  void setMpn(const SimpleString& value) noexcept;
   void setManufacturer(const SimpleString& value) noexcept;
 
   // Operator Overloadings
@@ -73,8 +73,8 @@ private:  // Methods
 private:  // Data
   Part& mPart;
 
-  ElementName mOldMpn;
-  ElementName mNewMpn;
+  SimpleString mOldMpn;
+  SimpleString mNewMpn;
   SimpleString mOldManufacturer;
   SimpleString mNewManufacturer;
 };

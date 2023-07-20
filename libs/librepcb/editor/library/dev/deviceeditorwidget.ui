@@ -326,7 +326,7 @@
          <item>
           <widget class="QGroupBox" name="groupBox_5">
            <property name="title">
-            <string>Part Numbers</string>
+            <string>Parts for Assembly (BOM/PnP)</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <property name="spacing">
@@ -543,6 +543,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>librepcb::editor::AttributeListEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/attributelisteditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>librepcb::editor::PlainTextEdit</class>
    <extends>QPlainTextEdit</extends>
    <header location="global">librepcb/editor/widgets/plaintextedit.h</header>
@@ -562,12 +568,6 @@
    <class>librepcb::editor::PadSignalMapEditorWidget</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/library/dev/padsignalmapeditorwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>librepcb::editor::AttributeListEditorWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">librepcb/editor/widgets/attributelisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

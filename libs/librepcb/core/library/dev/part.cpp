@@ -49,14 +49,14 @@ Part::Part(const Part& other) noexcept
 
 Part::Part(const SExpression& node)
   : onEdited(*this),
-    mMpn(deserialize<ElementName>(node.getChild("@0"))),
+    mMpn(deserialize<SimpleString>(node.getChild("@0"))),
     mManufacturer(deserialize<SimpleString>(node.getChild("manufacturer/@0"))),
     mAttributes(node),
     mOnAttributesEditedSlot(*this, &Part::attributeListEdited) {
   mAttributes.onEdited.attach(mOnAttributesEditedSlot);
 }
 
-Part::Part(const ElementName& mpn, const SimpleString& manufacturer,
+Part::Part(const SimpleString& mpn, const SimpleString& manufacturer,
            const AttributeList& attributes) noexcept
   : onEdited(*this),
     mMpn(mpn),
@@ -72,6 +72,10 @@ Part::~Part() noexcept {
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
+
+bool Part::isEmpty() const noexcept {
+  return mMpn->isEmpty() && mManufacturer->isEmpty() && mAttributes.isEmpty();
+}
 
 QStringList Part::getAttributeValuesTr() const noexcept {
   QStringList result;
@@ -98,7 +102,7 @@ QStringList Part::getAttributeKeyValuesTr() const noexcept {
  *  Setters
  ******************************************************************************/
 
-void Part::setMpn(const ElementName& value) noexcept {
+void Part::setMpn(const SimpleString& value) noexcept {
   if (value == mMpn) {
     return;
   }

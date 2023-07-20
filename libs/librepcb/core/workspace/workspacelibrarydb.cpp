@@ -47,6 +47,11 @@
  ******************************************************************************/
 namespace librepcb {
 
+static inline uint qHash(const WorkspaceLibraryDb::Part& key,
+                         uint seed) noexcept {
+  return ::qHash(qMakePair(key.mpn, key.manufacturer), seed);
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
@@ -137,19 +142,17 @@ QList<WorkspaceLibraryDb::Part> WorkspaceLibraryDb::findPartsOfDevice(
       "LEFT JOIN devices "
       "ON devices.id = parts.device_id "
       "WHERE devices.uuid = :device "
-      "AND (parts.mpn LIKE :keyword OR parts.manufacturer LIKE :keyword) "
-      "GROUP BY mpn, manufacturer "
-      "ORDER BY mpn ASC, manufacturer ASC");
+      "AND (parts.mpn LIKE :keyword OR parts.manufacturer LIKE :keyword)");
   query.bindValue(":device", device.toStr());
   query.bindValue(":keyword", "%" + keyword + "%");
   mDb->exec(query);
 
-  QList<Part> parts;
+  QSet<Part> parts;
   while (query.next()) {
-    parts.append(Part{query.value(1).toString(), query.value(2).toString(),
+    parts.insert(Part{query.value(1).toString(), query.value(2).toString(),
                       getPartAttributes(query.value(0).toInt())});
   }
-  return parts;
+  return Toolbox::sortedQSet(parts);
 }
 
 bool WorkspaceLibraryDb::getLibraryMetadata(const FilePath libDir,
@@ -221,18 +224,16 @@ QList<WorkspaceLibraryDb::Part> WorkspaceLibraryDb::getDeviceParts(
   QSqlQuery query = mDb->prepareQuery(
       "SELECT parts.id, mpn, manufacturer FROM parts "
       "LEFT JOIN devices ON devices.id = parts.device_id "
-      "WHERE devices.uuid = :device "
-      "GROUP BY mpn, manufacturer "
-      "ORDER BY mpn ASC, manufacturer ASC");
+      "WHERE devices.uuid = :device");
   query.bindValue(":device", device.toStr());
   mDb->exec(query);
 
-  QList<Part> parts;
+  QSet<Part> parts;
   while (query.next()) {
-    parts.append(Part{query.value(1).toString(), query.value(2).toString(),
+    parts.insert(Part{query.value(1).toString(), query.value(2).toString(),
                       getPartAttributes(query.value(0).toInt())});
   }
-  return parts;
+  return Toolbox::sortedQSet(parts);
 }
 
 /*******************************************************************************
