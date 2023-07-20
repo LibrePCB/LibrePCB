@@ -87,6 +87,28 @@ def test_export_project_with_two_boards_explicit_one_attributes(cli, project):
     assert b'SUPPLIER,SKU' in open(fp, 'rb').read()
 
 
+@pytest.mark.parametrize("project", [params.PROJECT_WITH_TWO_BOARDS_LPP_PARAM])
+def test_export_project_with_two_boards_with_variant(cli, project):
+    cli.add_project(project.dir, as_lppz=project.is_lppz)
+    fp = project.output_dir + '/bom/{{BOARD}}_{{VARIANT}}.csv'
+    dir = cli.abspath(project.output_dir + '/bom')
+    assert not os.path.exists(dir)
+    code, stdout, stderr = cli.run('open-project',
+                                   '--export-board-bom', fp,
+                                   '--variant-index=0',
+                                   project.path)
+    assert stderr == ''
+    assert stdout == \
+        "Open project '{project.path}'...\n" \
+        "Export board-specific BOM to '{project.output_dir}/bom/{{{{BOARD}}}}_{{{{VARIANT}}}}.csv'...\n" \
+        "  - 'default' => '{project.output_dir_native}//bom//default_AV.csv'\n" \
+        "  - 'copy' => '{project.output_dir_native}//bom//copy_AV.csv'\n" \
+        "SUCCESS\n".format(project=project).replace('//', os.sep)
+    assert code == 0
+    assert os.path.exists(dir)
+    assert len(os.listdir(dir)) == 2
+
+
 @pytest.mark.parametrize("project", [params.PROJECT_WITH_TWO_BOARDS_LPP])
 def test_export_project_with_two_conflicting_boards_fails(cli, project):
     cli.add_project(project.dir, as_lppz=project.is_lppz)

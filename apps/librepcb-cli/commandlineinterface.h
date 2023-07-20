@@ -58,19 +58,18 @@ public:
   int execute(const QStringList& args) noexcept;
 
 private:  // Methods
-  bool openProject(const QString& projectFile, bool runErc, bool runDrc,
-                   const QString& drcSettingsPath,
-                   const QStringList& exportSchematicsFiles,
-                   const QStringList& exportBomFiles,
-                   const QStringList& exportBoardBomFiles,
-                   const QString& bomAttributes, bool exportPcbFabricationData,
-                   const QString& pcbFabricationSettingsPath,
-                   const QStringList& exportPnpTopFiles,
-                   const QStringList& exportPnpBottomFiles,
-                   const QStringList& exportNetlistFiles,
-                   const QStringList& boardNames,
-                   const QStringList& boardIndices, bool removeOtherBoards,
-                   bool save, bool strict) const noexcept;
+  bool openProject(
+      const QString& projectFile, bool runErc, bool runDrc,
+      const QString& drcSettingsPath, const QStringList& exportSchematicsFiles,
+      const QStringList& exportBomFiles, const QStringList& exportBoardBomFiles,
+      const QString& bomAttributes, bool exportPcbFabricationData,
+      const QString& pcbFabricationSettingsPath,
+      const QStringList& exportPnpTopFiles,
+      const QStringList& exportPnpBottomFiles,
+      const QStringList& exportNetlistFiles, const QStringList& boardNames,
+      const QStringList& boardIndices, bool removeOtherBoards,
+      const QStringList& avNames, const QStringList& avIndices,
+      const QString& setDefaultAv, bool save, bool strict) const noexcept;
   bool openLibrary(const QString& libDir, bool all, bool runCheck,
                    bool minifyStepFiles, bool save, bool strict) const noexcept;
   void processLibraryElement(const QString& libDir, TransactionalFileSystem& fs,

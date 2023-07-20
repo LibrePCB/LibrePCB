@@ -193,6 +193,23 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
          "will be removed. Pass '%2' to save the modified project to disk.")
           .arg("--board[-index]")
           .arg("--save"));
+  QCommandLineOption assemblyVariantOption(
+      "variant",
+      tr("The name of the assembly variant(s) to export. Can be given multiple "
+         "times. If not set, all assembly variants are exported."),
+      tr("name"));
+  QCommandLineOption assemblyVariantIndexOption(
+      "variant-index",
+      tr("Same as '%1', but allows to specify assembly variants by index "
+         "instead of by name.")
+          .arg("--variant"),
+      tr("index"));
+  QCommandLineOption setDefaultAssemblyVariantOption(
+      "set-default-variant",
+      tr("Move the specified assembly variant to the top before executing all "
+         "the other actions. Pass '%1' to save the modified project to disk.")
+          .arg("--save"),
+      tr("name"));
   QCommandLineOption saveOption(
       "save",
       tr("Save project before closing it (useful to upgrade file format)."));
@@ -264,6 +281,9 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     parser.addOption(boardOption);
     parser.addOption(boardIndexOption);
     parser.addOption(removeOtherBoardsOption);
+    parser.addOption(assemblyVariantOption);
+    parser.addOption(assemblyVariantIndexOption);
+    parser.addOption(setDefaultAssemblyVariantOption);
     parser.addOption(saveOption);
     parser.addOption(prjStrictOption);
   } else if (command == "open-library") {
@@ -363,6 +383,9 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
         parser.values(boardOption),  // board names
         parser.values(boardIndexOption),  // board indices
         parser.isSet(removeOtherBoardsOption),  // remove other boards
+        parser.values(assemblyVariantOption),  // assembly variant names
+        parser.values(assemblyVariantIndexOption),  // assembly variant indices
+        parser.value(setDefaultAssemblyVariantOption),  // set default AV
         parser.isSet(saveOption),  // save project
         parser.isSet(prjStrictOption)  // strict mode
     );
@@ -399,8 +422,9 @@ bool CommandLineInterface::openProject(
     const QStringList& exportPnpTopFiles,
     const QStringList& exportPnpBottomFiles,
     const QStringList& exportNetlistFiles, const QStringList& boardNames,
-    const QStringList& boardIndices, bool removeOtherBoards, bool save,
-    bool strict) const noexcept {
+    const QStringList& boardIndices, bool removeOtherBoards,
+    const QStringList& avNames, const QStringList& avIndices,
+    const QString& setDefaultAv, bool save, bool strict) const noexcept {
   try {
     bool success = true;
     QMap<FilePath, int> writtenFilesCounter;
@@ -448,12 +472,53 @@ bool CommandLineInterface::openProject(
       }
     }
 
+    // Set the default assembly variant.
+    if (!setDefaultAv.isEmpty()) {
+      print(tr("Set default assembly variant to '%1'...").arg(setDefaultAv));
+      if (project->getCircuit().getAssemblyVariants().contains(setDefaultAv)) {
+        project->getCircuit().getAssemblyVariants().insert(
+            0, project->getCircuit().getAssemblyVariants().take(setDefaultAv));
+      } else {
+        printErr(tr("ERROR: No assembly variant with the name '%1' found.")
+                     .arg(setDefaultAv));
+        success = false;
+      }
+    }
+
     // Parse list of assembly variants.
-    // Not implemented yet, always use all assembly variants.
     QVector<std::shared_ptr<AssemblyVariant>> assemblyVariants;
-    for (auto it = project->getCircuit().getAssemblyVariants().begin();
-         it != project->getCircuit().getAssemblyVariants().end(); ++it) {
-      assemblyVariants.append(it.ptr());
+    foreach (const QString& avName, avNames) {
+      if (auto av = project->getCircuit().getAssemblyVariants().find(avName)) {
+        if (!assemblyVariants.contains(av)) {
+          assemblyVariants.append(av);
+        }
+      } else {
+        printErr(tr("ERROR: No assembly variant with the name '%1' found.")
+                     .arg(avName));
+        success = false;
+      }
+    }
+    foreach (const QString& avIndex, avIndices) {
+      bool ok = false;
+      const int index = avIndex.trimmed().toInt(&ok);
+      auto av = project->getCircuit().getAssemblyVariants().value(index);
+      if (ok && av) {
+        if (!assemblyVariants.contains(av)) {
+          assemblyVariants.append(av);
+        }
+      } else {
+        printErr(
+            tr("ERROR: Assembly variant index '%1' is invalid.").arg(avIndex));
+        success = false;
+      }
+    }
+
+    // If no assembly variants are specified, export all variants.
+    if (avNames.isEmpty() && avIndices.isEmpty()) {
+      for (auto it = project->getCircuit().getAssemblyVariants().begin();
+           it != project->getCircuit().getAssemblyVariants().end(); ++it) {
+        assemblyVariants.append(it.ptr());
+      }
     }
 
     // Parse list of boards.
