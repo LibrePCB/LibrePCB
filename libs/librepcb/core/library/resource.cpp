@@ -20,10 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "libraryelement.h"
-
-#include "../utils/toolbox.h"
-#include "libraryelementcheck.h"
+#include "resource.h"
 
 #include <QtCore>
 
@@ -36,55 +33,82 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-LibraryElement::LibraryElement(const QString& shortElementName,
-                               const QString& longElementName, const Uuid& uuid,
-                               const Version& version, const QString& author,
-                               const ElementName& name_en_US,
-                               const QString& description_en_US,
-                               const QString& keywords_en_US)
-  : LibraryBaseElement(shortElementName, longElementName, uuid, version, author,
-                       name_en_US, description_en_US, keywords_en_US) {
+Resource::Resource(const Resource& other) noexcept
+  : onEdited(*this),
+    mName(other.mName),
+    mMediaType(other.mMediaType),
+    mUrl(other.mUrl) {
 }
 
-LibraryElement::LibraryElement(
-    const QString& shortElementName, const QString& longElementName,
-    bool dirnameMustBeUuid, std::unique_ptr<TransactionalDirectory> directory,
-    const SExpression& root)
-  : LibraryBaseElement(shortElementName, longElementName, dirnameMustBeUuid,
-                       std::move(directory), root),
-    mCategories(),
-    mResources(root) {
-  // read category UUIDs
-  foreach (const SExpression* node, root.getChildren("category")) {
-    mCategories.insert(deserialize<Uuid>(node->getChild("@0")));
+Resource::Resource(const SExpression& node)
+  : onEdited(*this),
+    mName(deserialize<ElementName>(node.getChild("@0"))),
+    mMediaType(node.getChild("mediatype/@0").getValue()),
+    // Don't use deserialize<QUrl>() to avoid any exception thrown.
+    mUrl(node.getChild("url/@0").getValue(), QUrl::StrictMode) {
+}
+
+Resource::Resource(const ElementName& name, const QString& mimeType,
+                   const QUrl& url) noexcept
+  : onEdited(*this), mName(name), mMediaType(mimeType), mUrl(url) {
+}
+
+Resource::~Resource() noexcept {
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void Resource::setName(const ElementName& name) noexcept {
+  if (name != mName) {
+    mName = name;
+    onEdited.notify(Event::NameChanged);
   }
 }
 
-LibraryElement::~LibraryElement() noexcept {
+void Resource::setMediaType(const QString& type) noexcept {
+  if (type != mMediaType) {
+    mMediaType = type;
+    onEdited.notify(Event::MediaTypeChanged);
+  }
+}
+
+void Resource::setUrl(const QUrl& url) noexcept {
+  if (url != mUrl) {
+    mUrl = url;
+    onEdited.notify(Event::UrlChanged);
+  }
 }
 
 /*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
-RuleCheckMessageList LibraryElement::runChecks() const {
-  LibraryElementCheck check(*this);
-  return check.runChecks();  // can throw
+void Resource::serialize(SExpression& root) const {
+  root.appendChild(mName);
+  root.appendChild("mediatype", mMediaType);
+  root.ensureLineBreak();
+  root.appendChild("url", mUrl.toString(QUrl::PrettyDecoded));
+  root.ensureLineBreak();
 }
 
 /*******************************************************************************
- *  Protected Methods
+ *  Operator Overloadings
  ******************************************************************************/
 
-void LibraryElement::serialize(SExpression& root) const {
-  LibraryBaseElement::serialize(root);
-  foreach (const Uuid& uuid, Toolbox::sortedQSet(mCategories)) {
-    root.ensureLineBreak();
-    root.appendChild("category", uuid);
-  }
-  root.ensureLineBreak();
-  mResources.serialize(root);
-  root.ensureLineBreak();
+bool Resource::operator==(const Resource& rhs) const noexcept {
+  if (mName != rhs.mName) return false;
+  if (mMediaType != rhs.mMediaType) return false;
+  if (mUrl != rhs.mUrl) return false;
+  return true;
+}
+
+Resource& Resource::operator=(const Resource& rhs) noexcept {
+  setName(rhs.mName);
+  setMediaType(rhs.mMediaType);
+  setUrl(rhs.mUrl);
+  return *this;
 }
 
 /*******************************************************************************
