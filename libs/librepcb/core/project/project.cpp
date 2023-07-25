@@ -50,7 +50,6 @@ namespace librepcb {
 Project::Project(std::unique_ptr<TransactionalDirectory> directory,
                  const QString& filename)
   : QObject(nullptr),
-    AttributeProvider(),
     mDirectory(std::move(directory)),
     mFilename(filename),
     mUuid(Uuid::createRandom()),
@@ -62,6 +61,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
     mLocaleOrder(),
     mNormOrder(),
     mCustomBomAttributes(),
+    mDefaultLockComponentAssembly(false),
     mPrimaryBoard(nullptr) {
   // Check if the file extension is correct
   if (!mFilename.endsWith(".lpp")) {
@@ -176,6 +176,10 @@ void Project::setCustomBomAttributes(const QStringList& newKeys) noexcept {
   if (newKeys != mCustomBomAttributes) {
     mCustomBomAttributes = newKeys;
   }
+}
+
+void Project::setDefaultLockComponentAssembly(bool newLock) noexcept {
+  mDefaultLockComponentAssembly = newLock;
 }
 
 bool Project::setErcMessageApprovals(
@@ -424,6 +428,9 @@ void Project::save() {
       node.ensureLineBreak();
     }
     root.ensureLineBreak();
+    root.appendChild("default_lock_component_assembly",
+                     mDefaultLockComponentAssembly);
+    root.ensureLineBreak();
     mDirectory->write("project/settings.lp", root.toByteArray());
   }
 
@@ -478,52 +485,6 @@ void Project::save() {
 }
 
 /*******************************************************************************
- *  Inherited from AttributeProvider
- ******************************************************************************/
-
-QString Project::getUserDefinedAttributeValue(const QString& key) const
-    noexcept {
-  if (const auto& attr = mAttributes.find(key)) {
-    return attr->getValueTr(true);
-  } else {
-    return QString();
-  }
-}
-
-QString Project::getBuiltInAttributeValue(const QString& key) const noexcept {
-  if (key == QLatin1String("PROJECT")) {
-    return *mName;
-  } else if (key == QLatin1String("PROJECT_DIRPATH")) {
-    return getPath().toNative();
-  } else if (key == QLatin1String("PROJECT_BASENAME")) {
-    return getFilepath().getBasename();
-  } else if (key == QLatin1String("PROJECT_FILENAME")) {
-    return getFilepath().getFilename();
-  } else if (key == QLatin1String("PROJECT_FILEPATH")) {
-    return getFilepath().toNative();
-  } else if (key == QLatin1String("CREATED_DATE")) {
-    return mCreated.date().toString(Qt::ISODate);
-  } else if (key == QLatin1String("CREATED_TIME")) {
-    return mCreated.time().toString(Qt::ISODate);
-  } else if (key == QLatin1String("DATE")) {
-    return mDateTime.date().toString(Qt::ISODate);
-  } else if (key == QLatin1String("TIME")) {
-    return mDateTime.time().toString(Qt::ISODate);
-  } else if (key == QLatin1String("AUTHOR")) {
-    return mAuthor;
-  } else if (key == QLatin1String("VERSION")) {
-    return mVersion;
-  } else if (key == QLatin1String("PAGES")) {
-    return QString::number(mSchematics.count());
-  } else if (key == QLatin1String("PAGE_X_OF_Y")) {
-    return "Page {{PAGE}} of {{PAGES}}";  // do not translate this, must be the
-                                          // same for every user!
-  } else {
-    return QString();
-  }
-}
-
-/*******************************************************************************
  *  Static Methods
  ******************************************************************************/
 
@@ -555,6 +516,10 @@ std::unique_ptr<Project> Project::create(
 
   // Create empty project.
   std::unique_ptr<Project> p(new Project(std::move(directory), filename));
+
+  // Add default assembly variant with name "Std".
+  p->getCircuit().addAssemblyVariant(std::make_shared<AssemblyVariant>(
+      Uuid::createRandom(), FileProofName("Std"), "Standard assembly"));
 
   // Add default netclass with name "default".
   {

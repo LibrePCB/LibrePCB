@@ -17,7 +17,6 @@ add_executable(
   core/algorithm/airwiresbuildertest.cpp
   core/applicationtest.cpp
   core/attribute/attributekeytest.cpp
-  core/attribute/attributeproviderdummy.h
   core/attribute/attributesubstitutortest.cpp
   core/attribute/attributetest.cpp
   core/attribute/attributetypetest.cpp
@@ -71,6 +70,7 @@ add_executable(
   core/types/alignmenttest.cpp
   core/types/angletest.cpp
   core/types/circuitidentifiertest.cpp
+  core/types/fileproofnametest.cpp
   core/types/lengthtest.cpp
   core/types/pointtest.cpp
   core/types/ratiotest.cpp

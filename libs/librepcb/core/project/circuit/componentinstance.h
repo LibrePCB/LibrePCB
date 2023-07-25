@@ -24,11 +24,13 @@
  *  Includes
  ******************************************************************************/
 #include "../../attribute/attribute.h"
-#include "../../attribute/attributeprovider.h"
 #include "../../types/circuitidentifier.h"
 #include "../../types/uuid.h"
+#include "componentassemblyoption.h"
 
 #include <QtCore>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -49,26 +51,22 @@ class SI_Symbol;
 /**
  * @brief The ComponentInstance class
  */
-class ComponentInstance : public QObject, public AttributeProvider {
+class ComponentInstance : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
   ComponentInstance() = delete;
   ComponentInstance(const ComponentInstance& other) = delete;
-  explicit ComponentInstance(
-      Circuit& circuit, const Uuid& uuid, const Component& cmp,
-      const Uuid& symbVar, const CircuitIdentifier& name,
-      const tl::optional<Uuid>& defaultDevice = tl::nullopt);
+  explicit ComponentInstance(Circuit& circuit, const Uuid& uuid,
+                             const Component& cmp, const Uuid& symbVar,
+                             const CircuitIdentifier& name);
   ~ComponentInstance() noexcept;
 
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }
   const CircuitIdentifier& getName() const noexcept { return mName; }
-  QString getValue(bool replaceAttributes = false) const noexcept;
-  const tl::optional<Uuid>& getDefaultDeviceUuid() const noexcept {
-    return mDefaultDeviceUuid;
-  }
+  const QString& getValue() const noexcept { return mValue; }
   const QPointer<const BI_Device>& getPrimaryDevice() const noexcept {
     return mPrimaryDevice;
   }
@@ -84,12 +82,23 @@ public:
     return mSignals.value(signalUuid);
   }
   const AttributeList& getAttributes() const noexcept { return *mAttributes; }
+  const ComponentAssemblyOptionList& getAssemblyOptions() const noexcept {
+    return mAssemblyOptions;
+  }
+  QSet<Uuid> getCompatibleDevices() const noexcept;
+  QVector<std::shared_ptr<const Part>> getParts(
+      const tl::optional<Uuid>& assemblyVariant) const noexcept;
+  bool getLockAssembly() const noexcept { return mLockAssembly; }
 
   // Getters: General
   Circuit& getCircuit() const noexcept { return mCircuit; }
   const QHash<Uuid, SI_Symbol*>& getSymbols() const noexcept {
     return mRegisteredSymbols;
   }
+  const QList<BI_Device*>& getDevices() const noexcept {
+    return mRegisteredDevices;
+  }
+  QSet<Uuid> getUsedDeviceUuids() const noexcept;
   int getRegisteredElementsCount() const noexcept;
   bool isUsed() const noexcept;
   bool isAddedToCircuit() const noexcept { return mIsAddedToCircuit; }
@@ -117,12 +126,9 @@ public:
 
   void setAttributes(const AttributeList& attributes) noexcept;
 
-  /**
-   * @brief Set the default device of the component
-   *
-   * @param device  The new device UUID
-   */
-  void setDefaultDeviceUuid(const tl::optional<Uuid>& device) noexcept;
+  void setAssemblyOptions(const ComponentAssemblyOptionList& options) noexcept;
+
+  void setLockAssembly(bool lock) noexcept { mLockAssembly = lock; }
 
   // General Methods
   void addToCircuit();
@@ -139,23 +145,11 @@ public:
    */
   void serialize(SExpression& root) const;
 
-  // Inherited from AttributeProvider
-  /// @copydoc ::librepcb::AttributeProvider::getUserDefinedAttributeValue()
-  QString getUserDefinedAttributeValue(const QString& key) const
-      noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
-  QVector<const AttributeProvider*> getAttributeProviderParents() const
-      noexcept override;
-
   // Operator Overloadings
   ComponentInstance& operator=(const ComponentInstance& rhs) = delete;
 
 signals:
-  /// @copydoc AttributeProvider::attributesChanged()
-  void attributesChanged() override;
-
+  void attributesChanged();
   void primaryDeviceChanged(const BI_Device* device);
 
 private:
@@ -180,9 +174,6 @@ private:
   /// resistance of a resistor)
   QString mValue;
 
-  /// @brief THe default device when adding the component to a board
-  tl::optional<Uuid> mDefaultDeviceUuid;
-
   /// @brief Reference to the component in the project's library
   const Component& mLibComponent;
 
@@ -194,6 +185,13 @@ private:
 
   /// @brief All signal instances (Key: component signal UUID)
   QMap<Uuid, ComponentSignalInstance*> mSignals;
+
+  /// @brief Assembly options including MPNs
+  ComponentAssemblyOptionList mAssemblyOptions;
+
+  /// @brief Whether #mAssemblyOptions can be modified from the board editor
+  ///        or not
+  bool mLockAssembly;
 
   // Registered Elements
 

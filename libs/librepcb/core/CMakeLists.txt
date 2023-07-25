@@ -73,8 +73,6 @@ add_library(
   attribute/attribute.cpp
   attribute/attribute.h
   attribute/attributekey.h
-  attribute/attributeprovider.cpp
-  attribute/attributeprovider.h
   attribute/attributesubstitutor.cpp
   attribute/attributesubstitutor.h
   attribute/attributetype.cpp
@@ -331,8 +329,12 @@ add_library(
   project/board/items/bi_zone.h
   project/bomgenerator.cpp
   project/bomgenerator.h
+  project/circuit/assemblyvariant.cpp
+  project/circuit/assemblyvariant.h
   project/circuit/circuit.cpp
   project/circuit/circuit.h
+  project/circuit/componentassemblyoption.cpp
+  project/circuit/componentassemblyoption.h
   project/circuit/componentinstance.cpp
   project/circuit/componentinstance.h
   project/circuit/componentsignalinstance.cpp
@@ -347,6 +349,8 @@ add_library(
   project/erc/electricalrulecheckmessages.h
   project/project.cpp
   project/project.h
+  project/projectattributelookup.cpp
+  project/projectattributelookup.h
   project/projectlibrary.cpp
   project/projectlibrary.h
   project/projectloader.cpp
@@ -397,6 +401,7 @@ add_library(
   types/boundedunsignedratio.h
   types/circuitidentifier.h
   types/elementname.h
+  types/fileproofname.h
   types/layer.cpp
   types/layer.h
   types/length.cpp

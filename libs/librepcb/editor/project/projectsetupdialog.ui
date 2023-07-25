@@ -301,6 +301,28 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabAssemblyVariants">
+      <attribute name="title">
+       <string>Assembly Variants</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="librepcb::editor::AssemblyVariantListEditorWidget" name="edtAssemblyVariants" native="true"/>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -317,6 +339,12 @@
    <class>librepcb::editor::AttributeListEditorWidget</class>
    <extends>QWidget</extends>
    <header location="global">librepcb/editor/widgets/attributelisteditorwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>librepcb::editor::AssemblyVariantListEditorWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/project/assemblyvariantlisteditorwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

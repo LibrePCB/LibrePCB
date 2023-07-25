@@ -159,6 +159,10 @@ ProjectSetupDialog::ProjectSetupDialog(Project& project, UndoStack& undoStack,
           EditorCommand::ActionFlag::WidgetShortcut),
       QLineEdit::TrailingPosition);
 
+  // Tab: Assembly Variants.
+  mUi->edtAssemblyVariants->setFrameStyle(QFrame::NoFrame);
+  mUi->edtAssemblyVariants->setReferences(&mUndoStack, &project.getCircuit());
+
   // Load all properties.
   load();
 

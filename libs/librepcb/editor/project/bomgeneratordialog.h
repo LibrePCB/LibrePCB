@@ -23,8 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/attribute/attributeprovider.h>
 #include <librepcb/core/fileio/filepath.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -36,9 +36,11 @@
  ******************************************************************************/
 namespace librepcb {
 
+class AssemblyVariant;
 class Board;
 class Bom;
 class Project;
+class Uuid;
 class WorkspaceSettings;
 
 namespace editor {
@@ -82,6 +84,8 @@ private:  // Methods
   void updateAttributes() noexcept;
   void updateBom() noexcept;
   void updateTable() noexcept;
+  std::shared_ptr<AssemblyVariant> getAssemblyVariant() const noexcept;
+  tl::optional<Uuid> getAssemblyVariantUuid(bool throwIfNullopt) const;
   FilePath getOutputFilePath() const noexcept;
 
 private:  // Data

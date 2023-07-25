@@ -34,7 +34,6 @@
  ******************************************************************************/
 namespace librepcb {
 
-class AttributeProvider;
 class BI_Device;
 class Board;
 class Path;
@@ -94,7 +93,6 @@ public:
   // General Methods
   BI_Device* getDevice() const noexcept { return mDevice; }
   void setDevice(BI_Device* device) noexcept;
-  const AttributeProvider* getAttributeProvider() const noexcept;
   void addToBoard() override;
   void removeFromBoard() override;
 

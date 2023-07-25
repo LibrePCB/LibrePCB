@@ -88,6 +88,7 @@ public:
   virtual QByteArray read(const QString& path) const override;
   virtual QByteArray readIfExists(const QString& path) const override;
   virtual void write(const QString& path, const QByteArray& content) override;
+  virtual void renameFile(const QString& src, const QString& dst) override;
   virtual void removeFile(const QString& path) override;
   virtual void removeDirRecursively(const QString& path = "") override;
 

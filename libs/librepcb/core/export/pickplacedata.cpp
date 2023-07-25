@@ -54,7 +54,7 @@ PickPlaceData::~PickPlaceData() noexcept {
 void PickPlaceData::addItem(const PickPlaceDataItem& item) noexcept {
   mItems.append(item);
 
-  // Sort items by designator to improve readability of the BOM.
+  // Sort items by designator to improve readability of the exported file.
   Toolbox::sortNumeric(mItems,
                        [](const QCollator& cmp, const PickPlaceDataItem& lhs,
                           const PickPlaceDataItem& rhs) {

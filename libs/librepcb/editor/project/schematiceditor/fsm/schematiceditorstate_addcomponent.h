@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "schematiceditorstate.h"
 
+#include <librepcb/core/project/circuit/componentassemblyoption.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/uuid.h>
 
@@ -93,11 +94,12 @@ public:
       const SchematicEditorState_AddComponent& rhs) = delete;
 
 private:  // Methods
-  void startAddingComponent(const tl::optional<Uuid>& cmp = tl::nullopt,
-                            const tl::optional<Uuid>& symbVar = tl::nullopt,
-                            const tl::optional<Uuid>& dev = tl::nullopt,
-                            const QString& searchTerm = QString(),
-                            bool keepValue = false);
+  void startAddingComponent(
+      const tl::optional<Uuid>& cmp = tl::nullopt,
+      const tl::optional<Uuid>& symbVar = tl::nullopt,
+      const tl::optional<librepcb::ComponentAssemblyOptionList>& options =
+          tl::nullopt,
+      const QString& searchTerm = QString(), bool keepValue = false);
   bool abortCommand(bool showErrMsgBox) noexcept;
   std::shared_ptr<const Attribute> getToolbarAttribute() const noexcept;
   void valueChanged(QString text) noexcept;

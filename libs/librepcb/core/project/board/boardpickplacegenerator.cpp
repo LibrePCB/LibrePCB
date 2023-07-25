@@ -22,11 +22,13 @@
  ******************************************************************************/
 #include "boardpickplacegenerator.h"
 
+#include "../../attribute/attributesubstitutor.h"
 #include "../../export/pickplacedata.h"
 #include "../../library/dev/device.h"
 #include "../../library/pkg/package.h"
 #include "../circuit/componentinstance.h"
 #include "../project.h"
+#include "../projectattributelookup.h"
 #include "board.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
@@ -42,8 +44,9 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BoardPickPlaceGenerator::BoardPickPlaceGenerator(const Board& board) noexcept
-  : mBoard(board) {
+BoardPickPlaceGenerator::BoardPickPlaceGenerator(
+    const Board& board, const Uuid& assemblyVariant) noexcept
+  : mBoard(board), mAssemblyVariant(assemblyVariant) {
 }
 
 BoardPickPlaceGenerator::~BoardPickPlaceGenerator() noexcept {
@@ -68,9 +71,13 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
   const QStringList& locale = mBoard.getProject().getLocaleOrder();
 
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    auto part = device->getParts(mAssemblyVariant).value(0);
+    ProjectAttributeLookup lookup(*device, part);
     QList<PickPlaceDataItem> items;
     const QString designator = *device->getComponentInstance().getName();
-    const QString val = device->getComponentInstance().getValue(true).trimmed();
+    const QString value =
+        AttributeSubstitutor::substitute("{{MPN or VALUE or DEVICE}}", lookup)
+            .simplified();
     const QString devName = *device->getLibDevice().getNames().value(locale);
     const QString pkgName = *device->getLibPackage().getNames().value(locale);
 
@@ -87,9 +94,9 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
         const Angle rotation =
             pad->getMirrored() ? -pad->getRotation() : pad->getRotation();
         foreach (const auto side, sides) {
-          items.append(PickPlaceDataItem(designator, val, devName, pkgName,
-                                         pad->getPosition(), rotation, side,
-                                         PickPlaceDataItem::Type::Fiducial));
+          items.append(PickPlaceDataItem(
+              designator, value, devName, pkgName, pad->getPosition(), rotation,
+              side, PickPlaceDataItem::Type::Fiducial, true));
         }
       }
     }
@@ -102,18 +109,19 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
       }
     }
 
-    // Export device only if its package is something to mount.
-    auto typeIt = types.find(device->getLibPackage().getAssemblyType(true));
-    if (typeIt != types.end()) {
-      const Point position = device->getPosition();
-      const Angle rotation = device->getMirrored() ? -device->getRotation()
-                                                   : device->getRotation();
-      const PickPlaceDataItem::BoardSide boardSide = device->getMirrored()
-          ? PickPlaceDataItem::BoardSide::Bottom
-          : PickPlaceDataItem::BoardSide::Top;
-      items.append(PickPlaceDataItem(designator, val, devName, pkgName,
-                                     position, rotation, boardSide, *typeIt));
-    }
+    // Export device only if it is contained in the assembly variant.
+    const Point position = device->getPosition();
+    const Angle rotation =
+        device->getMirrored() ? -device->getRotation() : device->getRotation();
+    const PickPlaceDataItem::BoardSide boardSide = device->getMirrored()
+        ? PickPlaceDataItem::BoardSide::Bottom
+        : PickPlaceDataItem::BoardSide::Top;
+    const PickPlaceDataItem::Type assemblyType =
+        types.value(device->getLibPackage().getAssemblyType(true),
+                    PickPlaceDataItem::Type::Other);
+    items.append(PickPlaceDataItem(designator, value, devName, pkgName,
+                                   position, rotation, boardSide, assemblyType,
+                                   part ? true : false));
 
     // Add all items.
     for (const PickPlaceDataItem& item : items) {

@@ -101,6 +101,7 @@ actions/move_to.png: Pastel → Arrows → Move Out
 actions/order_pcb.png: Color → Ecommerce → Buy and Sell → Buy
 actions/ruler.png: Color → Editing → Image Editing → Ruler
 actions/view_3d.png: Windows 11 Color → Editing → 3D Objects
+library/part.png: Color → Ecommerce → Buy and Sell → Buy
 ```
 
 From [publicdomainvectors.org](https://publicdomainvectors.org/):

@@ -24,6 +24,7 @@
 
 #include "../../../library/cmp/component.h"
 #include "../../../library/dev/device.h"
+#include "../../../library/dev/part.h"
 #include "../../../library/pkg/package.h"
 #include "../../../library/sym/symbol.h"
 #include "../../../utils/scopeguardlist.h"
@@ -192,6 +193,31 @@ tl::optional<Uuid> BI_Device::getDefaultLibModelUuid() const noexcept {
     return model->getUuid();
   }
   return tl::nullopt;
+}
+
+QVector<std::shared_ptr<const Part>> BI_Device::getParts(
+    const tl::optional<Uuid>& assemblyVariant) const noexcept {
+  QVector<std::shared_ptr<const Part>> parts;
+  for (const ComponentAssemblyOption& opt :
+       mCompInstance.getAssemblyOptions()) {
+    if ((opt.getDevice() == mLibDevice->getUuid()) &&
+        ((!assemblyVariant) ||
+         (opt.getAssemblyVariants().contains(*assemblyVariant)))) {
+      for (auto it = opt.getParts().begin(); it != opt.getParts().end(); ++it) {
+        parts.append(it.ptr());
+      }
+      if (opt.getParts().isEmpty()) {
+        parts.append(std::make_shared<const Part>(
+            SimpleString(""), SimpleString(""), opt.getAttributes()));
+      }
+    }
+  }
+  return parts;
+}
+
+bool BI_Device::doesPackageRequireAssembly(bool resolveAuto) const noexcept {
+  return mLibPackage->getAssemblyType(resolveAuto) !=
+      Package::AssemblyType::None;
 }
 
 bool BI_Device::isUsed() const noexcept {
@@ -370,35 +396,6 @@ void BI_Device::serialize(SExpression& root) const {
   root.ensureLineBreak();
 }
 
-/*******************************************************************************
- *  Inherited from AttributeProvider
- ******************************************************************************/
-
-QString BI_Device::getUserDefinedAttributeValue(const QString& key) const
-    noexcept {
-  if (std::shared_ptr<const Attribute> attr = mAttributes.find(key)) {
-    return attr->getValueTr(true);
-  } else {
-    return QString();
-  }
-}
-
-QString BI_Device::getBuiltInAttributeValue(const QString& key) const noexcept {
-  if (key == QLatin1String("DEVICE")) {
-    return *mLibDevice->getNames().value(getLocaleOrder());
-  } else if (key == QLatin1String("PACKAGE")) {
-    return *mLibPackage->getNames().value(getLocaleOrder());
-  } else if (key == QLatin1String("FOOTPRINT")) {
-    return *mLibFootprint->getNames().value(getLocaleOrder());
-  } else {
-    return QString();
-  }
-}
-
-QVector<const AttributeProvider*> BI_Device::getAttributeProviderParents() const
-    noexcept {
-  return QVector<const AttributeProvider*>{&mBoard, &mCompInstance};
-}
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

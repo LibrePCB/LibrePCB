@@ -37,6 +37,7 @@ namespace editor {
 
 EditableTableWidget::EditableTableWidget(QWidget* parent) noexcept
   : QTableView(parent),
+    mAddButtonOnLastRow(true),
     mShowCopyButton(false),
     mShowEditButton(false),
     mShowMoveButtons(false),
@@ -140,8 +141,9 @@ void EditableTableWidget::rowsInserted(const QModelIndex& parent, int start,
  ******************************************************************************/
 
 void EditableTableWidget::updateCanRemove() noexcept {
-  const bool canRemove =
-      model() && (model()->rowCount() > (mMinimumRowCount + 1)) && (!mReadOnly);
+  const int metaRowCount = mAddButtonOnLastRow ? 1 : 0;
+  const bool canRemove = model() &&
+      (model()->rowCount() > (mMinimumRowCount + metaRowCount)) && (!mReadOnly);
   if (canRemove != mCanRemove) {
     mCanRemove = canRemove;
     emit canRemoveChanged(mCanRemove);
@@ -180,7 +182,9 @@ void EditableTableWidget::installButtons(int row) noexcept {
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     int size = rowHeight(row);
-    if (row < model()->rowCount() - 1) {
+    const int itemsCount =
+        mAddButtonOnLastRow ? (model()->rowCount() - 1) : model()->rowCount();
+    if (row < itemsCount) {
       if (mShowEditButton) {
         layout->addWidget(createButton(
             "btnEdit", QIcon(":/img/actions/edit.png"), "", tr("Edit"), size,

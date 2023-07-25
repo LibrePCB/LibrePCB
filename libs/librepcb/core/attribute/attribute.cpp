@@ -133,6 +133,12 @@ bool Attribute::operator==(const Attribute& rhs) const noexcept {
   return true;
 }
 
+Attribute& Attribute::operator=(const Attribute& rhs) noexcept {
+  setKey(rhs.mKey);
+  setTypeValueUnit(*rhs.mType, rhs.mValue, rhs.mUnit);
+  return *this;
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/

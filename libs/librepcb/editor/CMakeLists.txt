@@ -387,6 +387,8 @@ add_library(
   modelview/angledelegate.h
   modelview/attributelistmodel.cpp
   modelview/attributelistmodel.h
+  modelview/checkableitemsdelegate.cpp
+  modelview/checkableitemsdelegate.h
   modelview/comboboxdelegate.cpp
   modelview/comboboxdelegate.h
   modelview/editablelistmodel.h
@@ -403,6 +405,10 @@ add_library(
   project/addcomponentdialog.cpp
   project/addcomponentdialog.h
   project/addcomponentdialog.ui
+  project/assemblyvariantlisteditorwidget.cpp
+  project/assemblyvariantlisteditorwidget.h
+  project/assemblyvariantlistmodel.cpp
+  project/assemblyvariantlistmodel.h
   project/boardeditor/boardclipboarddata.cpp
   project/boardeditor/boardclipboarddata.h
   project/boardeditor/boardclipboarddatabuilder.cpp
@@ -495,6 +501,12 @@ add_library(
   project/cmd/cmdadddevicetoboard.h
   project/cmd/cmdaddsymboltoschematic.cpp
   project/cmd/cmdaddsymboltoschematic.h
+  project/cmd/cmdassemblyvariantadd.cpp
+  project/cmd/cmdassemblyvariantadd.h
+  project/cmd/cmdassemblyvariantedit.cpp
+  project/cmd/cmdassemblyvariantedit.h
+  project/cmd/cmdassemblyvariantremove.cpp
+  project/cmd/cmdassemblyvariantremove.h
   project/cmd/cmdboardadd.cpp
   project/cmd/cmdboardadd.h
   project/cmd/cmdboardedit.cpp
@@ -665,6 +677,8 @@ add_library(
   project/cmd/cmdsymbolinstancetextremove.h
   project/cmd/cmdsymbolinstancetextsreset.cpp
   project/cmd/cmdsymbolinstancetextsreset.h
+  project/componentassemblyoptionlisteditorwidget.cpp
+  project/componentassemblyoptionlisteditorwidget.h
   project/newprojectwizard/newprojectwizard.cpp
   project/newprojectwizard/newprojectwizard.h
   project/newprojectwizard/newprojectwizard.ui
@@ -776,6 +790,8 @@ add_library(
   widgets/attributeunitcombobox.h
   widgets/centeredcheckbox.cpp
   widgets/centeredcheckbox.h
+  widgets/checkableitemseditorwidget.cpp
+  widgets/checkableitemseditorwidget.h
   widgets/doublespinbox.cpp
   widgets/doublespinbox.h
   widgets/editabletablewidget.cpp

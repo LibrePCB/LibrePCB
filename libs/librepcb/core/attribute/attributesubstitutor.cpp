@@ -22,8 +22,6 @@
  ******************************************************************************/
 #include "attributesubstitutor.h"
 
-#include "attributeprovider.h"
-
 #include <QtCore>
 
 /*******************************************************************************
@@ -35,8 +33,7 @@ namespace librepcb {
  *  Public Methods
  ******************************************************************************/
 
-QString AttributeSubstitutor::substitute(QString str,
-                                         const AttributeProvider* ap,
+QString AttributeSubstitutor::substitute(QString str, LookupFunction lookup,
                                          FilterFunction filter) noexcept {
   int startPos = 0;
   int length = 0;
@@ -62,7 +59,7 @@ QString AttributeSubstitutor::substitute(QString str,
             key.length() - 2;  // do not search for variables in the value
         keyFound = true;
         break;
-      } else if ((getValueOfKey(key, value, ap)) &&
+      } else if ((getValueOfKey(key, value, lookup)) &&
                  (!keyBacktrace.contains(key))) {
         // replace "{{KEY}}" with the value of KEY
         str.replace(startPos, length, value);
@@ -120,9 +117,9 @@ void AttributeSubstitutor::applyFilter(QString& str, int& start, int& end,
 }
 
 bool AttributeSubstitutor::getValueOfKey(const QString& key, QString& value,
-                                         const AttributeProvider* ap) noexcept {
-  if (ap) {
-    value = ap->getAttributeValue(key);
+                                         LookupFunction lookup) noexcept {
+  if (lookup) {
+    value = lookup(key);
     return !value.isEmpty();
   } else {
     return false;

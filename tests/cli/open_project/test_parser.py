@@ -38,7 +38,7 @@ Options:
                                      overwritten. Supported file extensions: csv
   --bom-attributes <attributes>      Comma-separated list of additional
                                      attributes to be exported to the BOM.
-                                     Example: "MANUFACTURER, MPN"
+                                     Example: "SUPPLIER, SKU"
   --export-pcb-fabrication-data      Export PCB fabrication data
                                      (Gerber/Excellon) according the fabrication
                                      output settings of boards. Existing files
@@ -70,6 +70,16 @@ Options:
                                      '--board[-index]' is not passed, all boards
                                      will be removed. Pass '--save' to save the
                                      modified project to disk.
+  --variant <name>                   The name of the assembly variant(s) to
+                                     export. Can be given multiple times. If not
+                                     set, all assembly variants are exported.
+  --variant-index <index>            Same as '--variant', but allows to specify
+                                     assembly variants by index instead of by
+                                     name.
+  --set-default-variant <name>       Move the specified assembly variant to the
+                                     top before executing all the other actions.
+                                     Pass '--save' to save the modified project
+                                     to disk.
   --save                             Save project before closing it (useful to
                                      upgrade file format).
   --strict                           Fail if the project files are not strictly

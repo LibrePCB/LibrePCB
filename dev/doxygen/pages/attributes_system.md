@@ -4,7 +4,7 @@ Attributes System {#doc_attributes_system}
 [TOC]
 
 LibrePCB uses a sophisticated attributes system which makes it possible to
-display dynamically determined information in schematics and boards, or to
+display dynamic, context-dependent information in schematics and boards, or to
 provide additional information for the BOM.
 
 
@@ -225,9 +225,10 @@ Here are some examples how the attribute system works for standard use-cases:
 
 # Implementation {#doc_attributes_system_implementation}
 
-Every class which provides some attributes need to inherit from
-librepcb::AttributeProvider. Please read the documentation of
-librepcb::AttributeProvider to see how this class works in detail.
+The class ::librepcb::ProjectAttributeLookup allows to query attributes on
+each of the objects providing any attributes (both built-in and user-defined
+attributes). However, this class does not perform any text substitution.
 
-The substitution of attributes in strings is done by the class
-librepcb::AttributeSubstitutor.
+The class ::librepcb::AttributeSubstitutor implements the actual text
+substitution. From a given input string and an attribute lookup function,
+the substituted output string is determined and returned.

@@ -60,6 +60,9 @@ public:
   void setIncludeMetadataComment(bool include) noexcept {
     mIncludeMetadataComment = include;
   }
+  void setIncludeNonMountedParts(bool include) noexcept {
+    mIncludeNonMountedParts = include;
+  }
 
   // General Methods
   std::shared_ptr<CsvFile> generateCsv() const;
@@ -76,6 +79,7 @@ private:  // Data
   const PickPlaceData& mData;
   BoardSide mBoardSide;
   bool mIncludeMetadataComment;
+  bool mIncludeNonMountedParts;
 };
 
 /*******************************************************************************

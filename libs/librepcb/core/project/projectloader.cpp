@@ -26,6 +26,7 @@
 #include "../fileio/versionfile.h"
 #include "../library/cmp/component.h"
 #include "../library/dev/device.h"
+#include "../library/dev/part.h"
 #include "../library/pkg/package.h"
 #include "../library/sym/symbol.h"
 #include "../serialization/fileformatmigration.h"
@@ -45,6 +46,7 @@
 #include "board/items/bi_stroketext.h"
 #include "board/items/bi_via.h"
 #include "board/items/bi_zone.h"
+#include "circuit/assemblyvariant.h"
 #include "circuit/circuit.h"
 #include "circuit/componentinstance.h"
 #include "circuit/componentsignalinstance.h"
@@ -212,6 +214,9 @@ void ProjectLoader::loadSettings(Project& p) {
     p.setCustomBomAttributes(l);
   }
 
+  p.setDefaultLockComponentAssembly(
+      deserialize<bool>(root.getChild("default_lock_component_assembly/@0")));
+
   qDebug() << "Successfully loaded project settings.";
 }
 
@@ -262,6 +267,15 @@ void ProjectLoader::loadCircuit(Project& p) {
   SExpression root = SExpression::parse(p.getDirectory().read(fp),
                                         p.getDirectory().getAbsPath(fp));
 
+  // Load assembly variants.
+  foreach (const SExpression* node, root.getChildren("variant")) {
+    auto av = std::make_shared<AssemblyVariant>(*node);
+    p.getCircuit().addAssemblyVariant(av);
+  }
+  if (p.getCircuit().getAssemblyVariants().isEmpty()) {
+    throw RuntimeError(__FILE__, __LINE__, "Project has no assembly variants.");
+  }
+
   // Load net classes.
   foreach (const SExpression* node, root.getChildren("netclass")) {
     NetClass* netclass =
@@ -299,10 +313,11 @@ void ProjectLoader::loadCircuit(Project& p) {
     ComponentInstance* cmp = new ComponentInstance(
         p.getCircuit(), deserialize<Uuid>(node->getChild("@0")), *libCmp,
         deserialize<Uuid>(node->getChild("lib_variant/@0")),
-        deserialize<CircuitIdentifier>(node->getChild("name/@0")),
-        deserialize<tl::optional<Uuid>>(node->getChild("lib_device/@0")));
+        deserialize<CircuitIdentifier>(node->getChild("name/@0")));
     cmp->setValue(node->getChild("value/@0").getValue());
     cmp->setAttributes(AttributeList(*node));
+    cmp->setAssemblyOptions(ComponentAssemblyOptionList(*node));
+    cmp->setLockAssembly(deserialize<bool>(node->getChild("lock_assembly/@0")));
     p.getCircuit().addComponentInstance(*cmp);
 
     QSet<Uuid> loadedSignals;

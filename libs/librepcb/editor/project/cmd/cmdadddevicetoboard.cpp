@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "cmdadddevicetoboard.h"
 
+#include "../../project/cmd/cmdcomponentinstanceedit.h"
 #include "../../project/cmd/cmddeviceinstanceadd.h"
 #include "../../project/cmd/cmdprojectlibraryaddelement.h"
 
@@ -31,6 +32,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectlibrary.h>
@@ -152,6 +154,32 @@ bool CmdAddDeviceToBoard::performExecute() {
     mPreferredModelUuid = mDeviceInstance->getDefaultLibModelUuid();
   }
   mDeviceInstance->setModel(mPreferredModelUuid);
+
+  // Make sure there is at least one assembly option for this device.
+  if (!mComponentInstance.getCompatibleDevices().contains(mDeviceUuid)) {
+    if (mComponentInstance.getLockAssembly()) {
+      throw RuntimeError(
+          __FILE__, __LINE__,
+          tr("The component in the schematic does not specify the chosen "
+             "device as compatible and is locked for modifications from the "
+             "board editor. Either add a corresponding assembly option to the "
+             "component in the schematic, or remove the lock from the "
+             "component."));
+    }
+    const QSet<Uuid> assemblyVariants =
+        mDeviceInstance->doesPackageRequireAssembly(true)
+        ? mComponentInstance.getCircuit().getAssemblyVariants().getUuidSet()
+        : QSet<Uuid>();
+    ComponentAssemblyOptionList assemblyOptions =
+        mComponentInstance.getAssemblyOptions();
+    assemblyOptions.append(std::make_shared<ComponentAssemblyOption>(
+        mDeviceUuid, mDeviceInstance->getLibDevice().getAttributes(),
+        assemblyVariants, PartList{}));
+    QScopedPointer<CmdComponentInstanceEdit> cmd(new CmdComponentInstanceEdit(
+        mComponentInstance.getCircuit(), mComponentInstance));
+    cmd->setAssemblyOptions(assemblyOptions);
+    execNewChildCmd(cmd.take());  // can throw
+  }
 
   // add a new device instance to the board
   execNewChildCmd(new CmdDeviceInstanceAdd(*mDeviceInstance));  // can throw

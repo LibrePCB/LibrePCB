@@ -26,7 +26,10 @@
 #include "../workspace/categorytreemodel.h"
 
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/library/dev/part.h>
+#include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/types/uuid.h>
+#include <optional/tl/optional.hpp>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -41,7 +44,7 @@ namespace librepcb {
 class Component;
 class ComponentSymbolVariant;
 class Device;
-class Package;
+class Part;
 class Symbol;
 class Theme;
 class WorkspaceLibraryDb;
@@ -69,9 +72,11 @@ class AddComponentDialog final : public QDialog {
 
   // Types
   struct SearchResultDevice {
+    tl::optional<Uuid> uuid;
     QString name;
     FilePath pkgFp;
     QString pkgName;
+    PartList parts;
     bool match = false;
   };
 
@@ -81,7 +86,11 @@ class AddComponentDialog final : public QDialog {
     bool match = false;
   };
 
-  typedef QHash<FilePath, SearchResultComponent> SearchResult;
+  struct SearchResult {
+    QHash<FilePath, SearchResultComponent> components;
+    int deviceCount = 0;
+    int partsCount = 0;
+  };
 
 public:
   // Constructors / Destructor
@@ -92,9 +101,21 @@ public:
   ~AddComponentDialog() noexcept;
 
   // Getters
-  tl::optional<Uuid> getSelectedComponentUuid() const noexcept;
-  tl::optional<Uuid> getSelectedSymbVarUuid() const noexcept;
-  tl::optional<Uuid> getSelectedDeviceUuid() const noexcept;
+  std::shared_ptr<const Component> getSelectedComponent() const noexcept {
+    return mSelectedComponent;
+  }
+  std::shared_ptr<const ComponentSymbolVariant> getSelectedSymbolVariant() const
+      noexcept {
+    return mSelectedSymbVar;
+  }
+  std::shared_ptr<const Device> getSelectedDevice() const noexcept {
+    return mSelectedDevice;
+  }
+  std::shared_ptr<const Part> getSelectedPart() const noexcept {
+    return mSelectedPart;
+  }
+  tl::optional<Package::AssemblyType> getSelectedPackageAssemblyType() const
+      noexcept;
 
   /**
    * @brief Check if dialog shall be opened again after the current component
@@ -113,7 +134,9 @@ public:
   void setNormOrder(const QStringList& order) noexcept { mNormOrder = order; }
 
   // General Methods
-  void selectComponentByKeyword(const QString keyword) noexcept;
+  void selectComponentByKeyword(
+      const QString keyword,
+      const tl::optional<Uuid>& selectedDevice = tl::nullopt) noexcept;
 
 private slots:
   void searchEditTextChanged(const QString& text) noexcept;
@@ -127,13 +150,17 @@ private slots:
 
 private:
   // Private Methods
-  void searchComponents(const QString& input, bool selectFirstResult = false);
-  SearchResult searchComponentsAndDevices(const QString& input);
+  void searchComponents(const QString& input,
+                        const tl::optional<Uuid>& selectedDevice = tl::nullopt,
+                        bool selectFirstResult = false);
+  SearchResult search(const QString& input);
   void setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
-  void setSelectedComponent(const Component* cmp);
+  void setSelectedComponent(std::shared_ptr<const Component> cmp);
   void setSelectedSymbVar(
       std::shared_ptr<const ComponentSymbolVariant> symbVar);
-  void setSelectedDevice(const Device* dev);
+  void setSelectedDevice(std::shared_ptr<const Device> dev);
+  void setSelectedPart(std::shared_ptr<const Part> part);
+  void addPartItem(std::shared_ptr<Part> part, QTreeWidgetItem* parent);
   void accept() noexcept;
 
   // General
@@ -151,8 +178,9 @@ private:
   tl::optional<Uuid> mSelectedCategoryUuid;
   std::shared_ptr<const Component> mSelectedComponent;
   std::shared_ptr<const ComponentSymbolVariant> mSelectedSymbVar;
-  QScopedPointer<const Device> mSelectedDevice;
+  std::shared_ptr<const Device> mSelectedDevice;
   std::unique_ptr<Package> mSelectedPackage;
+  std::shared_ptr<const Part> mSelectedPart;
   QList<std::shared_ptr<Symbol>> mPreviewSymbols;
   QList<std::shared_ptr<SymbolGraphicsItem>> mPreviewSymbolGraphicsItems;
   QScopedPointer<FootprintGraphicsItem> mPreviewFootprintGraphicsItem;

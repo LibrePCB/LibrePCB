@@ -65,7 +65,7 @@ public:
   PickPlaceDataItem(const QString& designator, const QString& value,
                     const QString& deviceName, const QString& packageName,
                     const Point& position, const Angle& rotation,
-                    BoardSide boardSide, Type type) noexcept
+                    BoardSide boardSide, Type type, bool mount) noexcept
     : mDesignator(designator),
       mValue(value),
       mDeviceName(deviceName),
@@ -73,7 +73,8 @@ public:
       mPosition(position),
       mRotation(rotation),
       mBoardSide(boardSide),
-      mType(type) {}
+      mType(type),
+      mMount(mount) {}
   PickPlaceDataItem(const PickPlaceDataItem& other) noexcept
     : mDesignator(other.mDesignator),
       mValue(other.mValue),
@@ -82,7 +83,8 @@ public:
       mPosition(other.mPosition),
       mRotation(other.mRotation),
       mBoardSide(other.mBoardSide),
-      mType(other.mType) {}
+      mType(other.mType),
+      mMount(other.mMount) {}
   ~PickPlaceDataItem() noexcept {}
 
   // Getters
@@ -94,6 +96,7 @@ public:
   const Angle& getRotation() const noexcept { return mRotation; }
   BoardSide getBoardSide() const noexcept { return mBoardSide; }
   Type getType() const noexcept { return mType; }
+  bool isMount() const noexcept { return mMount; }
 
   // Setters
   void setDesignator(const QString& value) noexcept { mDesignator = value; }
@@ -108,6 +111,7 @@ public:
     mRotation = rhs.mRotation;
     mBoardSide = rhs.mBoardSide;
     mType = rhs.mType;
+    mMount = rhs.mMount;
     return *this;
   }
 
@@ -120,6 +124,7 @@ private:
   Angle mRotation;
   BoardSide mBoardSide;
   Type mType;
+  bool mMount;  ///< False means "do not mount".
 };
 
 /*******************************************************************************

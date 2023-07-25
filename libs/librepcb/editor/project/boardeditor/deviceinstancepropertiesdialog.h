@@ -35,8 +35,9 @@ namespace librepcb {
 
 class BI_Device;
 class LengthUnit;
+class Part;
 class Project;
-class WorkspaceSettings;
+class Workspace;
 
 namespace editor {
 
@@ -62,9 +63,8 @@ public:
   DeviceInstancePropertiesDialog() = delete;
   DeviceInstancePropertiesDialog(const DeviceInstancePropertiesDialog& other) =
       delete;
-  DeviceInstancePropertiesDialog(const WorkspaceSettings& settings,
-                                 Project& project, BI_Device& device,
-                                 UndoStack& undoStack,
+  DeviceInstancePropertiesDialog(const Workspace& ws, Project& project,
+                                 BI_Device& device, UndoStack& undoStack,
                                  const LengthUnit& lengthUnit,
                                  const QString& settingsPrefix,
                                  QWidget* parent) noexcept;
@@ -75,17 +75,19 @@ public:
       const DeviceInstancePropertiesDialog& rhs) = delete;
 
 private:  // Methods
+  void setSelectedPart(std::shared_ptr<Part> part) noexcept;
   void buttonBoxClicked(QAbstractButton* button) noexcept;
   void keyPressEvent(QKeyEvent* e) noexcept override;
   void accept() noexcept override;
   bool applyChanges() noexcept;
 
 private:  // Data
-  const WorkspaceSettings& mSettings;
+  const Workspace& mWorkspace;
   Project& mProject;
   BI_Device& mDevice;
   UndoStack& mUndoStack;
   AttributeList mAttributes;
+  std::shared_ptr<Part> mSelectedPart;  // Avoid dangling reference.
   QScopedPointer<Ui::DeviceInstancePropertiesDialog> mUi;
 };
 

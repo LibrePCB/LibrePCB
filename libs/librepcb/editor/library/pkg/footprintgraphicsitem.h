@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/attribute/attributeprovider.h>
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 
@@ -64,8 +63,7 @@ class ZoneGraphicsItem;
 /**
  * @brief The FootprintGraphicsItem class
  */
-class FootprintGraphicsItem final : public QGraphicsItemGroup,
-                                    public AttributeProvider {
+class FootprintGraphicsItem final : public QGraphicsItemGroup {
 public:
   enum class FindFlag {
     // Item types
@@ -140,9 +138,6 @@ public:
   // Operator Overloadings
   FootprintGraphicsItem& operator=(const FootprintGraphicsItem& rhs) = delete;
 
-signals:
-  void attributesChanged() override {}
-
 private:  // Methods
   void syncPads() noexcept;
   void syncCircles() noexcept;
@@ -153,7 +148,6 @@ private:  // Methods
   void footprintEdited(const Footprint& footprint,
                        Footprint::Event event) noexcept;
   void substituteText(StrokeTextGraphicsItem& text) noexcept;
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
 
 private:  // Data
   std::shared_ptr<Footprint> mFootprint;

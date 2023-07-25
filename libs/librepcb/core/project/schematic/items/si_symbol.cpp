@@ -259,23 +259,6 @@ void SI_Symbol::serialize(SExpression& root) const {
 }
 
 /*******************************************************************************
- *  Inherited from AttributeProvider
- ******************************************************************************/
-
-QString SI_Symbol::getBuiltInAttributeValue(const QString& key) const noexcept {
-  if (key == QLatin1String("NAME")) {
-    return getName();
-  } else {
-    return QString();
-  }
-}
-
-QVector<const AttributeProvider*> SI_Symbol::getAttributeProviderParents() const
-    noexcept {
-  return QVector<const AttributeProvider*>{&mSchematic, &mComponentInstance};
-}
-
-/*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 

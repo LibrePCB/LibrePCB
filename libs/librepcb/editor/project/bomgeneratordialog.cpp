@@ -35,8 +35,11 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/bomgenerator.h>
+#include <librepcb/core/project/circuit/assemblyvariant.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -64,7 +67,16 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
   mUi->tableWidget->verticalHeader()->setMinimumSectionSize(10);
   mUi->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
   mUi->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-  mUi->edtOutputPath->setText("./output/{{VERSION}}/{{PROJECT}}_BOM.csv");
+  const bool multipleAssemblyVariants =
+      mProject.getCircuit().getAssemblyVariants().count() > 1;
+  mUi->lblAssemblyVariant->setVisible(multipleAssemblyVariants);
+  mUi->cbxAssemblyVariant->setVisible(multipleAssemblyVariants);
+  QString outPath = "./output/{{VERSION}}/{{PROJECT}}_BOM";
+  if (multipleAssemblyVariants) {
+    outPath += "_{{VARIANT}}";
+  }
+  mUi->edtOutputPath->setText(outPath % ".csv");
+  mUi->lblNote->setText("ⓘ " % mUi->lblNote->text());
   mBtnGenerate =
       mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::AcceptRole);
   mBtnGenerate->setDefault(true);
@@ -84,6 +96,13 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
     mUi->cbxBoard->addItem(*brd->getName());
   }
 
+  // List assembly variants.
+  for (const auto& av : mProject.getCircuit().getAssemblyVariants()) {
+    mUi->cbxAssemblyVariant->addItem(av.getDisplayText(), av.getUuid().toStr());
+  }
+  mUi->cbxAssemblyVariant->setCurrentIndex(0);
+  mUi->cbxAssemblyVariant->setEnabled(mUi->cbxAssemblyVariant->count() > 1);
+
   // List attributes.
   mUi->edtAttributes->setText(mProject.getCustomBomAttributes().join(", "));
 
@@ -94,6 +113,10 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
 
   connect(
       mUi->cbxBoard,
+      static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+      this, &BomGeneratorDialog::updateBom);
+  connect(
+      mUi->cbxAssemblyVariant,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, &BomGeneratorDialog::updateBom);
   connect(mUi->edtAttributes, &QLineEdit::textEdited, this,
@@ -171,56 +194,14 @@ void BomGeneratorDialog::updateAttributes() noexcept {
 }
 
 void BomGeneratorDialog::updateBom() noexcept {
-  const Board* board =
-      mProject.getBoardByIndex(mUi->cbxBoard->currentIndex() - 1);
+  if (auto avUuid = getAssemblyVariantUuid(false)) {
+    const Board* board =
+        mProject.getBoardByIndex(mUi->cbxBoard->currentIndex() - 1);
 
-  BomGenerator gen(mProject);
-  gen.setAdditionalAttributes(mProject.getCustomBomAttributes());
-  mBom = gen.generate(board);
-  updateTable();
-
-  // Update status label to indicate whether the devices are in sync with the
-  // devices chosen in the schematic.
-  // See https://github.com/LibrePCB/LibrePCB/issues/584
-  if (board) {
-    QStringList differentDevices;
-    foreach (const BI_Device* device, board->getDeviceInstances()) {
-      tl::optional<Uuid> selectedDevice =
-          device->getComponentInstance().getDefaultDeviceUuid();
-      if (selectedDevice &&
-          (selectedDevice != device->getLibDevice().getUuid())) {
-        differentDevices.append(*device->getComponentInstance().getName());
-      }
-    }
-    differentDevices.sort(Qt::CaseInsensitive);
-    if (!differentDevices.isEmpty()) {
-      int max = 20;
-      QString designators = differentDevices.mid(0, max).join(", ");
-      if (differentDevices.count() > max) {
-        designators += ", ...";
-      }
-      mUi->lblMessage->setText(
-          "⚠️ " %
-          tr("Warning: %n device(s) from the selected board differ from their "
-             "pre-selected devices in the schematic: %1",
-             nullptr, differentDevices.count())
-              .arg(designators));
-      mUi->lblMessage->setStyleSheet(
-          "QLabel {background-color: darksalmon; color: black;};");
-    } else {
-      mUi->lblMessage->setText(
-          "✓ " %
-          tr("All devices of the selected board are in sync with their "
-             "pre-selected devices in the schematic."));
-      mUi->lblMessage->setStyleSheet(
-          "QLabel {background-color: yellowgreen; color: black;};");
-    }
-  } else {
-    mUi->lblMessage->setText(
-        "ℹ️ " %
-        tr("Devices are not exported because no board is selected."));
-    mUi->lblMessage->setStyleSheet(
-        "QLabel {background-color: yellow; color: black;};");
+    BomGenerator gen(mProject);
+    gen.setAdditionalAttributes(mProject.getCustomBomAttributes());
+    mBom = gen.generate(board, *avUuid);
+    updateTable();
   }
 }
 
@@ -229,6 +210,7 @@ void BomGeneratorDialog::updateTable() noexcept {
 
   try {
     BomCsvWriter writer(*mBom);
+    writer.setIncludeNonMountedParts(true);
     std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
     mUi->tableWidget->setRowCount(csv->getValues().count());
     mUi->tableWidget->setColumnCount(csv->getHeader().count());
@@ -240,7 +222,11 @@ void BomGeneratorDialog::updateTable() noexcept {
       for (int row = 0; row < csv->getValues().count(); ++row) {
         QString text = csv->getValues()[row][column];
         text.replace("\n", " ");
-        mUi->tableWidget->setItem(row, column, new QTableWidgetItem(text));
+        QTableWidgetItem* item = new QTableWidgetItem(text);
+        if (csv->getValues()[row][0] == "0") {
+          item->setBackground(Qt::gray);
+        }
+        mUi->tableWidget->setItem(row, column, item);
       }
     }
     mUi->tableWidget->resizeRowsToContents();
@@ -249,10 +235,28 @@ void BomGeneratorDialog::updateTable() noexcept {
   }
 }
 
+std::shared_ptr<AssemblyVariant> BomGeneratorDialog::getAssemblyVariant() const
+    noexcept {
+  auto uuid = getAssemblyVariantUuid(false);
+  return uuid ? mProject.getCircuit().getAssemblyVariants().find(*uuid)
+              : std::shared_ptr<AssemblyVariant>();
+}
+
+tl::optional<Uuid> BomGeneratorDialog::getAssemblyVariantUuid(
+    bool throwIfNullopt) const {
+  const tl::optional<Uuid> uuid =
+      Uuid::tryFromString(mUi->cbxAssemblyVariant->currentData().toString());
+  if ((!uuid) && throwIfNullopt) {
+    throw LogicError(__FILE__, __LINE__, "No assembly variant selected.");
+  }
+  return uuid;
+}
+
 FilePath BomGeneratorDialog::getOutputFilePath() const noexcept {
   QString path = mUi->edtOutputPath->text().trimmed();
   path = AttributeSubstitutor::substitute(
-      path, &mProject, [&](const QString& str) {
+      path, ProjectAttributeLookup(mProject, getAssemblyVariant()),
+      [&](const QString& str) {
         return FilePath::cleanFileName(
             str, FilePath::ReplaceSpaces | FilePath::KeepCase);
       });

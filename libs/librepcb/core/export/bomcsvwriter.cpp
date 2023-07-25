@@ -36,7 +36,8 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
-BomCsvWriter::BomCsvWriter(const Bom& bom) noexcept : mBom(bom) {
+BomCsvWriter::BomCsvWriter(const Bom& bom) noexcept
+  : mBom(bom), mIncludeNonMountedParts(false) {
 }
 
 BomCsvWriter::~BomCsvWriter() noexcept {
@@ -46,6 +47,10 @@ BomCsvWriter::~BomCsvWriter() noexcept {
  *  General Methods
  ******************************************************************************/
 
+void BomCsvWriter::setIncludeNonMountedParts(bool include) noexcept {
+  mIncludeNonMountedParts = include;
+}
+
 std::shared_ptr<CsvFile> BomCsvWriter::generateCsv() const {
   std::shared_ptr<CsvFile> file(new CsvFile());
 
@@ -54,8 +59,13 @@ std::shared_ptr<CsvFile> BomCsvWriter::generateCsv() const {
   file->setHeader(QStringList{"Quantity", "Designators"} + mBom.getColumns());
 
   foreach (const BomItem& item, mBom.getItems()) {
+    const int count = item.isMount() ? item.getDesignators().count() : 0;
+    if ((count == 0) && (!mIncludeNonMountedParts)) {
+      continue;
+    }
+
     QStringList values;
-    values += QString::number(item.getDesignators().count());
+    values += QString::number(count);
     values += item.getDesignators().join(", ");
     foreach (const QString& attribute, item.getAttributes()) {
       values += attribute;

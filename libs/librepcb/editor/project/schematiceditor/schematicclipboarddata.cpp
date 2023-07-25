@@ -40,11 +40,13 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-SchematicClipboardData::SchematicClipboardData(const Uuid& schematicUuid,
-                                               const Point& cursorPos) noexcept
+SchematicClipboardData::SchematicClipboardData(
+    const Uuid& schematicUuid, const Point& cursorPos,
+    const AssemblyVariantList& assemblyVariants) noexcept
   : mFileSystem(TransactionalFileSystem::openRW(FilePath::getRandomTempPath())),
     mSchematicUuid(schematicUuid),
     mCursorPos(cursorPos),
+    mAssemblyVariants(assemblyVariants),
     mComponentInstances(),
     mSymbolInstances(),
     mNetSegments(),
@@ -53,13 +55,14 @@ SchematicClipboardData::SchematicClipboardData(const Uuid& schematicUuid,
 }
 
 SchematicClipboardData::SchematicClipboardData(const QByteArray& mimeData)
-  : SchematicClipboardData(Uuid::createRandom(), Point()) {
+  : SchematicClipboardData(Uuid::createRandom(), Point(), {}) {
   mFileSystem->loadFromZip(mimeData);  // can throw
 
   SExpression root =
       SExpression::parse(mFileSystem->read("schematic.lp"), FilePath());
   mSchematicUuid = deserialize<Uuid>(root.getChild("schematic/@0"));
   mCursorPos = Point(root.getChild("cursor_position"));
+  mAssemblyVariants.loadFromSExpression(root);
   mComponentInstances.loadFromSExpression(root);
   mSymbolInstances.loadFromSExpression(root);
   mNetSegments.loadFromSExpression(root);
@@ -95,6 +98,8 @@ std::unique_ptr<QMimeData> SchematicClipboardData::toMimeData() const {
   mCursorPos.serialize(root.appendList("cursor_position"));
   root.ensureLineBreak();
   root.appendChild("schematic", mSchematicUuid);
+  root.ensureLineBreak();
+  mAssemblyVariants.serialize(root);
   root.ensureLineBreak();
   mComponentInstances.serialize(root);
   root.ensureLineBreak();

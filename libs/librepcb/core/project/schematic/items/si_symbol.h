@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../../attribute/attributeprovider.h"
 #include "../../../geometry/text.h"
 #include "../../../types/angle.h"
 #include "../../../types/point.h"
@@ -52,7 +51,7 @@ class Symbol;
 /**
  * @brief The SI_Symbol class
  */
-class SI_Symbol final : public SI_Base, public AttributeProvider {
+class SI_Symbol final : public SI_Base {
   Q_OBJECT
 
 public:
@@ -114,22 +113,13 @@ public:
    */
   void serialize(SExpression& root) const;
 
-  // Inherited from AttributeProvider
-  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
-  QVector<const AttributeProvider*> getAttributeProviderParents() const
-      noexcept override;
-
   // Operator Overloadings
   SI_Symbol& operator=(const SI_Symbol& rhs) = delete;
 
 signals:
   void textAdded(SI_Text& text);
   void textRemoved(SI_Text& text);
-
-  /// @copydoc AttributeProvider::attributesChanged()
-  void attributesChanged() override;
+  void attributesChanged();
 
 private:
   bool checkAttributesValidity() const noexcept;

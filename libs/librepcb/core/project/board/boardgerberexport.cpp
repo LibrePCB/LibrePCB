@@ -37,6 +37,7 @@
 #include "../circuit/componentsignalinstance.h"
 #include "../circuit/netsignal.h"
 #include "../project.h"
+#include "../projectattributelookup.h"
 #include "board.h"
 #include "boardfabricationoutputsettings.h"
 #include "items/bi_device.h"
@@ -121,6 +122,7 @@ void BoardGerberExport::exportPcbLayers(
 }
 
 void BoardGerberExport::exportComponentLayer(BoardSide side,
+                                             const Uuid& assemblyVariant,
                                              const FilePath& filePath) const {
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
                       mProject.getVersion());
@@ -146,13 +148,21 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   // Export all components on the selected board side.
   foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
     if (device->getMirrored() == (side == BoardSide::Bottom)) {
+      auto part = device->getParts(assemblyVariant).value(0);
+      if (!part) {
+        continue;  // Do not mount.
+      }
+
+      // Determine assembly type.
       const Package::AssemblyType assemblyType =
           device->getLibPackage().getAssemblyType(true);
       GerberGenerator::MountType mountType = GerberGenerator::MountType::Other;
       switch (assemblyType) {
         case Package::AssemblyType::None:
-          // Skip devices which don't represent a mountable package.
-          continue;
+          qWarning()
+              << "Exported device with non-mountable package to Gerber X3:"
+              << *device->getComponentInstance().getName();
+          break;
         case Package::AssemblyType::Tht:
         case Package::AssemblyType::Mixed:  // Does this make sense?!
           mountType = GerberGenerator::MountType::Tht;
@@ -170,17 +180,16 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
       }
 
       // Export component center and attributes.
-      Angle rotation = device->getRotation();
-      QString designator = *device->getComponentInstance().getName();
-      QString value = device->getComponentInstance().getValue(true).trimmed();
-      QString manufacturer =
-          AttributeSubstitutor::substitute("{{MANUFACTURER}}", device)
-              .trimmed();
-      QString mpn = AttributeSubstitutor::substitute(
-                        "{{MPN or PARTNUMBER or DEVICE}}", device)
-                        .trimmed();
+      ProjectAttributeLookup lookup(*device, part);
+      const Angle rotation = device->getRotation();
+      const QString designator = *device->getComponentInstance().getName();
+      const QString value =
+          AttributeSubstitutor::substitute(lookup("VALUE"), lookup).trimmed();
+      const QString mpn = lookup("MPN").simplified();
+      const QString manufacturer = lookup("MANUFACTURER").simplified();
+
       // Note: Always use english locale to make PnP files portable.
-      QString footprintName =
+      const QString footprintName =
           *device->getLibPackage().getNames().getDefaultValue();
       gen.flashComponent(device->getPosition(), rotation, designator, value,
                          mountType, manufacturer, mpn, footprintName);
@@ -246,12 +255,14 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
     int padNumber = 1;
     foreach (const BI_FootprintPad* pad, device->getPads()) {
       if (pad->getLibPad().getFunctionIsFiducial() && pad->isOnLayer(cuLayer)) {
+        ProjectAttributeLookup lookup(*device, nullptr);
         const QString designator =
             QString("%1:%2")
                 .arg(*device->getComponentInstance().getName())
                 .arg(padNumber);
         const QString value =
-            device->getComponentInstance().getValue(true).trimmed();
+            AttributeSubstitutor::substitute(lookup("VALUE"), lookup)
+                .simplified();
         const QString footprintName =
             *device->getLibPackage().getNames().getDefaultValue();
         gen.flashComponent(pad->getPosition(), pad->getRotation(), designator,
@@ -265,43 +276,6 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   gen.generate();
   gen.saveToFile(filePath);
   mWrittenFiles.append(filePath);
-}
-
-/*******************************************************************************
- *  Inherited from AttributeProvider
- ******************************************************************************/
-
-QString BoardGerberExport::getBuiltInAttributeValue(const QString& key) const
-    noexcept {
-  auto getLayerName = [](const Layer* layer) {
-    Q_ASSERT(layer && layer->isCopper());
-    if (layer->isTop()) {
-      return QString("TOP");  // no tr()!
-    } else if (layer->isBottom()) {
-      return QString("BOTTOM");  // no tr()!
-    } else {
-      return QString("IN%1").arg(layer->getCopperNumber());  // no tr()!
-    }
-  };
-
-  if ((key == QLatin1String("CU_LAYER")) && (mCurrentInnerCopperLayer > 0)) {
-    return QString::number(mCurrentInnerCopperLayer);
-  } else if ((mCurrentStartLayer) && (key == QLatin1String("START_LAYER"))) {
-    return getLayerName(mCurrentStartLayer);
-  } else if ((mCurrentEndLayer) && (key == QLatin1String("END_LAYER"))) {
-    return getLayerName(mCurrentEndLayer);
-  } else if ((mCurrentStartLayer) && (key == QLatin1String("START_NUMBER"))) {
-    return QString::number(mCurrentStartLayer->getCopperNumber() + 1);
-  } else if ((mCurrentEndLayer) && (key == QLatin1String("END_NUMBER"))) {
-    return QString::number(mCurrentEndLayer->getCopperNumber() + 1);
-  } else {
-    return QString();
-  }
-}
-
-QVector<const AttributeProvider*>
-    BoardGerberExport::getAttributeProviderParents() const noexcept {
-  return QVector<const AttributeProvider*>{&mBoard};
 }
 
 /*******************************************************************************
@@ -999,15 +973,46 @@ std::unique_ptr<ExcellonGenerator> BoardGerberExport::createExcellonGenerator(
 }
 
 FilePath BoardGerberExport::getOutputFilePath(QString path) const noexcept {
-  path = AttributeSubstitutor::substitute(path, this, [&](const QString& str) {
-    return FilePath::cleanFileName(
-        str, FilePath::ReplaceSpaces | FilePath::KeepCase);
-  });
+  path = AttributeSubstitutor::substitute(
+      path, [this](const QString& key) { return getAttributeValue(key); },
+      [&](const QString& str) {
+        return FilePath::cleanFileName(
+            str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+      });
 
   if (QDir::isAbsolutePath(path)) {
     return FilePath(path);
   } else {
     return mBoard.getProject().getPath().getPathTo(path);
+  }
+}
+
+QString BoardGerberExport::getAttributeValue(const QString& key) const
+    noexcept {
+  auto getLayerName = [](const Layer* layer) {
+    Q_ASSERT(layer && layer->isCopper());
+    if (layer->isTop()) {
+      return QString("TOP");  // no tr()!
+    } else if (layer->isBottom()) {
+      return QString("BOTTOM");  // no tr()!
+    } else {
+      return QString("IN%1").arg(layer->getCopperNumber());  // no tr()!
+    }
+  };
+
+  if ((key == QLatin1String("CU_LAYER")) && (mCurrentInnerCopperLayer > 0)) {
+    return QString::number(mCurrentInnerCopperLayer);
+  } else if ((mCurrentStartLayer) && (key == QLatin1String("START_LAYER"))) {
+    return getLayerName(mCurrentStartLayer);
+  } else if ((mCurrentEndLayer) && (key == QLatin1String("END_LAYER"))) {
+    return getLayerName(mCurrentEndLayer);
+  } else if ((mCurrentStartLayer) && (key == QLatin1String("START_NUMBER"))) {
+    return QString::number(mCurrentStartLayer->getCopperNumber() + 1);
+  } else if ((mCurrentEndLayer) && (key == QLatin1String("END_NUMBER"))) {
+    return QString::number(mCurrentEndLayer->getCopperNumber() + 1);
+  } else {
+    const ProjectAttributeLookup lookup(mBoard, nullptr);
+    return lookup(key);
   }
 }
 

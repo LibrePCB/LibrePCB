@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../attribute/attributeprovider.h"
 #include "../../fileio/filepath.h"
 #include "../../fileio/transactionaldirectory.h"
 #include "../../types/elementname.h"
@@ -72,7 +71,7 @@ class SI_Text;
  *  - circle:           TODO
  *  - text:             ::librepcb::SI_Text
  */
-class Schematic final : public QObject, public AttributeProvider {
+class Schematic final : public QObject {
   Q_OBJECT
 
 public:
@@ -135,13 +134,6 @@ public:
   void save();
   void updateAllNetLabelAnchors() noexcept;
 
-  // Inherited from AttributeProvider
-  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getAttributeProviderParents()
-  QVector<const AttributeProvider*> getAttributeProviderParents() const
-      noexcept override;
-
   // Operator Overloadings
   Schematic& operator=(const Schematic& rhs) = delete;
   bool operator==(const Schematic& rhs) noexcept { return (this == &rhs); }
@@ -157,8 +149,7 @@ signals:
   void textAdded(SI_Text& text);
   void textRemoved(SI_Text& text);
 
-  /// @copydoc AttributeProvider::attributesChanged()
-  void attributesChanged() override;
+  void attributesChanged();
 
 private:
   // General

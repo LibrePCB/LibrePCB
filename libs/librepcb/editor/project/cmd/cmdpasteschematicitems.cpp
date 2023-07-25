@@ -104,6 +104,29 @@ bool CmdPasteSchematicItems::performExecute() {
   //  - The graphics items of the added elements are selected immediately to
   //    allow dragging them afterwards.
 
+  // Parts assembly variants conversion function. Work with blacklisting
+  // instead of whitelisting to avoid accidentally disappearing parts if
+  // some assembly variants do not exist in the pasted project.
+  auto convertAssemblyVariants = [this](const QSet<Uuid>& uuids) {
+    if (uuids.isEmpty()) {
+      return uuids;  // Keep do-not-mount status!
+    }
+    QSet<Uuid> result =
+        mProject.getCircuit().getAssemblyVariants().getUuidSet();
+    for (const AssemblyVariant& oldAv : mData->getAssemblyVariants()) {
+      if (!uuids.contains(oldAv.getUuid())) {
+        if (result.contains(oldAv.getUuid())) {
+          result.remove(oldAv.getUuid());
+        } else if (auto newAv =
+                       mProject.getCircuit().getAssemblyVariants().find(
+                           *oldAv.getName())) {
+          result.remove(newAv->getUuid());
+        }
+      }
+    }
+    return result;
+  };
+
   // Copy new components to project library
   std::unique_ptr<TransactionalDirectory> cmpDir = mData->getDirectory("cmp");
   foreach (const QString& dirname, cmpDir->getDirs()) {
@@ -142,11 +165,18 @@ bool CmdPasteSchematicItems::performExecute() {
           mProject.getCircuit().generateAutoComponentInstanceName(
               libCmp->getPrefixes().value(mProject.getLocaleOrder())));
     }
-    QScopedPointer<ComponentInstance> copy(new ComponentInstance(
-        mProject.getCircuit(), Uuid::createRandom(), *libCmp,
-        cmp.libVariantUuid, name, cmp.libDeviceUuid));
+    QScopedPointer<ComponentInstance> copy(
+        new ComponentInstance(mProject.getCircuit(), Uuid::createRandom(),
+                              *libCmp, cmp.libVariantUuid, name));
     copy->setValue(cmp.value);
     copy->setAttributes(cmp.attributes);
+    ComponentAssemblyOptionList assemblyOptions = cmp.assemblyOptions;
+    for (ComponentAssemblyOption& option : assemblyOptions) {
+      option.setAssemblyVariants(
+          convertAssemblyVariants(option.getAssemblyVariants()));
+    }
+    copy->setAssemblyOptions(assemblyOptions);
+    copy->setLockAssembly(cmp.lockAssembly);
     componentInstanceMap.insert(cmp.uuid, copy->getUuid());
     execNewChildCmd(
         new CmdComponentInstanceAdd(mProject.getCircuit(), copy.take()));

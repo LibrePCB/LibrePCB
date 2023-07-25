@@ -43,15 +43,19 @@ class BomItem final {
 public:
   // Constructors / Destructor
   BomItem() = delete;
-  BomItem(const QString& designator, const QStringList& attributes) noexcept
-    : mDesignators({designator}), mAttributes(attributes) {}
+  BomItem(const QString& designator, const QStringList& attributes,
+          bool mount) noexcept
+    : mDesignators({designator}), mAttributes(attributes), mMount(mount) {}
   BomItem(const BomItem& other) noexcept
-    : mDesignators(other.mDesignators), mAttributes(other.mAttributes) {}
+    : mDesignators(other.mDesignators),
+      mAttributes(other.mAttributes),
+      mMount(other.mMount) {}
   ~BomItem() noexcept {}
 
   // Getters
   const QStringList& getDesignators() const noexcept { return mDesignators; }
   const QStringList& getAttributes() const noexcept { return mAttributes; }
+  bool isMount() const noexcept { return mMount; }
 
   // General Methods
   void addDesignator(const QString& designator) noexcept;
@@ -60,12 +64,14 @@ public:
   BomItem& operator=(const BomItem& rhs) noexcept {
     mDesignators = rhs.mDesignators;
     mAttributes = rhs.mAttributes;
+    mMount = rhs.mMount;
     return *this;
   }
 
 private:
   QStringList mDesignators;
   QStringList mAttributes;
+  bool mMount;  ///< False means "do not mount".
 };
 
 /*******************************************************************************
@@ -90,8 +96,8 @@ public:
   const QList<BomItem>& getItems() const noexcept { return mItems; }
 
   // General Methods
-  void addItem(const QString& designator,
-               const QStringList& attributes) noexcept;
+  void addItem(const QString& designator, const QStringList& attributes,
+               bool mount) noexcept;
 
   // Operator Overloadings
   Bom& operator=(const Bom& rhs) noexcept = delete;

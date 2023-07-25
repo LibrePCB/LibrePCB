@@ -20,9 +20,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-
-#include "attributeproviderdummy.h"
-
 #include <gtest/gtest.h>
 #include <librepcb/core/attribute/attributesubstitutor.h>
 
@@ -33,6 +30,19 @@
  ******************************************************************************/
 namespace librepcb {
 namespace tests {
+
+static QString lookup(const QString& key) {
+  if (key == "KEY") return "";
+  if (key == "KEY_1") return "Normal value";
+  if (key == "KEY_2") return "Value with {}}}{{ noise";
+  if (key == "KEY_3") return "Recursive {{UNDEFINED}} value";
+  if (key == "KEY_4") return "Recursive {{KEY_1}} value";
+  if (key == "KEY_5") return "Recursive {{KEY_4}} value";
+  if (key == "KEY_6") return "Endless {{KEY_7}} part 1";
+  if (key == "KEY_7") return "Endless {{KEY_6}} part 2";
+  if (key == "KEY_8") return "{{KEY}}";
+  return QString();
+}
 
 /*******************************************************************************
  *  Test Data Type
@@ -57,8 +67,7 @@ class AttributeSubstitutorTest
 TEST_P(AttributeSubstitutorTest, testData) {
   const AttributeSubstitutorTestData& data = GetParam();
 
-  AttributeProviderDummy ap;
-  QString output = AttributeSubstitutor::substitute(data.input, &ap);
+  QString output = AttributeSubstitutor::substitute(data.input, &lookup);
   EXPECT_EQ(data.output, output)
       << "Actual value: '" << qPrintable(output) << "'";
 }

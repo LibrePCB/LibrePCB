@@ -1700,9 +1700,8 @@ bool BoardEditorState_Select::openPropertiesDialog(
 void BoardEditorState_Select::openDevicePropertiesDialog(
     BI_Device& device) noexcept {
   DeviceInstancePropertiesDialog dialog(
-      mContext.workspace.getSettings(), mContext.project, device,
-      mContext.undoStack, getLengthUnit(),
-      "board_editor/device_properties_dialog", parentWidget());
+      mContext.workspace, mContext.project, device, mContext.undoStack,
+      getLengthUnit(), "board_editor/device_properties_dialog", parentWidget());
   dialog.exec();
 }
 
@@ -1765,6 +1764,7 @@ QList<BoardEditorState_Select::DeviceMenuItem>
         const ComponentInstance& cmpInst) const noexcept {
   QList<BoardEditorState_Select::DeviceMenuItem> items;
   try {
+    const QSet<Uuid> cmpDevices = cmpInst.getCompatibleDevices();
     QSet<Uuid> devices = mContext.workspace.getLibraryDb().getComponentDevices(
         cmpInst.getLibComponent().getUuid());  // can throw
     foreach (const Uuid& deviceUuid, devices) {
@@ -1780,8 +1780,12 @@ QList<BoardEditorState_Select::DeviceMenuItem>
           mContext.workspace.getLibraryDb().getLatest<Package>(pkgUuid);
       mContext.workspace.getLibraryDb().getTranslations<Package>(
           pkgFp, mContext.project.getLocaleOrder(), &pkgName);
-      items.append(
-          DeviceMenuItem{QString("%1 [%2]").arg(devName, pkgName), deviceUuid});
+
+      DeviceMenuItem item{QString("%1 [%2]").arg(devName, pkgName), deviceUuid};
+      if (cmpDevices.contains(deviceUuid)) {
+        item.name += " ✔";
+      }
+      items.append(item);
     }
 
     // sort by name.

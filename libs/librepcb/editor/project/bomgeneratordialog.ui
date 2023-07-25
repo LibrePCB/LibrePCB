@@ -6,24 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>818</width>
-    <height>556</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Generate BOM</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
-   <property name="fieldGrowthPolicy">
-    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-   </property>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Board:</string>
-     </property>
-    </widget>
-   </item>
+  <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,1">
    <item row="0" column="1">
     <widget class="QComboBox" name="cbxBoard"/>
    </item>
@@ -34,24 +24,44 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="edtAttributes">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string notr="true"/>
-     </property>
-     <property name="placeholderText">
-      <string extracomment="Don't translate the attributes MANUFACTURER and MPN, they must be in English.">Comma-separated list of additional attributes, e.g. &quot;MANUFACTURER, MPN&quot;</string>
+      <string>Board:</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="0" column="2">
+    <widget class="QLabel" name="lblAssemblyVariant">
+     <property name="text">
+      <string>Assembly Variant:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Output File:</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
+   <item row="0" column="3">
+    <widget class="QComboBox" name="cbxAssemblyVariant"/>
+   </item>
+   <item row="1" column="1" colspan="3">
+    <widget class="QLineEdit" name="edtAttributes">
+     <property name="text">
+      <string notr="true"/>
+     </property>
+     <property name="placeholderText">
+      <string>Comma-separated list of custom attributes (optional)</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1" colspan="3">
+    <widget class="QLineEdit" name="edtOutputPath"/>
+   </item>
+   <item row="3" column="0" colspan="4">
     <widget class="QTableWidget" name="tableWidget">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -61,23 +71,7 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="2">
-    <widget class="QLabel" name="lblMessage">
-     <property name="frameShape">
-      <enum>QFrame::Box</enum>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-     <property name="margin">
-      <number>3</number>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0" colspan="2">
+   <item row="4" column="0" colspan="4">
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QPushButton" name="btnBrowseOutputDir">
@@ -86,6 +80,18 @@
        </property>
        <property name="autoDefault">
         <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblNote">
+       <property name="font">
+        <font>
+         <italic>true</italic>
+        </font>
+       </property>
+       <property name="text">
+        <string>Gray rows are not exported (do not mount).</string>
        </property>
       </widget>
      </item>
@@ -100,9 +106,6 @@
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLineEdit" name="edtOutputPath"/>
    </item>
   </layout>
  </widget>

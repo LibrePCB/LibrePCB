@@ -22,9 +22,9 @@
  ******************************************************************************/
 #include "componentinstance.h"
 
-#include "../../attribute/attributesubstitutor.h"
 #include "../../exceptions.h"
 #include "../../library/cmp/component.h"
+#include "../../library/dev/device.h"
 #include "../../utils/scopeguardlist.h"
 #include "../board/board.h"
 #include "../board/items/bi_device.h"
@@ -48,18 +48,17 @@ namespace librepcb {
 
 ComponentInstance::ComponentInstance(Circuit& circuit, const Uuid& uuid,
                                      const Component& cmp, const Uuid& symbVar,
-                                     const CircuitIdentifier& name,
-                                     const tl::optional<Uuid>& defaultDevice)
+                                     const CircuitIdentifier& name)
   : QObject(&circuit),
     mCircuit(circuit),
     mIsAddedToCircuit(false),
     mUuid(uuid),
     mName(name),
     mValue(cmp.getDefaultValue()),
-    mDefaultDeviceUuid(defaultDevice),
     mLibComponent(cmp),
     mCompSymbVar(cmp.getSymbolVariants().get(symbVar).get()),  // can throw
     mAttributes(new AttributeList(cmp.getAttributes())),
+    mLockAssembly(circuit.getProject().getDefaultLockComponentAssembly()),
     mPrimaryDevice(nullptr) {
   Q_ASSERT(mCompSymbVar);
 
@@ -91,12 +90,38 @@ ComponentInstance::~ComponentInstance() noexcept {
  *  Getters
  ******************************************************************************/
 
-QString ComponentInstance::getValue(bool replaceAttributes) const noexcept {
-  if (replaceAttributes) {
-    return AttributeSubstitutor::substitute(mValue, this);
-  } else {
-    return mValue;
+QSet<Uuid> ComponentInstance::getCompatibleDevices() const noexcept {
+  QSet<Uuid> result;
+  for (const ComponentAssemblyOption& option : mAssemblyOptions) {
+    result.insert(option.getDevice());
   }
+  return result;
+}
+
+QVector<std::shared_ptr<const Part>> ComponentInstance::getParts(
+    const tl::optional<Uuid>& assemblyVariant) const noexcept {
+  QVector<std::shared_ptr<const Part>> parts;
+  for (const ComponentAssemblyOption& opt : mAssemblyOptions) {
+    if (((!assemblyVariant) ||
+         (opt.getAssemblyVariants().contains(*assemblyVariant)))) {
+      for (auto it = opt.getParts().begin(); it != opt.getParts().end(); ++it) {
+        parts.append(it.ptr());
+      }
+      if (opt.getParts().isEmpty()) {
+        parts.append(std::make_shared<Part>(SimpleString(""), SimpleString(""),
+                                            opt.getAttributes()));
+      }
+    }
+  }
+  return parts;
+}
+
+QSet<Uuid> ComponentInstance::getUsedDeviceUuids() const noexcept {
+  QSet<Uuid> uuids;
+  foreach (const BI_Device* device, mRegisteredDevices) {
+    uuids.insert(device->getLibDevice().getUuid());
+  }
+  return uuids;
 }
 
 int ComponentInstance::getRegisteredElementsCount() const noexcept {
@@ -144,10 +169,10 @@ void ComponentInstance::setAttributes(
   }
 }
 
-void ComponentInstance::setDefaultDeviceUuid(
-    const tl::optional<Uuid>& device) noexcept {
-  if (device != mDefaultDeviceUuid) {
-    mDefaultDeviceUuid = device;
+void ComponentInstance::setAssemblyOptions(
+    const ComponentAssemblyOptionList& options) noexcept {
+  if (options != mAssemblyOptions) {
+    mAssemblyOptions = options;
     emit attributesChanged();
   }
 }
@@ -258,52 +283,20 @@ void ComponentInstance::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("lib_variant", mCompSymbVar->getUuid());
   root.ensureLineBreak();
-  root.appendChild("lib_device", mDefaultDeviceUuid);
-  root.ensureLineBreak();
   root.appendChild("name", mName);
   root.appendChild("value", mValue);
   root.ensureLineBreak();
+  root.appendChild("lock_assembly", mLockAssembly);
+  root.ensureLineBreak();
   mAttributes->serialize(root);
+  root.ensureLineBreak();
+  mAssemblyOptions.serialize(root);
   root.ensureLineBreak();
   for (const ComponentSignalInstance* obj : mSignals) {
     obj->serialize(root.appendList("signal"));
     root.ensureLineBreak();
   }
   root.ensureLineBreak();
-}
-
-/*******************************************************************************
- *  Inherited from AttributeProvider
- ******************************************************************************/
-
-QString ComponentInstance::getUserDefinedAttributeValue(
-    const QString& key) const noexcept {
-  if (std::shared_ptr<Attribute> attr = mAttributes->find(key)) {
-    return attr->getValueTr(true);
-  } else {
-    return QString();
-  }
-}
-
-QString ComponentInstance::getBuiltInAttributeValue(const QString& key) const
-    noexcept {
-  if (key == QLatin1String("NAME")) {
-    return *mName;
-  } else if (key == QLatin1String("VALUE")) {
-    return mValue;
-  } else if (key == QLatin1String("COMPONENT")) {
-    return *mLibComponent.getNames().value(getLocaleOrder());
-  } else {
-    return QString();
-  }
-}
-
-QVector<const AttributeProvider*>
-    ComponentInstance::getAttributeProviderParents() const noexcept {
-  return QVector<const AttributeProvider*>{
-      &mCircuit.getProject(),
-      getPrimaryDevice(),
-  };
 }
 
 /*******************************************************************************

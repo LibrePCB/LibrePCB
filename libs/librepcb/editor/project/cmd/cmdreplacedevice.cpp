@@ -25,13 +25,16 @@
 #include "../../project/cmd/cmdboardnetsegmentaddelements.h"
 #include "../../project/cmd/cmddeviceinstanceremove.h"
 #include "cmdadddevicetoboard.h"
+#include "cmdcomponentinstanceedit.h"
 #include "cmdremoveboarditems.h"
 
+#include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
+#include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
@@ -96,8 +99,39 @@ bool CmdReplaceDevice::performExecute() {
     }
   }
 
-  // replace the device instance
+  // Remove the device instance-
   execNewChildCmd(new CmdDeviceInstanceRemove(mDeviceInstance));  // can throw
+
+  // If the assembly option is now unused, remove it.
+  if (!mDeviceInstance.getComponentInstance().getLockAssembly()) {
+    const Uuid oldDevice = mDeviceInstance.getLibDevice().getUuid();
+    bool deviceUsedInOtherBoards = false;
+    foreach (const BI_Device* device,
+             mDeviceInstance.getComponentInstance().getDevices()) {
+      if (device->getLibDevice().getUuid() == oldDevice) {
+        deviceUsedInOtherBoards = true;
+        break;
+      }
+    }
+    if (!deviceUsedInOtherBoards) {
+      ComponentAssemblyOptionList options =
+          mDeviceInstance.getComponentInstance().getAssemblyOptions();
+      for (int i = options.count() - 1; i >= 0; --i) {
+        auto option = options.at(i);
+        if ((option->getDevice() == oldDevice) &&
+            (option->getParts().isEmpty())) {
+          options.remove(i);
+        }
+      }
+      QScopedPointer<CmdComponentInstanceEdit> cmd(
+          new CmdComponentInstanceEdit(mDeviceInstance.getCircuit(),
+                                       mDeviceInstance.getComponentInstance()));
+      cmd->setAssemblyOptions(options);
+      execNewChildCmd(cmd.take());
+    }
+  }
+
+  // Add the new device.
   CmdAddDeviceToBoard* cmd = new CmdAddDeviceToBoard(
       mWorkspace, mBoard, mDeviceInstance.getComponentInstance(),
       mNewDeviceUuid, mNewFootprintUuid, mDeviceInstance.getLibModelUuid(),

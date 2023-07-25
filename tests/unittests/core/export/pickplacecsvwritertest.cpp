@@ -46,19 +46,24 @@ protected:
     data->addItem(PickPlaceDataItem("R10", "", "device", "pack,\"age\"",
                                     Point(-1000000, -2000000), -Angle::deg45(),
                                     PickPlaceDataItem::BoardSide::Top,
-                                    PickPlaceDataItem::Type::Tht));
+                                    PickPlaceDataItem::Type::Tht, true));
     data->addItem(PickPlaceDataItem("U5", "1kΩ\r\n\r\n", "device", "package",
                                     Point(1000000, 2000000), Angle::deg45(),
                                     PickPlaceDataItem::BoardSide::Bottom,
-                                    PickPlaceDataItem::Type::Smt));
-    data->addItem(PickPlaceDataItem(
-        "R1", " 1kΩ\n1W\n100V ", "device \"foo\"", "pack,age",
-        Point(1000000, 2000000), Angle::deg45(),
-        PickPlaceDataItem::BoardSide::Top, PickPlaceDataItem::Type::Fiducial));
+                                    PickPlaceDataItem::Type::Smt, true));
+    data->addItem(PickPlaceDataItem("R1", " 1kΩ\n1W\n100V ", "device \"foo\"",
+                                    "pack,age", Point(1000000, 2000000),
+                                    Angle::deg45(),
+                                    PickPlaceDataItem::BoardSide::Top,
+                                    PickPlaceDataItem::Type::Fiducial, true));
     data->addItem(PickPlaceDataItem("U1", "mixed", "mixed device",
                                     "mixed package", Point(0, 0), Angle::deg0(),
                                     PickPlaceDataItem::BoardSide::Bottom,
-                                    PickPlaceDataItem::Type::Mixed));
+                                    PickPlaceDataItem::Type::Mixed, true));
+    data->addItem(PickPlaceDataItem("DNM", "dnm", "", "", Point(0, 0),
+                                    Angle::deg0(),
+                                    PickPlaceDataItem::BoardSide::Top,
+                                    PickPlaceDataItem::Type::Mixed, false));
     return data;
   }
 };

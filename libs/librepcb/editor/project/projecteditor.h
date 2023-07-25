@@ -23,7 +23,6 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/attribute/attributeprovider.h>
 #include <librepcb/core/rulecheck/rulecheckmessage.h>
 #include <librepcb/core/serialization/fileformatmigration.h>
 #include <optional/tl/optional.hpp>

@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/uuid.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -35,6 +36,7 @@
  ******************************************************************************/
 namespace librepcb {
 
+class AssemblyVariant;
 class Board;
 class PickPlaceData;
 class WorkspaceSettings;
@@ -68,7 +70,9 @@ public:
 private:  // Methods
   void setFileExtension(const QString& extension) noexcept;
   void btnGenerateClicked() noexcept;
-  void updateTable() noexcept;
+  void updateData() noexcept;
+  std::shared_ptr<AssemblyVariant> getAssemblyVariant() const noexcept;
+  tl::optional<Uuid> getAssemblyVariantUuid(bool throwIfNullopt) const;
   FilePath getOutputFilePath(const QString& text) const noexcept;
 
 private:  // Data

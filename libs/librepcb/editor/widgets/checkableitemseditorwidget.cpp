@@ -20,56 +20,75 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "attributeprovider.h"
+#include "checkableitemseditorwidget.h"
+
+#include "../utils/editortoolbox.h"
+
+#include <librepcb/core/utils/qtmetatyperegistration.h>
 
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
+
+// Register Qt meta types.
+static QtMetaTypeRegistration<CheckableItemsEditorWidget::ItemList> sMetaType;
 
 /*******************************************************************************
- *  Public Methods
+ *  Constructors / Destructor
  ******************************************************************************/
 
-QString AttributeProvider::getAttributeValue(const QString& key) const
-    noexcept {
-  QVector<const AttributeProvider*> backtrace;  // for endless loop detection
-  return getAttributeValue(key, backtrace);
+CheckableItemsEditorWidget::CheckableItemsEditorWidget(QWidget* parent) noexcept
+  : QFrame(parent), mLayout(new QVBoxLayout()), mItems() {
+  setFrameStyle(StyledPanel);
+  mLayout->setContentsMargins(3, 0, 3, 0);
+  mLayout->setSpacing(3);
+  setLayout(mLayout);
+}
+
+CheckableItemsEditorWidget::~CheckableItemsEditorWidget() noexcept {
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void CheckableItemsEditorWidget::setItems(const ItemList& items) noexcept {
+  mItems = items;
+  updateWidgets();
 }
 
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
 
-QString AttributeProvider::getAttributeValue(
-    const QString& key, QVector<const AttributeProvider*>& backtrace) const
-    noexcept {
-  // priority 1: user defined attributes of this object
-  QString value = getUserDefinedAttributeValue(key);
-  if (!value.isEmpty()) return value;
-
-  // priority 2: built-in attributes of this object
-  value = getBuiltInAttributeValue(key);
-  if (!value.isEmpty()) return value;
-
-  // priority 3: attributes from all parent objects in specific order
-  backtrace.append(this);
-  foreach (const AttributeProvider* parent, getAttributeProviderParents()) {
-    if (parent &&
-        (!backtrace.contains(parent))) {  // break possible endless loop
-      value = parent->getAttributeValue(key, backtrace);
-      if (!value.isEmpty()) return value;
-    }
+void CheckableItemsEditorWidget::updateWidgets() noexcept {
+  while (mLayout->count() > 0) {
+    QLayoutItem* item = mLayout->takeAt(0);
+    Q_ASSERT(item);
+    EditorToolbox::deleteLayoutItemRecursively(item);
   }
 
-  // attribute not set...
-  return QString();
+  for (Item& item : mItems) {
+    QCheckBox* cbx = new QCheckBox(this);
+    cbx->setText(std::get<1>(item));
+    cbx->setCheckState(std::get<2>(item));
+    connect(cbx, &QCheckBox::stateChanged, cbx, [&item](int state) {
+      std::get<2>(item) = static_cast<Qt::CheckState>(state);
+    });
+    mLayout->addWidget(cbx);
+  }
+
+  setFixedHeight(sizeHint().height());
 }
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb

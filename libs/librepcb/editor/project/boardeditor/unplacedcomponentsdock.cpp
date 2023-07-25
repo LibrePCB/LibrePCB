@@ -33,6 +33,7 @@
 #include "ui_unplacedcomponentsdock.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/attribute/attributesubstitutor.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
@@ -43,6 +44,7 @@
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/projectlibrary.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
@@ -121,14 +123,10 @@ UnplacedComponentsDock::UnplacedComponentsDock(ProjectEditor& editor,
       mUi->cbxSelectedFootprint,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, &UnplacedComponentsDock::currentFootprintIndexChanged);
-  connect(mUi->cbxIsDefaultDevice, &QCheckBox::clicked, this,
-          &UnplacedComponentsDock::setSelectedDeviceAsDefault);
   connect(mUi->btnAdd, &QPushButton::clicked, this,
           &UnplacedComponentsDock::addSelectedDeviceToBoard);
   connect(mUi->btnAddSimilar, &QPushButton::clicked, this,
           &UnplacedComponentsDock::addSimilarDevicesToBoard);
-  connect(mUi->btnAddPreSelected, &QPushButton::clicked, this,
-          &UnplacedComponentsDock::addPreSelectedDevicesToBoard);
   connect(mUi->btnAddAll, &QPushButton::clicked, this,
           &UnplacedComponentsDock::addAllDevicesToBoard);
 }
@@ -183,7 +181,6 @@ void UnplacedComponentsDock::setBoard(Board* board) {
 void UnplacedComponentsDock::updateComponentsList() noexcept {
   if (mDisableListUpdate) return;
 
-  bool hasPreselectedDevices = false;
   int selectedIndex = mUi->lstUnplacedComponents->currentRow();
   setSelectedComponentInstance(nullptr);
   mUi->lstUnplacedComponents->clear();
@@ -204,19 +201,17 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
     foreach (ComponentInstance* component, componentsList) {
       if (boardDeviceList.contains(component->getUuid())) continue;
       if (component->getLibComponent().isSchematicOnly()) continue;
-      bool hasPreSelectedDevice = component->getDefaultDeviceUuid().has_value();
 
       // Add component to list.
-      QString value = component->getValue(true)
-                          .split("\n", QString::SkipEmptyParts)
-                          .join("|");
+      ProjectAttributeLookup lookup(*component, nullptr,
+                                    component->getParts(tl::nullopt).value(0));
+      const QString value =
+          AttributeSubstitutor::substitute(lookup("VALUE"), lookup)
+              .split("\n", QString::SkipEmptyParts)
+              .join("|");
       QString libCmpName = *component->getLibComponent().getNames().value(
           mProject.getLocaleOrder());
       QStringList text = {*component->getName() % ":"};
-      if (hasPreSelectedDevice) {
-        text += "✔";
-        hasPreselectedDevices = true;
-      }
       text += value;
       text += libCmpName;
       QListWidgetItem* item =
@@ -226,9 +221,6 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
       tooltip += tr("Designator") % ": " % *component->getName();
       tooltip += tr("Value") % ": " % value;
       tooltip += tr("Component") % ": " % libCmpName;
-      if (hasPreSelectedDevice) {
-        tooltip += "✔ " % tr("Device is already pre-selected in schematics.");
-      }
       item->setToolTip(tooltip.join("\n"));
     }
 
@@ -238,15 +230,6 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
     }
   }
 
-  if (hasPreselectedDevices) {
-    mUi->btnAddAll->setVisible(false);
-    mUi->btnAddPreSelected->setVisible(true);
-  } else {
-    mUi->btnAddPreSelected->setVisible(false);
-    mUi->btnAddAll->setVisible(true);
-  }
-
-  mUi->btnAddPreSelected->setEnabled(getUnplacedComponentsCount() > 0);
   mUi->btnAddAll->setEnabled(getUnplacedComponentsCount() > 0);
   setWindowTitle(tr("Place Devices [%1]").arg(getUnplacedComponentsCount()));
   emit unplacedComponentsCountChanged(getUnplacedComponentsCount());
@@ -333,14 +316,10 @@ void UnplacedComponentsDock::setSelectedComponentInstance(
         // Package name not contained in device name, so let's show it as well.
         text += " [" % device.packageName % "]";
       }
-      mUi->cbxSelectedDevice->addItem(text);
-      if (device.selectedInSchematic) {
-        // Highlight pre-selected device.
-        QFont font =
-            mUi->cbxSelectedDevice->itemData(i, Qt::FontRole).value<QFont>();
-        font.setBold(true);
-        mUi->cbxSelectedDevice->setItemData(i, font, Qt::FontRole);
+      if (device.isListedInComponentInstance) {
+        text += " ✔";
       }
+      mUi->cbxSelectedDevice->addItem(text);
     }
     mUi->cbxSelectedDevice->setCurrentIndex(devices.second);
     if (mUi->cbxSelectedDevice->count() == 0) {
@@ -348,7 +327,6 @@ void UnplacedComponentsDock::setSelectedComponentInstance(
     }
   }
 
-  mUi->cbxIsDefaultDevice->setEnabled(mUi->cbxSelectedDevice->count() > 0);
   mUi->cbxSelectedDevice->setEnabled(mUi->cbxSelectedDevice->count() > 1);
 }
 
@@ -357,7 +335,6 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(
     bool packageOwned) noexcept {
   setSelectedFootprintUuid(tl::nullopt);
   mUi->lblNoDeviceFound->setVisible(deviceUuid && (!package));
-  mUi->cbxIsDefaultDevice->setCheckState(Qt::Unchecked);
   mUi->cbxSelectedFootprint->clear();
   if (mSelectedPackageOwned) {
     delete mSelectedPackage;
@@ -370,11 +347,6 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(
     mSelectedDeviceUuid = deviceUuid;
     mSelectedPackage = package;
     mSelectedPackageOwned = packageOwned;
-    if (deviceUuid == mSelectedComponent->getDefaultDeviceUuid()) {
-      mUi->cbxIsDefaultDevice->setCheckState(Qt::Checked);
-    } else if (mSelectedComponent->getDefaultDeviceUuid()) {
-      mUi->cbxIsDefaultDevice->setCheckState(Qt::PartiallyChecked);
-    }
     QStringList localeOrder = mProject.getLocaleOrder();
     for (const Footprint& fpt : mSelectedPackage->getFootprints()) {
       mUi->cbxSelectedFootprint->addItem(*fpt.getNames().value(localeOrder),
@@ -426,26 +398,6 @@ void UnplacedComponentsDock::setSelectedFootprintUuid(
   }
 }
 
-void UnplacedComponentsDock::setSelectedDeviceAsDefault() noexcept {
-  if (mBoard && mSelectedComponent && mSelectedDeviceUuid) {
-    try {
-      // Release undo stack.
-      mProjectEditor.abortBlockingToolsInOtherEditors(this);
-      QScopedPointer<CmdComponentInstanceEdit> cmd(new CmdComponentInstanceEdit(
-          mProject.getCircuit(), *mSelectedComponent));
-      if (mSelectedComponent->getDefaultDeviceUuid() == mSelectedDeviceUuid) {
-        cmd->setDefaultDeviceUuid(tl::nullopt);
-      } else {
-        cmd->setDefaultDeviceUuid(mSelectedDeviceUuid);
-      }
-      mProjectEditor.getUndoStack().execCmd(cmd.take());
-    } catch (const Exception& e) {
-      QMessageBox::critical(this, tr("Error"), e.getMsg());
-    }
-  }
-  updateComponentsList();
-}
-
 void UnplacedComponentsDock::addSelectedDeviceToBoard() noexcept {
   if (mBoard && mSelectedComponent && mSelectedDeviceUuid && mSelectedPackage &&
       mSelectedFootprintUuid) {
@@ -466,8 +418,7 @@ void UnplacedComponentsDock::addSimilarDevicesToBoard() noexcept {
         mSelectedComponent->getLibComponent().getUuid(), *mSelectedDeviceUuid);
     mLastFootprintOfPackage.insert(mSelectedPackage->getUuid(),
                                    *mSelectedFootprintUuid);
-    autoAddDevicesToBoard(false,
-                          mSelectedComponent->getLibComponent().getUuid());
+    autoAddDevicesToBoard(mSelectedComponent->getLibComponent().getUuid());
   }
 
   updateComponentsList();
@@ -475,22 +426,13 @@ void UnplacedComponentsDock::addSimilarDevicesToBoard() noexcept {
 
 void UnplacedComponentsDock::addAllDevicesToBoard() noexcept {
   if (mBoard) {
-    autoAddDevicesToBoard(false, tl::nullopt);
-  }
-
-  updateComponentsList();
-}
-
-void UnplacedComponentsDock::addPreSelectedDevicesToBoard() noexcept {
-  if (mBoard) {
-    autoAddDevicesToBoard(true, tl::nullopt);
+    autoAddDevicesToBoard(tl::nullopt);
   }
 
   updateComponentsList();
 }
 
 void UnplacedComponentsDock::autoAddDevicesToBoard(
-    bool onlyWithPreSelectedDevice,
     const tl::optional<Uuid>& libCmpUuidFilter) noexcept {
   Q_ASSERT(mBoard);
   mProjectEditor.abortBlockingToolsInOtherEditors(this);  // Release undo stack.
@@ -504,7 +446,6 @@ void UnplacedComponentsDock::autoAddDevicesToBoard(
     ComponentInstance* component =
         mProject.getCircuit().getComponentInstanceByUuid(*componentUuid);
     if (component &&
-        ((!onlyWithPreSelectedDevice) || component->getDefaultDeviceUuid()) &&
         ((!libCmpUuidFilter) ||
          (component->getLibComponent().getUuid() == *libCmpUuidFilter))) {
       std::pair<QList<DeviceMetadata>, int> devices =
@@ -582,7 +523,9 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
   }
 
   // Determine missing metadata.
+  const QSet<Uuid> cmpDevices = cmp.getCompatibleDevices();
   for (DeviceMetadata& device : devices) {
+    device.isListedInComponentInstance = cmpDevices.contains(device.deviceUuid);
     if (const Package* package =
             mProjectEditor.getProject().getLibrary().getPackage(
                 device.packageUuid)) {
@@ -601,8 +544,6 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
                     << e.getMsg();
       }
     }
-    device.selectedInSchematic =
-        device.deviceUuid == cmp.getDefaultDeviceUuid();
   }
 
   // Sort by device name, using numeric sort.
@@ -613,19 +554,26 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
                        },
                        Qt::CaseInsensitive, false);
 
-  // Prio 1: Use the device chosen in the schematic.
-  if (tl::optional<Uuid> dev = cmp.getDefaultDeviceUuid()) {
+  // Prio 1: Use the device already used for the same component before, if it
+  // is chosen in the component instance.
+  auto lastDeviceIterator = mLastDeviceOfComponent.find(cmpUuid);
+  if ((lastDeviceIterator != mLastDeviceOfComponent.end())) {
     for (int i = 0; i < devices.count(); ++i) {
-      if (devices.at(i).deviceUuid == *dev) {
+      if (devices.at(i).isListedInComponentInstance &&
+          (devices.at(i).deviceUuid == *lastDeviceIterator)) {
         return std::make_pair(devices, i);
       }
     }
-    qWarning() << "Selected device" << *dev
-               << "not found in library, will use another device...";
   }
 
-  // Prio 2: Use the device already used for the same component before.
-  auto lastDeviceIterator = mLastDeviceOfComponent.find(cmpUuid);
+  // Prio 2: Use the first device chosen in the component instance.
+  for (int i = 0; i < devices.count(); ++i) {
+    if (devices.at(i).isListedInComponentInstance) {
+      return std::make_pair(devices, i);
+    }
+  }
+
+  // Prio 3: Use the device already used for the same component before.
   if ((lastDeviceIterator != mLastDeviceOfComponent.end())) {
     for (int i = 0; i < devices.count(); ++i) {
       if (devices.at(i).deviceUuid == *lastDeviceIterator) {
@@ -634,7 +582,7 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
     }
   }
 
-  // Prio 3: Use the most used device in the current board.
+  // Prio 4: Use the most used device in the current board.
   Q_ASSERT(mBoard);
   QHash<Uuid, int> devOccurences;
   foreach (const BI_Device* device, mBoard->getDeviceInstances()) {
@@ -654,14 +602,14 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
     }
   }
 
-  // Prio 4: Use the first device found in the project library.
+  // Prio 5: Use the first device found in the project library.
   for (int i = 0; i < devices.count(); ++i) {
     if (prjLibDev.contains(devices.at(i).deviceUuid)) {
       return std::make_pair(devices, i);
     }
   }
 
-  // Prio 5: Use the first device found in the workspace library.
+  // Prio 6: Use the first device found in the workspace library.
   return std::make_pair(devices, devices.isEmpty() ? -1 : 0);
 }
 

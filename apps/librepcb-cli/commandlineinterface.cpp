@@ -48,8 +48,11 @@
 #include <librepcb/core/project/board/boardplanefragmentsbuilder.h>
 #include <librepcb/core/project/board/drc/boarddesignrulecheck.h>
 #include <librepcb/core/project/bomgenerator.h>
+#include <librepcb/core/project/circuit/assemblyvariant.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/project/schematic/schematicpainter.h>
 #include <librepcb/core/utils/toolbox.h>
@@ -141,7 +144,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       "bom-attributes",
       tr("Comma-separated list of additional attributes to be exported "
          "to the BOM. Example: \"%1\"")
-          .arg("MANUFACTURER, MPN"),
+          .arg("SUPPLIER, SKU"),
       tr("attributes"));
   QCommandLineOption exportPcbFabricationDataOption(
       "export-pcb-fabrication-data",
@@ -190,6 +193,23 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
          "will be removed. Pass '%2' to save the modified project to disk.")
           .arg("--board[-index]")
           .arg("--save"));
+  QCommandLineOption assemblyVariantOption(
+      "variant",
+      tr("The name of the assembly variant(s) to export. Can be given multiple "
+         "times. If not set, all assembly variants are exported."),
+      tr("name"));
+  QCommandLineOption assemblyVariantIndexOption(
+      "variant-index",
+      tr("Same as '%1', but allows to specify assembly variants by index "
+         "instead of by name.")
+          .arg("--variant"),
+      tr("index"));
+  QCommandLineOption setDefaultAssemblyVariantOption(
+      "set-default-variant",
+      tr("Move the specified assembly variant to the top before executing all "
+         "the other actions. Pass '%1' to save the modified project to disk.")
+          .arg("--save"),
+      tr("name"));
   QCommandLineOption saveOption(
       "save",
       tr("Save project before closing it (useful to upgrade file format)."));
@@ -261,6 +281,9 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     parser.addOption(boardOption);
     parser.addOption(boardIndexOption);
     parser.addOption(removeOtherBoardsOption);
+    parser.addOption(assemblyVariantOption);
+    parser.addOption(assemblyVariantIndexOption);
+    parser.addOption(setDefaultAssemblyVariantOption);
     parser.addOption(saveOption);
     parser.addOption(prjStrictOption);
   } else if (command == "open-library") {
@@ -360,6 +383,9 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
         parser.values(boardOption),  // board names
         parser.values(boardIndexOption),  // board indices
         parser.isSet(removeOtherBoardsOption),  // remove other boards
+        parser.values(assemblyVariantOption),  // assembly variant names
+        parser.values(assemblyVariantIndexOption),  // assembly variant indices
+        parser.value(setDefaultAssemblyVariantOption),  // set default AV
         parser.isSet(saveOption),  // save project
         parser.isSet(prjStrictOption)  // strict mode
     );
@@ -396,8 +422,9 @@ bool CommandLineInterface::openProject(
     const QStringList& exportPnpTopFiles,
     const QStringList& exportPnpBottomFiles,
     const QStringList& exportNetlistFiles, const QStringList& boardNames,
-    const QStringList& boardIndices, bool removeOtherBoards, bool save,
-    bool strict) const noexcept {
+    const QStringList& boardIndices, bool removeOtherBoards,
+    const QStringList& avNames, const QStringList& avIndices,
+    const QString& setDefaultAv, bool save, bool strict) const noexcept {
   try {
     bool success = true;
     QMap<FilePath, int> writtenFilesCounter;
@@ -442,6 +469,55 @@ bool CommandLineInterface::openProject(
                   .arg(msg.getSeverityStrTr())
                   .arg(multiplier)
                   .arg(msg.message));
+      }
+    }
+
+    // Set the default assembly variant.
+    if (!setDefaultAv.isEmpty()) {
+      print(tr("Set default assembly variant to '%1'...").arg(setDefaultAv));
+      if (project->getCircuit().getAssemblyVariants().contains(setDefaultAv)) {
+        project->getCircuit().getAssemblyVariants().insert(
+            0, project->getCircuit().getAssemblyVariants().take(setDefaultAv));
+      } else {
+        printErr(tr("ERROR: No assembly variant with the name '%1' found.")
+                     .arg(setDefaultAv));
+        success = false;
+      }
+    }
+
+    // Parse list of assembly variants.
+    QVector<std::shared_ptr<AssemblyVariant>> assemblyVariants;
+    foreach (const QString& avName, avNames) {
+      if (auto av = project->getCircuit().getAssemblyVariants().find(avName)) {
+        if (!assemblyVariants.contains(av)) {
+          assemblyVariants.append(av);
+        }
+      } else {
+        printErr(tr("ERROR: No assembly variant with the name '%1' found.")
+                     .arg(avName));
+        success = false;
+      }
+    }
+    foreach (const QString& avIndex, avIndices) {
+      bool ok = false;
+      const int index = avIndex.trimmed().toInt(&ok);
+      auto av = project->getCircuit().getAssemblyVariants().value(index);
+      if (ok && av) {
+        if (!assemblyVariants.contains(av)) {
+          assemblyVariants.append(av);
+        }
+      } else {
+        printErr(
+            tr("ERROR: Assembly variant index '%1' is invalid.").arg(avIndex));
+        success = false;
+      }
+    }
+
+    // If no assembly variants are specified, export all variants.
+    if (avNames.isEmpty() && avIndices.isEmpty()) {
+      for (auto it = project->getCircuit().getAssemblyVariants().begin();
+           it != project->getCircuit().getAssemblyVariants().end(); ++it) {
+        assemblyVariants.append(it.ptr());
       }
     }
 
@@ -585,7 +661,8 @@ bool CommandLineInterface::openProject(
     foreach (const QString& destStr, exportSchematicsFiles) {
       print(tr("Export schematics to '%1'...").arg(destStr));
       QString destPathStr = AttributeSubstitutor::substitute(
-          destStr, project.get(), [&](const QString& str) {
+          destStr, ProjectAttributeLookup(*project, nullptr),
+          [&](const QString& str) {
             return FilePath::cleanFileName(
                 str, FilePath::ReplaceSpaces | FilePath::KeepCase);
           });
@@ -644,34 +721,35 @@ bool CommandLineInterface::openProject(
           boardsToExport = {nullptr};
         }
         foreach (const Board* board, boardsToExport) {
-          const AttributeProvider* attrProvider = board;
-          if (!board) {
-            attrProvider = project.get();
-          }
-          QString destPathStr = AttributeSubstitutor::substitute(
-              destStr, attrProvider, [&](const QString& str) {
-                return FilePath::cleanFileName(
-                    str, FilePath::ReplaceSpaces | FilePath::KeepCase);
-              });
-          FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
-          BomGenerator gen(*project);
-          gen.setAdditionalAttributes(attributes);
-          std::shared_ptr<Bom> bom = gen.generate(board);
-          if (board) {
-            print(QString("  - '%1' => '%2'")
-                      .arg(*board->getName(), prettyPath(fp, destPathStr)));
-          } else {
-            print(QString("  => '%1'").arg(prettyPath(fp, destPathStr)));
-          }
-          QString suffix = destStr.split('.').last().toLower();
-          if (suffix == "csv") {
-            BomCsvWriter writer(*bom);
-            std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
-            csv->saveToFile(fp);  // can throw
-            writtenFilesCounter[fp]++;
-          } else {
-            printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
-            success = false;
+          foreach (std::shared_ptr<AssemblyVariant> av, assemblyVariants) {
+            QString destPathStr = AttributeSubstitutor::substitute(
+                destStr,
+                board ? ProjectAttributeLookup(*board, av)
+                      : ProjectAttributeLookup(*project, av),
+                [&](const QString& str) {
+                  return FilePath::cleanFileName(
+                      str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+                });
+            FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
+            BomGenerator gen(*project);
+            gen.setAdditionalAttributes(attributes);
+            std::shared_ptr<Bom> bom = gen.generate(board, av->getUuid());
+            if (board) {
+              print(QString("  - '%1' => '%2'")
+                        .arg(*board->getName(), prettyPath(fp, destPathStr)));
+            } else {
+              print(QString("  => '%1'").arg(prettyPath(fp, destPathStr)));
+            }
+            QString suffix = destStr.split('.').last().toLower();
+            if (suffix == "csv") {
+              BomCsvWriter writer(*bom);
+              std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
+              csv->saveToFile(fp);  // can throw
+              writtenFilesCounter[fp]++;
+            } else {
+              printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
+              success = false;
+            }
           }
         }
       }
@@ -734,31 +812,35 @@ bool CommandLineInterface::openProject(
                   .arg(job.boardSideStr)
                   .arg(job.destStr));
         foreach (const Board* board, boards) {
-          const QString destPathStr = AttributeSubstitutor::substitute(
-              job.destStr, board, [&](const QString& str) {
-                return FilePath::cleanFileName(
-                    str, FilePath::ReplaceSpaces | FilePath::KeepCase);
-              });
-          const FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
-          print(QString("  - '%1' => '%2'")
-                    .arg(*board->getName(), prettyPath(fp, destPathStr)));
-          const QString suffix = job.destStr.split('.').last().toLower();
-          if (suffix == "csv") {
-            BoardPickPlaceGenerator gen(*board);
-            std::shared_ptr<PickPlaceData> data = gen.generate();
-            PickPlaceCsvWriter writer(*data);
-            writer.setIncludeMetadataComment(true);
-            writer.setBoardSide(job.boardSideCsv);
-            std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
-            csv->saveToFile(fp);  // can throw
-            writtenFilesCounter[fp]++;
-          } else if (suffix == "gbr") {
-            BoardGerberExport gen(*board);
-            gen.exportComponentLayer(job.boardSideGbr, fp);  // can throw
-            writtenFilesCounter[fp]++;
-          } else {
-            printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
-            success = false;
+          foreach (std::shared_ptr<AssemblyVariant> av, assemblyVariants) {
+            const QString destPathStr = AttributeSubstitutor::substitute(
+                job.destStr, ProjectAttributeLookup(*board, av),
+                [&](const QString& str) {
+                  return FilePath::cleanFileName(
+                      str, FilePath::ReplaceSpaces | FilePath::KeepCase);
+                });
+            const FilePath fp(QFileInfo(destPathStr).absoluteFilePath());
+            print(QString("  - '%1' => '%2'")
+                      .arg(*board->getName(), prettyPath(fp, destPathStr)));
+            const QString suffix = job.destStr.split('.').last().toLower();
+            if (suffix == "csv") {
+              BoardPickPlaceGenerator gen(*board, av->getUuid());
+              std::shared_ptr<PickPlaceData> data = gen.generate();
+              PickPlaceCsvWriter writer(*data);
+              writer.setIncludeMetadataComment(true);
+              writer.setBoardSide(job.boardSideCsv);
+              std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
+              csv->saveToFile(fp);  // can throw
+              writtenFilesCounter[fp]++;
+            } else if (suffix == "gbr") {
+              BoardGerberExport gen(*board);
+              gen.exportComponentLayer(job.boardSideGbr, av->getUuid(),
+                                       fp);  // can throw
+              writtenFilesCounter[fp]++;
+            } else {
+              printErr("  " % tr("ERROR: Unknown extension '%1'.").arg(suffix));
+              success = false;
+            }
           }
         }
       }
@@ -769,7 +851,8 @@ bool CommandLineInterface::openProject(
       print(tr("Export netlist to '%1'...").arg(destStr));
       foreach (const Board* board, boards) {
         QString destPathStr = AttributeSubstitutor::substitute(
-            destStr, board, [&](const QString& str) {
+            destStr, ProjectAttributeLookup(*board, nullptr),
+            [&](const QString& str) {
               return FilePath::cleanFileName(
                   str, FilePath::ReplaceSpaces | FilePath::KeepCase);
             });

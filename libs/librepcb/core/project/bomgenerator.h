@@ -35,6 +35,7 @@ namespace librepcb {
 class Board;
 class Bom;
 class Project;
+class Uuid;
 
 /*******************************************************************************
  *  Class BomGenerator
@@ -59,12 +60,16 @@ public:
   }
 
   // General Methods
-  std::shared_ptr<Bom> generate(const Board* board = nullptr) noexcept;
+  std::shared_ptr<Bom> generate(const Board* board,
+                                const Uuid& assemblyVariant) noexcept;
 
   // Operator Overloadings
   BomGenerator& operator=(const BomGenerator& rhs) = delete;
 
-private:
+private:  // Methods
+  static void removeSubString(QString& str, const QString& substr) noexcept;
+
+private:  // Data
   const Project& mProject;
   QStringList mAdditionalAttributes;
 };

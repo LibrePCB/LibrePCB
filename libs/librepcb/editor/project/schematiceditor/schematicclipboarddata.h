@@ -28,6 +28,7 @@
 #include <librepcb/core/geometry/netline.h>
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/text.h>
+#include <librepcb/core/project/circuit/assemblyvariant.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 
 #include <QtCore>
@@ -61,36 +62,38 @@ public:
     Uuid uuid;
     Uuid libComponentUuid;
     Uuid libVariantUuid;
-    tl::optional<Uuid> libDeviceUuid;
     CircuitIdentifier name;
     QString value;
     AttributeList attributes;
+    ComponentAssemblyOptionList assemblyOptions;
+    bool lockAssembly;
 
     Signal<ComponentInstance> onEdited;  ///< Dummy event, not used
 
     ComponentInstance(const Uuid& uuid, const Uuid& libComponentUuid,
-                      const Uuid& libVariantUuid,
-                      const tl::optional<Uuid>& libDeviceUuid,
-                      const CircuitIdentifier& name, const QString& value,
-                      const AttributeList& attributes)
+                      const Uuid& libVariantUuid, const CircuitIdentifier& name,
+                      const QString& value, const AttributeList& attributes,
+                      const ComponentAssemblyOptionList& assemblyOptions,
+                      bool lockParts)
       : uuid(uuid),
         libComponentUuid(libComponentUuid),
         libVariantUuid(libVariantUuid),
-        libDeviceUuid(libDeviceUuid),
         name(name),
         value(value),
         attributes(attributes),
+        assemblyOptions(assemblyOptions),
+        lockAssembly(lockParts),
         onEdited(*this) {}
 
     explicit ComponentInstance(const SExpression& node)
       : uuid(deserialize<Uuid>(node.getChild("@0"))),
         libComponentUuid(deserialize<Uuid>(node.getChild("lib_component/@0"))),
         libVariantUuid(deserialize<Uuid>(node.getChild("lib_variant/@0"))),
-        libDeviceUuid(
-            deserialize<tl::optional<Uuid>>(node.getChild("lib_device/@0"))),
         name(deserialize<CircuitIdentifier>(node.getChild("name/@0"))),
         value(node.getChild("value/@0").getValue()),
         attributes(node),
+        assemblyOptions(node),
+        lockAssembly(deserialize<bool>(node.getChild("lock_assembly/@0"))),
         onEdited(*this) {}
 
     /// Required for ::librepcb::SerializableObjectList::contains()
@@ -103,20 +106,23 @@ public:
       root.ensureLineBreak();
       root.appendChild("lib_variant", libVariantUuid);
       root.ensureLineBreak();
-      root.appendChild("lib_device", libDeviceUuid);
-      root.ensureLineBreak();
       root.appendChild("name", name);
       root.appendChild("value", value);
       root.ensureLineBreak();
       attributes.serialize(root);
       root.ensureLineBreak();
+      assemblyOptions.serialize(root);
+      root.ensureLineBreak();
+      root.appendChild("lock_assembly", lockAssembly);
+      root.ensureLineBreak();
     }
 
     bool operator!=(const ComponentInstance& rhs) noexcept {
       return (uuid != rhs.uuid) || (libComponentUuid != rhs.libComponentUuid) ||
-          (libVariantUuid != rhs.libVariantUuid) ||
-          (libDeviceUuid != rhs.libDeviceUuid) || (name != rhs.name) ||
-          (value != rhs.value) || (attributes != rhs.attributes);
+          (libVariantUuid != rhs.libVariantUuid) || (name != rhs.name) ||
+          (value != rhs.value) || (attributes != rhs.attributes) ||
+          (assemblyOptions != rhs.assemblyOptions) ||
+          (lockAssembly != rhs.lockAssembly);
     }
   };
 
@@ -219,8 +225,8 @@ public:
   // Constructors / Destructor
   SchematicClipboardData() = delete;
   SchematicClipboardData(const SchematicClipboardData& other) = delete;
-  SchematicClipboardData(const Uuid& schematicUuid,
-                         const Point& cursorPos) noexcept;
+  SchematicClipboardData(const Uuid& schematicUuid, const Point& cursorPos,
+                         const AssemblyVariantList& assemblyVariants) noexcept;
   explicit SchematicClipboardData(const QByteArray& mimeData);
   ~SchematicClipboardData() noexcept;
 
@@ -229,6 +235,9 @@ public:
       const QString& path = "") noexcept;
   const Uuid& getSchematicUuid() const noexcept { return mSchematicUuid; }
   const Point& getCursorPos() const noexcept { return mCursorPos; }
+  const AssemblyVariantList& getAssemblyVariants() noexcept {
+    return mAssemblyVariants;
+  }
   SerializableObjectList<ComponentInstance, ComponentInstance>&
       getComponentInstances() noexcept {
     return mComponentInstances;
@@ -258,6 +267,7 @@ private:  // Data
   std::shared_ptr<TransactionalFileSystem> mFileSystem;
   Uuid mSchematicUuid;
   Point mCursorPos;
+  AssemblyVariantList mAssemblyVariants;
   SerializableObjectList<ComponentInstance, ComponentInstance>
       mComponentInstances;
   SerializableObjectList<SymbolInstance, SymbolInstance> mSymbolInstances;

@@ -24,7 +24,6 @@
  *  Includes
  ******************************************************************************/
 #include "../attribute/attribute.h"
-#include "../attribute/attributeprovider.h"
 #include "../fileio/directorylock.h"
 #include "../fileio/transactionaldirectory.h"
 #include "../types/elementname.h"
@@ -67,7 +66,7 @@ class StrokeFontPool;
  * @note !! A detailed description about projects is available here: @ref
  * doc_project !!
  */
-class Project final : public QObject, public AttributeProvider {
+class Project final : public QObject {
   Q_OBJECT
 
 public:
@@ -196,6 +195,16 @@ public:
   }
 
   /**
+   * @brief Whether assembly options of new components are locked for the
+   *        board editor or not
+   *
+   * @return Default state for ::librepcb::ComponentInstance::mLockAssembly
+   */
+  bool getDefaultLockComponentAssembly() const noexcept {
+    return mDefaultLockComponentAssembly;
+  }
+
+  /**
    * @brief Get the ProjectLibrary object which contains all library elements
    * used in this project
    *
@@ -298,6 +307,14 @@ public:
    * @param newKeys           The new attribute keys.
    */
   void setCustomBomAttributes(const QStringList& newKeys) noexcept;
+
+  /**
+   * @brief Set the default value for
+   *        ::librepcb::ComponentInstance::mLockAssembly
+   *
+   * @param newLock           The new lock default value.
+   */
+  void setDefaultLockComponentAssembly(bool newLock) noexcept;
 
   /**
    * @brief Set all ERC message approvals
@@ -455,13 +472,6 @@ public:
    */
   void save();
 
-  // Inherited from AttributeProvider
-  /// @copydoc ::librepcb::AttributeProvider::getUserDefinedAttributeValue()
-  QString getUserDefinedAttributeValue(const QString& key) const
-      noexcept override;
-  /// @copydoc ::librepcb::AttributeProvider::getBuiltInAttributeValue()
-  QString getBuiltInAttributeValue(const QString& key) const noexcept override;
-
   // Operator Overloadings
   bool operator==(const Project& rhs) noexcept { return (this == &rhs); }
   bool operator!=(const Project& rhs) noexcept { return (this != &rhs); }
@@ -477,9 +487,7 @@ public:
   static Version getProjectFileFormatVersion(const FilePath& dir);
 
 signals:
-
-  /// @copydoc AttributeProvider::attributesChanged()
-  void attributesChanged() override;
+  void attributesChanged();
 
   /**
    * @brief The norm order has been changed
@@ -571,6 +579,9 @@ private:  // Data
 
   /// Custom attributes to be included in BOM export.
   QStringList mCustomBomAttributes;
+
+  /// Default value for ::librepcb::ComponentInstance::mLockAssembly
+  bool mDefaultLockComponentAssembly;
 
   /// Ehe library which contains all elements needed in this project.
   QScopedPointer<ProjectLibrary> mProjectLibrary;

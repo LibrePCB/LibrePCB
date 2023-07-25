@@ -17,56 +17,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UNITTESTS_CORE_ATTRIBUTEPROVIDERDUMMY_H
-#define UNITTESTS_CORE_ATTRIBUTEPROVIDERDUMMY_H
+#ifndef LIBREPCB_EDITOR_CHECKABLEITEMSEDITORWIDGET_H
+#define LIBREPCB_EDITOR_CHECKABLEITEMSEDITORWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/attribute/attributeprovider.h>
-
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace tests {
+namespace editor {
 
 /*******************************************************************************
- *  Class AttributeProviderDummy
+ *  Class CheckableItemsEditorWidget
  ******************************************************************************/
 
-class AttributeProviderDummy final : public AttributeProvider {
+/**
+ * @brief A widget to modify a list of checkable string items
+ *
+ * Used for ::librepcb::editor::CheckableItemsDelegate.
+ */
+class CheckableItemsEditorWidget final : public QFrame {
+  Q_OBJECT
+
 public:
-  AttributeProviderDummy() noexcept {}
-  AttributeProviderDummy(const AttributeProviderDummy& other) = delete;
-  AttributeProviderDummy& operator=(const AttributeProviderDummy& rhs) = delete;
-  ~AttributeProviderDummy() noexcept {}
+  /// Key, text, check state
+  typedef std::tuple<QVariant, QString, Qt::CheckState> Item;
+  typedef QVector<Item> ItemList;
 
-  QString getUserDefinedAttributeValue(const QString& key) const
-      noexcept override {
-    if (key == "KEY") return "";
-    if (key == "KEY_1") return "Normal value";
-    if (key == "KEY_2") return "Value with {}}}{{ noise";
-    if (key == "KEY_3") return "Recursive {{UNDEFINED}} value";
-    if (key == "KEY_4") return "Recursive {{KEY_1}} value";
-    if (key == "KEY_5") return "Recursive {{KEY_4}} value";
-    if (key == "KEY_6") return "Endless {{KEY_7}} part 1";
-    if (key == "KEY_7") return "Endless {{KEY_6}} part 2";
-    if (key == "KEY_8") return "{{KEY}}";
-    return QString();
-  }
+  // Constructors / Destructor
+  CheckableItemsEditorWidget() = delete;
+  explicit CheckableItemsEditorWidget(QWidget* parent = nullptr) noexcept;
+  CheckableItemsEditorWidget(const CheckableItemsEditorWidget& other) = delete;
+  ~CheckableItemsEditorWidget() noexcept;
 
-signals:
-  void attributesChanged() override {}
+  // General Methods
+  const ItemList& getItems() const noexcept { return mItems; }
+  void setItems(const ItemList& items) noexcept;
+
+  // Operator Overloadings
+  CheckableItemsEditorWidget& operator=(const CheckableItemsEditorWidget& rhs) =
+      delete;
+
+private:  // Methods
+  void updateWidgets() noexcept;
+
+private:  // Data
+  QPointer<QVBoxLayout> mLayout;
+  ItemList mItems;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace tests
+}  // namespace editor
 }  // namespace librepcb
+
+Q_DECLARE_METATYPE(librepcb::editor::CheckableItemsEditorWidget::Item)
+Q_DECLARE_METATYPE(librepcb::editor::CheckableItemsEditorWidget::ItemList)
 
 #endif

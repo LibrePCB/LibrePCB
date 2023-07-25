@@ -53,6 +53,7 @@ public:
   // Setters
   virtual void setModel(QAbstractItemModel* model) noexcept override;
   void setReadOnly(bool readOnly) noexcept;
+  void setAddButtonOnLastRow(bool btn) noexcept { mAddButtonOnLastRow = btn; }
   void setShowCopyButton(bool show) noexcept { mShowCopyButton = show; }
   void setShowEditButton(bool show) noexcept { mShowEditButton = show; }
   void setShowMoveButtons(bool show) noexcept { mShowMoveButtons = show; }
@@ -97,6 +98,7 @@ private:
   void buttonClickedHandler(Signal clickedSignal,
                             const QPersistentModelIndex& itemIndex) noexcept;
 
+  bool mAddButtonOnLastRow;
   bool mShowCopyButton;
   bool mShowEditButton;
   bool mShowMoveButtons;

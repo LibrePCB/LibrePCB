@@ -35,6 +35,10 @@
 #include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/attribute/attributeunit.h>
 #include <librepcb/core/library/cmp/component.h>
+#include <librepcb/core/library/dev/device.h>
+#include <librepcb/core/library/dev/part.h>
+#include <librepcb/core/project/circuit/assemblyvariant.h>
+#include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/items/si_symbol.h>
@@ -166,7 +170,7 @@ bool SchematicEditorState_AddComponent::processAddComponent(
     mLastAngle.setAngleMicroDeg(0);  // reset the angle
     mLastMirrored = false;
     mUseAddComponentDialog = false;
-    startAddingComponent(cmp, symbVar);
+    startAddingComponent(cmp, symbVar, tl::nullopt);
     return true;
   } catch (UserCanceled& exc) {
   } catch (Exception& exc) {
@@ -273,13 +277,13 @@ bool SchematicEditorState_AddComponent::
       // all symbols placed, start adding the next component
       Uuid componentUuid = mCurrentComponent->getLibComponent().getUuid();
       Uuid symbVarUuid = mCurrentComponent->getSymbolVariant().getUuid();
-      tl::optional<Uuid> defaultDeviceUuid =
-          mCurrentComponent->getDefaultDeviceUuid();
+      ComponentAssemblyOptionList options =
+          mCurrentComponent->getAssemblyOptions();
       mContext.undoStack.commitCmdGroup();
       mIsUndoCmdActive = false;
       abortCommand(false);  // reset attributes
-      startAddingComponent(componentUuid, symbVarUuid, defaultDeviceUuid,
-                           QString(), true);
+      startAddingComponent(componentUuid, symbVarUuid, options, QString(),
+                           true);
     }
     return true;
   } catch (Exception& e) {
@@ -323,7 +327,8 @@ bool SchematicEditorState_AddComponent::
 
 void SchematicEditorState_AddComponent::startAddingComponent(
     const tl::optional<Uuid>& cmp, const tl::optional<Uuid>& symbVar,
-    const tl::optional<Uuid>& dev, const QString& searchTerm, bool keepValue) {
+    const tl::optional<ComponentAssemblyOptionList>& options,
+    const QString& searchTerm, bool keepValue) {
   // Discard any temporary changes and release undo stack.
   abortBlockingToolsInOtherEditors();
 
@@ -339,7 +344,7 @@ void SchematicEditorState_AddComponent::startAddingComponent(
     if (cmp && symbVar) {
       // add selected component to circuit
       auto* cmd = new CmdAddComponentToCircuit(
-          mContext.workspace, mContext.project, *cmp, *symbVar, dev);
+          mContext.workspace, mContext.project, *cmp, *symbVar, options);
       mContext.undoStack.appendToCmdGroup(cmd);
       mCurrentComponent = cmd->getComponentInstance();
     } else {
@@ -359,17 +364,37 @@ void SchematicEditorState_AddComponent::startAddingComponent(
       }
       if (mAddComponentDialog->exec() != QDialog::Accepted)
         throw UserCanceled(__FILE__, __LINE__);  // abort
-      if (!mAddComponentDialog->getSelectedComponentUuid())
+      if (!mAddComponentDialog->getSelectedComponent())
         throw LogicError(__FILE__, __LINE__);
-      if (!mAddComponentDialog->getSelectedSymbVarUuid())
+      if (!mAddComponentDialog->getSelectedSymbolVariant())
         throw LogicError(__FILE__, __LINE__);
+
+      // Create assembly options.
+      ComponentAssemblyOptionList assemblyOptions;
+      if (auto libDev = mAddComponentDialog->getSelectedDevice()) {
+        PartList parts;
+        if (auto libPart = mAddComponentDialog->getSelectedPart()) {
+          parts.append(std::make_shared<Part>(
+              libPart->getMpn(), libPart->getManufacturer(),
+              libPart->getAttributes() | libDev->getAttributes()));
+        }
+        QSet<Uuid> assemblyVariants;
+        if (mAddComponentDialog->getSelectedPackageAssemblyType() !=
+            Package::AssemblyType::None) {
+          assemblyVariants =
+              mContext.project.getCircuit().getAssemblyVariants().getUuidSet();
+        }
+        assemblyOptions.append(std::make_shared<ComponentAssemblyOption>(
+            libDev->getUuid(), libDev->getAttributes(), assemblyVariants,
+            parts));
+      }
 
       // add selected component to circuit
       auto cmd = new CmdAddComponentToCircuit(
           mContext.workspace, mContext.project,
-          *mAddComponentDialog->getSelectedComponentUuid(),
-          *mAddComponentDialog->getSelectedSymbVarUuid(),
-          mAddComponentDialog->getSelectedDeviceUuid());
+          mAddComponentDialog->getSelectedComponent()->getUuid(),
+          mAddComponentDialog->getSelectedSymbolVariant()->getUuid(),
+          assemblyOptions);
       mContext.undoStack.appendToCmdGroup(cmd);
       mCurrentComponent = cmd->getComponentInstance();
     }

@@ -51,7 +51,7 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataEmpty) {
   Point pos(Length(12345), Length(54321));
 
   // Create object
-  SchematicClipboardData obj1(uuid, pos);
+  SchematicClipboardData obj1(uuid, pos, {});
 
   // Serialize to MIME data
   std::unique_ptr<QMimeData> mime1 = obj1.toMimeData();
@@ -73,12 +73,33 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   Uuid uuid = Uuid::createRandom();
   Point pos(Length(12345), Length(54321));
 
+  std::shared_ptr<AssemblyVariant> av1 = std::make_shared<AssemblyVariant>(
+      Uuid::createRandom(), FileProofName("AV1"), "desc 1");
+
+  std::shared_ptr<AssemblyVariant> av2 = std::make_shared<AssemblyVariant>(
+      Uuid::createRandom(), FileProofName("AV2"), "desc 2");
+
   std::shared_ptr<Attribute> attribute1 = std::make_shared<Attribute>(
       AttributeKey("A1"), AttrTypeString::instance(), "foo bar", nullptr);
 
   std::shared_ptr<Attribute> attribute2 = std::make_shared<Attribute>(
       AttributeKey("A2"), AttrTypeVoltage::instance(), "4.2",
       AttrTypeVoltage::instance().getUnitFromString("millivolt"));
+
+  std::shared_ptr<Part> part1 = std::make_shared<Part>(
+      SimpleString("mpn 1"), SimpleString("man 1"), AttributeList{});
+
+  std::shared_ptr<Part> part2 = std::make_shared<Part>(
+      SimpleString(""), SimpleString(""), AttributeList{attribute1});
+
+  std::shared_ptr<ComponentAssemblyOption> assemblyOption1 =
+      std::make_shared<ComponentAssemblyOption>(
+          Uuid::createRandom(), AttributeList{attribute1},
+          QSet<Uuid>{av1->getUuid()}, PartList{part1, part2});
+
+  std::shared_ptr<ComponentAssemblyOption> assemblyOption2 =
+      std::make_shared<ComponentAssemblyOption>(
+          Uuid::createRandom(), AttributeList{}, QSet<Uuid>{}, PartList{});
 
   std::shared_ptr<Text> text1 = std::make_shared<Text>(
       Uuid::createRandom(), Layer::botCopper(), "text 1", Point(1, 2), Angle(3),
@@ -92,14 +113,16 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
   std::shared_ptr<SchematicClipboardData::ComponentInstance> component1 =
       std::make_shared<SchematicClipboardData::ComponentInstance>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          Uuid::createRandom(), CircuitIdentifier("foo"), "bar",
-          AttributeList{attribute1, attribute2});
+          CircuitIdentifier("foo"), "bar",
+          AttributeList{attribute1, attribute2},
+          ComponentAssemblyOptionList{assemblyOption1, assemblyOption2}, true);
 
   std::shared_ptr<SchematicClipboardData::ComponentInstance> component2 =
       std::make_shared<SchematicClipboardData::ComponentInstance>(
           Uuid::createRandom(), Uuid::createRandom(), Uuid::createRandom(),
-          tl::nullopt, CircuitIdentifier("bar"), "hello world",
-          AttributeList{attribute2, attribute1});
+          CircuitIdentifier("bar"), "hello world",
+          AttributeList{attribute2, attribute1},
+          ComponentAssemblyOptionList{assemblyOption2, assemblyOption1}, false);
 
   std::shared_ptr<SchematicClipboardData::SymbolInstance> symbol1 =
       std::make_shared<SchematicClipboardData::SymbolInstance>(
@@ -161,7 +184,7 @@ TEST(SchematicClipboardDataTest, testToFromMimeDataPopulated) {
             Vertex(Point(40, 50), Angle(60))}));
 
   // Create object
-  SchematicClipboardData obj1(uuid, pos);
+  SchematicClipboardData obj1(uuid, pos, {av1, av2});
   obj1.getComponentInstances().append(component1);
   obj1.getComponentInstances().append(component2);
   obj1.getSymbolInstances().append(symbol1);
