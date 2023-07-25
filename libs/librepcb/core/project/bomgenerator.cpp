@@ -128,8 +128,8 @@ std::shared_ptr<Bom> BomGenerator::generate(
       PartItem partItem;
       partItem.mpn = *part->getMpn();
       partItem.manufacturer = *part->getManufacturer();
-      partItem.value = AttributeSubstitutor::substitute(lookup("VALUE"), lookup)
-                           .simplified();
+      partItem.value =
+          AttributeSubstitutor::substitute(lookup("VALUE"), lookup);
       // Remove redundant information from the value since it could
       // lead to confusion.
       if (!partItem.mpn.isEmpty()) {
@@ -140,6 +140,7 @@ std::shared_ptr<Bom> BomGenerator::generate(
       if (!partItem.manufacturer.isEmpty()) {
         removeSubString(partItem.value, partItem.manufacturer);
       }
+      partItem.value = partItem.value.simplified();  // Do *after* replacements!
       foreach (const QString& attribute, customPartAttributes) {
         partItem.attributes.append(
             AttributeSubstitutor::substitute(lookup(attribute), lookup));
