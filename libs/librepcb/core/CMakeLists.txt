@@ -244,6 +244,8 @@ add_library(
   library/pkg/packagemodel.h
   library/pkg/packagepad.cpp
   library/pkg/packagepad.h
+  library/resource.cpp
+  library/resource.h
   library/sym/symbol.cpp
   library/sym/symbol.h
   library/sym/symbolcheck.cpp

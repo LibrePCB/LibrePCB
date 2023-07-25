@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "librarybaseelement.h"
+#include "resource.h"
 
 #include <QtCore>
 
@@ -60,11 +61,15 @@ public:
                  const SExpression& root);
   virtual ~LibraryElement() noexcept;
 
-  // Getters: Attributes
+  // Getters
   const QSet<Uuid>& getCategories() const noexcept { return mCategories; }
+  const ResourceList& getResources() const noexcept { return mResources; }
 
-  // Setters: Attributes
+  // Setters
   void setCategories(const QSet<Uuid>& uuids) noexcept { mCategories = uuids; }
+  void setResources(const ResourceList& resources) noexcept {
+    mResources = resources;
+  }
 
   // General Methods
   virtual RuleCheckMessageList runChecks() const override;
@@ -76,6 +81,7 @@ protected:
   virtual void serialize(SExpression& root) const override;
 
   QSet<Uuid> mCategories;
+  ResourceList mResources;
 };
 
 /*******************************************************************************
