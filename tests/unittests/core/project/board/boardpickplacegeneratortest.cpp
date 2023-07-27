@@ -75,7 +75,7 @@ TEST_F(BoardPickPlaceGeneratorTest, test) {
 
   // top devices with comment
   {
-    writer.setBoardSide(PickPlaceCsvWriter::BoardSide::TOP);
+    writer.setBoardSide(PickPlaceCsvWriter::BoardSide::Top);
     writer.setIncludeMetadataComment(true);
     FilePath fp = testDataDir.getPathTo("actual/top.csv");
     writer.generateCsv()->saveToFile(fp);
@@ -84,7 +84,7 @@ TEST_F(BoardPickPlaceGeneratorTest, test) {
 
   // bottom devices with comment
   {
-    writer.setBoardSide(PickPlaceCsvWriter::BoardSide::BOTTOM);
+    writer.setBoardSide(PickPlaceCsvWriter::BoardSide::Bottom);
     writer.setIncludeMetadataComment(true);
     FilePath fp = testDataDir.getPathTo("actual/bottom.csv");
     writer.generateCsv()->saveToFile(fp);
@@ -93,7 +93,7 @@ TEST_F(BoardPickPlaceGeneratorTest, test) {
 
   // top+bottom devices without comment
   {
-    writer.setBoardSide(PickPlaceCsvWriter::BoardSide::BOTH);
+    writer.setBoardSide(PickPlaceCsvWriter::BoardSide::Both);
     writer.setIncludeMetadataComment(false);
     FilePath fp = testDataDir.getPathTo("actual/both.csv");
     writer.generateCsv()->saveToFile(fp);

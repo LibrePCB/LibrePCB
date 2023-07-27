@@ -798,11 +798,11 @@ bool CommandLineInterface::openProject(
       };
       QVector<Job> jobs;
       foreach (const QString& fp, exportPnpTopFiles) {
-        jobs.append(Job{tr("top"), PickPlaceCsvWriter::BoardSide::TOP,
+        jobs.append(Job{tr("top"), PickPlaceCsvWriter::BoardSide::Top,
                         BoardGerberExport::BoardSide::Top, fp});
       }
       foreach (const QString& fp, exportPnpBottomFiles) {
-        jobs.append(Job{tr("bottom"), PickPlaceCsvWriter::BoardSide::BOTTOM,
+        jobs.append(Job{tr("bottom"), PickPlaceCsvWriter::BoardSide::Bottom,
                         BoardGerberExport::BoardSide::Bottom, fp});
       }
       foreach (const auto& job, jobs) {
