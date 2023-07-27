@@ -223,10 +223,19 @@ GraphicsExport::Result GraphicsExport::run(RunArgs args) noexcept {
       }
 
       // Determine output page orientation.
-      const QPageLayout::Orientation pageOrientation =
-          page.second->getOrientation()
-          ? (*page.second->getOrientation())
-          : getOrientation(sourceRectTransformedPx.size());
+      QPageLayout::Orientation pageOrientation;
+      switch (page.second->getOrientation()) {
+        case GraphicsExportSettings::Orientation::Landscape:
+          pageOrientation = QPageLayout::Landscape;
+          break;
+        case GraphicsExportSettings::Orientation::Portrait:
+          pageOrientation = QPageLayout::Portrait;
+          break;
+        case GraphicsExportSettings::Orientation::Auto:
+        default:
+          pageOrientation = getOrientation(sourceRectTransformedPx.size());
+          break;
+      }
       if (pagedPaintDevice) {
         QPageLayout::Orientation orientation = pageOrientation;
         if (getOrientation(pageSize.sizePoints()) == QPageLayout::Landscape) {
@@ -337,7 +346,7 @@ GraphicsExport::Result GraphicsExport::run(RunArgs args) noexcept {
 
       // Perform the export.
       painter.save();
-      if (page.second->getBackgroundColor() != Qt::transparent) {
+      if (page.second->getBackgroundColor().alpha() > 0) {
         painter.fillRect(pageRectPx, page.second->getBackgroundColor());
       }
       painter.translate(pageContentRectPx.center().x(),
@@ -420,8 +429,8 @@ QTransform GraphicsExport::getSourceTransformation(
   if (settings.getMirror()) {
     t.scale(-1, 1);
   }
-  if (settings.getScale()) {
-    t.scale(*settings.getScale(), *settings.getScale());
+  if (auto scale = settings.getScale()) {
+    t.scale((*scale)->toNormalized(), (*scale)->toNormalized());
   }
   return t;
 }

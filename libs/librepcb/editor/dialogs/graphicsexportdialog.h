@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/export/graphicsexportsettings.h>
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/types/length.h>
 #include <optional/tl/optional.hpp>
@@ -129,9 +130,8 @@ private:  // Methods
   // GUI Access Methods
   void setPageSize(const tl::optional<QPageSize::PageSizeId>& size) noexcept;
   tl::optional<QPageSize> getPageSize() const noexcept;
-  void setOrientation(
-      const tl::optional<QPageLayout::Orientation>& orientation) noexcept;
-  tl::optional<QPageLayout::Orientation> getOrientation() const noexcept;
+  void setOrientation(GraphicsExportSettings::Orientation orientation) noexcept;
+  GraphicsExportSettings::Orientation getOrientation() const noexcept;
   void setMarginLeft(const UnsignedLength& margin) noexcept;
   UnsignedLength getMarginLeft() const noexcept;
   void setMarginTop(const UnsignedLength& margin) noexcept;
@@ -148,14 +148,14 @@ private:  // Methods
   bool getMirror() const noexcept;
   void setFitToPage(bool fit) noexcept;
   bool getFitToPage() const noexcept;
-  void setScaleFactor(qreal factor) noexcept;
-  qreal getScaleFactor() const noexcept;
+  void setScaleFactor(const UnsignedRatio& factor) noexcept;
+  UnsignedRatio getScaleFactor() const noexcept;
   void setDpi(int dpi) noexcept;
   int getDpi() const noexcept;
   void setBlackWhite(bool blackWhite) noexcept;
   bool getBlackWhite() const noexcept;
-  void setBackgroundColor(Qt::GlobalColor color) noexcept;
-  Qt::GlobalColor getBackgroundColor() const noexcept;
+  void setBackgroundColor(const QColor& color) noexcept;
+  QColor getBackgroundColor() const noexcept;
   void setMinLineWidth(const UnsignedLength& width) noexcept;
   UnsignedLength getMinLineWidth() const noexcept;
   void setPrinterName(const QString& name) noexcept;

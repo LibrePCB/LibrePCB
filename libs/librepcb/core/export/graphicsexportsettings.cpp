@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "graphicsexportsettings.h"
 
+#include "../serialization/sexpression.h"
 #include "../types/layer.h"
 #include "../workspace/theme.h"
 
@@ -34,12 +35,61 @@
 namespace librepcb {
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+template <>
+SExpression serialize(const GraphicsExportSettings::Orientation& obj) {
+  if (obj == GraphicsExportSettings::Orientation::Landscape) {
+    return SExpression::createToken("landscape");
+  } else if (obj == GraphicsExportSettings::Orientation::Portrait) {
+    return SExpression::createToken("portrait");
+  } else {
+    Q_ASSERT(obj == GraphicsExportSettings::Orientation::Auto);
+    return SExpression::createToken("auto");
+  }
+}
+
+template <>
+GraphicsExportSettings::Orientation deserialize(const SExpression& node) {
+  if (node.getValue() == "landscape") {
+    return GraphicsExportSettings::Orientation::Landscape;
+  } else if (node.getValue() == "portrait") {
+    return GraphicsExportSettings::Orientation::Portrait;
+  } else if (node.getValue() == "auto") {
+    return GraphicsExportSettings::Orientation::Auto;
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Invalid page orientation: '%1'").arg(node.getValue()));
+  }
+}
+
+template <>
+SExpression serialize(const tl::optional<UnsignedRatio>& obj) {
+  if (obj) {
+    return serialize(*obj);
+  } else {
+    return SExpression::createToken("auto");
+  }
+}
+
+template <>
+tl::optional<UnsignedRatio> deserialize(const SExpression& node) {
+  if (node.getValue() == "auto") {
+    return tl::nullopt;
+  } else {
+    return deserialize<UnsignedRatio>(node);
+  }
+}
+
+/*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 GraphicsExportSettings::GraphicsExportSettings() noexcept
   : mPageSize(tl::nullopt),  // Auto
-    mOrientation(tl::nullopt),  // Auto
+    mOrientation(Orientation::Auto),
     mMarginLeft(10000000),  // 10mm
     mMarginTop(10000000),  // 10mm
     mMarginRight(10000000),  // 10mm

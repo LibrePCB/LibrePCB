@@ -126,7 +126,7 @@ TEST_F(GraphicsExportTest, testExportImageWithManualScaling) {
   std::shared_ptr<GraphicsExportSettings> settings =
       std::make_shared<GraphicsExportSettings>();
   settings->setPixmapDpi(100);
-  settings->setScale(4);
+  settings->setScale(UnsignedRatio(Ratio::fromNormalized(4)));
   settings->setMarginLeft(UnsignedLength(25400000));  // 5% of width.
   settings->setMarginTop(UnsignedLength(12700000));  // 5% of height.
   settings->setMarginRight(UnsignedLength(50800000));  // 10% of width.
@@ -233,7 +233,7 @@ TEST_F(GraphicsExportTest, testExportSvgWithManualScaling) {
   std::shared_ptr<GraphicsExportSettings> settings =
       std::make_shared<GraphicsExportSettings>();
   settings->setPixmapDpi(100);
-  settings->setScale(4);
+  settings->setScale(UnsignedRatio(Ratio::fromNormalized(4)));
   settings->setMarginLeft(UnsignedLength(25400000));  // 5% of width.
   settings->setMarginTop(UnsignedLength(12700000));  // 5% of height.
   settings->setMarginRight(UnsignedLength(50800000));  // 10% of width.
@@ -269,7 +269,7 @@ TEST_F(GraphicsExportTest, testExportPdfWithAutoScaling) {
   std::shared_ptr<GraphicsExportSettings> settings =
       std::make_shared<GraphicsExportSettings>();
   settings->setPageSize(tl::nullopt);
-  settings->setOrientation(tl::nullopt);
+  settings->setOrientation(GraphicsExportSettings::Orientation::Auto);
   settings->setScale(tl::nullopt);
   settings->setMarginLeft(UnsignedLength(10000000));  // 10mm.
   settings->setMarginTop(UnsignedLength(20000000));  // 20mm.

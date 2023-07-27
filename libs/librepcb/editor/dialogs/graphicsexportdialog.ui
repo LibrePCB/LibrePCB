@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>839</width>
-    <height>374</height>
+    <height>375</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -180,23 +180,7 @@
             </widget>
            </item>
            <item>
-            <widget class="librepcb::editor::DoubleSpinBox" name="spbxScaleFactor">
-             <property name="decimals">
-              <number>6</number>
-             </property>
-             <property name="minimum">
-              <double>0.000001000000000</double>
-             </property>
-             <property name="maximum">
-              <double>100000.000000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.100000000000000</double>
-             </property>
-             <property name="value">
-              <double>1.000000000000000</double>
-             </property>
-            </widget>
+            <widget class="librepcb::editor::UnsignedRatioEdit" name="spbxScaleFactor" native="true"/>
            </item>
           </layout>
          </item>
@@ -709,9 +693,10 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>librepcb::editor::DoubleSpinBox</class>
-   <extends>QDoubleSpinBox</extends>
-   <header location="global">librepcb/editor/widgets/doublespinbox.h</header>
+   <class>librepcb::editor::UnsignedRatioEdit</class>
+   <extends>QWidget</extends>
+   <header location="global">librepcb/editor/widgets/unsignedratioedit.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -721,7 +706,6 @@
   <tabstop>rbtnOrientationLandscape</tabstop>
   <tabstop>rbtnOrientationPortrait</tabstop>
   <tabstop>cbxScaleAuto</tabstop>
-  <tabstop>spbxScaleFactor</tabstop>
   <tabstop>rbtnBackgroundNone</tabstop>
   <tabstop>rbtnBackgroundWhite</tabstop>
   <tabstop>rbtnBackgroundBlack</tabstop>
@@ -746,8 +730,8 @@
  <resources/>
  <connections/>
  <buttongroups>
-  <buttongroup name="btnGroupOrientation"/>
   <buttongroup name="btnGroupPages"/>
+  <buttongroup name="btnGroupOrientation"/>
   <buttongroup name="btnGroupBackground"/>
  </buttongroups>
 </ui>

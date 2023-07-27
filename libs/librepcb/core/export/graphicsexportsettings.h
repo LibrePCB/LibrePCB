@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../types/length.h"
+#include "../types/ratio.h"
 
 #include <optional/tl/optional.hpp>
 
@@ -49,6 +50,13 @@ class Theme;
  */
 class GraphicsExportSettings final {
 public:
+  // Types
+  enum class Orientation {
+    Landscape,
+    Portrait,
+    Auto,
+  };
+
   // Constructors / Destructor
   GraphicsExportSettings() noexcept;
   GraphicsExportSettings(const GraphicsExportSettings& other) noexcept;
@@ -58,10 +66,7 @@ public:
   const tl::optional<QPageSize>& getPageSize() const noexcept {
     return mPageSize;
   }
-  const tl::optional<QPageLayout::Orientation>& getOrientation() const
-      noexcept {
-    return mOrientation;
-  }
+  Orientation getOrientation() const noexcept { return mOrientation; }
   const UnsignedLength& getMarginLeft() const noexcept { return mMarginLeft; }
   const UnsignedLength& getMarginTop() const noexcept { return mMarginTop; }
   const UnsignedLength& getMarginRight() const noexcept { return mMarginRight; }
@@ -70,12 +75,12 @@ public:
   }
   bool getRotate() const noexcept { return mRotate; }
   bool getMirror() const noexcept { return mMirror; }
-  const tl::optional<qreal>& getScale() const noexcept { return mScale; }
+  const tl::optional<UnsignedRatio>& getScale() const noexcept {
+    return mScale;
+  }
   int getPixmapDpi() const noexcept { return mPixmapDpi; }
   bool getBlackWhite() const noexcept { return mBlackWhite; }
-  Qt::GlobalColor getBackgroundColor() const noexcept {
-    return mBackgroundColor;
-  }
+  const QColor& getBackgroundColor() const noexcept { return mBackgroundColor; }
   const UnsignedLength& getMinLineWidth() const noexcept {
     return mMinLineWidth;
   }
@@ -91,8 +96,7 @@ public:
   void setPageSize(const tl::optional<QPageSize>& size) noexcept {
     mPageSize = size;
   }
-  void setOrientation(
-      tl::optional<QPageLayout::Orientation> orientation) noexcept {
+  void setOrientation(Orientation orientation) noexcept {
     mOrientation = orientation;
   }
   void setMarginLeft(const librepcb::UnsignedLength& margin) noexcept {
@@ -109,10 +113,10 @@ public:
   }
   void setRotate(bool rotate) noexcept { mRotate = rotate; }
   void setMirror(bool mirror) noexcept { mMirror = mirror; }
-  void setScale(tl::optional<qreal> scale) noexcept { mScale = scale; }
+  void setScale(tl::optional<UnsignedRatio> scale) noexcept { mScale = scale; }
   void setPixmapDpi(int dpi) noexcept { mPixmapDpi = dpi; }
   void setBlackWhite(bool blackWhite) noexcept { mBlackWhite = blackWhite; }
-  void setBackgroundColor(Qt::GlobalColor c) noexcept { mBackgroundColor = c; }
+  void setBackgroundColor(const QColor& c) noexcept { mBackgroundColor = c; }
   void setMinLineWidth(const UnsignedLength& width) noexcept {
     mMinLineWidth = width;
   }
@@ -135,17 +139,17 @@ private:  // Methods
 
 private:  // Data
   tl::optional<QPageSize> mPageSize;
-  tl::optional<QPageLayout::Orientation> mOrientation;
+  Orientation mOrientation;
   UnsignedLength mMarginLeft;
   UnsignedLength mMarginTop;
   UnsignedLength mMarginRight;
   UnsignedLength mMarginBottom;
   bool mRotate;
   bool mMirror;
-  tl::optional<qreal> mScale;
+  tl::optional<UnsignedRatio> mScale;
   int mPixmapDpi;
   bool mBlackWhite;
-  Qt::GlobalColor mBackgroundColor;
+  QColor mBackgroundColor;
   UnsignedLength mMinLineWidth;
   QList<std::pair<QString, QColor>> mColors;
 };

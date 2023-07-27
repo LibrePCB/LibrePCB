@@ -33,6 +33,7 @@
 #include <librepcb/core/workspace/theme.h>
 #include <librepcb/editor/dialogs/graphicsexportdialog.h>
 #include <librepcb/editor/widgets/unsignedlengthedit.h>
+#include <librepcb/editor/widgets/unsignedratioedit.h>
 
 #include <QtTest>
 
@@ -340,8 +341,10 @@ TEST_F(GraphicsExportDialogTest, testPageSize) {
 }
 
 TEST_F(GraphicsExportDialogTest, testOrientation) {
-  const tl::optional<QPageLayout::Orientation> defaultValue = tl::nullopt;
-  const tl::optional<QPageLayout::Orientation> newValue = QPageLayout::Portrait;
+  const GraphicsExportSettings::Orientation defaultValue =
+      GraphicsExportSettings::Orientation::Auto;
+  const GraphicsExportSettings::Orientation newValue =
+      GraphicsExportSettings::Orientation::Portrait;
   QString defaultWidget =
       "tabWidget/qt_tabwidget_stackedwidget/tabGeneral/rbtnOrientationAuto";
   QString newWidget =
@@ -661,8 +664,9 @@ TEST_F(GraphicsExportDialogTest, testMirror) {
 }
 
 TEST_F(GraphicsExportDialogTest, testScale) {
-  const tl::optional<qreal> defaultValue = tl::nullopt;
-  const tl::optional<qreal> newValue = 2;
+  const tl::optional<UnsignedRatio> defaultValue = tl::nullopt;
+  const tl::optional<UnsignedRatio> newValue =
+      UnsignedRatio(Ratio::fromNormalized(2));
   QString widgetCbx =
       "tabWidget/qt_tabwidget_stackedwidget/tabGeneral/cbxScaleAuto";
   QString widgetSpbx =
@@ -677,19 +681,21 @@ TEST_F(GraphicsExportDialogTest, testScale) {
                              theme, "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widgetCbx);
-    QDoubleSpinBox& spbx =
-        TestHelpers::getChild<QDoubleSpinBox>(dlg, widgetSpbx);
+    UnsignedRatioEdit& spbx =
+        TestHelpers::getChild<UnsignedRatioEdit>(dlg, widgetSpbx);
 
     // Check the default value.
     EXPECT_EQ(!defaultValue, cbx.isChecked());
     EXPECT_EQ(defaultValue.has_value(), spbx.isEnabled());
-    EXPECT_EQ(defaultValue ? *defaultValue : 1, spbx.value());
+    EXPECT_EQ(defaultValue ? **defaultValue : Ratio::percent100(),
+              *spbx.getValue());
     EXPECT_EQ(defaultValue, getSettings(dlg, 1).at(0)->getScale());
 
     // Check if the value can be changed and are applied properly.
     cbx.setChecked(!newValue);
     EXPECT_EQ(newValue.has_value(), spbx.isEnabled());
-    EXPECT_EQ(1, getSettings(dlg, 1).at(0)->getScale());
+    EXPECT_EQ(UnsignedRatio(Ratio::percent100()),
+              getSettings(dlg, 1).at(0)->getScale());
     spbx.setValue(*newValue);
     EXPECT_EQ(newValue, getSettings(dlg, 1).at(0)->getScale());
   }
@@ -704,20 +710,21 @@ TEST_F(GraphicsExportDialogTest, testScale) {
                              theme, "unittest");
     prepareDialog(dlg, outFile);
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dlg, widgetCbx);
-    QDoubleSpinBox& spbx =
-        TestHelpers::getChild<QDoubleSpinBox>(dlg, widgetSpbx);
+    UnsignedRatioEdit& spbx =
+        TestHelpers::getChild<UnsignedRatioEdit>(dlg, widgetSpbx);
 
     // Check new value.
     EXPECT_EQ(!newValue, cbx.isChecked());
     EXPECT_EQ(newValue.has_value(), spbx.isEnabled());
-    EXPECT_EQ(newValue ? *newValue : 1, spbx.value());
+    EXPECT_EQ(newValue ? **newValue : Ratio::percent100(), *spbx.getValue());
     EXPECT_EQ(newValue, getSettings(dlg, 1).at(0)->getScale());
 
     // Restore default value.
     restoreDefaults(dlg);
     EXPECT_EQ(!defaultValue, cbx.isChecked());
     EXPECT_EQ(defaultValue.has_value(), spbx.isEnabled());
-    EXPECT_EQ(defaultValue ? *defaultValue : 1, spbx.value());
+    EXPECT_EQ(defaultValue ? **defaultValue : Ratio::percent100(),
+              *spbx.getValue());
     EXPECT_EQ(defaultValue, getSettings(dlg, 1).at(0)->getScale());
 
     // Sanity check that the export is actually successful.
@@ -829,8 +836,8 @@ TEST_F(GraphicsExportDialogTest, testBlackWhite) {
 }
 
 TEST_F(GraphicsExportDialogTest, testBackgroundColor) {
-  const Qt::GlobalColor defaultValue = Qt::transparent;
-  const Qt::GlobalColor newValue = Qt::black;
+  const QColor defaultValue = Qt::transparent;
+  const QColor newValue = Qt::black;
   QString widgetDefault =
       "tabWidget/qt_tabwidget_stackedwidget/tabGeneral/rbtnBackgroundNone";
   QString widgetNew =
