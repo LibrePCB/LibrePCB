@@ -671,17 +671,10 @@ void BoardGerberExport::drawLayer(GerberGenerator& gen,
   foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
     Q_ASSERT(polygon);
     if (layer == polygon->getData().getLayer()) {
-      UnsignedLength lineWidth =
-          calcWidthOfLayer(polygon->getData().getLineWidth(), layer);
-      gen.drawPathOutline(polygon->getData().getPath(), lineWidth,
-                          graphicsFunction, graphicsNet, QString());
-      // Only fill closed paths (for consistency with the appearance in the
-      // board editor, and because Gerber expects area outlines as closed).
-      if (polygon->getData().isFilled() &&
-          polygon->getData().getPath().isClosed()) {
-        gen.drawPathArea(polygon->getData().getPath(), graphicsFunction,
-                         graphicsNet, QString());
-      }
+      drawPolygon(gen, layer, polygon->getData().getPath(),
+                  polygon->getData().getLineWidth(),
+                  polygon->getData().isFilled(), graphicsFunction, graphicsNet,
+                  QString());
     }
   }
 
@@ -773,15 +766,9 @@ void BoardGerberExport::drawDevice(GerberGenerator& gen,
        device.getLibFootprint().getPolygons().sortedByUuid()) {
     const Layer& polygonLayer = transform.map(polygon.getLayer());
     if (polygonLayer == layer) {
-      Path path = transform.map(polygon.getPath());
-      gen.drawPathOutline(
-          path, calcWidthOfLayer(polygon.getLineWidth(), polygonLayer),
-          graphicsFunction, graphicsNet, component);
-      // Only fill closed paths (for consistency with the appearance in the
-      // board editor, and because Gerber expects area outlines as closed).
-      if (polygon.isFilled() && path.isClosed()) {
-        gen.drawPathArea(path, graphicsFunction, graphicsNet, component);
-      }
+      const Path path = transform.map(polygon.getPath());
+      drawPolygon(gen, layer, path, polygon.getLineWidth(), polygon.isFilled(),
+                  graphicsFunction, graphicsNet, component);
     }
   }
 
@@ -959,6 +946,29 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
       }
       default: { throw LogicError(__FILE__, __LINE__, "Unknown pad shape!"); }
     }
+  }
+}
+
+void BoardGerberExport::drawPolygon(GerberGenerator& gen, const Layer& layer,
+                                    const Path& outline,
+                                    const UnsignedLength& lineWidth, bool fill,
+                                    GerberGenerator::Function function,
+                                    const tl::optional<QString>& net,
+                                    const QString& component) const {
+  // Don't draw zero-width outlines if the path gets filled! They have
+  // no purpose and Gerber states that zero-width strokes shall not be
+  // created! However, if the path is not filled, let's draw the
+  // outline anyway as this *might* lead to a warning during production
+  // to inform the user about this shaky input data.
+  if ((lineWidth > 0) || (!fill) || (!outline.isClosed())) {
+    gen.drawPathOutline(outline, calcWidthOfLayer(lineWidth, layer), function,
+                        net, component);
+  }
+
+  // Only fill closed paths (for consistency with the appearance in the
+  // board editor, and because Gerber expects area outlines as closed).
+  if (fill && outline.isClosed()) {
+    gen.drawPathArea(outline, function, net, component);
   }
 }
 
