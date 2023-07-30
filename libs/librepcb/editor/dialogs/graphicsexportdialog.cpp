@@ -1155,6 +1155,15 @@ void GraphicsExportDialog::startExport(bool toClipboard) noexcept {
     if (!extensions.contains(fp.getSuffix().toLower().toUtf8())) {
       fp.setPath(fp.toStr() % "." % defaultExtension);
     }
+    if (!isPdf) {
+      // Strip page number from the file path, if any.
+      QString tmp = fp.toStr();
+      tmp.chop(fp.getSuffix().length() + 1);
+      while ((!tmp.isEmpty()) && (tmp.back() == "1")) {
+        tmp.chop(1);
+      }
+      fp.setPath(tmp % "." % fp.getSuffix());
+    }
     if (fp.toStr() == key) {
       sUsedFilePaths.remove(key);
     } else {

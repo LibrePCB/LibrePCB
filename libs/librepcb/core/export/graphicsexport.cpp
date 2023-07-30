@@ -143,10 +143,6 @@ QString GraphicsExport::run(RunArgs args) noexcept {
     if (args.filePath.isValid() && (args.pages.count() > 1)) {
       outputFilePathTmpl = args.filePath.toStr();
       outputFilePathTmpl.chop(fileExt.length() + 1);
-      while ((!outputFilePathTmpl.isEmpty()) &&
-             outputFilePathTmpl.at(outputFilePathTmpl.size() - 1).isDigit()) {
-        outputFilePathTmpl.chop(1);
-      }
       outputFilePathTmpl += "%1." % args.filePath.getSuffix();
     }
 
