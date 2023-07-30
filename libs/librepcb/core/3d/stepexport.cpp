@@ -65,8 +65,9 @@ bool StepExport::isBusy() const noexcept {
       (!mFuture.isFinished()) && (!mFuture.isCanceled());
 }
 
-void StepExport::waitForFinished() noexcept {
+QString StepExport::waitForFinished() noexcept {
   mFuture.waitForFinished();
+  return mFuture.result();
 }
 
 void StepExport::cancel() noexcept {
@@ -79,8 +80,8 @@ void StepExport::cancel() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void StepExport::run(std::shared_ptr<SceneData3D> data, FilePath fp,
-                     int finishDelayMs) noexcept {
+QString StepExport::run(std::shared_ptr<SceneData3D> data, FilePath fp,
+                        int finishDelayMs) noexcept {
   // Note: This method is called from a different thread, thus be careful with
   //       calling other methods to only call thread-safe methods!
 
@@ -98,7 +99,7 @@ void StepExport::run(std::shared_ptr<SceneData3D> data, FilePath fp,
     emit progressStatus(tr("Preparing..."));
     data->preprocess(false, true);
     emit progressPercent(10);
-    if (mAbort) return;
+    if (mAbort) return QString();
 
     // Create assembly model.
     std::unique_ptr<OccModel> model =
@@ -165,7 +166,7 @@ void StepExport::run(std::shared_ptr<SceneData3D> data, FilePath fp,
           lastError = obj.name % ": " % e.getMsg();
         }
         emit progressPercent(20 + ((70 * i) / data->getDevices().count()));
-        if (mAbort) return;
+        if (mAbort) return QString();
         ++i;
       }
     }
@@ -176,32 +177,34 @@ void StepExport::run(std::shared_ptr<SceneData3D> data, FilePath fp,
     emit progressPercent(100);
     qDebug() << "Exported STEP file in" << timer.elapsed() << "ms.";
 
+    QString errMsg;
     if (deviceErrors > 0) {
-      QString msg = tr("The export completed, but there were %1 errors!")
-                        .arg(deviceErrors);
-      msg += " " % tr("The last error was:");
-      msg += "\n" % lastError;
+      errMsg = tr("The export completed, but there were %1 errors!")
+                   .arg(deviceErrors);
+      errMsg += " " % tr("The last error was:");
+      errMsg += "\n" % lastError;
       emit progressStatus(tr("Finished with errors!"));
-      emit failed(msg);
+      emit failed(errMsg);
     } else {
       emit progressStatus(tr("Success!"));
       emit succeeded();
       QThread::msleep(finishDelayMs);  // Keep displaying status message.
     }
 
-    return;  // Do not handle mAbort anymore.
+    return errMsg;  // Do not handle mAbort anymore.
   } catch (const Exception& e) {
     emit progressStatus(tr("Failed!"));
     emit progressPercent(100);
     emit failed(e.getMsg());
     qCritical().noquote() << "Failed to export STEP file after"
                           << timer.elapsed() << "ms:" << e.getMsg();
-    return;  // Do not handle mAbort anymore.
+    return e.getMsg();  // Do not handle mAbort anymore.
   }
 
   // Aborted.
   emit progressStatus(tr("Aborted!"));
   qDebug() << "STEP export aborted after" << timer.elapsed() << "ms.";
+  return QString();
 }
 
 /*******************************************************************************

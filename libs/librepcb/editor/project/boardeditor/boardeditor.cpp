@@ -1683,14 +1683,14 @@ void BoardEditor::execStepExportDialog() noexcept {
   connect(&exp, &StepExport::progressStatus, &dlg,
           &QProgressDialog::setLabelText);
   connect(&exp, &StepExport::progressPercent, &dlg, &QProgressDialog::setValue);
-  connect(&exp, &StepExport::failed, this, [this](QString errorMsg) {
-    QMessageBox::critical(this, tr("STEP Export Failure"), errorMsg);
-  });
   connect(&exp, &StepExport::finished, &dlg, &QProgressDialog::close);
   connect(&dlg, &QProgressDialog::canceled, &exp, &StepExport::cancel);
   exp.start(board->buildScene3D(), fp, 700);
   dlg.exec();
-  exp.waitForFinished();
+  const QString errorMsg = exp.waitForFinished();
+  if (!errorMsg.isEmpty()) {
+    QMessageBox::critical(this, tr("STEP Export Failure"), errorMsg);
+  }
 }
 
 void BoardEditor::execD356NetlistExportDialog() noexcept {
