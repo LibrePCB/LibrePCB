@@ -165,7 +165,8 @@ QList<BI_Base*> Board::getAllItems() const noexcept {
   return items;
 }
 
-std::shared_ptr<SceneData3D> Board::buildScene3D() const noexcept {
+std::shared_ptr<SceneData3D> Board::buildScene3D(
+    const tl::optional<Uuid>& assemblyVariant) const noexcept {
   auto data = std::make_shared<SceneData3D>(
       std::make_shared<TransactionalDirectory>(mProject.getDirectory()), false);
   data->setProjectName(*mProject.getName());
@@ -177,12 +178,14 @@ std::shared_ptr<SceneData3D> Board::buildScene3D() const noexcept {
   foreach (const BI_Device* obj, mDeviceInstances) {
     const Transform transform(*obj);
     if (auto model = obj->getLibModel()) {
-      const QString stepFile = obj->getLibPackage().getDirectory().getPath() %
-          "/" % model->getFileName();
-      data->addDevice(obj->getComponentInstanceUuid(), transform, stepFile,
-                      obj->getLibFootprint().getModelPosition(),
-                      obj->getLibFootprint().getModelRotation(),
-                      *obj->getComponentInstance().getName());
+      if (assemblyVariant && obj->isInAssemblyVariant(*assemblyVariant)) {
+        const QString stepFile = obj->getLibPackage().getDirectory().getPath() %
+            "/" % model->getFileName();
+        data->addDevice(obj->getComponentInstanceUuid(), transform, stepFile,
+                        obj->getLibFootprint().getModelPosition(),
+                        obj->getLibFootprint().getModelRotation(),
+                        *obj->getComponentInstance().getName());
+      }
     }
     foreach (const BI_FootprintPad* pad, obj->getPads()) {
       const Transform padTransform(*pad);

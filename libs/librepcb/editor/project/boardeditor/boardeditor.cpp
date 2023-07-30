@@ -1444,7 +1444,9 @@ void BoardEditor::performScheduledTasks() noexcept {
       isActiveTopLevelWindow()) {
     std::shared_ptr<SceneData3D> data;
     if (Board* board = getActiveBoard()) {
-      data = board->buildScene3D();
+      auto av = mProject.getCircuit().getAssemblyVariants().value(0);
+      data = board->buildScene3D(av ? tl::make_optional(av->getUuid())
+                                    : tl::nullopt);
     } else {
       data = std::make_shared<SceneData3D>();
     }
@@ -1675,6 +1677,11 @@ void BoardEditor::execStepExportDialog() noexcept {
     return;
   }
 
+  // Build data.
+  auto av = mProject.getCircuit().getAssemblyVariants().value(0);
+  auto data =
+      board->buildScene3D(av ? tl::make_optional(av->getUuid()) : tl::nullopt);
+
   // Start export.
   StepExport exp;
   QProgressDialog dlg(this);
@@ -1685,7 +1692,7 @@ void BoardEditor::execStepExportDialog() noexcept {
   connect(&exp, &StepExport::progressPercent, &dlg, &QProgressDialog::setValue);
   connect(&exp, &StepExport::finished, &dlg, &QProgressDialog::close);
   connect(&dlg, &QProgressDialog::canceled, &exp, &StepExport::cancel);
-  exp.start(board->buildScene3D(), fp, 700);
+  exp.start(data, fp, 700);
   dlg.exec();
   const QString errorMsg = exp.waitForFinished();
   if (!errorMsg.isEmpty()) {

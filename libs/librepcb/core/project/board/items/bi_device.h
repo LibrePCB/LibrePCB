@@ -103,6 +103,7 @@ public:
   }
   QVector<std::shared_ptr<const Part>> getParts(
       const tl::optional<Uuid>& assemblyVariant) const noexcept;
+  bool isInAssemblyVariant(const Uuid& assemblyVariant) const noexcept;
   bool doesPackageRequireAssembly(bool resolveAuto) const noexcept;
   bool isUsed() const noexcept;
 
