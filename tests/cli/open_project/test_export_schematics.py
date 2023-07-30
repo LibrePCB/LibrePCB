@@ -27,7 +27,6 @@ def test_if_unknown_file_extension_fails(cli, project):
     assert stdout == \
         "Open project '{project.path}'...\n" \
         "Export schematics to 'foo.bar'...\n" \
-        "  => 'foo.bar'\n" \
         "Finished with errors!\n".format(project=project)
     assert code == 1
 

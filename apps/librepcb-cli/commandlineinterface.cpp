@@ -669,12 +669,6 @@ bool CommandLineInterface::openProject(
       FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
       GraphicsExport graphicsExport;
       graphicsExport.setDocumentName(*project->getName());
-      QObject::connect(
-          &graphicsExport, &GraphicsExport::savingFile,
-          [&destPathStr, &writtenFilesCounter](const FilePath& fp) {
-            print(QString("  => '%1'").arg(prettyPath(fp, destPathStr)));
-            writtenFilesCounter[fp]++;
-          });
       std::shared_ptr<GraphicsExportSettings> settings =
           std::make_shared<GraphicsExportSettings>();
       GraphicsExport::Pages pages;
@@ -683,9 +677,13 @@ bool CommandLineInterface::openProject(
             std::make_shared<SchematicPainter>(*schematic), settings));
       }
       graphicsExport.startExport(pages, destPath);
-      const QString errorMsg = graphicsExport.waitForFinished();
-      if (!errorMsg.isEmpty()) {
-        printErr("  " % tr("ERROR") % ": " % errorMsg);
+      const GraphicsExport::Result result = graphicsExport.waitForFinished();
+      foreach (const FilePath& writtenFile, result.writtenFiles) {
+        print(QString("  => '%1'").arg(prettyPath(writtenFile, destPathStr)));
+        writtenFilesCounter[writtenFile]++;
+      }
+      if (!result.errorMsg.isEmpty()) {
+        printErr("  " % tr("ERROR") % ": " % result.errorMsg);
         success = false;
       }
     }

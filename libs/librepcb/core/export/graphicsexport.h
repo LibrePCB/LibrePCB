@@ -97,6 +97,11 @@ public:
       Page;
   typedef QList<Page> Pages;
 
+  struct Result {
+    QVector<FilePath> writtenFiles;
+    QString errorMsg;
+  };
+
   // Constructors / Destructor
   GraphicsExport(QObject* parent = nullptr) noexcept;
   GraphicsExport(const GraphicsExport& other) = delete;
@@ -152,9 +157,9 @@ public:
   /**
    * @brief Wait (block) until the preview/export/print is finished
    *
-   * @return Error message, if an error occurred (null on success).
+   * @return Result of the export.
    */
-  QString waitForFinished() noexcept;
+  Result waitForFinished() noexcept;
 
   /**
    * @brief Cancel the current job
@@ -200,7 +205,7 @@ private:  // Types
   };
 
 private:  // Methods
-  QString run(RunArgs args) noexcept;
+  Result run(RunArgs args) noexcept;
   static QTransform getSourceTransformation(
       const GraphicsExportSettings& settings) noexcept;
   static QRectF calcSourceRect(const GraphicsPagePainter& page,
@@ -210,7 +215,7 @@ private:  // Methods
 private:  // Data
   QString mCreator;
   QString mDocumentName;
-  QFuture<QString> mFuture;
+  QFuture<Result> mFuture;
   bool mAbort;
 };
 

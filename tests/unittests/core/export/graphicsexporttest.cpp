@@ -110,7 +110,9 @@ TEST_F(GraphicsExportTest, testExportImageWithAutoScaling) {
 
   FilePath outFile = getFilePath("out.png");
   e.startExport(pages, outFile);
-  e.waitForFinished();
+  const GraphicsExport::Result result = e.waitForFinished();
+  EXPECT_EQ("", result.errorMsg.toStdString());
+  EXPECT_EQ(str({outFile}), str(result.writtenFiles));
   EXPECT_EQ(str({outFile}), str(mSavedFiles));
   EXPECT_TRUE(outFile.isExistingFile());
   EXPECT_EQ("2300x1150", str(getImageSize(outFile)));  // 2000x1000 + margins.
@@ -136,7 +138,9 @@ TEST_F(GraphicsExportTest, testExportImageWithManualScaling) {
 
   FilePath outFile = getFilePath("out.png");
   e.startExport(pages, outFile);
-  e.waitForFinished();
+  const GraphicsExport::Result result = e.waitForFinished();
+  EXPECT_EQ("", result.errorMsg.toStdString());
+  EXPECT_EQ(str({outFile}), str(result.writtenFiles));
   EXPECT_EQ(str({outFile}), str(mSavedFiles));
   EXPECT_TRUE(outFile.isExistingFile());
   EXPECT_EQ("8300x4150", str(getImageSize(outFile)));  // 8000x4000 + margins.
@@ -171,7 +175,14 @@ TEST_F(GraphicsExportTest, testExportMultipleImages) {
   prepare(e);
 
   e.startExport(pages, getFilePath("out.png"));
-  e.waitForFinished();
+  const GraphicsExport::Result result = e.waitForFinished();
+  EXPECT_EQ("", result.errorMsg.toStdString());
+  EXPECT_EQ(str({
+                getFilePath("out1.png"),
+                getFilePath("out2.png"),
+                getFilePath("out3.png"),
+            }),
+            str(result.writtenFiles));
   EXPECT_EQ(str({
                 getFilePath("out1.png"),
                 getFilePath("out2.png"),
@@ -206,7 +217,9 @@ TEST_F(GraphicsExportTest, testExportSvgWithAutoScaling) {
 
   FilePath outFile = getFilePath("out.svg");
   e.startExport(pages, outFile);
-  e.waitForFinished();
+  const GraphicsExport::Result result = e.waitForFinished();
+  EXPECT_EQ("", result.errorMsg.toStdString());
+  EXPECT_EQ(str({outFile}), str(result.writtenFiles));
   EXPECT_EQ(str({outFile}), str(mSavedFiles));
   EXPECT_TRUE(outFile.isExistingFile());
   EXPECT_EQ("2300x1150", str(getSvgSize(outFile)));  // 2000x1000 + margins.
@@ -232,7 +245,9 @@ TEST_F(GraphicsExportTest, testExportSvgWithManualScaling) {
 
   FilePath outFile = getFilePath("out.svg");
   e.startExport(pages, outFile);
-  e.waitForFinished();
+  const GraphicsExport::Result result = e.waitForFinished();
+  EXPECT_EQ("", result.errorMsg.toStdString());
+  EXPECT_EQ(str({outFile}), str(result.writtenFiles));
   EXPECT_EQ(str({outFile}), str(mSavedFiles));
   EXPECT_TRUE(outFile.isExistingFile());
   EXPECT_EQ("8300x4150", str(getSvgSize(outFile)));  // 8000x4000 + margins.
@@ -271,7 +286,9 @@ TEST_F(GraphicsExportTest, testExportPdfWithAutoScaling) {
 
   FilePath outFile = getFilePath("out.pdf");
   e.startExport(pages, outFile);
-  e.waitForFinished();
+  const GraphicsExport::Result result = e.waitForFinished();
+  EXPECT_EQ("", result.errorMsg.toStdString());
+  EXPECT_EQ(str({outFile}), str(result.writtenFiles));
   EXPECT_EQ(str({outFile}), str(mSavedFiles));
   EXPECT_TRUE(outFile.isExistingFile());
 }

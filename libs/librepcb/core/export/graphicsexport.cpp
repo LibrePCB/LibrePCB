@@ -94,7 +94,7 @@ void GraphicsExport::startPrint(const Pages& pages, const QString& printerName,
   mFuture = QtConcurrent::run(this, &GraphicsExport::run, args);
 }
 
-QString GraphicsExport::waitForFinished() noexcept {
+GraphicsExport::Result GraphicsExport::waitForFinished() noexcept {
   mFuture.waitForFinished();
   return mFuture.result();
 }
@@ -125,7 +125,7 @@ QStringList GraphicsExport::getSupportedImageExtensions() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-QString GraphicsExport::run(RunArgs args) noexcept {
+GraphicsExport::Result GraphicsExport::run(RunArgs args) noexcept {
   // Note: This method is called from a different thread, thus be careful with
   //       calling other methods to only call thread-safe methods!
 
@@ -134,6 +134,7 @@ QString GraphicsExport::run(RunArgs args) noexcept {
   qDebug() << "Start graphics export in worker thread...";
   emit progress(10, 0, args.pages.count());
 
+  Result result;
   try {
     QPagedPaintDevice* pagedPaintDevice = nullptr;
 
@@ -174,6 +175,7 @@ QString GraphicsExport::run(RunArgs args) noexcept {
       pdfWriter->setTitle(mDocumentName);
       pdfWriter->setPageMargins(QMarginsF(0, 0, 0, 0));  // Manually set below.
       pagedPaintDevice = pdfWriter.data();
+      result.writtenFiles.append(args.filePath);
       emit savingFile(args.filePath);
     }
 
@@ -307,6 +309,7 @@ QString GraphicsExport::run(RunArgs args) noexcept {
         svgGenerator->setViewBox(pageRectPx);
         svgGenerator->setResolution(dpi);
         beginSuccess = painter.begin(svgGenerator.data());
+        result.writtenFiles.append(outputFilePath);
         emit savingFile(outputFilePath);
       } else if (!args.preview) {
         QString target =
@@ -358,6 +361,7 @@ QString GraphicsExport::run(RunArgs args) noexcept {
                  "make sure to use a supported image file extension.")
                   .arg(outputFilePath.toNative()));
         }
+        result.writtenFiles.append(outputFilePath);
       } else if (image) {
         // Copy to clipboard must be performed in the main thread since
         // QClipboard is not thread-safe. This is done by a queued signal-slot
@@ -397,13 +401,13 @@ QString GraphicsExport::run(RunArgs args) noexcept {
     qDebug() << "Successfully exported graphics in" << timer.elapsed() << "ms.";
     emit progress(100, args.pages.count(), args.pages.count());
     emit succeeded();
-    return QString();
+    return result;
   } catch (const Exception& e) {
-    QString msg = e.getMsg().isEmpty() ? "Unknown error" : e.getMsg();
+    result.errorMsg = e.getMsg().isEmpty() ? "Unknown error" : e.getMsg();
     qCritical().noquote() << "Graphics export failed after" << timer.elapsed()
-                          << "ms:" << msg;
-    emit failed(msg);
-    return msg;
+                          << "ms:" << result.errorMsg;
+    emit failed(result.errorMsg);
+    return result;
   }
 }
 
