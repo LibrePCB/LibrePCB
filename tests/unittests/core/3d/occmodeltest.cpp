@@ -52,7 +52,21 @@ TEST_F(OccModelTest, testCreateAssembly) {
   }
 }
 
-TEST_F(OccModelTest, testCreateBoard) {
+TEST_F(OccModelTest, testCreateBoardWithoutHoles) {
+  const Path outline = Path::obround(Point(0, 0), Point(50000000, 50000000),
+                                     PositiveLength(10000000));
+  const QVector<Path> holes;
+  if (OccModel::isAvailable()) {
+    std::unique_ptr<OccModel> model = OccModel::createBoard(
+        outline, holes, PositiveLength(1000000), Qt::black);
+  } else {
+    EXPECT_THROW(OccModel::createBoard(outline, holes, PositiveLength(1000000),
+                                       Qt::black),
+                 Exception);
+  }
+}
+
+TEST_F(OccModelTest, testCreateBoardWithHoles) {
   const Path outline = Path::obround(Point(0, 0), Point(50000000, 50000000),
                                      PositiveLength(10000000));
   const QVector<Path> holes{

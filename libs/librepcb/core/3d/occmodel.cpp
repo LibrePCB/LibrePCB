@@ -440,20 +440,28 @@ std::unique_ptr<OccModel> OccModel::createBoard(const librepcb::Path& outline,
     Handle(XCAFDoc_ShapeTool) shapeTool =
         XCAFDoc_DocumentTool::ShapeTool(doc->Main());
 
-    TopTools_ListOfShape boardFaces;
-    boardFaces.Append(pathToFace(outline.cleaned(), Length(0)));
-
-    TopTools_ListOfShape holeFaces;
-    foreach (const Path& hole, holes) {
-      holeFaces.Append(pathToFace({hole.cleaned()}, Length(0)));
+    TopoDS_Shape face;
+    if (holes.isEmpty()) {
+      // Cutting fails if there are no holes.
+      face = pathToFace(outline.cleaned(), Length(0));
+    } else {
+      TopTools_ListOfShape boardFaces;
+      boardFaces.Append(pathToFace(outline.cleaned(), Length(0)));
+      TopTools_ListOfShape holeFaces;
+      foreach (const Path& hole, holes) {
+        holeFaces.Append(pathToFace({hole.cleaned()}, Length(0)));
+      }
+      BRepAlgoAPI_Cut cutter;
+      cutter.SetArguments(boardFaces);
+      cutter.SetTools(holeFaces);
+      cutter.SetRunParallel(Standard_True);
+      cutter.Build();
+      face = cutter.Shape();
     }
-
-    BRepAlgoAPI_Cut cutter;
-    cutter.SetArguments(boardFaces);
-    cutter.SetTools(holeFaces);
-    cutter.SetRunParallel(Standard_True);
-    cutter.Build();
-    TopoDS_Shape face = cutter.Shape();
+    if (face.IsNull()) {
+      // Handle error to avoid segfault in code below.
+      throw LogicError(__FILE__, __LINE__, "OCC failed to build board shape.");
+    }
     TopoDS_Shape shape =
         BRepPrimAPI_MakePrism(face, gp_Vec(0, 0, thickness->toMm()));
     TDF_Label label = shapeTool->AddShape(shape, false);
