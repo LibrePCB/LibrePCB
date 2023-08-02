@@ -116,6 +116,17 @@ TEST_P(FilePathTest, testToRelative) {
   }
 }
 
+TEST_P(FilePathTest, testToRelativeNative) {
+  const FilePathTestData& data = GetParam();
+
+  if (data.valid) {
+    FilePath base(data.inputBasePath);
+    FilePath p(data.inputFilePath);
+    EXPECT_EQ(QString(data.toRelative).replace('/', QDir::separator()),
+              p.toRelativeNative(base));
+  }
+}
+
 TEST_P(FilePathTest, testFromRelative) {
   const FilePathTestData& data = GetParam();
 

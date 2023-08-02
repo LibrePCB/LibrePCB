@@ -128,6 +128,10 @@ QString FilePath::toRelative(const FilePath& base) const noexcept {
   return makeWellFormatted(baseDir.relativeFilePath(mFileInfo.filePath()));
 }
 
+QString FilePath::toRelativeNative(const FilePath& base) const noexcept {
+  return QDir::toNativeSeparators(toRelative(base));
+}
+
 QString FilePath::getBasename() const noexcept {
   if (mIsValid)
     return mFileInfo.baseName();

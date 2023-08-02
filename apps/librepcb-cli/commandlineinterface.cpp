@@ -1187,12 +1187,14 @@ QStringList CommandLineInterface::prepareRuleCheckMessages(
 QString CommandLineInterface::prettyPath(const FilePath& path,
                                          const QString& style) noexcept {
   if (QFileInfo(style).isAbsolute()) {
-    return path.toNative();  // absolute path
+    // absolute path
+    return path.toNative();
   } else if (path == FilePath(QDir::currentPath())) {
-    return path.getFilename();  // name of current directory
+    // name of current directory
+    return path.getFilename();
   } else {
-    return QDir::toNativeSeparators(
-        path.toRelative(FilePath(QDir::currentPath())));  // relative path
+    // relative path
+    return path.toRelativeNative(FilePath(QDir::currentPath()));
   }
 }
 
