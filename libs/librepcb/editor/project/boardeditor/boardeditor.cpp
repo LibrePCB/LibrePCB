@@ -42,6 +42,7 @@
 #include "../../widgets/searchtoolbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
+#include "../outputjobsdialog/outputjobsdialog.h"
 #include "../projecteditor.h"
 #include "../projectsetupdialog.h"
 #include "boardgraphicsscene.h"
@@ -606,6 +607,14 @@ void BoardEditor::createActions() noexcept {
       }));
   mActionGenerateD356Netlist.reset(cmd.generateD356Netlist.createAction(
       this, this, &BoardEditor::execD356NetlistExportDialog));
+  mActionOutputJobs.reset(cmd.outputJobs.createAction(this, this, [this]() {
+    OutputJobsDialog dialog(mProjectEditor.getWorkspace().getSettings(),
+                            mProject, mProjectEditor.getUndoStack(),
+                            "board_editor", this);
+    connect(&dialog, &OutputJobsDialog::orderPcbDialogTriggered, this,
+            [this, &dialog]() { mProjectEditor.execOrderPcbDialog(&dialog); });
+    dialog.exec();
+  }));
   mActionOrderPcb.reset(cmd.orderPcb.createAction(
       this, this, [this]() { mProjectEditor.execOrderPcbDialog(this); }));
   mActionNewBoard.reset(
@@ -847,6 +856,7 @@ void BoardEditor::createToolBars() noexcept {
   mToolBarFile->addAction(mActionSaveProject.data());
   mToolBarFile->addAction(mActionPrint.data());
   mToolBarFile->addAction(mActionExportPdf.data());
+  mToolBarFile->addAction(mActionOutputJobs.data());
   mToolBarFile->addAction(mActionOrderPcb.data());
   mToolBarFile->addSeparator();
   mToolBarFile->addAction(mActionControlPanel.data());
@@ -1001,6 +1011,7 @@ void BoardEditor::createMenus() noexcept {
     smb.addAction(mActionGeneratePickPlace);
     smb.addAction(mActionGenerateD356Netlist);
   }
+  mb.addAction(mActionOutputJobs);
   mb.addSeparator();
   mb.addAction(mActionPrint);
   mb.addAction(mActionOrderPcb);

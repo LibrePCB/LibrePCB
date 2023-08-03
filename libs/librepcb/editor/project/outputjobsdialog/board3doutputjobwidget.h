@@ -17,64 +17,61 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_DESKTOPSERVICES_H
-#define LIBREPCB_EDITOR_DESKTOPSERVICES_H
+#ifndef LIBREPCB_EDITOR_BOARD3DOUTPUTJOBWIDGET_H
+#define LIBREPCB_EDITOR_BOARD3DOUTPUTJOBWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class FilePath;
-class WorkspaceSettings;
+class Board3DOutputJob;
+class Project;
 
 namespace editor {
 
+namespace Ui {
+class Board3DOutputJobWidget;
+}
+
 /*******************************************************************************
- *  Class DesktopServices
+ *  Class Board3DOutputJobWidget
  ******************************************************************************/
 
 /**
- * @brief Provides methods to access common desktop services
- *
- * Similar to `QDesktopServices`, but respecting the workspace settings (e.g.
- * custom PDF viewer).
- *
- * @see https://doc.qt.io/qt-5/qdesktopservices.html
+ * @brief The Board3DOutputJobWidget class
  */
-class DesktopServices final {
-  Q_DECLARE_TR_FUNCTIONS(DesktopServices)
+class Board3DOutputJobWidget final : public QWidget {
+  Q_OBJECT
 
 public:
   // Constructors / Destructor
-  DesktopServices() = delete;
-  DesktopServices(const DesktopServices& other) = delete;
-  explicit DesktopServices(const WorkspaceSettings& settings,
-                           QWidget* parent) noexcept;
-  ~DesktopServices() noexcept;
+  Board3DOutputJobWidget() = delete;
+  Board3DOutputJobWidget(const Board3DOutputJobWidget& other) = delete;
+  explicit Board3DOutputJobWidget(Project& project,
+                                  std::shared_ptr<Board3DOutputJob> job,
+                                  QWidget* parent = nullptr) noexcept;
+  ~Board3DOutputJobWidget() noexcept;
 
-  // General Methods
-  bool openUrl(const QUrl& url) const noexcept;
-  bool openWebUrl(const QUrl& url) const noexcept;
-  bool openLocalPath(const FilePath& filePath) const noexcept;
-
-  // Operator Overloadings
-  DesktopServices& operator=(const DesktopServices& rhs) = delete;
+  // Operator Overloads
+  Board3DOutputJobWidget& operator=(const Board3DOutputJobWidget& rhs) = delete;
 
 private:  // Methods
-  bool openDirectory(const FilePath& filePath) const noexcept;
-  bool openLocalPathWithCommand(const FilePath& filePath,
-                                const QStringList& commands) const noexcept;
-  bool openUrlFallback(const QUrl& url) const noexcept;
+  void applyBoards(bool checked = true) noexcept;
+  void applyVariants(bool checked = true) noexcept;
 
 private:  // Data
-  const WorkspaceSettings& mSettings;
-  QPointer<QWidget> mParent;
+  Project& mProject;
+  std::shared_ptr<Board3DOutputJob> mJob;
+  QScopedPointer<Ui::Board3DOutputJobWidget> mUi;
 };
 
 /*******************************************************************************

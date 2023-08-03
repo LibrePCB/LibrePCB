@@ -228,6 +228,7 @@ private:
   QScopedPointer<QAction> mActionGenerateFabricationData;
   QScopedPointer<QAction> mActionGeneratePickPlace;
   QScopedPointer<QAction> mActionGenerateD356Netlist;
+  QScopedPointer<QAction> mActionOutputJobs;
   QScopedPointer<QAction> mActionOrderPcb;
   QScopedPointer<QAction> mActionNewBoard;
   QScopedPointer<QAction> mActionCopyBoard;

@@ -17,64 +17,55 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_DESKTOPSERVICES_H
-#define LIBREPCB_EDITOR_DESKTOPSERVICES_H
+#ifndef LIBREPCB_EDITOR_OUTPUTJOBHOMEWIDGET_H
+#define LIBREPCB_EDITOR_OUTPUTJOBHOMEWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class FilePath;
+class Project;
 class WorkspaceSettings;
 
 namespace editor {
 
+namespace Ui {
+class OutputJobHomeWidget;
+}
+
 /*******************************************************************************
- *  Class DesktopServices
+ *  Class OutputJobHomeWidget
  ******************************************************************************/
 
 /**
- * @brief Provides methods to access common desktop services
- *
- * Similar to `QDesktopServices`, but respecting the workspace settings (e.g.
- * custom PDF viewer).
- *
- * @see https://doc.qt.io/qt-5/qdesktopservices.html
+ * @brief The OutputJobHomeWidget class
  */
-class DesktopServices final {
-  Q_DECLARE_TR_FUNCTIONS(DesktopServices)
+class OutputJobHomeWidget final : public QWidget {
+  Q_OBJECT
 
 public:
   // Constructors / Destructor
-  DesktopServices() = delete;
-  DesktopServices(const DesktopServices& other) = delete;
-  explicit DesktopServices(const WorkspaceSettings& settings,
-                           QWidget* parent) noexcept;
-  ~DesktopServices() noexcept;
+  OutputJobHomeWidget() = delete;
+  OutputJobHomeWidget(const OutputJobHomeWidget& other) = delete;
+  explicit OutputJobHomeWidget(const WorkspaceSettings& settings,
+                               const Project& project,
+                               QWidget* parent = nullptr) noexcept;
+  ~OutputJobHomeWidget() noexcept;
 
-  // General Methods
-  bool openUrl(const QUrl& url) const noexcept;
-  bool openWebUrl(const QUrl& url) const noexcept;
-  bool openLocalPath(const FilePath& filePath) const noexcept;
-
-  // Operator Overloadings
-  DesktopServices& operator=(const DesktopServices& rhs) = delete;
-
-private:  // Methods
-  bool openDirectory(const FilePath& filePath) const noexcept;
-  bool openLocalPathWithCommand(const FilePath& filePath,
-                                const QStringList& commands) const noexcept;
-  bool openUrlFallback(const QUrl& url) const noexcept;
+  // Operator Overloads
+  OutputJobHomeWidget& operator=(const OutputJobHomeWidget& rhs) = delete;
 
 private:  // Data
   const WorkspaceSettings& mSettings;
-  QPointer<QWidget> mParent;
+  const Project& mProject;
+  QScopedPointer<Ui::OutputJobHomeWidget> mUi;
 };
 
 /*******************************************************************************

@@ -17,64 +17,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_DESKTOPSERVICES_H
-#define LIBREPCB_EDITOR_DESKTOPSERVICES_H
+#ifndef LIBREPCB_EDITOR_PICKPLACEOUTPUTJOBWIDGET_H
+#define LIBREPCB_EDITOR_PICKPLACEOUTPUTJOBWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
-class FilePath;
-class WorkspaceSettings;
+class PickPlaceOutputJob;
+class Project;
 
 namespace editor {
 
+namespace Ui {
+class PickPlaceOutputJobWidget;
+}
+
 /*******************************************************************************
- *  Class DesktopServices
+ *  Class PickPlaceOutputJobWidget
  ******************************************************************************/
 
 /**
- * @brief Provides methods to access common desktop services
- *
- * Similar to `QDesktopServices`, but respecting the workspace settings (e.g.
- * custom PDF viewer).
- *
- * @see https://doc.qt.io/qt-5/qdesktopservices.html
+ * @brief The PickPlaceOutputJobWidget class
  */
-class DesktopServices final {
-  Q_DECLARE_TR_FUNCTIONS(DesktopServices)
+class PickPlaceOutputJobWidget final : public QWidget {
+  Q_OBJECT
 
 public:
   // Constructors / Destructor
-  DesktopServices() = delete;
-  DesktopServices(const DesktopServices& other) = delete;
-  explicit DesktopServices(const WorkspaceSettings& settings,
-                           QWidget* parent) noexcept;
-  ~DesktopServices() noexcept;
+  PickPlaceOutputJobWidget() = delete;
+  PickPlaceOutputJobWidget(const PickPlaceOutputJobWidget& other) = delete;
+  explicit PickPlaceOutputJobWidget(Project& project,
+                                    std::shared_ptr<PickPlaceOutputJob> job,
+                                    QWidget* parent = nullptr) noexcept;
+  ~PickPlaceOutputJobWidget() noexcept;
 
-  // General Methods
-  bool openUrl(const QUrl& url) const noexcept;
-  bool openWebUrl(const QUrl& url) const noexcept;
-  bool openLocalPath(const FilePath& filePath) const noexcept;
-
-  // Operator Overloadings
-  DesktopServices& operator=(const DesktopServices& rhs) = delete;
+  // Operator Overloads
+  PickPlaceOutputJobWidget& operator=(const PickPlaceOutputJobWidget& rhs) =
+      delete;
 
 private:  // Methods
-  bool openDirectory(const FilePath& filePath) const noexcept;
-  bool openLocalPathWithCommand(const FilePath& filePath,
-                                const QStringList& commands) const noexcept;
-  bool openUrlFallback(const QUrl& url) const noexcept;
+  void applyBoards(bool checked = true) noexcept;
+  void applyVariants(bool checked = true) noexcept;
 
 private:  // Data
-  const WorkspaceSettings& mSettings;
-  QPointer<QWidget> mParent;
+  Project& mProject;
+  std::shared_ptr<PickPlaceOutputJob> mJob;
+  QScopedPointer<Ui::PickPlaceOutputJobWidget> mUi;
 };
 
 /*******************************************************************************

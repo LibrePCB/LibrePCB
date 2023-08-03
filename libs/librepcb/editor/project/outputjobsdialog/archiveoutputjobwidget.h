@@ -17,85 +17,64 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDPROJECTEDIT_H
-#define LIBREPCB_EDITOR_CMDPROJECTEDIT_H
+#ifndef LIBREPCB_EDITOR_ARCHIVEOUTPUTJOBWIDGET_H
+#define LIBREPCB_EDITOR_ARCHIVEOUTPUTJOBWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommand.h"
-
-#include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/job/outputjob.h>
-#include <librepcb/core/types/elementname.h>
-#include <librepcb/core/types/fileproofname.h>
 
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
 
+class ArchiveOutputJob;
 class Project;
 
 namespace editor {
 
+namespace Ui {
+class ArchiveOutputJobWidget;
+}
+
 /*******************************************************************************
- *  Class CmdProjectEdit
+ *  Class ArchiveOutputJobWidget
  ******************************************************************************/
 
 /**
- * @brief The CmdProjectEdit class
+ * @brief The ArchiveOutputJobWidget class
  */
-class CmdProjectEdit final : public UndoCommand {
+class ArchiveOutputJobWidget final : public QWidget {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  explicit CmdProjectEdit(Project& project) noexcept;
-  ~CmdProjectEdit() noexcept;
+  ArchiveOutputJobWidget() = delete;
+  ArchiveOutputJobWidget(const ArchiveOutputJobWidget& other) = delete;
+  explicit ArchiveOutputJobWidget(Project& project,
+                                  const OutputJobList& allJobs,
+                                  std::shared_ptr<ArchiveOutputJob> job,
+                                  QWidget* parent = nullptr) noexcept;
+  ~ArchiveOutputJobWidget() noexcept;
 
-  // Setters
-  void setName(const ElementName& newName) noexcept;
-  void setAuthor(const QString& newAuthor) noexcept;
-  void setVersion(const FileProofName& newVersion) noexcept;
-  void setAttributes(const AttributeList& attributes) noexcept;
-  void setLocaleOrder(const QStringList& order) noexcept;
-  void setNormOrder(const QStringList& order) noexcept;
-  void setOutputBaseDir(const QString& dir) noexcept;
-  void setOutputJobs(const OutputJobList& jobs) noexcept;
+  // Operator Overloads
+  ArchiveOutputJobWidget& operator=(const ArchiveOutputJobWidget& rhs) = delete;
 
-private:
-  // Private Methods
+private:  // Methods
+  void applyInputJobs() noexcept;
 
-  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  bool performExecute() override;
-
-  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  void performUndo() override;
-
-  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  void performRedo() override;
-
-  // Private Member Variables
-
-  // General
+private:  // Data
   Project& mProject;
-
-  // Misc
-  ElementName mOldName;
-  ElementName mNewName;
-  QString mOldAuthor;
-  QString mNewAuthor;
-  FileProofName mOldVersion;
-  FileProofName mNewVersion;
-  AttributeList mOldAttributes;
-  AttributeList mNewAttributes;
-  QStringList mOldLocaleOrder;
-  QStringList mNewLocaleOrder;
-  QStringList mOldNormOrder;
-  QStringList mNewNormOrder;
-  OutputJobList mOldOutputJobs;
-  OutputJobList mNewOutputJobs;
+  const OutputJobList& mAllJobs;
+  std::shared_ptr<ArchiveOutputJob> mJob;
+  QScopedPointer<Ui::ArchiveOutputJobWidget> mUi;
 };
 
 /*******************************************************************************

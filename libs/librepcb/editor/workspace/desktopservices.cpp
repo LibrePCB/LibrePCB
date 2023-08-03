@@ -50,6 +50,14 @@ DesktopServices::~DesktopServices() noexcept {
  *  General Methods
  ******************************************************************************/
 
+bool DesktopServices::openUrl(const QUrl& url) const noexcept {
+  if (url.isLocalFile()) {
+    return openLocalPath(FilePath(url.toLocalFile()));
+  } else {
+    return openWebUrl(url);
+  }
+}
+
 bool DesktopServices::openWebUrl(const QUrl& url) const noexcept {
   foreach (QString cmd, mSettings.externalWebBrowserCommands.get()) {
     cmd.replace("{{URL}}", url.toString());
@@ -60,7 +68,7 @@ bool DesktopServices::openWebUrl(const QUrl& url) const noexcept {
       qWarning() << "Failed to open URL with command:" << cmd;
     }
   }
-  return openUrl(url);
+  return openUrlFallback(url);
 }
 
 bool DesktopServices::openLocalPath(const FilePath& filePath) const noexcept {
@@ -71,7 +79,7 @@ bool DesktopServices::openLocalPath(const FilePath& filePath) const noexcept {
     return openLocalPathWithCommand(filePath,
                                     mSettings.externalPdfReaderCommands.get());
   } else {
-    return openUrl(QUrl::fromLocalFile(filePath.toNative()));
+    return openUrlFallback(QUrl::fromLocalFile(filePath.toNative()));
   }
 }
 
@@ -97,10 +105,10 @@ bool DesktopServices::openLocalPathWithCommand(
       qWarning() << "Failed to open file or directory with command:" << cmd;
     }
   }
-  return openUrl(url);
+  return openUrlFallback(url);
 }
 
-bool DesktopServices::openUrl(const QUrl& url) const noexcept {
+bool DesktopServices::openUrlFallback(const QUrl& url) const noexcept {
   if (QDesktopServices::openUrl(url)) {
     qDebug() << "Successfully opened URL with QDesktopServices:" << url;
     return true;

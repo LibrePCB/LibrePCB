@@ -17,6 +17,7 @@
         <file>actions/bookmark_gray.png</file>
         <file>actions/cam_export.png</file>
         <file>actions/cancel.png</file>
+        <file>actions/clean.png</file>
         <file>actions/clone.png</file>
         <file>actions/close.png</file>
         <file>actions/copy.png</file>
@@ -63,6 +64,7 @@
         <file>actions/open.png</file>
         <file>actions/open_browser.png</file>
         <file>actions/order_pcb.png</file>
+        <file>actions/output_jobs.png</file>
         <file>actions/paste.png</file>
         <file>actions/pdf.png</file>
         <file>actions/plus.png</file>
@@ -78,6 +80,8 @@
         <file>actions/rotate_left.png</file>
         <file>actions/rotate_right.png</file>
         <file>actions/ruler.png</file>
+        <file>actions/run.png</file>
+        <file>actions/run_all.png</file>
         <file>actions/save.png</file>
         <file>actions/schematic.png</file>
         <file>actions/search.png</file>

@@ -17,65 +17,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_DESKTOPSERVICES_H
-#define LIBREPCB_EDITOR_DESKTOPSERVICES_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "lppzoutputjobwidget.h"
+
+#include "ui_lppzoutputjobwidget.h"
+
+#include <librepcb/core/job/lppzoutputjob.h>
+#include <librepcb/core/project/project.h>
+
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class FilePath;
-class WorkspaceSettings;
-
 namespace editor {
 
 /*******************************************************************************
- *  Class DesktopServices
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief Provides methods to access common desktop services
- *
- * Similar to `QDesktopServices`, but respecting the workspace settings (e.g.
- * custom PDF viewer).
- *
- * @see https://doc.qt.io/qt-5/qdesktopservices.html
- */
-class DesktopServices final {
-  Q_DECLARE_TR_FUNCTIONS(DesktopServices)
+LppzOutputJobWidget::LppzOutputJobWidget(Project& project,
+                                         std::shared_ptr<LppzOutputJob> job,
+                                         QWidget* parent) noexcept
+  : QWidget(parent),
+    mProject(project),
+    mJob(job),
+    mUi(new Ui::LppzOutputJobWidget) {
+  mUi->setupUi(this);
 
-public:
-  // Constructors / Destructor
-  DesktopServices() = delete;
-  DesktopServices(const DesktopServices& other) = delete;
-  explicit DesktopServices(const WorkspaceSettings& settings,
-                           QWidget* parent) noexcept;
-  ~DesktopServices() noexcept;
+  // Name.
+  mUi->edtName->setText(*job->getName());
+  connect(mUi->edtName, &QLineEdit::textEdited, this, [this](QString text) {
+    text = cleanElementName(text);
+    if (!text.isEmpty()) {
+      mJob->setName(ElementName(text));
+    }
+  });
 
-  // General Methods
-  bool openUrl(const QUrl& url) const noexcept;
-  bool openWebUrl(const QUrl& url) const noexcept;
-  bool openLocalPath(const FilePath& filePath) const noexcept;
+  // Output path.
+  mUi->edtOutput->setText(job->getOutputPath());
+  connect(mUi->edtOutput, &QLineEdit::textEdited, this, [this](QString text) {
+    mJob->setOutputPath(text.replace("\\", "/").trimmed());
+  });
+}
 
-  // Operator Overloadings
-  DesktopServices& operator=(const DesktopServices& rhs) = delete;
-
-private:  // Methods
-  bool openDirectory(const FilePath& filePath) const noexcept;
-  bool openLocalPathWithCommand(const FilePath& filePath,
-                                const QStringList& commands) const noexcept;
-  bool openUrlFallback(const QUrl& url) const noexcept;
-
-private:  // Data
-  const WorkspaceSettings& mSettings;
-  QPointer<QWidget> mParent;
-};
+LppzOutputJobWidget::~LppzOutputJobWidget() noexcept {
+}
 
 /*******************************************************************************
  *  End of File
@@ -83,5 +74,3 @@ private:  // Data
 
 }  // namespace editor
 }  // namespace librepcb
-
-#endif

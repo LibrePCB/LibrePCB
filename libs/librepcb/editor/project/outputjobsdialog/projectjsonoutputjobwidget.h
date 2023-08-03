@@ -17,20 +17,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_CMDPROJECTEDIT_H
-#define LIBREPCB_EDITOR_CMDPROJECTEDIT_H
+#ifndef LIBREPCB_EDITOR_PROJECTJSONOUTPUTJOBWIDGET_H
+#define LIBREPCB_EDITOR_PROJECTJSONOUTPUTJOBWIDGET_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "../../undocommand.h"
-
-#include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/job/outputjob.h>
-#include <librepcb/core/types/elementname.h>
-#include <librepcb/core/types/fileproofname.h>
 
 #include <QtCore>
+#include <QtWidgets>
+
+#include <memory>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
@@ -38,64 +36,41 @@
 namespace librepcb {
 
 class Project;
+class ProjectJsonOutputJob;
 
 namespace editor {
 
+namespace Ui {
+class ProjectJsonOutputJobWidget;
+}
+
 /*******************************************************************************
- *  Class CmdProjectEdit
+ *  Class ProjectJsonOutputJobWidget
  ******************************************************************************/
 
 /**
- * @brief The CmdProjectEdit class
+ * @brief The ProjectJsonOutputJobWidget class
  */
-class CmdProjectEdit final : public UndoCommand {
+class ProjectJsonOutputJobWidget final : public QWidget {
+  Q_OBJECT
+
 public:
   // Constructors / Destructor
-  explicit CmdProjectEdit(Project& project) noexcept;
-  ~CmdProjectEdit() noexcept;
+  ProjectJsonOutputJobWidget() = delete;
+  ProjectJsonOutputJobWidget(const ProjectJsonOutputJobWidget& other) = delete;
+  explicit ProjectJsonOutputJobWidget(Project& project,
+                                      std::shared_ptr<ProjectJsonOutputJob> job,
+                                      QWidget* parent = nullptr) noexcept;
+  ~ProjectJsonOutputJobWidget() noexcept;
 
-  // Setters
-  void setName(const ElementName& newName) noexcept;
-  void setAuthor(const QString& newAuthor) noexcept;
-  void setVersion(const FileProofName& newVersion) noexcept;
-  void setAttributes(const AttributeList& attributes) noexcept;
-  void setLocaleOrder(const QStringList& order) noexcept;
-  void setNormOrder(const QStringList& order) noexcept;
-  void setOutputBaseDir(const QString& dir) noexcept;
-  void setOutputJobs(const OutputJobList& jobs) noexcept;
+  // Operator Overloads
+  ProjectJsonOutputJobWidget& operator=(const ProjectJsonOutputJobWidget& rhs) =
+      delete;
 
-private:
-  // Private Methods
-
-  /// @copydoc ::librepcb::editor::UndoCommand::performExecute()
-  bool performExecute() override;
-
-  /// @copydoc ::librepcb::editor::UndoCommand::performUndo()
-  void performUndo() override;
-
-  /// @copydoc ::librepcb::editor::UndoCommand::performRedo()
-  void performRedo() override;
-
-  // Private Member Variables
-
-  // General
+private:  // Data
   Project& mProject;
-
-  // Misc
-  ElementName mOldName;
-  ElementName mNewName;
-  QString mOldAuthor;
-  QString mNewAuthor;
-  FileProofName mOldVersion;
-  FileProofName mNewVersion;
-  AttributeList mOldAttributes;
-  AttributeList mNewAttributes;
-  QStringList mOldLocaleOrder;
-  QStringList mNewLocaleOrder;
-  QStringList mOldNormOrder;
-  QStringList mNewNormOrder;
-  OutputJobList mOldOutputJobs;
-  OutputJobList mNewOutputJobs;
+  std::shared_ptr<ProjectJsonOutputJob> mJob;
+  QScopedPointer<Ui::ProjectJsonOutputJobWidget> mUi;
 };
 
 /*******************************************************************************
