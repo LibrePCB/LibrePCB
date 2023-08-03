@@ -403,6 +403,9 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     }
   }
 
+  // Output jobs.
+  createOutputJobs(dir);
+
   // Metadata.
   {
     const QString fp = "project/metadata.lp";
@@ -584,6 +587,11 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
  *  Private Methods
  ******************************************************************************/
 
+void FileFormatMigrationV01::createOutputJobs(TransactionalDirectory& dir) {
+  SExpression root = SExpression::createList("librepcb_jobs");
+  dir.write("project/jobs.lp", root.toByteArray());
+}
+
 void FileFormatMigrationV01::upgradeMetadata(SExpression& root) {
   SExpression& versionNode = root.getChild("version/@0");
   versionNode.setValue(toFileProofName(versionNode.getValue(), "latest"));
@@ -592,6 +600,7 @@ void FileFormatMigrationV01::upgradeMetadata(SExpression& root) {
 void FileFormatMigrationV01::upgradeSettings(SExpression& root) {
   upgradeStrings(root);
   root.appendList("custom_bom_attributes");
+  root.appendChild("output_directory", QString("./output/{{VERSION}}/"));
   root.appendChild("default_lock_component_assembly",
                    SExpression::createToken("false"));
 }

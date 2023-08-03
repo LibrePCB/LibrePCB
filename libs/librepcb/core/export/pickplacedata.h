@@ -52,7 +52,8 @@ public:
     Bottom,
   };
 
-  // ATTENTION: When modifying items, adjust PickPlaceCsvWriter as well!
+  // ATTENTION: When modifying items, adjust PickPlaceCsvWriter and
+  // PickPlaceOutputJob as well!
   enum class Type : int {
     Tht,  ///< Pure THT package
     Smt,  ///< Pure SMT package

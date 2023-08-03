@@ -136,6 +136,8 @@ add_library(
   fileio/filesystem.h
   fileio/fileutils.cpp
   fileio/fileutils.h
+  fileio/outputdirectorywriter.cpp
+  fileio/outputdirectorywriter.h
   fileio/transactionaldirectory.cpp
   fileio/transactionaldirectory.h
   fileio/transactionalfilesystem.cpp
@@ -180,6 +182,32 @@ add_library(
   geometry/zone.h
   import/dxfreader.cpp
   import/dxfreader.h
+  job/archiveoutputjob.cpp
+  job/archiveoutputjob.h
+  job/board3doutputjob.cpp
+  job/board3doutputjob.h
+  job/bomoutputjob.cpp
+  job/bomoutputjob.h
+  job/copyoutputjob.cpp
+  job/copyoutputjob.h
+  job/gerberexcellonoutputjob.cpp
+  job/gerberexcellonoutputjob.h
+  job/gerberx3outputjob.cpp
+  job/gerberx3outputjob.h
+  job/graphicsoutputjob.cpp
+  job/graphicsoutputjob.h
+  job/lppzoutputjob.cpp
+  job/lppzoutputjob.h
+  job/netlistoutputjob.cpp
+  job/netlistoutputjob.h
+  job/outputjob.cpp
+  job/outputjob.h
+  job/pickplaceoutputjob.cpp
+  job/pickplaceoutputjob.h
+  job/projectjsonoutputjob.cpp
+  job/projectjsonoutputjob.h
+  job/unknownoutputjob.cpp
+  job/unknownoutputjob.h
   library/cat/componentcategory.cpp
   library/cat/componentcategory.h
   library/cat/librarycategory.cpp
@@ -349,6 +377,8 @@ add_library(
   project/erc/electricalrulecheck.h
   project/erc/electricalrulecheckmessages.cpp
   project/erc/electricalrulecheckmessages.h
+  project/outputjobrunner.cpp
+  project/outputjobrunner.h
   project/project.cpp
   project/project.h
   project/projectattributelookup.cpp

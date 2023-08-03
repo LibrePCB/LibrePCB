@@ -72,6 +72,8 @@ static bool operator<(const BoardGerberExport::LayerPair& lhs,
 BoardGerberExport::BoardGerberExport(const Board& board) noexcept
   : mProject(board.getProject()),
     mBoard(board),
+    mRemoveObsoleteFiles(true),
+    mBeforeWriteCallback(),
     mCreationDateTime(QDateTime::currentDateTime()),
     mProjectName(*mProject.getName()),
     mCurrentInnerCopperLayer(0),
@@ -95,6 +97,18 @@ FilePath BoardGerberExport::getOutputDirectory(
     const BoardFabricationOutputSettings& settings) const noexcept {
   return getOutputFilePath(settings.getOutputBasePath() + "dummy")
       .getParentDir();  // use dummy suffix
+}
+
+/*******************************************************************************
+ *  Setters
+ ******************************************************************************/
+
+void BoardGerberExport::setRemoveObsoleteFiles(bool remove) {
+  mRemoveObsoleteFiles = remove;
+}
+
+void BoardGerberExport::setBeforeWriteCallback(BeforeWriteCallback cb) {
+  mBeforeWriteCallback = cb;
 }
 
 /*******************************************************************************
@@ -275,8 +289,8 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
   }
 
   gen.generate();
+  trackFileBeforeWrite(filePath);  // can throw
   gen.saveToFile(filePath);
-  mWrittenFiles.append(filePath);
 }
 
 /*******************************************************************************
@@ -294,9 +308,10 @@ void BoardGerberExport::exportDrillsMerged(
     drawPthDrills(*gen);
     drawNpthDrills(*gen);
     gen->generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen->saveToFile(fp);
-    mWrittenFiles.append(fp);
-  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+  } else if (mRemoveObsoleteFiles && fp.isExistingFile() &&
+             (!mWrittenFiles.contains(fp))) {
     FileUtils::removeFile(fp);
   }
 }
@@ -319,9 +334,10 @@ void BoardGerberExport::exportDrillsNpth(
     // doesn't support a separate NPTH file, the user shall enable the
     // "merge PTH and NPTH drills"  option.
     gen->generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen->saveToFile(fp);
-    mWrittenFiles.append(fp);
-  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+  } else if (mRemoveObsoleteFiles && fp.isExistingFile() &&
+             (!mWrittenFiles.contains(fp))) {
     FileUtils::removeFile(fp);
   }
 }
@@ -336,9 +352,10 @@ void BoardGerberExport::exportDrillsPth(
             settings, ExcellonGenerator::Plating::Yes);
     drawPthDrills(*gen);
     gen->generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen->saveToFile(fp);
-    mWrittenFiles.append(fp);
-  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+  } else if (mRemoveObsoleteFiles && fp.isExistingFile() &&
+             (!mWrittenFiles.contains(fp))) {
     FileUtils::removeFile(fp);
   }
 }
@@ -359,8 +376,8 @@ void BoardGerberExport::exportDrillsBlindBuried(
                  ExcellonGenerator::Function::ViaDrill);
     }
     gen->generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen->saveToFile(fp);
-    mWrittenFiles.append(fp);
   }
 }
 
@@ -374,8 +391,8 @@ void BoardGerberExport::exportLayerBoardOutlines(
   drawLayer(gen, Layer::boardOutlines());
   drawLayer(gen, Layer::boardCutouts());
   gen.generate();
+  trackFileBeforeWrite(fp);  // can throw
   gen.saveToFile(fp);
-  mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportLayerTopCopper(
@@ -388,8 +405,8 @@ void BoardGerberExport::exportLayerTopCopper(
                             GerberGenerator::Polarity::Positive);
   drawLayer(gen, Layer::topCopper());
   gen.generate();
+  trackFileBeforeWrite(fp);  // can throw
   gen.saveToFile(fp);
-  mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportLayerBottomCopper(
@@ -403,8 +420,8 @@ void BoardGerberExport::exportLayerBottomCopper(
                             GerberGenerator::Polarity::Positive);
   drawLayer(gen, Layer::botCopper());
   gen.generate();
+  trackFileBeforeWrite(fp);  // can throw
   gen.saveToFile(fp);
-  mWrittenFiles.append(fp);
 }
 
 void BoardGerberExport::exportLayerInnerCopper(
@@ -423,8 +440,8 @@ void BoardGerberExport::exportLayerInnerCopper(
       throw LogicError(__FILE__, __LINE__, "Unknown inner copper layer.");
     }
     gen.generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen.saveToFile(fp);
-    mWrittenFiles.append(fp);
   }
   mCurrentInnerCopperLayer = 0;
 }
@@ -440,9 +457,10 @@ void BoardGerberExport::exportLayerTopSolderMask(
                                   GerberGenerator::Polarity::Negative);
     drawLayer(gen, Layer::topStopMask());
     gen.generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen.saveToFile(fp);
-    mWrittenFiles.append(fp);
-  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+  } else if (mRemoveObsoleteFiles && fp.isExistingFile() &&
+             (!mWrittenFiles.contains(fp))) {
     FileUtils::removeFile(fp);
   }
 }
@@ -458,9 +476,10 @@ void BoardGerberExport::exportLayerBottomSolderMask(
                                   GerberGenerator::Polarity::Negative);
     drawLayer(gen, Layer::botStopMask());
     gen.generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen.saveToFile(fp);
-    mWrittenFiles.append(fp);
-  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+  } else if (mRemoveObsoleteFiles && fp.isExistingFile() &&
+             (!mWrittenFiles.contains(fp))) {
     FileUtils::removeFile(fp);
   }
 }
@@ -479,9 +498,10 @@ void BoardGerberExport::exportLayerTopSilkscreen(
     gen.setLayerPolarity(GerberGenerator::Polarity::Negative);
     drawLayer(gen, Layer::topStopMask());
     gen.generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen.saveToFile(fp);
-    mWrittenFiles.append(fp);
-  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+  } else if (mRemoveObsoleteFiles && fp.isExistingFile() &&
+             (!mWrittenFiles.contains(fp))) {
     FileUtils::removeFile(fp);
   }
 }
@@ -500,9 +520,10 @@ void BoardGerberExport::exportLayerBottomSilkscreen(
     gen.setLayerPolarity(GerberGenerator::Polarity::Negative);
     drawLayer(gen, Layer::botStopMask());
     gen.generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen.saveToFile(fp);
-    mWrittenFiles.append(fp);
-  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+  } else if (mRemoveObsoleteFiles && fp.isExistingFile() &&
+             (!mWrittenFiles.contains(fp))) {
     FileUtils::removeFile(fp);
   }
 }
@@ -518,9 +539,10 @@ void BoardGerberExport::exportLayerTopSolderPaste(
                              GerberGenerator::Polarity::Positive);
     drawLayer(gen, Layer::topSolderPaste());
     gen.generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen.saveToFile(fp);
-    mWrittenFiles.append(fp);
-  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+  } else if (mRemoveObsoleteFiles && fp.isExistingFile() &&
+             (!mWrittenFiles.contains(fp))) {
     FileUtils::removeFile(fp);
   }
 }
@@ -536,9 +558,10 @@ void BoardGerberExport::exportLayerBottomSolderPaste(
                              GerberGenerator::Polarity::Positive);
     drawLayer(gen, Layer::botSolderPaste());
     gen.generate();
+    trackFileBeforeWrite(fp);  // can throw
     gen.saveToFile(fp);
-    mWrittenFiles.append(fp);
-  } else if (fp.isExistingFile() && (!mWrittenFiles.contains(fp))) {
+  } else if (mRemoveObsoleteFiles && fp.isExistingFile() &&
+             (!mWrittenFiles.contains(fp))) {
     FileUtils::removeFile(fp);
   }
 }
@@ -1058,6 +1081,13 @@ QString BoardGerberExport::getAttributeValue(const QString& key) const
     const ProjectAttributeLookup lookup(mBoard, nullptr);
     return lookup(key);
   }
+}
+
+void BoardGerberExport::trackFileBeforeWrite(const FilePath& fp) const {
+  if (mBeforeWriteCallback) {
+    mBeforeWriteCallback(fp);  // can throw
+  }
+  mWrittenFiles.append(fp);
 }
 
 /*******************************************************************************

@@ -26,6 +26,7 @@
 #include "../attribute/attribute.h"
 #include "../fileio/directorylock.h"
 #include "../fileio/transactionaldirectory.h"
+#include "../job/outputjob.h"
 #include "../types/elementname.h"
 #include "../types/fileproofname.h"
 #include "../types/uuid.h"
@@ -123,6 +124,15 @@ public:
   TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
 
   /**
+   * @brief Get the output jobs base directory for the current version number
+   *
+   * @return Output path (`./output/{{VERSION}}/`)
+   */
+  FilePath getCurrentOutputDir() const noexcept {
+    return mDirectory->getAbsPath("output/" % *mVersion);
+  }
+
+  /**
    * @brief Get the StrokeFontPool which contains all stroke fonts of the
    * project
    *
@@ -211,6 +221,14 @@ public:
   bool getDefaultLockComponentAssembly() const noexcept {
     return mDefaultLockComponentAssembly;
   }
+
+  /**
+   * @brief Get all output jobs
+   *
+   * @return Output jobs
+   */
+  const OutputJobList& getOutputJobs() const noexcept { return mOutputJobs; }
+  OutputJobList& getOutputJobs() noexcept { return mOutputJobs; }
 
   /**
    * @brief Get the ProjectLibrary object which contains all library elements
@@ -590,6 +608,9 @@ private:  // Data
 
   /// Default value for ::librepcb::ComponentInstance::mLockAssembly
   bool mDefaultLockComponentAssembly;
+
+  /// Output jobs
+  OutputJobList mOutputJobs;
 
   /// Ehe library which contains all elements needed in this project.
   QScopedPointer<ProjectLibrary> mProjectLibrary;

@@ -141,6 +141,7 @@ std::unique_ptr<Project> ProjectLoader::open(
   std::unique_ptr<Project> p(new Project(std::move(directory), filename));
   loadMetadata(*p);
   loadSettings(*p);
+  loadOutputJobs(*p);
   loadLibrary(*p);
   loadCircuit(*p);
   loadErc(*p);
@@ -224,6 +225,15 @@ void ProjectLoader::loadSettings(Project& p) {
       deserialize<bool>(root.getChild("default_lock_component_assembly/@0")));
 
   qDebug() << "Successfully loaded project settings.";
+}
+
+void ProjectLoader::loadOutputJobs(Project& p) {
+  qDebug() << "Load output jobs...";
+  const QString fp = "project/jobs.lp";
+  const SExpression root = SExpression::parse(p.getDirectory().read(fp),
+                                              p.getDirectory().getAbsPath(fp));
+  p.getOutputJobs() = deserialize<OutputJobList>(root);
+  qDebug() << "Successfully loaded output jobs.";
 }
 
 void ProjectLoader::loadLibrary(Project& p) {

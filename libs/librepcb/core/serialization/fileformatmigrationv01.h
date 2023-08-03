@@ -126,6 +126,7 @@ public:
   FileFormatMigrationV01& operator=(const FileFormatMigrationV01& rhs) = delete;
 
 protected:  // Methods
+  virtual void createOutputJobs(TransactionalDirectory& dir);
   virtual void upgradeMetadata(SExpression& root);
   virtual void upgradeSettings(SExpression& root);
   virtual void upgradeCircuit(SExpression& root, ProjectContext& context);

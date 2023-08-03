@@ -89,6 +89,15 @@ private:
 };
 
 /*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+inline uint qHash(const std::shared_ptr<AssemblyVariant>& key,
+                  uint seed = 0) noexcept {
+  return ::qHash(key.get(), seed);
+}
+
+/*******************************************************************************
  *  Class AssemblyVariantList
  ******************************************************************************/
 
@@ -99,10 +108,10 @@ using AssemblyVariantList =
     SerializableObjectList<AssemblyVariant, AssemblyVariantListNameProvider,
                            AssemblyVariant::Event>;
 
+}  // namespace librepcb
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
-
-}  // namespace librepcb
 
 #endif

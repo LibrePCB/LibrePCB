@@ -434,6 +434,15 @@ void Project::save() {
     mDirectory->write("project/settings.lp", root.toByteArray());
   }
 
+  // Output jobs.
+  {
+    SExpression root = SExpression::createList("librepcb_jobs");
+    root.ensureLineBreak();
+    mOutputJobs.serialize(root);
+    root.ensureLineBreak();
+    mDirectory->write("project/jobs.lp", root.toByteArray());
+  }
+
   // Circuit.
   {
     SExpression root = SExpression::createList("librepcb_circuit");

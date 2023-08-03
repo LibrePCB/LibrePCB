@@ -79,6 +79,7 @@ public:
 private:  // Methods
   void loadMetadata(Project& p);
   void loadSettings(Project& p);
+  void loadOutputJobs(Project& p);
   void loadLibrary(Project& p);
   template <typename ElementType>
   void loadLibraryElements(Project& p, const QString& dirname,

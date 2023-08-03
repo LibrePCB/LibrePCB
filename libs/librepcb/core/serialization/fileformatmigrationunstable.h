@@ -72,6 +72,7 @@ public:
       const FileFormatMigrationUnstable& rhs) = delete;
 
 private:  // Methods
+  virtual void createOutputJobs(TransactionalDirectory& dir) override;
   virtual void upgradeSettings(SExpression& root) override;
   virtual void upgradeCircuit(SExpression& root,
                               ProjectContext& context) override;
