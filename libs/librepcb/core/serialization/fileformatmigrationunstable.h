@@ -81,6 +81,7 @@ private:  // Methods
   virtual void upgradeBoard(SExpression& root,
                             ProjectContext& context) override;
   virtual void upgradeBoardUserSettings(SExpression& root) override;
+  virtual void upgradeBoardDrcSettings(SExpression& root) override;
 };
 
 /*******************************************************************************

@@ -77,17 +77,20 @@ signals:
 
 private:  // Methods
   void rebuildPlanes(int progressEnd);
-  void checkMinimumCopperWidth(int progressEnd);
   void checkCopperCopperClearances(int progressEnd);
   void checkCopperBoardClearances(int progressEnd);
   void checkCopperHoleClearances(int progressEnd);
   void checkDrillDrillClearances(int progressEnd);
   void checkDrillBoardClearances(int progressEnd);
+  void checkSilkscreenStopmaskClearances(int progressEnd);
+  void checkMinimumCopperWidth(int progressEnd);
   void checkMinimumPthAnnularRing(int progressEnd);
   void checkMinimumNpthDrillDiameter(int progressEnd);
   void checkMinimumNpthSlotWidth(int progressEnd);
   void checkMinimumPthDrillDiameter(int progressEnd);
   void checkMinimumPthSlotWidth(int progressEnd);
+  void checkMinimumSilkscreenWidth(int progressEnd);
+  void checkMinimumSilkscreenTextHeight(int progressEnd);
   void checkZones(int progressEnd);
   void checkVias(int progressEnd);
   void checkAllowedNpthSlots(int progressEnd);
@@ -98,6 +101,8 @@ private:  // Methods
   void checkForUnplacedComponents(int progressEnd);
   void checkForMissingConnections(int progressEnd);
   void checkForStaleObjects(int progressEnd);
+  void checkMinimumWidth(const UnsignedLength& minWidth,
+                         std::function<bool(const Layer&)> layerFilter);
   template <typename THole>
   bool requiresHoleSlotWarning(
       const THole& hole, BoardDesignRuleCheckSettings::AllowedSlots allowed);

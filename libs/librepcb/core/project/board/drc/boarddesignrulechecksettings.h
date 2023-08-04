@@ -59,9 +59,6 @@ public:
   ~BoardDesignRuleCheckSettings() noexcept;
 
   // Getters
-  const UnsignedLength& getMinCopperWidth() const noexcept {
-    return mMinCopperWidth;
-  }
   const UnsignedLength& getMinCopperCopperClearance() const noexcept {
     return mMinCopperCopperClearance;
   }
@@ -76,6 +73,12 @@ public:
   }
   const UnsignedLength& getMinDrillBoardClearance() const noexcept {
     return mMinDrillBoardClearance;
+  }
+  const UnsignedLength& getMinSilkscreenStopmaskClearance() const noexcept {
+    return mMinSilkscreenStopmaskClearance;
+  }
+  const UnsignedLength& getMinCopperWidth() const noexcept {
+    return mMinCopperWidth;
   }
   const UnsignedLength& getMinPthAnnularRing() const noexcept {
     return mMinPthAnnularRing;
@@ -92,6 +95,12 @@ public:
   const UnsignedLength& getMinPthSlotWidth() const noexcept {
     return mMinPthSlotWidth;
   }
+  const UnsignedLength& getMinSilkscreenWidth() const noexcept {
+    return mMinSilkscreenWidth;
+  }
+  const UnsignedLength& getMinSilkscreenTextHeight() const noexcept {
+    return mMinSilkscreenTextHeight;
+  }
   const UnsignedLength& getMinOutlineToolDiameter() const noexcept {
     return mMinOutlineToolDiameter;
   }
@@ -103,9 +112,6 @@ public:
   AllowedSlots getAllowedPthSlots() const noexcept { return mAllowedPthSlots; }
 
   // Setters
-  void setMinCopperWidth(const UnsignedLength& value) noexcept {
-    mMinCopperWidth = value;
-  }
   void setMinCopperCopperClearance(const UnsignedLength& value) noexcept {
     mMinCopperCopperClearance = value;
   }
@@ -121,6 +127,12 @@ public:
   void setMinDrillBoardClearance(const UnsignedLength& value) noexcept {
     mMinDrillBoardClearance = value;
   }
+  void setMinSilkscreenStopmaskClearance(const UnsignedLength& value) noexcept {
+    mMinSilkscreenStopmaskClearance = value;
+  }
+  void setMinCopperWidth(const UnsignedLength& value) noexcept {
+    mMinCopperWidth = value;
+  }
   void setMinPthAnnularRing(const UnsignedLength& value) noexcept {
     mMinPthAnnularRing = value;
   }
@@ -135,6 +147,12 @@ public:
   }
   void setMinPthSlotWidth(const UnsignedLength& value) noexcept {
     mMinPthSlotWidth = value;
+  }
+  void setMinSilkscreenWidth(const UnsignedLength& value) noexcept {
+    mMinSilkscreenWidth = value;
+  }
+  void setMinSilkscreenTextHeight(const UnsignedLength& value) noexcept {
+    mMinSilkscreenTextHeight = value;
   }
   void setMinOutlineToolDiameter(const UnsignedLength& value) noexcept {
     mMinOutlineToolDiameter = value;
@@ -167,19 +185,22 @@ public:
 
 private:  // Data
   // Clearances
-  UnsignedLength mMinCopperWidth;
   UnsignedLength mMinCopperCopperClearance;
   UnsignedLength mMinCopperBoardClearance;
   UnsignedLength mMinCopperNpthClearance;
   UnsignedLength mMinDrillDrillClearance;
   UnsignedLength mMinDrillBoardClearance;
+  UnsignedLength mMinSilkscreenStopmaskClearance;
 
   // Minimum sizes
+  UnsignedLength mMinCopperWidth;
   UnsignedLength mMinPthAnnularRing;
   UnsignedLength mMinNpthDrillDiameter;
   UnsignedLength mMinPthDrillDiameter;
   UnsignedLength mMinNpthSlotWidth;
   UnsignedLength mMinPthSlotWidth;
+  UnsignedLength mMinSilkscreenWidth;
+  UnsignedLength mMinSilkscreenTextHeight;
   UnsignedLength mMinOutlineToolDiameter;
 
   // Allowed features

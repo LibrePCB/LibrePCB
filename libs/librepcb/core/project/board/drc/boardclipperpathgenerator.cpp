@@ -162,6 +162,100 @@ void BoardClipperPathGenerator::addCopper(
   }
 }
 
+void BoardClipperPathGenerator::addStopMaskOpenings(const Layer& layer,
+                                                    const Length& offset) {
+  // Board polygons.
+  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
+    if (polygon->getData().getLayer() == layer) {
+      addPolygon(polygon->getData().getPath(),
+                 polygon->getData().getLineWidth(),
+                 polygon->getData().isFilled(), offset);
+    }
+  }
+
+  // Stroke texts.
+  foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
+    if (strokeText->getData().getLayer() == layer) {
+      addStrokeText(*strokeText, offset);
+    }
+  }
+
+  // Holes.
+  foreach (const BI_Hole* hole, mBoard.getHoles()) {
+    if (auto maskOffset = hole->getStopMaskOffset()) {
+      const Length maskDia = hole->getData().getDiameter() + (*maskOffset) * 2;
+      addHole(PositiveLength(maskDia), hole->getData().getPath(), Transform(),
+              offset);
+    }
+  }
+
+  // Devices.
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    Transform transform(*device);
+
+    // Polygons.
+    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
+      const Layer& polygonLayer = transform.map(polygon.getLayer());
+      if (polygonLayer == layer) {
+        addPolygon(transform.map(polygon.getPath()), polygon.getLineWidth(),
+                   polygon.isFilled(), offset);
+      }
+    }
+
+    // Circles.
+    for (const Circle& circle : device->getLibFootprint().getCircles()) {
+      const Layer& circleLayer = transform.map(circle.getLayer());
+      if (circleLayer == layer) {
+        addCircle(circle, transform, offset);
+      }
+    }
+
+    // Stroke texts.
+    foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
+      // Do *not* mirror layer since it is independent of the device!
+      if (strokeText->getData().getLayer() == layer) {
+        addStrokeText(*strokeText, offset);
+      }
+    }
+
+    // Holes.
+    for (const Hole& hole : device->getLibFootprint().getHoles()) {
+      if (auto maskOffset = device->getHoleStopMasks().value(hole.getUuid())) {
+        const Length maskDia = hole.getDiameter() + (*maskOffset) * 2;
+        addHole(PositiveLength(maskDia), hole.getPath(), transform, offset);
+      }
+    }
+
+    // Pads.
+    foreach (const BI_FootprintPad* pad, device->getPads()) {
+      const Transform padTransform(*pad);
+      foreach (PadGeometry geometry, pad->getGeometries().value(&layer)) {
+        if (offset != 0) {
+          geometry = geometry.withOffset(offset);
+        }
+        ClipperHelpers::unite(
+            mPaths,
+            ClipperHelpers::convert(padTransform.map(geometry.toOutlines()),
+                                    mMaxArcTolerance),
+            ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
+      }
+    }
+  }
+
+  // Vias.
+  foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
+    foreach (const BI_Via* via, netsegment->getVias()) {
+      const tl::optional<PositiveLength> stopMaskDia = layer.isTop()
+          ? via->getStopMaskDiameterTop()
+          : via->getStopMaskDiameterBottom();
+      if (stopMaskDia) {
+        addHole(*stopMaskDia, makeNonEmptyPath(via->getPosition()), Transform(),
+                offset);
+      }
+    }
+  }
+}
+
 void BoardClipperPathGenerator::addVia(const BI_Via& via,
                                        const Length& offset) {
   ClipperHelpers::unite(
@@ -189,10 +283,11 @@ void BoardClipperPathGenerator::addPlane(const BI_Plane& plane) {
 
 void BoardClipperPathGenerator::addPolygon(const Path& path,
                                            const UnsignedLength& lineWidth,
-                                           bool filled) {
+                                           bool filled, const Length& offset) {
   // Outline.
-  if (lineWidth > 0) {
-    QVector<Path> paths = path.toOutlineStrokes(PositiveLength(*lineWidth));
+  const Length totalWidth = lineWidth + offset * 2;
+  if ((lineWidth > 0) && (totalWidth > 0)) {
+    QVector<Path> paths = path.toOutlineStrokes(PositiveLength(totalWidth));
     ClipperHelpers::unite(mPaths,
                           ClipperHelpers::convert(paths, mMaxArcTolerance),
                           ClipperLib::pftEvenOdd, ClipperLib::pftNonZero);
@@ -201,9 +296,12 @@ void BoardClipperPathGenerator::addPolygon(const Path& path,
   // Area (only fill closed paths, for consistency with the appearance in
   // the board editor and Gerber output).
   if (filled && path.isClosed()) {
-    ClipperHelpers::unite(mPaths,
-                          {ClipperHelpers::convert(path, mMaxArcTolerance)},
-                          ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+    ClipperLib::Paths paths = {ClipperHelpers::convert(path, mMaxArcTolerance)};
+    if (offset != 0) {
+      ClipperHelpers::offset(paths, offset, mMaxArcTolerance);
+    }
+    ClipperHelpers::unite(mPaths, paths, ClipperLib::pftEvenOdd,
+                          ClipperLib::pftEvenOdd);
   }
 }
 

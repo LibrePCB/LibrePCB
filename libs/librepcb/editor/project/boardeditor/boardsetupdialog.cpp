@@ -168,9 +168,6 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
           mUi->edtRulesViaAnnularRingMin, &UnsignedLengthEdit::clipToMaximum);
 
   // Tab: DRC Settings
-  mUi->edtDrcMinCopperWidth->configure(mBoard.getGridUnit(),
-                                       LengthEditBase::Steps::generic(),
-                                       sSettingsPrefix % "/min_copper_width");
   mUi->edtDrcClearanceCopperCopper->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
       sSettingsPrefix % "/clearance_copper_copper");
@@ -186,6 +183,12 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   mUi->edtDrcClearanceDrillBoard->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
       sSettingsPrefix % "/clearance_drill_board");
+  mUi->edtDrcClearanceSilkscreenStopmask->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/clearance_silkscreen_stopmask");
+  mUi->edtDrcMinCopperWidth->configure(mBoard.getGridUnit(),
+                                       LengthEditBase::Steps::generic(),
+                                       sSettingsPrefix % "/min_copper_width");
   mUi->edtDrcMinPthAnnularRing->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
       sSettingsPrefix % "/min_pth_annular_ring");
@@ -201,6 +204,12 @@ BoardSetupDialog::BoardSetupDialog(Board& board, UndoStack& undoStack,
   mUi->edtDrcMinPthSlotWidth->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
       sSettingsPrefix % "/min_pth_slot_width");
+  mUi->edtDrcMinSilkscreenWidth->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/min_silkscreen_width");
+  mUi->edtDrcMinSilkscreenTextHeight->configure(
+      mBoard.getGridUnit(), LengthEditBase::Steps::generic(),
+      sSettingsPrefix % "/min_silkscreen_text_height");
   mUi->edtDrcMinOutlineToolDiameter->configure(
       mBoard.getGridUnit(), LengthEditBase::Steps::drillDiameter(),
       sSettingsPrefix % "/min_outline_tool_diameter");
@@ -319,8 +328,6 @@ void BoardSetupDialog::load() noexcept {
   mUi->edtRulesStopMaskMaxViaDia->setValue(r.getStopMaskMaxViaDiameter());
 
   // Tab: DRC Settings
-  mUi->edtDrcMinCopperWidth->setValue(
-      mBoard.getDrcSettings().getMinCopperWidth());
   mUi->edtDrcClearanceCopperCopper->setValue(
       mBoard.getDrcSettings().getMinCopperCopperClearance());
   mUi->edtDrcClearanceCopperBoard->setValue(
@@ -331,6 +338,10 @@ void BoardSetupDialog::load() noexcept {
       mBoard.getDrcSettings().getMinDrillDrillClearance());
   mUi->edtDrcClearanceDrillBoard->setValue(
       mBoard.getDrcSettings().getMinDrillBoardClearance());
+  mUi->edtDrcClearanceSilkscreenStopmask->setValue(
+      mBoard.getDrcSettings().getMinSilkscreenStopmaskClearance());
+  mUi->edtDrcMinCopperWidth->setValue(
+      mBoard.getDrcSettings().getMinCopperWidth());
   mUi->edtDrcMinPthAnnularRing->setValue(
       mBoard.getDrcSettings().getMinPthAnnularRing());
   mUi->edtDrcMinNpthDrillDiameter->setValue(
@@ -341,6 +352,10 @@ void BoardSetupDialog::load() noexcept {
       mBoard.getDrcSettings().getMinPthDrillDiameter());
   mUi->edtDrcMinPthSlotWidth->setValue(
       mBoard.getDrcSettings().getMinPthSlotWidth());
+  mUi->edtDrcMinSilkscreenWidth->setValue(
+      mBoard.getDrcSettings().getMinSilkscreenWidth());
+  mUi->edtDrcMinSilkscreenTextHeight->setValue(
+      mBoard.getDrcSettings().getMinSilkscreenTextHeight());
   mUi->edtDrcMinOutlineToolDiameter->setValue(
       mBoard.getDrcSettings().getMinOutlineToolDiameter());
   mUi->cbxBlindViasAllowed->setChecked(
@@ -402,17 +417,22 @@ bool BoardSetupDialog::apply() noexcept {
 
     // Tab: DRC Settings
     BoardDesignRuleCheckSettings s = mBoard.getDrcSettings();
-    s.setMinCopperWidth(mUi->edtDrcMinCopperWidth->getValue());
     s.setMinCopperCopperClearance(mUi->edtDrcClearanceCopperCopper->getValue());
     s.setMinCopperBoardClearance(mUi->edtDrcClearanceCopperBoard->getValue());
     s.setMinCopperNpthClearance(mUi->edtDrcClearanceCopperNpth->getValue());
     s.setMinDrillDrillClearance(mUi->edtDrcClearanceDrillDrill->getValue());
     s.setMinDrillBoardClearance(mUi->edtDrcClearanceDrillBoard->getValue());
+    s.setMinSilkscreenStopmaskClearance(
+        mUi->edtDrcClearanceSilkscreenStopmask->getValue());
+    s.setMinCopperWidth(mUi->edtDrcMinCopperWidth->getValue());
     s.setMinPthAnnularRing(mUi->edtDrcMinPthAnnularRing->getValue());
     s.setMinNpthDrillDiameter(mUi->edtDrcMinNpthDrillDiameter->getValue());
     s.setMinNpthSlotWidth(mUi->edtDrcMinNpthSlotWidth->getValue());
     s.setMinPthDrillDiameter(mUi->edtDrcMinPthDrillDiameter->getValue());
     s.setMinPthSlotWidth(mUi->edtDrcMinPthSlotWidth->getValue());
+    s.setMinSilkscreenWidth(mUi->edtDrcMinSilkscreenWidth->getValue());
+    s.setMinSilkscreenTextHeight(
+        mUi->edtDrcMinSilkscreenTextHeight->getValue());
     s.setMinOutlineToolDiameter(mUi->edtDrcMinOutlineToolDiameter->getValue());
     s.setBlindViasAllowed(mUi->cbxBlindViasAllowed->isChecked());
     s.setBuriedViasAllowed(mUi->cbxBuriedViasAllowed->isChecked());

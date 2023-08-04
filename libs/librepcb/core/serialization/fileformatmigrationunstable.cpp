@@ -93,81 +93,12 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
 
 void FileFormatMigrationUnstable::upgradeSettings(SExpression& root) {
   Q_UNUSED(root);
-  root.appendChild("default_lock_component_assembly",
-                   SExpression::createToken("false"));
 }
 
 void FileFormatMigrationUnstable::upgradeCircuit(SExpression& root,
                                                  ProjectContext& context) {
   Q_UNUSED(root);
-
-  // Add default assembly variant.
-  if (!root.tryGetChild("variant")) {
-    SExpression& node = root.appendList("variant");
-    node.appendChild(SExpression::createToken(context.projectUuid));
-    node.appendChild("name", SExpression::createString("Std"));
-    node.appendChild("description",
-                     SExpression::createString("Standard assembly"));
-  }
-
-  // Add assembly options & parts to components.
-  foreach (SExpression* cmpNode, root.getChildren("component")) {
-    if (!cmpNode->tryGetChild("lib_device")) {
-      continue;  // already migrated
-    }
-
-    const Uuid cmpUuid = deserialize<Uuid>(cmpNode->getChild("@0"));
-    const Uuid libCmpUuid =
-        deserialize<Uuid>(cmpNode->getChild("lib_component/@0"));
-    const bool isLogo =
-        (libCmpUuid.toStr() == "b91cf23a-4f07-4b99-8f52-0b42304aef20");
-    const bool addToAssemblyVariant =
-        (!context.components.value(libCmpUuid).schematicOnly) && (!isLogo);
-    const SExpression& libDevNode = cmpNode->getChild("lib_device");
-    QSet<Uuid> libDeviceUuids = context.devicesUsedInBoards.value(cmpUuid);
-    if (auto u = deserialize<tl::optional<Uuid>>(libDevNode.getChild("@0"))) {
-      libDeviceUuids.insert(*u);
-    }
-
-    if (!libDeviceUuids.isEmpty()) {
-      QString mpn, manufacturer;
-      QVector<SExpression*> consumedAttributes;
-      const QList<SExpression*> attributes = cmpNode->getChildren("attribute");
-      for (int i = attributes.count() - 1; i >= 0; --i) {
-        const QString key = attributes.at(i)->getChild("@0").getValue();
-        if (key == "MPN") {
-          mpn = *cleanSimpleString(
-              attributes.at(i)->getChild("value/@0").getValue());
-          consumedAttributes.append(attributes.at(i));
-        } else if (key == "MANUFACTURER") {
-          manufacturer = *cleanSimpleString(
-              attributes.at(i)->getChild("value/@0").getValue());
-          consumedAttributes.append(attributes.at(i));
-        }
-      }
-      foreach (SExpression* attrNode, consumedAttributes) {
-        cmpNode->removeChild(*attrNode);
-      }
-
-      foreach (const Uuid& devUuid, libDeviceUuids) {
-        SExpression& devNode = cmpNode->appendList("device");
-        devNode.appendChild(SExpression::createToken(devUuid.toStr()));
-        if ((!mpn.isEmpty()) || (!manufacturer.isEmpty())) {
-          SExpression& partNode = devNode.appendList("part");
-          partNode.appendChild(mpn);
-          partNode.appendChild("manufacturer", manufacturer);
-        }
-        if (addToAssemblyVariant) {
-          devNode.appendChild("variant",
-                              SExpression::createToken(context.projectUuid));
-        }
-      }
-      ++context.componentsWithAssemblyOptions;
-    }
-
-    cmpNode->removeChild(libDevNode);
-    cmpNode->appendChild("lock_assembly", SExpression::createToken("false"));
-  }
+  Q_UNUSED(context);
 }
 
 void FileFormatMigrationUnstable::upgradeErc(SExpression& root,
@@ -186,10 +117,20 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
+  upgradeBoardDrcSettings(root);
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {
   Q_UNUSED(root);
+}
+
+void FileFormatMigrationUnstable::upgradeBoardDrcSettings(SExpression& root) {
+  SExpression& node = root.getChild("design_rule_check");
+  node.appendChild("min_silkscreen_stopmask_clearance",
+                   SExpression::createToken("0.127"));
+  node.appendChild("min_silkscreen_width", SExpression::createToken("0.15"));
+  node.appendChild("min_silkscreen_text_height",
+                   SExpression::createToken("0.8"));
 }
 
 /*******************************************************************************
