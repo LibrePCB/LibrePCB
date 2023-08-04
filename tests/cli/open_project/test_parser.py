@@ -27,6 +27,15 @@ Options:
                                      file containing custom settings. If not
                                      set, the settings from the boards will be
                                      used instead.
+  --run-job <name>                   Run a particular output job. Can be given
+                                     multiple times to run multiple jobs.
+  --run-jobs                         Run all existing output jobs.
+  --jobs <file>                      Override output jobs with a *.lp file
+                                     containing custom jobs. If not set, the
+                                     jobs from the project will be used instead.
+  --outdir <path>                    Override the output base directory of
+                                     jobs. If not set, the standard output
+                                     directory from the project is used.
   --export-schematics <file>         Export schematics to given file(s).
                                      Existing files will be overwritten.
                                      Supported file extensions: pdf, svg, ***
