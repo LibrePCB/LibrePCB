@@ -68,7 +68,7 @@ public:
       const ComponentSymbolVariantListWidget& rhs) = delete;
 
 private:  // Methods
-  void btnEditClicked(const QVariant& data) noexcept;
+  void btnEditClicked(const QPersistentModelIndex& itemIndex) noexcept;
   void viewDoubleClicked(const QModelIndex& index) noexcept;
   void editVariant(const Uuid& uuid) noexcept;
 

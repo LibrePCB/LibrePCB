@@ -111,8 +111,9 @@ void ComponentSymbolVariantListWidget::setReferences(
  ******************************************************************************/
 
 void ComponentSymbolVariantListWidget::btnEditClicked(
-    const QVariant& data) noexcept {
-  tl::optional<Uuid> uuid = Uuid::tryFromString(data.toString());
+    const QPersistentModelIndex& itemIndex) noexcept {
+  tl::optional<Uuid> uuid =
+      Uuid::tryFromString(itemIndex.data(Qt::EditRole).toString());
   if (uuid && mSymbolVariantList && mUndoStack && mEditorProvider) {
     editVariant(*uuid);
   }
