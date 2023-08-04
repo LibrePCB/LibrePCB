@@ -107,6 +107,8 @@ private:
   bool mCanRemove;
   bool mReadOnly;
 
+  QScopedPointer<QAction> mActionAddRow;
+  QScopedPointer<QAction> mActionRemoveRow;
   QMetaObject::Connection mRowsRemovedConnection;
 };
 
