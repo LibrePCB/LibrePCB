@@ -1202,7 +1202,7 @@ void SchematicEditor::execGraphicsExportDialog(
     QString projectName = FilePath::cleanFileName(
         *mProject.getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
     QString projectVersion = FilePath::cleanFileName(
-        mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+        *mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
     QString relativePath =
         QString("output/%1/%2_Schematics").arg(projectVersion, projectName);
     FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);

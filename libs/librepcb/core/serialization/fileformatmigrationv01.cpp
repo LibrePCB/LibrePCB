@@ -408,6 +408,8 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     const QString fp = "project/metadata.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
     context.projectUuid = root.getChild("@0").getValue();
+    upgradeMetadata(root);
+    dir.write(fp, root.toByteArray());
   }
 
   // Settings.
@@ -581,6 +583,11 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
+
+void FileFormatMigrationV01::upgradeMetadata(SExpression& root) {
+  SExpression& versionNode = root.getChild("version/@0");
+  versionNode.setValue(toFileProofName(versionNode.getValue(), "latest"));
+}
 
 void FileFormatMigrationV01::upgradeSettings(SExpression& root) {
   upgradeStrings(root);
@@ -1136,6 +1143,25 @@ void FileFormatMigrationV01::replaceStrings(
     }
     child->setValue(s);
   }
+}
+
+QString FileFormatMigrationV01::toFileProofName(
+    const QString& name, const QString& fallback) noexcept {
+  // perform compatibility decomposition (NFKD)
+  QString ret = name.normalized(QString::NormalizationForm_KD);
+  // remove leading and trailing spaces
+  ret = ret.trimmed();
+  // replace remaining spaces with replacement
+  ret.replace(" ", "-");
+  // remove all invalid characters
+  ret.remove(QRegularExpression("[^-a-zA-Z0-9_+().]"));
+  // truncate to maximum allowed length
+  ret.truncate(20);
+  // if there are leading or trailing spaces, remove them again ;)
+  ret = ret.trimmed();
+  // if the result is not valid, return the fallback
+  if (ret.isEmpty()) ret = fallback;
+  return ret;
 }
 
 /*******************************************************************************

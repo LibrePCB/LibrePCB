@@ -27,6 +27,7 @@
 #include "../fileio/directorylock.h"
 #include "../fileio/transactionaldirectory.h"
 #include "../types/elementname.h"
+#include "../types/fileproofname.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
 
@@ -146,9 +147,9 @@ public:
   /**
    * @brief Get the version of the project
    *
-   * @return The version of the project (arbitrary string)
+   * @return The version of the project
    */
-  const QString& getVersion() const noexcept { return mVersion; }
+  const FileProofName& getVersion() const noexcept { return mVersion; }
 
   /**
    * @brief Get the date and time when the project was created
@@ -264,9 +265,9 @@ public:
   /**
    * @brief Set the version of the project
    *
-   * @param newVersion        The new version (can be an arbitrary string)
+   * @param newVersion        The new version
    */
-  void setVersion(const QString& newVersion) noexcept;
+  void setVersion(const FileProofName& newVersion) noexcept;
 
   /**
    * @brief Set the creation date/time
@@ -559,8 +560,8 @@ private:  // Data
   /// Author (optional).
   QString mAuthor;
 
-  /// Version (arbitrary string, optional).
-  QString mVersion;
+  /// Version number.
+  FileProofName mVersion;
 
   /// Date/time of project creation.
   QDateTime mCreated;

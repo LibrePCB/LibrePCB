@@ -125,7 +125,7 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
                                              const Uuid& assemblyVariant,
                                              const FilePath& filePath) const {
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getVersion());
+                      *mProject.getVersion());
   if (side == BoardSide::Top) {
     gen.setFileFunctionComponent(1, GerberGenerator::BoardSide::Top);
   } else {
@@ -369,7 +369,7 @@ void BoardGerberExport::exportLayerBoardOutlines(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixOutlines());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getVersion());
+                      *mProject.getVersion());
   gen.setFileFunctionOutlines(false);
   drawLayer(gen, Layer::boardOutlines());
   drawLayer(gen, Layer::boardCutouts());
@@ -383,7 +383,7 @@ void BoardGerberExport::exportLayerTopCopper(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixCopperTop());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getVersion());
+                      *mProject.getVersion());
   gen.setFileFunctionCopper(1, GerberGenerator::CopperSide::Top,
                             GerberGenerator::Polarity::Positive);
   drawLayer(gen, Layer::topCopper());
@@ -397,7 +397,7 @@ void BoardGerberExport::exportLayerBottomCopper(
   FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                   settings.getSuffixCopperBot());
   GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                      mProject.getVersion());
+                      *mProject.getVersion());
   gen.setFileFunctionCopper(mBoard.getInnerLayerCount() + 2,
                             GerberGenerator::CopperSide::Bottom,
                             GerberGenerator::Polarity::Positive);
@@ -414,7 +414,7 @@ void BoardGerberExport::exportLayerInnerCopper(
     FilePath fp = getOutputFilePath(settings.getOutputBasePath() %
                                     settings.getSuffixCopperInner());
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getVersion());
+                        *mProject.getVersion());
     gen.setFileFunctionCopper(i + 1, GerberGenerator::CopperSide::Inner,
                               GerberGenerator::Polarity::Positive);
     if (const Layer* layer = Layer::innerCopper(i)) {
@@ -435,7 +435,7 @@ void BoardGerberExport::exportLayerTopSolderMask(
                                         settings.getSuffixSolderMaskTop());
   if (mBoard.getSolderResist()) {
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getVersion());
+                        *mProject.getVersion());
     gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Top,
                                   GerberGenerator::Polarity::Negative);
     drawLayer(gen, Layer::topStopMask());
@@ -453,7 +453,7 @@ void BoardGerberExport::exportLayerBottomSolderMask(
                                         settings.getSuffixSolderMaskBot());
   if (mBoard.getSolderResist()) {
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getVersion());
+                        *mProject.getVersion());
     gen.setFileFunctionSolderMask(GerberGenerator::BoardSide::Bottom,
                                   GerberGenerator::Polarity::Negative);
     drawLayer(gen, Layer::botStopMask());
@@ -472,7 +472,7 @@ void BoardGerberExport::exportLayerTopSilkscreen(
   const QVector<const Layer*>& layers = mBoard.getSilkscreenLayersTop();
   if (layers.count() > 0) {  // don't export silkscreen if no layers selected
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getVersion());
+                        *mProject.getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Top,
                               GerberGenerator::Polarity::Positive);
     foreach (const Layer* layer, layers) { drawLayer(gen, *layer); }
@@ -493,7 +493,7 @@ void BoardGerberExport::exportLayerBottomSilkscreen(
   const QVector<const Layer*>& layers = mBoard.getSilkscreenLayersBot();
   if (layers.count() > 0) {  // don't export silkscreen if no layers selected
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getVersion());
+                        *mProject.getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Bottom,
                               GerberGenerator::Polarity::Positive);
     foreach (const Layer* layer, layers) { drawLayer(gen, *layer); }
@@ -513,7 +513,7 @@ void BoardGerberExport::exportLayerTopSolderPaste(
                                         settings.getSuffixSolderPasteTop());
   if (settings.getEnableSolderPasteTop()) {
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getVersion());
+                        *mProject.getVersion());
     gen.setFileFunctionPaste(GerberGenerator::BoardSide::Top,
                              GerberGenerator::Polarity::Positive);
     drawLayer(gen, Layer::topSolderPaste());
@@ -531,7 +531,7 @@ void BoardGerberExport::exportLayerBottomSolderPaste(
                                         settings.getSuffixSolderPasteBot());
   if (settings.getEnableSolderPasteBot()) {
     GerberGenerator gen(mCreationDateTime, mProjectName, mBoard.getUuid(),
-                        mProject.getVersion());
+                        *mProject.getVersion());
     gen.setFileFunctionPaste(GerberGenerator::BoardSide::Bottom,
                              GerberGenerator::Polarity::Positive);
     drawLayer(gen, Layer::botSolderPaste());
@@ -1010,7 +1010,7 @@ std::unique_ptr<ExcellonGenerator> BoardGerberExport::createExcellonGenerator(
     const BoardFabricationOutputSettings& settings,
     ExcellonGenerator::Plating plating) const {
   std::unique_ptr<ExcellonGenerator> gen(new ExcellonGenerator(
-      mCreationDateTime, mProjectName, mBoard.getUuid(), mProject.getVersion(),
+      mCreationDateTime, mProjectName, mBoard.getUuid(), *mProject.getVersion(),
       plating, 1, mBoard.getInnerLayerCount() + 2));
   gen->setUseG85Slots(settings.getUseG85SlotCommand());
   return gen;

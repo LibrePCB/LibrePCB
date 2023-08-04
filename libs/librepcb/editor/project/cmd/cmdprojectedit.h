@@ -27,6 +27,7 @@
 
 #include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/types/elementname.h>
+#include <librepcb/core/types/fileproofname.h>
 
 #include <QtCore>
 
@@ -55,7 +56,7 @@ public:
   // Setters
   void setName(const ElementName& newName) noexcept;
   void setAuthor(const QString& newAuthor) noexcept;
-  void setVersion(const QString& newVersion) noexcept;
+  void setVersion(const FileProofName& newVersion) noexcept;
   void setAttributes(const AttributeList& attributes) noexcept;
   void setLocaleOrder(const QStringList& order) noexcept;
   void setNormOrder(const QStringList& order) noexcept;
@@ -82,8 +83,8 @@ private:
   ElementName mNewName;
   QString mOldAuthor;
   QString mNewAuthor;
-  QString mOldVersion;
-  QString mNewVersion;
+  FileProofName mOldVersion;
+  FileProofName mNewVersion;
   AttributeList mOldAttributes;
   AttributeList mNewAttributes;
   QStringList mOldLocaleOrder;

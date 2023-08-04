@@ -180,7 +180,7 @@ void ProjectLoader::loadMetadata(Project& p) {
   p.setUuid(deserialize<Uuid>(root.getChild("@0")));
   p.setName(deserialize<ElementName>(root.getChild("name/@0")));
   p.setAuthor(root.getChild("author/@0").getValue());
-  p.setVersion(root.getChild("version/@0").getValue());
+  p.setVersion(deserialize<FileProofName>(root.getChild("version/@0")));
   p.setCreated(deserialize<QDateTime>(root.getChild("created/@0")));
   p.setAttributes(AttributeList(root));
 

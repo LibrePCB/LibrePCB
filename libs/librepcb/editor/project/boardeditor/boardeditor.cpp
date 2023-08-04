@@ -1618,7 +1618,7 @@ void BoardEditor::execGraphicsExportDialog(
     QString projectName = FilePath::cleanFileName(
         *mProject.getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
     QString projectVersion = FilePath::cleanFileName(
-        mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+        *mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
     QString relativePath =
         QString("output/%1/%2_Board").arg(projectVersion, projectName);
     FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
@@ -1665,7 +1665,7 @@ void BoardEditor::execStepExportDialog() noexcept {
   const QString projectName = FilePath::cleanFileName(
       *mProject.getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
   const QString projectVersion = FilePath::cleanFileName(
-      mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+      *mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
   const FilePath defaultFilePath = mProject.getPath().getPathTo(
       QString("output/%1/%2.step").arg(projectVersion, projectName));
 

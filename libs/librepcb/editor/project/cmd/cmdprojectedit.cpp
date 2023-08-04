@@ -70,7 +70,7 @@ void CmdProjectEdit::setAuthor(const QString& newAuthor) noexcept {
   mNewAuthor = newAuthor;
 }
 
-void CmdProjectEdit::setVersion(const QString& newVersion) noexcept {
+void CmdProjectEdit::setVersion(const FileProofName& newVersion) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewVersion = newVersion;
 }

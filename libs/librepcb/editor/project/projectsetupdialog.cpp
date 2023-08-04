@@ -63,6 +63,10 @@ ProjectSetupDialog::ProjectSetupDialog(Project& project, UndoStack& undoStack,
 
   const EditorCommandSet& cmd = EditorCommandSet::instance();
 
+  // Tab: Metadata
+  mUi->edtProjectVersion->setValidator(
+      new QRegularExpressionValidator(FileProofNameConstraint::regex(), this));
+
   // Tab: Attributes
   mUi->edtProjectAttributes->setFrameStyle(QFrame::NoFrame);
   mUi->edtProjectAttributes->setReferences(nullptr, &mAttributes);
@@ -213,7 +217,7 @@ void ProjectSetupDialog::load() noexcept {
   // Tab: Metadata
   mUi->edtProjectName->setText(*mProject.getName());
   mUi->edtProjectAuthor->setText(mProject.getAuthor());
-  mUi->edtProjectVersion->setText(mProject.getVersion());
+  mUi->edtProjectVersion->setText(*mProject.getVersion());
   mUi->lblProjectCreated->setText(
       mProject.getCreated().toString(Qt::DefaultLocaleLongDate));
 
@@ -248,10 +252,11 @@ bool ProjectSetupDialog::apply() noexcept {
     QScopedPointer<CmdProjectEdit> cmd(new CmdProjectEdit(mProject));
 
     // Tab: Metadata
-    cmd->setName(
-        ElementName(mUi->edtProjectName->text().trimmed()));  // can throw
+    cmd->setName(ElementName(
+        cleanElementName(mUi->edtProjectName->text())));  // can throw
     cmd->setAuthor(mUi->edtProjectAuthor->text().trimmed());
-    cmd->setVersion(mUi->edtProjectVersion->text().trimmed());
+    cmd->setVersion(FileProofName(
+        cleanFileProofName(mUi->edtProjectVersion->text())));  // can throw
 
     // Tab: Attributes
     cmd->setAttributes(mAttributes);

@@ -73,7 +73,7 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
   EXPECT_EQ(mProjectDir, project->getPath());
   EXPECT_EQ("Unnamed", project->getName());
   EXPECT_EQ("", project->getAuthor());
-  EXPECT_EQ("", project->getVersion());
+  EXPECT_EQ("v1", *project->getVersion());
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
               project->getCreated().toMSecsSinceEpoch(), 5000);
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
@@ -103,7 +103,7 @@ TEST_F(ProjectTest, testCreateCloseOpen) {
   EXPECT_EQ(mProjectDir, project->getPath());
   EXPECT_EQ("Unnamed", project->getName());
   EXPECT_EQ("", project->getAuthor());
-  EXPECT_EQ("", project->getVersion());
+  EXPECT_EQ("v1", *project->getVersion());
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
               project->getCreated().toMSecsSinceEpoch(), 5000);
   EXPECT_NEAR(datetime.toMSecsSinceEpoch(),
@@ -167,7 +167,7 @@ TEST_F(ProjectTest, testSettersGetters) {
   // set properties
   ElementName name("test name 1234");
   QString author = "test author 1234";
-  QString version = "test version 1234";
+  FileProofName version("test-version-12.34");
   project->setName(name);
   project->setAuthor(author);
   project->setVersion(version);

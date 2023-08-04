@@ -59,7 +59,7 @@ BoardD356NetlistExport::~BoardD356NetlistExport() noexcept {
 
 QByteArray BoardD356NetlistExport::generate() const {
   D356NetlistGenerator gen(*mBoard.getProject().getName(),
-                           mBoard.getProject().getVersion(), *mBoard.getName(),
+                           *mBoard.getProject().getVersion(), *mBoard.getName(),
                            mCreationDateTime);
 
   // Vias.
