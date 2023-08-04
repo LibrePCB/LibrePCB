@@ -67,6 +67,23 @@ ErcMsgOpenNet::ErcMsgOpenNet(const NetSignal& net) noexcept
 }
 
 /*******************************************************************************
+ *  ErcMsgOpenWireInSegment
+ ******************************************************************************/
+
+ErcMsgOpenWireInSegment::ErcMsgOpenWireInSegment(
+    const SI_NetSegment& segment) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Open wire in net: '%1'").arg(*segment.getNetSignal().getName()),
+        tr("The wire has an open (unconnected) end with no net "
+           "label attached, thus is looks like a mistake. Check "
+           "if a connection to another wire or pin is missing (denoted by a "
+           "cross mark)."),
+        "open_wire") {
+  mApproval.appendChild("segment", segment.getUuid());
+}
+
+/*******************************************************************************
  *  ErcMsgUnconnectedRequiredSignal
  ******************************************************************************/
 

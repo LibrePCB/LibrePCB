@@ -38,6 +38,7 @@ class ComponentSymbolVariantItem;
 class NetClass;
 class NetSignal;
 class SI_NetPoint;
+class SI_NetSegment;
 class SI_SymbolPin;
 
 /*******************************************************************************
@@ -76,6 +77,25 @@ public:
   ErcMsgOpenNet(const ErcMsgOpenNet& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~ErcMsgOpenNet() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class ErcMsgOpenWireInSegment
+ ******************************************************************************/
+
+/**
+ * @brief The ErcMsgOpenWireInSegment class
+ */
+class ErcMsgOpenWireInSegment final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(ErcMsgOpenWireInSegment)
+
+public:
+  // Constructors / Destructor
+  ErcMsgOpenWireInSegment() = delete;
+  explicit ErcMsgOpenWireInSegment(const SI_NetSegment& segment) noexcept;
+  ErcMsgOpenWireInSegment(const ErcMsgOpenWireInSegment& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~ErcMsgOpenWireInSegment() noexcept {}
 };
 
 /*******************************************************************************

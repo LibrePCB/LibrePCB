@@ -71,6 +71,9 @@ public:
   SI_NetSegment& getNetSegment() const noexcept { return mNetSegment; }
   NetSignal& getNetSignalOfNetSegment() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
+  bool isOpen() const noexcept override {
+    return mRegisteredNetLines.count() < 2;
+  }
   NetLineAnchor toNetLineAnchor() const noexcept override;
 
   // Setters

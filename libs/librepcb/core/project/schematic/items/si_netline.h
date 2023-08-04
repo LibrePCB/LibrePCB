@@ -50,6 +50,7 @@ public:
   virtual void unregisterNetLine(SI_NetLine& netline) = 0;
   virtual const QSet<SI_NetLine*>& getNetLines() const noexcept = 0;
   virtual const Point& getPosition() const noexcept = 0;
+  virtual bool isOpen() const noexcept = 0;
 
   virtual NetLineAnchor toNetLineAnchor() const noexcept = 0;
 };

@@ -114,6 +114,9 @@ public:
   bool isRequired() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
   bool isVisibleJunction() const noexcept;
+  bool isOpen() const noexcept override {
+    return mRegisteredNetLines.isEmpty();
+  }
   NetLineAnchor toNetLineAnchor() const noexcept override;
 
   // General Methods
