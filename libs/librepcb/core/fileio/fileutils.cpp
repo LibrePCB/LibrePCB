@@ -186,6 +186,16 @@ QList<FilePath> FileUtils::getFilesInDirectory(const FilePath& dir,
   return files;
 }
 
+QList<FilePath> FileUtils::findDirectories(const FilePath& rootDir) {
+  QList<FilePath> result;
+  QDir qDir(rootDir.toStr());
+  qDir.setFilter(QDir::Hidden | QDir::Dirs | QDir::NoDotAndDotDot);
+  foreach (const QFileInfo& info, qDir.entryInfoList()) {
+    result.append(FilePath(info.absoluteFilePath()));
+  }
+  return result;
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
