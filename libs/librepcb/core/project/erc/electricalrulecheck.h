@@ -33,6 +33,7 @@
 namespace librepcb {
 
 class ComponentInstance;
+class NetSignal;
 class Project;
 class SI_NetSegment;
 class SI_Symbol;
@@ -72,6 +73,7 @@ private:  // Methods
 
 private:  // Data
   const Project& mProject;
+  mutable QSet<const NetSignal*> mOpenNetSignals;
 };
 
 /*******************************************************************************

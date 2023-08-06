@@ -60,6 +60,8 @@ ElectricalRuleCheck::~ElectricalRuleCheck() noexcept {
  ******************************************************************************/
 
 RuleCheckMessageList ElectricalRuleCheck::runChecks() const {
+  mOpenNetSignals.clear();
+
   RuleCheckMessageList msgs;
   checkNetClasses(msgs);
   checkNetSignals(msgs);
@@ -102,6 +104,7 @@ void ElectricalRuleCheck::checkNetSignals(RuleCheckMessageList& msgs) const {
       }
     }
     if (registeredRealComponentCount < 2) {
+      mOpenNetSignals.insert(net);
       msgs.append(std::make_shared<ErcMsgOpenNet>(*net));
     }
   }
@@ -168,6 +171,20 @@ void ElectricalRuleCheck::checkNetSegments(const Schematic& schematic,
                                            RuleCheckMessageList& msgs) const {
   foreach (const SI_NetSegment* netSegment, schematic.getNetSegments()) {
     checkNetPoints(*netSegment, msgs);
+
+    // If there are no net labels, check for any open wire. But only if there's
+    // no "open net" warning on the net raised, since this would be quite a
+    // duplicate warning.
+    if (netSegment->getNetLabels().isEmpty() &&
+        (!mOpenNetSignals.contains(&netSegment->getNetSignal()))) {
+      foreach (const SI_NetLine* netLine, netSegment->getNetLines()) {
+        if (netLine->getStartPoint().isOpen() ||
+            netLine->getEndPoint().isOpen()) {
+          msgs.append(std::make_shared<ErcMsgOpenWireInSegment>(*netSegment));
+          break;
+        }
+      }
+    }
   }
 }
 
