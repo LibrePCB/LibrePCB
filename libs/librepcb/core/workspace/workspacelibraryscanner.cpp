@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "workspacelibraryscanner.h"
 
+#include "../fileio/fileutils.h"
 #include "../fileio/transactionalfilesystem.h"
 #include "../library/cat/componentcategory.h"
 #include "../library/cat/packagecategory.h"
@@ -112,11 +113,9 @@ void WorkspaceLibraryScanner::scan() noexcept {
     WorkspaceLibraryDbWriter writer(mLibrariesPath, db);
 
     // update list of libraries
-    std::shared_ptr<TransactionalFileSystem> fs =
-        TransactionalFileSystem::openRO(mLibrariesPath);
     QList<std::shared_ptr<Library>> libraries;
-    getLibrariesOfDirectory(fs, "local", libraries);
-    getLibrariesOfDirectory(fs, "remote", libraries);
+    getLibrariesOfDirectory("local", libraries);
+    getLibrariesOfDirectory("remote", libraries);
     QHash<FilePath, int> libIds =
         updateLibraries(db, writer, libraries);  // can throw
     emit scanLibraryListUpdated(libIds.count());
@@ -144,26 +143,26 @@ void WorkspaceLibraryScanner::scan() noexcept {
       int libId = libIds[fp];
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<ComponentCategory>(
-          writer, fs, fp, lib->searchForElements<ComponentCategory>(), libId);
+          writer, fp, lib->searchForElements<ComponentCategory>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<PackageCategory>(
-          writer, fs, fp, lib->searchForElements<PackageCategory>(), libId);
+          writer, fp, lib->searchForElements<PackageCategory>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
-      count += addElementsToDb<Symbol>(writer, fs, fp,
+      count += addElementsToDb<Symbol>(writer, fp,
                                        lib->searchForElements<Symbol>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Package>(
-          writer, fs, fp, lib->searchForElements<Package>(), libId);
+          writer, fp, lib->searchForElements<Package>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
       count += addElementsToDb<Component>(
-          writer, fs, fp, lib->searchForElements<Component>(), libId);
+          writer, fp, lib->searchForElements<Component>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
       if (mAbort || (mSemaphore.available() > 0)) break;
-      count += addElementsToDb<Device>(writer, fs, fp,
+      count += addElementsToDb<Device>(writer, fp,
                                        lib->searchForElements<Device>(), libId);
       emit scanProgressUpdate(percent += qreal(98) / (libraries.count() * 6));
     }
@@ -187,24 +186,22 @@ void WorkspaceLibraryScanner::scan() noexcept {
 }
 
 void WorkspaceLibraryScanner::getLibrariesOfDirectory(
-    std::shared_ptr<TransactionalFileSystem> fs, const QString& root,
-    QList<std::shared_ptr<Library>>& libs) noexcept {
-  foreach (const QString& name, fs->getDirs(root)) {
-    QString dirpath = root % "/" % name;
-    std::unique_ptr<TransactionalDirectory> dir(
-        new TransactionalDirectory(fs, dirpath));
-    if (Library::isValidElementDirectory<Library>(*dir, "")) {
+    const QString& root, QList<std::shared_ptr<Library>>& libs) noexcept {
+  const FilePath rootFp = mLibrariesPath.getPathTo(root);
+  foreach (const FilePath& fp, FileUtils::findDirectories(rootFp)) {
+    if (Library::isValidElementDirectory<Library>(fp)) {
       try {
-        libs.append(std::shared_ptr<Library>(
-            Library::open(std::move(dir)).release()));  // can throw
+        std::unique_ptr<Library> lib =
+            openAndMigrate<Library>(fp);  // can throw
+        libs.append(std::shared_ptr<Library>(lib.release()));
       } catch (Exception& e) {
         qCritical() << "Could not open workspace library!";
-        qCritical() << "Library:" << fs->getAbsPath(dirpath).toNative();
+        qCritical() << "Library:" << fp.toNative();
         qCritical() << "Error:" << e.getMsg();
       }
     } else {
       qWarning() << "Directory is not a valid library, ignoring it:"
-                 << fs->getAbsPath(dirpath).toNative();
+                 << fp.toNative();
     }
   }
 }
@@ -267,26 +264,23 @@ QHash<FilePath, int> WorkspaceLibraryScanner::updateLibraries(
 }
 
 template <typename ElementType>
-int WorkspaceLibraryScanner::addElementsToDb(
-    WorkspaceLibraryDbWriter& writer,
-    std::shared_ptr<TransactionalFileSystem> fs, const FilePath& libPath,
-    const QStringList& dirs, int libId) {
+int WorkspaceLibraryScanner::addElementsToDb(WorkspaceLibraryDbWriter& writer,
+                                             const FilePath& libPath,
+                                             const QStringList& dirs,
+                                             int libId) {
   int count = 0;
   foreach (const QString& dirpath, dirs) {
     if (mAbort || (mSemaphore.available() > 0)) break;
-    FilePath absPath = libPath.getPathTo(dirpath);
-    QString relPath = absPath.toRelative(fs->getAbsPath());
+    const FilePath fp = libPath.getPathTo(dirpath);
     try {
-      std::unique_ptr<TransactionalDirectory> dir(
-          new TransactionalDirectory(fs, relPath));  // can throw
       std::unique_ptr<ElementType> element =
-          ElementType::open(std::move(dir));  // can throw
+          openAndMigrate<ElementType>(fp);  // can throw
       int id = addElementToDb(writer, libId, *element);
       addTranslationsToDb(writer, id, *element);
       count++;
     } catch (const Exception& e) {
       qWarning() << "Failed to open library element during scan:"
-                 << absPath.toNative();
+                 << fp.toNative();
     }
   }
   return count;
@@ -360,6 +354,30 @@ void WorkspaceLibraryScanner::addToCategories(WorkspaceLibraryDbWriter& writer,
   foreach (const Uuid& category, element.getCategories()) {
     writer.addToCategory<ElementType>(elementId, category);
   }
+}
+
+template <typename ElementType>
+std::unique_ptr<ElementType> WorkspaceLibraryScanner::openAndMigrate(
+    const FilePath& fp) {
+  // Try to open the library element read-only first.
+  auto fs = TransactionalFileSystem::openRO(fp);
+  std::unique_ptr<ElementType> element = ElementType::open(
+      std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
+      true);  // can throw
+  if (!element) {
+    // If this didn't work, a file format migration is required so we try
+    // it again in read/write mode. Afterwards save the element to disk to
+    // avoid the huge overhead the next time. Also this makes sure there
+    // are no library elements with legacy file format in the workspace
+    // so we don't need to keep backwards compatibility forever.
+    fs = TransactionalFileSystem::openRW(fp);
+    element = ElementType::open(
+        std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
+        false);  // can throw
+    fs->save();  // can throw
+    fs->releaseLock();  // can throw
+  }
+  return element;
 }
 
 /*******************************************************************************

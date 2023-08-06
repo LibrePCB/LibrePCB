@@ -59,7 +59,8 @@ public:
 
   // Static Methods
   static std::unique_ptr<PackageCategory> open(
-      std::unique_ptr<TransactionalDirectory> directory);
+      std::unique_ptr<TransactionalDirectory> directory,
+      bool abortBeforeMigration = false);
   static QString getShortElementName() noexcept {
     return QStringLiteral("pkgcat");
   }

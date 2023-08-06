@@ -53,8 +53,8 @@
      </property>
      <property name="text">
       <string>&lt;p&gt;Your workspace was created with an older LibrePCB version and needs to be upgraded.&lt;/p&gt;
-&lt;p&gt;To still keep the workspace compatible with older versions of LibrePCB, a snapshot of the currently installed libraries and settings will be created.&lt;/p&gt;
-&lt;p&gt;No worries, this operation is not harmful at all, it may just take a few seconds ;-)&lt;/p&gt;</string>
+&lt;p&gt;To still keep the workspace compatible with older versions of LibrePCB, a snapshot of the currently installed libraries and settings will be created. This may take a moment.&lt;/p&gt;
+&lt;p&gt;Also the first background library scan after the upgrade takes longer than usual, but you can start working on projects without waiting for its completion.&lt;/p&gt;</string>
      </property>
      <property name="textFormat">
       <enum>Qt::RichText</enum>

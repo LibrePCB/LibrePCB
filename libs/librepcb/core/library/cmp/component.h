@@ -137,7 +137,8 @@ public:
 
   // Static Methods
   static std::unique_ptr<Component> open(
-      std::unique_ptr<TransactionalDirectory> directory);
+      std::unique_ptr<TransactionalDirectory> directory,
+      bool abortBeforeMigration = false);
   static QString getShortElementName() noexcept {
     return QStringLiteral("cmp");
   }

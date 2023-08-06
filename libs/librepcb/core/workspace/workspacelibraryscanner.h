@@ -36,7 +36,6 @@ namespace librepcb {
 
 class Library;
 class SQLiteDatabase;
-class TransactionalFileSystem;
 class WorkspaceLibraryDbWriter;
 
 /*******************************************************************************
@@ -81,17 +80,15 @@ signals:
 private:  // Methods
   void run() noexcept override;
   void scan() noexcept;
-  void getLibrariesOfDirectory(std::shared_ptr<TransactionalFileSystem> fs,
-                               const QString& root,
+  void getLibrariesOfDirectory(const QString& root,
                                QList<std::shared_ptr<Library>>& libs) noexcept;
+
   QHash<FilePath, int> updateLibraries(
       SQLiteDatabase& db, WorkspaceLibraryDbWriter& writer,
       const QList<std::shared_ptr<Library>>& libs);
   template <typename ElementType>
-  int addElementsToDb(WorkspaceLibraryDbWriter& writer,
-                      std::shared_ptr<TransactionalFileSystem> fs,
-                      const FilePath& libPath, const QStringList& dirs,
-                      int libId);
+  int addElementsToDb(WorkspaceLibraryDbWriter& writer, const FilePath& libPath,
+                      const QStringList& dirs, int libId);
   template <typename ElementType>
   int addElementToDb(WorkspaceLibraryDbWriter& writer, int libId,
                      const ElementType& element);
@@ -101,6 +98,8 @@ private:  // Methods
   template <typename ElementType>
   void addToCategories(WorkspaceLibraryDbWriter& writer, int elementId,
                        const ElementType& element);
+  template <typename ElementType>
+  std::unique_ptr<ElementType> openAndMigrate(const FilePath& fp);
 
 private:  // Data
   const FilePath mLibrariesPath;  ///< Path to workspace libraries directory.
