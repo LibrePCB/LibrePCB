@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "editabletablewidget.h"
 
+#include "../editorcommandset.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -55,6 +57,29 @@ EditableTableWidget::EditableTableWidget(QWidget* parent) noexcept
   horizontalHeader()->setMinimumSectionSize(5);  // for button columns
   verticalHeader()->setMinimumSectionSize(10);  // more compact rows
   verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+  // Add actions.
+  const EditorCommandSet& cmd = EditorCommandSet::instance();
+  mActionAddRow.reset(cmd.inputAcceptAdd.createAction(
+      this, EditorCommand::ActionFlag::WidgetShortcut));
+  mActionAddRow->setEnabled(false);
+  addAction(mActionAddRow.data());
+  mActionRemoveRow.reset(cmd.remove.createAction(
+      this, this,
+      [this]() {
+        if (mCanRemove && model()) {
+          const QModelIndex index =
+              model()->index(currentIndex().row(), model()->columnCount() - 1);
+          const bool newItemRow =
+              mAddButtonOnLastRow && (index.row() == (model()->rowCount() - 1));
+          if ((index.isValid()) && (!newItemRow)) {
+            emit btnRemoveClicked(index);
+          }
+        }
+      },
+      EditorCommand::ActionFlag::WidgetShortcut));
+  mActionRemoveRow->setEnabled(false);
+  addAction(mActionRemoveRow.data());
 }
 
 EditableTableWidget::~EditableTableWidget() noexcept {
@@ -121,10 +146,14 @@ void EditableTableWidget::currentChanged(const QModelIndex& current,
   QTableView::currentChanged(current, previous);
   if (current.isValid() &&
       (!previous.isValid() || (previous.row() != current.row()))) {
+    mActionAddRow->setEnabled(mAddButtonOnLastRow && model() &&
+                              (current.row() == (model()->rowCount() - 1)));
     emit currentRowChanged(current.row());
   } else if ((!current.isValid()) && previous.isValid()) {
+    mActionAddRow->setEnabled(false);
     emit currentRowChanged(-1);
   }
+  mActionRemoveRow->setEnabled(current.isValid());
 }
 
 void EditableTableWidget::rowsInserted(const QModelIndex& parent, int start,
@@ -212,9 +241,12 @@ void EditableTableWidget::installButtons(int row) noexcept {
       if (mShowEditButton) width += size;
       if (mShowCopyButton) width += size;
       if (mShowMoveButtons) width += 2 * size;
-      layout->addWidget(createButton(
+      QToolButton* btn = createButton(
           "btnAdd", QIcon(":/img/actions/add.png"), "", tr("Add"), width, size,
-          &EditableTableWidget::btnAddClicked, index, true, false));
+          &EditableTableWidget::btnAddClicked, index, true, false);
+      connect(mActionAddRow.data(), &QAction::triggered, btn,
+              &QToolButton::click);
+      layout->addWidget(btn);
     }
     setIndexWidget(index, widget);
   }
