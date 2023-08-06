@@ -148,6 +148,7 @@ std::unique_ptr<Component> Component::open(
   std::unique_ptr<Component> obj(new Component(std::move(directory), root));
   if (!migrations.isEmpty()) {
     obj->removeObsoleteMessageApprovals();
+    obj->save();  // Format all files correctly as the migration doesn't!
   }
   return obj;
 }

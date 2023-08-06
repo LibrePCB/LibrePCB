@@ -81,6 +81,7 @@ std::unique_ptr<ComponentCategory> ComponentCategory::open(
       new ComponentCategory(std::move(directory), root));
   if (!migrations.isEmpty()) {
     obj->removeObsoleteMessageApprovals();
+    obj->save();  // Format all files correctly as the migration doesn't!
   }
   return obj;
 }

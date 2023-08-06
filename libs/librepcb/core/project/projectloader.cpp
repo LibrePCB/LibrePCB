@@ -156,6 +156,12 @@ std::unique_ptr<Project> ProjectLoader::open(
     p->setErcMessageApprovals(p->getErcMessageApprovals() & approvals);
   }
 
+  // Make sure the files are formatted correctly. Also handle possible errors
+  // during serialization now instead of later.
+  if (mUpgradeMessages) {
+    p->save();
+  }
+
   // Done!
   qDebug() << "Successfully opened project in" << timer.elapsed() << "ms.";
   return p;

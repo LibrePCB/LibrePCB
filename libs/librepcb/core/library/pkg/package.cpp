@@ -195,6 +195,7 @@ std::unique_ptr<Package> Package::open(
   std::unique_ptr<Package> obj(new Package(std::move(directory), root));
   if (!migrations.isEmpty()) {
     obj->removeObsoleteMessageApprovals();
+    obj->save();  // Format all files correctly as the migration doesn't!
   }
   return obj;
 }
