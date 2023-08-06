@@ -402,6 +402,11 @@ void TransactionalFileSystem::save() {
   discardChanges();
 }
 
+void TransactionalFileSystem::releaseLock() {
+  mIsWritable = false;
+  mLock.unlockIfLocked();  // can throw
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
