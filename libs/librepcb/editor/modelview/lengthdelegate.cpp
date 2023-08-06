@@ -25,7 +25,6 @@
 #include "../widgets/lengthedit.h"
 
 #include <librepcb/core/types/length.h>
-#include <librepcb/core/utils/toolbox.h>
 
 #include <QtCore>
 
@@ -60,10 +59,7 @@ void LengthDelegate::setUnit(const LengthUnit& unit) noexcept {
 
 QString LengthDelegate::displayText(const QVariant& value,
                                     const QLocale& locale) const {
-  qreal converted = mUnit.convertToUnit(value.value<Length>());
-  return Toolbox::floatToString(converted,
-                                mUnit.getReasonableNumberOfDecimals(), locale) %
-      " " % mUnit.toShortStringTr();
+  return mUnit.format(value.value<Length>(), locale);
 }
 
 QWidget* LengthDelegate::createEditor(QWidget* parent,
