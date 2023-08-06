@@ -105,16 +105,14 @@ bool InitializeWorkspaceWizard_Upgrade::validatePage() noexcept {
     return true;
   }
 
-  if (QAbstractButton* btn = wizard()->button(QWizard::BackButton)) {
-    btn->setEnabled(false);
-  } else {
-    qWarning() << "Could not disable back button in workspace upgrade wizard.";
-  }
-  if (QAbstractButton* btn = wizard()->button(QWizard::FinishButton)) {
-    btn->setEnabled(false);
-  } else {
-    qWarning()
-        << "Could not disable finish button in workspace upgrade wizard.";
+  for (auto btnId :
+       {QWizard::CustomButton1, QWizard::BackButton, QWizard::FinishButton}) {
+    if (QAbstractButton* btn = wizard()->button(btnId)) {
+      btn->setEnabled(false);
+    } else {
+      qWarning() << "Could not disable button in workspace upgrade wizard:"
+                 << btnId;
+    }
   }
   mUi->progressBar->show();
   mCopyOperation->start();
