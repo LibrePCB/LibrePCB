@@ -97,6 +97,7 @@ private:  // Data
   QSet<Uuid> mDependencies;
   QScopedPointer<Ui::OnlineLibraryListWidgetItem> mUi;
   QScopedPointer<LibraryDownload> mLibraryDownload;
+  bool mAutoCheck;
 };
 
 /*******************************************************************************

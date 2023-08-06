@@ -49,12 +49,15 @@ OnlineLibraryListWidgetItem::OnlineLibraryListWidgetItem(
   : QWidget(nullptr),
     mWorkspace(ws),
     mJsonObject(obj),
-    mUi(new Ui::OnlineLibraryListWidgetItem) {
+    mUi(new Ui::OnlineLibraryListWidgetItem),
+    mAutoCheck(true) {
   mUi->setupUi(this);
   mUi->lblIcon->setText("");
   mUi->prgProgress->setVisible(false);
   connect(mUi->cbxDownload, &QCheckBox::toggled, this,
           &OnlineLibraryListWidgetItem::checkedChanged);
+  connect(mUi->cbxDownload, &QCheckBox::clicked, this,
+          [this]() { mAutoCheck = false; });
 
   mUuid = Uuid::tryFromString(mJsonObject.value("uuid").toString());
   mVersion = Version::tryFromString(mJsonObject.value("version").toString());
@@ -108,6 +111,7 @@ bool OnlineLibraryListWidgetItem::isChecked() const noexcept {
 
 void OnlineLibraryListWidgetItem::setChecked(bool checked) noexcept {
   mUi->cbxDownload->setChecked(checked);
+  mAutoCheck = false;
 }
 
 /*******************************************************************************
@@ -226,6 +230,10 @@ void OnlineLibraryListWidgetItem::updateInstalledStatus() noexcept {
       }
       mUi->cbxDownload->setText(tr("Install") % ":");
       mUi->cbxDownload->setVisible(true);
+    }
+    if (mAutoCheck) {
+      mUi->cbxDownload->setChecked(
+          installedVersion ? (installedVersion < mVersion) : mIsRecommended);
     }
   } else {
     mUi->lblInstalledVersion->setText(tr("Error: Invalid UUID"));

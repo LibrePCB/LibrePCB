@@ -40,11 +40,19 @@ def test(librepcb, helpers):
             assert statuslabel.properties()['text'] == 'Recommended'
             statuslabels.append(statuslabel)
             checkbox = app.widget(path=item_path + '::cbxDownload')
-            assert checkbox.properties()['checked'] is False
+            assert checkbox.properties()['checked'] is True  # Recommended
             checkboxes.append(checkbox)
             progressbar = app.widget(path=item_path + '::prgProgress', wait_active=False)
             assert progressbar.properties()['value'] == 0
             progressbars.append(progressbar)
+
+        # Deselect first library to install -> this must also uncheck the
+        # other libraries because it's a dependency!
+        checkboxes[0].set_property('checked', False)
+
+        # Verify checked state of all libraries
+        for i in range(0, remote_library_count):
+            assert checkboxes[i].properties()['checked'] is False
 
         # Select second library to install -> this must also check the first
         # library because it's a dependency!
