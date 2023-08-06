@@ -128,6 +128,10 @@ public:
     Q_UNUSED(locked);
     return false;
   }
+  virtual bool processChangeLineWidth(int step) noexcept {
+    Q_UNUSED(step);
+    return false;
+  }
   virtual bool processResetAllTexts() noexcept { return false; }
   virtual bool processRemove() noexcept { return false; }
   virtual bool processEditProperties() noexcept { return false; }

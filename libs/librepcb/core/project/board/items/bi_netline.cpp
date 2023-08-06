@@ -143,6 +143,9 @@ UnsignedLength BI_NetLine::getLength() const noexcept {
  ******************************************************************************/
 
 void BI_NetLine::setLayer(const Layer& layer) {
+  if (layer == mTrace.getLayer()) {
+    return;
+  }
   if (isAddedToBoard() || (!layer.isCopper())) {
     throw LogicError(__FILE__, __LINE__);
   }

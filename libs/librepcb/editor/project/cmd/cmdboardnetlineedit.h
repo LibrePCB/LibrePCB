@@ -51,6 +51,9 @@ public:
   explicit CmdBoardNetLineEdit(BI_NetLine& netline) noexcept;
   ~CmdBoardNetLineEdit() noexcept;
 
+  // Getters
+  BI_NetLine& getObj() const noexcept { return mNetLine; }
+
   // Setters
   void setLayer(const Layer& layer) noexcept;
   void setWidth(const PositiveLength& width) noexcept;

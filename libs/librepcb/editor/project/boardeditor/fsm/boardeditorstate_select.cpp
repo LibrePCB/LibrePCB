@@ -33,6 +33,7 @@
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
 #include "../../../widgets/graphicsview.h"
+#include "../../../widgets/unsignedlengthedit.h"
 #include "../../cmd/cmdadddevicetoboard.h"
 #include "../../cmd/cmdboardplaneedit.h"
 #include "../../cmd/cmdboardpolygonedit.h"
@@ -86,6 +87,7 @@
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 
@@ -382,6 +384,17 @@ bool BoardEditorState_Select::processSetLocked(bool locked) noexcept {
     return false;
   }
   return lockSelectedItems(locked);
+}
+
+bool BoardEditorState_Select::processChangeLineWidth(int step) noexcept {
+  // Discard any temporary changes and release undo stack.
+  abortBlockingToolsInOtherEditors();
+
+  if (mIsUndoCmdActive || mSelectedItemsDragCommand || mCmdPolygonEdit ||
+      mCmdPlaneEdit || mCmdZoneEdit) {
+    return false;
+  }
+  return changeWidthOfSelectedItems(step);
 }
 
 bool BoardEditorState_Select::processResetAllTexts() noexcept {
@@ -853,6 +866,8 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       modMenu->setEnabled(!modMenu->isEmpty());
     } else if (auto netline =
                    std::dynamic_pointer_cast<BGI_NetLine>(selectedItem)) {
+      mb.addAction(cmd.setLineWidth.createAction(
+          &menu, this, [this]() { changeWidthOfSelectedItems(0); }));
       mb.addAction(cmd.remove.createAction(
           &menu, this, [this]() { removeSelectedItems(); }));
       mb.addAction(cmd.traceRemoveWhole.createAction(
@@ -1198,7 +1213,7 @@ bool BoardEditorState_Select::startMovingSelectedItems(
     BoardGraphicsScene& scene, const Point& startPos) noexcept {
   Q_ASSERT(mSelectedItemsDragCommand.isNull());
   mSelectedItemsDragCommand.reset(
-      new CmdDragSelectedBoardItems(scene, getIgnoreLocks(), startPos));
+      new CmdDragSelectedBoardItems(scene, getIgnoreLocks(), false, startPos));
   return true;
 }
 
@@ -1207,8 +1222,8 @@ bool BoardEditorState_Select::moveSelectedItems(const Point& delta) noexcept {
   if ((!scene) || (mSelectedItemsDragCommand)) return false;
 
   try {
-    QScopedPointer<CmdDragSelectedBoardItems> cmd(
-        new CmdDragSelectedBoardItems(*scene, getIgnoreLocks(), Point(0, 0)));
+    QScopedPointer<CmdDragSelectedBoardItems> cmd(new CmdDragSelectedBoardItems(
+        *scene, getIgnoreLocks(), false, Point(0, 0)));
     cmd->setCurrentPosition(delta);
     return execCmd(cmd.take());
   } catch (const Exception& e) {
@@ -1278,6 +1293,95 @@ bool BoardEditorState_Select::lockSelectedItems(bool locked) noexcept {
         new CmdDragSelectedBoardItems(*scene, true));
     cmd->setLocked(locked);
     mContext.undoStack.execCmd(cmd.take());
+    return true;
+  } catch (const Exception& e) {
+    QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
+    return false;
+  }
+}
+
+bool BoardEditorState_Select::changeWidthOfSelectedItems(int step) noexcept {
+  BoardGraphicsScene* scene = getActiveBoardScene();
+  if (!scene) return false;
+
+  try {
+    QScopedPointer<CmdDragSelectedBoardItems> cmd(
+        new CmdDragSelectedBoardItems(*scene, true, true));
+    if (!cmd->hasAnythingSelected()) {
+      return false;
+    }
+    const UnsignedLength currentWidth = cmd->getMedianLineWidth();
+    tl::optional<UnsignedLength> width;
+    if (step != 0) {
+      QSet<UnsignedLength> widths;
+      auto addWidth = [&currentWidth, &widths, step](const UnsignedLength& w) {
+        if ((w != currentWidth) && ((w > currentWidth) == (step > 0))) {
+          widths.insert(w);
+        }
+      };
+      if (cmd->hasTracesSelected()) {
+        foreach (const BI_NetSegment* netSegment,
+                 scene->getBoard().getNetSegments()) {
+          foreach (const BI_NetLine* netLine, netSegment->getNetLines()) {
+            addWidth(positiveToUnsigned(netLine->getWidth()));
+          }
+        }
+      }
+      if (cmd->hasPolygonsSelected()) {
+        foreach (const BI_Polygon* polygon, scene->getBoard().getPolygons()) {
+          addWidth(polygon->getData().getLineWidth());
+        }
+      }
+      if (cmd->hasStrokeTextsSelected()) {
+        foreach (const BI_StrokeText* text,
+                 scene->getBoard().getStrokeTexts()) {
+          addWidth(text->getData().getStrokeWidth());
+        }
+        foreach (const BI_Device* device,
+                 scene->getBoard().getDeviceInstances()) {
+          foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
+            addWidth(text->getData().getStrokeWidth());
+          }
+        }
+      }
+      if (!widths.isEmpty()) {
+        if (step > 0) {
+          width = *std::min_element(widths.begin(), widths.end());
+        } else {
+          width = *std::max_element(widths.begin(), widths.end());
+        }
+      }
+      // Else: Show the dialog to enter a custom value.
+    }
+    if (!width) {
+      QDialog dlg(&mContext.editor);
+      dlg.setWindowTitle(tr("Set Width"));
+      QVBoxLayout* vLayout = new QVBoxLayout(&dlg);
+      UnsignedLengthEdit* edtWidth = new UnsignedLengthEdit(&dlg);
+      edtWidth->configure(
+          mContext.workspace.getSettings().defaultLengthUnit.get(),
+          LengthEditBase::Steps::generic(),
+          "board_editor/set_line_width_dialog");
+      edtWidth->setValue(currentWidth);
+      edtWidth->setFocus();
+      vLayout->addWidget(edtWidth);
+      QDialogButtonBox* btnBox = new QDialogButtonBox(&dlg);
+      btnBox->setStandardButtons(QDialogButtonBox::Ok |
+                                 QDialogButtonBox::Cancel);
+      connect(btnBox, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+      connect(btnBox, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+      vLayout->addWidget(btnBox);
+      if (dlg.exec() != QDialog::Accepted) {
+        return false;
+      }
+      width = edtWidth->getValue();
+    }
+    cmd->setLineWidth(*width);
+    mContext.undoStack.execCmd(cmd.take());
+    emit statusBarMessageChanged(
+        mContext.workspace.getSettings().defaultLengthUnit.get().format(
+            **width, mContext.editor.locale()),
+        5000);
     return true;
   } catch (const Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());
@@ -1488,8 +1592,8 @@ bool BoardEditorState_Select::startPaste(
       mIsUndoCmdActive = false;
     } else {
       // Start moving the selected items.
-      mSelectedItemsDragCommand.reset(
-          new CmdDragSelectedBoardItems(scene, true, startPos));  // can throw
+      mSelectedItemsDragCommand.reset(new CmdDragSelectedBoardItems(
+          scene, true, false, startPos));  // can throw
     }
     return true;
   } else {

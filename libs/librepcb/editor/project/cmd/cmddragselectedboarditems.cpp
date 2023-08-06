@@ -25,6 +25,7 @@
 #include "../boardeditor/boardgraphicsscene.h"
 #include "../boardeditor/boardselectionquery.h"
 #include "cmdboardholeedit.h"
+#include "cmdboardnetlineedit.h"
 #include "cmdboardnetpointedit.h"
 #include "cmdboardplaneedit.h"
 #include "cmdboardpolygonedit.h"
@@ -37,6 +38,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
+#include <librepcb/core/project/board/items/bi_netline.h>
 #include <librepcb/core/project/board/items/bi_netpoint.h>
 #include <librepcb/core/project/board/items/bi_polygon.h>
 #include <librepcb/core/project/board/items/bi_stroketext.h>
@@ -57,7 +59,7 @@ namespace editor {
  ******************************************************************************/
 
 CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
-    BoardGraphicsScene& scene, bool includeLockedItems,
+    BoardGraphicsScene& scene, bool includeLockedItems, bool includeNetLines,
     const Point& startPos) noexcept
   : UndoCommandGroup(tr("Drag Board Elements")),
     mScene(scene),
@@ -68,12 +70,16 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     mDeltaAngle(0),
     mSnappedToGrid(false),
     mLockedChanged(false),
+    mLineWidthChanged(false),
     mTextsReset(false) {
   // get all selected items
   BoardSelectionQuery query(mScene, includeLockedItems);
   query.addDeviceInstancesOfSelectedFootprints();
   query.addSelectedVias();
   query.addSelectedNetPoints();
+  if (includeNetLines) {
+    query.addSelectedNetLines();
+  }
   query.addSelectedNetLines();
   query.addNetPointsOfNetLines();
   query.addSelectedPlanes();
@@ -105,6 +111,14 @@ CmdDragSelectedBoardItems::CmdDragSelectedBoardItems(
     ++mItemCount;
     CmdBoardNetPointEdit* cmd = new CmdBoardNetPointEdit(*netpoint);
     mNetPointEditCmds.append(cmd);
+  }
+  foreach (BI_NetLine* netline, query.getNetLines()) {
+    Q_ASSERT(netline);
+    mCenterPos += netline->getStartPoint().getPosition();
+    mCenterPos += netline->getEndPoint().getPosition();
+    mItemCount += 2;
+    CmdBoardNetLineEdit* cmd = new CmdBoardNetLineEdit(*netline);
+    mNetLineEditCmds.append(cmd);
   }
   foreach (BI_Plane* plane, query.getPlanes()) {
     Q_ASSERT(plane);
@@ -163,6 +177,25 @@ CmdDragSelectedBoardItems::~CmdDragSelectedBoardItems() noexcept {
 }
 
 /*******************************************************************************
+ *  Getters
+ ******************************************************************************/
+
+UnsignedLength CmdDragSelectedBoardItems::getMedianLineWidth() const noexcept {
+  QList<UnsignedLength> values;
+  foreach (CmdBoardNetLineEdit* cmd, mNetLineEditCmds) {
+    values.append(positiveToUnsigned(cmd->getObj().getWidth()));
+  }
+  foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
+    values.append(cmd->getObj().getData().getLineWidth());
+  }
+  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+    values.append(cmd->getObj().getData().getStrokeWidth());
+  }
+  std::sort(values.begin(), values.end());
+  return values.value(values.count() / 2, UnsignedLength(0));
+}
+
+/*******************************************************************************
  *  General Methods
  ******************************************************************************/
 
@@ -211,6 +244,22 @@ void CmdDragSelectedBoardItems::setLocked(bool locked) noexcept {
   }
   foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) { cmd->setLocked(locked); }
   mLockedChanged = true;
+}
+
+void CmdDragSelectedBoardItems::setLineWidth(
+    const UnsignedLength& width) noexcept {
+  if (width > 0) {
+    foreach (CmdBoardNetLineEdit* cmd, mNetLineEditCmds) {
+      cmd->setWidth(PositiveLength(*width));
+    }
+  }
+  foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->setLineWidth(width, false);
+  }
+  foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
+    cmd->setStrokeWidth(width, false);
+  }
+  mLineWidthChanged = true;
 }
 
 void CmdDragSelectedBoardItems::resetAllTexts() noexcept {
@@ -303,7 +352,8 @@ void CmdDragSelectedBoardItems::rotate(const Angle& angle,
 
 bool CmdDragSelectedBoardItems::performExecute() {
   if (mDeltaPos.isOrigin() && (mDeltaAngle == Angle::deg0()) &&
-      (!mSnappedToGrid) && (!mTextsReset) && (!mLockedChanged)) {
+      (!mSnappedToGrid) && (!mTextsReset) && (!mLockedChanged) &&
+      (!mLineWidthChanged)) {
     // no movement required --> discard all commands
     qDeleteAll(mDeviceEditCmds);
     mDeviceEditCmds.clear();
@@ -313,6 +363,8 @@ bool CmdDragSelectedBoardItems::performExecute() {
     mViaEditCmds.clear();
     qDeleteAll(mNetPointEditCmds);
     mNetPointEditCmds.clear();
+    qDeleteAll(mNetLineEditCmds);
+    mNetLineEditCmds.clear();
     qDeleteAll(mPlaneEditCmds);
     mPlaneEditCmds.clear();
     qDeleteAll(mZoneEditCmds);
@@ -341,6 +393,9 @@ bool CmdDragSelectedBoardItems::performExecute() {
     appendChild(cmd);  // can throw
   }
   foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
+    appendChild(cmd);  // can throw
+  }
+  foreach (CmdBoardNetLineEdit* cmd, mNetLineEditCmds) {
     appendChild(cmd);  // can throw
   }
   foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {

@@ -51,6 +51,9 @@ public:
   explicit CmdBoardStrokeTextEdit(BI_StrokeText& text) noexcept;
   ~CmdBoardStrokeTextEdit() noexcept;
 
+  // Getters
+  BI_StrokeText& getObj() const noexcept { return mText; }
+
   // Setters
   void setLayer(const Layer& layer, bool immediate) noexcept;
   void setText(const QString& text, bool immediate) noexcept;

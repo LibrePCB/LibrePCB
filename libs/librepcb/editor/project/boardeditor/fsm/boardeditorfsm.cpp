@@ -244,6 +244,15 @@ bool BoardEditorFsm::processSetLocked(bool locked) noexcept {
   return false;
 }
 
+bool BoardEditorFsm::processChangeLineWidth(int step) noexcept {
+  if (BoardEditorState* state = getCurrentStateObj()) {
+    if (state->processChangeLineWidth(step)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool BoardEditorFsm::processResetAllTexts() noexcept {
   if (BoardEditorState* state = getCurrentStateObj()) {
     if (state->processResetAllTexts()) {

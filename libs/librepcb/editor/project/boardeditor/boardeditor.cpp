@@ -734,6 +734,12 @@ void BoardEditor::createActions() noexcept {
       this, this, [this]() { mFsm->processSetLocked(false); }));
   mActionResetAllTexts.reset(cmd.deviceResetTextAll.createAction(
       this, mFsm.data(), &BoardEditorFsm::processResetAllTexts));
+  mActionIncreaseLineWidth.reset(cmd.lineWidthIncrease.createAction(
+      this, this, [this]() { mFsm->processChangeLineWidth(1); }));
+  mActionDecreaseLineWidth.reset(cmd.lineWidthDecrease.createAction(
+      this, this, [this]() { mFsm->processChangeLineWidth(-1); }));
+  mActionChangeLineWidth.reset(cmd.setLineWidth.createAction(
+      this, this, [this]() { mFsm->processChangeLineWidth(0); }));
   mActionProperties.reset(cmd.properties.createAction(
       this, mFsm.data(), &BoardEditorFsm::processEditProperties));
   mActionRemove.reset(cmd.remove.createAction(this, mFsm.data(),
@@ -1022,6 +1028,12 @@ void BoardEditor::createMenus() noexcept {
   mb.addAction(mActionLock);
   mb.addAction(mActionUnlock);
   mb.addAction(mActionResetAllTexts);
+  {
+    MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createLineWidthMenu));
+    smb.addAction(mActionIncreaseLineWidth);
+    smb.addAction(mActionDecreaseLineWidth);
+    smb.addAction(mActionChangeLineWidth);
+  }
   mb.addSeparator();
   mb.addAction(mActionFind);
   mb.addAction(mActionFindNext);

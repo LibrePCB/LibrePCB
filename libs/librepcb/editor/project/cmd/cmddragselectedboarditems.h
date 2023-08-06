@@ -38,6 +38,7 @@ namespace editor {
 
 class BoardGraphicsScene;
 class CmdBoardHoleEdit;
+class CmdBoardNetLineEdit;
 class CmdBoardNetPointEdit;
 class CmdBoardPlaneEdit;
 class CmdBoardPolygonEdit;
@@ -59,12 +60,27 @@ public:
   // Constructors / Destructor
   explicit CmdDragSelectedBoardItems(BoardGraphicsScene& scene,
                                      bool includeLockedItems,
+                                     bool includeNetLines = false,
                                      const Point& startPos = Point()) noexcept;
   ~CmdDragSelectedBoardItems() noexcept;
+
+  // Getters
+  bool hasAnythingSelected() const noexcept { return mItemCount > 0; }
+  bool hasTracesSelected() const noexcept {
+    return !mNetLineEditCmds.isEmpty();
+  }
+  bool hasPolygonsSelected() const noexcept {
+    return !mPolygonEditCmds.isEmpty();
+  }
+  bool hasStrokeTextsSelected() const noexcept {
+    return !mStrokeTextEditCmds.isEmpty();
+  }
+  UnsignedLength getMedianLineWidth() const noexcept;
 
   // General Methods
   void snapToGrid() noexcept;
   void setLocked(bool locked) noexcept;
+  void setLineWidth(const UnsignedLength& width) noexcept;
   void resetAllTexts() noexcept;
   void setCurrentPosition(const Point& pos,
                           const bool gridIncrement = true) noexcept;
@@ -85,6 +101,7 @@ private:
   Angle mDeltaAngle;
   bool mSnappedToGrid;
   bool mLockedChanged;
+  bool mLineWidthChanged;
   bool mTextsReset;
 
   // Move commands
@@ -92,6 +109,7 @@ private:
   QList<CmdDeviceStrokeTextsReset*> mDeviceStrokeTextsResetCmds;
   QList<CmdBoardViaEdit*> mViaEditCmds;
   QList<CmdBoardNetPointEdit*> mNetPointEditCmds;
+  QList<CmdBoardNetLineEdit*> mNetLineEditCmds;
   QList<CmdBoardPlaneEdit*> mPlaneEditCmds;
   QList<CmdBoardZoneEdit*> mZoneEditCmds;
   QList<CmdBoardPolygonEdit*> mPolygonEditCmds;

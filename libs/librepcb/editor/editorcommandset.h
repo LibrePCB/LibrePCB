@@ -724,6 +724,16 @@ public:
       {QKeySequence(Qt::CTRL + Qt::Key_U)},
       &categoryModify,
   };
+  EditorCommand setLineWidth{
+      "line_width_set",  // clang-format break
+      QT_TR_NOOP("Set Line Width"),
+      QT_TR_NOOP(
+          "Change the line/trace/stroke width of the selected object(s)"),
+      QIcon(),
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryModify,
+  };
   EditorCommand deviceResetTextAll{
       "device_reset_text_all",  // clang-format break
       QT_TR_NOOP("Reset All Texts"),

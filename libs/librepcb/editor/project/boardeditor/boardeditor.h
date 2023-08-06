@@ -263,6 +263,9 @@ private:
   QScopedPointer<QAction> mActionLock;
   QScopedPointer<QAction> mActionUnlock;
   QScopedPointer<QAction> mActionResetAllTexts;
+  QScopedPointer<QAction> mActionIncreaseLineWidth;
+  QScopedPointer<QAction> mActionDecreaseLineWidth;
+  QScopedPointer<QAction> mActionChangeLineWidth;
   QScopedPointer<QAction> mActionProperties;
   QScopedPointer<QAction> mActionRemove;
   QScopedPointer<QAction> mActionShowPlanes;

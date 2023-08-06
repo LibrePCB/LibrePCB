@@ -167,6 +167,10 @@ QMenu* MenuBuilder::createProductionDataMenu(QWidget* parent) noexcept {
                     QIcon(":/img/actions/export_pick_place_file.png"), parent);
 }
 
+QMenu* MenuBuilder::createLineWidthMenu(QWidget* parent) noexcept {
+  return createMenu("menuLineWidth", tr("Line &Width"), QIcon(), parent);
+}
+
 QMenu* MenuBuilder::createChangeDeviceMenu(QWidget* parent) noexcept {
   return createMenu("menuChangeDevice", tr("Change &Device"),
                     QIcon(":/img/library/package.png"), parent);
