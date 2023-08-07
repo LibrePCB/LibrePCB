@@ -51,7 +51,10 @@ namespace editor {
  ******************************************************************************/
 
 AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
-  : QWidget(nullptr), mWorkspace(ws), mUi(new Ui::AddLibraryWidget) {
+  : QWidget(nullptr),
+    mWorkspace(ws),
+    mUi(new Ui::AddLibraryWidget),
+    mManualCheckStateForAllRemoteLibraries(false) {
   mUi->setupUi(this);
   connect(mUi->btnDownloadZip, &QPushButton::clicked, this,
           &AddLibraryWidget::downloadZippedLibraryButtonClicked);
@@ -68,6 +71,8 @@ AddLibraryWidget::AddLibraryWidget(Workspace& ws) noexcept
             DesktopServices ds(mWorkspace.getSettings(), this);
             ds.openWebUrl(QUrl(url));
           });
+  connect(mUi->cbxOnlineLibrariesSelectAll, &QCheckBox::clicked, this,
+          [this]() { mManualCheckStateForAllRemoteLibraries = true; });
 
   // Hide text in library list since text is displayed with custom item
   // widgets, but list item texts are still set for keyboard navigation.
@@ -379,7 +384,9 @@ void AddLibraryWidget::onlineLibraryListReceived(
   foreach (const QJsonValue& libVal, libs) {
     OnlineLibraryListWidgetItem* widget =
         new OnlineLibraryListWidgetItem(mWorkspace, libVal.toObject());
-    widget->setChecked(mUi->cbxOnlineLibrariesSelectAll->isChecked());
+    if (mManualCheckStateForAllRemoteLibraries) {
+      widget->setChecked(mUi->cbxOnlineLibrariesSelectAll->isChecked());
+    }
     connect(mUi->cbxOnlineLibrariesSelectAll, &QCheckBox::clicked, widget,
             &OnlineLibraryListWidgetItem::setChecked);
     connect(widget, &OnlineLibraryListWidgetItem::checkedChanged, this,

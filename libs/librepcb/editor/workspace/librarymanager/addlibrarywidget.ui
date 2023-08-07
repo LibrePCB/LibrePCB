@@ -47,7 +47,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="lstOnlineLibraries"/>
+        <widget class="QListWidget" name="lstOnlineLibraries">
+         <property name="verticalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">

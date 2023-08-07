@@ -92,6 +92,7 @@ private:  // Data
   QScopedPointer<Ui::AddLibraryWidget> mUi;
   QScopedPointer<LibraryDownload> mManualLibraryDownload;
   QList<std::shared_ptr<ApiEndpoint>> mApiEndpoints;
+  bool mManualCheckStateForAllRemoteLibraries;
 };
 
 /*******************************************************************************

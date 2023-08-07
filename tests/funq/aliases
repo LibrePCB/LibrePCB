@@ -105,6 +105,7 @@ libraryManagerInstallLibrariesTab = {libraryManagerAddLibraryStackedWidget}::tab
 libraryManagerInstallLibrariesLibraryList = {libraryManagerInstallLibrariesTab}::lstOnlineLibraries
 libraryManagerInstallLibrariesLibraryListViewport = {libraryManagerInstallLibrariesLibraryList}::qt_scrollarea_viewport
 libraryManagerInstallLibrariesLibraryListItem = {libraryManagerInstallLibrariesLibraryListViewport}::librepcb__editor__OnlineLibraryListWidgetItem
+libraryManagerInstallLibrariesSelectAllCheckBox = {libraryManagerInstallLibrariesTab}::cbxOnlineLibrariesSelectAll
 libraryManagerInstallLibrariesDownloadButton = {libraryManagerInstallLibrariesTab}::btnOnlineLibrariesDownload
 
 # Create local library tab
