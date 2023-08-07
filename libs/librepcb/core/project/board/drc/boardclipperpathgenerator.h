@@ -69,11 +69,13 @@ public:
   // General Methods
   void addCopper(const Layer& layer, const QSet<const NetSignal*>& netsignals,
                  bool ignorePlanes = false);
+  void addStopMaskOpenings(const Layer& layer,
+                           const Length& offset = Length(0));
   void addVia(const BI_Via& via, const Length& offset = Length(0));
   void addNetLine(const BI_NetLine& netLine, const Length& offset = Length(0));
   void addPlane(const BI_Plane& plane);
   void addPolygon(const Path& path, const UnsignedLength& lineWidth,
-                  bool filled);
+                  bool filled, const Length& offset = Length(0));
   void addCircle(const Circle& circle, const Transform& transform,
                  const Length& offset = Length(0));
   void addStrokeText(const BI_StrokeText& strokeText,

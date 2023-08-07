@@ -26,6 +26,7 @@
 #include "../../../geometry/hole.h"
 #include "../../../geometry/polygon.h"
 #include "../../../library/pkg/packagepad.h"
+#include "../../../utils/transform.h"
 #include "../../circuit/componentinstance.h"
 #include "../../circuit/netsignal.h"
 #include "../board.h"
@@ -273,6 +274,37 @@ DrcMsgUnconnectedJunction::DrcMsgUnconnectedJunction(
 }
 
 /*******************************************************************************
+ *  DrcMsgMinimumTextHeightViolation
+ ******************************************************************************/
+
+DrcMsgMinimumTextHeightViolation::DrcMsgMinimumTextHeightViolation(
+    const BI_StrokeText& text, const UnsignedLength& minHeight,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Text height on '%1': %2 < %3 %4",
+           "Placeholders: Layer name, actual height, minimum height, unit")
+            .arg(text.getData().getLayer().getNameTr(),
+                 text.getData().getHeight()->toMmString(),
+                 minHeight->toMmString(), "mm"),
+        tr("The text height is smaller than the minimum height configured "
+           "in the DRC settings. If the text is smaller than the minimum "
+           "height specified by the PCB manufacturer, it may not be readable "
+           "after production.") %
+            "\n\n" %
+            tr("Check the DRC settings and increase the text height if "
+               "needed."),
+        "minimum_text_height_violation", locations) {
+  mApproval.ensureLineBreak();
+  if (const BI_Device* device = text.getDevice()) {
+    mApproval.appendChild("device", device->getComponentInstanceUuid());
+    mApproval.ensureLineBreak();
+  }
+  mApproval.appendChild("stroke_text", text.getData().getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  DrcMsgMinimumWidthViolation
  ******************************************************************************/
 
@@ -321,6 +353,27 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
 }
 
 DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
+    const BI_Polygon& polygon, const UnsignedLength& minWidth,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Polygon width on '%1': %2 < %3 %4",
+           "Placeholders: Layer name, actual width, minimum width, unit")
+            .arg(polygon.getData().getLayer().getNameTr(),
+                 polygon.getData().getLineWidth()->toMmString(),
+                 minWidth->toMmString(), "mm"),
+        tr("The polygon line width is smaller than the minimum width "
+           "configured in the DRC settings.") %
+            "\n\n" %
+            tr("Check the DRC settings and increase the polygon line width if "
+               "needed."),
+        "minimum_width_violation", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("polygon", polygon.getData().getUuid());
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
     const BI_StrokeText& text, const UnsignedLength& minWidth,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
@@ -330,8 +383,8 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
             .arg(text.getData().getLayer().getNameTr(),
                  text.getData().getStrokeWidth()->toMmString(),
                  minWidth->toMmString(), "mm"),
-        tr("The text stroke width is smaller than the minimum copper width "
-           "configured in the DRC settings.") %
+        tr("The text stroke width is smaller than the minimum width configured "
+           "in the DRC settings.") %
             "\n\n" %
             tr("Check the DRC settings and increase the text stroke width if "
                "needed."),
@@ -342,6 +395,57 @@ DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
     mApproval.ensureLineBreak();
   }
   mApproval.appendChild("stroke_text", text.getData().getUuid());
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
+    const BI_Device& device, const Polygon& polygon,
+    const UnsignedLength& minWidth, const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Polygon width of '%1' on '%2': %3 < %4 %5",
+           "Placeholders: Device name, layer name, actual width, minimum "
+           "width, unit")
+            .arg(*device.getComponentInstance().getName(),
+                 Transform(device).map(polygon.getLayer()).getNameTr(),
+                 polygon.getLineWidth()->toMmString(), minWidth->toMmString(),
+                 "mm"),
+        tr("The polygon line width is smaller than the minimum width "
+           "configured "
+           "in the DRC settings.") %
+            "\n\n" %
+            tr("Check the DRC settings and increase the polygon line width if "
+               "needed."),
+        "minimum_width_violation", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("polygon", polygon.getUuid());
+  mApproval.ensureLineBreak();
+}
+
+DrcMsgMinimumWidthViolation::DrcMsgMinimumWidthViolation(
+    const BI_Device& device, const Circle& circle,
+    const UnsignedLength& minWidth, const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Circle width of '%1' on '%2': %3 < %4 %5",
+           "Placeholders: Device name, layer name, actual width, minimum "
+           "width, unit")
+            .arg(*device.getComponentInstance().getName(),
+                 Transform(device).map(circle.getLayer()).getNameTr(),
+                 circle.getLineWidth()->toMmString(), minWidth->toMmString(),
+                 "mm"),
+        tr("The circle line width is smaller than the minimum width configured "
+           "in the DRC settings.") %
+            "\n\n" %
+            tr("Check the DRC settings and increase the circle line width if "
+               "needed."),
+        "minimum_width_violation", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("circle", circle.getUuid());
   mApproval.ensureLineBreak();
 }
 
@@ -596,7 +700,7 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
 }
 
 DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
-    const BI_Device* device, const Circle& circle,
+    const BI_Device& device, const Circle& circle,
     const UnsignedLength& minClearance, const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
@@ -610,10 +714,8 @@ DrcMsgCopperBoardClearanceViolation::DrcMsgCopperBoardClearanceViolation(
                "outline if needed."),
         "copper_board_clearance_violation", locations) {
   mApproval.ensureLineBreak();
-  if (device) {
-    mApproval.appendChild("device", device->getComponentInstanceUuid());
-    mApproval.ensureLineBreak();
-  }
+  mApproval.appendChild("device", device.getComponentInstanceUuid());
+  mApproval.ensureLineBreak();
   mApproval.appendChild("circle", circle.getUuid());
   mApproval.ensureLineBreak();
 }
@@ -1501,6 +1603,36 @@ QString DrcMsgForbiddenVia::determineDescription(const BI_Via& via) noexcept {
               "manufacturer is able to create them.") %
         suggestion;
   }
+}
+
+/*******************************************************************************
+ *  Class DrcMsgSilkscreenClearanceViolation
+ ******************************************************************************/
+
+DrcMsgSilkscreenClearanceViolation::DrcMsgSilkscreenClearanceViolation(
+    const BI_StrokeText& strokeText, const UnsignedLength& minClearance,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Clearance silkscreen text ↔ stop mask < %1 %2",
+           "Placeholders: Clearance value, unit")
+            .arg(minClearance->toMmString(), "mm"),
+        tr("The clearance between a silkscreen text and a solder resist "
+           "opening "
+           "is smaller than the minimum clearance configured in the DRC "
+           "settings. This could lead to clipped silkscreen during "
+           "production.") %
+            "\n\n" %
+            tr("Check the DRC settings and move the text away from the "
+               "solder resist opening if needed."),
+        "silkscreen_clearance_violation", locations) {
+  mApproval.ensureLineBreak();
+  if (const BI_Device* device = strokeText.getDevice()) {
+    mApproval.appendChild("device", device->getComponentInstanceUuid());
+    mApproval.ensureLineBreak();
+  }
+  mApproval.appendChild("stroke_text", strokeText.getData().getUuid());
+  mApproval.ensureLineBreak();
 }
 
 /*******************************************************************************

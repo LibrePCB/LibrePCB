@@ -100,14 +100,17 @@ void BoardDesignRuleCheck::execute(bool quick) {
   checkCopperHoleClearances(44);  // 10%
 
   if (!quick) {
-    checkDrillDrillClearances(49);  // 5%
-    checkDrillBoardClearances(54);  // 5%
-    checkMinimumPthAnnularRing(59);  // 5%
+    checkDrillDrillClearances(48);  // 4%
+    checkDrillBoardClearances(52);  // 4%
+    checkSilkscreenStopmaskClearances(56);  // 4%
+    checkMinimumPthAnnularRing(59);  // 3%
     checkMinimumNpthDrillDiameter(61);  // 2%
     checkMinimumNpthSlotWidth(63);  // 2%
     checkMinimumPthDrillDiameter(65);  // 2%
     checkMinimumPthSlotWidth(67);  // 2%
-    checkZones(72);  // 5%
+    checkMinimumSilkscreenWidth(68);  // 1%
+    checkMinimumSilkscreenTextHeight(69);  // 1%
+    checkZones(72);  // 3%
     checkVias(74);  // 2%
     checkAllowedNpthSlots(75);  // 1%
     checkAllowedPthSlots(76);  // 1%
@@ -134,84 +137,6 @@ void BoardDesignRuleCheck::rebuildPlanes(int progressEnd) {
   emitStatus(tr("Rebuild planes..."));
   BoardPlaneFragmentsBuilder builder;
   builder.runSynchronously(mBoard);  // can throw
-  emitProgress(progressEnd);
-}
-
-void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
-  const UnsignedLength minWidth = mSettings.getMinCopperWidth();
-  if (minWidth == 0) {
-    return;
-  }
-
-  emitStatus(tr("Check copper widths..."));
-
-  // stroke texts
-  foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
-    if (!mBoard.getCopperLayers().contains(&text->getData().getLayer())) {
-      continue;
-    }
-    if (text->getData().getStrokeWidth() < minWidth) {
-      QVector<Path> locations;
-      Transform transform(text->getData());
-      foreach (Path path, transform.map(text->getPaths())) {
-        locations += path.toOutlineStrokes(PositiveLength(
-            qMax(*text->getData().getStrokeWidth(), Length(50000))));
-      }
-      emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(*text, minWidth,
-                                                                locations));
-    }
-  }
-
-  // planes
-  foreach (const BI_Plane* plane, mBoard.getPlanes()) {
-    if (!mBoard.getCopperLayers().contains(&plane->getLayer())) {
-      continue;
-    }
-    if (plane->getMinWidth() < minWidth) {
-      const QVector<Path> locations =
-          plane->getOutline().toClosedPath().toOutlineStrokes(
-              PositiveLength(200000));
-      emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
-          *plane, minWidth, locations));
-    }
-  }
-
-  // devices
-  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-    foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
-      // Do *not* mirror layer since it is independent of the device!
-      if (!mBoard.getCopperLayers().contains(&text->getData().getLayer())) {
-        continue;
-      }
-      if (text->getData().getStrokeWidth() < minWidth) {
-        QVector<Path> locations;
-        Transform transform(text->getData());
-        foreach (Path path, transform.map(text->getPaths())) {
-          locations += path.toOutlineStrokes(PositiveLength(
-              qMax(*text->getData().getStrokeWidth(), Length(50000))));
-        }
-        emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
-            *text, minWidth, locations));
-      }
-    }
-  }
-
-  // netlines
-  foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
-    foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
-      if (!mBoard.getCopperLayers().contains(&netline->getLayer())) {
-        continue;
-      }
-      if (netline->getWidth() < minWidth) {
-        const QVector<Path> locations{Path::obround(
-            netline->getStartPoint().getPosition(),
-            netline->getEndPoint().getPosition(), netline->getWidth())};
-        emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
-            *netline, minWidth, locations));
-      }
-    }
-  }
-
   emitProgress(progressEnd);
 }
 
@@ -379,7 +304,8 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
     // Polygons.
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      if (mBoard.getCopperLayers().contains(&polygon.getLayer())) {
+      if (mBoard.getCopperLayers().contains(
+              &transform.map(polygon.getLayer()))) {
         auto it = items.insert(items.end(),
                                Item{device,
                                     &polygon,
@@ -401,7 +327,8 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
     // Circles.
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
-      if (mBoard.getCopperLayers().contains(&circle.getLayer())) {
+      if (mBoard.getCopperLayers().contains(
+              &transform.map(circle.getLayer()))) {
         auto it = items.insert(items.end(),
                                Item{device,
                                     nullptr,
@@ -421,6 +348,7 @@ void BoardDesignRuleCheck::checkCopperCopperClearances(int progressEnd) {
 
     // Stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
+      // Layer does not need to be transformed!
       if (mBoard.getCopperLayers().contains(
               &strokeText->getData().getLayer())) {
         auto it = items.insert(items.end(),
@@ -602,7 +530,8 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
     // Check polygons.
     for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
-      if (mBoard.getCopperLayers().contains(&polygon.getLayer())) {
+      if (mBoard.getCopperLayers().contains(
+              &transform.map(polygon.getLayer()))) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addPolygon(transform.map(polygon.getPath()), polygon.getLineWidth(),
                        polygon.isFilled());
@@ -615,18 +544,20 @@ void BoardDesignRuleCheck::checkCopperBoardClearances(int progressEnd) {
 
     // Check circles.
     for (const Circle& circle : device->getLibFootprint().getCircles()) {
-      if (mBoard.getCopperLayers().contains(&circle.getLayer())) {
+      if (mBoard.getCopperLayers().contains(
+              &transform.map(circle.getLayer()))) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
         gen.addCircle(circle, transform);
         if (intersects(gen.getPaths())) {
           emitMessage(std::make_shared<DrcMsgCopperBoardClearanceViolation>(
-              device, circle, clearance, locations));
+              *device, circle, clearance, locations));
         }
       }
     }
 
     // Check stroke texts.
     foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
+      // Layer does not need to be transformed!
       if (mBoard.getCopperLayers().contains(
               &strokeText->getData().getLayer())) {
         BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
@@ -859,6 +790,107 @@ void BoardDesignRuleCheck::checkDrillBoardClearances(int progressEnd) {
   emitProgress(progressEnd);
 }
 
+void BoardDesignRuleCheck::checkSilkscreenStopmaskClearances(int progressEnd) {
+  const UnsignedLength clearance =
+      mSettings.getMinSilkscreenStopmaskClearance();
+  const QVector<const Layer*> layersTop = mBoard.getSilkscreenLayersTop();
+  const QVector<const Layer*> layersBot = mBoard.getSilkscreenLayersBot();
+  if ((clearance == 0) || (layersTop.isEmpty() && layersBot.isEmpty())) {
+    return;
+  }
+
+  emitStatus(tr("Check silkscreen to stopmask clearances..."));
+
+  // Determine areas of stop mask openings.
+  ClipperLib::Paths boardArea = ClipperHelpers::convert(
+      getBoardOutlines({&Layer::boardOutlines()}), maxArcTolerance());
+  ClipperHelpers::subtract(
+      boardArea,
+      ClipperHelpers::convert(getBoardOutlines({&Layer::boardCutouts()}),
+                              maxArcTolerance()),
+      ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+  const ClipperLib::Paths boardClearance = getBoardClearanceArea(clearance);
+
+  // Run the checks on each board side.
+  for (const auto& config :
+       {std::make_pair(layersTop, &Layer::topStopMask()),
+        std::make_pair(layersBot, &Layer::botStopMask())}) {
+    if (config.first.isEmpty()) {
+      continue;
+    }
+
+    // Build stopmask openings area. Only take the board area into account
+    // since warnings outside the board area are not really helpful.
+    BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
+    gen.addStopMaskOpenings(*config.second, *clearance);
+    ClipperLib::Paths clearanceArea = gen.getPaths();
+    ClipperHelpers::unite(clearanceArea, boardClearance, ClipperLib::pftEvenOdd,
+                          ClipperLib::pftNonZero);
+    ClipperHelpers::intersect(clearanceArea, boardArea, ClipperLib::pftEvenOdd,
+                              ClipperLib::pftEvenOdd);
+
+    // Note: We check only stroke texts. For other objects like polygons,
+    // usually there are dozens of clearance violations but most of the time
+    // they are not relevant and cannot be avoided. So let's omit these
+    // annoying warnings.
+
+    // Helper for the actual check.
+    QVector<Path> locations;
+    auto intersects = [&clearanceArea,
+                       &locations](const ClipperLib::Paths& paths) {
+      std::unique_ptr<ClipperLib::PolyTree> intersections =
+          ClipperHelpers::intersectToTree(clearanceArea, paths,
+                                          ClipperLib::pftEvenOdd,
+                                          ClipperLib::pftEvenOdd);
+      locations =
+          ClipperHelpers::convert(ClipperHelpers::flattenTree(*intersections));
+      return (!locations.isEmpty());
+    };
+
+    // Check board stroke texts.
+    foreach (const BI_StrokeText* strokeText, mBoard.getStrokeTexts()) {
+      if (config.first.contains(&strokeText->getData().getLayer())) {
+        BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
+        gen.addStrokeText(*strokeText);
+        if (intersects(gen.getPaths())) {
+          emitMessage(std::make_shared<DrcMsgSilkscreenClearanceViolation>(
+              *strokeText, clearance, locations));
+        }
+      }
+    }
+
+    // Check device stroke texts.
+    foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+      foreach (const BI_StrokeText* strokeText, device->getStrokeTexts()) {
+        // Layer does not need to be transformed!
+        if (config.first.contains(&strokeText->getData().getLayer())) {
+          BoardClipperPathGenerator gen(mBoard, maxArcTolerance());
+          gen.addStrokeText(*strokeText);
+          if (intersects(gen.getPaths())) {
+            emitMessage(std::make_shared<DrcMsgSilkscreenClearanceViolation>(
+                *strokeText, clearance, locations));
+          }
+        }
+      }
+    }
+  }
+
+  emitProgress(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkMinimumCopperWidth(int progressEnd) {
+  const UnsignedLength minWidth = mSettings.getMinCopperWidth();
+  if (minWidth == 0) {
+    return;
+  }
+
+  emitStatus(tr("Check copper widths..."));
+  checkMinimumWidth(minWidth, [this](const Layer& layer) {
+    return mBoard.getCopperLayers().contains(&layer);
+  });
+  emitProgress(progressEnd);
+}
+
 void BoardDesignRuleCheck::checkMinimumPthAnnularRing(int progressEnd) {
   const UnsignedLength annularWidth = mSettings.getMinPthAnnularRing();
   if (annularWidth == 0) {
@@ -1047,6 +1079,48 @@ void BoardDesignRuleCheck::checkMinimumPthSlotWidth(int progressEnd) {
     }
   }
 
+  emitProgress(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkMinimumSilkscreenWidth(int progressEnd) {
+  const UnsignedLength minWidth = mSettings.getMinSilkscreenWidth();
+  const QVector<const Layer*> layers =
+      mBoard.getSilkscreenLayersTop() + mBoard.getSilkscreenLayersBot();
+  if ((minWidth == 0) || (layers.isEmpty())) {
+    return;
+  }
+
+  emitStatus(tr("Check silkscreen widths..."));
+  checkMinimumWidth(minWidth, [&layers](const Layer& layer) {
+    return layers.contains(&layer);
+  });
+  emitProgress(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkMinimumSilkscreenTextHeight(int progressEnd) {
+  const UnsignedLength minHeight = mSettings.getMinSilkscreenTextHeight();
+  const QVector<const Layer*> layers =
+      mBoard.getSilkscreenLayersTop() + mBoard.getSilkscreenLayersBot();
+  if ((minHeight == 0) || (layers.isEmpty())) {
+    return;
+  }
+
+  emitStatus(tr("Check silkscreen text heights..."));
+  foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
+    if (!layers.contains(&text->getData().getLayer())) {
+      continue;
+    }
+    if (text->getData().getHeight() < minHeight) {
+      QVector<Path> locations;
+      Transform transform(text->getData());
+      foreach (Path path, transform.map(text->getPaths())) {
+        locations += path.toOutlineStrokes(PositiveLength(
+            qMax(*text->getData().getStrokeWidth(), Length(50000))));
+      }
+      emitMessage(std::make_shared<DrcMsgMinimumTextHeightViolation>(
+          *text, minHeight, locations));
+    }
+  }
   emitProgress(progressEnd);
 }
 
@@ -1579,6 +1653,135 @@ void BoardDesignRuleCheck::checkForStaleObjects(int progressEnd) {
   }
 
   emitProgress(progressEnd);
+}
+
+void BoardDesignRuleCheck::checkMinimumWidth(
+    const UnsignedLength& minWidth,
+    std::function<bool(const Layer&)> layerFilter) {
+  Q_ASSERT(layerFilter);
+
+  // Stroke texts.
+  foreach (const BI_StrokeText* text, mBoard.getStrokeTexts()) {
+    if (!layerFilter(text->getData().getLayer())) {
+      continue;
+    }
+    if (text->getData().getStrokeWidth() < minWidth) {
+      QVector<Path> locations;
+      Transform transform(text->getData());
+      foreach (Path path, transform.map(text->getPaths())) {
+        locations += path.toOutlineStrokes(PositiveLength(
+            qMax(*text->getData().getStrokeWidth(), Length(50000))));
+      }
+      emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(*text, minWidth,
+                                                                locations));
+    }
+  }
+
+  // Polygons.
+  foreach (const BI_Polygon* polygon, mBoard.getPolygons()) {
+    // Filled polygons with line width 0 have no strokes in Gerber files.
+    if (polygon->getData().isFilled() &&
+        polygon->getData().getPath().isClosed() &&
+        (polygon->getData().getLineWidth() == 0)) {
+      continue;
+    }
+    if (!layerFilter(polygon->getData().getLayer())) {
+      continue;
+    }
+    if (polygon->getData().getLineWidth() < minWidth) {
+      const QVector<Path> locations =
+          polygon->getData().getPath().toOutlineStrokes(PositiveLength(
+              qMax(*polygon->getData().getLineWidth(), Length(50000))));
+      emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
+          *polygon, minWidth, locations));
+    }
+  }
+
+  // Planes.
+  foreach (const BI_Plane* plane, mBoard.getPlanes()) {
+    if (!layerFilter(plane->getLayer())) {
+      continue;
+    }
+    if (plane->getMinWidth() < minWidth) {
+      const QVector<Path> locations =
+          plane->getOutline().toClosedPath().toOutlineStrokes(
+              PositiveLength(200000));
+      emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
+          *plane, minWidth, locations));
+    }
+  }
+
+  // Devices.
+  foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
+    const Transform transform(*device);
+    foreach (const BI_StrokeText* text, device->getStrokeTexts()) {
+      // Do *not* mirror layer since it is independent of the device!
+      if (!layerFilter(text->getData().getLayer())) {
+        continue;
+      }
+      if (text->getData().getStrokeWidth() < minWidth) {
+        QVector<Path> locations;
+        Transform transform(text->getData());
+        foreach (Path path, transform.map(text->getPaths())) {
+          locations += path.toOutlineStrokes(PositiveLength(
+              qMax(*text->getData().getStrokeWidth(), Length(50000))));
+        }
+        emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
+            *text, minWidth, locations));
+      }
+    }
+    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
+      // Filled polygons with line width 0 have no strokes in Gerber files.
+      if (polygon.isFilled() && polygon.getPath().isClosed() &&
+          (polygon.getLineWidth() == 0)) {
+        continue;
+      }
+      if (!layerFilter(transform.map(polygon.getLayer()))) {
+        continue;
+      }
+      if (polygon.getLineWidth() < minWidth) {
+        const QVector<Path> locations =
+            transform.map(polygon.getPath())
+                .toOutlineStrokes(PositiveLength(
+                    qMax(*polygon.getLineWidth(), Length(50000))));
+        emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
+            *device, polygon, minWidth, locations));
+      }
+    }
+    for (const Circle& circle : device->getLibFootprint().getCircles()) {
+      if (!layerFilter(transform.map(circle.getLayer()))) {
+        continue;
+      }
+      // Filled circles are a single (zero-length) stroke in Gerber files.
+      const PositiveLength outerDiameter =
+          circle.getDiameter() + circle.getLineWidth();
+      const UnsignedLength relevantWidth = circle.isFilled()
+          ? positiveToUnsigned(outerDiameter)
+          : circle.getLineWidth();
+      if (relevantWidth < minWidth) {
+        const QVector<Path> locations = {transform.map(
+            Path::circle(outerDiameter).translated(circle.getCenter()))};
+        emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
+            *device, circle, minWidth, locations));
+      }
+    }
+  }
+
+  // Netlines.
+  foreach (const BI_NetSegment* netsegment, mBoard.getNetSegments()) {
+    foreach (const BI_NetLine* netline, netsegment->getNetLines()) {
+      if (!layerFilter(netline->getLayer())) {
+        continue;
+      }
+      if (netline->getWidth() < minWidth) {
+        const QVector<Path> locations{Path::obround(
+            netline->getStartPoint().getPosition(),
+            netline->getEndPoint().getPosition(), netline->getWidth())};
+        emitMessage(std::make_shared<DrcMsgMinimumWidthViolation>(
+            *netline, minWidth, locations));
+      }
+    }
+  }
 }
 
 template <typename THole>

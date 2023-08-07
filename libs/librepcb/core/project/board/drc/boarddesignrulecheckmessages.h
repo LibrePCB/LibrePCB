@@ -222,6 +222,28 @@ public:
 };
 
 /*******************************************************************************
+ *  Class DrcMsgMinimumTextHeightViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgMinimumTextHeightViolation class
+ */
+class DrcMsgMinimumTextHeightViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgMinimumTextHeightViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgMinimumTextHeightViolation() = delete;
+  DrcMsgMinimumTextHeightViolation(const BI_StrokeText& text,
+                                   const UnsignedLength& minHeight,
+                                   const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumTextHeightViolation(
+      const DrcMsgMinimumTextHeightViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgMinimumTextHeightViolation() noexcept {}
+};
+
+/*******************************************************************************
  *  Class DrcMsgMinimumWidthViolation
  ******************************************************************************/
 
@@ -240,7 +262,16 @@ public:
   DrcMsgMinimumWidthViolation(const BI_Plane& plane,
                               const UnsignedLength& minWidth,
                               const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumWidthViolation(const BI_Polygon& polygon,
+                              const UnsignedLength& minWidth,
+                              const QVector<Path>& locations) noexcept;
   DrcMsgMinimumWidthViolation(const BI_StrokeText& text,
+                              const UnsignedLength& minWidth,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumWidthViolation(const BI_Device& device, const Polygon& polygon,
+                              const UnsignedLength& minWidth,
+                              const QVector<Path>& locations) noexcept;
+  DrcMsgMinimumWidthViolation(const BI_Device& device, const Circle& circle,
                               const UnsignedLength& minWidth,
                               const QVector<Path>& locations) noexcept;
   DrcMsgMinimumWidthViolation(const DrcMsgMinimumWidthViolation& other) noexcept
@@ -312,7 +343,7 @@ public:
                                       const Polygon& polygon,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
-  DrcMsgCopperBoardClearanceViolation(const BI_Device* device,
+  DrcMsgCopperBoardClearanceViolation(const BI_Device& device,
                                       const Circle& circle,
                                       const UnsignedLength& minClearance,
                                       const QVector<Path>& locations) noexcept;
@@ -730,6 +761,28 @@ public:
 private:
   static QString determineMessage(const BI_Via& via) noexcept;
   static QString determineDescription(const BI_Via& via) noexcept;
+};
+
+/*******************************************************************************
+ *  Class DrcMsgSilkscreenClearanceViolation
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgSilkscreenClearanceViolation class
+ */
+class DrcMsgSilkscreenClearanceViolation final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgSilkscreenClearanceViolation)
+
+public:
+  // Constructors / Destructor
+  DrcMsgSilkscreenClearanceViolation() = delete;
+  DrcMsgSilkscreenClearanceViolation(const BI_StrokeText& strokeText,
+                                     const UnsignedLength& minClearance,
+                                     const QVector<Path>& locations) noexcept;
+  DrcMsgSilkscreenClearanceViolation(
+      const DrcMsgSilkscreenClearanceViolation& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgSilkscreenClearanceViolation() noexcept {}
 };
 
 /*******************************************************************************

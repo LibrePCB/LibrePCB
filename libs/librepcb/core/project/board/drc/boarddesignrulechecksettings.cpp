@@ -74,17 +74,20 @@ inline BoardDesignRuleCheckSettings::AllowedSlots deserialize(
  ******************************************************************************/
 
 BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings() noexcept
-  : mMinCopperWidth(200000),  // 200um
-    mMinCopperCopperClearance(200000),  // 200um
+  : mMinCopperCopperClearance(200000),  // 200um
     mMinCopperBoardClearance(300000),  // 300um
     mMinCopperNpthClearance(250000),  // 250um
     mMinDrillDrillClearance(350000),  // 350um
     mMinDrillBoardClearance(500000),  // 500um
+    mMinSilkscreenStopmaskClearance(127000),  // 127um
+    mMinCopperWidth(200000),  // 200um
     mMinPthAnnularRing(200000),  // 200um
     mMinNpthDrillDiameter(300000),  // 300um
     mMinPthDrillDiameter(300000),  // 300um
     mMinNpthSlotWidth(1000000),  // 1mm
     mMinPthSlotWidth(700000),  // 0.7mm
+    mMinSilkscreenWidth(150000),  // 150um
+    mMinSilkscreenTextHeight(800000),  // 0.8mm
     mMinOutlineToolDiameter(2000000),  // 2mm
     mBlindViasAllowed(false),  // Just to be on the safe side
     mBuriedViasAllowed(false),  // Just to be on the safe side
@@ -101,9 +104,7 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings(
 
 BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings(
     const SExpression& node)
-  : mMinCopperWidth(
-        deserialize<UnsignedLength>(node.getChild("min_copper_width/@0"))),
-    mMinCopperCopperClearance(deserialize<UnsignedLength>(
+  : mMinCopperCopperClearance(deserialize<UnsignedLength>(
         node.getChild("min_copper_copper_clearance/@0"))),
     mMinCopperBoardClearance(deserialize<UnsignedLength>(
         node.getChild("min_copper_board_clearance/@0"))),
@@ -113,6 +114,10 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings(
         node.getChild("min_drill_drill_clearance/@0"))),
     mMinDrillBoardClearance(deserialize<UnsignedLength>(
         node.getChild("min_drill_board_clearance/@0"))),
+    mMinSilkscreenStopmaskClearance(deserialize<UnsignedLength>(
+        node.getChild("min_silkscreen_stopmask_clearance/@0"))),
+    mMinCopperWidth(
+        deserialize<UnsignedLength>(node.getChild("min_copper_width/@0"))),
     mMinPthAnnularRing(
         deserialize<UnsignedLength>(node.getChild("min_annular_ring/@0"))),
     mMinNpthDrillDiameter(deserialize<UnsignedLength>(
@@ -123,6 +128,10 @@ BoardDesignRuleCheckSettings::BoardDesignRuleCheckSettings(
         deserialize<UnsignedLength>(node.getChild("min_npth_slot_width/@0"))),
     mMinPthSlotWidth(
         deserialize<UnsignedLength>(node.getChild("min_pth_slot_width/@0"))),
+    mMinSilkscreenWidth(
+        deserialize<UnsignedLength>(node.getChild("min_silkscreen_width/@0"))),
+    mMinSilkscreenTextHeight(deserialize<UnsignedLength>(
+        node.getChild("min_silkscreen_text_height/@0"))),
     mMinOutlineToolDiameter(deserialize<UnsignedLength>(
         node.getChild("min_outline_tool_diameter/@0"))),
     mBlindViasAllowed(
@@ -144,8 +153,6 @@ BoardDesignRuleCheckSettings::~BoardDesignRuleCheckSettings() noexcept {
 
 void BoardDesignRuleCheckSettings::serialize(SExpression& root) const {
   root.ensureLineBreak();
-  root.appendChild("min_copper_width", mMinCopperWidth);
-  root.ensureLineBreak();
   root.appendChild("min_copper_copper_clearance", mMinCopperCopperClearance);
   root.ensureLineBreak();
   root.appendChild("min_copper_board_clearance", mMinCopperBoardClearance);
@@ -156,6 +163,11 @@ void BoardDesignRuleCheckSettings::serialize(SExpression& root) const {
   root.ensureLineBreak();
   root.appendChild("min_drill_board_clearance", mMinDrillBoardClearance);
   root.ensureLineBreak();
+  root.appendChild("min_silkscreen_stopmask_clearance",
+                   mMinSilkscreenStopmaskClearance);
+  root.ensureLineBreak();
+  root.appendChild("min_copper_width", mMinCopperWidth);
+  root.ensureLineBreak();
   root.appendChild("min_annular_ring", mMinPthAnnularRing);
   root.ensureLineBreak();
   root.appendChild("min_npth_drill_diameter", mMinNpthDrillDiameter);
@@ -165,6 +177,10 @@ void BoardDesignRuleCheckSettings::serialize(SExpression& root) const {
   root.appendChild("min_npth_slot_width", mMinNpthSlotWidth);
   root.ensureLineBreak();
   root.appendChild("min_pth_slot_width", mMinPthSlotWidth);
+  root.ensureLineBreak();
+  root.appendChild("min_silkscreen_width", mMinSilkscreenWidth);
+  root.ensureLineBreak();
+  root.appendChild("min_silkscreen_text_height", mMinSilkscreenTextHeight);
   root.ensureLineBreak();
   root.appendChild("min_outline_tool_diameter", mMinOutlineToolDiameter);
   root.ensureLineBreak();
@@ -184,17 +200,20 @@ void BoardDesignRuleCheckSettings::serialize(SExpression& root) const {
 
 BoardDesignRuleCheckSettings& BoardDesignRuleCheckSettings::operator=(
     const BoardDesignRuleCheckSettings& rhs) noexcept {
-  mMinCopperWidth = rhs.mMinCopperWidth;
   mMinCopperCopperClearance = rhs.mMinCopperCopperClearance;
   mMinCopperBoardClearance = rhs.mMinCopperBoardClearance;
   mMinCopperNpthClearance = rhs.mMinCopperNpthClearance;
   mMinDrillDrillClearance = rhs.mMinDrillDrillClearance;
   mMinDrillBoardClearance = rhs.mMinDrillBoardClearance;
+  mMinSilkscreenStopmaskClearance = rhs.mMinSilkscreenStopmaskClearance;
+  mMinCopperWidth = rhs.mMinCopperWidth;
   mMinPthAnnularRing = rhs.mMinPthAnnularRing;
   mMinNpthDrillDiameter = rhs.mMinNpthDrillDiameter;
   mMinPthDrillDiameter = rhs.mMinPthDrillDiameter;
   mMinNpthSlotWidth = rhs.mMinNpthSlotWidth;
   mMinPthSlotWidth = rhs.mMinPthSlotWidth;
+  mMinSilkscreenWidth = rhs.mMinSilkscreenWidth;
+  mMinSilkscreenTextHeight = rhs.mMinSilkscreenTextHeight;
   mMinOutlineToolDiameter = rhs.mMinOutlineToolDiameter;
   mBlindViasAllowed = rhs.mBlindViasAllowed;
   mBuriedViasAllowed = rhs.mBuriedViasAllowed;
@@ -205,17 +224,21 @@ BoardDesignRuleCheckSettings& BoardDesignRuleCheckSettings::operator=(
 
 bool BoardDesignRuleCheckSettings::operator==(
     const BoardDesignRuleCheckSettings& rhs) const noexcept {
-  if (mMinCopperWidth != rhs.mMinCopperWidth) return false;
   if (mMinCopperCopperClearance != rhs.mMinCopperCopperClearance) return false;
   if (mMinCopperBoardClearance != rhs.mMinCopperBoardClearance) return false;
   if (mMinCopperNpthClearance != rhs.mMinCopperNpthClearance) return false;
   if (mMinDrillDrillClearance != rhs.mMinDrillDrillClearance) return false;
   if (mMinDrillBoardClearance != rhs.mMinDrillBoardClearance) return false;
+  if (mMinSilkscreenStopmaskClearance != rhs.mMinSilkscreenStopmaskClearance)
+    return false;
+  if (mMinCopperWidth != rhs.mMinCopperWidth) return false;
   if (mMinPthAnnularRing != rhs.mMinPthAnnularRing) return false;
   if (mMinNpthDrillDiameter != rhs.mMinNpthDrillDiameter) return false;
   if (mMinPthDrillDiameter != rhs.mMinPthDrillDiameter) return false;
   if (mMinNpthSlotWidth != rhs.mMinNpthSlotWidth) return false;
   if (mMinPthSlotWidth != rhs.mMinPthSlotWidth) return false;
+  if (mMinSilkscreenWidth != rhs.mMinSilkscreenWidth) return false;
+  if (mMinSilkscreenTextHeight != rhs.mMinSilkscreenTextHeight) return false;
   if (mMinOutlineToolDiameter != rhs.mMinOutlineToolDiameter) return false;
   if (mBlindViasAllowed != rhs.mBlindViasAllowed) return false;
   if (mBuriedViasAllowed != rhs.mBuriedViasAllowed) return false;

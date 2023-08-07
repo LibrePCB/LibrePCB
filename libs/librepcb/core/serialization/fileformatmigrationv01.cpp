@@ -939,7 +939,6 @@ void FileFormatMigrationV01::upgradeBoardDesignRules(SExpression& root) {
 
 void FileFormatMigrationV01::upgradeBoardDrcSettings(SExpression& root) {
   SExpression& node = root.appendList("design_rule_check");
-  node.appendChild("min_copper_width", SExpression::createToken("0.2"));
   node.appendChild("min_copper_copper_clearance",
                    SExpression::createToken("0.2"));
   node.appendChild("min_copper_board_clearance",
@@ -950,11 +949,17 @@ void FileFormatMigrationV01::upgradeBoardDrcSettings(SExpression& root) {
                    SExpression::createToken("0.35"));
   node.appendChild("min_drill_board_clearance",
                    SExpression::createToken("0.5"));
+  node.appendChild("min_silkscreen_stopmask_clearance",
+                   SExpression::createToken("0.127"));
+  node.appendChild("min_copper_width", SExpression::createToken("0.2"));
   node.appendChild("min_annular_ring", SExpression::createToken("0.2"));
   node.appendChild("min_npth_drill_diameter", SExpression::createToken("0.3"));
   node.appendChild("min_pth_drill_diameter", SExpression::createToken("0.3"));
   node.appendChild("min_npth_slot_width", SExpression::createToken("1.0"));
   node.appendChild("min_pth_slot_width", SExpression::createToken("0.7"));
+  node.appendChild("min_silkscreen_width", SExpression::createToken("0.15"));
+  node.appendChild("min_silkscreen_text_height",
+                   SExpression::createToken("0.8"));
   node.appendChild("min_outline_tool_diameter",
                    SExpression::createToken("2.0"));
   node.appendChild("blind_vias_allowed", SExpression::createToken("false"));
