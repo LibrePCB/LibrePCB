@@ -159,6 +159,9 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   if (!windowSize.isEmpty()) {
     resize(windowSize);
   }
+
+  // Move focus to search field to allow typing immediately.
+  mUi->edtSearch->setFocus(Qt::ShortcutFocusReason);
 }
 
 AddComponentDialog::~AddComponentDialog() noexcept {
@@ -214,35 +217,42 @@ void AddComponentDialog::selectComponentByKeyword(
  ******************************************************************************/
 
 void AddComponentDialog::searchEditTextChanged(const QString& text) noexcept {
+  mUi->lblErrorMsg->clear();
   try {
     QModelIndex catIndex = mUi->treeCategories->currentIndex();
     if (text.trimmed().isEmpty() && catIndex.isValid()) {
+      // Change tab order: https://github.com/LibrePCB/LibrePCB/issues/1059
+      setTabOrder(mUi->edtSearch, mUi->treeCategories);
       setSelectedCategory(
           Uuid::tryFromString(catIndex.data(Qt::UserRole).toString()));
     } else {
+      // Change tab order: https://github.com/LibrePCB/LibrePCB/issues/1059
+      setTabOrder(mUi->treeCategories, mUi->edtSearch);
       searchComponents(text.trimmed());
     }
   } catch (const Exception& e) {
-    QMessageBox::critical(this, tr("Error"), e.getMsg());
+    mUi->lblErrorMsg->setText(e.getMsg());
   }
 }
 
 void AddComponentDialog::treeCategories_currentItemChanged(
     const QModelIndex& current, const QModelIndex& previous) noexcept {
   Q_UNUSED(previous);
+  mUi->lblErrorMsg->clear();
 
   try {
     tl::optional<Uuid> categoryUuid =
         Uuid::tryFromString(current.data(Qt::UserRole).toString());
     setSelectedCategory(categoryUuid);
   } catch (Exception& e) {
-    QMessageBox::critical(this, tr("Error"), e.getMsg());
+    mUi->lblErrorMsg->setText(e.getMsg());
   }
 }
 
 void AddComponentDialog::treeComponents_currentItemChanged(
     QTreeWidgetItem* current, QTreeWidgetItem* previous) noexcept {
   Q_UNUSED(previous);
+  mUi->lblErrorMsg->clear();
   try {
     if (current) {
       QTreeWidgetItem* partItem = current;
@@ -284,8 +294,10 @@ void AddComponentDialog::treeComponents_currentItemChanged(
     } else {
       setSelectedComponent(nullptr);
     }
-  } catch (Exception& e) {
-    QMessageBox::critical(this, tr("Error"), e.getMsg());
+  } catch (const Exception& e) {
+    // Do not show a message box as it would be annoying while typing in the
+    // search field.
+    mUi->lblErrorMsg->setText(e.getMsg());
     setSelectedComponent(nullptr);
   }
 }
@@ -317,7 +329,7 @@ void AddComponentDialog::cbxSymbVar_currentIndexChanged(int index) noexcept {
 
 void AddComponentDialog::searchComponents(
     const QString& input, const tl::optional<Uuid>& selectedDevice,
-    bool selectFirstResult) {
+    bool selectFirstDevice) {
   mCurrentSearchTerm = input;
   setSelectedComponent(nullptr);
   mUi->treeComponents->clear();
@@ -372,7 +384,7 @@ void AddComponentDialog::searchComponents(
       selectedDeviceItem->parent()->setExpanded(true);
       selectedDeviceItem = selectedDeviceItem->parent();
     }
-  } else if (selectFirstResult) {
+  } else if (selectFirstDevice) {
     if (QTreeWidgetItem* cmpItem = mUi->treeComponents->topLevelItem(0)) {
       cmpItem->setExpanded(true);
       if (QTreeWidgetItem* devItem = cmpItem->child(0)) {
@@ -380,6 +392,18 @@ void AddComponentDialog::searchComponents(
       } else {
         mUi->treeComponents->setCurrentItem(cmpItem);
       }
+    }
+  } else {
+    QTreeWidgetItem* item = mUi->treeComponents->topLevelItem(0);
+    while (item && item->isExpanded() && item->childCount()) {
+      item = item->child(0);
+    }
+    while (item && item->parent() &&
+           (!item->text(0).toLower().contains(input.toLower()))) {
+      item = item->parent();
+    }
+    if (item) {
+      mUi->treeComponents->setCurrentItem(item);
     }
   }
 }
