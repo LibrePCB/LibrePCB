@@ -67,7 +67,6 @@
        <property name="font">
         <font>
          <pointsize>11</pointsize>
-         <weight>75</weight>
          <bold>true</bold>
         </font>
        </property>
@@ -117,21 +116,13 @@
     </layout>
    </item>
    <item row="1" column="2">
-    <widget class="librepcb::editor::GraphicsView" name="viewComponent">
-     <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
-     </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
-     </property>
-    </widget>
+    <widget class="librepcb::editor::GraphicsView" name="viewComponent" native="true"/>
    </item>
    <item row="2" column="2">
     <widget class="QLabel" name="lblDeviceName">
      <property name="font">
       <font>
        <pointsize>11</pointsize>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -144,29 +135,29 @@
     </widget>
    </item>
    <item row="3" column="2">
-    <widget class="librepcb::editor::GraphicsView" name="viewDevice">
-     <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
-     </property>
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
-     </property>
-    </widget>
+    <widget class="librepcb::editor::GraphicsView" name="viewDevice" native="true"/>
    </item>
    <item row="4" column="0" colspan="3">
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0">
      <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+      <widget class="QLabel" name="lblErrorMsg">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Ignored" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
+       <property name="font">
+        <font>
+         <bold>true</bold>
+        </font>
        </property>
-      </spacer>
+       <property name="styleSheet">
+        <string notr="true">QLabel {
+  color: red;
+}</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QCheckBox" name="cbxAddMore">
@@ -206,7 +197,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>GraphicsView</class>
+   <class>librepcb::editor::GraphicsView</class>
    <extends>QGraphicsView</extends>
    <header location="global">librepcb/editor/widgets/graphicsview.h</header>
   </customwidget>

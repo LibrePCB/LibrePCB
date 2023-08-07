@@ -152,7 +152,7 @@ private:
   // Private Methods
   void searchComponents(const QString& input,
                         const tl::optional<Uuid>& selectedDevice = tl::nullopt,
-                        bool selectFirstResult = false);
+                        bool selectFirstDevice = false);
   SearchResult search(const QString& input);
   void setSelectedCategory(const tl::optional<Uuid>& categoryUuid);
   void setSelectedComponent(std::shared_ptr<const Component> cmp);
