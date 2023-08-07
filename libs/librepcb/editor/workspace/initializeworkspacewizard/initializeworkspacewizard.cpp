@@ -49,6 +49,14 @@ InitializeWorkspaceWizard::InitializeWorkspaceWizard(bool forceChoosePath,
   setPixmap(WizardPixmap::LogoPixmap, QPixmap(":/img/logo/48x48.png"));
   setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 
+  // Setup "switch workspace" button.
+  setButtonText(CustomButton1, tr("Switch Workspace"));
+  connect(button(CustomButton1), &QAbstractButton::clicked, this, [this]() {
+    setStartId(InitializeWorkspaceWizardContext::ID_ChooseWorkspace);
+    setOption(QWizard::HaveCustomButton1, false);
+    restart();
+  });
+
   // Add pages.
   setPage(InitializeWorkspaceWizardContext::ID_Welcome,
           new InitializeWorkspaceWizard_Welcome(mContext));
@@ -110,6 +118,12 @@ void InitializeWorkspaceWizard::updateStartPage() noexcept {
     setStartId(InitializeWorkspaceWizardContext::ID_None);
     mNeedsToBeShown = false;
   }
+
+  // If a workspace upgrade or initialization is needed, provide the option to
+  // choose a different workspace instead, otherwise it would be very bad user
+  // experience. See https://github.com/LibrePCB/LibrePCB/issues/1044.
+  setOption(QWizard::HaveCustomButton1,
+            startId() > InitializeWorkspaceWizardContext::ID_ChooseWorkspace);
 }
 
 /*******************************************************************************
