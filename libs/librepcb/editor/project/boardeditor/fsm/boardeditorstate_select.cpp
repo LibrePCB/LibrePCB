@@ -52,6 +52,7 @@
 #include "../boardviapropertiesdialog.h"
 #include "../deviceinstancepropertiesdialog.h"
 #include "../graphicsitems/bgi_device.h"
+#include "../graphicsitems/bgi_footprintpad.h"
 #include "../graphicsitems/bgi_hole.h"
 #include "../graphicsitems/bgi_netline.h"
 #include "../graphicsitems/bgi_netpoint.h"
@@ -714,12 +715,21 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     foreach (auto item, items) {
       if (item->isSelected()) {
         selectedItem = item;
+        break;  // Take the top most selected item!
       }
     }
     if (!selectedItem) {
       selectedItem = items.first();
       scene->clearSelection();
       selectedItem->setSelected(true);
+    }
+    if (auto pad = std::dynamic_pointer_cast<BGI_FootprintPad>(selectedItem)) {
+      // Pads have no context menu, thus open the context menu of its footprint.
+      // Fixes https://github.com/LibrePCB/LibrePCB/issues/1060.
+      if (auto fpt = scene->getDevices().value(&pad->getPad().getDevice())) {
+        selectedItem = fpt;
+        selectedItem->setSelected(true);
+      }
     }
     Q_ASSERT(selectedItem);
     Q_ASSERT(selectedItem->isSelected());
@@ -1159,7 +1169,10 @@ bool BoardEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
       aIsLocked->setChecked(hole->getHole().getData().isLocked());
       mb.addAction(aIsLocked);
     } else {
-      return false;
+      // Do not handle the right click anymore if clicked on a selected item
+      // although it doesn't provide a context menu.
+      // Fixes https://github.com/LibrePCB/LibrePCB/issues/1060.
+      return true;
     }
 
     // execute the context menu
