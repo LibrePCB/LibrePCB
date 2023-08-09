@@ -50,6 +50,10 @@ AboutDialog::AboutDialog(const WorkspaceSettings& settings,
           &AboutDialog::openExternalLink);
   connect(mUi->lblContributing, &QLabel::linkActivated, this,
           &AboutDialog::openExternalLink);
+  connect(mUi->lblCredits, &QLabel::linkActivated, this,
+          &AboutDialog::openExternalLink);
+  connect(mUi->lblNgi0Text, &QLabel::linkActivated, this,
+          &AboutDialog::openExternalLink);
   connect(mUi->lblCopyDetailsToClipboard, &QLabel::linkActivated, [this]() {
     QApplication::clipboard()->setText(mUi->txtDetails->toPlainText());
     QToolTip::showText(QCursor::pos(), tr("Copied!"),
@@ -108,11 +112,6 @@ AboutDialog::AboutDialog(const WorkspaceSettings& settings,
                 "https://github.com/LibrePCB/LibrePCB/blob/master/"
                 "LICENSE.txt") %
         "</p>";
-    text += "<p>" %
-        tr("Some of the icons used in LibrePCB are provided by "
-           "<a href='%1'>icons8.com</a>, thank you!")
-            .arg("https://icons8.com") %
-        "</p>";
     mUi->lblIntro->setText(text);
   }
 
@@ -144,6 +143,32 @@ AboutDialog::AboutDialog(const WorkspaceSettings& settings,
            "tutorial. We're happy if more people can get to know LibrePCB.") %
         "</p>";
     mUi->lblContributing->setText(text);
+  }
+
+  // Set credits text (not using Qt designer to avoid layouting issues).
+  {
+    QString text;
+    text += "<p>" %
+        tr("This project relies on <a href='%1'>many contributors</a>, "
+           "sponsors and other open-source components like software libraries "
+           "or icons. Many thanks to all the people and projects supporting "
+           "LibrePCB!")
+            .arg("https://github.com/LibrePCB/LibrePCB/graphs/contributors") %
+        " ♥<p>";
+    text += "<h4>" % tr("Sponsors") % "</h4>";
+    text += "<p>" %
+        tr("For the list of current sponsors, see <a href='%1'>%2</a>.")
+            .arg("https://librepcb.org/sponsors/")
+            .arg("librepcb.org/sponsors") %
+        "<p>";
+    text += "<h4>" % tr("Icons") % "</h4>";
+    text += "<p>" %
+        tr("Some of the icons used in LibrePCB are provided by "
+           "<a href='%1'>%2</a>, thank you!")
+            .arg("https://icons8.com")
+            .arg("icons8.com") %
+        "</p>";
+    mUi->lblCredits->setText(text);
   }
 
   // Information text (always English, not translatable)
