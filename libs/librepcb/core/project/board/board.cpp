@@ -662,6 +662,43 @@ void Board::forceAirWiresRebuild() noexcept {
  *  General Methods
  ******************************************************************************/
 
+tl::optional<std::pair<Point, Point>> Board::calculateBoundingRect() const
+    noexcept {
+  QList<Path> outlines;
+  foreach (const BI_Polygon* polygon, mPolygons) {
+    if ((polygon->getData().getLayer() == Layer::boardOutlines()) &&
+        (!polygon->getData().getPath().getVertices().isEmpty())) {
+      outlines.append(polygon->getData().getPath());
+    }
+  }
+  foreach (const BI_Device* device, mDeviceInstances) {
+    for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
+      if ((polygon.getLayer() == Layer::boardOutlines()) &&
+          (!polygon.getPath().getVertices().isEmpty())) {
+        outlines.append(Transform(*device).map(polygon.getPath()));
+      }
+    }
+    for (const Circle& circle : device->getLibFootprint().getCircles()) {
+      if (circle.getLayer() == Layer::boardOutlines()) {
+        outlines.append(Transform(*device).map(
+            Path::circle(circle.getDiameter()).translated(circle.getCenter())));
+      }
+    }
+  }
+  if (!outlines.isEmpty()) {
+    QPainterPath p;
+    foreach (const Path& outline, outlines) {
+      p.addPath(outline.toQPainterPathPx());
+    }
+    const QRectF rectPx = p.boundingRect();
+    const Point bottomLeft = Point::fromPx(rectPx.bottomLeft());
+    const Point topRight = Point::fromPx(rectPx.topRight());
+    return std::make_pair(bottomLeft, topRight);
+  } else {
+    return tl::nullopt;
+  }
+}
+
 void Board::addDefaultContent() {
   // Add 100x80mm board outline (1/2 Eurocard size).
   addPolygon(*new BI_Polygon(

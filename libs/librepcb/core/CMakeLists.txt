@@ -353,6 +353,8 @@ add_library(
   project/project.h
   project/projectattributelookup.cpp
   project/projectattributelookup.h
+  project/projectjsonexport.cpp
+  project/projectjsonexport.h
   project/projectlibrary.cpp
   project/projectlibrary.h
   project/projectloader.cpp

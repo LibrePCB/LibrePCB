@@ -94,6 +94,13 @@ public:
   // Getters
 
   /**
+   * @brief Get the filename of the project file (*.lpp)
+   *
+   * @return Filename with suffix but without path
+   */
+  const QString& getFileName() const noexcept { return mFilename; }
+
+  /**
    * @brief Get the filepath of the project file (*.lpp)
    *
    * @return The absolute filepath
