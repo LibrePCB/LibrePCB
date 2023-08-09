@@ -41,6 +41,7 @@
 #cmakedefine LIBREPCB_BINARY_DIR "@LIBREPCB_BINARY_DIR@"
 
 // Features
+#cmakedefine01 BUILD_QTQUICK_TEST
 #cmakedefine01 LIBREPCB_ENABLE_DESKTOP_INTEGRATION
 #cmakedefine01 USE_GLU
 #cmakedefine01 USE_OPENCASCADE

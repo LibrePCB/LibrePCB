@@ -935,6 +935,9 @@ target_link_libraries(
          Qt5::Network
          Qt5::Widgets
 )
+if(BUILD_QTQUICK_TEST)
+  target_link_libraries(librepcb_editor PUBLIC Qt5::Quick)
+endif()
 
 # Hoedown is only needed on Qt <5.14
 if(Qt5Core_VERSION_MAJOR EQUAL 5 AND Qt5Core_VERSION_MINOR LESS 14)

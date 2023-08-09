@@ -153,6 +153,23 @@ LibrePCB should also work with the Community Edition (OCE). CMake should
 automatically detect the availability of both variants.
 
 
+# QtQuick / Qt Declarative / QML Dependency
+
+Starting with version 1.0, LibrePCB depends on the QtQuick / Qt Declarative
+component for evaluation purposes. In future QML might be used for the GUI,
+but we first need to do some evaluation and testing. To catch potential issues
+as early as possible, the dependency has been added already but is not used
+yet for productive features. If this dependency causes any issues during
+packaging or during runtime, LibrePCB can currently be built without it:
+
+    cmake .. -DBUILD_QTQUICK_TEST=0
+
+**IMPORTANT**: Please report any problems in our
+[issue tracker](https://github.com/LibrePCB/LibrePCB/issues)! Otherwise,
+sooner or later the dependency might be mandatory without having a workaround
+anymore for your issue!
+
+
 # Dynamic Linking / Unbundling {#doc_building_unbundling}
 
 By default, all dependencies except Qt and OpenCascade will be linked

@@ -48,6 +48,7 @@ option(BUILD_TESTS "Build unit tests." ON)
 option(BUILD_DISALLOW_WARNINGS
        "Disallow compiler warnings during build (build with -Werror)." OFF
 )
+option(BUILD_QTQUICK_TEST "Build the QML test window." ON)
 option(UNBUNDLE_DXFLIB "Don't use vendored dxflib library." OFF)
 option(UNBUNDLE_FONTOBENE_QT5 "Don't use vendored FontoBeneQt5 library." OFF)
 option(UNBUNDLE_GTEST "Don't use vendored GoogleTest library." OFF)
@@ -125,6 +126,13 @@ find_package(
              Widgets
   REQUIRED
 )
+if(BUILD_QTQUICK_TEST)
+  find_package(
+    Qt5 5.5.0
+    COMPONENTS Quick
+    REQUIRED
+  )
+endif()
 if(BUILD_TESTS)
   find_package(
     Qt5 5.5.0
