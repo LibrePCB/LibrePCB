@@ -25,7 +25,6 @@
 #include "../editorcommandset.h"
 
 #include <librepcb/core/utils/mathparser.h>
-#include <librepcb/core/utils/toolbox.h>
 
 /*******************************************************************************
  *  Namespace
@@ -376,10 +375,7 @@ QString LengthEditBase::getValueStr(const LengthUnit& unit) const noexcept {
     // of 0.1mm displayed in mils is 3.937007874, but such a number is annoying
     // in a GUI). The underlying value is of course not truncated, so it should
     // be fine to reduce the displayed number of decimals.
-    return Toolbox::floatToString(unit.convertToUnit(mValue),
-                                  unit.getReasonableNumberOfDecimals(),
-                                  locale()) %
-        " " % unit.toShortStringTr();
+    return unit.format(mValue, locale());
   }
 }
 

@@ -147,6 +147,21 @@ public:
   QString toShortStringTr() const noexcept;
 
   /**
+   * @brief Get a pretty formatted length value with this unit
+   *
+   * Uses up to #getReasonableNumberOfDecimals() decimals, but without trailing
+   * zeros.
+   *
+   * @param value     The value to format.
+   * @param locale    The locale to use for the number format.
+   * @param separator Separator between value and unit (defaults to one space).
+   *
+   * @return Formatted string like "-0.5 mm".
+   */
+  QString format(const Length& value, const QLocale& locale,
+                 const QString& separator = " ") const noexcept;
+
+  /**
    * @brief Get a reasonable number of decimals to be shown
    *
    * When displaying length values to the user, often it makes sense to limit

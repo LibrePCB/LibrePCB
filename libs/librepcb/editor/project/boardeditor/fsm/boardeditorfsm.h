@@ -128,6 +128,7 @@ public:
   bool processFlip(Qt::Orientation orientation) noexcept;
   bool processSnapToGrid() noexcept;
   bool processSetLocked(bool locked) noexcept;
+  bool processChangeLineWidth(int step) noexcept;
   bool processResetAllTexts() noexcept;
   bool processRemove() noexcept;
   bool processEditProperties() noexcept;

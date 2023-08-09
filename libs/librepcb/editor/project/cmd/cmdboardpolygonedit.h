@@ -54,6 +54,9 @@ public:
   explicit CmdBoardPolygonEdit(BI_Polygon& polygon) noexcept;
   ~CmdBoardPolygonEdit() noexcept;
 
+  // Getters
+  BI_Polygon& getObj() const noexcept { return mPolygon; }
+
   // Setters
   void setLayer(const Layer& layer, bool immediate) noexcept;
   void setLineWidth(const UnsignedLength& width, bool immediate) noexcept;

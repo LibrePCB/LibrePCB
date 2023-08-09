@@ -23,6 +23,7 @@
 #include "lengthunit.h"
 
 #include "../serialization/sexpression.h"
+#include "../utils/toolbox.h"
 #include "length.h"
 #include "point.h"
 
@@ -97,6 +98,13 @@ QString LengthUnit::toShortStringTr() const noexcept {
       Q_ASSERT(false);
       return QString();
   }
+}
+
+QString LengthUnit::format(const Length& value, const QLocale& locale,
+                           const QString& separator) const noexcept {
+  return Toolbox::floatToString(convertToUnit(value),
+                                getReasonableNumberOfDecimals(), locale) %
+      separator % toShortStringTr();
 }
 
 int LengthUnit::getReasonableNumberOfDecimals() const noexcept {

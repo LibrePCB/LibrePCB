@@ -602,12 +602,8 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
               (tickPos <=
                (distance - std::min(textHeight, tickInterval * 5)))) {
             // Draw text beside the long tick.
-            const float value = gauge.unit.convertToUnit(tickPos);
             const QString text =
-                Toolbox::floatToString(
-                    value, gauge.unit.getReasonableNumberOfDecimals(),
-                    QLocale()) %
-                gauge.unitSeparator % gauge.unit.toShortStringTr();
+                gauge.unit.format(tickPos, QLocale(), gauge.unitSeparator);
             p.drawText(
                 Point(textOffset, tickPos), textRotation, textHeight,
                 (gauge.xScale != xScale) ? textAlign.mirroredH() : textAlign,
