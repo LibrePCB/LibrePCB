@@ -180,6 +180,7 @@ public:
   QStringList checkForModifications() const;
   void autosave();
   void save();
+  void releaseLock();
 
   // Static Methods
   static std::shared_ptr<TransactionalFileSystem> open(
@@ -215,7 +216,7 @@ private:  // Methods
 
 private:  // Data
   const FilePath mFilePath;
-  const bool mIsWritable;
+  bool mIsWritable;
   DirectoryLock mLock;
   bool mRestoredFromAutosave;
   mutable QMutex mMutex;

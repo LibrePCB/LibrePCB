@@ -146,6 +146,16 @@ public:
       const FilePath& dir, const QStringList& filters = QStringList(),
       bool recursive = false);
 
+  /**
+   * @brief Get all directories within a given directory
+   *
+   * @param rootDir       Filepath to a directory (may or may not exist).
+   *
+   * @return  A list of filepaths to directories in the specified directory
+   *          (empty if the directory doesn't exist).
+   */
+  static QList<FilePath> findDirectories(const FilePath& rootDir);
+
   // Operator Overloadings
   FileUtils& operator=(const FileUtils& rhs) = delete;
 };

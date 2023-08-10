@@ -751,6 +751,22 @@ TEST_F(TransactionalFileSystemTest, testCheckForModifications) {
   EXPECT_EQ(0, fs.checkForModifications().count());
 }
 
+TEST_F(TransactionalFileSystemTest, testReleaseLock) {
+  const FilePath lockFp = mPopulatedDir.getPathTo(".lock");
+
+  TransactionalFileSystem fs(mPopulatedDir, true);
+  EXPECT_TRUE(lockFp.isExistingFile());
+  fs.write("foo", "x");  // Create new file.
+  fs.save();
+  fs.write("bar", "x");  // Create new file.
+  fs.releaseLock();
+  EXPECT_FALSE(lockFp.isExistingFile());
+  fs.releaseLock();  // Second call should do nothing.
+  EXPECT_FALSE(lockFp.isExistingFile());
+  fs.write("foobar", "x");  // Create new file.
+  EXPECT_THROW(fs.save(), Exception);  // Failed because it's read-only.
+}
+
 /*******************************************************************************
  *  Parametrized getSubDirs() Tests
  ******************************************************************************/

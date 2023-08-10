@@ -126,13 +126,17 @@ RuleCheckMessageList Component::runChecks() const {
 }
 
 std::unique_ptr<Component> Component::open(
-    std::unique_ptr<TransactionalDirectory> directory) {
+    std::unique_ptr<TransactionalDirectory> directory,
+    bool abortBeforeMigration) {
   Q_ASSERT(directory);
 
   // Upgrade file format, if needed.
   const Version fileFormat =
       readFileFormat(*directory, ".librepcb-" % getShortElementName());
   const auto migrations = FileFormatMigration::getMigrations(fileFormat);
+  if (abortBeforeMigration && (!migrations.isEmpty())) {
+    return nullptr;
+  }
   for (auto migration : migrations) {
     migration->upgradeComponent(*directory);
   }
@@ -144,6 +148,7 @@ std::unique_ptr<Component> Component::open(
   std::unique_ptr<Component> obj(new Component(std::move(directory), root));
   if (!migrations.isEmpty()) {
     obj->removeObsoleteMessageApprovals();
+    obj->save();  // Format all files correctly as the migration doesn't!
   }
   return obj;
 }
