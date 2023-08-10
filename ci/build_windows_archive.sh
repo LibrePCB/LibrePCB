@@ -22,5 +22,9 @@ windeployqt --compiler-runtime --force \
     ./build/install/opt/bin/librepcb.exe
 windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb-cli.exe
 
+# Test if the bundles are working (hopefully catching deployment issues).
+./build/install/opt/bin/librepcb-cli.exe --version
+./build/install/opt/bin/librepcb.exe --exit-after-startup
+
 # Copy everything to artifacts directory for deployment
 cp -r ./build/install/opt/. ./artifacts/nightly_builds/librepcb-nightly-windows-x86/

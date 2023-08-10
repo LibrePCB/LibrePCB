@@ -28,6 +28,10 @@ popd
 mv "./build/install/opt/LibrePCB.app" "./build/install/opt/librepcb.app"
 mv "./build/install/opt/LibrePCB-CLI.app" "./build/install/opt/librepcb-cli.app"
 
+# Test if the bundles are working (hopefully catching deployment issues).
+./build/install/opt/librepcb-cli.app/Contents/MacOS/librepcb-cli --version
+./build/install/opt/librepcb.app/Contents/MacOS/librepcb --exit-after-startup
+
 # Move bundles to artifacts directory
 mv ./build/install/opt/LibrePCB.dmg ./artifacts/nightly_builds/librepcb-nightly-mac-x86_64.dmg
 mv ./build/install/opt/LibrePCB-CLI.dmg ./artifacts/nightly_builds/librepcb-cli-nightly-mac-x86_64.dmg

@@ -50,5 +50,10 @@ linuxdeployqt "./build/install/opt/bin/librepcb-cli" $LINUXDEPLOYQT_FLAGS -alway
 linuxdeployqt "./build/install/opt/bin/librepcb" $LINUXDEPLOYQT_FLAGS -always-overwrite \
   -qmldir="./build/install/opt/share/librepcb/qml"
 
+# Test if the bundles are working (hopefully catching deployment issues).
+# Doesn't work for AppImages unfortunately because of missing fuse on CI.
+xvfb-run -a ./build/install/opt/bin/librepcb-cli --version
+xvfb-run -a ./build/install/opt/bin/librepcb --exit-after-startup
+
 # Copy to artifacts.
 cp -r "./build/install/opt" "./artifacts/nightly_builds/librepcb-nightly-linux-x86_64"
