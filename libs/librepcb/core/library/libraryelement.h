@@ -62,10 +62,12 @@ public:
   virtual ~LibraryElement() noexcept;
 
   // Getters
+  const QString& getGeneratedBy() const noexcept { return mGeneratedBy; }
   const QSet<Uuid>& getCategories() const noexcept { return mCategories; }
   const ResourceList& getResources() const noexcept { return mResources; }
 
   // Setters
+  void setGeneratedBy(const QString& gen) noexcept { mGeneratedBy = gen; }
   void setCategories(const QSet<Uuid>& uuids) noexcept { mCategories = uuids; }
   void setResources(const ResourceList& resources) noexcept {
     mResources = resources;
@@ -80,6 +82,7 @@ public:
 protected:
   virtual void serialize(SExpression& root) const override;
 
+  QString mGeneratedBy;  ///< If not empty, the element is generated.
   QSet<Uuid> mCategories;
   ResourceList mResources;
 };

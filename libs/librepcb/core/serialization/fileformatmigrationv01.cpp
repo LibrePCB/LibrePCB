@@ -78,6 +78,7 @@ void FileFormatMigrationV01::upgradeSymbol(TransactionalDirectory& dir) {
   {
     const QString fp = "symbol.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root.appendChild("generated_by", QString());
 
     // Various strings.
     upgradeStrings(root);
@@ -110,6 +111,7 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
   {
     const QString fp = "package.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root.appendChild("generated_by", QString());
 
     // Various strings.
     upgradeStrings(root);
@@ -218,6 +220,7 @@ void FileFormatMigrationV01::upgradeComponent(TransactionalDirectory& dir) {
   {
     const QString fp = "component.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root.appendChild("generated_by", QString());
 
     // Signals.
     upgradeInversionCharacters(root, "signal", "name/@0");
@@ -237,6 +240,7 @@ void FileFormatMigrationV01::upgradeDevice(TransactionalDirectory& dir) {
   {
     const QString fp = "device.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+    root.appendChild("generated_by", QString());
 
     // Various strings.
     upgradeStrings(root);

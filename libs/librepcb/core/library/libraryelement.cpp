@@ -43,7 +43,8 @@ LibraryElement::LibraryElement(const QString& shortElementName,
                                const QString& description_en_US,
                                const QString& keywords_en_US)
   : LibraryBaseElement(shortElementName, longElementName, uuid, version, author,
-                       name_en_US, description_en_US, keywords_en_US) {
+                       name_en_US, description_en_US, keywords_en_US),
+    mGeneratedBy() {
 }
 
 LibraryElement::LibraryElement(
@@ -52,6 +53,7 @@ LibraryElement::LibraryElement(
     const SExpression& root)
   : LibraryBaseElement(shortElementName, longElementName, dirnameMustBeUuid,
                        std::move(directory), root),
+    mGeneratedBy(root.getChild("generated_by/@0").getValue()),
     mCategories(),
     mResources(root) {
   // read category UUIDs
@@ -78,6 +80,8 @@ RuleCheckMessageList LibraryElement::runChecks() const {
 
 void LibraryElement::serialize(SExpression& root) const {
   LibraryBaseElement::serialize(root);
+  root.ensureLineBreak();
+  root.appendChild("generated_by", mGeneratedBy);
   foreach (const Uuid& uuid, Toolbox::sortedQSet(mCategories)) {
     root.ensureLineBreak();
     root.appendChild("category", uuid);
