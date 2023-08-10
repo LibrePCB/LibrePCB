@@ -4,11 +4,10 @@
 set -euv -o pipefail
 
 # replace "bin" and "share" directories with the single *.app directory
-mv "./build/install/opt/bin/librepcb.app" "./build/install/opt/LibrePCB.app"
+cp -r "./build/install/opt/bin/librepcb.app" "./build/install/opt/LibrePCB.app"
 cp -r "./build/install/opt/share" "./build/install/opt/LibrePCB.app/Contents/"
-mv "./build/install/opt/bin/librepcb-cli.app" "./build/install/opt/LibrePCB-CLI.app"
+cp -r "./build/install/opt/bin/librepcb-cli.app" "./build/install/opt/LibrePCB-CLI.app"
 cp -r "./build/install/opt/share" "./build/install/opt/LibrePCB-CLI.app/Contents/"
-rm -r "./build/install/opt/bin" "./build/install/opt/share"
 
 # Build bundles
 pushd "./build/install/opt/"  # Avoid having path in DMG name
@@ -20,7 +19,8 @@ dylibbundler -ns -od -b \
   -x LibrePCB-CLI.app/Contents/MacOS/librepcb-cli \
   -d LibrePCB-CLI.app/Contents/Frameworks/ \
   -p @executable_path/../Frameworks/
-macdeployqt "LibrePCB.app" -dmg -always-overwrite
+macdeployqt "LibrePCB.app" -dmg -always-overwrite \
+  -qmldir=./LibrePCB.app/Contents/share/librepcb/qml
 macdeployqt "LibrePCB-CLI.app" -dmg -always-overwrite
 popd
 

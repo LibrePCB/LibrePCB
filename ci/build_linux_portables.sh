@@ -40,13 +40,15 @@ cp -r "./build/install" "./build/appimage"
 cp "./build/appimage/opt/share/icons/hicolor/scalable/apps/org.librepcb.LibrePCB.svg" \
   "./build/appimage/org.librepcb.LibrePCB.svg"
 linuxdeployqt "./build/appimage/opt/share/applications/org.librepcb.LibrePCB.desktop" \
+  -qmldir="./build/appimage/opt/share/librepcb/qml" \
   $LINUXDEPLOYQT_FLAGS -appimage
 patch_appimage
 mv ./LibrePCB-*-x86_64.AppImage ./artifacts/nightly_builds/librepcb-nightly-linux-x86_64.AppImage
 
 # Run linuxdeployqt to bundle all libraries into the portable packages.
 linuxdeployqt "./build/install/opt/bin/librepcb-cli" $LINUXDEPLOYQT_FLAGS -always-overwrite
-linuxdeployqt "./build/install/opt/bin/librepcb" $LINUXDEPLOYQT_FLAGS -always-overwrite
+linuxdeployqt "./build/install/opt/bin/librepcb" $LINUXDEPLOYQT_FLAGS -always-overwrite \
+  -qmldir="./build/install/opt/share/librepcb/qml"
 
 # Copy to artifacts.
 cp -r "./build/install/opt" "./artifacts/nightly_builds/librepcb-nightly-linux-x86_64"

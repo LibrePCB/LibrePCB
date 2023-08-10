@@ -17,7 +17,9 @@ cp -v C:/OpenCascade/win32/gcc/bin/libTK*.dll ./build/install/opt/bin/
 cp -v "`qmake -query QT_INSTALL_PREFIX`"/bin/lib*.dll ./build/install/opt/bin/
 
 # Copy Qt DLLs
-windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb.exe
+windeployqt --compiler-runtime --force \
+    --qmldir=./build/install/opt/share/librepcb/qml \
+    ./build/install/opt/bin/librepcb.exe
 windeployqt --compiler-runtime --force ./build/install/opt/bin/librepcb-cli.exe
 
 # Copy everything to artifacts directory for deployment

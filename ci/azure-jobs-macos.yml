@@ -29,7 +29,9 @@ jobs:
     displayName: Run LibrePCB Unittests
   - bash: pytest -vvv --librepcb-executable="build/install/opt/librepcb-cli.app/Contents/MacOS/librepcb-cli" ./tests/cli
     displayName: Run LibrePCB-CLI Functional Tests
-  - bash: pytest -vvv --librepcb-executable="build/install/opt/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
+  # Note: Functional tests need to be run with the non-bundled app, otherwise
+  # we get the error "Cannot add multiple registrations for QtQml.Models 2".
+  - bash: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb.app/Contents/MacOS/librepcb" --reruns 5 --reruns-delay 10 ./tests/funq
     displayName: Run LibrePCB Functional Tests
   - bash: ./ci/upload_artifacts.sh
     displayName: Upload Artifacts
