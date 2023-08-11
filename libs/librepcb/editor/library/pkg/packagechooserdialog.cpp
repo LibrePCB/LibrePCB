@@ -61,8 +61,8 @@ PackageChooserDialog::PackageChooserDialog(
   mGraphicsScene.reset(new GraphicsScene());
   const Theme& theme = mWorkspace.getSettings().themes.getActive();
   mUi->graphicsView->setBackgroundColors(
-      theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
-      theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
+      theme.getColor(Theme::Color::sBoardBackground).getPrimaryColor(),
+      theme.getColor(Theme::Color::sBoardBackground).getSecondaryColor());
   mUi->graphicsView->setScene(mGraphicsScene.data());
 
   mCategoryTreeModel.reset(
