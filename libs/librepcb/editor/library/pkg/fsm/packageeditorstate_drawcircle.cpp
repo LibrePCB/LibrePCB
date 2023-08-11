@@ -91,6 +91,8 @@ bool PackageEditorState_DrawCircle::entry() noexcept {
       edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
   edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
       edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
+  connect(this, &PackageEditorState_DrawCircle::requestLineWidth,
+          edtLineWidth.get(), &UnsignedLengthEdit::setValue);
   connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
           &PackageEditorState_DrawCircle::lineWidthEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtLineWidth));
@@ -245,6 +247,15 @@ void PackageEditorState_DrawCircle::layerComboBoxValueChanged(
   if (mEditCmd) {
     mEditCmd->setLayer(*mLastLayer, true);
   }
+  if (mUsedLineWidths.contains(&layer)) {
+    emit requestLineWidth(*mUsedLineWidths.find(&layer));
+  } else if (layer.getPolygonsRepresentAreas()) {
+    // Zero-width circles.
+    emit requestLineWidth(UnsignedLength(0));
+  } else {
+    // Typical width according library conventions.
+    emit requestLineWidth(UnsignedLength(200000));
+  }
 }
 
 void PackageEditorState_DrawCircle::lineWidthEditValueChanged(
@@ -253,6 +264,7 @@ void PackageEditorState_DrawCircle::lineWidthEditValueChanged(
   if (mEditCmd) {
     mEditCmd->setLineWidth(mLastLineWidth, true);
   }
+  mUsedLineWidths.insert(mLastLayer, value);
 }
 
 void PackageEditorState_DrawCircle::fillCheckBoxCheckedChanged(

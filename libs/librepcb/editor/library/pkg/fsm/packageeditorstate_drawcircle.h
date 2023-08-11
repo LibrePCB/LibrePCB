@@ -78,6 +78,9 @@ public:
   PackageEditorState_DrawCircle& operator=(
       const PackageEditorState_DrawCircle& rhs) = delete;
 
+signals:
+  void requestLineWidth(const UnsignedLength& value);
+
 private:  // Methods
   bool startAddCircle(const Point& pos) noexcept;
   bool updateCircleDiameter(const Point& pos) noexcept;
@@ -99,6 +102,7 @@ private:  // Types / Data
   UnsignedLength mLastLineWidth;
   bool mLastFill;
   bool mLastGrabArea;
+  QHash<const Layer*, UnsignedLength> mUsedLineWidths;
 };
 
 /*******************************************************************************

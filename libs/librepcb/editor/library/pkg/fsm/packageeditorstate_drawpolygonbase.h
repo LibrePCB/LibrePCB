@@ -89,6 +89,9 @@ public:
   PackageEditorState_DrawPolygonBase& operator=(
       const PackageEditorState_DrawPolygonBase& rhs) = delete;
 
+signals:
+  void requestLineWidth(const UnsignedLength& value);
+
 private:  // Methods
   bool start() noexcept;
   bool abort(bool showErrMsgBox = true) noexcept;
@@ -123,6 +126,7 @@ private:  // Types / Data
   Angle mLastAngle;
   bool mLastFill;
   bool mLastGrabArea;
+  QHash<const Layer*, UnsignedLength> mUsedLineWidths;
 };
 
 /*******************************************************************************
