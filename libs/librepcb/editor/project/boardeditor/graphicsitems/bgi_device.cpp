@@ -82,7 +82,7 @@ BGI_Device::BGI_Device(BI_Device& device,
 
   for (auto& obj : mDevice.getLibFootprint().getPolygons()) {
     auto i = std::make_shared<PrimitivePathGraphicsItem>(this);
-    i->setPath(obj.getPath().toQPainterPathPx());
+    i->setPath(obj.getPathForRendering().toQPainterPathPx());
     i->setLineWidth(obj.getLineWidth());
     i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
     if (obj.isGrabArea()) {

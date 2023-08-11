@@ -167,6 +167,7 @@ void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
     case Polygon::Event::LayerChanged:
       setLineLayer(mLayerProvider.getLayer(polygon.getLayer()));
       updateFillLayer();  // required if the area is filled with the line layer
+      updatePath();  // Implicitly closed might have changed.
       break;
     case Polygon::Event::LineWidthChanged:
       setLineWidth(polygon.getLineWidth());
@@ -213,7 +214,7 @@ void PolygonGraphicsItem::updatePath() noexcept {
     }
     mVertexHandles.append(VertexHandle{p, maxRadius.toPx()});
   }
-  setPath(mPolygon.getPath().toQPainterPathPx());
+  setPath(mPolygon.getPathForRendering().toQPainterPathPx());
   updateBoundingRectMargin();
 }
 

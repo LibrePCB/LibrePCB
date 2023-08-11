@@ -74,6 +74,7 @@ public:
   bool isFilled() const noexcept { return mIsFilled; }
   bool isGrabArea() const noexcept { return mIsGrabArea; }
   const Path& getPath() const noexcept { return mPath; }
+  Path getPathForRendering() const noexcept;
 
   // Setters
   bool setLayer(const Layer& layer) noexcept;

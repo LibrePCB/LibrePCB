@@ -115,23 +115,25 @@ const QSet<const Layer*>&
       &Layer::boardDocumentation(),
       &Layer::boardComments(),
       &Layer::boardGuide(),
-      &Layer::topLegend(),
-      // &Layer::topHiddenGrabAreas(), -> makes no sense in boards
-      &Layer::topDocumentation(),
       &Layer::topNames(),
       &Layer::topValues(),
+      &Layer::topLegend(),
+      &Layer::topDocumentation(),
+      // &Layer::topPackageOutlines(), -> makes no sense in boards
+      // &Layer::topCourtyard(), -> makes no sense in boards
+      // &Layer::topHiddenGrabAreas(), -> makes no sense in boards
       &Layer::topCopper(),
-      &Layer::topCourtyard(),
       &Layer::topGlue(),
       &Layer::topSolderPaste(),
       &Layer::topStopMask(),
-      &Layer::botLegend(),
-      // &Layer::botHiddenGrabAreas(), -> makes no sense in boards
-      &Layer::botDocumentation(),
       &Layer::botNames(),
       &Layer::botValues(),
+      &Layer::botLegend(),
+      &Layer::botDocumentation(),
+      // &Layer::botPackageOutlines(), -> makes no sense in boards
+      // &Layer::botCourtyard(), -> makes no sense in boards
+      // &Layer::botHiddenGrabAreas(), -> makes no sense in boards
       &Layer::botCopper(),
-      &Layer::botCourtyard(),
       &Layer::botGlue(),
       &Layer::botSolderPaste(),
       &Layer::botStopMask(),
