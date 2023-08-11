@@ -160,6 +160,15 @@ static void writeLogHeader() noexcept {
  ******************************************************************************/
 
 static int runApplication() noexcept {
+  // For deployment testing purposes, exit the application now if the flag
+  // '--exit-after-startup' is passed. This shall be done *before* any user
+  // interaction (e.g. message box) to make it working headless.
+  const char* exitFlagName = "--exit-after-startup";
+  if (qApp->arguments().contains(exitFlagName)) {
+    qInfo().nospace() << "Exit requested by flag '" << exitFlagName << "'.";
+    return 0;
+  }
+
   // If the file format is unstable (e.g. for nightly builds), ask to abort now.
   // This warning *must* come that early to be really sure that no files are
   // overwritten with unstable content!

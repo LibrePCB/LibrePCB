@@ -51,9 +51,16 @@
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb_build_env.h>
 
 #include <QtCore>
 #include <QtWidgets>
+
+#if BUILD_QTQUICK_TEST
+#include <QQmlContext>
+#include <QQmlEngine>
+#include <QQuickView>
+#endif
 
 /*******************************************************************************
  *  Namespace
@@ -291,6 +298,24 @@ void ControlPanel::createActions() noexcept {
   mActionWebsite.reset(
       cmd.website.createAction(this, mStandardCommandHandler.data(),
                                &StandardEditorCommandHandler::website));
+  mActionQtQuickTest.reset(new QAction("QtQuick Test Window", this));
+  connect(mActionQtQuickTest.data(), &QAction::triggered, this, [this]() {
+#if BUILD_QTQUICK_TEST
+    Q_UNUSED(this);
+    QQuickView* view = new QQuickView;
+    view->setTitle("QtQuick Test");
+    view->setResizeMode(QQuickView::SizeRootObjectToView);
+    view->resize(350, 150);
+    view->engine()->rootContext()->setContextProperty("view", view);
+    view->setSource(Application::getResourcesDir()
+                        .getPathTo("qml/testwindow.qml")
+                        .toQUrl());
+    view->show();
+#else
+    QMessageBox::warning(this, "QtQuick Test",
+                         "LibrePCB was built without QtQuick support!");
+#endif
+  });
   mActionQuit.reset(cmd.applicationQuit.createAction(
       this, qApp, &QApplication::closeAllWindows,
       EditorCommand::ActionFlag::QueuedConnection));
@@ -321,6 +346,8 @@ void ControlPanel::createMenus() noexcept {
   mb.addAction(mActionOnlineDocumentation);
   mb.addAction(mActionKeyboardShortcutsReference);
   mb.addAction(mActionWebsite);
+  mb.addSeparator();
+  mb.addAction(mActionQtQuickTest);
   mb.addSeparator();
   mb.addAction(mActionAboutLibrePcb);
   mb.addAction(mActionAboutQt);
