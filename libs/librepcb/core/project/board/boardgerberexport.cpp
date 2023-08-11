@@ -194,37 +194,38 @@ void BoardGerberExport::exportComponentLayer(BoardSide side,
       gen.flashComponent(device->getPosition(), rotation, designator, value,
                          mountType, manufacturer, mpn, footprintName);
 
-      // Export component outline. But only closed ones, sunce Gerber specs say
-      // that component outlines must be closed.
-      QHash<const Layer*, GerberAttribute::ApertureFunction> layerFunction;
-      if (side == BoardSide::Top) {
-        layerFunction[&Layer::topDocumentation()] =
-            GerberAttribute::ApertureFunction::ComponentOutlineBody;
-        layerFunction[&Layer::topCourtyard()] =
-            GerberAttribute::ApertureFunction::ComponentOutlineCourtyard;
-      } else {
-        layerFunction[&Layer::botDocumentation()] =
-            GerberAttribute::ApertureFunction::ComponentOutlineBody;
-        layerFunction[&Layer::botCourtyard()] =
-            GerberAttribute::ApertureFunction::ComponentOutlineCourtyard;
+      // Export component body outlines.
+      QVector<std::pair<GerberAttribute::ApertureFunction, Path>> outlines;
+      const Layer& outlinesLayer = (side == BoardSide::Top)
+          ? Layer::topPackageOutlines()
+          : Layer::botPackageOutlines();
+      foreach (const Path& p, getComponentOutlines(*device, outlinesLayer)) {
+        outlines.append(std::make_pair(
+            GerberAttribute::ApertureFunction::ComponentOutlineBody, p));
       }
-      const Transform transform(*device);
-      for (const Polygon& polygon :
-           device->getLibFootprint().getPolygons().sortedByUuid()) {
-        if (!polygon.getPath().isClosed()) {
-          continue;
+      if (outlines.isEmpty()) {
+        // Many packages probably don't have an explicit package outline, thus
+        // using the documentation layer as a fallback.
+        const Layer& documentationLayer = (side == BoardSide::Top)
+            ? Layer::topDocumentation()
+            : Layer::botDocumentation();
+        foreach (const Path& p,
+                 getComponentOutlines(*device, documentationLayer)) {
+          outlines.append(std::make_pair(
+              GerberAttribute::ApertureFunction::ComponentOutlineBody, p));
         }
-        if (polygon.isFilled()) {
-          continue;
-        }
-        const Layer& layer = transform.map(polygon.getLayer());
-        if (!layerFunction.contains(&layer)) {
-          continue;
-        }
-        Path path = transform.map(polygon.getPath());
-        gen.drawComponentOutline(path, rotation, designator, value, mountType,
-                                 manufacturer, mpn, footprintName,
-                                 layerFunction[&layer]);
+      }
+      const Layer& courtyardLayer = (side == BoardSide::Top)
+          ? Layer::topCourtyard()
+          : Layer::botCourtyard();
+      foreach (const Path& p, getComponentOutlines(*device, courtyardLayer)) {
+        outlines.append(std::make_pair(
+            GerberAttribute::ApertureFunction::ComponentOutlineCourtyard, p));
+      }
+      for (const auto& pair : outlines) {
+        gen.drawComponentOutline(pair.second, rotation, designator, value,
+                                 mountType, manufacturer, mpn, footprintName,
+                                 pair.first);
       }
 
       // Export component pins.
@@ -970,6 +971,39 @@ void BoardGerberExport::drawPolygon(GerberGenerator& gen, const Layer& layer,
   if (fill && outline.isClosed()) {
     gen.drawPathArea(outline, function, net, component);
   }
+}
+
+QVector<Path> BoardGerberExport::getComponentOutlines(
+    const BI_Device& device, const Layer& layer) const {
+  QVector<Path> result;
+  const Transform transform(device);
+  for (const Polygon& polygon :
+       device.getLibFootprint().getPolygons().sortedByUuid()) {
+    // Return only closed ones, sunce Gerber specs say that component outlines
+    // must be closed.
+    if ((!polygon.getLayer().getPolygonsRepresentAreas()) &&
+        (!polygon.getPath().isClosed())) {
+      continue;
+    }
+    if (polygon.isFilled()) {
+      continue;
+    }
+    if (transform.map(polygon.getLayer()) != layer) {
+      continue;
+    }
+    result.append(transform.map(polygon.getPathForRendering()));
+  }
+  for (const Circle& circle :
+       device.getLibFootprint().getCircles().sortedByUuid()) {
+    if (circle.isFilled()) {
+      continue;
+    }
+    if (transform.map(circle.getLayer()) != layer) {
+      continue;
+    }
+    result.append(transform.map(Path::circle(circle.getDiameter())));
+  }
+  return result;
 }
 
 std::unique_ptr<ExcellonGenerator> BoardGerberExport::createExcellonGenerator(
