@@ -193,6 +193,26 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
         padNode->appendChild("clearance", SExpression::createToken("0.0"));
       }
 
+      // Polygons.
+      for (SExpression* polygonNode : fptNode->getChildren("polygon")) {
+        if (polygonNode->getChild("layer/@0")
+                .getValue()
+                .endsWith("_courtyard")) {
+          SExpression& widthNode = polygonNode->getChild("width/@0");
+          widthNode.setValue("0.0");
+        }
+      }
+
+      // Circles.
+      for (SExpression* circleNode : fptNode->getChildren("circle")) {
+        if (circleNode->getChild("layer/@0")
+                .getValue()
+                .endsWith("_courtyard")) {
+          SExpression& widthNode = circleNode->getChild("width/@0");
+          widthNode.setValue("0.0");
+        }
+      }
+
       // Stroke texts.
       for (SExpression* txtNode : fptNode->getChildren("stroke_text")) {
         if (deserialize<bool>(txtNode->getChild("mirror/@0"))) {
