@@ -61,6 +61,8 @@ protected:  // Methods
   void checkMissingFootprint(MsgList& msgs) const;
   void checkMissingTexts(MsgList& msgs) const;
   void checkWrongTextLayers(MsgList& msgs) const;
+  void checkPackageOutlines(MsgList& msgs) const;
+  void checkCourtyards(MsgList& msgs) const;
   void checkPadsClearanceToPads(MsgList& msgs) const;
   void checkPadsClearanceToLegend(MsgList& msgs) const;
   void checkPadsAnnularRing(MsgList& msgs) const;

@@ -762,6 +762,20 @@ void PackageEditorWidget::fixMsg(const MsgMissingCategories& msg) {
 }
 
 template <>
+void PackageEditorWidget::fixMsg(const MsgMissingPackageOutline& msg) {
+  mUi->footprintEditorWidget->setCurrentIndex(
+      mPackage->getFootprints().indexOf(msg.getFootprint().get()));
+  mFsm->processGenerateOutline();
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgMissingCourtyard& msg) {
+  mUi->footprintEditorWidget->setCurrentIndex(
+      mPackage->getFootprints().indexOf(msg.getFootprint().get()));
+  mFsm->processGenerateCourtyard();
+}
+
+template <>
 void PackageEditorWidget::fixMsg(const MsgMissingFootprint& msg) {
   Q_UNUSED(msg);
   std::shared_ptr<Footprint> fpt = std::make_shared<Footprint>(
@@ -778,12 +792,16 @@ void PackageEditorWidget::fixMsg(const MsgMissingFootprintModel& msg) {
 template <>
 void PackageEditorWidget::fixMsg(const MsgMissingFootprintName& msg) {
   Q_UNUSED(msg);
+  mUi->footprintEditorWidget->setCurrentIndex(
+      mPackage->getFootprints().indexOf(msg.getFootprint().get()));
   mFsm->processStartAddingNames();
 }
 
 template <>
 void PackageEditorWidget::fixMsg(const MsgMissingFootprintValue& msg) {
   Q_UNUSED(msg);
+  mUi->footprintEditorWidget->setCurrentIndex(
+      mPackage->getFootprints().indexOf(msg.getFootprint().get()));
   mFsm->processStartAddingValues();
 }
 
@@ -968,6 +986,8 @@ bool PackageEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingPackageOutline>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingCourtyard>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprint>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprintModel>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprintName>(msg, applyFix)) return true;

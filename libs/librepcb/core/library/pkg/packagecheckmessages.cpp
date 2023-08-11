@@ -175,6 +175,31 @@ MsgInvalidCustomPadOutline::MsgInvalidCustomPadOutline(
 }
 
 /*******************************************************************************
+ *  MsgMissingCourtyard
+ ******************************************************************************/
+
+MsgMissingCourtyard::MsgMissingCourtyard(
+    std::shared_ptr<const Footprint> footprint) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Missing courtyard in footprint '%1'")
+            .arg(*footprint->getNames().getDefaultValue()),
+        tr("It is recommended to draw the package courtyard with a "
+           "single, closed, zero-width polygon or circle on "
+           "layer '%1'. This allows the DRC to warn if another device "
+           "is placed within the courtyard of this device (i.e. too close).")
+                .arg(Layer::topCourtyard().getNameTr()) %
+            "\n\n" %
+            tr("Often this is identical to the package outline but with a "
+               "small offset. If you're unsure, just ignore this message."),
+        "missing_courtyard"),
+    mFootprint(footprint) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  MsgMissingFootprint
  ******************************************************************************/
 
@@ -220,7 +245,8 @@ MsgMissingFootprintName::MsgMissingFootprintName(
            "silkscreen). There are only a few exceptions which don't need a "
            "name (e.g. if the footprint is only a drawing), for those you can "
            "ignore this message."),
-        "missing_name_text") {
+        "missing_name_text"),
+    mFootprint(footprint) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("footprint", footprint->getUuid());
   mApproval.ensureLineBreak();
@@ -241,7 +267,30 @@ MsgMissingFootprintValue::MsgMissingFootprintValue(
            "silkscreen). There are only a few exceptions which don't need a "
            "value (e.g. if the footprint is only a drawing), for those you can "
            "ignore this message."),
-        "missing_value_text") {
+        "missing_value_text"),
+    mFootprint(footprint) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
+ *  MsgMissingPackageOutline
+ ******************************************************************************/
+
+MsgMissingPackageOutline::MsgMissingPackageOutline(
+    std::shared_ptr<const Footprint> footprint) noexcept
+  : RuleCheckMessage(
+        Severity::Warning,
+        tr("Missing outline in footprint '%1'")
+            .arg(*footprint->getNames().getDefaultValue()),
+        tr("It is recommended to draw the package outline with a "
+           "single, closed, zero-width polygon or circle on "
+           "layer '%1'. This allows the DRC to warn if this device "
+           "is placed within the courtyard of another device (i.e. too close).")
+            .arg(Layer::topPackageOutlines().getNameTr()),
+        "missing_package_outline"),
+    mFootprint(footprint) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("footprint", footprint->getUuid());
   mApproval.ensureLineBreak();

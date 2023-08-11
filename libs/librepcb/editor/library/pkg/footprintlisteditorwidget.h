@@ -64,6 +64,7 @@ public:
   void setReadOnly(bool readOnly) noexcept;
   void setReferences(Package* package, UndoStack* stack) noexcept;
   void setLengthUnit(const LengthUnit& unit) noexcept;
+  void setCurrentIndex(int index) noexcept;
 
   // Operator Overloadings
   FootprintListEditorWidget& operator=(const FootprintListEditorWidget& rhs) =

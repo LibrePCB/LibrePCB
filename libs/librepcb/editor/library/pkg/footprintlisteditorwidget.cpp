@@ -129,6 +129,10 @@ void FootprintListEditorWidget::setLengthUnit(const LengthUnit& unit) noexcept {
   mLengthDelegateZ->setUnit(unit);
 }
 
+void FootprintListEditorWidget::setCurrentIndex(int index) noexcept {
+  mView->setCurrentIndex(mModel->index(index, 0));
+}
+
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
