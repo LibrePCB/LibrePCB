@@ -37,8 +37,6 @@ namespace librepcb {
 namespace editor {
 namespace tests {
 
-using ::librepcb::tests::TestHelpers;
-
 /*******************************************************************************
  *  Test Class
  ******************************************************************************/
@@ -52,11 +50,11 @@ class ShortcutsReferenceGeneratorTest : public ::testing::Test {};
 TEST_F(ShortcutsReferenceGeneratorTest, testExportPdfMultipleTimes) {
   FilePath fp = FilePath::getRandomTempPath().getPathTo("test.pdf");
   ShortcutsReferenceGenerator gen(EditorCommandSet::instance());
-  gen.generatePdf(fp);
+  EXPECT_TRUE(gen.generatePdf(fp)) << "Page layout overflow!";
   EXPECT_TRUE(fp.isExistingFile());
 
   // Export again to see if it doesn't fail on already existing file.
-  gen.generatePdf(fp);
+  EXPECT_TRUE(gen.generatePdf(fp));
 }
 
 /*******************************************************************************
