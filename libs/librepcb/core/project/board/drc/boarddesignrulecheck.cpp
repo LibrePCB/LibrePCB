@@ -115,7 +115,7 @@ void BoardDesignRuleCheck::execute(bool quick) {
     checkAllowedNpthSlots(75);  // 1%
     checkAllowedPthSlots(76);  // 1%
     checkInvalidPadConnections(78);  // 2%
-    checkCourtyardClearances(88);  // 10%
+    checkDeviceClearances(88);  // 10%
     checkBoardOutline(91);  // 3%
     checkForUnplacedComponents(93);  // 2%
     checkForMissingConnections(95);  // 2%
@@ -1192,10 +1192,14 @@ void BoardDesignRuleCheck::checkZones(int progressEnd) {
     }
     QSet<const Layer*> noDeviceLayers;
     if (zone.rules.testFlag(Zone::Rule::NoDevices)) {
+      // Note: Also adding documentation layers since many packages probably
+      // don't have an explicit package outline.
       if (zone.layers.contains(&Layer::topCopper())) {
+        noDeviceLayers.insert(&Layer::topPackageOutlines());
         noDeviceLayers.insert(&Layer::topDocumentation());
       }
       if (zone.layers.contains(&Layer::botCopper())) {
+        noDeviceLayers.insert(&Layer::botPackageOutlines());
         noDeviceLayers.insert(&Layer::botDocumentation());
       }
     }
@@ -1262,8 +1266,11 @@ void BoardDesignRuleCheck::checkZones(int progressEnd) {
       bool deviceInKeepoutZone = false;
       for (const Polygon& polygon : device->getLibFootprint().getPolygons()) {
         auto check = [&intersectsPolygon, &transform, &polygon]() {
-          return intersectsPolygon(transform.map(polygon.getPath()),
-                                   polygon.getLineWidth(), polygon.isFilled());
+          return intersectsPolygon(
+              transform.map(polygon.getPathForRendering()),
+              polygon.getLineWidth(),
+              polygon.isFilled() ||
+                  polygon.getLayer().getPolygonsRepresentAreas());
         };
         const Layer& layer = transform.map(polygon.getLayer());
         if ((noCopperLayers.contains(&layer)) && check()) {
@@ -1285,7 +1292,9 @@ void BoardDesignRuleCheck::checkZones(int progressEnd) {
           return intersectsPolygon(
               transform.map(Path::circle(circle.getDiameter())
                                 .translated(circle.getCenter())),
-              circle.getLineWidth(), circle.isFilled());
+              circle.getLineWidth(),
+              circle.isFilled() ||
+                  circle.getLayer().getPolygonsRepresentAreas());
         };
         const Layer& layer = transform.map(circle.getLayer());
         if ((noCopperLayers.contains(&layer)) && check()) {
@@ -1489,34 +1498,55 @@ void BoardDesignRuleCheck::checkInvalidPadConnections(int progressEnd) {
   emitProgress(progressEnd);
 }
 
-void BoardDesignRuleCheck::checkCourtyardClearances(int progressEnd) {
-  emitStatus(tr("Check courtyard clearances..."));
+void BoardDesignRuleCheck::checkDeviceClearances(int progressEnd) {
+  emitStatus(tr("Check device clearances..."));
 
-  for (const Layer& layer : {Layer::topCourtyard(), Layer::botCourtyard()}) {
-    // determine device courtyard areas
+  for (const auto& layers :
+       {std::make_pair(&Layer::topPackageOutlines(), &Layer::topCourtyard()),
+        std::make_pair(&Layer::botPackageOutlines(), &Layer::botCourtyard())}) {
+    // Determine device outlines and courtyards.
+    QMap<const BI_Device*, ClipperLib::Paths> deviceOutlines;
     QMap<const BI_Device*, ClipperLib::Paths> deviceCourtyards;
     foreach (const BI_Device* device, mBoard.getDeviceInstances()) {
-      deviceCourtyards.insert(device, getDeviceCourtyardPaths(*device, layer));
+      deviceOutlines.insert(device,
+                            getDeviceOutlinePaths(*device, *layers.first));
+      deviceCourtyards.insert(device,
+                              getDeviceOutlinePaths(*device, *layers.second));
     }
 
-    // check clearances
+    // Helper functions.
+    QVector<Path> locations;
+    auto doesOverlap = [&](const ClipperLib::Paths& area1,
+                           const ClipperLib::Paths& area2) {
+      if (area1.empty() || area2.empty()) {
+        return false;
+      }
+      const std::unique_ptr<ClipperLib::PolyTree> intersections =
+          ClipperHelpers::intersectToTree(area1, area2, ClipperLib::pftEvenOdd,
+                                          ClipperLib::pftEvenOdd);
+      locations =
+          ClipperHelpers::convert(ClipperHelpers::flattenTree(*intersections));
+      return !locations.isEmpty();
+    };
+    auto check = [&](const BI_Device* dev1, const BI_Device* dev2) {
+      if (doesOverlap(deviceOutlines[dev1], deviceOutlines[dev2])) {
+        emitMessage(std::make_shared<DrcMsgOverlappingDevices>(*dev1, *dev2,
+                                                               locations));
+      } else if (doesOverlap(deviceOutlines[dev1], deviceCourtyards[dev2]) ||
+                 doesOverlap(deviceOutlines[dev2], deviceCourtyards[dev1])) {
+        emitMessage(
+            std::make_shared<DrcMsgDeviceInCourtyard>(*dev1, *dev2, locations));
+      }
+    };
+
+    // Check for overlaps.
     for (int i = 0; i < deviceCourtyards.count(); ++i) {
       const BI_Device* dev1 = deviceCourtyards.keys()[i];
       Q_ASSERT(dev1);
-      const ClipperLib::Paths& paths1 = deviceCourtyards[dev1];
       for (int k = i + 1; k < deviceCourtyards.count(); ++k) {
         const BI_Device* dev2 = deviceCourtyards.keys()[k];
         Q_ASSERT(dev2);
-        const ClipperLib::Paths& paths2 = deviceCourtyards[dev2];
-        const std::unique_ptr<ClipperLib::PolyTree> intersections =
-            ClipperHelpers::intersectToTree(
-                paths1, paths2, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
-        const QVector<Path> locations = ClipperHelpers::convert(
-            ClipperHelpers::flattenTree(*intersections));
-        if (!locations.isEmpty()) {
-          emitMessage(std::make_shared<DrcMsgCourtyardOverlap>(*dev1, *dev2,
-                                                               locations));
-        }
+        check(dev1, dev2);
       }
     }
   }
@@ -1860,31 +1890,32 @@ const ClipperLib::Paths& BoardDesignRuleCheck::getCopperPaths(
   return mCachedPaths[key];
 }
 
-ClipperLib::Paths BoardDesignRuleCheck::getDeviceCourtyardPaths(
+ClipperLib::Paths BoardDesignRuleCheck::getDeviceOutlinePaths(
     const BI_Device& device, const Layer& layer) {
   ClipperLib::Paths paths;
-  Transform transform(device);
+  const Transform transform(device);
   for (const Polygon& polygon : device.getLibFootprint().getPolygons()) {
     const Layer& polygonLayer = transform.map(polygon.getLayer());
     if (polygonLayer != layer) {
       continue;
     }
-    Path path = transform.map(polygon.getPath());
+    const Path path = transform.map(polygon.getPath());
     ClipperHelpers::unite(paths,
                           {ClipperHelpers::convert(path, maxArcTolerance())},
-                          ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+                          ClipperLib::pftNonZero, ClipperLib::pftNonZero);
   }
   for (const Circle& circle : device.getLibFootprint().getCircles()) {
     const Layer& circleLayer = transform.map(circle.getLayer());
     if (circleLayer != layer) {
       continue;
     }
-    Point absolutePos = transform.map(circle.getCenter());
+    const Point absolutePos = transform.map(circle.getCenter());
     ClipperHelpers::unite(
         paths,
-        {ClipperHelpers::convert(Path::circle(circle.getDiameter()),
-                                 maxArcTolerance())},
-        ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+        {ClipperHelpers::convert(
+            Path::circle(circle.getDiameter()).translated(absolutePos),
+            maxArcTolerance())},
+        ClipperLib::pftNonZero, ClipperLib::pftNonZero);
   }
   return paths;
 }

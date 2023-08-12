@@ -96,7 +96,7 @@ private:  // Methods
   void checkAllowedNpthSlots(int progressEnd);
   void checkAllowedPthSlots(int progressEnd);
   void checkInvalidPadConnections(int progressEnd);
-  void checkCourtyardClearances(int progressEnd);
+  void checkDeviceClearances(int progressEnd);
   void checkBoardOutline(int progressEnd);
   void checkForUnplacedComponents(int progressEnd);
   void checkForMissingConnections(int progressEnd);
@@ -112,8 +112,8 @@ private:  // Methods
       noexcept;
   const ClipperLib::Paths& getCopperPaths(
       const Layer& layer, const QSet<const NetSignal*>& netsignals);
-  ClipperLib::Paths getDeviceCourtyardPaths(const BI_Device& device,
-                                            const Layer& layer);
+  ClipperLib::Paths getDeviceOutlinePaths(const BI_Device& device,
+                                          const Layer& layer);
   QVector<Path> getDeviceLocation(const BI_Device& device) const;
   QVector<Path> getViaLocation(const BI_Via& via) const noexcept;
   template <typename THole>
