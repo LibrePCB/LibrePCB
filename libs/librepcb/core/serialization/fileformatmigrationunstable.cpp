@@ -63,19 +63,39 @@ void FileFormatMigrationUnstable::upgradePackageCategory(
 
 void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  const QString fp = "symbol.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  root.appendChild("generated_by", QString());
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  const QString fp = "package.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  root.appendChild("generated_by", QString());
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  const QString fp = "component.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  root.appendChild("generated_by", QString());
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeDevice(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
+
+  const QString fp = "device.lp";
+  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
+  root.appendChild("generated_by", QString());
+  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {
@@ -125,12 +145,7 @@ void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {
 }
 
 void FileFormatMigrationUnstable::upgradeBoardDrcSettings(SExpression& root) {
-  SExpression& node = root.getChild("design_rule_check");
-  node.appendChild("min_silkscreen_stopmask_clearance",
-                   SExpression::createToken("0.127"));
-  node.appendChild("min_silkscreen_width", SExpression::createToken("0.15"));
-  node.appendChild("min_silkscreen_text_height",
-                   SExpression::createToken("0.8"));
+  Q_UNUSED(root);
 }
 
 /*******************************************************************************
