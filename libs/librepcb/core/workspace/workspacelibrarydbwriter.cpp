@@ -202,6 +202,14 @@ void WorkspaceLibraryDbWriter::createAllTables() {
       "`category_uuid` TEXT NOT NULL, "
       "UNIQUE(element_id, category_uuid)"
       ")");
+  queries << QString(
+      "CREATE TABLE IF NOT EXISTS packages_alt ("
+      "`id` INTEGER PRIMARY KEY NOT NULL, "
+      "`package_id` INTEGER "
+      "REFERENCES packages(id) ON DELETE CASCADE NOT NULL, "
+      "`name` TEXT NOT NULL, "
+      "`reference` TEXT NOT NULL"
+      ")");
 
   // components
   queries << QString(
@@ -380,6 +388,18 @@ int WorkspaceLibraryDbWriter::addPartAttribute(int partId,
   query.bindValue(
       ":unit",
       attribute.getUnit() ? attribute.getUnit()->getName() : QVariant());
+  return mDb.insert(query);
+}
+
+int WorkspaceLibraryDbWriter::addAlternativeName(
+    int pkgId, const ElementName& name, const SimpleString& reference) {
+  QSqlQuery query = mDb.prepareQuery(
+      "INSERT INTO packages_alt "
+      "(package_id, name, reference) VALUES "
+      "(:package_id, :name, :reference)");
+  query.bindValue(":package_id", pkgId);
+  query.bindValue(":name", *name);
+  query.bindValue(":reference", nonNull(*reference));
   return mDb.insert(query);
 }
 

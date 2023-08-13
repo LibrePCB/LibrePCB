@@ -111,6 +111,32 @@ int WorkspaceLibraryDb::getScanProgressPercent() const noexcept {
   return mLibraryScanner->getProgressPercent();
 }
 
+template <>
+QList<Uuid> WorkspaceLibraryDb::find<Package>(const QString& keyword) const {
+  // ATTENTION: Keep SQL in sync with the generig find() method below!
+  QSqlQuery query = mDb->prepareQuery(
+      "SELECT packages.uuid FROM packages "
+      "LEFT JOIN packages_tr "
+      "ON packages.id = packages_tr.element_id "
+      "LEFT JOIN packages_alt "
+      "ON packages.id = packages_alt.package_id "
+      "WHERE packages_tr.name LIKE :escapedKeyword "
+      "OR packages_tr.keywords LIKE :escapedKeyword "
+      "OR packages_alt.name LIKE :escapedKeyword "
+      "OR packages.uuid = :keyword "
+      "GROUP BY packages.uuid "
+      "ORDER BY packages_tr.name ASC");
+  query.bindValue(":keyword", keyword);
+  query.bindValue(":escapedKeyword", "%" + keyword + "%");
+  mDb->exec(query);
+
+  QList<Uuid> uuids;
+  while (query.next()) {
+    uuids.append(Uuid::fromString(query.value(0).toString()));  // can throw
+  }
+  return uuids;
+}
+
 QList<Uuid> WorkspaceLibraryDb::findDevicesOfParts(
     const QString& keyword) const {
   QSqlQuery query = mDb->prepareQuery(
@@ -307,6 +333,7 @@ FilePath WorkspaceLibraryDb::getLatestVersionFilePath(
 
 QList<Uuid> WorkspaceLibraryDb::find(const QString& elementsTable,
                                      const QString& keyword) const {
+  // ATTENTION: Keep SQL in sync with the find<Package>() method above!
   QSqlQuery query = mDb->prepareQuery(
       "SELECT %elements.uuid FROM %elements "
       "LEFT JOIN %elements_tr "

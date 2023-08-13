@@ -316,6 +316,20 @@ int WorkspaceLibraryScanner::addElementToDb<PackageCategory>(
 }
 
 template <>
+int WorkspaceLibraryScanner::addElementToDb<Package>(
+    WorkspaceLibraryDbWriter& writer, int libId, const Package& element) {
+  const int id = writer.addElement<Package>(
+      libId, element.getDirectory().getAbsPath(), element.getUuid(),
+      element.getVersion(), element.isDeprecated());
+  addToCategories(writer, id, element);
+  foreach (const Package::AlternativeName& name,
+           element.getAlternativeNames()) {
+    writer.addAlternativeName(id, name.name, name.reference);
+  }
+  return id;
+}
+
+template <>
 int WorkspaceLibraryScanner::addElementToDb<Device>(
     WorkspaceLibraryDbWriter& writer, int libId, const Device& element) {
   const int id = writer.addDevice(
