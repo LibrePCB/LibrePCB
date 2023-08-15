@@ -85,6 +85,9 @@
        <string>Circular Drill</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout_2">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_4">
          <property name="text">
@@ -109,6 +112,9 @@
        <string>Linear Slot</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout_3">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <item row="1" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
