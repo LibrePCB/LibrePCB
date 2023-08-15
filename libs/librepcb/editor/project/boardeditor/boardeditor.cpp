@@ -1733,7 +1733,7 @@ void BoardEditor::execD356NetlistExportDialog() noexcept {
               str, FilePath::ReplaceSpaces | FilePath::KeepCase);
         });
     path = FileDialog::getSaveFileName(
-        this, tr("Export project to *.lppz"),
+        this, tr("Export IPC D-356A Netlist"),
         mProject.getPath().getPathTo(path).toStr(), "*.d356");
     if (path.isEmpty()) return;
     if (!path.contains(".")) path.append(".d356");
