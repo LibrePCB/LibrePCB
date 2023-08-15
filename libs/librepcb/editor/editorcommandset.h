@@ -1684,7 +1684,7 @@ public:
       "locked",  // clang-format break
       QT_TR_NOOP("Lock Placement"),
       QT_TR_NOOP("Toggle placement lock"),
-      QIcon(),
+      QIcon(":/img/status/locked.png"),  // For consistent context menu look.
       EditorCommand::Flags(),
       {},
       &categoryContextMenu,
