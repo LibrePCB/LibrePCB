@@ -87,6 +87,7 @@ Package::Package(const Uuid& uuid, const Version& version,
                  const QString& keywords_en_US, AssemblyType assemblyType)
   : LibraryElement(getShortElementName(), getLongElementName(), uuid, version,
                    author, name_en_US, description_en_US, keywords_en_US),
+    mAlternativeNames(),
     mAssemblyType(assemblyType),
     mPads(),
     mModels(),
@@ -97,10 +98,14 @@ Package::Package(std::unique_ptr<TransactionalDirectory> directory,
                  const SExpression& root)
   : LibraryElement(getShortElementName(), getLongElementName(), true,
                    std::move(directory), root),
+    mAlternativeNames(),
     mAssemblyType(deserialize<AssemblyType>(root.getChild("assembly_type/@0"))),
     mPads(root),
     mModels(root),
     mFootprints(root) {
+  foreach (const SExpression* node, root.getChildren("alternative_name")) {
+    mAlternativeNames.append(AlternativeName(*node));
+  }
 }
 
 Package::~Package() noexcept {
@@ -206,6 +211,10 @@ std::unique_ptr<Package> Package::open(
 
 void Package::serialize(SExpression& root) const {
   LibraryElement::serialize(root);
+  foreach (const AlternativeName& name, mAlternativeNames) {
+    root.ensureLineBreak();
+    name.serialize(root.appendList("alternative_name"));
+  }
   root.ensureLineBreak();
   root.appendChild("assembly_type", mAssemblyType);
   root.ensureLineBreak();

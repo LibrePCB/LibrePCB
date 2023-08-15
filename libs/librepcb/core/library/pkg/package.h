@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../../types/simplestring.h"
 #include "../libraryelement.h"
 #include "footprint.h"
 #include "packagemodel.h"
@@ -60,6 +61,20 @@ class Package final : public LibraryElement {
 
 public:
   // Types
+  struct AlternativeName {
+    ElementName name;
+    SimpleString reference;
+
+    AlternativeName(const ElementName& name, const SimpleString& reference)
+      : name(name), reference(reference) {}
+    AlternativeName(const SExpression& node)
+      : name(deserialize<ElementName>(node.getChild("@0"))),
+        reference(deserialize<SimpleString>(node.getChild("reference/@0"))) {}
+    void serialize(SExpression& root) const {
+      root.appendChild(name);
+      root.appendChild("reference", reference);
+    }
+  };
   enum class AssemblyType {
     None,  ///< Nothing to mount (i.e. not a package, just a footprint)
     Tht,  ///< Pure THT package
@@ -78,6 +93,9 @@ public:
   ~Package() noexcept;
 
   // Getters
+  const QList<AlternativeName>& getAlternativeNames() const noexcept {
+    return mAlternativeNames;
+  }
   AssemblyType getAssemblyType(bool resolveAuto) const noexcept;
   AssemblyType guessAssemblyType() const noexcept;
   PackagePadList& getPads() noexcept { return mPads; }
@@ -117,6 +135,7 @@ private:  // Methods
           const SExpression& root);
 
 private:  // Data
+  QList<AlternativeName> mAlternativeNames;  ///< Optional
   AssemblyType mAssemblyType;  ///< Package assembly type (metadata)
   PackagePadList mPads;  ///< empty list if the package has no pads
   PackageModelList mModels;  ///< 3D models (optional)
