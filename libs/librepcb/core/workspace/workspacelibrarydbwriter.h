@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../fileio/filepath.h"
 #include "../types/elementname.h"
+#include "../types/simplestring.h"
 
 #include <optional/tl/optional.hpp>
 
@@ -261,6 +262,17 @@ public:
                   "Unsupported ElementType");
     return addToCategory(getElementTable<ElementType>(), elementId, category);
   }
+
+  /**
+   * @brief Add an alternative name to a previously added package
+   *
+   * @param pkgId         ID of the package for this alternative name.
+   * @param name          Alternative name (mandatory).
+   * @param reference     Origin of the alternative name (optional).
+   * @return ID of the added part.
+   */
+  int addAlternativeName(int pkgId, const ElementName& name,
+                         const SimpleString& reference);
 
   // Helper Functions
 
