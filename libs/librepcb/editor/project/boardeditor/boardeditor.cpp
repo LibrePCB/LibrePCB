@@ -206,6 +206,16 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   createMenus();  // Depends on dock widgets!
   updateBoardActionGroup();  // Depends on menus!
 
+  // Setup "project upgraded" message.
+  {
+    const QString msg = mProjectEditor.getUpgradeMessageLabelText();
+    mUi->msgProjectUpgraded->init(msg, !msg.isEmpty());
+    connect(mUi->msgProjectUpgraded, &MessageWidget::linkActivated, this,
+            [this]() { mProjectEditor.showUpgradeMessages(this); });
+    connect(&mProjectEditor, &ProjectEditor::projectSavedToDisk, this,
+            [this]() { mUi->msgProjectUpgraded->setActive(false); });
+  }
+
   // add all boards to the menu and connect to project signals
   mUi->tabBar->setVisible(false);  // hide since there are no boards yet
   for (int i = 0; i < mProject.getBoards().count(); i++) boardAdded(i);

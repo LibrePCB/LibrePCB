@@ -77,9 +77,7 @@ public:
   // Constructors / Destructor
   SchematicEditor() = delete;
   SchematicEditor(const SchematicEditor& other) = delete;
-  explicit SchematicEditor(
-      ProjectEditor& projectEditor, Project& project,
-      const tl::optional<QList<FileFormatMigration::Message>>& upgradeMessages);
+  explicit SchematicEditor(ProjectEditor& projectEditor, Project& project);
   ~SchematicEditor();
 
   // Getters
@@ -147,8 +145,6 @@ private:
   void execGraphicsExportDialog(GraphicsExportDialog::Output output,
                                 const QString& settingsKey) noexcept;
   bool useIeee315Symbols() const noexcept;
-  void showUpgradeMessages(
-      QList<FileFormatMigration::Message> messages) noexcept;
 
   // General Attributes
   ProjectEditor& mProjectEditor;

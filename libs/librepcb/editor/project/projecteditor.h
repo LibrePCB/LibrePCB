@@ -83,6 +83,9 @@ public:
 
   Workspace& getWorkspace() const noexcept { return mWorkspace; }
   Project& getProject() const noexcept { return mProject; }
+  const QString& getUpgradeMessageLabelText() const noexcept {
+    return mUpgradeMessageLabelText;
+  }
   const LengthUnit& getDefaultLengthUnit() const noexcept;
 
   /**
@@ -131,6 +134,13 @@ public:
   ProjectEditor& operator=(const Project& rhs) = delete;
 
 public slots:
+
+  /**
+   * @brief Show a dialog with all project file format upgrade messages
+   *
+   * @param parent    Parent widget.
+   */
+  void showUpgradeMessages(QWidget* parent) noexcept;
 
   /**
    * @brief Open the schematic and/or the board editor window
@@ -253,6 +263,8 @@ private:  // Methods
 private:  // Data
   Workspace& mWorkspace;
   Project& mProject;
+  QList<FileFormatMigration::Message> mUpgradeMessages;
+  QString mUpgradeMessageLabelText;
 
   /// The timer for the periodically automatic saving
   /// functionality (see also @ref doc_project_save)

@@ -60,11 +60,28 @@ ProjectEditor::ProjectEditor(
     mLastAutosaveStateId(0),
     mManualModificationsMade(false) {
   try {
+    if (upgradeMessages) {
+      mUpgradeMessages = *upgradeMessages;
+      mUpgradeMessageLabelText =
+          tr("ATTENTION: This project has been upgraded to a new file format. "
+             "After saving, it will not be possible anymore to open it with an "
+             "older LibrePCB version!");
+      if (!upgradeMessages->isEmpty()) {
+        mUpgradeMessageLabelText += " ";
+        mUpgradeMessageLabelText +=
+            tr("The upgrade produced <a href='%1'>%2 message(s)</a>, please "
+               "review before proceeding.",
+               nullptr, upgradeMessages->count())
+                .arg("messages")
+                .arg(upgradeMessages->count());
+      }
+    }
+
     mUndoStack = new UndoStack();
     mLastAutosaveStateId = mUndoStack->getUniqueStateId();
 
     // create the whole schematic/board editor GUI inclusive FSM and so on
-    mSchematicEditor = new SchematicEditor(*this, mProject, upgradeMessages);
+    mSchematicEditor = new SchematicEditor(*this, mProject);
     mBoardEditor = new BoardEditor(*this, mProject);
   } catch (...) {
     // free the allocated memory in the reverse order of their allocation...
@@ -157,6 +174,65 @@ bool ProjectEditor::windowIsAboutToClose(QMainWindow& window) noexcept {
 /*******************************************************************************
  *  Public Slots
  ******************************************************************************/
+
+void ProjectEditor::showUpgradeMessages(QWidget* parent) noexcept {
+  std::sort(mUpgradeMessages.begin(), mUpgradeMessages.end(),
+            [](const FileFormatMigration::Message& a,
+               const FileFormatMigration::Message& b) {
+              if (a.severity > b.severity) return true;
+              if (a.toVersion < b.toVersion) return true;
+              if (a.message < b.message) return true;
+              return false;
+            });
+
+  QDialog dialog(parent);
+  dialog.setWindowTitle(tr("File Format Upgrade Messages"));
+  dialog.resize(800, 400);
+  QVBoxLayout* layout = new QVBoxLayout(&dialog);
+  QTableWidget* table = new QTableWidget(mUpgradeMessages.count(), 4, &dialog);
+  table->setHorizontalHeaderLabels(
+      {tr("Severity"), tr("Version"), tr("Occurrences"), tr("Message")});
+  table->horizontalHeader()->setSectionResizeMode(
+      0, QHeaderView::ResizeToContents);
+  table->horizontalHeader()->setSectionResizeMode(
+      1, QHeaderView::ResizeToContents);
+  table->horizontalHeader()->setSectionResizeMode(
+      2, QHeaderView::ResizeToContents);
+  table->horizontalHeader()->setStretchLastSection(true);
+  table->horizontalHeaderItem(3)->setTextAlignment(Qt::AlignLeft);
+  table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  table->setSelectionBehavior(QAbstractItemView::SelectRows);
+  table->setWordWrap(true);
+  for (int i = 0; i < mUpgradeMessages.count(); ++i) {
+    const FileFormatMigration::Message m = mUpgradeMessages.at(i);
+    QTableWidgetItem* item = new QTableWidgetItem(m.getSeverityStrTr());
+    item->setTextAlignment(Qt::AlignCenter);
+    table->setItem(i, 0, item);
+
+    item = new QTableWidgetItem(m.fromVersion.toStr() % " → " %
+                                m.toVersion.toStr());
+    item->setTextAlignment(Qt::AlignCenter);
+    table->setItem(i, 1, item);
+
+    item = new QTableWidgetItem(
+        (m.affectedItems > 0) ? QString::number(m.affectedItems) : QString());
+    item->setTextAlignment(Qt::AlignCenter);
+    table->setItem(i, 2, item);
+
+    item = new QTableWidgetItem(m.message);
+    item->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    table->setItem(i, 3, item);
+  }
+  layout->addWidget(table);
+  QTimer::singleShot(10, table, &QTableWidget::resizeRowsToContents);
+  connect(table->horizontalHeader(), &QHeaderView::sectionResized, table,
+          &QTableWidget::resizeRowsToContents);
+  QDialogButtonBox* buttonBox =
+      new QDialogButtonBox(QDialogButtonBox::Close, &dialog);
+  connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::close);
+  layout->addWidget(buttonBox);
+  dialog.exec();
+}
 
 void ProjectEditor::showAllRequiredEditors() noexcept {
   // show board editor if there is at least one board
