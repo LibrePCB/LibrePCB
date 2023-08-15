@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "packageeditorstate_select.h"
 
+#include "../../../cmd/cmdcircleedit.h"
 #include "../../../cmd/cmdpolygonedit.h"
 #include "../../../cmd/cmdzoneedit.h"
 #include "../../../dialogs/circlepropertiesdialog.h"
@@ -40,6 +41,7 @@
 #include "../../../undostack.h"
 #include "../../../utils/menubuilder.h"
 #include "../../../widgets/graphicsview.h"
+#include "../../../widgets/positivelengthedit.h"
 #include "../../cmd/cmddragselectedfootprintitems.h"
 #include "../../cmd/cmdpastefootprintitems.h"
 #include "../../cmd/cmdremoveselectedfootprintitems.h"
@@ -51,8 +53,10 @@
 
 #include <librepcb/core/import/dxfreader.h>
 #include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/utils/clipperhelpers.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
+#include <librepcb/core/utils/transform.h>
 
 #include <QtCore>
 
@@ -557,6 +561,24 @@ bool PackageEditorState_Select::processEditProperties() noexcept {
     default: { break; }
   }
   return false;
+}
+
+bool PackageEditorState_Select::processGenerateOutline() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      return generateOutline();
+    }
+    default: { return false; }
+  }
+}
+
+bool PackageEditorState_Select::processGenerateCourtyard() noexcept {
+  switch (mState) {
+    case SubState::IDLE: {
+      return generateCourtyard();
+    }
+    default: { return false; }
+  }
 }
 
 bool PackageEditorState_Select::processImportDxf() noexcept {
@@ -1065,6 +1087,224 @@ bool PackageEditorState_Select::removeSelectedItems() noexcept {
     QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
   }
   return true;  // TODO: return false if no items were selected
+}
+
+bool PackageEditorState_Select::generateOutline() noexcept {
+  if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
+    return false;
+  }
+
+  try {
+    clearSelectionRect(true);
+    UndoStackTransaction transaction(mContext.undoStack,
+                                     tr("Generate package outline"));
+
+    for (bool bottom : {false, true}) {
+      const Transform transform(Point(), Angle(), bottom);
+      QPainterPath p;
+      for (Polygon& polygon : mContext.currentFootprint->getPolygons()) {
+        if (transform.map(polygon.getLayer()) == Layer::topDocumentation()) {
+          if (polygon.getLineWidth() > 0) {
+            foreach (const Path& path,
+                     polygon.getPath().toOutlineStrokes(
+                         PositiveLength(*polygon.getLineWidth()))) {
+              p.addPath(path.toQPainterPathPx());
+            }
+          } else {
+            p.addPath(polygon.getPath().toQPainterPathPx());
+          }
+        }
+      }
+      for (Circle& circle : mContext.currentFootprint->getCircles()) {
+        if (transform.map(circle.getLayer()) == Layer::topDocumentation()) {
+          const qreal radiusPx =
+              (circle.getDiameter() + circle.getLineWidth())->toPx() / 2;
+          p.addEllipse(circle.getCenter().toPxQPointF(), radiusPx, radiusPx);
+        }
+      }
+      // Generate bottom outlines only if there is documentation on the
+      // bottom side!
+      if ((!p.isEmpty()) || (!bottom)) {
+        for (FootprintPad& pad : mContext.currentFootprint->getPads()) {
+          const Transform padTransform(pad.getPosition(), pad.getRotation());
+          if (pad.isOnLayer(transform.map(Layer::topCopper()))) {
+            p.addPath(Path::toQPainterPathPx(
+                padTransform.map(pad.getGeometry().toOutlines()), true));
+          }
+        }
+      }
+      const QRectF boundingRect = p.boundingRect();
+      if (!boundingRect.isEmpty()) {
+        const Layer& layer = transform.map(Layer::topPackageOutlines());
+        const Path path = Path::rect(Point::fromPx(boundingRect.topLeft()),
+                                     Point::fromPx(boundingRect.bottomRight()))
+                              .toOpenPath();
+        bool outlineSet = false;
+        for (Polygon& polygon : mContext.currentFootprint->getPolygons()) {
+          if (polygon.getLayer() == layer) {
+            if (!outlineSet) {
+              QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(polygon));
+              cmd->setLineWidth(UnsignedLength(0), false);
+              cmd->setPath(path, false);
+              transaction.append(cmd.take());
+              outlineSet = true;
+            } else {
+              transaction.append(new CmdPolygonRemove(
+                  mContext.currentFootprint->getPolygons(), &polygon));
+            }
+          }
+        }
+        if (!outlineSet) {
+          transaction.append(new CmdPolygonInsert(
+              mContext.currentFootprint->getPolygons(),
+              std::make_shared<Polygon>(Uuid::createRandom(), layer,
+                                        UnsignedLength(0), false, false,
+                                        path)));
+        }
+      }
+    }
+
+    if (!transaction.commit()) {
+      QMessageBox::information(
+          &mContext.editorWidget, tr("No Content"),
+          tr("No content (e.g. pads or documentation polygons) found to "
+             "generate the package outline from. Please add at least the pads "
+             "before invoking this command."));
+    }
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return true;
+}
+
+bool PackageEditorState_Select::generateCourtyard() noexcept {
+  if ((!mContext.currentFootprint) || (!mContext.currentGraphicsItem)) {
+    return false;
+  }
+
+  try {
+    tl::optional<PositiveLength> offset;
+    auto getOffset = [&]() {
+      if (!offset) {
+        QDialog dlg(&mContext.editorWidget);
+        dlg.setWindowTitle(tr("Courtyard Excess"));
+        QVBoxLayout* vLayout = new QVBoxLayout(&dlg);
+        PositiveLengthEdit* edtOffset = new PositiveLengthEdit(&dlg);
+        edtOffset->configure(mContext.lengthUnit,
+                             LengthEditBase::Steps::generic(),
+                             "package_editor/generate_courtyard_dialog");
+        edtOffset->setValue(PositiveLength(250000));  // From IPC7351.
+        edtOffset->setFocus();
+        vLayout->addWidget(edtOffset);
+        QDialogButtonBox* btnBox = new QDialogButtonBox(&dlg);
+        btnBox->setStandardButtons(QDialogButtonBox::Ok |
+                                   QDialogButtonBox::Cancel);
+        connect(btnBox, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+        connect(btnBox, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+        vLayout->addWidget(btnBox);
+        if (dlg.exec() != QDialog::Accepted) {
+          throw UserCanceled(__FILE__, __LINE__);
+        }
+        offset = edtOffset->getValue();
+      }
+      return *offset;
+    };
+
+    clearSelectionRect(true);
+    UndoStackTransaction transaction(mContext.undoStack,
+                                     tr("Generate courtyard"));
+
+    // Offset polygons.
+    const PositiveLength maxArcTolerance(50000);
+    QList<std::pair<const Layer*, Path>> polygons;
+    for (const Polygon& polygon : mContext.currentFootprint->getPolygons()) {
+      if (polygon.getLayer().isPackageOutline()) {
+        ClipperLib::Paths paths{
+            ClipperHelpers::convert(polygon.getPath(), maxArcTolerance)};
+        ClipperHelpers::offset(paths, *getOffset(), maxArcTolerance,
+                               ClipperLib::jtMiter);
+        foreach (const Path& path, ClipperHelpers::convert(paths)) {
+          polygons.append(std::make_pair(polygon.getLayer().isTop()
+                                             ? &Layer::topCourtyard()
+                                             : &Layer::botCourtyard(),
+                                         path.toOpenPath()));
+        }
+      }
+    }
+    // Update existing courtyards / remove obsolete courtyards.
+    for (Polygon& polygon : mContext.currentFootprint->getPolygons()) {
+      if (polygon.getLayer().isPackageCourtyard()) {
+        if (!polygons.isEmpty()) {
+          const auto pair = polygons.takeFirst();
+          QScopedPointer<CmdPolygonEdit> cmd(new CmdPolygonEdit(polygon));
+          cmd->setLayer(*pair.first, false);
+          cmd->setLineWidth(UnsignedLength(0), false);
+          cmd->setPath(pair.second, false);
+          transaction.append(cmd.take());
+        } else {
+          transaction.append(new CmdPolygonRemove(
+              mContext.currentFootprint->getPolygons(), &polygon));
+        }
+      }
+    }
+    // Add new courtyards.
+    for (const auto& pair : polygons) {
+      transaction.append(new CmdPolygonInsert(
+          mContext.currentFootprint->getPolygons(),
+          std::make_shared<Polygon>(Uuid::createRandom(), *pair.first,
+                                    UnsignedLength(0), false, false,
+                                    pair.second)));
+    }
+
+    // Offset circles.
+    QList<std::tuple<const Layer*, Point, PositiveLength>> circles;
+    for (const Circle& circle : mContext.currentFootprint->getCircles()) {
+      if (circle.getLayer().isPackageOutline()) {
+        circles.append(
+            std::make_tuple(circle.getLayer().isTop() ? &Layer::topCourtyard()
+                                                      : &Layer::botCourtyard(),
+                            circle.getCenter(),
+                            circle.getDiameter() + getOffset() + getOffset()));
+      }
+    }
+    // Update existing courtyards / remove obsolete courtyards.
+    for (Circle& circle : mContext.currentFootprint->getCircles()) {
+      if (circle.getLayer().isPackageCourtyard()) {
+        if (!circles.isEmpty()) {
+          const auto tuple = circles.takeFirst();
+          QScopedPointer<CmdCircleEdit> cmd(new CmdCircleEdit(circle));
+          cmd->setLayer(*std::get<0>(tuple), false);
+          cmd->setLineWidth(UnsignedLength(0), false);
+          cmd->setCenter(std::get<1>(tuple), false);
+          cmd->setDiameter(std::get<2>(tuple), false);
+          transaction.append(cmd.take());
+        } else {
+          transaction.append(new CmdCircleRemove(
+              mContext.currentFootprint->getCircles(), &circle));
+        }
+      }
+    }
+    // Add new courtyards.
+    for (const auto& tuple : circles) {
+      transaction.append(new CmdCircleInsert(
+          mContext.currentFootprint->getCircles(),
+          std::make_shared<Circle>(Uuid::createRandom(), *std::get<0>(tuple),
+                                   UnsignedLength(0), false, false,
+                                   std::get<1>(tuple), std::get<2>(tuple))));
+    }
+
+    if (!transaction.commit()) {
+      QMessageBox::information(
+          &mContext.editorWidget, tr("No Outline"),
+          tr("The courtyard can only be generated if there's a package outline "
+             "polygon or circle, so that needs to be added first."));
+    }
+  } catch (const UserCanceled& e) {
+    Q_UNUSED(e);
+  } catch (const Exception& e) {
+    QMessageBox::critical(&mContext.editorWidget, tr("Error"), e.getMsg());
+  }
+  return true;
 }
 
 void PackageEditorState_Select::removePolygonVertices(

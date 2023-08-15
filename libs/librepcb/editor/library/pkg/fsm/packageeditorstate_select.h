@@ -102,6 +102,8 @@ public:
   bool processSnapToGrid() noexcept override;
   bool processRemove() noexcept override;
   bool processEditProperties() noexcept override;
+  bool processGenerateOutline() noexcept override;
+  bool processGenerateCourtyard() noexcept override;
   bool processImportDxf() noexcept override;
   bool processAbortCommand() noexcept override;
 
@@ -121,6 +123,8 @@ private:  // Methods
                            bool flipLayers) noexcept;
   bool snapSelectedItemsToGrid() noexcept;
   bool removeSelectedItems() noexcept;
+  bool generateOutline() noexcept;
+  bool generateCourtyard() noexcept;
   void removePolygonVertices(std::shared_ptr<Polygon> polygon,
                              const QVector<int> vertices) noexcept;
   void startAddingPolygonVertex(std::shared_ptr<Polygon> polygon, int vertex,

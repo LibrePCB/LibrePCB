@@ -404,6 +404,22 @@ bool PackageEditorFsm::processEditProperties() noexcept {
   }
 }
 
+bool PackageEditorFsm::processGenerateOutline() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processGenerateOutline();
+  } else {
+    return false;
+  }
+}
+
+bool PackageEditorFsm::processGenerateCourtyard() noexcept {
+  if (getCurrentState()) {
+    return getCurrentState()->processGenerateCourtyard();
+  } else {
+    return false;
+  }
+}
+
 bool PackageEditorFsm::processAbortCommand() noexcept {
   if (getCurrentState() && (!getCurrentState()->processAbortCommand())) {
     return setNextState(State::SELECT);

@@ -47,6 +47,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/pkg/packagecheckmessages.h>
 #include <librepcb/core/types/pcbcolor.h>
+#include <librepcb/core/utils/clipperhelpers.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -261,6 +262,8 @@ QSet<EditorWidgetBase::Feature> PackageEditorWidget::getAvailableFeatures()
       EditorWidgetBase::Feature::GraphicsView,
       EditorWidgetBase::Feature::OpenGlView,
       EditorWidgetBase::Feature::ExportGraphics,
+      EditorWidgetBase::Feature::GenerateOutline,
+      EditorWidgetBase::Feature::GenerateCourtyard,
   };
   return features + mFsm->getAvailableFeatures();
 }
@@ -418,6 +421,14 @@ bool PackageEditorWidget::toggle3D() noexcept {
 
 bool PackageEditorWidget::abortCommand() noexcept {
   return mFsm->processAbortCommand();
+}
+
+bool PackageEditorWidget::processGenerateOutline() noexcept {
+  return mFsm->processGenerateOutline();
+}
+
+bool PackageEditorWidget::processGenerateCourtyard() noexcept {
+  return mFsm->processGenerateCourtyard();
 }
 
 bool PackageEditorWidget::importDxf() noexcept {

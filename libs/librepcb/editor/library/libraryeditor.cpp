@@ -639,6 +639,17 @@ void LibraryEditor::createActions() noexcept {
   mActionRemove.reset(cmd.remove.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->remove();
   }));
+  mActionGenerate.reset(cmd.generateContent.createAction(this));
+  mActionGenerateOutline.reset(
+      cmd.toolGenerateOutline.createAction(this, this, [this]() {
+        if (mCurrentEditorWidget)
+          mCurrentEditorWidget->processGenerateOutline();
+      }));
+  mActionGenerateCourtyard.reset(
+      cmd.toolGenerateCourtyard.createAction(this, this, [this]() {
+        if (mCurrentEditorWidget)
+          mCurrentEditorWidget->processGenerateCourtyard();
+      }));
   mActionAbort.reset(cmd.abort.createAction(this, this, [this]() {
     if (mCurrentEditorWidget) mCurrentEditorWidget->abortCommand();
   }));
@@ -820,6 +831,16 @@ void LibraryEditor::createToolBars() noexcept {
   mToolBarTools->addAction(mActionToolZone.data());
   mToolBarTools->addAction(mActionToolHole.data());
   mToolBarTools->addSeparator();
+  mToolBarTools->addAction(mActionGenerate.data());
+  if (auto btn = qobject_cast<QToolButton*>(
+          mToolBarTools->widgetForAction(mActionGenerate.data()))) {
+    QMenu* menu = new QMenu(mToolBarTools.data());
+    menu->addAction(mActionGenerateOutline.data());
+    menu->addAction(mActionGenerateCourtyard.data());
+    btn->setMenu(menu);
+    btn->setPopupMode(QToolButton::InstantPopup);
+  }
+  mToolBarTools->addSeparator();
   mToolBarTools->addAction(mActionToolMeasure.data());
   addToolBar(Qt::LeftToolBarArea, mToolBarTools.data());
 }
@@ -915,6 +936,9 @@ void LibraryEditor::createMenus() noexcept {
   mb.addAction(mActionToolZone);
   mb.addAction(mActionToolHole);
   mb.addSeparator();
+  mb.addAction(mActionGenerateOutline);
+  mb.addAction(mActionGenerateCourtyard);
+  mb.addSeparator();
   mb.addAction(mActionToolMeasure);
 
   // Help.
@@ -965,6 +989,12 @@ void LibraryEditor::setAvailableFeatures(
   mActionMirrorVertical->setEnabled(features.contains(Feature::Mirror));
   mActionFlipHorizontal->setEnabled(features.contains(Feature::Flip));
   mActionFlipVertical->setEnabled(features.contains(Feature::Flip));
+  mActionGenerate->setEnabled(features.contains(Feature::GenerateOutline) ||
+                              features.contains(Feature::GenerateCourtyard));
+  mActionGenerateOutline->setEnabled(
+      features.contains(Feature::GenerateOutline));
+  mActionGenerateCourtyard->setEnabled(
+      features.contains(Feature::GenerateCourtyard));
   mActionImportDxf->setEnabled(features.contains(Feature::ImportGraphics));
   mActionSnapToGrid->setEnabled(features.contains(Feature::SnapToGrid));
   mActionProperties->setEnabled(features.contains(Feature::Properties));

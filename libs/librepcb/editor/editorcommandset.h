@@ -1083,6 +1083,24 @@ public:
       {QKeySequence(Qt::Key_N)},
       &categoryTools,
   };
+  EditorCommand toolGenerateOutline{
+      "tool_generate_outline",  // clang-format break
+      QT_TR_NOOP("Generate Outline"),
+      QT_TR_NOOP("Automatically generate the outline polygon"),
+      QIcon(":/img/actions/wizard.png"),
+      EditorCommand::Flags(),
+      {},
+      &categoryTools,
+  };
+  EditorCommand toolGenerateCourtyard{
+      "tool_generate_courtyard",  // clang-format break
+      QT_TR_NOOP("Generate Courtyard"),
+      QT_TR_NOOP("Automatically generate the courtyard polygon"),
+      QIcon(":/img/actions/wizard.png"),
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryTools,
+  };
   EditorCommand toolMeasure{
       "tool_measure",  // clang-format break
       QT_TR_NOOP("Measure Distance"),
@@ -1668,6 +1686,16 @@ public:
       QT_TR_NOOP("Toggle visibility"),
       QIcon(),
       EditorCommand::Flags(),
+      {},
+      &categoryContextMenu,
+  };
+  EditorCommand generateContent{
+      // Actually not really for the context menu :-/
+      "generate_content",  // clang-format break
+      QT_TR_NOOP("Generate Content"),
+      QT_TR_NOOP("Automatically generate some content"),
+      QIcon(":/img/actions/wizard.png"),
+      EditorCommand::Flag::OpensPopup,
       {},
       &categoryContextMenu,
   };

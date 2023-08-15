@@ -64,7 +64,7 @@ public:
   // General Methods
   void append(UndoCommand* cmd);
   void abort();
-  void commit();
+  bool commit();
 
   // Operator Overloadings
   UndoStackTransaction& operator=(const UndoStackTransaction& rhs) = delete;

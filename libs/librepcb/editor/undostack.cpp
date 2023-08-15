@@ -66,10 +66,11 @@ void UndoStackTransaction::abort() {
   mCmdActive = false;
 }
 
-void UndoStackTransaction::commit() {
+bool UndoStackTransaction::commit() {
   if (!mCmdActive) throw LogicError(__FILE__, __LINE__);
-  mStack.commitCmdGroup();  // can throw
+  const bool result = mStack.commitCmdGroup();  // can throw
   mCmdActive = false;
+  return result;
 }
 
 /*******************************************************************************
