@@ -57,7 +57,7 @@ ShortcutsReferenceGenerator::~ShortcutsReferenceGenerator() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void ShortcutsReferenceGenerator::generatePdf(const FilePath& fp) {
+bool ShortcutsReferenceGenerator::generatePdf(const FilePath& fp) {
   FileUtils::makePath(fp.getParentDir());
 
   QPdfWriter writer(fp.toStr());
@@ -95,12 +95,32 @@ void ShortcutsReferenceGenerator::generatePdf(const FilePath& fp) {
   drawRow(writer, painter, x, y, sPageWidth - x, shortcutsWidth, "Zoom View",
           "Scroll Wheel", true);
 
-  drawSectionTitle(writer, painter, 0, sPageWidth, 26,
+  drawSectionTitle(writer, painter, 0, sPageWidth, 25.5,
                    "Configured in Workspace Settings");
 
-  auto categories = mCommands.getCategories();
+  // Use manual order of categories to get a compact page layout.
+  const QVector<EditorCommandCategory*> categories = {
+      &mCommands.categoryEditor,  // long
+      &mCommands.categoryWindowManagement,  //
+      &mCommands.categoryImportExport,  //
+      &mCommands.categoryModify,  // long
+      &mCommands.categoryView,  //
+      &mCommands.categoryTools,  // long
+      &mCommands.categoryComponents,  //
+      &mCommands.categoryDocks,  //
+      &mCommands.categoryCommands,  // long
+      &mCommands.categoryTextInput,  //
+      &mCommands.categoryHelp,  //
+      &mCommands.categoryContextMenu,  // Not visible
+  };
+  if (categories.count() != mCommands.getCategories().count()) {
+    throw LogicError(
+        __FILE__, __LINE__,
+        "Editor command category not added to shortcuts reference export.");
+  }
   x = 0;
-  y = 33;
+  y = 32;
+  bool layoutOverflow = false;
   for (int i = 0; i < categories.count(); ++i) {
     if (!categories.at(i)->isConfigurable()) {
       continue;
@@ -109,7 +129,11 @@ void ShortcutsReferenceGenerator::generatePdf(const FilePath& fp) {
         mCommands.getCommands(categories.at(i)).count() * sRowHeight;
     if ((y + categoryHeight) > sPageHeight) {
       x += sColumnWidth + sColumnSpacing;
-      y = 33;
+      y = 32;
+      if (((y + categoryHeight) > sPageHeight) ||
+          ((x + sColumnWidth) > sPageWidth)) {
+        layoutOverflow = true;
+      }
     }
     drawCommandCategory(writer, painter, x, y, *categories.at(i));
     y += categoryHeight + sCategorySpacing;
@@ -125,6 +149,8 @@ void ShortcutsReferenceGenerator::generatePdf(const FilePath& fp) {
     throw RuntimeError(__FILE__, __LINE__,
                        "Failed to finish PDF export - invalid output file?");
   }
+
+  return !layoutOverflow;
 }
 
 /*******************************************************************************

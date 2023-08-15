@@ -70,7 +70,17 @@ public:
   ~ShortcutsReferenceGenerator() noexcept;
 
   // General Methods
-  void generatePdf(const FilePath& fp);
+  /**
+   * @brief Generate the PDF
+   *
+   * @param fp    Destination PDF file path.
+   *
+   * @retval true on success.
+   * @retval false If the PDF was generated, but the layout has overflown.
+   *
+   * @throw Exception in case of a fatal error.
+   */
+  bool generatePdf(const FilePath& fp);
 
   // Operator Overloadings
   ShortcutsReferenceGenerator& operator=(
@@ -97,7 +107,7 @@ private:  // Data
   static constexpr qreal sCategoryTextSize = 3;
   static constexpr qreal sRowTextSize = 2.5;
   static constexpr qreal sRowHeight = 3;
-  static constexpr qreal sCategorySpacing = 6;
+  static constexpr qreal sCategorySpacing = 5;
   static constexpr qreal sColumnSpacing = 3.5;
   static constexpr qreal sColumnWidth = (sPageWidth - 3 * sColumnSpacing) / 4;
   static constexpr qreal sShortcutsWidth = 28;
