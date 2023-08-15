@@ -21,6 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectloader.h>
@@ -62,6 +64,40 @@ protected:
 /*******************************************************************************
  *  Test Methods
  ******************************************************************************/
+
+TEST_F(ProjectTest, testUpgradeV01) {
+  // Copy project into temporary directory.
+  const FilePath src(TEST_DATA_DIR "/projects/v0.1");
+  FileUtils::copyDirRecursively(src, mProjectDir);
+
+  // Open/upgrade/close project.
+  int schematicCount = -1;
+  int boardCount = -1;
+  ASSERT_TRUE(FileUtils::readFile(mProjectDir.getPathTo(".librepcb-project"))
+                  .startsWith("0.1\n"));
+  {
+    ProjectLoader loader;
+    std::unique_ptr<Project> project =
+        loader.open(createDir(), mProjectFile.getFilename());
+    schematicCount = project->getSchematics().count();
+    boardCount = project->getBoards().count();
+    project->save();
+    project->getDirectory().getFileSystem()->save();
+  }
+
+  // Re-open project.
+  ASSERT_TRUE(
+      FileUtils::readFile(mProjectDir.getPathTo(".librepcb-project"))
+          .startsWith(Application::getFileFormatVersion().toStr().toUtf8() %
+                      "\n"));
+  {
+    ProjectLoader loader;
+    std::unique_ptr<Project> project =
+        loader.open(createDir(), mProjectFile.getFilename());
+    EXPECT_EQ(schematicCount, project->getSchematics().count());
+    EXPECT_EQ(boardCount, project->getBoards().count());
+  }
+}
 
 TEST_F(ProjectTest, testCreateCloseOpen) {
   QDateTime datetime = QDateTime::currentDateTime();

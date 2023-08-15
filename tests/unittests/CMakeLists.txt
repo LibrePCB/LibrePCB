@@ -48,9 +48,16 @@ add_executable(
   core/library/cmp/componentprefixtest.cpp
   core/library/cmp/componentsymbolvariantitemsuffixtest.cpp
   core/library/cmp/componentsymbolvariantitemtest.cpp
+  core/library/cmp/componenttest.cpp
+  core/library/cmpcat/componentcategorytest.cpp
+  core/library/dev/devicetest.cpp
   core/library/librarybaseelementtest.cpp
+  core/library/librarytest.cpp
   core/library/pkg/footprintpadtest.cpp
+  core/library/pkg/packagetest.cpp
+  core/library/pkgcat/packagecategorytest.cpp
   core/library/sym/symbolpintest.cpp
+  core/library/sym/symboltest.cpp
   core/network/filedownloadtest.cpp
   core/network/networkrequestbasesignalreceiver.h
   core/network/networkrequesttest.cpp
