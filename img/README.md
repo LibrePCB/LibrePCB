@@ -15,6 +15,7 @@ actions/apply.png icons/png/48x48/actions/dialog-accept.png LGPL-2.1
 actions/bookmark.png icons/png/48x48/actions/bookmark-4.png LGPL-2.1
 actions/cam_export.png icons/png/48x48/apps/gerbv.png GPLv3
 actions/cancel.png icons/png/48x48/actions/dialog-cancel-4.png LGPL-2.1
+actions/clean.png icons/png/48x48/actions/edit-clear-3.png PD
 actions/close.png icons/png/48x48/actions/application-exit-4.png CC-BY-SA 3.0 or LGPL
 actions/copy.png icons/png/48x48/actions/edit-copy-6.png CC-BY-SA 3.0 or LGPL
 actions/cut.png icons/png/48x48/actions/edit-cut-5.png LGPL-2.1
@@ -38,6 +39,7 @@ actions/move.png icons/png/48x48/actions/transform-move.png CC-BY-SA 3.0 or LGPL
 actions/new_2.png icons/png/48x48/actions/document-new-3.png GPLv2
 actions/new.png icons/png/48x48/actions/document-new-8.png LGPL-2.1
 actions/open.png icons/png/48x48/actions/document-open-7.png CC-BY-SA 3.0 or LGPL
+actions/output_jobs.png icons/png/48x48/actions/system-run-3.png GPLv2
 actions/paste.png icons/png/48x48/actions/edit-paste-3.png GPLv2
 actions/pdf.png icons/png/48x48/mimetypes/oxygen-style/application-pdf.png CC-BY-SA 3.0 or LGPL
 actions/plus_2.png icons/png/48x48/actions/edit-add-4.png LGPL-2.1
@@ -51,6 +53,8 @@ actions/redo.png icons/png/48x48/actions/edit-redo-3.png GPLv2
 actions/refresh.png icons/png/48x48/actions/view-refresh-7.png CC-BY-SA 3.0 or LGPL
 actions/rotate_left.png icons/png/48x48/actions/object-rotate-left-3.png CC-BY-SA 3.0 or LGPL
 actions/rotate_right.png icons/png/48x48/actions/object-rotate-right-3.png CC-BY-SA 3.0 or LGPL
+actions/run.png icons/png/48x48/actions/arrow-right-3.png CC-BY-SA 3.0 or LGPL
+actions/run_all.png icons/png/48x48/actions/arrow-right-double-3.png CC-BY-SA 3.0 or LGPL
 actions/save.png icons/png/48x48/actions/document-save-2.png GPLv2
 actions/search.png icons/png/64x64/actions/edit-find-5.png LGPL-2.1
 actions/select_all.png icons/png/64x64/actions/edit-select-all-2.png PD

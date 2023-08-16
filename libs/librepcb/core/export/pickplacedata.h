@@ -52,7 +52,9 @@ public:
     Bottom,
   };
 
-  enum class Type {
+  // ATTENTION: When modifying items, adjust PickPlaceCsvWriter and
+  // PickPlaceOutputJob as well!
+  enum class Type : int {
     Tht,  ///< Pure THT package
     Smt,  ///< Pure SMT package
     Mixed,  ///< Mixed THT/SMT package
@@ -164,6 +166,14 @@ private:
   QString mBoardName;
   QList<PickPlaceDataItem> mItems;
 };
+
+/*******************************************************************************
+ *  Non-Member Functions
+ ******************************************************************************/
+
+inline uint qHash(PickPlaceDataItem::Type key, uint seed = 0) noexcept {
+  return ::qHash(static_cast<int>(key), seed);
+}
 
 /*******************************************************************************
  *  End of File

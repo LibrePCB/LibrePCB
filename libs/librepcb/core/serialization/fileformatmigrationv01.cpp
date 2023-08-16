@@ -403,11 +403,16 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
     }
   }
 
+  // Output jobs.
+  createOutputJobs(dir);
+
   // Metadata.
   {
     const QString fp = "project/metadata.lp";
     SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
     context.projectUuid = root.getChild("@0").getValue();
+    upgradeMetadata(root);
+    dir.write(fp, root.toByteArray());
   }
 
   // Settings.
@@ -582,9 +587,20 @@ void FileFormatMigrationV01::upgradeWorkspaceData(TransactionalDirectory& dir) {
  *  Private Methods
  ******************************************************************************/
 
+void FileFormatMigrationV01::createOutputJobs(TransactionalDirectory& dir) {
+  SExpression root = SExpression::createList("librepcb_jobs");
+  dir.write("project/jobs.lp", root.toByteArray());
+}
+
+void FileFormatMigrationV01::upgradeMetadata(SExpression& root) {
+  SExpression& versionNode = root.getChild("version/@0");
+  versionNode.setValue(toFileProofName(versionNode.getValue(), "latest"));
+}
+
 void FileFormatMigrationV01::upgradeSettings(SExpression& root) {
   upgradeStrings(root);
   root.appendList("custom_bom_attributes");
+  root.appendChild("output_directory", QString("./output/{{VERSION}}/"));
   root.appendChild("default_lock_component_assembly",
                    SExpression::createToken("false"));
 }
@@ -1136,6 +1152,25 @@ void FileFormatMigrationV01::replaceStrings(
     }
     child->setValue(s);
   }
+}
+
+QString FileFormatMigrationV01::toFileProofName(
+    const QString& name, const QString& fallback) noexcept {
+  // perform compatibility decomposition (NFKD)
+  QString ret = name.normalized(QString::NormalizationForm_KD);
+  // remove leading and trailing spaces
+  ret = ret.trimmed();
+  // replace remaining spaces with replacement
+  ret.replace(" ", "-");
+  // remove all invalid characters
+  ret.remove(QRegularExpression("[^-a-zA-Z0-9_+().]"));
+  // truncate to maximum allowed length
+  ret.truncate(20);
+  // if there are leading or trailing spaces, remove them again ;)
+  ret = ret.trimmed();
+  // if the result is not valid, return the fallback
+  if (ret.isEmpty()) ret = fallback;
+  return ret;
 }
 
 /*******************************************************************************

@@ -50,7 +50,9 @@ CmdProjectEdit::CmdProjectEdit(Project& project) noexcept
     mOldLocaleOrder(mProject.getLocaleOrder()),
     mNewLocaleOrder(mOldLocaleOrder),
     mOldNormOrder(mProject.getNormOrder()),
-    mNewNormOrder(mOldNormOrder) {
+    mNewNormOrder(mOldNormOrder),
+    mOldOutputJobs(project.getOutputJobs()),
+    mNewOutputJobs(mOldOutputJobs) {
 }
 
 CmdProjectEdit::~CmdProjectEdit() noexcept {
@@ -70,7 +72,7 @@ void CmdProjectEdit::setAuthor(const QString& newAuthor) noexcept {
   mNewAuthor = newAuthor;
 }
 
-void CmdProjectEdit::setVersion(const QString& newVersion) noexcept {
+void CmdProjectEdit::setVersion(const FileProofName& newVersion) noexcept {
   Q_ASSERT(!wasEverExecuted());
   mNewVersion = newVersion;
 }
@@ -90,6 +92,11 @@ void CmdProjectEdit::setNormOrder(const QStringList& order) noexcept {
   mNewNormOrder = order;
 }
 
+void CmdProjectEdit::setOutputJobs(const OutputJobList& jobs) noexcept {
+  Q_ASSERT(!wasEverExecuted());
+  mNewOutputJobs = jobs;
+}
+
 /*******************************************************************************
  *  Inherited from UndoCommand
  ******************************************************************************/
@@ -103,6 +110,7 @@ bool CmdProjectEdit::performExecute() {
   if (mNewAttributes != mOldAttributes) return true;
   if (mNewLocaleOrder != mOldLocaleOrder) return true;
   if (mNewNormOrder != mOldNormOrder) return true;
+  if (mNewOutputJobs != mOldOutputJobs) return true;
   return false;
 }
 
@@ -113,6 +121,7 @@ void CmdProjectEdit::performUndo() {
   mProject.setAttributes(mOldAttributes);
   mProject.setLocaleOrder(mOldLocaleOrder);
   mProject.setNormOrder(mOldNormOrder);
+  mProject.getOutputJobs() = mOldOutputJobs;
 }
 
 void CmdProjectEdit::performRedo() {
@@ -122,6 +131,7 @@ void CmdProjectEdit::performRedo() {
   mProject.setAttributes(mNewAttributes);
   mProject.setLocaleOrder(mNewLocaleOrder);
   mProject.setNormOrder(mNewNormOrder);
+  mProject.getOutputJobs() = mNewOutputJobs;
 }
 
 /*******************************************************************************

@@ -59,6 +59,7 @@ public:
   ~DesktopServices() noexcept;
 
   // General Methods
+  bool openUrl(const QUrl& url) const noexcept;
   bool openWebUrl(const QUrl& url) const noexcept;
   bool openLocalPath(const FilePath& filePath) const noexcept;
 
@@ -69,7 +70,7 @@ private:  // Methods
   bool openDirectory(const FilePath& filePath) const noexcept;
   bool openLocalPathWithCommand(const FilePath& filePath,
                                 const QStringList& commands) const noexcept;
-  bool openUrl(const QUrl& url) const noexcept;
+  bool openUrlFallback(const QUrl& url) const noexcept;
 
 private:  // Data
   const WorkspaceSettings& mSettings;

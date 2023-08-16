@@ -66,7 +66,7 @@ std::shared_ptr<PickPlaceData> BoardPickPlaceGenerator::generate() noexcept {
   };
 
   std::shared_ptr<PickPlaceData> data = std::make_shared<PickPlaceData>(
-      *mBoard.getProject().getName(), mBoard.getProject().getVersion(),
+      *mBoard.getProject().getName(), *mBoard.getProject().getVersion(),
       *mBoard.getName());
   const QStringList& locale = mBoard.getProject().getLocaleOrder();
 

@@ -535,7 +535,7 @@ public:
       QT_TR_NOOP("Generate pick&place files for automated PCB assembly"),
       QIcon(":/img/actions/export_pick_place_file.png"),
       EditorCommand::Flag::OpensPopup,
-      {QKeySequence(Qt::Key_F11)},
+      {},  // Was F11 until v0.1.7
       &categoryImportExport,
   };
   EditorCommand generateD356Netlist{
@@ -545,6 +545,15 @@ public:
       QIcon(":/img/actions/generate_bom.png"),  // No netlist icon yet.
       EditorCommand::Flag::OpensPopup,
       {},
+      &categoryImportExport,
+  };
+  EditorCommand outputJobs{
+      "output_jobs",  // clang-format break
+      QT_TR_NOOP("Output Jobs"),
+      QT_TR_NOOP("Modify or run output jobs"),
+      QIcon(":/img/actions/output_jobs.png"),
+      EditorCommand::Flag::OpensPopup,
+      {QKeySequence(Qt::Key_F11)},
       &categoryImportExport,
   };
   EditorCommand orderPcb{

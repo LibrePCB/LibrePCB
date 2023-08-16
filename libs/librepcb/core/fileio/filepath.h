@@ -268,9 +268,20 @@ public:  // Methods
    *
    * @note This method is very useful to store relative paths in (text) files.
    *
-   * @see #fromRelative()
+   * @see #toRelativeNative(), #fromRelative()
    */
   QString toRelative(const FilePath& base) const noexcept;
+
+  /**
+   * @brief Same as #toRelative(), but with native directory separators
+   *
+   * @param base  See #toRelative().
+   *
+   * @return See #toRelative(), but with native directory separators.
+   *
+   * @see #toRelative(), #fromRelative()
+   */
+  QString toRelativeNative(const FilePath& base) const noexcept;
 
   /**
    * @brief Create and return a QUrl object with this filepath

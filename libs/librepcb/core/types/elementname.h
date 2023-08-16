@@ -41,17 +41,6 @@ namespace librepcb {
  *  Class ElementName
  ******************************************************************************/
 
-inline static QString cleanElementName(const QString& userInput) noexcept {
-  QString ret = userInput.trimmed();
-  for (int i = ret.length() - 1; i >= 0; --i) {
-    if (!ret[i].isPrint()) {
-      ret.remove(i, 1);
-    }
-  }
-  ret.truncate(70);
-  return ret;
-}
-
 struct ElementNameVerifier {
   template <typename Value, typename Predicate>
   static constexpr auto verify(Value&& val, const Predicate& p) ->
@@ -150,6 +139,29 @@ inline QDebug operator<<(QDebug stream, const ElementName& obj) {
 
 inline uint qHash(const ElementName& key, uint seed = 0) noexcept {
   return ::qHash(*key, seed);
+}
+
+inline static QString cleanElementName(const QString& userInput) noexcept {
+  QString ret = userInput.trimmed();
+  for (int i = ret.length() - 1; i >= 0; --i) {
+    if (!ret[i].isPrint()) {
+      ret.remove(i, 1);
+    }
+  }
+  ret.truncate(70);
+  return ret;
+}
+
+inline static ElementName elementNameFromTr(const char* context,
+                                            const char* textNoTr) noexcept {
+  Q_ASSERT(ElementNameConstraint()(textNoTr));  // textNoTr must be valid!!!
+  const QString textTr =
+      cleanElementName(QCoreApplication::translate(context, textNoTr));
+  if (ElementNameConstraint()(textTr)) {
+    return ElementName(textTr);
+  } else {
+    return ElementName(textNoTr);
+  }
 }
 
 /*******************************************************************************

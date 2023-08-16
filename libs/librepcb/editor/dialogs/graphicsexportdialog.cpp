@@ -28,7 +28,6 @@
 #include "ui_graphicsexportdialog.h"
 
 #include <librepcb/core/export/graphicsexport.h>
-#include <librepcb/core/export/graphicsexportsettings.h>
 #include <librepcb/core/utils/toolbox.h>
 #include <librepcb/core/workspace/theme.h>
 
@@ -264,13 +263,11 @@ GraphicsExportDialog::GraphicsExportDialog(
   if ((output == Output::Pdf) || (output == Output::Print)) {
     mUi->spbxScaleFactor->setEnabled(!mUi->cbxScaleAuto->isChecked());
     connect(mUi->cbxScaleAuto, &QCheckBox::toggled, mUi->spbxScaleFactor,
-            &DoubleSpinBox::setDisabled);
+            &UnsignedRatioEdit::setDisabled);
     connect(mUi->cbxScaleAuto, &QCheckBox::toggled, this,
             &GraphicsExportDialog::applySettings);
-    connect(mUi->spbxScaleFactor,
-            static_cast<void (DoubleSpinBox::*)(double)>(
-                &DoubleSpinBox::valueChanged),
-            this, &GraphicsExportDialog::applySettings);
+    connect(mUi->spbxScaleFactor, &UnsignedRatioEdit::valueChanged, this,
+            &GraphicsExportDialog::applySettings);
   } else {
     EditorToolbox::removeFormLayoutRow(*mUi->lblScale);
   }
@@ -473,8 +470,9 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
   setRotate(mDefaultSettings->getRotate());
   setMirror(mDefaultSettings->getMirror());
   setFitToPage(!mDefaultSettings->getScale().has_value());
-  setScaleFactor(mDefaultSettings->getScale() ? *mDefaultSettings->getScale()
-                                              : 1);
+  setScaleFactor(mDefaultSettings->getScale()
+                     ? *mDefaultSettings->getScale()
+                     : UnsignedRatio(Ratio::percent100()));
   setDpi(mDefaultSettings->getPixmapDpi());
   setBlackWhite(mDefaultSettings->getBlackWhite());
   setBackgroundColor(mDefaultSettings->getBackgroundColor());
@@ -649,10 +647,10 @@ void GraphicsExportDialog::syncClientSettings(
     }
 
     // Orientation.
-    QHash<QString, tl::optional<QPageLayout::Orientation>> orientationMap = {
-        {"auto", tl::nullopt},
-        {"landscape", QPageLayout::Landscape},
-        {"portrait", QPageLayout::Portrait},
+    QHash<QString, GraphicsExportSettings::Orientation> orientationMap = {
+        {"auto", GraphicsExportSettings::Orientation::Auto},
+        {"landscape", GraphicsExportSettings::Orientation::Landscape},
+        {"portrait", GraphicsExportSettings::Orientation::Portrait},
     };
     if (action == ClientSettingsAction::Store) {
       s.setValue(mSettingsPrefix % "/orientation",
@@ -734,11 +732,13 @@ void GraphicsExportDialog::syncClientSettings(
 
     // Scale factor.
     if (action == ClientSettingsAction::Store) {
-      s.setValue(mSettingsPrefix % "/scale_factor", getScaleFactor());
+      s.setValue(mSettingsPrefix % "/scale_factor",
+                 getScaleFactor()->toNormalized());
     } else {
-      QVariant value = s.value(mSettingsPrefix % "/scale_factor");
-      if ((!value.isNull()) && (value.value<qreal>() > 0)) {
-        setScaleFactor(value.value<qreal>());
+      const QVariant value = s.value(mSettingsPrefix % "/scale_factor");
+      const Ratio ratio = Ratio::fromNormalized(value.value<qreal>());
+      if ((!value.isNull()) && (ratio > 0)) {
+        setScaleFactor(UnsignedRatio(ratio));
       }
     }
 
@@ -764,13 +764,13 @@ void GraphicsExportDialog::syncClientSettings(
 
     // Background color.
     if (action == ClientSettingsAction::Store) {
-      s.setValue(
-          mSettingsPrefix % "/background_color",
-          QMetaEnum::fromType<Qt::GlobalColor>().key(getBackgroundColor()));
+      s.setValue(mSettingsPrefix % "/background_color_v2",
+                 getBackgroundColor().name(QColor::HexArgb));
     } else {
-      QVariant value = s.value(mSettingsPrefix % "/background_color");
-      if (!value.isNull()) {
-        setBackgroundColor(value.value<Qt::GlobalColor>());
+      const QVariant value = s.value(mSettingsPrefix % "/background_color_v2");
+      const QColor color = value.value<QColor>();
+      if ((!value.isNull()) && color.isValid()) {
+        setBackgroundColor(color);
       }
     }
 
@@ -1155,6 +1155,15 @@ void GraphicsExportDialog::startExport(bool toClipboard) noexcept {
     if (!extensions.contains(fp.getSuffix().toLower().toUtf8())) {
       fp.setPath(fp.toStr() % "." % defaultExtension);
     }
+    if (!isPdf) {
+      // Strip page number from the file path, if any.
+      QString tmp = fp.toStr();
+      tmp.chop(fp.getSuffix().length() + 1);
+      while ((!tmp.isEmpty()) && (tmp.back() == "1")) {
+        tmp.chop(1);
+      }
+      fp.setPath(tmp % "." % fp.getSuffix());
+    }
     if (fp.toStr() == key) {
       sUsedFilePaths.remove(key);
     } else {
@@ -1213,24 +1222,24 @@ tl::optional<QPageSize> GraphicsExportDialog::getPageSize() const noexcept {
 }
 
 void GraphicsExportDialog::setOrientation(
-    const tl::optional<QPageLayout::Orientation>& orientation) noexcept {
-  if (orientation == QPageLayout::Landscape) {
+    GraphicsExportSettings::Orientation orientation) noexcept {
+  if (orientation == GraphicsExportSettings::Orientation::Landscape) {
     mUi->rbtnOrientationLandscape->setChecked(true);
-  } else if (orientation == QPageLayout::Portrait) {
+  } else if (orientation == GraphicsExportSettings::Orientation::Portrait) {
     mUi->rbtnOrientationPortrait->setChecked(true);
   } else {
     mUi->rbtnOrientationAuto->setChecked(true);
   }
 }
 
-tl::optional<QPageLayout::Orientation> GraphicsExportDialog::getOrientation()
-    const noexcept {
+GraphicsExportSettings::Orientation GraphicsExportDialog::getOrientation() const
+    noexcept {
   if (mUi->rbtnOrientationLandscape->isChecked()) {
-    return QPageLayout::Landscape;
+    return GraphicsExportSettings::Orientation::Landscape;
   } else if (mUi->rbtnOrientationPortrait->isChecked()) {
-    return QPageLayout::Portrait;
+    return GraphicsExportSettings::Orientation::Portrait;
   } else {
-    return tl::nullopt;
+    return GraphicsExportSettings::Orientation::Auto;
   }
 }
 
@@ -1301,12 +1310,13 @@ bool GraphicsExportDialog::getFitToPage() const noexcept {
   return mUi->cbxScaleAuto->isChecked();
 }
 
-void GraphicsExportDialog::setScaleFactor(qreal factor) noexcept {
+void GraphicsExportDialog::setScaleFactor(
+    const UnsignedRatio& factor) noexcept {
   mUi->spbxScaleFactor->setValue(factor);
 }
 
-qreal GraphicsExportDialog::getScaleFactor() const noexcept {
-  return mUi->spbxScaleFactor->value();
+UnsignedRatio GraphicsExportDialog::getScaleFactor() const noexcept {
+  return mUi->spbxScaleFactor->getValue();
 }
 
 void GraphicsExportDialog::setDpi(int dpi) noexcept {
@@ -1325,7 +1335,7 @@ bool GraphicsExportDialog::getBlackWhite() const noexcept {
   return mUi->cbxBlackWhite->isChecked();
 }
 
-void GraphicsExportDialog::setBackgroundColor(Qt::GlobalColor color) noexcept {
+void GraphicsExportDialog::setBackgroundColor(const QColor& color) noexcept {
   if (color == Qt::white) {
     mUi->rbtnBackgroundWhite->setChecked(true);
   } else if (color == Qt::black) {
@@ -1335,7 +1345,7 @@ void GraphicsExportDialog::setBackgroundColor(Qt::GlobalColor color) noexcept {
   }
 }
 
-Qt::GlobalColor GraphicsExportDialog::getBackgroundColor() const noexcept {
+QColor GraphicsExportDialog::getBackgroundColor() const noexcept {
   if (mUi->rbtnBackgroundWhite->isChecked()) {
     return Qt::white;
   } else if (mUi->rbtnBackgroundBlack->isChecked()) {

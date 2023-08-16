@@ -51,6 +51,7 @@
 #include <librepcb/core/project/circuit/assemblyvariant.h>
 #include <librepcb/core/project/circuit/circuit.h>
 #include <librepcb/core/project/erc/electricalrulecheck.h>
+#include <librepcb/core/project/outputjobrunner.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
 #include <librepcb/core/project/projectloader.h>
@@ -122,6 +123,23 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
          "settings. If not set, the settings from the boards will be used "
          "instead."),
       tr("file"));
+  QCommandLineOption runSpecificJobOption(
+      "run-job",
+      tr("Run a particular output job. Can be given multiple times to run "
+         "multiple jobs."),
+      tr("name"));
+  QCommandLineOption runAllJobsOption("run-jobs",
+                                      tr("Run all existing output jobs."));
+  QCommandLineOption customJobsOption(
+      "jobs",
+      tr("Override output jobs with a *.lp file containing custom jobs. If not "
+         "set, the jobs from the project will be used instead."),
+      tr("file"));
+  QCommandLineOption customOutDirOption(
+      "outdir",
+      tr("Override the output base directory of jobs. If not set, the "
+         "standard output directory from the project is used."),
+      tr("path"));
   QCommandLineOption exportSchematicsOption(
       "export-schematics",
       tr("Export schematics to given file(s). Existing files will be "
@@ -269,6 +287,10 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     parser.addOption(ercOption);
     parser.addOption(drcOption);
     parser.addOption(drcSettingsOption);
+    parser.addOption(runSpecificJobOption);
+    parser.addOption(runAllJobsOption);
+    parser.addOption(customJobsOption);
+    parser.addOption(customOutDirOption);
     parser.addOption(exportSchematicsOption);
     parser.addOption(exportBomOption);
     parser.addOption(exportBoardBomOption);
@@ -371,6 +393,10 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
         parser.isSet(ercOption),  // run ERC
         parser.isSet(drcOption),  // run DRC
         parser.value(drcSettingsOption),  // DRC settings
+        parser.values(runSpecificJobOption),  // run specific output jobs
+        parser.isSet(runAllJobsOption),  // run all output jobs
+        parser.value(customJobsOption).trimmed(),  // custom jobs file path
+        parser.value(customOutDirOption).trimmed(),  // custom jobs outdir
         parser.values(exportSchematicsOption),  // export schematics
         parser.values(exportBomOption),  // export generic BOM
         parser.values(exportBoardBomOption),  // export board BOM
@@ -415,10 +441,11 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
 
 bool CommandLineInterface::openProject(
     const QString& projectFile, bool runErc, bool runDrc,
-    const QString& drcSettingsPath, const QStringList& exportSchematicsFiles,
-    const QStringList& exportBomFiles, const QStringList& exportBoardBomFiles,
-    const QString& bomAttributes, bool exportPcbFabricationData,
-    const QString& pcbFabricationSettingsPath,
+    const QString& drcSettingsPath, const QStringList& runJobs, bool runAllJobs,
+    const QString& customJobsPath, const QString& customOutDir,
+    const QStringList& exportSchematicsFiles, const QStringList& exportBomFiles,
+    const QStringList& exportBoardBomFiles, const QString& bomAttributes,
+    bool exportPcbFabricationData, const QString& pcbFabricationSettingsPath,
     const QStringList& exportPnpTopFiles,
     const QStringList& exportPnpBottomFiles,
     const QStringList& exportNetlistFiles, const QStringList& boardNames,
@@ -428,6 +455,7 @@ bool CommandLineInterface::openProject(
   try {
     bool success = true;
     QMap<FilePath, int> writtenFilesCounter;
+    QMap<FilePath, int> writtenOutputJobFilesCounter;
 
     // Open project
     FilePath projectFp(QFileInfo(projectFile).absoluteFilePath());
@@ -566,7 +594,8 @@ bool CommandLineInterface::openProject(
     }
 
     // Build planes, if needed.
-    if (runDrc || exportPcbFabricationData) {
+    if (runDrc || exportPcbFabricationData || (!runJobs.isEmpty()) ||
+        runAllJobs) {
       foreach (Board* board, boards) {
         qInfo().nospace().noquote() << "Rebuilding all planes of board '"
                                     << *board->getName() << "'...";
@@ -657,6 +686,70 @@ bool CommandLineInterface::openProject(
       }
     }
 
+    // Run output jobs.
+    if ((!runJobs.isEmpty()) || runAllJobs) {
+      // Determine jobs.
+      tl::optional<OutputJobList> allJobs;
+      if (!customJobsPath.isEmpty()) {
+        try {
+          qDebug() << "Load custom output jobs:" << customJobsPath;
+          const FilePath fp(QFileInfo(customJobsPath).absoluteFilePath());
+          const SExpression root =
+              SExpression::parse(FileUtils::readFile(fp), fp);
+          allJobs = deserialize<OutputJobList>(root);  // can throw
+        } catch (const Exception& e) {
+          printErr(tr("ERROR: Failed to load custom output jobs: %1")
+                       .arg(e.getMsg()));
+          success = false;
+        }
+      } else {
+        allJobs = project->getOutputJobs();
+      }
+      if (allJobs) {
+        QVector<std::shared_ptr<OutputJob>> jobs;
+        if (runAllJobs) {
+          jobs = allJobs->values();
+        } else {
+          foreach (const QString& name, runJobs) {
+            if (auto job = allJobs->find(name)) {
+              jobs.append(job);
+            } else {
+              printErr(tr("ERROR: No output job with the name '%1' found.")
+                           .arg(name));
+              success = false;
+            }
+          }
+        }
+        try {
+          OutputJobRunner runner(*project);
+          QObject::connect(
+              &runner, &OutputJobRunner::jobStarted,
+              [](std::shared_ptr<const OutputJob> job) {
+                print(tr("Run output job '%1'...").arg(*job->getName()));
+              });
+          QObject::connect(
+              &runner, &OutputJobRunner::aboutToWriteFile,
+              [&projectFile,
+               &writtenOutputJobFilesCounter](const FilePath& fp) {
+                print(QString("  => '%1'").arg(prettyPath(fp, projectFile)));
+                writtenOutputJobFilesCounter[fp]++;
+              });
+          if (!customOutDir.isEmpty()) {
+            runner.setOutputDirectory(
+                QDir::isRelativePath(customOutDir)
+                    ? FilePath(QDir::currentPath()).getPathTo(customOutDir)
+                    : FilePath(customOutDir));
+          }
+          qDebug() << "Using output base directory:"
+                   << runner.getOutputDirectory().toNative();
+          runner.run(jobs);  // can throw
+        } catch (const Exception& e) {
+          printErr(tr("ERROR:") % " " % e.getMsg());
+          success = false;
+        }
+      }
+    }
+
     // Export schematics
     foreach (const QString& destStr, exportSchematicsFiles) {
       print(tr("Export schematics to '%1'...").arg(destStr));
@@ -669,12 +762,6 @@ bool CommandLineInterface::openProject(
       FilePath destPath(QFileInfo(destPathStr).absoluteFilePath());
       GraphicsExport graphicsExport;
       graphicsExport.setDocumentName(*project->getName());
-      QObject::connect(
-          &graphicsExport, &GraphicsExport::savingFile,
-          [&destPathStr, &writtenFilesCounter](const FilePath& fp) {
-            print(QString("  => '%1'").arg(prettyPath(fp, destPathStr)));
-            writtenFilesCounter[fp]++;
-          });
       std::shared_ptr<GraphicsExportSettings> settings =
           std::make_shared<GraphicsExportSettings>();
       GraphicsExport::Pages pages;
@@ -683,9 +770,13 @@ bool CommandLineInterface::openProject(
             std::make_shared<SchematicPainter>(*schematic), settings));
       }
       graphicsExport.startExport(pages, destPath);
-      const QString errorMsg = graphicsExport.waitForFinished();
-      if (!errorMsg.isEmpty()) {
-        printErr("  " % tr("ERROR") % ": " % errorMsg);
+      const GraphicsExport::Result result = graphicsExport.waitForFinished();
+      foreach (const FilePath& writtenFile, result.writtenFiles) {
+        print(QString("  => '%1'").arg(prettyPath(writtenFile, destPathStr)));
+        writtenFilesCounter[writtenFile]++;
+      }
+      if (!result.errorMsg.isEmpty()) {
+        printErr("  " % tr("ERROR") % ": " % result.errorMsg);
         success = false;
       }
     }
@@ -800,11 +891,11 @@ bool CommandLineInterface::openProject(
       };
       QVector<Job> jobs;
       foreach (const QString& fp, exportPnpTopFiles) {
-        jobs.append(Job{tr("top"), PickPlaceCsvWriter::BoardSide::TOP,
+        jobs.append(Job{tr("top"), PickPlaceCsvWriter::BoardSide::Top,
                         BoardGerberExport::BoardSide::Top, fp});
       }
       foreach (const QString& fp, exportPnpBottomFiles) {
-        jobs.append(Job{tr("bottom"), PickPlaceCsvWriter::BoardSide::BOTTOM,
+        jobs.append(Job{tr("bottom"), PickPlaceCsvWriter::BoardSide::Bottom,
                         BoardGerberExport::BoardSide::Bottom, fp});
       }
       foreach (const auto& job, jobs) {
@@ -888,13 +979,14 @@ bool CommandLineInterface::openProject(
 
     // Fail if some files were written multiple times
     bool filesOverwritten = false;
-    QMapIterator<FilePath, int> writtenFilesIterator(writtenFilesCounter);
-    while (writtenFilesIterator.hasNext()) {
-      writtenFilesIterator.next();
-      if (writtenFilesIterator.value() > 1) {
+    for (auto it = writtenFilesCounter.begin(); it != writtenFilesCounter.end();
+         ++it) {
+      const int totalWritten =
+          it.value() + writtenOutputJobFilesCounter.value(it.key(), 0);
+      if (totalWritten > 1) {
         filesOverwritten = true;
         printErr(tr("ERROR: The file '%1' was written multiple times!")
-                     .arg(prettyPath(writtenFilesIterator.key(), projectFile)));
+                     .arg(prettyPath(it.key(), projectFile)));
       }
     }
     if (filesOverwritten) {
@@ -1187,12 +1279,14 @@ QStringList CommandLineInterface::prepareRuleCheckMessages(
 QString CommandLineInterface::prettyPath(const FilePath& path,
                                          const QString& style) noexcept {
   if (QFileInfo(style).isAbsolute()) {
-    return path.toNative();  // absolute path
+    // absolute path
+    return path.toNative();
   } else if (path == FilePath(QDir::currentPath())) {
-    return path.getFilename();  // name of current directory
+    // name of current directory
+    return path.getFilename();
   } else {
-    return QDir::toNativeSeparators(
-        path.toRelative(FilePath(QDir::currentPath())));  // relative path
+    // relative path
+    return path.toRelativeNative(FilePath(QDir::currentPath()));
   }
 }
 

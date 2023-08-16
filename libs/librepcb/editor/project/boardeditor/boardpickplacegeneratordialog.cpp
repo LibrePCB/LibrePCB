@@ -159,12 +159,12 @@ void BoardPickPlaceGeneratorDialog::btnGenerateClicked() noexcept {
       writer.setIncludeMetadataComment(
           mUi->rbtnFormatCsvWithMetadata->isChecked());
       if (mUi->cbxTopDevices->isChecked()) {
-        writer.setBoardSide(PickPlaceCsvWriter::BoardSide::TOP);
+        writer.setBoardSide(PickPlaceCsvWriter::BoardSide::Top);
         writer.generateCsv()->saveToFile(
             getOutputFilePath(mUi->edtTopFilePath->text()));  // can throw
       }
       if (mUi->cbxBottomDevices->isChecked()) {
-        writer.setBoardSide(PickPlaceCsvWriter::BoardSide::BOTTOM);
+        writer.setBoardSide(PickPlaceCsvWriter::BoardSide::Bottom);
         writer.generateCsv()->saveToFile(
             getOutputFilePath(mUi->edtBottomFilePath->text()));  // can throw
       }

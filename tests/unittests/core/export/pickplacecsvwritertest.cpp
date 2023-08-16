@@ -96,7 +96,7 @@ TEST_F(PickPlaceCsvWriterTest, testBothSides) {
   EXPECT_EQ("# Unit:                mm", lines[7].toStdString());
   EXPECT_EQ("# Rotation:            Degrees CCW", lines[8].toStdString());
   EXPECT_EQ("# Board Side:          Top + Bottom", lines[9].toStdString());
-  EXPECT_EQ("# Supported Types:     THT, SMT, THT+SMT, Fiducial, Other",
+  EXPECT_EQ("# Assembly Types:      THT, SMT, THT+SMT, Fiducial, Other",
             lines[10].toStdString());
   EXPECT_EQ("", lines[11].toStdString());
   EXPECT_EQ(
@@ -121,7 +121,7 @@ TEST_F(PickPlaceCsvWriterTest, testTopSide) {
   std::shared_ptr<PickPlaceData> data = createData();
   PickPlaceCsvWriter writer(*data);
   writer.setIncludeMetadataComment(false);
-  writer.setBoardSide(PickPlaceCsvWriter::BoardSide::TOP);
+  writer.setBoardSide(PickPlaceCsvWriter::BoardSide::Top);
   std::shared_ptr<CsvFile> file = writer.generateCsv();
   QStringList lines = file->toString().split("\n");
   EXPECT_EQ(
@@ -142,7 +142,7 @@ TEST_F(PickPlaceCsvWriterTest, testBottomSide) {
   std::shared_ptr<PickPlaceData> data = createData();
   PickPlaceCsvWriter writer(*data);
   writer.setIncludeMetadataComment(false);
-  writer.setBoardSide(PickPlaceCsvWriter::BoardSide::BOTTOM);
+  writer.setBoardSide(PickPlaceCsvWriter::BoardSide::Bottom);
   std::shared_ptr<CsvFile> file = writer.generateCsv();
   QStringList lines = file->toString().split("\n");
   EXPECT_EQ(

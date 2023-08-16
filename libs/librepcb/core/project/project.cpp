@@ -55,7 +55,7 @@ Project::Project(std::unique_ptr<TransactionalDirectory> directory,
     mUuid(Uuid::createRandom()),
     mName("Unnamed"),
     mAuthor(),
-    mVersion(),
+    mVersion("v1"),
     mCreated(QDateTime::currentDateTime()),
     mDateTime(QDateTime::currentDateTime()),
     mLocaleOrder(),
@@ -131,7 +131,7 @@ void Project::setAuthor(const QString& newAuthor) noexcept {
   }
 }
 
-void Project::setVersion(const QString& newVersion) noexcept {
+void Project::setVersion(const FileProofName& newVersion) noexcept {
   if (newVersion != mVersion) {
     mVersion = newVersion;
     emit attributesChanged();
@@ -432,6 +432,15 @@ void Project::save() {
                      mDefaultLockComponentAssembly);
     root.ensureLineBreak();
     mDirectory->write("project/settings.lp", root.toByteArray());
+  }
+
+  // Output jobs.
+  {
+    SExpression root = SExpression::createList("librepcb_jobs");
+    root.ensureLineBreak();
+    mOutputJobs.serialize(root);
+    root.ensureLineBreak();
+    mDirectory->write("project/jobs.lp", root.toByteArray());
   }
 
   // Circuit.

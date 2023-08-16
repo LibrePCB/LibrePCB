@@ -73,8 +73,10 @@ public:
 
   /**
    * @brief Wait (block) until the build is finished
+   *
+   * @return Error message (null on success).
    */
-  void waitForFinished() noexcept;
+  QString waitForFinished() noexcept;
 
   /**
    * @brief Cancel the build
@@ -93,11 +95,11 @@ signals:
   void finished();
 
 private:  // Methods
-  void run(std::shared_ptr<SceneData3D> data, FilePath fp,
-           int finishDelayMs) noexcept;
+  QString run(std::shared_ptr<SceneData3D> data, FilePath fp,
+              int finishDelayMs) noexcept;
 
 private:  // Data
-  QFuture<void> mFuture;
+  QFuture<QString> mFuture;
   bool mAbort;
 };
 

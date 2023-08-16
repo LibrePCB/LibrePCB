@@ -42,6 +42,7 @@
 #include "../../widgets/searchtoolbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
+#include "../outputjobsdialog/outputjobsdialog.h"
 #include "../projecteditor.h"
 #include "../projectsetupdialog.h"
 #include "boardgraphicsscene.h"
@@ -606,6 +607,14 @@ void BoardEditor::createActions() noexcept {
       }));
   mActionGenerateD356Netlist.reset(cmd.generateD356Netlist.createAction(
       this, this, &BoardEditor::execD356NetlistExportDialog));
+  mActionOutputJobs.reset(cmd.outputJobs.createAction(this, this, [this]() {
+    OutputJobsDialog dialog(mProjectEditor.getWorkspace().getSettings(),
+                            mProject, mProjectEditor.getUndoStack(),
+                            "board_editor", this);
+    connect(&dialog, &OutputJobsDialog::orderPcbDialogTriggered, this,
+            [this, &dialog]() { mProjectEditor.execOrderPcbDialog(&dialog); });
+    dialog.exec();
+  }));
   mActionOrderPcb.reset(cmd.orderPcb.createAction(
       this, this, [this]() { mProjectEditor.execOrderPcbDialog(this); }));
   mActionNewBoard.reset(
@@ -847,6 +856,7 @@ void BoardEditor::createToolBars() noexcept {
   mToolBarFile->addAction(mActionSaveProject.data());
   mToolBarFile->addAction(mActionPrint.data());
   mToolBarFile->addAction(mActionExportPdf.data());
+  mToolBarFile->addAction(mActionOutputJobs.data());
   mToolBarFile->addAction(mActionOrderPcb.data());
   mToolBarFile->addSeparator();
   mToolBarFile->addAction(mActionControlPanel.data());
@@ -1001,6 +1011,7 @@ void BoardEditor::createMenus() noexcept {
     smb.addAction(mActionGeneratePickPlace);
     smb.addAction(mActionGenerateD356Netlist);
   }
+  mb.addAction(mActionOutputJobs);
   mb.addSeparator();
   mb.addAction(mActionPrint);
   mb.addAction(mActionOrderPcb);
@@ -1444,7 +1455,9 @@ void BoardEditor::performScheduledTasks() noexcept {
       isActiveTopLevelWindow()) {
     std::shared_ptr<SceneData3D> data;
     if (Board* board = getActiveBoard()) {
-      data = board->buildScene3D();
+      auto av = mProject.getCircuit().getAssemblyVariants().value(0);
+      data = board->buildScene3D(av ? tl::make_optional(av->getUuid())
+                                    : tl::nullopt);
     } else {
       data = std::make_shared<SceneData3D>();
     }
@@ -1616,7 +1629,7 @@ void BoardEditor::execGraphicsExportDialog(
     QString projectName = FilePath::cleanFileName(
         *mProject.getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
     QString projectVersion = FilePath::cleanFileName(
-        mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+        *mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
     QString relativePath =
         QString("output/%1/%2_Board").arg(projectVersion, projectName);
     FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);
@@ -1663,7 +1676,7 @@ void BoardEditor::execStepExportDialog() noexcept {
   const QString projectName = FilePath::cleanFileName(
       *mProject.getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
   const QString projectVersion = FilePath::cleanFileName(
-      mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+      *mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
   const FilePath defaultFilePath = mProject.getPath().getPathTo(
       QString("output/%1/%2.step").arg(projectVersion, projectName));
 
@@ -1675,6 +1688,11 @@ void BoardEditor::execStepExportDialog() noexcept {
     return;
   }
 
+  // Build data.
+  auto av = mProject.getCircuit().getAssemblyVariants().value(0);
+  auto data =
+      board->buildScene3D(av ? tl::make_optional(av->getUuid()) : tl::nullopt);
+
   // Start export.
   StepExport exp;
   QProgressDialog dlg(this);
@@ -1683,14 +1701,14 @@ void BoardEditor::execStepExportDialog() noexcept {
   connect(&exp, &StepExport::progressStatus, &dlg,
           &QProgressDialog::setLabelText);
   connect(&exp, &StepExport::progressPercent, &dlg, &QProgressDialog::setValue);
-  connect(&exp, &StepExport::failed, this, [this](QString errorMsg) {
-    QMessageBox::critical(this, tr("STEP Export Failure"), errorMsg);
-  });
   connect(&exp, &StepExport::finished, &dlg, &QProgressDialog::close);
   connect(&dlg, &QProgressDialog::canceled, &exp, &StepExport::cancel);
-  exp.start(board->buildScene3D(), fp, 700);
+  exp.start(data, fp, 700);
   dlg.exec();
-  exp.waitForFinished();
+  const QString errorMsg = exp.waitForFinished();
+  if (!errorMsg.isEmpty()) {
+    QMessageBox::critical(this, tr("STEP Export Failure"), errorMsg);
+  }
 }
 
 void BoardEditor::execD356NetlistExportDialog() noexcept {

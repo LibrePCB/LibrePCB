@@ -126,6 +126,8 @@ public:
   FileFormatMigrationV01& operator=(const FileFormatMigrationV01& rhs) = delete;
 
 protected:  // Methods
+  virtual void createOutputJobs(TransactionalDirectory& dir);
+  virtual void upgradeMetadata(SExpression& root);
   virtual void upgradeSettings(SExpression& root);
   virtual void upgradeCircuit(SExpression& root, ProjectContext& context);
   virtual void upgradeErc(SExpression& root, ProjectContext& context);
@@ -144,6 +146,8 @@ protected:  // Methods
   virtual void upgradeStrings(SExpression& root);
   virtual void replaceStrings(SExpression& root,
                               const QMap<QString, QString>& replacements);
+  static QString toFileProofName(const QString& name,
+                                 const QString& fallback) noexcept;
 };
 
 /*******************************************************************************

@@ -101,7 +101,8 @@ public:
   }
   bool isEmpty() const noexcept;
   QList<BI_Base*> getAllItems() const noexcept;
-  std::shared_ptr<SceneData3D> buildScene3D() const noexcept;
+  std::shared_ptr<SceneData3D> buildScene3D(
+      const tl::optional<Uuid>& assemblyVariant) const noexcept;
 
   // Getters: Attributes
   const Uuid& getUuid() const noexcept { return mUuid; }
@@ -123,6 +124,12 @@ public:
   const PcbColor* getSolderResist() const noexcept { return mSolderResist; }
   const PcbColor& getSilkscreenColor() const noexcept {
     return *mSilkscreenColor;
+  }
+  const PcbColor* getSilkscreenColorTop() const noexcept {
+    return (!mSilkscreenLayersTop.isEmpty()) ? mSilkscreenColor : nullptr;
+  }
+  const PcbColor* getSilkscreenColorBot() const noexcept {
+    return (!mSilkscreenLayersBot.isEmpty()) ? mSilkscreenColor : nullptr;
   }
   const QVector<const Layer*>& getSilkscreenLayersTop() const noexcept {
     return mSilkscreenLayersTop;
@@ -227,6 +234,7 @@ public:
   void forceAirWiresRebuild() noexcept;
 
   // General Methods
+  tl::optional<std::pair<Point, Point>> calculateBoundingRect() const noexcept;
   void addDefaultContent();
   void copyFrom(const Board& other);
   void addToProject();

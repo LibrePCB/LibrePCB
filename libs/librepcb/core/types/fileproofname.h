@@ -61,8 +61,12 @@ struct FileProofNameVerifier {
 };
 
 struct FileProofNameConstraint {
+  static QRegularExpression regex() noexcept {
+    return QRegularExpression("\\A[-a-zA-Z0-9_+().]{1,20}\\z");
+  }
+
   bool operator()(const QString& value) const noexcept {
-    return QRegularExpression("\\A[-a-zA-Z0-9_+().]{1,20}\\z")
+    return regex()
         .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
         .hasMatch();
   }

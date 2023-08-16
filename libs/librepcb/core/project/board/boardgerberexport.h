@@ -32,6 +32,7 @@
 
 #include <QtCore>
 
+#include <functional>
 #include <memory>
 
 /*******************************************************************************
@@ -63,6 +64,7 @@ class BoardGerberExport final : public QObject {
 public:
   enum class BoardSide { Top, Bottom };
   typedef std::pair<const Layer*, const Layer*> LayerPair;
+  typedef std::function<void(const FilePath&)> BeforeWriteCallback;
 
   // Constructors / Destructor
   BoardGerberExport() = delete;
@@ -76,6 +78,10 @@ public:
   const QVector<FilePath>& getWrittenFiles() const noexcept {
     return mWrittenFiles;
   }
+
+  // Setters
+  void setRemoveObsoleteFiles(bool remove);
+  void setBeforeWriteCallback(BeforeWriteCallback cb);
 
   // General Methods
   void exportPcbLayers(const BoardFabricationOutputSettings& settings) const;
@@ -136,6 +142,7 @@ private:
       ExcellonGenerator::Plating plating) const;
   FilePath getOutputFilePath(QString path) const noexcept;
   QString getAttributeValue(const QString& key) const noexcept;
+  void trackFileBeforeWrite(const FilePath& fp) const;
 
   // Static Methods
   static UnsignedLength calcWidthOfLayer(const UnsignedLength& width,
@@ -144,6 +151,8 @@ private:
   // Private Member Variables
   const Project& mProject;
   const Board& mBoard;
+  bool mRemoveObsoleteFiles;
+  BeforeWriteCallback mBeforeWriteCallback;
   QDateTime mCreationDateTime;
   QString mProjectName;
   mutable int mCurrentInnerCopperLayer;

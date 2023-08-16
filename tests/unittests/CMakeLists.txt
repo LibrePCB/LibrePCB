@@ -60,6 +60,7 @@ add_executable(
   core/project/board/boardgerberexporttest.cpp
   core/project/board/boardpickplacegeneratortest.cpp
   core/project/board/boardplanefragmentsbuildertest.cpp
+  core/project/projectjsonexporttest.cpp
   core/project/projectlibrarytest.cpp
   core/project/projecttest.cpp
   core/serialization/serializableobjectlisttest.cpp

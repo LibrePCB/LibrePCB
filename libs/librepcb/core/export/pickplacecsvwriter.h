@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "pickplacedata.h"
+
 #include <QtCore>
 
 #include <memory>
@@ -33,8 +35,6 @@
 namespace librepcb {
 
 class CsvFile;
-class PickPlaceData;
-class PickPlaceDataItem;
 
 /*******************************************************************************
  *  Class PickPlaceCsvWriter
@@ -47,7 +47,7 @@ class PickPlaceCsvWriter final {
   Q_DECLARE_TR_FUNCTIONS(PickPlaceCsvWriter)
 
 public:
-  enum class BoardSide { TOP, BOTTOM, BOTH };
+  enum class BoardSide { Top, Bottom, Both };
 
   // Constructors / Destructor
   PickPlaceCsvWriter() = delete;
@@ -57,6 +57,9 @@ public:
 
   // Setters
   void setBoardSide(BoardSide side) noexcept { mBoardSide = side; }
+  void setTypeFilter(const QSet<PickPlaceDataItem::Type>& filter) noexcept {
+    mTypeFilter = filter;
+  }
   void setIncludeMetadataComment(bool include) noexcept {
     mIncludeMetadataComment = include;
   }
@@ -78,6 +81,7 @@ private:  // Methods
 private:  // Data
   const PickPlaceData& mData;
   BoardSide mBoardSide;
+  QSet<PickPlaceDataItem::Type> mTypeFilter;
   bool mIncludeMetadataComment;
   bool mIncludeNonMountedParts;
 };

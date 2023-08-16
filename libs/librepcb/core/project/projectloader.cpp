@@ -141,6 +141,7 @@ std::unique_ptr<Project> ProjectLoader::open(
   std::unique_ptr<Project> p(new Project(std::move(directory), filename));
   loadMetadata(*p);
   loadSettings(*p);
+  loadOutputJobs(*p);
   loadLibrary(*p);
   loadCircuit(*p);
   loadErc(*p);
@@ -180,7 +181,7 @@ void ProjectLoader::loadMetadata(Project& p) {
   p.setUuid(deserialize<Uuid>(root.getChild("@0")));
   p.setName(deserialize<ElementName>(root.getChild("name/@0")));
   p.setAuthor(root.getChild("author/@0").getValue());
-  p.setVersion(root.getChild("version/@0").getValue());
+  p.setVersion(deserialize<FileProofName>(root.getChild("version/@0")));
   p.setCreated(deserialize<QDateTime>(root.getChild("created/@0")));
   p.setAttributes(AttributeList(root));
 
@@ -224,6 +225,15 @@ void ProjectLoader::loadSettings(Project& p) {
       deserialize<bool>(root.getChild("default_lock_component_assembly/@0")));
 
   qDebug() << "Successfully loaded project settings.";
+}
+
+void ProjectLoader::loadOutputJobs(Project& p) {
+  qDebug() << "Load output jobs...";
+  const QString fp = "project/jobs.lp";
+  const SExpression root = SExpression::parse(p.getDirectory().read(fp),
+                                              p.getDirectory().getAbsPath(fp));
+  p.getOutputJobs() = deserialize<OutputJobList>(root);
+  qDebug() << "Successfully loaded output jobs.";
 }
 
 void ProjectLoader::loadLibrary(Project& p) {

@@ -203,7 +203,7 @@ bool ProjectAttributeLookup::query(const Project& project, const QString& key,
     value = project.getAuthor();
     return true;
   } else if (key == QLatin1String("VERSION")) {
-    value = project.getVersion();
+    value = *project.getVersion();
     return true;
   } else if (key == QLatin1String("PAGES")) {
     value = QString::number(project.getSchematics().count());

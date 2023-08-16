@@ -26,7 +26,9 @@
 #include "../attribute/attribute.h"
 #include "../fileio/directorylock.h"
 #include "../fileio/transactionaldirectory.h"
+#include "../job/outputjob.h"
 #include "../types/elementname.h"
+#include "../types/fileproofname.h"
 #include "../types/uuid.h"
 #include "../types/version.h"
 
@@ -93,6 +95,13 @@ public:
   // Getters
 
   /**
+   * @brief Get the filename of the project file (*.lpp)
+   *
+   * @return Filename with suffix but without path
+   */
+  const QString& getFileName() const noexcept { return mFilename; }
+
+  /**
    * @brief Get the filepath of the project file (*.lpp)
    *
    * @return The absolute filepath
@@ -113,6 +122,15 @@ public:
   }
 
   TransactionalDirectory& getDirectory() noexcept { return *mDirectory; }
+
+  /**
+   * @brief Get the output jobs base directory for the current version number
+   *
+   * @return Output path (`./output/{{VERSION}}/`)
+   */
+  FilePath getCurrentOutputDir() const noexcept {
+    return mDirectory->getAbsPath("output/" % *mVersion);
+  }
 
   /**
    * @brief Get the StrokeFontPool which contains all stroke fonts of the
@@ -146,9 +164,9 @@ public:
   /**
    * @brief Get the version of the project
    *
-   * @return The version of the project (arbitrary string)
+   * @return The version of the project
    */
-  const QString& getVersion() const noexcept { return mVersion; }
+  const FileProofName& getVersion() const noexcept { return mVersion; }
 
   /**
    * @brief Get the date and time when the project was created
@@ -203,6 +221,14 @@ public:
   bool getDefaultLockComponentAssembly() const noexcept {
     return mDefaultLockComponentAssembly;
   }
+
+  /**
+   * @brief Get all output jobs
+   *
+   * @return Output jobs
+   */
+  const OutputJobList& getOutputJobs() const noexcept { return mOutputJobs; }
+  OutputJobList& getOutputJobs() noexcept { return mOutputJobs; }
 
   /**
    * @brief Get the ProjectLibrary object which contains all library elements
@@ -264,9 +290,9 @@ public:
   /**
    * @brief Set the version of the project
    *
-   * @param newVersion        The new version (can be an arbitrary string)
+   * @param newVersion        The new version
    */
-  void setVersion(const QString& newVersion) noexcept;
+  void setVersion(const FileProofName& newVersion) noexcept;
 
   /**
    * @brief Set the creation date/time
@@ -559,8 +585,8 @@ private:  // Data
   /// Author (optional).
   QString mAuthor;
 
-  /// Version (arbitrary string, optional).
-  QString mVersion;
+  /// Version number.
+  FileProofName mVersion;
 
   /// Date/time of project creation.
   QDateTime mCreated;
@@ -582,6 +608,9 @@ private:  // Data
 
   /// Default value for ::librepcb::ComponentInstance::mLockAssembly
   bool mDefaultLockComponentAssembly;
+
+  /// Output jobs
+  OutputJobList mOutputJobs;
 
   /// Ehe library which contains all elements needed in this project.
   QScopedPointer<ProjectLibrary> mProjectLibrary;

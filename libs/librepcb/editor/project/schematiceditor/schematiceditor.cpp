@@ -39,6 +39,7 @@
 #include "../../widgets/searchtoolbar.h"
 #include "../../workspace/desktopservices.h"
 #include "../bomgeneratordialog.h"
+#include "../outputjobsdialog/outputjobsdialog.h"
 #include "../projecteditor.h"
 #include "../projectsetupdialog.h"
 #include "fsm/schematiceditorfsm.h"
@@ -435,6 +436,14 @@ void SchematicEditor::createActions() noexcept {
             &mProjectEditor, &ProjectEditor::setManualModificationsMade);
     dialog.exec();
   }));
+  mActionOutputJobs.reset(cmd.outputJobs.createAction(this, this, [this]() {
+    OutputJobsDialog dialog(mProjectEditor.getWorkspace().getSettings(),
+                            mProject, mProjectEditor.getUndoStack(),
+                            "schematic_editor", this);
+    connect(&dialog, &OutputJobsDialog::orderPcbDialogTriggered, this,
+            [this, &dialog]() { mProjectEditor.execOrderPcbDialog(&dialog); });
+    dialog.exec();
+  }));
   mActionOrderPcb.reset(cmd.orderPcb.createAction(
       this, this, [this]() { mProjectEditor.execOrderPcbDialog(this); }));
   mActionNewSheet.reset(
@@ -667,6 +676,7 @@ void SchematicEditor::createToolBars() noexcept {
   mToolBarFile->addAction(mActionSaveProject.data());
   mToolBarFile->addAction(mActionPrint.data());
   mToolBarFile->addAction(mActionExportPdf.data());
+  mToolBarFile->addAction(mActionOutputJobs.data());
   mToolBarFile->addAction(mActionOrderPcb.data());
   mToolBarFile->addSeparator();
   mToolBarFile->addAction(mActionControlPanel.data());
@@ -816,6 +826,7 @@ void SchematicEditor::createMenus() noexcept {
     MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createProductionDataMenu));
     smb.addAction(mActionGenerateBom);
   }
+  mb.addAction(mActionOutputJobs);
   mb.addSeparator();
   mb.addAction(mActionPrint);
   mb.addAction(mActionOrderPcb);
@@ -1202,7 +1213,7 @@ void SchematicEditor::execGraphicsExportDialog(
     QString projectName = FilePath::cleanFileName(
         *mProject.getName(), FilePath::ReplaceSpaces | FilePath::KeepCase);
     QString projectVersion = FilePath::cleanFileName(
-        mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
+        *mProject.getVersion(), FilePath::ReplaceSpaces | FilePath::KeepCase);
     QString relativePath =
         QString("output/%1/%2_Schematics").arg(projectVersion, projectName);
     FilePath defaultFilePath = mProject.getPath().getPathTo(relativePath);

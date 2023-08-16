@@ -67,7 +67,8 @@ namespace librepcb {
  * @tparam T  The type of the list items. The type must provide following
  *            functionality:
  *              - Optional: A nothrow copy constructor (to make the list
- *                copyable)
+ *                copyable). For polymorphic objects, implement a method
+ *                `std::shared_ptr<T> cloneShared() const noexcept`
  *              - Optional: A constructor with one parameter of type `const
  *                SExpression&`
  *              - Optional: A method `void serialize(SExpression&) const`
@@ -422,7 +423,8 @@ public:
     clear();
     mObjects.reserve(rhs.count());
     foreach (const std::shared_ptr<T>& ptr, rhs.mObjects) {
-      append(std::make_shared<T>(*ptr));  // call copy constructor of object
+      append(copyObject(
+          *ptr, typename std::is_nothrow_copy_constructible<T>::type()));
     }
     return *this;
   }
@@ -475,6 +477,18 @@ protected:  // Methods
                "no element of type \"%1\" with the name \"%2\" in the list."))
             .arg(P::tagname)
             .arg(name));
+  }
+
+private:  // Internal Helper Methods
+  std::shared_ptr<T> copyObject(const T& other,
+                                std::true_type copyConstructable) noexcept {
+    Q_UNUSED(copyConstructable);
+    return std::make_shared<T>(other);  // Call copy constructor of object.
+  }
+  std::shared_ptr<T> copyObject(const T& other,
+                                std::false_type copyConstructable) noexcept {
+    Q_UNUSED(copyConstructable);
+    return other.cloneShared();  // Call cloneShared() on object.
   }
 
 protected:  // Data

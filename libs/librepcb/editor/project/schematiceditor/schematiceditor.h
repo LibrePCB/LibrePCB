@@ -182,6 +182,7 @@ private:
   QScopedPointer<QAction> mActionExportPdf;
   QScopedPointer<QAction> mActionPrint;
   QScopedPointer<QAction> mActionGenerateBom;
+  QScopedPointer<QAction> mActionOutputJobs;
   QScopedPointer<QAction> mActionOrderPcb;
   QScopedPointer<QAction> mActionNewSheet;
   QScopedPointer<QAction> mActionRenameSheet;

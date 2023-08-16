@@ -215,6 +215,18 @@ QVector<std::shared_ptr<const Part>> BI_Device::getParts(
   return parts;
 }
 
+bool BI_Device::isInAssemblyVariant(const Uuid& assemblyVariant) const
+    noexcept {
+  for (const ComponentAssemblyOption& opt :
+       mCompInstance.getAssemblyOptions()) {
+    if ((opt.getDevice() == mLibDevice->getUuid()) &&
+        (opt.getAssemblyVariants().contains(assemblyVariant))) {
+      return true;
+    }
+  }
+  return false;
+}
+
 bool BI_Device::doesPackageRequireAssembly(bool resolveAuto) const noexcept {
   return mLibPackage->getAssemblyType(resolveAuto) !=
       Package::AssemblyType::None;

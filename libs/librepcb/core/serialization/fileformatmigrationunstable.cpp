@@ -109,6 +109,13 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
  *  Private Methods
  ******************************************************************************/
 
+void FileFormatMigrationUnstable::createOutputJobs(
+    TransactionalDirectory& dir) {
+  if (!dir.fileExists("project/jobs.lp")) {
+    FileFormatMigrationV01::createOutputJobs(dir);
+  }
+}
+
 void FileFormatMigrationUnstable::upgradeSettings(SExpression& root) {
   Q_UNUSED(root);
 }

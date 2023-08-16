@@ -60,7 +60,9 @@ public:
 private:  // Methods
   bool openProject(
       const QString& projectFile, bool runErc, bool runDrc,
-      const QString& drcSettingsPath, const QStringList& exportSchematicsFiles,
+      const QString& drcSettingsPath, const QStringList& runJobs,
+      bool runAllJobs, const QString& customJobsPath,
+      const QString& customOutDir, const QStringList& exportSchematicsFiles,
       const QStringList& exportBomFiles, const QStringList& exportBoardBomFiles,
       const QString& bomAttributes, bool exportPcbFabricationData,
       const QString& pcbFabricationSettingsPath,

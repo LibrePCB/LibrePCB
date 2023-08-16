@@ -39,7 +39,14 @@ namespace librepcb {
 
 PickPlaceCsvWriter::PickPlaceCsvWriter(const PickPlaceData& data) noexcept
   : mData(data),
-    mBoardSide(BoardSide::BOTH),
+    mBoardSide(BoardSide::Both),
+    mTypeFilter({
+        PickPlaceDataItem::Type::Tht,
+        PickPlaceDataItem::Type::Smt,
+        PickPlaceDataItem::Type::Mixed,
+        PickPlaceDataItem::Type::Fiducial,
+        PickPlaceDataItem::Type::Other,
+    }),
     mIncludeMetadataComment(true),
     mIncludeNonMountedParts(false) {
 }
@@ -69,6 +76,12 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
 
   // Optionally add some metadata to to the CSV as a help for readers.
   if (mIncludeMetadataComment) {
+    QStringList enabledTypeNames;
+    foreach (auto type, types) {
+      if (mTypeFilter.contains(type)) {
+        enabledTypeNames.append(getTypeName(type));
+      }
+    }
     QString comment =
         QString(
             "Pick&Place Position Data File\n"
@@ -81,14 +94,14 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
             "Unit:                mm\n"
             "Rotation:            Degrees CCW\n"
             "Board Side:          %6\n"
-            "Supported Types:     %7")
+            "Assembly Types:      %7")
             .arg(mData.getProjectName())
             .arg(mData.getProjectVersion())
             .arg(mData.getBoardName())
             .arg(Application::getVersion())
             .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
             .arg(boardSideToString(mBoardSide))
-            .arg(typeNames.join(", "));
+            .arg(enabledTypeNames.join(", "));
     file->setComment(comment);
   }
 
@@ -99,6 +112,7 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
 
   foreach (const PickPlaceDataItem& item, mData.getItems()) {
     if (isOnBoardSide(item, mBoardSide) &&
+        (mTypeFilter.contains(item.getType())) &&
         (item.isMount() || mIncludeNonMountedParts)) {
       QStringList values;
       values += item.getDesignator();
@@ -126,9 +140,9 @@ std::shared_ptr<CsvFile> PickPlaceCsvWriter::generateCsv() const {
 bool PickPlaceCsvWriter::isOnBoardSide(const PickPlaceDataItem& item,
                                        BoardSide side) noexcept {
   switch (side) {
-    case BoardSide::TOP:
+    case BoardSide::Top:
       return (item.getBoardSide() == PickPlaceDataItem::BoardSide::Top);
-    case BoardSide::BOTTOM:
+    case BoardSide::Bottom:
       return (item.getBoardSide() == PickPlaceDataItem::BoardSide::Bottom);
     default:
       return true;
@@ -137,11 +151,11 @@ bool PickPlaceCsvWriter::isOnBoardSide(const PickPlaceDataItem& item,
 
 QString PickPlaceCsvWriter::boardSideToString(BoardSide side) noexcept {
   switch (side) {
-    case BoardSide::TOP:
+    case BoardSide::Top:
       return "Top";
-    case BoardSide::BOTTOM:
+    case BoardSide::Bottom:
       return "Bottom";
-    case BoardSide::BOTH:
+    case BoardSide::Both:
       return "Top + Bottom";
     default:
       return "Unknown";
