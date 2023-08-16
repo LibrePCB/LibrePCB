@@ -1062,27 +1062,60 @@ QString DrcMsgDrillBoardClearanceViolation::getDescription() noexcept {
 }
 
 /*******************************************************************************
- *  DrcMsgCourtyardOverlap
+ *  DrcMsgDeviceInCourtyard
  ******************************************************************************/
 
-DrcMsgCourtyardOverlap::DrcMsgCourtyardOverlap(
+DrcMsgDeviceInCourtyard::DrcMsgDeviceInCourtyard(
     const BI_Device& device1, const BI_Device& device2,
     const QVector<Path>& locations) noexcept
   : RuleCheckMessage(
         Severity::Warning,
-        tr("Courtyard overlap: '%1' ↔ '%2'",
+        tr("Device in courtyard: '%1' ↔ '%2'",
            "Placeholders: Device 1 name, device 2 name")
             .arg(std::min(*device1.getComponentInstance().getName(),
                           *device2.getComponentInstance().getName()),
                  std::max(*device1.getComponentInstance().getName(),
                           *device2.getComponentInstance().getName())),
-        tr("The courtyard of two devices overlap, which might cause troubles "
-           "during assembly of these parts.") %
+        tr("A device is placed within the courtyard of another device, which "
+           "might cause troubles during assembly of these parts.") %
             "\n\n" %
-            tr("Either move the devices to increase their distance or approve "
+            tr("Either move the devices to increase their clearance or approve "
                "this message if you're sure they can be assembled without "
                "problems."),
-        "courtyard_overlap", locations) {
+        "device_in_courtyard", locations) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("device",
+                        std::min(device1.getComponentInstanceUuid(),
+                                 device2.getComponentInstanceUuid()));
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("device",
+                        std::max(device1.getComponentInstanceUuid(),
+                                 device2.getComponentInstanceUuid()));
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
+ *  DrcMsgOverlappingDevices
+ ******************************************************************************/
+
+DrcMsgOverlappingDevices::DrcMsgOverlappingDevices(
+    const BI_Device& device1, const BI_Device& device2,
+    const QVector<Path>& locations) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Device overlap: '%1' ↔ '%2'",
+           "Placeholders: Device 1 name, device 2 name")
+            .arg(std::min(*device1.getComponentInstance().getName(),
+                          *device2.getComponentInstance().getName()),
+                 std::max(*device1.getComponentInstance().getName(),
+                          *device2.getComponentInstance().getName())),
+        tr("Two devices are overlapping and thus probably cannot be assembled "
+           "both at the same time.") %
+            "\n\n" %
+            tr("Either move the devices to increase their clearance or approve "
+               "this message if you're sure they can be assembled without "
+               "problems (or only one of them gets assembled)."),
+        "overlapping_devices", locations) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("device",
                         std::min(device1.getComponentInstanceUuid(),

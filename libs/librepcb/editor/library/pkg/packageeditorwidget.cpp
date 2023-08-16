@@ -47,6 +47,7 @@
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/pkg/packagecheckmessages.h>
 #include <librepcb/core/types/pcbcolor.h>
+#include <librepcb/core/utils/clipperhelpers.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -261,6 +262,8 @@ QSet<EditorWidgetBase::Feature> PackageEditorWidget::getAvailableFeatures()
       EditorWidgetBase::Feature::GraphicsView,
       EditorWidgetBase::Feature::OpenGlView,
       EditorWidgetBase::Feature::ExportGraphics,
+      EditorWidgetBase::Feature::GenerateOutline,
+      EditorWidgetBase::Feature::GenerateCourtyard,
   };
   return features + mFsm->getAvailableFeatures();
 }
@@ -418,6 +421,14 @@ bool PackageEditorWidget::toggle3D() noexcept {
 
 bool PackageEditorWidget::abortCommand() noexcept {
   return mFsm->processAbortCommand();
+}
+
+bool PackageEditorWidget::processGenerateOutline() noexcept {
+  return mFsm->processGenerateOutline();
+}
+
+bool PackageEditorWidget::processGenerateCourtyard() noexcept {
+  return mFsm->processGenerateCourtyard();
 }
 
 bool PackageEditorWidget::importDxf() noexcept {
@@ -751,6 +762,20 @@ void PackageEditorWidget::fixMsg(const MsgMissingCategories& msg) {
 }
 
 template <>
+void PackageEditorWidget::fixMsg(const MsgMissingPackageOutline& msg) {
+  mUi->footprintEditorWidget->setCurrentIndex(
+      mPackage->getFootprints().indexOf(msg.getFootprint().get()));
+  mFsm->processGenerateOutline();
+}
+
+template <>
+void PackageEditorWidget::fixMsg(const MsgMissingCourtyard& msg) {
+  mUi->footprintEditorWidget->setCurrentIndex(
+      mPackage->getFootprints().indexOf(msg.getFootprint().get()));
+  mFsm->processGenerateCourtyard();
+}
+
+template <>
 void PackageEditorWidget::fixMsg(const MsgMissingFootprint& msg) {
   Q_UNUSED(msg);
   std::shared_ptr<Footprint> fpt = std::make_shared<Footprint>(
@@ -767,12 +792,16 @@ void PackageEditorWidget::fixMsg(const MsgMissingFootprintModel& msg) {
 template <>
 void PackageEditorWidget::fixMsg(const MsgMissingFootprintName& msg) {
   Q_UNUSED(msg);
+  mUi->footprintEditorWidget->setCurrentIndex(
+      mPackage->getFootprints().indexOf(msg.getFootprint().get()));
   mFsm->processStartAddingNames();
 }
 
 template <>
 void PackageEditorWidget::fixMsg(const MsgMissingFootprintValue& msg) {
   Q_UNUSED(msg);
+  mUi->footprintEditorWidget->setCurrentIndex(
+      mPackage->getFootprints().indexOf(msg.getFootprint().get()));
   mFsm->processStartAddingValues();
 }
 
@@ -957,6 +986,8 @@ bool PackageEditorWidget::processRuleCheckMessage(
   if (fixMsgHelper<MsgNameNotTitleCase>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingAuthor>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingCategories>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingPackageOutline>(msg, applyFix)) return true;
+  if (fixMsgHelper<MsgMissingCourtyard>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprint>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprintModel>(msg, applyFix)) return true;
   if (fixMsgHelper<MsgMissingFootprintName>(msg, applyFix)) return true;

@@ -128,6 +128,8 @@ private:
                    bool fill, GerberGenerator::Function function,
                    const tl::optional<QString>& net,
                    const QString& component) const;
+  QVector<Path> getComponentOutlines(const BI_Device& device,
+                                     const Layer& layer) const;
 
   std::unique_ptr<ExcellonGenerator> createExcellonGenerator(
       const BoardFabricationOutputSettings& settings,

@@ -56,6 +56,8 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkMissingFootprint(msgs);
   checkMissingTexts(msgs);
   checkWrongTextLayers(msgs);
+  checkPackageOutlines(msgs);
+  checkCourtyards(msgs);
   checkPadsClearanceToPads(msgs);
   checkPadsClearanceToLegend(msgs);
   checkPadsAnnularRing(msgs);
@@ -137,6 +139,54 @@ void PackageCheck::checkWrongTextLayers(MsgList& msgs) const {
       if (expectedLayer && (&(*it).getLayer() != expectedLayer)) {
         msgs.append(std::make_shared<MsgWrongFootprintTextLayer>(
             itFtp.ptr(), it.ptr(), *expectedLayer));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkPackageOutlines(MsgList& msgs) const {
+  if (mPackage.getAssemblyType(false) != Package::AssemblyType::None) {
+    for (auto itFtp = mPackage.getFootprints().begin();
+         itFtp != mPackage.getFootprints().end(); ++itFtp) {
+      int count = 0;
+      for (auto it = (*itFtp).getPolygons().begin();
+           it != (*itFtp).getPolygons().end(); ++it) {
+        if (it->getLayer().isPackageOutline()) {
+          ++count;
+        }
+      }
+      for (auto it = (*itFtp).getCircles().begin();
+           it != (*itFtp).getCircles().end(); ++it) {
+        if (it->getLayer().isPackageOutline()) {
+          ++count;
+        }
+      }
+      if (count == 0) {
+        msgs.append(std::make_shared<MsgMissingPackageOutline>(itFtp.ptr()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkCourtyards(MsgList& msgs) const {
+  if (mPackage.getAssemblyType(false) != Package::AssemblyType::None) {
+    for (auto itFtp = mPackage.getFootprints().begin();
+         itFtp != mPackage.getFootprints().end(); ++itFtp) {
+      int count = 0;
+      for (auto it = (*itFtp).getPolygons().begin();
+           it != (*itFtp).getPolygons().end(); ++it) {
+        if (it->getLayer().isPackageCourtyard()) {
+          ++count;
+        }
+      }
+      for (auto it = (*itFtp).getCircles().begin();
+           it != (*itFtp).getCircles().end(); ++it) {
+        if (it->getLayer().isPackageCourtyard()) {
+          ++count;
+        }
+      }
+      if (count == 0) {
+        msgs.append(std::make_shared<MsgMissingCourtyard>(itFtp.ptr()));
       }
     }
   }

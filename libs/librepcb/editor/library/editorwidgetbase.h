@@ -98,6 +98,8 @@ public:
     GraphicsView,
     OpenGlView,
     ExportGraphics,
+    GenerateOutline,
+    GenerateCourtyard,
 
     // Handled by FSM states (dynamic).
     SelectGraphics,
@@ -169,6 +171,8 @@ public slots:
   virtual bool zoomAll() noexcept { return false; }
   virtual bool toggle3D() noexcept { return false; }
   virtual bool abortCommand() noexcept { return false; }
+  virtual bool processGenerateOutline() noexcept { return false; }
+  virtual bool processGenerateCourtyard() noexcept { return false; }
   virtual bool importDxf() noexcept { return false; }
   virtual bool exportImage() noexcept;
   virtual bool exportPdf() noexcept;

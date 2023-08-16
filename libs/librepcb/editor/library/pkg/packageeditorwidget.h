@@ -105,6 +105,8 @@ public slots:
   bool zoomAll() noexcept override;
   bool toggle3D() noexcept override;
   bool abortCommand() noexcept override;
+  bool processGenerateOutline() noexcept override;
+  bool processGenerateCourtyard() noexcept override;
   bool importDxf() noexcept override;
   bool editGridProperties() noexcept override;
   bool increaseGridInterval() noexcept override;

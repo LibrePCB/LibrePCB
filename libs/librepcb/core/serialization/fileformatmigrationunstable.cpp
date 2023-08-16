@@ -63,11 +63,6 @@ void FileFormatMigrationUnstable::upgradePackageCategory(
 
 void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  const QString fp = "symbol.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  root.appendChild("generated_by", QString());
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
@@ -75,27 +70,30 @@ void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
 
   const QString fp = "package.lp";
   SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  root.appendChild("generated_by", QString());
+  for (SExpression* fptNode : root.getChildren("footprint")) {
+    for (SExpression* polygonNode : fptNode->getChildren("polygon")) {
+      if (polygonNode->getChild("layer/@0").getValue().endsWith("_courtyard")) {
+        SExpression& widthNode = polygonNode->getChild("width/@0");
+        widthNode.setValue("0.0");
+      }
+    }
+    for (SExpression* circleNode : fptNode->getChildren("circle")) {
+      if (circleNode->getChild("layer/@0").getValue().endsWith("_courtyard")) {
+        SExpression& widthNode = circleNode->getChild("width/@0");
+        widthNode.setValue("0.0");
+      }
+    }
+  }
   dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
     TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  const QString fp = "component.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  root.appendChild("generated_by", QString());
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeDevice(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  const QString fp = "device.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  root.appendChild("generated_by", QString());
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeLibrary(TransactionalDirectory& dir) {

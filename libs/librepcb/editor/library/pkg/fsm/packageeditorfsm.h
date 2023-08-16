@@ -141,6 +141,8 @@ public:
   bool processSnapToGrid() noexcept;
   bool processRemove() noexcept;
   bool processEditProperties() noexcept;
+  bool processGenerateOutline() noexcept;
+  bool processGenerateCourtyard() noexcept;
   bool processAbortCommand() noexcept;
   bool processStartSelecting() noexcept;
   bool processStartAddingFootprintThtPads() noexcept;

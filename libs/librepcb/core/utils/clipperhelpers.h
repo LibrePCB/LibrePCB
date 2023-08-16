@@ -88,7 +88,8 @@ public:
       ClipperLib::PolyFillType subjectFillType,
       ClipperLib::PolyFillType clipFillType, bool closed = true);
   static void offset(ClipperLib::Paths& paths, const Length& offset,
-                     const PositiveLength& maxArcTolerance);
+                     const PositiveLength& maxArcTolerance,
+                     ClipperLib::JoinType joinType = ClipperLib::jtRound);
   static std::unique_ptr<ClipperLib::PolyTree> offsetToTree(
       const ClipperLib::Paths& paths, const Length& offset,
       const PositiveLength& maxArcTolerance);

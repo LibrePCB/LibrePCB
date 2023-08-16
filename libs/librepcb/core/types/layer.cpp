@@ -58,12 +58,13 @@ Layer::~Layer() noexcept {
 
 const Layer& Layer::mirrored(int innerLayers) const noexcept {
   static QHash<const Layer*, const Layer*> map = {
-      {&topLegend(), &botLegend()},
-      {&topDocumentation(), &botDocumentation()},
-      {&topHiddenGrabAreas(), &botHiddenGrabAreas()},
       {&topNames(), &botNames()},
       {&topValues(), &botValues()},
+      {&topLegend(), &botLegend()},
+      {&topDocumentation(), &botDocumentation()},
+      {&topPackageOutlines(), &botPackageOutlines()},
       {&topCourtyard(), &botCourtyard()},
+      {&topHiddenGrabAreas(), &botHiddenGrabAreas()},
       {&topStopMask(), &botStopMask()},
       {&topSolderPaste(), &botSolderPaste()},
       {&topFinish(), &botFinish()},
@@ -199,6 +200,30 @@ const Layer& Layer::boardGuide() noexcept {
   return layer;
 }
 
+const Layer& Layer::topNames() noexcept {
+  static Layer layer("top_names", tr("Top Names"), Theme::Color::sBoardNamesTop,
+                     Flag::Board | Flag::Top);
+  return layer;
+}
+
+const Layer& Layer::botNames() noexcept {
+  static Layer layer("bot_names", tr("Bottom Names"),
+                     Theme::Color::sBoardNamesBot, Flag::Board | Flag::Bottom);
+  return layer;
+}
+
+const Layer& Layer::topValues() noexcept {
+  static Layer layer("top_values", tr("Top Values"),
+                     Theme::Color::sBoardValuesTop, Flag::Board | Flag::Top);
+  return layer;
+}
+
+const Layer& Layer::botValues() noexcept {
+  static Layer layer("bot_values", tr("Bottom Values"),
+                     Theme::Color::sBoardValuesBot, Flag::Board | Flag::Bottom);
+  return layer;
+}
+
 const Layer& Layer::topLegend() noexcept {
   static Layer layer("top_legend", tr("Top Legend"),
                      Theme::Color::sBoardLegendTop, Flag::Board | Flag::Top);
@@ -225,6 +250,38 @@ const Layer& Layer::botDocumentation() noexcept {
   return layer;
 }
 
+const Layer& Layer::topPackageOutlines() noexcept {
+  static Layer layer("top_package_outlines", tr("Top Package Outlines"),
+                     Theme::Color::sBoardPackageOutlinesTop,
+                     Flag::Board | Flag::Top | Flag::PackageOutline |
+                         Flag::PolygonsRepresentAreas);
+  return layer;
+}
+
+const Layer& Layer::botPackageOutlines() noexcept {
+  static Layer layer("bot_package_outlines", tr("Bottom Package Outlines"),
+                     Theme::Color::sBoardPackageOutlinesBot,
+                     Flag::Board | Flag::Bottom | Flag::PackageOutline |
+                         Flag::PolygonsRepresentAreas);
+  return layer;
+}
+
+const Layer& Layer::topCourtyard() noexcept {
+  static Layer layer("top_courtyard", tr("Top Courtyard"),
+                     Theme::Color::sBoardCourtyardTop,
+                     Flag::Board | Flag::Top | Flag::PackageCourtyard |
+                         Flag::PolygonsRepresentAreas);
+  return layer;
+}
+
+const Layer& Layer::botCourtyard() noexcept {
+  static Layer layer("bot_courtyard", tr("Bottom Courtyard"),
+                     Theme::Color::sBoardCourtyardBot,
+                     Flag::Board | Flag::Bottom | Flag::PackageCourtyard |
+                         Flag::PolygonsRepresentAreas);
+  return layer;
+}
+
 const Layer& Layer::topHiddenGrabAreas() noexcept {
   static Layer layer("top_hidden_grab_areas", tr("Top Hidden Grab Areas"),
                      Theme::Color::sBoardHiddenGrabAreasTop,
@@ -235,43 +292,6 @@ const Layer& Layer::topHiddenGrabAreas() noexcept {
 const Layer& Layer::botHiddenGrabAreas() noexcept {
   static Layer layer("bot_hidden_grab_areas", tr("Bottom Hidden Grab Areas"),
                      Theme::Color::sBoardHiddenGrabAreasBot,
-                     Flag::Board | Flag::Bottom);
-  return layer;
-}
-
-const Layer& Layer::topNames() noexcept {
-  static Layer layer("top_names", tr("Top Names"), Theme::Color::sBoardNamesTop,
-                     Flag::Board | Flag::Top);
-  return layer;
-}
-
-const Layer& Layer::botNames() noexcept {
-  static Layer layer("bot_names", tr("Bottom Names"),
-                     Theme::Color::sBoardNamesBot, Flag::Board | Flag::Bottom);
-  return layer;
-}
-
-const Layer& Layer::topValues() noexcept {
-  static Layer layer("top_values", tr("Top Values"),
-                     Theme::Color::sBoardValuesTop, Flag::Board | Flag::Top);
-  return layer;
-}
-
-const Layer& Layer::botValues() noexcept {
-  static Layer layer("bot_values", tr("Bottom Values"),
-                     Theme::Color::sBoardValuesBot, Flag::Board | Flag::Bottom);
-  return layer;
-}
-
-const Layer& Layer::topCourtyard() noexcept {
-  static Layer layer("top_courtyard", tr("Top Courtyard"),
-                     Theme::Color::sBoardCourtyardTop, Flag::Board | Flag::Top);
-  return layer;
-}
-
-const Layer& Layer::botCourtyard() noexcept {
-  static Layer layer("bot_courtyard", tr("Bottom Courtyard"),
-                     Theme::Color::sBoardCourtyardBot,
                      Flag::Board | Flag::Bottom);
   return layer;
 }
@@ -395,12 +415,13 @@ const QVector<const Layer*>& Layer::all() noexcept {
           &boardDocumentation(),  //
           &boardComments(),  //
           &boardGuide(),  //
-          &topLegend(),  //
-          &topDocumentation(),  //
-          &topHiddenGrabAreas(),  //
           &topNames(),  //
           &topValues(),  //
+          &topLegend(),  //
+          &topDocumentation(),  //
+          &topPackageOutlines(),  //
           &topCourtyard(),  //
+          &topHiddenGrabAreas(),  //
           &topStopMask(),  //
           &topSolderPaste(),  //
           &topFinish(),  //
@@ -410,12 +431,13 @@ const QVector<const Layer*>& Layer::all() noexcept {
       innerCopper() +
       QVector<const Layer*>{
           &botCopper(),  //
-          &botLegend(),  //
-          &botDocumentation(),  //
-          &botHiddenGrabAreas(),  //
           &botNames(),  //
           &botValues(),  //
+          &botLegend(),  //
+          &botDocumentation(),  //
+          &botPackageOutlines(),  //
           &botCourtyard(),  //
+          &botHiddenGrabAreas(),  //
           &botStopMask(),  //
           &botSolderPaste(),  //
           &botFinish(),  //

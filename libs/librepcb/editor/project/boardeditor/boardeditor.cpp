@@ -444,14 +444,16 @@ void BoardEditor::addLayers(const Theme& theme) noexcept {
   addLayer(Theme::Color::sBoardGrabAreasBot, false);
   // addLayer(Theme::Color::sBoardHiddenGrabAreasTop, true); Not needed!
   // addLayer(Theme::Color::sBoardHiddenGrabAreasBot, true); Not needed!
-  addLayer(Theme::Color::sBoardLegendTop, true);
-  addLayer(Theme::Color::sBoardLegendBot, true);
-  addLayer(Theme::Color::sBoardDocumentationTop, true);
-  addLayer(Theme::Color::sBoardDocumentationBot, true);
   addLayer(Theme::Color::sBoardNamesTop, true);
   addLayer(Theme::Color::sBoardNamesBot, true);
   addLayer(Theme::Color::sBoardValuesTop, true);
   addLayer(Theme::Color::sBoardValuesBot, true);
+  addLayer(Theme::Color::sBoardLegendTop, true);
+  addLayer(Theme::Color::sBoardLegendBot, true);
+  addLayer(Theme::Color::sBoardDocumentationTop, true);
+  addLayer(Theme::Color::sBoardDocumentationBot, true);
+  addLayer(Theme::Color::sBoardPackageOutlinesTop, false);
+  addLayer(Theme::Color::sBoardPackageOutlinesBot, false);
   addLayer(Theme::Color::sBoardCourtyardTop, false);
   addLayer(Theme::Color::sBoardCourtyardBot, false);
   addLayer(Theme::Color::sBoardStopMaskTop, true);

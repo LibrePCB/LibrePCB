@@ -97,6 +97,8 @@ bool PackageEditorState_DrawPolygonBase::entry() noexcept {
       edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepUp));
   edtLineWidth->addAction(cmd.lineWidthDecrease.createAction(
       edtLineWidth.get(), edtLineWidth.get(), &UnsignedLengthEdit::stepDown));
+  connect(this, &PackageEditorState_DrawPolygonBase::requestLineWidth,
+          edtLineWidth.get(), &UnsignedLengthEdit::setValue);
   connect(edtLineWidth.get(), &UnsignedLengthEdit::valueChanged, this,
           &PackageEditorState_DrawPolygonBase::lineWidthEditValueChanged);
   mContext.commandToolBar.addWidget(std::move(edtLineWidth));
@@ -570,6 +572,15 @@ void PackageEditorState_DrawPolygonBase::layerComboBoxValueChanged(
   if (mEditCmd) {
     mEditCmd->setLayer(*mLastLayer, true);
   }
+  if (mUsedLineWidths.contains(&layer)) {
+    emit requestLineWidth(*mUsedLineWidths.find(&layer));
+  } else if (layer.getPolygonsRepresentAreas()) {
+    // Zero-width polygons.
+    emit requestLineWidth(UnsignedLength(0));
+  } else {
+    // Typical width according library conventions.
+    emit requestLineWidth(UnsignedLength(200000));
+  }
 }
 
 void PackageEditorState_DrawPolygonBase::lineWidthEditValueChanged(
@@ -578,6 +589,7 @@ void PackageEditorState_DrawPolygonBase::lineWidthEditValueChanged(
   if (mEditCmd) {
     mEditCmd->setLineWidth(mLastLineWidth, true);
   }
+  mUsedLineWidths.insert(mLastLayer, value);
 }
 
 void PackageEditorState_DrawPolygonBase::angleEditValueChanged(

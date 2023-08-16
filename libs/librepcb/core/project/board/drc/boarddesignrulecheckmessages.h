@@ -501,23 +501,43 @@ private:  // Methods
 };
 
 /*******************************************************************************
- *  Class DrcMsgCourtyardOverlap
+ *  Class DrcMsgDeviceInCourtyard
  ******************************************************************************/
 
 /**
- * @brief The DrcMsgCourtyardOverlap class
+ * @brief The DrcMsgDeviceInCourtyard class
  */
-class DrcMsgCourtyardOverlap final : public RuleCheckMessage {
-  Q_DECLARE_TR_FUNCTIONS(DrcMsgCourtyardOverlap)
+class DrcMsgDeviceInCourtyard final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgDeviceInCourtyard)
 
 public:
   // Constructors / Destructor
-  DrcMsgCourtyardOverlap() = delete;
-  DrcMsgCourtyardOverlap(const BI_Device& device1, const BI_Device& device2,
-                         const QVector<Path>& locations) noexcept;
-  DrcMsgCourtyardOverlap(const DrcMsgCourtyardOverlap& other) noexcept
+  DrcMsgDeviceInCourtyard() = delete;
+  DrcMsgDeviceInCourtyard(const BI_Device& device1, const BI_Device& device2,
+                          const QVector<Path>& locations) noexcept;
+  DrcMsgDeviceInCourtyard(const DrcMsgDeviceInCourtyard& other) noexcept
     : RuleCheckMessage(other) {}
-  virtual ~DrcMsgCourtyardOverlap() noexcept {}
+  virtual ~DrcMsgDeviceInCourtyard() noexcept {}
+};
+
+/*******************************************************************************
+ *  Class DrcMsgOverlappingDevices
+ ******************************************************************************/
+
+/**
+ * @brief The DrcMsgOverlappingDevices class
+ */
+class DrcMsgOverlappingDevices final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(DrcMsgOverlappingDevices)
+
+public:
+  // Constructors / Destructor
+  DrcMsgOverlappingDevices() = delete;
+  DrcMsgOverlappingDevices(const BI_Device& device1, const BI_Device& device2,
+                           const QVector<Path>& locations) noexcept;
+  DrcMsgOverlappingDevices(const DrcMsgOverlappingDevices& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~DrcMsgOverlappingDevices() noexcept {}
 };
 
 /*******************************************************************************

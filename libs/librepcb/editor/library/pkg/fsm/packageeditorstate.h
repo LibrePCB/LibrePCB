@@ -124,6 +124,8 @@ public:
   }
   virtual bool processRemove() noexcept { return false; }
   virtual bool processEditProperties() noexcept { return false; }
+  virtual bool processGenerateOutline() noexcept { return false; }
+  virtual bool processGenerateCourtyard() noexcept { return false; }
   virtual bool processImportDxf() noexcept { return false; }
   virtual bool processAbortCommand() noexcept { return false; }
 

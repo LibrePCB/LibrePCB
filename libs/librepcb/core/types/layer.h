@@ -53,6 +53,9 @@ public:
     StopMask = (1 << 21),
     SolderPaste = (1 << 22),
     BoardEdge = (1 << 23),
+    PackageOutline = (1 << 24),
+    PackageCourtyard = (1 << 25),
+    PolygonsRepresentAreas = (1 << 26),
   };
   Q_DECLARE_FLAGS(Flags, Flag)
 
@@ -155,6 +158,33 @@ public:
   bool isBoardEdge() const noexcept { return mFlags.testFlag(Flag::BoardEdge); }
 
   /**
+   * @brief Check if this is a package outline layer
+   *
+   * @return Whether this is a package outline layer or not
+   */
+  bool isPackageOutline() const noexcept {
+    return mFlags.testFlag(Flag::PackageOutline);
+  }
+
+  /**
+   * @brief Check if this is a package courtyard layer
+   *
+   * @return Whether this is a package courtyard layer or not
+   */
+  bool isPackageCourtyard() const noexcept {
+    return mFlags.testFlag(Flag::PackageCourtyard);
+  }
+
+  /**
+   * @brief Check if polygons on this layers always represent areas
+   *
+   * @return Whether this is an area polygon or not
+   */
+  bool getPolygonsRepresentAreas() const noexcept {
+    return mFlags.testFlag(Flag::PolygonsRepresentAreas);
+  }
+
+  /**
    * @brief Get the copper layer number
    *
    * @return Copper layer number (0 = top, 1 = first inner, 63 = bottom)
@@ -196,18 +226,20 @@ public:
   static const Layer& boardDocumentation() noexcept;
   static const Layer& boardComments() noexcept;
   static const Layer& boardGuide() noexcept;
-  static const Layer& topLegend() noexcept;
-  static const Layer& botLegend() noexcept;
-  static const Layer& topDocumentation() noexcept;
-  static const Layer& botDocumentation() noexcept;
-  static const Layer& topHiddenGrabAreas() noexcept;
-  static const Layer& botHiddenGrabAreas() noexcept;
   static const Layer& topNames() noexcept;
   static const Layer& botNames() noexcept;
   static const Layer& topValues() noexcept;
   static const Layer& botValues() noexcept;
+  static const Layer& topLegend() noexcept;
+  static const Layer& botLegend() noexcept;
+  static const Layer& topDocumentation() noexcept;
+  static const Layer& botDocumentation() noexcept;
+  static const Layer& topPackageOutlines() noexcept;
+  static const Layer& botPackageOutlines() noexcept;
   static const Layer& topCourtyard() noexcept;
   static const Layer& botCourtyard() noexcept;
+  static const Layer& topHiddenGrabAreas() noexcept;
+  static const Layer& botHiddenGrabAreas() noexcept;
   static const Layer& topStopMask() noexcept;
   static const Layer& botStopMask() noexcept;
   static const Layer& topSolderPaste() noexcept;

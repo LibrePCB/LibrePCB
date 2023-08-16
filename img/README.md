@@ -58,6 +58,7 @@ actions/select_rect.png icons/png/48x48/actions/select-rectangular.png CC-BY-SA 
 actions/settings.png icons/png/48x48/actions/configure-2.png LGPL-2.1
 actions/stop.png icons/png/48x48/actions/process-stop.png GPLv2
 actions/up.png icons/png/48x48/actions/go-up-5.png PD
+actions/wizard.png icons/png/48x48/actions/tools-wizard-3.png CC-BY-SA 3.0 or LGPL
 actions/working.png icons/png/48x48/symbols/pictograms-road_signs-workman_ahead_roadsign.png PD
 actions/zoom_all.png icons/png/48x48/actions/zoom-fit-best-2.png GPLv2
 actions/zoom_in.png icons/png/48x48/actions/zoom-in-3.png GPLv2

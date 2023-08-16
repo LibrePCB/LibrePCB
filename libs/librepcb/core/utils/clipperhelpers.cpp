@@ -249,10 +249,11 @@ std::unique_ptr<ClipperLib::PolyTree> ClipperHelpers::subtractToTree(
 }
 
 void ClipperHelpers::offset(ClipperLib::Paths& paths, const Length& offset,
-                            const PositiveLength& maxArcTolerance) {
+                            const PositiveLength& maxArcTolerance,
+                            ClipperLib::JoinType joinType) {
   try {
     ClipperLib::ClipperOffset o(2.0, maxArcTolerance->toNm());
-    o.AddPaths(paths, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+    o.AddPaths(paths, joinType, ClipperLib::etClosedPolygon);
     o.Execute(paths, offset.toNm());
   } catch (const std::exception& e) {
     throw LogicError(__FILE__, __LINE__,

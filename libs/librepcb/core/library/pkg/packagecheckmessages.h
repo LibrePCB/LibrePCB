@@ -38,6 +38,7 @@ class FootprintPad;
 class Hole;
 class Layer;
 class PackagePad;
+class Polygon;
 class StrokeText;
 class Zone;
 
@@ -222,6 +223,34 @@ private:
 };
 
 /*******************************************************************************
+ *  Class MsgMissingCourtyard
+ ******************************************************************************/
+
+/**
+ * @brief The MsgMissingCourtyard class
+ */
+class MsgMissingCourtyard final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgMissingCourtyard)
+
+public:
+  // Constructors / Destructor
+  MsgMissingCourtyard() = delete;
+  explicit MsgMissingCourtyard(
+      std::shared_ptr<const Footprint> footprint) noexcept;
+  MsgMissingCourtyard(const MsgMissingCourtyard& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgMissingCourtyard() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+};
+
+/*******************************************************************************
  *  Class MsgMissingFootprint
  ******************************************************************************/
 
@@ -276,6 +305,14 @@ public:
   MsgMissingFootprintName(const MsgMissingFootprintName& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~MsgMissingFootprintName() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
 };
 
 /*******************************************************************************
@@ -296,6 +333,42 @@ public:
   MsgMissingFootprintValue(const MsgMissingFootprintValue& other) noexcept
     : RuleCheckMessage(other) {}
   virtual ~MsgMissingFootprintValue() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+};
+
+/*******************************************************************************
+ *  Class MsgMissingPackageOutline
+ ******************************************************************************/
+
+/**
+ * @brief The MsgMissingPackageOutline class
+ */
+class MsgMissingPackageOutline final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgMissingPackageOutline)
+
+public:
+  // Constructors / Destructor
+  MsgMissingPackageOutline() = delete;
+  explicit MsgMissingPackageOutline(
+      std::shared_ptr<const Footprint> footprint) noexcept;
+  MsgMissingPackageOutline(const MsgMissingPackageOutline& other) noexcept
+    : RuleCheckMessage(other) {}
+  virtual ~MsgMissingPackageOutline() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
 };
 
 /*******************************************************************************

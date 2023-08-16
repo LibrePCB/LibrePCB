@@ -226,6 +226,9 @@ private:  // Data
   QScopedPointer<QAction> mActionSnapToGrid;
   QScopedPointer<QAction> mActionProperties;
   QScopedPointer<QAction> mActionRemove;
+  QScopedPointer<QAction> mActionGenerate;
+  QScopedPointer<QAction> mActionGenerateOutline;
+  QScopedPointer<QAction> mActionGenerateCourtyard;
   QScopedPointer<QAction> mActionAbort;
   QScopedPointer<QAction> mActionToolSelect;
   QScopedPointer<QAction> mActionToolLine;
