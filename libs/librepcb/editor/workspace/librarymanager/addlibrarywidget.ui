@@ -84,7 +84,7 @@
        <item row="0" column="0" colspan="2">
         <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>&lt;p&gt;Creates a new local library in the currently opened workspace.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Note: Please specify all attributes in the english language (locale 'en_US'). Support for other languages will be added in a later release of LibrePCB.&lt;/span&gt;&lt;/p&gt;</string>
+          <string>Creates a new local library in the currently opened workspace.</string>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
