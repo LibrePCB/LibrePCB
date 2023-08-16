@@ -26,21 +26,21 @@ there are many other ways how to contribute to the LibrePCB project, see
 - Open a new issue for your idea, assuming one does not already exist.
 - Fork the repository on GitHub.
 - Have a look at our
-  [development resources](https://github.com/LibrePCB/LibrePCB/tree/master/dev),
+  [development resources](https://github.com/LibrePCB/LibrePCB/tree/main/dev),
   especially at the [developers documentation](https://developers.librepcb.org/).
 - When using QtCreator, import and use our
-  [code style guide file](https://github.com/LibrePCB/LibrePCB/blob/master/dev/CodingStyle_QtCreator.xml).
+  [code style guide file](https://github.com/LibrePCB/LibrePCB/blob/main/dev/CodingStyle_QtCreator.xml).
 
 ## Making Changes
 
 - Create a topic branch from where you want to base your work.
-  - This is usually the master branch.
-  - To quickly create a topic branch based on master:
-    `git checkout -b my_contribution master`
-  - Please avoid working directly on the `master` branch.
+  - This is usually the `main` branch.
+  - To quickly create a topic branch based on `main`:
+    `git checkout -b my_contribution main`
+  - Please avoid working directly on the `main` branch.
 - Write code which follows our
   [code style guides](https://developers.librepcb.org/df/d24/doc_code_style_guide.html)
-  and [.editorconfig settings](https://github.com/LibrePCB/LibrePCB/blob/master/.editorconfig).
+  and [.editorconfig settings](https://github.com/LibrePCB/LibrePCB/blob/main/.editorconfig).
   - You can use [clang-format](https://clang.llvm.org/docs/ClangFormat.html) to
     automatically format the code. To format all files at once, just run the
     script [`./dev/format_code.sh`](dev/format_code.sh).
@@ -62,7 +62,7 @@ there are many other ways how to contribute to the LibrePCB project, see
   - This is done by running the binary
     `./build/tests/unittests/librepcb-unittests`.
 - If you like, feel free to add yourself to the
-  [AUTHORS.md](https://github.com/LibrePCB/LibrePCB/blob/master/AUTHORS.md)
+  [AUTHORS.md](https://github.com/LibrePCB/LibrePCB/blob/main/AUTHORS.md)
   file.
 
 ## Submitting Changes

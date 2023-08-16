@@ -21,7 +21,7 @@ if [ ! -f ./i18n/librepcb.ts ]; then
   if [ "$OS" = "windows" ]; then  # Workaround for permission error
     git config --global --add safe.directory '*'
   fi
-  git -C ./i18n checkout master && git -C ./i18n pull origin master
+  git -C ./i18n checkout main && git -C ./i18n pull origin main
 fi
 
 # build librepcb

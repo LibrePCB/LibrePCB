@@ -18,7 +18,7 @@ if [[ -n $(git status --porcelain) ]]; then
 fi
 echo "STASH=${STASH}"
 
-START="master"
+START="main"
 END=${HEAD}
 
 trap "git checkout ${HEAD} && test ${STASH} -ne 1 || git stash pop" EXIT
@@ -31,4 +31,3 @@ for commit in ${COMMITS[@]}; do
 done
 
 echo "SUCCESSFULLY FINISHED!"
-

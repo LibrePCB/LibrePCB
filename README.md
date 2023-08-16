@@ -6,7 +6,7 @@
 [![Website](https://img.shields.io/badge/Website-librepcb.org-29d682.svg)](https://librepcb.org/)
 [![Docs](https://img.shields.io/badge/Docs-read-yellow.svg)](https://librepcb.org/docs/)
 
-[![Azure Build Status](https://dev.azure.com/LibrePCB/LibrePCB/_apis/build/status/LibrePCB.LibrePCB?branchName=master)](https://dev.azure.com/LibrePCB/LibrePCB/_build/latest?definitionId=2&branchName=master)
+[![Azure Build Status](https://dev.azure.com/LibrePCB/LibrePCB/_apis/build/status/LibrePCB.LibrePCB?branchName=main)](https://dev.azure.com/LibrePCB/LibrePCB/_build/latest?definitionId=2&branchName=main)
 [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/1652/badge)](https://bestpractices.coreinfrastructure.org/projects/1652)
 
 ## About LibrePCB
@@ -37,7 +37,7 @@ For internal details take a look at the
 
 ## Development
 
-***WARNING: The `master` branch always contains the latest UNSTABLE version of
+***WARNING: The `main` branch always contains the latest UNSTABLE version of
 LibrePCB. Everything you do with this unstable version could break your
 workspace, libraries or projects, so you should not use it productively! For
 productive use, please install an official release as described in the
@@ -87,7 +87,7 @@ sudo pacman -S qt5-doc qtcreator # optional
 *Note: Instead of installing the dependencies and building LibrePCB manually,
 you could install the package
 [librepcb-git](https://aur.archlinux.org/packages/librepcb-git/) from the AUR.
-The package clones and builds the latest version of the `master` branch from
+The package clones and builds the latest version of the `main` branch from
 GitHub.*
 
 #### Installation on Mac OS X

@@ -78,8 +78,8 @@ do
   if [ "$ALL" == "--all" ]; then
     TRACKED=$(git ls-files -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
   else
-    # Only files which differ from the master branch
-    TRACKED=$(git diff --name-only master -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
+    # Only files which differ from the main branch
+    TRACKED=$(git diff --name-only main -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
   fi
   UNTRACKED=$(git ls-files --others --exclude-standard -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
   for file in $TRACKED $UNTRACKED
@@ -118,8 +118,8 @@ do
   if [ "$ALL" == "--all" ]; then
     TRACKED=$(git ls-files -- "${dir}**.ui")
   else
-    # Only files which differ from the master branch
-    TRACKED=$(git diff --name-only master -- "${dir}**.ui")
+    # Only files which differ from the main branch
+    TRACKED=$(git diff --name-only main -- "${dir}**.ui")
   fi
   UNTRACKED=$(git ls-files --others --exclude-standard -- "${dir}**.ui")
   for file in $TRACKED $UNTRACKED
@@ -152,8 +152,8 @@ echo "Formatting CMake files with cmake-format..."
 if [ "$ALL" == "--all" ]; then
   TRACKED=$(git ls-files -- "**CMakeLists.txt" "*.cmake")
 else
-  # Only files which differ from the master branch
-  TRACKED=$(git diff --name-only master -- "**CMakeLists.txt" "*.cmake")
+  # Only files which differ from the main branch
+  TRACKED=$(git diff --name-only main -- "**CMakeLists.txt" "*.cmake")
 fi
 UNTRACKED=$(git ls-files --others --exclude-standard -- "**CMakeLists.txt" "*.cmake")
 for file in $TRACKED $UNTRACKED
@@ -185,8 +185,8 @@ echo "Formatting resource files with xmlsort..."
 if [ "$ALL" == "--all" ]; then
   TRACKED=$(git ls-files -- "**.qrc")
 else
-  # Only files which differ from the master branch
-  TRACKED=$(git diff --name-only master -- "**.qrc")
+  # Only files which differ from the main branch
+  TRACKED=$(git diff --name-only main -- "**.qrc")
 fi
 UNTRACKED=$(git ls-files --others --exclude-standard -- "**.qrc")
 for file in $TRACKED $UNTRACKED

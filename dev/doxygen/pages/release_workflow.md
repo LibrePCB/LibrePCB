@@ -42,13 +42,13 @@ Whether the file format is stable or not is controlled by the define
 # Git Branches {#doc_release_workflow_branches}
 
 The continuous development happens on feature/bugfix branches (or pull requests),
-which are merged into the `master` branch as soon as they are finished. As new
-features sometimes also introduce file format changes, the `master` branch must
+which are merged into the `main` branch as soon as they are finished. As new
+features sometimes also introduce file format changes, the `main` branch must
 always be considered to contain the (unstable) *next* major version of the
 application. For example if the last stable release was version "2.3.4", the
-`master` must immediately be considered as version "3.0.0-unstable".
+`main` must immediately be considered as version "3.0.0-unstable".
 
-This also means that on the `master` branch we cannot provide updates for
+This also means that on the `main` branch we cannot provide updates for
 already released versions. So we have to provide such updates in release
 branches. For every major version we create a release branch, which is then used
 for *any* update for that major version. For example on the branch `release/2`
@@ -57,7 +57,7 @@ we would provide the releases "2.0", "2.0.1" (bugfix) and "2.1.0" (new feature).
 ![Git Branches](release_workflow_diagram.png)
 
 Features and bugfixes which do not affect the file format may be cherry-picked
-from `master` to release branches. This way we can publish updates for the last
+from `main` to release branches. This way we can publish updates for the last
 officially released application version while the next major version is still in
 development. Generally we do *not* maintain older releases than the last stable
 release because this would be too much effort. So for example as soon as the
@@ -73,7 +73,7 @@ application's version number. Examples: "0.1.0-rc1", "0.1.0", "1.2.0", "1.2.1"
 
 # Warning in Unstable Versions {#doc_release_workflow_warning}
 
-Because (at least) the `master` branch is always unstable, it's very dangerous
+Because (at least) the `main` branch is always unstable, it's very dangerous
 for end users to work productively with this version (it could break projects
 etc.!). So we should warn users in that situation.
 
@@ -89,18 +89,18 @@ released).
 
 We use [Transifex] to translate LibrePCB into other languages. As Transifex
 doesn't have support for branches, we use a separate [resource] for each major
-application version. The translations for the `master` branch are contained in
+application version. The translations for the `main` branch are contained in
 the resource `librepcb.ts`, while translations for releases are contained in
 resources like `librepcb-0.1.ts`.
 
 Translations are automatically checked into the repository
 [LibrePCB/librepcb-i18n](https://github.com/LibrePCB/librepcb-i18n). The
-`master` branch contains translations of the resource `librepcb.ts`, while
+`main` branch contains translations of the resource `librepcb.ts`, while
 translations of resources for releases are available on branches for the
 corresponding releases (e.g. `release/0.1` for `librepcb-0.1.ts`).
 
 The `librepcb-i18n` repository is included as a submodule in the main
-repository. On the `master` branch, the submodule points to a commit which does
+repository. On the `main` branch, the submodule points to a commit which does
 not contain any translation files because translations change very often, so we
 would have to update the submodule very often too (avoid commit spam). But on
 release branches, the submodule points to the translations for the corresponding
@@ -111,7 +111,7 @@ for packagers).
 # Changelog {#doc_release_workflow_changelog}
 
 The changelog is not checked into the repository because it would probably lead
-to confusion (add it to the `master` branch, release branches or even both?).
+to confusion (add it to the `main` branch, release branches or even both?).
 Instead, currently we use our blog to list the changes of every release.
 
 
@@ -132,12 +132,12 @@ downloading translations from [Transifex].
 
 ## Prepare New Major Release
 
-1. Review the file format of the current `master` branch very carefully. We must
+1. Review the file format of the current `main` branch very carefully. We must
    be sure that the file format is completely stable *before* creating a release
    branch.
 2. On [Transifex], create a new [resource] by copying `librepcb.ts`.
-3. Create a new release branch (e.g. `release/0.1`) from the current `master`.
-4. On `master`, add a commit to increment the application's major version and
+3. Create a new release branch (e.g. `release/0.1`) from the current `main`.
+4. On `main`, add a commit to increment the application's major version and
    the file format version.
 5. On the release branch, set the define `FILE_FORMAT_STABLE` to `1` and commit.
 6. On the release branch, change resource in `.tx/config` to the corresponding
@@ -145,9 +145,9 @@ downloading translations from [Transifex].
 
 ## Create Release
 
-1. Make sure CI uses the latest Qt version. If necessary, update CI on `master`
+1. Make sure CI uses the latest Qt version. If necessary, update CI on `main`
    first and test the artifacts before starting with the release procedure.
-2. Cherry-pick relevant commits from `master` to the release branch (e.g.
+2. Cherry-pick relevant commits from `main` to the release branch (e.g.
    `release/0.1`). For minor releases, only pick commits which do not modify
    the file format!
 3. Make sure all submodules point to persistent commits (commits could be
@@ -171,8 +171,8 @@ downloading translations from [Transifex].
     "LibrePCB <LIBREPCB_APP_VERSION>". Keep in mind that the tag must be
     signed and the version number must always have three numbers (i.e. "0.1.0"
     instead of "0.1")!
-13. Cherry-pick the `org.librepcb.LibrePCB.appdata.xml` commit to `master`.
-14. For major releases, bump application and installer version on `master`.
+13. Cherry-pick the `org.librepcb.LibrePCB.appdata.xml` commit to `main`.
+14. For major releases, bump application and installer version on `main`.
 15. Update website/documentation download links and publish blog post
     containing the changelog.
 16. Add tag description to [GitHub Releases], including a link to the blog post.

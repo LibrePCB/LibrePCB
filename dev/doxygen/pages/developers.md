@@ -4,12 +4,12 @@ General Information for Developers {#doc_developers}
 [TOC]
 
 This page contains some general information for LibrePCB developers. Please also read our
-contribution guidelines: https://github.com/LibrePCB/LibrePCB/blob/master/CONTRIBUTING.md
+contribution guidelines: https://github.com/LibrePCB/LibrePCB/blob/main/CONTRIBUTING.md
 
 
 # Unstable Version {#doc_developers_unstable_versions}
 
-As explained in the @ref doc_release_workflow, the `master` branch is always
+As explained in the @ref doc_release_workflow, the `main` branch is always
 unstable. And unstable doesn't mean "If you have bad luck, something doesn't
 work as expected". It rather means "Everything you save with an unstable
 version can't be opened again with any other (stable or unstable) version!!!".
@@ -33,7 +33,7 @@ to the one above. But be careful with the disabled warning! :)
 
 # Git {#doc_developers_git}
 
-- The `master` branch must always compile and all tests have to pass (CI successful).
+- The `main` branch must always compile and all tests have to pass (CI successful).
 - Use separate branches to fix bugs or implement new features.
 - Do not pack lot of changes in one commit. Make small, incremental commits instead.
 - Write commit messages according this guideline: http://chris.beams.io/posts/git-commit/
@@ -44,9 +44,9 @@ to the one above. But be careful with the disabled warning! :)
 To keep our Git history clear, simple and consistent, we use the following
 strategy for working with branches and GitHub Pull Requests:
 
-- If a branch is outdated (i.e. commits were added to `master` in the mean
+- If a branch is outdated (i.e. commits were added to `main` in the mean
   time), the branch should be updated by **rebasing** it. Please do not update
-  branches by merging `master` into it (as the "Update Branch" button on the
+  branches by merging `main` into it (as the "Update Branch" button on the
   GitHub UI unfortunately does).
 - When adding fixes or other new changes to a branch, the already pushed
   commits should be updated accordingly (e.g. modified or amended) and then

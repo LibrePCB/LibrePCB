@@ -20,6 +20,6 @@ LibrePCB Developers Documentation {#mainpage}
 
 # External Links {#doc_main_external}
 
-- Contribution Guidelines: https://github.com/LibrePCB/LibrePCB/blob/master/CONTRIBUTING.md
-- Development Resources: https://github.com/LibrePCB/LibrePCB/tree/master/dev
-- Diagrams: https://github.com/LibrePCB/LibrePCB/tree/master/dev/diagrams/svg
+- Contribution Guidelines: https://github.com/LibrePCB/LibrePCB/blob/main/CONTRIBUTING.md
+- Development Resources: https://github.com/LibrePCB/LibrePCB/tree/main/dev
+- Diagrams: https://github.com/LibrePCB/LibrePCB/tree/main/dev/diagrams/svg
