@@ -9,7 +9,9 @@ there are many other ways how to contribute to the LibrePCB project, see
 ## Notes
 
 - **Before spending lots of time on something, please ask for feedback on
-  your idea first!**
+  your idea first!** Also note that we do not accept major changes
+  (e.g. changes affecting the file format) at any time, see details in our
+  [development workflow documentation](https://developers.librepcb.org/da/dbc/doc_release_workflow.html#doc_release_workflow_branches).
 - Please search issues and pull requests before adding something new to avoid duplicating efforts and conversations.
 - Issues which are considered to be easy to solve are marked with the label `easy`:
   [Browse all easy issues](https://github.com/LibrePCB/LibrePCB/labels/easy).
