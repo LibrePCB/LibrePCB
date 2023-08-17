@@ -80,7 +80,7 @@ class LibrePcbFixture(object):
         # Force LibrePCB to use Qt-style file dialogs because native dialogs don't work
         self.env['LIBREPCB_DISABLE_NATIVE_DIALOGS'] = '1'
         # Disable warning about unstable file format, since tests are run also
-        # on the (unstable) master branch
+        # on the (unstable) main branch
         self.env['LIBREPCB_DISABLE_UNSTABLE_WARNING'] = '1'
 
     def abspath(self, relpath):

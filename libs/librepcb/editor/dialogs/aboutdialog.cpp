@@ -109,7 +109,7 @@ AboutDialog::AboutDialog(const WorkspaceSettings& settings,
            "License (GPL) version 3 or later. You can find the full license "
            "text <a href='%1'>in our source code</a>.")
             .arg(
-                "https://github.com/LibrePCB/LibrePCB/blob/master/"
+                "https://github.com/LibrePCB/LibrePCB/blob/main/"
                 "LICENSE.txt") %
         "</p>";
     mUi->lblIntro->setText(text);

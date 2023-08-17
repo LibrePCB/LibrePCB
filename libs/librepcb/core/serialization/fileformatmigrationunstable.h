@@ -43,7 +43,7 @@ class SExpression;
  *
  * This class overrides the stable file format migration class to perform
  * only a partial upgrade. This allows to upgrade file from the previous
- * unstable file format (master branch) to the latest unstable file format
+ * unstable file format (main branch) to the latest unstable file format
  * (feature branch). This upgrade is only performed when the environment
  * variable `LIBREPCB_UPGRADE_UNSTABLE=1` is set.
  */

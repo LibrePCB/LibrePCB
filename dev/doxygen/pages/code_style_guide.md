@@ -19,7 +19,7 @@ This page describes the code style guide for LibrePCB developers.
   command `clang-format -style=file -i <FILE>` to format a single source file.
 - To automatically format all modified source, CMake, *.ui and *.qrc files,
   please run the script `./dev/format_code.sh`. It will format all files which
-  are modified compared to the `master` branch (this avoids formatting of files
+  are modified compared to the `main` branch (this avoids formatting of files
   other than the ones you modified). For details, read the comment in that
   script.
 - If you have Docker installed, it's recommended to invoke that script with
