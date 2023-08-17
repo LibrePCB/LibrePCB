@@ -33,6 +33,13 @@ Component.prototype.createOperations = function() {
                                    "text/plain",
                                    "\"@TargetDir@\\nightly\\bin\\librepcb.exe\"",
                                    "ProgId=LibrePCB.lpp");
+            component.addOperation("RegisterFileType",
+                                   "lppz",
+                                   "\"@TargetDir@\\nightly\\bin\\librepcb.exe\" \"%1\"",
+                                   "LibrePCB Project Archive",
+                                   "application/zip",
+                                   "\"@TargetDir@\\nightly\\bin\\librepcb.exe\"",
+                                   "ProgId=LibrePCB.lppz");
         }
 
         if (systemInfo.kernelType === "linux") {

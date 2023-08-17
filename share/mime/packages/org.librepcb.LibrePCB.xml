@@ -18,4 +18,10 @@
     </magic>
     <icon name="org.librepcb.LibrePCB-project"/>
   </mime-type>
+  <mime-type type="application/x-librepcb-project-archive">
+    <sub-class-of type="application/zip"/>
+    <comment>LibrePCB Project Archive</comment>
+    <glob pattern="*.lppz"/>
+    <icon name="org.librepcb.LibrePCB-archive"/>
+  </mime-type>
 </mime-info>
