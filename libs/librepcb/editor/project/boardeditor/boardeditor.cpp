@@ -206,6 +206,14 @@ BoardEditor::BoardEditor(ProjectEditor& projectEditor, Project& project)
   createMenus();  // Depends on dock widgets!
   updateBoardActionGroup();  // Depends on menus!
 
+  // Disable actions which do not work nicely with *.lppz projects yet.
+  if (!mProject.getDirectory().isWritable()) {
+    mActionGenerateFabricationData->setEnabled(false);
+    mActionGenerateBom->setEnabled(false);
+    mActionGeneratePickPlace->setEnabled(false);
+    mActionOutputJobs->setEnabled(false);
+  }
+
   // Setup "project upgraded" message.
   {
     const QString msg = mProjectEditor.getUpgradeMessageLabelText();

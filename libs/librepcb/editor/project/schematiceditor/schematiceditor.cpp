@@ -152,6 +152,12 @@ SchematicEditor::SchematicEditor(ProjectEditor& projectEditor, Project& project)
   createDockWidgets();
   createMenus();  // Depends on dock widgets!
 
+  // Disable actions which do not work nicely with *.lppz projects yet.
+  if (!mProject.getDirectory().isWritable()) {
+    mActionGenerateBom->setEnabled(false);
+    mActionOutputJobs->setEnabled(false);
+  }
+
   // Setup "project upgraded" message.
   {
     const QString msg = mProjectEditor.getUpgradeMessageLabelText();
