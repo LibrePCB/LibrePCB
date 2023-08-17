@@ -50,6 +50,8 @@ QIcon FileIconProvider::icon(const QFileInfo& info) const noexcept {
   if (info.isFile()) {
     if (info.suffix() == "lpp") {
       return QIcon(":/img/app/librepcb.png");
+    } else if (info.suffix() == "lppz") {
+      return QIcon(":/img/app/librepcb.png");  // TODO: Use zipped project icon.
     } else {
       return QIcon(":/img/places/file.png");
     }

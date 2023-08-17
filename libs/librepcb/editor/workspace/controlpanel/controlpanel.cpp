@@ -483,7 +483,7 @@ ProjectEditor* ControlPanel::openProject(FilePath filepath) noexcept {
 
     filepath = FilePath(FileDialog::getOpenFileName(
         this, tr("Open Project"), lastOpenedFile,
-        tr("LibrePCB project files (%1)").arg("*.lpp")));
+        tr("LibrePCB project files (%1)").arg("*.lpp *.lppz")));
     if (!filepath.isValid()) return nullptr;
 
     settings.setValue("controlpanel/last_open_project", filepath.toNative());
@@ -497,15 +497,29 @@ ProjectEditor* ControlPanel::openProject(FilePath filepath) noexcept {
       setCursor(Qt::WaitCursor);
       auto cursorScopeGuard = scopeGuard([this]() { unsetCursor(); });
 
-      std::shared_ptr<TransactionalFileSystem> fs =
-          TransactionalFileSystem::openRW(
-              filepath.getParentDir(), &askForRestoringBackup,
-              DirectoryLockHandlerDialog::createDirectoryLockCallback());
+      std::shared_ptr<TransactionalFileSystem> fs;
+      QString projectFileName = filepath.getFilename();
+      if (filepath.getSuffix() == "lppz") {
+        fs = TransactionalFileSystem::openRO(
+            FilePath::getRandomTempPath(),
+            &TransactionalFileSystem::RestoreMode::no);
+        fs->removeDirRecursively();  // 1) Get a clean initial state.
+        fs->loadFromZip(filepath);  // 2) Load files from ZIP.
+        foreach (const QString& fn, fs->getFiles()) {
+          if (fn.endsWith(".lpp")) {
+            projectFileName = fn;
+          }
+        }
+      } else {
+        fs = TransactionalFileSystem::openRW(
+            filepath.getParentDir(), &askForRestoringBackup,
+            DirectoryLockHandlerDialog::createDirectoryLockCallback());
+      }
       ProjectLoader loader;
       std::unique_ptr<Project> project =
           loader.open(std::unique_ptr<TransactionalDirectory>(
                           new TransactionalDirectory(fs)),
-                      filepath.getFilename());  // can throw
+                      projectFileName);  // can throw
       editor = new ProjectEditor(mWorkspace, *project.release(),
                                  loader.getUpgradeMessages());
       connect(editor, &ProjectEditor::projectEditorClosed, this,
@@ -653,7 +667,8 @@ void ControlPanel::openProjectsPassedByCommandLine() noexcept {
 
 void ControlPanel::openProjectPassedByOs(const QString& file) noexcept {
   FilePath filepath(file);
-  if ((filepath.isExistingFile()) && (filepath.getSuffix() == "lpp")) {
+  if ((filepath.isExistingFile()) &&
+      ((filepath.getSuffix() == "lpp") || (filepath.getSuffix() == "lppz"))) {
     openProject(filepath);
   } else {
     qDebug() << "Ignore invalid request to open project:" << file;
@@ -665,10 +680,11 @@ void ControlPanel::projectEditorClosed() noexcept {
   Q_ASSERT(editor);
   if (!editor) return;
 
+  const QString fp = mOpenProjectEditors.key(editor);
+  Q_ASSERT(mOpenProjectEditors.contains(fp));
+  mOpenProjectEditors.remove(fp);
+
   Project* project = &editor->getProject();
-  Q_ASSERT(
-      mOpenProjectEditors.contains(project->getFilepath().toUnique().toStr()));
-  mOpenProjectEditors.remove(project->getFilepath().toUnique().toStr());
   delete project;
 }
 
@@ -690,7 +706,7 @@ void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index) {
   if (fp.isExistingDir()) {
     mUi->projectTreeView->setExpanded(index,
                                       !mUi->projectTreeView->isExpanded(index));
-  } else if (fp.getSuffix() == "lpp") {
+  } else if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
     openProject(fp);
   } else {
     DesktopServices ds(mWorkspace.getSettings(), this);
