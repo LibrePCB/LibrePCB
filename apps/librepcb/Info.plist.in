@@ -48,6 +48,20 @@
             <key>LSHandlerRank</key>
             <string>Owner</string>
         </dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>lppz</string>
+            </array>
+            <key>CFBundleTypeName</key>
+            <string>LibrePCB Project Archive</string>
+            <key>CFBundleTypeIconFile</key>
+            <string>librepcb.icns</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+        </dict>
     </array>
 </dict>
 </plist>
