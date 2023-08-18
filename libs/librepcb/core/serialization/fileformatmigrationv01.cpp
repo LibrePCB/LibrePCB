@@ -47,7 +47,7 @@ namespace librepcb {
  ******************************************************************************/
 
 FileFormatMigrationV01::FileFormatMigrationV01(QObject* parent) noexcept
-  : FileFormatMigration(Version::fromString("0.1"), Version::fromString("0.2"),
+  : FileFormatMigration(Version::fromString("0.1"), Version::fromString("1"),
                         parent) {
 }
 
@@ -140,7 +140,7 @@ void FileFormatMigrationV01::upgradePackage(TransactionalDirectory& dir) {
       for (SExpression* padNode : fptNode->getChildren("pad")) {
         // In the file format 0.1, footprint pads did not have their own UUID,
         // but only the UUID of the package pad they were connected to. To get
-        // a deterministic UUID when upgrading a v0.1 footprint pad to v0.2,
+        // a deterministic UUID when upgrading a v0.1 footprint pad to v1,
         // we simply use the package pad UUID as the footprint pad UUID too.
         // See https://github.com/LibrePCB/LibrePCB/issues/445
         const Uuid uuid = deserialize<Uuid>(padNode->getChild("@0"));
