@@ -7,4 +7,4 @@ Type=Application
 Terminal=false
 Icon=org.librepcb.LibrePCB
 Exec=librepcb %U
-MimeType=application/x-librepcb-project;
+MimeType=application/x-librepcb-project;application/x-librepcb-project-archive;
