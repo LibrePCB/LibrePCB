@@ -40,8 +40,6 @@ def test_messages(cli):
         "    - [HINT] No part numbers added\n" \
         "  - R-0603 (483a71eb-318e-448e-82ff-f02efc4821aa):\n" \
         "    - [HINT] No part numbers added\n" \
-        "  - Demo Device (4f5ee784-4b1b-407c-802b-44625163d90f):\n" \
-        "    - [HINT] No part numbers added\n" \
         "  - PSMN022-30PL (5738d8f9-4101-4409-bd46-d9c173b40d60):\n" \
         "    - [ERROR] No categories set\n" \
         "    - [HINT] No part numbers added\n" \
