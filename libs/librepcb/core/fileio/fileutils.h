@@ -136,15 +136,16 @@ public:
    * @brief Get all files in a given directory (optionally filtered by
    * extension)
    *
-   * @param dir           Filepath to a directory (must exist)
-   * @param filters       Only files matching this filters are returned
-   * @param recursive     If true, also subdirectories are searched for files.
+   * @param dir             Filepath to a directory (must exist)
+   * @param filters         Only files matching this filters are returned
+   * @param recursive       If true, also subdirectories are searched for files.
+   * @param skipHiddenFiles If true, hidden files won't be returned.
    *
    * @return A list of filepaths to files in the specified directory
    */
   static QList<FilePath> getFilesInDirectory(
       const FilePath& dir, const QStringList& filters = QStringList(),
-      bool recursive = false);
+      bool recursive = false, bool skipHiddenFiles = false);
 
   /**
    * @brief Get all directories within a given directory

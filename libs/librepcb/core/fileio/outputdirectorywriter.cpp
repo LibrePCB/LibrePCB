@@ -154,7 +154,8 @@ QList<FilePath> OutputDirectoryWriter::findUnknownFiles(
   }
   QList<FilePath> result;
   if (mDirPath.isExistingDir()) {
-    result = FileUtils::getFilesInDirectory(mDirPath, {}, true);
+    // Note: Ignore hidden files such as .DS_Store or Thumbs.db.
+    result = FileUtils::getFilesInDirectory(mDirPath, {}, true, true);
     result.removeOne(mIndexFilePath);
     for (auto it = mIndex.begin(); it != mIndex.end(); ++it) {
       if (knownJobs.contains(it.value())) {
