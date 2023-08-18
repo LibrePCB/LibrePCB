@@ -92,6 +92,11 @@ OutputJobHomeWidget::OutputJobHomeWidget(const WorkspaceSettings& settings,
          "feedback</a> is highly appreciated!")
           .arg("https://librepcb.org/help/") %
       " ♥</i></p>");
+  connect(mUi->lblNote, &QLabel::linkActivated, this,
+          [this](const QString& url) {
+            DesktopServices ds(mSettings, this);
+            ds.openUrl(QUrl(url));
+          });
 }
 
 OutputJobHomeWidget::~OutputJobHomeWidget() noexcept {
