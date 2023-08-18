@@ -67,24 +67,6 @@ void FileFormatMigrationUnstable::upgradeSymbol(TransactionalDirectory& dir) {
 
 void FileFormatMigrationUnstable::upgradePackage(TransactionalDirectory& dir) {
   Q_UNUSED(dir);
-
-  const QString fp = "package.lp";
-  SExpression root = SExpression::parse(dir.read(fp), dir.getAbsPath(fp));
-  for (SExpression* fptNode : root.getChildren("footprint")) {
-    for (SExpression* polygonNode : fptNode->getChildren("polygon")) {
-      if (polygonNode->getChild("layer/@0").getValue().endsWith("_courtyard")) {
-        SExpression& widthNode = polygonNode->getChild("width/@0");
-        widthNode.setValue("0.0");
-      }
-    }
-    for (SExpression* circleNode : fptNode->getChildren("circle")) {
-      if (circleNode->getChild("layer/@0").getValue().endsWith("_courtyard")) {
-        SExpression& widthNode = circleNode->getChild("width/@0");
-        widthNode.setValue("0.0");
-      }
-    }
-  }
-  dir.write(fp, root.toByteArray());
 }
 
 void FileFormatMigrationUnstable::upgradeComponent(
@@ -111,9 +93,7 @@ void FileFormatMigrationUnstable::upgradeWorkspaceData(
 
 void FileFormatMigrationUnstable::createOutputJobs(
     TransactionalDirectory& dir) {
-  if (!dir.fileExists("project/jobs.lp")) {
-    FileFormatMigrationV01::createOutputJobs(dir);
-  }
+  Q_UNUSED(dir);
 }
 
 void FileFormatMigrationUnstable::upgradeSettings(SExpression& root) {
@@ -142,7 +122,6 @@ void FileFormatMigrationUnstable::upgradeBoard(SExpression& root,
                                                ProjectContext& context) {
   Q_UNUSED(root);
   Q_UNUSED(context);
-  upgradeBoardDrcSettings(root);
 }
 
 void FileFormatMigrationUnstable::upgradeBoardUserSettings(SExpression& root) {
