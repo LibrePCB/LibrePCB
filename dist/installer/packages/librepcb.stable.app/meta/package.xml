@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-  <Name>librepcb.nightly.app</Name>
-  <DisplayName>LibrePCB Nightly Build</DisplayName>
-  <Description>Latest automatically built version. Attention: These are unstable builds, DO NOT USE THEM FOR PRODUCTIVE USE!</Description>
-  <Version>APP_VERSION_NIGHTLY</Version>
+  <Name>librepcb.stable.app</Name>
+  <DisplayName>LibrePCB Application</DisplayName>
+  <Description>Latest stable release of the LibrePCB application.</Description>
+  <Version>APP_VERSION</Version>
   <ReleaseDate>RELEASE_DATE</ReleaseDate>
   <Default>true</Default>
   <Script>installscript.qs</Script>

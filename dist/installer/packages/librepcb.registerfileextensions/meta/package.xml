@@ -3,7 +3,7 @@
   <Name>librepcb.registerfileextensions</Name>
   <DisplayName>Register File Extensions</DisplayName>
   <Description>Register *.lpp file extension to open LibrePCB by double-clicking project files.</Description>
-  <Version>0.1.0</Version><!-- it's a special package, so its version is static -->
+  <Version>0.2.0</Version><!-- it's a special package, so its version is static -->
   <ReleaseDate>RELEASE_DATE</ReleaseDate>
   <Default>true</Default>
   <Script>installscript.qs</Script>

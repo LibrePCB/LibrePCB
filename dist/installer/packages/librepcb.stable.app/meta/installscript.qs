@@ -21,23 +21,23 @@ Component.prototype.createOperations = function() {
     try {
         if (systemInfo.productType === "windows") {
             component.addOperation("CreateShortcut",
-                                   "@TargetDir@/nightly/bin/librepcb.exe",
-                                   "@StartMenuDir@/LibrePCB Nightly.lnk");
+                                   "@TargetDir@/stable/bin/librepcb.exe",
+                                   "@StartMenuDir@/LibrePCB.lnk");
         }
 
         if (systemInfo.kernelType === "linux") {
             component.addOperation("InstallIcons",
-                                   "@TargetDir@/nightly/share/icons");
+                                   "@TargetDir@/stable/share/icons");
             component.addOperation("CreateDesktopEntry",
-                                   "librepcb-nightly-from-installer.desktop",
-                                   "Name=LibrePCB Nightly\n" +
+                                   "librepcb-stable-from-installer.desktop",
+                                   "Name=LibrePCB\n" +
                                    "Comment=Design Schematics and PCBs\n" +
                                    "GenericName=PCB Designer\n" +
                                    "Categories=Development;Engineering;Electronics;\n" +
                                    "Type=Application\n" +
                                    "Terminal=false\n" +
                                    "Icon=org.librepcb.LibrePCB\n" +
-                                   "Exec=@TargetDir@/nightly/bin/librepcb %U\n" +
+                                   "Exec=@TargetDir@/stable/bin/librepcb %U\n" +
                                    "MimeType=application/x-librepcb-project;");
             component.addOperation("Execute",
                                    "update-desktop-database",

@@ -28,17 +28,17 @@ Component.prototype.createOperations = function() {
             // @Microsoft: Don't write blogs about that, fix this crappy shit!!!
             component.addOperation("RegisterFileType",
                                    "lpp",
-                                   "\"@TargetDir@\\nightly\\bin\\librepcb.exe\" \"%1\"",
+                                   "\"@TargetDir@\\stable\\bin\\librepcb.exe\" \"%1\"",
                                    "LibrePCB Project",
                                    "text/plain",
-                                   "\"@TargetDir@\\nightly\\bin\\librepcb.exe\"",
+                                   "\"@TargetDir@\\stable\\bin\\librepcb.exe\"",
                                    "ProgId=LibrePCB.lpp");
             component.addOperation("RegisterFileType",
                                    "lppz",
-                                   "\"@TargetDir@\\nightly\\bin\\librepcb.exe\" \"%1\"",
+                                   "\"@TargetDir@\\stable\\bin\\librepcb.exe\" \"%1\"",
                                    "LibrePCB Project Archive",
                                    "application/zip",
-                                   "\"@TargetDir@\\nightly\\bin\\librepcb.exe\"",
+                                   "\"@TargetDir@\\stable\\bin\\librepcb.exe\"",
                                    "ProgId=LibrePCB.lppz");
         }
 

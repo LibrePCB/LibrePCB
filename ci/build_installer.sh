@@ -21,8 +21,8 @@ fi
 TARGET="$OS-$ARCH"
 ./dist/installer/update_metadata.sh "$TARGET" "0.2.0-1"  # TODO: How to determine version number?
 PACKAGES_DIR="./artifacts/installer_packages/$TARGET"
-mkdir -p $PACKAGES_DIR/librepcb.nightly.app/data/nightly
+mkdir -p $PACKAGES_DIR/librepcb.stable.app/data/stable
 cp -r ./dist/installer/output/packages/. $PACKAGES_DIR/
-cp -r ./build/install/opt/. $PACKAGES_DIR/librepcb.nightly.app/data/nightly/
+cp -r ./build/install/opt/. $PACKAGES_DIR/librepcb.stable.app/data/stable/
 binarycreator --online-only -c ./dist/installer/output/config/config.xml -p $PACKAGES_DIR \
               ./artifacts/nightly_builds/librepcb-installer-nightly-$TARGET.$EXECUTABLE_EXT
