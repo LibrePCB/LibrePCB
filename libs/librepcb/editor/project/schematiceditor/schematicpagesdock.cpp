@@ -178,7 +178,7 @@ void SchematicPagesDock::updateSchematicNames() noexcept {
     QListWidgetItem* item = mUi->listWidget->item(i);
     const Schematic* schematic = mProject.getSchematicByIndex(i);
     if (item && schematic) {
-      item->setText(*schematic->getName());
+      item->setText(QString("%1: %2").arg(i + 1).arg(*schematic->getName()));
     }
   }
 }
