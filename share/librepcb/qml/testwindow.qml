@@ -1,5 +1,6 @@
-import QtQuick 2.5
-import QtQuick.Controls 1.4
+// Note: These dependencies require at least Qt 5.7 to run.
+import QtQuick 2.7
+import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.2
 
 ColumnLayout {
