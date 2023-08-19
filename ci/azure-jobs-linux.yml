@@ -9,7 +9,7 @@ jobs:
   strategy:
     matrix:
       Ubuntu_1804_Qt_5_15_GCC:
-        IMAGE: librepcb/librepcb-dev:ubuntu-18.04-qt5.15.2-1
+        IMAGE: librepcb/librepcb-dev:ubuntu-18.04-qt5.15.2-2
         DEPLOY: true
         NO_HOEDOWN: true
       Ubuntu_2004_Unbundled:
