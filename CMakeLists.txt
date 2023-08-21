@@ -18,24 +18,23 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET
 
 # Application version:
 #  - Always three numbers (MAJOR.MINOR.PATCH)!
-#  - Unstable versions (non-release branches): Suffix "-unstable", e.g.
-#    "1.0.0-unstable"
-#  - Release candidates (on release branches): Suffix "-rc#", e.g. "1.0.0-rc3"
-#  - Releases (on release branches): No suffix, e.g. "1.0.0"
-set(LIBREPCB_APP_VERSION "0.2.0-unstable")
+#  - Unstable (development) versions: Suffix "-unstable", e.g. "1.0.0-unstable"
+#  - Release candidates: Suffix "-rc#", e.g. "1.0.0-rc3"
+#  - Releases: No suffix, e.g. "1.0.0"
+set(LIBREPCB_APP_VERSION "1.0.0-rc1")
 
 # File format version:
 #  - Must be equal to the major version of APP_VERSION!
 #  - If APP_VERSION < 1.0.0: Two numbers, e.g. "0.2" for APP_VERSION=="0.2.x"
 #  - If APP_VERSION >= 1.0.0: Only one number, e.g. "2" for APP_VERSION=="2.x.y"
-set(LIBREPCB_FILE_FORMAT_VERSION "0.2")
+set(LIBREPCB_FILE_FORMAT_VERSION "1")
 
 # File format stable flag:
 #  - On all non-release branches: false
 #  - On release branches: true
 # Note: Do not use a CMake boolean (ON / TRUE), use a C++ style boolean
 # string instead ("true" / "false").
-set(LIBREPCB_FILE_FORMAT_STABLE "false")
+set(LIBREPCB_FILE_FORMAT_STABLE "true")
 
 # Define project
 project(librepcb LANGUAGES CXX)

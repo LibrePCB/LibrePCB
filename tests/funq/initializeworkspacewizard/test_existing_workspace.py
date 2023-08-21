@@ -81,7 +81,7 @@ def test_downgrade(librepcb, helpers):
     older file format
     """
     v01_path = os.path.join(librepcb.workspace_path, 'v0.1')
-    v02_path = os.path.join(librepcb.workspace_path, 'v0.2')
+    v02_path = os.path.join(librepcb.workspace_path, 'v1')
     data_path = os.path.join(librepcb.workspace_path, 'data')
     shutil.rmtree(v01_path)
     with open(os.path.join(data_path, '.librepcb-data'), 'wb') as f:
@@ -93,7 +93,7 @@ def test_downgrade(librepcb, helpers):
         user_edit.set_property('text', 'foobar 42')
         app.widget('initWorkspaceWizardFinishButton').click()
 
-        # Verify that the v0.2 directory has been created.
+        # Verify that the v1 directory has been created.
         helpers.wait_until_widget_hidden(wizard)
         assert os.path.exists(os.path.join(v02_path, '.librepcb-data'))
 

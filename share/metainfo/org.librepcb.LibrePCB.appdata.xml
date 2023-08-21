@@ -56,6 +56,27 @@
   </provides>
 
   <releases>
+    <!--
+      NOTES:
+        - Remove development releases when stable release is ready!
+        - For prereleases, use tilde instead of dash (e.g. "1.0.0~rc1")!
+    -->
+    <release version="1.0.0~rc1" date="2023-08-21" type="development">
+      <description>
+        <p>Highlights:</p>
+        <ul>
+          <li>3D viewer &amp; STEP export</li>
+          <li>MPN management &amp; assembly variants</li>
+          <li>Unified production data files generator</li>
+          <li>Thermal relief pads in planes</li>
+          <li>Blind &amp; buried vias</li>
+          <li>Plated and non-plated slots</li>
+          <li>Keepout zones</li>
+          <li>Rounded and custom footprint pad shapes</li>
+        </ul>
+      </description>
+      <url type="details">https://librepcb.org/blog/2023-08-21_release_1.0.0-rc1/</url>
+    </release>
     <release version="0.1.7" date="2022-10-03" type="stable">
       <description>
         <p>Highlights:</p>
