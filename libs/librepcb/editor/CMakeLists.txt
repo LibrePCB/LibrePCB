@@ -978,7 +978,7 @@ target_link_libraries(
          Qt5::Widgets
 )
 if(BUILD_QTQUICK_TEST)
-  target_link_libraries(librepcb_editor PUBLIC Qt5::Quick)
+  target_link_libraries(librepcb_editor PUBLIC Qt5::Quick Qt5::QuickControls2)
 endif()
 
 # Hoedown is only needed on Qt <5.14

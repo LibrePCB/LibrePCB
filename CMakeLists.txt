@@ -129,7 +129,7 @@ find_package(
 if(BUILD_QTQUICK_TEST)
   find_package(
     Qt5 5.5.0
-    COMPONENTS Quick
+    COMPONENTS Quick QuickControls2
     REQUIRED
   )
 endif()

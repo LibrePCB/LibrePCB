@@ -19,12 +19,15 @@ jobs:
         UNBUNDLE_MUPARSER: true
         #UNBUNDLE_QUAZIP: true  # Note: Does not ship quazip 1.x yet
         UNBUNDLE_POLYCLIPPING: true
-        CMAKE_OPTIONS: "-DUSE_GLU=0 -DUSE_OPENCASCADE=0"
+        # Note: QtQuick Controls not available in Docker image (yet).
+        CMAKE_OPTIONS: "-DBUILD_QTQUICK_TEST=0 -DUSE_GLU=0 -DUSE_OPENCASCADE=0"
         LD_LIBRARY_PATH: $(Build.Repository.LocalPath)/build/install/opt/lib
       Ubuntu_2204_Clang:
         IMAGE: librepcb/librepcb-dev:ubuntu-22.04-1
         CC: clang
         CXX: clang++
+        # Note: QtQuick Controls not available in Docker image (yet).
+        CMAKE_OPTIONS: "-DBUILD_QTQUICK_TEST=0"
   container: $[ variables['IMAGE'] ]
   steps:
   - checkout: self
