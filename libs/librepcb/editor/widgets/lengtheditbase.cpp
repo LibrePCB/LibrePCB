@@ -142,11 +142,13 @@ void LengthEditBase::configureClientSettings(
 
   try {
     QSettings clientSettings;
-    QString unit = clientSettings.value(mSettingsKey).toString();
-    if (!unit.isEmpty()) {
-      mSelectedUnit = LengthUnit::fromString(unit);  // can throw
-    } else {
-      mSelectedUnit = tl::nullopt;
+    const QString unitStr = clientSettings.value(mSettingsKey).toString();
+    const tl::optional<LengthUnit> unit = (!unitStr.isEmpty())
+        ? tl::make_optional(LengthUnit::fromString(unitStr))  // can throw
+        : tl::nullopt;
+    if (unit != mSelectedUnit) {
+      mSelectedUnit = unit;
+      updateText();
     }
   } catch (const Exception& e) {
     qWarning() << "Failed to restore length edit unit from user settings:"
