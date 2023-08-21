@@ -21,7 +21,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET
 #  - Unstable (development) versions: Suffix "-unstable", e.g. "1.0.0-unstable"
 #  - Release candidates: Suffix "-rc#", e.g. "1.0.0-rc3"
 #  - Releases: No suffix, e.g. "1.0.0"
-set(LIBREPCB_APP_VERSION "1.0.0-rc1")
+set(LIBREPCB_APP_VERSION "1.0.1-unstable")
 
 # File format version:
 #  - Must be equal to the major version of APP_VERSION!
