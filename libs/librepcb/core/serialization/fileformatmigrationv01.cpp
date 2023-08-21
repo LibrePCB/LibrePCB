@@ -499,13 +499,13 @@ void FileFormatMigrationV01::upgradeProject(TransactionalDirectory& dir,
         context.removedErcApprovals));
   }
   if (context.holesCount > 0) {
-    messages.append(
-        buildMessage(Message::Severity::Note,
-                     tr("All non-plated holes (NPTH) now have automatic stop "
-                        "mask added on both board sides. The expansion value "
-                        "is determined by the boards design rule settings but "
-                        "can be overridden in the hole properties dialog."),
-                     context.holesCount));
+    messages.append(buildMessage(
+        Message::Severity::Note,
+        tr("All non-plated holes (NPTH) now have automatic solder resist "
+           "openings added on both board sides. The expansion value is "
+           "configured in the board design rules but can be overridden in the "
+           "hole properties dialog."),
+        context.holesCount));
   }
   if (context.nonRoundViaCount > 0) {
     messages.append(
