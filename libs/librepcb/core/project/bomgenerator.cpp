@@ -61,9 +61,10 @@ std::shared_ptr<Bom> BomGenerator::generate(
   // Parse custom attributes.
   QStringList customCommonAttributes;
   QStringList customPartAttributes;
-  foreach (const QString& attribute, mAdditionalAttributes) {
+  foreach (QString attribute, mAdditionalAttributes) {
     if (attribute.endsWith("[]")) {
-      customPartAttributes.append(attribute.chopped(2));
+      attribute.chop(2);
+      customPartAttributes.append(attribute);
     } else {
       customCommonAttributes.append(attribute);
     }
