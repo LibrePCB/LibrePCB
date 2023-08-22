@@ -71,8 +71,9 @@ actually used for CI, but are also useful to build LibrePCB locally.
 
 ```bash
 sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
-     qtbase5-dev qttools5-dev-tools qttools5-dev qtquickcontrols2-5-dev \
-     libqt5opengl5-dev libqt5svg5-dev libglu1-mesa-dev liboce-*-dev
+     qtbase5-dev qtdeclarative5-dev qttools5-dev-tools qttools5-dev \
+     qtquickcontrols2-5-dev libqt5opengl5-dev libqt5svg5-dev \
+     libglu1-mesa-dev liboce-*-dev
 sudo apt-get install qt5-doc qtcreator # optional
 ```
 
@@ -80,7 +81,7 @@ sudo apt-get install qt5-doc qtcreator # optional
 
 ```bash
 sudo pacman -S base-devel git cmake openssl zlib desktop-file-utils shared-mime-info \
-     qt5-base qt5-quickcontrols2 qt5-svg qt5-tools opencascade
+     qt5-base qt5-declarative qt5-quickcontrols2 qt5-svg qt5-tools opencascade
 sudo pacman -S qt5-doc qtcreator # optional
 ```
 
