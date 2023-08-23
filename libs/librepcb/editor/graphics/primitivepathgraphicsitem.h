@@ -78,6 +78,7 @@ public:
   void setLineWidth(const UnsignedLength& width) noexcept;
   void setLineLayer(const std::shared_ptr<GraphicsLayer>& layer) noexcept;
   void setFillLayer(const std::shared_ptr<GraphicsLayer>& layer) noexcept;
+  void setLighterColors(bool lighter) noexcept;
   void setShapeMode(ShapeMode mode) noexcept;
 
   // Inherited from QGraphicsItem
@@ -100,11 +101,13 @@ private:  // Methods
   void updateColors() noexcept;
   void updateBoundingRectAndShape() noexcept;
   void updateVisibility() noexcept;
+  QColor convertColor(const QColor& color) const noexcept;
 
 protected:  // Data
   bool mMirror;
   std::shared_ptr<GraphicsLayer> mLineLayer;
   std::shared_ptr<GraphicsLayer> mFillLayer;
+  bool mLighterColors;
   ShapeMode mShapeMode;
   QPen mPen;
   QPen mPenHighlighted;

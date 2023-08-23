@@ -43,6 +43,7 @@ PrimitivePathGraphicsItem::PrimitivePathGraphicsItem(
     mMirror(false),
     mLineLayer(nullptr),
     mFillLayer(nullptr),
+    mLighterColors(false),
     mShapeMode(ShapeMode::StrokeAndAreaByLayer),
     mBoundingRectMarginPx(0),
     mOnLayerEditedSlot(*this, &PrimitivePathGraphicsItem::layerEdited) {
@@ -119,6 +120,11 @@ void PrimitivePathGraphicsItem::setFillLayer(
   updateBoundingRectAndShape();  // grab area may have changed
 }
 
+void PrimitivePathGraphicsItem::setLighterColors(bool lighter) noexcept {
+  mLighterColors = lighter;
+  updateColors();
+}
+
 void PrimitivePathGraphicsItem::setShapeMode(ShapeMode mode) noexcept {
   mShapeMode = mode;
   updateBoundingRectAndShape();
@@ -178,8 +184,8 @@ void PrimitivePathGraphicsItem::updateColors() noexcept {
   if (mLineLayer && mLineLayer->isVisible()) {
     mPen.setStyle(Qt::SolidLine);
     mPenHighlighted.setStyle(Qt::SolidLine);
-    mPen.setColor(mLineLayer->getColor(false));
-    mPenHighlighted.setColor(mLineLayer->getColor(true));
+    mPen.setColor(convertColor(mLineLayer->getColor(false)));
+    mPenHighlighted.setColor(convertColor(mLineLayer->getColor(true)));
   } else {
     mPen.setStyle(Qt::NoPen);
     mPenHighlighted.setStyle(Qt::NoPen);
@@ -188,8 +194,8 @@ void PrimitivePathGraphicsItem::updateColors() noexcept {
   if (mFillLayer && mFillLayer->isVisible()) {
     mBrush.setStyle(Qt::SolidPattern);
     mBrushHighlighted.setStyle(Qt::SolidPattern);
-    mBrush.setColor(mFillLayer->getColor(false));
-    mBrushHighlighted.setColor(mFillLayer->getColor(true));
+    mBrush.setColor(convertColor(mFillLayer->getColor(false)));
+    mBrushHighlighted.setColor(convertColor(mFillLayer->getColor(true)));
   } else {
     mBrush.setStyle(Qt::NoBrush);
     mBrushHighlighted.setStyle(Qt::NoBrush);
@@ -213,6 +219,11 @@ void PrimitivePathGraphicsItem::updateBoundingRectAndShape() noexcept {
 
 void PrimitivePathGraphicsItem::updateVisibility() noexcept {
   setVisible((mPen.style() != Qt::NoPen) || (mBrush.style() != Qt::NoBrush));
+}
+
+QColor PrimitivePathGraphicsItem::convertColor(const QColor& color) const
+    noexcept {
+  return mLighterColors ? color.lighter(200) : color;
 }
 
 /*******************************************************************************

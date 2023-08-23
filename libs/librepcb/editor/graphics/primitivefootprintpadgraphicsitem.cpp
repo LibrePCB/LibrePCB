@@ -24,13 +24,16 @@
 
 #include "origincrossgraphicsitem.h"
 #include "primitivepathgraphicsitem.h"
-#include "primitivetextgraphicsitem.h"
 
+#include <librepcb/core/application.h>
+#include <librepcb/core/font/stroketextpathbuilder.h>
 #include <librepcb/core/geometry/padgeometry.h>
+#include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/angle.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/types/length.h>
 #include <librepcb/core/types/point.h>
+#include <librepcb/core/types/stroketextspacing.h>
 #include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
@@ -54,7 +57,7 @@ PrimitiveFootprintPadGraphicsItem::PrimitiveFootprintPadGraphicsItem(
     mMirror(false),
     mCopperLayer(nullptr),
     mOriginCrossGraphicsItem(new OriginCrossGraphicsItem(this)),
-    mTextGraphicsItem(new PrimitiveTextGraphicsItem(this)),
+    mTextGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mPathGraphicsItems(),
     mOnLayerEditedSlot(*this, &PrimitiveFootprintPadGraphicsItem::layerEdited) {
   setFlag(QGraphicsItem::ItemHasNoContents, true);
@@ -71,10 +74,9 @@ PrimitiveFootprintPadGraphicsItem::PrimitiveFootprintPadGraphicsItem(
   mOriginCrossGraphicsItem->setZValue(1000);
 
   // text properties
-  mTextGraphicsItem->setHeight(PositiveLength(1000000));
-  mTextGraphicsItem->setAlignment(
-      Alignment(HAlign::center(), VAlign::center()));
-  mTextGraphicsItem->setShapeEnabled(false);
+  mTextGraphicsItem->setLineWidth(UnsignedLength(100000));
+  mTextGraphicsItem->setLighterColors(true);  // More contrast for readability.
+  mTextGraphicsItem->setShapeMode(PrimitivePathGraphicsItem::ShapeMode::None);
   mTextGraphicsItem->setZValue(500);
 }
 
@@ -104,9 +106,14 @@ void PrimitiveFootprintPadGraphicsItem::setMirrored(bool mirrored) noexcept {
 }
 
 void PrimitiveFootprintPadGraphicsItem::setText(const QString& text) noexcept {
+  const QVector<Path> paths = StrokeTextPathBuilder::build(
+      Application::getDefaultStrokeFont(), StrokeTextSpacing(),
+      StrokeTextSpacing(), PositiveLength(1000000), UnsignedLength(100000),
+      Alignment(HAlign::center(), VAlign::center()), Angle(0), false, text);
+
   setToolTip(text);
   mOriginCrossGraphicsItem->setToolTip(text);
-  mTextGraphicsItem->setText(text, true);
+  mTextGraphicsItem->setPath(Path::toQPainterPathPx(paths, false));
   foreach (auto& item, mPathGraphicsItems) { item.item->setToolTip(text); }
   updateTextHeight();
 }
@@ -116,7 +123,7 @@ void PrimitiveFootprintPadGraphicsItem::setLayer(
   auto layer = mLayerProvider.getLayer(layerName);
   if (layer != mCopperLayer) {
     mCopperLayer = layer;
-    mTextGraphicsItem->setLayer(mCopperLayer);
+    mTextGraphicsItem->setLineLayer(mCopperLayer);
     updateRegisteredLayers();
     updatePathLayers();
   }
@@ -256,7 +263,7 @@ void PrimitiveFootprintPadGraphicsItem::updateTextHeight() noexcept {
   const qreal heightRatio = textRect.height() / size;
   const qreal widthRatio = textRect.width() / size;
   const qreal ratio = qMax(heightRatio, widthRatio);
-  mTextGraphicsItem->setScale(1.0 / ratio);
+  mTextGraphicsItem->setScale(0.9 / ratio);
 }
 
 void PrimitiveFootprintPadGraphicsItem::updateRegisteredLayers() noexcept {

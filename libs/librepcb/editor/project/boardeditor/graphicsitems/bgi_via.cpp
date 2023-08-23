@@ -23,14 +23,18 @@
 #include "bgi_via.h"
 
 #include "../../../graphics/graphicslayer.h"
+#include "../../../graphics/primitivepathgraphicsitem.h"
 #include "../boardgraphicsscene.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/font/stroketextpathbuilder.h>
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/board/items/bi_netsegment.h>
 #include <librepcb/core/project/board/items/bi_via.h>
 #include <librepcb/core/project/circuit/netsignal.h>
+#include <librepcb/core/types/alignment.h>
 #include <librepcb/core/types/layer.h>
+#include <librepcb/core/types/stroketextspacing.h>
 #include <librepcb/core/workspace/theme.h>
 
 #include <QtCore>
@@ -56,17 +60,23 @@ BGI_Via::BGI_Via(BI_Via& via, const IF_GraphicsLayerProvider& lp,
     mViaLayer(lp.getLayer(Theme::Color::sBoardVias)),
     mTopStopMaskLayer(lp.getLayer(Theme::Color::sBoardStopMaskTop)),
     mBottomStopMaskLayer(lp.getLayer(Theme::Color::sBoardStopMaskBot)),
+    mTextGraphicsItem(new PrimitivePathGraphicsItem(this)),
     mOnEditedSlot(*this, &BGI_Via::viaEdited),
     mOnLayerEditedSlot(*this, &BGI_Via::layerEdited) {
   setFlag(QGraphicsItem::ItemIsSelectable, true);
   setZValue(BoardGraphicsScene::ZValue_Vias);
 
-  mFont = Application::getDefaultSansSerifFont();
-  mFont.setPixelSize(1);
+  // text properties
+  mTextGraphicsItem->setLineLayer(mViaLayer);
+  mTextGraphicsItem->setLineWidth(UnsignedLength(100000));
+  mTextGraphicsItem->setLighterColors(true);  // More contrast for readability.
+  mTextGraphicsItem->setShapeMode(PrimitivePathGraphicsItem::ShapeMode::None);
+  mTextGraphicsItem->setZValue(500);
 
   updatePosition();
   updateShapes();
   updateToolTip();
+  updateText();
 
   mVia.onEdited.attach(mOnEditedSlot);
   for (auto layer : {mViaLayer, mTopStopMaskLayer, mBottomStopMaskLayer}) {
@@ -131,14 +141,6 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         startAngle += spanAngle;
       }
     }
-
-    // draw netsignal name
-    if (netsignal) {
-      painter->setFont(mFont);
-      painter->setPen(mViaLayer->getColor(highlight).lighter(150));
-      painter->drawText(mShape.boundingRect(), Qt::AlignCenter,
-                        *netsignal->getName());
-    }
   }
 
   if (mTopStopMaskLayer && mTopStopMaskLayer->isVisible() &&
@@ -148,6 +150,14 @@ void BGI_Via::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     painter->setBrush(mTopStopMaskLayer->getColor(highlight));
     painter->drawPath(mStopMaskTop);
   }
+}
+
+QVariant BGI_Via::itemChange(GraphicsItemChange change,
+                             const QVariant& value) noexcept {
+  if ((change == ItemSelectedHasChanged) && mTextGraphicsItem) {
+    mTextGraphicsItem->setSelected(value.toBool());
+  }
+  return QGraphicsItem::itemChange(change, value);
 }
 
 /*******************************************************************************
@@ -167,13 +177,15 @@ void BGI_Via::viaEdited(const BI_Via& obj, BI_Via::Event event) noexcept {
       updatePosition();
       break;
     case BI_Via::Event::SizeChanged:
+      updateTextHeight();
+      // fallthrough
     case BI_Via::Event::DrillDiameterChanged:
     case BI_Via::Event::StopMaskDiametersChanged:
       updateShapes();
       break;
     case BI_Via::Event::NetSignalNameChanged:
       updateToolTip();
-      update();
+      updateText();
       break;
     default:
       qWarning() << "Unhandled switch-case in BGI_Via::viaEdited():"
@@ -245,6 +257,28 @@ void BGI_Via::updateToolTip() noexcept {
     s += "\n" % tr("End Layer: %1").arg(via.getEndLayer().getNameTr());
   }
   setToolTip(s);
+}
+
+void BGI_Via::updateText() noexcept {
+  const QString text = mVia.getNetSegment().getNetNameToDisplay(false);
+  if (mText != text) {
+    mText = text;
+    const QVector<Path> paths = StrokeTextPathBuilder::build(
+        Application::getDefaultStrokeFont(), StrokeTextSpacing(),
+        StrokeTextSpacing(), PositiveLength(1000000), UnsignedLength(100000),
+        Alignment(HAlign::center(), VAlign::center()), Angle(0), false, mText);
+    mTextGraphicsItem->setPath(Path::toQPainterPathPx(paths, false));
+    updateTextHeight();
+  }
+}
+
+void BGI_Via::updateTextHeight() noexcept {
+  const qreal viaSize = mVia.getSize()->toPx();
+  const QRectF textRect = mTextGraphicsItem->boundingRect();
+  const qreal textSize = std::max(textRect.width(), textRect.height());
+  if (textSize > 0) {
+    mTextGraphicsItem->setScale(0.8 * viaSize / textSize);
+  }
 }
 
 void BGI_Via::updateVisibility() noexcept {
