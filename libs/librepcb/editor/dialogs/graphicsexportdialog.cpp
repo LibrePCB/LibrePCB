@@ -1159,7 +1159,7 @@ void GraphicsExportDialog::startExport(bool toClipboard) noexcept {
       // Strip page number from the file path, if any.
       QString tmp = fp.toStr();
       tmp.chop(fp.getSuffix().length() + 1);
-      while ((!tmp.isEmpty()) && (tmp.back() == "1")) {
+      while ((!tmp.isEmpty()) && (tmp.at(tmp.length() - 1) == "1")) {
         tmp.chop(1);
       }
       fp.setPath(tmp % "." % fp.getSuffix());
