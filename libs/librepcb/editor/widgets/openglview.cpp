@@ -29,6 +29,18 @@
 #include <QtOpenGL>
 #include <QtWidgets>
 
+// Compatibility defines to fix build error on some targets, see
+// https://github.com/LibrePCB/LibrePCB/issues/1205.
+#ifndef GL_MULTISAMPLE
+#define GL_MULTISAMPLE 0x809D
+#endif
+#ifndef GL_LINE_SMOOTH
+#define GL_LINE_SMOOTH 0x0B20
+#endif
+#ifndef GL_LINE_SMOOTH_HINT
+#define GL_LINE_SMOOTH_HINT 0x0C52
+#endif
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
