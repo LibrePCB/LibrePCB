@@ -41,6 +41,8 @@ class NetSignal;
 
 namespace editor {
 
+class PrimitivePathGraphicsItem;
+
 /*******************************************************************************
  *  Class BGI_Via
  ******************************************************************************/
@@ -76,9 +78,13 @@ private:  // Methods
   void viaEdited(const BI_Via& obj, BI_Via::Event event) noexcept;
   void layerEdited(const GraphicsLayer& layer,
                    GraphicsLayer::Event event) noexcept;
+  virtual QVariant itemChange(GraphicsItemChange change,
+                              const QVariant& value) noexcept override;
   void updatePosition() noexcept;
   void updateShapes() noexcept;
   void updateToolTip() noexcept;
+  void updateText() noexcept;
+  void updateTextHeight() noexcept;
   void updateVisibility() noexcept;
   void attachToCopperLayers() noexcept;
 
@@ -90,6 +96,7 @@ private:  // Data
   std::shared_ptr<GraphicsLayer> mViaLayer;
   std::shared_ptr<GraphicsLayer> mTopStopMaskLayer;
   std::shared_ptr<GraphicsLayer> mBottomStopMaskLayer;
+  QScopedPointer<PrimitivePathGraphicsItem> mTextGraphicsItem;
 
   /// Copper layers for blind- and buried vias (empty for through-hole vias)
   QVector<std::shared_ptr<GraphicsLayer>> mBlindBuriedCopperLayers;
@@ -100,7 +107,7 @@ private:  // Data
   QPainterPath mStopMaskTop;
   QPainterPath mStopMaskBottom;
   QRectF mBoundingRect;
-  QFont mFont;
+  QString mText;
 
   // Slots
   BI_Via::OnEditedSlot mOnEditedSlot;

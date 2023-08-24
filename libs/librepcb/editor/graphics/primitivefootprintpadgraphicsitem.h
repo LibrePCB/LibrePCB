@@ -45,7 +45,6 @@ namespace editor {
 
 class OriginCrossGraphicsItem;
 class PrimitivePathGraphicsItem;
-class PrimitiveTextGraphicsItem;
 
 /*******************************************************************************
  *  Class PrimitiveFootprintPadGraphicsItem
@@ -95,7 +94,7 @@ private:  // Data
   bool mMirror;
   std::shared_ptr<GraphicsLayer> mCopperLayer;
   QScopedPointer<OriginCrossGraphicsItem> mOriginCrossGraphicsItem;
-  QScopedPointer<PrimitiveTextGraphicsItem> mTextGraphicsItem;
+  QScopedPointer<PrimitivePathGraphicsItem> mTextGraphicsItem;
   struct PathItem {
     std::shared_ptr<GraphicsLayer> layer;
     bool isCopper;
