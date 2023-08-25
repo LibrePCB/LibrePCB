@@ -98,9 +98,14 @@ std::unique_ptr<QMimeData> FootprintClipboardData::toMimeData(
   mHoles.serialize(root);
   root.ensureLineBreak();
 
+  const QByteArray sexpr = root.toByteArray();
   std::unique_ptr<QMimeData> data(new QMimeData());
   data->setImageData(generatePixmap(lp));
-  data->setData(getMimeType(), root.toByteArray());
+  data->setData(getMimeType(), sexpr);
+  // Note: At least on one system the clipboard didn't work if no text was
+  // set, so let's also copy the SExpression as text as a workaround. This
+  // might be useful anyway, e.g. for debugging purposes.
+  data->setText(QString::fromUtf8(sexpr));
   return data;
 }
 
