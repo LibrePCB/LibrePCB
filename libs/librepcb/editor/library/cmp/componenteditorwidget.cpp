@@ -314,10 +314,10 @@ void ComponentEditorWidget::fixMsg(const MsgMissingComponentDefaultValue& msg) {
   int answer = QMessageBox::question(this, title, question, QMessageBox::Cancel,
                                      QMessageBox::Yes, QMessageBox::No);
   if (answer == QMessageBox::Yes) {
-    mUi->edtDefaultValue->setPlainText("{{PARTNUMBER or DEVICE or COMPONENT}}");
+    mUi->edtDefaultValue->setPlainText("{{MPN or DEVICE or COMPONENT}}");
     commitMetadata();
   } else if (answer == QMessageBox::No) {
-    mUi->edtDefaultValue->setPlainText("{{PARTNUMBER or DEVICE}}");
+    mUi->edtDefaultValue->setPlainText("{{MPN or DEVICE}}");
     commitMetadata();
   }
 }

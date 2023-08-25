@@ -535,7 +535,7 @@ void EagleLibraryImport::run() noexcept {
       component->setCategories(mComponentCategories);
       component->setPrefixes(NormDependentPrefixMap(
           ComponentPrefix(cmp.deviceSet->getPrefix().trimmed())));
-      component->setDefaultValue("{{ PARTNUMBER or DEVICE }}");
+      component->setDefaultValue("{{ MPN or DEVICE }}");
       auto symbolVariant = std::make_shared<ComponentSymbolVariant>(
           Uuid::createRandom(), "", ElementName("default"), "");
       component->getSymbolVariants().append(symbolVariant);
