@@ -146,7 +146,9 @@ QStringList Library::searchForElements() const noexcept {
     QString dirPath = subdir % "/" % dirname;
     if (isValidElementDirectory<ElementType>(*mDirectory, dirPath)) {
       list.append(dirPath);
-    } else {
+    } else if (!mDirectory->getFiles(dirPath).isEmpty()) {
+      // Note: Do not warn about empty directories since this happens often
+      // when switching branches, leading to annoying warnings.
       qWarning() << "Directory is not a valid library element, ignoring it:"
                  << mDirectory->getAbsPath(dirPath).toNative();
     }

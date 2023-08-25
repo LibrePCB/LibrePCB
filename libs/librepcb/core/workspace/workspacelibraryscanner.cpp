@@ -199,7 +199,7 @@ void WorkspaceLibraryScanner::getLibrariesOfDirectory(
         qCritical() << "Library:" << fp.toNative();
         qCritical() << "Error:" << e.getMsg();
       }
-    } else {
+    } else if (!fp.isEmptyDir()) {
       qWarning() << "Directory is not a valid library, ignoring it:"
                  << fp.toNative();
     }
