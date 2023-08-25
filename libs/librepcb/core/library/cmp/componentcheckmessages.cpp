@@ -64,8 +64,8 @@ MsgMissingComponentDefaultValue::MsgMissingComponentDefaultValue() noexcept
            "Generic parts (e.g. a diode): %1\n"
            "Specific parts (e.g. a microcontroller): %2\n"
            "Passive parts: Using an attribute, e.g. %3")
-            .arg("'{{PARTNUMBER or DEVICE}}'",
-                 "'{{PARTNUMBER or DEVICE or COMPONENT}}'", "'{{RESISTANCE}}'"),
+            .arg("'{{MPN or DEVICE}}'", "'{{MPN or DEVICE or COMPONENT}}'",
+                 "'{{RESISTANCE}}'"),
         "empty_default_value") {
 }
 
