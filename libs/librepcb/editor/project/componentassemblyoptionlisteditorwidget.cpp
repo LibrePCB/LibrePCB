@@ -454,8 +454,11 @@ void ComponentAssemblyOptionListEditorWidget::optionListEdited(
     return;
   }
 
-  auto fillOptionRow = [this](QTreeWidgetItem* item,
-                              const ComponentAssemblyOption& option) {
+  const QBrush bgRed(QColor(255, 0, 0, 80));
+  const QBrush bgYellow(QColor(255, 255, 0, 120));
+
+  auto fillOptionRow = [this, &bgRed](QTreeWidgetItem* item,
+                                      const ComponentAssemblyOption& option) {
     item->setIcon(COLUMN_DEVICE, QIcon(":/img/library/device.png"));
     QString devName = option.getDevice().toStr().left(8) % "...";
     QString toolTip;
@@ -500,12 +503,12 @@ void ComponentAssemblyOptionListEditorWidget::optionListEdited(
                       ? QVariant()
                       : QVariant(inAnyVariants ? Qt::Checked : Qt::Unchecked));
     item->setData(COLUMN_MOUNT, Qt::UserRole, QVariant::fromValue(avItems));
-    item->setBackground(COLUMN_MOUNT,
-                        inAnyVariants ? QBrush() : QBrush(Qt::red));
+    item->setBackground(COLUMN_MOUNT, inAnyVariants ? QBrush() : bgRed);
   };
 
-  auto fillPartRow = [](QTreeWidgetItem* item, std::shared_ptr<const Part> part,
-                        int index) {
+  auto fillPartRow = [&bgRed, &bgYellow](QTreeWidgetItem* item,
+                                         std::shared_ptr<const Part> part,
+                                         int index) {
     if (index > 0) {
       item->setText(COLUMN_DEVICE, "↳ " % tr("Alternative %1:").arg(index));
     }
@@ -513,19 +516,16 @@ void ComponentAssemblyOptionListEditorWidget::optionListEdited(
     item->setText(COLUMN_MPN, part ? *part->getMpn() : QString());
     item->setBackground(
         COLUMN_MPN,
-        (!part) ? QBrush(Qt::red)
-                : (part->getMpn()->isEmpty() ? QBrush(Qt::yellow) : QBrush()));
+        (!part) ? bgRed : (part->getMpn()->isEmpty() ? bgYellow : QBrush()));
     item->setText(COLUMN_MANUFACTURER,
                   part ? *part->getManufacturer() : QString());
     item->setBackground(
         COLUMN_MANUFACTURER,
-        (!part) ? QBrush(Qt::red)
-                : (part->getManufacturer()->isEmpty() ? QBrush(Qt::yellow)
-                                                      : QBrush()));
+        (!part) ? bgRed
+                : (part->getManufacturer()->isEmpty() ? bgYellow : QBrush()));
     item->setText(COLUMN_ATTRIBUTES,
                   part ? part->getAttributeValuesTr().join(" ") : QString());
-    item->setBackground(COLUMN_ATTRIBUTES,
-                        (!part) ? QBrush(Qt::red) : QBrush());
+    item->setBackground(COLUMN_ATTRIBUTES, (!part) ? bgRed : QBrush());
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable |
                    Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
   };
