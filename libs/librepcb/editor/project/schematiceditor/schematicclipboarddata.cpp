@@ -111,13 +111,18 @@ std::unique_ptr<QMimeData> SchematicClipboardData::toMimeData() const {
   root.ensureLineBreak();
   mTexts.serialize(root);
   root.ensureLineBreak();
-  mFileSystem->write("schematic.lp", root.toByteArray());
 
-  QByteArray zip = mFileSystem->exportToZip();
+  const QByteArray sexpr = root.toByteArray();
+  mFileSystem->write("schematic.lp", sexpr);
+  const QByteArray zip = mFileSystem->exportToZip();
 
   std::unique_ptr<QMimeData> data(new QMimeData());
   data->setData(getMimeType(), zip);
   data->setData("application/zip", zip);
+  // Note: At least on one system the clipboard didn't work if no text was
+  // set, so let's also copy the SExpression as text as a workaround. This
+  // might be useful anyway, e.g. for debugging purposes.
+  data->setText(QString::fromUtf8(sexpr));
   return data;
 }
 
