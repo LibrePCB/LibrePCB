@@ -32,6 +32,7 @@
 #include <librepcb/core/3d/occmodel.h>
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/library/pkg/package.h>
+#include <librepcb/core/utils/scopeguard.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -466,23 +467,34 @@ bool PackageModelListModel::chooseStepFile(QByteArray& content,
   }
   clientSettings.setValue(key, fp.toStr());
 
-  // Load and try to minify the provided STEP file.
-  content = FileUtils::readFile(fp);
-  try {
-    const QByteArray minified = OccModel::minifyStep(content);
-    OccModel::loadStep(minified);  // throws if invalid
-    content = minified;
-  } catch (const Exception& e) {
-    // Maybe the original STEP file is already broken, let's validate it now.
-    OccModel::loadStep(content);  // throws if invalid
+  tl::optional<QString> minifyError;
+  {
+    // Loading and minifying the STEP file can block the UI some time, so let's
+    // indicate the ongoing operation with a wait cursor.
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+    auto csg = scopeGuard([]() { QGuiApplication::restoreOverrideCursor(); });
 
+    // Load and try to minify the provided STEP file.
+    content = FileUtils::readFile(fp);
+    try {
+      const QByteArray minified = OccModel::minifyStep(content);
+      OccModel::loadStep(minified);  // throws if invalid
+      content = minified;
+    } catch (const Exception& e) {
+      // Maybe the original STEP file is already broken, let's validate it now.
+      OccModel::loadStep(content);  // throws if invalid
+      minifyError = e.getMsg();
+    }
+  }
+
+  if (minifyError) {
     // Original looks good, just show a warning that the minification failed.
-    qCritical() << "Failed to minify STEP file:" << e.getMsg();
+    qCritical() << "Failed to minify STEP file:" << *minifyError;
     QString msg = "<p>" %
         tr("Failed to minify the provided STEP file, will keep the original "
            "as-is.") %
         "</p>";
-    msg += "<p>" % tr("Reason:") % " " % e.getMsg() % "</p>";
+    msg += "<p>" % tr("Reason:") % " " % (*minifyError) % "</p>";
     msg += "<p>" %
         tr("Please <a href='%1'>report this issue</a> to the LibrePCB "
            "developers with the STEP file attached.")
@@ -490,6 +502,7 @@ bool PackageModelListModel::chooseStepFile(QByteArray& content,
         "</p>";
     QMessageBox::warning(nullptr, tr("Warning"), msg, QMessageBox::Ok);
   }
+
   return true;
 }
 
