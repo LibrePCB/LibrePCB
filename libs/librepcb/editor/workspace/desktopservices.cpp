@@ -109,13 +109,32 @@ bool DesktopServices::openLocalPathWithCommand(
 }
 
 bool DesktopServices::openUrlFallback(const QUrl& url) const noexcept {
-  if (QDesktopServices::openUrl(url)) {
-    qDebug() << "Successfully opened URL with QDesktopServices:" << url;
-    return true;
+  // Support specifying a custom URL handler application (such as `xdg-open`)
+  // since QDesktopServices::openUrl() does not work in any case (observed
+  // with Snap packages). See https://bugreports.qt.io/browse/QTBUG-83939.
+  static const QString envHandler =
+      QString(qgetenv("LIBREPCB_OPEN_URL_HANDLER")).trimmed();
+
+  QString handlerName;
+  bool success = false;
+  if (!envHandler.isEmpty()) {
+    handlerName = envHandler;
+    success = QProcess::startDetached(envHandler, {url.toString()});
   } else {
-    qCritical() << "Failed to open URL with QDesktopServices:" << url;
-    return false;
+    handlerName = "QDesktopServices";
+    success = QDesktopServices::openUrl(url);
   }
+
+  if (success) {
+    qInfo().noquote() << QString("Successfully opened URL with %1: \"%2\"")
+                             .arg(handlerName)
+                             .arg(url.toString());
+  } else {
+    qCritical().noquote() << QString("Failed to open URL with %1: \"%2\"")
+                                 .arg(handlerName)
+                                 .arg(url.toString());
+  }
+  return success;
 }
 
 /*******************************************************************************
