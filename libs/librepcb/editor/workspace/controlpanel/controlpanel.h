@@ -88,7 +88,7 @@ protected:
 private slots:
   // private slots
   void openProjectsPassedByCommandLine() noexcept;
-  void openProjectPassedByOs(const QString& file) noexcept;
+  void openProjectPassedByOs(const QString& file, bool silent = false) noexcept;
   void projectEditorClosed() noexcept;
 
   // Actions

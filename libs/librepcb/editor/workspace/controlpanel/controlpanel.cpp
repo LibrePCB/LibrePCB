@@ -659,19 +659,23 @@ bool ControlPanel::closeAllLibraryEditors(bool askForSave) noexcept {
  ******************************************************************************/
 
 void ControlPanel::openProjectsPassedByCommandLine() noexcept {
-  // parse command line arguments and open all project files
-  foreach (const QString& arg, qApp->arguments()) {
-    openProjectPassedByOs(arg);
+  // Parse command line arguments and open all project files.
+  // Note: Do not print a warning if the first argument is not a valid project,
+  // since it might or might not be the application file path.
+  const QStringList args = qApp->arguments();
+  for (int i = 0; i < args.count(); ++i) {
+    openProjectPassedByOs(args.at(i), i == 0);  // Silent on first item.
   }
 }
 
-void ControlPanel::openProjectPassedByOs(const QString& file) noexcept {
+void ControlPanel::openProjectPassedByOs(const QString& file,
+                                         bool silent) noexcept {
   FilePath filepath(file);
   if ((filepath.isExistingFile()) &&
       ((filepath.getSuffix() == "lpp") || (filepath.getSuffix() == "lppz"))) {
     openProject(filepath);
-  } else {
-    qDebug() << "Ignore invalid request to open project:" << file;
+  } else if (!silent) {
+    qWarning() << "Ignore invalid request to open project:" << file;
   }
 }
 
