@@ -188,10 +188,12 @@ QVariant PartListModel::data(const QModelIndex& index, int role) const {
 
   std::shared_ptr<Part> item = mPartList->value(index.row());
 
+  const QBrush bgRed(QColor(255, 0, 0, 80));
+  const QBrush bgYellow(QColor(255, 255, 0, 120));
   if ((!item) && (mPartList->isEmpty()) && (role == Qt::BackgroundRole)) {
-    return QBrush(Qt::red);
+    return bgRed;
   } else if ((item) && (item->isEmpty()) && (role == Qt::BackgroundRole)) {
-    return QBrush(Qt::red);
+    return bgRed;
   }
 
   switch (index.column()) {
@@ -205,9 +207,8 @@ QVariant PartListModel::data(const QModelIndex& index, int role) const {
               ? QVariant()
               : tr("Exact manufacturer part number (without placeholders)");
         case Qt::BackgroundRole:
-          return (item && item->getMpn()->isEmpty())
-              ? QVariant(QBrush(Qt::yellow))
-              : QVariant();
+          return (item && item->getMpn()->isEmpty()) ? QVariant(bgYellow)
+                                                     : QVariant();
         default:
           return QVariant();
       }
@@ -221,7 +222,7 @@ QVariant PartListModel::data(const QModelIndex& index, int role) const {
           return item ? QVariant() : tr("Name of the manufacturer");
         case Qt::BackgroundRole:
           return (item && item->getManufacturer()->isEmpty())
-              ? QVariant(QBrush(Qt::yellow))
+              ? QVariant(bgYellow)
               : QVariant();
         default:
           return QVariant();
