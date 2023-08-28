@@ -400,19 +400,25 @@ void LibraryOverviewWidget::updateElementLists() noexcept {
 template <typename ElementType>
 void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
                                               const QIcon& icon) noexcept {
-  QHash<FilePath, QString> elementNames;
+  struct Element {
+    QString name;
+    bool deprecated;
+  };
+  QMap<FilePath, Element> elements;
 
   try {
     // get all library element names
-    QMultiMap<Version, FilePath> elements =
+    QMultiMap<Version, FilePath> dbElements =
         mContext.workspace.getLibraryDb().getAll<ElementType>(
             tl::nullopt,
             mLibrary->getDirectory().getAbsPath());  // can throw
-    foreach (const FilePath& filepath, elements) {
-      QString name;
+    foreach (const FilePath& filepath, dbElements) {
+      Element element;
+      mContext.workspace.getLibraryDb().getMetadata<ElementType>(
+          filepath, nullptr, nullptr, &element.deprecated);  // can throw
       mContext.workspace.getLibraryDb().getTranslations<ElementType>(
-          filepath, getLibLocaleOrder(), &name);  // can throw
-      elementNames.insert(filepath, name);
+          filepath, getLibLocaleOrder(), &element.name);  // can throw
+      elements.insert(filepath, element);
     }
   } catch (const Exception& e) {
     listWidget.clear();
@@ -430,19 +436,22 @@ void LibraryOverviewWidget::updateElementList(QListWidget& listWidget,
     QListWidgetItem* item = listWidget.item(i);
     Q_ASSERT(item);
     FilePath filePath(item->data(Qt::UserRole).toString());
-    if (elementNames.contains(filePath)) {
-      item->setText(elementNames.take(filePath));
+    if (elements.contains(filePath)) {
+      const Element element = elements.take(filePath);
+      item->setText(element.name);
+      item->setForeground(element.deprecated ? QBrush(Qt::red) : QBrush());
     } else {
       delete item;
     }
   }
 
   // add new list widget items
-  foreach (const FilePath& fp, elementNames.keys()) {
-    QString name = elementNames.value(fp);
+  foreach (const FilePath& fp, elements.keys()) {
+    const Element element = elements.value(fp);
     QListWidgetItem* item = new QListWidgetItem(&listWidget);
-    item->setText(name);
-    item->setToolTip(name);
+    item->setText(element.name);
+    item->setToolTip(element.name);
+    item->setForeground(element.deprecated ? QBrush(Qt::red) : QBrush());
     item->setData(Qt::UserRole, fp.toStr());
     item->setIcon(icon);
   }

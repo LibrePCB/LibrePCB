@@ -159,7 +159,11 @@ void ComponentChooserDialog::searchComponents(const QString& input) {
       QString name;
       mWorkspace.getLibraryDb().getTranslations<Component>(fp, localeOrder(),
                                                            &name);  // can throw
+      bool deprecated = false;
+      mWorkspace.getLibraryDb().getMetadata<Component>(
+          fp, nullptr, nullptr, &deprecated);  // can throw
       QListWidgetItem* item = new QListWidgetItem(name);
+      item->setForeground(deprecated ? QBrush(Qt::red) : QBrush());
       item->setData(Qt::UserRole, uuid.toStr());
       mUi->listComponents->addItem(item);
     }
@@ -186,7 +190,11 @@ void ComponentChooserDialog::setSelectedCategory(
         mWorkspace.getLibraryDb().getTranslations<Component>(
             fp, localeOrder(),
             &name);  // can throw
+        bool deprecated = false;
+        mWorkspace.getLibraryDb().getMetadata<Component>(
+            fp, nullptr, nullptr, &deprecated);  // can throw
         QListWidgetItem* item = new QListWidgetItem(name);
+        item->setForeground(deprecated ? QBrush(Qt::red) : QBrush());
         item->setData(Qt::UserRole, cmpUuid.toStr());
         mUi->listComponents->addItem(item);
       } catch (const Exception& e) {

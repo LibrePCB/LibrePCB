@@ -157,7 +157,11 @@ void PackageChooserDialog::searchPackages(const QString& input) {
       QString name;
       mWorkspace.getLibraryDb().getTranslations<Package>(fp, localeOrder(),
                                                          &name);  // can throw
+      bool deprecated = false;
+      mWorkspace.getLibraryDb().getMetadata<Package>(fp, nullptr, nullptr,
+                                                     &deprecated);  // can throw
       QListWidgetItem* item = new QListWidgetItem(name);
+      item->setForeground(deprecated ? QBrush(Qt::red) : QBrush());
       item->setData(Qt::UserRole, uuid.toStr());
       mUi->listPackages->addItem(item);
     }
@@ -183,7 +187,11 @@ void PackageChooserDialog::setSelectedCategory(
         QString name;
         mWorkspace.getLibraryDb().getTranslations<Package>(fp, localeOrder(),
                                                            &name);  // can throw
+        bool deprecated = false;
+        mWorkspace.getLibraryDb().getMetadata<Package>(
+            fp, nullptr, nullptr, &deprecated);  // can throw
         QListWidgetItem* item = new QListWidgetItem(name);
+        item->setForeground(deprecated ? QBrush(Qt::red) : QBrush());
         item->setData(Qt::UserRole, pkgUuid.toStr());
         mUi->listPackages->addItem(item);
       } catch (const Exception& e) {

@@ -348,12 +348,16 @@ void AddComponentDialog::searchComponents(
       QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
       cmpItem->setIcon(0, QIcon(":/img/library/symbol.png"));
       cmpItem->setText(0, cmpIt.value().name);
+      cmpItem->setForeground(
+          0, cmpIt.value().deprecated ? QBrush(Qt::red) : QBrush());
       cmpItem->setData(0, Qt::UserRole, cmpIt.key().toStr());
       for (auto devIt = cmpIt->devices.begin(); devIt != cmpIt->devices.end();
            ++devIt) {
         QTreeWidgetItem* devItem = new QTreeWidgetItem(cmpItem);
         devItem->setIcon(0, QIcon(":/img/library/device.png"));
         devItem->setText(0, devIt.value().name);
+        devItem->setForeground(
+            0, devIt.value().deprecated ? QBrush(Qt::red) : QBrush());
         devItem->setData(0, Qt::UserRole, devIt.key().toStr());
         devItem->setText(1, devIt.value().pkgName);
         devItem->setTextAlignment(1, Qt::AlignRight);
@@ -492,19 +496,23 @@ AddComponentDialog::SearchResult AddComponentDialog::search(
     }
   }
 
-  // Get name of elements.
+  // Get additional metadata of elements.
   QMutableHashIterator<FilePath, SearchResultComponent> cmpIt(
       result.components);
   while (cmpIt.hasNext()) {
     cmpIt.next();
     mDb.getTranslations<Component>(cmpIt.key(), mLocaleOrder,
                                    &cmpIt.value().name);
+    mDb.getMetadata<Component>(cmpIt.key(), nullptr, nullptr,
+                               &cmpIt.value().deprecated);
     QMutableHashIterator<FilePath, SearchResultDevice> devIt(
         cmpIt.value().devices);
     while (devIt.hasNext()) {
       devIt.next();
       mDb.getTranslations<Device>(devIt.key(), mLocaleOrder,
                                   &devIt.value().name);
+      mDb.getMetadata<Device>(devIt.key(), nullptr, nullptr,
+                              &devIt.value().deprecated);
       if (devIt.value().pkgFp.isValid()) {
         mDb.getTranslations<Package>(devIt.value().pkgFp, mLocaleOrder,
                                      &devIt.value().pkgName);
@@ -537,9 +545,12 @@ void AddComponentDialog::setSelectedCategory(
     if (!cmpFp.isValid()) continue;
     QString cmpName;
     mDb.getTranslations<Component>(cmpFp, mLocaleOrder, &cmpName);
+    bool cmpDeprecated = false;
+    mDb.getMetadata<Component>(cmpFp, nullptr, nullptr, &cmpDeprecated);
     QTreeWidgetItem* cmpItem = new QTreeWidgetItem(mUi->treeComponents);
     cmpItem->setIcon(0, QIcon(":/img/library/symbol.png"));
     cmpItem->setText(0, cmpName);
+    cmpItem->setForeground(0, cmpDeprecated ? QBrush(Qt::red) : QBrush());
     cmpItem->setData(0, Qt::UserRole, cmpFp.toStr());
     // devices
     QSet<Uuid> devices = mDb.getComponentDevices(cmpUuid);
@@ -549,9 +560,12 @@ void AddComponentDialog::setSelectedCategory(
         if (!devFp.isValid()) continue;
         QString devName;
         mDb.getTranslations<Device>(devFp, mLocaleOrder, &devName);
+        bool devDeprecated = false;
+        mDb.getMetadata<Device>(devFp, nullptr, nullptr, &devDeprecated);
         QTreeWidgetItem* devItem = new QTreeWidgetItem(cmpItem);
         devItem->setIcon(0, QIcon(":/img/library/device.png"));
         devItem->setText(0, devName);
+        devItem->setForeground(0, devDeprecated ? QBrush(Qt::red) : QBrush());
         devItem->setData(0, Qt::UserRole, devFp.toStr());
         // package
         Uuid pkgUuid = Uuid::createRandom();  // only for initialization, will

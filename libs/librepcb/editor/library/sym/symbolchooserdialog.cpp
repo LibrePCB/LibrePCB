@@ -175,7 +175,11 @@ void SymbolChooserDialog::searchSymbols(const QString& input) {
       QString name;
       mWorkspace.getLibraryDb().getTranslations<Symbol>(fp, localeOrder(),
                                                         &name);  // can throw
+      bool deprecated = false;
+      mWorkspace.getLibraryDb().getMetadata<Symbol>(fp, nullptr, nullptr,
+                                                    &deprecated);  // can throw
       QListWidgetItem* item = new QListWidgetItem(name);
+      item->setForeground(deprecated ? QBrush(Qt::red) : QBrush());
       item->setData(Qt::UserRole, fp.toStr());
       mUi->listSymbols->addItem(item);
     }
@@ -196,13 +200,18 @@ void SymbolChooserDialog::setSelectedCategory(
         mWorkspace.getLibraryDb().getByCategory<Symbol>(uuid);  // can throw
     foreach (const Uuid& symbolUuid, symbols) {
       try {
-        QString symName;
-        FilePath symFp = mWorkspace.getLibraryDb().getLatest<Symbol>(
+        FilePath fp = mWorkspace.getLibraryDb().getLatest<Symbol>(
             symbolUuid);  // can throw
-        mWorkspace.getLibraryDb().getTranslations<Symbol>(
-            symFp, localeOrder(), &symName);  // can throw
-        QListWidgetItem* item = new QListWidgetItem(symName);
-        item->setData(Qt::UserRole, symFp.toStr());
+        QString name;
+        mWorkspace.getLibraryDb().getTranslations<Symbol>(fp, localeOrder(),
+                                                          &name);  // can throw
+        bool deprecated = false;
+        mWorkspace.getLibraryDb().getMetadata<Symbol>(
+            fp, nullptr, nullptr,
+            &deprecated);  // can throw
+        QListWidgetItem* item = new QListWidgetItem(name);
+        item->setForeground(deprecated ? QBrush(Qt::red) : QBrush());
+        item->setData(Qt::UserRole, fp.toStr());
         mUi->listSymbols->addItem(item);
       } catch (const Exception& e) {
         continue;  // should we do something here?
