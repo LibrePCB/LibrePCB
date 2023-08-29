@@ -8,6 +8,7 @@ add_library(OpenCascade::OpenCascade ALIAS open_cascade)
 # Leave library empty when building without OpenCascade
 if(NOT USE_OPENCASCADE)
   message(STATUS "Building without OpenCascade features")
+  set(OCC_EDITION_NAME "N/A") # Referenced from occmodel.cpp
   return()
 endif()
 
@@ -22,6 +23,7 @@ if(OpenCASCADE_FOUND)
   )
   find_library(OCC_LIBRARIES, PATHS "${OpenCASCADE_LIBRARY_DIR}")
   target_link_libraries(open_cascade INTERFACE ${OCC_LIBRARIES})
+  set(OCC_EDITION_NAME "OCCT") # Referenced from occmodel.cpp
 
   # Stop here, we're done
   return()
@@ -38,6 +40,7 @@ if(OCE_FOUND)
   )
   find_library(OCC_LIBRARIES, PATHS "${OCE_LIBRARIES}")
   target_link_libraries(open_cascade INTERFACE ${OCC_LIBRARIES})
+  set(OCC_EDITION_NAME "OCE") # Referenced from occmodel.cpp
 
   # Stop here, we're done
   return()
