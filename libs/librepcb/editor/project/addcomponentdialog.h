@@ -74,6 +74,7 @@ class AddComponentDialog final : public QDialog {
   struct SearchResultDevice {
     tl::optional<Uuid> uuid;
     QString name;
+    bool deprecated = false;
     FilePath pkgFp;
     QString pkgName;
     PartList parts;
@@ -82,6 +83,7 @@ class AddComponentDialog final : public QDialog {
 
   struct SearchResultComponent {
     QString name;
+    bool deprecated = false;
     QHash<FilePath, SearchResultDevice> devices;
     bool match = false;
   };
