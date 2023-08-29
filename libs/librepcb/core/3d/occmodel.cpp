@@ -394,6 +394,15 @@ bool OccModel::isAvailable() noexcept {
   return (USE_OPENCASCADE != 0);
 }
 
+QString OccModel::getOccVersionString() noexcept {
+  QString s = OCC_EDITION_NAME;
+#if USE_OPENCASCADE
+  s += " ";
+  s += OCC_VERSION_COMPLETE;
+#endif
+  return s;
+}
+
 std::unique_ptr<OccModel> OccModel::createAssembly(const QString& name) {
   std::unique_ptr<OccModel> result;
 #if USE_OPENCASCADE
