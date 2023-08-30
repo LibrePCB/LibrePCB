@@ -1193,7 +1193,7 @@ bool PackageEditorState_Select::generateCourtyard() noexcept {
         edtOffset->configure(mContext.lengthUnit,
                              LengthEditBase::Steps::generic(),
                              "package_editor/generate_courtyard_dialog");
-        edtOffset->setValue(PositiveLength(250000));  // From IPC7351.
+        edtOffset->setValue(PositiveLength(200000));  // From IPC7351C Draft.
         edtOffset->setFocus();
         vLayout->addWidget(edtOffset);
         QDialogButtonBox* btnBox = new QDialogButtonBox(&dlg);
