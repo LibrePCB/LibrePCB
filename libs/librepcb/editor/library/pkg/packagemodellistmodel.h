@@ -87,6 +87,9 @@ public:
   // Operator Overloadings
   PackageModelListModel& operator=(const PackageModelListModel& rhs) noexcept;
 
+signals:
+  void newModelAdded(int index);
+
 private:
   void modelListEdited(const PackageModelList& list, int index,
                        const std::shared_ptr<const PackageModel>& obj,

@@ -69,6 +69,10 @@ PackageModelListEditorWidget::PackageModelListEditorWidget(
   connect(mView.data(), &EditableTableWidget::currentRowChanged, this,
           &PackageModelListEditorWidget::currentIndexChanged);
 
+  // Select model after adding a new one as the user expects that.
+  connect(mModel.data(), &PackageModelListModel::newModelAdded, mView.data(),
+          &EditableTableWidget::selectRow);
+
   QVBoxLayout* layout = new QVBoxLayout(this);
   layout->setContentsMargins(0, 0, 0, 0);
   layout->addWidget(mView.data());

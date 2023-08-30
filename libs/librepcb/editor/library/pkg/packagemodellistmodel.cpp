@@ -127,6 +127,9 @@ void PackageModelListModel::add(
         Uuid::createRandom(), validateNameOrThrow(mNewName));
     execCmd(new CmdPackageModelAdd(*mPackage, obj, content, mNewEnabled));
     mNewName = QString();
+
+    // Make sure the view selects the new model as the user expects that.
+    emit newModelAdded(mPackage->getModels().count() - 1);
   } catch (const Exception& e) {
     QMessageBox::critical(nullptr, tr("Error"), e.getMsg());
   }
