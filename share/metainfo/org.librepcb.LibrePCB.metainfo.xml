@@ -8,15 +8,14 @@
   <developer_name>The LibrePCB Developers</developer_name>
 
   <description>
-    <p>LibrePCB is a free EDA software to develop printed circuit boards.</p>
+    <p>LibrePCB is a free electronic design automation (EDA) software for developing printed circuit boards (PCBs).</p>
     <p>Key Features:</p>
     <ul>
-      <li>Cross-platform (Unix/Linux, Mac OS X, Windows)</li>
-      <li>All-in-one (project management, library/schematic/board editors)</li>
+      <li>Cross-platform (Unix/Linux, macOS, Windows)</li>
+      <li>All-in-one package (project management, library/schematic/board editors)</li>
       <li>Intuitive, modern and easy-to-use graphical user interface</li>
       <li>Very powerful library design with some innovative concepts</li>
       <li>Human-readable file formats</li>
-      <li>Open Source (GNU GPLv3)</li>
     </ul>
   </description>
 
@@ -46,9 +45,23 @@
     </screenshot>
   </screenshots>
 
+  <keywords>
+    <keyword translate="no">EDA</keyword>
+    <keyword translate="no">PCB</keyword>
+    <keyword translate="no">PCBs</keyword>
+    <keyword>electronics</keyword>
+    <keyword>schematics</keyword>
+  </keywords>
+
   <url type="homepage">https://librepcb.org</url>
   <url type="bugtracker">https://github.com/LibrePCB/LibrePCB/issues</url>
+  <url type="faq">https://librepcb.org/faq/</url>
   <url type="help">https://librepcb.org/docs/</url>
+  <url type="donation">https://librepcb.org/donate/</url>
+  <url type="translate">https://explore.transifex.com/librepcb/librepcb-application/</url>
+  <url type="contact">https://librepcb.org/contact/</url>
+  <url type="vcs-browser">https://github.com/LibrePCB/LibrePCB</url>
+  <url type="contribute">https://librepcb.org/contribute/</url>
 
   <provides>
     <binary>librepcb</binary>
