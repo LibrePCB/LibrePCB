@@ -52,6 +52,12 @@ class CliExecutor(object):
         else:
             shutil.copytree(src, dst)
 
+    def add_file(self, relpath):
+        src = os.path.join(DATA_DIR, relpath)
+        dst = os.path.join(self.tmpdir, os.path.basename(relpath))
+        shutil.copyfile(src, dst)
+        return dst
+
     def run(self, *args):
         p = subprocess.Popen([self.executable] + list(args), cwd=self.tmpdir,
                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
