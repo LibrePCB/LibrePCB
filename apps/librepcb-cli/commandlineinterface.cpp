@@ -345,6 +345,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
   // --verbose
   if (parser.isSet(verboseOption)) {
     Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::All);
+    OccModel::setVerboseOutput(true);
   }
 
   // --help (also shown if no arguments supplied)
