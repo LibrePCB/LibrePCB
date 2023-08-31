@@ -364,6 +364,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     print(tr("Git Revision %1").arg(Application::getGitRevision()));
     print(tr("Qt Version %1 (compiled against %2)")
               .arg(qVersion(), QT_VERSION_STR));
+    print("OpenCascade " % OccModel::getOccVersionString());
     print(tr("Built at %1")
               .arg(Application::getBuildDate().toString(Qt::LocalDate)));
     return 0;
