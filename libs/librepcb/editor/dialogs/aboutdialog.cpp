@@ -25,6 +25,7 @@
 #include "../workspace/desktopservices.h"
 #include "ui_aboutdialog.h"
 
+#include <librepcb/core/3d/occmodel.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/systeminfo.h>
 
@@ -186,6 +187,7 @@ AboutDialog::AboutDialog(const WorkspaceSettings& settings,
   details << "Operating System: " + QSysInfo::prettyProductName();
   details << "Platform Plugin:  " + qApp->platformName();
   details << "TLS Library:      " + QSslSocket::sslLibraryVersionString();
+  details << "OCC Library:      " + OccModel::getOccVersionString();
   if (!SystemInfo::detectRuntime().isEmpty()) {
     details << "Runtime:          " + SystemInfo::detectRuntime();
   }

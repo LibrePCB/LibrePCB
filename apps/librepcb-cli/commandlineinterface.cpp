@@ -355,16 +355,18 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
 
   // --version
   if (parser.isSet(versionOption)) {
-    print(tr("LibrePCB CLI Version %1").arg(Application::getVersion()));
-    print(
-        tr("File Format %1").arg(Application::getFileFormatVersion().toStr()) %
-        " " %
-        (Application::isFileFormatStable() ? tr("(stable)")
-                                           : tr("(unstable)")));
-    print(tr("Git Revision %1").arg(Application::getGitRevision()));
-    print(tr("Qt Version %1 (compiled against %2)")
+    // Note: Do not translate this output as it probably looks ugly and this
+    // way it is deterministic even if LANG/LC_ALL is not explicitly set.
+    print(QString("LibrePCB CLI Version %1").arg(Application::getVersion()));
+    print(QString("File Format %1")
+              .arg(Application::getFileFormatVersion().toStr()) %
+          " " %
+          (Application::isFileFormatStable() ? "(stable)" : "(unstable)"));
+    print(QString("Git Revision %1").arg(Application::getGitRevision()));
+    print(QString("Qt Version %1 (compiled against %2)")
               .arg(qVersion(), QT_VERSION_STR));
-    print(tr("Built at %1")
+    print("OpenCascade " % OccModel::getOccVersionString());
+    print(QString("Built at %1")
               .arg(Application::getBuildDate().toString(Qt::LocalDate)));
     return 0;
   }
