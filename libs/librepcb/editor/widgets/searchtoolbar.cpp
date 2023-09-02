@@ -53,6 +53,7 @@ SearchToolBar::SearchToolBar(QWidget* parent) noexcept
   addWidget(mLineEdit.data());
   setFocusPolicy(mLineEdit->focusPolicy());
   setFocusProxy(mLineEdit.data());
+  setWindowTitle(tr("Search"));
 }
 
 SearchToolBar::~SearchToolBar() noexcept {
