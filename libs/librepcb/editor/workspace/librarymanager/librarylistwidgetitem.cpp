@@ -55,7 +55,8 @@ LibraryListWidgetItem::LibraryListWidgetItem(Workspace& ws,
       mUi->lblIcon->setPixmap(icon);
     }
     mUi->lblLibraryName->setText(name);
-    mUi->lblLibraryDescription->setText(description);
+    // Only show the first line to avoid breaking the UI layout.
+    mUi->lblLibraryDescription->setText(description.split("\n").first());
     QString path = libDir.toRelative(ws.getLibrariesPath());
     path.replace("local/", "<font color=\"blue\">local</font>/");
     path.replace("remote/", "<font color=\"red\">remote</font>/");

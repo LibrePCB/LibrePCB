@@ -79,7 +79,8 @@ OnlineLibraryListWidgetItem::OnlineLibraryListWidgetItem(
 
   mUi->lblName->setText(
       QString("%1 v%2").arg(mName, mVersion ? mVersion->toStr() : QString()));
-  mUi->lblDescription->setText(desc);
+  // Only show the first line to avoid breaking the UI layout.
+  mUi->lblDescription->setText(desc.split("\n").first());
   mUi->lblAuthor->setText(QString("Author: %1").arg(author));
 
   NetworkRequest* request = new NetworkRequest(iconUrl);
