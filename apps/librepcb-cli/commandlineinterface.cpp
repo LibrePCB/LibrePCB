@@ -84,10 +84,14 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
   QMap<QString, QPair<QString, QString>> commands = {
       {"open-project",
        {tr("Open a project to execute project-related tasks."),
-        tr("open-project [command_options]")}},
+        "open-project [command_options]"}},  // no tr()!
       {"open-library",
        {tr("Open a library to execute library-related tasks."),
-        tr("open-library [command_options]")}},
+        "open-library [command_options]"}},  // no tr()!
+      {"open-step",
+       {tr("Open a STEP model to execute STEP-related tasks outside of a "
+           "library."),
+        "open-step [command_options]"}},  // no tr()!
   };
 
   // Add global options
@@ -259,6 +263,24 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
       tr("Fail if the opened files are not strictly canonical, i.e. "
          "there would be changes when saving the library elements."));
 
+  // Define options for "open-step"
+  QCommandLineOption stepMinifyOption(
+      "minify",
+      tr("Minify the STEP model before validating it. Use in conjunction with "
+         "'%1' to save the output of the operation.")
+          .arg("--save-to"));
+  QCommandLineOption stepTesselateOption(
+      "tesselate",
+      tr("Tesselate the loaded STEP model to check if LibrePCB is able to "
+         "render it. Reports failure (exit code = 1) if no content is "
+         "detected."));
+  QCommandLineOption stepSaveToOption(
+      "save-to",
+      tr("Write the (modified) STEP file to this output location (may be equal "
+         "to the opened file path). Only makes sense in conjunction with '%1'.")
+          .arg("--minify"),
+      tr("file"));
+
   // Build help text.
   const QString executable = args.value(0);
   QString helpText = parser.helpText() % "\n" % tr("Commands:") % "\n";
@@ -319,6 +341,15 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
     parser.addOption(libMinifyStepOption);
     parser.addOption(libSaveOption);
     parser.addOption(libStrictOption);
+  } else if (command == "open-step") {
+    parser.addPositionalArgument(command, commands[command].first,
+                                 commands[command].second);
+    parser.addPositionalArgument(
+        "file", tr("Path to the STEP file (%1).").arg("*.step"));
+    positionalArgNames.append("file");
+    parser.addOption(stepMinifyOption);
+    parser.addOption(stepTesselateOption);
+    parser.addOption(stepSaveToOption);
   } else if (!command.isEmpty()) {
     printErr(tr("Unknown command '%1'.").arg(command));
     printErr(usageHelpText);
@@ -345,6 +376,7 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
   // --verbose
   if (parser.isSet(verboseOption)) {
     Debug::instance()->setDebugLevelStderr(Debug::DebugLevel_t::All);
+    OccModel::setVerboseOutput(true);
   }
 
   // --help (also shown if no arguments supplied)
@@ -424,6 +456,12 @@ int CommandLineInterface::execute(const QStringList& args) noexcept {
                              parser.isSet(libMinifyStepOption),  // minify STEP
                              parser.isSet(libSaveOption),  // save
                              parser.isSet(libStrictOption)  // strict mode
+    );
+  } else if (command == "open-step") {
+    cmdSuccess = openStep(positionalArgs.value(1),  // STEP file path
+                          parser.isSet(stepMinifyOption),  // minify
+                          parser.isSet(stepTesselateOption),  // tesselate
+                          parser.value(stepSaveToOption)  // save to
     );
   } else {
     printErr("Internal failure.");  // No tr() because this cannot occur.
@@ -1248,6 +1286,80 @@ void CommandLineInterface::processLibraryElement(
   // Do not propagate changes in the transactional file system to the
   // following checks
   fs.discardChanges();
+}
+
+bool CommandLineInterface::openStep(const QString& filePath, bool minify,
+                                    bool tesselate, const QString& saveTo) const
+    noexcept {
+  try {
+    // Note: Not using tr() for this command as it is basically intended for
+    // developers, not end users.
+
+    bool success = true;
+
+    // Open file.
+    const FilePath stepFp(QFileInfo(filePath).absoluteFilePath());
+    print(QString("Open STEP file '%1'...").arg(prettyPath(stepFp, filePath)));
+    QByteArray stepContent = FileUtils::readFile(stepFp);  // can throw
+
+    // Minify before validation.
+    if (minify) {
+      print("Perform minify...");
+      const QByteArray minified =
+          OccModel::minifyStep(stepContent);  // can throw
+      if (minified != stepContent) {
+        const qreal percent = 100 * (minified.size() - stepContent.size()) /
+            qreal(stepContent.size());
+        QLocale locale = QLocale::c();
+        locale.setNumberOptions(QLocale::DefaultNumberOptions);
+        print(QString(" - Minified from %1 bytes to %2 bytes (%3%)")
+                  .arg(locale.toString(stepContent.size()))
+                  .arg(locale.toString(minified.size()))
+                  .arg(percent, 0, 'f', 0));
+        if (minified.size() > stepContent.size()) {
+          printErr(" - ERROR: The output is larger than the input!");
+          success = false;
+        }
+        stepContent = minified;
+      } else {
+        print(" - File is already minified");
+      }
+    }
+
+    // Write to output *before* validating it, otherwise it won't be possible
+    // to inspect the invalid result of the minify operation.
+    if (!saveTo.isEmpty()) {
+      const FilePath outFp(QFileInfo(saveTo).absoluteFilePath());
+      print(QString("Save to '%1'...").arg(prettyPath(outFp, saveTo)));
+      FileUtils::writeFile(outFp, stepContent);  // can throw
+    }
+
+    // Validate.
+    print("Load model...");
+    std::unique_ptr<OccModel> model =
+        OccModel::loadStep(stepContent);  // throws if STEP is invalid
+
+    // Tesselate.
+    if (tesselate) {
+      print("Tesselate model...");
+      const QMap<OccModel::Color, QVector<QVector3D>> vertices =
+          model->tesselate();  // can throw
+      int vertexCount = 0;
+      foreach (const auto& v, vertices) { vertexCount += v.count(); }
+      print(QString(" - Built %1 vertices with %2 different colors")
+                .arg(vertexCount)
+                .arg(vertices.count()));
+      if (vertexCount == 0) {
+        printErr(" - ERROR: No content found in model!");
+        success = false;
+      }
+    }
+
+    return success;
+  } catch (const Exception& e) {
+    printErr(tr("ERROR: %1").arg(e.getMsg()));
+    return false;
+  }
 }
 
 QStringList CommandLineInterface::prepareRuleCheckMessages(

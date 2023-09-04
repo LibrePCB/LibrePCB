@@ -72,6 +72,7 @@ public:
   // Static Methods
   static bool isAvailable() noexcept;
   static QString getOccVersionString() noexcept;
+  static void setVerboseOutput(bool verbose) noexcept;
   static std::unique_ptr<OccModel> createAssembly(const QString& name);
   static std::unique_ptr<OccModel> createBoard(const Path& outline,
                                                const QVector<Path>& holes,
@@ -90,6 +91,8 @@ private:  // Methods
   static void throwNotAvailable();
 
 private:  // Data
+  static bool sOutputVerbosityConfigured;
+
   std::unique_ptr<Data> mImpl;
 };
 

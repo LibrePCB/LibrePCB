@@ -75,6 +75,8 @@
  ******************************************************************************/
 namespace librepcb {
 
+bool OccModel::sOutputVerbosityConfigured = false;
+
 /*******************************************************************************
  *  Data
  ******************************************************************************/
@@ -403,6 +405,19 @@ QString OccModel::getOccVersionString() noexcept {
   return s;
 }
 
+void OccModel::setVerboseOutput(bool verbose) noexcept {
+#if USE_OPENCASCADE
+  const Message_SequenceOfPrinters& printers =
+      Message::DefaultMessenger()->Printers();
+  for (int i = 1; i <= printers.Length(); ++i) {
+    printers.Value(i)->SetTraceLevel(verbose ? Message_Trace : Message_Alarm);
+  }
+#else
+  Q_UNUSED(verbose);
+#endif
+  sOutputVerbosityConfigured = true;
+}
+
 std::unique_ptr<OccModel> OccModel::createAssembly(const QString& name) {
   std::unique_ptr<OccModel> result;
 #if USE_OPENCASCADE
@@ -683,10 +698,8 @@ void OccModel::initOpenCascade() {
 #if USE_OPENCASCADE
   auto initOnce = []() {
     // Make console output less verbose.
-    const Message_SequenceOfPrinters& printers =
-        Message::DefaultMessenger()->Printers();
-    for (int i = 1; i <= printers.Length(); ++i) {
-      printers.Value(i)->SetTraceLevel(Message_Alarm);
+    if (!sOutputVerbosityConfigured) {
+      setVerboseOutput(false);
     }
 
     // Apply global settings.

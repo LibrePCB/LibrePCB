@@ -24,6 +24,7 @@ Arguments:
 Commands:
   open-library   Open a library to execute library-related tasks.
   open-project   Open a project to execute project-related tasks.
+  open-step      Open a STEP model to execute STEP-related tasks outside of a library.
 
 List command-specific options:
   {executable} <command> --help

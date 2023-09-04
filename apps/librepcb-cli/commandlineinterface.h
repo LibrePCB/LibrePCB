@@ -78,6 +78,8 @@ private:  // Methods
                              LibraryBaseElement& element, bool runCheck,
                              bool minifyStepFiles, bool save, bool strict,
                              bool& success) const;
+  bool openStep(const QString& filePath, bool minify, bool tesselate,
+                const QString& saveTo) const noexcept;
   static QStringList prepareRuleCheckMessages(
       RuleCheckMessageList messages, const QSet<SExpression>& approvals,
       int& approvedMsgCount) noexcept;
