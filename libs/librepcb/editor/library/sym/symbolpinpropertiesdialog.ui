@@ -189,12 +189,15 @@
  </customwidgets>
  <tabstops>
   <tabstop>edtName</tabstop>
+  <tabstop>edtLength</tabstop>
+  <tabstop>cbxAutoMoveText</tabstop>
   <tabstop>edtPosX</tabstop>
   <tabstop>edtPosY</tabstop>
   <tabstop>edtRotation</tabstop>
   <tabstop>edtNamePosX</tabstop>
   <tabstop>edtNamePosY</tabstop>
   <tabstop>edtNameRotation</tabstop>
+  <tabstop>edtNameHeight</tabstop>
   <tabstop>edtNameAlignment</tabstop>
  </tabstops>
  <resources/>

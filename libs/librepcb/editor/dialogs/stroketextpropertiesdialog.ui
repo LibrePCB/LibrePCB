@@ -244,6 +244,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>edtText</tabstop>
+  <tabstop>cbxLayer</tabstop>
   <tabstop>alignmentSelector</tabstop>
   <tabstop>edtHeight</tabstop>
   <tabstop>edtStrokeWidth</tabstop>
@@ -253,6 +254,8 @@
   <tabstop>cbxLineSpacingAuto</tabstop>
   <tabstop>edtPosX</tabstop>
   <tabstop>edtPosY</tabstop>
+  <tabstop>edtRotation</tabstop>
+  <tabstop>cbxAutoRotate</tabstop>
   <tabstop>cbxMirrored</tabstop>
   <tabstop>cbxLock</tabstop>
  </tabstops>
