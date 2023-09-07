@@ -26,6 +26,8 @@
 #include "../../modelview/sortfilterproxymodel.h"
 #include "../../widgets/editabletablewidget.h"
 
+#include <librepcb/core/library/pkg/package.h>
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -97,6 +99,7 @@ void PackageModelListEditorWidget::setReadOnly(bool readOnly) noexcept {
 
 void PackageModelListEditorWidget::setReferences(Package* package,
                                                  UndoStack* stack) noexcept {
+  mCurrentPackage = package;
   mModel->setPackage(package);
   mModel->setUndoStack(stack);
 }
@@ -106,6 +109,27 @@ void PackageModelListEditorWidget::setCurrentFootprint(
   mModel->setFootprint(footprint);
   mView->horizontalHeader()->setSectionHidden(
       PackageModelListModel::COLUMN_ENABLED, !footprint);
+
+  // Switch selected model if none is selected or it is not compatible with the
+  // footprint.
+  if (mCurrentPackage) {
+    const auto currentModel =
+        mCurrentPackage->getModels().value(mView->currentIndex().row());
+    const QSet<Uuid> compatibleModels =
+        footprint ? footprint->getModels() : QSet<Uuid>();
+    if ((!currentModel) ||
+        (currentModel &&
+         (!compatibleModels.contains(currentModel->getUuid())))) {
+      for (int i = 0; i < mCurrentPackage->getModels().count(); ++i) {
+        if (compatibleModels.contains(
+                mCurrentPackage->getModels().at(i)->getUuid())) {
+          mView->selectRow(i);
+          return;
+        }
+      }
+      mView->selectRow(-1);
+    }
+  }
 }
 
 /*******************************************************************************

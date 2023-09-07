@@ -76,6 +76,7 @@ signals:
   void currentIndexChanged(int index);
 
 private:
+  QPointer<Package> mCurrentPackage;
   QScopedPointer<PackageModelListModel> mModel;
   QScopedPointer<SortFilterProxyModel> mProxy;
   QScopedPointer<EditableTableWidget> mView;

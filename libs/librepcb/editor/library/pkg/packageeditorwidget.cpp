@@ -229,7 +229,6 @@ PackageEditorWidget::PackageEditorWidget(const Context& context,
   connect(mFsm.data(), &PackageEditorFsm::statusBarMessageChanged, this,
           &PackageEditorWidget::setStatusBarMessage);
   currentFootprintChanged(0);  // small hack to select the first footprint...
-  currentModelChanged(0);  // one more time
 
   // Last but not least, connect the graphics scene events with the FSM.
   mUi->graphicsView->setEventHandlerObject(this);
