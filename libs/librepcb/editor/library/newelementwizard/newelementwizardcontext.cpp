@@ -286,6 +286,11 @@ void NewElementWizardContext::copyElement(ElementType type,
               text.getLineSpacing(), text.getAlign(), text.getMirrored(),
               text.getAutoRotate()));
         }
+        // copy zones but generate new UUIDs
+        for (const Zone& zone : footprint.getZones()) {
+          newFootprint->getZones().append(
+              std::make_shared<Zone>(Uuid::createRandom(), zone));
+        }
         // copy holes but generate new UUIDs
         for (const Hole& hole : footprint.getHoles()) {
           newFootprint->getHoles().append(
