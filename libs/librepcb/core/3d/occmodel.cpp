@@ -96,22 +96,24 @@ struct OccModel::Data {
 
 #if USE_OPENCASCADE
 
-static OccModel::Color getColor(Handle(TDocStd_Document) document,
-                                const TopoDS_Shape& shape) {
-  Quantity_Color color(0.5, 0.5, 0.5, Quantity_TOC_RGB);
-  TDF_Label label;
-  Handle(XCAFDoc_ColorTool) colorTool =
-      XCAFDoc_DocumentTool::ColorTool(document->Main());
-  if (colorTool->ShapeTool()->Search(shape, label)) {
-    colorTool->GetColor(shape, XCAFDoc_ColorGen, color) ||
-        colorTool->GetColor(shape, XCAFDoc_ColorCurv, color) ||
-        colorTool->GetColor(shape, XCAFDoc_ColorSurf, color);
-  }
-  return std::make_tuple(color.Red(), color.Green(), color.Blue());
+static bool tryGetColor(Handle(XCAFDoc_ColorTool) colorTool,
+                        const TopoDS_Shape& shape, Quantity_Color& color) {
+  return colorTool->GetColor(shape, XCAFDoc_ColorSurf, color) ||
+      colorTool->GetColor(shape, XCAFDoc_ColorGen, color) ||
+      colorTool->GetColor(shape, XCAFDoc_ColorCurv, color);
 }
 
-static bool tesselateFace(const TopoDS_Face& face,
-                          QVector<QVector3D>& triangles) {
+static bool tryGetColor(Handle(XCAFDoc_ColorTool) colorTool,
+                        const TDF_Label& label, Quantity_Color& color) {
+  return colorTool->GetColor(label, XCAFDoc_ColorSurf, color) ||
+      colorTool->GetColor(label, XCAFDoc_ColorGen, color) ||
+      colorTool->GetColor(label, XCAFDoc_ColorCurv, color);
+}
+
+static bool tesselateFace(Handle(XCAFDoc_ColorTool) colorTool,
+                          const TopoDS_Face& face, const gp_Trsf& transform,
+                          Quantity_Color color,
+                          QMap<OccModel::Color, QVector<QVector3D>>& result) {
   if (face.IsNull()) return false;
 
   const Standard_Real deflectionAngle = 20. * 3.141 / 180.;
@@ -127,23 +129,127 @@ static bool tesselateFace(const TopoDS_Face& face,
   }
   if (triangulation.IsNull()) return false;
 
+  tryGetColor(colorTool, face, color);
+  const OccModel::Color colorTuple =
+      std::make_tuple(color.Red(), color.Green(), color.Blue());
+  QVector<QVector3D>& triangles = result[colorTuple];
+
   Standard_Integer n1, n2, n3;
   for (Standard_Integer i = 1; i < (triangulation->NbTriangles() + 1); ++i) {
     triangulation->Triangles().Value(i).Get(n1, n2, n3);
 #if OCC_VERSION_HEX >= 0x070600
-    const gp_Pnt p1 = triangulation->Node(n1);
-    const gp_Pnt p2 = triangulation->Node(n2);
-    const gp_Pnt p3 = triangulation->Node(n3);
+    gp_XYZ p1 = triangulation->Node(n1).XYZ();
+    gp_XYZ p2 = triangulation->Node(n2).XYZ();
+    gp_XYZ p3 = triangulation->Node(n3).XYZ();
 #else
-    const gp_Pnt p1 = triangulation->Nodes().Value(n1);
-    const gp_Pnt p2 = triangulation->Nodes().Value(n2);
-    const gp_Pnt p3 = triangulation->Nodes().Value(n3);
+    gp_XYZ p1 = triangulation->Nodes().Value(n1).XYZ();
+    gp_XYZ p2 = triangulation->Nodes().Value(n2).XYZ();
+    gp_XYZ p3 = triangulation->Nodes().Value(n3).XYZ();
 #endif
+    transform.Transforms(p1);
+    transform.Transforms(p2);
+    transform.Transforms(p3);
     triangles.append(QVector3D(p1.X(), p1.Y(), p1.Z()));
     triangles.append(QVector3D(p2.X(), p2.Y(), p2.Z()));
     triangles.append(QVector3D(p3.X(), p3.Y(), p3.Z()));
   }
   return true;
+}
+
+static void tesselateShell(Handle(XCAFDoc_ColorTool) colorTool,
+                           const TopoDS_Shape& shell, const gp_Trsf& transform,
+                           Quantity_Color color,
+                           QMap<OccModel::Color, QVector<QVector3D>>& result) {
+  tryGetColor(colorTool, shell, color);
+
+  TopoDS_Iterator it;
+  for (it.Initialize(shell); it.More(); it.Next()) {
+    const TopoDS_Face& face = TopoDS::Face(it.Value());
+    tesselateFace(colorTool, face, transform, color, result);
+  }
+}
+
+static void tesselateSolid(Handle(XCAFDoc_ColorTool) colorTool,
+                           const TopoDS_Shape& solid, const gp_Trsf& transform,
+                           Quantity_Color color,
+                           QMap<OccModel::Color, QVector<QVector3D>>& result) {
+  tryGetColor(colorTool, solid, color);
+
+  TopoDS_Iterator it;
+  for (it.Initialize(solid); it.More(); it.Next()) {
+    const TopoDS_Shape& subShape = it.Value();
+    if (subShape.ShapeType() == TopAbs_SHELL) {
+      tesselateShell(colorTool, TopoDS::Shell(subShape), transform, color,
+                     result);
+    }
+  }
+}
+
+static void tesselateLabel(Handle(XCAFDoc_ShapeTool) shapeTool,
+                           Handle(XCAFDoc_ColorTool) colorTool,
+                           gp_Trsf transform, Quantity_Color color,
+                           TDF_Label label,
+                           QMap<OccModel::Color, QVector<QVector3D>>& result) {
+  if (!colorTool->IsVisible(label)) {
+    return;
+  }
+
+  TopoDS_Shape shape;
+  if (!shapeTool->GetShape(label, shape)) {
+    return;
+  }
+  if (!shape.Location().IsIdentity()) {
+    transform *= shape.Location().Transformation();
+  }
+
+  if (shapeTool->GetReferredShape(label, label)) {
+    if (!shapeTool->GetShape(label, shape)) {
+      return;
+    }
+  }
+
+  switch (shape.ShapeType()) {
+    case TopAbs_COMPOUND: {
+      if (!shapeTool->IsAssembly(label)) {
+        TopExp_Explorer ex;
+        tryGetColor(colorTool, shape, color);
+        for (ex.Init(shape, TopAbs_SOLID); ex.More(); ex.Next()) {
+          tesselateSolid(colorTool, ex.Current(), transform, color, result);
+        }
+        for (ex.Init(shape, TopAbs_SHELL, TopAbs_SOLID); ex.More(); ex.Next()) {
+          tesselateShell(colorTool, ex.Current(), transform, color, result);
+        }
+        for (ex.Init(shape, TopAbs_FACE, TopAbs_SHELL); ex.More(); ex.Next()) {
+          const TopoDS_Face& face = TopoDS::Face(ex.Current());
+          tesselateFace(colorTool, face, transform, color, result);
+        }
+      }
+      break;
+    }
+    case TopAbs_SOLID: {
+      tesselateSolid(colorTool, shape, transform, color, result);
+      break;
+    }
+    case TopAbs_SHELL: {
+      tesselateShell(colorTool, shape, transform, color, result);
+      break;
+    }
+    case TopAbs_FACE: {
+      tesselateFace(colorTool, TopoDS::Face(shape), transform, color, result);
+      break;
+    }
+    default:
+      break;
+  }
+
+  if ((!shapeTool->IsSimpleShape(label)) && label.HasChild()) {
+    tryGetColor(colorTool, shape, color);
+    TDF_ChildIterator it;
+    for (it.Initialize(label); it.More(); it.Next()) {
+      tesselateLabel(shapeTool, colorTool, transform, color, it.Value(),
+                     result);
+    }
+  }
 }
 
 static TopoDS_Face pathToFace(const Path& path, const Length& z) {
@@ -216,7 +322,7 @@ void OccModel::addToAssembly(const OccModel& model, const Point3D& pos,
     for (int i = 1; i <= modelShapes.Length(); ++i) {
       TopoDS_Shape shape = modelShapeTool->GetShape(modelShapes.Value(i));
       if (shape.IsNull()) continue;
-      TDF_Label shapeLabel = assemblyShapeTool->AddShape(shape, false);
+      TDF_Label shapeLabel = assemblyShapeTool->AddShape(shape, Standard_False);
       const QString shapeName = QString("%1:%2").arg(cleanString(name)).arg(i);
       TDataStd_Name::Set(shapeLabel, shapeName.toStdString().c_str());
       TDF_Label cmpLabel = assemblyShapeTool->AddComponent(newLabel, shapeLabel,
@@ -229,18 +335,12 @@ void OccModel::addToAssembly(const OccModel& model, const Point3D& pos,
         Quantity_Color color;
         TDF_Label label;
         if (modelShapeTool->FindShape(modelExplorer.Current(), label)) {
-          if (assemblyColorTool->GetColor(label, XCAFDoc_ColorSurf, color) ||
-              assemblyColorTool->GetColor(label, XCAFDoc_ColorGen, color) ||
-              assemblyColorTool->GetColor(label, XCAFDoc_ColorCurv, color)) {
+          if (tryGetColor(assemblyColorTool, label, color)) {
             modelColorTool->SetColor(assemblyExplorer.Current(), color,
                                      XCAFDoc_ColorSurf);
           }
-        } else if (assemblyColorTool->GetColor(modelExplorer.Current(),
-                                               XCAFDoc_ColorSurf, color) ||
-                   assemblyColorTool->GetColor(modelExplorer.Current(),
-                                               XCAFDoc_ColorGen, color) ||
-                   assemblyColorTool->GetColor(modelExplorer.Current(),
-                                               XCAFDoc_ColorCurv, color)) {
+        } else if (tryGetColor(assemblyColorTool, modelExplorer.Current(),
+                               color)) {
           modelColorTool->SetColor(assemblyExplorer.Current(), color,
                                    XCAFDoc_ColorSurf);
         }
@@ -249,25 +349,19 @@ void OccModel::addToAssembly(const OccModel& model, const Point3D& pos,
       }
 
       // Copy solid colors.
-      modelExplorer.Init(shape, TopAbs_SOLID);
+      modelExplorer.Init(shape, TopAbs_SOLID, TopAbs_FACE);
       assemblyExplorer.Init(assemblyShapeTool->GetShape(cmpLabel), TopAbs_SOLID,
                             TopAbs_FACE);
       while (modelExplorer.More() && assemblyExplorer.More()) {
         Quantity_Color color;
         TDF_Label label;
         if (modelShapeTool->FindShape(modelExplorer.Current(), label)) {
-          if (assemblyColorTool->GetColor(label, XCAFDoc_ColorSurf, color) ||
-              assemblyColorTool->GetColor(label, XCAFDoc_ColorGen, color) ||
-              assemblyColorTool->GetColor(label, XCAFDoc_ColorCurv, color)) {
+          if (tryGetColor(assemblyColorTool, label, color)) {
             modelColorTool->SetColor(assemblyExplorer.Current(), color,
-                                     XCAFDoc_ColorGen);
+                                     XCAFDoc_ColorSurf);
           }
-        } else if (assemblyColorTool->GetColor(modelExplorer.Current(),
-                                               XCAFDoc_ColorSurf, color) ||
-                   assemblyColorTool->GetColor(modelExplorer.Current(),
-                                               XCAFDoc_ColorGen, color) ||
-                   assemblyColorTool->GetColor(modelExplorer.Current(),
-                                               XCAFDoc_ColorCurv, color)) {
+        } else if (tryGetColor(assemblyColorTool, modelExplorer.Current(),
+                               color)) {
           modelColorTool->SetColor(assemblyExplorer.Current(), color,
                                    XCAFDoc_ColorSurf);
         }
@@ -358,25 +452,14 @@ QMap<OccModel::Color, QVector<QVector3D>> OccModel::tesselate() const {
   try {
     Handle(XCAFDoc_ShapeTool) shapeTool =
         XCAFDoc_DocumentTool::ShapeTool(mImpl->doc->Main());
+    Handle(XCAFDoc_ColorTool) colorTool =
+        XCAFDoc_DocumentTool::ColorTool(mImpl->doc->Main());
     TDF_LabelSequence labels;
     shapeTool->GetFreeShapes(labels);
     for (Standard_Integer i = 1; i <= labels.Length(); ++i) {
-      const TDF_Label& label = labels.Value(i);
-      if ((!label.IsNull()) && label.HasChild()) {
-        TDF_ChildIterator it;
-        for (it.Initialize(label); it.More(); it.Next()) {
-          TopExp_Explorer explorer(shapeTool->GetShape(it.Value()),
-                                   TopAbs_FACE);
-          for (; explorer.More(); explorer.Next()) {
-            const TopoDS_Shape& face = explorer.Current();
-            if (face.ShapeType() == TopAbs_FACE) {
-              const OccModel::Color color =
-                  getColor(mImpl->doc, shapeTool->GetShape(it.Value()));
-              tesselateFace(TopoDS::Face(face), result[color]);
-            }
-          }
-        }
-      }
+      tesselateLabel(shapeTool, colorTool, gp_Trsf(),
+                     Quantity_Color(0.5, 0.5, 0.5, Quantity_TOC_RGB),
+                     labels.Value(i), result);
     }
   } catch (const Standard_Failure& e) {
     qCritical() << "OpenCascade error:" << e.GetMessageString();
