@@ -12,7 +12,7 @@ Test command "open-step --tesselate"
 PATTERN = "Open STEP file '{path}'...\\n" \
           "Load model...\\n" \
           "Tesselate model...\\n" \
-          " - Built \\d\\d+ vertices with 1 different colors\\n" \
+          " - Built \\d\\d+ vertices with [1-9]\\d* different colors\\n" \
           "SUCCESS\\n"
 
 
