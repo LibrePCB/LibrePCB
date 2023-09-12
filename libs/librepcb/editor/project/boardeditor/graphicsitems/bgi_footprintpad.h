@@ -67,6 +67,7 @@ public:
   const std::weak_ptr<BGI_Device>& getDeviceGraphicsItem() noexcept {
     return mDeviceGraphicsItem;
   }
+  void updateHighlightedNetSignals() noexcept;
 
   // Inherited from QGraphicsItem
   QPainterPath shape() const noexcept override;
@@ -82,6 +83,7 @@ private:  // Methods
   virtual QVariant itemChange(GraphicsItemChange change,
                               const QVariant& value) noexcept override;
   void updateLayer() noexcept;
+  void updateHightlighted(bool selected) noexcept;
 
 private:  // Data
   BI_FootprintPad& mPad;
