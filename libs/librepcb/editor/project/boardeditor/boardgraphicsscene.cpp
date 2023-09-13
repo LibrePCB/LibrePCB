@@ -220,7 +220,7 @@ void BoardGraphicsScene::clearSelection() noexcept {
 }
 
 void BoardGraphicsScene::updateHighlightedNetSignals() noexcept {
-  foreach (auto item, mFootprintPads) { item->update(); }
+  foreach (auto item, mFootprintPads) { item->updateHighlightedNetSignals(); }
   foreach (auto item, mVias) { item->update(); }
   foreach (auto item, mNetLines) { item->update(); }
   foreach (auto item, mPlanes) { item->update(); }

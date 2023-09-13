@@ -76,6 +76,14 @@ BGI_FootprintPad::~BGI_FootprintPad() noexcept {
 }
 
 /*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+void BGI_FootprintPad::updateHighlightedNetSignals() noexcept {
+  updateHightlighted(isSelected());
+}
+
+/*******************************************************************************
  *  Inherited from QGraphicsItem
  ******************************************************************************/
 
@@ -87,7 +95,7 @@ QPainterPath BGI_FootprintPad::shape() const noexcept {
 QVariant BGI_FootprintPad::itemChange(GraphicsItemChange change,
                                       const QVariant& value) noexcept {
   if ((change == ItemSelectedHasChanged) && mGraphicsItem) {
-    mGraphicsItem->setSelected(value.toBool());
+    updateHightlighted(value.toBool());
   }
   return QGraphicsItem::itemChange(change, value);
 }
@@ -142,6 +150,12 @@ void BGI_FootprintPad::updateLayer() noexcept {
     setZValue(BoardGraphicsScene::ZValue_FootprintPadsBottom);
     mGraphicsItem->setLayer(Theme::Color::sBoardCopperBot);
   }
+}
+
+void BGI_FootprintPad::updateHightlighted(bool selected) noexcept {
+  mGraphicsItem->setSelected(
+      selected ||
+      mHighlightedNetSignals->contains(mPad.getCompSigInstNetSignal()));
 }
 
 /*******************************************************************************
