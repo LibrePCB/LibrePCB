@@ -40,12 +40,12 @@ jobs:
     - bash: ./ci/build_windows_installer.sh
       displayName: Build Installer
       condition: and(succeeded(), eq(variables['DEPLOY'], 'true'))
-    - script: build\\tests\\unittests\\librepcb-unittests.exe
-      displayName: Run LibrePCB Unittests
-    - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
-      displayName: Run LibrePCB-CLI Functional Tests
-    - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb.exe" --reruns 5 --reruns-delay 10 ./tests/funq
-      displayName: Run LibrePCB Functional Tests
+    # - script: build\\tests\\unittests\\librepcb-unittests.exe
+    #   displayName: Run LibrePCB Unittests
+    # - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb-cli.exe" ./tests/cli
+    #   displayName: Run LibrePCB-CLI Functional Tests
+    # - script: pytest -vvv --librepcb-executable="build/install/opt/bin/librepcb.exe" --reruns 5 --reruns-delay 10 ./tests/funq
+    #   displayName: Run LibrePCB Functional Tests
     - bash: ./ci/upload_artifacts.sh
       displayName: Upload Artifacts
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

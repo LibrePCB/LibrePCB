@@ -151,10 +151,6 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
       });
 
   // connect some actions which are created with the Qt Designer
-  connect(mUi->openProjectButton, &QPushButton::clicked,
-          mActionOpenProject.data(), &QAction::trigger);
-  connect(mUi->newProjectButton, &QPushButton::clicked,
-          mActionNewProject.data(), &QAction::trigger);
   connect(mUi->openLibraryManagerButton, &QPushButton::clicked,
           mActionLibraryManager.data(), &QAction::trigger);
   connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
@@ -192,10 +188,6 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
 
   loadSettings();
 
-  // slightly delay opening projects to make sure the control panel window goes
-  // to background (schematic editor should be the top most window)
-  QTimer::singleShot(10, this, &ControlPanel::openProjectsPassedByCommandLine);
-
   // To allow opening files by the MacOS Finder, install event filter.
   qApp->installEventFilter(this);
 
@@ -231,16 +223,6 @@ void ControlPanel::closeEvent(QCloseEvent* event) {
 
   // if the control panel is closed, we will quit the whole application
   QApplication::exit();
-}
-
-bool ControlPanel::eventFilter(QObject* watched, QEvent* event) {
-  if (event->type() == QEvent::FileOpen) {
-    QFileOpenEvent* openEvent = static_cast<QFileOpenEvent*>(event);
-    qDebug() << "Received request to open file:" << openEvent->file();
-    openProjectPassedByOs(openEvent->file());
-    return true;
-  }
-  return QMainWindow::eventFilter(watched, event);
 }
 
 void ControlPanel::showControlPanel() noexcept {
@@ -280,17 +262,11 @@ void ControlPanel::createActions() noexcept {
       &WorkspaceLibraryDb::startLibraryRescan));
   mActionSwitchWorkspace.reset(cmd.workspaceSwitch.createAction(
       this, this, &ControlPanel::switchWorkspace));
-  mActionNewProject.reset(
-      cmd.projectNew.createAction(this, this, [this]() { newProject(); }));
-  mActionOpenProject.reset(
-      cmd.projectOpen.createAction(this, this, [this]() { openProject(); }));
   mActionCloseAllProjects.reset(cmd.projectCloseAll.createAction(
       this, this, [this]() { closeAllProjects(true); },
       EditorCommand::ActionFlag::ApplicationShortcut));
   mActionAddExampleProjects.reset(cmd.addExampleProjects.createAction(
       this, this, &ControlPanel::addExampleProjects));
-  mActionImportEagleProject.reset(cmd.importEagleProject.createAction(
-      this, this, [this]() { newProject(true); }));
   mActionAboutLibrePcb.reset(cmd.aboutLibrePcb.createAction(
       this, mStandardCommandHandler.data(),
       &StandardEditorCommandHandler::aboutLibrePcb));
@@ -349,8 +325,6 @@ void ControlPanel::createMenus() noexcept {
 
   // File.
   mb.newMenu(&MenuBuilder::createFileMenu);
-  mb.addAction(mActionNewProject);
-  mb.addAction(mActionOpenProject);
   mb.addAction(mActionCloseAllProjects);
   mb.addSeparator();
   {
@@ -526,102 +500,6 @@ void ControlPanel::removeProjectsTreeItem(const FilePath& fp) noexcept {
  *  Project Management
  ******************************************************************************/
 
-ProjectEditor* ControlPanel::newProject(bool eagleImport,
-                                        FilePath parentDir) noexcept {
-  const NewProjectWizard::Mode mode = eagleImport
-      ? NewProjectWizard::Mode::EagleImport
-      : NewProjectWizard::Mode::NewProject;
-  NewProjectWizard wizard(mWorkspace, mode, this);
-  if (parentDir.isValid()) {
-    wizard.setLocationOverride(parentDir);
-  }
-  if (wizard.exec() == QWizard::Accepted) {
-    try {
-      std::unique_ptr<Project> project = wizard.createProject();  // can throw
-      const FilePath fp = project->getFilepath();
-      project.reset();  // Release lock.
-      return openProject(fp);
-    } catch (const Exception& e) {
-      QMessageBox::critical(this, tr("Could not create project"), e.getMsg());
-    }
-  }
-  return nullptr;
-}
-
-ProjectEditor* ControlPanel::openProject(FilePath filepath) noexcept {
-  if (!filepath.isValid()) {
-    QSettings settings;  // client settings
-    QString lastOpenedFile = settings
-                                 .value("controlpanel/last_open_project",
-                                        mWorkspace.getPath().toStr())
-                                 .toString();
-
-    filepath = FilePath(FileDialog::getOpenFileName(
-        this, tr("Open Project"), lastOpenedFile,
-        tr("LibrePCB project files (%1)").arg("*.lpp *.lppz")));
-    if (!filepath.isValid()) return nullptr;
-
-    settings.setValue("controlpanel/last_open_project", filepath.toNative());
-  }
-
-  try {
-    ProjectEditor* editor = getOpenProject(filepath);
-    if (!editor) {
-      // Opening the project can take some time, use wait cursor to provide
-      // immediate UI feedback.
-      setCursor(Qt::WaitCursor);
-      auto cursorScopeGuard = scopeGuard([this]() { unsetCursor(); });
-
-      std::shared_ptr<TransactionalFileSystem> fs;
-      QString projectFileName = filepath.getFilename();
-      if (filepath.getSuffix() == "lppz") {
-        fs = TransactionalFileSystem::openRO(
-            FilePath::getRandomTempPath(),
-            &TransactionalFileSystem::RestoreMode::no);
-        fs->removeDirRecursively();  // 1) Get a clean initial state.
-        fs->loadFromZip(filepath);  // 2) Load files from ZIP.
-        foreach (const QString& fn, fs->getFiles()) {
-          if (fn.endsWith(".lpp")) {
-            projectFileName = fn;
-          }
-        }
-      } else {
-        fs = TransactionalFileSystem::openRW(
-            filepath.getParentDir(), &askForRestoringBackup,
-            DirectoryLockHandlerDialog::createDirectoryLockCallback());
-      }
-      ProjectLoader loader;
-      std::unique_ptr<Project> project =
-          loader.open(std::unique_ptr<TransactionalDirectory>(
-                          new TransactionalDirectory(fs)),
-                      projectFileName);  // can throw
-      editor = new ProjectEditor(mWorkspace, *project.release(),
-                                 loader.getUpgradeMessages());
-      connect(editor, &ProjectEditor::projectEditorClosed, this,
-              &ControlPanel::projectEditorClosed);
-      connect(editor, &ProjectEditor::showControlPanelClicked, this,
-              &ControlPanel::showControlPanel);
-      connect(editor, &ProjectEditor::openProjectLibraryUpdaterClicked, this,
-              &ControlPanel::openProjectLibraryUpdater);
-      mOpenProjectEditors.insert(filepath.toUnique().toStr(), editor);
-
-      // Delay updating the last opened project to avoid an issue when
-      // double-clicking: https://github.com/LibrePCB/LibrePCB/issues/293
-      QTimer::singleShot(500, this, [this, filepath]() {
-        mRecentProjectsModel->setLastRecentProject(filepath);
-      });
-    }
-    editor->showAllRequiredEditors();
-    return editor;
-  } catch (UserCanceled& e) {
-    // do nothing
-    return nullptr;
-  } catch (Exception& e) {
-    QMessageBox::critical(this, tr("Could not open project"), e.getMsg());
-    return nullptr;
-  }
-}
-
 bool ControlPanel::closeProject(ProjectEditor& editor,
                                 bool askForSave) noexcept {
   Q_ASSERT(mOpenProjectEditors.contains(
@@ -659,24 +537,6 @@ ProjectEditor* ControlPanel::getOpenProject(
     return mOpenProjectEditors.value(filepath.toUnique().toStr());
   else
     return nullptr;
-}
-
-bool ControlPanel::askForRestoringBackup(const FilePath& dir) {
-  Q_UNUSED(dir);
-  QMessageBox::StandardButton btn = QMessageBox::question(
-      0, tr("Restore autosave backup?"),
-      tr("It seems that the application crashed the last time you opened this "
-         "project. Do you want to restore the last autosave backup?"),
-      QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-      QMessageBox::Cancel);
-  switch (btn) {
-    case QMessageBox::Yes:
-      return true;
-    case QMessageBox::No:
-      return false;
-    default:
-      throw UserCanceled(__FILE__, __LINE__);
-  }
 }
 
 /*******************************************************************************
@@ -733,27 +593,6 @@ bool ControlPanel::closeAllLibraryEditors(bool askForSave) noexcept {
  *  Private Slots
  ******************************************************************************/
 
-void ControlPanel::openProjectsPassedByCommandLine() noexcept {
-  // Parse command line arguments and open all project files.
-  // Note: Do not print a warning if the first argument is not a valid project,
-  // since it might or might not be the application file path.
-  const QStringList args = qApp->arguments();
-  for (int i = 0; i < args.count(); ++i) {
-    openProjectPassedByOs(args.at(i), i == 0);  // Silent on first item.
-  }
-}
-
-void ControlPanel::openProjectPassedByOs(const QString& file,
-                                         bool silent) noexcept {
-  FilePath filepath(file);
-  if ((filepath.isExistingFile()) &&
-      ((filepath.getSuffix() == "lpp") || (filepath.getSuffix() == "lppz"))) {
-    openProject(filepath);
-  } else if (!silent) {
-    qWarning() << "Ignore invalid request to open project:" << file;
-  }
-}
-
 void ControlPanel::projectEditorClosed() noexcept {
   ProjectEditor* editor = dynamic_cast<ProjectEditor*>(QObject::sender());
   Q_ASSERT(editor);
@@ -785,8 +624,6 @@ void ControlPanel::on_projectTreeView_doubleClicked(const QModelIndex& index) {
   if (fp.isExistingDir()) {
     mUi->projectTreeView->setExpanded(index,
                                       !mUi->projectTreeView->isExpanded(index));
-  } else if ((fp.getSuffix() == "lpp") || (fp.getSuffix() == "lppz")) {
-    openProject(fp);
   } else {
     DesktopServices ds(mWorkspace.getSettings(), this);
     ds.openLocalPath(fp);
@@ -809,10 +646,6 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
   const EditorCommandSet& cmd = EditorCommandSet::instance();
   if (isProjectFile) {
     if (!getOpenProject(fp)) {
-      mb.addAction(cmd.itemOpen.createAction(
-                       &menu, this, [this, fp]() { openProject(fp); },
-                       EditorCommand::ActionFlag::NoShortcuts),
-                   MenuBuilder::Flag::DefaultAction);
     } else {
       mb.addAction(cmd.projectClose.createAction(
           &menu, this, [this, fp]() { closeProject(fp, true); },
@@ -845,9 +678,6 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
   }
   mb.addSeparator();
   if (fp.isExistingDir() && (!isProjectDir) && (!isInProjectDir)) {
-    mb.addAction(cmd.projectNew.createAction(
-        &menu, this, [this, fp]() { newProject(false, fp); },
-        EditorCommand::ActionFlag::NoShortcuts));
     mb.addAction(cmd.folderNew.createAction(
         &menu, this,
         [this, fp]() {
@@ -879,17 +709,6 @@ void ControlPanel::on_favoriteProjectsListView_entered(
   showProjectReadmeInBrowser(filepath.getParentDir());
 }
 
-void ControlPanel::on_recentProjectsListView_clicked(const QModelIndex& index) {
-  FilePath filepath(index.data(Qt::UserRole).toString());
-  openProject(filepath);
-}
-
-void ControlPanel::on_favoriteProjectsListView_clicked(
-    const QModelIndex& index) {
-  FilePath filepath(index.data(Qt::UserRole).toString());
-  openProject(filepath);
-}
-
 void ControlPanel::on_recentProjectsListView_customContextMenuRequested(
     const QPoint& pos) {
   QModelIndex index = mUi->recentProjectsListView->indexAt(pos);
@@ -904,11 +723,6 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(
   QMenu menu;
   MenuBuilder mb(&menu);
   const EditorCommandSet& cmd = EditorCommandSet::instance();
-  mb.addAction(cmd.itemOpen.createAction(
-                   &menu, this, [this, fp]() { openProject(fp); },
-                   EditorCommand::ActionFlag::NoShortcuts),
-               MenuBuilder::Flag::DefaultAction);
-  mb.addSeparator();
   if (isFavorite) {
     mb.addAction(cmd.favoriteRemove.createAction(
         &menu, this,
@@ -936,11 +750,6 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(
   QMenu menu;
   MenuBuilder mb(&menu);
   const EditorCommandSet& cmd = EditorCommandSet::instance();
-  mb.addAction(cmd.itemOpen.createAction(
-                   &menu, this, [this, fp]() { openProject(fp); },
-                   EditorCommand::ActionFlag::NoShortcuts),
-               MenuBuilder::Flag::DefaultAction);
-  mb.addSeparator();
   mb.addAction(cmd.favoriteRemove.createAction(
       &menu, this,
       [this, fp]() { mFavoriteProjectsModel->removeFavoriteProject(fp); },

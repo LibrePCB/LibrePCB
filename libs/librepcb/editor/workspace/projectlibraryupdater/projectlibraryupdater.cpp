@@ -152,7 +152,7 @@ void ProjectLibraryUpdater::btnUpdateClicked() {
 
     // re-open project if it was previously open
     if (editor) {
-      mControlPanel.openProject(mProjectFilePath);
+      // mControlPanel.openProject(mProjectFilePath);
       // bring this window to front again (with some delay to make it working
       // properly)
       QTimer::singleShot(500, this, &QDialog::raise);
