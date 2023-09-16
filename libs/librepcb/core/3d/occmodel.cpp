@@ -701,6 +701,8 @@ QByteArray OccModel::minifyStep(const QByteArray& content) {
           .split(';', QString::SkipEmptyParts);
 
   // Parse data into key-value structure.
+  // Note: The last item of the QList<int> is not part of the data, but only
+  // used internally to make particular entries unique.
   typedef std::pair<QStringList, QList<int>> Value;
   QMap<int, Value> data;
   re = QRegularExpression("#([0-9]+)");
@@ -724,6 +726,16 @@ QByteArray OccModel::minifyStep(const QByteArray& content) {
       consumed = match.capturedEnd(1);
     }
     value.first.append(valueStr.mid(consumed));
+    // Important: It seems some entries must not be merged even if they are
+    // identical. When merged, the STEP model won't be rendered anymore
+    // and FreeCAD displays a wrong shape object tree. We add a unique
+    // number to these entries to ensure they are left untouched.
+    if (valueStr.contains("PRODUCT_DEFINITION") ||
+        valueStr.contains("SHAPE_REPRESENTATION")) {
+      value.second.append(data.count() + 1);
+    } else {
+      value.second.append(0);
+    }
     data.insert(id, value);
   }
 
@@ -761,7 +773,7 @@ QByteArray OccModel::minifyStep(const QByteArray& content) {
     output += QString("#%1=").arg(it.key()).toUtf8();
     for (int i = 0; i < it.value().first.count(); ++i) {
       output += it.value().first.at(i).toUtf8();
-      if (i < it.value().second.count()) {
+      if (i < (it.value().second.count() - 1)) {  // Ignore unique ID.
         output += QString::number(it.value().second.at(i)).toUtf8();
       }
     }
