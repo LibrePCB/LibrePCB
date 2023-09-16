@@ -20,6 +20,7 @@ target_link_libraries(
   librepcb
   PRIVATE common
           # LibrePCB
+          LibrePCB::Gui
           LibrePCB::Editor
           LibrePCB::Core
           # Qt

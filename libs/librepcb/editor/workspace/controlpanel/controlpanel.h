@@ -83,12 +83,10 @@ public slots:
 protected:
   // Inherited Methods
   virtual void closeEvent(QCloseEvent* event) override;
-  virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 private slots:
   // private slots
-  void openProjectsPassedByCommandLine() noexcept;
-  void openProjectPassedByOs(const QString& file, bool silent = false) noexcept;
+
   void projectEditorClosed() noexcept;
 
   // Actions
@@ -97,8 +95,6 @@ private slots:
   void on_projectTreeView_customContextMenuRequested(const QPoint& pos);
   void on_recentProjectsListView_entered(const QModelIndex& index);
   void on_favoriteProjectsListView_entered(const QModelIndex& index);
-  void on_recentProjectsListView_clicked(const QModelIndex& index);
-  void on_favoriteProjectsListView_clicked(const QModelIndex& index);
   void on_recentProjectsListView_customContextMenuRequested(const QPoint& pos);
   void on_favoriteProjectsListView_customContextMenuRequested(
       const QPoint& pos);
@@ -117,20 +113,6 @@ private:
   void removeProjectsTreeItem(const FilePath& fp) noexcept;
 
   // Project Management
-
-  ProjectEditor* newProject(bool eagleImport = false,
-                            FilePath parentDir = FilePath()) noexcept;
-
-  /**
-   * @brief Open a project with the editor (or bring an already opened editor to
-   * front)
-   *
-   * @param filepath  The filepath to the *.lpp project file to open. If invalid
-   *                  (the default), a file dialog will be shown to select it.
-   *
-   * @return The pointer to the opened project editor (nullptr on error)
-   */
-  ProjectEditor* openProject(FilePath filepath = FilePath()) noexcept;
 
   /**
    * @brief Close an opened project editor
@@ -176,18 +158,6 @@ private:
    */
   ProjectEditor* getOpenProject(const FilePath& filepath) const noexcept;
 
-  /**
-   * @brief Ask the user whether to restore a backup of a project
-   *
-   * @param dir   The project directory to be restored.
-   *
-   * @retval true   Restore backup.
-   * @retval false  Do not restore backup.
-   *
-   * @throw Exception to abort opening the project.
-   */
-  static bool askForRestoringBackup(const FilePath& dir);
-
   // Library Management
   void openLibraryEditor(const FilePath& libDir) noexcept;
   void libraryEditorDestroyed() noexcept;
@@ -219,8 +189,6 @@ private:
   QScopedPointer<QAction> mActionWorkspaceSettings;
   QScopedPointer<QAction> mActionRescanLibraries;
   QScopedPointer<QAction> mActionSwitchWorkspace;
-  QScopedPointer<QAction> mActionNewProject;
-  QScopedPointer<QAction> mActionOpenProject;
   QScopedPointer<QAction> mActionCloseAllProjects;
   QScopedPointer<QAction> mActionAddExampleProjects;
   QScopedPointer<QAction> mActionImportEagleProject;

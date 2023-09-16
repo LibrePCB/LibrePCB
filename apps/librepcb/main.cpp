@@ -31,7 +31,9 @@
 #include <librepcb/editor/project/partinformationprovider.h>
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
+#include <librepcb/gui/editorapplication.h>
 
+#include <QQmlApplicationEngine>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -58,6 +60,11 @@ static int appExec() noexcept;
  ******************************************************************************/
 
 int main(int argc, char* argv[]) {
+  qputenv("QT_QUICK_CONTROLS_STYLE", QByteArray("Material"));
+  qputenv("QT_QUICK_CONTROLS_MATERIAL_THEME", QByteArray("Dark"));
+  qputenv("QT_QUICK_CONTROLS_MATERIAL_VARIANT", QByteArray("Dense"));
+  qputenv("QT_QUICK_CONTROLS_MATERIAL_ACCENT", QByteArray("#29d682"));
+  qputenv("QT_QUICK_CONTROLS_MATERIAL_PRIMARY", QByteArray("#353535"));
   QApplication app(argc, argv);
 
   // Give the main thread a higher priority than most other threads as GUI
@@ -126,6 +133,7 @@ static void setApplicationMetadata() noexcept {
   QApplication::setApplicationName("LibrePCB");
   QApplication::setApplicationVersion(Application::getVersion());
   QApplication::setDesktopFileName("org.librepcb.LibrePCB");
+  QApplication::setWindowIcon(QIcon(":/img/logo/32x32.png"));
 }
 
 /*******************************************************************************
@@ -323,10 +331,8 @@ static int openWorkspace(FilePath& path) {
                    &WorkspaceSettingsItem::edited,
                    &ws.getSettings().keyboardShortcuts, applyKeyboardShortcuts);
 
-  // Open the control panel.
-  ControlPanel p(ws, wizard.getWorkspaceContainsNewerFileFormats());
-  p.show();
-
+  // Open the main window.
+  gui::EditorApplication editor(ws);
   return appExec();
 }
 
