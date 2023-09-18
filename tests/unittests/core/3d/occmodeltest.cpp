@@ -164,6 +164,35 @@ TEST_F(OccModelTest, testTesselate) {
   }
 }
 
+TEST_F(OccModelTest, testMinifyStep) {
+  const QByteArray input =
+      "header;\n"
+      "DATA;\n"
+      "#1 = 42;\n"
+      "#2 = 42;\n"
+      "#3 = FOO(#1, #2);\n"
+      "#4 = FOO(#2, #1);\n"
+      "#5 = PRODUCT_DEFINITION(#2, #3);\n"
+      "#6 = PRODUCT_DEFINITION(#2, #3);\n"
+      "#7 = SHAPE_REPRESENTATION(#2, #3);\n"
+      "#8 = SHAPE_REPRESENTATION(#2, #3);\n"
+      "ENDSEC;\n"
+      "footer;\n";
+  const QByteArray expected =
+      "header;\n"
+      "DATA;\n"
+      "#1=42;\n"
+      "#2=FOO(#1, #1);\n"
+      "#3=PRODUCT_DEFINITION(#1, #2);\n"  // Merging not allowed!
+      "#4=PRODUCT_DEFINITION(#1, #2);\n"  // Merging not allowed!
+      "#5=SHAPE_REPRESENTATION(#1, #2);\n"  // Merging not allowed!
+      "#6=SHAPE_REPRESENTATION(#1, #2);\n"  // Merging not allowed!
+      "ENDSEC;\n"
+      "footer;\n";
+  const QByteArray result = OccModel::minifyStep(input);
+  EXPECT_EQ(expected.toStdString(), result.toStdString());
+}
+
 TEST_F(OccModelTest, testMinifyStepValid) {
   const FilePath fp(TEST_DATA_DIR
                     "/unittests/librepcbcommon/OccModelTest/model.step");
