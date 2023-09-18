@@ -111,13 +111,14 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
               localeOrder)) +
       ")");
   mUi->lblCompLibName->setToolTip(
-      mComponentInstance.getLibComponent().getDescriptions().value(
-          localeOrder) +
-      "<p>" +
-      mComponentInstance.getLibComponent()
-          .getDirectory()
-          .getAbsPath()
-          .toNative());
+      (mComponentInstance.getLibComponent().getDescriptions().value(
+           localeOrder) +
+       "\n\n" +
+       mComponentInstance.getLibComponent()
+           .getDirectory()
+           .getAbsPath()
+           .toNative())
+          .trimmed());
   connect(mUi->lblCompLibName, &QLabel::linkActivated, this,
           [this](const QString& url) {
             DesktopServices ds(mWorkspace.getSettings(), this);
@@ -136,8 +137,9 @@ SymbolInstancePropertiesDialog::SymbolInstancePropertiesDialog(
       htmlLink.arg(mSymbol.getLibSymbol().getDirectory().getAbsPath().toStr(),
                    *mSymbol.getLibSymbol().getNames().value(localeOrder)));
   mUi->lblSymbLibName->setToolTip(
-      mSymbol.getLibSymbol().getDescriptions().value(localeOrder) + "<p>" +
-      mSymbol.getLibSymbol().getDirectory().getAbsPath().toNative());
+      (mSymbol.getLibSymbol().getDescriptions().value(localeOrder) + "\n\n" +
+       mSymbol.getLibSymbol().getDirectory().getAbsPath().toNative())
+          .trimmed());
   connect(mUi->lblSymbLibName, &QLabel::linkActivated, this,
           [this](const QString& url) {
             DesktopServices ds(mWorkspace.getSettings(), this);

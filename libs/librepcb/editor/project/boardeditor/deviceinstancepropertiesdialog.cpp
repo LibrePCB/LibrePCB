@@ -93,8 +93,9 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
       htmlLink.arg(mDevice.getLibDevice().getDirectory().getAbsPath().toStr(),
                    *mDevice.getLibDevice().getNames().value(localeOrder)));
   mUi->lblLibDeviceName->setToolTip(
-      mDevice.getLibDevice().getDescriptions().value(localeOrder) + "<p>" +
-      mDevice.getLibDevice().getDirectory().getAbsPath().toNative());
+      (mDevice.getLibDevice().getDescriptions().value(localeOrder) + "\n\n" +
+       mDevice.getLibDevice().getDirectory().getAbsPath().toNative())
+          .trimmed());
   connect(mUi->lblLibDeviceName, &QLabel::linkActivated, this,
           [this](const QString& url) {
             DesktopServices ds(mWorkspace.getSettings(), this);
@@ -108,8 +109,9 @@ DeviceInstancePropertiesDialog::DeviceInstancePropertiesDialog(
           .arg(tr("Footprint"))
           .arg(*mDevice.getLibFootprint().getNames().value(localeOrder)));
   mUi->lblLibPackageName->setToolTip(
-      mDevice.getLibPackage().getDescriptions().value(localeOrder) + "<p>" +
-      mDevice.getLibPackage().getDirectory().getAbsPath().toNative());
+      (mDevice.getLibPackage().getDescriptions().value(localeOrder) + "\n\n" +
+       mDevice.getLibPackage().getDirectory().getAbsPath().toNative())
+          .trimmed());
   connect(mUi->lblLibPackageName, &QLabel::linkActivated, this,
           [this](const QString& url) {
             DesktopServices ds(mWorkspace.getSettings(), this);
