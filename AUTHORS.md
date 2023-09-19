@@ -12,6 +12,7 @@ yourself by creating a pull request (see [CONTRIBUTING.md](CONTRIBUTING.md)).
 - Raphael Nestler ([@rnestler](https://github.com/rnestler))
 - Danilo Bargen ([@dbrgn](https://github.com/dbrgn))
 - Florian Bruhin ([@The-Compiler](https://github.com/The-Compiler))
+- [@Luz](https://github.com/Luz)
 - [@NiFa18](https://github.com/NiFa18)
 - [@chrisgwerder](https://github.com/chrisgwerder)
 - [@0xB767B](https://github.com/0xB767B)

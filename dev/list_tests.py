@@ -16,7 +16,7 @@ import glob
 
 
 if __name__ == '__main__':
-    root = os.path.dirname(os.path.dirname(__file__))
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sources_dir = os.path.join(root, 'libs', 'librepcb')
     sources = [os.path.relpath(x, sources_dir)
                for x in glob.glob(sources_dir + '/**/*.h', recursive=True)]
