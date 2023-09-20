@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Helper script to capture screenshots of LibrePCB windows.
 # Requirements: sudo apt-get install wmctrl shutter imagemagick

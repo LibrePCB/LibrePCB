@@ -55,7 +55,7 @@ if [ "$DOCKER" == "--docker" ]; then
   $DOCKER_CMD run --rm -t --user "$(id -u):$(id -g)" \
     -v "$REPO_ROOT:/code" \
     $DOCKER_IMAGE \
-    /bin/bash -c "cd /code && dev/format_code.sh $ALL"
+    /usr/bin/env bash -c "cd /code && dev/format_code.sh $ALL"
 
   echo "[Docker done.]"
   exit 0
