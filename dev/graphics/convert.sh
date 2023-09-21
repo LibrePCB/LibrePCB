@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Note: the PDF files must be created "by hand" (e.g. with the print-to-pdf feature of LibreCAD)
 

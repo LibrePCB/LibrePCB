@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # set shell settings (see https://sipb.mit.edu/doc/safe-shell/)
 set -eu -o pipefail
