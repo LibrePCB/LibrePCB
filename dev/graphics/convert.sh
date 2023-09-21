@@ -6,6 +6,6 @@ mkdir -p png
 
 for f in *.pdf
 do
-  convert -density 600 -trim -border 100x100 -bordercolor White "$f" "png/`basename "$f" .pdf`.png"
+  convert -density 600 -trim -border 100x100 -bordercolor White "$f" "png/$(basename "$f" .pdf).png"
   # rm "$f"
 done
