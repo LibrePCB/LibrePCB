@@ -8,8 +8,6 @@ add_library(
   librepcb_gui STATIC
   editorapplication.cpp
   editorapplication.h
-  editortab.cpp
-  editortab.h
   editorwindow.cpp
   editorwindow.h
   objectlistmodel.cpp

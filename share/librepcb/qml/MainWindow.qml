@@ -110,19 +110,11 @@ ApplicationWindow {
                     visible:btnLibraries.checked
                 }
             }
-            SplitView {
+            Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                EditorArea {
-                    Layout.minimumWidth: 100
-                    width: parent.width / 2
-                    cppTabsModel: cppWindow.tabsLeft
-                }
-                EditorArea {
-                    Layout.minimumWidth: 100
-                    width: parent.width / 2
-                    cppTabsModel: cppWindow.tabsRight
-                }
+                Layout.minimumWidth: 100
+                color: "#4f4f4f"
             }
         }
     }
