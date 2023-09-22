@@ -6,7 +6,7 @@ mkdir svg
 # convert all *.dia files to *.svg files
 find . -type f -name "*.dia" | while read f
 do
-  mkdir -p "svg/"`dirname "$f"`
+  mkdir -p "svg/"$(dirname "$f")
   outfile="svg/${f%.dia}.svg"
   dia -e "$outfile" "$f"
 done
