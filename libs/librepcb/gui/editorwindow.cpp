@@ -59,6 +59,17 @@ EditorWindow::EditorWindow(EditorApplication& application)
   mEngine->rootContext()->setContextProperty("cppApp", &mApplication);
   mEngine->rootContext()->setContextProperty("cppWindow", this);
   mEngine->load(url);
+
+  // For testing, open a project automatically.
+  QTimer::singleShot(200, this, [this]() {
+    QSettings s;
+    const FilePath fp(
+        s.value("app/last_open_project", mApplication.getWorkspacePath())
+            .toString());
+    if (fp.isValid()) {
+      setCurrentProject(mApplication.openProject(fp));
+    }
+  });
 }
 
 EditorWindow::~EditorWindow() noexcept {

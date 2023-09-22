@@ -17,55 +17,57 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef LIBREPCB_GUI_SCHEMATICGUI_H
+#define LIBREPCB_GUI_SCHEMATICGUI_H
+
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "openedproject.h"
-
-#include "editorapplication.h"
-#include "objectlistmodel.h"
-#include "schematicgui.h"
-
-#include <librepcb/core/project/project.h>
-
 #include <QtCore>
 
+#include <memory>
+
 /*******************************************************************************
- *  Namespace
+ *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+
+class Schematic;
+
 namespace gui {
 
-/*******************************************************************************
- *  Constructors / Destructor
- ******************************************************************************/
-
-OpenedProject::OpenedProject(EditorApplication& application,
-                             std::unique_ptr<Project> project) noexcept
-  : QObject(&application),
-    mApplication(application),
-    mProject(std::move(project)),
-    mSchematicsModel(new ObjectListModel(this)) {
-  Q_ASSERT(mProject);
-  foreach (Schematic* s, mProject->getSchematics()) {
-    mSchematicsModel->insert(-1, std::make_shared<SchematicGui>(*this, *s));
-  }
-}
-
-OpenedProject::~OpenedProject() noexcept {
-}
+class OpenedProject;
 
 /*******************************************************************************
- *  Getters
+ *  Class SchematicGui
  ******************************************************************************/
 
-const QString& OpenedProject::getName() const noexcept {
-  return *mProject->getName();
-}
+/**
+ * @brief GUI wrapper for a ::librepcb::Schematic
+ */
+class SchematicGui : public QObject {
+  Q_OBJECT
 
-QAbstractItemModel* OpenedProject::getSchematics() noexcept {
-  return mSchematicsModel.data();
-}
+public:
+  // Constructors / Destructor
+  SchematicGui() = delete;
+  SchematicGui(OpenedProject& project, Schematic& schematic) noexcept;
+  SchematicGui(const SchematicGui& other) noexcept = delete;
+  virtual ~SchematicGui() noexcept;
+
+  // Properties
+  Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
+
+  // Getters
+  const QString& getName() const noexcept;
+
+signals:
+  void nameChanged(const QString& name);
+
+private:
+  OpenedProject& mProject;
+  QPointer<Schematic> mSchematic;
+};
 
 /*******************************************************************************
  *  End of File
@@ -73,3 +75,5 @@ QAbstractItemModel* OpenedProject::getSchematics() noexcept {
 
 }  // namespace gui
 }  // namespace librepcb
+
+#endif

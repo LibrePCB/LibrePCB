@@ -61,11 +61,6 @@ ApplicationWindow {
                     enabled: !cppApp.openedProjects.empty
                 }
                 SideButton {
-                    id: btnLayers
-                    text: "LAYERS"
-                    enabled: !cppApp.openedProjects.empty
-                }
-                SideButton {
                     id: btnChecks
                     text: "CHECKS"
                     enabled: !cppApp.openedProjects.empty
