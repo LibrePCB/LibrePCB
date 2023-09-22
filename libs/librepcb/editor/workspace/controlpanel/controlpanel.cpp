@@ -247,16 +247,6 @@ void ControlPanel::createActions() noexcept {
   mActionLibraryManager.reset(cmd.libraryManager.createAction(
       this, this, &ControlPanel::openLibraryManager,
       EditorCommand::ActionFlag::ApplicationShortcut));
-  mActionWorkspaceSettings.reset(cmd.workspaceSettings.createAction(
-      this, this,
-      [this]() {
-        WorkspaceSettingsDialog dialog(mWorkspace, this);
-        connect(&dialog,
-                &WorkspaceSettingsDialog::desktopIntegrationStatusChanged, this,
-                &ControlPanel::updateDesktopIntegrationMessage);
-        dialog.exec();
-      },
-      EditorCommand::ActionFlag::ApplicationShortcut));
   mActionRescanLibraries.reset(cmd.workspaceLibrariesRescan.createAction(
       this, &mWorkspace.getLibraryDb(),
       &WorkspaceLibraryDb::startLibraryRescan));
@@ -342,7 +332,6 @@ void ControlPanel::createMenus() noexcept {
   mb.addAction(mActionRescanLibraries);
   mb.addAction(mActionLibraryManager);
   mb.addSeparator();
-  mb.addAction(mActionWorkspaceSettings);
 
   // Help.
   mb.newMenu(&MenuBuilder::createHelpMenu);

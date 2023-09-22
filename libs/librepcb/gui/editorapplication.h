@@ -39,6 +39,7 @@ namespace gui {
 
 class EditorWindow;
 class ObjectListModel;
+class OpenedProject;
 
 /*******************************************************************************
  *  Class EditorApplication
@@ -64,9 +65,13 @@ public:
   QString getWorkspacePath() const noexcept;
   QAbstractItemModel* getOpenedProjects() noexcept;
 
+  // General Methods
+  std::shared_ptr<OpenedProject> createProject() noexcept;
+  std::shared_ptr<OpenedProject> openProject() noexcept;
+  std::shared_ptr<OpenedProject> openProject(const FilePath& fp) noexcept;
+
 public slots:  // GUI Handlers
-  void createProject() noexcept;
-  void openProject() noexcept;
+  void openWorkspaceSettings() noexcept;
 
 signals:
   void workspaceChanged();
@@ -77,7 +82,6 @@ protected:  // Inherited Methods
 private:  // Methods
   void openProjectsPassedByCommandLine() noexcept;
   void openProjectPassedByOs(const QString& file, bool silent = false) noexcept;
-  void openProject(const FilePath& fp) noexcept;
 
 private:  // Data
   Workspace& mWorkspace;

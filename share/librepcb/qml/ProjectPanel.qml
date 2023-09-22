@@ -10,7 +10,7 @@ Column {
         border.color: "gray"
         border.width: 1
         Label {
-            text: "Project: Demo"
+            text: cppWindow.currentProject ? ("Project: " + cppWindow.currentProject.name) : "No project opened"
             color: "white"
             elide: Label.ElideRight
             x: 3

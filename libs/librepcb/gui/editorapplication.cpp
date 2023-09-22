@@ -35,6 +35,7 @@
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/dialogs/filedialog.h>
 #include <librepcb/editor/project/newprojectwizard/newprojectwizard.h>
+#include <librepcb/editor/workspace/workspacesettingsdialog.h>
 
 #include <QtCore>
 
@@ -76,10 +77,10 @@ QAbstractItemModel* EditorApplication::getOpenedProjects() noexcept {
 }
 
 /*******************************************************************************
- *  GUI Handlers
+ *  General Methods
  ******************************************************************************/
 
-void EditorApplication::createProject() noexcept {
+std::shared_ptr<OpenedProject> EditorApplication::createProject() noexcept {
   editor::NewProjectWizard wizard(mWorkspace,
                                   editor::NewProjectWizard::Mode::NewProject);
   wizard.setLocationOverride(mWorkspace.getProjectsPath());
@@ -94,18 +95,31 @@ void EditorApplication::createProject() noexcept {
                             e.getMsg());
     }
   }
+  return nullptr;
 }
 
-void EditorApplication::openProject() noexcept {
+std::shared_ptr<OpenedProject> EditorApplication::openProject() noexcept {
   QSettings s;
   const QString lastOpenedFile =
       s.value("app/last_open_project", mWorkspace.getPath().toStr()).toString();
   const FilePath fp = FilePath(editor::FileDialog::getOpenFileName(
       nullptr, tr("Open Project"), lastOpenedFile,
       tr("LibrePCB project files (%1)").arg("*.lpp *.lppz")));
-  if (!fp.isValid()) return;
+  if (!fp.isValid()) return nullptr;
   s.setValue("app/last_open_project", fp.toNative());
-  openProject(fp);
+  return openProject(fp);
+}
+
+/*******************************************************************************
+ *  GUI Handlers
+ ******************************************************************************/
+
+void EditorApplication::openWorkspaceSettings() noexcept {
+  editor::WorkspaceSettingsDialog dialog(mWorkspace);
+  // connect(&dialog,
+  //        &editor::WorkspaceSettingsDialog::desktopIntegrationStatusChanged,
+  //        this, &ControlPanel::updateDesktopIntegrationMessage);
+  dialog.exec();
 }
 
 /*******************************************************************************
@@ -147,7 +161,8 @@ void EditorApplication::openProjectPassedByOs(const QString& file,
   }
 }
 
-void EditorApplication::openProject(const FilePath& fp) noexcept {
+std::shared_ptr<OpenedProject> EditorApplication::openProject(
+    const FilePath& fp) noexcept {
   try {
     // Opening the project can take some time, use wait cursor to provide
     // immediate UI feedback.
@@ -195,14 +210,15 @@ void EditorApplication::openProject(const FilePath& fp) noexcept {
     std::unique_ptr<Project> project = loader.open(
         std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
         projectFileName);  // can throw
-    mOpenedProjects->insert(
-        -1, std::make_shared<OpenedProject>(*this, std::move(project)));
+    auto openedProject =
+        std::make_shared<OpenedProject>(*this, std::move(project));
+    mOpenedProjects->insert(-1, openedProject);
+    return openedProject;
   } catch (const UserCanceled&) {
-    return;
   } catch (const Exception& e) {
     QMessageBox::critical(nullptr, tr("Could not open project"), e.getMsg());
-    return;
   }
+  return nullptr;
 }
 
 /*******************************************************************************
