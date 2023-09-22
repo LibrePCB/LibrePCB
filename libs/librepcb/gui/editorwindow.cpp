@@ -23,7 +23,6 @@
 #include "editorwindow.h"
 
 #include "editorapplication.h"
-#include "editortab.h"
 #include "objectlistmodel.h"
 #include "openedproject.h"
 
@@ -46,8 +45,6 @@ EditorWindow::EditorWindow(EditorApplication& application)
   : QObject(&application),
     mApplication(application),
     mTitle(QString("LibrePCB %1").arg(qApp->applicationVersion())),
-    mTabsModelLeft(new ObjectListModel(this)),
-    mTabsModelRight(new ObjectListModel(this)),
     mEngine(new QQmlApplicationEngine(this)) {
   const QUrl url =
       Application::getResourcesDir().getPathTo("qml/MainWindow.qml").toQUrl();
@@ -62,10 +59,6 @@ EditorWindow::EditorWindow(EditorApplication& application)
   mEngine->rootContext()->setContextProperty("cppApp", &mApplication);
   mEngine->rootContext()->setContextProperty("cppWindow", this);
   mEngine->load(url);
-
-  mTabsModelLeft->insert(0, std::make_shared<EditorTab>(mApplication, *this));
-  mTabsModelLeft->insert(1, std::make_shared<EditorTab>(mApplication, *this));
-  mTabsModelRight->insert(0, std::make_shared<EditorTab>(mApplication, *this));
 }
 
 EditorWindow::~EditorWindow() noexcept {
@@ -77,14 +70,6 @@ EditorWindow::~EditorWindow() noexcept {
 
 QObject* EditorWindow::getCurrentProject() noexcept {
   return mCurrentProject.get();
-}
-
-QAbstractItemModel* EditorWindow::getTabsLeft() noexcept {
-  return mTabsModelLeft.data();
-}
-
-QAbstractItemModel* EditorWindow::getTabsRight() noexcept {
-  return mTabsModelRight.data();
 }
 
 /*******************************************************************************

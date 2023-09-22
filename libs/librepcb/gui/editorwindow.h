@@ -50,8 +50,6 @@ public:
   Q_PROPERTY(QString title MEMBER mTitle NOTIFY titleChanged FINAL)
   Q_PROPERTY(QObject* currentProject READ getCurrentProject NOTIFY
                  currentProjectChanged FINAL)
-  Q_PROPERTY(QAbstractItemModel* tabsLeft READ getTabsLeft CONSTANT FINAL)
-  Q_PROPERTY(QAbstractItemModel* tabsRight READ getTabsRight CONSTANT FINAL)
 
   // Constructors / Destructor
   EditorWindow() = delete;
@@ -61,8 +59,6 @@ public:
 
   // Getters
   QObject* getCurrentProject() noexcept;
-  QAbstractItemModel* getTabsLeft() noexcept;
-  QAbstractItemModel* getTabsRight() noexcept;
 
 public slots:  // GUI Handlers
   bool createProject() noexcept;
@@ -79,8 +75,6 @@ private:
   EditorApplication& mApplication;
   QString mTitle;
   std::shared_ptr<OpenedProject> mCurrentProject;
-  QScopedPointer<ObjectListModel> mTabsModelLeft;
-  QScopedPointer<ObjectListModel> mTabsModelRight;
   QScopedPointer<QQmlApplicationEngine> mEngine;
 };
 
