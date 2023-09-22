@@ -34,6 +34,7 @@ namespace gui {
 
 class EditorApplication;
 class ObjectListModel;
+class OpenedProject;
 
 /*******************************************************************************
  *  Class EditorWindow
@@ -47,6 +48,8 @@ class EditorWindow : public QObject {
 
 public:
   Q_PROPERTY(QString title MEMBER mTitle NOTIFY titleChanged FINAL)
+  Q_PROPERTY(QObject* currentProject READ getCurrentProject NOTIFY
+                 currentProjectChanged FINAL)
   Q_PROPERTY(QAbstractItemModel* tabsLeft READ getTabsLeft CONSTANT FINAL)
   Q_PROPERTY(QAbstractItemModel* tabsRight READ getTabsRight CONSTANT FINAL)
 
@@ -57,15 +60,25 @@ public:
   virtual ~EditorWindow() noexcept;
 
   // Getters
+  QObject* getCurrentProject() noexcept;
   QAbstractItemModel* getTabsLeft() noexcept;
   QAbstractItemModel* getTabsRight() noexcept;
 
+public slots:  // GUI Handlers
+  bool createProject() noexcept;
+  bool openProject() noexcept;
+
 signals:
   void titleChanged(const QString& title);
+  void currentProjectChanged();
+
+private:  // Methods
+  void setCurrentProject(std::shared_ptr<OpenedProject> p) noexcept;
 
 private:
   EditorApplication& mApplication;
   QString mTitle;
+  std::shared_ptr<OpenedProject> mCurrentProject;
   QScopedPointer<ObjectListModel> mTabsModelLeft;
   QScopedPointer<ObjectListModel> mTabsModelRight;
   QScopedPointer<QQmlApplicationEngine> mEngine;

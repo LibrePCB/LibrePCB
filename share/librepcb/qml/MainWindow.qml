@@ -22,10 +22,13 @@ ApplicationWindow {
             MenuItem { text: qsTr("&Quit") }
         }
         Menu {
-            title: qsTr("&Edit")
-            MenuItem { text: qsTr("Cu&t") }
-            MenuItem { text: qsTr("&Copy") }
-            MenuItem { text: qsTr("&Paste") }
+            title: qsTr("&Extras")
+            MenuItem {
+                text: qsTr("Workspace Settings") + "..."
+                iconSource: "qrc:///img/actions/settings.png"
+                shortcut: "Ctrl+,"
+                onTriggered: cppApp.openWorkspaceSettings()
+            }
         }
         Menu {
             title: qsTr("&Help")
@@ -81,12 +84,12 @@ ApplicationWindow {
             Button {
                 text: "Create Project"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: cppApp.createProject()
+                onClicked: if (cppWindow.createProject()) {btnProject.checked = true}
             }
             Button {
                 text: "Open Project"
                 Layout.alignment: Qt.AlignCenter
-                onClicked: cppApp.openProject()
+                onClicked: if (cppWindow.openProject()) {btnProject.checked = true}
             }
         }
         SplitView {

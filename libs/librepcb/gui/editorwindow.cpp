@@ -25,6 +25,7 @@
 #include "editorapplication.h"
 #include "editortab.h"
 #include "objectlistmodel.h"
+#include "openedproject.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/filepath.h>
@@ -74,12 +75,48 @@ EditorWindow::~EditorWindow() noexcept {
  *  Getters
  ******************************************************************************/
 
+QObject* EditorWindow::getCurrentProject() noexcept {
+  return mCurrentProject.get();
+}
+
 QAbstractItemModel* EditorWindow::getTabsLeft() noexcept {
   return mTabsModelLeft.data();
 }
 
 QAbstractItemModel* EditorWindow::getTabsRight() noexcept {
   return mTabsModelRight.data();
+}
+
+/*******************************************************************************
+ *  GUI Handlers
+ ******************************************************************************/
+
+bool EditorWindow::createProject() noexcept {
+  if (auto p = mApplication.createProject()) {
+    setCurrentProject(p);
+    return true;
+  }
+  return false;
+}
+
+bool EditorWindow::openProject() noexcept {
+  if (auto p = mApplication.openProject()) {
+    setCurrentProject(p);
+    return true;
+  }
+  return false;
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void EditorWindow::setCurrentProject(
+    std::shared_ptr<OpenedProject> p) noexcept {
+  if (p != mCurrentProject) {
+    mCurrentProject = p;
+    emit currentProjectChanged();
+  }
 }
 
 /*******************************************************************************
