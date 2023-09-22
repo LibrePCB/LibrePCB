@@ -20,13 +20,11 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "openedproject.h"
-
-#include "editorapplication.h"
-#include "objectlistmodel.h"
 #include "schematicgui.h"
 
-#include <librepcb/core/project/project.h>
+#include "openedproject.h"
+
+#include <librepcb/core/project/schematic/schematic.h>
 
 #include <QtCore>
 
@@ -40,31 +38,21 @@ namespace gui {
  *  Constructors / Destructor
  ******************************************************************************/
 
-OpenedProject::OpenedProject(EditorApplication& application,
-                             std::unique_ptr<Project> project) noexcept
-  : QObject(&application),
-    mApplication(application),
-    mProject(std::move(project)),
-    mSchematicsModel(new ObjectListModel(this)) {
-  Q_ASSERT(mProject);
-  foreach (Schematic* s, mProject->getSchematics()) {
-    mSchematicsModel->insert(-1, std::make_shared<SchematicGui>(*this, *s));
-  }
+SchematicGui::SchematicGui(OpenedProject& project,
+                           Schematic& schematic) noexcept
+  : QObject(&project), mProject(project), mSchematic(&schematic) {
 }
 
-OpenedProject::~OpenedProject() noexcept {
+SchematicGui::~SchematicGui() noexcept {
 }
 
 /*******************************************************************************
  *  Getters
  ******************************************************************************/
 
-const QString& OpenedProject::getName() const noexcept {
-  return *mProject->getName();
-}
-
-QAbstractItemModel* OpenedProject::getSchematics() noexcept {
-  return mSchematicsModel.data();
+const QString& SchematicGui::getName() const noexcept {
+  Q_ASSERT(mSchematic);
+  return *mSchematic->getName();
 }
 
 /*******************************************************************************

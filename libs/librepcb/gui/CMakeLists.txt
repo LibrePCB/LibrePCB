@@ -14,6 +14,8 @@ add_library(
   objectlistmodel.h
   openedproject.cpp
   openedproject.h
+  schematicgui.cpp
+  schematicgui.h
 )
 target_include_directories(
   librepcb_gui

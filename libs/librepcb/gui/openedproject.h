@@ -37,6 +37,7 @@ class Project;
 namespace gui {
 
 class EditorApplication;
+class ObjectListModel;
 
 /*******************************************************************************
  *  Class OpenedProject
@@ -58,9 +59,11 @@ public:
 
   // Properties
   Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
+  Q_PROPERTY(QAbstractItemModel* schematics READ getSchematics CONSTANT)
 
   // Getters
   const QString& getName() const noexcept;
+  QAbstractItemModel* getSchematics() noexcept;
 
 signals:
   void nameChanged(const QString& name);
@@ -68,6 +71,7 @@ signals:
 private:
   EditorApplication& mApplication;
   std::unique_ptr<Project> mProject;
+  QScopedPointer<ObjectListModel> mSchematicsModel;
 };
 
 /*******************************************************************************
