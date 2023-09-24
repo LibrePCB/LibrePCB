@@ -74,7 +74,7 @@
         - Remove development releases when stable release is ready!
         - For prereleases, use tilde instead of dash (e.g. "1.0.0~rc1")!
     -->
-    <release version="1.0.0~rc1" date="2023-08-21" type="development">
+    <release version="1.0.0" date="2023-09-24" type="stable">
       <description>
         <p>Highlights:</p>
         <ul>
@@ -88,7 +88,7 @@
           <li>Rounded and custom footprint pad shapes</li>
         </ul>
       </description>
-      <url type="details">https://librepcb.org/blog/2023-08-21_release_1.0.0-rc1/</url>
+      <url type="details">https://librepcb.org/blog/2023-09-24_release_1.0.0/</url>
     </release>
     <release version="0.1.7" date="2022-10-03" type="stable">
       <description>
