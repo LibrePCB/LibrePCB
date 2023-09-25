@@ -181,7 +181,7 @@ QList<FilePath> FileUtils::getFilesInDirectory(const FilePath& dir,
     if (info.isFile()) {
       files.append(fp);
     } else if (info.isDir() && recursive) {
-      files += getFilesInDirectory(fp, filters, recursive);
+      files += getFilesInDirectory(fp, filters, recursive, skipHiddenFiles);
     }
   }
   return files;
