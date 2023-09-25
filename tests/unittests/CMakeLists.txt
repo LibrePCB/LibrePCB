@@ -34,6 +34,7 @@ add_executable(
   core/fileio/csvfiletest.cpp
   core/fileio/directorylocktest.cpp
   core/fileio/filepathtest.cpp
+  core/fileio/fileutilstest.cpp
   core/fileio/transactionaldirectorytest.cpp
   core/fileio/transactionalfilesystemtest.cpp
   core/fileio/versionfiletest.cpp
