@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GUI_EDITORAPPLICATION_H
-#define LIBREPCB_GUI_EDITORAPPLICATION_H
+#ifndef LIBREPCB_GUI_LIBRARYGUI_H
+#define LIBREPCB_GUI_LIBRARYGUI_H
 
 /*******************************************************************************
  *  Includes
@@ -32,65 +32,41 @@
  ******************************************************************************/
 namespace librepcb {
 
-class FilePath;
-class Workspace;
+class Library;
 
 namespace gui {
 
-class EditorWindow;
-class ObjectListModel;
 class OpenedProject;
 
 /*******************************************************************************
- *  Class EditorApplication
+ *  Class LibraryGui
  ******************************************************************************/
 
 /**
- * @brief Top level class of the graphical editor application
+ * @brief GUI wrapper for a ::librepcb::Library
  */
-class EditorApplication : public QObject {
+class LibraryGui : public QObject {
   Q_OBJECT
 
 public:
   // Constructors / Destructor
-  EditorApplication(Workspace& ws, QObject* parent = nullptr);
-  EditorApplication(const EditorApplication& other) noexcept = delete;
-  virtual ~EditorApplication() noexcept;
+  LibraryGui() = delete;
+  LibraryGui(OpenedProject& project, Library& library) noexcept;
+  LibraryGui(const LibraryGui& other) noexcept = delete;
+  virtual ~LibraryGui() noexcept;
 
   // Properties
-  Q_PROPERTY(QString wsPath READ getWorkspacePath CONSTANT)
-  Q_PROPERTY(QAbstractItemModel* workspaceLibraries READ getWorkspaceLibraries
-                 CONSTANT)
-  Q_PROPERTY(QAbstractItemModel* openedProjects READ getOpenedProjects CONSTANT)
+  Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
 
   // Getters
-  QString getWorkspacePath() const noexcept;
-  QAbstractItemModel* getWorkspaceLibraries() noexcept;
-  QAbstractItemModel* getOpenedProjects() noexcept;
-
-  // General Methods
-  std::shared_ptr<OpenedProject> createProject() noexcept;
-  std::shared_ptr<OpenedProject> openProject() noexcept;
-  std::shared_ptr<OpenedProject> openProject(const FilePath& fp) noexcept;
-
-public slots:  // GUI Handlers
-  void openWorkspaceSettings() noexcept;
+  const QString& getName() const noexcept;
 
 signals:
-  void workspaceChanged();
+  void nameChanged(const QString& name);
 
-protected:  // Inherited Methods
-  virtual bool eventFilter(QObject* watched, QEvent* event) noexcept override;
-
-private:  // Methods
-  void openProjectsPassedByCommandLine() noexcept;
-  void openProjectPassedByOs(const QString& file, bool silent = false) noexcept;
-
-private:  // Data
-  Workspace& mWorkspace;
-  QVector<std::shared_ptr<EditorWindow>> mWindows;
-  QScopedPointer<ObjectListModel> mWorkspaceLibraries;
-  QScopedPointer<ObjectListModel> mOpenedProjects;
+private:
+  OpenedProject& mProject;
+  QPointer<Library> mLibrary;
 };
 
 /*******************************************************************************

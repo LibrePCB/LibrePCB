@@ -17,65 +17,42 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_GUI_OPENEDPROJECT_H
-#define LIBREPCB_GUI_OPENEDPROJECT_H
-
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "librarygui.h"
+
+#include "openedproject.h"
+
+#include <librepcb/core/library/library.h>
+
 #include <QtCore>
 
-#include <memory>
-
 /*******************************************************************************
- *  Namespace / Forward Declarations
+ *  Namespace
  ******************************************************************************/
 namespace librepcb {
-
-class Project;
-
 namespace gui {
 
-class EditorApplication;
-class ObjectListModel;
-
 /*******************************************************************************
- *  Class OpenedProject
+ *  Constructors / Destructor
  ******************************************************************************/
 
-/**
- * @brief Wrapper of an opened project
- */
-class OpenedProject : public QObject {
-  Q_OBJECT
+LibraryGui::LibraryGui(OpenedProject& project, Library& library) noexcept
+  : QObject(&project), mProject(project), mLibrary(&library) {
+}
 
-public:
-  // Constructors / Destructor
-  OpenedProject() = delete;
-  OpenedProject(EditorApplication& application,
-                std::unique_ptr<Project> project) noexcept;
-  OpenedProject(const OpenedProject& other) noexcept = delete;
-  virtual ~OpenedProject() noexcept;
+LibraryGui::~LibraryGui() noexcept {
+}
 
-  // Properties
-  Q_PROPERTY(QString name READ getName NOTIFY nameChanged)
-  Q_PROPERTY(QAbstractItemModel* schematics READ getSchematics CONSTANT)
-  Q_PROPERTY(QAbstractItemModel* boards READ getBoards CONSTANT)
+/*******************************************************************************
+ *  Getters
+ ******************************************************************************/
 
-  // Getters
-  const QString& getName() const noexcept;
-  QAbstractItemModel* getSchematics() noexcept;
-  QAbstractItemModel* getBoards() noexcept;
-
-signals:
-  void nameChanged(const QString& name);
-
-private:
-  EditorApplication& mApplication;
-  std::unique_ptr<Project> mProject;
-  QScopedPointer<ObjectListModel> mSchematicsModel;
-  QScopedPointer<ObjectListModel> mBoardsModel;
-};
+const QString& LibraryGui::getName() const noexcept {
+  Q_ASSERT(mLibrary);
+  return *mLibrary->getNames().getDefaultValue();
+}
 
 /*******************************************************************************
  *  End of File
@@ -83,5 +60,3 @@ private:
 
 }  // namespace gui
 }  // namespace librepcb
-
-#endif

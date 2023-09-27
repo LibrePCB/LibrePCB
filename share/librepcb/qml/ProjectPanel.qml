@@ -58,4 +58,43 @@ ColumnLayout {
         }
         focus: true
     }
+    ListView {
+        id: lstBoards
+        Layout.fillWidth: true
+        Layout.fillHeight: true
+        model: cppWindow.currentProject ? cppWindow.currentProject.boards : null
+        delegate: Item {
+            width: parent.width
+            height: 25
+            RowLayout {
+                Image {
+                    Layout.margins: 2
+                    Layout.preferredHeight: 21
+                    Layout.preferredWidth: 21
+                    source: "qrc:///img/actions/board_editor.png"
+                    fillMode: Image.PreserveAspectFit
+                }
+                Text {
+                    Layout.margins: 2
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    text: item.name
+                    color: lstBoardsMouseArea.hasHover ? "darkgrey" : "black"
+                }
+            }
+            MouseArea {
+                id: lstBoardsMouseArea
+                anchors.fill: parent
+                hoverEnabled: true
+                property bool hasHover: false
+                onEntered: hasHover = true
+                onExited: hasHover = false
+                onClicked: lstBoards.currentIndex = index
+            }
+        }
+        highlight: Rectangle {
+            color: "grey"
+        }
+        focus: true
+    }
 }

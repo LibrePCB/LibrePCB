@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "openedproject.h"
 
+#include "boardgui.h"
 #include "editorapplication.h"
 #include "objectlistmodel.h"
 #include "schematicgui.h"
@@ -45,10 +46,14 @@ OpenedProject::OpenedProject(EditorApplication& application,
   : QObject(&application),
     mApplication(application),
     mProject(std::move(project)),
-    mSchematicsModel(new ObjectListModel(this)) {
+    mSchematicsModel(new ObjectListModel(this)),
+    mBoardsModel(new ObjectListModel(this)) {
   Q_ASSERT(mProject);
   foreach (Schematic* s, mProject->getSchematics()) {
     mSchematicsModel->insert(-1, std::make_shared<SchematicGui>(*this, *s));
+  }
+  foreach (Board* b, mProject->getBoards()) {
+    mBoardsModel->insert(-1, std::make_shared<BoardGui>(*this, *b));
   }
 }
 
@@ -65,6 +70,10 @@ const QString& OpenedProject::getName() const noexcept {
 
 QAbstractItemModel* OpenedProject::getSchematics() noexcept {
   return mSchematicsModel.data();
+}
+
+QAbstractItemModel* OpenedProject::getBoards() noexcept {
+  return mBoardsModel.data();
 }
 
 /*******************************************************************************

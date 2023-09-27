@@ -23,6 +23,7 @@
 #include "editorapplication.h"
 
 #include "editorwindow.h"
+#include "librarygui.h"
 #include "objectlistmodel.h"
 #include "openedproject.h"
 
@@ -32,6 +33,7 @@
 #include <librepcb/core/project/projectloader.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
+#include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/dialogs/filedialog.h>
 #include <librepcb/editor/project/newprojectwizard/newprojectwizard.h>
@@ -53,8 +55,21 @@ EditorApplication::EditorApplication(Workspace& ws, QObject* parent)
   : QObject(parent),
     mWorkspace(ws),
     mWindows(),
+    mWorkspaceLibraries(new ObjectListModel(this)),
     mOpenedProjects(new ObjectListModel(this)) {
   mWindows.append(std::make_shared<EditorWindow>(*this));
+
+  /*QMultiMap<Version, FilePath> libraries =
+      mWorkspace.getLibraryDb().getAll<Library>();  // can throw
+
+  foreach (const FilePath& libDir, libraries) {
+    QString name, description, keywords;
+    mWorkspace.getLibraryDb().getTranslations<Library>(
+        libDir, mWorkspace.getSettings().libraryLocaleOrder.get(), &name,
+        &description, &keywords);  // can throw
+    QPixmap icon;
+    mWorkspace.getLibraryDb().getLibraryMetadata(libDir, &icon);  // can throw
+  }*/
 
   // Slightly delay opening projects just to ensure the GUI is fully loaded.
   QTimer::singleShot(20, this,
@@ -70,6 +85,10 @@ EditorApplication::~EditorApplication() noexcept {
 
 QString EditorApplication::getWorkspacePath() const noexcept {
   return mWorkspace.getPath().toNative();
+}
+
+QAbstractItemModel* EditorApplication::getWorkspaceLibraries() noexcept {
+  return mWorkspaceLibraries.data();
 }
 
 QAbstractItemModel* EditorApplication::getOpenedProjects() noexcept {
