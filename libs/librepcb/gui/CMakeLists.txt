@@ -6,10 +6,14 @@ set(CMAKE_AUTORCC OFF)
 # Export library
 add_library(
   librepcb_gui STATIC
+  boardgui.cpp
+  boardgui.h
   editorapplication.cpp
   editorapplication.h
   editorwindow.cpp
   editorwindow.h
+  librarygui.cpp
+  librarygui.h
   objectlistmodel.cpp
   objectlistmodel.h
   openedproject.cpp
