@@ -22,8 +22,8 @@
  ******************************************************************************/
 
 #include <gtest/gtest.h>
-#include <librepcb/core/fileio/versionfile.h>
 #include <librepcb/core/exceptions.h>
+#include <librepcb/core/fileio/versionfile.h>
 
 /*******************************************************************************
  *  Namespace
