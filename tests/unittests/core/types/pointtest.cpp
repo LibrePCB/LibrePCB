@@ -157,6 +157,74 @@ INSTANTIATE_TEST_SUITE_P(PointRotateTest, PointRotateTest, ::testing::Values(
 // clang-format on
 
 /*******************************************************************************
+ *  Tests for precision of getLength()
+ ******************************************************************************/
+
+struct PointLengthPrecisionTestData {
+  Length range;
+  UnsignedLength axisLength;
+  UnsignedLength squaredLength;
+};
+
+class PointLengthPrecisionTest
+  : public ::testing::TestWithParam<PointLengthPrecisionTestData> {};
+
+TEST_P(PointLengthPrecisionTest, testPrecision) {
+  const PointLengthPrecisionTestData& data = GetParam();
+
+  Point px(data.range, 0);
+  Point py(0, data.range);
+  Point pxy(data.range, data.range);
+
+  ASSERT_NO_THROW(px.getLength());
+  ASSERT_NO_THROW(py.getLength());
+  ASSERT_NO_THROW(pxy.getLength());
+
+  EXPECT_EQ(data.axisLength, px.getLength())
+      << "Computed: " << px.getLength()->toNm()
+      << " Expected: " << data.axisLength->toNm();
+  EXPECT_EQ(data.axisLength, py.getLength())
+      << "Computed: " << px.getLength()->toNm()
+      << " Expected: " << data.axisLength->toNm();
+  EXPECT_EQ(data.squaredLength, pxy.getLength())
+      << "Computed: " << pxy.getLength()->toNm()
+      << " Expected: " << data.squaredLength->toNm();
+}
+
+// sqrt2 according wikipedia
+// 1.41421356237309504880168872420969807856967187537694807317667973799
+
+static const LengthBase_t MM = 1000000LL;
+static const LengthBase_t M = 1000000000LL;
+static const LengthBase_t KM = 1000000000000LL;
+
+// clang-format off
+INSTANTIATE_TEST_SUITE_P(PointLengthPrecisionTest, PointLengthPrecisionTest, ::testing::Values(
+    //                           {range,            axisLength,               squaredLength}
+    PointLengthPrecisionTestData({Length(0),        UnsignedLength(0),        UnsignedLength(0)}),
+
+    // keep precision on nanometer scale
+    PointLengthPrecisionTestData({Length(10),       UnsignedLength(10),       UnsignedLength(14)}),
+
+    // keep precision on millimeter scale
+    PointLengthPrecisionTestData({Length(MM),       UnsignedLength(MM),       UnsignedLength(1414213)}),
+
+    // keep precision on meter scale
+    PointLengthPrecisionTestData({Length(M),        UnsignedLength(M),        UnsignedLength(1414213562)}),
+    PointLengthPrecisionTestData({Length(2*M),      UnsignedLength(2*M),      UnsignedLength(2828427124)}),
+    PointLengthPrecisionTestData({Length(3*M),      UnsignedLength(3*M),      UnsignedLength(4242640687)}),
+
+    // keep precision on kilometer scale
+    PointLengthPrecisionTestData({Length(KM),       UnsignedLength(KM),       UnsignedLength(1414213562373)}),
+    PointLengthPrecisionTestData({Length(10*KM),    UnsignedLength(10*KM),    UnsignedLength(14142135623730)}),
+    PointLengthPrecisionTestData({Length(100*KM),   UnsignedLength(100*KM),   UnsignedLength(141421356237309)}),
+
+    // keep precision on small planet's scale
+    PointLengthPrecisionTestData({Length(1000*KM),  UnsignedLength(1000*KM),  UnsignedLength(1414213562373095)})
+));
+// clang-format on
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 
