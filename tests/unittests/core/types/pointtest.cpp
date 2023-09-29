@@ -166,7 +166,8 @@ struct PointLengthPrecisionTestData {
   UnsignedLength squaredLength;
 };
 
-class PointLengthPrecisionTest : public ::testing::TestWithParam<PointLengthPrecisionTestData> {};
+class PointLengthPrecisionTest
+  : public ::testing::TestWithParam<PointLengthPrecisionTestData> {};
 
 TEST_P(PointLengthPrecisionTest, testPrecision) {
   const PointLengthPrecisionTestData& data = GetParam();
@@ -180,14 +181,18 @@ TEST_P(PointLengthPrecisionTest, testPrecision) {
   ASSERT_NO_THROW(pxy.getLength());
 
   EXPECT_EQ(data.axisLength, px.getLength())
-    << "Computed: " << px.getLength()->toNm() << " Expected: " << data.axisLength->toNm();
+      << "Computed: " << px.getLength()->toNm()
+      << " Expected: " << data.axisLength->toNm();
   EXPECT_EQ(data.axisLength, py.getLength())
-    << "Computed: " << px.getLength()->toNm() << " Expected: " << data.axisLength->toNm();
+      << "Computed: " << px.getLength()->toNm()
+      << " Expected: " << data.axisLength->toNm();
   EXPECT_EQ(data.squaredLength, pxy.getLength())
-    << "Computed: " << pxy.getLength()->toNm() << " Expected: " << data.squaredLength->toNm();
+      << "Computed: " << pxy.getLength()->toNm()
+      << " Expected: " << data.squaredLength->toNm();
 }
 
-// sqrt2 according wikipedia 1.41421356237309504880168872420969807856967187537694807317667973799
+// sqrt2 according wikipedia
+// 1.41421356237309504880168872420969807856967187537694807317667973799
 
 static const LengthBase_t MM = 1000000LL;
 static const LengthBase_t M = 1000000000LL;
