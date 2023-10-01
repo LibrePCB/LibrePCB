@@ -25,8 +25,9 @@ then
   # Actually we don't want to waste time with upgrading packages, but sometimes
   # this needs to be done to get it working (maybe it depends on the phase of
   # the moon whether this is required or not).
-  echo "Upgrading packages..."
-  brew upgrade || true
+  # At the moment, the phase of the moon says it *must not* be done.
+  # echo "Upgrading packages..."
+  # brew upgrade || true
 
   # Make python3/pip3 the default
   export PATH="/usr/local/opt/python/libexec/bin:$PATH"
