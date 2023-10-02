@@ -325,9 +325,9 @@ bool SymbolEditorState_Select::processSelectAll() noexcept {
     case SubState::IDLE: {
       // Set a selection rect slightly larger than the total items bounding
       // rect to get all items selected.
-      mContext.symbolGraphicsItem.setSelectionRect(
-          mContext.symbolGraphicsItem.boundingRect().adjusted(-100, -100, 100,
-                                                              100));
+      auto bounds = mContext.graphicsScene.itemsBoundingRect();
+      bounds.adjust(-100, -100, 100, 100);
+      mContext.symbolGraphicsItem.setSelectionRect(bounds);
       emit availableFeaturesChanged();  // Selection might have changed.
       return true;
     }

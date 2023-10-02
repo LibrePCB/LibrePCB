@@ -373,8 +373,9 @@ bool PackageEditorState_Select::processSelectAll() noexcept {
       if (auto item = mContext.currentGraphicsItem) {
         // Set a selection rect slightly larger than the total items bounding
         // rect to get all items selected.
-        item->setSelectionRect(
-            item->boundingRect().adjusted(-100, -100, 100, 100));
+        auto bounds = mContext.graphicsScene.itemsBoundingRect();
+        bounds.adjust(-100, -100, 100, 100);
+        item->setSelectionRect(bounds);
         emit availableFeaturesChanged();  // Selection might have changed.
         return true;
       }
