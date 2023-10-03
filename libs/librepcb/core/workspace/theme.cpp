@@ -116,7 +116,7 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
   addColor(Color::sBoardAirWires,              brd, tr("Air Wires"),                Qt::yellow,                 Qt::yellow        );
   addColor(Color::sBoardMeasures,              brd, tr("Measures"),                 QColor("#FF808000"),        QColor("#FFA3B200"));
   addColor(Color::sBoardAlignment,             brd, tr("Alignment"),                QColor("#B4E59500"),        QColor("#DCFFBF00"));
-  addColor(Color::sBoardDocumentation,         brd, tr("Documentation"),            QColor("#96E0E0E0"),        QColor("#DCE0E0E0"));
+  addColor(Color::sBoardDocumentation,         brd, tr("Documentation"),            QColor("#76fbc697"),        QColor("#b6fbc697"));
   addColor(Color::sBoardComments,              brd, tr("Comments"),                 QColor("#B4E59500"),        QColor("#DCFFBF00"));
   addColor(Color::sBoardGuide,                 brd, tr("Guide"),                    QColor("#FF808000"),        QColor("#FFA3B200"));
   addColor(Color::sBoardNamesTop,              brd, tr("Names Top"),                QColor("#96EDFFD8"),        QColor("#DCE0E0E0")  );
