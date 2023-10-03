@@ -156,16 +156,16 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
         secondary = QColor("#C0DA84FF");
         break;
       case 1:
-        primary = QColor("#96E2A1FF");
-        secondary = QColor("#C0E9BAFF");
+        primary = QColor("#96E50063");
+        secondary = QColor("#C0E50063");
         break;
       case 2:
         primary = QColor("#96EE5C9B");
         secondary = QColor("#C0FF4C99");
         break;
       case 3:
-        primary = QColor("#96E50063");
-        secondary = QColor("#C0E50063");
+        primary = QColor("#96E2A1FF");
+        secondary = QColor("#C0E9BAFF");
         break;
       case 4:
         primary = QColor("#96A70049");
