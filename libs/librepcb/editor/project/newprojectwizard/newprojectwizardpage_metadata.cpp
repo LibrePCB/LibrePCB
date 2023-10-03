@@ -90,6 +90,26 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
   mUi->cbxLicense->addItem(
       tr("CC-BY-SA-4.0 (requires attribution + share alike)"),
       QString("licenses/cc-by-sa-4.0.txt"));
+  mUi->cbxLicense->addItem(
+      tr("CC-BY-NC-4.0 (requires attribution + non commercial)"),
+      QString("licenses/cc-by-nc-4.0.txt"));
+  mUi->cbxLicense->addItem(tr("CC-BY-NC-SA-4.0 (requires attribution + non "
+                              "commercial + share alike)"),
+                           QString("licenses/cc-by-nc-sa-4.0.txt"));
+  mUi->cbxLicense->addItem(tr("CC-BY-NC-ND-4.0 (requires attribution + non "
+                              "commercial + no derivatives)"),
+                           QString("licenses/cc-by-nc-nd-4.0.txt"));
+  mUi->cbxLicense->addItem(
+      tr("CC-BY-ND-4.0 (requires attribution + no derivatives)"),
+      QString("licenses/cc-by-nd-4.0.txt"));
+  mUi->cbxLicense->addItem(tr("TAPR-OHL-1.0"),
+                           QString("licenses/tapr-ohl-1.0.txt"));
+  mUi->cbxLicense->addItem(tr("CERN-OHL-P-2.0 (permissive)"),
+                           QString("licenses/cern-ohl-p-2.0.txt"));
+  mUi->cbxLicense->addItem(tr("CERN-OHL-W-2.0 (weakly reciprocal)"),
+                           QString("licenses/cern-ohl-w-2.0.txt"));
+  mUi->cbxLicense->addItem(tr("CERN-OHL-S-2.0 (strongly reciprocal)"),
+                           QString("licenses/cern-ohl-s-2.0.txt"));
   mUi->cbxLicense->setCurrentIndex(0);  // no license
 
   // Restore client settings.
