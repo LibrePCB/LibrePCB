@@ -63,7 +63,7 @@ protected:
 
   QStringList filter;
 
-  static void SetupFile(const FilePath& pth, const QByteArray& content) {
+  static void setupFile(const FilePath& pth, const QByteArray& content) {
     QFile f(pth.toNative());
     if (f.open(QIODevice::ReadWrite | QIODevice::NewOnly)) f.write(content);
     f.close();
@@ -94,13 +94,12 @@ protected:
     QDir().mkdir(subdir.toNative());
     QDir().mkdir(subdirSubdir.toNative());
 
-    SetupFile(rootFile, "test\n");
-    SetupFile(rootFileHidden, "hiddenContent\n");
-    SetupFile(subdirFile, "test\n");
-    SetupFile(subdirSubdirFile, "test\n");
-    SetupFile(subdirSubdirFileHidden, "hiddenContent\n");
+    setupFile(rootFile, "test\n");
+    setupFile(rootFileHidden, "hiddenContent\n");
+    setupFile(subdirFile, "test\n");
+    setupFile(subdirSubdirFile, "test\n");
+    setupFile(subdirSubdirFileHidden, "hiddenContent\n");
 
-    // TODO make hidden files already hidden under Windows !
 #if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
     SetFileAttributes(rootFileHidden.toNative().toStdWString().c_str(), FILE_ATTRIBUTE_HIDDEN);
     SetFileAttributes(subdirSubdirFileHidden.toNative().toStdWString().c_str(), FILE_ATTRIBUTE_HIDDEN);
@@ -111,7 +110,7 @@ protected:
 
   void TearDown() override { QDir(root.toNative()).removeRecursively(); }
 
-  static void ExpectList(const QList<FilePath>& result,
+  static void expectList(const QList<FilePath>& result,
                          const QList<FilePath>& expected) {
     std::string resultStr;
     std::string expStr;
@@ -218,13 +217,13 @@ TEST_F(FileUtilsTest, testRecursiveCopySubdir) {
 TEST_F(FileUtilsTest, testFindDirectories) {
   auto p = FileUtils::findDirectories(root);
 
-  ExpectList(p, {subdir});
+  expectList(p, {subdir});
 }
 
 TEST_F(FileUtilsTest, testFindFileInDirectory) {
   auto p = FileUtils::getFilesInDirectory(root);
 
-  ExpectList(p,
+  expectList(p,
              {
                  rootFile, rootFileHidden,
                  // subdirFile, skipped (not recursive)
@@ -236,7 +235,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectory) {
 TEST_F(FileUtilsTest, testFindFileInDirectoryRecursive) {
   auto p = FileUtils::getFilesInDirectory(root, {}, true);
 
-  ExpectList(p,
+  expectList(p,
              {
                  rootFile,
                  rootFileHidden,
@@ -249,7 +248,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectoryRecursive) {
 TEST_F(FileUtilsTest, testFindFileInDirectorySkipHidden) {
   auto p = FileUtils::getFilesInDirectory(root, {}, false, true);
 
-  ExpectList(p,
+  expectList(p,
              {
                  rootFile,
                  // rootFileHidden, skipped (hidden)
@@ -262,7 +261,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectorySkipHidden) {
 TEST_F(FileUtilsTest, testFindFileInDirectoryRecursiveSkipHidden) {
   auto p = FileUtils::getFilesInDirectory(root, {}, true, true);
 
-  ExpectList(p,
+  expectList(p,
              {
                  rootFile,
                  // rootFileHidden, skipped (hidden)
@@ -274,7 +273,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectoryRecursiveSkipHidden) {
 TEST_F(FileUtilsTest, testFindFileInDirectoryFiltered) {
   auto p = FileUtils::getFilesInDirectory(root, filter, false);
 
-  ExpectList(p,
+  expectList(p,
              {
                  rootFile, rootFileHidden,
                  // subdirFile skipped (not recursive)
@@ -286,7 +285,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectoryFiltered) {
 TEST_F(FileUtilsTest, testFindFileInDirectoryRecursiveFiltered) {
   auto p = FileUtils::getFilesInDirectory(root, filter, true);
 
-  ExpectList(p,
+  expectList(p,
              {rootFile, rootFileHidden, subdirFile, subdirSubdirFile,
               subdirSubdirFileHidden});
 }
@@ -294,7 +293,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectoryRecursiveFiltered) {
 TEST_F(FileUtilsTest, testFindFileInDirectoryRecursiveFilteredSkipHidden) {
   auto p = FileUtils::getFilesInDirectory(root, filter, true, true);
 
-  ExpectList(p,
+  expectList(p,
              {
                  rootFile,
                  // rootFileHidden skipped (hidden)
