@@ -73,24 +73,22 @@ protected:
     root = FilePath::getRandomTempPath();
 
     // the sources of already existing files and directories
-    rootFile = FilePath::fromRelative(root, "file.txt");
-    rootFileHidden = FilePath::fromRelative(root, ".hidden.txt");
-    subdir = FilePath::fromRelative(root, "subdir");
-    subdirFile = FilePath::fromRelative(subdir, "file.txt");
-    subdirSubdir = FilePath::fromRelative(subdir, "subdir");
-    subdirSubdirFile = FilePath::fromRelative(subdirSubdir, "file.txt");
-    subdirSubdirFileHidden =
-        FilePath::fromRelative(subdirSubdir, ".hidden.txt");
+    rootFile = root.getPathTo("file.txt");
+    rootFileHidden = root.getPathTo(".hidden.txt");
+    subdir = root.getPathTo("subdir");
+    subdirFile = subdir.getPathTo("file.txt");
+    subdirSubdir = subdir.getPathTo("subdir");
+    subdirSubdirFile = subdirSubdir.getPathTo("file.txt");
+    subdirSubdirFileHidden = subdirSubdir.getPathTo(".hidden.txt");
 
     // the destinations for copying files, nonexistent at start of test
-    rootFileCopy = FilePath::fromRelative(root, "fileCopy.txt");
-    rootFileCopy = FilePath::fromRelative(root, "missing.txt");
-    subdirCopy = FilePath::fromRelative(root, "subdirCopy");
-    subdirCopyFile = FilePath::fromRelative(subdirCopy, "file.txt");
-    subdirCopySubdir = FilePath::fromRelative(subdirCopy, "subdir");
-    subdirCopySubdirFile = FilePath::fromRelative(subdirCopySubdir, "file.txt");
-    subdirCopySubdirFileHidden =
-        FilePath::fromRelative(subdirCopySubdir, ".hidden.txt");
+    rootFileCopy = root.getPathTo("fileCopy.txt");
+    rootFileCopy = root.getPathTo("missing.txt");
+    subdirCopy = root.getPathTo("subdirCopy");
+    subdirCopyFile = subdirCopy.getPathTo("file.txt");
+    subdirCopySubdir = subdirCopy.getPathTo("subdir");
+    subdirCopySubdirFile = subdirCopySubdir.getPathTo("file.txt");
+    subdirCopySubdirFileHidden = subdirCopySubdir.getPathTo(".hidden.txt");
 
     QDir().mkdir(root.toNative());
     QDir().mkdir(subdir.toNative());
