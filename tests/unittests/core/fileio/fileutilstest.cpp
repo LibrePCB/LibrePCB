@@ -31,11 +31,28 @@
 
 #include <QtCore>
 
+#include <fstream>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
 namespace tests {
+
+static void setupFile(const FilePath& pth, const QByteArray& content,
+                      bool hidden = false) {
+  auto filename = pth.toNative().toStdString();
+  std::fstream file{filename, std::ios::out | std::ios::trunc};
+  EXPECT_TRUE(file.is_open());
+  file.write(content.data(), content.size());
+  file.close();
+
+  if (hidden) {
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+    SetFileAttributes(pth.toNative().toStdWString().c_str(), FILE_ATTRIBUTE_HIDDEN);
+#endif
+  }
+}
 
 /*******************************************************************************
  *  Test Class
@@ -61,22 +78,7 @@ protected:
   FilePath subdirCopySubdirFile;
   FilePath subdirCopySubdirFileHidden;
 
-  QStringList filter;
-
-  static void setupFile(const FilePath& pth, const QByteArray& content,
-                        bool hidden = false) {
-    QFile f(pth.toNative());
-    if (f.open(QIODevice::ReadWrite | QIODevice::NewOnly)) {
-      f.write(content);
-    }
-    f.close();
-
-    if (hidden) {
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
-      SetFileAttributes(pth.toNative().toStdWString().c_str(), FILE_ATTRIBUTE_HIDDEN);
-#endif
-    }
-  }
+  QStringList filter{"*.txt"};
 
   void SetUp() override {
     root = FilePath::getRandomTempPath();
@@ -108,8 +110,6 @@ protected:
     setupFile(subdirFile, "test\n");
     setupFile(subdirSubdirFile, "test\n");
     setupFile(subdirSubdirFileHidden, "hiddenContent\n", true);
-
-    filter << "*.txt";
   }
 
   void TearDown() override { QDir(root.toNative()).removeRecursively(); }
