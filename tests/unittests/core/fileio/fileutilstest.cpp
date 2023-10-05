@@ -60,47 +60,30 @@ static void setupFile(const FilePath& pth, const QByteArray& content,
 
 class FileUtilsTest : public ::testing::Test {
 protected:
-  FilePath root;
-  FilePath rootFile;  // source for all operations
-  FilePath rootFileHidden;
+  FilePath root{FilePath::getRandomTempPath()};
 
-  FilePath subdir;
-  FilePath subdirFile;
-  FilePath subdirSubdir;
-  FilePath subdirSubdirFile;
-  FilePath subdirSubdirFileHidden;
+  // the sources of already existing files and directories
+  FilePath rootFile{root.getPathTo("file.txt")};  // source for all operations
+  FilePath rootFileHidden{root.getPathTo(".hidden.txt")};
 
-  FilePath rootFileMissing;
-  FilePath rootFileCopy;
-  FilePath subdirCopy;
-  FilePath subdirCopyFile;
-  FilePath subdirCopySubdir;
-  FilePath subdirCopySubdirFile;
-  FilePath subdirCopySubdirFileHidden;
+  FilePath subdir{root.getPathTo("subdir")};
+  FilePath subdirFile{subdir.getPathTo("file.txt")};
+  FilePath subdirSubdir{subdir.getPathTo("subdir")};
+  FilePath subdirSubdirFile{subdirSubdir.getPathTo("file.txt")};
+  FilePath subdirSubdirFileHidden{subdirSubdir.getPathTo(".hidden.txt")};
+
+  // the destinations for copying files, nonexistent at start of test
+  FilePath rootFileMissing{root.getPathTo("missing.txt")};
+  FilePath rootFileCopy{root.getPathTo("fileCopy.txt")};
+  FilePath subdirCopy{root.getPathTo("subdirCopy")};
+  FilePath subdirCopyFile{subdirCopy.getPathTo("file.txt")};
+  FilePath subdirCopySubdir{subdirCopy.getPathTo("subdir")};
+  FilePath subdirCopySubdirFile{subdirCopySubdir.getPathTo("file.txt")};
+  FilePath subdirCopySubdirFileHidden{subdirCopySubdir.getPathTo(".hidden.txt")};
 
   QStringList filter{"*.txt"};
 
-  void SetUp() override {
-    root = FilePath::getRandomTempPath();
-
-    // the sources of already existing files and directories
-    rootFile = root.getPathTo("file.txt");
-    rootFileHidden = root.getPathTo(".hidden.txt");
-    subdir = root.getPathTo("subdir");
-    subdirFile = subdir.getPathTo("file.txt");
-    subdirSubdir = subdir.getPathTo("subdir");
-    subdirSubdirFile = subdirSubdir.getPathTo("file.txt");
-    subdirSubdirFileHidden = subdirSubdir.getPathTo(".hidden.txt");
-
-    // the destinations for copying files, nonexistent at start of test
-    rootFileCopy = root.getPathTo("fileCopy.txt");
-    rootFileCopy = root.getPathTo("missing.txt");
-    subdirCopy = root.getPathTo("subdirCopy");
-    subdirCopyFile = subdirCopy.getPathTo("file.txt");
-    subdirCopySubdir = subdirCopy.getPathTo("subdir");
-    subdirCopySubdirFile = subdirCopySubdir.getPathTo("file.txt");
-    subdirCopySubdirFileHidden = subdirCopySubdir.getPathTo(".hidden.txt");
-
+  FileUtilsTest() {
     QDir().mkdir(root.toNative());
     QDir().mkdir(subdir.toNative());
     QDir().mkdir(subdirSubdir.toNative());
@@ -112,7 +95,10 @@ protected:
     setupFile(subdirSubdirFileHidden, "hiddenContent\n", true);
   }
 
-  void TearDown() override { QDir(root.toNative()).removeRecursively(); }
+  ~FileUtilsTest() {
+    // each test should clean itself after run
+    QDir(root.toNative()).removeRecursively();
+  }
 
   static void expectList(const QList<FilePath>& result,
                          const QList<FilePath>& expected) {
