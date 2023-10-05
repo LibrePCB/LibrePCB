@@ -63,10 +63,19 @@ protected:
 
   QStringList filter;
 
-  static void setupFile(const FilePath& pth, const QByteArray& content) {
+  static void setupFile(const FilePath& pth, const QByteArray& content,
+                        bool hidden = false) {
     QFile f(pth.toNative());
-    if (f.open(QIODevice::ReadWrite | QIODevice::NewOnly)) f.write(content);
+    if (f.open(QIODevice::ReadWrite | QIODevice::NewOnly)) {
+      f.write(content);
+    }
     f.close();
+
+    if (hidden) {
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+      SetFileAttributes(pth.toNative().toStdWString().c_str(), FILE_ATTRIBUTE_HIDDEN);
+#endif
+    }
   }
 
   void SetUp() override {
@@ -95,15 +104,10 @@ protected:
     QDir().mkdir(subdirSubdir.toNative());
 
     setupFile(rootFile, "test\n");
-    setupFile(rootFileHidden, "hiddenContent\n");
+    setupFile(rootFileHidden, "hiddenContent\n", true);
     setupFile(subdirFile, "test\n");
     setupFile(subdirSubdirFile, "test\n");
-    setupFile(subdirSubdirFileHidden, "hiddenContent\n");
-
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
-    SetFileAttributes(rootFileHidden.toNative().toStdWString().c_str(), FILE_ATTRIBUTE_HIDDEN);
-    SetFileAttributes(subdirSubdirFileHidden.toNative().toStdWString().c_str(), FILE_ATTRIBUTE_HIDDEN);
-#endif
+    setupFile(subdirSubdirFileHidden, "hiddenContent\n", true);
 
     filter << "*.txt";
   }
