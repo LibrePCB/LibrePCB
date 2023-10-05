@@ -49,7 +49,8 @@ static void setupFile(const FilePath& pth, const QByteArray& content,
 
   if (hidden) {
 #if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
-    SetFileAttributes(pth.toNative().toStdWString().c_str(), FILE_ATTRIBUTE_HIDDEN);
+    SetFileAttributes(pth.toNative().toStdWString().c_str(),
+                      FILE_ATTRIBUTE_HIDDEN);
 #endif
   }
 }
@@ -79,7 +80,8 @@ protected:
   FilePath subdirCopyFile{subdirCopy.getPathTo("file.txt")};
   FilePath subdirCopySubdir{subdirCopy.getPathTo("subdir")};
   FilePath subdirCopySubdirFile{subdirCopySubdir.getPathTo("file.txt")};
-  FilePath subdirCopySubdirFileHidden{subdirCopySubdir.getPathTo(".hidden.txt")};
+  FilePath subdirCopySubdirFileHidden{
+      subdirCopySubdir.getPathTo(".hidden.txt")};
 
   QStringList filter{"*.txt"};
 
