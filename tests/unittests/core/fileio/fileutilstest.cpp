@@ -42,10 +42,10 @@ namespace tests {
 static void setupFile(const FilePath& pth, const QByteArray& content,
                       bool hidden = false) {
   auto filename = pth.toNative().toStdString();
-  std::fstream file{filename, std::ios::out | std::ios::trunc};
-  EXPECT_TRUE(file.is_open());
-  file.write(content.data(), content.size());
-  file.close();
+  std::fstream fs{filename, std::ios::out | std::ios::trunc | std::ios::binary};
+  EXPECT_TRUE(fs.is_open());
+  fs.write(content.data(), content.size());
+  fs.close();
 
   if (hidden) {
 #if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
