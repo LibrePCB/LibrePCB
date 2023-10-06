@@ -116,7 +116,7 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
   addColor(Color::sBoardAirWires,              brd, tr("Air Wires"),                Qt::yellow,                 Qt::yellow        );
   addColor(Color::sBoardMeasures,              brd, tr("Measures"),                 QColor("#FF808000"),        QColor("#FFA3B200"));
   addColor(Color::sBoardAlignment,             brd, tr("Alignment"),                QColor("#B4E59500"),        QColor("#DCFFBF00"));
-  addColor(Color::sBoardDocumentation,         brd, tr("Documentation"),            QColor("#76fbc697"),        QColor("#b6fbc697"));
+  addColor(Color::sBoardDocumentation,         brd, tr("Documentation"),            QColor("#76FBC697"),        QColor("#B6FBC697"));
   addColor(Color::sBoardComments,              brd, tr("Comments"),                 QColor("#B4E59500"),        QColor("#DCFFBF00"));
   addColor(Color::sBoardGuide,                 brd, tr("Guide"),                    QColor("#FF808000"),        QColor("#FFA3B200"));
   addColor(Color::sBoardNamesTop,              brd, tr("Names Top"),                QColor("#96EDFFD8"),        QColor("#DCE0E0E0")  );
@@ -125,8 +125,8 @@ Theme::Theme(const Uuid& uuid, const QString& name) noexcept
   addColor(Color::sBoardValuesBot,             brd, tr("Values Bottom"),            QColor("#96D8F2FF"),        QColor("#DCE0E0E0")  );
   addColor(Color::sBoardLegendTop,             brd, tr("Legend Top"),               QColor("#BBFFFFFF"),        QColor("#FFFFFFFF")  );
   addColor(Color::sBoardLegendBot,             brd, tr("Legend Bottom"),            QColor("#BBFFFFFF"),        QColor("#FFFFFFFF")  );
-  addColor(Color::sBoardDocumentationTop,      brd, tr("Documentation Top"),        QColor("#96E0E0E0"),        QColor("#DCE0E0E0")  );
-  addColor(Color::sBoardDocumentationBot,      brd, tr("Documentation Bottom"),     QColor("#96E0E0E0"),        QColor("#DCE0E0E0")  );
+  addColor(Color::sBoardDocumentationTop,      brd, tr("Documentation Top"),        QColor("#76FBC697"),        QColor("#B6FBC697")  );
+  addColor(Color::sBoardDocumentationBot,      brd, tr("Documentation Bottom"),     QColor("#76FBC697"),        QColor("#B6FBC697")  );
   addColor(Color::sBoardPackageOutlinesTop,    brd, tr("Package Outlines Top"),     QColor("#C000FFFF"),        QColor("#FF00FFFF")  );
   addColor(Color::sBoardPackageOutlinesBot,    brd, tr("Package Outlines Bottom"),  QColor("#C000FFFF"),        QColor("#FF00FFFF")  );
   addColor(Color::sBoardCourtyardTop,          brd, tr("Courtyard Top"),            QColor("#C0FF00FF"),        QColor("#FFFF00FF")  );
