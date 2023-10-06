@@ -25,13 +25,13 @@
 #include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/fileio/fileutils.h>
+
 #if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)  // Windows
 #include <fileapi.h>
 #endif
 
-#include <QtCore>
-
 #include <fstream>
+#include <QtCore>
 
 /*******************************************************************************
  *  Namespace
@@ -102,22 +102,43 @@ protected:
     QDir(root.toNative()).removeRecursively();
   }
 
-  static void expectList(const QList<FilePath>& result,
-                         const QList<FilePath>& expected) {
-    std::string resultStr;
-    std::string expStr;
-    for (const auto& i : result)
-      resultStr += "  " + i.toStr().toStdString() + "\n";
-    for (const auto& i : expected)
-      expStr += "  " + i.toStr().toStdString() + "\n";
-
-    ASSERT_EQ(result.size(), expected.size())
-        << "\nActual:\n" << resultStr
-        << "\nExpected:\n" << expStr;
-    for (const auto& i : expected)
-      ASSERT_TRUE(result.contains(i))
-          << "\nActual:\n" << resultStr
-          << "\nExpected:\n" << expStr;
+  /**
+   * @brief Make the unordered result list comparable with better test message
+   *
+   *  **using std::string:**
+   *  Expected equality of these values:
+   *    comparable(actual)
+   *      Which is: "\n/tmp/librepcb/1696569432486_2075782095/file.txt..."
+   *    comparable(expected)
+   *      Which is: "\n/tmp/librepcb/1696569432486_2075782095/file.txt..."
+   *  With diff:
+   *   @@ +1,4 @@
+   *
+   *   +/tmp/librepcb/1696569432486_2075782095/file.txt
+   *    /tmp/librepcb/1696569432486_2075782095/file.txt
+   *    /tmp/librepcb/1696569432486_2075782095/subdir/file.txt
+   *
+   *  **using Qt's QString**:
+   *  Expected equality of these values:
+   *    comparable(actual)
+   *      Which is: { 2-byte object <0A-00>, 2-byte object <2F-00>, ... }
+   *    comparable(expected)
+   *      Which is: { 2-byte object <0A-00>, 2-byte object <2F-00>, ... }
+   *
+   *  @param path result from getFilesInDirectory
+   *  @return comparable string for EXPECT macros
+   */
+  static std::string comparable(const QList<FilePath>& path) {
+    auto join = [](std::string a, std::string b) {
+      return !a.empty() ? (std::move(a) + '\n' + std::move(b)) : std::move(b);
+    };
+    auto conv = [](const FilePath& filepath) {
+      return filepath.toStr().toStdString();
+    };
+    std::vector<std::string> paths{};
+    std::transform(path.begin(), path.end(), std::back_inserter(paths), conv);
+    std::sort(paths.begin(), paths.end());
+    return std::accumulate(paths.begin(), paths.end(), std::string(), join);
   }
 };
 
@@ -207,91 +228,88 @@ TEST_F(FileUtilsTest, testRecursiveCopySubdir) {
 }
 
 TEST_F(FileUtilsTest, testFindDirectories) {
-  auto p = FileUtils::findDirectories(root);
+  auto actual = FileUtils::findDirectories(root);
+  auto expected = QList<FilePath>{subdir};
 
-  expectList(p, {subdir});
+  EXPECT_EQ(comparable(actual), comparable(expected));
 }
 
 TEST_F(FileUtilsTest, testGetFilesInDirectory) {
-  auto p = FileUtils::getFilesInDirectory(root);
+  auto actual = FileUtils::getFilesInDirectory(root);
+  auto expected = QList<FilePath>{rootFile, rootFileHidden};
 
-  expectList(p,
-             {
-                 rootFile, rootFileHidden,
-                 // subdirFile, skipped (not recursive)
-                 // subdirSubdirFile, skipped (not recursive)
-                 // subdirSubdirFileHidden (not recursive)
-             });
+  // Those should be skipped:
+  // * subdirFile, (not recursive)
+  // * subdirSubdirFile, (not recursive)
+  // * subdirSubdirFileHidden (not recursive)
+
+  EXPECT_EQ(comparable(actual), comparable(expected));
 }
 
 TEST_F(FileUtilsTest, testGetFilesInDirectoryRecursive) {
-  auto p = FileUtils::getFilesInDirectory(root, {}, true);
+  auto actual = FileUtils::getFilesInDirectory(root, {}, true);
+  auto expected = QList<FilePath>{
+      rootFile,         rootFileHidden,         subdirFile,
+      subdirSubdirFile, subdirSubdirFileHidden,
+  };
 
-  expectList(p,
-             {
-                 rootFile,
-                 rootFileHidden,
-                 subdirFile,
-                 subdirSubdirFile,
-                 subdirSubdirFileHidden,
-             });
+  EXPECT_EQ(comparable(actual), comparable(expected));
 }
 
 TEST_F(FileUtilsTest, testGetFilesInDirectorySkipHidden) {
-  auto p = FileUtils::getFilesInDirectory(root, {}, false, true);
+  auto actual = FileUtils::getFilesInDirectory(root, {}, false, true);
+  auto expected = QList<FilePath>{rootFile};
 
-  expectList(p,
-             {
-                 rootFile,
-                 // rootFileHidden, skipped (hidden)
-                 // subdirFile, skipped (not recursive)
-                 // subdirSubdirFile, skipped (not recursive)
-                 // subdirSubdirFileHidden (not recursive, hidden)
-             });
+  // Those should be skipped in output:
+  // * rootFileHidden  (hidden)
+  // * subdirFile  (not recursive)
+  // * subdirSubdirFile (not recursive)
+  // * subdirSubdirFileHidden (not recursive, hidden)
+
+  EXPECT_EQ(comparable(actual), comparable(expected));
 }
 
 TEST_F(FileUtilsTest, testGetFilesInDirectoryRecursiveSkipHidden) {
-  auto p = FileUtils::getFilesInDirectory(root, {}, true, true);
+  auto actual = FileUtils::getFilesInDirectory(root, {}, true, true);
+  auto expected = QList<FilePath>{rootFile, subdirFile, subdirSubdirFile};
 
-  expectList(p,
-             {
-                 rootFile,
-                 // rootFileHidden, skipped (hidden)
-                 subdirFile, subdirSubdirFile,
-                 // subdirSubdirFileHidden (hidden)
-             });
+  // Those should be skipped in output:
+  // * rootFileHidden (hidden)
+  // * subdirSubdirFileHidden (hidden)
+
+  EXPECT_EQ(comparable(actual), comparable(expected));
 }
 
 TEST_F(FileUtilsTest, testGetFilesInDirectoryFiltered) {
-  auto p = FileUtils::getFilesInDirectory(root, filter, false);
+  auto actual = FileUtils::getFilesInDirectory(root, filter, false);
+  auto expected = QList<FilePath>{rootFile, rootFileHidden};
 
-  expectList(p,
-             {
-                 rootFile, rootFileHidden,
-                 // subdirFile skipped (not recursive)
-                 // subdirSubdirFile (not recursive)
-                 // subdirSubdirFileHidden (not recursive)
-             });
+  // Those should be skipped in output:
+  // * subdirFile (not recursive)
+  // * subdirSubdirFile (not recursive)
+  // * subdirSubdirFileHidden (not recursive)
+
+  EXPECT_EQ(comparable(actual), comparable(expected));
 }
 
 TEST_F(FileUtilsTest, testGetFilesInDirectoryRecursiveFiltered) {
-  auto p = FileUtils::getFilesInDirectory(root, filter, true);
+  auto actual = FileUtils::getFilesInDirectory(root, filter, true);
+  auto expected = QList<FilePath>{rootFile, rootFileHidden, subdirFile,
+                                  subdirSubdirFile, subdirSubdirFileHidden};
 
-  expectList(p,
-             {rootFile, rootFileHidden, subdirFile, subdirSubdirFile,
-              subdirSubdirFileHidden});
+  EXPECT_EQ(comparable(actual), comparable(expected));
 }
 
 TEST_F(FileUtilsTest, testGetFilesInDirectoryRecursiveFilteredSkipHidden) {
-  auto p = FileUtils::getFilesInDirectory(root, filter, true, true);
+  auto actual = FileUtils::getFilesInDirectory(root, filter, true, true);
+  auto expected =
+      QList<FilePath>{rootFile, subdirFile, subdirSubdirFile};
 
-  expectList(p,
-             {
-                 rootFile,
-                 // rootFileHidden skipped (hidden)
-                 subdirFile, subdirSubdirFile
-                 // subdirSubdirFileHidden skipped (hidden)
-             });
+  // Those should be skipped in output:
+  // * rootFileHidden skipped (hidden)
+  // * subdirSubdirFileHidden skipped (hidden)
+
+  EXPECT_EQ(comparable(actual), comparable(expected));
 }
 
 /*******************************************************************************
