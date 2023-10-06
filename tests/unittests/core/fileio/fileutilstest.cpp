@@ -212,7 +212,7 @@ TEST_F(FileUtilsTest, testFindDirectories) {
   expectList(p, {subdir});
 }
 
-TEST_F(FileUtilsTest, testFindFileInDirectory) {
+TEST_F(FileUtilsTest, testGetFilesInDirectory) {
   auto p = FileUtils::getFilesInDirectory(root);
 
   expectList(p,
@@ -224,7 +224,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectory) {
              });
 }
 
-TEST_F(FileUtilsTest, testFindFileInDirectoryRecursive) {
+TEST_F(FileUtilsTest, testGetFilesInDirectoryRecursive) {
   auto p = FileUtils::getFilesInDirectory(root, {}, true);
 
   expectList(p,
@@ -237,7 +237,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectoryRecursive) {
              });
 }
 
-TEST_F(FileUtilsTest, testFindFileInDirectorySkipHidden) {
+TEST_F(FileUtilsTest, testGetFilesInDirectorySkipHidden) {
   auto p = FileUtils::getFilesInDirectory(root, {}, false, true);
 
   expectList(p,
@@ -250,7 +250,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectorySkipHidden) {
              });
 }
 
-TEST_F(FileUtilsTest, testFindFileInDirectoryRecursiveSkipHidden) {
+TEST_F(FileUtilsTest, testGetFilesInDirectoryRecursiveSkipHidden) {
   auto p = FileUtils::getFilesInDirectory(root, {}, true, true);
 
   expectList(p,
@@ -262,7 +262,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectoryRecursiveSkipHidden) {
              });
 }
 
-TEST_F(FileUtilsTest, testFindFileInDirectoryFiltered) {
+TEST_F(FileUtilsTest, testGetFilesInDirectoryFiltered) {
   auto p = FileUtils::getFilesInDirectory(root, filter, false);
 
   expectList(p,
@@ -274,7 +274,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectoryFiltered) {
              });
 }
 
-TEST_F(FileUtilsTest, testFindFileInDirectoryRecursiveFiltered) {
+TEST_F(FileUtilsTest, testGetFilesInDirectoryRecursiveFiltered) {
   auto p = FileUtils::getFilesInDirectory(root, filter, true);
 
   expectList(p,
@@ -282,7 +282,7 @@ TEST_F(FileUtilsTest, testFindFileInDirectoryRecursiveFiltered) {
               subdirSubdirFileHidden});
 }
 
-TEST_F(FileUtilsTest, testFindFileInDirectoryRecursiveFilteredSkipHidden) {
+TEST_F(FileUtilsTest, testGetFilesInDirectoryRecursiveFilteredSkipHidden) {
   auto p = FileUtils::getFilesInDirectory(root, filter, true, true);
 
   expectList(p,
