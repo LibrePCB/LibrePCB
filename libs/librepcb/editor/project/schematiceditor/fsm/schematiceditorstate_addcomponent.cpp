@@ -182,19 +182,27 @@ bool SchematicEditorState_AddComponent::processAddComponent(
 
 bool SchematicEditorState_AddComponent::processRotate(
     const Angle& rotation) noexcept {
-  mCurrentSymbolEditCommand->rotate(rotation,
-                                    mCurrentSymbolToPlace->getPosition(), true);
-  mLastAngle = mCurrentSymbolToPlace->getRotation();
-  return true;
+  if (mIsUndoCmdActive && mCurrentSymbolToPlace && mCurrentSymbolEditCommand) {
+    mCurrentSymbolEditCommand->rotate(
+        rotation, mCurrentSymbolToPlace->getPosition(), true);
+    mLastAngle = mCurrentSymbolToPlace->getRotation();
+    return true;
+  }
+
+  return false;
 }
 
 bool SchematicEditorState_AddComponent::processMirror(
     Qt::Orientation orientation) noexcept {
-  mCurrentSymbolEditCommand->mirror(mCurrentSymbolToPlace->getPosition(),
-                                    orientation, true);
-  mLastAngle = mCurrentSymbolToPlace->getRotation();
-  mLastMirrored = mCurrentSymbolToPlace->getMirrored();
-  return true;
+  if (mIsUndoCmdActive && mCurrentSymbolToPlace && mCurrentSymbolEditCommand) {
+    mCurrentSymbolEditCommand->mirror(mCurrentSymbolToPlace->getPosition(),
+                                      orientation, true);
+    mLastAngle = mCurrentSymbolToPlace->getRotation();
+    mLastMirrored = mCurrentSymbolToPlace->getMirrored();
+    return true;
+  }
+
+  return false;
 }
 
 bool SchematicEditorState_AddComponent::processAbortCommand() noexcept {
@@ -219,11 +227,10 @@ bool SchematicEditorState_AddComponent::processAbortCommand() noexcept {
 
 bool SchematicEditorState_AddComponent::processGraphicsSceneMouseMoved(
     QGraphicsSceneMouseEvent& e) noexcept {
-  if (mIsUndoCmdActive) {
+  if (mIsUndoCmdActive && mCurrentSymbolEditCommand) {
     // set temporary position of the current symbol
-    Q_ASSERT(mCurrentSymbolEditCommand);
-    Point pos = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
-    mCurrentSymbolEditCommand->setPosition(pos, true);
+    const Point p = Point::fromPx(e.scenePos()).mappedToGrid(getGridInterval());
+    mCurrentSymbolEditCommand->setPosition(p, true);
     return true;
   }
 
@@ -237,6 +244,9 @@ bool SchematicEditorState_AddComponent::
   Schematic* schematic = getActiveSchematic();
   if (!schematic) return false;
   if (!mIsUndoCmdActive) return false;
+  if (!mCurrentComponent) return false;
+  if (!mCurrentSymbolToPlace) return false;
+  if (!mCurrentSymbolEditCommand) return false;
 
   try {
     // place the current symbol finally
