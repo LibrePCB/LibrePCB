@@ -30,8 +30,9 @@
 #include <fileapi.h>
 #endif
 
-#include <fstream>
 #include <QtCore>
+
+#include <fstream>
 
 /*******************************************************************************
  *  Namespace
@@ -302,8 +303,7 @@ TEST_F(FileUtilsTest, testGetFilesInDirectoryRecursiveFiltered) {
 
 TEST_F(FileUtilsTest, testGetFilesInDirectoryRecursiveFilteredSkipHidden) {
   auto actual = FileUtils::getFilesInDirectory(root, filter, true, true);
-  auto expected =
-      QList<FilePath>{rootFile, subdirFile, subdirSubdirFile};
+  auto expected = QList<FilePath>{rootFile, subdirFile, subdirSubdirFile};
 
   // Those should be skipped in output:
   // * rootFileHidden skipped (hidden)
