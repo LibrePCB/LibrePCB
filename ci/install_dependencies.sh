@@ -25,26 +25,30 @@ then
   # Actually we don't want to waste time with upgrading packages, but sometimes
   # this needs to be done to get it working (maybe it depends on the phase of
   # the moon whether this is required or not).
-  # At the moment, the phase of the moon says it *must not* be done.
-  # echo "Upgrading packages..."
-  # brew upgrade || true
+  echo "Upgrading packages..."
+  brew upgrade || true
 
   # Make python3/pip3 the default
   export PATH="/usr/local/opt/python/libexec/bin:$PATH"
 
   # Install Qt
   echo "Installing qt5..."
-  brew install --overwrite qt5
+  brew install --force-bottle --overwrite qt5
   echo "Linking qt5..."
   brew link --force --overwrite qt5
 
   # Install OpenCascade
   echo "Installing opencascade..."
-  brew install opencascade
+  brew install --force-bottle opencascade
 
   # Install dylibbundler
   echo "Installing dylibbundler..."
-  brew install dylibbundler
+  brew install --force-bottle dylibbundler
+
+  # Fix macdeployqt issue (https://github.com/actions/runner-images/issues/7522)
+  echo "Killing XProtect..."
+  sudo pkill -9 XProtect >/dev/null || true;
+  while pgrep XProtect; do sleep 3; done;
 fi
 
 # Configure pip
