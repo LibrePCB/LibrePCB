@@ -33,7 +33,7 @@ exhaustive, and do not form part of our licenses.
      material not subject to the license. This includes other CC-
      licensed material, or material used under an exception or
      limitation to copyright. More considerations for licensors:
-	wiki.creativecommons.org/Considerations_for_licensors
+    wiki.creativecommons.org/Considerations_for_licensors
 
      Considerations for the public: By using one of our public
      licenses, a licensor grants the public permission to use the
@@ -48,9 +48,9 @@ exhaustive, and do not form part of our licenses.
      rights in the material. A licensor may make special requests,
      such as asking that all changes be marked or described.
      Although not required by our licenses, you are encouraged to
-     respect those requests where reasonable. More_considerations
-     for the public: 
-	wiki.creativecommons.org/Considerations_for_licensees
+     respect those requests where reasonable. More considerations
+     for the public:
+    wiki.creativecommons.org/Considerations_for_licensees
 
 =======================================================================
 
