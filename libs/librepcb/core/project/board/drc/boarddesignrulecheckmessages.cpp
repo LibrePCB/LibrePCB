@@ -243,7 +243,7 @@ DrcMsgEmptyNetSegment::DrcMsgEmptyNetSegment(
                      "trace. This should not happen, please report it as a "
                      "bug. But no worries, this issue is not harmful at all "
                      "so you can safely ignore this message.",
-                     "empty_netsegment", {}) {
+                     "empty_netsegment", {}), mBoard(netSegment.getBoard().getUuid()), mNetSegment(netSegment.getUuid()) {
   mApproval.ensureLineBreak();
   mApproval.appendChild("netsegment", netSegment.getUuid());
   mApproval.ensureLineBreak();

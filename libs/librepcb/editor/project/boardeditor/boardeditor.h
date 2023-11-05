@@ -152,6 +152,11 @@ private:
   void highlightDrcMessage(const RuleCheckMessage& msg, bool zoomTo) noexcept;
   void setDrcMessageApproved(const RuleCheckMessage& msg,
                              bool approved) noexcept;
+  template <typename MessageType>
+  bool fixMsg(const MessageType& msg);
+  template <typename MessageType>
+  bool fixMsgHelper(std::shared_ptr<const RuleCheckMessage> msg, bool apply);
+  bool fixDrcMessage(std::shared_ptr<const RuleCheckMessage> msg, bool apply);
   void clearDrcMarker() noexcept;
   QList<BI_Device*> getSearchCandidates() noexcept;
   QStringList getSearchToolBarCompleterList() noexcept;

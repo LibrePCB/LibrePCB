@@ -25,7 +25,7 @@
  ******************************************************************************/
 #include "../../../rulecheck/rulecheckmessage.h"
 #include "../../../types/length.h"
-
+#include "../../../types/uuid.h"
 #include <QtCore>
 
 /*******************************************************************************
@@ -197,8 +197,16 @@ public:
   DrcMsgEmptyNetSegment() = delete;
   explicit DrcMsgEmptyNetSegment(const BI_NetSegment& netSegment) noexcept;
   DrcMsgEmptyNetSegment(const DrcMsgEmptyNetSegment& other) noexcept
-    : RuleCheckMessage(other) {}
+    : RuleCheckMessage(other), mBoard(other.mBoard), mNetSegment(other.mNetSegment) {}
   virtual ~DrcMsgEmptyNetSegment() noexcept {}
+
+  // Getters
+  const Uuid& getBoard() const noexcept {return mBoard;}
+  const Uuid& getNetSegment() const noexcept {return mNetSegment;}
+
+private:
+  const Uuid mBoard;
+  const Uuid mNetSegment;
 };
 
 /*******************************************************************************

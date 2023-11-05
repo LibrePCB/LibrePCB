@@ -30,6 +30,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
+#include <functional>
+
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
@@ -56,6 +58,8 @@ public:
     ElectricalRuleCheck,
     BoardDesignRuleCheck,
   };
+  typedef std::function<bool(std::shared_ptr<const RuleCheckMessage>, bool)>
+      RuleCheckFixProvider;
 
   // Constructors / Destructor
   explicit RuleCheckDock(Mode mode, QWidget* parent = nullptr) noexcept;
@@ -72,6 +76,7 @@ public:
    *          Useful to temporarily disable widget & restore previous state.
    */
   bool setInteractive(bool interactive) noexcept;
+  void setFixProvider(RuleCheckFixProvider provider) noexcept;
   void setProgressPercent(int percent) noexcept;
   void setProgressStatus(const QString& status) noexcept;
   void setMessages(const tl::optional<RuleCheckMessageList>& messages) noexcept;
@@ -105,6 +110,7 @@ private:  // Methods
 
 private:
   const Mode mMode;
+  RuleCheckFixProvider mFixProvider;
   QScopedPointer<Ui::RuleCheckDock> mUi;
 };
 

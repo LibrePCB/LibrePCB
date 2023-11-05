@@ -38,7 +38,10 @@ namespace editor {
  ******************************************************************************/
 
 RuleCheckDock::RuleCheckDock(Mode mode, QWidget* parent) noexcept
-  : QDockWidget(parent), mMode(mode), mUi(new Ui::RuleCheckDock) {
+  : QDockWidget(parent),
+    mMode(mode),
+    mFixProvider(),
+    mUi(new Ui::RuleCheckDock) {
   mUi->setupUi(this);
   updateTitle(tl::nullopt);
   mUi->lstMessages->setHandler(this);
@@ -71,6 +74,10 @@ bool RuleCheckDock::setInteractive(bool interactive) noexcept {
   mUi->btnRunDrc->setEnabled(interactive);
   mUi->btnRunQuickCheck->setEnabled(interactive);
   return wasInteractive;
+}
+
+void RuleCheckDock::setFixProvider(RuleCheckFixProvider provider) noexcept {
+  mFixProvider = provider;
 }
 
 void RuleCheckDock::setProgressPercent(int percent) noexcept {
@@ -131,13 +138,25 @@ void RuleCheckDock::updateTitle(tl::optional<int> unapprovedMessages) noexcept {
 
 bool RuleCheckDock::ruleCheckFixAvailable(
     std::shared_ptr<const RuleCheckMessage> msg) noexcept {
-  Q_UNUSED(msg);
+  if (mFixProvider) {
+    try {
+      return mFixProvider(msg, false);  // Can throw, but should really not.
+    } catch (const Exception& e) {
+      QMessageBox::critical(this, tr("Error"), e.getMsg());
+    }
+  }
   return false;
 }
 
 void RuleCheckDock::ruleCheckFixRequested(
     std::shared_ptr<const RuleCheckMessage> msg) noexcept {
-  Q_UNUSED(msg);
+  if (mFixProvider) {
+    try {
+      mFixProvider(msg, true);  // can throw
+    } catch (const Exception& e) {
+      QMessageBox::critical(this, tr("Error"), e.getMsg());
+    }
+  }
 }
 
 void RuleCheckDock::ruleCheckDescriptionRequested(

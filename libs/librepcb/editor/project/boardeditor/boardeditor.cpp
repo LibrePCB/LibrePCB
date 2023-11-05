@@ -34,6 +34,7 @@
 #include "../../utils/exclusiveactiongroup.h"
 #include "../../utils/menubuilder.h"
 #include "../../utils/standardeditorcommandhandler.h"
+#include "../cmd/cmdboardnetsegmentremove.h"
 #include "../../utils/toolbarproxy.h"
 #include "../../utils/undostackactiongroup.h"
 #include "../../widgets/graphicsview.h"
@@ -264,6 +265,9 @@ BoardEditor::~BoardEditor() {
   // Important: Release command toolbar proxy since otherwise the actions will
   // be deleted first.
   mCommandToolBarProxy->setToolBar(nullptr);
+
+  // Reset references to this object.
+  mDockDrc->setFixProvider(RuleCheckDock::RuleCheckFixProvider());
 
   mFsm.reset();
 }
@@ -986,6 +990,10 @@ void BoardEditor::createDockWidgets() noexcept {
       new RuleCheckDock(RuleCheckDock::Mode::BoardDesignRuleCheck, this));
   mDockDrc->setObjectName("dockDrc");
   mDockDrc->setInteractive(false);
+  mDockDrc->setFixProvider(
+      [this](std::shared_ptr<const RuleCheckMessage> msg, bool apply) {
+        return fixDrcMessage(msg, apply);
+      });
   connect(mDockDrc.data(), &RuleCheckDock::settingsDialogRequested, this,
           [this]() { execBoardSetupDialog(true); });
   connect(mDockDrc.data(), &RuleCheckDock::runDrcRequested, this,
@@ -1380,6 +1388,58 @@ void BoardEditor::setDrcMessageApproved(const RuleCheckMessage& msg,
     mDockDrc->setApprovals(board->getDrcMessageApprovals());
     mProjectEditor.setManualModificationsMade();
   }
+}
+
+template <>
+bool BoardEditor::fixMsg(const DrcMsgEmptyNetSegment& msg) {
+  if (Board* board = mProject.getBoardByUuid(msg.getBoard())) {
+    if (BI_NetSegment* seg = board->getNetSegments().value(msg.getNetSegment())) {
+      mProjectEditor.getUndoStack().execCmd(new CmdBoardNetSegmentRemove(*seg)); // can throw
+      if (auto msgs = mDrcMessages[board->getUuid()]) {
+        msgs->remove();
+      }
+    }
+  }
+}
+
+template <typename MessageType>
+bool BoardEditor::fixMsgHelper(std::shared_ptr<const RuleCheckMessage> msg,
+                               bool apply) {
+  if (msg) {
+    if (auto m = msg->as<MessageType>()) {
+      if (apply) {
+        if (fixMsg(*m)) {  // can throw
+
+          mDrcMessages
+
+        mDrcMessages.insert(board->getUuid(), drc.getMessages());
+        mDockDrc->setMessages(drc.getMessages());
+
+        // Detect & remove disappeared messages.
+        const QSet<SExpression> approvals =
+            RuleCheckMessage::getAllApprovals(drc.getMessages());
+        if (board->updateDrcMessageApprovals(approvals, quick)) {
+          mDockDrc->setApprovals(board->getDrcMessageApprovals());
+          mProjectEditor.setManualModificationsMade();
+        }
+
+        return true;
+        } else {
+          throw RuntimeError(__FILE__, __LINE__, tr("Message could not be fixed automatically. Probably the message was not up to date anymore, please run the DRC again to update it."));
+        return false;
+        }
+      } else {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool BoardEditor::fixDrcMessage(std::shared_ptr<const RuleCheckMessage> msg,
+                                bool apply) {
+  if (fixMsgHelper<DrcMsgEmptyNetSegment>(msg, apply)) return true;
+  return false;
 }
 
 void BoardEditor::clearDrcMarker() noexcept {
