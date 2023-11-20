@@ -60,6 +60,9 @@
         <file>actions/hide_planes.png</file>
         <file>actions/home.png</file>
         <file>actions/home.svg</file>
+        <file>actions/icons8-zoom-in-30.png</file>
+        <file>actions/icons8-zoom-out-30.png</file>
+        <file>actions/icons8-zoom-to-extends-50.png</file>
         <file>actions/import.png</file>
         <file>actions/info.png</file>
         <file>actions/layers.png</file>

@@ -93,7 +93,8 @@ void OpenGlRenderer::synchronize(QQuickFramebufferObject* qqfbo) noexcept {
 }
 
 void OpenGlRenderer::render() noexcept {
-  glClearColor(0.0f, 0.5f, 0.7f, 1.0f);
+  glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+  // glClearColor(0.0f, 0.5f, 0.7f, 1.0f);
 
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -111,9 +112,9 @@ void OpenGlRenderer::render() noexcept {
   // m_program.disableAttributeArray("aPos");
   // m_program.disableAttributeArray("aTexCoord");
 
+  glBegin(GL_POINTS);
   glColor3f(1.0, 0.0, 0.0);
   glPointSize(10.0f);
-  glBegin(GL_POINTS);
   glVertex2i(0, 0);
   glEnd();
 

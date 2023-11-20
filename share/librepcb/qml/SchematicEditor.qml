@@ -8,4 +8,25 @@ Rectangle {
     OpenGlView {
         anchors.fill: parent
     }
+
+    Column {
+        x: parent.width - 8 - width
+        y: 8
+        width: 25
+
+        ImageButton {
+            width: parent.width
+            icon: "qrc:///img/actions/icons8-zoom-in-30.png"
+        }
+
+        ImageButton {
+            width: parent.width
+            icon: "qrc:///img/actions/icons8-zoom-out-30.png"
+        }
+
+        ImageButton {
+            width: parent.width
+            icon: "qrc:///img/actions/icons8-zoom-to-extends-50.png"
+        }
+    }
 }
