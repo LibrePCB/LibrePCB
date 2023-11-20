@@ -48,26 +48,31 @@ ApplicationWindow {
                 anchors.fill: parent
                 SideButton {
                     id: btnHome
-                    text: "HOME"
+                    name: qsTr("Home")
+                    iconSource: "qrc:///img/actions/home.svg"
                     checked: true
                 }
                 SideButton {
                     id: btnLibraries
-                    text: "LIBS"
+                    name: qsTr("Libraries")
+                    iconSource: "qrc:///img/actions/libraries.svg"
                 }
                 SideButton {
                     id: btnProject
-                    text: "PROJECT"
+                    name: qsTr("Projects")
+                    iconSource: "qrc:///img/actions/projects.svg"
                     enabled: !cppApp.openedProjects.empty
                 }
                 SideButton {
                     id: btnChecks
-                    text: "CHECKS"
+                    name: qsTr("Checks")
+                    iconSource: "qrc:///img/actions/checks.svg"
                     enabled: !cppApp.openedProjects.empty
                 }
                 SideButton {
                     id: btnSearch
-                    text: "FIND"
+                    name: qsTr("Find")
+                    iconSource: "qrc:///img/actions/find.svg"
                     enabled: !cppApp.openedProjects.empty
                 }
             }
