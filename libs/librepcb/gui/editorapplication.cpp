@@ -42,6 +42,8 @@
 
 #include <QtCore>
 
+#include <openglview.h>
+
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
@@ -59,6 +61,8 @@ EditorApplication::EditorApplication(Workspace& ws, QObject* parent)
     mWindows(),
     mWorkspaceLibraries(new ObjectListModel(this)),
     mOpenedProjects(new ObjectListModel(this)) {
+  qmlRegisterType<OpenGlView>("org.librepcb.qmlcomponents", 1, 0, "OpenGlView");
+
   mWindows.append(std::make_shared<EditorWindow>(*this));
 
   /*QMultiMap<Version, FilePath> libraries =
