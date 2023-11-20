@@ -35,6 +35,7 @@ namespace gui {
 class EditorApplication;
 class ObjectListModel;
 class OpenedProject;
+class SchematicGui;
 
 /*******************************************************************************
  *  Class EditorWindow
@@ -50,6 +51,8 @@ public:
   Q_PROPERTY(QString title MEMBER mTitle NOTIFY titleChanged FINAL)
   Q_PROPERTY(QObject* currentProject READ getCurrentProject NOTIFY
                  currentProjectChanged FINAL)
+  Q_PROPERTY(QObject* currentSchematic READ getCurrentSchematic NOTIFY
+                 currentSchematicChanged FINAL)
 
   // Constructors / Destructor
   EditorWindow() = delete;
@@ -59,6 +62,7 @@ public:
 
   // Getters
   QObject* getCurrentProject() noexcept;
+  QObject* getCurrentSchematic() noexcept;
 
 public slots:  // GUI Handlers
   bool createProject() noexcept;
@@ -67,14 +71,17 @@ public slots:  // GUI Handlers
 signals:
   void titleChanged(const QString& title);
   void currentProjectChanged();
+  void currentSchematicChanged();
 
 private:  // Methods
   void setCurrentProject(std::shared_ptr<OpenedProject> p) noexcept;
+  void setCurrentSchematic(std::shared_ptr<SchematicGui> s) noexcept;
 
 private:
   EditorApplication& mApplication;
   QString mTitle;
   std::shared_ptr<OpenedProject> mCurrentProject;
+  std::shared_ptr<SchematicGui> mCurrentSchematic;
   QScopedPointer<QQmlApplicationEngine> mEngine;
 };
 

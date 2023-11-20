@@ -35,6 +35,10 @@ namespace librepcb {
 class FilePath;
 class Workspace;
 
+namespace editor {
+class LibraryManager;
+}
+
 namespace gui {
 
 class EditorWindow;
@@ -75,6 +79,7 @@ public:
 
 public slots:  // GUI Handlers
   void openWorkspaceSettings() noexcept;
+  void openLibraryManager() noexcept;
 
 signals:
   void workspaceChanged();
@@ -88,6 +93,7 @@ private:  // Methods
 
 private:  // Data
   Workspace& mWorkspace;
+  QScopedPointer<editor::LibraryManager> mLibraryManager;
   QVector<std::shared_ptr<EditorWindow>> mWindows;
   QScopedPointer<ObjectListModel> mWorkspaceLibraries;
   QScopedPointer<ObjectListModel> mOpenedProjects;

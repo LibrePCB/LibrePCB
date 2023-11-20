@@ -25,6 +25,7 @@
 #include "editorapplication.h"
 #include "objectlistmodel.h"
 #include "openedproject.h"
+#include "schematicgui.h"
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/filepath.h>
@@ -83,6 +84,10 @@ QObject* EditorWindow::getCurrentProject() noexcept {
   return mCurrentProject.get();
 }
 
+QObject* EditorWindow::getCurrentSchematic() noexcept {
+  return mCurrentSchematic.get();
+}
+
 /*******************************************************************************
  *  GUI Handlers
  ******************************************************************************/
@@ -110,8 +115,17 @@ bool EditorWindow::openProject() noexcept {
 void EditorWindow::setCurrentProject(
     std::shared_ptr<OpenedProject> p) noexcept {
   if (p != mCurrentProject) {
+    setCurrentSchematic(nullptr);
     mCurrentProject = p;
     emit currentProjectChanged();
+  }
+}
+
+void EditorWindow::setCurrentSchematic(
+    std::shared_ptr<SchematicGui> s) noexcept {
+  if (s != mCurrentSchematic) {
+    mCurrentSchematic = s;
+    emit currentSchematicChanged();
   }
 }
 

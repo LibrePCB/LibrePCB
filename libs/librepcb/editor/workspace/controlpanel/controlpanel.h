@@ -106,7 +106,6 @@ private:
   void saveSettings();
   void loadSettings();
   void updateDesktopIntegrationMessage() noexcept;
-  void openLibraryManager() noexcept;
   void addExampleProjects() noexcept;
   void switchWorkspace() noexcept;
   void showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept;
@@ -179,7 +178,6 @@ private:
   QScopedPointer<ProjectTreeModel> mProjectTreeModel;
   QScopedPointer<RecentProjectsModel> mRecentProjectsModel;
   QScopedPointer<FavoriteProjectsModel> mFavoriteProjectsModel;
-  QScopedPointer<LibraryManager> mLibraryManager;
   QHash<QString, ProjectEditor*> mOpenProjectEditors;
   QHash<FilePath, LibraryEditor*> mOpenLibraryEditors;
   QScopedPointer<ProjectLibraryUpdater> mProjectLibraryUpdater;

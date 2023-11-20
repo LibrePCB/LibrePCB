@@ -37,6 +37,7 @@
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/dialogs/filedialog.h>
 #include <librepcb/editor/project/newprojectwizard/newprojectwizard.h>
+#include <librepcb/editor/workspace/librarymanager/librarymanager.h>
 #include <librepcb/editor/workspace/workspacesettingsdialog.h>
 
 #include <QtCore>
@@ -54,6 +55,7 @@ namespace gui {
 EditorApplication::EditorApplication(Workspace& ws, QObject* parent)
   : QObject(parent),
     mWorkspace(ws),
+    mLibraryManager(new editor::LibraryManager(mWorkspace)),
     mWindows(),
     mWorkspaceLibraries(new ObjectListModel(this)),
     mOpenedProjects(new ObjectListModel(this)) {
@@ -139,6 +141,13 @@ void EditorApplication::openWorkspaceSettings() noexcept {
   //        &editor::WorkspaceSettingsDialog::desktopIntegrationStatusChanged,
   //        this, &ControlPanel::updateDesktopIntegrationMessage);
   dialog.exec();
+}
+
+void EditorApplication::openLibraryManager() noexcept {
+  mLibraryManager->show();
+  mLibraryManager->raise();
+  mLibraryManager->activateWindow();
+  mLibraryManager->updateOnlineLibraryList();
 }
 
 /*******************************************************************************
