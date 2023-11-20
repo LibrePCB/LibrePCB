@@ -18,6 +18,10 @@ add_library(
   objectlistmodel.h
   openedproject.cpp
   openedproject.h
+  openglrenderer.cpp
+  openglrenderer.h
+  openglview.cpp
+  openglview.h
   schematicgui.cpp
   schematicgui.h
 )
