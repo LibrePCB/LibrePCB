@@ -5,6 +5,7 @@ AbstractButton {
     id: root
     implicitWidth: parent.width
     implicitHeight: parent.width
+    checkable: true
     autoExclusive: true
 
     property alias iconSource: image.source
@@ -17,12 +18,15 @@ AbstractButton {
         property bool hasHover: false
         onEntered: hasHover = true
         onExited: hasHover = false
-        onClicked: root.checked = true
+        onClicked: {
+            if (root.checkable) {root.checked = true}
+            root.onClicked()
+        }
     }
 
     background: Rectangle {
         opacity: enabled ? 1 : 0.3
-        color: root.checked ? "#1c1c1c" : (mouseArea.hasHover ? "#424242" : "#353535")
+        color: root.checked ? "#1c1c1c" : (mouseArea.pressed ? "#555555" : (mouseArea.hasHover ? "#424242" : "#353535"))
         Rectangle {
             width: 3
             height: root.height

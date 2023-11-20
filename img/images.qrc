@@ -20,6 +20,7 @@
         <file>actions/bookmark_gray.png</file>
         <file>actions/cam_export.png</file>
         <file>actions/cancel.png</file>
+        <file>actions/checks.png</file>
         <file>actions/clean.png</file>
         <file>actions/clone.png</file>
         <file>actions/close.png</file>
@@ -49,6 +50,7 @@
         <file>actions/export_step.png</file>
         <file>actions/export_svg.png</file>
         <file>actions/export_zip.png</file>
+        <file>actions/find.png</file>
         <file>actions/flip_horizontal.png</file>
         <file>actions/flip_vertical.png</file>
         <file>actions/generate_bom.png</file>
@@ -61,6 +63,7 @@
         <file>actions/import.png</file>
         <file>actions/info.png</file>
         <file>actions/layers.png</file>
+        <file>actions/libraries.png</file>
         <file>actions/minus.png</file>
         <file>actions/mirror_horizontal.png</file>
         <file>actions/mirror_vertical.png</file>
@@ -79,6 +82,7 @@
         <file>actions/plus_2.png</file>
         <file>actions/print.png</file>
         <file>actions/print_preview.png</file>
+        <file>actions/projects.png</file>
         <file>actions/quick_check.png</file>
         <file>actions/quit.png</file>
         <file>actions/rebuild_plane.png</file>

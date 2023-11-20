@@ -55,24 +55,27 @@ ApplicationWindow {
                 SideButton {
                     id: btnLibraries
                     name: qsTr("Libraries")
-                    iconSource: "qrc:///img/actions/libraries.svg"
+                    iconSource: "qrc:///img/actions/libraries.png"
+                    checkable: false
+                    autoExclusive: false
+                    onClicked: cppApp.openLibraryManager()
                 }
                 SideButton {
                     id: btnProject
                     name: qsTr("Projects")
-                    iconSource: "qrc:///img/actions/projects.svg"
+                    iconSource: "qrc:///img/actions/projects.png"
                     enabled: !cppApp.openedProjects.empty
                 }
                 SideButton {
                     id: btnChecks
                     name: qsTr("Checks")
-                    iconSource: "qrc:///img/actions/checks.svg"
+                    iconSource: "qrc:///img/actions/checks.png"
                     enabled: !cppApp.openedProjects.empty
                 }
                 SideButton {
                     id: btnSearch
                     name: qsTr("Find")
-                    iconSource: "qrc:///img/actions/find.svg"
+                    iconSource: "qrc:///img/actions/find.png"
                     enabled: !cppApp.openedProjects.empty
                 }
             }
@@ -110,11 +113,10 @@ ApplicationWindow {
                     visible:btnLibraries.checked
                 }
             }
-            Rectangle {
+            SchematicEditor {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 Layout.minimumWidth: 100
-                color: "#4f4f4f"
             }
         }
     }

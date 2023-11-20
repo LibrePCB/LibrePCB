@@ -77,8 +77,7 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
     mWorkspace(workspace),
     mUi(new Ui::ControlPanel),
     mStandardCommandHandler(
-        new StandardEditorCommandHandler(mWorkspace.getSettings(), this)),
-    mLibraryManager(new LibraryManager(mWorkspace, this)) {
+        new StandardEditorCommandHandler(mWorkspace.getSettings(), this)) {
   mUi->setupUi(this);
   setWindowTitle(
       tr("Control Panel - LibrePCB %1").arg(Application::getVersion()));
@@ -136,8 +135,8 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
          "library manager</a> to add some libraries.")
           .arg("library-manager"),
       false);
-  connect(mUi->msgWarnForNoLibraries, &MessageWidget::linkActivated, this,
-          &ControlPanel::openLibraryManager);
+  // connect(mUi->msgWarnForNoLibraries, &MessageWidget::linkActivated, this,
+  //         &ControlPanel::openLibraryManager);
   connect(
       &mWorkspace.getLibraryDb(), &WorkspaceLibraryDb::scanLibraryListUpdated,
       this, [this]() {
@@ -153,8 +152,9 @@ ControlPanel::ControlPanel(Workspace& workspace, bool fileFormatIsOutdated)
   // connect some actions which are created with the Qt Designer
   connect(mUi->openLibraryManagerButton, &QPushButton::clicked,
           mActionLibraryManager.data(), &QAction::trigger);
-  connect(mLibraryManager.data(), &LibraryManager::openLibraryEditorTriggered,
-          this, &ControlPanel::openLibraryEditor);
+  // connect(mLibraryManager.data(),
+  // &LibraryManager::openLibraryEditorTriggered,
+  //         this, &ControlPanel::openLibraryEditor);
   connect(mUi->textBrowser, &QTextBrowser::anchorClicked, this,
           [this](QUrl url) {
             const QStringList searchPaths = mUi->textBrowser->searchPaths();
@@ -199,7 +199,6 @@ ControlPanel::~ControlPanel() noexcept {
   mProjectLibraryUpdater.reset();
   closeAllProjects(false);
   closeAllLibraryEditors(false);
-  mLibraryManager.reset();
   mUi.reset();
 }
 
@@ -244,9 +243,9 @@ void ControlPanel::openProjectLibraryUpdater(const FilePath& project) noexcept {
 void ControlPanel::createActions() noexcept {
   const EditorCommandSet& cmd = EditorCommandSet::instance();
 
-  mActionLibraryManager.reset(cmd.libraryManager.createAction(
-      this, this, &ControlPanel::openLibraryManager,
-      EditorCommand::ActionFlag::ApplicationShortcut));
+  // mActionLibraryManager.reset(cmd.libraryManager.createAction(
+  //     this, this, &ControlPanel::openLibraryManager,
+  //     EditorCommand::ActionFlag::ApplicationShortcut));
   mActionRescanLibraries.reset(cmd.workspaceLibrariesRescan.createAction(
       this, &mWorkspace.getLibraryDb(),
       &WorkspaceLibraryDb::startLibraryRescan));
@@ -404,13 +403,6 @@ void ControlPanel::updateDesktopIntegrationMessage() noexcept {
       DesktopIntegration::isSupported() &&
       (DesktopIntegration::getStatus() !=
        DesktopIntegration::Status::InstalledThis));
-}
-
-void ControlPanel::openLibraryManager() noexcept {
-  mLibraryManager->show();
-  mLibraryManager->raise();
-  mLibraryManager->activateWindow();
-  mLibraryManager->updateOnlineLibraryList();
 }
 
 void ControlPanel::addExampleProjects() noexcept {
