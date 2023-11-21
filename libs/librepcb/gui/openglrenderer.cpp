@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "openglrenderer.h"
 
+#include "openglview.h"
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -35,22 +37,29 @@ namespace gui {
  ******************************************************************************/
 
 OpenGlRenderer::OpenGlRenderer() noexcept
-  : QQuickFramebufferObject::Renderer() {
+  : QQuickFramebufferObject::Renderer(), mWindow(nullptr) {
   initializeOpenGLFunctions();
 
-  m_program.addShaderFromSourceCode(QOpenGLShader::Vertex,
-                                    "attribute highp vec4 aPos;"
-                                    ""
-                                    "void main() {"
-                                    "    gl_Position = aPos;"
-                                    "}");
-  m_program.addShaderFromSourceCode(
-      QOpenGLShader::Fragment,
-      "void main() {"
-      "   gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);"
-      "}");
-  m_program.link();
-  m_program.bind();
+  mProgram.addShaderFromSourceCode(
+      QOpenGLShader::Vertex,
+      "#ifdef GL_ES\n"
+      "precision mediump int;\n"
+      "precision mediump float;\n"
+      "#endif\n"
+      "\n"
+      "uniform mat4 mvp_matrix;\n"
+      "\n"
+      "attribute vec4 a_position;\n"
+      "\n"
+      "void main() {\n"
+      "    gl_Position = mvp_matrix * a_position;\n"
+      "}\n");
+  mProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
+                                   "void main() {"
+                                   "   gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);"
+                                   "}");
+  mProgram.link();
+  mProgram.bind();
 }
 
 OpenGlRenderer::~OpenGlRenderer() noexcept {
@@ -69,7 +78,10 @@ QOpenGLFramebufferObject* OpenGlRenderer::createFramebufferObject(
 }
 
 void OpenGlRenderer::synchronize(QQuickFramebufferObject* qqfbo) noexcept {
-  m_window = qqfbo->window();
+  Q_ASSERT(qobject_cast<OpenGlView*>(qqfbo));
+  OpenGlView* view = static_cast<OpenGlView*>(qqfbo);
+  mTransform = view->getTransform();
+  mWindow = view->window();
 }
 
 void OpenGlRenderer::render() noexcept {
@@ -78,7 +90,8 @@ void OpenGlRenderer::render() noexcept {
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
 
-  m_program.bind();
+  mProgram.bind();
+  mProgram.setUniformValue("mvp_matrix", mTransform);
 
   glBegin(GL_QUADS);
   glVertex2f(-0.5f, -0.5f);
@@ -87,7 +100,9 @@ void OpenGlRenderer::render() noexcept {
   glVertex2f(-0.5f, 0.5f);
   glEnd();
 
-  m_window->resetOpenGLState();
+  if (mWindow) {
+    mWindow->resetOpenGLState();
+  }
 }
 
 /*******************************************************************************

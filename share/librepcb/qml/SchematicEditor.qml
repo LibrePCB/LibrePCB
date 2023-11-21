@@ -6,6 +6,7 @@ import org.librepcb.qmlcomponents 1.0
 Rectangle {
     color: "#4f4f4f"
     OpenGlView {
+        id: view
         anchors.fill: parent
     }
 
@@ -17,16 +18,19 @@ Rectangle {
         ImageButton {
             width: parent.width
             icon: "qrc:///img/actions/icons8-zoom-in-30.png"
+            onClicked: view.zoomIn()
         }
 
         ImageButton {
             width: parent.width
             icon: "qrc:///img/actions/icons8-zoom-out-30.png"
+            onClicked: view.zoomOut()
         }
 
         ImageButton {
             width: parent.width
             icon: "qrc:///img/actions/icons8-zoom-to-extents-50.png"
+            onClicked: view.zoomAll()
         }
     }
 }

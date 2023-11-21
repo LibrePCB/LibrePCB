@@ -54,8 +54,9 @@ protected:  // Inherited Methods
   void render() noexcept override;
 
 private:
-  QOpenGLShaderProgram m_program;
-  QQuickWindow* m_window;
+  QMatrix4x4 mTransform;
+  QOpenGLShaderProgram mProgram;
+  QQuickWindow* mWindow;
 };
 
 /*******************************************************************************

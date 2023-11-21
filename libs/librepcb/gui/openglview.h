@@ -48,8 +48,35 @@ public:
   OpenGlView(const OpenGlView& other) noexcept = delete;
   virtual ~OpenGlView() noexcept;
 
+  // Getters
+  const QMatrix4x4& getTransform() const noexcept { return mTransform; }
+
   // General Methods
   QQuickFramebufferObject::Renderer* createRenderer() const noexcept override;
+
+public slots:
+  void zoomIn() noexcept;
+  void zoomOut() noexcept;
+  void zoomAll() noexcept;
+
+protected:  // Methods
+  void mousePressEvent(QMouseEvent* e) override;
+  void mouseMoveEvent(QMouseEvent* e) override;
+  void wheelEvent(QWheelEvent* e) override;
+  void smoothTo(const QMatrix4x4& transform) noexcept;
+
+private:
+  QMatrix4x4 mTransform;
+  QMatrix4x4 mMousePressTransform;
+  QVector2D mMousePressPosition;
+
+  // Transform Animation
+  QMatrix4x4 mAnimationTransformStart;
+  QMatrix4x4 mAnimationTransformDelta;
+  QScopedPointer<QVariantAnimation> mAnimation;
+
+  // Static Variables
+  static constexpr qreal sZoomStepFactor = 1.3;
 };
 
 /*******************************************************************************
