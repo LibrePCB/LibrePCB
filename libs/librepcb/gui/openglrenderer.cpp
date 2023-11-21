@@ -50,14 +50,25 @@ OpenGlRenderer::OpenGlRenderer() noexcept
       "uniform mat4 mvp_matrix;\n"
       "\n"
       "attribute vec4 a_position;\n"
+      "attribute vec4 a_color;\n"
+      "\n"
+      "varying vec4 v_color;\n"
       "\n"
       "void main() {\n"
+      "    v_color = a_color;\n"
       "    gl_Position = mvp_matrix * a_position;\n"
       "}\n");
   mProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
-                                   "void main() {"
-                                   "   gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);"
-                                   "}");
+                                   "#ifdef GL_ES\n"
+                                   "precision mediump int;\n"
+                                   "precision mediump float;\n"
+                                   "#endif\n"
+                                   "\n"
+                                   "varying vec4 v_color;\n"
+                                   "\n"
+                                   "void main() {\n"
+                                   "    gl_FragColor = v_color;\n"
+                                   "}\n");
   mProgram.link();
   mProgram.bind();
 }
@@ -93,16 +104,44 @@ void OpenGlRenderer::render() noexcept {
   glClear(GL_COLOR_BUFFER_BIT);
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   mProgram.bind();
   mProgram.setUniformValue("mvp_matrix", mTransform);
 
+  mProgram.setAttributeValue("a_color", QColor(0, 0, 255, 100));
   glBegin(GL_QUADS);
   glVertex2f(-0.5f, -0.5f);
-  glVertex2f(0.5f, -0.5f);
-  glVertex2f(0.5f, 0.5f);
-  glVertex2f(-0.5f, 0.5f);
+  glVertex2f(1.0f, -0.5f);
+  glVertex2f(1.0f, 1.0f);
+  glVertex2f(-0.5f, 1.0f);
   glEnd();
+
+  mProgram.setAttributeValue("a_color", QColor(255, 0, 0, 100));
+  glBegin(GL_QUADS);
+  glVertex2f(-1.0f, -1.0f);
+  glVertex2f(0.5f, -1.0f);
+  glVertex2f(0.5f, 0.5f);
+  glVertex2f(-1.0f, 0.5f);
+  glEnd();
+
+  glBegin(GL_QUADS);
+  glVertex2f(0.0f, 0.0f);
+  glVertex2f(0.8f, 0.0f);
+  glVertex2f(0.8f, -0.8f);
+  glVertex2f(0.0f, -0.8f);
+  glEnd();
+
+  mProgram.setAttributeValue("a_color", QColor(0, 0, 255, 100));
+  glBegin(GL_QUADS);
+  glVertex2f(-0.3f, 0.8f);
+  glVertex2f(-0.8f, 0.8f);
+  glVertex2f(-0.8f, 1.0f);
+  glVertex2f(-0.3f, 1.0f);
+  glEnd();
+
+
 
   if (mWindow) {
     mWindow->resetOpenGLState();
