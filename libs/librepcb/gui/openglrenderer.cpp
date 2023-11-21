@@ -40,37 +40,17 @@ OpenGlRenderer::OpenGlRenderer() noexcept
 
   m_program.addShaderFromSourceCode(QOpenGLShader::Vertex,
                                     "attribute highp vec4 aPos;"
-                                    "attribute highp vec2 aTexCoord;"
-                                    "varying mediump vec2 vTexCoord;"
                                     ""
                                     "void main() {"
                                     "    gl_Position = aPos;"
-                                    "    vTexCoord = aTexCoord;"
                                     "}");
-
   m_program.addShaderFromSourceCode(
       QOpenGLShader::Fragment,
-      "varying mediump vec2 vTexCoord;"
-      "uniform sampler2D uTex;"
-      ""
       "void main() {"
-      "   gl_FragColor = texture2D(uTex, vTexCoord);"
+      "   gl_FragColor = vec4(1.0, 0.0, 0.0, 0.5);"
       "}");
-
   m_program.link();
-
   m_program.bind();
-
-  // Setup texture sampler uniform
-  glActiveTexture(GL_TEXTURE0);
-  m_program.setUniformValue("uTex", 0);
-
-  m_vertices << QVector3D(0, 0, 0.0f);
-  m_vertices << QVector3D(1, 0, 0.0f);
-  m_vertices << QVector3D(0, 1, 0.0f);
-  m_texCoords << QVector2D(0, 0);
-  m_texCoords << QVector2D(1, 0);
-  m_texCoords << QVector2D(0, 1);
 }
 
 OpenGlRenderer::~OpenGlRenderer() noexcept {
@@ -94,28 +74,17 @@ void OpenGlRenderer::synchronize(QQuickFramebufferObject* qqfbo) noexcept {
 
 void OpenGlRenderer::render() noexcept {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  // glClearColor(0.0f, 0.5f, 0.7f, 1.0f);
-
   glClear(GL_COLOR_BUFFER_BIT);
-
   glDisable(GL_CULL_FACE);
   glDisable(GL_DEPTH_TEST);
 
   m_program.bind();
 
-  // paint
-  // m_program.enableAttributeArray("aPos");
-  // m_program.enableAttributeArray("aTexCoord");
-  // m_program.setAttributeArray("aPos", m_vertices.constData());
-  // m_program.setAttributeArray("vTexCoord", m_texCoords.constData());
-  // glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
-  // m_program.disableAttributeArray("aPos");
-  // m_program.disableAttributeArray("aTexCoord");
-
-  glBegin(GL_POINTS);
-  glColor3f(1.0, 0.0, 0.0);
-  glPointSize(10.0f);
-  glVertex2i(0, 0);
+  glBegin(GL_QUADS);
+  glVertex2f(-0.5f, -0.5f);
+  glVertex2f(0.5f, -0.5f);
+  glVertex2f(0.5f, 0.5f);
+  glVertex2f(-0.5f, 0.5f);
   glEnd();
 
   m_window->resetOpenGLState();
