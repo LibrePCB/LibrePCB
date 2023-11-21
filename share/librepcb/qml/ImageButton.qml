@@ -7,12 +7,14 @@ Item {
     height: width
 
     property alias icon: image.source
+    signal clicked()
 
     MouseArea {
         id: mouseArea
         anchors.fill: parent
         hoverEnabled: true
         cursorShape: Qt.PointingHandCursor
+        onClicked: root.clicked()
     }
 
     Image {

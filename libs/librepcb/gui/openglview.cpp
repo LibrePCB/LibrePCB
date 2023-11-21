@@ -36,7 +36,19 @@ namespace gui {
  *  Constructors / Destructor
  ******************************************************************************/
 
-OpenGlView::OpenGlView() noexcept : QQuickFramebufferObject() {
+OpenGlView::OpenGlView() noexcept
+  : QQuickFramebufferObject(), mAnimation(new QVariantAnimation(this)) {
+  mAnimation->setDuration(500);
+  mAnimation->setEasingCurve(QEasingCurve::InOutCubic);
+  connect(mAnimation.data(), &QVariantAnimation::valueChanged, this,
+          [this](const QVariant& value) {
+            const qreal normalized = value.toReal();
+            mTransform = mAnimationTransformStart +
+                mAnimationTransformDelta * normalized;
+            update();
+          });
+
+  setAcceptedMouseButtons(Qt::AllButtons);
 }
 
 OpenGlView::~OpenGlView() noexcept {
@@ -48,6 +60,65 @@ OpenGlView::~OpenGlView() noexcept {
 
 QQuickFramebufferObject::Renderer* OpenGlView::createRenderer() const noexcept {
   return new OpenGlRenderer;
+}
+
+/*******************************************************************************
+ *  Public Slots
+ ******************************************************************************/
+
+void OpenGlView::zoomIn() noexcept {
+  mAnimation->stop();
+  mTransform.scale(sZoomStepFactor);
+  update();
+}
+
+void OpenGlView::zoomOut() noexcept {
+  mAnimation->stop();
+  mTransform.scale(1 / sZoomStepFactor);
+  update();
+}
+
+void OpenGlView::zoomAll() noexcept {
+  QMatrix4x4 t;
+  t.translate(0, 0, 0);
+  smoothTo(t);
+}
+
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+void OpenGlView::mousePressEvent(QMouseEvent* e) {
+  mMousePressPosition = QVector2D(e->pos());
+  mMousePressTransform = mTransform;
+}
+
+void OpenGlView::mouseMoveEvent(QMouseEvent* e) {
+  const QVector2D diff = QVector2D(e->pos()) - mMousePressPosition;
+  if (e->buttons().testFlag(Qt::MiddleButton) ||
+      e->buttons().testFlag(Qt::RightButton)) {
+    mTransform = mMousePressTransform;
+    mTransform.translate(
+        mMousePressTransform.inverted().map(QVector3D(diff.x(), diff.y(), 0)) /
+        200);
+    update();
+  }
+}
+
+void OpenGlView::wheelEvent(QWheelEvent* e) {
+  mAnimation->stop();
+  mTransform.scale(qPow(sZoomStepFactor, e->delta() / qreal(120)));
+  update();
+}
+
+void OpenGlView::smoothTo(const QMatrix4x4& transform) noexcept {
+  mAnimationTransformStart = mTransform;
+  mAnimationTransformDelta = transform - mAnimationTransformStart;
+
+  mAnimation->stop();
+  mAnimation->setStartValue(qreal(0));
+  mAnimation->setEndValue(qreal(1));
+  mAnimation->start();
 }
 
 /*******************************************************************************
