@@ -54,8 +54,6 @@ protected:  // Inherited Methods
   void render() noexcept override;
 
 private:
-  QVector<QVector3D> m_vertices;
-  QVector<QVector2D> m_texCoords;
   QOpenGLShaderProgram m_program;
   QQuickWindow* m_window;
 };

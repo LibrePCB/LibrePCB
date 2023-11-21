@@ -26,7 +26,7 @@ Rectangle {
 
         ImageButton {
             width: parent.width
-            icon: "qrc:///img/actions/icons8-zoom-to-extends-50.png"
+            icon: "qrc:///img/actions/icons8-zoom-to-extents-50.png"
         }
     }
 }
