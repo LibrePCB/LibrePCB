@@ -82,6 +82,10 @@ void OpenGlRenderer::synchronize(QQuickFramebufferObject* qqfbo) noexcept {
   OpenGlView* view = static_cast<OpenGlView*>(qqfbo);
   mTransform = view->getTransform();
   mWindow = view->window();
+
+  // Correct aspect ratio.
+  const qreal ratio = view->width() / static_cast<qreal>(view->height());
+  mTransform.scale(std::min(1 / ratio, qreal(1)), std::min(ratio, qreal(1)));
 }
 
 void OpenGlRenderer::render() noexcept {
