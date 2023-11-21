@@ -56,6 +56,7 @@ protected:  // Inherited Methods
 private:
   QMatrix4x4 mTransform;
   QOpenGLShaderProgram mProgram;
+  QOpenGLBuffer mBuffer;
   QQuickWindow* mWindow;
 };
 

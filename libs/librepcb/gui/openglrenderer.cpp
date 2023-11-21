@@ -37,7 +37,7 @@ namespace gui {
  ******************************************************************************/
 
 OpenGlRenderer::OpenGlRenderer() noexcept
-  : QQuickFramebufferObject::Renderer(), mWindow(nullptr) {
+  : QQuickFramebufferObject::Renderer(), mBuffer(QOpenGLBuffer::VertexBuffer), mWindow(nullptr) {
   initializeOpenGLFunctions();
 
   mProgram.addShaderFromSourceCode(
@@ -74,6 +74,7 @@ OpenGlRenderer::OpenGlRenderer() noexcept
 }
 
 OpenGlRenderer::~OpenGlRenderer() noexcept {
+  mBuffer.destroy();
 }
 
 /*******************************************************************************
@@ -110,7 +111,36 @@ void OpenGlRenderer::render() noexcept {
   mProgram.bind();
   mProgram.setUniformValue("mvp_matrix", mTransform);
 
-  mProgram.setAttributeValue("a_color", QColor(0, 0, 255, 100));
+  struct Primitive {
+    qreal x0;
+    qreal y0;
+    qreal z0;
+
+    qreal x1;
+    qreal y1;
+    qreal z1;
+
+    qreal x2;
+    qreal y2;
+    qreal z2;
+  };
+
+  Primitive data[1] = {
+    Primitive{-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f},
+  };
+  if (!mBuffer.isCreated()) {
+    mBuffer.create();
+    mBuffer.bind();
+    mBuffer.allocate(data, sizeof(data));
+  }
+    mBuffer.bind();
+  mProgram.setAttributeValue("a_color", QColor(0, 255, 0, 100));
+  int vertexLocation = mProgram.attributeLocation("a_position");
+  mProgram.enableAttributeArray(vertexLocation);
+  mProgram.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
+  glDrawArrays(GL_TRIANGLES, 0, 3);
+
+  /*mProgram.setAttributeValue("a_color", QColor(0, 0, 255, 100));
   glBegin(GL_QUADS);
   glVertex2f(-0.5f, -0.5f);
   glVertex2f(1.0f, -0.5f);
@@ -139,7 +169,7 @@ void OpenGlRenderer::render() noexcept {
   glVertex2f(-0.8f, 0.8f);
   glVertex2f(-0.8f, 1.0f);
   glVertex2f(-0.3f, 1.0f);
-  glEnd();
+  glEnd();*/
 
 
 
