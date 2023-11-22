@@ -24,6 +24,9 @@
 
 #include "openglview.h"
 
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/filepath.h>
+
 #include <QtCore>
 
 /*******************************************************************************
@@ -37,38 +40,27 @@ namespace gui {
  ******************************************************************************/
 
 OpenGlRenderer::OpenGlRenderer() noexcept
-  : QQuickFramebufferObject::Renderer(), mBuffer(QOpenGLBuffer::VertexBuffer), mWindow(nullptr) {
+  : QQuickFramebufferObject::Renderer(),
+    mBuffer(QOpenGLBuffer::VertexBuffer),
+    mWindow(nullptr) {
   initializeOpenGLFunctions();
 
-  mProgram.addShaderFromSourceCode(
+  mProgram.addShaderFromSourceFile(
       QOpenGLShader::Vertex,
-      "#ifdef GL_ES\n"
-      "precision mediump int;\n"
-      "precision mediump float;\n"
-      "#endif\n"
-      "\n"
-      "uniform mat4 mvp_matrix;\n"
-      "\n"
-      "attribute vec4 a_position;\n"
-      "attribute vec4 a_color;\n"
-      "\n"
-      "varying vec4 v_color;\n"
-      "\n"
-      "void main() {\n"
-      "    v_color = a_color;\n"
-      "    gl_Position = mvp_matrix * a_position;\n"
-      "}\n");
-  mProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
-                                   "#ifdef GL_ES\n"
-                                   "precision mediump int;\n"
-                                   "precision mediump float;\n"
-                                   "#endif\n"
-                                   "\n"
-                                   "varying vec4 v_color;\n"
-                                   "\n"
-                                   "void main() {\n"
-                                   "    gl_FragColor = v_color;\n"
-                                   "}\n");
+      Application::getResourcesDir()
+          .getPathTo("opengl/2d-vertex-shader.glsl")
+          .toStr());
+  mProgram.addShaderFromSourceFile(
+      QOpenGLShader::Geometry,
+      Application::getResourcesDir()
+          .getPathTo("opengl/2d-geometry-shader.glsl")
+          .toStr());
+  mProgram.addShaderFromSourceFile(
+      QOpenGLShader::Fragment,
+      Application::getResourcesDir()
+          .getPathTo("opengl/2d-fragment-shader.glsl")
+          .toStr());
+
   mProgram.link();
   mProgram.bind();
 }
@@ -111,34 +103,38 @@ void OpenGlRenderer::render() noexcept {
   mProgram.bind();
   mProgram.setUniformValue("mvp_matrix", mTransform);
 
-  struct Primitive {
-    qreal x0;
-    qreal y0;
-    qreal z0;
+  // struct Primitive {
+  //  float x0;
+  //  float y0;
 
-    qreal x1;
-    qreal y1;
-    qreal z1;
+  //  float x1;
+  //  float y1;
 
-    qreal x2;
-    qreal y2;
-    qreal z2;
-  };
+  //  float x2;
+  //  float y2;
+  //};
 
-  Primitive data[1] = {
-    Primitive{-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f},
+  // Primitive data[1] = {
+  //    Primitive{-0.5f, -0.5f, 0.5f, -0.5f, 0.0f, 0.5f},
+  //};
+  float points[] = {
+      -0.5f, 0.5f,  1.0f, 0.0f, 0.0f,  // top-left
+      0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  // top-right
+      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f,  // bottom-right
+      -0.5f, -0.5f, 1.0f, 1.0f, 0.0f  // bottom-left
   };
   if (!mBuffer.isCreated()) {
     mBuffer.create();
     mBuffer.bind();
-    mBuffer.allocate(data, sizeof(data));
+    mBuffer.allocate(points, sizeof(points));
   }
-    mBuffer.bind();
+  mBuffer.bind();
   mProgram.setAttributeValue("a_color", QColor(0, 255, 0, 100));
-  int vertexLocation = mProgram.attributeLocation("a_position");
-  mProgram.enableAttributeArray(vertexLocation);
-  mProgram.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 3, sizeof(QVector3D));
-  glDrawArrays(GL_TRIANGLES, 0, 3);
+  // int vertexLocation = mProgram.attributeLocation("a_position");
+  // mProgram.enableAttributeArray(vertexLocation);
+  // mProgram.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 1,
+  //                            sizeof(Primitive));
+  glDrawArrays(GL_POINTS, 0, 4);
 
   /*mProgram.setAttributeValue("a_color", QColor(0, 0, 255, 100));
   glBegin(GL_QUADS);
@@ -170,8 +166,6 @@ void OpenGlRenderer::render() noexcept {
   glVertex2f(-0.8f, 1.0f);
   glVertex2f(-0.3f, 1.0f);
   glEnd();*/
-
-
 
   if (mWindow) {
     mWindow->resetOpenGLState();
