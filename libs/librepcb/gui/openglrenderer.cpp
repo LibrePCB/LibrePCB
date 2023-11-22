@@ -127,13 +127,20 @@ void OpenGlRenderer::render() noexcept {
     mBuffer.create();
     mBuffer.bind();
     mBuffer.allocate(points, sizeof(points));
+  } else {
+    mBuffer.bind();
   }
-  mBuffer.bind();
-  mProgram.setAttributeValue("a_color", QColor(0, 255, 0, 100));
-  // int vertexLocation = mProgram.attributeLocation("a_position");
-  // mProgram.enableAttributeArray(vertexLocation);
-  // mProgram.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 1,
-  //                            sizeof(Primitive));
+
+  int vertexLocation = mProgram.attributeLocation("a_position");
+  mProgram.enableAttributeArray(vertexLocation);
+  mProgram.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 2,
+                             5 * sizeof(float));
+
+  int colorLocation = mProgram.attributeLocation("a_color");
+  mProgram.enableAttributeArray(colorLocation);
+  mProgram.setAttributeBuffer(colorLocation, GL_FLOAT, 0, 3,
+                             5 * sizeof(float));
+
   glDrawArrays(GL_POINTS, 0, 4);
 
   /*mProgram.setAttributeValue("a_color", QColor(0, 0, 255, 100));

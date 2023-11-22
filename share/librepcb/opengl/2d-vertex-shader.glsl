@@ -1,15 +1,13 @@
 #version 330 core
 
-layout (location = 0) in vec2 aPos;
-layout (location = 1) in vec3 aColor;
+attribute vec2 a_position;
+attribute vec3 a_color;
 
-uniform mat4 mvp_matrix;
-
-out VS_OUT {
+out vData {
     vec3 color;
-} vs_out;
+} vertex;
 
 void main() {
-    gl_Position = mvp_matrix * vec4(aPos.x, aPos.y, 0.0, 1.0);
-    vs_out.color = aColor;
+    vertex.color = a_color;
+    gl_Position = vec4(a_position.x, a_position.y, 0.0, 1.0);
 }
