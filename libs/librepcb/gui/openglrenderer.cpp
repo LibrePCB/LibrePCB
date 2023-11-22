@@ -87,9 +87,9 @@ void OpenGlRenderer::synchronize(QQuickFramebufferObject* qqfbo) noexcept {
   mTransform = view->getTransform();
   mWindow = view->window();
 
-  // Correct aspect ratio.
+  // Correct aspect ratio and y-direction.
   const qreal ratio = view->width() / static_cast<qreal>(view->height());
-  mTransform.scale(std::min(1 / ratio, qreal(1)), std::min(ratio, qreal(1)));
+  mTransform.scale(std::min(1 / ratio, qreal(1)), -std::min(ratio, qreal(1)));
 }
 
 void OpenGlRenderer::render() noexcept {
@@ -103,45 +103,62 @@ void OpenGlRenderer::render() noexcept {
   mProgram.bind();
   mProgram.setUniformValue("mvp_matrix", mTransform);
 
-  // struct Primitive {
-  //  float x0;
-  //  float y0;
+  struct Primitive {
+    // Type 1: Triangle [p0, p1, p2]
+    // Type 2: Rounded line [p0, p1, width]
+    // Type 3: Circle [pos, diameter]
+    // Type 42: House
+    float type;  // TODO: Should be integer, but doesn't work.
+    QVector2D position;
+    QVector4D params;
+    QVector4D color;
+  };
 
-  //  float x1;
-  //  float y1;
-
-  //  float x2;
-  //  float y2;
-  //};
-
-  // Primitive data[1] = {
-  //    Primitive{-0.5f, -0.5f, 0.5f, -0.5f, 0.0f, 0.5f},
-  //};
-  float points[] = {
-      -0.5f, 0.5f,  1.0f, 0.0f, 0.0f,  // top-left
-      0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  // top-right
-      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f,  // bottom-right
-      -0.5f, -0.5f, 1.0f, 1.0f, 0.0f  // bottom-left
+  Primitive data[] = {
+      // Triangle
+      Primitive{1, QVector2D{-0.5f, 0.5f}, QVector4D{0.0f, 0.5f, 0.0f, 0.0f},
+                QVector4D{1.0f, 0.0f, 0.0f, 0.5}},
+      // Rounded line
+      Primitive{2, QVector2D{0.0f, 0.0f}, QVector4D{0.5f, 0.5f, 0.1f, NAN},
+                QVector4D{0.0f, 1.0f, 0.0f, 0.5}},
+      // Circle
+      Primitive{3, QVector2D{0.5f, -0.5f}, QVector4D{0.1f, NAN, NAN, NAN},
+                QVector4D{0.0f, 0.0f, 1.0f, 0.5f}},
+      // House
+      Primitive{42, QVector2D{-0.5f, -0.5f}, QVector4D{NAN, NAN, NAN, NAN},
+                QVector4D{1.0f, 1.0f, 0.0f, 0.5f}},
   };
   if (!mBuffer.isCreated()) {
     mBuffer.create();
     mBuffer.bind();
-    mBuffer.allocate(points, sizeof(points));
+    mBuffer.allocate(data, sizeof(data));
   } else {
     mBuffer.bind();
   }
 
-  int vertexLocation = mProgram.attributeLocation("a_position");
-  mProgram.enableAttributeArray(vertexLocation);
-  mProgram.setAttributeBuffer(vertexLocation, GL_FLOAT, 0, 2,
-                             5 * sizeof(float));
+  int typeLocation = mProgram.attributeLocation("a_type");
+  mProgram.enableAttributeArray(typeLocation);
+  mProgram.setAttributeBuffer(typeLocation, GL_FLOAT, offsetof(Primitive, type),
+                              1, sizeof(Primitive));
+
+  int positionLocation = mProgram.attributeLocation("a_position");
+  mProgram.enableAttributeArray(positionLocation);
+  mProgram.setAttributeBuffer(positionLocation, GL_FLOAT,
+                              offsetof(Primitive, position), 2,
+                              sizeof(Primitive));
+
+  int paramsLocation = mProgram.attributeLocation("a_params");
+  mProgram.enableAttributeArray(paramsLocation);
+  mProgram.setAttributeBuffer(paramsLocation, GL_FLOAT,
+                              offsetof(Primitive, params), 4,
+                              sizeof(Primitive));
 
   int colorLocation = mProgram.attributeLocation("a_color");
   mProgram.enableAttributeArray(colorLocation);
-  mProgram.setAttributeBuffer(colorLocation, GL_FLOAT, 0, 3,
-                             5 * sizeof(float));
+  mProgram.setAttributeBuffer(colorLocation, GL_FLOAT,
+                              offsetof(Primitive, color), 4, sizeof(Primitive));
 
-  glDrawArrays(GL_POINTS, 0, 4);
+  glDrawArrays(GL_POINTS, 0, sizeof(data) / sizeof(Primitive));
 
   /*mProgram.setAttributeValue("a_color", QColor(0, 0, 255, 100));
   glBegin(GL_QUADS);
