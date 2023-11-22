@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eufo pipefail
 
 # Formats files according our coding style.
 #
 # Usage:
 #
-#   format_code.sh [--all] [--sudo] [--docker]
+#   format_code.sh [--all] [--sudo] [--docker] [--base <base>] [--check]
 #
 # Notes:
 #   - Run the command "./dev/format_code.sh" in the root of the repository.
@@ -18,11 +18,18 @@ set -euo pipefail
 #   - To format all files (instead of only modified ones), add the "--all"
 #     parameter. This is intended only for LibrePCB maintainers, usually you
 #     should not use this!
+#   - To update files modified against some branch <branch> in history, use
+#     option "--base <base>". If this is not specified, the default "master"
+#     branch will be used.
+#   - To only check which files are wrongly formatted, use option "--check".
+#     No file modifications will be made, nonzero exit code will be thrown
+#     instead.
 
 DOCKER=""
 DOCKER_CMD="docker"
 CLANGFORMAT=${CLANGFORMAT:-clang-format}
-ALL=""
+BASE="master"
+CHECK=""
 for i in "$@"
 do
 case $i in
@@ -35,8 +42,17 @@ case $i in
   shift
   ;;
   --all)
-  ALL="--all"
+  BASE=""
   shift
+  ;;
+  --base)
+  shift
+  BASE=$1
+  shift
+  ;;
+  --check)
+  CHECK="--check"
+  shift;
   ;;
 esac
 done
@@ -55,13 +71,56 @@ if [ "$DOCKER" == "--docker" ]; then
   $DOCKER_CMD run --rm -t --user "$(id -u):$(id -g)" \
     -v "$REPO_ROOT:/code" \
     $DOCKER_IMAGE \
-    /usr/bin/env bash -c "cd /code && dev/format_code.sh $ALL"
+    /usr/bin/env bash -c "cd /code && dev/format_code.sh --base \"$BASE\" $CHECK"
 
   echo "[Docker done.]"
   exit 0
 fi
 
 COUNTER=0
+
+# This function searches for all files for a given Git match pattern.
+# It searchs sorted for tracked files first, then following untracked files.
+#
+# All found files are put on stdout so it is parsable by foreach loop.
+search_files() {
+  if [ "$BASE" == "" ]; then
+    TRACKED=$(git ls-files -- $@)
+  else
+    # Only files which differ from the base branch
+    TRACKED=$(git diff --name-only ${BASE} -- $@)
+  fi
+  UNTRACKED=$(git ls-files --others --exclude-standard -- $@)
+
+  for file in $TRACKED $UNTRACKED; do
+    if [ -f "$file" ]; then
+      echo "$file"
+    fi
+  done
+}
+
+# This function tracks modifications of file and prints out information that
+# file has been processed by the script. It increments processed file counter.
+#
+# Note: Do NOT use in-place edition of the tools because these causes "make"
+# to detect the files as changed every time, even if the content was not
+# modified! So we only overwrite the files here if their content has changed.
+update_file() {
+  NEW_CONTENT=$(cat)
+  OLD_CONTENT=$(cat "$1")
+
+  if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]; then
+    if [ "$CHECK" == "" ]; then
+      printf "%s\n" "$NEW_CONTENT" > "$1"
+    fi
+    echo "[M] $1"
+    COUNTER=$((COUNTER+1))
+  else
+    if [ "$CHECK" == "" ]; then
+      echo "[ ] $1"
+    fi
+  fi
+}
 
 # Format source files with clang-format and Python 3.
 clang_format_failed() {
@@ -73,33 +132,9 @@ clang_format_failed() {
   exit 7
 }
 echo "Formatting sources with $CLANGFORMAT and Python..."
-for dir in apps/ libs/librepcb/ tests/unittests/
-do
-  if [ "$ALL" == "--all" ]; then
-    TRACKED=$(git ls-files -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
-  else
-    # Only files which differ from the master branch
-    TRACKED=$(git diff --name-only master -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
-  fi
-  UNTRACKED=$(git ls-files --others --exclude-standard -- "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h")
-  for file in $TRACKED $UNTRACKED
-  do
-    if [ -f "$file" ]; then
-      # Note: Do NOT use in-place edition of clang-format because this causes
-      # "make" to detect the files as changed every time, even if the content was
-      # not modified! So we only overwrite the files if their content has changed.
-      OLD_CONTENT=$(cat "$file")
-      NEW_CONTENT=$($CLANGFORMAT -style=file "$file" || clang_format_failed)
-      NEW_CONTENT=$(echo "$NEW_CONTENT" | "$REPO_ROOT/dev/format_code_helper.py" "$file" || clang_format_failed)
-      if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
-      then
-        printf "%s\n" "$NEW_CONTENT" > "$file"
-        echo "[M] $file"
-        COUNTER=$((COUNTER+1))
-      else
-        echo "[ ] $file"
-      fi
-    fi
+for dir in apps/ libs/librepcb/ tests/unittests/ share/; do
+  for file in $(search_files "${dir}**.cpp" "${dir}**.hpp" "${dir}**.h" "${dir}**.js"); do
+    $CLANGFORMAT -style=file "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" | update_file "$file" || clang_format_failed
   done
 done
 
@@ -113,29 +148,9 @@ ui_format_failed() {
   exit 7
 }
 echo "Formatting UI files with Python..."
-for dir in apps/ libs/librepcb/ tests/unittests/
-do
-  if [ "$ALL" == "--all" ]; then
-    TRACKED=$(git ls-files -- "${dir}**.ui")
-  else
-    # Only files which differ from the master branch
-    TRACKED=$(git diff --name-only master -- "${dir}**.ui")
-  fi
-  UNTRACKED=$(git ls-files --others --exclude-standard -- "${dir}**.ui")
-  for file in $TRACKED $UNTRACKED
-  do
-    if [ -f "$file" ]; then
-      OLD_CONTENT=$(cat "$file")
-      NEW_CONTENT=$(echo "$OLD_CONTENT" | "$REPO_ROOT/dev/format_code_helper.py" "$file" || ui_format_failed)
-      if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
-      then
-        printf "%s\n" "$NEW_CONTENT" > "$file"
-        echo "[M] $file"
-        COUNTER=$((COUNTER+1))
-      else
-        echo "[ ] $file"
-      fi
-    fi
+for dir in apps/ libs/librepcb/ tests/unittests/; do
+  for file in $(search_files "${dir}**.ui"); do
+    cat "$file" | "$REPO_ROOT/dev/format_code_helper.py" "$file" | update_file "$file" || ui_format_failed
   done
 done
 
@@ -149,27 +164,8 @@ cmake_format_failed() {
   exit 7
 }
 echo "Formatting CMake files with cmake-format..."
-if [ "$ALL" == "--all" ]; then
-  TRACKED=$(git ls-files -- "**CMakeLists.txt" "*.cmake")
-else
-  # Only files which differ from the master branch
-  TRACKED=$(git diff --name-only master -- "**CMakeLists.txt" "*.cmake")
-fi
-UNTRACKED=$(git ls-files --others --exclude-standard -- "**CMakeLists.txt" "*.cmake")
-for file in $TRACKED $UNTRACKED
-do
-  if [ -f "$file" ]; then
-    OLD_CONTENT=$(cat "$file")
-    NEW_CONTENT=$(cmake-format "$file" || cmake_format_failed)
-    if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
-    then
-      printf "%s\n" "$NEW_CONTENT" > "$file"
-      echo "[M] $file"
-      COUNTER=$((COUNTER+1))
-    else
-      echo "[ ] $file"
-    fi
-  fi
+for file in $(search_files "**CMakeLists.txt" "*.cmake"); do
+  cmake-format "$file" | update_file "$file" || cmake_format_failed
 done
 
 # Format *.qrc files with xmlsort.
@@ -182,28 +178,37 @@ xmlsort_failed() {
   exit 7
 }
 echo "Formatting resource files with xmlsort..."
-if [ "$ALL" == "--all" ]; then
-  TRACKED=$(git ls-files -- "**.qrc")
-else
-  # Only files which differ from the master branch
-  TRACKED=$(git diff --name-only master -- "**.qrc")
-fi
-UNTRACKED=$(git ls-files --others --exclude-standard -- "**.qrc")
-for file in $TRACKED $UNTRACKED
-do
-  if [ -f "$file" ]; then
-    OLD_CONTENT=$(cat "$file")
-    NEW_CONTENT=$(xmlsort -r "RCC/qresource/file" -i -s "$file" || xmlsort_failed)
-    NEW_CONTENT="${NEW_CONTENT//\'/\"}"
-    if [ "$NEW_CONTENT" != "$OLD_CONTENT" ]
-    then
-      printf "%s\n" "$NEW_CONTENT" > "$file"
-      echo "[M] $file"
-      COUNTER=$((COUNTER+1))
-    else
-      echo "[ ] $file"
-    fi
-  fi
+for file in $(search_files "**.qrc"); do
+  xmlsort -r "RCC/qresource/file" -i -s "$file" | tr "'" '"' | update_file "$file" || xmlsort_failed
 done
 
+# Format qml source files with qmlformat.
+qml_format_failed() {
+  echo "" >&2
+  echo "ERROR: qmlformat failed!" >&2
+  echo "  On Linux, you can also run this script in a docker" >&2
+  echo "  container by using the '--docker' argument." >&2
+  exit 7
+}
+QMLFORMAT=$(which qmlformat || true)
+if [ -z "${QMLFORMAT}" -o ! -x ${QMLFORMAT} ]; then
+  QMLFORMAT="/usr/lib/qt5/bin/qmlformat"  # For qtdeclarative5-dev-tools package
+fi
+if [ -x ${QMLFORMAT} ]; then
+  echo "Formatting QML sources with qmlformat..."
+  for file in $(search_files "**.qml"); do
+    ${QMLFORMAT} "$file" | update_file "$file" || qml_format_failed
+  done
+else
+  echo "Formatting QML sources with qmlformat DISABLED ..."
+  echo "  Make sure that qmlformat (qtdeclarative5-dev-tools) are installed."
+  echo "  On Linux, you can also run this script in a docker"
+  echo "  container by using the '--docker' argument."
+fi
+
 echo "Finished: $COUNTER files modified."
+
+# Nonzero exit code.
+if [ "$CHECK" == "--check" ] && [ $COUNTER -ne 0 ]; then
+  exit 1
+fi
