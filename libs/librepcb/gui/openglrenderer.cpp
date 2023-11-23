@@ -84,11 +84,12 @@ QOpenGLFramebufferObject* OpenGlRenderer::createFramebufferObject(
 void OpenGlRenderer::synchronize(QQuickFramebufferObject* qqfbo) noexcept {
   Q_ASSERT(qobject_cast<OpenGlView*>(qqfbo));
   OpenGlView* view = static_cast<OpenGlView*>(qqfbo);
+  mResolution = QVector2D(view->width(), view->height());
   mTransform = view->getTransform();
   mWindow = view->window();
 
   // Correct aspect ratio and y-direction.
-  const qreal ratio = view->width() / static_cast<qreal>(view->height());
+  const qreal ratio = mResolution.x() / mResolution.y();
   mTransform.scale(std::min(1 / ratio, qreal(1)), -std::min(ratio, qreal(1)));
 }
 
@@ -101,6 +102,7 @@ void OpenGlRenderer::render() noexcept {
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   mProgram.bind();
+  mProgram.setUniformValue("u_resolution", mResolution);
   mProgram.setUniformValue("mvp_matrix", mTransform);
 
   struct Primitive {
@@ -122,7 +124,7 @@ void OpenGlRenderer::render() noexcept {
       Primitive{2, QVector2D{0.0f, 0.0f}, QVector4D{0.5f, 0.5f, 0.1f, NAN},
                 QVector4D{0.0f, 1.0f, 0.0f, 0.5}},
       // Circle
-      Primitive{3, QVector2D{0.5f, -0.5f}, QVector4D{0.1f, NAN, NAN, NAN},
+      Primitive{3, QVector2D{0.5f, -0.5f}, QVector4D{0.4f, NAN, NAN, NAN},
                 QVector4D{0.0f, 0.0f, 1.0f, 0.5f}},
       // House
       Primitive{42, QVector2D{-0.5f, -0.5f}, QVector4D{NAN, NAN, NAN, NAN},

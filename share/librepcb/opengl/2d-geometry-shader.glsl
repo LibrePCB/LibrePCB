@@ -7,14 +7,14 @@ in float vg_type[1];
 in vec4 vg_params[1];
 in vec4 vg_color[1];
 
-// smooth out vec2 gf_position;
+smooth out vec2 gf_circle_position;
+out float gf_circle_radius;
 out vec4 gf_color;
 
 uniform mat4 mvp_matrix;
 
 void emit_vertex(vec4 position) {
     gl_Position = mvp_matrix * position;
-    //gf_position = position.xy;
     EmitVertex();
 }
 
@@ -38,6 +38,14 @@ void draw_line(vec4 p0, vec4 p1, float width) {
 }
 
 void draw_circle(vec4 position, float diameter) {
+    float radius = diameter / 2.0;
+    gf_circle_position = (mvp_matrix * position).xy;
+    gf_circle_radius = radius;
+    emit_vertex(position + vec4(-radius, -radius, 0.0, 0.0));
+    emit_vertex(position + vec4(-radius, radius, 0.0, 0.0));
+    emit_vertex(position + vec4(radius, -radius, 0.0, 0.0));
+    emit_vertex(position + vec4(radius, radius, 0.0, 0.0));
+    EndPrimitive();
 }
 
 void draw_house(vec4 position) {
