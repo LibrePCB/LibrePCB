@@ -54,6 +54,7 @@ protected:  // Inherited Methods
   void render() noexcept override;
 
 private:
+  QVector2D mResolution;
   QMatrix4x4 mTransform;
   QOpenGLShaderProgram mProgram;
   QOpenGLBuffer mBuffer;
