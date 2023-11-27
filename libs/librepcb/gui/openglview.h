@@ -64,11 +64,13 @@ protected:  // Methods
   void mouseMoveEvent(QMouseEvent* e) override;
   void wheelEvent(QWheelEvent* e) override;
   void smoothTo(const QMatrix4x4& transform) noexcept;
+  QVector2D toScenePos(const QMatrix4x4& t, const QPointF& widgetPos) const
+      noexcept;
 
 private:
   QMatrix4x4 mTransform;
   QMatrix4x4 mMousePressTransform;
-  QVector2D mMousePressPosition;
+  QVector2D mMousePressScenePos;
 
   // Transform Animation
   QMatrix4x4 mAnimationTransformStart;

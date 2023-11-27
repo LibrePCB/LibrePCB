@@ -25,6 +25,17 @@ void draw_triangle(vec4 p0, vec4 p1, vec4 p2) {
     EndPrimitive();
 }
 
+void draw_circle(vec4 position, float diameter) {
+    float radius = diameter / 2.0;
+    gf_circle_position = (mvp_matrix * position).xy;
+    gf_circle_radius = radius;
+    emit_vertex(position + vec4(-radius, -radius, 0.0, 0.0));
+    emit_vertex(position + vec4(-radius, radius, 0.0, 0.0));
+    emit_vertex(position + vec4(radius, -radius, 0.0, 0.0));
+    emit_vertex(position + vec4(radius, radius, 0.0, 0.0));
+    EndPrimitive();
+}
+
 void draw_line(vec4 p0, vec4 p1, float width) {
     vec2 dir = normalize(p1.xy - p0.xy);
     vec2 normal = vec2(dir.y, -dir.x);
@@ -37,40 +48,18 @@ void draw_line(vec4 p0, vec4 p1, float width) {
     EndPrimitive();
 }
 
-void draw_circle(vec4 position, float diameter) {
-    float radius = diameter / 2.0;
-    gf_circle_position = (mvp_matrix * position).xy;
-    gf_circle_radius = radius;
-    emit_vertex(position + vec4(-radius, -radius, 0.0, 0.0));
-    emit_vertex(position + vec4(-radius, radius, 0.0, 0.0));
-    emit_vertex(position + vec4(radius, -radius, 0.0, 0.0));
-    emit_vertex(position + vec4(radius, radius, 0.0, 0.0));
-    EndPrimitive();
-}
-
-void draw_house(vec4 position) {
-    emit_vertex(position + vec4(-0.2, -0.2, 0.0, 0.0));
-    emit_vertex(position + vec4( 0.2, -0.2, 0.0, 0.0));
-    emit_vertex(position + vec4(-0.2,  0.2, 0.0, 0.0));
-    emit_vertex(position + vec4( 0.2,  0.2, 0.0, 0.0));
-    emit_vertex(position + vec4( 0.0,  0.4, 0.0, 0.0));
-    EndPrimitive();
-}
-
 void main() {
     gf_color = vg_color[0];
     if (vg_type[0] == 1.0) {
         draw_triangle(gl_in[0].gl_Position,
                        vec4(vg_params[0].xy, 0.0, 1.0),
                        vec4(vg_params[0].zw, 0.0, 1.0));
+    } else if (vg_type[0] == 3.0) {
+        draw_circle(gl_in[0].gl_Position,
+                    vg_params[0].x);
     } else if (vg_type[0] == 2.0) {
         draw_line(gl_in[0].gl_Position,
                    vec4(vg_params[0].xy, 0.0, 1.0),
                    vg_params[0].z);
-    } else if (vg_type[0] == 3.0) {
-        draw_circle(gl_in[0].gl_Position,
-                    vg_params[0].x);
-    } else if (vg_type[0] == 42.0) {
-        draw_house(gl_in[0].gl_Position);
     }
 }
