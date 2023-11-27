@@ -111,8 +111,8 @@ QVariant CategoryTreeModel::headerData(int section, Qt::Orientation orientation,
   return QVariant();
 }
 
-QVariant CategoryTreeModel::data(const QModelIndex& index, int role) const
-    noexcept {
+QVariant CategoryTreeModel::data(const QModelIndex& index,
+                                 int role) const noexcept {
   if (const Item* item = itemFromIndex(index)) {
     switch (role) {
       case Qt::DisplayRole:

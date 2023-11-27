@@ -241,7 +241,9 @@ QVector<Path> StrokeFont::polylines2paths(
 Path StrokeFont::polyline2path(const fb::Polyline& p,
                                const PositiveLength& height) noexcept {
   Path path;
-  foreach (const fb::Vertex& v, p) { path.addVertex(convertVertex(v, height)); }
+  foreach (const fb::Vertex& v, p) {
+    path.addVertex(convertVertex(v, height));
+  }
   return path;
 }
 

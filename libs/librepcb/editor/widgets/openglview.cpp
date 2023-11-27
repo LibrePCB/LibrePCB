@@ -254,7 +254,9 @@ void OpenGlView::paintGL() {
   mProgram.setUniformValue("mvp_matrix", mProjection * mTransform);
 
   // Draw all objects.
-  foreach (const auto& obj, mObjects) { obj->draw(*this, mProgram); }
+  foreach (const auto& obj, mObjects) {
+    obj->draw(*this, mProgram);
+  }
 }
 
 /*******************************************************************************

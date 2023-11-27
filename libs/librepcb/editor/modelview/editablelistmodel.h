@@ -320,9 +320,8 @@ private:  // Methods
     return value;
   }
 
-  tl::optional<Uuid> convertInputValue(const QVariant& input,
-                                       const tl::optional<Uuid>& tag) const
-      noexcept {
+  tl::optional<Uuid> convertInputValue(
+      const QVariant& input, const tl::optional<Uuid>& tag) const noexcept {
     Q_UNUSED(tag);  // used only for template tag dispatching
     return Uuid::tryFromString(input.toString());
   }
@@ -334,9 +333,8 @@ private:  // Methods
     return str.isEmpty() ? tl::nullopt : tl::make_optional(str);
   }
 
-  tl::optional<QUrl> convertInputValue(const QVariant& input,
-                                       const tl::optional<QUrl>& tag) const
-      noexcept {
+  tl::optional<QUrl> convertInputValue(
+      const QVariant& input, const tl::optional<QUrl>& tag) const noexcept {
     Q_UNUSED(tag);  // used only for template tag dispatching
     QUrl url = QUrl::fromUserInput(input.toString());
     return url.isValid() ? tl::make_optional(url) : tl::nullopt;

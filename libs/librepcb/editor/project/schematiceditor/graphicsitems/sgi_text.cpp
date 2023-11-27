@@ -129,7 +129,9 @@ void SGI_Text::symbolGraphicsItemEdited(const SGI_Symbol& obj,
       setSelected(obj.isSelected());
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
 }
 

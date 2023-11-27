@@ -99,8 +99,8 @@ int BGI_Plane::getLineIndexAtPosition(const Point& pos) const noexcept {
   return -1;
 }
 
-QVector<int> BGI_Plane::getVertexIndicesAtPosition(const Point& pos) const
-    noexcept {
+QVector<int> BGI_Plane::getVertexIndicesAtPosition(
+    const Point& pos) const noexcept {
   QMultiMap<Length, int> indices;
   for (int i = 0; i < mPlane.getOutline().getVertices().count(); ++i) {
     const Length distance =
@@ -180,7 +180,9 @@ void BGI_Plane::paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
     if (mPlane.isVisible()) {
       painter->setPen(Qt::NoPen);
       painter->setBrush(mLayer->getColor(highlight));
-      foreach (const QPainterPath& area, mAreas) { painter->drawPath(area); }
+      foreach (const QPainterPath& area, mAreas) {
+        painter->drawPath(area);
+      }
     }
   }
 }

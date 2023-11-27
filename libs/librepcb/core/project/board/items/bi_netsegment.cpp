@@ -359,8 +359,8 @@ bool BI_NetSegment::areAllNetPointsConnectedTogether() const noexcept {
 
 void BI_NetSegment::findAllConnectedNetPoints(
     const BI_NetLineAnchor& p, QSet<const BI_Via*>& vias,
-    QSet<const BI_FootprintPad*>& pads, QSet<const BI_NetPoint*>& points) const
-    noexcept {
+    QSet<const BI_FootprintPad*>& pads,
+    QSet<const BI_NetPoint*>& points) const noexcept {
   if (const BI_Via* via = dynamic_cast<const BI_Via*>(&p)) {
     if (vias.contains(via)) return;
     vias.insert(via);

@@ -286,8 +286,8 @@ void GerberExcellonOutputJob::setOutputPath(const QString& path) noexcept {
  *  General Methods
  ******************************************************************************/
 
-std::shared_ptr<OutputJob> GerberExcellonOutputJob::cloneShared() const
-    noexcept {
+std::shared_ptr<OutputJob> GerberExcellonOutputJob::cloneShared()
+    const noexcept {
   return std::make_shared<GerberExcellonOutputJob>(*this);
 }
 

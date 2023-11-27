@@ -68,9 +68,8 @@ QString AttrTypeResistance::valueFromTr(const QString& value) const noexcept {
     return QString();
 }
 
-QString AttrTypeResistance::printableValueTr(const QString& value,
-                                             const AttributeUnit* unit) const
-    noexcept {
+QString AttrTypeResistance::printableValueTr(
+    const QString& value, const AttributeUnit* unit) const noexcept {
   bool ok = false;
   float v = value.toFloat(&ok);
   if (ok && unit)

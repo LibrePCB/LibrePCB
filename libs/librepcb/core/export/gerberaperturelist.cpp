@@ -287,8 +287,8 @@ int GerberApertureList::addOutline(const QString& name, const Path& path,
   return addAperture(s, function);
 }
 
-QString GerberApertureList::buildOutlineMacro(Path path, const Angle& rot) const
-    noexcept {
+QString GerberApertureList::buildOutlineMacro(Path path,
+                                              const Angle& rot) const noexcept {
   path.close();
   Q_ASSERT(path.getVertices().count() >= 4);
   QString s = QString("4,1,%2,").arg(path.getVertices().count() - 1);

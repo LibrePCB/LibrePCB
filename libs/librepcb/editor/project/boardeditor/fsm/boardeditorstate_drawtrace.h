@@ -186,8 +186,8 @@ private:
    * @param mode The selected WireMode.
    * @return Middle Point.
    */
-  Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
-      noexcept;
+  Point calcMiddlePointPos(const Point& p1, const Point p2,
+                           WireMode mode) const noexcept;
 
   // State
   SubState mSubState;  ///< the current substate

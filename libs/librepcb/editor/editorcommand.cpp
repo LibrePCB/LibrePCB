@@ -79,8 +79,8 @@ void EditorCommand::updateTranslations() noexcept {
       QCoreApplication::translate("EditorCommandSet", mDescriptionNoTr);
 }
 
-QAction* EditorCommand::createAction(QObject* parent, ActionFlags flags) const
-    noexcept {
+QAction* EditorCommand::createAction(QObject* parent,
+                                     ActionFlags flags) const noexcept {
   return setupAction(new QAction(parent), flags);
 }
 
@@ -88,8 +88,8 @@ QAction* EditorCommand::createAction(QObject* parent, ActionFlags flags) const
  *  Private Methods
  ******************************************************************************/
 
-QAction* EditorCommand::setupAction(QAction* action, ActionFlags flags) const
-    noexcept {
+QAction* EditorCommand::setupAction(QAction* action,
+                                    ActionFlags flags) const noexcept {
   QString name = "action";
   foreach (const QString& fragment, mIdentifier.split('.').last().split('_')) {
     name.append(fragment.mid(0, 1).toUpper() % fragment.midRef(1));

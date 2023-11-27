@@ -77,32 +77,36 @@ protected:
 
   bool run(AsyncCopyOperation& copy, unsigned long timeout) {
     // Connect all signals by hand because QSignalSpy is not threadsafe!
-    QObject::connect(&copy, &AsyncCopyOperation::started, &mContext,
-                     [this]() { ++mSignalStarted; }, Qt::QueuedConnection);
-    QObject::connect(&copy, &AsyncCopyOperation::progressStatus, &mContext,
-                     [this](const QString& status) {
-                       std::cout << "STATUS: " << status.toStdString()
-                                 << std::endl;
-                       mSignalProgressStatus.append(status);
-                     },
-                     Qt::QueuedConnection);
-    QObject::connect(&copy, &AsyncCopyOperation::progressPercent, &mContext,
-                     [this](int percent) {
-                       std::cout << "PROGRESS: " << percent << std::endl;
-                       mSignalProgressPercent.append(percent);
-                     },
-                     Qt::QueuedConnection);
-    QObject::connect(&copy, &AsyncCopyOperation::succeeded, &mContext,
-                     [this]() { ++mSignalSucceeded; }, Qt::QueuedConnection);
-    QObject::connect(&copy, &AsyncCopyOperation::failed, &mContext,
-                     [this](const QString& error) {
-                       std::cout << "ERROR: " << error.toStdString()
-                                 << std::endl;
-                       mSignalFailed.append(error);
-                     },
-                     Qt::QueuedConnection);
-    QObject::connect(&copy, &AsyncCopyOperation::finished, &mContext,
-                     [this]() { ++mSignalFinished; }, Qt::QueuedConnection);
+    QObject::connect(
+        &copy, &AsyncCopyOperation::started, &mContext,
+        [this]() { ++mSignalStarted; }, Qt::QueuedConnection);
+    QObject::connect(
+        &copy, &AsyncCopyOperation::progressStatus, &mContext,
+        [this](const QString& status) {
+          std::cout << "STATUS: " << status.toStdString() << std::endl;
+          mSignalProgressStatus.append(status);
+        },
+        Qt::QueuedConnection);
+    QObject::connect(
+        &copy, &AsyncCopyOperation::progressPercent, &mContext,
+        [this](int percent) {
+          std::cout << "PROGRESS: " << percent << std::endl;
+          mSignalProgressPercent.append(percent);
+        },
+        Qt::QueuedConnection);
+    QObject::connect(
+        &copy, &AsyncCopyOperation::succeeded, &mContext,
+        [this]() { ++mSignalSucceeded; }, Qt::QueuedConnection);
+    QObject::connect(
+        &copy, &AsyncCopyOperation::failed, &mContext,
+        [this](const QString& error) {
+          std::cout << "ERROR: " << error.toStdString() << std::endl;
+          mSignalFailed.append(error);
+        },
+        Qt::QueuedConnection);
+    QObject::connect(
+        &copy, &AsyncCopyOperation::finished, &mContext,
+        [this]() { ++mSignalFinished; }, Qt::QueuedConnection);
 
     copy.start();
     const bool success = copy.wait(timeout);

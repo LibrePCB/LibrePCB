@@ -363,7 +363,9 @@ void NewElementWizardContext::copyElement(ElementType type,
       break;
     }
 
-    default: { break; }
+    default: {
+      break;
+    }
   }
 }
 

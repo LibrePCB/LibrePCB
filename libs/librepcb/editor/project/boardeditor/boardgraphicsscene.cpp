@@ -71,14 +71,30 @@ BoardGraphicsScene::BoardGraphicsScene(
     mBoard(board),
     mLayerProvider(lp),
     mHighlightedNetSignals(highlightedNetSignals) {
-  foreach (BI_Device* obj, mBoard.getDeviceInstances()) { addDevice(*obj); }
-  foreach (BI_NetSegment* obj, mBoard.getNetSegments()) { addNetSegment(*obj); }
-  foreach (BI_Plane* obj, mBoard.getPlanes()) { addPlane(*obj); }
-  foreach (BI_Zone* obj, mBoard.getZones()) { addZone(*obj); }
-  foreach (BI_Polygon* obj, mBoard.getPolygons()) { addPolygon(*obj); }
-  foreach (BI_StrokeText* obj, mBoard.getStrokeTexts()) { addStrokeText(*obj); }
-  foreach (BI_Hole* obj, mBoard.getHoles()) { addHole(*obj); }
-  foreach (BI_AirWire* obj, mBoard.getAirWires()) { addAirWire(*obj); }
+  foreach (BI_Device* obj, mBoard.getDeviceInstances()) {
+    addDevice(*obj);
+  }
+  foreach (BI_NetSegment* obj, mBoard.getNetSegments()) {
+    addNetSegment(*obj);
+  }
+  foreach (BI_Plane* obj, mBoard.getPlanes()) {
+    addPlane(*obj);
+  }
+  foreach (BI_Zone* obj, mBoard.getZones()) {
+    addZone(*obj);
+  }
+  foreach (BI_Polygon* obj, mBoard.getPolygons()) {
+    addPolygon(*obj);
+  }
+  foreach (BI_StrokeText* obj, mBoard.getStrokeTexts()) {
+    addStrokeText(*obj);
+  }
+  foreach (BI_Hole* obj, mBoard.getHoles()) {
+    addHole(*obj);
+  }
+  foreach (BI_AirWire* obj, mBoard.getAirWires()) {
+    addAirWire(*obj);
+  }
 
   connect(&mBoard, &Board::deviceAdded, this, &BoardGraphicsScene::addDevice);
   connect(&mBoard, &Board::deviceRemoved, this,
@@ -109,19 +125,39 @@ BoardGraphicsScene::BoardGraphicsScene(
 BoardGraphicsScene::~BoardGraphicsScene() noexcept {
   // Need to remove all graphics items from scene in case some shared pointers
   // are still hold outside of this class.
-  foreach (BI_Device* obj, mDevices.keys()) { removeDevice(*obj); }
+  foreach (BI_Device* obj, mDevices.keys()) {
+    removeDevice(*obj);
+  }
   foreach (BI_FootprintPad* obj, mFootprintPads.keys()) {
     removeFootprintPad(*obj);
   }
-  foreach (BI_Via* obj, mVias.keys()) { removeVia(*obj); }
-  foreach (BI_NetLine* obj, mNetLines.keys()) { removeNetLine(*obj); }
-  foreach (BI_NetPoint* obj, mNetPoints.keys()) { removeNetPoint(*obj); }
-  foreach (BI_Plane* obj, mPlanes.keys()) { removePlane(*obj); }
-  foreach (BI_Zone* obj, mZones.keys()) { removeZone(*obj); }
-  foreach (BI_Polygon* obj, mPolygons.keys()) { removePolygon(*obj); }
-  foreach (BI_StrokeText* obj, mStrokeTexts.keys()) { removeStrokeText(*obj); }
-  foreach (BI_Hole* obj, mHoles.keys()) { removeHole(*obj); }
-  foreach (BI_AirWire* obj, mAirWires.keys()) { removeAirWire(*obj); }
+  foreach (BI_Via* obj, mVias.keys()) {
+    removeVia(*obj);
+  }
+  foreach (BI_NetLine* obj, mNetLines.keys()) {
+    removeNetLine(*obj);
+  }
+  foreach (BI_NetPoint* obj, mNetPoints.keys()) {
+    removeNetPoint(*obj);
+  }
+  foreach (BI_Plane* obj, mPlanes.keys()) {
+    removePlane(*obj);
+  }
+  foreach (BI_Zone* obj, mZones.keys()) {
+    removeZone(*obj);
+  }
+  foreach (BI_Polygon* obj, mPolygons.keys()) {
+    removePolygon(*obj);
+  }
+  foreach (BI_StrokeText* obj, mStrokeTexts.keys()) {
+    removeStrokeText(*obj);
+  }
+  foreach (BI_Hole* obj, mHoles.keys()) {
+    removeHole(*obj);
+  }
+  foreach (BI_AirWire* obj, mAirWires.keys()) {
+    removeAirWire(*obj);
+  }
 }
 
 /*******************************************************************************
@@ -129,16 +165,36 @@ BoardGraphicsScene::~BoardGraphicsScene() noexcept {
  ******************************************************************************/
 
 void BoardGraphicsScene::selectAll() noexcept {
-  foreach (auto item, mDevices) { item->setSelected(true); }
-  foreach (auto item, mFootprintPads) { item->setSelected(true); }
-  foreach (auto item, mNetPoints) { item->setSelected(true); }
-  foreach (auto item, mNetLines) { item->setSelected(true); }
-  foreach (auto item, mVias) { item->setSelected(true); }
-  foreach (auto item, mPlanes) { item->setSelected(true); }
-  foreach (auto item, mZones) { item->setSelected(true); }
-  foreach (auto item, mPolygons) { item->setSelected(true); }
-  foreach (auto item, mStrokeTexts) { item->setSelected(true); }
-  foreach (auto item, mHoles) { item->setSelected(true); }
+  foreach (auto item, mDevices) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mFootprintPads) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mNetPoints) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mNetLines) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mVias) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mPlanes) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mZones) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mPolygons) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mStrokeTexts) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mHoles) {
+    item->setSelected(true);
+  }
 }
 
 void BoardGraphicsScene::selectItemsInRect(const Point& p1,
@@ -207,24 +263,54 @@ void BoardGraphicsScene::selectNetSegment(BI_NetSegment& netSegment) noexcept {
 }
 
 void BoardGraphicsScene::clearSelection() noexcept {
-  foreach (auto item, mDevices) { item->setSelected(false); }
-  foreach (auto item, mFootprintPads) { item->setSelected(false); }
-  foreach (auto item, mNetPoints) { item->setSelected(false); }
-  foreach (auto item, mNetLines) { item->setSelected(false); }
-  foreach (auto item, mVias) { item->setSelected(false); }
-  foreach (auto item, mPlanes) { item->setSelected(false); }
-  foreach (auto item, mZones) { item->setSelected(false); }
-  foreach (auto item, mPolygons) { item->setSelected(false); }
-  foreach (auto item, mStrokeTexts) { item->setSelected(false); }
-  foreach (auto item, mHoles) { item->setSelected(false); }
+  foreach (auto item, mDevices) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mFootprintPads) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mNetPoints) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mNetLines) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mVias) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mPlanes) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mZones) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mPolygons) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mStrokeTexts) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mHoles) {
+    item->setSelected(false);
+  }
 }
 
 void BoardGraphicsScene::updateHighlightedNetSignals() noexcept {
-  foreach (auto item, mFootprintPads) { item->updateHighlightedNetSignals(); }
-  foreach (auto item, mVias) { item->update(); }
-  foreach (auto item, mNetLines) { item->update(); }
-  foreach (auto item, mPlanes) { item->update(); }
-  foreach (auto item, mAirWires) { item->update(); }
+  foreach (auto item, mFootprintPads) {
+    item->updateHighlightedNetSignals();
+  }
+  foreach (auto item, mVias) {
+    item->update();
+  }
+  foreach (auto item, mNetLines) {
+    item->update();
+  }
+  foreach (auto item, mPlanes) {
+    item->update();
+  }
+  foreach (auto item, mAirWires) {
+    item->update();
+  }
 }
 
 qreal BoardGraphicsScene::getZValueOfCopperLayer(const Layer& layer) noexcept {
@@ -256,7 +342,9 @@ void BoardGraphicsScene::addDevice(BI_Device& device) noexcept {
   foreach (BI_FootprintPad* obj, device.getPads()) {
     addFootprintPad(*obj, item);
   }
-  foreach (BI_StrokeText* obj, device.getStrokeTexts()) { addStrokeText(*obj); }
+  foreach (BI_StrokeText* obj, device.getStrokeTexts()) {
+    addStrokeText(*obj);
+  }
 
   connect(&device, &BI_Device::strokeTextAdded, this,
           &BoardGraphicsScene::addStrokeText);
@@ -273,7 +361,9 @@ void BoardGraphicsScene::removeDevice(BI_Device& device) noexcept {
   foreach (BI_StrokeText* obj, device.getStrokeTexts()) {
     removeStrokeText(*obj);
   }
-  foreach (BI_FootprintPad* obj, device.getPads()) { removeFootprintPad(*obj); }
+  foreach (BI_FootprintPad* obj, device.getPads()) {
+    removeFootprintPad(*obj);
+  }
 
   if (std::shared_ptr<BGI_Device> item = mDevices.take(&device)) {
     removeItem(*item);
@@ -300,9 +390,15 @@ void BoardGraphicsScene::removeFootprintPad(BI_FootprintPad& pad) noexcept {
 }
 
 void BoardGraphicsScene::addNetSegment(BI_NetSegment& netSegment) noexcept {
-  foreach (BI_Via* obj, netSegment.getVias()) { addVia(*obj); }
-  foreach (BI_NetPoint* obj, netSegment.getNetPoints()) { addNetPoint(*obj); }
-  foreach (BI_NetLine* obj, netSegment.getNetLines()) { addNetLine(*obj); }
+  foreach (BI_Via* obj, netSegment.getVias()) {
+    addVia(*obj);
+  }
+  foreach (BI_NetPoint* obj, netSegment.getNetPoints()) {
+    addNetPoint(*obj);
+  }
+  foreach (BI_NetLine* obj, netSegment.getNetLines()) {
+    addNetLine(*obj);
+  }
   connect(&netSegment, &BI_NetSegment::elementsAdded, this,
           &BoardGraphicsScene::addNetSegmentElements);
   connect(&netSegment, &BI_NetSegment::elementsRemoved, this,
@@ -314,27 +410,43 @@ void BoardGraphicsScene::removeNetSegment(BI_NetSegment& netSegment) noexcept {
              &BoardGraphicsScene::addNetSegmentElements);
   disconnect(&netSegment, &BI_NetSegment::elementsRemoved, this,
              &BoardGraphicsScene::removeNetSegmentElements);
-  foreach (BI_NetLine* obj, netSegment.getNetLines()) { removeNetLine(*obj); }
+  foreach (BI_NetLine* obj, netSegment.getNetLines()) {
+    removeNetLine(*obj);
+  }
   foreach (BI_NetPoint* obj, netSegment.getNetPoints()) {
     removeNetPoint(*obj);
   }
-  foreach (BI_Via* obj, netSegment.getVias()) { removeVia(*obj); }
+  foreach (BI_Via* obj, netSegment.getVias()) {
+    removeVia(*obj);
+  }
 }
 
 void BoardGraphicsScene::addNetSegmentElements(
     const QList<BI_Via*>& vias, const QList<BI_NetPoint*>& netPoints,
     const QList<BI_NetLine*>& netLines) noexcept {
-  foreach (BI_Via* obj, vias) { addVia(*obj); }
-  foreach (BI_NetPoint* obj, netPoints) { addNetPoint(*obj); }
-  foreach (BI_NetLine* obj, netLines) { addNetLine(*obj); }
+  foreach (BI_Via* obj, vias) {
+    addVia(*obj);
+  }
+  foreach (BI_NetPoint* obj, netPoints) {
+    addNetPoint(*obj);
+  }
+  foreach (BI_NetLine* obj, netLines) {
+    addNetLine(*obj);
+  }
 }
 
 void BoardGraphicsScene::removeNetSegmentElements(
     const QList<BI_Via*>& vias, const QList<BI_NetPoint*>& netPoints,
     const QList<BI_NetLine*>& netLines) noexcept {
-  foreach (BI_NetLine* obj, netLines) { removeNetLine(*obj); }
-  foreach (BI_NetPoint* obj, netPoints) { removeNetPoint(*obj); }
-  foreach (BI_Via* obj, vias) { removeVia(*obj); }
+  foreach (BI_NetLine* obj, netLines) {
+    removeNetLine(*obj);
+  }
+  foreach (BI_NetPoint* obj, netPoints) {
+    removeNetPoint(*obj);
+  }
+  foreach (BI_Via* obj, vias) {
+    removeVia(*obj);
+  }
 }
 
 void BoardGraphicsScene::addVia(BI_Via& via) noexcept {

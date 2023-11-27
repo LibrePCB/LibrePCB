@@ -69,9 +69,8 @@ QString AttrTypeInductance::valueFromTr(const QString& value) const noexcept {
     return QString();
 }
 
-QString AttrTypeInductance::printableValueTr(const QString& value,
-                                             const AttributeUnit* unit) const
-    noexcept {
+QString AttrTypeInductance::printableValueTr(
+    const QString& value, const AttributeUnit* unit) const noexcept {
   bool ok = false;
   float v = value.toFloat(&ok);
   if (ok && unit)

@@ -154,8 +154,8 @@ public:
   bool hasAutoTopSolderPaste() const noexcept;
   bool hasAutoBottomSolderPaste() const noexcept;
   PadGeometry getGeometry() const noexcept;
-  QHash<const Layer*, QList<PadGeometry>> buildPreviewGeometries() const
-      noexcept;
+  QHash<const Layer*, QList<PadGeometry>> buildPreviewGeometries()
+      const noexcept;
 
   // Setters
   bool setPackagePadUuid(const tl::optional<Uuid>& pad) noexcept;

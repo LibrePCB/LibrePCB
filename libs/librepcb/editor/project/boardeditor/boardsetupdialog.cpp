@@ -452,8 +452,8 @@ bool BoardSetupDialog::apply() noexcept {
   }
 }
 
-QVector<const Layer*> BoardSetupDialog::getTopSilkscreenLayers() const
-    noexcept {
+QVector<const Layer*> BoardSetupDialog::getTopSilkscreenLayers()
+    const noexcept {
   QVector<const Layer*> layers;
   if (mUi->cbxSilkTopLegend->isChecked()) {
     layers << &Layer::topLegend();
@@ -467,8 +467,8 @@ QVector<const Layer*> BoardSetupDialog::getTopSilkscreenLayers() const
   return layers;
 }
 
-QVector<const Layer*> BoardSetupDialog::getBotSilkscreenLayers() const
-    noexcept {
+QVector<const Layer*> BoardSetupDialog::getBotSilkscreenLayers()
+    const noexcept {
   QVector<const Layer*> layers;
   if (mUi->cbxSilkBotLegend->isChecked()) {
     layers << &Layer::botLegend();

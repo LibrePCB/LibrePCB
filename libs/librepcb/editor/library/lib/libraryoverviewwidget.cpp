@@ -548,7 +548,9 @@ void LibraryOverviewWidget::openContextMenuAtPos(const QPoint& pos) noexcept {
   QAction* action = menu.exec(QCursor::pos());
   if (action == aEdit) {
     Q_ASSERT(selectedItemPaths.count() > 0);
-    foreach (const FilePath& fp, selectedItemPaths) { editItem(list, fp); }
+    foreach (const FilePath& fp, selectedItemPaths) {
+      editItem(list, fp);
+    }
   } else if (action == aDuplicate) {
     Q_ASSERT(selectedItemPaths.count() == 1);
     duplicateItem(list, selectedItemPaths.values().first());

@@ -69,8 +69,8 @@ public:
   ~FootprintPainter() noexcept;
 
   // General Methods
-  void paint(QPainter& painter, const GraphicsExportSettings& settings) const
-      noexcept override;
+  void paint(QPainter& painter,
+             const GraphicsExportSettings& settings) const noexcept override;
 
   // Operator Overloadings
   FootprintPainter& operator=(const FootprintPainter& rhs) = delete;

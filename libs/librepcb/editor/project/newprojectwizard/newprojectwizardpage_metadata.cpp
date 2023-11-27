@@ -116,8 +116,8 @@ bool NewProjectWizardPage_Metadata::isLicenseSet() const noexcept {
   return !mUi->cbxLicense->currentData(Qt::UserRole).toString().isEmpty();
 }
 
-FilePath NewProjectWizardPage_Metadata::getProjectLicenseFilePath() const
-    noexcept {
+FilePath NewProjectWizardPage_Metadata::getProjectLicenseFilePath()
+    const noexcept {
   QString licenseFileName =
       mUi->cbxLicense->currentData(Qt::UserRole).toString();
   if (!licenseFileName.isEmpty()) {

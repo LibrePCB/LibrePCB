@@ -78,8 +78,8 @@ PrimitiveZoneGraphicsItem::~PrimitiveZoneGraphicsItem() noexcept {
  *  Getters
  ******************************************************************************/
 
-int PrimitiveZoneGraphicsItem::getLineIndexAtPosition(const Point& pos) const
-    noexcept {
+int PrimitiveZoneGraphicsItem::getLineIndexAtPosition(
+    const Point& pos) const noexcept {
   // We build temporary PrimitivePathGraphicsItem objects for each segment of
   // the zone and check if the specified position is located within the shape
   // of one of these graphics items. This is quite ugly, but was easy to

@@ -106,8 +106,8 @@ public:
   std::shared_ptr<const Component> getSelectedComponent() const noexcept {
     return mSelectedComponent;
   }
-  std::shared_ptr<const ComponentSymbolVariant> getSelectedSymbolVariant() const
-      noexcept {
+  std::shared_ptr<const ComponentSymbolVariant> getSelectedSymbolVariant()
+      const noexcept {
     return mSelectedSymbVar;
   }
   std::shared_ptr<const Device> getSelectedDevice() const noexcept {
@@ -116,8 +116,8 @@ public:
   std::shared_ptr<const Part> getSelectedPart() const noexcept {
     return mSelectedPart;
   }
-  tl::optional<Package::AssemblyType> getSelectedPackageAssemblyType() const
-      noexcept;
+  tl::optional<Package::AssemblyType> getSelectedPackageAssemblyType()
+      const noexcept;
 
   /**
    * @brief Check if dialog shall be opened again after the current component

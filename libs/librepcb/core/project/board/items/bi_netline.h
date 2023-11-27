@@ -98,8 +98,8 @@ public:
   const PositiveLength& getWidth() const noexcept { return mTrace.getWidth(); }
   BI_NetLineAnchor& getStartPoint() const noexcept { return *mStartPoint; }
   BI_NetLineAnchor& getEndPoint() const noexcept { return *mEndPoint; }
-  BI_NetLineAnchor* getOtherPoint(const BI_NetLineAnchor& firstPoint) const
-      noexcept;
+  BI_NetLineAnchor* getOtherPoint(
+      const BI_NetLineAnchor& firstPoint) const noexcept;
   Path getSceneOutline(const Length& expansion = Length(0)) const noexcept;
   UnsignedLength getLength() const noexcept;
 

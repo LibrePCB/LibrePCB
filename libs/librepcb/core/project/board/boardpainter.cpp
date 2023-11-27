@@ -138,9 +138,8 @@ BoardPainter::~BoardPainter() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void BoardPainter::paint(QPainter& painter,
-                         const GraphicsExportSettings& settings) const
-    noexcept {
+void BoardPainter::paint(
+    QPainter& painter, const GraphicsExportSettings& settings) const noexcept {
   // Determine what to paint on which color layer.
   initContentByColor();
 

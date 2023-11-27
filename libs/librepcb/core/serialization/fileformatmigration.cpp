@@ -94,8 +94,8 @@ QList<std::shared_ptr<FileFormatMigration>> FileFormatMigration::getMigrations(
  ******************************************************************************/
 
 FileFormatMigration::Message FileFormatMigration::buildMessage(
-    Message::Severity severity, const QString& message, int affectedItems) const
-    noexcept {
+    Message::Severity severity, const QString& message,
+    int affectedItems) const noexcept {
   const Message msg{mFromVersion, mToVersion, severity, affectedItems, message};
   const QString multiplier =
       affectedItems > 0 ? QString(" (%1x)").arg(affectedItems) : "";

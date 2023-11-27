@@ -64,8 +64,8 @@ public:
   // General Methods
   virtual bool entry() noexcept { return true; }
   virtual bool exit() noexcept { return true; }
-  virtual QSet<EditorWidgetBase::Feature> getAvailableFeatures() const
-      noexcept = 0;
+  virtual QSet<EditorWidgetBase::Feature> getAvailableFeatures()
+      const noexcept = 0;
 
   // Event Handlers
   virtual bool processKeyPressed(const QKeyEvent& e) noexcept {

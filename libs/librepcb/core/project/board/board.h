@@ -95,8 +95,8 @@ public:
   BoardFabricationOutputSettings& getFabricationOutputSettings() noexcept {
     return *mFabricationOutputSettings;
   }
-  const BoardFabricationOutputSettings& getFabricationOutputSettings() const
-      noexcept {
+  const BoardFabricationOutputSettings& getFabricationOutputSettings()
+      const noexcept {
     return *mFabricationOutputSettings;
   }
   bool isEmpty() const noexcept;

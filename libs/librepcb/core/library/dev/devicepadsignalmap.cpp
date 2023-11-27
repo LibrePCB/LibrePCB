@@ -80,8 +80,8 @@ void DevicePadSignalMapItem::serialize(SExpression& root) const {
  *  Operator Overloadings
  ******************************************************************************/
 
-bool DevicePadSignalMapItem::operator==(const DevicePadSignalMapItem& rhs) const
-    noexcept {
+bool DevicePadSignalMapItem::operator==(
+    const DevicePadSignalMapItem& rhs) const noexcept {
   if (mPadUuid != rhs.mPadUuid) return false;
   if (mSignalUuid != rhs.mSignalUuid) return false;
   return true;

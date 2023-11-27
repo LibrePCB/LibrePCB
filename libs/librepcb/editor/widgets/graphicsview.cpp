@@ -249,9 +249,8 @@ Point GraphicsView::mapGlobalPosToScenePos(const QPoint& globalPosPx,
   return scenePos;
 }
 
-QPainterPath GraphicsView::calcPosWithTolerance(const Point& pos,
-                                                qreal multiplier) const
-    noexcept {
+QPainterPath GraphicsView::calcPosWithTolerance(
+    const Point& pos, qreal multiplier) const noexcept {
   const qreal tolerance = 5 * multiplier;  // Screen pixel tolerance.
   const QRectF deviceRect(-tolerance, -tolerance, 2 * tolerance, 2 * tolerance);
   const QTransform t(transform().inverted());

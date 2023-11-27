@@ -124,7 +124,9 @@ QPixmap SymbolClipboardData::generatePixmap(
   for (Text& text : mTexts) {
     items.append(std::make_shared<TextGraphicsItem>(text, lp));
   }
-  foreach (const auto& item, items) { scene.addItem(*item); }
+  foreach (const auto& item, items) {
+    scene.addItem(*item);
+  }
   return scene.toPixmap(300);
 }
 

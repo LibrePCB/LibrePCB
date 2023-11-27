@@ -77,7 +77,9 @@ protected:
 
   std::string str(const QVector<FilePath>& paths) const {
     QStringList l;
-    foreach (const FilePath& fp, paths) { l.append(fp.toStr()); }
+    foreach (const FilePath& fp, paths) {
+      l.append(fp.toStr());
+    }
     return l.join(", ").toStdString();
   }
 

@@ -86,8 +86,8 @@ bool CmdPasteSymbolItems::performExecute() {
   collator.setNumericMode(true);
   collator.setCaseSensitivity(Qt::CaseInsensitive);
   collator.setIgnorePunctuation(false);
-  for (const SymbolPin &pin : mData->getPins().sorted(
-           [&collator](const SymbolPin&lhs, const SymbolPin&rhs) {
+  for (const SymbolPin& pin : mData->getPins().sorted(
+           [&collator](const SymbolPin& lhs, const SymbolPin& rhs) {
              return collator(*lhs.getName(), *rhs.getName());
            })) {
     Uuid uuid = pin.getUuid();

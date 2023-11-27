@@ -62,12 +62,18 @@ SchematicGraphicsScene::SchematicGraphicsScene(
     mSchematic(schematic),
     mLayerProvider(lp),
     mHighlightedNetSignals(highlightedNetSignals) {
-  foreach (SI_Symbol* obj, mSchematic.getSymbols()) { addSymbol(*obj); }
+  foreach (SI_Symbol* obj, mSchematic.getSymbols()) {
+    addSymbol(*obj);
+  }
   foreach (SI_NetSegment* obj, mSchematic.getNetSegments()) {
     addNetSegment(*obj);
   }
-  foreach (SI_Polygon* obj, mSchematic.getPolygons()) { addPolygon(*obj); }
-  foreach (SI_Text* obj, mSchematic.getTexts()) { addText(*obj); }
+  foreach (SI_Polygon* obj, mSchematic.getPolygons()) {
+    addPolygon(*obj);
+  }
+  foreach (SI_Text* obj, mSchematic.getTexts()) {
+    addText(*obj);
+  }
 
   connect(&mSchematic, &Schematic::symbolAdded, this,
           &SchematicGraphicsScene::addSymbol);
@@ -90,13 +96,27 @@ SchematicGraphicsScene::SchematicGraphicsScene(
 SchematicGraphicsScene::~SchematicGraphicsScene() noexcept {
   // Need to remove all graphics items from scene in case some shared pointers
   // are still hold outside of this class.
-  foreach (SI_Symbol* obj, mSymbols.keys()) { removeSymbol(*obj); }
-  foreach (SI_SymbolPin* obj, mSymbolPins.keys()) { removeSymbolPin(*obj); }
-  foreach (SI_NetLabel* obj, mNetLabels.keys()) { removeNetLabel(*obj); }
-  foreach (SI_NetLine* obj, mNetLines.keys()) { removeNetLine(*obj); }
-  foreach (SI_NetPoint* obj, mNetPoints.keys()) { removeNetPoint(*obj); }
-  foreach (SI_Polygon* obj, mPolygons.keys()) { removePolygon(*obj); }
-  foreach (SI_Text* obj, mTexts.keys()) { removeText(*obj); }
+  foreach (SI_Symbol* obj, mSymbols.keys()) {
+    removeSymbol(*obj);
+  }
+  foreach (SI_SymbolPin* obj, mSymbolPins.keys()) {
+    removeSymbolPin(*obj);
+  }
+  foreach (SI_NetLabel* obj, mNetLabels.keys()) {
+    removeNetLabel(*obj);
+  }
+  foreach (SI_NetLine* obj, mNetLines.keys()) {
+    removeNetLine(*obj);
+  }
+  foreach (SI_NetPoint* obj, mNetPoints.keys()) {
+    removeNetPoint(*obj);
+  }
+  foreach (SI_Polygon* obj, mPolygons.keys()) {
+    removePolygon(*obj);
+  }
+  foreach (SI_Text* obj, mTexts.keys()) {
+    removeText(*obj);
+  }
 }
 
 /*******************************************************************************
@@ -104,13 +124,27 @@ SchematicGraphicsScene::~SchematicGraphicsScene() noexcept {
  ******************************************************************************/
 
 void SchematicGraphicsScene::selectAll() noexcept {
-  foreach (auto item, mSymbols) { item->setSelected(true); }
-  foreach (auto item, mSymbolPins) { item->setSelected(true); }
-  foreach (auto item, mNetPoints) { item->setSelected(true); }
-  foreach (auto item, mNetLines) { item->setSelected(true); }
-  foreach (auto item, mNetLabels) { item->setSelected(true); }
-  foreach (auto item, mPolygons) { item->setSelected(true); }
-  foreach (auto item, mTexts) { item->setSelected(true); }
+  foreach (auto item, mSymbols) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mSymbolPins) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mNetPoints) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mNetLines) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mNetLabels) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mPolygons) {
+    item->setSelected(true);
+  }
+  foreach (auto item, mTexts) {
+    item->setSelected(true);
+  }
 }
 
 void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
@@ -152,20 +186,42 @@ void SchematicGraphicsScene::selectItemsInRect(const Point& p1,
 }
 
 void SchematicGraphicsScene::clearSelection() noexcept {
-  foreach (auto item, mSymbols) { item->setSelected(false); }
-  foreach (auto item, mSymbolPins) { item->setSelected(false); }
-  foreach (auto item, mNetPoints) { item->setSelected(false); }
-  foreach (auto item, mNetLines) { item->setSelected(false); }
-  foreach (auto item, mNetLabels) { item->setSelected(false); }
-  foreach (auto item, mPolygons) { item->setSelected(false); }
-  foreach (auto item, mTexts) { item->setSelected(false); }
+  foreach (auto item, mSymbols) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mSymbolPins) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mNetPoints) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mNetLines) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mNetLabels) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mPolygons) {
+    item->setSelected(false);
+  }
+  foreach (auto item, mTexts) {
+    item->setSelected(false);
+  }
 }
 
 void SchematicGraphicsScene::updateHighlightedNetSignals() noexcept {
-  foreach (auto item, mSymbolPins) { item->updateHighlightedState(); }
-  foreach (auto item, mNetPoints) { item->update(); }
-  foreach (auto item, mNetLines) { item->update(); }
-  foreach (auto item, mNetLabels) { item->update(); }
+  foreach (auto item, mSymbolPins) {
+    item->updateHighlightedState();
+  }
+  foreach (auto item, mNetPoints) {
+    item->update();
+  }
+  foreach (auto item, mNetLines) {
+    item->update();
+  }
+  foreach (auto item, mNetLabels) {
+    item->update();
+  }
 }
 
 /*******************************************************************************
@@ -179,8 +235,12 @@ void SchematicGraphicsScene::addSymbol(SI_Symbol& symbol) noexcept {
   addItem(*item);
   mSymbols.insert(&symbol, item);
 
-  foreach (SI_SymbolPin* obj, symbol.getPins()) { addSymbolPin(*obj, item); }
-  foreach (SI_Text* obj, symbol.getTexts()) { addText(*obj); }
+  foreach (SI_SymbolPin* obj, symbol.getPins()) {
+    addSymbolPin(*obj, item);
+  }
+  foreach (SI_Text* obj, symbol.getTexts()) {
+    addText(*obj);
+  }
 
   connect(&symbol, &SI_Symbol::textAdded, this,
           &SchematicGraphicsScene::addText);
@@ -194,8 +254,12 @@ void SchematicGraphicsScene::removeSymbol(SI_Symbol& symbol) noexcept {
   disconnect(&symbol, &SI_Symbol::textRemoved, this,
              &SchematicGraphicsScene::removeText);
 
-  foreach (SI_Text* obj, symbol.getTexts()) { removeText(*obj); }
-  foreach (SI_SymbolPin* obj, symbol.getPins()) { removeSymbolPin(*obj); }
+  foreach (SI_Text* obj, symbol.getTexts()) {
+    removeText(*obj);
+  }
+  foreach (SI_SymbolPin* obj, symbol.getPins()) {
+    removeSymbolPin(*obj);
+  }
 
   if (std::shared_ptr<SGI_Symbol> item = mSymbols.take(&symbol)) {
     removeItem(*item);
@@ -222,9 +286,15 @@ void SchematicGraphicsScene::removeSymbolPin(SI_SymbolPin& pin) noexcept {
 }
 
 void SchematicGraphicsScene::addNetSegment(SI_NetSegment& netSegment) noexcept {
-  foreach (SI_NetPoint* obj, netSegment.getNetPoints()) { addNetPoint(*obj); }
-  foreach (SI_NetLine* obj, netSegment.getNetLines()) { addNetLine(*obj); }
-  foreach (SI_NetLabel* obj, netSegment.getNetLabels()) { addNetLabel(*obj); }
+  foreach (SI_NetPoint* obj, netSegment.getNetPoints()) {
+    addNetPoint(*obj);
+  }
+  foreach (SI_NetLine* obj, netSegment.getNetLines()) {
+    addNetLine(*obj);
+  }
+  foreach (SI_NetLabel* obj, netSegment.getNetLabels()) {
+    addNetLabel(*obj);
+  }
   connect(&netSegment, &SI_NetSegment::netPointsAndNetLinesAdded, this,
           &SchematicGraphicsScene::addNetPointsAndNetLines);
   connect(&netSegment, &SI_NetSegment::netPointsAndNetLinesRemoved, this,
@@ -248,7 +318,9 @@ void SchematicGraphicsScene::removeNetSegment(
   foreach (SI_NetPoint* obj, netSegment.getNetPoints()) {
     removeNetPoint(*obj);
   }
-  foreach (SI_NetLine* obj, netSegment.getNetLines()) { removeNetLine(*obj); }
+  foreach (SI_NetLine* obj, netSegment.getNetLines()) {
+    removeNetLine(*obj);
+  }
   foreach (SI_NetLabel* obj, netSegment.getNetLabels()) {
     removeNetLabel(*obj);
   }
@@ -257,15 +329,23 @@ void SchematicGraphicsScene::removeNetSegment(
 void SchematicGraphicsScene::addNetPointsAndNetLines(
     const QList<SI_NetPoint*>& netPoints,
     const QList<SI_NetLine*>& netLines) noexcept {
-  foreach (SI_NetPoint* obj, netPoints) { addNetPoint(*obj); }
-  foreach (SI_NetLine* obj, netLines) { addNetLine(*obj); }
+  foreach (SI_NetPoint* obj, netPoints) {
+    addNetPoint(*obj);
+  }
+  foreach (SI_NetLine* obj, netLines) {
+    addNetLine(*obj);
+  }
 }
 
 void SchematicGraphicsScene::removeNetPointsAndNetLines(
     const QList<SI_NetPoint*>& netPoints,
     const QList<SI_NetLine*>& netLines) noexcept {
-  foreach (SI_NetPoint* obj, netPoints) { removeNetPoint(*obj); }
-  foreach (SI_NetLine* obj, netLines) { removeNetLine(*obj); }
+  foreach (SI_NetPoint* obj, netPoints) {
+    removeNetPoint(*obj);
+  }
+  foreach (SI_NetLine* obj, netLines) {
+    removeNetLine(*obj);
+  }
 }
 
 void SchematicGraphicsScene::addNetPoint(SI_NetPoint& netPoint) noexcept {

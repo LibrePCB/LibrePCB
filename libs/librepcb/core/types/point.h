@@ -346,8 +346,8 @@ public:
    *
    * @see ::librepcb::Point::rotate()
    */
-  Point rotated(const Angle& angle, const Point& center = Point(0, 0)) const
-      noexcept;
+  Point rotated(const Angle& angle,
+                const Point& center = Point(0, 0)) const noexcept;
 
   /**
    * @brief Rotate the point by a specific angle with respect to a specific

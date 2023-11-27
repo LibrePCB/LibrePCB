@@ -100,10 +100,10 @@ private:
                         ComponentSignalList::Event event) noexcept;
   void execCmd(UndoCommand* cmd);
   void updateSignalComboBoxItems() noexcept;
-  void getRowItem(int row, int& symbolItemIndex,
-                  std::shared_ptr<ComponentSymbolVariantItem>& symbolItem,
-                  std::shared_ptr<ComponentPinSignalMapItem>& mapItem) const
-      noexcept;
+  void getRowItem(
+      int row, int& symbolItemIndex,
+      std::shared_ptr<ComponentSymbolVariantItem>& symbolItem,
+      std::shared_ptr<ComponentPinSignalMapItem>& mapItem) const noexcept;
 
 private:  // Data
   ComponentSymbolVariant* mSymbolVariant;

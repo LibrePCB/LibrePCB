@@ -188,8 +188,8 @@ SymbolEditorWidget::~SymbolEditorWidget() noexcept {
  *  Getters
  ******************************************************************************/
 
-QSet<EditorWidgetBase::Feature> SymbolEditorWidget::getAvailableFeatures() const
-    noexcept {
+QSet<EditorWidgetBase::Feature> SymbolEditorWidget::getAvailableFeatures()
+    const noexcept {
   QSet<EditorWidgetBase::Feature> features = {
       EditorWidgetBase::Feature::Close,
       EditorWidgetBase::Feature::GraphicsView,
@@ -456,7 +456,9 @@ bool SymbolEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
       Q_ASSERT(e);
       return mFsm->processKeyReleased(*e);
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 

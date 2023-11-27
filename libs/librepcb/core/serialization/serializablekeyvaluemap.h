@@ -111,8 +111,8 @@ public:
   bool contains(const QString& key) const noexcept {
     return mValues.contains(key);
   }
-  tl::optional<typename T::ValueType> tryGet(const QString& key) const
-      noexcept {
+  tl::optional<typename T::ValueType> tryGet(
+      const QString& key) const noexcept {
     auto i = mValues.find(key);
     if ((i != mValues.end()) && (i.key() == key)) {
       return i.value();
@@ -120,9 +120,8 @@ public:
       return tl::nullopt;
     }
   }
-  const typename T::ValueType& value(const QStringList& keyOrder,
-                                     QString* usedKey = nullptr) const
-      noexcept {
+  const typename T::ValueType& value(
+      const QStringList& keyOrder, QString* usedKey = nullptr) const noexcept {
     // search in the specified key order
     foreach (const QString& key, keyOrder) {
       auto i = mValues.find(key);

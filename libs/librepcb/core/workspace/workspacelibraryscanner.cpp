@@ -54,9 +54,10 @@ WorkspaceLibraryScanner::WorkspaceLibraryScanner(
     mSemaphore(0),
     mAbort(false),
     mLastProgressPercent(100) {
-  connect(this, &WorkspaceLibraryScanner::scanProgressUpdate, this,
-          [this](int percent) { mLastProgressPercent = percent; },
-          Qt::QueuedConnection);
+  connect(
+      this, &WorkspaceLibraryScanner::scanProgressUpdate, this,
+      [this](int percent) { mLastProgressPercent = percent; },
+      Qt::QueuedConnection);
   start();
 }
 

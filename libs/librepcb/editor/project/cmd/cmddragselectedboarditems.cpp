@@ -204,7 +204,9 @@ void CmdDragSelectedBoardItems::snapToGrid() noexcept {
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
     cmd->snapToGrid(grid, true);
   }
-  foreach (CmdBoardViaEdit* cmd, mViaEditCmds) { cmd->snapToGrid(grid, true); }
+  foreach (CmdBoardViaEdit* cmd, mViaEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
   foreach (CmdBoardNetPointEdit* cmd, mNetPointEditCmds) {
     cmd->snapToGrid(grid, true);
   }
@@ -234,15 +236,21 @@ void CmdDragSelectedBoardItems::setLocked(bool locked) noexcept {
   foreach (CmdDeviceInstanceEdit* cmd, mDeviceEditCmds) {
     cmd->setLocked(locked);
   }
-  foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) { cmd->setLocked(locked); }
-  foreach (CmdBoardZoneEdit* cmd, mZoneEditCmds) { cmd->setLocked(locked); }
+  foreach (CmdBoardPlaneEdit* cmd, mPlaneEditCmds) {
+    cmd->setLocked(locked);
+  }
+  foreach (CmdBoardZoneEdit* cmd, mZoneEditCmds) {
+    cmd->setLocked(locked);
+  }
   foreach (CmdBoardPolygonEdit* cmd, mPolygonEditCmds) {
     cmd->setLocked(locked);
   }
   foreach (CmdBoardStrokeTextEdit* cmd, mStrokeTextEditCmds) {
     cmd->setLocked(locked);
   }
-  foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) { cmd->setLocked(locked); }
+  foreach (CmdBoardHoleEdit* cmd, mHoleEditCmds) {
+    cmd->setLocked(locked);
+  }
   mLockedChanged = true;
 }
 

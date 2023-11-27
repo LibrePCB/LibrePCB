@@ -69,8 +69,8 @@ public:
   // General Methods
   virtual bool entry() noexcept override;
   virtual bool exit() noexcept override;
-  QSet<EditorWidgetBase::Feature> getAvailableFeatures() const
-      noexcept override;
+  QSet<EditorWidgetBase::Feature> getAvailableFeatures()
+      const noexcept override;
 
   // Event Handlers
   virtual bool processGraphicsSceneMouseMoved(

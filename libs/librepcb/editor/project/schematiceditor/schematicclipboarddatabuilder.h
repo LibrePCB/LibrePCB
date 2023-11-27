@@ -56,8 +56,8 @@ public:
   ~SchematicClipboardDataBuilder() noexcept;
 
   // General Methods
-  std::unique_ptr<SchematicClipboardData> generate(const Point& cursorPos) const
-      noexcept;
+  std::unique_ptr<SchematicClipboardData> generate(
+      const Point& cursorPos) const noexcept;
 
   // Operator Overloadings
   SchematicClipboardDataBuilder& operator=(

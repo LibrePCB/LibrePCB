@@ -20,7 +20,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include "board.h"
+#include "boardd356netlistexport.h"
 
 #include "../../export/d356netlistgenerator.h"
 #include "../../library/pkg/footprintpad.h"
@@ -29,7 +29,7 @@
 #include "../circuit/componentinstance.h"
 #include "../circuit/netsignal.h"
 #include "../project.h"
-#include "boardd356netlistexport.h"
+#include "board.h"
 #include "items/bi_device.h"
 #include "items/bi_footprintpad.h"
 #include "items/bi_netsegment.h"

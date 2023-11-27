@@ -60,8 +60,8 @@ CmpSigPinDisplayTypeComboBox::~CmpSigPinDisplayTypeComboBox() noexcept {
  *  Getters
  ******************************************************************************/
 
-CmpSigPinDisplayType CmpSigPinDisplayTypeComboBox::getCurrentItem() const
-    noexcept {
+CmpSigPinDisplayType CmpSigPinDisplayTypeComboBox::getCurrentItem()
+    const noexcept {
   int index = mComboBox->currentIndex();
   Q_ASSERT(index >= 0);
   Q_ASSERT(index < CmpSigPinDisplayType::getAllTypes().count());

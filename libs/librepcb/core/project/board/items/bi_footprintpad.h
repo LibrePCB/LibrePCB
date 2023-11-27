@@ -103,8 +103,8 @@ public:
   }
   NetSignal* getCompSigInstNetSignal() const noexcept;
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
-  const QHash<const Layer*, QList<PadGeometry>>& getGeometries() const
-      noexcept {
+  const QHash<const Layer*, QList<PadGeometry>>& getGeometries()
+      const noexcept {
     return mGeometries;
   }
   TraceAnchor toTraceAnchor() const noexcept override;
@@ -136,8 +136,8 @@ private:  // Methods
   QString getNetSignalName() const noexcept;
   UnsignedLength getSizeForMaskOffsetCalculaton() const noexcept;
   QList<PadGeometry> getGeometryOnLayer(const Layer& layer) const noexcept;
-  QList<PadGeometry> getGeometryOnCopperLayer(const Layer& layer) const
-      noexcept;
+  QList<PadGeometry> getGeometryOnCopperLayer(
+      const Layer& layer) const noexcept;
   bool isConnectedOnLayer(const Layer& layer) const noexcept;
 
 private:  // Data

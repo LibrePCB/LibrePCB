@@ -84,8 +84,8 @@ const FilePath& OutputJobRunner::getOutputDirectory() const noexcept {
   return mWriter->getDirectoryPath();
 }
 
-const QMultiHash<Uuid, FilePath>& OutputJobRunner::getWrittenFiles() const
-    noexcept {
+const QMultiHash<Uuid, FilePath>& OutputJobRunner::getWrittenFiles()
+    const noexcept {
   return mWriter->getWrittenFiles();
 }
 

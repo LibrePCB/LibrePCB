@@ -77,8 +77,8 @@ public:
   const QMap<Uuid, ComponentSignalInstance*>& getSignals() const noexcept {
     return mSignals;
   }
-  ComponentSignalInstance* getSignalInstance(const Uuid& signalUuid) const
-      noexcept {
+  ComponentSignalInstance* getSignalInstance(
+      const Uuid& signalUuid) const noexcept {
     return mSignals.value(signalUuid);
   }
   const AttributeList& getAttributes() const noexcept { return *mAttributes; }

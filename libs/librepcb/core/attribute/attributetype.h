@@ -76,9 +76,9 @@ public:
   const AttributeUnit* tryExtractUnitFromValue(QString& value) const noexcept;
   virtual bool isValueValid(const QString& value) const noexcept = 0;
   virtual QString valueFromTr(const QString& value) const noexcept = 0;
-  virtual QString printableValueTr(const QString& value,
-                                   const AttributeUnit* unit = nullptr) const
-      noexcept = 0;
+  virtual QString printableValueTr(
+      const QString& value,
+      const AttributeUnit* unit = nullptr) const noexcept = 0;
 
   // Static Methods
   static QList<const AttributeType*> getAllTypes() noexcept;

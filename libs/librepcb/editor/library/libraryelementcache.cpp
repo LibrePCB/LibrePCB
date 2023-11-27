@@ -92,8 +92,8 @@ std::shared_ptr<const Device> LibraryElementCache::getDevice(
 
 template <typename T>
 std::shared_ptr<const T> LibraryElementCache::getElement(
-    QHash<Uuid, std::shared_ptr<const T>>& container, const Uuid& uuid) const
-    noexcept {
+    QHash<Uuid, std::shared_ptr<const T>>& container,
+    const Uuid& uuid) const noexcept {
   std::shared_ptr<const T> element = container.value(uuid);
   if ((!element) && mDb) {
     try {

@@ -111,10 +111,10 @@ protected:  // Data
 class IF_GraphicsLayerProvider {
 public:
   virtual ~IF_GraphicsLayerProvider() noexcept {}
-  virtual QList<std::shared_ptr<GraphicsLayer>> getAllLayers() const
-      noexcept = 0;
-  virtual std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const
-      noexcept = 0;
+  virtual QList<std::shared_ptr<GraphicsLayer>> getAllLayers()
+      const noexcept = 0;
+  virtual std::shared_ptr<GraphicsLayer> getLayer(
+      const QString& name) const noexcept = 0;
   std::shared_ptr<GraphicsLayer> getLayer(const Layer& layer) const noexcept;
   std::shared_ptr<GraphicsLayer> getGrabAreaLayer(
       const Layer& outlineLayer) const noexcept;

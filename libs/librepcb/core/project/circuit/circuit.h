@@ -119,10 +119,10 @@ public:
   const QMap<Uuid, ComponentInstance*>& getComponentInstances() const noexcept {
     return mComponentInstances;
   }
-  ComponentInstance* getComponentInstanceByUuid(const Uuid& uuid) const
-      noexcept;
-  ComponentInstance* getComponentInstanceByName(const QString& name) const
-      noexcept;
+  ComponentInstance* getComponentInstanceByUuid(
+      const Uuid& uuid) const noexcept;
+  ComponentInstance* getComponentInstanceByName(
+      const QString& name) const noexcept;
   void addComponentInstance(ComponentInstance& cmp);
   void removeComponentInstance(ComponentInstance& cmp);
   void setComponentInstanceName(ComponentInstance& cmp,

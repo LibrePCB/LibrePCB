@@ -69,8 +69,8 @@ int BGI_Zone::getLineIndexAtPosition(const Point& pos) const noexcept {
   return mGraphicsItem->getLineIndexAtPosition(pos);
 }
 
-QVector<int> BGI_Zone::getVertexIndicesAtPosition(const Point& pos) const
-    noexcept {
+QVector<int> BGI_Zone::getVertexIndicesAtPosition(
+    const Point& pos) const noexcept {
   return mGraphicsItem->getVertexIndicesAtPosition(pos);
 }
 

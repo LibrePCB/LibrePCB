@@ -568,8 +568,8 @@ int WorkspaceLibraryDbWriter::addToCategory(const QString& elementsTable,
   return mDb.insert(query);
 }
 
-QString WorkspaceLibraryDbWriter::filePathToString(const FilePath& fp) const
-    noexcept {
+QString WorkspaceLibraryDbWriter::filePathToString(
+    const FilePath& fp) const noexcept {
   return fp.toRelative(mLibrariesRoot);
 }
 

@@ -96,13 +96,17 @@ void PrimitiveFootprintPadGraphicsItem::setPosition(
 void PrimitiveFootprintPadGraphicsItem::setRotation(
     const Angle& rotation) noexcept {
   mOriginCrossGraphicsItem->setRotation(rotation);
-  foreach (auto& item, mPathGraphicsItems) { item.item->setRotation(rotation); }
+  foreach (auto& item, mPathGraphicsItems) {
+    item.item->setRotation(rotation);
+  }
   // Keep the text always at 0° for readability.
 }
 
 void PrimitiveFootprintPadGraphicsItem::setMirrored(bool mirrored) noexcept {
   mMirror = mirrored;
-  foreach (auto& item, mPathGraphicsItems) { item.item->setMirrored(mirrored); }
+  foreach (auto& item, mPathGraphicsItems) {
+    item.item->setMirrored(mirrored);
+  }
 }
 
 void PrimitiveFootprintPadGraphicsItem::setText(const QString& text) noexcept {
@@ -114,7 +118,9 @@ void PrimitiveFootprintPadGraphicsItem::setText(const QString& text) noexcept {
   setToolTip(text);
   mOriginCrossGraphicsItem->setToolTip(text);
   mTextGraphicsItem->setPath(Path::toQPainterPathPx(paths, false));
-  foreach (auto& item, mPathGraphicsItems) { item.item->setToolTip(text); }
+  foreach (auto& item, mPathGraphicsItems) {
+    item.item->setToolTip(text);
+  }
   updateTextHeight();
 }
 

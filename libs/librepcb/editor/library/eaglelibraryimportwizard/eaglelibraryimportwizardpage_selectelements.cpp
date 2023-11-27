@@ -52,24 +52,27 @@ EagleLibraryImportWizardPage_SelectElements::
   mUi->setupUi(this);
   connect(mUi->treeWidget, &QTreeWidget::itemChanged, this,
           &EagleLibraryImportWizardPage_SelectElements::treeItemChanged);
-  connect(&mContext->getImport(), &EagleLibraryImport::symbolCheckStateChanged,
-          this,
-          [this](const QString& name, Qt::CheckState checkState) {
-            updateItemCheckState(ElementType::Symbol, name, checkState);
-          },
-          Qt::QueuedConnection);
-  connect(&mContext->getImport(), &EagleLibraryImport::packageCheckStateChanged,
-          this,
-          [this](const QString& name, Qt::CheckState checkState) {
-            updateItemCheckState(ElementType::Package, name, checkState);
-          },
-          Qt::QueuedConnection);
-  connect(&mContext->getImport(),
-          &EagleLibraryImport::componentCheckStateChanged, this,
-          [this](const QString& name, Qt::CheckState checkState) {
-            updateItemCheckState(ElementType::Component, name, checkState);
-          },
-          Qt::QueuedConnection);
+  connect(
+      &mContext->getImport(), &EagleLibraryImport::symbolCheckStateChanged,
+      this,
+      [this](const QString& name, Qt::CheckState checkState) {
+        updateItemCheckState(ElementType::Symbol, name, checkState);
+      },
+      Qt::QueuedConnection);
+  connect(
+      &mContext->getImport(), &EagleLibraryImport::packageCheckStateChanged,
+      this,
+      [this](const QString& name, Qt::CheckState checkState) {
+        updateItemCheckState(ElementType::Package, name, checkState);
+      },
+      Qt::QueuedConnection);
+  connect(
+      &mContext->getImport(), &EagleLibraryImport::componentCheckStateChanged,
+      this,
+      [this](const QString& name, Qt::CheckState checkState) {
+        updateItemCheckState(ElementType::Component, name, checkState);
+      },
+      Qt::QueuedConnection);
   connect(this, &EagleLibraryImportWizardPage_SelectElements::completeChanged,
           this, &EagleLibraryImportWizardPage_SelectElements::updateRootNodes,
           Qt::QueuedConnection);

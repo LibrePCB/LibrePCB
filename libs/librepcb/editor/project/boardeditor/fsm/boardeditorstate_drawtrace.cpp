@@ -953,10 +953,8 @@ void BoardEditorState_DrawTrace::wireAutoWidthEditToggled(
   mCurrentAutoWidth = checked;
 }
 
-Point BoardEditorState_DrawTrace::calcMiddlePointPos(const Point& p1,
-                                                     const Point p2,
-                                                     WireMode mode) const
-    noexcept {
+Point BoardEditorState_DrawTrace::calcMiddlePointPos(
+    const Point& p1, const Point p2, WireMode mode) const noexcept {
   Point delta = p2 - p1;
   qreal xPositive = delta.getX() >= 0 ? 1 : -1;
   qreal yPositive = delta.getY() >= 0 ? 1 : -1;

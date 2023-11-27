@@ -116,7 +116,9 @@ WorkspaceSettingsDialog::WorkspaceSettingsDialog(Workspace& workspace,
     QList<QLocale> locales = QLocale::matchingLocales(
         QLocale::AnyLanguage, QLocale::AnyScript, QLocale::AnyCountry);
     QStringList localesStr;
-    foreach (const QLocale& l, locales) { localesStr.append(l.name()); }
+    foreach (const QLocale& l, locales) {
+      localesStr.append(l.name());
+    }
     mLibLocaleOrderModel->setPlaceholderText(tr("Click here to add a locale"));
     mLibLocaleOrderModel->setDefaultValue(QString(""));
     mLibLocaleOrderModel->setChoices(localesStr);
@@ -493,12 +495,13 @@ void WorkspaceSettingsDialog::externalApplicationListIndexChanged(
           mExternalApplications[index].currentValue.append(edit->text());
         }
       });
-      connect(edit, &QLineEdit::editingFinished, edit,
-              [this]() {
-                externalApplicationListIndexChanged(
-                    mUi->lstExternalApplications->currentRow());
-              },
-              Qt::QueuedConnection);
+      connect(
+          edit, &QLineEdit::editingFinished, edit,
+          [this]() {
+            externalApplicationListIndexChanged(
+                mUi->lstExternalApplications->currentRow());
+          },
+          Qt::QueuedConnection);
     }
     mUi->layoutExternalApplicationCommands->addWidget(edit);
 

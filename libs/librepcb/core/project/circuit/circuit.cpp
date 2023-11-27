@@ -47,24 +47,21 @@ Circuit::Circuit(Project& project) : QObject(&project), mProject(project) {
 
 Circuit::~Circuit() noexcept {
   // delete all component instances (and catch all thrown exceptions)
-  foreach (ComponentInstance* compInstance, mComponentInstances)
-    try {
+  foreach (ComponentInstance* compInstance, mComponentInstances) try {
       removeComponentInstance(*compInstance);
       delete compInstance;
     } catch (...) {
     }
 
   // delete all netsignals (and catch all thrown exceptions)
-  foreach (NetSignal* netsignal, mNetSignals)
-    try {
+  foreach (NetSignal* netsignal, mNetSignals) try {
       removeNetSignal(*netsignal);
       delete netsignal;
     } catch (...) {
     }
 
   // delete all netclasses (and catch all thrown exceptions)
-  foreach (NetClass* netclass, mNetClasses)
-    try {
+  foreach (NetClass* netclass, mNetClasses) try {
       removeNetClass(*netclass);
       delete netclass;
     } catch (...) {
@@ -282,8 +279,8 @@ QString Circuit::generateAutoComponentInstanceName(
   return name;
 }
 
-ComponentInstance* Circuit::getComponentInstanceByUuid(const Uuid& uuid) const
-    noexcept {
+ComponentInstance* Circuit::getComponentInstanceByUuid(
+    const Uuid& uuid) const noexcept {
   return mComponentInstances.value(uuid, nullptr);
 }
 

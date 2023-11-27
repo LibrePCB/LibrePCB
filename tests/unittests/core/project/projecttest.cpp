@@ -54,8 +54,8 @@ protected:
     QDir(mProjectDir.getParentDir().toStr()).removeRecursively();
   }
 
-  std::unique_ptr<TransactionalDirectory> createDir(bool writable = true) const
-      noexcept {
+  std::unique_ptr<TransactionalDirectory> createDir(
+      bool writable = true) const noexcept {
     return std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(
         TransactionalFileSystem::open(mProjectDir, writable)));
   }

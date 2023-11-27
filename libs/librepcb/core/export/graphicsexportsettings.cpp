@@ -126,8 +126,8 @@ QStringList GraphicsExportSettings::getPaintOrder() const noexcept {
   return l;
 }
 
-QColor GraphicsExportSettings::getColor(const QString& colorName) const
-    noexcept {
+QColor GraphicsExportSettings::getColor(
+    const QString& colorName) const noexcept {
   QColor color = getColorImpl(colorName);
   if (color.isValid() && mBlackWhite) {
     color = (mBackgroundColor == Qt::black) ? Qt::white : Qt::black;
@@ -258,8 +258,8 @@ GraphicsExportSettings& GraphicsExportSettings::operator=(
   return *this;
 }
 
-bool GraphicsExportSettings::operator==(const GraphicsExportSettings& rhs) const
-    noexcept {
+bool GraphicsExportSettings::operator==(
+    const GraphicsExportSettings& rhs) const noexcept {
   if (mPageSize != rhs.mPageSize) return false;
   if (mOrientation != rhs.mOrientation) return false;
   if (mMarginLeft != rhs.mMarginLeft) return false;
@@ -277,8 +277,8 @@ bool GraphicsExportSettings::operator==(const GraphicsExportSettings& rhs) const
   return true;
 }
 
-bool GraphicsExportSettings::operator!=(const GraphicsExportSettings& rhs) const
-    noexcept {
+bool GraphicsExportSettings::operator!=(
+    const GraphicsExportSettings& rhs) const noexcept {
   return !(*this == rhs);
 }
 
@@ -286,8 +286,8 @@ bool GraphicsExportSettings::operator!=(const GraphicsExportSettings& rhs) const
  *  Private Methods
  ******************************************************************************/
 
-QColor GraphicsExportSettings::getColorImpl(const QString& name) const
-    noexcept {
+QColor GraphicsExportSettings::getColorImpl(
+    const QString& name) const noexcept {
   foreach (const auto& pair, mColors) {
     if (pair.first == name) {
       return pair.second;

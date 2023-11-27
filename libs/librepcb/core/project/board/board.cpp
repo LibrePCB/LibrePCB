@@ -146,22 +146,14 @@ bool Board::isEmpty() const noexcept {
 
 QList<BI_Base*> Board::getAllItems() const noexcept {
   QList<BI_Base*> items;
-  foreach (BI_Device* device, mDeviceInstances)
-    items.append(device);
-  foreach (BI_NetSegment* netsegment, mNetSegments)
-    items.append(netsegment);
-  foreach (BI_Plane* plane, mPlanes)
-    items.append(plane);
-  foreach (BI_Zone* zone, mZones)
-    items.append(zone);
-  foreach (BI_Polygon* polygon, mPolygons)
-    items.append(polygon);
-  foreach (BI_StrokeText* text, mStrokeTexts)
-    items.append(text);
-  foreach (BI_Hole* hole, mHoles)
-    items.append(hole);
-  foreach (BI_AirWire* airWire, mAirWires)
-    items.append(airWire);
+  foreach (BI_Device* device, mDeviceInstances) items.append(device);
+  foreach (BI_NetSegment* netsegment, mNetSegments) items.append(netsegment);
+  foreach (BI_Plane* plane, mPlanes) items.append(plane);
+  foreach (BI_Zone* zone, mZones) items.append(zone);
+  foreach (BI_Polygon* polygon, mPolygons) items.append(polygon);
+  foreach (BI_StrokeText* text, mStrokeTexts) items.append(text);
+  foreach (BI_Hole* hole, mHoles) items.append(hole);
+  foreach (BI_AirWire* airWire, mAirWires) items.append(airWire);
   return items;
 }
 
@@ -361,8 +353,8 @@ void Board::setDrcMessageApproved(const SExpression& approval,
  *  DeviceInstance Methods
  ******************************************************************************/
 
-BI_Device* Board::getDeviceInstanceByComponentUuid(const Uuid& uuid) const
-    noexcept {
+BI_Device* Board::getDeviceInstanceByComponentUuid(
+    const Uuid& uuid) const noexcept {
   return mDeviceInstances.value(uuid, nullptr);
 }
 
@@ -471,7 +463,9 @@ void Board::invalidatePlanes(const Layer* layer) noexcept {
 
 void Board::invalidatePlanes(const QSet<const Layer*>& layers) noexcept {
 #if defined(QT_NO_DEBUG)
-  foreach (const Layer* layer, layers) { Q_ASSERT(layer && layer->isCopper()); }
+  foreach (const Layer* layer, layers) {
+    Q_ASSERT(layer && layer->isCopper());
+  }
 #endif
   mScheduledLayersForPlanesRebuild |= layers;
 }
@@ -662,8 +656,8 @@ void Board::forceAirWiresRebuild() noexcept {
  *  General Methods
  ******************************************************************************/
 
-tl::optional<std::pair<Point, Point>> Board::calculateBoundingRect() const
-    noexcept {
+tl::optional<std::pair<Point, Point>> Board::calculateBoundingRect()
+    const noexcept {
   QList<Path> outlines;
   foreach (const BI_Polygon* polygon, mPolygons) {
     if ((polygon->getData().getLayer() == Layer::boardOutlines()) &&

@@ -69,9 +69,8 @@ FootprintPainter::~FootprintPainter() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void FootprintPainter::paint(QPainter& painter,
-                             const GraphicsExportSettings& settings) const
-    noexcept {
+void FootprintPainter::paint(
+    QPainter& painter, const GraphicsExportSettings& settings) const noexcept {
   // Determine what to paint on which color layer.
   initContentByColor();
 

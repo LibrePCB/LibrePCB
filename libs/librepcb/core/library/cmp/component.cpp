@@ -93,8 +93,8 @@ std::shared_ptr<const ComponentSignal> Component::getSignalOfPin(
   }
 }
 
-int Component::getSymbolVariantIndexByNorm(const QStringList& normOrder) const
-    noexcept {
+int Component::getSymbolVariantIndexByNorm(
+    const QStringList& normOrder) const noexcept {
   foreach (const QString& norm, normOrder) {
     for (int i = 0; i < mSymbolVariants.count(); ++i) {
       std::shared_ptr<const ComponentSymbolVariant> var = mSymbolVariants.at(i);

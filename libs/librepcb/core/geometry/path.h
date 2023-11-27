@@ -88,8 +88,8 @@ public:
   Path& mapToGrid(const PositiveLength& gridInterval) noexcept;
   Path mappedToGrid(const PositiveLength& gridInterval) const noexcept;
   Path& rotate(const Angle& angle, const Point& center = Point(0, 0)) noexcept;
-  Path rotated(const Angle& angle, const Point& center = Point(0, 0)) const
-      noexcept;
+  Path rotated(const Angle& angle,
+               const Point& center = Point(0, 0)) const noexcept;
   Path& mirror(Qt::Orientation orientation,
                const Point& center = Point(0, 0)) noexcept;
   Path mirrored(Qt::Orientation orientation,

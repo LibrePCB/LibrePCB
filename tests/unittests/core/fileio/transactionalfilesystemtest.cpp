@@ -25,7 +25,6 @@
 #include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/utils/toolbox.h>
-
 #include <quazip/quazip.h>
 
 /*******************************************************************************

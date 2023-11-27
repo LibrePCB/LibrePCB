@@ -67,9 +67,8 @@ public:
       const NewElementWizardPage_ComponentSignals& rhs) = delete;
 
 private:  // Methods
-  QHash<Uuid, CircuitIdentifier> getPinNames(const Uuid& symbol,
-                                             const QString& suffix) const
-      noexcept;
+  QHash<Uuid, CircuitIdentifier> getPinNames(
+      const Uuid& symbol, const QString& suffix) const noexcept;
   void initializePage() noexcept override;
   void cleanupPage() noexcept override;
 

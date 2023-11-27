@@ -163,7 +163,9 @@ bool SchematicEditorState_DrawWire::processKeyPressed(
       break;
     }
 
-    default: { break; }
+    default: {
+      break;
+    }
   }
 
   return false;
@@ -180,7 +182,9 @@ bool SchematicEditorState_DrawWire::processKeyReleased(
       break;
     }
 
-    default: { break; }
+    default: {
+      break;
+    }
   }
 
   return false;
@@ -692,10 +696,8 @@ void SchematicEditorState_DrawWire::wireModeChanged(WireMode mode) noexcept {
   }
 }
 
-Point SchematicEditorState_DrawWire::calcMiddlePointPos(const Point& p1,
-                                                        const Point p2,
-                                                        WireMode mode) const
-    noexcept {
+Point SchematicEditorState_DrawWire::calcMiddlePointPos(
+    const Point& p1, const Point p2, WireMode mode) const noexcept {
   Point delta = p2 - p1;
   switch (mode) {
     case WireMode::HV:

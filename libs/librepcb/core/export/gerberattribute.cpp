@@ -113,7 +113,9 @@ QString GerberAttribute::toString() const noexcept {
       s += "D";
       break;
     }
-    default: { return QString(); }
+    default: {
+      return QString();
+    }
   }
   s += mKey;
   foreach (const QString& value, mValues) {

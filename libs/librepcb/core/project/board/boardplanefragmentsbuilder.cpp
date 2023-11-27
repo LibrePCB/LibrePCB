@@ -62,8 +62,9 @@ BoardPlaneFragmentsBuilder::BoardPlaneFragmentsBuilder(bool rebuildAirWires,
     mFuture(),
     mWatcher(),
     mAbort(false) {
-  connect(&mWatcher, &QFutureWatcherBase::finished, this,
-          [this]() { applyToBoard(mFuture.result()); }, Qt::QueuedConnection);
+  connect(
+      &mWatcher, &QFutureWatcherBase::finished, this,
+      [this]() { applyToBoard(mFuture.result()); }, Qt::QueuedConnection);
 }
 
 BoardPlaneFragmentsBuilder::~BoardPlaneFragmentsBuilder() noexcept {

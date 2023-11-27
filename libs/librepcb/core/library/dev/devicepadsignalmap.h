@@ -125,7 +125,9 @@ public:
   }
 
   static void setPads(DevicePadSignalMap& map, QSet<Uuid> pads) noexcept {
-    foreach (const Uuid& pad, map.getUuidSet() - pads) { map.remove(pad); }
+    foreach (const Uuid& pad, map.getUuidSet() - pads) {
+      map.remove(pad);
+    }
     foreach (const Uuid& pad, pads - map.getUuidSet()) {
       map.append(std::make_shared<DevicePadSignalMapItem>(pad, tl::nullopt));
     }

@@ -106,8 +106,8 @@ QList<SExpression*> SExpression::getChildren(const QString& name) noexcept {
   return children;
 }
 
-QList<const SExpression*> SExpression::getChildren(const QString& name) const
-    noexcept {
+QList<const SExpression*> SExpression::getChildren(
+    const QString& name) const noexcept {
   QList<const SExpression*> children;
   for (const SExpression& child : mChildren) {
     if (child.isList() && (child.mValue == name)) {
@@ -159,8 +159,8 @@ SExpression* SExpression::tryGetChild(const QString& path) noexcept {
   return child;
 }
 
-const SExpression* SExpression::tryGetChild(const QString& path) const
-    noexcept {
+const SExpression* SExpression::tryGetChild(
+    const QString& path) const noexcept {
   return const_cast<SExpression*>(this)->tryGetChild(path);
 }
 
@@ -302,7 +302,9 @@ QString SExpression::escapeString(const QString& string) noexcept {
 
   QString escaped;
   escaped.reserve(string.length() + (string.length() / 10));
-  foreach (const QChar& c, string) { escaped += replacements.value(c, c); }
+  foreach (const QChar& c, string) {
+    escaped += replacements.value(c, c);
+  }
   return escaped;
 }
 

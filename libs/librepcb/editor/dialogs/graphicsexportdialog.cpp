@@ -396,24 +396,26 @@ GraphicsExportDialog::GraphicsExportDialog(
 
   // Setup export.
   mExport->setDocumentName(documentName);
-  connect(mExport.data(), &GraphicsExport::succeeded, this,
-          [this]() {
-            const bool canceled = mProgressDialog->wasCanceled();
-            mProgressDialog->reset();
-            if (!canceled) {
-              if (mPathToOpenAfterExport.isValid()) {
-                emit requestOpenFile(mPathToOpenAfterExport);
-              }
-              close();
-            }
-          },
-          Qt::QueuedConnection);
-  connect(mExport.data(), &GraphicsExport::failed, this,
-          [this](const QString& msg) {
-            mProgressDialog->reset();
-            QMessageBox::critical(this, tr("Error"), msg);
-          },
-          Qt::QueuedConnection);
+  connect(
+      mExport.data(), &GraphicsExport::succeeded, this,
+      [this]() {
+        const bool canceled = mProgressDialog->wasCanceled();
+        mProgressDialog->reset();
+        if (!canceled) {
+          if (mPathToOpenAfterExport.isValid()) {
+            emit requestOpenFile(mPathToOpenAfterExport);
+          }
+          close();
+        }
+      },
+      Qt::QueuedConnection);
+  connect(
+      mExport.data(), &GraphicsExport::failed, this,
+      [this](const QString& msg) {
+        mProgressDialog->reset();
+        QMessageBox::critical(this, tr("Error"), msg);
+      },
+      Qt::QueuedConnection);
 
   // Setup progress dialog.
   mProgressDialog->reset();
@@ -422,15 +424,16 @@ GraphicsExportDialog::GraphicsExportDialog(
   mProgressDialog->setAutoReset(false);
   connect(mProgressDialog.data(), &QProgressDialog::canceled, mExport.data(),
           &GraphicsExport::cancel);
-  connect(mExport.data(), &GraphicsExport::progress, mProgressDialog.data(),
-          [this](int percent, int page, int total) {
-            if (mProgressDialog->isVisible()) {
-              mProgressDialog->setLabelText(
-                  tr("Processing page %1 of %2...").arg(page).arg(total));
-              mProgressDialog->setValue(percent);
-            }
-          },
-          Qt::QueuedConnection);
+  connect(
+      mExport.data(), &GraphicsExport::progress, mProgressDialog.data(),
+      [this](int percent, int page, int total) {
+        if (mProgressDialog->isVisible()) {
+          mProgressDialog->setLabelText(
+              tr("Processing page %1 of %2...").arg(page).arg(total));
+          mProgressDialog->setValue(percent);
+        }
+      },
+      Qt::QueuedConnection);
 
   // Load settings.
   loadDefaultSettings();
@@ -487,7 +490,9 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
 
   // Page content.
   QSet<QString> allColors;
-  foreach (const auto& pair, mColors) { allColors.insert(pair.first); }
+  foreach (const auto& pair, mColors) {
+    allColors.insert(pair.first);
+  }
   QSet<QString> commonColors = {
       Theme::Color::sBoardMeasures,
       Theme::Color::sBoardFrames,
@@ -1232,8 +1237,8 @@ void GraphicsExportDialog::setOrientation(
   }
 }
 
-GraphicsExportSettings::Orientation GraphicsExportDialog::getOrientation() const
-    noexcept {
+GraphicsExportSettings::Orientation GraphicsExportDialog::getOrientation()
+    const noexcept {
   if (mUi->rbtnOrientationLandscape->isChecked()) {
     return GraphicsExportSettings::Orientation::Landscape;
   } else if (mUi->rbtnOrientationPortrait->isChecked()) {

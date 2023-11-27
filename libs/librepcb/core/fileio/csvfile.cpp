@@ -66,7 +66,9 @@ void CsvFile::addValue(const QStringList& value) {
 QString CsvFile::toString() const noexcept {
   QString str = getCommentLines();
   str += lineToString(mHeader);
-  foreach (const QStringList& value, mValues) { str += lineToString(value); }
+  foreach (const QStringList& value, mValues) {
+    str += lineToString(value);
+  }
   return str;
 }
 

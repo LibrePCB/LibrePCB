@@ -347,8 +347,8 @@ QString BI_FootprintPad::getNetSignalName() const noexcept {
   }
 }
 
-UnsignedLength BI_FootprintPad::getSizeForMaskOffsetCalculaton() const
-    noexcept {
+UnsignedLength BI_FootprintPad::getSizeForMaskOffsetCalculaton()
+    const noexcept {
   if (mFootprintPad->getShape() == FootprintPad::Shape::Custom) {
     // Width/height of the shape are not directly known and difficulat/heavy to
     // determine. So let's consider the pad as small to always get the smallest
@@ -360,8 +360,8 @@ UnsignedLength BI_FootprintPad::getSizeForMaskOffsetCalculaton() const
   }
 }
 
-QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(const Layer& layer) const
-    noexcept {
+QList<PadGeometry> BI_FootprintPad::getGeometryOnLayer(
+    const Layer& layer) const noexcept {
   if (layer.isCopper()) {
     return getGeometryOnCopperLayer(layer);
   }

@@ -55,8 +55,8 @@ public:
   ~BoardClipboardDataBuilder() noexcept;
 
   // General Methods
-  std::unique_ptr<BoardClipboardData> generate(const Point& cursorPos) const
-      noexcept;
+  std::unique_ptr<BoardClipboardData> generate(
+      const Point& cursorPos) const noexcept;
 
   // Operator Overloadings
   BoardClipboardDataBuilder& operator=(const BoardClipboardDataBuilder& rhs) =

@@ -55,12 +55,13 @@ void PickPlaceData::addItem(const PickPlaceDataItem& item) noexcept {
   mItems.append(item);
 
   // Sort items by designator to improve readability of the exported file.
-  Toolbox::sortNumeric(mItems,
-                       [](const QCollator& cmp, const PickPlaceDataItem& lhs,
-                          const PickPlaceDataItem& rhs) {
-                         return cmp(lhs.getDesignator(), rhs.getDesignator());
-                       },
-                       Qt::CaseInsensitive, false);
+  Toolbox::sortNumeric(
+      mItems,
+      [](const QCollator& cmp, const PickPlaceDataItem& lhs,
+         const PickPlaceDataItem& rhs) {
+        return cmp(lhs.getDesignator(), rhs.getDesignator());
+      },
+      Qt::CaseInsensitive, false);
 }
 
 /*******************************************************************************

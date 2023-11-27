@@ -75,8 +75,8 @@ void KeyboardShortcutsModel::setOverrides(
  *  Inherited Methods
  ******************************************************************************/
 
-int KeyboardShortcutsModel::columnCount(const QModelIndex& parent) const
-    noexcept {
+int KeyboardShortcutsModel::columnCount(
+    const QModelIndex& parent) const noexcept {
   Q_UNUSED(parent);
   return 3;
 }
@@ -91,9 +91,8 @@ int KeyboardShortcutsModel::rowCount(const QModelIndex& parent) const noexcept {
   }
 }
 
-QModelIndex KeyboardShortcutsModel::index(int row, int column,
-                                          const QModelIndex& parent) const
-    noexcept {
+QModelIndex KeyboardShortcutsModel::index(
+    int row, int column, const QModelIndex& parent) const noexcept {
   if (!parent.isValid()) {
     return createIndex(row, column, nullptr);
   } else if (Category* category = categoryFromIndex(parent)) {
@@ -103,8 +102,8 @@ QModelIndex KeyboardShortcutsModel::index(int row, int column,
   }
 }
 
-QModelIndex KeyboardShortcutsModel::parent(const QModelIndex& index) const
-    noexcept {
+QModelIndex KeyboardShortcutsModel::parent(
+    const QModelIndex& index) const noexcept {
   if (index.isValid()) {
     if (Category* category = static_cast<Category*>(index.internalPointer())) {
       int index = mCategories.indexOf(category);
@@ -115,8 +114,8 @@ QModelIndex KeyboardShortcutsModel::parent(const QModelIndex& index) const
   return QModelIndex();
 }
 
-Qt::ItemFlags KeyboardShortcutsModel::flags(const QModelIndex& index) const
-    noexcept {
+Qt::ItemFlags KeyboardShortcutsModel::flags(
+    const QModelIndex& index) const noexcept {
   Qt::ItemFlags flags = QAbstractItemModel::flags(index);
   if ((index.column() == 2) && (index.internalPointer())) {
     flags |= Qt::ItemIsEditable;
@@ -124,8 +123,8 @@ Qt::ItemFlags KeyboardShortcutsModel::flags(const QModelIndex& index) const
   return flags;
 }
 
-QVariant KeyboardShortcutsModel::data(const QModelIndex& index, int role) const
-    noexcept {
+QVariant KeyboardShortcutsModel::data(const QModelIndex& index,
+                                      int role) const noexcept {
   if (const Category* category = categoryFromIndex(index)) {
     if (index.column() == 0) {
       switch (role) {
@@ -197,7 +196,9 @@ QVariant KeyboardShortcutsModel::data(const QModelIndex& index, int role) const
         }
         break;
       }
-      default: { break; }
+      default: {
+        break;
+      }
     }
   }
   return QVariant();

@@ -278,7 +278,9 @@ void OpenGlSceneBuilder::run(std::shared_ptr<SceneData3D> data) noexcept {
 
     // Remove all no longer existing devices.
     foreach (const Uuid& uuid, mDevices.keys().toSet() - deviceUuids) {
-      foreach (auto obj, mDevices.take(uuid)) { emit objectRemoved(obj); }
+      foreach (auto obj, mDevices.take(uuid)) {
+        emit objectRemoved(obj);
+      }
     }
 
     qDebug() << "Successfully built 3D scene in" << timer.elapsed() << "ms.";

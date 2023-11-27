@@ -151,7 +151,9 @@ void BGI_StrokeText::deviceGraphicsItemEdited(
       setSelected(obj.isSelected());
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
 }
 

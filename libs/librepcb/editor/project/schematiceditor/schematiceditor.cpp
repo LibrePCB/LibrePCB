@@ -925,7 +925,9 @@ bool SchematicEditor::graphicsViewEventHandler(QEvent* event) {
           mFsm->processGraphicsSceneLeftMouseButtonPressed(*e);
           break;
         }
-        default: { break; }
+        default: {
+          break;
+        }
       }
       break;
     }
@@ -942,7 +944,9 @@ bool SchematicEditor::graphicsViewEventHandler(QEvent* event) {
           mFsm->processGraphicsSceneRightMouseButtonReleased(*e);
           break;
         }
-        default: { break; }
+        default: {
+          break;
+        }
       }
       break;
     }
@@ -955,7 +959,9 @@ bool SchematicEditor::graphicsViewEventHandler(QEvent* event) {
           mFsm->processGraphicsSceneLeftMouseButtonDoubleClicked(*e);
           break;
         }
-        default: { break; }
+        default: {
+          break;
+        }
       }
       break;
     }
@@ -986,7 +992,9 @@ bool SchematicEditor::graphicsViewEventHandler(QEvent* event) {
       break;
     }
 
-    default: { break; }
+    default: {
+      break;
+    }
   }
 
   // Always accept graphics scene events, even if we do not react on some of

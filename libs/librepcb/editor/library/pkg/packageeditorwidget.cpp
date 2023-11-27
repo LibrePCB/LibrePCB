@@ -562,7 +562,9 @@ bool PackageEditorWidget::graphicsViewEventHandler(QEvent* event) noexcept {
       Q_ASSERT(e);
       return mFsm->processKeyReleased(*e);
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 

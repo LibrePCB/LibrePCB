@@ -157,11 +157,9 @@ bool ShortcutsReferenceGenerator::generatePdf(const FilePath& fp) {
  *  Private Methods
  ******************************************************************************/
 
-void ShortcutsReferenceGenerator::drawSectionTitle(QPdfWriter& writer,
-                                                   QPainter& painter, qreal x1,
-                                                   qreal x2, qreal y,
-                                                   const QString& text) const
-    noexcept {
+void ShortcutsReferenceGenerator::drawSectionTitle(
+    QPdfWriter& writer, QPainter& painter, qreal x1, qreal x2, qreal y,
+    const QString& text) const noexcept {
   int textLength = drawText(writer, painter, (x1 + x2) / 2, y - 0.25, 3, 0,
                             text, Flag::AlignCenter);
 
@@ -242,8 +240,8 @@ int ShortcutsReferenceGenerator::drawText(QPdfWriter& writer, QPainter& painter,
   return boundingRect.width();
 }
 
-int ShortcutsReferenceGenerator::mmToPx(QPdfWriter& writer, qreal mm) const
-    noexcept {
+int ShortcutsReferenceGenerator::mmToPx(QPdfWriter& writer,
+                                        qreal mm) const noexcept {
   return qRound(mm * writer.resolution() / 25.4);
 }
 

@@ -74,7 +74,9 @@ protected:
 
   std::string str(const QList<Uuid>& set) {
     QStringList s;
-    foreach (const Uuid& uuid, set) { s.append(uuid.toStr()); }
+    foreach (const Uuid& uuid, set) {
+      s.append(uuid.toStr());
+    }
     return s.join(", ").toStdString();
   }
 

@@ -111,8 +111,8 @@ Point& Point::rotate(const Angle& angle, const Point& center) noexcept {
   return *this;
 }
 
-Point Point::mirrored(Qt::Orientation orientation, const Point& center) const
-    noexcept {
+Point Point::mirrored(Qt::Orientation orientation,
+                      const Point& center) const noexcept {
   Point p(*this);
   p.mirror(orientation, center);
   return p;

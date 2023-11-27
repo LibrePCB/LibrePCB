@@ -92,13 +92,13 @@ TransactionalFileSystem::~TransactionalFileSystem() noexcept {
  *  Inherited from FileSystem
  ******************************************************************************/
 
-FilePath TransactionalFileSystem::getAbsPath(const QString& path) const
-    noexcept {
+FilePath TransactionalFileSystem::getAbsPath(
+    const QString& path) const noexcept {
   return mFilePath.getPathTo(cleanPath(path));
 }
 
-QStringList TransactionalFileSystem::getDirs(const QString& path) const
-    noexcept {
+QStringList TransactionalFileSystem::getDirs(
+    const QString& path) const noexcept {
   QSet<QString> dirnames;
   QString dirpath = cleanPath(path);
   if (!dirpath.isEmpty()) dirpath.append("/");
@@ -126,8 +126,8 @@ QStringList TransactionalFileSystem::getDirs(const QString& path) const
   return dirnames.values();
 }
 
-QStringList TransactionalFileSystem::getFiles(const QString& path) const
-    noexcept {
+QStringList TransactionalFileSystem::getFiles(
+    const QString& path) const noexcept {
   QSet<QString> filenames;
   QString dirpath = cleanPath(path);
   if (!dirpath.isEmpty()) dirpath.append("/");

@@ -25,8 +25,9 @@
 #include "../exceptions.h"
 #include "../utils/scopeguard.h"
 
-#include <QtCore>
 #include <quazip/JlCompress.h>
+
+#include <QtCore>
 
 /*******************************************************************************
  *  Namespace
