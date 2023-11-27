@@ -95,11 +95,20 @@ void OpenGlRenderer::synchronize(QQuickFramebufferObject* qqfbo) noexcept {
 
 void OpenGlRenderer::render() noexcept {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDisable(GL_CULL_FACE);
-  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  // glBlendFunc(GL_SRC_COLOR, GL_ONE_MINUS_SRC_COLOR);
+  // glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+  // glBlendEquationSeparate(GL_MIN, GL_FUNC_ADD);
+  // glBlendFuncSeparate(GL_CONSTANT_COLOR, GL_DST_COLOR,
+  //                    GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA);
+  // glBlendFunc(GL_CONSTANT_ALPHA, GL_CONSTANT_ALPHA);
+
+  // glEnable(GL_ALPHA_TEST);
+  // glAlphaFunc(GL_GREATER, 0);
 
   mProgram.bind();
   mProgram.setUniformValue("u_resolution", mResolution);
@@ -107,91 +116,76 @@ void OpenGlRenderer::render() noexcept {
 
   struct Primitive {
     // Type 1: Triangle [p0, p1, p2]
-    // Type 2: Rounded line [p0, p1, width]
-    // Type 3: Circle [pos, diameter]
-    // Type 42: House
+    // Type 2: Circle [pos, diameter]
+    // Type 3: Line [p0, p1, width]
     float type;  // TODO: Should be integer, but doesn't work.
     QVector2D position;
     QVector4D params;
+  };
+
+  struct Layer {
+    float z;
     QVector4D color;
+    QVector<Primitive> primitives;
   };
 
-  Primitive data[] = {
-      // Triangle
-      Primitive{1, QVector2D{-0.5f, 0.5f}, QVector4D{0.0f, 0.5f, 0.0f, 0.0f},
-                QVector4D{1.0f, 0.0f, 0.0f, 0.5}},
-      // Rounded line
-      Primitive{2, QVector2D{0.0f, 0.0f}, QVector4D{0.5f, 0.5f, 0.1f, NAN},
-                QVector4D{0.0f, 1.0f, 0.0f, 0.5}},
-      // Circle
-      Primitive{3, QVector2D{0.5f, -0.5f}, QVector4D{0.4f, NAN, NAN, NAN},
-                QVector4D{0.0f, 0.0f, 1.0f, 0.5f}},
-      // House
-      Primitive{42, QVector2D{-0.5f, -0.5f}, QVector4D{NAN, NAN, NAN, NAN},
-                QVector4D{1.0f, 1.0f, 0.0f, 0.5f}},
+  Layer layers[] = {
+      {0.1f,
+       QVector4D(0.0f, 0.0f, 1.0f, 1.0),
+       {
+           // Triangle
+           Primitive{1, QVector2D{-0.5f, 0.5f},
+                     QVector4D{0.0f, 0.5f, 0.0f, 0.0f}},
+           // Circle
+           Primitive{3, QVector2D{0.5f, -0.5f}, QVector4D{0.4f, NAN, NAN, NAN}},
+           // Line
+           Primitive{2, QVector2D{0.0f, 0.0f},
+                     QVector4D{0.5f, 0.5f, 0.1f, NAN}},
+       }},
+      {0.0f,
+       QVector4D(1.0, 0.0, 0.0, 1.0),
+       {
+           // Triangle
+           Primitive{1, QVector2D{-0.3f, 0.3f},
+                     QVector4D{0.0f, 0.3f, 0.0f, 0.0f}},
+           // Circle
+           Primitive{3, QVector2D{0.7f, -0.7f}, QVector4D{0.4f, NAN, NAN, NAN}},
+           // Line
+           Primitive{2, QVector2D{0.0f, 0.0f},
+                     QVector4D{0.7f, 0.3f, 0.1f, NAN}},
+       }},
   };
-  if (!mBuffer.isCreated()) {
-    mBuffer.create();
-    mBuffer.bind();
-    mBuffer.allocate(data, sizeof(data));
-  } else {
-    mBuffer.bind();
+  for (const Layer& layer : layers) {
+    QOpenGLBuffer buf;
+    buf.create();
+    buf.bind();
+    buf.allocate(layer.primitives.data(),
+                 layer.primitives.count() * sizeof(Primitive));
+
+    int typeLocation = mProgram.attributeLocation("a_type");
+    mProgram.enableAttributeArray(typeLocation);
+    mProgram.setAttributeBuffer(typeLocation, GL_FLOAT,
+                                offsetof(Primitive, type), 1,
+                                sizeof(Primitive));
+
+    int positionLocation = mProgram.attributeLocation("a_position");
+    mProgram.enableAttributeArray(positionLocation);
+    mProgram.setAttributeBuffer(positionLocation, GL_FLOAT,
+                                offsetof(Primitive, position), 2,
+                                sizeof(Primitive));
+
+    int paramsLocation = mProgram.attributeLocation("a_params");
+    mProgram.enableAttributeArray(paramsLocation);
+    mProgram.setAttributeBuffer(paramsLocation, GL_FLOAT,
+                                offsetof(Primitive, params), 4,
+                                sizeof(Primitive));
+
+    mProgram.setUniformValue("u_z", layer.z);
+    mProgram.setUniformValue("u_color", layer.color);
+    glBlendColor(layer.color.x(), layer.color.y(), layer.color.z(),
+                 layer.color.w());
+    glDrawArrays(GL_POINTS, 0, layer.primitives.count());
   }
-
-  int typeLocation = mProgram.attributeLocation("a_type");
-  mProgram.enableAttributeArray(typeLocation);
-  mProgram.setAttributeBuffer(typeLocation, GL_FLOAT, offsetof(Primitive, type),
-                              1, sizeof(Primitive));
-
-  int positionLocation = mProgram.attributeLocation("a_position");
-  mProgram.enableAttributeArray(positionLocation);
-  mProgram.setAttributeBuffer(positionLocation, GL_FLOAT,
-                              offsetof(Primitive, position), 2,
-                              sizeof(Primitive));
-
-  int paramsLocation = mProgram.attributeLocation("a_params");
-  mProgram.enableAttributeArray(paramsLocation);
-  mProgram.setAttributeBuffer(paramsLocation, GL_FLOAT,
-                              offsetof(Primitive, params), 4,
-                              sizeof(Primitive));
-
-  int colorLocation = mProgram.attributeLocation("a_color");
-  mProgram.enableAttributeArray(colorLocation);
-  mProgram.setAttributeBuffer(colorLocation, GL_FLOAT,
-                              offsetof(Primitive, color), 4, sizeof(Primitive));
-
-  glDrawArrays(GL_POINTS, 0, sizeof(data) / sizeof(Primitive));
-
-  /*mProgram.setAttributeValue("a_color", QColor(0, 0, 255, 100));
-  glBegin(GL_QUADS);
-  glVertex2f(-0.5f, -0.5f);
-  glVertex2f(1.0f, -0.5f);
-  glVertex2f(1.0f, 1.0f);
-  glVertex2f(-0.5f, 1.0f);
-  glEnd();
-
-  mProgram.setAttributeValue("a_color", QColor(255, 0, 0, 100));
-  glBegin(GL_QUADS);
-  glVertex2f(-1.0f, -1.0f);
-  glVertex2f(0.5f, -1.0f);
-  glVertex2f(0.5f, 0.5f);
-  glVertex2f(-1.0f, 0.5f);
-  glEnd();
-
-  glBegin(GL_QUADS);
-  glVertex2f(0.0f, 0.0f);
-  glVertex2f(0.8f, 0.0f);
-  glVertex2f(0.8f, -0.8f);
-  glVertex2f(0.0f, -0.8f);
-  glEnd();
-
-  mProgram.setAttributeValue("a_color", QColor(0, 0, 255, 100));
-  glBegin(GL_QUADS);
-  glVertex2f(-0.3f, 0.8f);
-  glVertex2f(-0.8f, 0.8f);
-  glVertex2f(-0.8f, 1.0f);
-  glVertex2f(-0.3f, 1.0f);
-  glEnd();*/
 
   if (mWindow) {
     mWindow->resetOpenGLState();

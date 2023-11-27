@@ -89,25 +89,30 @@ void OpenGlView::zoomAll() noexcept {
  ******************************************************************************/
 
 void OpenGlView::mousePressEvent(QMouseEvent* e) {
-  mMousePressPosition = QVector2D(e->pos());
   mMousePressTransform = mTransform;
+  mMousePressScenePos = toScenePos(mTransform, e->pos());
 }
 
 void OpenGlView::mouseMoveEvent(QMouseEvent* e) {
-  const QVector2D diff = QVector2D(e->pos()) - mMousePressPosition;
   if (e->buttons().testFlag(Qt::MiddleButton) ||
       e->buttons().testFlag(Qt::RightButton)) {
+    const QVector2D delta =
+        toScenePos(mMousePressTransform, e->pos()) - mMousePressScenePos;
     mTransform = mMousePressTransform;
-    mTransform.translate(
-        mMousePressTransform.inverted().map(QVector3D(diff.x(), diff.y(), 0)) /
-        200);
+    mTransform.translate(delta.x(), delta.y());
     update();
   }
 }
 
 void OpenGlView::wheelEvent(QWheelEvent* e) {
+  const QVector2D center =
+      toScenePos(mTransform, mapFromGlobal(QCursor::pos()));
+  const float factor = qPow(sZoomStepFactor, e->delta() / qreal(120));
+
   mAnimation->stop();
-  mTransform.scale(qPow(sZoomStepFactor, e->delta() / qreal(120)));
+  mTransform.translate(center.x(), center.y());
+  mTransform.scale(factor);
+  mTransform.translate(-center.x(), -center.y());
   update();
 }
 
@@ -119,6 +124,12 @@ void OpenGlView::smoothTo(const QMatrix4x4& transform) noexcept {
   mAnimation->setStartValue(qreal(0));
   mAnimation->setEndValue(qreal(1));
   mAnimation->start();
+}
+
+QVector2D OpenGlView::toScenePos(const QMatrix4x4& t,
+                                 const QPointF& widgetPos) const noexcept {
+  return QVector2D(t.inverted().map(QPointF(
+      (widgetPos.x() / width()) * 2 - 1, (widgetPos.y() / height()) * 2 - 1)));
 }
 
 /*******************************************************************************
