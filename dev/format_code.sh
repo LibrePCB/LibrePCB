@@ -44,11 +44,11 @@ done
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
 if [ "$DOCKER" == "--docker" ]; then
-  DOCKER_IMAGE=librepcb/devtools:1.0.0
+  DOCKER_IMAGE=librepcb/devtools:2.0.0
 
   if [ "$($DOCKER_CMD images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
     echo "Building devtools container..."
-    $DOCKER_CMD build "$REPO_ROOT/dev/devtools" -t librepcb/devtools:1.0.0
+    $DOCKER_CMD build "$REPO_ROOT/dev/devtools" -t $DOCKER_IMAGE
   fi
 
   echo "[Re-running format_code.sh inside Docker container]"
