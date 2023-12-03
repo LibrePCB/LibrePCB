@@ -25,6 +25,9 @@
 #include "../3d/openglobject.h"
 #include "waitingspinnerwidget.h"
 
+#include <librepcb/core/application.h>
+#include <librepcb/core/fileio/filepath.h>
+
 #include <QtCore>
 #include <QtOpenGL>
 #include <QtWidgets>
@@ -46,36 +49,6 @@
  ******************************************************************************/
 namespace librepcb {
 namespace editor {
-
-static const char* sVertexShader =
-    "#ifdef GL_ES\n"
-    "precision mediump int;\n"
-    "precision mediump float;\n"
-    "#endif\n"
-    "\n"
-    "uniform mat4 mvp_matrix;\n"
-    "\n"
-    "attribute vec4 a_position;\n"
-    "attribute vec4 a_color;\n"
-    "\n"
-    "varying vec4 v_color;\n"
-    "\n"
-    "void main() {\n"
-    "    v_color = a_color;\n"
-    "    gl_Position = mvp_matrix * a_position;\n"
-    "}\n";
-
-static const char* sFragmentShader =
-    "#ifdef GL_ES\n"
-    "precision mediump int;\n"
-    "precision mediump float;\n"
-    "#endif\n"
-    "\n"
-    "varying vec4 v_color;\n"
-    "\n"
-    "void main() {\n"
-    "    gl_FragColor = v_color;\n"
-    "}\n";
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -230,9 +203,11 @@ void OpenGlView::initializeGL() {
   initializeOpenGLFunctions();
 
   // Compile shaders.
-  if (mProgram.addShaderFromSourceCode(QOpenGLShader::Vertex, sVertexShader) &&
-      mProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
-                                       sFragmentShader) &&
+  const FilePath dir = Application::getResourcesDir().getPathTo("opengl");
+  const QString vertexShaderFp = dir.getPathTo("3d-vertex-shader.glsl").toStr();
+  const QString fragShaderFp = dir.getPathTo("3d-fragment-shader.glsl").toStr();
+  if (mProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, vertexShaderFp) &&
+      mProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, fragShaderFp) &&
       mProgram.link() && mProgram.bind()) {
     mInitialized = true;
   } else {
