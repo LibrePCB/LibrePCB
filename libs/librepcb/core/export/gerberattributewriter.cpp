@@ -82,8 +82,12 @@ QString GerberAttributeWriter::setAttributes(
 
   // Build string.
   QString s;
-  foreach (const GerberAttribute& a, toDelete) { s += a.toGerberString(); }
-  foreach (const GerberAttribute& a, toSet) { s += a.toGerberString(); }
+  foreach (const GerberAttribute& a, toDelete) {
+    s += a.toGerberString();
+  }
+  foreach (const GerberAttribute& a, toSet) {
+    s += a.toGerberString();
+  }
   return s;
 }
 

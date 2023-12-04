@@ -159,7 +159,9 @@ bool SymbolEditorState_Select::processGraphicsSceneMouseMoved(
       mCmdPolygonEdit->setPath(Path(vertices), true);
       return true;
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -250,7 +252,9 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       }
       return true;
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -287,7 +291,9 @@ bool SymbolEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
       setState(SubState::IDLE);
       return true;
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -316,7 +322,9 @@ bool SymbolEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     case SubState::PASTING: {
       return rotateSelectedItems(Angle::deg90());
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -331,7 +339,9 @@ bool SymbolEditorState_Select::processSelectAll() noexcept {
       emit availableFeaturesChanged();  // Selection might have changed.
       return true;
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -344,7 +354,9 @@ bool SymbolEditorState_Select::processCut() noexcept {
         return false;
       }
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -353,7 +365,9 @@ bool SymbolEditorState_Select::processCopy() noexcept {
     case SubState::IDLE: {
       return copySelectedItemsToClipboard();
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -374,7 +388,9 @@ bool SymbolEditorState_Select::processPaste() noexcept {
         return false;
       }
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
 
   return false;
@@ -432,7 +448,9 @@ bool SymbolEditorState_Select::processRotate(const Angle& rotation) noexcept {
     case SubState::PASTING: {
       return rotateSelectedItems(rotation);
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -444,7 +462,9 @@ bool SymbolEditorState_Select::processMirror(
     case SubState::PASTING: {
       return mirrorSelectedItems(orientation);
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -455,7 +475,9 @@ bool SymbolEditorState_Select::processSnapToGrid() noexcept {
     case SubState::PASTING: {
       return snapSelectedItemsToGrid();
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -464,7 +486,9 @@ bool SymbolEditorState_Select::processRemove() noexcept {
     case SubState::IDLE: {
       return removeSelectedItems();
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -485,7 +509,9 @@ bool SymbolEditorState_Select::processEditProperties() noexcept {
       }
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
   return false;
 }

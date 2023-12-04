@@ -264,8 +264,8 @@ void BoardStrokeTextData::serialize(SExpression& root) const {
  *  Operator Overloadings
  ******************************************************************************/
 
-bool BoardStrokeTextData::operator==(const BoardStrokeTextData& rhs) const
-    noexcept {
+bool BoardStrokeTextData::operator==(
+    const BoardStrokeTextData& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mLayer != rhs.mLayer) return false;
   if (mText != rhs.mText) return false;

@@ -56,15 +56,17 @@ QWidget* KeySequenceDelegate::createEditor(QWidget* parent,
       new KeySequencesEditorWidget(defaultSequences, parent);
   edt->setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
   KeySequenceDelegate* mutableThis = const_cast<KeySequenceDelegate*>(this);
-  connect(edt, &KeySequencesEditorWidget::applyTriggered, this,
-          [mutableThis, edt]() {
-            emit mutableThis->commitData(edt);
-            emit mutableThis->closeEditor(edt);
-          },
-          Qt::QueuedConnection);
-  connect(edt, &KeySequencesEditorWidget::cancelTriggered, this,
-          [mutableThis, edt]() { emit mutableThis->closeEditor(edt); },
-          Qt::QueuedConnection);
+  connect(
+      edt, &KeySequencesEditorWidget::applyTriggered, this,
+      [mutableThis, edt]() {
+        emit mutableThis->commitData(edt);
+        emit mutableThis->closeEditor(edt);
+      },
+      Qt::QueuedConnection);
+  connect(
+      edt, &KeySequencesEditorWidget::cancelTriggered, this,
+      [mutableThis, edt]() { emit mutableThis->closeEditor(edt); },
+      Qt::QueuedConnection);
   return edt;
 }
 

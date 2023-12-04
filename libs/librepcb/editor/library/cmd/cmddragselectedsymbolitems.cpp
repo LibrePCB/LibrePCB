@@ -135,12 +135,18 @@ int CmdDragSelectedSymbolItems::getSelectedItemsCount() const noexcept {
 
 void CmdDragSelectedSymbolItems::snapToGrid() noexcept {
   PositiveLength grid = mContext.graphicsView.getGridInterval();
-  foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) { cmd->snapToGrid(grid, true); }
-  foreach (CmdCircleEdit* cmd, mCircleEditCmds) { cmd->snapToGrid(grid, true); }
+  foreach (CmdSymbolPinEdit* cmd, mPinEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
   foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
     cmd->snapToGrid(grid, true);
   }
-  foreach (CmdTextEdit* cmd, mTextEditCmds) { cmd->snapToGrid(grid, true); }
+  foreach (CmdTextEdit* cmd, mTextEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
   mSnappedToGrid = true;
 }
 

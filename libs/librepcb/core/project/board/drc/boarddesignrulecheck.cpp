@@ -1975,8 +1975,8 @@ QVector<Path> BoardDesignRuleCheck::getDeviceLocation(
   return locations;
 }
 
-QVector<Path> BoardDesignRuleCheck::getViaLocation(const BI_Via& via) const
-    noexcept {
+QVector<Path> BoardDesignRuleCheck::getViaLocation(
+    const BI_Via& via) const noexcept {
   return {Path::circle(via.getSize()).translated(via.getPosition())};
 }
 
@@ -2003,8 +2003,8 @@ void BoardDesignRuleCheck::emitMessage(
   emit progressMessage(msg->getMessage());
 }
 
-QString BoardDesignRuleCheck::formatLength(const Length& length) const
-    noexcept {
+QString BoardDesignRuleCheck::formatLength(
+    const Length& length) const noexcept {
   return Toolbox::floatToString(length.toMm(), 6, QLocale()) % "mm";
 }
 

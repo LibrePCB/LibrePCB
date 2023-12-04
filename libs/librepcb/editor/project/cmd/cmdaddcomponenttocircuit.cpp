@@ -65,8 +65,8 @@ CmdAddComponentToCircuit::~CmdAddComponentToCircuit() noexcept {
  *  Getters
  ******************************************************************************/
 
-ComponentInstance* CmdAddComponentToCircuit::getComponentInstance() const
-    noexcept {
+ComponentInstance* CmdAddComponentToCircuit::getComponentInstance()
+    const noexcept {
   Q_ASSERT(mCmdAddToCircuit);
   return mCmdAddToCircuit ? mCmdAddToCircuit->getComponentInstance() : nullptr;
 }

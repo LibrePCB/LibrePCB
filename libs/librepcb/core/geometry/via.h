@@ -95,8 +95,8 @@ public:
   bool isBuried() const noexcept;
   bool isOnLayer(const Layer& layer) const noexcept;
   bool isOnAnyLayer(const QSet<const Layer*>& layers) const noexcept;
-  QPainterPath toQPainterPathPx(const Length& expansion = Length(0)) const
-      noexcept;
+  QPainterPath toQPainterPathPx(
+      const Length& expansion = Length(0)) const noexcept;
 
   // Setters
   bool setUuid(const Uuid& uuid) noexcept;

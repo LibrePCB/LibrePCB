@@ -179,7 +179,9 @@ public:
           *this,
           &SerializableObjectList<T, P,
                                   OnEditedArgs...>::elementEditedHandler) {
-    foreach (const std::shared_ptr<T>& obj, elements) { append(obj); }
+    foreach (const std::shared_ptr<T>& obj, elements) {
+      append(obj);
+    }
   }
   explicit SerializableObjectList(const SExpression& node)
     : onEdited(*this),
@@ -380,8 +382,8 @@ public:
 
   // Convenience Methods
   template <typename Compare>
-  SerializableObjectList<T, P, OnEditedArgs...> sorted(Compare lessThan) const
-      noexcept {
+  SerializableObjectList<T, P, OnEditedArgs...> sorted(
+      Compare lessThan) const noexcept {
     SerializableObjectList<T, P, OnEditedArgs...> copiedList;
     copiedList.mObjects = mObjects;  // copy only the pointers, not the objects!
     std::sort(copiedList.mObjects.begin(), copiedList.mObjects.end(),

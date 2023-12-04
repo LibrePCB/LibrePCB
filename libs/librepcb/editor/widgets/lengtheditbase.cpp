@@ -308,8 +308,8 @@ void LengthEditBase::updateText() noexcept {
   lineEdit()->setText(getValueStr(getDisplayedUnit()));
 }
 
-LengthUnit LengthEditBase::extractUnitFromExpression(QString& expression) const
-    noexcept {
+LengthUnit LengthEditBase::extractUnitFromExpression(
+    QString& expression) const noexcept {
   foreach (const LengthUnit& unit, LengthUnit::getAllUnits()) {
     foreach (const QString& suffix, unit.getUserInputSuffixes()) {
       if (expression.endsWith(suffix)) {

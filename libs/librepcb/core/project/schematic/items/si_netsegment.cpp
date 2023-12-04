@@ -289,7 +289,9 @@ void SI_NetSegment::removeNetLabel(SI_NetLabel& netlabel) {
 }
 
 void SI_NetSegment::updateAllNetLabelAnchors() noexcept {
-  foreach (SI_NetLabel* netlabel, mNetLabels) { netlabel->updateAnchor(); }
+  foreach (SI_NetLabel* netlabel, mNetLabels) {
+    netlabel->updateAnchor();
+  }
 }
 
 /*******************************************************************************

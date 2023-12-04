@@ -76,18 +76,18 @@ bool TransactionalDirectory::isRestoredFromAutosave() const noexcept {
  *  Inherited from FileSystem
  ******************************************************************************/
 
-FilePath TransactionalDirectory::getAbsPath(const QString& path) const
-    noexcept {
+FilePath TransactionalDirectory::getAbsPath(
+    const QString& path) const noexcept {
   return mFileSystem->getAbsPath(mPath % "/" % path);
 }
 
-QStringList TransactionalDirectory::getDirs(const QString& path) const
-    noexcept {
+QStringList TransactionalDirectory::getDirs(
+    const QString& path) const noexcept {
   return mFileSystem->getDirs(mPath % "/" % path);
 }
 
-QStringList TransactionalDirectory::getFiles(const QString& path) const
-    noexcept {
+QStringList TransactionalDirectory::getFiles(
+    const QString& path) const noexcept {
   return mFileSystem->getFiles(mPath % "/" % path);
 }
 

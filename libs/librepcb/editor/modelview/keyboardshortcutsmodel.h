@@ -62,17 +62,17 @@ public:
       const QMap<QString, QList<QKeySequence>>& overrides) noexcept;
 
   // Inherited Methods
-  int columnCount(const QModelIndex& parent = QModelIndex()) const
-      noexcept override;
-  int rowCount(const QModelIndex& parent = QModelIndex()) const
-      noexcept override;
-  QModelIndex index(int row, int column,
-                    const QModelIndex& parent = QModelIndex()) const
-      noexcept override;
+  int columnCount(
+      const QModelIndex& parent = QModelIndex()) const noexcept override;
+  int rowCount(
+      const QModelIndex& parent = QModelIndex()) const noexcept override;
+  QModelIndex index(
+      int row, int column,
+      const QModelIndex& parent = QModelIndex()) const noexcept override;
   QModelIndex parent(const QModelIndex& index) const noexcept override;
   Qt::ItemFlags flags(const QModelIndex& index) const noexcept override;
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const
-      noexcept override;
+  QVariant data(const QModelIndex& index,
+                int role = Qt::DisplayRole) const noexcept override;
   bool setData(const QModelIndex& index, const QVariant& value,
                int role = Qt::EditRole) noexcept override;
 
@@ -81,8 +81,8 @@ public:
 
 private:  // Methods
   Category* categoryFromIndex(const QModelIndex& index) const noexcept;
-  const EditorCommand* commandFromIndex(const QModelIndex& index) const
-      noexcept;
+  const EditorCommand* commandFromIndex(
+      const QModelIndex& index) const noexcept;
   static QString format(const QList<QKeySequence>& sequences,
                         bool showNone) noexcept;
 

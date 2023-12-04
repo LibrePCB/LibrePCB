@@ -130,9 +130,8 @@ SchematicPainter::~SchematicPainter() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void SchematicPainter::paint(QPainter& painter,
-                             const GraphicsExportSettings& settings) const
-    noexcept {
+void SchematicPainter::paint(
+    QPainter& painter, const GraphicsExportSettings& settings) const noexcept {
   GraphicsPainter p(painter);
   p.setMinLineWidth(settings.getMinLineWidth());
 

@@ -68,8 +68,8 @@ public:
   virtual ~TransactionalDirectory() noexcept;
 
   // Getters
-  std::shared_ptr<const TransactionalFileSystem> getFileSystem() const
-      noexcept {
+  std::shared_ptr<const TransactionalFileSystem> getFileSystem()
+      const noexcept {
     return mFileSystem;
   }
   std::shared_ptr<TransactionalFileSystem> getFileSystem() noexcept {
@@ -82,8 +82,8 @@ public:
   // Inherited from FileSystem
   virtual FilePath getAbsPath(const QString& path = "") const noexcept override;
   virtual QStringList getDirs(const QString& path = "") const noexcept override;
-  virtual QStringList getFiles(const QString& path = "") const
-      noexcept override;
+  virtual QStringList getFiles(
+      const QString& path = "") const noexcept override;
   virtual bool fileExists(const QString& path) const noexcept override;
   virtual QByteArray read(const QString& path) const override;
   virtual QByteArray readIfExists(const QString& path) const override;

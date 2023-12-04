@@ -96,8 +96,8 @@ public:
   bool getIgnoreLocks() const noexcept;
 
   /// @copydoc ::librepcb::editor::IF_GraphicsLayerProvider::getLayer()
-  virtual std::shared_ptr<GraphicsLayer> getLayer(const QString& name) const
-      noexcept override {
+  virtual std::shared_ptr<GraphicsLayer> getLayer(
+      const QString& name) const noexcept override {
     foreach (const std::shared_ptr<GraphicsLayer>& layer, mLayers) {
       if (layer->getName() == name) {
         return layer;

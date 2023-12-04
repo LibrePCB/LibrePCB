@@ -74,9 +74,8 @@ QString AttrTypeFrequency::valueFromTr(const QString& value) const noexcept {
     return QString();
 }
 
-QString AttrTypeFrequency::printableValueTr(const QString& value,
-                                            const AttributeUnit* unit) const
-    noexcept {
+QString AttrTypeFrequency::printableValueTr(
+    const QString& value, const AttributeUnit* unit) const noexcept {
   bool ok = false;
   float v = value.toFloat(&ok);
   if (ok && unit)

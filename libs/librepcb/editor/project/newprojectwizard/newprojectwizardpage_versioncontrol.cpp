@@ -53,8 +53,8 @@ NewProjectWizardPage_VersionControl::
  *  Getters
  ******************************************************************************/
 
-bool NewProjectWizardPage_VersionControl::getInitGitRepository() const
-    noexcept {
+bool NewProjectWizardPage_VersionControl::getInitGitRepository()
+    const noexcept {
   return mUi->gbxInitGitRepo->isChecked();
 }
 

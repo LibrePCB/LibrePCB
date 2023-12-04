@@ -161,8 +161,8 @@ public:
   // Inherited from FileSystem
   virtual FilePath getAbsPath(const QString& path = "") const noexcept override;
   virtual QStringList getDirs(const QString& path = "") const noexcept override;
-  virtual QStringList getFiles(const QString& path = "") const
-      noexcept override;
+  virtual QStringList getFiles(
+      const QString& path = "") const noexcept override;
   virtual bool fileExists(const QString& path) const noexcept override;
   virtual QByteArray read(const QString& path) const override;
   virtual QByteArray readIfExists(const QString& path) const override;

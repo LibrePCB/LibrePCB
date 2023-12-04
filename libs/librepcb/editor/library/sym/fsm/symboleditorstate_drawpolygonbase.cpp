@@ -503,7 +503,9 @@ void SymbolEditorState_DrawPolygonBase::updateOverlayText() noexcept {
       const UnsignedLength radius =
           (count >= 2) ? (p0 - mArcCenter).getLength() : UnsignedLength(0);
       Angle angle;
-      foreach (const Vertex& v, vertices) { angle += v.getAngle(); }
+      foreach (const Vertex& v, vertices) {
+        angle += v.getAngle();
+      }
       text += formatLength("X·", center.getX()) % "<br>";
       text += formatLength("Y·", center.getY()) % "<br>";
       text += formatLength("X0", p0.getX()) % "<br>";

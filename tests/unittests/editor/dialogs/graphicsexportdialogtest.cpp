@@ -94,7 +94,9 @@ protected:
   QList<std::shared_ptr<GraphicsExportSettings>> getSettings(
       const GraphicsExportDialog& dlg, int expectedCount = -1) {
     QList<std::shared_ptr<GraphicsExportSettings>> settings;
-    foreach (const auto& pair, dlg.getPages()) { settings.append(pair.second); }
+    foreach (const auto& pair, dlg.getPages()) {
+      settings.append(pair.second);
+    }
     if ((expectedCount >= 0) && (settings.count() != expectedCount)) {
       throw Exception(__FILE__, __LINE__,
                       QString("Expected %1 pages, but got %2 pages.")

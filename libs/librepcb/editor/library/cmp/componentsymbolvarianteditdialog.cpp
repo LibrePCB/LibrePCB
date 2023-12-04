@@ -193,7 +193,9 @@ void ComponentSymbolVariantEditDialog::updatePreview() noexcept {
     mUi->graphicsView->zoomAll();
   } else if (mPreviewTextsUpdateScheduled) {
     mPreviewTextsUpdateScheduled = false;
-    foreach (auto item, mGraphicsItems) { item->updateAllTexts(); }
+    foreach (auto item, mGraphicsItems) {
+      item->updateAllTexts();
+    }
   }
 }
 

@@ -147,7 +147,9 @@ void RenameNetSegmentDialog::accept() noexcept {
         transaction.commit();  // can throw
         break;
       }
-      default: { break; }
+      default: {
+        break;
+      }
     }
     QDialog::accept();
   } catch (const Exception& e) {

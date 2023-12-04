@@ -238,8 +238,8 @@ public slots:
   void setErcMessageApproved(const RuleCheckMessage& msg,
                              bool approve) noexcept;
 
-  std::shared_ptr<const QSet<const NetSignal*>> getHighlightedNetSignals() const
-      noexcept {
+  std::shared_ptr<const QSet<const NetSignal*>> getHighlightedNetSignals()
+      const noexcept {
     return mHighlightedNetSignals;
   }
   void setHighlightedNetSignals(

@@ -57,8 +57,8 @@ CmpSigPinDisplayType::~CmpSigPinDisplayType() noexcept {
  *  Operator Overloadings
  ******************************************************************************/
 
-bool CmpSigPinDisplayType::operator==(const CmpSigPinDisplayType& rhs) const
-    noexcept {
+bool CmpSigPinDisplayType::operator==(
+    const CmpSigPinDisplayType& rhs) const noexcept {
   return mDisplayType == rhs.mDisplayType;
 }
 

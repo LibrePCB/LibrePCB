@@ -313,8 +313,8 @@ void BGI_Device::updateZoneLayers() noexcept {
   }
 }
 
-std::shared_ptr<GraphicsLayer> BGI_Device::getLayer(const Layer& layer) const
-    noexcept {
+std::shared_ptr<GraphicsLayer> BGI_Device::getLayer(
+    const Layer& layer) const noexcept {
   return mLayerProvider.getLayer(mDevice.getMirrored()
                                      ? layer.mirrored().getThemeColor()
                                      : layer.getThemeColor());

@@ -191,12 +191,13 @@ void UnplacedComponentsDock::updateComponentsList() noexcept {
     const QMap<Uuid, BI_Device*> boardDeviceList = mBoard->getDeviceInstances();
 
     // Sort components manually using numeric sort.
-    Toolbox::sortNumeric(componentsList,
-                         [](const QCollator& cmp, const ComponentInstance* lhs,
-                            const ComponentInstance* rhs) {
-                           return cmp(*lhs->getName(), *rhs->getName());
-                         },
-                         Qt::CaseInsensitive, false);
+    Toolbox::sortNumeric(
+        componentsList,
+        [](const QCollator& cmp, const ComponentInstance* lhs,
+           const ComponentInstance* rhs) {
+          return cmp(*lhs->getName(), *rhs->getName());
+        },
+        Qt::CaseInsensitive, false);
 
     foreach (ComponentInstance* component, componentsList) {
       if (boardDeviceList.contains(component->getUuid())) continue;
@@ -478,8 +479,8 @@ void UnplacedComponentsDock::autoAddDevicesToBoard(
 }
 
 std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
-    UnplacedComponentsDock::getAvailableDevices(ComponentInstance& cmp) const
-    noexcept {
+    UnplacedComponentsDock::getAvailableDevices(
+        ComponentInstance& cmp) const noexcept {
   QList<DeviceMetadata> devices;
   Uuid cmpUuid = cmp.getLibComponent().getUuid();
   QStringList localeOrder = mProject.getLocaleOrder();
@@ -547,12 +548,13 @@ std::pair<QList<UnplacedComponentsDock::DeviceMetadata>, int>
   }
 
   // Sort by device name, using numeric sort.
-  Toolbox::sortNumeric(devices,
-                       [](const QCollator& cmp, const DeviceMetadata& lhs,
-                          const DeviceMetadata& rhs) {
-                         return cmp(lhs.deviceName, rhs.deviceName);
-                       },
-                       Qt::CaseInsensitive, false);
+  Toolbox::sortNumeric(
+      devices,
+      [](const QCollator& cmp, const DeviceMetadata& lhs,
+         const DeviceMetadata& rhs) {
+        return cmp(lhs.deviceName, rhs.deviceName);
+      },
+      Qt::CaseInsensitive, false);
 
   // Prio 1: Use the device already used for the same component before, if it
   // is chosen in the component instance.

@@ -101,8 +101,8 @@ public:
   bool getAutoRotate() const noexcept { return mAutoRotate; }
   const QString& getText() const noexcept { return mText; }
   QVector<Path> generatePaths(const StrokeFont& font) const noexcept;
-  QVector<Path> generatePaths(const StrokeFont& font, const QString& text) const
-      noexcept;
+  QVector<Path> generatePaths(const StrokeFont& font,
+                              const QString& text) const noexcept;
 
   // Setters
   bool setLayer(const Layer& layer) noexcept;

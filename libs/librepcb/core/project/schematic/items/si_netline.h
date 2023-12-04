@@ -91,8 +91,8 @@ public:
   }
   SI_NetLineAnchor& getStartPoint() const noexcept { return *mStartPoint; }
   SI_NetLineAnchor& getEndPoint() const noexcept { return *mEndPoint; }
-  SI_NetLineAnchor* getOtherPoint(const SI_NetLineAnchor& firstPoint) const
-      noexcept;
+  SI_NetLineAnchor* getOtherPoint(
+      const SI_NetLineAnchor& firstPoint) const noexcept;
   NetSignal& getNetSignalOfNetSegment() const noexcept;
 
   // Setters

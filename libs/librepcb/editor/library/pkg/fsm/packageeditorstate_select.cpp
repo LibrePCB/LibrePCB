@@ -188,7 +188,9 @@ bool PackageEditorState_Select::processGraphicsSceneMouseMoved(
       mCmdZoneEdit->setOutline(Path(vertices), true);
       return true;
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -284,7 +286,9 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonPressed(
       }
       return true;
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -333,7 +337,9 @@ bool PackageEditorState_Select::processGraphicsSceneLeftMouseButtonReleased(
       setState(SubState::IDLE);
       return true;
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -363,7 +369,9 @@ bool PackageEditorState_Select::processGraphicsSceneRightMouseButtonReleased(
     case SubState::PASTING: {
       return rotateSelectedItems(Angle::deg90());
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -381,7 +389,9 @@ bool PackageEditorState_Select::processSelectAll() noexcept {
       }
       return false;
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -394,7 +404,9 @@ bool PackageEditorState_Select::processCut() noexcept {
         return false;
       }
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -403,7 +415,9 @@ bool PackageEditorState_Select::processCopy() noexcept {
     case SubState::IDLE: {
       return copySelectedItemsToClipboard();
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -424,7 +438,9 @@ bool PackageEditorState_Select::processPaste() noexcept {
         return false;
       }
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
 
   return false;
@@ -486,7 +502,9 @@ bool PackageEditorState_Select::processRotate(const Angle& rotation) noexcept {
     case SubState::PASTING: {
       return rotateSelectedItems(rotation);
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -498,7 +516,9 @@ bool PackageEditorState_Select::processMirror(
     case SubState::PASTING: {
       return mirrorSelectedItems(orientation, false);
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -510,7 +530,9 @@ bool PackageEditorState_Select::processFlip(
     case SubState::PASTING: {
       return mirrorSelectedItems(orientation, true);
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -521,7 +543,9 @@ bool PackageEditorState_Select::processSnapToGrid() noexcept {
     case SubState::PASTING: {
       return snapSelectedItemsToGrid();
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -530,7 +554,9 @@ bool PackageEditorState_Select::processRemove() noexcept {
     case SubState::IDLE: {
       return removeSelectedItems();
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -559,7 +585,9 @@ bool PackageEditorState_Select::processEditProperties() noexcept {
       }
       break;
     }
-    default: { break; }
+    default: {
+      break;
+    }
   }
   return false;
 }
@@ -569,7 +597,9 @@ bool PackageEditorState_Select::processGenerateOutline() noexcept {
     case SubState::IDLE: {
       return generateOutline();
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 
@@ -578,7 +608,9 @@ bool PackageEditorState_Select::processGenerateCourtyard() noexcept {
     case SubState::IDLE: {
       return generateCourtyard();
     }
-    default: { return false; }
+    default: {
+      return false;
+    }
   }
 }
 

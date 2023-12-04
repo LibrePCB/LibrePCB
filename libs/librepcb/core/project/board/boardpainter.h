@@ -140,8 +140,8 @@ public:
   ~BoardPainter() noexcept;
 
   // General Methods
-  void paint(QPainter& painter, const GraphicsExportSettings& settings) const
-      noexcept override;
+  void paint(QPainter& painter,
+             const GraphicsExportSettings& settings) const noexcept override;
 
   // Operator Overloadings
   BoardPainter& operator=(const BoardPainter& rhs) = delete;

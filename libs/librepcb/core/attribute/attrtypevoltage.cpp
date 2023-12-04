@@ -74,9 +74,8 @@ QString AttrTypeVoltage::valueFromTr(const QString& value) const noexcept {
     return QString();
 }
 
-QString AttrTypeVoltage::printableValueTr(const QString& value,
-                                          const AttributeUnit* unit) const
-    noexcept {
+QString AttrTypeVoltage::printableValueTr(
+    const QString& value, const AttributeUnit* unit) const noexcept {
   bool ok = false;
   float v = value.toFloat(&ok);
   if (ok && unit)

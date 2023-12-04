@@ -494,7 +494,9 @@ void BoardGerberExport::exportLayerTopSilkscreen(
                         *mProject.getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Top,
                               GerberGenerator::Polarity::Positive);
-    foreach (const Layer* layer, layers) { drawLayer(gen, *layer); }
+    foreach (const Layer* layer, layers) {
+      drawLayer(gen, *layer);
+    }
     gen.setLayerPolarity(GerberGenerator::Polarity::Negative);
     drawLayer(gen, Layer::topStopMask());
     gen.generate();
@@ -516,7 +518,9 @@ void BoardGerberExport::exportLayerBottomSilkscreen(
                         *mProject.getVersion());
     gen.setFileFunctionLegend(GerberGenerator::BoardSide::Bottom,
                               GerberGenerator::Polarity::Positive);
-    foreach (const Layer* layer, layers) { drawLayer(gen, *layer); }
+    foreach (const Layer* layer, layers) {
+      drawLayer(gen, *layer);
+    }
     gen.setLayerPolarity(GerberGenerator::Polarity::Negative);
     drawLayer(gen, Layer::botStopMask());
     gen.generate();
@@ -968,7 +972,9 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
         flashPadOutline();  // can throw
         break;
       }
-      default: { throw LogicError(__FILE__, __LINE__, "Unknown pad shape!"); }
+      default: {
+        throw LogicError(__FILE__, __LINE__, "Unknown pad shape!");
+      }
     }
   }
 }
@@ -1054,8 +1060,8 @@ FilePath BoardGerberExport::getOutputFilePath(QString path) const noexcept {
   }
 }
 
-QString BoardGerberExport::getAttributeValue(const QString& key) const
-    noexcept {
+QString BoardGerberExport::getAttributeValue(
+    const QString& key) const noexcept {
   auto getLayerName = [](const Layer* layer) {
     Q_ASSERT(layer && layer->isCopper());
     if (layer->isTop()) {

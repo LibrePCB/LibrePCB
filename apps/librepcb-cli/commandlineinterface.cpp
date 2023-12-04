@@ -1289,8 +1289,8 @@ void CommandLineInterface::processLibraryElement(
 }
 
 bool CommandLineInterface::openStep(const QString& filePath, bool minify,
-                                    bool tesselate, const QString& saveTo) const
-    noexcept {
+                                    bool tesselate,
+                                    const QString& saveTo) const noexcept {
   try {
     // Note: Not using tr() for this command as it is basically intended for
     // developers, not end users.
@@ -1345,7 +1345,9 @@ bool CommandLineInterface::openStep(const QString& filePath, bool minify,
       const QMap<OccModel::Color, QVector<QVector3D>> vertices =
           model->tesselate();  // can throw
       int vertexCount = 0;
-      foreach (const auto& v, vertices) { vertexCount += v.count(); }
+      foreach (const auto& v, vertices) {
+        vertexCount += v.count();
+      }
       print(QString(" - Built %1 vertices with %2 different colors")
                 .arg(vertexCount)
                 .arg(vertices.count()));
@@ -1366,17 +1368,18 @@ QStringList CommandLineInterface::prepareRuleCheckMessages(
     RuleCheckMessageList messages, const QSet<SExpression>& approvals,
     int& approvedMsgCount) noexcept {
   // Sort messages to increases readability of console output.
-  Toolbox::sortNumeric(messages,
-                       [](const QCollator& cmp,
-                          const std::shared_ptr<const RuleCheckMessage>& lhs,
-                          const std::shared_ptr<const RuleCheckMessage>& rhs) {
-                         if (lhs->getSeverity() != rhs->getSeverity()) {
-                           return lhs->getSeverity() > rhs->getSeverity();
-                         } else {
-                           return cmp(lhs->getMessage(), rhs->getMessage());
-                         }
-                       },
-                       Qt::CaseInsensitive, false);
+  Toolbox::sortNumeric(
+      messages,
+      [](const QCollator& cmp,
+         const std::shared_ptr<const RuleCheckMessage>& lhs,
+         const std::shared_ptr<const RuleCheckMessage>& rhs) {
+        if (lhs->getSeverity() != rhs->getSeverity()) {
+          return lhs->getSeverity() > rhs->getSeverity();
+        } else {
+          return cmp(lhs->getMessage(), rhs->getMessage());
+        }
+      },
+      Qt::CaseInsensitive, false);
   approvedMsgCount = 0;
   QStringList printedMessages;
   foreach (const auto& msg, messages) {

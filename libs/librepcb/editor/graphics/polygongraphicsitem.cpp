@@ -66,8 +66,8 @@ PolygonGraphicsItem::~PolygonGraphicsItem() noexcept {
  *  Public Methods
  ******************************************************************************/
 
-int PolygonGraphicsItem::getLineIndexAtPosition(const Point& pos) const
-    noexcept {
+int PolygonGraphicsItem::getLineIndexAtPosition(
+    const Point& pos) const noexcept {
   // We build temporary PrimitivePathGraphicsItem objects for each segment of
   // the polygon and check if the specified position is located within the shape
   // of one of these graphics items. This is quite ugly, but was easy to

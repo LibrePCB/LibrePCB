@@ -63,9 +63,8 @@ SymbolPainter::~SymbolPainter() noexcept {
  *  General Methods
  ******************************************************************************/
 
-void SymbolPainter::paint(QPainter& painter,
-                          const GraphicsExportSettings& settings) const
-    noexcept {
+void SymbolPainter::paint(
+    QPainter& painter, const GraphicsExportSettings& settings) const noexcept {
   GraphicsPainter p(painter);
   p.setMinLineWidth(settings.getMinLineWidth());
 

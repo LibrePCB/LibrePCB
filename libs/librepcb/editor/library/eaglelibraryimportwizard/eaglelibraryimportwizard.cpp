@@ -67,14 +67,15 @@ EagleLibraryImportWizard::EagleLibraryImportWizard(Workspace& workspace,
   // wizard. The button will be enabled in the last page, and removed when
   // clicking on it.
   setButtonText(QWizard::CustomButton1, tr("&Restart"));
-  connect(this, &QWizard::customButtonClicked, this,
-          [this]() {
-            // Hide restart button and start over.
-            setOption(QWizard::HaveCustomButton1, false);
-            restart();
-            next();
-          },
-          Qt::QueuedConnection);
+  connect(
+      this, &QWizard::customButtonClicked, this,
+      [this]() {
+        // Hide restart button and start over.
+        setOption(QWizard::HaveCustomButton1, false);
+        restart();
+        next();
+      },
+      Qt::QueuedConnection);
 
   // Load window geometry.
   QSettings clientSettings;

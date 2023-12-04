@@ -69,8 +69,8 @@ public:
       const Uuid& uuid) const noexcept;
   std::shared_ptr<const Symbol> getSymbol(const Uuid& uuid) const noexcept;
   std::shared_ptr<const Package> getPackage(const Uuid& uuid) const noexcept;
-  std::shared_ptr<const Component> getComponent(const Uuid& uuid) const
-      noexcept;
+  std::shared_ptr<const Component> getComponent(
+      const Uuid& uuid) const noexcept;
   std::shared_ptr<const Device> getDevice(const Uuid& uuid) const noexcept;
 
   // Operator Overloadings
@@ -79,8 +79,8 @@ public:
 private:  // Methods
   template <typename T>
   std::shared_ptr<const T> getElement(
-      QHash<Uuid, std::shared_ptr<const T>>& container, const Uuid& uuid) const
-      noexcept;
+      QHash<Uuid, std::shared_ptr<const T>>& container,
+      const Uuid& uuid) const noexcept;
 
 private:  // Data
   QPointer<const WorkspaceLibraryDb> mDb;

@@ -118,8 +118,8 @@ Path Path::toOpenPath() const noexcept {
   return p;
 }
 
-QVector<Path> Path::toOutlineStrokes(const PositiveLength& width) const
-    noexcept {
+QVector<Path> Path::toOutlineStrokes(
+    const PositiveLength& width) const noexcept {
   QVector<Path> paths;
   paths.reserve(mVertices.count());
   if (mVertices.count() == 1) {
@@ -218,8 +218,8 @@ Path& Path::mirror(Qt::Orientation orientation, const Point& center) noexcept {
   return *this;
 }
 
-Path Path::mirrored(Qt::Orientation orientation, const Point& center) const
-    noexcept {
+Path Path::mirrored(Qt::Orientation orientation,
+                    const Point& center) const noexcept {
   return Path(*this).mirror(orientation, center);
 }
 

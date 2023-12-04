@@ -132,11 +132,10 @@ signals:
 private:
   bool checkAttributesValidity() const noexcept;
   bool areAllNetPointsConnectedTogether() const noexcept;
-  void findAllConnectedNetPoints(const BI_NetLineAnchor& p,
-                                 QSet<const BI_Via*>& vias,
-                                 QSet<const BI_FootprintPad*>& pads,
-                                 QSet<const BI_NetPoint*>& points) const
-      noexcept;
+  void findAllConnectedNetPoints(
+      const BI_NetLineAnchor& p, QSet<const BI_Via*>& vias,
+      QSet<const BI_FootprintPad*>& pads,
+      QSet<const BI_NetPoint*>& points) const noexcept;
 
   // Attributes
   Uuid mUuid;

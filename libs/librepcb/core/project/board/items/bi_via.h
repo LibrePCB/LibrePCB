@@ -77,13 +77,13 @@ public:
   const tl::optional<PositiveLength>& getStopMaskDiameterTop() const noexcept {
     return mStopMaskDiameterTop;
   }
-  const tl::optional<PositiveLength>& getStopMaskDiameterBottom() const
-      noexcept {
+  const tl::optional<PositiveLength>& getStopMaskDiameterBottom()
+      const noexcept {
     return mStopMaskDiameterBottom;
   }
   bool isUsed() const noexcept { return (mRegisteredNetLines.count() > 0); }
-  tl::optional<std::pair<const Layer*, const Layer*> > getDrillLayerSpan() const
-      noexcept;
+  tl::optional<std::pair<const Layer*, const Layer*> > getDrillLayerSpan()
+      const noexcept;
   TraceAnchor toTraceAnchor() const noexcept override;
 
   // Setters

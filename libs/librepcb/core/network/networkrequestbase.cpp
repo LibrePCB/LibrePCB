@@ -223,7 +223,9 @@ void NetworkRequestBase::replySslErrorsSlot(
   Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
   mErrored = true;
   QStringList errorsList;
-  foreach (const QSslError& e, errors) { errorsList.append(e.errorString()); }
+  foreach (const QSslError& e, errors) {
+    errorsList.append(e.errorString());
+  }
   finalize(tr("SSL errors occurred:\n\n%1").arg(errorsList.join("\n")));
 }
 

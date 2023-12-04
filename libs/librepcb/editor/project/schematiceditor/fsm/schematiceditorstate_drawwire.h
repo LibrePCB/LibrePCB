@@ -110,8 +110,8 @@ private:  //  Methods
       const QVector<std::shared_ptr<QGraphicsItem>>& except = {}) noexcept;
   Point updateNetpointPositions(bool snap) noexcept;
   void wireModeChanged(WireMode mode) noexcept;
-  Point calcMiddlePointPos(const Point& p1, const Point p2, WireMode mode) const
-      noexcept;
+  Point calcMiddlePointPos(const Point& p1, const Point p2,
+                           WireMode mode) const noexcept;
 
 private:  // Data
   Circuit& mCircuit;

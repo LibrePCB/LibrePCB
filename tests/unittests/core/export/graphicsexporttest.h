@@ -52,8 +52,8 @@ public:
 
   virtual ~GraphicsPagePainterMock() noexcept {}
 
-  void paint(QPainter& painter, const GraphicsExportSettings& settings) const
-      noexcept override {
+  void paint(QPainter& painter,
+             const GraphicsExportSettings& settings) const noexcept override {
     Q_UNUSED(settings);
 
     Point topLeft(mPos.getX() - mWidth / 2, mPos.getY() + mHeight / 2);

@@ -73,8 +73,8 @@ public:
       const QString& text, const PositiveLength& height,
       const Length& letterSpacing, Length& width) const noexcept;
   QVector<Path> strokeLine(const QString& text, const PositiveLength& height,
-                           const Length& letterSpacing, Length& width) const
-      noexcept;
+                           const Length& letterSpacing,
+                           Length& width) const noexcept;
   QVector<Path> strokeGlyph(const QChar& glyph, const PositiveLength& height,
                             Length& spacing) const noexcept;
 
@@ -91,8 +91,8 @@ private:
                             const PositiveLength& height) noexcept;
   static Vertex convertVertex(const fontobene::Vertex& v,
                               const PositiveLength& height) noexcept;
-  Length convertLength(const PositiveLength& height, qreal length) const
-      noexcept;
+  Length convertLength(const PositiveLength& height,
+                       qreal length) const noexcept;
   static void computeBoundingRect(const QVector<Path>& paths, Point& bottomLeft,
                                   Point& topRight) noexcept;
 

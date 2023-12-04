@@ -129,8 +129,8 @@ private:  // Methods
    */
   std::pair<QList<DeviceMetadata>, int> getAvailableDevices(
       ComponentInstance& cmp) const noexcept;
-  tl::optional<Uuid> getSuggestedFootprint(const Uuid& libPkgUuid) const
-      noexcept;
+  tl::optional<Uuid> getSuggestedFootprint(
+      const Uuid& libPkgUuid) const noexcept;
 
 private:  // Data
   ProjectEditor& mProjectEditor;

@@ -578,8 +578,8 @@ bool ControlPanel::closeAllProjects(bool askForSave) noexcept {
   return success;
 }
 
-ProjectEditor* ControlPanel::getOpenProject(const FilePath& filepath) const
-    noexcept {
+ProjectEditor* ControlPanel::getOpenProject(
+    const FilePath& filepath) const noexcept {
   if (mOpenProjectEditors.contains(filepath.toUnique().toStr()))
     return mOpenProjectEditors.value(filepath.toUnique().toStr());
   else
@@ -852,10 +852,10 @@ void ControlPanel::on_recentProjectsListView_customContextMenuRequested(
   QMenu menu;
   MenuBuilder mb(&menu);
   const EditorCommandSet& cmd = EditorCommandSet::instance();
-  mb.addAction(
-      cmd.itemOpen.createAction(&menu, this, [this, fp]() { openProject(fp); },
-                                EditorCommand::ActionFlag::NoShortcuts),
-      MenuBuilder::Flag::DefaultAction);
+  mb.addAction(cmd.itemOpen.createAction(
+                   &menu, this, [this, fp]() { openProject(fp); },
+                   EditorCommand::ActionFlag::NoShortcuts),
+               MenuBuilder::Flag::DefaultAction);
   mb.addSeparator();
   if (isFavorite) {
     mb.addAction(cmd.favoriteRemove.createAction(
@@ -884,10 +884,10 @@ void ControlPanel::on_favoriteProjectsListView_customContextMenuRequested(
   QMenu menu;
   MenuBuilder mb(&menu);
   const EditorCommandSet& cmd = EditorCommandSet::instance();
-  mb.addAction(
-      cmd.itemOpen.createAction(&menu, this, [this, fp]() { openProject(fp); },
-                                EditorCommand::ActionFlag::NoShortcuts),
-      MenuBuilder::Flag::DefaultAction);
+  mb.addAction(cmd.itemOpen.createAction(
+                   &menu, this, [this, fp]() { openProject(fp); },
+                   EditorCommand::ActionFlag::NoShortcuts),
+               MenuBuilder::Flag::DefaultAction);
   mb.addSeparator();
   mb.addAction(cmd.favoriteRemove.createAction(
       &menu, this,

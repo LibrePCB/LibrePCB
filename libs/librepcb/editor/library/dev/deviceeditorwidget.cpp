@@ -173,8 +173,8 @@ DeviceEditorWidget::~DeviceEditorWidget() noexcept {
  *  Getters
  ******************************************************************************/
 
-QSet<EditorWidgetBase::Feature> DeviceEditorWidget::getAvailableFeatures() const
-    noexcept {
+QSet<EditorWidgetBase::Feature> DeviceEditorWidget::getAvailableFeatures()
+    const noexcept {
   return {
       EditorWidgetBase::Feature::Close,
   };

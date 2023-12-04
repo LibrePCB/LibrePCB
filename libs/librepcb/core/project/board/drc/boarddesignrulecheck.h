@@ -108,8 +108,8 @@ private:  // Methods
       const THole& hole, BoardDesignRuleCheckSettings::AllowedSlots allowed);
   ClipperLib::Paths getBoardClearanceArea(
       const UnsignedLength& clearance) const;
-  QVector<Path> getBoardOutlines(const QSet<const Layer*>& layers) const
-      noexcept;
+  QVector<Path> getBoardOutlines(
+      const QSet<const Layer*>& layers) const noexcept;
   const ClipperLib::Paths& getCopperPaths(
       const Layer& layer, const QSet<const NetSignal*>& netsignals);
   ClipperLib::Paths getDeviceOutlinePaths(const BI_Device& device,
@@ -117,9 +117,9 @@ private:  // Methods
   QVector<Path> getDeviceLocation(const BI_Device& device) const;
   QVector<Path> getViaLocation(const BI_Via& via) const noexcept;
   template <typename THole>
-  QVector<Path> getHoleLocation(const THole& hole,
-                                const Transform& transform = Transform()) const
-      noexcept;
+  QVector<Path> getHoleLocation(
+      const THole& hole,
+      const Transform& transform = Transform()) const noexcept;
   void emitProgress(int percent) noexcept;
   void emitStatus(const QString& status) noexcept;
   void emitMessage(const std::shared_ptr<const RuleCheckMessage>& msg) noexcept;

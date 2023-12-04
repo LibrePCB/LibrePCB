@@ -151,8 +151,8 @@ void ComponentSymbolVariant::serialize(SExpression& root) const {
  *  Operator Overloadings
  ******************************************************************************/
 
-bool ComponentSymbolVariant::operator==(const ComponentSymbolVariant& rhs) const
-    noexcept {
+bool ComponentSymbolVariant::operator==(
+    const ComponentSymbolVariant& rhs) const noexcept {
   if (mUuid != rhs.mUuid) return false;
   if (mNorm != rhs.mNorm) return false;
   if (mNames != rhs.mNames) return false;

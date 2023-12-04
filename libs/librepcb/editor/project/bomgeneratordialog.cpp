@@ -235,8 +235,8 @@ void BomGeneratorDialog::updateTable() noexcept {
   }
 }
 
-std::shared_ptr<AssemblyVariant> BomGeneratorDialog::getAssemblyVariant() const
-    noexcept {
+std::shared_ptr<AssemblyVariant> BomGeneratorDialog::getAssemblyVariant()
+    const noexcept {
   auto uuid = getAssemblyVariantUuid(false);
   return uuid ? mProject.getCircuit().getAssemblyVariants().find(*uuid)
               : std::shared_ptr<AssemblyVariant>();

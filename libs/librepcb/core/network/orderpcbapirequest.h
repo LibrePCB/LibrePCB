@@ -113,8 +113,8 @@ public:
    * @param boardPath   Path to the pre-selected board (e.g.
    *                    "boards/default/board.lp"). Leave empty if unknown.
    */
-  void startUpload(const QByteArray& lppz, const QString& boardPath) const
-      noexcept;
+  void startUpload(const QByteArray& lppz,
+                   const QString& boardPath) const noexcept;
 
   // Operators
   OrderPcbApiRequest& operator=(const OrderPcbApiRequest& rhs) = delete;

@@ -175,15 +175,21 @@ void CmdDragSelectedFootprintItems::snapToGrid() noexcept {
   foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
     cmd->snapToGrid(grid, true);
   }
-  foreach (CmdCircleEdit* cmd, mCircleEditCmds) { cmd->snapToGrid(grid, true); }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
   foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
     cmd->snapToGrid(grid, true);
   }
   foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
     cmd->snapToGrid(grid, true);
   }
-  foreach (CmdZoneEdit* cmd, mZoneEditCmds) { cmd->snapToGrid(grid, true); }
-  foreach (CmdHoleEdit* cmd, mHoleEditCmds) { cmd->snapToGrid(grid, true); }
+  foreach (CmdZoneEdit* cmd, mZoneEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
+  foreach (CmdHoleEdit* cmd, mHoleEditCmds) {
+    cmd->snapToGrid(grid, true);
+  }
   mSnappedToGrid = true;
 }
 
@@ -263,11 +269,21 @@ void CmdDragSelectedFootprintItems::mirrorGeometry(
 }
 
 void CmdDragSelectedFootprintItems::mirrorLayer() noexcept {
-  foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) { cmd->mirrorLayer(true); }
-  foreach (CmdCircleEdit* cmd, mCircleEditCmds) { cmd->mirrorLayer(true); }
-  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) { cmd->mirrorLayer(true); }
-  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) { cmd->mirrorLayer(true); }
-  foreach (CmdZoneEdit* cmd, mZoneEditCmds) { cmd->mirrorLayers(true); }
+  foreach (CmdFootprintPadEdit* cmd, mPadEditCmds) {
+    cmd->mirrorLayer(true);
+  }
+  foreach (CmdCircleEdit* cmd, mCircleEditCmds) {
+    cmd->mirrorLayer(true);
+  }
+  foreach (CmdPolygonEdit* cmd, mPolygonEditCmds) {
+    cmd->mirrorLayer(true);
+  }
+  foreach (CmdStrokeTextEdit* cmd, mTextEditCmds) {
+    cmd->mirrorLayer(true);
+  }
+  foreach (CmdZoneEdit* cmd, mZoneEditCmds) {
+    cmd->mirrorLayers(true);
+  }
   mMirroredLayer = !mMirroredLayer;
 }
 

@@ -95,10 +95,10 @@ QString Library::getElementsDirectoryName() const noexcept {
 }
 
 // explicit template instantiations
-template QString Library::getElementsDirectoryName<ComponentCategory>() const
-    noexcept;
-template QString Library::getElementsDirectoryName<PackageCategory>() const
-    noexcept;
+template QString Library::getElementsDirectoryName<ComponentCategory>()
+    const noexcept;
+template QString Library::getElementsDirectoryName<PackageCategory>()
+    const noexcept;
 template QString Library::getElementsDirectoryName<Symbol>() const noexcept;
 template QString Library::getElementsDirectoryName<Package>() const noexcept;
 template QString Library::getElementsDirectoryName<Component>() const noexcept;
@@ -157,10 +157,10 @@ QStringList Library::searchForElements() const noexcept {
 }
 
 // explicit template instantiations
-template QStringList Library::searchForElements<ComponentCategory>() const
-    noexcept;
-template QStringList Library::searchForElements<PackageCategory>() const
-    noexcept;
+template QStringList Library::searchForElements<ComponentCategory>()
+    const noexcept;
+template QStringList Library::searchForElements<PackageCategory>()
+    const noexcept;
 template QStringList Library::searchForElements<Symbol>() const noexcept;
 template QStringList Library::searchForElements<Package>() const noexcept;
 template QStringList Library::searchForElements<Component>() const noexcept;

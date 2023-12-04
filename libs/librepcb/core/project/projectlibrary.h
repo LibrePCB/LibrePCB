@@ -85,8 +85,8 @@ public:
   }
 
   // Getters: Special Queries
-  QHash<Uuid, Device*> getDevicesOfComponent(const Uuid& compUuid) const
-      noexcept;
+  QHash<Uuid, Device*> getDevicesOfComponent(
+      const Uuid& compUuid) const noexcept;
 
   // Add/Remove Methods
   void addSymbol(Symbol& s);

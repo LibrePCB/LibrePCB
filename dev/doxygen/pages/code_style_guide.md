@@ -15,7 +15,7 @@ This page describes the code style guide for LibrePCB developers.
   `dev/CodingStyle_QtCreator.xml` which you can import.
 - In the repository root there is a `.clang-format` file with the exact rules.
   You can use [clang-format](https://clang.llvm.org/docs/ClangFormat.html)
-  (version 6.0.0) to automatically format files according these rules. Use the
+  (version 15.0.7) to automatically format files according these rules. Use the
   command `clang-format -style=file -i <FILE>` to format a single source file.
 - To automatically format all modified source, CMake, *.ui and *.qrc files,
   please run the script `./dev/format_code.sh`. It will format all files which

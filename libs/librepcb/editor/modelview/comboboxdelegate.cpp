@@ -37,10 +37,12 @@ namespace editor {
  ******************************************************************************/
 
 void ComboBoxDelegate::Items::sort() noexcept {
-  Toolbox::sortNumeric(*this,
-                       [](const QCollator& cmp, const Item& lhs,
-                          const Item& rhs) { return cmp(lhs.text, rhs.text); },
-                       Qt::CaseInsensitive, false);
+  Toolbox::sortNumeric(
+      *this,
+      [](const QCollator& cmp, const Item& lhs, const Item& rhs) {
+        return cmp(lhs.text, rhs.text);
+      },
+      Qt::CaseInsensitive, false);
 }
 
 /*******************************************************************************

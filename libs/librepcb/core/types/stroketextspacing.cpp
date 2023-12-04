@@ -72,8 +72,8 @@ StrokeTextSpacing::~StrokeTextSpacing() noexcept {
  *  Operator Overloadings
  ******************************************************************************/
 
-bool StrokeTextSpacing::operator==(const StrokeTextSpacing& rhs) const
-    noexcept {
+bool StrokeTextSpacing::operator==(
+    const StrokeTextSpacing& rhs) const noexcept {
   return (mRatio == rhs.mRatio);
 }
 

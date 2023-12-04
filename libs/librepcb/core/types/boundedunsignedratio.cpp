@@ -56,8 +56,8 @@ BoundedUnsignedRatio::~BoundedUnsignedRatio() noexcept {
  *  Getters
  ******************************************************************************/
 
-UnsignedLength BoundedUnsignedRatio::calcValue(const Length& input) const
-    noexcept {
+UnsignedLength BoundedUnsignedRatio::calcValue(
+    const Length& input) const noexcept {
   return UnsignedLength(
       qBound(*mMinValue, input.scaled(mRatio->toNormalized()), *mMaxValue));
 }
@@ -84,8 +84,8 @@ BoundedUnsignedRatio& BoundedUnsignedRatio::operator=(
   return *this;
 }
 
-bool BoundedUnsignedRatio::operator==(const BoundedUnsignedRatio& rhs) const
-    noexcept {
+bool BoundedUnsignedRatio::operator==(
+    const BoundedUnsignedRatio& rhs) const noexcept {
   return (mRatio == rhs.mRatio) && (mMinValue == rhs.mMinValue) &&
       (mMaxValue == rhs.mMaxValue);
 }

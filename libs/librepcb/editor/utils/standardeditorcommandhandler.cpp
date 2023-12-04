@@ -71,8 +71,8 @@ void StandardEditorCommandHandler::website() const noexcept {
   ds.openWebUrl(QUrl("https://librepcb.org"));
 }
 
-void StandardEditorCommandHandler::fileManager(const FilePath& fp) const
-    noexcept {
+void StandardEditorCommandHandler::fileManager(
+    const FilePath& fp) const noexcept {
   DesktopServices ds(mSettings, mParent);
   ds.openLocalPath(fp);
 }

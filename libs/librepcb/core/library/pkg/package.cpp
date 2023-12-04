@@ -115,8 +115,8 @@ Package::~Package() noexcept {
  *  Getters
  ******************************************************************************/
 
-Package::AssemblyType Package::getAssemblyType(bool resolveAuto) const
-    noexcept {
+Package::AssemblyType Package::getAssemblyType(
+    bool resolveAuto) const noexcept {
   if (resolveAuto && (mAssemblyType == AssemblyType::Auto)) {
     return guessAssemblyType();
   } else {

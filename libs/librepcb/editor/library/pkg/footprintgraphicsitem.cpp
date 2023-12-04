@@ -281,8 +281,12 @@ void FootprintGraphicsItem::setRotation(const Angle& rot) noexcept {
 }
 
 void FootprintGraphicsItem::updateAllTexts() noexcept {
-  foreach (const auto& ptr, mPadGraphicsItems) { ptr->updateText(); }
-  foreach (const auto& ptr, mStrokeTextGraphicsItems) { substituteText(*ptr); }
+  foreach (const auto& ptr, mPadGraphicsItems) {
+    ptr->updateText();
+  }
+  foreach (const auto& ptr, mStrokeTextGraphicsItems) {
+    substituteText(*ptr);
+  }
 }
 
 void FootprintGraphicsItem::setSelectionRect(const QRectF rect) noexcept {

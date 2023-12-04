@@ -67,8 +67,8 @@ FavoriteProjectsModel::~FavoriteProjectsModel() noexcept {
  *  General Methods
  ******************************************************************************/
 
-bool FavoriteProjectsModel::isFavoriteProject(const FilePath& filepath) const
-    noexcept {
+bool FavoriteProjectsModel::isFavoriteProject(
+    const FilePath& filepath) const noexcept {
   return mAllProjects.contains(filepath);
 }
 

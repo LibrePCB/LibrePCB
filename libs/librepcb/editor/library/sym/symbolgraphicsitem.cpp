@@ -192,8 +192,12 @@ void SymbolGraphicsItem::setRotation(const Angle& rot) noexcept {
 }
 
 void SymbolGraphicsItem::updateAllTexts() noexcept {
-  foreach (const auto& ptr, mPinGraphicsItems) { ptr->updateText(); }
-  foreach (const auto& ptr, mTextGraphicsItems) { substituteText(*ptr); }
+  foreach (const auto& ptr, mPinGraphicsItems) {
+    ptr->updateText();
+  }
+  foreach (const auto& ptr, mTextGraphicsItems) {
+    substituteText(*ptr);
+  }
 }
 
 void SymbolGraphicsItem::setSelectionRect(const QRectF rect) noexcept {

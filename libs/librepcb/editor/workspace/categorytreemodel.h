@@ -84,26 +84,26 @@ public:
   void setLocaleOrder(const QStringList& order) noexcept;
 
   // Inherited Methods
-  int columnCount(const QModelIndex& parent = QModelIndex()) const
-      noexcept override;
-  int rowCount(const QModelIndex& parent = QModelIndex()) const
-      noexcept override;
-  QModelIndex index(int row, int column,
-                    const QModelIndex& parent = QModelIndex()) const
-      noexcept override;
+  int columnCount(
+      const QModelIndex& parent = QModelIndex()) const noexcept override;
+  int rowCount(
+      const QModelIndex& parent = QModelIndex()) const noexcept override;
+  QModelIndex index(
+      int row, int column,
+      const QModelIndex& parent = QModelIndex()) const noexcept override;
   QModelIndex parent(const QModelIndex& index) const noexcept override;
   QVariant headerData(int section, Qt::Orientation orientation,
                       int role = Qt::DisplayRole) const noexcept override;
-  QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const
-      noexcept override;
+  QVariant data(const QModelIndex& index,
+                int role = Qt::DisplayRole) const noexcept override;
 
   // Operator Overloadings
   CategoryTreeModel& operator=(const CategoryTreeModel& rhs) = delete;
 
 private:  // Methods
   void update() noexcept;
-  QVector<std::shared_ptr<Item>> getChilds(std::shared_ptr<Item> parent) const
-      noexcept;
+  QVector<std::shared_ptr<Item>> getChilds(
+      std::shared_ptr<Item> parent) const noexcept;
   bool containsItems(const tl::optional<Uuid>& uuid) const;
   bool listAll() const noexcept;
   bool listPackageCategories() const noexcept;

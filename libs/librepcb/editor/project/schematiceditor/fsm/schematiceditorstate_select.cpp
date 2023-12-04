@@ -260,7 +260,9 @@ bool SchematicEditorState_Select::processAbortCommand() noexcept {
         mSubState = SubState::IDLE;
         return true;
       }
-      default: { break; }
+      default: {
+        break;
+      }
     }
   } catch (Exception& e) {
     QMessageBox::critical(parentWidget(), tr("Error"), e.getMsg());

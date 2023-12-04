@@ -76,7 +76,9 @@ void CategoryListEditorWidget::setRequiresMinimumOneEntry(bool v) noexcept {
 void CategoryListEditorWidget::setUuids(const QSet<Uuid>& uuids) noexcept {
   mUuids = uuids;
   mUi->listWidget->clear();
-  foreach (const Uuid& category, mUuids) { addItem(category); }
+  foreach (const Uuid& category, mUuids) {
+    addItem(category);
+  }
 }
 
 /*******************************************************************************

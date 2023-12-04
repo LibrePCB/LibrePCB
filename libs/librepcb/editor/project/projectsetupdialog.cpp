@@ -89,7 +89,9 @@ ProjectSetupDialog::ProjectSetupDialog(Project& project, UndoStack& undoStack,
     }
   });
   connect(mUi->btnLocaleRemove, &QToolButton::clicked, this, [this]() {
-    foreach (auto item, mUi->lstLocaleOrder->selectedItems()) { delete item; }
+    foreach (auto item, mUi->lstLocaleOrder->selectedItems()) {
+      delete item;
+    }
   });
   connect(mUi->btnLocaleUp, &QToolButton::clicked, this, [this]() {
     int row = mUi->lstLocaleOrder->currentRow();
@@ -116,7 +118,9 @@ ProjectSetupDialog::ProjectSetupDialog(Project& project, UndoStack& undoStack,
     }
   });
   connect(mUi->btnNormRemove, &QToolButton::clicked, this, [this]() {
-    foreach (auto item, mUi->lstNormOrder->selectedItems()) { delete item; }
+    foreach (auto item, mUi->lstNormOrder->selectedItems()) {
+      delete item;
+    }
   });
   connect(mUi->btnNormUp, &QToolButton::clicked, this, [this]() {
     int row = mUi->lstNormOrder->currentRow();

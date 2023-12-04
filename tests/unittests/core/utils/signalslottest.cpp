@@ -86,7 +86,9 @@ TEST(SignalSlotTest, testDuringCallbackDetachedSlotsAreNotCalled) {
     std::shared_ptr<Slot<Sender, int>> receiver =
         std::make_shared<Slot<Sender, int>>([&](const Sender&, int) {
           ++callbackCounter;
-          foreach (const auto& r, receivers) { sender.signal.detach(*r); }
+          foreach (const auto& r, receivers) {
+            sender.signal.detach(*r);
+          }
         });
     receivers.append(receiver);
     sender.signal.attach(*receiver);

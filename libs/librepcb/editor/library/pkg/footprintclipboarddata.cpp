@@ -149,7 +149,9 @@ QPixmap FootprintClipboardData::generatePixmap(
   for (Hole& hole : mHoles) {
     items.append(std::make_shared<HoleGraphicsItem>(hole, lp, false));
   }
-  foreach (const auto& item, items) { scene.addItem(*item); }
+  foreach (const auto& item, items) {
+    scene.addItem(*item);
+  }
   return scene.toPixmap(300, Qt::black);
 }
 

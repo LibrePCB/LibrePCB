@@ -95,8 +95,8 @@ public:
   ~SchematicPainter() noexcept;
 
   // General Methods
-  void paint(QPainter& painter, const GraphicsExportSettings& settings) const
-      noexcept override;
+  void paint(QPainter& painter,
+             const GraphicsExportSettings& settings) const noexcept override;
 
   // Operator Overloadings
   SchematicPainter& operator=(const SchematicPainter& rhs) = delete;

@@ -71,9 +71,8 @@ QString AttrTypeCapacitance::valueFromTr(const QString& value) const noexcept {
     return QString();
 }
 
-QString AttrTypeCapacitance::printableValueTr(const QString& value,
-                                              const AttributeUnit* unit) const
-    noexcept {
+QString AttrTypeCapacitance::printableValueTr(
+    const QString& value, const AttributeUnit* unit) const noexcept {
   bool ok = false;
   float v = value.toFloat(&ok);
   if (ok && unit)

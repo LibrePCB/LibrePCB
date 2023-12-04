@@ -143,8 +143,8 @@ void OrderPcbApiRequest::infoRequestResponseReceived(
   emit infoRequestSucceeded(mInfoUrl, mMaxFileSize);
 }
 
-void OrderPcbApiRequest::uploadResponseReceived(const QByteArray& data) const
-    noexcept {
+void OrderPcbApiRequest::uploadResponseReceived(
+    const QByteArray& data) const noexcept {
   qDebug().noquote() << "Received JSON:" << data.left(500).replace("\n", " ");
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {

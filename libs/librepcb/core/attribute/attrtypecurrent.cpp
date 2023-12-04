@@ -76,9 +76,8 @@ QString AttrTypeCurrent::valueFromTr(const QString& value) const noexcept {
     return QString();
 }
 
-QString AttrTypeCurrent::printableValueTr(const QString& value,
-                                          const AttributeUnit* unit) const
-    noexcept {
+QString AttrTypeCurrent::printableValueTr(
+    const QString& value, const AttributeUnit* unit) const noexcept {
   bool ok = false;
   float v = value.toFloat(&ok);
   if (ok && unit)

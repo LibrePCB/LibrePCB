@@ -57,8 +57,8 @@ public:
   ~SymbolPainter() noexcept;
 
   // General Methods
-  void paint(QPainter& painter, const GraphicsExportSettings& settings) const
-      noexcept override;
+  void paint(QPainter& painter,
+             const GraphicsExportSettings& settings) const noexcept override;
 
   // Operator Overloadings
   SymbolPainter& operator=(const SymbolPainter& rhs) = delete;

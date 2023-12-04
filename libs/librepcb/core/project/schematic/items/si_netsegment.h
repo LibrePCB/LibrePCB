@@ -121,10 +121,9 @@ signals:
 private:
   bool checkAttributesValidity() const noexcept;
   bool areAllNetPointsConnectedTogether() const noexcept;
-  void findAllConnectedNetPoints(const SI_NetLineAnchor& p,
-                                 QSet<const SI_SymbolPin*>& pins,
-                                 QSet<const SI_NetPoint*>& points) const
-      noexcept;
+  void findAllConnectedNetPoints(
+      const SI_NetLineAnchor& p, QSet<const SI_SymbolPin*>& pins,
+      QSet<const SI_NetPoint*>& points) const noexcept;
 
   // Attributes
   Uuid mUuid;

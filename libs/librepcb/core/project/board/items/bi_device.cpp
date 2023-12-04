@@ -215,8 +215,8 @@ QVector<std::shared_ptr<const Part>> BI_Device::getParts(
   return parts;
 }
 
-bool BI_Device::isInAssemblyVariant(const Uuid& assemblyVariant) const
-    noexcept {
+bool BI_Device::isInAssemblyVariant(
+    const Uuid& assemblyVariant) const noexcept {
   for (const ComponentAssemblyOption& opt :
        mCompInstance.getAssemblyOptions()) {
     if ((opt.getDevice() == mLibDevice->getUuid()) &&

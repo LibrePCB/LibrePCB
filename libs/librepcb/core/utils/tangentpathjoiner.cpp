@@ -106,7 +106,9 @@ QVector<Path> TangentPathJoiner::join(QVector<Path> paths,
     }
   }
   std::sort(obsoletePaths.begin(), obsoletePaths.end(), std::greater<int>());
-  foreach (int i, obsoletePaths) { paths.removeAt(i); }
+  foreach (int i, obsoletePaths) {
+    paths.removeAt(i);
+  }
 
   // Add closed paths to the result and remove them from the input.
   for (int i = paths.count() - 1; i >= 0; --i) {

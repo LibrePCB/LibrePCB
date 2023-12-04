@@ -221,8 +221,8 @@ void PrimitivePathGraphicsItem::updateVisibility() noexcept {
   setVisible((mPen.style() != Qt::NoPen) || (mBrush.style() != Qt::NoBrush));
 }
 
-QColor PrimitivePathGraphicsItem::convertColor(const QColor& color) const
-    noexcept {
+QColor PrimitivePathGraphicsItem::convertColor(
+    const QColor& color) const noexcept {
   return mLighterColors ? color.lighter(200) : color;
 }
 
