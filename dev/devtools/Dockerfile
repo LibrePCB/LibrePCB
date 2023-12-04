@@ -8,6 +8,7 @@ RUN apt-get -q update \
   git \
   python3 \
   python3-pip \
+  qtdeclarative5-dev-tools \
   libxml-filter-sort-perl \
  && apt-get clean
 
