@@ -44,7 +44,7 @@ done
 REPO_ROOT=$(git rev-parse --show-toplevel)
 
 if [ "$DOCKER" == "--docker" ]; then
-  DOCKER_IMAGE=librepcb/devtools:2.0.0
+  DOCKER_IMAGE=librepcb/devtools:2.1.0
 
   if [ "$($DOCKER_CMD images -q $DOCKER_IMAGE | wc -l)" == "0" ]; then
     echo "Building devtools container..."
