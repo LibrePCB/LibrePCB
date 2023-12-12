@@ -308,7 +308,7 @@ std::shared_ptr<GerberExcellonOutputJob>
   obj->setSuffixDrillsNpth("_NPTH.drl");
   obj->setSuffixDrillsPth("_PTH.drl");
   obj->setSuffixDrillsBlindBuried("_L{{START_NUMBER}}-L{{END_NUMBER}}.drl");
-  obj->setSuffixOutlines(".gml");
+  obj->setSuffixOutlines(".gm1");
   obj->setSuffixCopperTop(".gtl");
   obj->setSuffixCopperInner(".g{{CU_LAYER}}");
   obj->setSuffixCopperBot(".gbl");
