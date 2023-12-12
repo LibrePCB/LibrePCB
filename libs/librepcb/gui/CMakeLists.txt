@@ -18,6 +18,8 @@ add_library(
   objectlistmodel.h
   openedproject.cpp
   openedproject.h
+  opengllayer.cpp
+  opengllayer.h
   openglrenderer.cpp
   openglrenderer.h
   openglview.cpp
