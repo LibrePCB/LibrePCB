@@ -323,6 +323,15 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
       mComponentSignalMap[key][gate.getName()][pinIt.key()] = signalUuid;
     }
   }
+  // If the device set has no package at all, we consider it as a schematic-only
+  // component to avoid the "unplaced devices" warning in the board editor.
+  bool hasPackage = false;
+  foreach (const auto& device, eagleDeviceSet.getDevices()) {
+    if (!device.getPackage().isEmpty()) {
+      hasPackage = true;
+    }
+  }
+  component->setIsSchematicOnly(!hasPackage);
   mComponentMap[key] = component->getUuid();
   return component;
 }
