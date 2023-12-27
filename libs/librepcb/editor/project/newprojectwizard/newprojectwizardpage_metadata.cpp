@@ -76,6 +76,7 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
   // insert values
   mUi->edtAuthor->setText(ws.getSettings().userName.get());
   mUi->cbxLicense->addItem(tr("None"), QString());
+  // add SPDX license identifiers
   mUi->cbxLicense->addItem(tr("CC0-1.0 (no restrictions)"),
                            QString("licenses/cc0-1.0.txt"));
   mUi->cbxLicense->addItem(tr("CC-BY-4.0 (requires attribution)"),
