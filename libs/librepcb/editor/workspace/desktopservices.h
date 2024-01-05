@@ -43,7 +43,8 @@ namespace editor {
  * @brief Provides methods to access common desktop services
  *
  * Similar to `QDesktopServices`, but respecting the workspace settings (e.g.
- * custom PDF viewer).
+ * custom PDF viewer). In addition, the cursor is automatically changed to
+ * a waiting spinner while opening an external application.
  *
  * @see https://doc.qt.io/qt-5/qdesktopservices.html
  */
@@ -71,6 +72,7 @@ private:  // Methods
   bool openLocalPathWithCommand(const FilePath& filePath,
                                 const QStringList& commands) const noexcept;
   bool openUrlFallback(const QUrl& url) const noexcept;
+  static void showWaitCursor() noexcept;
 
 private:  // Data
   const WorkspaceSettings& mSettings;
