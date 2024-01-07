@@ -127,9 +127,21 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
           &BomGeneratorDialog::btnGenerateClicked);
   connect(mUi->buttonBox, &QDialogButtonBox::rejected, this,
           &BomGeneratorDialog::reject);
+
+  // Load the window geometry and settings.
+  // Note: Do not use restoreGeometry(), only store the window size (but not
+  // the position) since the dialog shall be centered within the parent window.
+  QSettings cs;
+  const QSize size = cs.value("bom_generator_dialog/window_size").toSize();
+  if (size.isValid()) {
+    resize(size);
+  }
 }
 
 BomGeneratorDialog::~BomGeneratorDialog() noexcept {
+  // Save the window geometry and settings.
+  QSettings cs;
+  cs.setValue("bom_generator_dialog/window_size", size());
 }
 
 /*******************************************************************************
