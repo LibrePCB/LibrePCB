@@ -59,6 +59,7 @@ bool DesktopServices::openUrl(const QUrl& url) const noexcept {
 }
 
 bool DesktopServices::openWebUrl(const QUrl& url) const noexcept {
+  showWaitCursor();
   foreach (QString cmd, mSettings.externalWebBrowserCommands.get()) {
     cmd.replace("{{URL}}", url.toString());
     if (QProcess::startDetached(cmd)) {
@@ -72,6 +73,7 @@ bool DesktopServices::openWebUrl(const QUrl& url) const noexcept {
 }
 
 bool DesktopServices::openLocalPath(const FilePath& filePath) const noexcept {
+  showWaitCursor();
   const QString ext = filePath.getSuffix().toLower();
   if (filePath.isExistingDir()) {
     return openDirectory(filePath);
@@ -135,6 +137,15 @@ bool DesktopServices::openUrlFallback(const QUrl& url) const noexcept {
                                  .arg(url.toString());
   }
   return success;
+}
+
+void DesktopServices::showWaitCursor() noexcept {
+  // While waiting for an external application to appear, change the cursor
+  // to a waiting spinner for a moment to give immediate feedback about the
+  // ongoing operation. Since we don't know how long the operation takes,
+  // we just use a fixed delay before restoring the normal cursor.
+  qApp->setOverrideCursor(Qt::WaitCursor);
+  QTimer::singleShot(2000, qApp, []() { qApp->restoreOverrideCursor(); });
 }
 
 /*******************************************************************************
