@@ -64,6 +64,11 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
     mUi(new Ui::BomGeneratorDialog) {
   mUi->setupUi(this);
   mUi->tableWidget->setWordWrap(false);
+  // Note: Don't stretch columns since it leads to cropped text in some
+  // columns and unused space in other columns. Better resize all columns
+  // to their content and show a horizontal scrollbar when needed.
+  mUi->tableWidget->horizontalHeader()->setSectionResizeMode(
+      QHeaderView::Interactive);
   mUi->tableWidget->verticalHeader()->setMinimumSectionSize(10);
   mUi->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
   mUi->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -228,9 +233,6 @@ void BomGeneratorDialog::updateTable() noexcept {
     mUi->tableWidget->setColumnCount(csv->getHeader().count());
     mUi->tableWidget->setHorizontalHeaderLabels(csv->getHeader());
     for (int column = 0; column < csv->getHeader().count(); ++column) {
-      mUi->tableWidget->horizontalHeader()->setSectionResizeMode(
-          column,
-          column <= 1 ? QHeaderView::ResizeToContents : QHeaderView::Stretch);
       for (int row = 0; row < csv->getValues().count(); ++row) {
         QString text = csv->getValues()[row][column];
         text.replace("\n", " ");
@@ -241,6 +243,7 @@ void BomGeneratorDialog::updateTable() noexcept {
         mUi->tableWidget->setItem(row, column, item);
       }
     }
+    mUi->tableWidget->resizeColumnsToContents();
     mUi->tableWidget->resizeRowsToContents();
   } catch (Exception& e) {
     qCritical() << "Failed to update BOM table widget:" << e.getMsg();
