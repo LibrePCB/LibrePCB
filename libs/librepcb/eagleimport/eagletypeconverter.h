@@ -189,6 +189,15 @@ public:
   static CircuitIdentifier convertPinOrPadName(const QString& n);
 
   /**
+   * @brief Convert the inversion syntax of a text
+   *
+   * @param s   EAGLE text possibly containing inversion signs (e.g. "!RST!/EN")
+   *
+   * @return Same text but with LibrePCB inversion syntax (e.g. "!RST/EN")
+   */
+  static QString convertInversionSyntax(const QString& s) noexcept;
+
+  /**
    * @brief Try to convert a layer ID to a schematic layer
    *
    * @param id  EAGLE layer ID

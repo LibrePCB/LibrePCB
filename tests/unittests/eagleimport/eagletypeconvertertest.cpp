@@ -124,6 +124,18 @@ TEST_F(EagleTypeConverterTest, testConvertPinOrPadName) {
   EXPECT_EQ("42", C::convertPinOrPadName("P$42")->toStdString());
   EXPECT_EQ("3", C::convertPinOrPadName("3")->toStdString());
   EXPECT_EQ("Foo_Bar", C::convertPinOrPadName(" Foo Bar ")->toStdString());
+  EXPECT_EQ("!FOO!/BAR", C::convertPinOrPadName("!FOO/BAR")->toStdString());
+}
+
+TEST_F(EagleTypeConverterTest, testConvertInversionSyntax) {
+  EXPECT_EQ("FOO", C::convertInversionSyntax("FOO").toStdString());
+  EXPECT_EQ("!FOO", C::convertInversionSyntax("!FOO").toStdString());
+  EXPECT_EQ("!FOO", C::convertInversionSyntax("!FOO!").toStdString());
+  EXPECT_EQ("!FOO/BAR", C::convertInversionSyntax("!FOO!/BAR").toStdString());
+  EXPECT_EQ("!FOO!/BAR", C::convertInversionSyntax("!FOO/BAR").toStdString());
+  EXPECT_EQ("FOO/!BAR", C::convertInversionSyntax("FOO/!BAR").toStdString());
+  EXPECT_EQ("FOO/!BAR", C::convertInversionSyntax("FOO/!BAR!").toStdString());
+  EXPECT_EQ("A/!B/C", C::convertInversionSyntax("A/!B!/C").toStdString());
 }
 
 TEST_F(EagleTypeConverterTest, testTryConvertSchematicLayer) {

@@ -97,7 +97,7 @@ ComponentSymbolVariantItemSuffix EagleTypeConverter::convertGateName(
 }
 
 CircuitIdentifier EagleTypeConverter::convertPinOrPadName(const QString& n) {
-  QString name = cleanCircuitIdentifier(n);
+  QString name = convertInversionSyntax(cleanCircuitIdentifier(n));
   if ((name.length() > 2) && (name.startsWith("P$"))) {
     name.remove(0, 2);
   }
@@ -105,6 +105,27 @@ CircuitIdentifier EagleTypeConverter::convertPinOrPadName(const QString& n) {
     name = "Unnamed";
   }
   return CircuitIdentifier(name);
+}
+
+QString EagleTypeConverter::convertInversionSyntax(const QString& s) noexcept {
+  QString out;
+  bool inputOverlined = false;
+  bool outputOverlined = false;
+  for (int i = 0; i < s.count(); ++i) {
+    if (s.at(i) == "!") {
+      inputOverlined = !inputOverlined;
+      continue;
+    }
+    if (s.at(i) == "/") {
+      outputOverlined = false;
+    }
+    if (inputOverlined != outputOverlined) {
+      out += "!";
+      outputOverlined = inputOverlined;
+    }
+    out += s.at(i);
+  }
+  return out;
 }
 
 const Layer* EagleTypeConverter::tryConvertSchematicLayer(int id) noexcept {
