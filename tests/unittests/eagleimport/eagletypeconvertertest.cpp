@@ -74,6 +74,37 @@ TEST_F(EagleTypeConverterTest, testConvertElementDescription) {
             C::convertElementDescription("<b>X</b>\n<br/>Y").toStdString());
 }
 
+TEST_F(EagleTypeConverterTest, testConvertComponentName) {
+  EXPECT_EQ("Valid Name", C::convertComponentName("Valid Name")->toStdString());
+  EXPECT_EQ("X", C::convertComponentName(" \nX ")->toStdString());
+  EXPECT_EQ("Foo - Bar", C::convertComponentName("Foo - Bar-")->toStdString());
+  EXPECT_EQ("Foo _ Bar", C::convertComponentName("Foo _ Bar_")->toStdString());
+  EXPECT_EQ("-", C::convertComponentName("-")->toStdString());
+  EXPECT_EQ("Unnamed", C::convertComponentName("\n")->toStdString());
+}
+
+TEST_F(EagleTypeConverterTest, testConvertDeviceName) {
+  EXPECT_EQ("Valid Name",
+            C::convertDeviceName("Valid Name", "")->toStdString());
+  EXPECT_EQ("Valid Name-Foo",
+            C::convertDeviceName("Valid Name", "Foo")->toStdString());
+  EXPECT_EQ("Valid Name-Foo",
+            C::convertDeviceName("Valid Name-", "Foo")->toStdString());
+  EXPECT_EQ("Valid Name_Foo",
+            C::convertDeviceName("Valid Name_", "Foo")->toStdString());
+  EXPECT_EQ("Valid Name-Foo",
+            C::convertDeviceName("Valid Name-", "Foo")->toStdString());
+  EXPECT_EQ("Valid Name_Foo",
+            C::convertDeviceName("Valid Name_", "Foo")->toStdString());
+  EXPECT_EQ("Valid Name-Foo",
+            C::convertDeviceName("Valid Name", "-Foo")->toStdString());
+  EXPECT_EQ("Valid Name_Foo",
+            C::convertDeviceName("Valid Name", "_Foo")->toStdString());
+  EXPECT_EQ("X", C::convertDeviceName(" \nX ", "")->toStdString());
+  EXPECT_EQ("Unnamed", C::convertDeviceName("\n", "")->toStdString());
+  EXPECT_EQ("Unnamed", C::convertDeviceName("", "")->toStdString());
+}
+
 TEST_F(EagleTypeConverterTest, testConvertGateName) {
   EXPECT_EQ("", C::convertGateName("")->toStdString());
   EXPECT_EQ("", C::convertGateName("G$42")->toStdString());
@@ -152,6 +183,56 @@ TEST_F(EagleTypeConverterTest, testConvertWire) {
                 Vertex(Point(3000000, 4000000), Angle(0)),
             }),
             out->getPath());
+}
+
+TEST_F(EagleTypeConverterTest, testConvertAndJoinWires) {
+  QStringList errors;
+  QList<parseagle::Wire> wires{
+      // clang-format off
+      parseagle::Wire(dom("<wire x1=\"1\" y1=\"2\" x2=\"3\" y2=\"4\" width=\"0.254\" layer=\"1\"/>")),
+      parseagle::Wire(dom("<wire x1=\"3\" y1=\"4\" x2=\"5\" y2=\"6\" width=\"0.254\" layer=\"1\"/>")),
+      parseagle::Wire(dom("<wire x1=\"5\" y1=\"6\" x2=\"7\" y2=\"8\" width=\"0.567\" layer=\"1\"/>")),
+      parseagle::Wire(dom("<wire x1=\"7\" y1=\"8\" x2=\"9\" y2=\"9\" width=\"0.567\" layer=\"2\"/>")),
+      parseagle::Wire(dom("<wire x1=\"7\" y1=\"8\" x2=\"9\" y2=\"9\" width=\"-1\" layer=\"2\"/>")),
+      // clang-format on
+  };
+  auto out = C::convertAndJoinWires(wires, &errors);
+  ASSERT_EQ(3, out.count());
+  EXPECT_EQ(1, errors.count());
+
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            out.at(0)->getLayer().getId().toStdString());
+  EXPECT_EQ(UnsignedLength(254000), out.at(0)->getLineWidth());
+  EXPECT_EQ(false, out.at(0)->isFilled());
+  EXPECT_EQ(false, out.at(0)->isGrabArea());
+  EXPECT_EQ(Path({
+                Vertex(Point(1000000, 2000000), Angle(0)),
+                Vertex(Point(3000000, 4000000), Angle(0)),
+                Vertex(Point(5000000, 6000000), Angle(0)),
+            }),
+            out.at(0)->getPath());
+
+  EXPECT_EQ(Layer::topCopper().getId().toStdString(),
+            out.at(1)->getLayer().getId().toStdString());
+  EXPECT_EQ(UnsignedLength(567000), out.at(1)->getLineWidth());
+  EXPECT_EQ(false, out.at(1)->isFilled());
+  EXPECT_EQ(false, out.at(1)->isGrabArea());
+  EXPECT_EQ(Path({
+                Vertex(Point(5000000, 6000000), Angle(0)),
+                Vertex(Point(7000000, 8000000), Angle(0)),
+            }),
+            out.at(1)->getPath());
+
+  EXPECT_EQ(Layer::innerCopper(1)->getId().toStdString(),
+            out.at(2)->getLayer().getId().toStdString());
+  EXPECT_EQ(UnsignedLength(567000), out.at(2)->getLineWidth());
+  EXPECT_EQ(false, out.at(2)->isFilled());
+  EXPECT_EQ(false, out.at(2)->isGrabArea());
+  EXPECT_EQ(Path({
+                Vertex(Point(7000000, 8000000), Angle(0)),
+                Vertex(Point(9000000, 9000000), Angle(0)),
+            }),
+            out.at(2)->getPath());
 }
 
 TEST_F(EagleTypeConverterTest, testConvertRectangle) {

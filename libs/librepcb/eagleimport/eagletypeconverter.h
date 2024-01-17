@@ -89,7 +89,7 @@ public:
   /**
    * @brief Convert an element (e.g. symbol) name
    *
-   * Removes all invalid characters from an EAGLe element name and convert it
+   * Removes all invalid characters from an EAGLE element name and convert it
    * to the corresponding LibrePCB type. If completely invalid, "Unnamed" will
    * be returned (no error).
    *
@@ -109,6 +109,32 @@ public:
    * @return LibrePCB element description (no HTML)
    */
   static QString convertElementDescription(const QString& d);
+
+  /**
+   * @brief Convert a component name
+   *
+   * Like #convertElementName(), but also removes trailing separation
+   * characters.
+   *
+   * @param n   EAGLE component name (e.g. "R-0805-")
+   *
+   * @return LibrePCB component name (e.g. "R-0805")
+   */
+  static ElementName convertComponentName(QString n);
+
+  /**
+   * @brief Convert a device name
+   *
+   * Like #convertElementName(), but concatenating the EAGLE device set name
+   * with the EAGLE device name.
+   *
+   * @param deviceSetName   EAGLE device set name
+   * @param deviceName      EAGLE device name
+   *
+   * @return LibrePCB device name
+   */
+  static ElementName convertDeviceName(const QString& deviceSetName,
+                                       const QString& deviceName);
 
   /**
    * @brief Convert a component gate name
@@ -199,6 +225,17 @@ public:
    * @return LibrePCB polygon containing 1 line segment
    */
   static std::shared_ptr<Polygon> convertWire(const parseagle::Wire& w);
+
+  /**
+   * @brief Convert and try to join tangent wires
+   *
+   * @param wires   EAGLE wires (line segments)
+   * @param errors  Error messages output
+   *
+   * @return LibrePCB polygons containing 1 or more line segments
+   */
+  static QVector<std::shared_ptr<Polygon> > convertAndJoinWires(
+      const QList<parseagle::Wire>& wires, QStringList* errors = nullptr);
 
   /**
    * @brief Convert a rectangle

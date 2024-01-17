@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "eagletypeconverter.h"
 
+#include <librepcb/core/utils/tangentpathjoiner.h>
 #include <parseagle/common/circle.h>
 #include <parseagle/common/point.h>
 #include <parseagle/common/polygon.h>
@@ -61,6 +62,27 @@ QString EagleTypeConverter::convertElementDescription(const QString& d) {
       .trimmed()
       .split("\n", QString::SkipEmptyParts)
       .join("\n");
+}
+
+ElementName EagleTypeConverter::convertComponentName(QString n) {
+  if ((n.length() > 1) && (n.endsWith("-") || n.endsWith("_"))) {
+    n.chop(1);
+  }
+  return convertElementName(n);  // Can theoretically throw, but should not.
+}
+
+ElementName EagleTypeConverter::convertDeviceName(const QString& deviceSetName,
+                                                  const QString& deviceName) {
+  const bool addSeparator = (!deviceSetName.endsWith("-")) &&
+      (!deviceSetName.endsWith("_")) && (!deviceName.startsWith("-")) &&
+      (!deviceName.startsWith("_"));
+
+  QString name = deviceSetName;
+  if (addSeparator && (!deviceName.isEmpty())) {
+    name += "-";
+  }
+  name += deviceName;
+  return convertElementName(name);  // Can theoretically throw, but should not.
 }
 
 ComponentSymbolVariantItemSuffix EagleTypeConverter::convertGateName(
@@ -271,6 +293,39 @@ std::shared_ptr<Polygon> EagleTypeConverter::convertWire(
       Path::line(convertPoint(w.getP1()), convertPoint(w.getP2()),
                  convertAngle(w.getCurve()))  // Path
   );
+}
+
+QVector<std::shared_ptr<Polygon> > EagleTypeConverter::convertAndJoinWires(
+    const QList<parseagle::Wire>& wires, QStringList* errors) {
+  QMap<std::pair<const Layer*, UnsignedLength>,
+       QVector<std::shared_ptr<Polygon> > >
+      joinablePolygons;
+  foreach (const parseagle::Wire& wire, wires) {
+    try {
+      auto polygon = convertWire(wire);
+      auto key = std::make_pair(&polygon->getLayer(), polygon->getLineWidth());
+      joinablePolygons[key].append(polygon);
+    } catch (const Exception& e) {
+      if (errors) {
+        errors->append(e.getMsg());
+      }
+    }
+  }
+
+  QVector<std::shared_ptr<Polygon> > polygons;
+  for (auto it = joinablePolygons.begin(); it != joinablePolygons.end(); it++) {
+    QVector<Path> paths;
+    foreach (const auto& polygon, it.value()) {
+      paths.append(polygon->getPath());
+    }
+    foreach (const Path& path, TangentPathJoiner::join(paths, 5000)) {
+      std::shared_ptr<Polygon> polygon =
+          std::make_shared<Polygon>(*it.value().first());
+      polygon->setPath(path);
+      polygons.append(polygon);
+    }
+  }
+  return polygons;
 }
 
 std::shared_ptr<Polygon> EagleTypeConverter::convertRectangle(

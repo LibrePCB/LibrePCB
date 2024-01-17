@@ -22,18 +22,15 @@
  ******************************************************************************/
 #include "eaglelibraryimport.h"
 
-#include "eagletypeconverter.cpp"
+#include "eaglelibraryconverter.h"
+#include "eagletypeconverter.h"
 
-#include <librepcb/core/exceptions.h>
 #include <librepcb/core/fileio/transactionaldirectory.h>
 #include <librepcb/core/fileio/transactionalfilesystem.h>
 #include <librepcb/core/library/cmp/component.h>
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
-#include <librepcb/core/types/layer.h>
-#include <librepcb/core/utils/tangentpathjoiner.h>
-#include <librepcb/core/utils/toolbox.h>
 #include <parseagle/library.h>
 
 #include <QtCore>
@@ -52,10 +49,7 @@ EagleLibraryImport::EagleLibraryImport(const FilePath& dstLibFp,
                                        QObject* parent) noexcept
   : QThread(parent),
     mDestinationLibraryFp(dstLibFp),
-    mNamePrefix(),
-    mVersion(Version::fromString("0.1")),
-    mAuthor("EAGLE Import"),
-    mKeywords("eagle,import"),
+    mSettings(new EagleLibraryConverterSettings()),
     mAbort(false) {
 }
 
@@ -98,6 +92,28 @@ int EagleLibraryImport::getCheckedDevicesCount() const noexcept {
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
+
+void EagleLibraryImport::setNamePrefix(const QString& prefix) noexcept {
+  mSettings->namePrefix = prefix;
+}
+
+void EagleLibraryImport::setSymbolCategories(const QSet<Uuid>& uuids) noexcept {
+  mSettings->symbolCategories = uuids;
+}
+
+void EagleLibraryImport::setPackageCategories(
+    const QSet<Uuid>& uuids) noexcept {
+  mSettings->packageCategories = uuids;
+}
+
+void EagleLibraryImport::setComponentCategories(
+    const QSet<Uuid>& uuids) noexcept {
+  mSettings->componentCategories = uuids;
+}
+
+void EagleLibraryImport::setDeviceCategories(const QSet<Uuid>& uuids) noexcept {
+  mSettings->deviceCategories = uuids;
+}
 
 void EagleLibraryImport::setSymbolChecked(const QString& name,
                                           bool checked) noexcept {
@@ -162,11 +178,8 @@ QStringList EagleLibraryImport::open(const FilePath& lbr) {
       foreach (const parseagle::Gate& gate, deviceSet.getGates()) {
         symbolDisplayNames.insert(gate.getSymbol());
       }
-      QString cmpName = deviceSet.getName();
-      if ((cmpName.length() > 1) &&
-          (cmpName.endsWith("-") || cmpName.endsWith("_"))) {
-        cmpName.chop(1);
-      }
+      const QString cmpName =
+          *EagleTypeConverter::convertComponentName(deviceSet.getName());
       mComponents.append(Component{
           cmpName,
           deviceSet.getDescription(),
@@ -175,15 +188,9 @@ QStringList EagleLibraryImport::open(const FilePath& lbr) {
           std::make_shared<parseagle::DeviceSet>(deviceSet),
       });
       foreach (const parseagle::Device& device, deviceSet.getDevices()) {
-        QString name = deviceSet.getName();
-        QString suffix = device.getName();
-        bool addSeparator = (!name.endsWith("-")) && (!name.endsWith("_")) &&
-            (!suffix.startsWith("-")) && (!suffix.startsWith("_"));
-        if (addSeparator && (!suffix.isEmpty())) {
-          name += "-";
-        }
         mDevices.append(Device{
-            name + suffix,
+            *EagleTypeConverter::convertDeviceName(deviceSet.getName(),
+                                                   device.getName()),
             deviceSet.getDescription(),
             Qt::Unchecked,
             cmpName,
@@ -306,61 +313,24 @@ bool EagleLibraryImport::setElementDependent(T& element,
   return false;
 }
 
-QVector<std::shared_ptr<Polygon> > EagleLibraryImport::convertWires(
-    const QString& element, const QList<parseagle::Wire>& wires) {
-  QMap<std::pair<const Layer*, UnsignedLength>,
-       QVector<std::shared_ptr<Polygon> > >
-      joinablePolygons;
-  foreach (const parseagle::Wire& wire, wires) {
-    tryOrRaiseError(element, [&joinablePolygons, &wire]() {
-      auto polygon = EagleTypeConverter::convertWire(wire);
-      auto key = std::make_pair(&polygon->getLayer(), polygon->getLineWidth());
-      joinablePolygons[key].append(polygon);
-    });
-  }
-
-  QVector<std::shared_ptr<Polygon> > polygons;
-  for (auto it = joinablePolygons.begin(); it != joinablePolygons.end(); it++) {
-    QVector<Path> paths;
-    foreach (const auto& polygon, it.value()) {
-      paths.append(polygon->getPath());
-    }
-    foreach (const Path& path, TangentPathJoiner::join(paths, 5000)) {
-      std::shared_ptr<Polygon> polygon =
-          std::make_shared<Polygon>(*it.value().first());
-      polygon->setPath(path);
-      polygons.append(polygon);
-    }
-  }
-  return polygons;
-}
-
-void EagleLibraryImport::tryOrRaiseError(const QString& element,
-                                         std::function<void()> func) {
-  try {
-    func();
-  } catch (const Exception& e) {
-    raiseImportError(element, e.getMsg());
-  }
-}
-
-void EagleLibraryImport::raiseImportError(const QString& element,
-                                          const QString& error) noexcept {
-  QString msg = QString("[%1] ").arg(element) % error;
-  mImportErrors.append(msg);
-  emit errorOccurred(msg);
-}
-
 void EagleLibraryImport::run() noexcept {
   // Note: This method is called from a different thread, thus be careful with
   //       calling other methods to only call thread-safe methods!
 
-  mImportErrors.clear();
+  QStringList errors;
+  auto raiseImportError = [this, &errors](const QString& element,
+                                          const QString& error) {
+    const QString msg = QString("[%1] ").arg(element) % error;
+    errors.append(msg);
+    emit errorOccurred(msg);
+  };
+
+  EagleLibraryConverter converter(*mSettings, this);
+  connect(&converter, &EagleLibraryConverter::errorOccurred, raiseImportError);
+
   int totalCount = getCheckedElementsCount();
   int count = 0;
 
-  QHash<QString, tl::optional<Uuid> > symbolMap;
-  QHash<QString, QHash<QString, tl::optional<Uuid> > > symbolPinMap;
   foreach (const Symbol& sym, mSymbols) {
     if (mAbort) {
       break;
@@ -370,57 +340,14 @@ void EagleLibraryImport::run() noexcept {
     }
     try {
       emit progressStatus(sym.displayName);
-      auto symbol = std::make_shared<librepcb::Symbol>(
-          Uuid::createRandom(), mVersion, mAuthor,
-          EagleTypeConverter::convertElementName(mNamePrefix + sym.displayName),
-          EagleTypeConverter::convertElementDescription(sym.description),
-          mKeywords);
-      symbol->setCategories(mSymbolCategories);
-      foreach (const auto& obj,
-               convertWires(sym.displayName, sym.symbol->getWires())) {
-        if (obj->getPath().isClosed()) {
-          obj->setIsGrabArea(true);
-        }
-        symbol->getPolygons().append(obj);
-      }
-      foreach (const auto& obj, sym.symbol->getRectangles()) {
-        tryOrRaiseError(sym.displayName, [&]() {
-          symbol->getPolygons().append(
-              EagleTypeConverter::convertRectangle(obj, true));
-        });
-      }
-      foreach (const auto& obj, sym.symbol->getPolygons()) {
-        tryOrRaiseError(sym.displayName, [&]() {
-          symbol->getPolygons().append(
-              EagleTypeConverter::convertPolygon(obj, true));
-        });
-      }
-      foreach (const auto& obj, sym.symbol->getCircles()) {
-        tryOrRaiseError(sym.displayName, [&]() {
-          symbol->getCircles().append(
-              EagleTypeConverter::convertCircle(obj, true));
-        });
-      }
-      foreach (const auto& obj, sym.symbol->getTexts()) {
-        tryOrRaiseError(sym.displayName, [&]() {
-          symbol->getTexts().append(
-              EagleTypeConverter::convertSchematicText(obj));
-        });
-      }
-      foreach (const auto& obj, sym.symbol->getPins()) {
-        tryOrRaiseError(sym.displayName, [&]() {
-          auto pin = EagleTypeConverter::convertSymbolPin(obj);
-          symbol->getPins().append(pin);
-          symbolPinMap[sym.symbol->getName()][obj.getName()] = pin->getUuid();
-        });
-      }
+      auto symbol =
+          converter.createSymbol(QString(), *sym.symbol);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Symbol::getShortElementName())
               .getPathTo(symbol->getUuid().toStr())));
       symbol->saveTo(dir);
       dir.getFileSystem()->save();
-      symbolMap[sym.symbol->getName()] = symbol->getUuid();
     } catch (const Exception& e) {
       raiseImportError(sym.displayName,
                        tr("Skipped symbol due to error: %1").arg(e.getMsg()));
@@ -429,8 +356,6 @@ void EagleLibraryImport::run() noexcept {
     emit progressPercent((100 * count) / std::max(totalCount, 1));
   }
 
-  QHash<QString, tl::optional<Uuid> > packageMap;
-  QHash<QString, QHash<QString, tl::optional<Uuid> > > packagePadMap;
   foreach (const Package& pkg, mPackages) {
     if (mAbort) {
       break;
@@ -440,73 +365,14 @@ void EagleLibraryImport::run() noexcept {
     }
     try {
       emit progressStatus(pkg.displayName);
-      auto package = std::make_shared<librepcb::Package>(
-          Uuid::createRandom(), mVersion, mAuthor,
-          EagleTypeConverter::convertElementName(mNamePrefix + pkg.displayName),
-          EagleTypeConverter::convertElementDescription(pkg.description),
-          mKeywords, librepcb::Package::AssemblyType::Auto);
-      package->setCategories(mPackageCategories);
-      auto footprint = std::make_shared<Footprint>(Uuid::createRandom(),
-                                                   ElementName("default"), "");
-      package->getFootprints().append(footprint);
-      foreach (const auto& obj,
-               convertWires(pkg.displayName, pkg.package->getWires())) {
-        footprint->getPolygons().append(obj);
-      }
-      foreach (const auto& obj, pkg.package->getRectangles()) {
-        tryOrRaiseError(pkg.displayName, [&]() {
-          footprint->getPolygons().append(
-              EagleTypeConverter::convertRectangle(obj, false));
-        });
-      }
-      foreach (const auto& obj, pkg.package->getPolygons()) {
-        tryOrRaiseError(pkg.displayName, [&]() {
-          footprint->getPolygons().append(
-              EagleTypeConverter::convertPolygon(obj, false));
-        });
-      }
-      foreach (const auto& obj, pkg.package->getCircles()) {
-        tryOrRaiseError(pkg.displayName, [&]() {
-          footprint->getCircles().append(
-              EagleTypeConverter::convertCircle(obj, false));
-        });
-      }
-      foreach (const auto& obj, pkg.package->getTexts()) {
-        tryOrRaiseError(pkg.displayName, [&]() {
-          footprint->getStrokeTexts().append(
-              EagleTypeConverter::convertBoardText(obj));
-        });
-      }
-      foreach (const auto& obj, pkg.package->getHoles()) {
-        tryOrRaiseError(pkg.displayName, [&]() {
-          footprint->getHoles().append(EagleTypeConverter::convertHole(obj));
-        });
-      }
-      foreach (const auto& obj, pkg.package->getThtPads()) {
-        tryOrRaiseError(pkg.displayName, [&]() {
-          auto pair = EagleTypeConverter::convertThtPad(obj);
-          package->getPads().append(pair.first);
-          footprint->getPads().append(pair.second);
-          packagePadMap[pkg.package->getName()][obj.getName()] =
-              pair.first->getUuid();
-        });
-      }
-      foreach (const auto& obj, pkg.package->getSmtPads()) {
-        tryOrRaiseError(pkg.displayName, [&]() {
-          auto pair = EagleTypeConverter::convertSmtPad(obj);
-          package->getPads().append(pair.first);
-          footprint->getPads().append(pair.second);
-          packagePadMap[pkg.package->getName()][obj.getName()] =
-              pair.first->getUuid();
-        });
-      }
+      auto package =
+          converter.createPackage(QString(), *pkg.package);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Package::getShortElementName())
               .getPathTo(package->getUuid().toStr())));
       package->saveTo(dir);
       dir.getFileSystem()->save();
-      packageMap[pkg.package->getName()] = package->getUuid();
     } catch (const Exception& e) {
       raiseImportError(pkg.displayName,
                        tr("Skipped package due to error: %1").arg(e.getMsg()));
@@ -515,9 +381,6 @@ void EagleLibraryImport::run() noexcept {
     emit progressPercent((100 * count) / std::max(totalCount, 1));
   }
 
-  QHash<QString, tl::optional<Uuid> > componentMap;
-  QHash<QString, QHash<QString, QHash<QString, tl::optional<Uuid> > > >
-      componentSignalMap;
   foreach (const Component& cmp, mComponents) {
     if (mAbort) {
       break;
@@ -527,64 +390,14 @@ void EagleLibraryImport::run() noexcept {
     }
     try {
       emit progressStatus(cmp.displayName);
-      auto component = std::make_shared<librepcb::Component>(
-          Uuid::createRandom(), mVersion, mAuthor,
-          EagleTypeConverter::convertElementName(mNamePrefix + cmp.displayName),
-          EagleTypeConverter::convertElementDescription(cmp.description),
-          mKeywords);
-      component->setCategories(mComponentCategories);
-      component->setPrefixes(NormDependentPrefixMap(
-          ComponentPrefix(cmp.deviceSet->getPrefix().trimmed())));
-      component->setDefaultValue("{{ MPN or DEVICE }}");
-      auto symbolVariant = std::make_shared<ComponentSymbolVariant>(
-          Uuid::createRandom(), "", ElementName("default"), "");
-      component->getSymbolVariants().append(symbolVariant);
-      QHash<QString, int> pinCount;
-      foreach (const auto& gate, cmp.deviceSet->getGates()) {
-        for (auto pinIt = symbolPinMap[gate.getSymbol()].constBegin();
-             pinIt != symbolPinMap[gate.getSymbol()].constEnd(); pinIt++) {
-          pinCount[pinIt.key()]++;
-        }
-      }
-      foreach (const auto& gate, cmp.deviceSet->getGates()) {
-        tl::optional<Uuid> symbolUuid = symbolMap[gate.getSymbol()];
-        if (!symbolUuid) {
-          throw RuntimeError(__FILE__, __LINE__,
-                             tr("Dependent symbol \"%1\" not imported.")
-                                 .arg(gate.getSymbol()));
-        }
-        auto item = std::make_shared<ComponentSymbolVariantItem>(
-            Uuid::createRandom(), *symbolUuid,
-            EagleTypeConverter::convertPoint(gate.getPosition()), Angle(0),
-            true, EagleTypeConverter::convertGateName(gate.getName()));
-        symbolVariant->getSymbolItems().append(item);
-        for (auto pinIt = symbolPinMap[gate.getSymbol()].constBegin();
-             pinIt != symbolPinMap[gate.getSymbol()].constEnd(); pinIt++) {
-          Uuid signalUuid = Uuid::createRandom();
-          QString signalName = pinIt.key();
-          if ((pinCount[signalName] > 1) ||
-              (component->getSignals().contains(signalName))) {
-            // Name conflict -> add prefix to ensure unique signal names.
-            signalName.prepend(*item->getSuffix() % "_");
-          }
-          component->getSignals().append(std::make_shared<ComponentSignal>(
-              signalUuid, EagleTypeConverter::convertPinOrPadName(signalName),
-              SignalRole::passive(), QString(), false, false, false));
-          item->getPinSignalMap().append(
-              std::make_shared<ComponentPinSignalMapItem>(
-                  pinIt->value(), signalUuid,
-                  CmpSigPinDisplayType::componentSignal()));
-          componentSignalMap[cmp.deviceSet->getName()][gate.getName()]
-                            [pinIt.key()] = signalUuid;
-        }
-      }
+      auto component =
+          converter.createComponent(QString(), *cmp.deviceSet);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Component::getShortElementName())
               .getPathTo(component->getUuid().toStr())));
       component->saveTo(dir);
       dir.getFileSystem()->save();
-      componentMap[cmp.deviceSet->getName()] = component->getUuid();
     } catch (const Exception& e) {
       raiseImportError(
           cmp.displayName,
@@ -603,39 +416,8 @@ void EagleLibraryImport::run() noexcept {
     }
     try {
       emit progressStatus(dev.displayName);
-      tl::optional<Uuid> componentUuid = componentMap[dev.deviceSet->getName()];
-      if (!componentUuid) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           tr("Dependent component \"%1\" not imported.")
-                               .arg(dev.componentDisplayName));
-      }
-      tl::optional<Uuid> packageUuid = packageMap[dev.device->getPackage()];
-      if (!packageUuid) {
-        throw RuntimeError(__FILE__, __LINE__,
-                           tr("Dependent package \"%1\" not imported.")
-                               .arg(dev.packageDisplayName));
-      }
-      std::unique_ptr<librepcb::Device> device(new librepcb::Device(
-          Uuid::createRandom(), mVersion, mAuthor,
-          EagleTypeConverter::convertElementName(mNamePrefix + dev.displayName),
-          EagleTypeConverter::convertElementDescription(dev.description),
-          mKeywords, *componentUuid, *packageUuid));
-      device->setCategories(mDeviceCategories);
-      for (auto padIt = packagePadMap[dev.device->getPackage()].constBegin();
-           padIt != packagePadMap[dev.device->getPackage()].constEnd();
-           padIt++) {
-        tl::optional<Uuid> signalUuid;
-        foreach (const auto& connection, dev.device->getConnections()) {
-          if (connection.getPads().contains(padIt.key())) {
-            signalUuid =
-                componentSignalMap[dev.deviceSet->getName()]
-                                  [connection.getGate()][connection.getPin()];
-          }
-        }
-        device->getPadSignalMap().append(
-            std::make_shared<DevicePadSignalMapItem>(padIt->value(),
-                                                     signalUuid));
-      }
+      auto device = converter.createDevice(QString(), *dev.deviceSet,
+                                           *dev.device);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Device::getShortElementName())
@@ -655,7 +437,7 @@ void EagleLibraryImport::run() noexcept {
                          "Placeholders are numbers", totalCount)
                           .arg(count)
                           .arg(totalCount));
-  emit finished(mImportErrors);
+  emit finished(errors);
 }
 
 /*******************************************************************************
