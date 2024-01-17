@@ -261,7 +261,9 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
   component->setCategories(mSettings.componentCategories);
   component->setPrefixes(NormDependentPrefixMap(
       C::convertComponentPrefix(eagleDeviceSet.getPrefix())));
-  component->setDefaultValue("{{ MPN or DEVICE }}");
+  component->setDefaultValue(eagleDeviceSet.getUserValue()
+                                 ? "{{ MPN }}"
+                                 : "{{ MPN or DEVICE or COMPONENT }}");
   auto symbolVariant = std::make_shared<ComponentSymbolVariant>(
       Uuid::createRandom(), "", ElementName("default"), "");
   component->getSymbolVariants().append(symbolVariant);
