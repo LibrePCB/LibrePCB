@@ -105,6 +105,13 @@ TEST_F(EagleTypeConverterTest, testConvertDeviceName) {
   EXPECT_EQ("Unnamed", C::convertDeviceName("", "")->toStdString());
 }
 
+TEST_F(EagleTypeConverterTest, testConvertComponentPrefix) {
+  EXPECT_EQ("", C::convertComponentPrefix("")->toStdString());
+  EXPECT_EQ("", C::convertComponentPrefix("$42+")->toStdString());
+  EXPECT_EQ("C", C::convertComponentPrefix("C")->toStdString());
+  EXPECT_EQ("Foo_Bar", C::convertComponentPrefix(" Foo Bar ")->toStdString());
+}
+
 TEST_F(EagleTypeConverterTest, testConvertGateName) {
   EXPECT_EQ("", C::convertGateName("")->toStdString());
   EXPECT_EQ("", C::convertGateName("G$42")->toStdString());

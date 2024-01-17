@@ -29,6 +29,7 @@
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/geometry/text.h>
+#include <librepcb/core/library/cmp/componentprefix.h>
 #include <librepcb/core/library/cmp/componentsymbolvariantitemsuffix.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/library/pkg/packagepad.h>
@@ -150,6 +151,18 @@ public:
    */
   static ElementName convertDeviceName(const QString& deviceSetName,
                                        const QString& deviceName);
+
+  /**
+   * @brief Convert a component prefix
+   *
+   * Removes all invalid characters and returns the component prefix in the
+   * corresponding LibrePCB type.
+   *
+   * @param p   EAGLE device set prefix
+   *
+   * @return LibrePCB component prefix
+   */
+  static ComponentPrefix convertComponentPrefix(const QString& p);
 
   /**
    * @brief Convert a component gate name

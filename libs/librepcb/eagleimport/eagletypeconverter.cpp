@@ -85,6 +85,11 @@ ElementName EagleTypeConverter::convertDeviceName(const QString& deviceSetName,
   return convertElementName(name);  // Can theoretically throw, but should not.
 }
 
+ComponentPrefix EagleTypeConverter::convertComponentPrefix(const QString& p) {
+  return ComponentPrefix(
+      cleanComponentPrefix(p));  // Can theoretically throw, but should not.
+}
+
 ComponentSymbolVariantItemSuffix EagleTypeConverter::convertGateName(
     const QString& n) {
   QString suffix = n.trimmed();
