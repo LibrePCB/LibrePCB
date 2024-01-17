@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "eagletypeconverter.h"
 
+#include <librepcb/core/types/boundedunsignedratio.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
 #include <parseagle/common/circle.h>
 #include <parseagle/common/frame.h>
@@ -548,49 +549,92 @@ std::shared_ptr<StrokeText> EagleTypeConverter::tryConvertBoardText(
   }
 }
 
-std::shared_ptr<SymbolPin> EagleTypeConverter::convertSymbolPin(
+EagleTypeConverter::Pin EagleTypeConverter::convertSymbolPin(
     const parseagle::Pin& p) {
-  UnsignedLength length(convertLength(p.getLengthInMillimeters()));
-  return std::make_shared<SymbolPin>(
+  Pin result;
+  const bool isDot = (p.getFunction() == parseagle::PinFunction::Dot) ||
+      (p.getFunction() == parseagle::PinFunction::DotClock);
+  const bool isClock = (p.getFunction() == parseagle::PinFunction::Clock) ||
+      (p.getFunction() == parseagle::PinFunction::DotClock);
+  const UnsignedLength dotDiameter(isDot ? 1700000 : 0);
+  const UnsignedLength totalLength(convertLength(p.getLengthInMillimeters()));
+  result.pin = std::make_shared<SymbolPin>(
       Uuid::createRandom(),  // UUID
       convertPinOrPadName(p.getName()),  // Name
       convertPoint(p.getPosition()),  // Position
-      length,  // Length
+      UnsignedLength(
+          std::max(*totalLength - *dotDiameter, Length(0))),  // Length
       convertAngle(p.getRotation().getAngle()),  // Rotation
-      SymbolPin::getDefaultNamePosition(length),  // Name position
+      Point(totalLength + Length(2540000), 0),  // Name position
       Angle(0),  // Name rotation
       SymbolPin::getDefaultNameHeight(),  // Name height
       Alignment(HAlign::left(), VAlign::center())  // Name alignment
   );
+  if (isDot) {
+    result.circle =
+        std::make_shared<Circle>(Uuid::createRandom(), Layer::symbolOutlines(),
+                                 UnsignedLength(158750), false, false,
+                                 Point((*totalLength) - (*dotDiameter) / 2, 0)
+                                         .rotated(result.pin->getRotation()) +
+                                     result.pin->getPosition(),
+                                 PositiveLength(*dotDiameter));
+  }
+  if (isClock) {
+    const Length dy(900000);
+    const Length dx(1900000);
+    const Path path = Path({
+                               Vertex(Point(*totalLength, dy)),
+                               Vertex(Point(*totalLength + dx, 0)),
+                               Vertex(Point(*totalLength, -dy)),
+                           })
+                          .rotated(result.pin->getRotation())
+                          .translated(result.pin->getPosition());
+    result.polygon =
+        std::make_shared<Polygon>(Uuid::createRandom(), Layer::symbolOutlines(),
+                                  UnsignedLength(158750), false, false, path);
+  }
+  return result;
 }
 
 std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
-    EagleTypeConverter::convertThtPad(const parseagle::ThtPad& p) {
+    EagleTypeConverter::convertThtPad(
+        const parseagle::ThtPad& p,
+        const BoundedUnsignedRatio& autoAnnularWidth) {
   Uuid uuid = Uuid::createRandom();
+  const PositiveLength drillDiameter(convertLength(p.getDrillDiameter()));
   Length size = convertLength(p.getOuterDiameter());
   if (size <= 0) {
     // If the pad size is set to "auto", it will be zero.
-    size = (convertLength(p.getDrillDiameter()) * 3) / 2;
+    const UnsignedLength annular = autoAnnularWidth.calcValue(*drillDiameter);
+    size = drillDiameter + annular * 2;
   }
   PositiveLength width(size);
   PositiveLength height(size);
   UnsignedLimitedRatio radius(Ratio::percent0());
   FootprintPad::Shape shape;
+  Path customShapeOutline;
   switch (p.getShape()) {
-    case parseagle::ThtPad::Shape::Square:
+    case parseagle::PadShape::Square:
       shape = FootprintPad::Shape::RoundedRect;
       break;
-    case parseagle::ThtPad::Shape::Octagon:
+    case parseagle::PadShape::Octagon:
       shape = FootprintPad::Shape::RoundedOctagon;
       break;
-    case parseagle::ThtPad::Shape::Round:
+    case parseagle::PadShape::Round:
       shape = FootprintPad::Shape::RoundedRect;
       radius = UnsignedLimitedRatio(Ratio::percent100());
       break;
-    case parseagle::ThtPad::Shape::Long:
+    case parseagle::PadShape::Long:
       shape = FootprintPad::Shape::RoundedRect;
       radius = UnsignedLimitedRatio(Ratio::percent100());
       width = PositiveLength(size * 2);
+      break;
+    case parseagle::PadShape::Offset:
+      shape = FootprintPad::Shape::Custom;
+      radius = UnsignedLimitedRatio(Ratio::percent100());
+      width = PositiveLength(size * 2);
+      customShapeOutline =
+          Path::obround(width, height).translated(Point(size / 2, 0));
       break;
     default:
       throw RuntimeError(
@@ -610,15 +654,15 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
           width,  // Width
           height,  // Height
           radius,  // Radius
-          Path(),  // Custom shape outline
-          MaskConfig::automatic(),  // Stop mask
+          customShapeOutline,  // Custom shape outline
+          p.getStop() ? MaskConfig::automatic()
+                      : MaskConfig::off(),  // Stop mask
           MaskConfig::off(),  // Solder paste
           UnsignedLength(0),  // Copper clearance
           FootprintPad::ComponentSide::Top,  // Side
           FootprintPad::Function::Unspecified,  // Function
           PadHoleList{std::make_shared<PadHole>(
-              Uuid::createRandom(),
-              PositiveLength(convertLength(p.getDrillDiameter())),
+              Uuid::createRandom(), drillDiameter,
               makeNonEmptyPath(Point(0, 0)))}  // Holes
           ));
 }
@@ -648,10 +692,12 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
           FootprintPad::Shape::RoundedRect,  // Shape
           PositiveLength(convertLength(p.getWidth())),  // Width
           PositiveLength(convertLength(p.getHeight())),  // Height
-          UnsignedLimitedRatio(Ratio::percent0()),  // Radius
+          UnsignedLimitedRatio(Ratio::fromPercent(p.getRoundness())),  // Radius
           Path(),  // Custom shape outline
-          MaskConfig::automatic(),  // Stop mask
-          MaskConfig::automatic(),  // Solder paste
+          p.getStop() ? MaskConfig::automatic()
+                      : MaskConfig::off(),  // Stop mask
+          p.getCream() ? MaskConfig::automatic()
+                       : MaskConfig::off(),  // Solder paste
           UnsignedLength(0),  // Copper clearance
           side,  // Side
           FootprintPad::Function::Unspecified,  // Function
@@ -699,6 +745,14 @@ std::shared_ptr<Polygon> EagleTypeConverter::tryConvertToBoardPolygon(
                                      g.filled, g.grabArea, g.path);
   }
   return nullptr;
+}
+
+BoundedUnsignedRatio
+    EagleTypeConverter::getDefaultAutoThtAnnularWidth() noexcept {
+  // The EAGLE footprint editor displays an annular ring of 25% of the drill
+  // diameter then, bounded to 10..20mils (0.254..0.508mm).
+  return BoundedUnsignedRatio(UnsignedRatio(Ratio::percent50() / 2),
+                              UnsignedLength(254000), UnsignedLength(508000));
 }
 
 /*******************************************************************************

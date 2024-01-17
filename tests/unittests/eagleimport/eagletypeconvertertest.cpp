@@ -448,26 +448,31 @@ TEST_F(EagleTypeConverterTest, testTryConvertBoardText) {
 TEST_F(EagleTypeConverterTest, testConvertSymbolPin) {
   QString xml = "<pin name=\"P$1\" x=\"1\" y=\"2\" length=\"point\"/>";
   auto out = C::convertSymbolPin(parseagle::Pin(dom(xml)));
-  EXPECT_EQ("1", out->getName()->toStdString());
-  EXPECT_EQ(Point(1000000, 2000000), out->getPosition());
-  EXPECT_EQ(UnsignedLength(0), out->getLength());
-  EXPECT_EQ(Angle(0), out->getRotation());
+  EXPECT_EQ("1", out.pin->getName()->toStdString());
+  EXPECT_EQ(Point(1000000, 2000000), out.pin->getPosition());
+  EXPECT_EQ(UnsignedLength(0), out.pin->getLength());
+  EXPECT_EQ(Angle(0), out.pin->getRotation());
+  EXPECT_EQ(nullptr, out.circle);
+  EXPECT_EQ(nullptr, out.polygon);
 }
 
 TEST_F(EagleTypeConverterTest, testConvertSymbolPinRotated) {
   QString xml =
       "<pin name=\"P$1\" x=\"1\" y=\"2\" length=\"middle\" rot=\"R90\"/>";
   auto out = C::convertSymbolPin(parseagle::Pin(dom(xml)));
-  EXPECT_EQ("1", out->getName()->toStdString());
-  EXPECT_EQ(Point(1000000, 2000000), out->getPosition());
-  EXPECT_EQ(UnsignedLength(5080000), out->getLength());
-  EXPECT_EQ(Angle(90000000), out->getRotation());
+  EXPECT_EQ("1", out.pin->getName()->toStdString());
+  EXPECT_EQ(Point(1000000, 2000000), out.pin->getPosition());
+  EXPECT_EQ(UnsignedLength(5080000), out.pin->getLength());
+  EXPECT_EQ(Angle(90000000), out.pin->getRotation());
+  EXPECT_EQ(nullptr, out.circle);
+  EXPECT_EQ(nullptr, out.polygon);
 }
 
 TEST_F(EagleTypeConverterTest, testConvertThtPad) {
   QString xml =
       "<pad name=\"P$1\" x=\"1\" y=\"2\" drill=\"1.5\" shape=\"square\"/>";
-  auto out = C::convertThtPad(parseagle::ThtPad(dom(xml)));
+  auto out = C::convertThtPad(parseagle::ThtPad(dom(xml)),
+                              C::getDefaultAutoThtAnnularWidth());
   EXPECT_EQ("1", out.first->getName()->toStdString());
   EXPECT_EQ(out.first->getUuid(), out.second->getPackagePadUuid());
   EXPECT_EQ(Point(1000000, 2000000), out.second->getPosition());
@@ -485,7 +490,8 @@ TEST_F(EagleTypeConverterTest, testConvertThtPadRotated) {
   QString xml =
       "<pad name=\"P$1\" x=\"1\" y=\"2\" drill=\"1.5\" diameter=\"2.54\" "
       "shape=\"octagon\" rot=\"R90\"/>";
-  auto out = C::convertThtPad(parseagle::ThtPad(dom(xml)));
+  auto out = C::convertThtPad(parseagle::ThtPad(dom(xml)),
+                              C::getDefaultAutoThtAnnularWidth());
   EXPECT_EQ("1", out.first->getName()->toStdString());
   EXPECT_EQ(out.first->getUuid(), out.second->getPackagePadUuid());
   EXPECT_EQ(Point(1000000, 2000000), out.second->getPosition());

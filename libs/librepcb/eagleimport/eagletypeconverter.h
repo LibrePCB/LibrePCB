@@ -34,6 +34,7 @@
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 #include <librepcb/core/library/sym/symbolpin.h>
+#include <librepcb/core/types/boundedunsignedratio.h>
 #include <librepcb/core/types/circuitidentifier.h>
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/point.h>
@@ -97,6 +98,15 @@ public:
     bool grabArea;
     Path path;
     tl::optional<std::pair<Point, PositiveLength>> circle;
+  };
+
+  /**
+   * @brief LibrePCB data structure to represent an EAGLE symbol pin
+   */
+  struct Pin {
+    std::shared_ptr<SymbolPin> pin;
+    std::shared_ptr<Circle> circle;
+    std::shared_ptr<Polygon> polygon;
   };
 
   // Constructors / Destructor
@@ -414,19 +424,23 @@ public:
    *
    * @param p   EAGLE pin
    *
-   * @return LibrePCB pin
+   * @return LibrePCB objects to represent the pin
    */
-  static std::shared_ptr<SymbolPin> convertSymbolPin(const parseagle::Pin& p);
+  static Pin convertSymbolPin(const parseagle::Pin& p);
 
   /**
    * @brief Convert a THT pad
    *
-   * @param p   EAGLE pad
+   * @param p                 EAGLE pad
+   * @param autoAnnularWidth  How to calculate the annular width (and thus the
+   *                          outer pad size) if it is set to 'auto' in EAGLE.
+   *                          See #getDefaultAutoThtAnnularWidth().
    *
    * @return LibrePCB package pad + footprint pad
    */
   static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
-      convertThtPad(const parseagle::ThtPad& p);
+      convertThtPad(const parseagle::ThtPad& p,
+                    const BoundedUnsignedRatio& autoAnnularWidth);
 
   /**
    * @brief Convert an SMT pad
@@ -476,6 +490,15 @@ public:
    * @return A polygon if the layer is valid for boards, otherwise `nullptr`
    */
   static std::shared_ptr<Polygon> tryConvertToBoardPolygon(const Geometry& g);
+
+  /**
+   * @brief Get the default annular width of THT pads with 'auto' size
+   *
+   * This is the value used by the EAGLE footprint editor.
+   *
+   * @return Ratio to calculate the annular width from the drill diameter
+   */
+  static BoundedUnsignedRatio getDefaultAutoThtAnnularWidth() noexcept;
 
   // Operator Overloadings
   EagleTypeConverter& operator=(const EagleTypeConverter& rhs) = delete;

@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/types/boundedunsignedratio.h>
 #include <librepcb/core/types/uuid.h>
 #include <librepcb/core/types/version.h>
 #include <optional/tl/optional.hpp>
@@ -70,6 +71,7 @@ struct EagleLibraryConverterSettings final {
   QSet<Uuid> packageCategories;
   QSet<Uuid> componentCategories;
   QSet<Uuid> deviceCategories;
+  BoundedUnsignedRatio autoThtAnnularWidth;
 };
 
 /*******************************************************************************

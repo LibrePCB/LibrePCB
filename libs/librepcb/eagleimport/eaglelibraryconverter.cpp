@@ -49,7 +49,8 @@ EagleLibraryConverterSettings::EagleLibraryConverterSettings() noexcept
   : namePrefix(),
     version(Version::fromString("0.1")),
     author("EAGLE Import"),
-    keywords("eagle,import") {
+    keywords("eagle,import"),
+    autoThtAnnularWidth(EagleTypeConverter::getDefaultAutoThtAnnularWidth()) {
 }
 
 /*******************************************************************************
@@ -143,10 +144,16 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
   }
   foreach (const auto& obj, eagleSymbol.getPins()) {
     tryOrRaiseError(eagleSymbol.getName(), [&]() {
-      auto pin = C::convertSymbolPin(obj);
-      symbol->getPins().append(pin);
-      mSymbolPinMap[key][obj.getName()] =
-          std::make_pair(std::make_shared<parseagle::Pin>(obj), pin->getUuid());
+      const auto pinObj = C::convertSymbolPin(obj);
+      symbol->getPins().append(pinObj.pin);
+      mSymbolPinMap[key][obj.getName()] = std::make_pair(
+          std::make_shared<parseagle::Pin>(obj), pinObj.pin->getUuid());
+      if (pinObj.circle) {
+        symbol->getCircles().append(pinObj.circle);
+      }
+      if (pinObj.polygon) {
+        symbol->getPolygons().append(pinObj.polygon);
+      }
     });
   }
   mSymbolMap[key] = symbol->getUuid();
@@ -203,7 +210,7 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
   }
   foreach (const auto& obj, eaglePackage.getThtPads()) {
     tryOrRaiseError(eaglePackage.getName(), [&]() {
-      auto pair = C::convertThtPad(obj);
+      auto pair = C::convertThtPad(obj, mSettings.autoThtAnnularWidth);
       package->getPads().append(pair.first);
       footprint->getPads().append(pair.second);
       mPackagePadMap[key][obj.getName()] = pair.first->getUuid();
