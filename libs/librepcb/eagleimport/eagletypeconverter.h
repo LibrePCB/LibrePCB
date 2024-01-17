@@ -81,6 +81,21 @@ class EagleTypeConverter final {
   Q_DECLARE_TR_FUNCTIONS(EagleTypeConverter)
 
 public:
+  // Types
+
+  /**
+   * @brief Intermediate geometry type used for converting polygon-like
+   *        EAGLE elements
+   */
+  struct Geometry {
+    int layerId;
+    UnsignedLength lineWidth;
+    bool filled;
+    bool grabArea;
+    Path path;
+    tl::optional<std::pair<Point, PositiveLength>> circle;
+  };
+
   // Constructors / Destructor
   EagleTypeConverter() = delete;
   EagleTypeConverter(const EagleTypeConverter& other) = delete;
@@ -161,15 +176,22 @@ public:
   static CircuitIdentifier convertPinOrPadName(const QString& n);
 
   /**
-   * @brief Convert a layer ID
+   * @brief Try to convert a layer ID to a schematic layer
    *
    * @param id  EAGLE layer ID
    *
-   * @return LibrePCB layer
-   *
-   * @throw Exception   If the layer is unknown or not supported
+   * @return LibrePCB schematic/symbol layer (`nullptr` to discard object)
    */
-  static const Layer& convertLayer(int id);
+  static const Layer* tryConvertSchematicLayer(int id) noexcept;
+
+  /**
+   * @brief Try to convert a layer ID to a board layer
+   *
+   * @param id  EAGLE layer ID
+   *
+   * @return LibrePCB board/footprint layer (`nullptr` to discard object)
+   */
+  static const Layer* tryConvertBoardLayer(int id) noexcept;
 
   /**
    * @brief Convert a length
@@ -218,57 +240,50 @@ public:
   static Path convertVertices(const QList<parseagle::Vertex>& v, bool close);
 
   /**
-   * @brief Convert a wire
+   * @brief Try to join and convert multiple wires to polygons
    *
-   * @param w   EAGLE wire (line segment)
+   * @param wires                 EAGLE wires
+   * @param isGrabAreaIfClosed    If true, grab area will be enabled on
+   *                              closed polygons
+   * @param errors                If not `nullptr`, any errors will be
+   *                              appended to this list
    *
-   * @return LibrePCB polygon containing 1 line segment
+   * @return Joined polygons as intermediate geometries
    */
-  static std::shared_ptr<Polygon> convertWire(const parseagle::Wire& w);
-
-  /**
-   * @brief Convert and try to join tangent wires
-   *
-   * @param wires   EAGLE wires (line segments)
-   * @param errors  Error messages output
-   *
-   * @return LibrePCB polygons containing 1 or more line segments
-   */
-  static QVector<std::shared_ptr<Polygon> > convertAndJoinWires(
-      const QList<parseagle::Wire>& wires, QStringList* errors = nullptr);
+  static QList<Geometry> convertAndJoinWires(
+      const QList<parseagle::Wire>& wires, bool isGrabAreaIfClosed,
+      QStringList* errors = nullptr);
 
   /**
    * @brief Convert a rectangle
    *
    * @param r           EAGLE rectangle
-   * @param isGrabArea  If the returned polygon should be a grab area
+   * @param isGrabArea  If the returned geometry should be a grab area
    *
-   * @return LibrePCB polygon containing 4 line segments
+   * @return Intermediate geometry containing 4 line segments
    */
-  static std::shared_ptr<Polygon> convertRectangle(
-      const parseagle::Rectangle& r, bool isGrabArea);
+  static Geometry convertRectangle(const parseagle::Rectangle& r,
+                                   bool isGrabArea);
 
   /**
    * @brief Convert a polygon
    *
    * @param p           EAGLE polygon
-   * @param isGrabArea  If the returned polygon should be a grab area
+   * @param isGrabArea  If the returned geometry should be a grab area
    *
-   * @return LibrePCB polygon (always closed)
+   * @return Intermediate geometry (always closed)
    */
-  static std::shared_ptr<Polygon> convertPolygon(const parseagle::Polygon& p,
-                                                 bool isGrabArea);
+  static Geometry convertPolygon(const parseagle::Polygon& p, bool isGrabArea);
 
   /**
    * @brief Convert a circle
    *
    * @param c           EAGLE circle
-   * @param isGrabArea  If the returned circle should be a grab area
+   * @param isGrabArea  If the returned geometry should be a grab area
    *
-   * @return LibrePCB circle
+   * @return Intermediate geometry
    */
-  static std::shared_ptr<Circle> convertCircle(const parseagle::Circle& c,
-                                               bool isGrabArea);
+  static Geometry convertCircle(const parseagle::Circle& c, bool isGrabArea);
 
   /**
    * @brief Convert a hole
@@ -289,22 +304,24 @@ public:
   static QString convertTextValue(const QString& v);
 
   /**
-   * @brief Convert a schematic/symbol text
+   * @brief Try to convert a schematic/symbol text
    *
    * @param t   EAGLE text
    *
-   * @return LibrePCB text
+   * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
-  static std::shared_ptr<Text> convertSchematicText(const parseagle::Text& t);
+  static std::shared_ptr<Text> tryConvertSchematicText(
+      const parseagle::Text& t);
 
   /**
-   * @brief Convert a board/footprint text
+   * @brief Try to cnvert a board/footprint text
    *
    * @param t   EAGLE text
    *
-   * @return LibrePCB text
+   * @return LibrePCB text if the layer is supported, otherwise `nullptr`
    */
-  static std::shared_ptr<StrokeText> convertBoardText(const parseagle::Text& t);
+  static std::shared_ptr<StrokeText> tryConvertBoardText(
+      const parseagle::Text& t);
 
   /**
    * @brief Convert a symbol pin
@@ -322,7 +339,7 @@ public:
    *
    * @return LibrePCB package pad + footprint pad
    */
-  static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
+  static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
       convertThtPad(const parseagle::ThtPad& p);
 
   /**
@@ -332,8 +349,47 @@ public:
    *
    * @return LibrePCB package pad + footprint pad
    */
-  static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
+  static std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
       convertSmtPad(const parseagle::SmtPad& p);
+
+  /**
+   * @brief Try to convert an intermediate geometry to a schematic circle
+   *
+   * @param g   intermediate geometry
+   *
+   * @return    A circle if the geometry represents a circle on a valid
+   *            schematic layer, otherwise `nullptr`
+   */
+  static std::shared_ptr<Circle> tryConvertToSchematicCircle(const Geometry& g);
+
+  /**
+   * @brief Try to convert an intermediate geometry to a schematic polygon
+   *
+   * @param g   intermediate geometry
+   *
+   * @return A polygon if the layer is valid for schematics, otherwise `nullptr`
+   */
+  static std::shared_ptr<Polygon> tryConvertToSchematicPolygon(
+      const Geometry& g);
+
+  /**
+   * @brief Try to convert an intermediate geometry to a board circle
+   *
+   * @param g   intermediate geometry
+   *
+   * @return    A circle if the geometry represents a circle on a valid
+   *            board layer, otherwise `nullptr`
+   */
+  static std::shared_ptr<Circle> tryConvertToBoardCircle(const Geometry& g);
+
+  /**
+   * @brief Try to convert an intermediate geometry to a board polygon
+   *
+   * @param g   intermediate geometry
+   *
+   * @return A polygon if the layer is valid for boards, otherwise `nullptr`
+   */
+  static std::shared_ptr<Polygon> tryConvertToBoardPolygon(const Geometry& g);
 
   // Operator Overloadings
   EagleTypeConverter& operator=(const EagleTypeConverter& rhs) = delete;

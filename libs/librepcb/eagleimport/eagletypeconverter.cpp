@@ -106,11 +106,41 @@ CircuitIdentifier EagleTypeConverter::convertPinOrPadName(const QString& n) {
   return CircuitIdentifier(name);
 }
 
-const Layer& EagleTypeConverter::convertLayer(int id) {
-  QString eagleLayerName = "unknown";
+const Layer* EagleTypeConverter::tryConvertSchematicLayer(int id) noexcept {
+  switch (id) {
+    case 90:  // modules
+      // Not sure what this layer is used for, discard or not?!
+      return &Layer::schematicDocumentation();
+    case 91:  // nets
+      // In some schematics, this layer seems to be used for things not related
+      // to nets at all so let's move them to the documentation layer.
+      return &Layer::schematicDocumentation();
+    case 92:  // buses
+      // Probably the same as for layer 91?
+      return &Layer::schematicDocumentation();
+    case 93:  // pins
+      return &Layer::symbolPinNames();
+    case 94:  // symbols
+      return &Layer::symbolOutlines();
+    case 95:  // names
+      return &Layer::symbolNames();
+    case 96:  // values
+      return &Layer::symbolValues();
+    case 97:  // info
+      return &Layer::schematicDocumentation();
+    case 98:  // guide
+      return &Layer::schematicGuide();
+    case 99:  // spice order
+      return nullptr;
+    default:
+      return nullptr;
+  }
+}
+
+const Layer* EagleTypeConverter::tryConvertBoardLayer(int id) noexcept {
   switch (id) {
     case 1:  // tCu
-      return Layer::topCopper();
+      return &Layer::topCopper();
     case 2:  // inner copper
     case 3:  // inner copper
     case 4:  // inner copper
@@ -125,133 +155,90 @@ const Layer& EagleTypeConverter::convertLayer(int id) {
     case 13:  // inner copper
     case 14:  // inner copper
     case 15:  // inner copper
-      if (const Layer* layer = Layer::innerCopper(id - 1)) {
-        return *layer;
-      }
-      eagleLayerName = "inner";
-      break;
+      return Layer::innerCopper(id - 1);
     case 16:  // bCu
-      return Layer::botCopper();
+      return &Layer::botCopper();
     case 17:  // pads
-      eagleLayerName = "pads";
       break;
     case 18:  // vias
-      eagleLayerName = "vias";
       break;
     case 19:  // unrouted
-      eagleLayerName = "unrouted";
       break;
     case 20:  // dimension
       // Note: We cannot know whether we need to return Layer::boardOutlines()
       // or Layer::boardCutouts(), but for footprints the dimension layer is
       // more likely used for cutouts.
-      return Layer::boardCutouts();
+      return &Layer::boardCutouts();
     case 21:  // tPlace
-      return Layer::topLegend();
+      return &Layer::topLegend();
     case 22:  // bPlace
-      return Layer::botLegend();
+      return &Layer::botLegend();
     case 23:  // tOrigins
-      eagleLayerName = "tOrigins";
       break;
     case 24:  // bOrigins
-      eagleLayerName = "bOrigins";
       break;
     case 25:  // tNames
-      return Layer::topNames();
+      return &Layer::topNames();
     case 26:  // bNames
-      return Layer::botNames();
+      return &Layer::botNames();
     case 27:  // tValues
-      return Layer::topValues();
+      return &Layer::topValues();
     case 28:  // bValues
-      return Layer::botValues();
+      return &Layer::botValues();
     case 29:  // tStop
-      return Layer::topStopMask();
+      return &Layer::topStopMask();
     case 30:  // bStop
-      return Layer::botStopMask();
+      return &Layer::botStopMask();
     case 31:  // tCream
-      return Layer::topSolderPaste();
+      return &Layer::topSolderPaste();
     case 32:  // bCream
-      return Layer::botSolderPaste();
+      return &Layer::botSolderPaste();
     case 33:  // tFinish
-      eagleLayerName = "tFinish";
       break;
     case 34:  // bFinish
-      eagleLayerName = "bFinish";
       break;
     case 35:  // tGlue
-      return Layer::topGlue();
+      return &Layer::topGlue();
+      break;
     case 36:  // bGlue
-      return Layer::botGlue();
+      return &Layer::botGlue();
+      break;
     case 37:  // tTest
-      eagleLayerName = "tTest";
       break;
     case 38:  // bTest
-      eagleLayerName = "bTest";
       break;
     case 39:  // tKeepout
-      return Layer::topCourtyard();
+      break;
     case 40:  // bKeepout
-      return Layer::botCourtyard();
+      break;
     case 41:  // tRestrict
-      eagleLayerName = "tRestrict";
       break;
     case 42:  // bRestrict
-      eagleLayerName = "bRestrict";
       break;
     case 43:  // vRestrict
-      eagleLayerName = "vRestrict";
       break;
     case 44:  // drills
-      eagleLayerName = "drills";
       break;
     case 45:  // holes
-      eagleLayerName = "holes";
       break;
     case 46:  // milling
-      return Layer::boardCutouts();
+      return &Layer::boardCutouts();
     case 47:  // measures
-      return Layer::boardDocumentation();
+      return &Layer::boardDocumentation();
     case 48:  // document
-      return Layer::boardDocumentation();
+      return &Layer::boardDocumentation();
     case 49:  // ReferenceLC
-      return Layer::boardDocumentation();
+      return &Layer::boardDocumentation();
     case 50:  // ReferenceLS
-      return Layer::boardDocumentation();
+      return &Layer::boardDocumentation();
     case 51:  // tDocu
-      return Layer::topDocumentation();
+      return &Layer::topDocumentation();
     case 52:  // bDocu
-      return Layer::botDocumentation();
-    case 90:  // modules
-      eagleLayerName = "modules";
-      break;
-    case 91:  // nets
-      eagleLayerName = "nets";
-      break;
-    case 92:  // buses
-      eagleLayerName = "buses";
-      break;
-    case 93:  // pins
-      return Layer::symbolPinNames();
-    case 94:  // symbols
-      return Layer::symbolOutlines();
-    case 95:  // names
-      return Layer::symbolNames();
-    case 96:  // values
-      return Layer::symbolValues();
-    case 97:  // info
-      return Layer::schematicDocumentation();
-    case 98:  // guide
-      return Layer::schematicGuide();
-    case 99:  // spice order
-      eagleLayerName = "spice order";
-      break;
+      return &Layer::botDocumentation();
     default:
       break;
   }
-
-  QString layer = QString("%1 (%2)").arg(id).arg(eagleLayerName);
-  throw RuntimeError(__FILE__, __LINE__,
-                     tr("Layer %1 is not supported.").arg(layer));
+  return nullptr;
 }
 
 Length EagleTypeConverter::convertLength(double l) {
@@ -282,93 +269,85 @@ Path EagleTypeConverter::convertVertices(const QList<parseagle::Vertex>& v,
   return path;
 }
 
-std::shared_ptr<Polygon> EagleTypeConverter::convertWire(
-    const parseagle::Wire& w) {
-  return std::make_shared<Polygon>(
-      Uuid::createRandom(),  // UUID
-      convertLayer(w.getLayer()),  // Layer
-      UnsignedLength(convertLength(w.getWidth())),  // Line width
-      false,  // Filled
-      false,  // Grab area
-      Path::line(convertPoint(w.getP1()), convertPoint(w.getP2()),
-                 convertAngle(w.getCurve()))  // Path
-  );
-}
-
-QVector<std::shared_ptr<Polygon> > EagleTypeConverter::convertAndJoinWires(
-    const QList<parseagle::Wire>& wires, QStringList* errors) {
-  QMap<std::pair<const Layer*, UnsignedLength>,
-       QVector<std::shared_ptr<Polygon> > >
-      joinablePolygons;
+QList<EagleTypeConverter::Geometry> EagleTypeConverter::convertAndJoinWires(
+    const QList<parseagle::Wire>& wires, bool isGrabAreaIfClosed,
+    QStringList* errors) {
+  QMap<std::pair<int, double>, QList<parseagle::Wire>> joinableWires;
   foreach (const parseagle::Wire& wire, wires) {
-    try {
-      auto polygon = convertWire(wire);
-      auto key = std::make_pair(&polygon->getLayer(), polygon->getLineWidth());
-      joinablePolygons[key].append(polygon);
-    } catch (const Exception& e) {
-      if (errors) {
-        errors->append(e.getMsg());
-      }
-    }
+    auto key = std::make_pair(wire.getLayer(), wire.getWidth());
+    joinableWires[key].append(wire);
   }
 
-  QVector<std::shared_ptr<Polygon> > polygons;
-  for (auto it = joinablePolygons.begin(); it != joinablePolygons.end(); it++) {
-    QVector<Path> paths;
-    foreach (const auto& polygon, it.value()) {
-      paths.append(polygon->getPath());
-    }
-    foreach (const Path& path, TangentPathJoiner::join(paths, 5000)) {
-      std::shared_ptr<Polygon> polygon =
-          std::make_shared<Polygon>(*it.value().first());
-      polygon->setPath(path);
-      polygons.append(polygon);
+  QList<Geometry> polygons;
+  for (auto it = joinableWires.begin(); it != joinableWires.end(); it++) {
+    try {
+      QVector<Path> paths;
+      foreach (const parseagle::Wire& wire, it.value()) {
+        paths.append(Path::line(convertPoint(wire.getP1()),
+                                convertPoint(wire.getP2()),
+                                convertAngle(wire.getCurve())));
+      }
+      foreach (const Path& path, TangentPathJoiner::join(paths, 5000)) {
+        polygons.append(Geometry{
+            it.value().first().getLayer(),  // Layer
+            UnsignedLength(
+                convertLength(it.value().first().getWidth())),  // Line width
+            false,  // Filled
+            isGrabAreaIfClosed && path.isClosed(),  // Grab area
+            path,  // Path
+            tl::nullopt,  // Circle
+        });
+      }
+    } catch (const Exception& e) {
+      if (errors) errors->append(e.getMsg());
     }
   }
   return polygons;
 }
 
-std::shared_ptr<Polygon> EagleTypeConverter::convertRectangle(
+EagleTypeConverter::Geometry EagleTypeConverter::convertRectangle(
     const parseagle::Rectangle& r, bool isGrabArea) {
-  Point p1 = convertPoint(r.getP1());
-  Point p2 = convertPoint(r.getP2());
-  Point center = (p1 + p2) / 2;
-  Path path = Path::rect(p1, p2);
-  path.rotate(convertAngle(r.getRotation().getAngle()), center);
-  return std::make_shared<Polygon>(Uuid::createRandom(),  // UUID
-                                   convertLayer(r.getLayer()),  // Layer
-                                   UnsignedLength(0),  // Line width
-                                   true,  // Filled
-                                   isGrabArea,  // Grab area
-                                   path  // Path
-  );
+  const Point p1 = convertPoint(r.getP1());
+  const Point p2 = convertPoint(r.getP2());
+  const Point center = (p1 + p2) / 2;
+  const Angle rotation = convertAngle(r.getRotation().getAngle());
+  const Path path = Path::rect(p1, p2).rotated(rotation, center);
+  return Geometry{
+      r.getLayer(),  // Layer
+      UnsignedLength(0),  // Line width
+      true,  // Filled
+      isGrabArea,  // Grab area
+      path,  // Path
+      tl::nullopt,  // Circle
+  };
 }
 
-std::shared_ptr<Polygon> EagleTypeConverter::convertPolygon(
+EagleTypeConverter::Geometry EagleTypeConverter::convertPolygon(
     const parseagle::Polygon& p, bool isGrabArea) {
-  return std::make_shared<Polygon>(
-      Uuid::createRandom(),  // UUID
-      convertLayer(p.getLayer()),  // Layer
+  return Geometry{
+      p.getLayer(),  // Layer
       UnsignedLength(convertLength(p.getWidth())),  // Line width
       true,  // Filled (EAGLE polygons are always filled)
       isGrabArea,  // Grab area
-      convertVertices(p.getVertices(), true)  // Path (polygons are closed)
-  );
+      convertVertices(p.getVertices(), true),  // Path (polygons are closed)
+      tl::nullopt,  // Circle
+  };
 }
 
-std::shared_ptr<Circle> EagleTypeConverter::convertCircle(
+EagleTypeConverter::Geometry EagleTypeConverter::convertCircle(
     const parseagle::Circle& c, bool isGrabArea) {
-  UnsignedLength lineWidth(convertLength(c.getWidth()));
-  bool filled = (lineWidth == 0);  // EAGLE fills circles of zero width!
-  return std::make_shared<Circle>(
-      Uuid::createRandom(),  // UUID
-      convertLayer(c.getLayer()),  // Layer
+  const bool filled = (c.getWidth() == 0);  // EAGLE fills zero-width circles!
+  const UnsignedLength lineWidth = UnsignedLength(convertLength(c.getWidth()));
+  const Point pos = convertPoint(c.getPosition());
+  const PositiveLength diameter(convertLength(c.getRadius()) * 2);
+  return Geometry{
+      c.getLayer(),  // Layer
       lineWidth,  // Line width
       filled,  // Filled
       isGrabArea,  // Grab area
-      convertPoint(c.getPosition()),  // Center
-      PositiveLength(convertLength(c.getRadius()) * 2)  // Diameter
-  );
+      Path::circle(diameter).translated(pos),
+      std::make_pair(pos, diameter),  // Circle
+  };
 }
 
 std::shared_ptr<Hole> EagleTypeConverter::convertHole(
@@ -389,35 +368,43 @@ QString EagleTypeConverter::convertTextValue(const QString& v) {
   return value;
 }
 
-std::shared_ptr<Text> EagleTypeConverter::convertSchematicText(
+std::shared_ptr<Text> EagleTypeConverter::tryConvertSchematicText(
     const parseagle::Text& t) {
-  return std::make_shared<Text>(
-      Uuid::createRandom(),  // UUID
-      convertLayer(t.getLayer()),  // Layer
-      convertTextValue(t.getValue()),  // Text
-      convertPoint(t.getPosition()),  // Position
-      convertAngle(t.getRotation().getAngle()),  // Rotation
-      PositiveLength(2500000),  // Height
-      Alignment(HAlign::left(), VAlign::bottom())  // Alignment
-  );
+  if (auto layer = tryConvertSchematicLayer(t.getLayer())) {
+    return std::make_shared<Text>(
+        Uuid::createRandom(),  // UUID
+        *layer,  // Layer
+        convertTextValue(t.getValue()),  // Text
+        convertPoint(t.getPosition()),  // Position
+        convertAngle(t.getRotation().getAngle()),  // Rotation
+        PositiveLength(2500000),  // Height
+        Alignment(HAlign::left(), VAlign::bottom())  // Alignment
+    );
+  } else {
+    return nullptr;
+  }
 }
 
-std::shared_ptr<StrokeText> EagleTypeConverter::convertBoardText(
+std::shared_ptr<StrokeText> EagleTypeConverter::tryConvertBoardText(
     const parseagle::Text& t) {
-  return std::make_shared<StrokeText>(
-      Uuid::createRandom(),  // UUID
-      convertLayer(t.getLayer()),  // Layer
-      convertTextValue(t.getValue()),  // Text
-      convertPoint(t.getPosition()),  // Position
-      convertAngle(t.getRotation().getAngle()),  // Rotation
-      PositiveLength(1000000),  // Height
-      UnsignedLength(200000),  // Stroke width
-      StrokeTextSpacing(),  // Letter spacing
-      StrokeTextSpacing(),  // Line spacing
-      Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
-      false,  // Mirrored
-      true  // Auto rotate
-  );
+  if (auto layer = tryConvertBoardLayer(t.getLayer())) {
+    return std::make_shared<StrokeText>(
+        Uuid::createRandom(),  // UUID
+        *layer,  // Layer
+        convertTextValue(t.getValue()),  // Text
+        convertPoint(t.getPosition()),  // Position
+        convertAngle(t.getRotation().getAngle()),  // Rotation
+        PositiveLength(1000000),  // Height
+        UnsignedLength(200000),  // Stroke width
+        StrokeTextSpacing(),  // Letter spacing
+        StrokeTextSpacing(),  // Line spacing
+        Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
+        false,  // Mirrored
+        true  // Auto rotate
+    );
+  } else {
+    return nullptr;
+  }
 }
 
 std::shared_ptr<SymbolPin> EagleTypeConverter::convertSymbolPin(
@@ -436,7 +423,7 @@ std::shared_ptr<SymbolPin> EagleTypeConverter::convertSymbolPin(
   );
 }
 
-std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
+std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
     EagleTypeConverter::convertThtPad(const parseagle::ThtPad& p) {
   Uuid uuid = Uuid::createRandom();
   Length size = convertLength(p.getOuterDiameter());
@@ -495,18 +482,18 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           ));
 }
 
-std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
+std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
     EagleTypeConverter::convertSmtPad(const parseagle::SmtPad& p) {
   Uuid uuid = Uuid::createRandom();
-  const Layer& layer = convertLayer(p.getLayer());
+  const Layer* layer = tryConvertBoardLayer(p.getLayer());
   FootprintPad::ComponentSide side;
-  if (layer == Layer::topCopper()) {
+  if (layer == &Layer::topCopper()) {
     side = FootprintPad::ComponentSide::Top;
-  } else if (layer == Layer::botCopper()) {
+  } else if (layer == &Layer::botCopper()) {
     side = FootprintPad::ComponentSide::Bottom;
   } else {
     throw RuntimeError(__FILE__, __LINE__,
-                       QString("Invalid pad layer: %1").arg(layer.getNameTr()));
+                       QString("Invalid pad layer: %1").arg(p.getLayer()));
   }
   return std::make_pair(
       std::make_shared<PackagePad>(uuid,  // UUID
@@ -529,6 +516,48 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad> >
           FootprintPad::Function::Unspecified,  // Function
           PadHoleList{}  // Holes
           ));
+}
+
+std::shared_ptr<Circle> EagleTypeConverter::tryConvertToSchematicCircle(
+    const Geometry& g) {
+  if (g.circle) {
+    if (auto layer = tryConvertSchematicLayer(g.layerId)) {
+      return std::make_shared<Circle>(Uuid::createRandom(), *layer, g.lineWidth,
+                                      g.filled, g.grabArea, g.circle->first,
+                                      g.circle->second);
+    }
+  }
+  return nullptr;
+}
+
+std::shared_ptr<Polygon> EagleTypeConverter::tryConvertToSchematicPolygon(
+    const Geometry& g) {
+  if (auto layer = tryConvertSchematicLayer(g.layerId)) {
+    return std::make_shared<Polygon>(Uuid::createRandom(), *layer, g.lineWidth,
+                                     g.filled, g.grabArea, g.path);
+  }
+  return nullptr;
+}
+
+std::shared_ptr<Circle> EagleTypeConverter::tryConvertToBoardCircle(
+    const Geometry& g) {
+  if (g.circle) {
+    if (auto layer = tryConvertBoardLayer(g.layerId)) {
+      return std::make_shared<Circle>(Uuid::createRandom(), *layer, g.lineWidth,
+                                      g.filled, g.grabArea, g.circle->first,
+                                      g.circle->second);
+    }
+  }
+  return nullptr;
+}
+
+std::shared_ptr<Polygon> EagleTypeConverter::tryConvertToBoardPolygon(
+    const Geometry& g) {
+  if (auto layer = tryConvertBoardLayer(g.layerId)) {
+    return std::make_shared<Polygon>(Uuid::createRandom(), *layer, g.lineWidth,
+                                     g.filled, g.grabArea, g.path);
+  }
+  return nullptr;
 }
 
 /*******************************************************************************

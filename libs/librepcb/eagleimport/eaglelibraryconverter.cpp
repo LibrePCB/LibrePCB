@@ -107,31 +107,33 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
       C::convertElementDescription(eagleSymbol.getDescription()),
       mSettings.keywords));
   symbol->setCategories(mSettings.symbolCategories);
-  foreach (const auto& obj, C::convertAndJoinWires(eagleSymbol.getWires())) {
-    if (obj->getPath().isClosed()) {
-      obj->setIsGrabArea(true);
-    }
-    symbol->getPolygons().append(obj);
-  }
+
+  QList<C::Geometry> geometries;
+  tryOrRaiseError(eagleSymbol.getName(), [&]() {
+    geometries += C::convertAndJoinWires(eagleSymbol.getWires(), true);
+  });
   foreach (const auto& obj, eagleSymbol.getRectangles()) {
-    tryOrRaiseError(eagleSymbol.getName(), [&]() {
-      symbol->getPolygons().append(C::convertRectangle(obj, true));
-    });
+    geometries.append(C::convertRectangle(obj, true));
   }
   foreach (const auto& obj, eagleSymbol.getPolygons()) {
-    tryOrRaiseError(eagleSymbol.getName(), [&]() {
-      symbol->getPolygons().append(C::convertPolygon(obj, true));
-    });
+    geometries.append(C::convertPolygon(obj, true));
   }
   foreach (const auto& obj, eagleSymbol.getCircles()) {
+    geometries.append(C::convertCircle(obj, true));
+  }
+  foreach (const auto& g, geometries) {
     tryOrRaiseError(eagleSymbol.getName(), [&]() {
-      symbol->getCircles().append(C::convertCircle(obj, true));
+      if (auto o = C::tryConvertToSchematicCircle(g)) {
+        symbol->getCircles().append(o);
+      } else if (auto o = C::tryConvertToSchematicPolygon(g)) {
+        symbol->getPolygons().append(o);
+      }
     });
   }
   foreach (const auto& obj, eagleSymbol.getTexts()) {
-    tryOrRaiseError(eagleSymbol.getName(), [&]() {
-      symbol->getTexts().append(C::convertSchematicText(obj));
-    });
+    if (auto lpObj = C::tryConvertSchematicText(obj)) {
+      symbol->getTexts().append(lpObj);
+    }
   }
   foreach (const auto& obj, eagleSymbol.getPins()) {
     tryOrRaiseError(eagleSymbol.getName(), [&]() {
@@ -160,28 +162,33 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
   auto footprint = std::make_shared<Footprint>(Uuid::createRandom(),
                                                ElementName("default"), "");
   package->getFootprints().append(footprint);
-  foreach (const auto& obj, C::convertAndJoinWires(eaglePackage.getWires())) {
-    footprint->getPolygons().append(obj);
-  }
+
+  QList<C::Geometry> geometries;
+  tryOrRaiseError(eaglePackage.getName(), [&]() {
+    geometries += C::convertAndJoinWires(eaglePackage.getWires(), false);
+  });
   foreach (const auto& obj, eaglePackage.getRectangles()) {
-    tryOrRaiseError(eaglePackage.getName(), [&]() {
-      footprint->getPolygons().append(C::convertRectangle(obj, false));
-    });
+    geometries.append(C::convertRectangle(obj, false));
   }
   foreach (const auto& obj, eaglePackage.getPolygons()) {
-    tryOrRaiseError(eaglePackage.getName(), [&]() {
-      footprint->getPolygons().append(C::convertPolygon(obj, false));
-    });
+    geometries.append(C::convertPolygon(obj, false));
   }
   foreach (const auto& obj, eaglePackage.getCircles()) {
+    geometries.append(C::convertCircle(obj, false));
+  }
+  foreach (const auto& g, geometries) {
     tryOrRaiseError(eaglePackage.getName(), [&]() {
-      footprint->getCircles().append(C::convertCircle(obj, false));
+      if (auto o = C::tryConvertToBoardCircle(g)) {
+        footprint->getCircles().append(o);
+      } else if (auto o = C::tryConvertToBoardPolygon(g)) {
+        footprint->getPolygons().append(o);
+      }
     });
   }
   foreach (const auto& obj, eaglePackage.getTexts()) {
-    tryOrRaiseError(eaglePackage.getName(), [&]() {
-      footprint->getStrokeTexts().append(C::convertBoardText(obj));
-    });
+    if (auto lpObj = C::tryConvertBoardText(obj)) {
+      footprint->getStrokeTexts().append(lpObj);
+    }
   }
   foreach (const auto& obj, eaglePackage.getHoles()) {
     tryOrRaiseError(eaglePackage.getName(), [&]() {
@@ -203,6 +210,17 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
       footprint->getPads().append(pair.second);
       mPackagePadMap[key][obj.getName()] = pair.first->getUuid();
     });
+  }
+  // If there is exactly one device keepout zone on the top layer, convert
+  // it to a package courtyard polygon.
+  auto courtyardZone = footprint->getZones().value(0);
+  if ((footprint->getZones().count() == 1) &&
+      (courtyardZone->getLayers() == Zone::Layers(Zone::Layer::Top)) &&
+      (courtyardZone->getRules() == Zone::Rules(Zone::Rule::NoDevices))) {
+    footprint->getPolygons().append(std::make_shared<Polygon>(
+        Uuid::createRandom(), Layer::topCourtyard(), UnsignedLength(0), false,
+        false, courtyardZone->getOutline()));
+    footprint->getZones().clear();
   }
   mPackageMap[key] = package->getUuid();
   return package;
