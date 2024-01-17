@@ -267,6 +267,20 @@ Length EagleTypeConverter::convertLength(double l) {
   return Length::fromMm(l);
 }
 
+UnsignedLength EagleTypeConverter::convertLineWidth(double w, int layerId) {
+  Length l;
+  switch (layerId) {
+    case 20:  // dimension
+    case 46:  // milling
+      l = 0;
+      break;
+    default:
+      l = convertLength(w);
+      break;
+  }
+  return UnsignedLength(l);  // can throw
+}
+
 Point EagleTypeConverter::convertPoint(const parseagle::Point& p) {
   return Point::fromMm(p.x, p.y);
 }
@@ -312,8 +326,8 @@ QList<EagleTypeConverter::Geometry> EagleTypeConverter::convertAndJoinWires(
       foreach (const Path& path, TangentPathJoiner::join(paths, 5000)) {
         polygons.append(Geometry{
             it.value().first().getLayer(),  // Layer
-            UnsignedLength(
-                convertLength(it.value().first().getWidth())),  // Line width
+            convertLineWidth(it.value().first().getWidth(),
+                             it.value().first().getLayer()),  // Line width
             false,  // Filled
             isGrabAreaIfClosed && path.isClosed(),  // Grab area
             path,  // Path
@@ -348,7 +362,7 @@ EagleTypeConverter::Geometry EagleTypeConverter::convertPolygon(
     const parseagle::Polygon& p, bool isGrabArea) {
   return Geometry{
       p.getLayer(),  // Layer
-      UnsignedLength(convertLength(p.getWidth())),  // Line width
+      convertLineWidth(p.getWidth(), p.getLayer()),  // Line width
       true,  // Filled (EAGLE polygons are always filled)
       isGrabArea,  // Grab area
       convertVertices(p.getVertices(), true),  // Path (polygons are closed)
@@ -359,7 +373,7 @@ EagleTypeConverter::Geometry EagleTypeConverter::convertPolygon(
 EagleTypeConverter::Geometry EagleTypeConverter::convertCircle(
     const parseagle::Circle& c, bool isGrabArea) {
   const bool filled = (c.getWidth() == 0);  // EAGLE fills zero-width circles!
-  const UnsignedLength lineWidth = UnsignedLength(convertLength(c.getWidth()));
+  const UnsignedLength lineWidth = convertLineWidth(c.getWidth(), c.getLayer());
   const Point pos = convertPoint(c.getPosition());
   const PositiveLength diameter(convertLength(c.getRadius()) * 2);
   return Geometry{

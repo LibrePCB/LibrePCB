@@ -158,6 +158,16 @@ TEST_F(EagleTypeConverterTest, testConvertLength) {
   EXPECT_EQ(Length(1234567), C::convertLength(1.234567));
 }
 
+TEST_F(EagleTypeConverterTest, testConvertLineWidth) {
+  EXPECT_EQ(UnsignedLength(0), C::convertLineWidth(0, 20));  // dimension
+  EXPECT_EQ(UnsignedLength(0), C::convertLineWidth(0, 46));  // milling
+  EXPECT_EQ(UnsignedLength(0), C::convertLineWidth(1.23, 20));  // dimension
+  EXPECT_EQ(UnsignedLength(0), C::convertLineWidth(1.23, 46));  // milling
+  EXPECT_EQ(UnsignedLength(1230000), C::convertLineWidth(1.23, 1));  // tCu
+  EXPECT_EQ(UnsignedLength(1230000), C::convertLineWidth(1.23, 94));  // symbols
+  EXPECT_THROW(C::convertLineWidth(-1.23, 94), Exception);
+}
+
 TEST_F(EagleTypeConverterTest, testConvertPoint) {
   EXPECT_EQ(Point(0, 0), C::convertPoint(parseagle::Point{0, 0}));
   EXPECT_EQ(Point(-1234567, 1234567),

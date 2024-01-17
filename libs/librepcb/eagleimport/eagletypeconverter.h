@@ -225,6 +225,19 @@ public:
   static Length convertLength(double l);
 
   /**
+   * @brief Convert a line width for a given layer
+   *
+   * Applies line width rules for some special purpose layers (like board
+   * outline).
+   *
+   * @param w         EAGLE line width [mm]
+   * @param layerId   EAGLE layer ID
+   *
+   * @return LibrePCB line width length
+   */
+  static UnsignedLength convertLineWidth(double w, int layerId);
+
+  /**
    * @brief Convert a point
    *
    * @param p   EAGLE point [mm]
