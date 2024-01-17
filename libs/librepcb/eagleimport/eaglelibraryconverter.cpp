@@ -110,7 +110,10 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
 
   QList<C::Geometry> geometries;
   tryOrRaiseError(eagleSymbol.getName(), [&]() {
-    geometries += C::convertAndJoinWires(eagleSymbol.getWires(), true);
+    // Enable grab areas on closed polygons. However, don't do this for sheet
+    // frames as it would look ugly. We guess that by the absence of pins.
+    const bool grabArea = !eagleSymbol.getPins().isEmpty();
+    geometries += C::convertAndJoinWires(eagleSymbol.getWires(), grabArea);
   });
   foreach (const auto& obj, eagleSymbol.getRectangles()) {
     geometries.append(C::convertRectangle(obj, true));
@@ -120,6 +123,9 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
   }
   foreach (const auto& obj, eagleSymbol.getCircles()) {
     geometries.append(C::convertCircle(obj, true));
+  }
+  foreach (const auto& obj, eagleSymbol.getFrames()) {
+    geometries.append(C::convertFrame(obj));
   }
   foreach (const auto& g, geometries) {
     tryOrRaiseError(eagleSymbol.getName(), [&]() {

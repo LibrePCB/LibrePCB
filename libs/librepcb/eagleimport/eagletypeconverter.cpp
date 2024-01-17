@@ -24,6 +24,7 @@
 
 #include <librepcb/core/utils/tangentpathjoiner.h>
 #include <parseagle/common/circle.h>
+#include <parseagle/common/frame.h>
 #include <parseagle/common/point.h>
 #include <parseagle/common/polygon.h>
 #include <parseagle/common/rectangle.h>
@@ -421,9 +422,34 @@ std::shared_ptr<Hole> EagleTypeConverter::convertHole(
   );
 }
 
+EagleTypeConverter::Geometry EagleTypeConverter::convertFrame(
+    const parseagle::Frame& f) {
+  const Length width(3810000);
+  const Point p1 = convertPoint(f.getP1());
+  const Point p2 = convertPoint(f.getP2());
+  const Point p1Abs(std::min(p1.getX(), p2.getX()) + width,
+                    std::min(p1.getY(), p2.getY()) + width);
+  const Point p2Abs(std::max(p1.getX(), p2.getX()) - width,
+                    std::max(p1.getY(), p2.getY()) - width);
+  return Geometry{
+      f.getLayer(),  // Layer
+      UnsignedLength(200000),  // Line width
+      false,  // Filled
+      false,  // Grab area
+      Path::rect(p1Abs, p2Abs),  // Path
+      tl::nullopt,  // Circle
+  };
+}
+
 QString EagleTypeConverter::convertTextValue(const QString& v) {
   QString value = v;
-  if (value.startsWith(">")) {
+  if (value == ">DRAWING_NAME") {
+    value = "{{PROJECT}}";
+  } else if ((value == ">LAST_DATE_TIME") || (value == ">PLOT_DATE_TIME")) {
+    value = "{{DATE}} {{TIME}}";
+  } else if (value == ">SHEET") {
+    value = "{{PAGE}}/{{PAGES}}";
+  } else if (value.startsWith(">")) {
     value = "{{" + value.mid(1).toUpper() + "}}";
   }
   return value;

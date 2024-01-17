@@ -363,6 +363,26 @@ TEST_F(EagleTypeConverterTest, testConvertHole) {
             out->getPath()->getVertices().first().getPos());
 }
 
+TEST_F(EagleTypeConverterTest, testConvertFrame) {
+  QString xml =
+      "<frame x1=\"10\" y1=\"20\" x2=\"40\" y2=\"30\" columns=\"6\" rows=\"4\" "
+      "layer=\"94\"/>";
+  auto out = C::convertFrame(parseagle::Frame(dom(xml)));
+  EXPECT_EQ(94, out.layerId);
+  EXPECT_EQ(UnsignedLength(200000), out.lineWidth);
+  EXPECT_EQ(false, out.filled);  // Filled frames make no sense.
+  EXPECT_EQ(false, out.grabArea);  // Grab area makes no sense.
+  EXPECT_EQ(Path({
+                Vertex(Point(13810000, 23810000), Angle(0)),
+                Vertex(Point(36190000, 23810000), Angle(0)),
+                Vertex(Point(36190000, 26190000), Angle(0)),
+                Vertex(Point(13810000, 26190000), Angle(0)),
+                Vertex(Point(13810000, 23810000), Angle(0)),
+            }),
+            out.path);
+  EXPECT_EQ(tl::nullopt, out.circle);
+}
+
 TEST_F(EagleTypeConverterTest, testConvertTextValue) {
   EXPECT_EQ("", C::convertTextValue("").toStdString());
   EXPECT_EQ("{{NAME}}", C::convertTextValue(">NAME").toStdString());

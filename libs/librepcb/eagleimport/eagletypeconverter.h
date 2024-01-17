@@ -50,6 +50,7 @@
 namespace parseagle {
 class Circle;
 class DeviceSet;
+class Frame;
 class Gate;
 class Hole;
 class Library;
@@ -338,6 +339,15 @@ public:
    * @return LibrePCB hole
    */
   static std::shared_ptr<Hole> convertHole(const parseagle::Hole& h);
+
+  /**
+   * @brief Convert a frame
+   *
+   * @param f   EAGLE frame
+   *
+   * @return Intermediate geometry containing 4 line segments
+   */
+  static Geometry convertFrame(const parseagle::Frame& f);
 
   /**
    * @brief Convert a text value
