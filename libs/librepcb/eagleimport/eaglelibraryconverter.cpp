@@ -273,6 +273,7 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
       pinCount[pinIt.key()]++;
     }
   }
+  const bool addGateSuffixes = eagleDeviceSet.getGates().count() > 1;
   foreach (const auto& gate, eagleDeviceSet.getGates()) {
     const auto symbolKey = std::make_pair(libName, gate.getSymbol());
     const tl::optional<Uuid> symbolUuid = mSymbolMap.value(symbolKey);
@@ -283,7 +284,8 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
     }
     auto item = std::make_shared<ComponentSymbolVariantItem>(
         Uuid::createRandom(), *symbolUuid, C::convertPoint(gate.getPosition()),
-        Angle(0), true, C::convertGateName(gate.getName()));
+        Angle(0), true,
+        C::convertGateName(addGateSuffixes ? gate.getName() : ""));
     symbolVariant->getSymbolItems().append(item);
     for (auto pinIt = mSymbolPinMap[symbolKey].constBegin();
          pinIt != mSymbolPinMap[symbolKey].constEnd(); pinIt++) {

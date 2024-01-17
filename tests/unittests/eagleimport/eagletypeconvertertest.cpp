@@ -114,7 +114,7 @@ TEST_F(EagleTypeConverterTest, testConvertComponentPrefix) {
 
 TEST_F(EagleTypeConverterTest, testConvertGateName) {
   EXPECT_EQ("", C::convertGateName("")->toStdString());
-  EXPECT_EQ("", C::convertGateName("G$42")->toStdString());
+  EXPECT_EQ("G42", C::convertGateName("G$42")->toStdString());
   EXPECT_EQ("1", C::convertGateName("-1")->toStdString());
   EXPECT_EQ("Foo_Bar", C::convertGateName(" Foo Bar ")->toStdString());
 }

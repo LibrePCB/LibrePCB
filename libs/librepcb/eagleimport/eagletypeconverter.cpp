@@ -92,12 +92,8 @@ ComponentPrefix EagleTypeConverter::convertComponentPrefix(const QString& p) {
 
 ComponentSymbolVariantItemSuffix EagleTypeConverter::convertGateName(
     const QString& n) {
-  QString suffix = n.trimmed();
-  if (suffix.startsWith("G$")) {
-    suffix = "";  // Convert EAGLE default name to LibrePCB default name.
-  }
-  suffix = cleanComponentSymbolVariantItemSuffix(suffix);
-  return ComponentSymbolVariantItemSuffix(suffix);
+  return ComponentSymbolVariantItemSuffix(
+      cleanComponentSymbolVariantItemSuffix(n));
 }
 
 CircuitIdentifier EagleTypeConverter::convertPinOrPadName(const QString& n) {
