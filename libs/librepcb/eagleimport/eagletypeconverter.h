@@ -29,6 +29,7 @@
 #include <librepcb/core/geometry/polygon.h>
 #include <librepcb/core/geometry/stroketext.h>
 #include <librepcb/core/geometry/text.h>
+#include <librepcb/core/geometry/zone.h>
 #include <librepcb/core/library/cmp/componentprefix.h>
 #include <librepcb/core/library/cmp/componentsymbolvariantitemsuffix.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
@@ -470,6 +471,31 @@ public:
    * @return A polygon if the layer is valid for schematics, otherwise `nullptr`
    */
   static std::shared_ptr<Polygon> tryConvertToSchematicPolygon(
+      const Geometry& g);
+
+  /**
+   * @brief Convert the outline of a board zone
+   *
+   * Our zones do not support setting aline width, so we have to offet the
+   * outline to get the same keepout area.
+   *
+   * @param outline   EAGLE keepout zone outline
+   * @param lineWidth EAGLE keepout zone line width
+   *
+   * @return Possibly multiple paths with the LibrePCB zone outline(s)
+   */
+  static QVector<Path> convertBoardZoneOutline(const Path& outline,
+                                               const Length& lineWidth);
+
+  /**
+   * @brief Try to convert an intermediate geometry to board keepout zones
+   *
+   * @param g   intermediate geometry
+   *
+   * @return    A keepout zone(s) if the geometry represents a zone,
+   *            otherwise an empty vector
+   */
+  static QVector<std::shared_ptr<Zone>> tryConvertToBoardZones(
       const Geometry& g);
 
   /**

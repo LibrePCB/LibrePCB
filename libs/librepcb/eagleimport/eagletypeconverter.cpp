@@ -23,6 +23,7 @@
 #include "eagletypeconverter.h"
 
 #include <librepcb/core/types/boundedunsignedratio.h>
+#include <librepcb/core/utils/clipperhelpers.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
 #include <parseagle/common/circle.h>
 #include <parseagle/common/frame.h>
@@ -724,6 +725,55 @@ std::shared_ptr<Polygon> EagleTypeConverter::tryConvertToSchematicPolygon(
                                      g.filled, g.grabArea, g.path);
   }
   return nullptr;
+}
+
+QVector<Path> EagleTypeConverter::convertBoardZoneOutline(
+    const Path& outline, const Length& lineWidth) {
+  const PositiveLength maxArcTolerance(10000);
+  if ((lineWidth / 2) > (*maxArcTolerance)) {
+    ClipperLib::Paths paths{ClipperHelpers::convert(outline, maxArcTolerance)};
+    ClipperHelpers::offset(paths, lineWidth / 2, maxArcTolerance,
+                           ClipperLib::jtRound);
+    return ClipperHelpers::convert(paths);
+  } else {
+    return {outline};
+  }
+}
+
+QVector<std::shared_ptr<Zone>> EagleTypeConverter::tryConvertToBoardZones(
+    const Geometry& g) {
+  Zone::Layers layers = Zone::Layers();
+  Zone::Rules rules = Zone::Rules();
+  switch (g.layerId) {
+    case 39:  // tKeepout
+      layers = Zone::Layer::Top;
+      rules = Zone::Rule::NoDevices;
+      break;
+    case 40:  // bKeepout
+      layers = Zone::Layer::Bottom;
+      rules = Zone::Rule::NoDevices;
+      break;
+    case 41:  // tRestrict
+      layers = Zone::Layer::Top;
+      rules = Zone::Rule::NoCopper | Zone::Rule::NoPlanes;
+      break;
+    case 42:  // bRestrict
+      layers = Zone::Layer::Bottom;
+      rules = Zone::Rule::NoCopper | Zone::Rule::NoPlanes;
+      break;
+    case 43:  // vRestrict
+      layers = Zone::Layer::Inner;
+      rules = Zone::Rule::NoCopper | Zone::Rule::NoPlanes;
+      break;
+    default:
+      return {};
+  }
+  QVector<std::shared_ptr<Zone>> result;
+  foreach (const Path& outline, convertBoardZoneOutline(g.path, *g.lineWidth)) {
+    result.append(
+        std::make_shared<Zone>(Uuid::createRandom(), layers, rules, outline));
+  }
+  return result;
 }
 
 std::shared_ptr<Circle> EagleTypeConverter::tryConvertToBoardCircle(

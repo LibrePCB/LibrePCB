@@ -191,7 +191,12 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
   }
   foreach (const auto& g, geometries) {
     tryOrRaiseError(eaglePackage.getName(), [&]() {
-      if (auto o = C::tryConvertToBoardCircle(g)) {
+      const auto zones = C::tryConvertToBoardZones(g);
+      if (!zones.isEmpty()) {
+        foreach (const auto& o, zones) {
+          footprint->getZones().append(o);
+        }
+      } else if (auto o = C::tryConvertToBoardCircle(g)) {
         footprint->getCircles().append(o);
       } else if (auto o = C::tryConvertToBoardPolygon(g)) {
         footprint->getPolygons().append(o);
