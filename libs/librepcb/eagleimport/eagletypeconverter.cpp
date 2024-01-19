@@ -263,6 +263,31 @@ const Layer* EagleTypeConverter::tryConvertBoardLayer(int id) noexcept {
   return nullptr;
 }
 
+Alignment EagleTypeConverter::convertAlignment(parseagle::Alignment a) {
+  switch (a) {
+    case parseagle::Alignment::BottomLeft:
+      return Alignment(HAlign::left(), VAlign::bottom());
+    case parseagle::Alignment::BottomCenter:
+      return Alignment(HAlign::center(), VAlign::bottom());
+    case parseagle::Alignment::BottomRight:
+      return Alignment(HAlign::right(), VAlign::bottom());
+    case parseagle::Alignment::CenterLeft:
+      return Alignment(HAlign::left(), VAlign::center());
+    case parseagle::Alignment::Center:
+      return Alignment(HAlign::center(), VAlign::center());
+    case parseagle::Alignment::CenterRight:
+      return Alignment(HAlign::right(), VAlign::center());
+    case parseagle::Alignment::TopLeft:
+      return Alignment(HAlign::left(), VAlign::top());
+    case parseagle::Alignment::TopCenter:
+      return Alignment(HAlign::center(), VAlign::top());
+    case parseagle::Alignment::TopRight:
+      return Alignment(HAlign::right(), VAlign::top());
+    default:
+      return Alignment(HAlign::left(), VAlign::bottom());
+  }
+}
+
 Length EagleTypeConverter::convertLength(double l) {
   return Length::fromMm(l);
 }
@@ -404,39 +429,93 @@ QString EagleTypeConverter::convertTextValue(const QString& v) {
   return value;
 }
 
+PositiveLength EagleTypeConverter::convertSchematicTextSize(double s) {
+  return PositiveLength(Length::fromMm(s * 2.5 / 1.778));
+}
+
 std::shared_ptr<Text> EagleTypeConverter::tryConvertSchematicText(
     const parseagle::Text& t) {
   if (auto layer = tryConvertSchematicLayer(t.getLayer())) {
+    const bool mirror = t.getRotation().getMirror();
+    const Angle rotation = convertAngle(t.getRotation().getAngle());
+    const Alignment alignment = convertAlignment(t.getAlignment());
     return std::make_shared<Text>(
         Uuid::createRandom(),  // UUID
         *layer,  // Layer
         convertTextValue(t.getValue()),  // Text
         convertPoint(t.getPosition()),  // Position
-        convertAngle(t.getRotation().getAngle()),  // Rotation
-        PositiveLength(2500000),  // Height
-        Alignment(HAlign::left(), VAlign::bottom())  // Alignment
+        mirror ? -rotation : rotation,  // Rotation
+        convertSchematicTextSize(t.getSize()),  // Height
+        mirror ? alignment.mirroredH() : alignment  // Alignment
     );
   } else {
     return nullptr;
   }
 }
 
+PositiveLength EagleTypeConverter::convertBoardTextSize(int layerId,
+                                                        double size) {
+  Length newSize = Length::fromMm(size * 0.85);
+  // Avoid too small texts on silkscreen layers. Do not touch texts on
+  // functional layers like copper to avoid possible unintended effects.
+  switch (layerId) {
+    case 21:  // tPlace
+    case 22:  // bPlace
+    case 25:  // tNames
+    case 26:  // bNames
+    case 27:  // tValues
+    case 28:  // bValues
+      newSize = std::max(newSize, Length(800000));  // min. 0.8mm
+      break;
+    default:
+      break;
+  }
+  return PositiveLength(newSize);
+}
+
+UnsignedLength EagleTypeConverter::convertBoardTextStrokeWidth(int layerId,
+                                                               double size,
+                                                               int ratio) {
+  if (ratio == 0) {
+    ratio = 15;
+  }
+  Length width = Length::fromMm((size * ratio) / 100);
+  // Avoid too thin texts on silkscreen layers. Do not touch texts on
+  // functional layers like copper to avoid possible unintended effects.
+  switch (layerId) {
+    case 21:  // tPlace
+    case 22:  // bPlace
+    case 25:  // tNames
+    case 26:  // bNames
+    case 27:  // tValues
+    case 28:  // bValues
+      width = std::max(width, Length(150000));  // min. 150um
+      break;
+    default:
+      break;
+  }
+  return UnsignedLength(width);
+}
+
 std::shared_ptr<StrokeText> EagleTypeConverter::tryConvertBoardText(
     const parseagle::Text& t) {
   if (auto layer = tryConvertBoardLayer(t.getLayer())) {
+    const bool mirror = t.getRotation().getMirror();
+    const Angle rotation = convertAngle(t.getRotation().getAngle());
     return std::make_shared<StrokeText>(
         Uuid::createRandom(),  // UUID
         *layer,  // Layer
         convertTextValue(t.getValue()),  // Text
         convertPoint(t.getPosition()),  // Position
-        convertAngle(t.getRotation().getAngle()),  // Rotation
-        PositiveLength(1000000),  // Height
-        UnsignedLength(200000),  // Stroke width
+        mirror ? -rotation : rotation,  // Rotation
+        convertBoardTextSize(t.getLayer(), t.getSize()),  // Height
+        convertBoardTextStrokeWidth(t.getLayer(), t.getSize(),
+                                    t.getRatio()),  // Stroke width
         StrokeTextSpacing(),  // Letter spacing
         StrokeTextSpacing(),  // Line spacing
-        Alignment(HAlign::left(), VAlign::bottom()),  // Alignment
-        false,  // Mirrored
-        true  // Auto rotate
+        convertAlignment(t.getAlignment()),  // Alignment
+        mirror,  // Mirrored
+        !t.getRotation().getSpin()  // Auto rotate
     );
   } else {
     return nullptr;

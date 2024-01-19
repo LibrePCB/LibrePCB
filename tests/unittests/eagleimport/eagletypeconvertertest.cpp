@@ -152,6 +152,13 @@ TEST_F(EagleTypeConverterTest, testTryConvertBoardLayer) {
   EXPECT_EQ(nullptr, C::tryConvertBoardLayer(999));  // non existent
 }
 
+TEST_F(EagleTypeConverterTest, testConvertAlignment) {
+  EXPECT_EQ(Qt::AlignBottom | Qt::AlignRight,
+            C::convertAlignment(parseagle::Alignment::BottomRight).toQtAlign());
+  EXPECT_EQ(Qt::AlignTop | Qt::AlignHCenter,
+            C::convertAlignment(parseagle::Alignment::TopCenter).toQtAlign());
+}
+
 TEST_F(EagleTypeConverterTest, testConvertLength) {
   EXPECT_EQ(Length(0), C::convertLength(0));
   EXPECT_EQ(Length(-1234567), C::convertLength(-1.234567));
@@ -363,18 +370,41 @@ TEST_F(EagleTypeConverterTest, testConvertTextValue) {
   EXPECT_EQ("Some Text", C::convertTextValue("Some Text").toStdString());
 }
 
+TEST_F(EagleTypeConverterTest, testTryConvertSchematicTextSize) {
+  // Attention: The conversion factor is never exactly correct due to different
+  // font layouting, but it seems to be a good value in most cases. Also it
+  // makes sense to convert EAGLEs default name/value size of 1.778mm (is this
+  // true?) to the LibrePCB's default name/value size of 2.5mm.
+  EXPECT_EQ(PositiveLength(2500000), C::convertSchematicTextSize(1.778));
+}
+
 TEST_F(EagleTypeConverterTest, testTryConvertSchematicText) {
-  QString xml = "<text x=\"1\" y=\"2\" size=\"3\" layer=\"94\">foo\nbar</text>";
+  QString xml =
+      "<text x=\"1\" y=\"2\" size=\"1.778\" layer=\"94\">foo\nbar</text>";
   auto out = C::tryConvertSchematicText(parseagle::Text(dom(xml)));
   ASSERT_TRUE(out);
   EXPECT_EQ(Layer::symbolOutlines().getId().toStdString(),
             out->getLayer().getId().toStdString());
   EXPECT_EQ(Point(1000000, 2000000), out->getPosition());
   EXPECT_EQ(Angle(0), out->getRotation());
-  EXPECT_EQ(PositiveLength(2500000), out->getHeight());  // Default (hardcoded).
-  EXPECT_EQ(Alignment(HAlign::left(), VAlign::bottom()),
-            out->getAlign());  // Default (hardcoded).
+  EXPECT_EQ(PositiveLength(2500000), out->getHeight());  // Scaled.
+  EXPECT_EQ(Alignment(HAlign::left(), VAlign::bottom()), out->getAlign());
   EXPECT_EQ("foo\nbar", out->getText().toStdString());
+}
+
+TEST_F(EagleTypeConverterTest, testTryConvertBoardTextSize) {
+  // Attention: The conversion factor is never exactly correct due to different
+  // font layouting, but it seems to be a good value for the vector font
+  // (LibrePCB doesn't support other fonts anyway, so we don't care about them).
+  EXPECT_EQ(PositiveLength(1700000), C::convertBoardTextSize(1, 2));
+}
+
+TEST_F(EagleTypeConverterTest, testTryConvertBoardTextStrokeWidth) {
+  EXPECT_EQ(UnsignedLength(1050000),
+            C::convertBoardTextStrokeWidth(1, 2.5, 42));
+  // It seems the ratio is sometimes not defined and is thus set to 0%. In this
+  // case, we fall back to a default ratio of 15%.
+  EXPECT_EQ(UnsignedLength(375000), C::convertBoardTextStrokeWidth(1, 2.5, 0));
 }
 
 TEST_F(EagleTypeConverterTest, testTryConvertBoardText) {
@@ -385,17 +415,13 @@ TEST_F(EagleTypeConverterTest, testTryConvertBoardText) {
             out->getLayer().getId().toStdString());
   EXPECT_EQ(Point(1000000, 2000000), out->getPosition());
   EXPECT_EQ(Angle(0), out->getRotation());
-  EXPECT_EQ(PositiveLength(1000000), out->getHeight());  // Default (hardcoded).
-  EXPECT_EQ(UnsignedLength(200000),
-            out->getStrokeWidth());  // Default (hardcoded).
-  EXPECT_EQ(StrokeTextSpacing(),
-            out->getLetterSpacing());  // Default (hardcoded).
-  EXPECT_EQ(StrokeTextSpacing(),
-            out->getLineSpacing());  // Default (hardcoded).
-  EXPECT_EQ(Alignment(HAlign::left(), VAlign::bottom()),
-            out->getAlign());  // Default (hardcoded).
-  EXPECT_EQ(false, out->getMirrored());  // Default (hardcoded).
-  EXPECT_EQ(true, out->getAutoRotate());  // Default (hardcoded).
+  EXPECT_EQ(PositiveLength(2550000), out->getHeight());  // Scaled.
+  EXPECT_EQ(UnsignedLength(240000), out->getStrokeWidth());  // Default ratio.
+  EXPECT_EQ(StrokeTextSpacing(), out->getLetterSpacing());  // Hardcoded.
+  EXPECT_EQ(StrokeTextSpacing(), out->getLineSpacing());  // Hardcoded.
+  EXPECT_EQ(Alignment(HAlign::left(), VAlign::bottom()), out->getAlign());
+  EXPECT_EQ(false, out->getMirrored());  // Default value.
+  EXPECT_EQ(true, out->getAutoRotate());  // Default value.
   EXPECT_EQ("{{NAME}}", out->getText().toStdString());
 }
 

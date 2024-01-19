@@ -38,6 +38,7 @@
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/point.h>
 #include <optional/tl/optional.hpp>
+#include <parseagle/common/enums.h>
 
 #include <QtCore>
 
@@ -216,6 +217,15 @@ public:
   static const Layer* tryConvertBoardLayer(int id) noexcept;
 
   /**
+   * @brief Convert an alignment
+   *
+   * @param a   EAGLE alignment
+   *
+   * @return LibrePCB alignment
+   */
+  static Alignment convertAlignment(parseagle::Alignment a);
+
+  /**
    * @brief Convert a length
    *
    * @param l   EAGLE length [mm]
@@ -339,6 +349,15 @@ public:
   static QString convertTextValue(const QString& v);
 
   /**
+   * @brief Convert the size (height) of a schematic text
+   *
+   * @param s   EAGLE text size [mm]
+   *
+   * @return LibrePCB text size
+   */
+  static PositiveLength convertSchematicTextSize(double s);
+
+  /**
    * @brief Try to convert a schematic/symbol text
    *
    * @param t   EAGLE text
@@ -347,6 +366,28 @@ public:
    */
   static std::shared_ptr<Text> tryConvertSchematicText(
       const parseagle::Text& t);
+
+  /**
+   * @brief Convert the size (height) of a board text
+   *
+   * @param layerId EAGLE layer ID
+   * @param size    EAGLE text size [mm]
+   *
+   * @return LibrePCB text size
+   */
+  static PositiveLength convertBoardTextSize(int layerId, double size);
+
+  /**
+   * @brief Convert the stroke width of a board text
+   *
+   * @param layerId EAGLE layer ID
+   * @param size    EAGLE text size [mm]
+   * @param ratio   EAGLE text ratio [%]
+   *
+   * @return LibrePCB stroke text width
+   */
+  static UnsignedLength convertBoardTextStrokeWidth(int layerId, double size,
+                                                    int ratio);
 
   /**
    * @brief Try to cnvert a board/footprint text
