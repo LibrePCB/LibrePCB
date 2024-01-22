@@ -116,7 +116,8 @@ private:
 
   // Project Management
 
-  ProjectEditor* newProject(FilePath parentDir = FilePath()) noexcept;
+  ProjectEditor* newProject(bool eagleImport = false,
+                            FilePath parentDir = FilePath()) noexcept;
 
   /**
    * @brief Open a project with the editor (or bring an already opened editor to
@@ -219,6 +220,7 @@ private:
   QScopedPointer<QAction> mActionNewProject;
   QScopedPointer<QAction> mActionOpenProject;
   QScopedPointer<QAction> mActionCloseAllProjects;
+  QScopedPointer<QAction> mActionImportEagleProject;
   QScopedPointer<QAction> mActionAboutLibrePcb;
   QScopedPointer<QAction> mActionAboutQt;
   QScopedPointer<QAction> mActionOnlineDocumentation;

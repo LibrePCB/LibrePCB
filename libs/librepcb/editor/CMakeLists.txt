@@ -680,6 +680,9 @@ add_library(
   project/newprojectwizard/newprojectwizard.cpp
   project/newprojectwizard/newprojectwizard.h
   project/newprojectwizard/newprojectwizard.ui
+  project/newprojectwizard/newprojectwizardpage_eagleimport.cpp
+  project/newprojectwizard/newprojectwizardpage_eagleimport.h
+  project/newprojectwizard/newprojectwizardpage_eagleimport.ui
   project/newprojectwizard/newprojectwizardpage_initialization.cpp
   project/newprojectwizard/newprojectwizardpage_initialization.h
   project/newprojectwizard/newprojectwizardpage_initialization.ui

@@ -283,6 +283,8 @@ void ControlPanel::createActions() noexcept {
   mActionCloseAllProjects.reset(cmd.projectCloseAll.createAction(
       this, this, [this]() { closeAllProjects(true); },
       EditorCommand::ActionFlag::ApplicationShortcut));
+  mActionImportEagleProject.reset(cmd.importEagleProject.createAction(
+      this, this, [this]() { newProject(true); }));
   mActionAboutLibrePcb.reset(cmd.aboutLibrePcb.createAction(
       this, mStandardCommandHandler.data(),
       &StandardEditorCommandHandler::aboutLibrePcb));
@@ -329,6 +331,11 @@ void ControlPanel::createMenus() noexcept {
   mb.addAction(mActionNewProject);
   mb.addAction(mActionOpenProject);
   mb.addAction(mActionCloseAllProjects);
+  mb.addSeparator();
+  {
+    MenuBuilder smb(mb.addSubMenu(&MenuBuilder::createImportMenu));
+    smb.addAction(mActionImportEagleProject);
+  }
   mb.addSeparator();
   mb.addAction(mActionSwitchWorkspace);
   mb.addSeparator();
@@ -453,12 +460,16 @@ void ControlPanel::showProjectReadmeInBrowser(
  *  Project Management
  ******************************************************************************/
 
-ProjectEditor* ControlPanel::newProject(FilePath parentDir) noexcept {
+ProjectEditor* ControlPanel::newProject(bool eagleImport,
+                                        FilePath parentDir) noexcept {
   if (!parentDir.isValid()) {
     parentDir = mWorkspace.getProjectsPath();
   }
 
-  NewProjectWizard wizard(mWorkspace, this);
+  const NewProjectWizard::Mode mode = eagleImport
+      ? NewProjectWizard::Mode::EagleImport
+      : NewProjectWizard::Mode::NewProject;
+  NewProjectWizard wizard(mWorkspace, mode, this);
   wizard.setLocation(parentDir);
   if (wizard.exec() == QWizard::Accepted) {
     try {
@@ -771,7 +782,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
   mb.addSeparator();
   if (fp.isExistingDir() && (!isProjectDir) && (!isInProjectDir)) {
     mb.addAction(cmd.projectNew.createAction(
-        &menu, this, [this, fp]() { newProject(fp); },
+        &menu, this, [this, fp]() { newProject(false, fp); },
         EditorCommand::ActionFlag::NoShortcuts));
     mb.addAction(cmd.folderNew.createAction(
         &menu, this,

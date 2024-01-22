@@ -17,14 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_NEWPROJECTWIZARDPAGE_METADATA_H
-#define LIBREPCB_EDITOR_NEWPROJECTWIZARDPAGE_METADATA_H
+#ifndef LIBREPCB_EDITOR_NEWPROJECTWIZARDPAGE_EAGLEIMPORT_H
+#define LIBREPCB_EDITOR_NEWPROJECTWIZARDPAGE_EAGLEIMPORT_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
-
 #include <QtCore>
 #include <QtWidgets>
 
@@ -33,61 +31,70 @@
  ******************************************************************************/
 namespace librepcb {
 
+namespace eagleimport {
+class EagleProjectImport;
+}
+
+class Project;
+class FilePath;
 class Workspace;
 
 namespace editor {
 
 namespace Ui {
-class NewProjectWizardPage_Metadata;
+class NewProjectWizardPage_EagleImport;
 }
 
+class WaitingSpinnerWidget;
+
 /*******************************************************************************
- *  Class NewProjectWizardPage_Metadata
+ *  Class NewProjectWizardPage_EagleImport
  ******************************************************************************/
 
 /**
- * @brief The NewProjectWizardPage_Metadata class
+ * @brief The NewProjectWizardPage_EagleImport class
  */
-class NewProjectWizardPage_Metadata final : public QWizardPage {
+class NewProjectWizardPage_EagleImport final : public QWizardPage {
   Q_OBJECT
+
+  struct ParserResult {
+    std::shared_ptr<eagleimport::EagleProjectImport> import;
+    QStringList messages;
+  };
 
 public:
   // Constructors / Destructor
-  explicit NewProjectWizardPage_Metadata(const Workspace& ws,
-                                         QWidget* parent = nullptr) noexcept;
-  NewProjectWizardPage_Metadata(const NewProjectWizardPage_Metadata& other) =
-      delete;
-  ~NewProjectWizardPage_Metadata() noexcept;
+  explicit NewProjectWizardPage_EagleImport(const Workspace& ws,
+                                            QWidget* parent = nullptr) noexcept;
+  NewProjectWizardPage_EagleImport(
+      const NewProjectWizardPage_EagleImport& other) = delete;
+  ~NewProjectWizardPage_EagleImport() noexcept;
 
-  // Setters
-  void setProjectName(const QString& name) noexcept;
-  void setDefaultLocation(const FilePath& dir) noexcept;
-
-  // Getters
-  QString getProjectName() const noexcept;
-  QString getProjectAuthor() const noexcept;
-  bool isLicenseSet() const noexcept;
-  FilePath getProjectLicenseFilePath() const noexcept;
-  FilePath getFullFilePath() const noexcept;
+  // General Methods
+  void import(Project& project);
 
   // Operator Overloadings
-  NewProjectWizardPage_Metadata& operator=(
-      const NewProjectWizardPage_Metadata& rhs) = delete;
+  NewProjectWizardPage_EagleImport& operator=(
+      const NewProjectWizardPage_EagleImport& rhs) = delete;
 
-private:  // GUI Action Handlers
-  void nameChanged(const QString& name) noexcept;
-  void locationChanged(const QString& dir) noexcept;
-  void chooseLocationClicked() noexcept;
+signals:
+  void projectSelected(const QString& name) const;
 
 private:  // Methods
-  void updateProjectFilePath() noexcept;
+  void updateStatus() noexcept;
+  static NewProjectWizardPage_EagleImport::ParserResult parseAsync(
+      std::shared_ptr<eagleimport::EagleProjectImport> import,
+      const FilePath& schFp, const FilePath& brdFp) noexcept;
   bool isComplete() const noexcept override;
-  bool validatePage() noexcept override;
 
 private:  // Data
   const Workspace& mWorkspace;
-  QScopedPointer<Ui::NewProjectWizardPage_Metadata> mUi;
-  FilePath mFullFilePath;
+  QScopedPointer<Ui::NewProjectWizardPage_EagleImport> mUi;
+  QScopedPointer<WaitingSpinnerWidget> mWaitingSpinner;
+  QString mCurrentSchematic;
+  QString mCurrentBoard;
+  QFuture<ParserResult> mFuture;
+  std::shared_ptr<eagleimport::EagleProjectImport> mImport;
 };
 
 /*******************************************************************************

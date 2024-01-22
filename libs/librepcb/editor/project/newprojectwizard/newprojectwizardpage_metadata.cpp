@@ -94,6 +94,11 @@ NewProjectWizardPage_Metadata::~NewProjectWizardPage_Metadata() noexcept {
  *  Setters
  ******************************************************************************/
 
+void NewProjectWizardPage_Metadata::setProjectName(
+    const QString& name) noexcept {
+  mUi->edtName->setText(name);
+}
+
 void NewProjectWizardPage_Metadata::setDefaultLocation(
     const FilePath& dir) noexcept {
   mUi->edtLocation->setText(dir.toNative());
