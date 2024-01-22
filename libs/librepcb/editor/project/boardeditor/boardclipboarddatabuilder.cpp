@@ -23,12 +23,12 @@
 #include "boardclipboarddatabuilder.h"
 
 #include "boardgraphicsscene.h"
-#include "boardnetsegmentsplitter.h"
 #include "boardselectionquery.h"
 
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardnetsegmentsplitter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>

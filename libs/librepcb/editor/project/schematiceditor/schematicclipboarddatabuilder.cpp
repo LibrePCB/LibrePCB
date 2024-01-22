@@ -23,7 +23,6 @@
 #include "schematicclipboarddatabuilder.h"
 
 #include "schematicgraphicsscene.h"
-#include "schematicnetsegmentsplitter.h"
 #include "schematicselectionquery.h"
 
 #include <librepcb/core/fileio/transactionalfilesystem.h>
@@ -42,6 +41,7 @@
 #include <librepcb/core/project/schematic/items/si_symbolpin.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/project/schematic/schematicnetsegmentsplitter.h>
 
 #include <QtCore>
 #include <QtWidgets>

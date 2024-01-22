@@ -421,8 +421,6 @@ add_library(
   project/boardeditor/boardlayersdock.cpp
   project/boardeditor/boardlayersdock.h
   project/boardeditor/boardlayersdock.ui
-  project/boardeditor/boardnetsegmentsplitter.cpp
-  project/boardeditor/boardnetsegmentsplitter.h
   project/boardeditor/boardpickplacegeneratordialog.cpp
   project/boardeditor/boardpickplacegeneratordialog.h
   project/boardeditor/boardpickplacegeneratordialog.ui
@@ -783,8 +781,6 @@ add_library(
   project/schematiceditor/schematiceditor.ui
   project/schematiceditor/schematicgraphicsscene.cpp
   project/schematiceditor/schematicgraphicsscene.h
-  project/schematiceditor/schematicnetsegmentsplitter.cpp
-  project/schematiceditor/schematicnetsegmentsplitter.h
   project/schematiceditor/schematicpagesdock.cpp
   project/schematiceditor/schematicpagesdock.h
   project/schematiceditor/schematicpagesdock.ui

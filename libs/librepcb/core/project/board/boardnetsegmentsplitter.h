@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_SCHEMATICNETSEGMENTSPLITTER_H
-#define LIBREPCB_EDITOR_SCHEMATICNETSEGMENTSPLITTER_H
+#ifndef LIBREPCB_CORE_BOARDNETSEGMENTSPLITTER_H
+#define LIBREPCB_CORE_BOARDNETSEGMENTSPLITTER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/geometry/junction.h>
-#include <librepcb/core/geometry/netlabel.h>
-#include <librepcb/core/geometry/netline.h>
+#include "../../geometry/junction.h"
+#include "../../geometry/trace.h"
+#include "../../geometry/via.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,69 +34,64 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace editor {
+
+class Layer;
 
 /*******************************************************************************
- *  Class SchematicNetSegmentSplitter
+ *  Class BoardNetSegmentSplitter
  ******************************************************************************/
 
 /**
- * @brief The SchematicNetSegmentSplitter class
+ * @brief The BoardNetSegmentSplitter class
  */
-class SchematicNetSegmentSplitter final {
+class BoardNetSegmentSplitter final {
 public:
   // Types
   struct Segment {
     JunctionList junctions;
-    NetLineList netlines;
-    NetLabelList netlabels;
+    ViaList vias;
+    TraceList traces;
   };
 
   // Constructors / Destructor
-  SchematicNetSegmentSplitter() noexcept;
-  SchematicNetSegmentSplitter(const SchematicNetSegmentSplitter& other) =
-      delete;
-  ~SchematicNetSegmentSplitter() noexcept;
+  BoardNetSegmentSplitter() noexcept;
+  BoardNetSegmentSplitter(const BoardNetSegmentSplitter& other) = delete;
+  ~BoardNetSegmentSplitter() noexcept;
 
   // General Methods
-  void addSymbolPin(const NetLineAnchor& anchor, const Point& pos,
-                    bool replaceByJunction = false) noexcept;
+  void replaceFootprintPadByJunctions(const TraceAnchor& anchor,
+                                      const Point& pos) noexcept;
   void addJunction(const Junction& junction) noexcept;
-  void addNetLine(const NetLine& netline) noexcept;
-  void addNetLabel(const NetLabel& netlabel) noexcept;
+  void addVia(const Via& via, bool replaceByJunctions) noexcept;
+  void addTrace(const Trace& trace) noexcept;
   QList<Segment> split() noexcept;
 
   // Operator Overloadings
-  SchematicNetSegmentSplitter& operator=(
-      const SchematicNetSegmentSplitter& rhs) = delete;
+  BoardNetSegmentSplitter& operator=(const BoardNetSegmentSplitter& rhs) =
+      delete;
 
 private:  // Methods
-  NetLineAnchor replacePinAnchor(const NetLineAnchor& anchor) noexcept;
-  void findConnectedLinesAndPoints(const NetLineAnchor& anchor,
-                                   NetLineList& availableNetLines,
-                                   Segment& segment)
+  TraceAnchor replaceAnchor(const TraceAnchor& anchor,
+                            const Layer& layer) noexcept;
+  void findConnectedLinesAndPoints(const TraceAnchor& anchor,
+                                   ViaList& availableVias,
+                                   TraceList& availableTraces, Segment& segment)
 
       noexcept;
-  void addNetLabelToNearestNetSegment(const NetLabel& netlabel,
-                                      QList<Segment>& segments) const noexcept;
-  Length getDistanceBetweenNetLabelAndNetSegment(
-      const NetLabel& netlabel, const Segment& netsegment) const noexcept;
-  Point getAnchorPosition(const NetLineAnchor& anchor) const noexcept;
 
 private:  // Data
   JunctionList mJunctions;
-  NetLineList mNetLines;
-  NetLabelList mNetLabels;
+  ViaList mVias;
+  TraceList mTraces;
 
-  QHash<NetLineAnchor, NetLineAnchor> mPinAnchorsToReplace;
-  QHash<NetLineAnchor, Point> mPinPositions;
+  QHash<TraceAnchor, Point> mAnchorsToReplace;
+  QHash<QPair<TraceAnchor, const Layer*>, TraceAnchor> mReplacedAnchors;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
 
 #endif

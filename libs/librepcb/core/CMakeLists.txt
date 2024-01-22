@@ -311,6 +311,8 @@ add_library(
   project/board/boardgerberexport.h
   project/board/boardholedata.cpp
   project/board/boardholedata.h
+  project/board/boardnetsegmentsplitter.cpp
+  project/board/boardnetsegmentsplitter.h
   project/board/boardpainter.cpp
   project/board/boardpainter.h
   project/board/boardpickplacegenerator.cpp
@@ -409,6 +411,8 @@ add_library(
   project/schematic/items/si_text.h
   project/schematic/schematic.cpp
   project/schematic/schematic.h
+  project/schematic/schematicnetsegmentsplitter.cpp
+  project/schematic/schematicnetsegmentsplitter.h
   project/schematic/schematicpainter.cpp
   project/schematic/schematicpainter.h
   rulecheck/rulecheckmessage.cpp

@@ -32,10 +32,10 @@
 #include "../../project/cmd/cmdboardzoneremove.h"
 #include "../../project/cmd/cmddeviceinstanceremove.h"
 #include "../../project/cmd/cmddevicestroketextremove.h"
-#include "../boardeditor/boardnetsegmentsplitter.h"
 #include "cmdremoveunusedlibraryelements.h"
 
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardnetsegmentsplitter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>

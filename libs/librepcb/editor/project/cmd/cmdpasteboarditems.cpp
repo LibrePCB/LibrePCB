@@ -35,7 +35,6 @@
 #include "../../project/cmd/cmdprojectlibraryaddelement.h"
 #include "../boardeditor/boardclipboarddata.h"
 #include "../boardeditor/boardgraphicsscene.h"
-#include "../boardeditor/boardnetsegmentsplitter.h"
 #include "../boardeditor/graphicsitems/bgi_device.h"
 #include "../boardeditor/graphicsitems/bgi_hole.h"
 #include "../boardeditor/graphicsitems/bgi_netline.h"
@@ -50,6 +49,7 @@
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/project/board/board.h>
+#include <librepcb/core/project/board/boardnetsegmentsplitter.h>
 #include <librepcb/core/project/board/items/bi_device.h>
 #include <librepcb/core/project/board/items/bi_footprintpad.h>
 #include <librepcb/core/project/board/items/bi_hole.h>
