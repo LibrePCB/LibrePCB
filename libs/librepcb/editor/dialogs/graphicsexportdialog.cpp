@@ -475,7 +475,7 @@ void GraphicsExportDialog::loadDefaultSettings() noexcept {
   setFitToPage(!mDefaultSettings->getScale().has_value());
   setScaleFactor(mDefaultSettings->getScale()
                      ? *mDefaultSettings->getScale()
-                     : UnsignedRatio(Ratio::percent100()));
+                     : UnsignedRatio(Ratio::fromPercent(100)));
   setDpi(mDefaultSettings->getPixmapDpi());
   setBlackWhite(mDefaultSettings->getBlackWhite());
   setBackgroundColor(mDefaultSettings->getBackgroundColor());

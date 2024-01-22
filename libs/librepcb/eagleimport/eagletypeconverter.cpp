@@ -616,7 +616,7 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
   }
   PositiveLength width(size);
   PositiveLength height(size);
-  UnsignedLimitedRatio radius(Ratio::percent0());
+  UnsignedLimitedRatio radius(Ratio::fromPercent(0));
   FootprintPad::Shape shape;
   Path customShapeOutline;
   switch (p.getShape()) {
@@ -628,16 +628,16 @@ std::pair<std::shared_ptr<PackagePad>, std::shared_ptr<FootprintPad>>
       break;
     case parseagle::PadShape::Round:
       shape = FootprintPad::Shape::RoundedRect;
-      radius = UnsignedLimitedRatio(Ratio::percent100());
+      radius = UnsignedLimitedRatio(Ratio::fromPercent(100));
       break;
     case parseagle::PadShape::Long:
       shape = FootprintPad::Shape::RoundedRect;
-      radius = UnsignedLimitedRatio(Ratio::percent100());
+      radius = UnsignedLimitedRatio(Ratio::fromPercent(100));
       width = PositiveLength(size * 2);
       break;
     case parseagle::PadShape::Offset:
       shape = FootprintPad::Shape::Custom;
-      radius = UnsignedLimitedRatio(Ratio::percent100());
+      radius = UnsignedLimitedRatio(Ratio::fromPercent(100));
       width = PositiveLength(size * 2);
       customShapeOutline =
           Path::obround(width, height).translated(Point(size / 2, 0));
@@ -925,7 +925,7 @@ BoundedUnsignedRatio
     EagleTypeConverter::getDefaultAutoThtAnnularWidth() noexcept {
   // The EAGLE footprint editor displays an annular ring of 25% of the drill
   // diameter then, bounded to 10..20mils (0.254..0.508mm).
-  return BoundedUnsignedRatio(UnsignedRatio(Ratio::percent50() / 2),
+  return BoundedUnsignedRatio(UnsignedRatio(Ratio::fromPercent(25)),
                               UnsignedLength(254000), UnsignedLength(508000));
 }
 

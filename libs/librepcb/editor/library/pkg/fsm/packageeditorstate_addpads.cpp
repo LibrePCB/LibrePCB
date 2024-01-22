@@ -61,7 +61,7 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
         FootprintPad::Shape::RoundedRect,  // Commonly used pad shape
         PositiveLength(2500000),  // There is no default/recommended pad size
         PositiveLength(1300000),  // -> choose reasonable multiple of 0.1mm
-        UnsignedLimitedRatio(Ratio::percent100()),  // Rounded pad
+        UnsignedLimitedRatio(Ratio::fromPercent(100)),  // Rounded pad
         Path(),  // Custom shape outline
         MaskConfig::automatic(),  // Stop mask
         MaskConfig::off(),  // Solder paste
@@ -70,34 +70,34 @@ PackageEditorState_AddPads::PackageEditorState_AddPads(
         function,  // Supplied by library editor
         PadHoleList{}) {
   if (mPadType == PadType::SMT) {
-    mLastPad.setRadius(UnsignedLimitedRatio(Ratio::percent50()));
+    mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(50)));
     mLastPad.setWidth(PositiveLength(1500000));
     mLastPad.setHeight(PositiveLength(700000));
     mLastPad.setSolderPasteConfig(MaskConfig::automatic());
     switch (function) {
       case FootprintPad::Function::ThermalPad:
-        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::percent0()));
+        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(0)));
         mLastPad.setWidth(PositiveLength(2000000));
         mLastPad.setHeight(PositiveLength(2000000));
         break;
       case FootprintPad::Function::BgaPad:
-        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::percent100()));
+        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
         mLastPad.setWidth(PositiveLength(300000));
         mLastPad.setHeight(PositiveLength(300000));
         break;
       case FootprintPad::Function::EdgeConnectorPad:
-        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::percent0()));
+        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(0)));
         mLastPad.setSolderPasteConfig(MaskConfig::off());
         break;
       case FootprintPad::Function::TestPad:
-        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::percent100()));
+        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
         mLastPad.setWidth(PositiveLength(700000));
         mLastPad.setHeight(PositiveLength(700000));
         mLastPad.setSolderPasteConfig(MaskConfig::off());
         break;
       case FootprintPad::Function::LocalFiducial:
       case FootprintPad::Function::GlobalFiducial:
-        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::percent100()));
+        mLastPad.setRadius(UnsignedLimitedRatio(Ratio::fromPercent(100)));
         mLastPad.setWidth(PositiveLength(1000000));
         mLastPad.setHeight(PositiveLength(1000000));
         mLastPad.setCopperClearance(UnsignedLength(500000));
@@ -168,41 +168,41 @@ bool PackageEditorState_AddPads::entry() noexcept {
       cmd.shapeRound.createAction(shapeActionGroup.get(), this, [this]() {
         shapeSelectorCurrentShapeChanged(
             FootprintPad::Shape::RoundedRect,
-            UnsignedLimitedRatio(Ratio::percent100()), false);
+            UnsignedLimitedRatio(Ratio::fromPercent(100)), false);
       });
   aShapeRound->setCheckable(true);
   aShapeRound->setChecked(
       (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
-      (*mLastPad.getRadius() == Ratio::percent100()));
+      (*mLastPad.getRadius() == Ratio::fromPercent(100)));
   aShapeRound->setActionGroup(shapeActionGroup.get());
   QAction* aShapeRoundedRect =
       cmd.shapeRoundedRect.createAction(shapeActionGroup.get(), this, [this]() {
         shapeSelectorCurrentShapeChanged(
             FootprintPad::Shape::RoundedRect,
-            UnsignedLimitedRatio(Ratio::percent50()), true);
+            UnsignedLimitedRatio(Ratio::fromPercent(50)), true);
       });
   aShapeRoundedRect->setCheckable(true);
   aShapeRoundedRect->setChecked(
       (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
-      (*mLastPad.getRadius() != Ratio::percent0()) &&
-      (*mLastPad.getRadius() != Ratio::percent100()));
+      (*mLastPad.getRadius() != Ratio::fromPercent(0)) &&
+      (*mLastPad.getRadius() != Ratio::fromPercent(100)));
   aShapeRoundedRect->setActionGroup(shapeActionGroup.get());
   QAction* aShapeRect =
       cmd.shapeRect.createAction(shapeActionGroup.get(), this, [this]() {
         shapeSelectorCurrentShapeChanged(
             FootprintPad::Shape::RoundedRect,
-            UnsignedLimitedRatio(Ratio::percent0()), false);
+            UnsignedLimitedRatio(Ratio::fromPercent(0)), false);
       });
   aShapeRect->setCheckable(true);
   aShapeRect->setChecked(
       (mLastPad.getShape() == FootprintPad::Shape::RoundedRect) &&
-      (*mLastPad.getRadius() == Ratio::percent0()));
+      (*mLastPad.getRadius() == Ratio::fromPercent(0)));
   aShapeRect->setActionGroup(shapeActionGroup.get());
   QAction* aShapeOctagon =
       cmd.shapeOctagon.createAction(shapeActionGroup.get(), this, [this]() {
         shapeSelectorCurrentShapeChanged(
             FootprintPad::Shape::RoundedOctagon,
-            UnsignedLimitedRatio(Ratio::percent0()), true);
+            UnsignedLimitedRatio(Ratio::fromPercent(0)), true);
       });
   aShapeOctagon->setCheckable(true);
   aShapeOctagon->setChecked(mLastPad.getShape() ==
@@ -588,8 +588,8 @@ void PackageEditorState_AddPads::pressFitCheckedChanged(bool value) noexcept {
 }
 
 void PackageEditorState_AddPads::applyRecommendedRoundedRectRadius() noexcept {
-  if ((*mLastPad.getRadius() > Ratio::percent0()) &&
-      (*mLastPad.getRadius() < Ratio::percent100())) {
+  if ((*mLastPad.getRadius() > Ratio::fromPercent(0)) &&
+      (*mLastPad.getRadius() < Ratio::fromPercent(100))) {
     emit requestRadius(FootprintPad::getRecommendedRadius(
         mLastPad.getWidth(), mLastPad.getHeight()));
   }

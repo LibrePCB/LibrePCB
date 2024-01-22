@@ -81,7 +81,13 @@ TEST_P(RatioTest, testSetRatioPpm) {
   EXPECT_EQ(data.ppm, r.toPpm());
 }
 
-TEST_P(RatioTest, testSetRatioPercent) {
+TEST(RatioTest, testSetRatioPercentInt) {
+  Ratio r;
+  r.setRatioPercent(42);
+  EXPECT_EQ(420000, r.toPpm());
+}
+
+TEST_P(RatioTest, testSetRatioPercentFloat) {
   const RatioTestData_t& data = GetParam();
 
   Ratio r;
@@ -140,10 +146,17 @@ TEST_P(RatioTest, testFromNormalizedString) {
   EXPECT_EQ(data.ppm, Ratio::fromNormalized(data.string).toPpm());
 }
 
-TEST(RatioTest, testStaticPercentMethods) {
-  EXPECT_NEAR(0.0, Ratio::percent0().toPercent(), 0.0002);
-  EXPECT_NEAR(50.0, Ratio::percent50().toPercent(), 0.0002);
-  EXPECT_NEAR(100.0, Ratio::percent100().toPercent(), 0.0002);
+TEST(RatioTest, testFromPercentInt) {
+  EXPECT_EQ(0, Ratio::fromPercent(0).toPpm());
+  EXPECT_EQ(500000, Ratio::fromPercent(50).toPpm());
+  EXPECT_EQ(1000000, Ratio::fromPercent(100).toPpm());
+}
+
+TEST(RatioTest, testFromPercentFloat) {
+  EXPECT_NEAR(0.0, Ratio::fromPercent(0.0).toPercent(), 0.0002);
+  EXPECT_NEAR(50.0, Ratio::fromPercent(50.0).toPercent(), 0.0002);
+  EXPECT_NEAR(100.0, Ratio::fromPercent(100.0).toPercent(), 0.0002);
+  EXPECT_NEAR(42.42, Ratio::fromPercent(42.42).toPercent(), 0.0002);
 }
 
 TEST_P(RatioTest, testOperatorAssign) {

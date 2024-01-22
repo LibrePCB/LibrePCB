@@ -61,7 +61,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionConnected) {
   EXPECT_EQ(FootprintPad::Shape::RoundedRect, obj.getShape());
   EXPECT_EQ(PositiveLength(1100000), obj.getWidth());
   EXPECT_EQ(UnsignedLength(2200000), obj.getHeight());
-  EXPECT_EQ(UnsignedLimitedRatio(Ratio::percent50()), obj.getRadius());
+  EXPECT_EQ(UnsignedLimitedRatio(Ratio::fromPercent(50)), obj.getRadius());
   EXPECT_EQ(MaskConfig::automatic(), obj.getStopMaskConfig());
   EXPECT_EQ(MaskConfig::manual(Length(250000)), obj.getSolderPasteConfig());
   EXPECT_EQ(UnsignedLength(330000), obj.getCopperClearance());
@@ -97,7 +97,7 @@ TEST_F(FootprintPadTest, testConstructFromSExpressionUnconnected) {
   EXPECT_EQ(FootprintPad::Shape::Custom, obj.getShape());
   EXPECT_EQ(PositiveLength(1100000), obj.getWidth());
   EXPECT_EQ(UnsignedLength(2200000), obj.getHeight());
-  EXPECT_EQ(UnsignedLimitedRatio(Ratio::percent50()), obj.getRadius());
+  EXPECT_EQ(UnsignedLimitedRatio(Ratio::fromPercent(50)), obj.getRadius());
   EXPECT_EQ(MaskConfig::off(), obj.getStopMaskConfig());
   EXPECT_EQ(MaskConfig::automatic(), obj.getSolderPasteConfig());
   EXPECT_EQ(UnsignedLength(330000), obj.getCopperClearance());
@@ -111,7 +111,7 @@ TEST_F(FootprintPadTest, testSerializeAndDeserialize) {
   FootprintPad obj1(
       Uuid::createRandom(), Uuid::createRandom(), Point(123, 567), Angle(789),
       FootprintPad::Shape::RoundedOctagon, PositiveLength(123),
-      PositiveLength(456), UnsignedLimitedRatio(Ratio::percent50()),
+      PositiveLength(456), UnsignedLimitedRatio(Ratio::fromPercent(50)),
       Path({Vertex(Point(1, 2), Angle(3)), Vertex(Point(4, 5), Angle(6))}),
       MaskConfig::automatic(), MaskConfig::manual(Length(123456)),
       UnsignedLength(98765), FootprintPad::ComponentSide::Top,

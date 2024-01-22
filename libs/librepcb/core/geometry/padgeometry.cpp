@@ -214,13 +214,13 @@ PadGeometry PadGeometry::stroke(const PositiveLength& diameter,
                                 const NonEmptyPath& path,
                                 const PadHoleList& holes) noexcept {
   return PadGeometry(Shape::Stroke, *diameter, Length(0),
-                     UnsignedLimitedRatio(Ratio::percent0()), *path, Length(0),
-                     holes);
+                     UnsignedLimitedRatio(Ratio::fromPercent(0)), *path,
+                     Length(0), holes);
 }
 
 PadGeometry PadGeometry::custom(const Path& outline, const PadHoleList& holes) {
   return PadGeometry(Shape::Custom, Length(0), Length(0),
-                     UnsignedLimitedRatio(Ratio::percent0()), outline,
+                     UnsignedLimitedRatio(Ratio::fromPercent(0)), outline,
                      Length(0), holes);
 }
 

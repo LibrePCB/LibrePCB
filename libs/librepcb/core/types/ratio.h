@@ -84,11 +84,16 @@ public:
    * @brief Set the ratio in percent
    *
    * @param percent       The ratio in percent
+   */
+  void setRatioPercent(int percent) noexcept { mPpm = percent * 1e4; }
+
+  /**
+   * @brief Set the ratio in percent
    *
-   * @warning If you want to set the ratio exactly to common values like 0%, 50%
-   * or 100%, you should not use this method. Please use #setRatioPpm() instead
-   * because it is more accurate (no use of floating point numbers). Or you can
-   * also use the static methods #percent0(), #percent50() and so on.
+   * @param percent       The ratio in percent
+   *
+   * @warning To set an exact value, please use the overload
+   *          #setRatioPercent(int) instead.
    */
   void setRatioPercent(qreal percent) noexcept { mPpm = percent * 1e4; }
 
@@ -97,10 +102,11 @@ public:
    *
    * @param normalized    The normalized ratio
    *
-   * @warning If you want to set the ratio exactly to common values like 0%, 50%
-   * or 100%, you should not use this method. Please use #setRatioPpm() instead
-   * because it is more accurate (no use of floating point numbers). Or you can
-   * also use the static methods #percent0(), #percent50() and so on.
+   * @warning If you want to set the ratio exactly to common values like
+   *          0%, 50% or 100%, you should not use this method. Please use
+   *          #setRatioPercent(int) or #setRatioPpm() instead because it is
+   *          more accurate (no use of floating point numbers). Or you can
+   *          also use the static method #setRatioPercent(int).
    */
   void setRatioNormalized(qreal normalized) noexcept {
     mPpm = normalized * 1e6;
@@ -161,6 +167,15 @@ public:
    *
    * @return A new Ratio object with the specified ratio
    */
+  static Ratio fromPercent(int percent) noexcept;
+
+  /**
+   * @brief Get a Ratio object with a specific ratio
+   *
+   * @param percent   See #setRatioPercent()
+   *
+   * @return A new Ratio object with the specified ratio
+   */
   static Ratio fromPercent(qreal percent) noexcept;
 
   /**
@@ -190,14 +205,6 @@ public:
    * thrown
    */
   static Ratio fromNormalized(const QString& normalized);
-
-  // Static Methods to create often used ratios
-  static Ratio percent0() noexcept { return Ratio(0); }
-  static Ratio percent1() noexcept { return Ratio(10000); }
-  static Ratio percent5() noexcept { return Ratio(50000); }
-  static Ratio percent10() noexcept { return Ratio(100000); }
-  static Ratio percent50() noexcept { return Ratio(500000); }
-  static Ratio percent100() noexcept { return Ratio(1000000); }
 
   // Operators
   Ratio& operator=(const Ratio& rhs) {
@@ -352,7 +359,7 @@ struct UnsignedLimitedRatioVerifier {
 
 struct UnsignedLimitedRatioConstraint {
   constexpr bool operator()(const Ratio& r) const noexcept {
-    return (r >= 0) && (r <= Ratio::percent100());
+    return (r >= 0) && (r <= Ratio::fromPercent(100));
   }
 };
 
