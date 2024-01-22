@@ -59,6 +59,17 @@ TEST_P(ComponentPrefixTest, testConstructor) {
   }
 }
 
+TEST_P(ComponentPrefixTest, testClean) {
+  const ComponentPrefixTestData& data = GetParam();
+
+  if (data.valid) {
+    EXPECT_EQ(data.input, cleanComponentPrefix(data.input));
+  } else {
+    QString cleaned = cleanComponentPrefix(data.input);
+    ComponentPrefix suffix(cleaned);  // must not throw
+  }
+}
+
 /*******************************************************************************
  *  Test Data
  ******************************************************************************/

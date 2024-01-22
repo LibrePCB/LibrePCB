@@ -25,7 +25,6 @@
  ******************************************************************************/
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/types/uuid.h>
-#include <librepcb/core/types/version.h>
 
 #include <QtCore>
 
@@ -43,10 +42,9 @@ class Wire;
 }  // namespace parseagle
 
 namespace librepcb {
-
-class Polygon;
-
 namespace eagleimport {
+
+struct EagleLibraryConverterSettings;
 
 /*******************************************************************************
  *  Class EagleLibraryImport
@@ -60,30 +58,30 @@ class EagleLibraryImport final : public QThread {
 
 public:
   struct Symbol {
-    QString displayName;
-    QString description;
+    QString displayName;  // Same as symbol->getName()
+    QString description;  // Same as symbol->getDescription()
     Qt::CheckState checkState;
     std::shared_ptr<parseagle::Symbol> symbol;
   };
 
   struct Package {
-    QString displayName;
-    QString description;
+    QString displayName;  // Same as package->getName()
+    QString description;  // Same as package->getDescription()
     Qt::CheckState checkState;
     std::shared_ptr<parseagle::Package> package;
   };
 
   struct Component {
-    QString displayName;
-    QString description;
+    QString displayName;  // Like deviceSet->getName() but without trailing [-_]
+    QString description;  // Same as deviceSet->getDescription()
     Qt::CheckState checkState;
     QSet<QString> symbolDisplayNames;
     std::shared_ptr<parseagle::DeviceSet> deviceSet;
   };
 
   struct Device {
-    QString displayName;
-    QString description;
+    QString displayName;  // Built from names of deviceSet and device
+    QString description;  // Same as deviceSet->getDescription()
     Qt::CheckState checkState;
     QString componentDisplayName;
     QString packageDisplayName;
@@ -113,19 +111,11 @@ public:
   const QVector<Device>& getDevices() const noexcept { return mDevices; }
 
   // Setters
-  void setNamePrefix(const QString& prefix) noexcept { mNamePrefix = prefix; }
-  void setSymbolCategories(const QSet<Uuid>& uuids) noexcept {
-    mSymbolCategories = uuids;
-  }
-  void setPackageCategories(const QSet<Uuid>& uuids) noexcept {
-    mPackageCategories = uuids;
-  }
-  void setComponentCategories(const QSet<Uuid>& uuids) noexcept {
-    mComponentCategories = uuids;
-  }
-  void setDeviceCategories(const QSet<Uuid>& uuids) noexcept {
-    mDeviceCategories = uuids;
-  }
+  void setNamePrefix(const QString& prefix) noexcept;
+  void setSymbolCategories(const QSet<Uuid>& uuids) noexcept;
+  void setPackageCategories(const QSet<Uuid>& uuids) noexcept;
+  void setComponentCategories(const QSet<Uuid>& uuids) noexcept;
+  void setDeviceCategories(const QSet<Uuid>& uuids) noexcept;
   void setSymbolChecked(const QString& name, bool checked) noexcept;
   void setPackageChecked(const QString& name, bool checked) noexcept;
   void setComponentChecked(const QString& name, bool checked) noexcept;
@@ -156,28 +146,15 @@ private:  // Methods
   void updateDependencies() noexcept;
   template <typename T>
   bool setElementDependent(T& element, bool dependent) noexcept;
-  QVector<std::shared_ptr<Polygon> > convertWires(
-      const QString& element, const QList<parseagle::Wire>& wires);
-  void tryOrRaiseError(const QString& element, std::function<void()> func);
-  void raiseImportError(const QString& element, const QString& error) noexcept;
   void run() noexcept override;
 
 private:  // Data
-  // Configuration
-  FilePath mDestinationLibraryFp;
-  QString mNamePrefix;
-  Version mVersion;
-  QString mAuthor;
-  QString mKeywords;
-  QSet<Uuid> mSymbolCategories;
-  QSet<Uuid> mPackageCategories;
-  QSet<Uuid> mComponentCategories;
-  QSet<Uuid> mDeviceCategories;
+  const FilePath mDestinationLibraryFp;
+  QScopedPointer<EagleLibraryConverterSettings> mSettings;
 
   // State
   bool mAbort;
   FilePath mLoadedFilePath;
-  QStringList mImportErrors;
 
   // Library elements
   QVector<Symbol> mSymbols;

@@ -25,6 +25,7 @@
  ******************************************************************************/
 #include "../../exceptions.h"
 #include "../../serialization/sexpression.h"
+#include "../../utils/toolbox.h"
 
 #include <type_safe/constrained_type.hpp>
 
@@ -38,6 +39,11 @@ namespace librepcb {
 /*******************************************************************************
  *  Class ComponentPrefix
  ******************************************************************************/
+
+inline static QString cleanComponentPrefix(const QString& userInput) noexcept {
+  return Toolbox::cleanUserInputString(
+      userInput, QRegularExpression("[^a-zA-Z_]"), true, false, false, "_", 16);
+}
 
 struct ComponentPrefixVerifier {
   template <typename Value, typename Predicate>

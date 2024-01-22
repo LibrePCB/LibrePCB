@@ -35,6 +35,13 @@ namespace librepcb {
  *  Constructors / Destructor
  ******************************************************************************/
 
+BoundedUnsignedRatio::BoundedUnsignedRatio(
+    const BoundedUnsignedRatio& other) noexcept
+  : mRatio(other.mRatio),
+    mMinValue(other.mMinValue),
+    mMaxValue(other.mMaxValue) {
+}
+
 BoundedUnsignedRatio::BoundedUnsignedRatio(const UnsignedRatio& ratio,
                                            const UnsignedLength& min,
                                            const UnsignedLength& max)
