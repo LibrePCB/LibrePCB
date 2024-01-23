@@ -29,6 +29,7 @@
 #include <librepcb/core/library/pkg/footprint.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/utils/messagelogger.h>
 #include <parseagle/library.h>
 
 #include <QtCore>
@@ -97,7 +98,8 @@ void EagleLibraryConverter::reset() noexcept {
 }
 
 std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
-    const QString& libName, const parseagle::Symbol& eagleSymbol) {
+    const QString& libName, const parseagle::Symbol& eagleSymbol,
+    MessageLogger& log) {
   const auto key = std::make_pair(libName, eagleSymbol.getName());
   if (mSymbolMap.contains(key)) {
     throw LogicError(__FILE__, __LINE__, "Duplicate import.");
@@ -110,12 +112,16 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
   symbol->setCategories(mSettings.symbolCategories);
 
   QList<C::Geometry> geometries;
-  tryOrRaiseError(eagleSymbol.getName(), [&]() {
-    // Enable grab areas on closed polygons. However, don't do this for sheet
-    // frames as it would look ugly. We guess that by the absence of pins.
-    const bool grabArea = !eagleSymbol.getPins().isEmpty();
-    geometries += C::convertAndJoinWires(eagleSymbol.getWires(), grabArea);
-  });
+  tryOrLogError(
+      [&]() {
+        // Enable grab areas on closed polygons. However, don't do this for
+        // sheet frames as it would look ugly. We guess that by the absence of
+        // pins.
+        const bool grabArea = !eagleSymbol.getPins().isEmpty();
+        geometries +=
+            C::convertAndJoinWires(eagleSymbol.getWires(), grabArea, log);
+      },
+      log);
   foreach (const auto& obj, eagleSymbol.getRectangles()) {
     geometries.append(C::convertRectangle(obj, true));
   }
@@ -129,39 +135,52 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
     geometries.append(C::convertFrame(obj));
   }
   foreach (const auto& g, geometries) {
-    tryOrRaiseError(eagleSymbol.getName(), [&]() {
-      if (auto o = C::tryConvertToSchematicCircle(g)) {
-        symbol->getCircles().append(o);
-      } else if (auto o = C::tryConvertToSchematicPolygon(g)) {
-        symbol->getPolygons().append(o);
-      }
-    });
+    tryOrLogError(
+        [&]() {
+          if (auto o = C::tryConvertToSchematicCircle(g)) {
+            symbol->getCircles().append(o);
+          } else if (auto o = C::tryConvertToSchematicPolygon(g)) {
+            symbol->getPolygons().append(o);
+          } else {
+            log.warning(tr("Skipped graphics object on layer %1 (%2).")
+                            .arg(g.layerId)
+                            .arg(C::getLayerName(g.layerId)));
+          }
+        },
+        log);
   }
   foreach (const auto& obj, eagleSymbol.getTexts()) {
     if (auto lpObj = C::tryConvertSchematicText(obj)) {
       symbol->getTexts().append(lpObj);
+    } else {
+      log.warning(tr("Skipped text on layer %1 (%2).")
+                      .arg(obj.getLayer())
+                      .arg(C::getLayerName(obj.getLayer())));
     }
   }
   foreach (const auto& obj, eagleSymbol.getPins()) {
-    tryOrRaiseError(eagleSymbol.getName(), [&]() {
-      const auto pinObj = C::convertSymbolPin(obj);
-      symbol->getPins().append(pinObj.pin);
-      mSymbolPinMap[key][obj.getName()] = std::make_pair(
-          std::make_shared<parseagle::Pin>(obj), pinObj.pin->getUuid());
-      if (pinObj.circle) {
-        symbol->getCircles().append(pinObj.circle);
-      }
-      if (pinObj.polygon) {
-        symbol->getPolygons().append(pinObj.polygon);
-      }
-    });
+    tryOrLogError(
+        [&]() {
+          const auto pinObj = C::convertSymbolPin(obj);
+          symbol->getPins().append(pinObj.pin);
+          mSymbolPinMap[key][obj.getName()] = std::make_pair(
+              std::make_shared<parseagle::Pin>(obj), pinObj.pin->getUuid());
+          if (pinObj.circle) {
+            symbol->getCircles().append(pinObj.circle);
+          }
+          if (pinObj.polygon) {
+            symbol->getPolygons().append(pinObj.polygon);
+          }
+        },
+        log);
   }
   mSymbolMap[key] = symbol->getUuid();
   return symbol;
 }
 
 std::unique_ptr<Package> EagleLibraryConverter::createPackage(
-    const QString& libName, const parseagle::Package& eaglePackage) {
+    const QString& libName, const parseagle::Package& eaglePackage,
+    MessageLogger& log) {
   const auto key = std::make_pair(libName, eaglePackage.getName());
   if (mPackageMap.contains(key)) {
     throw LogicError(__FILE__, __LINE__, "Duplicate import.");
@@ -177,9 +196,12 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
   package->getFootprints().append(footprint);
 
   QList<C::Geometry> geometries;
-  tryOrRaiseError(eaglePackage.getName(), [&]() {
-    geometries += C::convertAndJoinWires(eaglePackage.getWires(), false);
-  });
+  tryOrLogError(
+      [&]() {
+        geometries +=
+            C::convertAndJoinWires(eaglePackage.getWires(), false, log);
+      },
+      log);
   foreach (const auto& obj, eaglePackage.getRectangles()) {
     geometries.append(C::convertRectangle(obj, false));
   }
@@ -190,44 +212,57 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
     geometries.append(C::convertCircle(obj, false));
   }
   foreach (const auto& g, geometries) {
-    tryOrRaiseError(eaglePackage.getName(), [&]() {
-      const auto zones = C::tryConvertToBoardZones(g);
-      if (!zones.isEmpty()) {
-        foreach (const auto& o, zones) {
-          footprint->getZones().append(o);
-        }
-      } else if (auto o = C::tryConvertToBoardCircle(g)) {
-        footprint->getCircles().append(o);
-      } else if (auto o = C::tryConvertToBoardPolygon(g)) {
-        footprint->getPolygons().append(o);
-      }
-    });
+    tryOrLogError(
+        [&]() {
+          const auto zones = C::tryConvertToBoardZones(g);
+          if (!zones.isEmpty()) {
+            foreach (const auto& o, zones) {
+              footprint->getZones().append(o);
+            }
+          } else if (auto o = C::tryConvertToBoardCircle(g)) {
+            footprint->getCircles().append(o);
+          } else if (auto o = C::tryConvertToBoardPolygon(g)) {
+            footprint->getPolygons().append(o);
+          } else {
+            log.warning(tr("Skipped graphics object on layer %1 (%2).")
+                            .arg(g.layerId)
+                            .arg(C::getLayerName(g.layerId)));
+          }
+        },
+        log);
   }
   foreach (const auto& obj, eaglePackage.getTexts()) {
     if (auto lpObj = C::tryConvertBoardText(obj)) {
       footprint->getStrokeTexts().append(lpObj);
+    } else {
+      log.warning(tr("Skipped text on layer %1 (%2).")
+                      .arg(obj.getLayer())
+                      .arg(C::getLayerName(obj.getLayer())));
     }
   }
   foreach (const auto& obj, eaglePackage.getHoles()) {
-    tryOrRaiseError(eaglePackage.getName(), [&]() {
-      footprint->getHoles().append(C::convertHole(obj));
-    });
+    tryOrLogError([&]() { footprint->getHoles().append(C::convertHole(obj)); },
+                  log);
   }
   foreach (const auto& obj, eaglePackage.getThtPads()) {
-    tryOrRaiseError(eaglePackage.getName(), [&]() {
-      auto pair = C::convertThtPad(obj, mSettings.autoThtAnnularWidth);
-      package->getPads().append(pair.first);
-      footprint->getPads().append(pair.second);
-      mPackagePadMap[key][obj.getName()] = pair.first->getUuid();
-    });
+    tryOrLogError(
+        [&]() {
+          auto pair = C::convertThtPad(obj, mSettings.autoThtAnnularWidth);
+          package->getPads().append(pair.first);
+          footprint->getPads().append(pair.second);
+          mPackagePadMap[key][obj.getName()] = pair.first->getUuid();
+        },
+        log);
   }
   foreach (const auto& obj, eaglePackage.getSmtPads()) {
-    tryOrRaiseError(eaglePackage.getName(), [&]() {
-      auto pair = C::convertSmtPad(obj);
-      package->getPads().append(pair.first);
-      footprint->getPads().append(pair.second);
-      mPackagePadMap[key][obj.getName()] = pair.first->getUuid();
-    });
+    tryOrLogError(
+        [&]() {
+          auto pair = C::convertSmtPad(obj);
+          package->getPads().append(pair.first);
+          footprint->getPads().append(pair.second);
+          mPackagePadMap[key][obj.getName()] = pair.first->getUuid();
+        },
+        log);
   }
   // If there is exactly one device keepout zone on the top layer, convert
   // it to a package courtyard polygon.
@@ -245,7 +280,9 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
 }
 
 std::unique_ptr<Component> EagleLibraryConverter::createComponent(
-    const QString& libName, const parseagle::DeviceSet& eagleDeviceSet) {
+    const QString& libName, const parseagle::DeviceSet& eagleDeviceSet,
+    MessageLogger& log) {
+  Q_UNUSED(log);
   const QMap<parseagle::PinVisibility, const CmpSigPinDisplayType*>
       displayTypeMap = {
           {parseagle::PinVisibility::Off, &CmpSigPinDisplayType::none()},
@@ -356,7 +393,8 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
 
 std::unique_ptr<Device> EagleLibraryConverter::createDevice(
     const QString& libName, const parseagle::DeviceSet& eagleDeviceSet,
-    const parseagle::Device& eagleDevice) {
+    const parseagle::Device& eagleDevice, MessageLogger& log) {
+  Q_UNUSED(log);
   const auto componentKey = std::make_pair(libName, eagleDeviceSet.getName());
   const tl::optional<Uuid> componentUuid = mComponentMap.value(componentKey);
   if (!componentUuid) {
@@ -397,12 +435,12 @@ std::unique_ptr<Device> EagleLibraryConverter::createDevice(
  *  Private Methods
  ******************************************************************************/
 
-void EagleLibraryConverter::tryOrRaiseError(const QString& element,
-                                            std::function<void()> func) {
+void EagleLibraryConverter::tryOrLogError(std::function<void()> func,
+                                          MessageLogger& log) {
   try {
     func();
   } catch (const Exception& e) {
-    emit errorOccurred(element, e.getMsg());
+    log.critical(e.getMsg());
   }
 }
 

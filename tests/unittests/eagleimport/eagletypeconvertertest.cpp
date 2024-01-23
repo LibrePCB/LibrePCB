@@ -26,6 +26,7 @@
 #include <librepcb/core/library/sym/symbolpin.h>
 #include <librepcb/core/types/layer.h>
 #include <librepcb/core/types/point.h>
+#include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/eagleimport/eagletypeconverter.h>
 #include <parseagle/common/domelement.h>
 #include <parseagle/library.h>
@@ -212,7 +213,7 @@ TEST_F(EagleTypeConverterTest, testConvertVertices) {
 }
 
 TEST_F(EagleTypeConverterTest, testConvertAndJoinWires) {
-  QStringList errors;
+  MessageLogger log;
   QList<parseagle::Wire> wires{
       // clang-format off
       parseagle::Wire(dom("<wire x1=\"1\" y1=\"2\" x2=\"3\" y2=\"4\" width=\"0.254\" layer=\"1\"/>")),
@@ -222,9 +223,9 @@ TEST_F(EagleTypeConverterTest, testConvertAndJoinWires) {
       parseagle::Wire(dom("<wire x1=\"7\" y1=\"8\" x2=\"9\" y2=\"9\" width=\"-1\" layer=\"2\"/>")),
       // clang-format on
   };
-  auto out = C::convertAndJoinWires(wires, true, &errors);
+  auto out = C::convertAndJoinWires(wires, true, log);
   ASSERT_EQ(3, out.count());
-  EXPECT_EQ(1, errors.count());
+  EXPECT_EQ(1, log.getMessages().count());
 
   EXPECT_EQ(1, out.at(0).layerId);
   EXPECT_EQ(UnsignedLength(254000), out.at(0).lineWidth);

@@ -25,6 +25,7 @@
 #include "eaglelibraryimportwizardcontext.h"
 #include "ui_eaglelibraryimportwizardpage_result.h"
 
+#include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/eagleimport/eaglelibraryimport.h>
@@ -99,8 +100,7 @@ bool EagleLibraryImportWizardPage_Result::isComplete() const {
  *  Private Methods
  ******************************************************************************/
 
-void EagleLibraryImportWizardPage_Result::importFinished(
-    const QStringList& errors) noexcept {
+void EagleLibraryImportWizardPage_Result::importFinished() noexcept {
   while (!mProgressBarConnections.isEmpty()) {
     disconnect(mProgressBarConnections.takeLast());
   }
@@ -109,9 +109,10 @@ void EagleLibraryImportWizardPage_Result::importFinished(
               &WorkspaceLibraryDb::scanProgressUpdate, mUi->prgImport,
               &QProgressBar::setValue, Qt::QueuedConnection));
 
-  mUi->lblMessages->setText(errors.join("\n"));
+  const auto log = mContext->getImport().getLogger();
+  mUi->lblMessages->setText(log->getMessagesRichText());
   mUi->prgImport->setFormat(tr("Scanning libraries") % " (%p%)");
-  mUi->gbxErrors->setVisible(!errors.isEmpty());
+  mUi->gbxErrors->setVisible(!log->getMessages().isEmpty());
   if (QWizard* wiz = wizard()) {
     // Show restart button to allow importing a next library.
     wiz->setOption(QWizard::HaveCustomButton1, true);

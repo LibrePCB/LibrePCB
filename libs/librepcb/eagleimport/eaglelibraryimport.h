@@ -42,6 +42,9 @@ class Wire;
 }  // namespace parseagle
 
 namespace librepcb {
+
+class MessageLogger;
+
 namespace eagleimport {
 
 struct EagleLibraryConverterSettings;
@@ -96,6 +99,7 @@ public:
   ~EagleLibraryImport() noexcept;
 
   // Getters
+  std::shared_ptr<MessageLogger> getLogger() const noexcept { return mLogger; }
   const FilePath& getLoadedFilePath() const noexcept { return mLoadedFilePath; }
   int getTotalElementsCount() const noexcept;
   int getCheckedElementsCount() const noexcept;
@@ -134,8 +138,7 @@ signals:
   void componentCheckStateChanged(const QString& name, Qt::CheckState state);
   void progressStatus(const QString& status);
   void progressPercent(int percent);
-  void errorOccurred(const QString& error);
-  void finished(const QStringList& errors);
+  void finished();
 
 private:  // Methods
   template <typename T>
@@ -151,6 +154,7 @@ private:  // Methods
 private:  // Data
   const FilePath mDestinationLibraryFp;
   QScopedPointer<EagleLibraryConverterSettings> mSettings;
+  std::shared_ptr<MessageLogger> mLogger;
 
   // State
   bool mAbort;

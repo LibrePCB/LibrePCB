@@ -33,8 +33,8 @@ namespace librepcb {
  *  General Methods
  ******************************************************************************/
 
-QVector<Path> TangentPathJoiner::join(QVector<Path> paths,
-                                      qint64 timeoutMs) noexcept {
+QVector<Path> TangentPathJoiner::join(QVector<Path> paths, qint64 timeoutMs,
+                                      bool* timedOut) noexcept {
   QVector<Path> result;
 
   // Return closed paths as-is and skip invalid paths.
@@ -121,7 +121,7 @@ QVector<Path> TangentPathJoiner::join(QVector<Path> paths,
   QVector<Result> found;
   QElapsedTimer timer;
   timer.start();
-  findAllPaths(found, paths, timer, timeoutMs);
+  findAllPaths(found, paths, timer, timeoutMs, Result(), timedOut);
   std::sort(found.begin(), found.end(), [](const Result& r1, const Result& r2) {
     // Prio 1: Closed paths
     if (r1.isClosed() != r2.isClosed()) {
@@ -168,11 +168,12 @@ QVector<Path> TangentPathJoiner::join(QVector<Path> paths,
 void TangentPathJoiner::findAllPaths(QVector<Result>& result,
                                      const QVector<Path>& paths,
                                      const QElapsedTimer& timer,
-                                     qint64 timeoutMs,
-                                     const Result& prefix) noexcept {
+                                     qint64 timeoutMs, const Result& prefix,
+                                     bool* timedOut) noexcept {
   for (int i = 0; i < paths.count(); ++i) {
     if ((timeoutMs >= 0) && (timer.elapsed() > timeoutMs)) {
       qWarning() << "Tangent path joining algorithm aborted due to timeout.";
+      if (timedOut) *timedOut = true;
       break;
     }
     if (!prefix.indices.contains(i)) {

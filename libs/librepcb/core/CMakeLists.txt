@@ -463,6 +463,8 @@ add_library(
   utils/clipperhelpers.h
   utils/mathparser.cpp
   utils/mathparser.h
+  utils/messagelogger.cpp
+  utils/messagelogger.h
   utils/overlinemarkupparser.cpp
   utils/overlinemarkupparser.h
   utils/qtmetatyperegistration.h

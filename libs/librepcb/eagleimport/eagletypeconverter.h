@@ -72,6 +72,7 @@ struct Point;
 namespace librepcb {
 
 class Layer;
+class MessageLogger;
 
 namespace eagleimport {
 
@@ -302,14 +303,13 @@ public:
    * @param wires                 EAGLE wires
    * @param isGrabAreaIfClosed    If true, grab area will be enabled on
    *                              closed polygons
-   * @param errors                If not `nullptr`, any errors will be
-   *                              appended to this list
+   * @param log                   Logging message handler
    *
    * @return Joined polygons as intermediate geometries
    */
   static QList<Geometry> convertAndJoinWires(
       const QList<parseagle::Wire>& wires, bool isGrabAreaIfClosed,
-      QStringList* errors = nullptr);
+      MessageLogger& log);
 
   /**
    * @brief Convert a rectangle
@@ -516,6 +516,17 @@ public:
    * @return A polygon if the layer is valid for boards, otherwise `nullptr`
    */
   static std::shared_ptr<Polygon> tryConvertToBoardPolygon(const Geometry& g);
+
+  /**
+   * @brief Get the EAGLE layer name for a given layer ID
+   *
+   * @param id        EAGLE layer ID
+   * @param fallback  The string to return if the given layer is unknown
+   *
+   * @return EAGLE layer name (fallback if unknown)
+   */
+  static QString getLayerName(int id,
+                              const QString& fallback = "unknown") noexcept;
 
   /**
    * @brief Get the default annular width of THT pads with 'auto' size

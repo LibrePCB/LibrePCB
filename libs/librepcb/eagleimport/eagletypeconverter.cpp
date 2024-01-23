@@ -24,6 +24,7 @@
 
 #include <librepcb/core/types/boundedunsignedratio.h>
 #include <librepcb/core/utils/clipperhelpers.h>
+#include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
 #include <parseagle/common/circle.h>
 #include <parseagle/common/frame.h>
@@ -224,10 +225,8 @@ const Layer* EagleTypeConverter::tryConvertBoardLayer(int id) noexcept {
       break;
     case 35:  // tGlue
       return &Layer::topGlue();
-      break;
     case 36:  // bGlue
       return &Layer::botGlue();
-      break;
     case 37:  // tTest
       break;
     case 38:  // bTest
@@ -335,7 +334,7 @@ Path EagleTypeConverter::convertVertices(const QList<parseagle::Vertex>& v,
 
 QList<EagleTypeConverter::Geometry> EagleTypeConverter::convertAndJoinWires(
     const QList<parseagle::Wire>& wires, bool isGrabAreaIfClosed,
-    QStringList* errors) {
+    MessageLogger& log) {
   QMap<std::pair<int, double>, QList<parseagle::Wire>> joinableWires;
   foreach (const parseagle::Wire& wire, wires) {
     auto key = std::make_pair(wire.getLayer(), wire.getWidth());
@@ -343,6 +342,7 @@ QList<EagleTypeConverter::Geometry> EagleTypeConverter::convertAndJoinWires(
   }
 
   QList<Geometry> polygons;
+  bool timedOut = false;
   for (auto it = joinableWires.begin(); it != joinableWires.end(); it++) {
     try {
       QVector<Path> paths;
@@ -351,20 +351,25 @@ QList<EagleTypeConverter::Geometry> EagleTypeConverter::convertAndJoinWires(
                                 convertPoint(wire.getP2()),
                                 convertAngle(wire.getCurve())));
       }
-      foreach (const Path& path, TangentPathJoiner::join(paths, 5000)) {
+      foreach (const Path& p, TangentPathJoiner::join(paths, 5000, &timedOut)) {
         polygons.append(Geometry{
             it.value().first().getLayer(),  // Layer
             convertLineWidth(it.value().first().getWidth(),
                              it.value().first().getLayer()),  // Line width
             false,  // Filled
-            isGrabAreaIfClosed && path.isClosed(),  // Grab area
-            path,  // Path
+            isGrabAreaIfClosed && p.isClosed(),  // Grab area
+            p,  // Path
             tl::nullopt,  // Circle
         });
       }
     } catch (const Exception& e) {
-      if (errors) errors->append(e.getMsg());
+      log.warning(QString("Failed to convert wires: %1").arg(e.getMsg()));
     }
+  }
+  if (timedOut) {
+    log.info(
+        "Aborted joining tangent line segments to polygons due to timeout, "
+        "keeping them separate.");
   }
   return polygons;
 }
@@ -795,6 +800,125 @@ std::shared_ptr<Polygon> EagleTypeConverter::tryConvertToBoardPolygon(
                                      g.filled, g.grabArea, g.path);
   }
   return nullptr;
+}
+
+QString EagleTypeConverter::getLayerName(int id,
+                                         const QString& fallback) noexcept {
+  switch (id) {
+    case 1:
+      return "tCu";
+    case 2:  // inner copper
+    case 3:  // inner copper
+    case 4:  // inner copper
+    case 5:  // inner copper
+    case 6:  // inner copper
+    case 7:  // inner copper
+    case 8:  // inner copper
+    case 9:  // inner copper
+    case 10:  // inner copper
+    case 11:  // inner copper
+    case 12:  // inner copper
+    case 13:  // inner copper
+    case 14:  // inner copper
+    case 15:  // inner copper
+      return QString("Route%1").arg(id);
+    case 16:
+      return "bCu";
+    case 17:
+      return "Pads";
+    case 18:
+      return "Vias";
+    case 19:
+      return "Unrouted";
+    case 20:
+      return "Dimension";
+    case 21:
+      return "tPlace";
+    case 22:
+      return "bPlace";
+    case 23:
+      return "tOrigins";
+    case 24:
+      return "bOrigins";
+    case 25:
+      return "tNames";
+    case 26:
+      return "bNames";
+    case 27:
+      return "tValues";
+    case 28:
+      return "bValues";
+    case 29:
+      return "tStop";
+    case 30:
+      return "bStop";
+    case 31:
+      return "tCream";
+    case 32:
+      return "bCream";
+    case 33:
+      return "tFinish";
+    case 34:
+      return "bFinish";
+    case 35:
+      return "tGlue";
+    case 36:
+      return "bGlue";
+    case 37:
+      return "tTest";
+    case 38:
+      return "bTest";
+    case 39:
+      return "tKeepout";
+    case 40:
+      return "bKeepout";
+    case 41:
+      return "tRestrict";
+    case 42:
+      return "bRestrict";
+    case 43:
+      return "vRestrict";
+    case 44:
+      return "Drills";
+    case 45:
+      return "Holes";
+    case 46:
+      return "Milling";
+    case 47:
+      return "Measures";
+    case 48:
+      return "Document";
+    case 49:
+      return "ReferenceLC";
+    case 50:
+      return "ReferenceLS";
+    case 51:
+      return "tDocu";
+    case 52:
+      return "bDocu";
+    case 90:
+      return "Modules";
+    case 91:
+      return "Nets";
+    case 92:
+      return "Buses";
+    case 93:
+      return "Pins";
+    case 94:
+      return "Symbols";
+    case 95:
+      return "Names";
+    case 96:
+      return "Values";
+    case 97:
+      return "Info";
+    case 98:
+      return "Guide";
+    case 99:
+      return "Spice Order";
+    default:
+      return fallback;
+  }
 }
 
 BoundedUnsignedRatio

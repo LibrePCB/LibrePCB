@@ -47,6 +47,7 @@ namespace librepcb {
 
 class Component;
 class Device;
+class MessageLogger;
 class Package;
 class Polygon;
 class Symbol;
@@ -100,23 +101,23 @@ public:
   // General Methods
   void reset() noexcept;
   std::unique_ptr<Symbol> createSymbol(const QString& libName,
-                                       const parseagle::Symbol& eagleSymbol);
-  std::unique_ptr<Package> createPackage(
-      const QString& libName, const parseagle::Package& eaglePackage);
+                                       const parseagle::Symbol& eagleSymbol,
+                                       MessageLogger& log);
+  std::unique_ptr<Package> createPackage(const QString& libName,
+                                         const parseagle::Package& eaglePackage,
+                                         MessageLogger& log);
   std::unique_ptr<Component> createComponent(
-      const QString& libName, const parseagle::DeviceSet& eagleDeviceSet);
+      const QString& libName, const parseagle::DeviceSet& eagleDeviceSet,
+      MessageLogger& log);
   std::unique_ptr<Device> createDevice(
       const QString& libName, const parseagle::DeviceSet& eagleDeviceSet,
-      const parseagle::Device& eagleDevice);
+      const parseagle::Device& eagleDevice, MessageLogger& log);
 
   // Operator Overloadings
   EagleLibraryConverter& operator=(const EagleLibraryConverter& rhs) = delete;
 
-signals:
-  void errorOccurred(const QString& elementName, const QString& msg);
-
 private:  // Methods
-  void tryOrRaiseError(const QString& element, std::function<void()> func);
+  void tryOrLogError(std::function<void()> func, MessageLogger& log);
 
 private:  // Data
   EagleLibraryConverterSettings mSettings;

@@ -64,8 +64,8 @@ public:
   ~TangentPathJoiner() = delete;
 
   // General Methods
-  static QVector<Path> join(QVector<Path> paths,
-                            qint64 timeoutMs = -1) noexcept;
+  static QVector<Path> join(QVector<Path> paths, qint64 timeoutMs = -1,
+                            bool* timedOut = nullptr) noexcept;
 
   // Operator Overloadings
   TangentPathJoiner& operator=(const TangentPathJoiner& rhs) = delete;
@@ -120,7 +120,8 @@ private:
 
   static void findAllPaths(QVector<Result>& result, const QVector<Path>& paths,
                            const QElapsedTimer& timer, qint64 timeoutMs,
-                           const Result& prefix = Result()) noexcept;
+                           const Result& prefix = Result(),
+                           bool* timedOut = nullptr) noexcept;
 
   static tl::optional<Result> join(const QVector<Path>& paths,
                                    const Result& prefix, int index,
