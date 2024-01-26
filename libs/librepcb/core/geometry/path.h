@@ -75,6 +75,7 @@ public:
   }
   const QVector<Vertex>& getVertices() const noexcept { return mVertices; }
   UnsignedLength getTotalStraightLength() const noexcept;
+  qreal calcAreaOfStraightSegments() const noexcept;
   Point calcNearestPointBetweenVertices(const Point& p) const noexcept;
   Path cleaned() const noexcept;
   Path toClosedPath() const noexcept;

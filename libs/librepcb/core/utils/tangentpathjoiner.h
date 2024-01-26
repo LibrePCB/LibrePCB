@@ -79,26 +79,43 @@ private:
   struct Result {
     QVector<Segment> segments;
     QSet<int> indices;
+    QSet<Point> junctions;
     Point startPos;
     Point endPos;
-    UnsignedLength length;
+    mutable qreal lengthAreaCache;
 
-    Result() : segments(), indices(), startPos(), endPos(), length(0) {}
+    Result()
+      : segments(),
+        indices(),
+        junctions(),
+        startPos(),
+        endPos(),
+        lengthAreaCache() {}
 
     bool isClosed() const noexcept {
       return (!segments.isEmpty()) && (startPos == endPos);
     }
 
-    Result sub(int index, bool reverse, const Point& start, const Point& end,
-               const UnsignedLength& l) const {
+    qreal calcLengthOrArea(const QVector<Path>& paths) const noexcept {
+      if (lengthAreaCache == 0) {
+        const Path path = buildPath(paths);
+        lengthAreaCache = path.isClosed()
+            ? path.calcAreaOfStraightSegments()
+            : path.getTotalStraightLength()->toMm();
+      }
+      return lengthAreaCache;
+    }
+
+    Result sub(int index, bool reverse, const Point& start,
+               const Point& end) const {
       Result r(*this);
       r.segments.append(Segment{index, reverse});
       r.indices.insert(index);
+      r.junctions.insert(end);
       if (segments.isEmpty()) {
         r.startPos = start;
       }
       r.endPos = end;
-      r.length += l;
       return r;
     }
 
