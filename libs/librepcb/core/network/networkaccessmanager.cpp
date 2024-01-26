@@ -95,6 +95,25 @@ QNetworkReply* NetworkAccessManager::post(const QNetworkRequest& request,
   }
 }
 
+bool NetworkAccessManager::setMinimumCacheExpirationDate(
+    const QUrl& url, const QDateTime& dt) noexcept {
+  Q_ASSERT(QThread::currentThread() == this);
+
+  if (mManager) {
+    if (QAbstractNetworkCache* cache = mManager->cache()) {
+      QNetworkCacheMetaData data = cache->metaData(url);
+      if (data.isValid() && (data.expirationDate() < dt)) {
+        data.setExpirationDate(dt);
+        cache->updateMetaData(data);
+        return true;
+      }
+    }
+  } else {
+    qCritical() << "No network access manager available! Thread not running?!";
+  }
+  return false;
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/

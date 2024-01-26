@@ -72,6 +72,8 @@ public:
   QNetworkReply* get(const QNetworkRequest& request) noexcept;
   QNetworkReply* post(const QNetworkRequest& request,
                       const QByteArray& data) noexcept;
+  bool setMinimumCacheExpirationDate(const QUrl& url,
+                                     const QDateTime& dt) noexcept;
 
   // Operator Overloadings
   NetworkAccessManager& operator=(const NetworkAccessManager& rhs) = delete;

@@ -84,6 +84,18 @@ public:
    */
   void setExpectedReplyContentSize(qint64 bytes) noexcept;
 
+  /**
+   * @brief Set the minimum time the request should be cached
+   *
+   * This allows to cache requests longer than specified in response headers,
+   * which is useful for URLs not under our own control where rather uncritical
+   * content like images are downloaded from. If the response header specifies
+   * a higher max-age value, it has priority so this method has no effect.
+   *
+   * @param seconds       Minimum cache time in seconds (default is 0)
+   */
+  void setMinimumCacheTime(int seconds) noexcept;
+
   // Operator Overloadings
   NetworkRequestBase& operator=(const NetworkRequestBase& rhs) = delete;
 
@@ -194,6 +206,7 @@ protected:  // Data
   QUrl mUrl;
   QByteArray mPostData;
   qint64 mExpectedContentSize;
+  int mMinimumCacheTime;
 
   // internal data
   QList<QUrl> mRedirectedUrls;

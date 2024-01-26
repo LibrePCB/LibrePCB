@@ -43,6 +43,7 @@ NetworkRequestBase::NetworkRequestBase(const QUrl& url,
   : mUrl(url),
     mPostData(postData),
     mExpectedContentSize(-1),
+    mMinimumCacheTime(0),
     mStarted(false),
     mAborted(false),
     mErrored(false),
@@ -87,6 +88,12 @@ void NetworkRequestBase::setExpectedReplyContentSize(qint64 bytes) noexcept {
   Q_ASSERT(QThread::currentThread() != NetworkAccessManager::instance());
   Q_ASSERT(!mStarted);
   mExpectedContentSize = bytes;
+}
+
+void NetworkRequestBase::setMinimumCacheTime(int seconds) noexcept {
+  Q_ASSERT(QThread::currentThread() != NetworkAccessManager::instance());
+  Q_ASSERT(!mStarted);
+  mMinimumCacheTime = seconds;
 }
 
 void NetworkRequestBase::start() noexcept {
@@ -289,10 +296,17 @@ void NetworkRequestBase::finalize(const QString& errorMsg) noexcept {
   Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
 
   if (errorMsg.isNull()) {
+    // If a minimum cache time was specified, apply it to the cache now.
+    NetworkAccessManager* nam = NetworkAccessManager::instance();
     const bool fromCache = mReply &&
         mReply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
-    qDebug() << "Request successfully finished:" << mUrl.toString()
-             << (fromCache ? "(from cache)" : "");
+    const bool cacheExtended = (!fromCache) && (mMinimumCacheTime > 0) && nam &&
+        nam->setMinimumCacheExpirationDate(
+            mUrl, QDateTime::currentDateTimeUtc().addSecs(mMinimumCacheTime));
+    qDebug().nospace().noquote()
+        << "Request succeeded: " << mUrl.toString()
+        << (cacheExtended ? QString(" (set max_age=%1)").arg(mMinimumCacheTime)
+                          : (fromCache ? " (from cache)" : ""));
     emit progressState(tr("Request successfully finished."));
     emitSuccessfullyFinishedSignals();
     emit succeeded();

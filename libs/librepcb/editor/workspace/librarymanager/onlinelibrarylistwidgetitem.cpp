@@ -84,6 +84,7 @@ OnlineLibraryListWidgetItem::OnlineLibraryListWidgetItem(
   mUi->lblAuthor->setText(QString("Author: %1").arg(author));
 
   NetworkRequest* request = new NetworkRequest(iconUrl);
+  request->setMinimumCacheTime(24 * 3600);  // 1 day
   connect(request, &NetworkRequest::dataReceived, this,
           &OnlineLibraryListWidgetItem::iconReceived, Qt::QueuedConnection);
   request->start();
