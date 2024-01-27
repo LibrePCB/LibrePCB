@@ -64,7 +64,7 @@ class NetworkAccessManager final : public QThread {
 
 public:
   // Constructors / Destructor
-  NetworkAccessManager() noexcept;
+  explicit NetworkAccessManager(const FilePath& cache = FilePath()) noexcept;
   NetworkAccessManager(const NetworkAccessManager& other) = delete;
   ~NetworkAccessManager() noexcept;
 
@@ -84,6 +84,7 @@ private:  // Methods
   void stop() noexcept;
 
 private:  // Data
+  const FilePath mCacheFp;
   QSemaphore mThreadStartSemaphore;
   QNetworkAccessManager* mManager;
   static NetworkAccessManager* sInstance;

@@ -83,9 +83,10 @@ int main(int argc, char* argv[]) {
   // (from http://www.qtcentre.org/threads/1904)
   app.setStyleSheet("QStatusBar::item { border: 0px solid black; }");
 
-  // Start network access manager thread
+  // Start network access manager thread with HTTP cache to avoid extensive
+  // requests (e.g. downloading library pictures each time opening the manager).
   QScopedPointer<NetworkAccessManager> networkAccessManager(
-      new NetworkAccessManager());
+      new NetworkAccessManager(Application::getCacheDir().getPathTo("http")));
 
   // Run the actual application
   int retval = runApplication();
@@ -150,9 +151,12 @@ static void writeLogHeader() noexcept {
   qInfo() << "Resources directory:"
           << Application::getResourcesDir().toNative();
 
-  // write application settings directory to log (nice to know for users)
+  // write application settings file to log (nice to know for users)
   qInfo() << "Application settings:"
           << FilePath(QSettings().fileName()).toNative();
+
+  // write cache directory to log (nice to know for users)
+  qInfo() << "Cache directory:" << Application::getCacheDir().toNative();
 }
 
 /*******************************************************************************

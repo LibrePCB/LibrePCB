@@ -289,7 +289,10 @@ void NetworkRequestBase::finalize(const QString& errorMsg) noexcept {
   Q_ASSERT(QThread::currentThread() == NetworkAccessManager::instance());
 
   if (errorMsg.isNull()) {
-    qDebug() << "Request successfully finished:" << mUrl.toString();
+    const bool fromCache = mReply &&
+        mReply->attribute(QNetworkRequest::SourceIsFromCacheAttribute).toBool();
+    qDebug() << "Request successfully finished:" << mUrl.toString()
+             << (fromCache ? "(from cache)" : "");
     emit progressState(tr("Request successfully finished."));
     emitSuccessfullyFinishedSignals();
     emit succeeded();

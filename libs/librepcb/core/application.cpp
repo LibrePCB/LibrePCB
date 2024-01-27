@@ -70,6 +70,24 @@ bool Application::isFileFormatStable() noexcept {
   return LIBREPCB_FILE_FORMAT_STABLE;
 }
 
+FilePath Application::getCacheDir() noexcept {
+  auto detect = []() {
+    // Use different configuration directory if supplied by environment
+    // variable "LIBREPCB_CACHE_DIR" (useful for functional testing).
+    FilePath fp(qgetenv("LIBREPCB_CACHE_DIR"));
+
+    // If no valid path was specified, use the default cache directory.
+    if (!fp.isValid()) {
+      fp.setPath(
+          QStandardPaths::writableLocation(QStandardPaths::CacheLocation));
+    }
+    return fp;
+  };
+
+  static const FilePath value = detect();
+  return value;
+}
+
 const FilePath& Application::getResourcesDir() noexcept {
   auto detect = []() {
     // get the directory of the currently running executable
