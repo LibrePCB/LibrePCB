@@ -22,12 +22,19 @@
  ******************************************************************************/
 #include "eagletypeconverter.h"
 
+#include <librepcb/core/attribute/attribute.h>
+#include <librepcb/core/attribute/attributekey.h>
+#include <librepcb/core/attribute/attrtypestring.h>
 #include <librepcb/core/types/boundedunsignedratio.h>
+#include <librepcb/core/types/lengthunit.h>
 #include <librepcb/core/utils/clipperhelpers.h>
 #include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/core/utils/tangentpathjoiner.h>
+#include <parseagle/board/param.h>
+#include <parseagle/common/attribute.h>
 #include <parseagle/common/circle.h>
 #include <parseagle/common/frame.h>
+#include <parseagle/common/grid.h>
 #include <parseagle/common/point.h>
 #include <parseagle/common/polygon.h>
 #include <parseagle/common/rectangle.h>
@@ -130,6 +137,51 @@ QString EagleTypeConverter::convertInversionSyntax(const QString& s) noexcept {
     out += s.at(i);
   }
   return out;
+}
+
+std::shared_ptr<Attribute> EagleTypeConverter::tryConvertAttribute(
+    const parseagle::Attribute& a, MessageLogger& log) {
+  const QString key = cleanAttributeKey(a.getName());
+  if (key.isEmpty()) {
+    log.warning(QString("Skipped attribute '%1' due to invalid name.")
+                    .arg(a.getName()));
+    return nullptr;
+  }
+  return std::make_shared<Attribute>(
+      AttributeKey(key), AttrTypeString::instance(), a.getValue(), nullptr);
+}
+
+void EagleTypeConverter::tryConvertAttributes(
+    const QList<parseagle::Attribute>& in, AttributeList& out,
+    MessageLogger& log) {
+  foreach (const auto& eagleAttr, in) {
+    if (auto lpObj = tryConvertAttribute(eagleAttr, log)) {
+      if (!out.contains(*lpObj->getKey())) {
+        out.append(lpObj);
+      }
+    }
+  }
+}
+
+void EagleTypeConverter::tryExtractMpnAndManufacturer(
+    AttributeList& attributes, SimpleString& mpn,
+    SimpleString& manufacturer) noexcept {
+  for (auto name : {"MPN", "MANUFACTURER_PART_NUMBER", "PART_NUMBER"}) {
+    if (auto a = attributes.find(name)) {
+      if (mpn->isEmpty()) {
+        mpn = cleanSimpleString(a->getValue());
+        attributes.remove(name);
+      }
+    }
+  }
+  for (auto name : {"MANUFACTURER", "MFR", "MF", "VENDOR"}) {
+    if (auto a = attributes.find(name)) {
+      if (manufacturer->isEmpty()) {
+        manufacturer = cleanSimpleString(a->getValue());
+        attributes.remove(name);
+      }
+    }
+  }
 }
 
 const Layer* EagleTypeConverter::tryConvertSchematicLayer(int id) noexcept {
@@ -265,6 +317,35 @@ const Layer* EagleTypeConverter::tryConvertBoardLayer(int id) noexcept {
   return nullptr;
 }
 
+QHash<const Layer*, const Layer*> EagleTypeConverter::convertLayerSetup(
+    const QString& s) {
+  QString tmp = s;
+  tmp.replace(QRegularExpression("[:\\*+\\(\\)\\[\\]]"), " ");
+  QSet<int> numbers;
+  foreach (const QString& numberStr, tmp.split(" ", QString::SkipEmptyParts)) {
+    const int id = numberStr.toInt();
+    if ((id < 1) || (id > 16)) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         QString("Unsupported layer setup: %1").arg(s));
+    }
+    numbers.insert(id);
+  }
+  QHash<const Layer*, const Layer*> result;
+  int nextInnerLayer = 1;
+  foreach (int id, Toolbox::sortedQSet(numbers)) {
+    if (id == 1) {
+      result.insert(&Layer::topCopper(), &Layer::topCopper());
+    } else if (id == 16) {
+      result.insert(&Layer::botCopper(), &Layer::botCopper());
+    } else {
+      result.insert(Layer::innerCopper(id - 1),
+                    Layer::innerCopper(nextInnerLayer));
+      ++nextInnerLayer;
+    }
+  }
+  return result;
+}
+
 Alignment EagleTypeConverter::convertAlignment(parseagle::Alignment a) {
   switch (a) {
     case parseagle::Alignment::BottomLeft:
@@ -308,12 +389,79 @@ UnsignedLength EagleTypeConverter::convertLineWidth(double w, int layerId) {
   return UnsignedLength(l);  // can throw
 }
 
+template <>
+Length EagleTypeConverter::convertParamTo(const parseagle::Param& p) {
+  const QMap<QString, LengthUnit> unitMap = {
+      {"mic", LengthUnit::micrometers()},
+      {"mm", LengthUnit::millimeters()},
+      {"mil", LengthUnit::mils()},
+      {"inch", LengthUnit::inches()},
+  };
+
+  double value;
+  QString unit;
+  if (p.tryGetValueAsDoubleWithUnit(value, unit) && unitMap.contains(unit)) {
+    return unitMap[unit].convertFromUnit(value);
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Invalid length parameter value: '%1'").arg(p.getValue()));
+  }
+}
+
+template <>
+UnsignedLength EagleTypeConverter::convertParamTo(const parseagle::Param& p) {
+  return UnsignedLength(convertParamTo<Length>(p));
+}
+
+template <>
+PositiveLength EagleTypeConverter::convertParamTo(const parseagle::Param& p) {
+  return PositiveLength(convertParamTo<Length>(p));
+}
+
+template <>
+Ratio EagleTypeConverter::convertParamTo(const parseagle::Param& p) {
+  double value;
+  if (p.tryGetValueAsDouble(value)) {
+    return Ratio::fromNormalized(value);
+  } else {
+    throw RuntimeError(
+        __FILE__, __LINE__,
+        QString("Invalid ratio parameter value: '%1'").arg(p.getValue()));
+  }
+}
+
+template <>
+UnsignedRatio EagleTypeConverter::convertParamTo(const parseagle::Param& p) {
+  return UnsignedRatio(convertParamTo<Ratio>(p));
+}
+
 Point EagleTypeConverter::convertPoint(const parseagle::Point& p) {
   return Point::fromMm(p.x, p.y);
 }
 
 Angle EagleTypeConverter::convertAngle(double a) {
   return Angle::fromDeg(a);
+}
+
+void EagleTypeConverter::convertGrid(const parseagle::Grid& g,
+                                     PositiveLength& interval,
+                                     LengthUnit& unit) {
+  const QMap<parseagle::GridUnit, LengthUnit> unitMap = {
+      {parseagle::GridUnit::Micrometers, LengthUnit::micrometers()},
+      {parseagle::GridUnit::Millimeters, LengthUnit::millimeters()},
+      {parseagle::GridUnit::Mils, LengthUnit::mils()},
+      {parseagle::GridUnit::Inches, LengthUnit::inches()},
+  };
+  const LengthUnit distUnit =
+      unitMap.value(g.getUnitDistance(), LengthUnit::millimeters());
+  const Length value = distUnit.convertFromUnit(g.getDistance());
+  if ((g.getDistance() > 0) && (value > 0)) {
+    interval = PositiveLength(value);
+  }
+  if (unitMap.contains(g.getUnit())) {
+    unit = unitMap.value(g.getUnit());
+  }
 }
 
 Vertex EagleTypeConverter::convertVertex(const parseagle::Vertex& v) {
@@ -350,6 +498,15 @@ QList<EagleTypeConverter::Geometry> EagleTypeConverter::convertAndJoinWires(
         paths.append(Path::line(convertPoint(wire.getP1()),
                                 convertPoint(wire.getP2()),
                                 convertAngle(wire.getCurve())));
+        if (wire.getWireStyle() != parseagle::WireStyle::Continuous) {
+          log.warning(
+              tr("Dashed/dotted line is not supported, converting to "
+                 "continuous."));
+        }
+        if (wire.getWireCap() != parseagle::WireCap::Round) {
+          log.warning(
+              tr("Flat line end is not supported, converting to round."));
+        }
       }
       foreach (const Path& p, TangentPathJoiner::join(paths, 5000, &timedOut)) {
         polygons.append(Geometry{
@@ -486,6 +643,26 @@ std::shared_ptr<Text> EagleTypeConverter::tryConvertSchematicText(
   }
 }
 
+std::shared_ptr<Text> EagleTypeConverter::tryConvertSchematicAttribute(
+    const parseagle::Attribute& t) {
+  if (auto layer = tryConvertSchematicLayer(t.getLayer())) {
+    const bool mirror = t.getRotation().getMirror();
+    const Angle rotation = convertAngle(t.getRotation().getAngle());
+    const Alignment alignment = convertAlignment(t.getAlignment());
+    return std::make_shared<Text>(
+        Uuid::createRandom(),  // UUID
+        *layer,  // Layer
+        convertTextValue(">" % t.getName()),  // Text
+        convertPoint(t.getPosition()),  // Position
+        mirror ? -rotation : rotation,  // Rotation
+        convertSchematicTextSize(t.getSize()),  // Height
+        mirror ? alignment.mirroredH() : alignment  // Alignment
+    );
+  } else {
+    return nullptr;
+  }
+}
+
 PositiveLength EagleTypeConverter::convertBoardTextSize(int layerId,
                                                         double size) {
   Length newSize = Length::fromMm(size * 0.85);
@@ -539,6 +716,31 @@ std::shared_ptr<StrokeText> EagleTypeConverter::tryConvertBoardText(
         Uuid::createRandom(),  // UUID
         *layer,  // Layer
         convertTextValue(t.getValue()),  // Text
+        convertPoint(t.getPosition()),  // Position
+        mirror ? -rotation : rotation,  // Rotation
+        convertBoardTextSize(t.getLayer(), t.getSize()),  // Height
+        convertBoardTextStrokeWidth(t.getLayer(), t.getSize(),
+                                    t.getRatio()),  // Stroke width
+        StrokeTextSpacing(),  // Letter spacing
+        StrokeTextSpacing(),  // Line spacing
+        convertAlignment(t.getAlignment()),  // Alignment
+        mirror,  // Mirrored
+        !t.getRotation().getSpin()  // Auto rotate
+    );
+  } else {
+    return nullptr;
+  }
+}
+
+std::shared_ptr<StrokeText> EagleTypeConverter::tryConvertBoardAttribute(
+    const parseagle::Attribute& t) {
+  if (auto layer = tryConvertBoardLayer(t.getLayer())) {
+    const bool mirror = t.getRotation().getMirror();
+    const Angle rotation = convertAngle(t.getRotation().getAngle());
+    return std::make_shared<StrokeText>(
+        Uuid::createRandom(),  // UUID
+        *layer,  // Layer
+        convertTextValue(">" % t.getName()),  // Text
         convertPoint(t.getPosition()),  // Position
         mirror ? -rotation : rotation,  // Rotation
         convertBoardTextSize(t.getLayer(), t.getSize()),  // Height

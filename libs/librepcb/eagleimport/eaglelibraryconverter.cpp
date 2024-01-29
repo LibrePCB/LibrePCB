@@ -134,6 +134,35 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
   foreach (const auto& obj, eagleSymbol.getFrames()) {
     geometries.append(C::convertFrame(obj));
   }
+  // Disable grab area on geometries located *within* another grab area to
+  // avoid overlapping grab areas, but also to avoid triggering issue
+  // https://github.com/LibrePCB/LibrePCB/issues/1278.
+  std::sort(geometries.begin(), geometries.end(),
+            [](const EagleTypeConverter::Geometry& a,
+               const EagleTypeConverter::Geometry& b) {
+              if (a.path.isClosed() != b.path.isClosed()) {
+                return a.path.isClosed();
+              }
+              if (a.path.isClosed()) {
+                return a.path.calcAreaOfStraightSegments() >
+                    b.path.calcAreaOfStraightSegments();
+              } else {
+                return a.path.getTotalStraightLength() >
+                    b.path.getTotalStraightLength();
+              }
+            });
+  QPainterPath totalGrabArea;
+  totalGrabArea.setFillRule(Qt::WindingFill);
+  for (EagleTypeConverter::Geometry& g : geometries) {
+    if (g.grabArea) {
+      const QPainterPath p = g.path.toQPainterPathPx();
+      if (totalGrabArea.contains(p)) {
+        g.grabArea = false;
+      } else {
+        totalGrabArea |= p;
+      }
+    }
+  }
   foreach (const auto& g, geometries) {
     tryOrLogError(
         [&]() {
@@ -427,6 +456,19 @@ std::unique_ptr<Device> EagleLibraryConverter::createDevice(
     }
     device->getPadSignalMap().append(
         std::make_shared<DevicePadSignalMapItem>(padIt->value(), signalUuid));
+  }
+  foreach (const auto& eagleTechnology, eagleDevice.getTechnologies()) {
+    AttributeList attributes;
+    C::tryConvertAttributes(eagleTechnology.getAttributes(), attributes, log);
+    SimpleString mpn(""), manufacturer("");
+    C::tryExtractMpnAndManufacturer(attributes, mpn, manufacturer);
+    if (mpn->isEmpty()) {
+      mpn = cleanSimpleString(eagleTechnology.getName());  // Good idea or not?
+    }
+    if (!mpn->isEmpty()) {
+      auto part = std::make_shared<Part>(mpn, manufacturer, attributes);
+      device->getParts().append(part);
+    }
   }
   return device;
 }

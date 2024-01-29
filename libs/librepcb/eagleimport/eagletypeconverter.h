@@ -23,6 +23,7 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include <librepcb/core/attribute/attribute.h>
 #include <librepcb/core/geometry/circle.h>
 #include <librepcb/core/geometry/hole.h>
 #include <librepcb/core/geometry/path.h>
@@ -39,6 +40,7 @@
 #include <librepcb/core/types/circuitidentifier.h>
 #include <librepcb/core/types/elementname.h>
 #include <librepcb/core/types/point.h>
+#include <librepcb/core/types/simplestring.h>
 #include <optional/tl/optional.hpp>
 #include <parseagle/common/enums.h>
 
@@ -50,13 +52,16 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace parseagle {
+class Attribute;
 class Circle;
 class DeviceSet;
 class Frame;
 class Gate;
+class Grid;
 class Hole;
 class Library;
 class Package;
+class Param;
 class Pin;
 class Polygon;
 class Rectangle;
@@ -72,6 +77,7 @@ struct Point;
 namespace librepcb {
 
 class Layer;
+class LengthUnit;
 class MessageLogger;
 
 namespace eagleimport {
@@ -212,6 +218,45 @@ public:
   static QString convertInversionSyntax(const QString& s) noexcept;
 
   /**
+   * @brief Try converting an attribute
+   *
+   * @param a           EAGLE attribute
+   * @param log         Message logger
+   *
+   * @return LibrePCB attribute (nullptr on failure)
+   */
+  static std::shared_ptr<Attribute> tryConvertAttribute(
+      const parseagle::Attribute& a, MessageLogger& log);
+
+  /**
+   * @brief Try converting a list of attributes
+   *
+   * @note Attributes are only added to the output if #tryConvertAttribute()
+   *       was able to convert them, and if no attribute with the same key
+   *       exists yet (no duplicates).
+   *
+   * @param in          EAGLE attribute list
+   * @param out         List where converted attributes are appended to
+   * @param log         Message logger
+   *
+   * @see #tryConvertAttribute()
+   */
+  static void tryConvertAttributes(const QList<parseagle::Attribute>& in,
+                                   AttributeList& out, MessageLogger& log);
+
+  /**
+   * @brief Try extracting MPN and manufacturer from a list of attributes
+   *
+   * @param attributes    Arbitrary attributes. Found MPN and manufacturer
+   *                      attributes will be removed from it.
+   * @param mpn           The found MPN (unmodified if not found)
+   * @param manufacturer  The found manufacturer name (unmodified if not found)
+   */
+  static void tryExtractMpnAndManufacturer(AttributeList& attributes,
+                                           SimpleString& mpn,
+                                           SimpleString& manufacturer) noexcept;
+
+  /**
    * @brief Try to convert a layer ID to a schematic layer
    *
    * @param id  EAGLE layer ID
@@ -228,6 +273,15 @@ public:
    * @return LibrePCB board/footprint layer (`nullptr` to discard object)
    */
   static const Layer* tryConvertBoardLayer(int id) noexcept;
+
+  /**
+   * @brief Convert a layer setup string
+   *
+   * @param s   EAGLE layer setup string (e.g. "[2:1+((2*3)+(14*15))+16:15]")
+   *
+   * @return Map to move all inner copper layers to the top (remove gaps)
+   */
+  static QHash<const Layer*, const Layer*> convertLayerSetup(const QString& s);
 
   /**
    * @brief Convert an alignment
@@ -261,6 +315,20 @@ public:
   static UnsignedLength convertLineWidth(double w, int layerId);
 
   /**
+   * @brief Convert a parameter value to a LibrePCB type
+   *
+   * @tparam  Return type, e.g. :librepcb::Length, ::librepcb::PositiveLength
+   *          or ::librepcb::Ratio
+   * @param p EAGLE parameter
+   *
+   * @return LibrePCB value
+   *
+   * @throws If the value could not be converted
+   */
+  template <typename T>
+  static T convertParamTo(const parseagle::Param& p);
+
+  /**
    * @brief Convert a point
    *
    * @param p   EAGLE point [mm]
@@ -277,6 +345,19 @@ public:
    * @return LibrePCB angle
    */
   static Angle convertAngle(double a);
+
+  /**
+   * @brief Convert grid settings
+   *
+   * @note  In case of unknown/unsupported grid settings, output parameters
+   *        are not overwritten.
+   *
+   * @param g         EAGLE grid settings
+   * @param interval  LibrePCB grid interval (output)
+   * @param unit      LibrePCB grid unit (output)
+   */
+  static void convertGrid(const parseagle::Grid& g, PositiveLength& interval,
+                          LengthUnit& unit);
 
   /**
    * @brief Convert a vertex
@@ -389,6 +470,16 @@ public:
       const parseagle::Text& t);
 
   /**
+   * @brief Try to convert a schematic/symbol attribute text
+   *
+   * @param t   EAGLE attribute text
+   *
+   * @return LibrePCB text if the layer is supported, otherwise `nullptr`
+   */
+  static std::shared_ptr<Text> tryConvertSchematicAttribute(
+      const parseagle::Attribute& t);
+
+  /**
    * @brief Convert the size (height) of a board text
    *
    * @param layerId EAGLE layer ID
@@ -419,6 +510,16 @@ public:
    */
   static std::shared_ptr<StrokeText> tryConvertBoardText(
       const parseagle::Text& t);
+
+  /**
+   * @brief Try to convert a board/footprint attribute text
+   *
+   * @param t   EAGLE attribute text
+   *
+   * @return LibrePCB text if the layer is supported, otherwise `nullptr`
+   */
+  static std::shared_ptr<StrokeText> tryConvertBoardAttribute(
+      const parseagle::Attribute& t);
 
   /**
    * @brief Convert a symbol pin

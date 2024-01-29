@@ -21,6 +21,8 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/core/attribute/attribute.h>
+#include <librepcb/core/attribute/attributetype.h>
 #include <librepcb/core/library/pkg/footprintpad.h>
 #include <librepcb/core/library/pkg/packagepad.h>
 #include <librepcb/core/library/sym/symbolpin.h>
@@ -28,6 +30,7 @@
 #include <librepcb/core/types/point.h>
 #include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/eagleimport/eagletypeconverter.h>
+#include <parseagle/common/attribute.h>
 #include <parseagle/common/domelement.h>
 #include <parseagle/library.h>
 
@@ -139,6 +142,25 @@ TEST_F(EagleTypeConverterTest, testConvertInversionSyntax) {
   EXPECT_EQ("A/!B/C", C::convertInversionSyntax("A/!B!/C").toStdString());
 }
 
+TEST_F(EagleTypeConverterTest, testConvertAttributeValid) {
+  MessageLogger log;
+  const QString xml = "<attribute name=\"Foo Bar\" value=\"hello world!\"/>";
+  auto out = C::tryConvertAttribute(parseagle::Attribute(dom(xml)), log);
+  ASSERT_TRUE(out != nullptr);
+  EXPECT_EQ("FOO_BAR", out->getKey()->toStdString());
+  EXPECT_EQ("hello world!", out->getValue().toStdString());
+  EXPECT_EQ(AttributeType::Type_t::String, out->getType().getType());
+  EXPECT_EQ(0, log.getMessages().count());
+}
+
+TEST_F(EagleTypeConverterTest, testConvertAttributeInvalid) {
+  MessageLogger log;
+  const QString xml = "<attribute name=\"!\" value=\"hello world!\"/>";
+  auto out = C::tryConvertAttribute(parseagle::Attribute(dom(xml)), log);
+  EXPECT_TRUE(out == nullptr);
+  EXPECT_EQ(1, log.getMessages().count());
+}
+
 TEST_F(EagleTypeConverterTest, testTryConvertSchematicLayer) {
   EXPECT_EQ(nullptr, C::tryConvertSchematicLayer(1));  // tCu
   EXPECT_EQ(&Layer::symbolOutlines(), C::tryConvertSchematicLayer(94));  // sym
@@ -151,6 +173,40 @@ TEST_F(EagleTypeConverterTest, testTryConvertBoardLayer) {
   EXPECT_EQ(&Layer::botCopper(), C::tryConvertBoardLayer(16));  // bCu
   EXPECT_EQ(nullptr, C::tryConvertBoardLayer(94));  // symbols
   EXPECT_EQ(nullptr, C::tryConvertBoardLayer(999));  // non existent
+}
+
+TEST_F(EagleTypeConverterTest, testConvertLayerSetup) {
+  typedef QHash<const Layer*, const Layer*> T;
+  EXPECT_EQ((T{}), C::convertLayerSetup(""));
+  EXPECT_EQ((T{
+                {&Layer::topCopper(), &Layer::topCopper()},
+                {&Layer::botCopper(), &Layer::botCopper()},
+            }),
+            C::convertLayerSetup("1*16"));
+  EXPECT_EQ((T{
+                {&Layer::topCopper(), &Layer::topCopper()},
+                {&Layer::botCopper(), &Layer::botCopper()},
+            }),
+            C::convertLayerSetup("(1*16)"));
+  EXPECT_EQ((T{
+                {&Layer::topCopper(), &Layer::topCopper()},
+                {Layer::innerCopper(1), Layer::innerCopper(1)},
+                {Layer::innerCopper(2), Layer::innerCopper(2)},
+                {Layer::innerCopper(13), Layer::innerCopper(3)},
+                {Layer::innerCopper(14), Layer::innerCopper(4)},
+                {&Layer::botCopper(), &Layer::botCopper()},
+            }),
+            C::convertLayerSetup("[2:1+((2*3)+(14*15))+16:15]"));
+  EXPECT_EQ((T{
+                {&Layer::topCopper(), &Layer::topCopper()},
+                {Layer::innerCopper(1), Layer::innerCopper(1)},
+                {Layer::innerCopper(2), Layer::innerCopper(2)},
+                {Layer::innerCopper(3), Layer::innerCopper(3)},
+                {Layer::innerCopper(4), Layer::innerCopper(4)},
+                {&Layer::botCopper(), &Layer::botCopper()},
+            }),
+            C::convertLayerSetup("[2:1+[3:2+(3*4)+5:4]+16:5]"));
+  EXPECT_THROW(C::convertLayerSetup("1*Foo*16"), Exception);
 }
 
 TEST_F(EagleTypeConverterTest, testConvertAlignment) {

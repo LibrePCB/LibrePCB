@@ -6,8 +6,14 @@ set(CMAKE_AUTORCC OFF)
 # Export library
 add_library(
   librepcb_eagleimport STATIC
-  eaglelibraryconverter.cpp eaglelibraryconverter.h eaglelibraryimport.cpp
-  eaglelibraryimport.h eagletypeconverter.cpp eagletypeconverter.h
+  eaglelibraryconverter.cpp
+  eaglelibraryconverter.h
+  eaglelibraryimport.cpp
+  eaglelibraryimport.h
+  eagleprojectimport.cpp
+  eagleprojectimport.h
+  eagletypeconverter.cpp
+  eagletypeconverter.h
 )
 target_include_directories(
   librepcb_eagleimport
