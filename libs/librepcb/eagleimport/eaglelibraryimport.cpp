@@ -31,6 +31,7 @@
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/utils/messagelogger.h>
 #include <parseagle/library.h>
 
 #include <QtCore>
@@ -50,6 +51,7 @@ EagleLibraryImport::EagleLibraryImport(const FilePath& dstLibFp,
   : QThread(parent),
     mDestinationLibraryFp(dstLibFp),
     mSettings(new EagleLibraryConverterSettings()),
+    mLogger(new MessageLogger(true)),
     mAbort(false) {
 }
 
@@ -317,16 +319,8 @@ void EagleLibraryImport::run() noexcept {
   // Note: This method is called from a different thread, thus be careful with
   //       calling other methods to only call thread-safe methods!
 
-  QStringList errors;
-  auto raiseImportError = [this, &errors](const QString& element,
-                                          const QString& error) {
-    const QString msg = QString("[%1] ").arg(element) % error;
-    errors.append(msg);
-    emit errorOccurred(msg);
-  };
-
+  std::shared_ptr<MessageLogger> globalLog = mLogger;
   EagleLibraryConverter converter(*mSettings, this);
-  connect(&converter, &EagleLibraryConverter::errorOccurred, raiseImportError);
 
   int totalCount = getCheckedElementsCount();
   int count = 0;
@@ -338,10 +332,11 @@ void EagleLibraryImport::run() noexcept {
     if (sym.checkState == Qt::Unchecked) {
       continue;
     }
+    MessageLogger log(globalLog.get(), sym.displayName);
     try {
       emit progressStatus(sym.displayName);
       auto symbol =
-          converter.createSymbol(QString(), *sym.symbol);  // can throw
+          converter.createSymbol(QString(), *sym.symbol, log);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Symbol::getShortElementName())
@@ -349,8 +344,7 @@ void EagleLibraryImport::run() noexcept {
       symbol->saveTo(dir);
       dir.getFileSystem()->save();
     } catch (const Exception& e) {
-      raiseImportError(sym.displayName,
-                       tr("Skipped symbol due to error: %1").arg(e.getMsg()));
+      log.critical(tr("Skipped symbol due to error: %1").arg(e.getMsg()));
     }
     ++count;
     emit progressPercent((100 * count) / std::max(totalCount, 1));
@@ -363,10 +357,11 @@ void EagleLibraryImport::run() noexcept {
     if (pkg.checkState == Qt::Unchecked) {
       continue;
     }
+    MessageLogger log(globalLog.get(), pkg.displayName);
     try {
       emit progressStatus(pkg.displayName);
       auto package =
-          converter.createPackage(QString(), *pkg.package);  // can throw
+          converter.createPackage(QString(), *pkg.package, log);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Package::getShortElementName())
@@ -374,8 +369,7 @@ void EagleLibraryImport::run() noexcept {
       package->saveTo(dir);
       dir.getFileSystem()->save();
     } catch (const Exception& e) {
-      raiseImportError(pkg.displayName,
-                       tr("Skipped package due to error: %1").arg(e.getMsg()));
+      log.critical(tr("Skipped package due to error: %1").arg(e.getMsg()));
     }
     ++count;
     emit progressPercent((100 * count) / std::max(totalCount, 1));
@@ -388,10 +382,11 @@ void EagleLibraryImport::run() noexcept {
     if (cmp.checkState == Qt::Unchecked) {
       continue;
     }
+    MessageLogger log(globalLog.get(), cmp.displayName);
     try {
       emit progressStatus(cmp.displayName);
-      auto component =
-          converter.createComponent(QString(), *cmp.deviceSet);  // can throw
+      auto component = converter.createComponent(QString(), *cmp.deviceSet,
+                                                 log);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Component::getShortElementName())
@@ -399,9 +394,7 @@ void EagleLibraryImport::run() noexcept {
       component->saveTo(dir);
       dir.getFileSystem()->save();
     } catch (const Exception& e) {
-      raiseImportError(
-          cmp.displayName,
-          tr("Skipped component due to error: %1").arg(e.getMsg()));
+      log.critical(tr("Skipped component due to error: %1").arg(e.getMsg()));
     }
     ++count;
     emit progressPercent((100 * count) / std::max(totalCount, 1));
@@ -414,10 +407,11 @@ void EagleLibraryImport::run() noexcept {
     if (dev.checkState == Qt::Unchecked) {
       continue;
     }
+    MessageLogger log(globalLog.get(), dev.displayName);
     try {
       emit progressStatus(dev.displayName);
       auto device = converter.createDevice(QString(), *dev.deviceSet,
-                                           *dev.device);  // can throw
+                                           *dev.device, log);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Device::getShortElementName())
@@ -425,8 +419,7 @@ void EagleLibraryImport::run() noexcept {
       device->saveTo(dir);
       dir.getFileSystem()->save();
     } catch (const Exception& e) {
-      raiseImportError(dev.displayName,
-                       tr("Skipped device due to error: %1").arg(e.getMsg()));
+      log.critical(tr("Skipped device due to error: %1").arg(e.getMsg()));
     }
     ++count;
     emit progressPercent((100 * count) / std::max(totalCount, 1));
@@ -437,7 +430,7 @@ void EagleLibraryImport::run() noexcept {
                          "Placeholders are numbers", totalCount)
                           .arg(count)
                           .arg(totalCount));
-  emit finished(errors);
+  emit finished();
 }
 
 /*******************************************************************************

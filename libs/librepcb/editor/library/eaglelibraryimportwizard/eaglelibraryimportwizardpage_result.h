@@ -69,7 +69,7 @@ public:
       const EagleLibraryImportWizardPage_Result& rhs) = delete;
 
 private:  // Methods
-  void importFinished(const QStringList& errors) noexcept;
+  void importFinished() noexcept;
 
 private:  // Data
   QScopedPointer<Ui::EagleLibraryImportWizardPage_Result> mUi;

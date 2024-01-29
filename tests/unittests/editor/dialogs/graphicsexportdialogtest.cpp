@@ -689,14 +689,14 @@ TEST_F(GraphicsExportDialogTest, testScale) {
     // Check the default value.
     EXPECT_EQ(!defaultValue, cbx.isChecked());
     EXPECT_EQ(defaultValue.has_value(), spbx.isEnabled());
-    EXPECT_EQ(defaultValue ? **defaultValue : Ratio::percent100(),
+    EXPECT_EQ(defaultValue ? **defaultValue : Ratio::fromPercent(100),
               *spbx.getValue());
     EXPECT_EQ(defaultValue, getSettings(dlg, 1).at(0)->getScale());
 
     // Check if the value can be changed and are applied properly.
     cbx.setChecked(!newValue);
     EXPECT_EQ(newValue.has_value(), spbx.isEnabled());
-    EXPECT_EQ(UnsignedRatio(Ratio::percent100()),
+    EXPECT_EQ(UnsignedRatio(Ratio::fromPercent(100)),
               getSettings(dlg, 1).at(0)->getScale());
     spbx.setValue(*newValue);
     EXPECT_EQ(newValue, getSettings(dlg, 1).at(0)->getScale());
@@ -718,14 +718,15 @@ TEST_F(GraphicsExportDialogTest, testScale) {
     // Check new value.
     EXPECT_EQ(!newValue, cbx.isChecked());
     EXPECT_EQ(newValue.has_value(), spbx.isEnabled());
-    EXPECT_EQ(newValue ? **newValue : Ratio::percent100(), *spbx.getValue());
+    EXPECT_EQ(newValue ? **newValue : Ratio::fromPercent(100),
+              *spbx.getValue());
     EXPECT_EQ(newValue, getSettings(dlg, 1).at(0)->getScale());
 
     // Restore default value.
     restoreDefaults(dlg);
     EXPECT_EQ(!defaultValue, cbx.isChecked());
     EXPECT_EQ(defaultValue.has_value(), spbx.isEnabled());
-    EXPECT_EQ(defaultValue ? **defaultValue : Ratio::percent100(),
+    EXPECT_EQ(defaultValue ? **defaultValue : Ratio::fromPercent(100),
               *spbx.getValue());
     EXPECT_EQ(defaultValue, getSettings(dlg, 1).at(0)->getScale());
 

@@ -21,6 +21,7 @@
  *  Includes
  ******************************************************************************/
 #include <gtest/gtest.h>
+#include <librepcb/core/utils/messagelogger.h>
 #include <librepcb/eagleimport/eaglelibraryimport.h>
 
 #include <QtCore>
@@ -50,12 +51,8 @@ TEST_F(EagleLibraryImportTest, testImport) {
 
   // Connect signals by hand because QSignalSpy is not threadsafe!
   int signalFinished = 0;
-  QStringList importErrors;
   QObject::connect(&import, &EagleLibraryImport::finished,
-                   [&signalFinished, &importErrors](const QStringList& e) {
-                     ++signalFinished;
-                     importErrors = e;
-                   });
+                   [&signalFinished]() { ++signalFinished; });
 
   QStringList parseErrors = import.open(src);
   EXPECT_EQ(1, import.getSymbols().count());
@@ -67,7 +64,7 @@ TEST_F(EagleLibraryImportTest, testImport) {
   import.start();
   EXPECT_TRUE(import.wait(10000));
   EXPECT_EQ(1, signalFinished);
-  EXPECT_EQ(0, importErrors.count());
+  EXPECT_EQ(0, import.getLogger()->getMessages().count());
 }
 
 /*******************************************************************************

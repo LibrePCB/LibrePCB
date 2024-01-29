@@ -22,6 +22,7 @@
  ******************************************************************************/
 #include "newprojectwizard.h"
 
+#include "newprojectwizardpage_eagleimport.h"
 #include "newprojectwizardpage_initialization.h"
 #include "newprojectwizardpage_metadata.h"
 #include "ui_newprojectwizard.h"
@@ -33,6 +34,7 @@
 #include <librepcb/core/project/board/board.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -49,13 +51,32 @@ namespace editor {
  *  Constructors / Destructor
  ******************************************************************************/
 
-NewProjectWizard::NewProjectWizard(const Workspace& ws,
+NewProjectWizard::NewProjectWizard(const Workspace& ws, Mode mode,
                                    QWidget* parent) noexcept
-  : QWizard(parent), mWorkspace(ws), mUi(new Ui::NewProjectWizard) {
+  : QWizard(parent),
+    mWorkspace(ws),
+    mMode(mode),
+    mUi(new Ui::NewProjectWizard),
+    mPageEagleImport(nullptr),
+    mPageMetadata(nullptr),
+    mPageInitialization(nullptr) {
   mUi->setupUi(this);
 
+  if (mMode == Mode::EagleImport) {
+    addPage(mPageEagleImport =
+                new NewProjectWizardPage_EagleImport(mWorkspace, this));
+  }
   addPage(mPageMetadata = new NewProjectWizardPage_Metadata(mWorkspace, this));
-  addPage(mPageInitialization = new NewProjectWizardPage_Initialization(this));
+  if (mMode == Mode::NewProject) {
+    addPage(mPageInitialization =
+                new NewProjectWizardPage_Initialization(this));
+  }
+
+  if (mPageEagleImport && mPageMetadata) {
+    connect(mPageEagleImport,
+            &NewProjectWizardPage_EagleImport::projectSelected, mPageMetadata,
+            &NewProjectWizardPage_Metadata::setProjectName);
+  }
 }
 
 NewProjectWizard::~NewProjectWizard() noexcept {
@@ -74,9 +95,20 @@ void NewProjectWizard::setLocation(const FilePath& dir) noexcept {
  ******************************************************************************/
 
 std::unique_ptr<Project> NewProjectWizard::createProject() const {
+  // Try to remove directory after creation failed and if it doesn't exist now.
+  const FilePath projectDir = mPageMetadata->getFullFilePath().getParentDir();
+  const bool projectDirExisted = projectDir.isExistingDir();
+  auto sg = scopeGuard([projectDir, projectDirExisted]() {
+    if (!projectDirExisted) QDir(projectDir.toStr()).removeRecursively();
+  });
+
+  // Show wait cursor since this operation can take a while.
+  qApp->setOverrideCursor(Qt::WaitCursor);
+  auto cursorSg = scopeGuard([]() { qApp->restoreOverrideCursor(); });
+
   // create file system
-  std::shared_ptr<TransactionalFileSystem> fs = TransactionalFileSystem::openRW(
-      mPageMetadata->getFullFilePath().getParentDir());
+  std::shared_ptr<TransactionalFileSystem> fs =
+      TransactionalFileSystem::openRW(projectDir);
   TransactionalDirectory dir(fs);
 
   // create project and set some metadata
@@ -92,7 +124,7 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   project->setNormOrder(mWorkspace.getSettings().libraryNormOrder.get());
 
   // add schematic
-  if (mPageInitialization->getCreateSchematic()) {
+  if (mPageInitialization && mPageInitialization->getCreateSchematic()) {
     Schematic* schematic = new Schematic(
         *project,
         std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
@@ -102,7 +134,7 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   }
 
   // add board
-  if (mPageInitialization->getCreateBoard()) {
+  if (mPageInitialization && mPageInitialization->getCreateBoard()) {
     Board* board = new Board(
         *project,
         std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory()),
@@ -156,11 +188,22 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
     qCritical() << "Could not copy the .gitattributes file:" << e.getMsg();
   }
 
+  // Import EAGLE project, if needed.
+  if (mPageEagleImport) {
+    try {
+      mPageEagleImport->import(*project);  // can throw
+    } catch (const Exception& e) {
+      throw RuntimeError(__FILE__, __LINE__,
+                         tr("EAGLE import failed:") % "\n\n" % e.getMsg());
+    }
+  }
+
   // save project to filesystem
   project->save();  // can throw
   fs->save();  // can throw
 
   // all done, return the new project
+  sg.dismiss();
   return project;
 }
 

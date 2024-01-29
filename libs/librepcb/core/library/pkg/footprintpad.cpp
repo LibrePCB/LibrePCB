@@ -560,10 +560,10 @@ UnsignedLimitedRatio FootprintPad::getRecommendedRadius(
   // Use 50% ratio, but maximum 0.25mm as recommended by IPC7351C.
   const PositiveLength size = std::min(width, height);
   Ratio maxRadius = Ratio::fromNormalized(qreal(0.5) / size->toMm());
-  maxRadius /= Ratio::percent1();
-  maxRadius *= Ratio::percent1();
+  maxRadius /= Ratio::fromPercent(1);
+  maxRadius *= Ratio::fromPercent(1);
   return UnsignedLimitedRatio(
-      qBound(Ratio::percent0(), maxRadius, Ratio::percent50()));
+      qBound(Ratio::fromPercent(0), maxRadius, Ratio::fromPercent(50)));
 }
 
 QString FootprintPad::getFunctionDescriptionTr(Function function) noexcept {

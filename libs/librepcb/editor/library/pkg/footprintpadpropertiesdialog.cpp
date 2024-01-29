@@ -210,11 +210,12 @@ FootprintPadPropertiesDialog::FootprintPadPropertiesDialog(
   }
   switch (mPad.getShape()) {
     case FootprintPad::Shape::RoundedRect:
-      mUi->btnShapeRound->setChecked(*mPad.getRadius() == Ratio::percent100());
-      mUi->btnShapeRect->setChecked(*mPad.getRadius() == Ratio::percent0());
+      mUi->btnShapeRound->setChecked(*mPad.getRadius() ==
+                                     Ratio::fromPercent(100));
+      mUi->btnShapeRect->setChecked(*mPad.getRadius() == Ratio::fromPercent(0));
       mUi->btnShapeRoundedRect->setChecked(
-          (*mPad.getRadius() != Ratio::percent0()) &&
-          (*mPad.getRadius() != Ratio::percent100()));
+          (*mPad.getRadius() != Ratio::fromPercent(0)) &&
+          (*mPad.getRadius() != Ratio::fromPercent(100)));
       break;
     case FootprintPad::Shape::RoundedOctagon:
       mUi->btnShapeOctagon->setChecked(true);
@@ -331,11 +332,13 @@ void FootprintPadPropertiesDialog::updateShapeDependentWidgets(
     mUi->edtWidth->setEnabled(!custom);
     mUi->edtHeight->setEnabled(!custom);
     if (round) {
-      mUi->edtRadiusRatio->setValue(UnsignedLimitedRatio(Ratio::percent100()));
+      mUi->edtRadiusRatio->setValue(
+          UnsignedLimitedRatio(Ratio::fromPercent(100)));
     } else if (roundedRect) {
       applyRecommendedRadius();
     } else {
-      mUi->edtRadiusRatio->setValue(UnsignedLimitedRatio(Ratio::percent0()));
+      mUi->edtRadiusRatio->setValue(
+          UnsignedLimitedRatio(Ratio::fromPercent(0)));
     }
   }
 }
@@ -355,9 +358,10 @@ void FootprintPadPropertiesDialog::updateRelativeRadius() noexcept {
   const UnsignedLength value = mUi->edtRadiusAbs->getValue();
   const Length maxValue =
       std::min(mUi->edtWidth->getValue(), mUi->edtHeight->getValue()) / 2;
-  mUi->edtRadiusRatio->setValue(UnsignedLimitedRatio(qBound(
-      Ratio::percent0(), Ratio::fromNormalized(value->toMm() / maxValue.toMm()),
-      Ratio::percent100())));
+  mUi->edtRadiusRatio->setValue(UnsignedLimitedRatio(
+      qBound(Ratio::fromPercent(0),
+             Ratio::fromNormalized(value->toMm() / maxValue.toMm()),
+             Ratio::fromPercent(100))));
 }
 
 void FootprintPadPropertiesDialog::applyRecommendedRadius() noexcept {

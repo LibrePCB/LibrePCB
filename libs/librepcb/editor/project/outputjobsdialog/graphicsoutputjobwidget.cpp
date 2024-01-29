@@ -437,7 +437,7 @@ void GraphicsOutputJobWidget::currentContentChanged(int index) noexcept {
     // Scale.
     mUi->cbxScaleAuto->setChecked(!c.scale);
     mUi->spbxScaleFactor->setValue(
-        c.scale ? *c.scale : UnsignedRatio(Ratio::percent100()));
+        c.scale ? *c.scale : UnsignedRatio(Ratio::fromPercent(100)));
 
     // Pixmap DPI.
     mUi->spbxResolutionDpi->setValue(c.pixmapDpi);

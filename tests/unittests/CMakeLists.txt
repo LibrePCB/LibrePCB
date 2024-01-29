@@ -100,6 +100,7 @@ add_executable(
   core/workspace/workspacesettingstest.cpp
   core/workspace/workspacetest.cpp
   eagleimport/eaglelibraryimporttest.cpp
+  eagleimport/eagleprojectimporttest.cpp
   eagleimport/eagletypeconvertertest.cpp
   editor/dialogs/dxfimportdialogtest.cpp
   editor/dialogs/graphicsexportdialogtest.cpp

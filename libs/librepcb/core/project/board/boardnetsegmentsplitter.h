@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_NEWPROJECTWIZARDPAGE_METADATA_H
-#define LIBREPCB_EDITOR_NEWPROJECTWIZARDPAGE_METADATA_H
+#ifndef LIBREPCB_CORE_BOARDNETSEGMENTSPLITTER_H
+#define LIBREPCB_CORE_BOARDNETSEGMENTSPLITTER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/fileio/filepath.h>
+#include "../../geometry/junction.h"
+#include "../../geometry/trace.h"
+#include "../../geometry/via.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -33,68 +35,63 @@
  ******************************************************************************/
 namespace librepcb {
 
-class Workspace;
-
-namespace editor {
-
-namespace Ui {
-class NewProjectWizardPage_Metadata;
-}
+class Layer;
 
 /*******************************************************************************
- *  Class NewProjectWizardPage_Metadata
+ *  Class BoardNetSegmentSplitter
  ******************************************************************************/
 
 /**
- * @brief The NewProjectWizardPage_Metadata class
+ * @brief The BoardNetSegmentSplitter class
  */
-class NewProjectWizardPage_Metadata final : public QWizardPage {
-  Q_OBJECT
-
+class BoardNetSegmentSplitter final {
 public:
+  // Types
+  struct Segment {
+    JunctionList junctions;
+    ViaList vias;
+    TraceList traces;
+  };
+
   // Constructors / Destructor
-  explicit NewProjectWizardPage_Metadata(const Workspace& ws,
-                                         QWidget* parent = nullptr) noexcept;
-  NewProjectWizardPage_Metadata(const NewProjectWizardPage_Metadata& other) =
-      delete;
-  ~NewProjectWizardPage_Metadata() noexcept;
+  BoardNetSegmentSplitter() noexcept;
+  BoardNetSegmentSplitter(const BoardNetSegmentSplitter& other) = delete;
+  ~BoardNetSegmentSplitter() noexcept;
 
-  // Setters
-  void setProjectName(const QString& name) noexcept;
-  void setDefaultLocation(const FilePath& dir) noexcept;
-
-  // Getters
-  QString getProjectName() const noexcept;
-  QString getProjectAuthor() const noexcept;
-  bool isLicenseSet() const noexcept;
-  FilePath getProjectLicenseFilePath() const noexcept;
-  FilePath getFullFilePath() const noexcept;
+  // General Methods
+  void replaceFootprintPadByJunctions(const TraceAnchor& anchor,
+                                      const Point& pos) noexcept;
+  void addJunction(const Junction& junction) noexcept;
+  void addVia(const Via& via, bool replaceByJunctions) noexcept;
+  void addTrace(const Trace& trace) noexcept;
+  QList<Segment> split() noexcept;
 
   // Operator Overloadings
-  NewProjectWizardPage_Metadata& operator=(
-      const NewProjectWizardPage_Metadata& rhs) = delete;
-
-private:  // GUI Action Handlers
-  void nameChanged(const QString& name) noexcept;
-  void locationChanged(const QString& dir) noexcept;
-  void chooseLocationClicked() noexcept;
+  BoardNetSegmentSplitter& operator=(const BoardNetSegmentSplitter& rhs) =
+      delete;
 
 private:  // Methods
-  void updateProjectFilePath() noexcept;
-  bool isComplete() const noexcept override;
-  bool validatePage() noexcept override;
+  TraceAnchor replaceAnchor(const TraceAnchor& anchor,
+                            const Layer& layer) noexcept;
+  void findConnectedLinesAndPoints(const TraceAnchor& anchor,
+                                   ViaList& availableVias,
+                                   TraceList& availableTraces, Segment& segment)
+
+      noexcept;
 
 private:  // Data
-  const Workspace& mWorkspace;
-  QScopedPointer<Ui::NewProjectWizardPage_Metadata> mUi;
-  FilePath mFullFilePath;
+  JunctionList mJunctions;
+  ViaList mVias;
+  TraceList mTraces;
+
+  QHash<TraceAnchor, Point> mAnchorsToReplace;
+  QHash<QPair<TraceAnchor, const Layer*>, TraceAnchor> mReplacedAnchors;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
 
 #endif

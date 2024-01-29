@@ -38,21 +38,21 @@ namespace librepcb {
 BoardDesignRules::BoardDesignRules() noexcept
   :  // stop mask
     mStopMaskMaxViaDrillDiameter(500000),  // 0.5mm
-    mStopMaskClearance(UnsignedRatio(Ratio::percent0()),  // 0%
+    mStopMaskClearance(UnsignedRatio(Ratio::fromPercent(0)),  // 0%
                        UnsignedLength(100000),  // 0.1mm
                        UnsignedLength(100000)),  // 0.1mm
     // solder paste
-    mSolderPasteClearance(UnsignedRatio(Ratio::percent100() / 10),  // 10%
+    mSolderPasteClearance(UnsignedRatio(Ratio::fromPercent(10)),  // 10%
                           UnsignedLength(0),  // 0mm
                           UnsignedLength(1000000)),  // 1mm
     // pad annular ring
     mPadCmpSideAutoAnnularRing(false),
     mPadInnerAutoAnnularRing(true),
-    mPadAnnularRing(UnsignedRatio(Ratio::percent100() / 4),  // 25%
+    mPadAnnularRing(UnsignedRatio(Ratio::fromPercent(25)),  // 25%
                     UnsignedLength(250000),  // 0.25mm
                     UnsignedLength(2000000)),  // 2mm
     // via annular ring
-    mViaAnnularRing(UnsignedRatio(Ratio::percent100() / 4),  // 25%
+    mViaAnnularRing(UnsignedRatio(Ratio::fromPercent(25)),  // 25%
                     UnsignedLength(200000),  // 0.2mm
                     UnsignedLength(2000000))  // 2mm
 {

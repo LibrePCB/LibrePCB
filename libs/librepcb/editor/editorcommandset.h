@@ -466,6 +466,15 @@ public:
       {},
       &categoryImportExport,
   };
+  EditorCommand importEagleProject{
+      "import_eagle_project",  // clang-format break
+      QT_TR_NOOP("Import EAGLE Project"),
+      QT_TR_NOOP("Import schematic/board from EAGLE *.sch/*.brd files"),
+      QIcon(),
+      EditorCommand::Flag::OpensPopup,
+      {},
+      &categoryImportExport,
+  };
   EditorCommand exportLppz{
       "export_lppz",  // clang-format break
       QT_TR_NOOP("Export *.lppz Archive"),

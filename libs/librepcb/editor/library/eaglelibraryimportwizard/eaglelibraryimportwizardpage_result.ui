@@ -44,7 +44,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Import Errors</string>
+      <string>Import messages:</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="leftMargin">
@@ -109,7 +109,7 @@
              <string notr="true"/>
             </property>
             <property name="textFormat">
-             <enum>Qt::PlainText</enum>
+             <enum>Qt::RichText</enum>
             </property>
             <property name="alignment">
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

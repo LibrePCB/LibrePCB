@@ -42,6 +42,12 @@ QString Ratio::toNormalizedString() const noexcept {
 
 // Static Methods
 
+Ratio Ratio::fromPercent(int percent) noexcept {
+  Ratio ratio;
+  ratio.setRatioPercent(percent);
+  return ratio;
+}
+
 Ratio Ratio::fromPercent(qreal percent) noexcept {
   Ratio ratio;
   ratio.setRatioPercent(percent);

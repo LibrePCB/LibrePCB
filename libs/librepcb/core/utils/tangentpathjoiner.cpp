@@ -33,8 +33,8 @@ namespace librepcb {
  *  General Methods
  ******************************************************************************/
 
-QVector<Path> TangentPathJoiner::join(QVector<Path> paths,
-                                      qint64 timeoutMs) noexcept {
+QVector<Path> TangentPathJoiner::join(QVector<Path> paths, qint64 timeoutMs,
+                                      bool* timedOut) noexcept {
   QVector<Path> result;
 
   // Return closed paths as-is and skip invalid paths.
@@ -48,7 +48,7 @@ QVector<Path> TangentPathJoiner::join(QVector<Path> paths,
 
   // Find all unambiguous path pairs which can be joined.
   enum class VertexIndex { First, Last };
-  QHash<Point, QMap<int, VertexIndex> > joinPoints;
+  QMap<Point, QMap<int, VertexIndex> > joinPoints;
   for (int i = 0; i < paths.count(); ++i) {
     joinPoints[paths.at(i).getVertices().first().getPos()].insert(
         i, VertexIndex::First);
@@ -121,33 +121,38 @@ QVector<Path> TangentPathJoiner::join(QVector<Path> paths,
   QVector<Result> found;
   QElapsedTimer timer;
   timer.start();
-  findAllPaths(found, paths, timer, timeoutMs);
-  std::sort(found.begin(), found.end(), [](const Result& r1, const Result& r2) {
-    // Prio 1: Closed paths
-    if (r1.isClosed() != r2.isClosed()) {
-      return r1.isClosed();
-    }
-    // Prio 2: Long paths
-    if (r1.length != r2.length) {
-      return r1.length > r2.length;
-    }
-    // Prio 3: Paths consisting of many joints
-    int c1 = r1.segments.count();
-    int c2 = r2.segments.count();
-    if (c1 != c2) {
-      return c1 > c2;
-    }
-    // Prio 4: Lower, non-reversed indices
-    for (int i = 0; i < c1; ++i) {
-      if (r1.segments.at(i).reverse != r2.segments.at(i).reverse) {
-        return r2.segments.at(i).reverse;
-      }
-      if (r1.segments.at(i).index != r2.segments.at(i).index) {
-        return r1.segments.at(i).index < r2.segments.at(i).index;
-      }
-    }
-    return false;
-  });
+  findAllPaths(found, paths, timer, timeoutMs, Result(), timedOut);
+  std::sort(found.begin(), found.end(),
+            [&paths](const Result& r1, const Result& r2) {
+              // Prio 1: Closed paths
+              if (r1.isClosed() != r2.isClosed()) {
+                return r1.isClosed();
+              }
+              // Prio 2: Long open paths or closed paths with a large area,
+              // to get the outest most polygons instead of polygons inside
+              // e.g. a symbol body
+              const qreal l1 = r1.calcLengthOrArea(paths);
+              const qreal l2 = r2.calcLengthOrArea(paths);
+              if (l1 != l2) {
+                return l1 > l2;
+              }
+              // Prio 3: Paths consisting of many joints
+              int c1 = r1.segments.count();
+              int c2 = r2.segments.count();
+              if (c1 != c2) {
+                return c1 > c2;
+              }
+              // Prio 4: Lower, non-reversed indices
+              for (int i = 0; i < c1; ++i) {
+                if (r1.segments.at(i).reverse != r2.segments.at(i).reverse) {
+                  return r2.segments.at(i).reverse;
+                }
+                if (r1.segments.at(i).index != r2.segments.at(i).index) {
+                  return r1.segments.at(i).index < r2.segments.at(i).index;
+                }
+              }
+              return false;
+            });
 
   // Add found paths to result.
   QSet<int> consumedIndices;
@@ -168,24 +173,21 @@ QVector<Path> TangentPathJoiner::join(QVector<Path> paths,
 void TangentPathJoiner::findAllPaths(QVector<Result>& result,
                                      const QVector<Path>& paths,
                                      const QElapsedTimer& timer,
-                                     qint64 timeoutMs,
-                                     const Result& prefix) noexcept {
+                                     qint64 timeoutMs, const Result& prefix,
+                                     bool* timedOut) noexcept {
   for (int i = 0; i < paths.count(); ++i) {
     if ((timeoutMs >= 0) && (timer.elapsed() > timeoutMs)) {
       qWarning() << "Tangent path joining algorithm aborted due to timeout.";
+      if (timedOut) *timedOut = true;
       break;
     }
     if (!prefix.indices.contains(i)) {
-      if (tl::optional<Result> r = join(paths, prefix, i, false)) {
-        result.append(*r);
-        if (!r->isClosed()) {
-          findAllPaths(result, paths, timer, timeoutMs, *r);
-        }
-      }
-      if (tl::optional<Result> r = join(paths, prefix, i, true)) {
-        result.append(*r);
-        if (!r->isClosed()) {
-          findAllPaths(result, paths, timer, timeoutMs, *r);
+      for (bool reverse : {false, true}) {
+        if (tl::optional<Result> r = join(paths, prefix, i, reverse)) {
+          result.append(*r);
+          if (!r->isClosed()) {
+            findAllPaths(result, paths, timer, timeoutMs, *r);
+          }
         }
       }
     }
@@ -200,12 +202,9 @@ tl::optional<TangentPathJoiner::Result> TangentPathJoiner::join(
                                : path.getVertices().first().getPos();
   const Point& end = reverse ? path.getVertices().first().getPos()
                              : path.getVertices().last().getPos();
-  if (prefix.segments.isEmpty()) {
-    return prefix.sub(index, reverse, start, end,
-                      path.getTotalStraightLength());
-  } else if (start == prefix.endPos) {
-    return prefix.sub(index, reverse, start, end,
-                      path.getTotalStraightLength());
+  if ((prefix.segments.isEmpty() || (start == prefix.endPos)) &&
+      (!prefix.junctions.contains(end))) {
+    return prefix.sub(index, reverse, start, end);
   } else {
     return tl::nullopt;
   }

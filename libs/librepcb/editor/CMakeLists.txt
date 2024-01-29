@@ -421,8 +421,6 @@ add_library(
   project/boardeditor/boardlayersdock.cpp
   project/boardeditor/boardlayersdock.h
   project/boardeditor/boardlayersdock.ui
-  project/boardeditor/boardnetsegmentsplitter.cpp
-  project/boardeditor/boardnetsegmentsplitter.h
   project/boardeditor/boardpickplacegeneratordialog.cpp
   project/boardeditor/boardpickplacegeneratordialog.h
   project/boardeditor/boardpickplacegeneratordialog.ui
@@ -682,6 +680,9 @@ add_library(
   project/newprojectwizard/newprojectwizard.cpp
   project/newprojectwizard/newprojectwizard.h
   project/newprojectwizard/newprojectwizard.ui
+  project/newprojectwizard/newprojectwizardpage_eagleimport.cpp
+  project/newprojectwizard/newprojectwizardpage_eagleimport.h
+  project/newprojectwizard/newprojectwizardpage_eagleimport.ui
   project/newprojectwizard/newprojectwizardpage_initialization.cpp
   project/newprojectwizard/newprojectwizardpage_initialization.h
   project/newprojectwizard/newprojectwizardpage_initialization.ui
@@ -783,8 +784,6 @@ add_library(
   project/schematiceditor/schematiceditor.ui
   project/schematiceditor/schematicgraphicsscene.cpp
   project/schematiceditor/schematicgraphicsscene.h
-  project/schematiceditor/schematicnetsegmentsplitter.cpp
-  project/schematiceditor/schematicnetsegmentsplitter.h
   project/schematiceditor/schematicpagesdock.cpp
   project/schematiceditor/schematicpagesdock.h
   project/schematiceditor/schematicpagesdock.ui

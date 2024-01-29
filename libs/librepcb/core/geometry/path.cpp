@@ -83,6 +83,21 @@ UnsignedLength Path::getTotalStraightLength() const noexcept {
   return length;
 }
 
+qreal Path::calcAreaOfStraightSegments() const noexcept {
+  // https://en.wikipedia.org/wiki/Shoelace_formula
+  // https://www.geeksforgeeks.org/area-of-a-polygon-with-given-n-ordered-vertices/
+  qreal area = 0;
+  const int n = isClosed() ? (mVertices.count() - 1) : mVertices.count();
+  int j = n - 1;
+  for (int i = 0; i < n; ++i) {
+    const QPointF pj = mVertices.at(j).getPos().toMmQPointF();
+    const QPointF pi = mVertices.at(i).getPos().toMmQPointF();
+    area += (pj.x() + pi.x()) * (pj.y() - pi.y());
+    j = i;
+  }
+  return std::abs(area / 2);
+}
+
 Point Path::calcNearestPointBetweenVertices(const Point& p) const noexcept {
   if (!mVertices.isEmpty()) {
     // Note: Does not take arcs into account yet.

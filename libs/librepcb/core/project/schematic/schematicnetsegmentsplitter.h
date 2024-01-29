@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_EDITOR_SCHEMATICNETSEGMENTSPLITTER_H
-#define LIBREPCB_EDITOR_SCHEMATICNETSEGMENTSPLITTER_H
+#ifndef LIBREPCB_CORE_SCHEMATICNETSEGMENTSPLITTER_H
+#define LIBREPCB_CORE_SCHEMATICNETSEGMENTSPLITTER_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
-#include <librepcb/core/geometry/junction.h>
-#include <librepcb/core/geometry/netlabel.h>
-#include <librepcb/core/geometry/netline.h>
+#include "../../geometry/junction.h"
+#include "../../geometry/netlabel.h"
+#include "../../geometry/netline.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -34,7 +34,6 @@
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
-namespace editor {
 
 /*******************************************************************************
  *  Class SchematicNetSegmentSplitter
@@ -96,7 +95,6 @@ private:  // Data
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
 
 #endif

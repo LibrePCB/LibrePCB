@@ -40,12 +40,9 @@ class Workspace;
 
 namespace editor {
 
+class NewProjectWizardPage_EagleImport;
 class NewProjectWizardPage_Initialization;
 class NewProjectWizardPage_Metadata;
-
-//
-
-class NewProjectWizardPage_VersionControl;
 
 namespace Ui {
 class NewProjectWizard;
@@ -62,10 +59,13 @@ class NewProjectWizard final : public QWizard {
   Q_OBJECT
 
 public:
+  // Types
+  enum class Mode { NewProject, EagleImport };
+
   // Constructors / Destructor
   NewProjectWizard() = delete;
   NewProjectWizard(const NewProjectWizard& other) = delete;
-  explicit NewProjectWizard(const Workspace& ws,
+  explicit NewProjectWizard(const Workspace& ws, Mode mode,
                             QWidget* parent = nullptr) noexcept;
   ~NewProjectWizard() noexcept;
 
@@ -80,10 +80,11 @@ public:
 
 private:  // Data
   const Workspace& mWorkspace;
+  const Mode mMode;
   QScopedPointer<Ui::NewProjectWizard> mUi;
+  NewProjectWizardPage_EagleImport* mPageEagleImport;
   NewProjectWizardPage_Metadata* mPageMetadata;
   NewProjectWizardPage_Initialization* mPageInitialization;
-  // NewProjectWizardPage_VersionControl* mPageVersionControl;
 };
 
 /*******************************************************************************

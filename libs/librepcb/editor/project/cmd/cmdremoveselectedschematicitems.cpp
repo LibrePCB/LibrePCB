@@ -34,7 +34,6 @@
 #include "../../project/cmd/cmdsymbolinstanceremove.h"
 #include "../../project/cmd/cmdsymbolinstancetextremove.h"
 #include "../schematiceditor/schematicgraphicsscene.h"
-#include "../schematiceditor/schematicnetsegmentsplitter.h"
 #include "../schematiceditor/schematicselectionquery.h"
 #include "cmdchangenetsignalofschematicnetsegment.h"
 #include "cmdremoveboarditems.h"
@@ -60,6 +59,7 @@
 #include <librepcb/core/project/schematic/items/si_symbolpin.h>
 #include <librepcb/core/project/schematic/items/si_text.h>
 #include <librepcb/core/project/schematic/schematic.h>
+#include <librepcb/core/project/schematic/schematicnetsegmentsplitter.h>
 #include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/utils/toolbox.h>
 

@@ -36,9 +36,9 @@ namespace editor {
 
 UnsignedLimitedRatioEdit::UnsignedLimitedRatioEdit(QWidget* parent) noexcept
   : NumberEditBase(parent),
-    mMinValue(Ratio::percent0()),
-    mMaxValue(Ratio::percent100()),
-    mValue(Ratio::percent0()) {
+    mMinValue(Ratio::fromPercent(0)),
+    mMaxValue(Ratio::fromPercent(100)),
+    mValue(Ratio::fromPercent(0)) {
   mSpinBox->setSuffix("%");
   updateSpinBox();
 }

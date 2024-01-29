@@ -22,7 +22,7 @@
  ******************************************************************************/
 #include "schematicnetsegmentsplitter.h"
 
-#include <librepcb/core/utils/toolbox.h>
+#include "../../utils/toolbox.h"
 
 #include <QtCore>
 #include <QtWidgets>
@@ -31,7 +31,6 @@
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
-namespace editor {
 
 /*******************************************************************************
  *  Constructors / Destructor
@@ -188,5 +187,4 @@ Point SchematicNetSegmentSplitter::getAnchorPosition(
  *  End of File
  ******************************************************************************/
 
-}  // namespace editor
 }  // namespace librepcb
