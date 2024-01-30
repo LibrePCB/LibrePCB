@@ -98,6 +98,7 @@ private:  // Methods
   void polygonEdited(const Polygon& polygon, Polygon::Event event) noexcept;
   void updateFillLayer() noexcept;
   void updatePath() noexcept;
+  void updateZValue() noexcept;
   void updateBoundingRectMargin() noexcept;
 
 private:  // Data

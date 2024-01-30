@@ -63,37 +63,31 @@ SGI_Symbol::SGI_Symbol(SI_Symbol& symbol,
       lp.getLayer(Theme::Color::sSchematicReferences));
   mShape.addRect(mOriginCrossGraphicsItem->boundingRect());
 
-  // Draw grab areas first to make them appearing behind every other graphics
-  // item. Otherwise they might completely cover (hide) other items.
-  for (bool grabArea : {true, false}) {
-    for (const auto& obj : mSymbol.getLibSymbol().getCircles()) {
-      if (obj.isGrabArea() != grabArea) continue;
-      auto i = std::make_shared<CircleGraphicsItem>(const_cast<Circle&>(obj),
-                                                    lp, this);
-      i->setFlag(QGraphicsItem::ItemIsSelectable, true);
-      i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
-      if (obj.isGrabArea()) {
-        const qreal r = (obj.getDiameter() + obj.getLineWidth())->toPx() / 2;
-        QPainterPath path;
-        path.addEllipse(obj.getCenter().toPxQPointF(), r, r);
-        mShape |= path;
-      }
-      mCircleGraphicsItems.append(i);
+  for (const auto& obj : mSymbol.getLibSymbol().getCircles()) {
+    auto i = std::make_shared<CircleGraphicsItem>(const_cast<Circle&>(obj), lp,
+                                                  this);
+    i->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    if (obj.isGrabArea()) {
+      const qreal r = (obj.getDiameter() + obj.getLineWidth())->toPx() / 2;
+      QPainterPath path;
+      path.addEllipse(obj.getCenter().toPxQPointF(), r, r);
+      mShape |= path;
     }
+    mCircleGraphicsItems.append(i);
+  }
 
-    for (const auto& obj : mSymbol.getLibSymbol().getPolygons()) {
-      if (obj.isGrabArea() != grabArea) continue;
-      auto i = std::make_shared<PolygonGraphicsItem>(const_cast<Polygon&>(obj),
-                                                     lp, this);
-      i->setFlag(QGraphicsItem::ItemIsSelectable, true);
-      i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
-      if (obj.isGrabArea()) {
-        mShape |= Toolbox::shapeFromPath(obj.getPath().toQPainterPathPx(),
-                                         Qt::SolidLine, Qt::SolidPattern,
-                                         obj.getLineWidth());
-      }
-      mPolygonGraphicsItems.append(i);
+  for (const auto& obj : mSymbol.getLibSymbol().getPolygons()) {
+    auto i = std::make_shared<PolygonGraphicsItem>(const_cast<Polygon&>(obj),
+                                                   lp, this);
+    i->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    i->setFlag(QGraphicsItem::ItemStacksBehindParent, true);
+    if (obj.isGrabArea()) {
+      mShape |= Toolbox::shapeFromPath(obj.getPath().toQPainterPathPx(),
+                                       Qt::SolidLine, Qt::SolidPattern,
+                                       obj.getLineWidth());
     }
+    mPolygonGraphicsItems.append(i);
   }
 
   updatePosition();

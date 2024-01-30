@@ -53,6 +53,7 @@ PolygonGraphicsItem::PolygonGraphicsItem(Polygon& polygon,
   setLineLayer(mLayerProvider.getLayer(mPolygon.getLayer()));
   updatePath();
   updateFillLayer();
+  updateZValue();
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   // register to the polygon to get attribute updates
@@ -175,6 +176,7 @@ void PolygonGraphicsItem::polygonEdited(const Polygon& polygon,
     case Polygon::Event::IsFilledChanged:
     case Polygon::Event::IsGrabAreaChanged:
       updateFillLayer();
+      updateZValue();
       break;
     case Polygon::Event::PathChanged:
       updatePath();
@@ -216,6 +218,17 @@ void PolygonGraphicsItem::updatePath() noexcept {
   }
   setPath(mPolygon.getPathForRendering().toQPainterPathPx());
   updateBoundingRectMargin();
+}
+
+void PolygonGraphicsItem::updateZValue() noexcept {
+  // Fix for https://github.com/LibrePCB/LibrePCB/issues/1278.
+  if (mPolygon.isFilled()) {
+    setZValue(0);
+  } else if (mPolygon.isGrabArea()) {
+    setZValue(-1);
+  } else {
+    setZValue(1);
+  }
 }
 
 void PolygonGraphicsItem::updateBoundingRectMargin() noexcept {

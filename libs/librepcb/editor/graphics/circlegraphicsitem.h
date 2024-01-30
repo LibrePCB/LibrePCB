@@ -63,6 +63,7 @@ public:
 private:  // Methods
   void circleEdited(const Circle& circle, Circle::Event event) noexcept;
   void updateFillLayer() noexcept;
+  void updateZValue() noexcept;
 
 private:  // Data
   Circle& mCircle;

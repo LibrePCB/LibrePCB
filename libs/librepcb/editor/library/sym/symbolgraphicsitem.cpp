@@ -129,7 +129,7 @@ QList<std::shared_ptr<QGraphicsItem>> SymbolGraphicsItem::findItemsAtPos(
   //
   //    0: pins
   //   10: texts
-  //   20: circles/polygons
+  //   20: circles/polygons (±1 for stacking order)
   //
   // And for items not directly under the cursor, but very close to the cursor,
   // add +1000.
@@ -164,14 +164,20 @@ QList<std::shared_ptr<QGraphicsItem>> SymbolGraphicsItem::findItemsAtPos(
 
   if (flags.testFlag(FindFlag::Circles)) {
     foreach (auto ptr, mCircleGraphicsItems) {
-      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 20,
+      int priority = 20;
+      if (ptr->zValue() > 0) priority -= 1;
+      if (ptr->zValue() < 0) priority += 1;
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
                   true);  // Probably large grab area makes sense?
     }
   }
 
   if (flags.testFlag(FindFlag::Polygons)) {
     foreach (auto ptr, mPolygonGraphicsItems) {
-      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), 20,
+      int priority = 20;
+      if (ptr->zValue() > 0) priority -= 1;
+      if (ptr->zValue() < 0) priority += 1;
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
                   true);  // Probably large grab area makes sense?
     }
   }
