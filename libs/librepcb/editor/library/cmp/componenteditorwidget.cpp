@@ -63,8 +63,11 @@ ComponentEditorWidget::ComponentEditorWidget(const Context& context,
   mUi->cbxSchematicOnly->setCheckable(!mContext.readOnly);
   mUi->edtPrefix->setReadOnly(mContext.readOnly);
   mUi->edtDefaultValue->setReadOnly(mContext.readOnly);
+  mUi->signalEditorWidget->setFrameStyle(QFrame::NoFrame);
   mUi->signalEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->symbolVariantsEditorWidget->setFrameStyle(QFrame::NoFrame);
   mUi->symbolVariantsEditorWidget->setReadOnly(mContext.readOnly);
+  mUi->attributesEditorWidget->setFrameStyle(QFrame::NoFrame);
   mUi->attributesEditorWidget->setReadOnly(mContext.readOnly);
   setupErrorNotificationWidget(*mUi->errorNotificationWidget);
   setWindowIcon(QIcon(":/img/library/component.png"));

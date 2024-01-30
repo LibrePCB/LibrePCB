@@ -57,6 +57,7 @@ public:
   ~ComponentSignalListEditorWidget() noexcept;
 
   // Setters
+  void setFrameStyle(int style) noexcept;
   void setReadOnly(bool readOnly) noexcept;
   void setReferences(UndoStack* undoStack, ComponentSignalList* list) noexcept;
 

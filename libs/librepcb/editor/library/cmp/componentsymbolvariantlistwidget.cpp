@@ -92,6 +92,10 @@ ComponentSymbolVariantListWidget::~ComponentSymbolVariantListWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void ComponentSymbolVariantListWidget::setFrameStyle(int style) noexcept {
+  mView->setFrameStyle(style);
+}
+
 void ComponentSymbolVariantListWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);
 }

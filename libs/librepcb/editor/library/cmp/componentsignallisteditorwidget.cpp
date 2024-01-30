@@ -77,6 +77,10 @@ ComponentSignalListEditorWidget::~ComponentSignalListEditorWidget() noexcept {
  *  Setters
  ******************************************************************************/
 
+void ComponentSignalListEditorWidget::setFrameStyle(int style) noexcept {
+  mView->setFrameStyle(style);
+}
+
 void ComponentSignalListEditorWidget::setReadOnly(bool readOnly) noexcept {
   mView->setReadOnly(readOnly);
 }
