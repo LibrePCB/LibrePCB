@@ -174,6 +174,8 @@ FilePath FilePath::getParentDir() const noexcept {
 }
 
 FilePath FilePath::getPathTo(const QString& filename) const noexcept {
+  if (!mIsValid) return FilePath();  // Avoid converting invalid path to valid.
+
   return FilePath(mFileInfo.filePath() % QLatin1Char('/') % filename);
 }
 

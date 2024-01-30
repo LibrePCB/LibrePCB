@@ -41,8 +41,11 @@ NetworkAccessManager* NetworkAccessManager::sInstance = nullptr;
  *  Constructors / Destructor
  ******************************************************************************/
 
-NetworkAccessManager::NetworkAccessManager() noexcept
-  : QThread(nullptr), mThreadStartSemaphore(0), mManager(nullptr) {
+NetworkAccessManager::NetworkAccessManager(const FilePath& cache) noexcept
+  : QThread(nullptr),
+    mCacheFp(cache),
+    mThreadStartSemaphore(0),
+    mManager(nullptr) {
   // This thread must only be started once, and from within the main application
   // thread!
   Q_ASSERT(QThread::currentThread() == qApp->thread());
@@ -92,6 +95,25 @@ QNetworkReply* NetworkAccessManager::post(const QNetworkRequest& request,
   }
 }
 
+bool NetworkAccessManager::setMinimumCacheExpirationDate(
+    const QUrl& url, const QDateTime& dt) noexcept {
+  Q_ASSERT(QThread::currentThread() == this);
+
+  if (mManager) {
+    if (QAbstractNetworkCache* cache = mManager->cache()) {
+      QNetworkCacheMetaData data = cache->metaData(url);
+      if (data.isValid() && (data.expirationDate() < dt)) {
+        data.setExpirationDate(dt);
+        cache->updateMetaData(data);
+        return true;
+      }
+    }
+  } else {
+    qCritical() << "No network access manager available! Thread not running?!";
+  }
+  return false;
+}
+
 /*******************************************************************************
  *  Static Methods
  ******************************************************************************/
@@ -108,6 +130,11 @@ void NetworkAccessManager::run() noexcept {
   Q_ASSERT(QThread::currentThread() == this);
   qDebug() << "Network access manager thread started.";
   mManager = new QNetworkAccessManager();
+  if (mCacheFp.isValid()) {
+    QNetworkDiskCache* cache = new QNetworkDiskCache();
+    cache->setCacheDirectory(mCacheFp.toStr());
+    mManager->setCache(cache);
+  }
   mThreadStartSemaphore.release();
   try {
     exec();  // event loop (blocking)

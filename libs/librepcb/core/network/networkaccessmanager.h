@@ -64,7 +64,7 @@ class NetworkAccessManager final : public QThread {
 
 public:
   // Constructors / Destructor
-  NetworkAccessManager() noexcept;
+  explicit NetworkAccessManager(const FilePath& cache = FilePath()) noexcept;
   NetworkAccessManager(const NetworkAccessManager& other) = delete;
   ~NetworkAccessManager() noexcept;
 
@@ -72,6 +72,8 @@ public:
   QNetworkReply* get(const QNetworkRequest& request) noexcept;
   QNetworkReply* post(const QNetworkRequest& request,
                       const QByteArray& data) noexcept;
+  bool setMinimumCacheExpirationDate(const QUrl& url,
+                                     const QDateTime& dt) noexcept;
 
   // Operator Overloadings
   NetworkAccessManager& operator=(const NetworkAccessManager& rhs) = delete;
@@ -84,6 +86,7 @@ private:  // Methods
   void stop() noexcept;
 
 private:  // Data
+  const FilePath mCacheFp;
   QSemaphore mThreadStartSemaphore;
   QNetworkAccessManager* mManager;
   static NetworkAccessManager* sInstance;

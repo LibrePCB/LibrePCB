@@ -107,6 +107,16 @@ public:
   static bool isFileFormatStable() noexcept;
 
   /**
+   * @brief Get the path to the cache directory
+   *
+   * @note This function is thread-safe.
+   *
+   * @return Guaranteed valid file path
+   *         (e.g. "/home/user/.cache/LibrePCB/LibrePCB/")
+   */
+  static FilePath getCacheDir() noexcept;
+
+  /**
    * @brief Get the path to the resources directory
    *
    * @note This function is thread-safe.

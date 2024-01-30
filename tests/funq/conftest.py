@@ -75,6 +75,8 @@ class LibrePcbFixture(object):
         self.env['LC_ALL'] = 'C'
         # Override configuration location to make tests independent of existing configs
         self.env['LIBREPCB_CONFIG_DIR'] = os.path.join(self.tmpdir, 'config')
+        # Override cache location to make each test indepotent
+        self.env['LIBREPCB_CACHE_DIR'] = os.path.join(self.tmpdir, 'cache')
         # Use a neutral username
         self.env['USERNAME'] = 'testuser'
         # Force LibrePCB to use Qt-style file dialogs because native dialogs don't work

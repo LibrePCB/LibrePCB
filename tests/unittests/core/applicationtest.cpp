@@ -23,6 +23,7 @@
 #include <gtest/gtest.h>
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/fileio/fileutils.h>
 #include <librepcb/core/types/version.h>
 
 #include <QtCore>
@@ -49,6 +50,15 @@ TEST(ApplicationTest, testGetVersion) {
 
 TEST(ApplicationTest, testGetFileFormatVersion) {
   EXPECT_GE(Application::getFileFormatVersion(), Version::fromString("0.1"));
+}
+
+TEST(ApplicationTest, testGetCacheDir) {
+  // Check if the resources directory is valid and writable.
+  EXPECT_TRUE(Application::getCacheDir().isValid());
+  const FilePath tmpFp = Application::getCacheDir().getPathTo("test.txt");
+  FileUtils::writeFile(tmpFp, "test");
+  EXPECT_EQ("test", FileUtils::readFile(tmpFp));
+  FileUtils::removeFile(tmpFp);
 }
 
 TEST(ApplicationTest, testGetResourcesDir) {
