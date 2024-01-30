@@ -13,7 +13,10 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -43,20 +46,47 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
-      <widget class="QPushButton" name="btnAdd">
+      <widget class="QToolButton" name="btnAdd">
        <property name="text">
-        <string>Add category</string>
+        <string notr="true"/>
        </property>
+<property name="icon">
+            <iconset>
+             <normaloff>:/img/actions/add.png</normaloff>:/img/actions/add.png</iconset>
+           </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btnRemove">
-       <property name="text">
-        <string>Remove selected</string>
+      <widget class="QToolButton" name="btnRemove">
+       <property name="toolTip">
+        <string>Remove selected category</string>
        </property>
+       <property name="text">
+        <string notr="true"/>
+       </property>
+<property name="icon">
+            <iconset>
+             <normaloff>:/img/actions/minus.png</normaloff>:/img/actions/minus.png</iconset>
+           </property>
       </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>

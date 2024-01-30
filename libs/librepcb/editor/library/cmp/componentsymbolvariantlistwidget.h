@@ -58,6 +58,7 @@ public:
   ~ComponentSymbolVariantListWidget() noexcept;
 
   // Setters
+  void setFrameStyle(int style) noexcept;
   void setReadOnly(bool readOnly) noexcept;
   void setReferences(
       UndoStack* undoStack, ComponentSymbolVariantList* list,
