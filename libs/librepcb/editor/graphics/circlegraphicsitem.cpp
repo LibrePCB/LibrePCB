@@ -49,6 +49,7 @@ CircleGraphicsItem::CircleGraphicsItem(Circle& circle,
   setLineWidth(mCircle.getLineWidth());
   setLineLayer(mLayerProvider.getLayer(mCircle.getLayer()));
   updateFillLayer();
+  updateZValue();
   setFlag(QGraphicsItem::ItemIsSelectable, true);
 
   // register to the circle to get attribute updates
@@ -75,6 +76,7 @@ void CircleGraphicsItem::circleEdited(const Circle& circle,
     case Circle::Event::IsFilledChanged:
     case Circle::Event::IsGrabAreaChanged:
       updateFillLayer();
+      updateZValue();
       break;
     case Circle::Event::CenterChanged:
       setPosition(circle.getCenter());
@@ -97,6 +99,17 @@ void CircleGraphicsItem::updateFillLayer() noexcept {
     setFillLayer(mLayerProvider.getGrabAreaLayer(mCircle.getLayer()));
   } else {
     setFillLayer(nullptr);
+  }
+}
+
+void CircleGraphicsItem::updateZValue() noexcept {
+  // Fix for https://github.com/LibrePCB/LibrePCB/issues/1278.
+  if (mCircle.isFilled()) {
+    setZValue(0);
+  } else if (mCircle.isGrabArea()) {
+    setZValue(-1);
+  } else {
+    setZValue(1);
   }
 }
 

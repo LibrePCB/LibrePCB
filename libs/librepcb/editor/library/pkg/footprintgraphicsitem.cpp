@@ -157,17 +157,17 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
   //     0: holes
   //    10: pads tht
   //    20: texts board layer
-  //    30: polygons/circles board layer
+  //    30: polygons/circles board layer (±1 for stacking order)
   //   110: pads top
   //   120: texts top
-  //   130: polygons/circles top
+  //   130: polygons/circles top (±1 for stacking order)
   //   140: zones top
   //   220: texts inner
-  //   230: polygons/circles inner
+  //   230: polygons/circles inner (±1 for stacking order)
   //   240: zones inner
   //   310: pads bottom
   //   320: texts bottom
-  //   330: polygons/circles bottom
+  //   330: polygons/circles bottom (±1 for stacking order)
   //   340: zones bottom
   //
   // So the system is:
@@ -236,16 +236,20 @@ QList<std::shared_ptr<QGraphicsItem>> FootprintGraphicsItem::findItemsAtPos(
 
   if (flags.testFlag(FindFlag::Circles)) {
     foreach (auto ptr, mCircleGraphicsItems) {
-      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
-                  30 + priorityFromLayer(ptr->getCircle().getLayer()),
+      int priority = 30 + priorityFromLayer(ptr->getCircle().getLayer());
+      if (ptr->zValue() > 0) priority -= 1;
+      if (ptr->zValue() < 0) priority += 1;
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
                   true);  // Probably large grab area makes sense?
     }
   }
 
   if (flags.testFlag(FindFlag::Polygons)) {
     foreach (auto ptr, mPolygonGraphicsItems) {
-      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr),
-                  30 + priorityFromLayer(ptr->getPolygon().getLayer()),
+      int priority = 30 + priorityFromLayer(ptr->getPolygon().getLayer());
+      if (ptr->zValue() > 0) priority -= 1;
+      if (ptr->zValue() < 0) priority += 1;
+      processItem(std::dynamic_pointer_cast<QGraphicsItem>(ptr), priority,
                   true);  // Probably large grab area makes sense?
     }
   }
