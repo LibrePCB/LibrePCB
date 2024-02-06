@@ -175,6 +175,29 @@ MsgInvalidCustomPadOutline::MsgInvalidCustomPadOutline(
 }
 
 /*******************************************************************************
+ *  MsgInvalidPadConnection
+ ******************************************************************************/
+
+MsgInvalidPadConnection::MsgInvalidPadConnection(
+    std::shared_ptr<const Footprint> footprint,
+    std::shared_ptr<const FootprintPad> pad) noexcept
+  : RuleCheckMessage(
+        Severity::Error,
+        tr("Invalid pad connection in '%1'")
+            .arg(*footprint->getNames().getDefaultValue()),
+        tr("A footprint pad is connected to a package pad which doesn't exist. "
+           "Check all pads for proper connections."),
+        "invalid_pad_connection"),
+    mFootprint(footprint),
+    mPad(pad) {
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("footprint", footprint->getUuid());
+  mApproval.ensureLineBreak();
+  mApproval.appendChild("pad", pad->getUuid());
+  mApproval.ensureLineBreak();
+}
+
+/*******************************************************************************
  *  MsgMissingCourtyard
  ******************************************************************************/
 
