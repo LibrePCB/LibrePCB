@@ -42,13 +42,6 @@ namespace librepcb {
  *  Class CircuitIdentifier
  ******************************************************************************/
 
-inline static QString cleanCircuitIdentifier(
-    const QString& userInput) noexcept {
-  return Toolbox::cleanUserInputString(
-      userInput, QRegularExpression("[^-a-zA-Z0-9._+/!?&@#$()]"), true, false,
-      false, "_", 32);
-}
-
 struct CircuitIdentifierVerifier {
   template <typename Value, typename Predicate>
   static constexpr auto verify(Value&& val, const Predicate& p) ->
@@ -65,12 +58,21 @@ struct CircuitIdentifierVerifier {
 };
 
 struct CircuitIdentifierConstraint {
+  static const constexpr int MAX_LENGTH = 32;
+
   bool operator()(const QString& value) const noexcept {
     return QRegularExpression("\\A[-a-zA-Z0-9._+/!?&@#$()]{1,32}\\z")
         .match(value, 0, QRegularExpression::PartialPreferCompleteMatch)
         .hasMatch();
   }
 };
+
+inline static QString cleanCircuitIdentifier(
+    const QString& userInput) noexcept {
+  return Toolbox::cleanUserInputString(
+      userInput, QRegularExpression("[^-a-zA-Z0-9._+/!?&@#$()]"), true, false,
+      false, "_", CircuitIdentifierConstraint::MAX_LENGTH);
+}
 
 /**
  * CircuitIdentifier is a wrapper around QString which guarantees to contain a

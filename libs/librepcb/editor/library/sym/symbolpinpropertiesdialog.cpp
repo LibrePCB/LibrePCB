@@ -47,6 +47,7 @@ SymbolPinPropertiesDialog::SymbolPinPropertiesDialog(
     mUi(new Ui::SymbolPinPropertiesDialog) {
   Q_ASSERT(mSymbolPin);
   mUi->setupUi(this);
+  mUi->edtName->setMaxLength(CircuitIdentifierConstraint::MAX_LENGTH);
   mUi->edtLength->configure(lengthUnit, LengthEditBase::Steps::pinLength(),
                             settingsPrefix % "/length");
   mUi->edtPosX->configure(lengthUnit, LengthEditBase::Steps::generic(),
