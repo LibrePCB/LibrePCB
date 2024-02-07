@@ -58,6 +58,7 @@ RuleCheckMessageList PackageCheck::runChecks() const {
   checkWrongTextLayers(msgs);
   checkPackageOutlines(msgs);
   checkCourtyards(msgs);
+  checkPadsPackagePadUuid(msgs);
   checkPadsClearanceToPads(msgs);
   checkPadsClearanceToLegend(msgs);
   checkPadsAnnularRing(msgs);
@@ -187,6 +188,21 @@ void PackageCheck::checkCourtyards(MsgList& msgs) const {
       }
       if (count == 0) {
         msgs.append(std::make_shared<MsgMissingCourtyard>(itFtp.ptr()));
+      }
+    }
+  }
+}
+
+void PackageCheck::checkPadsPackagePadUuid(MsgList& msgs) const {
+  for (auto itFtp = mPackage.getFootprints().begin();
+       itFtp != mPackage.getFootprints().end(); ++itFtp) {
+    std::shared_ptr<const Footprint> footprint = itFtp.ptr();
+    for (auto itPad = (*itFtp).getPads().begin();
+         itPad != (*itFtp).getPads().end(); ++itPad) {
+      std::shared_ptr<const FootprintPad> pad = itPad.ptr();
+      if ((pad->getPackagePadUuid()) &&
+          (!mPackage.getPads().find(*pad->getPackagePadUuid()))) {
+        msgs.append(std::make_shared<MsgInvalidPadConnection>(footprint, pad));
       }
     }
   }

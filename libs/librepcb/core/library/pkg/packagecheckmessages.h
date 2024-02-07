@@ -223,6 +223,36 @@ private:
 };
 
 /*******************************************************************************
+ *  Class MsgInvalidPadConnection
+ ******************************************************************************/
+
+/**
+ * @brief The MsgInvalidPadConnection class
+ */
+class MsgInvalidPadConnection final : public RuleCheckMessage {
+  Q_DECLARE_TR_FUNCTIONS(MsgInvalidPadConnection)
+
+public:
+  // Constructors / Destructor
+  MsgInvalidPadConnection() = delete;
+  MsgInvalidPadConnection(std::shared_ptr<const Footprint> footprint,
+                          std::shared_ptr<const FootprintPad> pad) noexcept;
+  MsgInvalidPadConnection(const MsgInvalidPadConnection& other) noexcept
+    : RuleCheckMessage(other), mFootprint(other.mFootprint), mPad(other.mPad) {}
+  virtual ~MsgInvalidPadConnection() noexcept {}
+
+  // Getters
+  std::shared_ptr<const Footprint> getFootprint() const noexcept {
+    return mFootprint;
+  }
+  std::shared_ptr<const FootprintPad> getPad() const noexcept { return mPad; }
+
+private:
+  std::shared_ptr<const Footprint> mFootprint;
+  std::shared_ptr<const FootprintPad> mPad;
+};
+
+/*******************************************************************************
  *  Class MsgMissingCourtyard
  ******************************************************************************/
 
