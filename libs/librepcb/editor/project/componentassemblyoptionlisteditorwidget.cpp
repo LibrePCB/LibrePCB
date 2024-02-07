@@ -36,6 +36,7 @@
 #include <librepcb/core/project/circuit/componentassemblyoption.h>
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
+#include <librepcb/core/project/projectlibrary.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacesettings.h>
@@ -460,26 +461,38 @@ void ComponentAssemblyOptionListEditorWidget::optionListEdited(
   auto fillOptionRow = [this, &bgRed](QTreeWidgetItem* item,
                                       const ComponentAssemblyOption& option) {
     item->setIcon(COLUMN_DEVICE, QIcon(":/img/library/device.png"));
-    QString devName = option.getDevice().toStr().left(8) % "...";
-    QString toolTip;
+    QString devName;
+    QString pkgName;
     try {
-      FilePath fp =
-          mWorkspace->getLibraryDb().getLatest<Device>(option.getDevice());
-      mWorkspace->getLibraryDb().getTranslations<Device>(
-          fp, mProject->getLocaleOrder(), &devName);
-
-      QString pkgName;
       Uuid pkgUuid = Uuid::createRandom();
-      mWorkspace->getLibraryDb().getDeviceMetadata(fp, nullptr, &pkgUuid);
-      fp = mWorkspace->getLibraryDb().getLatest<Package>(pkgUuid);
-      mWorkspace->getLibraryDb().getTranslations<Package>(
-          fp, mProject->getLocaleOrder(), &pkgName);
-      toolTip = tr("Package: %1").arg(pkgName);
+      if (auto dev = mProject->getLibrary().getDevice(option.getDevice())) {
+        devName = *dev->getNames().value(mProject->getLocaleOrder());
+        pkgUuid = dev->getPackageUuid();
+      } else {
+        const FilePath fp =
+            mWorkspace->getLibraryDb().getLatest<Device>(option.getDevice());
+        mWorkspace->getLibraryDb().getTranslations<Device>(
+            fp, mProject->getLocaleOrder(), &devName);
+        mWorkspace->getLibraryDb().getDeviceMetadata(fp, nullptr, &pkgUuid);
+      }
+      if (auto pkg = mProject->getLibrary().getPackage(pkgUuid)) {
+        pkgName = *pkg->getNames().value(mProject->getLocaleOrder());
+      } else {
+        const FilePath fp =
+            mWorkspace->getLibraryDb().getLatest<Package>(pkgUuid);
+        mWorkspace->getLibraryDb().getTranslations<Package>(
+            fp, mProject->getLocaleOrder(), &pkgName);
+      }
     } catch (const Exception& e) {
       qWarning() << "Failed to fetch device metadata:" << e.getMsg();
     }
+    if (devName.isEmpty()) {
+      devName = option.getDevice().toStr().left(8) % "...";
+    }
     item->setText(COLUMN_DEVICE, devName);
-    item->setToolTip(COLUMN_DEVICE, toolTip);
+    item->setToolTip(
+        COLUMN_DEVICE,
+        pkgName.isEmpty() ? pkgName : tr("Package: %1").arg(pkgName));
 
     QStringList avNames;
     CheckableItemsEditorWidget::ItemList avItems;
