@@ -9,6 +9,8 @@
 [![Azure Build Status](https://dev.azure.com/LibrePCB/LibrePCB/_apis/build/status/LibrePCB.LibrePCB?branchName=master)](https://dev.azure.com/LibrePCB/LibrePCB/_build/latest?definitionId=2&branchName=master)
 [![OpenSSF Best Practices](https://bestpractices.coreinfrastructure.org/projects/1652/badge)](https://bestpractices.coreinfrastructure.org/projects/1652)
 
+[![Packaging status](https://repology.org/badge/vertical-allrepos/librepcb.svg?columns=3&header=LibrePCB)](https://repology.org/project/librepcb/versions)
+
 ## About LibrePCB
 
 LibrePCB is a free
