@@ -27,6 +27,7 @@
 
 #include <librepcb/core/application.h>
 #include <librepcb/core/fileio/filepath.h>
+#include <librepcb/core/types/angle.h>
 
 #include <QtCore>
 #include <QtOpenGL>
@@ -60,6 +61,9 @@ OpenGlView::OpenGlView(QWidget* parent) noexcept
     mLayout(new QVBoxLayout(this)),
     mErrorLabel(new QLabel(this)),
     mInitialized(false),
+    mProjectionAspectRatio(1),
+    mProjectionFov(sInitialFov),
+    mProjectionCenter(0, 0),
     mIdleTimeMs(0),
     mWaitingSpinner(new WaitingSpinnerWidget(this)),
     mAnimation(new QVariantAnimation(this)) {
@@ -78,12 +82,17 @@ OpenGlView::OpenGlView(QWidget* parent) noexcept
   connect(mAnimation.data(), &QVariantAnimation::valueChanged, this,
           [this](const QVariant& value) {
             const qreal normalized = value.toReal();
-            mTransform = mAnimationTransformStart +
-                mAnimationTransformDelta * normalized;
+            mProjectionFov =
+                mAnimationDataStart.fov + mAnimationDataDelta.fov * normalized;
+            mProjectionCenter = mAnimationDataStart.center +
+                mAnimationDataDelta.center * normalized;
+            mTransform = mAnimationDataStart.transform +
+                mAnimationDataDelta.transform * normalized;
             update();
           });
 
-  mTransform.translate(0, 0, -5);
+  setStatusTip(tr("Press %1 to rotate around Z-axis")
+                   .arg(QCoreApplication::translate("QShortcut", "Shift")));
 
   QTimer* idleTimer = new QTimer(this);
   connect(idleTimer, &QTimer::timeout, this, [this]() { mIdleTimeMs += 100; });
@@ -117,24 +126,16 @@ void OpenGlView::setObjects(
 }
 
 void OpenGlView::zoomIn() noexcept {
-  mAnimation->stop();
-  mTransform.scale(sZoomStepFactor);
-  mIdleTimeMs = 0;
-  update();
+  zoom(rect().center(), sZoomStepFactor);
 }
 
 void OpenGlView::zoomOut() noexcept {
-  mAnimation->stop();
-  mTransform.scale(1 / sZoomStepFactor);
-  mIdleTimeMs = 0;
-  update();
+  zoom(rect().center(), 1 / sZoomStepFactor);
 }
 
 void OpenGlView::zoomAll() noexcept {
-  QMatrix4x4 t;
-  t.translate(0, 0, -5);
   mIdleTimeMs = 0;
-  smoothTo(t);
+  smoothTo(sInitialFov, QPointF(0, 0), QMatrix4x4());
 }
 
 void OpenGlView::startSpinning() noexcept {
@@ -156,42 +157,65 @@ void OpenGlView::stopSpinning(QString errorMsg) noexcept {
  ******************************************************************************/
 
 void OpenGlView::mousePressEvent(QMouseEvent* e) {
-  mMousePressPosition = QVector2D(e->pos());
+  mMousePressPosition = e->pos();
   mMousePressTransform = mTransform;
+  mMousePressCenter = mProjectionCenter;
   mIdleTimeMs = 0;
 }
 
 void OpenGlView::mouseMoveEvent(QMouseEvent* e) {
-  const QVector2D diff = QVector2D(e->pos()) - mMousePressPosition;
+  const QPointF posNorm = toNormalizedPos(e->pos());
+  const QPointF mousePressPosNorm = toNormalizedPos(mMousePressPosition);
+
   if (e->buttons().testFlag(Qt::MiddleButton) ||
       e->buttons().testFlag(Qt::RightButton)) {
-    mTransform = mMousePressTransform;
-    mTransform.translate(
-        mMousePressTransform.inverted().map(QVector3D(diff.x(), -diff.y(), 0)) /
-        200);
+    const QPointF cursorPosOld = toModelPos(mousePressPosNorm);
+    const QPointF cursorPosNew = toModelPos(posNorm);
+    mProjectionCenter = mMousePressCenter + cursorPosNew - cursorPosOld;
     update();
   }
   if (e->buttons() & Qt::LeftButton) {
-    const QVector3D axis =
-        mMousePressTransform.inverted().map(QVector3D(diff.y(), diff.x(), 0.0));
-    const qreal angle = diff.length() / 3.0;
     mTransform = mMousePressTransform;
-    mTransform.rotate(QQuaternion::fromAxisAndAngle(axis.normalized(), angle));
+    if (e->modifiers().testFlag(Qt::ShiftModifier)) {
+      // Rotate around Z axis.
+      const QPointF p1 = toModelPos(mousePressPosNorm) - mProjectionCenter;
+      const QPointF p2 = toModelPos(posNorm) - mProjectionCenter;
+      const qreal angle1 = std::atan2(p1.y(), p1.x());
+      const qreal angle2 = std::atan2(p2.y(), p2.x());
+      const Angle angle = Angle::fromRad(angle2 - angle1).mappedTo180deg();
+      const QVector3D axis =
+          mMousePressTransform.inverted().map(QVector3D(0, 0, angle.toDeg()));
+      mTransform.rotate(QQuaternion::fromAxisAndAngle(axis.normalized(),
+                                                      angle.abs().toDeg()));
+    } else {
+      // Rotate around X/Y axis.
+      const QVector2D delta(posNorm - mousePressPosNorm);
+      const QVector3D axis = mMousePressTransform.inverted().map(
+          QVector3D(-delta.y(), delta.x(), 0));
+      mTransform.rotate(QQuaternion::fromAxisAndAngle(axis.normalized(),
+                                                      delta.length() * 270));
+    }
     update();
   }
   mIdleTimeMs = 0;
 }
 
 void OpenGlView::wheelEvent(QWheelEvent* e) {
-  mAnimation->stop();
-  mTransform.scale(qPow(sZoomStepFactor, e->delta() / qreal(120)));
-  mIdleTimeMs = 0;
-  update();
+  zoom(e->pos(), qPow(sZoomStepFactor, e->delta() / qreal(120)));
 }
 
-void OpenGlView::smoothTo(const QMatrix4x4& transform) noexcept {
-  mAnimationTransformStart = mTransform;
-  mAnimationTransformDelta = transform - mAnimationTransformStart;
+void OpenGlView::smoothTo(qreal fov, const QPointF& center,
+                          const QMatrix4x4& transform) noexcept {
+  mAnimationDataStart = TransformData{
+      mProjectionFov,
+      mProjectionCenter,
+      mTransform,
+  };
+  mAnimationDataDelta = TransformData{
+      fov - mAnimationDataStart.fov,
+      center - mAnimationDataStart.center,
+      transform - mAnimationDataStart.transform,
+  };
 
   mAnimation->stop();
   mAnimation->setStartValue(qreal(0));
@@ -234,12 +258,7 @@ void OpenGlView::initializeGL() {
 }
 
 void OpenGlView::resizeGL(int w, int h) {
-  const qreal aspectRatio = qreal(w) / qreal(h ? h : 1);
-  const qreal fov = 30.0;
-  const qreal zNear = 2.0;
-  const qreal zFar = 100.0;
-  mProjection.setToIdentity();
-  mProjection.perspective(fov, aspectRatio, zNear, zFar);
+  mProjectionAspectRatio = qreal(w) / qreal(h ? h : 1);
 }
 
 void OpenGlView::paintGL() {
@@ -251,12 +270,48 @@ void OpenGlView::paintGL() {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // Set modelview-projection matrix.
-  mProgram.setUniformValue("mvp_matrix", mProjection * mTransform);
+  const qreal zNear = 0.1;
+  const qreal zFar = 100.0;
+  QMatrix4x4 projection;
+  projection.setToIdentity();
+  projection.perspective(mProjectionFov, mProjectionAspectRatio, zNear, zFar);
+  projection.translate(mProjectionCenter.x(), mProjectionCenter.y(),
+                       -sCameraPosZ);
+  mProgram.setUniformValue("mvp_matrix", projection * mTransform);
 
   // Draw all objects.
   foreach (const auto& obj, mObjects) {
     obj->draw(*this, mProgram);
   }
+}
+
+/*******************************************************************************
+ *  Private Methods
+ ******************************************************************************/
+
+void OpenGlView::zoom(const QPoint& center, qreal factor) noexcept {
+  mAnimation->stop();
+
+  const QPointF centerNormalized = toNormalizedPos(center);
+  const QPointF modelPosOld = toModelPos(centerNormalized);
+  mProjectionFov = qBound(qreal(0.01), mProjectionFov / factor, qreal(90));
+  const QPointF modelPosNew = toModelPos(centerNormalized);
+  mProjectionCenter += modelPosNew - modelPosOld;
+
+  mIdleTimeMs = 0;
+  update();
+}
+
+QPointF OpenGlView::toNormalizedPos(const QPoint& pos) const noexcept {
+  const qreal w = width();
+  const qreal h = height();
+  return QPointF((pos.x() / w) - 0.5, ((h - pos.y()) / h) - 0.5);
+}
+
+QPointF OpenGlView::toModelPos(const QPointF& pos) const noexcept {
+  const qreal wy = 2 * sCameraPosZ * std::tan(mProjectionFov * M_PI / 360);
+  const qreal wx = wy * mProjectionAspectRatio;
+  return QPointF(pos.x() * wx, pos.y() * wy);
 }
 
 /*******************************************************************************
