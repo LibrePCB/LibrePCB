@@ -36,6 +36,7 @@ then
   brew install --force-bottle --overwrite qt5
   echo "Linking qt5..."
   brew link --force --overwrite qt5
+  export PATH="$(brew --prefix qt5)/bin:$PATH"
 
   # Install OpenCascade
   echo "Installing opencascade..."
