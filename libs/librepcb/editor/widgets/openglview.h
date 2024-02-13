@@ -74,32 +74,48 @@ protected:
   void mousePressEvent(QMouseEvent* e) override;
   void mouseMoveEvent(QMouseEvent* e) override;
   void wheelEvent(QWheelEvent* e) override;
-  void smoothTo(const QMatrix4x4& transform) noexcept;
+  void smoothTo(qreal fov, const QPointF& center,
+                const QMatrix4x4& transform) noexcept;
   void initializeGL() override;
   void resizeGL(int w, int h) override;
   void paintGL() override;
+
+private:
+  void zoom(const QPoint& center, qreal factor) noexcept;
+  QPointF toNormalizedPos(const QPoint& pos) const noexcept;
+  QPointF toModelPos(const QPointF& pos) const noexcept;
 
 private:
   QScopedPointer<QVBoxLayout> mLayout;
   QScopedPointer<QLabel> mErrorLabel;
   bool mInitialized;
   QOpenGLShaderProgram mProgram;
-  QMatrix4x4 mProjection;
+  qreal mProjectionAspectRatio;
+  qreal mProjectionFov;
+  QPointF mProjectionCenter;
   QMatrix4x4 mTransform;
+  QPoint mMousePressPosition;
   QMatrix4x4 mMousePressTransform;
-  QVector2D mMousePressPosition;
+  QPointF mMousePressCenter;
   qint64 mIdleTimeMs;
   QScopedPointer<WaitingSpinnerWidget> mWaitingSpinner;
 
   // Transform Animation
-  QMatrix4x4 mAnimationTransformStart;
-  QMatrix4x4 mAnimationTransformDelta;
+  struct TransformData {
+    qreal fov;
+    QPointF center;
+    QMatrix4x4 transform;
+  };
+  TransformData mAnimationDataStart;
+  TransformData mAnimationDataDelta;
   QScopedPointer<QVariantAnimation> mAnimation;
 
   // Content
   QVector<std::shared_ptr<OpenGlObject>> mObjects;
 
   // Static Variables
+  static constexpr qreal sCameraPosZ = 5.0;
+  static constexpr qreal sInitialFov = 15.0;
   static constexpr qreal sZoomStepFactor = 1.3;
 };
 
