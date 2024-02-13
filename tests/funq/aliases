@@ -57,7 +57,7 @@ controlPanelNewProjectWizardFinishButton = {controlPanelNewProjectWizardWidget}:
 controlPanelNewProjectWizardFrame = {controlPanelNewProjectWizardWidget}::QFrame
 controlPanelNewProjectWizardMetadataPage = {controlPanelNewProjectWizardFrame}::librepcb__editor__NewProjectWizardPage_Metadata
 controlPanelNewProjectWizardMetadataNameEdit = {controlPanelNewProjectWizardMetadataPage}::edtName
-controlPanelNewProjectWizardMetadataPathLabel = {controlPanelNewProjectWizardMetadataPage}::lblFullFilePath
+controlPanelNewProjectWizardMetadataPathEdit = {controlPanelNewProjectWizardMetadataPage}::edtPath
 
 # Workspace settings dialog
 controlPanelWorkspaceSettingsDialog = librepcb__editor__WorkspaceSettingsDialog

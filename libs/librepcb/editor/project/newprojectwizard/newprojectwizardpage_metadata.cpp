@@ -28,6 +28,7 @@
 #include "ui_newprojectwizardpage_metadata.h"
 
 #include <librepcb/core/application.h>
+#include <librepcb/core/types/elementname.h>
 #include <librepcb/core/workspace/workspace.h>
 #include <librepcb/core/workspace/workspacesettings.h>
 
@@ -48,16 +49,18 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
     const Workspace& ws, QWidget* parent) noexcept
   : QWizardPage(parent),
     mWorkspace(ws),
-    mUi(new Ui::NewProjectWizardPage_Metadata) {
+    mUi(new Ui::NewProjectWizardPage_Metadata),
+    mLocation(ws.getProjectsPath()),
+    mLocationOverridden(false) {
   mUi->setupUi(this);
   setPixmap(QWizard::LogoPixmap, QPixmap(":/img/actions/plus_2.png"));
   setPixmap(QWizard::WatermarkPixmap, QPixmap(":/img/wizards/watermark.jpg"));
 
   // Add browse action.
   const EditorCommandSet& cmd = EditorCommandSet::instance();
-  mUi->edtLocation->addAction(
+  mUi->edtPath->addAction(
       cmd.inputBrowse.createAction(
-          mUi->edtLocation, this,
+          mUi->edtPath, this,
           &NewProjectWizardPage_Metadata::chooseLocationClicked,
           EditorCommand::ActionFlag::WidgetShortcut),
       QLineEdit::TrailingPosition);
@@ -65,8 +68,11 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
   // signal/slot connections
   connect(mUi->edtName, &QLineEdit::textChanged, this,
           &NewProjectWizardPage_Metadata::nameChanged);
-  connect(mUi->edtLocation, &QLineEdit::textChanged, this,
-          &NewProjectWizardPage_Metadata::locationChanged);
+  connect(mUi->edtName, &QLineEdit::editingFinished, this, [this]() {
+    mUi->edtName->setText(cleanElementName(mUi->edtName->text()));
+  });
+  connect(mUi->edtPath, &QLineEdit::textChanged, this,
+          &NewProjectWizardPage_Metadata::pathChanged);
   connect(mUi->lblLicenseLink, &QLabel::linkActivated, this,
           [this](const QString& url) {
             DesktopServices ds(mWorkspace.getSettings(), this);
@@ -85,9 +91,32 @@ NewProjectWizardPage_Metadata::NewProjectWizardPage_Metadata(
       tr("CC-BY-SA-4.0 (requires attribution + share alike)"),
       QString("licenses/cc-by-sa-4.0.txt"));
   mUi->cbxLicense->setCurrentIndex(0);  // no license
+
+  // Restore client settings.
+  QSettings cs;
+  const QString loc = cs.value(QString("new_project_wizard/location/%1")
+                                   .arg(mWorkspace.getPath().toStr()))
+                          .toString();
+  if (QDir::isAbsolutePath(loc)) {
+    mLocation.setPath(loc);
+  } else if (!loc.isEmpty()) {
+    mLocation = mWorkspace.getPath().getPathTo(loc);
+  }
+
+  // Update UI state.
+  nameChanged(mUi->edtName->text());
 }
 
 NewProjectWizardPage_Metadata::~NewProjectWizardPage_Metadata() noexcept {
+  // Save client settings.
+  QSettings cs;
+  if (!mLocationOverridden) {
+    cs.setValue(QString("new_project_wizard/location/%1")
+                    .arg(mWorkspace.getPath().toStr()),
+                mLocation.isLocatedInDir(mWorkspace.getPath())
+                    ? mLocation.toRelative(mWorkspace.getPath())
+                    : mLocation.toStr());
+  }
 }
 
 /*******************************************************************************
@@ -99,11 +128,11 @@ void NewProjectWizardPage_Metadata::setProjectName(
   mUi->edtName->setText(name);
 }
 
-void NewProjectWizardPage_Metadata::setDefaultLocation(
+void NewProjectWizardPage_Metadata::setLocationOverride(
     const FilePath& dir) noexcept {
-  mUi->edtLocation->setText(dir.toNative());
-  updateProjectFilePath();
-  emit completeChanged();
+  mLocationOverridden = true;
+  mLocation = dir;
+  pathChanged(mUi->edtName->text());
 }
 
 /*******************************************************************************
@@ -133,34 +162,42 @@ FilePath NewProjectWizardPage_Metadata::getProjectLicenseFilePath()
   }
 }
 
-FilePath NewProjectWizardPage_Metadata::getFullFilePath() const noexcept {
-  return mFullFilePath;
-}
-
 /*******************************************************************************
  *  GUI Action Handlers
  ******************************************************************************/
 
 void NewProjectWizardPage_Metadata::nameChanged(const QString& name) noexcept {
-  Q_UNUSED(name);
-  updateProjectFilePath();
+  if (cleanElementName(name).isEmpty()) {
+    mUi->edtPath->clear();
+    mUi->edtPath->setPlaceholderText(tr("Please enter a project name"));
+    mUi->edtPath->setEnabled(false);
+  } else {
+    QString fname = FilePath::cleanFileName(name, FilePath::ReplaceSpaces);
+    if (fname.isEmpty()) {
+      fname = "project";
+    }
+    const FilePath fp = mLocation.getPathTo(fname % "/" % fname % ".lpp");
+    mUi->edtPath->setText(fp.toNative());
+    mUi->edtPath->setPlaceholderText(QString());
+    mUi->edtPath->setEnabled(true);
+  }
   emit completeChanged();
 }
 
-void NewProjectWizardPage_Metadata::locationChanged(
-    const QString& dir) noexcept {
-  Q_UNUSED(dir);
-  updateProjectFilePath();
+void NewProjectWizardPage_Metadata::pathChanged(const QString& fp) noexcept {
+  mFullFilePath.setPath(fp);
+  if (mFullFilePath.isValid() && (mFullFilePath.getSuffix() == "lpp")) {
+    mLocation = mFullFilePath.getParentDir().getParentDir();
+  }
   emit completeChanged();
 }
 
 void NewProjectWizardPage_Metadata::chooseLocationClicked() noexcept {
-  QString dir = FileDialog::getExistingDirectory(
-      this, tr("Project's parent directory"), mUi->edtLocation->text());
-  if (!dir.isEmpty()) {
-    mUi->edtLocation->setText(FilePath(dir).toNative());
-    updateProjectFilePath();
-    emit completeChanged();
+  const FilePath fp(FileDialog::getExistingDirectory(
+      this, tr("Project's parent directory"), mLocation.toStr()));
+  if (fp.isValid()) {
+    mLocation = fp;
+    nameChanged(mUi->edtName->text());
   }
 }
 
@@ -168,47 +205,41 @@ void NewProjectWizardPage_Metadata::chooseLocationClicked() noexcept {
  *  Private Methods
  ******************************************************************************/
 
-void NewProjectWizardPage_Metadata::updateProjectFilePath() noexcept {
-  // invalidate filepath
-  mFullFilePath = FilePath();
-
-  // check filename
-  QString name = mUi->edtName->text();
-  QString filename = FilePath::cleanFileName(name, FilePath::ReplaceSpaces);
-  if (filename.isEmpty()) {
-    mUi->lblFullFilePath->setText(tr("Please enter a valid project name."));
-    return;
-  }
-
-  // check location
-  FilePath location(mUi->edtLocation->text());
-  if ((!location.isValid()) || (!location.isExistingDir())) {
-    mUi->lblFullFilePath->setText(
-        tr("The location must be an existing directory."));
-    return;
-  }
-
-  // determine project directory and filepath
-  FilePath projDir = location.getPathTo(filename);
-  FilePath fullFilePath = projDir.getPathTo(filename % ".lpp");
-  if ((!projDir.isValid()) || (!fullFilePath.isValid())) {
-    mUi->lblFullFilePath->setText(
-        tr("Oops, could not determine a valid filepath."));
-    return;
-  }
-
-  // the filepath is valid
-  mFullFilePath = fullFilePath;
-  mUi->lblFullFilePath->setText(fullFilePath.toNative());
-}
-
 bool NewProjectWizardPage_Metadata::isComplete() const noexcept {
-  // check base class
-  if (!QWizardPage::isComplete()) return false;
+  // Check project name.
+  if (cleanElementName(mUi->edtName->text()).isEmpty()) {
+    setStatusMessage(QString());
+    return false;
+  }
 
-  // check filepath
-  if (!mFullFilePath.isValid()) return false;
+  // Check file path.
+  if ((!mFullFilePath.isValid()) || (mFullFilePath.getSuffix() != "lpp") ||
+      (mFullFilePath.getBasename().isEmpty())) {
+    setStatusMessage(
+        "<font color=\"red\">⚠ " %
+        tr("Please enter a valid project path with '%1' file extension.")
+            .arg(".lpp")
+            .toHtmlEscaped() %
+        "</font>");
+    return false;
+  }
 
+  // Check parent directory.
+  const FilePath parent = mFullFilePath.getParentDir();
+  if ((parent.isExistingDir() && (!parent.isEmptyDir()))) {
+    setStatusMessage(
+        "<font color=\"red\">⚠ " %
+        tr("The selected directory is not empty.").toHtmlEscaped() % "</font>");
+    return false;
+  }
+
+  // Check base class.
+  if (!QWizardPage::isComplete()) {
+    setStatusMessage(
+        "<font color=\"red\">⚠ Please fill out all fields.</font>");
+  }
+
+  setStatusMessage(QString());
   return true;
 }
 
@@ -227,6 +258,12 @@ bool NewProjectWizardPage_Metadata::validatePage() noexcept {
   }
 
   return true;
+}
+
+void NewProjectWizardPage_Metadata::setStatusMessage(
+    const QString& msg) const noexcept {
+  mUi->lblStatus->setText(msg);
+  mUi->lblStatus->setVisible(!msg.isEmpty());
 }
 
 /*******************************************************************************

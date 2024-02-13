@@ -70,7 +70,7 @@ public:
   ~NewProjectWizard() noexcept;
 
   // Setters
-  void setLocation(const FilePath& dir) noexcept;
+  void setLocationOverride(const FilePath& dir) noexcept;
 
   // General Methods
   std::unique_ptr<Project> createProject() const;
