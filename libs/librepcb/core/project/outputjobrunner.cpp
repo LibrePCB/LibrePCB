@@ -50,6 +50,7 @@
 #include "board/boardgerberexport.h"
 #include "board/boardpainter.h"
 #include "board/boardpickplacegenerator.h"
+#include "board/realisticboardpainter.h"
 #include "bomgenerator.h"
 #include "circuit/circuit.h"
 #include "project.h"
@@ -184,8 +185,17 @@ GraphicsExport::Pages OutputJobRunner::buildPages(
       foreach (const Board* board, boards) {
         foreach (auto av, assemblyVariants) {
           Q_UNUSED(av);  // TODO
-          std::shared_ptr<GraphicsPagePainter> painter =
-              std::make_shared<BoardPainter>(*board);
+          std::shared_ptr<GraphicsPagePainter> painter;
+          // New option "realistic" was added after the v1.0.0 release, thus
+          // not officially supported in file format v1.0. Should probably be
+          // migrated to a new content type in file format v2, maybe with
+          // some configuration options.
+          if (content.options.contains("realistic")) {
+            painter = std::make_shared<RealisticBoardPainter>(
+                board->buildScene3D(tl::nullopt));
+          } else {
+            painter = std::make_shared<BoardPainter>(*board);
+          }
           pages.append(std::make_pair(painter, settings));
         }
       }
