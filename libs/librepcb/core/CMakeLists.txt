@@ -359,6 +359,8 @@ add_library(
   project/board/items/bi_via.h
   project/board/items/bi_zone.cpp
   project/board/items/bi_zone.h
+  project/board/realisticboardpainter.cpp
+  project/board/realisticboardpainter.h
   project/bomgenerator.cpp
   project/bomgenerator.h
   project/circuit/assemblyvariant.cpp
