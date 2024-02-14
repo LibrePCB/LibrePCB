@@ -182,6 +182,7 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
   // priorities (0 = highest priority):
   //
   //     0: vias
+  //     1: pads THT
   //     5: holes
   //    50: polygons/texts board layer
   //   110: netpoints top
@@ -389,8 +390,12 @@ QList<std::shared_ptr<QGraphicsItem>> BoardEditorState::findItemsAtPos(
       if (netsignals.isEmpty() ||
           netsignals.contains(it.key()->getCompSigInstNetSignal())) {
         if ((!cuLayer) || (it.key()->isOnLayer(*cuLayer))) {
-          processItem(it.value(), it.key()->getPosition(),
-                      50 + (it.key()->getMirrored() ? 300 : 100), false);
+          // Give THT pads high priority to fix
+          // https://github.com/LibrePCB/LibrePCB/issues/1073.
+          const int priority = it.key()->getLibPad().isTht()
+              ? 1
+              : (50 + (it.key()->getMirrored() ? 300 : 100));
+          processItem(it.value(), it.key()->getPosition(), priority, false);
         }
       }
     }
