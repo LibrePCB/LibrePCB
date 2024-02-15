@@ -284,15 +284,27 @@ void SI_SymbolPin::updateNumbers() noexcept {
   if (numbers != mNumbers) {
     mNumbers = numbers;
     mNumbersTruncated.clear();
-    foreach (QString number, numbers) {
-      if (!mNumbersTruncated.isEmpty()) {
-        number.prepend(",");
-      }
-      if (mNumbersTruncated.length() + number.length() < 8) {
-        mNumbersTruncated += number;
-      } else {
-        mNumbersTruncated += "…";
-        break;
+    // Hide pin number if it's identical to the pin name shown on the
+    // schematic. This avoids cluttering the schematic with redundant
+    // information, mainly for components like connectors where pin names
+    // and pad names are just numbers (1, 2, 3, ...). In such cases, hiding
+    // pin numbers also reduces the risk of overlaps in case of non-standard
+    // pin lengths (also often the case for connectors).
+    const bool allowHide = ((mPinSignalMapItem->getDisplayType() ==
+                             CmpSigPinDisplayType::pinName()) ||
+                            (mPinSignalMapItem->getDisplayType() ==
+                             CmpSigPinDisplayType::componentSignal()));
+    if ((!allowHide) || (mNumbers.count() != 1) || (mNumbers.at(0) != mName)) {
+      foreach (QString number, numbers) {
+        if (!mNumbersTruncated.isEmpty()) {
+          number.prepend(",");
+        }
+        if (mNumbersTruncated.length() + number.length() < 8) {
+          mNumbersTruncated += number;
+        } else {
+          mNumbersTruncated += "…";
+          break;
+        }
       }
     }
     onEdited.notify(Event::NumbersChanged);
