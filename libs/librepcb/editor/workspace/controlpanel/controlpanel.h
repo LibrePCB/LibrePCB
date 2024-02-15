@@ -113,6 +113,7 @@ private:
   void openLibraryManager() noexcept;
   void switchWorkspace() noexcept;
   void showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept;
+  void removeProjectsTreeItem(const FilePath& fp) noexcept;
 
   // Project Management
 

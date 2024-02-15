@@ -321,6 +321,21 @@ void ControlPanel::createActions() noexcept {
   mActionQuit.reset(cmd.applicationQuit.createAction(
       this, qApp, &QApplication::closeAllWindows,
       EditorCommand::ActionFlag::QueuedConnection));
+
+  // Widget actions.
+  mUi->projectTreeView->addAction(cmd.remove.createAction(
+      mUi->projectTreeView, this,
+      [this]() {
+        const QModelIndexList indexes =
+            mUi->projectTreeView->selectionModel()->selectedRows();
+        if (indexes.count() == 1) {
+          removeProjectsTreeItem(
+              FilePath(mProjectTreeModel->filePath(indexes.first())));
+        }
+      },
+      // Queued for funq testing.
+      EditorCommand::ActionFlag::QueuedConnection |
+          EditorCommand::ActionFlag::WidgetShortcut));
 }
 
 void ControlPanel::createMenus() noexcept {
@@ -453,6 +468,32 @@ void ControlPanel::showProjectReadmeInBrowser(
         MarkdownConverter::convertMarkdownToHtml(readmeFilePath));
   } else {
     mUi->textBrowser->clear();
+  }
+}
+
+void ControlPanel::removeProjectsTreeItem(const FilePath& fp) noexcept {
+  if ((!fp.isValid()) || (!fp.isLocatedInDir(mWorkspace.getProjectsPath()))) {
+    return;
+  }
+
+  const QMessageBox::StandardButton btn = QMessageBox::question(
+      this, tr("Remove"),
+      tr("Are you really sure to remove following file or directory?\n\n"
+         "%1\n\nWarning: This cannot be undone!")
+          .arg(fp.toNative()));
+  if (btn == QMessageBox::Yes) {
+    try {
+      if (fp.isExistingDir()) {
+        FileUtils::removeDirRecursively(fp);
+      } else {
+        FileUtils::removeFile(fp);
+      }
+    } catch (const Exception& e) {
+      QMessageBox::critical(this, tr("Error"), e.getMsg());
+    }
+    // Something was removed -> update lists of recent and favorite projects.
+    mRecentProjectsModel->updateVisibleProjects();
+    mFavoriteProjectsModel->updateVisibleProjects();
   }
 }
 
@@ -794,30 +835,7 @@ void ControlPanel::on_projectTreeView_customContextMenuRequested(
   if (fp != mWorkspace.getProjectsPath()) {
     mb.addSeparator();
     mb.addAction(cmd.remove.createAction(
-        &menu, this,
-        [this, fp]() {
-          QMessageBox::StandardButton btn = QMessageBox::question(
-              this, tr("Remove"),
-              tr("Are you really sure to remove following file or "
-                 "directory?\n\n"
-                 "%1\n\nWarning: This cannot be undone!")
-                  .arg(fp.toNative()));
-          if (btn == QMessageBox::Yes) {
-            try {
-              if (fp.isExistingDir()) {
-                FileUtils::removeDirRecursively(fp);
-              } else {
-                FileUtils::removeFile(fp);
-              }
-            } catch (const Exception& e) {
-              QMessageBox::critical(this, tr("Error"), e.getMsg());
-            }
-            // something was removed -> update lists of recent and favorite
-            // projects
-            mRecentProjectsModel->updateVisibleProjects();
-            mFavoriteProjectsModel->updateVisibleProjects();
-          }
-        },
+        &menu, this, [this, fp]() { removeProjectsTreeItem(fp); },
         EditorCommand::ActionFlag::NoShortcuts));
   }
 
