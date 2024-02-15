@@ -19,7 +19,7 @@ def test_new_project_wizard(librepcb):
         # Enter metadata
         name = 'New Project'
         app.widget('controlPanelNewProjectWizardMetadataNameEdit').set_property('text', name)
-        path = app.widget('controlPanelNewProjectWizardMetadataPathLabel').properties()['text']
+        path = app.widget('controlPanelNewProjectWizardMetadataPathEdit').properties()['text']
         app.widget('controlPanelNewProjectWizardNextButton').click()
         # Setup schematic/board
         app.widget('controlPanelNewProjectWizardFinishButton').click()

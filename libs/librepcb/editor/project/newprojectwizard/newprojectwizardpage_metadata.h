@@ -61,14 +61,14 @@ public:
 
   // Setters
   void setProjectName(const QString& name) noexcept;
-  void setDefaultLocation(const FilePath& dir) noexcept;
+  void setLocationOverride(const FilePath& dir) noexcept;
 
   // Getters
   QString getProjectName() const noexcept;
   QString getProjectAuthor() const noexcept;
   bool isLicenseSet() const noexcept;
   FilePath getProjectLicenseFilePath() const noexcept;
-  FilePath getFullFilePath() const noexcept;
+  FilePath getFullFilePath() const noexcept { return mFullFilePath; }
 
   // Operator Overloadings
   NewProjectWizardPage_Metadata& operator=(
@@ -76,17 +76,19 @@ public:
 
 private:  // GUI Action Handlers
   void nameChanged(const QString& name) noexcept;
-  void locationChanged(const QString& dir) noexcept;
+  void pathChanged(const QString& fp) noexcept;
   void chooseLocationClicked() noexcept;
 
 private:  // Methods
-  void updateProjectFilePath() noexcept;
   bool isComplete() const noexcept override;
   bool validatePage() noexcept override;
+  void setStatusMessage(const QString& msg) const noexcept;
 
 private:  // Data
   const Workspace& mWorkspace;
   QScopedPointer<Ui::NewProjectWizardPage_Metadata> mUi;
+  FilePath mLocation;
+  bool mLocationOverridden;
   FilePath mFullFilePath;
 };
 

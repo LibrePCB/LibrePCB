@@ -462,15 +462,13 @@ void ControlPanel::showProjectReadmeInBrowser(
 
 ProjectEditor* ControlPanel::newProject(bool eagleImport,
                                         FilePath parentDir) noexcept {
-  if (!parentDir.isValid()) {
-    parentDir = mWorkspace.getProjectsPath();
-  }
-
   const NewProjectWizard::Mode mode = eagleImport
       ? NewProjectWizard::Mode::EagleImport
       : NewProjectWizard::Mode::NewProject;
   NewProjectWizard wizard(mWorkspace, mode, this);
-  wizard.setLocation(parentDir);
+  if (parentDir.isValid()) {
+    wizard.setLocationOverride(parentDir);
+  }
   if (wizard.exec() == QWizard::Accepted) {
     try {
       std::unique_ptr<Project> project = wizard.createProject();  // can throw

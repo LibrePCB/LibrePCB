@@ -77,17 +77,27 @@ NewProjectWizard::NewProjectWizard(const Workspace& ws, Mode mode,
             &NewProjectWizardPage_EagleImport::projectSelected, mPageMetadata,
             &NewProjectWizardPage_Metadata::setProjectName);
   }
+
+  // Restore client settings.
+  QSettings cs;
+  const QSize windowSize = cs.value("new_project_wizard/window_size").toSize();
+  if (!windowSize.isEmpty()) {
+    resize(windowSize);
+  }
 }
 
 NewProjectWizard::~NewProjectWizard() noexcept {
+  // Save client settings.
+  QSettings cs;
+  cs.setValue("new_project_wizard/window_size", size());
 }
 
 /*******************************************************************************
  *  Setters
  ******************************************************************************/
 
-void NewProjectWizard::setLocation(const FilePath& dir) noexcept {
-  mPageMetadata->setDefaultLocation(dir);
+void NewProjectWizard::setLocationOverride(const FilePath& dir) noexcept {
+  mPageMetadata->setLocationOverride(dir);
 }
 
 /*******************************************************************************
@@ -115,8 +125,8 @@ std::unique_ptr<Project> NewProjectWizard::createProject() const {
   std::unique_ptr<Project> project = Project::create(
       std::unique_ptr<TransactionalDirectory>(new TransactionalDirectory(fs)),
       mPageMetadata->getFullFilePath().getFilename());
-  project->setName(
-      ElementName(mPageMetadata->getProjectName().trimmed()));  // can throw
+  project->setName(ElementName(
+      cleanElementName(mPageMetadata->getProjectName())));  // can throw
   project->setAuthor(mPageMetadata->getProjectAuthor());
 
   // set project settings (copy from workspace settings)
