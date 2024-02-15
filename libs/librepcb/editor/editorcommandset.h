@@ -448,6 +448,15 @@ public:
 
   EditorCommandCategory categoryImportExport{
       "categoryImportExport", QT_TR_NOOP("Import/Export"), true, &categoryRoot};
+  EditorCommand addExampleProjects{
+      "add_example_projects",  // clang-format break
+      QT_TR_NOOP("Add Example Projects"),
+      QT_TR_NOOP("Add some example projects to the workspace"),
+      ":/img/logo/32x32.png",
+      EditorCommand::Flag::OpensPopup,
+      {},
+      nullptr,  // Exclude from shortcuts overview & configuration
+  };
   EditorCommand importDxf{
       "import_dxf",  // clang-format break
       QT_TR_NOOP("Import DXF"),

@@ -111,6 +111,7 @@ private:
   void loadSettings();
   void updateDesktopIntegrationMessage() noexcept;
   void openLibraryManager() noexcept;
+  void addExampleProjects() noexcept;
   void switchWorkspace() noexcept;
   void showProjectReadmeInBrowser(const FilePath& projectFilePath) noexcept;
   void removeProjectsTreeItem(const FilePath& fp) noexcept;
@@ -221,6 +222,7 @@ private:
   QScopedPointer<QAction> mActionNewProject;
   QScopedPointer<QAction> mActionOpenProject;
   QScopedPointer<QAction> mActionCloseAllProjects;
+  QScopedPointer<QAction> mActionAddExampleProjects;
   QScopedPointer<QAction> mActionImportEagleProject;
   QScopedPointer<QAction> mActionAboutLibrePcb;
   QScopedPointer<QAction> mActionAboutQt;
