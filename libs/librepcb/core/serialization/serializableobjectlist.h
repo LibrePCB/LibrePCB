@@ -232,9 +232,10 @@ public:
     }
     return -1;
   }
-  int indexOf(const QString& name) const noexcept {
+  int indexOf(const QString& name,
+              Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept {
     for (int i = 0; i < count(); ++i) {
-      if (mObjects[i]->getName() == name) {
+      if (QString::compare(asStr(mObjects[i]->getName()), name, cs) == 0) {
         return i;
       }
     }
@@ -261,11 +262,14 @@ public:
   std::shared_ptr<const T> find(const Uuid& key) const noexcept {
     return value(indexOf(key));
   }
-  std::shared_ptr<T> find(const QString& name) noexcept {
-    return value(indexOf(name));
+  std::shared_ptr<T> find(const QString& name,
+                          Qt::CaseSensitivity cs = Qt::CaseSensitive) noexcept {
+    return value(indexOf(name, cs));
   }
-  std::shared_ptr<const T> find(const QString& name) const noexcept {
-    return value(indexOf(name));
+  std::shared_ptr<const T> find(
+      const QString& name,
+      Qt::CaseSensitivity cs = Qt::CaseSensitive) const noexcept {
+    return value(indexOf(name, cs));
   }
 
   // "Hard" Element Access (assertion or exception if not found!)
@@ -492,6 +496,11 @@ private:  // Internal Helper Methods
     Q_UNUSED(copyConstructable);
     return other.cloneShared();  // Call cloneShared() on object.
   }
+  template <typename TStr>
+  inline const QString& asStr(const TStr& obj) const noexcept {
+    return *obj;
+  }
+  inline const QString& asStr(const QString& obj) const noexcept { return obj; }
 
 protected:  // Data
   QVector<std::shared_ptr<T>> mObjects;

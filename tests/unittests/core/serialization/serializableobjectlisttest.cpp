@@ -156,9 +156,17 @@ TEST_F(SerializableObjectListTest, testIndexOfUuid) {
   EXPECT_EQ(1, l.indexOf(mMocks[1]->mUuid));
 }
 
-TEST_F(SerializableObjectListTest, testIndexOfName) {
+TEST_F(SerializableObjectListTest, testIndexOfNameCaseSensitive) {
   List l{mMocks[0], mMocks[1], mMocks[2]};
-  EXPECT_EQ(2, l.indexOf(mMocks[2]->mName));
+  EXPECT_EQ(2, l.indexOf("pcb"));
+  EXPECT_EQ(2, l.indexOf("pcb", Qt::CaseSensitive));
+  EXPECT_EQ(-1, l.indexOf("PCB"));
+}
+
+TEST_F(SerializableObjectListTest, testIndexOfNameCaseInsensitive) {
+  List l{mMocks[0], mMocks[1], mMocks[2]};
+  EXPECT_EQ(2, l.indexOf("pcb", Qt::CaseInsensitive));
+  EXPECT_EQ(2, l.indexOf("PCB", Qt::CaseInsensitive));
 }
 
 TEST_F(SerializableObjectListTest, testContainsPointer) {
