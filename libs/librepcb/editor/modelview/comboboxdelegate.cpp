@@ -67,8 +67,9 @@ QWidget* ComboBoxDelegate::createEditor(QWidget* parent,
   Q_UNUSED(index);
   QComboBox* cbx = new QComboBox(parent);
   cbx->setFrame(false);
-  cbx->setSizePolicy(QSizePolicy::Ignored, cbx->sizePolicy().verticalPolicy());
+  cbx->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
   cbx->setEditable(mEditable);
+  cbx->setAutoFillBackground(true);  // Fix transparency on macOS.
   Items items = index.data(Qt::UserRole).value<Items>();
   foreach (const auto& item, items) {
     cbx->addItem(item.icon, item.text, item.data);
