@@ -75,6 +75,9 @@ DeviceEditorWidget::DeviceEditorWidget(const Context& context,
   mUi->btnChooseComponent->setHidden(mContext.readOnly);
   mUi->padSignalMapEditorWidget->setReadOnly(mContext.readOnly);
   mUi->padSignalMapEditorWidget->setFrameStyle(QFrame::NoFrame);
+  connect(mUi->padSignalMapEditorWidget,
+          &PadSignalMapEditorWidget::statusTipChanged, this,
+          [this](const QString& statusTip) { setStatusBarMessage(statusTip); });
   mUi->partsEditorWidget->setReadOnly(mContext.readOnly);
   mUi->partsEditorWidget->setFrameStyle(QFrame::NoFrame);
   if (mContext.library) {

@@ -66,14 +66,58 @@ public:
   void setPadList(const PackagePadList& list) noexcept;
   void setSignalList(const ComponentSignalList& list) noexcept;
 
+  // Inherited Methods
+  bool eventFilter(QObject* watched, QEvent* event) noexcept override;
+
   // Operator Overloadings
   PadSignalMapEditorWidget& operator=(const PadSignalMapEditorWidget& rhs) =
       delete;
 
+signals:
+  void statusTipChanged(const QString& statusTip);
+
+protected:
+  void resizeEvent(QResizeEvent* e) noexcept override;
+  void keyPressEvent(QKeyEvent* e) noexcept override;
+
 private:
+  void scheduleToolButtonPositionUpdate() noexcept;
+  void updateToolButtonPosition() noexcept;
+  void updateButtonsVisibility() noexcept;
+  void toolButtonClicked() noexcept;
+  void resetAll() noexcept;
+  void autoConnect() noexcept;
+  void loadFromFile() noexcept;
+  void setInteractiveMode(bool enabled) noexcept;
+  void updateInteractiveList(QString filter) noexcept;
+  void commitInteractiveMode(const QListWidgetItem* listItem) noexcept;
+  QMap<Uuid, Uuid> getMap() const noexcept;
+  void setMap(const QString& cmdText, const QMap<Uuid, Uuid>& map);
+  bool hasAutoConnectablePads() const noexcept;
+  bool hasUnconnectedPadsAndUnusedSignals() const noexcept;
+  bool askForResetFirst() noexcept;
+
+private:
+  bool mReadOnly;
+  int mInteractiveModePadIndex;
   QScopedPointer<DevicePadSignalMapModel> mModel;
   QScopedPointer<SortFilterProxyModel> mProxy;
   QScopedPointer<QTableView> mView;
+  QScopedPointer<QFrame> mInteractiveFrame;
+  QScopedPointer<QLabel> mInteractiveLabel1;
+  QScopedPointer<QLabel> mInteractiveLabel2;
+  QScopedPointer<QLineEdit> mInteractiveEdit;
+  QScopedPointer<QToolButton> mInteractiveAbortButton;
+  QScopedPointer<QListWidget> mInteractiveList;
+  QScopedPointer<QToolButton> mToolButton;
+  QScopedPointer<QPushButton> mAutoConnectButton;
+  QScopedPointer<QFrame> mButtonsVLine;
+  QScopedPointer<QPushButton> mInteractiveConnectButton;
+
+  DevicePadSignalMap* mPadSignalMap;
+  UndoStack* mUndoStack;
+  ComponentSignalList mSignals;
+  PackagePadList mPads;
 };
 
 /*******************************************************************************
