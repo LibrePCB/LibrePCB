@@ -90,7 +90,8 @@ public:
     AssemblyVariantSet assemblyVariants;
 
     // Arbitrary options for forward compatibility in case we really need to
-    // add new settings in a minor release.
+    // add new settings in a minor release. Supported options:
+    //  - realistic: If present, render boards in realistic mode
     QMap<QString, QList<SExpression>> options;
 
     Content(Preset preset) noexcept
