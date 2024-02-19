@@ -69,8 +69,10 @@ public:
 private:  // Methods
   void initializePage() noexcept override;
   void cleanupPage() noexcept override;
+  QList<Uuid> getSymbolUuids() const noexcept;
 
 private:  // Data
+  QList<Uuid> mLoadedSymbolUuids;
   NewElementWizardContext& mContext;
   QScopedPointer<Ui::NewElementWizardPage_ComponentSymbols> mUi;
 };
