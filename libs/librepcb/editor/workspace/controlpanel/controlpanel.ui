@@ -215,6 +215,9 @@
                  <property name="mouseTracking">
                   <bool>true</bool>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::NoFocus</enum>
+                 </property>
                  <property name="contextMenuPolicy">
                   <enum>Qt::CustomContextMenu</enum>
                  </property>
@@ -226,11 +229,12 @@
 }
 QListView::item:hover
 {
-    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 170, 255, 100), stop:1 rgba(0, 170, 255, 0));
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 palette(highlight), stop:1 rgba(0, 0, 0, 0));
+    color: palette(highlighted-text);
 }
 QListView::item
 {
-	color: blue;
+	color: palette(link);
 }</string>
                  </property>
                  <property name="frameShape">
@@ -288,6 +292,9 @@ QListView::item
                  <property name="mouseTracking">
                   <bool>true</bool>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::NoFocus</enum>
+                 </property>
                  <property name="contextMenuPolicy">
                   <enum>Qt::CustomContextMenu</enum>
                  </property>
@@ -299,11 +306,12 @@ QListView::item
 }
 QListView::item:hover
 {
-    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(0, 170, 255, 100), stop:1 rgba(0, 170, 255, 0));
+    background: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 palette(highlight), stop:1 rgba(0, 0, 0, 0));
+    color: palette(highlighted-text);
 }
 QListView::item
 {
-	color: blue;
+	color: palette(link);
 }</string>
                  </property>
                  <property name="frameShape">
