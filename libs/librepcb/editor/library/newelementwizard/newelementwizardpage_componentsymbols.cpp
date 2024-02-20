@@ -58,6 +58,20 @@ NewElementWizardPage_ComponentSymbols::
  ******************************************************************************/
 
 bool NewElementWizardPage_ComponentSymbols::validatePage() noexcept {
+  const auto symbols = getSymbolUuids();
+  if (symbols != mLoadedSymbolUuids) {
+    // Symbols have been modified, so the component signals might not be
+    // valid anymore. See https://github.com/LibrePCB/LibrePCB/issues/842.
+    mContext.mComponentSignals.clear();
+    for (auto& var : mContext.mComponentSymbolVariants) {
+      for (auto& item : var.getSymbolItems()) {
+        for (auto& map : item.getPinSignalMap()) {
+          map.setSignalUuid(tl::nullopt);
+        }
+      }
+    }
+    mLoadedSymbolUuids = symbols;
+  }
   return true;
 }
 
@@ -75,6 +89,7 @@ int NewElementWizardPage_ComponentSymbols::nextId() const noexcept {
  ******************************************************************************/
 
 void NewElementWizardPage_ComponentSymbols::initializePage() noexcept {
+  qDebug() << "foo";
   QWizardPage::initializePage();
   if (mContext.mComponentSymbolVariants.count() < 1) {
     mContext.mComponentSymbolVariants.append(
@@ -87,6 +102,7 @@ void NewElementWizardPage_ComponentSymbols::initializePage() noexcept {
       std::make_shared<LibraryElementCache>(
           mContext.getWorkspace().getLibraryDb()),
       nullptr);
+  mLoadedSymbolUuids = getSymbolUuids();
 }
 
 void NewElementWizardPage_ComponentSymbols::cleanupPage() noexcept {
@@ -94,6 +110,17 @@ void NewElementWizardPage_ComponentSymbols::cleanupPage() noexcept {
 
   // References might become invalid, thus resetting them.
   mUi->symbolListEditorWidget->resetReferences();
+}
+
+QList<Uuid> NewElementWizardPage_ComponentSymbols::getSymbolUuids()
+    const noexcept {
+  QList<Uuid> result;
+  if (auto var = mContext.mComponentSymbolVariants.value(0)) {
+    for (const auto& item : var->getSymbolItems()) {
+      result.append(item.getSymbolUuid());
+    }
+  }
+  return result;
 }
 
 /*******************************************************************************
