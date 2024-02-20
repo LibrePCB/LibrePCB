@@ -1439,9 +1439,11 @@ void BoardEditor::goToDevice(const QString& name, int index) noexcept {
     if (auto item = mGraphicsScene->getDevices().value(device)) {
       item->setSelected(true);
       QRectF rect = item->mapRectToScene(item->childrenBoundingRect());
-      // Zoom to a rectangle relative to the maximum device dimension. The
-      // device is 1/4th of the screen.
-      qreal margin = 1.5f * std::max(rect.size().width(), rect.size().height());
+      // Zoom to a rectangle relative to the maximum graphics item dimension,
+      // occupying 1/4th of the screen, but limiting the margin to 10mm.
+      const qreal margin =
+          std::min(1.5f * std::max(rect.size().width(), rect.size().height()),
+                   Length::fromMm(10).toPx());
       rect.adjust(-margin, -margin, margin, margin);
       mUi->graphicsView->zoomToRect(rect);
     }
