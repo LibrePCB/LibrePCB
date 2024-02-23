@@ -66,5 +66,6 @@ else
 fi
 
 # Install Python packages
+export PIP_BREAK_SYSTEM_PACKAGES=1
 pip install $PIP_USER_INSTALL -r "$DIR/../tests/cli/requirements.txt"
 pip install $PIP_USER_INSTALL -r "$DIR/../tests/funq/requirements.txt"
