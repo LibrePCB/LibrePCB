@@ -320,7 +320,7 @@ void UnplacedComponentsDock::setSelectedComponentInstance(
       if (device.isListedInComponentInstance) {
         text += " ✔";
       }
-      mUi->cbxSelectedDevice->addItem(text);
+      mUi->cbxSelectedDevice->addItem(QIcon(":/img/library/device.png"), text);
     }
     mUi->cbxSelectedDevice->setCurrentIndex(devices.second);
     if (mUi->cbxSelectedDevice->count() == 0) {
@@ -350,7 +350,8 @@ void UnplacedComponentsDock::setSelectedDeviceAndPackage(
     mSelectedPackageOwned = packageOwned;
     QStringList localeOrder = mProject.getLocaleOrder();
     for (const Footprint& fpt : mSelectedPackage->getFootprints()) {
-      mUi->cbxSelectedFootprint->addItem(*fpt.getNames().value(localeOrder),
+      mUi->cbxSelectedFootprint->addItem(QIcon(":/img/library/footprint.png"),
+                                         *fpt.getNames().value(localeOrder),
                                          fpt.getUuid().toStr());
     }
     if (mUi->cbxSelectedFootprint->count() > 0) {
