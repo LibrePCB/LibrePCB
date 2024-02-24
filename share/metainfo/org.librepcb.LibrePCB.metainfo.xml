@@ -5,7 +5,9 @@
   <project_license>GPL-3.0</project_license>
   <name>LibrePCB</name>
   <summary>Design Schematics and PCBs</summary>
-  <developer_name>The LibrePCB Developers</developer_name>
+  <developer id="org.librepcb">
+    <name>The LibrePCB Developers</name>
+  </developer>
 
   <description>
     <p>LibrePCB is a free electronic design automation (EDA) software for developing printed circuit boards (PCBs).</p>
@@ -21,6 +23,7 @@
 
   <screenshots>
     <screenshot type="default">
+      <caption>Control panel, board editor and schematic editor</caption>
       <image>https://github.com/LibrePCB/librepcb-doc/blob/b5488bb1dd8473d33110e744023e3ca14d796db1/about/img/screenshot.png?raw=true</image>
     </screenshot>
     <screenshot>
@@ -67,6 +70,8 @@
     <binary>librepcb</binary>
     <binary>librepcb-cli</binary>
   </provides>
+
+  <launchable type="desktop-id">org.librepcb.LibrePCB.desktop</launchable>
 
   <releases>
     <!--
