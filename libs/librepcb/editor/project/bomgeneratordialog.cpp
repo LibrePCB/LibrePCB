@@ -24,7 +24,9 @@
 
 #include "../dialogs/filedialog.h"
 #include "../editorcommandset.h"
+#include "../modelview/partinformationdelegate.h"
 #include "../workspace/desktopservices.h"
+#include "partinformationtooltip.h"
 #include "ui_bomgeneratordialog.h"
 
 #include <librepcb/core/attribute/attributesubstitutor.h>
@@ -40,6 +42,7 @@
 #include <librepcb/core/project/circuit/componentinstance.h>
 #include <librepcb/core/project/project.h>
 #include <librepcb/core/project/projectattributelookup.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -60,8 +63,11 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
   : QDialog(parent),
     mSettings(settings),
     mProject(project),
-    mBom(new Bom(QStringList())),
-    mUi(new Ui::BomGeneratorDialog) {
+    mBom(new Bom(QStringList(), {})),
+    mUi(new Ui::BomGeneratorDialog),
+    mPartToolTip(new PartInformationToolTip(settings, this)),
+    mPartInfoProgress(0),
+    mUpdatePartInformationScheduled(false) {
   mUi->setupUi(this);
   mUi->tableWidget->setWordWrap(false);
   // Note: Don't stretch columns since it leads to cropped text in some
@@ -85,6 +91,41 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
   mBtnGenerate =
       mUi->buttonBox->addButton(tr("&Generate"), QDialogButtonBox::AcceptRole);
   mBtnGenerate->setDefault(true);
+
+  // Setup part information tooltip.
+  auto setProviderInfo = [this]() {
+    mPartToolTip->setProviderInfo(
+        PartInformationProvider::instance().getProviderName(),
+        PartInformationProvider::instance().getProviderUrl(),
+        PartInformationProvider::instance().getProviderLogo(),
+        PartInformationProvider::instance().getInfoUrl());
+  };
+  setProviderInfo();
+  connect(&PartInformationProvider::instance(),
+          &PartInformationProvider::providerInfoChanged, this, setProviderInfo);
+  mUi->tableWidget->setMouseTracking(true);
+  mUi->tableWidget->installEventFilter(this);
+  mPartToolTip->installEventFilter(this);
+  connect(
+      mUi->tableWidget, &QTableWidget::itemEntered, this,
+      [this](QTableWidgetItem* item) {
+        if (item) {
+          const auto data =
+              item->data(Qt::UserRole).value<PartInformationDelegate::Data>();
+          if (data.info && (data.info->results == 1)) {
+            const QRect rect =
+                mUi->tableWidget->visualItemRect(item).intersected(
+                    mUi->tableWidget->viewport()->rect());
+            const QPoint pos = mUi->tableWidget->viewport()->mapToGlobal(
+                QPoint(rect.right(), rect.center().y()));
+            mPartToolTip->showPart(data.info, pos);
+          } else {
+            mPartToolTip->hideAndReset(!data.initialized);
+          }
+        } else {
+          mPartToolTip->hideAndReset();
+        }
+      });
 
   // Add browse action.
   const EditorCommandSet& cmd = EditorCommandSet::instance();
@@ -116,6 +157,23 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
   mUi->cbxBoard->setCurrentIndex(index);
   updateBom();
 
+  // Setup automatic update of parts information.
+  QTimer* partInfoTimer = new QTimer(this);
+  partInfoTimer->setInterval(250);
+  connect(partInfoTimer, &QTimer::timeout, this, [this]() {
+    ++mPartInfoProgress;
+    if (mUpdatePartInformationScheduled) {
+      updatePartsInformation();
+    }
+  });
+  partInfoTimer->start();
+  connect(&PartInformationProvider::instance(),
+          &PartInformationProvider::serviceOperational, this,
+          &BomGeneratorDialog::updatePartsInformation);
+  connect(&PartInformationProvider::instance(),
+          &PartInformationProvider::newPartsInformationAvailable, this,
+          &BomGeneratorDialog::updatePartsInformation);
+
   connect(
       mUi->cbxBoard,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -126,6 +184,8 @@ BomGeneratorDialog::BomGeneratorDialog(const WorkspaceSettings& settings,
       this, &BomGeneratorDialog::updateBom);
   connect(mUi->edtAttributes, &QLineEdit::textEdited, this,
           &BomGeneratorDialog::updateAttributes);
+  connect(mUi->tableWidget, &QTableWidget::cellDoubleClicked, this,
+          &BomGeneratorDialog::tableCellDoubleClicked);
   connect(mUi->btnBrowseOutputDir, &QPushButton::clicked, this,
           &BomGeneratorDialog::btnOpenOutputDirectoryClicked);
   connect(mBtnGenerate, &QPushButton::clicked, this,
@@ -147,6 +207,20 @@ BomGeneratorDialog::~BomGeneratorDialog() noexcept {
   // Save the window geometry and settings.
   QSettings cs;
   cs.setValue("bom_generator_dialog/window_size", size());
+}
+
+/*******************************************************************************
+ *  General Methods
+ ******************************************************************************/
+
+bool BomGeneratorDialog::eventFilter(QObject* obj, QEvent* e) noexcept {
+  if (mPartToolTip && (e->type() == QEvent::Leave) &&
+      ((!mPartToolTip->isVisible()) ||
+       ((!mPartToolTip->rect().contains(
+           mPartToolTip->mapFromGlobal(QCursor::pos())))))) {
+    mPartToolTip->hideAndReset();
+  }
+  return QDialog::eventFilter(obj, e);
 }
 
 /*******************************************************************************
@@ -187,6 +261,17 @@ void BomGeneratorDialog::btnGenerateClicked() noexcept {
   }
 }
 
+void BomGeneratorDialog::tableCellDoubleClicked(int row, int column) noexcept {
+  if (auto item = mUi->tableWidget->item(row, column)) {
+    const auto data =
+        item->data(Qt::UserRole).value<PartInformationDelegate::Data>();
+    if (data.info && data.info->pricingUrl.isValid()) {
+      DesktopServices ds(mSettings, this);
+      ds.openWebUrl(data.info->pricingUrl);
+    }
+  }
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -224,6 +309,7 @@ void BomGeneratorDialog::updateBom() noexcept {
 
 void BomGeneratorDialog::updateTable() noexcept {
   mUi->tableWidget->clear();
+  mUi->lblTotalPrice->clear();
 
   try {
     BomCsvWriter writer(*mBom);
@@ -231,7 +317,8 @@ void BomGeneratorDialog::updateTable() noexcept {
     std::shared_ptr<CsvFile> csv = writer.generateCsv();  // can throw
     mUi->tableWidget->setRowCount(csv->getValues().count());
     mUi->tableWidget->setColumnCount(csv->getHeader().count());
-    mUi->tableWidget->setHorizontalHeaderLabels(csv->getHeader());
+    mUi->tableWidget->setHorizontalHeaderLabels(
+        csv->getHeader() + QStringList{tr("Availability")});
     for (int column = 0; column < csv->getHeader().count(); ++column) {
       for (int row = 0; row < csv->getValues().count(); ++row) {
         QString text = csv->getValues()[row][column];
@@ -243,11 +330,98 @@ void BomGeneratorDialog::updateTable() noexcept {
         mUi->tableWidget->setItem(row, column, item);
       }
     }
-    mUi->tableWidget->resizeColumnsToContents();
+    foreach (const auto& columnPair, mBom->getMpnManufacturerColumns()) {
+      mUi->tableWidget->setItemDelegateForColumn(
+          columnPair.second + 2, new PartInformationDelegate(false, this));
+    }
     mUi->tableWidget->resizeRowsToContents();
+    mUi->tableWidget->resizeColumnsToContents();
+    updatePartsInformation();
   } catch (Exception& e) {
     qCritical() << "Failed to update BOM table widget:" << e.getMsg();
   }
+}
+
+void BomGeneratorDialog::updatePartsInformation() noexcept {
+  if (!mSettings.autofetchLivePartInformation.get()) {
+    return;
+  }
+
+  if (!PartInformationProvider::instance().isOperational()) {
+    PartInformationProvider::instance().startOperation();
+    return;
+  }
+
+  mUpdatePartInformationScheduled = false;
+
+  qreal totalPrice = 0;
+  int partsWithPrice = 0;
+  QSet<int> countedParts;
+  foreach (const auto& columnPair, mBom->getMpnManufacturerColumns()) {
+    for (int row = 0; row < mBom->getItems().count(); ++row) {
+      const BomItem& item = mBom->getItems().at(row);
+      QTableWidgetItem* mpnItem =
+          mUi->tableWidget->item(row, columnPair.first + 2);
+      QTableWidgetItem* manufacturerItem =
+          mUi->tableWidget->item(row, columnPair.second + 2);
+      if ((!mpnItem) || (!manufacturerItem)) {
+        qCritical() << "Invalid MPN/manufacturer cell index in BOM table.";
+        continue;
+      }
+      PartInformationDelegate::Data data =
+          manufacturerItem->data(Qt::UserRole)
+              .value<PartInformationDelegate::Data>();
+      if (!data.initialized) {
+        data.part.mpn = mpnItem->text();
+        data.part.manufacturer = manufacturerItem->text();
+        data.priceQuantity = item.getDesignators().count();
+        data.initialized = true;
+      }
+      if ((!data.info) && (!data.part.mpn.isEmpty()) &&
+          (!data.part.manufacturer.isEmpty())) {
+        data.info = PartInformationProvider::instance().getPartInfo(data.part);
+        if ((!data.info) && (!data.infoRequested)) {
+          PartInformationProvider::instance().scheduleRequest(data.part);
+          data.infoRequested = true;
+        }
+        if ((!data.info) && data.infoRequested) {
+          if (PartInformationProvider::instance().isOngoing(data.part)) {
+            // Request is still ongoing.
+            data.progress = mPartInfoProgress / 2;
+            mUpdatePartInformationScheduled = true;  // Require reload.
+          } else {
+            // Request failed.
+            data.progress = 0;
+          }
+        }
+      }
+      manufacturerItem->setData(Qt::UserRole, QVariant::fromValue(data));
+
+      if (item.isMount() && (!countedParts.contains(row)) && (data.info) &&
+          (!data.info->prices.isEmpty())) {
+        totalPrice += data.info->getPrice(item.getDesignators().count()) *
+            item.getDesignators().count();
+        partsWithPrice += item.getDesignators().count();
+        countedParts.insert(row);
+      }
+    }
+  }
+  mUi->tableWidget->resizeColumnsToContents();
+
+  QString totalStr;
+  const int totalParts = mBom->getTotalAssembledPartsCount();
+  if (totalPrice > 0) {
+    if (partsWithPrice == totalParts) {
+      totalStr = tr("%1 parts:").arg(totalParts);
+    } else {
+      totalStr = tr("%1 of %2 parts:").arg(partsWithPrice).arg(totalParts);
+    }
+    totalStr += QString(" <b>$ %1</b>").arg(totalPrice, 0, 'f', 2);
+  } else {
+    totalStr = tr("Total: %1 parts").arg(totalParts);
+  }
+  mUi->lblTotalPrice->setText(totalStr);
+  PartInformationProvider::instance().requestScheduledParts();
 }
 
 std::shared_ptr<AssemblyVariant> BomGeneratorDialog::getAssemblyVariant()

@@ -160,19 +160,23 @@ std::shared_ptr<Bom> BomGenerator::generate(
 
   // Build BOM header.
   QStringList columns{"Package"};
+  QVector<std::pair<int, int>> mpnManufacturerColumns;
   columns += customCommonAttributes;
   for (int i = 0; i < maxPartNumber; ++i) {
     const QString suffix = (i > 0) ? QString("[%1]").arg(i + 1) : QString();
     columns.append("Value" % suffix);
     columns.append("MPN" % suffix);
     columns.append("Manufacturer" % suffix);
+    mpnManufacturerColumns.append(
+        std::make_pair(columns.count() - 2, columns.count() - 1));
     foreach (const QString& attribute, customPartAttributes) {
       columns.append(attribute % suffix);
     }
   }
 
   // Generate BOM.
-  std::shared_ptr<Bom> bom = std::make_shared<Bom>(columns);
+  std::shared_ptr<Bom> bom =
+      std::make_shared<Bom>(columns, mpnManufacturerColumns);
   foreach (const ComponentItem& item, items) {
     QStringList attributes;
     attributes.append(item.pkgName);
