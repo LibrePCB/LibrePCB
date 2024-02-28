@@ -54,6 +54,49 @@ void ApiEndpoint::requestLibraryList() const noexcept {
   requestLibraryList(QUrl(mUrl.toString() % path));
 }
 
+void ApiEndpoint::requestPartsInformationStatus() const noexcept {
+  NetworkRequest* request =
+      new NetworkRequest(QUrl(mUrl.toString() % "/api/v1/parts"));
+  request->setHeaderField("Accept", "application/json;charset=UTF-8");
+  request->setHeaderField("Accept-Charset", "UTF-8");
+  connect(request, &NetworkRequest::errored, this,
+          &ApiEndpoint::errorWhileFetchingPartsInformationStatus,
+          Qt::QueuedConnection);
+  connect(request, &NetworkRequest::dataReceived, this,
+          &ApiEndpoint::partsInformationStatusResponseReceived,
+          Qt::QueuedConnection);
+  request->start();
+}
+
+void ApiEndpoint::requestPartsInformation(
+    const QUrl& url, const QVector<Part>& parts) const noexcept {
+  // Build JSON object to be uploaded.
+  QJsonArray partsArray;
+  foreach (const Part& part, parts) {
+    partsArray.append(QJsonObject{
+        {"mpn", part.mpn},
+        {"manufacturer", part.manufacturer},
+    });
+  }
+  const QJsonObject obj{
+      {"parts", partsArray},
+  };
+  const QByteArray postData = QJsonDocument(obj).toJson();
+
+  NetworkRequest* request = new NetworkRequest(url, postData);
+  request->setHeaderField("Content-Type", "application/json");
+  request->setHeaderField("Content-Length",
+                          QString::number(postData.size()).toUtf8());
+  request->setHeaderField("Accept", "application/json;charset=UTF-8");
+  request->setHeaderField("Accept-Charset", "UTF-8");
+  connect(request, &NetworkRequest::errored, this,
+          &ApiEndpoint::errorWhileFetchingPartsInformation,
+          Qt::QueuedConnection);
+  connect(request, &NetworkRequest::dataReceived, this,
+          &ApiEndpoint::partsInformationResponseReceived, Qt::QueuedConnection);
+  request->start();
+}
+
 /*******************************************************************************
  *  Private Methods
  ******************************************************************************/
@@ -65,11 +108,11 @@ void ApiEndpoint::requestLibraryList(const QUrl& url) const noexcept {
   connect(request, &NetworkRequest::errored, this,
           &ApiEndpoint::errorWhileFetchingLibraryList, Qt::QueuedConnection);
   connect(request, &NetworkRequest::dataReceived, this,
-          &ApiEndpoint::requestedDataReceived, Qt::QueuedConnection);
+          &ApiEndpoint::libraryListResponseReceived, Qt::QueuedConnection);
   request->start();
 }
 
-void ApiEndpoint::requestedDataReceived(const QByteArray& data) noexcept {
+void ApiEndpoint::libraryListResponseReceived(const QByteArray& data) noexcept {
   QJsonDocument doc = QJsonDocument::fromJson(data);
   if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
     emit errorWhileFetchingLibraryList(
@@ -96,6 +139,28 @@ void ApiEndpoint::requestedDataReceived(const QByteArray& data) noexcept {
     return;
   }
   emit libraryListReceived(reposVal.toArray());
+}
+
+void ApiEndpoint::partsInformationStatusResponseReceived(
+    const QByteArray& data) noexcept {
+  QJsonDocument doc = QJsonDocument::fromJson(data);
+  if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+    emit errorWhileFetchingPartsInformation(
+        tr("Received JSON object is not valid."));
+    return;
+  }
+  emit partsInformationStatusReceived(doc.object());
+}
+
+void ApiEndpoint::partsInformationResponseReceived(
+    const QByteArray& data) noexcept {
+  QJsonDocument doc = QJsonDocument::fromJson(data);
+  if (doc.isNull() || doc.isEmpty() || (!doc.isObject())) {
+    emit errorWhileFetchingPartsInformation(
+        tr("Received JSON object is not valid."));
+    return;
+  }
+  emit partsInformationReceived(doc.object());
 }
 
 /*******************************************************************************

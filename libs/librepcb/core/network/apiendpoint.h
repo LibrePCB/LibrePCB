@@ -43,6 +43,12 @@ class ApiEndpoint final : public QObject {
   Q_OBJECT
 
 public:
+  // Types
+  struct Part {
+    QString mpn;
+    QString manufacturer;
+  };
+
   // Constructors / Destructor
   ApiEndpoint() = delete;
   ApiEndpoint(const ApiEndpoint& other) = delete;
@@ -54,6 +60,9 @@ public:
 
   // General Methods
   void requestLibraryList() const noexcept;
+  void requestPartsInformationStatus() const noexcept;
+  void requestPartsInformation(const QUrl& url,
+                               const QVector<Part>& parts) const noexcept;
 
   // Operators
   ApiEndpoint& operator=(const ApiEndpoint& rhs) = delete;
@@ -61,10 +70,16 @@ public:
 signals:
   void libraryListReceived(const QJsonArray& libs);
   void errorWhileFetchingLibraryList(const QString& errorMsg);
+  void errorWhileFetchingPartsInformationStatus(const QString& errorMsg);
+  void partsInformationStatusReceived(const QJsonObject& status);
+  void partsInformationReceived(const QJsonObject& info);
+  void errorWhileFetchingPartsInformation(const QString& errorMsg);
 
 private:  // Methods
   void requestLibraryList(const QUrl& url) const noexcept;
-  void requestedDataReceived(const QByteArray& data) noexcept;
+  void libraryListResponseReceived(const QByteArray& data) noexcept;
+  void partsInformationStatusResponseReceived(const QByteArray& data) noexcept;
+  void partsInformationResponseReceived(const QByteArray& data) noexcept;
 
 private:  // Data
   QUrl mUrl;

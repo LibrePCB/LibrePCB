@@ -737,6 +737,8 @@ add_library(
   project/outputjobsdialog/projectjsonoutputjobwidget.cpp
   project/outputjobsdialog/projectjsonoutputjobwidget.h
   project/outputjobsdialog/projectjsonoutputjobwidget.ui
+  project/partinformationprovider.cpp
+  project/partinformationprovider.h
   project/projecteditor.cpp
   project/projecteditor.h
   project/projectsetupdialog.cpp
