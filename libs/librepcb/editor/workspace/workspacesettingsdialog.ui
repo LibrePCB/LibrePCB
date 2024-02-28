@@ -770,6 +770,16 @@ To completely disable Internet access, just remove all entries.&lt;/p&gt;
          </attribute>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="cbxAutofetchLivePartInformation">
+         <property name="toolTip">
+          <string>&lt;p&gt;Allow the editors to automatically display live information about parts (lifecycle status, stock availability, price, ...) by requesting it from the configured API endpoints.&lt;/p&gt;&lt;p&gt;This may generate many API requests, especially while adding components to schematics.&lt;/p&gt;&lt;p&gt;If this feature is disabled, no such API requests are made (and no live information is displayed) without explicit user interaction.&lt;/p&gt;</string>
+         </property>
+         <property name="text">
+          <string>Auto-Fetch Live Part Information</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>

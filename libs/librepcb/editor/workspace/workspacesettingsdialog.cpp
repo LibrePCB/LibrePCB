@@ -674,8 +674,12 @@ void WorkspaceSettingsDialog::loadSettings() noexcept {
   // Library Norm Order
   mLibNormOrderModel->setValues(mSettings.libraryNormOrder.get());
 
-  // API endpoints
+  // API Endpoints
   mApiEndpointModel->setValues(mSettings.apiEndpoints.get());
+
+  // Auto-Fetch Live Part Information
+  mUi->cbxAutofetchLivePartInformation->setChecked(
+      mSettings.autofetchLivePartInformation.get());
 
   // External Applications
   for (auto& app : mExternalApplications) {
@@ -723,8 +727,12 @@ void WorkspaceSettingsDialog::saveSettings() noexcept {
     // Library Norm Order
     mSettings.libraryNormOrder.set(mLibNormOrderModel->getValues());
 
-    // API endpoints
+    // API Endpoints
     mSettings.apiEndpoints.set(mApiEndpointModel->getValues());
+
+    // Auto-Fetch Live Part Information
+    mSettings.autofetchLivePartInformation.set(
+        mUi->cbxAutofetchLivePartInformation->isChecked());
 
     // External Applications
     for (auto& app : mExternalApplications) {
