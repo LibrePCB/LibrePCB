@@ -271,7 +271,8 @@ const Symbol& EagleProjectImport::importLibrarySymbol(
     const parseagle::Symbol& eagleSymbol = getSymbol(eagleLib, symName);
     MessageLogger log(mLogger.get(), eagleSymbol.getName());
     std::unique_ptr<Symbol> sym =
-        converter.createSymbol(eagleLib.getEmbeddedName(), eagleSymbol, log);
+        converter.createSymbol(eagleLib.getEmbeddedName(),
+                               eagleLib.getEmbeddedUrn(), eagleSymbol, log);
     it = mLibSymbolMap.insert(key, sym->getUuid());
     library.addSymbol(*sym.release());
   }
@@ -296,7 +297,8 @@ const Component& EagleProjectImport::importLibraryComponent(
     }
     MessageLogger log(mLogger.get(), eagleDevSet.getName());
     std::unique_ptr<Component> cmp =
-        converter.createComponent(eagleLib.getEmbeddedName(), eagleDevSet, log);
+        converter.createComponent(eagleLib.getEmbeddedName(),
+                                  eagleLib.getEmbeddedUrn(), eagleDevSet, log);
     if ((cmp->getSymbolVariants().count() != 1) ||
         (cmp->getSymbolVariants().first()->getSymbolItems().count() !=
          eagleDevSet.getGates().count())) {
@@ -328,7 +330,8 @@ const Package& EagleProjectImport::importLibraryPackage(
     const parseagle::Package& eaglePackage = getPackage(eagleLib, pkgName);
     MessageLogger log(mLogger.get(), eaglePackage.getName());
     std::unique_ptr<Package> pkg =
-        converter.createPackage(eagleLib.getEmbeddedName(), eaglePackage, log);
+        converter.createPackage(eagleLib.getEmbeddedName(),
+                                eagleLib.getEmbeddedUrn(), eaglePackage, log);
     it = mLibPackageMap.insert(key, pkg->getUuid());
     library.addPackage(*pkg.release());
   }
@@ -353,7 +356,8 @@ const Device& EagleProjectImport::importLibraryDevice(
                          eagleDev.getPackage());
     MessageLogger log(mLogger.get(), eagleDev.getName());
     std::unique_ptr<Device> dev = converter.createDevice(
-        eagleLib.getEmbeddedName(), eagleDevSet, eagleDev, log);
+        eagleLib.getEmbeddedName(), eagleLib.getEmbeddedUrn(), eagleDevSet,
+        eagleDev, log);
     it = mLibDeviceMap.insert(key, dev->getUuid());
     library.addDevice(*dev.release());
   }
@@ -531,8 +535,8 @@ void EagleProjectImport::importSchematic(Project& project,
           }
           const parseagle::Part& part = getPart(eaglePinRef.getPart());
           const Uuid sigUuid = converter.getComponentSignalOfSymbolPin(
-              part.getLibrary(), part.getDeviceSet(), eaglePinRef.getGate(),
-              eaglePinRef.getPin());
+              part.getLibrary(), part.getLibraryUrn(), part.getDeviceSet(),
+              eaglePinRef.getGate(), eaglePinRef.getPin());
           ComponentSignalInstance* cmpSigInst =
               cmpInst->getSignalInstance(sigUuid);
           if (!cmpSigInst) {

@@ -335,8 +335,8 @@ void EagleLibraryImport::run() noexcept {
     MessageLogger log(globalLog.get(), sym.displayName);
     try {
       emit progressStatus(sym.displayName);
-      auto symbol =
-          converter.createSymbol(QString(), *sym.symbol, log);  // can throw
+      auto symbol = converter.createSymbol(QString(), QString(), *sym.symbol,
+                                           log);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Symbol::getShortElementName())
@@ -360,8 +360,8 @@ void EagleLibraryImport::run() noexcept {
     MessageLogger log(globalLog.get(), pkg.displayName);
     try {
       emit progressStatus(pkg.displayName);
-      auto package =
-          converter.createPackage(QString(), *pkg.package, log);  // can throw
+      auto package = converter.createPackage(QString(), QString(), *pkg.package,
+                                             log);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Package::getShortElementName())
@@ -385,8 +385,9 @@ void EagleLibraryImport::run() noexcept {
     MessageLogger log(globalLog.get(), cmp.displayName);
     try {
       emit progressStatus(cmp.displayName);
-      auto component = converter.createComponent(QString(), *cmp.deviceSet,
-                                                 log);  // can throw
+      auto component =
+          converter.createComponent(QString(), QString(), *cmp.deviceSet,
+                                    log);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp
               .getPathTo(librepcb::Component::getShortElementName())
@@ -410,7 +411,7 @@ void EagleLibraryImport::run() noexcept {
     MessageLogger log(globalLog.get(), dev.displayName);
     try {
       emit progressStatus(dev.displayName);
-      auto device = converter.createDevice(QString(), *dev.deviceSet,
+      auto device = converter.createDevice(QString(), QString(), *dev.deviceSet,
                                            *dev.device, log);  // can throw
       TransactionalDirectory dir(TransactionalFileSystem::openRW(
           mDestinationLibraryFp

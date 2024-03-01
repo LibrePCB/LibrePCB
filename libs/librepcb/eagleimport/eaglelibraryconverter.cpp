@@ -71,17 +71,17 @@ EagleLibraryConverter::~EagleLibraryConverter() noexcept {
  ******************************************************************************/
 
 Uuid EagleLibraryConverter::getComponentSignalOfSymbolPin(
-    const QString& libName, const QString& devSetName, const QString& gateName,
-    const QString& pinName) const {
-  auto uuid = mComponentSignalMap[std::make_pair(libName, devSetName)][gateName]
-                                 [pinName];
-  if (!uuid) {
+    const QString& libName, const QString& libUrn, const QString& devSetName,
+    const QString& gateName, const QString& pinName) const {
+  const QStringList key = {libName, libUrn, devSetName, gateName, pinName};
+  if (auto uuid = mComponentSignalMap.value(key)) {
+    return *uuid;
+  } else {
     throw RuntimeError(
         __FILE__, __LINE__,
         QString("Could not find component signal from pin name: %1")
             .arg(pinName));
   }
-  return *uuid;
 }
 
 /*******************************************************************************
@@ -98,9 +98,9 @@ void EagleLibraryConverter::reset() noexcept {
 }
 
 std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
-    const QString& libName, const parseagle::Symbol& eagleSymbol,
-    MessageLogger& log) {
-  const auto key = std::make_pair(libName, eagleSymbol.getName());
+    const QString& libName, const QString& libUrn,
+    const parseagle::Symbol& eagleSymbol, MessageLogger& log) {
+  const QStringList key = {libName, libUrn, eagleSymbol.getName()};
   if (mSymbolMap.contains(key)) {
     throw LogicError(__FILE__, __LINE__, "Duplicate import.");
   }
@@ -208,9 +208,9 @@ std::unique_ptr<Symbol> EagleLibraryConverter::createSymbol(
 }
 
 std::unique_ptr<Package> EagleLibraryConverter::createPackage(
-    const QString& libName, const parseagle::Package& eaglePackage,
-    MessageLogger& log) {
-  const auto key = std::make_pair(libName, eaglePackage.getName());
+    const QString& libName, const QString& libUrn,
+    const parseagle::Package& eaglePackage, MessageLogger& log) {
+  const QStringList key = {libName, libUrn, eaglePackage.getName()};
   if (mPackageMap.contains(key)) {
     throw LogicError(__FILE__, __LINE__, "Duplicate import.");
   }
@@ -309,8 +309,8 @@ std::unique_ptr<Package> EagleLibraryConverter::createPackage(
 }
 
 std::unique_ptr<Component> EagleLibraryConverter::createComponent(
-    const QString& libName, const parseagle::DeviceSet& eagleDeviceSet,
-    MessageLogger& log) {
+    const QString& libName, const QString& libUrn,
+    const parseagle::DeviceSet& eagleDeviceSet, MessageLogger& log) {
   Q_UNUSED(log);
   const QMap<parseagle::PinVisibility, const CmpSigPinDisplayType*>
       displayTypeMap = {
@@ -333,7 +333,7 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
       {parseagle::PinDirection::Supply, &SignalRole::passive()},
   };
 
-  const auto key = std::make_pair(libName, eagleDeviceSet.getName());
+  const QStringList key = {libName, libUrn, eagleDeviceSet.getName()};
   if (mComponentMap.contains(key)) {
     throw LogicError(__FILE__, __LINE__, "Duplicate import.");
   }
@@ -353,7 +353,7 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
   component->getSymbolVariants().append(symbolVariant);
   QHash<QString, int> pinCount;
   foreach (const auto& gate, eagleDeviceSet.getGates()) {
-    const auto symbolKey = std::make_pair(libName, gate.getSymbol());
+    const QStringList symbolKey = {libName, libUrn, gate.getSymbol()};
     for (auto pinIt = mSymbolPinMap[symbolKey].constBegin();
          pinIt != mSymbolPinMap[symbolKey].constEnd(); pinIt++) {
       pinCount[pinIt.key()]++;
@@ -361,7 +361,7 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
   }
   const bool addGateSuffixes = eagleDeviceSet.getGates().count() > 1;
   foreach (const auto& gate, eagleDeviceSet.getGates()) {
-    const auto symbolKey = std::make_pair(libName, gate.getSymbol());
+    const QStringList symbolKey = {libName, libUrn, gate.getSymbol()};
     const tl::optional<Uuid> symbolUuid = mSymbolMap.value(symbolKey);
     if (!symbolUuid) {
       throw RuntimeError(
@@ -404,7 +404,8 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
       item->getPinSignalMap().append(
           std::make_shared<ComponentPinSignalMapItem>(pinIt->second.value(),
                                                       signalUuid, displayType));
-      mComponentSignalMap[key][gate.getName()][pinIt.key()] = signalUuid;
+      mComponentSignalMap[key + QStringList{gate.getName(), pinIt.key()}] =
+          signalUuid;
     }
   }
   // If the device set has no package at all, we consider it as a schematic-only
@@ -421,17 +422,18 @@ std::unique_ptr<Component> EagleLibraryConverter::createComponent(
 }
 
 std::unique_ptr<Device> EagleLibraryConverter::createDevice(
-    const QString& libName, const parseagle::DeviceSet& eagleDeviceSet,
+    const QString& libName, const QString& libUrn,
+    const parseagle::DeviceSet& eagleDeviceSet,
     const parseagle::Device& eagleDevice, MessageLogger& log) {
   Q_UNUSED(log);
-  const auto componentKey = std::make_pair(libName, eagleDeviceSet.getName());
+  const QStringList componentKey = {libName, libUrn, eagleDeviceSet.getName()};
   const tl::optional<Uuid> componentUuid = mComponentMap.value(componentKey);
   if (!componentUuid) {
     throw RuntimeError(__FILE__, __LINE__,
                        tr("Dependent component \"%1\" not imported.")
                            .arg(eagleDeviceSet.getName()));
   }
-  const auto packageKey = std::make_pair(libName, eagleDevice.getPackage());
+  const QStringList packageKey = {libName, libUrn, eagleDevice.getPackage()};
   const tl::optional<Uuid> packageUuid = mPackageMap.value(packageKey);
   if (!packageUuid) {
     throw RuntimeError(__FILE__, __LINE__,
@@ -450,8 +452,9 @@ std::unique_ptr<Device> EagleLibraryConverter::createDevice(
     tl::optional<Uuid> signalUuid;
     foreach (const auto& connection, eagleDevice.getConnections()) {
       if (connection.getPads().contains(padIt.key())) {
-        signalUuid = mComponentSignalMap[componentKey][connection.getGate()]
-                                        [connection.getPin()];
+        signalUuid = mComponentSignalMap[componentKey +
+                                         QStringList{connection.getGate(),
+                                                     connection.getPin()}];
       }
     }
     device->getPadSignalMap().append(

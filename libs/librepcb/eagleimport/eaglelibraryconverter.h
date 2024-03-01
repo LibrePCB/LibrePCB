@@ -94,6 +94,7 @@ public:
 
   // Getters
   Uuid getComponentSignalOfSymbolPin(const QString& libName,
+                                     const QString& libUrn,
                                      const QString& devSetName,
                                      const QString& gateName,
                                      const QString& pinName) const;
@@ -101,16 +102,19 @@ public:
   // General Methods
   void reset() noexcept;
   std::unique_ptr<Symbol> createSymbol(const QString& libName,
+                                       const QString& libUrn,
                                        const parseagle::Symbol& eagleSymbol,
                                        MessageLogger& log);
   std::unique_ptr<Package> createPackage(const QString& libName,
+                                         const QString& libUrn,
                                          const parseagle::Package& eaglePackage,
                                          MessageLogger& log);
   std::unique_ptr<Component> createComponent(
-      const QString& libName, const parseagle::DeviceSet& eagleDeviceSet,
-      MessageLogger& log);
+      const QString& libName, const QString& libUrn,
+      const parseagle::DeviceSet& eagleDeviceSet, MessageLogger& log);
   std::unique_ptr<Device> createDevice(
-      const QString& libName, const parseagle::DeviceSet& eagleDeviceSet,
+      const QString& libName, const QString& libUrn,
+      const parseagle::DeviceSet& eagleDeviceSet,
       const parseagle::Device& eagleDevice, MessageLogger& log);
 
   // Operator Overloadings
@@ -124,36 +128,32 @@ private:  // Data
 
   // State
 
-  /// Key: (Library Name, Symbol Name)
+  /// Key: [Library Name, Library URN, Symbol Name]
   /// Value: LibrePCB Symbol UUID
-  QHash<std::pair<QString, QString>, tl::optional<Uuid> > mSymbolMap;
+  QHash<QStringList, tl::optional<Uuid> > mSymbolMap;
 
-  /// Key: (Library Name, Symbol Name) | Pin Name
+  /// Key: [Library Name, Library URN, Symbol Name] | Pin Name
   /// Value: (EAGLE Pin Object, LibrePCB Symbol Pin UUID)
-  QHash<
-      std::pair<QString, QString>,
-      QHash<QString,
-            std::pair<std::shared_ptr<parseagle::Pin>, tl::optional<Uuid> > > >
+  QHash<QStringList,
+        QMap<QString,
+             std::pair<std::shared_ptr<parseagle::Pin>, tl::optional<Uuid> > > >
       mSymbolPinMap;
 
-  /// Key: (Library Name, Package Name)
+  /// Key: [Library Name, Library URN, Package Name]
   /// Value: LibrePCB Package UUID
-  QHash<std::pair<QString, QString>, tl::optional<Uuid> > mPackageMap;
+  QHash<QStringList, tl::optional<Uuid> > mPackageMap;
 
-  /// Key: (Library Name, Package Name) | Pad Name
+  /// Key: [Library Name, Library URN, Package Name] | Pad Name
   /// Value: LibrePCB Package Pad UUID
-  QHash<std::pair<QString, QString>, QHash<QString, tl::optional<Uuid> > >
-      mPackagePadMap;
+  QHash<QStringList, QMap<QString, tl::optional<Uuid> > > mPackagePadMap;
 
-  /// Key: (Library Name, Device Set Name)
+  /// Key: [Library Name, Library URN, Device Set Name]
   /// Value: LibrePCB Component UUID
-  QHash<std::pair<QString, QString>, tl::optional<Uuid> > mComponentMap;
+  QHash<QStringList, tl::optional<Uuid> > mComponentMap;
 
-  /// Key: (Library Name, Device Set Name) | Gate Name | Pin Name
+  /// Key: [Library Name, Library URN, Device Set Name, Gate Name, Pin Name]
   /// Value: LibrePCB Component Signal UUID
-  QHash<std::pair<QString, QString>,
-        QHash<QString, QHash<QString, tl::optional<Uuid> > > >
-      mComponentSignalMap;
+  QHash<QStringList, tl::optional<Uuid> > mComponentSignalMap;
 };
 
 /*******************************************************************************
