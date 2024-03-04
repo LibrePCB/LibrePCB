@@ -9,6 +9,7 @@ jobs:
       CCACHE_DIR: $(Pipeline.Workspace)/.ccache
       CMAKE_CXX_COMPILER_LAUNCHER: ccache
       CMAKE_GENERATOR: 'Ninja'
+      FUNQ_MAKE_PATH: 'ninja'
     strategy:
       matrix:
         Qt_5_15_MinGW_32bit:

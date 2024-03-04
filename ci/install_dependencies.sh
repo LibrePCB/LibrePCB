@@ -76,8 +76,6 @@ then
 else
   # Extending PATH does not work, thus installing Python packages globally
   PIP_USER_INSTALL=""
-  # Set custom "make" command for building Funq
-  export FUNQ_MAKE_PATH="mingw32-make"
 fi
 
 # Install Python packages
