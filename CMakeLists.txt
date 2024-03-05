@@ -166,6 +166,9 @@ if(BUILD_TESTS)
 endif()
 message(STATUS "Building with Qt${Qt5Core_VERSION}")
 
+# For the ParsEagle library, use the same Qt version as for LibrePCB
+set(PARSEAGLE_QT_MAJOR_VERSION 5)
+
 # Find third party libraries
 find_package(DelaunayTriangulation REQUIRED)
 find_package(Dxflib REQUIRED)
