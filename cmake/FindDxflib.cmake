@@ -11,6 +11,9 @@ if(EXISTS "${DXFLIB_SUBMODULE_BASEPATH}"
     EXCLUDE_FROM_ALL
   )
 
+  # Disable deprecation warnings since they are not under our control.
+  target_compile_options(dxflib PRIVATE -Wno-deprecated-declarations)
+
   # Stop here, we're done
   return()
 endif()

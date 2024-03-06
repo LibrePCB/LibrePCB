@@ -25,6 +25,9 @@ if(EXISTS "${MUPARSER_SUBMODULE_BASEPATH}"
     EXCLUDE_FROM_ALL
   )
 
+  # Disable deprecation warnings since they are not under our control.
+  target_compile_options(muparser PRIVATE -Wno-deprecated-declarations)
+
   # Alias lib to namespaced variant
   add_library(MuParser::MuParser ALIAS muparser)
 

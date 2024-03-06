@@ -111,6 +111,20 @@ if(WIN32)
   add_definitions(-DUNICODE -D_UNICODE)
 endif()
 
+# Disable Qt functions which are deprecated in Qt <= 5.5 to enforce us
+# migrating away from them. Always set this to the lowest Qt version we want
+# to support.
+add_definitions(-DQT_DISABLE_DEPRECATED_BEFORE=0x050500)
+
+# Not sure what we should do with deprecation warnings. Better keeping
+# backwards compatibility with already existing & supported environments
+# instead of forward compatibility with not yet existing environments, no?
+add_definitions(
+  -DQT_NO_DEPRECATED_WARNINGS # Qt
+  -DGL_SILENCE_DEPRECATION # OpenGL
+  -DOCCT_NO_DEPRECATED # OpenCascade
+)
+
 # Find required Qt packages
 find_package(
   Qt5 5.5.0
@@ -140,15 +154,6 @@ if(BUILD_TESTS)
   )
 endif()
 message(STATUS "Building with Qt${Qt5Core_VERSION}")
-
-# In Qt 5.15, a lot of things were marked as deprecated, without providing
-# alternatives available in previous Qt versions. It would require a lot of
-# preprocessor conditionals to avoid these deprecation warnings, so let's just
-# disable them for now. We are using CI anyway to ensure LibrePCB compiles with
-# the targeted Qt versions.
-if("${Qt5Core_VERSION_MAJOR}.${Qt5Core_VERSION_MINOR}" VERSION_GREATER 5.14)
-  target_compile_options(common INTERFACE -Wno-deprecated-declarations)
-endif()
 
 # Find third party libraries
 find_package(DelaunayTriangulation REQUIRED)
