@@ -27,9 +27,12 @@
 #include "../graphics/graphicsscene.h"
 #include "../library/pkg/footprintgraphicsitem.h"
 #include "../library/sym/symbolgraphicsitem.h"
+#include "../modelview/partinformationdelegate.h"
 #include "../widgets/graphicsview.h"
 #include "../widgets/waitingspinnerwidget.h"
 #include "../workspace/categorytreemodel.h"
+#include "../workspace/desktopservices.h"
+#include "partinformationtooltip.h"
 #include "ui_addcomponentdialog.h"
 
 #include <librepcb/core/application.h>
@@ -40,8 +43,10 @@
 #include <librepcb/core/library/dev/device.h>
 #include <librepcb/core/library/pkg/package.h>
 #include <librepcb/core/library/sym/symbol.h>
+#include <librepcb/core/utils/scopeguard.h>
 #include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 
 #include <QtCore>
 #include <QtWidgets>
@@ -57,19 +62,27 @@ namespace editor {
  ******************************************************************************/
 
 AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
+                                       const WorkspaceSettings& settings,
                                        const QStringList& localeOrder,
                                        const QStringList& normOrder,
-                                       const Theme& theme, QWidget* parent)
+                                       QWidget* parent)
   : QDialog(parent),
     mDb(db),
+    mSettings(settings),
     mLocaleOrder(localeOrder),
     mNormOrder(normOrder),
     mUi(new Ui::AddComponentDialog),
     mComponentPreviewScene(new GraphicsScene()),
     mDevicePreviewScene(new GraphicsScene()),
-    mGraphicsLayerProvider(new DefaultGraphicsLayerProvider(theme)),
+    mGraphicsLayerProvider(
+        new DefaultGraphicsLayerProvider(mSettings.themes.getActive())),
     mCategoryTreeModel(new CategoryTreeModel(
         mDb, mLocaleOrder, CategoryTreeModel::Filter::CmpCatWithComponents)),
+    mPartToolTip(new PartInformationToolTip(mSettings, this)),
+    mPartInfoProgress(0),
+    mUpdatePartInformationScheduled(false),
+    mUpdatePartInformationDownloadStart(0),
+    mUpdatePartInformationOnExpand(true),
     mCurrentSearchTerm(),
     mSelectedComponent(nullptr),
     mSelectedSymbVar(nullptr),
@@ -78,13 +91,18 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
     mSelectedPart(nullptr),
     mPreviewFootprintGraphicsItem(nullptr) {
   mUi->setupUi(this);
-  mUi->treeComponents->setColumnCount(2);
+  mUi->treeComponents->setColumnCount(3);
   mUi->treeComponents->header()->setStretchLastSection(false);
   mUi->treeComponents->header()->setSectionResizeMode(
       0, QHeaderView::ResizeToContents);
   mUi->treeComponents->header()->setSectionResizeMode(1, QHeaderView::Stretch);
+  mUi->treeComponents->header()->setSectionResizeMode(
+      2, QHeaderView::ResizeToContents);
+  mUi->treeComponents->header()->setMinimumSectionSize(0);
+  mUi->treeComponents->setItemDelegateForColumn(
+      2, new PartInformationDelegate(true, this));
+  mUi->treeComponents->setColumnHidden(2, true);
   mUi->lblCompDescription->hide();
-  mUi->lblSymbVar->hide();
   mUi->cbxSymbVar->hide();
   connect(mUi->edtSearch, &QLineEdit::textChanged, this,
           &AddComponentDialog::searchEditTextChanged);
@@ -92,18 +110,55 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
           &AddComponentDialog::treeComponents_currentItemChanged);
   connect(mUi->treeComponents, &QTreeWidget::itemDoubleClicked, this,
           &AddComponentDialog::treeComponents_itemDoubleClicked);
+  connect(mUi->treeComponents, &QTreeWidget::itemExpanded, this,
+          &AddComponentDialog::treeComponents_itemExpanded);
   connect(
       mUi->cbxSymbVar,
       static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
       this, &AddComponentDialog::cbxSymbVar_currentIndexChanged);
   connect(&mDb, &WorkspaceLibraryDb::scanSucceeded, this, [this]() {
-    // Update component tree view since there might be new DB entries. But for
-    // now very fundamental since keeping the selection is not implemented yet.
+    // Update component tree view since there might be new DB entries.
+    // But for now very fundamental since keeping the selection is not
+    // implemented yet.
     if ((!mCurrentSearchTerm.isEmpty()) &&
         (!mUi->treeComponents->currentItem())) {
       selectComponentByKeyword(mCurrentSearchTerm);
     }
   });
+
+  // Setup part information tooltip.
+  auto setProviderInfo = [this]() {
+    mPartToolTip->setProviderInfo(
+        PartInformationProvider::instance().getProviderName(),
+        PartInformationProvider::instance().getProviderUrl(),
+        PartInformationProvider::instance().getProviderLogo(),
+        PartInformationProvider::instance().getInfoUrl());
+  };
+  setProviderInfo();
+  connect(&PartInformationProvider::instance(),
+          &PartInformationProvider::providerInfoChanged, this, setProviderInfo);
+  mUi->treeComponents->setMouseTracking(true);
+  mUi->treeComponents->installEventFilter(this);
+  mPartToolTip->installEventFilter(this);
+  connect(mUi->treeComponents, &QTreeWidget::itemEntered, this,
+          [this](QTreeWidgetItem* item, int column) {
+            if (item && (column == 2)) {
+              const auto data = item->data(2, Qt::UserRole)
+                                    .value<PartInformationDelegate::Data>();
+              if (data.info && (data.info->results == 1)) {
+                const QRect rect =
+                    mUi->treeComponents->visualItemRect(item).intersected(
+                        mUi->treeComponents->viewport()->rect());
+                const QPoint pos = mUi->treeComponents->viewport()->mapToGlobal(
+                    QPoint(rect.right(), rect.center().y()));
+                mPartToolTip->showPart(data.info, pos);
+              } else {
+                mPartToolTip->hideAndReset(false);
+              }
+            } else {
+              mPartToolTip->hideAndReset();
+            }
+          });
 
   // Add actions.
   const EditorCommandSet& cmd = EditorCommandSet::instance();
@@ -112,6 +167,7 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
   }));
 
   // Setup symbol graphics view.
+  const Theme& theme = mSettings.themes.getActive();
   mUi->viewComponent->setBackgroundColors(
       theme.getColor(Theme::Color::sSchematicBackground).getPrimaryColor(),
       theme.getColor(Theme::Color::sSchematicBackground).getSecondaryColor());
@@ -133,16 +189,37 @@ AddComponentDialog::AddComponentDialog(const WorkspaceLibraryDb& db,
           &AddComponentDialog::treeCategories_currentItemChanged);
 
   // Add waiting spinner during workspace library scan.
-  auto addSpinner = [&db](QWidget* widget) {
+  auto addSpinner = [this](QWidget* widget) {
     WaitingSpinnerWidget* spinner = new WaitingSpinnerWidget(widget);
-    connect(&db, &WorkspaceLibraryDb::scanStarted, spinner,
+    connect(&mDb, &WorkspaceLibraryDb::scanStarted, spinner,
             &WaitingSpinnerWidget::show);
-    connect(&db, &WorkspaceLibraryDb::scanFinished, spinner,
+    connect(&mDb, &WorkspaceLibraryDb::scanFinished, spinner,
             &WaitingSpinnerWidget::hide);
-    spinner->setVisible(db.isScanInProgress());
+    spinner->setVisible(mDb.isScanInProgress());
   };
   addSpinner(mUi->treeCategories);
   addSpinner(mUi->treeComponents);
+
+  // Setup automatic update of parts information.
+  QTimer* partInfoTimer = new QTimer(this);
+  partInfoTimer->setInterval(250);
+  connect(partInfoTimer, &QTimer::timeout, this, [this]() {
+    ++mPartInfoProgress;
+    if (mUpdatePartInformationScheduled) {
+      updatePartsInformation();
+    }
+  });
+  partInfoTimer->start();
+  connect(mUi->treeComponents->horizontalScrollBar(), &QScrollBar::valueChanged,
+          this, &AddComponentDialog::schedulePartsInformationUpdate);
+  connect(mUi->treeComponents->verticalScrollBar(), &QScrollBar::valueChanged,
+          this, &AddComponentDialog::schedulePartsInformationUpdate);
+  connect(&PartInformationProvider::instance(),
+          &PartInformationProvider::serviceOperational, this,
+          &AddComponentDialog::schedulePartsInformationUpdate);
+  connect(&PartInformationProvider::instance(),
+          &PartInformationProvider::newPartsInformationAvailable, this,
+          &AddComponentDialog::schedulePartsInformationUpdate);
 
   // Reset GUI to state of nothing selected.
   setSelectedComponent(nullptr);
@@ -210,6 +287,27 @@ void AddComponentDialog::selectComponentByKeyword(
     qCritical().noquote() << "Failed to pre-select component by keyword:"
                           << e.getMsg();
   }
+}
+
+bool AddComponentDialog::eventFilter(QObject* obj, QEvent* e) noexcept {
+  if (mPartToolTip && (e->type() == QEvent::Leave) &&
+      ((!mPartToolTip->isVisible()) ||
+       ((!mPartToolTip->rect().contains(
+           mPartToolTip->mapFromGlobal(QCursor::pos())))))) {
+    mPartToolTip->hideAndReset();
+  }
+  return QDialog::eventFilter(obj, e);
+}
+
+/*******************************************************************************
+ *  Protected Methods
+ ******************************************************************************/
+
+bool AddComponentDialog::event(QEvent* event) noexcept {
+  if (event->type() == QEvent::Resize) {
+    schedulePartsInformationUpdate();
+  }
+  return QDialog::event(event);
 }
 
 /*******************************************************************************
@@ -304,9 +402,23 @@ void AddComponentDialog::treeComponents_currentItemChanged(
 
 void AddComponentDialog::treeComponents_itemDoubleClicked(QTreeWidgetItem* item,
                                                           int column) noexcept {
-  Q_UNUSED(column);
-  if (item && item->parent())
-    accept();  // only accept device items (not components)
+  if (item && item->parent() && item->parent()->parent() && (column == 2)) {
+    const auto data =
+        item->data(2, Qt::UserRole).value<PartInformationDelegate::Data>();
+    if (data.info && data.info->pricingUrl.isValid()) {
+      DesktopServices ds(mSettings, this);
+      ds.openWebUrl(data.info->pricingUrl);
+    }
+  } else if (item) {
+    accept();
+  }
+}
+
+void AddComponentDialog::treeComponents_itemExpanded(
+    QTreeWidgetItem* item) noexcept {
+  if (mUpdatePartInformationOnExpand && item && (item->childCount() > 0)) {
+    updatePartsInformation();
+  }
 }
 
 void AddComponentDialog::cbxSymbVar_currentIndexChanged(int index) noexcept {
@@ -333,6 +445,11 @@ void AddComponentDialog::searchComponents(
   mCurrentSearchTerm = input;
   setSelectedComponent(nullptr);
   mUi->treeComponents->clear();
+
+  // Temporarily disable update on expand for performance reasons.
+  mUpdatePartInformationOnExpand = false;
+  auto disableExpandSg =
+      scopeGuard([this]() { mUpdatePartInformationOnExpand = true; });
 
   QTreeWidgetItem* selectedDeviceItem = nullptr;
 
@@ -410,6 +527,10 @@ void AddComponentDialog::searchComponents(
       mUi->treeComponents->setCurrentItem(item);
     }
   }
+
+  // Delay parts information download, but show cached information immediately
+  // to avoid flicker.
+  updatePartsInformation(1200);
 }
 
 AddComponentDialog::SearchResult AddComponentDialog::search(
@@ -487,7 +608,8 @@ AddComponentDialog::SearchResult AddComponentDialog::search(
       parts = mDb.getDeviceParts(devUuid);  // can throw
     } else {
       // List only matched parts of device.
-      parts = mDb.findPartsOfDevice(devUuid, input);  // can throw
+      parts = mDb.findPartsOfDevice(devUuid,
+                                    input);  // can throw
     }
     foreach (const WorkspaceLibraryDb::Part& part, parts) {
       resDev.parts.append(std::make_shared<Part>(
@@ -599,6 +721,10 @@ void AddComponentDialog::setSelectedCategory(
   }
 
   mUi->treeComponents->sortByColumn(0, Qt::AscendingOrder);
+
+  // Delay parts information download, but show cached information immediately
+  // to avoid flicker.
+  updatePartsInformation(1000);
 }
 
 void AddComponentDialog::setSelectedComponent(
@@ -630,7 +756,6 @@ void AddComponentDialog::setSelectedComponent(
     }
   }
 
-  mUi->lblSymbVar->setVisible(mUi->cbxSymbVar->count() > 1);
   mUi->cbxSymbVar->setVisible(mUi->cbxSymbVar->count() > 1);
   mUi->lblCompDescription->setVisible(
       !mUi->lblCompDescription->text().isEmpty());
@@ -724,6 +849,96 @@ void AddComponentDialog::addPartItem(std::shared_ptr<Part> part,
   QFont font = item->font(1);
   font.setItalic(true);
   item->setFont(1, font);
+}
+
+void AddComponentDialog::schedulePartsInformationUpdate() noexcept {
+  mUpdatePartInformationScheduled = true;
+}
+
+void AddComponentDialog::updatePartsInformation(int downloadDelayMs) noexcept {
+  if (!mSettings.autofetchLivePartInformation.get()) {
+    return;
+  }
+
+  if (!PartInformationProvider::instance().isOperational()) {
+    PartInformationProvider::instance().startOperation();
+    return;
+  }
+
+  const qint64 ts = QDateTime::currentMSecsSinceEpoch();
+  if ((ts + downloadDelayMs) > mUpdatePartInformationDownloadStart) {
+    mUpdatePartInformationDownloadStart = ts + downloadDelayMs;
+  }
+  const bool doRequest = (ts >= mUpdatePartInformationDownloadStart);
+
+  mUi->treeComponents->setColumnHidden(2, false);
+  mUpdatePartInformationScheduled = false;
+
+  bool ok = true;
+  const QRectF viewRect = mUi->treeComponents->viewport()->rect();
+  for (int i = 0; (i < mUi->treeComponents->topLevelItemCount()) && ok; ++i) {
+    QTreeWidgetItem* cmpItem = mUi->treeComponents->topLevelItem(i);
+    if (!cmpItem->isExpanded()) continue;
+    for (int k = 0; (k < cmpItem->childCount()) && ok; ++k) {
+      QTreeWidgetItem* devItem = cmpItem->child(k);
+      if (!devItem->isExpanded()) continue;
+      for (int m = 0; (m < devItem->childCount()) && ok; ++m) {
+        QTreeWidgetItem* partItem = devItem->child(m);
+        const QRect rect = mUi->treeComponents->visualItemRect(partItem);
+        if (rect.bottom() > viewRect.bottom()) {
+          // End of view reached, all items below won't be visible.
+          ok = false;
+          break;
+        }
+        if (!rect.intersects(mUi->treeComponents->viewport()->rect())) {
+          continue;
+        }
+        PartInformationDelegate::Data data =
+            partItem->data(2, Qt::UserRole)
+                .value<PartInformationDelegate::Data>();
+        bool dataModified = false;
+        if (!data.initialized) {
+          if (auto partPtr = partItem->data(0, Qt::UserRole)
+                                 .value<std::shared_ptr<Part>>()) {
+            data.part.mpn = *partPtr->getMpn();
+            data.part.manufacturer = *partPtr->getManufacturer();
+          } else {
+            qCritical() << "Failed to extract part from tree item.";
+          }
+          data.initialized = true;
+          dataModified = true;
+        }
+        if ((!data.info) && (!data.part.mpn.isEmpty()) &&
+            (!data.part.manufacturer.isEmpty())) {
+          data.info =
+              PartInformationProvider::instance().getPartInfo(data.part);
+          if (data.info) dataModified = true;
+          if ((!data.info) && (!data.infoRequested) && doRequest) {
+            PartInformationProvider::instance().scheduleRequest(data.part);
+            data.infoRequested = true;
+            dataModified = true;
+          }
+          if ((!data.info) && (data.infoRequested || (!doRequest))) {
+            if ((!doRequest) ||
+                PartInformationProvider::instance().isOngoing(data.part)) {
+              // Request is still ongoing.
+              data.progress = mPartInfoProgress / 2;
+              dataModified = true;
+              mUpdatePartInformationScheduled = true;  // Require reload.
+            } else {
+              // Request failed.
+              data.progress = 0;
+              dataModified = true;
+            }
+          }
+        }
+        if (dataModified) {
+          partItem->setData(2, Qt::UserRole, QVariant::fromValue(data));
+        }
+      }
+    }
+  }
+  PartInformationProvider::instance().requestScheduledParts();
 }
 
 void AddComponentDialog::accept() noexcept {

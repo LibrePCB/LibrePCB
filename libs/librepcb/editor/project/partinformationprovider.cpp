@@ -133,6 +133,21 @@ QString PartInformationProvider::PartInformation::getPriceStr(
   return s;
 }
 
+QString PartInformationProvider::PartInformation::formatQuantity(
+    const QLocale& locale, int qty) noexcept {
+  QString number;
+  QString suffix;
+  if (qty >= 1000000) {
+    number = locale.toString(qty / qreal(1000000), 'f', 6);
+    while (number.endsWith(locale.zeroDigit())) number.chop(1);
+    if (number.endsWith(locale.decimalPoint())) number.chop(1);
+    suffix = "M";
+  } else {
+    number = locale.toString(qty);
+  }
+  return number + suffix;
+}
+
 void PartInformationProvider::PartInformation::serialize(
     SExpression& root) const {
   root.appendChild("mpn", mpn);

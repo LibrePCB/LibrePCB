@@ -398,6 +398,8 @@ add_library(
   modelview/keysequencedelegate.h
   modelview/lengthdelegate.cpp
   modelview/lengthdelegate.h
+  modelview/partinformationdelegate.cpp
+  modelview/partinformationdelegate.h
   modelview/pathmodel.cpp
   modelview/pathmodel.h
   modelview/sortfilterproxymodel.cpp
@@ -739,6 +741,9 @@ add_library(
   project/outputjobsdialog/projectjsonoutputjobwidget.ui
   project/partinformationprovider.cpp
   project/partinformationprovider.h
+  project/partinformationtooltip.cpp
+  project/partinformationtooltip.h
+  project/partinformationtooltip.ui
   project/projecteditor.cpp
   project/projecteditor.h
   project/projectsetupdialog.cpp

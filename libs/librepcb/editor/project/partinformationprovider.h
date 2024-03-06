@@ -93,6 +93,7 @@ public:
     qreal getPrice(int quantity = 1) const noexcept;
     QString getPriceStr(int quantity = 1, const char* prefix = "$ ",
                         const char* suffix = "") const noexcept;
+    static QString formatQuantity(const QLocale& locale, int qty) noexcept;
 
     /**
      * @brief Serialize into ::librepcb::SExpression node
