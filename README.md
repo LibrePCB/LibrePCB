@@ -48,10 +48,12 @@ productive use, please install an official release as described in the
 
 ### Requirements
 
-To compile LibrePCB, you need the following software components:
+To compile and run LibrePCB, you need the following software components:
 
 - g++ >= 4.8, MinGW >= 4.8, or Clang >= 3.3 (C++11 support is required)
-- [Qt](http://www.qt.io/download-open-source/) >= 5.5
+- [Qt](http://www.qt.io/download-open-source/) >= 5.5 (make sure the
+  [imageformats](https://doc.qt.io/qt-5/qtimageformats-index.html) plugin
+  is installed too as it will be needed at runtime!).
 - [OpenCASCADE](https://www.opencascade.com/) OCCT or OCE (optional)
 - [OpenGL Utility Library](https://en.wikipedia.org/wiki/OpenGL_Utility_Library)
   GLU (optional)
@@ -75,7 +77,7 @@ actually used for CI, but are also useful to build LibrePCB locally.
 sudo apt-get install build-essential git cmake openssl zlib1g zlib1g-dev \
      qtbase5-dev qtdeclarative5-dev qttools5-dev-tools qttools5-dev \
      qtquickcontrols2-5-dev libqt5opengl5-dev libqt5svg5-dev \
-     libglu1-mesa-dev liboce-*-dev
+     qt5-image-formats-plugins libglu1-mesa-dev liboce-*-dev
 sudo apt-get install qt5-doc qtcreator # optional
 ```
 
@@ -83,7 +85,8 @@ sudo apt-get install qt5-doc qtcreator # optional
 
 ```bash
 sudo pacman -S base-devel git cmake openssl zlib desktop-file-utils shared-mime-info \
-     qt5-base qt5-declarative qt5-quickcontrols2 qt5-svg qt5-tools opencascade
+     qt5-base qt5-declarative qt5-quickcontrols2 qt5-svg qt5-tools qt5-imageformats \
+     opencascade
 sudo pacman -S qt5-doc qtcreator # optional
 ```
 

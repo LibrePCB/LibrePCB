@@ -34,6 +34,7 @@
 #include <librepcb/core/workspace/theme.h>
 #include <librepcb/core/workspace/workspacelibrarydb.h>
 #include <librepcb/core/workspace/workspacelibrarydbwriter.h>
+#include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/project/addcomponentdialog.h>
 
 #include <QtTest>
@@ -68,6 +69,14 @@ protected:
     mFs.reset(new TransactionalFileSystem(mWsDir, true));
   }
 
+  ~AddComponentDialogTest() {
+    mFs.reset();
+    mWriter.reset();
+    mDb.reset();
+    mWsDb.reset();
+    QDir(mWsDir.toStr()).removeRecursively();
+  }
+
   std::string str(const tl::optional<Uuid>& uuid) {
     return uuid ? uuid->toStr().toStdString() : "";
   }
@@ -97,11 +106,12 @@ protected:
  ******************************************************************************/
 
 TEST_F(AddComponentDialogTest, testAddMore) {
+  WorkspaceSettings settings;
   const bool defaultValue = true;
   const bool newValue = false;
 
   {
-    AddComponentDialog dialog(*mWsDb, {}, {}, Theme());
+    AddComponentDialog dialog(*mWsDb, settings, {}, {});
 
     // Check the default value.
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dialog, "cbxAddMore");
@@ -115,7 +125,7 @@ TEST_F(AddComponentDialogTest, testAddMore) {
 
   // Check if the setting is saved and restored automatically.
   {
-    AddComponentDialog dialog(*mWsDb, {}, {}, Theme());
+    AddComponentDialog dialog(*mWsDb, settings, {}, {});
     QCheckBox& cbx = TestHelpers::getChild<QCheckBox>(dialog, "cbxAddMore");
     EXPECT_EQ(newValue, cbx.isChecked());
     EXPECT_EQ(newValue, dialog.getAutoOpenAgain());
@@ -182,7 +192,8 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
   mFs->save();
 
   // Create dialog
-  AddComponentDialog dialog(*mWsDb, {}, {}, Theme());
+  WorkspaceSettings settings;
+  AddComponentDialog dialog(*mWsDb, settings, {}, {});
   QTreeView& catView =
       TestHelpers::getChild<QTreeView>(dialog, "treeCategories");
   QTreeWidget& cmpView =
@@ -213,7 +224,9 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
   EXPECT_EQ("var 2", cbxSymbVar.currentText().toStdString());
 
   // Check getters
+  ASSERT_TRUE(dialog.getSelectedComponent() != nullptr);
   EXPECT_EQ(str(uuid(4)), str(dialog.getSelectedComponent()->getUuid()));
+  ASSERT_TRUE(dialog.getSelectedSymbolVariant() != nullptr);
   EXPECT_EQ(str(uuid(8)), str(dialog.getSelectedSymbolVariant()->getUuid()));
   EXPECT_EQ(nullptr, dialog.getSelectedDevice());
 
@@ -224,8 +237,11 @@ TEST_F(AddComponentDialogTest, testChooseComponentDevice) {
   EXPECT_EQ("dev 1 [pkg 1]", lblDevName.text().toStdString());
 
   // Check getters again
+  ASSERT_TRUE(dialog.getSelectedComponent() != nullptr);
   EXPECT_EQ(str(uuid(4)), str(dialog.getSelectedComponent()->getUuid()));
+  ASSERT_TRUE(dialog.getSelectedSymbolVariant() != nullptr);
   EXPECT_EQ(str(uuid(8)), str(dialog.getSelectedSymbolVariant()->getUuid()));
+  ASSERT_TRUE(dialog.getSelectedDevice() != nullptr);
   EXPECT_EQ(str(uuid(6)), str(dialog.getSelectedDevice()->getUuid()));
 }
 
@@ -257,7 +273,8 @@ TEST_F(AddComponentDialogTest, testSetNormOrder) {
   mFs->save();
 
   // Create dialog
-  AddComponentDialog dialog(*mWsDb, {}, {"NORM"}, Theme());
+  WorkspaceSettings settings;
+  AddComponentDialog dialog(*mWsDb, settings, {}, {"NORM"});
   QTreeView& catView =
       TestHelpers::getChild<QTreeView>(dialog, "treeCategories");
   QTreeWidget& cmpView =
@@ -291,7 +308,8 @@ TEST_F(AddComponentDialogTest, testSearch) {
                                      tl::nullopt, tl::nullopt);
 
   // Create dialog
-  AddComponentDialog dialog(*mWsDb, {}, {}, Theme());
+  WorkspaceSettings settings;
+  AddComponentDialog dialog(*mWsDb, settings, {}, {});
   QLineEdit& edtSearch = TestHelpers::getChild<QLineEdit>(dialog, "edtSearch");
   QTreeWidget& cmpView =
       TestHelpers::getChild<QTreeWidget>(dialog, "treeComponents");

@@ -46,15 +46,39 @@ void BomItem::addDesignator(const QString& designator) noexcept {
  *  Constructors / Destructor
  ******************************************************************************/
 
-Bom::Bom(const QStringList& columns) noexcept : mColumns(columns), mItems() {
+Bom::Bom(const QStringList& columns,
+         const QVector<IndexPair>& mpnManufacturerColumns) noexcept
+  : mColumns(columns),
+    mMpnManufacturerColumns(mpnManufacturerColumns),
+    mItems() {
 }
 
 Bom::~Bom() noexcept {
 }
 
 /*******************************************************************************
- *  General Methods
+ *  Public Methods
  ******************************************************************************/
+
+int Bom::getAssembledRowsCount() const noexcept {
+  int count = 0;
+  for (const BomItem& item : mItems) {
+    if (item.isMount()) {
+      ++count;
+    }
+  }
+  return count;
+}
+
+int Bom::getTotalAssembledPartsCount() const noexcept {
+  int count = 0;
+  for (const BomItem& item : mItems) {
+    if (item.isMount()) {
+      count += item.getDesignators().count();
+    }
+  }
+  return count;
+}
 
 void Bom::addItem(const QString& designator, const QStringList& attributes,
                   bool mount) noexcept {

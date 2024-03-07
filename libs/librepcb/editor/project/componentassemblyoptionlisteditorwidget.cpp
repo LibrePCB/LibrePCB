@@ -210,9 +210,9 @@ void ComponentAssemblyOptionListEditorWidget::addOption() noexcept {
         ? (currentIndices.first + 1)
         : mOptions.count();
 
-    AddComponentDialog dlg(mWorkspace->getLibraryDb(),
-                           mProject->getLocaleOrder(), mProject->getNormOrder(),
-                           mWorkspace->getSettings().themes.getActive(), this);
+    AddComponentDialog dlg(
+        mWorkspace->getLibraryDb(), mWorkspace->getSettings(),
+        mProject->getLocaleOrder(), mProject->getNormOrder(), this);
     dlg.selectComponentByKeyword(
         mComponent->getLibComponent().getUuid().toStr());
     if (dlg.exec() != QDialog::Accepted) {
@@ -277,9 +277,9 @@ bool ComponentAssemblyOptionListEditorWidget::addPart() noexcept {
         ? (currentIndices.second + 1)
         : option->getParts().count();
 
-    AddComponentDialog dlg(mWorkspace->getLibraryDb(),
-                           mProject->getLocaleOrder(), mProject->getNormOrder(),
-                           mWorkspace->getSettings().themes.getActive(), this);
+    AddComponentDialog dlg(
+        mWorkspace->getLibraryDb(), mWorkspace->getSettings(),
+        mProject->getLocaleOrder(), mProject->getNormOrder(), this);
     dlg.selectComponentByKeyword(
         mComponent->getLibComponent().getUuid().toStr(), option->getDevice());
     if (dlg.exec() != QDialog::Accepted) {

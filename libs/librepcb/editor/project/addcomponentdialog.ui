@@ -13,11 +13,23 @@
   <property name="windowTitle">
    <string>Add Component</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" rowstretch="0,1,0,1,0" columnstretch="4,5,4">
+  <layout class="QGridLayout" name="gridLayout" rowstretch="0,1,0,1,0" columnstretch="7,10,7">
    <item row="0" column="0" rowspan="4">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QLineEdit" name="edtSearch">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="placeholderText">
         <string>What are you looking for?</string>
        </property>
@@ -28,8 +40,23 @@
      </item>
      <item>
       <widget class="QTreeView" name="treeCategories">
+       <property name="minimumSize">
+        <size>
+         <width>100</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
+       </property>
+       <property name="indentation">
+        <number>15</number>
        </property>
        <property name="headerHidden">
         <bool>true</bool>
@@ -49,6 +76,9 @@
      <property name="verticalScrollMode">
       <enum>QAbstractItemView::ScrollPerPixel</enum>
      </property>
+     <property name="indentation">
+      <number>15</number>
+     </property>
      <property name="headerHidden">
       <bool>true</bool>
      </property>
@@ -58,12 +88,21 @@
      <property name="columnCount">
       <number>0</number>
      </property>
+     <attribute name="headerMinimumSectionSize">
+      <number>10</number>
+     </attribute>
     </widget>
    </item>
    <item row="0" column="2">
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QLabel" name="lblCompName">
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <pointsize>11</pointsize>
@@ -83,6 +122,12 @@
      </item>
      <item>
       <widget class="QLabel" name="lblCompDescription">
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="font">
         <font>
          <italic>true</italic>
@@ -100,26 +145,41 @@
       </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
-       <item>
-        <widget class="QLabel" name="lblSymbVar">
-         <property name="text">
-          <string>Variant:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="cbxSymbVar"/>
-       </item>
-      </layout>
+      <widget class="QComboBox" name="cbxSymbVar">
+       <property name="maximumSize">
+        <size>
+         <width>400</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
    <item row="1" column="2">
-    <widget class="librepcb::editor::GraphicsView" name="viewComponent" native="true"/>
+    <widget class="librepcb::editor::GraphicsView" name="viewComponent">
+     <property name="maximumSize">
+      <size>
+       <width>400</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+    </widget>
    </item>
    <item row="2" column="2">
     <widget class="QLabel" name="lblDeviceName">
+     <property name="maximumSize">
+      <size>
+       <width>400</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <pointsize>11</pointsize>
@@ -135,7 +195,20 @@
     </widget>
    </item>
    <item row="3" column="2">
-    <widget class="librepcb::editor::GraphicsView" name="viewDevice" native="true"/>
+    <widget class="librepcb::editor::GraphicsView" name="viewDevice">
+     <property name="maximumSize">
+      <size>
+       <width>400</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="verticalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+    </widget>
    </item>
    <item row="4" column="0" colspan="3">
     <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,0">
@@ -218,8 +291,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>889</x>
+     <y>489</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -234,28 +307,12 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>889</x>
+     <y>489</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>treeComponents</sender>
-   <signal>itemDoubleClicked(QTreeWidgetItem*,int)</signal>
-   <receiver>librepcb::editor::AddComponentDialog</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>419</x>
-     <y>301</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>492</x>
-     <y>463</y>
     </hint>
    </hints>
   </connection>

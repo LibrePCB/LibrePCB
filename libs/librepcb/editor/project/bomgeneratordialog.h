@@ -23,6 +23,8 @@
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "partinformationprovider.h"
+
 #include <librepcb/core/fileio/filepath.h>
 #include <optional/tl/optional.hpp>
 
@@ -44,6 +46,8 @@ class Uuid;
 class WorkspaceSettings;
 
 namespace editor {
+
+class PartInformationToolTip;
 
 namespace Ui {
 class BomGeneratorDialog;
@@ -68,6 +72,9 @@ public:
                      QWidget* parent = nullptr) noexcept;
   ~BomGeneratorDialog() noexcept;
 
+  // General Methods
+  virtual bool eventFilter(QObject* obj, QEvent* e) noexcept override;
+
   // Operator Overloads
   BomGeneratorDialog& operator=(const BomGeneratorDialog& rhs) = delete;
 
@@ -79,11 +86,13 @@ private:  // GUI Event Handlers
   void btnChooseOutputPathClicked() noexcept;
   void btnOpenOutputDirectoryClicked() noexcept;
   void btnGenerateClicked() noexcept;
+  void tableCellDoubleClicked(int row, int column) noexcept;
 
 private:  // Methods
   void updateAttributes() noexcept;
   void updateBom() noexcept;
   void updateTable() noexcept;
+  void updatePartsInformation() noexcept;
   std::shared_ptr<AssemblyVariant> getAssemblyVariant() const noexcept;
   tl::optional<Uuid> getAssemblyVariantUuid(bool throwIfNullopt) const;
   FilePath getOutputFilePath() const noexcept;
@@ -94,6 +103,9 @@ private:  // Data
   std::shared_ptr<Bom> mBom;
   QScopedPointer<Ui::BomGeneratorDialog> mUi;
   QPointer<QPushButton> mBtnGenerate;
+  QScopedPointer<PartInformationToolTip> mPartToolTip;
+  uint mPartInfoProgress;
+  bool mUpdatePartInformationScheduled;
 };
 
 /*******************************************************************************

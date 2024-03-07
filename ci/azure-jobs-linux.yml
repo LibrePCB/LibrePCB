@@ -28,7 +28,10 @@ jobs:
         CXX: clang++
         # Note: QtQuick Controls not available in Docker image (yet).
         CMAKE_OPTIONS: "-DBUILD_QTQUICK_TEST=0"
-  container: $[ variables['IMAGE'] ]
+  container:
+    image: $[ variables['IMAGE'] ]
+    # Temporari hack for installing the imageformats plugin!
+    options: '--name mycontainer -v /usr/bin/docker:/tmp/docker:ro'
   steps:
   - checkout: self
     clean: true

@@ -209,6 +209,13 @@ public:
   WorkspaceSettingsItem_GenericValueList<QList<QUrl>> apiEndpoints;
 
   /**
+   * @brief Enable auto-fetch of live parts information (through #apiEndpoints)
+   *
+   * Default: True
+   */
+  WorkspaceSettingsItem_GenericValue<bool> autofetchLivePartInformation;
+
+  /**
    * @brief Custom command(s) to be used for opening web URLs
    *
    * When opening an URL, the application will iterate through this list of

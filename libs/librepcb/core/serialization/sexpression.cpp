@@ -604,6 +604,16 @@ SExpression serialize(const int& obj) {
 }
 
 template <>
+SExpression serialize(const long& obj) {
+  return SExpression::createToken(QString::number(obj));
+}
+
+template <>
+SExpression serialize(const qlonglong& obj) {
+  return SExpression::createToken(QString::number(obj));
+}
+
+template <>
 SExpression serialize(const bool& obj) {
   return SExpression::createToken(obj ? "true" : "false");
 }
@@ -673,6 +683,30 @@ int deserialize(const SExpression& node) {
   } else {
     throw RuntimeError(__FILE__, __LINE__,
                        QString("Invalid integer: '%1'").arg(node.getValue()));
+  }
+}
+
+template <>
+long deserialize(const SExpression& node) {
+  bool ok = false;
+  const long value = node.getValue().toLong(&ok);
+  if (ok) {
+    return value;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid long: '%1'").arg(node.getValue()));
+  }
+}
+
+template <>
+qlonglong deserialize(const SExpression& node) {
+  bool ok = false;
+  const qlonglong value = node.getValue().toLongLong(&ok);
+  if (ok) {
+    return value;
+  } else {
+    throw RuntimeError(__FILE__, __LINE__,
+                       QString("Invalid longlong: '%1'").arg(node.getValue()));
   }
 }
 

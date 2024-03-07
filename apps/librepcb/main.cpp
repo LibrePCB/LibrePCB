@@ -28,6 +28,7 @@
 #include <librepcb/core/workspace/workspacesettings.h>
 #include <librepcb/editor/dialogs/directorylockhandlerdialog.h>
 #include <librepcb/editor/editorcommandset.h>
+#include <librepcb/editor/project/partinformationprovider.h>
 #include <librepcb/editor/workspace/controlpanel/controlpanel.h>
 #include <librepcb/editor/workspace/initializeworkspacewizard/initializeworkspacewizard.h>
 
@@ -276,6 +277,17 @@ static int openWorkspace(FilePath& path) {
     Application::setTranslationLocale(locale);
     EditorCommandSet::instance().updateTranslations();
   }
+
+  // Setup global parts information provider (with cache).
+  PartInformationProvider::instance().setCacheDir(Application::getCacheDir());
+  auto applyPartInformationProviderSettings = [&ws]() {
+    PartInformationProvider::instance().setApiEndpoint(
+        ws.getSettings().apiEndpoints.get().value(0));
+  };
+  applyPartInformationProviderSettings();
+  QObject::connect(
+      &ws.getSettings().apiEndpoints, &WorkspaceSettingsItem::edited,
+      &ws.getSettings().apiEndpoints, applyPartInformationProviderSettings);
 
   // Apply keyboard shortcuts from workspace settings globally.
   auto applyKeyboardShortcuts = [&ws]() {

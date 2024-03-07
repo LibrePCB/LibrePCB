@@ -85,15 +85,24 @@ class Bom final {
   Q_DECLARE_TR_FUNCTIONS(Bom)
 
 public:
+  // Types
+  typedef std::pair<int, int> IndexPair;
+
   // Constructors / Destructor
   Bom() = delete;
   Bom(const Bom& other) noexcept = delete;
-  explicit Bom(const QStringList& columns) noexcept;
+  Bom(const QStringList& columns,
+      const QVector<IndexPair>& mpnManufacturerColumns) noexcept;
   ~Bom() noexcept;
 
   // Getters
   const QStringList& getColumns() const noexcept { return mColumns; }
+  const QVector<IndexPair>& getMpnManufacturerColumns() const noexcept {
+    return mMpnManufacturerColumns;
+  }
   const QList<BomItem>& getItems() const noexcept { return mItems; }
+  int getAssembledRowsCount() const noexcept;
+  int getTotalAssembledPartsCount() const noexcept;
 
   // General Methods
   void addItem(const QString& designator, const QStringList& attributes,
@@ -104,6 +113,7 @@ public:
 
 private:
   QStringList mColumns;
+  QVector<IndexPair> mMpnManufacturerColumns;
   QList<BomItem> mItems;
 };
 

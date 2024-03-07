@@ -84,6 +84,13 @@ void NetworkRequestBase::setHeaderField(const QByteArray& name,
   mRequest.setRawHeader(name, value);
 }
 
+void NetworkRequestBase::setCacheLoadControl(
+    QNetworkRequest::CacheLoadControl value) noexcept {
+  Q_ASSERT(QThread::currentThread() != NetworkAccessManager::instance());
+  Q_ASSERT(!mStarted);
+  mRequest.setAttribute(QNetworkRequest::CacheLoadControlAttribute, value);
+}
+
 void NetworkRequestBase::setExpectedReplyContentSize(qint64 bytes) noexcept {
   Q_ASSERT(QThread::currentThread() != NetworkAccessManager::instance());
   Q_ASSERT(!mStarted);
@@ -315,6 +322,14 @@ void NetworkRequestBase::finalize(const QString& errorMsg) noexcept {
     qDebug() << "Request aborted:" << mUrl.toString();
     emit progressState(tr("Request aborted."));
     emit aborted();
+    emit finished(false);
+  } else if ((mReply &&
+              (mReply->error() == QNetworkReply::ContentNotFoundError)) &&
+             (mRequest.attribute(QNetworkRequest::CacheLoadControlAttribute)
+                  .toInt() == QNetworkRequest::AlwaysCache)) {
+    qDebug() << "Not in cache:" << mUrl.toString();
+    emit progressState(QString("Not in cache: %1").arg(errorMsg));  // No tr().
+    emit errored(errorMsg);
     emit finished(false);
   } else {
     qCritical() << "Request failed:" << mUrl.toString();

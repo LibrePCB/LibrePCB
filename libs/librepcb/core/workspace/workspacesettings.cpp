@@ -53,6 +53,7 @@ WorkspaceSettings::WorkspaceSettings(QObject* parent)
     libraryNormOrder("library_norm_order", "norm", QStringList(), this),
     apiEndpoints("api_endpoints", "url",
                  QList<QUrl>{QUrl("https://api.librepcb.org")}, this),
+    autofetchLivePartInformation("autofetch_live_part_information", true, this),
     externalWebBrowserCommands("external_web_browser", "command", QStringList(),
                                this),
     externalFileManagerCommands("external_file_manager", "command",

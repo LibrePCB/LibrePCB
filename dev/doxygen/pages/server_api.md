@@ -90,6 +90,7 @@ Following resources are available:
 |--------------|---------------------------------------|
 | [/libraries] | Fetch list of available libraries     |
 | [/order]     | Upload a project to start ordering it |
+| [/parts]     | Request live information about parts  |
 
 
 ## Libraries {#doc_server_api_resources_libraries}
@@ -255,6 +256,201 @@ curl -X POST -H "Content-Type: application/json" \
 }
 ~~~
 
+## Parts Information {#doc_server_api_resources_parts}
+
+The resource path `/parts` is used to request live information about concrete
+parts (by MPN), for example prices or stock availability. The availability
+of this API depends on the cooperation with a corresponding data provider
+since the LibrePCB project cannot maintain such a parts database. If there is
+no such cooperation, this API will not be available.
+
+The client has to initiate the query with a GET request to the path `/parts`.
+The response is a JSON object with the following data (no pagination used):
+
+| Name                       | Type    | Description                                               |
+|----------------------------|---------|-----------------------------------------------------------|
+| provider_name              | string  | Name of the data provider                                 |
+| provider_url               | string  | URL to the data providers website                         |
+| provider_logo_url          | string  | URL to the data providers logo (light theme, optional)    |
+| ~~provider_logo_dark_url~~ | string  | URL to the data providers logo (dark theme, optional)     |
+| info_url                   | string  | URL pointing to service information (e.g. privacy policy) |
+| query_url                  | string  | URL where to post the actual queries                      |
+| max_parts                  | integer | Maximum number of parts to query in one request           |
+
+*Notes:*
+- *If the service is (temporarily) not available, an empty JSON object can
+  be returned. The client shall detect this by the property `query_url` which
+  may be missing, `null` or an empty string, and then either display a message
+  like "No part information available" or just silently don't display any
+  part information.*
+- The `provider_logo_dark_url` key is currently only a proposal, not officially
+  part of the API.
+- *The `info_url` should be short and descriptive to allow displaying it as-is
+  in the LibrePCB GUI.*
+- *The `max_parts` specifies how many parts are allowed to be queried in a
+  single request. However, clients should apply their own limit which is
+  smaller or equal to the value returned here.*
+
+Afterwards, the client has to make POST requests to the received `query_url`
+with a JSON object containing the following data:
+
+| Name       | Type    | Description                                           |
+|------------|---------|-------------------------------------------------------|
+| parts      | array   | Array of parts to ask for information                 |
+
+Where the `parts` array shall consist of 0..n JSON objects with the following
+properties:
+
+| Name         | Type    | Description                                         |
+|--------------|---------|-----------------------------------------------------|
+| mpn          | string  | Manufacturer part number                            |
+| manufacturer | string  | Manufacturer name of the part                       |
+
+The response is a JSON object with the following data (no pagination used):
+
+| Name              | Type    | Description                                    |
+|-------------------|---------|------------------------------------------------|
+| parts             | array   | Array with an entry for each requested part    |
+
+Where the `parts` array consists of JSON objects with the following properties:
+
+| Name            | Type    | Description                                                |
+|-----------------|---------|------------------------------------------------------------|
+| mpn             | string  | Manufacturer part number (copied from request)             |
+| manufacturer    | string  | Manufacturer name of the part (copied from request)        |
+| results         | integer | Number of parts found for the given MPN/manufacturer       |
+| product_url     | string  | URL to the manufacturers part information page             |
+| picture_url     | string  | URL to a picture of the part (e.g. PNG or JPEG)            |
+| pricing_url     | string  | URL to pricing information across suppliers                |
+| status          | string  | Either Preview, Active, NRND or Obsolete (to be extended)  |
+| availability    | integer | -10=VeryBad, -5=Bad, 0=Normal, 5=Good, 10=VeryGood         |
+| prices          | array   | Part price for various quantities                          |
+| resources       | array   | Part resources, e.g. datasheets and reference manuals      |
+| ~~suggestions~~ | array   | Alternative part suggestions (if obsolete or `results!=1`) |
+
+Where the `prices` array consists of JSON objects with the following
+properties:
+
+| Name     | Type    | Description                                                 |
+|----------|---------|-------------------------------------------------------------|
+| quantity | integer | Quantity for which this price is valid                      |
+| price    | float   | Part price in USD for 1 piece, valid for the given quantity |
+
+And the `resources` array consists of JSON objects with the following
+properties:
+
+| Name      | Type    | Description                                                   |
+|-----------|---------|---------------------------------------------------------------|
+| name      | string  | Name of the resource (e.g. "Datasheet")                       |
+| mediatype | string  | Type of the resource linked by `url` (e.g. `application/pdf`) |
+| url       | string  | Direct URL to the resource                                    |
+
+The `suggestions` key is only a proposal, not officially part of the API yet.
+It may be added later as an array which consists of JSON objects with the
+following properties:
+
+| Name         | Type    | Description                                         |
+|--------------|---------|-----------------------------------------------------|
+| mpn          | string  | MPN of a suggested alternative part                 |
+| manufacturer | string  | Manufacturer name of the suggested part             |
+
+*Notes:*
+- *Except for `mpn`, `manufacturer` and `results`, each property of the
+  response part objects may be omitted or set to `null` to indicate the
+  corresponding information is not available.*
+- *If `results` is not `1`, no part information shall be contained in the
+  response.*
+- *Since no pagination is used, it is the responsibility of the client to
+  avoid too large responses by limiting the number of parts in the request.
+  Instead of requesting many parts at once, several smaller requests should
+  be made. The `max_parts` value returned in the status response shall be
+  respected as the upper limit.*
+- *To avoid too much traffic & server load, clients shall always wait for
+  the response before sending the next request, i.e. parallel requests
+  shall not be made! This also applies to large requests split into several
+  smaller requests.*
+
+### Example
+
+**Initial Request:**
+
+~~~{.sh}
+curl -H "Content-Type: application/json" \
+     'https://api.librepcb.org/api/v1/parts'
+~~~
+
+**Initial Response:**
+
+~~~{.json}
+{
+  "provider_name": "LibrePCB Data Provider",
+  "provider_url": "https://librepcb-data-provider.com",
+  "provider_logo_url": "https://librepcb-data-provider.com/logo.png",
+  "info_url": "https://api.librepcb.org",
+  "query_url": "https://api.librepcb.org/api/v1/parts/query",
+  "max_parts": 10
+}
+~~~
+
+**Query Request:**
+
+~~~{.json}
+{
+  "parts": [
+    {
+      "mpn": "1N4148",
+      "manufacturer": "Texas Instruments"
+    }
+  ]
+}
+~~~
+
+~~~{.sh}
+curl -X POST -H "Content-Type: application/json" -d @request.json \
+     'https://api.librepcb.org/api/v1/parts/query'
+~~~
+
+**Query Response:**
+
+~~~{.json}
+{
+  "parts": [
+    {
+      "mpn": "1N4148",
+      "manufacturer": "Texas Instruments",
+      "results": 1,
+      "product_url": "https://ti.com/1n4148/",
+      "picture_url": "https://ti.com/1n4148/picture.png",
+      "pricing_url": "https://librepcb-data-provider.com/1n4148/",
+      "status": "Obsolete",
+      "availability": 5,
+      "prices": [
+        {
+          "quantity": 1,
+          "price": 0.01
+        },
+        {
+          "quantity": 10,
+          "price": 0.009
+        },
+        {
+          "quantity": 1000,
+          "price": 0.008
+        }
+      ],
+      "resources": [
+        {
+          "name": "Datasheet",
+          "mediatype": "application/pdf",
+          "url": "https://ti.com/1n4148/datasheet.pdf"
+        }
+      ]
+    }
+  ]
+}
+~~~
+
 [/libraries]: @ref doc_server_api_resources_libraries
 [/order]: @ref doc_server_api_resources_order
+[/parts]: @ref doc_server_api_resources_parts
 [ISO 8601]: https://en.wikipedia.org/wiki/ISO_8601

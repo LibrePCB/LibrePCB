@@ -17,78 +17,78 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LIBREPCB_CORE_APIENDPOINT_H
-#define LIBREPCB_CORE_APIENDPOINT_H
+#ifndef LIBREPCB_EDITOR_PARTINFORMATIONDELEGATE_H
+#define LIBREPCB_EDITOR_PARTINFORMATIONDELEGATE_H
 
 /*******************************************************************************
  *  Includes
  ******************************************************************************/
+#include "../project/partinformationprovider.h"
+
 #include <QtCore>
+#include <QtWidgets>
 
 /*******************************************************************************
  *  Namespace / Forward Declarations
  ******************************************************************************/
 namespace librepcb {
+namespace editor {
 
 /*******************************************************************************
- *  Class ApiEndpoint
+ *  Class PartInformationDelegate
  ******************************************************************************/
 
 /**
- * @brief Access to a LibrePCB API endpoint
- *
- * @see @ref doc_server_api
+ * @brief Subclass of QStyledItemDelegate to display part status/price
  */
-class ApiEndpoint final : public QObject {
+class PartInformationDelegate final : public QStyledItemDelegate {
   Q_OBJECT
 
 public:
-  // Types
-  struct Part {
-    QString mpn;
-    QString manufacturer;
+  struct Data {
+    bool initialized = false;
+    bool infoRequested = false;
+    int progress = 0;
+    PartInformationProvider::Part part;
+    std::shared_ptr<const PartInformationProvider::PartInformation> info;
+    int priceQuantity = 1;
+
+    QSize calcSizeHint(const QStyleOptionViewItem& option) const noexcept;
+    QString getDisplayText(bool maxLen = false) const noexcept;
+    bool getColors(QBrush& background, QPen& outline,
+                   QPen& text) const noexcept;
   };
 
   // Constructors / Destructor
-  ApiEndpoint() = delete;
-  ApiEndpoint(const ApiEndpoint& other) = delete;
-  explicit ApiEndpoint(const QUrl& url) noexcept;
-  ~ApiEndpoint() noexcept;
+  explicit PartInformationDelegate(bool fillCell,
+                                   QObject* parent = nullptr) noexcept;
+  PartInformationDelegate(const PartInformationDelegate& other) = delete;
+  ~PartInformationDelegate() noexcept;
 
-  // Getters
-  const QUrl& getUrl() const noexcept { return mUrl; }
+  // Inherited from QStyledItemDelegate
+  virtual QSize sizeHint(const QStyleOptionViewItem& option,
+                         const QModelIndex& index) const noexcept override;
+  virtual void paint(QPainter* painter, const QStyleOptionViewItem& option,
+                     const QModelIndex& index) const override;
 
-  // General Methods
-  void requestLibraryList() const noexcept;
-  void requestPartsInformationStatus() const noexcept;
-  void requestPartsInformation(const QUrl& url,
-                               const QVector<Part>& parts) const noexcept;
-
-  // Operators
-  ApiEndpoint& operator=(const ApiEndpoint& rhs) = delete;
-
-signals:
-  void libraryListReceived(const QJsonArray& libs);
-  void errorWhileFetchingLibraryList(const QString& errorMsg);
-  void errorWhileFetchingPartsInformationStatus(const QString& errorMsg);
-  void partsInformationStatusReceived(const QJsonObject& status);
-  void partsInformationReceived(const QJsonObject& info);
-  void errorWhileFetchingPartsInformation(const QString& errorMsg);
+  // Operator Overloadings
+  PartInformationDelegate& operator=(const PartInformationDelegate& rhs) =
+      delete;
 
 private:  // Methods
-  void requestLibraryList(const QUrl& url) const noexcept;
-  void libraryListResponseReceived(const QByteArray& data) noexcept;
-  void partsInformationStatusResponseReceived(const QByteArray& data) noexcept;
-  void partsInformationResponseReceived(const QByteArray& data) noexcept;
+  bool getData(const QModelIndex& index, Data& data) const noexcept;
 
 private:  // Data
-  QUrl mUrl;
+  const bool mFillCell;
 };
 
 /*******************************************************************************
  *  End of File
  ******************************************************************************/
 
+}  // namespace editor
 }  // namespace librepcb
+
+Q_DECLARE_METATYPE(librepcb::editor::PartInformationDelegate::Data)
 
 #endif

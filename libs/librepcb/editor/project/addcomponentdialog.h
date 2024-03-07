@@ -24,6 +24,7 @@
  *  Includes
  ******************************************************************************/
 #include "../workspace/categorytreemodel.h"
+#include "partinformationprovider.h"
 
 #include <librepcb/core/fileio/filepath.h>
 #include <librepcb/core/library/dev/part.h>
@@ -46,14 +47,16 @@ class ComponentSymbolVariant;
 class Device;
 class Part;
 class Symbol;
-class Theme;
 class WorkspaceLibraryDb;
+class WorkspaceSettings;
 
 namespace editor {
 
 class DefaultGraphicsLayerProvider;
 class FootprintGraphicsItem;
 class GraphicsScene;
+class PartInformationProvider;
+class PartInformationToolTip;
 class SymbolGraphicsItem;
 
 namespace Ui {
@@ -97,8 +100,9 @@ class AddComponentDialog final : public QDialog {
 public:
   // Constructors / Destructor
   explicit AddComponentDialog(const WorkspaceLibraryDb& db,
+                              const WorkspaceSettings& settings,
                               const QStringList& localeOrder,
-                              const QStringList& normOrder, const Theme& theme,
+                              const QStringList& normOrder,
                               QWidget* parent = nullptr);
   ~AddComponentDialog() noexcept;
 
@@ -139,6 +143,10 @@ public:
   void selectComponentByKeyword(
       const QString keyword,
       const tl::optional<Uuid>& selectedDevice = tl::nullopt) noexcept;
+  virtual bool eventFilter(QObject* obj, QEvent* e) noexcept override;
+
+protected:
+  virtual bool event(QEvent* event) noexcept override;
 
 private slots:
   void searchEditTextChanged(const QString& text) noexcept;
@@ -148,6 +156,7 @@ private slots:
                                          QTreeWidgetItem* previous) noexcept;
   void treeComponents_itemDoubleClicked(QTreeWidgetItem* item,
                                         int column) noexcept;
+  void treeComponents_itemExpanded(QTreeWidgetItem* item) noexcept;
   void cbxSymbVar_currentIndexChanged(int index) noexcept;
 
 private:
@@ -163,10 +172,13 @@ private:
   void setSelectedDevice(std::shared_ptr<const Device> dev);
   void setSelectedPart(std::shared_ptr<const Part> part);
   void addPartItem(std::shared_ptr<Part> part, QTreeWidgetItem* parent);
-  void accept() noexcept;
+  void schedulePartsInformationUpdate() noexcept;
+  void updatePartsInformation(int downloadDelayMs = 0) noexcept;
+  virtual void accept() noexcept override;
 
   // General
   const WorkspaceLibraryDb& mDb;
+  const WorkspaceSettings& mSettings;
   QStringList mLocaleOrder;
   QStringList mNormOrder;
   QScopedPointer<Ui::AddComponentDialog> mUi;
@@ -174,6 +186,11 @@ private:
   QScopedPointer<GraphicsScene> mDevicePreviewScene;
   QScopedPointer<DefaultGraphicsLayerProvider> mGraphicsLayerProvider;
   QScopedPointer<CategoryTreeModel> mCategoryTreeModel;
+  QScopedPointer<PartInformationToolTip> mPartToolTip;
+  uint mPartInfoProgress;
+  bool mUpdatePartInformationScheduled;
+  qint64 mUpdatePartInformationDownloadStart;
+  bool mUpdatePartInformationOnExpand;
   QString mCurrentSearchTerm;
 
   // Attributes

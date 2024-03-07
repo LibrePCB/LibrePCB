@@ -74,6 +74,17 @@ public:
   void setHeaderField(const QByteArray& name, const QByteArray& value) noexcept;
 
   /**
+   * @brief Set the cache load control attribute
+   *
+   * Allows to control the caching behavior, e.g. enforcing download only from
+   * cache but not from the network. For details, see documentation of
+   * `QNetworkRequest::setAttribute()`.
+   *
+   * @param value   The new cache control value
+   */
+  void setCacheLoadControl(QNetworkRequest::CacheLoadControl value) noexcept;
+
+  /**
    * @brief Set the expected size of the requested content
    *
    * If set, this size will be used to calculate the download progress in

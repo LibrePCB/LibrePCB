@@ -364,9 +364,8 @@ void SchematicEditorState_AddComponent::startAddingComponent(
         mAddComponentDialog->setNormOrder(mContext.project.getNormOrder());
       } else {
         mAddComponentDialog.reset(new AddComponentDialog(
-            mContext.workspace.getLibraryDb(),
+            mContext.workspace.getLibraryDb(), mContext.workspace.getSettings(),
             mContext.project.getLocaleOrder(), mContext.project.getNormOrder(),
-            mContext.workspace.getSettings().themes.getActive(),
             parentWidget()));
       }
       if (!searchTerm.isEmpty()) {
