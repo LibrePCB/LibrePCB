@@ -134,19 +134,26 @@ Length Length::max() noexcept {
  ******************************************************************************/
 
 void Length::setLengthFromFloat(qreal nanometers) {
-  LengthBase_t min = std::numeric_limits<LengthBase_t>::min();
-  LengthBase_t max = std::numeric_limits<LengthBase_t>::max();
-  if ((nanometers > static_cast<qreal>(max)) ||
-      (nanometers < static_cast<qreal>(min))) {
-    throw RangeError(__FILE__, __LINE__, nanometers, min, max);
-  }
-
+  checkRange(nanometers, true);  // Throws on range error.
   mNanometers = qRound64(nanometers);
 }
 
 /*******************************************************************************
  *  Private Static Methods
  ******************************************************************************/
+
+bool Length::checkRange(qreal nanometers, bool doThrow) {
+  const LengthBase_t min = std::numeric_limits<LengthBase_t>::min();
+  const LengthBase_t max = std::numeric_limits<LengthBase_t>::max();
+  if ((nanometers >= static_cast<qreal>(min)) &&
+      (nanometers <= static_cast<qreal>(max))) {
+    return true;
+  } else if (!doThrow) {
+    return false;
+  } else {
+    throw RangeError(__FILE__, __LINE__, nanometers, min, max);
+  }
+}
 
 LengthBase_t Length::mapNmToGrid(LengthBase_t nanometers,
                                  const Length& gridInterval) noexcept {
