@@ -100,8 +100,8 @@ Point& Point::rotate(const Angle& angle, const Point& center) noexcept {
   } else if (angle != Angle::deg0()) {
     // angle is not a multiple of 90 degrees --> we must use floating point
     // arithmetic
-    qreal sin = qSin(angle.toRad());
-    qreal cos = qCos(angle.toRad());
+    qreal sin = std::sin(angle.toRad());
+    qreal cos = std::cos(angle.toRad());
     setX(Length::fromMm(center.getX().toMm() + cos * dx.toMm() -
                         sin * dy.toMm()));
     setY(Length::fromMm(center.getY().toMm() + sin * dx.toMm() +

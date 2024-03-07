@@ -475,7 +475,7 @@ void PackageEditorState_DrawPolygonBase::updateOverlayText() noexcept {
       const Point diff = p1 - p0;
       const UnsignedLength length = (p1 - p0).getLength();
       const Angle angle = Angle::fromRad(
-          qAtan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()));
+          std::atan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()));
       text += formatLength("X0", p0.getX()) % "<br>";
       text += formatLength("Y0", p0.getY()) % "<br>";
       text += formatLength("X1", p1.getX()) % "<br>";

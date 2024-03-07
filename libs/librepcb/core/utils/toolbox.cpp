@@ -72,8 +72,8 @@ tl::optional<Length> Toolbox::arcRadius(const Point& p1, const Point& p2,
   const qreal y1 = p1.getY().toMm();
   const qreal x2 = p2.getX().toMm();
   const qreal y2 = p2.getY().toMm();
-  const qreal d = qSqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-  const qreal r = d / (2 * qSin(angleMapped.toRad() / 2));
+  const qreal d = std::sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+  const qreal r = d / (2 * std::sin(angleMapped.toRad() / 2));
   if (Length::isValidMm(r)) {
     return Length::fromMm(r);
   } else {
@@ -94,10 +94,10 @@ tl::optional<Point> Toolbox::arcCenter(const Point& p1, const Point& p2,
   const qreal x1 = p2.getX().toMm();
   const qreal y1 = p2.getY().toMm();
   const qreal angleSgn = (angleMapped >= 0) ? 1 : -1;
-  const qreal d = qSqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
-  const qreal r = d / (2 * qSin(angleMapped.toRad() / 2));
+  const qreal d = std::sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+  const qreal r = d / (2 * std::sin(angleMapped.toRad() / 2));
   // Note: std::max() fixes https://github.com/LibrePCB/LibrePCB/issues/974
-  const qreal h = qSqrt(std::max(r * r - d * d / 4.0, qreal(0)));
+  const qreal h = std::sqrt(std::max(r * r - d * d / 4.0, qreal(0)));
   const qreal u = (x1 - x0) / d;
   const qreal v = (y1 - y0) / d;
   const qreal a = ((x0 + x1) / 2) - h * v * angleSgn;
@@ -116,8 +116,8 @@ Angle Toolbox::arcAngle(const Point& p1, const Point& p2,
   if (delta1.isOrigin() || delta2.isOrigin()) {
     return Angle::deg0();
   }
-  qreal angle1 = qAtan2(delta1.getY().toMm(), delta1.getX().toMm());
-  qreal angle2 = qAtan2(delta2.getY().toMm(), delta2.getX().toMm());
+  qreal angle1 = std::atan2(delta1.getY().toMm(), delta1.getX().toMm());
+  qreal angle2 = std::atan2(delta2.getY().toMm(), delta2.getX().toMm());
   return Angle::fromRad(angle2 - angle1).mapTo0_360deg();
 }
 
@@ -126,7 +126,7 @@ Angle Toolbox::angleBetweenPoints(const Point& p1, const Point& p2) noexcept {
   if (delta.isOrigin()) {
     return Angle::deg0();
   }
-  return Angle::fromRad(qAtan2(delta.getY().toMm(), delta.getX().toMm()))
+  return Angle::fromRad(std::atan2(delta.getY().toMm(), delta.getX().toMm()))
       .mapTo0_360deg();
 }
 

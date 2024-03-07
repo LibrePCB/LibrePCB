@@ -379,8 +379,8 @@ void PackageEditorState_DrawZone::updateOverlayText() noexcept {
   const Point p1 = (count >= 2) ? vertices[count - 1].getPos() : mCursorPos;
   const Point diff = p1 - p0;
   const UnsignedLength length = (p1 - p0).getLength();
-  const Angle angle =
-      Angle::fromRad(qAtan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()));
+  const Angle angle = Angle::fromRad(
+      std::atan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()));
   text += formatLength("X0", p0.getX()) % "<br>";
   text += formatLength("Y0", p0.getY()) % "<br>";
   text += formatLength("X1", p1.getX()) % "<br>";

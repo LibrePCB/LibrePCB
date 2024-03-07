@@ -957,7 +957,7 @@ void BoardGerberExport::drawFootprintPad(GerberGenerator& gen,
             const PositiveLength height(width);
             const PositiveLength width = height + (p1 - p0).getLength();
             const Angle rotation = Angle::fromRad(
-                qAtan2(delta.getY().toMm(), delta.getX().toMm()));
+                std::atan2(delta.getY().toMm(), delta.getX().toMm()));
             gen.flashObround(center, width, height, rotation, function, net,
                              component, pin, signal);
           } else {

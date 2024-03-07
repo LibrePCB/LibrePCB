@@ -168,9 +168,9 @@ const QPainterPath& Path::toQPainterPathPx() const noexcept {
         const QPointF centerPx = center->toPxQPointF();
         const QPointF diffPx = v0.getPos().toPxQPointF() - centerPx;
         const qreal radiusPx =
-            qSqrt(diffPx.x() * diffPx.x() + diffPx.y() * diffPx.y());
+            std::sqrt(diffPx.x() * diffPx.x() + diffPx.y() * diffPx.y());
         const qreal startAngleDeg =
-            -qRadiansToDegrees(qAtan2(diffPx.y(), diffPx.x()));
+            -qRadiansToDegrees(std::atan2(diffPx.y(), diffPx.x()));
         mPainterPathPx.arcTo(centerPx.x() - radiusPx, centerPx.y() - radiusPx,
                              radiusPx * 2, radiusPx * 2, startAngleDeg,
                              v0.getAngle().toDeg());
@@ -402,7 +402,7 @@ Path Path::obround(const Point& p1, const Point& p2,
                    const PositiveLength& width) noexcept {
   Point diff = p2 - p1;
   Path p = obround(UnsignedLength(diff.getLength()) + width, width);
-  p.rotate(Angle::fromRad(qAtan2(diff.getY().toMm(), diff.getX().toMm())));
+  p.rotate(Angle::fromRad(std::atan2(diff.getY().toMm(), diff.getX().toMm())));
   p.translate((p1 + p2) / 2);
   return p;
 }
@@ -415,8 +415,8 @@ Path Path::arcObround(const Point& p1, const Point& p2, const Angle& angle,
   if (auto center = Toolbox::arcCenter(p1, p2, angle)) {
     Point delta1 = p1 - (*center);
     Point delta2 = p2 - (*center);
-    qreal angle1Rad = qAtan2(delta1.getY().toPx(), delta1.getX().toPx());
-    qreal angle2Rad = qAtan2(delta2.getY().toPx(), delta2.getX().toPx());
+    qreal angle1Rad = std::atan2(delta1.getY().toPx(), delta1.getX().toPx());
+    qreal angle2Rad = std::atan2(delta2.getY().toPx(), delta2.getX().toPx());
     UnsignedLength radius = delta1.getLength();
     Length innerRadius = (*radius) - (*width / 2);
     Length outerRadius = (*radius) + (*width / 2);
@@ -489,7 +489,7 @@ Path Path::octagon(const PositiveLength& width, const PositiveLength& height,
   const Length ry = height / 2;
   const Length innerChamfer =
       Length::fromMm(std::min(rx - cornerRadius, ry - cornerRadius).toMm() *
-                     (2 - qSqrt(2))) +
+                     (2 - std::sqrt(2))) +
       cornerRadius;
   if (cornerRadius == 0) {
     // Regular polygon without rounded corners.
@@ -507,7 +507,7 @@ Path Path::octagon(const PositiveLength& width, const PositiveLength& height,
   } else {
     // Octagon with rounded corners.
     const Length chamferOffset =
-        Length::fromMm(cornerRadius->toMm() * (1 - (1 / qSqrt(2))));
+        Length::fromMm(cornerRadius->toMm() * (1 - (1 / std::sqrt(2))));
     const Length outerChamfer = innerChamfer - cornerRadius + chamferOffset;
     Q_ASSERT(chamferOffset >= 0);
     Q_ASSERT(chamferOffset <= outerChamfer);
@@ -544,7 +544,7 @@ Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle,
           qBound(qreal(0.0), static_cast<qreal>(maxTolerance->toNm()),
                  radiusAbsNm / qreal(4));
       const qreal stepsPerRad = std::min(
-          qreal(0.5) / qAcos(1 - y / radiusAbsNm), radiusAbsNm / qreal(2));
+          qreal(0.5) / std::acos(1 - y / radiusAbsNm), radiusAbsNm / qreal(2));
       const int steps = qCeil(stepsPerRad * angle.abs().toRad());
 
       // create line segments

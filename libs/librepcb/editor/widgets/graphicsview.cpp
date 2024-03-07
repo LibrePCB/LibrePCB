@@ -530,7 +530,8 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect) {
     const Point diff = mRulerPositions->second - mRulerPositions->first;
     const Length distance = *diff.getLength();
     const Angle angle = (!diff.isOrigin())
-        ? Angle::fromRad(qAtan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()))
+        ? Angle::fromRad(
+              std::atan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()))
         : -Angle::deg90();
 
     // Transform painter to allow drawing from (0,0) to (0,distance).
