@@ -47,11 +47,20 @@ then
   export PATH="/usr/local/opt/python/libexec/bin:$PATH"
 
   # Install Qt
-  echo "Installing qt5..."
-  brew install --force-bottle --overwrite qt5
-  echo "Linking qt5..."
-  brew link --force --overwrite qt5
-  export PATH="$(brew --prefix qt5)/bin:$PATH"
+  if [ "$QT" = "6" ]
+  then
+    echo "Installing qt6..."
+    brew install --force-bottle --overwrite qt6
+    echo "Linking qt6..."
+    brew link --force --overwrite qt6
+    export PATH="$(brew --prefix qt6)/bin:$PATH"
+  else
+    echo "Installing qt5..."
+    brew install --force-bottle --overwrite qt5
+    echo "Linking qt5..."
+    brew link --force --overwrite qt5
+    export PATH="$(brew --prefix qt5)/bin:$PATH"
+  fi
 
   # Install OpenCascade
   echo "Installing opencascade..."
