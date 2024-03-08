@@ -162,22 +162,21 @@ const QPainterPath& Path::toQPainterPathPx() const noexcept {
         continue;
       }
       const Vertex& v0 = mVertices.at(i - 1);
-      if (v0.getAngle() == 0) {
-        mPainterPathPx.lineTo(v.getPos().toPxQPointF());
-      } else {
-        QPointF centerPx =
-            Toolbox::arcCenter(v0.getPos(), v.getPos(), v0.getAngle())
-                .toPxQPointF();
-        qreal radiusPx =
-            Toolbox::arcRadius(v0.getPos(), v.getPos(), v0.getAngle())
-                .abs()
-                .toPx();
-        QPointF diffPx = v0.getPos().toPxQPointF() - centerPx;
-        qreal startAngleDeg =
+      if (auto center =
+              Toolbox::arcCenter(v0.getPos(), v.getPos(), v0.getAngle())) {
+        // Arc segment.
+        const QPointF centerPx = center->toPxQPointF();
+        const QPointF diffPx = v0.getPos().toPxQPointF() - centerPx;
+        const qreal radiusPx =
+            qSqrt(diffPx.x() * diffPx.x() + diffPx.y() * diffPx.y());
+        const qreal startAngleDeg =
             -qRadiansToDegrees(qAtan2(diffPx.y(), diffPx.x()));
         mPainterPathPx.arcTo(centerPx.x() - radiusPx, centerPx.y() - radiusPx,
                              radiusPx * 2, radiusPx * 2, startAngleDeg,
                              v0.getAngle().toDeg());
+      } else {
+        // Straight segment.
+        mPainterPathPx.lineTo(v.getPos().toPxQPointF());
       }
     }
   }
@@ -413,30 +412,34 @@ Path Path::arcObround(const Point& p1, const Point& p2, const Angle& angle,
   if (p1 == p2) {
     return circle(width).translated(p1);
   }
-  Length radius = Toolbox::arcRadius(p1, p2, angle).abs();
-  Length innerRadius = radius - (*width / 2);
-  Length outerRadius = radius + (*width / 2);
-  Point center = Toolbox::arcCenter(p1, p2, angle);
-  Point delta1 = p1 - center;
-  Point delta2 = p2 - center;
-  qreal angle1Rad = qAtan2(delta1.getY().toPx(), delta1.getX().toPx());
-  qreal angle2Rad = qAtan2(delta2.getY().toPx(), delta2.getX().toPx());
-  Point p1Inner =
-      center + Point(innerRadius, 0).rotated(Angle::fromRad(angle1Rad));
-  Point p1Outer =
-      center + Point(outerRadius, 0).rotated(Angle::fromRad(angle1Rad));
-  Point p2Inner =
-      center + Point(innerRadius, 0).rotated(Angle::fromRad(angle2Rad));
-  Point p2Outer =
-      center + Point(outerRadius, 0).rotated(Angle::fromRad(angle2Rad));
+  if (auto center = Toolbox::arcCenter(p1, p2, angle)) {
+    Point delta1 = p1 - (*center);
+    Point delta2 = p2 - (*center);
+    qreal angle1Rad = qAtan2(delta1.getY().toPx(), delta1.getX().toPx());
+    qreal angle2Rad = qAtan2(delta2.getY().toPx(), delta2.getX().toPx());
+    UnsignedLength radius = delta1.getLength();
+    Length innerRadius = (*radius) - (*width / 2);
+    Length outerRadius = (*radius) + (*width / 2);
+    Point p1Inner =
+        (*center) + Point(innerRadius, 0).rotated(Angle::fromRad(angle1Rad));
+    Point p1Outer =
+        (*center) + Point(outerRadius, 0).rotated(Angle::fromRad(angle1Rad));
+    Point p2Inner =
+        (*center) + Point(innerRadius, 0).rotated(Angle::fromRad(angle2Rad));
+    Point p2Outer =
+        (*center) + Point(outerRadius, 0).rotated(Angle::fromRad(angle2Rad));
 
-  Path p;
-  p.addVertex(p1Inner, angle);
-  p.addVertex(p2Inner, angle < 0 ? Angle::deg180() : -Angle::deg180());
-  p.addVertex(p2Outer, -angle);
-  p.addVertex(p1Outer, angle < 0 ? Angle::deg180() : -Angle::deg180());
-  p.addVertex(p1Inner, Angle::deg0());
-  return p;
+    Path p;
+    p.addVertex(p1Inner, angle);
+    p.addVertex(p2Inner, angle < 0 ? Angle::deg180() : -Angle::deg180());
+    p.addVertex(p2Outer, -angle);
+    p.addVertex(p1Outer, angle < 0 ? Angle::deg180() : -Angle::deg180());
+    p.addVertex(p1Inner, Angle::deg0());
+    return p;
+  } else {
+    // Seems to be a straight segment.
+    return Path::obround(p1, p2, width);
+  }
 }
 
 Path Path::rect(const Point& p1, const Point& p2) noexcept {
@@ -532,33 +535,32 @@ Path Path::octagon(const PositiveLength& width, const PositiveLength& height,
 
 Path Path::flatArc(const Point& p1, const Point& p2, const Angle& angle,
                    const PositiveLength& maxTolerance) noexcept {
-  // return straight line if radius is smaller than half of the allowed
-  // tolerance
-  Length radiusAbs = Toolbox::arcRadius(p1, p2, angle).abs();
-  if (radiusAbs <= maxTolerance / 2) {
-    return line(p1, p2);
+  if (auto center = Toolbox::arcCenter(p1, p2, angle)) {
+    const UnsignedLength radiusAbs = (p1 - (*center)).getLength();
+    if (radiusAbs > (maxTolerance / 2)) {
+      // Calculate how many lines we need to create.
+      const qreal radiusAbsNm = static_cast<qreal>(radiusAbs->toNm());
+      const qreal y =
+          qBound(qreal(0.0), static_cast<qreal>(maxTolerance->toNm()),
+                 radiusAbsNm / qreal(4));
+      const qreal stepsPerRad = std::min(
+          qreal(0.5) / qAcos(1 - y / radiusAbsNm), radiusAbsNm / qreal(2));
+      const int steps = qCeil(stepsPerRad * angle.abs().toRad());
+
+      // create line segments
+      Path p;
+      p.addVertex(p1);
+      const qreal angleDelta = angle.toMicroDeg() / (qreal)steps;
+      for (int i = 1; i < steps; ++i) {
+        p.addVertex(p1.rotated(Angle(angleDelta * i), *center));
+      }
+      p.addVertex(p2);
+      return p;
+    }
   }
 
-  // calculate how many lines we need to create
-  qreal radiusAbsNm = static_cast<qreal>(radiusAbs.toNm());
-  qreal y = qBound(qreal(0.0), static_cast<qreal>(maxTolerance->toNm()),
-                   radiusAbsNm / qreal(4));
-  qreal stepsPerRad =
-      qMin(qreal(0.5) / qAcos(1 - y / radiusAbsNm), radiusAbsNm / qreal(2));
-  int steps = qCeil(stepsPerRad * angle.abs().toRad());
-
-  // some other very complex calculations...
-  qreal angleDelta = angle.toMicroDeg() / (qreal)steps;
-  Point center = Toolbox::arcCenter(p1, p2, angle);
-
-  // create line segments
-  Path p;
-  p.addVertex(p1);
-  for (int i = 1; i < steps; ++i) {
-    p.addVertex(p1.rotated(Angle(angleDelta * i), center));
-  }
-  p.addVertex(p2);
-  return p;
+  // By default, return a straight line segment.
+  return line(p1, p2);
 }
 
 QPainterPath Path::toQPainterPathPx(const QVector<Path>& paths,

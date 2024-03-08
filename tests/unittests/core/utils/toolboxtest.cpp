@@ -89,7 +89,7 @@ struct ToolboxArcCenterTestData {
   Point p1;
   Point p2;
   Angle angle;
-  Point center;
+  tl::optional<Point> center;
 };
 
 class ToolboxArcCenterTest
@@ -99,19 +99,29 @@ class ToolboxArcCenterTest
 TEST_P(ToolboxArcCenterTest, test) {
   const ToolboxArcCenterTestData& data = GetParam();
 
-  // On Windows, abort here and skip this test because on AppVeyor the result
-  // is slightly different. See discussion here:
-  // https://github.com/LibrePCB/LibrePCB/pull/511#issuecomment-529089212
-#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
-  GTEST_SKIP();
-#endif
+  const tl::optional<Point> actual =
+      Toolbox::arcCenter(data.p1, data.p2, data.angle);
+  ASSERT_EQ(data.center.has_value(), actual.has_value());
 
-  EXPECT_EQ(data.center, Toolbox::arcCenter(data.p1, data.p2, data.angle));
+  if (actual) {
+    // On Windows, accept small deviations since the results on CI are slightly
+    // different. See discussion here:
+    // https://github.com/LibrePCB/LibrePCB/pull/511#issuecomment-529089212
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+    EXPECT_LE(std::abs(actual->getX().toNm() - data.center->getX().toNm()), 5);
+    EXPECT_LE(std::abs(actual->getY().toNm() - data.center->getY().toNm()), 5);
+#else
+    EXPECT_EQ(*data.center, *actual);
+#endif
+  }
 }
 
 // clang-format off
 static ToolboxArcCenterTestData sToolboxArcCenterTestData[] = {
 // p1,                         p2,                         angle,              center
+  {Point(0, 0),                Point(0, 0),                Angle::deg0(),      tl::nullopt},
+  {Point(0, 0),                Point(0, 0),                Angle::fromDeg(20), tl::nullopt},
+  {Point(1000, 2000),          Point(5000, 4000),          Angle::deg0(),      tl::nullopt},
   {Point(47744137, 37820591),  Point(55364137, 24622364),  -Angle::deg90(),    Point(44955023, 27411478)},
   // Test to reproduce https://github.com/LibrePCB/LibrePCB/issues/974
   {Point(30875000, 32385000),  Point(26275000, 32385000),  -Angle::deg180(),   Point(28575000, 32385000)}

@@ -262,18 +262,18 @@ static TopoDS_Face pathToFace(const Path& path, const Length& z) {
     const gp_Pnt p1(v1.getPos().getX().toMm(), v1.getPos().getY().toMm(),
                     z.toMm());
     TopoDS_Edge edge;
-    if (v0.getAngle() == 0) {
-      edge = BRepBuilderAPI_MakeEdge(p0, p1);
-    } else {
-      const Point center =
-          Toolbox::arcCenter(v0.getPos(), v1.getPos(), v0.getAngle());
-      const Length radius =
-          Toolbox::arcRadius(v0.getPos(), v1.getPos(), v0.getAngle());
+    if (auto center =
+            Toolbox::arcCenter(v0.getPos(), v1.getPos(), v0.getAngle())) {
+      // Arc segment.
+      const UnsignedLength radiusAbs = (v0.getPos() - (*center)).getLength();
       gp_Circ arc(
-          gp_Ax2(gp_Pnt(center.getX().toMm(), center.getY().toMm(), z.toMm()),
+          gp_Ax2(gp_Pnt(center->getX().toMm(), center->getY().toMm(), z.toMm()),
                  gp_Dir(0.0, 0.0, (v0.getAngle() < 0) ? -1.0 : 1.0)),
-          radius.abs().toMm());
+          radiusAbs->toMm());
       edge = BRepBuilderAPI_MakeEdge(arc, p0, p1);
+    } else {
+      // Straight segment.
+      edge = BRepBuilderAPI_MakeEdge(p0, p1);
     }
     wire.Add(edge);
   }

@@ -203,13 +203,20 @@ void ExcellonGenerator::printRout(const NonEmptyPath& path) noexcept {
       printLinearInterpolation(v1.getPos());
     } else if (v0.getAngle().abs() > Angle::deg180()) {
       // Split arc as recommended in the XNC format specification from Ucamco.
-      const Angle halfAngle = v0.getAngle() / 2;
-      const Point center =
-          Toolbox::arcCenter(v0.getPos(), v1.getPos(), v0.getAngle());
-      const Point middlePos = v0.getPos().rotated(halfAngle, center);
-      printCircularInterpolation(v0.getPos(), middlePos, halfAngle);
-      printCircularInterpolation(middlePos, v1.getPos(),
-                                 v0.getAngle() - halfAngle);
+      if (auto center =
+              Toolbox::arcCenter(v0.getPos(), v1.getPos(), v0.getAngle())) {
+        const Angle halfAngle = v0.getAngle() / 2;
+        const Point middlePos = v0.getPos().rotated(halfAngle, *center);
+        printCircularInterpolation(v0.getPos(), middlePos, halfAngle);
+        printCircularInterpolation(middlePos, v1.getPos(),
+                                   v0.getAngle() - halfAngle);
+      } else {
+        // Fallback: Use single arc segment and hope the Excellon parser can
+        // handle it.
+        qCritical() << "Failed to split arc segment into two pieces for "
+                       "ExcellonGenerator export!";
+        printCircularInterpolation(v0.getPos(), v1.getPos(), v0.getAngle());
+      }
     } else {
       printCircularInterpolation(v0.getPos(), v1.getPos(), v0.getAngle());
     }
@@ -231,10 +238,15 @@ void ExcellonGenerator::printLinearInterpolation(const Point& pos) noexcept {
 void ExcellonGenerator::printCircularInterpolation(
     const Point& from, const Point& to, const Angle& angle) noexcept {
   const QString cmd = (angle < 0) ? "G02" : "G03";
-  const Length radius = Toolbox::arcRadius(from, to, angle).abs();
+  tl::optional<Length> radius = Toolbox::arcRadius(from, to, angle);
+  if (!radius) {
+    qCritical() << "Failed to calculate arc radius in ExcellonGenerator, will "
+                   "apply clipping.";
+    radius = Length::fromMm(1e6);
+  }
   mOutput.append(QString("%1X%2Y%3A%4\n")
                      .arg(cmd, to.getX().toMmString(), to.getY().toMmString(),
-                          radius.toMmString()));
+                          radius->abs().toMmString()));
 }
 
 void ExcellonGenerator::printFooter() noexcept {
