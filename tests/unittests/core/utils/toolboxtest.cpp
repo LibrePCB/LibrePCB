@@ -124,7 +124,9 @@ static ToolboxArcCenterTestData sToolboxArcCenterTestData[] = {
   {Point(1000, 2000),          Point(5000, 4000),          Angle::deg0(),      tl::nullopt},
   {Point(47744137, 37820591),  Point(55364137, 24622364),  -Angle::deg90(),    Point(44955023, 27411478)},
   // Test to reproduce https://github.com/LibrePCB/LibrePCB/issues/974
-  {Point(30875000, 32385000),  Point(26275000, 32385000),  -Angle::deg180(),   Point(28575000, 32385000)}
+  {Point(30875000, 32385000),  Point(26275000, 32385000),  -Angle::deg180(),   Point(28575000, 32385000)},
+  // Test to reproduce another case where small deviations were observed
+  {Point(-21401446, 16018901), Point(-23214523, 17264994), -Angle::deg180(),   Point(-22307985, 16641948)},
 };
 // clang-format on
 

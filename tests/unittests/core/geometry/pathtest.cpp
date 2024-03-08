@@ -413,6 +413,20 @@ TEST_F(PathTest, testFlatArc) {
   EXPECT_EQ(str(expected), str(actual));
 }
 
+// Test to reproduce another case where small deviations were observed
+TEST_F(PathTest, testFlatArc2) {
+  Path expected = Path({
+      Vertex(Point(-21401446, 16018901)),
+      Vertex(Point(-22394290, 15545339)),
+      Vertex(Point(-23300829, 16168386)),
+      Vertex(Point(-23214523, 17264994)),
+  });
+  Path actual =
+      Path::flatArc(Point(-21401446, 16018901), Point(-23214523, 17264994),
+                    -Angle::deg180(), PositiveLength(2000000));
+  EXPECT_EQ(str(expected), str(actual));
+}
+
 /*******************************************************************************
  *  Parametrized obround(width, height) Tests
  ******************************************************************************/
