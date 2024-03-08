@@ -66,7 +66,7 @@ public:
   EditorCommand() = delete;
   EditorCommand(const EditorCommand& other) = delete;
   EditorCommand(const QString& identifier, const char* text,
-                const char* description, const QIcon& icon, Flags flags,
+                const char* description, const QString& iconFp, Flags flags,
                 const QList<QKeySequence>& defaultKeySequences,
                 QObject* parent = nullptr) noexcept;
   ~EditorCommand() noexcept;

@@ -22,6 +22,8 @@
  ******************************************************************************/
 #include "editorcommand.h"
 
+#include "utils/editortoolbox.h"
+
 #include <QtCore>
 #include <QtWidgets>
 
@@ -31,12 +33,29 @@
 namespace librepcb {
 namespace editor {
 
+static bool enableDarkIcons() noexcept {
+  auto detect = []() {
+    // This environment variable should not actively be promoted, it is only
+    // here as a last resort if the auto-detection doesn't work for some users.
+    const QString override = qgetenv("LIBREPCB_DARK_ICONS");
+    if (override == "1") {
+      return true;
+    } else if (override == "0") {
+      return false;
+    } else {
+      return EditorToolbox::isWindowBackgroundDark();
+    }
+  };
+  static bool value = detect();
+  return value;
+}
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
 
 EditorCommand::EditorCommand(const QString& identifier, const char* text,
-                             const char* description, const QIcon& icon,
+                             const char* description, const QString& iconFp,
                              Flags flags,
                              const QList<QKeySequence>& defaultKeySequences,
                              QObject* parent) noexcept
@@ -46,11 +65,19 @@ EditorCommand::EditorCommand(const QString& identifier, const char* text,
     mText(text),
     mDescriptionNoTr(description),
     mDescription(description),
-    mIcon(icon),
+    mIcon(),
     mFlags(flags),
     mDefaultKeySequences(defaultKeySequences),
     mKeySequences(defaultKeySequences) {
   updateTranslations();
+
+  const QStringList splitFp = iconFp.split('.');
+  const QString darkIconFp = splitFp.first() % "_dark." % splitFp.last();
+  if (enableDarkIcons() && QFileInfo::exists(darkIconFp)) {
+    mIcon = QIcon(darkIconFp);
+  } else {
+    mIcon = QIcon(iconFp);
+  }
 }
 
 EditorCommand::~EditorCommand() noexcept {
