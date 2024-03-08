@@ -53,15 +53,21 @@
 #include "boardclipperpathgenerator.h"
 
 #include <QtCore>
+#include <thread>
+#include <mutex>
+
 
 /*******************************************************************************
  *  Namespace
  ******************************************************************************/
 namespace librepcb {
 
+
 /*******************************************************************************
  *  Constructors / Destructor
  ******************************************************************************/
+std::mutex messagemutex;
+volatile int progressTotal;
 
 BoardDesignRuleCheck::BoardDesignRuleCheck(
     Board& board, const BoardDesignRuleCheckSettings& settings,
@@ -83,6 +89,7 @@ BoardDesignRuleCheck::~BoardDesignRuleCheck() noexcept {
  ******************************************************************************/
 
 void BoardDesignRuleCheck::execute(bool quick) {
+  progressTotal = 0;
   emit started();
   emitProgress(2);
 
@@ -91,41 +98,64 @@ void BoardDesignRuleCheck::execute(bool quick) {
   mMessages.clear();
 
   if (!quick) {
-    rebuildPlanes(12);  // 10%
+    rebuildPlanes(10);  // 10%
   }
+ //create a pool of four threads for a quick check. Start each of them, then join after the slow check conditional block
+  std::thread quickpool [4] = {};
 
-  checkMinimumCopperWidth(14);  // 2%
+  //12
+  quickpool[0] = std::thread(&BoardDesignRuleCheck::checkMinimumCopperWidth,this,2);
+  quickpool[1] = std::thread(&BoardDesignRuleCheck::checkCopperCopperClearances,this,10);
+  quickpool[2] = std::thread(&BoardDesignRuleCheck::checkCopperBoardClearances,this,10);
+  quickpool[3] = std::thread(&BoardDesignRuleCheck::checkCopperHoleClearances,this,10);
+  //42
+  
+  /*checkMinimumCopperWidth(14);  // 2%
   checkCopperCopperClearances(24);  // 10%
   checkCopperBoardClearances(34);  // 10%
   checkCopperHoleClearances(44);  // 10%
+  */
 
   if (!quick) {
-    checkDrillDrillClearances(48);  // 4%
-    checkDrillBoardClearances(52);  // 4%
-    checkSilkscreenStopmaskClearances(56);  // 4%
-    checkMinimumPthAnnularRing(59);  // 3%
-    checkMinimumNpthDrillDiameter(61);  // 2%
-    checkMinimumNpthSlotWidth(63);  // 2%
-    checkMinimumPthDrillDiameter(65);  // 2%
-    checkMinimumPthSlotWidth(67);  // 2%
-    checkMinimumSilkscreenWidth(68);  // 1%
-    checkMinimumSilkscreenTextHeight(69);  // 1%
-    checkZones(72);  // 3%
-    checkVias(74);  // 2%
-    checkAllowedNpthSlots(75);  // 1%
-    checkAllowedPthSlots(76);  // 1%
-    checkInvalidPadConnections(78);  // 2%
-    checkDeviceClearances(88);  // 10%
-    checkBoardOutline(91);  // 3%
-    checkForUnplacedComponents(93);  // 2%
-    checkForMissingConnections(95);  // 2%
-    checkForStaleObjects(97);  // 2%
+    std::thread threadpool [20] = {};  
+      
+      
+    threadpool[0] = std::thread(&BoardDesignRuleCheck::checkDrillDrillClearances,this,4);//4%
+    threadpool[1] = std::thread(&BoardDesignRuleCheck::checkDrillBoardClearances,this,4);  // 4%
+    threadpool[2] = std::thread(&BoardDesignRuleCheck::checkSilkscreenStopmaskClearances,this,3);  // 4%
+    threadpool[3] = std::thread(&BoardDesignRuleCheck::checkMinimumPthAnnularRing,this,2);  // 3%
+    threadpool[4] = std::thread(&BoardDesignRuleCheck::checkMinimumNpthDrillDiameter,this,2);  // 2%
+    threadpool[5] = std::thread(&BoardDesignRuleCheck::checkMinimumNpthSlotWidth,this,2);  // 2%
+    threadpool[6] = std::thread(&BoardDesignRuleCheck::checkMinimumPthDrillDiameter,this,2);  // 2%
+    threadpool[7] = std::thread(&BoardDesignRuleCheck::checkMinimumPthSlotWidth,this,2);  // 2%
+    //63
+    threadpool[8] = std::thread(&BoardDesignRuleCheck::checkMinimumSilkscreenWidth,this,1);  // 1%
+    threadpool[9] = std::thread(&BoardDesignRuleCheck::checkMinimumSilkscreenTextHeight,this,1);  // 1%
+    threadpool[10] = std::thread(&BoardDesignRuleCheck::checkZones,this,3);  // 3%
+    threadpool[11] = std::thread(&BoardDesignRuleCheck::checkVias,this,2);  // 2%
+    threadpool[12] = std::thread(&BoardDesignRuleCheck::checkAllowedNpthSlots,this,1);  // 1%
+    threadpool[13] = std::thread(&BoardDesignRuleCheck::checkAllowedPthSlots,this,1);  // 1%
+    threadpool[14] = std::thread(&BoardDesignRuleCheck::checkInvalidPadConnections,this,2);  // 2%
+    threadpool[15] = std::thread(&BoardDesignRuleCheck::checkDeviceClearances,this,10);  // 10%
+    threadpool[16] = std::thread(&BoardDesignRuleCheck::checkBoardOutline,this,3);  // 3%
+    threadpool[17] = std::thread(&BoardDesignRuleCheck::checkForUnplacedComponents,this,2);  // 2%
+    threadpool[18] = std::thread(&BoardDesignRuleCheck::checkForMissingConnections,this,2);  // 2%
+    threadpool[19] = std::thread(&BoardDesignRuleCheck::checkForStaleObjects,this,2);
+    
+    for(int i=0;i<20;i++){
+      threadpool[i].join();
+    }
   }
+
+  for(int i=0;i<4;i++){
+    quickpool[i].join();
+  }
+
 
   emitStatus(
       tr("Finished with %1 message(s)!", "Count of messages", mMessages.count())
           .arg(mMessages.count()));
-  emitProgress(100);
+  emitProgress(8);
   emit finished();
 }
 
@@ -1987,20 +2017,28 @@ QVector<Path> BoardDesignRuleCheck::getHoleLocation(
 }
 
 void BoardDesignRuleCheck::emitProgress(int percent) noexcept {
-  mProgressPercent = percent;
-  emit progressPercent(percent);
+  messagemutex.lock();
+  progressTotal += percent;
+  mProgressPercent = progressTotal;
+  emit progressPercent(mProgressPercent);
+  messagemutex.unlock();
 }
 
 void BoardDesignRuleCheck::emitStatus(const QString& status) noexcept {
+  messagemutex.lock();
   mProgressStatus.append(status);
   emit progressStatus(status);
   qApp->processEvents();
+  messagemutex.unlock();
 }
 
 void BoardDesignRuleCheck::emitMessage(
     const std::shared_ptr<const RuleCheckMessage>& msg) noexcept {
+    messagemutex.lock();
+    
   mMessages.append(msg);
   emit progressMessage(msg->getMessage());
+    messagemutex.unlock();
 }
 
 QString BoardDesignRuleCheck::formatLength(
