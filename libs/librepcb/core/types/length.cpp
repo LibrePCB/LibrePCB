@@ -135,7 +135,9 @@ Length Length::max() noexcept {
 
 void Length::setLengthFromFloat(qreal nanometers) {
   checkRange(nanometers, true);  // Throws on range error.
-  mNanometers = qRound64(nanometers);
+  // Note: Don't use qRound() because in Qt5 it is implemented strange.
+  mNanometers = (nanometers >= 0.0) ? qint64(nanometers + qreal(0.5))
+                                    : qint64(nanometers - qreal(0.5));
 }
 
 /*******************************************************************************
