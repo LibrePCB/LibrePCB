@@ -60,6 +60,8 @@ PartInformationToolTip::PartInformationToolTip(
 
   // Set up stylesheet.
   mWaitingSpinner->setColor(Qt::darkGray);
+  mUi->line->setStyleSheet("border-top: 0.5px solid darkgray;");
+  mUi->lblPicture->setStyleSheet("border: 0.5px solid darkgray;");
   setStyleSheet(QString("QWidget{"
                         " background-color: #FFFFCA;"
                         " color: black;"
@@ -69,6 +71,8 @@ PartInformationToolTip::PartInformationToolTip(
                         " border-right: 1px solid gray; "
                         " border-top: 1px solid gray;"
                         " border-bottom: 1px solid gray;"
+                        " padding: 0px;"
+                        " margin: 0px;"
                         "};")
                     .arg(sWindowArrowSize + 1));
 
