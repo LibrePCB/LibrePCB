@@ -49,7 +49,7 @@ option(BUILD_DISALLOW_WARNINGS
 )
 option(BUILD_QTQUICK_TEST "Build the QML test window." ON)
 option(UNBUNDLE_DXFLIB "Don't use vendored dxflib library." OFF)
-option(UNBUNDLE_FONTOBENE_QT5 "Don't use vendored FontoBeneQt5 library." OFF)
+option(UNBUNDLE_FONTOBENE_QT "Don't use vendored FontoBeneQt library." OFF)
 option(UNBUNDLE_GTEST "Don't use vendored GoogleTest library." OFF)
 option(UNBUNDLE_HOEDOWN "Don't use vendored Hoedown library." OFF)
 option(UNBUNDLE_MUPARSER "Don't use vendored MuParser library." OFF)
@@ -58,6 +58,17 @@ option(UNBUNDLE_QUAZIP "Don't use vendored QuaZip library." OFF)
 option(UNBUNDLE_ALL "Don't use any vendored library." OFF)
 option(USE_GLU "Include features depending on OpenGL Utility Library (GLU)." ON)
 option(USE_OPENCASCADE "Include features depending on OpenCascade." ON)
+
+# Deprecated options
+if(UNBUNDLE_FONTOBENE_QT5)
+  message(
+    WARNING
+      "Option 'UNBUNDLE_FONTOBENE_QT5' is deprecated and will be removed in \
+      the next release. Please replace the dependency fontobene-qt5 by its \
+      successor fontobene-qt and use the new option 'UNBUNDLE_FONTOBENE_QT'."
+  )
+  set(UNBUNDLE_FONTOBENE_QT ${UNBUNDLE_FONTOBENE_QT5})
+endif()
 
 # Create a release build by default
 include(DefaultBuildType)
@@ -155,10 +166,13 @@ if(BUILD_TESTS)
 endif()
 message(STATUS "Building with Qt${Qt5Core_VERSION}")
 
+# For the ParsEagle library, use the same Qt version as for LibrePCB
+set(PARSEAGLE_QT_MAJOR_VERSION 5)
+
 # Find third party libraries
 find_package(DelaunayTriangulation REQUIRED)
 find_package(Dxflib REQUIRED)
-find_package(FontoBeneQt5 REQUIRED)
+find_package(FontoBeneQt REQUIRED)
 find_package(GLU REQUIRED)
 find_package(MuParser REQUIRED)
 find_package(OpenCascade REQUIRED)

@@ -521,7 +521,7 @@ target_link_libraries(
           OpenCascade::OpenCascade
           DelaunayTriangulation::DelaunayTriangulation
           Dxflib::Dxflib
-          FontoBene::FontoBeneQt5
+          FontoBene::FontoBeneQt
           MuParser::MuParser
           QuaZip::QuaZip
 )

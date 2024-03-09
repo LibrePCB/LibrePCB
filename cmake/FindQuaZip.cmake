@@ -5,6 +5,21 @@ if(EXISTS "${QUAZIP_SUBMODULE_BASEPATH}"
 )
   message(STATUS "Using vendored QuaZip")
 
+  # Use same Qt version as for LibrePCB
+  set(QUAZIP_QT_MAJOR_VERSION 5)
+
+  # We don't need bzip2 (do we?)
+  set(QUAZIP_BZIP2
+      OFF
+      CACHE BOOL "" FORCE
+  )
+
+  # Use Qt embedded ZLib as this simplifies deployment
+  set(QUAZIP_USE_QT_ZLIB
+      ON
+      CACHE STRING "" FORCE
+  )
+
   # We don't need to support installation when using the lib as a submodule
   set(QUAZIP_INSTALL
       OFF

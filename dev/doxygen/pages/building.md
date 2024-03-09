@@ -176,7 +176,7 @@ By default, all dependencies except Qt and OpenCascade will be linked
 statically using vendored git submodules. If you prefer to unbundle some
 libraries, set the `UNBUNDLE_xxx` variable:
 
-    cmake .. -DUNBUNDLE_FONTOBENE_QT5=1 -DUNBUNDLE_POLYCLIPPING=1
+    cmake .. -DUNBUNDLE_FONTOBENE_QT=1 -DUNBUNDLE_POLYCLIPPING=1
 
 To unbundle all dependencies that support it, use `-DUNBUNDLE_ALL=1`.
 
@@ -185,7 +185,7 @@ Right now, the following libraries can be unbundled:
 | Library | Parameter | Search Methods |
 |-|-|-|
 | [dxflib] | `UNBUNDLE_DXFLIB` | `pkg-config` |
-| [fontobene-qt5] | `UNBUNDLE_FONTOBENE_QT5` | `pkg-config`, `find_path` |
+| [fontobene-qt] | `UNBUNDLE_FONTOBENE_QT` | `pkg-config`, `find_path` |
 | [googletest] | `UNBUNDLE_GTEST` | `cmake`, `pkg-config` |
 | [hoedown] ¹ | `UNBUNDLE_HOEDOWN` | `pkg-config` |
 | [muparser] | `UNBUNDLE_MUPARSER` | `cmake`, `pkg-config` |
@@ -193,7 +193,7 @@ Right now, the following libraries can be unbundled:
 | [quazip] ² | `UNBUNDLE_QUAZIP` | `cmake` |
 
 [dxflib]: https://www.qcad.org/en/90-dxflib
-[fontobene-qt5]: https://github.com/fontobene/fontobene-qt5/
+[fontobene-qt]: https://github.com/fontobene/fontobene-qt/
 [googletest]: https://github.com/google/googletest
 [hoedown]: https://github.com/hoedown/hoedown
 [muparser]: https://github.com/beltoforion/muparser
