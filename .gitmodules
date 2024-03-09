@@ -13,9 +13,9 @@
 [submodule "libs/parseagle"]
     path = libs/parseagle
     url = https://github.com/LibrePCB/parseagle.git
-[submodule "libs/fontobene"]
-    path = libs/fontobene-qt5
-    url = https://github.com/fontobene/fontobene-qt5.git
+[submodule "libs/fontobene-qt"]
+    path = libs/fontobene-qt
+    url = https://github.com/fontobene/fontobene-qt.git
 [submodule "share/librepcb/fontobene"]
     path = share/librepcb/fontobene
     url = https://github.com/LibrePCB/fontobene-fonts.git

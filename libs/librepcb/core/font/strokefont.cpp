@@ -22,8 +22,14 @@
  ******************************************************************************/
 #include "strokefont.h"
 
+#if FONTOBENE_QT5
+#warning "Using legacy fontobene-qt5, please replace it by fontobene-qt."
 #include <fontobene-qt5/font.h>
 #include <fontobene-qt5/glyphlistaccessor.h>
+#else
+#include <fontobene-qt/font.h>
+#include <fontobene-qt/glyphlistaccessor.h>
+#endif
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore>
