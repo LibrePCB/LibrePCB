@@ -157,6 +157,42 @@ INSTANTIATE_TEST_SUITE_P(LengthMappedToGrid, LengthMappedToGrid, ::testing::Valu
 // clang-format on
 
 /*******************************************************************************
+ *  Tests for fromMm(float)
+ ******************************************************************************/
+
+struct LengthFromMmTestData {
+  qreal input;
+  Length output;
+};
+
+class LengthFromMmTest : public ::testing::TestWithParam<LengthFromMmTestData> {
+};
+
+TEST_P(LengthFromMmTest, test) {
+  const LengthFromMmTestData& data = GetParam();
+
+  const Length actual = Length::fromMm(data.input);
+
+  // On Windows, accept small deviations since the results on CI are slightly
+  // different. See discussion here:
+  // https://github.com/LibrePCB/LibrePCB/pull/511#issuecomment-529089212
+#if defined(Q_OS_WIN32) || defined(Q_OS_WIN64)
+  EXPECT_LE(std::abs(actual.toNm() - data.output.toNm()), 5);
+#else
+  EXPECT_EQ(data.output.toNm(), actual.toNm());
+#endif
+}
+
+// clang-format off
+INSTANTIATE_TEST_SUITE_P(LengthFromMmTest, LengthFromMmTest, ::testing::Values(
+    //                   {input,       output            }
+    LengthFromMmTestData({0,           Length(0)         }),
+    LengthFromMmTestData({-22.3079845, Length(-22307985) }),
+    LengthFromMmTestData({16.6419475,  Length(16641948)  })
+));
+// clang-format on
+
+/*******************************************************************************
  *  End of File
  ******************************************************************************/
 

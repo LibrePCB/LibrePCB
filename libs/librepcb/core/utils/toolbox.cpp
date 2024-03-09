@@ -61,44 +61,51 @@ QPainterPath Toolbox::shapeFromPath(const QPainterPath& path, const QPen& pen,
   }
 }
 
-Length Toolbox::arcRadius(const Point& p1, const Point& p2,
-                          const Angle& a) noexcept {
-  if (a == 0) {
-    return Length(0);
-  } else {
-    qreal x1 = p1.getX().toMm();
-    qreal y1 = p1.getY().toMm();
-    qreal x2 = p2.getX().toMm();
-    qreal y2 = p2.getY().toMm();
-    qreal angle = a.mappedTo180deg().toRad();
-    qreal d = qSqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-    qreal r = d / (2 * qSin(angle / 2));
+tl::optional<Length> Toolbox::arcRadius(const Point& p1, const Point& p2,
+                                        const Angle& angle) noexcept {
+  const Angle angleMapped = angle.mappedTo180deg();
+  if ((angleMapped == 0) || (p1 == p2)) {
+    return tl::nullopt;  // Given input is a straight line.
+  }
+
+  const qreal x1 = p1.getX().toMm();
+  const qreal y1 = p1.getY().toMm();
+  const qreal x2 = p2.getX().toMm();
+  const qreal y2 = p2.getY().toMm();
+  const qreal d = std::sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+  const qreal r = d / (2 * std::sin(angleMapped.toRad() / 2));
+  if (Length::isValidMm(r)) {
     return Length::fromMm(r);
+  } else {
+    return tl::nullopt;  // Too large radius.
   }
 }
 
-Point Toolbox::arcCenter(const Point& p1, const Point& p2,
-                         const Angle& a) noexcept {
-  if (a == 0) {
-    // there is no arc center...just return the middle of start- and endpoint
-    return (p1 + p2) / 2;
-  } else {
-    // http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
-    qreal x0 = p1.getX().toMm();
-    qreal y0 = p1.getY().toMm();
-    qreal x1 = p2.getX().toMm();
-    qreal y1 = p2.getY().toMm();
-    qreal angle = a.mappedTo180deg().toRad();
-    qreal angleSgn = (angle >= 0) ? 1 : -1;
-    qreal d = qSqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
-    qreal r = d / (2 * qSin(angle / 2));
-    // Note: std::max() fixes https://github.com/LibrePCB/LibrePCB/issues/974
-    qreal h = qSqrt(std::max(r * r - d * d / 4.0, qreal(0)));
-    qreal u = (x1 - x0) / d;
-    qreal v = (y1 - y0) / d;
-    qreal a = ((x0 + x1) / 2) - h * v * angleSgn;
-    qreal b = ((y0 + y1) / 2) + h * u * angleSgn;
+tl::optional<Point> Toolbox::arcCenter(const Point& p1, const Point& p2,
+                                       const Angle& angle) noexcept {
+  const Angle angleMapped = angle.mappedTo180deg();
+  if ((angleMapped == 0) || (p1 == p2)) {
+    return tl::nullopt;  // Given input is a straight line.
+  }
+
+  // http://math.stackexchange.com/questions/27535/how-to-find-center-of-an-arc-given-start-point-end-point-radius-and-arc-direc
+  const qreal x0 = p1.getX().toMm();
+  const qreal y0 = p1.getY().toMm();
+  const qreal x1 = p2.getX().toMm();
+  const qreal y1 = p2.getY().toMm();
+  const qreal angleSgn = (angleMapped >= 0) ? 1 : -1;
+  const qreal d = std::sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+  const qreal r = d / (2 * std::sin(angleMapped.toRad() / 2));
+  // Note: std::max() fixes https://github.com/LibrePCB/LibrePCB/issues/974
+  const qreal h = std::sqrt(std::max(r * r - d * d / 4.0, qreal(0)));
+  const qreal u = (x1 - x0) / d;
+  const qreal v = (y1 - y0) / d;
+  const qreal a = ((x0 + x1) / 2) - h * v * angleSgn;
+  const qreal b = ((y0 + y1) / 2) + h * u * angleSgn;
+  if (Length::isValidMm(a) && Length::isValidMm(b)) {
     return Point::fromMm(a, b);
+  } else {
+    return tl::nullopt;  // Center too far away, consider it as a straight line.
   }
 }
 
@@ -109,8 +116,8 @@ Angle Toolbox::arcAngle(const Point& p1, const Point& p2,
   if (delta1.isOrigin() || delta2.isOrigin()) {
     return Angle::deg0();
   }
-  qreal angle1 = qAtan2(delta1.getY().toMm(), delta1.getX().toMm());
-  qreal angle2 = qAtan2(delta2.getY().toMm(), delta2.getX().toMm());
+  qreal angle1 = std::atan2(delta1.getY().toMm(), delta1.getX().toMm());
+  qreal angle2 = std::atan2(delta2.getY().toMm(), delta2.getX().toMm());
   return Angle::fromRad(angle2 - angle1).mapTo0_360deg();
 }
 
@@ -119,7 +126,7 @@ Angle Toolbox::angleBetweenPoints(const Point& p1, const Point& p2) noexcept {
   if (delta.isOrigin()) {
     return Angle::deg0();
   }
-  return Angle::fromRad(qAtan2(delta.getY().toMm(), delta.getX().toMm()))
+  return Angle::fromRad(std::atan2(delta.getY().toMm(), delta.getX().toMm()))
       .mapTo0_360deg();
 }
 

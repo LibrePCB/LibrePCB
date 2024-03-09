@@ -127,7 +127,10 @@ public:
    * and so on.
    */
   void setAngleDeg(qreal degrees) noexcept {
-    setAngleMicroDeg(qRound(std::fmod(degrees * 1e6, 360e6)));
+    const qreal value = std::fmod(degrees * 1e6, 360e6);
+    // Note: Don't use qRound() because in Qt5 it is implemented strange.
+    setAngleMicroDeg((value >= 0.0) ? qint64(value + qreal(0.5))
+                                    : qint64(value - qreal(0.5)));
   }
 
   /**

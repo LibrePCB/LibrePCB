@@ -428,8 +428,8 @@ void MeasureTool::updateRulerPositions() noexcept {
 
   const Point diff = endPos - startPos;
   const UnsignedLength length = diff.getLength();
-  const Angle angle =
-      Angle::fromRad(qAtan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()));
+  const Angle angle = Angle::fromRad(
+      std::atan2(diff.toMmQPointF().y(), diff.toMmQPointF().x()));
   int decimals = mUnit.getReasonableNumberOfDecimals() + 1;
 
   QString text;

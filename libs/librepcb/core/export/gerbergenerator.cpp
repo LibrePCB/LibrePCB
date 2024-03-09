@@ -503,20 +503,19 @@ void GerberGenerator::circularInterpolateToPosition(const Point& start,
 
 void GerberGenerator::interpolateBetween(const Vertex& from,
                                          const Vertex& to) noexcept {
-  if (from.getAngle() == 0) {
-    // linear segment
-    linearInterpolateToPosition(to.getPos());
-  } else {
+  if (auto center =
+          Toolbox::arcCenter(from.getPos(), to.getPos(), from.getAngle())) {
     // arc segment
     if (from.getAngle() < 0) {
       switchToCircularCwInterpolationModeG02();
     } else {
       switchToCircularCcwInterpolationModeG03();
     }
-    Point center =
-        Toolbox::arcCenter(from.getPos(), to.getPos(), from.getAngle());
-    circularInterpolateToPosition(from.getPos(), center, to.getPos());
+    circularInterpolateToPosition(from.getPos(), *center, to.getPos());
     switchToLinearInterpolationModeG01();
+  } else {
+    // linear segment
+    linearInterpolateToPosition(to.getPos());
   }
 }
 

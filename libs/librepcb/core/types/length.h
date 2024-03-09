@@ -356,6 +356,18 @@ public:
   // Static Functions
 
   /**
+   * @brief Check if a float value in millimeters is in the allowed range
+   *
+   * @param millimeters   The value to check
+   *
+   * @retval true   Value is valid, can construct a #Length from it.
+   * @retval false  Value is invalid, constructing a #Length would throw.
+   */
+  static bool isValidMm(qreal millimeters) noexcept {
+    return checkRange(millimeters * 1e6);
+  }
+
+  /**
    * @brief Get a Length object with a specific length and map it to a specific
    * grid
    *
@@ -580,6 +592,18 @@ private:
   void setLengthFromFloat(qreal nanometers);
 
   // Private Static Functions
+
+  /**
+   * @brief Check if a float value in nanometers is in the allowed range
+   *
+   * @param nanometers    The value to check
+   * @param doThrow       If true, throw a ::librepcb::RangeError if out of
+   *                      range instead of returning the result
+   *
+   * @retval true   Value is valid, can construct a #Length from it.
+   * @retval false  Value is invalid, constructing a #Length would throw.
+   */
+  static bool checkRange(qreal nanometers, bool doThrow = false);
 
   /**
    * @brief Map a length in nanometers to a grid interval in nanometers
