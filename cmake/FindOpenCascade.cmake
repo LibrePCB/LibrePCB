@@ -1,6 +1,3 @@
-# Specify OpenCascade libraries needed for LibrePCB
-set(OCC_LIBRARIES TKXCAF TKXDESTEP)
-
 # Add library
 add_library(open_cascade INTERFACE)
 add_library(OpenCascade::OpenCascade ALIAS open_cascade)
@@ -15,7 +12,22 @@ endif()
 # Try to find OCCT shared library on the system
 find_package(OpenCASCADE CONFIG QUIET)
 if(OpenCASCADE_FOUND)
-  message(STATUS "Using system OpenCASCADE (OCCT)")
+  message(STATUS "Using system OpenCASCADE (OCCT ${OpenCASCADE_VERSION})")
+
+  # Specify OpenCascade libraries needed for LibrePCB
+  # https://github.com/LibrePCB/LibrePCB/issues/1315
+  if(OpenCASCADE_VERSION VERSION_GREATER 7.8.0)
+    set(OCC_LIBRARIES TKCAF TKDESTEP)
+  elseif(OpenCASCADE_VERSION VERSION_EQUAL 7.8.0)
+    message(
+      FATAL_ERROR
+        "Cannot use OpenCascade 7.8.0 because it contains a critical bug. \
+        Please use a different version (or if this is not possible, try OCE \
+        instead of OCCT)."
+    )
+  else()
+    set(OCC_LIBRARIES TKXCAF TKXDESTEP)
+  endif()
 
   # Populate target
   target_include_directories(
@@ -32,7 +44,10 @@ endif()
 # Try to find OCE shared library on the system
 find_package(OCE CONFIG QUIET)
 if(OCE_FOUND)
-  message(STATUS "Using system OpenCASCADE (OCE)")
+  message(STATUS "Using system OpenCASCADE (OCE ${OCE_VERSION})")
+
+  # Specify OpenCascade libraries needed for LibrePCB
+  set(OCC_LIBRARIES TKXCAF TKXDESTEP)
 
   # Populate target
   target_include_directories(
